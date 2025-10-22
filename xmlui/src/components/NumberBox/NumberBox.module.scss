@@ -12,53 +12,293 @@ $themeVars: (
 $componentName: "NumberBox";
 $themeVars: t.composePaddingVars($themeVars, $componentName);
 
+// Generic NumberBox variables
+$gap-adornment-NumberBox: createThemeVar("Input:gap-adornment-#{$componentName}");
+$backgroundColor-NumberBox--disabled: createThemeVar("Input:backgroundColor-NumberBox--disabled");
+$textColor-NumberBox--disabled: createThemeVar("Input:textColor-NumberBox--disabled");
+$borderColor-NumberBox--disabled: createThemeVar("Input:borderColor-NumberBox--disabled");
+
+// Default variant variables
+$borderRadius-NumberBox-default: createThemeVar("Input:borderRadius-#{$componentName}-default");
+$borderColor-NumberBox-default: createThemeVar("Input:borderColor-#{$componentName}-default");
+$borderWidth-NumberBox-default: createThemeVar("Input:borderWidth-#{$componentName}-default");
+$borderStyle-NumberBox-default: createThemeVar("Input:borderStyle-#{$componentName}-default");
+$fontSize-NumberBox-default: createThemeVar("Input:fontSize-#{$componentName}-default");
+$backgroundColor-NumberBox-default: createThemeVar("Input:backgroundColor-#{$componentName}-default");
+$boxShadow-NumberBox-default: createThemeVar("Input:boxShadow-#{$componentName}-default");
+$textColor-NumberBox-default: createThemeVar("Input:textColor-#{$componentName}-default");
+$borderColor-NumberBox-default--hover: createThemeVar("Input:borderColor-#{$componentName}-default--hover");
+$backgroundColor-NumberBox-default--hover: createThemeVar("Input:backgroundColor-#{$componentName}-default--hover");
+$boxShadow-NumberBox-default--hover: createThemeVar("Input:boxShadow-#{$componentName}-default--hover");
+$textColor-NumberBox-default--hover: createThemeVar("Input:textColor-#{$componentName}-default--hover");
+$borderColor-NumberBox-default--focus: createThemeVar("Input:borderColor-#{$componentName}-default--focus");
+$backgroundColor-NumberBox-default--focus: createThemeVar("Input:backgroundColor-#{$componentName}-default--focus");
+$boxShadow-NumberBox-default--focus: createThemeVar("Input:boxShadow-#{$componentName}-default--focus");
+$textColor-NumberBox-default--focus: createThemeVar("Input:textColor-#{$componentName}-default--focus");
+$outlineWidth-NumberBox-default--focus: createThemeVar("Input:outlineWidth-#{$componentName}-default--focus");
+$outlineColor-NumberBox-default--focus: createThemeVar("Input:outlineColor-#{$componentName}-default--focus");
+$outlineStyle-NumberBox-default--focus: createThemeVar("Input:outlineStyle-#{$componentName}-default--focus");
+$outlineOffset-NumberBox-default--focus: createThemeVar("Input:outlineOffset-#{$componentName}-default--focus");
+$textColor-placeholder-NumberBox-default: createThemeVar("Input:textColor-placeholder-#{$componentName}-default");
+$fontSize-placeholder-NumberBox-default: createThemeVar("Input:fontSize-placeholder-#{$componentName}-default");
+$color-adornment-NumberBox-default: createThemeVar("Input:color-adornment-#{$componentName}-default");
+
+// Error variant variables
+$borderRadius-NumberBox-error: createThemeVar("Input:borderRadius-#{$componentName}-error");
+$borderColor-NumberBox-error: createThemeVar("Input:borderColor-#{$componentName}-error");
+$borderWidth-NumberBox-error: createThemeVar("Input:borderWidth-#{$componentName}-error");
+$borderStyle-NumberBox-error: createThemeVar("Input:borderStyle-#{$componentName}-error");
+$fontSize-NumberBox-error: createThemeVar("Input:fontSize-#{$componentName}-error");
+$backgroundColor-NumberBox-error: createThemeVar("Input:backgroundColor-#{$componentName}-error");
+$boxShadow-NumberBox-error: createThemeVar("Input:boxShadow-#{$componentName}-error");
+$textColor-NumberBox-error: createThemeVar("Input:textColor-#{$componentName}-error");
+$borderColor-NumberBox-error--hover: createThemeVar("Input:borderColor-#{$componentName}-error--hover");
+$backgroundColor-NumberBox-error--hover: createThemeVar("Input:backgroundColor-#{$componentName}-error--hover");
+$boxShadow-NumberBox-error--hover: createThemeVar("Input:boxShadow-#{$componentName}-error--hover");
+$textColor-NumberBox-error--hover: createThemeVar("Input:textColor-#{$componentName}-error--hover");
+$borderColor-NumberBox-error--focus: createThemeVar("Input:borderColor-#{$componentName}-error--focus");
+$backgroundColor-NumberBox-error--focus: createThemeVar("Input:backgroundColor-#{$componentName}-error--focus");
+$boxShadow-NumberBox-error--focus: createThemeVar("Input:boxShadow-#{$componentName}-error--focus");
+$textColor-NumberBox-error--focus: createThemeVar("Input:textColor-#{$componentName}-error--focus");
+$outlineWidth-NumberBox-error--focus: createThemeVar("Input:outlineWidth-#{$componentName}-error--focus");
+$outlineColor-NumberBox-error--focus: createThemeVar("Input:outlineColor-#{$componentName}-error--focus");
+$outlineStyle-NumberBox-error--focus: createThemeVar("Input:outlineStyle-#{$componentName}-error--focus");
+$outlineOffset-NumberBox-error--focus: createThemeVar("Input:outlineOffset-#{$componentName}-error--focus");
+$textColor-placeholder-NumberBox-error: createThemeVar("Input:textColor-placeholder-#{$componentName}-error");
+$fontSize-placeholder-NumberBox-error: createThemeVar("Input:fontSize-placeholder-#{$componentName}-error");
+$color-adornment-NumberBox-error: createThemeVar("Input:color-adornment-#{$componentName}-error");
+
+// Warning variant variables
+$borderRadius-NumberBox-warning: createThemeVar("Input:borderRadius-#{$componentName}-warning");
+$borderColor-NumberBox-warning: createThemeVar("Input:borderColor-#{$componentName}-warning");
+$borderWidth-NumberBox-warning: createThemeVar("Input:borderWidth-#{$componentName}-warning");
+$borderStyle-NumberBox-warning: createThemeVar("Input:borderStyle-#{$componentName}-warning");
+$fontSize-NumberBox-warning: createThemeVar("Input:fontSize-#{$componentName}-warning");
+$backgroundColor-NumberBox-warning: createThemeVar("Input:backgroundColor-#{$componentName}-warning");
+$boxShadow-NumberBox-warning: createThemeVar("Input:boxShadow-#{$componentName}-warning");
+$textColor-NumberBox-warning: createThemeVar("Input:textColor-#{$componentName}-warning");
+$borderColor-NumberBox-warning--hover: createThemeVar("Input:borderColor-#{$componentName}-warning--hover");
+$backgroundColor-NumberBox-warning--hover: createThemeVar("Input:backgroundColor-#{$componentName}-warning--hover");
+$boxShadow-NumberBox-warning--hover: createThemeVar("Input:boxShadow-#{$componentName}-warning--hover");
+$textColor-NumberBox-warning--hover: createThemeVar("Input:textColor-#{$componentName}-warning--hover");
+$borderColor-NumberBox-warning--focus: createThemeVar("Input:borderColor-#{$componentName}-warning--focus");
+$backgroundColor-NumberBox-warning--focus: createThemeVar("Input:backgroundColor-#{$componentName}-warning--focus");
+$boxShadow-NumberBox-warning--focus: createThemeVar("Input:boxShadow-#{$componentName}-warning--focus");
+$textColor-NumberBox-warning--focus: createThemeVar("Input:textColor-#{$componentName}-warning--focus");
+$outlineWidth-NumberBox-warning--focus: createThemeVar("Input:outlineWidth-#{$componentName}-warning--focus");
+$outlineColor-NumberBox-warning--focus: createThemeVar("Input:outlineColor-#{$componentName}-warning--focus");
+$outlineStyle-NumberBox-warning--focus: createThemeVar("Input:outlineStyle-#{$componentName}-warning--focus");
+$outlineOffset-NumberBox-warning--focus: createThemeVar("Input:outlineOffset-#{$componentName}-warning--focus");
+$textColor-placeholder-NumberBox-warning: createThemeVar("Input:textColor-placeholder-#{$componentName}-warning");
+$fontSize-placeholder-NumberBox-warning: createThemeVar("Input:fontSize-placeholder-#{$componentName}-warning");
+$color-adornment-NumberBox-warning: createThemeVar("Input:color-adornment-#{$componentName}-warning");
+
+// Success variant variables
+$borderRadius-NumberBox-success: createThemeVar("Input:borderRadius-#{$componentName}-success");
+$borderColor-NumberBox-success: createThemeVar("Input:borderColor-#{$componentName}-success");
+$borderWidth-NumberBox-success: createThemeVar("Input:borderWidth-#{$componentName}-success");
+$borderStyle-NumberBox-success: createThemeVar("Input:borderStyle-#{$componentName}-success");
+$fontSize-NumberBox-success: createThemeVar("Input:fontSize-#{$componentName}-success");
+$backgroundColor-NumberBox-success: createThemeVar("Input:backgroundColor-#{$componentName}-success");
+$boxShadow-NumberBox-success: createThemeVar("Input:boxShadow-#{$componentName}-success");
+$textColor-NumberBox-success: createThemeVar("Input:textColor-#{$componentName}-success");
+$borderColor-NumberBox-success--hover: createThemeVar("Input:borderColor-#{$componentName}-success--hover");
+$backgroundColor-NumberBox-success--hover: createThemeVar("Input:backgroundColor-#{$componentName}-success--hover");
+$boxShadow-NumberBox-success--hover: createThemeVar("Input:boxShadow-#{$componentName}-success--hover");
+$textColor-NumberBox-success--hover: createThemeVar("Input:textColor-#{$componentName}-success--hover");
+$borderColor-NumberBox-success--focus: createThemeVar("Input:borderColor-#{$componentName}-success--focus");
+$backgroundColor-NumberBox-success--focus: createThemeVar("Input:backgroundColor-#{$componentName}-success--focus");
+$boxShadow-NumberBox-success--focus: createThemeVar("Input:boxShadow-#{$componentName}-success--focus");
+$textColor-NumberBox-success--focus: createThemeVar("Input:textColor-#{$componentName}-success--focus");
+$outlineWidth-NumberBox-success--focus: createThemeVar("Input:outlineWidth-#{$componentName}-success--focus");
+$outlineColor-NumberBox-success--focus: createThemeVar("Input:outlineColor-#{$componentName}-success--focus");
+$outlineStyle-NumberBox-success--focus: createThemeVar("Input:outlineStyle-#{$componentName}-success--focus");
+$outlineOffset-NumberBox-success--focus: createThemeVar("Input:outlineOffset-#{$componentName}-success--focus");
+$textColor-placeholder-NumberBox-success: createThemeVar("Input:textColor-placeholder-#{$componentName}-success");
+$fontSize-placeholder-NumberBox-success: createThemeVar("Input:fontSize-placeholder-#{$componentName}-success");
+$color-adornment-NumberBox-success: createThemeVar("Input:color-adornment-#{$componentName}-success");
+
 // --- CSS properties of a particular NumberBox variant
 @mixin variant($variantName) {
-  border-radius: createThemeVar("Input:borderRadius-#{$componentName}-#{$variantName}");
-  border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}");
-  border-width: createThemeVar("Input:borderWidth-#{$componentName}-#{$variantName}");
-  border-style: createThemeVar("Input:borderStyle-#{$componentName}-#{$variantName}");
-  font-size: createThemeVar("Input:fontSize-#{$componentName}-#{$variantName}");
+  @if $variantName == "default" {
+    border-radius: $borderRadius-NumberBox-default;
+    border-color: $borderColor-NumberBox-default;
+    border-width: $borderWidth-NumberBox-default;
+    border-style: $borderStyle-NumberBox-default;
+    font-size: $fontSize-NumberBox-default;
+    background-color: $backgroundColor-NumberBox-default;
+    box-shadow: $boxShadow-NumberBox-default;
+    color: $textColor-NumberBox-default;
 
-  background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}");
-  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
-  color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}");
-
-  &:hover {
-    border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--hover");
-    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--hover"
-    );
-    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
-    color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--hover");
-  }
-
-  &:focus-within {
-    border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--focus");
-    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--focus"
-    );
-    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--focus");
-    color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--focus");
-  }
-
-  &:has(.input:focus-visible) {
-    outline-width: createThemeVar("Input:outlineWidth-#{$componentName}-#{$variantName}--focus");
-    outline-color: createThemeVar("Input:outlineColor-#{$componentName}-#{$variantName}--focus");
-    outline-style: createThemeVar("Input:outlineStyle-#{$componentName}-#{$variantName}--focus");
-    outline-offset: createThemeVar("Input:outlineOffset-#{$componentName}-#{$variantName}--focus");
-  }
-
-  .input {
-    &::placeholder {
-      color: createThemeVar("Input:textColor-placeholder-#{$componentName}-#{$variantName}");
-      font-size: createThemeVar("Input:fontSize-placeholder-#{$componentName}-#{$variantName}");
+    &:hover {
+      border-color: $borderColor-NumberBox-default--hover;
+      background-color: $backgroundColor-NumberBox-default--hover;
+      box-shadow: $boxShadow-NumberBox-default--hover;
+      color: $textColor-NumberBox-default--hover;
     }
-  }
 
-  .adornment {
-    color: createThemeVar("Input:color-adornment-#{$componentName}-#{$variantName}");
+    &:focus-within {
+      border-color: $borderColor-NumberBox-default--focus;
+      background-color: $backgroundColor-NumberBox-default--focus;
+      box-shadow: $boxShadow-NumberBox-default--focus;
+      color: $textColor-NumberBox-default--focus;
+    }
 
-    * {
-      color: inherit;
+    &:has(.input:focus-visible) {
+      outline-width: $outlineWidth-NumberBox-default--focus;
+      outline-color: $outlineColor-NumberBox-default--focus;
+      outline-style: $outlineStyle-NumberBox-default--focus;
+      outline-offset: $outlineOffset-NumberBox-default--focus;
+    }
+
+    .input {
+      &::placeholder {
+        color: $textColor-placeholder-NumberBox-default;
+        font-size: $fontSize-placeholder-NumberBox-default;
+      }
+    }
+
+    .adornment {
+      color: $color-adornment-NumberBox-default;
+
+      * {
+        color: inherit;
+      }
+    }
+  } @else if $variantName == "error" {
+    border-radius: $borderRadius-NumberBox-error;
+    border-color: $borderColor-NumberBox-error;
+    border-width: $borderWidth-NumberBox-error;
+    border-style: $borderStyle-NumberBox-error;
+    font-size: $fontSize-NumberBox-error;
+    background-color: $backgroundColor-NumberBox-error;
+    box-shadow: $boxShadow-NumberBox-error;
+    color: $textColor-NumberBox-error;
+
+    &:hover {
+      border-color: $borderColor-NumberBox-error--hover;
+      background-color: $backgroundColor-NumberBox-error--hover;
+      box-shadow: $boxShadow-NumberBox-error--hover;
+      color: $textColor-NumberBox-error--hover;
+    }
+
+    &:focus-within {
+      border-color: $borderColor-NumberBox-error--focus;
+      background-color: $backgroundColor-NumberBox-error--focus;
+      box-shadow: $boxShadow-NumberBox-error--focus;
+      color: $textColor-NumberBox-error--focus;
+    }
+
+    &:has(.input:focus-visible) {
+      outline-width: $outlineWidth-NumberBox-error--focus;
+      outline-color: $outlineColor-NumberBox-error--focus;
+      outline-style: $outlineStyle-NumberBox-error--focus;
+      outline-offset: $outlineOffset-NumberBox-error--focus;
+    }
+
+    .input {
+      &::placeholder {
+        color: $textColor-placeholder-NumberBox-error;
+        font-size: $fontSize-placeholder-NumberBox-error;
+      }
+    }
+
+    .adornment {
+      color: $color-adornment-NumberBox-error;
+
+      * {
+        color: inherit;
+      }
+    }
+  } @else if $variantName == "warning" {
+    border-radius: $borderRadius-NumberBox-warning;
+    border-color: $borderColor-NumberBox-warning;
+    border-width: $borderWidth-NumberBox-warning;
+    border-style: $borderStyle-NumberBox-warning;
+    font-size: $fontSize-NumberBox-warning;
+    background-color: $backgroundColor-NumberBox-warning;
+    box-shadow: $boxShadow-NumberBox-warning;
+    color: $textColor-NumberBox-warning;
+
+    &:hover {
+      border-color: $borderColor-NumberBox-warning--hover;
+      background-color: $backgroundColor-NumberBox-warning--hover;
+      box-shadow: $boxShadow-NumberBox-warning--hover;
+      color: $textColor-NumberBox-warning--hover;
+    }
+
+    &:focus-within {
+      border-color: $borderColor-NumberBox-warning--focus;
+      background-color: $backgroundColor-NumberBox-warning--focus;
+      box-shadow: $boxShadow-NumberBox-warning--focus;
+      color: $textColor-NumberBox-warning--focus;
+    }
+
+    &:has(.input:focus-visible) {
+      outline-width: $outlineWidth-NumberBox-warning--focus;
+      outline-color: $outlineColor-NumberBox-warning--focus;
+      outline-style: $outlineStyle-NumberBox-warning--focus;
+      outline-offset: $outlineOffset-NumberBox-warning--focus;
+    }
+
+    .input {
+      &::placeholder {
+        color: $textColor-placeholder-NumberBox-warning;
+        font-size: $fontSize-placeholder-NumberBox-warning;
+      }
+    }
+
+    .adornment {
+      color: $color-adornment-NumberBox-warning;
+
+      * {
+        color: inherit;
+      }
+    }
+  } @else if $variantName == "success" {
+    border-radius: $borderRadius-NumberBox-success;
+    border-color: $borderColor-NumberBox-success;
+    border-width: $borderWidth-NumberBox-success;
+    border-style: $borderStyle-NumberBox-success;
+    font-size: $fontSize-NumberBox-success;
+    background-color: $backgroundColor-NumberBox-success;
+    box-shadow: $boxShadow-NumberBox-success;
+    color: $textColor-NumberBox-success;
+
+    &:hover {
+      border-color: $borderColor-NumberBox-success--hover;
+      background-color: $backgroundColor-NumberBox-success--hover;
+      box-shadow: $boxShadow-NumberBox-success--hover;
+      color: $textColor-NumberBox-success--hover;
+    }
+
+    &:focus-within {
+      border-color: $borderColor-NumberBox-success--focus;
+      background-color: $backgroundColor-NumberBox-success--focus;
+      box-shadow: $boxShadow-NumberBox-success--focus;
+      color: $textColor-NumberBox-success--focus;
+    }
+
+    &:has(.input:focus-visible) {
+      outline-width: $outlineWidth-NumberBox-success--focus;
+      outline-color: $outlineColor-NumberBox-success--focus;
+      outline-style: $outlineStyle-NumberBox-success--focus;
+      outline-offset: $outlineOffset-NumberBox-success--focus;
+    }
+
+    .input {
+      &::placeholder {
+        color: $textColor-placeholder-NumberBox-success;
+        font-size: $fontSize-placeholder-NumberBox-success;
+      }
+    }
+
+    .adornment {
+      color: $color-adornment-NumberBox-success;
+
+      * {
+        color: inherit;
+      }
     }
   }
 }
@@ -67,7 +307,7 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
   .inputRoot {
     display: flex;
     align-items: center;
-    gap: createThemeVar("Input:gap-adornment-#{$componentName}");
+    gap: $gap-adornment-NumberBox;
     width: 100%;
     border-style: solid;
     border-width: 1px;
@@ -91,9 +331,9 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
 
     &:has(.input:is(:disabled)) {
       cursor: not-allowed;
-      background-color: createThemeVar("Input:backgroundColor-NumberBox--disabled");
-      color: createThemeVar("Input:textColor-NumberBox--disabled");
-      border-color: createThemeVar("Input:borderColor-NumberBox--disabled");
+      background-color: $backgroundColor-NumberBox--disabled;
+      color: $textColor-NumberBox--disabled;
+      border-color: $borderColor-NumberBox--disabled;
     }
 
     &.rtl {

@@ -12,51 +12,237 @@ $themeVars: (
 $componentName: "DatePicker";
 $themeVars: t.composePaddingVars($themeVars, $componentName);
 
-// --- CSS properties of a particular Select variant
-@mixin variant($variantName) {
-  border-radius: createThemeVar("Input:borderRadius-#{$componentName}-#{$variantName}");
-  border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}");
-  border-width: createThemeVar("Input:borderWidth-#{$componentName}-#{$variantName}");
-  border-style: createThemeVar("Input:borderStyle-#{$componentName}-#{$variantName}");
-  background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}");
-  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
-  color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}");
+// Generic DatePicker variables
+$minHeight-DatePicker: createThemeVar("Input:minHeight-#{$componentName}");
+$fontSize-DatePicker: createThemeVar("Input:fontSize-DatePicker");
+$backgroundColor-DatePicker--disabled: createThemeVar("Input:backgroundColor-DatePicker--disabled");
+$textColor-DatePicker--disabled: createThemeVar("Input:textColor-DatePicker--disabled");
+$borderColor-DatePicker--disabled: createThemeVar("Input:borderColor-DatePicker--disabled");
 
-  &:hover {
-    border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--hover");
-    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--hover"
-    );
-    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
-    color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--hover");
-  }
+// Default variant variables
+$borderRadius-DatePicker-default: createThemeVar("Input:borderRadius-#{$componentName}-default");
+$borderColor-DatePicker-default: createThemeVar("Input:borderColor-#{$componentName}-default");
+$borderWidth-DatePicker-default: createThemeVar("Input:borderWidth-#{$componentName}-default");
+$borderStyle-DatePicker-default: createThemeVar("Input:borderStyle-#{$componentName}-default");
+$backgroundColor-DatePicker-default: createThemeVar("Input:backgroundColor-#{$componentName}-default");
+$boxShadow-DatePicker-default: createThemeVar("Input:boxShadow-#{$componentName}-default");
+$textColor-DatePicker-default: createThemeVar("Input:textColor-#{$componentName}-default");
+$borderColor-DatePicker-default--hover: createThemeVar("Input:borderColor-#{$componentName}-default--hover");
+$backgroundColor-DatePicker-default--hover: createThemeVar("Input:backgroundColor-#{$componentName}-default--hover");
+$boxShadow-DatePicker-default--hover: createThemeVar("Input:boxShadow-#{$componentName}-default--hover");
+$textColor-DatePicker-default--hover: createThemeVar("Input:textColor-#{$componentName}-default--hover");
+$outlineWidth-DatePicker-default--focus: createThemeVar("Input:outlineWidth-#{$componentName}-default--focus");
+$outlineColor-DatePicker-default--focus: createThemeVar("Input:outlineColor-#{$componentName}-default--focus");
+$outlineStyle-DatePicker-default--focus: createThemeVar("Input:outlineStyle-#{$componentName}-default--focus");
+$outlineOffset-DatePicker-default--focus: createThemeVar("Input:outlineOffset-#{$componentName}-default--focus");
+$textColor-placeholder-DatePicker-default: createThemeVar("Input:textColor-placeholder-#{$componentName}-default");
+$fontSize-placeholder-DatePicker-default: createThemeVar("Input:fontSize-placeholder-#{$componentName}-default");
+$color-adornment-DatePicker-default: createThemeVar("Input:color-adornment-#{$componentName}-default");
 
-  &:focus {
-    outline-width: createThemeVar("Input:outlineWidth-#{$componentName}-#{$variantName}--focus");
-    outline-color: createThemeVar("Input:outlineColor-#{$componentName}-#{$variantName}--focus");
-    outline-style: createThemeVar("Input:outlineStyle-#{$componentName}-#{$variantName}--focus");
-    outline-offset: createThemeVar("Input:outlineOffset-#{$componentName}-#{$variantName}--focus");
-  }
+// Error variant variables
+$borderRadius-DatePicker-error: createThemeVar("Input:borderRadius-#{$componentName}-error");
+$borderColor-DatePicker-error: createThemeVar("Input:borderColor-#{$componentName}-error");
+$borderWidth-DatePicker-error: createThemeVar("Input:borderWidth-#{$componentName}-error");
+$borderStyle-DatePicker-error: createThemeVar("Input:borderStyle-#{$componentName}-error");
+$backgroundColor-DatePicker-error: createThemeVar("Input:backgroundColor-#{$componentName}-error");
+$boxShadow-DatePicker-error: createThemeVar("Input:boxShadow-#{$componentName}-error");
+$textColor-DatePicker-error: createThemeVar("Input:textColor-#{$componentName}-error");
+$borderColor-DatePicker-error--hover: createThemeVar("Input:borderColor-#{$componentName}-error--hover");
+$backgroundColor-DatePicker-error--hover: createThemeVar("Input:backgroundColor-#{$componentName}-error--hover");
+$boxShadow-DatePicker-error--hover: createThemeVar("Input:boxShadow-#{$componentName}-error--hover");
+$textColor-DatePicker-error--hover: createThemeVar("Input:textColor-#{$componentName}-error--hover");
+$outlineWidth-DatePicker-error--focus: createThemeVar("Input:outlineWidth-#{$componentName}-error--focus");
+$outlineColor-DatePicker-error--focus: createThemeVar("Input:outlineColor-#{$componentName}-error--focus");
+$outlineStyle-DatePicker-error--focus: createThemeVar("Input:outlineStyle-#{$componentName}-error--focus");
+$outlineOffset-DatePicker-error--focus: createThemeVar("Input:outlineOffset-#{$componentName}-error--focus");
+$textColor-placeholder-DatePicker-error: createThemeVar("Input:textColor-placeholder-#{$componentName}-error");
+$fontSize-placeholder-DatePicker-error: createThemeVar("Input:fontSize-placeholder-#{$componentName}-error");
+$color-adornment-DatePicker-error: createThemeVar("Input:color-adornment-#{$componentName}-error");
 
-  .placeholder {
-    color: createThemeVar("Input:textColor-placeholder-#{$componentName}-#{$variantName}");
-    font-size: createThemeVar("Input:fontSize-placeholder-#{$componentName}-#{$variantName}");
-  }
+// Warning variant variables
+$borderRadius-DatePicker-warning: createThemeVar("Input:borderRadius-#{$componentName}-warning");
+$borderColor-DatePicker-warning: createThemeVar("Input:borderColor-#{$componentName}-warning");
+$borderWidth-DatePicker-warning: createThemeVar("Input:borderWidth-#{$componentName}-warning");
+$borderStyle-DatePicker-warning: createThemeVar("Input:borderStyle-#{$componentName}-warning");
+$backgroundColor-DatePicker-warning: createThemeVar("Input:backgroundColor-#{$componentName}-warning");
+$boxShadow-DatePicker-warning: createThemeVar("Input:boxShadow-#{$componentName}-warning");
+$textColor-DatePicker-warning: createThemeVar("Input:textColor-#{$componentName}-warning");
+$borderColor-DatePicker-warning--hover: createThemeVar("Input:borderColor-#{$componentName}-warning--hover");
+$backgroundColor-DatePicker-warning--hover: createThemeVar("Input:backgroundColor-#{$componentName}-warning--hover");
+$boxShadow-DatePicker-warning--hover: createThemeVar("Input:boxShadow-#{$componentName}-warning--hover");
+$textColor-DatePicker-warning--hover: createThemeVar("Input:textColor-#{$componentName}-warning--hover");
+$outlineWidth-DatePicker-warning--focus: createThemeVar("Input:outlineWidth-#{$componentName}-warning--focus");
+$outlineColor-DatePicker-warning--focus: createThemeVar("Input:outlineColor-#{$componentName}-warning--focus");
+$outlineStyle-DatePicker-warning--focus: createThemeVar("Input:outlineStyle-#{$componentName}-warning--focus");
+$outlineOffset-DatePicker-warning--focus: createThemeVar("Input:outlineOffset-#{$componentName}-warning--focus");
+$textColor-placeholder-DatePicker-warning: createThemeVar("Input:textColor-placeholder-#{$componentName}-warning");
+$fontSize-placeholder-DatePicker-warning: createThemeVar("Input:fontSize-placeholder-#{$componentName}-warning");
+$color-adornment-DatePicker-warning: createThemeVar("Input:color-adornment-#{$componentName}-warning");
 
-  .adornment {
-    color: createThemeVar("Input:color-adornment-#{$componentName}-#{$variantName}");
-  }
-}
+// Success variant variables
+$borderRadius-DatePicker-success: createThemeVar("Input:borderRadius-#{$componentName}-success");
+$borderColor-DatePicker-success: createThemeVar("Input:borderColor-#{$componentName}-success");
+$borderWidth-DatePicker-success: createThemeVar("Input:borderWidth-#{$componentName}-success");
+$borderStyle-DatePicker-success: createThemeVar("Input:borderStyle-#{$componentName}-success");
+$backgroundColor-DatePicker-success: createThemeVar("Input:backgroundColor-#{$componentName}-success");
+$boxShadow-DatePicker-success: createThemeVar("Input:boxShadow-#{$componentName}-success");
+$textColor-DatePicker-success: createThemeVar("Input:textColor-#{$componentName}-success");
+$borderColor-DatePicker-success--hover: createThemeVar("Input:borderColor-#{$componentName}-success--hover");
+$backgroundColor-DatePicker-success--hover: createThemeVar("Input:backgroundColor-#{$componentName}-success--hover");
+$boxShadow-DatePicker-success--hover: createThemeVar("Input:boxShadow-#{$componentName}-success--hover");
+$textColor-DatePicker-success--hover: createThemeVar("Input:textColor-#{$componentName}-success--hover");
+$outlineWidth-DatePicker-success--focus: createThemeVar("Input:outlineWidth-#{$componentName}-success--focus");
+$outlineColor-DatePicker-success--focus: createThemeVar("Input:outlineColor-#{$componentName}-success--focus");
+$outlineStyle-DatePicker-success--focus: createThemeVar("Input:outlineStyle-#{$componentName}-success--focus");
+$outlineOffset-DatePicker-success--focus: createThemeVar("Input:outlineOffset-#{$componentName}-success--focus");
+$textColor-placeholder-DatePicker-success: createThemeVar("Input:textColor-placeholder-#{$componentName}-success");
+$fontSize-placeholder-DatePicker-success: createThemeVar("Input:fontSize-placeholder-#{$componentName}-success");
+$color-adornment-DatePicker-success: createThemeVar("Input:color-adornment-#{$componentName}-success");
 
+// Menu variables
+$boxShadow-menu-DatePicker: createThemeVar("Input:boxShadow-menu-DatePicker");
+$backgroundColor-menu-DatePicker: createThemeVar("Input:backgroundColor-menu-DatePicker");
+$borderRadius-menu-DatePicker: createThemeVar("Input:borderRadius-menu-DatePicker");
+
+// Item variables
 $rdp-accent-color: createThemeVar("Input:backgroundColor-item-DatePicker--active");
-$backgroundColor-item-DatePicker--hover: createThemeVar("Input:backgroundColor-item-DatePicker--hover"
-  );
+$backgroundColor-item-DatePicker--hover: createThemeVar("Input:backgroundColor-item-DatePicker--hover");
 $rdp-selected-color: createThemeVar("Input:textColor-value-DatePicker");
+$borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selectedItem-DatePicker");
+
 $rdp-cell-size: 40px;
 $rdp-caption-font-size: 18px;
 $rdp-outline: 2px solid t.useVar($rdp-accent-color);
 $rdp-outline-selected: 3px solid t.useVar($rdp-accent-color);
-$minHeight: createThemeVar("Input:minHeight-#{$componentName}");
-$borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selectedItem-DatePicker");
+
+// --- CSS properties of a particular DatePicker variant
+@mixin variant($variantName) {
+  @if $variantName == "default" {
+    border-radius: $borderRadius-DatePicker-default;
+    border-color: $borderColor-DatePicker-default;
+    border-width: $borderWidth-DatePicker-default;
+    border-style: $borderStyle-DatePicker-default;
+    background-color: $backgroundColor-DatePicker-default;
+    box-shadow: $boxShadow-DatePicker-default;
+    color: $textColor-DatePicker-default;
+
+    &:hover {
+      border-color: $borderColor-DatePicker-default--hover;
+      background-color: $backgroundColor-DatePicker-default--hover;
+      box-shadow: $boxShadow-DatePicker-default--hover;
+      color: $textColor-DatePicker-default--hover;
+    }
+
+    &:focus {
+      outline-width: $outlineWidth-DatePicker-default--focus;
+      outline-color: $outlineColor-DatePicker-default--focus;
+      outline-style: $outlineStyle-DatePicker-default--focus;
+      outline-offset: $outlineOffset-DatePicker-default--focus;
+    }
+
+    .placeholder {
+      color: $textColor-placeholder-DatePicker-default;
+      font-size: $fontSize-placeholder-DatePicker-default;
+    }
+
+    .adornment {
+      color: $color-adornment-DatePicker-default;
+    }
+  } @else if $variantName == "error" {
+    border-radius: $borderRadius-DatePicker-error;
+    border-color: $borderColor-DatePicker-error;
+    border-width: $borderWidth-DatePicker-error;
+    border-style: $borderStyle-DatePicker-error;
+    background-color: $backgroundColor-DatePicker-error;
+    box-shadow: $boxShadow-DatePicker-error;
+    color: $textColor-DatePicker-error;
+
+    &:hover {
+      border-color: $borderColor-DatePicker-error--hover;
+      background-color: $backgroundColor-DatePicker-error--hover;
+      box-shadow: $boxShadow-DatePicker-error--hover;
+      color: $textColor-DatePicker-error--hover;
+    }
+
+    &:focus {
+      outline-width: $outlineWidth-DatePicker-error--focus;
+      outline-color: $outlineColor-DatePicker-error--focus;
+      outline-style: $outlineStyle-DatePicker-error--focus;
+      outline-offset: $outlineOffset-DatePicker-error--focus;
+    }
+
+    .placeholder {
+      color: $textColor-placeholder-DatePicker-error;
+      font-size: $fontSize-placeholder-DatePicker-error;
+    }
+
+    .adornment {
+      color: $color-adornment-DatePicker-error;
+    }
+  } @else if $variantName == "warning" {
+    border-radius: $borderRadius-DatePicker-warning;
+    border-color: $borderColor-DatePicker-warning;
+    border-width: $borderWidth-DatePicker-warning;
+    border-style: $borderStyle-DatePicker-warning;
+    background-color: $backgroundColor-DatePicker-warning;
+    box-shadow: $boxShadow-DatePicker-warning;
+    color: $textColor-DatePicker-warning;
+
+    &:hover {
+      border-color: $borderColor-DatePicker-warning--hover;
+      background-color: $backgroundColor-DatePicker-warning--hover;
+      box-shadow: $boxShadow-DatePicker-warning--hover;
+      color: $textColor-DatePicker-warning--hover;
+    }
+
+    &:focus {
+      outline-width: $outlineWidth-DatePicker-warning--focus;
+      outline-color: $outlineColor-DatePicker-warning--focus;
+      outline-style: $outlineStyle-DatePicker-warning--focus;
+      outline-offset: $outlineOffset-DatePicker-warning--focus;
+    }
+
+    .placeholder {
+      color: $textColor-placeholder-DatePicker-warning;
+      font-size: $fontSize-placeholder-DatePicker-warning;
+    }
+
+    .adornment {
+      color: $color-adornment-DatePicker-warning;
+    }
+  } @else if $variantName == "success" {
+    border-radius: $borderRadius-DatePicker-success;
+    border-color: $borderColor-DatePicker-success;
+    border-width: $borderWidth-DatePicker-success;
+    border-style: $borderStyle-DatePicker-success;
+    background-color: $backgroundColor-DatePicker-success;
+    box-shadow: $boxShadow-DatePicker-success;
+    color: $textColor-DatePicker-success;
+
+    &:hover {
+      border-color: $borderColor-DatePicker-success--hover;
+      background-color: $backgroundColor-DatePicker-success--hover;
+      box-shadow: $boxShadow-DatePicker-success--hover;
+      color: $textColor-DatePicker-success--hover;
+    }
+
+    &:focus {
+      outline-width: $outlineWidth-DatePicker-success--focus;
+      outline-color: $outlineColor-DatePicker-success--focus;
+      outline-style: $outlineStyle-DatePicker-success--focus;
+      outline-offset: $outlineOffset-DatePicker-success--focus;
+    }
+
+    .placeholder {
+      color: $textColor-placeholder-DatePicker-success;
+      font-size: $fontSize-placeholder-DatePicker-success;
+    }
+
+    .adornment {
+      color: $color-adornment-DatePicker-success;
+    }
+  }
+}
 
 @layer components {
   .datePicker {
@@ -65,13 +251,13 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     cursor: pointer;
     flex-direction: row;
     width: 100%;
-    min-height: $minHeight;
+    min-height: $minHeight-DatePicker;
     border-width: 1px;
     border-style: solid;
     transition: background-color ease-in 0.1s;
     overflow: hidden;
     gap: t.$space-2;
-    font-size: createThemeVar("Input:fontSize-DatePicker");
+    font-size: $fontSize-DatePicker;
     @include t.paddingVars($themeVars, $componentName);
 
     @include variant("default");
@@ -90,9 +276,9 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
 
     &.disabled {
       cursor: not-allowed;
-      background-color: createThemeVar("Input:backgroundColor-DatePicker--disabled");
-      color: createThemeVar("Input:textColor-DatePicker--disabled");
-      border-color: createThemeVar("Input:borderColor-DatePicker--disabled");
+      background-color: $backgroundColor-DatePicker--disabled;
+      color: $textColor-DatePicker--disabled;
+      border-color: $borderColor-DatePicker--disabled;
 
       .indicator,
       .datePickerInput {
@@ -127,9 +313,9 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     padding: t.$space-4;
     overflow-y: auto;
     height: fit-content;
-    box-shadow: createThemeVar("Input:boxShadow-menu-DatePicker");
-    background-color: createThemeVar("Input:backgroundColor-menu-DatePicker");
-    border-radius: createThemeVar("Input:borderRadius-menu-DatePicker");
+    box-shadow: $boxShadow-menu-DatePicker;
+    background-color: $backgroundColor-menu-DatePicker;
+    border-radius: $borderRadius-menu-DatePicker;
     border: 1px solid $rdp-accent-color;
   }
 

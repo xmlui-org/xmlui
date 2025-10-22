@@ -7,12 +7,13 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$textColor-LabelList: createThemeVar("textColor-LabelList");
 
 $componentName: "LabelList";
 
 @layer components {
   .labelList {
-    fill: createThemeVar("textColor-LabelList");
+    fill: $textColor-LabelList;
   }
 }
 
