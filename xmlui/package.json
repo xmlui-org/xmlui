@@ -175,24 +175,24 @@
         "xmlui": "dist/scripts/bin/bootstrap.js"
       },
       "main": "./dist/standalone/xmlui-standalone.umd.js",
-      "module": "./dist/lib/xmlui.mjs",
+      "module": "./dist/lib/xmlui.js",
       "types": "./dist/lib/xmlui.d.ts",
       "exports": {
         ".": {
-          "import": "./dist/lib/xmlui.mjs",
+          "import": "./dist/lib/xmlui.js",
           "require": "./dist/standalone/xmlui-standalone.umd.js"
         },
         "./language-server": {
-          "import": "./dist/lib/language-server.mjs",
-          "require": "./dist/lib/language-server.mjs"
+          "import": "./dist/lib/language-server.js",
+          "require": "./dist/lib/language-server.js"
         },
         "./language-server-web-worker": {
-          "import": "./dist/lib/language-server-web-worker.mjs",
-          "require": "./dist/lib/language-server-web-worker.mjs"
+          "import": "./dist/lib/language-server-web-worker.js",
+          "require": "./dist/lib/language-server-web-worker.js"
         },
         "./parser": {
-          "import": "./dist/lib/xmlui-parser.mjs",
-          "require": "./dist/lib/xmlui-parser.mjs"
+          "import": "./dist/lib/xmlui-parser.js",
+          "require": "./dist/lib/xmlui-parser.js"
         },
         "./*.css": {
           "import": "./dist/lib/*.css",
@@ -211,12 +211,12 @@
           "require": "./dist/scripts/bin/vite-xmlui-plugin.js"
         },
         "./syntax/monaco": {
-          "import": "./dist/lib/syntax-monaco.mjs",
-          "require": "./dist/lib/syntax-monaco.mjs"
+          "import": "./dist/lib/syntax-monaco.js",
+          "require": "./dist/lib/syntax-monaco.js"
         },
         "./syntax/textmate": {
-          "import": "./dist/lib/syntax-textmate.mjs",
-          "require": "./dist/lib/syntax-textmate.mjs"
+          "import": "./dist/lib/syntax-textmate.js",
+          "require": "./dist/lib/syntax-textmate.js"
         }
       }
     }
