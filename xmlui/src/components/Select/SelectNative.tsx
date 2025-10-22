@@ -570,11 +570,10 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                             placeholder="Search..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            autoFocus
                           />
                         </div>
                       ) : (
-                        <button autoFocus aria-hidden="true" className={styles.srOnly} />
+                        <button aria-hidden="true" className={styles.srOnly} />
                       )}
                       <div role="listbox" className={styles.commandList}>
                         {inProgress ? (
