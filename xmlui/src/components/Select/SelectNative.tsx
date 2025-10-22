@@ -333,16 +333,18 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   // Helper functions to find next/previous enabled option
   const findNextEnabledIndex = useCallback(
     (currentIndex: number) => {
+      if (filteredOptions.length === 0) return -1;
+
       for (let i = currentIndex + 1; i < filteredOptions.length; i++) {
         const item = filteredOptions[i];
-        if (item.enabled !== false) {
+        if (item && item.enabled !== false) {
           return i;
         }
       }
       // Wrap around to beginning
       for (let i = 0; i <= currentIndex; i++) {
         const item = filteredOptions[i];
-        if (item.enabled !== false) {
+        if (item && item.enabled !== false) {
           return i;
         }
       }
@@ -353,16 +355,18 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
 
   const findPreviousEnabledIndex = useCallback(
     (currentIndex: number) => {
+      if (filteredOptions.length === 0) return -1;
+
       for (let i = currentIndex - 1; i >= 0; i--) {
         const item = filteredOptions[i];
-        if (item.enabled !== false) {
+        if (item && item.enabled !== false) {
           return i;
         }
       }
       // Wrap around to end
       for (let i = filteredOptions.length - 1; i >= currentIndex; i--) {
         const item = filteredOptions[i];
-        if (item.enabled !== false) {
+        if (item && item.enabled !== false) {
           return i;
         }
       }
@@ -395,7 +399,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
           event.preventDefault();
           if (selectedIndex >= 0 && selectedIndex < filteredOptions.length) {
             const selectedItem = filteredOptions[selectedIndex];
-            if (selectedItem.enabled !== false) {
+            if (selectedItem && selectedItem.enabled !== false) {
               toggleOption(selectedItem.value);
               // Close dropdown after selecting in single-select mode
               if (!multiSelect) {
@@ -498,7 +502,9 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
       setSelectedIndex,
       options,
       highlightedValue:
-        selectedIndex >= 0 && selectedIndex < filteredOptions.length
+        selectedIndex >= 0 &&
+        selectedIndex < filteredOptions.length &&
+        filteredOptions[selectedIndex]
           ? filteredOptions[selectedIndex].value
           : undefined,
       optionRenderer,
@@ -563,6 +569,11 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                 ) {
                   event.preventDefault();
                   setOpen(true);
+                  // Set initial selectedIndex to first enabled option if options exist
+                  if (filteredOptions.length > 0) {
+                    const firstEnabledIndex = findNextEnabledIndex(-1);
+                    setSelectedIndex(firstEnabledIndex !== -1 ? firstEnabledIndex : 0);
+                  }
                   return;
                 }
 
