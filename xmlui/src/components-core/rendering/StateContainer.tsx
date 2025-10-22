@@ -122,16 +122,31 @@ export const StateContainer = memo(
     console.log(`[StateContainer ${instanceId.current}] Render - componentState testCall:`, {
       hasTestCall: 'testCall' in componentState,
       testCallValue: componentState['testCall'],
+      testCallSymbolValue: Object.getOwnPropertySymbols(componentState).find(s => s.description === 'testCall') 
+        ? componentState[Object.getOwnPropertySymbols(componentState).find(s => s.description === 'testCall')!]
+        : undefined,
     });
 
     const componentStateWithApis = useShallowCompareMemoize(
       useMemo(() => {
         console.log(`[StateContainer ${instanceId.current}] componentStateWithApis useMemo RUNNING`);
         const ret = { ...componentState };
+        
+        // Get set of registered API keys - only these should have reducer state exposed as string keys
+        const registeredApiKeys = new Set(
+          Object.getOwnPropertySymbols(componentApis)
+            .map(s => s.description)
+            .filter((d): d is string => d !== undefined)
+        );
+        
         for (const stateKey of Object.getOwnPropertySymbols(componentState)) {
           const value = componentState[stateKey];
           if (stateKey.description) {
-            ret[stateKey.description] = value;
+            // Only copy reducer state to string keys for APIs registered in THIS container
+            // This prevents child containers from inheriting reducer state for parent APIs
+            if (registeredApiKeys.has(stateKey.description)) {
+              ret[stateKey.description] = value;
+            }
           }
         }
         if (Reflect.ownKeys(componentApis).length === 0) {
@@ -229,6 +244,11 @@ export const StateContainer = memo(
       hasTestCall: 'testCall' in mergedWithVars,
       testCallValue: mergedWithVars['testCall'],
       testCallHasExecute: mergedWithVars['testCall']?.execute !== undefined,
+    });
+    console.log(`[StateContainer ${instanceId.current}] stateFromOutside testCall:`, {
+      hasTestCall: 'testCall' in stateFromOutside,
+      testCallValue: stateFromOutside['testCall'],
+      testCallHasExecute: stateFromOutside['testCall']?.execute !== undefined,
     });
     const combinedState = useCombinedState(
       mergedWithVars,           // Local vars and component state (lower priority)
