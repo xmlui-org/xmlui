@@ -145,6 +145,7 @@ import { optionComponentRenderer } from "./Option/Option";
 import { autoCompleteComponentRenderer } from "./AutoComplete/AutoComplete";
 import type StandaloneExtensionManager from "../components-core/StandaloneExtensionManager";
 import { backdropComponentRenderer } from "./Backdrop/Backdrop";
+import { includeComponentRenderer } from "./Include/Include";
 import type { ThemeDefinition } from "../abstractions/ThemingDefs";
 import type { Extension } from "../abstractions/ExtensionDefs";
 import {
@@ -593,6 +594,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(accordionComponentRenderer);
       this.registerCoreComponent(sliderComponentRenderer);
       this.registerCoreComponent(backdropComponentRenderer);
+      this.registerCoreComponent(includeComponentRenderer);
     }
     this.registerCoreComponent(breakoutComponentRenderer);
     this.registerCoreComponent(themeComponentRenderer);

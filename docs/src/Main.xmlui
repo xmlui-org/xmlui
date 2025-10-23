@@ -584,4 +584,6 @@
             </Link>
         </CHStack>
     </Footer>
+
+  <Include url="http://localhost:5174/FooterLinks.xmlui"/>
 </App>

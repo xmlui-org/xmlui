@@ -1,0 +1,6 @@
+<Component name="FooterLinks">
+    <Link to="https://docs.xmlui.org" label="Docs" />
+    <Link to="https://blog.xmlui.org" label="Blog" />
+    <Link to="https://github.com/xmlui-org/xmlui-mcp" label="MCP Server" />
+    <Link to="https://xmlui.org/news-and-reviews" label="News and Reviews" />
+</Component>
