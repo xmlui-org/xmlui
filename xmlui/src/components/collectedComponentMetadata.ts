@@ -77,6 +77,7 @@ import { ToneSwitchMd } from "./ToneSwitch/ToneSwitch";
 import { OptionMd } from "./Option/Option";
 import { AutoCompleteMd } from "./AutoComplete/AutoComplete";
 import { BackdropMd } from "./Backdrop/Backdrop";
+import { IncludeMd } from "./Include/Include";
 import {
   HtmlAddressMd,
   HtmlAMd,
@@ -318,6 +319,7 @@ export const collectedComponentMetadata = {
   Avatar: AvatarMd,
   Backdrop: BackdropMd,
   Badge: BadgeMd,
+  Include: IncludeMd,
   Bookmark: BookmarkMd,
   Breakout: BreakoutMd,
   Button: ButtonMd,

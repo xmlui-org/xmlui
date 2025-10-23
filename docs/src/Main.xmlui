@@ -574,16 +574,7 @@
         </Page>
     </Pages>
     <Footer>
-        <CHStack width="*">
-            This site is an XMLUI™ app.
-            <SpaceFiller />
-            <Link
-                to="https://github.com/xmlui-org/xmlui/tree/main/docs/src"
-                target="_blank">
-                <Button variant="ghost" icon="github" />
-            </Link>
-        </CHStack>
+      <Include url="http://localhost:5174/FooterLinks.xmlui"/>
     </Footer>
 
-  <Include url="http://localhost:5174/FooterLinks.xmlui"/>
 </App>
