@@ -5,14 +5,13 @@
                 <Logo height="$space-8" />
             </Link>
         </property>
-        <Search data="{appGlobals.plainTextContent}" />
+        <Search
+          when="{mediaSize.sizeIndex >= 1}"
+          data="{appGlobals.plainTextContent}"
+        />
         <property name="profileMenuTemplate">
             <Text>XMLUI Docs: For people and AIs</Text>
         </property>
-        <SpaceFiller />
-        <Search
-            data="{appGlobals.plainTextContent}"
-            when="{mediaSize.sizeIndex > 2}" />
     </AppHeader>
     <NavPanel
         when="{!window.location.hash.includes('/404') || mediaSize.sizeIndex <= 2}">

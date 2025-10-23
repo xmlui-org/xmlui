@@ -16,7 +16,10 @@
                 <Logo height="$space-8"/>
             </Link>
         </property>
-        <Search data="{appGlobals.plainTextContent}" />
+        <Search
+          when="{mediaSize.sizeIndex >= 1}"
+          data="{appGlobals.plainTextContent}"
+        />
         <property name="profileMenuTemplate">
             <Text>XMLUI Blog: Tutorials, tips, best practices</Text>
         </property>
