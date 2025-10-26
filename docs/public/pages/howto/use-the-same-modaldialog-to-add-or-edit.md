@@ -2,12 +2,12 @@
 
 See also the [refactoring](/refactoring) guide. Briefly: props flow down, events flow up.
 
-```xmlui-pg noHeader height="400px"
+```xmlui-pg height="400px"
 ---app
 <App>
   <Test />
 </App>
----comp display
+---comp display {35-48}
 <Component name="Test" var.editingProductId="{null}" var.showAddModal="{false}">
   <DataSource id="products" url="/api/products" />
 

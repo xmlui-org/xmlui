@@ -1,6 +1,6 @@
 # Assign a complex JSON literal to a component variable
 
-```xmlui-pg noHeader
+```xmlui-pg
 ---app
 <App>
   <Test />

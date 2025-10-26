@@ -1,6 +1,6 @@
 # Share a ModalDialog across components
 
-```xmlui-pg noHeader
+```xmlui-pg
 ---app
 <App>
   <Test />
@@ -21,7 +21,7 @@
     }
   }
 }
----comp display
+---comp display /settings/ /settingsDialog/ /appSettings/
 <Component name="Test">
 
   <AppState id="settings" bucket="appSettings" initialValue="{{
@@ -42,8 +42,8 @@
     </property>
   </AppHeader>
 
-  <VStack gap="1rem">
-    <HStack gap="1rem">
+  <VStack>
+    <HStack>
       <Text>Items ({settings.value.itemSize} size)</Text>
       <Button
         label="Settings"
@@ -65,11 +65,11 @@
   </VStack>
 
 </Component>
----comp display
+---comp display /settings/ /settingsDialog/ /appSettings/
 <Component name="SettingsPanel">
   <AppState id="settings" bucket="appSettings" />
 
-  <VStack gap="1rem">
+  <VStack>
 
     <Select
       label="Item Size"
