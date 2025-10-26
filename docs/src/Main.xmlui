@@ -122,6 +122,9 @@
                 label="Chain a DataSource refetch from an APICall.execute"
                 to="/howto/chain-a-refetch" />
             <NavLink
+                label="Control cache invalidation"
+                to="/howto/control-cache-invalidation" />
+            <NavLink
                 label="Handle background operations"
                 to="/howto/handle-background-operations" />
             <!--
@@ -515,6 +518,9 @@
         </Page>
         <Page url="/howto/chain-a-refetch">
             <DocumentPageNoTOC url="/pages/howto/chain-a-refetch.md" />
+        </Page>
+        <Page url="/howto/control-cache-invalidation">
+            <DocumentPageNoTOC url="/pages/howto/control-cache-invalidation.md" />
         </Page>
         <Page url="/howto/handle-background-operations">
             <DocumentPageNoTOC
