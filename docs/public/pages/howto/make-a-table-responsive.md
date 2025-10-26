@@ -1,6 +1,6 @@
 # Make a Table responsive
 
-```xmlui-pg noHeader
+```xmlui-pg
 ---app
 <App>
   <ResponsiveTable />

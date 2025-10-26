@@ -1,6 +1,6 @@
 # Use built-in form validation
 
-```xmlui-pg noHeader
+```xmlui-pg
 ---app
 <App>
   <Test />

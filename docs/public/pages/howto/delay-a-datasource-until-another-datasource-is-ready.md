@@ -1,6 +1,6 @@
 # Delay a DataSource until another DataSource is ready
 
-```xmlui-pg noHeader
+```xmlui-pg
 ---app
 <App>
   <Test />
@@ -30,7 +30,7 @@
     }
   }
 }
----comp display
+---comp display /selectedId/ /nonce/
 <Component name="Test" var.selectedId="" var.nonce="{0}">
 
   <DataSource

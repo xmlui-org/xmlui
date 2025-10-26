@@ -54,7 +54,7 @@ This situation is where `AppState` comes into the picture. With an `AppState` in
 
 Let's turn the previous example into one using `AppState`! The following code shows how we change the main app file:
 
-```xmlui-pg 
+```xmlui-pg
 ---app copy display filename="Main.xmlui"
 <App>
   <AppState id="appState" initialValue="{{ enhancedMode: false }}"/>
@@ -112,6 +112,8 @@ This property is the identifier of the bucket to which the `AppState` instance i
 ### `initialValue` [#initialvalue]
 
 This property contains the initial state value. Though you can use multiple `AppState`component instances for the same bucket with their `initialValue` set, it may result in faulty app logic. When xmlui instantiates an `AppState` with an explicit initial value, that value is immediately merged with the existing state. The issue may come from the behavior that `initialValue` is set (merged) only when a component mounts. By default, the bucket's initial state is undefined.
+
+We recommend declaring an `AppState` component in `Main.xmlui` and initializing it there. Other components should reference the bucket without `initialValue`.
 
 ## Events [#events]
 

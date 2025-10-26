@@ -5,7 +5,7 @@
 <App>
   <Test />
 </App>
----comp display
+---comp display /searchText/ /triggerSearch/
   <!-- Use two different variables -->
 <Component name="Test" var.searchText="" var.triggerSearch="{false}">
   <TextBox

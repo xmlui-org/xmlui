@@ -1,6 +1,6 @@
 # Hide an element until its DataSource is ready
 
-```xmlui-pg noHeader
+```xmlui-pg
 ---app
 <App>
   <Test />
@@ -21,7 +21,7 @@
     }
   }
 }
----comp display
+---comp display /nonce/
 <Component name="Test" var.nonce="{0}">
 
 <DataSource
