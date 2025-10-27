@@ -1,5 +1,85 @@
 [
   {
+    "tag_name": "xmlui@0.10.25",
+    "published_at": "2025-10-22T14:39:36Z",
+    "changes": [
+      {
+        "description": "refactor: Select - remove radix select",
+        "commit_sha": "e7c503e"
+      },
+      {
+        "description": "Fix the NavGroup click behavior in responsive view",
+        "commit_sha": "5fe3052"
+      },
+      {
+        "description": "Fix the $item access issue within a ModalDialog inside a Column",
+        "commit_sha": "5fe3052"
+      },
+      {
+        "description": "Fix the APICall becomes non-functional after first error when used with DataSource + Items + $item context issue",
+        "commit_sha": "250647b"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.25.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.25/xmlui-0.10.25.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.10.24",
+    "published_at": "2025-10-21T13:53:23Z",
+    "changes": [
+      {
+        "description": "The xmlui-pg codefence now accepts emojies",
+        "commit_sha": "3e361c4"
+      },
+      {
+        "description": "Exend the formatDate, formatDateTime, and formatTime functions with optional format strings",
+        "commit_sha": "3e361c4"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.24.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.24/xmlui-0.10.24.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.10.23",
+    "published_at": "2025-10-21T07:04:42Z",
+    "changes": [
+      {
+        "description": "Experiment with the \"variant\" behavior",
+        "commit_sha": "bf18444"
+      },
+      {
+        "description": "Form now has a willSubmit event (it can cancel the submit event)",
+        "commit_sha": "6d3bb89"
+      },
+      {
+        "description": "Fix the boolean conversion issue with showAnchor in Heading",
+        "commit_sha": "89c69af"
+      },
+      {
+        "description": "Fix loading code-behind files in standalone mode",
+        "commit_sha": "4cfebf0"
+      },
+      {
+        "description": "fix: pointer-events:none when using sibling Dialog",
+        "commit_sha": "145cd68"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.23.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.23/xmlui-0.10.23.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.10.22",
     "published_at": "2025-10-17T06:33:28Z",
     "changes": [
@@ -164,126 +244,6 @@
       {
         "name": "xmlui-0.10.16.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.16/xmlui-0.10.16.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.10.15",
-    "published_at": "2025-09-26T11:41:22Z",
-    "changes": [
-      {
-        "description": "Add the data property to the Pdf component",
-        "commit_sha": "3c8ad14"
-      },
-      {
-        "description": "Add the \"transform\" layout property",
-        "commit_sha": "5502fea"
-      },
-      {
-        "description": "Add syncWithAppState and initiallySelected properties to Table",
-        "commit_sha": "e08f0ba"
-      },
-      {
-        "description": "Fix MenuSeparator and SubMenuitem (forwardRef)",
-        "commit_sha": "5502fea"
-      },
-      {
-        "description": "fix: NavGroup componenet's iconVertical{Expanded,Collapsed} properties now apply based on it's 'open' state. Only the Expanded one was present before the fix.",
-        "commit_sha": "db618b5"
-      },
-      {
-        "description": "Allow event handlers to use nested action components recursively",
-        "commit_sha": "a795b3d"
-      },
-      {
-        "description": "feat: introducing behaviors - tooltip, animation, label",
-        "commit_sha": "5851c02"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.10.15.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.15/xmlui-0.10.15.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.10.14",
-    "published_at": "2025-09-23T12:57:26Z",
-    "changes": [
-      {
-        "description": "fix: Modal dialog scrolling issue",
-        "commit_sha": "618049b"
-      },
-      {
-        "description": "Allow image to accept binary data (and use it instead of src)",
-        "commit_sha": "215a142"
-      },
-      {
-        "description": "Allow user-defined components in extension packages",
-        "commit_sha": "65b52e1"
-      },
-      {
-        "description": "Fixed Slider input type, label focus, readOnly property, as well as min & max value issues.",
-        "commit_sha": "0cc2178"
-      },
-      {
-        "description": "Fixed feature to add custom icons for the Carousel prev/next page buttons.",
-        "commit_sha": "53d4ed9"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.10.14.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.14/xmlui-0.10.14.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.10.13",
-    "published_at": "2025-09-22T08:53:46Z",
-    "changes": [
-      {
-        "description": "Added short debounce to ColorPicker to make changing color values with slider a bit smoother.",
-        "commit_sha": "9401ee0"
-      },
-      {
-        "description": "fix: assigning new properties to objects in xmlui script",
-        "commit_sha": "eb62858"
-      },
-      {
-        "description": "fix: stricter empty body detection in RestApiProxy",
-        "commit_sha": "eb62858"
-      },
-      {
-        "description": "fix: TextArea autofocus",
-        "commit_sha": "eb62858"
-      },
-      {
-        "description": "fix: dropdownMenu overflow",
-        "commit_sha": "eb62858"
-      },
-      {
-        "description": "fix: ability to use user defined components in triggerTemplate (dropdownMenu)",
-        "commit_sha": "eb62858"
-      },
-      {
-        "description": "select: use focus-visible instead of focus for outline",
-        "commit_sha": "eb62858"
-      },
-      {
-        "description": "fix: modal dialog/toast issue",
-        "commit_sha": "243b7fa"
-      },
-      {
-        "description": "form: hideButtonRowUntilDirty",
-        "commit_sha": "eb62858"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.10.13.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.13/xmlui-0.10.13.js"
       }
     ]
   }
