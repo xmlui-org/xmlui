@@ -11,6 +11,7 @@
     "build:xmlui-standalone": "vite build --mode standalone",
     "build:xmlui-metadata": "vite build --mode metadata",
     "test:unit": "vitest run",
+    "test:e2e": "playwright test",
     "test:e2e-summary": "node scripts/e2e-test-summary.js",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "prepublishOnly": "clean-package",

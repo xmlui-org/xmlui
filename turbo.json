@@ -77,25 +77,29 @@
       "dependsOn": ["^build:extension", "^build:xmlui"],
       "outputs": ["dist/**"]
     },
-    "build:xmlui-test-bed": {
+    "xmlui#build:xmlui-test-bed": {
       "dependsOn": ["build:extension"],
       "outputs": ["src/testing/infrastructure/dist/**"]
     },
-    "test:unit": {},
-    "test:e2e-smoke": {
-      "dependsOn": ["build:xmlui-test-bed"],
+    "test:all": {
+      "dependsOn": ["test:unit", "//#test:e2e"],
       "outputs": ["playwright-report/**"]
     },
-    "test:e2e-non-smoke": {
-      "dependsOn": ["build:xmlui-test-bed", "test:e2e-smoke"],
+    "test:smoke": {
+      "dependsOn": ["test:unit", "//#test:e2e:smoke"],
       "outputs": ["playwright-report/**"]
     },
-    "test:xmlui-all": {
-      "dependsOn": ["test:unit", "test:e2e-non-smoke"],
+    "test:unit": {
+      "outputs": []
+    },
+    "//#test:e2e": {
+      "env": ["PLAYWRIGHT_USE_DEV_SERVER"],
+      "dependsOn": ["xmlui#build:xmlui-test-bed"],
       "outputs": ["playwright-report/**"]
     },
-    "test:xmlui-smoke": {
-      "dependsOn": ["test:unit", "test:e2e-smoke"],
+    "//#test:e2e:smoke": {
+      "env": ["PLAYWRIGHT_USE_DEV_SERVER"],
+      "dependsOn": ["xmlui#build:xmlui-test-bed"],
       "outputs": ["playwright-report/**"]
     }
   }

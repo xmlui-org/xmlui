@@ -25,12 +25,9 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!CI,
 
-  /*
-  Default Github job runners have 4 cores (on public repos, 2 on privates)
-  https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories */
-  workers: undefined,
+  workers: CI ? "100%" : "75%",
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: CI ? [["github"], ["html"]] : [["html"]],
+  reporter: CI ? [["github"], ["html"]] : [["html", { open: "never" }]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     ...devices["Desktop Chrome"],
@@ -45,17 +42,11 @@ export default defineConfig({
     permissions: ["clipboard-read", "clipboard-write"],
   },
 
-  /* Global timeout settings */
-  timeout: CI ? 5000 : 10000,
-  expect: {
-    timeout: 5000, // 5 seconds for expect assertions
-  },
-
   retries: CI ? 2 : 1,
   /* Configure projects for major browsers */
   projects: [
     {
-      name: "xmlui-non-smoke",
+      name: "xmlui-nonsmoke",
       testDir: "./xmlui",
       grepInvert: /@smoke/,
     },
@@ -65,7 +56,7 @@ export default defineConfig({
       grep: /@smoke/,
     },
     {
-      name: "extensions-non-smoke",
+      name: "extensions-nonsmoke",
       testDir: "./packages",
       grepInvert: /@smoke/,
     },
