@@ -14,6 +14,44 @@ import { d, createMetadata } from "../metadata-helpers";
 
 const COMP = "Heading";
 
+/**
+ * Normalizes the level value to a valid HeadingLevel (h1-h6).
+ * Accepts: 1-6, "1"-"6", "h1"-"h6", "H1"-"H6"
+ * Returns "h1" for any invalid value.
+ */
+function normalizeHeadingLevel(value: any): HeadingLevel {
+  if (value === null || value === undefined) {
+    return "h1";
+  }
+  
+  // Handle numeric values (1-6)
+  if (typeof value === "number") {
+    if (value >= 1 && value <= 6) {
+      return `h${value}` as HeadingLevel;
+    }
+    return "h1";
+  }
+  
+  // Handle string values
+  if (typeof value === "string") {
+    const trimmed = value.trim().toLowerCase();
+    
+    // Handle "h1"-"h6" (case insensitive)
+    if (/^h[1-6]$/.test(trimmed)) {
+      return trimmed as HeadingLevel;
+    }
+    
+    // Handle "1"-"6"
+    if (/^[1-6]$/.test(trimmed)) {
+      return `h${trimmed}` as HeadingLevel;
+    }
+  }
+  
+  // Default fallback
+  return "h1";
+}
+
+
 const VALUE_DESC = d(
   `This property determines the text displayed in the heading. \`${COMP}\` also accepts nested ` +
     `text instead of specifying the \`value\`. If both \`value\` and a nested text are used, ` +
@@ -72,8 +110,15 @@ export const HeadingMd = createMetadata({
   props: {
     value: VALUE_DESC,
     level: {
-      description: "This property sets the visual significance (level) of the heading.",
-      availableValues: ["h1", "h2", "h3", "h4", "h5", "h6"],
+      description: 
+        "This property sets the visual significance (level) of the heading. " +
+        "Accepts multiple formats: `h1`-`h6`, `H1`-`H6`, or `1`-`6`." +
+        "Invalid values default to `h1`.",
+      availableValues: [
+        "h1", "h2", "h3", "h4", "h5", "h6",
+        "H1", "H2", "H3", "H4", "H5", "H6",
+        "1", "2", "3", "4", "5", "6",
+      ],
       defaultValue: defaultProps.level,
     },
     maxLines: MAX_LINES_DESC,
@@ -311,10 +356,15 @@ function renderHeading({
   const { maxLines, preserveLinebreaks, ellipses, showAnchor, ...restProps } = node.props;
   delete restProps.level; // Remove level from restProps as it is handled separately
   const showAnchorValue = extractValue.asOptionalBoolean(node.props?.showAnchor);
+  
+  // Extract and normalize the level value
+  const extractedLevel = extractValue(level);
+  const normalizedLevel = normalizeHeadingLevel(extractedLevel);
+  
   return (
     <Heading
       uid={node.uid}
-      level={(extractValue.asOptionalString(level) ?? "h1") as HeadingLevel}
+      level={normalizedLevel}
       maxLines={extractValue.asOptionalNumber(maxLines)}
       preserveLinebreaks={extractValue.asOptionalBoolean(preserveLinebreaks, false)}
       ellipses={extractValue.asOptionalBoolean(ellipses, true)}
