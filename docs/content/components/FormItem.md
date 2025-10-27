@@ -259,6 +259,10 @@ In the demo below, enter an input smaller than 18 or just submit the form as is.
 </App>
 ```
 
+### `noSubmit` (default: false) [#nosubmit-default-false]
+
+When set to `true`, the field will not be included in the form's submitted data. This is useful for fields that should be present in the form but not submitted, similar to hidden fields. If multiple FormItems reference the same `bindTo` value and any of them has `noSubmit` set to `true`, the field will NOT be submitted.
+
 ### `pattern` [#pattern]
 
 This value specifies a predefined regular expression to test the input value. If this value is not set, no pattern check is done.

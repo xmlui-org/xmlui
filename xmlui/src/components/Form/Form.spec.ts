@@ -99,6 +99,367 @@ test.describe("Basic Functionality", () => {
   });
 
   // =============================================================================
+  // HIDE BUTTON ROW TESTS
+  // =============================================================================
+
+  test.describe("hideButtonRow property", () => {
+    test("hides button row when set to true", async ({ initTestBed, page }) => {
+      await initTestBed(`<Form hideButtonRow="true"/>`);
+
+      await expect(page.getByRole("button", { name: "Cancel" })).not.toBeVisible();
+      await expect(page.getByRole("button", { name: "Save" })).not.toBeVisible();
+    });
+
+    test("shows button row when set to false", async ({ initTestBed, page }) => {
+      await initTestBed(`<Form hideButtonRow="false"/>`);
+
+      await expect(page.getByRole("button", { name: "Cancel" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+    });
+
+    test("shows button row by default when property not set", async ({ initTestBed, page }) => {
+      await initTestBed(`<Form/>`);
+
+      await expect(page.getByRole("button", { name: "Cancel" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+    });
+
+    test("hides custom button row template when set to true", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Form hideButtonRow="true">
+          <property name="buttonRowTemplate">
+            <Button label="Custom Save" type="submit" testId="customSave" />
+            <Button label="Custom Cancel" type="button" testId="customCancel" />
+          </property>
+        </Form>
+      `);
+
+      await expect(page.getByTestId("customSave")).not.toBeVisible();
+      await expect(page.getByTestId("customCancel")).not.toBeVisible();
+    });
+
+    test("overrides hideButtonRowUntilDirty when both are set", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      await initTestBed(`
+        <Form hideButtonRow="true" hideButtonRowUntilDirty="true">
+          <FormItem label="Name" bindTo="name" testId="nameField" />
+        </Form>
+      `);
+
+      // Button row should be hidden even before making changes
+      await expect(page.getByRole("button", { name: "Save" })).not.toBeVisible();
+      await expect(page.getByRole("button", { name: "Cancel" })).not.toBeVisible();
+
+      // Make the form dirty
+      const driver = await createFormItemDriver("nameField");
+      const input = await createTextBoxDriver(driver.input);
+      await input.field.fill("John");
+
+      // Button row should still be hidden even after making changes
+      await expect(page.getByRole("button", { name: "Save" })).not.toBeVisible();
+      await expect(page.getByRole("button", { name: "Cancel" })).not.toBeVisible();
+    });
+
+    test("handles null value gracefully", async ({ initTestBed, page }) => {
+      await initTestBed(`<Form hideButtonRow="{null}"/>`);
+
+      // Should show button row (default behavior)
+      await expect(page.getByRole("button", { name: "Cancel" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+    });
+
+    test("handles undefined value gracefully", async ({ initTestBed, page }) => {
+      await initTestBed(`<Form hideButtonRow="{undefined}"/>`);
+
+      // Should show button row (default behavior)
+      await expect(page.getByRole("button", { name: "Cancel" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+    });
+
+    test("handles string 'true' value", async ({ initTestBed, page }) => {
+      await initTestBed(`<Form hideButtonRow="true"/>`);
+
+      await expect(page.getByRole("button", { name: "Cancel" })).not.toBeVisible();
+      await expect(page.getByRole("button", { name: "Save" })).not.toBeVisible();
+    });
+
+    test("handles string 'false' value", async ({ initTestBed, page }) => {
+      await initTestBed(`<Form hideButtonRow="false"/>`);
+
+      await expect(page.getByRole("button", { name: "Cancel" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+    });
+
+    test("form submission still works with hidden button row via external submit", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <Form id="testForm" hideButtonRow="true" onSubmit="arg => testState = arg">
+            <FormItem label="Name" bindTo="name" testId="nameField" />
+            <Button type="submit" label="External Submit" testId="externalSubmit" />
+          </Form>
+        </Fragment>
+      `);
+
+      const driver = await createFormItemDriver("nameField");
+      const input = await createTextBoxDriver(driver.input);
+      await input.field.fill("John Doe");
+
+      await page.getByTestId("externalSubmit").click();
+
+      const submittedData = await testStateDriver.testState();
+      expect(submittedData).toEqual({ name: "John Doe" });
+    });
+  });
+
+  // =============================================================================
+  // HIDE BUTTON ROW UNTIL DIRTY TESTS
+  // =============================================================================
+
+  test.describe("hideButtonRowUntilDirty property", () => {
+    test("hides button row initially when form is not dirty", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Form hideButtonRowUntilDirty="true">
+          <FormItem label="Name" bindTo="name" testId="nameField" />
+        </Form>
+      `);
+
+      await expect(page.getByRole("button", { name: "Cancel" })).not.toBeVisible();
+      await expect(page.getByRole("button", { name: "Save" })).not.toBeVisible();
+    });
+
+    test("shows button row when form becomes dirty", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      await initTestBed(`
+        <Form hideButtonRowUntilDirty="true">
+          <FormItem label="Name" bindTo="name" testId="nameField" />
+        </Form>
+      `);
+
+      // Initially hidden
+      await expect(page.getByRole("button", { name: "Save" })).not.toBeVisible();
+
+      // Make form dirty
+      const driver = await createFormItemDriver("nameField");
+      const input = await createTextBoxDriver(driver.input);
+      await input.field.fill("John");
+
+      // Now visible
+      await expect(page.getByRole("button", { name: "Cancel" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+    });
+
+    test("keeps button row visible after form becomes dirty", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      await initTestBed(`
+        <Form hideButtonRowUntilDirty="true">
+          <FormItem label="Name" bindTo="name" testId="nameField" />
+        </Form>
+      `);
+
+      const driver = await createFormItemDriver("nameField");
+      const input = await createTextBoxDriver(driver.input);
+
+      // Make form dirty
+      await input.field.fill("John");
+      await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+
+      // Clear the input (form is still dirty)
+      await input.field.clear();
+      await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+    });
+
+    test("shows button row by default when property set to false", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Form hideButtonRowUntilDirty="false">
+          <FormItem label="Name" bindTo="name" testId="nameField" />
+        </Form>
+      `);
+
+      await expect(page.getByRole("button", { name: "Cancel" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+    });
+
+    test("shows button row by default when property not set", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Form>
+          <FormItem label="Name" bindTo="name" testId="nameField" />
+        </Form>
+      `);
+
+      await expect(page.getByRole("button", { name: "Cancel" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+    });
+
+    test("works with multiple form items", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      await initTestBed(`
+        <Form hideButtonRowUntilDirty="true">
+          <FormItem label="Name" bindTo="name" testId="nameField" />
+          <FormItem label="Email" bindTo="email" testId="emailField" />
+        </Form>
+      `);
+
+      // Initially hidden
+      await expect(page.getByRole("button", { name: "Save" })).not.toBeVisible();
+
+      // Modify second field
+      const emailDriver = await createFormItemDriver("emailField");
+      const emailInput = await createTextBoxDriver(emailDriver.input);
+      await emailInput.field.fill("test@example.com");
+
+      // Now visible
+      await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+    });
+
+    test("hides custom button row template until dirty", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      await initTestBed(`
+        <Form hideButtonRowUntilDirty="true">
+          <FormItem label="Name" bindTo="name" testId="nameField" />
+          <property name="buttonRowTemplate">
+            <Button label="Custom Save" type="submit" testId="customSave" />
+          </property>
+        </Form>
+      `);
+
+      // Initially hidden
+      await expect(page.getByTestId("customSave")).not.toBeVisible();
+
+      // Make form dirty
+      const driver = await createFormItemDriver("nameField");
+      const input = await createTextBoxDriver(driver.input);
+      await input.field.fill("John");
+
+      // Now visible
+      await expect(page.getByTestId("customSave")).toBeVisible();
+    });
+
+    test("handles null value gracefully", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Form hideButtonRowUntilDirty="{null}">
+          <FormItem label="Name" bindTo="name" testId="nameField" />
+        </Form>
+      `);
+
+      // Should show button row (default behavior)
+      await expect(page.getByRole("button", { name: "Cancel" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+    });
+
+    test("handles undefined value gracefully", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Form hideButtonRowUntilDirty="{undefined}">
+          <FormItem label="Name" bindTo="name" testId="nameField" />
+        </Form>
+      `);
+
+      // Should show button row (default behavior)
+      await expect(page.getByRole("button", { name: "Cancel" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+    });
+
+    test("works with form initialized with data", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      await initTestBed(`
+        <Form hideButtonRowUntilDirty="true" data="{{ name: 'Initial' }}">
+          <FormItem label="Name" bindTo="name" testId="nameField" />
+        </Form>
+      `);
+
+      // Initially hidden (form has data but is not dirty)
+      await expect(page.getByRole("button", { name: "Save" })).not.toBeVisible();
+
+      // Make form dirty
+      const driver = await createFormItemDriver("nameField");
+      const input = await createTextBoxDriver(driver.input);
+      await input.field.fill("Modified");
+
+      // Now visible
+      await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+    });
+
+    test("button row appears when checkbox is checked", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Form hideButtonRowUntilDirty="true">
+          <FormItem label="Accept Terms" bindTo="terms" type="checkbox" />
+        </Form>
+      `);
+
+      // Initially hidden
+      await expect(page.getByRole("button", { name: "Save" })).not.toBeVisible();
+
+      // Check the checkbox
+      const checkbox = page.getByRole("checkbox");
+      await checkbox.check();
+
+      // Now visible
+      await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+    });
+
+    test("button row appears when slider value changes", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Form hideButtonRowUntilDirty="true">
+          <FormItem label="Volume" bindTo="volume" type="slider" testId="volumeField" />
+        </Form>
+      `);
+
+      // Initially hidden
+      await expect(page.getByRole("button", { name: "Save" })).not.toBeVisible();
+
+      // Move the slider using keyboard
+      const slider = page.getByRole("slider");
+      await slider.press("ArrowRight");
+
+      // Now visible
+      await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+    });
+  });
+
+  // =============================================================================
   // DATA PROPERTY TESTS
   // =============================================================================
 

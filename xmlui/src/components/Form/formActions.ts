@@ -29,13 +29,14 @@ export type FormAction = {
     | any;
 };
 
-export function fieldInitialized(uid: string, value: any, force = false) {
+export function fieldInitialized(uid: string, value: any, force = false, noSubmit = false) {
   return {
     type: FormActionKind.FIELD_INITIALIZED,
     payload: {
       uid,
       value,
-      force
+      force,
+      noSubmit
     },
   };
 }

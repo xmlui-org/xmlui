@@ -69,6 +69,10 @@ This boolean property value indicates whether the component responds to user eve
 
 This property sets the message to display when the form submission fails.
 
+### `hideButtonRow` (default: false) [#hidebuttonrow-default-false]
+
+This property hides the button row entirely when set to true.
+
 ### `hideButtonRowUntilDirty` (default: false) [#hidebuttonrowuntildirty-default-false]
 
 This property hides the button row until the form data is modified (dirty).

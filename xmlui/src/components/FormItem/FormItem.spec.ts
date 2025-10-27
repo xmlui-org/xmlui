@@ -1142,4 +1142,245 @@ test.describe("Other Edge Cases", () => {
     await expect(field).not.toBeVisible();
     await expect(page.locator("[data-error-boundary]")).toBeVisible();
   });
+
+  // =============================================================================
+  // NOSUBMIT PROPERTY TESTS
+  // =============================================================================
+
+  test.describe("noSubmit property", () => {
+    test("excludes field from submission when noSubmit is true", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form onSubmit="data => testState = data">
+          <FormItem testId="field1" label="Included Field" bindTo="included" initialValue="visible" />
+          <FormItem testId="field2" label="Excluded Field" bindTo="excluded" initialValue="hidden" noSubmit="true" />
+        </Form>
+      `);
+
+      const driver1 = await createFormItemDriver("field1");
+      const input1 = await createTextBoxDriver(driver1.input);
+      await input1.field.fill("submitted value");
+
+      const driver2 = await createFormItemDriver("field2");
+      const input2 = await createTextBoxDriver(driver2.input);
+      await input2.field.fill("not submitted");
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      await expect.poll(testStateDriver.testState).toEqual({
+        included: "submitted value",
+      });
+    });
+
+    test("includes field in submission when noSubmit is false", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form onSubmit="data => testState = data">
+          <FormItem testId="field1" label="Field 1" bindTo="field1" initialValue="value1" noSubmit="false" />
+          <FormItem testId="field2" label="Field 2" bindTo="field2" initialValue="value2" />
+        </Form>
+      `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      await expect.poll(testStateDriver.testState).toEqual({
+        field1: "value1",
+        field2: "value2",
+      });
+    });
+
+    test("includes field by default when noSubmit is not specified", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form onSubmit="data => testState = data">
+          <FormItem testId="field1" label="Field 1" bindTo="field1" initialValue="value1" />
+          <FormItem testId="field2" label="Field 2" bindTo="field2" initialValue="value2" />
+        </Form>
+      `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      await expect.poll(testStateDriver.testState).toEqual({
+        field1: "value1",
+        field2: "value2",
+      });
+    });
+
+    test("excludes field when multiple FormItems with same bindTo all have noSubmit true", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form onSubmit="data => testState = data">
+          <FormItem testId="field1" label="FormItem 1" bindTo="shared" initialValue="first" noSubmit="true" />
+          <FormItem testId="field2" label="FormItem 2" bindTo="shared" initialValue="second" noSubmit="true" />
+          <FormItem testId="field3" label="Other Field" bindTo="other" initialValue="included" />
+        </Form>
+      `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      await expect.poll(testStateDriver.testState).toEqual({
+        other: "included",
+      });
+    });
+
+    test("excludes field when any FormItem with same bindTo has noSubmit true", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form onSubmit="data => testState = data">
+          <FormItem testId="field1" label="FormItem 1" bindTo="shared" initialValue="first" noSubmit="true" />
+          <FormItem testId="field2" label="FormItem 2" bindTo="shared" initialValue="second" noSubmit="false" />
+          <FormItem testId="field3" label="Other Field" bindTo="other" initialValue="included" />
+        </Form>
+      `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      await expect.poll(testStateDriver.testState).toEqual({
+        other: "included",
+      });
+    });
+
+    test("excludes field when any FormItem with same bindTo has noSubmit true (mixed order)", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form onSubmit="data => testState = data">
+          <FormItem testId="field1" label="FormItem 1" bindTo="shared" initialValue="first" noSubmit="false" />
+          <FormItem testId="field2" label="FormItem 2" bindTo="shared" initialValue="second" noSubmit="true" />
+          <FormItem testId="field3" label="Other Field" bindTo="other" initialValue="included" />
+        </Form>
+      `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      await expect.poll(testStateDriver.testState).toEqual({
+        other: "included",
+      });
+    });
+
+    test("field still participates in validation when noSubmit is true", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form onSubmit="data => testState = data">
+          <FormItem 
+            testId="field1" 
+            label="Required No Submit" 
+            bindTo="excluded" 
+            required="true"
+            noSubmit="true" 
+          />
+        </Form>
+      `);
+
+      // Try to submit with empty required field
+      await page.getByRole("button", { name: "Save" }).click();
+
+      // Form should not submit due to validation error
+      await expect.poll(testStateDriver.testState).toBeNull();
+
+      // Fill the required field
+      const driver = await createFormItemDriver("field1");
+      const input = await createTextBoxDriver(driver.input);
+      await input.field.fill("value");
+
+      // Now submit should succeed but field should not be in data
+      await page.getByRole("button", { name: "Save" }).click();
+      await expect.poll(testStateDriver.testState).toEqual({});
+    });
+
+    test("noSubmit works with different input types", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form onSubmit="data => testState = data">
+          <FormItem testId="text" label="Text" type="text" bindTo="text" initialValue="text" noSubmit="true" />
+          <FormItem testId="number" label="Number" type="number" bindTo="number" initialValue="42" noSubmit="true" />
+          <FormItem testId="checkbox" label="Checkbox" type="checkbox" bindTo="checkbox" initialValue="true" noSubmit="true" />
+          <FormItem testId="included" label="Included" bindTo="included" initialValue="visible" />
+        </Form>
+      `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      await expect.poll(testStateDriver.testState).toEqual({
+        included: "visible",
+      });
+    });
+
+    test("noSubmit works with select type", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form onSubmit="data => testState = data">
+          <FormItem testId="select" label="Select" type="select" bindTo="select" initialValue="opt1" noSubmit="true">
+            <Option value="opt1" label="Option 1" />
+            <Option value="opt2" label="Option 2" />
+          </FormItem>
+          <FormItem testId="included" label="Included" bindTo="included" initialValue="visible" />
+        </Form>
+      `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      await expect.poll(testStateDriver.testState).toEqual({
+        included: "visible",
+      });
+    });
+
+    test("noSubmit field value changes do not affect submission data", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form onSubmit="data => testState = data">
+          <FormItem testId="excluded" label="Excluded" bindTo="excluded" initialValue="initial" noSubmit="true" />
+          <FormItem testId="included" label="Included" bindTo="included" initialValue="value" />
+        </Form>
+      `);
+
+      const excludedDriver = await createFormItemDriver("excluded");
+      const excludedInput = await createTextBoxDriver(excludedDriver.input);
+      await excludedInput.field.fill("changed value");
+
+      const includedDriver = await createFormItemDriver("included");
+      const includedInput = await createTextBoxDriver(includedDriver.input);
+      await includedInput.field.fill("modified");
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      await expect.poll(testStateDriver.testState).toEqual({
+        included: "modified",
+      });
+    });
+  });
 });
+
