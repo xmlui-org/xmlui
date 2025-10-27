@@ -1,11 +1,9 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { usePlayground } from "../hooks/usePlayground";
 import { NestedApp } from "xmlui";
 
 export function Preview() {
   const { appDescription, options } = usePlayground();
-
-  console.log("Preview render - options.id:", options.id);
 
   let components = useMemo(
     () => appDescription.components.map((comp) => comp.component),
