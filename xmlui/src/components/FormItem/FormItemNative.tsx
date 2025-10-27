@@ -78,17 +78,19 @@ type Props = {
   inputRenderer?: any;
   itemIndex?: number;
   gap?: string;
+  noSubmit?: boolean;
 } & FormItemValidations;
 
 export const defaultProps: Pick<
   Props,
-  "type" | "labelBreak" | "enabled" | "customValidationsDebounce" | "gap"
+  "type" | "labelBreak" | "enabled" | "customValidationsDebounce" | "gap" | "noSubmit"
 > = {
   type: "text",
   labelBreak: true,
   enabled: true,
   customValidationsDebounce: 0,
   gap: "0",
+  noSubmit: false,
 };
 
 const FormItemContext = createContext<any>({ parentFormItemId: null });
@@ -162,6 +164,7 @@ export const FormItem = memo(function FormItem({
   itemIndex,
   initialValue: initialValueFromProps,
   gap,
+  noSubmit = defaultProps.noSubmit,
   ...rest
 }: Props) {
   const validations: FormItemValidations = useShallowCompareMemoize({
@@ -222,10 +225,10 @@ export const FormItem = memo(function FormItem({
   const isEnabled = enabled && formEnabled;
 
   useEffect(() => {
-    if (initialValue !== undefined) {
-      dispatch(fieldInitialized(formItemId, initialValue));
-    }
-  }, [dispatch, formItemId, initialValue]);
+    // Always dispatch fieldInitialized to ensure noSubmit tracking
+    // Pass undefined as value when initialValue is undefined to avoid overwriting existing values
+    dispatch(fieldInitialized(formItemId, initialValue, false, noSubmit));
+  }, [dispatch, formItemId, initialValue, noSubmit]);
 
   useValidation(validations, onValidate, value, dispatch, formItemId, customValidationsDebounce);
 
