@@ -84,6 +84,12 @@ export const FormMd = createMetadata({
       type: "boolean",
       defaultValue: defaultProps.hideButtonRowUntilDirty,
     },
+    hideButtonRow: {
+      description:
+        `This property hides the button row entirely when set to true.`,
+      type: "boolean",
+      defaultValue: defaultProps.hideButtonRow,
+    },
     submitUrl: d(`URL to submit the form data.`),
     submitMethod: {
       description:

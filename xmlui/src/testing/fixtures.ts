@@ -186,7 +186,10 @@ function mapThemeRelatedVars(description: TestBedDescription): TestBedDescriptio
 // -----------------------------------------------------------------
 // --- TestBed and Driver Fixtures
 
-type TestBedDescription = Omit<Partial<StandaloneAppDescription>, "entryPoint" | "components"> & {
+export type TestBedDescription = Omit<
+  Partial<StandaloneAppDescription>,
+  "entryPoint" | "components"
+> & {
   testThemeVars?: Record<string, string>;
   components?: string[];
 };

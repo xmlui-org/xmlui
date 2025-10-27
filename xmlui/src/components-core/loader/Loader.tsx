@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, type QueryFunction } from "@tanstack/react-query";
 import { createDraft, finishDraft } from "immer";
-import type { QueryFunction } from "@tanstack/query-core/src/types";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import type {

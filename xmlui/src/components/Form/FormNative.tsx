@@ -73,14 +73,23 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
   }
   switch (action.type) {
     case FormActionKind.FIELD_INITIALIZED: {
-      if (!state.interactionFlags[uid].isDirty || action.payload.force) {
+      // Only set the value if initialValue is defined and field is not dirty (or force is true)
+      if (action.payload.value !== undefined && (!state.interactionFlags[uid].isDirty || action.payload.force)) {
         set(state.subject, uid, action.payload.value);
+      }
+      // Track noSubmit flag - if multiple FormItems reference the same bindTo,
+      // and any of them has noSubmit: true, the field should NOT be submitted.
+      if (state.noSubmitFields[uid] === true || action.payload.noSubmit === true) {
+        state.noSubmitFields[uid] = true;
+      } else {
+        state.noSubmitFields[uid] = false;
       }
       break;
     }
     case FormActionKind.FIELD_REMOVED: {
       delete state.validationResults[uid];
       delete state.interactionFlags[uid];
+      delete state.noSubmitFields[uid];
       break;
     }
     case FormActionKind.FIELD_VALUE_CHANGED: {
@@ -201,6 +210,7 @@ interface FormState {
   validationResults: Record<string, ValidationResult>;
   generalValidationResults: Array<SingleValidationResult>;
   interactionFlags: Record<string, InteractionFlags>;
+  noSubmitFields: Record<string, boolean>; // Track noSubmit flag for each field
   submitInProgress?: boolean;
   resetVersion?: number;
 }
@@ -210,6 +220,7 @@ const initialState: FormState = {
   validationResults: {},
   generalValidationResults: [],
   interactionFlags: {},
+  noSubmitFields: {},
   submitInProgress: false,
   resetVersion: 0,
 };
@@ -248,6 +259,7 @@ type Props = {
   itemLabelPosition?: string; // type LabelPosition
   keepModalOpenOnSubmit?: boolean;
   hideButtonRowUntilDirty?: boolean;
+  hideButtonRow?: boolean;
 };
 
 export const defaultProps: Pick<
@@ -260,6 +272,7 @@ export const defaultProps: Pick<
   | "keepModalOpenOnSubmit"
   | "swapCancelAndSave"
   | "hideButtonRowUntilDirty"
+  | "hideButtonRow"
 > = {
   cancelLabel: "Cancel",
   saveLabel: "Save",
@@ -269,13 +282,15 @@ export const defaultProps: Pick<
   keepModalOpenOnSubmit: false,
   swapCancelAndSave: false,
   hideButtonRowUntilDirty: false,
+  hideButtonRow: false,
 };
 
 // --- Remove the properties from formState.subject where the property name ends with UNBOUND_FIELD_SUFFIX
-function cleanUpSubject(subject: any) {
+// --- or where the field has noSubmit set to true
+function cleanUpSubject(subject: any, noSubmitFields: Record<string, boolean>) {
   return Object.entries(subject || {}).reduce(
     (acc, [key, value]) => {
-      if (!key.endsWith(UNBOUND_FIELD_SUFFIX)) {
+      if (!key.endsWith(UNBOUND_FIELD_SUFFIX) && !noSubmitFields[key]) {
         acc[key] = value;
       }
       return acc;
@@ -310,6 +325,7 @@ const Form = forwardRef(function (
     itemLabelPosition = defaultProps.itemLabelPosition,
     keepModalOpenOnSubmit = defaultProps.keepModalOpenOnSubmit,
     hideButtonRowUntilDirty,
+    hideButtonRow = defaultProps.hideButtonRow,
     ...rest
   }: Props,
   ref: ForwardedRef<HTMLFormElement>,
@@ -385,7 +401,7 @@ const Form = forwardRef(function (
     const prevFocused = document.activeElement;
     dispatch(formSubmitting());
     try {
-      const filteredSubject = cleanUpSubject(formState.subject);
+      const filteredSubject = cleanUpSubject(formState.subject, formState.noSubmitFields);
       const canSubmit = await onWillSubmit?.(filteredSubject);
       if (canSubmit === false) {
         // --- We do not reset the form but allow the next submit.
@@ -527,7 +543,7 @@ const Form = forwardRef(function (
       >
         <ValidationSummary generalValidationResults={formState.generalValidationResults} />
         <FormContext.Provider value={formContextValue}>{children}</FormContext.Provider>
-        {(!hideButtonRowUntilDirty || isDirty) && safeButtonRow}
+        {!hideButtonRow && (!hideButtonRowUntilDirty || isDirty) && safeButtonRow}
       </form>
       {confirmSubmitModalVisible && (
         <ModalDialog
@@ -604,8 +620,8 @@ export const FormWithContextVar = forwardRef(function (
       });
     };
 
-    return { ...cleanUpSubject(formState.subject), update: updateData };
-  }, [formState.subject]);
+    return { ...cleanUpSubject(formState.subject, formState.noSubmitFields), update: updateData };
+  }, [formState.subject, formState.noSubmitFields]);
 
   const nodeWithItem = useMemo(() => {
     return {
@@ -642,6 +658,7 @@ export const FormWithContextVar = forwardRef(function (
         itemLabelBreak={extractValue.asOptionalBoolean(node.props.itemLabelBreak)}
         itemLabelWidth={itemLabelWidthCssProps.width as string}
         hideButtonRowUntilDirty={extractValue.asOptionalBoolean(node.props.hideButtonRowUntilDirty)}
+        hideButtonRow={extractValue.asOptionalBoolean(node.props.hideButtonRow)}
         formState={formState}
         dispatch={dispatch}
         id={node.uid}

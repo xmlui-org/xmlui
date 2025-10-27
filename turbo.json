@@ -14,12 +14,12 @@
       "outputs": ["dist/standalone/**"]
     },
     "build:xmlui-metadata": {
-      "inputs": ["$TURBO_DEFAULT$", "!src/language-server/xmlui-metadata-generated.mjs"],
+      "inputs": ["$TURBO_DEFAULT$", "!src/language-server/xmlui-metadata-generated.js"],
       "outputs": ["dist/metadata/**"]
     },
     "gen:langserver-metadata": {
       "dependsOn": ["build:xmlui-metadata"],
-      "outputs": ["src/language-server/xmlui-metadata-generated.mjs"]
+      "outputs": ["src/language-server/xmlui-metadata-generated.js"]
     },
     "build:extension": {
       "dependsOn": ["^build:extension"],
@@ -74,35 +74,32 @@
       "outputs": ["dist/**"]
     },
     "build:blog": {
-      "dependsOn": [
-        "^build:extension",
-        "^build:xmlui"
-      ],
+      "dependsOn": ["^build:extension", "^build:xmlui"],
       "outputs": ["dist/**"]
     },
-    "build:xmlui-test-bed": {
+    "xmlui#build:xmlui-test-bed": {
       "dependsOn": ["build:extension"],
       "outputs": ["src/testing/infrastructure/dist/**"]
     },
-    "build:test-bed": {
-      "dependsOn": ["build:extension"],
-      "outputs": ["dist/**"]
-    },
-    "test:unit": {},
-    "test:e2e-smoke": {
-      "dependsOn": ["build:test-bed", "build:xmlui-test-bed"],
+    "test:all": {
+      "dependsOn": ["test:unit", "//#test:e2e"],
       "outputs": ["playwright-report/**"]
     },
-    "test:e2e-non-smoke": {
-      "dependsOn": ["build:test-bed", "build:xmlui-test-bed", "test:e2e-smoke"],
+    "test:smoke": {
+      "dependsOn": ["test:unit", "//#test:e2e:smoke"],
       "outputs": ["playwright-report/**"]
     },
-    "test:xmlui-all": {
-      "dependsOn": ["test:unit", "test:e2e-non-smoke"],
+    "test:unit": {
+      "outputs": []
+    },
+    "//#test:e2e": {
+      "env": ["PLAYWRIGHT_USE_DEV_SERVER"],
+      "dependsOn": ["xmlui#build:xmlui-test-bed"],
       "outputs": ["playwright-report/**"]
     },
-    "test:xmlui-smoke": {
-      "dependsOn": ["test:unit", "test:e2e-smoke"],
+    "//#test:e2e:smoke": {
+      "env": ["PLAYWRIGHT_USE_DEV_SERVER"],
+      "dependsOn": ["xmlui#build:xmlui-test-bed"],
       "outputs": ["playwright-report/**"]
     }
   }

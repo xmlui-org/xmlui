@@ -22,12 +22,14 @@ This document explains how the XMLUI framework package itself is built using Vit
 The XMLUI framework package is built using **Vite** with multiple build modes. The build configuration is defined in `xmlui/vite.config.ts` and supports three distinct modes.
 
 **Build System:**
+
 - **Build Tool:** Vite 5.x with Rollup
 - **Configuration:** `xmlui/vite.config.ts`
 - **Package Manager:** npm with clean-package for publishing
 - **Task Orchestration:** Turborepo (see [XMLUI Repository Structure](./xmlui-repo.md))
 
 **Quick Build Commands:**
+
 ```bash
 # From workspace root
 npm run build-xmlui              # Build entire XMLUI core package
@@ -43,11 +45,11 @@ npm run build:xmlui-metadata     # Extract component metadata
 
 ## Build Modes
 
-| Mode | Entry Point | Output Format | Purpose |
-|------|-------------|---------------|---------|
-| **lib** | Multiple entries | ES Modules (.mjs) | npm package distribution |
-| **standalone** | index-standalone.ts | UMD bundle (.umd.js) | Buildless CDN deployment |
-| **metadata** | collectedComponentMetadata.ts | ES Module | Documentation/LSP |
+| Mode           | Entry Point                   | Output Format        | Purpose                  |
+| -------------- | ----------------------------- | -------------------- | ------------------------ |
+| **lib**        | Multiple entries              | ES Modules (.mjs)    | npm package distribution |
+| **standalone** | index-standalone.ts           | UMD bundle (.umd.js) | Buildless CDN deployment |
+| **metadata**   | collectedComponentMetadata.ts | ES Module            | Documentation/LSP        |
 
 ## Library Build (lib)
 
@@ -116,16 +118,18 @@ This is implemented via `rollup-plugin-copy`:
 
 ```typescript
 copy({
-  hook: 'writeBundle',
-  targets: [{
-    src: ['src/**/*.scss', '!src/**/*.module.scss'],
-    dest: 'dist/lib/scss',
-    rename: (name, extension, fullPath) => {
-      // Remove 'src/' prefix to preserve structure
-      return fullPath.replace('src/', '');
-    }
-  }]
-})
+  hook: "writeBundle",
+  targets: [
+    {
+      src: ["src/**/*.scss", "!src/**/*.module.scss"],
+      dest: "dist/lib/scss",
+      rename: (name, extension, fullPath) => {
+        // Remove 'src/' prefix to preserve structure
+        return fullPath.replace("src/", "");
+      },
+    },
+  ],
+});
 ```
 
 ### Output Structure
@@ -150,26 +154,26 @@ After `clean-package` transforms package.json during publish:
 
 ```json
 {
-  "main": "./dist/lib/xmlui.mjs",
+  "main": "./dist/lib/xmlui.js",
   "types": "./dist/lib/xmlui.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/lib/xmlui.mjs"
+      "import": "./dist/lib/xmlui.js"
     },
     "./parser": {
-      "import": "./dist/lib/xmlui-parser.mjs"
+      "import": "./dist/lib/xmlui-parser.js"
     },
     "./language-server": {
-      "import": "./dist/lib/language-server.mjs"
+      "import": "./dist/lib/language-server.js"
     },
     "./language-server-web-worker": {
-      "import": "./dist/lib/language-server-web-worker.mjs"
+      "import": "./dist/lib/language-server-web-worker.js"
     },
     "./syntax/monaco": {
-      "import": "./dist/lib/syntax-monaco.mjs"
+      "import": "./dist/lib/syntax-monaco.js"
     },
     "./syntax/textmate": {
-      "import": "./dist/lib/syntax-textmate.mjs"
+      "import": "./dist/lib/syntax-textmate.js"
     },
     "./*.css": {
       "import": "./dist/lib/*.css"
@@ -202,7 +206,7 @@ Creates a self-contained UMD bundle that includes all dependencies for buildless
 ### Entry Point
 
 ```typescript
-entry: "src/index-standalone.ts"
+entry: "src/index-standalone.ts";
 ```
 
 ### Build Configuration
@@ -277,6 +281,7 @@ npm run build:xmlui-metadata
 ### Purpose
 
 Extracts component metadata for:
+
 - Documentation generation
 - Language server autocomplete
 - Component explorer tools
@@ -285,7 +290,7 @@ Extracts component metadata for:
 ### Entry Point
 
 ```typescript
-entry: "src/components/collectedComponentMetadata.ts"
+entry: "src/components/collectedComponentMetadata.ts";
 ```
 
 ### Build Configuration
@@ -333,6 +338,7 @@ npm run export-themes
 ### Complete Build Sequence
 
 **Using Turborepo (recommended):**
+
 ```bash
 # From workspace root - builds everything
 npm run build-xmlui
@@ -340,6 +346,7 @@ npm run build-xmlui
 ```
 
 This internally runs in order:
+
 1. `build:bin` - Compile CLI tools
 2. `build:xmlui-metadata` - Extract component metadata
 3. `build:xmlui` - Build library mode
@@ -349,6 +356,7 @@ This internally runs in order:
 > **Note:** For detailed task dependencies and Turborepo orchestration, see [XMLUI Repository Structure](./xmlui-repo.md).
 
 **Manual build sequence** (from xmlui/ directory):
+
 ```bash
 # 1. Build CLI tools
 npm run build:bin
@@ -381,6 +389,7 @@ npm publish
 The `clean-package` tool transforms package.json during publish:
 
 **Before publish (development):**
+
 ```json
 {
   "main": "./src/index.ts",
@@ -391,9 +400,10 @@ The `clean-package` tool transforms package.json during publish:
 ```
 
 **After publish (production):**
+
 ```json
 {
-  "main": "./dist/lib/xmlui.mjs",
+  "main": "./dist/lib/xmlui.js",
   "bin": {
     "xmlui": "dist/scripts/bin/bootstrap.js"
   }
@@ -423,7 +433,7 @@ The `clean-package` tool transforms package.json during publish:
 {
   resolve: {
     alias: {
-      lodash: "lodash-es"  // Use ES modules version
+      lodash: "lodash-es"; // Use ES modules version
     }
   }
 }
@@ -443,16 +453,8 @@ The `clean-package` tool transforms package.json during publish:
 ```json
 {
   "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "production": [">0.2%", "not dead", "not op_mini all"],
+    "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
   }
 }
 ```
@@ -517,12 +519,14 @@ npm run test:e2e-summary
 ### Build Times (approximate)
 
 **Individual builds:**
+
 - **Library build:** ~30-60 seconds
 - **Standalone build:** ~60-90 seconds (includes all dependencies)
 - **Metadata build:** ~10-20 seconds (minimal processing)
 - **CLI tools build:** ~5-10 seconds
 
 **Full pipeline:**
+
 - **build:xmlui-all:** ~2-3 minutes (first run)
 
 > **Note:** For Turborepo caching benefits and incremental build times, see [XMLUI Repository Structure](./xmlui-repo.md).
@@ -575,7 +579,7 @@ npm run build-xmlui
 cd xmlui
 
 # Check all entry points
-ls -la dist/lib/*.mjs
+ls -la dist/lib/*.js
 
 # Verify TypeScript declarations
 ls -la dist/lib/*.d.ts
@@ -612,6 +616,7 @@ npx tsc --noEmit
 ### Common Issues
 
 **Issue: Missing .d.ts files**
+
 ```bash
 # Ensure vite-plugin-dts is installed
 cd xmlui
@@ -622,6 +627,7 @@ npm run build:xmlui
 ```
 
 **Issue: SCSS files not copied**
+
 ```bash
 # Verify rollup-plugin-copy configuration
 # Check that src/**/*.scss exists
@@ -630,6 +636,7 @@ find src -name "*.scss" | head -10
 ```
 
 **Issue: Standalone build too large**
+
 ```bash
 # Analyze bundle contents
 cd xmlui
@@ -640,6 +647,7 @@ npx rollup-plugin-visualizer dist/standalone/xmlui-standalone.umd.js
 ```
 
 **Issue: Type conflicts**
+
 ```bash
 # Clear type cache
 rm -rf node_modules/.cache/typescript/
@@ -652,6 +660,7 @@ npm run build:xmlui
 ### Performance Issues
 
 **Slow initial builds:**
+
 - Ensure dependencies are installed: `npm install`
 - Check disk I/O: Build on SSD if possible
 - Increase Node.js memory: `NODE_OPTIONS=--max-old-space-size=4096`
