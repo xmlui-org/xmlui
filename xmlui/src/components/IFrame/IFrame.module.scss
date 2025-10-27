@@ -10,14 +10,17 @@ $themeVars: ();
 $component: "IFrame";
 $themeVars: t.composeBorderVars($themeVars, $component);
 
+// Variables for @layer section
+$width-IFrame: createThemeVar("width-IFrame");
+$height-IFrame: createThemeVar("height-IFrame");
 
 @layer components {
   .iframe {
     @include t.borderVars($themeVars, $component);
 
     display: block;
-    width: createThemeVar("width-IFrame");
-    height: createThemeVar("height-IFrame");
+    width: $width-IFrame;
+    height: $height-IFrame;
   }
 }
 
