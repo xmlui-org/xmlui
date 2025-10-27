@@ -198,5 +198,3 @@ export {
   StandaloneComponent,
   Theme,
 };
-
-export { test, expect } from "./testing/index";
