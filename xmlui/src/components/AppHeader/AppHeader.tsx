@@ -37,11 +37,6 @@ export const AppHeaderMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.showLogo,
     },
-    showNavPanelIf: {
-      description: "Determines if the navigation panel should be displayed",
-      valueType: "boolean",
-      defaultValue: defaultProps.showNavPanelIf,
-    },
   },
   themeVars: parseScssVar(styles.themeVars),
   themeVarDescriptions: {
@@ -75,7 +70,6 @@ export const appHeaderComponentRenderer = createComponentRenderer(
         profileMenu={renderChild(extractValue(node.props.profileMenuTemplate, true))}
         title={extractValue(node.props.title)}
         showLogo={extractValue.asOptionalBoolean(node.props.showLogo)}
-        showNavPanelIf={extractValue.asOptionalBoolean(node.props.showNavPanelIf, defaultProps.showNavPanelIf)}
         titleContent={
           titleTemplate && (
             <SlotItem

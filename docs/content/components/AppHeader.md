@@ -67,10 +67,6 @@ It accepts component definitions.
 
 Show the logo in the header
 
-### `showNavPanelIf` (default: true) [#shownavpanelif-default-true]
-
-Determines if the navigation panel should be displayed
-
 ### `title` [#title]
 
 Title for the application logo
