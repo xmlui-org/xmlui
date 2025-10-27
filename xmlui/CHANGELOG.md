@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.10.26
+
+### Patch Changes
+
+- e1b8d58: Heading now accepts "H1"..."H6", "1"..."6", too. Invalid values fall back to "h1".
+- 1ad832c: Remove the showNavPanelIf property from AppHeader (fix NavPanel's "when" usage)
+
 ## 0.10.25
 
 ### Patch Changes
