@@ -74,27 +74,20 @@
       "outputs": ["dist/**"]
     },
     "build:blog": {
-      "dependsOn": [
-        "^build:extension",
-        "^build:xmlui"
-      ],
+      "dependsOn": ["^build:extension", "^build:xmlui"],
       "outputs": ["dist/**"]
     },
     "build:xmlui-test-bed": {
       "dependsOn": ["build:extension"],
       "outputs": ["src/testing/infrastructure/dist/**"]
     },
-    "build:test-bed": {
-      "dependsOn": ["build:extension"],
-      "outputs": ["dist/**"]
-    },
     "test:unit": {},
     "test:e2e-smoke": {
-      "dependsOn": ["build:test-bed", "build:xmlui-test-bed"],
+      "dependsOn": ["build:xmlui-test-bed"],
       "outputs": ["playwright-report/**"]
     },
     "test:e2e-non-smoke": {
-      "dependsOn": ["build:test-bed", "build:xmlui-test-bed", "test:e2e-smoke"],
+      "dependsOn": ["build:xmlui-test-bed", "test:e2e-smoke"],
       "outputs": ["playwright-report/**"]
     },
     "test:xmlui-all": {

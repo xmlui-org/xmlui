@@ -40,12 +40,6 @@ export default defineConfig({
     permissions: ["clipboard-read", "clipboard-write"],
   },
 
-  /* Global timeout settings */
-  timeout: process.env.CI ? 5000 : 10000,
-  expect: {
-    timeout: 5000, // 5 seconds for expect assertions
-  },
-
   retries: process.env.CI ? 2 : 1,
   /* Configure projects for major browsers */
   projects: [
