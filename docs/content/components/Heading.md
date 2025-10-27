@@ -52,9 +52,9 @@ This property indicates whether ellipses should be displayed (`true`) when the h
 
 ### `level` (default: "h1") [#level-default-h1]
 
-This property sets the visual significance (level) of the heading.
+This property sets the visual significance (level) of the heading. Accepts multiple formats: `h1`-`h6`, `H1`-`H6`, or `1`-`6`.Invalid values default to `h1`.
 
-Available values: `h1` **(default)**, `h2`, `h3`, `h4`, `h5`, `h6`
+Available values: `h1` **(default)**, `h2`, `h3`, `h4`, `h5`, `h6`, `H1`, `H2`, `H3`, `H4`, `H5`, `H6`, `1`, `2`, `3`, `4`, `5`, `6`
 
 | Value | Description                                           |
 | :---- | :---------------------------------------------------- |

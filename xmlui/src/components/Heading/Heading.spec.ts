@@ -417,6 +417,95 @@ test.describe("Basic Functionality", () => {
     const driver = await createHeadingDriver();
     await expect(driver.component).toHaveText("Child content text");
   });
+
+  test.describe("level property accepts numeric values", () => {
+    [1, 2, 3, 4, 5, 6].forEach((level) => {
+      test(`level="{${level}}" renders as h${level}`, async ({ initTestBed, createHeadingDriver }) => {
+        await initTestBed(`<Heading level="{${level}}">Numeric Level ${level}</Heading>`);
+        const driver = await createHeadingDriver();
+        await expect(driver.component).toBeVisible();
+        const tagName = await driver.getComponentTagName();
+        expect(tagName.toLowerCase()).toBe(`h${level}`);
+        await expect(driver.component).toHaveText(`Numeric Level ${level}`);
+      });
+    });
+  });
+
+  test.describe("level property accepts string numeric values", () => {
+    ["1", "2", "3", "4", "5", "6"].forEach((level) => {
+      test(`level="${level}" renders as h${level}`, async ({ initTestBed, createHeadingDriver }) => {
+        await initTestBed(`<Heading level="${level}">String Level ${level}</Heading>`);
+        const driver = await createHeadingDriver();
+        await expect(driver.component).toBeVisible();
+        const tagName = await driver.getComponentTagName();
+        expect(tagName.toLowerCase()).toBe(`h${level}`);
+        await expect(driver.component).toHaveText(`String Level ${level}`);
+      });
+    });
+  });
+
+  test.describe("level property accepts uppercase H format", () => {
+    ["H1", "H2", "H3", "H4", "H5", "H6"].forEach((level) => {
+      test(`level="${level}" renders as ${level.toLowerCase()}`, async ({ initTestBed, createHeadingDriver }) => {
+        await initTestBed(`<Heading level="${level}">Uppercase Level ${level}</Heading>`);
+        const driver = await createHeadingDriver();
+        await expect(driver.component).toBeVisible();
+        const tagName = await driver.getComponentTagName();
+        expect(tagName.toLowerCase()).toBe(level.toLowerCase());
+        await expect(driver.component).toHaveText(`Uppercase Level ${level}`);
+      });
+    });
+  });
+
+  test.describe("level property handles invalid values", () => {
+    [
+      { value: '"invalid"', label: "invalid string" },
+      { value: '"{0}"', label: "zero" },
+      { value: '"{7}"', label: "out of range number (7)" },
+      { value: '"{-1}"', label: "negative number" },
+      { value: '"{999}"', label: "large number" },
+      { value: '"h7"', label: "invalid h-format (h7)" },
+      { value: '"h0"', label: "invalid h-format (h0)" },
+      { value: '"7"', label: "out of range string (7)" },
+      { value: '"{null}"', label: "null" },
+      { value: '"{undefined}"', label: "undefined" },
+      { value: '"{{}}"', label: "empty object" },
+      { value: '"{[]}"', label: "empty array" },
+    ].forEach(({ value, label }) => {
+      test(`level=${value} (${label}) defaults to h1`, async ({ initTestBed, createHeadingDriver }) => {
+        await initTestBed(`<Heading level=${value}>Invalid Level Fallback</Heading>`);
+        const driver = await createHeadingDriver();
+        await expect(driver.component).toBeVisible();
+        const tagName = await driver.getComponentTagName();
+        expect(tagName.toLowerCase()).toBe("h1");
+        await expect(driver.component).toHaveText("Invalid Level Fallback");
+      });
+    });
+  });
+
+  test("level property with mixed case string formats", async ({ initTestBed, createHeadingDriver }) => {
+    const testCases = [
+      { input: "H3", expected: "h3" },
+      { input: "h3", expected: "h3" },
+      { input: "h3", expected: "h3" },
+    ];
+
+    for (const { input, expected } of testCases) {
+      await initTestBed(`<Heading level="${input}">Mixed Case ${input}</Heading>`);
+      const driver = await createHeadingDriver();
+      await expect(driver.component).toBeVisible();
+      const tagName = await driver.getComponentTagName();
+      expect(tagName.toLowerCase()).toBe(expected);
+    }
+  });
+
+  test("level property handles whitespace in string values", async ({ initTestBed, createHeadingDriver }) => {
+    await initTestBed(`<Heading level=" h2 ">Whitespace Level</Heading>`);
+    const driver = await createHeadingDriver();
+    await expect(driver.component).toBeVisible();
+    const tagName = await driver.getComponentTagName();
+    expect(tagName.toLowerCase()).toBe("h2");
+  });
 });
 
 // =============================================================================
