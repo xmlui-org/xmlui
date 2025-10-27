@@ -65,8 +65,9 @@ export function encodeToBase64(value: string | number | boolean | object | null)
 
 /**
  * Convert base64 string to Uint8Array without using atob.
+ * Use this for binary data (e.g., compressed data).
  */
-function base64ToUint8Array(base64: string): Uint8Array {
+export function base64ToUint8Array(base64: string): Uint8Array {
   const base64abc = [
     "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
     "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
