@@ -70,6 +70,7 @@
     "glob": "7.2.0",
     "immer": "9.0.16",
     "js-yaml": "^4.1.0",
+    "known-css-properties": "^0.37.0",
     "lodash-es": "4.17.21",
     "memoize-one": "6.0.0",
     "msw": "2.8.4",

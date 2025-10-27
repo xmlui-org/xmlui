@@ -1,11 +1,10 @@
-import type { CSSProperties } from "react";
 import type React from "react";
 import { createContext, useContext, useEffect, useInsertionEffect, useMemo, useState } from "react";
 import type { StyleObjectType } from "./StyleRegistry";
 import { StyleRegistry } from "./StyleRegistry";
 import { EMPTY_OBJECT } from "../constants";
 import { useIndexerContext } from "../../components/App/IndexerContext";
-import { CssPropsWithStates, ResolvedComponentLayout } from "./component-layout-resolver";
+import type { CssPropsWithStates, ResolvedComponentLayout } from "./component-layout-resolver";
 import { useTheme } from "./ThemeContext";
 
 // The context is typed to hold either a StyleRegistry instance or null.

@@ -3,7 +3,7 @@ import {
   BASE_COMPONENT_PART,
   resolveComponentLayoutProps,
 } from "../../../src/components-core/theming/component-layout-resolver";
-import { StackStylePropResolvers } from "../../../src/components/Stack/Stack";
+import { StackStyleResolver } from "../../../src/components/Stack/Stack";
 
 describe("Component property layout", () => {
   it("should parse empty", () => {
@@ -1042,20 +1042,18 @@ describe("Component property layout", () => {
       "horizontalAlignment": "center",
       "orientation-md": "horizontal"
     }, {
-      stylePropResolvers: StackStylePropResolvers
+      stylePropResolvers: StackStyleResolver
     });
     expect(result).toStrictEqual({
       [BASE_COMPONENT_PART]: {
         baseStyles: {
-          flexDirection: "column",
-          justifyContent: "flex-start",
           alignItems: "center"
         },
         responsiveStyles: {
           md: {
             flexDirection: "row",
-            justifyContent: "center",
             alignItems: "flex-start",
+            justifyContent: "center",
           }
         }
       },
@@ -1063,26 +1061,19 @@ describe("Component property layout", () => {
   });
 
   it("responsive depends on (Stack orientation + horizontalAlignment + reverse)", () => {
-    // <Stack
-    //     orientation="vertical"
-    //     orientation-md="horizontal"
-    //     horizontalAlignment="center"
-    //   >
-
     const result = resolveComponentLayoutProps({
       "orientation": "vertical",
-      "horizontalAlignment": "center",
       "reverse": "true",
+      "horizontalAlignment": "center",
       "orientation-md": "horizontal",
       "reverse-md": "false",
     }, {
-      stylePropResolvers: StackStylePropResolvers
+      stylePropResolvers: StackStyleResolver
     });
     expect(result).toStrictEqual({
       [BASE_COMPONENT_PART]: {
         baseStyles: {
           flexDirection: "column-reverse",
-          justifyContent: "flex-start",
           alignItems: "center"
         },
         responsiveStyles: {
@@ -1099,27 +1090,31 @@ describe("Component property layout", () => {
 
   it("responsive depends on (Stack orientation + horizontalAlignment + reverse 2)", () => {
     // <Stack
+    //     height="100px"
+    //     backgroundColor="blue"
     //     orientation="vertical"
-    //     orientation-md="horizontal"
+    //     reverse="true"
     //     horizontalAlignment="center"
+    //     orientation-md="horizontal"
+    //     reverse-xl="false"
+    //     backgroundColor-xxl="red"
     //   >
 
     const result = resolveComponentLayoutProps({
       "orientation": "vertical",
-      "horizontalAlignment": "center",
       "reverse": "true",
+      "horizontalAlignment": "center",
       "orientation-md": "horizontal",
       "reverse-xl": "false",
       "backgroundColor-xxl": "red"
     }, {
-      stylePropResolvers: StackStylePropResolvers
+      stylePropResolvers: StackStyleResolver
     });
     expect(result).toStrictEqual({
       [BASE_COMPONENT_PART]: {
         baseStyles: {
           flexDirection: "column-reverse",
-          justifyContent: "flex-start",
-          alignItems: "center"
+          alignItems: "center",
         },
         responsiveStyles: {
           md: {
@@ -1128,9 +1123,7 @@ describe("Component property layout", () => {
             alignItems: "flex-start",
           },
           xl: {
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "flex-start",
+            flexDirection: "row"
           },
           xxl: {
             backgroundColor: "red"
@@ -1139,6 +1132,4 @@ describe("Component property layout", () => {
       },
     });
   });
-
-
 });

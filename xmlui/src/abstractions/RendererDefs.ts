@@ -11,7 +11,7 @@ import type { ContainerState } from "./ContainerDefs";
 import type { LookupActionOptions, LookupAsyncFn, LookupSyncFn } from "./ActionDefs";
 import type { AsyncFunction } from "./FunctionDefs";
 import type {ComponentApi} from "../components-core/rendering/ContainerWrapper";
-import { layoutOptionKeys } from "../components-core/descriptorHelper";
+import type { layoutOptionKeys } from "../components-core/descriptorHelper";
 
 // This interface defines the renderer context for the exposed components of the 
 // XMLUI framework.
@@ -142,8 +142,10 @@ export type StylePropResolvers = Partial<
   Record<(typeof layoutOptionKeys)[number] | "defaults", (context: StylePropResolverContext) => CSSProperties>
 >;
 
+export type StylePropsResolver = (styleProps: Record<(typeof layoutOptionKeys)[number], string>)=> CSSProperties;
+
 export type ComponentRendererOptions = {
-  stylePropResolvers?: StylePropResolvers;
+  stylePropsResolver?: StylePropsResolver;
 };
 
 // This function renders a component definition into a React component

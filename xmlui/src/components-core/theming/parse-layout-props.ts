@@ -10,7 +10,7 @@ export type ParsedLayout = {
   states?: string[];
 }
 
-export function parseLayoutProperty(prop: string, parseComponent: boolean = false): ParsedLayout | string {
+export function parseLayoutProperty(prop: string, parseComponent: boolean = false, value: any): ParsedLayout | string {
   if (!prop || typeof prop !== 'string') {
     return "Property string cannot be empty";
   }
@@ -49,7 +49,8 @@ export function parseLayoutProperty(prop: string, parseComponent: boolean = fals
 
   const result: ParsedLayout = {
     property,
-    states: states.length > 0 ? states : undefined
+    states: states.length > 0 ? states : undefined,
+    value
   };
 
   let segmentIndex = 1;

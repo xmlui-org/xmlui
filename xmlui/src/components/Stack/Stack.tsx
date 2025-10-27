@@ -3,16 +3,17 @@ import type React from "react";
 import styles from "./Stack.module.scss";
 
 import type { ComponentDef, ComponentPropertyMetadata } from "../../abstractions/ComponentDefs";
-import type { RenderChildFn, StylePropResolvers } from "../../abstractions/RendererDefs";
-import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
+import { RenderChildFn, StylePropsResolver } from "../../abstractions/RendererDefs";
+import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { isComponentDefChildren } from "../../components-core/utils/misc";
 import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dClick, dInternal } from "../metadata-helpers";
-import { DEFAULT_ORIENTATION, Stack, defaultProps } from "./StackNative";
+import { DEFAULT_ORIENTATION, defaultProps, Stack } from "./StackNative";
 import { alignmentOptionValues } from "../abstractions";
+import type { layoutOptionKeys } from "../../components-core/descriptorHelper";
 
 const COMP = "Stack";
 
@@ -176,41 +177,34 @@ function renderStack({
   );
 }
 
-export const StackStylePropResolvers: StylePropResolvers = {
-  defaults: () => {
-    return {
-      flexDirection: "row",
-      alignItems: "flex-start",
-      justifyContent: "flex-start",
-    };
-  },
-  orientation: ({ value, node, extractValue, resolveStyleProp }) => {
-    return {
-      flexDirection: value === "horizontal" ? "row" : "column",
-    };
-  },
-  reverse: ({ value, resolveStyleProp }) => {
-    if (resolveStyleProp("flexDirection").startsWith("row")) {
-      return { flexDirection: value === "true" ? "row-reverse" : "row" };
-    } else {
-      return { flexDirection: value === "true" ? "column-reverse" : "column" };
+export const StackStyleResolver: StylePropsResolver = (styleProps) => {
+  const {
+    orientation = defaultProps.orientation,
+    horizontalAlignment = "start",
+    verticalAlignment = "start",
+    reverse = defaultProps.reverse,
+  } = styleProps;
+  let result: Record<(typeof layoutOptionKeys)[number], string> = {};
+  if (orientation === "horizontal") {
+    result.flexDirection = reverse ? "row-reverse" : "row";
+    if (horizontalAlignment) {
+      result.justifyContent = horizontalAlignment;
     }
-  },
-  horizontalAlignment: ({ value, resolveStyleProp }) => {
-    if (resolveStyleProp("flexDirection").startsWith("row")) {
-      return { justifyContent: value };
-    } else {
-      return { alignItems: value };
+    if (verticalAlignment) {
+      result.alignItems = verticalAlignment;
     }
-  },
-  verticalAlignment: ({ value, resolveStyleProp }) => {
-    if (resolveStyleProp("flexDirection").startsWith("column")) {
-      return { justifyContent: value };
-    } else {
-      return { alignItems: value };
+  } else if (orientation === "vertical") {
+    result.flexDirection = reverse ? "column-reverse" : "column";
+    if (horizontalAlignment) {
+      result.alignItems = horizontalAlignment;
     }
-  },
+    if (verticalAlignment) {
+      result.justifyContent = verticalAlignment;
+    }
+  }
+  return result;
 };
+
 export const stackComponentRenderer = createComponentRenderer(
   COMP,
   StackMd,
@@ -230,7 +224,7 @@ export const stackComponentRenderer = createComponentRenderer(
     });
   },
   {
-    stylePropResolvers: StackStylePropResolvers,
+    stylePropsResolver: StackStyleResolver,
   },
 );
 

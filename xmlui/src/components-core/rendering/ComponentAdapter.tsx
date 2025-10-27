@@ -10,6 +10,7 @@ import type {
   RegisterComponentApiFn,
   RenderChildFn,
   RendererContext,
+  StylePropsResolver,
 } from "../../abstractions/RendererDefs";
 import type { LookupAsyncFn, LookupSyncFn } from "../../abstractions/ActionDefs";
 
@@ -30,9 +31,13 @@ import { layoutOptionKeys } from "../descriptorHelper";
 import { useMouseEventHandlers } from "../event-handlers";
 import UnknownComponent from "./UnknownComponent";
 import InvalidComponent from "./InvalidComponent";
-import { parseTooltipOptions, Tooltip } from "../../components/Tooltip/TooltipNative";
 import { useComponentStyle } from "../theming/StyleContext";
-import { resolveComponentLayoutProps } from "../theming/component-layout-resolver";
+import {
+  cleanUpLayoutProps,
+  extendLayoutPropsWithExtra,
+  resolveComponentLayoutProps,
+  ResolvedComponentLayout,
+} from "../theming/component-layout-resolver";
 
 // --- The available properties of Component
 type Props = Omit<InnerRendererContext, "layoutContext"> & {
@@ -205,26 +210,31 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
   // --- Collect and compile the layout property values
   const resolvedPartLayouts = useMemo(() => {
-    console.log(safeNode.props);
-    const resolvedLayoutProps: Record<string, any> = Object.keys(safeNode.props)
-      .filter((key) => [...Object.keys(rendererOptions?.stylePropResolvers || {}), ...layoutOptionKeys].some((prefix) => key.startsWith(prefix)))
-      .reduce((acc, key) => {
-        acc[key] = valueExtractor(safeNode.props[key], true);
-        return acc;
-      }, {});
+    let resolvedLayoutProps = {};
+    const resolvedProps: Record<string, any> = {};
+      Object.keys(safeNode.props)
+      .forEach((key) => {
+        resolvedProps[key] = valueExtractor(safeNode.props[key], true)
+        if(layoutOptionKeys.some((prefix) => key.startsWith(prefix))){
+          resolvedLayoutProps[key] = resolvedProps[key];
+        }
+      });
+
     // --- New layout property resolution
-    return resolveComponentLayoutProps(resolvedLayoutProps, {
-      layoutContext: layoutContextRef?.current,
-      stylePropResolvers: rendererOptions?.stylePropResolvers,
-      node: safeNode,
-      valueExtractor,
-    });
+    let result = resolveComponentLayoutProps(resolvedLayoutProps, layoutContextRef?.current);
+    if(rendererOptions?.stylePropsResolver){
+      result = extendLayoutPropsWithExtra(result, resolvedProps, rendererOptions.stylePropsResolver);
+    }
+
+    result = cleanUpLayoutProps(result);
+
+    return result;
     // --- Old layout property resolution
     // return compileLayout(resolvedLayoutProps, themeVars, {
     //   ...layoutContextRef?.current,
     //   mediaSize: appContext.mediaSize,
     // });
-  }, [layoutContextRef, rendererOptions?.stylePropResolvers, safeNode, valueExtractor]);
+  }, [layoutContextRef, rendererOptions?.stylePropsResolver, safeNode.props, valueExtractor]);
 
   // const className = useComponentStyle(cssProps);
 

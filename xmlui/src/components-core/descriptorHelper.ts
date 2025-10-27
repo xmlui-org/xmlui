@@ -89,6 +89,7 @@ export const layoutOptionKeys = [
   "wordWrap",
   "writingMode",
   "transition",
+  "transform",
   "visible",
   "when"
-] as const;
+];
