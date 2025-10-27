@@ -2,6 +2,7 @@
   "name": "xmlui",
   "version": "0.10.26",
   "sideEffects": false,
+  "type": "module",
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
     "build:xmlui-test-bed": "cd src/testing/infrastructure && xmlui build --build-mode=INLINE_ALL --withHostingMetaFiles --withMock",
@@ -10,9 +11,7 @@
     "build:xmlui-standalone": "vite build --mode standalone",
     "build:xmlui-metadata": "vite build --mode metadata",
     "test:unit": "vitest run",
-    "test:e2e-non-smoke": "playwright test --project non-smoke",
-    "test:e2e-smoke": "playwright test --project smoke",
-    "test:e2e-ui": "playwright test --ui",
+    "test:e2e": "playwright test",
     "test:e2e-summary": "node scripts/e2e-test-summary.js",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "prepublishOnly": "clean-package",
@@ -22,7 +21,7 @@
     "generate-all-docs": "npm run build:xmlui-metadata && npm run generate-docs && npm run generate-docs-summaries",
     "export-themes": "npm run build:xmlui-metadata && node scripts/generate-docs/create-theme-files.mjs",
     "generate-docs-with-refresh": "npm run build:xmlui-metadata && npm run generate-docs && npm run generate-docs-summaries",
-    "gen:langserver-metadata": "node scripts/get-langserver-metadata.mjs > src/language-server/xmlui-metadata-generated.mjs"
+    "gen:langserver-metadata": "node scripts/get-langserver-metadata.js > src/language-server/xmlui-metadata-generated.js"
   },
   "dependencies": {
     "@eslint-community/regexpp": "4.10.0",
@@ -115,7 +114,6 @@
     "@babel/core": "7.19.6",
     "@babel/preset-env": "7.19.4",
     "@babel/preset-typescript": "7.18.6",
-    "@playwright/test": "1.53.0",
     "@remix-run/dev": "2.12.1",
     "@remix-run/node": "2.12.1",
     "@remix-run/serve": "2.12.1",
@@ -146,6 +144,7 @@
     "rollup-plugin-visualizer": "5.8.3",
     "serve": "14.2.0",
     "terser": "^5.44.0",
+    "tsx": "4.20.6",
     "typescript": "5.7.3",
     "vite": "5.4.19",
     "vite-plugin-dts": "4.5.0",
@@ -170,27 +169,27 @@
   "clean-package": {
     "replace": {
       "bin": {
-        "xmlui": "dist/scripts/bin/bootstrap.js"
+        "xmlui": "dist/scripts/bin/bootstrap.cjs"
       },
       "main": "./dist/standalone/xmlui-standalone.umd.js",
-      "module": "./dist/lib/xmlui.mjs",
+      "module": "./dist/lib/xmlui.js",
       "types": "./dist/lib/xmlui.d.ts",
       "exports": {
         ".": {
-          "import": "./dist/lib/xmlui.mjs",
+          "import": "./dist/lib/xmlui.js",
           "require": "./dist/standalone/xmlui-standalone.umd.js"
         },
         "./language-server": {
-          "import": "./dist/lib/language-server.mjs",
-          "require": "./dist/lib/language-server.mjs"
+          "import": "./dist/lib/language-server.js",
+          "require": "./dist/lib/language-server.js"
         },
         "./language-server-web-worker": {
-          "import": "./dist/lib/language-server-web-worker.mjs",
-          "require": "./dist/lib/language-server-web-worker.mjs"
+          "import": "./dist/lib/language-server-web-worker.js",
+          "require": "./dist/lib/language-server-web-worker.js"
         },
         "./parser": {
-          "import": "./dist/lib/xmlui-parser.mjs",
-          "require": "./dist/lib/xmlui-parser.mjs"
+          "import": "./dist/lib/xmlui-parser.js",
+          "require": "./dist/lib/xmlui-parser.js"
         },
         "./*.css": {
           "import": "./dist/lib/*.css",
@@ -209,12 +208,16 @@
           "require": "./dist/scripts/bin/vite-xmlui-plugin.js"
         },
         "./syntax/monaco": {
-          "import": "./dist/lib/syntax-monaco.mjs",
-          "require": "./dist/lib/syntax-monaco.mjs"
+          "import": "./dist/lib/syntax-monaco.js",
+          "require": "./dist/lib/syntax-monaco.js"
         },
         "./syntax/textmate": {
-          "import": "./dist/lib/syntax-textmate.mjs",
-          "require": "./dist/lib/syntax-textmate.mjs"
+          "import": "./dist/lib/syntax-textmate.js",
+          "require": "./dist/lib/syntax-textmate.js"
+        },
+        "./testing": {
+          "import": "./dist/lib/testing.js",
+          "require": "./dist/lib/testing.js"
         }
       }
     }
@@ -255,6 +258,10 @@
     "./syntax/textmate": {
       "import": "./src/syntax/textMate/index.ts",
       "require": "./src/syntax/textMate/index.ts"
+    },
+    "./testing": {
+      "import": "./src/testing/index.ts",
+      "require": "./src/testing/index.ts"
     }
   },
   "browserslist": {

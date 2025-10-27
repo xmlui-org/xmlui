@@ -372,40 +372,34 @@ headingLevels.forEach((level) => {
 // =============================================================================
 
 test.describe("Basic Functionality", () => {
-  test("component renders with basic props", async ({ initTestBed, createHeadingDriver }) => {
+  test("component renders with basic props", async ({ initTestBed, page, createHeadingDriver }) => {
     await initTestBed(`<Heading>Test Heading</Heading>`);
     const driver = await createHeadingDriver();
     await expect(driver.component).toBeVisible();
     await expect(driver.component).toHaveText("Test Heading");
   });
 
-  test("component renders with all heading levels", async ({
-    initTestBed,
-    createHeadingDriver,
-  }) => {
-    const levels = ["h1", "h2", "h3", "h4", "h5", "h6"];
-    for (const level of levels) {
-      await initTestBed(`<Heading level="${level}">Level ${level}</Heading>`);
+  ["h1", "h2", "h3", "h4", "h5", "h6"].forEach((lvl) => {
+    test(`component renders with ${lvl} level`, async ({ initTestBed, createHeadingDriver }) => {
+      await initTestBed(`<Heading level="${lvl}">Level ${lvl}</Heading>`);
       const driver = await createHeadingDriver();
       await expect(driver.component).toBeVisible();
       const tagName = await driver.getComponentTagName();
-      expect(tagName.toLowerCase()).toBe(level);
-    }
+      expect(tagName.toLowerCase()).toBe(lvl);
+    });
   });
 
-  test("specialized heading components render correctly", async ({
-    initTestBed,
-    createHeadingDriver,
-  }) => {
-    const components = ["H1", "H2", "H3", "H4", "H5", "H6"];
-    for (const component of components) {
-      await initTestBed(`<${component}>Specialized ${component}</${component}>`);
+  ["H1", "H2", "H3", "H4", "H5", "H6"].forEach((c) => {
+    test(`specialized ${c} components renders content`, async ({
+      initTestBed,
+      createHeadingDriver,
+    }) => {
+      await initTestBed(`<${c}>Specialized ${c}</${c}>`);
       const driver = await createHeadingDriver();
       await expect(driver.component).toBeVisible();
-      await expect(driver.component).toHaveText(`Specialized ${component}`);
-    }
+      await expect(driver.component).toHaveText(`Specialized ${c}`);
+    });
   });
-
   test("component handles value prop", async ({ initTestBed, createHeadingDriver }) => {
     await initTestBed(`<Heading value="Value prop text" />`);
     const driver = await createHeadingDriver();
@@ -524,40 +518,24 @@ test.describe("Accessibility", () => {
     expect(tagName.toLowerCase()).toBe("h2");
   });
 
-  test("all heading levels have correct semantic roles", async ({
-    initTestBed,
-    createHeadingDriver,
-  }) => {
-    const levels = ["h1", "h2", "h3", "h4", "h5", "h6"];
-    for (const level of levels) {
-      await initTestBed(`<Heading level="${level}">Level ${level}</Heading>`);
-      const driver = await createHeadingDriver();
-      await expect(driver.component).toHaveRole("heading");
-      const tagName = await driver.getComponentTagName();
-      expect(tagName.toLowerCase()).toBe(level);
-    }
-  });
-
-  test("specialized components maintain semantic heading structure", async ({
-    initTestBed,
-    createHeadingDriver,
-  }) => {
-    const components = [
-      { component: "H1", expectedTag: "h1" },
-      { component: "H2", expectedTag: "h2" },
-      { component: "H3", expectedTag: "h3" },
-      { component: "H4", expectedTag: "h4" },
-      { component: "H5", expectedTag: "h5" },
-      { component: "H6", expectedTag: "h6" },
-    ];
-
-    for (const { component, expectedTag } of components) {
+  [
+    { component: "H1", expectedTag: "h1" },
+    { component: "H2", expectedTag: "h2" },
+    { component: "H3", expectedTag: "h3" },
+    { component: "H4", expectedTag: "h4" },
+    { component: "H5", expectedTag: "h5" },
+    { component: "H6", expectedTag: "h6" },
+  ].forEach(({ component, expectedTag }) => {
+    test(`${component} renders as ${expectedTag} element`, async ({
+      initTestBed,
+      createHeadingDriver,
+    }) => {
       await initTestBed(`<${component}>Heading Level ${expectedTag}</${component}>`);
       const driver = await createHeadingDriver();
       await expect(driver.component).toHaveRole("heading");
       const tagName = await driver.getComponentTagName();
       expect(tagName.toLowerCase()).toBe(expectedTag);
-    }
+    });
   });
 
   test("component supports accessible text content", async ({
@@ -1057,8 +1035,8 @@ test.describe("API", () => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Stack width="200px">
-          <H1 id="overflowHeading" maxLines="{1}" 
-            value="This is a very long heading text that should definitely overflow when constrained to a small width" 
+          <H1 id="overflowHeading" maxLines="{1}"
+            value="This is a very long heading text that should definitely overflow when constrained to a small width"
           />
           <Button onClick="testState = overflowHeading.hasOverflow()" />
         </Stack>
@@ -1142,13 +1120,13 @@ test.describe("API", () => {
           <H4 id="h4Text" maxLines="{1}" value="This is a very long heading that should overflow" />
           <H5 id="h5Text" maxLines="{1}" value="This is a very long heading that should overflow" />
           <H6 id="h6Text" maxLines="{1}" value="This is a very long heading that should overflow" />
-          <Button onClick="testState = { 
-            h1: h1Text.hasOverflow(), 
-            h2: h2Text.hasOverflow(), 
-            h3: h3Text.hasOverflow(), 
-            h4: h4Text.hasOverflow(), 
-            h5: h5Text.hasOverflow(), 
-            h6: h6Text.hasOverflow() 
+          <Button onClick="testState = {
+            h1: h1Text.hasOverflow(),
+            h2: h2Text.hasOverflow(),
+            h3: h3Text.hasOverflow(),
+            h4: h4Text.hasOverflow(),
+            h5: h5Text.hasOverflow(),
+            h6: h6Text.hasOverflow()
           }" />
         </Stack>
       </Fragment>
@@ -1216,7 +1194,10 @@ test.describe("API", () => {
     await expect.poll(testStateDriver.testState).toBe(true);
   });
 
-  test("hasOverflow works with nested content instead of value prop", async ({ initTestBed, page }) => {
+  test("hasOverflow works with nested content instead of value prop", async ({
+    initTestBed,
+    page,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Stack width="100px">

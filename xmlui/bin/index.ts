@@ -1,19 +1,14 @@
-#!/usr/bin/env node
-
 import { build } from "./build";
 import { start } from "./start";
 import { preview } from "./preview";
-import { argv } from "yargs";
+import yargs from "yargs/yargs";
+import { hideBin } from "yargs/helpers";
 import AdmZip from "adm-zip";
 import { buildLib } from "./build-lib";
 
 process.on("unhandledRejection", (err) => {
   throw err;
 });
-const args = process.argv.slice(2);
-
-const scriptIndex = args.findIndex((x) => x === "build" || x === "eject" || x === "start" || x === "test");
-const script = scriptIndex === -1 ? args[0] : args[scriptIndex];
 
 async function zipDirectory(sourceDir: string, outPath: string = sourceDir) {
   const zip = new AdmZip();
@@ -22,7 +17,13 @@ async function zipDirectory(sourceDir: string, outPath: string = sourceDir) {
   console.log(`Zip file created: ${outPath}`);
 }
 
-async function zipDist({target = "ui.zip", source="dist"}: {target?: string, source?: string}) {
+async function zipDist({
+  target = "ui.zip",
+  source = "dist",
+}: {
+  target?: string;
+  source?: string;
+}) {
   await zipDirectory(`${process.cwd()}/${source}`, `${process.cwd()}/${target}`);
 }
 
@@ -47,10 +48,116 @@ function getStringArg(arg: any, defaultValue: string | undefined) {
   return dedupeArg(arg);
 }
 
-switch (script) {
+// Configure yargs with proper typing
+interface BuildArgs {
+  flatDist?: boolean;
+  prod?: boolean;
+  buildMode?: string;
+  withMock?: boolean;
+  withHostingMetaFiles?: boolean;
+  withRelativeRoot?: boolean;
+}
+
+interface BuildLibArgs {
+  watch?: boolean;
+  mode?: string;
+}
+
+interface StartArgs {
+  port?: number;
+  withMock?: boolean;
+  proxy?: string;
+}
+
+interface PreviewArgs {
+  proxy?: string;
+}
+
+interface ZipDistArgs {
+  target?: string;
+  source?: string;
+}
+
+const argv = yargs(hideBin(process.argv))
+  .command<BuildArgs>("build", "Build the project", (yargs) => {
+    return yargs
+      .option("flatDist", {
+        type: "boolean",
+        description: "Create flat distribution",
+      })
+      .option("prod", {
+        type: "boolean",
+        description: "Production build",
+      })
+      .option("buildMode", {
+        type: "string",
+        description: "Build mode",
+      })
+      .option("withMock", {
+        type: "boolean",
+        description: "Include mock data",
+      })
+      .option("withHostingMetaFiles", {
+        type: "boolean",
+        description: "Include hosting meta files",
+      })
+      .option("withRelativeRoot", {
+        type: "boolean",
+        description: "Use relative root",
+      });
+  })
+  .command<BuildLibArgs>("build-lib", "Build library", (yargs) => {
+    return yargs
+      .option("watch", {
+        type: "boolean",
+        description: "Watch mode",
+      })
+      .option("mode", {
+        type: "string",
+        description: "Build mode",
+      });
+  })
+  .command<StartArgs>("start", "Start development server", (yargs) => {
+    return yargs
+      .option("port", {
+        type: "number",
+        description: "Port number",
+      })
+      .option("withMock", {
+        type: "boolean",
+        description: "Include mock data",
+      })
+      .option("proxy", {
+        type: "string",
+        description: "Proxy target",
+      });
+  })
+  .command<PreviewArgs>("preview", "Preview build", (yargs) => {
+    return yargs.option("proxy", {
+      type: "string",
+      description: "Proxy target",
+    });
+  })
+  .command<ZipDistArgs>("zip-dist", "Zip distribution", (yargs) => {
+    return yargs
+      .option("target", {
+        type: "string",
+        description: "Target zip file",
+      })
+      .option("source", {
+        type: "string",
+        description: "Source directory",
+      });
+  })
+  .help()
+  .parseSync();
+
+const command = argv._[0] as string;
+
+switch (command) {
   case "build": {
     const { flatDist, prod, buildMode, withMock, withHostingMetaFiles, withRelativeRoot } =
-      argv as any;
+      argv as BuildArgs;
 
     build({
       buildMode: getStringArg(buildMode, prod ? "CONFIG_ONLY" : undefined),
@@ -62,27 +169,28 @@ switch (script) {
     break;
   }
   case "build-lib": {
-    const { watch, mode } = argv as any;
-    buildLib({watchMode: getBoolArg(watch, false), mode: getStringArg(mode, "")});
+    const { watch, mode } = argv as BuildLibArgs;
+    buildLib({ watchMode: getBoolArg(watch, false), mode: getStringArg(mode, "") });
     break;
   }
   case "start": {
-    const { port, withMock, proxy } = argv as any;
+    const { port, withMock, proxy } = argv as StartArgs;
     start({ port, withMock: getBoolArg(withMock), proxy });
     break;
   }
   case "preview": {
-    const { proxy } = argv as any;
-    preview({proxy});
+    const { proxy } = argv as PreviewArgs;
+    preview({ proxy });
     break;
   }
   case "zip-dist": {
-    const { target, source } = argv as any;
-    zipDist({target, source});
+    const { target, source } = argv as ZipDistArgs;
+    zipDist({ target, source });
     break;
   }
   default: {
-    console.log('Unknown script "' + script + '".');
+    console.log('Unknown command "' + command + '".');
     console.log("Perhaps you need to update xmlui?");
+    process.exit(1);
   }
 }

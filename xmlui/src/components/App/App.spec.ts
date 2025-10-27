@@ -10,29 +10,40 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByTestId("app")).toBeVisible();
   });
 
-  test("renders with different layout types", async ({ initTestBed, page }) => {
-    await initTestBed(`<App layout="horizontal" testId="app"/>`);
-    await expect(page.getByTestId("app")).toBeVisible();
-
-    await initTestBed(`<App layout="horizontal-sticky" testId="app"/>`);
-    await expect(page.getByTestId("app")).toBeVisible();
-
-    await initTestBed(`<App layout="condensed" testId="app"/>`);
-    await expect(page.getByTestId("app")).toBeVisible();
-
-    await initTestBed(`<App layout="condensed-sticky" testId="app"/>`);
-    await expect(page.getByTestId("app")).toBeVisible();
-
-    await initTestBed(`<App layout="vertical" testId="app"/>`);
-    await expect(page.getByTestId("app")).toBeVisible();
-
-    await initTestBed(`<App layout="vertical-sticky" testId="app"/>`);
-    await expect(page.getByTestId("app")).toBeVisible();
-
-    await initTestBed(`<App layout="vertical-full-header" testId="app"/>`);
-    await expect(page.getByTestId("app")).toBeVisible();
+  test("renders with horizontal layout", async ({ initTestBed, page }) => {
+    await initTestBed(`<App layout="horizontal">test text</App>`);
+    await expect(page.getByText("test text")).toBeVisible();
   });
 
+  test("renders with horizontal-sticky layout", async ({ initTestBed, page }) => {
+    await initTestBed(`<App layout="horizontal-sticky">test text</App>`);
+    await expect(page.getByText("test text")).toBeVisible();
+  });
+
+  test("renders with condensed layout", async ({ initTestBed, page }) => {
+    await initTestBed(`<App layout="condensed">test text</App>`);
+    await expect(page.getByText("test text")).toBeVisible();
+  });
+
+  test("renders with condensed-sticky layout", async ({ initTestBed, page }) => {
+    await initTestBed(`<App layout="condensed-sticky">test text</App>`);
+    await expect(page.getByText("test text")).toBeVisible();
+  });
+
+  test("renders with vertical layout", async ({ initTestBed, page }) => {
+    await initTestBed(`<App layout="vertical">test text</App>`);
+    await expect(page.getByText("test text")).toBeVisible();
+  });
+
+  test("renders with vertical-sticky layout", async ({ initTestBed, page }) => {
+    await initTestBed(`<App layout="vertical-sticky">test text</App>`);
+    await expect(page.getByText("test text")).toBeVisible();
+  });
+
+  test("renders with vertical-full-header layout", async ({ initTestBed, page }) => {
+    await initTestBed(`<App layout="vertical-full-header">test text</App>`);
+    await expect(page.getByText("test text")).toBeVisible();
+  });
   test("handles layout prop changes correctly", async ({
     page,
     initTestBed,

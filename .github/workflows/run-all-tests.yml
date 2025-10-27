@@ -70,8 +70,10 @@ jobs:
       - name: Install Playwright Browsers
         if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
-      - name: run some tests
-        run: npm run test-xmlui
+      - name: ensure we can build xmlui and the extensions
+        run: npm run build-xmlui
+      - name: run all tests
+        run: npm run test
       - uses: actions/upload-artifact@v4
         with:
           name: playwright-report

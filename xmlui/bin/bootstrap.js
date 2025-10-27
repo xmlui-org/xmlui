@@ -1,11 +1,4 @@
 #!/usr/bin/env node
+import "tsx";
 
-require("ts-node").register({
-  transpileOnly: true,
-  esm: true,
-  compilerOptions: {
-    module: "commonjs",
-    esModuleInterop: true,
-  },
-});
-require("./index");
+await import("./index.ts");

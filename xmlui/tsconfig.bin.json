@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2015",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -24,8 +20,6 @@
     "outDir": "dist/scripts",
     "types": ["vite/client", "vite-plugin-svgr/client", "node"]
   },
-  "include": [
-    "bin",
-    "src"
-  ]
+  "include": ["bin", "src"],
+  "exclude": ["bin/bootstrap.js"]
 }
