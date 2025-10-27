@@ -29,6 +29,7 @@ import { SearchContextProvider } from "./SearchContext";
 import type { NavHierarchyNode } from "../NavPanel/NavPanelNative";
 import { LinkInfoContext } from "./LinkInfoContext";
 import { EMPTY_OBJECT } from "../../components-core/constants";
+import { shouldKeep } from "../../components-core/utils/extractParam";
 
 type Props = {
   children: ReactNode;
@@ -114,9 +115,20 @@ export function App({
   const safeLayout = layoutWithDefaultValue
     ?.trim()
     .replace(/[\u2013\u2014\u2011]/g, "-") as AppLayoutType; //It replaces all &ndash; (–) and &mdash; (—) and non-breaking hyphen '‑' symbols with simple dashes (-).
-  const { setLoggedInUser, mediaSize, forceRefreshAnchorScroll, appGlobals } = useAppContext();
+  const appContext = useAppContext();
+  const { setLoggedInUser, mediaSize, forceRefreshAnchorScroll, appGlobals } = appContext;
   const hasRegisteredHeader = header !== undefined;
-  const hasRegisteredNavPanel = navPanelDef !== undefined;
+  
+  // --- Check if NavPanel's "when" condition allows it to be rendered
+  // --- This ensures the drawer and hamburger menu are hidden when NavPanel.when evaluates to false
+  const navPanelShouldRender = useMemo(() => {
+    if (!navPanelDef) return false;
+    // Use shouldKeep to evaluate the NavPanel's when condition
+    // Pass empty state {} and appContext since we're evaluating at the App level
+    return shouldKeep(navPanelDef.when, {}, appContext);
+  }, [navPanelDef, appContext]);
+  
+  const hasRegisteredNavPanel = navPanelDef !== undefined && navPanelShouldRender;
 
   useEffect(() => {
     setLoggedInUser(loggedInUser);

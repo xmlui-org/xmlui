@@ -44,6 +44,17 @@ function collectParams(expression: any) {
 
 export function asOptionalBoolean(value: any, defValue?: boolean | undefined) {
   if (value === undefined || value === null) return defValue;
+  
+  // Empty array returns false
+  if (Array.isArray(value) && value.length === 0) {
+    return false;
+  }
+  
+  // Empty object returns false
+  if (typeof value === "object" && value !== null && !Array.isArray(value) && Object.keys(value).length === 0) {
+    return false;
+  }
+  
   if (typeof value === "number") {
     return value !== 0;
   }
@@ -66,7 +77,7 @@ export function asOptionalBoolean(value: any, defValue?: boolean | undefined) {
   if (typeof value === "boolean") {
     return value;
   }
-  throw new Error(`A boolean value expected but ${typeof value} received.`);
+  return true;
 }
 
 // This function represents the extractor function we pass to extractValue

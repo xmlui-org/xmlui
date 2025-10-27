@@ -263,3 +263,134 @@ test.describe("Event Handling", () => {
     await expect.poll(testStateDriver.testState).toEqual(testData);
   });
 });
+
+// =============================================================================
+// Drawer HANDLING TESTS
+// =============================================================================
+
+test.describe("Drawer Handling", () => {
+  test("Drawer displayed if NavPanel has no 'when'", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Set small viewport to trigger drawer mode
+    await page.setViewportSize({ width: 400, height: 600 });
+
+    await initTestBed(`
+      <App layout="condensed">
+        <AppHeader testId="appHeader"/>
+        <NavPanel>
+          <NavGroup label="Pages">
+            <NavLink label="Page 1" to="/page1"/>
+            <NavLink label="Page 2" to="/page2"/>
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `);
+
+    // Open drawer by clicking hamburger button
+    const appHeader = page.getByTestId("appHeader");
+    const hamburgerButton = appHeader.locator('[data-part-id="hamburger"]').first();
+    await expect (hamburgerButton).toBeVisible();
+  });
+
+  test("Drawer displayed if NavPanel has when='true'", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Set small viewport to trigger drawer mode
+    await page.setViewportSize({ width: 400, height: 600 });
+
+    await initTestBed(`
+      <App layout="condensed">
+        <AppHeader testId="appHeader"/>
+        <NavPanel when="true">
+          <NavGroup label="Pages">
+            <NavLink label="Page 1" to="/page1"/>
+            <NavLink label="Page 2" to="/page2"/>
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `);
+
+    // Open drawer by clicking hamburger button
+    const appHeader = page.getByTestId("appHeader");
+    const hamburgerButton = appHeader.locator('[data-part-id="hamburger"]').first();
+    await expect (hamburgerButton).toBeVisible();
+  });
+
+  test("Drawer displayed if NavPanel has when='{true}'", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Set small viewport to trigger drawer mode
+    await page.setViewportSize({ width: 400, height: 600 });
+
+    await initTestBed(`
+      <App layout="condensed">
+        <AppHeader testId="appHeader"/>
+        <NavPanel when="{true}">
+          <NavGroup label="Pages">
+            <NavLink label="Page 1" to="/page1"/>
+            <NavLink label="Page 2" to="/page2"/>
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `);
+
+    // Open drawer by clicking hamburger button
+    const appHeader = page.getByTestId("appHeader");
+    const hamburgerButton = appHeader.locator('[data-part-id="hamburger"]').first();
+    await expect (hamburgerButton).toBeVisible();
+  });
+
+  test("Drawer not displayed if NavPanel has when='false'", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Set small viewport to trigger drawer mode
+    await page.setViewportSize({ width: 400, height: 600 });
+
+    await initTestBed(`
+      <App layout="condensed">
+        <AppHeader testId="appHeader"/>
+        <NavPanel when="false">
+          <NavGroup label="Pages">
+            <NavLink label="Page 1" to="/page1"/>
+            <NavLink label="Page 2" to="/page2"/>
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `);
+
+    // Open drawer by clicking hamburger button
+    const appHeader = page.getByTestId("appHeader");
+    const hamburgerButton = appHeader.locator('[data-part-id="hamburger"]').first();
+    await expect (hamburgerButton).not.toBeVisible();
+  });
+
+  test("Drawer not displayed if NavPanel has when='{false}'", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Set small viewport to trigger drawer mode
+    await page.setViewportSize({ width: 400, height: 600 });
+
+    await initTestBed(`
+      <App layout="condensed">
+        <AppHeader testId="appHeader"/>
+        <NavPanel when="{false}">
+          <NavGroup label="Pages">
+            <NavLink label="Page 1" to="/page1"/>
+            <NavLink label="Page 2" to="/page2"/>
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `);
+
+    // Open drawer by clicking hamburger button
+    const appHeader = page.getByTestId("appHeader");
+    const hamburgerButton = appHeader.locator('[data-part-id="hamburger"]').first();
+    await expect (hamburgerButton).not.toBeVisible();
+  });
+});

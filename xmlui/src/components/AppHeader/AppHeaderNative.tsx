@@ -27,7 +27,6 @@ type Props = {
   title?: string;
   navPanelVisible?: boolean;
   showLogo?: boolean;
-  showNavPanelIf?: boolean;
   toggleDrawer?: () => void;
   hasRegisteredNavPanel?: boolean;
   titleContent?: ReactNode;
@@ -35,9 +34,8 @@ type Props = {
   renderChild?: RenderChildFn;
 };
 
-export const defaultProps: Pick<Props, "showLogo" | "showNavPanelIf"> = {
+export const defaultProps: Pick<Props, "showLogo"> = {
   showLogo: true,
-  showNavPanelIf: true,
 };
 
 export function useLogoUrl() {
@@ -65,7 +63,6 @@ export const AppHeader = ({
   navPanelVisible = true,
   toggleDrawer,
   showLogo = defaultProps.showLogo,
-  showNavPanelIf = defaultProps.showNavPanelIf,
   hasRegisteredNavPanel,
   title,
   titleContent,
@@ -75,7 +72,7 @@ export const AppHeader = ({
   const { mediaSize } = useAppContext();
   const logoUrl = useLogoUrl();
   const subNavPanelSlot = useRef(null);
-  const effectiveNavPanelVisible = navPanelVisible && showNavPanelIf;
+  const effectiveNavPanelVisible = navPanelVisible;
   const safeLogoTitle =
     mediaSize.sizeIndex < 2 ? null : !titleContent && title ? (
       <NavLink to={"/"} displayActive={false} style={{ paddingLeft: 0 }}>
@@ -96,7 +93,7 @@ export const AppHeader = ({
           [styles.full]: !canRestrictContentWidth,
         })}
       >
-        {hasRegisteredNavPanel && showNavPanelIf && (
+        {hasRegisteredNavPanel && (
           <Button
             data-part-id={PART_HAMBURGER}
             onClick={toggleDrawer}
@@ -143,7 +140,6 @@ type AppContextAwareAppHeaderProps = {
   title?: string;
   titleContent?: ReactNode;
   showLogo?: boolean;
-  showNavPanelIf?: boolean;
   renderChild: RenderChildFn;
 };
 
@@ -156,7 +152,6 @@ export function AppContextAwareAppHeader({
   title,
   titleContent,
   showLogo = true,
-  showNavPanelIf = defaultProps.showNavPanelIf,
   renderChild,
 }: AppContextAwareAppHeaderProps) {
   const appLayoutContext = useAppLayoutContext();
@@ -174,7 +169,7 @@ export function AppContextAwareAppHeader({
   // console.log("APP LAYOUT CONTEXT", appLayoutContext);
   const displayLogo = layout !== "vertical" && layout !== "vertical-sticky" && showLogo;
   const canRestrictContentWidth = layout !== "vertical-full-header";
-  const effectiveNavPanelVisible = navPanelVisible && showNavPanelIf;
+  const effectiveNavPanelVisible = navPanelVisible;
 
   return (
     <AppHeader
@@ -183,7 +178,6 @@ export function AppContextAwareAppHeader({
       toggleDrawer={toggleDrawer}
       canRestrictContentWidth={canRestrictContentWidth}
       showLogo={displayLogo}
-      showNavPanelIf={showNavPanelIf}
       logoContent={logoContent || renderChild(logoContentDef)}
       profileMenu={profileMenu}
       style={style}

@@ -9,6 +9,7 @@ import { evalBinding } from "../script-runner/eval-tree-sync";
 import { LRUCache } from "../utils/LruCache";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { layoutOptionKeys } from "../descriptorHelper";
+import { asOptionalBoolean } from "../rendering/valueExtractor";
 
 /**
  * Extract the value of the specified parameter from the given view container state
@@ -171,7 +172,7 @@ export function shouldKeep(
   if (when === undefined) {
     return true;
   }
-  return extractParam(componentState, when, appContext, true);
+  return asOptionalBoolean(extractParam(componentState, when, appContext, true));
 }
 
 /**
