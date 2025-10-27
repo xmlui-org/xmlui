@@ -1,14 +1,17 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { usePlayground } from "../hooks/usePlayground";
 import { NestedApp } from "xmlui";
 
 export function Preview() {
   const { appDescription, options } = usePlayground();
 
+  console.log("Preview render - options.id:", options.id);
+
   let components = useMemo(
     () => appDescription.components.map((comp) => comp.component),
     [appDescription.components],
   );
+
   return (
     <NestedApp
       app={appDescription.app}
@@ -18,6 +21,7 @@ export function Preview() {
       components={components}
       config={appDescription.config}
       height={"100%"}
+      refreshVersion={options.id}
     />
   );
 }
