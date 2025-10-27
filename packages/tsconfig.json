@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2015",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -15,18 +11,12 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": [
-    "demo",
-    "src",
-    "index.ts"
-  ],
-  "exclude": [
-    "demo/**/*.xmlui.xs"
-  ]
+  "include": ["**/demo/**/*", "**/src/**/*", "**/index.ts"],
+  "exclude": ["**/node_modules", "**/dist", "**/demo/**/*.xmlui.xs"]
 }
