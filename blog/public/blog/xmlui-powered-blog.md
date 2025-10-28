@@ -6,7 +6,7 @@ We started with the simplest possible approach: post metadata and data as litera
 
 ```xmlui-pg name="XMLUI blog v1" height="200px"
 ---app
-<App layout="vertical-full-header">
+<App layout="vertical">
   <NavPanel>
     <NavGroup label="Blog">
       <NavLink label="Newest post" to="/newest-post" />
