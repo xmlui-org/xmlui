@@ -248,7 +248,7 @@ $borderColor-TimeInput--disabled: createThemeVar("Input:borderColor-#{$component
       cursor: pointer;
       color: inherit;
       padding: $padding-button-TimeInput;
-      border-radius: createThemeVar("Input:borderRadius-#{$componentName}-default");
+      border-radius: $borderRadius-TimeInput-default;
 
       &:hover {
         background-color: $backgroundColor-TimeInput--hover;

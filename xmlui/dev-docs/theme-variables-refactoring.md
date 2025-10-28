@@ -481,8 +481,9 @@ When refactoring Markdown-like components, prioritize logical grouping by contex
 29. **Slider**
 30. **Select**
 31. **DatePicker**
+32. **Toggle** (contains both Checkbox and Switch)
 
-**Total: 31 components refactored**
+**Total: 32 components refactored**
 
 ### 📦 Components Using Shared Stylesheets
 
@@ -506,5 +507,5 @@ The following components share stylesheets with already-refactored components an
 
 ### 📋 Components Remaining
 
-Approximately **2 components** still need refactoring (out of 42 total with unexposed theme variables, accounting for 31 direct refactorings + 9 shared-stylesheet components + 1 skipped).
+Approximately **1 component** still needs refactoring (out of 42 total with unexposed theme variables, accounting for 32 direct refactorings + 9 shared-stylesheet components + 1 skipped).
 
