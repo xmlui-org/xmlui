@@ -132,7 +132,7 @@ $alignment-content-AppHeader: createThemeVar("alignment-content-#{$component}");
   .drawerToggle.drawerToggle{
     padding: createThemeVar("padding-drawerToggle-#{$component}") !important;
     display: none;
-    @include t.withMaxScreenSize(2) {
+    @include t.withMaxScreenSize(0) {
       display: block;
     }
   }
