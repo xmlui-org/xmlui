@@ -47,19 +47,8 @@ Open source developers who respond to bug reports always hope for, but rarely ge
 
 If you want to make such a report, you can visit [xmlui-codefence-runner.netlify.app](https://xmlui-codefence-runner.netlify.app/), paste in your codefence, open it into a playground, and share its URL. That's the gold standard for this kind of thing, and it's implemented for that site with a dozen lines of XMLUI dropped onto Netlify.
 
-```xmlui
-<App>
-  <H1>XMLUI Codefence Runner</H1>
-  <TextArea
-    id="code"
-    rows="15"
-    initialValue="```xmlui-pg
-  <App>  Hello  </App>
-  ```
-  " />
-  <Markdown content="{code.value}" />
-</App>
-```
+![codefence runner](/blog/images/codefence-runner.png)
+
 
 If you find yourself [filing an issue](https://github.com/xmlui-org/xmlui/issues) that needs a solid reproduction, please give it a try.
 
