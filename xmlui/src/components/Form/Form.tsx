@@ -136,6 +136,14 @@ export const FormMd = createMetadata({
         data: "An object containing the form data to update.",
       },
     },
+    validate: {
+      description: "This method triggers validation on all form fields without submitting the form. " +
+        "It displays validation errors and returns the validation result along with the cleaned form data. " +
+        "This is useful for implementing custom submit buttons or performing operations that require " +
+        "validated data without actually submitting the form.",
+      signature: "validate(): Promise<{ isValid: boolean, data: Record<string, any>, errors: ValidationResult[], warnings: ValidationResult[], validationResults: Record<string, ValidationResult> }>",
+      returns: "A promise that resolves to an object containing validation status, cleaned data, and detailed validation results.",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
