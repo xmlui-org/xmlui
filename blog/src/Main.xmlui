@@ -28,7 +28,7 @@
     ]}`>
     <AppHeader>
         <property name="logoTemplate">
-            <Link to="https://xmlui.org/">
+            <Link to="https:/blog.xmlui.org/">
                 <Logo height="$space-8"/>
             </Link>
         </property>
@@ -72,11 +72,6 @@
             <Text>This site is an XMLUI™ app.</Text>
             <SpaceFiller />
             <ToneSwitch />
-            <Image
-              width="$space-6"
-              height="$space-6"
-              onClick="window.location.href = '/feed.rss'"
-              src="/resources/rss.svg" />
         </HStack>
     </Footer>
 </App>
