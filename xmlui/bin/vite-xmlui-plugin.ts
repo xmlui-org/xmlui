@@ -10,7 +10,6 @@ import {
   moduleFileExtension,
 } from "../src/parsers/xmlui-parser/fileExtensions";
 import { Parser } from "../src/parsers/scripting/Parser";
-import * as fs from "fs";
 import * as path from "path";
 import { errReportComponent, xmlUiMarkupToComponent } from "../src/components-core/xmlui-parser";
 
@@ -75,7 +74,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         // should be checked for errors and warnings. If there are errors, throw an error.
 
         return {
-          code: dataToEsm({...codeBehind, src: code}),
+          code: dataToEsm({ ...codeBehind, src: code }),
           map: { mappings: "" },
         };
       }
