@@ -23,9 +23,11 @@ This boolean property value indicates whether the component responds to user eve
 
 This widget doesn't just display the live app, it also enables you to modify it by clicking the ![popout](/resources/pg-popout.svg) icon. Try it now! You'll land in [a hosted playground](https://playground.xmlui.org/#/playground/#H4sIAAAAAAAAE61W204bMRD9ldWUx2zJhRBYpZXCTVQCVBUKlQoPk%2FUkseK1LduBBZR%2Fr%2BzdJtmw4SLxlsycmTmeOfbsM1iHkqFQkiB5BtQaEugPtP5%2BK6PoWOJQEIvSCaXTocrJJt7cP710mE4DJIr6h6U34pI7juIaxYy%2B3YIzM7qFiIokS8P2W4EjFPaVyP72Sv0jbj%2BV4%2F%2FaG0gK3EyyGrrCsr9dNBQakKpMK0nSWUj%2B3vn%2FcsTHvvVuQhl56zNIzAgS%2BHN%2B9vtHdCDUOLryTmgAZ5DAUKhx7EoL5Y4k83GQZ2LG4a5RpLpGY33eIabTsVEzyQ6VUAYS2Er9j9jOzAhTipuBlrdowzM0j5DAl05nt3d4uPCUWO9pUbvX2YHGeuI4VdKRdPEgaKimSIb5DWduUiJanXZT56v2aoa9ncI9VPnlBJl6iCXe%2F0RJogRIL9qXPC5K1EsS3WYNfC1pXYhGxrgcX5NxPEVRqWB1gAWehpH5xccTVxxnBdaqHvTI4AP5UXSaxRkd5W7B%2FozL6QoTSpVkaB7j3eZyVFwynqJbBsQxpo7f%2BxE5g9JqNCTda%2FiJug8c3gnXhqwl9iKgpv3V%2FGsdbTXrplBTpjZupKS7Id%2FjmoMPlWB1zdzIZT%2FkrMEvUm5Vbkbc3RQQCrwV58lf8ieKT1teE193u4ay6qGCp1e0qNATMj6z8anLxJV%2FaIJogmaEDwgvx4LOkUpnGUnnOVl%2FWbsHuzu9boVyBbPszJfWQbvTHtSMxpJGE7TwIj21qUsI8wYwNNOa1%2Bb1R6FWCh9QzCdf86Lh8QVZR6x8o3QeWSU4i9YC2rWcwpQmhDXy7TY3T8G3cu94vzfYe9ekTvZPBicHH5tUZ2%2Bn1z2G%2BbwBhqyamdTvmuf5%2FM6blHZcybAuRjwnVqybJCy0BtgH1NpfyfK%2FNnTP6eFcsSVGGU7SoU8DCUyU4U9KOhTQgOJOlCmry6t0hY%2BPUs9hJXrJQBK%2BRubzfwm13uekCAAA) where you can edit the XMLUI code and see changes instantly.
 
-Playgrounds work with the [Markdown](https://docs.xmlui.org/components/Markdown) component which is the renderer for this page. Here's the XMLUI source for the checkboxes example. We show it here as an image because if we were to include the text it would just render as above!
+Playgrounds work with the [Markdown](https://docs.xmlui.org/components/Markdown) component which is the renderer for this page. Here's the XMLUI source for the checkboxes example.
 
 ![playground checkbox source](/blog/images/playground-checkbox-source.png)
+
+ We show it here as an image because if we were to include the text it would just render as above!
 
 It starts as conventional Markdown codefence bounded by triple backtics. You can use the language identifier `xmlui` for XMLUI syntax highlighting, or (as here) use `xmlui-pg` to introduce a live playground. The bracketed numbers specify line ranges to highlight.
 
