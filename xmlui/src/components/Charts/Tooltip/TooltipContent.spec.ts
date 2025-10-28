@@ -35,7 +35,6 @@ const tooltipNameSelector = "[class*='mutedText']";
 // =============================================================================
 
 test.describe("Basic Functionality", () => {
-  
   // Smoke tests
   test.describe("smoke tests", { tag: "@smoke" }, () => {
     test("TooltipContent renders in PieChart on hover", async ({ initTestBed, page }) => {
@@ -48,13 +47,13 @@ test.describe("Basic Functionality", () => {
           height="400px"
         />
       `);
-      
+
       await page.waitForSelector(chartRoot, { timeout: 10000 });
-      
+
       // Hover over a pie sector to trigger tooltip
       const pieSector = page.locator(".recharts-pie-sector").first();
       await pieSector.hover();
-      
+
       // Tooltip should appear
       await expect(page.locator(tooltipSelector)).toBeVisible();
       await expect(page.locator(tooltipContentSelector)).toBeVisible();
@@ -70,13 +69,13 @@ test.describe("Basic Functionality", () => {
           height="400px"
         />
       `);
-      
+
       await page.waitForSelector(chartRoot, { timeout: 10000 });
-      
+
       // Hover over a bar to trigger tooltip
       const barElement = page.locator(".recharts-bar-rectangle").first();
       await barElement.hover();
-      
+
       // Check if tooltip content is visible
       await expect(page.locator(tooltipContentSelector)).toBeVisible();
       await expect(page.locator(tooltipNameSelector)).toBeVisible();
@@ -96,15 +95,15 @@ test.describe("Basic Functionality", () => {
           height="400px"
         />
       `);
-      
+
       await page.waitForSelector(chartRoot, { timeout: 10000 });
       const pieSector = page.locator(".recharts-pie-sector").first();
       await pieSector.hover();
-      
+
       await expect(page.locator(tooltipContentSelector)).toBeVisible();
       const indicator = page.locator(tooltipIndicatorSelector);
       await expect(indicator).toBeVisible();
-      
+
       // Should have dot styling (default)
       await expect(indicator).toHaveClass(/dot/);
     });
@@ -121,13 +120,13 @@ test.describe("Basic Functionality", () => {
           height="400px"
         />
       `);
-      
+
       await page.waitForSelector(chartRoot, { timeout: 10000 });
-      
+
       // Hover over a bar to trigger tooltip
       const barElement = page.locator(".recharts-bar-rectangle").first();
       await barElement.hover();
-      
+
       // Check if tooltip content is visible with proper styling
       await expect(page.locator(tooltipContentSelector)).toBeVisible();
       await expect(page.locator(tooltipNameSelector)).toBeVisible();
@@ -139,7 +138,7 @@ test.describe("Basic Functionality", () => {
   test.describe("data handling", () => {
     test("displays single data point correctly", async ({ initTestBed, page }) => {
       const singleData = `[{ name: 'Single', value: 100 }]`;
-      
+
       await initTestBed(`
         <PieChart
           nameKey="name"
@@ -149,11 +148,11 @@ test.describe("Basic Functionality", () => {
           height="400px"
         />
       `);
-      
+
       await page.waitForSelector(chartRoot, { timeout: 10000 });
       const pieSector = page.locator(".recharts-pie-sector").first();
       await pieSector.hover();
-      
+
       await expect(page.locator(tooltipContentSelector)).toBeVisible();
       await expect(page.locator(tooltipNameSelector)).toContainText("Single");
       await expect(page.locator(tooltipValueSelector)).toContainText("100");
@@ -169,16 +168,16 @@ test.describe("Basic Functionality", () => {
           height="400px"
         />
       `);
-      
+
       await page.waitForSelector(chartRoot, { timeout: 10000 });
-      
+
       // Hover over a bar to trigger tooltip
       const barElement = page.locator(".recharts-bar-rectangle").first();
       await barElement.hover();
-      
+
       // Check if tooltip shows multiple series data
       await expect(page.locator(tooltipContentSelector)).toBeVisible();
-      
+
       // Should show data for both series - check for multiple indicators
       const indicators = page.locator(tooltipIndicatorSelector);
       await expect(indicators).toHaveCount(2);
@@ -194,13 +193,13 @@ test.describe("Basic Functionality", () => {
           height="400px"
         />
       `);
-      
+
       await page.waitForSelector(chartRoot, { timeout: 10000 });
       const pieSector = page.locator(".recharts-pie-sector").first();
       await pieSector.hover();
-      
+
       await expect(page.locator(tooltipContentSelector)).toBeVisible();
-      
+
       // Should format large numbers with commas
       const valueText = await page.locator(tooltipValueSelector).textContent();
       expect(valueText).toMatch(/1,234,567/);
@@ -211,7 +210,7 @@ test.describe("Basic Functionality", () => {
         { name: 'Zero', value: 0 },
         { name: 'Positive', value: 100 }
       ]`;
-      
+
       await initTestBed(`
         <PieChart
           nameKey="name"
@@ -221,11 +220,11 @@ test.describe("Basic Functionality", () => {
           height="400px"
         />
       `);
-      
+
       await page.waitForSelector(chartRoot, { timeout: 10000 });
       const pieSector = page.locator(".recharts-pie-sector").first();
       await pieSector.hover();
-      
+
       await expect(page.locator(tooltipContentSelector)).toBeVisible();
       // Should handle zero values gracefully
       const valueElements = page.locator(tooltipValueSelector);
@@ -245,13 +244,13 @@ test.describe("Basic Functionality", () => {
           height="400px"
         />
       `);
-      
+
       await page.waitForSelector(chartRoot, { timeout: 10000 });
       const pieSector = page.locator(".recharts-pie-sector").first();
       await pieSector.hover();
-      
+
       await expect(page.locator(tooltipContentSelector)).toBeVisible();
-      
+
       // Default PieChart tooltip doesn't have a label, so check for name and value instead
       await expect(page.locator(tooltipNameSelector)).toBeVisible();
       await expect(page.locator(tooltipValueSelector)).toBeVisible();
@@ -262,7 +261,7 @@ test.describe("Basic Functionality", () => {
         { name: 'Desktop 🖥️', value: 400 },
         { name: 'Mobile 📱', value: 300 }
       ]`;
-      
+
       await initTestBed(`
         <PieChart
           nameKey="name"
@@ -272,13 +271,13 @@ test.describe("Basic Functionality", () => {
           height="400px"
         />
       `);
-      
+
       await page.waitForSelector(chartRoot, { timeout: 10000 });
       const pieSector = page.locator(".recharts-pie-sector").first();
       await pieSector.hover();
-      
+
       await expect(page.locator(tooltipContentSelector)).toBeVisible();
-      
+
       // Should display Unicode characters correctly
       const nameText = page.locator(tooltipNameSelector);
       await expect(nameText).toContainText("🖥️");
@@ -297,24 +296,27 @@ test.describe("Basic Functionality", () => {
           height="400px"
         />
       `);
-      
+
       await page.waitForSelector(chartRoot, { timeout: 10000 });
       const pieSector = page.locator(".recharts-pie-sector").first();
       await pieSector.hover();
-      
+
       await expect(page.locator(tooltipContentSelector)).toBeVisible();
-      
+
       const indicator = page.locator(tooltipIndicatorSelector);
       await expect(indicator).toBeVisible();
-      
+
       // Indicator should have background color
-      const backgroundColor = await indicator.evaluate(el => 
-        window.getComputedStyle(el).backgroundColor
+      const backgroundColor = await indicator.evaluate(
+        (el) => window.getComputedStyle(el).backgroundColor,
       );
       expect(backgroundColor).not.toBe("rgba(0, 0, 0, 0)"); // Not transparent
     });
 
-    test("applies consistent styling across different chart types", async ({ initTestBed, page }) => {
+    test("applies consistent styling across different chart types", async ({
+      initTestBed,
+      page,
+    }) => {
       // Test in LineChart context
       await initTestBed(`
         <LineChart
@@ -325,15 +327,17 @@ test.describe("Basic Functionality", () => {
           height="400px"
         />
       `);
-      
+
       await page.waitForSelector(chartRoot, { timeout: 10000 });
-      
-      // Hover over line to trigger tooltip
-      const line = page.locator(".recharts-line-curve");
-      await line.hover();
-      
+
+      // Hover over chart area to trigger tooltip (Recharts tooltip activates on chart area, not just line)
+      const chartSvg = page.locator(".recharts-surface").first();
+      await chartSvg.hover({ position: { x: 200, y: 200 } });
+
+      // Wait for tooltip to appear
+      await page.waitForTimeout(500);
       await expect(page.locator(tooltipContentSelector)).toBeVisible();
-      
+
       // Should have consistent styling
       const indicator = page.locator(tooltipIndicatorSelector);
       await expect(indicator).toBeVisible();
@@ -356,17 +360,17 @@ test.describe("Accessibility", () => {
         height="400px"
       />
     `);
-    
+
     await page.waitForSelector(chartRoot, { timeout: 10000 });
     const pieSector = page.locator(".recharts-pie-sector").first();
     await pieSector.hover();
-    
+
     await expect(page.locator(tooltipContentSelector)).toBeVisible();
-    
+
     // Tooltip content should be accessible
     const tooltipContent = page.locator(tooltipContentSelector);
     await expect(tooltipContent).toBeVisible();
-    
+
     // Text content should be readable
     const nameText = page.locator(tooltipNameSelector);
     const valueText = page.locator(tooltipValueSelector);
@@ -384,21 +388,21 @@ test.describe("Accessibility", () => {
         height="400px"
       />
     `);
-    
+
     await page.waitForSelector(chartRoot, { timeout: 10000 });
     const pieSector = page.locator(".recharts-pie-sector").first();
     await pieSector.hover();
-    
+
     await expect(page.locator(tooltipContentSelector)).toBeVisible();
-    
+
     // Text should have readable font size
     const valueText = page.locator(tooltipValueSelector);
     await expect(valueText).toHaveCSS("font-size", /\d+px/);
-    
+
     // Should have proper contrast (background vs text)
     const tooltipContainer = page.locator(tooltipContentSelector);
-    const backgroundColor = await tooltipContainer.evaluate(el => 
-      window.getComputedStyle(el).backgroundColor
+    const backgroundColor = await tooltipContainer.evaluate(
+      (el) => window.getComputedStyle(el).backgroundColor,
     );
     expect(backgroundColor).not.toBe("transparent");
   });
@@ -413,12 +417,12 @@ test.describe("Accessibility", () => {
         height="400px"
       />
     `);
-    
+
     await page.waitForSelector(chartRoot, { timeout: 10000 });
-    
+
     // Focus on chart and use keyboard navigation
     await page.keyboard.press("Tab");
-    
+
     // Chart should be focusable and tooltip may appear on focus
     const focusedElement = page.locator(":focus");
     await expect(focusedElement).toBeVisible();
@@ -440,17 +444,17 @@ test.describe("Performance and Edge Cases", () => {
         height="400px"
       />
     `);
-    
+
     await page.waitForSelector(chartRoot, { timeout: 10000 });
-    
+
     const sectors = page.locator(".recharts-pie-sector");
-    
+
     // Rapidly hover over different sectors
     for (let i = 0; i < 3; i++) {
       await sectors.nth(i).hover();
       await page.waitForTimeout(100);
     }
-    
+
     // Tooltip should still work correctly
     await sectors.first().hover();
     await expect(page.locator(tooltipContentSelector)).toBeVisible();
@@ -458,7 +462,7 @@ test.describe("Performance and Edge Cases", () => {
 
   test("handles empty or null data gracefully", async ({ initTestBed, page }) => {
     const emptyData = `[]`;
-    
+
     await initTestBed(`
       <PieChart
         nameKey="name"
@@ -468,9 +472,9 @@ test.describe("Performance and Edge Cases", () => {
         height="400px"
       />
     `);
-    
+
     await page.waitForSelector(chartRoot, { timeout: 10000 });
-    
+
     // Should not crash with empty data
     // Tooltip won't appear since there's no data to hover over
     const chart = page.locator(chartRoot);
@@ -490,13 +494,13 @@ test.describe("Performance and Edge Cases", () => {
         height="400px"
       />
     `);
-    
+
     await page.waitForSelector(chartRoot, { timeout: 10000 });
     const pieSector = page.locator(".recharts-pie-sector").first();
     await pieSector.hover();
-    
+
     await expect(page.locator(tooltipContentSelector)).toBeVisible();
-    
+
     // Should handle special characters correctly
     const nameText = page.locator(tooltipNameSelector);
     await expect(nameText).toContainText("quotes");
@@ -513,15 +517,15 @@ test.describe("Performance and Edge Cases", () => {
         height="200px"
       />
     `);
-    
+
     await page.waitForSelector(chartRoot, { timeout: 10000 });
-    
+
     // Hover near edge of small chart
     const pieSector = page.locator(".recharts-pie-sector").first();
     await pieSector.hover();
-    
+
     await expect(page.locator(tooltipContentSelector)).toBeVisible();
-    
+
     // Tooltip should be positioned within viewport
     const tooltip = page.locator(tooltipSelector);
     const boundingBox = await tooltip.boundingBox();
