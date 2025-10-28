@@ -36,6 +36,7 @@
             <Text variant="em">Tutorials, tips, best practices</Text>
         </property>
     </AppHeader>
+    <!--
     <NavPanel>
        <NavGroup label="Recent posts" to="/blog" initiallyExpanded>
             <NavLink
@@ -50,6 +51,7 @@
 
         </NavGroup>
     </NavPanel>
+    -->
     <Pages fallbackPath="/404">
         <Page url="/">
             <BlogOverview posts="{posts}" />
