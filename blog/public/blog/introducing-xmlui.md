@@ -1,3 +1,6 @@
+> [!TIP]
+> Ed. note: This is the post that was discussed on [Hacker News](https://news.ycombinator.com/item?id=44625292).
+
 In the mid-1990s you could create useful software without being an ace coder. You had Visual Basic, you had a rich ecosystem of components, you could wire them together to create apps, standing on the shoulders of the coders who built those components. If you're younger than 45 you may not know what that was like, nor realize web components have never worked the same way. The project we're announcing today, [XMLUI](https://xmlui.org), brings the VB model to the modern web and its React-based component ecosystem. XMLUI wraps React and CSS and provides a suite of components that you compose with XML markup. Here's a little app to check the status of London tube lines.
 
 ```xml
