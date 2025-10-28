@@ -54,14 +54,15 @@ export const TableOfContentsMd = createMetadata({
     [`paddingLeft-${COMP_CHILD}-level-5`]: "$space-6",
     [`paddingLeft-${COMP_CHILD}-level-6`]: "$space-6",
     [`fontWeight-${COMP_CHILD}`]: "$fontWeight-bold",
-    [`fontWeight-${COMP_CHILD}-level-3`]: "normal",
-    [`fontWeight-${COMP_CHILD}-level-4`]: "normal",
-    [`fontWeight-${COMP_CHILD}-level-5`]: "normal",
-    [`fontWeight-${COMP_CHILD}-level-6`]: "normal",
+    [`fontWeight-${COMP_CHILD}-level-2`]: "$fontWeight-medium",
+    [`fontWeight-${COMP_CHILD}-level-3`]: "$fontWeight-normal",
+    [`fontWeight-${COMP_CHILD}-level-4`]: "$fontWeight-normal",
+    [`fontWeight-${COMP_CHILD}-level-5`]: "$fontWeight-normal",
+    [`fontWeight-${COMP_CHILD}-level-6`]: "$fontWeight-normal",
 
     [`fontStyle-${COMP_CHILD}-level-6`]: "italic",
-
-    [`color-${COMP_CHILD}--active`]: "$color-primary-500",
+    [`textColor-${COMP_CHILD}--active`]: "$color-primary-400",
+    [`fontWeight-${COMP_CHILD}--active`]: "$fontWeight-bold",
   },
 });
 

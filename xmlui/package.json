@@ -164,7 +164,7 @@
     "src/syntax"
   ],
   "bin": {
-    "xmlui": "dist/scripts/bin/bootstrap.cjs"
+    "xmlui": "./bin/bootstrap.js"
   },
   "clean-package": {
     "replace": {
@@ -222,51 +222,46 @@
       }
     }
   },
-  "main": "./dist/standalone/xmlui-standalone.umd.js",
+  "main": "./src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/lib/xmlui.js",
-      "require": "./dist/standalone/xmlui-standalone.umd.js"
-    },
-    "./language-server": {
-      "import": "./dist/lib/language-server.js",
-      "require": "./dist/lib/language-server.js"
-    },
-    "./language-server-web-worker": {
-      "import": "./dist/lib/language-server-web-worker.js",
-      "require": "./dist/lib/language-server-web-worker.js"
+      "import": "./src/index.ts",
+      "require": "./src/index.ts"
     },
     "./parser": {
-      "import": "./dist/lib/xmlui-parser.js",
-      "require": "./dist/lib/xmlui-parser.js"
-    },
-    "./*.css": {
-      "import": "./dist/lib/*.css",
-      "require": "./dist/lib/*.css"
+      "import": "./src/parsers/xmlui-parser/index.ts",
+      "require": "./src/parsers/xmlui-parser/index.ts"
     },
     "./index.scss": {
-      "import": "./dist/lib/scss/index.scss",
-      "require": "./dist/lib/scss/index.scss"
+      "import": "./src/index.scss",
+      "require": "./src/index.scss"
     },
     "./themes.scss": {
-      "import": "./dist/lib/scss/components-core/theming/_themes.scss",
-      "require": "./dist/lib/scss/components-core/theming/_themes.scss"
+      "import": "./src/components-core/theming/_themes.scss"
     },
     "./vite-xmlui-plugin": {
-      "import": "./dist/scripts/bin/vite-xmlui-plugin.js",
-      "require": "./dist/scripts/bin/vite-xmlui-plugin.js"
+      "import": "./bin/vite-xmlui-plugin.ts",
+      "require": "./bin/vite-xmlui-plugin.ts"
+    },
+    "./language-server": {
+      "import": "./src/language-server/server.ts",
+      "require": "./src/language-server/server.ts"
+    },
+    "./language-server-web-worker": {
+      "import": "./src/language-server/server-web-worker.ts",
+      "require": "./src/language-server/server-web-worker.ts"
     },
     "./syntax/monaco": {
-      "import": "./dist/lib/syntax-monaco.js",
-      "require": "./dist/lib/syntax-monaco.js"
+      "import": "./src/syntax/monaco/index.ts",
+      "require": "./src/syntax/monaco/index.ts"
     },
     "./syntax/textmate": {
-      "import": "./dist/lib/syntax-textmate.js",
-      "require": "./dist/lib/syntax-textmate.js"
+      "import": "./src/syntax/textMate/index.ts",
+      "require": "./src/syntax/textMate/index.ts"
     },
     "./testing": {
-      "import": "./dist/lib/testing.js",
-      "require": "./dist/lib/testing.js"
+      "import": "./src/testing/index.ts",
+      "require": "./src/testing/index.ts"
     }
   },
   "browserslist": {
@@ -286,7 +281,5 @@
   },
   "msw": {
     "workerDirectory": "src/testing/infrastructure/public"
-  },
-  "module": "./dist/lib/xmlui.js",
-  "types": "./dist/lib/xmlui.d.ts"
+  }
 }
