@@ -1,5 +1,22 @@
 # xmlui
 
+## 0.11.0
+
+### Minor Changes
+
+- 19145d2: xmlui builds with ESM
+- 5109dce: Migrate from CommonJs to ESM internally. Lays the groundwork for exporting testing capabilities.
+
+### Patch Changes
+
+- fe503eb: Add enableSubmit to Form
+- 06bb966: Fix TableOfContents styling
+- e6b5810: fix: playground - app reset
+- db94656: improve: bar/line chart spacing
+- fe503eb: Queue now passes $queuedItems and $completedItems context variables to its event handlers
+- 82ddbe7: Fix codefence first line indent style issue
+- 75b701b: Extend form with hideButtonRow and FormItem with noSubmit
+
 ## 0.10.26
 
 ### Patch Changes
