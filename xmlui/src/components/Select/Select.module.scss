@@ -1,8 +1,7 @@
 @use "../../components-core/theming/themes" as t;
 
 // --- This code snippet is required to collect the theme variables used in this module
-$themeVars: (
-);
+$themeVars: ();
 $animDuration: 0.1s;
 
 @function createThemeVar($componentVariable) {
