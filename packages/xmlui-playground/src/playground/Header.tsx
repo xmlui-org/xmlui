@@ -64,7 +64,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
 
   const share = useCallback(async () => {
     const url = await createAppUrl(false);
-    navigator.clipboard.writeText(url);
+    await navigator.clipboard.writeText(url);
     showToast({
       title: "URL copied to clipboard",
       description: "",
@@ -72,8 +72,8 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
     });
   }, [createAppUrl, showToast]);
 
-  const download = useCallback(() => {
-    handleDownloadZip(appDescription);
+  const download = useCallback(async () => {
+    await handleDownloadZip(appDescription);
   }, [appDescription]);
 
   return (

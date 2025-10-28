@@ -9,6 +9,7 @@ export function Preview() {
     () => appDescription.components.map((comp) => comp.component),
     [appDescription.components],
   );
+
   return (
     <NestedApp
       app={appDescription.app}
@@ -18,6 +19,7 @@ export function Preview() {
       components={components}
       config={appDescription.config}
       height={"100%"}
+      refreshVersion={options.id}
     />
   );
 }
