@@ -90,6 +90,13 @@ export const FormMd = createMetadata({
       type: "boolean",
       defaultValue: defaultProps.hideButtonRow,
     },
+    enableSubmit: {
+      description:
+        `This property controls whether the submit button is enabled. When set to false, ` +
+        `the submit button is disabled and the form cannot be submitted.`,
+      type: "boolean",
+      defaultValue: defaultProps.enableSubmit,
+    },
     submitUrl: d(`URL to submit the form data.`),
     submitMethod: {
       description:

@@ -260,6 +260,7 @@ type Props = {
   keepModalOpenOnSubmit?: boolean;
   hideButtonRowUntilDirty?: boolean;
   hideButtonRow?: boolean;
+  enableSubmit?: boolean;
 };
 
 export const defaultProps: Pick<
@@ -273,6 +274,7 @@ export const defaultProps: Pick<
   | "swapCancelAndSave"
   | "hideButtonRowUntilDirty"
   | "hideButtonRow"
+  | "enableSubmit"
 > = {
   cancelLabel: "Cancel",
   saveLabel: "Save",
@@ -283,6 +285,7 @@ export const defaultProps: Pick<
   swapCancelAndSave: false,
   hideButtonRowUntilDirty: false,
   hideButtonRow: false,
+  enableSubmit: true,
 };
 
 // --- Remove the properties from formState.subject where the property name ends with UNBOUND_FIELD_SUFFIX
@@ -326,6 +329,7 @@ const Form = forwardRef(function (
     keepModalOpenOnSubmit = defaultProps.keepModalOpenOnSubmit,
     hideButtonRowUntilDirty,
     hideButtonRow = defaultProps.hideButtonRow,
+    enableSubmit = defaultProps.enableSubmit,
     ...rest
   }: Props,
   ref: ForwardedRef<HTMLFormElement>,
@@ -527,11 +531,11 @@ const Form = forwardRef(function (
     );
   const submitButton = useMemo(
     () => (
-      <Button data-part-id={PART_SUBMIT_BUTTON} key="submit" type={"submit"} disabled={!isEnabled}>
+      <Button data-part-id={PART_SUBMIT_BUTTON} key="submit" type={"submit"} disabled={!isEnabled || !enableSubmit}>
         {formState.submitInProgress ? saveInProgressLabel : saveLabel}
       </Button>
     ),
-    [isEnabled, formState.submitInProgress, saveInProgressLabel, saveLabel],
+    [isEnabled, enableSubmit, formState.submitInProgress, saveInProgressLabel, saveLabel],
   );
 
   useEffect(() => {
@@ -682,6 +686,7 @@ export const FormWithContextVar = forwardRef(function (
         itemLabelWidth={itemLabelWidthCssProps.width as string}
         hideButtonRowUntilDirty={extractValue.asOptionalBoolean(node.props.hideButtonRowUntilDirty)}
         hideButtonRow={extractValue.asOptionalBoolean(node.props.hideButtonRow)}
+        enableSubmit={extractValue.asOptionalBoolean(node.props.enableSubmit)}
         formState={formState}
         dispatch={dispatch}
         id={node.uid}
