@@ -4,8 +4,8 @@ import classnames from "classnames";
 import * as Dialog from "@radix-ui/react-dialog";
 
 import styles from "./InspectorDialog.module.scss";
-import { useTheme } from "xmlui";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTheme } from "../theming/ThemeContext";
 
 // =====================================================================================================================
 // React component definition

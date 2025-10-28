@@ -1,4 +1,4 @@
-@use "xmlui/themes.scss" as t;
+@use "../../../components-core/theming/themes" as t;
 
 // --- This code snippet is required to collect the theme variables used in this module
 $themeVars: (
