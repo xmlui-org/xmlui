@@ -1,7 +1,7 @@
 import { createComponentRenderer } from "../../components-core/renderers";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, d } from "../metadata-helpers";
-import { Queue, defaultProps } from "./QueueNative";
+import { QueueWithContextVar, defaultProps } from "./QueueNative";
 
 const COMP = "Queue";
 
@@ -103,46 +103,12 @@ export const queueComponentRenderer = createComponentRenderer(
   QueueMd,
   ({ node, registerComponentApi, lookupEventHandler, renderChild, extractValue }) => {
     return (
-      <Queue
+      <QueueWithContextVar
+        node={node as any}
+        renderChild={renderChild}
+        extractValue={extractValue}
+        lookupEventHandler={lookupEventHandler as any}
         registerComponentApi={registerComponentApi}
-        renderResultFeedback={
-          node.props.resultFeedback
-            ? (completedItems, queuedItems) => {
-                return (
-                  <MemoizedItem
-                    node={node.props.resultFeedback! as any}
-                    contextVars={{
-                      $completedItems: completedItems,
-                      $queuedItems: queuedItems,
-                    }}
-                    renderChild={renderChild}
-                  />
-                );
-              }
-            : undefined
-        }
-        renderProgressFeedback={
-          node.props.progressFeedback
-            ? (completedItems, queuedItems) => {
-                return (
-                  <MemoizedItem
-                    node={node.props.progressFeedback! as any}
-                    contextVars={{
-                      $completedItems: completedItems,
-                      $queuedItems: queuedItems,
-                    }}
-                    renderChild={renderChild}
-                  />
-                );
-              }
-            : undefined
-        }
-        willProcessItem={lookupEventHandler("willProcess")}
-        processItem={lookupEventHandler("process", { signError: false })}
-        didProcessItem={lookupEventHandler("didProcess")}
-        processItemError={lookupEventHandler("processError")}
-        onComplete={lookupEventHandler("complete")}
-        clearAfterFinish={extractValue.asOptionalBoolean(node.props.clearAfterFinish)}
       />
     );
   },
