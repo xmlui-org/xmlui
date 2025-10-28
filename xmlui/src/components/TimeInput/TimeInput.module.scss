@@ -66,6 +66,100 @@ $outlineOffset-ampm-TimeInput--focused: createThemeVar(
   "outlineOffset-ampm-#{$componentName}--focused"
 );
 
+// Variables for default variant
+$borderRadius-TimeInput-default: createThemeVar("Input:borderRadius-#{$componentName}-default");
+$borderColor-TimeInput-default: createThemeVar("Input:borderColor-#{$componentName}-default");
+$borderWidth-TimeInput-default: createThemeVar("Input:borderWidth-#{$componentName}-default");
+$borderStyle-TimeInput-default: createThemeVar("Input:borderStyle-#{$componentName}-default");
+$backgroundColor-TimeInput-default: createThemeVar("Input:backgroundColor-#{$componentName}-default");
+$boxShadow-TimeInput-default: createThemeVar("Input:boxShadow-#{$componentName}-default");
+$textColor-TimeInput-default: createThemeVar("Input:textColor-#{$componentName}-default");
+$borderColor-TimeInput-default--hover: createThemeVar("Input:borderColor-#{$componentName}-default--hover");
+$backgroundColor-TimeInput-default--hover: createThemeVar("Input:backgroundColor-#{$componentName}-default--hover");
+$boxShadow-TimeInput-default--hover: createThemeVar("Input:boxShadow-#{$componentName}-default--hover");
+$textColor-TimeInput-default--hover: createThemeVar("Input:textColor-#{$componentName}-default--hover");
+$borderColor-TimeInput-default--focus: createThemeVar("Input:borderColor-#{$componentName}-default--focus");
+$backgroundColor-TimeInput-default--focus: createThemeVar("Input:backgroundColor-#{$componentName}-default--focus");
+$boxShadow-TimeInput-default--focus: createThemeVar("Input:boxShadow-#{$componentName}-default--focus");
+$textColor-TimeInput-default--focus: createThemeVar("Input:textColor-#{$componentName}-default--focus");
+$outlineWidth-TimeInput-default--focus: createThemeVar("Input:outlineWidth-#{$componentName}-default--focus");
+$outlineColor-TimeInput-default--focus: createThemeVar("Input:outlineColor-#{$componentName}-default--focus");
+$outlineStyle-TimeInput-default--focus: createThemeVar("Input:outlineStyle-#{$componentName}-default--focus");
+$outlineOffset-TimeInput-default--focus: createThemeVar("Input:outlineOffset-#{$componentName}-default--focus");
+$color-adornment-TimeInput-default: createThemeVar("Input:color-adornment-#{$componentName}-default");
+
+// Variables for error variant
+$borderRadius-TimeInput-error: createThemeVar("Input:borderRadius-#{$componentName}-error");
+$borderColor-TimeInput-error: createThemeVar("Input:borderColor-#{$componentName}-error");
+$borderWidth-TimeInput-error: createThemeVar("Input:borderWidth-#{$componentName}-error");
+$borderStyle-TimeInput-error: createThemeVar("Input:borderStyle-#{$componentName}-error");
+$backgroundColor-TimeInput-error: createThemeVar("Input:backgroundColor-#{$componentName}-error");
+$boxShadow-TimeInput-error: createThemeVar("Input:boxShadow-#{$componentName}-error");
+$textColor-TimeInput-error: createThemeVar("Input:textColor-#{$componentName}-error");
+$borderColor-TimeInput-error--hover: createThemeVar("Input:borderColor-#{$componentName}-error--hover");
+$backgroundColor-TimeInput-error--hover: createThemeVar("Input:backgroundColor-#{$componentName}-error--hover");
+$boxShadow-TimeInput-error--hover: createThemeVar("Input:boxShadow-#{$componentName}-error--hover");
+$textColor-TimeInput-error--hover: createThemeVar("Input:textColor-#{$componentName}-error--hover");
+$borderColor-TimeInput-error--focus: createThemeVar("Input:borderColor-#{$componentName}-error--focus");
+$backgroundColor-TimeInput-error--focus: createThemeVar("Input:backgroundColor-#{$componentName}-error--focus");
+$boxShadow-TimeInput-error--focus: createThemeVar("Input:boxShadow-#{$componentName}-error--focus");
+$textColor-TimeInput-error--focus: createThemeVar("Input:textColor-#{$componentName}-error--focus");
+$outlineWidth-TimeInput-error--focus: createThemeVar("Input:outlineWidth-#{$componentName}-error--focus");
+$outlineColor-TimeInput-error--focus: createThemeVar("Input:outlineColor-#{$componentName}-error--focus");
+$outlineStyle-TimeInput-error--focus: createThemeVar("Input:outlineStyle-#{$componentName}-error--focus");
+$outlineOffset-TimeInput-error--focus: createThemeVar("Input:outlineOffset-#{$componentName}-error--focus");
+$color-adornment-TimeInput-error: createThemeVar("Input:color-adornment-#{$componentName}-error");
+
+// Variables for warning variant
+$borderRadius-TimeInput-warning: createThemeVar("Input:borderRadius-#{$componentName}-warning");
+$borderColor-TimeInput-warning: createThemeVar("Input:borderColor-#{$componentName}-warning");
+$borderWidth-TimeInput-warning: createThemeVar("Input:borderWidth-#{$componentName}-warning");
+$borderStyle-TimeInput-warning: createThemeVar("Input:borderStyle-#{$componentName}-warning");
+$backgroundColor-TimeInput-warning: createThemeVar("Input:backgroundColor-#{$componentName}-warning");
+$boxShadow-TimeInput-warning: createThemeVar("Input:boxShadow-#{$componentName}-warning");
+$textColor-TimeInput-warning: createThemeVar("Input:textColor-#{$componentName}-warning");
+$borderColor-TimeInput-warning--hover: createThemeVar("Input:borderColor-#{$componentName}-warning--hover");
+$backgroundColor-TimeInput-warning--hover: createThemeVar("Input:backgroundColor-#{$componentName}-warning--hover");
+$boxShadow-TimeInput-warning--hover: createThemeVar("Input:boxShadow-#{$componentName}-warning--hover");
+$textColor-TimeInput-warning--hover: createThemeVar("Input:textColor-#{$componentName}-warning--hover");
+$borderColor-TimeInput-warning--focus: createThemeVar("Input:borderColor-#{$componentName}-warning--focus");
+$backgroundColor-TimeInput-warning--focus: createThemeVar("Input:backgroundColor-#{$componentName}-warning--focus");
+$boxShadow-TimeInput-warning--focus: createThemeVar("Input:boxShadow-#{$componentName}-warning--focus");
+$textColor-TimeInput-warning--focus: createThemeVar("Input:textColor-#{$componentName}-warning--focus");
+$outlineWidth-TimeInput-warning--focus: createThemeVar("Input:outlineWidth-#{$componentName}-warning--focus");
+$outlineColor-TimeInput-warning--focus: createThemeVar("Input:outlineColor-#{$componentName}-warning--focus");
+$outlineStyle-TimeInput-warning--focus: createThemeVar("Input:outlineStyle-#{$componentName}-warning--focus");
+$outlineOffset-TimeInput-warning--focus: createThemeVar("Input:outlineOffset-#{$componentName}-warning--focus");
+$color-adornment-TimeInput-warning: createThemeVar("Input:color-adornment-#{$componentName}-warning");
+
+// Variables for success variant
+$borderRadius-TimeInput-success: createThemeVar("Input:borderRadius-#{$componentName}-success");
+$borderColor-TimeInput-success: createThemeVar("Input:borderColor-#{$componentName}-success");
+$borderWidth-TimeInput-success: createThemeVar("Input:borderWidth-#{$componentName}-success");
+$borderStyle-TimeInput-success: createThemeVar("Input:borderStyle-#{$componentName}-success");
+$backgroundColor-TimeInput-success: createThemeVar("Input:backgroundColor-#{$componentName}-success");
+$boxShadow-TimeInput-success: createThemeVar("Input:boxShadow-#{$componentName}-success");
+$textColor-TimeInput-success: createThemeVar("Input:textColor-#{$componentName}-success");
+$borderColor-TimeInput-success--hover: createThemeVar("Input:borderColor-#{$componentName}-success--hover");
+$backgroundColor-TimeInput-success--hover: createThemeVar("Input:backgroundColor-#{$componentName}-success--hover");
+$boxShadow-TimeInput-success--hover: createThemeVar("Input:boxShadow-#{$componentName}-success--hover");
+$textColor-TimeInput-success--hover: createThemeVar("Input:textColor-#{$componentName}-success--hover");
+$borderColor-TimeInput-success--focus: createThemeVar("Input:borderColor-#{$componentName}-success--focus");
+$backgroundColor-TimeInput-success--focus: createThemeVar("Input:backgroundColor-#{$componentName}-success--focus");
+$boxShadow-TimeInput-success--focus: createThemeVar("Input:boxShadow-#{$componentName}-success--focus");
+$textColor-TimeInput-success--focus: createThemeVar("Input:textColor-#{$componentName}-success--focus");
+$outlineWidth-TimeInput-success--focus: createThemeVar("Input:outlineWidth-#{$componentName}-success--focus");
+$outlineColor-TimeInput-success--focus: createThemeVar("Input:outlineColor-#{$componentName}-success--focus");
+$outlineStyle-TimeInput-success--focus: createThemeVar("Input:outlineStyle-#{$componentName}-success--focus");
+$outlineOffset-TimeInput-success--focus: createThemeVar("Input:outlineOffset-#{$componentName}-success--focus");
+$color-adornment-TimeInput-success: createThemeVar("Input:color-adornment-#{$componentName}-success");
+
+// Variables for @layer section
+$gap-adornment-TimeInput: createThemeVar("Input:gap-adornment-#{$componentName}");
+$backgroundColor-TimeInput--disabled: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
+$textColor-TimeInput--disabled: createThemeVar("Input:textColor-#{$componentName}--disabled");
+$borderColor-TimeInput--disabled: createThemeVar("Input:borderColor-#{$componentName}--disabled");
+
 // --- CSS properties of a particular TimeInput variant
 @mixin variant($variantName) {
   border-radius: createThemeVar("Input:borderRadius-#{$componentName}-#{$variantName}");
@@ -115,7 +209,7 @@ $outlineOffset-ampm-TimeInput--focused: createThemeVar(
     border-width: 1px;
     transition: $transition-background-TimeInput;
     overflow: hidden;
-    gap: createThemeVar("Input:gap-adornment-#{$componentName}");
+    gap: $gap-adornment-TimeInput;
     @include t.paddingVars($themeVars, $componentName);
 
     &.disabled {
@@ -143,9 +237,9 @@ $outlineOffset-ampm-TimeInput--focused: createThemeVar(
 
     &:has(input:is(:disabled)) {
       cursor: not-allowed;
-      background-color: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
-      color: createThemeVar("Input:textColor-#{$componentName}--disabled");
-      border-color: createThemeVar("Input:borderColor-#{$componentName}--disabled");
+      background-color: $backgroundColor-TimeInput--disabled;
+      color: $textColor-TimeInput--disabled;
+      border-color: $borderColor-TimeInput--disabled;
     }
 
     button {
@@ -161,7 +255,7 @@ $outlineOffset-ampm-TimeInput--focused: createThemeVar(
       }
 
       &:focus {
-        outline: 2px solid createThemeVar("Input:outlineColor-#{$componentName}-default--focus");
+        outline: 2px solid $outlineColor-TimeInput-default--focus;
         outline-offset: 2px;
       }
 

@@ -10,6 +10,70 @@ $themeVars: ();
 
 $componentName: "Slider";
 
+// Variables for default variant
+$borderRadius-Slider-default: createThemeVar("Input:borderRadius-#{$componentName}-default");
+$borderColor-Slider-default: createThemeVar("Input:borderColor-#{$componentName}-default");
+$borderWidth-Slider-default: createThemeVar("Input:borderWidth-#{$componentName}-default");
+$borderStyle-Slider-default: createThemeVar("Input:borderStyle-#{$componentName}-default");
+$boxShadow-Slider-default: createThemeVar("Input:boxShadow-#{$componentName}-default");
+$borderColor-Slider-default--hover: createThemeVar("Input:borderColor-#{$componentName}-default--hover");
+$boxShadow-Slider-default--hover: createThemeVar("Input:boxShadow-#{$componentName}-default--hover");
+$borderColor-Slider-default--focus: createThemeVar("Input:borderColor-#{$componentName}-default--focus");
+$boxShadow-Slider-default--focus: createThemeVar("Input:boxShadow-#{$componentName}-default--focus");
+
+// Variables for error variant
+$borderRadius-Slider-error: createThemeVar("Input:borderRadius-#{$componentName}-error");
+$borderColor-Slider-error: createThemeVar("Input:borderColor-#{$componentName}-error");
+$borderWidth-Slider-error: createThemeVar("Input:borderWidth-#{$componentName}-error");
+$borderStyle-Slider-error: createThemeVar("Input:borderStyle-#{$componentName}-error");
+$boxShadow-Slider-error: createThemeVar("Input:boxShadow-#{$componentName}-error");
+$borderColor-Slider-error--hover: createThemeVar("Input:borderColor-#{$componentName}-error--hover");
+$boxShadow-Slider-error--hover: createThemeVar("Input:boxShadow-#{$componentName}-error--hover");
+$borderColor-Slider-error--focus: createThemeVar("Input:borderColor-#{$componentName}-error--focus");
+$boxShadow-Slider-error--focus: createThemeVar("Input:boxShadow-#{$componentName}-error--focus");
+
+// Variables for warning variant
+$borderRadius-Slider-warning: createThemeVar("Input:borderRadius-#{$componentName}-warning");
+$borderColor-Slider-warning: createThemeVar("Input:borderColor-#{$componentName}-warning");
+$borderWidth-Slider-warning: createThemeVar("Input:borderWidth-#{$componentName}-warning");
+$borderStyle-Slider-warning: createThemeVar("Input:borderStyle-#{$componentName}-warning");
+$boxShadow-Slider-warning: createThemeVar("Input:boxShadow-#{$componentName}-warning");
+$borderColor-Slider-warning--hover: createThemeVar("Input:borderColor-#{$componentName}-warning--hover");
+$boxShadow-Slider-warning--hover: createThemeVar("Input:boxShadow-#{$componentName}-warning--hover");
+$borderColor-Slider-warning--focus: createThemeVar("Input:borderColor-#{$componentName}-warning--focus");
+$boxShadow-Slider-warning--focus: createThemeVar("Input:boxShadow-#{$componentName}-warning--focus");
+
+// Variables for success variant
+$borderRadius-Slider-success: createThemeVar("Input:borderRadius-#{$componentName}-success");
+$borderColor-Slider-success: createThemeVar("Input:borderColor-#{$componentName}-success");
+$borderWidth-Slider-success: createThemeVar("Input:borderWidth-#{$componentName}-success");
+$borderStyle-Slider-success: createThemeVar("Input:borderStyle-#{$componentName}-success");
+$boxShadow-Slider-success: createThemeVar("Input:boxShadow-#{$componentName}-success");
+$borderColor-Slider-success--hover: createThemeVar("Input:borderColor-#{$componentName}-success--hover");
+$boxShadow-Slider-success--hover: createThemeVar("Input:boxShadow-#{$componentName}-success--hover");
+$borderColor-Slider-success--focus: createThemeVar("Input:borderColor-#{$componentName}-success--focus");
+$boxShadow-Slider-success--focus: createThemeVar("Input:boxShadow-#{$componentName}-success--focus");
+
+// Variables for @layer section
+$backgroundColor-track-Slider: createThemeVar("Input:backgroundColor-track-#{$componentName}");
+$backgroundColor-track-Slider--disabled: createThemeVar("Input:backgroundColor-track-#{$componentName}--disabled");
+$backgroundColor-range-Slider: createThemeVar("Input:backgroundColor-range-#{$componentName}");
+$backgroundColor-range-Slider--disabled: createThemeVar("Input:backgroundColor-range-#{$componentName}--disabled");
+$borderWidth-thumb-Slider: createThemeVar("Input:borderWidth-thumb-#{$componentName}");
+$borderStyle-thumb-Slider: createThemeVar("Input:borderStyle-thumb-#{$componentName}");
+$borderColor-thumb-Slider: createThemeVar("Input:borderColor-thumb-#{$componentName}");
+$backgroundColor-thumb-Slider: createThemeVar("Input:backgroundColor-thumb-#{$componentName}");
+$boxShadow-thumb-Slider: createThemeVar("Input:boxShadow-thumb-#{$componentName}");
+$backgroundColor-thumb-Slider--focus: createThemeVar("Input:backgroundColor-thumb-#{$componentName}--focus");
+$boxShadow-thumb-Slider--focus: createThemeVar("Input:boxShadow-thumb-#{$componentName}--focus");
+$backgroundColor-thumb-Slider--hover: createThemeVar("Input:backgroundColor-thumb-#{$componentName}--hover");
+$boxShadow-thumb-Slider--hover: createThemeVar("Input:boxShadow-thumb-#{$componentName}--hover");
+$backgroundColor-thumb-Slider--active: createThemeVar("Input:backgroundColor-thumb-#{$componentName}--active");
+$boxShadow-thumb-Slider--active: createThemeVar("Input:boxShadow-thumb-#{$componentName}--active");
+$borderColor-Slider-error: createThemeVar("Input:borderColor-#{$componentName}-error");
+$borderColor-Slider-warning: createThemeVar("Input:borderColor-#{$componentName}-warning");
+$borderColor-Slider-success: createThemeVar("Input:borderColor-#{$componentName}-success");
+
 // Basic variant mixin for consistent theming
 @mixin variant($variantName) {
   border-radius: createThemeVar("Input:borderRadius-#{$componentName}-#{$variantName}");
@@ -56,7 +120,7 @@ $componentName: "Slider";
     flex-grow: 1;
     overflow: hidden;
     border-radius: 9999px;
-    background-color: createThemeVar("Input:backgroundColor-track-#{$componentName}");
+    background-color: $backgroundColor-track-Slider;
 
     @include variant("default");
 
@@ -71,7 +135,7 @@ $componentName: "Slider";
     }
 
     &.disabled, &[data-disabled] {
-      background-color: createThemeVar("Input:backgroundColor-track-#{$componentName}--disabled");
+      background-color: $backgroundColor-track-Slider--disabled;
     }
 
     &:not(.disabled):not([data-disabled]):hover {
@@ -83,11 +147,11 @@ $componentName: "Slider";
   .sliderRange {
     position: absolute;
     height: 100%;
-    background-color: createThemeVar("Input:backgroundColor-range-#{$componentName}");
+    background-color: $backgroundColor-range-Slider;
     border-radius: 9999px;
 
     &.disabled, &[data-disabled] {
-      background-color: createThemeVar("Input:backgroundColor-range-#{$componentName}--disabled");
+      background-color: $backgroundColor-range-Slider--disabled;
     }
   }
 
@@ -98,11 +162,11 @@ $componentName: "Slider";
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    border: createThemeVar("Input:borderWidth-thumb-#{$componentName}")
-    createThemeVar("Input:borderStyle-thumb-#{$componentName}")
-    createThemeVar("Input:borderColor-thumb-#{$componentName}");
-    background-color: createThemeVar("Input:backgroundColor-thumb-#{$componentName}");
-    box-shadow: createThemeVar("Input:boxShadow-thumb-#{$componentName}");
+    border: $borderWidth-thumb-Slider
+    $borderStyle-thumb-Slider
+    $borderColor-thumb-Slider;
+    background-color: $backgroundColor-thumb-Slider;
+    box-shadow: $boxShadow-thumb-Slider;
     position: relative;
     transition: background-color 0.2s, box-shadow 0.2s;
     outline: none;
@@ -113,16 +177,16 @@ $componentName: "Slider";
     }
 
     &:focus-visible, &[data-focus] {
-      background-color: createThemeVar("Input:backgroundColor-thumb-#{$componentName}--focus");
-      box-shadow: createThemeVar("Input:boxShadow-thumb-#{$componentName}--focus");
+      background-color: $backgroundColor-thumb-Slider--focus;
+      box-shadow: $boxShadow-thumb-Slider--focus;
     }
     &:hover, &[data-hover] {
-      background-color: createThemeVar("Input:backgroundColor-thumb-#{$componentName}--hover");
-      box-shadow: createThemeVar("Input:boxShadow-thumb-#{$componentName}--hover");
+      background-color: $backgroundColor-thumb-Slider--hover;
+      box-shadow: $boxShadow-thumb-Slider--hover;
     }
     &:active, &[data-active] {
-      background-color: createThemeVar("Input:backgroundColor-thumb-#{$componentName}--active");
-      box-shadow: createThemeVar("Input:boxShadow-thumb-#{$componentName}--active");
+      background-color: $backgroundColor-thumb-Slider--active;
+      box-shadow: $boxShadow-thumb-Slider--active;
     }
   }
 
@@ -138,15 +202,15 @@ $componentName: "Slider";
   }
 
   .error {
-    border-color: createThemeVar("Input:borderColor-#{$componentName}-error");
+    border-color: $borderColor-Slider-error;
   }
 
   .warning {
-    border-color: createThemeVar("Input:borderColor-#{$componentName}-warning");
+    border-color: $borderColor-Slider-warning;
   }
 
   .valid {
-    border-color: createThemeVar("Input:borderColor-#{$componentName}-success");
+    border-color: $borderColor-Slider-success;
   }
 }
 

@@ -475,8 +475,30 @@ When refactoring Markdown-like components, prioritize logical grouping by contex
 23. **RadioGroup**
 24. **ToneSwitch**
 25. **TreeDisplay**
+26. **TableOfContents**
+27. **TextArea**
+28. **TimeInput**
+29. **Slider**
+30. **Select**
+31. **DatePicker**
 
-**Total: 25 components refactored**
+**Total: 31 components refactored**
+
+### 📦 Components Using Shared Stylesheets
+
+The following components share stylesheets with already-refactored components and are therefore complete:
+
+1. **H1** - Uses `Heading.module.scss` (Heading already refactored #6)
+2. **H2** - Uses `Heading.module.scss` (Heading already refactored #6)
+3. **H3** - Uses `Heading.module.scss` (Heading already refactored #6)
+4. **H4** - Uses `Heading.module.scss` (Heading already refactored #6)
+5. **H5** - Uses `Heading.module.scss` (Heading already refactored #6)
+6. **H6** - Uses `Heading.module.scss` (Heading already refactored #6)
+7. **CarouselItem** - Uses `Carousel.module.scss` (Carousel already refactored #3)
+8. **RadioItem** - Uses `RadioGroup.module.scss` (RadioGroup already refactored #23)
+9. **Password** - Uses `TextBox.module.scss` (TextBox already refactored #1)
+
+**Total: 9 additional components complete via shared stylesheets**
 
 ### ⚠️ Components Skipped
 
@@ -484,5 +506,5 @@ When refactoring Markdown-like components, prioritize logical grouping by contex
 
 ### 📋 Components Remaining
 
-Approximately **17 components** still need refactoring (out of 42 total with unexposed theme variables).
+Approximately **2 components** still need refactoring (out of 42 total with unexposed theme variables, accounting for 31 direct refactorings + 9 shared-stylesheet components + 1 skipped).
 
