@@ -6,11 +6,11 @@ We started with the simplest possible approach: post metadata and data as litera
 
 ```xmlui-pg name="XMLUI blog v1" height="200px"
 ---app
-<App layout="vertical-full-header">
+<App layout="vertical">
   <NavPanel>
     <NavGroup label="Blog">
       <NavLink label="Newest post" to="/newest-post" />
-      <NavLink label="Older post" to="/older-post" />
+      <NavLink label="Older píost" to="/older-post" />
     </NavGroup>
   </NavPanel>
     <Pages>
@@ -213,11 +213,11 @@ Although we have a `NavGroup` to list the posts, a blog should really have an ov
     <VStack width="100%">
       <H1>XMLUI Blog</H1>
       <Text>Latest updates, tutorials, and insights for building with XMLUI</Text>
-      <List  data="{
-      $props.posts.sort(function(a, b) {
-        return new Date(b.date) - new Date(a.date);
-      })
-    }">
+      <List data="{
+        $props.posts.sort(function(a, b) {
+          return new Date(b.date) - new Date(a.date);
+        })
+      }">
         <VStack gap="$space-2">
           <Link to="/blog/{$item.slug}">
             <Text fontSize="larger">

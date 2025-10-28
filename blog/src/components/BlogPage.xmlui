@@ -1,7 +1,5 @@
 <Component name="BlogPage">
-    <VStack
-       width="85%"
-       marginHorizontal="auto">
+    <VStack>
       <Link
         fontSize="$fontSize-xs"
         textDecorationLine="none"

@@ -1,6 +1,5 @@
 <App
     layout="vertical-full-header"
-    noScrollbarGutters
     var.posts=`{[
       {
         title: "An XMLUI-powered blog",
@@ -38,7 +37,7 @@
         </property>
     </AppHeader>
     <NavPanel>
-       <NavGroup label="Recent posts" to="/blog">
+       <NavGroup label="Recent posts" to="/blog" initiallyExpanded>
             <NavLink
                 label="An XMLUI-powered blog"
                 to="/blog/{posts[0].slug}" />

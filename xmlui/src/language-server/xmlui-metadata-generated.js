@@ -3135,6 +3135,25 @@ export default {
       "paddingRight-Button-lg": "var(--xmlui-paddingRight-Button-lg, var(--xmlui-paddingHorizontal-Button-lg, var(--xmlui-padding-Button-lg)))",
       "paddingTop-Button-lg": "var(--xmlui-paddingTop-Button-lg, var(--xmlui-paddingVertical-Button-lg, var(--xmlui-padding-Button-lg)))",
       "paddingBottom-Button-lg": "var(--xmlui-paddingBottom-Button-lg, var(--xmlui-paddingVertical-Button-lg, var(--xmlui-padding-Button-lg)))",
+      "fontFamily-Button": "var(--xmlui-fontFamily-Button)",
+      "fontSize-Button": "var(--xmlui-fontSize-Button)",
+      "fontWeight-Button": "var(--xmlui-fontWeight-Button)",
+      "fontStyle-Button": "var(--xmlui-fontStyle-Button)",
+      "borderRadius-Button": "var(--xmlui-borderRadius-Button)",
+      "borderWidth-Button": "var(--xmlui-borderWidth-Button)",
+      "borderWidth-Button--hover": "var(--xmlui-borderWidth-Button--hover)",
+      "borderColor-Button": "var(--xmlui-borderColor-Button)",
+      "borderColor-Button--hover": "var(--xmlui-borderColor-Button--hover)",
+      "borderStyle-Button": "var(--xmlui-borderStyle-Button)",
+      "borderStyle-Button--hover": "var(--xmlui-borderStyle-Button--hover)",
+      "backgroundColor-Button": "var(--xmlui-backgroundColor-Button)",
+      "backgroundColor-Button--hover": "var(--xmlui-backgroundColor-Button--hover)",
+      "textColor-Button": "var(--xmlui-textColor-Button)",
+      "textColor-Button--hover": "var(--xmlui-textColor-Button--hover)",
+      "boxShadow-Button": "var(--xmlui-boxShadow-Button)",
+      "boxShadow-Button--hover": "var(--xmlui-boxShadow-Button--hover)",
+      "gap-Button": "var(--xmlui-gap-Button)",
+      "transition-Button": "var(--xmlui-transition-Button)",
       "width-Button": "var(--xmlui-width-Button)",
       "height-Button": "var(--xmlui-height-Button)",
       "fontFamily-Button-primary-solid": "var(--xmlui-fontFamily-Button-primary-solid)",
@@ -3147,6 +3166,7 @@ export default {
       "backgroundColor-Button-primary-solid": "var(--xmlui-backgroundColor-Button-primary-solid)",
       "textColor-Button-primary-solid": "var(--xmlui-textColor-Button-primary-solid)",
       "boxShadow-Button-primary-solid": "var(--xmlui-boxShadow-Button-primary-solid)",
+      "transition-Button-primary-solid": "var(--xmlui-transition-Button-primary-solid)",
       "outlineWidth-Button-primary-solid--focus": "var(--xmlui-outlineWidth-Button-primary-solid--focus)",
       "outlineColor-Button-primary-solid--focus": "var(--xmlui-outlineColor-Button-primary-solid--focus)",
       "outlineStyle-Button-primary-solid--focus": "var(--xmlui-outlineStyle-Button-primary-solid--focus)",
@@ -3171,6 +3191,7 @@ export default {
       "backgroundColor-Button-secondary-solid": "var(--xmlui-backgroundColor-Button-secondary-solid)",
       "textColor-Button-secondary-solid": "var(--xmlui-textColor-Button-secondary-solid)",
       "boxShadow-Button-secondary-solid": "var(--xmlui-boxShadow-Button-secondary-solid)",
+      "transition-Button-secondary-solid": "var(--xmlui-transition-Button-secondary-solid)",
       "outlineWidth-Button-secondary-solid--focus": "var(--xmlui-outlineWidth-Button-secondary-solid--focus)",
       "outlineColor-Button-secondary-solid--focus": "var(--xmlui-outlineColor-Button-secondary-solid--focus)",
       "outlineStyle-Button-secondary-solid--focus": "var(--xmlui-outlineStyle-Button-secondary-solid--focus)",
@@ -3192,6 +3213,7 @@ export default {
       "backgroundColor-Button-attention-solid": "var(--xmlui-backgroundColor-Button-attention-solid)",
       "textColor-Button-attention-solid": "var(--xmlui-textColor-Button-attention-solid)",
       "boxShadow-Button-attention-solid": "var(--xmlui-boxShadow-Button-attention-solid)",
+      "transition-Button-attention-solid": "var(--xmlui-transition-Button-attention-solid)",
       "outlineWidth-Button-attention-solid--focus": "var(--xmlui-outlineWidth-Button-attention-solid--focus)",
       "outlineColor-Button-attention-solid--focus": "var(--xmlui-outlineColor-Button-attention-solid--focus)",
       "outlineStyle-Button-attention-solid--focus": "var(--xmlui-outlineStyle-Button-attention-solid--focus)",
@@ -3304,11 +3326,17 @@ export default {
       "textColor-Button-attention-ghost--active": "var(--xmlui-textColor-Button-attention-ghost--active)"
     },
     "defaultThemeVars": {
+      "padding-Button": "$space-2 $space-4",
+      "gap-Button": "$space-2",
+      "borderColor-Button": "transparent",
+      "backgroundColor-Button": "transparent",
+      "transition-Button": "color 0.2s, background 0.2s",
       "width-Button": "fit-content",
       "height-Button": "fit-content",
       "borderRadius-Button": "$borderRadius",
       "fontSize-Button": "$fontSize-sm",
       "fontWeight-Button": "$fontWeight-medium",
+      "fontStyle-Button": "$fontStyle-normal",
       "backgroundColor-Button-primary": "$color-primary-500",
       "backgroundColor-Button-attention": "$backgroundColor-attention",
       "borderColor-Button-attention": "$color-attention",
@@ -5632,6 +5660,11 @@ export default {
         "type": "boolean",
         "defaultValue": false
       },
+      "hideButtonRow": {
+        "description": "This property hides the button row entirely when set to true.",
+        "type": "boolean",
+        "defaultValue": false
+      },
       "submitUrl": {
         "description": "URL to submit the form data."
       },
@@ -5658,6 +5691,9 @@ export default {
       }
     },
     "events": {
+      "willSubmit": {
+        "description": "The form infrastructure fires this event just before the form is submitted. The event argument is the current `data` value to be submitted. You can cancel the submission by returning `false` from the event handler."
+      },
       "submit": {
         "description": "The form infrastructure fires this event when the form is submitted. The event argument is the current `data` value to save."
       },
@@ -5962,6 +5998,11 @@ export default {
         "description": "This property defines the gap between the adornments and the input area.",
         "valueType": "string",
         "defaultValue": "0"
+      },
+      "noSubmit": {
+        "description": "When set to `true`, the field will not be included in the form's submitted data. This is useful for fields that should be present in the form but not submitted, similar to hidden fields. If multiple FormItems reference the same `bindTo` value and any of them has `noSubmit` set to `true`, the field will NOT be submitted.",
+        "type": "boolean",
+        "defaultValue": false
       }
     },
     "events": {
@@ -6078,14 +6119,26 @@ export default {
         "description": "This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed."
       },
       "level": {
-        "description": "This property sets the visual significance (level) of the heading.",
+        "description": "This property sets the visual significance (level) of the heading. Accepts multiple formats: `h1`-`h6`, `H1`-`H6`, or `1`-`6`.Invalid values default to `h1`.",
         "availableValues": [
           "h1",
           "h2",
           "h3",
           "h4",
           "h5",
-          "h6"
+          "h6",
+          "H1",
+          "H2",
+          "H3",
+          "H4",
+          "H5",
+          "H6",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6"
         ],
         "defaultValue": "h1"
       },
@@ -11285,6 +11338,16 @@ export default {
         "description": "The fallback path when the current URL does not match any of the paths of the pages.",
         "defaultValue": "/"
       }
+    },
+    "themeVars": {
+      "paddingVertical-Pages": "var(--xmlui-paddingVertical-Pages)",
+      "paddingHorizontal-Pages": "var(--xmlui-paddingHorizontal-Pages)",
+      "gap-Pages": "var(--xmlui-gap-Pages)"
+    },
+    "defaultThemeVars": {
+      "paddingVertical-Pages": "$space-5",
+      "paddingHorizontal-Pages": "$space-4",
+      "gap-Pages": "$space-5"
     }
   },
   "Pagination": {
@@ -14210,11 +14273,38 @@ export default {
       }
     },
     "themeVars": {
+      "textColor-Text": "var(--xmlui-textColor-Text)",
+      "fontFamily-Text": "var(--xmlui-fontFamily-Text)",
+      "fontSize-Text": "var(--xmlui-fontSize-Text)",
+      "fontStyle-Text": "var(--xmlui-fontStyle-Text)",
+      "fontVariant-Text": "var(--xmlui-fontVariant-Text)",
+      "fontWeight-Text": "var(--xmlui-fontWeight-Text)",
+      "fontStretch-Text": "var(--xmlui-fontStretch-Text)",
+      "textDecorationLine-Text": "var(--xmlui-textDecorationLine-Text)",
+      "textDecorationColor-Text": "var(--xmlui-textDecorationColor-Text)",
+      "textDecorationStyle-Text": "var(--xmlui-textDecorationStyle-Text)",
+      "textDecorationThickness-Text": "var(--xmlui-textDecorationThickness-Text)",
+      "textUnderlineOffset-Text": "var(--xmlui-textUnderlineOffset-Text)",
+      "lineHeight-Text": "var(--xmlui-lineHeight-Text)",
+      "backgroundColor-Text": "var(--xmlui-backgroundColor-Text)",
+      "textTransform-Text": "var(--xmlui-textTransform-Text)",
+      "letterSpacing-Text": "var(--xmlui-letterSpacing-Text)",
+      "wordSpacing-Text": "var(--xmlui-wordSpacing-Text)",
+      "textShadow-Text": "var(--xmlui-textShadow-Text)",
+      "textIndent-Text": "var(--xmlui-textIndent-Text)",
+      "textAlign-Text": "var(--xmlui-textAlign-Text)",
+      "textAlignLast-Text": "var(--xmlui-textAlignLast-Text)",
+      "wordBreak-Text": "var(--xmlui-wordBreak-Text)",
+      "wordWrap-Text": "var(--xmlui-wordWrap-Text)",
+      "direction-Text": "var(--xmlui-direction-Text)",
+      "writingMode-Text": "var(--xmlui-writingMode-Text)",
+      "lineBreak-Text": "var(--xmlui-lineBreak-Text)",
       "marginTop-Text": "var(--xmlui-marginTop-Text)",
       "marginBottom-Text": "var(--xmlui-marginBottom-Text)",
       "marginLeft-Text": "var(--xmlui-marginLeft-Text)",
       "marginRight-Text": "var(--xmlui-marginRight-Text)",
       "verticalAlignment-Text": "var(--xmlui-verticalAlignment-Text)",
+      "textColor-Text--hover": "var(--xmlui-textColor-Text--hover)",
       "fontWeight-Text-abbr": "var(--xmlui-fontWeight-Text-abbr)",
       "textTransform-Text-abbr": "var(--xmlui-textTransform-Text-abbr)",
       "fontStyle-Text-cite": "var(--xmlui-fontStyle-Text-cite)",
@@ -14237,7 +14327,7 @@ export default {
       "borderRadius-Text-keyboard": "var(--xmlui-borderRadius-Text-keyboard)",
       "paddingHorizontal-Text-keyboard": "var(--xmlui-paddingHorizontal-Text-keyboard)",
       "backgroundColor-Text-marked": "var(--xmlui-backgroundColor-Text-marked)",
-      "color-Text-marked": "var(--xmlui-color-Text-marked)",
+      "textColor-Text-marked": "var(--xmlui-textColor-Text-marked)",
       "fontWeight-Text-marked": "var(--xmlui-fontWeight-Text-marked)",
       "fontStyle-Text-marked": "var(--xmlui-fontStyle-Text-marked)",
       "lineHeight-Text-marked": "var(--xmlui-lineHeight-Text-marked)",
@@ -14256,13 +14346,15 @@ export default {
       "marginLeft-Text-small": "var(--xmlui-marginLeft-Text-small)",
       "marginRight-Text-small": "var(--xmlui-marginRight-Text-small)",
       "verticalAlignment-Text-small": "var(--xmlui-verticalAlignment-Text-small)",
+      "textColor-Text-small--hover": "var(--xmlui-textColor-Text-small--hover)",
       "marginTop-Text-code": "var(--xmlui-marginTop-Text-code)",
       "marginBottom-Text-code": "var(--xmlui-marginBottom-Text-code)",
       "marginLeft-Text-code": "var(--xmlui-marginLeft-Text-code)",
       "marginRight-Text-code": "var(--xmlui-marginRight-Text-code)",
       "verticalAlignment-Text-code": "var(--xmlui-verticalAlignment-Text-code)",
+      "textColor-Text-code--hover": "var(--xmlui-textColor-Text-code--hover)",
       "letterSpacing-Text-caption": "var(--xmlui-letterSpacing-Text-caption)",
-      "color-Text-placeholder": "var(--xmlui-color-Text-placeholder)",
+      "textColor-Text-placeholder": "var(--xmlui-textColor-Text-placeholder)",
       "fontStyle-Text-placeholder": "var(--xmlui-fontStyle-Text-placeholder)",
       "fontWeight-Text-placeholder": "var(--xmlui-fontWeight-Text-placeholder)",
       "fontSize-Text-placeholder": "var(--xmlui-fontSize-Text-placeholder)",
@@ -14273,14 +14365,14 @@ export default {
       "fontStyle-Text-subheading": "var(--xmlui-fontStyle-Text-subheading)",
       "letterSpacing-Text-subheading": "var(--xmlui-letterSpacing-Text-subheading)",
       "textTransform-Text-subheading": "var(--xmlui-textTransform-Text-subheading)",
-      "color-Text-subheading": "var(--xmlui-color-Text-subheading)",
+      "textColor-Text-subheading": "var(--xmlui-textColor-Text-subheading)",
       "marginTop-Text-tableheading": "var(--xmlui-marginTop-Text-tableheading)",
       "marginBottom-Text-tableheading": "var(--xmlui-marginBottom-Text-tableheading)",
       "paddingHorizontal-Text-tableheading": "var(--xmlui-paddingHorizontal-Text-tableheading)",
       "fontSize-Text-tableheading": "var(--xmlui-fontSize-Text-tableheading)",
       "fontWeight-Text-tableheading": "var(--xmlui-fontWeight-Text-tableheading)",
       "fontSize-Text-secondary": "var(--xmlui-fontSize-Text-secondary)",
-      "color-Text-secondary": "var(--xmlui-color-Text-secondary)"
+      "textColor-Text-secondary": "var(--xmlui-textColor-Text-secondary)"
     },
     "defaultThemeVars": {
       "borderRadius-Text": "$borderRadius",
@@ -14342,10 +14434,10 @@ export default {
       "backgroundColor-Text-keyboard": "rgb(from $color-surface-100 r g b / 0.4)",
       "borderColor-Text-keyboard": "$color-surface-300",
       "backgroundColor-Text-marked": "rgb(from $color-primary-200 r g b / 0.4)",
-      "color-Text-placeholder": "$color-surface-500",
-      "color-Text-codefence": "$color-surface-900",
-      "color-Text-subheading": "$textColor-secondary",
-      "color-Text-secondary": "$textColor-secondary",
+      "textColor-Text-placeholder": "$color-surface-500",
+      "textColor-Text-codefence": "$color-surface-900",
+      "textColor-Text-subheading": "$textColor-secondary",
+      "textColor-Text-secondary": "$textColor-secondary",
       "dark": {
         "backgroundColor-Text-marked": "rgb(from $color-primary-400 r g b / 0.4)"
       }
