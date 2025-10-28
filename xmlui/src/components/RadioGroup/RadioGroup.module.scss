@@ -56,6 +56,11 @@ $textColor-RadioGroupOption-error: createThemeVar("Input:textColor-RadioGroupOpt
 $textColor-RadioGroupOption-warning: createThemeVar("Input:textColor-RadioGroupOption-warning");
 $textColor-RadioGroupOption-success: createThemeVar("Input:textColor-RadioGroupOption-success");
 
+// Variables for @layer section
+$outlineWidth-RadioGroupOption--focus: createThemeVar("Input:outlineWidth-RadioGroupOption--focus");
+$outlineColor-RadioGroupOption--focus: createThemeVar("Input:outlineColor-RadioGroupOption--focus");
+$outlineStyle-RadioGroupOption--focus: createThemeVar("Input:outlineStyle-RadioGroupOption--focus");
+$outlineOffset-RadioGroupOption--focus: createThemeVar("Input:outlineOffset-RadioGroupOption--focus");
 
 @layer components {
   .radioGroupContainer {
@@ -87,10 +92,10 @@ $textColor-RadioGroupOption-success: createThemeVar("Input:textColor-RadioGroupO
       border-color: $borderColor-RadioGroupOption-default--hover;
     }
     &:focus-visible {
-      outline-width: createThemeVar("Input:outlineWidth-RadioGroupOption--focus");
-      outline-color: createThemeVar("Input:outlineColor-RadioGroupOption--focus");
-      outline-style: createThemeVar("Input:outlineStyle-RadioGroupOption--focus");
-      outline-offset: createThemeVar("Input:outlineOffset-RadioGroupOption--focus");
+      outline-width: $outlineWidth-RadioGroupOption--focus;
+      outline-color: $outlineColor-RadioGroupOption--focus;
+      outline-style: $outlineStyle-RadioGroupOption--focus;
+      outline-offset: $outlineOffset-RadioGroupOption--focus;
     }
     &:disabled {
       cursor: not-allowed;

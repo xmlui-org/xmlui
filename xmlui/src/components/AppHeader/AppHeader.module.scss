@@ -17,13 +17,19 @@ $themeVars: t.composeBorderVars($themeVars, $component);
 $width-logo-AppHeader: createThemeVar("width-logo-#{$component}");
 $alignment-content-AppHeader: createThemeVar("alignment-content-#{$component}");
 
+// Variables for @layer section
+$height-AppHeader: createThemeVar("height-#{$component}");
+$backgroundColor-AppHeader: createThemeVar("backgroundColor-#{$component}");
+$maxWidth-content-AppHeader: createThemeVar("maxWidth-content-#{$component}");
+$maxWidth-AppHeader: createThemeVar("maxWidth-#{$component}");
+$padding-drawerToggle-AppHeader: createThemeVar("padding-drawerToggle-#{$component}");
 
 @layer components {
   .header {
     position: relative;
-    height: createThemeVar("height-#{$component}");
+    height: $height-AppHeader;
     box-sizing: content-box;
-    background-color: createThemeVar("backgroundColor-#{$component}");
+    background-color: $backgroundColor-AppHeader;
     @include t.borderVars($themeVars, $component);
   }
 
@@ -35,12 +41,12 @@ $alignment-content-AppHeader: createThemeVar("alignment-content-#{$component}");
     display: flex;
     flex-direction: row;
     align-items: center;
-    max-width: createThemeVar("maxWidth-content-#{$component}");
+    max-width: $maxWidth-content-AppHeader;
     padding-inline: t.getThemeVar($themeVars, "paddingHorizontal-#{$component}");
     @include t.paddingVars($themeVars, $component);
 
     &.full {
-      max-width: createThemeVar("maxWidth-#{$component}");
+      max-width: $maxWidth-AppHeader;
     }
     width: 100%;
     margin: 0 auto;
@@ -130,7 +136,7 @@ $alignment-content-AppHeader: createThemeVar("alignment-content-#{$component}");
   }
 
   .drawerToggle.drawerToggle{
-    padding: createThemeVar("padding-drawerToggle-#{$component}") !important;
+    padding: $padding-drawerToggle-AppHeader !important;
     display: none;
     @include t.withMaxScreenSize(0) {
       display: block;

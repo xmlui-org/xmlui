@@ -465,8 +465,18 @@ When refactoring Markdown-like components, prioritize logical grouping by contex
 13. **NavPanel**
 14. **NavLink**
 15. **Table**
+16. **App**
+17. **AppHeader**
+18. **AutoComplete**
+19. **ColorPicker**
+20. **DateInput**
+21. **FileInput**
+22. **Pagination**
+23. **RadioGroup**
+24. **ToneSwitch**
+25. **TreeDisplay**
 
-**Total: 15 components refactored**
+**Total: 25 components refactored**
 
 ### ⚠️ Components Skipped
 
@@ -474,5 +484,5 @@ When refactoring Markdown-like components, prioritize logical grouping by contex
 
 ### 📋 Components Remaining
 
-Approximately **27 components** still need refactoring (out of 42 total with unexposed theme variables).
+Approximately **17 components** still need refactoring (out of 42 total with unexposed theme variables).
 

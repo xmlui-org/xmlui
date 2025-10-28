@@ -7,13 +7,21 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+// Variables for @layer section
+$borderColor-ToneSwitch: createThemeVar("borderColor-ToneSwitch");
+$borderColor-ToneSwitch--hover: createThemeVar("borderColor-ToneSwitch--hover");
+$backgroundColor-ToneSwitch-light: createThemeVar("backgroundColor-ToneSwitch-light");
+$color-ToneSwitch-light: createThemeVar("color-ToneSwitch-light");
+$backgroundColor-ToneSwitch-dark: createThemeVar("backgroundColor-ToneSwitch-dark");
+$color-ToneSwitch-dark: createThemeVar("color-ToneSwitch-dark");
+
 @layer components {
   .iconSwitch {
     display: flex;
     align-items: center;
     padding: 4px;
     border-radius: 1rem;
-    border: 1px solid createThemeVar("borderColor-ToneSwitch");
+    border: 1px solid $borderColor-ToneSwitch;
     transition: background-color 0.3s ease, border-color 0.3s ease;
     cursor: pointer;
     min-height: 1rem;
@@ -22,7 +30,7 @@ $themeVars: ();
     pointer-events: auto;
 
     &:hover {
-      border-color: createThemeVar("borderColor-ToneSwitch--hover");
+      border-color: $borderColor-ToneSwitch--hover;
     }
   }
 
@@ -58,13 +66,13 @@ $themeVars: ();
   }
 
   .iconSwitch.light {
-    background-color: createThemeVar("backgroundColor-ToneSwitch-light");
-    color: createThemeVar("color-ToneSwitch-light");
+    background-color: $backgroundColor-ToneSwitch-light;
+    color: $color-ToneSwitch-light;
   }
 
   .iconSwitch.dark {
-    background-color: createThemeVar("backgroundColor-ToneSwitch-dark");
-    color: createThemeVar("color-ToneSwitch-dark");
+    background-color: $backgroundColor-ToneSwitch-dark;
+    color: $color-ToneSwitch-dark;
   }
 
   .icon {
