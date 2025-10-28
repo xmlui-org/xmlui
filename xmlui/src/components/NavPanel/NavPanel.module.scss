@@ -22,6 +22,11 @@ $height-NavPanel: createThemeVar("height-AppHeader");
 $paddingVertical-AppHeader: createThemeVar("paddingVertical-AppHeader");
 $alignment-content-AppHeader: createThemeVar("alignment-content-AppHeader");
 
+// Variables for @layer section
+$paddingHorizontal-NavPanel: createThemeVar("paddingHorizontal-#{$component}");
+$paddingVertical-logo-NavPanel: createThemeVar("paddingVertical-logo-#{$component}");
+$paddingHorizontal-logo-NavPanel: createThemeVar("paddingHorizontal-logo-#{$component}");
+$horizontalAlignment-logo-NavPanel: createThemeVar("horizontalAlignment-logo-#{$component}");
 
 @layer components {
   .wrapper {
@@ -54,7 +59,7 @@ $alignment-content-AppHeader: createThemeVar("alignment-content-AppHeader");
 
       &:not(.condensed){
         .wrapperInner{
-          padding-inline: createThemeVar("paddingHorizontal-#{$component}");
+          padding-inline: $paddingHorizontal-NavPanel;
           justify-content: $alignment-content-AppHeader;
         }
       }
@@ -82,11 +87,11 @@ $alignment-content-AppHeader: createThemeVar("alignment-content-AppHeader");
       display: flex;
       flex-shrink: 0;
       height: $height-NavPanel;
-      padding-top: calc(#{createThemeVar("paddingVertical-logo-#{$component}")} + #{$paddingVertical-AppHeader});
-      padding-bottom: calc(#{createThemeVar("paddingVertical-logo-#{$component}")} + #{$paddingVertical-AppHeader});
-      padding-inline: createThemeVar("paddingHorizontal-logo-#{$component}");
+      padding-top: calc(#{$paddingVertical-logo-NavPanel} + #{$paddingVertical-AppHeader});
+      padding-bottom: calc(#{$paddingVertical-logo-NavPanel} + #{$paddingVertical-AppHeader});
+      padding-inline: $paddingHorizontal-logo-NavPanel;
       margin-bottom: $marginBottom-logo-NavPanel;
-      justify-content: createThemeVar("horizontalAlignment-logo-#{$component}");
+      justify-content: $horizontalAlignment-logo-NavPanel;
     }
 
     &.inDrawer {     //to make room for the close button

@@ -6,11 +6,16 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+// Variables for @layer section
+$gap-Form: createThemeVar("gap-Form");
+$gap-buttonRow-Form: createThemeVar("gap-buttonRow-Form");
+$marginTop-buttonRow-Form: createThemeVar("marginTop-buttonRow-Form");
+
 @layer components {
   .wrapper {
     display: flex;
     flex-direction: column;
-    gap: createThemeVar("gap-Form");
+    gap: $gap-Form;
   }
 
   .buttonRow {
@@ -18,8 +23,8 @@ $themeVars: ();
     flex-direction: row;
     align-items: center;
     justify-content: flex-end;
-    gap: createThemeVar("gap-buttonRow-Form");
-    margin-top: createThemeVar("marginTop-buttonRow-Form");
+    gap: $gap-buttonRow-Form;
+    margin-top: $marginTop-buttonRow-Form;
   }
 }
 

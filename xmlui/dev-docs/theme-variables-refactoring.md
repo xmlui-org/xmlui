@@ -458,8 +458,15 @@ When refactoring Markdown-like components, prioritize logical grouping by contex
 6. **Heading**
 7. **IFrame**
 8. **Markdown**
+9. **Button**
+10. **Text**
+11. **FormItem**
+12. **Form**
+13. **NavPanel**
+14. **NavLink**
+15. **Table**
 
-**Total: 8 components refactored**
+**Total: 15 components refactored**
 
 ### ⚠️ Components Skipped
 
@@ -467,5 +474,5 @@ When refactoring Markdown-like components, prioritize logical grouping by contex
 
 ### 📋 Components Remaining
 
-Approximately **34 components** still need refactoring (out of 42 total with unexposed theme variables).
+Approximately **27 components** still need refactoring (out of 42 total with unexposed theme variables).
 
