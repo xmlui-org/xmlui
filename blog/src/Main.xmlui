@@ -11,7 +11,7 @@
         image: "blog-scrabble.png"
       },
       {
-        title: "The versatile XMLUI playground",
+        title: "Reproducible XMLUI",
         slug: "xmlui-playground",
         description: "Use playgrounds to infuse docs with live examples, iterate on prototypes, and reproduce bugs.",
         author: "Jon Udell",
@@ -43,7 +43,7 @@
                 label="An XMLUI-powered blog"
                 to="/blog/{posts[0].slug}" />
             <NavLink
-                label="The versatile XMLUI playground"
+                label="Reproducible XMLUI"
                 to="/blog/{posts[1].slug}" />
             <NavLink
                 label="Introducing XMLUI"
