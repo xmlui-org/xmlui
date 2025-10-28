@@ -14,7 +14,7 @@ import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
 import { useTheme } from "../../../components-core/theming/ThemeContext";
 import classnames from "classnames";
-import styles from './LineChart.module.scss';
+import styles from "./LineChart.module.scss";
 
 export type LineChartProps = {
   data: any[];
@@ -38,7 +38,17 @@ export type LineChartProps = {
   tooltipRenderer?: (tooltipData: any) => ReactNode;
 };
 
-export const defaultProps: Pick<LineChartProps, "hideX" | "hideY" | "hideTooltip" | "showLegend" | "tickFormatterX" | "tickFormatterY" | "hideTickX" | "hideTickY"> = {
+export const defaultProps: Pick<
+  LineChartProps,
+  | "hideX"
+  | "hideY"
+  | "hideTooltip"
+  | "showLegend"
+  | "tickFormatterX"
+  | "tickFormatterY"
+  | "hideTickX"
+  | "hideTickY"
+> = {
   hideTickX: false,
   hideTickY: false,
   hideX: false,
@@ -53,23 +63,26 @@ const defaultChartParams = {
   chartWidth: 800,
 };
 
-export const LineChart = forwardRef(function LineChart({
-  data,
-  dataKeys = [],
-  nameKey,
-  style,
-  className,
-  hideX = defaultProps.hideX,
-  hideY = defaultProps.hideY,
-  hideTickX = defaultProps.hideTickX,
-  hideTickY = defaultProps.hideTickY,
-  hideTooltip = defaultProps.hideTooltip,
-  tickFormatterX = defaultProps.tickFormatterX,
-  tickFormatterY = defaultProps.tickFormatterY,
-  children,
-  showLegend = defaultProps.showLegend,
-  tooltipRenderer,
-}: LineChartProps, forwardedRef: ForwardedRef<HTMLDivElement>) {
+export const LineChart = forwardRef(function LineChart(
+  {
+    data,
+    dataKeys = [],
+    nameKey,
+    style,
+    className,
+    hideX = defaultProps.hideX,
+    hideY = defaultProps.hideY,
+    hideTickX = defaultProps.hideTickX,
+    hideTickY = defaultProps.hideTickY,
+    hideTooltip = defaultProps.hideTooltip,
+    tickFormatterX = defaultProps.tickFormatterX,
+    tickFormatterY = defaultProps.tickFormatterY,
+    children,
+    showLegend = defaultProps.showLegend,
+    tooltipRenderer,
+  }: LineChartProps,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   const { getThemeVar } = useTheme();
 
   const colorValues = useMemo(() => {
@@ -129,10 +142,10 @@ export const LineChart = forwardRef(function LineChart({
 
   const safeTooltipRenderer = useCallback(
     (props: any) => {
-      if (!tooltipRenderer) return <TooltipContent {...props}/>;
+      if (!tooltipRenderer) return <TooltipContent {...props} />;
 
       const payloadArray: Array<{ label: string; value: any; color: string }> = [];
-      
+
       if (props.payload && props.payload.length > 0 && props.payload[0].payload) {
         const originalPayload = props.payload[0].payload;
         // Transform dataKeys into array of objects with label, value, and color
@@ -141,7 +154,7 @@ export const LineChart = forwardRef(function LineChart({
             payloadArray.push({
               label: dataKey,
               value: originalPayload[dataKey],
-              color: colorValues[index] || colorValues[0]
+              color: colorValues[index] || colorValues[0],
             });
           }
         });
@@ -156,7 +169,7 @@ export const LineChart = forwardRef(function LineChart({
 
       return tooltipRenderer(tooltipData);
     },
-    [tooltipRenderer, dataKeys, colorValues]
+    [tooltipRenderer, dataKeys, colorValues],
   );
 
   useEffect(() => {
@@ -197,7 +210,7 @@ export const LineChart = forwardRef(function LineChart({
     window.addEventListener("resize", calc);
     return () => window.removeEventListener("resize", calc);
   }, [data, nameKey, xAxisHeight, safeData.length, fontSize]);
-  
+
   // The stroke width of the lines
   const strokeWidth = getThemeVar("width-line-LineChart");
 
@@ -210,18 +223,18 @@ export const LineChart = forwardRef(function LineChart({
       >
         {safeData.length > 0 && nameKey
           ? safeData
-            .map((d) => d?.[nameKey])
-            .map((label, idx) => (
-              <span key={idx} style={{ fontSize: 12, whiteSpace: "nowrap" }}>
-                {label}
-              </span>
-            ))
+              .map((d) => d?.[nameKey])
+              .map((label, idx) => (
+                <span key={idx} style={{ fontSize: 12, whiteSpace: "nowrap" }}>
+                  {label}
+                </span>
+              ))
           : null}
       </div>
       <div
         ref={forwardedRef}
         className={classnames(className, styles.wrapper)}
-        style={{ flexGrow: 1, ...style}} 
+        style={{ flexGrow: 1, ...style }}
       >
         <ResponsiveContainer
           ref={containerRef}
@@ -252,6 +265,7 @@ export const LineChart = forwardRef(function LineChart({
               tickLine={false}
               tickFormatter={miniMode ? undefined : tickFormatterY}
               tick={miniMode ? false : !hideTickY && { fill: "currentColor", fontSize }}
+              domain={[(dataMin: number) => dataMin * 0.95, (dataMax: number) => dataMax * 1.05]}
             />
             {!miniMode && !hideTooltip && <Tooltip content={safeTooltipRenderer} />}
             {dataKeys.map((dataKey, i) => (

@@ -333,6 +333,7 @@ export function BarChart({
           height: miniMode || hideX ? 0 : xAxisHeight,
           tick: miniMode || hideTickX ? false : { fill: "currentColor", fontSize },
           tickFormatter: miniMode || hideTickX ? undefined : tickFormatterX,
+          domain: [0, (dataMax: number) => dataMax * 1.05],
         }
       : {
           type: "category",
@@ -367,6 +368,7 @@ export function BarChart({
           tickCount: yTickCount,
           tickFormatter: miniMode || hideTickY ? undefined : tickFormatterY,
           width: miniMode || hideY ? 0 : yAxisWidth,
+          domain: [0, (dataMax: number) => dataMax * 1.1],
         };
 
   return (
