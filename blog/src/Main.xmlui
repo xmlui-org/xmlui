@@ -3,12 +3,28 @@
     noScrollbarGutters
     var.posts=`{[
       {
-        title: "Welcome to the XMLUI blog!",
-        slug: "welcome-to-the-xmlui-blog",
-        description: "In our inaugural blog post we show how to build a simple blog engine with XMLUI.",
+        title: "An XMLUI-powered blog",
+        slug: "xmlui-powered-blog",
+        description: "How we made this blog with a few dozen lines of XMLUI.",
         author: "Jon Udell",
-        date: "2025-10-22",
+        date: "2025-10-28",
         image: "blog-scrabble.png"
+      },
+      {
+        title: "Reproducible XMLUI",
+        slug: "xmlui-playground",
+        description: "Use playgrounds to infuse docs with live examples, iterate on prototypes, and reproduce bugs.",
+        author: "Jon Udell",
+        date: "2025-10-27",
+        image: "playground.png"
+      },
+      {
+        title: "Introducing XMLUI",
+        slug: "introducing-xmlui",
+        description: "Let's make building user interfaces as easy as it was 30 years ago.",
+        author: "Jon Udell",
+        date: "2025-07-18",
+        image: "xmlui-demo-gallery.png"
       }
     ]}`>
     <AppHeader>
@@ -18,14 +34,21 @@
             </Link>
         </property>
         <property name="profileMenuTemplate">
-            <Text variant="em">XMLUI Blog: Tutorials, tips, best practices</Text>
+            <Text variant="em">Tutorials, tips, best practices</Text>
         </property>
     </AppHeader>
     <NavPanel>
        <NavGroup label="Recent posts" to="/blog">
             <NavLink
-                label="Welcome to the XMLUI blog!"
+                label="An XMLUI-powered blog"
                 to="/blog/{posts[0].slug}" />
+            <NavLink
+                label="Reproducible XMLUI"
+                to="/blog/{posts[1].slug}" />
+            <NavLink
+                label="Introducing XMLUI"
+                to="/blog/{posts[2].slug}" />
+
         </NavGroup>
     </NavPanel>
     <Pages fallbackPath="/404">
@@ -37,6 +60,12 @@
         </Page>
         <Page url="/blog/{posts[0].slug}">
             <BlogPage post="{posts[0]}" />
+        </Page>
+        <Page url="/blog/{posts[1].slug}">
+            <BlogPage post="{posts[1]}" />
+        </Page>
+        <Page url="/blog/{posts[2].slug}">
+            <BlogPage post="{posts[2]}" />
         </Page>
     </Pages>
     <Footer>
