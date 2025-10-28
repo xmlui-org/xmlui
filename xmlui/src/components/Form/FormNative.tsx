@@ -260,6 +260,7 @@ type Props = {
   keepModalOpenOnSubmit?: boolean;
   hideButtonRowUntilDirty?: boolean;
   hideButtonRow?: boolean;
+  enableSubmit?: boolean;
 };
 
 export const defaultProps: Pick<
@@ -273,6 +274,7 @@ export const defaultProps: Pick<
   | "swapCancelAndSave"
   | "hideButtonRowUntilDirty"
   | "hideButtonRow"
+  | "enableSubmit"
 > = {
   cancelLabel: "Cancel",
   saveLabel: "Save",
@@ -283,6 +285,7 @@ export const defaultProps: Pick<
   swapCancelAndSave: false,
   hideButtonRowUntilDirty: false,
   hideButtonRow: false,
+  enableSubmit: true,
 };
 
 // --- Remove the properties from formState.subject where the property name ends with UNBOUND_FIELD_SUFFIX
@@ -326,6 +329,7 @@ const Form = forwardRef(function (
     keepModalOpenOnSubmit = defaultProps.keepModalOpenOnSubmit,
     hideButtonRowUntilDirty,
     hideButtonRow = defaultProps.hideButtonRow,
+    enableSubmit = defaultProps.enableSubmit,
     ...rest
   }: Props,
   ref: ForwardedRef<HTMLFormElement>,
@@ -373,6 +377,28 @@ const Form = forwardRef(function (
     void requestModalFormClose();
   });
 
+  const doValidate = useEvent(async () => {
+    // Trigger validation display on all fields
+    dispatch(triedToSubmit());
+    
+    // Get validation results grouped by severity
+    const { error, warning } = groupInvalidValidationResultsBySeverity(
+      Object.values(formState.validationResults),
+    );
+    
+    // Prepare cleaned data
+    const cleanedData = cleanUpSubject(formState.subject, formState.noSubmitFields);
+    
+    // Return validation result
+    return {
+      isValid: error.length === 0,
+      data: cleanedData,
+      errors: error,
+      warnings: warning,
+      validationResults: formState.validationResults,
+    };
+  });
+
   const doSubmit = useEvent(async (event?: FormEvent<HTMLFormElement>) => {
     /* console.log(`🚀 Form submit started`);
     console.log(`🔍 Initial values:`, {
@@ -387,21 +413,21 @@ const Form = forwardRef(function (
       return;
     }
     setConfirmSubmitModalVisible(false);
-    dispatch(triedToSubmit());
-    const { error, warning } = groupInvalidValidationResultsBySeverity(
-      Object.values(formState.validationResults),
-    );
-    if (error.length) {
+    
+    // Use the extracted validation logic
+    const validationResult = await doValidate();
+    
+    if (!validationResult.isValid) {
       return;
     }
-    if (warning.length && !confirmSubmitModalVisible) {
+    if (validationResult.warnings.length > 0 && !confirmSubmitModalVisible) {
       setConfirmSubmitModalVisible(true);
       return;
     }
     const prevFocused = document.activeElement;
     dispatch(formSubmitting());
     try {
-      const filteredSubject = cleanUpSubject(formState.subject, formState.noSubmitFields);
+      const filteredSubject = validationResult.data;
       const canSubmit = await onWillSubmit?.(filteredSubject);
       if (canSubmit === false) {
         // --- We do not reset the form but allow the next submit.
@@ -505,19 +531,20 @@ const Form = forwardRef(function (
     );
   const submitButton = useMemo(
     () => (
-      <Button data-part-id={PART_SUBMIT_BUTTON} key="submit" type={"submit"} disabled={!isEnabled}>
+      <Button data-part-id={PART_SUBMIT_BUTTON} key="submit" type={"submit"} disabled={!isEnabled || !enableSubmit}>
         {formState.submitInProgress ? saveInProgressLabel : saveLabel}
       </Button>
     ),
-    [isEnabled, formState.submitInProgress, saveInProgressLabel, saveLabel],
+    [isEnabled, enableSubmit, formState.submitInProgress, saveInProgressLabel, saveLabel],
   );
 
   useEffect(() => {
     registerComponentApi?.({
       reset: doReset,
       update: updateData,
+      validate: doValidate,
     });
-  }, [doReset, updateData, registerComponentApi]);
+  }, [doReset, updateData, doValidate, registerComponentApi]);
 
   let safeButtonRow = (
     <>
@@ -659,6 +686,7 @@ export const FormWithContextVar = forwardRef(function (
         itemLabelWidth={itemLabelWidthCssProps.width as string}
         hideButtonRowUntilDirty={extractValue.asOptionalBoolean(node.props.hideButtonRowUntilDirty)}
         hideButtonRow={extractValue.asOptionalBoolean(node.props.hideButtonRow)}
+        enableSubmit={extractValue.asOptionalBoolean(node.props.enableSubmit)}
         formState={formState}
         dispatch={dispatch}
         id={node.uid}

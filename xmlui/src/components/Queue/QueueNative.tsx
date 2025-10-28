@@ -1,14 +1,22 @@
 import type React from "react";
-import { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useRef } from "react";
 import toast from "react-hot-toast";
 import produce from "immer";
 import { isEqual } from "lodash-es";
 
-import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
+import type {
+  LookupEventHandlerFn,
+  RegisterComponentApiFn,
+  RenderChildFn,
+  ValueExtractor,
+} from "../../abstractions/RendererDefs";
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import { usePrevious } from "../../components-core/utils/hooks";
 import { generatedId, useEvent } from "../../components-core/utils/misc";
 import { useAppContext } from "../../components-core/AppContext";
+import { MemoizedItem } from "../container-helpers";
+import type { QueueMd } from "./Queue";
 import type { QueueAction } from "../Queue/queueActions";
 import {
   actionItemCompleted,
@@ -39,6 +47,9 @@ type Props = {
   renderProgressFeedback?: (completedItems: any, queuedItems: any) => React.ReactNode;
   renderResultFeedback?: (completedItems: any, queuedItems: any) => React.ReactNode;
   clearAfterFinish?: boolean;
+  // Optional external state management
+  queueState?: QueueState;
+  dispatch?: React.Dispatch<QueueAction>;
 };
 
 const queueReducer = produce((state: QueueState, action: QueueAction) => {
@@ -132,9 +143,15 @@ export function Queue({
   renderProgressFeedback,
   renderResultFeedback,
   clearAfterFinish = defaultProps.clearAfterFinish,
+  queueState: externalQueueState,
+  dispatch: externalDispatch,
 }: Props) {
   const runningActionItemRef = useRef<Set<string>>(new Set());
-  const [queueState, dispatch] = useReducer(queueReducer, INITIAL_STATE);
+  const [internalQueueState, internalDispatch] = useReducer(queueReducer, INITIAL_STATE);
+  
+  // Use external state if provided, otherwise use internal state
+  const queueState = externalQueueState ?? internalQueueState;
+  const dispatch = externalDispatch ?? internalDispatch;
 
   let appContext = useAppContext();
 
@@ -343,3 +360,109 @@ type QueueState = {
   queue: string[];
   queueState: Record<string, QueueItem>;
 };
+
+// =====================================================================================================================
+// QueueWithContextVar component - wrapper that provides context variables to event handlers
+
+type QueueComponentDef = ComponentDef<typeof QueueMd>;
+
+export function QueueWithContextVar({
+  node,
+  renderChild,
+  extractValue,
+  lookupEventHandler,
+  registerComponentApi,
+}: {
+  node: QueueComponentDef;
+  renderChild: RenderChildFn;
+  extractValue: ValueExtractor;
+  lookupEventHandler: LookupEventHandlerFn<typeof QueueMd>;
+  registerComponentApi: RegisterComponentApiFn;
+}) {
+  const [queueState, dispatch] = useReducer(queueReducer, INITIAL_STATE);
+
+  // Compute context variables from queue state
+  const completedItems = useMemo(() => {
+    return Object.values(queueState.queueState).filter((item) => item.status === "completed");
+  }, [queueState.queueState]);
+
+  const queuedItems = useMemo(() => {
+    return Object.values(queueState.queueState);
+  }, [queueState.queueState]);
+
+  const $completedItems = completedItems;
+  const $queuedItems = queuedItems;
+
+  return (
+    <Queue
+      queueState={queueState}
+      dispatch={dispatch}
+      registerComponentApi={registerComponentApi}
+      renderResultFeedback={
+        node.props.resultFeedback
+          ? (completedItems, queuedItems) => {
+              return (
+                <MemoizedItem
+                  node={node.props.resultFeedback! as any}
+                  contextVars={{
+                    $completedItems: completedItems,
+                    $queuedItems: queuedItems,
+                  }}
+                  renderChild={renderChild}
+                />
+              );
+            }
+          : undefined
+      }
+      renderProgressFeedback={
+        node.props.progressFeedback
+          ? (completedItems, queuedItems) => {
+              return (
+                <MemoizedItem
+                  node={node.props.progressFeedback! as any}
+                  contextVars={{
+                    $completedItems: completedItems,
+                    $queuedItems: queuedItems,
+                  }}
+                  renderChild={renderChild}
+                />
+              );
+            }
+          : undefined
+      }
+      willProcessItem={lookupEventHandler("willProcess", {
+        context: {
+          $completedItems,
+          $queuedItems,
+        },
+      })}
+      processItem={lookupEventHandler("process", {
+        signError: false,
+        context: {
+          $completedItems,
+          $queuedItems,
+        },
+      })}
+      didProcessItem={lookupEventHandler("didProcess", {
+        context: {
+          $completedItems,
+          $queuedItems,
+        },
+      })}
+      processItemError={lookupEventHandler("processError", {
+        context: {
+          $completedItems,
+          $queuedItems,
+        },
+      })}
+      onComplete={lookupEventHandler("complete", {
+        context: {
+          $completedItems,
+          $queuedItems,
+        },
+      })}
+      clearAfterFinish={extractValue.asOptionalBoolean(node.props.clearAfterFinish)}
+    />
+  );
+}
+

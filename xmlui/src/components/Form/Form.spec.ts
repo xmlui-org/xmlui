@@ -225,10 +225,7 @@ test.describe("Basic Functionality", () => {
   // =============================================================================
 
   test.describe("hideButtonRowUntilDirty property", () => {
-    test("hides button row initially when form is not dirty", async ({
-      initTestBed,
-      page,
-    }) => {
+    test("hides button row initially when form is not dirty", async ({ initTestBed, page }) => {
       await initTestBed(`
         <Form hideButtonRowUntilDirty="true">
           <FormItem label="Name" bindTo="name" testId="nameField" />
@@ -302,10 +299,7 @@ test.describe("Basic Functionality", () => {
       await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
     });
 
-    test("shows button row by default when property not set", async ({
-      initTestBed,
-      page,
-    }) => {
+    test("shows button row by default when property not set", async ({ initTestBed, page }) => {
       await initTestBed(`
         <Form>
           <FormItem label="Name" bindTo="name" testId="nameField" />
@@ -416,10 +410,7 @@ test.describe("Basic Functionality", () => {
       await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
     });
 
-    test("button row appears when checkbox is checked", async ({
-      initTestBed,
-      page,
-    }) => {
+    test("button row appears when checkbox is checked", async ({ initTestBed, page }) => {
       await initTestBed(`
         <Form hideButtonRowUntilDirty="true">
           <FormItem label="Accept Terms" bindTo="terms" type="checkbox" />
@@ -437,10 +428,7 @@ test.describe("Basic Functionality", () => {
       await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
     });
 
-    test("button row appears when slider value changes", async ({
-      initTestBed,
-      page,
-    }) => {
+    test("button row appears when slider value changes", async ({ initTestBed, page }) => {
       await initTestBed(`
         <Form hideButtonRowUntilDirty="true">
           <FormItem label="Volume" bindTo="volume" type="slider" testId="volumeField" />
@@ -456,6 +444,122 @@ test.describe("Basic Functionality", () => {
 
       // Now visible
       await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+    });
+  });
+
+  // =============================================================================
+  // ENABLE SUBMIT PROPERTY TESTS
+  // =============================================================================
+
+  test.describe("enableSubmit property", () => {
+    test("disables submit button when set to false", async ({ initTestBed, page }) => {
+      await initTestBed(`<Form enableSubmit="false"/>`);
+
+      const saveButton = page.getByRole("button", { name: "Save" });
+      await expect(saveButton).toBeVisible();
+      await expect(saveButton).toBeDisabled();
+    });
+
+    test("enables submit button when set to true", async ({ initTestBed, page }) => {
+      await initTestBed(`<Form enableSubmit="true"/>`);
+
+      const saveButton = page.getByRole("button", { name: "Save" });
+      await expect(saveButton).toBeVisible();
+      await expect(saveButton).toBeEnabled();
+    });
+
+    test("submit button is enabled by default when property not set", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`<Form/>`);
+
+      const saveButton = page.getByRole("button", { name: "Save" });
+      await expect(saveButton).toBeEnabled();
+    });
+
+    test("prevents form submission when set to false", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form enableSubmit="false" onSubmit="arg => testState = arg">
+          <FormItem label="Name" bindTo="name" testId="nameField" />
+        </Form>
+      `);
+
+      const saveButton = page.getByRole("button", { name: "Save" });
+      await expect(saveButton).toBeDisabled();
+
+      // Verify form does not submit (button is disabled, so click won't work)
+      await saveButton.click({ force: true }); // Force click on disabled button
+
+      // testState should remain null since submit was prevented
+      await expect.poll(testStateDriver.testState).toBeNull();
+    });
+
+    test("allows form submission when set to true", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form enableSubmit="true" onSubmit="arg => testState = arg">
+          <FormItem label="Name" bindTo="name" testId="nameField" />
+        </Form>
+      `);
+
+      const driver = await createFormItemDriver("nameField");
+      const input = await createTextBoxDriver(driver.input);
+      await input.field.fill("John Doe");
+
+      const saveButton = page.getByRole("button", { name: "Save" });
+      await expect(saveButton).toBeEnabled();
+      await saveButton.click();
+
+      const submittedData = await testStateDriver.testState();
+      expect(submittedData).toEqual({ name: "John Doe" });
+    });
+
+    test("handles null value gracefully (defaults to enabled)", async ({ initTestBed, page }) => {
+      await initTestBed(`<Form enableSubmit="{null}"/>`);
+
+      const saveButton = page.getByRole("button", { name: "Save" });
+      await expect(saveButton).toBeEnabled();
+    });
+
+    test("handles string 'true' value", async ({ initTestBed, page }) => {
+      await initTestBed(`<Form enableSubmit="true"/>`);
+
+      const saveButton = page.getByRole("button", { name: "Save" });
+      await expect(saveButton).toBeEnabled();
+    });
+
+    test("handles string 'false' value", async ({ initTestBed, page }) => {
+      await initTestBed(`<Form enableSubmit="false"/>`);
+
+      const saveButton = page.getByRole("button", { name: "Save" });
+      await expect(saveButton).toBeDisabled();
+    });
+
+    test("does not affect cancel button", async ({ initTestBed, page }) => {
+      await initTestBed(`<Form enableSubmit="false"/>`);
+
+      const cancelButton = page.getByRole("button", { name: "Cancel" });
+      await expect(cancelButton).toBeEnabled();
+    });
+
+    test("works with custom submit button label", async ({ initTestBed, page }) => {
+      await initTestBed(`<Form enableSubmit="false" saveLabel="Submit Now"/>`);
+
+      const submitButton = page.getByRole("button", { name: "Submit Now" });
+      await expect(submitButton).toBeDisabled();
+    });
+
+    test("works together with form disabled state", async ({ initTestBed, page }) => {
+      await initTestBed(`<Form enabled="false" enableSubmit="true"/>`);
+
+      const saveButton = page.getByRole("button", { name: "Save" });
+      // Form disabled takes precedence
+      await expect(saveButton).toBeDisabled();
     });
   });
 
@@ -809,6 +913,179 @@ test.describe("Basic Functionality", () => {
       await page.getByRole("button", { name: "Reset" }).click();
 
       await expect(nameInput.field).toHaveValue("Initial");
+    });
+
+    test("validate method returns validation results without submitting", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form id="testForm">
+          <FormItem label="Name" bindTo="name" required="true" testId="nameField" />
+          <FormItem label="Email" bindTo="email" testId="emailField" />
+          <Button onClick="testState = testForm.validate()" label="Validate" testId="validateBtn" />
+        </Form>
+      `);
+
+      // Click validate button without filling required field
+      await page.getByTestId("validateBtn").click();
+
+      // Wait for validation to complete
+      await page.waitForTimeout(100);
+
+      const result = await testStateDriver.testState();
+      expect(result).toBeTruthy();
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toBeDefined();
+      expect(result.errors.length).toBeGreaterThan(0);
+    });
+
+    test("validate method returns isValid true when all validations pass", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form id="testForm">
+          <FormItem label="Name" bindTo="name" required="true" testId="nameField" />
+          <Button onClick="testState = testForm.validate()" label="Validate" testId="validateBtn" />
+        </Form>
+      `);
+
+      // Fill the required field
+      const nameDriver = await createFormItemDriver("nameField");
+      const nameInput = await createTextBoxDriver(nameDriver.input);
+      await nameInput.field.fill("John Doe");
+
+      // Click validate button
+      await page.getByTestId("validateBtn").click();
+
+      // Wait for validation to complete
+      await page.waitForTimeout(100);
+
+      const result = await testStateDriver.testState();
+      expect(result).toBeTruthy();
+      expect(result.isValid).toBe(true);
+      expect(result.errors.length).toBe(0);
+    });
+
+    test("validate method returns cleaned form data", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form id="testForm">
+          <FormItem label="Name" bindTo="name" testId="nameField" />
+          <FormItem label="Age" bindTo="age" type="integer" testId="ageField" />
+          <Button onClick="testState = testForm.validate()" label="Validate" testId="validateBtn" />
+        </Form>
+      `);
+
+      // Fill form fields
+      const nameDriver = await createFormItemDriver("nameField");
+      const nameInput = await createTextBoxDriver(nameDriver.input);
+      await nameInput.field.fill("John Doe");
+
+      const ageDriver = await createFormItemDriver("ageField");
+      const ageInput = await createTextBoxDriver(ageDriver.input);
+      await ageInput.field.fill("30");
+
+      // Click validate button
+      await page.getByTestId("validateBtn").click();
+
+      // Wait for validation to complete
+      await page.waitForTimeout(100);
+
+      const result = await testStateDriver.testState();
+      expect(result).toBeTruthy();
+      expect(result.data).toEqual({ name: "John Doe", age: "30" });
+    });
+
+    test("validate method displays validation errors on form", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+    }) => {
+      await initTestBed(`
+        <Form id="testForm">
+          <FormItem label="Name" bindTo="name" required="true" testId="nameField" />
+          <Button onClick="testForm.validate()" label="Validate" testId="validateBtn" />
+        </Form>
+      `);
+
+      // Click validate without filling required field
+      await page.getByTestId("validateBtn").click();
+
+      // Validation error should be displayed
+      const nameField = page.getByTestId("nameField");
+      await expect(nameField).toContainText("This field is required");
+    });
+
+    test("validate method does not trigger form submission", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form id="testForm" onSubmit="testState = 'submitted'">
+          <FormItem label="Name" bindTo="name" testId="nameField" />
+          <Button onClick="testForm.validate()" label="Validate" testId="validateBtn" />
+        </Form>
+      `);
+
+      // Fill form
+      const nameDriver = await createFormItemDriver("nameField");
+      const nameInput = await createTextBoxDriver(nameDriver.input);
+      await nameInput.field.fill("John");
+
+      // Click validate button
+      await page.getByTestId("validateBtn").click();
+
+      // Wait a bit
+      await page.waitForTimeout(200);
+
+      // testState should remain null (not 'submitted')
+      await expect.poll(testStateDriver.testState).toBeNull();
+    });
+
+    test("validate method returns complete validation results object", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form id="testForm">
+          <FormItem label="Name" bindTo="name" required="true" testId="nameField" />
+          <FormItem label="Email" bindTo="email" testId="emailField" />
+          <Button onClick="testState = testForm.validate()" label="Validate" testId="validateBtn" />
+        </Form>
+      `);
+
+      // Fill only email (name is required)
+      const emailDriver = await createFormItemDriver("emailField");
+      const emailInput = await createTextBoxDriver(emailDriver.input);
+      await emailInput.field.fill("test@example.com");
+
+      // Click validate button
+      await page.getByTestId("validateBtn").click();
+
+      // Wait for validation to complete
+      await page.waitForTimeout(100);
+
+      const result = await testStateDriver.testState();
+      expect(result).toBeTruthy();
+      expect(result.isValid).toBeDefined();
+      expect(result.data).toBeDefined();
+      expect(result.errors).toBeDefined();
+      expect(result.warnings).toBeDefined();
+      expect(result.validationResults).toBeDefined();
     });
   });
 
