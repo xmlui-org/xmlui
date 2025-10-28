@@ -140,7 +140,58 @@ $borderColor-Image: createThemeVar("borderColor-Image");
 }
 ```
 
-### Level 2: Components with Sub-Elements and States
+### Level 2: Components with States
+
+Components that have state variations (hover, focus, active, disabled) but no variants or complex sub-elements.
+
+**Example - Link component:**
+```scss
+// Variables for @layer section
+$outlineWidth-Link--focus: createThemeVar("outlineWidth-Link--focus");
+$outlineColor-Link--focus: createThemeVar("outlineColor-Link--focus");
+$outlineStyle-Link--focus: createThemeVar("outlineStyle-Link--focus");
+$outlineOffset-Link--focus: createThemeVar("outlineOffset-Link--focus");
+
+@layer components {
+  .link {
+    &:focus {
+      outline-width: $outlineWidth-Link--focus;
+      outline-color: $outlineColor-Link--focus;
+      outline-style: $outlineStyle-Link--focus;
+      outline-offset: $outlineOffset-Link--focus;
+    }
+  }
+}
+```
+
+**Example - Heading component with multiple heading levels:**
+```scss
+// Variables for H1
+$textColor-H1: createThemeVar("textColor-H1");
+$letterSpacing-H1: createThemeVar("letterSpacing-H1");
+$fontFamily-H1: createThemeVar("fontFamily-H1");
+$fontWeight-H1: createThemeVar("fontWeight-H1");
+$marginTop-H1: createThemeVar("marginTop-H1");
+$marginBottom-H1: createThemeVar("marginBottom-H1");
+
+// Variables for H2
+$textColor-H2: createThemeVar("textColor-H2");
+$letterSpacing-H2: createThemeVar("letterSpacing-H2");
+// ... repeat for H3-H6
+
+@layer components {
+  .h1 {
+    color: $textColor-H1;
+    letter-spacing: $letterSpacing-H1;
+    font-family: $fontFamily-H1;
+    font-weight: $fontWeight-H1;
+    margin-top: $marginTop-H1;
+    margin-bottom: $marginBottom-H1;
+  }
+}
+```
+
+### Level 3: Components with Sub-Elements
 
 Components with multiple distinct sub-elements (not variants), each with their own state variations. Group variables by sub-element for better organization.
 
@@ -174,7 +225,7 @@ $backgroundColor-indicator-Carousel--active: createThemeVar("backgroundColor-ind
 }
 ```
 
-### Level 3: Components with Variants
+### Level 4: Components with Validation Variants
 
 Components like TextBox and NumberBox that support validation variants (default, error, warning, success).
 
@@ -223,7 +274,7 @@ $textColor-TextBox--disabled: createThemeVar("Input:textColor-#{$componentName}-
 }
 ```
 
-### Level 4: Components with Variants AND Unique Sub-Elements
+### Level 5: Components with Validation Variants AND Unique Sub-Elements
 
 Components that combine validation variants with component-specific elements (like TextBox with passwordToggle).
 
@@ -262,3 +313,159 @@ $borderRadius-NumberBox-success: createThemeVar("Input:borderRadius-#{$component
 
 ### Inconsistent State Naming
 Always use `--` for states, never `-`. If you find incorrect naming, note it for correction but don't extract those variables during refactoring.
+
+## New Findings from Recent Refactorings
+
+### CSS !important Flag Behavior
+The CSS `!important` flag can be used with SASS variables when they are referenced in property declarations, but NOT in variable assignments:
+
+**✅ Valid - !important on CSS property:**
+```scss
+h1 {
+  margin-top: $marginTop-H1-markdown !important;  // Correct
+  font-size: $fontSize-H1-markdown !important;    // Correct
+}
+```
+
+This compiles to:
+```css
+h1 {
+  margin-top: var(--marginTop-H1-markdown) !important;
+}
+```
+
+**❌ Invalid - !important on variable assignment:**
+```scss
+// This has no effect and should not be used
+$marginTop-H1-markdown: createThemeVar("marginTop-H1-markdown") !important;
+```
+
+The `!important` flag is a CSS feature that applies to property values in the compiled output, not to SASS variable definitions.
+
+### Complex Components with Multiple Contexts
+
+Some components like Markdown have variables used in multiple contexts:
+
+1. **Component-level properties** - applied to the root element (e.g., `paddingTop-Markdown`)
+2. **Sub-element properties** - for distinct parts like blockquotes, admonitions (e.g., `backgroundColor-Blockquote`)
+3. **Contextual variations** - elements styled differently within the component (e.g., `marginTop-H1-markdown`, `marginTop-Image-markdown`)
+4. **Sub-element variants** - variations of sub-elements (e.g., `backgroundColor-Admonition-info`, `backgroundColor-Admonition-warning`)
+
+When refactoring complex components:
+- Group variables logically by their context (use comments to separate groups)
+- Maintain the `-markdown` suffix for contextual variations to distinguish them from standalone component variables
+- Sub-element variants should follow the pattern: `{property}-{part}-{component}-{variant}` (e.g., `backgroundColor-Admonition-info`)
+
+**Example from Markdown component:**
+```scss
+// Variables for main Markdown container
+$paddingTop-MarkDown: createThemeVar("paddingTop-Markdown");
+$backgroundColor-MarkDown: createThemeVar("backgroundColor-Markdown");
+
+// Variables for Text-markdown (contextual variation)
+$marginTop-Text-markdown: createThemeVar("marginTop-Text-markdown");
+$marginLeft-Text-markdown: createThemeVar("marginLeft-Text-markdown");
+
+// Variables for Admonition sub-element
+$backgroundColor-Admonition: createThemeVar("backgroundColor-Admonition");
+$marginTop-Admonition: createThemeVar("marginTop-Admonition");
+
+// Variables for Admonition variants
+$backgroundColor-Admonition-info: createThemeVar("backgroundColor-Admonition-info");
+$backgroundColor-Admonition-warning: createThemeVar("backgroundColor-Admonition-warning");
+$backgroundColor-Admonition-danger: createThemeVar("backgroundColor-Admonition-danger");
+```
+
+### Components with Minimal Variables
+
+Not all components have numerous theme variables. Some simpler components like:
+- **IFrame** - Only 2 variables (`width-IFrame`, `height-IFrame`)
+- **Image** - Only 2 variables (`borderRadius-Image`, `borderColor-Image`)
+
+For these simple components, the refactoring is straightforward with just a few variable declarations before the `@layer` block.
+
+## Special Cases
+
+### Markdown Component - Hybrid Content Renderer
+
+The **Markdown** component is a special case that doesn't fit into the standard complexity levels. It acts as a content renderer that styles multiple different elements and contexts within markdown content.
+
+**Unique characteristics:**
+1. **Multiple component contexts** - Styles many different HTML elements (h1-h6, images, blockquotes, horizontal rules, etc.)
+2. **Contextual variations** - Same element types styled differently within markdown (e.g., `H1-markdown` vs standalone `H1`)
+3. **Sub-element variants** - Has variant systems for sub-elements (e.g., Admonition with info/warning/danger/note/tip variants)
+4. **Mixed naming patterns** - Uses both component-level naming and contextual suffixes
+
+**Variable organization pattern:**
+```scss
+// Variables for main Markdown container
+$paddingTop-MarkDown: createThemeVar("paddingTop-Markdown");
+$backgroundColor-MarkDown: createThemeVar("backgroundColor-Markdown");
+
+// Variables for Text-markdown (contextual variation)
+$marginTop-Text-markdown: createThemeVar("marginTop-Text-markdown");
+$marginLeft-Text-markdown: createThemeVar("marginLeft-Text-markdown");
+
+// Variables for Heading margins in markdown context
+$marginTop-H1-markdown: createThemeVar("marginTop-H1-markdown");
+$marginBottom-H1-markdown: createThemeVar("marginBottom-H1-markdown");
+$fontSize-H1-markdown: createThemeVar("fontSize-H1-markdown");
+// ... repeat for H2-H6
+
+// Variables for Image in markdown context
+$marginTop-Image-markdown: createThemeVar("marginTop-Image-markdown");
+$marginBottom-Image-markdown: createThemeVar("marginBottom-Image-markdown");
+
+// Variables for Blockquote sub-element
+$backgroundColor-Blockquote: createThemeVar("backgroundColor-Blockquote");
+$marginTop-Blockquote: createThemeVar("marginTop-Blockquote");
+$color-accent-Blockquote: createThemeVar("color-accent-Blockquote");
+
+// Variables for Admonition sub-element
+$backgroundColor-Admonition: createThemeVar("backgroundColor-Admonition");
+$borderRadius-Admonition: createThemeVar("borderRadius-Admonition");
+
+// Variables for Admonition variants
+$backgroundColor-Admonition-info: createThemeVar("backgroundColor-Admonition-info");
+$borderColor-Admonition-info: createThemeVar("borderColor-Admonition-info");
+$backgroundColor-Admonition-warning: createThemeVar("backgroundColor-Admonition-warning");
+$borderColor-Admonition-warning: createThemeVar("borderColor-Admonition-warning");
+// ... etc
+
+// Variables for HorizontalRule
+$borderColor-HorizontalRule: createThemeVar("borderColor-HorizontalRule");
+$borderStyle-HorizontalRule: createThemeVar("borderStyle-HorizontalRule");
+$borderWidth-HorizontalRule: createThemeVar("borderWidth-HorizontalRule");
+```
+
+**Key differences from other components:**
+- Uses `-markdown` suffix to differentiate contextual element styles from standalone components
+- Combines multiple sub-elements (Blockquote, Admonition, HorizontalRule) each with their own properties
+- Has variant systems for sub-elements (not for the Markdown component itself)
+- Requires careful grouping with comments to maintain readability due to the large number of variables
+
+When refactoring Markdown-like components, prioritize logical grouping by context and use clear comments to separate different sections.
+
+## Refactoring Progress
+
+### ✅ Completed Refactorings
+
+1. **TextBox**
+2. **NumberBox**
+3. **Carousel** ⚠️ Has incorrect naming (uses `-hover` instead of `--hover`) - needs correction
+4. **Image**
+5. **Link**
+6. **Heading**
+7. **IFrame**
+8. **Markdown**
+
+**Total: 8 components refactored**
+
+### ⚠️ Components Skipped
+
+1. **Accordion** - Incorrect variable naming (single dash for states instead of double dash)
+
+### 📋 Components Remaining
+
+Approximately **34 components** still need refactoring (out of 42 total with unexposed theme variables).
+
