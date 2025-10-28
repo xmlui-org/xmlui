@@ -39,7 +39,7 @@ If you [view the XMLUI source](https://github.com/xmlui-org/xmlui/blob/main/docs
 
  This is a concise way to express the rich set of behaviors seen in this video.
 
- <video controls autoplay src="/blog/images/advanced-codefence.mp4"></video>
+ <video controls autoplay src="/blog/images/an-advanced-codefence.mp4"></video>
 
 ## Share a working reproduction of a bug
 
