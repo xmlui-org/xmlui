@@ -63,18 +63,20 @@ If you want to make such a report, you can visit [xmlui-codefence-runner.netlify
 
 If you find yourself [filing an issue](https://github.com/xmlui-org/xmlui/issues) that needs a solid reproduction, please give it a try.
 
-
-
-
-<!--
- ## Help AI assistants know the truth
+## Help your AI assistants stay grounded
 
 When you use the [XMLUI MCP server](https://github.com/xmlui-org/xmlui-mcp) with coding assistants like Claude or Copilot, they will prefer How To examples when available.
 
 ![use xmlui-mcp to find a how to](/blog/images/use-xmlui-mcp-to-find-a-howto.png)
 
-That's the gold standard response: a link to a known working pattern that proves its existence by running live.
+That's the gold standard response: a link to a known working pattern that proves its existence by running live. And because XMLUI is concise, the pattern doesn't occupy too much space in an AI's context window.
 
-When you ask a question for which they cannot provide such a link, they are supposed to admit that, and to cite the rule that prohibits inventing undocumented syntax. That doesn't always happen yet, but it happens often enough to steer assistants away from imaginary rabbit holes.
--->
+When you ask a question for which an assistant cannot provide such a link, we tell it to admit that and refuse to invent undocumented syntax. They won't always comply but with a running playground that embodies ground truth you can often steer them away from rabbit holes. The more working patterns contributed to the project, the stronger that effect will be.
+
+## Reproducible XMLUI
+
+The common theme here is reproducibility. Whether it lives in a component doc, a How To, or a GitHub issue, an XMLUI codefence captures a piece of XMLUI behavior that you can replay consistently. That's useful for the XMLUI project itself but also for apps you build with XMLUI. Playgrounds that we can reliably reproduce and exchange make everything easier to build, document, debug, and maintain.
+
+
+
 
