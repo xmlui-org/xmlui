@@ -7,7 +7,7 @@
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
     "build:xmlui-test-bed": "cd src/testing/infrastructure && xmlui build --build-mode=INLINE_ALL --withHostingMetaFiles --withMock",
     "build:bin": "tsc -p tsconfig.bin.json",
-    "build:xmlui": "vite build --mode lib",
+    "build:xmlui": "vite build --mode lib && ncc build bin/vite-xmlui-plugin.ts -o dist/lib/vite-xmlui-plugin",
     "build:xmlui-standalone": "vite build --mode standalone",
     "build:xmlui-metadata": "vite build --mode metadata",
     "test:unit": "vitest run",
@@ -204,8 +204,8 @@
           "require": "./dist/lib/scss/components-core/theming/_themes.scss"
         },
         "./vite-xmlui-plugin": {
-          "import": "./dist/scripts/bin/vite-xmlui-plugin.js",
-          "require": "./dist/scripts/bin/vite-xmlui-plugin.js"
+          "import": "./dist/lib/vite-xmlui-plugin/index.js",
+          "require": "./dist/lib/vite-xmlui-plugin/index.js"
         },
         "./syntax/monaco": {
           "import": "./dist/lib/syntax-monaco.js",
