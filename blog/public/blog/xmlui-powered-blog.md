@@ -1,4 +1,4 @@
-In this inaugural post we'll explore the development of the blog engine we're using on this site. Our tagline is *Practical User Interfaces Built Simply*  and creating this blog couldn't have been simpler. It's an XMLUI app built with a handful of core components (including [NavPanel](https://docs.xmlui.org/components/NavPanel), [NavLink](https://docs.xmlui.org/components/NavLink), [Pages](https://docs.xmlui.org/components/Pages), [Page](https://docs.xmlui.org/components/Page), and [Markdown](https://docs.xmlui.org/components/Markdown)) and a couple of [user-defined components](https://docs.xmlui.org/user-defined-components).
+In this post we'll explore the development of the blog engine we're using on this site. Our tagline is *Practical User Interfaces Built Simply*  and creating this blog couldn't have been simpler. It's an XMLUI app built with a handful of core components (including [NavPanel](https://docs.xmlui.org/components/NavPanel), [NavLink](https://docs.xmlui.org/components/NavLink), [Pages](https://docs.xmlui.org/components/Pages), [Page](https://docs.xmlui.org/components/Page), and [Markdown](https://docs.xmlui.org/components/Markdown)) and a couple of [user-defined components](https://docs.xmlui.org/user-defined-components).
 
 ## The simplest possible thing
 
@@ -102,7 +102,7 @@ So far the post content exists only as the `content` property passed to the `Blo
   var.posts = `{[
     {
       title: "Welcome to the XMLUI blog!",
-      slug: "welcome-to-the-xmlui-blog",
+      slug: "xmlui-powered-blog",
       author: "Jon Udell",
       date: "2025-09-01",
       image: "blog-scrabble.png"
@@ -144,7 +144,7 @@ So far the post content exists only as the `content` property passed to the `Blo
 </Component>
 ```
 
-Now we write post metadata as an App-level variable, and create Markdown files corresponding to the slugs. In this case the files are `welcome-to-the-xmlui-blog.md` (this post) and `lorem-ipsum.md` (a dummy older post). We also add a hero image for each post.
+Now we write post metadata as an App-level variable, and create Markdown files corresponding to the slugs. In this case the files are `xmlui-powered-blog.md` (this post) and `lorem-ipsum.md` (a dummy older post). We also add a hero image for each post.
 
 ```xmlui copy
 <App
@@ -152,7 +152,7 @@ Now we write post metadata as an App-level variable, and create Markdown files c
   var.posts = `{[
     {
       title: "Welcome to the XMLUI blog!",
-      slug: "welcome-to-the-xmlui-blog",
+      slug: "xmlui-powered-blog",
       author: "Jon Udell",
       date: "2025-09-01",
       image: "blog-scrabble.png"
@@ -273,7 +273,7 @@ But it can exist standalone, you only need a folder with a handful of files.
 │   │   ├── blog-scrabble.png
 │   │   └── lorem-ipsum.png
 │   ├── lorem-ipsum.md
-│   └── welcome-to-the-xmlui-blog.md
+│   └── xmlui-powered-blog.md
 ├── components
 │   ├── BlogOverview.xmlui
 │   ├── BlogPage.xmlui
