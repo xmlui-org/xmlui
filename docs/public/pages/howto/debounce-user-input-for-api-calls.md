@@ -70,7 +70,7 @@ Use `debounce` to delay function execution until user input pauses, reducing unn
       "method": "post",
       "handler": "
         delay(800);
-        const query = $requestBody.query.toLowerCase();
+        const query = ($requestBody.query || '').toLowerCase();
         const filtered = $state.products.filter(p =>
           p.name.toLowerCase().includes(query) ||
           p.category.toLowerCase().includes(query)
