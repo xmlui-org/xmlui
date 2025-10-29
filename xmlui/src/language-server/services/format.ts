@@ -145,33 +145,12 @@ class XmluiFormatter {
   }
 
   printTriviaBetweenTextAndTaglike(textNode: Node, node: Node) {
-    // const comment = this.getCommentsSpaceJoined(node);
-
-    // if (comment) {
-    //   let commentInline: boolean = true;
-
-    //   if (this.hasNewlineTriviaBeforeComment(node)) {
-    //     commentInline = false;
-    //   } else {
-    //     const prevText = this.getText(prevSibling);
-    // commentInline = !hasNewlineInTrailingWhitespace(prevText);
-    //   }
-
-    //   if (commentInline) {
-    //     if (acc.at(-1) === this.newlineToken) {
-    //       acc = acc.substring(0, acc.length - this.newlineToken.length);
-    //     }
-    //     acc += ` ${comment}${this.newlineToken}`;
-    //   } else {
-    //     acc += this.indent(this.indentationLvl) + comment + this.newlineToken;
-    //   }
-    // }
-
     let acc = "";
     const trivias = node.getTriviaNodes();
     const trailingNewlinesInText = newlinesInTrailingWhitespace(this.getText(textNode));
 
     if (trivias) {
+      // todo refactor this into wscollapse maybe?
       const newlinesAfterText = Math.min(trailingNewlinesInText, this.maxConsecutiveNewlines);
 
       const collapsedTrivias = this.collapseBlankLines(trivias);
@@ -215,7 +194,8 @@ class XmluiFormatter {
     return acc;
   }
 
-  /* returns newline and comment nodes so that at most 1 blank line is permitted */
+  /* Filters out trivias so that only comments and newline remain.
+  Respects the maximum permitted consecitive blank lines and throws out any extra consecutive newlines. */
   collapseBlankLines(trivias: Node[]) {
     let consecutiveNewlines = 0;
     const accTrivias: Node[] = [];
@@ -325,36 +305,38 @@ class XmluiFormatter {
     const closeNodeStartIdx = node.children.findIndex((c) => c.kind === SyntaxKind.CloseNodeStart);
     const hasCloseNodeStart = closeNodeStartIdx !== -1;
 
-    let openTagNodeCount: number;
+    let nodesOfOpenTagNodeEndIdx: number;
     if (hasContentList) {
-      openTagNodeCount = contentListIdx;
+      nodesOfOpenTagNodeEndIdx = contentListIdx;
     } else if (hasCloseNodeStart) {
-      openTagNodeCount = closeNodeStartIdx;
+      nodesOfOpenTagNodeEndIdx = closeNodeStartIdx;
     } else {
-      openTagNodeCount = node.children.length;
+      nodesOfOpenTagNodeEndIdx = node.children.length;
     }
 
-    const openTagNodes = node.children.slice(0, openTagNodeCount);
-    acc += this.printOpenTag(openTagNodes);
+    const nodesOfOpenTagNode = node.children.slice(0, nodesOfOpenTagNodeEndIdx);
+    acc += this.printOpenTag(nodesOfOpenTagNode);
 
+    let lastContentNode: Node | null = null;
     if (hasContentList) {
       const contentListNode = node.children[contentListIdx];
+      lastContentNode = contentListNode.children.at(-1);
 
       ++this.indentationLvl;
       acc += this.printContentListNode(contentListNode);
       --this.indentationLvl;
     }
 
-    let closeTagNodesStartIdx: number;
+    let nodesOfCloseTagNodeStartIdx: number;
     if (hasCloseNodeStart) {
-      closeTagNodesStartIdx = closeNodeStartIdx;
+      nodesOfCloseTagNodeStartIdx = closeNodeStartIdx;
     } else if (hasContentList) {
-      closeTagNodesStartIdx = contentListIdx + 1;
+      nodesOfCloseTagNodeStartIdx = contentListIdx + 1;
     } else {
-      closeTagNodesStartIdx = openTagNodeCount + 1;
+      nodesOfCloseTagNodeStartIdx = nodesOfOpenTagNodeEndIdx + 1;
     }
-    const closeTagNodes = node.children.slice(closeTagNodesStartIdx);
-    acc += this.printClosingTag(closeTagNodes, hasContentList);
+    const closeTagNodes = node.children.slice(nodesOfCloseTagNodeStartIdx);
+    acc += this.printClosingTag(closeTagNodes, lastContentNode);
     return acc;
   }
 
@@ -384,22 +366,37 @@ class XmluiFormatter {
     return acc;
   }
 
-  private printClosingTag(tagChildren: Node[], hasContentList: boolean) {
+  private printClosingTag(tagChildren: Node[], lastContentNode: Node | null) {
     let acc = "";
     for (let i = 0; i < tagChildren.length; ++i) {
       const c = tagChildren[i];
       switch (c.kind) {
         case SyntaxKind.CloseNodeStart:
-          const comment = this.getCommentsSpaceJoined(c);
-          if (comment) {
-            if (!hasContentList) {
-              acc += this.newlineToken;
-            }
-            acc += this.indent(this.indentationLvl + 1);
-            acc += comment + this.newlineToken;
-          }
+          //   const comment = this.getCommentsSpaceJoined(c);
+          //   if (comment) {
+          //     if (!hasContentList) {
+          //       acc += this.newlineToken;
+          //     }
+          //     acc += this.indent(this.indentationLvl + 1);
+          //     acc += comment;
+          //   }
 
-          acc += this.newlineToken + this.indent(this.indentationLvl) + "</";
+          //   acc += this.newlineToken + this.indent(this.indentationLvl) + "</";
+
+          const collapsedTrivias = this.collapseBlankLines(c.triviaBefore ?? []);
+          if (lastContentNode){
+            if (lastContentNode.kind === SyntaxKind.StringLiteral || lastContentNode.kind === SyntaxKind.TextNode){
+
+              const trailingNewlinesInText = newlinesInTrailingWhitespace(this.getText(lastContentNode));
+              const newlinesAfterText = Math.min(trailingNewlinesInText, this.maxConsecutiveNewlines);
+
+              need to do somthing with indent lvl
+              this.addWsToCollapsedTriviaAfterText(collapsedTrivias, newlinesAfterText )
+            } else {
+              this.addWsToCollapsedTrivia(collapsedTrivias)
+            }
+          }
+          acc += "</";
           break;
         case SyntaxKind.TagNameNode:
           acc += this.printTagName(c);
