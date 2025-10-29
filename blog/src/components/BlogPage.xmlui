@@ -9,7 +9,7 @@
         {$props.post.title}
       </H1>
       <Text variant="blog-attribution">
-        {$props.post.date} • {$props.post.author}
+        {formatDate($props.post.date, "MMM dd, yyyy")} • {$props.post.author}
       </Text>
       <Image src="/blog/images/{$props.post.image}" />
       <Markdown marginTop="$space-4" data="/blog/{$props.post.slug}.md" />

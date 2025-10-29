@@ -1,5 +1,6 @@
 <App
     layout="vertical-full-header"
+    noScrollbarGutters
     var.posts=`{[
       {
         title: "An XMLUI-powered blog",
