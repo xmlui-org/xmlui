@@ -22,7 +22,7 @@
         </Text>
         <SpaceFiller />
         <Text variant="em" fontSize="$fontSize-xs">
-          {$item.date}
+          {formatDate($item.date, "MMM dd, yyyy")}
         </Text>
       </HStack>
     </VStack>
