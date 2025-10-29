@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.11.1
+
+### Patch Changes
+
+- 7bbbb1d: Add the debounce function to globals
+
 ## 0.11.0
 
 ### Minor Changes
