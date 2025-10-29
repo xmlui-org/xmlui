@@ -232,6 +232,11 @@ export type AppContextObject = {
   capitalize: (s?: string) => string;
   pluralize: (number: number, singular: string, plural: string) => string;
   delay: (timeInMs: number, callback?: any) => Promise<void>;
+  debounce: <F extends (...args: any[]) => any>(
+    delayMs: number,
+    func: F,
+    ...args: any[]
+  ) => void;
   toHashObject: (arr: any[], keyProp: string, valueProp: string) => any;
   findByField: (arr: any[], field: string, value: any) => any;
   readonly embed: { isInIFrame: boolean };
