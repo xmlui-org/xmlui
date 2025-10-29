@@ -736,6 +736,13 @@ describe("XML Formatter", () => {
 <!-- This is a comment -->`,
       );
     });
+
+    test("should handle comments after text, before eof", () => {
+      const input = `Content        <!-- c-->`;
+      const result = formatTwice(input);
+
+      expect(result).toEqual(`Content <!-- c-->`);
+    });
   });
   describe("Edge Cases", () => {
     test("should handle empty string", () => {

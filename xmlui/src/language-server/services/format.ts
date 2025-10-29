@@ -114,15 +114,11 @@ class XmluiFormatter {
           acc += this.getText(c, false);
           break;
 
-        case SyntaxKind.EndOfFileToken:
-          const comment = this.getCommentsSpaceJoined(c);
-          if (comment) {
-            if (!this.hasNewlineTriviaBeforeComment(c) && acc.at(-1) === this.newlineToken) {
-              acc = acc.substring(0, acc.length - this.newlineToken.length) + " ";
-            }
-            acc += this.indent(this.indentationLvl) + comment;
-          }
+        case SyntaxKind.EndOfFileToken: {
+          const collapsedTrivias = this.collapseBlankLines(c.triviaBefore ?? []);
+          acc += this.addWsToCollapsedTrivia(collapsedTrivias);
           break;
+        }
       }
     }
     return acc;
