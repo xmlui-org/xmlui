@@ -49,7 +49,8 @@ const baseSplitterMd = createMetadata({
     maxPrimarySize: {
       description:
         `This property sets the maximum size the primary section can have. The unit of the size ` +
-        `value is in pixels or percentages.`,
+        `value is in pixels or percentages. Negative values are supported and calculate from the ` +
+        `end of the container (e.g., "-20%" means "80% of container", "-100px" means "container size - 100px").`,
       valueType: "string",
       defaultValue: defaultProps.maxPrimarySize,
     },

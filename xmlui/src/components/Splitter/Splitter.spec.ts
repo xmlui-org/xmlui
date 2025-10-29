@@ -1,5 +1,6 @@
 import { getBounds, SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
+import { parseSize, toPercentage } from "./utils";
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
@@ -329,6 +330,66 @@ test.describe("Basic Functionality", () => {
       const bounds = await getBounds(primary);
       expect(bounds.width).toBeLessThanOrEqual(310); // Allow small tolerance
     });
+
+    test("negative maxPrimarySize in pixels constrains from end", async ({ initTestBed, page, createSplitterDriver }) => {
+      await initTestBed(`
+        <Splitter height="200px" width="400px" orientation="horizontal" maxPrimarySize="-100px" testId="splitter">
+          <Stack backgroundColor="lightblue" height="100%" testId="primary"/>
+          <Stack backgroundColor="darksalmon" height="100%" testId="secondary"/>
+        </Splitter>
+      `);
+
+      const splitter = page.getByTestId("splitter");
+      const primary = page.getByTestId("primary");
+      const driver = await createSplitterDriver(splitter);
+      
+      // Try to drag resizer far to the right
+      await driver.dragResizer(350, 0);
+      
+      // Primary should not be larger than 400 - 100 = 300px
+      const bounds = await getBounds(primary);
+      expect(bounds.width).toBeLessThanOrEqual(310); // Allow small tolerance for 300px max
+    });
+
+    test("negative maxPrimarySize in percentage constrains from end", async ({ initTestBed, page, createSplitterDriver }) => {
+      await initTestBed(`
+        <Splitter height="200px" width="400px" orientation="horizontal" maxPrimarySize="-25%" testId="splitter">
+          <Stack backgroundColor="lightblue" height="100%" testId="primary"/>
+          <Stack backgroundColor="darksalmon" height="100%" testId="secondary"/>
+        </Splitter>
+      `);
+
+      const splitter = page.getByTestId("splitter");
+      const primary = page.getByTestId("primary");
+      const driver = await createSplitterDriver(splitter);
+      
+      // Try to drag resizer far to the right
+      await driver.dragResizer(350, 0);
+      
+      // Primary should not be larger than 75% of 400px = 300px
+      const bounds = await getBounds(primary);
+      expect(bounds.width).toBeLessThanOrEqual(310); // Allow small tolerance for 300px max
+    });
+
+    test("negative maxPrimarySize works in vertical orientation", async ({ initTestBed, page, createSplitterDriver }) => {
+      await initTestBed(`
+        <Splitter height="400px" width="200px" orientation="vertical" maxPrimarySize="-100px" testId="splitter">
+          <Stack backgroundColor="lightblue" width="100%" testId="primary"/>
+          <Stack backgroundColor="darksalmon" width="100%" testId="secondary"/>
+        </Splitter>
+      `);
+
+      const splitter = page.getByTestId("splitter");
+      const primary = page.getByTestId("primary");
+      const driver = await createSplitterDriver(splitter);
+      
+      // Try to drag resizer far down
+      await driver.dragResizer(0, 350);
+      
+      // Primary should not be larger than 400 - 100 = 300px height
+      const bounds = await getBounds(primary);
+      expect(bounds.height).toBeLessThanOrEqual(310); // Allow small tolerance for 300px max
+    });
   });
 
   test.describe("resize event", () => {
@@ -632,5 +693,51 @@ test.describe("Other Edge Cases", () => {
     // Should still be functional
     await expect(page.getByTestId("primary")).toBeVisible();
     await expect(page.getByTestId("secondary")).toBeVisible();
+  });
+});
+
+// =============================================================================
+// UTILITY FUNCTION TESTS
+// =============================================================================
+
+test.describe("Utility Functions", () => {
+  test.describe("parseSize", () => {
+    test("parses positive pixel values", () => {
+      expect(parseSize("100px", 400)).toBe(100);
+      expect(parseSize("200px", 400)).toBe(200);
+    });
+
+    test("parses positive percentage values", () => {
+      expect(parseSize("50%", 400)).toBe(200);
+      expect(parseSize("25%", 400)).toBe(100);
+      expect(parseSize("100%", 400)).toBe(400);
+    });
+
+    test("parses negative pixel values (calculated from end)", () => {
+      expect(parseSize("-100px", 400)).toBe(300); // 400 - 100
+      expect(parseSize("-50px", 400)).toBe(350);  // 400 - 50
+      expect(parseSize("-200px", 600)).toBe(400); // 600 - 200
+    });
+
+    test("parses negative percentage values (calculated from end)", () => {
+      expect(parseSize("-20%", 400)).toBe(320); // 80% of 400
+      expect(parseSize("-50%", 400)).toBe(200); // 50% of 400
+      expect(parseSize("-10%", 600)).toBe(540); // 90% of 600
+    });
+
+    test("throws error for invalid format", () => {
+      expect(() => parseSize("100", 400)).toThrow("Invalid size format. Use px or %.");
+      expect(() => parseSize("100em", 400)).toThrow("Invalid size format. Use px or %.");
+      expect(() => parseSize("invalid", 400)).toThrow("Invalid size format. Use px or %.");
+    });
+  });
+
+  test.describe("toPercentage", () => {
+    test("converts pixel size to percentage", () => {
+      expect(toPercentage(200, 400)).toBe(50);
+      expect(toPercentage(100, 400)).toBe(25);
+      expect(toPercentage(400, 400)).toBe(100);
+      expect(toPercentage(0, 400)).toBe(0);
+    });
   });
 });

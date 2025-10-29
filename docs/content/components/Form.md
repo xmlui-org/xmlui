@@ -65,6 +65,10 @@ This property sets the initial value of the form's data structure. The form infr
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
+### `enableSubmit` (default: true) [#enablesubmit-default-true]
+
+This property controls whether the submit button is enabled. When set to false, the submit button is disabled and the form cannot be submitted.
+
 ### `errorNotificationMessage` [#errornotificationmessage]
 
 This property sets the message to display when the form submission fails.
@@ -224,6 +228,12 @@ This method updates the form data with the change passed in its parameter. The p
   </Form>
 </App>  
 ```
+
+### `validate` [#validate]
+
+This method triggers validation on all form fields without submitting the form. It displays validation errors and returns the validation result along with the cleaned form data. This is useful for implementing custom submit buttons or performing operations that require validated data without actually submitting the form.
+
+**Signature**: `validate(): Promise<{ isValid: boolean, data: Record<string, any>, errors: ValidationResult[], warnings: ValidationResult[], validationResults: Record<string, ValidationResult> }>`
 
 ## Styling [#styling]
 
