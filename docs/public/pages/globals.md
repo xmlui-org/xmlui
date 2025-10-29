@@ -572,6 +572,39 @@ function delay(ms: number): Promise<void>;
 
 Delays the execution of the next line of code by the specified number of milliseconds.
 
+### `debounce`
+
+```ts
+function debounce<F extends (...args: any[]) => any>(
+  delayMs: number,
+  func: F,
+  ...args: any[]
+): void;
+```
+
+Delays function execution until the specified time has elapsed since the last invocation. Useful for limiting expensive operations like API calls during user input.
+
+```xmlui copy
+<App>
+  <!-- Basic usage: pass value as argument -->
+  <TextBox 
+    label="Search:" 
+    onDidChange="e => debounce(500, (val) => console.log('Search:', val), e)"
+  />
+
+  <!-- With API call -->
+  <TextBox 
+    label="Email:" 
+    onDidChange="e => debounce(1000, (email) => {
+      Actions.callApi({
+        url: '/api/validate-email',
+        body: { email }
+      });
+    }, e)"
+  />
+</App>
+```
+
 ### `distinct`
 
 ```ts

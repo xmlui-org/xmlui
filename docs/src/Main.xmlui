@@ -142,6 +142,9 @@
             <NavLink
                 label="Make NavPanel width responsive"
                 to="/howto/make-navpanel-width-responsive" />
+            <NavLink
+                label="Debounce user input for API calls"
+                to="/howto/debounce-user-input-for-api-calls" />
             <!-- Add more links as additional files are created -->
         </NavGroup>
         <NavGroup label="Reference">
@@ -541,6 +544,10 @@
         <Page url="/howto/make-navpanel-width-responsive">
             <DocumentPageNoTOC
                 url="/pages/howto/make-navpanel-width-responsive.md" />
+        </Page>
+        <Page url="/howto/debounce-user-input-for-api-calls">
+            <DocumentPageNoTOC
+                url="/pages/howto/debounce-user-input-for-api-calls.md" />
         </Page>
 
         <!-- Add more pages as additional files are created -->
