@@ -174,13 +174,11 @@ class XmluiFormatter {
     if (trivias) {
       const newlinesAfterText = Math.min(trailingNewlinesInText, this.maxConsecutiveNewlines);
 
-      acc += this.newlineToken.repeat(newlinesAfterText);
-      if (newlinesAfterText > 0) {
-        acc += this.indent(this.indentationLvl);
-      }
-
       const collapsedTrivias = this.collapseBlankLines(trivias);
-      const formattedTrivia = this.addWsToCollapsedTriviaAfterText(collapsedTrivias);
+      const formattedTrivia = this.addWsToCollapsedTriviaAfterText(
+        collapsedTrivias,
+        newlinesAfterText,
+      );
 
       acc += formattedTrivia + this.indent(this.indentationLvl);
     } else {
@@ -238,8 +236,17 @@ class XmluiFormatter {
   }
 
   // todo refactor this
-  addWsToCollapsedTriviaAfterText(trivias: Node[]) {
-    let acc = "";
+  addWsToCollapsedTriviaAfterText(trivias: Node[], newlinesAfterText: number) {
+    let trivBefGuaranteedComment: string;
+    if (newlinesAfterText > 0) {
+      trivBefGuaranteedComment =
+        this.newlineToken.repeat(newlinesAfterText) + this.indent(this.indentationLvl);
+    } else {
+      trivBefGuaranteedComment = " ";
+    }
+
+    let acc: string = trivBefGuaranteedComment;
+
     let lastKeptTriviaIsComment = false;
     for (let i = 0; i < trivias.length; i++) {
       const t = trivias[i];
@@ -300,6 +307,7 @@ class XmluiFormatter {
     }
     return acc;
   }
+
   printTagLike(node: Node): string {
     switch (node.kind) {
       case SyntaxKind.Script:
