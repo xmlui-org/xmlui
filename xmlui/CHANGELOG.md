@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.11.2
+
+### Patch Changes
+
+- c1f306f: update package dependencies for tsx usage
+
 ## 0.11.1
 
 ### Patch Changes
