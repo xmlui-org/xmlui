@@ -44,7 +44,8 @@ export const Splitter = ({
   resize = noop,
   ...rest
 }: SplitterProps) => {
-  const [size, setSize] = useState(0);
+  const [sizePercentage, setSizePercentage] = useState(50); // Store as percentage
+  const [containerSize, setContainerSize] = useState(0);
   const [splitter, setSplitter] = useState<HTMLDivElement | null>(null);
   const [resizerVisible, setResizerVisible] = useState(false);
   const [resizer, setResizer] = useState<HTMLDivElement | null>(null);
@@ -54,19 +55,52 @@ export const Splitter = ({
     [floating, resizer, floatingResizer],
   );
 
+  // Calculate actual size in pixels from percentage
+  const size = useMemo(() => {
+    return (sizePercentage / 100) * containerSize;
+  }, [sizePercentage, containerSize]);
+
+  // ResizeObserver to track container size changes
+  useEffect(() => {
+    if (!splitter) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const newContainerSize =
+          orientation === "horizontal"
+            ? entry.contentRect.width
+            : entry.contentRect.height;
+        setContainerSize(newContainerSize);
+      }
+    });
+
+    resizeObserver.observe(splitter);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [splitter, orientation]);
+
+  // Initialize container size and primary panel percentage
   useEffect(() => {
     if (splitter) {
-      const containerSize =
+      const newContainerSize =
         orientation === "horizontal"
           ? splitter.getBoundingClientRect().width
           : splitter.getBoundingClientRect().height;
-      const initialParsedSize = parseSize(initialPrimarySize, containerSize);
-
-      setSize(initialParsedSize);
+      
+      setContainerSize(newContainerSize);
+      
+      // Parse initial size and convert to percentage
+      const initialParsedSize = parseSize(initialPrimarySize, newContainerSize);
+      const initialPercentage = toPercentage(initialParsedSize, newContainerSize);
+      
+      setSizePercentage(initialPercentage);
+      
       if (resize) {
         resize([
-          toPercentage(initialParsedSize, containerSize),
-          toPercentage(containerSize - initialParsedSize, containerSize),
+          initialPercentage,
+          100 - initialPercentage,
         ]);
       }
     }
@@ -74,11 +108,7 @@ export const Splitter = ({
 
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
-      if (splitter && resizerElement) {
-        const containerSize =
-          orientation === "horizontal"
-            ? splitter.getBoundingClientRect().width
-            : splitter.getBoundingClientRect().height;
+      if (splitter && resizerElement && containerSize > 0) {
         const newSize =
           orientation === "horizontal"
             ? Math.min(
@@ -96,11 +126,13 @@ export const Splitter = ({
                 parseSize(maxPrimarySize, containerSize),
               );
 
-        setSize(newSize);
+        const newPercentage = toPercentage(newSize, containerSize);
+        setSizePercentage(newPercentage);
+        
         if (resize) {
           resize([
-            toPercentage(newSize, containerSize),
-            toPercentage(containerSize - newSize, containerSize),
+            newPercentage,
+            100 - newPercentage,
           ]);
         }
       }
@@ -127,7 +159,7 @@ export const Splitter = ({
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [minPrimarySize, maxPrimarySize, orientation, resize, floating, resizerElement, splitter]);
+  }, [minPrimarySize, maxPrimarySize, orientation, resize, floating, resizerElement, splitter, containerSize]);
 
   useEffect(() => {
     const watchResizer = (event: MouseEvent) => {
