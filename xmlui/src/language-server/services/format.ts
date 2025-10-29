@@ -288,6 +288,61 @@ class XmluiFormatter {
     return acc;
   }
 
+  addWsToCollapsedCloseNodeStartTrivia(trivias: Node[], lastContentNode: Node | null) {
+    let newlinesAfterText: number | null = null;
+    let lastContentIsText = false;
+    if (lastContentNode) {
+      if (
+        lastContentNode.kind === SyntaxKind.StringLiteral ||
+        lastContentNode.kind === SyntaxKind.TextNode
+      ) {
+        lastContentIsText = true;
+        const trailingNewlinesInText = newlinesInTrailingWhitespace(this.getText(lastContentNode));
+        newlinesAfterText = Math.min(trailingNewlinesInText, this.maxConsecutiveNewlines);
+      }
+    }
+    const contentEndsInNewlines = lastContentIsText && newlinesAfterText > 0;
+
+    let acc = "";
+    if (contentEndsInNewlines) {
+      acc += this.newlineToken.repeat(newlinesAfterText);
+    }
+
+    for (let i = 0; i < trivias.length; ++i) {
+      const t = trivias[i];
+      switch (t.kind) {
+        case SyntaxKind.CommentTrivia: {
+          if (i === 0 && ((lastContentIsText && newlinesAfterText === 0) || !lastContentIsText)) {
+            acc += " ";
+            acc += this.getText(t);
+          } else {
+            acc += this.indent(this.indentationLvl + 1) + this.getText(t);
+          }
+          if (trivias[i + 1]?.kind === SyntaxKind.CommentTrivia) {
+            acc += this.newlineToken;
+          }
+          break;
+        }
+        case SyntaxKind.NewLineTrivia: {
+          acc += this.newlineToken;
+          break;
+        }
+      }
+    }
+
+    if (!lastContentNode && trivias.length === 0) {
+      // leave the closing tag on the same line
+      // when there's nothing inside it
+    } else if (contentEndsInNewlines || trivias.at(-1)?.kind === SyntaxKind.NewLineTrivia) {
+      acc += this.indent(this.indentationLvl);
+    } else {
+      acc += this.newlineToken;
+      acc += this.indent(this.indentationLvl);
+    }
+
+    return acc;
+  }
+
   printTagLike(node: Node): string {
     switch (node.kind) {
       case SyntaxKind.Script:
@@ -372,30 +427,8 @@ class XmluiFormatter {
       const c = tagChildren[i];
       switch (c.kind) {
         case SyntaxKind.CloseNodeStart:
-          //   const comment = this.getCommentsSpaceJoined(c);
-          //   if (comment) {
-          //     if (!hasContentList) {
-          //       acc += this.newlineToken;
-          //     }
-          //     acc += this.indent(this.indentationLvl + 1);
-          //     acc += comment;
-          //   }
-
-          //   acc += this.newlineToken + this.indent(this.indentationLvl) + "</";
-
           const collapsedTrivias = this.collapseBlankLines(c.triviaBefore ?? []);
-          if (lastContentNode){
-            if (lastContentNode.kind === SyntaxKind.StringLiteral || lastContentNode.kind === SyntaxKind.TextNode){
-
-              const trailingNewlinesInText = newlinesInTrailingWhitespace(this.getText(lastContentNode));
-              const newlinesAfterText = Math.min(trailingNewlinesInText, this.maxConsecutiveNewlines);
-
-              need to do somthing with indent lvl
-              this.addWsToCollapsedTriviaAfterText(collapsedTrivias, newlinesAfterText )
-            } else {
-              this.addWsToCollapsedTrivia(collapsedTrivias)
-            }
-          }
+          acc += this.addWsToCollapsedCloseNodeStartTrivia(collapsedTrivias, lastContentNode);
           acc += "</";
           break;
         case SyntaxKind.TagNameNode:
@@ -415,10 +448,8 @@ class XmluiFormatter {
     let acc: string = "";
     let closingIsNodeClose = false;
     let attrSegmentsFormatted: string[] = [];
-    let attrListOffsetInAcc: number;
 
     let closingSegmentsFormatted: string[] = [];
-    let closingOffsetInAcc: number;
 
     let attrsAlreadyMultiline = false;
 
@@ -433,10 +464,8 @@ class XmluiFormatter {
               .getTriviaNodes()
               ?.some((attrTrivia) => attrTrivia.kind === SyntaxKind.NewLineTrivia),
           );
-          attrListOffsetInAcc = acc.length;
           break;
         case SyntaxKind.NodeClose: {
-          closingOffsetInAcc = acc.length;
           closingIsNodeClose = true;
           const comments = this.getCommentsSpaceJoined(c);
           if (comments) {
@@ -447,7 +476,6 @@ class XmluiFormatter {
           break;
         }
         case SyntaxKind.NodeEnd: {
-          closingOffsetInAcc = acc.length;
           closingIsNodeClose = false;
 
           const comments = this.getCommentsSpaceJoined(c);

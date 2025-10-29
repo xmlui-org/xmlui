@@ -166,17 +166,6 @@ describe("XML Formatter", () => {
 <A />`);
     });
 
-    test("removes blank lines around comment if it's the only content", () => {
-      const result = formatTwice(`<A>
-
-  <!--c-->
-
-</A>`);
-      expect(result).toEqual(`<A>
-  <!--c-->
-</A>`);
-    });
-
     test("collapses multiple blank lines around comment only line", () => {
       const result = formatTwice(`<A />
 
@@ -535,8 +524,7 @@ describe("XML Formatter", () => {
   <n2
     attr3="val2"
     attr4 />
-  text2
-  <!--c-->
+  text2 <!--c-->
 </n>`,
       );
     });
@@ -679,9 +667,17 @@ describe("XML Formatter", () => {
       const input = `<n> <!-- c --> </n>`;
       const result = formatTwice(input);
 
+      expect(result).toEqual(`<n> <!-- c -->
+</n>`);
+    });
+
+    test("2 comments as the only content in tag", () => {
+      const input = `<n> <!-- c --> <!-- d --> </n>`;
+      const result = formatTwice(input);
+
       expect(result).toEqual(
-        `<n>
-  <!-- c -->
+        `<n> <!-- c -->
+  <!-- d -->
 </n>`,
       );
     });
