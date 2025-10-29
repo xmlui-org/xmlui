@@ -15,68 +15,68 @@ $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, "item-#{$component}");
 
 // Variables for default variant
-$borderRadius-AutoComplete-default: createThemeVar("Input:borderRadius-#{$component}-default");
-$borderColor-AutoComplete-default: createThemeVar("Input:borderColor-#{$component}-default");
-$borderWidth-AutoComplete-default: createThemeVar("Input:borderWidth-#{$component}-default");
-$borderStyle-AutoComplete-default: createThemeVar("Input:borderStyle-#{$component}-default");
-$fontSize-AutoComplete-default: createThemeVar("Input:fontSize-#{$component}-default");
-$backgroundColor-AutoComplete-default: createThemeVar("Input:backgroundColor-#{$component}-default");
-$boxShadow-AutoComplete-default: createThemeVar("Input:boxShadow-#{$component}-default");
-$textColor-AutoComplete-default: createThemeVar("Input:textColor-#{$component}-default");
-$borderColor-AutoComplete-default--hover: createThemeVar("Input:borderColor-#{$component}-default--hover");
-$backgroundColor-AutoComplete-default--hover: createThemeVar("Input:backgroundColor-#{$component}-default--hover");
-$boxShadow-AutoComplete-default--hover: createThemeVar("Input:boxShadow-#{$component}-default--hover");
-$textColor-AutoComplete-default--hover: createThemeVar("Input:textColor-#{$component}-default--hover");
-$textColor-placeholder-AutoComplete-default: createThemeVar("Input:textColor-placeholder-#{$component}-default");
-$fontSize-placeholder-AutoComplete-default: createThemeVar("Input:fontSize-placeholder-#{$component}-default");
+$borderRadius-AutoComplete--default: createThemeVar("Input:borderRadius-#{$component}--default");
+$borderColor-AutoComplete--default: createThemeVar("Input:borderColor-#{$component}--default");
+$borderWidth-AutoComplete--default: createThemeVar("Input:borderWidth-#{$component}--default");
+$borderStyle-AutoComplete--default: createThemeVar("Input:borderStyle-#{$component}--default");
+$fontSize-AutoComplete--default: createThemeVar("Input:fontSize-#{$component}--default");
+$backgroundColor-AutoComplete--default: createThemeVar("Input:backgroundColor-#{$component}--default");
+$boxShadow-AutoComplete--default: createThemeVar("Input:boxShadow-#{$component}--default");
+$textColor-AutoComplete--default: createThemeVar("Input:textColor-#{$component}--default");
+$borderColor-AutoComplete--default--hover: createThemeVar("Input:borderColor-#{$component}--default--hover");
+$backgroundColor-AutoComplete--default--hover: createThemeVar("Input:backgroundColor-#{$component}--default--hover");
+$boxShadow-AutoComplete--default--hover: createThemeVar("Input:boxShadow-#{$component}--default--hover");
+$textColor-AutoComplete--default--hover: createThemeVar("Input:textColor-#{$component}--default--hover");
+$textColor-placeholder-AutoComplete--default: createThemeVar("Input:textColor-placeholder-#{$component}--default");
+$fontSize-placeholder-AutoComplete--default: createThemeVar("Input:fontSize-placeholder-#{$component}--default");
 
 // Variables for error variant
-$borderRadius-AutoComplete-error: createThemeVar("Input:borderRadius-#{$component}-error");
-$borderColor-AutoComplete-error: createThemeVar("Input:borderColor-#{$component}-error");
-$borderWidth-AutoComplete-error: createThemeVar("Input:borderWidth-#{$component}-error");
-$borderStyle-AutoComplete-error: createThemeVar("Input:borderStyle-#{$component}-error");
-$fontSize-AutoComplete-error: createThemeVar("Input:fontSize-#{$component}-error");
-$backgroundColor-AutoComplete-error: createThemeVar("Input:backgroundColor-#{$component}-error");
-$boxShadow-AutoComplete-error: createThemeVar("Input:boxShadow-#{$component}-error");
-$textColor-AutoComplete-error: createThemeVar("Input:textColor-#{$component}-error");
-$borderColor-AutoComplete-error--hover: createThemeVar("Input:borderColor-#{$component}-error--hover");
-$backgroundColor-AutoComplete-error--hover: createThemeVar("Input:backgroundColor-#{$component}-error--hover");
-$boxShadow-AutoComplete-error--hover: createThemeVar("Input:boxShadow-#{$component}-error--hover");
-$textColor-AutoComplete-error--hover: createThemeVar("Input:textColor-#{$component}-error--hover");
-$textColor-placeholder-AutoComplete-error: createThemeVar("Input:textColor-placeholder-#{$component}-error");
-$fontSize-placeholder-AutoComplete-error: createThemeVar("Input:fontSize-placeholder-#{$component}-error");
+$borderRadius-AutoComplete--error: createThemeVar("Input:borderRadius-#{$component}--error");
+$borderColor-AutoComplete--error: createThemeVar("Input:borderColor-#{$component}--error");
+$borderWidth-AutoComplete--error: createThemeVar("Input:borderWidth-#{$component}--error");
+$borderStyle-AutoComplete--error: createThemeVar("Input:borderStyle-#{$component}--error");
+$fontSize-AutoComplete--error: createThemeVar("Input:fontSize-#{$component}--error");
+$backgroundColor-AutoComplete--error: createThemeVar("Input:backgroundColor-#{$component}--error");
+$boxShadow-AutoComplete--error: createThemeVar("Input:boxShadow-#{$component}--error");
+$textColor-AutoComplete--error: createThemeVar("Input:textColor-#{$component}--error");
+$borderColor-AutoComplete--error--hover: createThemeVar("Input:borderColor-#{$component}--error--hover");
+$backgroundColor-AutoComplete--error--hover: createThemeVar("Input:backgroundColor-#{$component}--error--hover");
+$boxShadow-AutoComplete--error--hover: createThemeVar("Input:boxShadow-#{$component}--error--hover");
+$textColor-AutoComplete--error--hover: createThemeVar("Input:textColor-#{$component}--error--hover");
+$textColor-placeholder-AutoComplete--error: createThemeVar("Input:textColor-placeholder-#{$component}--error");
+$fontSize-placeholder-AutoComplete--error: createThemeVar("Input:fontSize-placeholder-#{$component}--error");
 
 // Variables for warning variant
-$borderRadius-AutoComplete-warning: createThemeVar("Input:borderRadius-#{$component}-warning");
-$borderColor-AutoComplete-warning: createThemeVar("Input:borderColor-#{$component}-warning");
-$borderWidth-AutoComplete-warning: createThemeVar("Input:borderWidth-#{$component}-warning");
-$borderStyle-AutoComplete-warning: createThemeVar("Input:borderStyle-#{$component}-warning");
-$fontSize-AutoComplete-warning: createThemeVar("Input:fontSize-#{$component}-warning");
-$backgroundColor-AutoComplete-warning: createThemeVar("Input:backgroundColor-#{$component}-warning");
-$boxShadow-AutoComplete-warning: createThemeVar("Input:boxShadow-#{$component}-warning");
-$textColor-AutoComplete-warning: createThemeVar("Input:textColor-#{$component}-warning");
-$borderColor-AutoComplete-warning--hover: createThemeVar("Input:borderColor-#{$component}-warning--hover");
-$backgroundColor-AutoComplete-warning--hover: createThemeVar("Input:backgroundColor-#{$component}-warning--hover");
-$boxShadow-AutoComplete-warning--hover: createThemeVar("Input:boxShadow-#{$component}-warning--hover");
-$textColor-AutoComplete-warning--hover: createThemeVar("Input:textColor-#{$component}-warning--hover");
-$textColor-placeholder-AutoComplete-warning: createThemeVar("Input:textColor-placeholder-#{$component}-warning");
-$fontSize-placeholder-AutoComplete-warning: createThemeVar("Input:fontSize-placeholder-#{$component}-warning");
+$borderRadius-AutoComplete--warning: createThemeVar("Input:borderRadius-#{$component}--warning");
+$borderColor-AutoComplete--warning: createThemeVar("Input:borderColor-#{$component}--warning");
+$borderWidth-AutoComplete--warning: createThemeVar("Input:borderWidth-#{$component}--warning");
+$borderStyle-AutoComplete--warning: createThemeVar("Input:borderStyle-#{$component}--warning");
+$fontSize-AutoComplete--warning: createThemeVar("Input:fontSize-#{$component}--warning");
+$backgroundColor-AutoComplete--warning: createThemeVar("Input:backgroundColor-#{$component}--warning");
+$boxShadow-AutoComplete--warning: createThemeVar("Input:boxShadow-#{$component}--warning");
+$textColor-AutoComplete--warning: createThemeVar("Input:textColor-#{$component}--warning");
+$borderColor-AutoComplete--warning--hover: createThemeVar("Input:borderColor-#{$component}--warning--hover");
+$backgroundColor-AutoComplete--warning--hover: createThemeVar("Input:backgroundColor-#{$component}--warning--hover");
+$boxShadow-AutoComplete--warning--hover: createThemeVar("Input:boxShadow-#{$component}--warning--hover");
+$textColor-AutoComplete--warning--hover: createThemeVar("Input:textColor-#{$component}--warning--hover");
+$textColor-placeholder-AutoComplete--warning: createThemeVar("Input:textColor-placeholder-#{$component}--warning");
+$fontSize-placeholder-AutoComplete--warning: createThemeVar("Input:fontSize-placeholder-#{$component}--warning");
 
 // Variables for success variant
-$borderRadius-AutoComplete-success: createThemeVar("Input:borderRadius-#{$component}-success");
-$borderColor-AutoComplete-success: createThemeVar("Input:borderColor-#{$component}-success");
-$borderWidth-AutoComplete-success: createThemeVar("Input:borderWidth-#{$component}-success");
-$borderStyle-AutoComplete-success: createThemeVar("Input:borderStyle-#{$component}-success");
-$fontSize-AutoComplete-success: createThemeVar("Input:fontSize-#{$component}-success");
-$backgroundColor-AutoComplete-success: createThemeVar("Input:backgroundColor-#{$component}-success");
-$boxShadow-AutoComplete-success: createThemeVar("Input:boxShadow-#{$component}-success");
-$textColor-AutoComplete-success: createThemeVar("Input:textColor-#{$component}-success");
-$borderColor-AutoComplete-success--hover: createThemeVar("Input:borderColor-#{$component}-success--hover");
-$backgroundColor-AutoComplete-success--hover: createThemeVar("Input:backgroundColor-#{$component}-success--hover");
-$boxShadow-AutoComplete-success--hover: createThemeVar("Input:boxShadow-#{$component}-success--hover");
-$textColor-AutoComplete-success--hover: createThemeVar("Input:textColor-#{$component}-success--hover");
-$textColor-placeholder-AutoComplete-success: createThemeVar("Input:textColor-placeholder-#{$component}-success");
-$fontSize-placeholder-AutoComplete-success: createThemeVar("Input:fontSize-placeholder-#{$component}-success");
+$borderRadius-AutoComplete--success: createThemeVar("Input:borderRadius-#{$component}--success");
+$borderColor-AutoComplete--success: createThemeVar("Input:borderColor-#{$component}--success");
+$borderWidth-AutoComplete--success: createThemeVar("Input:borderWidth-#{$component}--success");
+$borderStyle-AutoComplete--success: createThemeVar("Input:borderStyle-#{$component}--success");
+$fontSize-AutoComplete--success: createThemeVar("Input:fontSize-#{$component}--success");
+$backgroundColor-AutoComplete--success: createThemeVar("Input:backgroundColor-#{$component}--success");
+$boxShadow-AutoComplete--success: createThemeVar("Input:boxShadow-#{$component}--success");
+$textColor-AutoComplete--success: createThemeVar("Input:textColor-#{$component}--success");
+$borderColor-AutoComplete--success--hover: createThemeVar("Input:borderColor-#{$component}--success--hover");
+$backgroundColor-AutoComplete--success--hover: createThemeVar("Input:backgroundColor-#{$component}--success--hover");
+$boxShadow-AutoComplete--success--hover: createThemeVar("Input:boxShadow-#{$component}--success--hover");
+$textColor-AutoComplete--success--hover: createThemeVar("Input:textColor-#{$component}--success--hover");
+$textColor-placeholder-AutoComplete--success: createThemeVar("Input:textColor-placeholder-#{$component}--success");
+$fontSize-placeholder-AutoComplete--success: createThemeVar("Input:fontSize-placeholder-#{$component}--success");
 
 // Variables for @layer section
 $gap-adornment-AutoComplete: createThemeVar("Input:gap-adornment-#{$component}");
@@ -110,25 +110,25 @@ $textColor-item-AutoComplete--disabled: createThemeVar("textColor-item-#{$compon
 
 // --- CSS properties of a particular AutoComplete variant
 @mixin variant($variantName) {
-  border-radius: createThemeVar("Input:borderRadius-#{$component}-#{$variantName}");
-  border-color: createThemeVar("Input:borderColor-#{$component}-#{$variantName}");
-  border-width: createThemeVar("Input:borderWidth-#{$component}-#{$variantName}");
-  border-style: createThemeVar("Input:borderStyle-#{$component}-#{$variantName}");
-  font-size: createThemeVar("Input:fontSize-#{$component}-#{$variantName}");
-  background-color: createThemeVar("Input:backgroundColor-#{$component}-#{$variantName}");
-  box-shadow: createThemeVar("Input:boxShadow-#{$component}-#{$variantName}");
-  color: createThemeVar("Input:textColor-#{$component}-#{$variantName}");
+  border-radius: createThemeVar("Input:borderRadius-#{$component}--#{$variantName}");
+  border-color: createThemeVar("Input:borderColor-#{$component}--#{$variantName}");
+  border-width: createThemeVar("Input:borderWidth-#{$component}--#{$variantName}");
+  border-style: createThemeVar("Input:borderStyle-#{$component}--#{$variantName}");
+  font-size: createThemeVar("Input:fontSize-#{$component}--#{$variantName}");
+  background-color: createThemeVar("Input:backgroundColor-#{$component}--#{$variantName}");
+  box-shadow: createThemeVar("Input:boxShadow-#{$component}--#{$variantName}");
+  color: createThemeVar("Input:textColor-#{$component}--#{$variantName}");
 
   &:hover {
-    border-color: createThemeVar("Input:borderColor-#{$component}-#{$variantName}--hover");
-    background-color: createThemeVar("Input:backgroundColor-#{$component}-#{$variantName}--hover");
-    box-shadow: createThemeVar("Input:boxShadow-#{$component}-#{$variantName}--hover");
-    color: createThemeVar("Input:textColor-#{$component}-#{$variantName}--hover");
+    border-color: createThemeVar("Input:borderColor-#{$component}--#{$variantName}--hover");
+    background-color: createThemeVar("Input:backgroundColor-#{$component}--#{$variantName}--hover");
+    box-shadow: createThemeVar("Input:boxShadow-#{$component}--#{$variantName}--hover");
+    color: createThemeVar("Input:textColor-#{$component}--#{$variantName}--hover");
   }
 
   &::placeholder {
-    color: createThemeVar("Input:textColor-placeholder-#{$component}-#{$variantName}");
-    font-size: createThemeVar("Input:fontSize-placeholder-#{$component}-#{$variantName}");
+    color: createThemeVar("Input:textColor-placeholder-#{$component}--#{$variantName}");
+    font-size: createThemeVar("Input:fontSize-placeholder-#{$component}--#{$variantName}");
   }
 }
 

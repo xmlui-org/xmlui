@@ -90,17 +90,25 @@ $borderColor-Image: createThemeVar("borderColor-Image");
 ### 3. For calls under `@mixin`
 Create SASS variables for **each variant case** outside the mixin.
 
-**Example for variants (default, error, warning, success):**
-```scss
-// Variables for default variant
-$borderColor-TextBox-default: createThemeVar("Input:borderColor-#{$componentName}-default");
-$borderColor-TextBox-default--hover: createThemeVar("Input:borderColor-#{$componentName}-default--hover");
+**IMPORTANT:** Validation variants (default, error, warning, success) should be treated as states and use double dashes (`--`) just like hover, focus, disabled, etc.
 
-// Variables for error variant  
-$borderColor-TextBox-error: createThemeVar("Input:borderColor-#{$componentName}-error");
-$borderColor-TextBox-error--hover: createThemeVar("Input:borderColor-#{$componentName}-error--hover");
+**Example for validation variant states (--default, --error, --warning, --success):**
+```scss
+// Variables for default variant state
+$borderColor-TextBox--default: createThemeVar("Input:borderColor-#{$componentName}--default");
+$borderColor-TextBox--default--hover: createThemeVar("Input:borderColor-#{$componentName}--default--hover");
+
+// Variables for error variant state
+$borderColor-TextBox--error: createThemeVar("Input:borderColor-#{$componentName}--error");
+$borderColor-TextBox--error--hover: createThemeVar("Input:borderColor-#{$componentName}--error--hover");
 
 // ... repeat for warning and success
+```
+
+String patterns can also omit the `#{$componentName}` but still must be accounted for:
+```scss
+$borderColor-RadioGroupOption--default: createThemeVar("Input:borderColor-RadioGroupOption--default");
+$borderColor-RadioGroupOption--default--hover: createThemeVar("Input:borderColor-RadioGroupOption--default--hover");
 ```
 
 ### 4. Keep `@mixin` contents unchanged
@@ -227,27 +235,27 @@ $backgroundColor-indicator-Carousel--active: createThemeVar("backgroundColor-ind
 
 ### Level 4: Components with Validation Variants
 
-Components like TextBox and NumberBox that support validation variants (default, error, warning, success).
+Components like TextBox and NumberBox that support validation variants (default, error, warning, success). These variants should use double dashes (`--`) as they are treated as states.
 
 **Structure:**
 ```scss
 $componentName: "TextBox";
 
-// Variables for default variant
-$borderColor-TextBox-default: createThemeVar("Input:borderColor-#{$componentName}-default");
-$borderWidth-TextBox-default: createThemeVar("Input:borderWidth-#{$componentName}-default");
-$backgroundColor-TextBox-default: createThemeVar("Input:backgroundColor-#{$componentName}-default");
-$borderColor-TextBox-default--hover: createThemeVar("Input:borderColor-#{$componentName}-default--hover");
-$borderColor-TextBox-default--focus: createThemeVar("Input:borderColor-#{$componentName}-default--focus");
+// Variables for default variant state
+$borderColor-TextBox--default: createThemeVar("Input:borderColor-#{$componentName}--default");
+$borderWidth-TextBox--default: createThemeVar("Input:borderWidth-#{$componentName}--default");
+$backgroundColor-TextBox--default: createThemeVar("Input:backgroundColor-#{$componentName}--default");
+$borderColor-TextBox--default--hover: createThemeVar("Input:borderColor-#{$componentName}--default--hover");
+$borderColor-TextBox--default--focus: createThemeVar("Input:borderColor-#{$componentName}--default--focus");
 
-// Variables for error variant
-$borderColor-TextBox-error: createThemeVar("Input:borderColor-#{$componentName}-error");
-$borderWidth-TextBox-error: createThemeVar("Input:borderWidth-#{$componentName}-error");
-$backgroundColor-TextBox-error: createThemeVar("Input:backgroundColor-#{$componentName}-error");
-$borderColor-TextBox-error--hover: createThemeVar("Input:borderColor-#{$componentName}-error--hover");
-$borderColor-TextBox-error--focus: createThemeVar("Input:borderColor-#{$componentName}-error--focus");
+// Variables for error variant state
+$borderColor-TextBox--error: createThemeVar("Input:borderColor-#{$componentName}--error");
+$borderWidth-TextBox--error: createThemeVar("Input:borderWidth-#{$componentName}--error");
+$backgroundColor-TextBox--error: createThemeVar("Input:backgroundColor-#{$componentName}--error");
+$borderColor-TextBox--error--hover: createThemeVar("Input:borderColor-#{$componentName}--error--hover");
+$borderColor-TextBox--error--focus: createThemeVar("Input:borderColor-#{$componentName}--error--focus");
 
-// ... repeat for warning and success variants
+// ... repeat for warning and success variant states
 
 // Variables for @layer section
 $gap-adornment-TextBox: createThemeVar("Input:gap-adornment-#{$componentName}");
@@ -280,11 +288,11 @@ Components that combine validation variants with component-specific elements (li
 
 **Structure:**
 ```scss
-// Variables for default variant
-$borderColor-TextBox-default: createThemeVar("Input:borderColor-#{$componentName}-default");
-$borderColor-TextBox-default--hover: createThemeVar("Input:borderColor-#{$componentName}-default--hover");
+// Variables for default variant state
+$borderColor-TextBox--default: createThemeVar("Input:borderColor-#{$componentName}--default");
+$borderColor-TextBox--default--hover: createThemeVar("Input:borderColor-#{$componentName}--default--hover");
 
-// Variables for error, warning, success variants
+// Variables for error, warning, success variant states
 // ... (same pattern as default)
 
 // Variables for passwordToggle (not variant-specific)
@@ -302,13 +310,13 @@ $textColor-TextBox--disabled: createThemeVar("Input:textColor-#{$componentName}-
 ## Common Issues
 
 ### Missing borderRadius Variables
-Some components (like NumberBox) may not have pre-existing borderRadius variables defined outside the mixin. Ensure all borderRadius variants are created:
+Some components (like NumberBox) may not have pre-existing borderRadius variables defined outside the mixin. Ensure all borderRadius variant states are created:
 
 ```scss
-$borderRadius-NumberBox-default: createThemeVar("Input:borderRadius-#{$componentName}-default");
-$borderRadius-NumberBox-error: createThemeVar("Input:borderRadius-#{$componentName}-error");
-$borderRadius-NumberBox-warning: createThemeVar("Input:borderRadius-#{$componentName}-warning");
-$borderRadius-NumberBox-success: createThemeVar("Input:borderRadius-#{$componentName}-success");
+$borderRadius-NumberBox--default: createThemeVar("Input:borderRadius-#{$componentName}--default");
+$borderRadius-NumberBox--error: createThemeVar("Input:borderRadius-#{$componentName}--error");
+$borderRadius-NumberBox--warning: createThemeVar("Input:borderRadius-#{$componentName}--warning");
+$borderRadius-NumberBox--success: createThemeVar("Input:borderRadius-#{$componentName}--success");
 ```
 
 ### Inconsistent State Naming

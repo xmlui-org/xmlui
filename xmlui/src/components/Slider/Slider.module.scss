@@ -11,48 +11,48 @@ $themeVars: ();
 $componentName: "Slider";
 
 // Variables for default variant
-$borderRadius-Slider-default: createThemeVar("Input:borderRadius-#{$componentName}-default");
-$borderColor-Slider-default: createThemeVar("Input:borderColor-#{$componentName}-default");
-$borderWidth-Slider-default: createThemeVar("Input:borderWidth-#{$componentName}-default");
-$borderStyle-Slider-default: createThemeVar("Input:borderStyle-#{$componentName}-default");
-$boxShadow-Slider-default: createThemeVar("Input:boxShadow-#{$componentName}-default");
-$borderColor-Slider-default--hover: createThemeVar("Input:borderColor-#{$componentName}-default--hover");
-$boxShadow-Slider-default--hover: createThemeVar("Input:boxShadow-#{$componentName}-default--hover");
-$borderColor-Slider-default--focus: createThemeVar("Input:borderColor-#{$componentName}-default--focus");
-$boxShadow-Slider-default--focus: createThemeVar("Input:boxShadow-#{$componentName}-default--focus");
+$borderRadius-Slider--default: createThemeVar("Input:borderRadius-#{$componentName}--default");
+$borderColor-Slider--default: createThemeVar("Input:borderColor-#{$componentName}--default");
+$borderWidth-Slider--default: createThemeVar("Input:borderWidth-#{$componentName}--default");
+$borderStyle-Slider--default: createThemeVar("Input:borderStyle-#{$componentName}--default");
+$boxShadow-Slider--default: createThemeVar("Input:boxShadow-#{$componentName}--default");
+$borderColor-Slider--default--hover: createThemeVar("Input:borderColor-#{$componentName}--default--hover");
+$boxShadow-Slider--default--hover: createThemeVar("Input:boxShadow-#{$componentName}--default--hover");
+$borderColor-Slider--default--focus: createThemeVar("Input:borderColor-#{$componentName}--default--focus");
+$boxShadow-Slider--default--focus: createThemeVar("Input:boxShadow-#{$componentName}--default--focus");
 
 // Variables for error variant
-$borderRadius-Slider-error: createThemeVar("Input:borderRadius-#{$componentName}-error");
-$borderColor-Slider-error: createThemeVar("Input:borderColor-#{$componentName}-error");
-$borderWidth-Slider-error: createThemeVar("Input:borderWidth-#{$componentName}-error");
-$borderStyle-Slider-error: createThemeVar("Input:borderStyle-#{$componentName}-error");
-$boxShadow-Slider-error: createThemeVar("Input:boxShadow-#{$componentName}-error");
-$borderColor-Slider-error--hover: createThemeVar("Input:borderColor-#{$componentName}-error--hover");
-$boxShadow-Slider-error--hover: createThemeVar("Input:boxShadow-#{$componentName}-error--hover");
-$borderColor-Slider-error--focus: createThemeVar("Input:borderColor-#{$componentName}-error--focus");
-$boxShadow-Slider-error--focus: createThemeVar("Input:boxShadow-#{$componentName}-error--focus");
+$borderRadius-Slider--error: createThemeVar("Input:borderRadius-#{$componentName}--error");
+$borderColor-Slider--error: createThemeVar("Input:borderColor-#{$componentName}--error");
+$borderWidth-Slider--error: createThemeVar("Input:borderWidth-#{$componentName}--error");
+$borderStyle-Slider--error: createThemeVar("Input:borderStyle-#{$componentName}--error");
+$boxShadow-Slider--error: createThemeVar("Input:boxShadow-#{$componentName}--error");
+$borderColor-Slider--error--hover: createThemeVar("Input:borderColor-#{$componentName}--error--hover");
+$boxShadow-Slider--error--hover: createThemeVar("Input:boxShadow-#{$componentName}--error--hover");
+$borderColor-Slider--error--focus: createThemeVar("Input:borderColor-#{$componentName}--error--focus");
+$boxShadow-Slider--error--focus: createThemeVar("Input:boxShadow-#{$componentName}--error--focus");
 
 // Variables for warning variant
-$borderRadius-Slider-warning: createThemeVar("Input:borderRadius-#{$componentName}-warning");
-$borderColor-Slider-warning: createThemeVar("Input:borderColor-#{$componentName}-warning");
-$borderWidth-Slider-warning: createThemeVar("Input:borderWidth-#{$componentName}-warning");
-$borderStyle-Slider-warning: createThemeVar("Input:borderStyle-#{$componentName}-warning");
-$boxShadow-Slider-warning: createThemeVar("Input:boxShadow-#{$componentName}-warning");
-$borderColor-Slider-warning--hover: createThemeVar("Input:borderColor-#{$componentName}-warning--hover");
-$boxShadow-Slider-warning--hover: createThemeVar("Input:boxShadow-#{$componentName}-warning--hover");
-$borderColor-Slider-warning--focus: createThemeVar("Input:borderColor-#{$componentName}-warning--focus");
-$boxShadow-Slider-warning--focus: createThemeVar("Input:boxShadow-#{$componentName}-warning--focus");
+$borderRadius-Slider--warning: createThemeVar("Input:borderRadius-#{$componentName}--warning");
+$borderColor-Slider--warning: createThemeVar("Input:borderColor-#{$componentName}--warning");
+$borderWidth-Slider--warning: createThemeVar("Input:borderWidth-#{$componentName}--warning");
+$borderStyle-Slider--warning: createThemeVar("Input:borderStyle-#{$componentName}--warning");
+$boxShadow-Slider--warning: createThemeVar("Input:boxShadow-#{$componentName}--warning");
+$borderColor-Slider--warning--hover: createThemeVar("Input:borderColor-#{$componentName}--warning--hover");
+$boxShadow-Slider--warning--hover: createThemeVar("Input:boxShadow-#{$componentName}--warning--hover");
+$borderColor-Slider--warning--focus: createThemeVar("Input:borderColor-#{$componentName}--warning--focus");
+$boxShadow-Slider--warning--focus: createThemeVar("Input:boxShadow-#{$componentName}--warning--focus");
 
 // Variables for success variant
-$borderRadius-Slider-success: createThemeVar("Input:borderRadius-#{$componentName}-success");
-$borderColor-Slider-success: createThemeVar("Input:borderColor-#{$componentName}-success");
-$borderWidth-Slider-success: createThemeVar("Input:borderWidth-#{$componentName}-success");
-$borderStyle-Slider-success: createThemeVar("Input:borderStyle-#{$componentName}-success");
-$boxShadow-Slider-success: createThemeVar("Input:boxShadow-#{$componentName}-success");
-$borderColor-Slider-success--hover: createThemeVar("Input:borderColor-#{$componentName}-success--hover");
-$boxShadow-Slider-success--hover: createThemeVar("Input:boxShadow-#{$componentName}-success--hover");
-$borderColor-Slider-success--focus: createThemeVar("Input:borderColor-#{$componentName}-success--focus");
-$boxShadow-Slider-success--focus: createThemeVar("Input:boxShadow-#{$componentName}-success--focus");
+$borderRadius-Slider--success: createThemeVar("Input:borderRadius-#{$componentName}--success");
+$borderColor-Slider--success: createThemeVar("Input:borderColor-#{$componentName}--success");
+$borderWidth-Slider--success: createThemeVar("Input:borderWidth-#{$componentName}--success");
+$borderStyle-Slider--success: createThemeVar("Input:borderStyle-#{$componentName}--success");
+$boxShadow-Slider--success: createThemeVar("Input:boxShadow-#{$componentName}--success");
+$borderColor-Slider--success--hover: createThemeVar("Input:borderColor-#{$componentName}--success--hover");
+$boxShadow-Slider--success--hover: createThemeVar("Input:boxShadow-#{$componentName}--success--hover");
+$borderColor-Slider--success--focus: createThemeVar("Input:borderColor-#{$componentName}--success--focus");
+$boxShadow-Slider--success--focus: createThemeVar("Input:boxShadow-#{$componentName}--success--focus");
 
 // Variables for @layer section
 $backgroundColor-track-Slider: createThemeVar("Input:backgroundColor-track-#{$componentName}");
@@ -70,26 +70,26 @@ $backgroundColor-thumb-Slider--hover: createThemeVar("Input:backgroundColor-thum
 $boxShadow-thumb-Slider--hover: createThemeVar("Input:boxShadow-thumb-#{$componentName}--hover");
 $backgroundColor-thumb-Slider--active: createThemeVar("Input:backgroundColor-thumb-#{$componentName}--active");
 $boxShadow-thumb-Slider--active: createThemeVar("Input:boxShadow-thumb-#{$componentName}--active");
-$borderColor-Slider-error: createThemeVar("Input:borderColor-#{$componentName}-error");
-$borderColor-Slider-warning: createThemeVar("Input:borderColor-#{$componentName}-warning");
-$borderColor-Slider-success: createThemeVar("Input:borderColor-#{$componentName}-success");
+$borderColor-Slider--error: createThemeVar("Input:borderColor-#{$componentName}--error");
+$borderColor-Slider--warning: createThemeVar("Input:borderColor-#{$componentName}--warning");
+$borderColor-Slider--success: createThemeVar("Input:borderColor-#{$componentName}--success");
 
 // Basic variant mixin for consistent theming
 @mixin variant($variantName) {
-  border-radius: createThemeVar("Input:borderRadius-#{$componentName}-#{$variantName}");
-  border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}");
-  border-width: createThemeVar("Input:borderWidth-#{$componentName}-#{$variantName}");
-  border-style: createThemeVar("Input:borderStyle-#{$componentName}-#{$variantName}");
-  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
+  border-radius: createThemeVar("Input:borderRadius-#{$componentName}--#{$variantName}");
+  border-color: createThemeVar("Input:borderColor-#{$componentName}--#{$variantName}");
+  border-width: createThemeVar("Input:borderWidth-#{$componentName}--#{$variantName}");
+  border-style: createThemeVar("Input:borderStyle-#{$componentName}--#{$variantName}");
+  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}");
 
   &:hover {
-    border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--hover");
-    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
+    border-color: createThemeVar("Input:borderColor-#{$componentName}--#{$variantName}--hover");
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}--hover");
   }
 
   &:focus-within {
-    border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--focus");
-    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--focus");
+    border-color: createThemeVar("Input:borderColor-#{$componentName}--#{$variantName}--focus");
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}--focus");
   }
 }
 
@@ -202,15 +202,15 @@ $borderColor-Slider-success: createThemeVar("Input:borderColor-#{$componentName}
   }
 
   .error {
-    border-color: $borderColor-Slider-error;
+    border-color: $borderColor-Slider--error;
   }
 
   .warning {
-    border-color: $borderColor-Slider-warning;
+    border-color: $borderColor-Slider--warning;
   }
 
   .valid {
-    border-color: $borderColor-Slider-success;
+    border-color: $borderColor-Slider--success;
   }
 }
 

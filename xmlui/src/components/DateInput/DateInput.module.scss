@@ -39,92 +39,92 @@ $margin-input-DateInput: createThemeVar("margin-input-#{$componentName}");
 $transition-background-DateInput: createThemeVar("transition-background-#{$componentName}");
 
 // Variables for default variant
-$borderRadius-DateInput-default: createThemeVar("Input:borderRadius-#{$componentName}-default");
-$borderColor-DateInput-default: createThemeVar("Input:borderColor-#{$componentName}-default");
-$borderWidth-DateInput-default: createThemeVar("Input:borderWidth-#{$componentName}-default");
-$borderStyle-DateInput-default: createThemeVar("Input:borderStyle-#{$componentName}-default");
-$backgroundColor-DateInput-default: createThemeVar("Input:backgroundColor-#{$componentName}-default");
-$boxShadow-DateInput-default: createThemeVar("Input:boxShadow-#{$componentName}-default");
-$textColor-DateInput-default: createThemeVar("Input:textColor-#{$componentName}-default");
-$borderColor-DateInput-default--hover: createThemeVar("Input:borderColor-#{$componentName}-default--hover");
-$backgroundColor-DateInput-default--hover: createThemeVar("Input:backgroundColor-#{$componentName}-default--hover");
-$boxShadow-DateInput-default--hover: createThemeVar("Input:boxShadow-#{$componentName}-default--hover");
-$textColor-DateInput-default--hover: createThemeVar("Input:textColor-#{$componentName}-default--hover");
-$borderColor-DateInput-default--focus: createThemeVar("Input:borderColor-#{$componentName}-default--focus");
-$backgroundColor-DateInput-default--focus: createThemeVar("Input:backgroundColor-#{$componentName}-default--focus");
-$boxShadow-DateInput-default--focus: createThemeVar("Input:boxShadow-#{$componentName}-default--focus");
-$textColor-DateInput-default--focus: createThemeVar("Input:textColor-#{$componentName}-default--focus");
-$outlineWidth-DateInput-default--focus: createThemeVar("Input:outlineWidth-#{$componentName}-default--focus");
-$outlineColor-DateInput-default--focus: createThemeVar("Input:outlineColor-#{$componentName}-default--focus");
-$outlineStyle-DateInput-default--focus: createThemeVar("Input:outlineStyle-#{$componentName}-default--focus");
-$outlineOffset-DateInput-default--focus: createThemeVar("Input:outlineOffset-#{$componentName}-default--focus");
-$color-adornment-DateInput-default: createThemeVar("Input:color-adornment-#{$componentName}-default");
+$borderRadius-DateInput--default: createThemeVar("Input:borderRadius-#{$componentName}--default");
+$borderColor-DateInput--default: createThemeVar("Input:borderColor-#{$componentName}--default");
+$borderWidth-DateInput--default: createThemeVar("Input:borderWidth-#{$componentName}--default");
+$borderStyle-DateInput--default: createThemeVar("Input:borderStyle-#{$componentName}--default");
+$backgroundColor-DateInput--default: createThemeVar("Input:backgroundColor-#{$componentName}--default");
+$boxShadow-DateInput--default: createThemeVar("Input:boxShadow-#{$componentName}--default");
+$textColor-DateInput--default: createThemeVar("Input:textColor-#{$componentName}--default");
+$borderColor-DateInput--default--hover: createThemeVar("Input:borderColor-#{$componentName}--default--hover");
+$backgroundColor-DateInput--default--hover: createThemeVar("Input:backgroundColor-#{$componentName}--default--hover");
+$boxShadow-DateInput--default--hover: createThemeVar("Input:boxShadow-#{$componentName}--default--hover");
+$textColor-DateInput--default--hover: createThemeVar("Input:textColor-#{$componentName}--default--hover");
+$borderColor-DateInput--default--focus: createThemeVar("Input:borderColor-#{$componentName}--default--focus");
+$backgroundColor-DateInput--default--focus: createThemeVar("Input:backgroundColor-#{$componentName}--default--focus");
+$boxShadow-DateInput--default--focus: createThemeVar("Input:boxShadow-#{$componentName}--default--focus");
+$textColor-DateInput--default--focus: createThemeVar("Input:textColor-#{$componentName}--default--focus");
+$outlineWidth-DateInput--default--focus: createThemeVar("Input:outlineWidth-#{$componentName}--default--focus");
+$outlineColor-DateInput--default--focus: createThemeVar("Input:outlineColor-#{$componentName}--default--focus");
+$outlineStyle-DateInput--default--focus: createThemeVar("Input:outlineStyle-#{$componentName}--default--focus");
+$outlineOffset-DateInput--default--focus: createThemeVar("Input:outlineOffset-#{$componentName}--default--focus");
+$color-adornment-DateInput--default: createThemeVar("Input:color-adornment-#{$componentName}--default");
 
 // Variables for error variant
-$borderRadius-DateInput-error: createThemeVar("Input:borderRadius-#{$componentName}-error");
-$borderColor-DateInput-error: createThemeVar("Input:borderColor-#{$componentName}-error");
-$borderWidth-DateInput-error: createThemeVar("Input:borderWidth-#{$componentName}-error");
-$borderStyle-DateInput-error: createThemeVar("Input:borderStyle-#{$componentName}-error");
-$backgroundColor-DateInput-error: createThemeVar("Input:backgroundColor-#{$componentName}-error");
-$boxShadow-DateInput-error: createThemeVar("Input:boxShadow-#{$componentName}-error");
-$textColor-DateInput-error: createThemeVar("Input:textColor-#{$componentName}-error");
-$borderColor-DateInput-error--hover: createThemeVar("Input:borderColor-#{$componentName}-error--hover");
-$backgroundColor-DateInput-error--hover: createThemeVar("Input:backgroundColor-#{$componentName}-error--hover");
-$boxShadow-DateInput-error--hover: createThemeVar("Input:boxShadow-#{$componentName}-error--hover");
-$textColor-DateInput-error--hover: createThemeVar("Input:textColor-#{$componentName}-error--hover");
-$borderColor-DateInput-error--focus: createThemeVar("Input:borderColor-#{$componentName}-error--focus");
-$backgroundColor-DateInput-error--focus: createThemeVar("Input:backgroundColor-#{$componentName}-error--focus");
-$boxShadow-DateInput-error--focus: createThemeVar("Input:boxShadow-#{$componentName}-error--focus");
-$textColor-DateInput-error--focus: createThemeVar("Input:textColor-#{$componentName}-error--focus");
-$outlineWidth-DateInput-error--focus: createThemeVar("Input:outlineWidth-#{$componentName}-error--focus");
-$outlineColor-DateInput-error--focus: createThemeVar("Input:outlineColor-#{$componentName}-error--focus");
-$outlineStyle-DateInput-error--focus: createThemeVar("Input:outlineStyle-#{$componentName}-error--focus");
-$outlineOffset-DateInput-error--focus: createThemeVar("Input:outlineOffset-#{$componentName}-error--focus");
-$color-adornment-DateInput-error: createThemeVar("Input:color-adornment-#{$componentName}-error");
+$borderRadius-DateInput--error: createThemeVar("Input:borderRadius-#{$componentName}--error");
+$borderColor-DateInput--error: createThemeVar("Input:borderColor-#{$componentName}--error");
+$borderWidth-DateInput--error: createThemeVar("Input:borderWidth-#{$componentName}--error");
+$borderStyle-DateInput--error: createThemeVar("Input:borderStyle-#{$componentName}--error");
+$backgroundColor-DateInput--error: createThemeVar("Input:backgroundColor-#{$componentName}--error");
+$boxShadow-DateInput--error: createThemeVar("Input:boxShadow-#{$componentName}--error");
+$textColor-DateInput--error: createThemeVar("Input:textColor-#{$componentName}--error");
+$borderColor-DateInput--error--hover: createThemeVar("Input:borderColor-#{$componentName}--error--hover");
+$backgroundColor-DateInput--error--hover: createThemeVar("Input:backgroundColor-#{$componentName}--error--hover");
+$boxShadow-DateInput--error--hover: createThemeVar("Input:boxShadow-#{$componentName}--error--hover");
+$textColor-DateInput--error--hover: createThemeVar("Input:textColor-#{$componentName}--error--hover");
+$borderColor-DateInput--error--focus: createThemeVar("Input:borderColor-#{$componentName}--error--focus");
+$backgroundColor-DateInput--error--focus: createThemeVar("Input:backgroundColor-#{$componentName}--error--focus");
+$boxShadow-DateInput--error--focus: createThemeVar("Input:boxShadow-#{$componentName}--error--focus");
+$textColor-DateInput--error--focus: createThemeVar("Input:textColor-#{$componentName}--error--focus");
+$outlineWidth-DateInput--error--focus: createThemeVar("Input:outlineWidth-#{$componentName}--error--focus");
+$outlineColor-DateInput--error--focus: createThemeVar("Input:outlineColor-#{$componentName}--error--focus");
+$outlineStyle-DateInput--error--focus: createThemeVar("Input:outlineStyle-#{$componentName}--error--focus");
+$outlineOffset-DateInput--error--focus: createThemeVar("Input:outlineOffset-#{$componentName}--error--focus");
+$color-adornment-DateInput--error: createThemeVar("Input:color-adornment-#{$componentName}--error");
 
 // Variables for warning variant
-$borderRadius-DateInput-warning: createThemeVar("Input:borderRadius-#{$componentName}-warning");
-$borderColor-DateInput-warning: createThemeVar("Input:borderColor-#{$componentName}-warning");
-$borderWidth-DateInput-warning: createThemeVar("Input:borderWidth-#{$componentName}-warning");
-$borderStyle-DateInput-warning: createThemeVar("Input:borderStyle-#{$componentName}-warning");
-$backgroundColor-DateInput-warning: createThemeVar("Input:backgroundColor-#{$componentName}-warning");
-$boxShadow-DateInput-warning: createThemeVar("Input:boxShadow-#{$componentName}-warning");
-$textColor-DateInput-warning: createThemeVar("Input:textColor-#{$componentName}-warning");
-$borderColor-DateInput-warning--hover: createThemeVar("Input:borderColor-#{$componentName}-warning--hover");
-$backgroundColor-DateInput-warning--hover: createThemeVar("Input:backgroundColor-#{$componentName}-warning--hover");
-$boxShadow-DateInput-warning--hover: createThemeVar("Input:boxShadow-#{$componentName}-warning--hover");
-$textColor-DateInput-warning--hover: createThemeVar("Input:textColor-#{$componentName}-warning--hover");
-$borderColor-DateInput-warning--focus: createThemeVar("Input:borderColor-#{$componentName}-warning--focus");
-$backgroundColor-DateInput-warning--focus: createThemeVar("Input:backgroundColor-#{$componentName}-warning--focus");
-$boxShadow-DateInput-warning--focus: createThemeVar("Input:boxShadow-#{$componentName}-warning--focus");
-$textColor-DateInput-warning--focus: createThemeVar("Input:textColor-#{$componentName}-warning--focus");
-$outlineWidth-DateInput-warning--focus: createThemeVar("Input:outlineWidth-#{$componentName}-warning--focus");
-$outlineColor-DateInput-warning--focus: createThemeVar("Input:outlineColor-#{$componentName}-warning--focus");
-$outlineStyle-DateInput-warning--focus: createThemeVar("Input:outlineStyle-#{$componentName}-warning--focus");
-$outlineOffset-DateInput-warning--focus: createThemeVar("Input:outlineOffset-#{$componentName}-warning--focus");
-$color-adornment-DateInput-warning: createThemeVar("Input:color-adornment-#{$componentName}-warning");
+$borderRadius-DateInput--warning: createThemeVar("Input:borderRadius-#{$componentName}--warning");
+$borderColor-DateInput--warning: createThemeVar("Input:borderColor-#{$componentName}--warning");
+$borderWidth-DateInput--warning: createThemeVar("Input:borderWidth-#{$componentName}--warning");
+$borderStyle-DateInput--warning: createThemeVar("Input:borderStyle-#{$componentName}--warning");
+$backgroundColor-DateInput--warning: createThemeVar("Input:backgroundColor-#{$componentName}--warning");
+$boxShadow-DateInput--warning: createThemeVar("Input:boxShadow-#{$componentName}--warning");
+$textColor-DateInput--warning: createThemeVar("Input:textColor-#{$componentName}--warning");
+$borderColor-DateInput--warning--hover: createThemeVar("Input:borderColor-#{$componentName}--warning--hover");
+$backgroundColor-DateInput--warning--hover: createThemeVar("Input:backgroundColor-#{$componentName}--warning--hover");
+$boxShadow-DateInput--warning--hover: createThemeVar("Input:boxShadow-#{$componentName}--warning--hover");
+$textColor-DateInput--warning--hover: createThemeVar("Input:textColor-#{$componentName}--warning--hover");
+$borderColor-DateInput--warning--focus: createThemeVar("Input:borderColor-#{$componentName}--warning--focus");
+$backgroundColor-DateInput--warning--focus: createThemeVar("Input:backgroundColor-#{$componentName}--warning--focus");
+$boxShadow-DateInput--warning--focus: createThemeVar("Input:boxShadow-#{$componentName}--warning--focus");
+$textColor-DateInput--warning--focus: createThemeVar("Input:textColor-#{$componentName}--warning--focus");
+$outlineWidth-DateInput--warning--focus: createThemeVar("Input:outlineWidth-#{$componentName}--warning--focus");
+$outlineColor-DateInput--warning--focus: createThemeVar("Input:outlineColor-#{$componentName}--warning--focus");
+$outlineStyle-DateInput--warning--focus: createThemeVar("Input:outlineStyle-#{$componentName}--warning--focus");
+$outlineOffset-DateInput--warning--focus: createThemeVar("Input:outlineOffset-#{$componentName}--warning--focus");
+$color-adornment-DateInput--warning: createThemeVar("Input:color-adornment-#{$componentName}--warning");
 
 // Variables for success variant
-$borderRadius-DateInput-success: createThemeVar("Input:borderRadius-#{$componentName}-success");
-$borderColor-DateInput-success: createThemeVar("Input:borderColor-#{$componentName}-success");
-$borderWidth-DateInput-success: createThemeVar("Input:borderWidth-#{$componentName}-success");
-$borderStyle-DateInput-success: createThemeVar("Input:borderStyle-#{$componentName}-success");
-$backgroundColor-DateInput-success: createThemeVar("Input:backgroundColor-#{$componentName}-success");
-$boxShadow-DateInput-success: createThemeVar("Input:boxShadow-#{$componentName}-success");
-$textColor-DateInput-success: createThemeVar("Input:textColor-#{$componentName}-success");
-$borderColor-DateInput-success--hover: createThemeVar("Input:borderColor-#{$componentName}-success--hover");
-$backgroundColor-DateInput-success--hover: createThemeVar("Input:backgroundColor-#{$componentName}-success--hover");
-$boxShadow-DateInput-success--hover: createThemeVar("Input:boxShadow-#{$componentName}-success--hover");
-$textColor-DateInput-success--hover: createThemeVar("Input:textColor-#{$componentName}-success--hover");
-$borderColor-DateInput-success--focus: createThemeVar("Input:borderColor-#{$componentName}-success--focus");
-$backgroundColor-DateInput-success--focus: createThemeVar("Input:backgroundColor-#{$componentName}-success--focus");
-$boxShadow-DateInput-success--focus: createThemeVar("Input:boxShadow-#{$componentName}-success--focus");
-$textColor-DateInput-success--focus: createThemeVar("Input:textColor-#{$componentName}-success--focus");
-$outlineWidth-DateInput-success--focus: createThemeVar("Input:outlineWidth-#{$componentName}-success--focus");
-$outlineColor-DateInput-success--focus: createThemeVar("Input:outlineColor-#{$componentName}-success--focus");
-$outlineStyle-DateInput-success--focus: createThemeVar("Input:outlineStyle-#{$componentName}-success--focus");
-$outlineOffset-DateInput-success--focus: createThemeVar("Input:outlineOffset-#{$componentName}-success--focus");
-$color-adornment-DateInput-success: createThemeVar("Input:color-adornment-#{$componentName}-success");
+$borderRadius-DateInput--success: createThemeVar("Input:borderRadius-#{$componentName}--success");
+$borderColor-DateInput--success: createThemeVar("Input:borderColor-#{$componentName}--success");
+$borderWidth-DateInput--success: createThemeVar("Input:borderWidth-#{$componentName}--success");
+$borderStyle-DateInput--success: createThemeVar("Input:borderStyle-#{$componentName}--success");
+$backgroundColor-DateInput--success: createThemeVar("Input:backgroundColor-#{$componentName}--success");
+$boxShadow-DateInput--success: createThemeVar("Input:boxShadow-#{$componentName}--success");
+$textColor-DateInput--success: createThemeVar("Input:textColor-#{$componentName}--success");
+$borderColor-DateInput--success--hover: createThemeVar("Input:borderColor-#{$componentName}--success--hover");
+$backgroundColor-DateInput--success--hover: createThemeVar("Input:backgroundColor-#{$componentName}--success--hover");
+$boxShadow-DateInput--success--hover: createThemeVar("Input:boxShadow-#{$componentName}--success--hover");
+$textColor-DateInput--success--hover: createThemeVar("Input:textColor-#{$componentName}--success--hover");
+$borderColor-DateInput--success--focus: createThemeVar("Input:borderColor-#{$componentName}--success--focus");
+$backgroundColor-DateInput--success--focus: createThemeVar("Input:backgroundColor-#{$componentName}--success--focus");
+$boxShadow-DateInput--success--focus: createThemeVar("Input:boxShadow-#{$componentName}--success--focus");
+$textColor-DateInput--success--focus: createThemeVar("Input:textColor-#{$componentName}--success--focus");
+$outlineWidth-DateInput--success--focus: createThemeVar("Input:outlineWidth-#{$componentName}--success--focus");
+$outlineColor-DateInput--success--focus: createThemeVar("Input:outlineColor-#{$componentName}--success--focus");
+$outlineStyle-DateInput--success--focus: createThemeVar("Input:outlineStyle-#{$componentName}--success--focus");
+$outlineOffset-DateInput--success--focus: createThemeVar("Input:outlineOffset-#{$componentName}--success--focus");
+$color-adornment-DateInput--success: createThemeVar("Input:color-adornment-#{$componentName}--success");
 
 // Variables for @layer section
 $gap-adornment-DateInput: createThemeVar("Input:gap-adornment-#{$componentName}");
@@ -134,41 +134,41 @@ $borderColor-DateInput--disabled: createThemeVar("Input:borderColor-#{$component
 
 // --- CSS properties of a particular DateInput variant
 @mixin variant($variantName) {
-  border-radius: createThemeVar("Input:borderRadius-#{$componentName}-#{$variantName}");
-  border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}");
-  border-width: createThemeVar("Input:borderWidth-#{$componentName}-#{$variantName}");
-  border-style: createThemeVar("Input:borderStyle-#{$componentName}-#{$variantName}");
-  background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}");
-  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
-  color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}");
+  border-radius: createThemeVar("Input:borderRadius-#{$componentName}--#{$variantName}");
+  border-color: createThemeVar("Input:borderColor-#{$componentName}--#{$variantName}");
+  border-width: createThemeVar("Input:borderWidth-#{$componentName}--#{$variantName}");
+  border-style: createThemeVar("Input:borderStyle-#{$componentName}--#{$variantName}");
+  background-color: createThemeVar("Input:backgroundColor-#{$componentName}--#{$variantName}");
+  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}");
+  color: createThemeVar("Input:textColor-#{$componentName}--#{$variantName}");
 
   &:hover {
-    border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--hover");
+    border-color: createThemeVar("Input:borderColor-#{$componentName}--#{$variantName}--hover");
     background-color: createThemeVar(
-      "Input:backgroundColor-#{$componentName}-#{$variantName}--hover"
+      "Input:backgroundColor-#{$componentName}--#{$variantName}--hover"
     );
-    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
-    color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--hover");
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}--hover");
+    color: createThemeVar("Input:textColor-#{$componentName}--#{$variantName}--hover");
   }
 
   &:focus-within {
-    border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--focus");
+    border-color: createThemeVar("Input:borderColor-#{$componentName}--#{$variantName}--focus");
     background-color: createThemeVar(
-      "Input:backgroundColor-#{$componentName}-#{$variantName}--focus"
+      "Input:backgroundColor-#{$componentName}--#{$variantName}--focus"
     );
-    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--focus");
-    color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--focus");
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}--focus");
+    color: createThemeVar("Input:textColor-#{$componentName}--#{$variantName}--focus");
   }
 
   &:has(.dateInputWrapper input:focus-visible) {
-    outline-width: createThemeVar("Input:outlineWidth-#{$componentName}-#{$variantName}--focus");
-    outline-color: createThemeVar("Input:outlineColor-#{$componentName}-#{$variantName}--focus");
-    outline-style: createThemeVar("Input:outlineStyle-#{$componentName}-#{$variantName}--focus");
-    outline-offset: createThemeVar("Input:outlineOffset-#{$componentName}-#{$variantName}--focus");
+    outline-width: createThemeVar("Input:outlineWidth-#{$componentName}--#{$variantName}--focus");
+    outline-color: createThemeVar("Input:outlineColor-#{$componentName}--#{$variantName}--focus");
+    outline-style: createThemeVar("Input:outlineStyle-#{$componentName}--#{$variantName}--focus");
+    outline-offset: createThemeVar("Input:outlineOffset-#{$componentName}--#{$variantName}--focus");
   }
 
   .adornment {
-    color: createThemeVar("Input:color-adornment-#{$componentName}-#{$variantName}");
+    color: createThemeVar("Input:color-adornment-#{$componentName}--#{$variantName}");
   }
 }
 
@@ -220,14 +220,14 @@ $borderColor-DateInput--disabled: createThemeVar("Input:borderColor-#{$component
       cursor: pointer;
       color: inherit;
       padding: $padding-button-DateInput;
-      border-radius: $borderRadius-DateInput-default;
+      border-radius: $borderRadius-DateInput--default;
       
       &:hover {
         background-color: $backgroundColor-DateInput--hover;
       }
       
       &:focus {
-        outline: 2px solid $outlineColor-DateInput-default--focus;
+        outline: 2px solid $outlineColor-DateInput--default--focus;
         outline-offset: 2px;
       }
       
