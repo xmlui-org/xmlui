@@ -43,7 +43,7 @@ class XmluiFormatter {
   private readonly maxConsecutiveNewlines: number = 2;
   private readonly getText: GetText;
   private readonly startingNode: Node;
-  private readonly maxLineLength: number;
+  private readonly maxLineLength: number = 80;
   private readonly tabSize: number;
   private readonly trimRespectingOptions: (str: string) => string;
   private indentationToken: string;
@@ -54,7 +54,6 @@ class XmluiFormatter {
     this.getText = getText;
     this.startingNode = node;
     this.indentationLvl = 0;
-    this.maxLineLength = 80;
     this.tabSize = options.tabSize;
 
     this.indentationToken = options.insertSpaces ? " ".repeat(options.tabSize) : "\t";

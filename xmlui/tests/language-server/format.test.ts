@@ -208,7 +208,7 @@ describe("XML Formatter", () => {
   });
 
   describe("comments", () => {
-    test("single comment #1", () => {
+    test("should handle comment before tag name", () => {
       const input = `<<!--c-->n attr="val" attr2>
   text1
   <n2
@@ -229,7 +229,7 @@ describe("XML Formatter", () => {
       );
     });
 
-    test("single comment #2", () => {
+    test("should handle comment after tag name", () => {
       const input = `<n<!--c--> attr="val" attr2>
   text1
   <n2
@@ -250,7 +250,7 @@ describe("XML Formatter", () => {
       );
     });
 
-    test("single comment #3", () => {
+    test("should handle comment between attribute name and =", () => {
       const input = `<n attr<!--c-->="val" attr2>
   text1
   <n2
@@ -271,7 +271,7 @@ describe("XML Formatter", () => {
       );
     });
 
-    test("single comment #4", () => {
+    test("should handle comment before attribute value", () => {
       const input = `<n attr=<!--c-->"val" attr2>
   text1
   <n2
@@ -292,7 +292,7 @@ describe("XML Formatter", () => {
       );
     });
 
-    test("single comment #5", () => {
+    test("should handle comment between attributes", () => {
       const input = `<n attr="val"<!--c--> attr2>
   text1
   <n2
@@ -313,7 +313,7 @@ describe("XML Formatter", () => {
       );
     });
 
-    test("single comment #6", () => {
+    test("should handle comment after last attribute", () => {
       const input = `<n attr="val" attr2<!--c-->>
   text1
   <n2
@@ -334,7 +334,7 @@ describe("XML Formatter", () => {
       );
     });
 
-    test("single comment #7", () => {
+    test("should handle comment after opening tag", () => {
       const input = `<n attr="val" attr2><!--c-->
   text1
   <n2
@@ -356,7 +356,7 @@ describe("XML Formatter", () => {
       );
     });
 
-    test("single comment #8", () => {
+    test("should handle comment before text content", () => {
       const input = `<n attr="val" attr2>
   <!--c-->text1
   <n2
@@ -377,7 +377,7 @@ describe("XML Formatter", () => {
       );
     });
 
-    test("single comment #9", () => {
+    test("should handle comment after text content", () => {
       const input = `<n attr="val" attr2>
   text1<!--c-->
   <n2
@@ -398,7 +398,7 @@ describe("XML Formatter", () => {
       );
     });
 
-    test("single comment #10", () => {
+    test("should handle comment before child element", () => {
       const input = `<n attr="val" attr2>
   text1
   <!--c--><n2
@@ -420,7 +420,7 @@ describe("XML Formatter", () => {
       );
     });
 
-    test("single comment #11", () => {
+    test("should handle comment in self closing tag after name", () => {
       const input = `<n attr="val" attr2>
   text1
   <n2<!--c-->
@@ -442,7 +442,7 @@ describe("XML Formatter", () => {
       );
     });
 
-    test("single comment #12", () => {
+    test("should handle comment in self closing tag after newline name", () => {
       const input = `<n attr="val" attr2>
   text1
   <n2
@@ -464,7 +464,7 @@ describe("XML Formatter", () => {
       );
     });
 
-    test("single comment #13", () => {
+    test("should handle comment in self closing tag between attributes", () => {
       const input = `<n attr="val" attr2>
   text1
   <n2
@@ -486,7 +486,7 @@ describe("XML Formatter", () => {
       );
     });
 
-    test("single comment #14", () => {
+    test("should handle comment before self-closing tag closing", () => {
       const input = `<n attr="val" attr2>
   text1
   <n2
@@ -508,7 +508,7 @@ describe("XML Formatter", () => {
       );
     });
 
-    test("single comment #15", () => {
+    test("should handle comment between text and closing tag", () => {
       const input = `<n attr="val" attr2>
   text1
   <n2
@@ -529,7 +529,7 @@ describe("XML Formatter", () => {
       );
     });
 
-    test("single comment #16", () => {
+    test("should handle comment between text with newline and closing tag", () => {
       const input = `<n attr="val" attr2>
   text1
   <n2
@@ -552,7 +552,7 @@ describe("XML Formatter", () => {
       );
     });
 
-    test("single comment #17", () => {
+    test("should handle comment right after last tag", () => {
       const input = `<n attr="val" attr2>
   text1
   <n2
@@ -573,7 +573,7 @@ describe("XML Formatter", () => {
       );
     });
 
-    test("single comment #19", () => {
+    test("should handle comment after closeNodeStart", () => {
       const input = `<n attr="val" attr2>
   text1
   <n2
@@ -594,7 +594,7 @@ describe("XML Formatter", () => {
       );
     });
 
-    test("single comment #20", () => {
+    test("should handle comment after closeing tag name", () => {
       const input = `<n attr="val" attr2>
   text1
   <n2
@@ -878,6 +878,95 @@ describe("XML Formatter", () => {
       Footer content
     </Text>
   </Footer>
+</Fragment>`,
+      );
+    });
+  });
+
+  describe("Additional Test Cases", () => {
+    test("should handle multiple comments in same line", () => {
+      const input = `<Fragment><!-- comment1 --><!-- comment2 --><Text>Content</Text></Fragment>`;
+      const result = formatTwice(input);
+
+      expect(result).toEqual(
+        `<Fragment> <!-- comment1 -->
+  <!-- comment2 -->
+  <Text>
+    Content
+  </Text>
+</Fragment>`,
+      );
+    });
+
+    test("should handle XML with namespaces", () => {
+      const input = `<ns:Fragment xmlns:ns="http://example.com">
+<ns:Text>Content</ns:Text>
+</ns:Fragment>`;
+      const result = formatTwice(input);
+
+      expect(result).toEqual(
+        `<ns:Fragment xmlns:ns="http://example.com">
+  <ns:Text>
+    Content
+  </ns:Text>
+</ns:Fragment>`,
+      );
+    });
+
+    test("should handle XML with escaped content", () => {
+      const input = `<Fragment>
+<Text>&lt;div&gt;Content&lt;/div&gt; &amp; &quot;quotes&quot;</Text>
+</Fragment>`;
+      const result = formatTwice(input);
+
+      expect(result).toEqual(
+        `<Fragment>
+  <Text>
+    &lt;div&gt;Content&lt;/div&gt; &amp; &quot;quotes&quot;
+  </Text>
+</Fragment>`,
+      );
+    });
+
+    test("should handle XML with mixed line endings", () => {
+      const input = `<Fragment>\r\n<Text>Content</Text>\r\n</Fragment>`;
+      const result = formatTwice(input);
+
+      expect(result).toEqual(
+        `<Fragment>
+  <Text>
+    Content
+  </Text>
+</Fragment>`,
+      );
+    });
+
+    test("should handle XML with trailing whitespace", () => {
+      const input = `<Fragment/>     `;
+      const result = formatTwice(input);
+
+      expect(result).toEqual(`<Fragment />`);
+    });
+
+    test("should handle XML with very long lines", () => {
+      const input = `<Fragment><Text attr1="value1" attr2="value2" attr3="value3" attr4="value4" attr5="value5" attr6="value6" attr7="value7" attr8="value8" attr9="value9" attr10="value10">text content</Text></Fragment>`;
+      const result = formatTwice(input);
+
+      expect(result).toEqual(
+        `<Fragment>
+  <Text
+    attr1="value1"
+    attr2="value2"
+    attr3="value3"
+    attr4="value4"
+    attr5="value5"
+    attr6="value6"
+    attr7="value7"
+    attr8="value8"
+    attr9="value9"
+    attr10="value10">
+    text content
+  </Text>
 </Fragment>`,
       );
     });
