@@ -1,5 +1,41 @@
 [
   {
+    "tag_name": "xmlui@0.11.1",
+    "published_at": "2025-10-29T08:11:14Z",
+    "changes": [
+      {
+        "description": "Add the debounce function to globals",
+        "commit_sha": "7bbbb1d"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.11.1.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.1/xmlui-0.11.1.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.10.26",
+    "published_at": "2025-10-27T11:31:35Z",
+    "changes": [
+      {
+        "description": "Heading now accepts \"H1\"...\"H6\", \"1\"...\"6\", too. Invalid values fall back to \"h1\".",
+        "commit_sha": "e1b8d58"
+      },
+      {
+        "description": "Remove the showNavPanelIf property from AppHeader (fix NavPanel's \"when\" usage)",
+        "commit_sha": "1ad832c"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.26.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.26/xmlui-0.10.26.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.10.25",
     "published_at": "2025-10-22T14:39:36Z",
     "changes": [
@@ -184,66 +220,6 @@
       {
         "name": "xmlui-0.10.19.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.19/xmlui-0.10.19.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.10.18",
-    "published_at": "2025-10-06T12:52:25Z",
-    "changes": [
-      {
-        "description": "refactor: use labelBehavior instead of ItemWithLabel",
-        "commit_sha": "202f2b2"
-      },
-      {
-        "description": "Add back removed RadioItem",
-        "commit_sha": "6650ee8"
-      },
-      {
-        "description": "Fixed FormItem validation indicators to use a relaxed validation indication strategy.",
-        "commit_sha": "da98994"
-      },
-      {
-        "description": "fix: labelBehavior, input components - styling issue",
-        "commit_sha": "8394663"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.10.18.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.18/xmlui-0.10.18.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.10.16",
-    "published_at": "2025-10-03T09:59:22Z",
-    "changes": [
-      {
-        "description": "Undust and improve the Tree component",
-        "commit_sha": "0ba6612"
-      },
-      {
-        "description": "Fixed Slider ranged version where only the first thumb is interactable.",
-        "commit_sha": "7b78052"
-      },
-      {
-        "description": "improve: remove cmdk from autocomple, add keywords prop to option",
-        "commit_sha": "314b429"
-      },
-      {
-        "description": "fix: NumberBox initialValue ignores non-convertible string values, minValue and maxValue now applies to typed-in input as well as to increments / decrements with spinner buttons.",
-        "commit_sha": "a1dea8f"
-      },
-      {
-        "description": "refactor: move behavior application earlier in ComponentAdapter render flow",
-        "commit_sha": "cff754c"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.10.16.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.16/xmlui-0.10.16.js"
       }
     ]
   }
