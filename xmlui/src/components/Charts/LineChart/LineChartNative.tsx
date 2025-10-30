@@ -265,7 +265,7 @@ export const LineChart = forwardRef(function LineChart(
               tickLine={false}
               tickFormatter={miniMode ? undefined : tickFormatterY}
               tick={miniMode ? false : !hideTickY && { fill: "currentColor", fontSize }}
-              domain={[(dataMin: number) => dataMin * 0.95, (dataMax: number) => dataMax * 1.05]}
+              domain={[0, (dataMax: number) => Math.ceil((dataMax * 1.05) / 10) * 10]}
             />
             {!miniMode && !hideTooltip && <Tooltip content={safeTooltipRenderer} />}
             {dataKeys.map((dataKey, i) => (
