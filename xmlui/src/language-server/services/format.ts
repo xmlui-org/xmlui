@@ -45,7 +45,7 @@ class XmluiFormatter {
   private readonly startingNode: Node;
   private readonly maxLineLength: number;
   private readonly tabSize: number;
-  private readonly handleTrailingWhitespace: (str: string) => string;
+  private readonly trimRespectingOptions: (str: string) => string;
   private indentationToken: string;
   private indentationLvl: number;
   private newlineToken: string = "\n";
@@ -59,12 +59,12 @@ class XmluiFormatter {
 
     this.indentationToken = options.insertSpaces ? " ".repeat(options.tabSize) : "\t";
     if (options.insertFinalNewline && !options.trimFinalNewlines) {
-      this.handleTrailingWhitespace = (formatted: string) => {
-        return formatted.trimEnd() + this.newlineToken;
+      this.trimRespectingOptions = (formatted: string) => {
+        return formatted.trim() + this.newlineToken;
       };
     } else {
-      this.handleTrailingWhitespace = (formatted: string) => {
-        return formatted.trimEnd();
+      this.trimRespectingOptions = (formatted: string) => {
+        return formatted.trim();
       };
     }
   }
@@ -76,7 +76,7 @@ class XmluiFormatter {
     }
 
     formattedStr = this.printContentListNode(this.startingNode);
-    formattedStr = this.handleTrailingWhitespace(formattedStr);
+    formattedStr = this.trimRespectingOptions(formattedStr);
 
     return formattedStr;
   }

@@ -241,6 +241,16 @@ describe("Xmlui parser", () => {
     expect(child0.kind).toEqual(SyntaxKind.TextNode);
     expect(getText(child0)).equal("  hello\r\n\rbello  ");
   });
+
+  it("Only text as source", () => {
+    const { node, errors, getText } = parseSource("ABC");
+    expect(errors).toHaveLength(0);
+
+    const textElement = node.children![0];
+
+    expect(textElement.kind).toBe(SyntaxKind.TextNode);
+    expect(getText(textElement)).toBe("ABC");
+  });
 });
 
 describe("Xmlui parser - expected scanner errors", () => {
@@ -329,8 +339,7 @@ describe("Xmlui parser - expected scanner errors", () => {
     //The end of file token is the '+1'
     expect(node.children!.length).toEqual(2 + 1);
     expect(node.children![0].kind).toEqual(SyntaxKind.ErrorNode);
-    expect(node.children![1].kind).toEqual(SyntaxKind.ErrorNode);
-    expect(node.children![1].children![0].kind).toEqual(SyntaxKind.TextNode);
+    expect(node.children![1].kind).toEqual(SyntaxKind.TextNode);
     const err = errors[0];
     expect(err.code).toEqual(ErrCodes.untermCData);
     expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<![CDATA[hi there");
@@ -403,14 +412,11 @@ describe("Xmlui parser - expected parser errors", () => {
   });
 
   it("Text after root element", () => {
-    const { errors } = parseSource("<A></A>ABC");
-    expect(errors[0].code).toBe(ErrCodes.expTagOpen);
-  });
+    const { errors, node } = parseSource("<A></A>ABC");
 
-  it("Only text as source", () => {
-    const { errors } = parseSource("ABC");
-    console.log(errors)
-    expect(errors[0].code).toBe(ErrCodes.expTagOpen);
+    expect(node.children![0].kind).toEqual(SyntaxKind.ElementNode);
+    expect(node.children![1].kind).toEqual(SyntaxKind.TextNode);
+    expect(errors).toHaveLength(0);
   });
 
   it("no name for tag", () => {
