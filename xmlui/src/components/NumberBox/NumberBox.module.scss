@@ -242,6 +242,7 @@ $borderColor-NumberBox--disabled: createThemeVar("Input:borderColor-NumberBox--d
       padding: 0 !important;
       width: t.$space-6;
       border: none;
+      line-height: 1;
 
       // &:hover {
       //   background-color: transparent !important;

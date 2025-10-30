@@ -43,6 +43,7 @@ $borderRadius-DateInput--default: createThemeVar("Input:borderRadius-#{$componen
 $borderColor-DateInput--default: createThemeVar("Input:borderColor-#{$componentName}--default");
 $borderWidth-DateInput--default: createThemeVar("Input:borderWidth-#{$componentName}--default");
 $borderStyle-DateInput--default: createThemeVar("Input:borderStyle-#{$componentName}--default");
+$fontSize-input-DateInput--default: createThemeVar("fontSize-input-#{$componentName}--default");
 $backgroundColor-DateInput--default: createThemeVar("Input:backgroundColor-#{$componentName}--default");
 $boxShadow-DateInput--default: createThemeVar("Input:boxShadow-#{$componentName}--default");
 $textColor-DateInput--default: createThemeVar("Input:textColor-#{$componentName}--default");
@@ -65,6 +66,7 @@ $borderRadius-DateInput--error: createThemeVar("Input:borderRadius-#{$componentN
 $borderColor-DateInput--error: createThemeVar("Input:borderColor-#{$componentName}--error");
 $borderWidth-DateInput--error: createThemeVar("Input:borderWidth-#{$componentName}--error");
 $borderStyle-DateInput--error: createThemeVar("Input:borderStyle-#{$componentName}--error");
+$fontSize-input-DateInput--error: createThemeVar("fontSize-input-#{$componentName}--error");
 $backgroundColor-DateInput--error: createThemeVar("Input:backgroundColor-#{$componentName}--error");
 $boxShadow-DateInput--error: createThemeVar("Input:boxShadow-#{$componentName}--error");
 $textColor-DateInput--error: createThemeVar("Input:textColor-#{$componentName}--error");
@@ -87,6 +89,7 @@ $borderRadius-DateInput--warning: createThemeVar("Input:borderRadius-#{$componen
 $borderColor-DateInput--warning: createThemeVar("Input:borderColor-#{$componentName}--warning");
 $borderWidth-DateInput--warning: createThemeVar("Input:borderWidth-#{$componentName}--warning");
 $borderStyle-DateInput--warning: createThemeVar("Input:borderStyle-#{$componentName}--warning");
+$fontSize-input-DateInput--warning: createThemeVar("fontSize-input-#{$componentName}--warning");
 $backgroundColor-DateInput--warning: createThemeVar("Input:backgroundColor-#{$componentName}--warning");
 $boxShadow-DateInput--warning: createThemeVar("Input:boxShadow-#{$componentName}--warning");
 $textColor-DateInput--warning: createThemeVar("Input:textColor-#{$componentName}--warning");
@@ -109,6 +112,7 @@ $borderRadius-DateInput--success: createThemeVar("Input:borderRadius-#{$componen
 $borderColor-DateInput--success: createThemeVar("Input:borderColor-#{$componentName}--success");
 $borderWidth-DateInput--success: createThemeVar("Input:borderWidth-#{$componentName}--success");
 $borderStyle-DateInput--success: createThemeVar("Input:borderStyle-#{$componentName}--success");
+$fontSize-input-DateInput--success: createThemeVar("fontSize-input-#{$componentName}--success");
 $backgroundColor-DateInput--success: createThemeVar("Input:backgroundColor-#{$componentName}--success");
 $boxShadow-DateInput--success: createThemeVar("Input:boxShadow-#{$componentName}--success");
 $textColor-DateInput--success: createThemeVar("Input:textColor-#{$componentName}--success");
@@ -141,6 +145,7 @@ $borderColor-DateInput--disabled: createThemeVar("Input:borderColor-#{$component
   background-color: createThemeVar("Input:backgroundColor-#{$componentName}--#{$variantName}");
   box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}");
   color: createThemeVar("Input:textColor-#{$componentName}--#{$variantName}");
+  font-size: createThemeVar("Input:fontSize-#{$componentName}--#{$variantName}");
 
   &:hover {
     border-color: createThemeVar("Input:borderColor-#{$componentName}--#{$variantName}--hover");
@@ -272,7 +277,7 @@ $borderColor-DateInput--disabled: createThemeVar("Input:borderColor-#{$component
     background: none;
     color: currentColor;
     font: inherit;
-    font-size: $fontSize-input-DateInput;
+    font-size: inherit;
     box-sizing: content-box;
     border-radius: $borderRadius-input-DateInput;
     -webkit-appearance: textfield;

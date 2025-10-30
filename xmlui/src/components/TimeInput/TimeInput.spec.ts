@@ -1218,7 +1218,7 @@ test.describe("Theme Variables", () => {
     createTimeInputDriver,
   }) => {
     await initTestBed(`<TimeInput testId="time-input" />`, {
-      testThemeVars: { "borderRadius-TimeInput-default": "10px" },
+      testThemeVars: { "borderRadius-TimeInput--default": "10px" },
     });
     const driver = await createTimeInputDriver("time-input");
     await expect(driver.component).toHaveCSS("border-radius", "10px");
@@ -1229,7 +1229,7 @@ test.describe("Theme Variables", () => {
     createTimeInputDriver,
   }) => {
     await initTestBed(`<TimeInput testId="time-input" />`, {
-      testThemeVars: { "borderColor-TimeInput-default": "rgb(255, 0, 0)" },
+      testThemeVars: { "borderColor-TimeInput--default": "rgb(255, 0, 0)" },
     });
     const driver = await createTimeInputDriver("time-input");
     await expect(driver.component).toHaveCSS("border-color", "rgb(255, 0, 0)");
@@ -1237,10 +1237,118 @@ test.describe("Theme Variables", () => {
 
   test("applies Input textColor theme variable", async ({ initTestBed, createTimeInputDriver }) => {
     await initTestBed(`<TimeInput testId="time-input" />`, {
-      testThemeVars: { "textColor-TimeInput-default": "rgb(0, 0, 255)" },
+      testThemeVars: { "textColor-TimeInput--default": "rgb(0, 0, 255)" },
     });
     const driver = await createTimeInputDriver("time-input");
     await expect(driver.component).toHaveCSS("color", "rgb(0, 0, 255)");
+  });
+
+  [
+    { value: "--default", prop: "" },
+    { value: "--warning", prop: 'validationStatus="warning"' },
+    { value: "--error", prop: 'validationStatus="error"' },
+    { value: "--success", prop: 'validationStatus="valid"' },
+  ].forEach((variant) => {
+    test(`applies correct borderRadius ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TimeInput testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderRadius-TimeInput${variant.value}`]: "12px" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-radius", "12px");
+    });
+
+    test(`applies correct borderColor ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TimeInput testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderColor-TimeInput${variant.value}`]: "rgb(255, 0, 0)" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    });
+
+    test(`applies correct borderWidth ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TimeInput testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderWidth-TimeInput${variant.value}`]: "1px" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-width", "1px");
+    });
+
+    test(`applies correct borderStyle ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TimeInput testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderStyle-TimeInput${variant.value}`]: "dashed" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-style", "dashed");
+    });
+
+    test(`applies correct fontSize ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TimeInput testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`fontSize-TimeInput${variant.value}`]: "14px" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("font-size", "14px");
+    });
+
+    test(`applies correct backgroundColor ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TimeInput testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`backgroundColor-TimeInput${variant.value}`]: "rgb(240, 240, 240)" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("background-color", "rgb(240, 240, 240)");
+    });
+
+    test(`applies correct boxShadow ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TimeInput testId="test" ${variant.prop} />`, {
+        testThemeVars: {
+          [`boxShadow-TimeInput${variant.value}`]: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS(
+        "box-shadow",
+        "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
+      );
+    });
+
+    test(`applies correct textColor ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TimeInput testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`textColor-TimeInput${variant.value}`]: "rgb(0, 0, 0)" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("color", "rgb(0, 0, 0)");
+    });
+
+    test(`applies correct borderColor on hover ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TimeInput testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderColor-TimeInput${variant.value}--hover`]: "rgb(0, 0, 0)" },
+      });
+      await page.getByTestId("test").hover();
+      await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(0, 0, 0)");
+    });
+
+    test(`applies correct backgroundColor on hover ${variant.value}`, async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`<TimeInput testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`backgroundColor-TimeInput${variant.value}--hover`]: "rgb(0, 0, 0)" },
+      });
+      await page.getByTestId("test").hover();
+      await expect(page.getByTestId("test")).toHaveCSS("background-color", "rgb(0, 0, 0)");
+    });
+
+    test(`applies correct boxShadow on hover ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TimeInput testId="test" ${variant.prop} />`, {
+        testThemeVars: {
+          [`boxShadow-TimeInput${variant.value}--hover`]: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        },
+      });
+      await page.getByTestId("test").hover();
+      await expect(page.getByTestId("test")).toHaveCSS(
+        "box-shadow",
+        "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
+      );
+    });
+
+    test(`applies correct textColor on hover ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TimeInput testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`textColor-TimeInput${variant.value}--hover`]: "rgb(0, 0, 0)" },
+      });
+      await page.getByTestId("test").hover();
+      await expect(page.getByTestId("test")).toHaveCSS("color", "rgb(0, 0, 0)");
+    });
   });
 });
 

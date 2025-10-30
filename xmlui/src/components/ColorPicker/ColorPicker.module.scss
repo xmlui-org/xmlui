@@ -65,7 +65,7 @@ $backgroundColor-ColorPicker: createThemeVar("Input:backgroundColor-#{$component
   border-style: createThemeVar("Input:borderStyle-#{$componentName}--#{$variantName}");
   box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}");
 
-  &:hover {
+  &:not([readonly]):hover {
     border-color: createThemeVar("Input:borderColor-#{$componentName}--#{$variantName}--hover");
     box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}--hover");
   }
@@ -85,6 +85,9 @@ $backgroundColor-ColorPicker: createThemeVar("Input:backgroundColor-#{$component
     -webkit-appearance: none;
     -moz-appearance: none;
     padding: 2px;
+    &:not([readonly]) {
+      cursor: pointer;
+    }
 
     &::-webkit-color-swatch-wrapper {
       padding: 0;

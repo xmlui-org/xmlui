@@ -839,36 +839,6 @@ test.describe("Theme Vars", () => {
     await expect(driver.component).toHaveCSS("background-color", "rgb(128, 128, 128)");
   });
 
-  test("valid borderColor", async ({ initTestBed, createCheckboxDriver }) => {
-    await initTestBed(`<Switch validationStatus="valid" />`, {
-      testThemeVars: {
-        "borderColor-checked-Switch-success": "rgb(0, 255, 0)",
-      },
-    });
-    const driver = await createCheckboxDriver();
-    await expect(driver.component).toBeVisible();
-  });
-
-  test("warning borderColor", async ({ initTestBed, createCheckboxDriver }) => {
-    await initTestBed(`<Switch validationStatus="warning" />`, {
-      testThemeVars: {
-        "borderColor-checked-Switch-warning": "rgb(255, 165, 0)",
-      },
-    });
-    const driver = await createCheckboxDriver();
-    await expect(driver.component).toBeVisible();
-  });
-
-  test("error borderColor", async ({ initTestBed, createCheckboxDriver }) => {
-    await initTestBed(`<Switch validationStatus="error" />`, {
-      testThemeVars: {
-        "borderColor-checked-Switch-error": "rgb(255, 0, 0)",
-      },
-    });
-    const driver = await createCheckboxDriver();
-    await expect(driver.component).toBeVisible();
-  });
-
   test("outlineWidth on focus", async ({ initTestBed, createCheckboxDriver }) => {
     await initTestBed(`<Switch />`, {
       testThemeVars: {
@@ -893,44 +863,63 @@ test.describe("Theme Vars", () => {
 });
 
 // =============================================================================
-// VALIDATION STATUS TESTS
+// VALIDATION TESTS
 // =============================================================================
 
 test.describe("Validation", () => {
-  test("validationStatus=error correctly displayed", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
-    await initTestBed(`<Switch validationStatus="error" />`);
-    const driver = await createCheckboxDriver();
-    await expect(driver.component).toHaveClass(/error/);
+  test(`applies correct borderColor --default`, async ({ initTestBed, page }) => {
+    await initTestBed(`<Switch testId="test" />`, {
+      testThemeVars: {
+        "borderColor-Switch": "rgb(255, 0, 0)",
+      },
+    });
+    await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(255, 0, 0)");
   });
 
-  test("validationStatus=warning correctly displayed", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
-    await initTestBed(`<Switch validationStatus="warning" />`);
-    const driver = await createCheckboxDriver();
-    await expect(driver.component).toHaveClass(/warning/);
+  test(`applies correct backgroundColor when checked --default`, async ({ initTestBed, page }) => {
+    await initTestBed(`<Switch testId="test" initialValue="true" />`, {
+      testThemeVars: {
+        "backgroundColor-checked-Switch": "rgb(240, 240, 240)",
+      },
+    });
+    await expect(page.getByTestId("test")).toHaveCSS("background-color", "rgb(240, 240, 240)");
   });
 
-  test("validationStatus=valid correctly displayed", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
-    await initTestBed(`<Switch validationStatus="valid" />`);
-    const driver = await createCheckboxDriver();
-    await expect(driver.component).toHaveClass(/valid/);
+  test(`applies correct borderColor on hover`, async ({ initTestBed, page }) => {
+    await initTestBed(`<Switch testId="test" />`, {
+      testThemeVars: { [`borderColor-Switch--default--hover`]: "rgb(0, 0, 0)" },
+    });
+    await page.getByTestId("test").hover();
+    await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(0, 0, 0)");
   });
 
-  test("handles invalid validationStatus gracefully", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
-    await initTestBed(`<Switch validationStatus="invalid-status" />`);
-    const driver = await createCheckboxDriver();
-    await expect(driver.component).toBeVisible();
+  [
+    { value: "--warning", prop: 'validationStatus="warning"' },
+    { value: "--error", prop: 'validationStatus="error"' },
+    { value: "--success", prop: 'validationStatus="valid"' },
+  ].forEach((variant) => {
+    test(`applies correct borderColor ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Switch testId="test" ${variant.prop} />`, {
+        testThemeVars: {
+          [`borderColor-Switch${variant.value === "--default" ? "" : variant.value}`]:
+            "rgb(255, 0, 0)",
+        },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    });
+
+    test(`applies correct backgroundColor when checked ${variant.value}`, async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`<Switch testId="test" initialValue="true" ${variant.prop} />`, {
+        testThemeVars: {
+          [`backgroundColor-checked-Switch${variant.value === "--default" ? "" : variant.value}`]:
+            "rgb(240, 240, 240)",
+        },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("background-color", "rgb(240, 240, 240)");
+    });
   });
 });
 

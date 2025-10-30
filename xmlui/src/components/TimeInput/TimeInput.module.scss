@@ -71,6 +71,7 @@ $borderRadius-TimeInput--default: createThemeVar("Input:borderRadius-#{$componen
 $borderColor-TimeInput--default: createThemeVar("Input:borderColor-#{$componentName}--default");
 $borderWidth-TimeInput--default: createThemeVar("Input:borderWidth-#{$componentName}--default");
 $borderStyle-TimeInput--default: createThemeVar("Input:borderStyle-#{$componentName}--default");
+$fontSize-TimeInput--default: createThemeVar("Input:fontSize-#{$componentName}--default");
 $backgroundColor-TimeInput--default: createThemeVar("Input:backgroundColor-#{$componentName}--default");
 $boxShadow-TimeInput--default: createThemeVar("Input:boxShadow-#{$componentName}--default");
 $textColor-TimeInput--default: createThemeVar("Input:textColor-#{$componentName}--default");
@@ -93,6 +94,7 @@ $borderRadius-TimeInput--error: createThemeVar("Input:borderRadius-#{$componentN
 $borderColor-TimeInput--error: createThemeVar("Input:borderColor-#{$componentName}--error");
 $borderWidth-TimeInput--error: createThemeVar("Input:borderWidth-#{$componentName}--error");
 $borderStyle-TimeInput--error: createThemeVar("Input:borderStyle-#{$componentName}--error");
+$fontSize-TimeInput--error: createThemeVar("Input:fontSize-#{$componentName}--error");
 $backgroundColor-TimeInput--error: createThemeVar("Input:backgroundColor-#{$componentName}--error");
 $boxShadow-TimeInput--error: createThemeVar("Input:boxShadow-#{$componentName}--error");
 $textColor-TimeInput--error: createThemeVar("Input:textColor-#{$componentName}--error");
@@ -115,6 +117,7 @@ $borderRadius-TimeInput--warning: createThemeVar("Input:borderRadius-#{$componen
 $borderColor-TimeInput--warning: createThemeVar("Input:borderColor-#{$componentName}--warning");
 $borderWidth-TimeInput--warning: createThemeVar("Input:borderWidth-#{$componentName}--warning");
 $borderStyle-TimeInput--warning: createThemeVar("Input:borderStyle-#{$componentName}--warning");
+$fontSize-TimeInput--warning: createThemeVar("Input:fontSize-#{$componentName}--warning");
 $backgroundColor-TimeInput--warning: createThemeVar("Input:backgroundColor-#{$componentName}--warning");
 $boxShadow-TimeInput--warning: createThemeVar("Input:boxShadow-#{$componentName}--warning");
 $textColor-TimeInput--warning: createThemeVar("Input:textColor-#{$componentName}--warning");
@@ -137,6 +140,7 @@ $borderRadius-TimeInput--success: createThemeVar("Input:borderRadius-#{$componen
 $borderColor-TimeInput--success: createThemeVar("Input:borderColor-#{$componentName}--success");
 $borderWidth-TimeInput--success: createThemeVar("Input:borderWidth-#{$componentName}--success");
 $borderStyle-TimeInput--success: createThemeVar("Input:borderStyle-#{$componentName}--success");
+$fontSize-TimeInput--success: createThemeVar("Input:fontSize-#{$componentName}--success");
 $backgroundColor-TimeInput--success: createThemeVar("Input:backgroundColor-#{$componentName}--success");
 $boxShadow-TimeInput--success: createThemeVar("Input:boxShadow-#{$componentName}--success");
 $textColor-TimeInput--success: createThemeVar("Input:textColor-#{$componentName}--success");
@@ -169,6 +173,7 @@ $borderColor-TimeInput--disabled: createThemeVar("Input:borderColor-#{$component
   background-color: createThemeVar("Input:backgroundColor-#{$componentName}--#{$variantName}");
   box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}");
   color: createThemeVar("Input:textColor-#{$componentName}--#{$variantName}");
+  font-size: createThemeVar("Input:fontSize-#{$componentName}--#{$variantName}");
 
   &:hover {
     border-color: createThemeVar("Input:borderColor-#{$componentName}--#{$variantName}--hover");
@@ -291,7 +296,7 @@ $borderColor-TimeInput--disabled: createThemeVar("Input:borderColor-#{$component
     background: none;
     color: currentColor;
     font: inherit;
-    font-size: $fontSize-input-TimeInput;
+    font-size: inherit;
     box-sizing: content-box;
     border-radius: $borderRadius-input-TimeInput;
     -webkit-appearance: textfield;
