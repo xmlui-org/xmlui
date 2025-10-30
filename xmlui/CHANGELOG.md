@@ -1,5 +1,13 @@
 # xmlui
 
+## 0.11.3
+
+### Patch Changes
+
+- 4a311e2: improve: charts - better domain configuration
+- f8a75ce: Tiny Splitter updates
+- bbc421b: Text strong variant style fixed
+
 ## 0.11.2
 
 ### Patch Changes
