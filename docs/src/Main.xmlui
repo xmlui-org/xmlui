@@ -145,6 +145,9 @@
             <NavLink
                 label="Debounce user input for API calls"
                 to="/howto/debounce-user-input-for-api-calls" />
+            <NavLink
+                label="Debounce with ChangeListener"
+                to="/howto/debounce-with-changelistener" />
             <!-- Add more links as additional files are created -->
         </NavGroup>
         <NavGroup label="Reference">
@@ -548,6 +551,10 @@
         <Page url="/howto/debounce-user-input-for-api-calls">
             <DocumentPageNoTOC
                 url="/pages/howto/debounce-user-input-for-api-calls.md" />
+        </Page>
+        <Page url="/howto/debounce-with-changelistener">
+            <DocumentPageNoTOC
+                url="/pages/howto/debounce-with-changelistener.md" />
         </Page>
 
         <!-- Add more pages as additional files are created -->
