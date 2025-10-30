@@ -74,14 +74,7 @@
       "outputs": ["dist/**"]
     },
     "release:docs": {
-      "dependsOn": [
-        "^build:extension",
-        "^build:xmlui",
-        "gen:releases",
-        "gen:download-latest-xmlui-release",
-        "generate-docs-summaries",
-        "xmlui-docs#release-docs"
-      ],
+      "dependsOn": ["build:docs"],
       "outputs": ["dist/ui.zip"]
     },
     "build:blog": {
