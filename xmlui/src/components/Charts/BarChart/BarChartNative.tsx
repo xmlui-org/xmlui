@@ -152,7 +152,7 @@ export function BarChart({
             payloadArray.push({
               label: dataKey,
               value: originalPayload[dataKey],
-              color: colorValues[index] || colorValues[0]
+              color: colorValues[index] || colorValues[0],
             });
           }
         });
@@ -280,7 +280,6 @@ export function BarChart({
 
   const onMouseEnter = useCallback(
     (e) => {
-
       setTooltipPosition({ x: e.x - tooltipWidth / 2, y: e.y });
     },
     [setTooltipPosition, tooltipWidth],
@@ -308,11 +307,11 @@ export function BarChart({
   const customTooltipRenderer = useCallback(
     (props: any) => {
       const tooltipContent = safeTooltipRenderer(props);
-      
+
       return (
         <div
           ref={(el) => {
-            if (el && el !== tooltipElement) {
+            if (el) {
               setTooltipElement(el);
             }
           }}
@@ -333,7 +332,7 @@ export function BarChart({
           height: miniMode || hideX ? 0 : xAxisHeight,
           tick: miniMode || hideTickX ? false : { fill: "currentColor", fontSize },
           tickFormatter: miniMode || hideTickX ? undefined : tickFormatterX,
-          domain: [0, (dataMax: number) => dataMax * 1.05],
+          domain: [0, (dataMax: number) => Math.ceil((dataMax * 1.05) / 10) * 10],
         }
       : {
           type: "category",
@@ -368,7 +367,13 @@ export function BarChart({
           tickCount: yTickCount,
           tickFormatter: miniMode || hideTickY ? undefined : tickFormatterY,
           width: miniMode || hideY ? 0 : yAxisWidth,
-          domain: [0, (dataMax: number) => dataMax * 1.1],
+          domain: [
+            0,
+            (dataMax: number) => {
+              const roundedMax = Math.ceil((dataMax * 1.05) / 10) * 10;
+              return roundedMax;
+            },
+          ],
         };
 
   return (
