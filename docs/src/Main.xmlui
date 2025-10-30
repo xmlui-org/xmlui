@@ -272,7 +272,7 @@
                 <NavGroup label="Xmlui Website Blocks">
                 <NavLink label="Extension Overview" to="/extensions/xmlui-website-blocks/_overview" />
                 <NavLink label="Carousel" to="/extensions/xmlui-website-blocks/Carousel" />
-                <NavLink label="HelloMd" to="/extensions/xmlui-website-blocks/HelloMd" />
+                <NavLink label="FancyButton" to="/extensions/xmlui-website-blocks/FancyButton" />
                 <NavLink label="HeroSection" to="/extensions/xmlui-website-blocks/HeroSection" />
                 <NavLink label="ScrollToTop" to="/extensions/xmlui-website-blocks/ScrollToTop" />
                 </NavGroup>
