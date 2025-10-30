@@ -80,7 +80,7 @@
         "gen:releases",
         "gen:download-latest-xmlui-release",
         "generate-docs-summaries",
-        "release-docs"
+        "xmlui-docs#release-docs"
       ],
       "outputs": ["dist/ui.zip"]
     },
