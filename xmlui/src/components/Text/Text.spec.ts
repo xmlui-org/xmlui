@@ -1345,6 +1345,349 @@ test.describe("Theme Variables", () => {
     const component = (await createTextDriver()).component;
     await expect(component).toHaveCSS("line-break", EXPECTED);
   });
+
+  // =============================================================================
+  // PREDEFINED VARIANT TESTS
+  // =============================================================================
+
+  test("variant='secondary' applies secondary theme variables", async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
+    await initTestBed(`
+      <Theme fontSize-Text-secondary="14px" textColor-Text-secondary="rgb(100, 100, 100)">
+        <Text variant="secondary" testId="text">Secondary text</Text>
+      </Theme>
+    `);
+
+    const component = (await createTextDriver("text")).component;
+    await expect(component).toHaveCSS("font-size", "14px");
+    await expect(component).toHaveCSS("color", "rgb(100, 100, 100)");
+  });
+
+  test("variant='abbr' applies abbreviation theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme fontWeight-Text-abbr="700" textTransform-Text-abbr="uppercase">
+        <Text variant="abbr" testId="text">HTML</Text>
+      </Theme>
+    `);
+
+    const component = page.getByTestId("text");
+    await expect(component).toHaveCSS("font-weight", "700");
+    await expect(component).toHaveCSS("text-transform", "uppercase");
+  });
+
+  test("variant='cite' applies citation theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme fontStyle-Text-cite="italic">
+        <Text variant="cite" testId="text">Citation</Text>
+      </Theme>
+    `);
+
+    const component = page.getByTestId("text");
+    await expect(component).toHaveCSS("font-style", "italic");
+  });
+
+  test("variant='code' applies inline code theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme 
+        fontFamily-Text-code="monospace"
+        fontSize-Text-code="14px"
+        borderWidth-Text-code="1px"
+        borderStyle-Text-code="solid"
+        borderRadius-Text-code="4px"
+        paddingHorizontal-Text-code="4px"
+        paddingBottom-Text-code="2px"
+        backgroundColor-Text-code="rgb(240, 240, 240)"
+        borderColor-Text-code="rgb(200, 200, 200)"
+      >
+        <Text variant="code" testId="text">code</Text>
+      </Theme>
+    `);
+
+    const component = page.getByTestId("text");
+    await expect(component).toHaveCSS("font-family", "monospace");
+    await expect(component).toHaveCSS("font-size", "14px");
+    await expect(component).toHaveCSS("border-width", "1px");
+    await expect(component).toHaveCSS("border-style", "solid");
+    await expect(component).toHaveCSS("border-radius", "4px");
+    await expect(component).toHaveCSS("padding-left", "4px");
+    await expect(component).toHaveCSS("padding-right", "4px");
+    await expect(component).toHaveCSS("padding-bottom", "2px");
+    await expect(component).toHaveCSS("background-color", "rgb(240, 240, 240)");
+    await expect(component).toHaveCSS("border-color", "rgb(200, 200, 200)");
+  });
+
+  test("variant='deleted' applies deleted text theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme textDecorationLine-Text-deleted="line-through">
+        <Text variant="deleted" testId="text">Deleted text</Text>
+      </Theme>
+    `);
+
+    const component = page.getByTestId("text");
+    await expect(component).toHaveCSS("text-decoration-line", "line-through");
+  });
+
+  test("variant='inserted' applies inserted text theme variables", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Theme textDecorationLine-Text-inserted="underline">
+        <Text variant="inserted" testId="text">Inserted text</Text>
+      </Theme>
+    `);
+
+    const component = page.getByTestId("text");
+    await expect(component).toHaveCSS("text-decoration-line", "underline");
+  });
+
+  test("variant='keyboard' applies keyboard theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme 
+        fontFamily-Text-keyboard="monospace"
+        fontSize-Text-keyboard="14px"
+        fontWeight-Text-keyboard="700"
+        borderWidth-Text-keyboard="1px"
+        paddingHorizontal-Text-keyboard="4px"
+        backgroundColor-Text-keyboard="rgb(245, 245, 245)"
+        borderColor-Text-keyboard="rgb(180, 180, 180)"
+      >
+        <Text variant="keyboard" testId="text">Ctrl+C</Text>
+      </Theme>
+    `);
+
+    const component = page.getByTestId("text");
+    await expect(component).toHaveCSS("font-family", "monospace");
+    await expect(component).toHaveCSS("font-size", "14px");
+    await expect(component).toHaveCSS("font-weight", "700");
+    await expect(component).toHaveCSS("border-width", "1px");
+    await expect(component).toHaveCSS("padding-left", "4px");
+    await expect(component).toHaveCSS("padding-right", "4px");
+    await expect(component).toHaveCSS("background-color", "rgb(245, 245, 245)");
+    await expect(component).toHaveCSS("border-color", "rgb(180, 180, 180)");
+  });
+
+  test("variant='sample' applies sample theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme 
+        fontFamily-Text-sample="monospace"
+        fontSize-Text-sample="14px"
+      >
+        <Text variant="sample" testId="text">Sample output</Text>
+      </Theme>
+    `);
+
+    const component = page.getByTestId("text");
+    await expect(component).toHaveCSS("font-family", "monospace");
+    await expect(component).toHaveCSS("font-size", "14px");
+  });
+
+  test("variant='sup' applies superscript theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme 
+        fontSize-Text-sup="12px"
+        verticalAlignment-Text-sup="super"
+      >
+        <Text variant="sup" testId="text">2</Text>
+      </Theme>
+    `);
+
+    const component = page.getByTestId("text");
+    await expect(component).toHaveCSS("font-size", "12px");
+    await expect(component).toHaveCSS("vertical-align", "super");
+  });
+
+  test("variant='sub' applies subscript theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme 
+        fontSize-Text-sub="12px"
+        verticalAlignment-Text-sub="sub"
+      >
+        <Text variant="sub" testId="text">2</Text>
+      </Theme>
+    `);
+
+    const component = page.getByTestId("text");
+    await expect(component).toHaveCSS("font-size", "12px");
+    await expect(component).toHaveCSS("vertical-align", "sub");
+  });
+
+  test("variant='var' applies variable theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme fontStyle-Text-var="italic">
+        <Text variant="var" testId="text">variable</Text>
+      </Theme>
+    `);
+
+    const component = page.getByTestId("text");
+    await expect(component).toHaveCSS("font-style", "italic");
+  });
+
+  test("variant='em' applies emphasis theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme fontStyle-Text-em="italic">
+        <Text variant="em" testId="text">Emphasized</Text>
+      </Theme>
+    `);
+
+    const component = page.getByTestId("text");
+    await expect(component).toHaveCSS("font-style", "italic");
+  });
+
+  test("variant='mono' applies monospace theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme fontFamily-Text-mono="monospace">
+        <Text variant="mono" testId="text">Monospace text</Text>
+      </Theme>
+    `);
+
+    const component = page.getByTestId("text");
+    await expect(component).toHaveCSS("font-family", "monospace");
+  });
+
+  test("variant='title' applies title theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme fontSize-Text-title="32px">
+        <Text variant="title" testId="text">Main Title</Text>
+      </Theme>
+    `);
+
+    const component = page.getByTestId("text");
+    await expect(component).toHaveCSS("font-size", "32px");
+  });
+
+  test("variant='subtitle' applies subtitle theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme fontSize-Text-subtitle="24px">
+        <Text variant="subtitle" testId="text">Subtitle</Text>
+      </Theme>
+    `);
+
+    const component = page.getByTestId("text");
+    await expect(component).toHaveCSS("font-size", "24px");
+  });
+
+  test("variant='small' applies small text theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme fontSize-Text-small="14px">
+        <Text variant="small" testId="text">Small text</Text>
+      </Theme>
+    `);
+
+    const component = page.getByTestId("text");
+    await expect(component).toHaveCSS("font-size", "14px");
+  });
+
+  test("variant='caption' applies caption theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme letterSpacing-Text-caption="0.8px">
+        <Text variant="caption" testId="text">Caption text</Text>
+      </Theme>
+    `);
+
+    const component = page.getByTestId("text");
+    await expect(component).toHaveCSS("letter-spacing", "0.8px");
+  });
+
+  test("variant='placeholder' applies placeholder theme variables", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Theme 
+        fontSize-Text-placeholder="12px"
+        textColor-Text-placeholder="rgb(150, 150, 150)"
+      >
+        <Text variant="placeholder" testId="text">Placeholder text</Text>
+      </Theme>
+    `);
+
+    const component = page.getByTestId("text");
+    await expect(component).toHaveCSS("font-size", "12px");
+    await expect(component).toHaveCSS("color", "rgb(150, 150, 150)");
+  });
+
+  test("variant='paragraph' applies paragraph theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme paddingVertical-Text-paragraph="4px">
+        <Text variant="paragraph" testId="text">Paragraph text</Text>
+      </Theme>
+    `);
+
+    const component = page.getByTestId("text");
+    await expect(component).toHaveCSS("padding-top", "4px");
+    await expect(component).toHaveCSS("padding-bottom", "4px");
+  });
+
+  test("variant='subheading' applies subheading theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme 
+        fontSize-Text-subheading="18px"
+        fontWeight-Text-subheading="700"
+        letterSpacing-Text-subheading="0.8px"
+        textTransform-Text-subheading="uppercase"
+        textColor-Text-subheading="rgb(80, 80, 80)"
+      >
+        <Text variant="subheading" testId="text">Subheading</Text>
+      </Theme>
+    `);
+
+    const component = page.getByTestId("text");
+    await expect(component).toHaveCSS("font-size", "18px");
+    await expect(component).toHaveCSS("font-weight", "700");
+    await expect(component).toHaveCSS("letter-spacing", "0.8px");
+    await expect(component).toHaveCSS("text-transform", "uppercase");
+    await expect(component).toHaveCSS("color", "rgb(80, 80, 80)");
+  });
+
+  test("variant='tableheading' applies table heading theme variables", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Theme 
+        marginTop-Text-tableheading="4px"
+        marginBottom-Text-tableheading="16px"
+        paddingHorizontal-Text-tableheading="4px"
+        fontSize-Text-tableheading="18px"
+        fontWeight-Text-tableheading="700"
+      >
+        <Text variant="tableheading" testId="text">Table Header</Text>
+      </Theme>
+    `);
+
+    const component = page.getByTestId("text");
+    await expect(component).toHaveCSS("margin-top", "4px");
+    await expect(component).toHaveCSS("margin-bottom", "16px");
+    await expect(component).toHaveCSS("padding-left", "4px");
+    await expect(component).toHaveCSS("padding-right", "4px");
+    await expect(component).toHaveCSS("font-size", "18px");
+    await expect(component).toHaveCSS("font-weight", "700");
+  });
+
+  test("variant='strong' applies strong theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme fontWeight-Text-strong="700">
+        <Text variant="strong" testId="text">Strong text</Text>
+      </Theme>
+    `);
+
+    const component = page.getByTestId("text");
+    await expect(component).toHaveCSS("font-weight", "700");
+  });
+
+  test("variant='marked' applies marked theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme backgroundColor-Text-marked="rgb(255, 255, 0)">
+        <Text variant="marked" testId="text">Highlighted text</Text>
+      </Theme>
+    `);
+
+    const component = page.getByTestId("text");
+    await expect(component).toHaveCSS("background-color", "rgb(255, 255, 0)");
+  });
 });
 
 // =============================================================================
