@@ -32,6 +32,7 @@
     "test:e2e:smoke": "cross-env PLAYWRIGHT_USE_DEV_SERVER=false playwright test --project=*-smoke",
     "build-extensions": "turbo run build:extension",
     "build-docs": "turbo run build:docs",
+    "release-docs": "turbo run release:docs",
     "build-blog": "turbo run build:blog",
     "watch-docs-content": "turbo watch generate-docs-summaries",
     "generate-docs": "turbo run generate-docs"

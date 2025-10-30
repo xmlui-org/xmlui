@@ -73,6 +73,10 @@
       ],
       "outputs": ["dist/**"]
     },
+    "release:docs": {
+      "dependsOn": ["build:docs"],
+      "outputs": ["dist/ui.zip"]
+    },
     "build:blog": {
       "dependsOn": ["^build:extension", "^build:xmlui"],
       "outputs": ["dist/**"]
