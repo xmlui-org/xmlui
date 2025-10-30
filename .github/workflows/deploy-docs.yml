@@ -28,7 +28,7 @@ jobs:
 
       - run: npm ci --prefer-offline
 
-      - run: cd docs && npm run release:docs
+      - run: npm run release:docs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCS_XMLUI_MAX_RELEASES_LENGTH: ${{ github.event.inputs.max_releases }}

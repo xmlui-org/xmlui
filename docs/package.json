@@ -10,7 +10,7 @@
     "gen:rss": "node scripts/generate-rss.js",
     "build:docs": "xmlui build --buildMode=INLINE_ALL --withMock && npm run gen:download-latest-xmlui-release && npm run gen:rss",
     "build-optimized": "npm run gen:releases && npm run gen:download-latest-xmlui-release && npm run gen:rss && npx xmlui-optimizer",
-    "release:docs": "npm run build:docs && xmlui zip-dist --source=dist --target=dist/ui.zip",
+    "release-docs": "npm run build:docs && xmlui zip-dist --source=dist --target=dist/ui.zip",
     "release-ci-optimized": "npm run build-optimized && xmlui zip-dist --source=xmlui-optimized-output --target=ui-optimized.zip",
     "preview-optimized": "npx serve@latest ./xmlui-optimized-output"
   },

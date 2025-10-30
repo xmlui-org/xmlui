@@ -79,7 +79,8 @@
         "^build:xmlui",
         "gen:releases",
         "gen:download-latest-xmlui-release",
-        "generate-docs-summaries"
+        "generate-docs-summaries",
+        "release-docs"
       ],
       "outputs": ["dist/ui.zip"]
     },
