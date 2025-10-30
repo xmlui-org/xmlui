@@ -501,7 +501,7 @@ async function evalFunctionInvocationAsync(
       thread,
       ...expr.arguments.map((a) => ({ ...a, _EXPRESSION_: true })),
     );
-    functionObj = await createArrowFunctionAsync(evaluator, functionObj as ArrowExpression);
+    functionObj = createArrowFunctionAsync(evaluator, functionObj as ArrowExpression);
   } else if (expr.obj.type === T_ARROW_EXPRESSION) {
     // --- We delay evaluating expression values. We pass the argument names as the first parameter, and then
     // --- all parameter expressions

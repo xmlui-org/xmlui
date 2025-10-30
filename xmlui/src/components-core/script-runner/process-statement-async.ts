@@ -74,6 +74,19 @@ export async function processStatementQueueAsync(
   evalContext: BindingTreeEvaluationContext,
   thread?: LogicalThread,
 ): Promise<QueueInfo> {
+  // --- Log event handler correlation information
+  if (evalContext.eventHandlerContext) {
+    const ctx = evalContext.eventHandlerContext;
+    console.log(`[Event Handler Correlation] Processing statements for:
+      Component: ${ctx.componentType} (${ctx.componentUid.toString()})
+      Event: ${ctx.eventName}
+      Execution ID: ${ctx.executionId.toString()}
+      Handler Hash: ${ctx.handlerHash}
+      Sequence: ${ctx.sequenceNumber}
+      Start Time: ${ctx.startTime}
+      Statements Count: ${statements.length}`);
+  }
+
   if (!thread) {
     // --- Create the main thread for the queue
     thread = ensureMainThread(evalContext);

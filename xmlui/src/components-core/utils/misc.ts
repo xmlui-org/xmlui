@@ -43,6 +43,25 @@ export function randomUUID() {
   );
 }
 
+/**
+ * Generates a stable hash from a string input using a simple hash algorithm.
+ * This is used for creating consistent identifiers for event handlers.
+ * @param input The string to hash
+ * @returns A stable hash string
+ */
+export function hashString(input: string): string {
+  let hash = 0;
+  if (input.length === 0) return hash.toString();
+  
+  for (let i = 0; i < input.length; i++) {
+    const char = input.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  
+  return Math.abs(hash).toString(36);
+}
+
 export function readCookie(name) {
   const nameEQ = name + "=";
   const ca = document.cookie.split(";");

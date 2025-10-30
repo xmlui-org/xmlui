@@ -60,7 +60,37 @@ export type BindingTreeEvaluationContext = {
 
   // --- Sign that a particular statement has completed
   onStatementCompleted?(evalContext: BindingTreeEvaluationContext, stmt: Statement): void | Promise<void>;
+
+  // --- Event handler context for correlation and tracking
+  eventHandlerContext?: EventHandlerContext;
 };
+
+// --- Event handler context for tracking and correlation
+export interface EventHandlerContext {
+  // --- Unique identifier for this specific execution instance
+  executionId: symbol;
+  
+  // --- Component instance identifier
+  componentUid: symbol;
+  
+  // --- Event name that triggered this handler (e.g., "didChange", "click")
+  eventName: string;
+  
+  // --- Component type (e.g., "TextBox", "Button")
+  componentType: string;
+  
+  // --- Original handler source code
+  handlerSource: string;
+  
+  // --- Stable hash of the handler source for identity
+  handlerHash: string;
+  
+  // --- Execution start timestamp
+  startTime: number;
+  
+  // --- Sequence number for this component's event executions
+  sequenceNumber: number;
+}
 
 // --- The type of non-local variable update
 type UpdateType = "assignment" | "pre-post" | "function-call";

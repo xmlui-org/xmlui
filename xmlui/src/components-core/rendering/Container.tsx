@@ -42,12 +42,12 @@ import type {
   ContainerWrapperDef,
   RegisterComponentApiFnInner,
 } from "../rendering/ContainerWrapper";
-import type { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
+import type { BindingTreeEvaluationContext, EventHandlerContext } from "../script-runner/BindingTreeEvaluationContext";
 import { processStatementQueueAsync } from "../script-runner/process-statement-async";
 import { processStatementQueue } from "../script-runner/process-statement-sync";
 import { extractParam, shouldKeep } from "../utils/extractParam";
 import { useIsomorphicLayoutEffect } from "../utils/hooks";
-import { capitalizeFirstLetter, delay, generatedId, useEvent } from "../utils/misc";
+import { capitalizeFirstLetter, delay, generatedId, useEvent, hashString } from "../utils/misc";
 import { parseHandlerCode, prepareHandlerStatements } from "../utils/statementUtils";
 import { renderChild } from "./renderChild";
 import { useTheme } from "../theming/ThemeContext";
@@ -149,6 +149,9 @@ export const Container = memo(
 
     const { apiInstance } = useApiInterceptorContext();
 
+    // --- Track sequence numbers for event handler executions
+    const eventSequenceRef = useRef(new Map<string, number>());
+
     const runCodeAsync = useEvent(
       async (
         source: string | ParsedEventValue | ArrowExpression,
@@ -160,6 +163,40 @@ export const Container = memo(
         const canSignEventLifecycle = () => {
           return componentUid.description !== undefined && options?.eventName !== undefined;
         };
+
+        // --- Create event handler context for correlation
+        let eventHandlerContext: EventHandlerContext | undefined;
+        if (componentUid.description && options?.eventName) {
+          let handlerSource: string;
+          if (typeof source === "string") {
+            handlerSource = source;
+          } else if (isParsedEventValue(source)) {
+            handlerSource = JSON.stringify(source.statements);
+          } else if (isArrowExpression(source)) {
+            handlerSource = JSON.stringify(source);
+          } else {
+            handlerSource = "unknown";
+          }
+          
+          const handlerHash = hashString(handlerSource);
+          const componentKey = `${componentUid.toString()}-${options.eventName}`;
+          
+          // Get and increment sequence number
+          const currentSequence = eventSequenceRef.current.get(componentKey) || 0;
+          const sequenceNumber = currentSequence + 1;
+          eventSequenceRef.current.set(componentKey, sequenceNumber);
+          
+          eventHandlerContext = {
+            executionId: Symbol(`${componentUid.description}-${options.eventName}-${Date.now()}-${Math.random()}`),
+            componentUid,
+            eventName: options.eventName,
+            componentType: node.type,
+            handlerSource,
+            handlerHash,
+            startTime: Date.now(),
+            sequenceNumber,
+          };
+        }
 
         let changes: Array<any> = [];
         const getComponentStateClone = () => {
@@ -206,6 +243,8 @@ export const Container = memo(
                 ? appContext.appGlobals.defaultToOptionalMemberAccess
                 : true,
           },
+          // Add event handler context for correlation
+          eventHandlerContext,
         };
 
         try {
