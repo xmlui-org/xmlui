@@ -4,6 +4,7 @@ import { get, throttle } from "lodash-es";
 import { formatDistanceToNow } from "date-fns";
 
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
+import type { EventHandlerContext } from "../script-runner/BindingTreeEvaluationContext";
 
 /**
  * Slice a single array into two based on a discriminator function.
@@ -589,6 +590,13 @@ const debounceRegistry = new Map<string, {
  * When called from XMLUI markup, it automatically generates a stable key based on the
  * call site to ensure proper debouncing across multiple invocations.
  * 
+ * This function supports two signatures:
+ * 1. Legacy: debounce(delayMs, func, ...args)
+ * 2. EventHandlerContextAware: debounce(context, delayMs, func, ...args)
+ * 
+ * The second signature is automatically used when called from event handlers
+ * that have EventHandlerContext available.
+ * 
  * @param delayMs The number of milliseconds to delay execution
  * @param func The function to debounce
  * @param args Optional arguments to pass to the function when it executes
@@ -606,10 +614,49 @@ export function debounce<F extends (...args: any[]) => any>(
   delayMs: number,
   func: F,
   ...args: any[]
+): void;
+
+export function debounce<F extends (...args: any[]) => any>(
+  context: EventHandlerContext,
+  delayMs: number,
+  func: F,
+  ...args: any[]
+): void;
+
+export function debounce<F extends (...args: any[]) => any>(
+  contextOrDelayMs: EventHandlerContext | number,
+  delayMsOrFunc: number | F,
+  funcOrFirstArg?: F | any,
+  ...restArgs: any[]
 ): void {
-  // Generate a unique key for this debounce call based on the function source
-  // This ensures that the same event handler in markup reuses the same timer
-  const key = func.toString();
+  let context: EventHandlerContext | undefined;
+  let delayMs: number;
+  let func: F;
+  let args: any[];
+
+  // Handle both signatures
+  if (typeof contextOrDelayMs === 'object' && contextOrDelayMs.executionId) {
+    // New signature: debounce(context, delayMs, func, ...args)
+    context = contextOrDelayMs as EventHandlerContext;
+    delayMs = delayMsOrFunc as number;
+    func = funcOrFirstArg as F;
+    args = restArgs;
+  } else {
+    // Legacy signature: debounce(delayMs, func, ...args)
+    delayMs = contextOrDelayMs as number;
+    func = delayMsOrFunc as F;
+    args = funcOrFirstArg ? [funcOrFirstArg, ...restArgs] : restArgs;
+  }
+
+  // Generate stable key
+  let key: string;
+  if (context) {
+    // Use stable event handler identity when context is available
+    key = `${context.componentUid.toString()}-${context.eventName}-${context.handlerHash}`;
+  } else {
+    // Fallback to function source (existing behavior)
+    key = func.toString();
+  }
 
   // Clear existing timeout for this key
   const existing = debounceRegistry.get(key);
@@ -628,3 +675,8 @@ export function debounce<F extends (...args: any[]) => any>(
 
   debounceRegistry.set(key, { timeoutId, args });
 }
+
+// Test helper to clear the debounce registry
+(debounce as any).__clearRegistry = () => {
+  debounceRegistry.clear();
+};

@@ -67,6 +67,7 @@ import {
 import { ensureMainThread } from "./process-statement-common";
 import { getAsyncProxy } from "./asyncProxy";
 import { isBannedFunction } from "./bannedFunctions";
+import { isEventHandlerContextAwareFunction } from "./event-handler-context-aware-functions";
 
 type EvaluatorAsyncFunction = (
   thisStack: any[],
@@ -553,6 +554,13 @@ async function evalFunctionInvocationAsync(
       } else {
         throw new Error("Cannot use implicitContextGetter, it is undefined");
       }
+    }
+
+    // --- Check if this is an EventHandlerContextAware function and inject context
+    const eventHandlerContextAwareInfo = isEventHandlerContextAwareFunction(functionObj);
+    if (eventHandlerContextAwareInfo?.injectContext && evalContext.eventHandlerContext) {
+      // Always inject context as first argument for EventHandlerContextAware functions
+      functionArgs.unshift(evalContext.eventHandlerContext);
     }
   }
 
