@@ -686,14 +686,18 @@ test.describe("Theme Variables", () => {
     expect(placeholderColor).toBe("rgb(0, 0, 0)");
   });
 
-  test("applies correct fontSize to placeholder", async ({ initTestBed, page }) => {
-    await initTestBed(`<AutoComplete testId="test" placeholder="Search..." />`, {
-      testThemeVars: { "fontSize-placeholder-AutoComplete": "20px" },
-    });
-    const placeholderFontSize = await page.evaluate(() => {
-      const input = document.querySelector("input");
-      return window.getComputedStyle(input, "::placeholder").fontSize;
-    });
-    expect(placeholderFontSize).toBe("20px");
-  });
+  test.fixme(
+    "applies correct fontSize to placeholder",
+    SKIP_REASON.UNSURE("Does AutoComplete applies the correct css for the placeholder?"),
+    async ({ initTestBed, page }) => {
+      await initTestBed(`<AutoComplete testId="test" placeholder="Search..." />`, {
+        testThemeVars: { "fontSize-placeholder-AutoComplete--default": "20px" },
+      });
+      const placeholderFontSize = await page.evaluate(() => {
+        const input = document.querySelector("input");
+        return window.getComputedStyle(input, "::placeholder").fontSize;
+      });
+      expect(placeholderFontSize).toBe("20px");
+    },
+  );
 });

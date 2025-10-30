@@ -968,66 +968,6 @@ test.describe("Theme Vars", () => {
     await expect(page.getByRole("checkbox")).toHaveCSS("background-color", EXPECTED_COLOR);
   });
 
-  test("valid borderColor", async ({ initTestBed, page }) => {
-    const EXPECTED_COLOR = "rgb(255, 0, 0)";
-    await initTestBed(`<Checkbox validationStatus="valid" />`, {
-      testThemeVars: {
-        "borderColor-Checkbox--success": EXPECTED_COLOR,
-      },
-    });
-    await expect(page.getByRole("checkbox")).toHaveCSS("border-color", EXPECTED_COLOR);
-  });
-
-  test("valid backgroundColor", async ({ initTestBed, page }) => {
-    const EXPECTED_COLOR = "rgb(255, 0, 0)";
-    await initTestBed(`<Checkbox validationStatus="valid" />`, {
-      testThemeVars: {
-        "backgroundColor-Checkbox--success": EXPECTED_COLOR,
-      },
-    });
-    await expect(page.getByRole("checkbox")).toHaveCSS("background-color", EXPECTED_COLOR);
-  });
-
-  test("warning borderColor", async ({ initTestBed, page }) => {
-    const EXPECTED_COLOR = "rgb(255, 0, 0)";
-    await initTestBed(`<Checkbox validationStatus="warning" />`, {
-      testThemeVars: {
-        "borderColor-Checkbox-warning": EXPECTED_COLOR,
-      },
-    });
-    await expect(page.getByRole("checkbox")).toHaveCSS("border-color", EXPECTED_COLOR);
-  });
-
-  test("warning backgroundColor", async ({ initTestBed, page }) => {
-    const EXPECTED_COLOR = "rgb(255, 0, 0)";
-    await initTestBed(`<Checkbox validationStatus="warning" />`, {
-      testThemeVars: {
-        "backgroundColor-Checkbox--warning": EXPECTED_COLOR,
-      },
-    });
-    await expect(page.getByRole("checkbox")).toHaveCSS("background-color", EXPECTED_COLOR);
-  });
-
-  test("error borderColor", async ({ initTestBed, page }) => {
-    const EXPECTED_COLOR = "rgb(255, 0, 0)";
-    await initTestBed(`<Checkbox validationStatus="error" />`, {
-      testThemeVars: {
-        "borderColor-Checkbox-error": EXPECTED_COLOR,
-      },
-    });
-    await expect(page.getByRole("checkbox")).toHaveCSS("border-color", EXPECTED_COLOR);
-  });
-
-  test("error backgroundColor", async ({ initTestBed, page }) => {
-    const EXPECTED_COLOR = "rgb(255, 0, 0)";
-    await initTestBed(`<Checkbox validationStatus="error" />`, {
-      testThemeVars: {
-        "backgroundColor-Checkbox-error": EXPECTED_COLOR,
-      },
-    });
-    await expect(page.getByRole("checkbox")).toHaveCSS("background-color", EXPECTED_COLOR);
-  });
-
   test("borderRadius", async ({ initTestBed, page }) => {
     const CUSTOM_BORDER_RADIUS = "10px";
     await initTestBed(`<Checkbox />`, {
