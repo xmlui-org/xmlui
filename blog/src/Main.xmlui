@@ -29,7 +29,7 @@
     ]}`>
     <AppHeader>
         <property name="logoTemplate">
-            <Link to="https:/blog.xmlui.org/">
+            <Link to="/">
                 <Logo height="$space-8"/>
             </Link>
         </property>
