@@ -612,36 +612,6 @@ test.describe("Theme Vars", () => {
     await expect(driver.component).toHaveCSS("background-color", "rgb(240, 240, 240)");
   });
 
-  test("error borderColor applies with error validation", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox testId="input" validationStatus="error" />`, {
-      testThemeVars: {
-        "borderColor-TextBox-error": "rgb(255, 0, 0)",
-      },
-    });
-    const driver = await createTextBoxDriver("input");
-    await expect(driver.component).toHaveCSS("border-color", "rgb(255, 0, 0)");
-  });
-
-  test("warning borderColor applies with warning validation", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox testId="input" validationStatus="warning" />`, {
-      testThemeVars: {
-        "borderColor-TextBox-warning": "rgb(255, 165, 0)",
-      },
-    });
-    const driver = await createTextBoxDriver("input");
-    await expect(driver.component).toHaveCSS("border-color", "rgb(255, 165, 0)");
-  });
-
-  test("success borderColor applies with valid validation", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox testId="input" validationStatus="valid" />`, {
-      testThemeVars: {
-        "borderColor-TextBox-success": "rgb(0, 255, 0)",
-      },
-    });
-    const driver = await createTextBoxDriver("input");
-    await expect(driver.component).toHaveCSS("border-color", "rgb(0, 255, 0)");
-  });
-
   test("borderRadius applies correctly", async ({ initTestBed, createTextBoxDriver }) => {
     await initTestBed(`<TextBox testId="input" />`, {
       testThemeVars: {
@@ -668,43 +638,13 @@ test.describe("Theme Vars", () => {
 // =============================================================================
 
 test.describe("Validation", () => {
-  test("validationStatus=error correctly displayed", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox testId="input" validationStatus="error" />`, {
-      testThemeVars: {
-        "borderColor-TextBox-error": "rgb(255, 0, 0)",
-      },
-    });
-    const driver = await createTextBoxDriver("input");
-    await expect(driver.component).toHaveCSS("border-color", "rgb(255, 0, 0)");
-  });
-
-  test("validationStatus=warning correctly displayed", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox testId="input" validationStatus="warning" />`, {
-      testThemeVars: {
-        "borderColor-TextBox-warning": "rgb(255, 165, 0)",
-      },
-    });
-    const driver = await createTextBoxDriver("input");
-    await expect(driver.component).toHaveCSS("border-color", "rgb(255, 165, 0)");
-  });
-
-  test("validationStatus=valid correctly displayed", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox testId="input" validationStatus="valid" />`, {
-      testThemeVars: {
-        "borderColor-TextBox-success": "rgb(0, 255, 0)",
-      },
-    });
-    const driver = await createTextBoxDriver("input");
-    await expect(driver.component).toHaveCSS("border-color", "rgb(0, 255, 0)");
-  });
-
   test("handles invalid validationStatus gracefully", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox testId="input" validationStatus="invalid-status" />`, {
+    await initTestBed(`<TextBox testId="input" validationStatus="invalid" />`, {
       testThemeVars: {
-        "borderColor-TextBox": "rgb(0, 0, 0)",
-        "borderColor-TextBox-error": "rgb(255, 0, 0)",
-        "borderColor-TextBox-warning": "rgb(255, 165, 0)",
-        "borderColor-TextBox-success": "rgb(0, 255, 0)",
+        "borderColor-TextBox--default": "rgb(0, 0, 0)",
+        "borderColor-TextBox--error": "rgb(255, 0, 0)",
+        "borderColor-TextBox--warning": "rgb(255, 165, 0)",
+        "borderColor-TextBox--success": "rgb(0, 255, 0)",
       },
     });
     const driver = await createTextBoxDriver("input");
@@ -712,6 +652,114 @@ test.describe("Validation", () => {
     await expect(driver.component).not.toHaveCSS("border-color", "rgb(255, 165, 0)");
     await expect(driver.component).not.toHaveCSS("border-color", "rgb(0, 255, 0)");
     await expect(driver.component).toHaveCSS("border-color", "rgb(0, 0, 0)");
+  });
+
+  [
+    { value: "--default", prop: "" },
+    { value: "--warning", prop: 'validationStatus="warning"' },
+    { value: "--error", prop: 'validationStatus="error"' },
+    { value: "--success", prop: 'validationStatus="valid"' },
+  ].forEach((variant) => {
+    test(`applies correct borderRadius ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TextBox testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderRadius-TextBox${variant.value}`]: "12px" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-radius", "12px");
+    });
+
+    test(`applies correct borderColor ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TextBox testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderColor-TextBox${variant.value}`]: "rgb(255, 0, 0)" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    });
+
+    test(`applies correct borderWidth ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TextBox testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderWidth-TextBox${variant.value}`]: "1px" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-width", "1px");
+    });
+
+    test(`applies correct borderStyle ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TextBox testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderStyle-TextBox${variant.value}`]: "dashed" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-style", "dashed");
+    });
+
+    test(`applies correct fontSize ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TextBox testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`fontSize-TextBox${variant.value}`]: "14px" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("font-size", "14px");
+    });
+
+    test(`applies correct backgroundColor ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TextBox testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`backgroundColor-TextBox${variant.value}`]: "rgb(240, 240, 240)" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("background-color", "rgb(240, 240, 240)");
+    });
+
+    test(`applies correct boxShadow ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TextBox testId="test" ${variant.prop} />`, {
+        testThemeVars: {
+          [`boxShadow-TextBox${variant.value}`]: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS(
+        "box-shadow",
+        "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
+      );
+    });
+
+    test(`applies correct textColor ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TextBox testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`textColor-TextBox${variant.value}`]: "rgb(0, 0, 0)" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("color", "rgb(0, 0, 0)");
+    });
+
+    test(`applies correct borderColor on hover ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TextBox testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderColor-TextBox${variant.value}--hover`]: "rgb(0, 0, 0)" },
+      });
+      await page.getByTestId("test").hover();
+      await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(0, 0, 0)");
+    });
+
+    test(`applies correct backgroundColor on hover ${variant.value}`, async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`<TextBox testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`backgroundColor-TextBox${variant.value}--hover`]: "rgb(0, 0, 0)" },
+      });
+      await page.getByTestId("test").hover();
+      await expect(page.getByTestId("test")).toHaveCSS("background-color", "rgb(0, 0, 0)");
+    });
+
+    test(`applies correct boxShadow on hover ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TextBox testId="test" ${variant.prop} />`, {
+        testThemeVars: {
+          [`boxShadow-TextBox${variant.value}--hover`]: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        },
+      });
+      await page.getByTestId("test").hover();
+      await expect(page.getByTestId("test")).toHaveCSS(
+        "box-shadow",
+        "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
+      );
+    });
+
+    test(`applies correct textColor on hover ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<TextBox testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`textColor-TextBox${variant.value}--hover`]: "rgb(0, 0, 0)" },
+      });
+      await page.getByTestId("test").hover();
+      await expect(page.getByTestId("test")).toHaveCSS("color", "rgb(0, 0, 0)");
+    });
   });
 });
 

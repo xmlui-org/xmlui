@@ -608,44 +608,88 @@ test.describe("Theme Variables", () => {
 });
 
 // =============================================================================
-// VALIDATION STATUS TESTS
+// VALIDATION TESTS
 // =============================================================================
 
-test.describe("Validation", () => {
-  test(`validationStatus=error applies correctly`, async ({ initTestBed, page }) => {
-    await initTestBed(`<Slider validationStatus="error" />`, {
-      testThemeVars: {
-        [`borderColor-Slider-error`]: "rgb(255, 0, 0)",
-      },
-    });
-    const sliderTrack = page.locator("[data-track]");
-    await expect(sliderTrack).toHaveCSS("border-color", "rgb(255, 0, 0)");
-  });
-
-  // NOTE: warning color is not applied correctly
-  test.fixme(`validationStatus=warning applies correctly`, async ({ initTestBed, page }) => {
-    await initTestBed(`<Slider validationStatus="warning" />`, {
-      testThemeVars: {
-        [`borderColor-Slider-warning`]: "rgb(255, 165, 0)",
-      },
-    });
-    const sliderTrack = page.locator("[data-track]");
-    await expect(sliderTrack).toHaveCSS("border-color", "rgb(218, 127, 0)");
-  });
-
-  test(`validationStatus=valid applies correctly`, async ({ initTestBed, page }) => {
-    await initTestBed(`<Slider validationStatus="valid" />`, {
-      testThemeVars: {
-        [`borderColor-Slider-success`]: "rgb(0, 255, 0)",
-      },
-    });
-    const sliderTrack = page.locator("[data-track]");
-    await expect(sliderTrack).toHaveCSS("border-color", "rgb(0, 255, 0)");
-  });
-
+test.describe("Validation", () => {  
   test("handles invalid validationStatus gracefully", async ({ initTestBed, page }) => {
     await initTestBed(`<Slider validationStatus="invalid" />`);
     await expect(page.getByRole("slider")).toBeVisible();
+  });
+
+  [
+    { value: "--default", prop: "" },
+    { value: "--warning", prop: 'validationStatus="warning"' },
+    { value: "--error", prop: 'validationStatus="error"' },
+    { value: "--success", prop: 'validationStatus="valid"' },
+  ].forEach((variant) => {
+    test(`applies correct borderRadius ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Slider ${variant.prop} />`, {
+        testThemeVars: { [`borderRadius-Slider${variant.value}`]: "12px" },
+      });
+      const sliderTrack = page.locator("[data-track]");
+      await expect(sliderTrack).toHaveCSS("border-radius", "12px");
+    });
+
+    test(`applies correct borderColor ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Slider ${variant.prop} />`, {
+        testThemeVars: { [`borderColor-Slider${variant.value}`]: "rgb(255, 0, 0)" },
+      });
+      const sliderTrack = page.locator("[data-track]");
+      await expect(sliderTrack).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    });
+
+    test(`applies correct borderWidth ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Slider testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderWidth-Slider${variant.value}`]: "1px" },
+      });
+      const sliderTrack = page.locator("[data-track]");
+      await expect(sliderTrack).toHaveCSS("border-width", "1px");
+    });
+
+    test(`applies correct borderStyle ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Slider ${variant.prop} />`, {
+        testThemeVars: { [`borderStyle-Slider${variant.value}`]: "dashed" },
+      });
+      const sliderTrack = page.locator("[data-track]");
+      await expect(sliderTrack).toHaveCSS("border-style", "dashed");
+    });
+
+    test(`applies correct boxShadow ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Slider ${variant.prop} />`, {
+        testThemeVars: {
+          [`boxShadow-Slider${variant.value}`]: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        },
+      });
+      const sliderTrack = page.locator("[data-track]");
+      await expect(sliderTrack).toHaveCSS(
+        "box-shadow",
+        "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
+      );
+    });
+
+    test(`applies correct borderColor on hover ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Slider ${variant.prop} />`, {
+        testThemeVars: { [`borderColor-Slider${variant.value}--hover`]: "rgb(0, 0, 0)" },
+      });
+      const sliderTrack = page.locator("[data-track]");
+      await sliderTrack.hover();
+      await expect(sliderTrack).toHaveCSS("border-color", "rgb(0, 0, 0)");
+    });
+
+    test(`applies correct boxShadow on hover ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Slider ${variant.prop} />`, {
+        testThemeVars: {
+          [`boxShadow-Slider${variant.value}--hover`]: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        },
+      });
+      const sliderTrack = page.locator("[data-track]");
+      await sliderTrack.hover();
+      await expect(sliderTrack).toHaveCSS(
+        "box-shadow",
+        "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
+      );
+    });
   });
 });
 

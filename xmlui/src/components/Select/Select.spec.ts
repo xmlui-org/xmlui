@@ -823,3 +823,117 @@ test.describe("Z-Index and Modal Layering", () => {
     await expect(page.getByRole("option", { name: "Account" })).toBeVisible();
   });
 });
+
+// =============================================================================
+// THEME VARIABLE TESTS
+// =============================================================================
+
+test.describe("Theme Variables", () => {
+  [
+    { value: "--default", prop: "" },
+    { value: "--warning", prop: 'validationStatus="warning"' },
+    { value: "--error", prop: 'validationStatus="error"' },
+    { value: "--success", prop: 'validationStatus="valid"' },
+  ].forEach((variant) => {
+    test(`applies correct borderRadius ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderRadius-Select${variant.value}`]: "12px" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-radius", "12px");
+    });
+
+    test(`applies correct borderColor ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderColor-Select${variant.value}`]: "rgb(255, 0, 0)" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    });
+
+    test(`applies correct borderWidth ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderWidth-Select${variant.value}`]: "1px" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-width", "1px");
+    });
+
+    test(`applies correct borderStyle ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderStyle-Select${variant.value}`]: "dashed" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-style", "dashed");
+    });
+
+    test(`applies correct fontSize ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`fontSize-Select${variant.value}`]: "14px" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("font-size", "14px");
+    });
+
+    test(`applies correct backgroundColor ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`backgroundColor-Select${variant.value}`]: "rgb(240, 240, 240)" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("background-color", "rgb(240, 240, 240)");
+    });
+
+    test(`applies correct boxShadow ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: {
+          [`boxShadow-Select${variant.value}`]: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS(
+        "box-shadow",
+        "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
+      );
+    });
+
+    test(`applies correct textColor ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`textColor-Select${variant.value}`]: "rgb(0, 0, 0)" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("color", "rgb(0, 0, 0)");
+    });
+
+    test(`applies correct borderColor on hover ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderColor-Select${variant.value}--hover`]: "rgb(0, 0, 0)" },
+      });
+      await page.getByTestId("test").hover();
+      await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(0, 0, 0)");
+    });
+
+    test(`applies correct backgroundColor on hover ${variant.value}`, async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`backgroundColor-Select${variant.value}--hover`]: "rgb(0, 0, 0)" },
+      });
+      await page.getByTestId("test").hover();
+      await expect(page.getByTestId("test")).toHaveCSS("background-color", "rgb(0, 0, 0)");
+    });
+
+    test(`applies correct boxShadow on hover ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: {
+          [`boxShadow-Select${variant.value}--hover`]: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        },
+      });
+      await page.getByTestId("test").hover();
+      await expect(page.getByTestId("test")).toHaveCSS(
+        "box-shadow",
+        "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
+      );
+    });
+
+    test(`applies correct textColor on hover ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`textColor-Select${variant.value}--hover`]: "rgb(0, 0, 0)" },
+      });
+      await page.getByTestId("test").hover();
+      await expect(page.getByTestId("test")).toHaveCSS("color", "rgb(0, 0, 0)");
+    });
+  });
+});

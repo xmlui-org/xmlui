@@ -35,6 +35,14 @@ $fontSize-heading-Table: createThemeVar("fontSize-heading-#{$component}");
 $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component}");
 $borderRadius-Table: createThemeVar("borderRadius-#{$component}");
 
+// Variables for @layer section
+$outlineWidth-heading-Table--focus: createThemeVar('outlineWidth-heading-#{$component}--focus');
+$outlineColor-heading-Table--focus: createThemeVar('outlineColor-heading-#{$component}--focus');
+$outlineStyle-heading-Table--focus: createThemeVar('outlineStyle-heading-#{$component}--focus');
+$outlineOffset-heading-Table--focus: createThemeVar('outlineOffset-heading-#{$component}--focus');
+$borderBottom-cell-Table: createThemeVar("borderBottom-cell-Table");
+$borderBottom-last-row-Table: createThemeVar("borderBottom-last-row-Table");
+$borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
 
 @layer components {
   .wrapper {
@@ -82,10 +90,10 @@ $borderRadius-Table: createThemeVar("borderRadius-#{$component}");
       }
 
       &:focus-visible {
-        outline-width: createThemeVar('outlineWidth-heading-#{$component}--focus');
-        outline-color: createThemeVar('outlineColor-heading-#{$component}--focus');
-        outline-style: createThemeVar('outlineStyle-heading-#{$component}--focus');
-        outline-offset: createThemeVar('outlineOffset-heading-#{$component}--focus');
+        outline-width: $outlineWidth-heading-Table--focus;
+        outline-color: $outlineColor-heading-Table--focus;
+        outline-style: $outlineStyle-heading-Table--focus;
+        outline-offset: $outlineOffset-heading-Table--focus;
 
       }
     }
@@ -140,7 +148,7 @@ $borderRadius-Table: createThemeVar("borderRadius-#{$component}");
     .headerRow {
       display: flex;
       flex-direction: row;
-      border-bottom: createThemeVar("borderBottom-cell-Table");
+      border-bottom: $borderBottom-cell-Table;
       user-select: none;
       //background-color: inherit;
 
@@ -250,7 +258,7 @@ $borderRadius-Table: createThemeVar("borderRadius-#{$component}");
       }
 
       &:last-child{
-        border-bottom: createThemeVar("borderBottom-last-row-Table");
+        border-bottom: $borderBottom-last-row-Table;
       }
 
       &.noBottomBorder:last-child {
@@ -365,7 +373,7 @@ $borderRadius-Table: createThemeVar("borderRadius-#{$component}");
       content: '';
       width: 1px;
       height: 100%;
-      background: createThemeVar("borderColor-cell-Table");
+      background: $borderColor-cell-Table;
     }
   }
 

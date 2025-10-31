@@ -11,21 +11,29 @@ $component: "TreeDisplay";
 $fontSize-TreeDisplay: createThemeVar("fontSize-#{$component}");
 $themeVars: t.composeBorderVars($themeVars, $component);
 
+// Variables for @layer section
+$backgroundColor-TreeDisplay: createThemeVar("backgroundColor-#{$component}");
+$padding-TreeDisplay: createThemeVar("padding-#{$component}");
+$paddingLeft-TreeDisplay: createThemeVar("paddingLeft-#{$component}");
+$fontFamily-TreeDisplay: createThemeVar("fontFamily-#{$component}");
+$color-TreeDisplay: createThemeVar("color-#{$component}");
+$color-connect-TreeDisplay: createThemeVar("color-connect-#{$component}");
+
 @layer components {
   .treeDisplay {
     display: block;
     @include t.borderVars($themeVars, $component);
-    background-color: createThemeVar("backgroundColor-#{$component}");
-    padding: createThemeVar("padding-#{$component}");
-    padding-left: createThemeVar("paddingLeft-#{$component}");
+    background-color: $backgroundColor-TreeDisplay;
+    padding: $padding-TreeDisplay;
+    padding-left: $paddingLeft-TreeDisplay;
   }
 
   .content {
     display: block;
     word-break: break-word;
-    font-family: createThemeVar("fontFamily-#{$component}");
+    font-family: $fontFamily-TreeDisplay;
     font-size: $fontSize-TreeDisplay;
-    color: createThemeVar("color-#{$component}");
+    color: $color-TreeDisplay;
   }
 
   .treeNode {
@@ -53,7 +61,7 @@ $themeVars: t.composeBorderVars($themeVars, $component);
   }
 
   .connectorLine {
-    stroke: createThemeVar("color-connect-#{$component}");
+    stroke: $color-connect-TreeDisplay;
     fill: none;
   }
 
@@ -62,7 +70,7 @@ $themeVars: t.composeBorderVars($themeVars, $component);
     top: 0;
     width: 1.5px;
     height: 100%;
-    background-color: createThemeVar("color-connect-#{$component}");
+    background-color: $color-connect-TreeDisplay;
     z-index: 1;
     pointer-events: none;
   }

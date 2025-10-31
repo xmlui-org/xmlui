@@ -29,6 +29,84 @@ $color-anchor-Heading: createThemeVar("color-anchor-Heading");
 $gap-anchor-Heading: createThemeVar("gap-anchor-Heading");
 $textDecorationLine-anchor-Heading: createThemeVar("textDecorationLine-anchor-Heading");
 
+// Variables for H1
+$textColor-H1: createThemeVar("Heading:textColor-H1");
+$letterSpacing-H1: createThemeVar("Heading:letterSpacing-H1");
+$fontFamily-H1: createThemeVar("Heading:fontFamily-H1");
+$fontWeight-H1: createThemeVar("Heading:fontWeight-H1");
+$marginTop-H1: createThemeVar("marginTop-H1");
+$marginBottom-H1: createThemeVar("marginBottom-H1");
+$textDecorationLine-H1: createThemeVar("Heading:textDecorationLine-H1");
+$textDecorationColor-H1: createThemeVar("Heading:textDecorationColor-H1");
+$textDecorationStyle-H1: createThemeVar("Heading:textDecorationStyle-H1");
+$textDecorationThickness-H1: createThemeVar("Heading:textDecorationThickness-H1");
+$textUnderlineOffset-H1: createThemeVar("Heading:textUnderlineOffset-H1");
+
+// Variables for H2
+$textColor-H2: createThemeVar("Heading:textColor-H2");
+$letterSpacing-H2: createThemeVar("Heading:letterSpacing-H2");
+$fontFamily-H2: createThemeVar("Heading:fontFamily-H2");
+$fontWeight-H2: createThemeVar("Heading:fontWeight-H2");
+$marginTop-H2: createThemeVar("marginTop-H2");
+$marginBottom-H2: createThemeVar("marginBottom-H2");
+$textDecorationLine-H2: createThemeVar("Heading:textDecorationLine-H2");
+$textDecorationColor-H2: createThemeVar("Heading:textDecorationColor-H2");
+$textDecorationStyle-H2: createThemeVar("Heading:textDecorationStyle-H2");
+$textDecorationThickness-H2: createThemeVar("Heading:textDecorationThickness-H2");
+$textUnderlineOffset-H2: createThemeVar("Heading:textUnderlineOffset-H2");
+
+// Variables for H3
+$textColor-H3: createThemeVar("Heading:textColor-H3");
+$letterSpacing-H3: createThemeVar("Heading:letterSpacing-H3");
+$fontFamily-H3: createThemeVar("Heading:fontFamily-H3");
+$fontWeight-H3: createThemeVar("Heading:fontWeight-H3");
+$marginTop-H3: createThemeVar("marginTop-H3");
+$marginBottom-H3: createThemeVar("marginBottom-H3");
+$textDecorationLine-H3: createThemeVar("Heading:textDecorationLine-H3");
+$textDecorationColor-H3: createThemeVar("Heading:textDecorationColor-H3");
+$textDecorationStyle-H3: createThemeVar("Heading:textDecorationStyle-H3");
+$textDecorationThickness-H3: createThemeVar("Heading:textDecorationThickness-H3");
+$textUnderlineOffset-H3: createThemeVar("Heading:textUnderlineOffset-H3");
+
+// Variables for H4
+$textColor-H4: createThemeVar("Heading:textColor-H4");
+$letterSpacing-H4: createThemeVar("Heading:letterSpacing-H4");
+$fontFamily-H4: createThemeVar("Heading:fontFamily-H4");
+$fontWeight-H4: createThemeVar("Heading:fontWeight-H4");
+$marginTop-H4: createThemeVar("marginTop-H4");
+$marginBottom-H4: createThemeVar("marginBottom-H4");
+$textDecorationLine-H4: createThemeVar("Heading:textDecorationLine-H4");
+$textDecorationColor-H4: createThemeVar("Heading:textDecorationColor-H4");
+$textDecorationStyle-H4: createThemeVar("Heading:textDecorationStyle-H4");
+$textDecorationThickness-H4: createThemeVar("Heading:textDecorationThickness-H4");
+$textUnderlineOffset-H4: createThemeVar("Heading:textUnderlineOffset-H4");
+
+// Variables for H5
+$textColor-H5: createThemeVar("Heading:textColor-H5");
+$letterSpacing-H5: createThemeVar("Heading:letterSpacing-H5");
+$fontFamily-H5: createThemeVar("Heading:fontFamily-H5");
+$fontWeight-H5: createThemeVar("Heading:fontWeight-H5");
+$marginTop-H5: createThemeVar("marginTop-H5");
+$marginBottom-H5: createThemeVar("marginBottom-H5");
+$textDecorationLine-H5: createThemeVar("Heading:textDecorationLine-H5");
+$textDecorationColor-H5: createThemeVar("Heading:textDecorationColor-H5");
+$textDecorationStyle-H5: createThemeVar("Heading:textDecorationStyle-H5");
+$textDecorationThickness-H5: createThemeVar("Heading:textDecorationThickness-H5");
+$textUnderlineOffset-H5: createThemeVar("Heading:textUnderlineOffset-H5");
+
+// Variables for H6
+$textColor-H6: createThemeVar("Heading:textColor-H6");
+$letterSpacing-H6: createThemeVar("Heading:letterSpacing-H6");
+$fontFamily-H6: createThemeVar("Heading:fontFamily-H6");
+$fontWeight-H6: createThemeVar("Heading:fontWeight-H6");
+$marginTop-H6: createThemeVar("marginTop-H6");
+$marginBottom-H6: createThemeVar("marginBottom-H6");
+$textDecorationLine-H6: createThemeVar("Heading:textDecorationLine-H6");
+$textDecorationColor-H6: createThemeVar("Heading:textDecorationColor-H6");
+$textDecorationStyle-H6: createThemeVar("Heading:textDecorationStyle-H6");
+$textDecorationThickness-H6: createThemeVar("Heading:textDecorationThickness-H6");
+$textUnderlineOffset-H6: createThemeVar("Heading:textUnderlineOffset-H6");
+
 @mixin heading($level) {
   @include t.paddingVars($themeVars, $level);
   @include t.borderVars($themeVars, $level);

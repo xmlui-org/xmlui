@@ -9,6 +9,126 @@ $themeVars: ();
 $component: "Text";
 $themeVars: t.composeTextVars($themeVars, $component);
 
+// Variables for default variant (empty string means default)
+$marginTop-Text: createThemeVar("marginTop-#{$component}");
+$marginBottom-Text: createThemeVar("marginBottom-#{$component}");
+$marginLeft-Text: createThemeVar("marginLeft-#{$component}");
+$marginRight-Text: createThemeVar("marginRight-#{$component}");
+$verticalAlignment-Text: createThemeVar("verticalAlignment-#{$component}");
+$textColor-Text--hover: createThemeVar("textColor-#{$component}--hover");
+
+// Variables for small variant
+$marginTop-Text-small: createThemeVar("marginTop-#{$component}-small");
+$marginBottom-Text-small: createThemeVar("marginBottom-#{$component}-small");
+$marginLeft-Text-small: createThemeVar("marginLeft-#{$component}-small");
+$marginRight-Text-small: createThemeVar("marginRight-#{$component}-small");
+$verticalAlignment-Text-small: createThemeVar("verticalAlignment-#{$component}-small");
+$textColor-Text-small--hover: createThemeVar("textColor-#{$component}-small--hover");
+
+// Variables for code variant
+$marginTop-Text-code: createThemeVar("marginTop-#{$component}-code");
+$marginBottom-Text-code: createThemeVar("marginBottom-#{$component}-code");
+$marginLeft-Text-code: createThemeVar("marginLeft-#{$component}-code");
+$marginRight-Text-code: createThemeVar("marginRight-#{$component}-code");
+$verticalAlignment-Text-code: createThemeVar("verticalAlignment-#{$component}-code");
+$textColor-Text-code--hover: createThemeVar("textColor-#{$component}-code--hover");
+
+// Variables for @layer section - abbr variant
+$fontWeight-Text-abbr: createThemeVar("fontWeight-#{$component}-abbr");
+$textTransform-Text-abbr: createThemeVar("textTransform-#{$component}-abbr");
+
+// Variables for cite variant
+$fontStyle-Text-cite: createThemeVar("fontStyle-#{$component}-cite");
+
+// Variables for em variant
+$fontStyle-Text-em: createThemeVar("fontStyle-#{$component}-em");
+
+// Variables for deleted variant
+$textDecorationLine-Text-deleted: createThemeVar("textDecorationLine-#{$component}-deleted");
+$textDecorationColor-Text-deleted: createThemeVar("textDecorationColor-#{$component}-deleted");
+$textDecorationStyle-Text-deleted: createThemeVar("textDecorationStyle-#{$component}-deleted");
+$textDecorationThickness-Text-deleted: createThemeVar("textDecorationThickness-#{$component}-deleted");
+
+// Variables for inserted variant
+$textDecorationLine-Text-inserted: createThemeVar("textDecorationLine-#{$component}-inserted");
+$textDecorationColor-Text-inserted: createThemeVar("textDecorationColor-#{$component}-inserted");
+$textDecorationStyle-Text-inserted: createThemeVar("textDecorationStyle-#{$component}-inserted");
+$textDecorationThickness-Text-inserted: createThemeVar("textDecorationThickness-#{$component}-inserted");
+
+// Variables for keyboard variant
+$backgroundColor-Text-keyboard: createThemeVar("backgroundColor-#{$component}-keyboard");
+$fontFamily-Text-keyboard: createThemeVar("fontFamily-#{$component}-keyboard");
+$fontWeight-Text-keyboard: createThemeVar("fontWeight-#{$component}-keyboard");
+$fontSize-Text-keyboard: createThemeVar("fontSize-#{$component}-keyboard");
+$borderWidth-Text-keyboard: createThemeVar("borderWidth-#{$component}-keyboard");
+$borderColor-Text-keyboard: createThemeVar("borderColor-#{$component}-keyboard");
+$borderStyle-Text-keyboard: createThemeVar("borderStyle-#{$component}-keyboard");
+$borderRadius-Text-keyboard: createThemeVar("borderRadius-#{$component}-keyboard");
+$paddingHorizontal-Text-keyboard: createThemeVar("paddingHorizontal-#{$component}-keyboard");
+
+// Variables for marked variant
+$backgroundColor-Text-marked: createThemeVar("backgroundColor-#{$component}-marked");
+$textColor-Text-marked: createThemeVar("textColor-#{$component}-marked");
+$fontWeight-Text-marked: createThemeVar("fontWeight-#{$component}-marked");
+$fontStyle-Text-marked: createThemeVar("fontStyle-#{$component}-marked");
+$lineHeight-Text-marked: createThemeVar("lineHeight-#{$component}-marked");
+
+// Variables for mono variant
+$fontFamily-Text-mono: createThemeVar("fontFamily-#{$component}-mono");
+
+// Variables for sample variant
+$fontFamily-Text-sample: createThemeVar("fontFamily-#{$component}-sample");
+$fontSize-Text-sample: createThemeVar("fontSize-#{$component}-sample");
+
+// Variables for sup variant
+$fontSize-Text-sup: createThemeVar("fontSize-#{$component}-sup");
+$verticalAlignment-Text-sup: createThemeVar("verticalAlignment-#{$component}-sup");
+
+// Variables for sub variant
+$fontSize-Text-sub: createThemeVar("fontSize-#{$component}-sub");
+$verticalAlignment-Text-sub: createThemeVar("verticalAlignment-#{$component}-sub");
+
+// Variables for var variant
+$fontStyle-Text-var: createThemeVar("fontStyle-#{$component}-var");
+
+// Variables for title variant
+$fontSize-Text-title: createThemeVar("fontSize-#{$component}-title");
+
+// Variables for subtitle variant
+$fontSize-Text-subtitle: createThemeVar("fontSize-#{$component}-subtitle");
+
+// Variables for caption variant
+$letterSpacing-Text-caption: createThemeVar("letterSpacing-#{$component}-caption");
+
+// Variables for placeholder variant
+$textColor-Text-placeholder: createThemeVar("textColor-#{$component}-placeholder");
+$fontStyle-Text-placeholder: createThemeVar("fontStyle-#{$component}-placeholder");
+$fontWeight-Text-placeholder: createThemeVar("fontWeight-#{$component}-placeholder");
+$fontSize-Text-placeholder: createThemeVar("fontSize-#{$component}-placeholder");
+
+// Variables for paragraph variant
+$fontSize-Text-paragraph: createThemeVar("fontSize-#{$component}-paragraph");
+$paddingVertical-Text-paragraph: createThemeVar("paddingVertical-#{$component}-paragraph");
+
+// Variables for subheading variant
+$fontSize-Text-subheading: createThemeVar("fontSize-#{$component}-subheading");
+$fontWeight-Text-subheading: createThemeVar("fontWeight-#{$component}-subheading");
+$fontStyle-Text-subheading: createThemeVar("fontStyle-#{$component}-subheading");
+$letterSpacing-Text-subheading: createThemeVar("letterSpacing-#{$component}-subheading");
+$textTransform-Text-subheading: createThemeVar("textTransform-#{$component}-subheading");
+$textColor-Text-subheading: createThemeVar("textColor-#{$component}-subheading");
+
+// Variables for tableheading variant
+$marginTop-Text-tableheading: createThemeVar("marginTop-#{$component}-tableheading");
+$marginBottom-Text-tableheading: createThemeVar("marginBottom-#{$component}-tableheading");
+$paddingHorizontal-Text-tableheading: createThemeVar("paddingHorizontal-#{$component}-tableheading");
+$fontSize-Text-tableheading: createThemeVar("fontSize-#{$component}-tableheading");
+$fontWeight-Text-tableheading: createThemeVar("fontWeight-#{$component}-tableheading");
+
+// Variables for secondary variant
+$fontSize-Text-secondary: createThemeVar("fontSize-#{$component}-secondary");
+$textColor-Text-secondary: createThemeVar("textColor-#{$component}-secondary");
+
 @mixin textVariant($variant) {
   $variantName: if($variant == "", "#{$component}", "#{$component}-#{$variant}");
   $themeVars: t.composePaddingVars($themeVars, $variantName);
@@ -46,23 +166,23 @@ $themeVars: t.composeTextVars($themeVars, $component);
     }
 
     &.abbr {
-      font-weight: createThemeVar("fontWeight-#{$component}-abbr");
-      text-transform: createThemeVar("textTransform-#{$component}-abbr");
+      font-weight: $fontWeight-Text-abbr;
+      text-transform: $textTransform-Text-abbr;
     }
 
     &.cite {
-      font-style: createThemeVar("fontStyle-#{$component}-cite");
+      font-style: $fontStyle-Text-cite;
     }
 
     &.em {
-      font-style: createThemeVar("fontStyle-#{$component}-em");
+      font-style: $fontStyle-Text-em;
     }
 
     &.deleted {
-      text-decoration-line: createThemeVar("textDecorationLine-#{$component}-deleted");
-      text-decoration-color: createThemeVar("textDecorationColor-#{$component}-deleted");
-      text-decoration-style: createThemeVar("textDecorationStyle-#{$component}-deleted");
-      text-decoration-thickness: createThemeVar("textDecorationThickness-#{$component}-deleted");
+      text-decoration-line: $textDecorationLine-Text-deleted;
+      text-decoration-color: $textDecorationColor-Text-deleted;
+      text-decoration-style: $textDecorationStyle-Text-deleted;
+      text-decoration-thickness: $textDecorationThickness-Text-deleted;
 
       // Based on accessibility concerns
       // Source: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/del
@@ -85,10 +205,10 @@ $themeVars: t.composeTextVars($themeVars, $component);
     }
 
     &.inserted {
-      text-decoration-line: createThemeVar("textDecorationLine-#{$component}-inserted") !important;
-      text-decoration-color: createThemeVar("textDecorationColor-#{$component}-inserted") !important;
-      text-decoration-style: createThemeVar("textDecorationStyle-#{$component}-inserted") !important;
-      text-decoration-thickness: createThemeVar("textDecorationThickness-#{$component}-inserted") !important;
+      text-decoration-line: $textDecorationLine-Text-inserted !important;
+      text-decoration-color: $textDecorationColor-Text-inserted !important;
+      text-decoration-style: $textDecorationStyle-Text-inserted !important;
+      text-decoration-thickness: $textDecorationThickness-Text-inserted !important;
 
       // Based on accessibility concerns
       // Source: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/ins
@@ -112,24 +232,24 @@ $themeVars: t.composeTextVars($themeVars, $component);
 
     // This is just a style placeholder
     &.keyboard {
-      background-color: createThemeVar("backgroundColor-#{$component}-keyboard");
-      font-family: createThemeVar("fontFamily-#{$component}-keyboard");
-      font-weight: createThemeVar("fontWeight-#{$component}-keyboard");
-      font-size: createThemeVar("fontSize-#{$component}-keyboard");
-      border-width: createThemeVar("borderWidth-#{$component}-keyboard");
-      border-color: createThemeVar("borderColor-#{$component}-keyboard");
-      border-style: createThemeVar("borderStyle-#{$component}-keyboard");
-      border-radius: createThemeVar("borderRadius-#{$component}-keyboard");
-      padding-left: createThemeVar("paddingHorizontal-#{$component}-keyboard");
-      padding-right: createThemeVar("paddingHorizontal-#{$component}-keyboard");
+      background-color: $backgroundColor-Text-keyboard;
+      font-family: $fontFamily-Text-keyboard;
+      font-weight: $fontWeight-Text-keyboard;
+      font-size: $fontSize-Text-keyboard;
+      border-width: $borderWidth-Text-keyboard;
+      border-color: $borderColor-Text-keyboard;
+      border-style: $borderStyle-Text-keyboard;
+      border-radius: $borderRadius-Text-keyboard;
+      padding-left: $paddingHorizontal-Text-keyboard;
+      padding-right: $paddingHorizontal-Text-keyboard;
     }
 
     &.marked {
-      background-color: createThemeVar("backgroundColor-#{$component}-marked");
-      color: createThemeVar("textColor-#{$component}-marked");
-      font-weight: createThemeVar("fontWeight-#{$component}-marked");
-      font-style: createThemeVar("fontStyle-#{$component}-marked");
-      line-height: createThemeVar("lineHeight-#{$component}-marked");
+      background-color: $backgroundColor-Text-marked;
+      color: $textColor-Text-marked;
+      font-weight: $fontWeight-Text-marked;
+      font-style: $fontStyle-Text-marked;
+      line-height: $lineHeight-Text-marked;
 
       // Based on accessibility concerns
       // Source: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/mark
@@ -152,34 +272,34 @@ $themeVars: t.composeTextVars($themeVars, $component);
     }
 
     &.mono {
-      font-family: createThemeVar("fontFamily-#{$component}-mono");
+      font-family: $fontFamily-Text-mono;
     }
 
     &.sample {
-      font-family: createThemeVar("fontFamily-#{$component}-sample");
-      font-size: createThemeVar("fontSize-#{$component}-sample");
+      font-family: $fontFamily-Text-sample;
+      font-size: $fontSize-Text-sample;
     }
 
     &.sup {
-      font-size: createThemeVar("fontSize-#{$component}-sup");
-      vertical-align: createThemeVar("verticalAlignment-#{$component}-sup");
+      font-size: $fontSize-Text-sup;
+      vertical-align: $verticalAlignment-Text-sup;
     }
 
     &.sub {
-      font-size: createThemeVar("fontSize-#{$component}-sub");
-      vertical-align: createThemeVar("verticalAlignment-#{$component}-sub");
+      font-size: $fontSize-Text-sub;
+      vertical-align: $verticalAlignment-Text-sub;
     }
 
     &.var {
-      font-style: createThemeVar("fontStyle-#{$component}-var");
+      font-style: $fontStyle-Text-var;
     }
 
     &.title {
-      font-size: createThemeVar("fontSize-#{$component}-title");
+      font-size: $fontSize-Text-title;
     }
 
     &.subtitle {
-      font-size: createThemeVar("fontSize-#{$component}-subtitle");
+      font-size: $fontSize-Text-subtitle;
     }
 
     &.small {
@@ -191,43 +311,43 @@ $themeVars: t.composeTextVars($themeVars, $component);
     }
 
     &.caption {
-      letter-spacing: createThemeVar("letterSpacing-#{$component}-caption");
+      letter-spacing: $letterSpacing-Text-caption;
     }
 
     &.placeholder {
-      color: createThemeVar("textColor-#{$component}-placeholder");
-      font-style: createThemeVar("fontStyle-#{$component}-placeholder");
-      font-weight: createThemeVar("fontWeight-#{$component}-placeholder");
-      font-size: createThemeVar("fontSize-#{$component}-placeholder");
+      color: $textColor-Text-placeholder;
+      font-style: $fontStyle-Text-placeholder;
+      font-weight: $fontWeight-Text-placeholder;
+      font-size: $fontSize-Text-placeholder;
     }
 
     &.paragraph {
-      font-size: createThemeVar("fontSize-#{$component}-paragraph");
-      padding-top: createThemeVar("paddingVertical-#{$component}-paragraph");
-      padding-bottom: createThemeVar("paddingVertical-#{$component}-paragraph");
+      font-size: $fontSize-Text-paragraph;
+      padding-top: $paddingVertical-Text-paragraph;
+      padding-bottom: $paddingVertical-Text-paragraph;
     }
 
     &.subheading {
-      font-size: createThemeVar("fontSize-#{$component}-subheading");
-      font-weight: createThemeVar("fontWeight-#{$component}-subheading");
-      font-style: createThemeVar("fontStyle-#{$component}-subheading");
-      letter-spacing: createThemeVar("letterSpacing-#{$component}-subheading");
-      text-transform: createThemeVar("textTransform-#{$component}-subheading");
-      color: createThemeVar("textColor-#{$component}-subheading");
+      font-size: $fontSize-Text-subheading;
+      font-weight: $fontWeight-Text-subheading;
+      font-style: $fontStyle-Text-subheading;
+      letter-spacing: $letterSpacing-Text-subheading;
+      text-transform: $textTransform-Text-subheading;
+      color: $textColor-Text-subheading;
     }
 
     &.tableheading {
-      margin-top: createThemeVar("marginTop-#{$component}-tableheading");
-      margin-bottom: createThemeVar("marginBottom-#{$component}-tableheading");
-      padding-left: createThemeVar("paddingHorizontal-#{$component}-tableheading");
-      padding-right: createThemeVar("paddingHorizontal-#{$component}-tableheading");
-      font-size: createThemeVar("fontSize-#{$component}-tableheading");
-      font-weight: createThemeVar("fontWeight-#{$component}-tableheading");
+      margin-top: $marginTop-Text-tableheading;
+      margin-bottom: $marginBottom-Text-tableheading;
+      padding-left: $paddingHorizontal-Text-tableheading;
+      padding-right: $paddingHorizontal-Text-tableheading;
+      font-size: $fontSize-Text-tableheading;
+      font-weight: $fontWeight-Text-tableheading;
     }
 
     &.secondary {
-      font-size: createThemeVar("fontSize-#{$component}-secondary");
-      color: createThemeVar("textColor-#{$component}-secondary");
+      font-size: $fontSize-Text-secondary;
+      color: $textColor-Text-secondary;
     }
 
     &.strong{

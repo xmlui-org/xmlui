@@ -253,9 +253,9 @@ test("component shows error validation states", async ({ page, initTestBed }) =>
   // Error state
   await initTestBed(`<DatePicker testId="datePicker" validationStatus="error" />`, {
     testThemeVars: {
-      "borderColor-DatePicker-error": "rgb(220, 38, 38)",
-      "backgroundColor-DatePicker-error": "rgb(254, 202, 202)",
-      "textColor-DatePicker-error": "rgb(127, 29, 29)",
+      "borderColor-DatePicker--error": "rgb(220, 38, 38)",
+      "backgroundColor-DatePicker--error": "rgb(254, 202, 202)",
+      "textColor-DatePicker--error": "rgb(127, 29, 29)",
     },
   });
   await expect(page.getByTestId("datePicker")).toHaveCSS("border-color", "rgb(220, 38, 38)");
@@ -267,9 +267,9 @@ test("component shows warning validation states", async ({ page, initTestBed }) 
   // Warning state
   await initTestBed(`<DatePicker testId="datePicker" validationStatus="warning" />`, {
     testThemeVars: {
-      "borderColor-DatePicker-warning": "rgb(255, 165, 0)",
-      "backgroundColor-DatePicker-warning": "rgb(255, 235, 156)",
-      "textColor-DatePicker-warning": "rgb(127, 29, 29)",
+      "borderColor-DatePicker--warning": "rgb(255, 165, 0)",
+      "backgroundColor-DatePicker--warning": "rgb(255, 235, 156)",
+      "textColor-DatePicker--warning": "rgb(127, 29, 29)",
     },
   });
   await expect(page.getByTestId("datePicker")).toHaveCSS("border-color", "rgb(255, 165, 0)");
@@ -281,9 +281,9 @@ test("component shows valid validation states", async ({ page, initTestBed }) =>
   // Valid state
   await initTestBed(`<DatePicker testId="datePicker" validationStatus="valid" />`, {
     testThemeVars: {
-      "borderColor-DatePicker-success": "rgb(0, 128, 0)",
-      "backgroundColor-DatePicker-success": "rgb(220, 255, 220)",
-      "textColor-DatePicker-success": "rgb(0, 100, 0)",
+      "borderColor-DatePicker--success": "rgb(0, 128, 0)",
+      "backgroundColor-DatePicker--success": "rgb(220, 255, 220)",
+      "textColor-DatePicker--success": "rgb(0, 100, 0)",
     },
   });
   await expect(page.getByTestId("datePicker")).toHaveCSS("border-color", "rgb(0, 128, 0)");

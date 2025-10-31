@@ -364,44 +364,47 @@ test.describe("Basic Functionality", () => {
   });
 });
 
-test("validationStatus 'none' is applied correctly", async ({ initTestBed, page }) => {
+test("correct borderColor applied on validationStatus 'default'", async ({ initTestBed, page }) => {
   await initTestBed(
     `
-    <RadioGroup validationStatus="none" initialValue="1">
+    <RadioGroup initialValue="1">
       <Option value="1">Option 1</Option>
       <Option value="2">Option 2</Option>
-    </RadioGroup>
-
-  `,
+    </RadioGroup>`,
     {
       testThemeVars: {
+        "borderColor-RadioGroupOption--default": "rgb(80, 80, 80)",
         "borderColor-checked-RadioGroupOption": "rgb(80, 80, 80)",
       },
     },
   );
   const options = page.getByRole("radiogroup").getByRole("radio");
-  await expect(options.nth(0)).toHaveCSS("border-top-color", "rgb(80, 80, 80)");
-  await expect(options.nth(1)).toHaveCSS("border-top-color", "rgb(80, 80, 80)");
+  await expect(options.nth(0)).toHaveCSS("border-color", "rgb(80, 80, 80)");
+  await expect(options.nth(1)).toHaveCSS("border-color", "rgb(80, 80, 80)");
 });
 
-test("validationStatus 'error' is applied correctly", async ({ initTestBed, page }) => {
-  await initTestBed(`
-    <Theme
-      borderColor-RadioGroupOption-error="rgb(255, 32, 0)"
-      borderColor-checked-RadioGroupOption="rgb(80, 80, 80)"
-    >
-      <RadioGroup validationStatus="error" initialValue="1">
-        <Option value="1">Option 1</Option>
-        <Option value="2">Option 2</Option>
-      </RadioGroup>
-    </Theme>
-  `);
+test("correct borderColor applied on validationStatus 'error'", async ({ initTestBed, page }) => {
+  await initTestBed(
+    `
+    <RadioGroup validationStatus="error" initialValue="1">
+      <Option value="1">Option 1</Option>
+      <Option value="2">Option 2</Option>
+    </RadioGroup>
+  `,
+    {
+      testThemeVars: {
+        "borderColor-RadioGroupOption--error": "rgb(255, 32, 0)",
+        "borderColor-RadioGroupOption--default": "rgb(80, 80, 80)",
+        "borderColor-checked-RadioGroupOption": "rgb(80, 80, 80)",
+      },
+    },
+  );
   const options = page.getByRole("radiogroup").getByRole("radio");
-  await expect(options.nth(0)).toHaveCSS("border-top-color", "rgb(255, 32, 0)");
-  await expect(options.nth(1)).toHaveCSS("border-top-color", "rgb(80, 80, 80)");
+  await expect(options.nth(0)).toHaveCSS("border-color", "rgb(255, 32, 0)");
+  await expect(options.nth(1)).toHaveCSS("border-color", "rgb(80, 80, 80)");
 });
 
-test("validationStatus 'warning' is applied correctly", async ({ initTestBed, page }) => {
+test("correct borderColor applied on validationStatus 'warning'", async ({ initTestBed, page }) => {
   await initTestBed(
     `
     <RadioGroup validationStatus="warning" initialValue="1">
@@ -411,17 +414,18 @@ test("validationStatus 'warning' is applied correctly", async ({ initTestBed, pa
   `,
     {
       testThemeVars: {
-        "borderColor-RadioGroupOption-warning": "rgb(255, 180, 0)",
+        "borderColor-RadioGroupOption--warning": "rgb(255, 180, 0)",
+        "borderColor-RadioGroupOption--default": "rgb(80, 80, 80)",
         "borderColor-checked-RadioGroupOption": "rgb(80, 80, 80)",
       },
     },
   );
   const options = page.getByRole("radiogroup").getByRole("radio");
-  await expect(options.nth(0)).toHaveCSS("border-top-color", "rgb(255, 180, 0)");
-  await expect(options.nth(1)).toHaveCSS("border-top-color", "rgb(80, 80, 80)");
+  await expect(options.nth(0)).toHaveCSS("border-color", "rgb(255, 180, 0)");
+  await expect(options.nth(1)).toHaveCSS("border-color", "rgb(80, 80, 80)");
 });
 
-test("validationStatus 'valid' is applied correctly", async ({ initTestBed, page }) => {
+test("correct borderColor applied on validationStatus 'valid'", async ({ initTestBed, page }) => {
   await initTestBed(
     `
     <RadioGroup validationStatus="valid" initialValue="1">
@@ -431,14 +435,15 @@ test("validationStatus 'valid' is applied correctly", async ({ initTestBed, page
   `,
     {
       testThemeVars: {
-        "borderColor-RadioGroupOption-success": "rgb(0, 180, 0)",
+        "borderColor-RadioGroupOption--success": "rgb(0, 180, 0)",
+        "borderColor-RadioGroupOption--default": "rgb(80, 80, 80)",
         "borderColor-checked-RadioGroupOption": "rgb(80, 80, 80)",
       },
     },
   );
   const options = page.getByRole("radiogroup").getByRole("radio");
-  await expect(options.nth(1)).toHaveCSS("border-top-color", "rgb(80, 80, 80)");
-  await expect(options.nth(0)).toHaveCSS("border-top-color", "rgb(0, 180, 0)");
+  await expect(options.nth(1)).toHaveCSS("border-color", "rgb(80, 80, 80)");
+  await expect(options.nth(0)).toHaveCSS("border-color", "rgb(0, 180, 0)");
 });
 
 test("label is rendered if provided", async ({ initTestBed, page }) => {

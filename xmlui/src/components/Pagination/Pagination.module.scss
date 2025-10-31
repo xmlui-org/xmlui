@@ -15,11 +15,15 @@ $textColor-Pagination: createThemeVar("textColor-Pagination");
 $backgroundColor-selector-Pagination: createThemeVar("backgroundColor-selector-Pagination");
 $textColor-selector-Pagination: createThemeVar("textColor-selector-Pagination");
 
+// Variables for @layer section
+$padding-Pagination: createThemeVar("padding-Pagination");
+$gap-buttonRow-Pagination: createThemeVar("gap-buttonRow-Pagination");
+
 @layer components {
   .pagination {
     display: grid;
     align-items: center;
-    padding: createThemeVar("padding-Pagination");
+    padding: $padding-Pagination;
     gap: t.$space-4;
     
     // Default 3-column layout
@@ -189,7 +193,7 @@ $textColor-selector-Pagination: createThemeVar("textColor-selector-Pagination");
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: createThemeVar("gap-buttonRow-Pagination");
+    gap: $gap-buttonRow-Pagination;
 
     li {
       margin: 0;

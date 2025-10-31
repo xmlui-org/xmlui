@@ -36,6 +36,12 @@ $color-indicator-NavLink--hover: createThemeVar("color-indicator-#{$component}--
 $color-indicator-NavLink--active: createThemeVar("color-indicator-#{$component}--active");
 $color-indicator-NavLink--pressed: createThemeVar("color-indicator-#{$component}--pressed");
 
+// Variables for @layer section
+$outlineWidth-NavLink--focus: createThemeVar('outlineWidth-#{$component}--focus');
+$outlineColor-NavLink--focus: createThemeVar('outlineColor-#{$component}--focus');
+$outlineStyle-NavLink--focus: createThemeVar('outlineStyle-#{$component}--focus');
+$outlineOffset-NavLink--focus: createThemeVar('outlineOffset-#{$component}--focus');
+
 $transition: color 0.1s, background-color 0.1s;
 
 @layer components {
@@ -101,19 +107,19 @@ $transition: color 0.1s, background-color 0.1s;
 
 
       &:focus-visible{
-        outline-width: createThemeVar('outlineWidth-#{$component}--focus');
-        outline-color: createThemeVar('outlineColor-#{$component}--focus');
-        outline-style: createThemeVar('outlineStyle-#{$component}--focus');
-        outline-offset: createThemeVar('outlineOffset-#{$component}--focus');
+        outline-width: $outlineWidth-NavLink--focus;
+        outline-color: $outlineColor-NavLink--focus;
+        outline-style: $outlineStyle-NavLink--focus;
+        outline-offset: $outlineOffset-NavLink--focus;
       }
 
       &[role='menuitem']{           //e.g. inside a navGroup, for hover it focuses the item, so it's always visible, that's why we have this selector here
         outline: none;
         &:not(:hover):focus-visible{
-          outline-width: createThemeVar('outlineWidth-#{$component}--focus');
-          outline-color: createThemeVar('outlineColor-#{$component}--focus');
-          outline-style: createThemeVar('outlineStyle-#{$component}--focus');
-          outline-offset: createThemeVar('outlineOffset-#{$component}--focus');
+          outline-width: $outlineWidth-NavLink--focus;
+          outline-color: $outlineColor-NavLink--focus;
+          outline-style: $outlineStyle-NavLink--focus;
+          outline-offset: $outlineOffset-NavLink--focus;
         }
       }
 

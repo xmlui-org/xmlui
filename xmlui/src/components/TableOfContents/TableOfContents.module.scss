@@ -32,6 +32,29 @@ $themeVars: t.composeTextVars($themeVars, "#{$componentItem}-level-5");
 $themeVars: t.composePaddingVars($themeVars, "#{$componentItem}-level-6");
 $themeVars: t.composeTextVars($themeVars, "#{$componentItem}-level-6");
 
+// Variables for @layer section
+$marginTop-TableOfContents: createThemeVar("marginTop-#{$component}");
+$marginBottom-TableOfContents: createThemeVar("marginBottom-#{$component}");
+$textColor-TableOfContentsItem: createThemeVar("textColor-#{$componentItem}");
+$backgroundColor-TableOfContentsItem--hover: createThemeVar("backgroundColor-#{$componentItem}--hover");
+$fontWeight-TableOfContentsItem--hover: createThemeVar("fontWeight-#{$componentItem}--hover");
+$textColor-TableOfContentsItem--hover: createThemeVar("textColor-#{$componentItem}--hover");
+$fontWeight-TableOfContentsItem-level-1--hover: createThemeVar("fontWeight-#{$componentItem}-level-1--hover");
+$fontWeight-TableOfContentsItem-level-2--hover: createThemeVar("fontWeight-#{$componentItem}-level-2--hover");
+$fontWeight-TableOfContentsItem-level-3--hover: createThemeVar("fontWeight-#{$componentItem}-level-3--hover");
+$fontWeight-TableOfContentsItem-level-4--hover: createThemeVar("fontWeight-#{$componentItem}-level-4--hover");
+$fontWeight-TableOfContentsItem-level-5--hover: createThemeVar("fontWeight-#{$componentItem}-level-5--hover");
+$fontWeight-TableOfContentsItem-level-6--hover: createThemeVar("fontWeight-#{$componentItem}-level-6--hover");
+$backgroundColor-TableOfContentsItem--active: createThemeVar("backgroundColor-#{$componentItem}--active");
+$textColor-TableOfContentsItem--active: createThemeVar("textColor-#{$componentItem}--active");
+$fontWeight-TableOfContentsItem--active: createThemeVar("fontWeight-#{$componentItem}--active");
+$fontWeight-TableOfContentsItem-level-1--active: createThemeVar("fontWeight-#{$componentItem}-level-1--active");
+$fontWeight-TableOfContentsItem-level-2--active: createThemeVar("fontWeight-#{$componentItem}-level-2--active");
+$fontWeight-TableOfContentsItem-level-3--active: createThemeVar("fontWeight-#{$componentItem}-level-3--active");
+$fontWeight-TableOfContentsItem-level-4--active: createThemeVar("fontWeight-#{$componentItem}-level-4--active");
+$fontWeight-TableOfContentsItem-level-5--active: createThemeVar("fontWeight-#{$componentItem}-level-5--active");
+$fontWeight-TableOfContentsItem-level-6--active: createThemeVar("fontWeight-#{$componentItem}-level-6--active");
+
 @layer components {
   .nav {
     border-width: createThemeVar("borderWidth-#{$component}");
@@ -52,8 +75,8 @@ $themeVars: t.composeTextVars($themeVars, "#{$componentItem}-level-6");
     position: sticky;
     scrollbar-width: thin;
     // --- Do not collapse these padding properties; they are intentionally expanded
-    margin-top: createThemeVar("marginTop-#{$component}");
-    margin-bottom: createThemeVar("marginBottom-#{$component}");
+    margin-top: $marginTop-TableOfContents;
+    margin-bottom: $marginBottom-TableOfContents;
 
     .list {
       margin: 0;
@@ -67,7 +90,7 @@ $themeVars: t.composeTextVars($themeVars, "#{$componentItem}-level-6");
         .link {
           display: block;
           overflow-wrap: break-word;
-          color: createThemeVar("textColor-#{$componentItem}");
+          color: $textColor-TableOfContentsItem;
           @include t.paddingVars($themeVars, $componentItem);
           @include t.textVars($themeVars, $componentItem);
 
@@ -104,58 +127,58 @@ $themeVars: t.composeTextVars($themeVars, "#{$componentItem}-level-6");
 
         &:hover {
           @include t.borderVars($themeVars, "#{$componentItem}--hover");
-          background-color: createThemeVar("backgroundColor-#{$componentItem}--hover");
+          background-color: $backgroundColor-TableOfContentsItem--hover;
 
           .link {
-            font-weight: createThemeVar("fontWeight-#{$componentItem}--hover");
-            color: createThemeVar("textColor-#{$componentItem}--hover");
+            font-weight: $fontWeight-TableOfContentsItem--hover;
+            color: $textColor-TableOfContentsItem--hover;
 
             &.head_1 {
-              font-weight: createThemeVar("fontWeight-#{$componentItem}-level-1--hover");
+              font-weight: $fontWeight-TableOfContentsItem-level-1--hover;
             }
             &.head_2 {
-              font-weight: createThemeVar("fontWeight-#{$componentItem}-level-2--hover");
+              font-weight: $fontWeight-TableOfContentsItem-level-2--hover;
             }
             &.head_3 {
-              font-weight: createThemeVar("fontWeight-#{$componentItem}-level-3--hover");
+              font-weight: $fontWeight-TableOfContentsItem-level-3--hover;
             }
             &.head_4 {
-              font-weight: createThemeVar("fontWeight-#{$componentItem}-level-4--hover");
+              font-weight: $fontWeight-TableOfContentsItem-level-4--hover;
             }
             &.head_5 {
-              font-weight: createThemeVar("fontWeight-#{$componentItem}-level-5--hover");
+              font-weight: $fontWeight-TableOfContentsItem-level-5--hover;
             }
             &.head_6 {
-              font-weight: createThemeVar("fontWeight-#{$componentItem}-level-6--hover");
+              font-weight: $fontWeight-TableOfContentsItem-level-6--hover;
             }
           }
         }
 
         &.active {
           @include t.borderVars($themeVars, "#{$componentItem}--active");
-          background-color: createThemeVar("backgroundColor-#{$componentItem}--active");
+          background-color: $backgroundColor-TableOfContentsItem--active;
 
           .link {
-            color: createThemeVar("textColor-#{$componentItem}--active");
-            font-weight: createThemeVar("fontWeight-#{$componentItem}--active");
+            color: $textColor-TableOfContentsItem--active;
+            font-weight: $fontWeight-TableOfContentsItem--active;
 
             &.head_1 {
-              font-weight: createThemeVar("fontWeight-#{$componentItem}-level-1--active");
+              font-weight: $fontWeight-TableOfContentsItem-level-1--active;
             }
             &.head_2 {
-              font-weight: createThemeVar("fontWeight-#{$componentItem}-level-2--active");
+              font-weight: $fontWeight-TableOfContentsItem-level-2--active;
             }
             &.head_3 {
-              font-weight: createThemeVar("fontWeight-#{$componentItem}-level-3--active");
+              font-weight: $fontWeight-TableOfContentsItem-level-3--active;
             }
             &.head_4 {
-              font-weight: createThemeVar("fontWeight-#{$componentItem}-level-4--active");
+              font-weight: $fontWeight-TableOfContentsItem-level-4--active;
             }
             &.head_5 {
-              font-weight: createThemeVar("fontWeight-#{$componentItem}-level-5--active");
+              font-weight: $fontWeight-TableOfContentsItem-level-5--active;
             }
             &.head_6 {
-              font-weight: createThemeVar("fontWeight-#{$componentItem}-level-6--active");
+              font-weight: $fontWeight-TableOfContentsItem-level-6--active;
             }
           }
         }
