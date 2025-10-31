@@ -106,7 +106,7 @@ $outlineOffset-RadioGroupOption--focus: createThemeVar("Input:outlineOffset-Radi
       color: $color-RadioGroupOption--disabled;
     }
     &:not(:disabled) {
-      &:not(.error):not(.warning):not(.valid) {
+      &.checked:not(.error):not(.warning):not(.valid) {
         border-color: $borderColor-checked-RadioGroupOption;
       }
       &.error {

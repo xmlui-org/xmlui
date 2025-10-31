@@ -57,7 +57,7 @@ export const UnwrappedRadioItem = ({
 
   return (
     <InnerRadioGroup.Item
-      className={classnames(styles.radioOption, statusStyles)}
+      className={classnames(styles.radioOption, statusStyles, {  [styles.checked]: checked })}
       id={id}
       value={convertOptionValue(value)}
       checked={checked}
