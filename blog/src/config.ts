@@ -116,7 +116,7 @@ try {
 // Merge blog content into plainTextContent
 Object.assign(plainTextContent, blogContent);
 
-const pagesRuntime: Record<string, any> = import.meta.glob(`/public/**/*.md`, {
+const pagesRuntime: Record<string, any> = import.meta.glob(`/public/pages/**/*.md`, {
   eager: true,
   query: "?raw",
 });
