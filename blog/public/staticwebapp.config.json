@@ -1,29 +1,7 @@
 {
   "mimeTypes": {
-    ".md": "text/markdown; charset=utf-8",
+    ".md": "text/markdown",
     ".json": "application/json",
     ".rss": "application/rss+xml"
-  },
-  "navigationFallback": {
-    "rewrite": "/index.html",
-    "exclude": [
-      "/blog/*",
-      "/blog/**/*",
-      "/resources/*",
-      "/*.css",
-      "/*.js",
-      "/*.json",
-      "/*.svg",
-      "/*.png",
-      "/*.jpg",
-      "/*.jpeg",
-      "/*.gif",
-      "/*.ico",
-      "/*.woff",
-      "/*.woff2",
-      "/*.ttf",
-      "/*.eot",
-      "/*.rss"
-    ]
   }
 }
