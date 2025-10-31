@@ -601,6 +601,7 @@ When using custom variants, you can style them using theme variables with the na
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-keyboard | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-marked | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-placeholder | *none* | *none* |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-strong | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-subheading | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-tableheading | $fontWeight-bold | $fontWeight-bold |
 | [letterSpacing](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
