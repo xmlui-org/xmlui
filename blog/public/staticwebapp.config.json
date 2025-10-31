@@ -1,4 +1,8 @@
 {
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/resources/*", "/*.{png,jpg,jpeg,gif,svg,webp,ico,json,xml,rss,js,css,woff,woff2,ttf,eot}"]
+  },
   "mimeTypes": {
     ".md": "text/markdown",
     ".json": "application/json",
