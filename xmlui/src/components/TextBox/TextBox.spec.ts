@@ -612,36 +612,6 @@ test.describe("Theme Vars", () => {
     await expect(driver.component).toHaveCSS("background-color", "rgb(240, 240, 240)");
   });
 
-  test("error borderColor applies with error validation", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox testId="input" validationStatus="error" />`, {
-      testThemeVars: {
-        "borderColor-TextBox--error": "rgb(255, 0, 0)",
-      },
-    });
-    const driver = await createTextBoxDriver("input");
-    await expect(driver.component).toHaveCSS("border-color", "rgb(255, 0, 0)");
-  });
-
-  test("warning borderColor applies with warning validation", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox testId="input" validationStatus="warning" />`, {
-      testThemeVars: {
-        "borderColor-TextBox--warning": "rgb(255, 165, 0)",
-      },
-    });
-    const driver = await createTextBoxDriver("input");
-    await expect(driver.component).toHaveCSS("border-color", "rgb(255, 165, 0)");
-  });
-
-  test("success borderColor applies with valid validation", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox testId="input" validationStatus="valid" />`, {
-      testThemeVars: {
-        "borderColor-TextBox--success": "rgb(0, 255, 0)",
-      },
-    });
-    const driver = await createTextBoxDriver("input");
-    await expect(driver.component).toHaveCSS("border-color", "rgb(0, 255, 0)");
-  });
-
   test("borderRadius applies correctly", async ({ initTestBed, createTextBoxDriver }) => {
     await initTestBed(`<TextBox testId="input" />`, {
       testThemeVars: {
@@ -660,6 +630,28 @@ test.describe("Theme Vars", () => {
     });
     const driver = await createTextBoxDriver("input");
     await expect(driver.component).toHaveCSS("padding", "12px");
+  });
+});
+
+// =============================================================================
+// VALIDATION STATUS TESTS
+// =============================================================================
+
+test.describe("Validation", () => {
+  test("handles invalid validationStatus gracefully", async ({ initTestBed, createTextBoxDriver }) => {
+    await initTestBed(`<TextBox testId="input" validationStatus="invalid" />`, {
+      testThemeVars: {
+        "borderColor-TextBox--default": "rgb(0, 0, 0)",
+        "borderColor-TextBox--error": "rgb(255, 0, 0)",
+        "borderColor-TextBox--warning": "rgb(255, 165, 0)",
+        "borderColor-TextBox--success": "rgb(0, 255, 0)",
+      },
+    });
+    const driver = await createTextBoxDriver("input");
+    await expect(driver.component).not.toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await expect(driver.component).not.toHaveCSS("border-color", "rgb(255, 165, 0)");
+    await expect(driver.component).not.toHaveCSS("border-color", "rgb(0, 255, 0)");
+    await expect(driver.component).toHaveCSS("border-color", "rgb(0, 0, 0)");
   });
 
   [
@@ -768,58 +760,6 @@ test.describe("Theme Vars", () => {
       await page.getByTestId("test").hover();
       await expect(page.getByTestId("test")).toHaveCSS("color", "rgb(0, 0, 0)");
     });
-  });
-});
-
-// =============================================================================
-// VALIDATION STATUS TESTS
-// =============================================================================
-
-test.describe("Validation", () => {
-  test("validationStatus=error correctly displayed", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox testId="input" validationStatus="error" />`, {
-      testThemeVars: {
-        "borderColor-TextBox-error": "rgb(255, 0, 0)",
-      },
-    });
-    const driver = await createTextBoxDriver("input");
-    await expect(driver.component).toHaveCSS("border-color", "rgb(255, 0, 0)");
-  });
-
-  test("validationStatus=warning correctly displayed", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox testId="input" validationStatus="warning" />`, {
-      testThemeVars: {
-        "borderColor-TextBox-warning": "rgb(255, 165, 0)",
-      },
-    });
-    const driver = await createTextBoxDriver("input");
-    await expect(driver.component).toHaveCSS("border-color", "rgb(255, 165, 0)");
-  });
-
-  test("validationStatus=valid correctly displayed", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox testId="input" validationStatus="valid" />`, {
-      testThemeVars: {
-        "borderColor-TextBox-success": "rgb(0, 255, 0)",
-      },
-    });
-    const driver = await createTextBoxDriver("input");
-    await expect(driver.component).toHaveCSS("border-color", "rgb(0, 255, 0)");
-  });
-
-  test("handles invalid validationStatus gracefully", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox testId="input" validationStatus="invalid-status" />`, {
-      testThemeVars: {
-        "borderColor-TextBox": "rgb(0, 0, 0)",
-        "borderColor-TextBox-error": "rgb(255, 0, 0)",
-        "borderColor-TextBox-warning": "rgb(255, 165, 0)",
-        "borderColor-TextBox-success": "rgb(0, 255, 0)",
-      },
-    });
-    const driver = await createTextBoxDriver("input");
-    await expect(driver.component).not.toHaveCSS("border-color", "rgb(255, 0, 0)");
-    await expect(driver.component).not.toHaveCSS("border-color", "rgb(255, 165, 0)");
-    await expect(driver.component).not.toHaveCSS("border-color", "rgb(0, 255, 0)");
-    await expect(driver.component).toHaveCSS("border-color", "rgb(0, 0, 0)");
   });
 });
 

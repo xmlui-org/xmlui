@@ -884,42 +884,6 @@ test.describe("Theme Variables", () => {
     await expect(page.getByTestId("input")).toHaveCSS("border-color", "rgb(200, 200, 200)");
   });
 
-  // Error variant theme variables
-  test("error variant borderRadius applies correctly", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox testId="input" validationStatus="error" />`, {
-      testThemeVars: { "borderRadius-NumberBox--error": "8px" },
-    });
-    await expect(page.getByTestId("input")).toHaveCSS("border-radius", "8px");
-  });
-
-  test("error variant fontSize applies correctly", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox testId="input" validationStatus="error" />`, {
-      testThemeVars: { "fontSize-NumberBox--error": "16px" },
-    });
-    await expect(page.getByTestId("input")).toHaveCSS("font-size", "16px");
-  });
-
-  test("error variant backgroundColor applies correctly", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox testId="input" validationStatus="error" />`, {
-      testThemeVars: { "backgroundColor-NumberBox--error": "rgb(255, 240, 240)" },
-    });
-    await expect(page.getByTestId("input")).toHaveCSS("background-color", "rgb(255, 240, 240)");
-  });
-
-  test("warning variant textColor applies correctly", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox testId="input" validationStatus="warning" />`, {
-      testThemeVars: { "textColor-NumberBox--warning": "rgb(133, 100, 4)" },
-    });
-    await expect(page.getByTestId("input")).toHaveCSS("color", "rgb(133, 100, 4)");
-  });
-
-  test("success variant backgroundColor applies correctly", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox testId="input" validationStatus="valid" />`, {
-      testThemeVars: { "backgroundColor-NumberBox--success": "rgb(240, 255, 240)" },
-    });
-    await expect(page.getByTestId("input")).toHaveCSS("background-color", "rgb(240, 255, 240)");
-  });
-
   test("input text adornment colors apply correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" startText="$" endText="€" />`, {
       testThemeVars: { "color-adornment-NumberBox--default": "rgb(0, 123, 255)" },

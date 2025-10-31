@@ -480,8 +480,8 @@ test.describe("Visual States", () => {
   test("component applies theme variables correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<TextArea testId="input" />`, {
       testThemeVars: {
-        "backgroundColor-TextArea-default": "rgb(255, 0, 0)",
-        "textColor-TextArea-default": "rgb(0, 255, 0)",
+        "backgroundColor-TextArea--default": "rgb(255, 0, 0)",
+        "textColor-TextArea--default": "rgb(0, 255, 0)",
       },
     });
     await expect(page.getByTestId("input")).toHaveCSS("background-color", "rgb(255, 0, 0)");

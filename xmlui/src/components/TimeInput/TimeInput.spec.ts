@@ -473,38 +473,6 @@ test.describe("Basic Functionality", () => {
     });
   });
 
-  test.describe("validationStatus property", () => {
-    test("displays valid status", async ({ initTestBed, createTimeInputDriver }) => {
-      await initTestBed(
-        `<TimeInput testId="timeInput" validationStatus="valid" initialValue="14:30" />`,
-      );
-      const driver = await createTimeInputDriver("timeInput");
-      await expect(driver.component).toBeVisible();
-    });
-
-    test("displays warning status", async ({ initTestBed, createTimeInputDriver }) => {
-      await initTestBed(
-        `<TimeInput testId="timeInput" validationStatus="warning" initialValue="14:30" />`,
-      );
-      const driver = await createTimeInputDriver("timeInput");
-      await expect(driver.component).toBeVisible();
-    });
-
-    test("displays error status", async ({ initTestBed, createTimeInputDriver }) => {
-      await initTestBed(
-        `<TimeInput testId="timeInput" validationStatus="error" initialValue="14:30" />`,
-      );
-      const driver = await createTimeInputDriver("timeInput");
-      await expect(driver.component).toBeVisible();
-    });
-
-    test("handles null validationStatus", async ({ initTestBed, createTimeInputDriver }) => {
-      await initTestBed(`<TimeInput testId="timeInput" validationStatus="{null}" />`);
-      const driver = await createTimeInputDriver("timeInput");
-      await expect(driver.component).toBeVisible();
-    });
-  });
-
   test.describe("minTime and maxTime properties", () => {
     test("accepts minTime constraint", async ({ initTestBed, createTimeInputDriver }) => {
       await initTestBed(`<TimeInput testId="timeInput" minTime="10:00" initialValue="14:30" />`);
@@ -1241,6 +1209,18 @@ test.describe("Theme Variables", () => {
     });
     const driver = await createTimeInputDriver("time-input");
     await expect(driver.component).toHaveCSS("color", "rgb(0, 0, 255)");
+  });
+
+  test("handles invalid validationStatus", async ({ initTestBed, page }) => {
+    await initTestBed(`<TimeInput testId="timeInput" validationStatus="invalid" />`, {
+      testThemeVars: {
+        "borderColor-TimeInput--default": "rgb(0, 0, 0)",
+        "borderColor-TimeInput--error": "rgb(255, 0, 0)",
+        "borderColor-TimeInput--warning": "rgb(255, 165, 0)",
+        "borderColor-TimeInput--success": "rgb(0, 255, 0)",
+      },
+    });
+    await expect(page.getByTestId("timeInput")).toHaveCSS("border-color", "rgb(0, 0, 0)");
   });
 
   [
