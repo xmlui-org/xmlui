@@ -1,5 +1,14 @@
 # xmlui
 
+## 0.11.4
+
+### Patch Changes
+
+- e384c59: Change validation status signature from having one dash to two dashes to better reflect that they are status modifiers. Ex. -default -> --default, -error -> --error
+- f296904: Splitter now responds the visibility changes of its children
+- f296904: Temporarily disable the "variant" behavior on Button
+- be73336: fix: Select - use extractValue for controlled component value prop
+
 ## 0.11.3
 
 ### Patch Changes
