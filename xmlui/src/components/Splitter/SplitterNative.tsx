@@ -28,6 +28,7 @@ type SplitterProps = {
   initialPrimarySize?: string;
   minPrimarySize?: string;
   maxPrimarySize?: string;
+  visibleChildCount?: number;
 };
 
 export const Splitter = ({
@@ -42,10 +43,11 @@ export const Splitter = ({
   floating = defaultProps.floating,
   splitterTemplate,
   resize = noop,
+  visibleChildCount,
   ...rest
 }: SplitterProps) => {
-  const [sizePercentage, setSizePercentage] = useState(50); // Store as percentage
-  const [containerSize, setContainerSize] = useState(0);
+  const [sizePercentage, setSizePercentage] = useState(50);
+  const [containerSize, setContainerSize] = useState(100);
   const [splitter, setSplitter] = useState<HTMLDivElement | null>(null);
   const [resizerVisible, setResizerVisible] = useState(false);
   const [resizer, setResizer] = useState<HTMLDivElement | null>(null);
@@ -59,6 +61,12 @@ export const Splitter = ({
   const size = useMemo(() => {
     return (sizePercentage / 100) * containerSize;
   }, [sizePercentage, containerSize]);
+
+  // Since the XMLUI renderer now pre-filters children, we can use them directly
+  const childrenArray = React.Children.toArray(children);
+  const actualChildCount = childrenArray.length;
+  const effectiveChildCount = visibleChildCount ?? actualChildCount;
+  const isMultiPanel = effectiveChildCount > 1;
 
   // ResizeObserver to track container size changes
   useEffect(() => {
@@ -98,10 +106,8 @@ export const Splitter = ({
       setSizePercentage(initialPercentage);
       
       if (resize) {
-        resize([
-          initialPercentage,
-          100 - initialPercentage,
-        ]);
+        const actualPrimarySize = (initialPercentage / 100) * newContainerSize;
+        resize([actualPrimarySize, newContainerSize - actualPrimarySize]);
       }
     }
   }, [initialPrimarySize, orientation, resize, splitter, swapped]);
@@ -212,7 +218,7 @@ export const Splitter = ({
       )}
       style={style}
     >
-      {React.Children.count(children) > 1 ? (
+      {isMultiPanel ? (
         <>
           <div
             style={!swapped ? { flexBasis: size } : {}}
@@ -221,7 +227,7 @@ export const Splitter = ({
               [styles.secondaryPanel]: swapped,
             })}
           >
-            {React.Children.toArray(children)[0]}
+            {childrenArray[0]}
           </div>
           {!floating && (
             <div
@@ -241,7 +247,7 @@ export const Splitter = ({
             })}
             style={swapped ? { flexBasis: size } : {}}
           >
-            {React.Children.toArray(children)[1]}
+            {childrenArray[1]}
           </div>
           {floating && (
             <div
@@ -261,8 +267,8 @@ export const Splitter = ({
         </>
       ) : (
         <>
-          {React.Children.toArray(children)?.[0] && (
-            <div className={styles.panel}>{React.Children.toArray(children)[0]}</div>
+          {childrenArray?.[0] && (
+            <div className={styles.panel}>{childrenArray[0]}</div>
           )}
         </>
       )}

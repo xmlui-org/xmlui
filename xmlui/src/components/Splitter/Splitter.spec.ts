@@ -31,6 +31,255 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByTestId("single-child")).toBeVisible();
   });
 
+  test.describe("conditional rendering behavior", () => {
+    test("hides resizer and stretches single panel when second child has when=false", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Splitter height="200px" width="400px" testId="splitter">
+          <Stack backgroundColor="lightblue" height="100%" testId="primary">Primary</Stack>
+          <Stack when="{false}" backgroundColor="darksalmon" height="100%" testId="secondary">Secondary</Stack>
+        </Splitter>
+      `);
+      
+      // Primary panel should be visible
+      await expect(page.getByTestId("primary")).toBeVisible();
+      
+      // Secondary panel should not be visible (filtered out by when=false)
+      await expect(page.getByTestId("secondary")).not.toBeVisible();
+      
+      // Resizer should not be visible when only one child is rendered
+      const resizer = page.locator('[class*="resizer"]');
+      const isResizerVisible = await resizer.isVisible().catch(() => false);
+      expect(isResizerVisible).toBe(false);
+      
+      // Primary panel should stretch to fill the entire splitter container
+      const splitter = page.getByTestId("splitter");
+      const primary = page.getByTestId("primary");
+      
+      const splitterBounds = await getBounds(splitter);
+      const primaryBounds = await getBounds(primary);
+      
+      // Allow small tolerance for borders/padding
+      const tolerance = 5;
+      expect(Math.abs(primaryBounds.width - splitterBounds.width)).toBeLessThan(tolerance);
+      expect(Math.abs(primaryBounds.height - splitterBounds.height)).toBeLessThan(tolerance);
+    });
+
+    test("hides resizer and stretches single panel when first child has when=false", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Splitter height="200px" width="400px" testId="splitter">
+          <Stack when="{false}" backgroundColor="lightblue" height="100%" testId="primary">Primary</Stack>
+          <Stack backgroundColor="darksalmon" height="100%" testId="secondary">Secondary</Stack>
+        </Splitter>
+      `);
+      
+      // Primary panel should not be visible (filtered out by when=false)
+      await expect(page.getByTestId("primary")).not.toBeVisible();
+      
+      // Secondary panel should be visible
+      await expect(page.getByTestId("secondary")).toBeVisible();
+      
+      // Resizer should not be visible when only one child is rendered
+      const resizer = page.locator('[class*="resizer"]');
+      const isResizerVisible = await resizer.isVisible().catch(() => false);
+      expect(isResizerVisible).toBe(false);
+      
+      // Secondary panel should stretch to fill the entire splitter container
+      const splitter = page.getByTestId("splitter");
+      const secondary = page.getByTestId("secondary");
+      
+      const splitterBounds = await getBounds(splitter);
+      const secondaryBounds = await getBounds(secondary);
+      
+      // Allow small tolerance for borders/padding
+      const tolerance = 5;
+      expect(Math.abs(secondaryBounds.width - splitterBounds.width)).toBeLessThan(tolerance);
+      expect(Math.abs(secondaryBounds.height - splitterBounds.height)).toBeLessThan(tolerance);
+    });
+
+    test("shows resizer when both children are visible", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Splitter height="200px" width="400px" testId="splitter">
+          <Stack backgroundColor="lightblue" height="100%" testId="primary">Primary</Stack>
+          <Stack backgroundColor="darksalmon" height="100%" testId="secondary">Secondary</Stack>
+        </Splitter>
+      `);
+      
+      // Both panels should be visible
+      await expect(page.getByTestId("primary")).toBeVisible();
+      await expect(page.getByTestId("secondary")).toBeVisible();
+      
+      // Resizer should be visible when both children are rendered
+      const resizer = page.locator('[class*="resizer"]');
+      await expect(resizer).toBeVisible();
+    });
+
+    test("dynamically updates when child visibility changes", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Fragment var.showSecondary="{true}">
+          <Splitter height="200px" width="400px" testId="splitter">
+            <Stack backgroundColor="lightblue" height="100%" testId="primary">Primary</Stack>
+            <Stack when="{showSecondary}" backgroundColor="darksalmon" height="100%" testId="secondary">Secondary</Stack>
+          </Splitter>
+          <Button testId="toggle" onClick="showSecondary = !showSecondary">Toggle Secondary</Button>
+        </Fragment>
+      `);
+      
+      // Initially both panels should be visible
+      await expect(page.getByTestId("primary")).toBeVisible();
+      await expect(page.getByTestId("secondary")).toBeVisible();
+      
+      // Resizer should be visible
+      const resizer = page.locator('[class*="resizer"]');
+      await expect(resizer).toBeVisible();
+      
+      // Click toggle to hide secondary panel
+      await page.getByTestId("toggle").click();
+      
+      // Primary should still be visible, secondary should be hidden
+      await expect(page.getByTestId("primary")).toBeVisible();
+      await expect(page.getByTestId("secondary")).not.toBeVisible();
+      
+      // Resizer should now be hidden
+      const isResizerVisible = await resizer.isVisible().catch(() => false);
+      expect(isResizerVisible).toBe(false);
+      
+      // Primary panel should stretch to fill container
+      const splitter = page.getByTestId("splitter");
+      const primary = page.getByTestId("primary");
+      
+      const splitterBounds = await getBounds(splitter);
+      const primaryBounds = await getBounds(primary);
+      
+      const tolerance = 5;
+      expect(Math.abs(primaryBounds.width - splitterBounds.width)).toBeLessThan(tolerance);
+      
+      // Click toggle again to show secondary panel
+      await page.getByTestId("toggle").click();
+      
+      // Both panels should be visible again
+      await expect(page.getByTestId("primary")).toBeVisible();
+      await expect(page.getByTestId("secondary")).toBeVisible();
+      
+      // Resizer should be visible again
+      await expect(resizer).toBeVisible();
+    });
+
+    test("handles when condition with complex expressions", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Fragment var.count="{0}">
+          <Splitter height="200px" width="400px" testId="splitter">
+            <Stack backgroundColor="lightblue" height="100%" testId="primary">Primary</Stack>
+            <Stack when="{count > 5}" backgroundColor="darksalmon" height="100%" testId="secondary">Secondary</Stack>
+          </Splitter>
+          <Button testId="increment" onClick="count = count + 1">Increment</Button>
+          <Text testId="count-display">{count}</Text>
+        </Fragment>
+      `);
+      
+      // Initially only primary should be visible (count = 0, which is not > 5)
+      await expect(page.getByTestId("primary")).toBeVisible();
+      await expect(page.getByTestId("secondary")).not.toBeVisible();
+      
+      // Resizer should be hidden
+      const resizer = page.locator('[class*="resizer"]');
+      const isResizerVisible1 = await resizer.isVisible().catch(() => false);
+      expect(isResizerVisible1).toBe(false);
+      
+      // Click increment 6 times to make count > 5
+      for (let i = 0; i < 6; i++) {
+        await page.getByTestId("increment").click();
+      }
+      
+      await expect(page.getByTestId("count-display")).toHaveText("6");
+      
+      // Now both panels should be visible
+      await expect(page.getByTestId("primary")).toBeVisible();
+      await expect(page.getByTestId("secondary")).toBeVisible();
+      
+      // Resizer should be visible
+      await expect(resizer).toBeVisible();
+    });
+
+    test("works with multiple conditionally hidden children", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Splitter height="200px" width="400px" testId="splitter">
+          <Stack when="{false}" backgroundColor="lightblue" height="100%" testId="child1">Child 1</Stack>
+          <Stack when="{false}" backgroundColor="darksalmon" height="100%" testId="child2">Child 2</Stack>
+          <Stack backgroundColor="lightgreen" height="100%" testId="child3">Child 3</Stack>
+        </Splitter>
+      `);
+      
+      // Only child3 should be visible
+      await expect(page.getByTestId("child1")).not.toBeVisible();
+      await expect(page.getByTestId("child2")).not.toBeVisible();
+      await expect(page.getByTestId("child3")).toBeVisible();
+      
+      // Resizer should be hidden (only one visible child)
+      const resizer = page.locator('[class*="resizer"]');
+      const isResizerVisible = await resizer.isVisible().catch(() => false);
+      expect(isResizerVisible).toBe(false);
+      
+      // Child3 should stretch to fill container
+      const splitter = page.getByTestId("splitter");
+      const child3 = page.getByTestId("child3");
+      
+      const splitterBounds = await getBounds(splitter);
+      const child3Bounds = await getBounds(child3);
+      
+      const tolerance = 5;
+      expect(Math.abs(child3Bounds.width - splitterBounds.width)).toBeLessThan(tolerance);
+    });
+
+    test("handles all children being conditionally hidden", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Splitter height="200px" width="400px" testId="splitter">
+          <Stack when="{false}" backgroundColor="lightblue" height="100%" testId="child1">Child 1</Stack>
+          <Stack when="{false}" backgroundColor="darksalmon" height="100%" testId="child2">Child 2</Stack>
+        </Splitter>
+      `);
+      
+      // No children should be visible
+      await expect(page.getByTestId("child1")).not.toBeVisible();
+      await expect(page.getByTestId("child2")).not.toBeVisible();
+      
+      // Splitter should still be visible but empty
+      await expect(page.getByTestId("splitter")).toBeVisible();
+      
+      // Resizer should not be visible
+      const resizer = page.locator('[class*="resizer"]');
+      const isResizerVisible = await resizer.isVisible().catch(() => false);
+      expect(isResizerVisible).toBe(false);
+    });
+
+    test("works with different orientations", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Splitter height="200px" width="400px" orientation="horizontal" testId="splitter">
+          <Stack backgroundColor="lightblue" height="100%" testId="primary">Primary</Stack>
+          <Stack when="{false}" backgroundColor="darksalmon" height="100%" testId="secondary">Secondary</Stack>
+        </Splitter>
+      `);
+      
+      // Primary should be visible, secondary should not
+      await expect(page.getByTestId("primary")).toBeVisible();
+      await expect(page.getByTestId("secondary")).not.toBeVisible();
+      
+      // Resizer should be hidden
+      const resizer = page.locator('[class*="resizer"]');
+      const isResizerVisible = await resizer.isVisible().catch(() => false);
+      expect(isResizerVisible).toBe(false);
+      
+      // Primary should stretch horizontally to fill container
+      const splitter = page.getByTestId("splitter");
+      const primary = page.getByTestId("primary");
+      
+      const splitterBounds = await getBounds(splitter);
+      const primaryBounds = await getBounds(primary);
+      
+      const tolerance = 5;
+      expect(Math.abs(primaryBounds.width - splitterBounds.width)).toBeLessThan(tolerance);
+    });
+  });
+
   test.describe("orientation property", () => {
     test("orientation='horizontal' arranges sections left to right", async ({ initTestBed, page }) => {
       await initTestBed(`
@@ -693,6 +942,40 @@ test.describe("Other Edge Cases", () => {
     // Should still be functional
     await expect(page.getByTestId("primary")).toBeVisible();
     await expect(page.getByTestId("secondary")).toBeVisible();
+  });
+
+  test("conditional rendering works with different child component types", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Splitter height="200px" width="400px" testId="splitter">
+        <VStack when="{false}" backgroundColor="lightblue" height="100%" testId="vstack">
+          <Text>VStack Content</Text>
+        </VStack>
+        <Text backgroundColor="darksalmon" height="100%" testId="text">Just Text</Text>
+        <Fragment when="{false}" testId="fragment">
+          <Stack backgroundColor="lightgreen" height="100%">Fragment Content</Stack>
+        </Fragment>
+      </Splitter>
+    `);
+    
+    // Only the Text component should be visible
+    await expect(page.getByTestId("vstack")).not.toBeVisible();
+    await expect(page.getByTestId("text")).toBeVisible();
+    await expect(page.getByTestId("fragment")).not.toBeVisible();
+    
+    // Resizer should be hidden since only one child is visible
+    const resizer = page.locator('[class*="resizer"]');
+    const isResizerVisible = await resizer.isVisible().catch(() => false);
+    expect(isResizerVisible).toBe(false);
+    
+    // Text component should stretch to fill container
+    const splitter = page.getByTestId("splitter");
+    const text = page.getByTestId("text");
+    
+    const splitterBounds = await getBounds(splitter);
+    const textBounds = await getBounds(text);
+    
+    const tolerance = 5;
+    expect(Math.abs(textBounds.width - splitterBounds.width)).toBeLessThan(tolerance);
   });
 });
 
