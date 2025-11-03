@@ -6,7 +6,7 @@
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
     "build:xmlui-test-bed": "cd src/testing/infrastructure && xmlui build --build-mode=INLINE_ALL --withHostingMetaFiles --withMock",
-    "build:bin": "tsc -p tsconfig.bin.json",
+    "build:bin": "tsdown --out-dir='dist/bin' bin/index.ts",
     "build:xmlui": "vite build --mode lib && ncc build bin/vite-xmlui-plugin.ts -o dist/lib/vite-xmlui-plugin",
     "build:xmlui-standalone": "vite build --mode standalone",
     "build:xmlui-metadata": "vite build --mode metadata",
@@ -99,6 +99,7 @@
     "remark-gfm": "^4.0.1",
     "sass": "1.55.0",
     "scroll-into-view-if-needed": "^3.1.0",
+    "tsx": "4.20.6",
     "turndown": "^7.2.0",
     "unist-util-visit": "^5.0.0",
     "use-context-selector": "1.4.1",
@@ -107,8 +108,7 @@
     "vite-plugin-svgr": "4.2.0",
     "vscode-languageserver": "^9.0.1",
     "vscode-languageserver-textdocument": "^1.0.11",
-    "yargs": "17.7.2",
-    "tsx": "4.20.6"
+    "yargs": "17.7.2"
   },
   "devDependencies": {
     "@babel/core": "7.19.6",
@@ -145,8 +145,10 @@
     "rollup-plugin-visualizer": "5.8.3",
     "serve": "14.2.0",
     "terser": "^5.44.0",
+    "tsdown": "^0.15.12",
     "typescript": "5.7.3",
-    "vite": "5.4.19",
+    "unplugin-lightningcss": "^0.4.3",
+    "vite": "6.4.1",
     "vite-plugin-dts": "4.5.0",
     "vitest": "^3.0.3"
   },
