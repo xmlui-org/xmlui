@@ -1,5 +1,8 @@
+#!/usr/bin/env node
+
 import { build } from "./build";
 import { start } from "./start";
+
 import { preview } from "./preview";
 import yargs from "yargs/yargs";
 import { hideBin } from "yargs/helpers";

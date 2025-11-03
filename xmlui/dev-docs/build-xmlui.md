@@ -635,17 +635,6 @@ cd xmlui
 find src -name "*.scss" | head -10
 ```
 
-**Issue: Standalone build too large**
-
-```bash
-# Analyze bundle contents
-cd xmlui
-npx rollup-plugin-visualizer dist/standalone/xmlui-standalone.umd.js
-
-# Consider splitting into multiple bundles
-# Or mark more dependencies as external
-```
-
 **Issue: Type conflicts**
 
 ```bash
