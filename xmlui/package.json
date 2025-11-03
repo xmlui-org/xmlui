@@ -141,7 +141,7 @@
   "clean-package": {
     "replace": {
       "bin": {
-        "xmlui": "dist/scripts/bin/bootstrap.cjs"
+        "xmlui": "dist/bin/index.js"
       },
       "main": "./dist/standalone/xmlui-standalone.umd.js",
       "module": "./dist/lib/xmlui.js",
