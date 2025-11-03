@@ -1,3 +1,5 @@
+import { validationStatusStyleNames } from "./themes/base-utils";
+
 export type HVar = {
   classes: Array<string>;
   attribute: string;
@@ -61,7 +63,19 @@ function createCombinations(arr: Array<any> = []) {
       stateCombinations.push(arr.slice(j, j + i));
     }
   }
-  return stateCombinations.sort((a, b) => b.length - a.length);
+  const result = stateCombinations.sort((a, b) => {
+    if (b.length !== a.length) {
+      return b.length - a.length;
+    }
+    // If lengths are equal, prioritize non-validation states
+    const aHasValidation = a.some((state: any) => validationStatusStyleNames.includes(state));
+    const bHasValidation = b.some((state: any) => validationStatusStyleNames.includes(state));
+
+    if (aHasValidation && !bHasValidation) return 1;
+    if (!aHasValidation && bHasValidation) return -1;
+    return 0;
+  });
+  return result;
 }
 
 export type ThemeVarMatchResult = {
