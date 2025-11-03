@@ -6,7 +6,7 @@
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
     "build:xmlui-test-bed": "cd src/testing/infrastructure && xmlui build --build-mode=INLINE_ALL --withHostingMetaFiles --withMock",
-    "build:bin": "tsdown --out-dir='dist/bin' bin/index.ts",
+    "build:bin": "tsdown",
     "build:xmlui": "vite build --mode lib && ncc build bin/vite-xmlui-plugin.ts -o dist/lib/vite-xmlui-plugin",
     "build:xmlui-standalone": "vite build --mode standalone",
     "build:xmlui-metadata": "vite build --mode metadata",
