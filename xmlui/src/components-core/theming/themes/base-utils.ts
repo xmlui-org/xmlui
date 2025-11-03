@@ -17,6 +17,9 @@ export function paddingSubject(name: string, valueSpec?: PaddingValue): Record<s
     [`paddingHorizontal-${name}`]: valueSpec?.horizontal ?? "",
     [`paddingVertical-${name}`]: valueSpec?.vertical ?? "",
     [`padding-${name}`]:
-      valueSpec?.all ?? `$paddingTop-${name} $paddingRight-${name} $paddingBottom-${name} $paddingLeft-${name}`,
+      valueSpec?.all ??
+      `$paddingTop-${name} $paddingRight-${name} $paddingBottom-${name} $paddingLeft-${name}`,
   };
 }
+
+export const validationStatusStyleNames = ["default", "success", "error", "warning"] as const;
