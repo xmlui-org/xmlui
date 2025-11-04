@@ -34,6 +34,17 @@ export const TableMd = createMetadata({
       `The component receives data via this property. The \`data\` property is a list of items ` +
         `that the \`Table\` can display.`,
     ),
+    dataIdProperty: {
+      description: `This property defines the name of the property in each data item that holds the unique ID ` +
+        `for that item. By default, the property is set to \`id\`. If your data items do not have ` +
+        `an \`id\` property, you can set this property to the name of the property that holds ` +
+        `the unique ID for each item.\n\n` +
+        `If the first 3 of the data items do not have such a property, the table will generate ` +
+        `unique IDs based on the index of each item in the data array. Note that this may lead to ` +
+        `issues when the data changes, as the indices may not remain consistent, thus an \`id\` should be provided.`,
+      valueType: "string",
+      defaultValue: defaultProps.dataIdProperty,
+    },
     isPaginated: {
       description: `This property adds pagination controls to the \`${COMP}\`.`,
       valueType: "boolean",
