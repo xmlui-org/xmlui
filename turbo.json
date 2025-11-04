@@ -5,7 +5,7 @@
   "envMode": "loose",
   "tasks": {
     "build:bin": {
-      "outputs": ["dist/scripts/**"]
+      "outputs": ["dist/bin/**"]
     },
     "build:xmlui": {
       "outputs": ["dist/lib/**"]

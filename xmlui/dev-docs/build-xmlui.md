@@ -35,7 +35,7 @@ The XMLUI framework package is built using **Vite** with multiple build modes. T
 npm run build-xmlui              # Build entire XMLUI core package
 
 # From xmlui/ directory
-npm run build:bin                # Build CLI tools
+npm run build:bin                # Build CLI tools using tsdown
 npm run build:xmlui              # Build library mode
 npm run build:xmlui-standalone   # Build UMD bundle
 npm run build:xmlui-metadata     # Extract component metadata
@@ -47,7 +47,7 @@ npm run build:xmlui-metadata     # Extract component metadata
 
 | Mode           | Entry Point                   | Output Format        | Purpose                  |
 | -------------- | ----------------------------- | -------------------- | ------------------------ |
-| **lib**        | Multiple entries              | ES Modules (.mjs)    | npm package distribution |
+| **lib**        | Multiple entries              | ES Modules (.js)     | npm package distribution |
 | **standalone** | index-standalone.ts           | UMD bundle (.umd.js) | Buildless CDN deployment |
 | **metadata**   | collectedComponentMetadata.ts | ES Module            | Documentation/LSP        |
 
@@ -136,13 +136,13 @@ copy({
 
 ```
 dist/lib/
-  ├── xmlui.mjs                          # Main framework bundle
+  ├── xmlui.js                          # Main framework bundle
   ├── xmlui.d.ts                         # Bundled type definitions
-  ├── xmlui-parser.mjs                   # Parser bundle
-  ├── language-server.mjs                # LSP server bundle
-  ├── language-server-web-worker.mjs     # Browser LSP bundle
-  ├── syntax-monaco.mjs                  # Monaco syntax bundle
-  ├── syntax-textmate.mjs                # TextMate syntax bundle
+  ├── xmlui-parser.js                   # Parser bundle
+  ├── language-server.js                # LSP server bundle
+  ├── language-server-web-worker.js     # Browser LSP bundle
+  ├── syntax-monaco.js                  # Monaco syntax bundle
+  ├── syntax-textmate.js                # TextMate syntax bundle
   ├── *.css                              # Extracted component styles
   └── scss/                              # Source SCSS files
       └── (mirrors src/ structure)
@@ -154,35 +154,53 @@ After `clean-package` transforms package.json during publish:
 
 ```json
 {
-  "main": "./dist/lib/xmlui.js",
+  "main": "./dist/standalone/xmlui-standalone.umd.js",
+  "module": "./dist/lib/xmlui.js",
   "types": "./dist/lib/xmlui.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/lib/xmlui.js"
-    },
-    "./parser": {
-      "import": "./dist/lib/xmlui-parser.js"
+      "import": "./dist/lib/xmlui.js",
+      "require": "./dist/standalone/xmlui-standalone.umd.js"
     },
     "./language-server": {
-      "import": "./dist/lib/language-server.js"
+      "import": "./dist/lib/language-server.js",
+      "require": "./dist/lib/language-server.js"
     },
     "./language-server-web-worker": {
-      "import": "./dist/lib/language-server-web-worker.js"
+      "import": "./dist/lib/language-server-web-worker.js",
+      "require": "./dist/lib/language-server-web-worker.js"
     },
-    "./syntax/monaco": {
-      "import": "./dist/lib/syntax-monaco.js"
-    },
-    "./syntax/textmate": {
-      "import": "./dist/lib/syntax-textmate.js"
+    "./parser": {
+      "import": "./dist/lib/xmlui-parser.js",
+      "require": "./dist/lib/xmlui-parser.js"
     },
     "./*.css": {
-      "import": "./dist/lib/*.css"
+      "import": "./dist/lib/*.css",
+      "require": "./dist/lib/*.css"
     },
     "./index.scss": {
-      "import": "./dist/lib/scss/index.scss"
+      "import": "./dist/lib/scss/index.scss",
+      "require": "./dist/lib/scss/index.scss"
+    },
+    "./themes.scss": {
+      "import": "./dist/lib/scss/components-core/theming/_themes.scss",
+      "require": "./dist/lib/scss/components-core/theming/_themes.scss"
     },
     "./vite-xmlui-plugin": {
-      "import": "./dist/scripts/bin/vite-xmlui-plugin.js"
+      "import": "./dist/lib/vite-xmlui-plugin/index.js",
+      "require": "./dist/lib/vite-xmlui-plugin/index.js"
+    },
+    "./syntax/monaco": {
+      "import": "./dist/lib/syntax-monaco.js",
+      "require": "./dist/lib/syntax-monaco.js"
+    },
+    "./syntax/textmate": {
+      "import": "./dist/lib/syntax-textmate.js",
+      "require": "./dist/lib/syntax-textmate.js"
+    },
+    "./testing": {
+      "import": "./dist/lib/testing.js",
+      "require": "./dist/lib/testing.js"
     }
   }
 }
@@ -360,8 +378,8 @@ This internally runs in order:
 ```bash
 # 1. Build CLI tools
 npm run build:bin
-# Compiles TypeScript in bin/ folder using tsconfig.bin.json
-# Output: bin/*.js files
+# Compiles TypeScript in bin/ folder using tsdown (see tsdown.config.ts)
+# Output: dist/bin/
 
 # 2. Build library for npm
 npm run build:xmlui
@@ -405,7 +423,7 @@ The `clean-package` tool transforms package.json during publish:
 {
   "main": "./dist/lib/xmlui.js",
   "bin": {
-    "xmlui": "dist/scripts/bin/bootstrap.js"
+    "xmlui": "dist/bin/index.js"
   }
 }
 ```

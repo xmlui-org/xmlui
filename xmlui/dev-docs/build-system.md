@@ -428,25 +428,24 @@ src/
 ```
 dist/
   ├── lib/                        # Library build
-  │   ├── xmlui.mjs
+  │   ├── xmlui.js
   │   ├── xmlui.d.ts
-  │   ├── xmlui-parser.mjs
-  │   ├── language-server.mjs
+  │   ├── xmlui-parser.js
+  │   ├── language-server.js
   │   └── scss/                   # SCSS source files
   ├── standalone/                 # Standalone build
   │   └── xmlui-standalone.umd.js
   ├── metadata/                   # Metadata build
   │   └── xmlui-metadata.js
-  └── scripts/
-      └── bin/
-          └── vite-xmlui-plugin.js
+  └── bin/
+      └── index.js
 ```
 
 ### Bin Scripts
 
 ```
 bin/
-  ├── bootstrap.js                # CLI entry (ts-node setup)
+  ├── bootstrap.js                # CLI entry for development (uses tsx)
   ├── index.ts                    # Command router
   ├── build.ts                    # Build implementation
   ├── build-lib.ts                # Library build
@@ -726,7 +725,7 @@ This table summarizes when to run builds across different contexts:
 | **xmlui/**     | Building standalone       | `npm run build:xmlui-standalone` | `vite build --mode standalone`                  | For CDN/buildless                              | Creates self-contained UMD bundle for `<script>` tag usage; framework builds itself with Vite directly                                                                                                                                                              |
 | **xmlui/**     | Generating metadata       | `npm run build:xmlui-metadata`   | `vite build --mode metadata`                    | After component changes, before doc generation | Extracts component metadata into `xmlui-metadata.js` for documentation generation and language server autocomplete. This is the source of truth for component APIs, props, and descriptions. Framework uses Vite directly.                                          |
 | **xmlui/**     | Full doc generation       | `npm run generate-all-docs`      | Node scripts (not CLI)                          | After metadata changes                         | Runs three scripts: (1) `build:xmlui-metadata` - extracts metadata, (2) `generate-docs` - creates component .md files from metadata, (3) `generate-docs-summaries` - creates overview/summary files. This is the complete pipeline from source code → documentation |
-| **xmlui/**     | Compile bin scripts       | `npm run build:bin`              | `tsc -p tsconfig.bin.json`                      | After changes to bin/\*.ts files               | Compiles TypeScript bin scripts (CLI tools) to JavaScript using TypeScript directly; needed when modifying build system or CLI commands                                                                                                                             |
+| **xmlui/**     | Compile bin scripts       | `npm run build:bin`              | `tsdown`                                        | After changes to bin/\*.ts files               | Compiles TypeScript bin scripts (CLI tools) to JavaScript using tsdown (see tsdown.config.ts); needed when modifying build system or CLI commands                                                                                                                   |
 | **extension/** | Development               | `npm start`                      | `xmlui start`                                   | Keep running during dev                        | Runs dev server with HMR for demo app; use with build-watch in separate terminal                                                                                                                                                                                    |
 | **extension/** | Watch mode build          | `npm run build-watch`            | `xmlui build-lib --watch`                       | Keep running during dev                        | Continuously rebuilds extension library on changes; pair with `npm start` for rapid iteration                                                                                                                                                                       |
 | **extension/** | Building for publish      | `npm run build:extension`        | `xmlui build-lib`                               | Before npm publish                             | Creates distributable library bundle (.mjs, .js, .d.ts, CSS) for npm package                                                                                                                                                                                        |
