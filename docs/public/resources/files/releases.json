@@ -1,5 +1,73 @@
 [
   {
+    "tag_name": "xmlui@0.11.4",
+    "published_at": "2025-10-31T15:41:04Z",
+    "changes": [
+      {
+        "description": "Change validation status signature from having one dash to two dashes to better reflect that they are status modifiers. Ex. -default -> --default, -error -> --error",
+        "commit_sha": "e384c59"
+      },
+      {
+        "description": "Splitter now responds the visibility changes of its children",
+        "commit_sha": "f296904"
+      },
+      {
+        "description": "Temporarily disable the \"variant\" behavior on Button",
+        "commit_sha": "f296904"
+      },
+      {
+        "description": "fix: Select - use extractValue for controlled component value prop",
+        "commit_sha": "be73336"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.11.4.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.4/xmlui-0.11.4.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.11.3",
+    "published_at": "2025-10-30T12:44:56Z",
+    "changes": [
+      {
+        "description": "improve: charts - better domain configuration",
+        "commit_sha": "4a311e2"
+      },
+      {
+        "description": "Tiny Splitter updates",
+        "commit_sha": "f8a75ce"
+      },
+      {
+        "description": "Text strong variant style fixed",
+        "commit_sha": "bbc421b"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.11.3.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.3/xmlui-0.11.3.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.11.2",
+    "published_at": "2025-10-29T11:26:36Z",
+    "changes": [
+      {
+        "description": "update package dependencies for tsx usage",
+        "commit_sha": "c1f306f"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.11.2.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.2/xmlui-0.11.2.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.11.1",
     "published_at": "2025-10-29T08:11:14Z",
     "changes": [
@@ -132,94 +200,6 @@
       {
         "name": "xmlui-0.10.22.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.22/xmlui-0.10.22.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.10.21",
-    "published_at": "2025-10-16T11:53:23Z",
-    "changes": [
-      {
-        "description": "Add custom Text variant styling",
-        "commit_sha": "6fd4d62"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.10.21.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.21/xmlui-0.10.21.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.10.20",
-    "published_at": "2025-10-15T12:46:33Z",
-    "changes": [
-      {
-        "description": "fix: Autocomplete handles animations correctly",
-        "commit_sha": "26eac90"
-      },
-      {
-        "description": "Add margin-related theme variables to ContentSeparator",
-        "commit_sha": "f53edff"
-      },
-      {
-        "description": "Add applyIf property to Theme",
-        "commit_sha": "1840916"
-      },
-      {
-        "description": "fix: external animation is now correctly applied to ModalDialogs as well",
-        "commit_sha": "c6be7a3"
-      },
-      {
-        "description": "Added better error text when rendering FormItem outside of a Form.",
-        "commit_sha": "6aaefaf"
-      },
-      {
-        "description": "refactor: Select and AutoComplete components",
-        "commit_sha": "28d2585"
-      },
-      {
-        "description": "The itemLabelWidth value of Form now supports theme variables ($space-\\* values).",
-        "commit_sha": "e29a231"
-      },
-      {
-        "description": "AppState now uses a merge operation to set initialValue",
-        "commit_sha": "22162c0"
-      },
-      {
-        "description": "fix: itemWithLabel - layout issue",
-        "commit_sha": "e90232b"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.10.20.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.20/xmlui-0.10.20.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.10.19",
-    "published_at": "2025-10-07T09:22:39Z",
-    "changes": [
-      {
-        "description": "Add checkboxTolerance property to Table",
-        "commit_sha": "facb257"
-      },
-      {
-        "description": "test: review onFocus, onBlur e2e tests",
-        "commit_sha": "6084c14"
-      },
-      {
-        "description": "Renamed the following properties in DatePicker: minValue -> startDate, maxValue -> endDate. Also updated component documentation.",
-        "commit_sha": "e1fa9d7"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.10.19.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.19/xmlui-0.10.19.js"
       }
     ]
   }
