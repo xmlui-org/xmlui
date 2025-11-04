@@ -98,6 +98,7 @@ export type CheckboxTolerance = (typeof CheckboxToleranceValues)[number];
 type CellVerticalAlign = "top" | "center" | "bottom";
 
 type TableProps = {
+  dataIdProperty?: string;
   data: any[];
   columns?: OurColumnMetadata[];
   isPaginated?: boolean;
@@ -180,22 +181,26 @@ const isWithinCheckboxBoundary = (
   pointX: number,
   pointY: number,
   checkboxRect: DOMRect,
-  tolerancePixels: number
+  tolerancePixels: number,
 ): boolean => {
   // Calculate distance from point to checkbox boundaries
   const distanceToLeft = Math.abs(pointX - checkboxRect.left);
   const distanceToRight = Math.abs(pointX - checkboxRect.right);
   const distanceToTop = Math.abs(pointY - checkboxRect.top);
   const distanceToBottom = Math.abs(pointY - checkboxRect.bottom);
-  
+
   // Check if point is within the checkbox bounds or within boundary pixels of any edge
   const withinHorizontalBounds = pointX >= checkboxRect.left && pointX <= checkboxRect.right;
   const withinVerticalBounds = pointY >= checkboxRect.top && pointY <= checkboxRect.bottom;
   const withinCheckbox = withinHorizontalBounds && withinVerticalBounds;
-  
-  const nearHorizontalBoundary = (withinVerticalBounds && (distanceToLeft <= tolerancePixels || distanceToRight <= tolerancePixels));
-  const nearVerticalBoundary = (withinHorizontalBounds && (distanceToTop <= tolerancePixels || distanceToBottom <= tolerancePixels));
-  
+
+  const nearHorizontalBoundary =
+    withinVerticalBounds &&
+    (distanceToLeft <= tolerancePixels || distanceToRight <= tolerancePixels);
+  const nearVerticalBoundary =
+    withinHorizontalBounds &&
+    (distanceToTop <= tolerancePixels || distanceToBottom <= tolerancePixels);
+
   return withinCheckbox || nearHorizontalBoundary || nearVerticalBoundary;
 };
 
@@ -226,6 +231,7 @@ const getCommonPinningStyles = (column: Column<RowWithOrder>): CSSProperties => 
 export const Table = forwardRef(
   (
     {
+      dataIdProperty = defaultProps.dataIdProperty,
       data = defaultProps.data,
       columns = defaultProps.columns,
       isPaginated = defaultProps.isPaginated,
@@ -271,11 +277,30 @@ export const Table = forwardRef(
     forwardedRef,
   ) => {
     const { getThemeVar } = useTheme();
-    const safeData = Array.isArray(data) ? data : EMPTY_ARRAY;
+    const arrayData = Array.isArray(data) ? data : EMPTY_ARRAY;
     const wrapperRef = useRef<HTMLDivElement>(null);
     const ref = forwardedRef ? composeRefs(wrapperRef, forwardedRef) : wrapperRef;
     const tableRef = useRef<HTMLTableElement>(null);
     const estimatedHeightRef = useRef<number | null>(null);
+
+    const safeData = useMemo(() => {
+      if (arrayData.length === 0) {
+        return arrayData;
+      }
+      if (dataIdProperty) {
+        return arrayData.map((item) => ({ ...item, id: item[dataIdProperty] }));
+      }
+      // --- Check the first 3 items for an 'id' property
+      const sampleSize = Math.min(3, arrayData.length);
+      const hasIdProperty = arrayData
+        .slice(0, sampleSize)
+        .every((item) => item && item.hasOwnProperty("id"));
+      if (!hasIdProperty) {
+        return arrayData.map((item, index) => ({ ...item, id: index }));
+      }
+
+      return arrayData;
+    }, [dataIdProperty, arrayData]);
 
     const safeColumns: OurColumnMetadata[] = useMemo(() => {
       if (columns) {
@@ -298,10 +323,10 @@ export const Table = forwardRef(
 
     // --- Track which row should show forced hover for checkbox
     const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
-    
+
     // --- Track if the header checkbox should show forced hover
     const [headerCheckboxHovered, setHeaderCheckboxHovered] = useState<boolean>(false);
-    
+
     // --- Calculate tolerance pixels from the prop
     const tolerancePixels = getCheckboxTolerancePixels(checkboxTolerance);
 
@@ -481,21 +506,24 @@ export const Table = forwardRef(
               }}
             />
           ) : null,
-        cell: ({ row }: CellContext<any, unknown>) => (
-          <Toggle
-            {...{
-              className: classnames(styles.checkBoxWrapper, {
-                [styles.forceHoverWrapper]: hoveredRowId === row.id,
-              }),
-              value: row.getIsSelected(),
-              indeterminate: row.getIsSomeSelected(),
-              forceHover: hoveredRowId === row.id,
-              onDidChange: () => {
-                toggleRow(row.original, { metaKey: true });
-              },
-            }}
-          />
-        ),
+        cell: ({ row }: CellContext<any, unknown>) => {
+          //console.log(row)
+          return (
+            <Toggle
+              {...{
+                className: classnames(styles.checkBoxWrapper, {
+                  [styles.forceHoverWrapper]: hoveredRowId === row.id,
+                }),
+                value: row.getIsSelected(),
+                indeterminate: row.getIsSomeSelected(),
+                forceHover: hoveredRowId === row.id,
+                onDidChange: () => {
+                  toggleRow(row.original, { metaKey: true });
+                },
+              }}
+            />
+          );
+        },
       };
       return rowsSelectable ? [selectColumn, ...columnsWithCustomCell] : columnsWithCustomCell;
     }, [
@@ -717,10 +745,7 @@ export const Table = forwardRef(
           (paginationControlsLocation === "top" || paginationControlsLocation === "both") &&
           paginationControls}
 
-        <table
-          className={styles.table}
-          ref={tableRef}
-        >
+        <table className={styles.table} ref={tableRef}>
           {!hideHeader && (
             <thead style={{ height: headerHeight }} className={styles.headerWrapper}>
               {table.getHeaderGroups().map((headerGroup, headerGroupIndex) => (
@@ -731,31 +756,40 @@ export const Table = forwardRef(
                   })}
                   onClick={(event) => {
                     const target = event.target as HTMLElement;
-                    const headerCell = target.closest('th');
-                    
+                    const headerCell = target.closest("th");
+
                     // Only handle clicks for the select column header
                     if (headerCell && rowsSelectable && enableMultiRowSelection) {
-                      const header = headerGroup.headers.find(h => {
+                      const header = headerGroup.headers.find((h) => {
                         const headerElement = headerCell;
-                        return headerElement?.getAttribute('data-column-id') === h.id || h.id === 'select';
+                        return (
+                          headerElement?.getAttribute("data-column-id") === h.id ||
+                          h.id === "select"
+                        );
                       });
-                      
-                      if (header && header.id === 'select') {
+
+                      if (header && header.id === "select") {
                         const clickX = event.clientX;
                         const clickY = event.clientY;
-                        const checkbox = headerCell.querySelector('input[type=\"checkbox\"]') as HTMLInputElement;
-                        
+                        const checkbox = headerCell.querySelector(
+                          'input[type=\"checkbox\"]',
+                        ) as HTMLInputElement;
+
                         if (checkbox) {
                           const checkboxRect = checkbox.getBoundingClientRect();
-                          
-                          if (isWithinCheckboxBoundary(clickX, clickY, checkboxRect, tolerancePixels)) {
+
+                          if (
+                            isWithinCheckboxBoundary(clickX, clickY, checkboxRect, tolerancePixels)
+                          ) {
                             // Prevent the default click and manually trigger the checkbox
                             event.preventDefault();
                             event.stopPropagation();
-                            
+
                             const allSelected = table
                               .getRowModel()
-                              .rows.every((row) => rowDisabledPredicate(row.original) || row.getIsSelected());
+                              .rows.every(
+                                (row) => rowDisabledPredicate(row.original) || row.getIsSelected(),
+                              );
                             checkAllRows(!allSelected);
                           }
                         }
@@ -765,34 +799,44 @@ export const Table = forwardRef(
                   onMouseMove={(event) => {
                     if (rowsSelectable && enableMultiRowSelection) {
                       const target = event.target as HTMLElement;
-                      const headerCell = target.closest('th');
-                      
+                      const headerCell = target.closest("th");
+
                       if (headerCell) {
-                        const header = headerGroup.headers.find(h => {
+                        const header = headerGroup.headers.find((h) => {
                           const headerElement = headerCell;
-                          return headerElement?.getAttribute('data-column-id') === h.id || h.id === 'select';
+                          return (
+                            headerElement?.getAttribute("data-column-id") === h.id ||
+                            h.id === "select"
+                          );
                         });
-                        
-                        if (header && header.id === 'select') {
+
+                        if (header && header.id === "select") {
                           const mouseX = event.clientX;
                           const mouseY = event.clientY;
-                          const checkbox = headerCell.querySelector('input[type=\"checkbox\"]') as HTMLInputElement;
-                          
+                          const checkbox = headerCell.querySelector(
+                            'input[type=\"checkbox\"]',
+                          ) as HTMLInputElement;
+
                           if (checkbox) {
                             const checkboxRect = checkbox.getBoundingClientRect();
-                            const shouldShowHover = isWithinCheckboxBoundary(mouseX, mouseY, checkboxRect, tolerancePixels);
-                            
+                            const shouldShowHover = isWithinCheckboxBoundary(
+                              mouseX,
+                              mouseY,
+                              checkboxRect,
+                              tolerancePixels,
+                            );
+
                             if (shouldShowHover && !headerCheckboxHovered) {
                               setHeaderCheckboxHovered(true);
-                              event.currentTarget.style.cursor = 'pointer';
+                              event.currentTarget.style.cursor = "pointer";
                             } else if (!shouldShowHover && headerCheckboxHovered) {
                               setHeaderCheckboxHovered(false);
-                              event.currentTarget.style.cursor = '';
+                              event.currentTarget.style.cursor = "";
                             }
                           }
                         } else if (headerCheckboxHovered) {
                           setHeaderCheckboxHovered(false);
-                          event.currentTarget.style.cursor = '';
+                          event.currentTarget.style.cursor = "";
                         }
                       }
                     }
@@ -800,7 +844,7 @@ export const Table = forwardRef(
                   onMouseLeave={(event) => {
                     if (headerCheckboxHovered) {
                       setHeaderCheckboxHovered(false);
-                      event.currentTarget.style.cursor = '';
+                      event.currentTarget.style.cursor = "";
                     }
                   }}
                 >
@@ -923,51 +967,62 @@ export const Table = forwardRef(
                       if (target.tagName.toLowerCase() === "input") {
                         return;
                       }
-                      
+
                       // Check if click is within checkbox boundary
                       const currentRow = event.currentTarget as HTMLElement;
-                      const checkbox = currentRow.querySelector('input[type="checkbox"]') as HTMLInputElement;
-                      
+                      const checkbox = currentRow.querySelector(
+                        'input[type="checkbox"]',
+                      ) as HTMLInputElement;
+
                       if (checkbox) {
                         const checkboxRect = checkbox.getBoundingClientRect();
                         const clickX = event.clientX;
                         const clickY = event.clientY;
-                        
-                        if (isWithinCheckboxBoundary(clickX, clickY, checkboxRect, tolerancePixels)) {
+
+                        if (
+                          isWithinCheckboxBoundary(clickX, clickY, checkboxRect, tolerancePixels)
+                        ) {
                           // Toggle the checkbox when clicking within the boundary
                           toggleRow(row.original, { metaKey: true });
                           return;
                         }
                       }
-                      
+
                       toggleRow(row.original, event);
                     }}
                     onMouseMove={(event) => {
                       // Change cursor and hover state when within checkbox boundary
                       const currentRow = event.currentTarget as HTMLElement;
-                      const checkbox = currentRow.querySelector('input[type="checkbox"]') as HTMLInputElement;
-                      
+                      const checkbox = currentRow.querySelector(
+                        'input[type="checkbox"]',
+                      ) as HTMLInputElement;
+
                       if (checkbox) {
                         const checkboxRect = checkbox.getBoundingClientRect();
                         const mouseX = event.clientX;
                         const mouseY = event.clientY;
-                        
-                        const shouldShowHover = isWithinCheckboxBoundary(mouseX, mouseY, checkboxRect, tolerancePixels);
-                        
+
+                        const shouldShowHover = isWithinCheckboxBoundary(
+                          mouseX,
+                          mouseY,
+                          checkboxRect,
+                          tolerancePixels,
+                        );
+
                         // Update hover state and cursor based on proximity to checkbox
                         if (shouldShowHover) {
                           setHoveredRowId(row.id);
-                          currentRow.style.cursor = 'pointer';
+                          currentRow.style.cursor = "pointer";
                         } else {
                           setHoveredRowId(null);
-                          currentRow.style.cursor = '';
+                          currentRow.style.cursor = "";
                         }
                       }
                     }}
                     onMouseLeave={(event) => {
                       // Reset cursor and hover state when leaving the row
                       const currentRow = event.currentTarget as HTMLElement;
-                      currentRow.style.cursor = '';
+                      currentRow.style.cursor = "";
                       setHoveredRowId(null);
                     }}
                   >
@@ -1097,6 +1152,7 @@ function ColumnOrderingIndicator({
 
 export const defaultProps = {
   data: EMPTY_ARRAY,
+  dataIdProperty: "id",
   columns: EMPTY_ARRAY,
   isPaginated: false,
   loading: false,

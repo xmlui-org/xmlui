@@ -880,6 +880,75 @@ test.describe("Edge Cases", () => {
     const headers = page.locator("th");
     await expect(headers.first()).toContainText("Name");
   });
+
+  test("row checkboxes work when data array contains items with 'id' property",
+    async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table testId="table" rowsSelectable="true" data="{[
+          { id: 1, name: 'Item 1' },
+          { id: 2, name: 'Item 2' }
+        ]}">
+          <Column bindTo="id" width="80px">
+            <Text>{$item.id}</Text>
+          </Column>
+          <Column bindTo="name">
+            <Text>{$item.name}</Text>
+          </Column>
+        </Table>
+      `);
+      const checkboxes = page.locator("input[type='checkbox']");
+      await checkboxes.nth(1).check({ force: true }); // First data row
+      await expect(checkboxes.nth(1)).toBeChecked();
+      await expect(checkboxes.nth(2)).not.toBeChecked(); // Second data row
+    }
+  );
+
+  test("row checkboxes work when 'dataIdProperty' property is specified",
+    async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table testId="table" rowsSelectable="true"
+          dataIdProperty="account_id"
+          data="{[
+            { account_id: 1, name: 'Item 1' },
+            { account_id: 2, name: 'Item 2' }
+          ]}">
+          <Column bindTo="account_id" width="80px">
+            <Text>{$item.account_id}</Text>
+          </Column>
+          <Column bindTo="name">
+            <Text>{$item.name}</Text>
+          </Column>
+        </Table>
+      `);
+      const checkboxes = page.locator("input[type='checkbox']");
+      await checkboxes.nth(1).check({ force: true }); // First data row
+      await expect(checkboxes.nth(1)).toBeChecked();
+      await expect(checkboxes.nth(2)).not.toBeChecked(); // Second data row
+    }
+  );
+
+  test("row checkboxes work when no 'dataIdProperty' prop and no 'id' in data items",
+    async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table testId="table" rowsSelectable="true"
+          data="{[
+            { account_id: 1, name: 'Item 1' },
+            { account_id: 2, name: 'Item 2' }
+          ]}">
+          <Column bindTo="account_id" width="80px">
+            <Text>{$item.account_id}</Text>
+          </Column>
+          <Column bindTo="name">
+            <Text>{$item.name}</Text>
+          </Column>
+        </Table>
+      `);
+      const checkboxes = page.locator("input[type='checkbox']");
+      await checkboxes.nth(1).check({ force: true }); // First data row
+      await expect(checkboxes.nth(1)).toBeChecked();
+      await expect(checkboxes.nth(2)).not.toBeChecked(); // Second data row
+    }
+  );
 });
 
 // =============================================================================
