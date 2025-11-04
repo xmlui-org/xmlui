@@ -380,6 +380,7 @@ const TableWithColumns = memo(forwardRef(
           className={className}
           ref={ref}
           data={data}
+          dataIdProperty={extractValue.asOptionalString(node.props.dataIdProperty)}
           columns={columns}
           pageSizeOptions={extractValue(node.props.pageSizeOptions)}
           pageSize={extractValue.asOptionalNumber(node.props.pageSize)}
