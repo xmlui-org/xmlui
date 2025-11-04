@@ -118,6 +118,13 @@ export default ({ mode = "lib" }) => {
         target: "es2020",
       },
     },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          silenceDeprecations: ["global-builtin", "import", "new-global"],
+        },
+      },
+    },
     build: {
       minify: "terser",
       emptyOutDir: true,

@@ -42,11 +42,30 @@ export async function getViteConfig({
     define: overrides.define,
     resolve: {
       alias: overrides.resolve?.alias,
-      extensions: ['.js', '.ts', '.jsx', '.tsx', '.json', '.xmlui', '.xmlui.xs', '.xs', ...(overrides.resolve?.extensions || [])],
+      extensions: [
+        ".js",
+        ".ts",
+        ".jsx",
+        ".tsx",
+        ".json",
+        ".xmlui",
+        ".xmlui.xs",
+        ".xs",
+        ...(overrides.resolve?.extensions || []),
+      ],
     },
-    css: overrides.css,
+    css: {
+      ...overrides.css,
+      preprocessorOptions: {
+        ...overrides.css?.preprocessorOptions,
+        scss: {
+          ...overrides.css?.preprocessorOptions?.scss,
+          silenceDeprecations: ["import", "global-builtin", "new-global"],
+        },
+      },
+    },
     optimizeDeps: {
-      extensions: ['.xmlui', '.xmlui.xs', '.xs'],
+      extensions: [".xmlui", ".xmlui.xs", ".xs"],
       ...overrides.optimizeDeps,
     },
     build: {
