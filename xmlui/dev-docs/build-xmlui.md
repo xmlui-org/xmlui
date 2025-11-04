@@ -428,6 +428,11 @@ The `clean-package` tool transforms package.json during publish:
 }
 ```
 
+> **Note on CLI Development:**
+> In the development environment, the `xmlui` command points to `bin/bootstrap.js`. This file uses `tsx` to execute the CLI's TypeScript source (`bin/index.ts`) on-the-fly. This allows for rapid development of the CLI without requiring a separate build step for every change.
+>
+> For production, `clean-package` replaces the `bin` entry to point to the compiled `dist/bin/index.js`, ensuring the published package does not rely on `tsx`.
+
 ## Vite Configuration
 
 ### Target and Optimization
