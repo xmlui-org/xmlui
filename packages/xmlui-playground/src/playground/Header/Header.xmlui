@@ -1,0 +1,10 @@
+<Component name="PlaygroundHeader">
+  <AppState id="state"/>
+  <HStack verticalAlignment="center">
+    <Logo height="24px"/>
+    <SpaceFiller />
+    <Button size="sm" icon="plus" variant="ghost" tooltip="Reset app"/>
+    <ThemeSwitcher />
+    <ToneSwitch tooltip="Change tone" onDidChange="(value) => state.update({ options: { ...state.value.options, activeTone: value } })"/>
+  </HStack>
+</Component>

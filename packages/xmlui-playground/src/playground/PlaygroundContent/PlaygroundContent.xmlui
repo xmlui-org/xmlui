@@ -1,0 +1,26 @@
+<Component name="PlaygroundContent">
+  <AppState id="state"/>
+  <Splitter
+    width="100%"
+    height="*"
+    orientation="{state.value.options.orientation}"
+    swapped="{state.value.options.swapped}"
+    initialPrimarySize="50%"
+  >
+  <Editor
+    when="{state.value.appDescription.app}"
+    value="{state.value.appDescription.app}"
+    onChange="(value) => state.update({ appDescription: { app: value } })"
+    language="{state.value.options.language}"
+    activeThemeTone="{state.value.appDescription.app}"
+  />
+  <Preview
+    withSplashScreen="true"
+    app="{state.value.appDescription.app}"
+    components="{state.value.appDescription.components}"
+    config="{state.value.appDescription.config}"
+    activeTheme="{state.value.options.activeTheme}"
+    activeTone="{state.value.options.activeTone}"
+  />
+  </Splitter>
+</Component>

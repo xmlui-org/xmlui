@@ -13,8 +13,8 @@ import ConfirmationDialog from "./ConfirmationDialog";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { CodeSelector } from "./CodeSelector";
 import { Button, Text, Logo } from "xmlui";
-import { ToneSwitcher } from "./ToneSwitcher";
 import { useToast } from "../hooks/useToast";
+import { ToneSwitch } from "xmlui";
 
 export const Header = ({ standalone = false }: { standalone?: boolean }) => {
   const { appDescription, options, dispatch } = usePlayground();
@@ -89,7 +89,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
             <>
               {!options.fixedTheme && (
                 <Tooltip label="Change tone">
-                  <ToneSwitcher />
+                  <ToneSwitch />
                 </Tooltip>
               )}
               {!options.fixedTheme &&

@@ -1,8 +1,8 @@
 import { createComponentRenderer } from "../../components-core/renderers";
-import { createMetadata } from "../metadata-helpers";
+import { createMetadata, dClick, dDidChange } from "../metadata-helpers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import styles from "./ToneSwitch.module.scss";
-import { ToneSwitch, type ToneSwitchProps } from "./ToneSwitchNative";
+import { ToneSwitch } from "./ToneSwitchNative";
 
 const COMP = "ToneSwitch";
 
@@ -21,6 +21,9 @@ export const ToneSwitchMd = createMetadata({
       description: "Icon to display for dark mode",
       defaultValue: "moon",
     },
+  },
+  events: {
+    didChange: dDidChange(COMP),
   },
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
@@ -45,13 +48,16 @@ export const ToneSwitchMd = createMetadata({
  * Define the renderer for the ToneSwitch component
  */
 export const toneSwitchComponentRenderer = createComponentRenderer(
-  COMP, 
-  ToneSwitchMd, 
-  ({ node, extractValue, className }) => {
-    return <ToneSwitch
-      className={className}
-      iconLight={extractValue(node.props.iconLight)}
-      iconDark={extractValue(node.props.iconDark)}
-    />;
-  }
+  COMP,
+  ToneSwitchMd,
+  ({ node, extractValue, className, lookupEventHandler }) => {
+    return (
+      <ToneSwitch
+        onDidChange={lookupEventHandler("didChange")}
+        className={className}
+        iconLight={extractValue(node.props.iconLight)}
+        iconDark={extractValue(node.props.iconDark)}
+      />
+    );
+  },
 );

@@ -1,0 +1,10 @@
+<Component name="ThemeSwitcher">
+  <DropdownMenu>
+    <property name="triggerTemplate">
+        <Button variant="ghost" icon="palette" tooltip="Change theme"/>
+    </property>
+    <Items items="{state.value.options.themes}">
+      <MenuItem>{item}</MenuItem>
+    </Items>
+  </DropdownMenu>
+</Component>

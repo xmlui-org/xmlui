@@ -1,5 +1,5 @@
-import { createComponentRenderer, createMetadata, parseScssVar } from "xmlui";
-import { StandalonePlayground } from "./StandalonePlaygroundNative";
+import { createMetadata, createUserDefinedComponentRenderer, parseScssVar } from "xmlui";
+import componentSource from "./StandalonePlayground/StandalonePlayground.xmlui";
 
 const COMP = "StandalonePlayground";
 
@@ -11,10 +11,7 @@ export const StandalonePlaygroundMd = createMetadata({
   defaultThemeVars: {},
 });
 
-export const standalonePlaygroundComponentRenderer = createComponentRenderer(
-  COMP,
+export const standalonePlaygroundComponentRenderer = createUserDefinedComponentRenderer(
   StandalonePlaygroundMd,
-  () => {
-    return <StandalonePlayground />;
-  },
+  componentSource,
 );

@@ -98,6 +98,8 @@ import {
   dValueApi,
 } from "./components/metadata-helpers";
 import StandaloneComponent from "./components-core/rendering/StandaloneComponent";
+import { ToneSwitch } from "./components/ToneSwitch/ToneSwitchNative";
+import AppWithCodeViewNative from "./components/NestedApp/AppWithCodeViewNative";
 
 export type {
   ThemeDefinition,
@@ -188,6 +190,8 @@ export {
   VisuallyHidden,
   LinkNative,
   ToneChangerButton,
+  ToneSwitch,
+  AppWithCodeViewNative,
   Logo,
   Breakout,
   useSearchContextContent,
