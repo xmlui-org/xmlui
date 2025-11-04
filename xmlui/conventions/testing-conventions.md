@@ -70,7 +70,7 @@ There's also documentation in the `.md` files, next to the component's file.
 **ALWAYS read the component's `.tsx` file before creating tests.** The component files contain essential metadata that documents:
 
 - **Properties**: All available props with their types and descriptions
-- **Events**: Available event handlers and their parameters  
+- **Events**: Available event handlers and their parameters
 - **Theme Variables**: Default values and names for CSS custom properties used in theme testing
 
 Use the documented theme variable names when creating theme tests instead of guessing:
@@ -95,7 +95,8 @@ test("applies theme variables", async ({ initTestBed, page }) => {
 - **Provides context** for proper testing scenarios
 
 Example documentation locations:
-- `Button.tsx` - Contains metadata 
+
+- `Button.tsx` - Contains metadata
 - `Button.md` - Contains examples and detailed usage
 - `Button.spec.ts` - Your test file
 
@@ -400,10 +401,10 @@ test("enqueueItem returns valid ID", async ({ initTestBed, createButtonDriver })
       <Button onClick="testState = { id: testQueue.enqueueItem('test'), hasId: true }" />
     </Fragment>
   `);
-  
+
   const buttonDriver = await createButtonDriver("button");
   await buttonDriver.component.click();
-  
+
   const result = await testStateDriver.testState();
   expect(result.id).toBeTruthy();
   expect(result.hasId).toBe(true);
@@ -489,6 +490,14 @@ Use web-first assertions, like `await expect(checkboxLocator).not.toBeChecked()`
 
 ## Best Practices
 
+### Avoid Frontend Code in E2E Tests
+
+It is crucial to avoid importing frontend code into E2E tests, especially if it transitively imports stylesheets. This can lead to unexpected issues with the test runner and slow down test execution.
+
+For example, importing `defaultProps` from a component file like `ButtonNative.tsx` into a test file like `Button.spec.ts` is an anti-pattern. The component file likely imports SCSS or CSS files, which should not be part of the test environment.
+
+Instead, if you need to share data between your component and your tests, define it in a separate file that can be imported safely by both.
+
 ### Skipping tests
 
 #### Skipping For coverage
@@ -545,7 +554,7 @@ Components that support layout properties (like `labelPosition`, `direction`, po
 
 #### Best Practices for Layout Testing
 
-- **Import getBounds**: Import from `"../../testing/component-test-helpers"` 
+- **Import getBounds**: Import from `"../../testing/component-test-helpers"`
 - **Use descriptive coordinates**: Destructure specific properties like `{ left, right, top, bottom }`
 - **Test both directions**: Include RTL tests when direction affects layout
 - **Verify invalid values**: Test graceful handling of invalid layout properties
@@ -555,7 +564,10 @@ Components that support layout properties (like `labelPosition`, `direction`, po
 Use `getBounds()` to get element coordinates and verify relative positioning:
 
 ```typescript
-test("ComponentName appears at the correct side of ComponentName2", async ({ initTestBed, page }) => {
+test("ComponentName appears at the correct side of ComponentName2", async ({
+  initTestBed,
+  page,
+}) => {
   await initTestBed(`
     <Fragment>
       <ComponentName testId="comp1" />
@@ -614,9 +626,7 @@ test("all adornments appear in the right place", async ({ initTestBed, page }) =
   const { left: startIconLeft, right: startIconRight } = await getBounds(
     page.getByRole("img").first(),
   );
-  const { left: endIconLeft, right: endIconRight } = await getBounds(
-    page.getByRole("img").last(),
-  );
+  const { left: endIconLeft, right: endIconRight } = await getBounds(page.getByRole("img").last());
 
   // Check order of adornments relative to their container component bounds
   expect(startTextRight - compLeft).toBeLessThanOrEqual(compRight - startTextLeft);

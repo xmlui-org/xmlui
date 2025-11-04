@@ -187,7 +187,7 @@ The `turbo.json` file at the repository root defines all tasks and their orchest
 
 ```json
 {
-  "outputs": ["dist/scripts/**"]
+  "outputs": ["dist/bin/**"]
 }
 ```
 
