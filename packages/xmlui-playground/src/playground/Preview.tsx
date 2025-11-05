@@ -12,6 +12,7 @@ export function Preview() {
 
   return (
     <NestedApp
+      withSplashScreen={true}
       app={appDescription.app}
       activeTone={options.activeTone}
       activeTheme={options.activeTheme}
