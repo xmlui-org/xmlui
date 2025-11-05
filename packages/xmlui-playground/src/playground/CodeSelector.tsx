@@ -1,24 +1,17 @@
-import { forwardRef, useMemo, useState } from "react";
-import * as RadixSelect from "@radix-ui/react-select";
-import selectStyles from "./Select.module.scss";
+import { useMemo } from "react";
 import { usePlayground } from "../hooks/usePlayground";
 import { contentChanged } from "../state/store";
-import { useTheme, Button, type CompoundComponentDef, Icon, type ThemeDefinition } from "xmlui";
-
-export const SelectItem = forwardRef(({ children, className, ...props }: any, forwardedRef) => {
-  return (
-    <RadixSelect.Item className={selectStyles.RadixMenuItem} {...props} ref={forwardedRef}>
-      <RadixSelect.ItemText>{children}</RadixSelect.ItemText>
-    </RadixSelect.Item>
-  );
-});
-
-SelectItem.displayName = "SelectItem";
+import {
+  type CompoundComponentDef,
+  type ThemeDefinition,
+  DropdownMenu,
+  MenuItem,
+  Text,
+} from "xmlui";
+import styles from "./CodeSelector.module.scss";
 
 export const CodeSelector = () => {
   const { appDescription, options, dispatch } = usePlayground();
-  const [open, setOpen] = useState(false);
-  const { root } = useTheme();
 
   const selectedValue = useMemo(() => {
     let content = "";
@@ -42,60 +35,38 @@ export const CodeSelector = () => {
   }, [appDescription.components, appDescription.config?.themes, options.content]);
 
   return (
-    <RadixSelect.Root
-      open={open}
-      onOpenChange={(open) => setOpen(open)}
-      value={options.content}
-      onValueChange={(value) => dispatch(contentChanged(value))}
-    >
-      <RadixSelect.Trigger aria-label="component">
-        <Button themeColor="primary" variant="ghost">
-          <RadixSelect.Value>{selectedValue}</RadixSelect.Value>
-          <RadixSelect.Icon className={selectStyles.SelectIcon}>
-            {open ? <Icon name="chevronup" /> : <Icon name="chevrondown" />}
-          </RadixSelect.Icon>
-        </Button>
-      </RadixSelect.Trigger>
-      <RadixSelect.Portal container={root}>
-        <RadixSelect.Content
-          className={selectStyles.RadixMenuContent}
-          side="bottom"
-          align="start"
-          position="popper"
-        >
-          <RadixSelect.Viewport>
-            <RadixSelect.Group>
-              <SelectItem value="app" key="app">
-                Main.xmlui
-              </SelectItem>
-            </RadixSelect.Group>
-            {appDescription.config?.themes?.length > 0 && (
-              <RadixSelect.Group>
-                <RadixSelect.Label className={selectStyles.SelectLabel}>Themes</RadixSelect.Label>
-                {appDescription.config?.themes?.map((theme: ThemeDefinition, index: number) => (
-                  <SelectItem value={theme.id} key={index}>
-                    {`${theme.id}.json`}
-                  </SelectItem>
-                ))}
-              </RadixSelect.Group>
-            )}
-            {appDescription.components?.length > 0 && (
-              <RadixSelect.Group>
-                <RadixSelect.Label className={selectStyles.SelectLabel}>
-                  Components
-                </RadixSelect.Label>
-                {appDescription.components?.map(
-                  (component: CompoundComponentDef, index: number) => (
-                    <SelectItem value={component.name} key={index}>
-                      {`${component.name}.xmlui`}
-                    </SelectItem>
-                  ),
-                )}
-              </RadixSelect.Group>
-            )}
-          </RadixSelect.Viewport>
-        </RadixSelect.Content>
-      </RadixSelect.Portal>
-    </RadixSelect.Root>
+    <DropdownMenu label={selectedValue}>
+      <MenuItem key={"app"} label={"Main.xmlui"} onClick={() => dispatch(contentChanged("app"))} />
+
+      {appDescription.config?.themes?.length > 0 && (
+        <>
+          <Text className={styles.sectionTitle} variant="strong">
+            Themes
+          </Text>
+          {appDescription.config?.themes?.map((theme: ThemeDefinition, index: number) => (
+            <MenuItem
+              key={index}
+              label={`${theme.id}.json`}
+              onClick={() => dispatch(contentChanged(theme.id))}
+            />
+          ))}
+        </>
+      )}
+
+      {appDescription.components?.length > 0 && (
+        <>
+          <Text className={styles.sectionTitle} variant="strong">
+            Components
+          </Text>
+          {appDescription.components?.map((component: CompoundComponentDef, index: number) => (
+            <MenuItem
+              key={index}
+              label={`${component.name}.xmlui`}
+              onClick={() => dispatch(contentChanged(component.name))}
+            />
+          ))}
+        </>
+      )}
+    </DropdownMenu>
   );
 };

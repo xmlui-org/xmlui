@@ -1,0 +1,8 @@
+@use "xmlui/themes.scss" as themes;
+
+.sectionTitle {
+  width: 100%;
+  padding-left: themes.$space-3;
+  padding-right: themes.$space-3;
+  font-size: themes.$space-3_5;
+}
