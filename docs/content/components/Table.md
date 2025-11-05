@@ -228,28 +228,6 @@ Here, the component displays rocket information coming from the official SpaceX 
 </App>
 ```
 
-### `dataIdProperty` (default: "id") [#dataidproperty-default-id]
-
-This property defines the name of the property in each data item that holds the unique ID for that item. By default, the property is set to `id`. If your data items do not have an `id` property, you can set this property to the name of the property that holds the unique ID for each item.
-
-If the first 3 of the data items do not have such a property, the table will generate unique IDs based on the index of each item in the data array. Note that this may lead to issues when the data changes, as the indices may not remain consistent, thus an `id` should be provided.
-
-```xmlui copy /dataIdProperty="key"/
-<App>
-  <Table
-    dataIdProperty="key"
-    rowsSelectable="true"
-    data="{[
-      { 'key': 0, 'name': 'John' },
-      { 'key': 1, 'name': 'Jane' },
-      { 'key': 2, 'name': 'Bill' },
-    ]}"
-  > 
-    <Column bindTo="name"/>
-  </Table>
-</App>
-```
-
 ### `enableMultiRowSelection` (default: true) [#enablemultirowselection-default-true]
 
 This boolean property indicates whether you can select multiple rows in the table. This property only has an effect when the rowsSelectable property is set. Setting it to `false` limits selection to a single row.
