@@ -1,10 +1,41 @@
 <Component name="PlaygroundHeader">
   <AppState id="state"/>
-  <HStack verticalAlignment="center">
-    <Logo height="24px"/>
+  <HStack verticalAlignment="center" padding="$space-2" borderBottom="1px solid $color-surface-100" wrapContent="true">
+    <Link to="https://xmlui.org/" height="100%">
+      <Logo height="$space-8"/>
+    </Link>
+    <DropdownMenu label="(ignored)">
+      <property name="triggerTemplate">
+        <Button label="{state.value.options.content}" variant="ghost" icon="chevrondown" iconPosition="end"/>
+      </property>
+      <MenuItem onClick="state.update({ options: { ...state.value.options, content: 'app' } })">Main.xmlui</MenuItem>
+      <Text value="Themes" variant="strong" padding="$space-2"/>
+      <MenuItem onClick="state.update({ options: { ...state.value.options, content: 'theme' } })">theme.json</MenuItem>
+      <Items items="{state.value.appDescription.config?.themes}">
+        <MenuItem onClick="state.update({ options: { ...state.value.options, content: item.id +'.json' } })">{item.id}</MenuItem>
+      </Items>
+      <Fragment when="{state.value.appDescription.components.length > 0}">
+        <Text value="Components" variant="strong" padding="$space-2"/>
+        <Items items="{state.value.appDescription.components}">
+          <MenuItem onClick="state.update({ options: { ...state.value.options, content: 'component' } })">{item}</MenuItem>
+        </Items>
+      </Fragment>
+    </DropdownMenu>
     <SpaceFiller />
-    <Button size="sm" icon="plus" variant="ghost" tooltip="Reset app"/>
     <ThemeSwitcher />
+    <Button icon="undo" variant="ghost" tooltip="Reset app" onClick="resetModal.open()"/>
+    <ContentSeparator orientation="vertical"/>
+    <Button icon="download" variant="ghost" tooltip="Download app" onClick="resetModal.open()"/>
+    <Button icon="share" variant="ghost" tooltip="Share this app" onClick="resetModal.open()"/>
+    <Button icon="popout" variant="ghost" tooltip="Preview in fullscreen" onClick="resetModal.open()"/>
+    <ContentSeparator orientation="vertical" />
     <ToneSwitch tooltip="Change tone" onDidChange="(value) => state.update({ options: { ...state.value.options, activeTone: value } })"/>
+    <ModalDialog id="resetModal" title="Confirm Reset" width="400px">
+      <Text value="Are you sure you want to reset the app? This action cannot be undone and will reset all code to its initial state."/>
+      <HStack horizontalAlignment="end">
+        <Button variant="outlined" tooltip="Cancel" onClick="resetModal.close()" label="Cancel"/>
+        <Button variant="solid" backgroundColor="$color-danger-400" tooltip="Confirm" onClick="resetModal.close()" label="Confirm"/>
+      </HStack>
+    </ModalDialog>
   </HStack>
 </Component>

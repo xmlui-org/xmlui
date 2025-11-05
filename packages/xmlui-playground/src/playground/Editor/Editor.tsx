@@ -16,7 +16,7 @@ export const EditorMd = createMetadata({
     language: {
       description: "The language of the editor.",
     },
-    activeThemeTone: {
+    activeTone: {
       description: "The active theme tone.",
     },
   },
@@ -32,7 +32,7 @@ export const editorRenderer = createComponentRenderer(
         value={extractValue(node.props.value)}
         onChange={lookupEventHandler("change")}
         language={extractValue(node.props.language)}
-        activeThemeTone={extractValue(node.props.activeThemeTone)}
+        activeThemeTone={extractValue(node.props.activeTone)}
       />
     );
   },

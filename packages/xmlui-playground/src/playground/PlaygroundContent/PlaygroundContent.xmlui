@@ -12,7 +12,7 @@
     value="{state.value.appDescription.app}"
     onChange="(value) => state.update({ appDescription: { app: value } })"
     language="{state.value.options.language}"
-    activeThemeTone="{state.value.appDescription.app}"
+    activeTone="{state.value.options.activeTone}"
   />
   <Preview
     withSplashScreen="true"

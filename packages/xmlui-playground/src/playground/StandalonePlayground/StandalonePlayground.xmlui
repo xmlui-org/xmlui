@@ -1,7 +1,4 @@
 <Component name="StandalonePlayground">
   <AppState id="state"/>
-  <VStack height="100vh" gap="0" padding="$space-2">
-    <PlaygroundHeader/>
-    <PlaygroundContent/>
-  </VStack>
+  <PlaygroundContent />
 </Component>

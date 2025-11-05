@@ -130,7 +130,10 @@ import TableDeleteRowIcon from "./Icon/TableDeleteRowIcon";
 import TableInsertColumnIcon from "./Icon/TableInsertColumnIcon";
 import TableDeleteColumnIcon from "./Icon/TableDeleteColumnIcon";
 
-type IconRenderer<T extends IconBaseProps> = (props: T, ref: ForwardedRef<HTMLElement>) => React.ReactElement<T>;
+type IconRenderer<T extends IconBaseProps> = (
+  props: T,
+  ref: ForwardedRef<HTMLElement>,
+) => React.ReactElement<T>;
 
 export type IconRegistryEntry = {
   renderer: IconRenderer<any>;
@@ -176,7 +179,9 @@ registerIconRenderer("chevronright", (props: IconBaseProps) => <ChevronRightIcon
 registerIconRenderer("chevronleft", (props: IconBaseProps) => <ChevronLeftIcon {...props} />);
 registerIconRenderer("doublechevrondown", (props: IconBaseProps) => <FiChevronsDown {...props} />);
 registerIconRenderer("doublechevronup", (props: IconBaseProps) => <FiChevronsUp {...props} />);
-registerIconRenderer("doublechevronright", (props: IconBaseProps) => <FiChevronsRight {...props} />);
+registerIconRenderer("doublechevronright", (props: IconBaseProps) => (
+  <FiChevronsRight {...props} />
+));
 registerIconRenderer("doublechevronleft", (props: IconBaseProps) => <FiChevronsLeft {...props} />);
 registerIconRenderer("dotmenu", (props: IconBaseProps) => <DotMenuIcon {...props} />);
 registerIconRenderer("dotmenuhorizontal", (props: IconBaseProps) => (
