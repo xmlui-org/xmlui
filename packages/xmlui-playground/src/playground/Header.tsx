@@ -8,12 +8,11 @@ import { resetApp, toneChanged } from "../state/store";
 import { handleDownloadZip } from "../utils/helpers";
 import { createQueryString } from "./utils";
 import { Box } from "./Box";
-import { Tooltip } from "./Tooltip";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { CodeSelector } from "./CodeSelector";
-import { Button, Text, Logo } from "xmlui";
-import { ToneSwitch } from "xmlui";
+import { Button, Text, Logo, Tooltip } from "xmlui";
+import { ToneSwitch, ContentSeparator } from "xmlui";
 import { useToast } from "../hooks/useToast";
 
 export const Header = ({ standalone = false }: { standalone?: boolean }) => {
@@ -84,7 +83,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
           {!options.previewMode && standalone && <CodeSelector />}
         </div>
         <Text>{appDescription.config?.name}</Text>
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
           {standalone && (
             <>
               {!options.fixedTheme &&
@@ -95,7 +94,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
           {!options.previewMode && show && (
             <>
               {!standalone && (
-                <Tooltip label="View and edit in new full-width window">
+                <Tooltip text="View and edit in new full-width window">
                   <Button variant="ghost" onClick={() => openStandaloneApp(false)}>
                     <RxOpenInNewWindow />
                   </Button>
@@ -113,7 +112,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
                 confirmText="Confirm"
                 cancelText="Cancel"
               />
-              <Tooltip label="Reset the app">
+              <Tooltip text="Reset the app">
                 <Button
                   variant="ghost"
                   onClick={() => {
@@ -131,23 +130,28 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
           )}
           {standalone && (
             <>
-              <Tooltip label="Share this app">
+              <ContentSeparator className={styles.separator} orientation="vertical" size={1} />
+
+              <Tooltip text="Share this app">
                 <Button variant="ghost" onClick={() => share()}>
                   <RxShare2 />
                 </Button>
               </Tooltip>
-              <Tooltip label="Preview in fullscreen">
+              <Tooltip text="Preview in fullscreen">
                 <Button variant="ghost" onClick={() => openStandaloneApp()}>
                   <RxOpenInNewWindow height={24} width={24} />
                 </Button>
               </Tooltip>
-              <Tooltip label="Download app">
+              <Tooltip text="Download app">
                 <Button variant="ghost" onClick={() => download()}>
                   <RxDownload height={24} width={24} />
                 </Button>
               </Tooltip>
+
+              <ContentSeparator className={styles.separator} orientation="vertical" size={1} />
+
               {!options.fixedTheme && (
-                <Tooltip label="Change tone">
+                <Tooltip text="Change tone">
                   <ToneSwitch onChange={(tone) => dispatch(toneChanged(tone))} />
                 </Tooltip>
               )}
