@@ -231,7 +231,8 @@ const getCommonPinningStyles = (column: Column<RowWithOrder>): CSSProperties => 
 export const Table = forwardRef(
   (
     {
-      dataIdProperty = defaultProps.dataIdProperty,
+      // TEMP: will be removed in favor of idKey
+      dataIdProperty,
       data = defaultProps.data,
       columns = defaultProps.columns,
       isPaginated = defaultProps.isPaginated,

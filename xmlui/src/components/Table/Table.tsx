@@ -43,7 +43,7 @@ export const TableMd = createMetadata({
         `unique IDs based on the index of each item in the data array. Note that this may lead to ` +
         `issues when the data changes, as the indices may not remain consistent, thus an \`id\` should be provided.`,
       valueType: "string",
-      defaultValue: defaultProps.dataIdProperty,
+      defaultValue: "id",
     },
     isPaginated: {
       description: `This property adds pagination controls to the \`${COMP}\`.`,
