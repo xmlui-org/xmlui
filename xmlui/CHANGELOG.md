@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.11.5
+
+### Patch Changes
+
+- 10d755e: refactor: xmlui-playground - design update
+- b3a4194: Fixed a case where if the data provided to a Table did not have 'id' attributes, the row selection would not work correctly.
+
 ## 0.11.4
 
 ### Patch Changes
