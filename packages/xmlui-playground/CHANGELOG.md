@@ -1,5 +1,11 @@
 # xmlui-playground
 
+## 0.1.13
+
+### Patch Changes
+
+- 10d755e: refactor: xmlui-playground - design update
+
 ## 0.1.12
 
 ### Patch Changes
