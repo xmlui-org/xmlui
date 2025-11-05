@@ -2,6 +2,7 @@ import { editorStatusChanged, textChanged } from "../state/store";
 import { startTransition, useCallback, useEffect, useState } from "react";
 import { usePlayground } from "../hooks/usePlayground";
 import { Editor as XMLUIEditor } from "xmlui-devtools";
+import { overflows } from "xmlui/testing";
 
 export const Editor = () => {
   const { text, dispatch, options } = usePlayground();

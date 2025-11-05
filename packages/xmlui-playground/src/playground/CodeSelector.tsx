@@ -5,6 +5,7 @@ import {
   type CompoundComponentDef,
   type ThemeDefinition,
   DropdownMenu,
+  Icon,
   MenuItem,
   Text,
 } from "xmlui";
@@ -36,7 +37,13 @@ export const CodeSelector = () => {
 
   return (
     <DropdownMenu label={selectedValue}>
-      <MenuItem key={"app"} label={"Main.xmlui"} onClick={() => dispatch(contentChanged("app"))} />
+      <MenuItem
+        iconPosition="end"
+        icon={"app" === options.content ? <Icon name="checkmark" /> : undefined}
+        key={"app"}
+        label={"Main.xmlui"}
+        onClick={() => dispatch(contentChanged("app"))}
+      />
 
       {appDescription.config?.themes?.length > 0 && (
         <>
@@ -45,6 +52,8 @@ export const CodeSelector = () => {
           </Text>
           {appDescription.config?.themes?.map((theme: ThemeDefinition, index: number) => (
             <MenuItem
+              iconPosition="end"
+              icon={theme.id === options.content ? <Icon name="checkmark" /> : undefined}
               key={index}
               label={`${theme.id}.json`}
               onClick={() => dispatch(contentChanged(theme.id))}
@@ -60,6 +69,8 @@ export const CodeSelector = () => {
           </Text>
           {appDescription.components?.map((component: CompoundComponentDef, index: number) => (
             <MenuItem
+              iconPosition="end"
+              icon={component.name === options.content ? <Icon name="checkmark" /> : undefined}
               key={index}
               label={`${component.name}.xmlui`}
               onClick={() => dispatch(contentChanged(component.name))}
