@@ -7,7 +7,7 @@
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
     "build:xmlui-test-bed": "cd src/testing/infrastructure && xmlui build --build-mode=INLINE_ALL --withHostingMetaFiles --withMock",
     "build:bin": "tsdown",
-    "build:xmlui": "vite build --mode lib && ncc build bin/vite-xmlui-plugin.ts -o dist/lib/vite-xmlui-plugin",
+    "build:xmlui": "vite build --mode lib && tsdown --no-config --no-clean --out-dir='dist/lib' --shims --dts bin/vite-xmlui-plugin.ts",
     "build:xmlui-standalone": "vite build --mode standalone",
     "build:xmlui-metadata": "vite build --mode metadata",
     "test:unit": "vitest run",
@@ -115,7 +115,7 @@
     "eslint-plugin-import": "2.28.1",
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-react-hooks": "^5.2.0",
-    "ncc": "^0.3.6",
+    "ncc": "^03.6",
     "prettier": "^3.3.3",
     "rollup-plugin-copy": "^3.5.0",
     "serve": "14.2.0",
@@ -175,8 +175,8 @@
           "require": "./dist/lib/scss/components-core/theming/_themes.scss"
         },
         "./vite-xmlui-plugin": {
-          "import": "./dist/lib/vite-xmlui-plugin/index.js",
-          "require": "./dist/lib/vite-xmlui-plugin/index.js"
+          "import": "./dist/lib/vite-xmlui-plugin.js",
+          "require": "./dist/lib/vite-xmlui-plugin.js"
         },
         "./syntax/monaco": {
           "import": "./dist/lib/syntax-monaco.js",
