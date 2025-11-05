@@ -13,7 +13,7 @@ import ConfirmationDialog from "./ConfirmationDialog";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { CodeSelector } from "./CodeSelector";
 import { Button, Text, Logo } from "xmlui";
-import { ToneSwitcher } from "./ToneSwitcher";
+import { ToneSwitch } from "xmlui";
 import { useToast } from "../hooks/useToast";
 
 export const Header = ({ standalone = false }: { standalone?: boolean }) => {
@@ -87,18 +87,9 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
         <div style={{ display: "flex", alignItems: "center" }}>
           {standalone && (
             <>
-              {!options.fixedTheme && (
-                <Tooltip label="Change tone">
-                  <ToneSwitcher />
-                </Tooltip>
-              )}
               {!options.fixedTheme &&
                 appDescription.availableThemes &&
-                appDescription.availableThemes.length > 1 && (
-                  <Tooltip label="Change theme">
-                    <ThemeSwitcher />
-                  </Tooltip>
-                )}
+                appDescription.availableThemes.length > 1 && <ThemeSwitcher />}
             </>
           )}
           {!options.previewMode && show && (
@@ -155,6 +146,11 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
                   <RxDownload height={24} width={24} />
                 </Button>
               </Tooltip>
+              {!options.fixedTheme && (
+                <Tooltip label="Change tone">
+                  <ToneSwitch />
+                </Tooltip>
+              )}
             </>
           )}
         </div>
