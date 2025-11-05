@@ -4,7 +4,7 @@ import classnames from "classnames";
 import { RxOpenInNewWindow, RxDownload, RxShare2 } from "react-icons/rx";
 import { LiaUndoAltSolid } from "react-icons/lia";
 import { usePlayground } from "../hooks/usePlayground";
-import { resetApp } from "../state/store";
+import { resetApp, toneChanged } from "../state/store";
 import { handleDownloadZip } from "../utils/helpers";
 import { createQueryString } from "./utils";
 import { Box } from "./Box";
@@ -148,7 +148,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
               </Tooltip>
               {!options.fixedTheme && (
                 <Tooltip label="Change tone">
-                  <ToneSwitch />
+                  <ToneSwitch onChange={(tone) => dispatch(toneChanged(tone))} />
                 </Tooltip>
               )}
             </>
