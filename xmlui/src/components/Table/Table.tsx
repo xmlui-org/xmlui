@@ -1,4 +1,4 @@
-import { forwardRef, useMemo, useRef, useState, memo } from "react";
+import { forwardRef, useMemo, useRef, useState, memo, useId } from "react";
 import produce from "immer";
 
 import styles from "./Table.module.scss";
@@ -14,7 +14,12 @@ import {
   StandaloneSelectionStore,
   useSelectionContext,
 } from "../SelectionStore/SelectionStoreNative";
-import { Table, TablePaginationControlsLocationValues, CheckboxToleranceValues, defaultProps } from "./TableNative";
+import {
+  Table,
+  TablePaginationControlsLocationValues,
+  CheckboxToleranceValues,
+  defaultProps,
+} from "./TableNative";
 import type { RendererContext } from "../../abstractions/RendererDefs";
 import { PositionValues } from "../Pagination/PaginationNative";
 
@@ -34,16 +39,13 @@ export const TableMd = createMetadata({
       `The component receives data via this property. The \`data\` property is a list of items ` +
         `that the \`Table\` can display.`,
     ),
-    dataIdProperty: {
-      description: `This property defines the name of the property in each data item that holds the unique ID ` +
-        `for that item. By default, the property is set to \`id\`. If your data items do not have ` +
-        `an \`id\` property, you can set this property to the name of the property that holds ` +
-        `the unique ID for each item.\n\n` +
-        `If the first 3 of the data items do not have such a property, the table will generate ` +
-        `unique IDs based on the index of each item in the data array. Note that this may lead to ` +
-        `issues when the data changes, as the indices may not remain consistent, thus an \`id\` should be provided.`,
+    idKey: {
+      description:
+        `This property is used to specify the unique ID property in the data array. ` +
+        `If the idKey points to a property that does not exist in the data items, ` +
+        `that will result in incorrect behavior when using selectable rows.`,
       valueType: "string",
-      defaultValue: "id",
+      defaultValue: defaultProps.idKey,
     },
     isPaginated: {
       description: `This property adds pagination controls to the \`${COMP}\`.`,
@@ -58,13 +60,13 @@ export const TableMd = createMetadata({
     rowsSelectable: d(`Indicates whether the rows are selectable (\`true\`) or not (\`false\`).`),
     initiallySelected: d(
       `An array of IDs that should be initially selected when the table is rendered. ` +
-        `This property only has an effect when the rowsSelectable property is set to \`true\`.`
+        `This property only has an effect when the rowsSelectable property is set to \`true\`.`,
     ),
     syncWithAppState: d(
       `An AppState instance to synchronize the table's selection state with. The table will ` +
         `read from and write to the 'selectedIds' property of the AppState object. When provided, ` +
         `this takes precedence over the initiallySelected property for initial selection. ` +
-        `You can use the AppState's didUpdate event to receive notifications when the selection changes.`
+        `You can use the AppState's didUpdate event to receive notifications when the selection changes.`,
     ),
     pageSize: d(
       `This property defines the number of rows to display per page when pagination is enabled.`,
@@ -93,14 +95,16 @@ export const TableMd = createMetadata({
       defaultProps.showCurrentPage,
     ),
     pageSizeSelectorPosition: {
-      description: "Determines where to place the page size selector in the layout. " +
+      description:
+        "Determines where to place the page size selector in the layout. " +
         "It works the same as the [Pagination component property](./Pagination#pagesizeselectorposition).",
       options: PositionValues,
       type: "string",
       default: defaultProps.pageSizeSelectorPosition,
     },
     pageInfoPosition: {
-      description: "Determines where to place the page information in the layout. " +
+      description:
+        "Determines where to place the page information in the layout. " +
         "It works the same as the [Pagination component property](./Pagination#pageinfoposition).",
       options: PositionValues,
       type: "string",
@@ -281,163 +285,166 @@ export const TableMd = createMetadata({
   },
 });
 
-const TableWithColumns = memo(forwardRef(
-  (
-    {
-      extractValue,
-      node,
-      renderChild,
-      lookupEventHandler,
-      lookupSyncCallback,
-      className,
-      registerComponentApi,
-    }: Pick<
-      RendererContext,
-      | "extractValue"
-      | "node"
-      | "renderChild"
-      | "lookupEventHandler"
-      | "className"
-      | "registerComponentApi"
-      | "lookupSyncCallback"
-    >,
-    ref,
-  ) => {
-    const data = extractValue(node.props.items) || extractValue(node.props.data);
+const TableWithColumns = memo(
+  forwardRef(
+    (
+      {
+        extractValue,
+        node,
+        renderChild,
+        lookupEventHandler,
+        lookupSyncCallback,
+        className,
+        registerComponentApi,
+      }: Pick<
+        RendererContext,
+        | "extractValue"
+        | "node"
+        | "renderChild"
+        | "lookupEventHandler"
+        | "className"
+        | "registerComponentApi"
+        | "lookupSyncCallback"
+      >,
+      ref,
+    ) => {
+      const idKey = extractValue.asOptionalString(node.props.idKey, defaultProps.idKey);
+      const data = extractValue(node.props.items) || extractValue(node.props.data);
+      const [columnIds, setColumnIds] = useState(EMPTY_ARRAY);
+      const [columnsByIds, setColumnByIds] = useState(EMPTY_OBJECT);
+      const columnIdsRef = useRef([]);
+      const [tableKey, setTableKey] = useState(0);
+      const tableContextValue = useMemo(() => {
+        return {
+          registerColumn: (column: OurColumnMetadata, id: string) => {
+            setColumnIds(
+              produce((draft) => {
+                const existing = draft.findIndex((colId) => colId === id);
+                if (existing < 0) {
+                  draft.push(id);
+                }
+              }),
+            );
+            setColumnByIds(
+              produce((draft) => {
+                draft[id] = column;
+              }),
+            );
+          },
+          unRegisterColumn: (id: string) => {
+            setColumnIds(
+              produce((draft) => {
+                return draft.filter((colId) => colId !== id);
+              }),
+            );
+            setColumnByIds(
+              produce((draft) => {
+                delete draft[id];
+              }),
+            );
+          },
+        };
+      }, []);
+      const columnRefresherContextValue = useMemo(() => {
+        return {
+          registerColumn: (column: OurColumnMetadata, id: string) => {
+            if (!columnIdsRef.current.find((colId) => colId === id)) {
+              setTableKey((prev) => prev + 1);
+              columnIdsRef.current.push(id);
+            }
+          },
+          unRegisterColumn: (id: string) => {
+            if (columnIdsRef.current.find((colId) => colId === id)) {
+              columnIdsRef.current = columnIdsRef.current.filter((colId) => colId !== id);
+              setTableKey((prev) => prev + 1);
+            }
+          },
+        };
+      }, []);
 
-    const [columnIds, setColumnIds] = useState(EMPTY_ARRAY);
-    const [columnsByIds, setColumnByIds] = useState(EMPTY_OBJECT);
-    const columnIdsRef = useRef([]);
-    const [tableKey, setTableKey] = useState(0);
-    const tableContextValue = useMemo(() => {
-      return {
-        registerColumn: (column: OurColumnMetadata, id: string) => {
-          setColumnIds(
-            produce((draft) => {
-              const existing = draft.findIndex((colId) => colId === id);
-              if (existing < 0) {
-                draft.push(id);
-              }
-            }),
-          );
-          setColumnByIds(
-            produce((draft) => {
-              draft[id] = column;
-            }),
-          );
-        },
-        unRegisterColumn: (id: string) => {
-          setColumnIds(
-            produce((draft) => {
-              return draft.filter((colId) => colId !== id);
-            }),
-          );
-          setColumnByIds(
-            produce((draft) => {
-              delete draft[id];
-            }),
-          );
-        },
-      };
-    }, []);
-    const columnRefresherContextValue = useMemo(() => {
-      return {
-        registerColumn: (column: OurColumnMetadata, id: string) => {
-          if (!columnIdsRef.current.find((colId) => colId === id)) {
-            setTableKey((prev) => prev + 1);
-            columnIdsRef.current.push(id);
-          }
-        },
-        unRegisterColumn: (id: string) => {
-          if (columnIdsRef.current.find((colId) => colId === id)) {
-            columnIdsRef.current = columnIdsRef.current.filter((colId) => colId !== id);
-            setTableKey((prev) => prev + 1);
-          }
-        },
-      };
-    }, []);
+      const columns = useMemo(
+        () => columnIds.map((colId) => columnsByIds[colId]),
+        [columnIds, columnsByIds],
+      );
 
-    const columns = useMemo(
-      () => columnIds.map((colId) => columnsByIds[colId]),
-      [columnIds, columnsByIds],
-    );
+      const selectionContext = useSelectionContext();
 
-    const selectionContext = useSelectionContext();
-
-    const tableContent = (
-      <>
-        {/* HACK: we render the column children twice, once in a context (with the key: 'tableKey') where we register the columns,
+      const tableContent = (
+        <>
+          {/* HACK: we render the column children twice, once in a context (with the key: 'tableKey') where we register the columns,
             and once in a context where we refresh the columns (by forcing the first context to re-mount, via the 'tableKey').
             This way the order of the columns is preserved.
         */}
-        <TableContext.Provider value={tableContextValue} key={tableKey}>
-          {renderChild(node.children)}
-        </TableContext.Provider>
-        <TableContext.Provider value={columnRefresherContextValue}>
-          {renderChild(node.children)}
-        </TableContext.Provider>
-        <Table
-          className={className}
-          ref={ref}
-          data={data}
-          dataIdProperty={extractValue.asOptionalString(node.props.dataIdProperty)}
-          columns={columns}
-          pageSizeOptions={extractValue(node.props.pageSizeOptions)}
-          pageSize={extractValue.asOptionalNumber(node.props.pageSize)}
-          rowsSelectable={extractValue.asOptionalBoolean(node.props.rowsSelectable)}
-          registerComponentApi={registerComponentApi}
-          noDataRenderer={
-            node.props.noDataTemplate &&
-            (() => {
-              return renderChild(node.props.noDataTemplate);
-            })
-          }
-          hideNoDataView={node.props.noDataTemplate === null || node.props.noDataTemplate === ""}
-          loading={extractValue.asOptionalBoolean(node.props.loading)}
-          isPaginated={extractValue.asOptionalBoolean(node.props?.isPaginated)}
-          headerHeight={extractValue.asSize(node.props.headerHeight)}
-          rowDisabledPredicate={lookupSyncCallback(node.props.rowDisabledPredicate)}
-          sortBy={extractValue(node.props?.sortBy)}
-          sortingDirection={extractValue(node.props?.sortDirection)}
-          iconSortAsc={extractValue.asOptionalString(node.props?.iconSortAsc)}
-          iconSortDesc={extractValue.asOptionalString(node.props?.iconSortDesc)}
-          iconNoSort={extractValue.asOptionalString(node.props?.iconNoSort)}
-          sortingDidChange={lookupEventHandler("sortingDidChange")}
-          onSelectionDidChange={lookupEventHandler("selectionDidChange")}
-          willSort={lookupEventHandler("willSort")}
-          uid={node.uid}
-          autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-          hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
-          enableMultiRowSelection={extractValue.asOptionalBoolean(
-            node.props.enableMultiRowSelection,
-          )}
-          alwaysShowSelectionHeader={extractValue.asOptionalBoolean(
-            node.props.alwaysShowSelectionHeader,
-          )}
-          noBottomBorder={extractValue.asOptionalBoolean(node.props.noBottomBorder)}
-          paginationControlsLocation={extractValue.asOptionalString(
-            node.props.paginationControlsLocation,
-          )}
-          cellVerticalAlign={extractValue.asOptionalString(node.props.cellVerticalAlign)}
-          buttonRowPosition={extractValue.asOptionalString(node.props.buttonRowPosition)}
-          pageSizeSelectorPosition={extractValue.asOptionalString(node.props.pageSizeSelectorPosition)}
-          pageInfoPosition={extractValue.asOptionalString(node.props.pageInfoPosition)}
-          showCurrentPage={extractValue.asOptionalBoolean(node.props.showCurrentPage)}
-          showPageInfo={extractValue.asOptionalBoolean(node.props.showPageInfo)}
-          showPageSizeSelector={extractValue.asOptionalBoolean(node.props.showPageSizeSelector)}
-          checkboxTolerance={extractValue.asOptionalString(node.props.checkboxTolerance)}
-          initiallySelected={extractValue(node.props.initiallySelected)}
-          syncWithAppState={extractValue(node.props.syncWithAppState)}
-        />
-      </>
-    );
+          <TableContext.Provider value={tableContextValue} key={tableKey}>
+            {renderChild(node.children)}
+          </TableContext.Provider>
+          <TableContext.Provider value={columnRefresherContextValue}>
+            {renderChild(node.children)}
+          </TableContext.Provider>
+          <Table
+            className={className}
+            ref={ref}
+            data={data}
+            columns={columns}
+            pageSizeOptions={extractValue(node.props.pageSizeOptions)}
+            pageSize={extractValue.asOptionalNumber(node.props.pageSize)}
+            rowsSelectable={extractValue.asOptionalBoolean(node.props.rowsSelectable)}
+            registerComponentApi={registerComponentApi}
+            noDataRenderer={
+              node.props.noDataTemplate &&
+              (() => {
+                return renderChild(node.props.noDataTemplate);
+              })
+            }
+            hideNoDataView={node.props.noDataTemplate === null || node.props.noDataTemplate === ""}
+            loading={extractValue.asOptionalBoolean(node.props.loading)}
+            isPaginated={extractValue.asOptionalBoolean(node.props?.isPaginated)}
+            headerHeight={extractValue.asSize(node.props.headerHeight)}
+            rowDisabledPredicate={lookupSyncCallback(node.props.rowDisabledPredicate)}
+            sortBy={extractValue(node.props?.sortBy)}
+            sortingDirection={extractValue(node.props?.sortDirection)}
+            iconSortAsc={extractValue.asOptionalString(node.props?.iconSortAsc)}
+            iconSortDesc={extractValue.asOptionalString(node.props?.iconSortDesc)}
+            iconNoSort={extractValue.asOptionalString(node.props?.iconNoSort)}
+            sortingDidChange={lookupEventHandler("sortingDidChange")}
+            onSelectionDidChange={lookupEventHandler("selectionDidChange")}
+            willSort={lookupEventHandler("willSort")}
+            uid={node.uid}
+            autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
+            hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
+            enableMultiRowSelection={extractValue.asOptionalBoolean(
+              node.props.enableMultiRowSelection,
+            )}
+            alwaysShowSelectionHeader={extractValue.asOptionalBoolean(
+              node.props.alwaysShowSelectionHeader,
+            )}
+            noBottomBorder={extractValue.asOptionalBoolean(node.props.noBottomBorder)}
+            paginationControlsLocation={extractValue.asOptionalString(
+              node.props.paginationControlsLocation,
+            )}
+            cellVerticalAlign={extractValue.asOptionalString(node.props.cellVerticalAlign)}
+            buttonRowPosition={extractValue.asOptionalString(node.props.buttonRowPosition)}
+            pageSizeSelectorPosition={extractValue.asOptionalString(
+              node.props.pageSizeSelectorPosition,
+            )}
+            pageInfoPosition={extractValue.asOptionalString(node.props.pageInfoPosition)}
+            showCurrentPage={extractValue.asOptionalBoolean(node.props.showCurrentPage)}
+            showPageInfo={extractValue.asOptionalBoolean(node.props.showPageInfo)}
+            showPageSizeSelector={extractValue.asOptionalBoolean(node.props.showPageSizeSelector)}
+            checkboxTolerance={extractValue.asOptionalString(node.props.checkboxTolerance)}
+            initiallySelected={extractValue(node.props.initiallySelected)}
+            syncWithAppState={extractValue(node.props.syncWithAppState)}
+          />
+        </>
+      );
 
-    if (selectionContext === null) {
-      return <StandaloneSelectionStore>{tableContent}</StandaloneSelectionStore>;
-    }
-    return tableContent;
-  },
-));
+      if (selectionContext === null) {
+        return <StandaloneSelectionStore idKey={idKey}>{tableContent}</StandaloneSelectionStore>;
+      }
+      return tableContent;
+    },
+  ),
+);
 TableWithColumns.displayName = "TableWithColumns";
 
 export const tableComponentRenderer = createComponentRenderer(

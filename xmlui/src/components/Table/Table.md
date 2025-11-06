@@ -1609,12 +1609,12 @@ Click on any of the column headers to trigger a new sorting:
 
 %-API-END
 
-%-API-START dataIdProperty
+%-PROP-START idKey
 
-```xmlui copy /dataIdProperty="key"/
+```xmlui copy /idKey="key"/
 <App>
   <Table
-    dataIdProperty="key"
+    idKey="key"
     rowsSelectable="true"
     data="{[
       { 'key': 0, 'name': 'John' },
@@ -1627,4 +1627,4 @@ Click on any of the column headers to trigger a new sorting:
 </App>
 ```
 
-%-API-END
+%-PROP-END
