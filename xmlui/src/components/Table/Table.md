@@ -1609,7 +1609,7 @@ Click on any of the column headers to trigger a new sorting:
 
 %-API-END
 
-%-API-START idKey
+%-PROP-START idKey
 
 ```xmlui copy /idKey="key"/
 <App>
@@ -1627,4 +1627,4 @@ Click on any of the column headers to trigger a new sorting:
 </App>
 ```
 
-%-API-END
+%-PROP-END
