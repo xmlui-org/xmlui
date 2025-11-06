@@ -98,7 +98,6 @@ export type CheckboxTolerance = (typeof CheckboxToleranceValues)[number];
 type CellVerticalAlign = "top" | "center" | "bottom";
 
 type TableProps = {
-  dataIdProperty?: string;
   data: any[];
   columns?: OurColumnMetadata[];
   isPaginated?: boolean;
@@ -231,8 +230,6 @@ const getCommonPinningStyles = (column: Column<RowWithOrder>): CSSProperties => 
 export const Table = forwardRef(
   (
     {
-      // TEMP: will be removed in favor of idKey
-      dataIdProperty,
       data = defaultProps.data,
       columns = defaultProps.columns,
       isPaginated = defaultProps.isPaginated,
@@ -278,30 +275,11 @@ export const Table = forwardRef(
     forwardedRef,
   ) => {
     const { getThemeVar } = useTheme();
-    const arrayData = Array.isArray(data) ? data : EMPTY_ARRAY;
+    const safeData = Array.isArray(data) ? data : EMPTY_ARRAY;
     const wrapperRef = useRef<HTMLDivElement>(null);
     const ref = forwardedRef ? composeRefs(wrapperRef, forwardedRef) : wrapperRef;
     const tableRef = useRef<HTMLTableElement>(null);
     const estimatedHeightRef = useRef<number | null>(null);
-
-    const safeData = useMemo(() => {
-      if (arrayData.length === 0) {
-        return arrayData;
-      }
-      if (dataIdProperty) {
-        return arrayData.map((item) => ({ ...item, id: item[dataIdProperty] }));
-      }
-      // --- Check the first 3 items for an 'id' property
-      const sampleSize = Math.min(3, arrayData.length);
-      const hasIdProperty = arrayData
-        .slice(0, sampleSize)
-        .every((item) => item && item.hasOwnProperty("id"));
-      if (!hasIdProperty) {
-        return arrayData.map((item, index) => ({ ...item, id: index }));
-      }
-
-      return arrayData;
-    }, [dataIdProperty, arrayData]);
 
     const safeColumns: OurColumnMetadata[] = useMemo(() => {
       if (columns) {
@@ -1161,8 +1139,8 @@ function ColumnOrderingIndicator({
 }
 
 export const defaultProps = {
+  idKey: "id",
   data: EMPTY_ARRAY,
-  dataIdProperty: "id",
   columns: EMPTY_ARRAY,
   isPaginated: false,
   loading: false,

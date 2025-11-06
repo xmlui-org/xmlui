@@ -28,10 +28,16 @@ type SelectionStoreProps = {
 const EMPTY_SELECTION_STATE = {
   value: EMPTY_ARRAY,
 };
-export const StandaloneSelectionStore = ({ children }) => {
+export const StandaloneSelectionStore = ({
+  children,
+  idKey,
+}: {
+  children: ReactNode;
+  idKey?: string;
+}) => {
   const [selection, setSelection] = useState(EMPTY_SELECTION_STATE);
   return (
-    <SelectionStore updateState={setSelection} selectedItems={selection.value}>
+    <SelectionStore updateState={setSelection} selectedItems={selection.value} idKey={idKey}>
       {children}
     </SelectionStore>
   );
