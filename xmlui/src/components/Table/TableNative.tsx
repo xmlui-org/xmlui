@@ -508,7 +508,6 @@ export const Table = forwardRef(
             />
           ) : null,
         cell: ({ row }: CellContext<any, unknown>) => {
-          //console.log(row)
           return (
             <Toggle
               {...{
@@ -519,7 +518,12 @@ export const Table = forwardRef(
                 indeterminate: row.getIsSomeSelected(),
                 forceHover: hoveredRowId === row.id,
                 onDidChange: () => {
-                  toggleRow(row.original, { metaKey: true });
+                  // In single selection mode, allow deselection by checking if already selected
+                  if (!enableMultiRowSelection && row.getIsSelected()) {
+                    checkAllRows(false); // Deselect all (which is just this one row)
+                  } else {
+                    toggleRow(row.original, { metaKey: true });
+                  }
                 },
               }}
             />
@@ -984,7 +988,12 @@ export const Table = forwardRef(
                           isWithinCheckboxBoundary(clickX, clickY, checkboxRect, tolerancePixels)
                         ) {
                           // Toggle the checkbox when clicking within the boundary
-                          toggleRow(row.original, { metaKey: true });
+                          // In single selection mode, allow deselection by checking if already selected
+                          if (!enableMultiRowSelection && row.getIsSelected()) {
+                            checkAllRows(false); // Deselect all (which is just this one row)
+                          } else {
+                            toggleRow(row.original, { metaKey: true });
+                          }
                           return;
                         }
                       }
