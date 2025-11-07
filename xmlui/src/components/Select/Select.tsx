@@ -34,6 +34,12 @@ export const SelectMd = createMetadata({
     clearButton: {
       description: "The button to clear the selected value(s).",
     },
+    item: {
+      description: "Styles each option item within the Select component.",
+    },
+    menu: {
+      description: "Styles the dropdown menu within the Select component.",
+    },
   },
   props: {
     placeholder: {

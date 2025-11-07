@@ -15,6 +15,11 @@ export const LinkMd = createMetadata({
     "external URLs. You can use the `label` and `icon` properties for simple text " +
     "links, or embed custom components like buttons, cards, or complex layouts " +
     "for rich interactive link presentations.",
+  parts: {
+    icon: {
+      description: "Styles the icon within the Link component.",
+    }
+  },
   props: {
     to: d(
       "This property defines the URL of the link. If the value is not defined, the link cannot be activated.",

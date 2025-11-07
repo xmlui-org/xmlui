@@ -16,6 +16,11 @@ export const NavLinkMd = createMetadata({
     "destinations within an app or external URLs. It automatically indicates active " +
     "states, supports custom icons and labels, and can execute custom actions instead " +
     "of navigation when needed.",
+  parts: {
+    indicator: {
+      description: "Styles the active indicator within the NavLink component.",
+    },
+  },
   props: {
     to: d(`This property defines the URL of the link.`),
     enabled: dEnabled(),
