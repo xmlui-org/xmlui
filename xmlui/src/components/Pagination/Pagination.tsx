@@ -22,6 +22,17 @@ export const PaginationMd = createMetadata({
   description:
     "`Pagination` enables navigation through large datasets by dividing content into pages. " +
     "It provides controls for page navigation and can display current page information.",
+  parts: {
+    buttonRow: {
+      description: "The container for pagination buttons.",
+    },
+    pageInfo: {
+      description: "The container for page information display.",
+    },
+    pageSizeSelector: {
+      description: "The container for the page size selector dropdown.",
+    },
+  },
   props: {
     enabled: dEnabled(),
     itemCount: d(

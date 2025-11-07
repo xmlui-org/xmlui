@@ -14,6 +14,11 @@ export const ExpandableItemMd = createMetadata({
     "`ExpandableItem` creates expandable/collapsible section, similar to the HTML " +
     "details disclosure element. When the user clicks on the `summary` the content " +
     "expands or collapses.",
+  parts: {
+    summary: {
+      description: "The summary section that is always visible and acts as the trigger.",
+    },
+  },
   props: {
     summary: dComponent("The summary content that is always visible and acts as the trigger."),
     initiallyExpanded: {

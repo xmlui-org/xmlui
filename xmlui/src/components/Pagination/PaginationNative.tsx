@@ -10,8 +10,6 @@ import { Icon } from "../Icon/IconNative";
 import type { OrientationOptions } from "../abstractions";
 import type { ComponentApi } from "../../components-core/rendering/ContainerWrapper";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
-import { Select } from "../Select/SelectNative";
-import { OptionNative } from "../Option/OptionNative";
 
 export const PageNumberValues = [1, 3, 5] as const;
 export type PageNumber = (typeof PageNumberValues)[number];
