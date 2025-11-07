@@ -16,6 +16,14 @@ export const NavPanelMd = createMetadata({
     "for NavLink and NavGroup components that create your application's primary " +
     "navigation menu. Its appearance and behavior automatically adapt based on the " +
     "App's layout configuration.",
+  parts: {
+    logo: {
+      description: "Styles the logo area within the NavPanel component.",
+    },
+    content: {
+      description: "Styles the content area within the NavPanel component.",
+    },
+  },
   props: {
     logoTemplate: dComponent(
       `This property defines the logo template to display in the navigation panel with the ` +
