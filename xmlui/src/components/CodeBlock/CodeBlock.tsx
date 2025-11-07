@@ -10,6 +10,14 @@ const COMP = "CodeBlock";
 export const CodeBlockMd = createMetadata({
   status: "stable",
   description: `The \`${COMP}\` component displays code with optional syntax highlighting and meta information.`,
+  parts: {
+    header: {
+      description: "The header section of the CodeBlock, typically displaying the filename.",
+    },
+    content: {
+      description: "The main content area of the CodeBlock where the code is displayed.",
+    }
+  },
   props: {},
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
