@@ -30,6 +30,11 @@ export const SelectMd = createMetadata({
     "supporting both single and multiple selection modes. It offers extensive " +
     "customization capabilities including search functionality, custom templates, " +
     "and comprehensive form integration.",
+  parts: {
+    clearButton: {
+      description: "The button to clear the selected value(s).",
+    },
+  },
   props: {
     placeholder: {
       ...dPlaceholder(),
@@ -92,6 +97,10 @@ export const SelectMd = createMetadata({
     inProgressNotificationMessage: {
       description: `This property indicates the message to display when the component is in progress.`,
       defaultValue: defaultProps.inProgressNotificationMessage,
+    },
+    clearable: {
+      description: `This property enables a clear button that allows the user to clear the selected value(s).`,
+      defaultValue: defaultProps.clearable,
     },
   },
   events: {
@@ -170,6 +179,7 @@ export const selectComponentRenderer = createComponentRenderer(
   }) => {
     const multiSelect = extractValue.asOptionalBoolean(node.props.multiSelect);
     const searchable = extractValue.asOptionalBoolean(node.props.searchable);
+    const clearable = extractValue.asOptionalBoolean(node.props.clearable);
 
     const isControlled = node.props.value !== undefined;
     return (
@@ -183,6 +193,7 @@ export const selectComponentRenderer = createComponentRenderer(
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
         updateState={isControlled ? undefined : updateState}
         searchable={searchable}
+        clearable={clearable}
         initialValue={extractValue(node.props.initialValue)}
         value={isControlled ? extractValue(node.props.value) : state?.value}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}

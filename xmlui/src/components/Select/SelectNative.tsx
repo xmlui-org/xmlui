@@ -25,6 +25,7 @@ import { OptionContext, useOption } from "./OptionContext";
 import { HiddenOption } from "./HiddenOption";
 
 const PART_LIST_WRAPPER = "listWrapper";
+const PART_CLEAR_BUTTON = "clearButton";
 
 export const defaultProps = {
   enabled: true,
@@ -38,6 +39,7 @@ export const defaultProps = {
   readOnly: false,
   validationStatus: "none" as ValidationStatus,
   labelBreak: false,
+  clearable: false,
 };
 
 export type SingleValueType = string | number;
@@ -71,6 +73,7 @@ interface SelectProps {
   // Multi-select and search
   searchable?: boolean;
   multiSelect?: boolean;
+  clearable?: boolean;
 
   // Templates and renderers (legacy - kept for compatibility)
   valueRenderer?: (item: Option, removeItem: () => void) => ReactNode;
@@ -165,6 +168,7 @@ interface SelectTriggerActionsProps {
   multiSelect: boolean;
   enabled: boolean;
   readOnly: boolean;
+  clearable: boolean;
   clearValue: () => void;
   showChevron?: boolean;
 }
@@ -174,6 +178,7 @@ const SelectTriggerActions = ({
   multiSelect,
   enabled,
   readOnly,
+  clearable,
   clearValue,
   showChevron = true,
 }: SelectTriggerActionsProps) => {
@@ -183,8 +188,9 @@ const SelectTriggerActions = ({
 
   return (
     <div className={styles.actions}>
-      {hasValue && enabled && !readOnly && (
+      {hasValue && enabled && !readOnly && clearable && (
         <span
+          data-part-id={PART_CLEAR_BUTTON}
           className={styles.action}
           onClick={(event) => {
             event.stopPropagation();
@@ -231,6 +237,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     // Multi-select and search
     searchable = defaultProps.searchable,
     multiSelect = defaultProps.multiSelect,
+    clearable = defaultProps.clearable,
 
     emptyListTemplate,
     valueRenderer,
@@ -598,6 +605,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                 multiSelect={multiSelect}
                 enabled={enabled}
                 readOnly={readOnly}
+                clearable={clearable}
                 clearValue={clearValue}
               />
             </PopoverTrigger>

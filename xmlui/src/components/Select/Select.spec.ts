@@ -350,6 +350,163 @@ test.describe("Basic Functionality", () => {
       await expect(page.getByTestId("text")).toHaveText("Selected value: Zero");
     },
   );
+
+  // --- clearable prop
+
+  test("clear button not visible by default (clearable=false)", async ({
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select initialValue="opt1">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+      </Select>
+    `);
+    const driver = await createSelectDriver();
+
+    // Clear button should not be visible (default clearable=false)
+    await expect(driver.clearButton).not.toBeVisible();
+  });
+
+  test("clear button visible when clearable=true and value selected", async ({
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select clearable="true">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+      </Select>
+    `);
+    const driver = await createSelectDriver();
+
+    // Clear button should not be visible when no value selected
+    await expect(driver.clearButton).not.toBeVisible();
+
+    // Select a value
+    await driver.toggleOptionsVisibility();
+    await driver.selectLabel("first");
+
+    // Clear button should now be visible
+    await expect(driver.clearButton).toBeVisible();
+  });
+
+  test("clicking clear button clears single selection", async ({
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select id="mySelect" clearable="true">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+      </Select>
+    `);
+    const driver = await createSelectDriver();
+    const select = driver.component;
+
+    // Select a value
+    await driver.toggleOptionsVisibility();
+    await driver.selectLabel("first");
+    await expect(select).toHaveText("first");
+
+    // Click the clear button
+    await driver.clearButton.click();
+
+    // Value should be cleared
+    await expect(select).not.toHaveText("first");
+    await expect(driver.clearButton).not.toBeVisible();
+  });
+
+  test("clear button works with multiSelect", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Select clearable="true" multiSelect="true">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+    `);
+    const driver = await createSelectDriver();
+
+    // Select multiple values
+    await driver.toggleOptionsVisibility();
+    await driver.selectMultipleLabels(["first", "second"]);
+    await driver.toggleOptionsVisibility();
+
+    // Clear button should be visible
+    await expect(driver.clearButton).toBeVisible();
+
+    // Click the clear button
+    await driver.clearButton.click();
+
+    // All values should be cleared
+    await expect(page.getByText("first")).not.toBeVisible();
+    await expect(page.getByText("second")).not.toBeVisible();
+    await expect(driver.clearButton).not.toBeVisible();
+  });
+
+  test("clear button not visible when readOnly=true", async ({
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select clearable="true" readOnly="true" initialValue="opt1">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+      </Select>
+    `);
+    const driver = await createSelectDriver();
+
+    // Clear button should not be visible even with clearable=true and value selected
+    await expect(driver.clearButton).not.toBeVisible();
+  });
+
+  test("clear button not visible when enabled=false", async ({
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select clearable="true" enabled="false" initialValue="opt1">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+      </Select>
+    `);
+    const driver = await createSelectDriver();
+
+    // Clear button should not be visible when disabled
+    await expect(driver.clearButton).not.toBeVisible();
+  });
+
+  test("clear button triggers didChange event", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Select clearable="true" onDidChange="testState = 'changed'">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+      </Select>
+    `);
+    const driver = await createSelectDriver();
+
+    // Select a value
+    await driver.toggleOptionsVisibility();
+    await driver.selectLabel("first");
+
+    // Reset test state
+    await page.evaluate(() => (window as any).testState = null);
+
+    // Click the clear button
+    await driver.clearButton.click();
+
+    // Event should have fired
+    await expect.poll(testStateDriver.testState).toEqual("changed");
+  });
 });
 
 // =============================================================================
