@@ -48,6 +48,10 @@ You can use `Select` with dynamic options:
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
+### `clearable` (default: false) [#clearable-default-false]
+
+This property enables a clear button that allows the user to clear the selected value(s).
+
 ### `dropdownHeight` [#dropdownheight]
 
 This property sets the height of the dropdown list. If not set, the height is determined automatically.
@@ -367,6 +371,12 @@ This API retrieves the current value of the `Select`. You can use it to get the 
 
 **Signature**: `get value(): string | string[] | undefined`
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`clearButton`**: The button to clear the selected value(s).
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]
@@ -474,6 +484,8 @@ This API retrieves the current value of the `Select`. You can use it to get the 
 | [fontSize](../styles-and-themes/common-units/#size)-Select--warning | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Select-badge | $fontSize-sm | $fontSize-sm |
 | [fontSize](../styles-and-themes/common-units/#size)-Select-badge | $fontSize-sm | $fontSize-sm |
+| [minHeight](../styles-and-themes/common-units/#size)-item-Select | $space-7 | $space-7 |
+| [minHeight](../styles-and-themes/common-units/#size)-Select | $space-7 | $space-7 |
 | [opacity](../styles-and-themes/common-units/#opacity)-Select--disabled | 0.5 | 0.5 |
 | [opacity](../styles-and-themes/common-units/#opacity)-text-item-Select--disabled | 0.5 | 0.5 |
 | [outlineColor](../styles-and-themes/common-units/#color)-Select--default--focus | *none* | *none* |
