@@ -266,6 +266,36 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 </App>
 ```
 
+#### `desktop`
+
+The `desktop` layout is designed for full-screen desktop applications. It stretches the app to fill the entire browser viewport with zero padding and margins. The header (if present) docks to the top, the footer (if present) docks to the bottom, and the main content area stretches to fill all remaining vertical and horizontal space. This layout ignores all max-width constraints and scrollbar gutter settings to ensure edge-to-edge display.
+
+```xmlui-pg copy name="Example: 'desktop' layout" height="300px"
+<App layout="desktop">
+  <AppHeader>
+    <property name="logoTemplate">
+        <Heading level="h3" value="Example App"/>
+    </property>
+  </AppHeader>
+  <Pages fallbackPath="/">
+      <Page url="/">
+        <List data="https://api.spacexdata.com/v3/history">
+          <property name="itemTemplate">
+            <Card title="{$item.title}" subtitle="{$item.details}"/>
+          </property>
+        </List>
+      </Page>
+      <Page url="/page1">
+        <Text value="Page 1" />
+      </Page>
+      <Page url="/page2">
+        <Text value="Page 2" />
+      </Page>
+  </Pages>
+  <Footer>Powered by XMLUI</Footer>
+</App>
+```
+
 %-PROP-END
 
 %-PROP-START scrollWholePage

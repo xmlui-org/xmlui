@@ -102,6 +102,112 @@ $maxWidth-App: createThemeVar("maxWidth-App");
       }
     }
 
+    &.desktop {
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      scrollbar-gutter: auto;
+      max-width: none;
+
+      // When nested (like in playground), use container dimensions instead of viewport
+      &:global(.nested-app) {
+        width: 100%;
+        height: 100%;
+      }
+
+      .headerWrapper {
+        position: sticky;
+        top: 0;
+        flex-shrink: 0;
+        z-index: 1;
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: none !important;
+        width: 100% !important;
+
+        & > * {
+          margin: 0 !important;
+          padding: 0 !important;
+          max-width: none !important;
+          width: 100% !important;
+        }
+
+        & * {
+          max-width: none !important;
+          padding-inline: 0 !important;
+          padding-left: 0 !important;
+          padding-right: 0 !important;
+          margin-inline: 0 !important;
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+        }
+
+        :global(.headerInner) {
+          padding: 0 !important;
+          margin: 0 !important;
+          padding-inline: 0 !important;
+          max-width: none !important;
+        }
+      }
+
+      .PagesWrapper {
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        scrollbar-gutter: auto;
+        margin: 0;
+        padding: 0;
+        max-width: none;
+        width: 100%;
+      }
+
+      .PagesWrapperInner {
+        flex: 1;
+        min-height: 0;
+        max-width: none;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        scrollbar-gutter: auto;
+      }
+
+      .footerWrapper {
+        position: sticky;
+        bottom: 0;
+        flex-shrink: 0;
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: none !important;
+        width: 100% !important;
+
+        & > * {
+          margin: 0 !important;
+          padding: 0 !important;
+          max-width: none !important;
+          width: 100% !important;
+        }
+
+        & * {
+          max-width: none !important;
+          padding-inline: 0 !important;
+          padding-left: 0 !important;
+          padding-right: 0 !important;
+          margin-inline: 0 !important;
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+        }
+      }
+    }
+
     &.verticalFullHeader {
       min-height: 100%;
       height: 100%;
@@ -169,6 +275,24 @@ $maxWidth-App: createThemeVar("maxWidth-App");
         }
         .contentWrapper {
           padding-inline: var(--scrollbar-width);
+        }
+      }
+
+      &.desktop {
+        scrollbar-gutter: auto;
+
+        .headerWrapper {
+          & > div {
+            padding-inline: 0;
+          }
+          margin-inline: 0;
+        }
+
+        .footerWrapper {
+          margin-inline: 0;
+          & > div {
+            padding-inline: 0;
+          }
         }
       }
     }

@@ -238,6 +238,8 @@ export function App({
         safeLayout === "horizontal" ||
         safeLayout === "condensed"
           ? "0px"
+          : safeLayout === "desktop"
+          ? headerHeight + "px"
           : headerHeight + "px",
       "--footer-height":
         !scrollWholePage ||
@@ -245,6 +247,8 @@ export function App({
         safeLayout === "horizontal" ||
         safeLayout === "condensed"
           ? "0px"
+          : safeLayout === "desktop"
+          ? footerHeight + "px"
           : footerHeight + "px",
       "--header-abs-height": headerHeight + "px",
       "--footer-abs-height": footerHeight + "px",
@@ -361,6 +365,7 @@ export function App({
       "media-desktop": mediaSize.desktop,
       "media-phone": mediaSize.phone,
       "media-tablet": mediaSize.tablet,
+      "nested-app": appGlobals?.isNested || false,
     },
   ];
 
@@ -518,6 +523,32 @@ export function App({
           <div className={styles.footerWrapper} ref={footerRefCallback}>
             {footer}
           </div>
+        </div>
+      );
+      break;
+    case "desktop":
+      content = (
+        <div
+          {...rest}
+          className={classnames(wrapperBaseClasses, styles.desktop)}
+          style={styleWithHelpers}
+        >
+          {header && (
+            <header
+              className={classnames(styles.headerWrapper, styles.sticky)}
+              ref={headerRefCallback}
+            >
+              {header}
+            </header>
+          )}
+          <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
+            <div className={styles.PagesWrapperInner}>{children}</div>
+          </div>
+          {footer && (
+            <div className={classnames(styles.footerWrapper, styles.sticky)} ref={footerRefCallback}>
+              {footer}
+            </div>
+          )}
         </div>
       );
       break;
