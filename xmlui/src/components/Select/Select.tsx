@@ -161,6 +161,8 @@ export const SelectMd = createMetadata({
     [`backgroundColor-item-${COMP}--active`]: "$backgroundColor-dropdown-item--active",
     // Default borderColor-Input--disabled is too light so the disabled component is barely visible
     [`borderColor-${COMP}--disabled`]: "initial",
+    [`minHeight-${COMP}`]: "$space-7",
+    [`minHeight-item-${COMP}`]: "$space-7",
   },
 });
 

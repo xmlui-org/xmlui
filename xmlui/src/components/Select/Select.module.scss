@@ -124,6 +124,8 @@ $backgroundColor-item-Select--hover: createThemeVar("backgroundColor-item-#{$com
 $textColor-item-Select--disabled: createThemeVar("textColor-item-#{$componentName}--disabled");
 $opacity-text-item-Select--disabled: createThemeVar("opacity-text-item-#{$componentName}--disabled");
 $textColor-indicator-Select: createThemeVar("textColor-indicator-#{$componentName}");
+$minHeight-Select: createThemeVar("minHeight-#{$componentName}");
+$minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
 
 
 // --- CSS properties of a particular Select variant
@@ -174,6 +176,7 @@ $textColor-indicator-Select: createThemeVar("textColor-indicator-#{$componentNam
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    min-height: $minHeight-Select;
     @include t.paddingVars($themeVars, $componentName);
 
     @include variant("default");
@@ -319,6 +322,21 @@ $textColor-indicator-Select: createThemeVar("textColor-indicator-#{$componentNam
     border-radius: $borderRadius-menu-Select;
     box-shadow: $boxShadow-menu-Select;
     border: $borderWidth-menu-Select solid $borderColor-menu-Select;
+    // Apply default variant fontSize (dropdown is portaled so needs explicit fontSize)
+    font-size: $fontSize-Select--default;
+    
+    // Apply variant-specific fontSize for dropdown
+    &.error {
+      font-size: $fontSize-Select--error;
+    }
+    
+    &.warning {
+      font-size: $fontSize-Select--warning;
+    }
+    
+    &.valid {
+      font-size: $fontSize-Select--success;
+    }
   }
 
   .command {
@@ -369,6 +387,7 @@ $textColor-indicator-Select: createThemeVar("textColor-indicator-#{$componentNam
     cursor: pointer;
     transition: background-color 0.2s ease;
     background-color: $backgroundColor-item-Select;
+    min-height: $minHeight-item-Select;
 
     .multiSelectOptionContent {
       width: 100%;
@@ -417,14 +436,9 @@ $textColor-indicator-Select: createThemeVar("textColor-indicator-#{$componentNam
     flex: 1;
     display: flex;
     align-items: center;
-    min-height: t.$space-7;
     outline: none;
     background-color: transparent;
-    font-size: t.$fontSize;
-  }
-
-  .action {
-    font-size: t.$fontSize;
+    // Inherit font-size from parent .selectTrigger which has variant-specific fontSize
   }
 
   /**
@@ -519,6 +533,7 @@ $textColor-indicator-Select: createThemeVar("textColor-indicator-#{$componentNam
     align-items: center;
     outline: none;
     justify-content: space-between;
+    min-height: $minHeight-item-Select;
 
     &[data-state=checked] {
       background-color: $backgroundColor-item-Select--active;
