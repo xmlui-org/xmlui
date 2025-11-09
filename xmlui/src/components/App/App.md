@@ -268,8 +268,6 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 
 #### `desktop`
 
-The `desktop` layout is designed for full-screen desktop applications. It stretches the app to fill the entire browser viewport with zero padding and margins. The header (if present) docks to the top, the footer (if present) docks to the bottom, and the main content area stretches to fill all remaining vertical and horizontal space. This layout ignores all max-width constraints and scrollbar gutter settings to ensure edge-to-edge display.
-
 ```xmlui-pg copy name="Example: 'desktop' layout" height="300px"
 <App layout="desktop">
   <AppHeader>
@@ -295,6 +293,8 @@ The `desktop` layout is designed for full-screen desktop applications. It stretc
   <Footer>Powered by XMLUI</Footer>
 </App>
 ```
+
+The `desktop` layout is designed for full-screen desktop applications. It stretches the app to fill the entire browser viewport with zero padding and margins. The header (if present) docks to the top, the footer (if present) docks to the bottom, and the main content area stretches to fill all remaining vertical and horizontal space. This layout ignores all max-width constraints and scrollbar gutter settings to ensure edge-to-edge display.
 
 %-PROP-END
 
