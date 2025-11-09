@@ -93,4 +93,10 @@ This component does not expose any methods.
 | [marginRight](../styles-and-themes/common-units/#size)-ContentSeparator | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-ContentSeparator | *none* | *none* |
 | [margin](../styles-and-themes/common-units/#size)Vertical-ContentSeparator | 0 | 0 |
+| [paddingBottom](../styles-and-themes/common-units/#size)-ContentSeparator | *none* | *none* |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-ContentSeparator | 0 | 0 |
+| [paddingLeft](../styles-and-themes/common-units/#size)-ContentSeparator | *none* | *none* |
+| [paddingRight](../styles-and-themes/common-units/#size)-ContentSeparator | *none* | *none* |
+| [paddingTop](../styles-and-themes/common-units/#size)-ContentSeparator | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-ContentSeparator | 0 | 0 |
 | [size](../styles-and-themes/common-units/#size)-ContentSeparator | 1px | 1px |

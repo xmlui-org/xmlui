@@ -740,6 +740,10 @@ export class AutoCompleteDriver extends ComponentDriver {
 // --- Select
 
 export class SelectDriver extends ComponentDriver {
+  get clearButton() {
+    return this.getByPartName("clearButton");
+  }
+
   async toggleOptionsVisibility() {
     await this.component.click();
   }
@@ -1443,3 +1447,4 @@ export class SliderDriver extends ComponentDriver {
     }
   }
 }
+

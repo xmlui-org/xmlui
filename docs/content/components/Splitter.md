@@ -1,6 +1,6 @@
 # Splitter [#splitter]
 
-`Splitter` component divides a container into two resizable sections. These are are identified by their names: primary and secondary. They have a draggable bar between them.
+`Splitter` component divides a container into two resizable sections. These are are identified by their names: primary and secondary. They have a draggable bar between them. When only a single child is visible (due to conditional rendering with `when` attributes), the splitter bar is not displayed and the single panel stretches to fill the entire viewport of the splitter container.
 
 Most properties of the component focus on the primary section (e.g. sizing).
 
