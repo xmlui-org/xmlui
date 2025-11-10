@@ -88,6 +88,21 @@ $borderWidth-HorizontalRule: createThemeVar("borderWidth-HorizontalRule");
     width: 100%;
     @include t.textVars($themeVars, "Text");
 
+    // Force word breaking ONLY for inline code elements
+    code {
+      overflow-wrap: break-word !important;
+      word-break: break-word !important;
+      white-space: normal !important;
+      overflow: visible !important;
+      text-overflow: clip !important;
+    }
+
+    // Ensure containers respect width constraints
+    p, li, ul, ol, div {
+      min-width: 0;
+      max-width: 100%;
+    }
+
     .markdown {
       $component: "Text";
       $variantName: "Text-markdown";
