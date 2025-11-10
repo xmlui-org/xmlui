@@ -4,7 +4,6 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 
 import styles from "./Markdown.module.scss";
-import htmlTagStyles from "../HtmlTags/HtmlTags.module.scss";
 
 import { Heading } from "../Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
@@ -132,14 +131,14 @@ export const Markdown = memo(
           components={{
             details({ children, node, ...props }) {
               return (
-                <details className={htmlTagStyles.htmlDetails} {...props}>
+                <details className={styles.htmlDetails} {...props}>
                   {children}
                 </details>
               );
             },
             video({ children, node, ...props }) {
               return (
-                <video className={htmlTagStyles.htmlVideo} {...props}>
+                <video className={styles.htmlVideo} {...props}>
                   {children}
                 </video>
               );
@@ -269,21 +268,21 @@ export const Markdown = memo(
             },
             ol({ children, node, ...props }) {
               return (
-                <ol className={htmlTagStyles.htmlOl} {...props}>
+                <ol className={styles.htmlOl} {...props}>
                   {children}
                 </ol>
               );
             },
             ul({ children, node, ...props }) {
               return (
-                <ul className={htmlTagStyles.htmlUl} {...props}>
+                <ul className={styles.htmlUl} {...props}>
                   {children}
                 </ul>
               );
             },
             li({ children, node, ...props }) {
               return (
-                <li className={htmlTagStyles.htmlLi} {...props}>
+                <li className={styles.htmlLi} {...props}>
                   <Text>{children}</Text>
                 </li>
               );
@@ -334,27 +333,27 @@ export const Markdown = memo(
             table({ children }) {
               return (
                 <div className={styles.tableScrollContainer}>
-                  <table className={htmlTagStyles.htmlTable}>{children}</table>
+                  <table className={styles.htmlTable}>{children}</table>
                 </div>
               );
             },
             tr({ children }) {
-              return <tr className={htmlTagStyles.htmlTr}>{children}</tr>;
+              return <tr className={styles.htmlTr}>{children}</tr>;
             },
             td({ children }) {
-              return <td className={htmlTagStyles.htmlTd}>{children}</td>;
+              return <td className={styles.htmlTd}>{children}</td>;
             },
             th({ children }) {
-              return <th className={htmlTagStyles.htmlTh}>{children}</th>;
+              return <th className={styles.htmlTh}>{children}</th>;
             },
             thead({ children }) {
-              return <thead className={htmlTagStyles.htmlThead}>{children}</thead>;
+              return <thead className={styles.htmlThead}>{children}</thead>;
             },
             tbody({ children }) {
-              return <tbody className={htmlTagStyles.htmlTbody}>{children}</tbody>;
+              return <tbody className={styles.htmlTbody}>{children}</tbody>;
             },
             tfoot({ children }) {
-              return <tfoot className={htmlTagStyles.htmlTfoot}>{children}</tfoot>;
+              return <tfoot className={styles.htmlTfoot}>{children}</tfoot>;
             },
             samp({ ...props }) {
               const markdownContentBase64 = props?.["data-pg-markdown"];
