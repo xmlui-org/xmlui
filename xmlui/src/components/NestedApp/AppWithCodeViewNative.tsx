@@ -27,6 +27,7 @@ type AppWithCodeViewNativeProps = {
   app: string;
   components?: any[];
   config?: any;
+  indexHtml?: string;
   activeTone?: ThemeTone;
   activeTheme?: string;
   title?: string;
@@ -54,6 +55,7 @@ export function AppWithCodeViewNative({
   api,
   components = [],
   config,
+  indexHtml,
   activeTone,
   activeTheme,
   title,
@@ -83,6 +85,7 @@ export function AppWithCodeViewNative({
           defaultTheme: activeTheme,
         },
         api: api,
+        indexHtml: indexHtml,
       },
       options: {
         fixedTheme: false,
@@ -180,6 +183,7 @@ export function AppWithCodeViewNative({
               api={api}
               components={components}
               config={config}
+              indexHtml={indexHtml}
               activeTone={activeTone}
               activeTheme={activeTheme}
               refreshVersion={refreshVersion}
@@ -200,6 +204,7 @@ export function AppWithCodeViewNative({
         api={api}
         components={components}
         config={config}
+        indexHtml={indexHtml}
         activeTone={activeTone}
         activeTheme={activeTheme}
         refreshVersion={refreshVersion}

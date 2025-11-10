@@ -28,6 +28,7 @@ export type PlaygroundPattern = {
   descriptions?: SegmentProps[];
   config?: SegmentProps;
   api?: SegmentProps;
+  indexHtml?: SegmentProps;
 };
 
 export function observePlaygroundPattern(content: string): [number, number, string] | null {
@@ -97,7 +98,7 @@ export function parseSegmentProps(input: string): SegmentProps {
   if (/\bwithSplashScreen\b/.test(input)) {
     segment.withSplashScreen = true;
   }
-  
+
   // --- Match the "noHeader" flag
   if (/\bnoHeader\b/.test(input)) {
     segment.noHeader = true;
@@ -208,6 +209,10 @@ export function parsePlaygroundPattern(content: string): PlaygroundPattern {
       const apiSegment = parseSegmentProps(line);
       pattern.api ??= { ...apiSegment };
       closeCurrentMode("api");
+    } else if (line.startsWith("---index.html")) {
+      const indexHtmlSegment = parseSegmentProps(line);
+      pattern.indexHtml ??= { ...indexHtmlSegment };
+      closeCurrentMode("indexHtml");
     } else if (line.startsWith("---desc")) {
       closeCurrentMode("desc");
       const descSegment = parseSegmentProps(line);
@@ -251,6 +256,10 @@ export function parsePlaygroundPattern(content: string): PlaygroundPattern {
         pattern.api.content = segmentContent;
         pattern.api.order = order++;
         break;
+      case "indexHtml":
+        pattern.indexHtml.content = segmentContent;
+        pattern.indexHtml.order = order++;
+        break;
       case "desc":
         pattern.descriptions[pattern.descriptions.length - 1].content = segmentContent;
         pattern.descriptions[pattern.descriptions.length - 1].order = order++;
@@ -274,6 +283,9 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
   }
   if (pattern.api?.order > maxOrder) {
     maxOrder = pattern.api.order;
+  }
+  if (pattern.indexHtml?.order > maxOrder) {
+    maxOrder = pattern.indexHtml.order;
   }
   if (pattern.descriptions) {
     pattern.descriptions.forEach((desc) => {
@@ -327,6 +339,9 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
     } else if (pattern.api?.order === i) {
       segment = pattern.api;
       type = "api";
+    } else if (pattern.indexHtml?.order === i) {
+      segment = pattern.indexHtml;
+      type = "indexHtml";
     }
     if (!segment && pattern.descriptions) {
       const descSegment = pattern.descriptions.find((desc) => desc.order === i);
@@ -385,6 +400,10 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
       case "api":
         // --- Never display API segments
         pgContent.api = segment.content;
+        break;
+      case "indexHtml":
+        // --- Never display indexHtml segments
+        pgContent.indexHtml = segment.content;
         break;
       case "comp":
         if (segment.display) {

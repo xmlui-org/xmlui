@@ -28,6 +28,7 @@ type NestedAppProps = {
   app: string;
   components?: any[];
   config?: any;
+  indexHtml?: string;
   activeTone?: ThemeTone;
   activeTheme?: string;
   height?: string | number;
@@ -99,6 +100,7 @@ export function NestedApp({
   app,
   components = EMPTY_ARRAY,
   config,
+  indexHtml,
   activeTheme,
   activeTone,
   height,
@@ -142,6 +144,8 @@ export function NestedApp({
       // apiUrl: apiUrl + (apiObject.apiUrl || ""),
     };
   }, [api]);
+
+  const injectedScriptRef = useRef<HTMLScriptElement | null>(null);
 
   useIsomorphicLayoutEffect(() => {
     if (!shadowRef.current && rootRef.current) {
@@ -199,6 +203,54 @@ export function NestedApp({
       contentRootRef.current = ReactDOM.createRoot(shadowRef.current);
     }
   }, []);
+
+  // Inject indexHtml script into parent document for debuggability
+  useEffect(() => {
+    if (indexHtml) {
+      // Remove any previously injected script
+      if (injectedScriptRef.current) {
+        injectedScriptRef.current.remove();
+        injectedScriptRef.current = null;
+      }
+
+      // Create a temporary container to parse the HTML
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = indexHtml.trim();
+
+      // Find all script tags in the indexHtml
+      const scripts = tempDiv.querySelectorAll('script');
+
+      scripts.forEach((scriptElement) => {
+        const newScript = document.createElement('script');
+
+        // Copy attributes
+        Array.from(scriptElement.attributes).forEach((attr) => {
+          newScript.setAttribute(attr.name, attr.value);
+        });
+
+        // Copy script content
+        if (scriptElement.src) {
+          newScript.src = scriptElement.src;
+        } else {
+          newScript.textContent = scriptElement.textContent;
+        }
+
+        // Inject into parent document head
+        document.head.appendChild(newScript);
+
+        // Store reference to the last script for cleanup
+        injectedScriptRef.current = newScript;
+      });
+    }
+
+    // Cleanup function
+    return () => {
+      if (injectedScriptRef.current) {
+        injectedScriptRef.current.remove();
+        injectedScriptRef.current = null;
+      }
+    };
+  }, [indexHtml]);
 
   const onInit = useCallback(() => {
     setInitialized(true);

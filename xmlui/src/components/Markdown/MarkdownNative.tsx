@@ -71,7 +71,7 @@ function PreTagComponent({ id, children, codeHighlighter }) {
   if (!highlighterResult) {
     return defaultCodefence;
   }
-  
+
   return (
     <CodeBlock meta={highlighterResult.meta} textToCopy={highlighterResult.codeStr}>
       <CodeText
@@ -368,6 +368,7 @@ export const Markdown = memo(
                   config={appProps.config}
                   components={appProps.components}
                   api={appProps.api}
+                  indexHtml={appProps.indexHtml}
                   activeTheme={appProps.activeTheme}
                   activeTone={appProps.activeTone}
                   title={appProps.name}
