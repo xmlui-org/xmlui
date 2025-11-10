@@ -172,6 +172,7 @@
                 <NavLink label="Carousel" to="/components/Carousel" />
                 <NavLink label="ChangeListener" to="/components/ChangeListener" />
                 <NavLink label="Checkbox" to="/components/Checkbox" />
+                <NavLink label="Choose" to="/components/Choose" />
                 <NavLink label="ColorPicker" to="/components/ColorPicker" />
                 <NavLink label="Column" to="/components/Column" />
                 <NavLink label="ContentSeparator" to="/components/ContentSeparator" />

@@ -206,6 +206,7 @@ import { TimerMd } from "./Timer/Timer";
 import { DateInput } from "./DateInput/DateInputNative";
 import { DateInputMd } from "./DateInput/DateInput";
 import { PaginationMd } from "./Pagination/Pagination";
+import { ChooseMd } from "./Choose/Choose";
 
 export const collectedComponentMetadata = {
   // --- HTML tags
@@ -325,6 +326,7 @@ export const collectedComponentMetadata = {
   Carousel: CarouselMd,
   ChangeListener: ChangeListenerMd,
   Checkbox: CheckboxMd,
+  Choose: ChooseMd,
   CODE: HtmlCodeMd,
   ColorPicker: ColorPickerMd,
   Column: ColumnMd,

@@ -176,8 +176,9 @@ $marginBottom-HtmlDetails: createThemeVar("marginBottom-HtmlDetails");
     overflow-wrap: break-word;
     @include t.textVars($themeVars, "Text");
 
-    // Force word breaking for inline code elements
-    code {
+    // Force word breaking ONLY for inline code elements (not code blocks)
+    // Code blocks are wrapped in <pre><code>, so we exclude those
+    code:not(pre code) {
       overflow-wrap: break-word !important;
       word-break: break-word !important;
       white-space: normal !important;
