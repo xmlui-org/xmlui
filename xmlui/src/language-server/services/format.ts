@@ -477,9 +477,7 @@ class XmluiFormatter {
         acc += wsBeforeAttr + attrsFormatted;
       }
       if (hasClosing) {
-        if (closingIsNodeClose) {
-          acc += " ";
-        }
+        acc += this.newlineToken + this.indent(this.indentationLvl);
         acc += closingFormatted;
       }
     } else {

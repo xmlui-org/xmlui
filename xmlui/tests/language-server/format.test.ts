@@ -223,7 +223,8 @@ describe("XML Formatter", () => {
   text1
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n>`,
       );
@@ -244,7 +245,8 @@ describe("XML Formatter", () => {
   text1
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n>`,
       );
@@ -265,7 +267,8 @@ describe("XML Formatter", () => {
   text1
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n>`,
       );
@@ -276,7 +279,8 @@ describe("XML Formatter", () => {
   text1
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n>`;
       const result = formatTwice(input);
@@ -286,7 +290,8 @@ describe("XML Formatter", () => {
   text1
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n>`,
       );
@@ -297,7 +302,8 @@ describe("XML Formatter", () => {
   text1
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n>`;
       const result = formatTwice(input);
@@ -307,7 +313,8 @@ describe("XML Formatter", () => {
   text1
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n>`,
       );
@@ -318,7 +325,8 @@ describe("XML Formatter", () => {
   text1
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n>`;
       const result = formatTwice(input);
@@ -328,7 +336,8 @@ describe("XML Formatter", () => {
   text1
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n>`,
       );
@@ -339,7 +348,8 @@ describe("XML Formatter", () => {
   text1
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n>`;
       const result = formatTwice(input);
@@ -350,7 +360,8 @@ describe("XML Formatter", () => {
   text1
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n>`,
       );
@@ -361,7 +372,8 @@ describe("XML Formatter", () => {
   <!--c-->text1
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n>`;
       const result = formatTwice(input);
@@ -371,7 +383,8 @@ describe("XML Formatter", () => {
   <!--c-->text1
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n>`,
       );
@@ -382,7 +395,8 @@ describe("XML Formatter", () => {
   text1<!--c-->
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n>`;
       const result = formatTwice(input);
@@ -392,7 +406,8 @@ describe("XML Formatter", () => {
   text1 <!--c-->
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n>`,
       );
@@ -403,7 +418,8 @@ describe("XML Formatter", () => {
   text1
   <!--c--><n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n>`;
       const result = formatTwice(input);
@@ -414,7 +430,8 @@ describe("XML Formatter", () => {
   <!--c-->
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n>`,
       );
@@ -425,7 +442,8 @@ describe("XML Formatter", () => {
   text1
   <n2<!--c-->
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n>`;
       const result = formatTwice(input);
@@ -436,7 +454,8 @@ describe("XML Formatter", () => {
   <n2
     <!--c-->
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n>`,
       );
@@ -447,7 +466,8 @@ describe("XML Formatter", () => {
   text1
   <n2
     <!--c-->attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n>`;
       const result = formatTwice(input);
@@ -458,7 +478,8 @@ describe("XML Formatter", () => {
   <n2
     <!--c-->
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n>`,
       );
@@ -469,7 +490,8 @@ describe("XML Formatter", () => {
   text1
   <n2
     attr3="val2"<!--c-->
-    attr4 />
+    attr4
+  />
   text2
 </n>`;
       const result = formatTwice(input);
@@ -480,7 +502,8 @@ describe("XML Formatter", () => {
   <n2
     attr3="val2"
     <!--c-->
-    attr4 />
+    attr4
+  />
   text2
 </n>`,
       );
@@ -491,7 +514,9 @@ describe("XML Formatter", () => {
   text1
   <n2
     attr3="val2"
-    attr4<!--c--> />
+    attr4
+    <!--c-->
+  />
   text2
 </n>`;
       const result = formatTwice(input);
@@ -502,7 +527,8 @@ describe("XML Formatter", () => {
   <n2
     attr3="val2"
     attr4
-    <!--c--> />
+    <!--c-->
+  />
   text2
 </n>`,
       );
@@ -513,7 +539,8 @@ describe("XML Formatter", () => {
   text1
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2<!--c-->
 </n>`;
       const result = formatTwice(input);
@@ -523,7 +550,8 @@ describe("XML Formatter", () => {
   text1
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2 <!--c-->
 </n>`,
       );
@@ -534,7 +562,8 @@ describe("XML Formatter", () => {
   text1
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
   <!--c-->
 </n>`;
@@ -545,7 +574,8 @@ describe("XML Formatter", () => {
   text1
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
   <!--c-->
 </n>`,
@@ -557,7 +587,8 @@ describe("XML Formatter", () => {
   text1
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n><!--c-->`;
       const result = formatTwice(input);
@@ -567,7 +598,8 @@ describe("XML Formatter", () => {
   text1
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n> <!--c-->`,
       );
@@ -578,7 +610,8 @@ describe("XML Formatter", () => {
   text1
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </<!--c-->n>`;
       const result = formatTwice(input);
@@ -588,7 +621,8 @@ describe("XML Formatter", () => {
   text1
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </ <!--c--> n>`,
       );
@@ -599,7 +633,8 @@ describe("XML Formatter", () => {
   text1
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n<!--c-->>`;
       const result = formatTwice(input);
@@ -609,7 +644,8 @@ describe("XML Formatter", () => {
   text1
   <n2
     attr3="val2"
-    attr4 />
+    attr4
+  />
   text2
 </n <!--c-->>`,
       );
@@ -690,7 +726,8 @@ describe("XML Formatter", () => {
         `<n
   attr="val"
   <!-- long, long commonet long, long commonet long, long commonet long, long commonet -->
-  attr2 ?></n2>`,
+  attr2 ?
+></n2>`,
       );
     });
 
@@ -830,7 +867,8 @@ describe("XML Formatter", () => {
   variant="primary"
   size="large"
   disabled="false"
-  onClick="handleClick">
+  onClick="handleClick"
+>
   Submit
 </Button>`,
       );
@@ -847,7 +885,8 @@ describe("XML Formatter", () => {
   variant="primary"
   size="large"
   disabled="false"
-  onClick="handleClick" />`,
+  onClick="handleClick"
+/>`,
       );
     });
 
@@ -964,7 +1003,8 @@ describe("XML Formatter", () => {
     attr7="value7"
     attr8="value8"
     attr9="value9"
-    attr10="value10">
+    attr10="value10"
+  >
     text content
   </Text>
 </Fragment>`,
