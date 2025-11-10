@@ -30,6 +30,14 @@ export const FileInputMd = createMetadata({
     "upload or processing. It combines a text field displaying selected files with " +
     "a customizable button that opens the system file browser. Use it for forms, " +
     "media uploads, and document processing workflows.",
+  parts: {
+    label: {
+      description: "The label displayed for the file input.",
+    },
+    input: {
+      description: "The file input area displaying selected file names.",
+    },
+  },
   props: {
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),

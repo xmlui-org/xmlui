@@ -28,6 +28,15 @@ const COMP = "Table";
 export const TableMd = createMetadata({
   status: "stable",
   description: "`Table` presents structured data for viewing, sorting, selection, and interaction.",
+  // NOTE: let's leave it like this for now, we'll expand later when the need arises
+  parts: {
+    table: {
+      description: "The main table container.",
+    },
+    pagination: {
+      description: "The pagination controls container.",
+    },
+  },
   props: {
     items: dInternal(
       `You can use \`items\` as an alias for the \`data\` property. ` +

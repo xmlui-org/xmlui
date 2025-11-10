@@ -30,6 +30,11 @@ export const RadioGroupMd = createMetadata({
     "Radio options store their values as strings. Numbers and booleans are converted to strings " +
     "when assigned, while objects, functions and arrays default to an empty string unless resolved " +
     "via binding expressions.",
+  parts: {
+    label: {
+      description: "The label displayed for the radio group.",
+    }
+  },
   props: {
     initialValue: {
       ...dInitialValue(),
