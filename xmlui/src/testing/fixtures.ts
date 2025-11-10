@@ -344,6 +344,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(AvatarDriver, testIdOrLocator);
     });
   },
+  createAvatar2Driver: async ({ createDriver }, use) => {
+    await use((testIdOrLocator?: string | Locator) => {
+      return createDriver(AvatarDriver, testIdOrLocator);
+    });
+  },
   createFormDriver: async ({ createDriver }, use) => {
     await use((testIdOrLocator?: string | Locator) => {
       return createDriver(FormDriver, testIdOrLocator);
@@ -625,6 +630,7 @@ type TestDriverExtenderProps = {
   createBackdropDriver: ComponentDriverMethod<BackdropDriver>;
   createContentSeparatorDriver: ComponentDriverMethod<ContentSeparatorDriver>;
   createAvatarDriver: ComponentDriverMethod<AvatarDriver>;
+  createAvatar2Driver: ComponentDriverMethod<AvatarDriver>;
   createFormDriver: ComponentDriverMethod<FormDriver>;
   createFormItemDriver: ComponentDriverMethod<FormItemDriver>;
   createValidationSummaryDriver: ComponentDriverMethod<ValidationSummaryDriver>;

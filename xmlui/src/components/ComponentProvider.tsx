@@ -37,6 +37,7 @@ import { tableComponentRenderer } from "./Table/Table";
 import { stickyBoxComponentRenderer } from "./StickyBox/StickyBox";
 import { badgeComponentRenderer } from "./Badge/Badge";
 import { avatarComponentRenderer } from "./Avatar/Avatar";
+import { avatar2ComponentRenderer } from "./Avatar/Avatar2";
 import { contentSeparatorComponentRenderer } from "./ContentSeparator/ContentSeparator";
 import { cardComponentRenderer } from "./Card/Card";
 import { flowLayoutComponentRenderer } from "./FlowLayout/FlowLayout";
@@ -470,6 +471,7 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_Avatar !== "false") {
       this.registerCoreComponent(avatarComponentRenderer);
+      this.registerCoreComponent(avatar2ComponentRenderer); // Experimental runtime CSS version
     }
     if (process.env.VITE_USED_COMPONENTS_ContentSeparator !== "false") {
       this.registerCoreComponent(contentSeparatorComponentRenderer);

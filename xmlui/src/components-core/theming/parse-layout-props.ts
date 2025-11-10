@@ -1,6 +1,15 @@
 import type { MediaBreakpointType} from "../../abstractions/AppContextDefs";
 import { MediaBreakpointKeys } from "../../abstractions/AppContextDefs";
 
+/**
+ * Parsed representation of a theme variable name.
+ * 
+ * Theme variables follow a strict naming convention:
+ * `{property}-{part}-{component}-{screenSize}[--{state1}][--{state2}]`
+ * 
+ * See: xmlui/dev-docs/theming-styling-current-state.md for detailed documentation,
+ * naming rules, and comprehensive examples.
+ */
 export type ParsedLayout = {
   property: string;
   part?: string;
@@ -23,6 +32,29 @@ export const CSS_PROPERTY_EXCEPTIONS: Record<string, string> = {
   borderHorizontal: "",
 };
 
+/**
+ * Parses a theme variable name into its constituent parts.
+ * 
+ * Theme variables follow a strict naming convention:
+ * `{property}-{part}-{component}-{screenSize}[--{state1}][--{state2}]`
+ * 
+ * Where single dash `-` separates structural parts and double dash `--` separates states.
+ * 
+ * @param prop - The theme variable name to parse
+ * @param parseComponent - Whether to allow component names in the variable name
+ * @returns ParsedLayout object with the parsed structure, or error message string
+ * 
+ * @example
+ * parseLayoutProperty('borderRadius-Image', true)
+ * // { property: 'borderRadius', component: 'Image' }
+ * 
+ * @example
+ * parseLayoutProperty('backgroundColor-control-Carousel--hover', true)
+ * // { property: 'backgroundColor', part: 'control', component: 'Carousel', states: ['hover'] }
+ * 
+ * See: xmlui/dev-docs/theming-styling-current-state.md for comprehensive documentation
+ * and examples of all naming patterns.
+ */
 export function parseLayoutProperty(prop: string, parseComponent: boolean = false): ParsedLayout | string {
   if (!prop || typeof prop !== 'string') {
     return "Property string cannot be empty";
