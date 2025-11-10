@@ -26,6 +26,17 @@ export const SliderMd = createMetadata({
     "multiple thumbs. It offers precise control through customizable steps and visual " +
     "feedback with formatted value display." +
     "Hover over the component to see the tooltip with the current value. On mobile, tap the thumb to see the tooltip.",
+  parts: {
+    label: {
+      description: "The label displayed for the slider.",
+    },
+    track: {
+      description: "The track element of the slider.",
+    },
+    thumb: {
+      description: "The thumb elements of the slider.",
+    },
+  },
   props: {
     initialValue: dInitialValue(),
     minValue: {

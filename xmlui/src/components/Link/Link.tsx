@@ -17,7 +17,7 @@ export const LinkMd = createMetadata({
     "for rich interactive link presentations.",
   parts: {
     icon: {
-      description: "Styles the icon within the Link component.",
+      description: "The icon within the Link component.",
     }
   },
   props: {

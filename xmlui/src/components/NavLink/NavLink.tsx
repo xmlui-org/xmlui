@@ -18,7 +18,7 @@ export const NavLinkMd = createMetadata({
     "of navigation when needed.",
   parts: {
     indicator: {
-      description: "Styles the active indicator within the NavLink component.",
+      description: "The active indicator within the NavLink component.",
     },
   },
   props: {

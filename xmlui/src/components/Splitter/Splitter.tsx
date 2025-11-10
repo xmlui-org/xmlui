@@ -24,6 +24,14 @@ const baseSplitterMd = createMetadata({
     "conditional rendering with `when` attributes), the splitter bar is not " +
     "displayed and the single panel stretches to fill the entire viewport of " +
     "the splitter container.",
+  parts: {
+    primaryPanel: {
+      description: "The primary section/panel of the `Splitter` component.",
+    },
+    secondaryPanel: {
+      description: "The secondary section/panel of the `Splitter` component.",
+    },
+  },
   props: {
     swapped: {
       description:
@@ -111,7 +119,7 @@ type RenderSplitterPars = {
 
 const DEFAULT_ORIENTATION = "vertical";
 
-function renderSplitter({
+function SplitterRenderer({
   node,
   extractValue,
   className,
@@ -131,7 +139,7 @@ function renderSplitter({
     }
     
     return node.children
-      .map((child, index) => renderChild(child))
+      .map((child) => renderChild(child))
       .filter(child => child !== null && child !== undefined)
       .map((child, index) => React.cloneElement(child as React.ReactElement, { key: index }));
   }, [node.children, renderChild]);
@@ -160,7 +168,7 @@ export const splitterComponentRenderer = createComponentRenderer(
   COMP,
   SplitterMd,
   ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
-    return renderSplitter({
+    return SplitterRenderer({
       node,
       extractValue,
       className,
@@ -174,7 +182,7 @@ export const vSplitterComponentRenderer = createComponentRenderer(
   "VSplitter",
   VSplitterMd,
   ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
-    return renderSplitter({
+    return SplitterRenderer({
       node,
       extractValue,
       className,
@@ -189,7 +197,7 @@ export const hSplitterComponentRenderer = createComponentRenderer(
   "HSplitter",
   HSplitterMd,
   ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
-    return renderSplitter({
+    return SplitterRenderer({
       node,
       extractValue,
       className,

@@ -18,10 +18,10 @@ export const NavPanelMd = createMetadata({
     "App's layout configuration.",
   parts: {
     logo: {
-      description: "Styles the logo area within the NavPanel component.",
+      description: "The logo area within the NavPanel component.",
     },
     content: {
-      description: "Styles the content area within the NavPanel component.",
+      description: "The content area within the NavPanel component.",
     },
   },
   props: {
