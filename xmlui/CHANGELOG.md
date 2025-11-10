@@ -1,5 +1,16 @@
 # xmlui
 
+## 0.11.6
+
+### Patch Changes
+
+- f9ac95e: Fix the variant behavior. It uses a React component now.
+- 097783b: Fixed Table row deselection if multiple row selections are disabled.
+- 0bace0a: Add clearable property to Select
+- 07b1a3d: Add a new layout, "desktop", to App
+- 0bace0a: Add padding theme vars to ContentSeparator
+- 0bace0a: Review Select fontSize and minHeight theme variables
+
 ## 0.11.5
 
 ### Patch Changes
