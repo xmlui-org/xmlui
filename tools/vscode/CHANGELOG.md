@@ -1,5 +1,13 @@
 # xmlui-vscode
 
+## 0.11.7
+
+### Patch Changes
+
+- Updated dependencies [de17ae1]
+- Updated dependencies [dc3d889]
+  - xmlui@0.11.7
+
 ## 0.11.6
 
 ### Patch Changes

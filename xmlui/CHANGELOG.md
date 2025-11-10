@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.11.7
+
+### Patch Changes
+
+- de17ae1: Add the Choose component to xmlui
+- dc3d889: Fix long text handling in markdown and dialogs
+
 ## 0.11.6
 
 ### Patch Changes
