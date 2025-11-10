@@ -392,6 +392,35 @@ export const Markdown = memo(
               }
               return null;
             },
+            // Handle SVG elements that pass through via rehype-raw
+            // These need to be created using React.createElement to avoid warnings about unrecognized tags
+            svg: (({ children, ...props }) => {
+              const { ref, ...restProps } = props as any;
+              return React.createElement('svg', restProps, children);
+            }) as any,
+            g: (({ children, ...props }) => {
+              const { ref, ...restProps } = props as any;
+              return React.createElement('g', restProps, children);
+            }) as any,
+            path: (({ children, ...props }) => {
+              const { ref, ...restProps } = props as any;
+              return React.createElement('path', restProps, children);
+            }) as any,
+            rect: (({ children, ...props }) => {
+              const { ref, ...restProps } = props as any;
+              return React.createElement('rect', restProps, children);
+            }) as any,
+            ellipse: (({ children, ...props }) => {
+              const { ref, ...restProps } = props as any;
+              return React.createElement('ellipse', restProps, children);
+            }) as any,
+            // The <text> element can appear in two contexts:
+            // 1. As an SVG <text> element inside SVG diagrams (rare, handled by rehype-raw)
+            // 2. As a literal <text> tag in markdown content that passes through rehype-raw
+            // We strip the wrapper and just render the children to avoid React warnings
+            text: (({ children }) => {
+              return <>{children}</>;
+            }) as any,
           }}
         >
           {children as any}
