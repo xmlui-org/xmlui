@@ -10,7 +10,6 @@ export const DefaultDocsTheme: ThemeDefinition = {
     backgroundColor: "$color-surface-0",
     "color-primary": "#3367CC",
     "color-surface": "#1e2734",
-    "backgroundColor-content-App": "$color-surface-0",
 
     // --- App layout
     "maxWidth-App": "1280px",

@@ -128,6 +128,7 @@ export const AppMd = createMetadata({
     [`width-navPanel-${COMP}`]: "$space-64",
     [`backgroundColor-navPanel-${COMP}`]: "$backgroundColor",
     [`maxWidth-content-${COMP}`]: "$maxWidth-content",
+    [`maxWidth-${COMP}`]: "$maxWidth-content",
     [`boxShadow-header-${COMP}`]: "none",
     [`boxShadow-navPanel-${COMP}`]: "$boxShadow-spread",
     [`scroll-padding-block-Pages`]: "$space-4",
