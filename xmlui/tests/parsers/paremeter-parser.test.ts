@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { parseParameterString } from "../../src/components-core/script-runner/ParameterParser";
-import { Expression } from "../../src/components-core/script-runner/ScriptingSourceTree";
+import type { Expression } from "../../src/components-core/script-runner/ScriptingSourceTree";
 import { T_BINARY_EXPRESSION, T_LITERAL } from "../../src/parsers/scripting/ScriptingNodeTypes";
 
 describe("parseParameterString", () => {

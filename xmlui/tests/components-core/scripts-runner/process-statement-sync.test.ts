@@ -3,9 +3,10 @@ import { describe, expect, it, assert } from "vitest";
 import { processStatementQueue } from "../../../src/components-core/script-runner/process-statement-sync";
 import { createEvalContext, parseStatements } from "./test-helpers";
 import { buildProxy } from "../../../src/components-core/rendering/buildProxy";
-import {
+import type {
   ArrowExpressionStatement,
-  ExpressionStatement,
+  ExpressionStatement} from "../../../src/components-core/script-runner/ScriptingSourceTree";
+import {
   T_ARROW_EXPRESSION_STATEMENT,
 } from "../../../src/components-core/script-runner/ScriptingSourceTree";
 

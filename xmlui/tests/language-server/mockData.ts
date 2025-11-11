@@ -1,4 +1,5 @@
-import { MetadataProvider, ComponentMetadataCollection } from "../../src/language-server/services/common/metadata-utils";
+import type { ComponentMetadataCollection } from "../../src/language-server/services/common/metadata-utils";
+import { MetadataProvider } from "../../src/language-server/services/common/metadata-utils";
 
 export const mockMetadata = {
   "Stack": {

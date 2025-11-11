@@ -1,13 +1,14 @@
 import { describe, expect, it } from "vitest";
 
 import { Parser } from "../../../src/parsers/scripting/Parser";
-import {
+import type {
   FunctionInvocationExpression,
   MemberAccessExpression,
   PostfixOpExpression,
   PrefixOpExpression,
   SequenceExpression,
-  SpreadExpression,
+  SpreadExpression} from "../../../src/components-core/script-runner/ScriptingSourceTree";
+import {
   T_ARRAY_LITERAL,
   T_BINARY_EXPRESSION,
   T_CALCULATED_MEMBER_ACCESS_EXPRESSION,

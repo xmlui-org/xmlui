@@ -1,7 +1,8 @@
 import { assert, describe, expect, it } from "vitest";
 
 import { parseAttributeValue } from "../../../src/components-core/script-runner/AttributeValueParser";
-import { Identifier, ObjectLiteral, T_IDENTIFIER } from "../../../src/components-core/script-runner/ScriptingSourceTree";
+import type { Identifier, ObjectLiteral} from "../../../src/components-core/script-runner/ScriptingSourceTree";
+import { T_IDENTIFIER } from "../../../src/components-core/script-runner/ScriptingSourceTree";
 import { T_OBJECT_LITERAL } from "../../../src/parsers/scripting/ScriptingNodeTypes";
 
 describe("Attribute value parsing", () => {

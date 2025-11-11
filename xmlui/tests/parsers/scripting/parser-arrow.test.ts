@@ -1,13 +1,14 @@
 import { describe, expect, it, assert } from "vitest";
 
 import { Parser } from "../../../src/parsers/scripting/Parser";
-import {
+import type {
   ArrowExpression,
   BlockStatement,
   Destructure,
   FunctionInvocationExpression,
   Identifier,
-  SpreadExpression,
+  SpreadExpression} from "../../../src/components-core/script-runner/ScriptingSourceTree";
+import {
   T_ARROW_EXPRESSION,
   T_BLOCK_STATEMENT,
   T_EXPRESSION_STATEMENT,
