@@ -58,6 +58,7 @@ type Props = {
   autoDetectTone?: boolean;
   applyDefaultContentPadding?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
+  footerNonSticky?: boolean;
 };
 
 export const defaultProps: Pick<
@@ -104,6 +105,7 @@ export function App({
   className,
   applyDefaultContentPadding,
   registerComponentApi,
+  footerNonSticky = false,
   ...rest
 }: Props) {
   const { getThemeVar } = useTheme();
@@ -373,6 +375,10 @@ export function App({
   let pagesWrapperClasses = classnames(styles.PagesWrapperInner, {
     [styles.withDefaultContentPadding]: applyDefaultContentPadding,
   });
+  
+  // Determine if footer should have nonSticky class (for non-desktop layouts when nonSticky is true)
+  const footerShouldBeNonSticky = footerNonSticky && safeLayout !== "desktop";
+  
   switch (safeLayout) {
     case "vertical":
       content = (
@@ -414,7 +420,12 @@ export function App({
             <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
               <div className={pagesWrapperClasses}>{children}</div>
             </div>
-            <div className={styles.footerWrapper} ref={footerRefCallback}>
+            <div 
+              className={classnames(styles.footerWrapper, {
+                [styles.nonSticky]: footerShouldBeNonSticky,
+              })} 
+              ref={footerRefCallback}
+            >
               {footer}
             </div>
           </div>
@@ -443,7 +454,12 @@ export function App({
               </div>
             </main>
           </div>
-          <div className={styles.footerWrapper} ref={footerRefCallback}>
+          <div 
+            className={classnames(styles.footerWrapper, {
+              [styles.nonSticky]: footerShouldBeNonSticky,
+            })} 
+            ref={footerRefCallback}
+          >
             {footer}
           </div>
         </div>
@@ -474,7 +490,12 @@ export function App({
           <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
             <div className={pagesWrapperClasses}>{children}</div>
           </div>
-          <div className={styles.footerWrapper} ref={footerRefCallback}>
+          <div 
+            className={classnames(styles.footerWrapper, {
+              [styles.nonSticky]: footerShouldBeNonSticky,
+            })} 
+            ref={footerRefCallback}
+          >
             {footer}
           </div>
         </div>
@@ -520,7 +541,12 @@ export function App({
           <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
             <div className={pagesWrapperClasses}>{children}</div>
           </div>
-          <div className={styles.footerWrapper} ref={footerRefCallback}>
+          <div 
+            className={classnames(styles.footerWrapper, {
+              [styles.nonSticky]: footerShouldBeNonSticky,
+            })} 
+            ref={footerRefCallback}
+          >
             {footer}
           </div>
         </div>
