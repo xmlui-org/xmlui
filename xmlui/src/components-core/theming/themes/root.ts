@@ -260,7 +260,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "boxShadow-spread-2-xl": "-6px -4px 40px 18px rgba(0, 0, 0, 0.1)",
 
     // --- The default maximum content width
-    "maxWidth-content": "1320px",
+    "maxWidth-content": "1280px",
 
     // --- Background colors
     backgroundColor: "$color-surface-subtle",
