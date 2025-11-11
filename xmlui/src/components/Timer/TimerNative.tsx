@@ -67,7 +67,8 @@ export const Timer = forwardRef(function Timer(
   hasEverStartedRef.current = hasEverStarted;
 
   // Derived state
-  const isRunning = enabled && !isPaused && (intervalRef.current !== null || initialDelayRef.current !== null);
+  const isRunning =
+    enabled && !isPaused && (intervalRef.current !== null || initialDelayRef.current !== null);
   const isInInitialDelay = initialDelayRef.current !== null;
 
   // Timer API methods
@@ -95,12 +96,15 @@ export const Timer = forwardRef(function Timer(
   }, [enabled, isPaused]);
 
   // Create API object once
-  const timerApi = useMemo(() => ({
-    pause,
-    resume,
-    isPaused: () => isPaused,
-    isRunning: () => isRunning && !isPaused,
-  }), [pause, resume, isPaused, isRunning]);
+  const timerApi = useMemo(
+    () => ({
+      pause,
+      resume,
+      isPaused: () => isPaused,
+      isRunning: () => isRunning && !isPaused,
+    }),
+    [pause, resume, isPaused, isRunning],
+  );
 
   // Register both APIs together
   useEffect(() => {
@@ -124,12 +128,12 @@ export const Timer = forwardRef(function Timer(
       handlerRunningRef.current = true;
       try {
         await onTickRef.current();
-        
+
         // Mark that the timer has actually started executing (for initial delay logic)
         if (!hasEverStartedRef.current) {
           setHasEverStarted(true);
         }
-        
+
         // If this is a "once" timer and it's the very first execution, mark it as executed
         // After the first execution, the timer becomes a regular timer that can be paused/resumed
         if (onceRef.current && !hasExecutedOnceRef.current) {
@@ -160,9 +164,10 @@ export const Timer = forwardRef(function Timer(
     if (enabled && !isPaused && interval > 0) {
       // Helper to start the actual timer
       const startTicking = () => {
-        intervalRef.current = (once && !hasExecutedOnce) 
-          ? setTimeout(handleTick, interval) as any
-          : setInterval(handleTick, interval);
+        intervalRef.current =
+          once && !hasExecutedOnce
+            ? (setTimeout(handleTick, interval) as any)
+            : setInterval(handleTick, interval);
       };
 
       // Only apply initial delay if timer has never been started before
@@ -186,7 +191,16 @@ export const Timer = forwardRef(function Timer(
         initialDelayRef.current = null;
       }
     };
-  }, [enabled, interval, once, hasExecutedOnce, isPaused, initialDelay, hasEverStarted]);
+  }, [
+    enabled,
+    interval,
+    once,
+    hasExecutedOnce,
+    isPaused,
+    initialDelay,
+    hasEverStarted,
+    handleTick,
+  ]);
 
   // Reset state when enabled changes
   useEffect(() => {
