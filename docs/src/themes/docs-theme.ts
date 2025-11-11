@@ -10,10 +10,10 @@ export const DefaultDocsTheme: ThemeDefinition = {
     backgroundColor: "$color-surface-0",
     "color-primary": "#3367CC",
     "color-surface": "#1e2734",
-    "backgroundColor-content-App": "$color-surface-0",
 
     // --- App layout
-    "maxWidth-App": "1320px",
+    "maxWidth-App": "1280px",
+    "maxWidth-docBody-App": "800px",
     "boxShadow-navPanel-App": "none",
 
     // --- We intentionally use different theming to amplify the "documentation" feel

@@ -138,7 +138,7 @@ $padding-drawerToggle-AppHeader: createThemeVar("padding-drawerToggle-#{$compone
   .drawerToggle.drawerToggle{
     padding: $padding-drawerToggle-AppHeader !important;
     display: none;
-    @include t.withMaxScreenSize(0) {
+    @include t.withMaxScreenSize(2) {
       display: block;
     }
   }

@@ -76,6 +76,9 @@ $maxWidth-App: createThemeVar("maxWidth-App");
           position: sticky;
           bottom: 0;
         }
+        .footerWrapper.nonSticky {
+          position: static;
+        }
       }
     }
 
@@ -93,6 +96,9 @@ $maxWidth-App: createThemeVar("maxWidth-App");
         .footerWrapper {
           position: sticky;
           bottom: 0;
+        }
+        .footerWrapper.nonSticky {
+          position: static;
         }
       }
       .navPanelWrapper {
@@ -248,6 +254,9 @@ $maxWidth-App: createThemeVar("maxWidth-App");
         left: 0;
         right: 0;
         bottom: 0;
+        &.nonSticky {
+          position: static;
+        }
       }
     }
 

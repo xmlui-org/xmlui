@@ -10,7 +10,7 @@
         <SpaceFiller />
         <Search
             data="{appGlobals.plainTextContent}"
-            when="{mediaSize.sizeIndex > 2}" />
+            when="{mediaSize.sizeIndex > 1}" />
         <ToneSwitch />
     </AppHeader>
     <NavPanel

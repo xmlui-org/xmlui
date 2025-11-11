@@ -128,6 +128,7 @@ export const AppMd = createMetadata({
     [`width-navPanel-${COMP}`]: "$space-64",
     [`backgroundColor-navPanel-${COMP}`]: "$backgroundColor",
     [`maxWidth-content-${COMP}`]: "$maxWidth-content",
+    [`maxWidth-${COMP}`]: "$maxWidth-content",
     [`boxShadow-header-${COMP}`]: "none",
     [`boxShadow-navPanel-${COMP}`]: "$boxShadow-spread",
     [`scroll-padding-block-Pages`]: "$space-4",
@@ -352,6 +353,23 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
 
   const applyDefaultContentPadding= !Pages;
 
+  // Extract nonSticky property from Footer component
+  const footerNonSticky = useMemo(() => {
+    if (!Footer) return false;
+    
+    // Check if Footer is wrapped in Theme
+    let footerNode = Footer;
+    if (Footer.type === "Theme" && Footer.children?.length > 0) {
+      footerNode = Footer.children.find((child) => child.type === "Footer");
+    }
+    
+    if (footerNode?.type === "Footer" && footerNode.props?.nonSticky !== undefined) {
+      return extractValue.asOptionalBoolean(footerNode.props.nonSticky, false);
+    }
+    
+    return false;
+  }, [Footer, extractValue]);
+
   // --- Memoize all app props to prevent unnecessary re-renders
   const appProps = useMemo(
     () => ({
@@ -369,7 +387,8 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
       defaultTone: extractValue(node.props.defaultTone),
       defaultTheme: extractValue(node.props.defaultTheme),
       autoDetectTone: extractValue.asOptionalBoolean(node.props.autoDetectTone, false),
-      applyDefaultContentPadding
+      applyDefaultContentPadding,
+      footerNonSticky,
     }),
     [
       extractValue,
@@ -386,7 +405,8 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
       node.props.defaultTheme,
       node.props.autoDetectTone,
       className,
-      applyDefaultContentPadding
+      applyDefaultContentPadding,
+      footerNonSticky,
     ],
   );
 
