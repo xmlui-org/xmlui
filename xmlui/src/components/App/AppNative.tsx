@@ -58,7 +58,7 @@ type Props = {
   autoDetectTone?: boolean;
   applyDefaultContentPadding?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
-  footerNonSticky?: boolean;
+  footerSticky?: boolean;
 };
 
 export const defaultProps: Pick<
@@ -105,7 +105,7 @@ export function App({
   className,
   applyDefaultContentPadding,
   registerComponentApi,
-  footerNonSticky = false,
+  footerSticky = true,
   ...rest
 }: Props) {
   const { getThemeVar } = useTheme();
@@ -376,8 +376,8 @@ export function App({
     [styles.withDefaultContentPadding]: applyDefaultContentPadding,
   });
   
-  // Determine if footer should have nonSticky class (for non-desktop layouts when nonSticky is true)
-  const footerShouldBeNonSticky = footerNonSticky && safeLayout !== "desktop";
+  // Determine if footer should have nonSticky class (when sticky=false for non-desktop layouts)
+  const footerShouldBeNonSticky = !footerSticky && safeLayout !== "desktop";
   
   switch (safeLayout) {
     case "vertical":

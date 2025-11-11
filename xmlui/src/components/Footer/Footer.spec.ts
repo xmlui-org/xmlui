@@ -112,10 +112,10 @@ test("component handles long content correctly", async ({ page, initTestBed }) =
 });
 
 // =============================================================================
-// NONSTICKY PROPERTY TESTS
+// STICKY PROPERTY TESTS
 // =============================================================================
 
-test.describe("nonSticky property", () => {
+test.describe("sticky property", () => {
   test("footer is sticky by default in horizontal-sticky layout", async ({ page, initTestBed }) => {
     await initTestBed(`
       <App layout="horizontal-sticky">
@@ -147,7 +147,7 @@ test.describe("nonSticky property", () => {
     expect(scrolledBounds?.y).toEqual(initialBounds?.y);
   });
 
-  test("footer scrolls with content when nonSticky=true in horizontal-sticky layout", async ({ page, initTestBed }) => {
+  test("footer scrolls with content when sticky=false in horizontal-sticky layout", async ({ page, initTestBed }) => {
     await initTestBed(`
       <App layout="horizontal-sticky">
         <Pages fallbackPath="/">
@@ -157,7 +157,7 @@ test.describe("nonSticky property", () => {
             </Stack>
           </Page>
         </Pages>
-        <Footer nonSticky testId="footer">
+        <Footer sticky="false" testId="footer">
           <Text>Footer Content</Text>
         </Footer>
       </App>
@@ -213,7 +213,7 @@ test.describe("nonSticky property", () => {
     expect(scrolledBounds?.y).toEqual(initialBounds?.y);
   });
 
-  test("footer scrolls with content when nonSticky=true in vertical-sticky layout", async ({ page, initTestBed }) => {
+  test("footer scrolls with content when sticky=false in vertical-sticky layout", async ({ page, initTestBed }) => {
     await initTestBed(`
       <App layout="vertical-sticky">
         <NavPanel>
@@ -226,7 +226,7 @@ test.describe("nonSticky property", () => {
             </Stack>
           </Page>
         </Pages>
-        <Footer nonSticky testId="footer">
+        <Footer sticky="false" testId="footer">
           <Text>Footer Content</Text>
         </Footer>
       </App>
@@ -282,7 +282,7 @@ test.describe("nonSticky property", () => {
     expect(scrolledBounds?.y).toEqual(initialBounds?.y);
   });
 
-  test("footer scrolls with content when nonSticky=true in condensed-sticky layout", async ({ page, initTestBed }) => {
+  test("footer scrolls with content when sticky=false in condensed-sticky layout", async ({ page, initTestBed }) => {
     await initTestBed(`
       <App layout="condensed-sticky">
         <Pages fallbackPath="/">
@@ -292,7 +292,7 @@ test.describe("nonSticky property", () => {
             </Stack>
           </Page>
         </Pages>
-        <Footer nonSticky testId="footer">
+        <Footer sticky="false" testId="footer">
           <Text>Footer Content</Text>
         </Footer>
       </App>
@@ -348,7 +348,7 @@ test.describe("nonSticky property", () => {
     expect(scrolledBounds?.y).toEqual(initialBounds?.y);
   });
 
-  test("footer scrolls with content when nonSticky=true in vertical-full-header layout", async ({ page, initTestBed }) => {
+  test("footer scrolls with content when sticky=false in vertical-full-header layout", async ({ page, initTestBed }) => {
     await initTestBed(`
       <App layout="vertical-full-header">
         <AppHeader>
@@ -364,7 +364,7 @@ test.describe("nonSticky property", () => {
             </Stack>
           </Page>
         </Pages>
-        <Footer nonSticky testId="footer">
+        <Footer sticky="false" testId="footer">
           <Text>Footer Content</Text>
         </Footer>
       </App>
@@ -383,7 +383,7 @@ test.describe("nonSticky property", () => {
     await expect(footer).toBeVisible();
   });
 
-  test("footer remains sticky in desktop layout regardless of nonSticky property", async ({ page, initTestBed }) => {
+  test("footer remains sticky in desktop layout regardless of sticky property", async ({ page, initTestBed }) => {
     await initTestBed(`
       <App layout="desktop">
         <Pages fallbackPath="/">
@@ -393,7 +393,7 @@ test.describe("nonSticky property", () => {
             </Stack>
           </Page>
         </Pages>
-        <Footer nonSticky testId="footer">
+        <Footer sticky="false" testId="footer">
           <Text>Footer Content</Text>
         </Footer>
       </App>
@@ -412,12 +412,12 @@ test.describe("nonSticky property", () => {
     });
     await page.waitForTimeout(100);
 
-    // Footer should remain in same position (sticky even with nonSticky=true)
+    // Footer should remain in same position (sticky even with sticky=false)
     const scrolledBounds = await footer.boundingBox();
     expect(scrolledBounds?.y).toEqual(initialBounds?.y);
   });
 
-  test("nonSticky=false behaves same as default (sticky)", async ({ page, initTestBed }) => {
+  test("sticky=true behaves same as default (sticky)", async ({ page, initTestBed }) => {
     await initTestBed(`
       <App layout="horizontal-sticky">
         <Pages fallbackPath="/">
@@ -427,7 +427,7 @@ test.describe("nonSticky property", () => {
             </Stack>
           </Page>
         </Pages>
-        <Footer nonSticky="false" testId="footer">
+        <Footer sticky="true" testId="footer">
           <Text>Footer Content</Text>
         </Footer>
       </App>
@@ -448,7 +448,7 @@ test.describe("nonSticky property", () => {
     expect(scrolledBounds?.y).toEqual(initialBounds?.y);
   });
 
-  test("footer in non-sticky layouts is not affected by nonSticky property", async ({ page, initTestBed }) => {
+  test("footer in non-sticky layouts is not affected by sticky property", async ({ page, initTestBed }) => {
     // Test with 'horizontal' layout (not sticky by default)
     await initTestBed(`
       <App layout="horizontal">
@@ -459,7 +459,7 @@ test.describe("nonSticky property", () => {
             </Stack>
           </Page>
         </Pages>
-        <Footer nonSticky testId="footer">
+        <Footer sticky="false" testId="footer">
           <Text>Footer Content</Text>
         </Footer>
       </App>

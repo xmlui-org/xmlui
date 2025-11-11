@@ -15,13 +15,13 @@ export const FooterMd = createMetadata({
     "footer content such as branding, copyright notices, or utility controls like " +
     "theme toggles.",
   props: {
-    nonSticky: {
+    sticky: {
       description:
-        "When set to true, undocks the Footer from the bottom of the page for non-desktop layouts, " +
-        "allowing it to scroll with the main content. In desktop layout, the Footer remains sticky " +
-        "regardless of this property.",
+        "When set to true (default), keeps the Footer docked to the bottom of the page in sticky layouts. " +
+        "When set to false, allows the Footer to scroll with the main content for non-desktop layouts. " +
+        "In desktop layout, the Footer remains sticky regardless of this property.",
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: true,
     },
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -49,12 +49,12 @@ export const footerRenderer = createComponentRenderer(
   COMP,
   FooterMd,
   ({ node, renderChild, className, layoutContext, extractValue }) => {
-    const nonSticky = extractValue.asOptionalBoolean(node.props.nonSticky, false);
+    const sticky = extractValue.asOptionalBoolean(node.props.sticky, true);
     
     return (
       <Footer 
         className={classnames(layoutContext?.themeClassName, className)}
-        nonSticky={nonSticky}
+        sticky={sticky}
       >
         {renderChild(node.children, {
           type: "Stack",

@@ -4,9 +4,9 @@
 
 ## Properties [#properties]
 
-### `nonSticky` (default: false) [#nonsticky-default-false]
+### `sticky` (default: true) [#sticky-default-true]
 
-When set to true, undocks the Footer from the bottom of the page for non-desktop layouts, allowing it to scroll with the main content. In desktop layout, the Footer remains sticky regardless of this property.
+When set to true (default), keeps the Footer docked to the bottom of the page in sticky layouts. When set to false, allows the Footer to scroll with the main content for non-desktop layouts. In desktop layout, the Footer remains sticky regardless of this property.
 
 ## Events [#events]
 
