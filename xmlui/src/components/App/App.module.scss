@@ -105,6 +105,14 @@ $maxWidth-App: createThemeVar("maxWidth-App");
         border-bottom: $borderBottom-NavPanel;
         justify-content: end;
         background-color: $backgroundColor-navPanel-App;
+        padding: 0;
+      }
+      .headerWrapper {
+        padding-inline: 0;
+        
+        > div {
+          padding-inline: 0;
+        }
       }
     }
 

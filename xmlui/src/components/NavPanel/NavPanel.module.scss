@@ -11,6 +11,7 @@ $themeVars: ();
 $themeVars: t.composeBorderVars($themeVars, $component);
 $backgroundColor-NavPanel: createThemeVar("backgroundColor-#{$component}");
 $backgroundColor-NavPanel-horizontal: createThemeVar("backgroundColor-#{$component}-horizontal");
+$borderRight-NavPanel-vertical: createThemeVar("borderRight-#{$component}-vertical");
 $boxShadow-NavPanel: createThemeVar("boxShadow-#{$component}");
 $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, "logo-#{$component}");
@@ -50,12 +51,14 @@ $horizontalAlignment-logo-NavPanel: createThemeVar("horizontalAlignment-logo-#{$
 
     &.vertical {
       scrollbar-gutter: stable;
+      border-right: $borderRight-NavPanel-vertical;
     }
 
     &.horizontal{
       box-shadow: none;
       height: $height-NavPanel;
       background-color: $backgroundColor-NavPanel-horizontal;
+      padding: 0;
 
       &:not(.condensed){
         .wrapperInner{
