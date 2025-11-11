@@ -11,7 +11,7 @@ import { useAppLayoutContext } from "../App/AppLayoutContext";
 // React Footer component implementation
 
 export const defaultProps = {
-  nonSticky: false,
+  sticky: true,
 };
 
 export const Footer = forwardRef(function Footer(
@@ -19,13 +19,13 @@ export const Footer = forwardRef(function Footer(
     children,
     style,
     className,
-    nonSticky = defaultProps.nonSticky,
+    sticky = defaultProps.sticky,
     ...rest
   }: {
     children: ReactNode;
     style?: React.CSSProperties;
     className?: string;
-    nonSticky?: boolean;
+    sticky?: boolean;
   },
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -38,7 +38,7 @@ export const Footer = forwardRef(function Footer(
       ref={forwardedRef} 
       style={style} 
       role="contentinfo"
-      data-non-sticky={nonSticky}
+      data-sticky={sticky}
     >
       <div
         className={classnames(styles.wrapper, className, {

@@ -353,9 +353,9 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
 
   const applyDefaultContentPadding= !Pages;
 
-  // Extract nonSticky property from Footer component
-  const footerNonSticky = useMemo(() => {
-    if (!Footer) return false;
+  // Extract sticky property from Footer component
+  const footerSticky = useMemo(() => {
+    if (!Footer) return true;
     
     // Check if Footer is wrapped in Theme
     let footerNode = Footer;
@@ -363,11 +363,11 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
       footerNode = Footer.children.find((child) => child.type === "Footer");
     }
     
-    if (footerNode?.type === "Footer" && footerNode.props?.nonSticky !== undefined) {
-      return extractValue.asOptionalBoolean(footerNode.props.nonSticky, false);
+    if (footerNode?.type === "Footer" && footerNode.props?.sticky !== undefined) {
+      return extractValue.asOptionalBoolean(footerNode.props.sticky, true);
     }
     
-    return false;
+    return true;
   }, [Footer, extractValue]);
 
   // --- Memoize all app props to prevent unnecessary re-renders
@@ -388,7 +388,7 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
       defaultTheme: extractValue(node.props.defaultTheme),
       autoDetectTone: extractValue.asOptionalBoolean(node.props.autoDetectTone, false),
       applyDefaultContentPadding,
-      footerNonSticky,
+      footerSticky,
     }),
     [
       extractValue,
@@ -406,7 +406,7 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
       node.props.autoDetectTone,
       className,
       applyDefaultContentPadding,
-      footerNonSticky,
+      footerSticky,
     ],
   );
 
