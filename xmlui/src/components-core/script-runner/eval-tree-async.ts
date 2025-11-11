@@ -386,7 +386,6 @@ async function evalBinaryAsync(
     return l;
   }
   if (expr.op === "||" && l) {
-
     setExprValue(expr, { value: l }, thread);
     thisStack.push(l);
     return l;
