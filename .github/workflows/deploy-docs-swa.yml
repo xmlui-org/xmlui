@@ -30,6 +30,5 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_WEBAPP_DEPLOYMENT_TOKEN_XMLUI_DOCS }}
           action: "upload"
-          app_location: ""
-          output_location: "docs/dist"
+          app_location: "docs/dist"
           skip_app_build: true
