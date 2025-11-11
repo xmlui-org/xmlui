@@ -71,6 +71,7 @@
         "gen:download-latest-xmlui-release",
         "generate-docs-summaries"
       ],
+      "inputs": ["$TURBO_DEFAULT$", "content/**"],
       "outputs": ["dist/**"]
     },
     "release:docs": {
