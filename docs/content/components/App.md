@@ -449,7 +449,7 @@ This component does not expose any methods.
 | [borderLeft](../styles-and-themes/common-units/#border)-content-App | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-header-App | none | none |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-navPanel-App | $boxShadow-spread | $boxShadow-spread |
-| [maxWidth](../styles-and-themes/common-units/#size)-App | *none* | *none* |
+| [maxWidth](../styles-and-themes/common-units/#size)-App | $maxWidth-content | $maxWidth-content |
 | [maxWidth-content](../styles-and-themes/common-units/#size)-App | $maxWidth-content | $maxWidth-content |
 | [width](../styles-and-themes/common-units/#size)-navPanel-App | $space-64 | $space-64 |
 

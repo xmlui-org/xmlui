@@ -11,7 +11,7 @@ import { useAppLayoutContext } from "../App/AppLayoutContext";
 // React Footer component implementation
 
 export const defaultProps = {
-  // No default props needed currently, but adding object for consistency
+  nonSticky: false,
 };
 
 export const Footer = forwardRef(function Footer(
@@ -19,18 +19,27 @@ export const Footer = forwardRef(function Footer(
     children,
     style,
     className,
+    nonSticky = defaultProps.nonSticky,
     ...rest
   }: {
     children: ReactNode;
     style?: React.CSSProperties;
     className?: string;
+    nonSticky?: boolean;
   },
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const { layout } = useAppLayoutContext() || {};
   const canRestrictContentWidth = layout !== "vertical-full-header";
   return (
-    <div {...rest} className={styles.outerWrapper} ref={forwardedRef} style={style} role="contentinfo">
+    <div 
+      {...rest} 
+      className={styles.outerWrapper} 
+      ref={forwardedRef} 
+      style={style} 
+      role="contentinfo"
+      data-non-sticky={nonSticky}
+    >
       <div
         className={classnames(styles.wrapper, className, {
           [styles.full]: !canRestrictContentWidth,

@@ -112,6 +112,374 @@ test("component handles long content correctly", async ({ page, initTestBed }) =
 });
 
 // =============================================================================
+// NONSTICKY PROPERTY TESTS
+// =============================================================================
+
+test.describe("nonSticky property", () => {
+  test("footer is sticky by default in horizontal-sticky layout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <App layout="horizontal-sticky">
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Stack height="2000px">
+              <Text>Long content to enable scrolling</Text>
+            </Stack>
+          </Page>
+        </Pages>
+        <Footer testId="footer">
+          <Text>Footer Content</Text>
+        </Footer>
+      </App>
+    `);
+
+    const footer = page.getByTestId("footer");
+    await expect(footer).toBeVisible();
+
+    // Get initial footer position
+    const initialBounds = await footer.boundingBox();
+    
+    // Scroll down
+    await page.evaluate(() => window.scrollBy(0, 500));
+    await page.waitForTimeout(100);
+
+    // Footer should remain in same position (sticky)
+    const scrolledBounds = await footer.boundingBox();
+    expect(scrolledBounds?.y).toEqual(initialBounds?.y);
+  });
+
+  test("footer scrolls with content when nonSticky=true in horizontal-sticky layout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <App layout="horizontal-sticky">
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Stack height="2000px">
+              <Text>Long content to enable scrolling</Text>
+            </Stack>
+          </Page>
+        </Pages>
+        <Footer nonSticky testId="footer">
+          <Text>Footer Content</Text>
+        </Footer>
+      </App>
+    `);
+
+    const footer = page.getByTestId("footer");
+    
+    // Footer should not be visible initially (scrolled out of view)
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(100);
+    
+    // Scroll to bottom to see footer
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(100);
+    
+    await expect(footer).toBeVisible();
+  });
+
+  test("footer is sticky by default in vertical-sticky layout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <App layout="vertical-sticky">
+        <NavPanel>
+          <NavLink label="Home" to="/" />
+        </NavPanel>
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Stack height="2000px">
+              <Text>Long content to enable scrolling</Text>
+            </Stack>
+          </Page>
+        </Pages>
+        <Footer testId="footer">
+          <Text>Footer Content</Text>
+        </Footer>
+      </App>
+    `);
+
+    const footer = page.getByTestId("footer");
+    await expect(footer).toBeVisible();
+
+    // Get initial footer position
+    const initialBounds = await footer.boundingBox();
+    
+    // Scroll down
+    await page.evaluate(() => {
+      const contentWrapper = document.querySelector('.contentWrapper');
+      if (contentWrapper) contentWrapper.scrollTop = 500;
+    });
+    await page.waitForTimeout(100);
+
+    // Footer should remain in same position (sticky)
+    const scrolledBounds = await footer.boundingBox();
+    expect(scrolledBounds?.y).toEqual(initialBounds?.y);
+  });
+
+  test("footer scrolls with content when nonSticky=true in vertical-sticky layout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <App layout="vertical-sticky">
+        <NavPanel>
+          <NavLink label="Home" to="/" />
+        </NavPanel>
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Stack height="2000px">
+              <Text>Long content to enable scrolling</Text>
+            </Stack>
+          </Page>
+        </Pages>
+        <Footer nonSticky testId="footer">
+          <Text>Footer Content</Text>
+        </Footer>
+      </App>
+    `);
+
+    const footer = page.getByTestId("footer");
+    
+    // Initially scroll to top
+    await page.evaluate(() => {
+      const contentWrapper = document.querySelector('.contentWrapper');
+      if (contentWrapper) contentWrapper.scrollTop = 0;
+    });
+    await page.waitForTimeout(100);
+    
+    // Scroll to bottom to see footer
+    await page.evaluate(() => {
+      const contentWrapper = document.querySelector('.contentWrapper');
+      if (contentWrapper) contentWrapper.scrollTop = contentWrapper.scrollHeight;
+    });
+    await page.waitForTimeout(100);
+    
+    await expect(footer).toBeVisible();
+  });
+
+  test("footer is sticky by default in condensed-sticky layout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <App layout="condensed-sticky">
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Stack height="2000px">
+              <Text>Long content to enable scrolling</Text>
+            </Stack>
+          </Page>
+        </Pages>
+        <Footer testId="footer">
+          <Text>Footer Content</Text>
+        </Footer>
+      </App>
+    `);
+
+    const footer = page.getByTestId("footer");
+    await expect(footer).toBeVisible();
+
+    // Get initial footer position
+    const initialBounds = await footer.boundingBox();
+    
+    // Scroll down
+    await page.evaluate(() => window.scrollBy(0, 500));
+    await page.waitForTimeout(100);
+
+    // Footer should remain in same position (sticky)
+    const scrolledBounds = await footer.boundingBox();
+    expect(scrolledBounds?.y).toEqual(initialBounds?.y);
+  });
+
+  test("footer scrolls with content when nonSticky=true in condensed-sticky layout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <App layout="condensed-sticky">
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Stack height="2000px">
+              <Text>Long content to enable scrolling</Text>
+            </Stack>
+          </Page>
+        </Pages>
+        <Footer nonSticky testId="footer">
+          <Text>Footer Content</Text>
+        </Footer>
+      </App>
+    `);
+
+    const footer = page.getByTestId("footer");
+    
+    // Footer should not be visible initially (scrolled out of view)
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(100);
+    
+    // Scroll to bottom to see footer
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(100);
+    
+    await expect(footer).toBeVisible();
+  });
+
+  test("footer is sticky by default in vertical-full-header layout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <App layout="vertical-full-header">
+        <AppHeader>
+          <Text>Header</Text>
+        </AppHeader>
+        <NavPanel>
+          <NavLink label="Home" to="/" />
+        </NavPanel>
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Stack height="2000px">
+              <Text>Long content to enable scrolling</Text>
+            </Stack>
+          </Page>
+        </Pages>
+        <Footer testId="footer">
+          <Text>Footer Content</Text>
+        </Footer>
+      </App>
+    `);
+
+    const footer = page.getByTestId("footer");
+    await expect(footer).toBeVisible();
+
+    // Get initial footer position
+    const initialBounds = await footer.boundingBox();
+    
+    // Scroll down
+    await page.evaluate(() => window.scrollBy(0, 500));
+    await page.waitForTimeout(100);
+
+    // Footer should remain in same position (sticky)
+    const scrolledBounds = await footer.boundingBox();
+    expect(scrolledBounds?.y).toEqual(initialBounds?.y);
+  });
+
+  test("footer scrolls with content when nonSticky=true in vertical-full-header layout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <App layout="vertical-full-header">
+        <AppHeader>
+          <Text>Header</Text>
+        </AppHeader>
+        <NavPanel>
+          <NavLink label="Home" to="/" />
+        </NavPanel>
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Stack height="2000px">
+              <Text>Long content to enable scrolling</Text>
+            </Stack>
+          </Page>
+        </Pages>
+        <Footer nonSticky testId="footer">
+          <Text>Footer Content</Text>
+        </Footer>
+      </App>
+    `);
+
+    const footer = page.getByTestId("footer");
+    
+    // Initially scroll to top
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(100);
+    
+    // Scroll to bottom to see footer
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(100);
+    
+    await expect(footer).toBeVisible();
+  });
+
+  test("footer remains sticky in desktop layout regardless of nonSticky property", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <App layout="desktop">
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Stack height="2000px">
+              <Text>Long content to enable scrolling</Text>
+            </Stack>
+          </Page>
+        </Pages>
+        <Footer nonSticky testId="footer">
+          <Text>Footer Content</Text>
+        </Footer>
+      </App>
+    `);
+
+    const footer = page.getByTestId("footer");
+    await expect(footer).toBeVisible();
+
+    // Get initial footer position
+    const initialBounds = await footer.boundingBox();
+    
+    // Scroll down within the page container
+    await page.evaluate(() => {
+      const pagesWrapper = document.querySelector('.PagesWrapperInner');
+      if (pagesWrapper) pagesWrapper.scrollTop = 500;
+    });
+    await page.waitForTimeout(100);
+
+    // Footer should remain in same position (sticky even with nonSticky=true)
+    const scrolledBounds = await footer.boundingBox();
+    expect(scrolledBounds?.y).toEqual(initialBounds?.y);
+  });
+
+  test("nonSticky=false behaves same as default (sticky)", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <App layout="horizontal-sticky">
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Stack height="2000px">
+              <Text>Long content to enable scrolling</Text>
+            </Stack>
+          </Page>
+        </Pages>
+        <Footer nonSticky="false" testId="footer">
+          <Text>Footer Content</Text>
+        </Footer>
+      </App>
+    `);
+
+    const footer = page.getByTestId("footer");
+    await expect(footer).toBeVisible();
+
+    // Get initial footer position
+    const initialBounds = await footer.boundingBox();
+    
+    // Scroll down
+    await page.evaluate(() => window.scrollBy(0, 500));
+    await page.waitForTimeout(100);
+
+    // Footer should remain in same position (sticky)
+    const scrolledBounds = await footer.boundingBox();
+    expect(scrolledBounds?.y).toEqual(initialBounds?.y);
+  });
+
+  test("footer in non-sticky layouts is not affected by nonSticky property", async ({ page, initTestBed }) => {
+    // Test with 'horizontal' layout (not sticky by default)
+    await initTestBed(`
+      <App layout="horizontal">
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Stack height="2000px">
+              <Text>Long content to enable scrolling</Text>
+            </Stack>
+          </Page>
+        </Pages>
+        <Footer nonSticky testId="footer">
+          <Text>Footer Content</Text>
+        </Footer>
+      </App>
+    `);
+
+    const footer = page.getByTestId("footer");
+    
+    // Footer should not be sticky in non-sticky layout
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(100);
+    
+    // Scroll to bottom to see footer
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(100);
+    
+    await expect(footer).toBeVisible();
+  });
+});
+
+// =============================================================================
 // VISUAL STATE TESTS
 // =============================================================================
 
