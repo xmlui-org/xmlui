@@ -593,7 +593,7 @@
             <PageNotFound />
         </Page>
     </Pages>
-    <Footer>
+    <Footer sticky="false">
         <CHStack width="*">
             This site is an XMLUI™ app.
             <SpaceFiller />

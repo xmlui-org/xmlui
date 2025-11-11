@@ -110,8 +110,9 @@ export function App({
 }: Props) {
   const { getThemeVar } = useTheme();
   const { setActiveThemeTone, setActiveThemeId, themes } = useThemes();
-
   const mounted = useRef(false);
+
+  console.log("footerSticky prop in App:", footerSticky);
 
   const layoutWithDefaultValue = layout || getThemeVar("layout-App") || "condensed-sticky";
   const safeLayout = layoutWithDefaultValue
@@ -362,6 +363,7 @@ export function App({
     {
       [styles.scrollWholePage]: scrollWholePage,
       [styles.noScrollbarGutters]: noScrollbarGutters,
+      [styles.noFooter]: !footerSticky,
       "media-large": mediaSize.largeScreen,
       "media-small": mediaSize.smallScreen,
       "media-desktop": mediaSize.desktop,
