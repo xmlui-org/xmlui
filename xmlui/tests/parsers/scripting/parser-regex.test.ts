@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import { Parser } from "../../../src/parsers/scripting/Parser";
-import {
+import type {
   ConstStatement,
-  Literal,
+  Literal} from "../../../src/components-core/script-runner/ScriptingSourceTree";
+import {
   T_CONST_STATEMENT,
   T_LITERAL,
 } from "../../../src/components-core/script-runner/ScriptingSourceTree";

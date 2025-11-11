@@ -1,7 +1,7 @@
 import { nodeToComponentDef } from "../../../src/parsers/xmlui-parser/transform";
 import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
-import { createXmlUiParser, ParseResult } from "../../../src/parsers/xmlui-parser/parser";
-import type { GetText } from "../../../src/parsers/xmlui-parser/parser";
+import { createXmlUiParser } from "../../../src/parsers/xmlui-parser/parser";
+import type { GetText , ParseResult } from "../../../src/parsers/xmlui-parser/parser";
 import { toDbgString } from "../../../src/parsers/xmlui-parser/utils";
 
 export function transformSource(

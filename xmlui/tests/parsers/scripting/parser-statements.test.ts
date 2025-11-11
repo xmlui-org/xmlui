@@ -1,7 +1,7 @@
 import { assert, describe, expect, it } from "vitest";
 
 import { Parser } from "../../../src/parsers/scripting/Parser";
-import {
+import type {
   BlockStatement,
   ConstStatement,
   DoWhileStatement,
@@ -13,6 +13,11 @@ import {
   LetStatement,
   ReturnStatement,
   SwitchStatement,
+  ThrowStatement,
+  TryStatement,
+  VarStatement,
+  WhileStatement} from "../../../src/components-core/script-runner/ScriptingSourceTree";
+import {
   T_ARRAY_LITERAL,
   T_BINARY_EXPRESSION,
   T_BLOCK_STATEMENT,
@@ -37,11 +42,7 @@ import {
   T_TRY_STATEMENT,
   T_UNARY_EXPRESSION,
   T_VAR_STATEMENT,
-  T_WHILE_STATEMENT,
-  ThrowStatement,
-  TryStatement,
-  VarStatement,
-  WhileStatement,
+  T_WHILE_STATEMENT
 } from "../../../src/components-core/script-runner/ScriptingSourceTree";
 
 describe("Parser - statements", () => {

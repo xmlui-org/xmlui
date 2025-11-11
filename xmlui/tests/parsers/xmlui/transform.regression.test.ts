@@ -1,7 +1,7 @@
 import { describe, expect, assert, it } from "vitest";
 import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
 import { transformSource } from "./xmlui";
-import { ParserError } from "../../../src/parsers/xmlui-parser";
+import type { ParserError } from "../../../src/parsers/xmlui-parser";
 
 describe("Xmlui transform - regression", () => {
   it("prop with multiple component #1", () => {
