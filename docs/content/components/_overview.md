@@ -35,9 +35,7 @@
 | [FlowLayout](./FlowLayout) | `FlowLayout` positions content in rows with automatic wrapping. When items exceed the available horizontal space, they automatically wrap to a new line. |
 | [Footer](./Footer) | `Footer` provides a designated area at the bottom of your application for footer content such as branding, copyright notices, or utility controls like theme toggles. |
 | [Form](./Form) | `Form` provides a structured container for collecting and validating user input, with built-in data binding, validation, and submission handling. It automatically manages form state and provides context for nested form controls to work together. |
-| [FormItem](./FormItem) | `FormItem` wraps individual input controls within a `Form`, providing data binding, validation, labeling, and layout functionality. It connects form controls to the parent form's data model and handles validation feedback automatically.
-
-> **Note:** `FormItem` must be used inside a `Form` component. |
+| [FormItem](./FormItem) | `FormItem` wraps individual input controls within a `Form`, providing data binding, validation, labeling, and layout functionality. It connects form controls to the parent form's data model and handles validation feedback automatically. **Note:** `FormItem` must be used inside a `Form` component. |
 | [FormSection](./FormSection) | `FormSection` groups elements within a `Form`. Child components are placed in a [FlowLayout](/components/FlowLayout). |
 | [Fragment](./Fragment) | `Fragment` provides conditional rendering. You can use `when=` on any component to render it conditionally, use `Fragment` to apply `when` to a group of components. |
 | [H1](./H1) | Represents a heading level 1 text |
@@ -77,15 +75,11 @@
 | [PieChart](./PieChart) | `PieChart` visualizes proportional data as circular segments; each slice represents a percentage of the whole. Note that the height of the component or its parent needs to be set explicitly. |
 | [ProgressBar](./ProgressBar) | `ProgressBar` provides a visual indicator showing the completion percentage of tasks, processes, or any measurable progress. It displays as a horizontal bar that fills from left to right based on the provided value between 0 (empty) and 1 (complete). |
 | [Queue](./Queue) | `Queue` manages sequential processing of items in FIFO (first-in, first-out) order. It is a non-visual component but provides UI progress reporting and result display. |
-| [RadioGroup](./RadioGroup) | `RadioGroup` creates a mutually exclusive selection interface where users can choose only one option from a group of radio buttons. It manages the selection state and ensures that selecting one option automatically deselects all others in the group.
-
-Radio options store their values as strings. Numbers and booleans are converted to strings when assigned, while objects, functions and arrays default to an empty string unless resolved via binding expressions. |
+| [RadioGroup](./RadioGroup) | `RadioGroup` creates a mutually exclusive selection interface where users can choose only one option from a group of radio buttons. It manages the selection state and ensures that selecting one option automatically deselects all others in the group.Radio options store their values as strings. Numbers and booleans are converted to strings when assigned, while objects, functions and arrays default to an empty string unless resolved via binding expressions. |
 | [RealTimeAdapter](./RealTimeAdapter) | `RealTimeAdapter` is a non-visual component that listens to real-time events. |
 | [Redirect](./Redirect) | `Redirect` immediately redirects the browser to the URL in its `to` property when it gets visible (its `when` property gets `true`). It works only within [App](/components/App), not externally. |
 | [Select](./Select) | `Select` provides a dropdown interface for choosing from a list of options, supporting both single and multiple selection modes. It offers extensive customization capabilities including search functionality, custom templates, and comprehensive form integration. |
-| [Slider](./Slider) | `Slider` provides an interactive control for selecting numeric values within a defined range, supporting both single value selection and range selection with multiple thumbs. It offers precise control through customizable steps and visual feedback with formatted value display.
-
-Hover over the component to see the tooltip with the current value. On mobile, tap the thumb to see the tooltip. |
+| [Slider](./Slider) | `Slider` provides an interactive control for selecting numeric values within a defined range, supporting both single value selection and range selection with multiple thumbs. It offers precise control through customizable steps and visual feedback with formatted value display.Hover over the component to see the tooltip with the current value. On mobile, tap the thumb to see the tooltip. |
 | [Slot](./Slot) | Placeholder in a reusable component. Signs the slot where the component's injected children should be rendered. |
 | [SpaceFiller](./SpaceFiller) | `SpaceFiller` works well in layout containers to fill remaining (unused) space. Its behavior depends on the layout container in which it is used. |
 | [Spinner](./Spinner) | `Spinner` is an animated indicator that represents an action in progress with no deterministic progress value. |

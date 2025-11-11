@@ -1,8 +1,6 @@
 # Slider [#slider]
 
-`Slider` provides an interactive control for selecting numeric values within a defined range, supporting both single value selection and range selection with multiple thumbs. It offers precise control through customizable steps and visual feedback with formatted value display.
-
-Hover over the component to see the tooltip with the current value. On mobile, tap the thumb to see the tooltip.
+`Slider` provides an interactive control for selecting numeric values within a defined range, supporting both single value selection and range selection with multiple thumbs. It offers precise control through customizable steps and visual feedback with formatted value display.Hover over the component to see the tooltip with the current value. On mobile, tap the thumb to see the tooltip.
 
 **Key features:**
 - **Range selection**: Single value or dual-thumb range selection with configurable minimum separation
