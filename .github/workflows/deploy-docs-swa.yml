@@ -22,6 +22,9 @@ jobs:
 
       - run: npm ci --prefer-offline
 
+      - name: Build docs
+        run: npm run build-docs
+
       - name: Deploy site
         uses: azure/static-web-apps-deploy@v1
         with:
@@ -29,4 +32,4 @@ jobs:
           action: "upload"
           app_location: ""
           output_location: "docs/dist"
-          app_build_command: "npm run build-docs"
+          skip_app_build: true
