@@ -136,7 +136,7 @@ export const TextArea = forwardRef(function TextArea(
         inputRef.current?.focus();
       }, 0);
     }
-  }, [autoFocus, inputRef.current]);
+  }, [autoFocus]);
 
   // --- Execute this function when the user copies the value
   const handleCopy = (event: React.SyntheticEvent) => {

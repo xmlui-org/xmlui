@@ -74,7 +74,10 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
   switch (action.type) {
     case FormActionKind.FIELD_INITIALIZED: {
       // Only set the value if initialValue is defined and field is not dirty (or force is true)
-      if (action.payload.value !== undefined && (!state.interactionFlags[uid].isDirty || action.payload.force)) {
+      if (
+        action.payload.value !== undefined &&
+        (!state.interactionFlags[uid].isDirty || action.payload.force)
+      ) {
         set(state.subject, uid, action.payload.value);
       }
       // Track noSubmit flag - if multiple FormItems reference the same bindTo,
@@ -377,18 +380,18 @@ const Form = forwardRef(function (
     void requestModalFormClose();
   });
 
-  const doValidate = useEvent(async () => {
+  const doValidate = useEvent(() => {
     // Trigger validation display on all fields
     dispatch(triedToSubmit());
-    
+
     // Get validation results grouped by severity
     const { error, warning } = groupInvalidValidationResultsBySeverity(
       Object.values(formState.validationResults),
     );
-    
+
     // Prepare cleaned data
     const cleanedData = cleanUpSubject(formState.subject, formState.noSubmitFields);
-    
+
     // Return validation result
     return {
       isValid: error.length === 0,
@@ -413,10 +416,10 @@ const Form = forwardRef(function (
       return;
     }
     setConfirmSubmitModalVisible(false);
-    
+
     // Use the extracted validation logic
-    const validationResult = await doValidate();
-    
+    const validationResult = doValidate();
+
     if (!validationResult.isValid) {
       return;
     }
@@ -531,7 +534,12 @@ const Form = forwardRef(function (
     );
   const submitButton = useMemo(
     () => (
-      <Button data-part-id={PART_SUBMIT_BUTTON} key="submit" type={"submit"} disabled={!isEnabled || !enableSubmit}>
+      <Button
+        data-part-id={PART_SUBMIT_BUTTON}
+        key="submit"
+        type={"submit"}
+        disabled={!isEnabled || !enableSubmit}
+      >
         {formState.submitInProgress ? saveInProgressLabel : saveLabel}
       </Button>
     ),
