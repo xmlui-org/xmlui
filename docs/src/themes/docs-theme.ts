@@ -14,6 +14,7 @@ export const DefaultDocsTheme: ThemeDefinition = {
 
     // --- App layout
     "maxWidth-App": "1280px",
+    "maxWidth-docBody-App": "800px",
     "boxShadow-navPanel-App": "none",
 
     // --- We intentionally use different theming to amplify the "documentation" feel
