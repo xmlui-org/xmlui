@@ -1,5 +1,15 @@
 # xmlui-vscode
 
+## 0.11.8
+
+### Patch Changes
+
+- 6f11265: feat: formatter puts ">", "/>" on a newline for long tag.
+- Updated dependencies [e25ea5b]
+- Updated dependencies [6f11265]
+- Updated dependencies [53c383c]
+  - xmlui@0.11.8
+
 ## 0.11.7
 
 ### Patch Changes

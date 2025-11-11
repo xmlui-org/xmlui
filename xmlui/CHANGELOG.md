@@ -1,5 +1,13 @@
 # xmlui
 
+## 0.11.8
+
+### Patch Changes
+
+- e25ea5b: Add nonSticky property to Footer
+- 6f11265: feat: formatter puts ">", "/>" on a newline for long tag.
+- 53c383c: Remove the experimental Choose component
+
 ## 0.11.7
 
 ### Patch Changes
