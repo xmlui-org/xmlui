@@ -75,7 +75,7 @@ export const Image = forwardRef(function Img(
         setBlobUrl(null);
       }
     }
-  }, [src, blobToRender]);
+  }, [src, blobToRender, blobUrl]);
 
   src = safeConvertPropToString(src);
   alt = safeConvertPropToString(alt);

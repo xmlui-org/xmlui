@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import { Parser } from "../../../src/parsers/scripting/Parser";
+import type {
+  Identifier} from "../../../src/components-core/script-runner/ScriptingSourceTree";
 import {
-  Identifier,
   T_BINARY_EXPRESSION,
   T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
   T_CONDITIONAL_EXPRESSION,

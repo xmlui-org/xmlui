@@ -2,9 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import { processStatementQueueAsync } from "../../../src/components-core/script-runner/process-statement-async";
 import { createEvalContext, parseStatements } from "./test-helpers";
-import {
+import type {
   ArrowExpressionStatement,
-  ExpressionStatement,
+  ExpressionStatement} from "../../../src/components-core/script-runner/ScriptingSourceTree";
+import {
   T_ARROW_EXPRESSION_STATEMENT,
 } from "../../../src/components-core/script-runner/ScriptingSourceTree";
 

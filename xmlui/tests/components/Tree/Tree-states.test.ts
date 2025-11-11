@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { NodeLoadingState } from '../../../src/components-core/abstractions/treeAbstractions';
+import type { NodeLoadingState } from '../../../src/components-core/abstractions/treeAbstractions';
 
 // Helper functions to test (these would normally be extracted from TreeNative for testing)
 type NodeStatesMap = Map<string, NodeLoadingState>;

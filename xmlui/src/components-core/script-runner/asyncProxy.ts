@@ -9,8 +9,8 @@ export function getAsyncProxy(fn: Function, origArgs: any[], context: any): Func
     const proxyFn = asyncProxies.get(fn);
     if (!proxyFn) return fn;
 
-    origArgs.unshift(context);
-    return proxyFn;
+  origArgs.unshift(context);
+  return proxyFn;
 }
 
 // Async implementations for JavaScript functions that do not support async arguments
