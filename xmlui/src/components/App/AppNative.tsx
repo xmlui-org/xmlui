@@ -112,8 +112,6 @@ export function App({
   const { setActiveThemeTone, setActiveThemeId, themes } = useThemes();
   const mounted = useRef(false);
 
-  console.log("footerSticky prop in App:", footerSticky);
-
   const layoutWithDefaultValue = layout || getThemeVar("layout-App") || "condensed-sticky";
   const safeLayout = layoutWithDefaultValue
     ?.trim()

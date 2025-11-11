@@ -364,7 +364,6 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
     }
     
     if (footerNode?.type === "Footer" && footerNode.props?.sticky !== undefined) {
-      console.log('Footer sticky prop:', footerNode.props.sticky);
       return extractValue.asOptionalBoolean(footerNode.props.sticky, true);
     }
     
