@@ -40,9 +40,8 @@ export const FormItemMd = createMetadata({
     "`FormItem` wraps individual input controls within a `Form`, providing data " +
     "binding, validation, labeling, and layout functionality. It connects form " +
     "controls to the parent form's data model and handles validation feedback " +
-    "automatically." +
-    "\n\n" +
-    "> **Note:** `FormItem` must be used inside a `Form` component.",
+    "automatically. " + 
+    "**Note:** `FormItem` must be used inside a `Form` component.",
   props: {
     bindTo: {
       description:

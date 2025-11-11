@@ -191,6 +191,13 @@ $marginBottom-HtmlDetails: createThemeVar("marginBottom-HtmlDetails");
       overflow: visible !important;
       overflow-wrap: break-word !important;
     }
+    
+    // But don't break words in table cells
+    .htmlTh :global([class*="text_"]),
+    .htmlTd :global([class*="text_"]) {
+      overflow-wrap: normal !important;
+      word-break: normal !important;
+    }
 
     .markdown {
       $component: "Text";
@@ -436,6 +443,12 @@ $marginBottom-HtmlDetails: createThemeVar("marginBottom-HtmlDetails");
       font-size: $fontSize-HtmlTh;
       @include t.borderVars($themeVars, "HtmlTh");
       @include t.paddingVars($themeVars, "HtmlTh");
+      
+      // Allow wrapping at word boundaries (spaces) and hyphens, but never break within words
+      white-space: normal;
+      word-break: normal !important;
+      overflow-wrap: normal !important;
+      word-wrap: normal !important;
 
       &:hover {
         background-color: $backgroundColor-HtmlTh--hover;
@@ -475,6 +488,12 @@ $marginBottom-HtmlDetails: createThemeVar("marginBottom-HtmlDetails");
       font-weight: $fontWeight-HtmlTd;
       @include t.borderVars($themeVars, "HtmlTd");
       @include t.paddingVars($themeVars, "HtmlTd");
+      
+      // Allow wrapping at word boundaries (spaces) and hyphens, but never break within words
+      white-space: normal;
+      word-break: normal !important;
+      overflow-wrap: normal !important;
+      word-wrap: normal !important;
     }
 
     // --- Lists

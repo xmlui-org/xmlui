@@ -21,7 +21,6 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "backgroundColor-NavPanel": "$color-surface-50",
     "backgroundColor-navPanel-App": "$color-surface-50",
     "paddingVertical-NavPanel": "$space-5",
-    "borderRightWidth-NavPanel": "1px",
     "maxWidth-Drawer": "100%",
     "textColor-NavLink": "$color-secondary-600",
     "color-indicator-NavLink--active": "transparent",
