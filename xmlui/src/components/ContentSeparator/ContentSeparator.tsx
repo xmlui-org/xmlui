@@ -16,10 +16,17 @@ export const ContentSeparatorMd = createMetadata({
     "breaking up dense content, separating list items, or creating clear boundaries " +
     "between different UI sections.",
   props: {
-    size: {
+    thickness: {
       description:
         "This property defines the component's height (if the \`orientation\` is horizontal) " +
         "or the width (if the \`orientation\` is vertical). " +
+        "If not defined, the component uses the entire available width or height.",
+      valueType: "any",
+    },
+    length: {
+      description:
+        "This property defines the component's height (if the \`orientation\` is vertical) " +
+        "or the width (if the \`orientation\` is horizontal). " +
         "If not defined, the component uses the entire available width or height.",
       valueType: "any",
     },
@@ -33,7 +40,8 @@ export const ContentSeparatorMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "$color-surface-200",
-    [`size-${COMP}`]: "1px",
+    [`thickness-${COMP}`]: "1px",
+    [`length-${COMP}`]: "100%",
     [`marginVertical-${COMP}`]: "0",
     [`marginHorizontal-${COMP}`]: "0",
     [`paddingVertical-${COMP}`]: "0",
@@ -54,7 +62,8 @@ export const contentSeparatorComponentRenderer = createComponentRenderer(
     return (
       <ContentSeparator
         orientation={extractValue(node.props.orientation)}
-        size={extractValue.asSize(node.props.size)}
+        thickness={extractValue.asSize(node.props.thickness)}
+        length={extractValue.asSize(node.props.length)}
         className={className}
       />
     );
