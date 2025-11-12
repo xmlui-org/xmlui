@@ -1327,3 +1327,111 @@ test.describe("Other Edge Cases", () => {
     await expect(page.getByText("Page 1 of 4 (17 items)")).toBeVisible();
   });
 });
+
+// =============================================================================
+// BEHAVIOR TESTS
+// =============================================================================
+
+test.describe("Behaviors and Parts", () => {
+  test("handles tooltip", async ({ page, initTestBed }) => {
+    await initTestBed(`<Pagination testId="test" tooltip="Tooltip text" itemCount="100" />`);
+
+    const component = page.getByTestId("test");
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test("handles variant", async ({ page, initTestBed }) => {
+    await initTestBed(`<Pagination testId="test" variant="CustomVariant" itemCount="100" />`, {
+      testThemeVars: {
+        "backgroundColor-Pagination-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    const component = page.getByTestId("test");
+    await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
+  });
+
+  test("can select part: 'pagination-controls'", async ({ page, initTestBed }) => {
+    await initTestBed(`<Pagination testId="test" itemCount="100" />`);
+    const paginationControls = page.getByTestId("test").locator("[data-part-id='pagination-controls']");
+    await expect(paginationControls).toBeVisible();
+  });
+
+  test("can select part: 'page-info'", async ({ page, initTestBed }) => {
+    await initTestBed(`<Pagination testId="test" itemCount="100" showPageInfo="true" />`);
+    const pageInfo = page.getByTestId("test").locator("[data-part-id='page-info']");
+    await expect(pageInfo).toBeVisible();
+  });
+
+  test("variant applies custom theme variables", async ({ page, initTestBed }) => {
+    await initTestBed(`<Pagination testId="test" variant="CustomVariant" itemCount="100" />`, {
+      testThemeVars: {
+        "backgroundColor-Pagination-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    
+    const component = page.getByTestId("test");
+    await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
+  });
+
+  test("tooltip with markdown content", async ({ page, initTestBed }) => {
+    await initTestBed(`<Pagination testId="test" tooltipMarkdown="**Bold text**" itemCount="100" />`);
+    
+    const component = page.getByTestId("test");
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip.locator("strong")).toHaveText("Bold text");
+  });
+
+  test("animation behavior", async ({ page, initTestBed }) => {
+    await initTestBed(`<Pagination testId="test" animation="fadeIn" itemCount="100" />`);
+    
+    const component = page.getByTestId("test");
+    await expect(component).toBeVisible();
+  });
+
+  test("combined tooltip and animation", async ({ page, initTestBed }) => {
+    await initTestBed(`<Pagination testId="test" tooltip="Tooltip text" animation="fadeIn" itemCount="100" />`);
+    
+    const component = page.getByTestId("test");
+    await expect(component).toBeVisible();
+    
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test("all behaviors combined with parts", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Pagination 
+        testId="test" 
+        variant="CustomVariant"
+        itemCount="100"
+        showPageInfo="true"
+        animation="fadeIn"
+      />
+    `, {
+      testThemeVars: {
+        "backgroundColor-Pagination-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    
+    const component = page.getByTestId("test");
+    const paginationControls = component.locator("[data-part-id='pagination-controls']");
+    const pageInfo = component.locator("[data-part-id='page-info']");
+    
+    // Verify variant applied
+    await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
+    
+    // Verify parts are visible
+    await expect(paginationControls).toBeVisible();
+    await expect(pageInfo).toBeVisible();
+  });
+});
+
