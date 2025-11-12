@@ -66,11 +66,11 @@
                     onClick="{() => showSearch = !showSearch}"
                 />
             </Fragment>
-            <Button
-                variant="solid"
-                label="Download"
-                onClick="{() => Actions.navigate('/get-started')}"
-            />
+            <Link to="https://www.xmlui.org/get-started">
+                <Button variant="solid" onClick="emitEvent('click')">
+                    Download
+                </Button>
+            </Link>
         </property>
     </AppHeader>
 
