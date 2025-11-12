@@ -8,6 +8,45 @@
 - Header/footer positioning logic is duplicated across layouts
 - NavPanel visibility logic is fragmented
 
+## AppHeader Sub-Blocks
+
+The Header Block (AppHeader component) is composed of several sub-blocks that flow horizontally from start to end, respecting the current text direction (LTR/RTL). Each sub-block can be customized via template properties on the AppHeader component.
+
+### Sub-Block Order (Start → End)
+1. **Logo** - Complete component for app logo/branding
+2. **App Title** - Text display for application name
+3. **Start Slot** - Flexible template slot for custom content at the start
+4. **Middle Slot** - Flexible template slot for custom content in the center
+5. **Search Box** - Complete component for search functionality
+6. **Profile Menu** - Complete component for user profile/menu
+7. **End Slot** - Flexible template slot for custom content at the end
+
+### AppHeader Template Properties
+The AppHeader component accepts template properties for each sub-block:
+- `logoTemplate` - Custom logo content (overrides default AppLogo)
+- `titleTemplate` - Custom title content (overrides default text title)
+- `startSlotTemplate` - Custom content for start slot
+- `middleSlotTemplate` - Custom content for middle slot
+- `searchBoxTemplate` - Custom search box content (overrides default AppSearchBox)
+- `profileMenuTemplate` - Custom profile menu content (overrides default AppProfileMenu)
+- `endSlotTemplate` - Custom content for end slot
+
+### Complete Components
+- **Logo Component**: Handles logo display with theme-aware variants (light/dark), clickable navigation to home
+- **Search Box Component**: Full-featured search input with dropdown results, keyboard navigation, and search indexing integration
+- **Profile Menu Component**: User profile display with dropdown menu for account actions, settings, logout
+
+### Flexible Slots
+- **Start Slot**: Template slot for custom content after the logo and title (e.g., quick actions, navigation breadcrumbs)
+- **Middle Slot**: Template slot for custom content in the center (e.g., tabs, filters, context-specific controls)
+- **End Slot**: Template slot for custom content before or instead of search/profile (e.g., notifications, help icon, theme toggle)
+
+### Layout Behavior
+- Sub-blocks follow flex layout with appropriate spacing
+- Components can be hidden/shown based on props or by omitting template properties
+- Respects text direction (LTR/RTL) for proper ordering
+- Mobile responsive: some slots may collapse or move to drawer
+
 ## Layout Types (8 variants)
 
 ### Core Layout Axes
@@ -166,8 +205,21 @@ Stores navigation hierarchy map for breadcrumbs/nav state
 - `AppScrollContainer` - handles scroll logic
 - `AppLayoutGrid` - grid structure with named areas
 - `AppNavPanelSlot` - NavPanel positioning/drawer logic
-- `AppHeaderSlot` - header positioning
+- `AppHeaderSlot` - header positioning with sub-block composition
 - `AppFooterSlot` - footer positioning
+- `AppLogo` - standalone logo component with theme awareness
+- `AppSearchBox` - standalone search component with indexing integration
+- `AppProfileMenu` - standalone profile/menu component
+
+### Refactor AppHeader Sub-Block Architecture
+- Decompose AppHeader into compositional sub-blocks
+- Create dedicated components for Logo, SearchBox, and ProfileMenu
+- Use template properties for all sub-blocks (logoTemplate, titleTemplate, startSlotTemplate, etc.)
+- Use flex layout for sub-block arrangement
+- Support flexible template slots (start, middle, end) for custom content
+- Maintain proper RTL/LTR text direction support
+- Enable responsive behavior (collapse/drawer for mobile)
+- Built-in components can be enabled/disabled via props (searchBoxEnabled, profileMenuEnabled)
 
 ### Standardize Stickiness
 - Single prop: `stickyElements: ("header" | "footer" | "navPanel")[]`
@@ -205,9 +257,19 @@ The app viewport is divided into distinct blocks that can be positioned and size
      - Gutter compensation: adds negative margins and padding to child blocks when gutters enabled
 
 1. **Header Block** (`H`)
-   - Contains: AppHeader component
+   - Contains: AppHeader component with sub-blocks
    - Properties: height (auto-sized by content), sticky/static positioning
    - Scroll: never scrolls independently, may stick to top or scroll with page
+   - **Sub-Blocks** (ordered start → end, respects LTR/RTL):
+     - `H.Logo` - Logo component (clickable, theme-aware)
+     - `H.Title` - App title text
+     - `H.StartSlot` - Flexible template slot for custom start content
+     - `H.MiddleSlot` - Flexible template slot for custom center content
+     - `H.SearchBox` - Search component (input + results dropdown)
+     - `H.ProfileMenu` - Profile menu component (avatar + dropdown)
+     - `H.EndSlot` - Flexible template slot for custom end content
+   - Layout: Horizontal flex layout, responsive collapse on mobile
+   - Template Properties: logoTemplate, titleTemplate, startSlotTemplate, middleSlotTemplate, searchBoxTemplate, profileMenuTemplate, endSlotTemplate
 
 2. **Navigation Panel Block** (`N`)
    - Contains: NavPanel component with navigation links/groups
@@ -347,3 +409,209 @@ Two fundamental scroll strategies that determine App Container behavior:
    - C properties: `overflow: hidden`, acts as layout wrapper
    - M properties: `overflow: auto`, `scrollbar-gutter: stable both-edges`
    - Used by: vertical-sticky, vertical-full-header, horizontal-sticky, condensed-sticky, desktop
+
+---
+
+## AppHeader Sub-Block Component Specifications
+
+### 1. AppLogo Component
+
+**Purpose**: Display application logo with theme-aware variants and navigation functionality.
+
+**Properties**:
+- `src`: string - Default logo image URL
+- `srcDark`: string (optional) - Logo variant for dark theme
+- `srcLight`: string (optional) - Logo variant for light theme
+- `alt`: string - Alternative text for accessibility
+- `href`: string (default: "/") - Navigation target when clicked
+- `width`: string | number (optional) - Logo width
+- `height`: string | number (optional) - Logo height
+- `onClick`: (event) => void (optional) - Custom click handler
+
+**Behavior**:
+- Automatically switches between light/dark variants based on active theme
+- Clickable by default, navigates to `href` location
+- Respects custom onClick handlers
+- Lazy loads images for performance
+- Falls back to default logo if theme-specific variant unavailable
+
+**Theme Variables**:
+- `width-logo-AppHeader` - Default logo width
+- `height-logo-AppHeader` - Default logo height
+- `margin-inline-end-logo-AppHeader` - Spacing after logo
+
+---
+
+### 2. AppSearchBox Component
+
+**Purpose**: Provide search functionality with dropdown results and keyboard navigation.
+
+**Properties**:
+- `placeholder`: string (default: "Search...") - Input placeholder text
+- `searchIndex`: SearchIndex - Search index data source
+- `maxResults`: number (default: 10) - Maximum results to display
+- `debounceMs`: number (default: 300) - Search debounce delay
+- `onResultClick`: (result) => void (optional) - Custom result click handler
+- `onSearch`: (query: string) => void (optional) - Search event handler
+- `shortcut`: string (default: "Ctrl+K" / "⌘K") - Keyboard shortcut hint
+- `disabled`: boolean - Disable search functionality
+
+**Behavior**:
+- Real-time search with debouncing
+- Dropdown results with keyboard navigation (↑/↓, Enter, Esc)
+- Click outside to close results
+- Keyboard shortcut to focus (Ctrl+K or Cmd+K)
+- Highlights matching text in results
+- Integrates with App's SearchContext for indexing
+
+**Events**:
+- `search` - Fires when search query changes
+- `resultClick` - Fires when a result is selected
+- `open` - Fires when dropdown opens
+- `close` - Fires when dropdown closes
+
+**Theme Variables**:
+- `width-searchBox-AppHeader` - Search box width
+- `backgroundColor-searchBox-AppHeader` - Search input background
+- `borderColor-searchBox-AppHeader` - Search input border
+- `backgroundColor-searchResults-AppHeader` - Results dropdown background
+- `boxShadow-searchResults-AppHeader` - Results dropdown shadow
+
+---
+
+### 3. AppProfileMenu Component
+
+**Purpose**: Display user profile with dropdown menu for account actions.
+
+**Properties**:
+- `user`: object - User data { name, email, avatar, ... }
+- `avatarSrc`: string (optional) - User avatar image URL
+- `userName`: string - Display name
+- `userEmail`: string (optional) - User email
+- `showAvatar`: boolean (default: true) - Show/hide avatar
+- `showName`: boolean (default: true) - Show/hide name on desktop
+- `menuItems`: MenuItem[] - Array of menu items
+- `onMenuItemClick`: (item) => void (optional) - Menu item click handler
+- `onSignOut`: () => void (optional) - Sign out handler
+
+**MenuItem Structure**:
+```typescript
+{
+  id: string;
+  label: string;
+  icon?: string | ReactNode;
+  href?: string;
+  onClick?: () => void;
+  separator?: boolean; // Renders a separator instead
+  disabled?: boolean;
+}
+```
+
+**Behavior**:
+- Displays user avatar with fallback to initials
+- Dropdown menu on click/hover
+- Keyboard navigation in menu (↑/↓, Enter, Esc)
+- Click outside to close menu
+- Responsive: may show avatar only on mobile
+
+**Events**:
+- `menuOpen` - Fires when menu opens
+- `menuClose` - Fires when menu closes
+- `menuItemClick` - Fires when menu item selected
+
+**Theme Variables**:
+- `size-avatar-profileMenu-AppHeader` - Avatar size
+- `backgroundColor-menu-profileMenu-AppHeader` - Menu background
+- `boxShadow-menu-profileMenu-AppHeader` - Menu dropdown shadow
+- `spacing-menu-profileMenu-AppHeader` - Menu item spacing
+
+---
+
+### 4. Flexible Slot Templates (StartSlot, MiddleSlot, EndSlot)
+
+**Purpose**: Provide customizable template slots within the AppHeader for application-specific controls.
+
+**AppHeader Template Properties**:
+- `startSlotTemplate`: ComponentDef - Template content for start slot
+- `middleSlotTemplate`: ComponentDef - Template content for middle slot
+- `endSlotTemplate`: ComponentDef - Template content for end slot
+
+**Slot Rendering**:
+- Slots render template content provided via AppHeader properties
+- If template property is not defined, slot is not rendered
+- Template content can be any XMLUI components
+
+**Layout Behavior**:
+- **StartSlot**: Positioned after logo and title, before middle
+  - Use for: breadcrumbs, quick actions, context indicators
+- **MiddleSlot**: Positioned in center, uses flex-grow
+  - Use for: tabs, filters, page-level controls
+- **EndSlot**: Positioned before search/profile, at the end
+  - Use for: notifications, help icon, theme toggle, settings
+
+**Responsive Behavior**:
+- Slots may collapse or move to hamburger menu on mobile
+- Priority order for collapse: MiddleSlot → StartSlot → EndSlot
+- Essential components (Logo, SearchBox, ProfileMenu) remain visible longer
+
+---
+
+### AppHeader Component Usage
+
+The AppHeader component composes all sub-blocks using template properties:
+
+```xml
+<AppHeader 
+  logo="/logo.svg"
+  logoDark="/logo-dark.svg"
+  logoLight="/logo-light.svg"
+  title="My Application"
+  startSlotTemplate={startSlotDef}
+  middleSlotTemplate={middleSlotDef}
+  searchBoxEnabled={true}
+  profileMenuEnabled={true}
+  profileMenuUser={$currentUser}
+  profileMenuItems={$userMenuItems}
+  endSlotTemplate={endSlotDef}
+/>
+```
+
+**Alternative: Custom Templates Override Defaults**
+```xml
+<AppHeader 
+  logoTemplate={customLogoDef}
+  titleTemplate={customTitleDef}
+  searchBoxTemplate={customSearchDef}
+  profileMenuTemplate={customProfileDef}
+/>
+```
+
+**XMLUI Markup Example with Inline Templates**:
+```xml
+<AppHeader title="My App" logo="/logo.svg">
+  <startSlotTemplate>
+    <Breadcrumb items={$breadcrumbs} />
+  </startSlotTemplate>
+  
+  <middleSlotTemplate>
+    <TabBar tabs={$mainTabs} />
+  </middleSlotTemplate>
+  
+  <endSlotTemplate>
+    <IconButton icon="notifications" onClick={@showNotifications} />
+    <IconButton icon="settings" onClick={@showSettings} />
+  </endSlotTemplate>
+</AppHeader>
+```
+
+**Default Rendering Order** (LTR):
+```
+[Logo] [Title] [StartSlot] [MiddleSlot] [SearchBox] [ProfileMenu] [EndSlot]
+```
+
+**RTL Support**: Order automatically reverses in RTL text direction.
+
+**Visibility Control**: Each sub-block can be shown/hidden via:
+- Omitting template properties (slot not rendered)
+- Using `*Enabled` props for built-in components (e.g., `searchBoxEnabled={false}`)
+- Conditional rendering within template content
