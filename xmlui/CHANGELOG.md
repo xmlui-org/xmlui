@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.11.9
+
+### Patch Changes
+
+- 9c42826: Add noIndicator property to NavLink and NavGroup
+
 ## 0.11.8
 
 ### Patch Changes
