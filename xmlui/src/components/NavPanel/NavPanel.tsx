@@ -35,6 +35,7 @@ export const NavPanelMd = createMetadata({
     [`backgroundColor-${COMP}-horizontal`]: "$backgroundColor-AppHeader",
     [`border-${COMP}`]: "0px solid $borderColor",
     [`borderRight-${COMP}-vertical`]: "1px solid $borderColor",
+    [`paddingVertical-${COMP}`]: "$space-5",
     [`paddingHorizontal-${COMP}`]: "0",
     [`paddingVertical-logo-${COMP}`]: "$space-4",
     [`paddingHorizontal-logo-${COMP}`]: "$space-4",

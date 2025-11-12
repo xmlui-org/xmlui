@@ -421,6 +421,7 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
       {...appProps}
       header={renderedHeader}
       footer={renderedFooter}
+      footerSticky={footerSticky}
       navPanel={renderedNavPanel}
       navPanelDef={NavPanel}
       logoContentDef={node.props.logoTemplate}
