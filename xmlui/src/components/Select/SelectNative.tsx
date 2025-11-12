@@ -584,8 +584,6 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                     }
                     return;
                   }
-                  return;
-                
 
                   // Handle keyboard navigation when dropdown is open
                   if (open) {
@@ -593,26 +591,26 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                   }
                 }}
                 autoFocus={autoFocus}
-                >
+              >
+                <SelectTriggerValue
+                  value={value}
+                  placeholder={placeholder}
+                  readOnly={readOnly}
+                  multiSelect={multiSelect}
+                  options={options}
+                  valueRenderer={valueRenderer}
+                  toggleOption={toggleOption}
+                />
+                <SelectTriggerActions
+                  value={value}
+                  multiSelect={multiSelect}
+                  enabled={enabled}
+                  readOnly={readOnly}
+                  clearable={clearable}
+                  clearValue={clearValue}
+                />
               </PopoverTrigger>
-              </Part>
-              <SelectTriggerValue
-                value={value}
-                placeholder={placeholder}
-                readOnly={readOnly}
-                multiSelect={multiSelect}
-                options={options}
-                valueRenderer={valueRenderer}
-                toggleOption={toggleOption}
-              />
-              <SelectTriggerActions
-                value={value}
-                multiSelect={multiSelect}
-                enabled={enabled}
-                readOnly={readOnly}
-                clearable={clearable}
-                clearValue={clearValue}
-              />
+            </Part>
             {open && (
               <Portal container={root}>
                 <PopoverContent
