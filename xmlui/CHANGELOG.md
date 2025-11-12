@@ -1,5 +1,11 @@
 # xmlui
 
+## 1.0.0
+
+### Major Changes
+
+- 741f760: refactor: rename size prop to thickness and add length prop in ContentSeparator
+
 ## 0.11.9
 
 ### Patch Changes
