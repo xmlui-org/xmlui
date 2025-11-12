@@ -84,6 +84,7 @@
     },
     "xmlui#build:xmlui-test-bed": {
       "dependsOn": ["build:extension"],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts"],
       "outputs": ["src/testing/infrastructure/dist/**"]
     },
     "test:all": {

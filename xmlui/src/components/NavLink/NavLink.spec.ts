@@ -1,5 +1,4 @@
 import { test, expect } from "../../testing/fixtures";
-import { initThemedApp } from "../../testing/themed-app-test-helpers";
 
 const CODE = `<NavLink to="/">Hello</NavLink>`;
 
@@ -1126,17 +1125,16 @@ test.describe("noIndicator property", () => {
     expect(afterElement.content).toBe("none");
   });
 
-  test("noIndicator works in vertical mode", async ({
-    initTestBed,
-    createNavLinkDriver,
-    page,
-  }) => {
-    await initTestBed(`<NavLink to="/" active="true" vertical="true" noIndicator="true">Test</NavLink>`, {
-      testThemeVars: {
-        "color-indicator-NavLink--active": "rgb(255, 0, 0)",
-        "thickness-indicator-NavLink": "4px",
+  test("noIndicator works in vertical mode", async ({ initTestBed, createNavLinkDriver, page }) => {
+    await initTestBed(
+      `<NavLink to="/" active="true" vertical="true" noIndicator="true">Test</NavLink>`,
+      {
+        testThemeVars: {
+          "color-indicator-NavLink--active": "rgb(255, 0, 0)",
+          "thickness-indicator-NavLink": "4px",
+        },
       },
-    });
+    );
 
     const driver = await createNavLinkDriver();
     const afterElement = await driver.component.evaluate((el) => {
@@ -1150,11 +1148,7 @@ test.describe("noIndicator property", () => {
     expect(afterElement.content).toBe("none");
   });
 
-  test("handles null value for noIndicator", async ({
-    initTestBed,
-    createNavLinkDriver,
-    page,
-  }) => {
+  test("handles null value for noIndicator", async ({ initTestBed, createNavLinkDriver, page }) => {
     await initTestBed(`<NavLink to="/" active="true" noIndicator="{null}">Test</NavLink>`, {
       testThemeVars: {
         "color-indicator-NavLink--active": "rgb(255, 0, 0)",

@@ -6,13 +6,6 @@ import type { ComponentDef, CompoundComponentDef } from "../abstractions/Compone
 import chroma, { type Color } from "chroma-js";
 import { ComponentDriver } from "./ComponentDrivers";
 
-export type ThemeTestDesc = {
-  themeVar: string;
-  themeVarAsCSS: string;
-  expected: string;
-  dependsOnVars?: Record<string, string>;
-};
-
 export function mapObject<K extends (val: any) => any, V extends (val: string) => string | number>(
   obj: Record<string, any>,
   valFn: K = ((val) => val) as K,
@@ -23,10 +16,6 @@ export function mapObject<K extends (val: any) => any, V extends (val: string) =
     newObject[keyFn(key)] = valFn(value);
   });
   return newObject;
-}
-
-export function getComponentTagName(locator: Locator) {
-  return locator.evaluate((el) => el.tagName.toLowerCase());
 }
 
 export function parseComponentIfNecessary(
@@ -42,46 +31,8 @@ export function parseComponentIfNecessary(
   };
 }
 
-/**
- * Scales a value by a percentage, using NumericCSS for parsing and clarity.
- * @param scalarOf100Percent The value representing 100%.
- * @param percentage A percentage string in the format "NN%", e.g., "40%". Must end with '%'.
- * @returns The scaled value.
- */
-export function scaleByPercent(scalarOf100Percent: number, percentage: string) {
-  const parsed = parseAsNumericCss(percentage);
-  if (parsed.unit !== "%") {
-    throw new Error(`Expected percentage unit (%), got: ${parsed.unit}`);
-  }
-  return (scalarOf100Percent / 100) * parsed.value;
-}
-
 export function getBoundingRect(locator: Locator) {
   return locator.evaluate((element) => element.getBoundingClientRect());
-}
-
-export function getElementStyle(specifier: Locator, style: string) {
-  return specifier.evaluate(
-    (element, style) => window.getComputedStyle(element).getPropertyValue(style),
-    style,
-  );
-}
-
-/**
- * Retreives all the provided style properties from the locator
- * @returns an object with the keys being the elements of the styles argument
- */
-export function getElementStyles(locator: Locator, styles: string[] = []) {
-  return locator.evaluate(
-    (element, styles) =>
-      Object.fromEntries(
-        styles.map((styleName) => [
-          styleName,
-          window.getComputedStyle(element).getPropertyValue(styleName),
-        ]),
-      ),
-    styles,
-  );
 }
 
 export function isIndeterminate(specifier: ComponentDriver | Locator) {
@@ -105,29 +56,10 @@ export async function overflows(locator: Locator, direction: "x" | "y" | "both" 
 // ComponentDriver style helpers
 // ----------------------------------
 
-export function getStyles(specifier: ComponentDriver | Locator, style: string | string[]) {
-  if (specifier instanceof ComponentDriver) specifier = specifier.component;
-  style = Array.isArray(style) ? style : [style];
-  return specifier.evaluate(
-    (element, styles) =>
-      Object.fromEntries(
-        styles.map((styleName) => [
-          styleName
-            .trim()
-            .split("-")
-            .map((n, idx) => (idx === 0 ? n : n[0].toUpperCase() + n.slice(1)))
-            .join(""),
-          window.getComputedStyle(element).getPropertyValue(styleName),
-        ]),
-      ),
-    style,
-  );
-}
-
-export function getPseudoStyles(
+export function getStyles(
   specifier: ComponentDriver | Locator,
-  pseudoElement: string,
   style: string | string[],
+  pseudoElement?: string,
 ) {
   if (specifier instanceof ComponentDriver) specifier = specifier.component;
   style = Array.isArray(style) ? style : [style];
@@ -145,21 +77,6 @@ export function getPseudoStyles(
       ),
     { style, pseudoElement },
   );
-}
-
-export async function getHtmlAttributes(
-  specifier: ComponentDriver | Locator,
-  attributes: string | string[],
-): Promise<{ [k: string]: string }> {
-  if (specifier instanceof ComponentDriver) specifier = specifier.component;
-  attributes = Array.isArray(attributes) ? attributes : [attributes];
-
-  const mapped = await Promise.all(
-    attributes.map(async (attr) => {
-      return [attr, await specifier.getAttribute(attr)];
-    }),
-  );
-  return Object.fromEntries(mapped);
 }
 
 export async function getPaddings(specifier: ComponentDriver | Locator) {
@@ -185,36 +102,6 @@ export async function getBorders(specifier: ComponentDriver | Locator) {
     right: borders.borderRight,
     top: borders.borderTop,
     bottom: borders.borderBottom,
-  };
-}
-
-export function getMargins(specifier: ComponentDriver | Locator) {
-  return getStyles(specifier, ["margin-left", "margin-right", "margin-top", "margin-bottom"]);
-}
-
-/**
- * Retrieves the bounding rectangle of the component including **margins** and **padding**
- * added to the dimensions.
- */
-export async function getBounds(specifier: ComponentDriver | Locator) {
-  if (specifier instanceof ComponentDriver) specifier = specifier.component;
-  const boundingRect = await specifier.evaluate((element) => element.getBoundingClientRect());
-  const m = mapObject(await getMargins(specifier), parseFloat);
-
-  const width = boundingRect.width + m.marginLeft + m.marginRight;
-  const height = boundingRect.height + m.marginTop + m.marginBottom;
-  const left = boundingRect.left - m.marginLeft;
-  const right = boundingRect.right + m.marginRight;
-  const top = boundingRect.top - m.marginTop;
-  const bottom = boundingRect.bottom + m.marginBottom;
-
-  return {
-    width,
-    height,
-    left,
-    right,
-    top,
-    bottom,
   };
 }
 
@@ -285,10 +172,6 @@ export const SKIP_REASON = new TestSkipReason();
 
 // --- CSS types and parsers
 
-export function pixelStrToNum(pixelStr: string) {
-  return Number(pixelStr.replace("px", ""));
-}
-
 export function parseAsCssBorder(str: string) {
   const parts = str.split(/\s+(?=[a-z]+|\()/i);
   if (parts.length > 3) {
@@ -355,20 +238,6 @@ export function parseAsNumericCss(str: string) {
   return result;
 }
 
-export function numericCSSToString(cssValue: NumericCSS) {
-  return `${cssValue.value}${cssValue.unit}`;
-}
-
-export type CSSColor = chroma.Color;
-
-export function isCSSColor(str: any): str is CSSColor {
-  return chroma.valid(str);
-}
-
-export function parseAsCSSColor(str: string): CSSColor {
-  return chroma(str);
-}
-
 const CSSUnitValues = [
   "px",
   "em",
@@ -415,16 +284,30 @@ export type CSSBorderStyle = (typeof CSSBorderStyleValues)[number];
 export function isCSSBorderStyle(str: string): str is CSSBorderStyle {
   return CSSBorderStyleValues.includes(str as any);
 }
-export function parseAsCSSBorderStyle(str: string) {
-  if (!isCSSBorderStyle(str)) {
-    throw new Error(`Provided value ${str} cannot be parsed as a CSS border style`);
-  }
-  return str;
-}
 
-export const BorderSideValues = ["top", "bottom", "left", "right"] as const;
-export type BorderSide = (typeof BorderSideValues)[number];
+/**
+ * Retrieves the bounding rectangle of the component including **margins** and **padding**
+ * added to the dimensions.
+ */
+export async function getBounds(locator: Locator) {
+  const { boundingRect, marginLeft, marginRight, marginTop, marginBottom } = await locator.evaluate(
+    (element) => {
+      const styles = window.getComputedStyle(element);
+      return {
+        boundingRect: element.getBoundingClientRect(),
+        marginLeft: parseFloat(styles.getPropertyValue("margin-left")),
+        marginRight: parseFloat(styles.getPropertyValue("margin-right")),
+        marginTop: parseFloat(styles.getPropertyValue("margin-top")),
+        marginBottom: parseFloat(styles.getPropertyValue("margin-bottom")),
+      };
+    },
+  );
 
-export function isBorderSide(str: string): str is BorderSide {
-  return BorderSideValues.includes(str as any);
+  const width = boundingRect.width + marginLeft + marginRight;
+  const height = boundingRect.height + marginTop + marginBottom;
+  const left = boundingRect.left - marginLeft;
+  const right = boundingRect.right + marginRight;
+  const top = boundingRect.top - marginTop;
+  const bottom = boundingRect.bottom + marginBottom;
+  return { width, height, left, right, top, bottom };
 }

@@ -57,7 +57,7 @@ test("htmlTable width using themes", async ({ initTestBed, createHtmlTagDriver }
     },
   });
   const driver = await createHtmlTagDriver();
-  const compWidth = (await getBounds(driver)).width;
+  const compWidth = (await getBounds(driver.component)).width;
 
   expect(compWidth).toEqual(width);
 });

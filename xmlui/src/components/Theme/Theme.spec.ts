@@ -147,11 +147,17 @@ test.describe("applyIf Property", () => {
       </App>
     `);
 
-    const { backgroundColor } = await getStyles(page.getByTestId("themed-button"), "background-color");
+    const { backgroundColor } = await getStyles(
+      page.getByTestId("themed-button"),
+      "background-color",
+    );
     expect(backgroundColor).toBe(EXPECTED_COLOR);
   });
 
-  test("applies theme when applyIf is omitted (defaults to true)", async ({ page, initTestBed }) => {
+  test("applies theme when applyIf is omitted (defaults to true)", async ({
+    page,
+    initTestBed,
+  }) => {
     const EXPECTED_COLOR = "rgb(0, 255, 0)";
     await initTestBed(`
       <App>
@@ -161,7 +167,10 @@ test.describe("applyIf Property", () => {
       </App>
     `);
 
-    const { backgroundColor } = await getStyles(page.getByTestId("themed-button"), "background-color");
+    const { backgroundColor } = await getStyles(
+      page.getByTestId("themed-button"),
+      "background-color",
+    );
     expect(backgroundColor).toBe(EXPECTED_COLOR);
   });
 
@@ -175,12 +184,18 @@ test.describe("applyIf Property", () => {
       </App>
     `);
 
-    const { backgroundColor } = await getStyles(page.getByTestId("unthemed-button"), "background-color");
+    const { backgroundColor } = await getStyles(
+      page.getByTestId("unthemed-button"),
+      "background-color",
+    );
     // Should not have the theme color when applyIf is false
     expect(backgroundColor).not.toBe(THEME_COLOR);
   });
 
-  test("renders children without theme wrapper when applyIf is false", async ({ page, initTestBed }) => {
+  test("renders children without theme wrapper when applyIf is false", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <App>
         <Theme tone="dark" applyIf="false">
@@ -207,28 +222,37 @@ test.describe("applyIf Property", () => {
     `);
 
     // Initially testState is null, expression evaluates to false
-    const initialBackground = await getStyles(page.getByTestId("conditional-button"), "background-color");
+    const initialBackground = await getStyles(
+      page.getByTestId("conditional-button"),
+      "background-color",
+    );
     expect(initialBackground.backgroundColor).not.toBe("rgb(255, 0, 0)");
 
     // Click to make testState true, theme should be applied
     await page.getByTestId("conditional-button").click();
     await expect.poll(testStateDriver.testState).toBe(true);
 
-    const appliedBackground = await getStyles(page.getByTestId("conditional-button"), "background-color");
+    const appliedBackground = await getStyles(
+      page.getByTestId("conditional-button"),
+      "background-color",
+    );
     expect(appliedBackground.backgroundColor).toBe("rgb(255, 0, 0)");
 
     // Click again to make testState false, theme should not be applied
     await page.getByTestId("conditional-button").click();
     await expect.poll(testStateDriver.testState).toBe(false);
 
-    const removedBackground = await getStyles(page.getByTestId("conditional-button"), "background-color");
+    const removedBackground = await getStyles(
+      page.getByTestId("conditional-button"),
+      "background-color",
+    );
     expect(removedBackground.backgroundColor).not.toBe("rgb(255, 0, 0)");
   });
 
   test("handles nested themes with different applyIf values", async ({ page, initTestBed }) => {
     const OUTER_COLOR = "rgb(255, 0, 0)";
     const INNER_COLOR = "rgb(0, 255, 0)";
-    
+
     await initTestBed(`
       <App>
         <Theme backgroundColor-Button="${OUTER_COLOR}" applyIf="true">
@@ -241,22 +265,28 @@ test.describe("applyIf Property", () => {
     `);
 
     // Outer button should have outer theme applied
-    const { backgroundColor: outerBg } = await getStyles(page.getByTestId("outer-themed"), "background-color");
+    const { backgroundColor: outerBg } = await getStyles(
+      page.getByTestId("outer-themed"),
+      "background-color",
+    );
     expect(outerBg).toBe(OUTER_COLOR);
 
     // Inner button should inherit outer theme (inner theme not applied due to applyIf=false)
-    const { backgroundColor: innerBg } = await getStyles(page.getByTestId("inner-unthemed"), "background-color");
+    const { backgroundColor: innerBg } = await getStyles(
+      page.getByTestId("inner-unthemed"),
+      "background-color",
+    );
     expect(innerBg).toBe(OUTER_COLOR); // Should inherit from outer theme
   });
 
   test("applies multiple theme variables when applyIf is true", async ({ page, initTestBed }) => {
     const BG_COLOR = "rgb(255, 0, 0)";
     const TEXT_COLOR = "rgb(0, 255, 0)";
-    
+
     await initTestBed(`
       <App>
-        <Theme 
-          backgroundColor-Button="${BG_COLOR}" 
+        <Theme
+          backgroundColor-Button="${BG_COLOR}"
           textColor-Button="${TEXT_COLOR}"
           applyIf="true"
         >
@@ -266,25 +296,25 @@ test.describe("applyIf Property", () => {
     `);
 
     const { backgroundColor } = await getStyles(
-      page.getByTestId("multi-themed"), 
-      "background-color"
+      page.getByTestId("multi-themed"),
+      "background-color",
     );
-    const { color } = await getStyles(
-      page.getByTestId("multi-themed"), 
-      "color"
-    );
+    const { color } = await getStyles(page.getByTestId("multi-themed"), "color");
     expect(backgroundColor).toBe(BG_COLOR);
     expect(color).toBe(TEXT_COLOR);
   });
 
-  test("does not apply any theme variables when applyIf is false", async ({ page, initTestBed }) => {
+  test("does not apply any theme variables when applyIf is false", async ({
+    page,
+    initTestBed,
+  }) => {
     const BG_COLOR = "rgb(255, 0, 0)";
     const TEXT_COLOR = "rgb(0, 255, 0)";
-    
+
     await initTestBed(`
       <App>
-        <Theme 
-          backgroundColor-Button="${BG_COLOR}" 
+        <Theme
+          backgroundColor-Button="${BG_COLOR}"
           textColor-Button="${TEXT_COLOR}"
           applyIf="false"
         >
@@ -293,14 +323,8 @@ test.describe("applyIf Property", () => {
       </App>
     `);
 
-    const { backgroundColor } = await getStyles(
-      page.getByTestId("no-theme"), 
-      "background-color"
-    );
-    const { color } = await getStyles(
-      page.getByTestId("no-theme"), 
-      "color"
-    );
+    const { backgroundColor } = await getStyles(page.getByTestId("no-theme"), "background-color");
+    const { color } = await getStyles(page.getByTestId("no-theme"), "color");
     expect(backgroundColor).not.toBe(BG_COLOR);
     expect(color).not.toBe(TEXT_COLOR);
   });
@@ -323,21 +347,21 @@ test.describe("applyIf Edge Cases", () => {
     // Initially testState is null, expression evaluates to false
     const initialBg = await getStyles(page.getByTestId("null-apply"), "background-color");
     expect(initialBg.backgroundColor).not.toBe("rgb(255, 0, 0)");
-    
+
     // Button should still be visible
     await expect(page.getByTestId("null-apply")).toBeVisible();
 
     // Click to set testState to 'apply', theme should be applied
     await page.getByTestId("null-apply").click();
     await expect.poll(testStateDriver.testState).toBe("apply");
-    
+
     const appliedBg = await getStyles(page.getByTestId("null-apply"), "background-color");
     expect(appliedBg.backgroundColor).toBe("rgb(255, 0, 0)");
 
     // Click again to set testState to null, theme should not be applied
     await page.getByTestId("null-apply").click();
     await expect.poll(testStateDriver.testState).toBe(null);
-    
+
     const removedBg = await getStyles(page.getByTestId("null-apply"), "background-color");
     expect(removedBg.backgroundColor).not.toBe("rgb(255, 0, 0)");
   });
@@ -354,22 +378,28 @@ test.describe("applyIf Edge Cases", () => {
     // Initially testState is null, expression evaluates to undefined (should use default true)
     const initialBg = await getStyles(page.getByTestId("undefined-apply"), "background-color");
     expect(initialBg.backgroundColor).toBe("rgb(255, 0, 0)"); // undefined should default to true
-    
+
     // Button should still be visible
     await expect(page.getByTestId("undefined-apply")).toBeVisible();
 
     // Click to set testState to 5, expression evaluates to undefined (should use default true)
     await page.getByTestId("undefined-apply").click();
     await expect.poll(testStateDriver.testState).toBe(5);
-    
-    const afterFirstClickBg = await getStyles(page.getByTestId("undefined-apply"), "background-color");
+
+    const afterFirstClickBg = await getStyles(
+      page.getByTestId("undefined-apply"),
+      "background-color",
+    );
     expect(afterFirstClickBg.backgroundColor).toBe("rgb(255, 0, 0)"); // undefined should default to true
 
     // Click again to set testState to 15, expression evaluates to true (explicit true)
     await page.getByTestId("undefined-apply").click();
     await expect.poll(testStateDriver.testState).toBe(15);
-    
-    const afterSecondClickBg = await getStyles(page.getByTestId("undefined-apply"), "background-color");
+
+    const afterSecondClickBg = await getStyles(
+      page.getByTestId("undefined-apply"),
+      "background-color",
+    );
     expect(afterSecondClickBg.backgroundColor).toBe("rgb(255, 0, 0)");
   });
 
@@ -383,13 +413,16 @@ test.describe("applyIf Edge Cases", () => {
     `);
 
     // String "false" should be treated as boolean false, so theme should not be applied
-    const { backgroundColor } = await getStyles(page.getByTestId("string-false"), "background-color");
+    const { backgroundColor } = await getStyles(
+      page.getByTestId("string-false"),
+      "background-color",
+    );
     expect(backgroundColor).not.toBe("rgb(255, 0, 0)");
   });
 
   test("handles numeric values correctly", async ({ page, initTestBed }) => {
     const THEME_COLOR = "rgb(255, 0, 0)";
-    
+
     // Test with 0 (falsy)
     await initTestBed(`
       <App>
@@ -399,7 +432,10 @@ test.describe("applyIf Edge Cases", () => {
       </App>
     `);
 
-    const { backgroundColor: zeroBg } = await getStyles(page.getByTestId("zero-apply"), "background-color");
+    const { backgroundColor: zeroBg } = await getStyles(
+      page.getByTestId("zero-apply"),
+      "background-color",
+    );
     expect(zeroBg).not.toBe(THEME_COLOR);
   });
 
@@ -421,21 +457,24 @@ test.describe("applyIf Edge Cases", () => {
     // Click once: testState becomes 1 (1 > 5 is false)
     await page.getByTestId("complex-condition").click();
     await expect.poll(testStateDriver.testState).toBe(1);
-    
+
     const firstClickBg = await getStyles(page.getByTestId("complex-condition"), "background-color");
     expect(firstClickBg.backgroundColor).not.toBe("rgb(255, 0, 0)");
 
     // Click again: testState becomes 4 (4 > 5 is false)
     await page.getByTestId("complex-condition").click();
     await expect.poll(testStateDriver.testState).toBe(4);
-    
-    const secondClickBg = await getStyles(page.getByTestId("complex-condition"), "background-color");
+
+    const secondClickBg = await getStyles(
+      page.getByTestId("complex-condition"),
+      "background-color",
+    );
     expect(secondClickBg.backgroundColor).not.toBe("rgb(255, 0, 0)");
 
     // Click again: testState becomes 7 (7 > 5 is true, theme should apply)
     await page.getByTestId("complex-condition").click();
     await expect.poll(testStateDriver.testState).toBe(7);
-    
+
     const thirdClickBg = await getStyles(page.getByTestId("complex-condition"), "background-color");
     expect(thirdClickBg.backgroundColor).toBe("rgb(255, 0, 0)");
   });
