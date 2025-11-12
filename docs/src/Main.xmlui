@@ -289,20 +289,20 @@
             <NavGroup label="Extensions">
                 <!-- GENERATED CONTENT/Extension references links -->
                 <NavGroup label="Xmlui Animations">
-                    <NavLink label="Extension Overview" to="/extensions/xmlui-animations/_overview" />
-                    <NavLink label="Animation" to="/extensions/xmlui-animations/Animation" />
-                    <NavLink label="FadeAnimation" to="/extensions/xmlui-animations/FadeAnimation" />
-                    <NavLink label="FadeInAnimation" to="/extensions/xmlui-animations/FadeInAnimation" />
-                    <NavLink label="FadeOutAnimation" to="/extensions/xmlui-animations/FadeOutAnimation" />
-                    <NavLink label="ScaleAnimation" to="/extensions/xmlui-animations/ScaleAnimation" />
-                    <NavLink label="SlideInAnimation" to="/extensions/xmlui-animations/SlideInAnimation" />
+                <NavLink label="Extension Overview" to="/extensions/xmlui-animations/_overview" />
+                <NavLink label="Animation" to="/extensions/xmlui-animations/Animation" />
+                <NavLink label="FadeAnimation" to="/extensions/xmlui-animations/FadeAnimation" />
+                <NavLink label="FadeInAnimation" to="/extensions/xmlui-animations/FadeInAnimation" />
+                <NavLink label="FadeOutAnimation" to="/extensions/xmlui-animations/FadeOutAnimation" />
+                <NavLink label="ScaleAnimation" to="/extensions/xmlui-animations/ScaleAnimation" />
+                <NavLink label="SlideInAnimation" to="/extensions/xmlui-animations/SlideInAnimation" />
                 </NavGroup>
                 <NavGroup label="Xmlui Website Blocks">
-                    <NavLink label="Extension Overview" to="/extensions/xmlui-website-blocks/_overview" />
-                    <NavLink label="Carousel" to="/extensions/xmlui-website-blocks/Carousel" />
-                    <NavLink label="HelloMd" to="/extensions/xmlui-website-blocks/HelloMd" />
-                    <NavLink label="HeroSection" to="/extensions/xmlui-website-blocks/HeroSection" />
-                    <NavLink label="ScrollToTop" to="/extensions/xmlui-website-blocks/ScrollToTop" />
+                <NavLink label="Extension Overview" to="/extensions/xmlui-website-blocks/_overview" />
+                <NavLink label="Carousel" to="/extensions/xmlui-website-blocks/Carousel" />
+                <NavLink label="HelloMd" to="/extensions/xmlui-website-blocks/HelloMd" />
+                <NavLink label="HeroSection" to="/extensions/xmlui-website-blocks/HeroSection" />
+                <NavLink label="ScrollToTop" to="/extensions/xmlui-website-blocks/ScrollToTop" />
                 </NavGroup>
                 <!-- END GENERATED CONTENT/Extension references links -->
             </NavGroup>

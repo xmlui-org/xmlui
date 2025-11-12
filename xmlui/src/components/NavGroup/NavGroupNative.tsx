@@ -49,6 +49,7 @@ type Props = {
   node: NavGroupComponentDef;
   renderChild: RenderChildFn;
   initiallyExpanded: boolean;
+  noIndicator?: boolean;
   iconHorizontalExpanded?: string;
   iconHorizontalCollapsed?: string;
   iconVerticalExpanded?: string;
@@ -61,11 +62,13 @@ export const defaultProps: Pick<
   | "iconHorizontalCollapsed"
   | "iconVerticalExpanded"
   | "iconVerticalCollapsed"
+  | "noIndicator"
 > = {
   iconHorizontalExpanded: "chevronright",
   iconHorizontalCollapsed: "chevronright",
   iconVerticalExpanded: "chevrondown",
   iconVerticalCollapsed: "chevronright",
+  noIndicator: false,
 };
 
 export const NavGroup = forwardRef(function NavGroup(
@@ -78,6 +81,7 @@ export const NavGroup = forwardRef(function NavGroup(
     to,
     disabled = false,
     initiallyExpanded = false,
+    noIndicator = defaultProps.noIndicator,
     iconHorizontalCollapsed,
     iconHorizontalExpanded,
     iconVerticalCollapsed,
@@ -138,6 +142,7 @@ export const NavGroup = forwardRef(function NavGroup(
           ref={ref}
           initiallyExpanded={initiallyExpanded}
           disabled={disabled}
+          noIndicator={noIndicator}
         />
       ) : (
         <DropDownNavGroup
@@ -150,6 +155,7 @@ export const NavGroup = forwardRef(function NavGroup(
           to={to}
           initiallyExpanded={initiallyExpanded}
           disabled={disabled}
+          noIndicator={noIndicator}
         />
       )}
     </NavGroupContext.Provider>
@@ -165,6 +171,7 @@ type ExpandableNavGroupProps = {
   to?: string;
   initiallyExpanded?: boolean;
   disabled?: boolean;
+  noIndicator?: boolean;
 };
 
 const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
@@ -177,6 +184,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
     to,
     initiallyExpanded = false,
     disabled = false,
+    noIndicator = false,
     ...rest
   }: ExpandableNavGroupProps,
   ref,
@@ -215,6 +223,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
         icon={icon}
         to={to}
         disabled={disabled}
+        noIndicator={noIndicator}
         aria-expanded={expanded}
       >
         {label}
@@ -244,6 +253,7 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     to,
     disabled = false,
     initiallyExpanded = false,
+    noIndicator = false,
     ...rest
   }: {
     style?: CSSProperties;
@@ -254,6 +264,7 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     to?: string;
     disabled?: boolean;
     initiallyExpanded?: boolean;
+    noIndicator?: boolean;
   },
   ref,
 ) {
@@ -294,6 +305,7 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
           vertical={level >= 1}
           to={to}
           disabled={disabled}
+          noIndicator={noIndicator}
         >
           {label}
           <div style={{ flex: 1 }} />

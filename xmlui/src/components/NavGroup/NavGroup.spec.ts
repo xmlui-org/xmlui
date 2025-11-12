@@ -363,3 +363,284 @@ test.describe("Drawer Interaction", () => {
     await expect(dialog).not.toBeVisible();
   });
 });
+
+// =============================================================================
+// noIndicator PROPERTY TESTS
+// =============================================================================
+
+test.describe("noIndicator property", () => {
+  test("indicator not displayed when noIndicator is true (vertical layout)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
+      <App layout="vertical">
+        <NavPanel>
+          <NavGroup label="Pages" noIndicator="true">
+            <NavLink label="Page 1" />
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `,
+      {
+        testThemeVars: {
+          "color-indicator-NavLink--hover": "rgb(255, 0, 0)",
+          "thickness-indicator-NavLink": "4px",
+        },
+      },
+    );
+
+    const navGroupButton = page.getByRole("button", { name: "Pages" });
+    const afterElement = await navGroupButton.evaluate((el) => {
+      const after = window.getComputedStyle(el, "::after");
+      return {
+        content: after.content,
+      };
+    });
+
+    // When noIndicator is true, the ::after element should not be rendered
+    expect(afterElement.content).toBe("none");
+  });
+
+  test("indicator displayed when noIndicator is false (vertical layout)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
+      <App layout="vertical">
+        <NavPanel>
+          <NavGroup label="Pages" noIndicator="false">
+            <NavLink label="Page 1" />
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `,
+      {
+        testThemeVars: {
+          "thickness-indicator-NavLink": "4px",
+        },
+      },
+    );
+
+    const navGroupButton = page.getByRole("button", { name: "Pages" });
+    await navGroupButton.hover();
+
+    const afterElement = await navGroupButton.evaluate((el) => {
+      const after = window.getComputedStyle(el, "::after");
+      return {
+        content: after.content,
+        width: after.width,
+      };
+    });
+
+    // When noIndicator is false, the ::after element should be rendered
+    // In vertical layout, the indicator is on the side (width), not bottom (height)
+    expect(afterElement.content).toBe('""');
+    expect(afterElement.width).toBe("4px");
+  });
+
+  test("indicator displayed by default (vertical layout)", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `
+      <App layout="vertical">
+        <NavPanel>
+          <NavGroup label="Pages">
+            <NavLink label="Page 1" />
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `,
+      {
+        testThemeVars: {
+          "thickness-indicator-NavLink": "5px",
+        },
+      },
+    );
+
+    const navGroupButton = page.getByRole("button", { name: "Pages" });
+    await navGroupButton.hover();
+
+    const afterElement = await navGroupButton.evaluate((el) => {
+      const after = window.getComputedStyle(el, "::after");
+      return {
+        content: after.content,
+        width: after.width,
+      };
+    });
+
+    // Default behavior should show the indicator
+    // In vertical layout, the indicator is on the side (width), not bottom (height)
+    expect(afterElement.content).toBe('""');
+    expect(afterElement.width).toBe("5px");
+  });
+
+  test("indicator not shown on hover when noIndicator is true (vertical layout)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
+      <App layout="vertical">
+        <NavPanel>
+          <NavGroup label="Pages" noIndicator="true">
+            <NavLink label="Page 1" />
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `,
+      {
+        testThemeVars: {
+          "color-indicator-NavLink--hover": "rgb(0, 0, 255)",
+          "thickness-indicator-NavLink": "3px",
+        },
+      },
+    );
+
+    const navGroupButton = page.getByRole("button", { name: "Pages" });
+    await navGroupButton.hover();
+
+    const afterElement = await navGroupButton.evaluate((el) => {
+      const after = window.getComputedStyle(el, "::after");
+      return {
+        content: after.content,
+      };
+    });
+
+    // Even on hover, indicator should not be displayed when noIndicator is true
+    expect(afterElement.content).toBe("none");
+  });
+
+  test("indicator not displayed when noIndicator is true (horizontal layout)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
+      <App layout="horizontal">
+        <NavPanel>
+          <NavGroup label="Pages" noIndicator="true">
+            <NavLink label="Page 1" />
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `,
+      {
+        testThemeVars: {
+          "color-indicator-NavLink--hover": "rgb(255, 0, 0)",
+          "thickness-indicator-NavLink": "4px",
+        },
+      },
+    );
+
+    const navGroupButton = page.getByRole("button", { name: "Pages" });
+    const afterElement = await navGroupButton.evaluate((el) => {
+      const after = window.getComputedStyle(el, "::after");
+      return {
+        content: after.content,
+      };
+    });
+
+    // When noIndicator is true, the ::after element should not be rendered
+    expect(afterElement.content).toBe("none");
+  });
+
+  test("indicator displayed by default (horizontal layout)", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `
+      <App layout="horizontal">
+        <NavPanel>
+          <NavGroup label="Pages">
+            <NavLink label="Page 1" />
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `,
+      {
+        testThemeVars: {
+          "thickness-indicator-NavLink": "5px",
+        },
+      },
+    );
+
+    const navGroupButton = page.getByRole("button", { name: "Pages" });
+    await navGroupButton.hover();
+
+    const afterElement = await navGroupButton.evaluate((el) => {
+      const after = window.getComputedStyle(el, "::after");
+      return {
+        content: after.content,
+        height: after.height,
+      };
+    });
+
+    // Default behavior should show the indicator
+    expect(afterElement.content).toBe('""');
+    expect(afterElement.height).toBe("5px");
+  });
+
+  test("handles null value for noIndicator", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `
+      <App layout="vertical">
+        <NavPanel>
+          <NavGroup label="Pages" noIndicator="{null}">
+            <NavLink label="Page 1" />
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `,
+      {
+        testThemeVars: {
+          "thickness-indicator-NavLink": "4px",
+        },
+      },
+    );
+
+    const navGroupButton = page.getByRole("button", { name: "Pages" });
+    await navGroupButton.hover();
+
+    const afterElement = await navGroupButton.evaluate((el) => {
+      const after = window.getComputedStyle(el, "::after");
+      return {
+        content: after.content,
+      };
+    });
+
+    // Null should be treated as false (default), so indicator should be shown
+    expect(afterElement.content).toBe('""');
+  });
+
+  test("handles undefined value for noIndicator", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `
+      <App layout="vertical">
+        <NavPanel>
+          <NavGroup label="Pages" noIndicator="{undefined}">
+            <NavLink label="Page 1" />
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `,
+      {
+        testThemeVars: {
+          "thickness-indicator-NavLink": "4px",
+        },
+      },
+    );
+
+    const navGroupButton = page.getByRole("button", { name: "Pages" });
+    await navGroupButton.hover();
+
+    const afterElement = await navGroupButton.evaluate((el) => {
+      const after = window.getComputedStyle(el, "::after");
+      return {
+        content: after.content,
+      };
+    });
+
+    // Undefined should be treated as false (default), so indicator should be shown
+    expect(afterElement.content).toBe('""');
+  });
+});

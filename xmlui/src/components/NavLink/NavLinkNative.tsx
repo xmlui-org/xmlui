@@ -17,6 +17,7 @@ import { NavGroupContext } from "../NavGroup/NavGroupContext";
 export const defaultProps = {
   active: false,
   displayActive: true,
+  noIndicator: false,
 };
 
 type Props = {
@@ -26,6 +27,7 @@ type Props = {
   disabled?: boolean;
   children?: ReactNode;
   displayActive?: boolean;
+  noIndicator?: boolean;
   forceActive?: boolean;
   vertical?: boolean;
   style?: CSSProperties;
@@ -43,6 +45,7 @@ export const NavLink = forwardRef(function NavLink(
     disabled,
     to,
     displayActive = defaultProps.displayActive,
+    noIndicator = defaultProps.noIndicator,
     vertical,
     style,
     onClick,
@@ -81,7 +84,7 @@ export const NavLink = forwardRef(function NavLink(
   const baseClasses = classnames(styles.content, styles.base, className, {
     [styles.disabled]: disabled,
     [styles.vertical]: safeVertical,
-    [styles.includeHoverIndicator]: displayActive,
+    [styles.includeHoverIndicator]: displayActive && !noIndicator,
     [styles.navItemActive]: displayActive && forceActive,
   });
 
