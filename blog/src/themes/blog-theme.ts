@@ -6,6 +6,8 @@ export const DefaultDocsTheme: ThemeDefinition = {
   extends: ["xmlui"],
   themeVars: {
     "paddingHorizontal-Pages": "0px",
+    // --- App layout
+    "maxWidth-content-App": "800px",
   },
   resources: {},
 };
