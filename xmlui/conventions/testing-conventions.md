@@ -48,6 +48,94 @@ test("handles no props gracefully", async ({ initTestBed, page }) => {
 });
 ```
 
+5. **Behaviors and Parts** - Tests for XMLUI's behavior system (tooltip, variant, animation) and component part selection system. **Only include this category for components that support behaviors or have identifiable parts**.
+
+## Behaviors and Parts Testing
+
+### Behavior Testing
+
+XMLUI has a behavior system that automatically wraps components with additional functionality when certain props are present. Test that behaviors work correctly:
+
+```typescript
+test.describe("Behaviors and Parts", () => {
+  // Test tooltip behavior
+  test("handles tooltip", async ({ page, initTestBed }) => {
+    await initTestBed(`<ComponentName testId="test" tooltip="Tooltip text" />`);
+    
+    const component = page.getByTestId("test");
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  // Test custom variant behavior (applies theme variables with variant suffix)
+  test("handles variant", async ({ page, initTestBed }) => {
+    await initTestBed(`<ComponentName testId="test" variant="CustomVariant" />`, {
+      testThemeVars: {
+        "borderColor-ComponentName-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    const component = page.getByTestId("test");
+    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+  });
+});
+```
+
+### Parts Testing
+
+Components can expose internal elements as "parts" using `<Part partId="partName">`. Test part selection using `data-part-id` attributes:
+
+```typescript
+test.describe("Behaviors and Parts", () => {
+  // Test individual parts are selectable
+  test("can select part: 'partName'", async ({ page, initTestBed }) => {
+    await initTestBed(`<ComponentName testId="test" />`);
+    const part = page.getByTestId("test").locator("[data-part-id='partName']");
+    await expect(part).toBeVisible();
+  });
+
+  // Test conditional parts (only visible with certain props)
+  test("can select part: 'conditionalPart'", async ({ page, initTestBed }) => {
+    await initTestBed(`<ComponentName testId="test" showConditionalPart="true" />`);
+    const part = page.getByTestId("test").locator("[data-part-id='conditionalPart']");
+    await expect(part).toBeVisible();
+  });
+
+  // Test that parts remain accessible when behaviors are applied
+  test("parts are present when tooltip is added", async ({ page, initTestBed }) => {
+    await initTestBed(`<ComponentName testId="test" tooltip="Tooltip text" />`);
+    
+    const part = page.getByTestId("test").locator("[data-part-id='partName']");
+    const tooltip = page.getByRole("tooltip");
+    
+    await page.getByTestId("test").hover();
+    
+    await expect(tooltip).toBeVisible();
+    await expect(part).toBeVisible();
+  });
+
+  test("parts are present when variant is added", async ({ page, initTestBed }) => {
+    await initTestBed(`<ComponentName testId="test" variant="CustomVariant" />`, {
+      testThemeVars: { "borderColor-ComponentName-CustomVariant": "rgb(255, 0, 0)" },
+    });
+    
+    const component = page.getByTestId("test");
+    const part = component.locator("[data-part-id='partName']");
+    
+    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await expect(part).toBeVisible();
+  });
+});
+```
+
+**Key Testing Patterns:**
+- Use `page.getByTestId("test").locator("[data-part-id='partName']")` to select parts
+- Test both unconditional parts and parts that require specific props to be visible
+- Verify that behaviors (tooltips, variants) don't interfere with part accessibility
+- For variant testing, use theme variables with the pattern `"property-ComponentName-VariantName"`
+
 ## File Organization
 
 - **Location**: Test files MUST be in the same directory as the component's implementation.
