@@ -701,3 +701,144 @@ test.describe("Theme Variables", () => {
     },
   );
 });
+
+// =============================================================================
+// BEHAVIOR TESTS
+// =============================================================================
+
+test.describe("Behaviors and Parts", () => {
+  test("handles tooltip", async ({ page, initTestBed }) => {
+    await initTestBed(`<AutoComplete testId="test" tooltip="Tooltip text" />`);
+
+    const component = page.getByTestId("test");
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test("handles variant", async ({ page, initTestBed }) => {
+    await initTestBed(`<AutoComplete testId="test" variant="CustomVariant" />`, {
+      testThemeVars: {
+        "borderColor-AutoComplete-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    const component = page.getByTestId("test");
+    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+  });
+
+  test("can select part: 'listWrapper'", async ({ page, initTestBed }) => {
+    await initTestBed(`<AutoComplete testId="test"><Option value="1" label="Test" /></AutoComplete>`);
+    const listWrapper = page.locator("[data-part-id='listWrapper']");
+    await expect(listWrapper).toBeVisible();
+  });
+
+  test("can select part: 'input'", async ({ page, initTestBed }) => {
+    await initTestBed(`<AutoComplete testId="test" />`);
+    const inputPart = page.locator("[data-part-id='input']");
+    await expect(inputPart).toBeVisible();
+  });
+
+  test("parts are present when tooltip is added", async ({ page, initTestBed }) => {
+    await initTestBed(`<AutoComplete testId="test" tooltip="Tooltip text"><Option value="1" label="Test" /></AutoComplete>`);
+    
+    const component = page.getByTestId("test");
+    const listWrapper = page.locator("[data-part-id='listWrapper']");
+    const inputPart = page.locator("[data-part-id='input']");
+    
+    await expect(listWrapper).toBeVisible();
+    await expect(inputPart).toBeVisible();
+    
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test("parts are present when variant is added", async ({ page, initTestBed }) => {
+    await initTestBed(`<AutoComplete testId="test" variant="CustomVariant"><Option value="1" label="Test" /></AutoComplete>`, {
+      testThemeVars: {
+        "borderColor-AutoComplete-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    
+    const component = page.getByTestId("test");
+    const listWrapper = page.locator("[data-part-id='listWrapper']");
+    const inputPart = page.locator("[data-part-id='input']");
+    
+    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await expect(listWrapper).toBeVisible();
+    await expect(inputPart).toBeVisible();
+  });
+
+  test("variant applies custom theme variables", async ({ page, initTestBed }) => {
+    await initTestBed(`<AutoComplete testId="test" variant="CustomVariant" />`, {
+      testThemeVars: {
+        "backgroundColor-AutoComplete-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+
+    const component = page.getByTestId("test");
+    await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
+  });
+
+  test("tooltip with markdown content", async ({ page, initTestBed }) => {
+    await initTestBed(`<AutoComplete testId="test" tooltipMarkdown="**Bold text**" />`);
+    
+    const component = page.getByTestId("test");
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip.locator("strong")).toHaveText("Bold text");
+  });
+
+  test("animation behavior", async ({ page, initTestBed }) => {
+    await initTestBed(`<AutoComplete testId="test" animation="fadeIn" />`);
+    
+    const component = page.getByTestId("test");
+    await expect(component).toBeVisible();
+  });
+
+  test("combined tooltip and animation", async ({ page, initTestBed }) => {
+    await initTestBed(`<AutoComplete testId="test" tooltip="Tooltip text" animation="fadeIn" />`);
+    
+    const component = page.getByTestId("test");
+    await expect(component).toBeVisible();
+    
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test("all behaviors combined with parts", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <AutoComplete 
+        testId="test" 
+        tooltip="Tooltip text" 
+        variant="CustomVariant"
+        animation="fadeIn"
+      >
+        <Option value="1" label="Test" />
+      </AutoComplete>
+    `, {
+      testThemeVars: {
+        "backgroundColor-AutoComplete-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    
+    const component = page.getByTestId("test");
+    const listWrapper = page.locator("[data-part-id='listWrapper']");
+    const inputPart = page.locator("[data-part-id='input']");
+    
+    // Verify variant applied
+    await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
+    
+    // Verify parts are visible
+    await expect(listWrapper).toBeVisible();
+    await expect(inputPart).toBeVisible();
+  });
+});
+

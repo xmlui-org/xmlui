@@ -54,7 +54,13 @@ test("handles no props gracefully", async ({ initTestBed, page }) => {
 
 ### Behavior Testing
 
-XMLUI has a behavior system that automatically wraps components with additional functionality when certain props are present. Test that behaviors work correctly:
+XMLUI has a behavior system that automatically wraps components with additional functionality when certain props are present. Common behaviors include:
+
+- **tooltipBehavior**: Wraps component in a Tooltip when `tooltip` or `tooltipMarkdown` props are present
+- **variantBehavior**: Applies CSS classes and theme variables based on `variant` prop
+- **animationBehavior**: Wraps component in an Animation when `animation` prop is present
+
+Test these behaviors systematically:
 
 ```typescript
 test.describe("Behaviors and Parts", () => {
@@ -70,6 +76,18 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip).toHaveText("Tooltip text");
   });
 
+  // Test markdown tooltip
+  test("tooltip with markdown content", async ({ page, initTestBed }) => {
+    await initTestBed(`<ComponentName testId="test" tooltipMarkdown="**Bold text**" />`);
+    
+    const component = page.getByTestId("test");
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip.locator("strong")).toHaveText("Bold text");
+  });
+
   // Test custom variant behavior (applies theme variables with variant suffix)
   test("handles variant", async ({ page, initTestBed }) => {
     await initTestBed(`<ComponentName testId="test" variant="CustomVariant" />`, {
@@ -80,12 +98,35 @@ test.describe("Behaviors and Parts", () => {
     const component = page.getByTestId("test");
     await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
   });
+
+  // Test animation behavior
+  test("animation behavior", async ({ page, initTestBed }) => {
+    await initTestBed(`<ComponentName testId="test" animation="fadeIn" />`);
+    
+    const component = page.getByTestId("test");
+    await expect(component).toBeVisible();
+  });
+
+  // Test combined behaviors
+  test("combined tooltip and animation", async ({ page, initTestBed }) => {
+    await initTestBed(`<ComponentName testId="test" tooltip="Tooltip text" animation="fadeIn" />`);
+    
+    const component = page.getByTestId("test");
+    await expect(component).toBeVisible();
+    
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
 });
 ```
 
 ### Parts Testing
 
-Components can expose internal elements as "parts" using `<Part partId="partName">`. Test part selection using `data-part-id` attributes:
+Components can expose internal elements as "parts" using `<Part partId="partName">`. This allows users to style or reference specific internal elements. 
+
+**Important**: Always check the component's native implementation file (e.g., `ComponentNameNative.tsx`) to find the actual `partId` values used in the code, as they may differ from metadata documentation.
 
 ```typescript
 test.describe("Behaviors and Parts", () => {
@@ -97,25 +138,20 @@ test.describe("Behaviors and Parts", () => {
   });
 
   // Test conditional parts (only visible with certain props)
-  test("can select part: 'conditionalPart'", async ({ page, initTestBed }) => {
-    await initTestBed(`<ComponentName testId="test" showConditionalPart="true" />`);
-    const part = page.getByTestId("test").locator("[data-part-id='conditionalPart']");
-    await expect(part).toBeVisible();
+  test("can select part: 'clearButton'", async ({ page, initTestBed }) => {
+    await initTestBed(`<ComponentName testId="test" clearable="true" />`);
+    const clearButton = page.getByTestId("test").locator("[data-part-id='clearButton']");
+    await expect(clearButton).toBeVisible();
+  });
+
+  // Test that conditional parts are absent without required props
+  test("clearButton part is not present without clearable", async ({ page, initTestBed }) => {
+    await initTestBed(`<ComponentName testId="test" clearable="false" />`);
+    const clearButton = page.getByTestId("test").locator("[data-part-id='clearButton']");
+    await expect(clearButton).not.toBeVisible();
   });
 
   // Test that parts remain accessible when behaviors are applied
-  test("parts are present when tooltip is added", async ({ page, initTestBed }) => {
-    await initTestBed(`<ComponentName testId="test" tooltip="Tooltip text" />`);
-    
-    const part = page.getByTestId("test").locator("[data-part-id='partName']");
-    const tooltip = page.getByRole("tooltip");
-    
-    await page.getByTestId("test").hover();
-    
-    await expect(tooltip).toBeVisible();
-    await expect(part).toBeVisible();
-  });
-
   test("parts are present when variant is added", async ({ page, initTestBed }) => {
     await initTestBed(`<ComponentName testId="test" variant="CustomVariant" />`, {
       testThemeVars: { "borderColor-ComponentName-CustomVariant": "rgb(255, 0, 0)" },
@@ -127,18 +163,83 @@ test.describe("Behaviors and Parts", () => {
     await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
     await expect(part).toBeVisible();
   });
+
+  // Test comprehensive scenario with all behaviors and parts
+  test("all behaviors combined with parts", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <ComponentName 
+        testId="test" 
+        tooltip="Tooltip text" 
+        variant="CustomVariant"
+        animation="fadeIn"
+      />
+    `, {
+      testThemeVars: {
+        "borderColor-ComponentName-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    
+    const component = page.getByTestId("test");
+    const part = component.locator("[data-part-id='partName']");
+    
+    // Verify variant applied
+    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    
+    // Verify parts are visible
+    await expect(part).toBeVisible();
+    
+    // Verify tooltip appears
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
 });
 ```
 
 **Key Testing Patterns:**
 - Use `page.getByTestId("test").locator("[data-part-id='partName']")` to select parts
 - Test both unconditional parts and parts that require specific props to be visible
-- Verify that behaviors (tooltips, variants) don't interfere with part accessibility
+- Verify that behaviors (tooltips, variants, animations) don't interfere with part accessibility
 - For variant testing, use theme variables with the pattern `"property-ComponentName-VariantName"`
+- Always verify actual `partId` values in the native implementation before writing tests
+
+**Parts That Wrap testId Elements:**
+Some components have parts that wrap the element with the `testId` attribute. In these cases:
+- You cannot scope from `testId` to the part (the part is the parent)
+- Select such parts without testId scoping: `page.locator("[data-part-id='partName']")`
+- Example from AutoComplete component:
+  ```typescript
+  // ❌ INCORRECT - listWrapper wraps the testId element
+  const listWrapper = page.getByTestId("test").locator("[data-part-id='listWrapper']");
+  
+  // ✅ CORRECT - Select without testId scoping
+  const listWrapper = page.locator("[data-part-id='listWrapper']");
+  const inputPart = page.locator("[data-part-id='input']"); // Also works for inner parts
+  ```
+- Use `.first()` if multiple instances exist on the page: `page.locator("[data-part-id='partName']").first()`
+
+**CSS Property Selection for Variant Testing:**
+- Choose CSS properties that the component actually supports and applies at the top level
+- Use `borderColor` as a reliable property for most components
+- Avoid `backgroundColor` on components that don't apply it directly (may be transparent)
+- Test only one or two CSS properties per variant test to keep tests focused
 
 **Important Limitations:**
-- Only test the base state theme variables for variant behavior, not hover/focus/active states
+- **CSS Pseudo-classes**: Do NOT test `:hover`, `:focus`, or `:active` pseudo-class states using `.toHaveCSS()` assertions. Playwright's `.hover()` action triggers JavaScript behaviors but does not activate CSS pseudo-class selectors for CSS inspection.
+  ```typescript
+  // ❌ INCORRECT - hover() doesn't trigger CSS :hover selector
+  await component.hover();
+  await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)"); // Will fail
+  
+  // ✅ CORRECT - Test functional outcomes of hover instead
+  await component.hover();
+  const tooltip = page.getByRole("tooltip");
+  await expect(tooltip).toBeVisible(); // Tests the behavior, not CSS
+  ```
+- Only test base state theme variables for variant behavior, not hover/focus/active states
 - If hover behavior needs testing, test the functional outcome (e.g., tooltip appears) rather than CSS changes
+- Tooltip tests can be flaky in complex scenarios - if a tooltip test fails consistently, simplify it or remove the tooltip assertion from combined behavior tests
 
 ## File Organization
 
