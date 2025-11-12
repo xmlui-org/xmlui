@@ -986,14 +986,29 @@ test("border, border-thickness-bottom", async ({ initTestBed, createLinkDriver }
   await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-/*
-test("Link accepts custom props", async ({
-  initTestBed,
-  createLinkDriver,
-}) => {
-  await initTestBed(`<Link data-custom="test">Test</Link>`);
-  const driver = await createLinkDriver();
+// =============================================================================
+// BEHAVIOR TESTS
+// =============================================================================
 
-  await expect(driver.component).toHaveAttribute("data-custom", "test");
+test.describe("Behaviors", () => {
+  test("handles tooltip", async ({ page, initTestBed }) => {
+    await initTestBed(`<Link to="/" testId="test" tooltip="Tooltip text">text</Link>`);
+
+    const input = page.getByTestId("test");
+    await input.hover();
+    const tooltip = page.getByRole("tooltip");
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test("handles variant", async ({ page, initTestBed }) => {
+    await initTestBed(`<Link to="/" testId="test" variant="TestInput" />`, {
+      testThemeVars: {
+        "borderColor-TimeInput-TestInput": "rgb(255, 0, 0)",
+      },
+    });
+    const input = page.getByTestId("test");
+    await expect(input).toHaveCSS("border-color", "rgb(255, 0, 0)");
+  });
 });
- */

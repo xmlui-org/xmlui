@@ -1,12 +1,5 @@
 import { type CSSProperties } from "react";
-import {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import classnames from "classnames";
 import styles from "./TimeInput.module.scss";
 import { PartialInput } from "../Input/PartialInput";
@@ -29,13 +22,14 @@ import {
   safeMin,
   type AmPmType,
 } from "./utils";
+import { Part } from "../Part/Part";
 
 // Component part names
-const PART_HOUR = "hour";
+/* const PART_HOUR = "hour";
 const PART_MINUTE = "minute";
 const PART_SECOND = "second";
 const PART_AMPM = "ampm";
-const PART_CLEAR_BUTTON = "clearButton";
+const PART_CLEAR_BUTTON = "clearButton"; */
 
 // Browser compatibility checks
 // Time format configuration flags
@@ -749,16 +743,17 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
         </div>
 
         {clearable && (
-          <button
-            data-part-id={PART_CLEAR_BUTTON}
-            className={classnames(styles.clearButton, styles.button)}
-            disabled={!enabled}
-            onClick={clear}
-            onFocus={stopPropagation}
-            type="button"
-          >
-            {clearIconElement}
-          </button>
+          <Part partId="clearButton">
+            <button
+              className={classnames(styles.clearButton, styles.button)}
+              disabled={!enabled}
+              onClick={clear}
+              onFocus={stopPropagation}
+              type="button"
+            >
+              {clearIconElement}
+            </button>
+          </Part>
         )}
       </div>
       {endAdornment}
@@ -834,21 +829,22 @@ function AmPmButton({
   );
 
   return (
-    <button
-      type="button"
-      data-part-id={PART_AMPM}
-      aria-label={ariaLabel || "Toggle AM/PM (Press A for AM, P for PM)"}
-      autoFocus={autoFocus}
-      className={classnames(styles.amPmButton, styles.button, className)}
-      disabled={isDisabled}
-      onClick={onClick}
-      onKeyDown={handleKeyDown}
-      ref={buttonRef as React.RefObject<HTMLButtonElement>}
-    >
-      <span className={styles.amPmValue}>
-        {value ? (value === "am" ? amLabel : pmLabel) : "--"}
-      </span>
-    </button>
+    <Part partId="ampm">
+      <button
+        type="button"
+        aria-label={ariaLabel || "Toggle AM/PM (Press A for AM, P for PM)"}
+        autoFocus={autoFocus}
+        className={classnames(styles.amPmButton, styles.button, className)}
+        disabled={isDisabled}
+        onClick={onClick}
+        onKeyDown={handleKeyDown}
+        ref={buttonRef as React.RefObject<HTMLButtonElement>}
+      >
+        <span className={styles.amPmValue}>
+          {value ? (value === "am" ? amLabel : pmLabel) : "--"}
+        </span>
+      </button>
+    </Part>
   );
 }
 
@@ -946,37 +942,38 @@ function HourInput({
   const displayValue = value || "";
 
   return (
-    <PartialInput
-      id={id}
-      data-part-id={PART_HOUR}
-      value={displayValue}
-      emptyCharacter={emptyCharacter}
-      placeholderLength={2}
-      max={maxHour}
-      min={minHour}
-      maxLength={2}
-      validateFn={(val) => isHourInvalid(val, is24Hour)}
-      onChange={otherProps.onChange}
-      onBlur={(direction, event) => {
-        // PartialInput provides direction, but the current onBlur expects just the event
-        if (otherProps.onBlur) {
-          otherProps.onBlur(event);
-        }
-      }}
-      onKeyDown={otherProps.onKeyDown}
-      className={classnames(styles.input, styles.hour)}
-      invalidClassName={styles.invalid}
-      disabled={otherProps.disabled}
-      readOnly={otherProps.readOnly}
-      required={otherProps.required}
-      autoFocus={otherProps.autoFocus}
-      inputRef={otherProps.inputRef}
-      nextInputRef={otherProps.nextInputRef}
-      nextButtonRef={otherProps.nextButtonRef}
-      name={is24Hour ? "hour24" : "hour12"}
-      ariaLabel={otherProps.ariaLabel}
-      isInvalid={isInvalid}
-    />
+    <Part partId="hour">
+      <PartialInput
+        id={id}
+        value={displayValue}
+        emptyCharacter={emptyCharacter}
+        placeholderLength={2}
+        max={maxHour}
+        min={minHour}
+        maxLength={2}
+        validateFn={(val) => isHourInvalid(val, is24Hour)}
+        onChange={otherProps.onChange}
+        onBlur={(direction, event) => {
+          // PartialInput provides direction, but the current onBlur expects just the event
+          if (otherProps.onBlur) {
+            otherProps.onBlur(event);
+          }
+        }}
+        onKeyDown={otherProps.onKeyDown}
+        className={classnames(styles.input, styles.hour)}
+        invalidClassName={styles.invalid}
+        disabled={otherProps.disabled}
+        readOnly={otherProps.readOnly}
+        required={otherProps.required}
+        autoFocus={otherProps.autoFocus}
+        inputRef={otherProps.inputRef}
+        nextInputRef={otherProps.nextInputRef}
+        nextButtonRef={otherProps.nextButtonRef}
+        name={is24Hour ? "hour24" : "hour12"}
+        ariaLabel={otherProps.ariaLabel}
+        isInvalid={isInvalid}
+      />
+    </Part>
   );
 }
 
@@ -1009,36 +1006,37 @@ function MinuteInput({
   const minMinute = safeMax(0, minTime && isSameHour(minTime) && getMinutes(minTime));
 
   return (
-    <PartialInput
-      data-part-id={PART_MINUTE}
-      max={maxMinute}
-      min={minMinute}
-      name="minute"
-      value={value}
-      validateFn={isMinuteOrSecondInvalid}
-      emptyCharacter={emptyCharacter}
-      placeholderLength={2}
-      maxLength={2}
-      onChange={otherProps.onChange}
-      onBlur={(direction, event) => {
-        // PartialInput provides direction, but the current onBlur expects just the event
-        if (otherProps.onBlur) {
-          otherProps.onBlur(event);
-        }
-      }}
-      onKeyDown={otherProps.onKeyDown}
-      className={classnames(styles.input, styles.minute)}
-      invalidClassName={styles.invalid}
-      disabled={otherProps.disabled}
-      readOnly={otherProps.readOnly}
-      required={otherProps.required}
-      autoFocus={otherProps.autoFocus}
-      inputRef={otherProps.inputRef}
-      nextInputRef={otherProps.nextInputRef}
-      nextButtonRef={otherProps.nextButtonRef}
-      ariaLabel={otherProps.ariaLabel}
-      isInvalid={isInvalid}
-    />
+    <Part partId="minute">
+      <PartialInput
+        max={maxMinute}
+        min={minMinute}
+        name="minute"
+        value={value}
+        validateFn={isMinuteOrSecondInvalid}
+        emptyCharacter={emptyCharacter}
+        placeholderLength={2}
+        maxLength={2}
+        onChange={otherProps.onChange}
+        onBlur={(direction, event) => {
+          // PartialInput provides direction, but the current onBlur expects just the event
+          if (otherProps.onBlur) {
+            otherProps.onBlur(event);
+          }
+        }}
+        onKeyDown={otherProps.onKeyDown}
+        className={classnames(styles.input, styles.minute)}
+        invalidClassName={styles.invalid}
+        disabled={otherProps.disabled}
+        readOnly={otherProps.readOnly}
+        required={otherProps.required}
+        autoFocus={otherProps.autoFocus}
+        inputRef={otherProps.inputRef}
+        nextInputRef={otherProps.nextInputRef}
+        nextButtonRef={otherProps.nextButtonRef}
+        ariaLabel={otherProps.ariaLabel}
+        isInvalid={isInvalid}
+      />
+    </Part>
   );
 }
 
@@ -1073,36 +1071,37 @@ function SecondInput({
   const minSecond = safeMax(0, minTime && isSameMinute(minTime) && getSeconds(minTime));
 
   return (
-    <PartialInput
-      data-part-id={PART_SECOND}
-      max={maxSecond}
-      min={minSecond}
-      name="second"
-      value={value}
-      validateFn={isMinuteOrSecondInvalid}
-      emptyCharacter={emptyCharacter}
-      placeholderLength={2}
-      maxLength={2}
-      onChange={otherProps.onChange}
-      onBlur={(direction, event) => {
-        // PartialInput provides direction, but the current onBlur expects just the event
-        if (otherProps.onBlur) {
-          otherProps.onBlur(event);
-        }
-      }}
-      onKeyDown={otherProps.onKeyDown}
-      className={classnames(styles.input, styles.second)}
-      invalidClassName={styles.invalid}
-      disabled={otherProps.disabled}
-      readOnly={otherProps.readOnly}
-      required={otherProps.required}
-      autoFocus={otherProps.autoFocus}
-      inputRef={otherProps.inputRef}
-      nextInputRef={otherProps.nextInputRef}
-      nextButtonRef={otherProps.nextButtonRef}
-      ariaLabel={otherProps.ariaLabel}
-      isInvalid={isInvalid}
-    />
+    <Part partId="second">
+      <PartialInput
+        max={maxSecond}
+        min={minSecond}
+        name="second"
+        value={value}
+        validateFn={isMinuteOrSecondInvalid}
+        emptyCharacter={emptyCharacter}
+        placeholderLength={2}
+        maxLength={2}
+        onChange={otherProps.onChange}
+        onBlur={(direction, event) => {
+          // PartialInput provides direction, but the current onBlur expects just the event
+          if (otherProps.onBlur) {
+            otherProps.onBlur(event);
+          }
+        }}
+        onKeyDown={otherProps.onKeyDown}
+        className={classnames(styles.input, styles.second)}
+        invalidClassName={styles.invalid}
+        disabled={otherProps.disabled}
+        readOnly={otherProps.readOnly}
+        required={otherProps.required}
+        autoFocus={otherProps.autoFocus}
+        inputRef={otherProps.inputRef}
+        nextInputRef={otherProps.nextInputRef}
+        nextButtonRef={otherProps.nextButtonRef}
+        ariaLabel={otherProps.ariaLabel}
+        isInvalid={isInvalid}
+      />
+    </Part>
   );
 }
 

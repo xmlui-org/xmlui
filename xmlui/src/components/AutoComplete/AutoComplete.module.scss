@@ -87,16 +87,16 @@ $outlineWidth-AutoComplete--focus: createThemeVar("Input:outlineWidth-#{$compone
 $outlineColor-AutoComplete--focus: createThemeVar("Input:outlineColor-#{$component}--focus");
 $outlineStyle-AutoComplete--focus: createThemeVar("Input:outlineStyle-#{$component}--focus");
 $outlineOffset-AutoComplete--focus: createThemeVar("Input:outlineOffset-#{$component}--focus");
-$paddingVertical-AutoComplete-badge: createThemeVar("paddingVertical-#{$component}-badge");
-$paddingHorizontal-AutoComplete-badge: createThemeVar("paddingHorizontal-#{$component}-badge");
-$borderRadius-AutoComplete-badge: createThemeVar("borderRadius-#{$component}-badge");
-$fontSize-AutoComplete-badge: createThemeVar("Input:fontSize-#{$component}-badge");
-$backgroundColor-AutoComplete-badge: createThemeVar("Input:backgroundColor-#{$component}-badge");
-$textColor-AutoComplete-badge: createThemeVar("Input:textColor-#{$component}-badge");
-$backgroundColor-AutoComplete-badge--hover: createThemeVar("Input:backgroundColor-#{$component}-badge--hover");
-$textColor-AutoComplete-badge--hover: createThemeVar("Input:textColor-#{$component}-badge--hover");
-$backgroundColor-AutoComplete-badge--active: createThemeVar("Input:backgroundColor-#{$component}-badge--active");
-$textColor-AutoComplete-badge--active: createThemeVar("Input:textColor-#{$component}-badge--active");
+$paddingVertical-badge-AutoComplete: createThemeVar("paddingVertical-badge-#{$component}");
+$paddingHorizontal-badge-AutoComplete: createThemeVar("paddingHorizontal-badge-#{$component}");
+$borderRadius-badge-AutoComplete: createThemeVar("borderRadius-badge-#{$component}");
+$fontSize-badge-AutoComplete: createThemeVar("Input:fontSize-#{$component}-badge");
+$backgroundColor-badge-AutoComplete: createThemeVar("Input:backgroundColor-#{$component}-badge");
+$textColor-badge-AutoComplete: createThemeVar("Input:textColor-#{$component}-badge");
+$backgroundColor-badge-AutoComplete--hover: createThemeVar("Input:backgroundColor-#{$component}-badge--hover");
+$textColor-badge-AutoComplete--hover: createThemeVar("Input:textColor-#{$component}-badge--hover");
+$backgroundColor-badge-AutoComplete--active: createThemeVar("Input:backgroundColor-#{$component}-badge--active");
+$textColor-badge-AutoComplete--active: createThemeVar("Input:textColor-#{$component}-badge--active");
 $textColor-placeholder-AutoComplete: createThemeVar("Input:textColor-placeholder-#{$component}");
 $borderRadius-menu-AutoComplete: createThemeVar("Input:borderRadius-menu-#{$component}");
 $borderWidth-menu-AutoComplete: createThemeVar("Input:borderWidth-menu-#{$component}");
@@ -199,8 +199,8 @@ $textColor-item-AutoComplete--disabled: createThemeVar("textColor-item-#{$compon
     width: fit-content;
     height: fit-content;
     min-width: 0;
-    padding: $paddingVertical-AutoComplete-badge $paddingHorizontal-AutoComplete-badge;
-    border-radius: $borderRadius-AutoComplete-badge;
+    padding: $paddingVertical-badge-AutoComplete $paddingHorizontal-badge-AutoComplete;
+    border-radius: $borderRadius-badge-AutoComplete;
     transition:
       color 0.2s,
       background-color 0.2s;
@@ -210,18 +210,18 @@ $textColor-item-AutoComplete--disabled: createThemeVar("textColor-item-#{$compon
     gap: t.$space-1;
     justify-content: center;
     align-items: center;
-    font-size: $fontSize-AutoComplete-badge;
-    background-color: $backgroundColor-AutoComplete-badge;
-    color: $textColor-AutoComplete-badge;
+    font-size: $fontSize-badge-AutoComplete;
+    background-color: $backgroundColor-badge-AutoComplete;
+    color: $textColor-badge-AutoComplete;
 
     &:hover {
-      background-color: $backgroundColor-AutoComplete-badge--hover;
-      color: $textColor-AutoComplete-badge--hover;
+      background-color: $backgroundColor-badge-AutoComplete--hover;
+      color: $textColor-badge-AutoComplete--hover;
     }
 
     &:active {
-      background-color: $backgroundColor-AutoComplete-badge--active;
-      color: $textColor-AutoComplete-badge--active;
+      background-color: $backgroundColor-badge-AutoComplete--active;
+      color: $textColor-badge-AutoComplete--active;
     }
   }
 
