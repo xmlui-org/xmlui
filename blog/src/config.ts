@@ -15,6 +15,7 @@ import html from "@shikijs/langs/html";
 
 import { xmluiGrammar, xmluiThemeLight, xmluiThemeDark } from "xmlui/syntax/textmate";
 
+import BlogTheme from "./themes/blog-theme";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkStringify from "remark-stringify";
@@ -280,6 +281,7 @@ const groupedNavPanelContent = buildTreeFromPathsAndMeta(navPanelContent, metaJs
 const App: StandaloneAppDescription = {
   name: "XMLUI Blog",
   defaultTheme: "blog-theme",
+  themes: [BlogTheme],
   resources: {
     logo: "/resources/logo.svg",
     "logo-dark": "/resources/logo-dark.svg",
