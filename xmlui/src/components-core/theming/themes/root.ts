@@ -262,6 +262,9 @@ export const RootThemeDefinition: ThemeDefinition = {
     // --- The default maximum content width
     "maxWidth-content": "1280px",
 
+    // --- The default maximum content column width
+    "maxWidth-columnContent": "800px",
+
     // --- Background colors
     backgroundColor: "$color-surface-subtle",
     "backgroundColor-overlay": "rgba(0, 0, 0, 0.2)",

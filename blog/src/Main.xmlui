@@ -1,6 +1,5 @@
 <App
     layout="vertical-full-header"
-    noScrollbarGutters
     var.posts=`{[
       {
         title: "An XMLUI-powered blog",
@@ -26,17 +25,55 @@
         date: "2025-07-18",
         image: "xmlui-demo-gallery.png"
       }
-    ]}`>
+    ]}`
+>
     <AppHeader>
         <property name="logoTemplate">
-            <Link to="/">
-                <Logo height="$space-8"/>
+            <Link to="/" height="100%">
+                <Logo height="$space-8" />
             </Link>
         </property>
+        <Theme>
+            <Fragment when="{mediaSize.sizeIndex > 2}">
+                <NavLink
+                    noIndicator
+                    label="Demo"
+                    to="https://demo.xmlui.org"
+                />
+                <NavLink
+                    noIndicator
+                    label="Docs"
+                    to="https://docs.xmlui.org"
+                />
+                <NavLink
+                    noIndicator
+                    label="Blog"
+                    to="https://blog.xmlui.org"
+                    active
+                />
+            </Fragment>
+        </Theme>
         <property name="profileMenuTemplate">
-            <Text variant="em">Tutorials, tips, best practices</Text>
+            <Fragment
+                when="{mediaSize.sizeIndex > 2}"
+                var.showSearch="{false}"
+            >
+                <Search when="{showSearch}" data="{{}}" />
+                <Button
+                    when="{!showSearch}"
+                    icon="search"
+                    variant="ghost"
+                    onClick="{() => showSearch = !showSearch}"
+                />
+            </Fragment>
+            <Button
+                variant="solid"
+                label="Download"
+                onClick="{() => Actions.navigate('/get-started')}"
+            />
         </property>
     </AppHeader>
+
     <!--
     <NavPanel>
        <NavGroup label="Recent posts" to="/blog" initiallyExpanded>
@@ -70,10 +107,37 @@
             <BlogPage post="{posts[2]}" />
         </Page>
     </Pages>
-    <Footer>
-        <HStack width="100%">
-            <Text>This site is an XMLUI™ app.</Text>
-            <SpaceFiller />
+    <Footer sticky="false">
+        <Text fontWeight="400">
+            This site is an
+            <Text variant="strong">
+                XMLUI™
+            </Text>
+            app.
+        </Text>
+        <SpaceFiller />
+        <HStack verticalAlignment="center">
+            <Fragment when="{mediaSize.sizeIndex > 2}">
+                <LinkButton
+                    to="https://blog.xmlui.org"
+                    label="News & Reviews"
+                    blank="true"
+                />
+                <LinkButton
+                    to="https://docs.xmlui.org/change-log"
+                    label="Changelog"
+                    blank="true"
+                />
+                <Separator />
+                <LinkButton to="" icon="rss" label="RSS" blank="true" />
+                <LinkButton
+                    to="https://github.com/xmlui-org/xmlui"
+                    icon="github"
+                    label="GitHub"
+                    blank="true"
+                />
+                <Separator />
+            </Fragment>
             <ToneSwitch />
         </HStack>
     </Footer>

@@ -1,6 +1,7 @@
 <App
-        layout="vertical-full-header"
-        noScrollbarGutters="false">
+    layout="vertical-full-header"
+    noScrollbarGutters="false"
+>
     <AppHeader>
         <property name="logoTemplate">
             <Link to="https://xmlui.org/">
@@ -8,16 +9,22 @@
             </Link>
         </property>
         <Fragment when="{mediaSize.sizeIndex > 2}">
-            <NavLink label="Demo" to="https://demo.xmlui.org" />
-            <NavLink label="Docs" to="/" />
-            <NavLink label="Blog" to="https://blog.xmlui.org" />
+            <NavLink noIndicator label="Demo" to="https://demo.xmlui.org" />
+            <NavLink noIndicator label="Docs" to="/" />
+            <NavLink noIndicator label="Blog" to="https://blog.xmlui.org" />
         </Fragment>
         <SpaceFiller />
         <Fragment when="{mediaSize.sizeIndex > 1}" var.showSearch="{false}">
-            <Search when="{showSearch}"
-                    data="{appGlobals.plainTextContent}"
+            <Search
+                when="{showSearch}"
+                data="{appGlobals.plainTextContent}"
             />
-            <Button when="{!showSearch}" icon="search" variant="ghost" onClick="{() => showSearch = !showSearch}"/>
+            <Button
+                when="{!showSearch}"
+                icon="search"
+                variant="ghost"
+                onClick="{() => showSearch = !showSearch}"
+            />
         </Fragment>
         <Link to="https://www.xmlui.org/get-started">
             <Button variant="solid" onClick="emitEvent('click')">
@@ -26,11 +33,13 @@
         </Link>
     </AppHeader>
     <NavPanel
-            when="{!window.location.hash.includes('/404') || mediaSize.sizeIndex <= 2}">
+        when="{!window.location.hash.includes('/404') || mediaSize.sizeIndex <= 2}"
+    >
         <Stack
-                paddingHorizontal="$space-4"
-                paddingBottom="$space-4"
-                when="{mediaSize.sizeIndex <= 2}">
+            paddingHorizontal="$space-4"
+            paddingBottom="$space-4"
+            when="{mediaSize.sizeIndex <= 2}"
+        >
             <Search data="{appGlobals.plainTextContent}" />
         </Stack>
 
@@ -47,7 +56,11 @@
             </Stack>
             <ContentSeparator />
         </Fragment>
-        <Stack padding="0" paddingTop="{mediaSize.sizeIndex <= 2 ? '$space-4' : '0'}" gap="0">
+        <Stack
+            padding="0"
+            paddingTop="{mediaSize.sizeIndex <= 2 ? '$space-4' : '0'}"
+            gap="0"
+        >
             <NavGroup initiallyExpanded="{true}" label="Learn XMLUI">
                 <NavLink label="Introduction" to="/" />
                 <NavLink label="Reactive Data" to="/reactive-intro" />
@@ -77,107 +90,138 @@
             <NavLink label="Layout" to="/layout" />
             <NavLink label="Working with Text" to="/working-with-text" />
             <NavLink
-                    label="Working with Markdown"
-                    to="/working-with-markdown" />
+                label="Working with Markdown"
+                to="/working-with-markdown"
+            />
             <NavLink label="Routing and Links" to="/routing-and-links" />
             <NavLink label="Forms" to="/forms" />
             <NavLink label="Modal Dialogs" to="/modal-dialogs" />
             <NavLink
-                    label="User-defined Components"
-                    to="/user-defined-components" />
+                label="User-defined Components"
+                to="/user-defined-components"
+            />
             <NavLink
-                    label="Refactoring"
-                    to="/refactoring" />
+                label="Refactoring"
+                to="/refactoring"
+            />
             <NavLink
-                    label="Build a HelloWorld Component"
-                    to="/build-hello-world-component" />
+                label="Build a HelloWorld Component"
+                to="/build-hello-world-component"
+            />
             <NavLink label="Hosted Deployment" to="/hosted-deployment" />
         </NavGroup>
         <NavGroup label="How To">
             <NavLink
-                    label="Expose a method from a component"
-                    to="/howto/expose-a-method-from-a-component" />
+                label="Expose a method from a component"
+                to="/howto/expose-a-method-from-a-component"
+            />
             <NavLink
-                    label="Delegate a method"
-                    to="/howto/delegate-a-method" />
+                label="Delegate a method"
+                to="/howto/delegate-a-method"
+            />
             <NavLink
-                    label="React to button click not keystrokes"
-                    to="/howto/react-to-button-click-not-keystrokes" />
+                label="React to button click not keystrokes"
+                to="/howto/react-to-button-click-not-keystrokes"
+            />
             <NavLink
-                    label="Modify a value reported in a Column"
-                    to="/howto/modify-a-value-reported-in-a-column" />
+                label="Modify a value reported in a Column"
+                to="/howto/modify-a-value-reported-in-a-column"
+            />
             <NavLink
-                    label="Filter and transform data from an API"
-                    to="/howto/filter-and-transform-data-from-an-api" />
+                label="Filter and transform data from an API"
+                to="/howto/filter-and-transform-data-from-an-api"
+            />
             <NavLink
-                    label="Group items in List by a property"
-                    to="/howto/group-items-in-list-by-a-property" />
+                label="Group items in List by a property"
+                to="/howto/group-items-in-list-by-a-property"
+            />
             <NavLink
-                    label="Delay a DataSource until another DataSource is ready"
-                    to="/howto/delay-a-datasource-until-another-datasource-is-ready" />
+                label="Delay a DataSource until another DataSource is ready"
+                to="/howto/delay-a-datasource-until-another-datasource-is-ready"
+            />
             <NavLink
-                    label="Hide an element until its DataSource is ready"
-                    to="/howto/hide-an-element-until-its-datasource-is-ready" />
+                label="Hide an element until its DataSource is ready"
+                to="/howto/hide-an-element-until-its-datasource-is-ready"
+            />
             <NavLink
-                    label="Use built-in form validation"
-                    to="/howto/use-built-in-form-validation" />
+                label="Use built-in form validation"
+                to="/howto/use-built-in-form-validation"
+            />
             <NavLink
-                    label="Do custom form validation"
-                    to="/howto/do-custom-form-validation" />
+                label="Do custom form validation"
+                to="/howto/do-custom-form-validation"
+            />
             <NavLink
-                    label="Assign a complex JSON literal to a component variable"
-                    to="/howto/assign-a-complex-json-literal-to-a-component-variable" />
+                label="Assign a complex JSON literal to a component variable"
+                to="/howto/assign-a-complex-json-literal-to-a-component-variable"
+            />
             <NavLink
-                    label="Make a set of equal-width cards"
-                    to="/howto/make-a-set-of-equal-width-cards" />
+                label="Make a set of equal-width cards"
+                to="/howto/make-a-set-of-equal-width-cards"
+            />
             <NavLink
-                    label="Set the initial value of a Select from fetched data"
-                    to="/howto/set-the-initial-value-of-a-select-from-fetched-data" />
+                label="Set the initial value of a Select from fetched data"
+                to="/howto/set-the-initial-value-of-a-select-from-fetched-data"
+            />
             <NavLink
-                    label="Pass data to a Modal Dialog"
-                    to="/howto/pass-data-to-a-modal-dialog" />
+                label="Pass data to a Modal Dialog"
+                to="/howto/pass-data-to-a-modal-dialog"
+            />
             <NavLink
-                    label="Debug a component"
-                    to="/howto/debug-a-component" />
+                label="Debug a component"
+                to="/howto/debug-a-component"
+            />
             <NavLink
-                    label="Share a ModalDialog across components"
-                    to="/howto/share-a-modaldialog-across-components" />
+                label="Share a ModalDialog across components"
+                to="/howto/share-a-modaldialog-across-components"
+            />
             <NavLink
-                    label="Use the same ModalDialog to add or edit"
-                    to="/howto/use-the-same-modaldialog-to-add-or-edit" />
+                label="Use the same ModalDialog to add or edit"
+                to="/howto/use-the-same-modaldialog-to-add-or-edit"
+            />
             <NavLink label="Paginate a List" to="/howto/paginate-a-list" />
             <NavLink
-                    label="Chain a DataSource refetch from an APICall.execute"
-                    to="/howto/chain-a-refetch" />
+                label="Chain a DataSource refetch from an APICall.execute"
+                to="/howto/chain-a-refetch"
+            />
             <NavLink
-                    label="Control cache invalidation"
-                    to="/howto/control-cache-invalidation" />
+                label="Control cache invalidation"
+                to="/howto/control-cache-invalidation"
+            />
             <NavLink
-                    label="Handle background operations"
-                    to="/howto/handle-background-operations" />
+                label="Handle background operations"
+                to="/howto/handle-background-operations"
+            />
             <!--
                 <NavLink label="Update UI optimistically" to="/howto/update-ui-optimistically" />
                 -->
             <NavLink
-                    label="Make a table responsive"
-                    to="/howto/make-a-table-responsive" />
+                label="Make a table responsive"
+                to="/howto/make-a-table-responsive"
+            />
             <NavLink
-                    label="Update UI optimistically"
-                    to="/howto/update-ui-optimistically" />
+                label="Update UI optimistically"
+                to="/howto/update-ui-optimistically"
+            />
             <NavLink
-                    label="Sync selections between table and list views"
-                    to="/howto/sync-selections-between-table-and-list-views" />
+                label="Sync selections between table and list views"
+                to="/howto/sync-selections-between-table-and-list-views"
+            />
             <NavLink
-                    label="Make NavPanel width responsive"
-                    to="/howto/make-navpanel-width-responsive" />
+                label="Make NavPanel width responsive"
+                to="/howto/make-navpanel-width-responsive"
+            />
             <NavLink
-                    label="Debounce user input for API calls"
-                    to="/howto/debounce-user-input-for-api-calls" />
+                label="Debounce user input for API calls"
+                to="/howto/debounce-user-input-for-api-calls"
+            />
             <NavLink
-                    label="Debounce with ChangeListener"
-                    to="/howto/debounce-with-changelistener" />
+                label="Debounce with ChangeListener"
+                to="/howto/debounce-with-changelistener"
+            />
             <!-- Add more links as additional files are created -->
-        </NavGroup>
+        </NavGroup
+        >
         <NavGroup label="Reference">
             <NavGroup label="Components">
                 <!-- GENERATED CONTENT/Component references links -->
@@ -202,7 +246,10 @@
                 <NavLink label="Checkbox" to="/components/Checkbox" />
                 <NavLink label="ColorPicker" to="/components/ColorPicker" />
                 <NavLink label="Column" to="/components/Column" />
-                <NavLink label="ContentSeparator" to="/components/ContentSeparator" />
+                <NavLink
+                    label="ContentSeparator"
+                    to="/components/ContentSeparator"
+                />
                 <NavLink label="DataSource" to="/components/DataSource" />
                 <NavLink label="DateInput" to="/components/DateInput" />
                 <NavLink label="DatePicker" to="/components/DatePicker" />
@@ -211,7 +258,10 @@
                 <NavLink label="EmojiSelector" to="/components/EmojiSelector" />
                 <NavLink label="ExpandableItem" to="/components/ExpandableItem" />
                 <NavLink label="FileInput" to="/components/FileInput" />
-                <NavLink label="FileUploadDropZone" to="/components/FileUploadDropZone" />
+                <NavLink
+                    label="FileUploadDropZone"
+                    to="/components/FileUploadDropZone"
+                />
                 <NavLink label="FlowLayout" to="/components/FlowLayout" />
                 <NavLink label="Footer" to="/components/Footer" />
                 <NavLink label="Form" to="/components/Form" />
@@ -256,7 +306,10 @@
                 <NavLink label="ProgressBar" to="/components/ProgressBar" />
                 <NavLink label="Queue" to="/components/Queue" />
                 <NavLink label="RadioGroup" to="/components/RadioGroup" />
-                <NavLink label="RealTimeAdapter" to="/components/RealTimeAdapter" />
+                <NavLink
+                    label="RealTimeAdapter"
+                    to="/components/RealTimeAdapter"
+                />
                 <NavLink label="Redirect" to="/components/Redirect" />
                 <NavLink label="Select" to="/components/Select" />
                 <NavLink label="Slider" to="/components/Slider" />
@@ -270,7 +323,10 @@
                 <NavLink label="Switch" to="/components/Switch" />
                 <NavLink label="TabItem" to="/components/TabItem" />
                 <NavLink label="Table" to="/components/Table" />
-                <NavLink label="TableOfContents" to="/components/TableOfContents" />
+                <NavLink
+                    label="TableOfContents"
+                    to="/components/TableOfContents"
+                />
                 <NavLink label="Tabs" to="/components/Tabs" />
                 <NavLink label="Text" to="/components/Text" />
                 <NavLink label="TextArea" to="/components/TextArea" />
@@ -278,54 +334,100 @@
                 <NavLink label="Theme" to="/components/Theme" />
                 <NavLink label="TimeInput" to="/components/TimeInput" />
                 <NavLink label="Timer" to="/components/Timer" />
-                <NavLink label="ToneChangerButton" to="/components/ToneChangerButton" />
+                <NavLink
+                    label="ToneChangerButton"
+                    to="/components/ToneChangerButton"
+                />
                 <NavLink label="ToneSwitch" to="/components/ToneSwitch" />
                 <NavLink label="Tooltip" to="/components/Tooltip" />
                 <NavLink label="Tree" to="/components/Tree" />
                 <NavLink label="VSplitter" to="/components/VSplitter" />
                 <NavLink label="VStack" to="/components/VStack" />
                 <!-- END GENERATED CONTENT/Component references links -->
-            </NavGroup>
+            </NavGroup
+            >
             <NavGroup label="Extensions">
                 <!-- GENERATED CONTENT/Extension references links -->
                 <NavGroup label="Xmlui Animations">
-                <NavLink label="Extension Overview" to="/extensions/xmlui-animations/_overview" />
-                <NavLink label="Animation" to="/extensions/xmlui-animations/Animation" />
-                <NavLink label="FadeAnimation" to="/extensions/xmlui-animations/FadeAnimation" />
-                <NavLink label="FadeInAnimation" to="/extensions/xmlui-animations/FadeInAnimation" />
-                <NavLink label="FadeOutAnimation" to="/extensions/xmlui-animations/FadeOutAnimation" />
-                <NavLink label="ScaleAnimation" to="/extensions/xmlui-animations/ScaleAnimation" />
-                <NavLink label="SlideInAnimation" to="/extensions/xmlui-animations/SlideInAnimation" />
+                    <NavLink
+                        label="Extension Overview"
+                        to="/extensions/xmlui-animations/_overview"
+                    />
+                    <NavLink
+                        label="Animation"
+                        to="/extensions/xmlui-animations/Animation"
+                    />
+                    <NavLink
+                        label="FadeAnimation"
+                        to="/extensions/xmlui-animations/FadeAnimation"
+                    />
+                    <NavLink
+                        label="FadeInAnimation"
+                        to="/extensions/xmlui-animations/FadeInAnimation"
+                    />
+                    <NavLink
+                        label="FadeOutAnimation"
+                        to="/extensions/xmlui-animations/FadeOutAnimation"
+                    />
+                    <NavLink
+                        label="ScaleAnimation"
+                        to="/extensions/xmlui-animations/ScaleAnimation"
+                    />
+                    <NavLink
+                        label="SlideInAnimation"
+                        to="/extensions/xmlui-animations/SlideInAnimation"
+                    />
                 </NavGroup>
                 <NavGroup label="Xmlui Website Blocks">
-                <NavLink label="Extension Overview" to="/extensions/xmlui-website-blocks/_overview" />
-                <NavLink label="Carousel" to="/extensions/xmlui-website-blocks/Carousel" />
-                <NavLink label="HelloMd" to="/extensions/xmlui-website-blocks/HelloMd" />
-                <NavLink label="HeroSection" to="/extensions/xmlui-website-blocks/HeroSection" />
-                <NavLink label="ScrollToTop" to="/extensions/xmlui-website-blocks/ScrollToTop" />
+                    <NavLink
+                        label="Extension Overview"
+                        to="/extensions/xmlui-website-blocks/_overview"
+                    />
+                    <NavLink
+                        label="Carousel"
+                        to="/extensions/xmlui-website-blocks/Carousel"
+                    />
+                    <NavLink
+                        label="HelloMd"
+                        to="/extensions/xmlui-website-blocks/HelloMd"
+                    />
+                    <NavLink
+                        label="HeroSection"
+                        to="/extensions/xmlui-website-blocks/HeroSection"
+                    />
+                    <NavLink
+                        label="ScrollToTop"
+                        to="/extensions/xmlui-website-blocks/ScrollToTop"
+                    />
                 </NavGroup>
                 <!-- END GENERATED CONTENT/Extension references links -->
-            </NavGroup>
+            </NavGroup
+            >
             <NavGroup label="Themes">
                 <NavLink
-                        label="Layout Properties"
-                        to="/styles-and-themes/layout-props" />
+                    label="Layout Properties"
+                    to="/styles-and-themes/layout-props"
+                />
                 <NavLink
-                        label="Theme Variables"
-                        to="/styles-and-themes/theme-variables" />
+                    label="Theme Variables"
+                    to="/styles-and-themes/theme-variables"
+                />
                 <NavLink
-                        label="Theme Variable Defaults"
-                        to="/styles-and-themes/theme-variable-defaults" />
+                    label="Theme Variable Defaults"
+                    to="/styles-and-themes/theme-variable-defaults"
+                />
                 <NavLink
-                        label="Common Units"
-                        to="/styles-and-themes/common-units" />
+                    label="Common Units"
+                    to="/styles-and-themes/common-units"
+                />
             </NavGroup>
             <NavLink label="Context Variables" to="/context-variables" />
             <NavLink label="Globals" to="/globals" />
             <NavLink label="Helper Tags" to="/helper-tags" />
             <NavLink
-                    label="Universal Properties"
-                    to="/universal-properties" />
+                label="Universal Properties"
+                to="/universal-properties"
+            />
             <NavLink label="Template Properties" to="/template-properties" />
             <NavLink label="Palettes" to="/palettes" />
             <NavLink label="Icons" to="/icons" />
@@ -443,7 +545,8 @@
         </Page>
         <Page url="/styles-and-themes/theme-variable-defaults">
             <DocumentPageNoTOC
-                    url="/pages/styles-and-themes/theme-variable-defaults.md" />
+                url="/pages/styles-and-themes/theme-variable-defaults.md"
+            />
         </Page>
         <Page url="/styles-and-themes/common-units">
             <DocumentPage url="/pages/styles-and-themes/common-units.md" />
@@ -480,72 +583,90 @@
         </Page>
         <Page url="/howto/expose-a-method-from-a-component">
             <DocumentPageNoTOC
-                    url="/pages/howto/expose-a-method-from-a-component.md" />
+                url="/pages/howto/expose-a-method-from-a-component.md"
+            />
         </Page>
         <Page url="/howto/delegate-a-method">
             <DocumentPageNoTOC url="/pages/howto/delegate-a-method.md" />
         </Page>
         <Page url="/howto/react-to-button-click-not-keystrokes">
             <DocumentPageNoTOC
-                    url="/pages/howto/react-to-button-click-not-keystrokes.md" />
+                url="/pages/howto/react-to-button-click-not-keystrokes.md"
+            />
         </Page>
         <Page url="/howto/modify-a-value-reported-in-a-column">
             <DocumentPageNoTOC
-                    url="/pages/howto/modify-a-value-reported-in-a-column.md" />
+                url="/pages/howto/modify-a-value-reported-in-a-column.md"
+            />
         </Page>
         <Page url="/howto/filter-and-transform-data-from-an-api">
             <DocumentPageNoTOC
-                    url="/pages/howto/filter-and-transform-data-from-an-api.md" />
+                url="/pages/howto/filter-and-transform-data-from-an-api.md"
+            />
         </Page>
         <Page url="/howto/group-items-in-list-by-a-property">
             <DocumentPageNoTOC
-                    url="/pages/howto/group-items-in-list-by-a-property.md" />
+                url="/pages/howto/group-items-in-list-by-a-property.md"
+            />
         </Page>
         <Page
-                url="/howto/delay-a-datasource-until-another-datasource-is-ready">
+            url="/howto/delay-a-datasource-until-another-datasource-is-ready"
+        >
             <DocumentPageNoTOC
-                    url="/pages/howto/delay-a-datasource-until-another-datasource-is-ready.md" />
+                url="/pages/howto/delay-a-datasource-until-another-datasource-is-ready.md"
+            />
         </Page>
         <Page url="/howto/hide-an-element-until-its-datasource-is-ready">
             <DocumentPageNoTOC
-                    url="/pages/howto/hide-an-element-until-its-datasource-is-ready.md" />
+                url="/pages/howto/hide-an-element-until-its-datasource-is-ready.md"
+            />
         </Page>
         <Page url="/howto/use-built-in-form-validation">
             <DocumentPageNoTOC
-                    url="/pages/howto/use-built-in-form-validation.md" />
+                url="/pages/howto/use-built-in-form-validation.md"
+            />
         </Page>
         <Page url="/howto/do-custom-form-validation">
             <DocumentPageNoTOC
-                    url="/pages/howto/do-custom-form-validation.md" />
+                url="/pages/howto/do-custom-form-validation.md"
+            />
         </Page>
         <Page
-                url="/howto/assign-a-complex-json-literal-to-a-component-variable">
+            url="/howto/assign-a-complex-json-literal-to-a-component-variable"
+        >
             <DocumentPageNoTOC
-                    url="/pages/howto/assign-a-complex-json-literal-to-a-component-variable.md" />
+                url="/pages/howto/assign-a-complex-json-literal-to-a-component-variable.md"
+            />
         </Page>
         <Page url="/howto/make-a-set-of-equal-width-cards">
             <DocumentPageNoTOC
-                    url="/pages/howto/make-a-set-of-equal-width-cards.md" />
+                url="/pages/howto/make-a-set-of-equal-width-cards.md"
+            />
         </Page>
         <Page
-                url="/howto/set-the-initial-value-of-a-select-from-fetched-data">
+            url="/howto/set-the-initial-value-of-a-select-from-fetched-data"
+        >
             <DocumentPageNoTOC
-                    url="/pages/howto/set-the-initial-value-of-a-select-from-fetched-data.md" />
+                url="/pages/howto/set-the-initial-value-of-a-select-from-fetched-data.md"
+            />
         </Page>
         <Page url="/howto/pass-data-to-a-modal-dialog">
             <DocumentPageNoTOC
-                    url="/pages/howto/pass-data-to-a-modal-dialog.md" />
+                url="/pages/howto/pass-data-to-a-modal-dialog.md"
+            />
         </Page>
         <Page url="/howto/debug-a-component">
             <DocumentPageNoTOC url="/pages/howto/debug-a-component.md" />
         </Page>
         <Page url="/howto/share-a-modaldialog-across-components">
             <DocumentPageNoTOC
-                    url="/pages/howto/share-a-modaldialog-across-components.md" />
+                url="/pages/howto/share-a-modaldialog-across-components.md"
+            />
         </Page>
         <Page url="/howto/use-the-same-modaldialog-to-add-or-edit">
             <DocumentPageNoTOC
-                    url="/pages/howto/use-the-same-modaldialog-to-add-or-edit.md" />
+                url="/pages/howto/use-the-same-modaldialog-to-add-or-edit.md"
+            />
         </Page>
         <Page url="/howto/paginate-a-list">
             <DocumentPageNoTOC url="/pages/howto/paginate-a-list.md" />
@@ -558,31 +679,38 @@
         </Page>
         <Page url="/howto/handle-background-operations">
             <DocumentPageNoTOC
-                    url="/pages/howto/handle-background-operations.md" />
+                url="/pages/howto/handle-background-operations.md"
+            />
         </Page>
         <Page url="/howto/update-ui-optimistically">
             <DocumentPageNoTOC
-                    url="/pages/howto/update-ui-optimistically.md" />
+                url="/pages/howto/update-ui-optimistically.md"
+            />
         </Page>
         <Page url="/howto/make-a-table-responsive">
             <DocumentPageNoTOC
-                    url="/pages/howto/make-a-table-responsive.md" />
+                url="/pages/howto/make-a-table-responsive.md"
+            />
         </Page>
         <Page url="/howto/sync-selections-between-table-and-list-views">
             <DocumentPageNoTOC
-                    url="/pages/howto/sync-selections-between-table-and-list-views.md" />
+                url="/pages/howto/sync-selections-between-table-and-list-views.md"
+            />
         </Page>
         <Page url="/howto/make-navpanel-width-responsive">
             <DocumentPageNoTOC
-                    url="/pages/howto/make-navpanel-width-responsive.md" />
+                url="/pages/howto/make-navpanel-width-responsive.md"
+            />
         </Page>
         <Page url="/howto/debounce-user-input-for-api-calls">
             <DocumentPageNoTOC
-                    url="/pages/howto/debounce-user-input-for-api-calls.md" />
+                url="/pages/howto/debounce-user-input-for-api-calls.md"
+            />
         </Page>
         <Page url="/howto/debounce-with-changelistener">
             <DocumentPageNoTOC
-                    url="/pages/howto/debounce-with-changelistener.md" />
+                url="/pages/howto/debounce-with-changelistener.md"
+            />
         </Page>
 
         <!-- Add more pages as additional files are created -->
@@ -621,15 +749,38 @@
             <PageNotFound />
         </Page>
     </Pages>
-    <Footer>
-        <CHStack width="*">
-            This site is an XMLUI™ app.
-            <SpaceFiller />
-            <Link
-                    to="https://github.com/xmlui-org/xmlui/tree/main/docs/src"
-                    target="_blank">
-                <Button variant="ghost" icon="github" />
-            </Link>
-        </CHStack>
+    <Footer sticky="false">
+        <Text fontWeight="400">
+            This site is an
+            <Text variant="strong">
+                XMLUI™
+            </Text>
+            app.
+        </Text>
+        <SpaceFiller />
+        <HStack verticalAlignment="center">
+            <Fragment when="{mediaSize.sizeIndex > 2}">
+                <LinkButton
+                    to="https://blog.xmlui.org"
+                    label="News & Reviews"
+                    blank="true"
+                />
+                <LinkButton
+                    to="https://docs.xmlui.org/change-log"
+                    label="Changelog"
+                    blank="true"
+                />
+                <Separator />
+                <LinkButton to="" icon="rss" label="RSS" blank="true" />
+                <LinkButton
+                    to="https://github.com/xmlui-org/xmlui"
+                    icon="github"
+                    label="GitHub"
+                    blank="true"
+                />
+                <Separator />
+            </Fragment>
+            <ToneSwitch />
+        </HStack>
     </Footer>
 </App>

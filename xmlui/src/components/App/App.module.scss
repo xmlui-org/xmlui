@@ -24,14 +24,12 @@ $maxWidth-App: createThemeVar("maxWidth-App");
 
 @layer components {
   @include t.withMaxScreenSize(0) {
-    .wrapper.verticalFullHeader{
-      .navPanelWrapper{
+    .wrapper.verticalFullHeader {
+      .navPanelWrapper {
         display: none;
       }
     }
   }
-
-
 
   .wrapper {
     --footer-height: 0px;
@@ -53,7 +51,7 @@ $maxWidth-App: createThemeVar("maxWidth-App");
         position: relative;
         scrollbar-gutter: stable both-edges;
       }
-      &.noScrollbarGutters{
+      &.noScrollbarGutters {
         .contentWrapper {
           scrollbar-gutter: auto;
         }
@@ -109,7 +107,7 @@ $maxWidth-App: createThemeVar("maxWidth-App");
       }
       .headerWrapper {
         padding-inline: 0;
-        
+
         > div {
           padding-inline: 0;
         }
@@ -244,10 +242,27 @@ $maxWidth-App: createThemeVar("maxWidth-App");
           background-color: $backgroundColor-navPanel-App;
         }
       }
+      
+      // When no footer is sticky (footer sticky=false), don't subtract footer height
+      &.noFooter {
+        .navPanelWrapper {
+          height: calc(var(--containerHeight, 100vh) - var(--header-height));
+        }
+      }
+
       .PagesWrapper {
         overflow: initial;
-        min-height: calc(var(--containerHeight, 100vh) - var(--header-height) - var(--footer-height));
+        min-height: calc(
+          var(--containerHeight, 100vh) - var(--header-height) - var(--footer-height)
+        );
         height: 100%;
+      }
+      
+      // When no footer is sticky (footer sticky=false), don't subtract footer height
+      &.noFooter {
+        .PagesWrapper {
+          min-height: calc(var(--containerHeight, 100vh) - var(--header-height));
+        }
       }
 
       .PagesWrapperInner {
@@ -338,7 +353,7 @@ $maxWidth-App: createThemeVar("maxWidth-App");
 
     &.noScrollbarGutters {
       scrollbar-gutter: auto;
-      .PagesWrapper{
+      .PagesWrapper {
         scrollbar-gutter: auto;
       }
     }
@@ -346,7 +361,6 @@ $maxWidth-App: createThemeVar("maxWidth-App");
 
   .headerWrapper {
     z-index: 1;
-    //position: relative;
     min-height: 0;
     flex-shrink: 0;
     overflow-x: clip;
@@ -390,25 +404,17 @@ $maxWidth-App: createThemeVar("maxWidth-App");
 
   .PagesWrapper {
     flex: 1;
-    //display: flex;
-    //flex-direction: column;
-    //flex: 1;
-    //min-height: 0;
-    //width: 100%;
     isolation: isolate;
-    //height: 100%;
-    //overflow: auto;
   }
 
   .PagesWrapperInner {
     max-width: $maxWidth-content-App;
     width: 100%;
     margin: 0 auto;
-    //flex: 1;
     min-height: 100%;
     display: flex;
     flex-direction: column;
-    &.withDefaultContentPadding{
+    &.withDefaultContentPadding {
       padding-left: t.$space-4;
       padding-right: t.$space-4;
       padding-top: t.$space-5;
@@ -419,12 +425,8 @@ $maxWidth-App: createThemeVar("maxWidth-App");
 
   .footerWrapper {
     flex-shrink: 0;
-    //position: sticky;
-    //bottom:  calc(-1 * var(--footer-height));
-    //margin-bottom: calc(-1 * var(--footer-height));
   }
 }
-
 
 // --- We export the theme variables to add them to the component renderer
 :export {
