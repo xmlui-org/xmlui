@@ -9,9 +9,9 @@
             </Link>
         </property>
         <Fragment when="{mediaSize.sizeIndex > 2}">
-            <NavLink label="Demo" to="https://demo.xmlui.org" />
-            <NavLink label="Docs" to="/" />
-            <NavLink label="Blog" to="https://blog.xmlui.org" />
+            <NavLink noIndicator label="Demo" to="https://demo.xmlui.org" />
+            <NavLink noIndicator label="Docs" to="/" />
+            <NavLink noIndicator label="Blog" to="https://blog.xmlui.org" />
         </Fragment>
         <SpaceFiller />
         <Fragment when="{mediaSize.sizeIndex > 1}" var.showSearch="{false}">
