@@ -549,7 +549,7 @@ test.describe("Basic Functionality", () => {
     );
 
     // Check that pagination controls exist and are rendered
-    await expect(page.locator('[data-component="pagination-controls"]')).toBeVisible();
+    await expect(page.locator('[data-part-id="pagination-controls"]')).toBeVisible();
     
     // Check the structure shows proper positioning (buttons should be rendered before page size selector)
     const nav = page.locator('nav[aria-label="Pagination"]');
@@ -569,7 +569,7 @@ test.describe("Basic Functionality", () => {
     );
 
     // Check that page size selector exists and is rendered
-    await expect(page.locator('[data-component="page-size-selector-container"]')).toBeVisible();
+    await expect(page.locator('[data-part-id="page-size-selector-container"]')).toBeVisible();
     await expect(page.getByText("Items per page")).toBeVisible();
   });
 
@@ -585,7 +585,7 @@ test.describe("Basic Functionality", () => {
     );
 
     // Check that page info exists and is rendered
-    await expect(page.locator('[data-component="page-info"]')).toBeVisible();
+    await expect(page.locator('[data-part-id="page-info"]')).toBeVisible();
     await expect(page.getByText("Page 1 of 5 (50 items)")).toBeVisible();
   });
 
@@ -601,11 +601,11 @@ test.describe("Basic Functionality", () => {
     );
 
     // Button row should be rendered
-    await expect(page.locator('[data-component="pagination-controls"]')).toBeVisible();
+    await expect(page.locator('[data-part-id="pagination-controls"]')).toBeVisible();
     
     // Page info and size selector should not be rendered
-    await expect(page.locator('[data-component="page-info"]')).not.toBeVisible();
-    await expect(page.locator('[data-component="page-size-selector-container"]')).not.toBeVisible();
+    await expect(page.locator('[data-part-id="page-info"]')).not.toBeVisible();
+    await expect(page.locator('[data-part-id="page-size-selector-container"]')).not.toBeVisible();
   });
 
   test("renders multiple components when in different positions", async ({ initTestBed, page }) => {
@@ -621,9 +621,9 @@ test.describe("Basic Functionality", () => {
     );
 
     // All components should be rendered
-    await expect(page.locator('[data-component="pagination-controls"]')).toBeVisible();
-    await expect(page.locator('[data-component="page-size-selector-container"]')).toBeVisible();
-    await expect(page.locator('[data-component="page-info"]')).toBeVisible();
+    await expect(page.locator('[data-part-id="pagination-controls"]')).toBeVisible();
+    await expect(page.locator('[data-part-id="page-size-selector-container"]')).toBeVisible();
+    await expect(page.locator('[data-part-id="page-info"]')).toBeVisible();
   });
 
   test("positions work correctly with vertical orientation", async ({ initTestBed, page }) => {
@@ -643,9 +643,9 @@ test.describe("Basic Functionality", () => {
     await expect(nav).toHaveClass(/paginationVertical/);
     
     // All components should still be positioned correctly
-    await expect(page.locator('[data-component="pagination-controls"]')).toBeVisible();
-    await expect(page.locator('[data-component="page-size-selector-container"]')).toBeVisible();
-    await expect(page.locator('[data-component="page-info"]')).toBeVisible();
+    await expect(page.locator('[data-part-id="pagination-controls"]')).toBeVisible();
+    await expect(page.locator('[data-part-id="page-size-selector-container"]')).toBeVisible();
+    await expect(page.locator('[data-part-id="page-info"]')).toBeVisible();
   });
 
   test("grid layout maintains accessibility", async ({ initTestBed, page }) => {
@@ -689,9 +689,9 @@ test.describe("Grid Layout and Positioning", () => {
 
     // Default: pageSizeSelectorPosition="start", buttonRowPosition="center", pageInfoPosition="end"
     // All components should be visible with default positioning
-    await expect(page.locator('[data-component="page-size-selector-container"]')).toBeVisible();
-    await expect(page.locator('[data-component="pagination-controls"]')).toBeVisible();
-    await expect(page.locator('[data-component="page-info"]')).toBeVisible();
+    await expect(page.locator('[data-part-id="page-size-selector-container"]')).toBeVisible();
+    await expect(page.locator('[data-part-id="pagination-controls"]')).toBeVisible();
+    await expect(page.locator('[data-part-id="page-info"]')).toBeVisible();
   });
 
   test("multiple components can be positioned in same location", async ({ initTestBed, page }) => {
@@ -707,9 +707,9 @@ test.describe("Grid Layout and Positioning", () => {
     );
 
     // Both button row and page size selector should be rendered (both in start position)
-    await expect(page.locator('[data-component="pagination-controls"]')).toBeVisible();
-    await expect(page.locator('[data-component="page-size-selector-container"]')).toBeVisible();
-    await expect(page.locator('[data-component="page-info"]')).toBeVisible();
+    await expect(page.locator('[data-part-id="pagination-controls"]')).toBeVisible();
+    await expect(page.locator('[data-part-id="page-size-selector-container"]')).toBeVisible();
+    await expect(page.locator('[data-part-id="page-info"]')).toBeVisible();
   });
 
   test("handles invalid position values gracefully", async ({ initTestBed, page }) => {
@@ -744,9 +744,9 @@ test.describe("Grid Layout and Positioning", () => {
     );
 
     // Only button row should be rendered
-    await expect(page.locator('[data-component="pagination-controls"]')).toBeVisible();
-    await expect(page.locator('[data-component="page-size-selector-container"]')).not.toBeVisible();
-    await expect(page.locator('[data-component="page-info"]')).not.toBeVisible();
+    await expect(page.locator('[data-part-id="pagination-controls"]')).toBeVisible();
+    await expect(page.locator('[data-part-id="page-size-selector-container"]')).not.toBeVisible();
+    await expect(page.locator('[data-part-id="page-info"]')).not.toBeVisible();
   });
 
   test("grid adapts to content in vertical orientation", async ({ initTestBed, page }) => {
@@ -766,9 +766,9 @@ test.describe("Grid Layout and Positioning", () => {
     await expect(nav).toHaveClass(/paginationVertical/);
     
     // Should have button row and page size selector
-    await expect(page.locator('[data-component="pagination-controls"]')).toBeVisible();
-    await expect(page.locator('[data-component="page-size-selector-container"]')).toBeVisible();
-    await expect(page.locator('[data-component="page-info"]')).not.toBeVisible();
+    await expect(page.locator('[data-part-id="pagination-controls"]')).toBeVisible();
+    await expect(page.locator('[data-part-id="page-size-selector-container"]')).toBeVisible();
+    await expect(page.locator('[data-part-id="page-info"]')).not.toBeVisible();
   });
 
   test("component order reflects positioning", async ({ initTestBed, page }) => {
@@ -784,9 +784,9 @@ test.describe("Grid Layout and Positioning", () => {
     );
 
     // All components should be rendered
-    await expect(page.locator('[data-component="pagination-controls"]')).toBeVisible();
-    await expect(page.locator('[data-component="page-size-selector-container"]')).toBeVisible();
-    await expect(page.locator('[data-component="page-info"]')).toBeVisible();
+    await expect(page.locator('[data-part-id="pagination-controls"]')).toBeVisible();
+    await expect(page.locator('[data-part-id="page-size-selector-container"]')).toBeVisible();
+    await expect(page.locator('[data-part-id="page-info"]')).toBeVisible();
   });
 
   test("position properties work with minimal pagination", async ({ initTestBed, page }) => {

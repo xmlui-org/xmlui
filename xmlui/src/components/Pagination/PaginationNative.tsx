@@ -10,6 +10,7 @@ import { Icon } from "../Icon/IconNative";
 import type { OrientationOptions } from "../abstractions";
 import type { ComponentApi } from "../../components-core/rendering/ContainerWrapper";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
+import { Part } from "../Part/Part";
 
 export const PageNumberValues = [1, 3, 5] as const;
 export type PageNumber = (typeof PageNumberValues)[number];
@@ -281,160 +282,162 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
   const isFirstPage = currentPage === 0;
   const isLastPage = currentPage === totalPages - 1;
   const buttonRow = (
-    <ul
-      data-component={`pagination-controls`}
-      className={classnames(styles.buttonRow, {
-        [styles.paginationListVertical]: orientation === "vertical",
-        // layout is already horizontal by default
-      })}
-    >
-      {/* First page button */}
-      <li>
-        <Button
-          variant="ghost"
-          size="sm"
-          disabled={!enabled || isFirstPage}
-          onClick={() => handlePageChange(0)}
-          contextualLabel="First page"
-          style={{ minHeight: "36px", padding: "8px" }}
-          aria-label="First page"
-        >
-          <Icon
-            name={`first:Pagination`}
-            fallback={orientation === "vertical" ? "doublechevronup" : "doublechevronleft"}
-            size="sm"
-          />
-        </Button>
-      </li>
-
-      {/* Previous page button */}
-      {visiblePages.length <= 2 && (
+    <Part partId="pagination-controls">
+      <ul
+        className={classnames(styles.buttonRow, {
+          [styles.paginationListVertical]: orientation === "vertical",
+          // layout is already horizontal by default
+        })}
+      >
+        {/* First page button */}
         <li>
           <Button
             variant="ghost"
             size="sm"
             disabled={!enabled || isFirstPage}
-            onClick={() => handlePageChange(currentPage - 1)}
-            contextualLabel="Previous page"
+            onClick={() => handlePageChange(0)}
+            contextualLabel="First page"
             style={{ minHeight: "36px", padding: "8px" }}
-            aria-label="Previous page"
+            aria-label="First page"
           >
             <Icon
-              name={`prev:Pagination`}
-              fallback={orientation === "vertical" ? "chevronup" : "chevronleft"}
+              name={`first:Pagination`}
+              fallback={orientation === "vertical" ? "doublechevronup" : "doublechevronleft"}
               size="sm"
             />
           </Button>
         </li>
-      )}
 
-      {/* Page number buttons or text indicator */}
-      {showCurrentPage && visiblePages.length === 1 && (
-        <li>
-          <Text
-            variant="strong"
-            style={{ paddingLeft: "1rem", paddingRight: "1rem" }}
-            aria-current="true"
-          >
-            {visiblePages[0]}
-          </Text>
-        </li>
-      )}
-      {visiblePages.length > 1 &&
-        visiblePages.map((pageNum) => (
-          <li key={`page-${pageNum}`}>
+        {/* Previous page button */}
+        {visiblePages.length <= 2 && (
+          <li>
             <Button
-              variant={pageNum === currentPageNumber ? "solid" : "ghost"}
-              disabled={!enabled}
+              variant="ghost"
               size="sm"
-              onClick={() => handlePageChange(pageNum - 1)}
-              contextualLabel={`Page ${pageNum}`}
-              aria-current={pageNum === currentPageNumber || undefined}
-              aria-label={`Page ${pageNum}${pageNum === currentPageNumber ? " (current)" : ""}`}
+              disabled={!enabled || isFirstPage}
+              onClick={() => handlePageChange(currentPage - 1)}
+              contextualLabel="Previous page"
+              style={{ minHeight: "36px", padding: "8px" }}
+              aria-label="Previous page"
             >
-              {pageNum}
+              <Icon
+                name={`prev:Pagination`}
+                fallback={orientation === "vertical" ? "chevronup" : "chevronleft"}
+                size="sm"
+              />
             </Button>
           </li>
-        ))}
+        )}
 
-      {/* Next page button */}
-      {visiblePages.length <= 2 && (
+        {/* Page number buttons or text indicator */}
+        {showCurrentPage && visiblePages.length === 1 && (
+          <li>
+            <Text
+              variant="strong"
+              style={{ paddingLeft: "1rem", paddingRight: "1rem" }}
+              aria-current="true"
+            >
+              {visiblePages[0]}
+            </Text>
+          </li>
+        )}
+        {visiblePages.length > 1 &&
+          visiblePages.map((pageNum) => (
+            <li key={`page-${pageNum}`}>
+              <Button
+                variant={pageNum === currentPageNumber ? "solid" : "ghost"}
+                disabled={!enabled}
+                size="sm"
+                onClick={() => handlePageChange(pageNum - 1)}
+                contextualLabel={`Page ${pageNum}`}
+                aria-current={pageNum === currentPageNumber || undefined}
+                aria-label={`Page ${pageNum}${pageNum === currentPageNumber ? " (current)" : ""}`}
+              >
+                {pageNum}
+              </Button>
+            </li>
+          ))}
+
+        {/* Next page button */}
+        {visiblePages.length <= 2 && (
+          <li>
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={!enabled || isLastPage}
+              onClick={() => handlePageChange(currentPage + 1)}
+              contextualLabel="Next page"
+              style={{ minHeight: "36px", padding: "8px" }}
+              aria-label="Next page"
+            >
+              <Icon
+                name={`next:Pagination`}
+                fallback={orientation === "vertical" ? "chevrondown" : "chevronright"}
+                size="sm"
+              />
+            </Button>
+          </li>
+        )}
+
+        {/* Last page button */}
         <li>
           <Button
             variant="ghost"
             size="sm"
             disabled={!enabled || isLastPage}
-            onClick={() => handlePageChange(currentPage + 1)}
-            contextualLabel="Next page"
+            onClick={() => handlePageChange(totalPages - 1)}
+            contextualLabel="Last page"
             style={{ minHeight: "36px", padding: "8px" }}
-            aria-label="Next page"
+            aria-label="Last page"
           >
             <Icon
-              name={`next:Pagination`}
-              fallback={orientation === "vertical" ? "chevrondown" : "chevronright"}
+              name={`last:Pagination`}
+              fallback={orientation === "vertical" ? "doublechevrondown" : "doublechevronright"}
               size="sm"
             />
           </Button>
         </li>
-      )}
-
-      {/* Last page button */}
-      <li>
-        <Button
-          variant="ghost"
-          size="sm"
-          disabled={!enabled || isLastPage}
-          onClick={() => handlePageChange(totalPages - 1)}
-          contextualLabel="Last page"
-          style={{ minHeight: "36px", padding: "8px" }}
-          aria-label="Last page"
-        >
-          <Icon
-            name={`last:Pagination`}
-            fallback={orientation === "vertical" ? "doublechevrondown" : "doublechevronright"}
-            size="sm"
-          />
-        </Button>
-      </li>
-    </ul>
+      </ul>
+    </Part>
   );
   const pageSizeSelector = showPageSizeSelector &&
     pageSizeOptions &&
     pageSizeOptions.length > 1 && (
-      <div
-        data-component={`page-size-selector-container`}
-        className={classnames(styles.selectorContainer)}
-      >
-        <ItemWithLabel
-          id={`${id}-page-size-selector`}
-          label={"Items per page"}
-          enabled={enabled}
-          style={style}
-          className={className}
-          labelPosition={orientation === "vertical" ? "top" : "start"}
-        >
-          <select
+      <Part partId="page-size-selector-container">
+        <div className={classnames(styles.selectorContainer)}>
+          <ItemWithLabel
             id={`${id}-page-size-selector`}
-            value={pageSize}
-            onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-            disabled={!enabled}
-            className={styles.pageSizeSelect}
+            label={"Items per page"}
+            enabled={enabled}
+            style={style}
+            className={className}
+            labelPosition={orientation === "vertical" ? "top" : "start"}
           >
-            {pageSizeOptions.map((size) => (
-              <option key={size} value={size}>
-                {size}
-              </option>
-            ))}
-          </select>
-        </ItemWithLabel>
-      </div>
+            <select
+              id={`${id}-page-size-selector`}
+              value={pageSize}
+              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+              disabled={!enabled}
+              className={styles.pageSizeSelect}
+            >
+              {pageSizeOptions.map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
+          </ItemWithLabel>
+        </div>
+      </Part>
     );
   const pageInfo = showPageInfo && (
-    <div data-component={`page-info`} className={classnames(styles.pageInfo)}>
-      <Text variant="secondary">
-        Page {currentPageNumber} of {totalPages} ({itemCount} items)
-      </Text>
-    </div>
+    <Part partId="page-info">
+      <div className={classnames(styles.pageInfo)}>
+        <Text variant="secondary">
+          Page {currentPageNumber} of {totalPages} ({itemCount} items)
+        </Text>
+      </div>
+    </Part>
   );
 
   // Used the following resource to provide a11y:
