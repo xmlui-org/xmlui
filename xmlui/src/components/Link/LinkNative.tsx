@@ -16,6 +16,7 @@ import { createUrlWithQueryParams } from "../component-utils";
 import { Icon } from "../Icon/IconNative";
 import type { To } from "react-router-dom";
 import { Part } from "../Part/Part";
+import { PART_ICON } from "../../components-core/parts";
 
 // =====================================================================================================================
 // React Link component implementation
@@ -79,7 +80,7 @@ export const LinkNative = forwardRef(function LinkNative(
       })}
     >
       {icon && (
-        <Part partId="icon">
+        <Part partId={PART_ICON}>
           <div className={styles.iconWrapper}>
             <Icon name={icon} />
           </div>

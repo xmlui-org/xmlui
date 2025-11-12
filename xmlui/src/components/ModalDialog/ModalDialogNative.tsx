@@ -20,6 +20,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import { Icon } from "../Icon/IconNative";
 import { Button } from "../Button/ButtonNative";
 import { ModalVisibilityContext } from "./ModalVisibilityContext";
+import { Part } from "../Part/Part";
 
 const PART_TITLE = "title";
 const PART_CONTENT = "content";
@@ -213,54 +214,57 @@ export const ModalDialog = React.forwardRef(
     }
 
     const Content = (
-      <Dialog.Content
-        {...rest}
-        data-part-id={PART_CONTENT}
-        className={classnames(
-          {
-            [styles.contentAnimation]: !externalAnimation,
-          },
-          styles.content,
-          className,
-        )}
-        onPointerDownOutside={(event) => {
-          if (
-            event.target instanceof Element &&
-            (event.target.closest("._debug-inspect-button") !== null ||
-              event.target.localName === "com-1password-button")
-          ) {
-            //we prevent the auto modal close on clicking the inspect button
-            event.preventDefault();
-          }
-        }}
-        ref={composedRef}
-        style={{ ...style, gap: undefined }}
-      >
-        {!!title && (
-          <Dialog.Title style={{ marginTop: 0 }}>
-            <header id="dialogTitle" className={styles.dialogTitle} data-part-id={PART_TITLE}>
-              {title}
-            </header>
-          </Dialog.Title>
-        )}
-        <div className={styles.innerContent} style={{ gap: style?.gap }}>
-          <ModalVisibilityContext.Provider value={modalVisibilityContextValue}>
-            {children}
-          </ModalVisibilityContext.Provider>
-        </div>
-        {closeButtonVisible && (
-          <Dialog.Close asChild={true}>
-            <Button
-              variant={"ghost"}
-              themeColor={"secondary"}
-              className={styles.closeButton}
-              aria-label="Close"
-              icon={<Icon name={"close"} size={"sm"} />}
-              orientation={"vertical"}
-            />
-          </Dialog.Close>
-        )}
-      </Dialog.Content>
+      <Part partId={PART_CONTENT}>
+        <Dialog.Content
+          {...rest}
+          className={classnames(
+            {
+              [styles.contentAnimation]: !externalAnimation,
+            },
+            styles.content,
+            className,
+          )}
+          onPointerDownOutside={(event) => {
+            if (
+              event.target instanceof Element &&
+              (event.target.closest("._debug-inspect-button") !== null ||
+                event.target.localName === "com-1password-button")
+            ) {
+              //we prevent the auto modal close on clicking the inspect button
+              event.preventDefault();
+            }
+          }}
+          ref={composedRef}
+          style={{ ...style, gap: undefined }}
+        >
+          {!!title && (
+            <Part partId={PART_TITLE}>
+              <Dialog.Title style={{ marginTop: 0 }}>
+                <header id="dialogTitle" className={styles.dialogTitle}>
+                  {title}
+                </header>
+              </Dialog.Title>
+            </Part>
+          )}
+          <div className={styles.innerContent} style={{ gap: style?.gap }}>
+            <ModalVisibilityContext.Provider value={modalVisibilityContextValue}>
+              {children}
+            </ModalVisibilityContext.Provider>
+          </div>
+          {closeButtonVisible && (
+            <Dialog.Close asChild={true}>
+              <Button
+                variant={"ghost"}
+                themeColor={"secondary"}
+                className={styles.closeButton}
+                aria-label="Close"
+                icon={<Icon name={"close"} size={"sm"} />}
+                orientation={"vertical"}
+              />
+            </Dialog.Close>
+          )}
+        </Dialog.Content>
+      </Part>
     );
 
     return (

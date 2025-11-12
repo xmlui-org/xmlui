@@ -6,6 +6,4 @@ export const PART_END_ADORNMENT = "endAdornment";
 export const PART_TRACK = "track";
 export const PART_RANGE = "range";
 export const PART_THUMB = "thumb";
-
-
-
+export const PART_ICON = "icon";

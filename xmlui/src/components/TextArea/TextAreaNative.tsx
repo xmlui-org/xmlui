@@ -22,6 +22,7 @@ import type { ValidationStatus } from "../abstractions";
 import TextAreaResizable from "./TextAreaResizable";
 import { PART_INPUT } from "../../components-core/parts";
 import { composeRefs } from "@radix-ui/react-compose-refs";
+import { Part } from "../Part/Part";
 
 export const resizeOptionKeys = ["horizontal", "vertical", "both"] as const;
 export type ResizeOptions = (typeof resizeOptionKeys)[number];
@@ -256,37 +257,36 @@ export const TextArea = forwardRef(function TextArea(
 
   if (resize === "both" || resize === "horizontal" || resize === "vertical") {
     return (
-      <TextAreaResizable
-        {...textareaProps}
-        data-part-id={PART_INPUT}
-        style={style as any}
-        className={classnames(classes)}
-        maxRows={maxRows}
-        minRows={minRows}
-        rows={rows}
-      />
+      <Part partId={PART_INPUT}>
+        <TextAreaResizable
+          {...textareaProps}
+          style={style as any}
+          className={classnames(classes)}
+          maxRows={maxRows}
+          minRows={minRows}
+          rows={rows}
+        />
+      </Part>
     );
   }
   if (autoSize || !isNil(maxRows) || !isNil(minRows)) {
     return (
-      <TextareaAutosize
-        {...textareaProps}
-        data-part-id={PART_INPUT}
-        style={style as any}
-        className={classnames(classes)}
-        maxRows={maxRows}
-        minRows={minRows}
-        rows={rows}
-      />
+      <Part partId={PART_INPUT}>
+        <TextareaAutosize
+          {...textareaProps}
+          style={style as any}
+          className={classnames(classes)}
+          maxRows={maxRows}
+          minRows={minRows}
+          rows={rows}
+        />
+      </Part>
     );
   }
 
   return (
-    <textarea
-      {...textareaProps}
-      data-part-id={PART_INPUT}
-      rows={rows}
-      className={classnames(classes)}
-    />
+    <Part partId={PART_INPUT}>
+      <textarea {...textareaProps} rows={rows} className={classnames(classes)} />
+    </Part>
   );
 });

@@ -10,6 +10,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import { Adornment } from "../Input/InputAdornment";
 import type { ValidationStatus } from "../abstractions";
 import { PART_START_ADORNMENT, PART_INPUT, PART_END_ADORNMENT } from "../../components-core/parts";
+import { Part } from "../Part/Part";
 
 /**
  * TextBox component that supports text input with various configurations.
@@ -254,19 +255,26 @@ export const TextBox = forwardRef(function TextBox(
         />
       )}
       {type === "password" && showPasswordToggle ? (
+        <Part partId={PART_END_ADORNMENT}>
         <Adornment
           data-part-id={PART_END_ADORNMENT}
           iconName={showPassword ? passwordVisibleIcon : passwordHiddenIcon}
           className={classnames(styles.adornment, styles.passwordToggle)}
           onClick={togglePasswordVisibility}
         />
+        </Part>
+      {type === "password" && showPasswordToggle ? (
+        <Part partId={PART_END_ADORNMENT}>
+          <Adornment
+            iconName={showPassword ? passwordVisibleIcon : passwordHiddenIcon}
+            className={classnames(styles.adornment, styles.passwordToggle)}
+            onClick={togglePasswordVisibility}
+          />
+        </Part>
       ) : (
-        <Adornment
-          data-part-id={PART_END_ADORNMENT}
-          text={endText}
-          iconName={endIcon}
-          className={styles.adornment}
-        />
+        <Part partId={PART_END_ADORNMENT}>
+          <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
+        </Part>
       )}
     </div>
   );
