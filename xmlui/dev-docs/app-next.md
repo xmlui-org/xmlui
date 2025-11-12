@@ -1,6 +1,45 @@
 # App Component Refactoring Notes
 
-## Current Problems
+This document analyzes the current App component implementation and proposes a new design with improved modularity and flexibility.
+
+## Table of Contents
+
+### Part 1: Current Implementation Analysis
+1. Current Problems
+2. Layout Types (8 variants)
+3. Key Component Props
+4. Major Complexity Points
+5. CSS Structure Issues
+6. Theme Variables
+7. Context & State Management
+8. Refactoring Opportunities
+
+### Part 2: New Design Proposal
+1. Design Goals
+2. Layout Definition Framework
+   - UI Blocks (Building Blocks)
+   - Block Arrangement Patterns
+   - Layout Descriptions by Block Arrangement
+   - Scroll Container Logic
+3. Table of Contents (TOC) Feature
+   - Configuration & Properties
+   - Layout & Positioning
+   - TOC Generation
+   - Behavior & Interactions
+   - XMLUI Markup Examples
+   - Theme Variables
+   - Accessibility
+4. AppHeader Modular Design
+   - Design Overview
+   - Sub-Block Component Specifications
+   - Component Usage Approaches
+   - When to Use Each Approach
+
+---
+
+## Part 1: Current Implementation Analysis
+
+### Current Problems
 - Layout options are not straightforward enough
 - Complex conditional logic for each layout type in AppNative.tsx switch statement
 - Scroll behavior tied to layout type creates inflexibility
@@ -8,46 +47,7 @@
 - Header/footer positioning logic is duplicated across layouts
 - NavPanel visibility logic is fragmented
 
-## AppHeader Sub-Blocks
-
-The Header Block (AppHeader component) is composed of several sub-blocks that flow horizontally from start to end, respecting the current text direction (LTR/RTL). Each sub-block can be customized via template properties on the AppHeader component.
-
-### Sub-Block Order (Start → End)
-1. **Logo** - Complete component for app logo/branding
-2. **App Title** - Text display for application name
-3. **Start Slot** - Flexible template slot for custom content at the start
-4. **Middle Slot** - Flexible template slot for custom content in the center
-5. **Search Box** - Complete component for search functionality
-6. **Profile Menu** - Complete component for user profile/menu
-7. **End Slot** - Flexible template slot for custom content at the end
-
-### AppHeader Template Properties
-The AppHeader component accepts template properties for each sub-block:
-- `logoTemplate` - Custom logo content (overrides default AppLogo)
-- `titleTemplate` - Custom title content (overrides default text title)
-- `startSlotTemplate` - Custom content for start slot
-- `middleSlotTemplate` - Custom content for middle slot
-- `searchBoxTemplate` - Custom search box content (overrides default AppSearchBox)
-- `profileMenuTemplate` - Custom profile menu content (overrides default AppProfileMenu)
-- `endSlotTemplate` - Custom content for end slot
-
-### Complete Components
-- **Logo Component**: Handles logo display with theme-aware variants (light/dark), clickable navigation to home
-- **Search Box Component**: Full-featured search input with dropdown results, keyboard navigation, and search indexing integration
-- **Profile Menu Component**: User profile display with dropdown menu for account actions, settings, logout
-
-### Flexible Slots
-- **Start Slot**: Template slot for custom content after the logo and title (e.g., quick actions, navigation breadcrumbs)
-- **Middle Slot**: Template slot for custom content in the center (e.g., tabs, filters, context-specific controls)
-- **End Slot**: Template slot for custom content before or instead of search/profile (e.g., notifications, help icon, theme toggle)
-
-### Layout Behavior
-- Sub-blocks follow flex layout with appropriate spacing
-- Components can be hidden/shown based on props or by omitting template properties
-- Respects text direction (LTR/RTL) for proper ordering
-- Mobile responsive: some slots may collapse or move to drawer
-
-## Layout Types (8 variants)
+### Layout Types (8 variants)
 
 ### Core Layout Axes
 1. **Orientation**: vertical (NavPanel left) vs horizontal (NavPanel top) vs desktop (full viewport)
@@ -231,10 +231,24 @@ Stores navigation hierarchy map for breadcrumbs/nav state
 - Currently tightly coupled to renderer
 - Makes testing difficult
 
-## Breaking Changes Considerations
+### Breaking Changes Considerations
 - Existing layouts need migration path
 - Theme variables should remain stable
 - XMLUI markup compatibility important
+
+---
+
+## Part 2: New Design Proposal
+
+This section describes the proposed new architecture for the App component, including improved layout flexibility and modular AppHeader design.
+
+### Design Goals
+- Simplify layout configuration with composable properties
+- Decouple scroll behavior from layout type
+- Extract reusable sub-components
+- Provide flexible AppHeader with multiple customization approaches
+- Maintain backward compatibility where possible
+- Improve testability and maintainability
 
 ---
 
@@ -282,6 +296,15 @@ The app viewport is divided into distinct blocks that can be positioned and size
    - Properties: fills remaining space, always scrollable
    - Scroll: either block scrolls independently OR entire viewport scrolls (controlled by `scrollWholePage`)
    - Sizing: respects `maxWidth-content-App` theme variable
+   - **Sub-Blocks** (when TOC enabled):
+     - `M.Content` - Main page content area
+     - `M.TOC` - Table of Contents sidebar (positioned to the right in LTR, left in RTL)
+   - Layout: Horizontal flex when TOC visible, single column otherwise
+   - TOC Control:
+     - `showToc` property on Pages container - Global flag to enable TOC feature
+     - `showToc` property on individual Page - Per-page override (can disable for specific pages)
+     - TOC automatically generated from page headings (h2, h3, etc.)
+     - TOC is sticky within the scrollable content area
 
 4. **Footer Block** (`F`)
    - Contains: Footer component
@@ -412,11 +435,288 @@ Two fundamental scroll strategies that determine App Container behavior:
 
 ---
 
+## Table of Contents (TOC) Feature
+
+### Overview
+
+The Table of Contents feature provides automatic navigation within page content, displaying a sidebar with links to page headings.
+
+### Configuration
+
+**Pages Container Property**:
+- `showToc`: boolean (default: false) - Global flag to enable TOC feature for all pages
+
+**Individual Page Property**:
+- `showToc`: boolean (optional) - Per-page override to show/hide TOC for specific pages
+- Overrides the Pages container setting
+- `showToc={false}` hides TOC even if enabled globally
+- `showToc={true}` shows TOC even if disabled globally
+
+### Layout and Positioning
+
+**TOC Positioning**:
+- **LTR (Left-to-Right)**: TOC appears on the right side of the content
+- **RTL (Right-to-Left)**: TOC appears on the left side of the content
+- Respects text direction automatically
+
+**Layout Structure**:
+```
+┌─────────────────────────────────────┐
+│  Main Content Block (M)             │
+├──────────────────────┬──────────────┤
+│                      │              │
+│  Page Content        │  TOC Sidebar │
+│  (M.Content)         │  (M.TOC)     │
+│                      │              │
+│  - Heading 1         │  • Heading 1 │
+│  - Heading 2         │    - Sub 1   │
+│    - Sub-heading 1   │    - Sub 2   │
+│    - Sub-heading 2   │  • Heading 2 │
+│  - Heading 3         │  • Heading 3 │
+│                      │              │
+└──────────────────────┴──────────────┘
+```
+
+**Responsive Behavior**:
+- Desktop: TOC visible in sidebar
+- Tablet: TOC may collapse to a toggle button
+- Mobile: TOC hidden or accessible via menu
+
+### TOC Generation
+
+**Automatic Generation**:
+- TOC is automatically generated from page content headings
+- Scans for heading elements: `<h2>`, `<h3>`, `<h4>`, `<h5>`, `<h6>`
+- Creates hierarchical navigation structure
+- `<h1>` is typically the page title and excluded from TOC
+
+**TOC Entry Structure**:
+```typescript
+{
+  id: string;        // Anchor link ID (e.g., "heading-1")
+  text: string;      // Heading text content
+  level: number;     // Heading level (2-6)
+  children?: TOCEntry[]; // Nested headings
+}
+```
+
+### Behavior
+
+**Sticky Positioning**:
+- TOC sidebar uses sticky positioning within scrollable content
+- Remains visible as user scrolls through content
+- Constrained to the height of the content area
+
+**Active State Highlighting**:
+- Current section is highlighted in TOC
+- Automatically updates as user scrolls
+- Uses intersection observer for accurate tracking
+
+**Click Navigation**:
+- Clicking TOC entry smoothly scrolls to corresponding heading
+- Updates URL hash (e.g., `#heading-1`)
+- Respects `scroll-margin-top` for proper positioning under sticky headers
+
+**Keyboard Navigation**:
+- TOC entries are keyboard accessible
+- Tab navigation through TOC links
+- Enter/Space to navigate to section
+
+### XMLUI Markup Examples
+
+**Enable TOC globally for all pages**:
+```xml
+<App>
+  <Pages showToc={true}>
+    <Page url="/" navLabel="Home">
+      <!-- TOC will be shown -->
+      <h2>Section 1</h2>
+      <h3>Subsection 1.1</h3>
+      <h2>Section 2</h2>
+    </Page>
+    
+    <Page url="/about" navLabel="About">
+      <!-- TOC will be shown -->
+      <h2>Our Story</h2>
+      <h2>Our Team</h2>
+    </Page>
+  </Pages>
+</App>
+```
+
+**Override TOC for specific pages**:
+```xml
+<App>
+  <Pages showToc={true}>
+    <Page url="/" navLabel="Home" showToc={false}>
+      <!-- TOC hidden for this page -->
+      <h2>Welcome</h2>
+    </Page>
+    
+    <Page url="/docs" navLabel="Documentation">
+      <!-- TOC shown (inherits from Pages) -->
+      <h2>Getting Started</h2>
+      <h3>Installation</h3>
+      <h3>Configuration</h3>
+      <h2>API Reference</h2>
+    </Page>
+  </Pages>
+</App>
+```
+
+**Enable TOC only for specific pages**:
+```xml
+<App>
+  <Pages showToc={false}>
+    <Page url="/" navLabel="Home">
+      <!-- No TOC -->
+      <h2>Welcome</h2>
+    </Page>
+    
+    <Page url="/docs" navLabel="Documentation" showToc={true}>
+      <!-- TOC shown only for this page -->
+      <h2>Getting Started</h2>
+      <h3>Installation</h3>
+      <h2>API Reference</h2>
+    </Page>
+  </Pages>
+</App>
+```
+
+### Theme Variables
+
+**TOC Styling**:
+- `width-toc-Pages` - TOC sidebar width (default: e.g., 240px)
+- `backgroundColor-toc-Pages` - TOC background color
+- `borderColor-toc-Pages` - TOC border color
+- `color-tocEntry-Pages` - TOC entry text color
+- `color-tocEntry-active-Pages` - Active TOC entry color
+- `fontSize-tocEntry-Pages` - TOC entry font size
+- `padding-tocEntry-Pages` - TOC entry padding
+- `indent-tocEntry-Pages` - Indentation per heading level
+
+**Layout Variables**:
+- `gap-content-toc-Pages` - Gap between content and TOC sidebar
+- `top-toc-Pages` - Top offset for sticky positioning
+- `maxHeight-toc-Pages` - Maximum height of TOC sidebar
+
+### Accessibility
+
+**ARIA Attributes**:
+- TOC container: `role="navigation"`, `aria-label="Table of Contents"`
+- TOC entries: Semantic `<nav>` with `<ul>` and `<li>` structure
+- Current section: `aria-current="location"` on active entry
+
+**Screen Reader Support**:
+- TOC is announced as navigation landmark
+- Heading levels are preserved in structure
+- Skip link available to bypass TOC
+
+---
+
+## AppHeader Modular Design
+
+The new AppHeader design provides a flexible, modular architecture with multiple customization approaches.
+
+### Design Overview
+
+The AppHeader component is composed of several sub-blocks that flow horizontally from start to end, respecting the current text direction (LTR/RTL). Each sub-block can be customized via template properties or by completely redefining the header structure.
+
+### Sub-Block Order (Default, Start → End)
+1. **Logo** - Complete component for app logo/branding
+2. **App Title** - Text display for application name
+3. **Start Slot** - Flexible template slot for custom content at the start
+4. **Middle Slot** - Flexible template slot for custom content in the center
+5. **Search Box** - Complete component for search functionality
+6. **Profile Menu** - Complete component for user profile/menu
+7. **End Slot** - Flexible template slot for custom content at the end
+
+### AppHeader Template Properties
+The AppHeader component accepts template properties for each sub-block:
+- `logoTemplate` - Custom logo content (overrides default AppLogo)
+- `titleTemplate` - Custom title content (overrides default text title)
+- `startSlotTemplate` - Custom content for start slot
+- `middleSlotTemplate` - Custom content for middle slot
+- `searchBoxTemplate` - Custom search box content (overrides default AppSearchBox)
+- `profileMenuTemplate` - Custom profile menu content (overrides default AppProfileMenu)
+- `endSlotTemplate` - Custom content for end slot
+
+### Layout Behavior
+- Sub-blocks follow flex layout with appropriate spacing
+- Components can be hidden/shown based on props or by omitting template properties
+- Respects text direction (LTR/RTL) for proper ordering
+- Mobile responsive: some slots may collapse or move to drawer
+
+---
+
 ## AppHeader Sub-Block Component Specifications
 
-### 1. AppLogo Component
+### 1. AppLogo Component (or `<Logo>` in AppHeader children)
 
 **Purpose**: Display application logo with theme-aware variants and navigation functionality.
+
+**Usage in AppHeader**:
+- As property: `<AppHeader logo="/logo.svg" logoDark="/dark.svg" logoLight="/light.svg" />`
+- As template: `<AppHeader logoTemplate={customLogoDef} />`
+- As child: `<AppHeader><Logo src="/logo.svg" /></AppHeader>` (Approach 4)
+
+**Properties**:
+- `src`: string - Default logo image URL
+- `srcDark`: string (optional) - Logo variant for dark theme
+- `srcLight`: string (optional) - Logo variant for light theme
+- `alt`: string - Alternative text for accessibility
+- `href`: string (default: "/") - Navigation target when clicked
+- `width`: string | number (optional) - Logo width
+- `height`: string | number (optional) - Logo height
+- `onClick`: (event) => void (optional) - Custom click handler
+
+**Behavior**:
+- Automatically switches between light/dark variants based on active theme
+- Clickable by default, navigates to `href` location
+- Respects custom onClick handlers
+- Lazy loads images for performance
+- Falls back to default logo if theme-specific variant unavailable
+
+**Theme Variables**:
+- `width-logo-AppHeader` - Default logo width
+- `height-logo-AppHeader` - Default logo height
+- `margin-inline-end-logo-AppHeader` - Spacing after logo
+
+---
+
+### 1b. AppTitle Component (or `<AppTitle>` in AppHeader children)
+
+**Purpose**: Display application title text.
+
+**Usage in AppHeader**:
+- As property: `<AppHeader title="My Application" />`
+- As template: `<AppHeader titleTemplate={customTitleDef} />`
+- As child: `<AppHeader><AppTitle>My App</AppTitle></AppHeader>` (Approach 4)
+
+**Properties**:
+- `text`: string (optional) - Title text
+- `children`: ReactNode (optional) - Title content (alternative to text)
+
+**Behavior**:
+- Displays as text in the header
+- Can include inline styling or nested components
+
+**Theme Variables**:
+- `fontSize-title-AppHeader` - Title font size
+- `fontWeight-title-AppHeader` - Title font weight
+- `color-title-AppHeader` - Title text color
+- `margin-inline-end-title-AppHeader` - Spacing after title
+
+---
+
+### 2. AppSearchBox Component (or `<AppSearchBox>` in AppHeader children)
+
+**Purpose**: Provide search functionality with dropdown results and keyboard navigation.
+
+**Usage in AppHeader**:
+- As enabled prop: `<AppHeader searchBoxEnabled={true} />`
+- As template: `<AppHeader searchBoxTemplate={customSearchDef} />`
+- As child: `<AppHeader><AppSearchBox /></AppHeader>` (Approach 4)
 
 **Properties**:
 - `src`: string - Default logo image URL
@@ -479,9 +779,14 @@ Two fundamental scroll strategies that determine App Container behavior:
 
 ---
 
-### 3. AppProfileMenu Component
+### 3. AppProfileMenu Component (or `<AppProfileMenu>` in AppHeader children)
 
 **Purpose**: Display user profile with dropdown menu for account actions.
+
+**Usage in AppHeader**:
+- As enabled prop: `<AppHeader profileMenuEnabled={true} profileMenuUser={$currentUser} />`
+- As template: `<AppHeader profileMenuTemplate={customProfileDef} />`
+- As child: `<AppHeader><AppProfileMenu user={$currentUser} /></AppHeader>` (Approach 4)
 
 **Properties**:
 - `user`: object - User data { name, email, avatar, ... }
@@ -531,10 +836,36 @@ Two fundamental scroll strategies that determine App Container behavior:
 
 **Purpose**: Provide customizable template slots within the AppHeader for application-specific controls.
 
+**Usage in AppHeader**:
+- As template properties: `<AppHeader startSlotTemplate={def} middleSlotTemplate={def} endSlotTemplate={def} />`
+- As inline templates:
+  ```xml
+  <AppHeader>
+    <startSlotTemplate>
+      <Breadcrumb />
+    </startSlotTemplate>
+  </AppHeader>
+  ```
+- As child slots (Approach 4):
+  ```xml
+  <AppHeader>
+    <Slot name="startSlotTemplate" />
+    <Logo />
+    <Slot name="middleSlotTemplate" />
+    <AppSearchBox />
+    <Slot name="endSlotTemplate" />
+  </AppHeader>
+  ```
+
 **AppHeader Template Properties**:
 - `startSlotTemplate`: ComponentDef - Template content for start slot
 - `middleSlotTemplate`: ComponentDef - Template content for middle slot
 - `endSlotTemplate`: ComponentDef - Template content for end slot
+
+**Slot Component**:
+When using Approach 4 (total redefinition), the `<Slot>` component references a named template:
+- `name`: "startSlotTemplate" | "middleSlotTemplate" | "endSlotTemplate" - The template slot to render
+- Content is defined via corresponding template property on AppHeader
 
 **Slot Rendering**:
 - Slots render template content provided via AppHeader properties
@@ -558,7 +889,11 @@ Two fundamental scroll strategies that determine App Container behavior:
 
 ### AppHeader Component Usage
 
-The AppHeader component composes all sub-blocks using template properties:
+The AppHeader component supports multiple approaches for customization:
+
+#### Approach 1: Template Properties (Declarative)
+
+Using template properties for standard layout with customization:
 
 ```xml
 <AppHeader 
@@ -576,7 +911,10 @@ The AppHeader component composes all sub-blocks using template properties:
 />
 ```
 
-**Alternative: Custom Templates Override Defaults**
+#### Approach 2: Custom Templates Override Defaults
+
+Override specific sub-blocks while keeping standard order:
+
 ```xml
 <AppHeader 
   logoTemplate={customLogoDef}
@@ -586,7 +924,10 @@ The AppHeader component composes all sub-blocks using template properties:
 />
 ```
 
-**XMLUI Markup Example with Inline Templates**:
+#### Approach 3: Inline Template Definitions
+
+Define template content inline as child elements:
+
 ```xml
 <AppHeader title="My App" logo="/logo.svg">
   <startSlotTemplate>
@@ -604,7 +945,53 @@ The AppHeader component composes all sub-blocks using template properties:
 </AppHeader>
 ```
 
-**Default Rendering Order** (LTR):
+#### Approach 4: Total Redefinition with Custom Order
+
+Completely redefine the AppHeader structure and sub-block order using predefined components:
+
+```xml
+<AppHeader>
+  <Slot name="startSlotTemplate" />
+  <Logo />
+  <AppSearchBox />
+  <AppProfileMenu />
+  <Slot name="endSlotTemplate" />
+</AppHeader>
+```
+
+This approach allows you to:
+- Reorder any sub-block components
+- Omit unwanted components (e.g., no title, no middle slot)
+- Insert custom components between sub-blocks
+- Use predefined sub-block components: `<Logo>`, `<AppTitle>`, `<AppSearchBox>`, `<AppProfileMenu>`
+- Reference template slots by name: `<Slot name="startSlotTemplate" />`, `<Slot name="middleSlotTemplate" />`, `<Slot name="endSlotTemplate" />`
+
+**Example: Custom order with all options**
+```xml
+<AppHeader>
+  <Logo src="/logo.svg" />
+  <Slot name="startSlotTemplate" />
+  <AppTitle>My App</AppTitle>
+  <Spacer />
+  <Slot name="middleSlotTemplate" />
+  <AppSearchBox />
+  <Divider orientation="vertical" />
+  <AppProfileMenu user={$currentUser} />
+  <Slot name="endSlotTemplate" />
+</AppHeader>
+```
+
+**Example: Minimal custom header**
+```xml
+<AppHeader>
+  <Logo />
+  <AppTitle>Dashboard</AppTitle>
+  <Spacer />
+  <AppProfileMenu />
+</AppHeader>
+```
+
+**Default Rendering Order** (LTR, when using Approach 1-3):
 ```
 [Logo] [Title] [StartSlot] [MiddleSlot] [SearchBox] [ProfileMenu] [EndSlot]
 ```
@@ -612,6 +999,782 @@ The AppHeader component composes all sub-blocks using template properties:
 **RTL Support**: Order automatically reverses in RTL text direction.
 
 **Visibility Control**: Each sub-block can be shown/hidden via:
-- Omitting template properties (slot not rendered)
-- Using `*Enabled` props for built-in components (e.g., `searchBoxEnabled={false}`)
+- Omitting template properties (slot not rendered) - Approaches 1-3
+- Not including components in markup - Approach 4
+- Using `*Enabled` props for built-in components (e.g., `searchBoxEnabled={false}`) - Approach 1
 - Conditional rendering within template content
+
+---
+
+### When to Use Each Approach
+
+**Approach 1 (Template Properties)**: Best for most use cases
+- ✅ Simple, declarative API
+- ✅ Standard layout with custom slots
+- ✅ Uses built-in components with easy configuration
+- ✅ Good for consistent headers across pages
+- Use when: You want the standard header layout with some customization
+
+**Approach 2 (Custom Templates Override)**: Advanced customization
+- ✅ Replace specific sub-blocks with custom implementations
+- ✅ Maintain standard order and spacing
+- ✅ Good for themed or branded variants
+- Use when: You need custom Logo, SearchBox, or ProfileMenu implementations
+
+**Approach 3 (Inline Templates)**: Quick customization
+- ✅ Define slot content inline for readability
+- ✅ Good for simple, page-specific content
+- ✅ Keeps markup self-contained
+- Use when: Slot content is simple and specific to one page
+
+**Approach 4 (Total Redefinition)**: Maximum flexibility
+- ✅ Complete control over order and composition
+- ✅ Can insert custom components between sub-blocks
+- ✅ Can omit any sub-block
+- ✅ Use predefined components (`<Logo>`, `<AppSearchBox>`, etc.) or custom ones
+- ⚠️ More verbose, requires understanding of all sub-blocks
+- Use when: You need a completely custom header layout or non-standard order
+
+**Predefined Sub-Block Components** (available in Approach 4):
+- `<Logo>` - AppLogo component
+- `<AppTitle>` - App title text
+- `<AppSearchBox>` - Search functionality
+- `<AppProfileMenu>` - User profile menu
+- `<Slot name="startSlotTemplate">` - Start slot reference
+- `<Slot name="middleSlotTemplate">` - Middle slot reference
+- `<Slot name="endSlotTemplate">` - End slot reference
+
+---
+
+## Screen Layout Diagrams
+
+### Complete App Screen Layout
+
+Basic app container without any internal blocks or scroll gutters.
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ C: App Container                                                             │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+### App Screen Layout with Scroll Gutters
+
+App container with reserved scroll gutter spaces on both sides (stable both-edges).
+
+```
+┌─┬──────────────────────────────────────────────────────────────────────────┬─┐
+│ │ C: App Container                                                         │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+└─┴──────────────────────────────────────────────────────────────────────────┴─┘
+```
+
+## Horizontal Layout Diagrams
+
+All horizontal layout diagrams share the following common characteristics:
+- **Navigation Panel Position**: The NavPanel (N) is positioned at the top of the viewport, below the header
+- **Block Arrangement**: Blocks are stacked vertically in rows: Header → NavPanel → Main Content → Footer
+- **Full Width Blocks**: All blocks (H, N, M, F) span the full width of the container
+- **NavPanel Behavior**: NavPanel is static (not independently scrollable) and rendered within the header area
+- **Variants**: The diagrams below demonstrate different combinations of scroll behavior (`scrollWholePage`), gutter reservation (`noScrollbarGutters`), and scroll positions
+
+### Horizontal Layout
+
+- `layout`: horizontal
+- `noScrollbarGutters`: true
+- `scrollWholePage`: true
+
+**Note:** We cannot see the scrollbars as the entire content fits into the viewport. The same is displayed when `scrollWholePage` is false.
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ H: Header                                                                    │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ N: Navigation Panel                                                          │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ M: Main Content                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ F: Footer                                                                    │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│ (remaining space below footer)                                               │
+│                                                                              │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Horizontal Layout with Scroll Gutters
+
+- `layout`: horizontal
+- `noScrollbarGutters`: false
+- `scrollWholePage`: true
+
+**Note:** The entire content fits into the viewport; no scrollbar visible. The scroll gutters are reserved on both sides.
+
+```
+┌─┬──────────────────────────────────────────────────────────────────────────┬─┐
+│ │ H: Header                                                                │ │
+│ ├──────────────────────────────────────────────────────────────────────────┤ │
+│ │ N: Navigation Panel                                                      │ │
+│ ├──────────────────────────────────────────────────────────────────────────┤ │
+│ │ M: Main Content                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ ├──────────────────────────────────────────────────────────────────────────┤ │
+│ │ F: Footer                                                                │ │
+│ ├──────────────────────────────────────────────────────────────────────────┤ │
+│ │                                                                          │ │
+│ │ (remaining space below footer)                                           │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+└─┴──────────────────────────────────────────────────────────────────────────┴─┘
+```
+
+### Horizontal Layout with Overflow and Scrollbar
+
+- `layout`: horizontal
+- `noScrollbarGutters`: false
+- `scrollWholePage`: true
+
+**Note:** The content overflows beyond the viewport; the scrollbar is visible in the right gutter at the top position; the footer extends below the visible screen.
+
+```
+┌─┬──────────────────────────────────────────────────────────────────────────┬─┐
+│ │ H: Header                                                                │█│
+│ ├──────────────────────────────────────────────────────────────────────────┤█│
+│ │ N: Navigation Panel                                                      │█│
+│ ├──────────────────────────────────────────────────────────────────────────┤█│
+│ │ M: Main Content                                                          │█│
+│ │                                                                          │█│
+│ │                                                                          │█│
+│ │                                                                          │█│
+│ │                                                                          │█│
+│ │                                                                          │█│
+│ │                                                                          │█│
+│ │                                                                          │█│
+│ │                                                                          │█│
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+└─┴──────────────────────────────────────────────────────────────────────────┴─┘
+  │                                                                          │
+  ├──────────────────────────────────────────────────────────────────────────┤
+  │ F: Footer                                                                │
+  └──────────────────────────────────────────────────────────────────────────┘
+```
+
+### Horizontal Layout with Overflow and Scrollbar (No Gutter Reservation)
+
+- `layout`: horizontal
+- `noScrollbarGutters`: true
+- `scrollWholePage`: true
+
+**Note:** The content overflows beyond the viewport; the scrollbar is visible on the right side; no scroll gutters are reserved; the footer extends below the visible screen.
+
+```
+┌────────────────────────────────────────────────────────────────────────────┬─┐
+│ H: Header                                                                  │█│
+├────────────────────────────────────────────────────────────────────────────┤█│
+│ N: Navigation Panel                                                        │█│
+├────────────────────────────────────────────────────────────────────────────┤█│
+│ M: Main Content                                                            │█│
+│                                                                            │█│
+│                                                                            │█│
+│                                                                            │█│
+│                                                                            │█│
+│                                                                            │█│
+│                                                                            │█│
+│                                                                            │█│
+│                                                                            │█│
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+└────────────────────────────────────────────────────────────────────────────┴─┘
+  │                                                                            │
+  ├────────────────────────────────────────────────────────────────────────────┤
+  │ F: Footer                                                                  │
+  └────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Horizontal Layout Scrolled to Bottom
+
+- `layout`: horizontal
+- `noScrollbarGutters`: false
+- `scrollWholePage`: true
+
+**Note:** The page is scrolled to the bottom; the header and the top of the main content overflow at the top; the scrollbar is at the bottom position; the footer is visible at the bottom of the screen.
+
+```
+  ┌──────────────────────────────────────────────────────────────────────────┐
+  │ H: Header                                                                │
+  ├──────────────────────────────────────────────────────────────────────────┤
+  │ N: Navigation Panel                                                      │
+  ├──────────────────────────────────────────────────────────────────────────┤
+  │ M: Main Content                                                          │
+  │                                                                          │
+  │                                                                          │
+┌─┼──────────────────────────────────────────────────────────────────────────┼─┐
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ ├──────────────────────────────────────────────────────────────────────────┤█│
+│ │ F: Footer                                                                │█│
+└─┴──────────────────────────────────────────────────────────────────────────┴─┘
+```
+
+### Horizontal Layout with Content-Only Scroll
+
+- `layout`: horizontal
+- `noScrollbarGutters`: false
+- `scrollWholePage`: false
+
+**Note:** Only the main content scrolls; header, navigation panel, and footer remain docked. The scrollbar belongs to the main content block. Content overflow is indicated with arrows showing hidden content above and below the visible area.
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ H: Header (docked to top)                                                    │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ N: Navigation Panel (docked to top)                                          │
+├─┬──────────────────────────────────────────────────────────────────────────┬─┤
+│ │ ↑ Content above (hidden)                                                 │ │
+│ │                                                                          │ │
+│ │                                                                          │█│
+│ │ M: Main Content (scrollable, mid-scroll position)                        │█│
+│ │                                                                          │█│
+│ │                                                                          │█│
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │ ↓ Content below (hidden)                                                 │ │
+├─┴──────────────────────────────────────────────────────────────────────────┴─┤
+│ F: Footer (docked to bottom)                                                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Horizontal Layout with Content-Only Scroll (Mid-Scroll Position)
+
+- `layout`: horizontal
+- `noScrollbarGutters`: true
+- `scrollWholePage`: false
+
+**Note:** Main content at mid-scroll position; header, navigation panel, and footer remain docked. The scrollbar is in the middle position. Content overflow is indicated with arrows showing hidden content both above and below the visible area.
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ H: Header (docked to top)                                                    │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ N: Navigation Panel (docked to top)                                          │
+├────────────────────────────────────────────────────────────────────────────┬─┤
+│ ↑ Content above (hidden)                                                   │ │
+│                                                                            │ │
+│                                                                            │ │
+│ M: Main Content (scrollable, mid-scroll position)                          │ │
+│                                                                            │█│
+│                                                                            │█│
+│                                                                            │█│
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│ ↓ Content below (hidden)                                                   │ │
+├────────────────────────────────────────────────────────────────────────────┴─┤
+│ F: Footer (docked to bottom)                                                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+## Horizontal-Sticky Layout Diagrams
+
+All horizontal-sticky layout diagrams share the following common characteristics:
+- **Header Sticky**: The Header (H) is always docked to the top of the viewport using sticky positioning
+- **NavPanel Sticky**: The NavPanel (N) is always docked to the top, below the header, using sticky positioning
+- **Footer Sticky**: The Footer (F) is always docked to the bottom of the viewport using sticky positioning
+- **Content Scroll**: Only the Main Content (M) area scrolls between the sticky header/navpanel and footer
+- **Scroll Container**: Can be either the App Container (C) when `scrollWholePage=true` or the Main Content block (M) when `scrollWholePage=false`
+- **Variants**: The diagrams below demonstrate different combinations of `scrollWholePage` and `noScrollbarGutters` settings
+
+### Horizontal-Sticky Layout (No Overflow)
+
+- `layout`: horizontal-sticky
+- `noScrollbarGutters`: true
+- `scrollWholePage`: true
+
+**Note:** Content fits within viewport; no scrollbar visible. Header, NavPanel, and Footer are docked.
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ H: Header (docked to top)                                                    │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ N: Navigation Panel (docked to top)                                          │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ M: Main Content                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ F: Footer (docked to bottom)                                                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Horizontal-Sticky Layout with Scroll Gutters (No Overflow)
+
+- `layout`: horizontal-sticky
+- `noScrollbarGutters`: false
+- `scrollWholePage`: true
+
+**Note:** Content fits within viewport; scroll gutters reserved on both sides. Header, NavPanel, and Footer are docked. App Container is the scroll parent.
+
+```
+┌─┬──────────────────────────────────────────────────────────────────────────┬─┐
+│ │ H: Header (docked to top)                                                │ │
+│ ├──────────────────────────────────────────────────────────────────────────┤ │
+│ │ N: Navigation Panel (docked to top)                                      │ │
+│ ├──────────────────────────────────────────────────────────────────────────┤ │
+│ │ M: Main Content                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ ├──────────────────────────────────────────────────────────────────────────┤ │
+│ │ F: Footer (docked to bottom)                                             │ │
+└─┴──────────────────────────────────────────────────────────────────────────┴─┘
+```
+
+### Horizontal-Sticky Layout with Content Overflow (Mid-Scroll)
+
+- `layout`: horizontal-sticky
+- `noScrollbarGutters`: true
+- `scrollWholePage`: true
+
+**Note:** Content overflows; scrollbar visible on right side spanning entire viewport. Header, NavPanel, and Footer remain docked. Scrollbar at mid-position. App Container is the scroll parent.
+
+```
+┌────────────────────────────────────────────────────────────────────────────┬─┐
+│ H: Header (docked to top)                                                  │ │
+├────────────────────────────────────────────────────────────────────────────┤ │
+│ N: Navigation Panel (docked to top)                                        │ │
+├────────────────────────────────────────────────────────────────────────────┤ │
+│ ↑ Content above (hidden)                                                   │ │
+│                                                                            │ │
+│                                                                            │ │
+│ M: Main Content (scrollable, mid-scroll position)                          │█│
+│                                                                            │█│
+│                                                                            │█│
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│ ↓ Content below (hidden)                                                   │ │
+├────────────────────────────────────────────────────────────────────────────┤ │
+│ F: Footer (docked to bottom)                                               │ │
+└────────────────────────────────────────────────────────────────────────────┴─┘
+```
+
+### Horizontal-Sticky Layout with Content Overflow and Scroll Gutters (Mid-Scroll)
+
+- `layout`: horizontal-sticky
+- `noScrollbarGutters`: false
+- `scrollWholePage`: true
+
+**Note:** Content overflows; scrollbar visible in right gutter spanning entire viewport. Header, NavPanel, and Footer remain docked. Scrollbar at mid-position. App Container is the scroll parent.
+
+```
+┌─┬──────────────────────────────────────────────────────────────────────────┬─┐
+│ │ H: Header (docked to top)                                                │█│
+│ ├──────────────────────────────────────────────────────────────────────────┤█│
+│ │ N: Navigation Panel (docked to top)                                      │█│
+│ ├──────────────────────────────────────────────────────────────────────────┤█│
+│ │ ↑ Content above (hidden)                                                 │█│
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │ M: Main Content (scrollable, mid-scroll position)                        │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │ ↓ Content below (hidden)                                                 │ │
+│ ├──────────────────────────────────────────────────────────────────────────┤ │
+│ │ F: Footer (docked to bottom)                                             │ │
+└─┴──────────────────────────────────────────────────────────────────────────┴─┘
+```
+
+### Horizontal-Sticky Layout Scrolled to Bottom
+
+- `layout`: horizontal-sticky
+- `noScrollbarGutters`: true
+- `scrollWholePage`: true
+
+**Note:** Content scrolled to bottom; scrollbar at bottom position spanning entire viewport. Header, NavPanel, and Footer remain docked. End of content visible. App Container is the scroll parent.
+
+```
+┌────────────────────────────────────────────────────────────────────────────┬─┐
+│ H: Header (docked to top)                                                  │ │
+├────────────────────────────────────────────────────────────────────────────┤ │
+│ N: Navigation Panel (docked to top)                                        │ │
+├────────────────────────────────────────────────────────────────────────────┤ │
+│ ↑ Content above (hidden)                                                   │ │
+│                                                                            │ │
+│                                                                            │ │
+│ M: Main Content (scrollable, scrolled to bottom)                           │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│ (end of content)                                                           │█│
+├────────────────────────────────────────────────────────────────────────────┤█│
+│ F: Footer (docked to bottom)                                               │█│
+└────────────────────────────────────────────────────────────────────────────┴─┘
+```
+
+### Horizontal-Sticky Layout Scrolled to Bottom with Scroll Gutters
+
+- `layout`: horizontal-sticky
+- `noScrollbarGutters`: false
+- `scrollWholePage`: true
+
+**Note:** Content scrolled to bottom; scrollbar at bottom position in right gutter spanning entire viewport. Header, NavPanel, and Footer remain docked. End of content visible. App Container is the scroll parent.
+
+```
+┌─┬──────────────────────────────────────────────────────────────────────────┬─┐
+│ │ H: Header (docked to top)                                                │ │
+│ ├──────────────────────────────────────────────────────────────────────────┤ │
+│ │ N: Navigation Panel (docked to top)                                      │ │
+│ ├──────────────────────────────────────────────────────────────────────────┤ │
+│ │ ↑ Content above (hidden)                                                 │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │ M: Main Content (scrollable, scrolled to bottom)                         │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │ (end of content)                                                         │█│
+│ ├──────────────────────────────────────────────────────────────────────────┤█│
+│ │ F: Footer (docked to bottom)                                             │█│
+└─┴──────────────────────────────────────────────────────────────────────────┴─┘
+```
+
+### Horizontal-Sticky Layout with Content-Only Scroll (No Overflow)
+
+- `layout`: horizontal-sticky
+- `noScrollbarGutters`: true
+- `scrollWholePage`: false
+
+**Note:** Content fits within viewport; no scrollbar visible. Header, NavPanel, and Footer are docked. Main Content block is the scroll parent.
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ H: Header (docked to top)                                                    │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ N: Navigation Panel (docked to top)                                          │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ M: Main Content                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ F: Footer (docked to bottom)                                                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Horizontal-Sticky Layout with Content-Only Scroll and Gutters (No Overflow)
+
+- `layout`: horizontal-sticky
+- `noScrollbarGutters`: false
+- `scrollWholePage`: false
+
+**Note:** Content fits within viewport; scroll gutters reserved only for Main Content area. Header, NavPanel, and Footer are docked. Main Content block is the scroll parent.
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ H: Header (docked to top)                                                    │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ N: Navigation Panel (docked to top)                                          │
+├─┬──────────────────────────────────────────────────────────────────────────┬─┤
+│ │ M: Main Content                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+├─┴──────────────────────────────────────────────────────────────────────────┴─┤
+│ F: Footer (docked to bottom)                                                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Horizontal-Sticky Layout with Content-Only Scroll (Mid-Scroll)
+
+- `layout`: horizontal-sticky
+- `noScrollbarGutters`: true
+- `scrollWholePage`: false
+
+**Note:** Content overflows; scrollbar visible on right side only for Main Content area. Header, NavPanel, and Footer remain docked and don't scroll. Scrollbar at mid-position. Main Content block is the scroll parent.
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ H: Header (docked to top)                                                    │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ N: Navigation Panel (docked to top)                                          │
+├────────────────────────────────────────────────────────────────────────────┬─┤
+│ ↑ Content above (hidden)                                                   │ │
+│                                                                            │ │
+│                                                                            │ │
+│ M: Main Content (scrollable, mid-scroll position)                          │█│
+│                                                                            │█│
+│                                                                            │█│
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│ ↓ Content below (hidden)                                                   │ │
+├────────────────────────────────────────────────────────────────────────────┴─┤
+│ F: Footer (docked to bottom)                                                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Horizontal-Sticky Layout with Content-Only Scroll and Gutters (Mid-Scroll)
+
+- `layout`: horizontal-sticky
+- `noScrollbarGutters`: false
+- `scrollWholePage`: false
+
+**Note:** Content overflows; scrollbar visible in right gutter only for Main Content area. Header, NavPanel, and Footer remain docked and don't scroll. Scrollbar at mid-position. Main Content block is the scroll parent.
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ H: Header (docked to top)                                                    │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ N: Navigation Panel (docked to top)                                          │
+├─┬──────────────────────────────────────────────────────────────────────────┬─┤
+│ │ ↑ Content above (hidden)                                                 │ │
+│ │                                                                          │ │
+│ │                                                                          │█│
+│ │ M: Main Content (scrollable, mid-scroll position)                        │█│
+│ │                                                                          │█│
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │ ↓ Content below (hidden)                                                 │ │
+├─┴──────────────────────────────────────────────────────────────────────────┴─┤
+│ F: Footer (docked to bottom)                                                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Horizontal-Sticky Layout with Content-Only Scroll (Scrolled to Bottom)
+
+- `layout`: horizontal-sticky
+- `noScrollbarGutters`: true
+- `scrollWholePage`: false
+
+**Note:** Content scrolled to bottom; scrollbar at bottom position only for Main Content area. Header, NavPanel, and Footer remain docked. End of content visible. Main Content block is the scroll parent.
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ H: Header (docked to top)                                                    │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ N: Navigation Panel (docked to top)                                          │
+├────────────────────────────────────────────────────────────────────────────┬─┤
+│ ↑ Content above (hidden)                                                   │ │
+│                                                                            │ │
+│                                                                            │ │
+│ M: Main Content (scrollable, scrolled to bottom)                           │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │█│
+│ (end of content)                                                           │█│
+├────────────────────────────────────────────────────────────────────────────┴─┤
+│ F: Footer (docked to bottom)                                                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Horizontal-Sticky Layout with Content-Only Scroll and Gutters (Scrolled to Bottom)
+
+- `layout`: horizontal-sticky
+- `noScrollbarGutters`: false
+- `scrollWholePage`: false
+
+**Note:** Content scrolled to bottom; scrollbar at bottom position in right gutter only for Main Content area. Header, NavPanel, and Footer remain docked. End of content visible. Main Content block is the scroll parent.
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ H: Header (docked to top)                                                    │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ N: Navigation Panel (docked to top)                                          │
+├─┬──────────────────────────────────────────────────────────────────────────┬─┤
+│ │ ↑ Content above (hidden)                                                 │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │ M: Main Content (scrollable, scrolled to bottom)                         │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │█│
+│ │ (end of content)                                                         │█│
+├─┴──────────────────────────────────────────────────────────────────────────┴─┤
+│ F: Footer (docked to bottom)                                                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
