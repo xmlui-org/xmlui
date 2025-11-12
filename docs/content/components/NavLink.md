@@ -136,6 +136,10 @@ This property sets the label of the component.  If not set, the component will n
 </App>
 ```
 
+### `noIndicator` (default: false) [#noindicator-default-false]
+
+This Boolean property controls whether to hide the visual indicator for active and hovered states. When set to `true`, the indicator line will not be displayed.
+
 ### `target` [#target]
 
 This optionally property specifies how to open the clicked link.
@@ -278,7 +282,7 @@ This component does not expose any methods.
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-NavLink | $fontFamily | $fontFamily |
 | [fontSize](../styles-and-themes/common-units/#size)-NavLink | $fontSize-sm | $fontSize-sm |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink | $fontWeight-normal | $fontWeight-normal |
-| [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink--active | *none* | *none* |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink--active | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink--pressed | $fontWeight-normal | $fontWeight-normal |
 | [outlineColor](../styles-and-themes/common-units/#color)-NavLink--focus | $outlineColor--focus | $outlineColor--focus |
 | [outlineOffset](../styles-and-themes/common-units/#size)-NavLink--focus | -1px | -1px |
@@ -292,7 +296,7 @@ This component does not expose any methods.
 | [paddingTop](../styles-and-themes/common-units/#size)-NavLink | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-NavLink | $space-2 | $space-2 |
 | [textColor](../styles-and-themes/common-units/#color)-NavLink | $textColor-primary | $textColor-primary |
-| [textColor](../styles-and-themes/common-units/#color)-NavLink--active | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-NavLink--active | $color-primary-500 | $color-primary-500 |
 | [textColor](../styles-and-themes/common-units/#color)-NavLink--hover | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-NavLink--hover--active | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-NavLink--pressed | *none* | *none* |

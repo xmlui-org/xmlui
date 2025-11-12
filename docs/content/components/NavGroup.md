@@ -153,6 +153,10 @@ This property sets the text displayed as the name of the `NavGroup`.
 
 For an example, see the [section on the icon property](#icon).
 
+### `noIndicator` (default: false) [#noindicator-default-false]
+
+This Boolean property controls whether to hide the visual indicator for active and hovered states. When set to `true`, the indicator line will not be displayed on the `NavGroup` toggle button.
+
 ### `to` [#to]
 
 This property defines an optional navigation link.

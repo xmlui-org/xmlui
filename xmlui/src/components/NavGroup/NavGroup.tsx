@@ -59,6 +59,14 @@ export const NavGroupMd = createMetadata({
       valueType: "string",
       defaultValue: defaultProps.iconVerticalCollapsed,
     },
+    noIndicator: {
+      description:
+        `This Boolean property controls whether to hide the visual indicator for active and ` +
+        `hovered states. When set to \`true\`, the indicator line will not be displayed on the ` +
+        `\`${COMP}\` toggle button.`,
+      valueType: "boolean",
+      defaultValue: defaultProps.noIndicator,
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -80,6 +88,7 @@ export const navGroupComponentRenderer = createComponentRenderer(
         icon={<Icon name={extractValue.asString(node.props.icon)} className={navLinkStyles.icon} />}
         node={node}
         initiallyExpanded={extractValue.asOptionalBoolean(node.props.initiallyExpanded)}
+        noIndicator={extractValue.asOptionalBoolean(node.props.noIndicator)}
         renderChild={renderChild}
         iconHorizontalExpanded={extractValue.asOptionalString(node.props.iconHorizontalExpanded)}
         iconVerticalExpanded={extractValue.asOptionalString(node.props.iconVerticalExpanded)}
