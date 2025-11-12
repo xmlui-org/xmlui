@@ -20,14 +20,14 @@ export const ContentSeparatorMd = createMetadata({
       description:
         "This property defines the component's height (if the \`orientation\` is horizontal) " +
         "or the width (if the \`orientation\` is vertical). " +
-        "If not defined, the component uses the entire available width or height.",
+        "If not defined, the component uses the theme variable \`thickness-ContentSeparator\` (default: 1px).",
       valueType: "any",
     },
     length: {
       description:
-        "This property defines the component's height (if the \`orientation\` is vertical) " +
-        "or the width (if the \`orientation\` is horizontal). " +
-        "If not defined, the component uses the entire available width or height.",
+        "This property defines the component's width (if the \`orientation\` is horizontal) " +
+        "or the height (if the \`orientation\` is vertical). " +
+        "If not defined, the component uses the theme variable \`length-ContentSeparator\` (default: 100%).",
       valueType: "any",
     },
     orientation: {

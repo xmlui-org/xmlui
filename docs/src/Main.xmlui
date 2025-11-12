@@ -246,10 +246,7 @@
                 <NavLink label="Checkbox" to="/components/Checkbox" />
                 <NavLink label="ColorPicker" to="/components/ColorPicker" />
                 <NavLink label="Column" to="/components/Column" />
-                <NavLink
-                    label="ContentSeparator"
-                    to="/components/ContentSeparator"
-                />
+                <NavLink label="ContentSeparator" to="/components/ContentSeparator" />
                 <NavLink label="DataSource" to="/components/DataSource" />
                 <NavLink label="DateInput" to="/components/DateInput" />
                 <NavLink label="DatePicker" to="/components/DatePicker" />
@@ -258,10 +255,7 @@
                 <NavLink label="EmojiSelector" to="/components/EmojiSelector" />
                 <NavLink label="ExpandableItem" to="/components/ExpandableItem" />
                 <NavLink label="FileInput" to="/components/FileInput" />
-                <NavLink
-                    label="FileUploadDropZone"
-                    to="/components/FileUploadDropZone"
-                />
+                <NavLink label="FileUploadDropZone" to="/components/FileUploadDropZone" />
                 <NavLink label="FlowLayout" to="/components/FlowLayout" />
                 <NavLink label="Footer" to="/components/Footer" />
                 <NavLink label="Form" to="/components/Form" />
@@ -306,10 +300,7 @@
                 <NavLink label="ProgressBar" to="/components/ProgressBar" />
                 <NavLink label="Queue" to="/components/Queue" />
                 <NavLink label="RadioGroup" to="/components/RadioGroup" />
-                <NavLink
-                    label="RealTimeAdapter"
-                    to="/components/RealTimeAdapter"
-                />
+                <NavLink label="RealTimeAdapter" to="/components/RealTimeAdapter" />
                 <NavLink label="Redirect" to="/components/Redirect" />
                 <NavLink label="Select" to="/components/Select" />
                 <NavLink label="Slider" to="/components/Slider" />
@@ -323,10 +314,7 @@
                 <NavLink label="Switch" to="/components/Switch" />
                 <NavLink label="TabItem" to="/components/TabItem" />
                 <NavLink label="Table" to="/components/Table" />
-                <NavLink
-                    label="TableOfContents"
-                    to="/components/TableOfContents"
-                />
+                <NavLink label="TableOfContents" to="/components/TableOfContents" />
                 <NavLink label="Tabs" to="/components/Tabs" />
                 <NavLink label="Text" to="/components/Text" />
                 <NavLink label="TextArea" to="/components/TextArea" />
@@ -334,10 +322,7 @@
                 <NavLink label="Theme" to="/components/Theme" />
                 <NavLink label="TimeInput" to="/components/TimeInput" />
                 <NavLink label="Timer" to="/components/Timer" />
-                <NavLink
-                    label="ToneChangerButton"
-                    to="/components/ToneChangerButton"
-                />
+                <NavLink label="ToneChangerButton" to="/components/ToneChangerButton" />
                 <NavLink label="ToneSwitch" to="/components/ToneSwitch" />
                 <NavLink label="Tooltip" to="/components/Tooltip" />
                 <NavLink label="Tree" to="/components/Tree" />
@@ -349,56 +334,20 @@
             <NavGroup label="Extensions">
                 <!-- GENERATED CONTENT/Extension references links -->
                 <NavGroup label="Xmlui Animations">
-                    <NavLink
-                        label="Extension Overview"
-                        to="/extensions/xmlui-animations/_overview"
-                    />
-                    <NavLink
-                        label="Animation"
-                        to="/extensions/xmlui-animations/Animation"
-                    />
-                    <NavLink
-                        label="FadeAnimation"
-                        to="/extensions/xmlui-animations/FadeAnimation"
-                    />
-                    <NavLink
-                        label="FadeInAnimation"
-                        to="/extensions/xmlui-animations/FadeInAnimation"
-                    />
-                    <NavLink
-                        label="FadeOutAnimation"
-                        to="/extensions/xmlui-animations/FadeOutAnimation"
-                    />
-                    <NavLink
-                        label="ScaleAnimation"
-                        to="/extensions/xmlui-animations/ScaleAnimation"
-                    />
-                    <NavLink
-                        label="SlideInAnimation"
-                        to="/extensions/xmlui-animations/SlideInAnimation"
-                    />
+                <NavLink label="Extension Overview" to="/extensions/xmlui-animations/_overview" />
+                <NavLink label="Animation" to="/extensions/xmlui-animations/Animation" />
+                <NavLink label="FadeAnimation" to="/extensions/xmlui-animations/FadeAnimation" />
+                <NavLink label="FadeInAnimation" to="/extensions/xmlui-animations/FadeInAnimation" />
+                <NavLink label="FadeOutAnimation" to="/extensions/xmlui-animations/FadeOutAnimation" />
+                <NavLink label="ScaleAnimation" to="/extensions/xmlui-animations/ScaleAnimation" />
+                <NavLink label="SlideInAnimation" to="/extensions/xmlui-animations/SlideInAnimation" />
                 </NavGroup>
                 <NavGroup label="Xmlui Website Blocks">
-                    <NavLink
-                        label="Extension Overview"
-                        to="/extensions/xmlui-website-blocks/_overview"
-                    />
-                    <NavLink
-                        label="Carousel"
-                        to="/extensions/xmlui-website-blocks/Carousel"
-                    />
-                    <NavLink
-                        label="HelloMd"
-                        to="/extensions/xmlui-website-blocks/HelloMd"
-                    />
-                    <NavLink
-                        label="HeroSection"
-                        to="/extensions/xmlui-website-blocks/HeroSection"
-                    />
-                    <NavLink
-                        label="ScrollToTop"
-                        to="/extensions/xmlui-website-blocks/ScrollToTop"
-                    />
+                <NavLink label="Extension Overview" to="/extensions/xmlui-website-blocks/_overview" />
+                <NavLink label="Carousel" to="/extensions/xmlui-website-blocks/Carousel" />
+                <NavLink label="FancyButton" to="/extensions/xmlui-website-blocks/FancyButton" />
+                <NavLink label="HeroSection" to="/extensions/xmlui-website-blocks/HeroSection" />
+                <NavLink label="ScrollToTop" to="/extensions/xmlui-website-blocks/ScrollToTop" />
                 </NavGroup>
                 <!-- END GENERATED CONTENT/Extension references links -->
             </NavGroup
