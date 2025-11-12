@@ -109,4 +109,4 @@ This component does not expose any methods.
 | [paddingTop](../styles-and-themes/common-units/#size)-logo-NavPanel | *none* | *none* |
 | [paddingTop](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-logo-NavPanel | $space-4 | $space-4 |
-| [paddingVertical](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-NavPanel | $space-5 | $space-5 |

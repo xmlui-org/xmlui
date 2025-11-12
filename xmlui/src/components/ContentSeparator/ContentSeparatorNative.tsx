@@ -4,7 +4,8 @@ import classnames from "classnames";
 import styles from "./ContentSeparator.module.scss";
 
 type ContentSeparatorProps = {
-  size?: number | string;
+  thickness?: number | string;
+  length?: number | string;
   orientation?: string;
   style?: CSSProperties;
   className?: string;
@@ -15,7 +16,29 @@ export const defaultProps: Pick<ContentSeparatorProps, "orientation"> = {
 };
 
 export const ContentSeparator = forwardRef<HTMLDivElement, ContentSeparatorProps>(
-  ({ orientation = defaultProps.orientation, size, style, className, ...rest }, ref) => {
+  (
+    { orientation = defaultProps.orientation, thickness, length, style, className, ...rest },
+    ref,
+  ) => {
+    // Only apply inline styles if props are explicitly provided
+    const inlineStyles: CSSProperties = {};
+
+    if (thickness !== undefined) {
+      if (orientation === "horizontal") {
+        inlineStyles.height = thickness;
+      } else {
+        inlineStyles.width = thickness;
+      }
+    }
+
+    if (length !== undefined) {
+      if (orientation === "horizontal") {
+        inlineStyles.width = length;
+      } else {
+        inlineStyles.height = length;
+      }
+    }
+
     return (
       <div
         {...rest}
@@ -29,11 +52,10 @@ export const ContentSeparator = forwardRef<HTMLDivElement, ContentSeparatorProps
           className,
         )}
         style={{
-          height: orientation === "horizontal" ? size : undefined,
-          width: orientation === "horizontal" ? "100%" : size,
+          ...inlineStyles,
           ...style,
         }}
       />
     );
-  }
+  },
 );

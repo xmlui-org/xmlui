@@ -8,7 +8,8 @@ $themeVars: ();
 }
 
 $backgroundColor-ContentSeparator: createThemeVar("backgroundColor-ContentSeparator");
-$size-ContentSeparator: createThemeVar("size-ContentSeparator");
+$thickness-ContentSeparator: createThemeVar("thickness-ContentSeparator");
+$length-ContentSeparator: createThemeVar("length-ContentSeparator");
 $marginTop-ContentSeparator: createThemeVar("marginTop-ContentSeparator");
 $marginBottom-ContentSeparator: createThemeVar("marginBottom-ContentSeparator");
 $marginVertical-ContentSeparator: createThemeVar("marginVertical-ContentSeparator");
@@ -37,13 +38,13 @@ $paddingHorizontal-ContentSeparator: createThemeVar("paddingHorizontal-ContentSe
     padding-right: t.createVarWithDefault("paddingRight-ContentSeparator", #{$paddingHorizontal-ContentSeparator});
 
     &.horizontal {
-      height: $size-ContentSeparator;
-      width: 100%;
+      height: $thickness-ContentSeparator;
+      width: $length-ContentSeparator;
     }
 
     &.vertical {
-      width: $size-ContentSeparator;
-      height: 100%;
+      width: $thickness-ContentSeparator;
+      height: $length-ContentSeparator;
     }
   }
 }
