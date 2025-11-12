@@ -1,12 +1,5 @@
 import React, { type CSSProperties } from "react";
-import {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import classnames from "classnames";
 import styles from "./DateInput.module.scss";
 import { format, parse, isValid } from "date-fns";
@@ -18,6 +11,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
 import Icon from "../Icon/IconNative";
+import { Part } from "../Part/Part";
 
 // Component part names
 const PART_DAY = "day";
@@ -397,7 +391,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
           }
         }
       },
-    [day, month, year, handleChange, onInvalidChange],
+    [day, month, year, handleChange, onInvalidChange, formatDateValue],
   );
 
   // Handle changes from individual inputs
@@ -767,19 +761,17 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
       <div className={styles.wrapper}>
         <div className={styles.inputGroup}>{createDateInputs()}</div>
         {clearable && (
-          <button
-            data-part-id={PART_CLEAR_BUTTON}
-            className={classnames(
-              styles.clearButton,
-              styles.button,
-            )}
-            disabled={!enabled}
-            onClick={clear}
-            onFocus={stopPropagation}
-            type="button"
-          >
-            {clearIconElement}
-          </button>
+          <Part partId={PART_CLEAR_BUTTON}>
+            <button
+              className={classnames(styles.clearButton, styles.button)}
+              disabled={!enabled}
+              onClick={clear}
+              onFocus={stopPropagation}
+              type="button"
+            >
+              {clearIconElement}
+            </button>
+          </Part>
         )}
       </div>
       {endAdornment}
@@ -953,38 +945,39 @@ function DayInput({
   }, [month, year]);
 
   return (
-    <PartialInput
-      data-part-id={PART_DAY}
-      id={otherProps.id}
-      value={value}
-      emptyCharacter={emptyCharacter}
-      placeholderLength={2}
-      max={Math.min(maxDay, 31)}
-      min={1}
-      maxLength={2}
-      validateFn={(val) => isDayInvalid(val, month, year)}
-      onBeep={onBeep}
-      onChange={otherProps.onChange}
-      onBlur={(direction, event) => {
-        // PartialInput provides direction, but current onBlur expects just event
-        if (otherProps.onBlur) {
-          // Provide both direction and event to match the expected signature
-          otherProps.onBlur(direction, event);
-        }
-      }}
-      onKeyDown={otherProps.onKeyDown}
-      className={classnames(styles.input, styles.day)}
-      invalidClassName={styles.invalid}
-      disabled={otherProps.disabled}
-      readOnly={otherProps.readOnly}
-      required={otherProps.required}
-      autoFocus={otherProps.autoFocus}
-      inputRef={otherProps.inputRef}
-      nextInputRef={otherProps.nextInputRef}
-      name="day"
-      ariaLabel={otherProps.ariaLabel}
-      isInvalid={isInvalid}
-    />
+    <Part partId={PART_DAY}>
+      <PartialInput
+        id={otherProps.id}
+        value={value}
+        emptyCharacter={emptyCharacter}
+        placeholderLength={2}
+        max={Math.min(maxDay, 31)}
+        min={1}
+        maxLength={2}
+        validateFn={(val) => isDayInvalid(val, month, year)}
+        onBeep={onBeep}
+        onChange={otherProps.onChange}
+        onBlur={(direction, event) => {
+          // PartialInput provides direction, but current onBlur expects just event
+          if (otherProps.onBlur) {
+            // Provide both direction and event to match the expected signature
+            otherProps.onBlur(direction, event);
+          }
+        }}
+        onKeyDown={otherProps.onKeyDown}
+        className={classnames(styles.input, styles.day)}
+        invalidClassName={styles.invalid}
+        disabled={otherProps.disabled}
+        readOnly={otherProps.readOnly}
+        required={otherProps.required}
+        autoFocus={otherProps.autoFocus}
+        inputRef={otherProps.inputRef}
+        nextInputRef={otherProps.nextInputRef}
+        name="day"
+        ariaLabel={otherProps.ariaLabel}
+        isInvalid={isInvalid}
+      />
+    </Part>
   );
 }
 
@@ -1008,38 +1001,39 @@ function MonthInput({
   ...otherProps
 }: MonthInputProps): React.ReactElement {
   return (
-    <PartialInput
-      data-part-id={PART_MONTH}
-      id={otherProps.id}
-      max={12}
-      min={1}
-      name="month"
-      value={value}
-      invalidClassName={styles.invalid}
-      isInvalid={isInvalid}
-      validateFn={isMonthInvalid}
-      onBeep={onBeep}
-      onChange={otherProps.onChange}
-      emptyCharacter={emptyCharacter}
-      placeholderLength={2}
-      className={classnames(styles.input, styles.month)}
-      maxLength={2}
-      disabled={otherProps.disabled}
-      required={otherProps.required}
-      onBlur={(direction, event) => {
-        // PartialInput provides direction, but current onBlur expects just event
-        if (otherProps.onBlur) {
-          // Provide both direction and event to match the expected signature
-          otherProps.onBlur(direction, event);
-        }
-      }}
-      onKeyDown={otherProps.onKeyDown}
-      readOnly={otherProps.readOnly}
-      autoFocus={otherProps.autoFocus}
-      inputRef={otherProps.inputRef}
-      nextInputRef={otherProps.nextInputRef}
-      ariaLabel={otherProps.ariaLabel}
-    />
+    <Part partId={PART_MONTH}>
+      <PartialInput
+        id={otherProps.id}
+        max={12}
+        min={1}
+        name="month"
+        value={value}
+        invalidClassName={styles.invalid}
+        isInvalid={isInvalid}
+        validateFn={isMonthInvalid}
+        onBeep={onBeep}
+        onChange={otherProps.onChange}
+        emptyCharacter={emptyCharacter}
+        placeholderLength={2}
+        className={classnames(styles.input, styles.month)}
+        maxLength={2}
+        disabled={otherProps.disabled}
+        required={otherProps.required}
+        onBlur={(direction, event) => {
+          // PartialInput provides direction, but current onBlur expects just event
+          if (otherProps.onBlur) {
+            // Provide both direction and event to match the expected signature
+            otherProps.onBlur(direction, event);
+          }
+        }}
+        onKeyDown={otherProps.onKeyDown}
+        readOnly={otherProps.readOnly}
+        autoFocus={otherProps.autoFocus}
+        inputRef={otherProps.inputRef}
+        nextInputRef={otherProps.nextInputRef}
+        ariaLabel={otherProps.ariaLabel}
+      />
+    </Part>
   );
 }
 
@@ -1074,30 +1068,31 @@ function YearInput({
   const { className: originalClassName, ...restProps } = otherProps;
 
   return (
-    <PartialInput
-      data-part-id={PART_YEAR}
-      id={otherProps.id}
-      max={max}
-      min={min}
-      name="year"
-      value={value}
-      isInvalid={isInvalid}
-      invalidClassName={styles.invalid}
-      validateFn={isYearInvalid}
-      onBeep={onBeep}
-      emptyCharacter={emptyCharacter}
-      placeholderLength={4}
-      className={classnames(styles.input, styles.year, originalClassName)}
-      maxLength={maxLength}
-      onBlur={(direction, event) => {
-        // PartialInput provides direction, but current onBlur expects just event
-        if (otherProps.onBlur) {
-          // Provide both direction and event to match the expected signature
-          otherProps.onBlur(direction, event);
-        }
-      }}
-      {...restProps}
-    />
+    <Part partId={PART_YEAR}>
+      <PartialInput
+        id={otherProps.id}
+        max={max}
+        min={min}
+        name="year"
+        value={value}
+        isInvalid={isInvalid}
+        invalidClassName={styles.invalid}
+        validateFn={isYearInvalid}
+        onBeep={onBeep}
+        emptyCharacter={emptyCharacter}
+        placeholderLength={4}
+        className={classnames(styles.input, styles.year, originalClassName)}
+        maxLength={maxLength}
+        onBlur={(direction, event) => {
+          // PartialInput provides direction, but current onBlur expects just event
+          if (otherProps.onBlur) {
+            // Provide both direction and event to match the expected signature
+            otherProps.onBlur(direction, event);
+          }
+        }}
+        {...restProps}
+      />
+    </Part>
   );
 }
 
@@ -1115,7 +1110,7 @@ function onFocus(event: React.FocusEvent<HTMLInputElement>) {
 // Utility function to parse date string into components
 function parseDateString(dateString: string, dateFormat: DateFormat) {
   // Handle non-string values gracefully by returning null (empty fields)
-  if (typeof dateString !== 'string' || dateString === null || dateString === undefined) {
+  if (typeof dateString !== "string" || dateString === null || dateString === undefined) {
     return null;
   }
 

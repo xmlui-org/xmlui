@@ -17,7 +17,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import { PART_INPUT } from "../../components-core/parts";
 import { composeRefs } from "@radix-ui/react-compose-refs";
-
+import { Part } from "../Part/Part";
 
 type ToggleProps = {
   id?: string;
@@ -166,36 +166,37 @@ export const Toggle = forwardRef(function Toggle(
   const input = useMemo(() => {
     const legitValue = transformToLegitValue(value);
     return (
-      <input
-        {...rest}
-        id={id}
-        data-part-id={PART_INPUT}
-        ref={ref}
-        type="checkbox"
-        role={variant}
-        checked={legitValue}
-        disabled={!enabled}
-        required={required}
-        readOnly={readOnly}
-        aria-readonly={readOnly}
-        aria-checked={indeterminate ? "mixed" : legitValue}
-        aria-required={required}
-        aria-disabled={!enabled}
-        onClick={onClick}
-        onChange={onInputChange}
-        onFocus={handleOnFocus}
-        onBlur={handleOnBlur}
-        autoFocus={autoFocus}
-        style={style}
-        className={classnames(className, styles.resetAppearance, {
-          [styles.checkbox]: variant === "checkbox",
-          [styles.switch]: variant === "switch",
-          [styles.error]: validationStatus === "error",
-          [styles.warning]: validationStatus === "warning",
-          [styles.valid]: validationStatus === "valid",
-          [styles.forceHover]: forceHover,
-        })}
-      />
+      <Part partId={PART_INPUT}>
+        <input
+          {...rest}
+          id={id}
+          ref={ref}
+          type="checkbox"
+          role={variant}
+          checked={legitValue}
+          disabled={!enabled}
+          required={required}
+          readOnly={readOnly}
+          aria-readonly={readOnly}
+          aria-checked={indeterminate ? "mixed" : legitValue}
+          aria-required={required}
+          aria-disabled={!enabled}
+          onClick={onClick}
+          onChange={onInputChange}
+          onFocus={handleOnFocus}
+          onBlur={handleOnBlur}
+          autoFocus={autoFocus}
+          style={style}
+          className={classnames(className, styles.resetAppearance, {
+            [styles.checkbox]: variant === "checkbox",
+            [styles.switch]: variant === "switch",
+            [styles.error]: validationStatus === "error",
+            [styles.warning]: validationStatus === "warning",
+            [styles.valid]: validationStatus === "valid",
+            [styles.forceHover]: forceHover,
+          })}
+        />
+      </Part>
     );
   }, [
     rest,
@@ -218,17 +219,15 @@ export const Toggle = forwardRef(function Toggle(
     forceHover,
   ]);
 
-  return (
-    inputRenderer ? (
-      <label className={styles.label}>
-        <div className={styles.inputContainer}>{input}</div>
-        {inputRenderer({
-          $checked: transformToLegitValue(value),
-          $setChecked: setValue,
-        })}
-      </label>
-    ) : (
-      input
-    )
+  return inputRenderer ? (
+    <label className={styles.label}>
+      <div className={styles.inputContainer}>{input}</div>
+      {inputRenderer({
+        $checked: transformToLegitValue(value),
+        $setChecked: setValue,
+      })}
+    </label>
+  ) : (
+    input
   );
 });

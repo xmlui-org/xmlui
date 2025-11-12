@@ -50,6 +50,7 @@ import { get, set } from "lodash-es";
 import classnames from "classnames";
 import { Slot } from "@radix-ui/react-slot";
 import { resolveLayoutProps } from "../../components-core/theming/layout-resolver";
+import { Part } from "../Part/Part";
 
 const PART_CANCEL_BUTTON = "cancelButton";
 const PART_SUBMIT_BUTTON = "submitButton";
@@ -535,27 +536,25 @@ const Form = forwardRef(function (
 
   const cancelButton =
     cancelLabel === "" ? null : (
-      <Button
-        data-part-id={PART_CANCEL_BUTTON}
-        key="cancel"
-        type="button"
-        themeColor={"secondary"}
-        variant={"ghost"}
-        onClick={doCancel}
-      >
-        {cancelLabel}
-      </Button>
+      <Part partId={PART_CANCEL_BUTTON}>
+        <Button
+          key="cancel"
+          type="button"
+          themeColor={"secondary"}
+          variant={"ghost"}
+          onClick={doCancel}
+        >
+          {cancelLabel}
+        </Button>
+      </Part>
     );
   const submitButton = useMemo(
     () => (
-      <Button
-        data-part-id={PART_SUBMIT_BUTTON}
-        key="submit"
-        type={"submit"}
-        disabled={!isEnabled || !enableSubmit}
-      >
-        {formState.submitInProgress ? saveInProgressLabel : saveLabel}
-      </Button>
+      <Part partId={PART_SUBMIT_BUTTON}>
+        <Button key="submit" type={"submit"} disabled={!isEnabled || !enableSubmit}>
+          {formState.submitInProgress ? saveInProgressLabel : saveLabel}
+        </Button>
+      </Part>
     ),
     [isEnabled, enableSubmit, formState.submitInProgress, saveInProgressLabel, saveLabel],
   );

@@ -136,6 +136,10 @@ test.describe("Behaviors and Parts", () => {
 - Verify that behaviors (tooltips, variants) don't interfere with part accessibility
 - For variant testing, use theme variables with the pattern `"property-ComponentName-VariantName"`
 
+**Important Limitations:**
+- Only test the base state theme variables for variant behavior, not hover/focus/active states
+- If hover behavior needs testing, test the functional outcome (e.g., tooltip appears) rather than CSS changes
+
 ## File Organization
 
 - **Location**: Test files MUST be in the same directory as the component's implementation.

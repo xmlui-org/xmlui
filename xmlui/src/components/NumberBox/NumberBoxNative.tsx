@@ -31,6 +31,7 @@ import { Icon } from "../Icon/IconNative";
 import { Adornment } from "../Input/InputAdornment";
 import { Button } from "../Button/ButtonNative";
 import { PART_END_ADORNMENT, PART_INPUT, PART_START_ADORNMENT } from "../../components-core/parts";
+import { Part } from "../Part/Part";
 
 const PART_SPINNER_UP = "spinnerUp";
 const PART_SPINNER_DOWN = "spinnerDown";
@@ -563,34 +564,31 @@ export const NumberBox = forwardRef(function NumberBox(
   }, [focus, registerComponentApi, setValue]);
 
   return (
-      <div
-        {...rest}
-        className={classnames(className, styles.inputRoot,{
-          [styles.readOnly]: readOnly,
-          [styles.disabled]: !enabled,
-          [styles.noSpinBox]: !hasSpinBox,
-          [styles.error]: validationStatus === "error",
-          [styles.warning]: validationStatus === "warning",
-          [styles.valid]: validationStatus === "valid",
-          [styles.rtl]: direction === "rtl",
-        })}
-        id={id}
-        ref={forwardedRef}
-        tabIndex={-1}
-        onFocus={() => {
-          inputRef.current?.focus();
-        }}
-        style={{ ...style, gap }}
-      >
-        <Adornment
-          data-part-id={PART_START_ADORNMENT}
-          text={startText}
-          iconName={startIcon}
-          className={classnames(styles.adornment)}
-        />
+    <div
+      {...rest}
+      className={classnames(className, styles.inputRoot, {
+        [styles.readOnly]: readOnly,
+        [styles.disabled]: !enabled,
+        [styles.noSpinBox]: !hasSpinBox,
+        [styles.error]: validationStatus === "error",
+        [styles.warning]: validationStatus === "warning",
+        [styles.valid]: validationStatus === "valid",
+        [styles.rtl]: direction === "rtl",
+      })}
+      id={id}
+      ref={forwardedRef}
+      tabIndex={-1}
+      onFocus={() => {
+        inputRef.current?.focus();
+      }}
+      style={{ ...style, gap }}
+    >
+      <Part partId={PART_START_ADORNMENT}>
+        <Adornment text={startText} iconName={startIcon} className={classnames(styles.adornment)} />
+      </Part>
+      <Part partId={PART_INPUT}>
         <input
           id={id}
-          data-part-id={PART_INPUT}
           type="text"
           inputMode="numeric"
           className={classnames(styles.input, {
@@ -612,16 +610,14 @@ export const NumberBox = forwardRef(function NumberBox(
           maxLength={maxLength}
           required={required}
         />
-        <Adornment
-          data-part-id={PART_END_ADORNMENT}
-          text={endText}
-          iconName={endIcon}
-          className={classnames(styles.adornment)}
-        />
-        {hasSpinBox && (
-          <div className={styles.spinnerBox}>
+      </Part>
+      <Part partId={PART_END_ADORNMENT}>
+        <Adornment text={endText} iconName={endIcon} className={classnames(styles.adornment)} />
+      </Part>
+      {hasSpinBox && (
+        <div className={styles.spinnerBox}>
+          <Part partId={PART_SPINNER_UP}>
             <Button
-              data-part-id={PART_SPINNER_UP}
               data-spinner="up"
               type="button"
               role="spinbutton"
@@ -634,8 +630,10 @@ export const NumberBox = forwardRef(function NumberBox(
             >
               <Icon name={spinnerUpIcon || "spinnerUp:NumberBox"} fallback="chevronup" size="sm" />
             </Button>
+          </Part>
+
+          <Part partId={PART_SPINNER_DOWN}>
             <Button
-              data-part-id={PART_SPINNER_DOWN}
               data-spinner="down"
               type="button"
               role="spinbutton"
@@ -652,9 +650,10 @@ export const NumberBox = forwardRef(function NumberBox(
                 size="sm"
               />
             </Button>
-          </div>
-        )}
-      </div>
+          </Part>
+        </div>
+      )}
+    </div>
   );
 });
 

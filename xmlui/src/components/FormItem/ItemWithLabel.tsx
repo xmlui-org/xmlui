@@ -8,6 +8,7 @@ import styles from "./FormItem.module.scss";
 import type { LabelPosition } from "../abstractions";
 import { Spinner } from "../Spinner/SpinnerNative";
 import { PART_LABELED_ITEM, PART_LABEL } from "../../components-core/parts";
+import { Part } from "../Part/Part";
 
 // Component part names
 
@@ -68,16 +69,17 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
   const inputId = id || generatedId;
   if (label === undefined && !validationResult) {
     return (
-      <Slot
-        {...rest}
-        data-part-id={PART_LABELED_ITEM}
-        style={style}
-        className={className}
-        id={inputId}
-        ref={ref}
-      >
-        {children}
-      </Slot>
+      <Part partId={PART_LABELED_ITEM}>
+        <Slot
+          {...rest}
+          style={style}
+          className={className}
+          id={inputId}
+          ref={ref}
+        >
+          {children}
+        </Slot>
+      </Part>
     );
   }
   return (
@@ -92,35 +94,37 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
         })}
       >
         {label && (
-          <label
-            data-part-id={PART_LABEL}
-            htmlFor={inputId}
-            onClick={onLabelClick || (() => document.getElementById(inputId)?.focus())}
-            style={{
-              ...labelStyle,
-              width: labelWidth && numberRegex.test(labelWidth) ? `${labelWidth}px` : labelWidth,
-              flexShrink: labelWidth !== undefined ? 0 : undefined,
-            }}
-            className={classnames(styles.inputLabel, {
-              [styles.required]: required,
-              [styles.disabled]: !enabled,
-              [styles.labelBreak]: labelBreak,
-            })}
-          >
-            {label} {required && <span className={styles.requiredMark}>*</span>}
-            {validationInProgress && (
-              <Spinner
-                style={{ height: "1em", width: "1em", marginLeft: "1em", alignSelf: "center" }}
-              />
-            )}
-          </label>
+          <Part partId={PART_LABEL}>
+            <label
+              htmlFor={inputId}
+              onClick={onLabelClick || (() => document.getElementById(inputId)?.focus())}
+              style={{
+                ...labelStyle,
+                width: labelWidth && numberRegex.test(labelWidth) ? `${labelWidth}px` : labelWidth,
+                flexShrink: labelWidth !== undefined ? 0 : undefined,
+              }}
+              className={classnames(styles.inputLabel, {
+                [styles.required]: required,
+                [styles.disabled]: !enabled,
+                [styles.labelBreak]: labelBreak,
+              })}
+            >
+              {label} {required && <span className={styles.requiredMark}>*</span>}
+              {validationInProgress && (
+                <Spinner
+                  style={{ height: "1em", width: "1em", marginLeft: "1em", alignSelf: "center" }}
+                />
+              )}
+            </label>
+          </Part>
         )}
-        {cloneElement(children as ReactElement, {
-          id: !isInputTemplateUsed ? inputId : undefined,
-          style: undefined,
-          className: undefined,
-          "data-part-id": PART_LABELED_ITEM,
-        })}
+        <Part partId={PART_LABELED_ITEM}>
+          {cloneElement(children as ReactElement, {
+            id: !isInputTemplateUsed ? inputId : undefined,
+            style: undefined,
+            className: undefined,
+          })}
+        </Part>
       </div>
       {validationResult}
     </div>
