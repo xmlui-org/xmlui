@@ -81,7 +81,7 @@ export const LinkMd = createMetadata({
 });
 
 /**
- * This function define the renderer for the Limk component.
+ * This function defines the renderer for the Link component.
  */
 export const localLinkComponentRenderer = createComponentRenderer(
   COMP,
