@@ -264,7 +264,9 @@ const App: StandaloneAppDescription = {
     logo: "/resources/logo.svg",
     "logo-dark": "/resources/logo-dark.svg",
     favicon: "/resources/favicon.ico",
-    "icon.github": "/resources/github.svg",
+    "icon.github": "/resources/icons/github.svg",
+    "icon.rss": "/resources/icons/rss.svg",
+
     "font.Inter":
       "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
