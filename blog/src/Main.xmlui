@@ -143,21 +143,21 @@
         <HStack verticalAlignment="center">
             <Fragment when="{mediaSize.sizeIndex > 2}">
                 <LinkButton
-                    to="https://blog.xmlui.org"
+                    to="https://xmlui.org/news"
                     label="News & Reviews"
-                    blank="true"
+                    blank="{true}"
                 />
                 <LinkButton
                     to="https://docs.xmlui.org/change-log"
                     label="Changelog"
-                    blank="true"
+                    blank="{true}"
                 />
                 <Separator />
                 <LinkButton
                     to="https://github.com/xmlui-org/xmlui"
                     icon="github"
                     label="GitHub"
-                    blank="true"
+                    blank="{true}"
                 />
                 <Separator />
             </Fragment>
