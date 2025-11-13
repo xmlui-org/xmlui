@@ -1110,3 +1110,125 @@ test.describe("Theme Variables", () => {
     });
   });
 });
+
+// =============================================================================
+// BEHAVIORS AND PARTS TESTS
+// =============================================================================
+
+test.describe("Behaviors and Parts", () => {
+  test("handles tooltip", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextArea testId="test" tooltip="Tooltip text" />`);
+    
+    const component = page.getByTestId("test");
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test("tooltip with markdown content", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextArea testId="test" tooltipMarkdown="**Bold text**" />`);
+    
+    const component = page.getByTestId("test");
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip.locator("strong")).toHaveText("Bold text");
+  });
+
+  test.fixme("handles variant", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextArea testId="test" variant="CustomVariant" />`, {
+      testThemeVars: {
+        "borderColor-TextArea-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    const component = page.getByTestId("test");
+    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+  });
+
+  test.fixme("variant applies custom theme variables", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextArea testId="test" variant="CustomVariant" />`, {
+      testThemeVars: {
+        "backgroundColor-TextArea-CustomVariant": "rgb(0, 255, 0)",
+      },
+    });
+    const component = page.getByTestId("test");
+    await expect(component).toHaveCSS("background-color", "rgb(0, 255, 0)");
+  });
+
+  test("animation behavior", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextArea testId="test" animation="fadeIn" />`);
+    
+    const component = page.getByTestId("test");
+    await expect(component).toBeVisible();
+  });
+
+  test("combined tooltip and animation", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextArea testId="test" tooltip="Tooltip text" animation="fadeIn" />`);
+    
+    const component = page.getByTestId("test");
+    await expect(component).toBeVisible();
+    
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test("can select part: 'input'", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextArea testId="test" />`);
+    const inputPart = page.locator("[data-part-id='input']");
+    await expect(inputPart).toBeVisible();
+  });
+
+  test("parts are present when tooltip is added", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextArea testId="test" tooltip="Tooltip text" />`);
+    const inputPart = page.locator("[data-part-id='input']");
+    
+    await expect(inputPart).toBeVisible();
+    
+    await inputPart.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test.fixme("parts are present when variant is added", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextArea testId="test" variant="CustomVariant" />`, {
+      testThemeVars: {
+        "borderColor-TextArea-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    
+    const component = page.getByTestId("test");
+    const inputPart = component.locator("[data-part-id='input']");
+    
+    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await expect(inputPart).toBeVisible();
+  });
+
+  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <TextArea 
+        testId="test" 
+        variant="CustomVariant"
+        animation="fadeIn"
+      />
+    `, {
+      testThemeVars: {
+        "backgroundColor-TextArea-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    
+    const component = page.getByTestId("test");
+    const inputPart = component.locator("[data-part-id='input']");
+    
+    // Verify variant applied
+    await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
+    
+    // Verify parts are visible
+    await expect(inputPart).toBeVisible();
+  });
+});
