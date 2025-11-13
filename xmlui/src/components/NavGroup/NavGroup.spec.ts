@@ -130,10 +130,12 @@ test("nested initiallyExpanded works", async ({ initTestBed, page }) => {
   await expect(stack).toBeVisible();
 
   const items = page.getByRole("menuitem");
-  await expect(items).toHaveCount(3);
+  await expect(items).toHaveCount(5);
   await expect(items.nth(0)).toHaveText("Page 1");
   await expect(items.nth(1)).toHaveText("subpages");
   await expect(items.nth(2)).toHaveText("Page 4");
+  await expect(items.nth(3)).toHaveText("inner page 2");
+  await expect(items.nth(4)).toHaveText("inner page 3");
 });
 
 test("expands even without label", async ({ initTestBed, page }) => {
