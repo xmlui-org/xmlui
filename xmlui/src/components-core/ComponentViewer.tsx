@@ -32,7 +32,7 @@ export const ComponentViewer = () => {
       return "";
     }
     const { start, end, fileId } = compSrc;
-    const slicedSrc = sources[fileId].slice(start, end);
+    const slicedSrc = sources[fileId].slice(start, end).replace(/inspect[\s\n]*=[\s\n]*"true"[\s\n]*/g, "");
 
     let dropEmptyLines = true;
     const prunedLines: Array<string> = [];
@@ -54,7 +54,7 @@ export const ComponentViewer = () => {
       }
     });
     return prunedLines
-      .map((line) => line.slice(trimBeginCount).replace(/inspect="true"/g, ""))
+      .map((line) => line.slice(trimBeginCount))
       .join("\n");
   }, [inspectedNode, sources]);
 
@@ -68,6 +68,7 @@ export const ComponentViewer = () => {
         initiallyShowCode={appGlobals?.initiallyShowCode ?? true}
         splitView={true}
         controlsWidth={"120px"}
+        allowReset={false}
         closeButton={
           <Tooltip
             trigger={

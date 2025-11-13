@@ -1,4 +1,4 @@
-import { type ReactNode, useCallback, useRef, useState } from "react";
+import { type ReactNode, useCallback, useState } from "react";
 import { IndexAwareNestedApp } from "./NestedAppNative";
 import { Markdown } from "../Markdown/Markdown";
 import type { ThemeTone } from "../../abstractions/ThemingDefs";
@@ -33,6 +33,7 @@ type AppWithCodeViewNativeProps = {
   height?: string | number;
   allowPlaygroundPopup?: boolean;
   withFrame?: boolean;
+  allowReset?: boolean;
   noHeader?: boolean;
   immediate?: boolean;
   withSplashScreen?: boolean;
@@ -47,6 +48,7 @@ export function AppWithCodeViewNative({
   markdown,
   splitView,
   withFrame = true,
+  allowReset = true,
   noHeader = false,
   initiallyShowCode = false,
   popOutUrl,
@@ -133,7 +135,7 @@ export function AppWithCodeViewNative({
                   </div>
                 </>
               )}
-              <div className={styles.wrapper} style={{ width: controlsWidth }}>
+              <div className={styles.controlWrapper} style={{ width: controlsWidth }}>
                 {allowPlaygroundPopup && (
                   <Tooltip
                     trigger={
@@ -149,20 +151,22 @@ export function AppWithCodeViewNative({
                     label="View and edit in new full-width window"
                   />
                 )}
-                <Tooltip
-                  trigger={
-                    <button
-                      className={styles.headerButton}
-                      onClick={() => {
-                        setShowCode(false);
-                        setRefreshVersion(refreshVersion + 1);
-                      }}
-                    >
-                      <LiaUndoAltSolid />
-                    </button>
-                  }
-                  label="Reset the app"
-                />
+                {allowReset && (
+                  <Tooltip
+                    trigger={
+                      <button
+                        className={styles.headerButton}
+                        onClick={() => {
+                          setShowCode(false);
+                          setRefreshVersion(refreshVersion + 1);
+                        }}
+                      >
+                        <LiaUndoAltSolid />
+                      </button>
+                    }
+                    label="Reset the app"
+                  />
+                )}
                 {closeButton}
               </div>
             </div>

@@ -133,9 +133,11 @@ export const variantBehavior: Behavior = {
 
     // Special handling for Button component
     if (node.type === "Button") {
+      // TODO: Fix with value extraction
       // For Button, only attach if variant is NOT one of the predefined values
-      const variantStr = typeof variant === "string" ? variant : String(variant);
-      return !buttonVariantValues.includes(variantStr as any);
+      // const variantStr = typeof variant === "string" ? variant : String(variant);
+      // return !buttonVariantValues.includes(variantStr as any);
+      return false;
     }
 
     // Special handling for Badge component

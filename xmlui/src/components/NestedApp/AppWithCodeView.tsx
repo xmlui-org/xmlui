@@ -63,6 +63,11 @@ It supports both side-by-side and stacked layouts.`,
       valueType: "boolean",
       defaultValue: defaultProps.withFrame,
     },
+    allowReset: {
+      description: "This property defines whether the reset button should be displayed in the header.",
+      valueType: "boolean",
+      defaultValue: defaultProps.allowReset,
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {},
@@ -109,6 +114,7 @@ export const appWithCodeViewComponentRenderer = createComponentRenderer(
         height={extractValue(node.props?.height)}
         allowPlaygroundPopup={extractValue.asOptionalBoolean(node.props?.allowPlaygroundPopup)}
         withFrame={extractValue.asOptionalBoolean(node.props?.withFrame)}
+        allowReset={extractValue.asOptionalBoolean(node.props?.allowReset)}
       />
     );
   },
