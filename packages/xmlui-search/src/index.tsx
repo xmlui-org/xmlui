@@ -3,6 +3,7 @@ import { Search, defaultProps } from "./Search";
 import styles from "./Search.module.scss";
 
 const COMP = "Search";
+const COMP_INPUT = `${COMP}Input`;
 const COMP_PANEL = `${COMP}Panel`;
 const COMP_ITEM = `${COMP}Item`;
 
@@ -21,6 +22,22 @@ export const SearchMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
+    [`textColor-${COMP_INPUT}`]: "$color-secondary-900",
+    [`fontSize-${COMP_INPUT}`]: "14px",
+    [`fontWeight-${COMP_INPUT}`]: "400",
+    [`backgroundColor-${COMP_INPUT}`]: "$color-surface-50",
+    [`fontFamily-${COMP_INPUT}`]: "$fontFamily-monospace",
+    [`width-${COMP_INPUT}`]: "258px",
+    [`height-${COMP_INPUT}`]: "32px",
+    [`textColor-placeholder-${COMP_INPUT}`]: "$color-secondary-500",
+    [`backgroundColor-${COMP_INPUT}--active`]: "$color-surface-0",
+    [`backgroundColor-${COMP_INPUT}--hover`]: "$color-surface-0",
+    [`borderColor-${COMP_INPUT}`]: "$color-surface-100",
+    [`textColor-adornment-${COMP_INPUT}`]: "$color-secondary-500",
+    [`textColor-adornment-${COMP_INPUT}--active`]: "$color-secondary-900",
+    [`paddingVertical-${COMP_INPUT}`]: "$space-4",
+    [`paddingHorizontal-${COMP_INPUT}`]: "$space-4",
+
     [`backgroundColor-${COMP_PANEL}`]: "$color-surface-0",
     [`borderRadius-${COMP_PANEL}`]: "8px",
     [`borderWidth-${COMP_PANEL}`]: "1px",
@@ -36,18 +53,22 @@ export const SearchMd = createMetadata({
       [`backgroundColor-${COMP_PANEL}`]: "$color-surface-100",
       [`borderColor-${COMP_PANEL}`]: "$color-surface-300",
       [`backgroundColor-${COMP_ITEM}--hover`]: "rgb(from $color-primary-200 r g b / 0.4)",
-    }
+    },
   },
 });
 
-const searchComponentRenderer = createComponentRenderer(COMP, SearchMd, ({ node, extractValue }) => {
-  return (
-    <Search
-      data={extractValue(node.props?.data)}
-      limit={extractValue.asOptionalNumber(node.props?.limit, defaultProps.limit)}
-    />
-  );
-});
+const searchComponentRenderer = createComponentRenderer(
+  COMP,
+  SearchMd,
+  ({ node, extractValue }) => {
+    return (
+      <Search
+        data={extractValue(node.props?.data)}
+        limit={extractValue.asOptionalNumber(node.props?.limit, defaultProps.limit)}
+      />
+    );
+  },
+);
 
 export default {
   namespace: "XMLUIExtensions",

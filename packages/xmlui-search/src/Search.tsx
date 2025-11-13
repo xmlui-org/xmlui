@@ -28,12 +28,7 @@ import type {
 import Fuse from "fuse.js";
 import styles from "./Search.module.scss";
 import classnames from "classnames";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  Portal,
-} from "@radix-ui/react-popover";
+import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 
 type Props = {
   id?: string;
@@ -92,6 +87,7 @@ export const Search = ({
   const itemRefs = useRef<HTMLLIElement[]>([]);
   const itemLinkRefs = useRef<HTMLDivElement[]>([]); // <- this is a messy solution
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [isFocused, setIsFocused] = useState(false);
 
   const [inputValue, setInputValue] = useState("");
   const debouncedValue = useDeferredValue(inputValue);
@@ -126,7 +122,7 @@ export const Search = ({
     return [...dataFromMd, ...Object.values(content ?? {})];
   }, [content, dataFromMd]);
 
-  useEffect(()=>{
+  useEffect(() => {
     fuse.setCollection(mergedData);
   }, [mergedData]);
 
@@ -148,12 +144,16 @@ export const Search = ({
   const onClick = useCallback(() => {
     setInputValue("");
     setActiveIndex(-1);
-    setShow(false);
   }, []);
 
   const onInputFocus = useCallback(() => {
+    setIsFocused(true);
     if (debouncedValue.length > 0) setShow(true);
   }, [debouncedValue]);
+
+  const onInputBlur = useCallback(() => {
+    setIsFocused(false);
+  }, []);
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback(
@@ -206,10 +206,14 @@ export const Search = ({
         <TextBox
           id={inputId}
           ref={inputRef}
+          className={classnames(styles.input, {
+            [styles.fullWidth]: inDrawer,
+            [styles.active]: inputValue.length > 0,
+            [styles.focused]: isFocused,
+          })}
           type="search"
-          placeholder="Type to search..."
+          placeholder="Type to search"
           value={inputValue}
-          style={{ height: "36px", width: inDrawer ? "100%" : "280px" }}
           startIcon="search"
           onDidChange={(value) =>
             setInputValue(() => {
@@ -218,6 +222,7 @@ export const Search = ({
             })
           }
           onFocus={onInputFocus}
+          onBlur={onInputBlur}
           onKeyDown={handleKeyDown}
           aria-autocomplete="list"
           aria-controls="dropdown-list"
