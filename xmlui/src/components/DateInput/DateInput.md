@@ -95,7 +95,7 @@ The `dateFormat` prop controls how dates are displayed and entered. Different fo
 
 %-PROP-START clearable
 
-When enabled, it displays a clear button that allows users to reset the date input back to its initial value. Enter a date in this app and then click the clear button:
+When enabled, it displays a clear button that allows users to clear the date input. Enter a date in this app and then click the clear button:
 
 ```xmlui-pg copy display name="Example: clearable" /clearable/
 <App>
@@ -122,8 +122,14 @@ When `true`, the clear button resets the input to its initial value. When `false
 
 ```xmlui-pg copy display name="Example: clearToInitialValue"
 <App>
-  <DateInput clearable="true" clearToInitialValue="true" initialValue="05/25/2024" />
-  <DateInput clearable="true" clearToInitialValue="false" initialValue="05/25/2024" />
+  <DateInput 
+    clearable="true" 
+    clearToInitialValue="true" 
+    initialValue="05/25/2024" />
+  <DateInput 
+    clearable="true" 
+    clearToInitialValue="false" 
+    initialValue="05/25/2024" />
 </App>
 ```
 

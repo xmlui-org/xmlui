@@ -424,7 +424,7 @@ test.describe("Basic Functionality", () => {
       initTestBed,
       createTimeInputDriver,
     }) => {
-      await initTestBed(`<TimeInput testId="timeInput" clearable="true" initialValue="14:30" />`);
+      await initTestBed(`<TimeInput testId="timeInput" clearable="true" clearToInitialValue="true" initialValue="14:30" />`);
       const driver = await createTimeInputDriver("timeInput");
       await driver.hourInput.fill("05");
       await driver.clearButton.click();

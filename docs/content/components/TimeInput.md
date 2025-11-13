@@ -19,7 +19,7 @@ If this property is set to `true`, the component gets the focus automatically wh
 
 Whether to show a clear button that allows clearing the selected time
 
-When enabled, it displays a clear button that allows users to reset the time picker back to its initial value. Change the time value in this app and then click the clear button:
+When enabled, it displays a clear button that allows users to clear the time input. Change the time value in this app and then click the clear button:
 
 ```xmlui-pg copy display name="Example: clearable" /clearable/
 <App>
@@ -38,7 +38,7 @@ The icon to display in the clear button.
 </App>
 ```
 
-### `clearToInitialValue` (default: true) [#cleartoinitialvalue-default-true]
+### `clearToInitialValue` (default: false) [#cleartoinitialvalue-default-false]
 
 Whether the clear button resets the time input to its initial value
 

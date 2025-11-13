@@ -781,7 +781,7 @@ test.describe("User Interactions", () => {
     createDateInputDriver,
   }) => {
     await initTestBed(
-      `<DateInput testId="dateInput" clearable="true" initialValue="05/25/2024" />`,
+      `<DateInput testId="dateInput" clearable="true" clearToInitialValue="true" initialValue="05/25/2024" />`,
     );
     const driver = await createDateInputDriver("dateInput");
     await expect(driver.monthInput).toHaveValue("05");
