@@ -1275,3 +1275,179 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
+
+// =============================================================================
+// BEHAVIORS AND PARTS TESTS
+// =============================================================================
+
+test.describe("Behaviors and Parts", () => {
+  test("handles tooltip", async ({ page, initTestBed }) => {
+    await initTestBed(`<NumberBox testId="test" tooltip="Tooltip text" />`);
+    
+    const component = page.getByTestId("test");
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test("tooltip with markdown content", async ({ page, initTestBed }) => {
+    await initTestBed(`<NumberBox testId="test" tooltipMarkdown="**Bold text**" />`);
+    
+    const component = page.getByTestId("test");
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip.locator("strong")).toHaveText("Bold text");
+  });
+
+  test.fixme("handles variant", async ({ page, initTestBed }) => {
+    await initTestBed(`<NumberBox testId="test" variant="CustomVariant" />`, {
+      testThemeVars: {
+        "borderColor-NumberBox-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    const component = page.getByTestId("test");
+    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+  });
+
+  test.fixme("variant applies custom theme variables", async ({ page, initTestBed }) => {
+    await initTestBed(`<NumberBox testId="test" variant="CustomVariant" />`, {
+      testThemeVars: {
+        "backgroundColor-NumberBox-CustomVariant": "rgb(0, 255, 0)",
+      },
+    });
+    const component = page.getByTestId("test");
+    await expect(component).toHaveCSS("background-color", "rgb(0, 255, 0)");
+  });
+
+  test("animation behavior", async ({ page, initTestBed }) => {
+    await initTestBed(`<NumberBox testId="test" animation="fadeIn" />`);
+    
+    const component = page.getByTestId("test");
+    await expect(component).toBeVisible();
+  });
+
+  test("combined tooltip and animation", async ({ page, initTestBed }) => {
+    await initTestBed(`<NumberBox testId="test" tooltip="Tooltip text" animation="fadeIn" />`);
+    
+    const component = page.getByTestId("test");
+    await expect(component).toBeVisible();
+    
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test("can select part: 'input'", async ({ page, initTestBed }) => {
+    await initTestBed(`<NumberBox testId="test" />`);
+    const inputPart = page.getByTestId("test").locator("[data-part-id='input']");
+    await expect(inputPart).toBeVisible();
+  });
+
+  test("can select part: 'spinnerUp'", async ({ page, initTestBed }) => {
+    await initTestBed(`<NumberBox testId="test" />`);
+    const spinnerUp = page.getByTestId("test").locator("[data-part-id='spinnerUp']");
+    await expect(spinnerUp).toBeVisible();
+  });
+
+  test("can select part: 'spinnerDown'", async ({ page, initTestBed }) => {
+    await initTestBed(`<NumberBox testId="test" />`);
+    const spinnerDown = page.getByTestId("test").locator("[data-part-id='spinnerDown']");
+    await expect(spinnerDown).toBeVisible();
+  });
+
+  test("can select part: 'startAdornment'", async ({ page, initTestBed }) => {
+    await initTestBed(`<NumberBox testId="test" startText="$" />`);
+    const startAdornment = page.getByTestId("test").locator("[data-part-id='startAdornment']");
+    await expect(startAdornment).toBeVisible();
+    await expect(startAdornment).toHaveText("$");
+  });
+
+  test("can select part: 'endAdornment'", async ({ page, initTestBed }) => {
+    await initTestBed(`<NumberBox testId="test" endText="USD" />`);
+    const endAdornment = page.getByTestId("test").locator("[data-part-id='endAdornment']");
+    await expect(endAdornment).toBeVisible();
+    await expect(endAdornment).toHaveText("USD");
+  });
+
+  test("spinners are not present when hasSpinBox is false", async ({ page, initTestBed }) => {
+    await initTestBed(`<NumberBox testId="test" hasSpinBox="false" />`);
+    const spinnerUp = page.getByTestId("test").locator("[data-part-id='spinnerUp']");
+    const spinnerDown = page.getByTestId("test").locator("[data-part-id='spinnerDown']");
+    await expect(spinnerUp).not.toBeVisible();
+    await expect(spinnerDown).not.toBeVisible();
+  });
+
+  test("parts are present when tooltip is added", async ({ page, initTestBed }) => {
+    await initTestBed(`<NumberBox testId="test" tooltip="Tooltip text" startText="$" />`);
+    
+    const component = page.getByTestId("test");
+    const inputPart = component.locator("[data-part-id='input']");
+    const startAdornment = component.locator("[data-part-id='startAdornment']");
+    const spinnerUp = component.locator("[data-part-id='spinnerUp']");
+    
+    await expect(inputPart).toBeVisible();
+    await expect(startAdornment).toBeVisible();
+    await expect(spinnerUp).toBeVisible();
+    
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test.fixme("parts are present when variant is added", async ({ page, initTestBed }) => {
+    await initTestBed(`<NumberBox testId="test" variant="CustomVariant" endText="USD" />`, {
+      testThemeVars: {
+        "borderColor-NumberBox-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    
+    const component = page.getByTestId("test");
+    const inputPart = component.locator("[data-part-id='input']");
+    const endAdornment = component.locator("[data-part-id='endAdornment']");
+    const spinnerDown = component.locator("[data-part-id='spinnerDown']");
+    
+    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await expect(inputPart).toBeVisible();
+    await expect(endAdornment).toBeVisible();
+    await expect(spinnerDown).toBeVisible();
+  });
+
+  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <NumberBox 
+        testId="test" 
+        variant="CustomVariant"
+        animation="fadeIn"
+        startText="$"
+        endText="USD"
+      />
+    `, {
+      testThemeVars: {
+        "backgroundColor-NumberBox-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    
+    const component = page.getByTestId("test");
+    const inputPart = component.locator("[data-part-id='input']");
+    const startAdornment = component.locator("[data-part-id='startAdornment']");
+    const endAdornment = component.locator("[data-part-id='endAdornment']");
+    const spinnerUp = component.locator("[data-part-id='spinnerUp']");
+    const spinnerDown = component.locator("[data-part-id='spinnerDown']");
+    
+    // Verify variant applied
+    await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
+    
+    // Verify parts are visible
+    await expect(inputPart).toBeVisible();
+    await expect(startAdornment).toBeVisible();
+    await expect(endAdornment).toBeVisible();
+    await expect(spinnerUp).toBeVisible();
+    await expect(spinnerDown).toBeVisible();
+  });
+});

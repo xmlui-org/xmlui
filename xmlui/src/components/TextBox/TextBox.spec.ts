@@ -908,3 +908,163 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
+
+// =============================================================================
+// BEHAVIORS AND PARTS TESTS
+// =============================================================================
+
+test.describe("Behaviors and Parts", () => {
+  test("handles tooltip", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextBox testId="test" tooltip="Tooltip text" />`);
+    
+    const component = page.getByTestId("test");
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test("tooltip with markdown content", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextBox testId="test" tooltipMarkdown="**Bold text**" />`);
+    
+    const component = page.getByTestId("test");
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip.locator("strong")).toHaveText("Bold text");
+  });
+
+  test.fixme("handles variant", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextBox testId="test" variant="CustomVariant" />`, {
+      testThemeVars: {
+        "borderColor-TextBox-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    const component = page.getByTestId("test");
+    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+  });
+
+  test.fixme("variant applies custom theme variables", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextBox testId="test" variant="CustomVariant" />`, {
+      testThemeVars: {
+        "backgroundColor-TextBox-CustomVariant": "rgb(0, 255, 0)",
+      },
+    });
+    const component = page.getByTestId("test");
+    await expect(component).toHaveCSS("background-color", "rgb(0, 255, 0)");
+  });
+
+  test("animation behavior", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextBox testId="test" animation="fadeIn" />`);
+    
+    const component = page.getByTestId("test");
+    await expect(component).toBeVisible();
+  });
+
+  test("combined tooltip and animation", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextBox testId="test" tooltip="Tooltip text" animation="fadeIn" />`);
+    
+    const component = page.getByTestId("test");
+    await expect(component).toBeVisible();
+    
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test("can select part: 'input'", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextBox testId="test" />`);
+    const inputPart = page.getByTestId("test").locator("[data-part-id='input']");
+    await expect(inputPart).toBeVisible();
+  });
+
+  test("can select part: 'startAdornment'", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextBox testId="test" startText="$" />`);
+    const startAdornment = page.getByTestId("test").locator("[data-part-id='startAdornment']");
+    await expect(startAdornment).toBeVisible();
+    await expect(startAdornment).toHaveText("$");
+  });
+
+  test("can select part: 'endAdornment'", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextBox testId="test" endText="USD" />`);
+    const endAdornment = page.getByTestId("test").locator("[data-part-id='endAdornment']");
+    await expect(endAdornment).toBeVisible();
+    await expect(endAdornment).toHaveText("USD");
+  });
+
+  test("startAdornment part is not present without startText or startIcon", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextBox testId="test" />`);
+    const startAdornment = page.getByTestId("test").locator("[data-part-id='startAdornment']");
+    await expect(startAdornment).not.toBeVisible();
+  });
+
+  test("endAdornment part is not present without endText or endIcon", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextBox testId="test" />`);
+    const endAdornment = page.getByTestId("test").locator("[data-part-id='endAdornment']");
+    await expect(endAdornment).not.toBeVisible();
+  });
+
+  test("parts are present when tooltip is added", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextBox testId="test" tooltip="Tooltip text" startText="$" />`);
+    
+    const component = page.getByTestId("test");
+    const inputPart = component.locator("[data-part-id='input']");
+    const startAdornment = component.locator("[data-part-id='startAdornment']");
+    
+    await expect(inputPart).toBeVisible();
+    await expect(startAdornment).toBeVisible();
+    
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test.fixme("parts are present when variant is added", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextBox testId="test" variant="CustomVariant" endText="USD" />`, {
+      testThemeVars: {
+        "borderColor-TextBox-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    
+    const component = page.getByTestId("test");
+    const inputPart = component.locator("[data-part-id='input']");
+    const endAdornment = component.locator("[data-part-id='endAdornment']");
+    
+    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await expect(inputPart).toBeVisible();
+    await expect(endAdornment).toBeVisible();
+  });
+
+  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <TextBox 
+        testId="test" 
+        variant="CustomVariant"
+        animation="fadeIn"
+        startText="$"
+        endText="USD"
+      />
+    `, {
+      testThemeVars: {
+        "backgroundColor-TextBox-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    
+    const component = page.getByTestId("test");
+    const inputPart = component.locator("[data-part-id='input']");
+    const startAdornment = component.locator("[data-part-id='startAdornment']");
+    const endAdornment = component.locator("[data-part-id='endAdornment']");
+    
+    // Verify variant applied
+    await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
+    
+    // Verify parts are visible
+    await expect(inputPart).toBeVisible();
+    await expect(startAdornment).toBeVisible();
+    await expect(endAdornment).toBeVisible();
+  });
+});
