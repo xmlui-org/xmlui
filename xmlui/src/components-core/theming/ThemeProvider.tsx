@@ -17,13 +17,16 @@ import { EMPTY_ARRAY, EMPTY_OBJECT } from "../constants";
 import { collectThemeChainByExtends } from "../theming/extendThemeUtils";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
 import {
+  XmlUiBlogThemeDefinition,
   XmlUiCyanThemeDefinition,
+  XmlUiDocsThemeDefinition,
   XmlUiGrayThemeDefinition,
   XmlUiGreenThemeDefinition,
   XmlUiOrangeThemeDefinition,
   XmlUiPurpleThemeDefinition,
   XmlUiRedThemeDefinition,
   XmlUiThemeDefinition,
+  XmlUiWebThemeDefinition,
 } from "../theming/themes/xmlui";
 import { useIsomorphicLayoutEffect } from "../utils/hooks";
 import type {
@@ -235,6 +238,9 @@ export const builtInThemes: Array<ThemeDefinition> = [
   XmlUiPurpleThemeDefinition,
   XmlUiCyanThemeDefinition,
   XmlUiRedThemeDefinition,
+  XmlUiDocsThemeDefinition,
+  XmlUiBlogThemeDefinition,
+  XmlUiWebThemeDefinition,
   /*SolidThemeDefinition,*/
 ];
 

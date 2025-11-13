@@ -22,14 +22,14 @@ export const XmlUiThemeDefinition: ThemeDefinition = {
       themeVars: {
         "backgroundColor-ModalDialog": "white",
         "backgroundColor-checked-RadioGroupOption": "$color-primary-400",
-      }
+      },
     },
     dark: {
       themeVars: {
         "color-error": "$color-danger-400",
-      }
-    }
-  }
+      },
+    },
+  },
 };
 
 export const XmlUiGreenThemeDefinition: ThemeDefinition = {
@@ -66,4 +66,39 @@ export const XmlUiRedThemeDefinition: ThemeDefinition = {
   id: "xmlui-red",
   extends: "xmlui",
   themeVars: { ...redThemeColors },
+};
+
+export const XmlUiDocsThemeDefinition: ThemeDefinition = {
+  id: "xmlui-docs",
+  extends: "xmlui",
+  themeVars: {},
+};
+
+export const XmlUiBlogThemeDefinition: ThemeDefinition = {
+  id: "xmlui-blog",
+  extends: "xmlui",
+  themeVars: {},
+};
+
+export const XmlUiWebThemeDefinition: ThemeDefinition = {
+  id: "xmlui-web",
+  extends: "xmlui",
+  themeVars: {
+    // --- Fundamental colors & typography
+    "maxWidth-content-AppHeader": "1280px",
+    backgroundColor: "$color-surface-0",
+    "color-primary": "#3367CC",
+    "color-surface": "#1e2734",
+    "fontWeight-Text": "400",
+    "fontWeight-bold": "700",
+    "textColor-primary": "$color-surface-800",
+    "textColor-NavLink--active": "$color-primary",
+
+    // --- App layout
+    "maxWidth-content-App": "800px",
+
+    // --- Headings
+    "fontSize-H2": "32px",
+    "fontSize-H3": "$space-6",
+  },
 };
