@@ -35,6 +35,29 @@ $borderRadius-SearchItem: createThemeVar("borderRadius-#{$componentListItem}");
 $backgroundColor-SearchItem--hover: createThemeVar("backgroundColor-#{$componentListItem}--hover");
 $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem}--focus");
 
+// Keyframe animations for collapsible search
+@keyframes expandSearch {
+  from {
+    width: 0;
+    opacity: 0;
+  }
+  to {
+    width: $width-SearchInput;
+    opacity: 1;
+  }
+}
+
+@keyframes collapseSearch {
+  from {
+    width: $width-SearchInput;
+    opacity: 1;
+  }
+  to {
+    width: 0;
+    opacity: 0;
+  }
+}
+
 .listPanel {
   @include t.borderVars($themeVars, $componentListPanel);
   @include t.paddingVars($themeVars, $componentListPanel);
@@ -83,6 +106,14 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
 
   &.fullWidth {
     width: 100%;
+  }
+
+  &.expanding {
+    animation: expandSearch 0.3s ease-out forwards;
+  }
+
+  &.collapsing {
+    animation: collapseSearch 0.3s ease-in forwards;
   }
 
   & > input::placeholder {

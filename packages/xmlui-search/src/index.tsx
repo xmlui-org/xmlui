@@ -19,6 +19,11 @@ export const SearchMd = createMetadata({
       valueType: "number",
       defaultValue: defaultProps.limit,
     },
+    collapsible: {
+      description: `If true, the search starts collapsed as a button with a search icon. Clicking the button expands the search field with an animation. When the field is empty and loses focus, it collapses back to the button.`,
+      valueType: "boolean",
+      defaultValue: false,
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -65,6 +70,7 @@ const searchComponentRenderer = createComponentRenderer(
       <Search
         data={extractValue(node.props?.data)}
         limit={extractValue.asOptionalNumber(node.props?.limit, defaultProps.limit)}
+        collapsible={extractValue.asOptionalBoolean(node.props?.collapsible, false)}
       />
     );
   },

@@ -18,6 +18,7 @@ import {
   VisuallyHidden,
   useAppLayoutContext,
   Button,
+  Icon,
 } from "xmlui";
 import type {
   FuseOptionKeyObject,
@@ -36,6 +37,7 @@ type Props = {
   data: Record<string, string>;
   limit?: number;
   maxContentMatchNumber?: number;
+  collapsible?: boolean;
 };
 
 export const defaultProps: Required<Pick<Props, "limit" | "maxContentMatchNumber">> = {
@@ -79,6 +81,7 @@ export const Search = ({
   data,
   limit = defaultProps.limit,
   maxContentMatchNumber = defaultProps.maxContentMatchNumber,
+  collapsible = false,
 }: Props) => {
   const content = useSearchContextContent();
   const _id = useId();
@@ -89,6 +92,10 @@ export const Search = ({
   const itemLinkRefs = useRef<HTMLDivElement[]>([]); // <- this is a messy solution
   const [activeIndex, setActiveIndex] = useState(-1);
   const [isFocused, setIsFocused] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(!collapsible);
+  const [animationDirection, setAnimationDirection] = useState<"expanding" | "collapsing" | null>(
+    null,
+  );
 
   const [inputValue, setInputValue] = useState("");
   const debouncedValue = useDeferredValue(inputValue);
@@ -154,7 +161,14 @@ export const Search = ({
 
   const onInputBlur = useCallback(() => {
     setIsFocused(false);
-  }, []);
+    if (collapsible && inputValue.length === 0) {
+      setAnimationDirection("collapsing");
+      setTimeout(() => {
+        setIsExpanded(false);
+        setAnimationDirection(null);
+      }, 300);
+    }
+  }, [collapsible, inputValue]);
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback(
@@ -203,34 +217,52 @@ export const Search = ({
       <VisuallyHidden>
         <label htmlFor={inputId}>Search Field</label>
       </VisuallyHidden>
-      <PopoverTrigger asChild>
-        <TextBox
-          id={inputId}
-          ref={inputRef}
-          className={classnames(styles.input, {
-            [styles.fullWidth]: inDrawer,
-            [styles.active]: inputValue.length > 0,
-            [styles.focused]: isFocused,
-          })}
-          type="search"
-          placeholder="Type to search"
-          value={inputValue}
-          startIcon="search"
-          onDidChange={(value) =>
-            setInputValue(() => {
-              setActiveIndex(-1);
-              return value;
-            })
-          }
-          showClearButton
-          onFocus={onInputFocus}
-          onBlur={onInputBlur}
-          onKeyDown={handleKeyDown}
-          aria-autocomplete="list"
-          aria-controls="dropdown-list"
-          aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
+      {collapsible && !isExpanded && animationDirection === null ? (
+        <Button
+          variant="ghost"
+          icon={<Icon name="search" aria-hidden />}
+          onClick={() => {
+            setIsExpanded(true);
+            setAnimationDirection("expanding");
+            // Focus a search inputot amikor kinyílik
+            setTimeout(() => {
+              inputRef.current?.focus();
+              setAnimationDirection(null);
+            }, 300);
+          }}
+          contextualLabel="Open search"
         />
-      </PopoverTrigger>
+      ) : (
+        <PopoverTrigger asChild>
+          <TextBox
+            id={inputId}
+            ref={inputRef}
+            className={classnames(styles.input, {
+              [styles.fullWidth]: inDrawer,
+              [styles.active]: inputValue.length > 0,
+              [styles.focused]: isFocused,
+              [styles.expanding]: animationDirection === "expanding",
+              [styles.collapsing]: animationDirection === "collapsing",
+            })}
+            type="search"
+            placeholder="Type to search"
+            value={inputValue}
+            startIcon="search"
+            onDidChange={(value) =>
+              setInputValue(() => {
+                setActiveIndex(-1);
+                return value;
+              })
+            }
+            onFocus={onInputFocus}
+            onBlur={onInputBlur}
+            onKeyDown={handleKeyDown}
+            aria-autocomplete="list"
+            aria-controls="dropdown-list"
+            aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
+          />
+        </PopoverTrigger>
+      )}
       {show && results && debouncedValue && (
         <Portal container={_root}>
           <PopoverContent

@@ -19,18 +19,11 @@
             <NavLink noIndicator label="Blog" to="https://blog.xmlui.org" />
         </HStack>
         <SpaceFiller />
-        <Fragment when="{mediaSize.sizeIndex > 1}" var.showSearch="{false}">
-            <Search
-                when="{showSearch}"
-                data="{appGlobals.plainTextContent}"
-            />
-            <Button
-                when="{!showSearch}"
-                icon="search"
-                variant="ghost"
-                onClick="{() => showSearch = !showSearch}"
-            />
-        </Fragment>
+        <Search
+            collapsible="true"
+            when="{mediaSize.sizeIndex > 1}"
+            data="{appGlobals.plainTextContent}"
+        />
         <Link to="https://www.xmlui.org/get-started">
             <Button variant="solid" onClick="emitEvent('click')">
                 Download
