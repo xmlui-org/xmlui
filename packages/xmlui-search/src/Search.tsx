@@ -17,6 +17,7 @@ import {
   useTheme,
   VisuallyHidden,
   useAppLayoutContext,
+  Button,
 } from "xmlui";
 import type {
   FuseOptionKeyObject,
@@ -221,6 +222,7 @@ export const Search = ({
               return value;
             })
           }
+          showClearButton
           onFocus={onInputFocus}
           onBlur={onInputBlur}
           onKeyDown={handleKeyDown}

@@ -243,6 +243,14 @@ export const TextBox = forwardRef(function TextBox(
         tabIndex={enabled ? tabIndex : -1}
         required={required}
       />
+      {!readOnly && enabled && localValue.length > 0 && type == "search" && (
+        <Adornment
+          data-part-id={PART_END_ADORNMENT}
+          iconName="close"
+          className={styles.adornment}
+          onClick={() => updateValue("")}
+        />
+      )}
       {type === "password" && showPasswordToggle ? (
         <Adornment
           data-part-id={PART_END_ADORNMENT}
