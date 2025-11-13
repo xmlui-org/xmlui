@@ -292,7 +292,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     const behaviors = componentRegistry.getBehaviors();
     if (!isCompoundComponent) {
       for (const behavior of behaviors) {
-        if (behavior.canAttach(rendererContext.node, descriptor)) {
+        if (behavior.canAttach(rendererContext, rendererContext.node, descriptor)) {
           renderedNode = behavior.attach(rendererContext, renderedNode, descriptor);
         }
       }

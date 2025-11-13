@@ -16,11 +16,12 @@ export interface Behavior {
   /**
    * A function that determines if the behavior should be applied based on the
    * component's context and props.
+   * @param context The renderer context of the component.
    * @param node The component definition.
    * @param metadata The metadata of the component.
    * @returns True if the behavior can be attached, otherwise false.
    */
-  canAttach: (node: ComponentDef, metadata: ComponentMetadata) => boolean;
+  canAttach: (context: RendererContext<any>, node: ComponentDef, metadata: ComponentMetadata) => boolean;
 
   /**
    * A function that attaches the behavior to the component's React node.
