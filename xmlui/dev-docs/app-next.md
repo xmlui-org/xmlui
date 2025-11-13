@@ -1424,6 +1424,7 @@ All horizontal-sticky layout diagrams share the following common characteristics
 │                                                                              │
 │                                                                              │
 │                                                                              │
+│                                                                              │
 ├──────────────────────────────────────────────────────────────────────────────┤
 │ F: Footer (docked to bottom)                                                 │
 └──────────────────────────────────────────────────────────────────────────────┘
@@ -1444,6 +1445,8 @@ All horizontal-sticky layout diagrams share the following common characteristics
 │ │ N: Navigation Panel (docked to top)                                      │ │
 │ ├──────────────────────────────────────────────────────────────────────────┤ │
 │ │ M: Main Content                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
 │ │                                                                          │ │
 │ │                                                                          │ │
 │ │                                                                          │ │
@@ -1479,9 +1482,14 @@ All horizontal-sticky layout diagrams share the following common characteristics
 │ ↑ Content above (hidden)                                                   │ │
 │                                                                            │ │
 │                                                                            │ │
+│                                                                            │ │
 │ M: Main Content (scrollable, mid-scroll position)                          │█│
 │                                                                            │█│
 │                                                                            │█│
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
 │                                                                            │ │
 │                                                                            │ │
 │                                                                            │ │
@@ -1520,6 +1528,9 @@ All horizontal-sticky layout diagrams share the following common characteristics
 │ │                                                                          │ │
 │ │                                                                          │ │
 │ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
 │ │ ↓ Content below (hidden)                                                 │ │
 │ ├──────────────────────────────────────────────────────────────────────────┤ │
 │ │ F: Footer (docked to bottom)                                             │ │
@@ -1544,6 +1555,11 @@ All horizontal-sticky layout diagrams share the following common characteristics
 │                                                                            │ │
 │                                                                            │ │
 │ M: Main Content (scrollable, scrolled to bottom)                           │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
 │                                                                            │ │
 │                                                                            │ │
 │                                                                            │ │
