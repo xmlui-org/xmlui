@@ -285,10 +285,18 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     Trigger = DropdownMenuSubTrigger as any;
     Content = DropdownMenuSubContent;
   }
-  const [expanded, setExpanded] = useState(initiallyExpanded);
+  const [expanded, setExpanded] = useState(false);
   const [renderCount, setRenderCount] = useState(false);
 
-  useEffect(() => setRenderCount(true), []);
+  useEffect(() => {
+    setRenderCount(true);
+    // Defer the initial expansion to allow proper positioning
+    if (initiallyExpanded) {
+      requestAnimationFrame(() => {
+        setExpanded(true);
+      });
+    }
+  }, [initiallyExpanded]);
 
   return (
     <Wrapper
