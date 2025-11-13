@@ -82,7 +82,7 @@ export const defaultProps = {
   hour24: true,
   seconds: false,
   clearable: false,
-  clearToInitialValue: true,
+  clearToInitialValue: false,
   required: false,
   readOnly: false,
   autoFocus: false,

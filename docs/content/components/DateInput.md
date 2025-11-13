@@ -19,7 +19,7 @@ If this property is set to `true`, the component gets the focus automatically wh
 
 Whether to show a clear button to reset the input
 
-When enabled, it displays a clear button that allows users to reset the date input back to its initial value. Enter a date in this app and then click the clear button:
+When enabled, it displays a clear button that allows users to clear the date input. Enter a date in this app and then click the clear button:
 
 ```xmlui-pg copy display name="Example: clearable" /clearable/
 <App>
@@ -38,7 +38,7 @@ Icon name for the clear button
 </App>
 ```
 
-### `clearToInitialValue` (default: true) [#cleartoinitialvalue-default-true]
+### `clearToInitialValue` (default: false) [#cleartoinitialvalue-default-false]
 
 Whether clearing resets to initial value or null
 
@@ -46,8 +46,14 @@ When `true`, the clear button resets the input to its initial value. When `false
 
 ```xmlui-pg copy display name="Example: clearToInitialValue"
 <App>
-  <DateInput clearable="true" clearToInitialValue="true" initialValue="05/25/2024" />
-  <DateInput clearable="true" clearToInitialValue="false" initialValue="05/25/2024" />
+  <DateInput 
+    clearable="true" 
+    clearToInitialValue="true" 
+    initialValue="05/25/2024" />
+  <DateInput 
+    clearable="true" 
+    clearToInitialValue="false" 
+    initialValue="05/25/2024" />
 </App>
 ```
 
