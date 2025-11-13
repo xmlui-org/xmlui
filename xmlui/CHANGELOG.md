@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.11.11
+
+### Patch Changes
+
+- d32fef2: New themes created: xmlui-docs, xmlui-blog, xmlui-web
+- c882b72: The "contextVars" warning with inspect="true" is fixed
+
 ## 0.11.10
 
 ### Patch Changes
