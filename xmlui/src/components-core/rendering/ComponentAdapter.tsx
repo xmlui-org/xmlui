@@ -191,10 +191,11 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     (url?: unknown) => {
       const extractedUrl = valueExtractor(url);
       if (typeof extractedUrl !== "string" || extractedUrl.trim() === "") {
-        console.warn(
-          `Component '${safeNode.type}': ` +
-            `the extracted resource URL is not a valid string: value ${extractedUrl}, type ${typeof extractedUrl}`,
-        );
+        // TODO: Review how we should log this warning
+        // console.warn(
+        //   `Component '${safeNode.type}': ` +
+        //     `the extracted resource URL is not a valid string: value ${extractedUrl}, type ${typeof extractedUrl}`,
+        // );
         return undefined;
       }
       return getResourceUrl(extractedUrl);
