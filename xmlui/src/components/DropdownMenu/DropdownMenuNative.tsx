@@ -216,7 +216,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
               e.preventDefault();
               contentRef.current?.focus();
             }}
-            onKeyDown={handleKeyDown}
+            onKeyDownCapture={handleKeyDown}
             role="menu"
             tabIndex={-1}
           >
