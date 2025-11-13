@@ -347,10 +347,10 @@ const iconPositionCases: {
 
 // This is a helper function to calculate the icon position
 async function iconPositionCalculation(buttonDriver: ComponentDriver, iconDriver: ComponentDriver) {
-  const buttonBounds = await getBounds(buttonDriver);
-  const buttonPadding = await getPaddings(buttonDriver);
+  const buttonBounds = await getBounds(buttonDriver.component);
+  const buttonPadding = await getPaddings(buttonDriver.component);
   const buttonBorders = await getBorders(buttonDriver);
-  const { left: iconLeft, right: iconRight } = await getBounds(iconDriver);
+  const { left: iconLeft, right: iconRight } = await getBounds(iconDriver.component);
   const buttonContentLeft =
     buttonBounds.left + buttonBorders.left.width.value + buttonPadding.left.value;
   const buttonContentRight =

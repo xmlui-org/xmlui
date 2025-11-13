@@ -1,6 +1,5 @@
 import { SKIP_REASON } from "../src/testing/component-test-helpers";
 import { expect, test } from "../src/testing/fixtures";
-import { initApp } from "../src/testing/themed-app-test-helpers";
 
 test("Increment counter through arrow function works", async ({ page, initTestBed }) => {
   await initTestBed(`
@@ -10,7 +9,7 @@ test("Increment counter through arrow function works", async ({ page, initTestBe
         label="Increment counter: {counter}"
         onClick="counter = incrementFunc(counter)"
       />
-    </Stack>  
+    </Stack>
   `);
   await page.getByTestId("button").click();
   await expect(page.getByTestId("button")).toHaveText("Increment counter: 1");
@@ -99,93 +98,35 @@ test("Array.map works with the binding engine", async ({ page, initTestBed }) =>
   await expect(page.getByTestId("button")).toHaveText('[{"id":1},{"id":2},{"id":3}]');
 });
 
-test("Compound components works", async ({ page }) => {
-  await initApp(page, {
-    name: "Compound component",
-    components: [
-      {
-        name: "AnotherTestButton",
-        component: {
-          type: "Button",
-          uid: "test button inner compound inner1",
-          props: {
-            debug: true,
-            label: "{$props.label}",
-          },
-          events: {
-            click: "emitEvent('click')",
-          },
-        },
-      },
-      {
-        name: "TestButton",
-        component: {
-          type: "Stack",
-          props: {
-            debug: true,
-          },
-          children: [
-            {
-              type: "Button",
-              uid: "test button inner1",
-              testId: "button1",
-              props: {
-                debug: true,
-                label: "{$props.label1}",
-              },
-              events: {
-                click: "emitEvent('click1')",
-              },
-            },
-            {
-              type: "Button",
-              testId: "button2",
-              uid: "test button inner2",
-              props: {
-                debug: true,
-                label: "{$props.label2}",
-              },
-              events: {
-                click: "emitEvent('click2')",
-              },
-            },
-            {
-              type: "AnotherTestButton",
-              testId: "button3",
-              uid: "test button inner compound",
-              props: {
-                debug: true,
-                label: "{$props.label3}",
-              },
-              events: {
-                click: "emitEvent('click3')",
-              },
-            },
-          ],
-        },
-      },
-    ],
-    entryPoint: {
-      type: "TestButton",
-      vars: {
-        counter1: 0,
-        counter2: 0,
-        counter3: 0,
-      },
-      uid: "test button used",
-      props: {
-        debug: true,
-        label1: "Button1 {counter1}",
-        label2: "Button2 {counter2}",
-        label3: "Button3 {counter3}",
-      },
-      events: {
-        click1: "counter1++",
-        click2: "counter2++",
-        click3: "counter3++",
-      },
+test("Compound components works", async ({ page, initTestBed }) => {
+  await initTestBed(
+    `<TestButton
+      var.counter1="{0}"
+      var.counter2="{0}"
+      var.counter3="{0}"
+      label1="Button1 {counter1}"
+      label2="Button2 {counter2}"
+      label3="Button3 {counter3}"
+      onClick1="counter1++"
+      onClick2="counter2++"
+      onClick3="counter3++" />`,
+    {
+      components: [
+        `<Component name="AnotherTestButton">
+          <Button onClick="emitEvent('click')" label="{$props.label}"/>
+        </Component>`,
+
+        `<Component name="TestButton">
+          <Stack>
+            <Button testId="button1" onClick="emitEvent('click1')" label="{$props.label1}"/>
+            <Button testId="button2" onClick="emitEvent('click2')" label="{$props.label2}"/>
+            <Button testId="button3" onClick="emitEvent('click3')" label="{$props.label3}"/>
+          </Stack>
+        </Component>`,
+      ],
     },
-  });
+  );
+
   await page.getByTestId("button1").click();
   await page.getByTestId("button1").click();
   await page.getByTestId("button1").click();
@@ -296,109 +237,54 @@ test("Setting null-values variable works", async ({ page, initTestBed }) => {
   await expect(page.getByTestId("button")).toHaveText("0");
 });
 
-test("Async hell", async ({ page }) => {
-  await initApp(page, {
-    entryPoint: {
-      type: "Stack",
-      vars: {
-        asyncValue: {
-          valami: {
-            counter: 0,
-            counter2: 0,
-          },
-        },
-        stuff: {
-          a: {
-            b: {
-              c: 0,
-            },
-          },
-        },
-        results: {},
-
-        getResult: "{()=> { delay(100); return asyncValue.valami.counter} }",
-        set1: `{()=> {
-      if( !results['set1'] ){ results['set1'] = {}; }
-      results['set1'].setting = true;
-      asyncValue.valami.counter += 1;
-      results['set1'].value = asyncValue.valami.counter; 
-      results['set1'].setting = false;
-     }}`,
-        set2: `{()=> {
-      if(!results['set2']){ results['set2'] = {}; };
-      results['set2'].setting = true;
-      const res = getResult();
-      asyncValue.valami.counter2 += res; 
-      results['set2'].value = asyncValue.valami.counter2; 
-      results['set2'].setting = false;
-    }}`,
-      },
-      children: [
-        {
-          type: "Text",
-          testId: "text1",
-          props: {
-            value: "{JSON.stringify(asyncValue.valami)}",
-          },
-        },
-        {
-          type: "Text",
-          testId: "text2",
-          props: {
-            value: "{JSON.stringify(results)}",
-          },
-        },
-        {
-          type: "Stack",
-          children: [
-            {
-              type: "Button",
-              testId: "button1",
-              props: {},
-              events: {
-                click: "set1();",
-              },
-            },
-          ],
-          events: {
-            mounted: "set1()",
-          },
-        },
-        {
-          type: "Stack",
-          children: [
-            {
-              type: "Button",
-              testId: "button2",
-              props: {},
-              events: {
-                click: "set2();",
-              },
-            },
-          ],
-          events: {
-            mounted: "set2()",
-          },
-        },
-      ],
-    },
-  });
-
+test("Async hell", async ({ page, initTestBed }) => {
+  await initTestBed(
+    `<Stack
+      var.asyncValue="{{ valami: { counter: 0, counter2: 0 } }}"
+      var.stuff="{{ a: { b: { c: 0 } } }}"
+      var.results="{{}}"
+      var.getResult="{()=> { delay(100); return asyncValue.valami.counter} }"
+      var.set1="{()=> {
+        if( !results['set1'] ){ results['set1'] = {}; }
+        results['set1'].setting = true;
+        asyncValue.valami.counter += 1;
+        results['set1'].value = asyncValue.valami.counter;
+        results['set1'].setting = false;
+      }}"
+      var.set2="{()=> {
+        if(!results['set2']){ results['set2'] = {}; };
+        results['set2'].setting = true;
+        const res = getResult();
+        asyncValue.valami.counter2 += res;
+        results['set2'].value = asyncValue.valami.counter2;
+        results['set2'].setting = false;
+      }}"
+    >
+      <Text testId="text1" value="{JSON.stringify(asyncValue.valami)}" />
+      <Text testId="text2" value="{JSON.stringify(results)}" />
+      <Stack onMounted="set1()">
+        <Button testId="button1" onClick="set1();" />
+      </Stack>
+      <Stack onMounted="set2()">
+        <Button testId="button2" onClick="set2();" />
+      </Stack>
+    </Stack>`,
+  );
   await expect(page.getByTestId("text1")).toHaveText('{"counter":1,"counter2":1}');
   await expect(page.getByTestId("text2")).toHaveText(
-    '{"set1":{"setting":false,"value":1},"set2":{"setting":false,"value":1}}'
+    '{"set1":{"setting":false,"value":1},"set2":{"setting":false,"value":1}}',
   );
   await page.getByTestId("button1").click();
   await delay(200);
   await expect(page.getByTestId("text1")).toHaveText('{"counter":2,"counter2":1}');
   await expect(page.getByTestId("text2")).toHaveText(
-    '{"set1":{"setting":false,"value":2},"set2":{"setting":false,"value":1}}'
+    '{"set1":{"setting":false,"value":2},"set2":{"setting":false,"value":1}}',
   );
   await page.getByTestId("button2").click();
   await delay(200);
   await expect(page.getByTestId("text1")).toHaveText('{"counter":2,"counter2":3}');
   await expect(page.getByTestId("text2")).toHaveText(
-    '{"set1":{"setting":false,"value":2},"set2":{"setting":false,"value":3}}'
+    '{"set1":{"setting":false,"value":2},"set2":{"setting":false,"value":3}}',
   );
 });
 
@@ -428,16 +314,16 @@ test("Array push direct/indirect works", async ({ page, initTestBed }) => {
     >
       <Text testId="text1" value="{array}" />
       <Text testId="text2" value="{objectWithArray.arrayInside}" />
-      
+
       <Button testId="button1" label="Push to array" onClick="array.push('hello')" />
-      
+
       <Button testId="button2" label="Push to array in object"
         onClick="objectWithArray.arrayInside.push('hello')" />
-      
+
       <Button testId="button3" label="Push to array (indirect)"
         onClick="const n = array; n.push('hello')" />
-      
-      <Button testId="button4" label="Push to array in object (indirect)" 
+
+      <Button testId="button4" label="Push to array in object (indirect)"
         onClick="const n = objectWithArray; n.arrayInside.push('hello')" />
     </Stack>`);
   await page.getByTestId("button1").click();

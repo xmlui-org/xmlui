@@ -1,5 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
-import { getPseudoStyles } from "./component-test-helpers";
+import { getStyles } from "./component-test-helpers";
 
 export type ComponentDriverParams = {
   locator: Locator;
@@ -1114,7 +1114,7 @@ export class CodeBlockDriver extends ComponentDriver {
 export class CheckboxDriver extends InputComponentDriver {
   async getIndicatorColor() {
     const specifier = this.component.getByRole("checkbox").or(this.component).last();
-    const { boxShadow } = await getPseudoStyles(specifier, "::before", "box-shadow");
+    const { boxShadow } = await getStyles(specifier, "box-shadow", "::before");
     const colorMatch = boxShadow.match(/(rgba?\([^)]+\)|hsla?\([^)]+\)|#[a-fA-F0-9]{3,8})/);
     return colorMatch ? colorMatch[1] : null;
   }
@@ -1447,4 +1447,3 @@ export class SliderDriver extends ComponentDriver {
     }
   }
 }
-

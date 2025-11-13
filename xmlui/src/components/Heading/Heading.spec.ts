@@ -91,7 +91,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
 
     const headingSizes = await Promise.all(
       headings.map(async (heading) => {
-        const { width, height } = await getBounds(heading);
+        const { width, height } = await getBounds(heading.component);
         return { width, height };
       }),
     );
@@ -163,8 +163,8 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     const shortHeading = await createHeadingDriver("headingShort");
     const longHeading = await createHeadingDriver("headingLong");
 
-    const { height: heightHeadingShort } = await getBounds(shortHeading);
-    const { height: heightHeadingLong } = await getBounds(longHeading);
+    const { height: heightHeadingShort } = await getBounds(shortHeading.component);
+    const { height: heightHeadingLong } = await getBounds(longHeading.component);
 
     expect(heightHeadingLong).toEqual(heightHeadingShort * 2);
   });
@@ -183,9 +183,11 @@ please do not break it!"
     </Fragment>
     `);
     const { height: heightHeadingShort } = await getBounds(
-      await createHeadingDriver("headingShort"),
+      (await createHeadingDriver("headingShort")).component,
     );
-    const { height: heightHeadingLong } = await getBounds(await createHeadingDriver("headingLong"));
+    const { height: heightHeadingLong } = await getBounds(
+      (await createHeadingDriver("headingLong")).component,
+    );
 
     expect(heightHeadingLong).toEqualWithTolerance(heightHeadingShort * 3, 0.01);
   });
@@ -204,8 +206,8 @@ please do not break it!"
     const shortTextDriver = await createHeadingDriver("headingShort");
     const longTextDriver = await createHeadingDriver("headingLong");
 
-    const { height: heightHeadingShort } = await getBounds(shortTextDriver);
-    const { height: heightHeadingLong } = await getBounds(longTextDriver);
+    const { height: heightHeadingShort } = await getBounds(shortTextDriver.component);
+    const { height: heightHeadingLong } = await getBounds(longTextDriver.component);
 
     expect(heightHeadingShort).toEqual(heightHeadingLong);
     await expect(longTextDriver.component).toHaveCSS("text-overflow", "ellipsis");
@@ -223,8 +225,8 @@ please do not break it!"
     const shortTextDriver = await createHeadingDriver("headingShort");
     const longTextDriver = await createHeadingDriver("headingLong");
 
-    const { height: heightHeadingShort } = await getBounds(shortTextDriver);
-    const { height: heightHeadingLong } = await getBounds(longTextDriver);
+    const { height: heightHeadingShort } = await getBounds(shortTextDriver.component);
+    const { height: heightHeadingLong } = await getBounds(longTextDriver.component);
 
     expect(heightHeadingShort).toEqual(heightHeadingLong);
     await expect(longTextDriver.component).not.toHaveCSS("text-overflow", "ellipsis");
@@ -273,8 +275,8 @@ test("break long text", async ({ initTestBed, createHeadingDriver }) => {
 
   await expect(longHeading.component).toBeVisible();
 
-  const { height: heightHeadingShort } = await getBounds(shortHeading);
-  const { height: heightHeadingLong } = await getBounds(longHeading);
+  const { height: heightHeadingShort } = await getBounds(shortHeading.component);
+  const { height: heightHeadingLong } = await getBounds(longHeading.component);
 
   expect(heightHeadingShort).toBeLessThan(heightHeadingLong);
 });
@@ -293,9 +295,9 @@ test("Heading is inline in HStack", async ({
       <Heading testId="heading1" >icon!</Heading>
     </HStack>
   `);
-  const { top: topHeading0 } = await getBounds(await createHeadingDriver("heading0"));
-  const { top: topIcon0 } = await getBounds(await createIconDriver("icon0"));
-  const { top: topHeading1 } = await getBounds(await createHeadingDriver("heading1"));
+  const { top: topHeading0 } = await getBounds((await createHeadingDriver("heading0")).component);
+  const { top: topIcon0 } = await getBounds((await createIconDriver("icon0")).component);
+  const { top: topHeading1 } = await getBounds((await createHeadingDriver("heading1")).component);
 
   expect(topHeading0).toEqual(topIcon0);
   expect(topIcon0).toEqual(topHeading1);
@@ -313,9 +315,9 @@ test("Heading is block in VStack", async ({
       <Heading testId="heading1" >icon!</Heading>
     </VStack>
   `);
-  const { top: topHeading0 } = await getBounds(await createHeadingDriver("heading0"));
+  const { top: topHeading0 } = await getBounds((await createHeadingDriver("heading0")).component);
   const { top: topIcon0 } = await getBounds((await createIconDriver("icon0")).svgIcon);
-  const { top: topHeading1 } = await getBounds(await createHeadingDriver("heading1"));
+  const { top: topHeading1 } = await getBounds((await createHeadingDriver("heading1")).component);
 
   expect(topHeading0).toBeLessThan(topIcon0);
   expect(topIcon0).toBeLessThan(topHeading1);
@@ -336,8 +338,8 @@ test("Heading overflows container dimensions", async ({
       </Heading>
     </VStack>
   `);
-  const { width: widthLayout } = await getBounds(await createVStackDriver());
-  const { width: widthHeading } = await getBounds(await createHeadingDriver("heading"));
+  const { width: widthLayout } = await getBounds((await createVStackDriver()).component);
+  const { width: widthHeading } = await getBounds((await createHeadingDriver("heading")).component);
 
   expect(widthHeading).toEqual(widthHeadingExpected);
   expect(widthLayout).toEqual(widthLayoutExpected);
@@ -414,7 +416,10 @@ test.describe("Basic Functionality", () => {
 
   test.describe("level property accepts numeric values", () => {
     [1, 2, 3, 4, 5, 6].forEach((level) => {
-      test(`level="{${level}}" renders as h${level}`, async ({ initTestBed, createHeadingDriver }) => {
+      test(`level="{${level}}" renders as h${level}`, async ({
+        initTestBed,
+        createHeadingDriver,
+      }) => {
         await initTestBed(`<Heading level="{${level}}">Numeric Level ${level}</Heading>`);
         const driver = await createHeadingDriver();
         await expect(driver.component).toBeVisible();
@@ -427,7 +432,10 @@ test.describe("Basic Functionality", () => {
 
   test.describe("level property accepts string numeric values", () => {
     ["1", "2", "3", "4", "5", "6"].forEach((level) => {
-      test(`level="${level}" renders as h${level}`, async ({ initTestBed, createHeadingDriver }) => {
+      test(`level="${level}" renders as h${level}`, async ({
+        initTestBed,
+        createHeadingDriver,
+      }) => {
         await initTestBed(`<Heading level="${level}">String Level ${level}</Heading>`);
         const driver = await createHeadingDriver();
         await expect(driver.component).toBeVisible();
@@ -440,7 +448,10 @@ test.describe("Basic Functionality", () => {
 
   test.describe("level property accepts uppercase H format", () => {
     ["H1", "H2", "H3", "H4", "H5", "H6"].forEach((level) => {
-      test(`level="${level}" renders as ${level.toLowerCase()}`, async ({ initTestBed, createHeadingDriver }) => {
+      test(`level="${level}" renders as ${level.toLowerCase()}`, async ({
+        initTestBed,
+        createHeadingDriver,
+      }) => {
         await initTestBed(`<Heading level="${level}">Uppercase Level ${level}</Heading>`);
         const driver = await createHeadingDriver();
         await expect(driver.component).toBeVisible();
@@ -466,7 +477,10 @@ test.describe("Basic Functionality", () => {
       { value: '"{{}}"', label: "empty object" },
       { value: '"{[]}"', label: "empty array" },
     ].forEach(({ value, label }) => {
-      test(`level=${value} (${label}) defaults to h1`, async ({ initTestBed, createHeadingDriver }) => {
+      test(`level=${value} (${label}) defaults to h1`, async ({
+        initTestBed,
+        createHeadingDriver,
+      }) => {
         await initTestBed(`<Heading level=${value}>Invalid Level Fallback</Heading>`);
         const driver = await createHeadingDriver();
         await expect(driver.component).toBeVisible();
@@ -477,7 +491,10 @@ test.describe("Basic Functionality", () => {
     });
   });
 
-  test("level property with mixed case string formats", async ({ initTestBed, createHeadingDriver }) => {
+  test("level property with mixed case string formats", async ({
+    initTestBed,
+    createHeadingDriver,
+  }) => {
     const testCases = [
       { input: "H3", expected: "h3" },
       { input: "h3", expected: "h3" },
@@ -493,7 +510,10 @@ test.describe("Basic Functionality", () => {
     }
   });
 
-  test("level property handles whitespace in string values", async ({ initTestBed, createHeadingDriver }) => {
+  test("level property handles whitespace in string values", async ({
+    initTestBed,
+    createHeadingDriver,
+  }) => {
     await initTestBed(`<Heading level=" h2 ">Whitespace Level</Heading>`);
     const driver = await createHeadingDriver();
     await expect(driver.component).toBeVisible();

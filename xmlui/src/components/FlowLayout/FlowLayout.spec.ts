@@ -1,4 +1,4 @@
-import { getBounds, overflows, scaleByPercent } from "../../testing/component-test-helpers";
+import { getBounds, overflows } from "../../testing/component-test-helpers";
 import { test, expect } from "../../testing/fixtures";
 
 // =============================================================================
@@ -260,43 +260,34 @@ test.describe("Edge cases", () => {
   const PAGE_WIDTH = 1280;
 
   test("1 item 25% width", async ({ page, initTestBed }) => {
-    const itemHeight = "64px";
-    const itemWidthPercent = "25%";
     await initTestBed(`
       <FlowLayout width="${PAGE_WIDTH}">
-        <Stack testId="item" backgroundColor="red" height="${itemHeight}" width="${itemWidthPercent}"/>
+        <Stack testId="item" backgroundColor="red" height="64px" width="25%"/>
       </FlowLayout>
     `);
-    const expectedWidth = scaleByPercent(PAGE_WIDTH, itemWidthPercent);
+    const expectedWidth = PAGE_WIDTH * 0.25;
     const { width: itemWidth } = await getBounds(page.getByTestId("item"));
     expect(itemWidth).toEqual(expectedWidth);
   });
 
   // gap should be ignored because of 1 item
   test("1 item 25% width + gap", async ({ page, initTestBed }) => {
-    const itemHeight = "64px";
-    const itemWidthPercent = "25%";
-    const gap = "26px";
     await initTestBed(`
-      <FlowLayout gap="${gap}" width="${PAGE_WIDTH}">
-        <Stack testId="item" backgroundColor="red" height="${itemHeight}" width="${itemWidthPercent}"/>
+      <FlowLayout gap="26px" width="${PAGE_WIDTH}">
+        <Stack testId="item" backgroundColor="red" height="64px" width="25%"/>
       </FlowLayout>
     `);
 
     const { right } = await getBounds(page.getByTestId("item"));
-    const expectedWidth = scaleByPercent(PAGE_WIDTH, itemWidthPercent);
+    const expectedWidth = PAGE_WIDTH * 0.25;
     expect(right).toEqual(expectedWidth);
   });
 
   // gap should be ignored because of 1 item
   test("1 item 100% width + gap", async ({ page, initTestBed }) => {
-    const itemHeight = "64px";
-    const itemWidthPercent = "100%";
-    const gap = "26px";
-
     await initTestBed(`
-      <FlowLayout gap="${gap}" width="${PAGE_WIDTH}">
-        <Stack testId="item" backgroundColor="red" height="${itemHeight}" width="${itemWidthPercent}"/>
+      <FlowLayout gap="26px" width="${PAGE_WIDTH}">
+        <Stack testId="item" backgroundColor="red" height="64px" width="100%"/>
       </FlowLayout>
     `);
     const { width } = await getBounds(page.getByTestId("item"));
@@ -544,10 +535,7 @@ test.describe("Edge cases", () => {
     expect(result).toEqual(true);
   });
 
-  test("multiple star sized next to each other doesn't break", async ({
-    page,
-    initTestBed,
-  }) => {
+  test("multiple star sized next to each other doesn't break", async ({ page, initTestBed }) => {
     await initTestBed(`
     <FlowLayout testId="layout" width="100px" columnGap="10px">
       <Stack testId="red" backgroundColor="red" height="10px" width="20px"/>

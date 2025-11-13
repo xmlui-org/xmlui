@@ -1,7 +1,6 @@
 import type { ApiInterceptorDefinition } from "../../components-core/interception/abstractions";
 import { labelPositionValues } from "../abstractions";
 import { expect, test } from "../../testing/fixtures";
-import { getElementStyle } from "../../testing/component-test-helpers";
 
 // Test data constants
 const errorDisplayInterceptor: ApiInterceptorDefinition = {
@@ -684,8 +683,7 @@ test.describe("Basic Functionality", () => {
         </Theme>
       `);
       const driver = await createFormItemDriver("testField");
-      const labelWidth = await getElementStyle(driver.label, "width");
-      expect(labelWidth).toBe(`${widthInPx}px`);
+      await expect(driver.label).toHaveCSS("width", widthInPx + "px");
     });
   });
 

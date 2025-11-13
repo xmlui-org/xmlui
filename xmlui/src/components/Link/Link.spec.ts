@@ -1,5 +1,4 @@
 import { expect, test } from "../../testing/fixtures";
-import { initThemedApp } from "../../testing/themed-app-test-helpers";
 
 test.describe("smoke tests", { tag: "@smoke" }, () => {
   test("component renders", async ({ initTestBed, createLinkDriver }) => {
@@ -23,7 +22,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
   }) => {
     await initTestBed(`<a custom="test" boolean>Test Heading</a>`);
     const driver = await createLinkDriver();
-  
+
     await expect(driver.component).toHaveAttribute("custom", "test");
     await expect(driver.component).toHaveAttribute("boolean", "true");
   });
@@ -987,7 +986,7 @@ test("border, border-thickness-bottom", async ({ initTestBed, createLinkDriver }
   await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-/* 
+/*
 test("Link accepts custom props", async ({
   initTestBed,
   createLinkDriver,

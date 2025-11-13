@@ -120,8 +120,12 @@ please do not break it!"
       />
     </VStack>
     `);
-    const { height: heightTextShort } = await getBounds(await createTextDriver("textShort"));
-    const { height: heightTextLong } = await getBounds(await createTextDriver("textLong"));
+    const { height: heightTextShort } = await getBounds(
+      (await createTextDriver("textShort")).component,
+    );
+    const { height: heightTextLong } = await getBounds(
+      (await createTextDriver("textLong")).component,
+    );
 
     expect(heightTextLong).toEqualWithTolerance(heightTextShort * 3, 0.01);
   });
@@ -139,8 +143,8 @@ test.describe("API", () => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Stack width="200px">
-          <Text id="overflowText" maxLines="{1}" 
-            value="This is a very long text that should definitely overflow when constrained to a small width" 
+          <Text id="overflowText" maxLines="{1}"
+            value="This is a very long text that should definitely overflow when constrained to a small width"
           />
           <Button onClick="testState = overflowText.hasOverflow()" />
         </Stack>
@@ -382,8 +386,8 @@ test.describe("Visual States", () => {
     const shortTextDriver = await createTextDriver("textShort");
     const longTextDriver = await createTextDriver("textLong");
 
-    const { height: heightTextShort } = await getBounds(shortTextDriver);
-    const { height: heightTextLong } = await getBounds(longTextDriver);
+    const { height: heightTextShort } = await getBounds(shortTextDriver.component);
+    const { height: heightTextLong } = await getBounds(longTextDriver.component);
 
     expect(heightTextShort).toEqual(heightTextLong);
     await expect(longTextDriver.component).toHaveCSS("text-overflow", "ellipsis");
@@ -401,8 +405,8 @@ test.describe("Visual States", () => {
     const shortTextDriver = await createTextDriver("textShort");
     const longTextDriver = await createTextDriver("textLong");
 
-    const { height: heightTextShort } = await getBounds(shortTextDriver);
-    const { height: heightTextLong } = await getBounds(longTextDriver);
+    const { height: heightTextShort } = await getBounds(shortTextDriver.component);
+    const { height: heightTextLong } = await getBounds(longTextDriver.component);
 
     expect(heightTextShort).toEqual(heightTextLong);
     await expect(longTextDriver.component).not.toHaveCSS("text-overflow", "ellipsis");
@@ -420,8 +424,8 @@ test.describe("Visual States", () => {
     const shortText = await createTextDriver("textShort");
     const longText = await createTextDriver("textLong");
 
-    const { height: heightTextShort } = await getBounds(shortText);
-    const { height: heightTextLong } = await getBounds(longText);
+    const { height: heightTextShort } = await getBounds(shortText.component);
+    const { height: heightTextLong } = await getBounds(longText.component);
 
     expect(heightTextLong).toEqual(heightTextShort * 2);
   });
@@ -440,8 +444,8 @@ test.describe("Visual States", () => {
 
     await expect(longText.component).toBeVisible();
 
-    const { height: heightTextShort } = await getBounds(shortText);
-    const { height: heightTextLong } = await getBounds(longText);
+    const { height: heightTextShort } = await getBounds(shortText.component);
+    const { height: heightTextLong } = await getBounds(longText.component);
 
     expect(heightTextShort).toBeLessThan(heightTextLong);
   });
@@ -461,8 +465,8 @@ test.describe("Visual States", () => {
         </Text>
       </VStack>
     `);
-    const { width: widthLayout } = await getBounds(await createVStackDriver());
-    const { width: widthText } = await getBounds(await createTextDriver("text"));
+    const { width: widthLayout } = await getBounds((await createVStackDriver()).component);
+    const { width: widthText } = await getBounds((await createTextDriver("text")).component);
 
     expect(widthText).toEqual(widthTextExpected);
     expect(widthLayout).toEqual(widthLayoutExpected);
@@ -720,8 +724,8 @@ test.describe("Overflow Mode", () => {
     await expect(multiLineDriver.component).toHaveCSS("-webkit-line-clamp", "2");
 
     // Verify heights: multi-line should be approximately 2x single line height
-    const { height: heightSingle } = await getBounds(singleLineDriver);
-    const { height: heightMulti } = await getBounds(multiLineDriver);
+    const { height: heightSingle } = await getBounds(singleLineDriver.component);
+    const { height: heightMulti } = await getBounds(multiLineDriver.component);
 
     // Multi-line should be taller than single line
     expect(heightMulti).toBeGreaterThan(heightSingle);
@@ -1000,9 +1004,9 @@ test.describe("Integration", () => {
         <Text testId="text1" >icon!</Text>
       </HStack>
     `);
-    const { top: topText0 } = await getBounds(await createTextDriver("text0"));
-    const { top: topIcon0 } = await getBounds(await createIconDriver("icon0"));
-    const { top: topText1 } = await getBounds(await createTextDriver("text1"));
+    const { top: topText0 } = await getBounds((await createTextDriver("text0")).component);
+    const { top: topIcon0 } = await getBounds((await createIconDriver("icon0")).component);
+    const { top: topText1 } = await getBounds((await createTextDriver("text1")).component);
 
     expect(topText0).toEqual(topIcon0);
     expect(topIcon0).toEqual(topText1);
@@ -1020,9 +1024,9 @@ test.describe("Integration", () => {
         <Text testId="text1" >icon!</Text>
       </VStack>
     `);
-    const { top: topText0 } = await getBounds(await createTextDriver("text0"));
+    const { top: topText0 } = await getBounds((await createTextDriver("text0")).component);
     const { top: topIcon0 } = await getBounds((await createIconDriver("icon0")).svgIcon);
-    const { top: topText1 } = await getBounds(await createTextDriver("text1"));
+    const { top: topText1 } = await getBounds((await createTextDriver("text1")).component);
 
     expect(topText0).toBeLessThan(topIcon0);
     expect(topIcon0).toBeLessThan(topText1);
@@ -1390,7 +1394,7 @@ test.describe("Theme Variables", () => {
 
   test("variant='code' applies inline code theme variables", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <Theme 
+      <Theme
         fontFamily-Text-code="monospace"
         fontSize-Text-code="14px"
         borderWidth-Text-code="1px"
@@ -1445,7 +1449,7 @@ test.describe("Theme Variables", () => {
 
   test("variant='keyboard' applies keyboard theme variables", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <Theme 
+      <Theme
         fontFamily-Text-keyboard="monospace"
         fontSize-Text-keyboard="14px"
         fontWeight-Text-keyboard="700"
@@ -1471,7 +1475,7 @@ test.describe("Theme Variables", () => {
 
   test("variant='sample' applies sample theme variables", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <Theme 
+      <Theme
         fontFamily-Text-sample="monospace"
         fontSize-Text-sample="14px"
       >
@@ -1486,7 +1490,7 @@ test.describe("Theme Variables", () => {
 
   test("variant='sup' applies superscript theme variables", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <Theme 
+      <Theme
         fontSize-Text-sup="12px"
         verticalAlignment-Text-sup="super"
       >
@@ -1501,7 +1505,7 @@ test.describe("Theme Variables", () => {
 
   test("variant='sub' applies subscript theme variables", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <Theme 
+      <Theme
         fontSize-Text-sub="12px"
         verticalAlignment-Text-sub="sub"
       >
@@ -1596,7 +1600,7 @@ test.describe("Theme Variables", () => {
     page,
   }) => {
     await initTestBed(`
-      <Theme 
+      <Theme
         fontSize-Text-placeholder="12px"
         textColor-Text-placeholder="rgb(150, 150, 150)"
       >
@@ -1623,7 +1627,7 @@ test.describe("Theme Variables", () => {
 
   test("variant='subheading' applies subheading theme variables", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <Theme 
+      <Theme
         fontSize-Text-subheading="18px"
         fontWeight-Text-subheading="700"
         letterSpacing-Text-subheading="0.8px"
@@ -1647,7 +1651,7 @@ test.describe("Theme Variables", () => {
     page,
   }) => {
     await initTestBed(`
-      <Theme 
+      <Theme
         marginTop-Text-tableheading="4px"
         marginBottom-Text-tableheading="16px"
         paddingHorizontal-Text-tableheading="4px"
@@ -1790,7 +1794,7 @@ test.describe("Custom Variants", () => {
     const EXPECTED = "rgb(255, 0, 0)";
     await initTestBed(`
       <App>
-        <Theme 
+        <Theme
           textDecorationLine-Text-customDeco="underline"
           textDecorationColor-Text-customDeco="${EXPECTED}"
         >
@@ -1806,7 +1810,7 @@ test.describe("Custom Variants", () => {
     const EXPECTED = "wavy";
     await initTestBed(`
       <App>
-        <Theme 
+        <Theme
           textDecorationLine-Text-customWavy="underline"
           textDecorationStyle-Text-customWavy="${EXPECTED}"
         >
@@ -1822,7 +1826,7 @@ test.describe("Custom Variants", () => {
     const EXPECTED = "3px";
     await initTestBed(`
       <App>
-        <Theme 
+        <Theme
           textDecorationLine-Text-customThick="underline"
           textDecorationThickness-Text-customThick="${EXPECTED}"
         >
@@ -1838,7 +1842,7 @@ test.describe("Custom Variants", () => {
     const EXPECTED = "5px";
     await initTestBed(`
       <App>
-        <Theme 
+        <Theme
           textDecorationLine-Text-customOffset="underline"
           textUnderlineOffset-Text-customOffset="${EXPECTED}"
         >
@@ -2035,10 +2039,10 @@ test.describe("Custom Variants", () => {
   test("custom variant with multiple theme variables", async ({ initTestBed, page }) => {
     await initTestBed(`
       <App>
-        <Theme 
-          textColor-Text-pinkElephant="rgb(255, 192, 203)" 
+        <Theme
+          textColor-Text-pinkElephant="rgb(255, 192, 203)"
           fontWeight-Text-pinkElephant="bold"
-          textColor-Text-greenDog="rgb(0, 128, 0)" 
+          textColor-Text-greenDog="rgb(0, 128, 0)"
           fontStyle-Text-greenDog="italic"
         >
           <Text variant="pinkElephant" testId="pink">

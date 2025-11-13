@@ -111,8 +111,8 @@ test.describe("Basic Functionality", () => {
     const text1Driver = await createTextDriver("text-1");
     const text2Driver = await createTextDriver("text-2");
 
-    const { right: text1Right } = await getBounds(text1Driver);
-    const { right: text2Left } = await getBounds(text2Driver);
+    const { right: text1Right } = await getBounds(text1Driver.component);
+    const { right: text2Left } = await getBounds(text2Driver.component);
     expect(text1Right).toBeLessThan(text2Left);
   });
 
@@ -129,8 +129,8 @@ test.describe("Basic Functionality", () => {
     const text1Driver = await createTextDriver("text-1");
     const text2Driver = await createTextDriver("text-2");
 
-    const { bottom: text1Bottom } = await getBounds(text1Driver);
-    const { top: text2Top } = await getBounds(text2Driver);
+    const { bottom: text1Bottom } = await getBounds(text1Driver.component);
+    const { top: text2Top } = await getBounds(text2Driver.component);
     expect(text1Bottom).toBeLessThan(text2Top);
   });
 });
