@@ -156,9 +156,11 @@ export const TextBox = forwardRef(function TextBox(
   // --- End NOTE
 
   // --- Initialize the related field with the input's initial value
+  // Normalize null/undefined to empty string
+  const normalizedInitialValue = initialValue ?? "";
   useEffect(() => {
-    updateState({ value: initialValue }, { initial: true });
-  }, [initialValue, updateState]);
+    updateState({ value: normalizedInitialValue }, { initial: true });
+  }, [normalizedInitialValue, updateState]);
 
   const updateValue = useCallback(
     (value: string) => {
@@ -243,6 +245,14 @@ export const TextBox = forwardRef(function TextBox(
         tabIndex={enabled ? tabIndex : -1}
         required={required}
       />
+      {!readOnly && enabled && localValue.length > 0 && type == "search" && (
+        <Adornment
+          data-part-id={PART_END_ADORNMENT}
+          iconName="close"
+          className={styles.adornment}
+          onClick={() => updateValue("")}
+        />
+      )}
       {type === "password" && showPasswordToggle ? (
         <Adornment
           data-part-id={PART_END_ADORNMENT}

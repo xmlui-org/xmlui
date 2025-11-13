@@ -45,7 +45,7 @@ export const TextBoxMd = createMetadata({
     },
     input: {
       description: "The text box input area.",
-    }
+    },
   },
   defaultPart: "input",
   props: {
