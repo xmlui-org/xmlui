@@ -184,13 +184,16 @@ import { ColorPickerMd } from "./ColorPicker/ColorPicker";
 import type { ThemeDefinition } from "../abstractions/ThemingDefs";
 import { RootThemeDefinition } from "../components-core/theming/themes/root";
 import {
+  XmlUiBlogThemeDefinition,
   XmlUiCyanThemeDefinition,
+  XmlUiDocsThemeDefinition,
   XmlUiGrayThemeDefinition,
   XmlUiGreenThemeDefinition,
   XmlUiOrangeThemeDefinition,
   XmlUiPurpleThemeDefinition,
   XmlUiRedThemeDefinition,
   XmlUiThemeDefinition,
+  XmlUiWebThemeDefinition,
 } from "../components-core/theming/themes/xmlui";
 import { BarChartMd } from "./Charts/BarChart/BarChart";
 import { DonutChartMd } from "./Charts/DonutChart/DonutChart";
@@ -427,4 +430,7 @@ export const collectedThemes: Record<string, ThemeDefinition> = {
   xmluiPurple: XmlUiPurpleThemeDefinition,
   xmluiCyan: XmlUiCyanThemeDefinition,
   xmluiRed: XmlUiRedThemeDefinition,
+  xmluiDocs: XmlUiDocsThemeDefinition,
+  xmluiBlog: XmlUiBlogThemeDefinition,
+  xmluiWeb: XmlUiWebThemeDefinition,
 };
