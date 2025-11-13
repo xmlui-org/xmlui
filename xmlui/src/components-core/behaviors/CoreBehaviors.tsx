@@ -18,9 +18,10 @@ import { badgeVariantValues } from "../../components/Badge/BadgeNative";
  */
 export const tooltipBehavior: Behavior = {
   name: "tooltip",
-  canAttach: (node) => {
-    const tooltipText = node.props?.tooltip;
-    const tooltipMarkdown = node.props?.tooltipMarkdown;
+  canAttach: (context, node) => {
+    const { extractValue } = context;
+    const tooltipText = extractValue(node.props?.tooltip, true);
+    const tooltipMarkdown = extractValue(node.props?.tooltipMarkdown, true);
     return !!tooltipText || !!tooltipMarkdown;
   },
   attach: (context, node, metadata) => {
@@ -43,8 +44,10 @@ export const tooltipBehavior: Behavior = {
  */
 export const animationBehavior: Behavior = {
   name: "animation",
-  canAttach: (node) => {
-    return !!node.props?.animation;
+  canAttach: (context, node) => {
+    const { extractValue } = context;
+    const animation = extractValue(node.props?.animation, true);
+    return !!animation;
   },
   attach: (context, node, metadata) => {
     const { extractValue } = context;
@@ -69,14 +72,17 @@ export const animationBehavior: Behavior = {
  */
 export const labelBehavior: Behavior = {
   name: "label",
-  canAttach: (node, metadata) => {
+  canAttach: (context, node, metadata) => {
     /**
      * This behavior can be attached if the component has a 'label' prop
      * and is not a component that handles its own labeling.
      */
     if (metadata?.props?.label) {
       return false;
-    } else if (!node.props?.label) {
+    }
+    const { extractValue } = context;
+    const label = extractValue(node.props?.label, true);
+    if (!label) {
       return false;
     }
     return true;
@@ -123,8 +129,9 @@ export const labelBehavior: Behavior = {
  */
 export const variantBehavior: Behavior = {
   name: "variant",
-  canAttach: (node) => {
-    const variant = node.props?.variant;
+  canAttach: (context, node) => {
+    const { extractValue } = context;
+    const variant = extractValue(node.props?.variant, true);
 
     // Must have a variant prop
     if (!variant) {
@@ -133,11 +140,9 @@ export const variantBehavior: Behavior = {
 
     // Special handling for Button component
     if (node.type === "Button") {
-      // TODO: Fix with value extraction
       // For Button, only attach if variant is NOT one of the predefined values
-      // const variantStr = typeof variant === "string" ? variant : String(variant);
-      // return !buttonVariantValues.includes(variantStr as any);
-      return false;
+      const variantStr = typeof variant === "string" ? variant : String(variant);
+      return variantStr != undefined && variantStr !== "" && !buttonVariantValues.includes(variantStr as any);
     }
 
     // Special handling for Badge component
