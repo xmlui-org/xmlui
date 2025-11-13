@@ -186,10 +186,16 @@ test("is keyboard accessible", async ({ initTestBed, createDropdownMenuDriver, p
 
   // Open with Enter
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("menuitem", { name: "Item 1" })).toBeVisible();
+  const menuItem = page.getByRole("menuitem", { name: "Item 1" });
+  await expect(menuItem).toBeVisible();
 
   // Navigate and select with keyboard
   await page.keyboard.press("ArrowDown");
+
+  // Verify the menu item is now focused
+  await expect(menuItem).toBeFocused();
+
+  // Press Enter to select
   await page.keyboard.press("Enter");
   await expect.poll(testStateDriver.testState).toEqual("keyboard-activated");
 });
