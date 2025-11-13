@@ -1,6 +1,6 @@
 <App
-        layout="vertical-full-header"
-        var.posts=`{[
+    layout="vertical-full-header"
+    var.posts=`{[
         {
         title: "An XMLUI-powered blog",
         slug: "xmlui-powered-blog",
@@ -26,7 +26,7 @@
         image: "xmlui-demo-gallery.png"
         }
         ]}`
-        >
+>
     <AppHeader>
         <property name="logoTemplate">
             <Link to="/" height="100%">
@@ -34,60 +34,61 @@
             </Link>
         </property>
         <Theme>
-            <Fragment when="{mediaSize.sizeIndex > 2}">
+            <HStack when="{mediaSize.sizeIndex > 2}" gap="0">
                 <NavLink
-                        noIndicator
-                        label="Demo"
-                        to="https://demo.xmlui.org"
-            />
-            <NavLink
+                    noIndicator
+                    label="Demo"
+                    paddingLeft="0"
+                    to="https://demo.xmlui.org"
+                />
+                <NavLink
                     noIndicator
                     label="Docs"
                     to="https://docs.xmlui.org"
-            />
-            <NavLink
+                />
+                <NavLink
                     noIndicator
                     label="Blog"
                     to="https://blog.xmlui.org"
                     active
-            />
-            </Fragment>
+                />
+            </HStack>
         </Theme>
         <property name="profileMenuTemplate">
             <Fragment
-                    when="{mediaSize.sizeIndex > 2}"
-                    var.showSearch="{false}"
-        >
-            <Search when="{showSearch}" data="{{}}" />
-            <Button
+                when="{mediaSize.sizeIndex > 2}"
+                var.showSearch="{false}"
+            >
+                <Search when="{showSearch}" data="{{}}" />
+                <Button
                     when="{!showSearch}"
                     icon="search"
                     variant="ghost"
                     onClick="{() => showSearch = !showSearch}"
-            />
-        </Fragment>
-        <Button
+                />
+            </Fragment>
+            <Button
                 variant="solid"
                 label="Download"
                 onClick="{() => Actions.navigate('/get-started')}"
-        />
-    </property>
+            />
+        </property>
     </AppHeader>
     <NavPanel when="{mediaSize.sizeIndex <= 2}">
         <Stack
-                paddingHorizontal="$space-4"
-                paddingBottom="$space-4"
+            paddingHorizontal="$space-4"
+            paddingBottom="$space-4"
         >
             <Search data="{{}}" />
         </Stack>
         <Fragment>
-            <NavLink label="Demo" to="/" />
-            <NavLink label="Docs" to="https://docs.xmlui.org" />
-            <NavLink label="Blog" to="https://blog.xmlui.org" />
+            <NavLink noIndicator label="Demo" to="/" />
+            <NavLink noIndicator label="Docs" to="https://docs.xmlui.org" />
+            <NavLink noIndicator label="Blog" to="https://blog.xmlui.org" />
         </Fragment>
         <Stack
-                paddingHorizontal="$space-4"
-                paddingBottom="$space-4"
+            paddingHorizontal="$space-4"
+            paddingBottom="$space-4"
         >
             <Link to="https://www.xmlui.org/get-started">
                 <Button variant="solid" onClick="emitEvent('click')">
@@ -97,7 +98,7 @@
         </Stack>
     </NavPanel>
 
-        <!--
+    <!--
         <NavPanel>
            <NavGroup label="Recent posts" to="/blog" initiallyExpanded>
                 <NavLink
@@ -133,31 +134,30 @@
     <Footer sticky="false">
         <Text fontWeight="400">
             This site is an
-        <Text variant="strong">
-            XMLUI™
-        </Text>
+            <Text variant="strong">
+                XMLUI™
+            </Text>
             app.
         </Text>
         <SpaceFiller />
         <HStack verticalAlignment="center">
             <Fragment when="{mediaSize.sizeIndex > 2}">
                 <LinkButton
-                        to="https://blog.xmlui.org"
-                        label="News & Reviews"
-                        blank="true"
+                    to="https://blog.xmlui.org"
+                    label="News & Reviews"
+                    blank="true"
                 />
                 <LinkButton
-                        to="https://docs.xmlui.org/change-log"
-                        label="Changelog"
-                        blank="true"
+                    to="https://docs.xmlui.org/change-log"
+                    label="Changelog"
+                    blank="true"
                 />
                 <Separator />
-                <LinkButton to="" icon="rss" label="RSS" blank="true" />
                 <LinkButton
-                        to="https://github.com/xmlui-org/xmlui"
-                        icon="github"
-                        label="GitHub"
-                        blank="true"
+                    to="https://github.com/xmlui-org/xmlui"
+                    icon="github"
+                    label="GitHub"
+                    blank="true"
                 />
                 <Separator />
             </Fragment>
