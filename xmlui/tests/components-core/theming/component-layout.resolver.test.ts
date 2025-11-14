@@ -1105,6 +1105,7 @@ describe("Component property layout", () => {
       "reverse": "true",
       "horizontalAlignment": "center",
       "orientation-md": "horizontal",
+      "orientation-md--hover": 'vertical',
       "reverse-xl": "false",
       "backgroundColor-xxl": "red"
     }, {
@@ -1121,6 +1122,13 @@ describe("Component property layout", () => {
             flexDirection: "row-reverse",
             justifyContent: "center",
             alignItems: "flex-start",
+            states: {
+              hover: {
+                flexDirection: "column-reverse",
+                justifyContent: "flex-start",
+                alignItems: "center",
+              }
+            }
           },
           xl: {
             flexDirection: "row"
