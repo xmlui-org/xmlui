@@ -46,6 +46,25 @@
             <NavLink noIndicator label="Demo" to="https://demo.xmlui.org" />
             <NavLink noIndicator label="Docs" to="/" />
             <NavLink noIndicator label="Blog" to="https://blog.xmlui.org" />
+            <NavLink
+                to="https://xmlui.org/news"
+                label="News & Reviews"
+                target="_self"
+                noIndicator
+            />
+            <NavLink
+                to="/change-log"
+                label="Changelog"
+                noIndicator
+                target="_self"
+            />
+            <NavLink
+                to="https://github.com/xmlui-org/xmlui"
+                icon="github"
+                label="GitHub"
+                noIndicator
+                target="_blank"
+            />
             <Stack paddingHorizontal="$space-4" paddingBottom="$space-4">
                 <Link to="https://www.xmlui.org/get-started">
                     <Button variant="solid" onClick="emitEvent('click')">

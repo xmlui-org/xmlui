@@ -60,6 +60,7 @@
                 when="{mediaSize.sizeIndex > 1}"
                 data="{appGlobals.plainTextContent}"
             />
+            <Separator />
             <Button
                 variant="solid"
                 label="Download"
@@ -78,6 +79,25 @@
             <NavLink noIndicator label="Demo" to="/" />
             <NavLink noIndicator label="Docs" to="https://docs.xmlui.org" />
             <NavLink noIndicator label="Blog" to="https://blog.xmlui.org" />
+            <NavLink
+                to="https://xmlui.org/news"
+                label="News & Reviews"
+                target="_self"
+                noIndicator
+            />
+            <NavLink
+                to="https://docs.xmlui.org/change-log"
+                label="Changelog"
+                noIndicator
+                target="_self"
+            />
+            <NavLink
+                to="https://github.com/xmlui-org/xmlui"
+                icon="github"
+                label="GitHub"
+                noIndicator
+                target="_blank"
+            />
         </Fragment>
         <Stack
             paddingHorizontal="$space-4"
