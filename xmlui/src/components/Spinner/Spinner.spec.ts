@@ -295,6 +295,7 @@ test.describe("Behaviors and Parts", () => {
         testId="test" 
         variant="CustomVariant"
         animation="fadeIn"
+        tooltip="Tooltip text"
         delay="{0}"
       />
     `, {
@@ -311,5 +312,10 @@ test.describe("Behaviors and Parts", () => {
     
     // Verify parts are visible
     await expect(ringPart).toBeVisible();
+
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
   });
 });

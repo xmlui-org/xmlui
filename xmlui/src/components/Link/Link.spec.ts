@@ -1119,7 +1119,7 @@ test.describe("Behaviors and Parts", () => {
       >Link text</Link>
     `, {
       testThemeVars: {
-        "borderColor-Link-CustomLink": "rgb(255, 0, 0)",
+        "backgroundColor-Link-CustomLink": "rgb(255, 0, 0)",
       },
     });
     
@@ -1127,7 +1127,7 @@ test.describe("Behaviors and Parts", () => {
     const icon = link.locator("[data-part-id='icon']");
     
     // Verify variant applied
-    await expect(link).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await expect(link).toHaveCSS("background-color", "rgb(255, 0, 0)");
     
     // Verify icon part is visible
     await expect(icon).toBeVisible();
