@@ -1,10 +1,11 @@
-import { forwardRef, ReactNode } from "react";
+import { forwardRef, type ReactNode } from "react";
 import { Button, Icon, Breakout, useTheme } from "xmlui";
 
 import styles from "./HeroSection.module.scss";
 
 import classnames from "classnames";
 import { Theme } from "xmlui";
+import { Part } from "../../../../xmlui/src/components/Part/Part";
 
 const PART_HEADER = "header";
 const PART_CONTENT = "content";
@@ -116,115 +117,118 @@ export const HeroSection = forwardRef(
     const ctaButton =
       (ctaButtonTemplate || ctaButtonText) &&
       (ctaButtonTemplate || (
-        <Button
-          data-part-id={PART_CTA_BUTTON}
-          className={classnames(styles.ctaButton)}
-          icon={ctaButtonIcon && <Icon name={ctaButtonIcon} aria-hidden />}
-          onClick={onCtaClick}
-        >
-          {ctaButtonText}
-        </Button>
+        <Part partId={PART_CTA_BUTTON}>
+          <Button
+            className={classnames(styles.ctaButton)}
+            icon={ctaButtonIcon && <Icon name={ctaButtonIcon} aria-hidden />}
+            onClick={onCtaClick}
+          >
+            {ctaButtonText}
+          </Button>
+        </Part>
       ));
 
     // Header section (preamble to CTA button)
     const headerSection = (
-      <div
-        data-part-id={PART_HEADER}
-        className={classnames(styles.header)}
-        style={{
-          width: isHorizontal ? headerWidth : undefined,
-          flexShrink: isHorizontal ? 0 : undefined,
-        }}
-      >
-        <Theme tone={effectiveHeaderTone}>
-          <div
-            data-part-id={PART_HEADING_SECTION}
-            className={classnames(styles.headingSection, {
-              [styles.start]: effectiveHeaderAlignment === "start",
-              [styles.center]: effectiveHeaderAlignment === "center",
-              [styles.end]: effectiveHeaderAlignment === "end",
-            })}
-          >
-            {preamble && (
-              <div data-part-id={PART_PREAMBLE} className={styles.preamble}>
-                {preamble}
+      <Part partId={PART_HEADER}>
+        <div
+          className={classnames(styles.header)}
+          style={{
+            width: isHorizontal ? headerWidth : undefined,
+            flexShrink: isHorizontal ? 0 : undefined,
+          }}
+        >
+          <Theme tone={effectiveHeaderTone}>
+            <Part partId={PART_HEADING_SECTION}>
+              <div
+                className={classnames(styles.headingSection, {
+                  [styles.start]: effectiveHeaderAlignment === "start",
+                  [styles.center]: effectiveHeaderAlignment === "center",
+                  [styles.end]: effectiveHeaderAlignment === "end",
+                })}
+              >
+                {preamble && (
+                  <Part partId={PART_PREAMBLE}>
+                    <div className={styles.preamble}>{preamble}</div>
+                  </Part>
+                )}
+                {headline && (
+                  <Part partId={PART_HEADLINE}>
+                    <div className={styles.headline}>{headline}</div>
+                  </Part>
+                )}
+                {subheadline && (
+                  <Part partId={PART_SUBHEADLINE}>
+                    <div className={styles.subheadline}>{subheadline}</div>
+                  </Part>
+                )}
+                {mainTextTemplate && (
+                  <Part partId={PART_MAIN_TEXT}>
+                    <div className={styles.textWrapper}>{mainTextTemplate}</div>
+                  </Part>
+                )}
+                {!mainTextTemplate && mainText && (
+                  <Part partId={PART_MAIN_TEXT}>
+                    <div className={styles.mainText}>{mainText}</div>
+                  </Part>
+                )}
+                {ctaButton && <div className={styles.ctaButtonWrapper}>{ctaButton}</div>}
               </div>
-            )}
-            {headline && (
-              <div data-part-id={PART_HEADLINE} className={styles.headline}>
-                {headline}
-              </div>
-            )}
-            {subheadline && (
-              <div data-part-id={PART_SUBHEADLINE} className={styles.subheadline}>
-                {subheadline}
-              </div>
-            )}
-            {mainTextTemplate && (
-              <div data-part-id={PART_MAIN_TEXT} className={styles.textWrapper}>
-                {mainTextTemplate}
-              </div>
-            )}
-            {!mainTextTemplate && mainText && (
-              <div data-part-id={PART_MAIN_TEXT} className={styles.mainText}>
-                {mainText}
-              </div>
-            )}
-            {ctaButton && <div className={styles.ctaButtonWrapper}>{ctaButton}</div>}
-          </div>
-        </Theme>
-      </div>
+            </Part>
+          </Theme>
+        </div>
+      </Part>
     );
 
     // Content section (image + children)
     const contentSection = (
-      <div
-        data-part-id={PART_CONTENT}
-        className={classnames(styles.content, {
-          [styles.contentStart]: contentAlignment === "start",
-          [styles.contentCenter]: contentAlignment === "center",
-          [styles.contentEnd]: contentAlignment === "end",
-        })}
-      >
-        <Theme tone={effectiveContentTone}>
-          <>
-            {image && (
-              <img
-                data-part-id={PART_IMAGE}
-                className={styles.image}
-                src={image}
-                style={{ width: imageWidth, height: imageHeight }}
-                aria-hidden
-              />
-            )}
-            {children}
-          </>
-        </Theme>
-      </div>
+      <Part partId={PART_CONTENT}>
+        <div
+          className={classnames(styles.content, {
+            [styles.contentStart]: contentAlignment === "start",
+            [styles.contentCenter]: contentAlignment === "center",
+            [styles.contentEnd]: contentAlignment === "end",
+          })}
+        >
+          <Theme tone={effectiveContentTone}>
+            <>
+              {image && (
+                <Part partId={PART_IMAGE}>
+                  <img
+                    className={styles.image}
+                    src={image}
+                    style={{ width: imageWidth, height: imageHeight }}
+                    aria-hidden
+                  />
+                </Part>
+              )}
+              {children}
+            </>
+          </Theme>
+        </div>
+      </Part>
     );
 
     const heroContent = (
-      <div
-        ref={ref}
-        data-part-id={PART_BACKGROUND}
-        className={classnames(styles.heroWrapper, className)}
-      >
-        {backgroundTemplate && (
-          <div className={styles.backgroundTemplate}>{backgroundTemplate}</div>
-        )}
-        <div
-          className={classnames(styles.heroContent, {
-            [styles.horizontal]: isHorizontal,
-            [styles.vertical]: !isHorizontal,
-          })}
-          style={{ gap, width: contentWidth }}
-        >
-          {effectiveContentPlacement === "left" && contentSection}
-          {headerSection}
-          {(effectiveContentPlacement === "right" || effectiveContentPlacement === "bottom") &&
-            contentSection}
+      <Part partId={PART_BACKGROUND}>
+        <div ref={ref} className={classnames(styles.heroWrapper, className)}>
+          {backgroundTemplate && (
+            <div className={styles.backgroundTemplate}>{backgroundTemplate}</div>
+          )}
+          <div
+            className={classnames(styles.heroContent, {
+              [styles.horizontal]: isHorizontal,
+              [styles.vertical]: !isHorizontal,
+            })}
+            style={{ gap, width: contentWidth }}
+          >
+            {effectiveContentPlacement === "left" && contentSection}
+            {headerSection}
+            {(effectiveContentPlacement === "right" || effectiveContentPlacement === "bottom") &&
+              contentSection}
+          </div>
         </div>
-      </div>
+      </Part>
     );
 
     return fullWidthBackground ? <Breakout>{heroContent}</Breakout> : heroContent;

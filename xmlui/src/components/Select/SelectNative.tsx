@@ -190,8 +190,8 @@ const SelectTriggerActions = ({
   return (
     <div className={styles.actions}>
       {hasValue && enabled && !readOnly && clearable && (
+        <Part partId={PART_CLEAR_BUTTON}>
         <span
-          data-part-id={PART_CLEAR_BUTTON}
           className={styles.action}
           onClick={(event) => {
             event.stopPropagation();
@@ -200,6 +200,7 @@ const SelectTriggerActions = ({
         >
           <Icon name="close" />
         </span>
+        </Part>
       )}
       {showChevron && (
         <span className={styles.action}>
