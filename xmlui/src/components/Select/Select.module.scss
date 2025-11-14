@@ -103,16 +103,16 @@ $outlineColor-Select--focus: createThemeVar("Input:outlineColor-#{$componentName
 $outlineStyle-Select--focus: createThemeVar("Input:outlineStyle-#{$componentName}--focus");
 $outlineOffset-Select--focus: createThemeVar("Input:outlineOffset-#{$componentName}--focus");
 $textColor-placeholder-Select: createThemeVar("Input:textColor-placeholder-#{$componentName}");
-$paddingVertical-badge-Select: createThemeVar("paddingVertical-#{$componentName}");
-$paddingHorizontal-badge-Select: createThemeVar("paddingHorizontal-#{$componentName}");
-$borderRadius-badge-Select: createThemeVar("borderRadius-#{$componentName}");
-$fontSize-badge-Select: createThemeVar("Input:fontSize-#{$componentName}");
-$backgroundColor-badge-Select: createThemeVar("Input:backgroundColor-badge-#{$componentName}");
-$textColor-badge-Select: createThemeVar("Input:textColor-badge-#{$componentName}");
-$backgroundColor-badge-Select--hover: createThemeVar("Input:backgroundColor-badge-#{$componentName}--hover");
-$textColor-badge-Select--hover: createThemeVar("Input:textColor-badge-#{$componentName}--hover");
-$backgroundColor-badge-Select--active: createThemeVar("Input:backgroundColor-badge-#{$componentName}--active");
-$textColor-badge-Select--active: createThemeVar("Input:textColor-badge-#{$componentName}--active");
+$paddingVertical-Select-badge: createThemeVar("paddingVertical-#{$componentName}-badge");
+$paddingHorizontal-Select-badge: createThemeVar("paddingHorizontal-#{$componentName}-badge");
+$borderRadius-Select-badge: createThemeVar("borderRadius-#{$componentName}-badge");
+$fontSize-Select-badge: createThemeVar("Input:fontSize-#{$componentName}-badge");
+$backgroundColor-Select-badge: createThemeVar("Input:backgroundColor-#{$componentName}-badge");
+$textColor-Select-badge: createThemeVar("Input:textColor-#{$componentName}-badge");
+$backgroundColor-Select-badge--hover: createThemeVar("Input:backgroundColor-#{$componentName}-badge--hover");
+$textColor-Select-badge--hover: createThemeVar("Input:textColor-#{$componentName}-badge--hover");
+$backgroundColor-Select-badge--active: createThemeVar("Input:backgroundColor-#{$componentName}-badge--active");
+$textColor-Select-badge--active: createThemeVar("Input:textColor-#{$componentName}-badge--active");
 $backgroundColor-menu-Select: createThemeVar("Input:backgroundColor-menu-#{$componentName}");
 $borderRadius-menu-Select: createThemeVar("Input:borderRadius-menu-#{$componentName}");
 $boxShadow-menu-Select: createThemeVar("Input:boxShadow-menu-#{$componentName}");
@@ -126,7 +126,6 @@ $opacity-text-item-Select--disabled: createThemeVar("opacity-text-item-#{$compon
 $textColor-indicator-Select: createThemeVar("textColor-indicator-#{$componentName}");
 $minHeight-Select: createThemeVar("minHeight-#{$componentName}");
 $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
-
 
 // --- CSS properties of a particular Select variant
 @mixin variant($variantName) {
@@ -286,7 +285,7 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     width: fit-content;
     height: fit-content;
     min-width: 0;
-    padding: $paddingVertical-badge-Select $paddingHorizontal-badge-Select;
+    padding: $paddingVertical-Select-badge $paddingHorizontal-Select-badge;
     transition: color 0.2s, background-color 0.2s;
     user-select: none;
     cursor: pointer;
@@ -294,19 +293,19 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     gap: t.$space-1;
     justify-content: center;
     align-items: center;
-    border-radius: $borderRadius-badge-Select;
-    font-size: $fontSize-badge-Select;
-    background-color: $backgroundColor-badge-Select;
-    color: $textColor-badge-Select;
+    border-radius: $borderRadius-Select-badge;
+    font-size: $fontSize-Select-badge;
+    background-color: $backgroundColor-Select-badge;
+    color: $textColor-Select-badge;
 
     &:hover {
-      background-color: $backgroundColor-badge-Select--hover;
-      color: $textColor-badge-Select--hover;
+      background-color: $backgroundColor-Select-badge--hover;
+      color: $textColor-Select-badge--hover;
     }
 
     &:active {
-      background-color: $backgroundColor-badge-Select--active;
-      color: $textColor-badge-Select--active;
+      background-color: $backgroundColor-Select-badge--active;
+      color: $textColor-Select-badge--active;
     }
   }
 
