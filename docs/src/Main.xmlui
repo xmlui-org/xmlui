@@ -24,6 +24,7 @@
             when="{mediaSize.sizeIndex > 1}"
             data="{appGlobals.plainTextContent}"
         />
+        <Separator />
         <Link to="https://www.xmlui.org/get-started">
             <Button variant="solid" onClick="emitEvent('click')">
                 Download
