@@ -9,7 +9,6 @@ import scss from "@shikijs/langs/scss";
 import css from "@shikijs/langs/css";
 // @ts-ignore
 import json from "@shikijs/langs/json";
-
 // @ts-ignore
 import html from "@shikijs/langs/html";
 
