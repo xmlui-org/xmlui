@@ -232,7 +232,7 @@ type OnSubmit = (
   params: Record<string, any> | undefined,
   options: { passAsDefaultBody: boolean },
 ) => Promise<void>;
-type OnWillSubmit = (params: Record<string, any> | undefined) => Promise<boolean | void>;
+type OnWillSubmit = (params: Record<string, any> | undefined) => Promise<boolean | void | null | undefined | string | Record<string, any>>;
 type OnSuccess = (result: any) => Promise<void>;
 type OnCancel = () => void;
 type OnReset = () => void;
@@ -431,16 +431,30 @@ const Form = forwardRef(function (
     dispatch(formSubmitting());
     try {
       const filteredSubject = validationResult.data;
-      const canSubmit = await onWillSubmit?.(filteredSubject);
-      if (canSubmit === false) {
+      const willSubmitResult = await onWillSubmit?.(filteredSubject);
+      
+      // Handle different return values from willSubmit
+      if (willSubmitResult === false) {
         // --- We do not reset the form but allow the next submit.
         dispatch(
           backendValidationArrived({ generalValidationResults: [], fieldValidationResults: {} }),
         );
         return;
       }
+      
+      // Determine what data to submit
+      let dataToSubmit = filteredSubject;
+      if (willSubmitResult !== null && 
+          willSubmitResult !== undefined && 
+          willSubmitResult !== "" && 
+          typeof willSubmitResult === "object" && 
+          !Array.isArray(willSubmitResult)) {
+        // Submit the returned object instead
+        dataToSubmit = willSubmitResult as Record<string, any>;
+      }
+      // For null, undefined, empty string, or any non-object: proceed with original data
 
-      const result = await onSubmit?.(filteredSubject, {
+      const result = await onSubmit?.(dataToSubmit, {
         passAsDefaultBody: true,
       });
       dispatch(formSubmitted());

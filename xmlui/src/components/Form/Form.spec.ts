@@ -848,6 +848,193 @@ test.describe("Basic Functionality", () => {
 
       await expect.poll(testStateDriver.testState).toEqual("reset");
     });
+
+    test("onWillSubmit allows submission when returning null", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form 
+          data="{{ name: 'John' }}"
+          onWillSubmit="data => null"
+          onSubmit="data => testState = data">
+          <FormItem label="Name" bindTo="name" />
+        </Form>
+      `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      await expect.poll(testStateDriver.testState).toEqual({ name: "John" });
+    });
+
+    test("onWillSubmit allows submission when returning undefined", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form 
+          data="{{ name: 'Jane' }}"
+          onWillSubmit="data => undefined"
+          onSubmit="data => testState = data">
+          <FormItem label="Name" bindTo="name" />
+        </Form>
+      `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      await expect.poll(testStateDriver.testState).toEqual({ name: "Jane" });
+    });
+
+    test("onWillSubmit allows submission when returning empty string", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form 
+          data="{{ name: 'Bob' }}"
+          onWillSubmit='data => ""'
+          onSubmit="data => testState = data">
+          <FormItem label="Name" bindTo="name" />
+        </Form>
+      `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      await expect.poll(testStateDriver.testState).toEqual({ name: "Bob" });
+    });
+
+    test("onWillSubmit allows submission when returning true", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form 
+          data="{{ name: 'Alice' }}"
+          onWillSubmit="data => true"
+          onSubmit="data => testState = data">
+          <FormItem label="Name" bindTo="name" />
+        </Form>
+      `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      await expect.poll(testStateDriver.testState).toEqual({ name: "Alice" });
+    });
+
+    test("onWillSubmit allows submission when returning a number", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form 
+          data="{{ name: 'Charlie' }}"
+          onWillSubmit="data => 42"
+          onSubmit="data => testState = data">
+          <FormItem label="Name" bindTo="name" />
+        </Form>
+      `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      await expect.poll(testStateDriver.testState).toEqual({ name: "Charlie" });
+    });
+
+    test("onWillSubmit cancels submission when returning false", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form 
+          data="{{ name: 'Test' }}"
+          onWillSubmit="data => false"
+          onSubmit="data => testState = 'submitted'">
+          <FormItem label="Name" bindTo="name" />
+        </Form>
+      `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      // Wait a bit to ensure submission doesn't happen
+      await page.waitForTimeout(200);
+      await expect.poll(testStateDriver.testState).toEqual(null);
+    });
+
+    test("onWillSubmit submits modified data when returning a plain object", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form 
+          data="{{ name: 'Original', email: 'old@test.com' }}"
+          onWillSubmit="data => ({ name: 'Modified', email: 'new@test.com', extra: 'added' })"
+          onSubmit="data => testState = data">
+          <FormItem label="Name" bindTo="name" />
+          <FormItem label="Email" bindTo="email" />
+        </Form>
+      `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      await expect.poll(testStateDriver.testState).toEqual({ 
+        name: "Modified", 
+        email: "new@test.com",
+        extra: "added"
+      });
+    });
+
+    test("onWillSubmit can add fields to submission data", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form 
+          data="{{ name: 'User' }}"
+          onWillSubmit="data => ({ name: data.name, timestamp: 1234567890, source: 'web' })"
+          onSubmit="data => testState = data">
+          <FormItem label="Name" bindTo="name" />
+        </Form>
+      `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      await expect.poll(testStateDriver.testState).toEqual({ 
+        name: "User",
+        timestamp: 1234567890,
+        source: "web"
+      });
+    });
+
+    test("onWillSubmit can remove fields from submission data", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form 
+          data="{{ name: 'User', password: 'secret', email: 'user@test.com' }}"
+          onWillSubmit="data => ({ name: data.name, email: data.email })"
+          onSubmit="data => testState = data">
+          <FormItem label="Name" bindTo="name" />
+          <FormItem label="Password" bindTo="password" />
+          <FormItem label="Email" bindTo="email" />
+        </Form>
+      `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      await expect.poll(testStateDriver.testState).toEqual({ 
+        name: "User",
+        email: "user@test.com"
+      });
+    });
+
+    test("onWillSubmit does not submit array when returned", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form 
+          data="{{ name: 'Test' }}"
+          onWillSubmit="data => ['array', 'value']"
+          onSubmit="data => testState = data">
+          <FormItem label="Name" bindTo="name" />
+        </Form>
+      `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      // Array is treated as non-object, so original data should be submitted
+      await expect.poll(testStateDriver.testState).toEqual({ name: "Test" });
+    });
+
+    test("onWillSubmit with complex object transformation", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form 
+          data="{{ firstName: 'John', lastName: 'Doe', age: 30 }}"
+          onWillSubmit="data => ({ fullName: data.firstName + ' ' + data.lastName, age: data.age })"
+          onSubmit="data => testState = data">
+          <FormItem label="First Name" bindTo="firstName" />
+          <FormItem label="Last Name" bindTo="lastName" />
+          <FormItem label="Age" bindTo="age" type="integer" />
+        </Form>
+      `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      await expect.poll(testStateDriver.testState).toEqual({ 
+        fullName: "John Doe",
+        age: 30
+      });
+    });
   });
 
   // =============================================================================
