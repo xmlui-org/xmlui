@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 640" width="840" height="640">
+  <defs>
+    <style>
+      .main-screen-border { fill: none; stroke: #333; stroke-width: 4; }
+      .container-bg { fill: #f8f9fa; }
+      .gutter { fill: #e9ecef; }
+      .gutter-edge { fill: none; stroke: #666; stroke-width: 1; stroke-dasharray: 4,2; }
+      .label-text { font-family: monospace; font-size: 14px; fill: #333; }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect class="container-bg" x="0" y="0" width="840" height="640" rx="4"/>
+  
+  <!-- Main screen border (THICK 4px) -->
+  <rect class="main-screen-border" x="20" y="20" width="800" height="600"/>
+  
+  <!-- Left gutter -->
+  <rect class="gutter" x="20" y="20" width="15" height="600"/>
+  
+  <!-- Right gutter -->
+  <rect class="gutter" x="805" y="20" width="15" height="600"/>
+  
+  <!-- Left gutter inner edge (dashed) - only left edge of container -->
+  <line class="gutter-edge" x1="35" y1="20" x2="35" y2="620"/>
+  
+  <!-- Right gutter inner edge (dashed) - only right edge of container -->
+  <line class="gutter-edge" x1="805" y1="20" x2="805" y2="620"/>
+  
+  <!-- App Container area (no top/bottom borders, just fill) -->
+  <rect class="container-bg" x="35" y="20" width="770" height="600"/>
+  
+  <!-- Label -->
+  <text class="label-text" x="45" y="45">C: App Container (with scroll gutters)</text>
+</svg>

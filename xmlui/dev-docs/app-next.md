@@ -1052,63 +1052,13 @@ This approach allows you to:
 
 Basic app container without any internal blocks or scroll gutters.
 
-```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ C: App Container                                                             │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-└──────────────────────────────────────────────────────────────────────────────┘
-```
+![App Container](images/app-container-diagram.svg)
 
 ### App Screen Layout with Scroll Gutters
 
 App container with reserved scroll gutter spaces on both sides (stable both-edges).
 
-```
-┌─┬──────────────────────────────────────────────────────────────────────────┬─┐
-│ │ C: App Container                                                         │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-└─┴──────────────────────────────────────────────────────────────────────────┴─┘
-```
+![App Container with Gutters](images/app-container-with-gutters-diagram.svg)
 
 ## Horizontal Layout Diagrams
 
@@ -1127,35 +1077,7 @@ All horizontal layout diagrams share the following common characteristics:
 
 **Note:** We cannot see the scrollbars as the entire content fits into the viewport. The same is displayed when `scrollWholePage` is false.
 
-```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ H: Header                                                                    │
-├──────────────────────────────────────────────────────────────────────────────┤
-│ N: Navigation Panel                                                          │
-├──────────────────────────────────────────────────────────────────────────────┤
-│ M: Main Content                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-├──────────────────────────────────────────────────────────────────────────────┤
-│ F: Footer                                                                    │
-├──────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│ (remaining space below footer)                                               │
-│                                                                              │
-│                                                                              │
-└──────────────────────────────────────────────────────────────────────────────┘
-```
+![Horizontal Layout](images/horizontal-layout-diagram.svg)
 
 ### Horizontal Layout with Scroll Gutters
 
@@ -1165,35 +1087,7 @@ All horizontal layout diagrams share the following common characteristics:
 
 **Note:** The entire content fits into the viewport; no scrollbar visible. The scroll gutters are reserved on both sides.
 
-```
-┌─┬──────────────────────────────────────────────────────────────────────────┬─┐
-│ │ H: Header                                                                │ │
-│ ├──────────────────────────────────────────────────────────────────────────┤ │
-│ │ N: Navigation Panel                                                      │ │
-│ ├──────────────────────────────────────────────────────────────────────────┤ │
-│ │ M: Main Content                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ ├──────────────────────────────────────────────────────────────────────────┤ │
-│ │ F: Footer                                                                │ │
-│ ├──────────────────────────────────────────────────────────────────────────┤ │
-│ │                                                                          │ │
-│ │ (remaining space below footer)                                           │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-└─┴──────────────────────────────────────────────────────────────────────────┴─┘
-```
+![Horizontal Layout with Gutters](images/horizontal-layout-with-gutters-diagram.svg)
 
 ### Horizontal Layout with Overflow and Scrollbar
 
@@ -1203,37 +1097,7 @@ All horizontal layout diagrams share the following common characteristics:
 
 **Note:** The content overflows beyond the viewport; the scrollbar is visible in the right gutter at the top position; the footer extends below the visible screen.
 
-```
-┌─┬──────────────────────────────────────────────────────────────────────────┬─┐
-│ │ H: Header                                                                │█│
-│ ├──────────────────────────────────────────────────────────────────────────┤█│
-│ │ N: Navigation Panel                                                      │█│
-│ ├──────────────────────────────────────────────────────────────────────────┤█│
-│ │ M: Main Content                                                          │█│
-│ │                                                                          │█│
-│ │                                                                          │█│
-│ │                                                                          │█│
-│ │                                                                          │█│
-│ │                                                                          │█│
-│ │                                                                          │█│
-│ │                                                                          │█│
-│ │                                                                          │█│
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-└─┴──────────────────────────────────────────────────────────────────────────┴─┘
-  │                                                                          │
-  ├──────────────────────────────────────────────────────────────────────────┤
-  │ F: Footer                                                                │
-  └──────────────────────────────────────────────────────────────────────────┘
-```
+![Horizontal Layout with Overflow and Scrollbar](images/horizontal-layout-overflow-scrollbar.svg)
 
 ### Horizontal Layout with Overflow and Scrollbar (No Gutter Reservation)
 
@@ -1243,37 +1107,7 @@ All horizontal layout diagrams share the following common characteristics:
 
 **Note:** The content overflows beyond the viewport; the scrollbar is visible on the right side; no scroll gutters are reserved; the footer extends below the visible screen.
 
-```
-┌────────────────────────────────────────────────────────────────────────────┬─┐
-│ H: Header                                                                  │█│
-├────────────────────────────────────────────────────────────────────────────┤█│
-│ N: Navigation Panel                                                        │█│
-├────────────────────────────────────────────────────────────────────────────┤█│
-│ M: Main Content                                                            │█│
-│                                                                            │█│
-│                                                                            │█│
-│                                                                            │█│
-│                                                                            │█│
-│                                                                            │█│
-│                                                                            │█│
-│                                                                            │█│
-│                                                                            │█│
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-└────────────────────────────────────────────────────────────────────────────┴─┘
-  │                                                                            │
-  ├────────────────────────────────────────────────────────────────────────────┤
-  │ F: Footer                                                                  │
-  └────────────────────────────────────────────────────────────────────────────┘
-```
+![Horizontal Layout with Overflow and Scrollbar](images/horizontal-layout-overflow-scrollbar.svg)
 
 ### Horizontal Layout Scrolled to Bottom
 
@@ -1600,6 +1434,10 @@ All horizontal-sticky layout diagrams share the following common characteristics
 │ │                                                                          │ │
 │ │                                                                          │ │
 │ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
 │ │ (end of content)                                                         │█│
 │ ├──────────────────────────────────────────────────────────────────────────┤█│
 │ │ F: Footer (docked to bottom)                                             │█│
@@ -1621,6 +1459,9 @@ All horizontal-sticky layout diagrams share the following common characteristics
 │ N: Navigation Panel (docked to top)                                          │
 ├──────────────────────────────────────────────────────────────────────────────┤
 │ M: Main Content                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
 │                                                                              │
 │                                                                              │
 │                                                                              │
@@ -1666,6 +1507,10 @@ All horizontal-sticky layout diagrams share the following common characteristics
 │ │                                                                          │ │
 │ │                                                                          │ │
 │ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
 ├─┴──────────────────────────────────────────────────────────────────────────┴─┤
 │ F: Footer (docked to bottom)                                                 │
 └──────────────────────────────────────────────────────────────────────────────┘
@@ -1691,6 +1536,12 @@ All horizontal-sticky layout diagrams share the following common characteristics
 │ M: Main Content (scrollable, mid-scroll position)                          │█│
 │                                                                            │█│
 │                                                                            │█│
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
 │                                                                            │ │
 │                                                                            │ │
 │                                                                            │ │
@@ -1727,6 +1578,11 @@ All horizontal-sticky layout diagrams share the following common characteristics
 │ │                                                                          │ │
 │ │                                                                          │ │
 │ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
 │ │ ↓ Content below (hidden)                                                 │ │
 ├─┴──────────────────────────────────────────────────────────────────────────┴─┤
 │ F: Footer (docked to bottom)                                                 │
@@ -1757,7 +1613,12 @@ All horizontal-sticky layout diagrams share the following common characteristics
 │                                                                            │ │
 │                                                                            │ │
 │                                                                            │ │
-│                                                                            │█│
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
 │ (end of content)                                                           │█│
 ├────────────────────────────────────────────────────────────────────────────┴─┤
 │ F: Footer (docked to bottom)                                                 │
@@ -1788,7 +1649,12 @@ All horizontal-sticky layout diagrams share the following common characteristics
 │ │                                                                          │ │
 │ │                                                                          │ │
 │ │                                                                          │ │
-│ │                                                                          │█│
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
+│ │                                                                          │ │
 │ │ (end of content)                                                         │█│
 ├─┴──────────────────────────────────────────────────────────────────────────┴─┤
 │ F: Footer (docked to bottom)                                                 │
@@ -1831,6 +1697,8 @@ All condensed layout diagrams share the following common characteristics:
 │                                                                              │
 │                                                                              │
 │                                                                              │
+│                                                                              │
+│                                                                              │
 ├──────────────────────────────────────────────────────────────────────────────┤
 │ F: Footer                                                                    │
 ├──────────────────────────────────────────────────────────────────────────────┤
@@ -1853,6 +1721,7 @@ All condensed layout diagrams share the following common characteristics:
 │ │ H/N: Header and Navigation Panel                                         │ │
 │ ├──────────────────────────────────────────────────────────────────────────┤ │
 │ │ M: Main Content                                                          │ │
+│ │                                                                          │ │
 │ │                                                                          │ │
 │ │                                                                          │ │
 │ │                                                                          │ │
@@ -1907,6 +1776,7 @@ All condensed layout diagrams share the following common characteristics:
 │ │                                                                          │ │
 │ │                                                                          │ │
 │ │                                                                          │ │
+│ │                                                                          │ │
 └─┴──────────────────────────────────────────────────────────────────────────┴─┘
   │                                                                          │
   ├──────────────────────────────────────────────────────────────────────────┤
@@ -1945,6 +1815,7 @@ All condensed layout diagrams share the following common characteristics:
 │                                                                            │ │
 │                                                                            │ │
 │                                                                            │ │
+│                                                                            │ │
 └────────────────────────────────────────────────────────────────────────────┴─┘
   │                                                                            │
   ├────────────────────────────────────────────────────────────────────────────┤
@@ -1969,6 +1840,7 @@ All condensed layout diagrams share the following common characteristics:
   │                                                                          │
   │                                                                          │
 ┌─┼──────────────────────────────────────────────────────────────────────────┼─┐
+│ │                                                                          │ │
 │ │                                                                          │ │
 │ │                                                                          │ │
 │ │                                                                          │ │
@@ -2052,6 +1924,8 @@ All condensed layout diagrams share the following common characteristics:
 │                                                                            │ │
 │                                                                            │ │
 │                                                                            │ │
+│                                                                            │ │
+│                                                                            │ │
 │ ↓ Content below (hidden)                                                   │ │
 ├────────────────────────────────────────────────────────────────────────────┴─┤
 │ F: Footer (docked to bottom)                                                 │
@@ -2081,7 +1955,6 @@ All condensed-sticky layout diagrams share the following common characteristics:
 │ H/N: Header and Navigation Panel (docked to top)                             │
 ├──────────────────────────────────────────────────────────────────────────────┤
 │ M: Main Content                                                              │
-│                                                                              │
 │                                                                              │
 │                                                                              │
 │                                                                              │

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 640" width="840" height="640">
+  <defs>
+    <style>
+      .outer-border { fill: none; stroke: #333; stroke-width: 2; }
+      .block-border { fill: none; stroke: #333; stroke-width: 1; }
+      .container-bg { fill: #f8f9fa; }
+      .header { fill: #d0d0d0; }
+      .nav { fill: #e0e0e0; }
+      .content { fill: #ffffff; }
+      .footer { fill: #d0d0d0; }
+      .text { font-family: Arial, sans-serif; font-size: 14px; fill: #333; text-anchor: start; font-style: italic; }
+    </style>
+    <pattern id="diagonalPattern" patternUnits="userSpaceOnUse" width="10" height="10">
+      <line x1="0" y1="10" x2="10" y2="0" stroke="#e0e0e0" stroke-width="1"/>
+      <line x1="0" y1="0" x2="10" y2="10" stroke="#e0e0e0" stroke-width="1"/>
+    </pattern>
+  </defs>
+  
+  <!-- Background -->
+  <rect class="container-bg" x="0" y="0" width="840" height="640" rx="4"/>
+  
+  <!-- Main area outer border (800x600) -->
+  <rect class="outer-border" x="20" y="20" width="800" height="600"/>
+  
+  <!-- Header block -->
+  <rect class="header" x="20" y="20" width="800" height="50"/>
+  <line class="block-border" x1="20" y1="70" x2="820" y2="70"/>
+  <text class="text" x="30" y="50">H: Header</text>
+  
+  <!-- Navigation Panel block -->
+  <rect class="nav" x="20" y="70" width="800" height="45"/>
+  <line class="block-border" x1="20" y1="115" x2="820" y2="115"/>
+  <text class="text" x="30" y="98">N: Navigation Panel</text>
+  
+  <!-- Main Content block -->
+  <rect class="content" x="20" y="115" width="800" height="335"/>
+  <line class="block-border" x1="20" y1="450" x2="820" y2="450"/>
+  <text class="text" x="30" y="140">M: Main Content</text>
+  
+  <!-- Footer block -->
+  <rect class="footer" x="20" y="450" width="800" height="45"/>
+  <line class="block-border" x1="20" y1="495" x2="820" y2="495"/>
+  <text class="text" x="30" y="478">F: Footer</text>
+  
+  <!-- Remaining space with diagonal pattern -->
+  <rect x="20" y="495" width="800" height="125" fill="url(#diagonalPattern)"/>
+</svg>
