@@ -27,7 +27,6 @@ export const RadioGroupMd = createMetadata({
     "choose only one option from a group of radio buttons. It manages the selection " +
     "state and ensures that selecting one option automatically deselects all others in " +
     "the group." +
-    "\n\n" +
     "Radio options store their values as strings. Numbers and booleans are converted to strings " +
     "when assigned, while objects, functions and arrays default to an empty string unless resolved " +
     "via binding expressions.",
@@ -66,13 +65,13 @@ export const RadioGroupMd = createMetadata({
     [`borderWidth-${RGOption}`]: "1px",
     [`borderWidth-${RGOption}-validation`]: `2px`,
 
-    [`borderColor-${RGOption}-default`]: "$color-surface-500",
+    [`borderColor-${RGOption}--default`]: "$color-surface-500",
     [`borderColor-checked-${RGOption}`]: "$color-primary-500",
-    [`borderColor-${RGOption}-default--hover`]: "$color-surface-700",
-    [`borderColor-${RGOption}-default--active`]: "$color-primary-500",
-    [`borderColor-${RGOption}-error`]: `$borderColor-Input-default--error`,
-    [`borderColor-${RGOption}-warning`]: `$borderColor-Input-default--warning`,
-    [`borderColor-${RGOption}-success`]: `$borderColor-Input-default--success`,
+    [`borderColor-${RGOption}--default--hover`]: "$color-surface-700",
+    [`borderColor-${RGOption}--default--active`]: "$color-primary-500",
+    [`borderColor-${RGOption}--error`]: `$borderColor-Input--error`,
+    [`borderColor-${RGOption}--warning`]: `$borderColor-Input--warning`,
+    [`borderColor-${RGOption}--success`]: `$borderColor-Input--success`,
 
     [`backgroundColor-${RGOption}--disabled`]: "$backgroundColor--disabled",
     [`backgroundColor-checked-${RGOption}`]: "$color-primary-500",

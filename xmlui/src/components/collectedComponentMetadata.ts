@@ -184,13 +184,16 @@ import { ColorPickerMd } from "./ColorPicker/ColorPicker";
 import type { ThemeDefinition } from "../abstractions/ThemingDefs";
 import { RootThemeDefinition } from "../components-core/theming/themes/root";
 import {
+  XmlUiBlogThemeDefinition,
   XmlUiCyanThemeDefinition,
+  XmlUiDocsThemeDefinition,
   XmlUiGrayThemeDefinition,
   XmlUiGreenThemeDefinition,
   XmlUiOrangeThemeDefinition,
   XmlUiPurpleThemeDefinition,
   XmlUiRedThemeDefinition,
   XmlUiThemeDefinition,
+  XmlUiWebThemeDefinition,
 } from "../components-core/theming/themes/xmlui";
 import { BarChartMd } from "./Charts/BarChart/BarChart";
 import { DonutChartMd } from "./Charts/DonutChart/DonutChart";
@@ -203,7 +206,6 @@ import { SlotMd } from "./Slot/Slot";
 import { TooltipMd } from "./Tooltip/Tooltip";
 import { TimeInputMd } from "./TimeInput/TimeInput";
 import { TimerMd } from "./Timer/Timer";
-import { DateInput } from "./DateInput/DateInputNative";
 import { DateInputMd } from "./DateInput/DateInput";
 import { PaginationMd } from "./Pagination/Pagination";
 
@@ -428,4 +430,7 @@ export const collectedThemes: Record<string, ThemeDefinition> = {
   xmluiPurple: XmlUiPurpleThemeDefinition,
   xmluiCyan: XmlUiCyanThemeDefinition,
   xmluiRed: XmlUiRedThemeDefinition,
+  xmluiDocs: XmlUiDocsThemeDefinition,
+  xmluiBlog: XmlUiBlogThemeDefinition,
+  xmluiWeb: XmlUiWebThemeDefinition,
 };

@@ -1,4 +1,4 @@
-import styles from "./LabelListNative.module.scss";
+import styles from "./LabelList.module.scss";
 import { defaultProps, LabelList } from "./LabelListNative";
 import { LabelPositionValues } from "../utils/abstractions";
 import { parseScssVar } from "../../../components-core/theming/themeVars";

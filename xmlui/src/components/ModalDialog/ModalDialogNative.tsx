@@ -3,6 +3,7 @@ import React, {
   type ReactNode,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -154,6 +155,20 @@ export const ModalDialog = React.forwardRef(
     const composedRef = ref ? composeRefs(ref, modalRef) : modalRef;
 
     const { isOpen, doClose, doOpen } = useModalOpenState(isInitiallyOpen, onOpen, onClose);
+
+    /**
+     * https://github.com/radix-ui/primitives/issues/3648
+     */
+    useLayoutEffect(() => {
+      return () => {
+        const root = document.getElementById("root");
+        if (root)
+          requestAnimationFrame(() => {
+            root.removeAttribute("aria-hidden");
+            document.body.style.pointerEvents = "auto";
+          });
+      };
+    }, []);
 
     useEffect(() => {
       if (isOpen) {

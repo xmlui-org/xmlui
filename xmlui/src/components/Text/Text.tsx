@@ -108,17 +108,24 @@ export const TextMd = createMetadata({
     [`borderStyle-${COMP}`]: "solid",
     [`fontSize-${COMP}`]: "$fontSize-sm",
     [`borderWidth-${COMP}`]: "$space-0",
-
-    [`lineHeight-${COMP}-codefence`]: "1.5",
-
-    [`fontWeight-${COMP}-abbr`]: "$fontWeight-bold",
-    [`textTransform-${COMP}-abbr`]: "uppercase",
-    [`fontSize-${COMP}-secondary`]: "$fontSize-sm",
-    [`fontStyle-${COMP}-cite`]: "italic",
     [`textColor-${COMP}`]: "$textColor-primary",
     [`fontFamily-${COMP}`]: "$fontFamily",
     [`fontWeight-${COMP}`]: "$fontWeight-normal",
+
+    [`fontSize-${COMP}-secondary`]: "$fontSize-sm",
+    [`textColor-${COMP}-secondary`]: "$textColor-secondary",
+
+    [`fontWeight-${COMP}-abbr`]: "$fontWeight-bold",
+    [`textTransform-${COMP}-abbr`]: "uppercase",
+    [`fontStyle-${COMP}-cite`]: "italic",
+
     [`fontSize-${COMP}-codefence`]: "$fontSize-code",
+    [`fontFamily-${COMP}-codefence`]: "$fontFamily-monospace",
+    [`paddingHorizontal-${COMP}-codefence`]: "$space-4",
+    [`paddingVertical-${COMP}-codefence`]: "$space-3",
+    [`textColor-${COMP}-codefence`]: "$color-surface-900",
+    [`lineHeight-${COMP}-codefence`]: "1.5",
+    
     [`fontFamily-${COMP}-code`]: "$fontFamily-monospace",
     [`fontSize-${COMP}-code`]: "$fontSize-sm",
     [`borderWidth-${COMP}-code`]: "1px",
@@ -126,50 +133,64 @@ export const TextMd = createMetadata({
     [`borderRadius-${COMP}-code`]: "4px",
     [`paddingHorizontal-${COMP}-code`]: "$space-0_5",
     [`paddingBottom-${COMP}-code`]: "2px",
+    [`backgroundColor-${COMP}-code`]: "rgb(from $color-surface-100 r g b / 0.4)",
+    [`borderColor-${COMP}-code`]: "$color-surface-100",
+
     [`textDecorationLine-${COMP}-deleted`]: "line-through",
+
     [`textDecorationLine-${COMP}-inserted`]: "underline",
+
     [`fontFamily-${COMP}-keyboard`]: "$fontFamily-monospace",
     [`fontSize-${COMP}-keyboard`]: "$fontSize-sm",
     [`fontWeight-${COMP}-keyboard`]: "$fontWeight-bold",
     [`borderWidth-${COMP}-keyboard`]: "1px",
     [`paddingHorizontal-${COMP}-keyboard`]: "$space-1",
+    [`backgroundColor-${COMP}-keyboard`]: "rgb(from $color-surface-100 r g b / 0.4)",
+    [`borderColor-${COMP}-keyboard`]: "$color-surface-300",
+
     [`fontFamily-${COMP}-sample`]: "$fontFamily-monospace",
     [`fontSize-${COMP}-sample`]: "$fontSize-sm",
+
     [`fontSize-${COMP}-sup`]: "$fontSize-xs",
     [`verticalAlignment-${COMP}-sup`]: "super",
+
     [`fontSize-${COMP}-sub`]: "$fontSize-xs",
     [`verticalAlignment-${COMP}-sub`]: "sub",
+
     [`fontStyle-${COMP}-var`]: "italic",
+
     [`fontStyle-${COMP}-em`]: "italic",
+
     [`fontFamily-${COMP}-mono`]: "$fontFamily-monospace",
+
     [`fontSize-${COMP}-title`]: "$fontSize-2xl",
+
     [`fontSize-${COMP}-subtitle`]: "$fontSize-xl",
+
     [`fontSize-${COMP}-small`]: "$fontSize-sm",
+
     [`letterSpacing-${COMP}-caption`]: "0.05rem",
+
     [`fontSize-${COMP}-placeholder`]: "$fontSize-xs",
-    [`fontFamily-${COMP}-codefence`]: "$fontFamily-monospace",
-    [`paddingHorizontal-${COMP}-codefence`]: "$space-4",
-    [`paddingVertical-${COMP}-codefence`]: "$space-3",
+    [`textColor-${COMP}-placeholder`]: "$color-surface-500",
+
     [`paddingVertical-${COMP}-paragraph`]: "$space-1",
+
     [`fontSize-${COMP}-subheading`]: "$fontSize-H6",
     [`fontWeight-${COMP}-subheading`]: "$fontWeight-bold",
     [`letterSpacing-${COMP}-subheading`]: "0.04em",
     [`textTransform-${COMP}-subheading`]: "uppercase",
+    [`textColor-${COMP}-subheading`]: "$textColor-secondary",
+
     [`marginTop-${COMP}-tableheading`]: "$space-1",
     [`marginBottom-${COMP}-tableheading`]: "$space-4",
     [`paddingHorizontal-${COMP}-tableheading`]: "$space-1",
     [`fontSize-${COMP}-tableheading`]: "$fontSize-H6",
     [`fontWeight-${COMP}-tableheading`]: "$fontWeight-bold",
 
-    [`backgroundColor-${COMP}-code`]: "rgb(from $color-surface-100 r g b / 0.4)",
-    [`borderColor-${COMP}-code`]: "$color-surface-100",
-    [`backgroundColor-${COMP}-keyboard`]: "rgb(from $color-surface-100 r g b / 0.4)",
-    [`borderColor-${COMP}-keyboard`]: "$color-surface-300",
+    [`fontWeight-${COMP}-strong`]: "$fontWeight-bold",
+
     [`backgroundColor-${COMP}-marked`]: "rgb(from $color-primary-200 r g b / 0.4)",
-    [`color-${COMP}-placeholder`]: "$color-surface-500",
-    [`color-${COMP}-codefence`]: "$color-surface-900",
-    [`color-${COMP}-subheading`]: "$textColor-secondary",
-    [`color-${COMP}-secondary`]: "$textColor-secondary",
 
     dark: {
       [`backgroundColor-${COMP}-marked`]: "rgb(from $color-primary-400 r g b / 0.4)",

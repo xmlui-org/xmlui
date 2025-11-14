@@ -554,3 +554,58 @@ export function asyncThrottle<F extends (...args: any[]) => Promise<any>>(
       throttled(resolve, reject, args);
     }) as ReturnType<F>;
 }
+
+/**
+ * Registry to store debounced function timers and their captured arguments by key
+ */
+const debounceRegistry = new Map<string, {
+  timeoutId: ReturnType<typeof setTimeout>;
+  args: any[];
+}>();
+
+/**
+ * Creates a debounced function that delays invoking the provided function until after
+ * the specified delay in milliseconds has elapsed since the last time it was invoked.
+ * 
+ * When called from XMLUI markup, it automatically generates a stable key based on the
+ * call site to ensure proper debouncing across multiple invocations.
+ * 
+ * @param delayMs The number of milliseconds to delay execution
+ * @param func The function to debounce
+ * @param args Optional arguments to pass to the function when it executes
+ * @returns void (executes the function after the delay)
+ * 
+ * @example
+ * // In XMLUI markup with value capture:
+ * <TextBox onDidChange="e => debounce(500, () => console.log('value:', e), e)" />
+ * 
+ * @example
+ * // In XMLUI markup with inline function:
+ * <TextBox onDidChange="e => debounce(500, (val) => console.log('value:', val), e)" />
+ */
+export function debounce<F extends (...args: any[]) => any>(
+  delayMs: number,
+  func: F,
+  ...args: any[]
+): void {
+  // Generate a unique key for this debounce call based on the function source
+  // This ensures that the same event handler in markup reuses the same timer
+  const key = func.toString();
+
+  // Clear existing timeout for this key
+  const existing = debounceRegistry.get(key);
+  if (existing !== undefined) {
+    clearTimeout(existing.timeoutId);
+  }
+
+  // Set new timeout with captured arguments
+  const timeoutId = setTimeout(() => {
+    const entry = debounceRegistry.get(key);
+    if (entry) {
+      func(...entry.args);
+      debounceRegistry.delete(key);
+    }
+  }, delayMs);
+
+  debounceRegistry.set(key, { timeoutId, args });
+}

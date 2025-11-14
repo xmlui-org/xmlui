@@ -157,8 +157,9 @@ export const Container = memo(
         ...eventArgs: any[]
       ) => {
         // --- Check if the event handler can sign its lifecycle state
-        const canSignEventLifecycle = () =>
-          componentUid.description !== undefined && options?.eventName !== undefined;
+        const canSignEventLifecycle = () => {
+          return componentUid.description !== undefined && options?.eventName !== undefined;
+        };
 
         let changes: Array<any> = [];
         const getComponentStateClone = () => {
@@ -525,9 +526,6 @@ export const Container = memo(
     ]);
 
     const cleanup = useEvent((uid) => {
-      // console.log("CLEANUP CALLED FOR", node);
-      //TODO cleanup registered component api for that uid
-      //TODO cleanup state for that uid
       delete fnsRef.current[uid];
     });
 

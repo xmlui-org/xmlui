@@ -1,4 +1,4 @@
-import type React from "react";
+import React, { useMemo } from "react";
 
 import styles from "./Splitter.module.scss";
 
@@ -20,7 +20,10 @@ const baseSplitterMd = createMetadata({
   description:
     "`Splitter` component divides a container into two resizable sections. These " +
     "are are identified by their names: primary and secondary. They have a " +
-    "draggable bar between them.",
+    "draggable bar between them. When only a single child is visible (due to " +
+    "conditional rendering with `when` attributes), the splitter bar is not " +
+    "displayed and the single panel stretches to fill the entire viewport of " +
+    "the splitter container.",
   props: {
     swapped: {
       description:
@@ -49,7 +52,8 @@ const baseSplitterMd = createMetadata({
     maxPrimarySize: {
       description:
         `This property sets the maximum size the primary section can have. The unit of the size ` +
-        `value is in pixels or percentages.`,
+        `value is in pixels or percentages. Negative values are supported and calculate from the ` +
+        `end of the container (e.g., "-20%" means "80% of container", "-100px" means "container size - 100px").`,
       valueType: "string",
       defaultValue: defaultProps.maxPrimarySize,
     },
@@ -118,6 +122,22 @@ function renderSplitter({
   if (!isComponentDefChildren(node.children)) {
     throw new NotAComponentDefError();
   }
+
+  // Let XMLUI handle the conditional rendering, then count the non-null results
+  const renderedChildren = useMemo(() => {
+    if (!Array.isArray(node.children)) {
+      const rendered = renderChild(node.children);
+      return rendered ? [rendered] : [];
+    }
+    
+    return node.children
+      .map((child, index) => renderChild(child))
+      .filter(child => child !== null && child !== undefined)
+      .map((child, index) => React.cloneElement(child as React.ReactElement, { key: index }));
+  }, [node.children, renderChild]);
+
+  const visibleChildCount = renderedChildren.length;
+
   return (
     <Splitter
       className={className}
@@ -129,8 +149,9 @@ function renderSplitter({
       maxPrimarySize={extractValue(node.props?.maxPrimarySize)}
       floating={extractValue.asOptionalBoolean(node.props?.floating)}
       resize={lookupEventHandler("resize")}
+      visibleChildCount={visibleChildCount}
     >
-      {renderChild(node.children)}
+      {renderedChildren}
     </Splitter>
   );
 }

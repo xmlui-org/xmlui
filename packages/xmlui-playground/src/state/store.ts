@@ -269,7 +269,7 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
       break;
     }
     case PlaygroundActionKind.RESET_APP: {
-      state.options.id = state.options.id + 1;
+      state.options = { ...state.options, id: state.options.id + 1 };
       state.appDescription = { ...state.originalAppDescription };
       if (state.options.content === "app") {
         state.text = state.originalAppDescription.app;
@@ -329,7 +329,6 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
     case PlaygroundActionKind.TEXT_CHANGED:
       state.options.id = state.options.id + 1;
       {
-        console.log("abababababa");
         state.text = action.payload.text || "";
         state.error = null;
         if (state.options.content === "app") {

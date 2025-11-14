@@ -8,11 +8,7 @@ type XmlUiStartOptions = {
   proxy?: string;
 };
 
-export const start = async ({
-  port,
-  withMock = true,
-  proxy,
-}: XmlUiStartOptions) => {
+export const start = async ({ port, withMock = true, proxy }: XmlUiStartOptions) => {
   console.log("Starting with options:", {
     withMock,
     withProxy: proxy,
@@ -43,12 +39,12 @@ export const start = async ({
       },
       define: {
         ...viteConfig.define,
-        "process.env.VITE_BUILD_MODE": JSON.stringify("ALL"),
+        "process.env.VITE_BUILD_MODE": '"ALL"',
         "process.env.VITE_DEV_MODE": true,
         "process.env.VITE_STANDALONE": process.env.VITE_STANDALONE,
         "process.env.VITE_MOCK_ENABLED": withMock,
-        "process.env.VITE_INCLUDE_ALL_COMPONENTS": JSON.stringify("true"),
-        "process.env.VITE_USER_COMPONENTS_Inspect": JSON.stringify("true"),
+        "process.env.VITE_INCLUDE_ALL_COMPONENTS": '"true"',
+        "process.env.VITE_USER_COMPONENTS_Inspect": '"true"',
       },
     } as InlineConfig);
 

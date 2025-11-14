@@ -1,5 +1,5 @@
-import { ComponentMetadata } from "../../src/abstractions/ComponentDefs";
-import { MetadataHandler, PropDescriptorHash } from "../../src/components-core/markup-check";
+import type { ComponentMetadata } from "../../src/abstractions/ComponentDefs";
+import type { MetadataHandler, PropDescriptorHash } from "../../src/components-core/markup-check";
 
 export function createTestMetadataHandler(
   desc: Record<string, ComponentMetadata>,

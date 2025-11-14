@@ -1,27 +1,35 @@
 <Component name="BlogOverview">
-  <Stack width="85%">
-    <H1>XMLUI Blog</H1>
-    <Text>Latest updates, tutorials, and insights for building with XMLUI</Text>
-  </Stack>
   <List
     data="{
-      $props.posts.sort(function(a, b) {
-        return new Date(b.date) - new Date(a.date);
-      })
-    }">
-    <VStack gap="$space-2" width="90%">
-      <Link to="/blog/{$item.slug}">
-        <Text fontSize="larger">
-          {$item.title}
-        </Text>
-      </Link>
-      <Text>
-        {$item.date} • {$item.author}
+    $props.posts.sort(function(a, b) {
+      return new Date(b.date) - new Date(a.date);
+    })
+  }">
+    <VStack
+       var.blogLink="/blog/{$item.slug}"
+       gap="$space-2"
+       onClick="Actions.navigate(blogLink)">
+      <H1>
+        {$item.title}
+      </H1>
+     <Image src="/blog/images/{$item.image}" />
+      <Text variant="em">
+        {$item.description}
       </Text>
-      <Link to="/blog/{$item.slug}">
-        <Image src="/blog/images/{$item.image}" />
-      </Link>
-    <Stack height="3rem" />
+      <HStack>
+        <Text variant="em" fontSize="$fontSize-xs">
+          {$item.author}
+        </Text>
+        <SpaceFiller />
+        <Text variant="em" fontSize="$fontSize-xs">
+          {formatDate($item.date, "MMM dd, yyyy")}
+        </Text>
+      </HStack>
     </VStack>
+    <ContentSeparator
+      when="{$itemIndex < $props.posts.length - 1}"
+      marginTop="$space-4"
+      marginBottom="$space-8"
+    />
   </List>
 </Component>

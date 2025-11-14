@@ -104,6 +104,9 @@ export const Button = React.forwardRef(function Button(
     }
   }, [autoFocus]);
 
+  if ((variant as any) === "") {
+    variant = defaultProps.variant;
+  }
   const iconToLeft = iconPosition === "start";
 
   if (!isSizeType(size)) {

@@ -186,12 +186,67 @@ test("is keyboard accessible", async ({ initTestBed, createDropdownMenuDriver, p
 
   // Open with Enter
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("menuitem", { name: "Item 1" })).toBeVisible();
+  const menuItem = page.getByRole("menuitem", { name: "Item 1" });
+  await expect(menuItem).toBeVisible();
 
   // Navigate and select with keyboard
   await page.keyboard.press("ArrowDown");
+
+  // Verify the menu item is now focused
+  await expect(menuItem).toBeFocused();
+
+  // Press Enter to select
   await page.keyboard.press("Enter");
   await expect.poll(testStateDriver.testState).toEqual("keyboard-activated");
+});
+
+test("navigates between multiple menu items with arrow keys", async ({
+  initTestBed,
+  createDropdownMenuDriver,
+  page,
+}) => {
+  const { testStateDriver } = await initTestBed(`
+    <DropdownMenu label="Menu">
+      <MenuItem onClick="testState = 'item1-clicked'">Item 1</MenuItem>
+      <MenuItem onClick="testState = 'item2-clicked'">Item 2</MenuItem>
+      <MenuItem onClick="testState = 'item3-clicked'">Item 3</MenuItem>
+    </DropdownMenu>
+  `);
+  const driver = await createDropdownMenuDriver();
+
+  await driver.open();
+
+  const item1 = page.getByRole("menuitem", { name: "Item 1" });
+  const item2 = page.getByRole("menuitem", { name: "Item 2" });
+  const item3 = page.getByRole("menuitem", { name: "Item 3" });
+
+  // Press ArrowDown to focus first item
+  await page.keyboard.press("ArrowDown");
+  await expect(item1).toBeFocused();
+
+  // Press ArrowDown to focus second item
+  await page.keyboard.press("ArrowDown");
+  await expect(item2).toBeFocused();
+
+  // Press ArrowDown to focus third item
+  await page.keyboard.press("ArrowDown");
+  await expect(item3).toBeFocused();
+
+  // Press ArrowDown again - should wrap to first item
+  await page.keyboard.press("ArrowDown");
+  await expect(item1).toBeFocused();
+
+  // Press ArrowUp to go back to third item
+  await page.keyboard.press("ArrowUp");
+  await expect(item3).toBeFocused();
+
+  // Press ArrowUp to go to second item
+  await page.keyboard.press("ArrowUp");
+  await expect(item2).toBeFocused();
+
+  // Press Enter to select second item
+  await page.keyboard.press("Enter");
+  await expect.poll(testStateDriver.testState).toEqual("item2-clicked");
 });
 
 test("disabled DropdownMenu can't be focused", async ({ initTestBed, page }) => {

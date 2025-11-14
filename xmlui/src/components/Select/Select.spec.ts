@@ -37,10 +37,10 @@ test.describe("Basic Functionality", () => {
     </Form>`);
     const driver = await createSelectDriver("mySelect");
 
-    await expect(driver.component.locator("select")).toHaveValue("opt1");
+    await expect(driver.component).toHaveText("first");
     await driver.toggleOptionsVisibility();
     await driver.selectLabel("second");
-    await expect(driver.component.locator("select")).toHaveValue("opt2");
+    await expect(driver.component).toHaveText("second");
   });
 
   // --- initialValue prop
@@ -157,12 +157,10 @@ test.describe("Basic Functionality", () => {
     </Select>
     `);
     const driver = await createSelectDriver();
-    await expect(page.getByText("Two")).not.toBeVisible();
-    await expect(page.getByText("One")).toBeVisible();
+    await expect(driver.component).toHaveText("One");
     await driver.toggleOptionsVisibility();
     await driver.selectLabel("Two");
-    await expect(page.getByText("Two")).not.toBeVisible();
-    await expect(page.getByText("One")).toBeVisible();
+    await expect(driver.component).toHaveText("One");
 
     // verify dropdown is not visible but value is shown
   });
@@ -352,6 +350,163 @@ test.describe("Basic Functionality", () => {
       await expect(page.getByTestId("text")).toHaveText("Selected value: Zero");
     },
   );
+
+  // --- clearable prop
+
+  test("clear button not visible by default (clearable=false)", async ({
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select initialValue="opt1">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+      </Select>
+    `);
+    const driver = await createSelectDriver();
+
+    // Clear button should not be visible (default clearable=false)
+    await expect(driver.clearButton).not.toBeVisible();
+  });
+
+  test("clear button visible when clearable=true and value selected", async ({
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select clearable="true">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+      </Select>
+    `);
+    const driver = await createSelectDriver();
+
+    // Clear button should not be visible when no value selected
+    await expect(driver.clearButton).not.toBeVisible();
+
+    // Select a value
+    await driver.toggleOptionsVisibility();
+    await driver.selectLabel("first");
+
+    // Clear button should now be visible
+    await expect(driver.clearButton).toBeVisible();
+  });
+
+  test("clicking clear button clears single selection", async ({
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select id="mySelect" clearable="true">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+      </Select>
+    `);
+    const driver = await createSelectDriver();
+    const select = driver.component;
+
+    // Select a value
+    await driver.toggleOptionsVisibility();
+    await driver.selectLabel("first");
+    await expect(select).toHaveText("first");
+
+    // Click the clear button
+    await driver.clearButton.click();
+
+    // Value should be cleared
+    await expect(select).not.toHaveText("first");
+    await expect(driver.clearButton).not.toBeVisible();
+  });
+
+  test("clear button works with multiSelect", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Select clearable="true" multiSelect="true">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+    `);
+    const driver = await createSelectDriver();
+
+    // Select multiple values
+    await driver.toggleOptionsVisibility();
+    await driver.selectMultipleLabels(["first", "second"]);
+    await driver.toggleOptionsVisibility();
+
+    // Clear button should be visible
+    await expect(driver.clearButton).toBeVisible();
+
+    // Click the clear button
+    await driver.clearButton.click();
+
+    // All values should be cleared
+    await expect(page.getByText("first")).not.toBeVisible();
+    await expect(page.getByText("second")).not.toBeVisible();
+    await expect(driver.clearButton).not.toBeVisible();
+  });
+
+  test("clear button not visible when readOnly=true", async ({
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select clearable="true" readOnly="true" initialValue="opt1">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+      </Select>
+    `);
+    const driver = await createSelectDriver();
+
+    // Clear button should not be visible even with clearable=true and value selected
+    await expect(driver.clearButton).not.toBeVisible();
+  });
+
+  test("clear button not visible when enabled=false", async ({
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select clearable="true" enabled="false" initialValue="opt1">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+      </Select>
+    `);
+    const driver = await createSelectDriver();
+
+    // Clear button should not be visible when disabled
+    await expect(driver.clearButton).not.toBeVisible();
+  });
+
+  test("clear button triggers didChange event", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Select clearable="true" onDidChange="testState = 'changed'">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+      </Select>
+    `);
+    const driver = await createSelectDriver();
+
+    // Select a value
+    await driver.toggleOptionsVisibility();
+    await driver.selectLabel("first");
+
+    // Reset test state
+    await page.evaluate(() => (window as any).testState = null);
+
+    // Click the clear button
+    await driver.clearButton.click();
+
+    // Event should have fired
+    await expect.poll(testStateDriver.testState).toEqual("changed");
+  });
 });
 
 // =============================================================================
@@ -763,5 +918,179 @@ test.describe("Visual State", () => {
     const input = page.getByTestId("test");
     const { width } = await input.boundingBox();
     expect(width).toBe(200);
+  });
+});
+
+// =============================================================================
+// Z-INDEX AND MODAL LAYERING TESTS
+// =============================================================================
+
+test.describe("Z-Index and Modal Layering", () => {
+  test("Select dropdown in modal is visible and not covered by modal overlay", async ({
+    initTestBed,
+    page,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <Select testId="select">
+          <Option value="stuff1">option 1</Option>
+          <Option value="stuff2">option 2</Option>
+          <Button onClick="modal.open()">BLOW UP</Button>
+        </Select>
+        <ModalDialog id="modal" title="Example Dialog">
+          <Form data="{{ firstName: 'Billy', lastName: 'Bob' }}">
+            <FormItem bindTo="firstName" required="true" />
+            <FormItem bindTo="lastName" required="true" />
+            <FormItem
+              label="Field to Update"
+              type="select"
+              width="200px"
+              bindTo="fieldToUpdate"
+              required
+              initialValue="rate"
+              testId="modal-select"
+            >
+              <Option value="rate">Price</Option>
+              <Option value="description">Item Description</Option>
+              <Option value="account_id">Account</Option>
+            </FormItem>
+          </Form>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    const selectDriver = await createSelectDriver("select");
+    await selectDriver.click();
+
+    // Click button to open modal
+    const blowUpButton = page.getByText("BLOW UP");
+    await blowUpButton.click();
+
+    // Wait for modal to be visible
+    await expect(page.getByRole("dialog", { name: "Example Dialog" })).toBeVisible();
+
+    // Open the select in the modal
+    const modalSelectDriver = await createSelectDriver("modal-select");
+    await modalSelectDriver.click();
+
+    // Check that all options are visible
+    await expect(page.getByRole("option", { name: "Price" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Item Description" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Account" })).toBeVisible();
+  });
+});
+
+// =============================================================================
+// THEME VARIABLE TESTS
+// =============================================================================
+
+test.describe("Theme Variables", () => {
+  [
+    { value: "--default", prop: "" },
+    { value: "--warning", prop: 'validationStatus="warning"' },
+    { value: "--error", prop: 'validationStatus="error"' },
+    { value: "--success", prop: 'validationStatus="valid"' },
+  ].forEach((variant) => {
+    test(`applies correct borderRadius ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderRadius-Select${variant.value}`]: "12px" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-radius", "12px");
+    });
+
+    test(`applies correct borderColor ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderColor-Select${variant.value}`]: "rgb(255, 0, 0)" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    });
+
+    test(`applies correct borderWidth ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderWidth-Select${variant.value}`]: "1px" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-width", "1px");
+    });
+
+    test(`applies correct borderStyle ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderStyle-Select${variant.value}`]: "dashed" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-style", "dashed");
+    });
+
+    test(`applies correct fontSize ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`fontSize-Select${variant.value}`]: "14px" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("font-size", "14px");
+    });
+
+    test(`applies correct backgroundColor ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`backgroundColor-Select${variant.value}`]: "rgb(240, 240, 240)" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("background-color", "rgb(240, 240, 240)");
+    });
+
+    test(`applies correct boxShadow ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: {
+          [`boxShadow-Select${variant.value}`]: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS(
+        "box-shadow",
+        "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
+      );
+    });
+
+    test(`applies correct textColor ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`textColor-Select${variant.value}`]: "rgb(0, 0, 0)" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("color", "rgb(0, 0, 0)");
+    });
+
+    test(`applies correct borderColor on hover ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderColor-Select${variant.value}--hover`]: "rgb(0, 0, 0)" },
+      });
+      await page.getByTestId("test").hover();
+      await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(0, 0, 0)");
+    });
+
+    test(`applies correct backgroundColor on hover ${variant.value}`, async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`backgroundColor-Select${variant.value}--hover`]: "rgb(0, 0, 0)" },
+      });
+      await page.getByTestId("test").hover();
+      await expect(page.getByTestId("test")).toHaveCSS("background-color", "rgb(0, 0, 0)");
+    });
+
+    test(`applies correct boxShadow on hover ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: {
+          [`boxShadow-Select${variant.value}--hover`]: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        },
+      });
+      await page.getByTestId("test").hover();
+      await expect(page.getByTestId("test")).toHaveCSS(
+        "box-shadow",
+        "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
+      );
+    });
+
+    test(`applies correct textColor on hover ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`textColor-Select${variant.value}--hover`]: "rgb(0, 0, 0)" },
+      });
+      await page.getByTestId("test").hover();
+      await expect(page.getByTestId("test")).toHaveCSS("color", "rgb(0, 0, 0)");
+    });
   });
 });

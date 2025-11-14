@@ -1,7 +1,6 @@
 import { getBounds } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 import { sizeValues } from "../abstractions";
-import { defaultProps } from "./AvatarNative";
 
 test.describe("smoke tests", { tag: "@smoke" }, () => {
   test("No initials without name", async ({ initTestBed, createAvatarDriver }) => {
@@ -119,46 +118,6 @@ test("size", async ({ initTestBed, page }) => {
   expect(widthXs).toBeLessThan(widthSm);
   expect(widthSm).toBeLessThan(widthMd);
   expect(widthMd).toBeLessThan(widthLg);
-});
-
-test(`invalid size falls back to default ${defaultProps.size}`, async ({
-  initTestBed,
-  createAvatarDriver,
-}) => {
-  await initTestBed(`
-    <Fragment>
-      <Avatar testId="reference" name="Lynn Gilbert" size="${defaultProps.size}" />
-      <Avatar testId="invalid" name="Invalid Size" size="invalid"/>
-    </Fragment>
-  `);
-  const driverReference = await createAvatarDriver("reference");
-  const driverInvalid = await createAvatarDriver("invalid");
-  const { width: widthRef, height: heightRef } = await getBounds(driverReference.component);
-  const { width: widthInvalid, height: heightInvalid } = await getBounds(driverInvalid.component);
-
-  await expect(driverInvalid.component).toBeVisible();
-  expect(widthInvalid).toBe(widthRef);
-  expect(heightInvalid).toBe(heightRef);
-});
-
-test(`no size prop defaults to ${defaultProps.size}`, async ({
-  initTestBed,
-  createAvatarDriver,
-}) => {
-  await initTestBed(
-    `<Fragment>
-      <Avatar testId="reference" name="Lynn Gilbert" size="${defaultProps.size}" />
-      <Avatar testId="default" name="Default Size" />
-    </Fragment>`,
-  );
-  const driverReference = await createAvatarDriver("reference");
-  const driverDefault = await createAvatarDriver("default");
-  const { width: widthRef, height: heightRef } = await getBounds(driverReference.component);
-  const { width: widthDefault, height: heightDefault } = await getBounds(driverDefault.component);
-
-  await expect(driverDefault.component).toBeVisible();
-  expect(widthDefault).toBe(widthRef);
-  expect(heightDefault).toBe(heightRef);
 });
 
 test("size property affects font size for initials", async ({

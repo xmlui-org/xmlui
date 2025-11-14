@@ -10,7 +10,21 @@ export type ParsedLayout = {
   states?: string[];
 }
 
-export function parseLayoutProperty(prop: string, parseComponent: boolean = false, value: any): ParsedLayout | string {
+/**
+ * Mapping exceptions for camelCase property names to CSS property names.
+ * These properties don't follow the standard camelCase-to-kebab-case conversion.
+ */
+export const CSS_PROPERTY_EXCEPTIONS: Record<string, string> = {
+  textColor: "color",
+  paddingVertical: "",
+  paddingHorizontal: "",
+  marginVertical: "",
+  marginHorizontal: "",
+  borderVertical: "",
+  borderHorizontal: "",
+};
+
+export function parseLayoutProperty(prop: string, parseComponent: boolean = false): ParsedLayout | string {
   if (!prop || typeof prop !== 'string') {
     return "Property string cannot be empty";
   }
@@ -100,6 +114,31 @@ export function parseLayoutProperty(prop: string, parseComponent: boolean = fals
   }
 
   return result;
+}
+
+/**
+ * Transforms a camelCase property name (as used in ParsedLayout.property)
+ * to its corresponding CSS style property name.
+ *
+ * Handles special cases defined in CSS_PROPERTY_EXCEPTIONS, otherwise
+ * converts camelCase to kebab-case (e.g., "fontSize" -> "font-size").
+ *
+ * @param property - The camelCase property name from ParsedLayout
+ * @returns The CSS property name in kebab-case or the mapped exception
+ *
+ * @example
+ * toCssPropertyName('fontSize') // returns 'font-size'
+ * toCssPropertyName('textColor') // returns 'color' (exception)
+ * toCssPropertyName('backgroundColor') // returns 'background-color'
+ */
+export function toCssPropertyName(property: string): string {
+  // Check if there's a mapping exception
+  if (property in CSS_PROPERTY_EXCEPTIONS) {
+    return CSS_PROPERTY_EXCEPTIONS[property];
+  }
+
+  // Convert camelCase to kebab-case
+  return property.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`);
 }
 
 function isValidPropertyName(name: string): boolean {

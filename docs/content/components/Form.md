@@ -65,9 +65,17 @@ This property sets the initial value of the form's data structure. The form infr
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
+### `enableSubmit` (default: true) [#enablesubmit-default-true]
+
+This property controls whether the submit button is enabled. When set to false, the submit button is disabled and the form cannot be submitted.
+
 ### `errorNotificationMessage` [#errornotificationmessage]
 
 This property sets the message to display when the form submission fails.
+
+### `hideButtonRow` (default: false) [#hidebuttonrow-default-false]
+
+This property hides the button row entirely when set to true.
 
 ### `hideButtonRowUntilDirty` (default: false) [#hidebuttonrowuntildirty-default-false]
 
@@ -154,6 +162,32 @@ The form infrastructure fires this event when the form is submitted. The event a
 
 The form infrastructure fires this event when the form is submitted successfully.
 
+### `willSubmit` [#willsubmit]
+
+The form infrastructure fires this event just before the form is submitted. The event argument is the current `data` value to be submitted. You can cancel the submission by returning `false` from the event handler.
+
+The following example allows saving customer data only when the age is an even number. The `willSubmit` event handler returns `false` if this condition is not met.
+
+```xmlui-pg display copy {4-9} name="Example: willSubmit"
+<App>
+  <Form padding="0.5rem"
+    data="{{ name: 'Joe', age: 43 }}"
+    onWillSubmit="(toSubmit) => {
+      if (toSubmit.age % 2) {
+        toast.error('Age must be an even number');
+        return false;
+      }
+    }"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FlowLayout columnGap="12px" paddingBottom="6px">
+      <FormItem bindTo="name" label="Customer name" width="50%" />
+      <FormItem bindTo="age" label="Age" type="integer" width="50%"
+        zeroOrPositive="true" />
+    </FlowLayout>
+  </Form>
+</App>  
+```
+
 ## Exposed Methods [#exposed-methods]
 
 ### `reset` [#reset]
@@ -194,6 +228,12 @@ This method updates the form data with the change passed in its parameter. The p
   </Form>
 </App>  
 ```
+
+### `validate` [#validate]
+
+This method triggers validation on all form fields without submitting the form. It displays validation errors and returns the validation result along with the cleaned form data. This is useful for implementing custom submit buttons or performing operations that require validated data without actually submitting the form.
+
+**Signature**: `validate(): Promise<{ isValid: boolean, data: Record<string, any>, errors: ValidationResult[], warnings: ValidationResult[], validationResults: Record<string, ValidationResult> }>`
 
 ## Styling [#styling]
 

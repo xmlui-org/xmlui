@@ -114,11 +114,19 @@ export const ButtonMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
+    // --- Default styles for supporting "variant" behavior
+    [`padding-${COMP}`]: "$space-2 $space-4",
+    [`gap-${COMP}`]: "$space-2",
+    [`borderColor-${COMP}`]: "transparent",
+    [`backgroundColor-${COMP}`]: "transparent",
+    [`transition-${COMP}`]: "color 0.2s, background 0.2s",
+
     [`width-${COMP}`]: "fit-content",
     [`height-${COMP}`]: "fit-content",
     [`borderRadius-${COMP}`]: "$borderRadius",
     [`fontSize-${COMP}`]: "$fontSize-sm",
     [`fontWeight-${COMP}`]: "$fontWeight-medium",
+    [`fontStyle-${COMP}`]: "$fontStyle-normal",
     [`backgroundColor-${COMP}-primary`]: "$color-primary-500",
     [`backgroundColor-${COMP}-attention`]: "$backgroundColor-attention",
     [`borderColor-${COMP}-attention`]: "$color-attention",

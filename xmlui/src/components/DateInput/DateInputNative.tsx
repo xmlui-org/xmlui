@@ -105,7 +105,7 @@ export const defaultProps = {
   weekStartsOn: WeekDays.Sunday,
   inline: true,
   clearable: false,
-  clearToInitialValue: true,
+  clearToInitialValue: false,
   required: false,
   labelPosition: "top",
   readOnly: false,

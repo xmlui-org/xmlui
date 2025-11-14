@@ -117,21 +117,74 @@ test("component is keyboard accessible", async ({ page, initTestBed }) => {
 // VISUAL STATE TESTS
 // =============================================================================
 
-test("component shows different validation states correctly", async ({ page, initTestBed }) => {
-  // Error state
-  await initTestBed(`<ColorPicker validationStatus="error" />`, {});
-  let colorInput = page.locator("input[type='color']");
-  await expect(colorInput).toHaveClass(/error/);
-  
-  // Warning state
-  await initTestBed(`<ColorPicker validationStatus="warning" />`, {});
-  colorInput = page.locator("input[type='color']");
-  await expect(colorInput).toHaveClass(/warning/);
-  
-  // Valid state
-  await initTestBed(`<ColorPicker validationStatus="valid" />`, {});
-  colorInput = page.locator("input[type='color']");
-  await expect(colorInput).toHaveClass(/valid/);
+test.describe("Validation", () => {
+  [
+    { value: "--default", prop: "" },
+    { value: "--warning", prop: 'validationStatus="warning"' },
+    { value: "--error", prop: 'validationStatus="error"' },
+    { value: "--success", prop: 'validationStatus="valid"' },
+  ].forEach((variant) => {
+    test(`applies correct borderRadius ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<ColorPicker testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderRadius-ColorPicker${variant.value}`]: "12px" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-radius", "12px");
+    });
+
+    test(`applies correct borderColor ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<ColorPicker testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderColor-ColorPicker${variant.value}`]: "rgb(255, 0, 0)" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    });
+
+    test(`applies correct borderWidth ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<ColorPicker testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderWidth-ColorPicker${variant.value}`]: "1px" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-width", "1px");
+    });
+
+    test(`applies correct borderStyle ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<ColorPicker testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderStyle-ColorPicker${variant.value}`]: "dashed" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-style", "dashed");
+    });
+
+    test(`applies correct boxShadow ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<ColorPicker testId="test" ${variant.prop} />`, {
+        testThemeVars: {
+          [`boxShadow-ColorPicker${variant.value}`]: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS(
+        "box-shadow",
+        "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
+      );
+    });
+
+    test(`applies correct borderColor on hover ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<ColorPicker testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderColor-ColorPicker${variant.value}--hover`]: "rgb(0, 0, 0)" },
+      });
+      await page.getByTestId("test").hover();
+      await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(0, 0, 0)");
+    });
+
+    test(`applies correct boxShadow on hover ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<ColorPicker testId="test" ${variant.prop} />`, {
+        testThemeVars: {
+          [`boxShadow-ColorPicker${variant.value}--hover`]: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        },
+      });
+      await page.getByTestId("test").hover();
+      await expect(page.getByTestId("test")).toHaveCSS(
+        "box-shadow",
+        "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
+      );
+    });
+  });
 });
 
 test("component applies backgroundColor-ColorPicker theme variable", async ({ page, initTestBed }) => {

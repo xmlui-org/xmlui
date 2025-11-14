@@ -1,3 +1,5 @@
+import { uint8ArrayToBase64 } from "../../../../xmlui/src/components-core/utils/base64-utils";
+
 /**
  * Convert a string to its UTF-8 bytes and compress it.
  *
@@ -33,7 +35,7 @@ async function compress(str: string) {
  */
 async function decompress(compressedBytes: Uint8Array) {
     // Convert the bytes to a stream.
-    const stream = new Blob([compressedBytes]).stream();
+    const stream = new Blob([new Uint8Array(compressedBytes)]).stream();
 
     // Create a decompressed stream.
     const decompressedStream = stream.pipeThrough(
@@ -57,12 +59,11 @@ async function decompress(compressedBytes: Uint8Array) {
 
 /**
  * Combine multiple Uint8Arrays into one.
- *
- * @param {ReadonlyArray<Uint8Array>} uint8arrays
- * @returns {Promise<Uint8Array>}
  */
-async function concatUint8Arrays(uint8arrays: Uint8Array[]) {
-    const blob = new Blob(uint8arrays);
+async function concatUint8Arrays(uint8arrays: ReadonlyArray<Uint8Array>) {
+    // Convert each Uint8Array into an ArrayBufferView (copy if necessary) so it matches BlobPart[] typing.
+    const parts: BlobPart[] = uint8arrays.map(u => new Uint8Array(u));
+    const blob = new Blob(parts);
     const buffer = await blob.arrayBuffer();
     return new Uint8Array(buffer);
 }
@@ -71,7 +72,7 @@ async function createQueryString(target: any) {
     // Convert the Uint8Array to a Base64 string.
 
     const compressed = await compress(target);
-    const base64 = btoa(String.fromCharCode(...compressed));
+    const base64 = uint8ArrayToBase64(compressed);
 
     // Create a query string.
     return encodeURIComponent(base64);

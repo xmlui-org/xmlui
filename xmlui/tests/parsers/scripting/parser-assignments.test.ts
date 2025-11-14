@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import { Parser } from "../../../src/parsers/scripting/Parser";
-import {
+import type {
   BinaryExpression,
-  AssignmentExpression,
+  AssignmentExpression} from "../../../src/components-core/script-runner/ScriptingSourceTree";
+import {
   T_ASSIGNMENT_EXPRESSION,
   T_IDENTIFIER,
   T_BINARY_EXPRESSION,

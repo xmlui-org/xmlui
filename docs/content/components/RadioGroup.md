@@ -1,8 +1,6 @@
 # RadioGroup [#radiogroup]
 
-`RadioGroup` creates a mutually exclusive selection interface where users can choose only one option from a group of radio buttons. It manages the selection state and ensures that selecting one option automatically deselects all others in the group.
-
-Radio options store their values as strings. Numbers and booleans are converted to strings when assigned, while objects, functions and arrays default to an empty string unless resolved via binding expressions.
+`RadioGroup` creates a mutually exclusive selection interface where users can choose only one option from a group of radio buttons. It manages the selection state and ensures that selecting one option automatically deselects all others in the group.Radio options store their values as strings. Numbers and booleans are converted to strings when assigned, while objects, functions and arrays default to an empty string unless resolved via binding expressions.
 
 **Key features:**
 - **Exclusive selection**: Only one option can be selected at a time within the group
@@ -148,23 +146,23 @@ This component does not expose any methods.
 | [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption | $color-primary-500 | $color-primary-500 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption--disabled | $textColor--disabled | $textColor--disabled |
 | [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption--disabled | $textColor--disabled | $textColor--disabled |
+| [backgroundColor](../styles-and-themes/common-units/#color)-RadioGroupOption--default | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-RadioGroupOption--disabled | $backgroundColor--disabled | $backgroundColor--disabled |
-| [backgroundColor](../styles-and-themes/common-units/#color)-RadioGroupOption-default | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption | $color-primary-500 | $color-primary-500 |
 | [borderColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption | $color-primary-500 | $color-primary-500 |
+| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption--default | $color-surface-500 | $color-surface-500 |
+| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption--default | $color-surface-500 | $color-surface-500 |
+| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption--default--active | $color-primary-500 | $color-primary-500 |
+| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption--default--active | $color-primary-500 | $color-primary-500 |
+| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption--default--hover | $color-surface-700 | $color-surface-700 |
+| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption--default--hover | $color-surface-700 | $color-surface-700 |
 | [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption--disabled | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-default | $color-surface-500 | $color-surface-500 |
-| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-default | $color-surface-500 | $color-surface-500 |
-| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-default--active | $color-primary-500 | $color-primary-500 |
-| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-default--active | $color-primary-500 | $color-primary-500 |
-| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-default--hover | $color-surface-700 | $color-surface-700 |
-| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-default--hover | $color-surface-700 | $color-surface-700 |
-| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-error | $borderColor-Input-default--error | $borderColor-Input-default--error |
-| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-error | $borderColor-Input-default--error | $borderColor-Input-default--error |
-| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-success | $borderColor-Input-default--success | $borderColor-Input-default--success |
-| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-success | $borderColor-Input-default--success | $borderColor-Input-default--success |
-| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-warning | $borderColor-Input-default--warning | $borderColor-Input-default--warning |
-| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-warning | $borderColor-Input-default--warning | $borderColor-Input-default--warning |
+| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption--error | $borderColor-Input--error | $borderColor-Input--error |
+| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption--error | $borderColor-Input--error | $borderColor-Input--error |
+| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption--success | $borderColor-Input--success | $borderColor-Input--success |
+| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption--success | $borderColor-Input--success | $borderColor-Input--success |
+| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption--warning | $borderColor-Input--warning | $borderColor-Input--warning |
+| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption--warning | $borderColor-Input--warning | $borderColor-Input--warning |
 | [borderWidth](../styles-and-themes/common-units/#size)-RadioGroupOption | 1px | 1px |
 | [borderWidth](../styles-and-themes/common-units/#size)-RadioGroupOption-validation | 2px | 2px |
 | [color](../styles-and-themes/common-units/#color)-RadioGroupOption--disabled | *none* | *none* |
@@ -177,7 +175,7 @@ This component does not expose any methods.
 | [outlineOffset](../styles-and-themes/common-units/#size)-RadioGroupOption--focus | *none* | *none* |
 | [outlineStyle](../styles-and-themes/common-units/#border)-RadioGroupOption--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-RadioGroupOption--focus | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption-default | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption-error | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption-success | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption-warning | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption--default | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption--error | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption--success | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption--warning | *none* | *none* |

@@ -1608,3 +1608,23 @@ Click on any of the column headers to trigger a new sorting:
 (See the [example](#clearselection) at the `clearSelection` method)
 
 %-API-END
+
+%-PROP-START idKey
+
+```xmlui copy /idKey="key"/
+<App>
+  <Table
+    idKey="key"
+    rowsSelectable="true"
+    data="{[
+      { 'key': 0, 'name': 'John' },
+      { 'key': 1, 'name': 'Jane' },
+      { 'key': 2, 'name': 'Bill' },
+    ]}"
+  > 
+    <Column bindTo="name"/>
+  </Table>
+</App>
+```
+
+%-PROP-END

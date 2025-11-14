@@ -76,6 +76,7 @@ This component does not expose any methods.
 | [borderLeftStyle](../styles-and-themes/common-units/#border-style)-NavPanel | *none* | *none* |
 | [borderLeftWidth](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |
 | [borderRight](../styles-and-themes/common-units/#border)-NavPanel | *none* | *none* |
+| [borderRight](../styles-and-themes/common-units/#border)-NavPanel-vertical | 1px solid $borderColor | 1px solid $borderColor |
 | [color](../styles-and-themes/common-units/#color)-NavPanel | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-NavPanel | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |
@@ -108,4 +109,4 @@ This component does not expose any methods.
 | [paddingTop](../styles-and-themes/common-units/#size)-logo-NavPanel | *none* | *none* |
 | [paddingTop](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-logo-NavPanel | $space-4 | $space-4 |
-| [paddingVertical](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-NavPanel | $space-5 | $space-5 |

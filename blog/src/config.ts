@@ -15,6 +15,7 @@ import html from "@shikijs/langs/html";
 
 import { xmluiGrammar, xmluiThemeLight, xmluiThemeDark } from "xmlui/syntax/textmate";
 
+import BlogTheme from "./themes/blog-theme";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkStringify from "remark-stringify";
@@ -105,12 +106,12 @@ Object.keys(contentRuntime).map((filePath) => {
 // Add blog content to search index
 let blogContent: Record<string, string> = {};
 try {
-  if (blogSearchData['/public/blog-search-data.json']) {
-    blogContent = JSON.parse(blogSearchData['/public/blog-search-data.json'].default);
+  if (blogSearchData["/public/blog-search-data.json"]) {
+    blogContent = JSON.parse(blogSearchData["/public/blog-search-data.json"].default);
     console.log(`Loaded ${Object.keys(blogContent).length} blog posts for search indexing`);
   }
 } catch (error) {
-  console.warn('Could not load blog search data:', error);
+  console.warn("Could not load blog search data:", error);
 }
 
 // Merge blog content into plainTextContent
@@ -278,13 +279,16 @@ function buildTreeFromPathsAndMeta(
 
 const groupedNavPanelContent = buildTreeFromPathsAndMeta(navPanelContent, metaJsons);
 const App: StandaloneAppDescription = {
-  name: "XMLUI Docs",
-  defaultTheme: "docs-theme",
+  name: "XMLUI Blog",
+  defaultTheme: "blog-theme",
+  themes: [BlogTheme],
   resources: {
     logo: "/resources/logo.svg",
     "logo-dark": "/resources/logo-dark.svg",
     favicon: "/resources/favicon.ico",
-    "icon.github": "/resources/github.svg",
+    "icon.github": "/resources/icons/github.svg",
+    "icon.rss": "/resources/icons/rss.svg",
+
     "font.Inter":
       "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
@@ -301,7 +305,7 @@ const App: StandaloneAppDescription = {
     },
     prefetchedContent,
     lintSeverity: "skip", // Turn off xmlui linting
-    popOutUrl: "/#/playground",
+    popOutUrl: "https://playground.xmlui.org/#/playground",
   },
 };
 

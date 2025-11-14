@@ -1,14 +1,15 @@
 import { describe, expect, it } from "vitest";
 
 import { Parser } from "../../../src/parsers/scripting/Parser";
-import {
+import type {
   ArrayLiteral,
   Expression,
   Identifier,
   Literal,
   ObjectLiteral,
   BinaryExpression,
-  TemplateLiteralExpression,
+  TemplateLiteralExpression} from "../../../src/components-core/script-runner/ScriptingSourceTree";
+import {
   T_LITERAL,
   T_TEMPLATE_LITERAL_EXPRESSION,
   T_BINARY_EXPRESSION,

@@ -1,8 +1,6 @@
 # FormItem [#formitem]
 
-`FormItem` wraps individual input controls within a `Form`, providing data binding, validation, labeling, and layout functionality. It connects form controls to the parent form's data model and handles validation feedback automatically.
-
-> **Note:** `FormItem` must be used inside a `Form` component.
+`FormItem` wraps individual input controls within a `Form`, providing data binding, validation, labeling, and layout functionality. It connects form controls to the parent form's data model and handles validation feedback automatically. **Note:** `FormItem` must be used inside a `Form` component.
 
 **Key features:**
 - **Data binding**: Automatically syncs control values with form data using the `bindTo` property
@@ -258,6 +256,10 @@ In the demo below, enter an input smaller than 18 or just submit the form as is.
   </Form>
 </App>
 ```
+
+### `noSubmit` (default: false) [#nosubmit-default-false]
+
+When set to `true`, the field will not be included in the form's submitted data. This is useful for fields that should be present in the form but not submitted, similar to hidden fields. If multiple FormItems reference the same `bindTo` value and any of them has `noSubmit` set to `true`, the field will NOT be submitted.
 
 ### `pattern` [#pattern]
 

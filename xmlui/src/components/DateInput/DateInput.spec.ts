@@ -406,30 +406,113 @@ test.describe("initialValue property", () => {
   });
 });
 
-test.describe("validationStatus property", () => {
-  test("applies valid status styling", async ({ initTestBed, createDateInputDriver }) => {
-    await initTestBed(
-      `<DateInput testId="dateInput" validationStatus="valid" initialValue="05/25/2024" />`,
-    );
-    const driver = await createDateInputDriver("dateInput");
-    await expect(driver.component).toBeVisible();
-    // Note: validation status may be applied via CSS classes rather than data attributes
-  });
+test.describe("Validation", () => {
+  [
+    { value: "--default", prop: "" },
+    { value: "--warning", prop: 'validationStatus="warning"' },
+    { value: "--error", prop: 'validationStatus="error"' },
+    { value: "--success", prop: 'validationStatus="valid"' },
+  ].forEach((variant) => {
+    test(`applies correct borderRadius ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<DateInput testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderRadius-DateInput${variant.value}`]: "12px" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-radius", "12px");
+    });
 
-  test("applies warning status styling", async ({ initTestBed, createDateInputDriver }) => {
-    await initTestBed(
-      `<DateInput testId="dateInput" validationStatus="warning" initialValue="05/25/2024" />`,
-    );
-    const driver = await createDateInputDriver("dateInput");
-    await expect(driver.component).toBeVisible();
-  });
+    test(`applies correct borderColor ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<DateInput testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderColor-DateInput${variant.value}`]: "rgb(255, 0, 0)" },
+      });
+    await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    });
 
-  test("applies error status styling", async ({ initTestBed, createDateInputDriver }) => {
-    await initTestBed(
-      `<DateInput testId="dateInput" validationStatus="error" initialValue="05/25/2024" />`,
-    );
-    const driver = await createDateInputDriver("dateInput");
-    await expect(driver.component).toBeVisible();
+    test(`applies correct borderWidth ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<DateInput testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderWidth-DateInput${variant.value}`]: "1px" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-width", "1px");
+    });
+
+    test(`applies correct borderStyle ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<DateInput testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderStyle-DateInput${variant.value}`]: "dashed" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("border-style", "dashed");
+    });
+
+    test(`applies correct fontSize ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<DateInput testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`fontSize-DateInput${variant.value}`]: "14px" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("font-size", "14px");
+    });
+
+    test(`applies correct backgroundColor ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<DateInput testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`backgroundColor-DateInput${variant.value}`]: "rgb(240, 240, 240)" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("background-color", "rgb(240, 240, 240)");
+    });
+
+    test(`applies correct boxShadow ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<DateInput testId="test" ${variant.prop} />`, {
+        testThemeVars: {
+          [`boxShadow-DateInput${variant.value}`]: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS(
+        "box-shadow",
+        "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
+      );
+    });
+
+    test(`applies correct textColor ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<DateInput testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`textColor-DateInput${variant.value}`]: "rgb(0, 0, 0)" },
+      });
+      await expect(page.getByTestId("test")).toHaveCSS("color", "rgb(0, 0, 0)");
+    });
+
+    test(`applies correct borderColor on hover ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<DateInput testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`borderColor-DateInput${variant.value}--hover`]: "rgb(0, 0, 0)" },
+      });
+      await page.getByTestId("test").hover();
+      await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(0, 0, 0)");
+    });
+
+    test(`applies correct backgroundColor on hover ${variant.value}`, async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`<DateInput testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`backgroundColor-DateInput${variant.value}--hover`]: "rgb(0, 0, 0)" },
+      });
+      await page.getByTestId("test").hover();
+      await expect(page.getByTestId("test")).toHaveCSS("background-color", "rgb(0, 0, 0)");
+    });
+
+    test(`applies correct boxShadow on hover ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<DateInput testId="test" ${variant.prop} />`, {
+        testThemeVars: {
+          [`boxShadow-DateInput${variant.value}--hover`]: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        },
+      });
+      await page.getByTestId("test").hover();
+      await expect(page.getByTestId("test")).toHaveCSS(
+        "box-shadow",
+        "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
+      );
+    });
+
+    test(`applies correct textColor on hover ${variant.value}`, async ({ initTestBed, page }) => {
+      await initTestBed(`<DateInput testId="test" ${variant.prop} />`, {
+        testThemeVars: { [`textColor-DateInput${variant.value}--hover`]: "rgb(0, 0, 0)" },
+      });
+      await page.getByTestId("test").hover();
+      await expect(page.getByTestId("test")).toHaveCSS("color", "rgb(0, 0, 0)");
+    });
   });
 });
 
@@ -698,7 +781,7 @@ test.describe("User Interactions", () => {
     createDateInputDriver,
   }) => {
     await initTestBed(
-      `<DateInput testId="dateInput" clearable="true" initialValue="05/25/2024" />`,
+      `<DateInput testId="dateInput" clearable="true" clearToInitialValue="true" initialValue="05/25/2024" />`,
     );
     const driver = await createDateInputDriver("dateInput");
     await expect(driver.monthInput).toHaveValue("05");

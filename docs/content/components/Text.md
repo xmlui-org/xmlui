@@ -550,6 +550,7 @@ When using custom variants, you can style them using theme variables with the na
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Text-code | rgb(from $color-surface-100 r g b / 0.4) | rgb(from $color-surface-100 r g b / 0.4) |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Text-keyboard | rgb(from $color-surface-100 r g b / 0.4) | rgb(from $color-surface-100 r g b / 0.4) |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Text-marked | rgb(from $color-primary-200 r g b / 0.4) | rgb(from $color-primary-400 r g b / 0.4) |
@@ -564,11 +565,7 @@ When using custom variants, you can style them using theme variables with the na
 | [borderWidth](../styles-and-themes/common-units/#size)-Text | $space-0 | $space-0 |
 | [borderWidth](../styles-and-themes/common-units/#size)-Text-code | 1px | 1px |
 | [borderWidth](../styles-and-themes/common-units/#size)-Text-keyboard | 1px | 1px |
-| [color](../styles-and-themes/common-units/#color)-Text-codefence | $color-surface-900 | $color-surface-900 |
-| [color](../styles-and-themes/common-units/#color)-Text-marked | *none* | *none* |
-| [color](../styles-and-themes/common-units/#color)-Text-placeholder | $color-surface-500 | $color-surface-500 |
-| [color](../styles-and-themes/common-units/#color)-Text-secondary | $textColor-secondary | $textColor-secondary |
-| [color](../styles-and-themes/common-units/#color)-Text-subheading | $textColor-secondary | $textColor-secondary |
+| [direction](../styles-and-themes/layout-props#direction)-Text | *none* | *none* |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text | $fontFamily | $fontFamily |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text-code | $fontFamily-monospace | $fontFamily-monospace |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text-codefence | $fontFamily-monospace | $fontFamily-monospace |
@@ -590,21 +587,28 @@ When using custom variants, you can style them using theme variables with the na
 | [fontSize](../styles-and-themes/common-units/#size)-Text-sup | $fontSize-xs | $fontSize-xs |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-tableheading | $fontSize-H6 | $fontSize-H6 |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-title | $fontSize-2xl | $fontSize-2xl |
+| [fontStretch](../styles-and-themes/common-units/#fontStretch)-Text | *none* | *none* |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text | *none* | *none* |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-cite | italic | italic |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-em | italic | italic |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-marked | *none* | *none* |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-placeholder | *none* | *none* |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-subheading | *none* | *none* |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-var | italic | italic |
+| [fontVariant](../styles-and-themes/common-units/#font-variant)-Text | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text | $fontWeight-normal | $fontWeight-normal |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-abbr | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-keyboard | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-marked | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-placeholder | *none* | *none* |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-strong | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-subheading | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-tableheading | $fontWeight-bold | $fontWeight-bold |
+| [letterSpacing](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
 | [letterSpacing](../styles-and-themes/common-units/#size)-Text-caption | 0.05rem | 0.05rem |
 | [letterSpacing](../styles-and-themes/common-units/#size)-Text-subheading | 0.04em | 0.04em |
+| [lineBreak](../styles-and-themes/common-units/#line-break)-Text | *none* | *none* |
+| [lineHeight](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
 | [lineHeight](../styles-and-themes/common-units/#size)-Text-codefence | 1.5 | 1.5 |
 | [lineHeight](../styles-and-themes/common-units/#size)-Text-marked | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
@@ -628,19 +632,41 @@ When using custom variants, you can style them using theme variables with the na
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-tableheading | $space-1 | $space-1 |
 | [paddingVertical](../styles-and-themes/common-units/#size)-Text-codefence | $space-3 | $space-3 |
 | [paddingVertical](../styles-and-themes/common-units/#size)-Text-paragraph | $space-1 | $space-1 |
+| [textAlign](../styles-and-themes/common-units/#text-align)-Text | *none* | *none* |
+| [textAlignLast](../styles-and-themes/common-units/#text-align)-Text | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Text | $textColor-primary | $textColor-primary |
+| [textColor](../styles-and-themes/common-units/#color)-Text--hover | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-Text-code--hover | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-Text-codefence | $color-surface-900 | $color-surface-900 |
+| [textColor](../styles-and-themes/common-units/#color)-Text-marked | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-Text-placeholder | $color-surface-500 | $color-surface-500 |
+| [textColor](../styles-and-themes/common-units/#color)-Text-secondary | $textColor-secondary | $textColor-secondary |
+| [textColor](../styles-and-themes/common-units/#color)-Text-small--hover | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-Text-subheading | $textColor-secondary | $textColor-secondary |
+| [textDecorationColor](../styles-and-themes/common-units/#color)-Text | *none* | *none* |
 | [textDecorationColor](../styles-and-themes/common-units/#color)-Text-deleted | *none* | *none* |
 | [textDecorationColor](../styles-and-themes/common-units/#color)-Text-inserted | *none* | *none* |
+| [textDecorationLine](../styles-and-themes/common-units/#textDecoration)-Text | *none* | *none* |
 | [textDecorationLine](../styles-and-themes/common-units/#textDecoration)-Text-deleted | line-through | line-through |
 | [textDecorationLine](../styles-and-themes/common-units/#textDecoration)-Text-inserted | underline | underline |
+| [textDecorationStyle](../styles-and-themes/common-units/#textDecoration)-Text | *none* | *none* |
 | [textDecorationStyle](../styles-and-themes/common-units/#textDecoration)-Text-deleted | *none* | *none* |
 | [textDecorationStyle](../styles-and-themes/common-units/#textDecoration)-Text-inserted | *none* | *none* |
+| [textDecorationThickness](../styles-and-themes/common-units/#textDecoration)-Text | *none* | *none* |
 | [textDecorationThickness](../styles-and-themes/common-units/#textDecoration)-Text-deleted | *none* | *none* |
 | [textDecorationThickness](../styles-and-themes/common-units/#textDecoration)-Text-inserted | *none* | *none* |
+| [textIndent](../styles-and-themes/common-units/#text-indent)-Text | *none* | *none* |
+| [textShadow](../styles-and-themes/common-units/#text-shadow)-Text | *none* | *none* |
+| [textTransform](../styles-and-themes/common-units/#textTransform)-Text | *none* | *none* |
 | [textTransform](../styles-and-themes/common-units/#textTransform)-Text-abbr | uppercase | uppercase |
 | [textTransform](../styles-and-themes/common-units/#textTransform)-Text-subheading | uppercase | uppercase |
+| [textUnderlineOffset](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
 | [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text | *none* | *none* |
 | [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-code | *none* | *none* |
 | [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-small | *none* | *none* |
 | [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-sub | sub | sub |
 | [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-sup | super | super |
+| [wordBreak](../styles-and-themes/common-units/#word-break)-Text | *none* | *none* |
+| [wordSpacing](../styles-and-themes/common-units/#word-spacing)-Text | *none* | *none* |
+| [wordWrap](../styles-and-themes/common-units/#word-wrap)-Text | *none* | *none* |
+| [writingMode](../styles-and-themes/common-units/#writing-mode)-Text | *none* | *none* |

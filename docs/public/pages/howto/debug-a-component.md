@@ -1,6 +1,6 @@
 # Debug a component
 
-```xmlui-pg noHeader
+```xmlui-pg
 ---app
 <App>
   <Test />

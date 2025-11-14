@@ -6,5 +6,6 @@ export const defaultProps = {
   withFrame: true,
   noHeader: false,
   splitView: false,
+  allowReset: true,
   components: EMPTY_ARRAY
 };

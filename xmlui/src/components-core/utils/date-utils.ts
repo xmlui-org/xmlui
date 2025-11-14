@@ -5,15 +5,24 @@ export function isoDateString (date?: string) {
   return (!date ? new Date() : new Date(date)).toJSON();
 }
 
-export function formatDate (date: string | Date) {
+export function formatDate (date: string | Date, formatString?: string) {
+  if (formatString) {
+    return format(new Date(date), formatString);
+  }
   return new Date(date).toLocaleDateString();
 }
 
-export function formatDateTime (date: string | Date) {
+export function formatDateTime (date: string | Date, formatString?: string) {
+  if (formatString) {
+    return format(new Date(date), formatString);
+  }
   return new Date(date).toLocaleString();
 }
 
-export function formatTime (date: string | Date) {
+export function formatTime (date: string | Date, formatString?: string) {
+  if (formatString) {
+    return format(new Date(date), formatString);
+  }
   return new Date(date).toLocaleTimeString();
 }
 

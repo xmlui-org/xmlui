@@ -1,0 +1,34 @@
+name: Deploy blog
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--max-old-space-size=8192"
+      TURBO_UI: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+          registry-url: https://registry.npmjs.org/
+
+      - name: Cache for Turbo
+        uses: rharkor/caching-for-turbo@v2.3.1
+
+      - run: npm ci --prefer-offline
+
+      - run: npm run build-blog
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Run Azure webapp deploy action using publish profile credentials"
+        uses: azure/webapps-deploy@v2
+        with:
+          package: "blog/ui.zip"
+          app-name: xmlui-blog
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_XMLUI_BLOG }}

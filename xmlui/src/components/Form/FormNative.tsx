@@ -73,14 +73,26 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
   }
   switch (action.type) {
     case FormActionKind.FIELD_INITIALIZED: {
-      if (!state.interactionFlags[uid].isDirty || action.payload.force) {
+      // Only set the value if initialValue is defined and field is not dirty (or force is true)
+      if (
+        action.payload.value !== undefined &&
+        (!state.interactionFlags[uid].isDirty || action.payload.force)
+      ) {
         set(state.subject, uid, action.payload.value);
+      }
+      // Track noSubmit flag - if multiple FormItems reference the same bindTo,
+      // and any of them has noSubmit: true, the field should NOT be submitted.
+      if (state.noSubmitFields[uid] === true || action.payload.noSubmit === true) {
+        state.noSubmitFields[uid] = true;
+      } else {
+        state.noSubmitFields[uid] = false;
       }
       break;
     }
     case FormActionKind.FIELD_REMOVED: {
       delete state.validationResults[uid];
       delete state.interactionFlags[uid];
+      delete state.noSubmitFields[uid];
       break;
     }
     case FormActionKind.FIELD_VALUE_CHANGED: {
@@ -201,6 +213,7 @@ interface FormState {
   validationResults: Record<string, ValidationResult>;
   generalValidationResults: Array<SingleValidationResult>;
   interactionFlags: Record<string, InteractionFlags>;
+  noSubmitFields: Record<string, boolean>; // Track noSubmit flag for each field
   submitInProgress?: boolean;
   resetVersion?: number;
 }
@@ -210,6 +223,7 @@ const initialState: FormState = {
   validationResults: {},
   generalValidationResults: [],
   interactionFlags: {},
+  noSubmitFields: {},
   submitInProgress: false,
   resetVersion: 0,
 };
@@ -218,6 +232,8 @@ type OnSubmit = (
   params: Record<string, any> | undefined,
   options: { passAsDefaultBody: boolean },
 ) => Promise<void>;
+type OnWillSubmit = (params: Record<string, any> | undefined) => Promise<boolean | void>;
+type OnSuccess = (result: any) => Promise<void>;
 type OnCancel = () => void;
 type OnReset = () => void;
 type Props = {
@@ -234,10 +250,11 @@ type Props = {
   saveInProgressLabel?: string;
   saveIcon?: string;
   swapCancelAndSave?: boolean;
+  onWillSubmit?: OnWillSubmit;
   onSubmit?: OnSubmit;
   onCancel?: OnCancel;
   onReset?: OnReset;
-  onSuccess?: (result: any) => void;
+  onSuccess?: OnSuccess;
   buttonRow?: ReactNode;
   registerComponentApi?: RegisterComponentApiFn;
   itemLabelBreak?: boolean;
@@ -245,6 +262,8 @@ type Props = {
   itemLabelPosition?: string; // type LabelPosition
   keepModalOpenOnSubmit?: boolean;
   hideButtonRowUntilDirty?: boolean;
+  hideButtonRow?: boolean;
+  enableSubmit?: boolean;
 };
 
 export const defaultProps: Pick<
@@ -257,6 +276,8 @@ export const defaultProps: Pick<
   | "keepModalOpenOnSubmit"
   | "swapCancelAndSave"
   | "hideButtonRowUntilDirty"
+  | "hideButtonRow"
+  | "enableSubmit"
 > = {
   cancelLabel: "Cancel",
   saveLabel: "Save",
@@ -266,13 +287,16 @@ export const defaultProps: Pick<
   keepModalOpenOnSubmit: false,
   swapCancelAndSave: false,
   hideButtonRowUntilDirty: false,
+  hideButtonRow: false,
+  enableSubmit: true,
 };
 
 // --- Remove the properties from formState.subject where the property name ends with UNBOUND_FIELD_SUFFIX
-function cleanUpSubject(subject: any) {
+// --- or where the field has noSubmit set to true
+function cleanUpSubject(subject: any, noSubmitFields: Record<string, boolean>) {
   return Object.entries(subject || {}).reduce(
     (acc, [key, value]) => {
-      if (!key.endsWith(UNBOUND_FIELD_SUFFIX)) {
+      if (!key.endsWith(UNBOUND_FIELD_SUFFIX) && !noSubmitFields[key]) {
         acc[key] = value;
       }
       return acc;
@@ -294,6 +318,7 @@ const Form = forwardRef(function (
     saveLabel = defaultProps.saveLabel,
     saveInProgressLabel = defaultProps.saveInProgressLabel,
     swapCancelAndSave,
+    onWillSubmit,
     onSubmit,
     onCancel,
     onReset,
@@ -306,6 +331,8 @@ const Form = forwardRef(function (
     itemLabelPosition = defaultProps.itemLabelPosition,
     keepModalOpenOnSubmit = defaultProps.keepModalOpenOnSubmit,
     hideButtonRowUntilDirty,
+    hideButtonRow = defaultProps.hideButtonRow,
+    enableSubmit = defaultProps.enableSubmit,
     ...rest
   }: Props,
   ref: ForwardedRef<HTMLFormElement>,
@@ -353,6 +380,28 @@ const Form = forwardRef(function (
     void requestModalFormClose();
   });
 
+  const doValidate = useEvent(() => {
+    // Trigger validation display on all fields
+    dispatch(triedToSubmit());
+
+    // Get validation results grouped by severity
+    const { error, warning } = groupInvalidValidationResultsBySeverity(
+      Object.values(formState.validationResults),
+    );
+
+    // Prepare cleaned data
+    const cleanedData = cleanUpSubject(formState.subject, formState.noSubmitFields);
+
+    // Return validation result
+    return {
+      isValid: error.length === 0,
+      data: cleanedData,
+      errors: error,
+      warnings: warning,
+      validationResults: formState.validationResults,
+    };
+  });
+
   const doSubmit = useEvent(async (event?: FormEvent<HTMLFormElement>) => {
     /* console.log(`🚀 Form submit started`);
     console.log(`🔍 Initial values:`, {
@@ -367,21 +416,29 @@ const Form = forwardRef(function (
       return;
     }
     setConfirmSubmitModalVisible(false);
-    dispatch(triedToSubmit());
-    const { error, warning } = groupInvalidValidationResultsBySeverity(
-      Object.values(formState.validationResults),
-    );
-    if (error.length) {
+
+    // Use the extracted validation logic
+    const validationResult = doValidate();
+
+    if (!validationResult.isValid) {
       return;
     }
-    if (warning.length && !confirmSubmitModalVisible) {
+    if (validationResult.warnings.length > 0 && !confirmSubmitModalVisible) {
       setConfirmSubmitModalVisible(true);
       return;
     }
     const prevFocused = document.activeElement;
     dispatch(formSubmitting());
     try {
-      const filteredSubject = cleanUpSubject(formState.subject);
+      const filteredSubject = validationResult.data;
+      const canSubmit = await onWillSubmit?.(filteredSubject);
+      if (canSubmit === false) {
+        // --- We do not reset the form but allow the next submit.
+        dispatch(
+          backendValidationArrived({ generalValidationResults: [], fieldValidationResults: {} }),
+        );
+        return;
+      }
 
       const result = await onSubmit?.(filteredSubject, {
         passAsDefaultBody: true,
@@ -477,19 +534,25 @@ const Form = forwardRef(function (
     );
   const submitButton = useMemo(
     () => (
-      <Button data-part-id={PART_SUBMIT_BUTTON} key="submit" type={"submit"} disabled={!isEnabled}>
+      <Button
+        data-part-id={PART_SUBMIT_BUTTON}
+        key="submit"
+        type={"submit"}
+        disabled={!isEnabled || !enableSubmit}
+      >
         {formState.submitInProgress ? saveInProgressLabel : saveLabel}
       </Button>
     ),
-    [isEnabled, formState.submitInProgress, saveInProgressLabel, saveLabel],
+    [isEnabled, enableSubmit, formState.submitInProgress, saveInProgressLabel, saveLabel],
   );
 
   useEffect(() => {
     registerComponentApi?.({
       reset: doReset,
       update: updateData,
+      validate: doValidate,
     });
-  }, [doReset, updateData, registerComponentApi]);
+  }, [doReset, updateData, doValidate, registerComponentApi]);
 
   let safeButtonRow = (
     <>
@@ -515,7 +578,7 @@ const Form = forwardRef(function (
       >
         <ValidationSummary generalValidationResults={formState.generalValidationResults} />
         <FormContext.Provider value={formContextValue}>{children}</FormContext.Provider>
-        {(!hideButtonRowUntilDirty || isDirty) && safeButtonRow}
+        {!hideButtonRow && (!hideButtonRowUntilDirty || isDirty) && safeButtonRow}
       </form>
       {confirmSubmitModalVisible && (
         <ModalDialog
@@ -592,8 +655,8 @@ export const FormWithContextVar = forwardRef(function (
       });
     };
 
-    return { ...cleanUpSubject(formState.subject), update: updateData };
-  }, [formState.subject]);
+    return { ...cleanUpSubject(formState.subject, formState.noSubmitFields), update: updateData };
+  }, [formState.subject, formState.noSubmitFields]);
 
   const nodeWithItem = useMemo(() => {
     return {
@@ -630,6 +693,8 @@ export const FormWithContextVar = forwardRef(function (
         itemLabelBreak={extractValue.asOptionalBoolean(node.props.itemLabelBreak)}
         itemLabelWidth={itemLabelWidthCssProps.width as string}
         hideButtonRowUntilDirty={extractValue.asOptionalBoolean(node.props.hideButtonRowUntilDirty)}
+        hideButtonRow={extractValue.asOptionalBoolean(node.props.hideButtonRow)}
+        enableSubmit={extractValue.asOptionalBoolean(node.props.enableSubmit)}
         formState={formState}
         dispatch={dispatch}
         id={node.uid}
@@ -638,6 +703,11 @@ export const FormWithContextVar = forwardRef(function (
         saveLabel={extractValue(node.props.saveLabel)}
         saveInProgressLabel={extractValue(node.props.saveInProgressLabel)}
         swapCancelAndSave={extractValue.asOptionalBoolean(node.props.swapCancelAndSave, false)}
+        onWillSubmit={lookupEventHandler("willSubmit", {
+          context: {
+            $data,
+          },
+        })}
         onSubmit={lookupEventHandler("submit", {
           defaultHandler: submitUrl
             ? `(eventArgs)=> Actions.callApi({ url: "${submitUrl}", method: "${submitMethod}", body: eventArgs, inProgressNotificationMessage: "${inProgressNotificationMessage}", completedNotificationMessage: "${completedNotificationMessage}", errorNotificationMessage: "${errorNotificationMessage}" })`

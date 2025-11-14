@@ -7,8 +7,22 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$componentInput: "SearchInput";
 $componentContainer: "SearchContainer";
 $themeVars: t.composePaddingVars($themeVars, $componentContainer);
+$themeVars: t.composePaddingVars($themeVars, $componentInput);
+$textColor-SearchInput: createThemeVar("textColor-#{$componentInput}");
+$fontFamily-SearchInput: createThemeVar("fontFamily-#{$componentInput}");
+$width-SearchInput: createThemeVar("width-#{$componentInput}");
+$height-SearchInput: createThemeVar("height-#{$componentInput}");
+$fontSize-SearchInput: createThemeVar("fontSize-#{$componentInput}");
+$fontWeight-SearchInput: createThemeVar("fontWeight-#{$componentInput}");
+$borderColor-SearchInput: createThemeVar("borderColor-#{$componentInput}");
+$textColor-placeholder-SearchInput: createThemeVar("textColor-placeholder-#{$componentInput}");
+$backgroundColor-SearchInput: createThemeVar("backgroundColor-#{$componentInput}");
+$backgroundColor-SearchInput--active: createThemeVar("backgroundColor-#{$componentInput}--active");
+$textColor-adornment-SearchInput: createThemeVar("textColor-adornment-#{$componentInput}");
+$textColor-adornment-SearchInput--active: createThemeVar("textColor-adornment-#{$componentInput}--active");
 
 $componentListPanel: "SearchPanel";
 $themeVars: t.composeBorderVars($themeVars, $componentListPanel);
@@ -20,6 +34,29 @@ $componentListItem: "SearchItem";
 $borderRadius-SearchItem: createThemeVar("borderRadius-#{$componentListItem}");
 $backgroundColor-SearchItem--hover: createThemeVar("backgroundColor-#{$componentListItem}--hover");
 $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem}--focus");
+
+// Keyframe animations for collapsible search
+@keyframes expandSearch {
+  from {
+    width: 0;
+    opacity: 0;
+  }
+  to {
+    width: $width-SearchInput;
+    opacity: 1;
+  }
+}
+
+@keyframes collapseSearch {
+  from {
+    width: $width-SearchInput;
+    opacity: 1;
+  }
+  to {
+    width: 0;
+    opacity: 0;
+  }
+}
 
 .listPanel {
   @include t.borderVars($themeVars, $componentListPanel);
@@ -42,6 +79,51 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
   scrollbar-gutter: stable;
   scrollbar-width: thin;
   padding: 0.75rem;
+}
+
+.input {
+  color: $textColor-SearchInput;
+  font-family: $fontFamily-SearchInput;
+  width: $width-SearchInput;
+  height: $height-SearchInput;
+  font-size: $fontSize-SearchInput;
+  font-weight: $fontWeight-SearchInput;
+  background-color: $backgroundColor-SearchInput;
+  border-color: $borderColor-SearchInput;
+  @include t.paddingVars($themeVars, $componentInput);
+
+
+  &.active {
+    [data-part-id="startAdornment"],
+    [data-part-id="endAdornment"] {
+      color: $textColor-adornment-SearchInput--active;
+    }
+  }
+
+  &.focused {
+    background-color: $backgroundColor-SearchInput--active;
+  }
+
+  &.fullWidth {
+    width: 100%;
+  }
+
+  &.expanding {
+    animation: expandSearch 0.3s ease-out forwards;
+  }
+
+  &.collapsing {
+    animation: collapseSearch 0.3s ease-in forwards;
+  }
+
+  & > input::placeholder {
+    color: $textColor-placeholder-SearchInput;
+  }
+
+  [data-part-id="startAdornment"],
+  [data-part-id="endAdornment"] {
+    color: $textColor-adornment-SearchInput;
+  }
 }
 
 .noResults {

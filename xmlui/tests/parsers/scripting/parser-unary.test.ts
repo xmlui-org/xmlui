@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import { Parser } from "../../../src/parsers/scripting/Parser";
+import type {
+  UnaryExpression} from "../../../src/components-core/script-runner/ScriptingSourceTree";
 import {
   T_BINARY_EXPRESSION,
   T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
@@ -10,8 +12,7 @@ import {
   T_LITERAL,
   T_MEMBER_ACCESS_EXPRESSION,
   T_SEQUENCE_EXPRESSION,
-  T_UNARY_EXPRESSION,
-  UnaryExpression,
+  T_UNARY_EXPRESSION
 } from "../../../src/components-core/script-runner/ScriptingSourceTree";
 
 describe("Parser - unary expressions", () => {

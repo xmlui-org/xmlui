@@ -20,7 +20,6 @@ import {
 } from "../metadata-helpers";
 import { MemoizedItem } from "../container-helpers";
 import { Select, defaultProps } from "./SelectNative";
-import { SelectItemText } from "@radix-ui/react-select";
 
 const COMP = "Select";
 
@@ -31,6 +30,11 @@ export const SelectMd = createMetadata({
     "supporting both single and multiple selection modes. It offers extensive " +
     "customization capabilities including search functionality, custom templates, " +
     "and comprehensive form integration.",
+  parts: {
+    clearButton: {
+      description: "The button to clear the selected value(s).",
+    },
+  },
   props: {
     placeholder: {
       ...dPlaceholder(),
@@ -94,6 +98,10 @@ export const SelectMd = createMetadata({
       description: `This property indicates the message to display when the component is in progress.`,
       defaultValue: defaultProps.inProgressNotificationMessage,
     },
+    clearable: {
+      description: `This property enables a clear button that allows the user to clear the selected value(s).`,
+      defaultValue: defaultProps.clearable,
+    },
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -153,6 +161,8 @@ export const SelectMd = createMetadata({
     [`backgroundColor-item-${COMP}--active`]: "$backgroundColor-dropdown-item--active",
     // Default borderColor-Input--disabled is too light so the disabled component is barely visible
     [`borderColor-${COMP}--disabled`]: "initial",
+    [`minHeight-${COMP}`]: "$space-7",
+    [`minHeight-item-${COMP}`]: "$space-7",
   },
 });
 
@@ -171,6 +181,7 @@ export const selectComponentRenderer = createComponentRenderer(
   }) => {
     const multiSelect = extractValue.asOptionalBoolean(node.props.multiSelect);
     const searchable = extractValue.asOptionalBoolean(node.props.searchable);
+    const clearable = extractValue.asOptionalBoolean(node.props.clearable);
 
     const isControlled = node.props.value !== undefined;
     return (
@@ -184,6 +195,7 @@ export const selectComponentRenderer = createComponentRenderer(
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
         updateState={isControlled ? undefined : updateState}
         searchable={searchable}
+        clearable={clearable}
         initialValue={extractValue(node.props.initialValue)}
         value={isControlled ? extractValue(node.props.value) : state?.value}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
@@ -224,13 +236,7 @@ export const selectComponentRenderer = createComponentRenderer(
                       $selectedValue: val,
                       $inTrigger: inTrigger,
                     }}
-                    renderChild={(...args) =>
-                      multiSelect || searchable ? (
-                        renderChild(...args)
-                      ) : (
-                        <SelectItemText>{renderChild(...args)}</SelectItemText>
-                      )
-                    }
+                    renderChild={renderChild}
                   />
                 );
               }

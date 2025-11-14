@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
+import type {
+  ModuleErrors} from "../../../src/parsers/scripting/modules";
 import {
-  ModuleErrors,
   isModuleErrors,
   parseScriptModule,
 } from "../../../src/parsers/scripting/modules";
-import { ScriptModule } from "../../../src/components-core/script-runner/ScriptingSourceTree";
+import type { ScriptModule } from "../../../src/components-core/script-runner/ScriptingSourceTree";
 
 const ROOT_MODULE = "test";
 

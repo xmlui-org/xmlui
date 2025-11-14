@@ -197,10 +197,11 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     (url?: unknown) => {
       const extractedUrl = valueExtractor(url);
       if (typeof extractedUrl !== "string" || extractedUrl.trim() === "") {
-        console.warn(
-          `Component '${safeNode.type}': ` +
-            `the extracted resource URL is not a valid string: value ${extractedUrl}, type ${typeof extractedUrl}`,
-        );
+        // TODO: Review how we should log this warning
+        // console.warn(
+        //   `Component '${safeNode.type}': ` +
+        //     `the extracted resource URL is not a valid string: value ${extractedUrl}, type ${typeof extractedUrl}`,
+        // );
         return undefined;
       }
       return getResourceUrl(extractedUrl);
@@ -250,10 +251,22 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
   const { inspectId, refreshInspection } = useInspector(safeNode, uid);
 
+  // --- Extract context variables (keys starting with "$") from state
+  const contextVars = useMemo(() => {
+    const vars: Record<string, any> = {};
+    for (const key of Object.keys(state)) {
+      if (key.startsWith("$")) {
+        vars[key] = state[key];
+      }
+    }
+    return vars;
+  }, [state]);
+
   // --- Assemble the renderer context we pass down the rendering chain
   const rendererContext: RendererContext<any> = {
     node: safeNode,
     state: state[uid] || EMPTY_OBJECT,
+    contextVars,
     updateState: memoedUpdateState,
     appContext,
     extractValue: valueExtractor,
@@ -295,8 +308,8 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     const behaviors = componentRegistry.getBehaviors();
     if (!isCompoundComponent) {
       for (const behavior of behaviors) {
-        if (behavior.canAttach(rendererContext.node, descriptor)) {
-          renderedNode = behavior.attach(rendererContext, renderedNode);
+        if (behavior.canAttach(rendererContext, rendererContext.node, descriptor)) {
+          renderedNode = behavior.attach(rendererContext, renderedNode, descriptor);
         }
       }
     }

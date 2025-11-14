@@ -47,6 +47,13 @@ export const NavLinkMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.displayActive,
     },
+    noIndicator: {
+      description:
+        `This Boolean property controls whether to hide the visual indicator for active and ` +
+        `hovered states. When set to \`true\`, the indicator line will not be displayed.`,
+      valueType: "boolean",
+      defaultValue: defaultProps.noIndicator,
+    },
     icon: d(
       `This property allows you to add an optional icon (specify the icon's name) to the navigation link.`,
     ),
@@ -69,7 +76,9 @@ export const NavLinkMd = createMetadata({
     [`fontWeight-${COMP}`]: "$fontWeight-normal",
     [`fontFamily-${COMP}`]: "$fontFamily",
     [`textColor-${COMP}`]: "$textColor-primary",
-    [`fontWeight-${COMP}--pressed`]: "$fontWeight-normal",
+    [`textColor-${COMP}--active`]: "$color-primary-500",
+    [`fontWeight-${COMP}--active`]: "$fontWeight-bold",
+    [`fontWeight-${COMP}--pressed`]: "$fontWeight-bold",
     [`thickness-indicator-${COMP}`]: "$space-0_5",
 
     [`outlineColor-${COMP}--focus`]: "$outlineColor--focus",
@@ -96,6 +105,7 @@ export const navLinkComponentRenderer = createComponentRenderer(
         disabled={!extractValue.asOptionalBoolean(node.props.enabled ?? true)}
         vertical={extractValue.asOptionalBoolean(node.props.vertical)}
         displayActive={extractValue.asOptionalBoolean(node.props.displayActive)}
+        noIndicator={extractValue.asOptionalBoolean(node.props.noIndicator)}
         forceActive={extractValue.asOptionalBoolean(node.props.active)}
         className={className}
         target={extractValue(node.props?.target)}

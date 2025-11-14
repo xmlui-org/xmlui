@@ -98,6 +98,10 @@ import {
   dValueApi,
 } from "./components/metadata-helpers";
 import StandaloneComponent from "./components-core/rendering/StandaloneComponent";
+import { ToneSwitch } from "./components/ToneSwitch/ToneSwitchNative";
+import { Tooltip } from "./components/Tooltip/TooltipNative";
+import { DropdownMenu, MenuItem } from "./components/DropdownMenu/DropdownMenuNative";
+import { ContentSeparator } from "./components/ContentSeparator/ContentSeparatorNative";
 
 export type {
   ThemeDefinition,
@@ -197,4 +201,9 @@ export {
   useEvent,
   StandaloneComponent,
   Theme,
+  ToneSwitch,
+  Tooltip,
+  DropdownMenu,
+  MenuItem,
+  ContentSeparator,
 };

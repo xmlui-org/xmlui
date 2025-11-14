@@ -6,19 +6,25 @@ import {
 } from "../../components/Animation/AnimationNative";
 import { ItemWithLabel } from "../../components/FormItem/ItemWithLabel";
 import { parseTooltipOptions, Tooltip } from "../../components/Tooltip/TooltipNative";
+import { useStyles } from "../theming/StyleContext";
+import { THEME_VAR_PREFIX, toCssVar } from "../theming/layout-resolver";
+import { parseLayoutProperty, toCssPropertyName } from "../theming/parse-layout-props";
+import { buttonVariantValues } from "../../components/abstractions";
 import type { Behavior } from "./Behavior";
+import { badgeVariantValues } from "../../components/Badge/BadgeNative";
 
 /**
  * Behavior for applying tooltips to components.
  */
 export const tooltipBehavior: Behavior = {
   name: "tooltip",
-  canAttach: (node) => {
-    const tooltipText = node.props?.tooltip;
-    const tooltipMarkdown = node.props?.tooltipMarkdown;
+  canAttach: (context, node) => {
+    const { extractValue } = context;
+    const tooltipText = extractValue(node.props?.tooltip, true);
+    const tooltipMarkdown = extractValue(node.props?.tooltipMarkdown, true);
     return !!tooltipText || !!tooltipMarkdown;
   },
-  attach: (context, node) => {
+  attach: (context, node, metadata) => {
     const { extractValue } = context;
     const tooltipText = extractValue(context.node.props?.tooltip, true);
     const tooltipMarkdown = extractValue(context.node.props?.tooltipMarkdown, true);
@@ -38,10 +44,12 @@ export const tooltipBehavior: Behavior = {
  */
 export const animationBehavior: Behavior = {
   name: "animation",
-  canAttach: (node) => {
-    return !!node.props?.animation;
+  canAttach: (context, node) => {
+    const { extractValue } = context;
+    const animation = extractValue(node.props?.animation, true);
+    return !!animation;
   },
-  attach: (context, node) => {
+  attach: (context, node, metadata) => {
     const { extractValue } = context;
     const animation = extractValue(context.node.props?.animation, true);
     const animationOptions = extractValue(context.node.props?.animationOptions, true);
@@ -64,19 +72,22 @@ export const animationBehavior: Behavior = {
  */
 export const labelBehavior: Behavior = {
   name: "label",
-  canAttach: (node, metadata) => {
+  canAttach: (context, node, metadata) => {
     /**
      * This behavior can be attached if the component has a 'label' prop
      * and is not a component that handles its own labeling.
      */
     if (metadata?.props?.label) {
       return false;
-    } else if (!node.props?.label) {
+    }
+    const { extractValue } = context;
+    const label = extractValue(node.props?.label, true);
+    if (!label) {
       return false;
     }
     return true;
   },
-  attach: (context, node) => {
+  attach: (context, node, metadata) => {
     const { extractValue, node: componentNode, className } = context;
 
     const label = extractValue.asOptionalString(componentNode.props.label);
@@ -109,6 +120,151 @@ export const labelBehavior: Behavior = {
   },
 };
 
-export const getCoreBehaviors = () => {
-  return [tooltipBehavior, animationBehavior, labelBehavior];
+/**
+ * Behavior for applying custom variant styling to components with non-predefined variant values.
+ * For Button components, this only applies if the variant is not "solid", "outlined", or "ghost".
+ * For other components, it applies to any component with a variant prop.
+ *
+ * This behavior wraps the rendered node in a VariantWrapper component that applies the variant styling.
+ */
+export const variantBehavior: Behavior = {
+  name: "variant",
+  canAttach: (context, node) => {
+    const { extractValue } = context;
+    const variant = extractValue(node.props?.variant, true);
+
+    // Must have a variant prop
+    if (!variant) {
+      return false;
+    }
+
+    // Special handling for Button component
+    if (node.type === "Button") {
+      // For Button, only attach if variant is NOT one of the predefined values
+      const variantStr = typeof variant === "string" ? variant : String(variant);
+      return variantStr != undefined && variantStr !== "" && !buttonVariantValues.includes(variantStr as any);
+    }
+
+    // Special handling for Badge component
+    if (node.type === "Badge") {
+      // For Badge, only attach if variant is NOT one of the predefined values
+      const variantStr = typeof variant === "string" ? variant : String(variant);
+      return !badgeVariantValues.includes(variantStr as any);
+    }
+
+    return true;
+  },
+  attach: (context, node, metadata) => {
+    const { extractValue, node: componentNode } = context;
+    const variant = extractValue(componentNode.props?.variant, true);
+    const componentType = componentNode.type;
+
+    if (!variant || typeof variant !== "string") {
+      return node;
+    }
+
+    // Get theme variables from metadata
+    const themeVars = metadata?.themeVars;
+
+    // Validate that themeVars is a record object
+    if (!themeVars || typeof themeVars !== "object" || Array.isArray(themeVars)) {
+      return node;
+    }
+
+    const themeVarKeys = Object.keys(themeVars);
+
+    if (themeVarKeys.length === 0) {
+      return node;
+    }
+
+    return (
+      <VariantWrapper variant={variant} componentType={componentType} themeVars={themeVars}>
+        {node as ReactElement}
+      </VariantWrapper>
+    );
+  },
 };
+
+/**
+ * Component that applies custom variant styling using React hooks.
+ */
+function VariantWrapper({
+  children,
+  variant,
+  componentType,
+  themeVars,
+}: {
+  children: ReactElement;
+  variant: string;
+  componentType: string;
+  themeVars: Record<string, any>;
+}) {
+  // Generate the variant style specification from metadata themeVars
+  const subject = `-${componentType}-${variant}`;
+
+  const variantSpec: Record<string, any> = {
+    "&": {},
+    "&:hover": {},
+    "&:active": {},
+    "&:disabled": {},
+  };
+
+  // Process each theme variable from metadata
+  for (const themeVar of Object.keys(themeVars)) {
+    const parsed = parseLayoutProperty(themeVar, true);
+
+    // Skip if parsing failed or returned an error string
+    if (typeof parsed === "string") {
+      continue;
+    }
+
+    const { property, states } = parsed;
+
+    // Convert camelCase property to CSS property name
+    const cssProperty = toCssPropertyName(property);
+    if (!cssProperty) {
+      continue;
+    }
+
+    // Determine which selector to use based on states
+    let selector = "&";
+    let stateSuffix = "";
+
+    if (states && states.length > 0) {
+      const state = states[0]; // Use first state
+      stateSuffix = `--${states.join("--")}`;
+
+      if (state === "hover") {
+        selector = "&:hover";
+      } else if (state === "active") {
+        selector = "&:active";
+      } else if (state === "disabled") {
+        selector = "&:disabled";
+      } else if (state === "focus") {
+        selector = "&:focus";
+      }
+    }
+
+    // Generate CSS variable reference for this theme variable with variant suffix
+    const cssVarValue =
+      `var(--${THEME_VAR_PREFIX}-${property}${subject}${stateSuffix}, ` +
+      `var(--${THEME_VAR_PREFIX}-${property}-${componentType}))`;
+
+    // Add to appropriate selector in variant spec
+    if (!variantSpec[selector]) {
+      variantSpec[selector] = {};
+    }
+    variantSpec[selector][cssProperty] = cssVarValue;
+  }
+
+  // Generate the CSS class using useStyles hook
+  const customVariantClassName = useStyles(variantSpec);
+
+  // Clone the node and add the custom variant className
+  const existingClassName = children.props.className || "";
+  const newClassName = `${existingClassName} ${customVariantClassName || ""}`.trim();
+
+  return cloneElement(children, {
+    className: newClassName,
+  });
+}

@@ -1,7 +1,8 @@
 {
   "name": "xmlui-playground",
-  "version": "0.1.10",
+  "version": "0.1.13",
   "sideEffects": false,
+  "type": "module",
   "scripts": {
     "start": "xmlui start",
     "preview": "xmlui preview",

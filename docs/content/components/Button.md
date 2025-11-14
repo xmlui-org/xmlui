@@ -286,7 +286,9 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button | transparent | transparent |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Button--disabled | $backgroundColor--disabled | $backgroundColor--disabled |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button--hover | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Button-attention | $backgroundColor-attention | $backgroundColor-attention |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Button-attention--active | $color-danger-500 | $color-danger-500 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Button-attention--hover | $color-danger-400 | $color-danger-400 |
@@ -317,7 +319,9 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
 | [backgroundColor](../styles-and-themes/common-units/#color)-Button-secondary-solid | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Button-secondary-solid--active | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Button-secondary-solid--hover | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-Button | transparent | transparent |
 | [borderColor](../styles-and-themes/common-units/#color)-Button--disabled | $borderColor--disabled | $borderColor--disabled |
+| [borderColor](../styles-and-themes/common-units/#color)-Button--hover | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Button-attention | $color-attention | $color-attention |
 | [borderColor](../styles-and-themes/common-units/#color)-Button-attention-outlined | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Button-attention-outlined--active | *none* | *none* |
@@ -350,6 +354,7 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Button-secondary-outlined | *none* | *none* |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Button-secondary-solid | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Button | solid | solid |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Button--hover | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Button-attention-outlined | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Button-attention-solid | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Button-primary-outlined | *none* | *none* |
@@ -357,6 +362,7 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Button-secondary-outlined | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Button-secondary-solid | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-Button | 1px | 1px |
+| [borderWidth](../styles-and-themes/common-units/#size)-Button--hover | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-Button-attention-ghost | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-Button-attention-outlined | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-Button-attention-solid | *none* | *none* |
@@ -366,6 +372,8 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
 | [borderWidth](../styles-and-themes/common-units/#size)-Button-secondary-ghost | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-Button-secondary-outlined | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-Button-secondary-solid | *none* | *none* |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Button | *none* | *none* |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Button--hover | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Button-attention-outlined | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Button-attention-solid | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Button-attention-solid--active | *none* | *none* |
@@ -375,6 +383,7 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Button-secondary-outlined | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Button-secondary-solid | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Button-secondary-solid--active | *none* | *none* |
+| [fontFamily](../styles-and-themes/common-units/#fontFamily)-Button | *none* | *none* |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Button-attention-ghost | *none* | *none* |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Button-attention-outlined | *none* | *none* |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Button-attention-solid | *none* | *none* |
@@ -394,6 +403,7 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
 | [fontSize](../styles-and-themes/common-units/#size)-Button-secondary-ghost | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Button-secondary-outlined | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Button-secondary-solid | *none* | *none* |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Button | $fontStyle-normal | $fontStyle-normal |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Button | $fontWeight-medium | $fontWeight-medium |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Button-attention-ghost | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Button-attention-outlined | *none* | *none* |
@@ -404,6 +414,7 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Button-secondary-ghost | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Button-secondary-outlined | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Button-secondary-solid | *none* | *none* |
+| [gap](../styles-and-themes/common-units/#size)-Button | $space-2 | $space-2 |
 | [height](../styles-and-themes/common-units/#size)-Button | fit-content | fit-content |
 | [outlineColor](../styles-and-themes/common-units/#color)-Button--focus | $outlineColor--focus | $outlineColor--focus |
 | [outlineColor](../styles-and-themes/common-units/#color)-Button-attention-ghost--focus | *none* | *none* |
@@ -445,7 +456,7 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
 | [outlineWidth](../styles-and-themes/common-units/#size)-Button-secondary-ghost--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-Button-secondary-outlined--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-Button-secondary-solid--focus | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-Button | *none* | *none* |
+| [padding](../styles-and-themes/common-units/#size)-Button | $space-2 $space-4 | $space-2 $space-4 |
 | [padding](../styles-and-themes/common-units/#size)-Button-lg | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-Button-md | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-Button-sm | *none* | *none* |
@@ -482,6 +493,7 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
 | [paddingVertical](../styles-and-themes/common-units/#size)-Button-xs | $space-0_5 | $space-0_5 |
 | [textColor](../styles-and-themes/common-units/#color)-Button | $color-surface-950 | $color-surface-950 |
 | [textColor](../styles-and-themes/common-units/#color)-Button--disabled | $textColor--disabled | $textColor--disabled |
+| [textColor](../styles-and-themes/common-units/#color)-Button--hover | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Button-attention-ghost | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Button-attention-ghost--active | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Button-attention-ghost--hover | *none* | *none* |
@@ -510,4 +522,8 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
 | [textColor](../styles-and-themes/common-units/#color)-Button-secondary-solid--active | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Button-secondary-solid--hover | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Button-solid | $const-color-surface-50 | $const-color-surface-50 |
+| [transition](../styles-and-themes/common-units/#transition)-Button | color 0.2s, background 0.2s | color 0.2s, background 0.2s |
+| [transition](../styles-and-themes/common-units/#transition)-Button-attention-solid | *none* | *none* |
+| [transition](../styles-and-themes/common-units/#transition)-Button-primary-solid | *none* | *none* |
+| [transition](../styles-and-themes/common-units/#transition)-Button-secondary-solid | *none* | *none* |
 | [width](../styles-and-themes/common-units/#size)-Button | fit-content | fit-content |

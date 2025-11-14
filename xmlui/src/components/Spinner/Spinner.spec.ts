@@ -1,6 +1,5 @@
-import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
-import { getFullRectangle } from "../../testing/themed-app-test-helpers";
+import { getBounds } from "../../testing/component-test-helpers";
 
 test.describe("Basic Functionality", () => {
   test("component renders with basic props", async ({ page, initTestBed }) => {
@@ -141,7 +140,7 @@ test.describe("Full Screen Mode", () => {
     const spinner = page.getByRole("status");
     await expect(spinner).toBeVisible();
 
-    const { width } = await getFullRectangle(spinner);
+    const { width } = await getBounds(spinner);
     expect(width).toEqual(page.viewportSize().width);
   });
 
@@ -151,7 +150,7 @@ test.describe("Full Screen Mode", () => {
     const spinner = page.getByRole("status");
     await expect(spinner).toBeVisible();
 
-    const { width } = await getFullRectangle(spinner);
+    const { width } = await getBounds(spinner);
     expect(width).not.toEqual(page.viewportSize().width);
   });
 });
@@ -170,7 +169,7 @@ test.describe("Edge Cases", { tag: "@smoke" }, () => {
 
     await expect(spinner).toBeVisible();
 
-    const { width } = await getFullRectangle(spinner);
+    const { width } = await getBounds(spinner);
     expect(width).toEqual(page.viewportSize().width);
   });
 

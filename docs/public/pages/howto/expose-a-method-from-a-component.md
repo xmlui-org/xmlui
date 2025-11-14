@@ -3,7 +3,7 @@
 Use the `<method>` element to create custom methods with JavaScript logic:
 
 ```xmlui-pg height="350px"
----app display
+---app display {6}
 <App>
   <H3>Custom Method Example</H3>
 
@@ -13,7 +13,7 @@ Use the `<method>` element to create custom methods with JavaScript logic:
 
   <MyModalWrapper id="myModal" title="Hello World!" />
 </App>
----comp display
+---comp display {13-16}
 <Component name="MyModalWrapper">
   <ModalDialog id="internalModal" title="{$props.title}" maxWidth="400px">
     <VStack gap="$space-3" padding="$space-4">

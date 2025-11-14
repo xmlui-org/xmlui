@@ -38,6 +38,7 @@ Available values:
 | `condensed-sticky` | However, the header and the navigation bar are in a single header block. |
 | `horizontal` | This layout stacks the layout sections in a single column in this order: header, navigation bar, main content, and footer. The application is a single scroll container; every part moves as you scroll the page. |
 | `horizontal-sticky` | Similar to `horizontal`, the header and the navigation bar dock to the top of the viewport, while the footer sticks to the bottom. |
+| `desktop` | This layout stretches the app to fill the entire browser viewport with zero padding and margins. The header (if present) docks to the top, the footer (if present) docks to the bottom, and the main content stretches to fill the remaining vertical and horizontal space. |
 
 Here are a few samples demonstrating the usage of the `layout` property. All samples use this markup, except the value of `App`'s layout and a few marked code snippets:
 
@@ -296,6 +297,36 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 </App>
 ```
 
+#### `desktop` [#desktop]
+
+```xmlui-pg copy name="Example: 'desktop' layout" height="300px"
+<App layout="desktop">
+  <AppHeader>
+    <property name="logoTemplate">
+        <Heading level="h3" value="Example App"/>
+    </property>
+  </AppHeader>
+  <Pages fallbackPath="/">
+      <Page url="/">
+        <List data="https://api.spacexdata.com/v3/history">
+          <property name="itemTemplate">
+            <Card title="{$item.title}" subtitle="{$item.details}"/>
+          </property>
+        </List>
+      </Page>
+      <Page url="/page1">
+        <Text value="Page 1" />
+      </Page>
+      <Page url="/page2">
+        <Text value="Page 2" />
+      </Page>
+  </Pages>
+  <Footer>Powered by XMLUI</Footer>
+</App>
+```
+
+The `desktop` layout is designed for full-screen desktop applications. It stretches the app to fill the entire browser viewport with zero padding and margins. The header (if present) docks to the top, the footer (if present) docks to the bottom, and the main content area stretches to fill all remaining vertical and horizontal space. This layout ignores all max-width constraints and scrollbar gutter settings to ensure edge-to-edge display.
+
 ### `loggedInUser` [#loggedinuser]
 
 Stores information about the currently logged-in user. By not defining this property, you can indicate that no user is logged in.
@@ -417,8 +448,8 @@ This component does not expose any methods.
 | [borderBottom](../styles-and-themes/common-units/#border)-AppHeader | *none* | *none* |
 | [borderLeft](../styles-and-themes/common-units/#border)-content-App | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-header-App | none | none |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-navPanel-App | $boxShadow-spread | $boxShadow-spread |
-| [maxWidth](../styles-and-themes/common-units/#size)-App | *none* | *none* |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-navPanel-App | none | none |
+| [maxWidth](../styles-and-themes/common-units/#size)-App | $maxWidth-content | $maxWidth-content |
 | [maxWidth-content](../styles-and-themes/common-units/#size)-App | $maxWidth-content | $maxWidth-content |
 | [width](../styles-and-themes/common-units/#size)-navPanel-App | $space-64 | $space-64 |
 

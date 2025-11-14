@@ -43,6 +43,15 @@ See also: [HSplitter](/components/HSplitter), [VSplitter](/components/VSplitter)
 </App>
 ```
 
+```xmlui-pg copy display name="Example: maxPrimarySize with negative value (from end)"
+<App>
+  <Splitter height="200px" maxPrimarySize="-50px">
+    <Stack backgroundColor="lightblue" height="100%" />
+    <Stack backgroundColor="darksalmon" height="100%" />
+  </Splitter>
+</App>
+```
+
 %-PROP-END
 
 %-PROP-START minPrimarySize

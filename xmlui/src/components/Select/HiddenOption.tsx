@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 
 export function HiddenOption(option: Option) {
   const { label } = option;
-  const { onOptionRemove, onOptionAdd } = useOption();
+  const { onOptionAdd } = useOption();
   const [node, setNode] = useState(null);
 
   const opt: Option = useMemo(() => {
@@ -18,8 +18,8 @@ export function HiddenOption(option: Option) {
 
   useEffect(() => {
     onOptionAdd(opt);
-    return () => onOptionRemove(opt);
-  }, [opt, onOptionAdd, onOptionRemove]);
+    // Don't remove options when component unmounts - they should persist
+  }, [opt, onOptionAdd]);
 
   return (
     <div ref={(el) => setNode(el)} style={{ display: "none" }}>

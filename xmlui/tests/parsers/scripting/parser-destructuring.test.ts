@@ -1,6 +1,6 @@
 import { describe, expect, it, assert } from "vitest";
 import { Parser } from "../../../src/parsers/scripting/Parser";
-import {
+import type {
   ConstStatement,
   LetStatement,
 } from "../../../src/components-core/script-runner/ScriptingSourceTree";

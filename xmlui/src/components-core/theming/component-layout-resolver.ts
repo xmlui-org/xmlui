@@ -195,7 +195,7 @@ function toCssVar(c: string): string {
 
 type SpecialResolver = (propValue: any, layoutContext?: LayoutContext) => CSSProperties;
 
-const specialResolvers: Record<string, SpecialResolver> = {
+export const specialResolvers: Record<string, SpecialResolver> = {
   paddingHorizontal: (propValue) => ({
     paddingLeft: propValue,
     paddingRight: propValue,

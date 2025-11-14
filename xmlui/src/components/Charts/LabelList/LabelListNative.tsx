@@ -1,4 +1,4 @@
-import styles from "./LabelListNative.module.scss";
+import styles from "./LabelList.module.scss";
 import type { LabelPosition } from "recharts/types/component/Label";
 import type { CSSProperties } from "react";
 import { useEffect, useMemo } from "react";

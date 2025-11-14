@@ -145,18 +145,60 @@ This function returns the difference between the two date parameters in minutes.
 ### `formatDate`
 
 ```ts
-function formatDate(date: string | Date): string;
+function formatDate(date: string | Date, formatString?: string): string;
 ```
 
-This function formats the specified value's date part into a local date string (according to the machine's local settings).
+This function formats the specified value's date part. When called without a `formatString` parameter, it returns a local date string according to the machine's local settings. When a `formatString` is provided, it uses [date-fns format patterns](https://date-fns.org/docs/format) to format the date.
+
+**Examples:**
+
+```ts
+formatDate(new Date())                    // "10/20/2025" (localized)
+formatDate(new Date(), "MMM dd, yyyy")    // "Oct 20, 2025"
+formatDate(new Date(), "yyyy-MM-dd")      // "2025-10-20"
+formatDate(new Date(), "'Today is' EEEE") // "Today is Monday"
+```
+
+**Common format patterns:**
+- `yyyy` - Full year (2025)
+- `yy` - Two-digit year (25)
+- `MMMM` - Full month name (October)
+- `MMM` - Abbreviated month name (Oct)
+- `MM` - Month as number with leading zero (10)
+- `M` - Month as number (10)
+- `dd` - Day of month with leading zero (20)
+- `d` - Day of month (20)
+- `EEEE` - Full day of week (Monday)
+- `EEE` - Abbreviated day of week (Mon)
+- `HH` - Hour in 24-hour format with leading zero (14)
+- `H` - Hour in 24-hour format (14)
+- `hh` - Hour in 12-hour format with leading zero (02)
+- `h` - Hour in 12-hour format (2)
+- `mm` - Minutes with leading zero (05)
+- `m` - Minutes (5)
+- `ss` - Seconds with leading zero (09)
+- `s` - Seconds (9)
+- `a` - AM/PM marker (AM, PM)
+- Use single quotes `'` to escape literal text
 
 ### `formatDateTime`
 
 ```ts
-function formatDateTime(date: string | Date): string;
+function formatDateTime(date: string | Date, formatString?: string): string;
 ```
 
-This function formats the specified value into a local date and time string (according to the machine's local settings).
+This function formats the specified value into a date and time string. When called without a `formatString` parameter, it returns a local date and time string according to the machine's local settings. When a `formatString` is provided, it uses [date-fns format patterns](https://date-fns.org/docs/format).
+
+**Examples:**
+
+```ts
+formatDateTime(new Date())                           // "10/20/2025, 2:30:45 PM" (localized)
+formatDateTime(new Date(), "MMM dd, yyyy HH:mm:ss")  // "Oct 20, 2025 14:30:45"
+formatDateTime(new Date(), "yyyy-MM-dd'T'HH:mm:ss")  // "2025-10-20T14:30:45"
+formatDateTime(new Date(), "EEEE, MMMM d 'at' h:mm a") // "Monday, October 20 at 2:30 PM"
+```
+
+See [common format patterns](#formatdate) in the `formatDate` documentation.
 
 ### `formatDateWithoutYear`
 
@@ -177,10 +219,22 @@ This function formats a date into a human-readable elapsed time string. It retur
 ### `formatTime`
 
 ```ts
-function formatTime(date: string | Date): string;
+function formatTime(date: string | Date, formatString?: string): string;
 ```
 
-This function formats the specified value's time part into a local date string (according to the machine's local settings).
+This function formats the specified value's time part. When called without a `formatString` parameter, it returns a local time string according to the machine's local settings. When a `formatString` is provided, it uses [date-fns format patterns](https://date-fns.org/docs/format).
+
+**Examples:**
+
+```ts
+formatTime(new Date())                    // "2:30:45 PM" (localized)
+formatTime(new Date(), "HH:mm:ss")        // "14:30:45"
+formatTime(new Date(), "h:mm a")          // "2:30 PM"
+formatTime(new Date(), "HH:mm")           // "14:30"
+formatTime(new Date(), "hh:mm:ss a")      // "02:30:45 PM"
+```
+
+See [common format patterns](#formatdate) in the `formatDate` documentation.
 
 ### `formatTimeWithoutSeconds`
 
@@ -517,6 +571,39 @@ function delay(ms: number): Promise<void>;
 ```
 
 Delays the execution of the next line of code by the specified number of milliseconds.
+
+### `debounce`
+
+```ts
+function debounce<F extends (...args: any[]) => any>(
+  delayMs: number,
+  func: F,
+  ...args: any[]
+): void;
+```
+
+Delays function execution until the specified time has elapsed since the last invocation. Useful for limiting expensive operations like API calls during user input.
+
+```xmlui copy
+<App>
+  <!-- Basic usage: pass value as argument -->
+  <TextBox 
+    label="Search:" 
+    onDidChange="e => debounce(500, (val) => console.log('Search:', val), e)"
+  />
+
+  <!-- With API call -->
+  <TextBox 
+    label="Email:" 
+    onDidChange="e => debounce(1000, (email) => {
+      Actions.callApi({
+        url: '/api/validate-email',
+        body: { email }
+      });
+    }, e)"
+  />
+</App>
+```
 
 ### `distinct`
 

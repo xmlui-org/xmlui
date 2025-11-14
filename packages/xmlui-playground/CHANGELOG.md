@@ -1,5 +1,25 @@
 # xmlui-playground
 
+## 0.1.13
+
+### Patch Changes
+
+- 10d755e: refactor: xmlui-playground - design update
+
+## 0.1.12
+
+### Patch Changes
+
+- e6b5810: fix: playground - app reset
+
+## 0.1.11
+
+### Patch Changes
+
+- 3e361c4: The xmlui-pg codefence now accepts emojies
+- Updated dependencies [3e361c4]
+  - xmlui-devtools@0.1.21
+
 ## 0.1.10
 
 ### Patch Changes

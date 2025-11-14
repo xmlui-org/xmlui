@@ -1,5 +1,144 @@
 # xmlui
 
+## 0.11.12
+
+### Patch Changes
+
+- cef5d43: fix: DropdownMenu - portal issue
+- a9e3115: Modify behaviors to use extractValue on attached properties
+- 72d968e: Fix clearable issue with DateInput (and TimeInput)
+
+## 0.11.11
+
+### Patch Changes
+
+- d32fef2: New themes created: xmlui-docs, xmlui-blog, xmlui-web
+- c882b72: The "contextVars" warning with inspect="true" is fixed
+
+## 0.11.10
+
+### Patch Changes
+
+- 741f760: refactor: rename size prop to thickness and add length prop in ContentSeparator
+
+## 0.11.9
+
+### Patch Changes
+
+- 9c42826: Add noIndicator property to NavLink and NavGroup
+
+## 0.11.8
+
+### Patch Changes
+
+- e25ea5b: Add nonSticky property to Footer
+- 6f11265: feat: formatter puts ">", "/>" on a newline for long tag.
+- 53c383c: Remove the experimental Choose component
+
+## 0.11.7
+
+### Patch Changes
+
+- de17ae1: Add the Choose component to xmlui
+- dc3d889: Fix long text handling in markdown and dialogs
+
+## 0.11.6
+
+### Patch Changes
+
+- f9ac95e: Fix the variant behavior. It uses a React component now.
+- 097783b: Fixed Table row deselection if multiple row selections are disabled.
+- 0bace0a: Add clearable property to Select
+- 07b1a3d: Add a new layout, "desktop", to App
+- 0bace0a: Add padding theme vars to ContentSeparator
+- 0bace0a: Review Select fontSize and minHeight theme variables
+
+## 0.11.5
+
+### Patch Changes
+
+- 10d755e: refactor: xmlui-playground - design update
+- b3a4194: Fixed a case where if the data provided to a Table did not have 'id' attributes, the row selection would not work correctly.
+
+## 0.11.4
+
+### Patch Changes
+
+- e384c59: Change validation status signature from having one dash to two dashes to better reflect that they are status modifiers. Ex. -default -> --default, -error -> --error
+- f296904: Splitter now responds the visibility changes of its children
+- f296904: Temporarily disable the "variant" behavior on Button
+- be73336: fix: Select - use extractValue for controlled component value prop
+
+## 0.11.3
+
+### Patch Changes
+
+- 4a311e2: improve: charts - better domain configuration
+- f8a75ce: Tiny Splitter updates
+- bbc421b: Text strong variant style fixed
+
+## 0.11.2
+
+### Patch Changes
+
+- c1f306f: update package dependencies for tsx usage
+
+## 0.11.1
+
+### Patch Changes
+
+- 7bbbb1d: Add the debounce function to globals
+
+## 0.11.0
+
+### Minor Changes
+
+- 19145d2: xmlui builds with ESM
+- 5109dce: Migrate from CommonJs to ESM internally. Lays the groundwork for exporting testing capabilities.
+
+### Patch Changes
+
+- fe503eb: Add enableSubmit to Form
+- 06bb966: Fix TableOfContents styling
+- e6b5810: fix: playground - app reset
+- db94656: improve: bar/line chart spacing
+- fe503eb: Queue now passes $queuedItems and $completedItems context variables to its event handlers
+- 82ddbe7: Fix codefence first line indent style issue
+- 75b701b: Extend form with hideButtonRow and FormItem with noSubmit
+
+## 0.10.26
+
+### Patch Changes
+
+- e1b8d58: Heading now accepts "H1"..."H6", "1"..."6", too. Invalid values fall back to "h1".
+- 1ad832c: Remove the showNavPanelIf property from AppHeader (fix NavPanel's "when" usage)
+
+## 0.10.25
+
+### Patch Changes
+
+- e7c503e: refactor: Select - remove radix select
+- 5fe3052: Fix the NavGroup click behavior in responsive view
+- 5fe3052: Fix the $item access issue within a ModalDialog inside a Column
+- 250647b: Fix the APICall becomes non-functional after first error when used with DataSource + Items + $item context issue
+
+## 0.10.24
+
+### Patch Changes
+
+- 3e361c4: The xmlui-pg codefence now accepts emojies
+- 3e361c4: Exend the formatDate, formatDateTime, and formatTime functions with optional format strings
+
+## 0.10.23
+
+### Patch Changes
+
+- bf18444: Experiment with the "variant" behavior
+- 6d3bb89: Form now has a willSubmit event (it can cancel the submit event)
+- 89c69af: Fix the boolean conversion issue with showAnchor in Heading
+- 4cfebf0: Fix loading code-behind files in standalone mode
+- 145cd68: fix: pointer-events:none when using sibling Dialog
+
 ## 0.10.22
 
 ### Patch Changes

@@ -128,8 +128,9 @@ export const AppMd = createMetadata({
     [`width-navPanel-${COMP}`]: "$space-64",
     [`backgroundColor-navPanel-${COMP}`]: "$backgroundColor",
     [`maxWidth-content-${COMP}`]: "$maxWidth-content",
+    [`maxWidth-${COMP}`]: "$maxWidth-content",
     [`boxShadow-header-${COMP}`]: "none",
-    [`boxShadow-navPanel-${COMP}`]: "$boxShadow-spread",
+    [`boxShadow-navPanel-${COMP}`]: "none",
     [`scroll-padding-block-Pages`]: "$space-4",
     [`backgroundColor-content-App`]: "$backgroundColor",
     light: {
@@ -352,6 +353,23 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
 
   const applyDefaultContentPadding= !Pages;
 
+  // Extract sticky property from Footer component
+  const footerSticky = useMemo(() => {
+    if (!Footer) return true;
+    
+    // Check if Footer is wrapped in Theme
+    let footerNode = Footer;
+    if (Footer.type === "Theme" && Footer.children?.length > 0) {
+      footerNode = Footer.children.find((child) => child.type === "Footer");
+    }
+    
+    if (footerNode?.type === "Footer" && footerNode.props?.sticky !== undefined) {
+      return extractValue.asOptionalBoolean(footerNode.props.sticky, true);
+    }
+    
+    return true;
+  }, [Footer, extractValue]);
+
   // --- Memoize all app props to prevent unnecessary re-renders
   const appProps = useMemo(
     () => ({
@@ -369,7 +387,8 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
       defaultTone: extractValue(node.props.defaultTone),
       defaultTheme: extractValue(node.props.defaultTheme),
       autoDetectTone: extractValue.asOptionalBoolean(node.props.autoDetectTone, false),
-      applyDefaultContentPadding
+      applyDefaultContentPadding,
+      footerSticky,
     }),
     [
       extractValue,
@@ -386,7 +405,8 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
       node.props.defaultTheme,
       node.props.autoDetectTone,
       className,
-      applyDefaultContentPadding
+      applyDefaultContentPadding,
+      footerSticky,
     ],
   );
 
@@ -401,6 +421,7 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
       {...appProps}
       header={renderedHeader}
       footer={renderedFooter}
+      footerSticky={footerSticky}
       navPanel={renderedNavPanel}
       navPanelDef={NavPanel}
       logoContentDef={node.props.logoTemplate}

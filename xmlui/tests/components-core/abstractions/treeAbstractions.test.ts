@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { NodeLoadingState, FlatTreeNodeWithState, FlatTreeNode } from '../../../src/components-core/abstractions/treeAbstractions';
+import type { NodeLoadingState, FlatTreeNodeWithState, FlatTreeNode } from '../../../src/components-core/abstractions/treeAbstractions';
 
 describe('Tree Abstractions - Loading States', () => {
   it('NodeLoadingState type should have correct values', () => {

@@ -29,6 +29,7 @@ import { SearchContextProvider } from "./SearchContext";
 import type { NavHierarchyNode } from "../NavPanel/NavPanelNative";
 import { LinkInfoContext } from "./LinkInfoContext";
 import { EMPTY_OBJECT } from "../../components-core/constants";
+import { shouldKeep } from "../../components-core/utils/extractParam";
 
 type Props = {
   children: ReactNode;
@@ -57,6 +58,7 @@ type Props = {
   autoDetectTone?: boolean;
   applyDefaultContentPadding?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
+  footerSticky?: boolean;
 };
 
 export const defaultProps: Pick<
@@ -103,20 +105,31 @@ export function App({
   className,
   applyDefaultContentPadding,
   registerComponentApi,
+  footerSticky = true,
   ...rest
 }: Props) {
   const { getThemeVar } = useTheme();
   const { setActiveThemeTone, setActiveThemeId, themes } = useThemes();
-
   const mounted = useRef(false);
 
   const layoutWithDefaultValue = layout || getThemeVar("layout-App") || "condensed-sticky";
   const safeLayout = layoutWithDefaultValue
     ?.trim()
     .replace(/[\u2013\u2014\u2011]/g, "-") as AppLayoutType; //It replaces all &ndash; (–) and &mdash; (—) and non-breaking hyphen '‑' symbols with simple dashes (-).
-  const { setLoggedInUser, mediaSize, forceRefreshAnchorScroll, appGlobals } = useAppContext();
+  const appContext = useAppContext();
+  const { setLoggedInUser, mediaSize, forceRefreshAnchorScroll, appGlobals } = appContext;
   const hasRegisteredHeader = header !== undefined;
-  const hasRegisteredNavPanel = navPanelDef !== undefined;
+  
+  // --- Check if NavPanel's "when" condition allows it to be rendered
+  // --- This ensures the drawer and hamburger menu are hidden when NavPanel.when evaluates to false
+  const navPanelShouldRender = useMemo(() => {
+    if (!navPanelDef) return false;
+    // Use shouldKeep to evaluate the NavPanel's when condition
+    // Pass empty state {} and appContext since we're evaluating at the App level
+    return shouldKeep(navPanelDef.when, {}, appContext);
+  }, [navPanelDef, appContext]);
+  
+  const hasRegisteredNavPanel = navPanelDef !== undefined && navPanelShouldRender;
 
   useEffect(() => {
     setLoggedInUser(loggedInUser);
@@ -226,6 +239,8 @@ export function App({
         safeLayout === "horizontal" ||
         safeLayout === "condensed"
           ? "0px"
+          : safeLayout === "desktop"
+          ? headerHeight + "px"
           : headerHeight + "px",
       "--footer-height":
         !scrollWholePage ||
@@ -233,6 +248,8 @@ export function App({
         safeLayout === "horizontal" ||
         safeLayout === "condensed"
           ? "0px"
+          : safeLayout === "desktop"
+          ? footerHeight + "px"
           : footerHeight + "px",
       "--header-abs-height": headerHeight + "px",
       "--footer-abs-height": footerHeight + "px",
@@ -344,11 +361,13 @@ export function App({
     {
       [styles.scrollWholePage]: scrollWholePage,
       [styles.noScrollbarGutters]: noScrollbarGutters,
+      [styles.noFooter]: !footerSticky,
       "media-large": mediaSize.largeScreen,
       "media-small": mediaSize.smallScreen,
       "media-desktop": mediaSize.desktop,
       "media-phone": mediaSize.phone,
       "media-tablet": mediaSize.tablet,
+      "nested-app": appGlobals?.isNested || false,
     },
   ];
 
@@ -356,6 +375,10 @@ export function App({
   let pagesWrapperClasses = classnames(styles.PagesWrapperInner, {
     [styles.withDefaultContentPadding]: applyDefaultContentPadding,
   });
+  
+  // Determine if footer should have nonSticky class (when sticky=false for non-desktop layouts)
+  const footerShouldBeNonSticky = !footerSticky && safeLayout !== "desktop";
+  
   switch (safeLayout) {
     case "vertical":
       content = (
@@ -397,7 +420,12 @@ export function App({
             <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
               <div className={pagesWrapperClasses}>{children}</div>
             </div>
-            <div className={styles.footerWrapper} ref={footerRefCallback}>
+            <div 
+              className={classnames(styles.footerWrapper, {
+                [styles.nonSticky]: footerShouldBeNonSticky,
+              })} 
+              ref={footerRefCallback}
+            >
               {footer}
             </div>
           </div>
@@ -426,7 +454,12 @@ export function App({
               </div>
             </main>
           </div>
-          <div className={styles.footerWrapper} ref={footerRefCallback}>
+          <div 
+            className={classnames(styles.footerWrapper, {
+              [styles.nonSticky]: footerShouldBeNonSticky,
+            })} 
+            ref={footerRefCallback}
+          >
             {footer}
           </div>
         </div>
@@ -457,7 +490,12 @@ export function App({
           <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
             <div className={pagesWrapperClasses}>{children}</div>
           </div>
-          <div className={styles.footerWrapper} ref={footerRefCallback}>
+          <div 
+            className={classnames(styles.footerWrapper, {
+              [styles.nonSticky]: footerShouldBeNonSticky,
+            })} 
+            ref={footerRefCallback}
+          >
             {footer}
           </div>
         </div>
@@ -503,9 +541,40 @@ export function App({
           <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
             <div className={pagesWrapperClasses}>{children}</div>
           </div>
-          <div className={styles.footerWrapper} ref={footerRefCallback}>
+          <div 
+            className={classnames(styles.footerWrapper, {
+              [styles.nonSticky]: footerShouldBeNonSticky,
+            })} 
+            ref={footerRefCallback}
+          >
             {footer}
           </div>
+        </div>
+      );
+      break;
+    case "desktop":
+      content = (
+        <div
+          {...rest}
+          className={classnames(wrapperBaseClasses, styles.desktop)}
+          style={styleWithHelpers}
+        >
+          {header && (
+            <header
+              className={classnames(styles.headerWrapper, styles.sticky)}
+              ref={headerRefCallback}
+            >
+              {header}
+            </header>
+          )}
+          <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
+            <div className={styles.PagesWrapperInner}>{children}</div>
+          </div>
+          {footer && (
+            <div className={classnames(styles.footerWrapper, styles.sticky)} ref={footerRefCallback}>
+              {footer}
+            </div>
+          )}
         </div>
       );
       break;

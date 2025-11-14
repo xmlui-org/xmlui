@@ -48,6 +48,10 @@ You can use `Select` with dynamic options:
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
+### `clearable` (default: false) [#clearable-default-false]
+
+This property enables a clear button that allows the user to clear the selected value(s).
+
 ### `dropdownHeight` [#dropdownheight]
 
 This property sets the height of the dropdown list. If not set, the height is determined automatically.
@@ -367,6 +371,12 @@ This API retrieves the current value of the `Select`. You can use it to get the 
 
 **Signature**: `get value(): string | string[] | undefined`
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`clearButton`**: The button to clear the selected value(s).
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]
@@ -378,21 +388,21 @@ This API retrieves the current value of the `Select`. You can use it to get the 
 | [backgroundColor](../styles-and-themes/common-units/#color)-item-Select--hover | $backgroundColor-dropdown-item--hover | $backgroundColor-dropdown-item--hover |
 | [backgroundColor](../styles-and-themes/common-units/#color)-menu-Select | $color-surface-raised | $color-surface-raised |
 | [backgroundColor](../styles-and-themes/common-units/#color)-menu-Select | $color-surface-raised | $color-surface-raised |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select--default | *none* | *none* |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select--default--hover | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Select--disabled | *none* | *none* |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select--error | *none* | *none* |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select--error--hover | *none* | *none* |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select--success | *none* | *none* |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select--success--hover | *none* | *none* |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select--warning | *none* | *none* |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select--warning--hover | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Select-badge | $color-primary-500 | $color-primary-500 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Select-badge | $color-primary-500 | $color-primary-500 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Select-badge--active | $color-primary-500 | $color-primary-500 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Select-badge--active | $color-primary-500 | $color-primary-500 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Select-badge--hover | $color-primary-400 | $color-primary-400 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Select-badge--hover | $color-primary-400 | $color-primary-400 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Select-default | *none* | *none* |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Select-default--hover | *none* | *none* |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Select-error | *none* | *none* |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Select-error--hover | *none* | *none* |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Select-success | *none* | *none* |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Select-success--hover | *none* | *none* |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Select-warning | *none* | *none* |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Select-warning--hover | *none* | *none* |
 | [border](../styles-and-themes/common-units/#border)-Select | *none* | *none* |
 | [borderBottom](../styles-and-themes/common-units/#border)-Select | *none* | *none* |
 | [borderBottomColor](../styles-and-themes/common-units/#color)-Select | *none* | *none* |
@@ -401,16 +411,16 @@ This API retrieves the current value of the `Select`. You can use it to get the 
 | [borderColor](../styles-and-themes/common-units/#color)-menu-Select | $borderColor | $borderColor |
 | [borderColor](../styles-and-themes/common-units/#color)-menu-Select | $borderColor | $borderColor |
 | [borderColor](../styles-and-themes/common-units/#color)-Select | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-Select--default | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-Select--default--hover | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Select--disabled | initial | initial |
 | [borderColor](../styles-and-themes/common-units/#color)-Select--disabled | initial | initial |
-| [borderColor](../styles-and-themes/common-units/#color)-Select-default | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-Select-default--hover | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-Select-error | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-Select-error--hover | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-Select-success | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-Select-success--hover | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-Select-warning | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-Select-warning--hover | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-Select--error | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-Select--error--hover | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-Select--success | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-Select--success--hover | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-Select--warning | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-Select--warning--hover | *none* | *none* |
 | [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-Select | *none* | *none* |
 | [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-Select | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-Select | *none* | *none* |
@@ -423,11 +433,11 @@ This API retrieves the current value of the `Select`. You can use it to get the 
 | [borderLeftWidth](../styles-and-themes/common-units/#size)-Select | *none* | *none* |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-menu-Select | $borderRadius | $borderRadius |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-menu-Select | $borderRadius | $borderRadius |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select--default | *none* | *none* |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select--error | *none* | *none* |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select--success | *none* | *none* |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select--warning | *none* | *none* |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select-badge | $borderRadius | $borderRadius |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select-default | *none* | *none* |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select-error | *none* | *none* |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select-success | *none* | *none* |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select-warning | *none* | *none* |
 | [borderRight](../styles-and-themes/common-units/#border)-Select | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-Select | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-Select | *none* | *none* |
@@ -435,10 +445,10 @@ This API retrieves the current value of the `Select`. You can use it to get the 
 | [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-Select | *none* | *none* |
 | [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-Select | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Select | *none* | *none* |
-| [borderStyle](../styles-and-themes/common-units/#border-style)-Select-default | *none* | *none* |
-| [borderStyle](../styles-and-themes/common-units/#border-style)-Select-error | *none* | *none* |
-| [borderStyle](../styles-and-themes/common-units/#border-style)-Select-success | *none* | *none* |
-| [borderStyle](../styles-and-themes/common-units/#border-style)-Select-warning | *none* | *none* |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Select--default | *none* | *none* |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Select--error | *none* | *none* |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Select--success | *none* | *none* |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Select--warning | *none* | *none* |
 | [borderTop](../styles-and-themes/common-units/#border)-Select | *none* | *none* |
 | [borderTopColor](../styles-and-themes/common-units/#color)-Select | *none* | *none* |
 | [borderTopStyle](../styles-and-themes/common-units/#border-style)-Select | *none* | *none* |
@@ -450,52 +460,54 @@ This API retrieves the current value of the `Select`. You can use it to get the 
 | [borderWidth](../styles-and-themes/common-units/#size)-menu-Select | 1px | 1px |
 | [borderWidth](../styles-and-themes/common-units/#size)-menu-Select | 1px | 1px |
 | [borderWidth](../styles-and-themes/common-units/#size)-Select | *none* | *none* |
-| [borderWidth](../styles-and-themes/common-units/#size)-Select-default | *none* | *none* |
-| [borderWidth](../styles-and-themes/common-units/#size)-Select-error | *none* | *none* |
-| [borderWidth](../styles-and-themes/common-units/#size)-Select-success | *none* | *none* |
-| [borderWidth](../styles-and-themes/common-units/#size)-Select-warning | *none* | *none* |
+| [borderWidth](../styles-and-themes/common-units/#size)-Select--default | *none* | *none* |
+| [borderWidth](../styles-and-themes/common-units/#size)-Select--error | *none* | *none* |
+| [borderWidth](../styles-and-themes/common-units/#size)-Select--success | *none* | *none* |
+| [borderWidth](../styles-and-themes/common-units/#size)-Select--warning | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-Select | $boxShadow-md | $boxShadow-md |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-Select | $boxShadow-md | $boxShadow-md |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-default | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-default--hover | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-error | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-error--hover | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-success | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-success--hover | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-warning | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-warning--hover | *none* | *none* |
-| [fontSize](../styles-and-themes/common-units/#size)-placeholder-Select-default | *none* | *none* |
-| [fontSize](../styles-and-themes/common-units/#size)-placeholder-Select-error | *none* | *none* |
-| [fontSize](../styles-and-themes/common-units/#size)-placeholder-Select-success | *none* | *none* |
-| [fontSize](../styles-and-themes/common-units/#size)-placeholder-Select-warning | *none* | *none* |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select--default | *none* | *none* |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select--default--hover | *none* | *none* |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select--error | *none* | *none* |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select--error--hover | *none* | *none* |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select--success | *none* | *none* |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select--success--hover | *none* | *none* |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select--warning | *none* | *none* |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select--warning--hover | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-Select--default | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-Select--error | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-Select--success | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-Select--warning | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-Select--default | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-Select--error | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-Select--success | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-Select--warning | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Select-badge | $fontSize-sm | $fontSize-sm |
 | [fontSize](../styles-and-themes/common-units/#size)-Select-badge | $fontSize-sm | $fontSize-sm |
-| [fontSize](../styles-and-themes/common-units/#size)-Select-default | *none* | *none* |
-| [fontSize](../styles-and-themes/common-units/#size)-Select-error | *none* | *none* |
-| [fontSize](../styles-and-themes/common-units/#size)-Select-success | *none* | *none* |
-| [fontSize](../styles-and-themes/common-units/#size)-Select-warning | *none* | *none* |
+| [minHeight](../styles-and-themes/common-units/#size)-item-Select | $space-7 | $space-7 |
+| [minHeight](../styles-and-themes/common-units/#size)-Select | $space-7 | $space-7 |
 | [opacity](../styles-and-themes/common-units/#opacity)-Select--disabled | 0.5 | 0.5 |
 | [opacity](../styles-and-themes/common-units/#opacity)-text-item-Select--disabled | 0.5 | 0.5 |
+| [outlineColor](../styles-and-themes/common-units/#color)-Select--default--focus | *none* | *none* |
+| [outlineColor](../styles-and-themes/common-units/#color)-Select--error--focus | *none* | *none* |
 | [outlineColor](../styles-and-themes/common-units/#color)-Select--focus | *none* | *none* |
-| [outlineColor](../styles-and-themes/common-units/#color)-Select-default--focus | *none* | *none* |
-| [outlineColor](../styles-and-themes/common-units/#color)-Select-error--focus | *none* | *none* |
-| [outlineColor](../styles-and-themes/common-units/#color)-Select-success--focus | *none* | *none* |
-| [outlineColor](../styles-and-themes/common-units/#color)-Select-warning--focus | *none* | *none* |
+| [outlineColor](../styles-and-themes/common-units/#color)-Select--success--focus | *none* | *none* |
+| [outlineColor](../styles-and-themes/common-units/#color)-Select--warning--focus | *none* | *none* |
+| [outlineOffset](../styles-and-themes/common-units/#size)-Select--default--focus | *none* | *none* |
+| [outlineOffset](../styles-and-themes/common-units/#size)-Select--error--focus | *none* | *none* |
 | [outlineOffset](../styles-and-themes/common-units/#size)-Select--focus | *none* | *none* |
-| [outlineOffset](../styles-and-themes/common-units/#size)-Select-default--focus | *none* | *none* |
-| [outlineOffset](../styles-and-themes/common-units/#size)-Select-error--focus | *none* | *none* |
-| [outlineOffset](../styles-and-themes/common-units/#size)-Select-success--focus | *none* | *none* |
-| [outlineOffset](../styles-and-themes/common-units/#size)-Select-warning--focus | *none* | *none* |
+| [outlineOffset](../styles-and-themes/common-units/#size)-Select--success--focus | *none* | *none* |
+| [outlineOffset](../styles-and-themes/common-units/#size)-Select--warning--focus | *none* | *none* |
+| [outlineStyle](../styles-and-themes/common-units/#border)-Select--default--focus | *none* | *none* |
+| [outlineStyle](../styles-and-themes/common-units/#border)-Select--error--focus | *none* | *none* |
 | [outlineStyle](../styles-and-themes/common-units/#border)-Select--focus | *none* | *none* |
-| [outlineStyle](../styles-and-themes/common-units/#border)-Select-default--focus | *none* | *none* |
-| [outlineStyle](../styles-and-themes/common-units/#border)-Select-error--focus | *none* | *none* |
-| [outlineStyle](../styles-and-themes/common-units/#border)-Select-success--focus | *none* | *none* |
-| [outlineStyle](../styles-and-themes/common-units/#border)-Select-warning--focus | *none* | *none* |
+| [outlineStyle](../styles-and-themes/common-units/#border)-Select--success--focus | *none* | *none* |
+| [outlineStyle](../styles-and-themes/common-units/#border)-Select--warning--focus | *none* | *none* |
+| [outlineWidth](../styles-and-themes/common-units/#size)-Select--default--focus | *none* | *none* |
+| [outlineWidth](../styles-and-themes/common-units/#size)-Select--error--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-Select--focus | *none* | *none* |
-| [outlineWidth](../styles-and-themes/common-units/#size)-Select-default--focus | *none* | *none* |
-| [outlineWidth](../styles-and-themes/common-units/#size)-Select-error--focus | *none* | *none* |
-| [outlineWidth](../styles-and-themes/common-units/#size)-Select-success--focus | *none* | *none* |
-| [outlineWidth](../styles-and-themes/common-units/#size)-Select-warning--focus | *none* | *none* |
+| [outlineWidth](../styles-and-themes/common-units/#size)-Select--success--focus | *none* | *none* |
+| [outlineWidth](../styles-and-themes/common-units/#size)-Select--warning--focus | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-item-Select | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-Select | *none* | *none* |
 | [paddingBottom](../styles-and-themes/common-units/#size)-item-Select | *none* | *none* |
@@ -515,20 +527,20 @@ This API retrieves the current value of the `Select`. You can use it to get the 
 | [textColor](../styles-and-themes/common-units/#color)-indicator-Select | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-item-Select--disabled | $color-surface-200 | $color-surface-200 |
 | [textColor](../styles-and-themes/common-units/#color)-placeholder-Select | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-placeholder-Select-default | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-placeholder-Select-error | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-placeholder-Select-success | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-placeholder-Select-warning | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-placeholder-Select--default | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-placeholder-Select--error | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-placeholder-Select--success | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-placeholder-Select--warning | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-Select--default | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-Select--default--hover | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Select--disabled | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-Select--error | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-Select--error--hover | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-Select--success | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-Select--success--hover | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-Select--warning | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-Select--warning--hover | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Select-badge | $const-color-surface-50 | $const-color-surface-50 |
 | [textColor](../styles-and-themes/common-units/#color)-Select-badge | $const-color-surface-50 | $const-color-surface-50 |
 | [textColor](../styles-and-themes/common-units/#color)-Select-badge--active | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Select-badge--hover | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-Select-default | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-Select-default--hover | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-Select-error | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-Select-error--hover | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-Select-success | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-Select-success--hover | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-Select-warning | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-Select-warning--hover | *none* | *none* |

@@ -84,6 +84,19 @@ export const FormMd = createMetadata({
       type: "boolean",
       defaultValue: defaultProps.hideButtonRowUntilDirty,
     },
+    hideButtonRow: {
+      description:
+        `This property hides the button row entirely when set to true.`,
+      type: "boolean",
+      defaultValue: defaultProps.hideButtonRow,
+    },
+    enableSubmit: {
+      description:
+        `This property controls whether the submit button is enabled. When set to false, ` +
+        `the submit button is disabled and the form cannot be submitted.`,
+      type: "boolean",
+      defaultValue: defaultProps.enableSubmit,
+    },
     submitUrl: d(`URL to submit the form data.`),
     submitMethod: {
       description:
@@ -97,6 +110,11 @@ export const FormMd = createMetadata({
     _data_url: dInternal("when we have an api bound data prop, we inject the url here"),
   },
   events: {
+    willSubmit: d(
+      `The form infrastructure fires this event just before the form is submitted. The event argument ` +
+        `is the current \`data\` value to be submitted. You can cancel the submission by returning ` +
+        `\`false\` from the event handler.`,
+    ),
     submit: d(
       `The form infrastructure fires this event when the form is submitted. The event argument ` +
         `is the current \`data\` value to save.`,
@@ -124,6 +142,14 @@ export const FormMd = createMetadata({
       parameters: {
         data: "An object containing the form data to update.",
       },
+    },
+    validate: {
+      description: "This method triggers validation on all form fields without submitting the form. " +
+        "It displays validation errors and returns the validation result along with the cleaned form data. " +
+        "This is useful for implementing custom submit buttons or performing operations that require " +
+        "validated data without actually submitting the form.",
+      signature: "validate(): Promise<{ isValid: boolean, data: Record<string, any>, errors: ValidationResult[], warnings: ValidationResult[], validationResults: Record<string, ValidationResult> }>",
+      returns: "A promise that resolves to an object containing validation status, cleaned data, and detailed validation results.",
     },
   },
   themeVars: parseScssVar(styles.themeVars),

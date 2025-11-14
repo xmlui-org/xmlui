@@ -9,6 +9,7 @@ import {
   type XmlUiNode,
 } from "xmlui";
 import { decompress } from "../playground/utils";
+import { base64ToUint8Array } from "../../../../xmlui/src/components-core/utils/base64-utils";
 
 export function normalizePath(url?: string): string | undefined {
   if (!url) {
@@ -55,7 +56,7 @@ export function serialize(component: ComponentDef | CompoundComponentDef): strin
 
 export async function decompressData(source: string) {
   const base64 = decodeURIComponent(source);
-  const compressed = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+  const compressed = base64ToUint8Array(base64);
   return await decompress(compressed);
 }
 

@@ -8,30 +8,43 @@ $themeVars: ();
 }
 
 $backgroundColor-ContentSeparator: createThemeVar("backgroundColor-ContentSeparator");
-$size-ContentSeparator: createThemeVar("size-ContentSeparator");
+$thickness-ContentSeparator: createThemeVar("thickness-ContentSeparator");
+$length-ContentSeparator: createThemeVar("length-ContentSeparator");
 $marginTop-ContentSeparator: createThemeVar("marginTop-ContentSeparator");
 $marginBottom-ContentSeparator: createThemeVar("marginBottom-ContentSeparator");
 $marginVertical-ContentSeparator: createThemeVar("marginVertical-ContentSeparator");
 $marginLeft-ContentSeparator: createThemeVar("marginLeft-ContentSeparator");
 $marginRight-ContentSeparator: createThemeVar("marginRight-ContentSeparator");
 $marginHorizontal-ContentSeparator: createThemeVar("marginHorizontal-ContentSeparator");
+$paddingTop-ContentSeparator: createThemeVar("paddingTop-ContentSeparator");
+$paddingBottom-ContentSeparator: createThemeVar("paddingBottom-ContentSeparator");
+$paddingVertical-ContentSeparator: createThemeVar("paddingVertical-ContentSeparator");
+$paddingLeft-ContentSeparator: createThemeVar("paddingLeft-ContentSeparator");
+$paddingRight-ContentSeparator: createThemeVar("paddingRight-ContentSeparator");
+$paddingHorizontal-ContentSeparator: createThemeVar("paddingHorizontal-ContentSeparator");
 
 @layer components {
   .separator {
+    box-sizing: border-box;
     background-color: $backgroundColor-ContentSeparator;
+    background-clip: content-box;
     margin-top: t.createVarWithDefault("marginTop-ContentSeparator", #{$marginVertical-ContentSeparator});
     margin-bottom: t.createVarWithDefault("marginBottom-ContentSeparator", #{$marginVertical-ContentSeparator});
     margin-left: t.createVarWithDefault("marginLeft-ContentSeparator", #{$marginHorizontal-ContentSeparator});
     margin-right: t.createVarWithDefault("marginRight-ContentSeparator", #{$marginHorizontal-ContentSeparator});
+    padding-top: t.createVarWithDefault("paddingTop-ContentSeparator", #{$paddingVertical-ContentSeparator});
+    padding-bottom: t.createVarWithDefault("paddingBottom-ContentSeparator", #{$paddingVertical-ContentSeparator});
+    padding-left: t.createVarWithDefault("paddingLeft-ContentSeparator", #{$paddingHorizontal-ContentSeparator});
+    padding-right: t.createVarWithDefault("paddingRight-ContentSeparator", #{$paddingHorizontal-ContentSeparator});
 
     &.horizontal {
-      height: $size-ContentSeparator;
-      width: 100%;
+      height: $thickness-ContentSeparator;
+      width: $length-ContentSeparator;
     }
 
     &.vertical {
-      width: $size-ContentSeparator;
-      min-height: 100%;
+      width: $thickness-ContentSeparator;
+      height: $length-ContentSeparator;
     }
   }
 }

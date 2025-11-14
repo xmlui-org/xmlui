@@ -1,7 +1,8 @@
 import { describe, expect, it, assert } from "vitest";
 
+import type {
+  ArrowExpressionStatement} from "../../../src/components-core/script-runner/ScriptingSourceTree";
 import {
-  ArrowExpressionStatement,
   T_ARROW_EXPRESSION,
   T_ARROW_EXPRESSION_STATEMENT,
   T_EXPRESSION_STATEMENT,

@@ -35,6 +35,137 @@ $marginLeft-Admonition-content: createThemeVar("marginLeft-Admonition-content");
 $marginTop-HtmlVideo: createThemeVar("marginTop-HtmlVideo");
 $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
 
+// Variables for @layer section - Text-markdown
+$marginTop-Text-markdown: createThemeVar("marginTop-Text-markdown");
+$marginBottom-Text-markdown: createThemeVar("marginBottom-Text-markdown");
+$marginLeft-Text-markdown: createThemeVar("marginLeft-Text-markdown");
+$marginRight-Text-markdown: createThemeVar("marginRight-Text-markdown");
+
+// Variables for @layer section - Heading margins in markdown
+$marginTop-H1-markdown: createThemeVar("marginTop-H1-markdown");
+$marginBottom-H1-markdown: createThemeVar("marginBottom-H1-markdown");
+$fontSize-H1-markdown: createThemeVar("fontSize-H1-markdown");
+$marginTop-H2-markdown: createThemeVar("marginTop-H2-markdown");
+$marginBottom-H2-markdown: createThemeVar("marginBottom-H2-markdown");
+$marginTop-H3-markdown: createThemeVar("marginTop-H3-markdown");
+$marginBottom-H3-markdown: createThemeVar("marginBottom-H3-markdown");
+$marginTop-H4-markdown: createThemeVar("marginTop-H4-markdown");
+$marginBottom-H4-markdown: createThemeVar("marginBottom-H4-markdown");
+$marginTop-H5-markdown: createThemeVar("marginTop-H5-markdown");
+$marginBottom-H5-markdown: createThemeVar("marginBottom-H5-markdown");
+$marginTop-H6-markdown: createThemeVar("marginTop-H6-markdown");
+$marginBottom-H6-markdown: createThemeVar("marginBottom-H6-markdown");
+
+// Variables for @layer section - Image in markdown
+$marginTop-Image-markdown: createThemeVar("marginTop-Image-markdown");
+$marginBottom-Image-markdown: createThemeVar("marginBottom-Image-markdown");
+$marginLeft-Image-markdown: createThemeVar("marginLeft-Image-markdown");
+$marginRight-Image-markdown: createThemeVar("marginRight-Image-markdown");
+
+// Variables for @layer section - Admonition variants
+$backgroundColor-Admonition-info: createThemeVar("backgroundColor-Admonition-info");
+$borderColor-Admonition-info: createThemeVar("borderColor-Admonition-info");
+$backgroundColor-Admonition-warning: createThemeVar("backgroundColor-Admonition-warning");
+$borderColor-Admonition-warning: createThemeVar("borderColor-Admonition-warning");
+$backgroundColor-Admonition-danger: createThemeVar("backgroundColor-Admonition-danger");
+$borderColor-Admonition-danger: createThemeVar("borderColor-Admonition-danger");
+$backgroundColor-Admonition-note: createThemeVar("backgroundColor-Admonition-note");
+$borderColor-Admonition-note: createThemeVar("borderColor-Admonition-note");
+$backgroundColor-Admonition-tip: createThemeVar("backgroundColor-Admonition-tip");
+$borderColor-Admonition-tip: createThemeVar("borderColor-Admonition-tip");
+
+// Variables for @layer section - HorizontalRule
+$borderColor-HorizontalRule: createThemeVar("borderColor-HorizontalRule");
+$borderStyle-HorizontalRule: createThemeVar("borderStyle-HorizontalRule");
+$borderWidth-HorizontalRule: createThemeVar("borderWidth-HorizontalRule");
+
+// --- HTML Tags variables (formerly from HtmlTags.module.scss)
+
+// --- Table
+$textColor-HtmlTable: createThemeVar("textColor-HtmlTable");
+$backgroundColor-HtmlTable: createThemeVar("backgroundColor-HtmlTable");
+$fontFamily-HtmlTable: createThemeVar("fontFamily-HtmlTable");
+$fontSize-HtmlTable: createThemeVar("fontSize-HtmlTable");
+$fontWeight-HtmlTable: createThemeVar("fontWeight-HtmlTable");
+$textTransform-HtmlTable: createThemeVar("textTransform-HtmlTable");
+$marginTop-HtmlTable: createThemeVar("marginTop-HtmlTable");
+$marginBottom-HtmlTable: createThemeVar("marginBottom-HtmlTable");
+$width-HtmlTable: createThemeVar("width-HtmlTable");
+$themeVars: t.composeBorderVars($themeVars, "HtmlTable");
+$themeVars: t.composePaddingVars($themeVars, "HtmlTable");
+
+// --- thead
+$backgroundColor-HtmlThead: createThemeVar("backgroundColor-HtmlThead");
+$textColor-HtmlThead: createThemeVar("textColor-HtmlThead");
+$fontWeight-HtmlThead: createThemeVar("fontWeight-HtmlThead");
+$fontSize-HtmlThead: createThemeVar("fontSize-HtmlThead");
+$textTransform-HtmlThead: createThemeVar("textTransform-HtmlThead");
+$themeVars: t.composeBorderVars($themeVars, "HtmlThead");
+$themeVars: t.composePaddingVars($themeVars, "HtmlThead");
+
+// --- tbody
+$backgroundColor-HtmlTbody: createThemeVar("backgroundColor-HtmlTbody");
+$textColor-HtmlTbody: createThemeVar("textColor-HtmlTbody");
+$textAlign-HtmlTbody: createThemeVar("textAlign-HtmlTbody");
+$verticalAlignment-HtmlTbody: createThemeVar("verticalAlignment-HtmlTbody");
+$textTransform-HtmlTbody: createThemeVar("textTransform-HtmlTbody");
+
+// --- tfoot
+$backgroundColor-HtmlTfoot: createThemeVar("backgroundColor-HtmlTfoot");
+$textColor-HtmlTfoot: createThemeVar("textColor-HtmlTfoot");
+
+// --- th
+$backgroundColor-HtmlTh: createThemeVar("backgroundColor-HtmlTh");
+$textColor-HtmlTh: createThemeVar("textColor-HtmlTh");
+$fontWeight-HtmlTh: createThemeVar("fontWeight-HtmlTh");
+$fontSize-HtmlTh: createThemeVar("fontSize-HtmlTh");
+$backgroundColor-HtmlTh--hover: createThemeVar("backgroundColor-HtmlTh--hover");
+$themeVars: t.composeBorderVars($themeVars, "HtmlTh");
+$themeVars: t.composePaddingVars($themeVars, "HtmlTh");
+
+// --- tr
+$backgroundColor-HtmlTr: createThemeVar("backgroundColor-HtmlTr");
+$backgroundColor-HtmlTr--hover: createThemeVar("backgroundColor-HtmlTr--hover");
+$backgroundColor-even-HtmlTr: createThemeVar("backgroundColor-even-HtmlTr");
+$textColor-HtmlTr: createThemeVar("textColor-HtmlTr");
+$textColor-HtmlTr--hover: createThemeVar("textColor-HtmlTr--hover");
+$fontSize-HtmlTr: createThemeVar("fontSize-HtmlTr");
+$fontWeight-HtmlTr: createThemeVar("fontWeight-HtmlTr");
+$themeVars: t.composeBorderVars($themeVars, "HtmlTr");
+
+// --- td
+$backgroundColor-HtmlTd: createThemeVar("backgroundColor-HtmlTd");
+$text-align-HtmlTd: createThemeVar("text-align-HtmlTd");
+$verticalAlignment-HtmlTd: createThemeVar("verticalAlignment-HtmlTd");
+$fontSize-HtmlTd: createThemeVar("fontSize-HtmlTd");
+$fontWeight-HtmlTd: createThemeVar("fontWeight-HtmlTd");
+$themeVars: t.composeBorderVars($themeVars, "HtmlTd");
+$themeVars: t.composePaddingVars($themeVars, "HtmlTd");
+
+// --- List styling (for both ul and ol)
+$themeVars: t.composeBorderVars($themeVars, "HtmlOl");
+$themeVars: t.composePaddingVars($themeVars, "HtmlOl");
+$marginTop-HtmlOl: createThemeVar("marginTop-HtmlOl");
+$marginBottom-HtmlOl: createThemeVar("marginBottom-HtmlOl");
+
+$themeVars: t.composeBorderVars($themeVars, "HtmlUl");
+$themeVars: t.composePaddingVars($themeVars, "HtmlUl");
+$marginTop-HtmlUl: createThemeVar("marginTop-HtmlUl");
+$marginBottom-HtmlUl: createThemeVar("marginBottom-HtmlUl");
+
+$themeVars: t.composeBorderVars($themeVars, "HtmlLi");
+$themeVars: t.composePaddingVars($themeVars, "HtmlLi");
+$marginLeft-HtmlLi: createThemeVar("marginLeft-HtmlLi");
+$marginTop-HtmlLi: createThemeVar("marginTop-HtmlLi");
+$marginBottom-HtmlLi: createThemeVar("marginBottom-HtmlLi");
+$listStyleType-HtmlLi: createThemeVar("listStyleType-HtmlLi");
+
+// --- Details
+$themeVars: t.composeBorderVars($themeVars, "HtmlDetails");
+$themeVars: t.composePaddingVars($themeVars, "HtmlDetails");
+$marginTop-HtmlDetails: createThemeVar("marginTop-HtmlDetails");
+$marginBottom-HtmlDetails: createThemeVar("marginBottom-HtmlDetails");
+
 @layer components {
   .markdownContent {
     padding-top: $paddingTop-MarkDown;
@@ -42,7 +173,31 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
     background-color: $backgroundColor-MarkDown;
     min-width: 0;
     width: 100%;
+    overflow-wrap: break-word;
     @include t.textVars($themeVars, "Text");
+
+    // Force word breaking ONLY for inline code elements (not code blocks)
+    // Code blocks are wrapped in <pre><code>, so we exclude those
+    code:not(pre code) {
+      overflow-wrap: break-word !important;
+      word-break: break-word !important;
+      white-space: normal !important;
+      overflow: visible !important;
+      text-overflow: clip !important;
+    }
+
+    // Override Text component's overflow: hidden for markdown text
+    :global([class*="text_"]) {
+      overflow: visible !important;
+      overflow-wrap: break-word !important;
+    }
+    
+    // But don't break words in table cells
+    .htmlTh :global([class*="text_"]),
+    .htmlTd :global([class*="text_"]) {
+      overflow-wrap: normal !important;
+      word-break: normal !important;
+    }
 
     .markdown {
       $component: "Text";
@@ -53,52 +208,52 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
       @include t.paddingVars($themeVars, $variantName);
       @include t.borderVars($themeVars, $variantName);
       @include t.textVars($themeVars, $variantName);
-      margin-top: createThemeVar("marginTop-#{$variantName}");
-      margin-bottom: createThemeVar("marginBottom-#{$variantName}");
-      margin-left: createThemeVar("marginLeft-#{$variantName}");
-      margin-right: createThemeVar("marginRight-#{$variantName}");
+      margin-top: $marginTop-Text-markdown;
+      margin-bottom: $marginBottom-Text-markdown;
+      margin-left: $marginLeft-Text-markdown;
+      margin-right: $marginRight-Text-markdown;
       overflow: visible;
       display: block;
     }
 
     // --- Additional Heading styles
     h1 {
-      margin-top: createThemeVar("marginTop-H1-markdown") !important;
-      margin-bottom: createThemeVar("marginBottom-H1-markdown") !important;
-      font-size: createThemeVar("fontSize-H1-markdown") !important;
+      margin-top: $marginTop-H1-markdown !important;
+      margin-bottom: $marginBottom-H1-markdown !important;
+      font-size: $fontSize-H1-markdown !important;
     }
 
     h2 {
-      margin-top: createThemeVar("marginTop-H2-markdown") !important;
-      margin-bottom: createThemeVar("marginBottom-H2-markdown") !important;
+      margin-top: $marginTop-H2-markdown !important;
+      margin-bottom: $marginBottom-H2-markdown !important;
     }
 
     h3 {
-      margin-top: createThemeVar("marginTop-H3-markdown") !important;
-      margin-bottom: createThemeVar("marginBottom-H3-markdown") !important;
+      margin-top: $marginTop-H3-markdown !important;
+      margin-bottom: $marginBottom-H3-markdown !important;
     }
 
     h4 {
-      margin-top: createThemeVar("marginTop-H4-markdown") !important;
-      margin-bottom: createThemeVar("marginBottom-H4-markdown") !important;
+      margin-top: $marginTop-H4-markdown !important;
+      margin-bottom: $marginBottom-H4-markdown !important;
     }
 
     h5 {
-      margin-top: createThemeVar("marginTop-H5-markdown") !important;
-      margin-bottom: createThemeVar("marginBottom-H5-markdown") !important;
+      margin-top: $marginTop-H5-markdown !important;
+      margin-bottom: $marginBottom-H5-markdown !important;
     }
 
     h6 {
-      margin-top: createThemeVar("marginTop-H6-markdown") !important;
-      margin-bottom: createThemeVar("marginBottom-H6-markdown") !important;
+      margin-top: $marginTop-H6-markdown !important;
+      margin-bottom: $marginBottom-H6-markdown !important;
     }
 
     // --- Image
     .block {
-      margin-top: createThemeVar("marginTop-Image-markdown");
-      margin-bottom: createThemeVar("marginBottom-Image-markdown");
-      margin-left: createThemeVar("marginLeft-Image-markdown");
-      margin-right: createThemeVar("marginRight-Image-markdown");
+      margin-top: $marginTop-Image-markdown;
+      margin-bottom: $marginBottom-Image-markdown;
+      margin-left: $marginLeft-Image-markdown;
+      margin-right: $marginRight-Image-markdown;
     }
 
     // --- Blockquote
@@ -135,24 +290,24 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
       @include t.paddingVars($themeVars, "Admonition");
 
       &.info {
-        background-color: createThemeVar("backgroundColor-Admonition-info");
-        border-color: createThemeVar("borderColor-Admonition-info");
+        background-color: $backgroundColor-Admonition-info;
+        border-color: $borderColor-Admonition-info;
       }
       &.warning {
-        background-color: createThemeVar("backgroundColor-Admonition-warning");
-        border-color: createThemeVar("borderColor-Admonition-warning");
+        background-color: $backgroundColor-Admonition-warning;
+        border-color: $borderColor-Admonition-warning;
       }
       &.danger {
-        background-color: createThemeVar("backgroundColor-Admonition-danger");
-        border-color: createThemeVar("borderColor-Admonition-danger");
+        background-color: $backgroundColor-Admonition-danger;
+        border-color: $borderColor-Admonition-danger;
       }
       &.note {
-        background-color: createThemeVar("backgroundColor-Admonition-note");
-        border-color: createThemeVar("borderColor-Admonition-note");
+        background-color: $backgroundColor-Admonition-note;
+        border-color: $borderColor-Admonition-note;
       }
       &.tip {
-        background-color: createThemeVar("backgroundColor-Admonition-tip");
-        border-color: createThemeVar("borderColor-Admonition-tip");
+        background-color: $backgroundColor-Admonition-tip;
+        border-color: $borderColor-Admonition-tip;
       }
     }
 
@@ -185,9 +340,9 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
     }
 
     .horizontalRule {
-      border-top-color: createThemeVar("borderColor-HorizontalRule");
-      border-top-style: createThemeVar("borderStyle-HorizontalRule");
-      border-top-width: createThemeVar("borderWidth-HorizontalRule");
+      border-top-color: $borderColor-HorizontalRule;
+      border-top-style: $borderStyle-HorizontalRule;
+      border-top-width: $borderWidth-HorizontalRule;
     }
 
     li:has(> input[type="checkbox"]),
@@ -235,6 +390,148 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
       :global(.content) {
         padding: 0 1rem 0.5rem 1rem;
       }
+    }
+
+    // --- HTML Tags styles (formerly from HtmlTags.module.scss)
+
+    // --- Table
+    .htmlTable {
+      background-color: $backgroundColor-HtmlTable;
+      color: $textColor-HtmlTable;
+      font-family: $fontFamily-HtmlTable;
+      font-size: $fontSize-HtmlTable;
+      font-weight: $fontWeight-HtmlTable;
+      text-transform: $textTransform-HtmlTable;
+      margin-top: $marginTop-HtmlTable;
+      margin-bottom: $marginBottom-HtmlTable;
+      width: $width-HtmlTable;
+      @include t.borderVars($themeVars, "HtmlTable");
+      @include t.paddingVars($themeVars, "HtmlTable");
+    }
+
+    // --- thead
+    .htmlThead {
+      background-color: $backgroundColor-HtmlThead;
+      color: $textColor-HtmlThead;
+      font-weight: $fontWeight-HtmlThead;
+      font-size: $fontSize-HtmlThead;
+      text-transform: $textTransform-HtmlThead;
+      @include t.borderVars($themeVars, "HtmlThead");
+      @include t.paddingVars($themeVars, "HtmlThead");
+    }
+
+    // --- tbody
+    .htmlTbody {
+      background-color: $backgroundColor-HtmlTbody;
+      color: $textColor-HtmlTbody;
+      text-align: $textAlign-HtmlTbody;
+      vertical-align: $verticalAlignment-HtmlTbody;
+      text-transform: $textTransform-HtmlTbody;
+    }
+
+    // --- tfoot
+    .htmlTfoot {
+      background-color: $backgroundColor-HtmlTfoot;
+      color: $textColor-HtmlTfoot;
+    }
+
+    // --- th
+    .htmlTh {
+      background-color: $backgroundColor-HtmlTh;
+      color: $textColor-HtmlTh;
+      font-weight: $fontWeight-HtmlTh;
+      font-size: $fontSize-HtmlTh;
+      @include t.borderVars($themeVars, "HtmlTh");
+      @include t.paddingVars($themeVars, "HtmlTh");
+      
+      // Allow wrapping at word boundaries (spaces) and hyphens, but never break within words
+      white-space: normal;
+      word-break: normal !important;
+      overflow-wrap: normal !important;
+      word-wrap: normal !important;
+
+      &:hover {
+        background-color: $backgroundColor-HtmlTh--hover;
+      }
+    }
+
+    // --- tr
+    .htmlTr {
+      background-color: $backgroundColor-HtmlTr;
+      color: $textColor-HtmlTr;
+      font-weight: $fontWeight-HtmlTr;
+      font-size: $fontSize-HtmlTr;
+      @include t.borderVars($themeVars, "HtmlTr");
+
+      &:nth-child(even) {
+        background-color: $backgroundColor-even-HtmlTr;
+      }
+
+      // Apply hover effect for rows with mixed th, td elements
+      &:hover {
+        background-color: $backgroundColor-HtmlTr--hover;
+        color: $textColor-HtmlTr--hover;
+      }
+
+      // Remove hover effect for rows with only th elements
+      &:hover:not(:has(:not(th))) {
+        background-color: initial;
+      }
+    }
+
+    // --- td
+    .htmlTd {
+      background-color: $backgroundColor-HtmlTd;
+      text-align: $text-align-HtmlTd;
+      vertical-align: $verticalAlignment-HtmlTd;
+      font-size: $fontSize-HtmlTd;
+      font-weight: $fontWeight-HtmlTd;
+      @include t.borderVars($themeVars, "HtmlTd");
+      @include t.paddingVars($themeVars, "HtmlTd");
+      
+      // Allow wrapping at word boundaries (spaces) and hyphens, but never break within words
+      white-space: normal;
+      word-break: normal !important;
+      overflow-wrap: normal !important;
+      word-wrap: normal !important;
+    }
+
+    // --- Lists
+    .htmlUl {
+      margin-top: $marginTop-HtmlUl;
+      margin-bottom: $marginBottom-HtmlUl;
+      @include t.borderVars($themeVars, "HtmlUl");
+      @include t.paddingVars($themeVars, "HtmlUl");
+    }
+
+    .htmlOl {
+      margin-top: $marginTop-HtmlOl;
+      margin-bottom: $marginBottom-HtmlOl;
+      @include t.borderVars($themeVars, "HtmlOl");
+      @include t.paddingVars($themeVars, "HtmlOl");
+    }
+
+    .htmlLi {
+      margin-top: $marginTop-HtmlLi;
+      margin-bottom: $marginBottom-HtmlLi;
+      list-style-type: $listStyleType-HtmlLi;
+      margin-left: $marginLeft-HtmlLi;
+      @include t.borderVars($themeVars, "HtmlLi");
+      @include t.paddingVars($themeVars, "HtmlLi");
+    }
+
+    // --- Video
+    .htmlVideo {
+      margin-top: $marginTop-HtmlVideo;
+      margin-bottom: $marginBottom-HtmlVideo;
+    }
+
+    // --- Details
+    .htmlDetails {
+      margin-top: $marginTop-HtmlDetails;
+      margin-bottom: $marginBottom-HtmlDetails;
+      @include t.borderVars($themeVars, "HtmlDetails");
+      @include t.paddingVars($themeVars, "HtmlDetails");
     }
   }
 

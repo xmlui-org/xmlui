@@ -17,10 +17,6 @@ import classnames from "classnames";
 import { Button } from "../components/Button/ButtonNative";
 import styles from "./InspectorButton.module.scss";
 import type { ProjectCompilation } from "../abstractions/scripting/Compilation";
-import { InspectorDialog } from "./devtools/InspectorDialog";
-import AppWithCodeViewNative from "../components/NestedApp/AppWithCodeViewNative";
-import { XmlUiHelper } from "../parsers/xmlui-parser";
-import { useAppContext } from "./AppContext";
 
 // --- The context object that is used to store the inspector information.
 interface IInspectorContext {

@@ -10,27 +10,131 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByTestId("app")).toBeVisible();
   });
 
-  test("renders with different layout types", async ({ initTestBed, page }) => {
-    await initTestBed(`<App layout="horizontal" testId="app"/>`);
-    await expect(page.getByTestId("app")).toBeVisible();
+  test("renders with horizontal layout", async ({ initTestBed, page }) => {
+    await initTestBed(`<App layout="horizontal">test text</App>`);
+    await expect(page.getByText("test text")).toBeVisible();
+  });
 
-    await initTestBed(`<App layout="horizontal-sticky" testId="app"/>`);
-    await expect(page.getByTestId("app")).toBeVisible();
+  test("renders with horizontal-sticky layout", async ({ initTestBed, page }) => {
+    await initTestBed(`<App layout="horizontal-sticky">test text</App>`);
+    await expect(page.getByText("test text")).toBeVisible();
+  });
 
-    await initTestBed(`<App layout="condensed" testId="app"/>`);
-    await expect(page.getByTestId("app")).toBeVisible();
+  test("renders with condensed layout", async ({ initTestBed, page }) => {
+    await initTestBed(`<App layout="condensed">test text</App>`);
+    await expect(page.getByText("test text")).toBeVisible();
+  });
 
-    await initTestBed(`<App layout="condensed-sticky" testId="app"/>`);
-    await expect(page.getByTestId("app")).toBeVisible();
+  test("renders with condensed-sticky layout", async ({ initTestBed, page }) => {
+    await initTestBed(`<App layout="condensed-sticky">test text</App>`);
+    await expect(page.getByText("test text")).toBeVisible();
+  });
 
-    await initTestBed(`<App layout="vertical" testId="app"/>`);
-    await expect(page.getByTestId("app")).toBeVisible();
+  test("renders with vertical layout", async ({ initTestBed, page }) => {
+    await initTestBed(`<App layout="vertical">test text</App>`);
+    await expect(page.getByText("test text")).toBeVisible();
+  });
 
-    await initTestBed(`<App layout="vertical-sticky" testId="app"/>`);
-    await expect(page.getByTestId("app")).toBeVisible();
+  test("renders with vertical-sticky layout", async ({ initTestBed, page }) => {
+    await initTestBed(`<App layout="vertical-sticky">test text</App>`);
+    await expect(page.getByText("test text")).toBeVisible();
+  });
 
-    await initTestBed(`<App layout="vertical-full-header" testId="app"/>`);
+  test("renders with vertical-full-header layout", async ({ initTestBed, page }) => {
+    await initTestBed(`<App layout="vertical-full-header">test text</App>`);
+    await expect(page.getByText("test text")).toBeVisible();
+  });
+
+  test("renders with desktop layout", async ({ initTestBed, page }) => {
+    await initTestBed(`<App layout="desktop">test text</App>`);
+    await expect(page.getByText("test text")).toBeVisible();
+  });
+
+  test("desktop layout fills viewport dimensions", async ({ initTestBed, page }) => {
+    await initTestBed(`<App layout="desktop" testId="app">test content</App>`);
+    
+    const app = page.getByTestId("app");
+    await expect(app).toBeVisible();
+    await expect(app).toHaveClass(/desktop/);
+  });
+
+  test("desktop layout renders with header and footer", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App layout="desktop" testId="app">
+        <AppHeader testId="header">
+          <property name="logoTemplate">
+            <Text value="Desktop App" />
+          </property>
+        </AppHeader>
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Text testId="main-content">Main Content</Text>
+          </Page>
+        </Pages>
+        <Footer testId="footer">Footer Content</Footer>
+      </App>
+    `);
+
     await expect(page.getByTestId("app")).toBeVisible();
+    await expect(page.getByTestId("header")).toBeVisible();
+    await expect(page.getByTestId("main-content")).toBeVisible();
+    await expect(page.getByTestId("footer")).toBeVisible();
+    await expect(page.getByText("Desktop App")).toBeVisible();
+    await expect(page.getByText("Footer Content")).toBeVisible();
+  });
+
+  test("desktop layout works without header", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App layout="desktop" testId="app">
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Text testId="content">Content without header</Text>
+          </Page>
+        </Pages>
+        <Footer testId="footer">Footer</Footer>
+      </App>
+    `);
+
+    await expect(page.getByTestId("app")).toBeVisible();
+    await expect(page.getByTestId("content")).toBeVisible();
+    await expect(page.getByTestId("footer")).toBeVisible();
+  });
+
+  test("desktop layout works without footer", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App layout="desktop" testId="app">
+        <AppHeader testId="header">
+          <property name="logoTemplate">
+            <Text value="Header Only" />
+          </property>
+        </AppHeader>
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Text testId="content">Content without footer</Text>
+          </Page>
+        </Pages>
+      </App>
+    `);
+
+    await expect(page.getByTestId("app")).toBeVisible();
+    await expect(page.getByTestId("header")).toBeVisible();
+    await expect(page.getByTestId("content")).toBeVisible();
+    await expect(page.getByText("Header Only")).toBeVisible();
+  });
+
+  test("desktop layout works with only content", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App layout="desktop" testId="app">
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Text testId="content">Content only</Text>
+          </Page>
+        </Pages>
+      </App>
+    `);
+
+    await expect(page.getByTestId("app")).toBeVisible();
+    await expect(page.getByTestId("content")).toBeVisible();
   });
 
   test("handles layout prop changes correctly", async ({
@@ -261,5 +365,262 @@ test.describe("Event Handling", () => {
 
     // Verify the complex data is received correctly
     await expect.poll(testStateDriver.testState).toEqual(testData);
+  });
+});
+
+// =============================================================================
+// Drawer HANDLING TESTS
+// =============================================================================
+
+test.describe("Drawer Handling", () => {
+  test("Drawer displayed if NavPanel has no 'when'", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Set small viewport to trigger drawer mode
+    await page.setViewportSize({ width: 400, height: 600 });
+
+    await initTestBed(`
+      <App layout="condensed">
+        <AppHeader testId="appHeader"/>
+        <NavPanel>
+          <NavGroup label="Pages">
+            <NavLink label="Page 1" to="/page1"/>
+            <NavLink label="Page 2" to="/page2"/>
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `);
+
+    // Open drawer by clicking hamburger button
+    const appHeader = page.getByTestId("appHeader");
+    const hamburgerButton = appHeader.locator('[data-part-id="hamburger"]').first();
+    await expect (hamburgerButton).toBeVisible();
+  });
+
+  test("Drawer displayed if NavPanel has when='true'", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Set small viewport to trigger drawer mode
+    await page.setViewportSize({ width: 400, height: 600 });
+
+    await initTestBed(`
+      <App layout="condensed">
+        <AppHeader testId="appHeader"/>
+        <NavPanel when="true">
+          <NavGroup label="Pages">
+            <NavLink label="Page 1" to="/page1"/>
+            <NavLink label="Page 2" to="/page2"/>
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `);
+
+    // Open drawer by clicking hamburger button
+    const appHeader = page.getByTestId("appHeader");
+    const hamburgerButton = appHeader.locator('[data-part-id="hamburger"]').first();
+    await expect (hamburgerButton).toBeVisible();
+  });
+
+  test("Drawer displayed if NavPanel has when='{true}'", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Set small viewport to trigger drawer mode
+    await page.setViewportSize({ width: 400, height: 600 });
+
+    await initTestBed(`
+      <App layout="condensed">
+        <AppHeader testId="appHeader"/>
+        <NavPanel when="{true}">
+          <NavGroup label="Pages">
+            <NavLink label="Page 1" to="/page1"/>
+            <NavLink label="Page 2" to="/page2"/>
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `);
+
+    // Open drawer by clicking hamburger button
+    const appHeader = page.getByTestId("appHeader");
+    const hamburgerButton = appHeader.locator('[data-part-id="hamburger"]').first();
+    await expect (hamburgerButton).toBeVisible();
+  });
+
+  test("Drawer not displayed if NavPanel has when='false'", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Set small viewport to trigger drawer mode
+    await page.setViewportSize({ width: 400, height: 600 });
+
+    await initTestBed(`
+      <App layout="condensed">
+        <AppHeader testId="appHeader"/>
+        <NavPanel when="false">
+          <NavGroup label="Pages">
+            <NavLink label="Page 1" to="/page1"/>
+            <NavLink label="Page 2" to="/page2"/>
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `);
+
+    // Open drawer by clicking hamburger button
+    const appHeader = page.getByTestId("appHeader");
+    const hamburgerButton = appHeader.locator('[data-part-id="hamburger"]').first();
+    await expect (hamburgerButton).not.toBeVisible();
+  });
+
+  test("Drawer not displayed if NavPanel has when='{false}'", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Set small viewport to trigger drawer mode
+    await page.setViewportSize({ width: 400, height: 600 });
+
+    await initTestBed(`
+      <App layout="condensed">
+        <AppHeader testId="appHeader"/>
+        <NavPanel when="{false}">
+          <NavGroup label="Pages">
+            <NavLink label="Page 1" to="/page1"/>
+            <NavLink label="Page 2" to="/page2"/>
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `);
+
+    // Open drawer by clicking hamburger button
+    const appHeader = page.getByTestId("appHeader");
+    const hamburgerButton = appHeader.locator('[data-part-id="hamburger"]').first();
+    await expect (hamburgerButton).not.toBeVisible();
+  });
+});
+
+// =============================================================================
+// DESKTOP LAYOUT SPECIFIC TESTS
+// =============================================================================
+
+test.describe("Desktop Layout", () => {
+  test("desktop layout applies nested-app class when used in NestedApp context", async ({ initTestBed, page }) => {
+    // Note: In actual nested context (playground), isNested would be true automatically
+    // This test verifies the class is applied when the condition is met
+    await initTestBed(`<App layout="desktop" testId="app">test content</App>`);
+    
+    const app = page.getByTestId("app");
+    await expect(app).toBeVisible();
+    await expect(app).toHaveClass(/desktop/);
+  });
+
+  test("desktop layout stretches content area vertically", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App layout="desktop" testId="app">
+        <AppHeader testId="header">Header</AppHeader>
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Text testId="content">Content that should stretch</Text>
+          </Page>
+        </Pages>
+        <Footer testId="footer">Footer</Footer>
+      </App>
+    `);
+
+    await expect(page.getByTestId("app")).toBeVisible();
+    await expect(page.getByTestId("header")).toBeVisible();
+    await expect(page.getByTestId("content")).toBeVisible();
+    await expect(page.getByTestId("footer")).toBeVisible();
+  });
+
+  test("desktop layout handles scrolling content", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App layout="desktop" testId="app">
+        <AppHeader testId="header">Header</AppHeader>
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <VStack testId="content" gap="4">
+              <Text value="Item 1" />
+              <Text value="Item 2" />
+              <Text value="Item 3" />
+              <Text value="Item 4" />
+              <Text value="Item 5" />
+            </VStack>
+          </Page>
+        </Pages>
+        <Footer testId="footer">Footer</Footer>
+      </App>
+    `);
+
+    await expect(page.getByTestId("app")).toBeVisible();
+    await expect(page.getByText("Item 1")).toBeVisible();
+    await expect(page.getByText("Item 5")).toBeVisible();
+  });
+
+  test("desktop layout ignores scrollWholePage property", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App layout="desktop" scrollWholePage="false" testId="app">
+        <Text testId="content">Content</Text>
+      </App>
+    `);
+
+    const app = page.getByTestId("app");
+    await expect(app).toBeVisible();
+    await expect(app).toHaveClass(/desktop/);
+    await expect(page.getByTestId("content")).toBeVisible();
+  });
+
+  test("desktop layout with NavPanel does not display navigation", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App layout="desktop" testId="app">
+        <AppHeader testId="header">Header</AppHeader>
+        <NavPanel testId="nav">
+          <NavLink label="Home" to="/" />
+          <NavLink label="About" to="/about" />
+        </NavPanel>
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Text testId="content">Home Page</Text>
+          </Page>
+        </Pages>
+        <Footer testId="footer">Footer</Footer>
+      </App>
+    `);
+
+    await expect(page.getByTestId("app")).toBeVisible();
+    await expect(page.getByTestId("header")).toBeVisible();
+    await expect(page.getByTestId("content")).toBeVisible();
+    await expect(page.getByTestId("footer")).toBeVisible();
+    
+    // NavPanel should not be visible in desktop layout
+    // (it's designed for full-screen apps without navigation panels)
+    await expect(page.getByTestId("nav")).not.toBeVisible();
+  });
+
+  test("desktop layout switches from other layout correctly", async ({ initTestBed, page, createButtonDriver }) => {
+    await initTestBed(`
+      <App var.currentLayout="horizontal" layout="{currentLayout}" testId="app">
+        <AppHeader testId="header">Header</AppHeader>
+        <Button testId="switchBtn" label="Switch to Desktop" onClick="currentLayout = 'desktop'" />
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Text testId="content">Content</Text>
+          </Page>
+        </Pages>
+        <Footer testId="footer">Footer</Footer>
+      </App>
+    `);
+
+    const app = page.getByTestId("app");
+    const buttonDriver = await createButtonDriver("switchBtn");
+
+    // Initially horizontal layout
+    await expect(app).toHaveClass(/horizontal/);
+    await expect(app).not.toHaveClass(/desktop/);
+
+    // Switch to desktop layout
+    await buttonDriver.click();
+    await expect(app).toHaveClass(/desktop/);
+    await expect(app).not.toHaveClass(/horizontal/);
   });
 });

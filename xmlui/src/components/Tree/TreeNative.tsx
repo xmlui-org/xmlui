@@ -453,7 +453,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       // Return empty data on error to prevent crashes
       return emptyTreeData;
     }
-  }, [effectiveData, dataFormat, fieldConfig, dataRevision]);
+  }, [effectiveData, dataFormat, fieldConfig]);
 
   const { treeData, treeItemsById } = transformedData;
 

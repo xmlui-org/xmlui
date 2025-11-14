@@ -4,6 +4,7 @@ import Icon from "../Icon/IconNative";
 import { Toggle } from "../Toggle/Toggle";
 import styles from "./ToneSwitch.module.scss";
 import classnames from "classnames";
+import { noop } from "../../components-core/constants";
 
 // Default icons for light and dark modes
 const DEFAULT_LIGHT_ICON = "sun";
@@ -22,23 +23,34 @@ export type ToneSwitchProps = {
    */
   iconDark?: string;
   className?: string;
+  onChange?: (tone: "light" | "dark") => void;
 };
 
-export const ToneSwitch = forwardRef<HTMLDivElement, ToneSwitchProps>(function ToneSwitch({
-  iconLight = DEFAULT_LIGHT_ICON,
-  iconDark = DEFAULT_DARK_ICON,
-  className,
-  ...rest
-}: ToneSwitchProps, ref) {
+export const ToneSwitch = forwardRef<HTMLDivElement, ToneSwitchProps>(function ToneSwitch(
+  {
+    iconLight = DEFAULT_LIGHT_ICON,
+    iconDark = DEFAULT_DARK_ICON,
+    className,
+    onChange = noop,
+    ...rest
+  }: ToneSwitchProps,
+  ref,
+) {
   const { activeThemeTone, setActiveThemeTone } = useThemes();
   //console.log('ToneSwitch render - activeThemeTone:', activeThemeTone); // Debug log
 
   const handleChange = (isDark: boolean) => {
     setActiveThemeTone(isDark ? "dark" : "light");
+    onChange?.(isDark ? "dark" : "light");
   };
 
   return (
-    <div {...rest} ref={ref} style={{ width: "fit-content", display: "inline-block" }} className={className}>
+    <div
+      {...rest}
+      ref={ref}
+      style={{ width: "fit-content", display: "inline-block" }}
+      className={className}
+    >
       <Toggle
         value={activeThemeTone === "dark"}
         onDidChange={handleChange}

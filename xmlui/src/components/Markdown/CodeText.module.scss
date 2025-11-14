@@ -59,18 +59,20 @@ $component: "Text";
 
     // TEMP: experimental - may be removed
     &.codefence:has(> code > span) {
-      padding-inline: 0;
+      padding-left: 0;
+      padding-right: 0;
     }
     &.codefence > code > span:not([class*="numbered"]) {
-      padding-inline: t.$space-3;
+      padding-left: t.$space-3;
     }
 
     &.codefence > code {
       font-family: createThemeVar("fontFamily-#{$component}-codefence");
-      //white-space: pre-wrap;
-      font-family: createThemeVar("fontFamily-#{$component}-codefence");
-      //display: inline-block;
-      width: 100%;
+      padding-left: 0;
+      padding-right: t.$space-3;
+      display: inline-block;
+      min-width: 100%;
+      box-sizing: border-box;
     }
 
     &.codefence > code::before {

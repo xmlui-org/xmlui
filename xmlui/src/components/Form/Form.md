@@ -12,7 +12,9 @@ See [this guide](/forms) for details.
 
 %-CONTEXT_VAR-START $data
 
-The following sample demonstrates enabling a field according to another's current value.
+The following sample demonstrates enabling a field based on another field's current value.
+
+`$data` is also available in these event handlers: `willSubmit`, `submit`, `cancel`, `reset`, and `success`.
 
 ```xmlui-pg copy {5} display name="Example: referencing field values"
 <App>
@@ -65,6 +67,32 @@ This example mimics a one-second search and turns off the submit button during t
 <App>
   <Form padding="0.5rem"
     data="{{ name: 'Joe', age: 43 }}"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FlowLayout columnGap="12px" paddingBottom="6px">
+      <FormItem bindTo="name" label="Customer name" width="50%" />
+      <FormItem bindTo="age" label="Age" type="integer" width="50%"
+        zeroOrPositive="true" />
+    </FlowLayout>
+  </Form>
+</App>  
+```
+
+%-EVENT-END
+
+%-EVENT-START willSubmit
+
+The following example allows saving customer data only when the age is an even number. The `willSubmit` event handler returns `false` if this condition is not met.
+
+```xmlui-pg display copy {4-9} name="Example: willSubmit"
+<App>
+  <Form padding="0.5rem"
+    data="{{ name: 'Joe', age: 43 }}"
+    onWillSubmit="(toSubmit) => {
+      if (toSubmit.age % 2) {
+        toast.error('Age must be an even number');
+        return false;
+      }
+    }"
     onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FlowLayout columnGap="12px" paddingBottom="6px">
       <FormItem bindTo="name" label="Customer name" width="50%" />

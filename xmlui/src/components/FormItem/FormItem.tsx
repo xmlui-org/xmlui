@@ -40,9 +40,8 @@ export const FormItemMd = createMetadata({
     "`FormItem` wraps individual input controls within a `Form`, providing data " +
     "binding, validation, labeling, and layout functionality. It connects form " +
     "controls to the parent form's data model and handles validation feedback " +
-    "automatically." +
-    "\n\n" +
-    "> **Note:** `FormItem` must be used inside a `Form` component.",
+    "automatically. " + 
+    "**Note:** `FormItem` must be used inside a `Form` component.",
   props: {
     bindTo: {
       description:
@@ -188,6 +187,15 @@ export const FormItemMd = createMetadata({
       valueType: "string",
       defaultValue: defaultProps.gap,
     },
+    noSubmit: {
+      description:
+        "When set to `true`, the field will not be included in the form's submitted data. " +
+        "This is useful for fields that should be present in the form but not submitted, " +
+        "similar to hidden fields. If multiple FormItems reference the same `bindTo` value " +
+        "and any of them has `noSubmit` set to `true`, the field will NOT be submitted.",
+      type: "boolean",
+      defaultValue: defaultProps.noSubmit,
+    },
   },
   events: {
     validate: d(`This event is used to define a custom validation function.`),
@@ -270,6 +278,7 @@ export const formItemComponentRenderer = createComponentRenderer(
       validationMode,
       maxTextLength,
       gap,
+      noSubmit,
       ...rest
     } = node.props;
 
@@ -318,6 +327,7 @@ export const formItemComponentRenderer = createComponentRenderer(
         maxTextLength={extractValue(maxTextLength)}
         itemIndex={extractValue("{$itemIndex}")}
         initialValue={extractValue(node.props.initialValue)}
+        noSubmit={extractValue.asOptionalBoolean(noSubmit)}
         inputRenderer={
           inputTemplate
             ? (contextVars) => (

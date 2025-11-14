@@ -80,7 +80,7 @@ import { footerRenderer } from "./Footer/Footer";
 import { navGroupComponentRenderer } from "./NavGroup/NavGroup";
 import { logoComponentRenderer } from "./Logo/Logo";
 import { radioGroupRenderer } from "./RadioGroup/RadioGroup";
-import { radioItemComponentRenderer} from "./RadioGroup/RadioItem";
+import { radioItemComponentRenderer } from "./RadioGroup/RadioItem";
 import { SlotHolder } from "./Slot/Slot";
 import { fileInputRenderer } from "./FileInput/FileInput";
 import { spinnerComponentRenderer } from "./Spinner/Spinner";
@@ -108,7 +108,12 @@ import { downloadAction } from "../components-core/action/FileDownloadAction";
 import { uploadAction } from "../components-core/action/FileUploadAction";
 import { navigateAction } from "../components-core/action/NavigateAction";
 import { timedAction } from "../components-core/action/TimedAction";
-import { tooltipBehavior, animationBehavior, labelBehavior } from "../components-core/behaviors/CoreBehaviors";
+import {
+  tooltipBehavior,
+  animationBehavior,
+  labelBehavior,
+  variantBehavior,
+} from "../components-core/behaviors/CoreBehaviors";
 import type {
   LoaderRenderer,
   LoaderRendererDef,
@@ -809,6 +814,7 @@ export class ComponentRegistry {
     this.registerLoaderRenderer(mockLoaderRenderer);
     this.registerLoaderRenderer(dataLoaderRenderer);
 
+    this.registerBehavior(variantBehavior);
     this.registerBehavior(tooltipBehavior);
     this.registerBehavior(animationBehavior);
     this.registerBehavior(labelBehavior);
@@ -1025,18 +1031,18 @@ export class ComponentRegistry {
   private registerBehavior(
     behavior: Behavior,
     location: "before" | "after" = "after",
-    position?: string
+    position?: string,
   ) {
     // If position is specified, insert relative to that behavior
     if (position) {
-      const targetIndex = this.behaviors.findIndex(b => b.name === position);
+      const targetIndex = this.behaviors.findIndex((b) => b.name === position);
       if (targetIndex !== -1) {
         const insertIndex = location === "before" ? targetIndex : targetIndex + 1;
         this.behaviors.splice(insertIndex, 0, behavior);
         return;
       }
     }
-    
+
     // Default: append to the end
     this.behaviors.push(behavior);
   }

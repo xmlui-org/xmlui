@@ -143,7 +143,7 @@ export function executeArrowExpressionSync(
   const evaluator: EvaluatorFunction = evalBindingExpressionTree;
 
   // --- Compiles the Arrow function to a JavaScript function
-  const nativeFunction = createArrowFunction(evaluator, expr, evalContext);
+  const nativeFunction = createArrowFunction(evaluator, expr);
 
   // --- Run the compiled arrow function. Note, we have two prefix arguments:
   // --- #1: The names of arrow function arguments
@@ -519,7 +519,7 @@ function evalFunctionInvocation(
       thread,
       ...expr.arguments.map((a) => ({ ...a, _EXPRESSION_: true })),
     );
-    functionObj = createArrowFunction(evaluator, functionObj as ArrowExpression, evalContext);
+    functionObj = createArrowFunction(evaluator, functionObj as ArrowExpression);
   } else if (expr.obj.type === T_ARROW_EXPRESSION) {
     // --- We delay evaluating expression values. We pass the argument names as the first parameter, and then
     // --- all parameter expressions
@@ -541,13 +541,13 @@ function evalFunctionInvocation(
         functionArgs.push(...funcArg);
       } else {
         if (arg.type === T_ARROW_EXPRESSION) {
-          const funcArg = createArrowFunction(evaluator, arg, evalContext);
+          const funcArg = createArrowFunction(evaluator, arg);
           const wrappedFunc = (...args: any[]) => funcArg(arg.args, evalContext, thread, ...args);
           functionArgs.push(wrappedFunc);
         } else {
           const funcArg = evaluator([], arg, evalContext, thread);
           if (funcArg?._ARROW_EXPR_) {
-            const wrappedFuncArg = createArrowFunction(evaluator, funcArg, evalContext);
+            const wrappedFuncArg = createArrowFunction(evaluator, funcArg);
             const wrappedFunc = (...args: any[]) =>
               wrappedFuncArg(funcArg.args, evalContext, thread, ...args);
             functionArgs.push(wrappedFunc);
@@ -601,11 +601,7 @@ function evalFunctionInvocation(
   return value;
 }
 
-function createArrowFunction(
-  evaluator: EvaluatorFunction,
-  expr: ArrowExpression,
-  evalContext: BindingTreeEvaluationContext,
-): Function {
+function createArrowFunction(evaluator: EvaluatorFunction, expr: ArrowExpression): Function {
   // --- Use this function, it evaluates the arrow function
   return (...args: any[]) => {
     // --- Prepare the variables to pass

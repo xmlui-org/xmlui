@@ -9,6 +9,20 @@ $themeVars: (
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+// Variables for @layer section
+$textColor-FormItemLabel: createThemeVar("textColor-FormItemLabel");
+$fontFamily-FormItemLabel: createThemeVar("fontFamily-FormItemLabel");
+$fontSize-FormItemLabel: createThemeVar("fontSize-FormItemLabel");
+$fontWeight-FormItemLabel: createThemeVar("fontWeight-FormItemLabel");
+$fontStyle-FormItemLabel: createThemeVar("fontStyle-FormItemLabel");
+$textTransform-FormItemLabel: createThemeVar("textTransform-FormItemLabel");
+$textColor-FormItemLabel-required: createThemeVar("textColor-FormItemLabel-required");
+$fontSize-FormItemLabel-required: createThemeVar("fontSize-FormItemLabel-required");
+$fontWeight-FormItemLabel-required: createThemeVar("fontWeight-FormItemLabel-required");
+$fontStyle-FormItemLabel-required: createThemeVar("fontStyle-FormItemLabel-required");
+$textTransform-FormItemLabel-required: createThemeVar("textTransform-FormItemLabel-required");
+$textColor-FormItemLabel-requiredMark: createThemeVar("textColor-FormItemLabel-requiredMark");
+
 // TODO: Add HelperText styles here, as HelperText React component is used only in FormItem
 
 @layer components {
@@ -51,12 +65,12 @@ $themeVars: (
 
     .inputLabel {
       display: flex;
-      color: createThemeVar("textColor-FormItemLabel");
-      font-family: createThemeVar("fontFamily-FormItemLabel");
-      font-size: createThemeVar("fontSize-FormItemLabel");
-      font-weight: createThemeVar("fontWeight-FormItemLabel");
-      font-style: createThemeVar("fontStyle-FormItemLabel");
-      text-transform: createThemeVar("textTransform-FormItemLabel");
+      color: $textColor-FormItemLabel;
+      font-family: $fontFamily-FormItemLabel;
+      font-size: $fontSize-FormItemLabel;
+      font-weight: $fontWeight-FormItemLabel;
+      font-style: $fontStyle-FormItemLabel;
+      text-transform: $textTransform-FormItemLabel;
       user-select: none;
       cursor: pointer;
       word-break: normal;
@@ -74,16 +88,16 @@ $themeVars: (
       }
 
       &.required {
-        color: createThemeVar("textColor-FormItemLabel-required");
-        font-size: createThemeVar("fontSize-FormItemLabel-required");
-        font-weight: createThemeVar("fontWeight-FormItemLabel-required");
-        font-style: createThemeVar("fontStyle-FormItemLabel-required");
-        text-transform: createThemeVar("textTransform-FormItemLabel-required");
+        color: $textColor-FormItemLabel-required;
+        font-size: $fontSize-FormItemLabel-required;
+        font-weight: $fontWeight-FormItemLabel-required;
+        font-style: $fontStyle-FormItemLabel-required;
+        text-transform: $textTransform-FormItemLabel-required;
       }
 
       .requiredMark {
         margin-left: 0.2em;
-        color: createThemeVar("textColor-FormItemLabel-requiredMark");
+        color: $textColor-FormItemLabel-requiredMark;
       }
     }
   }
@@ -92,6 +106,11 @@ $themeVars: (
    display: flex;
    justify-content: center;
    align-items: center;
+   flex-direction: column;
+  }
+
+  .helperTextContainer {
+    width: 100%;
   }
 }
 

@@ -7,6 +7,17 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+// Variables for @layer section
+$borderRadius-FileInput--focus: createThemeVar("Input:borderRadius-FileInput--focus");
+$borderColor-FileInput--focus: createThemeVar("Input:borderColor-FileInput--focus");
+$backgroundColor-FileInput--focus: createThemeVar("Input:backgroundColor-FileInput--focus");
+$boxShadow-FileInput--focus: createThemeVar("Input:boxShadow-FileInput--focus");
+$textColor-FileInput--focus: createThemeVar("Input:textColor-FileInput--focus");
+$outlineWidth-FileInput--focus: createThemeVar("Input:outlineWidth-FileInput--focus");
+$outlineColor-FileInput--focus: createThemeVar("Input:outlineColor-FileInput--focus");
+$outlineStyle-FileInput--focus: createThemeVar("Input:outlineStyle-FileInput--focus");
+$outlineOffset-FileInput--focus: createThemeVar("Input:outlineOffset-FileInput--focus");
+
 // --- The FileInput component uses a TextBox and a Button. We do not allow separately customize the
 // --- FileInput theme, only through the TextBox and Button themes.
 
@@ -34,18 +45,18 @@ $themeVars: ();
     min-height: fit-content;
 
     &:focus-within {
-      border-radius: createThemeVar("Input:borderRadius-FileInput--focus");
-      border-color: createThemeVar("Input:borderColor-FileInput--focus");
-      background-color: createThemeVar("Input:backgroundColor-FileInput--focus");
-      box-shadow: createThemeVar("Input:boxShadow-FileInput--focus");
-      color: createThemeVar("Input:textColor-FileInput--focus");
+      border-radius: $borderRadius-FileInput--focus;
+      border-color: $borderColor-FileInput--focus;
+      background-color: $backgroundColor-FileInput--focus;
+      box-shadow: $boxShadow-FileInput--focus;
+      color: $textColor-FileInput--focus;
     }
 
     &:has(.input:focus-visible) {
-      outline-width: createThemeVar("Input:outlineWidth-FileInput--focus");
-      outline-color: createThemeVar("Input:outlineColor-FileInput--focus");
-      outline-style: createThemeVar("Input:outlineStyle-FileInput--focus");
-      outline-offset: createThemeVar("Input:outlineOffset-FileInput--focus");
+      outline-width: $outlineWidth-FileInput--focus;
+      outline-color: $outlineColor-FileInput--focus;
+      outline-style: $outlineStyle-FileInput--focus;
+      outline-offset: $outlineOffset-FileInput--focus;
     }
   }
 

@@ -927,7 +927,7 @@ function useStandalone(
                 ...(compWrapper.component as any).component,
                 vars: {
                   ...(compWrapper.component as any).component.vars,
-                  ...componentCodeBehind?.component?.vars,
+                  ...componentCodeBehind?.codeBehind?.vars,
                 },
               },
             };

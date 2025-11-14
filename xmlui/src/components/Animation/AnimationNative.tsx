@@ -234,7 +234,6 @@ export const Animation = forwardRef(function Animation(
       onStart,
       onStop,
       reset,
-      once,
       reverse,
       toggle,
     ],

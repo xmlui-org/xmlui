@@ -382,10 +382,12 @@ async function evalBinaryAsync(
   const l = await completeExprValue(expr.left, thread);
   if (expr.op === "&&" && !l) {
     setExprValue(expr, { value: l }, thread);
+    thisStack.push(l);
     return l;
   }
   if (expr.op === "||" && l) {
     setExprValue(expr, { value: l }, thread);
+    thisStack.push(l);
     return l;
   }
   await evaluator(thisStack, expr.right, evalContext, thread);

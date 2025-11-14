@@ -25,7 +25,6 @@ export const SliderMd = createMetadata({
     "a defined range, supporting both single value selection and range selection with " +
     "multiple thumbs. It offers precise control through customizable steps and visual " +
     "feedback with formatted value display." +
-    "\n\n" +
     "Hover over the component to see the tooltip with the current value. On mobile, tap the thumb to see the tooltip.",
   props: {
     initialValue: dInitialValue(),
@@ -110,11 +109,11 @@ export const SliderMd = createMetadata({
     [`boxShadow-thumb-${COMP}--hover`]: "0 0 0 6px rgb(from $color-primary r g b / 0.4)",
     [`backgroundColor-thumb-${COMP}--active`]: "$color-primary-400",
     [`boxShadow-thumb-${COMP}--active`]: "0 0 0 6px rgb(from $color-primary r g b / 0.4)",
-    [`borderRadius-${COMP}-default`]: "$borderRadius",
-    [`borderColor-${COMP}-default`]: "transparent",
-    [`borderWidth-${COMP}-default`]: "0",
-    [`borderStyle-${COMP}-default`]: "solid",
-    [`boxShadow-${COMP}-default`]: "none",
+    [`borderRadius-${COMP}--default`]: "$borderRadius",
+    [`borderColor-${COMP}--default`]: "transparent",
+    [`borderWidth-${COMP}--default`]: "0",
+    [`borderStyle-${COMP}--default`]: "solid",
+    [`boxShadow-${COMP}--default`]: "none",
 
     light: {
       [`backgroundColor-track-${COMP}--disabled`]: "$color-surface-300",

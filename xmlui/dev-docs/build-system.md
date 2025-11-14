@@ -40,16 +40,19 @@ The XMLUI CLI is installed via the `bin/bootstrap.js` entry point and provides c
 Starts a Vite development server with hot module reloading for rapid application development.
 
 **Usage:**
+
 ```bash
 xmlui start [options]
 ```
 
 **Options:**
+
 - `--port <number>` - Server port (default: Vite's default port)
 - `--withMock [boolean]` - Enable MSW API mocking (default: true)
 - `--proxy <pattern->target>` - Proxy API requests (e.g., `/api->http://localhost:3000`)
 
 **Examples:**
+
 ```bash
 # Start dev server with default settings
 xmlui start
@@ -62,6 +65,7 @@ xmlui start --proxy /api->http://localhost:8080
 ```
 
 **Behavior:**
+
 - Enables full build mode (`VITE_BUILD_MODE=ALL`) with all components included
 - Automatically enables MSW for API interception unless disabled
 - Provides instant feedback through HMR when source files change
@@ -72,11 +76,13 @@ xmlui start --proxy /api->http://localhost:8080
 Builds an XMLUI application for production deployment with optimized assets.
 
 **Usage:**
+
 ```bash
 xmlui build [options]
 ```
 
 **Options:**
+
 - `--buildMode <mode>` - Build mode: `CONFIG_ONLY`, `INLINE_ALL`, or `ALL` (default: `CONFIG_ONLY` in dev, auto in prod)
 - `--flatDist [boolean]` - Flatten dist directory structure for simple hosting (default: false in dev, true in prod)
 - `--withMock [boolean]` - Include MSW API mocking in build (default: true in dev, false in prod)
@@ -86,13 +92,14 @@ xmlui build [options]
 
 **Build Modes:**
 
-| Mode | Description | Use Case |
-|------|-------------|----------|
-| `CONFIG_ONLY` | Bundles only configuration; loads components at runtime | Development and dynamic apps |
-| `INLINE_ALL` | Bundles entire app including all components | Production with minimal runtime overhead |
-| `ALL` | Full build with both inline and runtime loading support | Maximum flexibility |
+| Mode          | Description                                             | Use Case                                 |
+| ------------- | ------------------------------------------------------- | ---------------------------------------- |
+| `CONFIG_ONLY` | Bundles only configuration; loads components at runtime | Development and dynamic apps             |
+| `INLINE_ALL`  | Bundles entire app including all components             | Production with minimal runtime overhead |
+| `ALL`         | Full build with both inline and runtime loading support | Maximum flexibility                      |
 
 **Examples:**
+
 ```bash
 # Development build
 xmlui build
@@ -109,7 +116,8 @@ xmlui build --buildMode=INLINE_ALL --withMock --withHostingMetaFiles
 
 **Output Structure:**
 
-*Standard (flatDist=false):*
+_Standard (flatDist=false):_
+
 ```
 dist/
   ├── index.html
@@ -120,7 +128,8 @@ dist/
       └── (resource files)
 ```
 
-*Flattened (flatDist=true):*
+_Flattened (flatDist=true):_
+
 ```
 dist/
   ├── index.html
@@ -135,14 +144,17 @@ dist/
 Serves a production build locally for testing before deployment.
 
 **Usage:**
+
 ```bash
 xmlui preview [options]
 ```
 
 **Options:**
+
 - `--proxy <pattern->target>` - Proxy API requests during preview
 
 **Example:**
+
 ```bash
 # Build and preview
 xmlui build --prod
@@ -157,15 +169,18 @@ xmlui preview --proxy /api->http://localhost:8080
 Builds the XMLUI framework itself as a distributable npm package. This command is used during XMLUI framework development, not for application builds.
 
 **Usage:**
+
 ```bash
 xmlui build-lib [options]
 ```
 
 **Options:**
+
 - `--watch [boolean]` - Watch mode for continuous rebuilds during development (default: false)
 - `--mode <mode>` - Build mode: `lib`, `standalone`, or `metadata`
 
 **Examples:**
+
 ```bash
 # Build library for npm distribution
 npm run build:xmlui
@@ -182,15 +197,18 @@ xmlui build-lib --watch
 Creates a ZIP archive of the dist directory for deployment.
 
 **Usage:**
+
 ```bash
 xmlui zip-dist [options]
 ```
 
 **Options:**
+
 - `--source <path>` - Source directory to zip (default: `dist`)
 - `--target <filename>` - Output ZIP filename (default: `ui.zip`)
 
 **Example:**
+
 ```bash
 xmlui build --prod
 xmlui zip-dist --target production.zip
@@ -203,12 +221,14 @@ XMLUI applications can be built in three distinct modes that control how compone
 ### CONFIG_ONLY Mode
 
 **Characteristics:**
+
 - Only configuration and entry point are bundled
 - Components loaded at runtime from source files
 - Smallest bundle size
 - Requires buildless component discovery at runtime
 
 **Use Cases:**
+
 - Development environments
 - Applications with frequently changing components
 - Scenarios where component hot-swapping is needed
@@ -216,12 +236,14 @@ XMLUI applications can be built in three distinct modes that control how compone
 ### INLINE_ALL Mode
 
 **Characteristics:**
+
 - All components pre-compiled and bundled
 - No runtime parsing or component discovery
 - Fastest startup time
 - Larger initial bundle size
 
 **Use Cases:**
+
 - Production deployments
 - Performance-critical applications
 - Environments with restricted runtime file access
@@ -229,11 +251,13 @@ XMLUI applications can be built in three distinct modes that control how compone
 ### ALL Mode
 
 **Characteristics:**
+
 - Hybrid approach with both bundled and runtime loading
 - Maximum flexibility
 - Balanced bundle size and performance
 
 **Use Cases:**
+
 - Complex applications with both static and dynamic components
 - Testing and staging environments
 
@@ -288,8 +312,8 @@ export default {
   plugins: [
     ViteXmlui({
       // Plugin options (currently none defined)
-    })
-  ]
+    }),
+  ],
 };
 ```
 
@@ -302,6 +326,7 @@ XMLUI uses Vite with mode-specific configurations for different build targets.
 **Purpose:** Build XMLUI framework for npm distribution
 
 **Entry Points:**
+
 - `xmlui` - Main framework export
 - `xmlui-parser` - Parser utilities
 - `language-server` - Node.js language server
@@ -312,6 +337,7 @@ XMLUI uses Vite with mode-specific configurations for different build targets.
 **Output Format:** ES modules
 
 **Key Features:**
+
 - TypeScript declarations generated via `vite-plugin-dts`
 - CSS injection via `vite-plugin-lib-inject-css`
 - SCSS source files copied to `dist/lib/scss/`
@@ -319,11 +345,12 @@ XMLUI uses Vite with mode-specific configurations for different build targets.
 - Rollup type bundling for optimized .d.ts files
 
 **NPM Package Exports:**
+
 ```json
 {
-  ".": "./dist/lib/xmlui.mjs",
-  "./parser": "./dist/lib/xmlui-parser.mjs",
-  "./language-server": "./dist/lib/language-server.mjs",
+  ".": "./dist/lib/xmlui.js",
+  "./parser": "./dist/lib/xmlui-parser.js",
+  "./language-server": "./dist/lib/language-server.js",
   "./vite-xmlui-plugin": "./dist/scripts/bin/vite-xmlui-plugin.js",
   "./*.css": "./dist/lib/*.css",
   "./index.scss": "./dist/lib/scss/index.scss"
@@ -339,6 +366,7 @@ XMLUI uses Vite with mode-specific configurations for different build targets.
 **Output Format:** UMD bundle (`xmlui-standalone.umd.js`)
 
 **Key Features:**
+
 - Self-contained runtime with all dependencies
 - MSW worker enabled for API mocking
 - Version stamping with build date
@@ -346,6 +374,7 @@ XMLUI uses Vite with mode-specific configurations for different build targets.
 - Supports buildless app execution
 
 **Use Cases:**
+
 - CDN distribution
 - Buildless application deployment
 - Prototyping and demos
@@ -360,12 +389,14 @@ XMLUI uses Vite with mode-specific configurations for different build targets.
 **Output:** `xmlui-metadata.js`
 
 **Use Cases:**
+
 - Generating documentation
 - Language server autocomplete
 - Component explorer tools
 - API reference generation
 
 **Workflow:**
+
 ```bash
 # Extract metadata
 npm run build:xmlui-metadata
@@ -380,6 +411,7 @@ npm run generate-docs-summaries
 ## Package Structure
 
 ### Source Layout
+
 ```
 src/
   ├── index.ts                    # Main framework entry
@@ -392,27 +424,28 @@ src/
 ```
 
 ### Build Output (after npm publish)
+
 ```
 dist/
   ├── lib/                        # Library build
-  │   ├── xmlui.mjs
+  │   ├── xmlui.js
   │   ├── xmlui.d.ts
-  │   ├── xmlui-parser.mjs
-  │   ├── language-server.mjs
+  │   ├── xmlui-parser.js
+  │   ├── language-server.js
   │   └── scss/                   # SCSS source files
   ├── standalone/                 # Standalone build
   │   └── xmlui-standalone.umd.js
   ├── metadata/                   # Metadata build
   │   └── xmlui-metadata.js
-  └── scripts/
-      └── bin/
-          └── vite-xmlui-plugin.js
+  └── bin/
+      └── index.js
 ```
 
 ### Bin Scripts
+
 ```
 bin/
-  ├── bootstrap.js                # CLI entry (ts-node setup)
+  ├── bootstrap.js                # CLI entry for development (uses tsx)
   ├── index.ts                    # Command router
   ├── build.ts                    # Build implementation
   ├── build-lib.ts                # Library build
@@ -431,6 +464,7 @@ XMLUI extensions are npm packages that provide reusable component libraries. The
 Extensions use standard npm scripts that invoke the `xmlui` CLI:
 
 **package.json example:**
+
 ```json
 {
   "scripts": {
@@ -445,17 +479,18 @@ Extensions use standard npm scripts that invoke the `xmlui` CLI:
 
 **Command Reference:**
 
-| Command | CLI Equivalent | Purpose | Output |
-|---------|---------------|---------|--------|
-| `npm start` | `xmlui start` | Dev server for demo app | Dev server with HMR |
-| `npm run build:extension` | `xmlui build-lib` | Build extension library | `dist/` with .mjs, .js, .d.ts, .css |
-| `npm run build-watch` | `xmlui build-lib --watch` | Watch mode for development | Continuous rebuilds |
-| `npm run build:demo` | `xmlui build` | Build demo application | Production demo build |
-| `npm run build:meta` | `xmlui build-lib --mode=metadata` | Extract component metadata | Metadata for docs/LSP |
+| Command                   | CLI Equivalent                    | Purpose                    | Output                        |
+| ------------------------- | --------------------------------- | -------------------------- | ----------------------------- |
+| `npm start`               | `xmlui start`                     | Dev server for demo app    | Dev server with HMR           |
+| `npm run build:extension` | `xmlui build-lib`                 | Build extension library    | `dist/` with .js, .d.ts, .css |
+| `npm run build-watch`     | `xmlui build-lib --watch`         | Watch mode for development | Continuous rebuilds           |
+| `npm run build:demo`      | `xmlui build`                     | Build demo application     | Production demo build         |
+| `npm run build:meta`      | `xmlui build-lib --mode=metadata` | Extract component metadata | Metadata for docs/LSP         |
 
 ### Extension Build Workflow
 
 **Development Process:**
+
 ```bash
 # Terminal 1: Watch extension builds
 npm run build-watch
@@ -465,6 +500,7 @@ npm start
 ```
 
 **Build Output:**
+
 ```
 dist/
   ├── xmlui-extension-name.js      # CommonJS bundle
@@ -476,6 +512,7 @@ dist/
 ### Extension Distribution
 
 **Publishing to npm:**
+
 ```bash
 # Build all artifacts
 npm run build:extension
@@ -486,6 +523,7 @@ npm publish
 ```
 
 **Package Configuration:**
+
 ```json
 {
   "name": "xmlui-myextension",
@@ -508,11 +546,13 @@ npm publish
 ### Using Extensions
 
 **Installation:**
+
 ```bash
 npm install xmlui-myextension
 ```
 
 **Integration:**
+
 ```typescript
 import { startApp } from "xmlui";
 import myExtension from "xmlui-myextension";
@@ -525,6 +565,7 @@ startApp(runtime, [myExtension]);
 ### Example: xmlui-website-blocks
 
 **Reference implementation in the monorepo:**
+
 ```
 packages/xmlui-website-blocks/
   ├── package.json          # Extension package config
@@ -537,6 +578,7 @@ packages/xmlui-website-blocks/
 ```
 
 **Build commands:**
+
 ```bash
 cd packages/xmlui-website-blocks
 
@@ -554,12 +596,14 @@ npm run build:meta          # Metadata extraction
 ### Framework Development
 
 **Setup:**
+
 ```bash
 cd xmlui
 npm install
 ```
 
 **Development Loop:**
+
 ```bash
 # Terminal 1: Watch mode for library
 npm run build:bin
@@ -571,6 +615,7 @@ xmlui start
 ```
 
 **Testing:**
+
 ```bash
 # Unit tests
 npm run test:unit
@@ -584,6 +629,7 @@ npm run test:e2e-ui
 ```
 
 **Publishing:**
+
 ```bash
 # Build all artifacts
 npm run build:xmlui
@@ -597,6 +643,7 @@ npm publish
 ### Application Development
 
 **Create New App:**
+
 ```bash
 # Create app directory
 mkdir my-xmlui-app
@@ -624,6 +671,7 @@ npx serve
 ```
 
 **Built App Development:**
+
 ```bash
 # Install xmlui
 npm install xmlui
@@ -647,6 +695,7 @@ xmlui build --prod
 ```
 
 **Key Scripts:**
+
 ```bash
 # Development
 xmlui start                      # Dev server with HMR
@@ -666,24 +715,25 @@ xmlui zip-dist
 
 This table summarizes when to run builds across different contexts:
 
-| Context | Scenario | npm Script | Underlying CLI | When to Run | Comments |
-|---------|----------|------------|---------------|-------------|----------|
-| **docs/** | Editing `.md` files | `npm start` | `xmlui start` | No build - just refresh browser | Markdown files are served directly; dev server provides hot reload for instant feedback |
-| **docs/** | Building docs site | `npm run build:docs` | `xmlui build --buildMode=INLINE_ALL --withMock` | Before deployment | Creates optimized production build with INLINE_ALL mode, downloads latest XMLUI release, generates RSS feed |
-| **docs/** | Preview production build | `npm run preview` | `xmlui preview` | After building | Serves production build locally for testing before deployment |
-| **xmlui/** | Testing component changes | `npm start-test-bed` | `cd src/testing/infrastructure && xmlui start` | Automatic HMR | Runs dev server in `src/testing/infrastructure`; component changes appear instantly via HMR |
-| **xmlui/** | Building framework | `npm run build:xmlui` | `vite build --mode lib` | Before npm publish | Builds library for npm distribution using Vite directly (not xmlui CLI); generates .mjs, .d.ts, and CSS |
-| **xmlui/** | Building standalone | `npm run build:xmlui-standalone` | `vite build --mode standalone` | For CDN/buildless | Creates self-contained UMD bundle for `<script>` tag usage; framework builds itself with Vite directly |
-| **xmlui/** | Generating metadata | `npm run build:xmlui-metadata` | `vite build --mode metadata` | After component changes, before doc generation | Extracts component metadata into `xmlui-metadata.js` for documentation generation and language server autocomplete. This is the source of truth for component APIs, props, and descriptions. Framework uses Vite directly. |
-| **xmlui/** | Full doc generation | `npm run generate-all-docs` | Node scripts (not CLI) | After metadata changes | Runs three scripts: (1) `build:xmlui-metadata` - extracts metadata, (2) `generate-docs` - creates component .md files from metadata, (3) `generate-docs-summaries` - creates overview/summary files. This is the complete pipeline from source code → documentation |
-| **xmlui/** | Compile bin scripts | `npm run build:bin` | `tsc -p tsconfig.bin.json` | After changes to bin/*.ts files | Compiles TypeScript bin scripts (CLI tools) to JavaScript using TypeScript directly; needed when modifying build system or CLI commands |
-| **extension/** | Development | `npm start` | `xmlui start` | Keep running during dev | Runs dev server with HMR for demo app; use with build-watch in separate terminal |
-| **extension/** | Watch mode build | `npm run build-watch` | `xmlui build-lib --watch` | Keep running during dev | Continuously rebuilds extension library on changes; pair with `npm start` for rapid iteration |
-| **extension/** | Building for publish | `npm run build:extension` | `xmlui build-lib` | Before npm publish | Creates distributable library bundle (.mjs, .js, .d.ts, CSS) for npm package |
-| **extension/** | Build demo app | `npm run build:demo` | `xmlui build` | For demo deployment | Builds the demo application (not the extension itself) for hosting |
-| **extension/** | Extract metadata | `npm run build:meta` | `xmlui build-lib --mode=metadata` | For LSP/docs support | Extracts extension component metadata for language server and documentation |
+| Context        | Scenario                  | npm Script                       | Underlying CLI                                  | When to Run                                    | Comments                                                                                                                                                                                                                                                            |
+| -------------- | ------------------------- | -------------------------------- | ----------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **docs/**      | Editing `.md` files       | `npm start`                      | `xmlui start`                                   | No build - just refresh browser                | Markdown files are served directly; dev server provides hot reload for instant feedback                                                                                                                                                                             |
+| **docs/**      | Building docs site        | `npm run build:docs`             | `xmlui build --buildMode=INLINE_ALL --withMock` | Before deployment                              | Creates optimized production build with INLINE_ALL mode, downloads latest XMLUI release, generates RSS feed                                                                                                                                                         |
+| **docs/**      | Preview production build  | `npm run preview`                | `xmlui preview`                                 | After building                                 | Serves production build locally for testing before deployment                                                                                                                                                                                                       |
+| **xmlui/**     | Testing component changes | `npm start-test-bed`             | `cd src/testing/infrastructure && xmlui start`  | Automatic HMR                                  | Runs dev server in `src/testing/infrastructure`; component changes appear instantly via HMR                                                                                                                                                                         |
+| **xmlui/**     | Building framework        | `npm run build:xmlui`            | `vite build --mode lib`                         | Before npm publish                             | Builds library for npm distribution using Vite directly (not xmlui CLI); generates .mjs, .d.ts, and CSS                                                                                                                                                             |
+| **xmlui/**     | Building standalone       | `npm run build:xmlui-standalone` | `vite build --mode standalone`                  | For CDN/buildless                              | Creates self-contained UMD bundle for `<script>` tag usage; framework builds itself with Vite directly                                                                                                                                                              |
+| **xmlui/**     | Generating metadata       | `npm run build:xmlui-metadata`   | `vite build --mode metadata`                    | After component changes, before doc generation | Extracts component metadata into `xmlui-metadata.js` for documentation generation and language server autocomplete. This is the source of truth for component APIs, props, and descriptions. Framework uses Vite directly.                                          |
+| **xmlui/**     | Full doc generation       | `npm run generate-all-docs`      | Node scripts (not CLI)                          | After metadata changes                         | Runs three scripts: (1) `build:xmlui-metadata` - extracts metadata, (2) `generate-docs` - creates component .md files from metadata, (3) `generate-docs-summaries` - creates overview/summary files. This is the complete pipeline from source code → documentation |
+| **xmlui/**     | Compile bin scripts       | `npm run build:bin`              | `tsdown`                                        | After changes to bin/\*.ts files               | Compiles TypeScript bin scripts (CLI tools) to JavaScript using tsdown (see tsdown.config.ts); needed when modifying build system or CLI commands                                                                                                                   |
+| **extension/** | Development               | `npm start`                      | `xmlui start`                                   | Keep running during dev                        | Runs dev server with HMR for demo app; use with build-watch in separate terminal                                                                                                                                                                                    |
+| **extension/** | Watch mode build          | `npm run build-watch`            | `xmlui build-lib --watch`                       | Keep running during dev                        | Continuously rebuilds extension library on changes; pair with `npm start` for rapid iteration                                                                                                                                                                       |
+| **extension/** | Building for publish      | `npm run build:extension`        | `xmlui build-lib`                               | Before npm publish                             | Creates distributable library bundle (.mjs, .js, .d.ts, CSS) for npm package                                                                                                                                                                                        |
+| **extension/** | Build demo app            | `npm run build:demo`             | `xmlui build`                                   | For demo deployment                            | Builds the demo application (not the extension itself) for hosting                                                                                                                                                                                                  |
+| **extension/** | Extract metadata          | `npm run build:meta`             | `xmlui build-lib --mode=metadata`               | For LSP/docs support                           | Extracts extension component metadata for language server and documentation                                                                                                                                                                                         |
 
 **Key principles:**
+
 - **Development mode uses HMR** - No manual builds needed when running `xmlui start`
 - **Production requires explicit builds** - Use `xmlui build` or `npm run build:*` scripts
 - **Framework builds itself differently** - XMLUI uses Vite directly (`vite build --mode lib`) instead of the `xmlui` CLI
@@ -711,6 +761,7 @@ VITE_STANDALONE=true
 ```
 
 **Key Variables:**
+
 - `VITE_BUILD_MODE` - Component bundling strategy
 - `VITE_MOCK_ENABLED` - Enable/disable MSW
 - `VITE_STANDALONE` - Standalone runtime mode

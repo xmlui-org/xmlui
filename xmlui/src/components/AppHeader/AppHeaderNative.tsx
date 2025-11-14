@@ -1,5 +1,5 @@
-import type { ReactNode} from "react";
-import { useLayoutEffect, useRef } from "react";
+import type { ReactNode } from "react";
+import { useRef } from "react";
 import classnames from "classnames";
 
 import styles from "./AppHeader.module.scss";
@@ -14,6 +14,8 @@ import { useAppLayoutContext } from "../../components/App/AppLayoutContext";
 import { Button } from "../../components/Button/ButtonNative";
 import { NavLink } from "../../components/NavLink/NavLinkNative";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
+
+const PART_HAMBURGER = "hamburger";
 
 type Props = {
   children?: ReactNode;
@@ -70,6 +72,7 @@ export const AppHeader = ({
   const { mediaSize } = useAppContext();
   const logoUrl = useLogoUrl();
   const subNavPanelSlot = useRef(null);
+  const effectiveNavPanelVisible = navPanelVisible;
   const safeLogoTitle =
     mediaSize.sizeIndex < 2 ? null : !titleContent && title ? (
       <NavLink to={"/"} displayActive={false} style={{ paddingLeft: 0 }}>
@@ -92,6 +95,7 @@ export const AppHeader = ({
       >
         {hasRegisteredNavPanel && (
           <Button
+            data-part-id={PART_HAMBURGER}
             onClick={toggleDrawer}
             icon={<Icon name={"hamburger"} />}
             variant={"ghost"}
@@ -100,7 +104,7 @@ export const AppHeader = ({
           />
         )}
         <div className={styles.logoAndTitle}>
-          {(showLogo || !navPanelVisible) &&
+          {(showLogo || !effectiveNavPanelVisible) &&
             (logoContent ? (
               <>
                 <div className={styles.customLogoContainer}>{logoContent}</div>
@@ -165,11 +169,12 @@ export function AppContextAwareAppHeader({
   // console.log("APP LAYOUT CONTEXT", appLayoutContext);
   const displayLogo = layout !== "vertical" && layout !== "vertical-sticky" && showLogo;
   const canRestrictContentWidth = layout !== "vertical-full-header";
+  const effectiveNavPanelVisible = navPanelVisible;
 
   return (
     <AppHeader
       hasRegisteredNavPanel={hasRegisteredNavPanel}
-      navPanelVisible={navPanelVisible}
+      navPanelVisible={effectiveNavPanelVisible}
       toggleDrawer={toggleDrawer}
       canRestrictContentWidth={canRestrictContentWidth}
       showLogo={displayLogo}
@@ -181,7 +186,7 @@ export function AppContextAwareAppHeader({
       titleContent={titleContent}
       registerSubNavPanelSlot={registerSubNavPanelSlot}
     >
-      {layout?.startsWith("condensed") && navPanelVisible && (
+      {layout?.startsWith("condensed") && effectiveNavPanelVisible && (
         <div style={{ minWidth: 0 }}>{renderChild(navPanelDef)}</div>
       )}
       {children}

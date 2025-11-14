@@ -28,6 +28,7 @@ XMLUI uses a **monorepo architecture** managed by **npm workspaces** with **Turb
 - **Incremental builds** with intelligent caching
 
 **Key Technologies:**
+
 - **Monorepo Manager:** npm workspaces
 - **Task Orchestration:** Turborepo 2.x
 - **Package Manager:** npm@10.9.2
@@ -83,17 +84,21 @@ xmlui-repo-root/
 ### Package Categories
 
 **Core Framework:**
+
 - `xmlui/` - Main XMLUI framework package
 
 **Documentation:**
+
 - `docs/` - Documentation website
 - `blog/` - Blog and changelog
 
 **Tools:**
+
 - `tools/create-app/` - CLI tool for scaffolding new apps
 - `tools/vscode/` - VS Code extension for XMLUI development
 
 **Extension Packages:**
+
 - `packages/xmlui-*` - Component libraries and extensions
 
 ## Workspace Configuration
@@ -123,6 +128,7 @@ xmlui-repo-root/
 ### Workspace Benefits
 
 **Dependency Hoisting:**
+
 ```bash
 # Shared dependencies installed once at root
 node_modules/
@@ -132,6 +138,7 @@ node_modules/
 ```
 
 **Cross-Package Dependencies:**
+
 ```json
 {
   "dependencies": {
@@ -142,6 +149,7 @@ node_modules/
 ```
 
 **Unified Scripts:**
+
 ```bash
 # Run command in all workspaces
 npm run build --workspaces
@@ -176,42 +184,48 @@ The `turbo.json` file at the repository root defines all tasks and their orchest
 #### XMLUI Core Package Tasks
 
 **build:bin**
+
 ```json
 {
-  "outputs": ["dist/scripts/**"]
+  "outputs": ["dist/bin/**"]
 }
 ```
+
 Compiles CLI tools in `xmlui/bin/` folder.
 
 **build:xmlui**
+
 ```json
 {
   "outputs": ["dist/lib/**"]
 }
 ```
+
 Builds library mode (ES modules for npm distribution).
 
 **build:xmlui-standalone**
+
 ```json
 {
   "outputs": ["dist/standalone/**"]
 }
 ```
+
 Builds standalone UMD bundle for CDN deployment.
 
 **build:xmlui-metadata**
+
 ```json
 {
-  "inputs": [
-    "$TURBO_DEFAULT$",
-    "!src/language-server/xmlui-metadata-generated.mjs"
-  ],
+  "inputs": ["$TURBO_DEFAULT$", "!src/language-server/xmlui-metadata-generated.js"],
   "outputs": ["dist/metadata/**"]
 }
 ```
+
 Extracts component metadata for documentation and LSP.
 
 **build:xmlui-all**
+
 ```json
 {
   "dependsOn": [
@@ -224,36 +238,38 @@ Extracts component metadata for documentation and LSP.
   "outputs": ["dist/**"]
 }
 ```
+
 Master task that builds entire XMLUI core package.
 
 #### Extension Package Tasks
 
 **build:extension**
+
 ```json
 {
   "dependsOn": ["^build:extension"],
   "outputs": ["dist/**"]
 }
 ```
+
 Builds extension packages. The `^` prefix means "wait for dependencies' build:extension".
 
 #### Documentation Tasks
 
 **generate-docs**
+
 ```json
 {
   "dependsOn": ["build:xmlui-metadata", "build:meta"],
-  "outputs": [
-    "public/pages/**",
-    "content/**/*.md",
-    "content/**/*.mdx"
-  ],
+  "outputs": ["public/pages/**", "content/**/*.md", "content/**/*.mdx"],
   "cache": false
 }
 ```
+
 Generates documentation from component metadata.
 
 **build:docs**
+
 ```json
 {
   "dependsOn": [
@@ -266,40 +282,43 @@ Generates documentation from component metadata.
   "outputs": ["dist/**", "xmlui-optimized-output/**"]
 }
 ```
+
 Builds complete documentation site.
 
 #### Testing Tasks
 
 **test:unit**
+
 ```json
 {
   "outputs": ["coverage/**"],
   "cache": false
 }
 ```
+
 Runs unit tests with Vitest.
 
 **test:e2e-smoke**
+
 ```json
 {
   "dependsOn": ["build:test-bed", "build:xmlui-test-bed"],
-  "outputs": [
-    "playwright-report/**",
-    "test-results/**",
-    "tests-e2e/screenshots/**"
-  ],
+  "outputs": ["playwright-report/**", "test-results/**", "tests-e2e/screenshots/**"],
   "cache": false
 }
 ```
+
 Runs smoke E2E tests with Playwright.
 
 **test:xmlui-all**
+
 ```json
 {
   "dependsOn": ["test:unit", "test:e2e-non-smoke"],
   "cache": false
 }
 ```
+
 Runs complete test suite.
 
 ### Turborepo Features
@@ -307,11 +326,13 @@ Runs complete test suite.
 #### Caching
 
 **How it works:**
+
 - Turborepo hashes task inputs (source files, dependencies, env vars)
 - If hash matches previous run, replays cached outputs
 - Dramatically speeds up incremental builds
 
 **Cache locations:**
+
 ```bash
 # Local cache
 node_modules/.cache/turbo/
@@ -321,6 +342,7 @@ node_modules/.cache/turbo/
 ```
 
 **Cache configuration:**
+
 ```json
 {
   "inputs": ["$TURBO_DEFAULT$", "!**/*.test.ts"],
@@ -329,6 +351,7 @@ node_modules/.cache/turbo/
 ```
 
 **Cache control:**
+
 ```bash
 # Use cache (default)
 turbo run build:xmlui-all
@@ -343,6 +366,7 @@ turbo run build:xmlui-all --verbosity=3
 #### Parallel Execution
 
 **Dependency-based parallelization:**
+
 ```
 build:xmlui-all
   ├── build:bin                    ⎤
@@ -352,6 +376,7 @@ build:xmlui-all
 ```
 
 **Concurrency control:**
+
 ```bash
 # Limit parallel tasks
 turbo run build:xmlui-all --concurrency=4
@@ -363,21 +388,25 @@ turbo run build:xmlui-all --concurrency=100
 #### Output Management
 
 **Inputs:**
+
 - `$TURBO_DEFAULT$` - All files except ignored ones
 - Specific patterns: `src/**/*.ts`, `package.json`
 - Negations: `!**/*.test.ts`
 
 **Outputs:**
+
 - Define what gets cached: `["dist/**"]`
 - Must be deterministic
 - Should not include timestamps or random content
 
 **Global environment variables:**
+
 ```json
 {
   "globalEnv": ["CI", "NODE_ENV"]
 }
 ```
+
 These affect cache keys.
 
 #### Cross-Package Dependencies
@@ -387,7 +416,7 @@ These affect cache keys.
 ```json
 {
   "dependsOn": [
-    "^build:extension"  // Dependencies must complete first
+    "^build:extension" // Dependencies must complete first
   ]
 }
 ```
@@ -395,6 +424,7 @@ These affect cache keys.
 The `^` means: "Before running this task, run the same task in all dependencies."
 
 **Example:**
+
 ```
 packages/xmlui-website-blocks/
   dependencies:
@@ -503,6 +533,7 @@ build:xmlui-all
 ```
 
 **Execution order:**
+
 1. `build:bin`, `build:xmlui-metadata`, `build:xmlui` run in parallel
 2. `build:xmlui-standalone` runs after `build:xmlui`
 3. `build:extension` runs after all above complete
@@ -555,6 +586,7 @@ tools/vscode#build:vsix
 ### Environment Variables
 
 **Global variables (affect cache):**
+
 ```json
 {
   "globalEnv": ["CI"]
@@ -562,6 +594,7 @@ tools/vscode#build:vsix
 ```
 
 **CI detection:**
+
 ```bash
 # Unix/Linux/macOS
 npm run test-xmlui:ci
@@ -584,20 +617,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'npm'
-      
+          cache: "npm"
+
       - run: npm ci
-      
+
       - name: Build
         run: npm run build-xmlui
-      
+
       - name: Test
         run: npm run test-xmlui:ci
-      
+
       - name: Build Extensions
         run: npm run build-extensions
 ```
@@ -605,6 +638,7 @@ jobs:
 ### Remote Caching (Optional)
 
 **Setup:**
+
 ```bash
 # Login to Vercel/Turbo
 turbo login
@@ -614,6 +648,7 @@ turbo link
 ```
 
 **Benefits:**
+
 - Share cache across CI runs
 - Share cache across team members
 - Faster CI builds
@@ -638,6 +673,7 @@ npm run build-extensions
 ### Daily Development
 
 **Working on XMLUI core:**
+
 ```bash
 cd xmlui
 
@@ -654,6 +690,7 @@ npm run start-test-bed
 ```
 
 **Working on extension:**
+
 ```bash
 cd packages/xmlui-website-blocks
 
@@ -666,6 +703,7 @@ xmlui start
 ```
 
 **Working on documentation:**
+
 ```bash
 cd docs
 
@@ -729,6 +767,7 @@ git push --follow-tags
 XMLUI uses `@changesets/cli` for coordinated version management across packages.
 
 **Add changeset:**
+
 ```bash
 npm run changeset:add
 
@@ -739,6 +778,7 @@ npm run changeset:add
 ```
 
 **Version packages:**
+
 ```bash
 npm run changeset:version
 
@@ -750,6 +790,7 @@ npm run changeset:version
 ```
 
 **Publish packages:**
+
 ```bash
 npm run changeset:publish
 
@@ -772,10 +813,11 @@ Dependencies between workspace packages use `workspace:*`:
 ```
 
 **During publish:**
+
 ```json
 {
   "dependencies": {
-    "xmlui": "^0.10.19"  // Replaced with actual version
+    "xmlui": "^0.10.19" // Replaced with actual version
   }
 }
 ```
@@ -841,6 +883,7 @@ npm install
 ### Turbo Issues
 
 **Cache problems:**
+
 ```bash
 # Clear cache
 rm -rf node_modules/.cache/turbo/
@@ -853,6 +896,7 @@ turbo run build:xmlui-all --verbosity=3
 ```
 
 **Task not found:**
+
 ```bash
 # Check turbo.json syntax
 cat turbo.json | jq .
@@ -865,6 +909,7 @@ cat turbo.json | jq '.tasks | keys'
 ```
 
 **Dependency issues:**
+
 ```bash
 # Show task graph
 turbo run build:xmlui-all --graph
@@ -876,6 +921,7 @@ npm run build-xmlui -- --verbosity=3
 ### Workspace Issues
 
 **Package not found:**
+
 ```bash
 # Verify workspaces configuration
 cat package.json | jq '.workspaces'
@@ -888,6 +934,7 @@ npm ls --workspace=xmlui
 ```
 
 **Cross-package imports failing:**
+
 ```bash
 # Ensure packages are built
 npm run build-xmlui
@@ -903,6 +950,7 @@ cat packages/xmlui-website-blocks/package.json | jq '.dependencies'
 ### Performance Issues
 
 **Slow builds:**
+
 ```bash
 # Use cache
 turbo run build:xmlui-all
@@ -917,6 +965,7 @@ NODE_OPTIONS=--max-old-space-size=4096 npm run build-xmlui
 ```
 
 **Cache misses:**
+
 ```bash
 # Check what's changing
 turbo run build:xmlui-all --verbosity=3
@@ -929,6 +978,7 @@ cat turbo.json | jq '.tasks["build:xmlui-all"]'
 ```
 
 **npm install slow:**
+
 ```bash
 # Use local registry cache
 npm config set registry https://registry.npmjs.org/

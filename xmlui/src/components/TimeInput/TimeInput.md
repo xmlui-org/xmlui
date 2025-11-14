@@ -99,7 +99,7 @@ The `format` prop controls how time is displayed and which parts are editable. B
 
 %-PROP-START clearable
 
-When enabled, it displays a clear button that allows users to reset the time picker back to its initial value. Change the time value in this app and then click the clear button:
+When enabled, it displays a clear button that allows users to clear the time input. Change the time value in this app and then click the clear button:
 
 ```xmlui-pg copy display name="Example: clearable" /clearable/
 <App>

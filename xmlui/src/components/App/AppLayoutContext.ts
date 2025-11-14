@@ -10,6 +10,7 @@ const appLayoutNames = [
   "condensed-sticky",
   "horizontal",
   "horizontal-sticky",
+  "desktop",
 ] as const;
 export const appLayoutMd: readonly PropertyValueDescription[] = [
   {
@@ -45,6 +46,11 @@ export const appLayoutMd: readonly PropertyValueDescription[] = [
     value: "horizontal-sticky",
     description:
       "Similar to `horizontal`, the header and the navigation bar dock to the top of the viewport, while the footer sticks to the bottom.",
+  },
+  {
+    value: "desktop",
+    description:
+      "This layout stretches the app to fill the entire browser viewport with zero padding and margins. The header (if present) docks to the top, the footer (if present) docks to the bottom, and the main content stretches to fill the remaining vertical and horizontal space.",
   },
 ] as const;
 

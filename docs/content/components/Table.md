@@ -697,6 +697,26 @@ Select a column header and set it to descending ordering.
 </App>
 ```
 
+### `idKey` (default: "id") [#idkey-default-id]
+
+This property is used to specify the unique ID property in the data array. If the idKey points to a property that does not exist in the data items, that will result in incorrect behavior when using selectable rows.
+
+```xmlui copy /idKey="key"/
+<App>
+  <Table
+    idKey="key"
+    rowsSelectable="true"
+    data="{[
+      { 'key': 0, 'name': 'John' },
+      { 'key': 1, 'name': 'Jane' },
+      { 'key': 2, 'name': 'Bill' },
+    ]}"
+  > 
+    <Column bindTo="name"/>
+  </Table>
+</App>
+```
+
 ### `initiallySelected` [#initiallyselected]
 
 An array of IDs that should be initially selected when the table is rendered. This property only has an effect when the rowsSelectable property is set to `true`.

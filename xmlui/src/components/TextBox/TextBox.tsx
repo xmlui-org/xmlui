@@ -45,7 +45,7 @@ export const TextBoxMd = createMetadata({
     },
     input: {
       description: "The text box input area.",
-    }
+    },
   },
   defaultPart: "input",
   props: {
@@ -129,9 +129,11 @@ export const TextBoxMd = createMetadata({
     "borderStyle-Input": "solid",
     "borderColor-Input--disabled": "$borderColor--disabled",
     "textColor-Input--disabled": "$textColor--disabled",
-    "borderColor-Input-error": "$borderColor-Input-default--error",
-    "borderColor-Input-warning": "$borderColor-Input-default--warning",
-    "borderColor-Input-success": "$borderColor-Input-default--success",
+    "borderColor-Input--default": "$borderColor-Input-default",
+    "borderColor-Input--default--hover": "$borderColor-Input-default--hover",
+    "borderColor-Input--error": "$borderColor-Input-default--error",
+    "borderColor-Input--warning": "$borderColor-Input-default--warning",
+    "borderColor-Input--success": "$borderColor-Input-default--success",
     "textColor-placeholder-Input": "$textColor-subtitle",
     "color-adornment-Input": "$textColor-subtitle",
 

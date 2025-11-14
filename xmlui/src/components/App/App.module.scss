@@ -19,16 +19,17 @@ $backgroundColor-AppHeader: createThemeVar("backgroundColor-AppHeader");
 $borderBottom-NavPanel: createThemeVar("borderBottom-AppHeader");
 $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
+// Variables for @layer section
+$maxWidth-App: createThemeVar("maxWidth-App");
+
 @layer components {
-  @include t.withMaxScreenSize(2) {
-    .wrapper.verticalFullHeader{
-      .navPanelWrapper{
+  @include t.withMaxScreenSize(0) {
+    .wrapper.verticalFullHeader {
+      .navPanelWrapper {
         display: none;
       }
     }
   }
-
-
 
   .wrapper {
     --footer-height: 0px;
@@ -50,7 +51,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
         position: relative;
         scrollbar-gutter: stable both-edges;
       }
-      &.noScrollbarGutters{
+      &.noScrollbarGutters {
         .contentWrapper {
           scrollbar-gutter: auto;
         }
@@ -73,6 +74,9 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
           position: sticky;
           bottom: 0;
         }
+        .footerWrapper.nonSticky {
+          position: static;
+        }
       }
     }
 
@@ -91,11 +95,128 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
           position: sticky;
           bottom: 0;
         }
+        .footerWrapper.nonSticky {
+          position: static;
+        }
       }
       .navPanelWrapper {
         border-bottom: $borderBottom-NavPanel;
         justify-content: end;
         background-color: $backgroundColor-navPanel-App;
+        padding: 0;
+      }
+      .headerWrapper {
+        padding-inline: 0;
+
+        > div {
+          padding-inline: 0;
+        }
+      }
+    }
+
+    &.desktop {
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      scrollbar-gutter: auto;
+      max-width: none;
+
+      // When nested (like in playground), use container dimensions instead of viewport
+      &:global(.nested-app) {
+        width: 100%;
+        height: 100%;
+      }
+
+      .headerWrapper {
+        position: sticky;
+        top: 0;
+        flex-shrink: 0;
+        z-index: 1;
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: none !important;
+        width: 100% !important;
+
+        & > * {
+          margin: 0 !important;
+          padding: 0 !important;
+          max-width: none !important;
+          width: 100% !important;
+        }
+
+        & * {
+          max-width: none !important;
+          padding-inline: 0 !important;
+          padding-left: 0 !important;
+          padding-right: 0 !important;
+          margin-inline: 0 !important;
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+        }
+
+        :global(.headerInner) {
+          padding: 0 !important;
+          margin: 0 !important;
+          padding-inline: 0 !important;
+          max-width: none !important;
+        }
+      }
+
+      .PagesWrapper {
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        scrollbar-gutter: auto;
+        margin: 0;
+        padding: 0;
+        max-width: none;
+        width: 100%;
+      }
+
+      .PagesWrapperInner {
+        flex: 1;
+        min-height: 0;
+        max-width: none;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        scrollbar-gutter: auto;
+      }
+
+      .footerWrapper {
+        position: sticky;
+        bottom: 0;
+        flex-shrink: 0;
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: none !important;
+        width: 100% !important;
+
+        & > * {
+          margin: 0 !important;
+          padding: 0 !important;
+          max-width: none !important;
+          width: 100% !important;
+        }
+
+        & * {
+          max-width: none !important;
+          padding-inline: 0 !important;
+          padding-left: 0 !important;
+          padding-right: 0 !important;
+          margin-inline: 0 !important;
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+        }
       }
     }
 
@@ -121,10 +242,27 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
           background-color: $backgroundColor-navPanel-App;
         }
       }
+      
+      // When no footer is sticky (footer sticky=false), don't subtract footer height
+      &.noFooter {
+        .navPanelWrapper {
+          height: calc(var(--containerHeight, 100vh) - var(--header-height));
+        }
+      }
+
       .PagesWrapper {
         overflow: initial;
-        min-height: calc(var(--containerHeight, 100vh) - var(--header-height) - var(--footer-height));
+        min-height: calc(
+          var(--containerHeight, 100vh) - var(--header-height) - var(--footer-height)
+        );
         height: 100%;
+      }
+      
+      // When no footer is sticky (footer sticky=false), don't subtract footer height
+      &.noFooter {
+        .PagesWrapper {
+          min-height: calc(var(--containerHeight, 100vh) - var(--header-height));
+        }
       }
 
       .PagesWrapperInner {
@@ -139,6 +277,9 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
         left: 0;
         right: 0;
         bottom: 0;
+        &.nonSticky {
+          position: static;
+        }
       }
     }
 
@@ -168,6 +309,24 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
           padding-inline: var(--scrollbar-width);
         }
       }
+
+      &.desktop {
+        scrollbar-gutter: auto;
+
+        .headerWrapper {
+          & > div {
+            padding-inline: 0;
+          }
+          margin-inline: 0;
+        }
+
+        .footerWrapper {
+          margin-inline: 0;
+          & > div {
+            padding-inline: 0;
+          }
+        }
+      }
     }
 
     &:not(.scrollWholePage) {
@@ -194,7 +353,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
     &.noScrollbarGutters {
       scrollbar-gutter: auto;
-      .PagesWrapper{
+      .PagesWrapper {
         scrollbar-gutter: auto;
       }
     }
@@ -202,7 +361,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
   .headerWrapper {
     z-index: 1;
-    //position: relative;
     min-height: 0;
     flex-shrink: 0;
     overflow-x: clip;
@@ -220,7 +378,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     isolation: isolate;
     align-self: center;
     width: 100%;
-    max-width: createThemeVar("maxWidth-App");
+    max-width: $maxWidth-App;
   }
 
   .contentWrapper {
@@ -246,25 +404,17 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
   .PagesWrapper {
     flex: 1;
-    //display: flex;
-    //flex-direction: column;
-    //flex: 1;
-    //min-height: 0;
-    //width: 100%;
     isolation: isolate;
-    //height: 100%;
-    //overflow: auto;
   }
 
   .PagesWrapperInner {
     max-width: $maxWidth-content-App;
     width: 100%;
     margin: 0 auto;
-    //flex: 1;
     min-height: 100%;
     display: flex;
     flex-direction: column;
-    &.withDefaultContentPadding{
+    &.withDefaultContentPadding {
       padding-left: t.$space-4;
       padding-right: t.$space-4;
       padding-top: t.$space-5;
@@ -275,12 +425,8 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
   .footerWrapper {
     flex-shrink: 0;
-    //position: sticky;
-    //bottom:  calc(-1 * var(--footer-height));
-    //margin-bottom: calc(-1 * var(--footer-height));
   }
 }
-
 
 // --- We export the theme variables to add them to the component renderer
 :export {

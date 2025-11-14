@@ -3,7 +3,7 @@
 Use `method.` attributes to directly delegate to internal component methods:
 
 ```xmlui-pg height="350px"
----app display
+---app display /myModal/ /MyModalWrapper/
 <App>
   <H3>Method Delegation Example</H3>
 
@@ -14,7 +14,7 @@ Use `method.` attributes to directly delegate to internal component methods:
   <MyModalWrapper id="myModal" title="Hello World!" />
 </App>
 
----comp display
+---comp display /MyModalWrapper/ /internalModal/
 <Component
   name="MyModalWrapper"
   method.openDialog="internalModal.open()"

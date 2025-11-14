@@ -9,8 +9,10 @@ export function Preview() {
     () => appDescription.components.map((comp) => comp.component),
     [appDescription.components],
   );
+
   return (
     <NestedApp
+      withSplashScreen={true}
       app={appDescription.app}
       activeTone={options.activeTone}
       activeTheme={options.activeTheme}
@@ -18,6 +20,7 @@ export function Preview() {
       components={components}
       config={appDescription.config}
       height={"100%"}
+      refreshVersion={options.id}
     />
   );
 }

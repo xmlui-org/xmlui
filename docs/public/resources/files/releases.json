@@ -1,345 +1,205 @@
 [
   {
-    "tag_name": "xmlui@0.10.20",
-    "published_at": "2025-10-15T12:46:33Z",
+    "tag_name": "xmlui@0.11.4",
+    "published_at": "2025-10-31T15:41:04Z",
     "changes": [
       {
-        "description": "fix: Autocomplete handles animations correctly",
-        "commit_sha": "26eac90"
+        "description": "Change validation status signature from having one dash to two dashes to better reflect that they are status modifiers. Ex. -default -> --default, -error -> --error",
+        "commit_sha": "e384c59"
       },
       {
-        "description": "Add margin-related theme variables to ContentSeparator",
-        "commit_sha": "f53edff"
+        "description": "Splitter now responds the visibility changes of its children",
+        "commit_sha": "f296904"
       },
       {
-        "description": "Add applyIf property to Theme",
-        "commit_sha": "1840916"
+        "description": "Temporarily disable the \"variant\" behavior on Button",
+        "commit_sha": "f296904"
       },
       {
-        "description": "fix: external animation is now correctly applied to ModalDialogs as well",
-        "commit_sha": "c6be7a3"
-      },
-      {
-        "description": "Added better error text when rendering FormItem outside of a Form.",
-        "commit_sha": "6aaefaf"
-      },
-      {
-        "description": "refactor: Select and AutoComplete components",
-        "commit_sha": "28d2585"
-      },
-      {
-        "description": "The itemLabelWidth value of Form now supports theme variables ($space-\\* values).",
-        "commit_sha": "e29a231"
-      },
-      {
-        "description": "AppState now uses a merge operation to set initialValue",
-        "commit_sha": "22162c0"
-      },
-      {
-        "description": "fix: itemWithLabel - layout issue",
-        "commit_sha": "e90232b"
+        "description": "fix: Select - use extractValue for controlled component value prop",
+        "commit_sha": "be73336"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.10.20.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.20/xmlui-0.10.20.js"
+        "name": "xmlui-0.11.4.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.4/xmlui-0.11.4.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.10.19",
-    "published_at": "2025-10-07T09:22:39Z",
+    "tag_name": "xmlui@0.11.3",
+    "published_at": "2025-10-30T12:44:56Z",
     "changes": [
       {
-        "description": "Add checkboxTolerance property to Table",
-        "commit_sha": "facb257"
+        "description": "improve: charts - better domain configuration",
+        "commit_sha": "4a311e2"
       },
       {
-        "description": "test: review onFocus, onBlur e2e tests",
-        "commit_sha": "6084c14"
+        "description": "Tiny Splitter updates",
+        "commit_sha": "f8a75ce"
       },
       {
-        "description": "Renamed the following properties in DatePicker: minValue -> startDate, maxValue -> endDate. Also updated component documentation.",
-        "commit_sha": "e1fa9d7"
+        "description": "Text strong variant style fixed",
+        "commit_sha": "bbc421b"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.10.19.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.19/xmlui-0.10.19.js"
+        "name": "xmlui-0.11.3.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.3/xmlui-0.11.3.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.10.18",
-    "published_at": "2025-10-06T12:52:25Z",
+    "tag_name": "xmlui@0.11.2",
+    "published_at": "2025-10-29T11:26:36Z",
     "changes": [
       {
-        "description": "refactor: use labelBehavior instead of ItemWithLabel",
-        "commit_sha": "202f2b2"
-      },
-      {
-        "description": "Add back removed RadioItem",
-        "commit_sha": "6650ee8"
-      },
-      {
-        "description": "Fixed FormItem validation indicators to use a relaxed validation indication strategy.",
-        "commit_sha": "da98994"
-      },
-      {
-        "description": "fix: labelBehavior, input components - styling issue",
-        "commit_sha": "8394663"
+        "description": "update package dependencies for tsx usage",
+        "commit_sha": "c1f306f"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.10.18.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.18/xmlui-0.10.18.js"
+        "name": "xmlui-0.11.2.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.2/xmlui-0.11.2.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.10.16",
-    "published_at": "2025-10-03T09:59:22Z",
+    "tag_name": "xmlui@0.11.1",
+    "published_at": "2025-10-29T08:11:14Z",
     "changes": [
       {
-        "description": "Undust and improve the Tree component",
-        "commit_sha": "0ba6612"
-      },
-      {
-        "description": "Fixed Slider ranged version where only the first thumb is interactable.",
-        "commit_sha": "7b78052"
-      },
-      {
-        "description": "improve: remove cmdk from autocomple, add keywords prop to option",
-        "commit_sha": "314b429"
-      },
-      {
-        "description": "fix: NumberBox initialValue ignores non-convertible string values, minValue and maxValue now applies to typed-in input as well as to increments / decrements with spinner buttons.",
-        "commit_sha": "a1dea8f"
-      },
-      {
-        "description": "refactor: move behavior application earlier in ComponentAdapter render flow",
-        "commit_sha": "cff754c"
+        "description": "Add the debounce function to globals",
+        "commit_sha": "7bbbb1d"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.10.16.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.16/xmlui-0.10.16.js"
+        "name": "xmlui-0.11.1.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.1/xmlui-0.11.1.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.10.15",
-    "published_at": "2025-09-26T11:41:22Z",
+    "tag_name": "xmlui@0.10.26",
+    "published_at": "2025-10-27T11:31:35Z",
     "changes": [
       {
-        "description": "Add the data property to the Pdf component",
-        "commit_sha": "3c8ad14"
+        "description": "Heading now accepts \"H1\"...\"H6\", \"1\"...\"6\", too. Invalid values fall back to \"h1\".",
+        "commit_sha": "e1b8d58"
       },
       {
-        "description": "Add the \"transform\" layout property",
-        "commit_sha": "5502fea"
-      },
-      {
-        "description": "Add syncWithAppState and initiallySelected properties to Table",
-        "commit_sha": "e08f0ba"
-      },
-      {
-        "description": "Fix MenuSeparator and SubMenuitem (forwardRef)",
-        "commit_sha": "5502fea"
-      },
-      {
-        "description": "fix: NavGroup componenet's iconVertical{Expanded,Collapsed} properties now apply based on it's 'open' state. Only the Expanded one was present before the fix.",
-        "commit_sha": "db618b5"
-      },
-      {
-        "description": "Allow event handlers to use nested action components recursively",
-        "commit_sha": "a795b3d"
-      },
-      {
-        "description": "feat: introducing behaviors - tooltip, animation, label",
-        "commit_sha": "5851c02"
+        "description": "Remove the showNavPanelIf property from AppHeader (fix NavPanel's \"when\" usage)",
+        "commit_sha": "1ad832c"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.10.15.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.15/xmlui-0.10.15.js"
+        "name": "xmlui-0.10.26.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.26/xmlui-0.10.26.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.10.14",
-    "published_at": "2025-09-23T12:57:26Z",
+    "tag_name": "xmlui@0.10.25",
+    "published_at": "2025-10-22T14:39:36Z",
     "changes": [
       {
-        "description": "fix: Modal dialog scrolling issue",
-        "commit_sha": "618049b"
+        "description": "refactor: Select - remove radix select",
+        "commit_sha": "e7c503e"
       },
       {
-        "description": "Allow image to accept binary data (and use it instead of src)",
-        "commit_sha": "215a142"
+        "description": "Fix the NavGroup click behavior in responsive view",
+        "commit_sha": "5fe3052"
       },
       {
-        "description": "Allow user-defined components in extension packages",
-        "commit_sha": "65b52e1"
+        "description": "Fix the $item access issue within a ModalDialog inside a Column",
+        "commit_sha": "5fe3052"
       },
       {
-        "description": "Fixed Slider input type, label focus, readOnly property, as well as min & max value issues.",
-        "commit_sha": "0cc2178"
-      },
-      {
-        "description": "Fixed feature to add custom icons for the Carousel prev/next page buttons.",
-        "commit_sha": "53d4ed9"
+        "description": "Fix the APICall becomes non-functional after first error when used with DataSource + Items + $item context issue",
+        "commit_sha": "250647b"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.10.14.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.14/xmlui-0.10.14.js"
+        "name": "xmlui-0.10.25.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.25/xmlui-0.10.25.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.10.13",
-    "published_at": "2025-09-22T08:53:46Z",
+    "tag_name": "xmlui@0.10.24",
+    "published_at": "2025-10-21T13:53:23Z",
     "changes": [
       {
-        "description": "Added short debounce to ColorPicker to make changing color values with slider a bit smoother.",
-        "commit_sha": "9401ee0"
+        "description": "The xmlui-pg codefence now accepts emojies",
+        "commit_sha": "3e361c4"
       },
       {
-        "description": "fix: assigning new properties to objects in xmlui script",
-        "commit_sha": "eb62858"
-      },
-      {
-        "description": "fix: stricter empty body detection in RestApiProxy",
-        "commit_sha": "eb62858"
-      },
-      {
-        "description": "fix: TextArea autofocus",
-        "commit_sha": "eb62858"
-      },
-      {
-        "description": "fix: dropdownMenu overflow",
-        "commit_sha": "eb62858"
-      },
-      {
-        "description": "fix: ability to use user defined components in triggerTemplate (dropdownMenu)",
-        "commit_sha": "eb62858"
-      },
-      {
-        "description": "select: use focus-visible instead of focus for outline",
-        "commit_sha": "eb62858"
-      },
-      {
-        "description": "fix: modal dialog/toast issue",
-        "commit_sha": "243b7fa"
-      },
-      {
-        "description": "form: hideButtonRowUntilDirty",
-        "commit_sha": "eb62858"
+        "description": "Exend the formatDate, formatDateTime, and formatTime functions with optional format strings",
+        "commit_sha": "3e361c4"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.10.13.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.13/xmlui-0.10.13.js"
+        "name": "xmlui-0.10.24.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.24/xmlui-0.10.24.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.10.12",
-    "published_at": "2025-09-19T13:53:31Z",
+    "tag_name": "xmlui@0.10.23",
+    "published_at": "2025-10-21T07:04:42Z",
     "changes": [
       {
-        "description": "fix: report errors in script tag",
-        "commit_sha": "f12a042"
+        "description": "Experiment with the \"variant\" behavior",
+        "commit_sha": "bf18444"
       },
       {
-        "description": "Avatar does not issue a resource URL warning when \"url\" is not specified",
-        "commit_sha": "8731eb8"
+        "description": "Form now has a willSubmit event (it can cancel the submit event)",
+        "commit_sha": "6d3bb89"
       },
       {
-        "description": "refactor: change LineChart/BarChart property names",
-        "commit_sha": "eb6454f"
+        "description": "Fix the boolean conversion issue with showAnchor in Heading",
+        "commit_sha": "89c69af"
       },
       {
-        "description": "Fix the layout property usage of ModalDialog",
-        "commit_sha": "1210852"
+        "description": "Fix loading code-behind files in standalone mode",
+        "commit_sha": "4cfebf0"
+      },
+      {
+        "description": "fix: pointer-events:none when using sibling Dialog",
+        "commit_sha": "145cd68"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.10.12.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.12/xmlui-0.10.12.js"
+        "name": "xmlui-0.10.23.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.23/xmlui-0.10.23.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.10.11",
-    "published_at": "2025-09-18T05:57:44Z",
+    "tag_name": "xmlui@0.10.22",
+    "published_at": "2025-10-17T06:33:28Z",
     "changes": [
       {
-        "description": "feat: style the error report colors and spaces in the browser for xmlui syntax errors",
-        "commit_sha": "8c76c8d"
+        "description": "The behavior infrastructure now uses ComponentProvider and allows adding custom behaviors",
+        "commit_sha": "501f60a"
       },
       {
-        "description": "RadioGroup now correctly handles different types of initialValue property values, applies readOnly property, and places necessary ARIA tags if the required property is set. Clarified component reference description on how RadioGroup and Option handles value types.",
-        "commit_sha": "d56c3e5"
-      },
-      {
-        "description": "Add FancyButton to xmlui-website-blocks",
-        "commit_sha": "e42d367"
-      },
-      {
-        "description": "feat: BarChart - add tooltip position tracking",
-        "commit_sha": "f539526"
-      },
-      {
-        "description": "Review Option handling in Select and RadioGroup",
-        "commit_sha": "19ce234"
-      },
-      {
-        "description": "feat: add animation support to all relevant components via animation and animationOptions props",
-        "commit_sha": "455b6c0"
-      },
-      {
-        "description": "feat: add support for 'uses' property",
-        "commit_sha": "e90dc73"
-      },
-      {
-        "description": "Update fontSize and lineHeight themes and style (may break existing xmlui code)",
-        "commit_sha": "819b563"
-      },
-      {
-        "description": "Add the autoDetectTone property to App",
-        "commit_sha": "b57dfa2"
-      },
-      {
-        "description": "Update Checkbox and Switch with click event metadata",
-        "commit_sha": "9dd0f97"
-      },
-      {
-        "description": "Select accepts null as an option value; it converts a value to a string no longer",
-        "commit_sha": "19ce234"
-      },
-      {
-        "description": "Extend Text and Heading APIs with hasOverflow",
-        "commit_sha": "898346d"
-      },
-      {
-        "description": "Fix RestApiProxy to deliver response status when no error body specified",
-        "commit_sha": "705dd04"
+        "description": "Extend Tab with the tabAlignment and accordionView properties",
+        "commit_sha": "1020f1c"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.10.11.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.11/xmlui-0.10.11.js"
+        "name": "xmlui-0.10.22.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.22/xmlui-0.10.22.js"
       }
     ]
   }

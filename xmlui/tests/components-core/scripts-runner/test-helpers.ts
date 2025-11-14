@@ -1,5 +1,5 @@
-import { Expression, Statement } from "../../../src/components-core/script-runner/ScriptingSourceTree";
-import { BindingTreeEvaluationContext } from "../../../src/components-core/script-runner/BindingTreeEvaluationContext";
+import type { Expression, Statement } from "../../../src/components-core/script-runner/ScriptingSourceTree";
+import type { BindingTreeEvaluationContext } from "../../../src/components-core/script-runner/BindingTreeEvaluationContext";
 import { Parser } from "../../../src/parsers/scripting/Parser";
 
 export function createEvalContext (parts: Partial<BindingTreeEvaluationContext>): BindingTreeEvaluationContext {

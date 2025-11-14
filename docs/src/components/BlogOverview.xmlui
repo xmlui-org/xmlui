@@ -17,7 +17,7 @@
         </Text>
       </Link>
       <Text>
-        {$item.date} - {$item.author}
+        {formatDate($item.date, "MMM dd, yyyy")} - {$item.author}
       </Text>
       <Link to="/blog/{$item.slug}">
         <Image src="/blog/images/{$item.image}" />

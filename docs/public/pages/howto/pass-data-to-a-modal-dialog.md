@@ -1,7 +1,7 @@
 # Pass data to a Modal Dialog
 
 ```xmlui-pg name="Click on a team member to edit details"
----app
+---app height="400px"
 <App>
   <Test />
 </App>
@@ -21,7 +21,7 @@
     }
   }
 }
----comp display
+---comp display /memberDetailsDialog/
 <Component name="Test">
 
   <DataSource
@@ -30,25 +30,24 @@
   />
 
   <ModalDialog id="memberDetailsDialog" title="Team Member Details">
-    <Theme backgroundColor-overlay="$color-surface-900">
-      <VStack gap="1rem" padding="1rem">
+      <VStack>
       <!-- Avatar and Basic Info -->
-      <HStack gap="1rem" alignItems="center">
+      <HStack>
         <Avatar
           url="{$param.avatar}"
           size="lg"
           name="{$param.name}"
         />
-        <VStack gap="0.25rem" alignItems="start">
-          <Text variant="strong" fontSize="1.2rem">{$param.name}</Text>
+        <VStack>
+          <Text variant="strong">{$param.name}</Text>
           <Text variant="caption">{$param.role}</Text>
           <Text variant="caption" color="blue">{$param.email}</Text>
         </VStack>
       </HStack>
 
       <!-- Details Card -->
-      <Card padding="1rem">
-        <VStack gap="0.5rem">
+      <Card>
+        <VStack>
           <HStack>
             <Text variant="strong">Department:</Text>
             <Text>{$param.department}</Text>
@@ -65,7 +64,7 @@
       </Card>
 
       <!-- Actions -->
-      <HStack gap="0.5rem">
+      <HStack>
         <Button
           label="Send Email"
           size="sm"
@@ -79,15 +78,13 @@
         />
       </HStack>
     </VStack>
-    </Theme>
   </ModalDialog>
 
   <Text variant="strong" marginBottom="1rem">Team Directory</Text>
 
-  <VStack gap="0.5rem">
+  <VStack>
     <Items data="{team_members}">
       <Card
-        padding="1rem"
         cursor="pointer"
         onClick="{
           memberDetailsDialog.open({
@@ -101,13 +98,13 @@
           })
         }"
       >
-        <HStack gap="1rem" alignItems="center">
+        <HStack>
           <Avatar
             url="{$item.avatar}"
             size="sm"
             name="{$item.name}"
           />
-          <VStack gap="0.25rem" alignItems="start">
+          <VStack>
             <Text variant="strong">{$item.name}</Text>
             <Text variant="caption">{$item.role} - {$item.department}</Text>
           </VStack>

@@ -1,6 +1,6 @@
 # Splitter [#splitter]
 
-`Splitter` component divides a container into two resizable sections. These are are identified by their names: primary and secondary. They have a draggable bar between them.
+`Splitter` component divides a container into two resizable sections. These are are identified by their names: primary and secondary. They have a draggable bar between them. When only a single child is visible (due to conditional rendering with `when` attributes), the splitter bar is not displayed and the single panel stretches to fill the entire viewport of the splitter container.
 
 Most properties of the component focus on the primary section (e.g. sizing).
 
@@ -36,11 +36,20 @@ This optional number property sets the initial size of the primary section. The 
 
 ### `maxPrimarySize` (default: "100%") [#maxprimarysize-default-100-]
 
-This property sets the maximum size the primary section can have. The unit of the size value is in pixels or percentages.
+This property sets the maximum size the primary section can have. The unit of the size value is in pixels or percentages. Negative values are supported and calculate from the end of the container (e.g., "-20%" means "80% of container", "-100px" means "container size - 100px").
 
 ```xmlui-pg copy display name="Example: maxPrimarySize"
 <App>
   <Splitter height="200px" maxPrimarySize="80%">
+    <Stack backgroundColor="lightblue" height="100%" />
+    <Stack backgroundColor="darksalmon" height="100%" />
+  </Splitter>
+</App>
+```
+
+```xmlui-pg copy display name="Example: maxPrimarySize with negative value (from end)"
+<App>
+  <Splitter height="200px" maxPrimarySize="-50px">
     <Stack backgroundColor="lightblue" height="100%" />
     <Stack backgroundColor="darksalmon" height="100%" />
   </Splitter>

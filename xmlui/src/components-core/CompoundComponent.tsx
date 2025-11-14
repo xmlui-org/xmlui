@@ -40,6 +40,7 @@ export const CompoundComponent = forwardRef(
       appContext,
       state,
       lookupAction,
+      contextVars, // Extract contextVars to prevent it from being passed to DOM elements
       ...restProps
     }: CompoundComponentProps,
     forwardedRef: React.ForwardedRef<any>,

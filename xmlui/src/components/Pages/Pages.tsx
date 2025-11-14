@@ -1,8 +1,11 @@
+import styles from "./Pages.module.scss";
+
 import { createComponentRenderer } from "../../components-core/renderers";
 import { TableOfContentsProvider } from "../../components-core/TableOfContentsContext";
 import { createMetadata, d, dInternal } from "../metadata-helpers";
 import { Pages, RouteWrapper, defaultProps } from "./PagesNative";
 import { extractPaddings } from "../../components-core/utils/css-utils";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 
 const PAGE = "Page";
 
@@ -58,6 +61,12 @@ export const PagesMd = createMetadata({
       description: `The fallback path when the current URL does not match any of the paths of the pages.`,
       defaultValue: defaultProps.fallbackPath,
     },
+  },
+    themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`paddingVertical-${COMP}`]: "$space-5",
+    [`paddingHorizontal-${COMP}`]: "$space-4",
+    [`gap-${COMP}`]: "$space-5",
   },
 });
 

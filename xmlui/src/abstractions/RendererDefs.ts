@@ -21,6 +21,9 @@ export interface RendererContext<TMd extends ComponentMetadata = ComponentMetada
 
   updateState: UpdateStateFn; // A component invokes this function to change its internal state
 
+  // Context variables (all keys starting with "$") available in the current container
+  contextVars: Record<string, any>;
+
   // When a component wants to access a property value (which may contain a binding
   // expression to evaluate), it must use this property to get the current value.
   extractValue: ValueExtractor;

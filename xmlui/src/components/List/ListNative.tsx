@@ -17,7 +17,6 @@ import {
   noop,
   omit,
   orderBy as lodashOrderBy,
-  rest,
   sortBy,
   uniq,
 } from "lodash-es";
@@ -25,7 +24,7 @@ import type { RegisterComponentApiFn, RenderChildFn } from "../../abstractions/R
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
 import type { FieldOrderBy, ScrollAnchoring } from "../abstractions";
 import { Card } from "../Card/CardNative";
-import type { CustomItemComponentProps, VListHandle } from "virtua";
+import type { CustomItemComponent, CustomItemComponentProps, VListHandle } from "virtua";
 import { Virtualizer } from "virtua";
 import {
   useHasExplicitHeight,
@@ -41,7 +40,6 @@ import { Spinner } from "../Spinner/SpinnerNative";
 import { Text } from "../Text/TextNative";
 import { MemoizedItem } from "../container-helpers";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
-import type { CustomItemComponent } from "virtua/lib/react/types";
 
 // Default props for List component
 export const defaultProps = {

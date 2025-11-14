@@ -4,7 +4,6 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 
 import styles from "./Markdown.module.scss";
-import htmlTagStyles from "../HtmlTags/HtmlTags.module.scss";
 
 import { Heading } from "../Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
@@ -26,6 +25,7 @@ import type { Node, Parent } from "unist";
 import { ExpandableItem } from "../ExpandableItem/ExpandableItemNative";
 import NestedAppAndCodeViewNative from "../NestedApp/AppWithCodeViewNative";
 import { CodeText } from "./CodeText";
+import { decodeFromBase64 } from "../../components-core/utils/base64-utils";
 
 // Default props for the Markdown component
 export const defaultProps = {
@@ -131,14 +131,14 @@ export const Markdown = memo(
           components={{
             details({ children, node, ...props }) {
               return (
-                <details className={htmlTagStyles.htmlDetails} {...props}>
+                <details className={styles.htmlDetails} {...props}>
                   {children}
                 </details>
               );
             },
             video({ children, node, ...props }) {
               return (
-                <video className={htmlTagStyles.htmlVideo} {...props}>
+                <video className={styles.htmlVideo} {...props}>
                   {children}
                 </video>
               );
@@ -268,21 +268,21 @@ export const Markdown = memo(
             },
             ol({ children, node, ...props }) {
               return (
-                <ol className={htmlTagStyles.htmlOl} {...props}>
+                <ol className={styles.htmlOl} {...props}>
                   {children}
                 </ol>
               );
             },
             ul({ children, node, ...props }) {
               return (
-                <ul className={htmlTagStyles.htmlUl} {...props}>
+                <ul className={styles.htmlUl} {...props}>
                   {children}
                 </ul>
               );
             },
             li({ children, node, ...props }) {
               return (
-                <li className={htmlTagStyles.htmlLi} {...props}>
+                <li className={styles.htmlLi} {...props}>
                   <Text>{children}</Text>
                 </li>
               );
@@ -333,33 +333,33 @@ export const Markdown = memo(
             table({ children }) {
               return (
                 <div className={styles.tableScrollContainer}>
-                  <table className={htmlTagStyles.htmlTable}>{children}</table>
+                  <table className={styles.htmlTable}>{children}</table>
                 </div>
               );
             },
             tr({ children }) {
-              return <tr className={htmlTagStyles.htmlTr}>{children}</tr>;
+              return <tr className={styles.htmlTr}>{children}</tr>;
             },
             td({ children }) {
-              return <td className={htmlTagStyles.htmlTd}>{children}</td>;
+              return <td className={styles.htmlTd}>{children}</td>;
             },
             th({ children }) {
-              return <th className={htmlTagStyles.htmlTh}>{children}</th>;
+              return <th className={styles.htmlTh}>{children}</th>;
             },
             thead({ children }) {
-              return <thead className={htmlTagStyles.htmlThead}>{children}</thead>;
+              return <thead className={styles.htmlThead}>{children}</thead>;
             },
             tbody({ children }) {
-              return <tbody className={htmlTagStyles.htmlTbody}>{children}</tbody>;
+              return <tbody className={styles.htmlTbody}>{children}</tbody>;
             },
             tfoot({ children }) {
-              return <tfoot className={htmlTagStyles.htmlTfoot}>{children}</tfoot>;
+              return <tfoot className={styles.htmlTfoot}>{children}</tfoot>;
             },
             samp({ ...props }) {
               const markdownContentBase64 = props?.["data-pg-markdown"];
-              const markdownContent = markdownContentBase64 ? atob(markdownContentBase64) : "";
+              const markdownContent = markdownContentBase64 ? decodeFromBase64(markdownContentBase64) : "";
               const dataContentBase64 = props?.["data-pg-content"];
-              const jsonContent = atob(dataContentBase64);
+              const jsonContent = decodeFromBase64(dataContentBase64);
               const appProps = JSON.parse(jsonContent);
               return (
                 <NestedAppAndCodeViewNative
@@ -386,11 +386,40 @@ export const Markdown = memo(
             section({ children, ...props }) {
               const treeContentBase64 = props?.["data-tree-content"];
               if (treeContentBase64 !== undefined) {
-                const content = atob(treeContentBase64);
+                const content = decodeFromBase64(treeContentBase64);
                 return <TreeDisplay content={content} />;
               }
               return null;
             },
+            // Handle SVG elements that pass through via rehype-raw
+            // These need to be created using React.createElement to avoid warnings about unrecognized tags
+            svg: (({ children, ...props }) => {
+              const { ref, ...restProps } = props as any;
+              return React.createElement('svg', restProps, children);
+            }) as any,
+            g: (({ children, ...props }) => {
+              const { ref, ...restProps } = props as any;
+              return React.createElement('g', restProps, children);
+            }) as any,
+            path: (({ children, ...props }) => {
+              const { ref, ...restProps } = props as any;
+              return React.createElement('path', restProps, children);
+            }) as any,
+            rect: (({ children, ...props }) => {
+              const { ref, ...restProps } = props as any;
+              return React.createElement('rect', restProps, children);
+            }) as any,
+            ellipse: (({ children, ...props }) => {
+              const { ref, ...restProps } = props as any;
+              return React.createElement('ellipse', restProps, children);
+            }) as any,
+            // The <text> element can appear in two contexts:
+            // 1. As an SVG <text> element inside SVG diagrams (rare, handled by rehype-raw)
+            // 2. As a literal <text> tag in markdown content that passes through rehype-raw
+            // We strip the wrapper and just render the children to avoid React warnings
+            text: (({ children }) => {
+              return <>{children}</>;
+            }) as any,
           }}
         >
           {children as any}

@@ -115,6 +115,10 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         case SyntaxKind.OpenNodeStart:
           parseOpeningTag();
           break;
+
+        case SyntaxKind.TextNode:
+          bumpAny();
+          break;
         case SyntaxKind.CloseNodeStart: {
           const errNode = errNodeUntil(RECOVER_FILE);
           errorAt(DIAGS.unexpectedCloseTag, errNode!.pos, errNode!.end);
@@ -576,11 +580,9 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     } else {
       pos = token.start;
     }
-    let start = pos;
     let triviaBefore = undefined;
     if (leadingComments.length > 0) {
       triviaBefore = leadingComments;
-      start = leadingComments[0].pos;
     }
 
     let kind = SyntaxKind.TextNode;
