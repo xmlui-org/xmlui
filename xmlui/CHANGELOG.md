@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.11.13
+
+### Patch Changes
+
+- 225a580: Review NavLink theme varaible defaults
+- 5e9bd24: Fix null value handling in TextBox
+
 ## 0.11.12
 
 ### Patch Changes
