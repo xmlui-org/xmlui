@@ -164,7 +164,7 @@ The form infrastructure fires this event when the form is submitted successfully
 
 ### `willSubmit` [#willsubmit]
 
-The form infrastructure fires this event just before the form is submitted. The event argument is the current `data` value to be submitted. You can cancel the submission by returning `false` from the event handler.
+The form infrastructure fires this event just before the form is submitted. The event argument is the current `data` value to be submitted. The return value controls submission behavior: returning `false` cancels the submission; returning a plain object submits that object instead; returning `null`, `undefined`, an empty string, or any non-object value proceeds with normal submission.
 
 The following example allows saving customer data only when the age is an even number. The `willSubmit` event handler returns `false` if this condition is not met.
 

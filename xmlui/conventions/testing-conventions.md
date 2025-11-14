@@ -104,11 +104,10 @@ Example documentation locations:
 
 ### Commands
 
-These commands should be ran inside the npm package named `xmlui`, which is inside the directory called `xmlui`.
-There might be a root level directory called `xmlui` (a monorepo) which contains the `xmlui` subdirectory. You want to run the commands from the `xmlui` subdirectory.
+**IMPORTANT**: All Playwright test commands must be run from the workspace root directory (`/Users/dotneteer/source/xmlui`), NOT from subdirectories. The workspace root is the monorepo directory that contains multiple packages including the `xmlui` subdirectory.
 
 ```bash
-# Standard execution
+# Standard execution (run from workspace root)
 npx playwright test ComponentName.spec.ts
 
 # Category-specific

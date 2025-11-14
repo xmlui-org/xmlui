@@ -282,8 +282,8 @@ This component does not expose any methods.
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-NavLink | $fontFamily | $fontFamily |
 | [fontSize](../styles-and-themes/common-units/#size)-NavLink | $fontSize-sm | $fontSize-sm |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink | $fontWeight-normal | $fontWeight-normal |
-| [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink--active | $fontWeight-bold | $fontWeight-bold |
-| [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink--pressed | $fontWeight-bold | $fontWeight-bold |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink--active | *none* | *none* |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink--pressed | *none* | *none* |
 | [outlineColor](../styles-and-themes/common-units/#color)-NavLink--focus | $outlineColor--focus | $outlineColor--focus |
 | [outlineOffset](../styles-and-themes/common-units/#size)-NavLink--focus | -1px | -1px |
 | [outlineStyle](../styles-and-themes/common-units/#border)-NavLink--focus | $outlineStyle--focus | $outlineStyle--focus |
