@@ -1,5 +1,13 @@
 # xmlui
 
+## 0.11.12
+
+### Patch Changes
+
+- cef5d43: fix: DropdownMenu - portal issue
+- a9e3115: Modify behaviors to use extractValue on attached properties
+- 72d968e: Fix clearable issue with DateInput (and TimeInput)
+
 ## 0.11.11
 
 ### Patch Changes
