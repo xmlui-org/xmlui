@@ -1381,6 +1381,16 @@ test.describe("Other Edge Cases", () => {
         included: "modified",
       });
     });
+
+    test("handles initial null value", async ({ initTestBed, createFormItemDriver }) => {
+      await initTestBed(`
+      <Form data="{{lastName: null}}">
+        <FormItem testId="formItem" bindTo="lastName" />
+      </Form>
+    `);
+      const driver = await createFormItemDriver("formItem");
+      await expect(driver.component).toBeVisible();
+    });
   });
 });
 

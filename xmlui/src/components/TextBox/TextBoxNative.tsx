@@ -245,7 +245,7 @@ export const TextBox = forwardRef(function TextBox(
         tabIndex={enabled ? tabIndex : -1}
         required={required}
       />
-      {!readOnly && enabled && localValue.length > 0 && type == "search" && (
+      {!readOnly && enabled && type == "search" && localValue?.length > 0 && (
         <Adornment
           data-part-id={PART_END_ADORNMENT}
           iconName="close"
