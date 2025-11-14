@@ -1099,6 +1099,26 @@ All horizontal layout diagrams share the following common characteristics:
 
 ![Horizontal Layout with Overflow and Scrollbar](images/horizontal-layout-overflow-scrollbar.svg)
 
+### Horizontal Layout with Overflow and Scrollbar (Mid-Scroll Position)
+
+- `layout`: horizontal
+- `noScrollbarGutters`: false
+- `scrollWholePage`: true
+
+**Note:** The content overflows both above and below the viewport; the scrollbar is visible in the right gutter at mid position showing the user has scrolled down from the top. The header, navigation panel, and part of the main content overflow at the top; the footer and remaining main content overflow at the bottom.
+
+![Horizontal Layout with Overflow and Scrollbar Mid-Scroll](images/horizontal-layout-overflow-scrollbar-mid.svg)
+
+### Horizontal Layout with Overflow and Scrollbar (Bottom-Scroll Position)
+
+- `layout`: horizontal
+- `noScrollbarGutters`: false
+- `scrollWholePage`: true
+
+**Note:** The content overflows above the viewport; the scrollbar is visible in the right gutter at the bottom position showing the user has scrolled to the end. The header, navigation panel, and part of the main content overflow at the top; the remaining main content and footer are fully visible in the viewport.
+
+![Horizontal Layout with Overflow and Scrollbar Bottom-Scroll](images/horizontal-layout-overflow-scrollbar-bottom.svg)
+
 ### Horizontal Layout with Overflow and Scrollbar (No Gutter Reservation)
 
 - `layout`: horizontal
@@ -1109,48 +1129,26 @@ All horizontal layout diagrams share the following common characteristics:
 
 ![Horizontal Layout with Overflow and Scrollbar](images/horizontal-layout-overflow-scrollbar.svg)
 
-### Horizontal Layout Scrolled to Bottom
+### Horizontal Layout with Overflow and Scrollbar (No Gutter Reservation, Mid-Scroll Position)
 
 - `layout`: horizontal
-- `noScrollbarGutters`: false
+- `noScrollbarGutters`: true
 - `scrollWholePage`: true
 
-**Note:** The page is scrolled to the bottom; the header and the top of the main content overflow at the top; the scrollbar is at the bottom position; the footer is visible at the bottom of the screen.
+**Note:** The content overflows both above and below the viewport; the scrollbar is visible on the right side at mid position showing the user has scrolled down from the top; no scroll gutters are reserved. The header, navigation panel, and part of the main content overflow at the top; the footer and remaining main content overflow at the bottom.
 
-```
-  ┌──────────────────────────────────────────────────────────────────────────┐
-  │ H: Header                                                                │
-  ├──────────────────────────────────────────────────────────────────────────┤
-  │ N: Navigation Panel                                                      │
-  ├──────────────────────────────────────────────────────────────────────────┤
-  │ M: Main Content                                                          │
-  │                                                                          │
-  │                                                                          │
-┌─┼──────────────────────────────────────────────────────────────────────────┼─┐
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ ├──────────────────────────────────────────────────────────────────────────┤█│
-│ │ F: Footer                                                                │█│
-└─┴──────────────────────────────────────────────────────────────────────────┴─┘
-```
+![Horizontal Layout with Overflow and Scrollbar Mid-Scroll No Gutter](images/horizontal-layout-overflow-scrollbar-nogutter-mid.svg)
+
+### Horizontal Layout with Overflow and Scrollbar (No Gutter Reservation, Bottom-Scroll Position)
+
+- `layout`: horizontal
+- `noScrollbarGutters`: true
+- `scrollWholePage`: true
+
+**Note:** The content overflows above the viewport; the scrollbar is visible on the right side at the bottom position showing the user has scrolled to the end; no scroll gutters are reserved. The header, navigation panel, and part of the main content overflow at the top; the remaining main content and footer are fully visible in the viewport.
+
+![Horizontal Layout with Overflow and Scrollbar Bottom-Scroll No Gutter](images/horizontal-layout-overflow-scrollbar-nogutter-bottom.svg)
+
 
 ### Horizontal Layout with Content-Only Scroll
 
@@ -1160,63 +1158,8 @@ All horizontal layout diagrams share the following common characteristics:
 
 **Note:** Only the main content scrolls; header, navigation panel, and footer remain docked. The scrollbar belongs to the main content block. Content overflow is indicated with arrows showing hidden content above and below the visible area.
 
-```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ H: Header (docked to top)                                                    │
-├──────────────────────────────────────────────────────────────────────────────┤
-│ N: Navigation Panel (docked to top)                                          │
-├─┬──────────────────────────────────────────────────────────────────────────┬─┤
-│ │ ↑ Content above (hidden)                                                 │ │
-│ │                                                                          │ │
-│ │                                                                          │█│
-│ │ M: Main Content (scrollable, mid-scroll position)                        │█│
-│ │                                                                          │█│
-│ │                                                                          │█│
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │ ↓ Content below (hidden)                                                 │ │
-├─┴──────────────────────────────────────────────────────────────────────────┴─┤
-│ F: Footer (docked to bottom)                                                 │
-└──────────────────────────────────────────────────────────────────────────────┘
-```
+![Horizontal Layout with Content-Only Scroll](images/horizontal-layout-content-scroll.svg)
 
-### Horizontal Layout with Content-Only Scroll (Mid-Scroll Position)
-
-- `layout`: horizontal
-- `noScrollbarGutters`: true
-- `scrollWholePage`: false
-
-**Note:** Main content at mid-scroll position; header, navigation panel, and footer remain docked. The scrollbar is in the middle position. Content overflow is indicated with arrows showing hidden content both above and below the visible area.
-
-```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ H: Header (docked to top)                                                    │
-├──────────────────────────────────────────────────────────────────────────────┤
-│ N: Navigation Panel (docked to top)                                          │
-├────────────────────────────────────────────────────────────────────────────┬─┤
-│ ↑ Content above (hidden)                                                   │ │
-│                                                                            │ │
-│                                                                            │ │
-│ M: Main Content (scrollable, mid-scroll position)                          │ │
-│                                                                            │█│
-│                                                                            │█│
-│                                                                            │█│
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│ ↓ Content below (hidden)                                                   │ │
-├────────────────────────────────────────────────────────────────────────────┴─┤
-│ F: Footer (docked to bottom)                                                 │
-└──────────────────────────────────────────────────────────────────────────────┘
-```
 
 ## Horizontal-Sticky Layout Diagrams
 
@@ -1236,33 +1179,7 @@ All horizontal-sticky layout diagrams share the following common characteristics
 
 **Note:** Content fits within viewport; no scrollbar visible. Header, NavPanel, and Footer are docked.
 
-```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ H: Header (docked to top)                                                    │
-├──────────────────────────────────────────────────────────────────────────────┤
-│ N: Navigation Panel (docked to top)                                          │
-├──────────────────────────────────────────────────────────────────────────────┤
-│ M: Main Content                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-├──────────────────────────────────────────────────────────────────────────────┤
-│ F: Footer (docked to bottom)                                                 │
-└──────────────────────────────────────────────────────────────────────────────┘
-```
+![Horizontal-Sticky Layout](images/horizontal-sticky-layout.svg)
 
 ### Horizontal-Sticky Layout with Scroll Gutters (No Overflow)
 
@@ -1272,32 +1189,7 @@ All horizontal-sticky layout diagrams share the following common characteristics
 
 **Note:** Content fits within viewport; scroll gutters reserved on both sides. Header, NavPanel, and Footer are docked. App Container is the scroll parent.
 
-```
-┌─┬──────────────────────────────────────────────────────────────────────────┬─┐
-│ │ H: Header (docked to top)                                                │ │
-│ ├──────────────────────────────────────────────────────────────────────────┤ │
-│ │ N: Navigation Panel (docked to top)                                      │ │
-│ ├──────────────────────────────────────────────────────────────────────────┤ │
-│ │ M: Main Content                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ ├──────────────────────────────────────────────────────────────────────────┤ │
-│ │ F: Footer (docked to bottom)                                             │ │
-└─┴──────────────────────────────────────────────────────────────────────────┴─┘
-```
+![Horizontal-Sticky Layout with Gutters](images/horizontal-sticky-layout-with-gutters.svg)
 
 ### Horizontal-Sticky Layout with Content Overflow (Mid-Scroll)
 
@@ -1307,34 +1199,7 @@ All horizontal-sticky layout diagrams share the following common characteristics
 
 **Note:** Content overflows; scrollbar visible on right side spanning entire viewport. Header, NavPanel, and Footer remain docked. Scrollbar at mid-position. App Container is the scroll parent.
 
-```
-┌────────────────────────────────────────────────────────────────────────────┬─┐
-│ H: Header (docked to top)                                                  │ │
-├────────────────────────────────────────────────────────────────────────────┤ │
-│ N: Navigation Panel (docked to top)                                        │ │
-├────────────────────────────────────────────────────────────────────────────┤ │
-│ ↑ Content above (hidden)                                                   │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│ M: Main Content (scrollable, mid-scroll position)                          │█│
-│                                                                            │█│
-│                                                                            │█│
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│ ↓ Content below (hidden)                                                   │ │
-├────────────────────────────────────────────────────────────────────────────┤ │
-│ F: Footer (docked to bottom)                                               │ │
-└────────────────────────────────────────────────────────────────────────────┴─┘
-```
+![Horizontal-Sticky Layout with Overflow Mid-Scroll](images/horizontal-sticky-layout-overflow-mid.svg)
 
 ### Horizontal-Sticky Layout with Content Overflow and Scroll Gutters (Mid-Scroll)
 

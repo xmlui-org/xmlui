@@ -11,7 +11,7 @@ These rules define how to create consistent, professional SVG diagrams illustrat
 
 ## Core Principles
 
-1. **Main Screen Border**: The outermost 4px thick border represents the visible viewport (800x600)
+1. **Main Screen Border**: The outermost 2px thick border represents the visible viewport (800x600)
 2. **No Double Borders**: Never draw borders on both sides of adjacent elements - only draw ONE border between them
 3. **Borders Only Between Adjacent Blocks**: Container areas have no borders unless blocks are adjacent
 4. **Gutters Inside Main Screen**: Scroll gutters are part of the main screen area, enclosed by the thick border
@@ -30,29 +30,36 @@ These rules define how to create consistent, professional SVG diagrams illustrat
 - **Dimensions**: Variable height (e.g., 840x840 for 200px overflow)
 - **ViewBox**: Adjusted to total height (e.g., `viewBox="0 0 840 840"`)
 - **Main screen**: 800x600 (x=20, y=20, width=800, height=600) - the visible viewport
-- **Overflow area**: Below main screen (e.g., x=20, y=620, height=200) - scrollable content
+- **Main screen border**: COMPLETE 2px rectangle on all 4 sides, forming a closed boundary
+- **Overflow area**: Below main screen (e.g., starting at y=620, height=200) - scrollable content outside viewport
+- **Important**: The main screen's bottom border (at y=620) marks where viewport ends and overflow begins
 
 ---
 
 ## Border Hierarchy
 
 ### 1. Main Screen Border (Highest Priority)
-- **Style**: 4px solid (#333)
+- **Style**: 2px solid (#333)
 - **CSS Class**: `.main-screen-border`
 - **Position**: x=20, y=20, width=800, height=600
 - **Purpose**: Represents the visible viewport boundary
 - **Encloses**: Everything inside the main screen (gutters + content blocks)
 - **CRITICAL**: This is the ONLY thick border - all other borders are thin (1px)
+- **CRITICAL**: Main screen MUST be completely bordered on all 4 sides (top, right, bottom, left)
+- **Drawing order**: Draw this LAST so it appears on top of all content
+- **Overflow diagrams**: The 2px border forms a complete closed rectangle around the 800x600 viewport, even when overflow content is shown below
 
 ### 2. Block Separator Borders
 - **Style**: 1px solid (#333)
 - **CSS Class**: `.block-border`
 - **Usage**: ONLY draw between adjacent blocks (never double borders)
+- **CRITICAL**: Blocks themselves have NO borders - they are just filled rectangles
 - **Rules**:
-  - Draw ONE horizontal line where blocks meet (e.g., bottom of Header when Nav is below)
-  - Do NOT draw borders on both blocks - choose one side only
-  - Convention: Draw border at the BOTTOM of upper block OR TOP of lower block (not both)
-  - Container areas with no blocks have NO borders
+  - Draw ONE horizontal line where blocks meet (e.g., at y=70 between Header and Nav)
+  - Separator lines are INDEPENDENT elements, NOT part of block rectangles
+  - Do NOT add stroke to block `<rect>` elements - use separate `<line>` elements
+  - Draw separator AFTER both adjacent blocks are drawn
+  - No separator after the last block (e.g., Footer has no bottom separator)
 
 ### 3. Gutter Edge Indicators
 - **Style**: 1px dashed (#666), stroke-dasharray="4,2"
@@ -79,48 +86,79 @@ These rules define how to create consistent, professional SVG diagrams illustrat
 ❌ WRONG:
 ```xml
 <!-- Header with bottom border -->
-<rect class="header" x="35" y="20" width="770" height="50"/>
-<line class="block-border" x1="35" y1="70" x2="805" y2="70"/> <!-- Header bottom -->
+<rect class="header" x="35" y="20" width="770" height="45"/>
+<line class="block-border" x1="35" y1="65" x2="805" y2="65"/> <!-- Header bottom -->
 
 <!-- Nav with top border -->
-<rect class="nav" x="35" y="70" width="770" height="45"/>
-<line class="block-border" x1="35" y1="70" x2="805" y2="70"/> <!-- Nav top - DUPLICATE! -->
+<rect class="nav" x="35" y="65" width="770" height="45"/>
+<line class="block-border" x1="35" y1="65" x2="805" y2="65"/> <!-- Nav top - DUPLICATE! -->
 ```
 
 ✅ CORRECT:
 ```xml
-<!-- Header with bottom border -->
-<rect class="header" x="35" y="20" width="770" height="50"/>
-<line class="block-border" x1="35" y1="70" x2="805" y2="70"/> <!-- SINGLE border between -->
+<!-- Header block (NO border attribute) -->
+<rect class="header" x="35" y="20" width="770" height="45"/>
 
-<!-- Nav without top border (already drawn above) -->
-<rect class="nav" x="35" y="70" width="770" height="45"/>
+<!-- Separator line between Header and Nav -->
+<line class="block-border" x1="35" y1="65" x2="805" y2="65"/>
+
+<!-- Nav block (NO border attribute) -->
+<rect class="nav" x="35" y="65" width="770" height="45"/>
 ```
 
-### Rule 2: Borders Only Between Adjacent Blocks
-**Do NOT draw borders where there are no adjacent blocks.**
+### Rule 2: Blocks Have NO Borders
+**Content block rectangles are ONLY filled shapes - they have no stroke attribute.**
 
 ❌ WRONG:
 ```xml
-<!-- App Container with top/bottom borders but no adjacent blocks -->
-<rect x="35" y="20" width="770" height="600"/>
-<line x1="35" y1="20" x2="805" y2="20"/> <!-- Top border - nothing above! -->
-<line x1="35" y1="620" x2="805" y2="620"/> <!-- Bottom border - nothing below! -->
+<!-- Block with stroke attribute -->
+<rect class="header" x="20" y="20" width="800" height="45" stroke="#333" stroke-width="1"/>
 ```
 
 ✅ CORRECT:
 ```xml
-<!-- App Container with no borders (no adjacent blocks) -->
-<rect x="35" y="20" width="770" height="600"/>
-<!-- Only gutter edges (dashed) at x=35 and x=805 -->
+<!-- Block with only fill (via CSS class) -->
+<rect class="header" x="20" y="20" width="800" height="45"/>
+
+<!-- Borders are separate line elements -->
+<line class="block-border" x1="20" y1="65" x2="820" y2="65"/>
 ```
 
-### Rule 3: Container Areas Have No Inherent Borders
-**Containers are just backgrounds - borders appear only at block boundaries.**
+### Rule 3: Separators Are Independent Lines
+**Block separators are standalone `<line>` elements between blocks.**
 
-- App Container: NO borders, just fill color
-- Scroll gutters: Fill color + dashed inner edges (not borders)
-- Content areas: Fill color, borders only where blocks meet
+❌ WRONG:
+```xml
+<!-- Trying to use rect border as separator -->
+<rect class="header" x="20" y="20" width="800" height="45" stroke-bottom="#333"/>
+```
+
+✅ CORRECT:
+```xml
+<!-- Blocks are separate from their separators -->
+<rect class="header" x="20" y="20" width="800" height="45"/>
+<rect class="nav" x="20" y="65" width="800" height="45"/>
+
+<!-- Separator is a separate line element -->
+<line class="block-border" x1="20" y1="65" x2="820" y2="65"/>
+```
+
+### Rule 4: No Border on Last Block
+**The last block in a sequence has no separator after it.**
+
+❌ WRONG:
+```xml
+<!-- Footer with bottom border but nothing below -->
+<rect class="footer" x="20" y="575" width="800" height="45"/>
+<line class="block-border" x1="20" y1="620" x2="820" y2="620"/> <!-- WRONG - nothing below! -->
+```
+
+✅ CORRECT:
+```xml
+<!-- Footer with no separator after it -->
+<rect class="footer" x="20" y="575" width="800" height="45"/>
+<!-- No line here - Footer is the last block -->
+```
 
 ---
 
@@ -170,7 +208,7 @@ These rules define how to create consistent, professional SVG diagrams illustrat
 - **Scroll Gutters**: #e9ecef (very light gray) - CSS class `.gutter`
 
 ### Border Colors
-- **Main screen border**: #333 (dark gray), 4px thick
+- **Main screen border**: #333 (dark gray), 2px thick
 - **Block separators**: #333 (dark gray), 1px solid
 - **Gutter edges**: #666 (medium gray), 1px dashed
 - **Viewport separator**: #666 (medium gray), 1px dotted
@@ -183,7 +221,8 @@ These rules define how to create consistent, professional SVG diagrams illustrat
 - **Background**: #f5f5f5
 - **Lines**: #e8e8e8 diagonal cross-hatch
 - **CSS**: Use pattern `.overflow-bg` with `url(#overflowPattern)`
-- **Applied to**: Main Content blocks in overflow area only (not Footer)
+- **Applied to**: ALL content blocks in overflow areas (Header, Navigation, Main Content, Footer)
+- **CRITICAL**: Blocks in overflow areas must use `.overflow-bg` class instead of their normal class (`.header`, `.nav`, `.content`, `.footer`) so the diagonal pattern remains visible and indicates overflow content
 
 ---
 
@@ -197,6 +236,15 @@ These rules define how to create consistent, professional SVG diagrams illustrat
 - **CSS Class**: `.text`
 - **Position**: 10px from left edge of content (x=45 when content starts at x=35)
 - **Vertical**: Centered or slightly above center in block
+
+### Centered Text Labels
+- **Font**: Arial, sans-serif
+- **Size**: 14px
+- **Color**: #666 (lighter for non-block areas)
+- **Style**: Italic, center-aligned
+- **CSS Class**: `.text-center`
+- **Usage**: For "Remaining space" areas and other centered annotations
+- **Position**: Centered both horizontally and vertically in the area
 
 ### Annotations (Minimal Use)
 - **Font**: Arial, sans-serif
@@ -212,31 +260,41 @@ These rules define how to create consistent, professional SVG diagrams illustrat
 
 ### Standard Diagrams
 1. Canvas background (`.container-bg`)
-2. Scroll gutters with fills (`.gutter`)
-3. Gutter inner edges - dashed lines (`.gutter-edge`)
-4. App Container area (if visible, same as canvas color)
-5. Content blocks (`.header`, `.nav`, `.content`, `.footer`)
-6. Block separator borders (`.block-border`) - between adjacent blocks only
-7. Scrollbar track (`.scrollbar-track`) - if visible, overlays right gutter
-8. Scrollbar thumb (`.scrollbar-thumb`)
-9. Main screen border (`.main-screen-border`) - thick 4px, drawn LAST for clean edges
-10. Text labels (`.text`) - always on top
+2. Scroll gutters with fills (`.gutter`) - if present
+3. Gutter inner edges - dashed lines (`.gutter-edge`) - if present
+4. Content blocks (`.header`, `.nav`, `.content`, `.footer`) - **rectangles with NO stroke**
+5. Block separator lines (`.block-border`) - **independent `<line>` elements between adjacent blocks**
+6. Scrollbar track (`.scrollbar-track`) - if visible, overlays right gutter
+7. Scrollbar thumb (`.scrollbar-thumb`)
+8. Text labels (`.text`)
+9. **Main screen border (`.main-screen-border`) - DRAW LAST so it appears on top of all content**
+
+**CRITICAL NOTES:**
+- Main screen border is drawn LAST so it appears on top of all content
+- Block rectangles have NO stroke attribute - they are fill-only
+- Separators are separate `<line>` elements, not part of block rectangles
+- Each separator is drawn ONCE between two adjacent blocks
 
 ### Overflow Diagrams
 1. Canvas background (`.container-bg`)
 2. **Main screen** gutters with fills
 3. **Main screen** gutter inner edges (dashed)
-4. **Main screen** content blocks
-5. **Main screen** block separator borders (between adjacent blocks only)
+4. **Main screen** content blocks - **rectangles with NO stroke**
+5. **Main screen** block separator lines - **between adjacent blocks only**
 6. Scrollbar track and thumb (main screen only)
-7. Main screen border (thick 4px, around viewport only)
-8. Viewport separator line (dotted, at y=620)
-9. **Overflow area** gutters with fills
-10. **Overflow area** gutter inner edges (dashed)
-11. **Overflow area** content blocks (with overflow pattern if applicable)
-12. **Overflow area** block separator borders (between adjacent blocks only)
-13. **Overflow area** bottom edge (at very bottom)
-14. Text labels (always on top)
+7. **Overflow area** gutters with fills
+8. **Overflow area** content blocks - **with overflow pattern if applicable, NO stroke**
+9. **Overflow area** block separator lines - **between adjacent blocks only**
+10. **Overflow area** bottom edge (at very bottom) - only if needed
+11. Text labels (always on top)
+12. **Main screen border (`.main-screen-border`) - DRAW LAST so it appears on top of overflow content**
+
+**OVERFLOW NOTES:**
+- Main screen border is a COMPLETE 2px rectangle around viewport (x=20, y=20, width=800, height=600)
+- The bottom border of the main screen (at y=620) separates viewport from overflow area
+- Overflow content continues below the main screen viewport with same block structure
+- Overflow area is NOT enclosed by the main screen border - it's outside the viewport
+- Separators in overflow area follow same rules: only between adjacent blocks
 
 ---
 
@@ -247,16 +305,16 @@ These rules define how to create consistent, professional SVG diagrams illustrat
 .container-bg { fill: #f8f9fa; }
 .gutter { fill: #e9ecef; }
 
-/* Blocks */
+/* Blocks - FILL ONLY, NO STROKE */
 .header { fill: #d0d0d0; }
 .nav { fill: #e0e0e0; }
 .content { fill: #ffffff; }
 .footer { fill: #d0d0d0; }
 .overflow-bg { fill: url(#overflowPattern); }
 
-/* Borders */
-.main-screen-border { stroke: #333; stroke-width: 4; fill: none; }
-.block-border { stroke: #333; stroke-width: 1; fill: none; }
+/* Borders - USE ON <line> AND <rect> ELEMENTS ONLY FOR BORDERS */
+.main-screen-border { stroke: #333; stroke-width: 2; fill: none; }
+.block-border { stroke: #333; stroke-width: 1; fill: none; }  /* Use ONLY on <line> elements */
 .dotted-border { stroke: #666; stroke-width: 1; stroke-dasharray: 4,4; fill: none; }
 .gutter-edge { stroke: #666; stroke-width: 1; stroke-dasharray: 4,2; fill: none; }
 
@@ -266,8 +324,14 @@ These rules define how to create consistent, professional SVG diagrams illustrat
 
 /* Text */
 .text { font-family: Arial, sans-serif; font-size: 14px; fill: #333; text-anchor: start; font-style: italic; }
+.text-center { font-family: Arial, sans-serif; font-size: 14px; fill: #666; text-anchor: middle; font-style: italic; }
 .label { font-family: Arial, sans-serif; font-size: 10px; fill: #666; font-style: italic; }
 ```
+
+**USAGE NOTES:**
+- `.header`, `.nav`, `.content`, `.footer` are for block `<rect>` elements - FILL ONLY
+- `.block-border` is for separator `<line>` elements - NEVER use stroke on block rectangles
+- `.main-screen-border` is for the outer viewport `<rect>` - stroke only, no fill
 
 ---
 
@@ -284,10 +348,10 @@ These rules define how to create consistent, professional SVG diagrams illustrat
 
 ## Typical Block Dimensions
 
-- **Header**: 40-50px height
-- **Navigation Panel**: 45-50px height  
+- **Header**: 45px height
+- **Navigation Panel**: 45px height  
 - **Main Content**: Variable, fills remaining space
-- **Footer**: 45-70px height
+- **Footer**: 45px height
 - **Scroll Gutters**: 15px width (each side)
 - **Scrollbar**: 15px width (overlays right gutter)
 
@@ -302,10 +366,18 @@ Adjust as needed to demonstrate specific layout concepts.
 1. **Set up canvas**: `<svg viewBox="0 0 840 640" width="840" height="640">`
 2. **Add CSS classes** in `<defs><style>` section (copy from CSS Class Reference)
 3. **Draw background**: Canvas background rectangle (`.container-bg`)
-4. **Draw main screen border**: 4px thick rectangle at x=20, y=20, width=800, height=600 (`.main-screen-border`)
+4. **Draw content first, then main screen border LAST**: 2px thick rectangle at x=20, y=20, width=800, height=600 (`.main-screen-border`)
 5. **Draw scroll gutters** (if needed): Left (x=20-35) and right (x=805-820) with dashed inner edges (`.gutter-edge`)
-6. **Draw content blocks**: Header, Nav, Content, Footer (use appropriate CSS classes)
-7. **Draw block separators**: ONE 1px line between adjacent blocks only (`.block-border`)
+6. **Draw content blocks**: Header, Nav, Content, Footer rectangles - **NO stroke attribute, fill only**
+   ```xml
+   <rect class="header" x="20" y="20" width="800" height="45"/>
+   <rect class="nav" x="20" y="65" width="800" height="45"/>
+   ```
+7. **Draw block separators**: ONE `<line>` element between each pair of adjacent blocks
+   ```xml
+   <line class="block-border" x1="20" y1="65" x2="820" y2="65"/>  <!-- Header|Nav -->
+   <line class="block-border" x1="20" y1="110" x2="820" y2="110"/>  <!-- Nav|Content -->
+   ```
 8. **Add scrollbar** (if needed): Track and thumb overlaying right gutter (`.scrollbar-track`, `.scrollbar-thumb`)
 9. **Add labels**: Block names (`.text`)
 
@@ -320,14 +392,53 @@ Adjust as needed to demonstrate specific layout concepts.
 7. **Draw bottom edge**: 1px line at very bottom of content
 8. **Add labels**: Indicate overflow content
 
+### Creating Diagrams with "Remaining Space" Areas
+
+When showing diagrams where content fits in viewport but there's visible empty space below the last block:
+
+1. **Draw all blocks** according to standard rules (Header, Nav, Content, Footer with separators)
+2. **Draw separator line** after the last block (e.g., Footer) to show the boundary with remaining space
+3. **Draw remaining space rectangle** with simple shading:
+   ```xml
+   <rect x="35" y="495" width="770" height="125" fill="#eeeeee"/>
+   ```
+4. **Add centered text label**:
+   ```xml
+   <text class="text-center" x="420" y="562">Remaining space</text>
+   ```
+   - Use `.text-center` class for center-aligned text
+   - Position text at horizontal center of content area
+   - Position text at vertical center of remaining space area
+
+**Remaining Space Styling Rules:**
+- Use simple shading (#eeeeee) instead of patterns to avoid visual artifacts at edges
+- Do NOT draw redundant gutter edge lines on individual blocks - gutters have their own edges
+- Remaining space should have a separator line at its top (after last block) but NOT at bottom (ends at main screen border)
+- Text should be centered both horizontally and vertically
+- Text color should be lighter (#666) than block labels (#333)
+
 ### Common Mistakes to Avoid
 
 ❌ Drawing borders on both sides of adjacent blocks (double borders)  
-❌ Drawing top/bottom borders on empty container areas  
+❌ Adding stroke attribute to block `<rect>` elements  
+❌ Drawing borders on block rectangles instead of using separate `<line>` elements  
+❌ Drawing bottom border on last block (Footer) when nothing is below it  
 ❌ Using 2px borders for block separators (should be 1px)  
-❌ Forgetting the main screen border (4px thick)  
+❌ Drawing main screen border first instead of last (it should be on top)  
+❌ Forgetting the main screen border (2px thick)  
 ❌ Drawing scrollbar in overflow area (only in viewport)  
 ❌ Placing scroll gutters outside the main screen border  
+❌ Using diagonal patterns that create visual artifacts at edges
+❌ Drawing redundant gutter edge lines on each individual block
+❌ Missing separator line between last block and remaining space
+❌ Drawing bottom edge on remaining space area (main screen border provides this)
+
+**GOLDEN RULES:**
+1. Blocks = filled rectangles with NO stroke
+2. Separators = independent `<line>` elements between blocks
+3. Main screen border = last element drawn (appears on top)
+4. One separator line per pair of adjacent blocks  
+5. Remaining space = simple shading with centered text, no patterns  
 
 ---
 
