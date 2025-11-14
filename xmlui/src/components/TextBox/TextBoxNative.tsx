@@ -256,15 +256,6 @@ export const TextBox = forwardRef(function TextBox(
       )}
       {type === "password" && showPasswordToggle ? (
         <Part partId={PART_END_ADORNMENT}>
-        <Adornment
-          data-part-id={PART_END_ADORNMENT}
-          iconName={showPassword ? passwordVisibleIcon : passwordHiddenIcon}
-          className={classnames(styles.adornment, styles.passwordToggle)}
-          onClick={togglePasswordVisibility}
-        />
-        </Part>
-      {type === "password" && showPasswordToggle ? (
-        <Part partId={PART_END_ADORNMENT}>
           <Adornment
             iconName={showPassword ? passwordVisibleIcon : passwordHiddenIcon}
             className={classnames(styles.adornment, styles.passwordToggle)}
