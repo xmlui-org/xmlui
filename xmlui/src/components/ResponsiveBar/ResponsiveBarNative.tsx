@@ -12,6 +12,7 @@ import classnames from "classnames";
 import styles from "./ResponsiveBar.module.scss";
 import { useResizeObserver } from "../../components-core/utils/hooks";
 import { DropdownMenu, MenuItem } from "../DropdownMenu/DropdownMenuNative";
+import type { AlignmentOptions } from "../abstractions";
 
 /**
  * ResponsiveBar Component - Adaptive Layout with Overflow Management
@@ -92,11 +93,15 @@ import { DropdownMenu, MenuItem } from "../DropdownMenu/DropdownMenuNative";
 
 type ResponsiveBarProps = {
   children?: ReactNode;
+  childNodes?: any[]; // XMLUI node definitions for context variable support
+  renderChildFn?: (node: any, isOverflow: boolean) => ReactNode;
   overflowIcon?: string;
   dropdownText?: string;
+  dropdownAlignment?: AlignmentOptions;
   triggerTemplate?: ReactNode;
   gap?: number; // Gap between children in pixels
   orientation?: "horizontal" | "vertical"; // Layout direction
+  reverse?: boolean; // Reverse the direction of children
   style?: CSSProperties;
   className?: string;
   onClick?: () => void;
@@ -112,12 +117,14 @@ interface LayoutState {
 const ResponsiveBarDropdown = ({ 
   overflowIcon, 
   dropdownText,
+  dropdownAlignment,
   triggerTemplate,
   children, 
   className 
 }: { 
   overflowIcon: string;
   dropdownText: string;
+  dropdownAlignment: AlignmentOptions;
   triggerTemplate?: ReactNode; 
   children: ReactNode; 
   className?: string;
@@ -127,6 +134,8 @@ const ResponsiveBarDropdown = ({
       label={dropdownText} 
       triggerButtonIcon={overflowIcon}
       triggerTemplate={triggerTemplate}
+      alignment={dropdownAlignment}
+      compact={true}
     >
       {children}
     </DropdownMenu>
@@ -138,16 +147,21 @@ export const defaultResponsiveBarProps = {
   dropdownText: "More options",
   gap: 0,
   orientation: "horizontal" as const,
+  reverse: false,
 };
 
 export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(function ResponsiveBar(
   {
     children,
+    childNodes,
+    renderChildFn,
     overflowIcon = defaultResponsiveBarProps.overflowIcon,
     dropdownText = defaultResponsiveBarProps.dropdownText,
+    dropdownAlignment,
     triggerTemplate,
     gap = defaultResponsiveBarProps.gap,
     orientation = defaultResponsiveBarProps.orientation,
+    reverse = defaultResponsiveBarProps.reverse,
     style,
     className,
     onClick,
@@ -155,6 +169,8 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
   }: ResponsiveBarProps,
   ref,
 ) {
+  // Compute default alignment based on reverse if not explicitly provided
+  const effectiveAlignment: AlignmentOptions = dropdownAlignment ?? (reverse ? "start" : "end");
   const containerRef = useRef<HTMLDivElement>(null);
   const measurementDropdownRef = useRef<HTMLDivElement>(null);
   const isCalculatingRef = useRef(false);
@@ -440,7 +456,9 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
       style={{
         ...style,
         gap: `${gap}px`, // Gap between visibleItems and overflowDropdown
-        flexDirection: orientation === "horizontal" ? "row" : "column",
+        flexDirection: orientation === "horizontal" 
+          ? (reverse ? "row-reverse" : "row") 
+          : (reverse ? "column-reverse" : "column"),
         height: orientation === "vertical" ? "100%" : undefined,
         width: orientation === "horizontal" ? "100%" : undefined,
       }}
@@ -460,7 +478,9 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
               visibility: "hidden",
               opacity: 0,
               pointerEvents: "none",
-              flexDirection: orientation === "horizontal" ? "row" : "column",
+              flexDirection: orientation === "horizontal" 
+                ? (reverse ? "row-reverse" : "row") 
+                : (reverse ? "column-reverse" : "column"),
             }}
           >
             {childrenArray.map((child, index) => (
@@ -480,6 +500,7 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
             <ResponsiveBarDropdown 
               overflowIcon={overflowIcon}
               dropdownText={dropdownText}
+              dropdownAlignment={effectiveAlignment}
               triggerTemplate={triggerTemplate}
               className={styles.overflowDropdown}
             >
@@ -497,7 +518,9 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
             )}
             style={{ 
               gap: `${gap}px`, // Gap between visible items
-              flexDirection: orientation === "horizontal" ? "row" : "column",
+              flexDirection: orientation === "horizontal" 
+                ? (reverse ? "row-reverse" : "row") 
+                : (reverse ? "column-reverse" : "column"),
             }}
           >
             {childrenArray.map((child, index) => {
@@ -505,7 +528,7 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
                 layout.visibleItems.length > 0 ? index < layout.visibleItems.length : true;
               return (
                 <div key={`item-${index}`} style={{ display: isVisible ? "block" : "none" }}>
-                  {child}
+                  {renderChildFn && childNodes ? renderChildFn(childNodes[index], false) : child}
                 </div>
               );
             })}
@@ -516,12 +539,19 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
             <ResponsiveBarDropdown 
               overflowIcon={overflowIcon}
               dropdownText={dropdownText}
+              dropdownAlignment={effectiveAlignment}
               triggerTemplate={triggerTemplate}
               className={styles.overflowDropdown}
             >
-              {layout.overflowItems.map((item, index) => (
-                <MenuItem key={index}>{item}</MenuItem>
-              ))}
+              {layout.overflowItems.map((item, index) => {
+                const originalIndex = layout.visibleItems.length + index;
+                const renderedChild = renderChildFn && childNodes ? renderChildFn(childNodes[originalIndex], true) : item;
+                return (
+                  <MenuItem key={index} compact={true}>
+                    {renderedChild}
+                  </MenuItem>
+                );
+              })}
             </ResponsiveBarDropdown>
           )}
         </>

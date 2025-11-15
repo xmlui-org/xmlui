@@ -39,6 +39,10 @@ $color-MenuSeparator: createThemeVar("color-MenuSeparator");
   .DropdownMenuContent {
     max-height: var(--radix-dropdown-menu-content-available-height);
     overflow: auto;
+
+    &.compact {
+      min-width: auto;
+    } 
   }
 
   .DropdownMenuContent,
@@ -97,6 +101,10 @@ $color-MenuSeparator: createThemeVar("color-MenuSeparator");
         background-color: $backgroundColor-MenuItem;
         color: $color-MenuItem--disabled;
       }
+    }
+
+    &.compact {
+      padding: 0;
     }
 
     .wrapper {

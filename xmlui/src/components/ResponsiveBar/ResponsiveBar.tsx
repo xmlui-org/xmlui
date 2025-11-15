@@ -4,6 +4,8 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dClick, dTriggerTemplate } from "../metadata-helpers";
 import { defaultResponsiveBarProps, ResponsiveBar } from "./ResponsiveBarNative";
+import { ResponsiveBarItem } from "./ResponsiveBarItem";
+import { alignmentOptionMd } from "../abstractions";
 
 const COMP = "ResponsiveBar";
 
@@ -40,6 +42,14 @@ export const ResponsiveBarMd = createMetadata({
       valueType: "string",
       defaultValue: defaultResponsiveBarProps.dropdownText,
     },
+    dropdownAlignment: {
+      description:
+        "Alignment of the dropdown menu relative to the trigger button. " +
+        "By default, uses 'end' when reverse is false (dropdown on the right/bottom) " +
+        "and 'start' when reverse is true (dropdown on the left/top).",
+      valueType: "string",
+      availableValues: alignmentOptionMd,
+    },
     triggerTemplate: dTriggerTemplate(COMP),
     gap: {
       description: 
@@ -48,12 +58,28 @@ export const ResponsiveBarMd = createMetadata({
       valueType: "number",
       defaultValue: defaultResponsiveBarProps.gap,
     },
+    reverse: {
+      description:
+        "Reverses the direction of child elements. In horizontal mode, items are arranged " +
+        "from right to left instead of left to right. In vertical mode, items are arranged " +
+        "from bottom to top instead of top to bottom. The dropdown menu position also adjusts " +
+        "to appear at the start (left/top) instead of the end (right/bottom).",
+      valueType: "boolean",
+      defaultValue: defaultResponsiveBarProps.reverse,
+    },
   },
   events: {
     click: dClick(COMP),
   },
   apis: {},
-  contextVars: {},
+  contextVars: {
+    $overflow: {
+      description:
+        "Boolean indicating whether the child component is displayed in the overflow " +
+        "dropdown menu (true) or visible in the main bar (false).",
+      valueType: "boolean",
+    },
+  },
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
   defaultThemeVars: {
@@ -66,18 +92,41 @@ export const ResponsiveBarMd = createMetadata({
 export const responsiveBarComponentRenderer = createComponentRenderer(
   COMP,
   ResponsiveBarMd,
-  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler, layoutContext }) => {
+    const children = Array.isArray(node.children) ? node.children : node.children ? [node.children] : [];
+    
+    const renderChildWithContext = (childNode: any, isOverflow: boolean) => (
+      <ResponsiveBarItem
+        node={childNode}
+        isOverflow={isOverflow}
+        renderChild={renderChild}
+        layoutContext={layoutContext}
+      />
+    );
+    
     return (
       <ResponsiveBar
         orientation={extractValue(node.props?.orientation)}
         overflowIcon={extractValue(node.props?.overflowIcon)}
         dropdownText={extractValue(node.props?.dropdownText)}
+        dropdownAlignment={extractValue(node.props?.dropdownAlignment)}
         triggerTemplate={renderChild(node.props?.triggerTemplate)}
         gap={extractValue(node.props?.gap)}
+        reverse={extractValue(node.props?.reverse)}
         onClick={lookupEventHandler("click")}
         className={className}
+        childNodes={children}
+        renderChildFn={renderChildWithContext}
       >
-        {renderChild(node.children)}
+        {children.map((child, index) => (
+          <ResponsiveBarItem
+            key={index}
+            node={child}
+            isOverflow={false}
+            renderChild={renderChild}
+            layoutContext={layoutContext}
+          />
+        ))}
       </ResponsiveBar>
     );
   },
