@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.11.14
+
+### Patch Changes
+
+- d4e05af: Review ResponsiveBar and ContentSeparator
+- 7276755: The return value of the Form willSubmit event can set the data to submit
+
 ## 0.11.13
 
 ### Patch Changes
