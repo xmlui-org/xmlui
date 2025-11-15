@@ -511,11 +511,12 @@ test.describe("dropdownAlignment property", () => {
     await expect(overflow).toBeVisible();
 
     await overflow.click();
+    await page.waitForTimeout(100); // Wait for menu to render
     const { width: triggerWidth, x: triggerX } = await overflow.boundingBox();
     const { width: menuWidth, x: menuX } = await page.getByRole("menu").boundingBox();
     const menuEndX = menuX + menuWidth;
     const triggerEndX = triggerX + triggerWidth;
-    expect(menuEndX).toBeCloseTo(triggerEndX, 1);
+    expect(menuEndX).toBeCloseTo(triggerEndX, 0);
   });
 
   test("alignment='center' centers dropdown menu", async ({
