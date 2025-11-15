@@ -12,6 +12,12 @@ import classnames from "classnames";
 import styles from "./ResponsiveBar.module.scss";
 import { useResizeObserver } from "../../components-core/utils/hooks";
 import { DropdownMenu, MenuItem } from "../DropdownMenu/DropdownMenuNative";
+import type { AlignmentOptions } from "../abstractions";
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+
+
+// Component part names
+const PART_OVERFLOW = "overflow";
 
 /**
  * ResponsiveBar Component - Adaptive Layout with Overflow Management
@@ -92,12 +98,20 @@ import { DropdownMenu, MenuItem } from "../DropdownMenu/DropdownMenuNative";
 
 type ResponsiveBarProps = {
   children?: ReactNode;
+  childNodes?: any[]; // XMLUI node definitions for context variable support
+  renderChildFn?: (node: any, isOverflow: boolean) => ReactNode;
   overflowIcon?: string;
+  dropdownText?: string;
+  dropdownAlignment?: AlignmentOptions;
+  triggerTemplate?: ReactNode;
   gap?: number; // Gap between children in pixels
   orientation?: "horizontal" | "vertical"; // Layout direction
+  reverse?: boolean; // Reverse the direction of children
   style?: CSSProperties;
   className?: string;
   onClick?: () => void;
+  onWillOpen?: () => Promise<boolean | undefined>;
+  registerComponentApi?: RegisterComponentApiFn;
   [key: string]: any; // For test props
 };
 
@@ -109,15 +123,33 @@ interface LayoutState {
 // Helper component to avoid duplication of DropdownMenu properties
 const ResponsiveBarDropdown = ({ 
   overflowIcon, 
+  dropdownText,
+  dropdownAlignment,
+  triggerTemplate,
   children, 
-  className 
+  className,
+  onWillOpen,
+  registerComponentApi,
 }: { 
-  overflowIcon: string; 
+  overflowIcon: string;
+  dropdownText: string;
+  dropdownAlignment: AlignmentOptions;
+  triggerTemplate?: ReactNode; 
   children: ReactNode; 
   className?: string;
+  onWillOpen?: () => Promise<boolean | undefined>;
+  registerComponentApi?: RegisterComponentApiFn;
 }) => (
-  <div className={className}>
-    <DropdownMenu label="More options" triggerButtonIcon={overflowIcon}>
+  <div className={className} data-part-id={PART_OVERFLOW}>
+    <DropdownMenu 
+      label={dropdownText} 
+      triggerButtonIcon={overflowIcon}
+      triggerTemplate={triggerTemplate}
+      alignment={dropdownAlignment}
+      compact={true}
+      onWillOpen={onWillOpen}
+      registerComponentApi={registerComponentApi}
+    >
       {children}
     </DropdownMenu>
   </div>
@@ -125,23 +157,35 @@ const ResponsiveBarDropdown = ({
 
 export const defaultResponsiveBarProps = {
   overflowIcon: "ellipsisHorizontal:ResponsiveBar",
+  dropdownText: "More options",
   gap: 0,
   orientation: "horizontal" as const,
+  reverse: false,
 };
 
 export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(function ResponsiveBar(
   {
     children,
+    childNodes,
+    renderChildFn,
     overflowIcon = defaultResponsiveBarProps.overflowIcon,
+    dropdownText = defaultResponsiveBarProps.dropdownText,
+    dropdownAlignment,
+    triggerTemplate,
     gap = defaultResponsiveBarProps.gap,
     orientation = defaultResponsiveBarProps.orientation,
+    reverse = defaultResponsiveBarProps.reverse,
     style,
     className,
     onClick,
+    onWillOpen,
+    registerComponentApi,
     ...rest
   }: ResponsiveBarProps,
   ref,
 ) {
+  // Compute default alignment based on reverse if not explicitly provided
+  const effectiveAlignment: AlignmentOptions = dropdownAlignment ?? (reverse ? "start" : "end");
   const containerRef = useRef<HTMLDivElement>(null);
   const measurementDropdownRef = useRef<HTMLDivElement>(null);
   const isCalculatingRef = useRef(false);
@@ -149,10 +193,12 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
   const lastChildrenCount = useRef(0);
   const lastChildrenRef = useRef<ReactNode>(null);
   const layoutCompletedRef = useRef(false);
+  const dropdownApiRef = useRef<{ open: () => void; close: () => void } | null>(null);
 
   // Two-phase rendering state
   const [isInMeasurementPhase, setIsInMeasurementPhase] = useState(true);
   const [measuredWidths, setMeasuredWidths] = useState<number[]>([]);
+  const [measuredDropdownSize, setMeasuredDropdownSize] = useState<number>(0);
 
   // Simple layout state
   const [layout, setLayout] = useState<LayoutState>({
@@ -170,6 +216,23 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
 
   // Stable children count to prevent unnecessary re-measurements
   const childrenCount = childrenArray.length;
+
+  // Register component API
+  useEffect(() => {
+    if (registerComponentApi) {
+      registerComponentApi({
+        open: () => {
+          dropdownApiRef.current?.open();
+        },
+        close: () => {
+          dropdownApiRef.current?.close();
+        },
+        hasOverflow: () => {
+          return layout.overflowItems.length > 0;
+        },
+      });
+    }
+  }, [registerComponentApi, layout.overflowItems.length]);
 
   // Measurement phase - measure all items in the same container
   const measureItems = () => {
@@ -200,7 +263,18 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
       return orientation === "horizontal" ? rect.width : rect.height;
     });
 
+    // Also measure the dropdown size during measurement phase
+    let dropdownSize = orientation === "horizontal" ? 147 : 47; // Default fallback
+    if (measurementDropdownRef.current) {
+      const dropdownRect = measurementDropdownRef.current.getBoundingClientRect();
+      const measuredSize = orientation === "horizontal" ? dropdownRect.width : dropdownRect.height;
+      if (measuredSize > 0) {
+        dropdownSize = measuredSize;
+      }
+    }
+
     setMeasuredWidths(measurements);
+    setMeasuredDropdownSize(dropdownSize);
     setIsInMeasurementPhase(false);
   }; 
   
@@ -224,9 +298,6 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
       return; // Not ready yet or no change
     }
 
-    // Debug logging
-    console.log(`ResponsiveBar ${orientation}: containerSize=${containerSize}, children=${childrenArray.length}`);
-
     isCalculatingRef.current = true;
     lastContainerSize.current = containerSize;
 
@@ -244,8 +315,6 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
       totalSize += gapSize + childSize;
     }
 
-    console.log(`Total size needed: ${totalSize}, available: ${containerSize}`);
-
     let visibleItems: ReactElement[];
     let overflowItems: ReactElement[];
 
@@ -254,24 +323,20 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
       visibleItems = childrenArray;
       overflowItems = [];
     } else {
-      // Need overflow - measure actual dropdown size
-      let dropdownSize = orientation === "horizontal" ? 147 : 47; // Different fallback for vertical
+      // Use pre-measured dropdown size from measurement phase
+      let dropdownSize = measuredDropdownSize > 0 ? measuredDropdownSize : (orientation === "horizontal" ? 147 : 47);
 
-      // First try existing dropdown in the visible layout
+      // Try to get actual dropdown size if it exists in the visible layout (for resize scenarios)
       const existingDropdown = container.querySelector(
         `.${styles.overflowDropdown}`,
       ) as HTMLElement;
       if (existingDropdown) {
         const dropdownRect = existingDropdown.getBoundingClientRect();
-        dropdownSize = orientation === "horizontal" ? dropdownRect.width : dropdownRect.height;
+        const currentSize = orientation === "horizontal" ? dropdownRect.width : dropdownRect.height;
+        if (currentSize > 0) {
+          dropdownSize = currentSize;
+        }
       }
-      // Then try the measurement dropdown
-      else if (measurementDropdownRef.current) {
-        const dropdownRect = measurementDropdownRef.current.getBoundingClientRect();
-        dropdownSize = orientation === "horizontal" ? dropdownRect.width : dropdownRect.height;
-      }
-
-      console.log(`Dropdown size: ${dropdownSize}`);
 
       let accumulatedSize = 0;
       let visibleCount = 0;
@@ -288,8 +353,6 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
         // The proposedSize already accounts for (visibleCount-1) gaps between items
         // We need to add 1 more gap for the space before the dropdown
         const totalSizeWithDropdown = proposedSize + gapValue + dropdownSize;
-
-        console.log(`Item ${i}: size=${childSize}, proposed=${proposedSize}, withDropdown=${totalSizeWithDropdown}`);
 
         if (totalSizeWithDropdown <= containerSize) {
           accumulatedSize = proposedSize;
@@ -328,20 +391,15 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
         // If all items would fit with dropdown space, don't show dropdown
         visibleItems = childrenArray;
         overflowItems = [];
-        console.log(`All items fit, no dropdown needed`);
       } else if (visibleCount === 0) {
         // If no items fit, show at least one visible and rest in overflow
         visibleItems = childrenArray.slice(0, 1);
         overflowItems = childrenArray.slice(1);
-        console.log(`No items fit, forcing one visible: visible=1, overflow=${overflowItems.length}`);
       } else {
         visibleItems = childrenArray.slice(0, visibleCount);
         overflowItems = childrenArray.slice(visibleCount);
-        console.log(`Split items: visible=${visibleItems.length}, overflow=${overflowItems.length}`);
       }
     }
-
-    console.log(`Final layout: visible=${visibleItems.length}, overflow=${overflowItems.length}`);
 
     // Only update if there's an actual change
     if (
@@ -375,6 +433,7 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
       lastChildrenCount.current = childrenCount;
       setIsInMeasurementPhase(true);
       setMeasuredWidths([]);
+      setMeasuredDropdownSize(0);
     }
   }, [childrenCount]);
 
@@ -427,7 +486,9 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
       style={{
         ...style,
         gap: `${gap}px`, // Gap between visibleItems and overflowDropdown
-        flexDirection: orientation === "horizontal" ? "row" : "column",
+        flexDirection: orientation === "horizontal" 
+          ? (reverse ? "row-reverse" : "row") 
+          : (reverse ? "column-reverse" : "column"),
         height: orientation === "vertical" ? "100%" : undefined,
         width: orientation === "horizontal" ? "100%" : undefined,
       }}
@@ -447,7 +508,9 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
               visibility: "hidden",
               opacity: 0,
               pointerEvents: "none",
-              flexDirection: orientation === "horizontal" ? "row" : "column",
+              flexDirection: orientation === "horizontal" 
+                ? (reverse ? "row-reverse" : "row") 
+                : (reverse ? "column-reverse" : "column"),
             }}
           >
             {childrenArray.map((child, index) => (
@@ -466,7 +529,14 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
           >
             <ResponsiveBarDropdown 
               overflowIcon={overflowIcon}
+              dropdownText={dropdownText}
+              dropdownAlignment={effectiveAlignment}
+              triggerTemplate={triggerTemplate}
               className={styles.overflowDropdown}
+              onWillOpen={onWillOpen}
+              registerComponentApi={(api) => {
+                // Don't store measurement dropdown API
+              }}
             >
               {childrenArray.length > 0 && <MenuItem>{childrenArray[0]}</MenuItem>}
             </ResponsiveBarDropdown>
@@ -482,15 +552,17 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
             )}
             style={{ 
               gap: `${gap}px`, // Gap between visible items
-              flexDirection: orientation === "horizontal" ? "row" : "column",
+              flexDirection: orientation === "horizontal" 
+                ? (reverse ? "row-reverse" : "row") 
+                : (reverse ? "column-reverse" : "column"),
             }}
           >
             {childrenArray.map((child, index) => {
               const isVisible =
                 layout.visibleItems.length > 0 ? index < layout.visibleItems.length : true;
               return (
-                <div key={`item-${index}`} style={{ display: isVisible ? "block" : "none" }}>
-                  {child}
+                <div key={`item-${index}`} style={{ display: isVisible ? "flex" : "none", alignItems: "stretch" }}>
+                  {renderChildFn && childNodes ? renderChildFn(childNodes[index], false) : child}
                 </div>
               );
             })}
@@ -500,11 +572,24 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
           {layout.overflowItems.length > 0 && (
             <ResponsiveBarDropdown 
               overflowIcon={overflowIcon}
+              dropdownText={dropdownText}
+              dropdownAlignment={effectiveAlignment}
+              triggerTemplate={triggerTemplate}
               className={styles.overflowDropdown}
+              onWillOpen={onWillOpen}
+              registerComponentApi={(api) => {
+                dropdownApiRef.current = api as { open: () => void; close: () => void };
+              }}
             >
-              {layout.overflowItems.map((item, index) => (
-                <MenuItem key={index}>{item}</MenuItem>
-              ))}
+              {layout.overflowItems.map((item, index) => {
+                const originalIndex = layout.visibleItems.length + index;
+                const renderedChild = renderChildFn && childNodes ? renderChildFn(childNodes[originalIndex], true) : item;
+                return (
+                  <MenuItem key={index} compact={true}>
+                    {renderedChild}
+                  </MenuItem>
+                );
+              })}
             </ResponsiveBarDropdown>
           )}
         </>

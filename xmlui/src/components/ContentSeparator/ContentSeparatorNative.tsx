@@ -7,6 +7,7 @@ type ContentSeparatorProps = {
   thickness?: number | string;
   length?: number | string;
   orientation?: string;
+  hasExplicitLength?: boolean;
   style?: CSSProperties;
   className?: string;
 };
@@ -17,7 +18,7 @@ export const defaultProps: Pick<ContentSeparatorProps, "orientation"> = {
 
 export const ContentSeparator = forwardRef<HTMLDivElement, ContentSeparatorProps>(
   (
-    { orientation = defaultProps.orientation, thickness, length, style, className, ...rest },
+    { orientation = defaultProps.orientation, thickness, length, hasExplicitLength = false, style, className, ...rest },
     ref,
   ) => {
     // Only apply inline styles if props are explicitly provided
@@ -48,6 +49,7 @@ export const ContentSeparator = forwardRef<HTMLDivElement, ContentSeparatorProps
           {
             [styles.horizontal]: orientation === "horizontal",
             [styles.vertical]: orientation === "vertical",
+            [styles.stretchToFit]: !hasExplicitLength,
           },
           className,
         )}

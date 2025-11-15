@@ -50,6 +50,7 @@ type DropdownMenuProps = {
   triggerButtonThemeColor?: string;
   triggerButtonIcon?: string;
   triggerButtonIconPosition?: IconPosition;
+  compact?: boolean;
 };
 
 export const defaultDropdownMenuProps: Pick<
@@ -82,6 +83,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
     triggerButtonThemeColor = defaultDropdownMenuProps.triggerButtonThemeColor,
     triggerButtonIcon = defaultDropdownMenuProps.triggerButtonIcon,
     triggerButtonIconPosition = defaultDropdownMenuProps.triggerButtonIconPosition,
+    compact = false,
     ...rest
   }: DropdownMenuProps,
   ref,
@@ -132,7 +134,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
 
       const currentIndex = menuItems.findIndex((item) => item === document.activeElement);
 
-      let nextIndex;
+      let nextIndex: number;
       if (currentIndex === -1) {
         // No item focused, focus the first one on ArrowDown, last on ArrowUp
         nextIndex = event.key === "ArrowDown" ? 0 : menuItems.length - 1;
@@ -210,7 +212,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
             ref={contentRef}
             align={alignment}
             style={style}
-            className={classnames(styles.DropdownMenuContent, className)}
+            className={classnames(styles.DropdownMenuContent, className, { [styles.compact]: compact })}
             onOpenAutoFocus={(e) => {
               // Allow focus on the popover content so keyboard events work
               e.preventDefault();
@@ -239,6 +241,7 @@ type MenuItemProps = {
   to?: string;
   active?: boolean;
   enabled?: boolean;
+  compact?: boolean;
 };
 
 export const defaultMenuItemProps: Pick<MenuItemProps, "iconPosition" | "active"> = {
@@ -257,6 +260,7 @@ export const MenuItem = forwardRef(function MenuItem(
     iconPosition = defaultMenuItemProps.iconPosition,
     active = defaultMenuItemProps.active,
     enabled = true,
+    compact = false,
   }: MenuItemProps,
   ref,
 ) {
@@ -298,6 +302,7 @@ export const MenuItem = forwardRef(function MenuItem(
       className={classnames(className, styles.DropdownMenuItem, {
         [styles.active]: active,
         [styles.disabled]: !enabled,
+        [styles.compact]: compact,
       })}
       ref={ref as any}
       onClick={handleClick}

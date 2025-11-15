@@ -208,6 +208,7 @@ import { TimeInputMd } from "./TimeInput/TimeInput";
 import { TimerMd } from "./Timer/Timer";
 import { DateInputMd } from "./DateInput/DateInput";
 import { PaginationMd } from "./Pagination/Pagination";
+import { ResponsiveBarMd } from "./ResponsiveBar/ResponsiveBar";
 
 export const collectedComponentMetadata = {
   // --- HTML tags
@@ -382,6 +383,7 @@ export const collectedComponentMetadata = {
   RadioGroup: RadioGroupMd,
   RealTimeAdapter: RealTimeAdapterMd,
   Redirect: RedirectMd,
+  ResponsiveBar: ResponsiveBarMd,
   Select: SelectMd,
   SelectionStore: SelectionStoreMd,
   Slider: SliderMd,

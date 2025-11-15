@@ -57,6 +57,7 @@ import {
   BackdropDriver,
   SpinnerDriver,
   SliderDriver,
+  ResponsiveBarDriver,
 } from "./ComponentDrivers";
 import { parseComponentIfNecessary } from "./component-test-helpers";
 import { TimeInputDriver } from "./drivers/TimeInputDriver";
@@ -589,6 +590,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(TreeDriver, testIdOrLocator);
     });
   },
+  createResponsiveBarDriver: async ({ createDriver }, use) => {
+    await use((testIdOrLocator?: string | Locator) => {
+      return createDriver(ResponsiveBarDriver, testIdOrLocator);
+    });
+  },
 });
 
 // --- Types
@@ -674,4 +680,5 @@ type TestDriverExtenderProps = {
   createDateInputDriver: ComponentDriverMethod<DateInputDriver>;
   createModalDialogDriver: ComponentDriverMethod<ModalDialogDriver>;
   createTreeDriver: ComponentDriverMethod<TreeDriver>;
+  createResponsiveBarDriver: ComponentDriverMethod<ResponsiveBarDriver>;
 };

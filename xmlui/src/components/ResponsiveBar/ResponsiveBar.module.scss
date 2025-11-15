@@ -19,7 +19,7 @@ $margin-ResponsiveBar: createThemeVar("margin-ResponsiveBar");
     flex-direction: row;
     flex-shrink: 0;
     flex-grow: 0;
-    align-items: center;
+    align-items: stretch;
     background-color: $backgroundColor-ResponsiveBar;
     padding: $padding-ResponsiveBar;
     margin: $margin-ResponsiveBar;
@@ -38,13 +38,13 @@ $margin-ResponsiveBar: createThemeVar("margin-ResponsiveBar");
       flex-direction: row;
       width: 100%;
       height: auto;
-      align-items: center;
+      align-items: stretch;
     }
 
     .visibleItems {
       display: flex;
       flex-direction: row;
-      align-items: center;
+      align-items: stretch;
       flex-shrink: 0;
       flex-grow: 1; /* Allow this container to grow and push dropdown to the end */
       min-width: 0;
@@ -62,7 +62,7 @@ $margin-ResponsiveBar: createThemeVar("margin-ResponsiveBar");
 
       &.horizontal {
         flex-direction: row;
-        align-items: center;
+        align-items: stretch;
         min-width: 0;
         min-height: auto;
         width: auto;
