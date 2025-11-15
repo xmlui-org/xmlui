@@ -561,7 +561,7 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
               const isVisible =
                 layout.visibleItems.length > 0 ? index < layout.visibleItems.length : true;
               return (
-                <div key={`item-${index}`} style={{ display: isVisible ? "block" : "none" }}>
+                <div key={`item-${index}`} style={{ display: isVisible ? "flex" : "none", alignItems: "stretch" }}>
                   {renderChildFn && childNodes ? renderChildFn(childNodes[index], false) : child}
                 </div>
               );

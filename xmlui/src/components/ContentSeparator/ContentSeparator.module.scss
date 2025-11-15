@@ -53,6 +53,7 @@ $paddingHorizontal-ContentSeparator: createThemeVar("paddingHorizontal-ContentSe
       
       &.stretchToFit {
         height: auto;
+        min-height: $thickness-ContentSeparator;
         align-self: stretch;
       }
     }
