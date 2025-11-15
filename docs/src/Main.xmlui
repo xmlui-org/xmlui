@@ -237,6 +237,11 @@
                 label="Debounce with ChangeListener"
                 to="/howto/debounce-with-changelistener"
             />
+            <NavLink
+                label="Use ModalDialog's onClose() method"
+                to="/howto/use-modal-dialog-onclose"
+            />
+
             <!-- Add more links as additional files are created -->
         </NavGroup
         >
@@ -677,6 +682,12 @@
                 url="/pages/howto/debounce-with-changelistener.md"
             />
         </Page>
+        <Page url="/howto/use-modal-dialog-onclose">
+            <DocumentPageNoTOC
+                url="/pages/howto/use-modal-dialog-onclose.md"
+            />
+        </Page>
+
 
         <!-- Add more pages as additional files are created -->
         <Page url="/hosted-deployment">
