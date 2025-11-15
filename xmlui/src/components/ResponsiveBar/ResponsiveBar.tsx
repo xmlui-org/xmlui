@@ -2,7 +2,7 @@ import styles from "./ResponsiveBar.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { createMetadata, dClick, dTriggerTemplate } from "../metadata-helpers";
+import { createMetadata, d, dClick, dTriggerTemplate } from "../metadata-helpers";
 import { defaultResponsiveBarProps, ResponsiveBar } from "./ResponsiveBarNative";
 import { ResponsiveBarItem } from "./ResponsiveBarItem";
 import { alignmentOptionMd } from "../abstractions";
@@ -70,8 +70,26 @@ export const ResponsiveBarMd = createMetadata({
   },
   events: {
     click: dClick(COMP),
+    willOpen: d(
+      `This event fires when the \`${COMP}\` overflow dropdown menu is about to be opened. ` +
+        `You can prevent opening the menu by returning \`false\` from the event handler. ` +
+        `Otherwise, the menu will open at the end of the event handler like normal.`,
+    ),
   },
-  apis: {},
+  apis: {
+    close: {
+      description: `This method closes the overflow dropdown menu.`,
+      signature: "close(): void",
+    },
+    open: {
+      description: `This method opens the overflow dropdown menu.`,
+      signature: "open(): void",
+    },
+    hasOverflow: {
+      description: `This method returns true if the ResponsiveBar currently has an overflow menu (i.e., some items don't fit and are in the dropdown).`,
+      signature: "hasOverflow(): boolean",
+    },
+  },
   contextVars: {
     $overflow: {
       description:
@@ -92,7 +110,7 @@ export const ResponsiveBarMd = createMetadata({
 export const responsiveBarComponentRenderer = createComponentRenderer(
   COMP,
   ResponsiveBarMd,
-  ({ node, extractValue, renderChild, className, lookupEventHandler, layoutContext }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi, layoutContext }) => {
     const children = Array.isArray(node.children) ? node.children : node.children ? [node.children] : [];
     
     const renderChildWithContext = (childNode: any, isOverflow: boolean) => (
@@ -112,8 +130,10 @@ export const responsiveBarComponentRenderer = createComponentRenderer(
         dropdownAlignment={extractValue(node.props?.dropdownAlignment)}
         triggerTemplate={renderChild(node.props?.triggerTemplate)}
         gap={extractValue(node.props?.gap)}
-        reverse={extractValue(node.props?.reverse)}
+        reverse={extractValue.asOptionalBoolean(node.props?.reverse)}
         onClick={lookupEventHandler("click")}
+        onWillOpen={lookupEventHandler("willOpen")}
+        registerComponentApi={registerComponentApi}
         className={className}
         childNodes={children}
         renderChildFn={renderChildWithContext}

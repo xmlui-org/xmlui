@@ -59,11 +59,20 @@ export const contentSeparatorComponentRenderer = createComponentRenderer(
   COMP,
   ContentSeparatorMd,
   ({ node, className, extractValue }) => {
+    const orientation = extractValue(node.props.orientation);
+    const length = extractValue.asSize(node.props.length);
+    
+    // Check if explicit sizing is provided via length prop or layout properties
+    const hasExplicitLength = length !== undefined ||
+      (orientation === "vertical" && node.props.height !== undefined) ||
+      (orientation === "horizontal" && node.props.width !== undefined);
+    
     return (
       <ContentSeparator
-        orientation={extractValue(node.props.orientation)}
+        orientation={orientation}
         thickness={extractValue.asSize(node.props.thickness)}
-        length={extractValue.asSize(node.props.length)}
+        length={length}
+        hasExplicitLength={hasExplicitLength}
         className={className}
       />
     );

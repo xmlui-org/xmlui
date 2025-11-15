@@ -325,6 +325,7 @@
                 <NavLink label="RadioGroup" to="/components/RadioGroup" />
                 <NavLink label="RealTimeAdapter" to="/components/RealTimeAdapter" />
                 <NavLink label="Redirect" to="/components/Redirect" />
+                <NavLink label="ResponsiveBar" to="/components/ResponsiveBar" />
                 <NavLink label="Select" to="/components/Select" />
                 <NavLink label="Slider" to="/components/Slider" />
                 <NavLink label="Slot" to="/components/Slot" />

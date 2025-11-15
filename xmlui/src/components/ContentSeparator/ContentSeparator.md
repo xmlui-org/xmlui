@@ -20,10 +20,18 @@ See the demo for an example under [`thickness`](#thickness).
 ```xmlui-pg copy display name="Example: no vertical space"
 <App>
   <HStack horizontalAlignment="center">
-    <ContentSeparator orientation="vertical" thickness="8px" backgroundColor="blue" />
+    <ContentSeparator 
+      orientation="vertical" 
+      thickness="8px" 
+      backgroundColor="blue" 
+    />
   </HStack>
   <HStack horizontalAlignment="center" height="48px">
-    <ContentSeparator orientation="vertical" thickness="8px" backgroundColor="red" />
+    <ContentSeparator 
+      orientation="vertical" 
+      thickness="8px" 
+      backgroundColor="red" 
+    />
   </HStack>
 </App>
 ```

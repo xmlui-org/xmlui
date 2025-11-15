@@ -1447,3 +1447,13 @@ export class SliderDriver extends ComponentDriver {
     }
   }
 }
+
+export class ResponsiveBarDriver extends ComponentDriver {
+  // Driver methods for ResponsiveBar will be added here
+  /**
+   * Get all menu items
+   */
+  getMenuItems() {
+    return this.page.getByRole("menuitem");
+  }
+}

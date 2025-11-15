@@ -617,6 +617,155 @@ test.describe("Integration", () => {
     expect(separator).toBeTruthy();
   });
 
+  test("vertical separator stretches to fill HStack height without explicit height", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <HStack height="100px">
+        <Button label="Button 1" />
+        <ContentSeparator orientation="vertical" thickness="2px" testId="separator" />
+        <Button label="Button 2" />
+      </HStack>
+    `);
+
+    const separator = page.getByTestId("separator");
+    await expect(separator).toBeVisible();
+
+    const { height } = await separator.evaluate((el) => {
+      const computedStyle = window.getComputedStyle(el);
+      return {
+        height: computedStyle.height,
+      };
+    });
+
+    // Separator should have significant height (close to container height)
+    const heightValue = parseInt(height);
+    expect(heightValue).toBeGreaterThan(50); // At least half the container height
+  });
+
+  test("vertical separator uses explicit height when provided", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <HStack height="100px">
+        <Button label="Button 1" />
+        <ContentSeparator orientation="vertical" height="40px" thickness="2px" testId="separator" />
+        <Button label="Button 2" />
+      </HStack>
+    `);
+
+    const separator = page.getByTestId("separator");
+    await expect(separator).toBeVisible();
+
+    const { height } = await separator.evaluate((el) => {
+      const computedStyle = window.getComputedStyle(el);
+      return {
+        height: computedStyle.height,
+      };
+    });
+
+    // Separator should use the explicit 40px height
+    expect(height).toBe("40px");
+  });
+
+  test("horizontal separator stretches to fill VStack width without explicit width", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <VStack width="400px">
+        <Text>Content 1</Text>
+        <ContentSeparator orientation="horizontal" thickness="2px" testId="separator" />
+        <Text>Content 2</Text>
+      </VStack>
+    `);
+
+    const separator = page.getByTestId("separator");
+    await expect(separator).toBeVisible();
+
+    const { width } = await separator.evaluate((el) => {
+      const computedStyle = window.getComputedStyle(el);
+      return {
+        width: computedStyle.width,
+      };
+    });
+
+    // Separator should span close to full container width
+    const widthValue = parseInt(width);
+    expect(widthValue).toBeGreaterThan(300); // At least 75% of container width
+  });
+
+  test("horizontal separator uses explicit width when provided", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack width="400px">
+        <Text>Content 1</Text>
+        <ContentSeparator orientation="horizontal" width="200px" thickness="2px" testId="separator" />
+        <Text>Content 2</Text>
+      </VStack>
+    `);
+
+    const separator = page.getByTestId("separator");
+    await expect(separator).toBeVisible();
+
+    const { width } = await separator.evaluate((el) => {
+      const computedStyle = window.getComputedStyle(el);
+      return {
+        width: computedStyle.width,
+      };
+    });
+
+    // Separator should use the explicit 200px width
+    expect(width).toBe("200px");
+  });
+
+  test("vertical separator with length prop does not stretch", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <HStack height="100px">
+        <Button label="Button 1" />
+        <ContentSeparator orientation="vertical" length="50px" thickness="2px" testId="separator" />
+        <Button label="Button 2" />
+      </HStack>
+    `);
+
+    const separator = page.getByTestId("separator");
+    await expect(separator).toBeVisible();
+
+    const { height } = await separator.evaluate((el) => {
+      const computedStyle = window.getComputedStyle(el);
+      return {
+        height: computedStyle.height,
+      };
+    });
+
+    // Separator should use the explicit length (50px) for height
+    expect(height).toBe("50px");
+  });
+
+  test("horizontal separator with length prop does not stretch", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <VStack width="400px">
+        <Text>Content 1</Text>
+        <ContentSeparator orientation="horizontal" length="150px" thickness="2px" testId="separator" />
+        <Text>Content 2</Text>
+      </VStack>
+    `);
+
+    const separator = page.getByTestId("separator");
+    await expect(separator).toBeVisible();
+
+    const { width } = await separator.evaluate((el) => {
+      const computedStyle = window.getComputedStyle(el);
+      return {
+        width: computedStyle.width,
+      };
+    });
+
+    // Separator should use the explicit length (150px) for width
+    expect(width).toBe("150px");
+  });
+
   test("component integrates with custom styling", async ({ initTestBed, page }) => {
     await initTestBed(`
       <ContentSeparator 

@@ -40,11 +40,21 @@ $paddingHorizontal-ContentSeparator: createThemeVar("paddingHorizontal-ContentSe
     &.horizontal {
       height: $thickness-ContentSeparator;
       width: $length-ContentSeparator;
+      
+      &.stretchToFit {
+        width: auto;
+        align-self: stretch;
+      }
     }
 
     &.vertical {
       width: $thickness-ContentSeparator;
       height: $length-ContentSeparator;
+      
+      &.stretchToFit {
+        height: auto;
+        align-self: stretch;
+      }
     }
   }
 }

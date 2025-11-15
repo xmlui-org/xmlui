@@ -8,13 +8,16 @@
 
 The component monitors its container width and automatically determines which child components fit within the available space. Components that don't fit are moved into a dropdown menu accessible via a "..." trigger button.
 
-```xmlui-pg copy display name="Example: Basic ResponsiveBar" height="200px"
+```xmlui-pg copy display name="Example: Basic ResponsiveBar" height="220px"
 ---app copy display
 <App>
   <ResponsiveBar>
     <Button label="File" />
     <Button label="Edit" />
     <Button label="View" />
+    <Button label="Very Long Menu Name" />
+    <Button label="Project" />
+    <Button label="Build" />
     <Button label="Window" />
     <Button label="Help" />
   </ResponsiveBar>
@@ -29,14 +32,17 @@ Try resizing the container or browser window to see the responsive behavior:
 
 You can customize the icon used for the overflow dropdown trigger:
 
-```xmlui-pg copy display name="Example: Custom overflow icon" height="200px"
+```xmlui-pg copy display name="Example: Custom overflow icon" height="220px"
 <App>
-  <ResponsiveBar overflowIcon="menu">
-    <Button label="Home" />
-    <Button label="Products" />
-    <Button label="Services" />
-    <Button label="About" />
-    <Button label="Contact" />
+  <ResponsiveBar overflowIcon="dotmenu">
+    <Button label="File" />
+    <Button label="Edit" />
+    <Button label="View" />
+    <Button label="Very Long Menu Name" />
+    <Button label="Project" />
+    <Button label="Build" />
+    <Button label="Window" />
+    <Button label="Help" />
   </ResponsiveBar>
 </App>
 ```
@@ -53,6 +59,12 @@ You can customize the icon used for the overflow dropdown trigger:
     <Button label="Item 1" />
     <Button label="Item 2" />
     <Button label="Item 3" />
+    <Button label="Item 4" />
+    <Button label="Item 5" />
+    <Button label="Item 6" />
+    <Button label="Item 7" />
+    <Button label="Item 8" />
+    <Button label="Item 9" />
   </ResponsiveBar>
 </App>
 ```
