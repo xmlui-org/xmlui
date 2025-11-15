@@ -93,6 +93,7 @@ import { DropdownMenu, MenuItem } from "../DropdownMenu/DropdownMenuNative";
 type ResponsiveBarProps = {
   children?: ReactNode;
   overflowIcon?: string;
+  dropdownText?: string;
   gap?: number; // Gap between children in pixels
   orientation?: "horizontal" | "vertical"; // Layout direction
   style?: CSSProperties;
@@ -109,15 +110,17 @@ interface LayoutState {
 // Helper component to avoid duplication of DropdownMenu properties
 const ResponsiveBarDropdown = ({ 
   overflowIcon, 
+  dropdownText,
   children, 
   className 
 }: { 
-  overflowIcon: string; 
+  overflowIcon: string;
+  dropdownText: string; 
   children: ReactNode; 
   className?: string;
 }) => (
   <div className={className}>
-    <DropdownMenu label="More options" triggerButtonIcon={overflowIcon}>
+    <DropdownMenu label={dropdownText} triggerButtonIcon={overflowIcon}>
       {children}
     </DropdownMenu>
   </div>
@@ -125,6 +128,7 @@ const ResponsiveBarDropdown = ({
 
 export const defaultResponsiveBarProps = {
   overflowIcon: "ellipsisHorizontal:ResponsiveBar",
+  dropdownText: "More options",
   gap: 0,
   orientation: "horizontal" as const,
 };
@@ -133,6 +137,7 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
   {
     children,
     overflowIcon = defaultResponsiveBarProps.overflowIcon,
+    dropdownText = defaultResponsiveBarProps.dropdownText,
     gap = defaultResponsiveBarProps.gap,
     orientation = defaultResponsiveBarProps.orientation,
     style,
@@ -466,6 +471,7 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
           >
             <ResponsiveBarDropdown 
               overflowIcon={overflowIcon}
+              dropdownText={dropdownText}
               className={styles.overflowDropdown}
             >
               {childrenArray.length > 0 && <MenuItem>{childrenArray[0]}</MenuItem>}
@@ -500,6 +506,7 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
           {layout.overflowItems.length > 0 && (
             <ResponsiveBarDropdown 
               overflowIcon={overflowIcon}
+              dropdownText={dropdownText}
               className={styles.overflowDropdown}
             >
               {layout.overflowItems.map((item, index) => (

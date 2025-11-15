@@ -33,6 +33,13 @@ export const ResponsiveBarMd = createMetadata({
       valueType: "string",
       defaultValue: defaultResponsiveBarProps.overflowIcon,
     },
+    dropdownText: {
+      description:
+        "Text to display in the dropdown trigger button label when items overflow. " +
+        "This text is used for accessibility and appears alongside the overflow icon.",
+      valueType: "string",
+      defaultValue: defaultResponsiveBarProps.dropdownText,
+    },
     gap: {
       description: 
         "Gap between child elements in pixels. Controls the spacing between items " +
@@ -63,6 +70,7 @@ export const responsiveBarComponentRenderer = createComponentRenderer(
       <ResponsiveBar
         orientation={extractValue(node.props?.orientation)}
         overflowIcon={extractValue(node.props?.overflowIcon)}
+        dropdownText={extractValue(node.props?.dropdownText)}
         gap={extractValue(node.props?.gap)}
         onClick={lookupEventHandler("click")}
         className={className}
