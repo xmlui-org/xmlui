@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.11.15
+
+### Patch Changes
+
+- 8b1f851: Fix inaccurate ResponsiveBar e2e test
+
 ## 0.11.14
 
 ### Patch Changes
