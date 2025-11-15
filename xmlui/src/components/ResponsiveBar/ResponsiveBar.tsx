@@ -2,7 +2,7 @@ import styles from "./ResponsiveBar.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { createMetadata, dClick } from "../metadata-helpers";
+import { createMetadata, dClick, dTriggerTemplate } from "../metadata-helpers";
 import { defaultResponsiveBarProps, ResponsiveBar } from "./ResponsiveBarNative";
 
 const COMP = "ResponsiveBar";
@@ -40,6 +40,7 @@ export const ResponsiveBarMd = createMetadata({
       valueType: "string",
       defaultValue: defaultResponsiveBarProps.dropdownText,
     },
+    triggerTemplate: dTriggerTemplate(COMP),
     gap: {
       description: 
         "Gap between child elements in pixels. Controls the spacing between items " +
@@ -71,6 +72,7 @@ export const responsiveBarComponentRenderer = createComponentRenderer(
         orientation={extractValue(node.props?.orientation)}
         overflowIcon={extractValue(node.props?.overflowIcon)}
         dropdownText={extractValue(node.props?.dropdownText)}
+        triggerTemplate={renderChild(node.props?.triggerTemplate)}
         gap={extractValue(node.props?.gap)}
         onClick={lookupEventHandler("click")}
         className={className}

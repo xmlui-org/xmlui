@@ -94,6 +94,7 @@ type ResponsiveBarProps = {
   children?: ReactNode;
   overflowIcon?: string;
   dropdownText?: string;
+  triggerTemplate?: ReactNode;
   gap?: number; // Gap between children in pixels
   orientation?: "horizontal" | "vertical"; // Layout direction
   style?: CSSProperties;
@@ -111,16 +112,22 @@ interface LayoutState {
 const ResponsiveBarDropdown = ({ 
   overflowIcon, 
   dropdownText,
+  triggerTemplate,
   children, 
   className 
 }: { 
   overflowIcon: string;
-  dropdownText: string; 
+  dropdownText: string;
+  triggerTemplate?: ReactNode; 
   children: ReactNode; 
   className?: string;
 }) => (
   <div className={className}>
-    <DropdownMenu label={dropdownText} triggerButtonIcon={overflowIcon}>
+    <DropdownMenu 
+      label={dropdownText} 
+      triggerButtonIcon={overflowIcon}
+      triggerTemplate={triggerTemplate}
+    >
       {children}
     </DropdownMenu>
   </div>
@@ -138,6 +145,7 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
     children,
     overflowIcon = defaultResponsiveBarProps.overflowIcon,
     dropdownText = defaultResponsiveBarProps.dropdownText,
+    triggerTemplate,
     gap = defaultResponsiveBarProps.gap,
     orientation = defaultResponsiveBarProps.orientation,
     style,
@@ -472,6 +480,7 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
             <ResponsiveBarDropdown 
               overflowIcon={overflowIcon}
               dropdownText={dropdownText}
+              triggerTemplate={triggerTemplate}
               className={styles.overflowDropdown}
             >
               {childrenArray.length > 0 && <MenuItem>{childrenArray[0]}</MenuItem>}
@@ -507,6 +516,7 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
             <ResponsiveBarDropdown 
               overflowIcon={overflowIcon}
               dropdownText={dropdownText}
+              triggerTemplate={triggerTemplate}
               className={styles.overflowDropdown}
             >
               {layout.overflowItems.map((item, index) => (
