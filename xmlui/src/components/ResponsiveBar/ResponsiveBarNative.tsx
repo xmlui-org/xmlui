@@ -198,6 +198,7 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
   // Two-phase rendering state
   const [isInMeasurementPhase, setIsInMeasurementPhase] = useState(true);
   const [measuredWidths, setMeasuredWidths] = useState<number[]>([]);
+  const [measuredDropdownSize, setMeasuredDropdownSize] = useState<number>(0);
 
   // Simple layout state
   const [layout, setLayout] = useState<LayoutState>({
@@ -262,7 +263,18 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
       return orientation === "horizontal" ? rect.width : rect.height;
     });
 
+    // Also measure the dropdown size during measurement phase
+    let dropdownSize = orientation === "horizontal" ? 147 : 47; // Default fallback
+    if (measurementDropdownRef.current) {
+      const dropdownRect = measurementDropdownRef.current.getBoundingClientRect();
+      const measuredSize = orientation === "horizontal" ? dropdownRect.width : dropdownRect.height;
+      if (measuredSize > 0) {
+        dropdownSize = measuredSize;
+      }
+    }
+
     setMeasuredWidths(measurements);
+    setMeasuredDropdownSize(dropdownSize);
     setIsInMeasurementPhase(false);
   }; 
   
@@ -311,21 +323,19 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
       visibleItems = childrenArray;
       overflowItems = [];
     } else {
-      // Need overflow - measure actual dropdown size
-      let dropdownSize = orientation === "horizontal" ? 147 : 47; // Different fallback for vertical
+      // Use pre-measured dropdown size from measurement phase
+      let dropdownSize = measuredDropdownSize > 0 ? measuredDropdownSize : (orientation === "horizontal" ? 147 : 47);
 
-      // First try existing dropdown in the visible layout
+      // Try to get actual dropdown size if it exists in the visible layout (for resize scenarios)
       const existingDropdown = container.querySelector(
         `.${styles.overflowDropdown}`,
       ) as HTMLElement;
       if (existingDropdown) {
         const dropdownRect = existingDropdown.getBoundingClientRect();
-        dropdownSize = orientation === "horizontal" ? dropdownRect.width : dropdownRect.height;
-      }
-      // Then try the measurement dropdown
-      else if (measurementDropdownRef.current) {
-        const dropdownRect = measurementDropdownRef.current.getBoundingClientRect();
-        dropdownSize = orientation === "horizontal" ? dropdownRect.width : dropdownRect.height;
+        const currentSize = orientation === "horizontal" ? dropdownRect.width : dropdownRect.height;
+        if (currentSize > 0) {
+          dropdownSize = currentSize;
+        }
       }
 
       let accumulatedSize = 0;
@@ -423,6 +433,7 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
       lastChildrenCount.current = childrenCount;
       setIsInMeasurementPhase(true);
       setMeasuredWidths([]);
+      setMeasuredDropdownSize(0);
     }
   }, [childrenCount]);
 
