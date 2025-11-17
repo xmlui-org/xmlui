@@ -165,10 +165,15 @@ export const NumberBox = forwardRef(function NumberBox(
   const updateValue = useCallback(
     (newValue: string | number | null | undefined, rep: string) => {
       setValueStrRep(rep);
-      updateState({ value: newValue });
+      if (typeof newValue !== "number") {
+        newValue = toUsableNumber(newValue, integersOnly);
+      }
+      if (newValue !== null && typeof newValue === "number") {
+        updateState({ value: newValue });
+      }
       onDidChange(newValue);
     },
-    [onDidChange, updateState],
+    [onDidChange, updateState, integersOnly],
   );
 
   // --- Keypress

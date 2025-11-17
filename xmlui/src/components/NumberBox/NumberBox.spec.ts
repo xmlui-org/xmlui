@@ -440,7 +440,7 @@ test.describe("Event Handling", () => {
       `<NumberBox onDidChange="arg => testState = arg" />`,
     );
     await page.getByRole("textbox").fill("123");
-    await expect.poll(testStateDriver.testState).toBe("123");
+    await expect.poll(testStateDriver.testState).toBe(123);
   });
 
   test("gotFocus event fires on focus", async ({ initTestBed, page }) => {
@@ -509,7 +509,7 @@ test.describe("API", () => {
 
     await page.getByRole("textbox").fill("456");
     await page.getByRole("button", { name: "test" }).click();
-    await expect.poll(testStateDriver.testState).toBe("456");
+    await expect.poll(testStateDriver.testState).toBe(456);
   });
 
   test("setValue API updates state", async ({ initTestBed, page }) => {
@@ -1129,7 +1129,7 @@ test.describe("Other Edge Cases", () => {
 
     // Test scientific notation
     await input.fill("1e5");
-    await expect(input).toHaveValue("1e5");
+    await expect(input).toHaveValue("100000");
 
     // Test negative numbers
     await input.clear();
