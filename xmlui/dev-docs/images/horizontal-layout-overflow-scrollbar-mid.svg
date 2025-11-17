@@ -61,7 +61,6 @@
   <!-- Left gutter for main content area (visible in viewport) -->
   <rect class="gutter" x="20" y="210" width="15" height="465"/>
   <line x1="35" y1="210" x2="35" y2="675" class="gutter-edge"/>
-  <text class="label" x="22" y="390" transform="rotate(-90 22 390)">Gutter</text>
   
   <!-- Main Content block visible in viewport (between gutters) -->
   <rect class="content" x="35" y="210" width="770" height="465"/>

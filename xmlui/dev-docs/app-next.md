@@ -1228,6 +1228,19 @@ All horizontal layout diagrams share the following common characteristics:
 
 ![Horizontal Layout with Content-Only Scroll (Bottom)](images/horizontal-layout-content-scroll-no-gutters-bottom.svg)
 
+### Horizontal Layout (scroll parent: main content, scrollbar gutters)
+
+- `noScrollbarGutters`: false
+- `scrollWholePage`: false
+
+![Horizontal Layout with Content-Only Scroll and Gutters (No Overflow)](images/horizontal-layout-content-scroll-with-gutters-diagram.svg)
+
+![Horizontal Layout with Content-Only Scroll and Gutters (Top)](images/horizontal-layout-content-scroll-with-gutters-top.svg)
+
+![Horizontal Layout with Content-Only Scroll and Gutters (Mid-Scroll)](images/horizontal-layout-content-scroll-with-gutters-mid.svg)
+
+![Horizontal Layout with Content-Only Scroll and Gutters (Bottom)](images/horizontal-layout-content-scroll-with-gutters-bottom.svg)
+
 ## Horizontal-Sticky Layout Diagrams
 
 **`layout`: "horizontal-sticky"**

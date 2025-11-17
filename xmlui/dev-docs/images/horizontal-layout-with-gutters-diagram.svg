@@ -33,12 +33,10 @@
   <!-- Left gutter for main content area -->
   <rect class="gutter" x="20" y="110" width="15" height="465"/>
   <line x1="35" y1="110" x2="35" y2="575" class="gutter-edge"/>
-  <text class="label" x="22" y="290" transform="rotate(-90 22 290)">Gutter</text>
   
   <!-- Right gutter for main content area -->
   <rect class="gutter" x="805" y="110" width="15" height="465"/>
   <line x1="805" y1="110" x2="805" y2="575" class="gutter-edge"/>
-  <text class="label" x="818" y="290" transform="rotate(90 818 290)">Gutter</text>
   
   <!-- Main Content block (between gutters) -->
   <rect class="content" x="35" y="110" width="770" height="465"/>
