@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.11.16
+
+### Patch Changes
+
+- 212c7ad: Fix StateContainer issue with updateState
+
 ## 0.11.15
 
 ### Patch Changes
