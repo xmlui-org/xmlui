@@ -45,6 +45,12 @@ export const NumberBoxMd = createMetadata({
     input: {
       description: "The text box input area.",
     },
+    spinnerButtonUp: {
+      description: "The spinner button for incrementing the value.",
+    },
+    spinnerButtonDown: {
+      description: "The spinner button for decrementing the value.",
+    },
   },
   props: {
     placeholder: dPlaceholder(),

@@ -1468,3 +1468,180 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
+
+// =============================================================================
+// BEHAVIOR TESTS
+// =============================================================================
+
+test.describe("Behaviors and Parts", () => {
+  test("handles tooltip", async ({ page, initTestBed }) => {
+    await initTestBed(`<DateInput testId="test" tooltip="Tooltip text" />`);
+
+    const component = page.getByTestId("test");
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test("handles variant", async ({ page, initTestBed }) => {
+    await initTestBed(`<DateInput testId="test" variant="CustomVariant" />`, {
+      testThemeVars: {
+        "borderColor-DateInput-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    const component = page.getByTestId("test");
+    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+  });
+
+  test("can select part: 'day'", async ({ page, initTestBed }) => {
+    await initTestBed(`<DateInput testId="test" />`);
+    const dayPart = page.getByTestId("test").locator("[data-part-id='day']");
+    await expect(dayPart).toBeVisible();
+  });
+
+  test("can select part: 'month'", async ({ page, initTestBed }) => {
+    await initTestBed(`<DateInput testId="test" />`);
+    const monthPart = page.getByTestId("test").locator("[data-part-id='month']");
+    await expect(monthPart).toBeVisible();
+  });
+
+  test("can select part: 'year'", async ({ page, initTestBed }) => {
+    await initTestBed(`<DateInput testId="test" />`);
+    const yearPart = page.getByTestId("test").locator("[data-part-id='year']");
+    await expect(yearPart).toBeVisible();
+  });
+
+  test("can select part: 'clearButton' when clearable", async ({ page, initTestBed }) => {
+    await initTestBed(`<DateInput testId="test" clearable="true" />`);
+    const clearButton = page.getByTestId("test").locator("[data-part-id='clearButton']");
+    await expect(clearButton).toBeVisible();
+  });
+
+  test("clearButton part is not present without clearable prop", async ({ page, initTestBed }) => {
+    await initTestBed(`<DateInput testId="test" />`);
+    const clearButton = page.getByTestId("test").locator("[data-part-id='clearButton']");
+    await expect(clearButton).not.toBeVisible();
+  });
+
+  test("parts are present when tooltip is added", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <DateInput testId="test" tooltip="Tooltip text" clearable="true" />
+    `);
+    
+    const component = page.getByTestId("test");
+    const dayPart = component.locator("[data-part-id='day']");
+    const monthPart = component.locator("[data-part-id='month']");
+    const yearPart = component.locator("[data-part-id='year']");
+    const clearButton = component.locator("[data-part-id='clearButton']");
+    const tooltip = page.getByRole("tooltip");
+    
+    await component.hover();
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+    await expect(dayPart).toBeVisible();
+    await expect(monthPart).toBeVisible();
+    await expect(yearPart).toBeVisible();
+    await expect(clearButton).toBeVisible();
+  });
+
+  test("parts are present when variant is added", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <DateInput testId="test" variant="CustomVariant" clearable="true" />
+    `, {
+      testThemeVars: {
+        "borderColor-DateInput-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    
+    const component = page.getByTestId("test");
+    const dayPart = component.locator("[data-part-id='day']");
+    const monthPart = component.locator("[data-part-id='month']");
+    const yearPart = component.locator("[data-part-id='year']");
+    const clearButton = component.locator("[data-part-id='clearButton']");
+    
+    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await expect(dayPart).toBeVisible();
+    await expect(monthPart).toBeVisible();
+    await expect(yearPart).toBeVisible();
+    await expect(clearButton).toBeVisible();
+  });
+
+  test("variant applies custom theme variables", async ({ page, initTestBed }) => {
+    await initTestBed(`<DateInput testId="test" variant="CustomVariant" />`, {
+      testThemeVars: {
+        "borderColor-DateInput-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+
+    const component = page.getByTestId("test");
+    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+  });  test("tooltip with markdown content", async ({ page, initTestBed }) => {
+    await initTestBed(`<DateInput testId="test" tooltipMarkdown="**Bold text**" />`);
+    
+    const component = page.getByTestId("test");
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip.locator("strong")).toHaveText("Bold text");
+  });
+
+  test("animation behavior", async ({ page, initTestBed }) => {
+    await initTestBed(`<DateInput testId="test" animation="fadeIn" />`);
+    
+    const component = page.getByTestId("test");
+    await expect(component).toBeVisible();
+  });
+
+  test("combined tooltip and animation", async ({ page, initTestBed }) => {
+    await initTestBed(`<DateInput testId="test" tooltip="Tooltip text" animation="fadeIn" />`);
+    
+    const component = page.getByTestId("test");
+    await expect(component).toBeVisible();
+    
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <DateInput 
+        testId="test" 
+        tooltip="Tooltip text" 
+        variant="CustomVariant"
+        clearable="true"
+        animation="fadeIn"
+      />
+    `, {
+      testThemeVars: {
+        "borderColor-DateInput-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    
+    const component = page.getByTestId("test");
+    const dayPart = component.locator("[data-part-id='day']");
+    const monthPart = component.locator("[data-part-id='month']");
+    const yearPart = component.locator("[data-part-id='year']");
+    const clearButton = component.locator("[data-part-id='clearButton']");
+    
+    // Verify variant applied
+    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    
+    // Verify parts are visible
+    await expect(dayPart).toBeVisible();
+    await expect(monthPart).toBeVisible();
+    await expect(yearPart).toBeVisible();
+    await expect(clearButton).toBeVisible();
+
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+});
+

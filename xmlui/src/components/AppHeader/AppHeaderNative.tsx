@@ -14,6 +14,7 @@ import { useAppLayoutContext } from "../../components/App/AppLayoutContext";
 import { Button } from "../../components/Button/ButtonNative";
 import { NavLink } from "../../components/NavLink/NavLinkNative";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
+import { Part } from "../Part/Part";
 
 const PART_HAMBURGER = "hamburger";
 
@@ -94,14 +95,15 @@ export const AppHeader = ({
         })}
       >
         {hasRegisteredNavPanel && (
-          <Button
-            data-part-id={PART_HAMBURGER}
-            onClick={toggleDrawer}
-            icon={<Icon name={"hamburger"} />}
-            variant={"ghost"}
-            className={styles.drawerToggle}
-            style={{ color: "inherit", flexShrink: 0 }}
-          />
+          <Part partId={PART_HAMBURGER}>
+            <Button
+              onClick={toggleDrawer}
+              icon={<Icon name={"hamburger"} />}
+              variant={"ghost"}
+              className={styles.drawerToggle}
+              style={{ color: "inherit", flexShrink: 0 }}
+            />
+          </Part>
         )}
         <div className={styles.logoAndTitle}>
           {(showLogo || !effectiveNavPanelVisible) &&

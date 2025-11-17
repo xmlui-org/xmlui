@@ -24,6 +24,11 @@ export const DropdownMenuMd = createMetadata({
     "a menu that can include items, separators, and nested submenus, making it ideal " +
     "for navigation, action lists, or any situation requiring many options without " +
     "permanent screen space.",
+  parts: {
+    content: {
+      description: "The content area of the DropdownMenu where menu items are displayed.",
+    },
+  },
   props: {
     label: dLabel(),
     triggerTemplate: dTriggerTemplate(DDMCOMP),

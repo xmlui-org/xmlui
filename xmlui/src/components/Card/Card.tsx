@@ -15,6 +15,17 @@ export const CardMd = createMetadata({
     "boundary, typically featuring background color, padding, borders, and rounded " +
     "corners. It's ideal for organizing information, creating sections, and " +
     "establishing visual hierarchy in your interface.",
+  parts: {
+    avatar: {
+      description: "The avatar displayed within the card, if any.",
+    },
+    title: {
+      description: "The title of the card.",
+    },
+    subtitle: {
+      description: "The subtitle of the card.",
+    },
+  },
   props: {
     avatarUrl: {
       description:

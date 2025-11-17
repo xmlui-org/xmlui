@@ -1671,3 +1671,116 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
+
+// =============================================================================
+// BEHAVIOR TESTS
+// =============================================================================
+
+test.describe("Behaviors and Parts", () => {
+  test("handles tooltip", async ({ page, initTestBed }) => {
+    await initTestBed(`<TimeInput testId="test" tooltip="Tooltip text" />`);
+
+    const input = page.getByTestId("test");
+    await input.hover();
+    const tooltip = page.getByRole("tooltip");
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test("handles variant", async ({ page, initTestBed }) => {
+    await initTestBed(`<TimeInput testId="test" variant="TestInput" />`, {
+      testThemeVars: {
+        "borderColor-TimeInput-TestInput": "rgb(255, 0, 0)",
+      },
+    });
+    const input = page.getByTestId("test");
+    await expect(input).toHaveCSS("border-color", "rgb(255, 0, 0)");
+  });
+
+  test("can select part: 'hour'", async ({ page, initTestBed }) => {
+    await initTestBed(`<TimeInput testId="test" />`);
+    const hourInput = page.getByTestId("test").locator("[data-part-id='hour']");
+    await expect(hourInput).toBeVisible();
+  });
+
+  test("can select part: 'minute'", async ({ page, initTestBed }) => {
+    await initTestBed(`<TimeInput testId="test" />`);
+    const minuteInput = page.getByTestId("test").locator("[data-part-id='minute']");
+    await expect(minuteInput).toBeVisible();
+  });
+
+  test("can select part: 'second'", async ({ page, initTestBed }) => {
+    await initTestBed(`<TimeInput testId="test" seconds="true" />`);
+    const secondInput = page.getByTestId("test").locator("[data-part-id='second']");
+    await expect(secondInput).toBeVisible();
+  });
+
+  test("can select part: 'ampm'", async ({ page, initTestBed }) => {
+    await initTestBed(`<TimeInput testId="test" hour24="false" />`);
+    const ampmInput = page.getByTestId("test").locator("[data-part-id='ampm']");
+    await expect(ampmInput).toBeVisible();
+  });
+
+  test("can select part: 'clearButton'", async ({ page, initTestBed }) => {
+    await initTestBed(`<TimeInput testId="test" clearable="true" />`);
+    const clearButton = page.getByTestId("test").locator("[data-part-id='clearButton']");
+    await expect(clearButton).toBeVisible();
+  });
+
+  test("parts are present when tooltip is added", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <TimeInput
+        testId="test"
+        tooltip="Tooltip text"
+        seconds="true"
+        hour24="false"
+        clearable="true"
+      />
+    `);
+    const hourInput = page.getByTestId("test").locator("[data-part-id='hour']");
+    const minuteInput = page.getByTestId("test").locator("[data-part-id='minute']");
+    const secondInput = page.getByTestId("test").locator("[data-part-id='second']");
+    const ampmInput = page.getByTestId("test").locator("[data-part-id='ampm']");
+    const clearButton = page.getByTestId("test").locator("[data-part-id='clearButton']");
+    const tooltip = page.getByRole("tooltip");
+
+    await page.getByTestId("test").hover();
+
+    await expect(tooltip).toBeVisible();
+    await expect(hourInput).toBeVisible();
+    await expect(minuteInput).toBeVisible();
+    await expect(secondInput).toBeVisible();
+    await expect(ampmInput).toBeVisible();
+    await expect(clearButton).toBeVisible();
+  });
+
+  test("parts are present when variant is added", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <TimeInput
+        testId="test"
+        variant="TestInput"
+        seconds="true"
+        hour24="false"
+        clearable="true"
+      />
+    `, {
+      testThemeVars: {
+        "borderColor-TimeInput-TestInput": "rgb(255, 0, 0)",
+      },
+    });
+    const input = page.getByTestId("test");
+    const hourInput = input.locator("[data-part-id='hour']");
+    const minuteInput = input.locator("[data-part-id='minute']");
+    const secondInput = input.locator("[data-part-id='second']");
+    const ampmInput = input.locator("[data-part-id='ampm']");
+    const clearButton = input.locator("[data-part-id='clearButton']");
+
+    await expect(input).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await expect(hourInput).toBeVisible();
+    await expect(minuteInput).toBeVisible();
+    await expect(secondInput).toBeVisible();
+    await expect(ampmInput).toBeVisible();
+    await expect(clearButton).toBeVisible();
+  });
+});

@@ -29,6 +29,11 @@ export const ButtonMd = createMetadata({
     "`Button` is the primary interactive component for triggering actions like " +
     "form submissions, navigation, opening modals, and API calls. It supports " +
     "multiple visual styles and sizes to match different UI contexts and importance levels.",
+  parts: {
+    icon: {
+      description: "The icon displayed within the button, if any.",
+    },
+  },
   props: {
     autoFocus: {
       description: "Indicates if the button should receive focus when the page loads.",

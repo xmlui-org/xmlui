@@ -1,5 +1,5 @@
 import type { CSSProperties, ForwardedRef } from "react";
-import { useEffect, useId, useTransition } from "react";
+import { useEffect, useTransition } from "react";
 import { forwardRef, useCallback, useRef } from "react";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
@@ -8,7 +8,6 @@ import { useEvent } from "../../components-core/utils/misc";
 import styles from "./ColorPicker.module.scss";
 import classnames from "classnames";
 import { composeRefs } from "@radix-ui/react-compose-refs";
-import { PART_INPUT } from "../../components-core/parts";
 
 type Props = {
   id?: string;
@@ -29,15 +28,13 @@ type Props = {
   validationStatus?: ValidationStatus;
 };
 
-export const defaultProps: Pick<
-  Props,
-  "initialValue" | "value" | "enabled" | "validationStatus"
-> = {
-  initialValue: "#000000",
-  value: "#000000",
-  enabled: true,
-  validationStatus: "none",
-};
+export const defaultProps: Pick<Props, "initialValue" | "value" | "enabled" | "validationStatus"> =
+  {
+    initialValue: "#000000",
+    value: "#000000",
+    enabled: true,
+    validationStatus: "none",
+  };
 
 export const ColorPicker = forwardRef(
   (
@@ -73,7 +70,6 @@ export const ColorPicker = forwardRef(
       },
       [onDidChange, updateState],
     );
-
 
     const updateValueWithTransition = useCallback(
       (value: string, immediate = false) => {
@@ -123,18 +119,19 @@ export const ColorPicker = forwardRef(
       });
     }, [focus, registerComponentApi, setValue]);
 
-    {/* Produces a 7 character RGB color output in hex as a string type */ }
+    {
+      /* Produces a 7 character RGB color output in hex as a string type */
+    }
     return (
       <input
         {...rest}
         id={id}
-        className={classnames(className,styles.colorInput, {
+        className={classnames(className, styles.colorInput, {
           [styles.disabled]: !enabled,
           [styles.error]: validationStatus === "error",
           [styles.warning]: validationStatus === "warning",
           [styles.valid]: validationStatus === "valid",
         })}
-        data-part-id={PART_INPUT}
         style={style}
         disabled={!enabled}
         onFocus={handleOnFocus}

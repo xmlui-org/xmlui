@@ -15,6 +15,8 @@ import type { LinkTarget } from "../abstractions";
 import { createUrlWithQueryParams } from "../component-utils";
 import { Icon } from "../Icon/IconNative";
 import type { To } from "react-router-dom";
+import { Part } from "../Part/Part";
+import { PART_ICON } from "../../components-core/parts";
 
 // =====================================================================================================================
 // React Link component implementation
@@ -78,9 +80,11 @@ export const LinkNative = forwardRef(function LinkNative(
       })}
     >
       {icon && (
-        <div className={styles.iconWrapper}>
-          <Icon name={icon} />
-        </div>
+        <Part partId={PART_ICON}>
+          <div className={styles.iconWrapper}>
+            <Icon name={icon} />
+          </div>
+        </Part>
       )}
       {children}
     </Node>
@@ -91,9 +95,9 @@ export const LinkNative = forwardRef(function LinkNative(
  * Converts generic types to more specific ones.
  */
 function specifyTypes(props: Props) {
-  const { target, referrerPolicy } = props;
+  const { target, referrerPolicy, ...rest } = props;
   return {
-    ...props,
+    ...rest,
     target: target as LinkTarget,
     referrerPolicy: referrerPolicy as HTMLAttributeReferrerPolicy,
   };

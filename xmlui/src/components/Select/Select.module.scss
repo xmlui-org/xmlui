@@ -127,7 +127,6 @@ $textColor-indicator-Select: createThemeVar("textColor-indicator-#{$componentNam
 $minHeight-Select: createThemeVar("minHeight-#{$componentName}");
 $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
 
-
 // --- CSS properties of a particular Select variant
 @mixin variant($variantName) {
   border-radius: createThemeVar("Input:borderRadius-#{$componentName}--#{$variantName}");

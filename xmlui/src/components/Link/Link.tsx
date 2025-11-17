@@ -15,6 +15,11 @@ export const LinkMd = createMetadata({
     "external URLs. You can use the `label` and `icon` properties for simple text " +
     "links, or embed custom components like buttons, cards, or complex layouts " +
     "for rich interactive link presentations.",
+  parts: {
+    icon: {
+      description: "The icon within the Link component.",
+    }
+  },
   props: {
     to: d(
       "This property defines the URL of the link. If the value is not defined, the link cannot be activated.",
@@ -76,7 +81,7 @@ export const LinkMd = createMetadata({
 });
 
 /**
- * This function define the renderer for the Limk component.
+ * This function defines the renderer for the Link component.
  */
 export const localLinkComponentRenderer = createComponentRenderer(
   COMP,

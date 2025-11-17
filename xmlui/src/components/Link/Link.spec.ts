@@ -986,14 +986,156 @@ test("border, border-thickness-bottom", async ({ initTestBed, createLinkDriver }
   await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-/*
-test("Link accepts custom props", async ({
-  initTestBed,
-  createLinkDriver,
-}) => {
-  await initTestBed(`<Link data-custom="test">Test</Link>`);
-  const driver = await createLinkDriver();
+// =============================================================================
+// BEHAVIOR TESTS
+// =============================================================================
 
-  await expect(driver.component).toHaveAttribute("data-custom", "test");
+test.describe("Behaviors and Parts", () => {
+  test("handles tooltip", async ({ page, initTestBed }) => {
+    await initTestBed(`<Link to="/" testId="test" tooltip="Tooltip text">text</Link>`);
+
+    const link = page.getByTestId("test");
+    await link.hover();
+    const tooltip = page.getByRole("tooltip");
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test("handles variant", async ({ page, initTestBed }) => {
+    await initTestBed(`<Link to="/" testId="test" variant="CustomLink">Link text</Link>`, {
+      testThemeVars: {
+        "borderColor-Link-CustomLink": "rgb(255, 0, 0)",
+      },
+    });
+    const link = page.getByTestId("test");
+    await expect(link).toHaveCSS("border-color", "rgb(255, 0, 0)");
+  });
+
+  test("can select part: 'icon'", async ({ page, initTestBed }) => {
+    await initTestBed(`<Link to="/" testId="test" icon="search">Link text</Link>`);
+    const icon = page.getByTestId("test").locator("[data-part-id='icon']");
+    await expect(icon).toBeVisible();
+  });
+
+  test("icon part is not present without icon prop", async ({ page, initTestBed }) => {
+    await initTestBed(`<Link to="/" testId="test">Link text</Link>`);
+    const icon = page.getByTestId("test").locator("[data-part-id='icon']");
+    await expect(icon).not.toBeVisible();
+  });
+
+  test("parts are present when tooltip is added", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Link to="/" testId="test" tooltip="Tooltip text" icon="search">Link text</Link>
+    `);
+    
+    const link = page.getByTestId("test");
+    const icon = link.locator("[data-part-id='icon']");
+    const tooltip = page.getByRole("tooltip");
+    
+    await link.hover();
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+    await expect(icon).toBeVisible();
+  });
+
+  test("parts are present when variant is added", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Link to="/" testId="test" variant="CustomLink" icon="search">Link text</Link>
+    `, {
+      testThemeVars: {
+        "textColor-Link-CustomLink": "rgb(255, 0, 0)",
+      },
+    });
+    
+    const link = page.getByTestId("test");
+    const icon = link.locator("[data-part-id='icon']");
+    
+    await expect(link).toHaveCSS("color", "rgb(255, 0, 0)");
+    await expect(icon).toBeVisible();
+  });
+
+  test("variant applies custom theme variables", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Link to="/" testId="test" variant="CustomLink">Link text</Link>
+    `, {
+      testThemeVars: {
+        "textColor-Link-CustomLink": "rgb(255, 0, 0)",
+        "fontSize-Link-CustomLink": "20px",
+      },
+    });
+    
+    const link = page.getByTestId("test");
+    await expect(link).toHaveCSS("color", "rgb(255, 0, 0)");
+    await expect(link).toHaveCSS("font-size", "20px");
+  });
+
+  test("tooltip with markdown content", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Link to="/" testId="test" tooltipMarkdown="**Bold text**">Link text</Link>
+    `);
+    
+    const link = page.getByTestId("test");
+    await link.hover();
+    const tooltip = page.getByRole("tooltip");
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip.locator("strong")).toHaveText("Bold text");
+  });
+
+  test("animation behavior", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Link to="/" testId="test" animation="fadeIn">Link text</Link>
+    `);
+    
+    const link = page.getByTestId("test");
+    await expect(link).toBeVisible();
+  });
+
+  test("combined tooltip and animation", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Link to="/" testId="test" tooltip="Tooltip text" animation="fadeIn">Link text</Link>
+    `);
+    
+    const link = page.getByTestId("test");
+    await expect(link).toBeVisible();
+    
+    await link.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Link 
+        to="/" 
+        testId="test" 
+        tooltip="Tooltip text" 
+        variant="CustomLink"
+        icon="search"
+        animation="fadeIn"
+      >Link text</Link>
+    `, {
+      testThemeVars: {
+        "backgroundColor-Link-CustomLink": "rgb(255, 0, 0)",
+      },
+    });
+    
+    const link = page.getByTestId("test");
+    const icon = link.locator("[data-part-id='icon']");
+    
+    // Verify variant applied
+    await expect(link).toHaveCSS("background-color", "rgb(255, 0, 0)");
+    
+    // Verify icon part is visible
+    await expect(icon).toBeVisible();
+    
+    // Verify tooltip appears
+    await link.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
 });
- */

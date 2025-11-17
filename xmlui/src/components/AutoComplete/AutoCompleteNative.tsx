@@ -25,6 +25,7 @@ import { useTheme } from "../../components-core/theming/ThemeContext";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import { HiddenOption } from "../Select/HiddenOption";
 import { PART_INPUT } from "../../components-core/parts";
+import { Part } from "../Part/Part";
 
 const PART_LIST_WRAPPER = "listWrapper";
 
@@ -479,131 +480,133 @@ export const AutoComplete = forwardRef(function AutoComplete(
             }}
             modal={false}
           >
-            <PopoverTrigger asChild ref={setReferenceElement}>
-              <div
-                ref={forwardedRef}
-                style={style}
-                data-part-id={PART_LIST_WRAPPER}
-                className={classnames(
-                  className,
-                  styles.badgeListWrapper,
-                  styles[validationStatus],
-                  {
-                    [styles.disabled]: !enabled,
-                    [styles.focused]: isFocused,
-                  },
-                )}
-                aria-expanded={open}
-                onClick={(event) => {
-                  if (readOnly) return;
-                  // In multi mode, only open the dropdown, don't toggle
-                  // In single mode, toggle as usual
-                  if (multi && open) {
-                    return; // Already open, don't close
-                  }
-                  event.stopPropagation();
-                  setOpen((prev) => !prev);
-                }}
-              >
-                {Array.isArray(selectedValue) && selectedValue.length > 0 && (
-                  <div className={styles.badgeList}>
-                    {selectedValue.map((v, index) => (
-                      <span key={index} className={styles.badge}>
-                        {v?.label}
-                        {!readOnly && (
-                          <Icon
-                            name="close"
-                            size="sm"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              toggleOption(v.value);
-                            }}
-                          />
-                        )}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                <div className={styles.inputWrapper}>
-                  <input
-                    {...rest}
-                    role="combobox"
-                    id={id}
-                    ref={inputRef}
-                    onFocus={(ev) => {
-                      setIsFocused(true);
-                      onFocus(ev);
-                    }}
-                    onBlur={(ev) => {
-                      if (inputValue === "" && !multi) {
-                        clearValue();
-                      } else {
-                        if (!Array.isArray(selectedValue) && selectedValue) {
-                          setInputValue(selectedValue?.label);
-                        } else {
-                          setInputValue("");
-                        }
-                      }
-                      onBlur(ev);
-                      setIsFocused(false);
-                    }}
-                    onKeyDown={(event) => {
-                      if (readOnly) return;
+            <Part partId={PART_LIST_WRAPPER}>
+              <PopoverTrigger asChild ref={setReferenceElement}>
+                <div
+                  ref={forwardedRef}
+                  style={style}
+                  className={classnames(
+                    className,
+                    styles.badgeListWrapper,
+                    styles[validationStatus],
+                    {
+                      [styles.disabled]: !enabled,
+                      [styles.focused]: isFocused,
+                    },
+                  )}
+                  aria-expanded={open}
+                  onClick={(event) => {
+                    if (readOnly) return;
+                    // In multi mode, only open the dropdown, don't toggle
+                    // In single mode, toggle as usual
+                    if (multi && open) {
+                      return; // Already open, don't close
+                    }
+                    event.stopPropagation();
+                    setOpen((prev) => !prev);
+                  }}
+                >
+                  {Array.isArray(selectedValue) && selectedValue.length > 0 && (
+                    <div className={styles.badgeList}>
+                      {selectedValue.map((v, index) => (
+                        <span key={index} className={styles.badge}>
+                          {v?.label}
+                          {!readOnly && (
+                            <Icon
+                              name="close"
+                              size="sm"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                toggleOption(v.value);
+                              }}
+                            />
+                          )}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <div className={styles.inputWrapper}>
+                    <Part partId={PART_INPUT}>
+                      <input
+                        {...rest}
+                        role="combobox"
+                        id={id}
+                        ref={inputRef}
+                        onFocus={(ev) => {
+                          setIsFocused(true);
+                          onFocus(ev);
+                        }}
+                        onBlur={(ev) => {
+                          if (inputValue === "" && !multi) {
+                            clearValue();
+                          } else {
+                            if (!Array.isArray(selectedValue) && selectedValue) {
+                              setInputValue(selectedValue?.label);
+                            } else {
+                              setInputValue("");
+                            }
+                          }
+                          onBlur(ev);
+                          setIsFocused(false);
+                        }}
+                        onKeyDown={(event) => {
+                          if (readOnly) return;
 
-                      // Handle opening dropdown
-                      if (event.key === "ArrowDown" && !open) {
-                        setOpen(true);
-                        return;
-                      }
+                          // Handle opening dropdown
+                          if (event.key === "ArrowDown" && !open) {
+                            setOpen(true);
+                            return;
+                          }
 
-                      // Handle keyboard navigation when dropdown is open
-                      if (open) {
-                        handleKeyDown(event);
-                      } else if (event.key === "Enter") {
-                        setOpen(true);
-                      }
-                    }}
-                    data-part-id={PART_INPUT}
-                    readOnly={readOnly}
-                    autoFocus={autoFocus}
-                    aria-autocomplete="list"
-                    value={inputValue}
-                    disabled={!enabled}
-                    onChange={(event) => {
-                      setOpen(true);
-                      setInputValue(event.target.value);
-                      setSearchTerm(event.target.value);
-                    }}
-                    placeholder={!readOnly ? placeholder : ""}
-                    className={styles.commandInput}
-                  />
-                  <div className={styles.actions}>
-                    {value?.length > 0 && enabled && !readOnly && (
+                          // Handle keyboard navigation when dropdown is open
+                          if (open) {
+                            handleKeyDown(event);
+                          } else if (event.key === "Enter") {
+                            setOpen(true);
+                          }
+                        }}
+                        readOnly={readOnly}
+                        autoFocus={autoFocus}
+                        aria-autocomplete="list"
+                        value={inputValue}
+                        disabled={!enabled}
+                        onChange={(event) => {
+                          setOpen(true);
+                          setInputValue(event.target.value);
+                          setSearchTerm(event.target.value);
+                        }}
+                        placeholder={!readOnly ? placeholder : ""}
+                        className={styles.commandInput}
+                      />
+                    </Part>
+                    <div className={styles.actions}>
+                      {value?.length > 0 && enabled && !readOnly && (
+                        <span
+                          className={styles.action}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            clearValue();
+                          }}
+                        >
+                          <Icon name="close" />
+                        </span>
+                      )}
                       <span
                         className={styles.action}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          clearValue();
+                        onClick={() => {
+                          if (readOnly) return;
+                          setOpen(!open);
+                          // Focus the input after opening dropdown
+                          inputRef.current?.focus();
                         }}
                       >
-                        <Icon name="close" />
+                        <Icon name="chevrondown" />
                       </span>
-                    )}
-                    <span
-                      className={styles.action}
-                      onClick={() => {
-                        if (readOnly) return;
-                        setOpen(!open);
-                        // Focus the input after opening dropdown
-                        inputRef.current?.focus();
-                      }}
-                    >
-                      <Icon name="chevrondown" />
-                    </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </PopoverTrigger>
+              </PopoverTrigger>
+            </Part>
             {open && (
               <Portal container={root}>
                 <PopoverContent

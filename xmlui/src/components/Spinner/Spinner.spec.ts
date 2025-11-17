@@ -188,3 +188,134 @@ test.describe("Edge Cases", { tag: "@smoke" }, () => {
     await expect.poll(testStateDriver.testState).not.toEqual("clicked");
   });
 });
+
+// =============================================================================
+// BEHAVIORS AND PARTS TESTS
+// =============================================================================
+
+test.describe("Behaviors and Parts", () => {
+  test("handles tooltip", async ({ page, initTestBed }) => {
+    await initTestBed(`<Spinner testId="test" tooltip="Tooltip text" delay="{0}" />`);
+    
+    const component = page.getByTestId("test");
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test("tooltip with markdown content", async ({ page, initTestBed }) => {
+    await initTestBed(`<Spinner testId="test" tooltipMarkdown="**Bold text**" delay="{0}" />`);
+    
+    const component = page.getByTestId("test");
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip.locator("strong")).toHaveText("Bold text");
+  });
+
+  test("handles variant", async ({ page, initTestBed }) => {
+    await initTestBed(`<Spinner testId="test" variant="CustomVariant" delay="{0}" />`, {
+      testThemeVars: {
+        "borderColor-Spinner-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    const component = page.getByTestId("test");
+    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+  });
+
+  test("variant applies custom theme variables", async ({ page, initTestBed }) => {
+    await initTestBed(`<Spinner testId="test" variant="CustomVariant" delay="{0}" />`, {
+      testThemeVars: {
+        "borderColor-Spinner-CustomVariant": "rgb(0, 255, 0)",
+      },
+    });
+    const component = page.getByTestId("test");
+    await expect(component).toHaveCSS("border-color", "rgb(0, 255, 0)");
+  });
+
+  test("animation behavior", async ({ page, initTestBed }) => {
+    await initTestBed(`<Spinner testId="test" animation="fadeIn" delay="{0}" />`);
+    
+    const component = page.getByTestId("test");
+    await expect(component).toBeVisible();
+  });
+
+  test("combined tooltip and animation", async ({ page, initTestBed }) => {
+    await initTestBed(`<Spinner testId="test" tooltip="Tooltip text" animation="fadeIn" delay="{0}" />`);
+    
+    const component = page.getByTestId("test");
+    await expect(component).toBeVisible();
+    
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test("can select part: 'ring'", async ({ page, initTestBed }) => {
+    await initTestBed(`<Spinner testId="test" delay="{0}" />`);
+    const ringPart = page.getByTestId("test").locator("[data-part-id='ring']");
+    await expect(ringPart).toBeVisible();
+  });
+
+  test("parts are present when tooltip is added", async ({ page, initTestBed }) => {
+    await initTestBed(`<Spinner testId="test" tooltip="Tooltip text" delay="{0}" />`);
+    
+    const component = page.getByTestId("test");
+    const ringPart = component.locator("[data-part-id='ring']");
+    
+    await expect(ringPart).toBeVisible();
+    
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test("parts are present when variant is added", async ({ page, initTestBed }) => {
+    await initTestBed(`<Spinner testId="test" variant="CustomVariant" delay="{0}" />`, {
+      testThemeVars: {
+        "borderColor-Spinner-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    
+    const component = page.getByTestId("test");
+    const ringPart = component.locator("[data-part-id='ring']");
+    
+    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await expect(ringPart).toBeVisible();
+  });
+
+  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Spinner 
+        testId="test" 
+        variant="CustomVariant"
+        animation="fadeIn"
+        tooltip="Tooltip text"
+        delay="{0}"
+      />
+    `, {
+      testThemeVars: {
+        "borderColor-Spinner-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    
+    const component = page.getByTestId("test");
+    const ringPart = component.locator("[data-part-id='ring']");
+    
+    // Verify variant applied
+    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    
+    // Verify parts are visible
+    await expect(ringPart).toBeVisible();
+
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+});

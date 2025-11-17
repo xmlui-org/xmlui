@@ -2519,3 +2519,39 @@ test("conditional fields keep the state", async ({
 
   await expect(textfield1Driver.field).toHaveValue("name1");
 });
+
+// =============================================================================
+// BEHAVIORS AND PARTS TESTS
+// =============================================================================
+
+test.describe("Behaviors and Parts", () => {
+  test("can select part: 'cancelButton'", async ({ page, initTestBed }) => {
+    await initTestBed(`<Form testId="test" />`);
+    const cancelButton = page.locator("[data-part-id='cancelButton']");
+    await expect(cancelButton).toBeVisible();
+    await expect(cancelButton).toHaveText("Cancel");
+  });
+
+  test("can select part: 'submitButton'", async ({ page, initTestBed }) => {
+    await initTestBed(`<Form testId="test" />`);
+    const submitButton = page.locator("[data-part-id='submitButton']");
+    await expect(submitButton).toBeVisible();
+    await expect(submitButton).toHaveText("Save");
+  });
+
+  test("cancelButton part is not present when cancelLabel is empty", async ({ page, initTestBed }) => {
+    await initTestBed(`<Form testId="test" cancelLabel="" />`);
+    const cancelButton = page.locator("[data-part-id='cancelButton']");
+    await expect(cancelButton).not.toBeVisible();
+  });
+
+  test("both parts are visible with default props", async ({ page, initTestBed }) => {
+    await initTestBed(`<Form testId="test" />`);
+    
+    const cancelButton = page.locator("[data-part-id='cancelButton']");
+    const submitButton = page.locator("[data-part-id='submitButton']");
+    
+    await expect(cancelButton).toBeVisible();
+    await expect(submitButton).toBeVisible();
+  });
+});

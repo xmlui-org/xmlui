@@ -15,6 +15,15 @@ export const FormMd = createMetadata({
     "input, with built-in data binding, validation, and submission handling. It " +
     "automatically manages form state and provides context for nested form controls " +
     "to work together.",
+  parts: {
+    buttonRow: {
+      description: "The container for the form action buttons (e.g., Save, Cancel).",
+    },
+    // NOTE: There is a ValidationSummary in the form and also one in the modal dialog.
+    validationSummary: {
+      description: "The area displaying validation summary messages for the form.",
+    }
+  },
   props: {
     buttonRowTemplate: dComponent(
       `This property allows defining a custom component to display the buttons at the bottom of the form.`,

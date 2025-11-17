@@ -198,3 +198,192 @@ test.describe("Open/Close", () => {
     await expect(page.getByTestId("pageBottomText")).not.toBeInViewport();
   });
 });
+
+// =============================================================================
+// BEHAVIORS AND PARTS TESTS
+// =============================================================================
+
+test.describe("Behaviors and Parts", () => {
+  test("handles tooltip", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="button" onClick="modal.open()">open</Button>
+        <ModalDialog id="modal" tooltip="Tooltip text" title="Modal Title">
+          <Text>Modal content</Text>
+        </ModalDialog>
+      </Fragment>
+    `);
+    // Open the modal
+    await page.getByTestId("button").click();
+    await expect(page.getByTestId("modal")).toBeVisible();
+    
+    const component = page.locator("[data-part-id='content']");
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
+  });
+
+  test("tooltip with markdown content", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="button" onClick="modal.open()">open</Button>
+        <ModalDialog id="modal" tooltipMarkdown="**Bold text**" title="Modal Title">
+          <Text>Modal content</Text>
+        </ModalDialog>
+      </Fragment>
+    `);
+    // Open the modal
+    await page.getByTestId("button").click();
+    await expect(page.getByTestId("modal")).toBeVisible();
+    
+    const component = page.locator("[data-part-id='content']");
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip.locator("strong")).toHaveText("Bold text");
+  });
+
+  test.fixme("handles variant", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="button" onClick="modal.open()">open</Button>
+        <ModalDialog id="modal" variant="CustomVariant" title="Modal Title">
+          <Text>Modal content</Text>
+        </ModalDialog>
+      </Fragment>
+    `, {
+      testThemeVars: {
+        "backgroundColor-ModalDialog-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    // Open the modal
+    await page.getByTestId("button").click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+
+    const component = page.getByTestId("modal");
+    await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
+  });
+
+  test.fixme("variant applies custom theme variables", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="button" onClick="modal.open()">open</Button>
+        <ModalDialog id="modal" variant="CustomVariant" title="Modal Title">
+          <Text>Modal content</Text>
+        </ModalDialog>
+      </Fragment>
+    `, {
+      testThemeVars: {
+        "backgroundColor-ModalDialog-CustomVariant": "rgb(0, 255, 0)",
+      },
+    });
+    // Open the modal
+    await page.getByTestId("button").click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+
+    const component = page.getByTestId("modal");
+    await expect(component).toHaveCSS("background-color", "rgb(0, 255, 0)");
+  });
+
+  test("animation behavior", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="button" onClick="modal.open()">open</Button>
+        <ModalDialog id="modal" animation="fadeIn" title="Modal Title">
+          <Text>Modal content</Text>
+        </ModalDialog>
+      </Fragment>
+    `);
+    // Open the modal
+    await page.getByTestId("button").click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+    
+    const component = page.getByTestId("modal");
+    await expect(component).toBeVisible();
+  });
+
+  test("can select part: 'title'", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="button" onClick="modal.open()">open</Button>
+        <ModalDialog id="modal" title="Modal Title">
+          <Text>Modal content</Text>
+        </ModalDialog>
+      </Fragment>
+    `);
+    // Open the modal
+    await page.getByTestId("button").click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+
+    const titlePart = page.locator("[data-part-id='title']");
+    await expect(titlePart).toBeVisible();
+    await expect(titlePart).toHaveText("Modal Title");
+  });
+
+  test("can select part: 'content'", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="button" onClick="modal.open()">open</Button>
+        <ModalDialog id="modal" title="Modal Title">
+          <Text>Modal content</Text>
+        </ModalDialog>
+      </Fragment>
+    `);
+    // Open the modal
+    await page.getByTestId("button").click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+    
+    const contentPart = page.locator("[data-part-id='content']");
+    await expect(contentPart).toBeVisible();
+    await expect(contentPart.getByText("Modal content")).toBeVisible();
+  });
+
+  test.fixme("parts are present when variant is added", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <ModalDialog testId="test" variant="CustomVariant" title="Modal Title">
+        <Text>Modal content</Text>
+      </ModalDialog>
+    `, {
+      testThemeVars: {
+        "borderColor-ModalDialog-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    
+    const contentPart = page.locator("[data-part-id='content']");
+    const titlePart = page.locator("[data-part-id='title']");
+    
+    await expect(contentPart).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await expect(titlePart).toBeVisible();
+    await expect(contentPart).toBeVisible();
+  });
+
+  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <ModalDialog 
+        testId="test" 
+        variant="CustomVariant"
+        animation="fadeIn"
+        title="Modal Title"
+      >
+        <Text>Modal content</Text>
+      </ModalDialog>
+    `, {
+      testThemeVars: {
+        "backgroundColor-ModalDialog-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
+    
+    const contentPart = page.locator("[data-part-id='content']");
+    const titlePart = page.locator("[data-part-id='title']");
+    
+    // Verify variant applied
+    await expect(contentPart).toHaveCSS("background-color", "rgb(255, 0, 0)");
+    
+    // Verify parts are visible
+    await expect(titlePart).toBeVisible();
+    await expect(contentPart).toBeVisible();
+  });
+});
