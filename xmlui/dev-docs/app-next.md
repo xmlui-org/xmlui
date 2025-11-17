@@ -5,6 +5,7 @@ This document analyzes the current App component implementation and proposes a n
 ## Table of Contents
 
 ### Part 1: Current Implementation Analysis
+
 1. Current Problems
 2. Layout Types (8 variants)
 3. Key Component Props
@@ -15,6 +16,7 @@ This document analyzes the current App component implementation and proposes a n
 8. Refactoring Opportunities
 
 ### Part 2: New Design Proposal
+
 1. Design Goals
 2. Layout Definition Framework
    - UI Blocks (Building Blocks)
@@ -40,6 +42,7 @@ This document analyzes the current App component implementation and proposes a n
 ## Part 1: Current Implementation Analysis
 
 ### Current Problems
+
 - Layout options are not straightforward enough
 - Complex conditional logic for each layout type in AppNative.tsx switch statement
 - Scroll behavior tied to layout type creates inflexibility
@@ -50,11 +53,13 @@ This document analyzes the current App component implementation and proposes a n
 ### Layout Types (8 variants)
 
 ### Core Layout Axes
+
 1. **Orientation**: vertical (NavPanel left) vs horizontal (NavPanel top) vs desktop (full viewport)
 2. **Stickiness**: none vs sticky header/footer vs full sticky
 3. **Header Width**: normal vs full-width (vertical-full-header only)
 
 ### Current Layouts
+
 - `vertical` - NavPanel left, whole page scrolls
 - `vertical-sticky` - NavPanel left, header/footer stick
 - `vertical-full-header` - NavPanel left, header spans full width, sticky
@@ -67,11 +72,13 @@ This document analyzes the current App component implementation and proposes a n
 ## Key Component Props
 
 ### Layout Control
+
 - `layout`: AppLayoutType (8 variants)
 - `scrollWholePage`: boolean (default: true) - controls scroll container
 - `noScrollbarGutters`: boolean (default: false) - removes gutter space
 
 ### Content Slots
+
 - `AppHeader`: header content (optional, extracted from children)
 - `NavPanel`: navigation panel (optional, extracted from children)
 - `Footer`: footer content (optional, extracted from children)
@@ -79,6 +86,7 @@ This document analyzes the current App component implementation and proposes a n
 - `logoTemplate`: custom logo component
 
 ### Theme
+
 - `defaultTone`: "light" | "dark"
 - `defaultTheme`: theme ID
 - `autoDetectTone`: boolean (uses system preference)
@@ -86,62 +94,79 @@ This document analyzes the current App component implementation and proposes a n
 ## Major Complexity Points
 
 ### 1. Child Extraction Logic (App.tsx lines 264-350)
+
 Extracts AppHeader, Footer, NavPanel, Pages from children tree, including unwrapping from Theme components. Creates new NavPanel with auto-generated nav from Pages with `navLabel` props.
 
 ### 2. Layout Rendering Switch (AppNative.tsx lines 378-588)
+
 Massive switch statement with 8 layout cases, each rendering different DOM structure with slight variations in:
+
 - Container flex direction
 - Scroll container location (wrapper vs inner)
 - NavPanel positioning
 - Header/footer sticky behavior
 
 ### 3. NavPanel Visibility Logic (AppNative.tsx)
+
 ```typescript
 // Line 136-137
-navPanelVisible = mediaSize.largeScreen || 
-  (!hasRegisteredHeader && layout !== "condensed" && layout !== "condensed-sticky")
+navPanelVisible =
+  mediaSize.largeScreen ||
+  (!hasRegisteredHeader && layout !== "condensed" && layout !== "condensed-sticky");
 ```
+
 - Desktop: always visible (except condensed without header)
 - Mobile: hidden, shown via drawer
 - Condensed: always in header, needs special treatment
 
 ### 4. Scroll Container Refs (AppNative.tsx lines 202-206)
+
 Two refs: `scrollPageContainerRef` and `noScrollPageContainerRef`
+
 - `scrollWholePage=true` → outer wrapper scrolls
 - `scrollWholePage=false` → PagesWrapper scrolls
-Choice depends on layout type and affects header/footer positioning
+  Choice depends on layout type and affects header/footer positioning
 
 ### 5. CSS Gutter Handling (AppNative.tsx lines 236-261)
+
 CSS custom properties manage scrollbar width to add padding that compensates for gutters when `noScrollbarGutters=false`:
+
 ```css
---scrollbar-width: calculated | 0px
+--scrollbar-width: calculated | 0px;
 ```
+
 Applied differently per layout via `margin-inline` and `padding-inline`
 
 ### 6. Footer Stickiness (App.tsx lines 353-367, AppNative.tsx lines 378+)
+
 - `footerSticky` extracted from Footer component props
 - Desktop layout: always sticky
 - Other layouts: sticky only in -sticky variants
 - Can be overridden via Footer `sticky` prop
 
 ### 7. Auto-Generated Navigation (App.tsx lines 309-332, 635-773)
+
 Complex logic extracts Pages with `navLabel="Parent | Child"` syntax and creates hierarchical NavGroups/NavLinks, merging with existing NavPanel children.
 
 ## CSS Structure Issues
 
 ### Wrapper Classes (App.module.scss)
+
 - Base `.wrapper` + layout modifier (`.vertical`, `.horizontal`, `.desktop`)
 - Optional `.sticky` modifier
 - Optional `.scrollWholePage` modifier
 - Optional `.noScrollbarGutters` modifier
 
 Results in combinations like:
+
 ```scss
 .wrapper.vertical.sticky.scrollWholePage
 ```
 
 ### Layout-Specific Overrides
+
 Each layout has different:
+
 - `.contentWrapper` scroll behavior
 - `.PagesWrapper` min-height calculation
 - `.headerWrapper` positioning
@@ -151,12 +176,15 @@ Each layout has different:
 Desktop layout (lines 118-225) has most aggressive overrides with `!important` to reset all spacing.
 
 ### Scrollbar Gutter Compensation
+
 Complex calc expressions in `.scrollWholePage` (lines 277-325) to handle gutter space:
+
 ```scss
 margin-inline: calc(-1 * var(--scrollbar-width));
 ```
 
 ## Theme Variables
+
 - `maxWidth-content-App` - content max width
 - `width-navPanel-App` - NavPanel width
 - `backgroundColor-navPanel-App` - NavPanel background
@@ -167,7 +195,9 @@ margin-inline: calc(-1 * var(--scrollbar-width));
 ## Context & State Management
 
 ### AppLayoutContext
+
 Provides to children:
+
 - `layout`, `navPanelVisible`, `drawerVisible`
 - `showDrawer()`, `hideDrawer()`, `toggleDrawer()`
 - Logo URLs and content
@@ -175,14 +205,17 @@ Provides to children:
 - `isNested` flag for playground/iframe usage
 
 ### SearchContext
+
 Wraps entire app for search indexing (auto-generated from Pages)
 
-### LinkInfoContext  
+### LinkInfoContext
+
 Stores navigation hierarchy map for breadcrumbs/nav state
 
 ## Refactoring Opportunities
 
 ### Simplify Layout Logic
+
 - Reduce 8 variants to composable properties:
   - `navPanelPlacement: "left" | "top" | "none"`
   - `headerSticky: boolean`
@@ -192,16 +225,19 @@ Stores navigation hierarchy map for breadcrumbs/nav state
 - Remove switch statement, use declarative config object
 
 ### Decouple Scroll Behavior
+
 - Make `scrollWholePage` independent of layout type
 - Single scroll container strategy configurable per app needs
 
 ### Simplify CSS
+
 - Use CSS Grid instead of nested flex containers
 - Named grid areas for header/nav/content/footer
 - Reduce modifier class combinations
 - Remove layout-specific overrides
 
 ### Extract Sub-Components
+
 - `AppScrollContainer` - handles scroll logic
 - `AppLayoutGrid` - grid structure with named areas
 - `AppNavPanelSlot` - NavPanel positioning/drawer logic
@@ -212,6 +248,7 @@ Stores navigation hierarchy map for breadcrumbs/nav state
 - `AppProfileMenu` - standalone profile/menu component
 
 ### Refactor AppHeader Sub-Block Architecture
+
 - Decompose AppHeader into compositional sub-blocks
 - Create dedicated components for Logo, SearchBox, and ProfileMenu
 - Use template properties for all sub-blocks (logoTemplate, titleTemplate, startSlotTemplate, etc.)
@@ -222,16 +259,19 @@ Stores navigation hierarchy map for breadcrumbs/nav state
 - Built-in components can be enabled/disabled via props (searchBoxEnabled, profileMenuEnabled)
 
 ### Standardize Stickiness
+
 - Single prop: `stickyElements: ("header" | "footer" | "navPanel")[]`
 - Remove per-layout sticky variants
 - CSS position: sticky with consistent offsets
 
 ### Auto-Nav Generation
+
 - Consider moving to separate utility/hook
 - Currently tightly coupled to renderer
 - Makes testing difficult
 
 ### Breaking Changes Considerations
+
 - Existing layouts need migration path
 - Theme variables should remain stable
 - XMLUI markup compatibility important
@@ -243,6 +283,7 @@ Stores navigation hierarchy map for breadcrumbs/nav state
 This section describes the proposed new architecture for the App component, including improved layout flexibility and modular AppHeader design.
 
 ### Design Goals
+
 - Simplify layout configuration with composable properties
 - Decouple scroll behavior from layout type
 - Extract reusable sub-components
@@ -259,8 +300,9 @@ This section describes the proposed new architecture for the App component, incl
 The app viewport is divided into distinct blocks that can be positioned and sized independently:
 
 0. **App Container Block** (`C`)
+
    - Contains: all other blocks (H, N, M, F)
-   - Properties: 
+   - Properties:
      - Height: fit-content OR stretch to viewport height (100vh/100%)
      - Scrollbar gutters: stable both-edges OR auto (controlled by `noScrollbarGutters`)
      - Scroll behavior: may be scroll container OR static wrapper
@@ -271,6 +313,7 @@ The app viewport is divided into distinct blocks that can be positioned and size
      - Gutter compensation: adds negative margins and padding to child blocks when gutters enabled
 
 1. **Header Block** (`H`)
+
    - Contains: AppHeader component with sub-blocks
    - Properties: height (auto-sized by content), sticky/static positioning
    - Scroll: never scrolls independently, may stick to top or scroll with page
@@ -286,12 +329,14 @@ The app viewport is divided into distinct blocks that can be positioned and size
    - Template Properties: logoTemplate, titleTemplate, startSlotTemplate, middleSlotTemplate, searchBoxTemplate, profileMenuTemplate, endSlotTemplate
 
 2. **Navigation Panel Block** (`N`)
+
    - Contains: NavPanel component with navigation links/groups
    - Properties: width (in vertical layouts) or height (in horizontal layouts), sticky/static positioning
    - Scroll: may have independent scroll in vertical layouts, static in horizontal layouts
    - Visibility: always visible on large screens, drawer on small screens (except condensed)
 
 3. **Main Content Block** (`M`)
+
    - Contains: Pages component with page content
    - Properties: fills remaining space, always scrollable
    - Scroll: either block scrolls independently OR entire viewport scrolls (controlled by `scrollWholePage`)
@@ -314,6 +359,7 @@ The app viewport is divided into distinct blocks that can be positioned and size
 ### Block Arrangement Patterns
 
 Each layout defines how these blocks are arranged in the viewport. The App Container (C) wraps all other blocks. Using a coordinate system where blocks can be:
+
 - **Rows**: blocks stacked vertically
 - **Columns**: blocks placed side-by-side
 - **Overlap**: blocks positioned on top of each other (for sticky elements)
@@ -321,6 +367,7 @@ Each layout defines how these blocks are arranged in the viewport. The App Conta
 ### Layout Descriptions by Block Arrangement
 
 **`vertical`**
+
 ```
 C: fit-content height, scrollbar gutters, is scroll container
 Columns: [N] [H + M + F]
@@ -332,6 +379,7 @@ Columns: [N] [H + M + F]
 ```
 
 **`vertical-sticky`**
+
 ```
 C: stretched to 100% height, scrollbar gutters, is scroll container
 Columns: [N] [H + M + F]
@@ -343,6 +391,7 @@ Columns: [N] [H + M + F]
 ```
 
 **`vertical-full-header`**
+
 ```
 C: stretched to 100% height, scrollbar gutters, is scroll container
 Row 1: [H spanning full width]
@@ -356,6 +405,7 @@ Row 3: [F spanning full width]
 ```
 
 **`horizontal`**
+
 ```
 C: fit-content height, scrollbar gutters, is scroll container
 Rows: [H + N] [M] [F]
@@ -367,6 +417,7 @@ Rows: [H + N] [M] [F]
 ```
 
 **`horizontal-sticky`**
+
 ```
 C: stretched to min 100% height, scrollbar gutters, is scroll container
 Rows: [H + N] [M] [F]
@@ -378,6 +429,7 @@ Rows: [H + N] [M] [F]
 ```
 
 **`condensed`**
+
 ```
 C: fit-content height, scrollbar gutters, is scroll container
 Rows: [H (with N embedded)] [M] [F]
@@ -390,6 +442,7 @@ Rows: [H (with N embedded)] [M] [F]
 ```
 
 **`condensed-sticky`**
+
 ```
 C: fit-content height, scrollbar gutters, is scroll container
 Rows: [H (with N embedded)] [M] [F]
@@ -402,6 +455,7 @@ Rows: [H (with N embedded)] [M] [F]
 ```
 
 **`desktop`**
+
 ```
 C: stretched to 100vw × 100vh (100% × 100% when nested), no gutters, static wrapper
 Rows: [H?] [M] [F?]
@@ -418,6 +472,7 @@ Rows: [H?] [M] [F?]
 Two fundamental scroll strategies that determine App Container behavior:
 
 1. **Whole Page Scroll** (`scrollWholePage=true`)
+
    - Container: App Container (C) is the scroll container
    - Behavior: H, N, M, F scroll together as one unit
    - Sticky elements: position relative to scrolling container
@@ -444,9 +499,11 @@ The Table of Contents feature provides automatic navigation within page content,
 ### Configuration
 
 **Pages Container Property**:
+
 - `showToc`: boolean (default: false) - Global flag to enable TOC feature for all pages
 
 **Individual Page Property**:
+
 - `showToc`: boolean (optional) - Per-page override to show/hide TOC for specific pages
 - Overrides the Pages container setting
 - `showToc={false}` hides TOC even if enabled globally
@@ -455,11 +512,13 @@ The Table of Contents feature provides automatic navigation within page content,
 ### Layout and Positioning
 
 **TOC Positioning**:
+
 - **LTR (Left-to-Right)**: TOC appears on the right side of the content
 - **RTL (Right-to-Left)**: TOC appears on the left side of the content
 - Respects text direction automatically
 
 **Layout Structure**:
+
 ```
 ┌─────────────────────────────────────┐
 │  Main Content Block (M)             │
@@ -478,6 +537,7 @@ The Table of Contents feature provides automatic navigation within page content,
 ```
 
 **Responsive Behavior**:
+
 - Desktop: TOC visible in sidebar
 - Tablet: TOC may collapse to a toggle button
 - Mobile: TOC hidden or accessible via menu
@@ -485,12 +545,14 @@ The Table of Contents feature provides automatic navigation within page content,
 ### TOC Generation
 
 **Automatic Generation**:
+
 - TOC is automatically generated from page content headings
 - Scans for heading elements: `<h2>`, `<h3>`, `<h4>`, `<h5>`, `<h6>`
 - Creates hierarchical navigation structure
 - `<h1>` is typically the page title and excluded from TOC
 
 **TOC Entry Structure**:
+
 ```typescript
 {
   id: string;        // Anchor link ID (e.g., "heading-1")
@@ -503,21 +565,25 @@ The Table of Contents feature provides automatic navigation within page content,
 ### Behavior
 
 **Sticky Positioning**:
+
 - TOC sidebar uses sticky positioning within scrollable content
 - Remains visible as user scrolls through content
 - Constrained to the height of the content area
 
 **Active State Highlighting**:
+
 - Current section is highlighted in TOC
 - Automatically updates as user scrolls
 - Uses intersection observer for accurate tracking
 
 **Click Navigation**:
+
 - Clicking TOC entry smoothly scrolls to corresponding heading
 - Updates URL hash (e.g., `#heading-1`)
 - Respects `scroll-margin-top` for proper positioning under sticky headers
 
 **Keyboard Navigation**:
+
 - TOC entries are keyboard accessible
 - Tab navigation through TOC links
 - Enter/Space to navigate to section
@@ -525,6 +591,7 @@ The Table of Contents feature provides automatic navigation within page content,
 ### XMLUI Markup Examples
 
 **Enable TOC globally for all pages**:
+
 ```xml
 <App>
   <Pages showToc={true}>
@@ -534,7 +601,7 @@ The Table of Contents feature provides automatic navigation within page content,
       <h3>Subsection 1.1</h3>
       <h2>Section 2</h2>
     </Page>
-    
+
     <Page url="/about" navLabel="About">
       <!-- TOC will be shown -->
       <h2>Our Story</h2>
@@ -545,6 +612,7 @@ The Table of Contents feature provides automatic navigation within page content,
 ```
 
 **Override TOC for specific pages**:
+
 ```xml
 <App>
   <Pages showToc={true}>
@@ -552,7 +620,7 @@ The Table of Contents feature provides automatic navigation within page content,
       <!-- TOC hidden for this page -->
       <h2>Welcome</h2>
     </Page>
-    
+
     <Page url="/docs" navLabel="Documentation">
       <!-- TOC shown (inherits from Pages) -->
       <h2>Getting Started</h2>
@@ -565,6 +633,7 @@ The Table of Contents feature provides automatic navigation within page content,
 ```
 
 **Enable TOC only for specific pages**:
+
 ```xml
 <App>
   <Pages showToc={false}>
@@ -572,7 +641,7 @@ The Table of Contents feature provides automatic navigation within page content,
       <!-- No TOC -->
       <h2>Welcome</h2>
     </Page>
-    
+
     <Page url="/docs" navLabel="Documentation" showToc={true}>
       <!-- TOC shown only for this page -->
       <h2>Getting Started</h2>
@@ -586,6 +655,7 @@ The Table of Contents feature provides automatic navigation within page content,
 ### Theme Variables
 
 **TOC Styling**:
+
 - `width-toc-Pages` - TOC sidebar width (default: e.g., 240px)
 - `backgroundColor-toc-Pages` - TOC background color
 - `borderColor-toc-Pages` - TOC border color
@@ -596,6 +666,7 @@ The Table of Contents feature provides automatic navigation within page content,
 - `indent-tocEntry-Pages` - Indentation per heading level
 
 **Layout Variables**:
+
 - `gap-content-toc-Pages` - Gap between content and TOC sidebar
 - `top-toc-Pages` - Top offset for sticky positioning
 - `maxHeight-toc-Pages` - Maximum height of TOC sidebar
@@ -603,11 +674,13 @@ The Table of Contents feature provides automatic navigation within page content,
 ### Accessibility
 
 **ARIA Attributes**:
+
 - TOC container: `role="navigation"`, `aria-label="Table of Contents"`
 - TOC entries: Semantic `<nav>` with `<ul>` and `<li>` structure
 - Current section: `aria-current="location"` on active entry
 
 **Screen Reader Support**:
+
 - TOC is announced as navigation landmark
 - Heading levels are preserved in structure
 - Skip link available to bypass TOC
@@ -623,6 +696,7 @@ The new AppHeader design provides a flexible, modular architecture with multiple
 The AppHeader component is composed of several sub-blocks that flow horizontally from start to end, respecting the current text direction (LTR/RTL). Each sub-block can be customized via template properties or by completely redefining the header structure.
 
 ### Sub-Block Order (Default, Start → End)
+
 1. **Logo** - Complete component for app logo/branding
 2. **App Title** - Text display for application name
 3. **Start Slot** - Flexible template slot for custom content at the start
@@ -632,7 +706,9 @@ The AppHeader component is composed of several sub-blocks that flow horizontally
 7. **End Slot** - Flexible template slot for custom content at the end
 
 ### AppHeader Template Properties
+
 The AppHeader component accepts template properties for each sub-block:
+
 - `logoTemplate` - Custom logo content (overrides default AppLogo)
 - `titleTemplate` - Custom title content (overrides default text title)
 - `startSlotTemplate` - Custom content for start slot
@@ -642,6 +718,7 @@ The AppHeader component accepts template properties for each sub-block:
 - `endSlotTemplate` - Custom content for end slot
 
 ### Layout Behavior
+
 - Sub-blocks follow flex layout with appropriate spacing
 - Components can be hidden/shown based on props or by omitting template properties
 - Respects text direction (LTR/RTL) for proper ordering
@@ -656,11 +733,13 @@ The AppHeader component accepts template properties for each sub-block:
 **Purpose**: Display application logo with theme-aware variants and navigation functionality.
 
 **Usage in AppHeader**:
+
 - As property: `<AppHeader logo="/logo.svg" logoDark="/dark.svg" logoLight="/light.svg" />`
 - As template: `<AppHeader logoTemplate={customLogoDef} />`
 - As child: `<AppHeader><Logo src="/logo.svg" /></AppHeader>` (Approach 4)
 
 **Properties**:
+
 - `src`: string - Default logo image URL
 - `srcDark`: string (optional) - Logo variant for dark theme
 - `srcLight`: string (optional) - Logo variant for light theme
@@ -671,6 +750,7 @@ The AppHeader component accepts template properties for each sub-block:
 - `onClick`: (event) => void (optional) - Custom click handler
 
 **Behavior**:
+
 - Automatically switches between light/dark variants based on active theme
 - Clickable by default, navigates to `href` location
 - Respects custom onClick handlers
@@ -678,6 +758,7 @@ The AppHeader component accepts template properties for each sub-block:
 - Falls back to default logo if theme-specific variant unavailable
 
 **Theme Variables**:
+
 - `width-logo-AppHeader` - Default logo width
 - `height-logo-AppHeader` - Default logo height
 - `margin-inline-end-logo-AppHeader` - Spacing after logo
@@ -689,19 +770,23 @@ The AppHeader component accepts template properties for each sub-block:
 **Purpose**: Display application title text.
 
 **Usage in AppHeader**:
+
 - As property: `<AppHeader title="My Application" />`
 - As template: `<AppHeader titleTemplate={customTitleDef} />`
 - As child: `<AppHeader><AppTitle>My App</AppTitle></AppHeader>` (Approach 4)
 
 **Properties**:
+
 - `text`: string (optional) - Title text
 - `children`: ReactNode (optional) - Title content (alternative to text)
 
 **Behavior**:
+
 - Displays as text in the header
 - Can include inline styling or nested components
 
 **Theme Variables**:
+
 - `fontSize-title-AppHeader` - Title font size
 - `fontWeight-title-AppHeader` - Title font weight
 - `color-title-AppHeader` - Title text color
@@ -714,11 +799,13 @@ The AppHeader component accepts template properties for each sub-block:
 **Purpose**: Provide search functionality with dropdown results and keyboard navigation.
 
 **Usage in AppHeader**:
+
 - As enabled prop: `<AppHeader searchBoxEnabled={true} />`
 - As template: `<AppHeader searchBoxTemplate={customSearchDef} />`
 - As child: `<AppHeader><AppSearchBox /></AppHeader>` (Approach 4)
 
 **Properties**:
+
 - `src`: string - Default logo image URL
 - `srcDark`: string (optional) - Logo variant for dark theme
 - `srcLight`: string (optional) - Logo variant for light theme
@@ -729,6 +816,7 @@ The AppHeader component accepts template properties for each sub-block:
 - `onClick`: (event) => void (optional) - Custom click handler
 
 **Behavior**:
+
 - Automatically switches between light/dark variants based on active theme
 - Clickable by default, navigates to `href` location
 - Respects custom onClick handlers
@@ -736,6 +824,7 @@ The AppHeader component accepts template properties for each sub-block:
 - Falls back to default logo if theme-specific variant unavailable
 
 **Theme Variables**:
+
 - `width-logo-AppHeader` - Default logo width
 - `height-logo-AppHeader` - Default logo height
 - `margin-inline-end-logo-AppHeader` - Spacing after logo
@@ -747,6 +836,7 @@ The AppHeader component accepts template properties for each sub-block:
 **Purpose**: Provide search functionality with dropdown results and keyboard navigation.
 
 **Properties**:
+
 - `placeholder`: string (default: "Search...") - Input placeholder text
 - `searchIndex`: SearchIndex - Search index data source
 - `maxResults`: number (default: 10) - Maximum results to display
@@ -757,6 +847,7 @@ The AppHeader component accepts template properties for each sub-block:
 - `disabled`: boolean - Disable search functionality
 
 **Behavior**:
+
 - Real-time search with debouncing
 - Dropdown results with keyboard navigation (↑/↓, Enter, Esc)
 - Click outside to close results
@@ -765,12 +856,14 @@ The AppHeader component accepts template properties for each sub-block:
 - Integrates with App's SearchContext for indexing
 
 **Events**:
+
 - `search` - Fires when search query changes
 - `resultClick` - Fires when a result is selected
 - `open` - Fires when dropdown opens
 - `close` - Fires when dropdown closes
 
 **Theme Variables**:
+
 - `width-searchBox-AppHeader` - Search box width
 - `backgroundColor-searchBox-AppHeader` - Search input background
 - `borderColor-searchBox-AppHeader` - Search input border
@@ -784,11 +877,13 @@ The AppHeader component accepts template properties for each sub-block:
 **Purpose**: Display user profile with dropdown menu for account actions.
 
 **Usage in AppHeader**:
+
 - As enabled prop: `<AppHeader profileMenuEnabled={true} profileMenuUser={$currentUser} />`
 - As template: `<AppHeader profileMenuTemplate={customProfileDef} />`
 - As child: `<AppHeader><AppProfileMenu user={$currentUser} /></AppHeader>` (Approach 4)
 
 **Properties**:
+
 - `user`: object - User data { name, email, avatar, ... }
 - `avatarSrc`: string (optional) - User avatar image URL
 - `userName`: string - Display name
@@ -800,6 +895,7 @@ The AppHeader component accepts template properties for each sub-block:
 - `onSignOut`: () => void (optional) - Sign out handler
 
 **MenuItem Structure**:
+
 ```typescript
 {
   id: string;
@@ -813,6 +909,7 @@ The AppHeader component accepts template properties for each sub-block:
 ```
 
 **Behavior**:
+
 - Displays user avatar with fallback to initials
 - Dropdown menu on click/hover
 - Keyboard navigation in menu (↑/↓, Enter, Esc)
@@ -820,11 +917,13 @@ The AppHeader component accepts template properties for each sub-block:
 - Responsive: may show avatar only on mobile
 
 **Events**:
+
 - `menuOpen` - Fires when menu opens
 - `menuClose` - Fires when menu closes
 - `menuItemClick` - Fires when menu item selected
 
 **Theme Variables**:
+
 - `size-avatar-profileMenu-AppHeader` - Avatar size
 - `backgroundColor-menu-profileMenu-AppHeader` - Menu background
 - `boxShadow-menu-profileMenu-AppHeader` - Menu dropdown shadow
@@ -837,6 +936,7 @@ The AppHeader component accepts template properties for each sub-block:
 **Purpose**: Provide customizable template slots within the AppHeader for application-specific controls.
 
 **Usage in AppHeader**:
+
 - As template properties: `<AppHeader startSlotTemplate={def} middleSlotTemplate={def} endSlotTemplate={def} />`
 - As inline templates:
   ```xml
@@ -858,21 +958,25 @@ The AppHeader component accepts template properties for each sub-block:
   ```
 
 **AppHeader Template Properties**:
+
 - `startSlotTemplate`: ComponentDef - Template content for start slot
 - `middleSlotTemplate`: ComponentDef - Template content for middle slot
 - `endSlotTemplate`: ComponentDef - Template content for end slot
 
 **Slot Component**:
 When using Approach 4 (total redefinition), the `<Slot>` component references a named template:
+
 - `name`: "startSlotTemplate" | "middleSlotTemplate" | "endSlotTemplate" - The template slot to render
 - Content is defined via corresponding template property on AppHeader
 
 **Slot Rendering**:
+
 - Slots render template content provided via AppHeader properties
 - If template property is not defined, slot is not rendered
 - Template content can be any XMLUI components
 
 **Layout Behavior**:
+
 - **StartSlot**: Positioned after logo and title, before middle
   - Use for: breadcrumbs, quick actions, context indicators
 - **MiddleSlot**: Positioned in center, uses flex-grow
@@ -881,6 +985,7 @@ When using Approach 4 (total redefinition), the `<Slot>` component references a 
   - Use for: notifications, help icon, theme toggle, settings
 
 **Responsive Behavior**:
+
 - Slots may collapse or move to hamburger menu on mobile
 - Priority order for collapse: MiddleSlot → StartSlot → EndSlot
 - Essential components (Logo, SearchBox, ProfileMenu) remain visible longer
@@ -896,7 +1001,7 @@ The AppHeader component supports multiple approaches for customization:
 Using template properties for standard layout with customization:
 
 ```xml
-<AppHeader 
+<AppHeader
   logo="/logo.svg"
   logoDark="/logo-dark.svg"
   logoLight="/logo-light.svg"
@@ -916,7 +1021,7 @@ Using template properties for standard layout with customization:
 Override specific sub-blocks while keeping standard order:
 
 ```xml
-<AppHeader 
+<AppHeader
   logoTemplate={customLogoDef}
   titleTemplate={customTitleDef}
   searchBoxTemplate={customSearchDef}
@@ -933,11 +1038,11 @@ Define template content inline as child elements:
   <startSlotTemplate>
     <Breadcrumb items={$breadcrumbs} />
   </startSlotTemplate>
-  
+
   <middleSlotTemplate>
     <TabBar tabs={$mainTabs} />
   </middleSlotTemplate>
-  
+
   <endSlotTemplate>
     <IconButton icon="notifications" onClick={@showNotifications} />
     <IconButton icon="settings" onClick={@showSettings} />
@@ -960,6 +1065,7 @@ Completely redefine the AppHeader structure and sub-block order using predefined
 ```
 
 This approach allows you to:
+
 - Reorder any sub-block components
 - Omit unwanted components (e.g., no title, no middle slot)
 - Insert custom components between sub-blocks
@@ -967,6 +1073,7 @@ This approach allows you to:
 - Reference template slots by name: `<Slot name="startSlotTemplate" />`, `<Slot name="middleSlotTemplate" />`, `<Slot name="endSlotTemplate" />`
 
 **Example: Custom order with all options**
+
 ```xml
 <AppHeader>
   <Logo src="/logo.svg" />
@@ -982,6 +1089,7 @@ This approach allows you to:
 ```
 
 **Example: Minimal custom header**
+
 ```xml
 <AppHeader>
   <Logo />
@@ -992,6 +1100,7 @@ This approach allows you to:
 ```
 
 **Default Rendering Order** (LTR, when using Approach 1-3):
+
 ```
 [Logo] [Title] [StartSlot] [MiddleSlot] [SearchBox] [ProfileMenu] [EndSlot]
 ```
@@ -999,6 +1108,7 @@ This approach allows you to:
 **RTL Support**: Order automatically reverses in RTL text direction.
 
 **Visibility Control**: Each sub-block can be shown/hidden via:
+
 - Omitting template properties (slot not rendered) - Approaches 1-3
 - Not including components in markup - Approach 4
 - Using `*Enabled` props for built-in components (e.g., `searchBoxEnabled={false}`) - Approach 1
@@ -1009,6 +1119,7 @@ This approach allows you to:
 ### When to Use Each Approach
 
 **Approach 1 (Template Properties)**: Best for most use cases
+
 - ✅ Simple, declarative API
 - ✅ Standard layout with custom slots
 - ✅ Uses built-in components with easy configuration
@@ -1016,18 +1127,21 @@ This approach allows you to:
 - Use when: You want the standard header layout with some customization
 
 **Approach 2 (Custom Templates Override)**: Advanced customization
+
 - ✅ Replace specific sub-blocks with custom implementations
 - ✅ Maintain standard order and spacing
 - ✅ Good for themed or branded variants
 - Use when: You need custom Logo, SearchBox, or ProfileMenu implementations
 
 **Approach 3 (Inline Templates)**: Quick customization
+
 - ✅ Define slot content inline for readability
 - ✅ Good for simple, page-specific content
 - ✅ Keeps markup self-contained
 - Use when: Slot content is simple and specific to one page
 
 **Approach 4 (Total Redefinition)**: Maximum flexibility
+
 - ✅ Complete control over order and composition
 - ✅ Can insert custom components between sub-blocks
 - ✅ Can omit any sub-block
@@ -1036,6 +1150,7 @@ This approach allows you to:
 - Use when: You need a completely custom header layout or non-standard order
 
 **Predefined Sub-Block Components** (available in Approach 4):
+
 - `<Logo>` - AppLogo component
 - `<AppTitle>` - App title text
 - `<AppSearchBox>` - Search functionality
@@ -1048,7 +1163,23 @@ This approach allows you to:
 
 ## Screen Layout Diagrams
 
+This section presents all variants of screen layouts. The following factors determine the visual appearance and behavior of the screen:
+
+**Configuration Properties:**
+- `layout` - Defines block arrangement (horizontal, horizontal-sticky, vertical, etc.)
+- `noScrollbarGutters` - Controls whether scrollbar gutters are reserved (false = reserved, true = no reservation)
+- `scrollWholePage` - Determines scroll container (true = App Container, false = Main Content block only)
+
+**Runtime Factors:**
+- **Content overflow** - Whether content fits within viewport or extends beyond it
+- **Scroll position** - Current scroll state (top, middle, bottom) when content overflows
+- **Viewport size** - Mobile vs. desktop/tablet (affects NavPanel visibility and drawer behavior)
+
+The diagrams below illustrate these combinations to show how the App component adapts to different scenarios.
+
 ### Complete App Screen Layout
+
+The following diagrams show the App container at full viewport height. However, the actual container height varies based on the `layout` property and content requirements. These diagrams illustrate the main container that wraps all nested App component blocks.
 
 Basic app container without any internal blocks or scroll gutters.
 
@@ -1062,108 +1193,53 @@ App container with reserved scroll gutter spaces on both sides (stable both-edge
 
 ## Horizontal Layout Diagrams
 
+**`layout`: horizontal**
+
 All horizontal layout diagrams share the following common characteristics:
+
 - **Navigation Panel Position**: The NavPanel (N) is positioned at the top of the viewport, below the header
 - **Block Arrangement**: Blocks are stacked vertically in rows: Header → NavPanel → Main Content → Footer
 - **Full Width Blocks**: All blocks (H, N, M, F) span the full width of the container
 - **NavPanel Behavior**: NavPanel is static (not independently scrollable) and rendered within the header area
 - **Variants**: The diagrams below demonstrate different combinations of scroll behavior (`scrollWholePage`), gutter reservation (`noScrollbarGutters`), and scroll positions
 
-### Horizontal Layout
+### Horizontal Layout (scroll parent: app container, no scrollbar gutters)
 
-- `layout`: horizontal
 - `noScrollbarGutters`: true
 - `scrollWholePage`: true
-
-**Note:** We cannot see the scrollbars as the entire content fits into the viewport. The same is displayed when `scrollWholePage` is false.
 
 ![Horizontal Layout](images/horizontal-layout-diagram.svg)
 
-### Horizontal Layout with Scroll Gutters
+### Horizontal Layout (scroll parent: app container, scrollbar gutters)
 
-- `layout`: horizontal
 - `noScrollbarGutters`: false
 - `scrollWholePage`: true
-
-**Note:** The entire content fits into the viewport; no scrollbar visible. The scroll gutters are reserved on both sides.
 
 ![Horizontal Layout with Gutters](images/horizontal-layout-with-gutters-diagram.svg)
 
-### Horizontal Layout with Overflow and Scrollbar
+![Horizontal Layout with Overflow and Scrollbar (Top)](images/horizontal-layout-overflow-scrollbar-top.svg)
 
-- `layout`: horizontal
-- `noScrollbarGutters`: false
-- `scrollWholePage`: true
+![Horizontal Layout with Overflow and Scrollbar (Mid-Scroll)](images/horizontal-layout-overflow-scrollbar-mid.svg)
 
-**Note:** The content overflows beyond the viewport; the scrollbar is visible in the right gutter at the top position; the footer extends below the visible screen.
+![Horizontal Layout with Overflow and Scrollbar (Bottom-Scroll)](images/horizontal-layout-overflow-scrollbar-bottom.svg)
 
-![Horizontal Layout with Overflow and Scrollbar](images/horizontal-layout-overflow-scrollbar.svg)
+### Horizontal Layout (scroll parent: main content, no scrollbar gutters)
 
-### Horizontal Layout with Overflow and Scrollbar (Mid-Scroll Position)
-
-- `layout`: horizontal
-- `noScrollbarGutters`: false
-- `scrollWholePage`: true
-
-**Note:** The content overflows both above and below the viewport; the scrollbar is visible in the right gutter at mid position showing the user has scrolled down from the top. The header, navigation panel, and part of the main content overflow at the top; the footer and remaining main content overflow at the bottom.
-
-![Horizontal Layout with Overflow and Scrollbar Mid-Scroll](images/horizontal-layout-overflow-scrollbar-mid.svg)
-
-### Horizontal Layout with Overflow and Scrollbar (Bottom-Scroll Position)
-
-- `layout`: horizontal
-- `noScrollbarGutters`: false
-- `scrollWholePage`: true
-
-**Note:** The content overflows above the viewport; the scrollbar is visible in the right gutter at the bottom position showing the user has scrolled to the end. The header, navigation panel, and part of the main content overflow at the top; the remaining main content and footer are fully visible in the viewport.
-
-![Horizontal Layout with Overflow and Scrollbar Bottom-Scroll](images/horizontal-layout-overflow-scrollbar-bottom.svg)
-
-### Horizontal Layout with Overflow and Scrollbar (No Gutter Reservation)
-
-- `layout`: horizontal
-- `noScrollbarGutters`: true
-- `scrollWholePage`: true
-
-**Note:** The content overflows beyond the viewport; the scrollbar is visible on the right side; no scroll gutters are reserved; the footer extends below the visible screen.
-
-![Horizontal Layout with Overflow and Scrollbar](images/horizontal-layout-overflow-scrollbar.svg)
-
-### Horizontal Layout with Overflow and Scrollbar (No Gutter Reservation, Mid-Scroll Position)
-
-- `layout`: horizontal
-- `noScrollbarGutters`: true
-- `scrollWholePage`: true
-
-**Note:** The content overflows both above and below the viewport; the scrollbar is visible on the right side at mid position showing the user has scrolled down from the top; no scroll gutters are reserved. The header, navigation panel, and part of the main content overflow at the top; the footer and remaining main content overflow at the bottom.
-
-![Horizontal Layout with Overflow and Scrollbar Mid-Scroll No Gutter](images/horizontal-layout-overflow-scrollbar-nogutter-mid.svg)
-
-### Horizontal Layout with Overflow and Scrollbar (No Gutter Reservation, Bottom-Scroll Position)
-
-- `layout`: horizontal
-- `noScrollbarGutters`: true
-- `scrollWholePage`: true
-
-**Note:** The content overflows above the viewport; the scrollbar is visible on the right side at the bottom position showing the user has scrolled to the end; no scroll gutters are reserved. The header, navigation panel, and part of the main content overflow at the top; the remaining main content and footer are fully visible in the viewport.
-
-![Horizontal Layout with Overflow and Scrollbar Bottom-Scroll No Gutter](images/horizontal-layout-overflow-scrollbar-nogutter-bottom.svg)
-
-
-### Horizontal Layout with Content-Only Scroll
-
-- `layout`: horizontal
 - `noScrollbarGutters`: false
 - `scrollWholePage`: false
 
-**Note:** Only the main content scrolls; header, navigation panel, and footer remain docked. The scrollbar belongs to the main content block. Content overflow is indicated with arrows showing hidden content above and below the visible area.
+**Note:** Only the main content scrolls; header, navigation panel, and footer remain docked. The scrollbar belongs to the main content block and is positioned within the right gutter. Content overflow is indicated with arrows showing hidden content.
 
-![Horizontal Layout with Content-Only Scroll](images/horizontal-layout-content-scroll.svg)
+![Horizontal Layout with Content-Only Scroll (Top)](images/horizontal-layout-content-scroll-top.svg)
 
+![Horizontal Layout with Content-Only Scroll (Mid-Scroll)](images/horizontal-layout-content-scroll.svg)
+
+![Horizontal Layout with Content-Only Scroll (Bottom)](images/horizontal-layout-content-scroll-bottom.svg)
 
 ## Horizontal-Sticky Layout Diagrams
 
 All horizontal-sticky layout diagrams share the following common characteristics:
+
 - **Header Sticky**: The Header (H) is always docked to the top of the viewport using sticky positioning
 - **NavPanel Sticky**: The NavPanel (N) is always docked to the top, below the header, using sticky positioning
 - **Footer Sticky**: The Footer (F) is always docked to the bottom of the viewport using sticky positioning
@@ -1191,17 +1267,21 @@ All horizontal-sticky layout diagrams share the following common characteristics
 
 ![Horizontal-Sticky Layout with Gutters](images/horizontal-sticky-layout-with-gutters.svg)
 
-### Horizontal-Sticky Layout with Content Overflow (Mid-Scroll)
-
-- `layout`: horizontal-sticky
-- `noScrollbarGutters`: true
-- `scrollWholePage`: true
-
-**Note:** Content overflows; scrollbar visible on right side spanning entire viewport. Header, NavPanel, and Footer remain docked. Scrollbar at mid-position. App Container is the scroll parent.
-
 ![Horizontal-Sticky Layout with Overflow Mid-Scroll](images/horizontal-sticky-layout-overflow-mid.svg)
 
-### Horizontal-Sticky Layout with Content Overflow and Scroll Gutters (Mid-Scroll)
+![Horizontal-Sticky Layout with Overflow Bottom-Scroll](images/horizontal-sticky-layout-overflow-bottom.svg)
+
+### Horizontal-Sticky Layout with Scroll Gutters (No Overflow)
+
+- `layout`: horizontal-sticky
+- `noScrollbarGutters`: false
+- `scrollWholePage`: true
+
+**Note:** Content fits within viewport; scroll gutters reserved on both sides. Header, NavPanel, and Footer are docked. No scrollbar visible. App Container is the scroll parent.
+
+![Horizontal-Sticky Layout with Gutters No Overflow](images/horizontal-sticky-layout-with-gutters-no-overflow.svg)
+
+### Horizontal-Sticky Layout with Scroll Gutters (Mid-Scroll)
 
 - `layout`: horizontal-sticky
 - `noScrollbarGutters`: false
@@ -1209,71 +1289,9 @@ All horizontal-sticky layout diagrams share the following common characteristics
 
 **Note:** Content overflows; scrollbar visible in right gutter spanning entire viewport. Header, NavPanel, and Footer remain docked. Scrollbar at mid-position. App Container is the scroll parent.
 
-```
-┌─┬──────────────────────────────────────────────────────────────────────────┬─┐
-│ │ H: Header (docked to top)                                                │█│
-│ ├──────────────────────────────────────────────────────────────────────────┤█│
-│ │ N: Navigation Panel (docked to top)                                      │█│
-│ ├──────────────────────────────────────────────────────────────────────────┤█│
-│ │ ↑ Content above (hidden)                                                 │█│
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │ M: Main Content (scrollable, mid-scroll position)                        │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │ ↓ Content below (hidden)                                                 │ │
-│ ├──────────────────────────────────────────────────────────────────────────┤ │
-│ │ F: Footer (docked to bottom)                                             │ │
-└─┴──────────────────────────────────────────────────────────────────────────┴─┘
-```
+![Horizontal-Sticky Layout with Gutters Mid-Scroll](images/horizontal-sticky-layout-with-gutters-mid-scroll.svg)
 
-### Horizontal-Sticky Layout Scrolled to Bottom
-
-- `layout`: horizontal-sticky
-- `noScrollbarGutters`: true
-- `scrollWholePage`: true
-
-**Note:** Content scrolled to bottom; scrollbar at bottom position spanning entire viewport. Header, NavPanel, and Footer remain docked. End of content visible. App Container is the scroll parent.
-
-```
-┌────────────────────────────────────────────────────────────────────────────┬─┐
-│ H: Header (docked to top)                                                  │ │
-├────────────────────────────────────────────────────────────────────────────┤ │
-│ N: Navigation Panel (docked to top)                                        │ │
-├────────────────────────────────────────────────────────────────────────────┤ │
-│ ↑ Content above (hidden)                                                   │ │
-│                                                                            │ │
-│                                                                            │ │
-│ M: Main Content (scrollable, scrolled to bottom)                           │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│ (end of content)                                                           │█│
-├────────────────────────────────────────────────────────────────────────────┤█│
-│ F: Footer (docked to bottom)                                               │█│
-└────────────────────────────────────────────────────────────────────────────┴─┘
-```
-
-### Horizontal-Sticky Layout Scrolled to Bottom with Scroll Gutters
+### Horizontal-Sticky Layout with Scroll Gutters (Scrolled to Bottom)
 
 - `layout`: horizontal-sticky
 - `noScrollbarGutters`: false
@@ -1281,33 +1299,7 @@ All horizontal-sticky layout diagrams share the following common characteristics
 
 **Note:** Content scrolled to bottom; scrollbar at bottom position in right gutter spanning entire viewport. Header, NavPanel, and Footer remain docked. End of content visible. App Container is the scroll parent.
 
-```
-┌─┬──────────────────────────────────────────────────────────────────────────┬─┐
-│ │ H: Header (docked to top)                                                │ │
-│ ├──────────────────────────────────────────────────────────────────────────┤ │
-│ │ N: Navigation Panel (docked to top)                                      │ │
-│ ├──────────────────────────────────────────────────────────────────────────┤ │
-│ │ ↑ Content above (hidden)                                                 │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │ M: Main Content (scrollable, scrolled to bottom)                         │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │ (end of content)                                                         │█│
-│ ├──────────────────────────────────────────────────────────────────────────┤█│
-│ │ F: Footer (docked to bottom)                                             │█│
-└─┴──────────────────────────────────────────────────────────────────────────┴─┘
-```
+![Horizontal-Sticky Layout with Gutters Bottom-Scroll](images/horizontal-sticky-layout-with-gutters-bottom-scroll.svg)
 
 ### Horizontal-Sticky Layout with Content-Only Scroll (No Overflow)
 
@@ -1529,6 +1521,7 @@ All horizontal-sticky layout diagrams share the following common characteristics
 ## Condensed Layout Diagrams
 
 All condensed layout diagrams share the following common characteristics:
+
 - **Header and NavPanel Combined**: The Header (H) and NavPanel (N) share the same row at the top of the viewport
 - **Block Arrangement**: Blocks are stacked vertically in rows: Header/NavPanel → Main Content → Footer
 - **Full Width Blocks**: All blocks span the full width of the container
@@ -1800,6 +1793,7 @@ All condensed layout diagrams share the following common characteristics:
 ## Condensed-Sticky Layout Diagrams
 
 All condensed-sticky layout diagrams share the following common characteristics:
+
 - **Header/NavPanel Sticky**: The combined Header and Navigation Panel (H/N) is always docked to the top of the viewport using sticky positioning
 - **Footer Sticky**: The Footer (F) is always docked to the bottom of the viewport using sticky positioning
 - **Content Scroll**: Only the Main Content (M) area scrolls between the sticky header/navpanel and footer
@@ -2218,6 +2212,7 @@ All condensed-sticky layout diagrams share the following common characteristics:
 ## Vertical Layout Diagrams
 
 All vertical layout diagrams share the following common characteristics:
+
 - **Navigation Panel Position**: The Navigation Panel (N) is positioned to the left of the Main Content (M)
 - **Layout Structure**: Header (H) at top, then a row containing NavPanel (N) on the left and Main Content (M) on the right, Footer (F) at bottom
 - **Scroll Container**: Can be either the App Container (C) when `scrollWholePage=true` or the Main Content block (M) when `scrollWholePage=false`
