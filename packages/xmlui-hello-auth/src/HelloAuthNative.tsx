@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { RegisterComponentApiFn, UpdateStateFn } from "xmlui";
 
 /* -------------------- PKCE + helpers (TS/DOM safe) -------------------- */
@@ -70,6 +70,7 @@ type Props = {
   autoLogin?: boolean;
   debug?: boolean;
   proxy_base_url?: string; // e.g. http://localhost:8080/proxy/
+  authorize_params?: Record<string, string | undefined>;
 
   registerComponentApi?: RegisterComponentApiFn;
   updateState?: UpdateStateFn;
@@ -88,6 +89,7 @@ type Echo = {
   storage?: string;
   autoLogin?: boolean;
   proxy_base_url?: string;
+  authorize_params?: Record<string, string | undefined>;
 };
 type Temp = {
   state?: string;
@@ -157,6 +159,7 @@ export const HelloAuth = React.forwardRef<HTMLDivElement, Props>(function HelloA
     autoLogin = defaultProps.autoLogin,
     debug = defaultProps.debug,
     proxy_base_url,
+    authorize_params,
     registerComponentApi,
     updateState,
   },
@@ -171,15 +174,61 @@ export const HelloAuth = React.forwardRef<HTMLDivElement, Props>(function HelloA
   const [claims, setClaims] = useState<IdClaims | undefined>(undefined);
   const [user, setUser] = useState<User | undefined>(undefined);
   const [expiresAt, setExpiresAt] = useState<number | undefined>(undefined);
+  const [autoLoginFired, setAutoLoginFired] = useState(false);
 
   const storageKey = useMemo(
     () => `xmlui.auth:${issuer || "unknown"}:${client_id || "unknown"}`,
     [issuer, client_id],
   );
+  const normalizedAuthorizeParams = useMemo(() => {
+    if (!authorize_params) return undefined;
+    const normalized: Record<string, string> = {};
+    Object.entries(authorize_params).forEach(([key, value]) => {
+      if (value === undefined || value === null) return;
+      normalized[key] = typeof value === "string" ? value : String(value);
+    });
+    return Object.keys(normalized).length ? normalized : undefined;
+  }, [authorize_params]);
   const echo: Echo = useMemo(
-    () => ({ issuer, client_id, redirect_uri, scopes, storage, autoLogin, proxy_base_url }),
-    [issuer, client_id, redirect_uri, scopes, storage, autoLogin, proxy_base_url],
+    () => ({
+      issuer,
+      client_id,
+      redirect_uri,
+      scopes,
+      storage,
+      autoLogin,
+      proxy_base_url,
+      authorize_params: normalizedAuthorizeParams,
+    }),
+    [
+      issuer,
+      client_id,
+      redirect_uri,
+      scopes,
+      storage,
+      autoLogin,
+      proxy_base_url,
+      normalizedAuthorizeParams,
+    ],
   );
+  const providerInitiated = useMemo(() => {
+    if (typeof window === "undefined" || !issuer) {
+      return { matched: false, params: undefined as Record<string, string> | undefined };
+    }
+    try {
+      const url = new URL(window.location.href);
+      const issParam = url.searchParams.get("iss");
+      if (issParam && issParam === issuer) {
+        const domainHint = url.searchParams.get("domain_hint") || undefined;
+        const params: Record<string, string> = {};
+        if (domainHint) params.domain_hint = domainHint;
+        return { matched: true, params };
+      }
+    } catch (err) {
+      if (debug) console.warn("[HelloAuth] provider init parse error", err);
+    }
+    return { matched: false, params: undefined as Record<string, string> | undefined };
+  }, [issuer, debug]);
 
   function publish() {
     const snapshot = {
@@ -331,7 +380,14 @@ export const HelloAuth = React.forwardRef<HTMLDivElement, Props>(function HelloA
       try {
         // Parse header/payload (no signature verification in this step)
         const { header, payload } = splitJwt(tokens.id_token);
-        if (debug) console.debug("[HelloAuth] id_token header/payload", header, payload);
+        if (debug) {
+          console.debug("[HelloAuth] id_token header/payload", header, payload);
+          console.info("[HelloAuth] login claims", {
+            sub: payload.sub,
+            email: payload.email,
+            iss: payload.iss,
+          });
+        }
 
         // Basic claim checks
         if (endpoints?.issuer && payload.iss !== endpoints.issuer) {
@@ -456,16 +512,8 @@ export const HelloAuth = React.forwardRef<HTMLDivElement, Props>(function HelloA
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [issuer, proxy_base_url]);
 
-  /* -------------------- APIs: poke() and login() -------------------- */
-  useEffect(() => {
-    const poke = () => {
-      const ts = new Date().toISOString();
-      if (debug) console.debug("[HelloAuth] poke()", ts);
-      setLastPokeAt(ts);
-      setTimeout(publish, 0);
-    };
-
-    const login = async () => {
+  const login = useCallback(
+    async (extraParams?: Record<string, string | undefined>) => {
       if (!endpoints?.authorization_endpoint || !client_id || !redirect_uri) {
         if (debug) console.warn("[HelloAuth] login(): missing config");
         setError({
@@ -506,6 +554,17 @@ export const HelloAuth = React.forwardRef<HTMLDivElement, Props>(function HelloA
         code_challenge: challenge,
         code_challenge_method: "S256",
       });
+
+      const mergedParams: Record<string, string | undefined> = {
+        ...(normalizedAuthorizeParams || {}),
+        ...(extraParams || {}),
+      };
+      Object.entries(mergedParams).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          params.set(key, value);
+        }
+      });
+
       url.search = params.toString();
       const authUrl = url.toString();
 
@@ -518,57 +577,80 @@ export const HelloAuth = React.forwardRef<HTMLDivElement, Props>(function HelloA
       });
       setTimeout(publish, 0);
 
-      // enable redirect (comment this line out if you want to inspect URL without navigating)
       window.location.assign(authUrl);
-    };
+    },
+    [
+      endpoints?.authorization_endpoint,
+      client_id,
+      redirect_uri,
+      scopes,
+      storage,
+      storageKey,
+      debug,
+      normalizedAuthorizeParams,
+    ],
+  );
 
-    const logout = async () => {
-      if (debug) console.debug("[HelloAuth] logout()");
+  const logout = useCallback(async () => {
+    if (debug) console.debug("[HelloAuth] logout()");
 
-      // Clear local state
-      setTokens(undefined);
-      setClaims(undefined);
-      setUser(undefined);
-      setExpiresAt(undefined);
-      setError(undefined);
-      setTemp(undefined);
+    setTokens(undefined);
+    setClaims(undefined);
+    setUser(undefined);
+    setExpiresAt(undefined);
+    setError(undefined);
+    setTemp(undefined);
 
-      // Clear storage
-      const kv = getKV(storage as any);
-      try {
-        kv.removeItem(storageKey);
-        kv.removeItem(`${storageKey}:session`);
-      } catch {}
+    const kv = getKV(storage as any);
+    try {
+      kv.removeItem(storageKey);
+      kv.removeItem(`${storageKey}:session`);
+    } catch {}
 
-      // If we have an end session endpoint, redirect to it
-      if (endpoints?.end_session_endpoint && tokens?.id_token) {
-        const url = new URL(endpoints.end_session_endpoint);
-        const params = new URLSearchParams({
-          id_token_hint: tokens.id_token,
-          post_logout_redirect_uri: redirect_uri || window.location.origin,
-        });
-        url.search = params.toString();
-        const logoutUrl = url.toString();
+    if (endpoints?.end_session_endpoint && tokens?.id_token) {
+      const url = new URL(endpoints.end_session_endpoint);
+      const params = new URLSearchParams({
+        id_token_hint: tokens.id_token,
+        post_logout_redirect_uri: redirect_uri || window.location.origin,
+      });
+      url.search = params.toString();
+      const logoutUrl = url.toString();
 
-        if (debug) console.debug("[HelloAuth] logout redirect →", logoutUrl);
-        window.location.assign(logoutUrl);
-      } else {
-        // Just clear state and stay on current page
-        setTimeout(publish, 0);
-      }
+      if (debug) console.debug("[HelloAuth] logout redirect →", logoutUrl);
+      window.location.assign(logoutUrl);
+    } else {
+      setTimeout(publish, 0);
+    }
+  }, [debug, storage, storageKey, endpoints?.end_session_endpoint, tokens?.id_token, redirect_uri]);
+
+  /* -------------------- APIs: poke() and login() -------------------- */
+  useEffect(() => {
+    const poke = () => {
+      const ts = new Date().toISOString();
+      if (debug) console.debug("[HelloAuth] poke()", ts);
+      setLastPokeAt(ts);
+      setTimeout(publish, 0);
     };
 
     registerComponentApi?.({ poke, login, logout });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [registerComponentApi, login, logout, debug]);
+
+  useEffect(() => {
+    if (autoLoginFired) return;
+    const shouldAutoLogin = autoLogin || providerInitiated.matched;
+    if (!shouldAutoLogin) return;
+    if (!endpoints?.authorization_endpoint || !client_id || !redirect_uri) return;
+    login(providerInitiated.params);
+    setAutoLoginFired(true);
   }, [
-    registerComponentApi,
-    endpoints,
+    autoLogin,
+    providerInitiated.matched,
+    providerInitiated.params,
+    autoLoginFired,
+    endpoints?.authorization_endpoint,
     client_id,
     redirect_uri,
-    scopes,
-    storage,
-    storageKey,
-    debug,
+    login,
   ]);
 
   /* -------------------- headless -------------------- */

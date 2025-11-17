@@ -38,6 +38,12 @@ const HelloAuthMd = createMetadata({
       type: "string",
       isRequired: false,
     },
+    authorize_params: {
+      description:
+        "Optional object of extra query params to append to the /authorize redirect (e.g. { domain_hint: 'nsoftware.com' }).",
+      type: "object",
+      isRequired: false,
+    },
     id: { description: "Component id.", type: "string", isRequired: false },
   },
   events: {},
@@ -51,19 +57,28 @@ const HelloAuthMd = createMetadata({
 export const helloAuthComponentRenderer = createComponentRenderer(
   "HelloAuth",
   HelloAuthMd,
-  ({ node, extractValue, registerComponentApi, updateState }) => (
-    <HelloAuth
-      id={extractValue.asOptionalString(node.props?.id)}
-      issuer={extractValue.asOptionalString(node.props?.issuer)}
-      client_id={extractValue.asOptionalString(node.props?.client_id)}
-      redirect_uri={extractValue.asOptionalString(node.props?.redirect_uri)}
-      scopes={extractValue.asOptionalString(node.props?.scopes)}
-      storage={extractValue.asOptionalString(node.props?.storage)}
-      autoLogin={extractValue.asOptionalBoolean(node.props?.autoLogin)}
-      debug={extractValue.asOptionalBoolean(node.props?.debug)}
-      proxy_base_url={extractValue.asOptionalString(node.props?.proxy_base_url)}
-      registerComponentApi={registerComponentApi}
-      updateState={updateState}
-    />
-  )
+  ({ node, extractValue, registerComponentApi, updateState }) => {
+    const authorizeParamsValue = extractValue(node.props?.authorize_params);
+    const authorizeParams =
+      authorizeParamsValue && typeof authorizeParamsValue === "object" && !Array.isArray(authorizeParamsValue)
+        ? (authorizeParamsValue as Record<string, string | undefined>)
+        : undefined;
+
+    return (
+      <HelloAuth
+        id={extractValue.asOptionalString(node.props?.id)}
+        issuer={extractValue.asOptionalString(node.props?.issuer)}
+        client_id={extractValue.asOptionalString(node.props?.client_id)}
+        redirect_uri={extractValue.asOptionalString(node.props?.redirect_uri)}
+        scopes={extractValue.asOptionalString(node.props?.scopes)}
+        storage={extractValue.asOptionalString(node.props?.storage)}
+        autoLogin={extractValue.asOptionalBoolean(node.props?.autoLogin)}
+        debug={extractValue.asOptionalBoolean(node.props?.debug)}
+        proxy_base_url={extractValue.asOptionalString(node.props?.proxy_base_url)}
+        authorize_params={authorizeParams}
+        registerComponentApi={registerComponentApi}
+        updateState={updateState}
+      />
+    );
+  }
 );
