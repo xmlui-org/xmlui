@@ -8,21 +8,23 @@
   <link rel="alternate" type="application/rss+xml" title="XMLUI Blog" href="/feed.rss" />
   <script>window.__PUBLIC_PATH = '/'</script>
   <base href="/">
-   <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-S7NYYDMNPR"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-S7NYYDMNPR'); </script>	
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-S7NYYDMNPR"></script>
+  <script>   window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag('js', new Date()); gtag('config', 'G-S7NYYDMNPR'); </script>
 </head>
 
 <body>
   <div id="root"></div>
   <script type="module" src="/index.ts"></script>
   <script type="text/javascript">
-    window.transformStops = function(stops) {
+    window.transformStops = function (stops) {
 
-      return stops.map(function(stop) {
+      return stops.map(function (stop) {
 
         // Helper to extract a value from additionalProperties by key
         function getProp(key) {
           if (!stop.additionalProperties) return '';
-          var propObj = stop.additionalProperties.find(function(p) { return p.key === key; });
+          var propObj = stop.additionalProperties.find(function (p) { return p.key === key; });
           return propObj ? propObj.value : '';
         }
 
@@ -33,14 +35,14 @@
           toilets: getProp('Toilets'),
           // A comma-separated list of line names that serve this stop
           lines: stop.lines
-            ? stop.lines.map(function(line) { return line.name; }).join(', ')
+            ? stop.lines.map(function (line) { return line.name; }).join(', ')
             : ''
         };
 
       });
     }
 
-    window.getComponentsList = function(items) {
+    window.getComponentsList = function (items) {
       const onlyComponents = items.filter(item => item.name === 'components');
       return onlyComponents;
     }
@@ -200,12 +202,12 @@
       return results;
     }
 
-    window.handleHelloClick = function(event) {
+    window.handleHelloClick = function (event) {
       console.log('Hello World clicked!', event);
       alert('Button clicked!');
     };
 
-    window.handleHelloReset = function(event) {
+    window.handleHelloReset = function (event) {
       console.log('Hello World reset!', event);
       alert('Counter was reset!');
     };
