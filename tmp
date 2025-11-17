@@ -1,0 +1,51 @@
+
+[@StandaloneApp.tsx](file:///home/ez/code/work/xmlui/xmlui/src/components-core/StandaloneApp.tsx) Look at this portion of the code:
+```
+
+      // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
+      // --- we must have the app definition available.
+      if (
+        (process.env.VITE_DEV_MODE || process.env.VITE_BUILD_MODE === "INLINE_ALL") &&
+        !process.env.VITE_STANDALONE
+      ) {
+        if (!appDef) {
+          throw new Error("couldn't find the application metadata");
+        }
+        const lintErrorComponent = processAppLinting(appDef, metadataProvider);
+        if (lintErrorComponent) {
+          appDef.entryPoint = lintErrorComponent;
+        }
+
+        discoverCompilationDependencies({
+          projectCompilation: resolvedRuntime.projectCompilation,
+          extensionManager,
+        });
+        setProjectCompilation(resolvedRuntime.projectCompilation);
+        setStandaloneApp(appDef);
+        return;
+      }
+```
+This runs when there's a runtime for the application, that is key value pairs with filepath as key and an ecmascript module as value. This snippet show what's inside a module:
+
+```
+
+        // --- "default" contains the component definition, the file index,
+        // --- and the source code.
+        componentsByFileName[key] = value.default.component;
+        sources[value.default.file] = value.default.src;
+
+        const componentCompilation: ComponentCompilation = {
+          definition: value.default.component,
+          filename: key,
+          markupSource: value.default.src,
+          dependencies: new Set(),
+        };
+        projectCompilation.components.push(componentCompilation);
+```
+As you can see, this file also handles the case when app runs in a so called "standalone mode", where the runtime is empty and the files need to be fetched manually. I want you to extend the build mode that has this condition:
+
+```
+(process.env.VITE_DEV_MODE || process.env.VITE_BUILD_MODE === "INLINE_ALL") &&
+!process.env.VITE_STANDALONE
+```
+I also want the application to try and fetch the components, despite them being in the runtime. Similar to how it's done in standalone mode. When a component is found via fetch, it should override the existing (pre-built) component.

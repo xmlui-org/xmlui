@@ -65,7 +65,7 @@ type RuntimeProps = {
   component?: ComponentDef | CompoundComponentDef;
   file?: string;
   src?: string;
-}
+};
 
 // --- The properties of the standalone app
 type StandaloneAppProps = {
@@ -628,6 +628,104 @@ function useStandalone(
         if (!appDef) {
           throw new Error("couldn't find the application metadata");
         }
+
+        const projectCompilation = resolvedRuntime.projectCompilation;
+
+        // --- In dev mode, try to fetch up-to-date sources
+        if (projectCompilation) {
+          const promises: Promise<any>[] = [];
+
+          // 1. Handle Entry Point
+          if (projectCompilation.entrypoint?.filename) {
+            const entryPointPromise = (async () => {
+              try {
+                console.log({ mainFile: projectCompilation.entrypoint.filename });
+                const resp = await fetchWithoutCache(projectCompilation.entrypoint.filename);
+                if (!resp.ok) return;
+                const parsed = await parseComponentMarkupResponse(resp);
+                if (parsed.hasError) return;
+
+                const updatedEntryPoint = parsed.component as ComponentDef;
+
+                // Handle code-behind
+                try {
+                  const codeBehindResp = await fetchWithoutCache(MAIN_CODE_BEHIND_FILE);
+                  if (codeBehindResp.ok) {
+                    const parsedCodeBehind = await parseCodeBehindResponse(codeBehindResp);
+                    if (!parsedCodeBehind.hasError && parsedCodeBehind.codeBehind) {
+                      updatedEntryPoint.vars = {
+                        ...updatedEntryPoint.vars,
+                        ...parsedCodeBehind.codeBehind.vars,
+                      };
+                      updatedEntryPoint.functions = parsedCodeBehind.codeBehind.functions;
+                      updatedEntryPoint.scriptError = parsedCodeBehind.codeBehind.moduleErrors;
+                      projectCompilation.entrypoint.codeBehindSource = parsedCodeBehind.src;
+                    }
+                  }
+                } catch (e) {
+                  /* ignore */
+                }
+
+                appDef.entryPoint = updatedEntryPoint;
+                projectCompilation.entrypoint.definition = updatedEntryPoint;
+                projectCompilation.entrypoint.markupSource = parsed.src;
+              } catch (e) {
+                /* ignore */
+              }
+            })();
+            promises.push(entryPointPromise);
+          }
+
+          // 2. Handle Components
+          const componentPromises = projectCompilation.components.map(async (compilation) => {
+            try {
+              console.log({ componentFile: compilation.filename });
+              const resp = await fetchWithoutCache(compilation.filename);
+              if (!resp.ok) return;
+              const parsed = await parseComponentMarkupResponse(resp);
+              if (parsed.hasError) return;
+
+              const updatedComponent = parsed.component as CompoundComponentDef;
+
+              // Handle code-behind
+              try {
+                const codeBehindPath = compilation.filename.replace(
+                  `.${componentFileExtension}`,
+                  `.${codeBehindFileExtension}`,
+                );
+                const codeBehindResp = await fetchWithoutCache(codeBehindPath);
+                if (codeBehindResp.ok) {
+                  const parsedCodeBehind = await parseCodeBehindResponse(codeBehindResp);
+                  if (!parsedCodeBehind.hasError && parsedCodeBehind.codeBehind) {
+                    updatedComponent.component.vars = {
+                      ...updatedComponent.component.vars,
+                      ...parsedCodeBehind.codeBehind.vars,
+                    };
+                    updatedComponent.component.functions = parsedCodeBehind.codeBehind.functions;
+                    updatedComponent.component.scriptError =
+                      parsedCodeBehind.codeBehind.moduleErrors;
+                    compilation.codeBehindSource = parsedCodeBehind.src;
+                  }
+                }
+              } catch (e) {
+                /* ignore */
+              }
+
+              const index = appDef.components.findIndex((c) => c.name === updatedComponent.name);
+              if (index !== -1) {
+                appDef.components[index] = updatedComponent;
+              }
+              compilation.definition = updatedComponent;
+              compilation.markupSource = parsed.src;
+            } catch (e) {
+              /* ignore */
+            }
+          });
+
+          promises.push(...componentPromises);
+          await Promise.all(promises);
+        }
+
         const lintErrorComponent = processAppLinting(appDef, metadataProvider);
         if (lintErrorComponent) {
           appDef.entryPoint = lintErrorComponent;
