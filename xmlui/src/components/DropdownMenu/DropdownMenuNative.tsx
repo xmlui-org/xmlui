@@ -212,7 +212,9 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
             ref={contentRef}
             align={alignment}
             style={style}
-            className={classnames(styles.DropdownMenuContent, className, { [styles.compact]: compact })}
+            className={classnames(styles.DropdownMenuContent, className, {
+              [styles.compact]: compact,
+            })}
             onOpenAutoFocus={(e) => {
               // Allow focus on the popover content so keyboard events work
               e.preventDefault();

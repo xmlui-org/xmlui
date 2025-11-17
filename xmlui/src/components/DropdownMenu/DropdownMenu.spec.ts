@@ -474,3 +474,54 @@ test("works with nested menu structures", async ({
   await expect(page.getByText("Deep Item 1")).toBeVisible();
   await expect(page.getByText("Deep Item 2")).toBeVisible();
 });
+
+// =============================================================================
+// Z-INDEX AND MODAL LAYERING TESTS
+// =============================================================================
+
+test.describe("Z-Index and Modal Layering", () => {
+  test("DropdownMenu in modal is visible and clickable", async ({
+    initTestBed,
+    page,
+    createDropdownMenuDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <ModalDialog when="{true}" title="Example Dialog">
+        <DropdownMenu testId="dropdown">
+          <property name="triggerTemplate">
+            <Button
+              size="sm"
+              icon="plus"
+              label="Add a member" />
+          </property>
+          <MenuItem icon="plus" onClick="testState = 'hello-clicked'">Hello</MenuItem>
+          <MenuItem icon="plus" onClick="testState = 'invite-clicked'">Invite people</MenuItem>
+        </DropdownMenu>
+      </ModalDialog>
+    `);
+
+    const driver = await createDropdownMenuDriver("dropdown");
+
+    // Dialog should be visible
+    await expect(page.getByRole("dialog", { name: "Example Dialog" })).toBeVisible();
+
+    // Open dropdown menu via custom trigger button
+    await driver.open();
+
+    // Menu items should be visible and not covered by the modal overlay
+    const helloItem = page.getByRole("menuitem", { name: "Hello" });
+    const inviteItem = page.getByRole("menuitem", { name: "Invite people" });
+
+    await expect(helloItem).toBeVisible();
+    await expect(inviteItem).toBeVisible();
+
+    // Click both items to ensure they are fully interactive
+    await helloItem.click();
+    await expect.poll(testStateDriver.testState).toEqual("hello-clicked");
+
+    // Re-open dropdown after it closes on item click
+    await driver.open();
+    await inviteItem.click();
+    await expect.poll(testStateDriver.testState).toEqual("invite-clicked");
+  });
+});
