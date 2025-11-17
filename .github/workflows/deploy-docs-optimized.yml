@@ -58,7 +58,7 @@ jobs:
           DOCS_XMLUI_MAX_RELEASES_LENGTH: ${{ github.event.inputs.max_releases }}
 
       - name: "Run Azure webapp deploy action using publish profile credentials"
-        uses: azure/webapps-deploy@v3
+        uses: azure/webapps-deploy@v2
         with:
           package: "docs/ui-optimized.zip"
           app-name: xmlui-docs
