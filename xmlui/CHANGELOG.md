@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.11.17
+
+### Patch Changes
+
+- f11267b: fix: dropdownmenu issue in a dialog
+
 ## 0.11.16
 
 ### Patch Changes
