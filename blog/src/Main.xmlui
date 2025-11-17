@@ -29,7 +29,7 @@
 >
     <AppHeader>
         <property name="logoTemplate">
-            <Link to="/" height="100%">
+            <Link to="https://xmlui.org/" height="100%">
                 <Logo height="$space-8" />
             </Link>
         </property>
@@ -52,6 +52,7 @@
                     to="https://blog.xmlui.org"
                     active
                 />
+                <NavLink to="https://www.xmlui.org/get-started" noIndicator label="Download"/>
             </HStack>
         </Theme>
         <property name="profileMenuTemplate">
@@ -59,12 +60,6 @@
                 collapsible="true"
                 when="{mediaSize.sizeIndex > 1}"
                 data="{appGlobals.plainTextContent}"
-            />
-            <Separator />
-            <Button
-                variant="solid"
-                label="Download"
-                onClick="{() => Actions.navigate('/get-started')}"
             />
         </property>
     </AppHeader>
@@ -99,16 +94,7 @@
                 target="_blank"
             />
         </Fragment>
-        <Stack
-            paddingHorizontal="$space-4"
-            paddingBottom="$space-4"
-        >
-            <Link to="https://www.xmlui.org/get-started">
-                <Button variant="solid" onClick="emitEvent('click')">
-                    Download
-                </Button>
-            </Link>
-        </Stack>
+        <NavLink to="https://www.xmlui.org/get-started" noIndicator label="Download"/>
     </NavPanel>
 
     <!--
