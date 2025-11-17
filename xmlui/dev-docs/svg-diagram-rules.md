@@ -264,13 +264,14 @@ These rules define how to create consistent, professional SVG diagrams illustrat
 3. Gutter inner edges - dashed lines (`.gutter-edge`) - if present
 4. Content blocks (`.header`, `.nav`, `.content`, `.footer`) - **rectangles with NO stroke**
 5. Block separator lines (`.block-border`) - **independent `<line>` elements between adjacent blocks**
-6. Scrollbar track (`.scrollbar-track`) - if visible, overlays right gutter
-7. Scrollbar thumb (`.scrollbar-thumb`)
-8. Text labels (`.text`)
-9. **Main screen border (`.main-screen-border`) - DRAW LAST so it appears on top of all content**
+6. Text labels (`.text`)
+7. Scrollbar track (`.scrollbar-track`) - if visible, overlays right gutter
+8. Scrollbar thumb (`.scrollbar-thumb`)
+9. **Main screen border (`.main-screen-border`) - DRAW LAST so it appears on top of all content, including scrollbars**
 
 **CRITICAL NOTES:**
-- Main screen border is drawn LAST so it appears on top of all content
+- Main screen border is drawn LAST (absolute final element) so it appears on top of ALL content, including scrollbars
+- Scrollbars must be drawn BEFORE the main screen border so they appear beneath it
 - Block rectangles have NO stroke attribute - they are fill-only
 - Separators are separate `<line>` elements, not part of block rectangles
 - Each separator is drawn ONCE between two adjacent blocks
@@ -281,16 +282,18 @@ These rules define how to create consistent, professional SVG diagrams illustrat
 3. **Main screen** gutter inner edges (dashed)
 4. **Main screen** content blocks - **rectangles with NO stroke**
 5. **Main screen** block separator lines - **between adjacent blocks only**
-6. Scrollbar track and thumb (main screen only)
-7. **Overflow area** gutters with fills
-8. **Overflow area** content blocks - **with overflow pattern if applicable, NO stroke**
-9. **Overflow area** block separator lines - **between adjacent blocks only**
-10. **Overflow area** bottom edge (at very bottom) - only if needed
-11. Text labels (always on top)
-12. **Main screen border (`.main-screen-border`) - DRAW LAST so it appears on top of overflow content**
+6. **Overflow area** gutters with fills
+7. **Overflow area** content blocks - **with overflow pattern if applicable, NO stroke**
+8. **Overflow area** block separator lines - **between adjacent blocks only**
+9. **Overflow area** bottom edge (at very bottom) - only if needed
+10. Text labels (always on top)
+11. Scrollbar track and thumb (main screen only) - **draw BEFORE main screen border**
+12. **Main screen border (`.main-screen-border`) - DRAW LAST (absolute final element) so it appears on top of ALL content including scrollbars**
 
 **OVERFLOW NOTES:**
 - Main screen border is a COMPLETE 2px rectangle around viewport (x=20, y=20, width=800, height=600)
+- Main screen border MUST be drawn as the absolute final element (after scrollbars) so it appears on top of everything
+- Scrollbars must be drawn BEFORE the main screen border so the border overlays them
 - The bottom border of the main screen (at y=620) separates viewport from overflow area
 - Overflow content continues below the main screen viewport with same block structure
 - Overflow area is NOT enclosed by the main screen border - it's outside the viewport
@@ -366,31 +369,33 @@ Adjust as needed to demonstrate specific layout concepts.
 1. **Set up canvas**: `<svg viewBox="0 0 840 640" width="840" height="640">`
 2. **Add CSS classes** in `<defs><style>` section (copy from CSS Class Reference)
 3. **Draw background**: Canvas background rectangle (`.container-bg`)
-4. **Draw content first, then main screen border LAST**: 2px thick rectangle at x=20, y=20, width=800, height=600 (`.main-screen-border`)
-5. **Draw scroll gutters** (if needed): Left (x=20-35) and right (x=805-820) with dashed inner edges (`.gutter-edge`)
-6. **Draw content blocks**: Header, Nav, Content, Footer rectangles - **NO stroke attribute, fill only**
+4. **Draw scroll gutters** (if needed): Left (x=20-35) and right (x=805-820) with dashed inner edges (`.gutter-edge`)
+5. **Draw content blocks**: Header, Nav, Content, Footer rectangles - **NO stroke attribute, fill only**
    ```xml
    <rect class="header" x="20" y="20" width="800" height="45"/>
    <rect class="nav" x="20" y="65" width="800" height="45"/>
    ```
-7. **Draw block separators**: ONE `<line>` element between each pair of adjacent blocks
+6. **Draw block separators**: ONE `<line>` element between each pair of adjacent blocks
    ```xml
    <line class="block-border" x1="20" y1="65" x2="820" y2="65"/>  <!-- Header|Nav -->
    <line class="block-border" x1="20" y1="110" x2="820" y2="110"/>  <!-- Nav|Content -->
    ```
+7. **Add labels**: Block names (`.text`)
 8. **Add scrollbar** (if needed): Track and thumb overlaying right gutter (`.scrollbar-track`, `.scrollbar-thumb`)
-9. **Add labels**: Block names (`.text`)
+9. **Draw main screen border LAST**: 2px thick rectangle at x=20, y=20, width=800, height=600 (`.main-screen-border`) - **MUST be the absolute final element so it appears on top of everything including scrollbars**
 
 ### Creating an Overflow Diagram
 
 1. **Set up canvas**: `<svg viewBox="0 0 840 840">` (or taller for more overflow)
-2. **Follow steps 2-9 above** for main screen area (y=20 to y=620)
+2. **Follow steps 2-7 above** for main screen area (y=20 to y=620)
 3. **Draw viewport separator**: Dotted line at y=620 (`.dotted-border`)
 4. **Extend gutters** into overflow area (same x positions, starting at y=620)
 5. **Draw overflow content blocks**: Continue blocks below y=620 with overflow pattern (`.overflow-bg`)
 6. **Draw block separators**: Between adjacent blocks in overflow area
 7. **Draw bottom edge**: 1px line at very bottom of content
 8. **Add labels**: Indicate overflow content
+9. **Add scrollbar** (if needed): Track and thumb overlaying right gutter in main screen only
+10. **Draw main screen border LAST**: 2px thick rectangle at x=20, y=20, width=800, height=600 (`.main-screen-border`) - **MUST be the absolute final element so it appears on top of everything including scrollbars and overflow content**
 
 ### Creating Diagrams with "Remaining Space" Areas
 
@@ -424,7 +429,8 @@ When showing diagrams where content fits in viewport but there's visible empty s
 ❌ Drawing borders on block rectangles instead of using separate `<line>` elements  
 ❌ Drawing bottom border on last block (Footer) when nothing is below it  
 ❌ Using 2px borders for block separators (should be 1px)  
-❌ Drawing main screen border first instead of last (it should be on top)  
+❌ Drawing main screen border before scrollbars (scrollbars must come first)  
+❌ Drawing main screen border anywhere except as the absolute final element  
 ❌ Forgetting the main screen border (2px thick)  
 ❌ Drawing scrollbar in overflow area (only in viewport)  
 ❌ Placing scroll gutters outside the main screen border  
@@ -436,9 +442,10 @@ When showing diagrams where content fits in viewport but there's visible empty s
 **GOLDEN RULES:**
 1. Blocks = filled rectangles with NO stroke
 2. Separators = independent `<line>` elements between blocks
-3. Main screen border = last element drawn (appears on top)
-4. One separator line per pair of adjacent blocks  
-5. Remaining space = simple shading with centered text, no patterns  
+3. Main screen border = ABSOLUTE FINAL ELEMENT drawn (appears on top of everything including scrollbars)
+4. Scrollbars drawn BEFORE main screen border so border overlays them
+5. One separator line per pair of adjacent blocks  
+6. Remaining space = simple shading with centered text, no patterns  
 
 ---
 

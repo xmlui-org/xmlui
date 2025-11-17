@@ -31,16 +31,16 @@
   <line class="block-border" x1="20" y1="450" x2="820" y2="450"/>
   <text class="text" x="30" y="135">M: Main Content</text>
   
-  <!-- Footer block -->
-  <rect class="footer" x="20" y="450" width="800" height="45"/>
-  <text class="text" x="30" y="478">F: Footer</text>
-  
-  <!-- Separator between Footer and Remaining space -->
-  <line class="block-border" x1="20" y1="495" x2="820" y2="495"/>
-  
   <!-- Remaining space with simple shading -->
-  <rect x="20" y="495" width="800" height="125" fill="#eeeeee"/>
-  <text class="text-center" x="420" y="562">Remaining space</text>
+  <rect x="20" y="450" width="800" height="125" fill="#eeeeee"/>
+  <text class="text-center" x="420" y="517">Remaining space</text>
+  
+  <!-- Separator between Remaining space and Footer -->
+  <line class="block-border" x1="20" y1="575" x2="820" y2="575"/>
+  
+  <!-- Footer block -->
+  <rect class="footer" x="20" y="575" width="800" height="45"/>
+  <text class="text" x="30" y="602">F: Footer</text>
   
   <!-- Main screen border drawn last -->
   <rect class="main-screen-border" x="20" y="20" width="800" height="600"/>

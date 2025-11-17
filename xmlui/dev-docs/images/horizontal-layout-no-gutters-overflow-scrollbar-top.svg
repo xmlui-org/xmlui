@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 840" width="840" height="840">
+  <defs>
+    <!-- Diagonal X pattern for overflow area -->
+    <pattern id="overflowPattern" patternUnits="userSpaceOnUse" width="10" height="10">
+      <rect width="10" height="10" fill="#f5f5f5"/>
+      <path d="M 0,0 L 10,10 M 10,0 L 0,10" stroke="#e8e8e8" stroke-width="1" fill="none"/>
+    </pattern>
+  </defs>
+  
+  <style>
+    .container-bg { fill: #f8f9fa; }
+    .main-screen-border { stroke: #333; stroke-width: 2; fill: none; }
+    .block-border { stroke: #333; stroke-width: 1; fill: none; }
+    .dotted-border { stroke: #666; stroke-width: 1; stroke-dasharray: 4,4; fill: none; }
+    .gutter-edge { stroke: #666; stroke-width: 1; stroke-dasharray: 4,2; fill: none; }
+    .header { fill: #d0d0d0; }
+    .nav { fill: #e0e0e0; }
+    .content { fill: #ffffff; }
+    .footer { fill: #d0d0d0; }
+    .gutter { fill: #e9ecef; }
+    .overflow-bg { fill: url(#overflowPattern); }
+    .scrollbar-track { fill: #e0e0e0; stroke: #999; stroke-width: 1; }
+    .scrollbar-thumb { fill: #999; stroke: #666; stroke-width: 1; }
+    .text { font-family: Arial, sans-serif; font-size: 14px; fill: #333; text-anchor: start; font-style: italic; }
+    .label { font-family: Arial, sans-serif; font-size: 10px; fill: #666; font-style: italic; }
+  </style>
+  
+  <!-- Background -->
+  <rect class="container-bg" x="0" y="0" width="840" height="840" rx="4"/>
+  
+  <!-- Header block (45px height) -->
+  <rect x="20" y="20" width="800" height="45" class="header"/>
+  <line x1="20" y1="65" x2="820" y2="65" class="block-border"/>
+  <text x="30" y="48" class="text">H: Header</text>
+  
+  <!-- Navigation block (45px height) -->
+  <rect x="20" y="65" width="800" height="45" class="nav"/>
+  <line x1="20" y1="110" x2="820" y2="110" class="block-border"/>
+  <text x="30" y="93" class="text">N: Navigation Panel</text>
+  
+  <!-- Main Content block (340px height, visible in viewport) -->
+  <rect x="20" y="110" width="800" height="340" class="content"/>
+  <text x="30" y="135" class="text">M: Main Content</text>
+  
+  <!-- Remaining space (125px height, visible in viewport) -->
+  <rect x="20" y="450" width="800" height="125" fill="#eeeeee"/>
+  <text x="420" y="517" class="text" text-anchor="middle" fill="#666">Remaining space</text>
+  <line x1="20" y1="575" x2="820" y2="575" class="block-border"/>
+  
+  <!-- Footer (45px height, visible in viewport) -->
+  <rect x="20" y="575" width="800" height="45" class="footer"/>
+  <text x="30" y="602" class="text">F: Footer</text>
+  
+  <!-- Overflow area BELOW main screen viewport (not part of 800x600 screen) -->
+  <!-- Overflow area of Main Content (155px) with diagonal X pattern -->
+  <rect x="20" y="620" width="800" height="155" class="overflow-bg"/>
+  <line x1="20" y1="775" x2="820" y2="775" class="block-border"/>
+  <text x="30" y="690" class="text">M: Main Content (overflow)</text>
+  
+  <!-- Footer in overflow area (45px height) -->
+  <rect x="20" y="775" width="800" height="45" class="overflow-bg"/>
+  <text x="30" y="803" class="text">F: Footer (overflow)</text>
+  
+  <!-- Bottom edge of overflow area -->
+  <line x1="20" y1="820" x2="820" y2="820" class="block-border"/>
+  
+  <!-- Scrollbar track (15px wide on the right side, viewport height only) -->
+  <rect x="805" y="20" width="15" height="600" class="scrollbar-track"/>
+  
+  <!-- Scrollbar thumb (positioned at top, representing ~75% of viewport visible) -->
+  <rect x="807" y="30" width="11" height="450" rx="3" class="scrollbar-thumb"/>
+  
+  <!-- Main screen border (THICK 2px) drawn LAST so it appears on top of everything -->
+  <rect x="20" y="20" width="800" height="600" class="main-screen-border"/>
+</svg>

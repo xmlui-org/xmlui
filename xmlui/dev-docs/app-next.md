@@ -1177,20 +1177,6 @@ This section presents all variants of screen layouts. The following factors dete
 
 The diagrams below illustrate these combinations to show how the App component adapts to different scenarios.
 
-### Complete App Screen Layout
-
-The following diagrams show the App container at full viewport height. However, the actual container height varies based on the `layout` property and content requirements. These diagrams illustrate the main container that wraps all nested App component blocks.
-
-Basic app container without any internal blocks or scroll gutters.
-
-![App Container](images/app-container-diagram.svg)
-
-### App Screen Layout with Scroll Gutters
-
-App container with reserved scroll gutter spaces on both sides (stable both-edges).
-
-![App Container with Gutters](images/app-container-with-gutters-diagram.svg)
-
 ## Horizontal Layout Diagrams
 
 **`layout`: horizontal**
@@ -1210,6 +1196,12 @@ All horizontal layout diagrams share the following common characteristics:
 
 ![Horizontal Layout](images/horizontal-layout-diagram.svg)
 
+![Horizontal Layout with Overflow and Scrollbar (Top)](images/horizontal-layout-no-gutters-overflow-scrollbar-top.svg)
+
+![Horizontal Layout with Overflow and Scrollbar (Mid-Scroll)](images/horizontal-layout-no-gutters-overflow-scrollbar-mid.svg)
+
+![Horizontal Layout with Overflow and Scrollbar (Bottom-Scroll)](images/horizontal-layout-no-gutters-overflow-scrollbar-bottom.svg)
+
 ### Horizontal Layout (scroll parent: app container, scrollbar gutters)
 
 - `noScrollbarGutters`: false
@@ -1225,16 +1217,14 @@ All horizontal layout diagrams share the following common characteristics:
 
 ### Horizontal Layout (scroll parent: main content, no scrollbar gutters)
 
-- `noScrollbarGutters`: false
+- `noScrollbarGutters`: true
 - `scrollWholePage`: false
 
-**Note:** Only the main content scrolls; header, navigation panel, and footer remain docked. The scrollbar belongs to the main content block and is positioned within the right gutter. Content overflow is indicated with arrows showing hidden content.
+![Horizontal Layout with Content-Only Scroll (Top)](images/horizontal-layout-content-scroll-no-gutters-top.svg)
 
-![Horizontal Layout with Content-Only Scroll (Top)](images/horizontal-layout-content-scroll-top.svg)
+![Horizontal Layout with Content-Only Scroll (Mid-Scroll)](images/horizontal-layout-content-scroll-no-gutters-mid.svg)
 
-![Horizontal Layout with Content-Only Scroll (Mid-Scroll)](images/horizontal-layout-content-scroll.svg)
-
-![Horizontal Layout with Content-Only Scroll (Bottom)](images/horizontal-layout-content-scroll-bottom.svg)
+![Horizontal Layout with Content-Only Scroll (Bottom)](images/horizontal-layout-content-scroll-no-gutters-bottom.svg)
 
 ## Horizontal-Sticky Layout Diagrams
 
