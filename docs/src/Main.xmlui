@@ -17,6 +17,7 @@
             />
             <NavLink noIndicator label="Docs" to="/" active />
             <NavLink noIndicator label="Blog" to="https://blog.xmlui.org" />
+            <NavLink to="https://www.xmlui.org/get-started" noIndicator label="Download"/>
         </HStack>
         <SpaceFiller />
         <Search
@@ -24,12 +25,6 @@
             when="{mediaSize.sizeIndex > 1}"
             data="{appGlobals.plainTextContent}"
         />
-        <Separator />
-        <Link to="https://www.xmlui.org/get-started">
-            <Button variant="solid" onClick="emitEvent('click')">
-                Download
-            </Button>
-        </Link>
     </AppHeader>
     <NavPanel
         when="{!window.location.hash.includes('/404') || mediaSize.sizeIndex <= 2}"
@@ -65,14 +60,7 @@
                 noIndicator
                 target="_blank"
             />
-            <Stack paddingHorizontal="$space-4" paddingBottom="$space-4">
-                <Link to="https://www.xmlui.org/get-started">
-                    <Button variant="solid" onClick="emitEvent('click')">
-                        Download
-                    </Button>
-                </Link>
-            </Stack>
-            <ContentSeparator />
+            <NavLink to="https://www.xmlui.org/get-started" noIndicator label="Download"/>
         </Fragment>
         <Stack
             padding="0"
