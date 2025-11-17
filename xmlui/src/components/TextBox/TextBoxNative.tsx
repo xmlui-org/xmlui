@@ -219,40 +219,39 @@ export const TextBox = forwardRef(function TextBox(
       onFocus={focus}
       style={{ ...style, gap }}
     >
-      <Adornment
-        data-part-id={PART_START_ADORNMENT}
-        text={startText}
-        iconName={startIcon}
-        className={classnames(styles.adornment)}
-      />
-      <input
-        id={id}
-        ref={inputRef}
-        data-part-id={PART_INPUT}
-        type={actualType}
-        className={classnames(styles.input, {
-          [styles.readOnly]: readOnly,
-        })}
-        disabled={!enabled}
-        value={localValue}
-        maxLength={maxLength}
-        placeholder={placeholder}
-        onChange={onInputChange}
-        onFocus={handleOnFocus}
-        onBlur={handleOnBlur}
-        onKeyDown={onKeyDown}
-        readOnly={readOnly}
-        autoFocus={autoFocus}
-        tabIndex={enabled ? tabIndex : -1}
-        required={required}
-      />
-      {!readOnly && enabled && type == "search" && localValue?.length > 0 && (
-        <Adornment
-          data-part-id={PART_END_ADORNMENT}
-          iconName="close"
-          className={styles.adornment}
-          onClick={() => updateValue("")}
+      <Part partId={PART_START_ADORNMENT}>
+        <Adornment text={startText} iconName={startIcon} className={classnames(styles.adornment)} />
+      </Part>
+      <Part partId={PART_INPUT}>
+        <input
+          id={id}
+          ref={inputRef}
+          type={actualType}
+          className={classnames(styles.input, {
+            [styles.readOnly]: readOnly,
+          })}
+          disabled={!enabled}
+          value={localValue}
+          maxLength={maxLength}
+          placeholder={placeholder}
+          onChange={onInputChange}
+          onFocus={handleOnFocus}
+          onBlur={handleOnBlur}
+          onKeyDown={onKeyDown}
+          readOnly={readOnly}
+          autoFocus={autoFocus}
+          tabIndex={enabled ? tabIndex : -1}
+          required={required}
         />
+      </Part>
+      {!readOnly && enabled && type == "search" && localValue?.length > 0 && (
+        <Part partId={PART_END_ADORNMENT}>
+          <Adornment
+            iconName="close"
+            className={styles.adornment}
+            onClick={() => updateValue("")}
+          />
+        </Part>
       )}
       {type === "password" && showPasswordToggle ? (
         <Part partId={PART_END_ADORNMENT}>
