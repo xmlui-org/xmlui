@@ -16,42 +16,36 @@
   </defs>
   
   <!-- Background -->
-  <rect class="container-bg" x="0" y="0" width="840" height="640" rx="4"/>
+  <rect class="container-bg" x="0" y="0" width="840" height="640"/>
   
-  <!-- Left gutter -->
-  <rect class="gutter" x="20" y="20" width="15" height="600"/>
+  <!-- Header block (docked, full width) -->
+  <rect class="header" x="20" y="20" width="800" height="45"/>
+  <line class="block-border" x1="20" y1="65" x2="820" y2="65"/>
+  <text class="label" x="30" y="48">H: Header (docked to top)</text>
   
-  <!-- Right gutter -->
-  <rect class="gutter" x="805" y="20" width="15" height="600"/>
+  <!-- Navigation Panel block (docked, full width) -->
+  <rect class="nav" x="20" y="65" width="800" height="45"/>
+  <line class="block-border" x1="20" y1="110" x2="820" y2="110"/>
+  <text class="label" x="30" y="93">N: Navigation Panel (docked to top)</text>
   
-  <!-- Gutter edge indicators -->
-  <line class="gutter-edge" x1="35" y1="20" x2="35" y2="620"/>
-  <line class="gutter-edge" x1="805" y1="20" x2="805" y2="620"/>
+  <!-- Left gutter for Main Content area only -->
+  <rect class="gutter" x="20" y="110" width="15" height="465"/>
+  <line class="gutter-edge" x1="35" y1="110" x2="35" y2="575"/>
   
-  <!-- Header block -->
-  <rect class="header" x="35" y="20" width="770" height="45"/>
-  <text class="label" x="45" y="47">H: Header (docked to top)</text>
-  
-  <!-- Separator between Header and Nav -->
-  <line class="block-border" x1="35" y1="65" x2="805" y2="65"/>
-  
-  <!-- Navigation Panel block -->
-  <rect class="nav" x="35" y="65" width="770" height="45"/>
-  <text class="label" x="45" y="92">N: Navigation Panel (docked to top)</text>
-  
-  <!-- Separator between Nav and Main Content -->
-  <line class="block-border" x1="35" y1="110" x2="805" y2="110"/>
-  
-  <!-- Main Content block -->
+  <!-- Main Content block (with gutters) -->
   <rect class="content" x="35" y="110" width="770" height="465"/>
-  <text class="label" x="45" y="137">M: Main Content</text>
+  <text class="label" x="45" y="135">M: Main Content</text>
   
-  <!-- Separator between Main Content and Footer -->
-  <line class="block-border" x1="35" y1="575" x2="805" y2="575"/>
+  <!-- Right gutter for Main Content area only -->
+  <line class="gutter-edge" x1="805" y1="110" x2="805" y2="575"/>
+  <rect class="gutter" x="805" y="110" width="15" height="465"/>
   
-  <!-- Footer block -->
-  <rect class="footer" x="35" y="575" width="770" height="45"/>
-  <text class="label" x="45" y="602">F: Footer (docked to bottom)</text>
+  <!-- Separator: Content|Footer -->
+  <line class="block-border" x1="20" y1="575" x2="820" y2="575"/>
+  
+  <!-- Footer block (docked to bottom, full width) -->
+  <rect class="footer" x="20" y="575" width="800" height="45"/>
+  <text class="label" x="30" y="603">F: Footer (docked to bottom)</text>
   
   <!-- Main screen border (drawn last, on top) -->
   <rect class="main-screen-border" x="20" y="20" width="800" height="600"/>

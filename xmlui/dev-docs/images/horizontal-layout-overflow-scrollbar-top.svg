@@ -11,7 +11,6 @@
     .container-bg { fill: #f8f9fa; }
     .main-screen-border { stroke: #333; stroke-width: 2; fill: none; }
     .block-border { stroke: #333; stroke-width: 1; fill: none; }
-    .dotted-border { stroke: #666; stroke-width: 1; stroke-dasharray: 4,4; fill: none; }
     .gutter-edge { stroke: #666; stroke-width: 1; stroke-dasharray: 4,2; fill: none; }
     .header { fill: #d0d0d0; }
     .nav { fill: #e0e0e0; }
@@ -19,8 +18,9 @@
     .footer { fill: #d0d0d0; }
     .gutter { fill: #e9ecef; }
     .overflow-bg { fill: url(#overflowPattern); }
-    .scrollbar-track { fill: #e0e0e0; stroke: #999; stroke-width: 1; }
-    .scrollbar-thumb { fill: #999; stroke: #666; stroke-width: 1; }
+    .scrollbar-track { fill: #e0e0e0; }
+    .scrollbar-thumb { fill: #999; }
+    .scrollbar-border { stroke: #999; stroke-width: 1; stroke-dasharray: 3,2; fill: none; }
     .text { font-family: Arial, sans-serif; font-size: 14px; fill: #333; text-anchor: start; font-style: italic; }
     .label { font-family: Arial, sans-serif; font-size: 10px; fill: #666; font-style: italic; }
   </style>
@@ -28,65 +28,62 @@
   <!-- Background -->
   <rect class="container-bg" x="0" y="0" width="840" height="840" rx="4"/>
   
-  <!-- Scrollbar track (15px wide on the right side, viewport height only) -->
-  <rect x="805" y="20" width="15" height="600" class="scrollbar-track"/>
+  <!-- MAIN SCREEN VIEWPORT (800x600) -->
   
-  <!-- Scrollbar thumb (positioned at top, representing ~75% of viewport visible) -->
-  <rect x="807" y="30" width="11" height="450" rx="3" class="scrollbar-thumb"/>
+  <!-- Header block (full width, no gutters) -->
+  <rect class="header" x="20" y="20" width="800" height="45"/>
+  <text class="text" x="30" y="48">H: Header</text>
   
-  <!-- Header block (45px height, full width, no gutters) -->
-  <rect x="20" y="20" width="800" height="45" class="header"/>
+  <!-- Separator between Header and Navigation Panel -->
   <line x1="20" y1="65" x2="820" y2="65" class="block-border"/>
-  <text x="30" y="48" class="text">H: Header</text>
   
-  <!-- Navigation block (45px height, full width, no gutters) -->
-  <rect x="20" y="65" width="800" height="45" class="nav"/>
+  <!-- Navigation Panel block (full width, no gutters) -->
+  <rect class="nav" x="20" y="65" width="800" height="45"/>
+  <text class="text" x="30" y="93">N: Navigation Panel</text>
+  
+  <!-- Separator between Navigation Panel and Main Content area -->
   <line x1="20" y1="110" x2="820" y2="110" class="block-border"/>
-  <text x="30" y="93" class="text">N: Navigation Panel</text>
   
-  <!-- Left scroll gutter for main content (15px wide, from main content start) -->
-  <rect x="20" y="110" width="15" height="510" class="gutter"/>
-  <line class="gutter-edge" x1="35" y1="110" x2="35" y2="620"/>
+  <!-- Left gutter for main content area (visible in viewport) -->
+  <rect class="gutter" x="20" y="110" width="15" height="465"/>
+  <line x1="35" y1="110" x2="35" y2="575" class="gutter-edge"/>
+  <text class="label" x="22" y="290" transform="rotate(-90 22 290)">Gutter</text>
   
-  <!-- Right scroll gutter for main content (15px wide, from main content start) -->
-  <rect x="805" y="110" width="15" height="510" class="gutter"/>
-  <line class="gutter-edge" x1="805" y1="110" x2="805" y2="620"/>
+  <!-- Main Content block visible in viewport (between gutters) -->
+  <rect class="content" x="35" y="110" width="770" height="465"/>
+  <text class="text" x="45" y="140">M: Main Content</text>
   
-  <!-- Main Content block (365px height, visible in viewport) -->
-  <rect x="35" y="110" width="770" height="365" class="content"/>
-  <text x="45" y="135" class="text">M: Main Content</text>
+  <!-- Separator between Main Content and Footer -->
+  <line x1="35" y1="575" x2="805" y2="575" class="block-border"/>
   
-  <!-- Remaining content space in viewport (145px) -->
-  <rect x="35" y="475" width="770" height="145" class="content"/>
+  <!-- Footer block in viewport (full width, no gutters) -->
+  <rect class="footer" x="20" y="575" width="800" height="45"/>
+  <text class="text" x="30" y="603">F: Footer</text>
   
-  <!-- Scrollbar track (15px wide on the right side, viewport height only) -->
+  <!-- Scrollbar separator line (dashed line for visual separation) -->
+  <line x1="805" y1="20" x2="805" y2="620" class="scrollbar-border"/>
+  
+  <!-- Scrollbar track (overlays right gutter, 15px wide, viewport height) -->
   <rect x="805" y="20" width="15" height="600" class="scrollbar-track"/>
   
-  <!-- Scrollbar thumb (positioned at top, representing ~75% of viewport visible) -->
-  <rect x="807" y="30" width="11" height="450" rx="3" class="scrollbar-thumb"/>
+  <!-- Scrollbar thumb at top position -->
+  <rect x="807" y="20" width="11" height="154" class="scrollbar-thumb"/>
   
-  <!-- Left scroll gutter in overflow (15px wide) -->
-  <rect x="20" y="620" width="15" height="155" class="gutter"/>
-  <line class="gutter-edge" x1="35" y1="620" x2="35" y2="775"/>
+  <!-- OVERFLOW AREA (below viewport at y=620) -->
   
-  <!-- Right scroll gutter in overflow (15px wide) -->
-  <rect x="805" y="620" width="15" height="155" class="gutter"/>
-  <line class="gutter-edge" x1="805" y1="620" x2="805" y2="775"/>
+  <!-- Left gutter continues in overflow -->
+  <rect class="gutter" x="20" y="620" width="15" height="200"/>
+  <line x1="35" y1="620" x2="35" y2="820" class="gutter-edge"/>
   
-  <!-- Overflow area BELOW main screen viewport (not part of 800x600 screen) -->
-  <!-- Overflow area of Main Content (155px) with diagonal X pattern -->
-  <rect x="35" y="620" width="770" height="155" class="overflow-bg"/>
-  <line x1="35" y1="775" x2="805" y2="775" class="block-border"/>
-  <text x="45" y="690" class="text">M: Main Content (overflow)</text>
+  <!-- Main Content continues in overflow (with overflow pattern) -->
+  <rect x="35" y="620" width="770" height="200" class="overflow-bg"/>
+  <text class="text" x="45" y="650">M: Main Content (overflow)</text>
   
-  <!-- Footer in overflow area (45px height, full width, no gutters) -->
-  <rect x="20" y="775" width="800" height="45" class="overflow-bg"/>
-  <text x="45" y="803" class="text">F: Footer (overflow)</text>
+  <!-- Right gutter continues in overflow (no scrollbar here) -->
+  <rect class="gutter" x="805" y="620" width="15" height="200"/>
+  <line x1="805" y1="620" x2="805" y2="820" class="gutter-edge"/>
   
-  <!-- Bottom edge of overflow area -->
-  <line x1="35" y1="820" x2="805" y2="820" class="block-border"/>
-  
-  <!-- Main screen border (THICK 4px) drawn LAST so it appears on top of overflow content -->
+  <!-- Main screen border (drawn last so it appears on top of everything) -->
   <rect x="20" y="20" width="800" height="600" class="main-screen-border"/>
 </svg>
 

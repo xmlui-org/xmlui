@@ -19,9 +19,11 @@
     .footer { fill: #d0d0d0; }
     .gutter { fill: #e9ecef; }
     .overflow-bg { fill: url(#overflowPattern); }
-    .scrollbar-track { fill: #e0e0e0; stroke: #999; stroke-width: 1; }
-    .scrollbar-thumb { fill: #999; stroke: #666; stroke-width: 1; }
+    .scrollbar-track { fill: #e0e0e0; }
+    .scrollbar-thumb { fill: #999; }
+    .scrollbar-border { stroke: #999; stroke-width: 1; stroke-dasharray: 3,2; fill: none; }
     .text { font-family: Arial, sans-serif; font-size: 14px; fill: #333; text-anchor: start; font-style: italic; }
+    .text-center { font-family: Arial, sans-serif; font-size: 14px; fill: #666; text-anchor: middle; font-style: italic; }
     .label { font-family: Arial, sans-serif; font-size: 10px; fill: #666; font-style: italic; }
   </style>
   
@@ -38,24 +40,18 @@
   <line x1="20" y1="110" x2="820" y2="110" class="block-border"/>
   <text x="30" y="93" class="text">N: Navigation Panel</text>
   
-  <!-- Main Content block (340px height, visible in viewport) -->
-  <rect x="20" y="110" width="800" height="340" class="content"/>
+  <!-- Main Content block visible in viewport (510px height) -->
+  <rect x="20" y="110" width="800" height="510" class="content"/>
   <text x="30" y="135" class="text">M: Main Content</text>
   
-  <!-- Remaining space (125px height, visible in viewport) -->
-  <rect x="20" y="450" width="800" height="125" fill="#eeeeee"/>
-  <text x="420" y="517" class="text" text-anchor="middle" fill="#666">Remaining space</text>
-  <line x1="20" y1="575" x2="820" y2="575" class="block-border"/>
+  <!-- OVERFLOW AREA BELOW main screen viewport (starts at y=620) -->
   
-  <!-- Footer (45px height, visible in viewport) -->
-  <rect x="20" y="575" width="800" height="45" class="footer"/>
-  <text x="30" y="602" class="text">F: Footer</text>
-  
-  <!-- Overflow area BELOW main screen viewport (not part of 800x600 screen) -->
-  <!-- Overflow area of Main Content (155px) with diagonal X pattern -->
+  <!-- Main Content continuation in overflow (155px) with diagonal X pattern -->
   <rect x="20" y="620" width="800" height="155" class="overflow-bg"/>
+  <text x="30" y="650" class="text">M: Main Content (overflow)</text>
+  
+  <!-- Separator between Main Content and Footer -->
   <line x1="20" y1="775" x2="820" y2="775" class="block-border"/>
-  <text x="30" y="690" class="text">M: Main Content (overflow)</text>
   
   <!-- Footer in overflow area (45px height) -->
   <rect x="20" y="775" width="800" height="45" class="overflow-bg"/>
@@ -64,11 +60,14 @@
   <!-- Bottom edge of overflow area -->
   <line x1="20" y1="820" x2="820" y2="820" class="block-border"/>
   
+    <!-- Scrollbar separator line (dashed line for visual separation) -->
+  <line x1="805" y1="20" x2="805" y2="620" class="scrollbar-border"/>
+  
   <!-- Scrollbar track (15px wide on the right side, viewport height only) -->
   <rect x="805" y="20" width="15" height="600" class="scrollbar-track"/>
   
-  <!-- Scrollbar thumb (positioned at top, representing ~75% of viewport visible) -->
-  <rect x="807" y="30" width="11" height="450" rx="3" class="scrollbar-thumb"/>
+  <!-- Scrollbar thumb (positioned at top, representing top scroll position) -->
+  <rect x="807" y="20" width="11" height="154" class="scrollbar-thumb"/>
   
   <!-- Main screen border (THICK 2px) drawn LAST so it appears on top of everything -->
   <rect x="20" y="20" width="800" height="600" class="main-screen-border"/>

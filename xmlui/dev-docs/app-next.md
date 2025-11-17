@@ -1179,7 +1179,7 @@ The diagrams below illustrate these combinations to show how the App component a
 
 ## Horizontal Layout Diagrams
 
-**`layout`: horizontal**
+**`layout`: "horizontal"**
 
 All horizontal layout diagrams share the following common characteristics:
 
@@ -1220,6 +1220,8 @@ All horizontal layout diagrams share the following common characteristics:
 - `noScrollbarGutters`: true
 - `scrollWholePage`: false
 
+![Horizontal Layout with Content-Only Scroll (No Overflow)](images/horizontal-layout-content-scroll-no-gutters-diagram.svg)
+
 ![Horizontal Layout with Content-Only Scroll (Top)](images/horizontal-layout-content-scroll-no-gutters-top.svg)
 
 ![Horizontal Layout with Content-Only Scroll (Mid-Scroll)](images/horizontal-layout-content-scroll-no-gutters-mid.svg)
@@ -1227,6 +1229,8 @@ All horizontal layout diagrams share the following common characteristics:
 ![Horizontal Layout with Content-Only Scroll (Bottom)](images/horizontal-layout-content-scroll-no-gutters-bottom.svg)
 
 ## Horizontal-Sticky Layout Diagrams
+
+**`layout`: "horizontal-sticky"**
 
 All horizontal-sticky layout diagrams share the following common characteristics:
 
@@ -1237,95 +1241,44 @@ All horizontal-sticky layout diagrams share the following common characteristics
 - **Scroll Container**: Can be either the App Container (C) when `scrollWholePage=true` or the Main Content block (M) when `scrollWholePage=false`
 - **Variants**: The diagrams below demonstrate different combinations of `scrollWholePage` and `noScrollbarGutters` settings
 
-### Horizontal-Sticky Layout (No Overflow)
+### Horizontal-Sticky Layout (scroll parent: app container, no scrollbar gutters)
 
-- `layout`: horizontal-sticky
 - `noScrollbarGutters`: true
 - `scrollWholePage`: true
 
-**Note:** Content fits within viewport; no scrollbar visible. Header, NavPanel, and Footer are docked.
-
 ![Horizontal-Sticky Layout](images/horizontal-sticky-layout.svg)
 
-### Horizontal-Sticky Layout with Scroll Gutters (No Overflow)
+![Horizontal-Sticky Layout with Overflow (Top)](images/horizontal-sticky-layout-overflow-top.svg)
 
-- `layout`: horizontal-sticky
+![Horizontal-Sticky Layout with Overflow (Mid-Scroll)](images/horizontal-sticky-layout-overflow-mid.svg)
+
+![Horizontal-Sticky Layout with Overflow (Bottom)](images/horizontal-sticky-layout-overflow-bottom.svg)
+
+### Horizontal-Sticky (scroll parent: app container, scrollbar gutters)
+
 - `noScrollbarGutters`: false
 - `scrollWholePage`: true
 
-**Note:** Content fits within viewport; scroll gutters reserved on both sides. Header, NavPanel, and Footer are docked. App Container is the scroll parent.
-
 ![Horizontal-Sticky Layout with Gutters](images/horizontal-sticky-layout-with-gutters.svg)
+
+![Horizontal-Sticky Layout with Gutters and Overflow (Top)](images/horizontal-sticky-layout-with-gutters-overflow-top.svg)
 
 ![Horizontal-Sticky Layout with Overflow Mid-Scroll](images/horizontal-sticky-layout-overflow-mid.svg)
 
 ![Horizontal-Sticky Layout with Overflow Bottom-Scroll](images/horizontal-sticky-layout-overflow-bottom.svg)
 
-### Horizontal-Sticky Layout with Scroll Gutters (No Overflow)
+### Horizontal-Sticky (scroll parent: main content, no scrollbar gutters)
 
-- `layout`: horizontal-sticky
-- `noScrollbarGutters`: false
-- `scrollWholePage`: true
-
-**Note:** Content fits within viewport; scroll gutters reserved on both sides. Header, NavPanel, and Footer are docked. No scrollbar visible. App Container is the scroll parent.
-
-![Horizontal-Sticky Layout with Gutters No Overflow](images/horizontal-sticky-layout-with-gutters-no-overflow.svg)
-
-### Horizontal-Sticky Layout with Scroll Gutters (Mid-Scroll)
-
-- `layout`: horizontal-sticky
-- `noScrollbarGutters`: false
-- `scrollWholePage`: true
-
-**Note:** Content overflows; scrollbar visible in right gutter spanning entire viewport. Header, NavPanel, and Footer remain docked. Scrollbar at mid-position. App Container is the scroll parent.
-
-![Horizontal-Sticky Layout with Gutters Mid-Scroll](images/horizontal-sticky-layout-with-gutters-mid-scroll.svg)
-
-### Horizontal-Sticky Layout with Scroll Gutters (Scrolled to Bottom)
-
-- `layout`: horizontal-sticky
-- `noScrollbarGutters`: false
-- `scrollWholePage`: true
-
-**Note:** Content scrolled to bottom; scrollbar at bottom position in right gutter spanning entire viewport. Header, NavPanel, and Footer remain docked. End of content visible. App Container is the scroll parent.
-
-![Horizontal-Sticky Layout with Gutters Bottom-Scroll](images/horizontal-sticky-layout-with-gutters-bottom-scroll.svg)
-
-### Horizontal-Sticky Layout with Content-Only Scroll (No Overflow)
-
-- `layout`: horizontal-sticky
 - `noScrollbarGutters`: true
 - `scrollWholePage`: false
 
-**Note:** Content fits within viewport; no scrollbar visible. Header, NavPanel, and Footer are docked. Main Content block is the scroll parent.
+![Horizontal-Sticky Layout with Content-Only Scroll (No Overflow)](images/horizontal-sticky-content-scroll-no-gutters.svg)
 
-```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ H: Header (docked to top)                                                    │
-├──────────────────────────────────────────────────────────────────────────────┤
-│ N: Navigation Panel (docked to top)                                          │
-├──────────────────────────────────────────────────────────────────────────────┤
-│ M: Main Content                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-├──────────────────────────────────────────────────────────────────────────────┤
-│ F: Footer (docked to bottom)                                                 │
-└──────────────────────────────────────────────────────────────────────────────┘
-```
+![Horizontal-Sticky Layout with Content-Only Scroll (Top)](images/horizontal-sticky-content-scroll-no-gutters-top.svg)
+
+![Horizontal-Sticky Layout with Content-Only Scroll (Mid-Scroll)](images/horizontal-sticky-content-scroll-no-gutters-mid.svg)
+
+![Horizontal-Sticky Layout with Content-Only Scroll (Bottom)](images/horizontal-sticky-content-scroll-no-gutters-bottom.svg)
 
 ### Horizontal-Sticky Layout with Content-Only Scroll and Gutters (No Overflow)
 

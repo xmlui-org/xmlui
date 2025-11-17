@@ -31,17 +31,16 @@
   <line class="block-border" x1="20" y1="110" x2="820" y2="110"/>
   <text class="text" x="30" y="93">N: Navigation Panel (docked to top)</text>
   
-  <!-- Main Content block (full width, showing bottom of content) -->
+  <!-- Main Content block (full width, showing top of content) -->
   <rect class="content" x="20" y="110" width="800" height="465"/>
-  <text class="overflow-indicator" x="420" y="135">↑ Content above (hidden)</text>
-  <text class="text" x="30" y="545">M: Main Content (scrollable, bottom position)</text>
-  <text class="text" x="30" y="565">(end of content)</text>
+  <text class="text" x="30" y="135">M: Main Content (scrollable, top position)</text>
+  <text class="overflow-indicator" x="420" y="545">↓ Content below (hidden)</text>
   
   <!-- Scrollbar border (left edge, dashed) -->
   <line class="scrollbar-border" x1="809" y1="110" x2="809" y2="575"/>
   
-  <!-- Scrollbar thumb (at bottom position, with 2px padding from border) -->
-  <rect class="scrollbar" x="809" y="419" width="11" height="154"/>
+  <!-- Scrollbar thumb (at top position, with 2px padding from border) -->
+  <rect class="scrollbar" x="809" y="112" width="11" height="154"/>
   
   <!-- Separator: Content|Footer -->
   <line class="block-border" x1="20" y1="575" x2="820" y2="575"/>

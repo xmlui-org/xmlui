@@ -19,8 +19,9 @@
     .footer { fill: #d0d0d0; }
     .gutter { fill: #e9ecef; }
     .overflow-bg { fill: url(#overflowPattern); }
-    .scrollbar-track { fill: #e0e0e0; stroke: #999; stroke-width: 1; }
-    .scrollbar-thumb { fill: #999; stroke: #666; stroke-width: 1; }
+    .scrollbar-track { fill: #e0e0e0; }
+    .scrollbar-thumb { fill: #999; }
+    .scrollbar-border { stroke: #999; stroke-width: 1; stroke-dasharray: 3,2; fill: none; }
     .text { font-family: Arial, sans-serif; font-size: 14px; fill: #333; text-anchor: start; font-style: italic; }
     .label { font-family: Arial, sans-serif; font-size: 10px; fill: #666; font-style: italic; }
   </style>
@@ -64,6 +65,9 @@
   <!-- Bottom edge of overflow area -->
   <line x1="20" y1="1020" x2="820" y2="1020" class="block-border"/>
   
+  <!-- Scrollbar separator line (dashed line for visual separation) -->
+  <line x1="805" y1="220" x2="805" y2="820" class="scrollbar-border"/>
+  
   <!-- Scrollbar track (15px wide on the right side, viewport height only) -->
   <rect x="805" y="220" width="15" height="600" class="scrollbar-track"/>
   
@@ -72,7 +76,7 @@
   <!-- Viewport shows 600px, so thumb should be 60% of track height = 360px -->
   <!-- Thumb positioned to show we're scrolled 200px down (20% into content) -->
   <!-- Track height 600px, thumb starts at 20% = 120px from top -->
-  <rect x="807" y="340" width="11" height="360" rx="3" class="scrollbar-thumb"/>
+  <rect x="807" y="340" width="11" height="154" class="scrollbar-thumb"/>
   
   <!-- Main screen border drawn last so it appears on top of everything -->
   <rect x="20" y="220" width="800" height="600" class="main-screen-border"/>
