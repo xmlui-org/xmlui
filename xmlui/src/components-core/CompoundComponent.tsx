@@ -95,12 +95,19 @@ export const CompoundComponent = forwardRef(
     const hasEventHandler = useEvent((eventName) => !!lookupEventHandler(eventName));
 
     const vars = useMemo(() => {
+      console.log("[CompoundComponent] Creating vars with updateState:", typeof updateState);
+      const wrappedUpdateState = (action: any) => {
+        console.log("[CompoundComponent] updateState called with:", action);
+        const result = updateState(action);
+        console.log("[CompoundComponent] updateState returned:", result);
+        return result;
+      };
       return {
         $props: resolvedProps,
         ...containerNode.vars,
         emitEvent,
         hasEventHandler,
-        updateState,
+        updateState: wrappedUpdateState,
       };
     }, [containerNode.vars, emitEvent, hasEventHandler, resolvedProps, updateState]);
     const stableVars = useShallowCompareMemoize(vars);

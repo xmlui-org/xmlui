@@ -718,3 +718,44 @@ test("method works with script", async ({ page, initTestBed }) => {
   await button.click();
   await expect(page.getByTestId("greeting")).toHaveText("Hello from MyComp!");
 });
+
+test("updateState works", async ({ page, initTestBed }) => {
+  const { testStateDriver } = await initTestBed(
+    `
+    <Fragment var.msg="">
+      <MyComp id="myComp"/>
+      <Text testId="helo">{myComp.value}</Text>
+      <Button testId="debug" onClick="() => { console.log('myComp.value:', myComp.value); testState = { compValue: myComp.value, type: typeof myComp.value } }">Debug</Button>
+    </Fragment>
+  `,
+    {
+      components: [
+        `
+        <Component name="MyComp" var.internalValue="">
+          <VStack>
+            <TextArea onDidChange="value => { console.log('onDidChange called with:', value); internalValue = value; updateState({value: value}); console.log('After updateState, internalValue:', internalValue) }"/>
+            <Text testId="internal">Internal: {internalValue}</Text>
+          </VStack>
+        </Component>
+      `,
+      ],
+    },
+  );
+
+  // First, let's see what's in the internal state
+  await expect(page.getByTestId("internal")).toHaveText("Internal: ");
+  
+  // Fill the textarea
+  await page.getByRole("textbox").fill("Hello from MyComp!");
+  
+  // Check internal state after fill
+  console.log("Checking internal state after fill...");
+  await expect(page.getByTestId("internal")).toHaveText("Internal: Hello from MyComp!");
+  
+  // Click debug button to see what's exposed via API
+  await page.getByTestId("debug").click();
+  const debugState = await testStateDriver.testState();
+  console.log("Debug state:", debugState);
+  
+  await expect(page.getByTestId("helo")).toHaveText("Hello from MyComp!");
+});
