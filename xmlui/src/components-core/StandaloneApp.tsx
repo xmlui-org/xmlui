@@ -639,8 +639,10 @@ function useStandalone(
           if (projectCompilation.entrypoint?.filename) {
             const entryPointPromise = (async () => {
               try {
-                console.log({ mainFile: projectCompilation.entrypoint.filename });
-                const resp = await fetchWithoutCache(projectCompilation.entrypoint.filename);
+                const entryPointBaseName = projectCompilation.entrypoint.filename.substring(
+                  projectCompilation.entrypoint.filename.lastIndexOf("/") + 1,
+                );
+                const resp = await fetchWithoutCache(`/xmlui/${entryPointBaseName}`);
                 if (!resp.ok) return;
                 const parsed = await parseComponentMarkupResponse(resp);
                 if (parsed.hasError) return;
@@ -649,7 +651,7 @@ function useStandalone(
 
                 // Handle code-behind
                 try {
-                  const codeBehindResp = await fetchWithoutCache(MAIN_CODE_BEHIND_FILE);
+                  const codeBehindResp = await fetchWithoutCache(`/xmlui/${MAIN_CODE_BEHIND_FILE}`);
                   if (codeBehindResp.ok) {
                     const parsedCodeBehind = await parseCodeBehindResponse(codeBehindResp);
                     if (!parsedCodeBehind.hasError && parsedCodeBehind.codeBehind) {
@@ -679,8 +681,10 @@ function useStandalone(
           // 2. Handle Components
           const componentPromises = projectCompilation.components.map(async (compilation) => {
             try {
-              console.log({ componentFile: compilation.filename });
-              const resp = await fetchWithoutCache(compilation.filename);
+              const componentBaseName = compilation.filename.substring(
+                compilation.filename.lastIndexOf("/") + 1,
+              );
+              const resp = await fetchWithoutCache(`/xmlui/${componentBaseName}`);
               if (!resp.ok) return;
               const parsed = await parseComponentMarkupResponse(resp);
               if (parsed.hasError) return;
@@ -689,11 +693,11 @@ function useStandalone(
 
               // Handle code-behind
               try {
-                const codeBehindPath = compilation.filename.replace(
+                const codeBehindBaseName = componentBaseName.replace(
                   `.${componentFileExtension}`,
                   `.${codeBehindFileExtension}`,
                 );
-                const codeBehindResp = await fetchWithoutCache(codeBehindPath);
+                const codeBehindResp = await fetchWithoutCache(`/xmlui/${codeBehindBaseName}`);
                 if (codeBehindResp.ok) {
                   const parsedCodeBehind = await parseCodeBehindResponse(codeBehindResp);
                   if (!parsedCodeBehind.hasError && parsedCodeBehind.codeBehind) {
