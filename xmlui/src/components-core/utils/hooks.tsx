@@ -9,6 +9,7 @@ import { shallowCompare, useEvent } from "../utils/misc";
 import { useTheme } from "../theming/ThemeContext";
 import { EMPTY_OBJECT } from "../constants";
 import Color from "color";
+import type { StandaloneAppDescription } from "../abstractions/standalone";
 
 /**
  * This hook invokes a callback when the size of the specified DOM element changes.
@@ -414,4 +415,20 @@ export function useHasExplicitHeight(parentRef: React.MutableRefObject<HTMLDivEl
     }
   }, [parentRef]);
   return hasHeight;
+}
+
+// --- This React hook logs the app's version number to the browser's console at startup
+export function usePrintVersionNumber(standaloneApp: StandaloneAppDescription | null) {
+  const logged = useRef(false);
+  useEffect(() => {
+    if (logged.current) {
+      return;
+    }
+    logged.current = true;
+    let log = `XMLUI version: ${process.env.VITE_XMLUI_VERSION || "dev"}`;
+    if (standaloneApp?.name) {
+      log += `; ${standaloneApp.name} version: ${process.env.VITE_APP_VERSION || "dev"}`;
+    }
+    console.log(log);
+  }, [standaloneApp?.name]);
 }
