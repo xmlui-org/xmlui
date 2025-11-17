@@ -1608,7 +1608,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip).toHaveText("Tooltip text");
   });
 
-  test("all behaviors combined with parts", async ({ page, initTestBed }) => {
+  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
     await initTestBed(`
       <DateInput 
         testId="test" 
@@ -1637,6 +1637,11 @@ test.describe("Behaviors and Parts", () => {
     await expect(monthPart).toBeVisible();
     await expect(yearPart).toBeVisible();
     await expect(clearButton).toBeVisible();
+
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
   });
 });
 

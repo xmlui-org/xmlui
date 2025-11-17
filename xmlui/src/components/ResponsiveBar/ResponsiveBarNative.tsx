@@ -14,6 +14,7 @@ import { useResizeObserver } from "../../components-core/utils/hooks";
 import { DropdownMenu, MenuItem } from "../DropdownMenu/DropdownMenuNative";
 import type { AlignmentOptions } from "../abstractions";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import { Part } from "../Part/Part";
 
 
 // Component part names
@@ -140,19 +141,21 @@ const ResponsiveBarDropdown = ({
   onWillOpen?: () => Promise<boolean | undefined>;
   registerComponentApi?: RegisterComponentApiFn;
 }) => (
-  <div className={className} data-part-id={PART_OVERFLOW}>
-    <DropdownMenu 
-      label={dropdownText} 
-      triggerButtonIcon={overflowIcon}
-      triggerTemplate={triggerTemplate}
-      alignment={dropdownAlignment}
-      compact={true}
-      onWillOpen={onWillOpen}
-      registerComponentApi={registerComponentApi}
-    >
-      {children}
-    </DropdownMenu>
-  </div>
+  <Part partId={PART_OVERFLOW}>
+    <div className={className}>
+      <DropdownMenu 
+        label={dropdownText} 
+        triggerButtonIcon={overflowIcon}
+        triggerTemplate={triggerTemplate}
+        alignment={dropdownAlignment}
+        compact={true}
+        onWillOpen={onWillOpen}
+        registerComponentApi={registerComponentApi}
+      >
+        {children}
+      </DropdownMenu>
+    </div>
+  </Part>
 );
 
 export const defaultResponsiveBarProps = {

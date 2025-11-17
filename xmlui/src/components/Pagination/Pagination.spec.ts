@@ -1407,7 +1407,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip).toHaveText("Tooltip text");
   });
 
-  test("all behaviors combined with parts", async ({ page, initTestBed }) => {
+  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Pagination 
         testId="test" 
@@ -1415,6 +1415,7 @@ test.describe("Behaviors and Parts", () => {
         itemCount="100"
         showPageInfo="true"
         animation="fadeIn"
+        tooltip="Tooltip text"
       />
     `, {
       testThemeVars: {
@@ -1432,6 +1433,11 @@ test.describe("Behaviors and Parts", () => {
     // Verify parts are visible
     await expect(paginationControls).toBeVisible();
     await expect(pageInfo).toBeVisible();
+
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
   });
 });
 

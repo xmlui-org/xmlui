@@ -996,3 +996,25 @@ test.describe("API methods", () => {
     await expect(page.getByRole("menu")).not.toBeVisible();
   });
 });
+
+// =============================================================================
+// BEHAVIORS AND PARTS TESTS
+// =============================================================================
+
+test.describe("Behaviors and Parts", () => {
+  test("can select ResponsiveBarDropdown", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Stack width="300px">
+        <ResponsiveBar testId="test">
+          <Button label="Button 1" />
+          <Button label="Button 2" />
+          <Button label="Button 3" />
+          <Button label="Button 4" />
+          <Button label="Button 5" />
+        </ResponsiveBar>Í
+      </Stack>
+    `);
+    const componentPart = page.getByTestId("test").locator('[data-part-id="overflow"]');
+    await expect(componentPart).toBeVisible();
+  });
+});

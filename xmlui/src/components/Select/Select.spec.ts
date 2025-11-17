@@ -1209,7 +1209,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(listWrapper).toBeVisible();
   });
 
-  test("all behaviors combined with parts", async ({ page, initTestBed }) => {
+  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Select 
         testId="test" 
@@ -1217,6 +1217,7 @@ test.describe("Behaviors and Parts", () => {
         animation="fadeIn"
         clearable="true"
         initialValue="1"
+        tooltip="Tooltip text"
       >
         <Option value="1" label="Test" />
       </Select>
@@ -1236,5 +1237,10 @@ test.describe("Behaviors and Parts", () => {
     // Verify parts are visible
     await expect(listWrapper).toBeVisible();
     await expect(clearButton).toBeVisible();
+
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
   });
 });

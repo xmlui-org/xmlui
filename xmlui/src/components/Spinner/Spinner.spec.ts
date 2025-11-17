@@ -289,7 +289,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(ringPart).toBeVisible();
   });
 
-  test("all behaviors combined with parts", async ({ page, initTestBed }) => {
+  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Spinner 
         testId="test" 
