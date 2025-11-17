@@ -86,7 +86,16 @@ export const XmlUiBlogThemeDefinition: ThemeDefinition = {
   id: "xmlui-blog",
   extends: "xmlui",
   color: "$color-primary-500",
-  themeVars: {},
+  themeVars: {
+    // --- App layout
+    "maxWidth-content-App": "800px",
+    // --- Fundamental colors & typography
+    backgroundColor: "$color-surface-0",
+    "fontWeight-Text": "400",
+    "fontWeight-bold": "700",
+    "textColor-primary": "$color-surface-800",
+    "textColor-NavLink--active": "$color-primary",
+  },
 };
 
 export const XmlUiWebThemeDefinition: ThemeDefinition = {

@@ -259,7 +259,7 @@ function buildTreeFromPathsAndMeta(
 const groupedNavPanelContent = buildTreeFromPathsAndMeta(navPanelContent, metaJsons);
 const App: StandaloneAppDescription = {
   name: "XMLUI Docs",
-  defaultTheme: "docs-theme",
+  defaultTheme: "xmlui-docs",
   resources: {
     logo: "/resources/logo.svg",
     "logo-dark": "/resources/logo-dark.svg",
