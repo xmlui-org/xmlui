@@ -89,9 +89,7 @@ export const StateContainer = memo(
     const memoedVars = useRef<MemoedVars>(new Map());
 
     const stateFromOutside = useShallowCompareMemoize(
-      useMemo(() => {
-        return extractScopedState(parentState, node.uses);
-      }, [node.uses, parentState]),
+      useMemo(() => extractScopedState(parentState, node.uses), [node.uses, parentState]),
     );
 
     // --- All state manipulation happens through the container reducer, which is created here.
@@ -107,22 +105,10 @@ export const StateContainer = memo(
     const componentStateWithApis = useShallowCompareMemoize(
       useMemo(() => {
         const ret = { ...componentState };
-        
-        // Get set of registered API keys - only these should have reducer state exposed as string keys
-        const registeredApiKeys = new Set(
-          Object.getOwnPropertySymbols(componentApis)
-            .map(s => s.description)
-            .filter((d): d is string => d !== undefined)
-        );
-        
         for (const stateKey of Object.getOwnPropertySymbols(componentState)) {
           const value = componentState[stateKey];
           if (stateKey.description) {
-            // Only copy reducer state to string keys for APIs registered in THIS container
-            // This prevents child containers from inheriting reducer state for parent APIs
-            if (registeredApiKeys.has(stateKey.description)) {
-              ret[stateKey.description] = value;
-            }
+            ret[stateKey.description] = value;
           }
         }
         if (Reflect.ownKeys(componentApis).length === 0) {
@@ -198,20 +184,22 @@ export const StateContainer = memo(
 
     const mergedWithVars = useMergedState(resolvedLocalVars, componentStateWithApis);
     const combinedState = useCombinedState(
-      stateFromOutside,         // Parent state (lower priority) - allows local vars to shadow
-      node.contextVars,         // Context vars like $item
-      mergedWithVars,           // Local vars and component state (higher priority) - enables shadowing
+      stateFromOutside,
+      node.contextVars,
+      mergedWithVars,
       routingParams,
     );
 
     const registerComponentApi: RegisterComponentApiFnInner = useCallback((uid, api) => {
       setComponentApis(
         produce((draft) => {
+          // console.log("-----BUST----setComponentApis");
           if (!draft[uid]) {
             draft[uid] = {};
           }
           Object.entries(api).forEach(([key, value]) => {
             if (draft[uid][key] !== value) {
+              // console.log(`-----BUST------new api for ${uid}`, draft[uid][key], value)
               draft[uid][key] = value;
             }
           });
@@ -321,9 +309,11 @@ function useCombinedState(...states: (ContainerState | undefined)[]) {
   const combined: ContainerState = useMemo(() => {
     let ret: ContainerState = {};
     states.forEach((state = EMPTY_OBJECT) => {
+      // console.log("st", state);
       if (state !== EMPTY_OBJECT) {
         ret = { ...ret, ...state };
       }
+      // console.log("ret", ret);
     });
     return ret;
   }, [states]);
@@ -386,6 +376,7 @@ function useVars(
                 if (isParsedValue(value)) {
                   return collectVariableDependencies(value.tree, referenceTrackedApi);
                 }
+                // console.log(`GETTING DEPENDENCY FOR ${value} with:`, referenceTrackedApi);
                 const params = parseParameterString(value);
                 let ret = new Set<string>();
                 params.forEach((param) => {
@@ -400,6 +391,15 @@ function useVars(
               }),
               obtainValue: memoizeOne(
                 (value, state, appContext, strict, deps, appContextDeps) => {
+                  // console.log(
+                  //   "VARS, BUST, obtain value called with",
+                  //   value,
+                  //   { state, appContext },
+                  //   {
+                  //     deps,
+                  //     appContextDeps,
+                  //   }
+                  // );
                   try {
                     return isParsedValue(value)
                       ? evalBinding(value.tree, {
@@ -461,6 +461,7 @@ function useVars(
           }
           const stateDepValues = pickFromObject(stateContext, dependencies);
           const appContextDepValues = pickFromObject(appContext, dependencies);
+          // console.log("VARS, obtain value called with", stateDepValues, appContextDepValues);
 
           ret[key] = memoedVars.current
             .get(value)!

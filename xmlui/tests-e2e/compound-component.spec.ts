@@ -718,3 +718,26 @@ test("method works with script", async ({ page, initTestBed }) => {
   await button.click();
   await expect(page.getByTestId("greeting")).toHaveText("Hello from MyComp!");
 });
+
+test("updateState works", async ({ page, initTestBed }) => {
+  await initTestBed(
+    `
+    <Fragment var.msg="">
+      <MyComp id="myComp"/>
+      <Text testId="helo">{myComp.value}</Text>
+    </Fragment>
+  `,
+    {
+      components: [
+        `
+        <Component name="MyComp">
+          <TextArea onDidChange="value => {  console.log('ondidchange', value);  updateState({value: value}) }"/>
+        </Component>
+      `,
+      ],
+    },
+  );
+
+  await page.getByRole("textbox").fill("Hello from MyComp!");
+  await expect(page.getByTestId("helo")).toHaveText("Hello from MyComp!");
+});
