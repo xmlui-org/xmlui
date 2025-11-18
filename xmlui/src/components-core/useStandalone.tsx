@@ -20,13 +20,7 @@ import {
   xmlUiMarkupToComponent,
 } from "./xmlui-parser";
 import type { ThemeDefinition } from "../abstractions/ThemingDefs";
-import {
-  getLintSeverity,
-  lintApp,
-  lintErrorsComponent,
-  LintSeverity,
-  printComponentLints,
-} from "../parsers/xmlui-parser/lint";
+import { processAppLinting } from "../parsers/xmlui-parser/lint";
 import { normalizePath } from "./utils/misc";
 import {
   codeBehindFileExtension,
@@ -44,10 +38,280 @@ import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree"
 import { collectedComponentMetadata } from "../components/collectedComponentMetadata";
 
 const MAIN_FILE = "Main." + componentFileExtension;
-const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
 const CONFIG_FILE = "config.json";
-
+const DEV_OR_INLINED_MODE =
+  (process.env.VITE_DEV_MODE || process.env.VITE_BUILD_MODE === "INLINE_ALL") &&
+  !process.env.VITE_STANDALONE;
 const metadataProvider = new MetadataProvider(collectedComponentMetadata);
+
+async function loadInlineOrDevMode(
+  appDef: StandaloneAppDescription,
+  projectCompilation: ProjectCompilation,
+  extensionManager?: StandaloneExtensionManager,
+): Promise<{ appDef: StandaloneAppDescription; projectCompilation: ProjectCompilation }> {
+  if (!appDef) {
+    throw new Error("couldn't find the application metadata");
+  }
+  if (!projectCompilation) {
+    return { appDef, projectCompilation };
+  }
+
+  // --- In dev mode, try to fetch up-to-date sources
+  const promises: Promise<any>[] = [];
+
+  // 1. Handle Entry Point
+  if (projectCompilation.entrypoint?.filename) {
+    const entryPointBaseName = projectCompilation.entrypoint.filename.substring(
+      projectCompilation.entrypoint.filename.lastIndexOf("/") + 1,
+    );
+    const entryPointPromise = fetchComponentWithCodeBehind(entryPointBaseName, "/xmlui").then(
+      ({ component, markupSource, codeBehindSource }) => {
+        if (component) {
+          appDef.entryPoint = component as ComponentDef;
+          projectCompilation.entrypoint.definition = component as ComponentDef;
+          projectCompilation.entrypoint.markupSource = markupSource;
+          projectCompilation.entrypoint.codeBehindSource = codeBehindSource;
+        }
+      },
+    );
+    promises.push(entryPointPromise);
+  }
+
+  // 2. Handle Components
+  const componentPromises = projectCompilation.components.map(async (compilation) => {
+    const componentBaseName = compilation.filename.substring(
+      compilation.filename.lastIndexOf("/") + 1,
+    );
+    const { component, markupSource, codeBehindSource } = await fetchComponentWithCodeBehind(
+      componentBaseName,
+      "/xmlui",
+    );
+    if (component) {
+      const updatedComponent = component as CompoundComponentDef;
+      const index = appDef.components.findIndex((c) => c.name === updatedComponent.name);
+      if (index !== -1) {
+        appDef.components[index] = updatedComponent;
+      }
+      compilation.definition = updatedComponent;
+      compilation.markupSource = markupSource;
+      compilation.codeBehindSource = codeBehindSource;
+    }
+  });
+
+  promises.push(...componentPromises);
+  await Promise.all(promises);
+
+  const lintErrorComponent = processAppLinting(appDef, metadataProvider);
+  if (lintErrorComponent) {
+    appDef.entryPoint = lintErrorComponent;
+  }
+
+  discoverCompilationDependencies({
+    projectCompilation,
+    extensionManager,
+  });
+
+  return { appDef, projectCompilation };
+}
+
+async function loadConfigOnlyMode(
+  appDef: StandaloneAppDescription,
+  projectCompilation: ProjectCompilation,
+  extensionManager?: StandaloneExtensionManager,
+): Promise<{ appDef: StandaloneAppDescription; projectCompilation: ProjectCompilation }> {
+  const configResponse = await fetchWithoutCache(CONFIG_FILE);
+  const config: StandaloneJsonConfig = await configResponse.json();
+
+  const themePromises: Promise<ThemeDefinition>[] = [];
+  config.themes?.forEach((theme) => {
+    themePromises.push(loadThemeFile(theme));
+  });
+  const themes = await Promise.all(themePromises);
+
+  const newAppDef: StandaloneAppDescription = {
+    ...appDef,
+    name: config.name,
+    appGlobals: config.appGlobals,
+    defaultTheme: config.defaultTheme,
+    resources: config.resources,
+    resourceMap: config.resourceMap,
+    themes,
+  };
+
+  const lintErrorComponent = processAppLinting(newAppDef, metadataProvider);
+  if (lintErrorComponent) {
+    newAppDef.entryPoint = lintErrorComponent;
+  }
+  discoverCompilationDependencies({
+    projectCompilation,
+    extensionManager,
+  });
+
+  return { appDef: newAppDef, projectCompilation };
+}
+
+async function loadStandaloneMode(
+  appDef: StandaloneAppDescription,
+  projectCompilation: ProjectCompilation,
+  extensionManager?: StandaloneExtensionManager,
+): Promise<{ appDef: StandaloneAppDescription; projectCompilation: ProjectCompilation }> {
+  const errorComponents: ComponentDef[] = [];
+  const sources: Record<string, string> = {};
+
+  // 1. Fetch Entry Point
+  const {
+    component: loadedEntryPoint,
+    markupSource: entryPointMarkup,
+    codeBehindSource: entryPointCodeBehind,
+    errorComponent: entryPointError,
+  } = await fetchComponentWithCodeBehind(MAIN_FILE, ".");
+
+  if (entryPointError) errorComponents.push(entryPointError);
+  if (entryPointMarkup) sources[MAIN_FILE] = entryPointMarkup;
+  if (loadedEntryPoint) {
+    projectCompilation.entrypoint.filename = MAIN_FILE;
+    projectCompilation.entrypoint.definition = loadedEntryPoint as ComponentDef;
+    projectCompilation.entrypoint.markupSource = entryPointMarkup;
+    projectCompilation.entrypoint.codeBehindSource = entryPointCodeBehind;
+  }
+
+  // 2. Fetch Config and Themes
+  let config: StandaloneJsonConfig | undefined;
+  try {
+    const configResponse = await fetchWithoutCache(CONFIG_FILE);
+    config = await configResponse.json();
+  } catch (e) {
+    /* config is optional */
+  }
+
+  let themePromises: Promise<ThemeDefinition>[] = [];
+  if ((config?.themes ?? []).length === 0 && config?.defaultTheme) {
+    themePromises = [loadThemeFile(`themes/${config?.defaultTheme}.json`)];
+  } else if (config?.themes) {
+    themePromises = config.themes.map((themePath) => loadThemeFile(themePath));
+  }
+  const themes = await Promise.all(themePromises);
+
+  // 3. Fetch components from config
+  const codeBehinds: any = {};
+  const componentsWithCodeBehinds: (CompoundComponentDef | ComponentDef)[] = [];
+  if (config?.components) {
+    const componentFetchPromises = config.components.map(async (componentPath) => {
+      const value = await fetchWithoutCache(componentPath);
+      if (componentPath.endsWith(`.${componentFileExtension}`)) {
+        return await parseComponentMarkupResponse(value);
+      } else {
+        return await parseCodeBehindResponse(value);
+      }
+    });
+    const loadedComponents = await Promise.all(componentFetchPromises);
+
+    loadedComponents.forEach((compWrapper) => {
+      if (compWrapper.hasError) {
+        errorComponents.push(compWrapper.component as ComponentDef);
+      }
+      if (compWrapper?.file?.endsWith(`.${codeBehindFileExtension}`)) {
+        codeBehinds[compWrapper.file] = compWrapper.codeBehind;
+      } else if (compWrapper.file) {
+        sources[compWrapper.file] = compWrapper.src;
+      }
+    });
+
+    const mergedFromConfig = loadedComponents
+      .filter((cw) => cw && !cw.file?.endsWith(".xmlui.xs"))
+      .map((cw) => {
+        const componentCodeBehind = codeBehinds[cw.file + ".xs"];
+        const component = cw.component as CompoundComponentDef;
+        return {
+          ...component,
+          component: {
+            ...component.component,
+            vars: { ...component.component.vars, ...componentCodeBehind?.vars },
+            functions: componentCodeBehind?.functions,
+            scriptError: componentCodeBehind?.moduleErrors,
+          },
+        };
+      });
+    componentsWithCodeBehinds.push(...mergedFromConfig);
+  }
+
+  // 4. Dynamically load missing components referenced in markup
+  let componentsToLoad = collectMissingComponents(
+    loadedEntryPoint,
+    componentsWithCodeBehinds,
+    undefined,
+    extensionManager,
+  );
+  const componentsFailedToLoad = new Set<string>();
+
+  while (componentsToLoad.size > 0) {
+    const componentPromises = [...componentsToLoad].map(async (componentName) => {
+      const componentFile = `${componentName}.${componentFileExtension}`;
+      const { component, markupSource, codeBehindSource, errorComponent } =
+        await fetchComponentWithCodeBehind(componentFile, "components");
+
+      if (errorComponent) {
+        errorComponents.push(errorComponent);
+      }
+
+      if (component) {
+        const filePath = `components/${componentFile}`;
+        if (markupSource) sources[filePath] = markupSource;
+        const compCompilation: ComponentCompilation = {
+          dependencies: new Set(),
+          filename: filePath,
+          markupSource: markupSource,
+          codeBehindSource: codeBehindSource,
+          definition: component as CompoundComponentDef,
+        };
+        projectCompilation.components.push(compCompilation);
+        return component;
+      } else {
+        componentsFailedToLoad.add(componentName);
+        return null;
+      }
+    });
+
+    const newlyLoaded = await Promise.all(componentPromises);
+    componentsWithCodeBehinds.push(...newlyLoaded.filter((c) => !!c));
+    componentsToLoad = collectMissingComponents(
+      loadedEntryPoint,
+      componentsWithCodeBehinds,
+      componentsFailedToLoad,
+      extensionManager,
+    );
+  }
+
+  // 5. Finalize App Definition
+  const newAppDef: StandaloneAppDescription = {
+    ...config,
+    themes,
+    sources,
+    components: componentsWithCodeBehinds as any,
+    entryPoint: loadedEntryPoint,
+  };
+
+  const lintErrorComponent = processAppLinting(newAppDef, metadataProvider);
+  const finalErrorComponent =
+    errorComponents.length > 0
+      ? { type: "VStack", props: { gap: 0, padding: 0 }, children: errorComponents }
+      : null;
+
+  if (finalErrorComponent) {
+    if (lintErrorComponent) finalErrorComponent.children!.push(lintErrorComponent);
+    newAppDef.entryPoint = finalErrorComponent;
+  } else if (lintErrorComponent) {
+    newAppDef.entryPoint = lintErrorComponent;
+  }
+
+  discoverCompilationDependencies({
+    projectCompilation,
+    extensionManager,
+  });
+
+  return { appDef: newAppDef, projectCompilation };
+}
+
 /**
  * Using its definition, this React hook prepares the runtime environment of a
  * standalone app. It runs every time an app source file changes.
@@ -68,10 +332,7 @@ export function useStandalone(
 
     // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
     // --- we must have the app definition available.
-    if (
-      (process.env.VITE_DEV_MODE || process.env.VITE_BUILD_MODE === "INLINE_ALL") &&
-      !process.env.VITE_STANDALONE
-    ) {
+    if (DEV_OR_INLINED_MODE) {
       if (!appDef) {
         throw new Error("couldn't find the application metadata");
       }
@@ -87,279 +348,36 @@ export function useStandalone(
   useIsomorphicLayoutEffect(() => {
     void (async function () {
       const resolvedRuntime = resolveRuntime(runtime);
-      const appDef = mergeAppDefWithRuntime(resolvedRuntime.standaloneApp, standaloneAppDef);
+      const initialAppDef = mergeAppDefWithRuntime(resolvedRuntime.standaloneApp, standaloneAppDef);
+      const initialProjectCompilation = resolvedRuntime.projectCompilation;
 
-      // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
-      // --- we must have the app definition available.
-      if (
-        (process.env.VITE_DEV_MODE || process.env.VITE_BUILD_MODE === "INLINE_ALL") &&
-        !process.env.VITE_STANDALONE
-      ) {
-        if (!appDef) {
-          throw new Error("couldn't find the application metadata");
-        }
+      let result: {
+        appDef: StandaloneAppDescription;
+        projectCompilation: ProjectCompilation;
+      };
 
-        const projectCompilation = resolvedRuntime.projectCompilation;
-        if (!projectCompilation) {
-          setStandaloneApp(appDef);
-          return;
-        }
-
-        // --- In dev mode, try to fetch up-to-date sources
-        const promises: Promise<any>[] = [];
-
-        // 1. Handle Entry Point
-        if (projectCompilation.entrypoint?.filename) {
-          const entryPointBaseName = projectCompilation.entrypoint.filename.substring(
-            projectCompilation.entrypoint.filename.lastIndexOf("/") + 1,
-          );
-          const entryPointPromise = fetchComponentWithCodeBehind(entryPointBaseName, "/xmlui").then(
-            ({ component, markupSource, codeBehindSource }) => {
-              if (component) {
-                appDef.entryPoint = component as ComponentDef;
-                projectCompilation.entrypoint.definition = component as ComponentDef;
-                projectCompilation.entrypoint.markupSource = markupSource;
-                projectCompilation.entrypoint.codeBehindSource = codeBehindSource;
-              }
-            },
-          );
-          promises.push(entryPointPromise);
-        }
-
-        // 2. Handle Components
-        const componentPromises = projectCompilation.components.map(async (compilation) => {
-          const componentBaseName = compilation.filename.substring(
-            compilation.filename.lastIndexOf("/") + 1,
-          );
-          const { component, markupSource, codeBehindSource } = await fetchComponentWithCodeBehind(
-            componentBaseName,
-            "/xmlui",
-          );
-          if (component) {
-            const updatedComponent = component as CompoundComponentDef;
-            const index = appDef.components.findIndex((c) => c.name === updatedComponent.name);
-            if (index !== -1) {
-              appDef.components[index] = updatedComponent;
-            }
-            compilation.definition = updatedComponent;
-            compilation.markupSource = markupSource;
-            compilation.codeBehindSource = codeBehindSource;
-          }
-        });
-
-        promises.push(...componentPromises);
-        await Promise.all(promises);
-
-        const lintErrorComponent = processAppLinting(appDef, metadataProvider);
-        if (lintErrorComponent) {
-          appDef.entryPoint = lintErrorComponent;
-        }
-
-        discoverCompilationDependencies({
-          projectCompilation: resolvedRuntime.projectCompilation,
+      if (DEV_OR_INLINED_MODE) {
+        result = await loadInlineOrDevMode(
+          initialAppDef,
+          initialProjectCompilation,
           extensionManager,
-        });
-        setProjectCompilation(resolvedRuntime.projectCompilation);
-        setStandaloneApp(appDef);
-        return;
-      }
-
-      // --- In standalone mode, we must fetch the XMLUI app's source files,
-      // --- compile them, and prepare the app's definition for the rendering
-      // --- engine.
-      if (process.env.VITE_BUILD_MODE === "CONFIG_ONLY") {
-        // --- In config-only mode, we override the pre-compiled app definition
-        // --- with elements from the configuration file. Note that we do not
-        // --- check whether the config file's content is semantically valid.
-        const configResponse = await fetchWithoutCache(CONFIG_FILE);
-        const config: StandaloneJsonConfig = await configResponse.json();
-
-        const themePromises: Promise<ThemeDefinition>[] = [];
-        config.themes?.forEach((theme) => {
-          themePromises.push(loadThemeFile(theme));
-        });
-        const themes = await Promise.all(themePromises);
-
-        const newAppDef = {
-          ...appDef,
-          name: config.name,
-          appGlobals: config.appGlobals,
-          defaultTheme: config.defaultTheme,
-          resources: config.resources,
-          resourceMap: config.resourceMap,
-          themes,
-        };
-
-        const lintErrorComponent = processAppLinting(newAppDef, metadataProvider);
-        if (lintErrorComponent) {
-          newAppDef.entryPoint = lintErrorComponent;
-        }
-        discoverCompilationDependencies({
-          projectCompilation: resolvedRuntime.projectCompilation,
+        );
+      } else if (process.env.VITE_BUILD_MODE === "CONFIG_ONLY") {
+        result = await loadConfigOnlyMode(
+          initialAppDef,
+          initialProjectCompilation,
           extensionManager,
-        });
-        setProjectCompilation(resolvedRuntime.projectCompilation);
-        setStandaloneApp(newAppDef);
-        return;
-      }
-
-      // --- Standalone Mode: Fetch all required files
-      const errorComponents: ComponentDef[] = [];
-      const sources: Record<string, string> = {};
-
-      // 1. Fetch Entry Point
-      const {
-        component: loadedEntryPoint,
-        markupSource: entryPointMarkup,
-        codeBehindSource: entryPointCodeBehind,
-        errorComponent: entryPointError,
-      } = await fetchComponentWithCodeBehind(MAIN_FILE, ".");
-
-      if (entryPointError) errorComponents.push(entryPointError);
-      if (entryPointMarkup) sources[MAIN_FILE] = entryPointMarkup;
-      if (loadedEntryPoint) {
-        resolvedRuntime.projectCompilation.entrypoint.filename = MAIN_FILE;
-        resolvedRuntime.projectCompilation.entrypoint.definition = loadedEntryPoint as ComponentDef;
-        resolvedRuntime.projectCompilation.entrypoint.markupSource = entryPointMarkup;
-        resolvedRuntime.projectCompilation.entrypoint.codeBehindSource = entryPointCodeBehind;
-      }
-
-      // 2. Fetch Config and Themes
-      let config: StandaloneJsonConfig | undefined;
-      try {
-        const configResponse = await fetchWithoutCache(CONFIG_FILE);
-        config = await configResponse.json();
-      } catch (e) {
-        /* config is optional */
-      }
-
-      let themePromises: Promise<ThemeDefinition>[] = [];
-      if ((config?.themes ?? []).length === 0 && config?.defaultTheme) {
-        themePromises = [loadThemeFile(`themes/${config?.defaultTheme}.json`)];
-      } else if (config?.themes) {
-        themePromises = config.themes.map((themePath) => loadThemeFile(themePath));
-      }
-      const themes = await Promise.all(themePromises);
-
-      // 3. Fetch components from config
-      const codeBehinds: any = {};
-      const componentsWithCodeBehinds: (CompoundComponentDef | ComponentDef)[] = [];
-      if (config?.components) {
-        const componentFetchPromises = config.components.map(async (componentPath) => {
-          const value = await fetchWithoutCache(componentPath);
-          if (componentPath.endsWith(`.${componentFileExtension}`)) {
-            return await parseComponentMarkupResponse(value);
-          } else {
-            return await parseCodeBehindResponse(value);
-          }
-        });
-        const loadedComponents = await Promise.all(componentFetchPromises);
-
-        loadedComponents.forEach((compWrapper) => {
-          if (compWrapper.hasError) {
-            errorComponents.push(compWrapper.component as ComponentDef);
-          }
-          if (compWrapper?.file?.endsWith(`.${codeBehindFileExtension}`)) {
-            codeBehinds[compWrapper.file] = compWrapper.codeBehind;
-          } else if (compWrapper.file) {
-            sources[compWrapper.file] = compWrapper.src;
-          }
-        });
-
-        const mergedFromConfig = loadedComponents
-          .filter((cw) => cw && !cw.file?.endsWith(".xmlui.xs"))
-          .map((cw) => {
-            const componentCodeBehind = codeBehinds[cw.file + ".xs"];
-            const component = cw.component as CompoundComponentDef;
-            return {
-              ...component,
-              component: {
-                ...component.component,
-                vars: { ...component.component.vars, ...componentCodeBehind?.vars },
-                functions: componentCodeBehind?.functions,
-                scriptError: componentCodeBehind?.moduleErrors,
-              },
-            };
-          });
-        componentsWithCodeBehinds.push(...mergedFromConfig);
-      }
-
-      // 4. Dynamically load missing components referenced in markup
-      let componentsToLoad = collectMissingComponents(
-        loadedEntryPoint,
-        componentsWithCodeBehinds,
-        undefined,
-        extensionManager,
-      );
-      const componentsFailedToLoad = new Set<string>();
-
-      while (componentsToLoad.size > 0) {
-        const componentPromises = [...componentsToLoad].map(async (componentName) => {
-          const componentFile = `${componentName}.${componentFileExtension}`;
-          const { component, markupSource, codeBehindSource, errorComponent } =
-            await fetchComponentWithCodeBehind(componentFile, "components");
-
-          if (errorComponent) {
-            errorComponents.push(errorComponent);
-          }
-
-          if (component) {
-            const filePath = `components/${componentFile}`;
-            if (markupSource) sources[filePath] = markupSource;
-            const compCompilation: ComponentCompilation = {
-              dependencies: new Set(),
-              filename: filePath,
-              markupSource: markupSource,
-              codeBehindSource: codeBehindSource,
-              definition: component as CompoundComponentDef,
-            };
-            resolvedRuntime.projectCompilation.components.push(compCompilation);
-            return component;
-          } else {
-            componentsFailedToLoad.add(componentName);
-            return null;
-          }
-        });
-
-        const newlyLoaded = await Promise.all(componentPromises);
-        componentsWithCodeBehinds.push(...newlyLoaded.filter((c) => !!c));
-        componentsToLoad = collectMissingComponents(
-          loadedEntryPoint,
-          componentsWithCodeBehinds,
-          componentsFailedToLoad,
+        );
+      } else {
+        result = await loadStandaloneMode(
+          initialAppDef,
+          initialProjectCompilation,
           extensionManager,
         );
       }
 
-      // 5. Finalize App Definition
-      const newAppDef = {
-        ...config,
-        themes,
-        sources,
-        components: componentsWithCodeBehinds as any,
-        entryPoint: loadedEntryPoint,
-      };
-
-      const lintErrorComponent = processAppLinting(newAppDef, metadataProvider);
-      const finalErrorComponent =
-        errorComponents.length > 0
-          ? { type: "VStack", props: { gap: 0, padding: 0 }, children: errorComponents }
-          : null;
-
-      if (finalErrorComponent) {
-        if (lintErrorComponent) finalErrorComponent.children!.push(lintErrorComponent);
-        newAppDef.entryPoint = finalErrorComponent;
-      } else if (lintErrorComponent) {
-        newAppDef.entryPoint = lintErrorComponent;
-      }
-
-      discoverCompilationDependencies({
-        projectCompilation: resolvedRuntime.projectCompilation,
-        extensionManager,
-      });
-
-      setProjectCompilation(resolvedRuntime.projectCompilation);
-      setStandaloneApp(newAppDef);
+      setProjectCompilation(result.projectCompilation);
+      setStandaloneApp(result.appDef);
     })();
   }, [runtime, standaloneAppDef, extensionManager]);
   return { standaloneApp, projectCompilation };
@@ -438,6 +456,7 @@ async function fetchComponentWithCodeBehind(
   try {
     const markupPath = normalizePath(`${basePath}/${componentFile}`);
     const markupResp = await fetchWithoutCache(markupPath);
+    console.log("fetching: ", markupPath);
     if (!markupResp.ok) {
       throw new Error(`Failed to fetch ${markupResp.url}`);
     }
@@ -686,17 +705,6 @@ function mergeAppDefWithRuntime(
   };
 }
 
-function resolvePath(basePath: string, relativePath: string) {
-  // Create a base URL. The 'http://dummy.com' is just a placeholder.
-  const baseUrl = new URL(basePath, "http://dummy.com");
-
-  // Create a new URL by resolving the relative path against the base URL.
-  const resolvedUrl = new URL(relativePath, baseUrl);
-
-  // Return the pathname, removing the leading slash.
-  return resolvedUrl.pathname.substring(1);
-}
-
 // --- Tests if the given path contains the specified folder
 function matchesFolder(path: string, folderName: string) {
   return path.includes(`/${folderName}/`);
@@ -798,6 +806,7 @@ async function parseComponentMarkupResponse(response: Response): Promise<ParsedR
   const code = await response.text();
   const fileId = response.url;
   let { component, errors, erroneousCompoundComponentName } = xmlUiMarkupToComponent(code, fileId);
+  console.log({ fileId, component, errors, erroneousCompoundComponentName });
   if (errors.length > 0) {
     const compName =
       erroneousCompoundComponentName ??
@@ -875,29 +884,6 @@ function fetchWithoutCache(url: string): Promise<Response> {
       "Cache-Control": "no-cache, no-store",
     },
   });
-}
-
-function processAppLinting(
-  appDef: StandaloneAppDescription,
-  metadataProvider: MetadataProvider,
-): null | ComponentDef {
-  const lintSeverity = getLintSeverity(appDef.appGlobals?.lintSeverity);
-
-  if (lintSeverity !== LintSeverity.Skip) {
-    const allComponentLints = lintApp({
-      appDef,
-      metadataProvider,
-    });
-
-    if (allComponentLints.length > 0) {
-      if (lintSeverity === LintSeverity.Warning) {
-        allComponentLints.forEach(printComponentLints);
-      } else if (lintSeverity === LintSeverity.Error) {
-        return lintErrorsComponent(allComponentLints);
-      }
-    }
-    return null;
-  }
 }
 
 function discoverCompilationDependencies({

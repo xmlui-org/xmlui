@@ -1,11 +1,6 @@
-import type {
-  ComponentDef,
-  CompoundComponentDef,
-  ComponentMetadata,
-} from "../../abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import type { StandaloneAppDescription } from "../../components-core/abstractions/standalone";
 import { layoutOptionKeys } from "../../components-core/descriptorHelper";
-import { viewportSizeMd } from "../../components/abstractions";
 import type {
   ComponentMetadataProvider,
   MetadataProvider,
@@ -22,14 +17,33 @@ export enum LintDiagKind {
   UnrecognisedProp,
 }
 
-type Options = {
-  severity: LintSeverity;
-};
-
 type LintDiagnostic = {
   message: string;
   kind: LintDiagKind;
 };
+
+export function processAppLinting(
+  appDef: StandaloneAppDescription,
+  metadataProvider: MetadataProvider,
+): null | ComponentDef {
+  const lintSeverity = getLintSeverity(appDef.appGlobals?.lintSeverity);
+
+  if (lintSeverity !== LintSeverity.Skip) {
+    const allComponentLints = lintApp({
+      appDef,
+      metadataProvider,
+    });
+
+    if (allComponentLints.length > 0) {
+      if (lintSeverity === LintSeverity.Warning) {
+        allComponentLints.forEach(printComponentLints);
+      } else if (lintSeverity === LintSeverity.Error) {
+        return lintErrorsComponent(allComponentLints);
+      }
+    }
+    return null;
+  }
+}
 
 export function getLintSeverity(lintSeverityOption: string | undefined): LintSeverity {
   if (!lintSeverityOption) {
