@@ -51,6 +51,7 @@ type DropdownMenuProps = {
   triggerButtonIcon?: string;
   triggerButtonIconPosition?: IconPosition;
   compact?: boolean;
+  modal?: boolean;
 };
 
 export const defaultDropdownMenuProps: Pick<
@@ -84,6 +85,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
     triggerButtonIcon = defaultDropdownMenuProps.triggerButtonIcon,
     triggerButtonIconPosition = defaultDropdownMenuProps.triggerButtonIconPosition,
     compact = false,
+    modal = false,
     ...rest
   }: DropdownMenuProps,
   ref,
@@ -182,7 +184,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
             }, 0);
           }
         }}
-        modal={false}
+        modal={modal}
       >
         <PopoverTrigger
           {...rest}

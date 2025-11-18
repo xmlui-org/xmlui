@@ -108,6 +108,11 @@ export const SelectMd = createMetadata({
       description: `This property enables a clear button that allows the user to clear the selected value(s).`,
       defaultValue: defaultProps.clearable,
     },
+    modal: {
+      isInternal: true,
+      description: "internal radix modal prop",
+      valueType: "boolean"
+    }
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -215,6 +220,7 @@ export const selectComponentRenderer = createComponentRenderer(
         emptyListTemplate={renderChild(node.props.emptyListTemplate)}
         dropdownHeight={extractValue(node.props.dropdownHeight)}
         required={extractValue.asOptionalBoolean(node.props.required)}
+        modal={extractValue.asOptionalBoolean(node.props.modal)}
         valueRenderer={
           node.props.valueTemplate
             ? (item, removeItem) => {

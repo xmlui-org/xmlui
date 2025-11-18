@@ -71,6 +71,11 @@ export const DropdownMenuMd = createMetadata({
       valueType: "string",
       availableValues: iconPositionMd,
     },
+    modal: {
+      isInternal: true,
+      description: "internal radix modal prop",
+      valueType: "boolean"
+    }
   },
   events: {
     willOpen: d(
@@ -117,6 +122,7 @@ export const dropdownMenuComponentRenderer = createComponentRenderer(
         triggerButtonVariant={extractValue(node.props.triggerButtonVariant)}
         triggerButtonIcon={extractValue(node.props.triggerButtonIcon)}
         triggerButtonIconPosition={extractValue(node.props.triggerButtonIconPosition)}
+        modal={extractValue.asOptionalBoolean(node.props.modal)}
       >
         {renderChild(node.children)}
       </DropdownMenu>
