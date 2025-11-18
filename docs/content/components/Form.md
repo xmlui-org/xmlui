@@ -235,6 +235,13 @@ This method triggers validation on all form fields without submitting the form. 
 
 **Signature**: `validate(): Promise<{ isValid: boolean, data: Record<string, any>, errors: ValidationResult[], warnings: ValidationResult[], validationResults: Record<string, ValidationResult> }>`
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`buttonRow`**: The container for the form action buttons (e.g., Save, Cancel).
+- **`validationSummary`**: The area displaying validation summary messages for the form.
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]

@@ -51,6 +51,13 @@ This component does not have any events.
 
 This component does not expose any methods.
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`content`**: The content area within the NavPanel component.
+- **`logo`**: The logo area within the NavPanel component.
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]

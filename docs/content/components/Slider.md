@@ -121,6 +121,14 @@ This API retrieves the current value of the `Slider`. You can use it to get the 
 
 **Signature**: `get value(): number | [number, number] | undefined`
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`label`**: The label displayed for the slider.
+- **`thumb`**: The thumb elements of the slider.
+- **`track`**: The track element of the slider.
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]

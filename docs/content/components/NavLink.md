@@ -228,6 +228,12 @@ The following example shows a message and navigates to the "/status" link after 
 
 This component does not expose any methods.
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`indicator`**: The active indicator within the NavLink component.
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]

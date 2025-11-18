@@ -134,6 +134,13 @@ This event fires when the component is resized.
 
 This component does not expose any methods.
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`primaryPanel`**: The primary section/panel of the `Splitter` component.
+- **`secondaryPanel`**: The secondary section/panel of the `Splitter` component.
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]

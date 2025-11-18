@@ -175,6 +175,14 @@ Moves to the previous page
 
 **Signature**: `movePrev(): void`
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`buttonRow`**: The container for pagination buttons.
+- **`pageInfo`**: The container for page information display.
+- **`pageSizeSelector`**: The container for the page size selector dropdown.
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]

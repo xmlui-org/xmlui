@@ -256,6 +256,13 @@ and note how the `Text` component displays the selected file's name:
 </App>
 ```
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`input`**: The file input area displaying selected file names.
+- **`label`**: The label displayed for the file input.
+
 ## Styling [#styling]
 
 The `FileInput` component does not theme variables directly.

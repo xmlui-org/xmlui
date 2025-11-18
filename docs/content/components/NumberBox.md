@@ -367,6 +367,8 @@ The component has some parts that can be styled through layout properties and th
 - **`endAdornment`**: The adornment displayed at the end of the text box.
 - **`input`**: The text box input area.
 - **`label`**: The label displayed for the text box.
+- **`spinnerButtonDown`**: The spinner button for decrementing the value.
+- **`spinnerButtonUp`**: The spinner button for incrementing the value.
 - **`startAdornment`**: The adornment displayed at the start of the text box.
 
 ## Styling [#styling]

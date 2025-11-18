@@ -71,6 +71,12 @@ This method toggles the item's expanded state.
 
 **Signature**: `toggle(): void`
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`summary`**: The summary section that is always visible and acts as the trigger.
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]

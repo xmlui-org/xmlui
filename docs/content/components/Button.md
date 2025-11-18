@@ -258,6 +258,12 @@ This event is triggered when the Button has lost the focus.
 
 This component does not expose any methods.
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`icon`**: The icon displayed within the button, if any.
+
 ## Styling [#styling]
 
 ### Fixed width and height [#fixed-width-and-height]
