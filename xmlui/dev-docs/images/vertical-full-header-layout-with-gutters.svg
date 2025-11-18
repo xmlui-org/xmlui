@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 640" width="840" height="640">
+  <defs>
+    <style>
+      /* Backgrounds */
+      .container-bg { fill: #f8f9fa; }
+      .gutter { fill: #e9ecef; }
+      
+      /* Blocks - FILL ONLY, NO STROKE */
+      .header { fill: #d0d0d0; }
+      .nav { fill: #e0e0e0; }
+      .content { fill: #ffffff; }
+      .footer { fill: #d0d0d0; }
+      
+      /* Borders */
+      .main-screen-border { stroke: #333; stroke-width: 2; fill: none; }
+      .block-border { stroke: #333; stroke-width: 1; fill: none; }
+      .gutter-edge { stroke: #666; stroke-width: 1; stroke-dasharray: 4,2; fill: none; }
+      
+      /* Text */
+      .text { font-family: Arial, sans-serif; font-size: 14px; fill: #333; text-anchor: start; font-style: italic; }
+      .text-center { font-family: Arial, sans-serif; font-size: 14px; fill: #666; text-anchor: middle; font-style: italic; }
+    </style>
+  </defs>
+  
+  <!-- Canvas background -->
+  <rect class="container-bg" x="0" y="0" width="840" height="640" rx="4"/>
+  
+  <!-- Header (full width, sticky) -->
+  <rect class="header" x="20" y="20" width="800" height="45"/>
+  <line class="block-border" x1="20" y1="65" x2="820" y2="65"/>
+  <text class="text" x="30" y="47">H: Header (docked to top, full width)</text>
+  
+  <!-- NavPanel (left side, below header, sticky) -->
+  <rect class="nav" x="20" y="65" width="200" height="510"/>
+  <line class="block-border" x1="220" y1="65" x2="220" y2="575"/>
+  <text class="text" x="30" y="92">N: Navigation Panel</text>
+  <text class="text" x="30" y="110">(docked to left)</text>
+  
+  <!-- Left gutter (Main Content area only) -->
+  <rect class="gutter" x="220" y="65" width="15" height="510"/>
+  <line class="gutter-edge" x1="235" y1="65" x2="235" y2="575"/>
+  
+  <!-- Main Content (right side, narrowed by gutters) -->
+  <rect class="content" x="235" y="65" width="570" height="510"/>
+  <text class="text" x="245" y="92">M: Main Content</text>
+  
+  <!-- Remaining space indicator -->
+  <rect fill="#eeeeee" x="235" y="450" width="570" height="125"/>
+  <text class="text-center" x="520" y="512">Remaining space</text>
+  
+  <!-- Right gutter (Main Content area only) -->
+  <rect class="gutter" x="805" y="65" width="15" height="510"/>
+  <line class="gutter-edge" x1="805" y1="65" x2="805" y2="575"/>
+  
+  <!-- Footer (full width, sticky) -->
+  <rect class="footer" x="20" y="575" width="800" height="45"/>
+  <line class="block-border" x1="20" y1="575" x2="820" y2="575"/>
+  <text class="text" x="30" y="602">F: Footer (docked to bottom, full width)</text>
+  
+  <!-- Main screen border (FINAL ELEMENT - draws on top) -->
+  <rect class="main-screen-border" x="20" y="20" width="800" height="600"/>
+</svg>

@@ -1603,34 +1603,3 @@ All desktop layout diagrams share the following common characteristics:
 Variants with overflow:
 
 <img src="images/desktop-layout-overflow-top.svg" alt="Desktop Layout with Overflow (Top)" width="420" /> <img src="images/desktop-layout-overflow-bottom.svg" alt="Desktop Layout with Overflow (Bottom)" width="420" />
-
-### Desktop Layout without Header and Footer
-
-- Minimal configuration with only Main Content block
-
-![Desktop Layout Minimal (No Overflow)](images/desktop-layout-minimal-no-overflow.svg)
-
-Variants with overflow:
-
-<img src="images/desktop-layout-minimal-overflow-top.svg" alt="Desktop Layout Minimal with Overflow (Top)" width="420" /> <img src="images/desktop-layout-minimal-overflow-bottom.svg" alt="Desktop Layout Minimal with Overflow (Bottom)" width="420" />
-
-### Desktop Layout with Header Only
-
-- Configuration with Header and Main Content, no Footer
-
-![Desktop Layout Header Only (No Overflow)](images/desktop-layout-header-only-no-overflow.svg)
-
-Variants with overflow:
-
-<img src="images/desktop-layout-header-only-overflow-top.svg" alt="Desktop Layout Header Only with Overflow (Top)" width="420" /> <img src="images/desktop-layout-header-only-overflow-bottom.svg" alt="Desktop Layout Header Only with Overflow (Bottom)" width="420" />
-
-### Desktop Layout with Footer Only
-
-- Configuration with Main Content and Footer, no Header
-
-![Desktop Layout Footer Only (No Overflow)](images/desktop-layout-footer-only-no-overflow.svg)
-
-Variants with overflow:
-
-<img src="images/desktop-layout-footer-only-overflow-top.svg" alt="Desktop Layout Footer Only with Overflow (Top)" width="420" /> <img src="images/desktop-layout-footer-only-overflow-bottom.svg" alt="Desktop Layout Footer Only with Overflow (Bottom)" width="420" />
-

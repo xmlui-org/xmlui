@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 840">
+  <defs>
+    <style>
+      /* Backgrounds */
+      .container-bg { fill: #f8f9fa; }
+      
+      /* Blocks - FILL ONLY, NO STROKE */
+      .header { fill: #d0d0d0; }
+      .nav { fill: #e0e0e0; }
+      .content { fill: #ffffff; }
+      .footer { fill: #d0d0d0; }
+      .overflow-bg { fill: url(#overflowPattern); }
+      
+      /* Borders */
+      .main-screen-border { stroke: #333; stroke-width: 2; fill: none; }
+      .block-border { stroke: #333; stroke-width: 1; fill: none; }
+      .scrollbar-border { stroke: #999; stroke-width: 1; stroke-dasharray: 3,2; fill: none; }
+      
+      /* Scrollbar */
+      .scrollbar { fill: #999; }
+      
+      /* Text */
+      .text { font-family: Arial, sans-serif; font-size: 14px; fill: #333; text-anchor: start; font-style: italic; }
+      .text-overflow { font-family: Arial, sans-serif; font-size: 11px; fill: #666; text-anchor: middle; font-style: italic; }
+    </style>
+    <pattern id="overflowPattern" patternUnits="userSpaceOnUse" width="10" height="10">
+      <rect width="10" height="10" fill="#f5f5f5"/>
+      <path d="M 0,0 L 10,10 M 10,0 L 0,10" stroke="#e8e8e8" stroke-width="1" fill="none"/>
+    </pattern>
+  </defs>
+  
+  <!-- Canvas background -->
+  <rect class="container-bg" x="0" y="0" width="840" height="840" rx="4"/>
+  
+  <!-- Header (full width, sticky) -->
+  <rect class="header" x="20" y="20" width="800" height="45"/>
+  <line class="block-border" x1="20" y1="65" x2="820" y2="65"/>
+  <text class="text" x="30" y="47">H: Header (docked to top, full width)</text>
+  
+  <!-- NavPanel (left side, below header, sticky) -->
+  <rect class="nav" x="20" y="65" width="200" height="510"/>
+  <line class="block-border" x1="220" y1="65" x2="220" y2="575"/>
+  <text class="text" x="30" y="92">N: Navigation Panel</text>
+  <text class="text" x="30" y="110">(docked to left)</text>
+  
+  <!-- Main Content (right side, within viewport) -->
+  <rect class="content" x="220" y="65" width="600" height="510"/>
+  <text class="text" x="230" y="92">M: Main Content</text>
+  
+  <!-- Footer (full width, sticky) -->
+  <rect class="footer" x="20" y="575" width="800" height="45"/>
+  <line class="block-border" x1="20" y1="575" x2="820" y2="575"/>
+  <text class="text" x="30" y="602">F: Footer (docked to bottom, full width)</text>
+  
+  <!-- Overflow area below viewport (Main Content continues) -->
+  <rect class="overflow-bg" x="220" y="620" width="600" height="200"/>
+  <text class="text" x="230" y="650">M: Main Content (overflow)</text>
+  <text class="text-overflow" x="520" y="720">↓ Overflow</text>
+  
+  <!-- Scrollbar (overlays content, no gutter) -->
+  <rect class="scrollbar-border" x="805" y="20" width="15" height="600"/>
+  <rect class="scrollbar" x="807" y="22" width="11" height="154"/>
+  
+  <!-- Main screen border (FINAL ELEMENT - draws on top) -->
+  <rect class="main-screen-border" x="20" y="20" width="800" height="600"/>
+</svg>
