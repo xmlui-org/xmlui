@@ -1703,6 +1703,13 @@ This method selects the row with the specified ID. This method has no effect if 
 
 (See the [example](#clearselection) at the `clearSelection` method)
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`pagination`**: The pagination controls container.
+- **`table`**: The main table container.
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]

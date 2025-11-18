@@ -203,6 +203,12 @@ This method command opens the dropdown.
 </App>
 ```
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`content`**: The content area of the DropdownMenu where menu items are displayed.
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]

@@ -134,6 +134,12 @@ This event is triggered when the RadioGroup has lost the focus.
 
 This component does not expose any methods.
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`label`**: The label displayed for the radio group.
+
 ## Styling [#styling]
 
 `RadioGroup` is a component that governs its children and stores the selected value. It does not support styling; however, you can style the options within the group. When you set the theme variables for the group's options, use the `RadioGroupOption` name.

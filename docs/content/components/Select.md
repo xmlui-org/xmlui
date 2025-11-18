@@ -376,6 +376,8 @@ This API retrieves the current value of the `Select`. You can use it to get the 
 The component has some parts that can be styled through layout properties and theme variables separately:
 
 - **`clearButton`**: The button to clear the selected value(s).
+- **`item`**: Each option item within the Select component.
+- **`menu`**: The dropdown menu within the Select component.
 
 ## Styling [#styling]
 

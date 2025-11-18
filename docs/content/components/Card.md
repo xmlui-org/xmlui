@@ -142,6 +142,14 @@ This event is triggered when the `Card` is clicked.
 
 This component does not expose any methods.
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`avatar`**: The avatar displayed within the card, if any.
+- **`subtitle`**: The subtitle of the card.
+- **`title`**: The title of the card.
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]
