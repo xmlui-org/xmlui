@@ -60,8 +60,7 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
             if (hints?.opaque) {
               return renderedChild;
             }
-            if (node.type === "ChangeListener") {
-              // ChangeListener is invisible in the layout
+            if (hints?.nonVisual) {
               return renderedChild;
             }
             // Handle SpaceFiller as flow item break
