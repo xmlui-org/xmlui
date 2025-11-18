@@ -30,8 +30,12 @@
   <text class="text" x="30" y="47">H/N: Header and Navigation Panel (docked to top)</text>
   
   <!-- Main Content block -->
-  <rect class="content" x="20" y="65" width="800" height="510"/>
+  <rect class="content" x="20" y="65" width="800" height="385"/>
   <text class="text" x="30" y="90">M: Main Content</text>
+  
+  <!-- Remaining space -->
+  <rect fill="#eeeeee" x="20" y="450" width="800" height="125"/>
+  <text class="text" text-anchor="middle" x="420" y="517">Remaining space</text>
   
   <!-- Footer separator line -->
   <line class="block-border" x1="20" y1="575" x2="820" y2="575"/>

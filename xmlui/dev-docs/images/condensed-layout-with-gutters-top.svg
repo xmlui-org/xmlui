@@ -58,12 +58,14 @@
 
   <!-- Bottom overflow: Left gutter -->
   <rect class="gutter overflow-bg" x="20" y="620" width="15" height="175"/>
+  <line class="gutter-edge" x1="35" y1="620" x2="35" y2="795"/>
 
   <!-- Bottom overflow: Main content -->
   <rect class="content overflow-bg" x="35" y="620" width="770" height="175"/>
   <text class="text" x="45" y="645">M: Main Content (overflow)</text>
 
   <!-- Bottom overflow: Right gutter -->
+  <line class="gutter-edge" x1="805" y1="620" x2="805" y2="795"/>
   <rect class="gutter overflow-bg" x="805" y="620" width="15" height="175"/>
 
   <!-- Footer separator line (in overflow area) -->

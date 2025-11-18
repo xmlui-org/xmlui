@@ -32,12 +32,14 @@
 
   <!-- Top overflow: Left gutter -->
   <rect class="gutter overflow-bg" x="20" y="65" width="15" height="155"/>
+  <line class="gutter-edge" x1="35" y1="65" x2="35" y2="220"/>
 
   <!-- Top overflow: Main content -->
   <rect class="content overflow-bg" x="35" y="65" width="770" height="155"/>
   <text class="text" x="45" y="90">M: Main Content (overflow)</text>
 
   <!-- Top overflow: Right gutter -->
+  <line class="gutter-edge" x1="805" y1="65" x2="805" y2="220"/>
   <rect class="gutter overflow-bg" x="805" y="65" width="15" height="155"/>
 
   <!-- Left gutter (in viewport) -->

@@ -30,16 +30,20 @@
   <text class="text" x="30" y="47">H/N: Header and Navigation Panel (docked to top)</text>
   
   <!-- Left gutter -->
-  <rect class="gutter" x="20" y="65" width="15" height="510"/>
-  <line class="gutter-edge" x1="35" y1="65" x2="35" y2="575"/>
+  <rect class="gutter" x="20" y="65" width="15" height="385"/>
+  <line class="gutter-edge" x1="35" y1="65" x2="35" y2="450"/>
   
   <!-- Main Content block -->
-  <rect class="content" x="35" y="65" width="770" height="510"/>
+  <rect class="content" x="35" y="65" width="770" height="385"/>
   <text class="text" x="45" y="90">M: Main Content</text>
   
   <!-- Right gutter edge and gutter -->
-  <line class="gutter-edge" x1="805" y1="65" x2="805" y2="575"/>
-  <rect class="gutter" x="805" y="65" width="15" height="510"/>
+  <line class="gutter-edge" x1="805" y1="65" x2="805" y2="450"/>
+  <rect class="gutter" x="805" y="65" width="15" height="385"/>
+  
+  <!-- Remaining space -->
+  <rect fill="#eeeeee" x="20" y="450" width="800" height="125"/>
+  <text class="text" text-anchor="middle" x="420" y="517">Remaining space</text>
   
   <!-- Footer separator line -->
   <line class="block-border" x1="35" y1="575" x2="805" y2="575"/>

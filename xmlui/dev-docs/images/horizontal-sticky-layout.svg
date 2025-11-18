@@ -30,10 +30,15 @@
   <text class="text" x="30" y="93">N: Navigation Panel (docked to top)</text>
   
   <!-- Main Content block (full width, no gutters) -->
-  <rect class="content" x="20" y="110" width="800" height="465"/>
+  <rect class="content" x="20" y="110" width="800" height="340"/>
+  <line class="block-border" x1="20" y1="450" x2="820" y2="450"/>
   <text class="text" x="30" y="135">M: Main Content</text>
   
-  <!-- Separator: Content|Footer -->
+  <!-- Remaining space with simple shading -->
+  <rect x="20" y="450" width="800" height="125" fill="#eeeeee"/>
+  <text class="text-center" x="420" y="517">Remaining space</text>
+  
+  <!-- Separator: Remaining space|Footer -->
   <line class="block-border" x1="20" y1="575" x2="820" y2="575"/>
   
   <!-- Footer block (docked to bottom, full width) -->

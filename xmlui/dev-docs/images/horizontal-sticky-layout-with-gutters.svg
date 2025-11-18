@@ -29,18 +29,23 @@
   <text class="label" x="30" y="93">N: Navigation Panel (docked to top)</text>
   
   <!-- Left gutter for Main Content area only -->
-  <rect class="gutter" x="20" y="110" width="15" height="465"/>
-  <line class="gutter-edge" x1="35" y1="110" x2="35" y2="575"/>
+  <rect class="gutter" x="20" y="110" width="15" height="340"/>
+  <line class="gutter-edge" x1="35" y1="110" x2="35" y2="450"/>
   
   <!-- Main Content block (with gutters) -->
-  <rect class="content" x="35" y="110" width="770" height="465"/>
+  <rect class="content" x="35" y="110" width="770" height="340"/>
+  <line class="block-border" x1="35" y1="450" x2="805" y2="450"/>
   <text class="label" x="45" y="135">M: Main Content</text>
   
   <!-- Right gutter for Main Content area only -->
-  <line class="gutter-edge" x1="805" y1="110" x2="805" y2="575"/>
-  <rect class="gutter" x="805" y="110" width="15" height="465"/>
+  <line class="gutter-edge" x1="805" y1="110" x2="805" y2="450"/>
+  <rect class="gutter" x="805" y="110" width="15" height="340"/>
   
-  <!-- Separator: Content|Footer -->
+  <!-- Remaining space with simple shading -->
+  <rect x="20" y="450" width="800" height="125" fill="#eeeeee"/>
+  <text class="label-center" x="420" y="517">Remaining space</text>
+  
+  <!-- Separator: Remaining space|Footer -->
   <line class="block-border" x1="20" y1="575" x2="820" y2="575"/>
   
   <!-- Footer block (docked to bottom, full width) -->

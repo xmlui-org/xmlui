@@ -33,18 +33,18 @@
   <text class="text" x="30" y="90">M: Main Content (overflow)</text>
 
   <!-- Main Content block (visible portion at bottom scroll) -->
-  <rect class="content" x="20" y="220" width="800" height="355"/>
+  <rect class="content" x="20" y="220" width="800" height="555"/>
   <text class="text" x="30" y="245">M: Main Content (scrollable, end)</text>
 
   <!-- Overflow indicator -->
   <text class="text-overflow" x="420" y="240">↑ Overflow</text>
 
-  <!-- Footer separator line (in viewport) -->
-  <line class="block-border" x1="20" y1="575" x2="820" y2="575"/>
+  <!-- Footer separator line (in viewport at bottom) -->
+  <line class="block-border" x1="20" y1="775" x2="820" y2="775"/>
 
-  <!-- Footer block (in viewport) -->
-  <rect class="footer" x="20" y="575" width="800" height="45"/>
-  <text class="text" x="30" y="602">F: Footer</text>
+  <!-- Footer block (in viewport at bottom) -->
+  <rect class="footer" x="20" y="775" width="800" height="45"/>
+  <text class="text" x="30" y="802">F: Footer</text>
 
   <!-- Scrollbar separator line -->
   <line class="scrollbar-border" x1="805" y1="220" x2="805" y2="820"/>

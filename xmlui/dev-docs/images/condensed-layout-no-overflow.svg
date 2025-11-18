@@ -8,6 +8,7 @@
       .main-screen-border { stroke: #333; stroke-width: 2; fill: none; }
       .block-border { stroke: #333; stroke-width: 1; fill: none; }
       .text { font-family: Arial, sans-serif; font-size: 14px; fill: #333; text-anchor: start; font-style: italic; }
+      .text-center { font-family: Arial, sans-serif; font-size: 14px; fill: #666; text-anchor: middle; font-style: italic; }
     </style>
   </defs>
 
@@ -20,9 +21,14 @@
   <text class="text" x="30" y="47">H/N: Header and Navigation Panel</text>
 
   <!-- Main Content block -->
-  <rect class="content" x="20" y="65" width="800" height="510"/>
+  <rect class="content" x="20" y="65" width="800" height="385"/>
+  <line class="block-border" x1="20" y1="450" x2="820" y2="450"/>
   <text class="text" x="30" y="90">M: Main Content</text>
-
+  
+  <!-- Remaining space with simple shading -->
+  <rect x="20" y="450" width="800" height="125" fill="#eeeeee"/>
+  <text class="text-center" x="420" y="517">Remaining space</text>
+  
   <!-- Footer separator line -->
   <line class="block-border" x1="20" y1="575" x2="820" y2="575"/>
 

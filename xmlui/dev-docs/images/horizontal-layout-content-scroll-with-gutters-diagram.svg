@@ -10,6 +10,7 @@
     .gutter { fill: #e9ecef; }
     .gutter-edge { stroke: #666; stroke-width: 1; stroke-dasharray: 4,2; fill: none; }
     .text { font-family: Arial, sans-serif; font-size: 14px; fill: #333; text-anchor: start; font-style: italic; }
+    .text-center { font-family: Arial, sans-serif; font-size: 14px; fill: #666; text-anchor: middle; font-style: italic; }
   </style>
   
   <!-- Background -->
@@ -29,19 +30,24 @@
   <!-- Separator between Navigation Panel and Main Content -->
   <line x1="20" y1="110" x2="820" y2="110" class="block-border"/>
   
-  <!-- Left gutter -->
-  <rect class="gutter" x="20" y="110" width="15" height="465"/>
-  <line x1="35" y1="110" x2="35" y2="575" class="gutter-edge"/>
+  <!-- Left gutter (reduced height to match content) -->
+  <rect class="gutter" x="20" y="110" width="15" height="340"/>
+  <line x1="35" y1="110" x2="35" y2="450" class="gutter-edge"/>
   
   <!-- Main Content block (between gutters) -->
-  <rect class="content" x="35" y="110" width="770" height="465"/>
+  <rect class="content" x="35" y="110" width="770" height="340"/>
+  <line class="block-border" x1="35" y1="450" x2="805" y2="450"/>
   <text class="text" x="45" y="140">M: Main Content</text>
   
-  <!-- Right gutter -->
-  <line x1="805" y1="110" x2="805" y2="575" class="gutter-edge"/>
-  <rect class="gutter" x="805" y="110" width="15" height="465"/>
+  <!-- Right gutter (reduced height to match content) -->
+  <line x1="805" y1="110" x2="805" y2="450" class="gutter-edge"/>
+  <rect class="gutter" x="805" y="110" width="15" height="340"/>
   
-  <!-- Separator between Main Content and Footer -->
+  <!-- Remaining space with simple shading -->
+  <rect x="20" y="450" width="800" height="125" fill="#eeeeee"/>
+  <text class="text-center" x="420" y="517">Remaining space</text>
+  
+  <!-- Separator between Remaining space and Footer -->
   <line x1="20" y1="575" x2="820" y2="575" class="block-border"/>
   
   <!-- Footer block (full width, static) -->

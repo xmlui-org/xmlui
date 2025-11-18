@@ -52,8 +52,12 @@
   <text class="text" x="30" y="602">F: Footer</text>
 
   <!-- Bottom overflow: Main content -->
-  <rect class="content overflow-bg" x="20" y="620" width="800" height="220"/>
+  <rect class="content overflow-bg" x="20" y="620" width="785" height="220"/>
   <text class="text" x="30" y="650">M: Main Content (overflow)</text>
+
+  <!-- Scrollbar in overflow area -->
+  <line class="scrollbar-border" x1="805" y1="620" x2="805" y2="840"/>
+  <rect fill="#e0e0e0" x="805" y="620" width="15" height="220"/>
 
   <!-- Main screen border (drawn last) -->
   <rect class="main-screen-border" x="20" y="20" width="800" height="600"/>
