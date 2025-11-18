@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 840" width="840" height="840">
+  <defs>
+    <style>
+      .container-bg { fill: #f8f9fa; }
+      .header { fill: #d0d0d0; }
+      .nav { fill: #e0e0e0; }
+      .content { fill: #ffffff; }
+      .footer { fill: #d0d0d0; }
+      .overflow-bg { fill: url(#overflowPattern); }
+      .main-screen-border { stroke: #333; stroke-width: 2; fill: none; }
+      .block-border { stroke: #333; stroke-width: 1; fill: none; }
+      .scrollbar-track { fill: #e0e0e0; }
+      .scrollbar-thumb { fill: #999; }
+      .scrollbar-border { stroke: #999; stroke-width: 1; stroke-dasharray: 3,2; fill: none; }
+      .text { font-family: Arial, sans-serif; font-size: 14px; fill: #333; text-anchor: start; font-style: italic; }
+      .text-overflow { font-family: Arial, sans-serif; font-size: 11px; fill: #666; text-anchor: middle; font-style: italic; }
+    </style>
+    <pattern id="overflowPattern" patternUnits="userSpaceOnUse" width="10" height="10">
+      <rect width="10" height="10" fill="#f5f5f5"/>
+      <path d="M 0,0 L 10,10 M 10,0 L 0,10" stroke="#e8e8e8" stroke-width="1" fill="none"/>
+    </pattern>
+  </defs>
+
+  <!-- Canvas Background -->
+  <rect width="840" height="840" class="container-bg"/>
+
+  <!-- Overflow Content (above viewport) -->
+  <rect x="20" y="20" width="800" height="200" class="content overflow-bg"/>
+
+  <!-- Header (docked, full width) -->
+  <rect x="20" y="220" width="800" height="45" class="header"/>
+  
+  <!-- Navigation Panel (docked, full width) -->
+  <rect x="20" y="265" width="800" height="45" class="nav"/>
+  
+  <!-- Main Content (bottom scroll position, full width) -->
+  <rect x="20" y="310" width="800" height="465" class="content"/>
+  
+  <!-- Footer (docked, full width) -->
+  <rect x="20" y="775" width="800" height="45" class="footer"/>
+
+  <!-- Block Separator Lines -->
+  <line x1="20" y1="265" x2="820" y2="265" class="block-border"/>
+  <line x1="20" y1="310" x2="820" y2="310" class="block-border"/>
+  <line x1="20" y1="775" x2="820" y2="775" class="block-border"/>
+
+  <!-- Text Labels -->
+  <text x="30" y="145" class="text">M: Overflow content (above)</text>
+  <text x="30" y="247" class="text">H: Header (docked)</text>
+  <text x="30" y="292" class="text">N: Navigation Panel (docked)</text>
+  <text x="30" y="337" class="text">M: Main Content (scrollable)</text>
+  <text x="30" y="802" class="text">F: Footer (docked)</text>
+
+  <!-- Overflow Indicator -->
+  <text x="420" y="330" class="text-overflow">↑ Overflow</text>
+
+  <!-- Scrollbar Separator Line -->
+  <line x1="805" y1="310" x2="805" y2="775" class="scrollbar-border"/>
+
+  <!-- Scrollbar Track -->
+  <rect x="805" y="310" width="15" height="465" class="scrollbar-track"/>
+
+  <!-- Scrollbar Thumb (bottom position) -->
+  <rect x="807" y="652" width="11" height="119" class="scrollbar-thumb"/>
+
+  <!-- Main Screen Border (draw last) -->
+  <rect x="20" y="220" width="800" height="600" class="main-screen-border"/>
+</svg>
