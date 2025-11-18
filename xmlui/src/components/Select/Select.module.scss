@@ -314,7 +314,6 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
    */
 
   .selectContent {
-    z-index: 1000;
     outline: none;
     overflow: auto;
     background-color: $backgroundColor-menu-Select;
@@ -447,7 +446,6 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     position: relative;
     width: 100%;
     max-height: 280px;
-    z-index: 1000;
     overflow: auto;
     background-color: $backgroundColor-menu-Select;
     border-radius: $borderRadius-menu-Select;

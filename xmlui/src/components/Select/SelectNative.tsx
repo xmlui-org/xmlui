@@ -89,6 +89,7 @@ interface SelectProps {
   updateState?: UpdateStateFn;
   registerComponentApi?: RegisterComponentApiFn;
   children?: ReactNode;
+  modal?: boolean;
 }
 
 // Common trigger value display props
@@ -253,7 +254,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     updateState = noop,
     registerComponentApi,
     children,
-
+    modal,
     ...rest
   },
   forwardedRef,
@@ -542,7 +543,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
               // Reset highlighted option when dropdown closes
               setSelectedIndex(-1);
             }}
-            modal={false}
+            modal={modal}
           >
             <Part partId={PART_LIST_WRAPPER}>
               <PopoverTrigger
