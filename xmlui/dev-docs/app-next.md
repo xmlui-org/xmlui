@@ -36,6 +36,15 @@ This document analyzes the current App component implementation and proposes a n
    - Sub-Block Component Specifications
    - Component Usage Approaches
    - When to Use Each Approach
+5. Screen Layout Diagrams
+   - Horizontal Layout Diagrams
+   - Horizontal-Sticky Layout Diagrams
+   - Condensed Layout Diagrams
+   - Condensed-Sticky Layout Diagrams
+   - Vertical Layout Diagrams
+   - Vertical-Sticky Layout Diagrams
+   - Vertical-Full-Header Layout Diagrams
+   - Desktop Layout Diagrams
 
 ---
 
@@ -1454,3 +1463,174 @@ Variants with overflow:
 Variants with overflow:
 
 <img src="images/vertical-layout-content-scroll-with-gutters-overflow-top.svg" alt="Vertical Layout with Content-Only Scroll and Gutters (Top)" width="420" /> <img src="images/vertical-layout-content-scroll-with-gutters-overflow-bottom.svg" alt="Vertical Layout with Content-Only Scroll and Gutters (Bottom)" width="420" />
+
+## Vertical-Sticky Layout Diagrams
+
+**`layout`: "vertical-sticky"**
+
+All vertical-sticky layout diagrams share the following common characteristics:
+
+- **Navigation Panel Position**: The Navigation Panel (N) is positioned to the left of the Main Content (M) with sticky positioning
+- **Header Sticky**: The Header (H) is always docked to the top of the right column using sticky positioning
+- **Footer Sticky**: The Footer (F) is always docked to the bottom of the right column using sticky positioning
+- **Layout Structure**: NavPanel (N) on the left spanning full height, then Header (H), Main Content (M), and Footer (F) stacked vertically on the right
+- **Content Scroll**: Only the Main Content (M) area scrolls between the sticky header and footer
+- **Scroll Container**: Can be either the App Container (C) when `scrollWholePage=true` or the Main Content block (M) when `scrollWholePage=false`
+
+### Vertical-Sticky Layout (scroll parent: app container, no scrollbar gutters)
+
+- `noScrollbarGutters`: true
+- `scrollWholePage`: true
+
+![Vertical-Sticky Layout (No Overflow)](images/vertical-sticky-layout-no-gutters.svg)
+
+Variants with overflow:
+
+<img src="images/vertical-sticky-layout-no-gutters-overflow-top.svg" alt="Vertical-Sticky Layout with Overflow (Top)" width="420" /> <img src="images/vertical-sticky-layout-no-gutters-overflow-bottom.svg" alt="Vertical-Sticky Layout with Overflow (Bottom)" width="420" />
+
+### Vertical-Sticky Layout (scroll parent: app container, scrollbar gutters)
+
+- `noScrollbarGutters`: false
+- `scrollWholePage`: true
+
+![Vertical-Sticky Layout with Gutters (No Overflow)](images/vertical-sticky-layout-with-gutters.svg)
+
+Variants with overflow:
+
+<img src="images/vertical-sticky-layout-with-gutters-overflow-top.svg" alt="Vertical-Sticky Layout with Gutters and Overflow (Top)" width="420" /> <img src="images/vertical-sticky-layout-with-gutters-overflow-bottom.svg" alt="Vertical-Sticky Layout with Gutters and Overflow (Bottom)" width="420" />
+
+### Vertical-Sticky Layout (scroll parent: main content, no scrollbar gutters)
+
+- `noScrollbarGutters`: true
+- `scrollWholePage`: false
+
+![Vertical-Sticky Layout with Content-Only Scroll (No Overflow)](images/vertical-sticky-content-scroll-no-gutters.svg)
+
+Variants with overflow:
+
+<img src="images/vertical-sticky-content-scroll-no-gutters-overflow-top.svg" alt="Vertical-Sticky Layout with Content-Only Scroll (Top)" width="420" /> <img src="images/vertical-sticky-content-scroll-no-gutters-overflow-bottom.svg" alt="Vertical-Sticky Layout with Content-Only Scroll (Bottom)" width="420" />
+
+### Vertical-Sticky Layout (scroll parent: main content, scrollbar gutters)
+
+- `noScrollbarGutters`: false
+- `scrollWholePage`: false
+
+![Vertical-Sticky Layout with Content-Only Scroll and Gutters (No Overflow)](images/vertical-sticky-content-scroll-with-gutters.svg)
+
+Variants with overflow:
+
+<img src="images/vertical-sticky-content-scroll-with-gutters-overflow-top.svg" alt="Vertical-Sticky Layout with Content-Only Scroll and Gutters (Top)" width="420" /> <img src="images/vertical-sticky-content-scroll-with-gutters-overflow-bottom.svg" alt="Vertical-Sticky Layout with Content-Only Scroll and Gutters (Bottom)" width="420" />
+
+## Vertical-Full-Header Layout Diagrams
+
+**`layout`: "vertical-full-header"**
+
+All vertical-full-header layout diagrams share the following common characteristics:
+
+- **Header Full Width**: The Header (H) spans the entire viewport width at the top with sticky positioning
+- **Footer Full Width**: The Footer (F) spans the entire viewport width at the bottom with sticky positioning
+- **Navigation Panel Position**: The Navigation Panel (N) is positioned to the left of the Main Content (M), below the header and above the footer
+- **Layout Structure**: Header (H) spanning full width at top, then NavPanel (N) on left and Main Content (M) on right in middle row, Footer (F) spanning full width at bottom
+- **Sticky Elements**: Header and Footer are sticky to viewport edges, NavPanel is sticky within its column
+- **Content Scroll**: Only the Main Content (M) area scrolls, constrained by the sticky header and footer
+- **Scroll Container**: Typically uses content-only scroll (`scrollWholePage=false`) due to sticky positioning requirements
+
+### Vertical-Full-Header Layout (scroll parent: app container, no scrollbar gutters)
+
+- `noScrollbarGutters`: true
+- `scrollWholePage`: true
+
+![Vertical-Full-Header Layout (No Overflow)](images/vertical-full-header-layout-no-gutters.svg)
+
+Variants with overflow:
+
+<img src="images/vertical-full-header-layout-no-gutters-overflow-top.svg" alt="Vertical-Full-Header Layout with Overflow (Top)" width="420" /> <img src="images/vertical-full-header-layout-no-gutters-overflow-bottom.svg" alt="Vertical-Full-Header Layout with Overflow (Bottom)" width="420" />
+
+### Vertical-Full-Header Layout (scroll parent: app container, scrollbar gutters)
+
+- `noScrollbarGutters`: false
+- `scrollWholePage`: true
+
+![Vertical-Full-Header Layout with Gutters (No Overflow)](images/vertical-full-header-layout-with-gutters.svg)
+
+Variants with overflow:
+
+<img src="images/vertical-full-header-layout-with-gutters-overflow-top.svg" alt="Vertical-Full-Header Layout with Gutters and Overflow (Top)" width="420" /> <img src="images/vertical-full-header-layout-with-gutters-overflow-bottom.svg" alt="Vertical-Full-Header Layout with Gutters and Overflow (Bottom)" width="420" />
+
+### Vertical-Full-Header Layout (scroll parent: main content, no scrollbar gutters)
+
+- `noScrollbarGutters`: true
+- `scrollWholePage`: false
+
+![Vertical-Full-Header Layout with Content-Only Scroll (No Overflow)](images/vertical-full-header-content-scroll-no-gutters.svg)
+
+Variants with overflow:
+
+<img src="images/vertical-full-header-content-scroll-no-gutters-overflow-top.svg" alt="Vertical-Full-Header Layout with Content-Only Scroll (Top)" width="420" /> <img src="images/vertical-full-header-content-scroll-no-gutters-overflow-bottom.svg" alt="Vertical-Full-Header Layout with Content-Only Scroll (Bottom)" width="420" />
+
+### Vertical-Full-Header Layout (scroll parent: main content, scrollbar gutters)
+
+- `noScrollbarGutters`: false
+- `scrollWholePage`: false
+
+![Vertical-Full-Header Layout with Content-Only Scroll and Gutters (No Overflow)](images/vertical-full-header-content-scroll-with-gutters.svg)
+
+Variants with overflow:
+
+<img src="images/vertical-full-header-content-scroll-with-gutters-overflow-top.svg" alt="Vertical-Full-Header Layout with Content-Only Scroll and Gutters (Top)" width="420" /> <img src="images/vertical-full-header-content-scroll-with-gutters-overflow-bottom.svg" alt="Vertical-Full-Header Layout with Content-Only Scroll and Gutters (Bottom)" width="420" />
+
+## Desktop Layout Diagrams
+
+**`layout`: "desktop"**
+
+All desktop layout diagrams share the following common characteristics:
+
+- **Full Viewport**: The App Container (C) stretches to 100vw × 100vh (or 100% × 100% when nested in iframe)
+- **Zero Padding/Margins**: All blocks have zero padding and margins for maximum screen utilization
+- **No Navigation Panel**: The Navigation Panel (N) is not rendered in desktop layout
+- **Minimal Structure**: Only Header (H, optional), Main Content (M), and Footer (F, optional) blocks are used
+- **Content-Only Scroll**: Main Content (M) is always the scroll container (`scrollWholePage=false` effectively)
+- **No Scrollbar Gutters**: Desktop layout ignores `noScrollbarGutters` setting and never reserves gutter space
+- **Sticky Positioning**: Header and Footer use sticky positioning relative to the viewport
+
+### Desktop Layout (no scrollbar gutters, content scroll)
+
+- `noScrollbarGutters`: ignored (always true)
+- `scrollWholePage`: ignored (always false)
+
+![Desktop Layout (No Overflow)](images/desktop-layout-no-overflow.svg)
+
+Variants with overflow:
+
+<img src="images/desktop-layout-overflow-top.svg" alt="Desktop Layout with Overflow (Top)" width="420" /> <img src="images/desktop-layout-overflow-bottom.svg" alt="Desktop Layout with Overflow (Bottom)" width="420" />
+
+### Desktop Layout without Header and Footer
+
+- Minimal configuration with only Main Content block
+
+![Desktop Layout Minimal (No Overflow)](images/desktop-layout-minimal-no-overflow.svg)
+
+Variants with overflow:
+
+<img src="images/desktop-layout-minimal-overflow-top.svg" alt="Desktop Layout Minimal with Overflow (Top)" width="420" /> <img src="images/desktop-layout-minimal-overflow-bottom.svg" alt="Desktop Layout Minimal with Overflow (Bottom)" width="420" />
+
+### Desktop Layout with Header Only
+
+- Configuration with Header and Main Content, no Footer
+
+![Desktop Layout Header Only (No Overflow)](images/desktop-layout-header-only-no-overflow.svg)
+
+Variants with overflow:
+
+<img src="images/desktop-layout-header-only-overflow-top.svg" alt="Desktop Layout Header Only with Overflow (Top)" width="420" /> <img src="images/desktop-layout-header-only-overflow-bottom.svg" alt="Desktop Layout Header Only with Overflow (Bottom)" width="420" />
+
+### Desktop Layout with Footer Only
+
+- Configuration with Main Content and Footer, no Header
+
+![Desktop Layout Footer Only (No Overflow)](images/desktop-layout-footer-only-no-overflow.svg)
+
+Variants with overflow:
+
+<img src="images/desktop-layout-footer-only-overflow-top.svg" alt="Desktop Layout Footer Only with Overflow (Top)" width="420" /> <img src="images/desktop-layout-footer-only-overflow-bottom.svg" alt="Desktop Layout Footer Only with Overflow (Bottom)" width="420" />
+
