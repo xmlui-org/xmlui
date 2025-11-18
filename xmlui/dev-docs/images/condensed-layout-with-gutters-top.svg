@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 840" width="840" height="840">
+  <defs>
+    <style>
+      .container-bg { fill: #f8f9fa; }
+      .header-nav { fill: #d0d0d0; }
+      .content { fill: #ffffff; }
+      .footer { fill: #d0d0d0; }
+      .gutter { fill: #e9ecef; }
+      .overflow-bg { fill: url(#overflowPattern); }
+      .main-screen-border { stroke: #333; stroke-width: 2; fill: none; }
+      .block-border { stroke: #333; stroke-width: 1; fill: none; }
+      .gutter-edge { stroke: #666; stroke-width: 1; stroke-dasharray: 4,2; fill: none; }
+      .scrollbar-track { fill: #e0e0e0; }
+      .scrollbar-thumb { fill: #999; }
+      .scrollbar-border { stroke: #999; stroke-width: 1; stroke-dasharray: 3,2; fill: none; }
+      .text { font-family: Arial, sans-serif; font-size: 14px; fill: #333; text-anchor: start; font-style: italic; }
+      .text-overflow { font-family: Arial, sans-serif; font-size: 11px; fill: #666; text-anchor: middle; font-style: italic; }
+    </style>
+    <pattern id="overflowPattern" patternUnits="userSpaceOnUse" width="10" height="10">
+      <rect width="10" height="10" fill="#f5f5f5"/>
+      <path d="M 0,0 L 10,10 M 10,0 L 0,10" stroke="#e8e8e8" stroke-width="1" fill="none"/>
+    </pattern>
+  </defs>
+
+  <!-- Canvas Background -->
+  <rect width="840" height="840" class="container-bg"/>
+
+  <!-- MAIN SCREEN VIEWPORT (800x600) -->
+  
+  <!-- Header/NavPanel Combined (full width, no gutters) -->
+  <rect x="20" y="20" width="800" height="45" class="header-nav"/>
+  <text x="30" y="47" class="text">H/N: Header and Navigation Panel</text>
+  
+  <!-- Separator between Header/NavPanel and Main Content area -->
+  <line x1="20" y1="65" x2="820" y2="65" class="block-border"/>
+  
+  <!-- Left gutter for main content area (visible in viewport) -->
+  <rect class="gutter" x="20" y="65" width="15" height="510"/>
+  <line x1="35" y1="65" x2="35" y2="575" class="gutter-edge"/>
+  
+  <!-- Main Content block visible in viewport (between gutters) -->
+  <rect x="35" y="65" width="770" height="510" class="content"/>
+  <text x="45" y="92" class="text">M: Main Content (scrollable)</text>
+  
+  <!-- Bottom overflow indicator -->
+  <text x="420" y="555" class="text-overflow">↓ Overflow</text>
+  
+  <!-- Separator between Main Content area and Footer -->
+  <line x1="35" y1="575" x2="805" y2="575" class="block-border"/>
+  
+  <!-- Footer (full width, no gutters) -->
+  <rect x="20" y="575" width="800" height="45" class="footer"/>
+  <text x="30" y="602" class="text">F: Footer</text>
+  
+  <!-- Scrollbar separator line (dashed line for visual separation) -->
+  <line x1="805" y1="20" x2="805" y2="620" class="scrollbar-border"/>
+  
+  <!-- Scrollbar track (overlays right gutter, 15px wide, viewport height) -->
+  <rect x="805" y="20" width="15" height="600" class="scrollbar-track"/>
+  
+  <!-- Scrollbar thumb at top position -->
+  <rect x="807" y="20" width="11" height="154" class="scrollbar-thumb"/>
+  
+  <!-- OVERFLOW AREA (below viewport at y=620) -->
+  
+  <!-- Left gutter continues in overflow -->
+  <rect class="gutter" x="20" y="620" width="15" height="200"/>
+  <line x1="35" y1="620" x2="35" y2="820" class="gutter-edge"/>
+  
+  <!-- Main Content continues in overflow (with overflow pattern) -->
+  <rect x="35" y="620" width="770" height="200" class="overflow-bg"/>
+  <text x="45" y="645" class="text">M: Overflow content</text>
+  
+  <!-- Right gutter continues in overflow (no scrollbar here) -->
+  <rect class="gutter" x="805" y="620" width="15" height="200"/>
+  <line x1="805" y1="620" x2="805" y2="820" class="gutter-edge"/>
+
+  <!-- Main Screen Border (draw last) -->
+  <rect x="20" y="20" width="800" height="600" class="main-screen-border"/>
+</svg>

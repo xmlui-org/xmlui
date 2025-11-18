@@ -41,24 +41,24 @@
   <line x1="20" y1="110" x2="820" y2="110" class="block-border"/>
   
   <!-- Main Content block visible in viewport -->
-  <rect class="content" x="20" y="110" width="800" height="465"/>
+  <rect class="content" x="20" y="110" width="800" height="510"/>
   <text class="text" x="30" y="140">M: Main Content</text>
   
   <!-- Bottom overflow indicator -->
-  <text class="text-overflow" x="420" y="545">↓ Overflow</text>
-  
-  <!-- Separator between Main Content and Footer -->
-  <line x1="20" y1="575" x2="820" y2="575" class="block-border"/>
-  
-  <!-- Footer block in viewport -->
-  <rect class="footer" x="20" y="575" width="800" height="45"/>
-  <text class="text" x="30" y="603">F: Footer</text>
+  <text class="text-overflow" x="420" y="590">↓ Overflow</text>
   
   <!-- OVERFLOW AREA (below viewport at y=620) -->
   
   <!-- Main Content continues in overflow (with overflow pattern) -->
-  <rect x="20" y="620" width="800" height="200" class="overflow-bg"/>
+  <rect x="20" y="620" width="800" height="155" class="overflow-bg"/>
   <text class="text" x="30" y="650">M: Main Content (overflow)</text>
+  
+  <!-- Separator between Main Content and Footer -->
+  <line x1="20" y1="775" x2="820" y2="775" class="block-border"/>
+  
+  <!-- Footer block in overflow area (with overflow pattern) -->
+  <rect x="20" y="775" width="800" height="45" class="overflow-bg"/>
+  <text class="text" x="30" y="802">F: Footer</text>
   
   <!-- Scrollbar separator line (dashed line for visual separation) -->
   <line x1="805" y1="20" x2="805" y2="620" class="scrollbar-border"/>

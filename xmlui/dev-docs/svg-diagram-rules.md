@@ -19,10 +19,28 @@ These rules define how to create consistent, professional SVG diagrams illustrat
 ### Overflow Diagrams
 - **Dimensions**: Variable height (e.g., 840x840 for 200px overflow)
 - **ViewBox**: Adjusted to total height (e.g., `viewBox="0 0 840 840"`)
+- **Display Size**: 420px width (half of actual size for side-by-side display in documentation)
 - **Main screen**: 800x600 - the visible viewport
 - **Main screen border**: COMPLETE 2px rectangle on all 4 sides, forming a closed boundary
+- **Main screen position**: ALWAYS at same coordinates (x=20, y=20, width=800, height=600) in standard position, but SHIFTED DOWN when showing top overflow
 - **Overflow area**: Content outside viewport (requires scrolling to see)
-- **Important**: When creating overflow diagrams, create three: top-scroll, mid-scroll, and bottom-scroll positions
+- **Important**: When creating overflow diagrams, create TWO: top-scroll and bottom-scroll positions only (no mid-scroll)
+- **Documentation Layout**: Display both diagrams on a single line using: `<img src="...-top.svg" alt="..." width="420" /> <img src="...-bottom.svg" alt="..." width="420" /><br/>`
+
+#### Positioning Strategy for Overflow Diagrams:
+
+**Top-Scroll Position (overflow below viewport)**:
+- Main screen border: x=20, y=20, width=800, height=600
+- Visible content: Inside main screen (y=20 to y=620)
+- Overflow content: Below main screen (y=620 and beyond)
+- Canvas height: Standard 640px + overflow height (e.g., 840px for 200px overflow)
+
+**Bottom-Scroll Position (overflow above viewport)**:
+- Main screen border: x=20, y=220, width=800, height=600 (SHIFTED DOWN by overflow height)
+- Visible content: Inside main screen (y=220 to y=820)
+- Overflow content: Above main screen (y=20 to y=220)
+- Canvas height: Standard 640px + overflow height (e.g., 840px for 200px overflow)
+- **CRITICAL**: All elements (blocks, scrollbar, border) shift down by the overflow height to make room for top overflow content
 
 ---
 
@@ -31,10 +49,14 @@ These rules define how to create consistent, professional SVG diagrams illustrat
 ### 1. Main Screen Border (Highest Priority)
 - **Style**: 2px solid (#333)
 - **CSS Class**: `.main-screen-border`
-- **Position**: x=20, y=20, width=800, height=600
+- **Position**: 
+  - Standard diagrams: x=20, y=20, width=800, height=600
+  - Top-scroll overflow: x=20, y=20, width=800, height=600
+  - Bottom-scroll overflow: x=20, y=(20 + overflow_height), width=800, height=600
 - **Purpose**: Represents the visible viewport boundary
 - **CRITICAL**: This is the ONLY thick border - all other borders are thin (1px)
 - **CRITICAL**: Main screen MUST be completely bordered on all 4 sides
+- **CRITICAL**: In bottom-scroll diagrams, the entire main screen (including border) shifts down to accommodate top overflow content
 - **Drawing order**: Draw this LAST so it appears on top of all content
 
 ### 2. Block Separator Borders
@@ -91,12 +113,15 @@ These rules define how to create consistent, professional SVG diagrams illustrat
 ## Scrollbars (Main Screen Only)
 
 ### Position and Dimensions
-- **Track**: x=805, y=20, width=15, height=600 (full viewport height)
+- **Track**: x=805, width=15, height=600 (full viewport height)
+  - Top-scroll position: y=20
+  - Bottom-scroll position: y=(20 + overflow_height)
 - **Track Fill**: #e0e0e0
 - **Thumb**: x=807, width=11 (2px padding), height=154
 - **Thumb Fill**: #999
 - **No borders or rounded corners** on track or thumb
 - **Overlays right gutter** when gutters are enabled
+- **CRITICAL**: Scrollbar ALWAYS stays within the main screen viewport boundaries
 
 ### Separator Line
 - **Position**: x=805 (left edge of scrollbar track)
@@ -104,10 +129,12 @@ These rules define how to create consistent, professional SVG diagrams illustrat
 - **Purpose**: Visual separation between content area and scrollbar
 
 ### Thumb Vertical Positions
-- **Top scroll**: y=20 (at track start)
-- **Mid scroll**: y=443 (centered: 20 + (600-154)/2 = 343 for mid-scroll with viewport at y=120)
-- **Bottom scroll**: y=666 (at track end: 820 - 154)
-- **Calculation varies** based on viewport start position
+- **Top scroll**: y=(viewport_y) (at track start)
+- **Bottom scroll**: y=(viewport_y + 446) (at track end: viewport_y + 600 - 154)
+- **Calculation**: 
+  - Top-scroll: thumb at y=20 (when viewport at y=20)
+  - Bottom-scroll: thumb at y=666 (when viewport at y=220 with 200px overflow)
+- **Note**: Thumb position is relative to the viewport's y-position, not absolute canvas coordinates
 
 ### CSS Classes
 ```css
@@ -140,7 +167,8 @@ These rules define how to create consistent, professional SVG diagrams illustrat
 - **Background**: #f5f5f5
 - **Lines**: #e8e8e8 diagonal cross-hatch
 - **CSS**: Use pattern `.overflow-bg` with `url(#overflowPattern)`
-- **Applied to**: Content blocks in overflow areas
+- **Applied to**: ALL blocks in overflow areas (Header, NavPanel, Main Content, Footer)
+- **CRITICAL**: Any block (H, N, M, F) that appears in the overflow area (outside the main screen viewport) MUST use the overflow pattern fill, not their standard fill color
 
 ---
 

@@ -1195,8 +1195,9 @@ All horizontal layout diagrams share the following common characteristics:
 
 ![Horizontal Layout](images/horizontal-layout-diagram.svg)
 
-<img src="images/horizontal-layout-no-gutters-overflow-scrollbar-top.svg" alt="Horizontal Layout with Overflow and Scrollbar (Top)" width="420" /> <img src="images/horizontal-layout-no-gutters-overflow-scrollbar-mid.svg" alt="Horizontal Layout with Overflow and Scrollbar (Mid-Scroll)" width="420" /><br/>
-<img src="images/horizontal-layout-no-gutters-overflow-scrollbar-bottom.svg" alt="Horizontal Layout with Overflow and Scrollbar (Bottom-Scroll)" width="420" />
+Variants with overflow:
+
+<img src="images/horizontal-layout-no-gutters-overflow-scrollbar-top.svg" alt="Horizontal Layout with Overflow and Scrollbar (Top)" width="420" /> <img src="images/horizontal-layout-no-gutters-overflow-scrollbar-bottom.svg" alt="Horizontal Layout with Overflow and Scrollbar (Bottom-Scroll)" width="420" />
 
 ### Horizontal Layout (scroll parent: app container, scrollbar gutters)
 
@@ -1205,18 +1206,20 @@ All horizontal layout diagrams share the following common characteristics:
 
 ![Horizontal Layout with Gutters](images/horizontal-layout-with-gutters-diagram.svg)
 
-<img src="images/horizontal-layout-overflow-scrollbar-top.svg" alt="Horizontal Layout with Overflow and Scrollbar (Top)" width="420" /> <img src="images/horizontal-layout-overflow-scrollbar-mid.svg" alt="Horizontal Layout with Overflow and Scrollbar (Mid-Scroll)" width="420" /><br/>
-<img src="images/horizontal-layout-overflow-scrollbar-bottom.svg" alt="Horizontal Layout with Overflow and Scrollbar (Bottom-Scroll)" width="420" />
+Variants with overflow:
+
+<img src="images/horizontal-layout-overflow-scrollbar-top.svg" alt="Horizontal Layout with Overflow and Scrollbar (Top)" width="420" /> <img src="images/horizontal-layout-overflow-scrollbar-bottom.svg" alt="Horizontal Layout with Overflow and Scrollbar (Bottom-Scroll)" width="420" />
 
 ### Horizontal Layout (scroll parent: main content, no scrollbar gutters)
 
 - `noScrollbarGutters`: true
 - `scrollWholePage`: false
 
-![Horizontal Layout with Content-Only Scroll (No Overflow)](images/horizontal-layout-content-scroll-no-gutters-diagram.svg)
+![Horizontal Layout with Content-Only Scroll (No Overflow)](images/horizontal-layout-content-scroll-no-gutters.svg)
 
-<img src="images/horizontal-layout-content-scroll-no-gutters-top.svg" alt="Horizontal Layout with Content-Only Scroll (Top)" width="420" /> <img src="images/horizontal-layout-content-scroll-no-gutters-mid.svg" alt="Horizontal Layout with Content-Only Scroll (Mid-Scroll)" width="420" /><br/>
-<img src="images/horizontal-layout-content-scroll-no-gutters-bottom.svg" alt="Horizontal Layout with Content-Only Scroll (Bottom)" width="420" />
+Variants with overflow:
+
+<img src="images/horizontal-layout-content-scroll-no-gutters-top.svg" alt="Horizontal Layout with Content-Only Scroll (Top)" width="420" /> <img src="images/horizontal-layout-content-scroll-no-gutters-bottom.svg" alt="Horizontal Layout with Content-Only Scroll (Bottom)" width="420" />
 
 ### Horizontal Layout (scroll parent: main content, scrollbar gutters)
 
@@ -1225,8 +1228,9 @@ All horizontal layout diagrams share the following common characteristics:
 
 ![Horizontal Layout with Content-Only Scroll and Gutters (No Overflow)](images/horizontal-layout-content-scroll-with-gutters-diagram.svg)
 
-<img src="images/horizontal-layout-content-scroll-with-gutters-top.svg" alt="Horizontal Layout with Content-Only Scroll and Gutters (Top)" width="420" /> <img src="images/horizontal-layout-content-scroll-with-gutters-mid.svg" alt="Horizontal Layout with Content-Only Scroll and Gutters (Mid-Scroll)" width="420" /><br/>
-<img src="images/horizontal-layout-content-scroll-with-gutters-bottom.svg" alt="Horizontal Layout with Content-Only Scroll and Gutters (Bottom)" width="420" />
+Variants with overflow:
+
+<img src="images/horizontal-layout-content-scroll-with-gutters-top.svg" alt="Horizontal Layout with Content-Only Scroll and Gutters (Top)" width="420" /> <img src="images/horizontal-layout-content-scroll-with-gutters-bottom.svg" alt="Horizontal Layout with Content-Only Scroll and Gutters (Bottom)" width="420" />
 
 ## Horizontal-Sticky Layout Diagrams
 
@@ -1247,8 +1251,9 @@ All horizontal-sticky layout diagrams share the following common characteristics
 
 ![Horizontal-Sticky Layout](images/horizontal-sticky-layout.svg)
 
-<img src="images/horizontal-sticky-layout-overflow-top.svg" alt="Horizontal-Sticky Layout with Overflow (Top)" width="420" /> <img src="images/horizontal-sticky-layout-overflow-mid.svg" alt="Horizontal-Sticky Layout with Overflow (Mid-Scroll)" width="420" /><br/>
-<img src="images/horizontal-sticky-layout-overflow-bottom.svg" alt="Horizontal-Sticky Layout with Overflow (Bottom)" width="420" />
+Variants with overflow:
+
+<img src="images/horizontal-sticky-layout-overflow-top.svg" alt="Horizontal-Sticky Layout with Overflow (Top)" width="420" /> <img src="images/horizontal-sticky-layout-overflow-bottom.svg" alt="Horizontal-Sticky Layout with Overflow (Bottom)" width="420" />
 
 ### Horizontal-Sticky (scroll parent: app container, scrollbar gutters)
 
@@ -1257,8 +1262,9 @@ All horizontal-sticky layout diagrams share the following common characteristics
 
 ![Horizontal-Sticky Layout with Gutters](images/horizontal-sticky-layout-with-gutters.svg)
 
-<img src="images/horizontal-sticky-layout-with-gutters-overflow-top.svg" alt="Horizontal-Sticky Layout with Gutters and Overflow (Top)" width="420" /> <img src="images/horizontal-sticky-layout-overflow-mid.svg" alt="Horizontal-Sticky Layout with Overflow Mid-Scroll" width="420" /><br/>
-<img src="images/horizontal-sticky-layout-overflow-bottom.svg" alt="Horizontal-Sticky Layout with Overflow Bottom-Scroll" width="420" />
+Variants with overflow:
+
+<img src="images/horizontal-sticky-layout-with-gutters-overflow-top.svg" alt="Horizontal-Sticky Layout with Gutters and Overflow (Top)" width="420" /> <img src="images/horizontal-sticky-layout-overflow-bottom.svg" alt="Horizontal-Sticky Layout with Overflow Bottom-Scroll" width="420" />
 
 ### Horizontal-Sticky (scroll parent: main content, no scrollbar gutters)
 
@@ -1267,8 +1273,9 @@ All horizontal-sticky layout diagrams share the following common characteristics
 
 ![Horizontal-Sticky Layout with Content-Only Scroll (No Overflow)](images/horizontal-sticky-content-scroll-no-gutters.svg)
 
-<img src="images/horizontal-sticky-content-scroll-no-gutters-top.svg" alt="Horizontal-Sticky Layout with Content-Only Scroll (Top)" width="420" /> <img src="images/horizontal-sticky-content-scroll-no-gutters-mid.svg" alt="Horizontal-Sticky Layout with Content-Only Scroll (Mid-Scroll)" width="420" /><br/>
-<img src="images/horizontal-sticky-content-scroll-no-gutters-bottom.svg" alt="Horizontal-Sticky Layout with Content-Only Scroll (Bottom)" width="420" />
+Variants with overflow:
+
+<img src="images/horizontal-sticky-content-scroll-no-gutters-top.svg" alt="Horizontal-Sticky Layout with Content-Only Scroll (Top)" width="420" /> <img src="images/horizontal-sticky-content-scroll-no-gutters-bottom.svg" alt="Horizontal-Sticky Layout with Content-Only Scroll (Bottom)" width="420" />
 
 ### Horizontal-Sticky (scroll parent: main content, scrollbar gutters)
 
@@ -1277,8 +1284,9 @@ All horizontal-sticky layout diagrams share the following common characteristics
 
 ![Horizontal-Sticky Layout with Content-Only Scroll and Gutters (No Overflow)](images/horizontal-sticky-content-scroll-with-gutters.svg)
 
-<img src="images/horizontal-sticky-content-scroll-with-gutters-top.svg" alt="Horizontal-Sticky Layout with Content-Only Scroll and Gutters (Top)" width="420" /> <img src="images/horizontal-sticky-content-scroll-with-gutters-mid.svg" alt="Horizontal-Sticky Layout with Content-Only Scroll and Gutters (Mid-Scroll)" width="420" /><br/>
-<img src="images/horizontal-sticky-content-scroll-with-gutters-bottom.svg" alt="Horizontal-Sticky Layout with Content-Only Scroll and Gutters (Bottom)" width="420" />
+Variants with overflow:
+
+<img src="images/horizontal-sticky-content-scroll-with-gutters-top.svg" alt="Horizontal-Sticky Layout with Content-Only Scroll and Gutters (Top)" width="420" /> <img src="images/horizontal-sticky-content-scroll-with-gutters-bottom.svg" alt="Horizontal-Sticky Layout with Content-Only Scroll and Gutters (Bottom)" width="420" />
 
 ## Condensed Layout Diagrams
 
@@ -1298,8 +1306,42 @@ All condensed layout diagrams share the following common characteristics:
 
 ![Condensed Layout (No Overflow)](images/condensed-layout-no-overflow.svg)
 
-<img src="images/condensed-layout-no-gutters-top.svg" alt="Condensed Layout with Overflow (Top)" width="420" /> <img src="images/condensed-layout-no-gutters-mid.svg" alt="Condensed Layout with Overflow (Mid-Scroll)" width="420" /><br/>
-<img src="images/condensed-layout-no-gutters-bottom.svg" alt="Condensed Layout with Overflow (Bottom)" width="420" />
+Variants with overflow:
+
+<img src="images/condensed-layout-no-gutters-top.svg" alt="Condensed Layout with Overflow (Top)" width="420" /> <img src="images/condensed-layout-no-gutters-bottom.svg" alt="Condensed Layout with Overflow (Bottom)" width="420" />
+
+### Condensed Layout (scroll parent: app container, scrollbar gutters)
+
+- `noScrollbarGutters`: false
+- `scrollWholePage`: true
+
+![Condensed Layout with Gutters (No Overflow)](images/condensed-layout-with-gutters-no-overflow.svg)
+
+Variants with overflow:
+
+<img src="images/condensed-layout-with-gutters-top.svg" alt="Condensed Layout with Gutters and Overflow (Top)" width="420" /> <img src="images/condensed-layout-with-gutters-bottom.svg" alt="Condensed Layout with Gutters and Overflow (Bottom)" width="420" />
+
+### Condensed Layout (scroll parent: main content, no scrollbar gutters)
+
+- `noScrollbarGutters`: true
+- `scrollWholePage`: false
+
+![Condensed Layout with Content-Only Scroll (No Overflow)](images/condensed-layout-content-scroll-no-gutters-no-overflow.svg)
+
+Variants with overflow:
+
+<img src="images/condensed-layout-content-scroll-no-gutters-top.svg" alt="Condensed Layout with Content-Only Scroll (Top)" width="420" /> <img src="images/condensed-layout-content-scroll-no-gutters-bottom.svg" alt="Condensed Layout with Content-Only Scroll (Bottom)" width="420" />
+
+### Condensed Layout (scroll parent: main content, scrollbar gutters)
+
+- `noScrollbarGutters`: false
+- `scrollWholePage`: false
+
+![Condensed Layout with Content-Only Scroll and Gutters (No Overflow)](images/condensed-layout-content-scroll-with-gutters-no-overflow.svg)
+
+Variants with overflow:
+
+<img src="images/condensed-layout-content-scroll-with-gutters-top.svg" alt="Condensed Layout with Content-Only Scroll and Gutters (Top)" width="420" /> <img src="images/condensed-layout-content-scroll-with-gutters-bottom.svg" alt="Condensed Layout with Content-Only Scroll and Gutters (Bottom)" width="420" />
 
 ## Condensed-Sticky Layout Diagrams
 
