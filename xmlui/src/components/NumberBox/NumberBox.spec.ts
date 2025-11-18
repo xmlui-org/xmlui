@@ -435,6 +435,14 @@ test.describe("Event Handling", () => {
     await expect.poll(testStateDriver.testState).toBe("changed");
   });
 
+  test("didChange event returns number type", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(
+      `<NumberBox onDidChange="arg => testState = arg" />`,
+    );
+    await page.getByRole("textbox").fill("123");
+    await expect.poll(async () => typeof (await testStateDriver.testState())).toBe("number");
+  });
+
   test("didChange event passes new value", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(
       `<NumberBox onDidChange="arg => testState = arg" />`,
@@ -499,6 +507,18 @@ test.describe("API", () => {
     await expect.poll(testStateDriver.testState).toBe(123);
   });
 
+  test("value API returns returns number type", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <NumberBox id="numberbox" />
+        <Button label="test" onClick="testState = numberbox.value" />
+      </Fragment>
+    `);
+    await page.getByRole("textbox").fill("456");
+    await page.getByRole("button", { name: "test" }).click();
+    await expect.poll(async () => typeof (await testStateDriver.testState())).toBe("number");
+  });
+
   test("value API returns state after change", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
@@ -506,7 +526,6 @@ test.describe("API", () => {
         <Button label="test" onClick="testState = numberbox.value" />
       </Fragment>
     `);
-
     await page.getByRole("textbox").fill("456");
     await page.getByRole("button", { name: "test" }).click();
     await expect.poll(testStateDriver.testState).toBe(456);
@@ -1122,19 +1141,105 @@ test.describe("Other Edge Cases", () => {
     await expect(driver.input).toHaveValue("5");
   });
 
-  // Special numeric formats
-  test("handle special numeric input formats", async ({ initTestBed, page }) => {
+  test("handle scientific notation input", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox />`);
     const input = page.getByRole("textbox");
 
-    // Test scientific notation
     await input.fill("1e5");
     await expect(input).toHaveValue("100000");
+  });
 
-    // Test negative numbers
-    await input.clear();
+  test("handle negative numbers input", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox />`);
+    const input = page.getByRole("textbox");
+
     await input.fill("-123");
     await expect(input).toHaveValue("-123");
+  });
+
+  test("handle incomplete negative numbers input", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox />`);
+    const input = page.getByRole("textbox");
+
+    await input.fill("-");
+    await expect(input).toHaveValue("-");
+  });
+
+  test("handle blur on incomplete negative numbers input", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox />`);
+    const input = page.getByRole("textbox");
+
+    await input.fill("-");
+    await input.blur();
+    await expect(input).toHaveValue("-");
+  });
+
+  test("handle scientific notation with negative exponent", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox />`);
+    const input = page.getByRole("textbox");
+
+    await input.fill("1e-3");
+    await expect(input).toHaveValue("0.001");
+  });
+
+  test("handle scientific notation with large exponent", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox />`);
+    const input = page.getByRole("textbox");
+
+    await input.fill("1e10");
+    await expect(input).toHaveValue("10000000000");
+  });
+
+  test("handle scientific notation with fractions", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox />`);
+    const input = page.getByRole("textbox");
+
+    await input.fill("10e1.01");
+    await expect(input).toHaveValue("");
+  });
+
+  test("handle scientific notation with fractions when typing", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox />`);
+    const input = page.getByRole("textbox");
+
+    await input.fill("101.01");
+    await input.press("ArrowLeft");
+    await input.press("ArrowLeft");
+    await input.press("ArrowLeft");
+    await input.press("ArrowLeft");
+    await input.press("e");
+    await expect(input).toHaveValue("10e1.01");
+  });
+
+  test("handle blur with scientific notation with fractions", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox />`);
+    const input = page.getByRole("textbox");
+
+    await input.fill("101.01");
+    await input.press("ArrowLeft");
+    await input.press("ArrowLeft");
+    await input.press("ArrowLeft");
+    await input.press("ArrowLeft");
+    await input.press("e");
+    await input.blur();
+    await expect(input).toHaveValue("101.01");
+  });
+
+  test("handle scientific notation with incomplete exponent", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox />`);
+    const input = page.getByRole("textbox");
+
+    await input.fill("e");
+    await expect(input).toHaveValue("e");
+  });
+
+  test("handle blur with scientific notation with incomplete exponent", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox />`);
+    const input = page.getByRole("textbox");
+
+    await input.fill("e");
+    await input.blur();
+    await expect(input).toHaveValue("");
   });
 
   test("entering multiple 0s only results in one 0", async ({ initTestBed, page }) => {
@@ -1235,6 +1340,60 @@ test.describe("Other Edge Cases", () => {
     await input.pressSequentially("123.");
     await input.blur();
     await expect(input).toHaveValue("123.0");
+  });
+
+  test("spinbox up-arrow rounds floats to user given precision", async ({
+    initTestBed,
+    createNumberBoxDriver,
+  }) => {
+    await initTestBed(`<NumberBox initialValue="-1.01" step="1" />`);
+    const driver = await createNumberBoxDriver();
+
+    await driver.increment();
+    await expect(driver.input).toHaveValue("-0.01");
+    await driver.increment();
+    await expect(driver.input).toHaveValue("0.99");
+  });
+
+  test("spinbox up-arrow maintains user precision on fraction change", async ({
+    initTestBed,
+    createNumberBoxDriver,
+  }) => {
+    await initTestBed(`<NumberBox initialValue="-1.01" step="1" />`);
+    const driver = await createNumberBoxDriver();
+
+    await driver.increment();
+    await expect(driver.input).toHaveValue("-0.01");
+    await driver.input.fill("-0.011");
+    await driver.increment();
+    await expect(driver.input).toHaveValue("0.989");
+  });
+
+  test("spinbox down-arrow rounds floats to user given precision", async ({
+    initTestBed,
+    createNumberBoxDriver,
+  }) => {
+    await initTestBed(`<NumberBox initialValue="1.01" step="1" />`);
+    const driver = await createNumberBoxDriver();
+
+    await driver.decrement();
+    await expect(driver.input).toHaveValue("0.01");
+    await driver.decrement();
+    await expect(driver.input).toHaveValue("-0.99");
+  });
+
+  test("spinbox down-arrow maintains user precision on fraction change", async ({
+    initTestBed,
+    createNumberBoxDriver,
+  }) => {
+    await initTestBed(`<NumberBox initialValue="1.01" step="1" />`);
+    const driver = await createNumberBoxDriver();
+
+    await driver.decrement();
+    await expect(driver.input).toHaveValue("0.01");
+    await driver.input.fill("0.011");
+    await driver.decrement();
+    await expect(driver.input).toHaveValue("-0.989");
   });
 });
 
@@ -1449,5 +1608,39 @@ test.describe("Behaviors and Parts", () => {
     await expect(endAdornment).toBeVisible();
     await expect(spinnerUp).toBeVisible();
     await expect(spinnerDown).toBeVisible();
+  });
+});
+
+// =============================================================================
+// INTEGRATION TESTS
+// =============================================================================
+
+test.describe("Integration Tests", () => {
+  test("NumberBox returns number type in Form", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form data="{{ 'age': 0 }}" onSubmit="data => testState = data.age" enableSubmit="true" saveLabel="Submit">
+        <FormItem label="age" type="number" testId="numberBox" bindTo="age" />
+      </Form>
+    `);
+    const numberBox = page.getByTestId("numberBox").getByRole("textbox");
+    const submitButton = page.getByRole("button", { name: "Submit" });
+
+    await numberBox.fill("30");
+    await submitButton.click();
+    await expect.poll(async () => typeof (await testStateDriver.testState())).toBe("number");
+  });
+
+  test("NumberBox returns correct value in Form", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form data="{{ 'age': 0 }}" onSubmit="data => testState = data.age" enableSubmit="true" saveLabel="Submit">
+        <FormItem label="age" type="number" testId="numberBox" bindTo="age" />
+      </Form>
+    `);
+    const numberBox = page.getByTestId("numberBox").getByRole("textbox");
+    const submitButton = page.getByRole("button", { name: "Submit" });
+
+    await numberBox.fill("30");
+    await submitButton.click();
+    await expect.poll(testStateDriver.testState).toBe(30);
   });
 });
