@@ -68,6 +68,7 @@ import { emojiSelectorRenderer } from "./EmojiSelector/EmojiSelector";
 import { numberBoxComponentRenderer } from "./NumberBox/NumberBox";
 import { hoverCardComponentRenderer } from "./HoverCard/HoverCard";
 import { appRenderer } from "./App/App";
+import { app2Renderer } from "./App2/App2";
 import { navPanelRenderer } from "./NavPanel/NavPanel";
 import { pageRenderer, pagesRenderer } from "./Pages/Pages";
 import type {
@@ -448,6 +449,9 @@ export class ComponentRegistry {
 
     if (process.env.VITE_USED_COMPONENTS_App !== "false") {
       this.registerCoreComponent(appRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_App2 !== "false") {
+      this.registerCoreComponent(app2Renderer);
     }
     if (process.env.VITE_USED_COMPONENTS_NavPanel !== "false") {
       this.registerCoreComponent(navPanelRenderer);
