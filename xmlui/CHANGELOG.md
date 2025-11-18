@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.11.18
+
+### Patch Changes
+
+- 0eaa966: consolidate radix dependency versions, fix ModalDialog, Select, DropdownMenu nesting
+
 ## 0.11.17
 
 ### Patch Changes
