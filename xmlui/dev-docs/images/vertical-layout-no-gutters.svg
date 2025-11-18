@@ -11,6 +11,7 @@
       .block-border { stroke: #333; stroke-width: 1; fill: none; }
       .gutter-edge { stroke: #666; stroke-width: 1; stroke-dasharray: 4,2; fill: none; }
       .text { font-family: Arial, sans-serif; font-size: 14px; fill: #333; text-anchor: start; font-style: italic; }
+      .text-center { font-family: Arial, sans-serif; font-size: 14px; fill: #666; text-anchor: middle; font-style: italic; }
     </style>
   </defs>
 
@@ -30,8 +31,12 @@
   <text class="text" x="230" y="47">H: Header (static)</text>
 
   <!-- Main Content block (right column) -->
-  <rect class="content" x="220" y="65" width="600" height="510"/>
+  <rect class="content" x="220" y="65" width="600" height="385"/>
   <text class="text" x="230" y="90">M: Main Content (static)</text>
+
+  <!-- Remaining space -->
+  <rect fill="#eeeeee" x="220" y="450" width="600" height="125"/>
+  <text class="text-center" x="520" y="517">Remaining space</text>
 
   <!-- Footer separator line -->
   <line class="block-border" x1="220" y1="575" x2="820" y2="575"/>

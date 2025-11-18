@@ -74,7 +74,7 @@
   <rect class="gutter overflow-bg" x="805" y="620" width="15" height="155"/>
 
   <!-- Footer separator line in overflow -->
-  <line class="block-border" x1="235" y1="775" x2="805" y2="775"/>
+  <line class="block-border" x1="220" y1="775" x2="820" y2="775"/>
 
   <!-- Footer in overflow -->
   <rect class="footer overflow-bg" x="220" y="775" width="600" height="45"/>

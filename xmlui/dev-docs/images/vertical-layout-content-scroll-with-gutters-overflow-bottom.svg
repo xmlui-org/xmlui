@@ -74,7 +74,7 @@
   <rect class="scrollbar" x="807" y="570" width="11" height="200"/>
 
   <!-- Footer separator line -->
-  <line class="block-border" x1="220" y1="775" x2="820" y2="775"/>
+  <line class="block-border" x1="220" y1="575" x2="820" y2="575"/>
 
   <!-- Footer block (right column only, static) -->
   <rect class="footer" x="220" y="775" width="600" height="45"/>

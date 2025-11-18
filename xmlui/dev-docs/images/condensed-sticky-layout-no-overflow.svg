@@ -18,6 +18,7 @@
       
       /* Text */
       .text { font-family: Arial, sans-serif; font-size: 14px; fill: #333; text-anchor: start; font-style: italic; }
+      .text-center { font-family: Arial, sans-serif; font-size: 14px; fill: #666; text-anchor: middle; font-style: italic; }
     </style>
   </defs>
   
@@ -35,7 +36,7 @@
   
   <!-- Remaining space -->
   <rect fill="#eeeeee" x="20" y="450" width="800" height="125"/>
-  <text class="text" text-anchor="middle" x="420" y="517">Remaining space</text>
+  <text class="text-center" x="420" y="517">Remaining space</text>
   
   <!-- Footer separator line -->
   <line class="block-border" x1="20" y1="575" x2="820" y2="575"/>

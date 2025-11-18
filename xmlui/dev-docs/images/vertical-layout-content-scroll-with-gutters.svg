@@ -11,6 +11,7 @@
       .block-border { stroke: #333; stroke-width: 1; fill: none; }
       .gutter-edge { stroke: #666; stroke-width: 1; stroke-dasharray: 4,2; fill: none; }
       .text { font-family: Arial, sans-serif; font-size: 14px; fill: #333; text-anchor: start; font-style: italic; }
+      .text-center { font-family: Arial, sans-serif; font-size: 14px; fill: #666; text-anchor: middle; font-style: italic; }
     </style>
   </defs>
 
@@ -30,21 +31,25 @@
   <text class="text" x="230" y="47">H: Header (static)</text>
 
   <!-- Left gutter in right column -->
-  <rect class="gutter" x="220" y="65" width="15" height="510"/>
-  <line class="gutter-edge" x1="235" y1="65" x2="235" y2="575"/>
+  <rect class="gutter" x="220" y="65" width="15" height="385"/>
+  <line class="gutter-edge" x1="235" y1="65" x2="235" y2="450"/>
 
   <!-- Main Content block (right column) -->
-  <rect class="content" x="235" y="65" width="570" height="510"/>
+  <rect class="content" x="235" y="65" width="570" height="385"/>
   <text class="text" x="245" y="90">M: Main Content (scrollable)</text>
 
   <!-- Right gutter edge -->
-  <line class="gutter-edge" x1="805" y1="65" x2="805" y2="575"/>
+  <line class="gutter-edge" x1="805" y1="65" x2="805" y2="450"/>
 
   <!-- Right gutter in right column -->
-  <rect class="gutter" x="805" y="65" width="15" height="510"/>
+  <rect class="gutter" x="805" y="65" width="15" height="385"/>
+
+  <!-- Remaining space -->
+  <rect fill="#eeeeee" x="220" y="450" width="600" height="125"/>
+  <text class="text-center" x="520" y="517">Remaining space</text>
 
   <!-- Footer separator line -->
-  <line class="block-border" x1="235" y1="575" x2="805" y2="575"/>
+  <line class="block-border" x1="220" y1="575" x2="820" y2="575"/>
 
   <!-- Footer block (right column only) -->
   <rect class="footer" x="220" y="575" width="600" height="45"/>
