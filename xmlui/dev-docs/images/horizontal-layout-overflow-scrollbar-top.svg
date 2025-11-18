@@ -22,6 +22,7 @@
     .scrollbar-thumb { fill: #999; }
     .scrollbar-border { stroke: #999; stroke-width: 1; stroke-dasharray: 3,2; fill: none; }
     .text { font-family: Arial, sans-serif; font-size: 14px; fill: #333; text-anchor: start; font-style: italic; }
+    .text-overflow { font-family: Arial, sans-serif; font-size: 11px; fill: #666; text-anchor: middle; font-style: italic; }
     .label { font-family: Arial, sans-serif; font-size: 10px; fill: #666; font-style: italic; }
   </style>
   
@@ -51,6 +52,9 @@
   <!-- Main Content block visible in viewport (between gutters) -->
   <rect class="content" x="35" y="110" width="770" height="465"/>
   <text class="text" x="45" y="140">M: Main Content</text>
+  
+  <!-- Bottom overflow indicator -->
+  <text class="text-overflow" x="420" y="545">↓ Overflow</text>
   
   <!-- Separator between Main Content and Footer -->
   <line x1="35" y1="575" x2="805" y2="575" class="block-border"/>

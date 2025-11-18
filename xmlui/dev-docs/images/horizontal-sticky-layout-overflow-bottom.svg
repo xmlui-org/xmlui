@@ -12,8 +12,8 @@
       .footer { fill: #d0d0d0; }
       .scrollbar { fill: #999; }
       .scrollbar-border { stroke: #999; stroke-width: 1; stroke-dasharray: 3,2; }
-      .overflow-indicator { font-family: Arial, sans-serif; font-size: 12px; fill: #999; text-anchor: middle; }
       .text { font-family: Arial, sans-serif; font-size: 14px; fill: #333; text-anchor: start; font-style: italic; }
+      .text-overflow { font-family: Arial, sans-serif; font-size: 11px; fill: #666; text-anchor: middle; font-style: italic; }
       .text-center { font-family: Arial, sans-serif; font-size: 14px; fill: #666; text-anchor: middle; font-style: italic; }
     </style>
   </defs>
@@ -33,15 +33,18 @@
   
   <!-- Main Content block (full width, showing bottom of content) -->
   <rect class="content" x="20" y="110" width="800" height="465"/>
-  <text class="overflow-indicator" x="420" y="135">↑ Content above (hidden)</text>
+  
+  <!-- Top overflow indicator -->
+  <text class="text-overflow" x="420" y="135">↑ Overflow</text>
+  
   <text class="text" x="30" y="545">M: Main Content (scrollable, bottom position)</text>
   <text class="text" x="30" y="565">(end of content)</text>
   
-  <!-- Scrollbar border (left edge, dashed) -->
-  <line class="scrollbar-border" x1="809" y1="110" x2="809" y2="575"/>
+  <!-- Scrollbar separator line for main content area -->
+  <line class="scrollbar-border" x1="805" y1="110" x2="805" y2="575"/>
   
-  <!-- Scrollbar thumb (at bottom position, with 2px padding from border) -->
-  <rect class="scrollbar" x="809" y="419" width="11" height="154"/>
+  <!-- Scrollbar thumb (at bottom position, with 2px padding from separator) -->
+  <rect class="scrollbar" x="807" y="419" width="11" height="154"/>
   
   <!-- Separator: Content|Footer -->
   <line class="block-border" x1="20" y1="575" x2="820" y2="575"/>

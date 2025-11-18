@@ -11,10 +11,9 @@
       .content { fill: #ffffff; }
       .footer { fill: #d0d0d0; }
       .scrollbar { fill: #999; }
-      .scrollbar-border { stroke: #999; stroke-width: 1; stroke-dasharray: 3,2; }
+      .scrollbar-border { stroke: #999; stroke-width: 1; stroke-dasharray: 3,2; fill: none; }
       .text { font-family: Arial, sans-serif; font-size: 14px; fill: #333; text-anchor: start; font-style: italic; }
       .text-overflow { font-family: Arial, sans-serif; font-size: 11px; fill: #666; text-anchor: middle; font-style: italic; }
-      .text-center { font-family: Arial, sans-serif; font-size: 14px; fill: #666; text-anchor: middle; font-style: italic; }
     </style>
   </defs>
   
@@ -31,18 +30,24 @@
   <line class="block-border" x1="20" y1="110" x2="820" y2="110"/>
   <text class="text" x="30" y="93">N: Navigation Panel (docked to top)</text>
   
-  <!-- Main Content block (full width, showing top of content) -->
-  <rect class="content" x="20" y="110" width="800" height="465"/>
-  <text class="text" x="30" y="135">M: Main Content (scrollable, top position)</text>
+  <!-- Left gutter for Main Content area only -->
+  <rect class="gutter" x="20" y="110" width="15" height="465"/>
+  <line class="gutter-edge" x1="35" y1="110" x2="35" y2="575"/>
   
-  <!-- Bottom overflow indicator -->
-  <text class="text-overflow" x="420" y="545">↓ Overflow</text>
+  <!-- Main Content block (with left gutter, scrollbar overlays right gutter) -->
+  <rect class="content" x="35" y="110" width="770" height="465"/>
   
-  <!-- Scrollbar separator line for main content area -->
+  <!-- Top overflow indicator -->
+  <text class="text-overflow" x="420" y="135">↑ Overflow</text>
+  
+  <text class="text" x="45" y="545">M: Main Content (scrollable, bottom position)</text>
+  <text class="text" x="45" y="565">(end of content)</text>
+  
+  <!-- Scrollbar separator line (overlays right gutter position) -->
   <line class="scrollbar-border" x1="805" y1="110" x2="805" y2="575"/>
   
-  <!-- Scrollbar thumb (at top position, with 2px padding from separator) -->
-  <rect class="scrollbar" x="807" y="112" width="11" height="154"/>
+  <!-- Scrollbar thumb (at bottom position, with 2px padding from separator) -->
+  <rect class="scrollbar" x="807" y="419" width="11" height="154"/>
   
   <!-- Separator: Content|Footer -->
   <line class="block-border" x1="20" y1="575" x2="820" y2="575"/>

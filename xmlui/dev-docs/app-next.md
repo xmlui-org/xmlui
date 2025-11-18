@@ -1187,7 +1187,6 @@ All horizontal layout diagrams share the following common characteristics:
 - **Block Arrangement**: Blocks are stacked vertically in rows: Header → NavPanel → Main Content → Footer
 - **Full Width Blocks**: All blocks (H, N, M, F) span the full width of the container
 - **NavPanel Behavior**: NavPanel is static (not independently scrollable) and rendered within the header area
-- **Variants**: The diagrams below demonstrate different combinations of scroll behavior (`scrollWholePage`), gutter reservation (`noScrollbarGutters`), and scroll positions
 
 ### Horizontal Layout (scroll parent: app container, no scrollbar gutters)
 
@@ -1196,11 +1195,8 @@ All horizontal layout diagrams share the following common characteristics:
 
 ![Horizontal Layout](images/horizontal-layout-diagram.svg)
 
-![Horizontal Layout with Overflow and Scrollbar (Top)](images/horizontal-layout-no-gutters-overflow-scrollbar-top.svg)
-
-![Horizontal Layout with Overflow and Scrollbar (Mid-Scroll)](images/horizontal-layout-no-gutters-overflow-scrollbar-mid.svg)
-
-![Horizontal Layout with Overflow and Scrollbar (Bottom-Scroll)](images/horizontal-layout-no-gutters-overflow-scrollbar-bottom.svg)
+<img src="images/horizontal-layout-no-gutters-overflow-scrollbar-top.svg" alt="Horizontal Layout with Overflow and Scrollbar (Top)" width="420" /> <img src="images/horizontal-layout-no-gutters-overflow-scrollbar-mid.svg" alt="Horizontal Layout with Overflow and Scrollbar (Mid-Scroll)" width="420" /><br/>
+<img src="images/horizontal-layout-no-gutters-overflow-scrollbar-bottom.svg" alt="Horizontal Layout with Overflow and Scrollbar (Bottom-Scroll)" width="420" />
 
 ### Horizontal Layout (scroll parent: app container, scrollbar gutters)
 
@@ -1209,11 +1205,8 @@ All horizontal layout diagrams share the following common characteristics:
 
 ![Horizontal Layout with Gutters](images/horizontal-layout-with-gutters-diagram.svg)
 
-![Horizontal Layout with Overflow and Scrollbar (Top)](images/horizontal-layout-overflow-scrollbar-top.svg)
-
-![Horizontal Layout with Overflow and Scrollbar (Mid-Scroll)](images/horizontal-layout-overflow-scrollbar-mid.svg)
-
-![Horizontal Layout with Overflow and Scrollbar (Bottom-Scroll)](images/horizontal-layout-overflow-scrollbar-bottom.svg)
+<img src="images/horizontal-layout-overflow-scrollbar-top.svg" alt="Horizontal Layout with Overflow and Scrollbar (Top)" width="420" /> <img src="images/horizontal-layout-overflow-scrollbar-mid.svg" alt="Horizontal Layout with Overflow and Scrollbar (Mid-Scroll)" width="420" /><br/>
+<img src="images/horizontal-layout-overflow-scrollbar-bottom.svg" alt="Horizontal Layout with Overflow and Scrollbar (Bottom-Scroll)" width="420" />
 
 ### Horizontal Layout (scroll parent: main content, no scrollbar gutters)
 
@@ -1222,11 +1215,8 @@ All horizontal layout diagrams share the following common characteristics:
 
 ![Horizontal Layout with Content-Only Scroll (No Overflow)](images/horizontal-layout-content-scroll-no-gutters-diagram.svg)
 
-![Horizontal Layout with Content-Only Scroll (Top)](images/horizontal-layout-content-scroll-no-gutters-top.svg)
-
-![Horizontal Layout with Content-Only Scroll (Mid-Scroll)](images/horizontal-layout-content-scroll-no-gutters-mid.svg)
-
-![Horizontal Layout with Content-Only Scroll (Bottom)](images/horizontal-layout-content-scroll-no-gutters-bottom.svg)
+<img src="images/horizontal-layout-content-scroll-no-gutters-top.svg" alt="Horizontal Layout with Content-Only Scroll (Top)" width="420" /> <img src="images/horizontal-layout-content-scroll-no-gutters-mid.svg" alt="Horizontal Layout with Content-Only Scroll (Mid-Scroll)" width="420" /><br/>
+<img src="images/horizontal-layout-content-scroll-no-gutters-bottom.svg" alt="Horizontal Layout with Content-Only Scroll (Bottom)" width="420" />
 
 ### Horizontal Layout (scroll parent: main content, scrollbar gutters)
 
@@ -1235,11 +1225,8 @@ All horizontal layout diagrams share the following common characteristics:
 
 ![Horizontal Layout with Content-Only Scroll and Gutters (No Overflow)](images/horizontal-layout-content-scroll-with-gutters-diagram.svg)
 
-![Horizontal Layout with Content-Only Scroll and Gutters (Top)](images/horizontal-layout-content-scroll-with-gutters-top.svg)
-
-![Horizontal Layout with Content-Only Scroll and Gutters (Mid-Scroll)](images/horizontal-layout-content-scroll-with-gutters-mid.svg)
-
-![Horizontal Layout with Content-Only Scroll and Gutters (Bottom)](images/horizontal-layout-content-scroll-with-gutters-bottom.svg)
+<img src="images/horizontal-layout-content-scroll-with-gutters-top.svg" alt="Horizontal Layout with Content-Only Scroll and Gutters (Top)" width="420" /> <img src="images/horizontal-layout-content-scroll-with-gutters-mid.svg" alt="Horizontal Layout with Content-Only Scroll and Gutters (Mid-Scroll)" width="420" /><br/>
+<img src="images/horizontal-layout-content-scroll-with-gutters-bottom.svg" alt="Horizontal Layout with Content-Only Scroll and Gutters (Bottom)" width="420" />
 
 ## Horizontal-Sticky Layout Diagrams
 
@@ -1252,7 +1239,6 @@ All horizontal-sticky layout diagrams share the following common characteristics
 - **Footer Sticky**: The Footer (F) is always docked to the bottom of the viewport using sticky positioning
 - **Content Scroll**: Only the Main Content (M) area scrolls between the sticky header/navpanel and footer
 - **Scroll Container**: Can be either the App Container (C) when `scrollWholePage=true` or the Main Content block (M) when `scrollWholePage=false`
-- **Variants**: The diagrams below demonstrate different combinations of `scrollWholePage` and `noScrollbarGutters` settings
 
 ### Horizontal-Sticky Layout (scroll parent: app container, no scrollbar gutters)
 
@@ -1261,11 +1247,8 @@ All horizontal-sticky layout diagrams share the following common characteristics
 
 ![Horizontal-Sticky Layout](images/horizontal-sticky-layout.svg)
 
-![Horizontal-Sticky Layout with Overflow (Top)](images/horizontal-sticky-layout-overflow-top.svg)
-
-![Horizontal-Sticky Layout with Overflow (Mid-Scroll)](images/horizontal-sticky-layout-overflow-mid.svg)
-
-![Horizontal-Sticky Layout with Overflow (Bottom)](images/horizontal-sticky-layout-overflow-bottom.svg)
+<img src="images/horizontal-sticky-layout-overflow-top.svg" alt="Horizontal-Sticky Layout with Overflow (Top)" width="420" /> <img src="images/horizontal-sticky-layout-overflow-mid.svg" alt="Horizontal-Sticky Layout with Overflow (Mid-Scroll)" width="420" /><br/>
+<img src="images/horizontal-sticky-layout-overflow-bottom.svg" alt="Horizontal-Sticky Layout with Overflow (Bottom)" width="420" />
 
 ### Horizontal-Sticky (scroll parent: app container, scrollbar gutters)
 
@@ -1274,11 +1257,8 @@ All horizontal-sticky layout diagrams share the following common characteristics
 
 ![Horizontal-Sticky Layout with Gutters](images/horizontal-sticky-layout-with-gutters.svg)
 
-![Horizontal-Sticky Layout with Gutters and Overflow (Top)](images/horizontal-sticky-layout-with-gutters-overflow-top.svg)
-
-![Horizontal-Sticky Layout with Overflow Mid-Scroll](images/horizontal-sticky-layout-overflow-mid.svg)
-
-![Horizontal-Sticky Layout with Overflow Bottom-Scroll](images/horizontal-sticky-layout-overflow-bottom.svg)
+<img src="images/horizontal-sticky-layout-with-gutters-overflow-top.svg" alt="Horizontal-Sticky Layout with Gutters and Overflow (Top)" width="420" /> <img src="images/horizontal-sticky-layout-overflow-mid.svg" alt="Horizontal-Sticky Layout with Overflow Mid-Scroll" width="420" /><br/>
+<img src="images/horizontal-sticky-layout-overflow-bottom.svg" alt="Horizontal-Sticky Layout with Overflow Bottom-Scroll" width="420" />
 
 ### Horizontal-Sticky (scroll parent: main content, no scrollbar gutters)
 
@@ -1287,194 +1267,22 @@ All horizontal-sticky layout diagrams share the following common characteristics
 
 ![Horizontal-Sticky Layout with Content-Only Scroll (No Overflow)](images/horizontal-sticky-content-scroll-no-gutters.svg)
 
-![Horizontal-Sticky Layout with Content-Only Scroll (Top)](images/horizontal-sticky-content-scroll-no-gutters-top.svg)
+<img src="images/horizontal-sticky-content-scroll-no-gutters-top.svg" alt="Horizontal-Sticky Layout with Content-Only Scroll (Top)" width="420" /> <img src="images/horizontal-sticky-content-scroll-no-gutters-mid.svg" alt="Horizontal-Sticky Layout with Content-Only Scroll (Mid-Scroll)" width="420" /><br/>
+<img src="images/horizontal-sticky-content-scroll-no-gutters-bottom.svg" alt="Horizontal-Sticky Layout with Content-Only Scroll (Bottom)" width="420" />
 
-![Horizontal-Sticky Layout with Content-Only Scroll (Mid-Scroll)](images/horizontal-sticky-content-scroll-no-gutters-mid.svg)
+### Horizontal-Sticky (scroll parent: main content, scrollbar gutters)
 
-![Horizontal-Sticky Layout with Content-Only Scroll (Bottom)](images/horizontal-sticky-content-scroll-no-gutters-bottom.svg)
-
-### Horizontal-Sticky Layout with Content-Only Scroll and Gutters (No Overflow)
-
-- `layout`: horizontal-sticky
 - `noScrollbarGutters`: false
 - `scrollWholePage`: false
 
-**Note:** Content fits within viewport; scroll gutters reserved only for Main Content area. Header, NavPanel, and Footer are docked. Main Content block is the scroll parent.
+![Horizontal-Sticky Layout with Content-Only Scroll and Gutters (No Overflow)](images/horizontal-sticky-content-scroll-with-gutters.svg)
 
-```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ H: Header (docked to top)                                                    │
-├──────────────────────────────────────────────────────────────────────────────┤
-│ N: Navigation Panel (docked to top)                                          │
-├─┬──────────────────────────────────────────────────────────────────────────┬─┤
-│ │ M: Main Content                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-├─┴──────────────────────────────────────────────────────────────────────────┴─┤
-│ F: Footer (docked to bottom)                                                 │
-└──────────────────────────────────────────────────────────────────────────────┘
-```
-
-### Horizontal-Sticky Layout with Content-Only Scroll (Mid-Scroll)
-
-- `layout`: horizontal-sticky
-- `noScrollbarGutters`: true
-- `scrollWholePage`: false
-
-**Note:** Content overflows; scrollbar visible on right side only for Main Content area. Header, NavPanel, and Footer remain docked and don't scroll. Scrollbar at mid-position. Main Content block is the scroll parent.
-
-```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ H: Header (docked to top)                                                    │
-├──────────────────────────────────────────────────────────────────────────────┤
-│ N: Navigation Panel (docked to top)                                          │
-├────────────────────────────────────────────────────────────────────────────┬─┤
-│ ↑ Content above (hidden)                                                   │ │
-│                                                                            │ │
-│                                                                            │ │
-│ M: Main Content (scrollable, mid-scroll position)                          │█│
-│                                                                            │█│
-│                                                                            │█│
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│ ↓ Content below (hidden)                                                   │ │
-├────────────────────────────────────────────────────────────────────────────┴─┤
-│ F: Footer (docked to bottom)                                                 │
-└──────────────────────────────────────────────────────────────────────────────┘
-```
-
-### Horizontal-Sticky Layout with Content-Only Scroll and Gutters (Mid-Scroll)
-
-- `layout`: horizontal-sticky
-- `noScrollbarGutters`: false
-- `scrollWholePage`: false
-
-**Note:** Content overflows; scrollbar visible in right gutter only for Main Content area. Header, NavPanel, and Footer remain docked and don't scroll. Scrollbar at mid-position. Main Content block is the scroll parent.
-
-```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ H: Header (docked to top)                                                    │
-├──────────────────────────────────────────────────────────────────────────────┤
-│ N: Navigation Panel (docked to top)                                          │
-├─┬──────────────────────────────────────────────────────────────────────────┬─┤
-│ │ ↑ Content above (hidden)                                                 │ │
-│ │                                                                          │ │
-│ │                                                                          │█│
-│ │ M: Main Content (scrollable, mid-scroll position)                        │█│
-│ │                                                                          │█│
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │ ↓ Content below (hidden)                                                 │ │
-├─┴──────────────────────────────────────────────────────────────────────────┴─┤
-│ F: Footer (docked to bottom)                                                 │
-└──────────────────────────────────────────────────────────────────────────────┘
-```
-
-### Horizontal-Sticky Layout with Content-Only Scroll (Scrolled to Bottom)
-
-- `layout`: horizontal-sticky
-- `noScrollbarGutters`: true
-- `scrollWholePage`: false
-
-**Note:** Content scrolled to bottom; scrollbar at bottom position only for Main Content area. Header, NavPanel, and Footer remain docked. End of content visible. Main Content block is the scroll parent.
-
-```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ H: Header (docked to top)                                                    │
-├──────────────────────────────────────────────────────────────────────────────┤
-│ N: Navigation Panel (docked to top)                                          │
-├────────────────────────────────────────────────────────────────────────────┬─┤
-│ ↑ Content above (hidden)                                                   │ │
-│                                                                            │ │
-│                                                                            │ │
-│ M: Main Content (scrollable, scrolled to bottom)                           │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│ (end of content)                                                           │█│
-├────────────────────────────────────────────────────────────────────────────┴─┤
-│ F: Footer (docked to bottom)                                                 │
-└──────────────────────────────────────────────────────────────────────────────┘
-```
-
-### Horizontal-Sticky Layout with Content-Only Scroll and Gutters (Scrolled to Bottom)
-
-- `layout`: horizontal-sticky
-- `noScrollbarGutters`: false
-- `scrollWholePage`: false
-
-**Note:** Content scrolled to bottom; scrollbar at bottom position in right gutter only for Main Content area. Header, NavPanel, and Footer remain docked. End of content visible. Main Content block is the scroll parent.
-
-```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ H: Header (docked to top)                                                    │
-├──────────────────────────────────────────────────────────────────────────────┤
-│ N: Navigation Panel (docked to top)                                          │
-├─┬──────────────────────────────────────────────────────────────────────────┬─┤
-│ │ ↑ Content above (hidden)                                                 │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │ M: Main Content (scrollable, scrolled to bottom)                         │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │ (end of content)                                                         │█│
-├─┴──────────────────────────────────────────────────────────────────────────┴─┤
-│ F: Footer (docked to bottom)                                                 │
-└──────────────────────────────────────────────────────────────────────────────┘
-```
+<img src="images/horizontal-sticky-content-scroll-with-gutters-top.svg" alt="Horizontal-Sticky Layout with Content-Only Scroll and Gutters (Top)" width="420" /> <img src="images/horizontal-sticky-content-scroll-with-gutters-mid.svg" alt="Horizontal-Sticky Layout with Content-Only Scroll and Gutters (Mid-Scroll)" width="420" /><br/>
+<img src="images/horizontal-sticky-content-scroll-with-gutters-bottom.svg" alt="Horizontal-Sticky Layout with Content-Only Scroll and Gutters (Bottom)" width="420" />
 
 ## Condensed Layout Diagrams
+
+**`layout`: "condensed"**
 
 All condensed layout diagrams share the following common characteristics:
 
@@ -1482,269 +1290,16 @@ All condensed layout diagrams share the following common characteristics:
 - **Block Arrangement**: Blocks are stacked vertically in rows: Header/NavPanel → Main Content → Footer
 - **Full Width Blocks**: All blocks span the full width of the container
 - **NavPanel in Header**: NavPanel is embedded within the header area (hamburger menu on small screens, inline on large screens)
-- **Variants**: The diagrams below demonstrate different combinations of scroll behavior (`scrollWholePage`), gutter reservation (`noScrollbarGutters`), and scroll positions
 
-### Condensed Layout (No Overflow)
+### Condensed Layout (scroll parent: app container, no scrollbar gutters)
 
-- `layout`: condensed
 - `noScrollbarGutters`: true
 - `scrollWholePage`: true
 
-**Note:** Content fits within viewport; no scrollbar visible. Header/NavPanel combined at top, Footer at bottom.
+![Condensed Layout (No Overflow)](images/condensed-layout-no-overflow.svg)
 
-```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ H/N: Header and Navigation Panel                                             │
-├──────────────────────────────────────────────────────────────────────────────┤
-│ M: Main Content                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-├──────────────────────────────────────────────────────────────────────────────┤
-│ F: Footer                                                                    │
-├──────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│ (remaining space below footer)                                               │
-│                                                                              │
-└──────────────────────────────────────────────────────────────────────────────┘
-```
-
-### Condensed Layout with Scroll Gutters (No Overflow)
-
-- `layout`: condensed
-- `noScrollbarGutters`: false
-- `scrollWholePage`: true
-
-**Note:** Content fits within viewport; scroll gutters reserved on both sides.
-
-```
-┌─┬──────────────────────────────────────────────────────────────────────────┬─┐
-│ │ H/N: Header and Navigation Panel                                         │ │
-│ ├──────────────────────────────────────────────────────────────────────────┤ │
-│ │ M: Main Content                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ ├──────────────────────────────────────────────────────────────────────────┤ │
-│ │ F: Footer                                                                │ │
-│ ├──────────────────────────────────────────────────────────────────────────┤ │
-│ │                                                                          │ │
-│ │ (remaining space below footer)                                           │ │
-│ │                                                                          │ │
-└─┴──────────────────────────────────────────────────────────────────────────┴─┘
-```
-
-### Condensed Layout with Overflow and Scrollbar
-
-- `layout`: condensed
-- `noScrollbarGutters`: false
-- `scrollWholePage`: true
-
-**Note:** Content overflows; scrollbar visible in right gutter at top position. Footer extends below visible screen.
-
-```
-┌─┬──────────────────────────────────────────────────────────────────────────┬─┐
-│ │ H/N: Header and Navigation Panel                                         │█│
-│ ├──────────────────────────────────────────────────────────────────────────┤█│
-│ │ M: Main Content                                                          │█│
-│ │                                                                          │█│
-│ │                                                                          │█│
-│ │                                                                          │█│
-│ │                                                                          │█│
-│ │                                                                          │█│
-│ │                                                                          │█│
-│ │                                                                          │█│
-│ │                                                                          │█│
-│ │                                                                          │█│
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-└─┴──────────────────────────────────────────────────────────────────────────┴─┘
-  │                                                                          │
-  ├──────────────────────────────────────────────────────────────────────────┤
-  │ F: Footer                                                                │
-  └──────────────────────────────────────────────────────────────────────────┘
-```
-
-### Condensed Layout with Overflow (No Gutter Reservation)
-
-- `layout`: condensed
-- `noScrollbarGutters`: true
-- `scrollWholePage`: true
-
-**Note:** Content overflows; scrollbar visible on right side. No scroll gutters reserved. Footer extends below visible screen.
-
-```
-┌────────────────────────────────────────────────────────────────────────────┬─┐
-│ H/N: Header and Navigation Panel                                           │█│
-├────────────────────────────────────────────────────────────────────────────┤█│
-│ M: Main Content                                                            │█│
-│                                                                            │█│
-│                                                                            │█│
-│                                                                            │█│
-│                                                                            │█│
-│                                                                            │█│
-│                                                                            │█│
-│                                                                            │█│
-│                                                                            │█│
-│                                                                            │█│
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-└────────────────────────────────────────────────────────────────────────────┴─┘
-  │                                                                            │
-  ├────────────────────────────────────────────────────────────────────────────┤
-  │ F: Footer                                                                  │
-  └────────────────────────────────────────────────────────────────────────────┘
-```
-
-### Condensed Layout Scrolled to Bottom
-
-- `layout`: condensed
-- `noScrollbarGutters`: false
-- `scrollWholePage`: true
-
-**Note:** Page scrolled to bottom; header/navpanel and top of main content overflow at top. Scrollbar at bottom position. Footer visible at bottom.
-
-```
-  ┌──────────────────────────────────────────────────────────────────────────┐
-  │ H/N: Header and Navigation Panel                                         │
-  ├──────────────────────────────────────────────────────────────────────────┤
-  │ M: Main Content                                                          │
-  │                                                                          │
-  │                                                                          │
-  │                                                                          │
-┌─┼──────────────────────────────────────────────────────────────────────────┼─┐
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ ├──────────────────────────────────────────────────────────────────────────┤█│
-│ │ F: Footer                                                                │█│
-└─┴──────────────────────────────────────────────────────────────────────────┴─┘
-```
-
-### Condensed Layout with Content-Only Scroll
-
-- `layout`: condensed
-- `noScrollbarGutters`: false
-- `scrollWholePage`: false
-
-**Note:** Only main content scrolls; header/navpanel and footer remain docked. Scrollbar belongs to main content block. Content overflow indicated with arrows.
-
-```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ H/N: Header and Navigation Panel (docked to top)                             │
-├─┬──────────────────────────────────────────────────────────────────────────┬─┤
-│ │ ↑ Content above (hidden)                                                 │ │
-│ │                                                                          │ │
-│ │                                                                          │█│
-│ │ M: Main Content (scrollable, mid-scroll position)                        │█│
-│ │                                                                          │█│
-│ │                                                                          │█│
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │ ↓ Content below (hidden)                                                 │ │
-├─┴──────────────────────────────────────────────────────────────────────────┴─┤
-│ F: Footer (docked to bottom)                                                 │
-└──────────────────────────────────────────────────────────────────────────────┘
-```
-
-### Condensed Layout with Content-Only Scroll (No Gutter Reservation)
-
-- `layout`: condensed
-- `noScrollbarGutters`: true
-- `scrollWholePage`: false
-
-**Note:** Only main content scrolls; header/navpanel and footer remain docked. Scrollbar on right side of main content only. Content overflow indicated with arrows.
-
-```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ H/N: Header and Navigation Panel (docked to top)                             │
-├────────────────────────────────────────────────────────────────────────────┬─┤
-│ ↑ Content above (hidden)                                                   │ │
-│                                                                            │ │
-│                                                                            │ │
-│ M: Main Content (scrollable, mid-scroll position)                          │█│
-│                                                                            │█│
-│                                                                            │█│
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│                                                                            │ │
-│ ↓ Content below (hidden)                                                   │ │
-├────────────────────────────────────────────────────────────────────────────┴─┤
-│ F: Footer (docked to bottom)                                                 │
-└──────────────────────────────────────────────────────────────────────────────┘
-```
+<img src="images/condensed-layout-no-gutters-top.svg" alt="Condensed Layout with Overflow (Top)" width="420" /> <img src="images/condensed-layout-no-gutters-mid.svg" alt="Condensed Layout with Overflow (Mid-Scroll)" width="420" /><br/>
+<img src="images/condensed-layout-no-gutters-bottom.svg" alt="Condensed Layout with Overflow (Bottom)" width="420" />
 
 ## Condensed-Sticky Layout Diagrams
 

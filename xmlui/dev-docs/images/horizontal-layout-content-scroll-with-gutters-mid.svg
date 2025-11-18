@@ -22,6 +22,7 @@
     .scrollbar-thumb { fill: #999; }
     .scrollbar-border { stroke: #999; stroke-width: 1; stroke-dasharray: 3,2; fill: none; }
     .text { font-family: Arial, sans-serif; font-size: 14px; fill: #333; text-anchor: start; font-style: italic; }
+    .text-overflow { font-family: Arial, sans-serif; font-size: 11px; fill: #666; text-anchor: middle; font-style: italic; }
   </style>
   
   <!-- Background -->
@@ -60,6 +61,12 @@
   <!-- Main Content block visible in viewport -->
   <rect class="content" x="35" y="210" width="770" height="465"/>
   <text class="text" x="45" y="240">M: Main Content</text>
+  
+  <!-- Top overflow indicator -->
+  <text class="text-overflow" x="420" y="235">↑ Overflow</text>
+  
+  <!-- Bottom overflow indicator -->
+  <text class="text-overflow" x="420" y="645">↓ Overflow</text>
   
   <!-- Scrollbar separator line for main content area only -->
   <line x1="805" y1="210" x2="805" y2="675" class="scrollbar-border"/>

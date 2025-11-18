@@ -6,9 +6,11 @@
       .nav { fill: #e0e0e0; }
       .content { fill: #ffffff; }
       .footer { fill: #d0d0d0; }
+      .gutter { fill: #e9ecef; }
       .overflow-bg { fill: url(#overflowPattern); }
       .main-screen-border { stroke: #333; stroke-width: 2; fill: none; }
       .block-border { stroke: #333; stroke-width: 1; fill: none; }
+      .gutter-edge { stroke: #666; stroke-width: 1; stroke-dasharray: 4,2; fill: none; }
       .scrollbar-track { fill: #e0e0e0; }
       .scrollbar-thumb { fill: #999; }
       .scrollbar-border { stroke: #999; stroke-width: 1; stroke-dasharray: 3,2; fill: none; }
@@ -25,7 +27,10 @@
   <rect width="840" height="840" class="container-bg"/>
 
   <!-- Overflow Content (above viewport) -->
-  <rect x="20" y="20" width="800" height="200" class="content overflow-bg"/>
+  <rect x="35" y="20" width="770" height="200" class="content overflow-bg"/>
+
+  <!-- Left Gutter (overflow area) -->
+  <rect x="20" y="20" width="15" height="200" class="gutter"/>
 
   <!-- Header (docked, full width) -->
   <rect x="20" y="220" width="800" height="45" class="header"/>
@@ -33,11 +38,18 @@
   <!-- Navigation Panel (docked, full width) -->
   <rect x="20" y="265" width="800" height="45" class="nav"/>
   
-  <!-- Main Content (bottom scroll position, full width) -->
-  <rect x="20" y="310" width="800" height="465" class="content"/>
+  <!-- Left Gutter (viewport) -->
+  <rect x="20" y="310" width="15" height="465" class="gutter"/>
+  
+  <!-- Main Content (bottom scroll position, with gutters) -->
+  <rect x="35" y="310" width="770" height="465" class="content"/>
   
   <!-- Footer (docked, full width) -->
   <rect x="20" y="775" width="800" height="45" class="footer"/>
+
+  <!-- Gutter Edges -->
+  <line x1="35" y1="20" x2="35" y2="220" class="gutter-edge"/>
+  <line x1="35" y1="310" x2="35" y2="775" class="gutter-edge"/>
 
   <!-- Block Separator Lines -->
   <line x1="20" y1="265" x2="820" y2="265" class="block-border"/>
@@ -45,10 +57,10 @@
   <line x1="20" y1="775" x2="820" y2="775" class="block-border"/>
 
   <!-- Text Labels -->
-  <text x="30" y="145" class="text">M: Overflow content (above)</text>
+  <text x="45" y="145" class="text">M: Overflow content (above)</text>
   <text x="30" y="247" class="text">H: Header (docked)</text>
   <text x="30" y="292" class="text">N: Navigation Panel (docked)</text>
-  <text x="30" y="337" class="text">M: Main Content (scrollable)</text>
+  <text x="45" y="337" class="text">M: Main Content (scrollable)</text>
   <text x="30" y="802" class="text">F: Footer (docked)</text>
 
   <!-- Overflow Indicator -->

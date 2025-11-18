@@ -70,36 +70,9 @@
   <rect x="805" y="220" width="15" height="600" class="scrollbar-track"/>
   
   <!-- Scrollbar thumb positioned at bottom (representing bottom scroll position) -->
-  <rect x="807" y="666" width="11" height="154" class="scrollbar-thumb"/>
-  
-  <!-- Main screen border (THICK 2px) drawn LAST so it appears on top of everything -->
-  <rect x="20" y="220" width="800" height="600" class="main-screen-border"/>
-</svg>
-  <text x="30" y="140" class="text">M: Main Content (overflow)</text>
-  
-  <!-- MAIN SCREEN VIEWPORT (800x600) starts at y=220 -->
-  
-  <!-- Main Content block visible in viewport (555px visible at top) -->
-  <rect x="20" y="220" width="800" height="555" class="content"/>
-  <text x="30" y="250" class="text">M: Main Content</text>
-  
-  <!-- Separator between Main Content and Footer -->
-  <line x1="20" y1="775" x2="820" y2="775" class="block-border"/>
-  
-  <!-- Footer in viewport (45px visible, aligned to bottom of viewport) -->
-  <rect x="20" y="775" width="800" height="45" class="footer"/>
-  <text x="30" y="803" class="text">F: Footer</text>
-  
-  <!-- Scrollbar separator line (dashed line for visual separation) -->
-  <line x1="805" y1="220" x2="805" y2="820" class="scrollbar-border"/>
-  
-  <!-- Scrollbar track (15px wide on the right side, viewport height only) -->
-  <rect x="805" y="220" width="15" height="600" class="scrollbar-track"/>
-  
-  <!-- Scrollbar thumb positioned at bottom (representing scrolled to bottom position) -->
   <!-- Thumb at bottom: track_start (220) + track_height (600) - thumb_height (154) = 666 -->
   <rect x="807" y="666" width="11" height="154" class="scrollbar-thumb"/>
   
-  <!-- Main screen border (drawn last so it appears on top of everything) -->
+  <!-- Main screen border (THICK 2px) drawn LAST so it appears on top of everything -->
   <rect x="20" y="220" width="800" height="600" class="main-screen-border"/>
 </svg>
