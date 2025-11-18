@@ -51,10 +51,10 @@
   <!-- Right gutter in overflow -->
   <rect class="gutter overflow-bg" x="805" y="20" width="15" height="200"/>
   
-  <!-- Navigation Panel (left side, full height in viewport) -->
+  <!-- Navigation Panel (left side, full height) -->
   <rect class="nav" x="20" y="220" width="200" height="600"/>
   <line class="block-border" x1="220" y1="220" x2="220" y2="820"/>
-  <text class="text" x="30" y="247">N: Navigation Panel (docked to left)</text>
+  <text class="text" x="30" y="250">N: NavPanel (docked left)</text>
   
   <!-- Header (right column, sticky to top) -->
   <rect class="header" x="220" y="220" width="600" height="45"/>
