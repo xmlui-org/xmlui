@@ -61,7 +61,7 @@
   <rect x="805" y="310" width="15" height="465" class="scrollbar-track"/>
 
   <!-- Scrollbar Thumb (bottom position) -->
-  <rect x="807" y="656" width="11" height="119" class="scrollbar-thumb"/>
+  <rect x="807" y="652" width="11" height="119" class="scrollbar-thumb"/>
 
   <!-- Main Screen Border (draw last) -->
   <rect x="20" y="220" width="800" height="600" class="main-screen-border"/>
