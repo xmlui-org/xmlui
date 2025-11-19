@@ -1,24 +1,12 @@
-import {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  type CSSProperties,
-  type ReactNode,
-} from "react";
+import { forwardRef, useRef, type CSSProperties, type ReactNode } from "react";
 import * as RadixSelect from "@radix-ui/react-select";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 import styles from "./Select.module.scss";
 
-import type { SingleValueType, ValueType } from "./SelectNative";
-import { SelectTriggerValue, SelectTriggerActions } from "./SelectNative";
+import type { SingleValueType } from "./SelectNative";
+import { SelectTriggerActions } from "./SelectNative";
 import type { ValidationStatus, Option } from "../abstractions";
-import Icon from "../Icon/IconNative";
-import { Part } from "../Part/Part";
-
-const PART_CLEAR_BUTTON = "clearButton";
 
 interface SimpleSelectProps {
   id?: string;
@@ -73,9 +61,6 @@ export const SimpleSelect = forwardRef<HTMLDivElement, SimpleSelectProps>(functi
 ) {
   const localRef = useRef<HTMLButtonElement>(null);
 
-  // Dummy toggleOption for SelectTriggerValue (not used in single select)
-  const toggleOption = useCallback(() => {}, []);
-
   return (
     <RadixSelect.Root value={value ? String(value) : undefined} onValueChange={onValueChange}>
       <RadixSelect.Trigger
@@ -91,15 +76,7 @@ export const SimpleSelect = forwardRef<HTMLDivElement, SimpleSelectProps>(functi
         })}
         autoFocus={autoFocus}
       >
-        <SelectTriggerValue
-          value={value}
-          placeholder={placeholder}
-          readOnly={readOnly}
-          multiSelect={false}
-          options={options}
-          valueRenderer={valueRenderer}
-          toggleOption={toggleOption}
-        />
+        <RadixSelect.Value placeholder={placeholder} />
         <SelectTriggerActions
           value={value}
           multiSelect={false}
