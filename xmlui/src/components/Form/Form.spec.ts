@@ -1188,7 +1188,7 @@ test.describe("Basic Functionality", () => {
 
       const result = await testStateDriver.testState();
       expect(result).toBeTruthy();
-      expect(result.data).toEqual({ name: "John Doe", age: "30" });
+      expect(result.data).toEqual({ name: "John Doe", age: 30 });
     });
 
     test("validate method displays validation errors on form", async ({

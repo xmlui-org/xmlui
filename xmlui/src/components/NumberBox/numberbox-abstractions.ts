@@ -29,14 +29,18 @@ export function clamp(value: number, min: number, max: number) {
 }
 
 export function toUsableNumber(value: string | number | empty, isInteger = false): number | empty {
-  const isUsable = isInteger ? isUsableInteger : isUsableFloat;
-  if (!isUsable(value)) return null;
+  if (!isUsableNumber(value, isInteger)) return null;
 
   if (typeof value === "string") {
     value = isInteger ? Number.parseInt(value) : +value;
   }
 
   return value;
+}
+
+export function isUsableNumber(value: string | number | empty, isInteger = false) {
+  const isUsable = isInteger ? isUsableInteger : isUsableFloat;
+  return isUsable(value);
 }
 
 /**

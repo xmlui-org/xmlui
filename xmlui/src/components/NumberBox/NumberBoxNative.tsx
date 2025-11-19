@@ -22,6 +22,7 @@ import {
   FLOAT_REGEXP,
   INT_REGEXP,
   isEmptyLike,
+  isUsableNumber,
   mapToRepresentation,
   NUMBERBOX_MAX_VALUE,
   toUsableNumber,
@@ -174,14 +175,23 @@ export const NumberBox = forwardRef(function NumberBox(
   // --- Keypress
   const onInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      // const newValue = sanitizeInput(event.target.value.trim(), value, integersOnly, zeroOrPositive, min, max);
-      // if (!newValue) return;
-      // updateValue(newValue[0], newValue[1]);
-      const value = event.target.value;
-      const repr = value;
-      updateValue(value, repr);
+      const newValue = event.target.value;
+      const repr = newValue;
+
+      if (newValue === "" || newValue === "-" ) {
+        updateValue(null, repr);
+        return;
+      }
+      if (isUsableNumber(newValue, integersOnly)) {
+        let usableNumber = toUsableNumber(newValue, integersOnly);
+        usableNumber = clamp(usableNumber as number, min, max);
+        updateValue(usableNumber, repr);
+        return;
+      }
+      setValueStrRep(repr);
+      onDidChange(newValue);
     },
-    [updateValue],
+    [updateValue, integersOnly, onDidChange, min, max],
   );
 
   // --- Stepper logic
@@ -368,18 +378,20 @@ export const NumberBox = forwardRef(function NumberBox(
   );
 
   // --- This logic prevents the user from typing invalid characters (in the current typing context)
-  const handleOnBeforeInput = (event: any) => {
-    const currentValue: string = event.target.value ?? "";
-    const currentPos = event.target.selectionStart;
+  // NOTE: the typing is done so 
+  const handleOnBeforeInput = (event: React.FormEvent<HTMLInputElement> & { data: string | null }) => {
+    const target = event.target as HTMLInputElement;
+    const currentValue: string = target.value ?? "";
+    const currentPos = target.selectionStart;
     const expectedNewValue =
       currentValue.substring(0, currentPos) +
       event.data +
-      currentValue.substring(event.target.selectionEnd);
+      currentValue.substring(target.selectionEnd);
 
     // --- Handle multi-character input (paste) through the legacy path
     if (event.data?.length > 1) {
       let shouldPreventDefault = false;
-      const selectionStart = event.target.selectionStart;
+      const selectionStart = target.selectionStart;
       let newInput = event.data;
 
       // --- Decide whether to accept the optional sign character
@@ -423,12 +435,9 @@ export const NumberBox = forwardRef(function NumberBox(
 
     // --- Apply value changes if needed
     if (result.newValue !== currentValue) {
-      const setNewValue = (newValue: string, pos: number) => {
-        event.target.value = newValue;
-        updateValue(newValue, newValue);
-        inputRef.current?.setSelectionRange(pos, pos);
-      };
-      setNewValue(result.newValue!, result.newPos!);
+      target.value = result.newValue!;
+      updateValue(result.newValue!, result.newValue!);
+      inputRef.current?.setSelectionRange(result.newPos!, result.newPos!);
     }
   };
 
@@ -665,10 +674,32 @@ function applyStep(
   integersOnly: boolean,
 ) {
   const currentValue = toUsableNumber(valueStrRep, integersOnly);
-  if (isEmptyLike(currentValue)) {
-    return;
+  if (isEmptyLike(currentValue)) return;
+
+  const clampedValue = clamp(currentValue + step, min, max);
+  const fractionLength = valueStrRep.split('.')[1]?.length ?? 0;
+  return roundTo(clampedValue, fractionLength);
+
+  // ---
+
+  function roundTo(n: number, digits: number | undefined) {
+    let negative = false;
+    if (digits === undefined) {
+      digits = 0;
+    }
+    if (n < 0) {
+      negative = true;
+      n = n * -1;
+    }
+    const multiplicator = Math.pow(10, digits);
+    n = n + (Math.pow(10, - digits - 1));
+    n = parseFloat((n * multiplicator).toFixed(11));
+    n = +((Math.round(n) / multiplicator).toFixed(digits));
+    if (negative) {
+      n = +((n * -1).toFixed(digits));
+    }
+    return n;
   }
-  return clamp(currentValue + step, min, max);
 }
 
 function useLongPress(elementRef: HTMLElement | null, action: () => void, delay: number = 500) {
