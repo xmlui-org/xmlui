@@ -1,0 +1,434 @@
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$width-navPanel-App: createThemeVar("width-navPanel-App");
+$backgroundColor-navPanel-App: createThemeVar("backgroundColor-navPanel-App");
+$boxShadow-header-App: createThemeVar("boxShadow-header-App");
+$boxShadow-navPanel-App: createThemeVar("boxShadow-navPanel-App");
+$backgroundColor-content-App: createThemeVar("backgroundColor-content-App");
+$borderLeft-content-App: createThemeVar("borderLeft-content-App");
+$maxWidth-content-App: createThemeVar("maxWidth-content-App");
+$maxWidth-App: createThemeVar("maxWidth-App");
+$backgroundColor-AppHeader: createThemeVar("backgroundColor-AppHeader");
+$borderBottom-NavPanel: createThemeVar("borderBottom-AppHeader");
+$scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
+
+// Variables for @layer section
+$maxWidth-App: createThemeVar("maxWidth-App");
+
+@layer components {
+  @include t.withMaxScreenSize(0) {
+    .wrapper.verticalFullHeader {
+      .navPanelWrapper {
+        display: none;
+      }
+    }
+  }
+
+  .wrapper {
+    --footer-height: 0px;
+    --header-height: 0px;
+    width: 100%;
+    height: 100%;
+    position: relative; //leave it here, otherwise there could be double scrollbars because of the absolute positionings (typically radix's visuallyHidden)
+    display: flex;
+    flex-direction: column;
+    isolation: isolate;
+
+    &.vertical {
+      flex-direction: row;
+      overflow: initial;
+
+      .contentWrapper {
+        overflow: auto;
+        scroll-padding-block: $scrollPaddingBlockPage;
+        position: relative;
+        scrollbar-gutter: stable both-edges;
+      }
+      &.noScrollbarGutters {
+        .contentWrapper {
+          scrollbar-gutter: auto;
+        }
+      }
+      .navPanelWrapper {
+        width: $width-navPanel-App;
+        flex-shrink: 0;
+      }
+
+      .PagesWrapper {
+        min-height: initial;
+        flex: 1;
+      }
+
+      .footerWrapper {
+        position: static;
+      }
+      &.sticky {
+        .footerWrapper {
+          position: sticky;
+          bottom: 0;
+        }
+        .footerWrapper.nonSticky {
+          position: static;
+        }
+      }
+    }
+
+    &.horizontal {
+      overflow: auto;
+      scroll-padding-block: $scrollPaddingBlockPage;
+      .PagesWrapper {
+        min-height: initial;
+      }
+      .footerWrapper {
+        position: static;
+      }
+      &.sticky {
+        min-height: 100%;
+        .footerWrapper {
+          position: sticky;
+          bottom: 0;
+        }
+        .footerWrapper.nonSticky {
+          position: static;
+        }
+      }
+      .navPanelWrapper {
+        border-bottom: $borderBottom-NavPanel;
+        justify-content: end;
+        background-color: $backgroundColor-navPanel-App;
+        padding: 0;
+      }
+      .headerWrapper {
+        padding-inline: 0;
+
+        > div {
+          padding-inline: 0;
+        }
+      }
+    }
+
+    &.desktop {
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      scrollbar-gutter: auto;
+      max-width: none;
+
+      // When nested (like in playground), use container dimensions instead of viewport
+      &:global(.nested-app) {
+        width: 100%;
+        height: 100%;
+      }
+
+      .headerWrapper {
+        position: sticky;
+        top: 0;
+        flex-shrink: 0;
+        z-index: 1;
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: none !important;
+        width: 100% !important;
+
+        & > * {
+          margin: 0 !important;
+          padding: 0 !important;
+          max-width: none !important;
+          width: 100% !important;
+        }
+
+        & * {
+          max-width: none !important;
+          padding-inline: 0 !important;
+          padding-left: 0 !important;
+          padding-right: 0 !important;
+          margin-inline: 0 !important;
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+        }
+
+        :global(.headerInner) {
+          padding: 0 !important;
+          margin: 0 !important;
+          padding-inline: 0 !important;
+          max-width: none !important;
+        }
+      }
+
+      .PagesWrapper {
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        scrollbar-gutter: auto;
+        margin: 0;
+        padding: 0;
+        max-width: none;
+        width: 100%;
+      }
+
+      .PagesWrapperInner {
+        flex: 1;
+        min-height: 0;
+        max-width: none;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        scrollbar-gutter: auto;
+      }
+
+      .footerWrapper {
+        position: sticky;
+        bottom: 0;
+        flex-shrink: 0;
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: none !important;
+        width: 100% !important;
+
+        & > * {
+          margin: 0 !important;
+          padding: 0 !important;
+          max-width: none !important;
+          width: 100% !important;
+        }
+
+        & * {
+          max-width: none !important;
+          padding-inline: 0 !important;
+          padding-left: 0 !important;
+          padding-right: 0 !important;
+          margin-inline: 0 !important;
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+        }
+      }
+    }
+
+    &.verticalFullHeader {
+      min-height: 100%;
+      height: 100%;
+      overflow: auto;
+      scroll-padding-block: $scrollPaddingBlockPage;
+      .navPanelWrapper {
+        width: $width-navPanel-App;
+        position: sticky;
+        height: calc(var(--containerHeight, 100vh) - var(--footer-height) - var(--header-height));
+        top: var(--header-height);
+
+        &::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          width: 50vw;
+          z-index: -1;
+          background-color: $backgroundColor-navPanel-App;
+        }
+      }
+      
+      // When no footer is sticky (footer sticky=false), don't subtract footer height
+      &.noFooter {
+        .navPanelWrapper {
+          height: calc(var(--containerHeight, 100vh) - var(--header-height));
+        }
+      }
+
+      .PagesWrapper {
+        overflow: initial;
+        min-height: calc(
+          var(--containerHeight, 100vh) - var(--header-height) - var(--footer-height)
+        );
+        height: 100%;
+      }
+      
+      // When no footer is sticky (footer sticky=false), don't subtract footer height
+      &.noFooter {
+        .PagesWrapper {
+          min-height: calc(var(--containerHeight, 100vh) - var(--header-height));
+        }
+      }
+
+      .PagesWrapperInner {
+        height: 100%;
+        & > :global(.xmlui-page-root) {
+          height: 100%;
+        }
+      }
+
+      .footerWrapper {
+        position: sticky;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        &.nonSticky {
+          position: static;
+        }
+      }
+    }
+
+    &.scrollWholePage {
+      scrollbar-gutter: stable both-edges;
+
+      .headerWrapper {
+        & > div {
+          padding-inline: var(--scrollbar-width);
+        }
+        margin-inline: calc(-1 * var(--scrollbar-width));
+      }
+
+      .footerWrapper {
+        margin-inline: calc(-1 * var(--scrollbar-width));
+        & > div {
+          padding-inline: var(--scrollbar-width);
+        }
+      }
+
+      &.verticalFullHeader {
+        .content {
+          margin-inline: calc(-1 * var(--scrollbar-width));
+          width: calc(100% + (2 * var(--scrollbar-width)));
+        }
+        .contentWrapper {
+          padding-inline: var(--scrollbar-width);
+        }
+      }
+
+      &.desktop {
+        scrollbar-gutter: auto;
+
+        .headerWrapper {
+          & > div {
+            padding-inline: 0;
+          }
+          margin-inline: 0;
+        }
+
+        .footerWrapper {
+          margin-inline: 0;
+          & > div {
+            padding-inline: 0;
+          }
+        }
+      }
+    }
+
+    &:not(.scrollWholePage) {
+      overflow: hidden;
+      .content {
+        min-height: 0;
+        height: 100%;
+      }
+      .contentWrapper {
+        overflow: initial;
+      }
+      .PagesWrapper {
+        overflow: auto;
+        scroll-padding-block: $scrollPaddingBlockPage;
+        min-height: 0;
+        height: 100%;
+        scrollbar-gutter: stable both-edges;
+      }
+      .PagesWrapperInner {
+        min-height: 100%;
+        height: 0;
+      }
+    }
+
+    &.noScrollbarGutters {
+      scrollbar-gutter: auto;
+      .PagesWrapper {
+        scrollbar-gutter: auto;
+      }
+    }
+  }
+
+  .headerWrapper {
+    z-index: 1;
+    min-height: 0;
+    flex-shrink: 0;
+    overflow-x: clip;
+    top: 0;
+    box-shadow: $boxShadow-header-App;
+    background-color: $backgroundColor-AppHeader;
+    &.sticky {
+      position: sticky;
+    }
+  }
+
+  .content {
+    display: flex;
+    flex-direction: row;
+    isolation: isolate;
+    align-self: center;
+    width: 100%;
+    max-width: $maxWidth-App;
+  }
+
+  .contentWrapper {
+    position: relative;
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    box-shadow: $boxShadow-navPanel-App;
+    background-color: $backgroundColor-content-App;
+    border-left: $borderLeft-content-App;
+  }
+
+  .navPanelWrapper {
+    display: flex;
+    position: sticky;
+    top: 0;
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  .PagesWrapper {
+    flex: 1;
+    isolation: isolate;
+  }
+
+  .PagesWrapperInner {
+    max-width: $maxWidth-content-App;
+    width: 100%;
+    margin: 0 auto;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    &.withDefaultContentPadding {
+      padding-left: t.$space-4;
+      padding-right: t.$space-4;
+      padding-top: t.$space-5;
+      padding-bottom: t.$space-5;
+      gap: t.$space-5;
+    }
+  }
+
+  .footerWrapper {
+    flex-shrink: 0;
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

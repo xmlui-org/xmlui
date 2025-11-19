@@ -1,0 +1,151 @@
+@use "../../components-core/theming/themes" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$maxWidth-Drawer: createThemeVar("maxWidth-Drawer");
+
+//we do it with animations (instead of transitions) because: https://www.radix-ui.com/primitives/docs/guides/animation
+$reveal-anim-duration: 300ms;
+
+@keyframes slide-in-from-left {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+    box-shadow: none;
+  }
+  to {
+  }
+}
+
+@keyframes slide-out-to-left {
+  from {
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+    box-shadow: none;
+  }
+}
+
+@keyframes blur-in {
+  from {
+    background-color: transparent;
+    backdrop-filter: blur(0);
+  }
+  to {
+  }
+}
+
+@keyframes blur-out {
+  from {
+  }
+  to {
+    backdrop-filter: blur(0);
+    background-color: transparent;
+  }
+}
+
+
+.overlay{
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  backdrop-filter: blur(4px);
+  background-color: #{rgb}(from t.useVar(t.$backgroundColor-primary) r g b / 70%);
+  
+  &[data-state='open']{
+    animation: blur-in $reveal-anim-duration;
+  }
+  &[data-state='closed']{
+    animation: blur-out $reveal-anim-duration;
+  }
+}
+
+
+.sheetContent{
+  position: absolute;
+  gap: 1rem;
+  background-color: t.$backgroundColor;
+
+  opacity: 1;
+  transform: translateX(0);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border-color: transparent;
+  
+  &[data-state='open']{
+    animation: slide-in-from-left $reveal-anim-duration;
+  }
+  &[data-state='closed']{
+    animation: slide-out-to-left $reveal-anim-duration;
+  }
+  
+  &.top{
+    right: 0;
+    left: 0;
+    top: 0;
+    border-bottom-width: 1px;
+  }
+  
+  &.bottom{
+    right: 0;
+    left: 0;
+    bottom: 0;
+    border-top-width: 1px;
+  }
+  
+  &.left{
+    top: 0;
+    bottom: 0;
+    left: 0;
+    border-right-width: 1px;
+    width: 100%;
+    height: 100%;
+    max-width: $maxWidth-Drawer;
+  }
+  
+  &.right{
+    top: 0;
+    bottom: 0;
+    right: 0;
+    border-left-width: 1px;
+    width: 100%;
+    height: 100%;
+    max-width: $maxWidth-Drawer;
+  }
+}
+
+.close{
+  color: inherit;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: t.$borderRadius;
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+  opacity: 0.7;
+  padding: 0.25rem;
+  background-color: inherit;
+  border: 0;
+  cursor: pointer;
+  z-index: 2;
+
+  &:hover {
+    opacity: 1;
+  }
+
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export{
+  themeVars: t.json-stringify($themeVars)
+}
