@@ -418,11 +418,7 @@ test.describe("Basic Functionality", () => {
     await expect(driver.clearButton).not.toBeVisible();
   });
 
-  test("clear button works with multiSelect", async ({
-    initTestBed,
-    createSelectDriver,
-    page,
-  }) => {
+  test("clear button works with multiSelect", async ({ initTestBed, createSelectDriver, page }) => {
     await initTestBed(`
       <Select clearable="true" multiSelect="true">
         <Option value="opt1" label="first"/>
@@ -499,7 +495,7 @@ test.describe("Basic Functionality", () => {
     await driver.selectLabel("first");
 
     // Reset test state
-    await page.evaluate(() => (window as any).testState = null);
+    await page.evaluate(() => ((window as any).testState = null));
 
     // Click the clear button
     await driver.clearButton.click();
@@ -1101,60 +1097,74 @@ test.describe("Theme Variables", () => {
 
 test.describe("Behaviors and Parts", () => {
   test("handles tooltip", async ({ page, initTestBed }) => {
-    await initTestBed(`<Select testId="test" tooltip="Tooltip text"><Option value="1" label="Test" /></Select>`);
-    
+    await initTestBed(
+      `<Select testId="test" tooltip="Tooltip text"><Option value="1" label="Test" /></Select>`,
+    );
+
     const component = page.getByTestId("test");
     await component.hover();
     const tooltip = page.getByRole("tooltip");
-    
+
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toHaveText("Tooltip text");
   });
 
   test("tooltip with markdown content", async ({ page, initTestBed }) => {
-    await initTestBed(`<Select testId="test" tooltipMarkdown="**Bold text**"><Option value="1" label="Test" /></Select>`);
-    
+    await initTestBed(
+      `<Select testId="test" tooltipMarkdown="**Bold text**"><Option value="1" label="Test" /></Select>`,
+    );
+
     const component = page.getByTestId("test");
     await component.hover();
     const tooltip = page.getByRole("tooltip");
-    
+
     await expect(tooltip).toBeVisible();
     await expect(tooltip.locator("strong")).toHaveText("Bold text");
   });
 
   test("handles variant", async ({ page, initTestBed }) => {
-    await initTestBed(`<Select testId="test" variant="CustomVariant"><Option value="1" label="Test" /></Select>`, {
-      testThemeVars: {
-        "borderColor-Select-CustomVariant": "rgb(255, 0, 0)",
+    await initTestBed(
+      `<Select testId="test" variant="CustomVariant"><Option value="1" label="Test" /></Select>`,
+      {
+        testThemeVars: {
+          "borderColor-Select-CustomVariant": "rgb(255, 0, 0)",
+        },
       },
-    });
+    );
     const component = page.getByTestId("test");
     await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
   });
 
   test("variant applies custom theme variables", async ({ page, initTestBed }) => {
-    await initTestBed(`<Select testId="test" variant="CustomVariant"><Option value="1" label="Test" /></Select>`, {
-      testThemeVars: {
-        "backgroundColor-Select-CustomVariant": "rgb(0, 255, 0)",
+    await initTestBed(
+      `<Select testId="test" variant="CustomVariant"><Option value="1" label="Test" /></Select>`,
+      {
+        testThemeVars: {
+          "backgroundColor-Select-CustomVariant": "rgb(0, 255, 0)",
+        },
       },
-    });
+    );
     const component = page.getByTestId("test");
     await expect(component).toHaveCSS("background-color", "rgb(0, 255, 0)");
   });
 
   test("animation behavior", async ({ page, initTestBed }) => {
-    await initTestBed(`<Select testId="test" animation="fadeIn"><Option value="1" label="Test" /></Select>`);
-    
+    await initTestBed(
+      `<Select testId="test" animation="fadeIn"><Option value="1" label="Test" /></Select>`,
+    );
+
     const component = page.getByTestId("test");
     await expect(component).toBeVisible();
   });
 
   test("combined tooltip and animation", async ({ page, initTestBed }) => {
-    await initTestBed(`<Select testId="test" tooltip="Tooltip text" animation="fadeIn"><Option value="1" label="Test" /></Select>`);
-    
+    await initTestBed(
+      `<Select testId="test" tooltip="Tooltip text" animation="fadeIn"><Option value="1" label="Test" /></Select>`,
+    );
+
     const component = page.getByTestId("test");
     await expect(component).toBeVisible();
-    
+
     await component.hover();
     const tooltip = page.getByRole("tooltip");
     await expect(tooltip).toBeVisible();
@@ -1168,27 +1178,33 @@ test.describe("Behaviors and Parts", () => {
   });
 
   test("can select part: 'clearButton'", async ({ page, initTestBed }) => {
-    await initTestBed(`<Select testId="test" clearable="true" initialValue="1"><Option value="1" label="Test" /></Select>`);
+    await initTestBed(
+      `<Select testId="test" clearable="true" initialValue="1"><Option value="1" label="Test" /></Select>`,
+    );
     const clearButton = page.locator("[data-part-id='clearButton']");
     await expect(clearButton).toBeVisible();
   });
 
   test("clearButton part is not present without clearable", async ({ page, initTestBed }) => {
-    await initTestBed(`<Select testId="test" clearable="false"><Option value="1" label="Test" /></Select>`);
+    await initTestBed(
+      `<Select testId="test" clearable="false"><Option value="1" label="Test" /></Select>`,
+    );
     const clearButton = page.locator("[data-part-id='clearButton']");
     await expect(clearButton).not.toBeVisible();
   });
 
   test("parts are present when tooltip is added", async ({ page, initTestBed }) => {
-    await initTestBed(`<Select testId="test" tooltip="Tooltip text" clearable="true" initialValue="1"><Option value="1" label="Test" /></Select>`);
-    
+    await initTestBed(
+      `<Select testId="test" tooltip="Tooltip text" clearable="true" initialValue="1"><Option value="1" label="Test" /></Select>`,
+    );
+
     const component = page.getByTestId("test");
     const listWrapper = page.locator("[data-part-id='listWrapper']");
     const clearButton = page.locator("[data-part-id='clearButton']");
-    
+
     await expect(listWrapper).toBeVisible();
     await expect(clearButton).toBeVisible();
-    
+
     await component.hover();
     const tooltip = page.getByRole("tooltip");
     await expect(tooltip).toBeVisible();
@@ -1196,21 +1212,25 @@ test.describe("Behaviors and Parts", () => {
   });
 
   test("parts are present when variant is added", async ({ page, initTestBed }) => {
-    await initTestBed(`<Select testId="test" variant="CustomVariant"><Option value="1" label="Test" /></Select>`, {
-      testThemeVars: {
-        "borderColor-Select-CustomVariant": "rgb(255, 0, 0)",
+    await initTestBed(
+      `<Select testId="test" variant="CustomVariant"><Option value="1" label="Test" /></Select>`,
+      {
+        testThemeVars: {
+          "borderColor-Select-CustomVariant": "rgb(255, 0, 0)",
+        },
       },
-    });
-    
+    );
+
     const component = page.getByTestId("test");
     const listWrapper = page.locator("[data-part-id='listWrapper']");
-    
+
     await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
     await expect(listWrapper).toBeVisible();
   });
 
   test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
-    await initTestBed(`
+    await initTestBed(
+      `
       <Select 
         testId="test" 
         variant="CustomVariant"
@@ -1221,19 +1241,21 @@ test.describe("Behaviors and Parts", () => {
       >
         <Option value="1" label="Test" />
       </Select>
-    `, {
-      testThemeVars: {
-        "backgroundColor-Select-CustomVariant": "rgb(255, 0, 0)",
+    `,
+      {
+        testThemeVars: {
+          "backgroundColor-Select-CustomVariant": "rgb(255, 0, 0)",
+        },
       },
-    });
-    
+    );
+
     const component = page.getByTestId("test");
     const listWrapper = page.locator("[data-part-id='listWrapper']");
     const clearButton = page.locator("[data-part-id='clearButton']");
-    
+
     // Verify variant applied
     await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
-    
+
     // Verify parts are visible
     await expect(listWrapper).toBeVisible();
     await expect(clearButton).toBeVisible();

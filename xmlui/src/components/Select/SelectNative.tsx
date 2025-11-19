@@ -8,10 +8,13 @@ import {
   type CSSProperties,
   type ReactNode,
 } from "react";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import classnames from "classnames";
+// Note: FocusScope from @radix-ui/react-focus-scope could be added for enhanced focus management
+// import { FocusScope } from "@radix-ui/react-focus-scope";
+import { SelectOption } from "./SelectOption";
 import styles from "./Select.module.scss";
-import { composeRefs } from "@radix-ui/react-compose-refs";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
@@ -19,14 +22,17 @@ import { useTheme } from "../../components-core/theming/ThemeContext";
 import { useEvent } from "../../components-core/utils/misc";
 import type { Option, ValidationStatus } from "../abstractions";
 import Icon from "../Icon/IconNative";
-import { SelectContext, useSelect } from "./SelectContext";
+import { SelectContext } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
-import { OptionContext, useOption } from "./OptionContext";
+import { OptionContext } from "./OptionContext";
 import { HiddenOption } from "./HiddenOption";
+import { useIsInsideForm } from "../Form/FormContext";
+import { SimpleSelect } from "./SimpleSelect";
+import { MultiSelectOption } from "./MultiSelectOption";
 import { Part } from "../Part/Part";
 
-const PART_LIST_WRAPPER = "listWrapper";
 const PART_CLEAR_BUTTON = "clearButton";
+const PART_LIST_WRAPPER = "listWrapper";
 
 export const defaultProps = {
   enabled: true,
@@ -93,7 +99,7 @@ interface SelectProps {
 }
 
 // Common trigger value display props
-interface SelectTriggerValueProps {
+export interface SelectTriggerValueProps {
   value: ValueType;
   placeholder: string;
   readOnly: boolean;
@@ -104,7 +110,7 @@ interface SelectTriggerValueProps {
 }
 
 // Common trigger value display component
-const SelectTriggerValue = ({
+export const SelectTriggerValue = ({
   value,
   placeholder,
   readOnly,
@@ -165,7 +171,7 @@ const SelectTriggerValue = ({
 };
 
 // Common trigger actions (clear button + chevron)
-interface SelectTriggerActionsProps {
+export interface SelectTriggerActionsProps {
   value: ValueType;
   multiSelect: boolean;
   enabled: boolean;
@@ -175,7 +181,7 @@ interface SelectTriggerActionsProps {
   showChevron?: boolean;
 }
 
-const SelectTriggerActions = ({
+export const SelectTriggerActions = ({
   value,
   multiSelect,
   enabled,
@@ -192,15 +198,15 @@ const SelectTriggerActions = ({
     <div className={styles.actions}>
       {hasValue && enabled && !readOnly && clearable && (
         <Part partId={PART_CLEAR_BUTTON}>
-        <span
-          className={styles.action}
-          onClick={(event) => {
-            event.stopPropagation();
-            clearValue();
-          }}
-        >
-          <Icon name="close" />
-        </span>
+          <span
+            className={styles.action}
+            onClick={(event) => {
+              event.stopPropagation();
+              clearValue();
+            }}
+          >
+            <Icon name="close" />
+          </span>
         </Part>
       )}
       {showChevron && (
@@ -265,6 +271,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   const observer = useRef<ResizeObserver>();
   const { root } = useTheme();
   const [options, setOptions] = useState(new Set<Option>());
+  const isInForm = useIsInsideForm();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
@@ -534,117 +541,95 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   return (
     <SelectContext.Provider value={selectContextValue}>
       <OptionContext.Provider value={optionContextValue}>
-        <OptionTypeProvider Component={VisibleSelectOption}>
-          <Popover
-            open={open}
-            onOpenChange={(isOpen) => {
-              if (!enabled) return;
-              setOpen(isOpen);
-              // Reset highlighted option when dropdown closes
-              setSelectedIndex(-1);
-            }}
-            modal={modal}
-          >
-            <Part partId={PART_LIST_WRAPPER}>
-              <PopoverTrigger
-                {...rest}
-                ref={composeRefs(setReferenceElement, forwardedRef)}
-                id={id}
-                aria-haspopup="listbox"
-                style={style}
-                onFocus={onFocus}
-                onBlur={onBlur}
-                disabled={!enabled}
-                aria-expanded={open}
-                className={classnames(className, styles.selectTrigger, styles[validationStatus], {
-                  [styles.disabled]: !enabled,
-                  [styles.multi]: multiSelect,
-                })}
-                role="combobox"
-                onClick={(event) => {
-                  if (!enabled) return;
-                  event.stopPropagation();
-                  setOpen((prev) => !prev);
-                }}
-                onKeyDown={(event) => {
-                  if (!enabled || readOnly) return;
-
-                  // Handle opening dropdown with keyboard
-                  if (
-                    !open &&
-                    (event.key === "ArrowDown" ||
-                      event.key === "ArrowUp" ||
-                      event.key === " " ||
-                      event.key === "Enter")
-                  ) {
-                    event.preventDefault();
-                    setOpen(true);
-                    // Set initial selectedIndex to first enabled option if options exist
-                    if (filteredOptions.length > 0) {
-                      const firstEnabledIndex = findNextEnabledIndex(-1);
-                      setSelectedIndex(firstEnabledIndex !== -1 ? firstEnabledIndex : 0);
+        {searchable || multiSelect ? (
+          <OptionTypeProvider Component={HiddenOption}>
+            <Popover
+              open={open}
+              onOpenChange={(isOpen) => {
+                if (!enabled) return;
+                setOpen(isOpen);
+              }}
+              modal={modal}
+            >
+              <Part partId={PART_LIST_WRAPPER}>
+                <PopoverTrigger
+                  {...rest}
+                  ref={composeRefs(setReferenceElement, forwardedRef)}
+                  id={id}
+                  aria-haspopup="listbox"
+                  style={style}
+                  onFocus={onFocus}
+                  onBlur={onBlur}
+                  disabled={!enabled}
+                  aria-expanded={open}
+                  onClick={(event) => {
+                    // Prevent event propagation to parent elements (e.g., DropdownMenu)
+                    event.stopPropagation();
+                    if (enabled) {
+                      setOpen((prev) => !prev);
                     }
-                    return;
-                  }
-
-                  // Handle keyboard navigation when dropdown is open
-                  if (open) {
-                    handleKeyDown(event);
-                  }
-                }}
-                autoFocus={autoFocus}
-              >
-                <SelectTriggerValue
-                  value={value}
-                  placeholder={placeholder}
-                  readOnly={readOnly}
-                  multiSelect={multiSelect}
-                  options={options}
-                  valueRenderer={valueRenderer}
-                  toggleOption={toggleOption}
-                />
-                <SelectTriggerActions
-                  value={value}
-                  multiSelect={multiSelect}
-                  enabled={enabled}
-                  readOnly={readOnly}
-                  clearable={clearable}
-                  clearValue={clearValue}
-                />
-              </PopoverTrigger>
-            </Part>
-            {open && (
-              <Portal container={root}>
-                <PopoverContent
-                  style={{ minWidth: width, height: dropdownHeight }}
-                  className={classnames(styles.selectContent, styles[validationStatus])}
-                  onKeyDown={handleKeyDown}
+                  }}
+                  className={classnames(
+                    styles.selectTrigger,
+                    styles[validationStatus],
+                    {
+                      [styles.disabled]: !enabled,
+                      [styles.multi]: multiSelect,
+                    },
+                    className,
+                  )}
+                  autoFocus={autoFocus}
                 >
-                  <div className={styles.command}>
-                    {searchable ? (
-                      <div className={styles.commandInputContainer}>
-                        <Icon name="search" />
-                        <input
-                          role="searchbox"
-                          className={classnames(styles.commandInput)}
-                          placeholder="Search..."
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                      </div>
-                    ) : (
-                      <button aria-hidden="true" className={styles.srOnly} />
-                    )}
-                    <div role="listbox" className={styles.commandList}>
-                      {inProgress ? (
-                        <div className={styles.loading}>{inProgressNotificationMessage}</div>
-                      ) : searchable && searchTerm ? (
-                        // When searching, show only filtered options
-                        filteredOptions.length === 0 ? (
-                          <div>{emptyListNode}</div>
-                        ) : (
+                  <SelectTriggerValue
+                    value={value}
+                    placeholder={placeholder}
+                    readOnly={readOnly}
+                    multiSelect={multiSelect}
+                    options={options}
+                    valueRenderer={valueRenderer}
+                    toggleOption={toggleOption}
+                  />
+                  <SelectTriggerActions
+                    value={value}
+                    multiSelect={multiSelect}
+                    enabled={enabled}
+                    readOnly={readOnly}
+                    clearable={clearable}
+                    clearValue={clearValue}
+                  />
+                </PopoverTrigger>
+              </Part>
+              {open && (
+                <Portal container={root}>
+                  {/* Note: FocusScope could be wrapped here for enhanced focus management */}
+                  <PopoverContent
+                    style={{ minWidth: width, height: dropdownHeight }}
+                    className={classnames(styles.selectContent, styles[validationStatus])}
+                    onKeyDown={handleKeyDown}
+                  >
+                    <div className={styles.command}>
+                      {searchable ? (
+                        <div className={styles.commandInputContainer}>
+                          <Icon name="search" />
+                          <input
+                            role="combobox"
+                            className={classnames(styles.commandInput)}
+                            placeholder="Search..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            autoFocus
+                          />
+                        </div>
+                      ) : (
+                        <button autoFocus aria-hidden="true" className={styles.srOnly} />
+                      )}
+                      <div role="listbox" className={styles.commandList}>
+                        {inProgress && (
+                          <div className={styles.loading}>{inProgressNotificationMessage}</div>
+                        )}
+                        {!inProgress &&
                           filteredOptions.map(({ value, label, enabled, keywords }, index) => (
-                            <SelectOptionItem
+                            <MultiSelectOption
                               key={value}
                               readOnly={readOnly}
                               value={value}
@@ -654,197 +639,48 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                               isHighlighted={selectedIndex === index}
                               itemIndex={index}
                             />
-                          ))
-                        )
-                      ) : (
-                        // When not searching, show all children (includes Options and other components like Button)
-                        <>
-                          {children}
-                          {options.size === 0 && <div>{emptyListNode}</div>}
-                        </>
-                      )}
+                          ))}
+                        {!inProgress && filteredOptions.length === 0 && <div>{emptyListNode}</div>}
+                      </div>
                     </div>
-                  </div>
-                </PopoverContent>
-              </Portal>
-            )}
-          </Popover>
-        </OptionTypeProvider>
-        {/* Hidden render to collect options when dropdown is closed */}
-        {!open && (
-          <div style={{ display: "none" }}>
-            <OptionTypeProvider Component={HiddenOption}>{children}</OptionTypeProvider>
-          </div>
+                  </PopoverContent>
+                </Portal>
+              )}
+            </Popover>
+            {children}
+          </OptionTypeProvider>
+        ) : (
+          <OptionTypeProvider Component={SelectOption}>
+            <SimpleSelect
+              {...rest}
+              readOnly={!!readOnly}
+              ref={forwardedRef}
+              key={isInForm ? (value ? `status-${value}` : "status-initial") : undefined} //workaround for https://github.com/radix-ui/primitives/issues/3135
+              value={value as SingleValueType}
+              onValueChange={toggleOption}
+              id={id}
+              style={style}
+              className={className}
+              onFocus={onFocus}
+              onBlur={onBlur}
+              enabled={enabled}
+              validationStatus={validationStatus}
+              triggerRef={setReferenceElement}
+              autoFocus={autoFocus}
+              placeholder={placeholder}
+              height={dropdownHeight}
+              width={width}
+              emptyListNode={emptyListNode}
+              clearable={clearable}
+              clearValue={clearValue}
+              options={options}
+              valueRenderer={valueRenderer}
+            >
+              {children}
+            </SimpleSelect>
+          </OptionTypeProvider>
         )}
       </OptionContext.Provider>
     </SelectContext.Provider>
   );
 });
-
-// Visible option component for rendering items in the dropdown (used by OptionTypeProvider)
-function VisibleSelectOption(option: Option) {
-  const { value, label, enabled = true, children } = option;
-  const { onOptionAdd } = useOption();
-  const {
-    value: selectedValue,
-    onChange,
-    multiSelect,
-    readOnly,
-    setOpen,
-    highlightedValue,
-    optionRenderer,
-  } = useSelect();
-
-  const optionRef = useRef<HTMLDivElement>(null);
-
-  const opt: Option = useMemo(() => {
-    return {
-      ...option,
-      label: label ?? "",
-      keywords: option.keywords || [label ?? ""],
-    };
-  }, [option, label]);
-
-  useEffect(() => {
-    onOptionAdd(opt);
-    // Don't remove options when component unmounts - they should persist
-  }, [opt, onOptionAdd]);
-
-  const selected = useMemo(() => {
-    return Array.isArray(selectedValue) && multiSelect
-      ? selectedValue.map((v) => String(v)).includes(value)
-      : String(selectedValue) === String(value);
-  }, [selectedValue, value, multiSelect]);
-
-  const isHighlighted = useMemo(() => {
-    return highlightedValue !== undefined && String(highlightedValue) === String(value);
-  }, [highlightedValue, value]);
-
-  // Scroll into view when highlighted
-  useEffect(() => {
-    if (isHighlighted && optionRef.current) {
-      optionRef.current.scrollIntoView({ block: "nearest", behavior: "smooth" });
-    }
-  }, [isHighlighted]);
-
-  const handleClick = () => {
-    if (readOnly) {
-      setOpen(false);
-      return;
-    }
-    if (enabled) {
-      onChange(value);
-    }
-  };
-
-  return (
-    <div
-      ref={optionRef}
-      role="option"
-      aria-disabled={!enabled}
-      aria-selected={selected}
-      className={classnames(styles.multiSelectOption, {
-        [styles.disabledOption]: !enabled,
-        [styles.highlighted]: isHighlighted,
-      })}
-      onMouseDown={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      }}
-      onClick={handleClick}
-      data-state={selected ? "checked" : undefined}
-    >
-      <div className={styles.multiSelectOptionContent}>
-        {optionRenderer ? (
-          optionRenderer({ label, value, enabled }, selectedValue as any, false)
-        ) : (
-          <>
-            {children || label}
-            {selected && <Icon name="checkmark" />}
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// Internal option component for rendering items in the dropdown
-function SelectOptionItem(option: Option & { isHighlighted?: boolean; itemIndex?: number }) {
-  const {
-    value,
-    label,
-    enabled = true,
-    readOnly,
-    children,
-    isHighlighted = false,
-    itemIndex,
-  } = option;
-  const {
-    value: selectedValue,
-    onChange,
-    multiSelect,
-    setOpen,
-    setSelectedIndex,
-    optionRenderer,
-  } = useSelect();
-
-  const optionRef = useRef<HTMLDivElement>(null);
-
-  const selected = useMemo(() => {
-    return Array.isArray(selectedValue) && multiSelect
-      ? selectedValue.map((v) => String(v)).includes(value)
-      : String(selectedValue) === String(value);
-  }, [selectedValue, value, multiSelect]);
-
-  // Scroll into view when highlighted
-  useEffect(() => {
-    if (isHighlighted && optionRef.current) {
-      optionRef.current.scrollIntoView({ block: "nearest", behavior: "smooth" });
-    }
-  }, [isHighlighted]);
-
-  const handleClick = () => {
-    if (readOnly) {
-      setOpen(false);
-      return;
-    }
-    if (enabled) {
-      onChange(value);
-    }
-  };
-
-  return (
-    <div
-      ref={optionRef}
-      role="option"
-      aria-disabled={!enabled}
-      aria-selected={selected}
-      className={classnames(styles.multiSelectOption, {
-        [styles.disabledOption]: !enabled,
-        [styles.highlighted]: isHighlighted,
-      })}
-      onMouseDown={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      }}
-      onMouseEnter={() => {
-        if (itemIndex !== undefined && setSelectedIndex && enabled) {
-          setSelectedIndex(itemIndex);
-        }
-      }}
-      onClick={handleClick}
-      data-state={selected ? "checked" : undefined}
-    >
-      <div className={styles.multiSelectOptionContent}>
-        {optionRenderer ? (
-          optionRenderer({ label, value, enabled }, selectedValue as any, false)
-        ) : (
-          <>
-            {children || label}
-            {selected && <Icon name="checkmark" />}
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
