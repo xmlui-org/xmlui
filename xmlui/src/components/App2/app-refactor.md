@@ -215,8 +215,35 @@ useEffect(() => {
   - "ready event is triggered for App with complex content" - works with full header/footer/nav
   - "ready event fires only once during component lifecycle" - confirms no duplicate calls
 
-#### Issue 4: **Scroll Container Ref Logic Complexity**
-**Location:** Lines 201-206
+#### Issue 4: **Scroll Container Ref Logic Complexity** ✅ FIXED
+**Location:** Lines 199-207 (App2Native.tsx - original)
+**Original Problem:** 
+```typescript
+const scrollPageContainerRef = useRef(null);
+const noScrollPageContainerRef = useRef(null);
+const scrollContainerRef = scrollWholePage ? scrollPageContainerRef : noScrollPageContainerRef;
+```
+- Confusing naming: `scrollPageContainerRef` sounds like it scrolls pages, but it's used when `scrollWholePage=true`
+- `noScrollPageContainerRef` suggests "no scroll", but it's actually used for content-only scrolling
+**Severity:** Low (works but confusing)
+**Solution:** ✅ **FIXED** - Renamed refs for clarity
+```typescript
+// Refs for scroll containers - naming clarified for better understanding
+// pageScrollRef: used when scrollWholePage=true (entire page scrolls)
+// contentScrollRef: used when scrollWholePage=false (only content area scrolls)
+const pageScrollRef = useRef(null);
+const contentScrollRef = useRef(null);
+const scrollContainerRef = scrollWholePage ? pageScrollRef : contentScrollRef;
+```
+**Fix Details:**
+  - Renamed `scrollPageContainerRef` → `pageScrollRef` (clearer: page-level scrolling)
+  - Renamed `noScrollPageContainerRef` → `contentScrollRef` (clearer: content-area scrolling)
+  - Updated all 13 usages throughout the component's layout switch cases
+  - Added explanatory comments to clarify the purpose of each ref
+**Test Coverage:** ✅ All 46 tests passing - no behavioral changes, only naming improvements
+
+#### Issue 5: **Missing Cleanup for forceRefreshAnchorScroll**
+**Location:** Lines 283-288
 **Problem:** Two refs (`scrollPageContainerRef`, `noScrollPageContainerRef`) are conditionally assigned to `scrollContainerRef`
 **Risk:** Confusing logic - one is for page scroll, one for content scroll, but naming suggests inverse
 **Severity:** Low (works but confusing)

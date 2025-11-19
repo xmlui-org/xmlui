@@ -196,10 +196,13 @@ export function App2({
     mediaSize.largeScreen ||
     (!hasRegisteredHeader && safeLayout !== "condensed" && safeLayout !== "condensed-sticky");
 
-  const scrollPageContainerRef = useRef(null);
-  const noScrollPageContainerRef = useRef(null);
+  // Refs for scroll containers - naming clarified for better understanding
+  // pageScrollRef: used when scrollWholePage=true (entire page scrolls)
+  // contentScrollRef: used when scrollWholePage=false (only content area scrolls)
+  const pageScrollRef = useRef(null);
+  const contentScrollRef = useRef(null);
 
-  const scrollContainerRef = scrollWholePage ? scrollPageContainerRef : noScrollPageContainerRef;
+  const scrollContainerRef = scrollWholePage ? pageScrollRef : contentScrollRef;
   const [footerHeight, setFooterHeight] = useState(0);
   const [headerHeight, setHeaderHeight] = useState(0);
   const scrollbarWidth = useScrollbarWidth();
@@ -402,11 +405,11 @@ export function App2({
           style={styleWithHelpers}
         >
           {navPanelVisible && <div className={classnames(styles.navPanelWrapper)}>{navPanel}</div>}
-          <div className={styles.contentWrapper} ref={scrollPageContainerRef}>
+          <div className={styles.contentWrapper} ref={pageScrollRef}>
             <header ref={headerRefCallback} className={classnames(styles.headerWrapper)}>
               {header}
             </header>
-            <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
+            <div className={styles.PagesWrapper} ref={contentScrollRef}>
               <div className={pagesWrapperClasses}>{children}</div>
             </div>
             <div className={styles.footerWrapper} ref={footerRefCallback}>
@@ -424,14 +427,14 @@ export function App2({
           style={styleWithHelpers}
         >
           {navPanelVisible && <div className={classnames(styles.navPanelWrapper)}>{navPanel}</div>}
-          <div className={styles.contentWrapper} ref={scrollPageContainerRef}>
+          <div className={styles.contentWrapper} ref={pageScrollRef}>
             <header
               ref={headerRefCallback}
-              className={classnames(styles.headerWrapper, styles.sticky)}
+              className={classnames(styles.headerWrapper, footerShouldBeNonSticky && styles.sticky)}
             >
               {header}
             </header>
-            <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
+            <div className={styles.PagesWrapper} ref={contentScrollRef}>
               <div className={pagesWrapperClasses}>{children}</div>
             </div>
             <div 
@@ -452,7 +455,7 @@ export function App2({
           {...rest}
           className={classnames(wrapperBaseClasses, styles.verticalFullHeader)}
           style={styleWithHelpers}
-          ref={scrollPageContainerRef}
+          ref={pageScrollRef}
         >
           <header
             className={classnames(styles.headerWrapper, styles.sticky)}
@@ -463,7 +466,7 @@ export function App2({
           <div className={styles.content}>
             {navPanelVisible && <aside className={styles.navPanelWrapper}>{navPanel}</aside>}
             <main className={styles.contentWrapper}>
-              <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
+              <div className={styles.PagesWrapper} ref={contentScrollRef}>
                 <div className={pagesWrapperClasses}>{children}</div>
               </div>
             </main>
@@ -488,7 +491,7 @@ export function App2({
             [styles.sticky]: safeLayout === "condensed-sticky",
           })}
           style={styleWithHelpers}
-          ref={scrollPageContainerRef}
+          ref={pageScrollRef}
         >
           <header
             className={classnames("app-layout-condensed", styles.headerWrapper, {
@@ -501,7 +504,7 @@ export function App2({
             )}
             {header}
           </header>
-          <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
+          <div className={styles.PagesWrapper} ref={contentScrollRef}>
             <div className={pagesWrapperClasses}>{children}</div>
           </div>
           <div 
@@ -521,13 +524,13 @@ export function App2({
           {...rest}
           className={classnames(wrapperBaseClasses, styles.horizontal)}
           style={styleWithHelpers}
-          ref={scrollPageContainerRef}
+          ref={pageScrollRef}
         >
           <header className={classnames(styles.headerWrapper)} ref={headerRefCallback}>
             {header}
             {navPanelVisible && <div className={styles.navPanelWrapper}>{navPanel}</div>}
           </header>
-          <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
+          <div className={styles.PagesWrapper} ref={contentScrollRef}>
             <div className={pagesWrapperClasses}>{children}</div>
           </div>
           <div className={styles.footerWrapper} ref={footerRefCallback}>
@@ -543,7 +546,7 @@ export function App2({
           {...rest}
           className={classnames(wrapperBaseClasses, styles.horizontal, styles.sticky)}
           style={styleWithHelpers}
-          ref={scrollPageContainerRef}
+          ref={pageScrollRef}
         >
           <header
             className={classnames(styles.headerWrapper, styles.sticky)}
@@ -552,7 +555,7 @@ export function App2({
             {header}
             {navPanelVisible && <div className={styles.navPanelWrapper}>{navPanel}</div>}
           </header>
-          <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
+          <div className={styles.PagesWrapper} ref={contentScrollRef}>
             <div className={pagesWrapperClasses}>{children}</div>
           </div>
           <div 
@@ -581,7 +584,7 @@ export function App2({
               {header}
             </header>
           )}
-          <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
+          <div className={styles.PagesWrapper} ref={contentScrollRef}>
             <div className={styles.PagesWrapperInner}>{children}</div>
           </div>
           {footer && (
