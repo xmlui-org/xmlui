@@ -352,11 +352,18 @@ const footerShouldBeNonSticky = !footerSticky;
   - Simplified logic - one rule applies to all layouts
 **Test Coverage:** ✅ All 46 tests passing - API consistency improved
 
-#### Issue 8: **Helper Function Placement**
-**Location:** Lines 620-628 (`getAppLayoutOrientation`)
-**Problem:** Function defined after component but exported, unclear if it's used internally or public API
-**Severity:** Low (organization issue)
-**Recommendation:** Move to separate utils file if public API, or use as internal helper only
+#### Issue 8: **Helper Function Placement** ✅ NOT AN ISSUE
+**Location:** Lines 644-653 (`getAppLayoutOrientation`)
+**Original Concern:** Function defined after component but exported, unclear if it's used internally or public API
+**Investigation:** ✅ **Verified as correct pattern**
+- Function is part of the public API, intentionally exported
+- Used by 3 other components:
+  - `NavLinkNative.tsx` (imports and uses it)
+  - `NavPanelNative.tsx` (imports and uses it)
+  - `NavGroupNative.tsx` (imports and uses it)
+- Pattern is consistent with original `App/AppNative.tsx`
+- Placement after component is standard for exported utility functions
+**Conclusion:** This is the correct pattern - function should remain exported and in its current location. No changes needed.
 
 ### Refactoring Workflow
 
