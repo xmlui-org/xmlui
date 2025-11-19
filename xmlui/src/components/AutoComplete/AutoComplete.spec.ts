@@ -713,7 +713,7 @@ test.describe("Behaviors and Parts", () => {
     const component = page.getByTestId("test");
     await component.hover();
     const tooltip = page.getByRole("tooltip");
-    
+
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toHaveText("Tooltip text");
   });
@@ -729,7 +729,9 @@ test.describe("Behaviors and Parts", () => {
   });
 
   test("can select part: 'listWrapper'", async ({ page, initTestBed }) => {
-    await initTestBed(`<AutoComplete testId="test"><Option value="1" label="Test" /></AutoComplete>`);
+    await initTestBed(
+      `<AutoComplete testId="test"><Option value="1" label="Test" /></AutoComplete>`,
+    );
     const listWrapper = page.locator("[data-part-id='listWrapper']");
     await expect(listWrapper).toBeVisible();
   });
@@ -741,15 +743,17 @@ test.describe("Behaviors and Parts", () => {
   });
 
   test("parts are present when tooltip is added", async ({ page, initTestBed }) => {
-    await initTestBed(`<AutoComplete testId="test" tooltip="Tooltip text"><Option value="1" label="Test" /></AutoComplete>`);
-    
+    await initTestBed(
+      `<AutoComplete testId="test" tooltip="Tooltip text"><Option value="1" label="Test" /></AutoComplete>`,
+    );
+
     const component = page.getByTestId("test");
     const listWrapper = page.locator("[data-part-id='listWrapper']");
     const inputPart = page.locator("[data-part-id='input']");
-    
+
     await expect(listWrapper).toBeVisible();
     await expect(inputPart).toBeVisible();
-    
+
     await component.hover();
     const tooltip = page.getByRole("tooltip");
     await expect(tooltip).toBeVisible();
@@ -757,16 +761,19 @@ test.describe("Behaviors and Parts", () => {
   });
 
   test("parts are present when variant is added", async ({ page, initTestBed }) => {
-    await initTestBed(`<AutoComplete testId="test" variant="CustomVariant"><Option value="1" label="Test" /></AutoComplete>`, {
-      testThemeVars: {
-        "borderColor-AutoComplete-CustomVariant": "rgb(255, 0, 0)",
+    await initTestBed(
+      `<AutoComplete testId="test" variant="CustomVariant"><Option value="1" label="Test" /></AutoComplete>`,
+      {
+        testThemeVars: {
+          "borderColor-AutoComplete-CustomVariant": "rgb(255, 0, 0)",
+        },
       },
-    });
-    
+    );
+
     const component = page.getByTestId("test");
     const listWrapper = page.locator("[data-part-id='listWrapper']");
     const inputPart = page.locator("[data-part-id='input']");
-    
+
     await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
     await expect(listWrapper).toBeVisible();
     await expect(inputPart).toBeVisible();
@@ -785,28 +792,28 @@ test.describe("Behaviors and Parts", () => {
 
   test("tooltip with markdown content", async ({ page, initTestBed }) => {
     await initTestBed(`<AutoComplete testId="test" tooltipMarkdown="**Bold text**" />`);
-    
+
     const component = page.getByTestId("test");
     await component.hover();
     const tooltip = page.getByRole("tooltip");
-    
+
     await expect(tooltip).toBeVisible();
     await expect(tooltip.locator("strong")).toHaveText("Bold text");
   });
 
   test("animation behavior", async ({ page, initTestBed }) => {
     await initTestBed(`<AutoComplete testId="test" animation="fadeIn" />`);
-    
+
     const component = page.getByTestId("test");
     await expect(component).toBeVisible();
   });
 
   test("combined tooltip and animation", async ({ page, initTestBed }) => {
     await initTestBed(`<AutoComplete testId="test" tooltip="Tooltip text" animation="fadeIn" />`);
-    
+
     const component = page.getByTestId("test");
     await expect(component).toBeVisible();
-    
+
     await component.hover();
     const tooltip = page.getByRole("tooltip");
     await expect(tooltip).toBeVisible();
@@ -814,7 +821,8 @@ test.describe("Behaviors and Parts", () => {
   });
 
   test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
-    await initTestBed(`
+    await initTestBed(
+      `
       <AutoComplete 
         testId="test" 
         tooltip="Tooltip text" 
@@ -823,22 +831,187 @@ test.describe("Behaviors and Parts", () => {
       >
         <Option value="1" label="Test" />
       </AutoComplete>
-    `, {
-      testThemeVars: {
-        "backgroundColor-AutoComplete-CustomVariant": "rgb(255, 0, 0)",
+    `,
+      {
+        testThemeVars: {
+          "backgroundColor-AutoComplete-CustomVariant": "rgb(255, 0, 0)",
+        },
       },
-    });
-    
+    );
+
     const component = page.getByTestId("test");
     const listWrapper = page.locator("[data-part-id='listWrapper']");
     const inputPart = page.locator("[data-part-id='input']");
-    
+
     // Verify variant applied
     await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
-    
+
     // Verify parts are visible
     await expect(listWrapper).toBeVisible();
     await expect(inputPart).toBeVisible();
   });
 });
 
+// =============================================================================
+// Z-INDEX AND MODAL LAYERING TESTS
+// =============================================================================
+
+test.describe("Nested DropdownMenu and AutoComplete", () => {
+  test("ModalDialog > DropdownMenu > AutoComplete", async ({
+    initTestBed,
+    page,
+    createDropdownMenuDriver,
+    createAutoCompleteDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Button testId="openBtn" onClick="outerDialog.open()">Open Dialog</Button>
+        <ModalDialog id="outerDialog" title="Outer Dialog">
+          <DropdownMenu testId="nested-dropdown" modal="{true}">
+            <property name="triggerTemplate">
+              <Button label="Open actions" />
+            </property>
+            <MenuItem>Item 1</MenuItem>
+            <MenuItem>Item 2</MenuItem>
+            <AutoComplete modal="{true}" id="testAutoComplete" testId="testAutoComplete">
+              <Option value="opt1" label="Option 1" />
+              <Option value="opt2" label="Option 2" />
+              <Button
+                label="Confirm action"
+                onClick="{
+                  const result = confirm('Confirm action', 'Are you sure?', 'Yes');
+                  testState = result ? 'confirmed' : 'canceled';
+                }"
+              />
+            </AutoComplete>
+          </DropdownMenu>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    const dropdownDriver = await createDropdownMenuDriver("nested-dropdown");
+
+    await page.getByTestId("openBtn").click();
+
+    const outerDialog = page.getByRole("dialog", { name: "Outer Dialog" });
+    await expect(outerDialog).toBeVisible();
+
+    await expect(dropdownDriver.component).toBeVisible();
+
+    await dropdownDriver.open();
+    await expect(page.getByText("Item 1")).toBeVisible();
+    await expect(page.getByText("Item 2")).toBeVisible();
+
+    const autoCompleteDriver = await createAutoCompleteDriver("testAutoComplete");
+    await expect(autoCompleteDriver.component).toBeVisible();
+
+    await autoCompleteDriver.click();
+    await expect(page.getByText("Item 1")).toBeVisible();
+    await expect(page.getByText("Item 2")).toBeVisible();
+    await expect(page.getByText("Outer Dialog")).toBeVisible();
+
+    await expect(page.getByText("Option 1")).toBeVisible();
+    await expect(page.getByText("Option 2")).toBeVisible();
+
+    await page.getByText("Confirm action").click();
+    const confirmDialog = page.getByRole("dialog", { name: "Confirm action" });
+    await expect(confirmDialog).toBeVisible();
+
+    await page.mouse.click(10, 10); // Click outside all dialogs
+    await expect(confirmDialog).not.toBeVisible();
+    await expect(page.getByText("Option 1")).toBeVisible();
+    await expect(page.getByText("Item 1")).toBeVisible();
+    await expect(page.getByText("Outer Dialog")).toBeVisible();
+
+    await page.mouse.click(10, 10);
+    await expect(page.getByText("Option 1")).not.toBeVisible();
+    await expect(page.getByText("Item 1")).toBeVisible();
+    await expect(page.getByText("Outer Dialog")).toBeVisible();
+
+    await page.mouse.click(10, 10);
+    await expect(page.getByText("Item 1")).not.toBeVisible();
+    await expect(page.getByText("Outer Dialog")).toBeVisible();
+
+    await page.mouse.click(10, 10);
+    await expect(page.getByText("Outer Dialog")).not.toBeVisible();
+  });
+
+  test("ModalDialog > AutoComplete > DropdownMenu", async ({
+    initTestBed,
+    page,
+    createDropdownMenuDriver,
+    createAutoCompleteDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Button testId="openBtn" onClick="outerDialog.open()">Open Dialog</Button>
+        <ModalDialog id="outerDialog" title="Outer Dialog">
+          <AutoComplete modal="{true}" id="testAutoComplete" testId="testAutoComplete">
+            <Option value="opt1" label="Option 1" />
+            <Option value="opt2" label="Option 2" />
+            <DropdownMenu testId="nested-dropdown" modal="{true}">
+              <property name="triggerTemplate">
+                <Button label="Open actions" />
+              </property>
+              <MenuItem>Item 1</MenuItem>
+              <MenuItem>Item 2</MenuItem>
+              <Button
+                label="Confirm action"
+                onClick="{
+                  const result = confirm('Confirm action', 'Are you sure?', 'Yes');
+                  testState = result ? 'confirmed' : 'canceled';
+                }"
+              />
+            </DropdownMenu>
+          </AutoComplete>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    const autoCompleteDriver = await createAutoCompleteDriver("testAutoComplete");
+
+    await page.getByTestId("openBtn").click();
+
+    const outerDialog = page.getByRole("dialog", { name: "Outer Dialog" });
+    await expect(outerDialog).toBeVisible();
+
+    await expect(autoCompleteDriver.component).toBeVisible();
+
+    await autoCompleteDriver.click();
+    await expect(page.getByText("Option 1")).toBeVisible();
+    await expect(page.getByText("Option 2")).toBeVisible();
+
+    const dropdownDriver = await createDropdownMenuDriver("nested-dropdown");
+    await expect(dropdownDriver.component).toBeVisible();
+
+    await dropdownDriver.open();
+    await expect(page.getByText("Option 1")).toBeVisible();
+    await expect(page.getByText("Option 2")).toBeVisible();
+    await expect(page.getByText("Outer Dialog")).toBeVisible();
+
+    await expect(page.getByText("Item 1")).toBeVisible();
+    await expect(page.getByText("Item 2")).toBeVisible();
+
+    await page.getByText("Confirm action").click();
+    const confirmDialog = page.getByRole("dialog", { name: "Confirm action" });
+    await expect(confirmDialog).toBeVisible();
+
+    await page.mouse.click(10, 10); // Click outside all dialogs
+    await expect(confirmDialog).not.toBeVisible();
+    await expect(page.getByText("Item 1")).toBeVisible();
+    await expect(page.getByText("Option 1")).toBeVisible();
+    await expect(page.getByText("Outer Dialog")).toBeVisible();
+
+    await page.mouse.click(10, 10);
+    await expect(page.getByText("Item 1")).not.toBeVisible();
+    await expect(page.getByText("Option 1")).toBeVisible();
+    await expect(page.getByText("Outer Dialog")).toBeVisible();
+
+    await page.mouse.click(10, 10);
+    await expect(page.getByText("Option 1")).not.toBeVisible();
+    await expect(page.getByText("Outer Dialog")).toBeVisible();
+
+    await page.mouse.click(10, 10);
+    await expect(page.getByText("Outer Dialog")).not.toBeVisible();
+  });
+});
