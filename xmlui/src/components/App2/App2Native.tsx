@@ -394,8 +394,9 @@ export function App2({
     [styles.withDefaultContentPadding]: applyDefaultContentPadding,
   });
   
-  // Determine if footer should have nonSticky class (when sticky=false for non-desktop layouts)
-  const footerShouldBeNonSticky = !footerSticky && safeLayout !== "desktop";
+  // Determine if footer should have nonSticky class based on footerSticky prop
+  // Desktop layout now also respects footerSticky prop for consistency
+  const footerShouldBeNonSticky = !footerSticky;
   
   switch (safeLayout) {
     case "vertical":
@@ -589,7 +590,12 @@ export function App2({
             <div className={styles.PagesWrapperInner}>{children}</div>
           </div>
           {footer && (
-            <div className={classnames(styles.footerWrapper, styles.sticky)} ref={footerRefCallback}>
+            <div 
+              className={classnames(styles.footerWrapper, {
+                [styles.nonSticky]: footerShouldBeNonSticky,
+              })} 
+              ref={footerRefCallback}
+            >
               {footer}
             </div>
           )}

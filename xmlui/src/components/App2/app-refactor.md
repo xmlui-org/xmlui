@@ -311,12 +311,46 @@ useEffect(() => {
   - Simpler, more declarative logic
 **Test Coverage:** ✅ All 46 tests passing - drawer behavior unchanged, more efficient
 
-#### Issue 7: **Desktop Layout Always Forces Sticky Footer**
-**Location:** Lines 554-583 (desktop case)
-**Problem:** Desktop layout always adds `styles.sticky` to footer, ignoring `footerSticky` prop
-**Risk:** Inconsistent with other layouts where `footerSticky` is respected
-**Severity:** Medium (API inconsistency)
-**Recommendation:** Respect `footerSticky` prop in desktop layout too, or document why desktop is special
+#### Issue 7: **Desktop Layout Always Forces Sticky Footer** ✅ FIXED
+**Location:** Lines 398, 594 (App2Native.tsx - original)
+**Original Problem:**
+```typescript
+// Line 398
+const footerShouldBeNonSticky = !footerSticky && safeLayout !== "desktop";
+
+// Line 594 - Desktop layout footer
+<div className={classnames(styles.footerWrapper, styles.sticky)} ref={footerRefCallback}>
+  {footer}
+</div>
+```
+- Desktop layout always forced `styles.sticky` on footer, ignoring `footerSticky` prop
+- `footerShouldBeNonSticky` explicitly excluded desktop layout
+- Inconsistent with other layouts where `footerSticky` prop is respected
+**Severity:** Medium (API inconsistency, footerSticky prop doesn't work in desktop layout)
+**Solution:** ✅ **FIXED** - Respect footerSticky prop in desktop layout
+```typescript
+// Simplified logic - applies to all layouts including desktop
+const footerShouldBeNonSticky = !footerSticky;
+
+// Desktop layout footer now uses conditional class like other layouts
+{footer && (
+  <div 
+    className={classnames(styles.footerWrapper, {
+      [styles.nonSticky]: footerShouldBeNonSticky,
+    })} 
+    ref={footerRefCallback}
+  >
+    {footer}
+  </div>
+)}
+```
+**Fix Details:**
+  - Removed `&& safeLayout !== "desktop"` condition from footerShouldBeNonSticky calculation
+  - Changed desktop footer from always `styles.sticky` to conditional `styles.nonSticky`
+  - Desktop layout now consistent with all other layouts
+  - `footerSticky` prop now works correctly in desktop layout
+  - Simplified logic - one rule applies to all layouts
+**Test Coverage:** ✅ All 46 tests passing - API consistency improved
 
 #### Issue 8: **Helper Function Placement**
 **Location:** Lines 620-628 (`getAppLayoutOrientation`)
