@@ -79,6 +79,11 @@ export const AutoCompleteMd = createMetadata({
     emptyListTemplate: dComponent(
       "This property defines the template to display when the list of options is empty.",
     ),
+    modal: {
+      isInternal: true,
+      description: "internal radix modal prop",
+      valueType: "boolean",
+    },
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -182,6 +187,7 @@ export const autoCompleteComponentRenderer = createComponentRenderer(
         dropdownHeight={extractValue(node.props.dropdownHeight)}
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
         initiallyOpen={extractValue.asOptionalBoolean(node.props.initiallyOpen)}
+        modal={extractValue.asOptionalBoolean(node.props.modal)}
         optionRenderer={
           node.props.optionTemplate
             ? (item, val, inTrigger) => {

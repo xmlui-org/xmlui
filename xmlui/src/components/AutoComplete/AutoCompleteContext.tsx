@@ -14,6 +14,7 @@ type AutoCompleteContextValue = {
   open?: boolean;
   setOpen?: (open: boolean) => void;
   setSelectedIndex?: (index: number) => void;
+  readOnly?: boolean;
   optionRenderer: (option: Option, selectedValue: SingleValueType, inTrigger: boolean) => ReactNode;
 };
 
@@ -26,6 +27,7 @@ export const AutoCompleteContext = createContext<AutoCompleteContextValue>({
   open: false,
   setOpen: (open: boolean) => {},
   setSelectedIndex: (index: number) => {},
+  readOnly: false,
   optionRenderer: (option: Option, selectedValue: SingleValueType, inTrigger: boolean) => null,
 });
 

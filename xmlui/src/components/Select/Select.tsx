@@ -111,8 +111,8 @@ export const SelectMd = createMetadata({
     modal: {
       isInternal: true,
       description: "internal radix modal prop",
-      valueType: "boolean"
-    }
+      valueType: "boolean",
+    },
   },
   events: {
     gotFocus: dGotFocus(COMP),
