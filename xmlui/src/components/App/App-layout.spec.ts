@@ -12,7 +12,7 @@ function createLayoutMarkup(
   contentHeight: string
 ) {
   return `
-    <App2
+    <App
       layout="${layout}"
       noScrollbarGutters="${noScrollbarGutters}"
       scrollWholePage="${scrollWholePage}"
@@ -36,7 +36,7 @@ function createLayoutMarkup(
       <Footer testId="footer">
         Footer
       </Footer>
-    </App2>
+    </App>
   `;
 }
 
@@ -304,7 +304,7 @@ async function verifyMainContentScrollbarGutters(page: Page, shouldHaveGutters: 
 // =============================================================================
 // LAYOUT TESTS
 // =============================================================================
-// These tests verify that the App2 component correctly positions and displays
+// These tests verify that the App component correctly positions and displays
 // its layout blocks (Header, NavPanel, Main Content, Footer) according to the
 // layout configuration specified in app-next.md.
 //
@@ -2289,7 +2289,7 @@ test.describe("Desktop Layout - with Header and Footer", () => {
     page,
   }) => {
     await initTestBed(`
-      <App2 layout="desktop">
+      <App layout="desktop">
         <AppHeader testId="appHeader">
           Desktop Header
         </AppHeader>
@@ -2303,7 +2303,7 @@ test.describe("Desktop Layout - with Header and Footer", () => {
         <Footer testId="footer">
           Desktop Footer
         </Footer>
-      </App2>
+      </App>
     `);
 
     // Verify header and footer are visible, NavPanel should not exist
@@ -2342,7 +2342,7 @@ test.describe("Desktop Layout - with Header and Footer", () => {
     page,
   }) => {
     await initTestBed(`
-      <App2 layout="desktop">
+      <App layout="desktop">
         <AppHeader testId="appHeader">
           Desktop Header
         </AppHeader>
@@ -2356,7 +2356,7 @@ test.describe("Desktop Layout - with Header and Footer", () => {
         <Footer testId="footer">
           Desktop Footer
         </Footer>
-      </App2>
+      </App>
     `);
 
     const header = page.getByTestId("appHeader");
@@ -2387,7 +2387,7 @@ test.describe("Desktop Layout - with Header and Footer", () => {
     page,
   }) => {
     await initTestBed(`
-      <App2 layout="desktop">
+      <App layout="desktop">
         <AppHeader testId="appHeader">
           Desktop Header
         </AppHeader>
@@ -2401,7 +2401,7 @@ test.describe("Desktop Layout - with Header and Footer", () => {
         <Footer testId="footer">
           Desktop Footer
         </Footer>
-      </App2>
+      </App>
     `);
 
     // Verify main content is scrollable
@@ -2416,7 +2416,7 @@ test.describe("Desktop Layout - with Header and Footer", () => {
     page,
   }) => {
     await initTestBed(`
-      <App2 layout="desktop">
+      <App layout="desktop">
         <AppHeader testId="appHeader">
           Desktop Header
         </AppHeader>
@@ -2430,7 +2430,7 @@ test.describe("Desktop Layout - with Header and Footer", () => {
         <Footer testId="footer">
           Desktop Footer
         </Footer>
-      </App2>
+      </App>
     `);
 
     // Desktop layout should not have scrollbar gutters
@@ -2454,7 +2454,7 @@ test.describe("Desktop Layout - with Header and Footer", () => {
     page,
   }) => {
     await initTestBed(`
-      <App2 layout="desktop">
+      <App layout="desktop">
         <AppHeader testId="appHeader">
           Desktop Header
         </AppHeader>
@@ -2468,7 +2468,7 @@ test.describe("Desktop Layout - with Header and Footer", () => {
         <Footer testId="footer">
           Desktop Footer
         </Footer>
-      </App2>
+      </App>
     `);
 
     const containerInfo = await page.evaluate(() => {
@@ -2506,7 +2506,7 @@ test.describe("Desktop Layout - without Header and Footer", () => {
     page,
   }) => {
     await initTestBed(`
-      <App2 layout="desktop">
+      <App layout="desktop">
         <Pages fallbackPath="/">
           <Page url="/">
             <Stack testId="mainContent" height="200px" backgroundColor="lightblue">
@@ -2514,7 +2514,7 @@ test.describe("Desktop Layout - without Header and Footer", () => {
             </Stack>
           </Page>
         </Pages>
-      </App2>
+      </App>
     `);
 
     // Only main content should be visible
@@ -2534,7 +2534,7 @@ test.describe("Desktop Layout - without Header and Footer", () => {
     page,
   }) => {
     await initTestBed(`
-      <App2 layout="desktop">
+      <App layout="desktop">
         <Pages fallbackPath="/">
           <Page url="/">
             <Stack testId="mainContent" height="200px" backgroundColor="lightblue">
@@ -2542,7 +2542,7 @@ test.describe("Desktop Layout - without Header and Footer", () => {
             </Stack>
           </Page>
         </Pages>
-      </App2>
+      </App>
     `);
 
     const mainContent = page.getByTestId("mainContent");
@@ -2559,7 +2559,7 @@ test.describe("Desktop Layout - without Header and Footer", () => {
     page,
   }) => {
     await initTestBed(`
-      <App2 layout="desktop">
+      <App layout="desktop">
         <Pages fallbackPath="/">
           <Page url="/">
             <Stack testId="mainContent" height="2000px" backgroundColor="lightblue">
@@ -2567,7 +2567,7 @@ test.describe("Desktop Layout - without Header and Footer", () => {
             </Stack>
           </Page>
         </Pages>
-      </App2>
+      </App>
     `);
 
     // Verify main content is scrollable
@@ -2589,7 +2589,7 @@ test.describe("Desktop Layout - scrollWholePage and noScrollbarGutters props", (
   }) => {
     // Test with scrollWholePage=true
     await initTestBed(`
-      <App2 layout="desktop" scrollWholePage="true">
+      <App layout="desktop" scrollWholePage="true">
         <Pages fallbackPath="/">
           <Page url="/">
             <Stack testId="mainContent" height="2000px" backgroundColor="lightblue">
@@ -2597,7 +2597,7 @@ test.describe("Desktop Layout - scrollWholePage and noScrollbarGutters props", (
             </Stack>
           </Page>
         </Pages>
-      </App2>
+      </App>
     `);
 
     // Main content should still be the scroll container (desktop always uses content-only scroll)
@@ -2611,7 +2611,7 @@ test.describe("Desktop Layout - scrollWholePage and noScrollbarGutters props", (
   }) => {
     // Test with noScrollbarGutters=false (should still not have gutters)
     await initTestBed(`
-      <App2 layout="desktop" noScrollbarGutters="false">
+      <App layout="desktop" noScrollbarGutters="false">
         <Pages fallbackPath="/">
           <Page url="/">
             <Stack testId="mainContent" height="2000px" backgroundColor="lightblue">
@@ -2619,7 +2619,7 @@ test.describe("Desktop Layout - scrollWholePage and noScrollbarGutters props", (
             </Stack>
           </Page>
         </Pages>
-      </App2>
+      </App>
     `);
 
     // Desktop layout never uses scrollbar gutters
@@ -2649,7 +2649,7 @@ test.describe("Desktop Layout - NavPanel behavior", () => {
     page,
   }) => {
     await initTestBed(`
-      <App2 layout="desktop">
+      <App layout="desktop">
         <AppHeader testId="appHeader">
           Desktop Header
         </AppHeader>
@@ -2667,7 +2667,7 @@ test.describe("Desktop Layout - NavPanel behavior", () => {
         <Footer testId="footer">
           Desktop Footer
         </Footer>
-      </App2>
+      </App>
     `);
 
     // NavPanel should not be visible in desktop layout
@@ -2685,7 +2685,7 @@ test.describe("Desktop Layout - NavPanel behavior", () => {
     page,
   }) => {
     await initTestBed(`
-      <App2 layout="desktop">
+      <App layout="desktop">
         <AppHeader testId="appHeader">
           Desktop Header
         </AppHeader>
@@ -2700,7 +2700,7 @@ test.describe("Desktop Layout - NavPanel behavior", () => {
             </Stack>
           </Page>
         </Pages>
-      </App2>
+      </App>
     `);
 
     // No hamburger menu button should exist
