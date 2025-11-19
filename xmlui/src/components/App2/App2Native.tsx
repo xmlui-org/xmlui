@@ -295,10 +295,15 @@ export function App2({
   }, [location.pathname]);
 
   useEffect(() => {
-    requestAnimationFrame(() => {
+    const frameId = requestAnimationFrame(() => {
       // we have to force refresh the anchor scroll to pos, because it depends on the header height (scroll-margin-top on anchors)
       forceRefreshAnchorScroll();
     });
+    
+    // Cleanup: cancel animation frame if component unmounts before it executes
+    return () => {
+      cancelAnimationFrame(frameId);
+    };
   }, [forceRefreshAnchorScroll]);
 
   const [subNavPanelSlot, setSubNavPanelSlot] = useState(null);
@@ -362,15 +367,11 @@ export function App2({
     };
   }, [linkMap, registerLinkMap]);
 
-  useEffect(() => {
-    if (navPanelVisible) {
-      setDrawerVisible(false);
-    }
-  }, [navPanelVisible]);
-
+  // Close drawer when: 1) nav panel becomes visible (large screen), 2) location/layout changes
+  // This ensures drawer is closed when it's no longer needed or context has changed
   useEffect(() => {
     setDrawerVisible(false);
-  }, [location, safeLayout]);
+  }, [navPanelVisible, location, safeLayout]);
 
   const wrapperBaseClasses = [
     className,
