@@ -1,101 +1,145 @@
-import { forwardRef, useRef, type CSSProperties, type ReactNode } from "react";
-import * as RadixSelect from "@radix-ui/react-select";
-import { composeRefs } from "@radix-ui/react-compose-refs";
-import classnames from "classnames";
+import type { CSSProperties, ReactNode } from "react";
+import { forwardRef, useCallback, useMemo } from "react";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 import styles from "./Select.module.scss";
-
+import { useSelect } from "./SelectContext";
+import Icon from "../Icon/IconNative";
+import classnames from "classnames";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 import type { SingleValueType } from "./SelectNative";
-import { SelectTriggerActions } from "./SelectNative";
-import type { ValidationStatus, Option } from "../abstractions";
+import type { ValidationStatus } from "../abstractions";
+import {
+  Root,
+  Trigger,
+  Content,
+  Viewport,
+  ScrollUpButton,
+  ScrollDownButton,
+  Portal,
+} from "@radix-ui/react-select";
 
 interface SimpleSelectProps {
-  id?: string;
   value: SingleValueType;
-  onValueChange: (value: SingleValueType) => void;
-  enabled?: boolean;
-  placeholder?: string;
-  autoFocus?: boolean;
-  readOnly?: boolean;
-  style?: CSSProperties;
+  onValueChange: (selectedValue: SingleValueType) => void;
+  id: string;
+  style: CSSProperties;
   className?: string;
-  onFocus?: () => void;
-  onBlur?: () => void;
-  validationStatus?: ValidationStatus;
-  triggerRef?: (element: HTMLElement | null) => void;
-  height?: CSSProperties["height"];
-  width?: number;
-  emptyListNode?: ReactNode;
-  clearable?: boolean;
-  clearValue?: () => void;
-  children?: ReactNode;
-  options?: Set<Option>;
-  valueRenderer?: (item: Option, removeItem: () => void) => ReactNode;
+  onFocus: () => void;
+  onBlur: () => void;
+  enabled: boolean;
+  validationStatus: ValidationStatus;
+  triggerRef: (value: ((prevState: HTMLElement) => HTMLElement) | HTMLElement) => void;
+  autoFocus: boolean;
+  placeholder: string;
+  height: CSSProperties["height"];
+  width: number;
+  children: ReactNode;
+  readOnly: boolean;
+  emptyListNode: ReactNode;
+  modal?: boolean;
 }
 
-export const SimpleSelect = forwardRef<HTMLDivElement, SimpleSelectProps>(function SimpleSelect(
-  {
-    id,
-    value,
-    onValueChange,
-    enabled = true,
-    placeholder = "",
-    autoFocus = false,
-    readOnly = false,
-    style,
-    className,
-    onFocus,
-    onBlur,
-    validationStatus = "none",
-    triggerRef,
-    height,
-    width,
-    emptyListNode,
-    clearable = false,
-    clearValue,
-    options = new Set(),
-    valueRenderer,
-    children,
-    ...rest
-  },
-  forwardedRef,
-) {
-  const localRef = useRef<HTMLButtonElement>(null);
+export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
+  function SimpleSelect(props, forwardedRef) {
+    const { root } = useTheme();
+    const {
+      enabled,
+      onBlur,
+      autoFocus,
+      onValueChange,
+      validationStatus,
+      value,
+      height,
+      style,
+      placeholder,
+      id,
+      triggerRef,
+      onFocus,
+      width,
+      children,
+      readOnly,
+      emptyListNode,
+      className,
+      modal,
+      ...rest
+    } = props;
 
-  return (
-    <RadixSelect.Root value={value ? String(value) : undefined} onValueChange={onValueChange}>
-      <RadixSelect.Trigger
-        {...rest}
-        ref={composeRefs(localRef, forwardedRef as any, triggerRef as any)}
-        id={id}
-        style={style}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        disabled={!enabled || readOnly}
-        className={classnames(className, styles.selectTrigger, styles[validationStatus], {
-          [styles.disabled]: !enabled,
-        })}
-        autoFocus={autoFocus}
-      >
-        <RadixSelect.Value placeholder={placeholder} />
-        <SelectTriggerActions
-          value={value}
-          multiSelect={false}
-          enabled={enabled}
-          readOnly={readOnly}
-          clearable={clearable}
-          clearValue={clearValue || (() => {})}
-        />
-      </RadixSelect.Trigger>
-      <RadixSelect.Portal>
-        <RadixSelect.Content
-          className={classnames(styles.selectContent, styles[validationStatus])}
-          style={{ minWidth: width, height }}
-          position="popper"
-          sideOffset={4}
+    const { options } = useSelect();
+    const composedRef = forwardRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;
+
+    // Convert value to string for Radix UI compatibility
+    const stringValue = useMemo(() => {
+      return value != undefined ? String(value) : undefined;
+    }, [value]);
+
+    // Handle value changes with proper type conversion
+    const handleValueChange = useCallback(
+      (val: string) => {
+        if (readOnly) return;
+        onValueChange(val);
+      },
+      [onValueChange, readOnly],
+    );
+
+    const optionsArray = useMemo(() => Array.from(options), [options]);
+
+    const selectedOption = useMemo(() => {
+      return optionsArray.find((option) => String(option.value) === String(value));
+    }, [optionsArray, value]);
+
+    return (
+      <Root value={stringValue} onValueChange={handleValueChange}>
+        <Trigger
+          {...rest}
+          id={id}
+          ref={composedRef}
+          aria-haspopup="listbox"
+          style={style}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          disabled={!enabled}
+          className={classnames(className, styles.selectTrigger, {
+            [styles.error]: validationStatus === "error",
+            [styles.warning]: validationStatus === "warning",
+            [styles.valid]: validationStatus === "valid",
+          })}
+          onClick={(event) => {
+            // Prevent event propagation to parent elements (e.g., DropdownMenu)
+            // This ensures that clicking the Select trigger doesn't close the containing DropdownMenu
+            event.stopPropagation();
+          }}
+          autoFocus={autoFocus}
         >
-          <RadixSelect.Viewport className={styles.commandList}>{children}</RadixSelect.Viewport>
-        </RadixSelect.Content>
-      </RadixSelect.Portal>
-    </RadixSelect.Root>
-  );
-});
+          <div
+            className={classnames(styles.selectValue, {
+              [styles.placeholder]: value === undefined,
+            })}
+          >
+            {selectedOption ? selectedOption.label : readOnly ? "" : placeholder}
+          </div>
+          <span className={styles.action}>
+            <Icon name="chevrondown" />
+          </span>
+        </Trigger>
+        <Portal container={root}>
+          <Content
+            className={styles.selectDropdownContent}
+            position="popper"
+            style={{ maxHeight: height, minWidth: width }}
+          >
+            <ScrollUpButton className={styles.selectScrollUpButton}>
+              <Icon name="chevronup" />
+            </ScrollUpButton>
+            <Viewport className={styles.selectViewport} role="listbox">
+              {children}
+              {optionsArray.length === 0 && emptyListNode}
+            </Viewport>
+            <ScrollDownButton className={styles.selectScrollDownButton}>
+              <Icon name="chevrondown" />
+            </ScrollDownButton>
+          </Content>
+        </Portal>
+      </Root>
+    );
+  },
+);

@@ -1,21 +1,20 @@
-import { useEffect, useMemo, useRef } from "react";
-import classnames from "classnames";
-import styles from "./Select.module.scss";
-
+import { type ForwardedRef, forwardRef, useId, useMemo } from "react";
 import type { Option } from "../abstractions";
 import { useSelect } from "./SelectContext";
+import classnames from "classnames";
+import styles from "./Select.module.scss";
 import Icon from "../Icon/IconNative";
 
-interface MultiSelectOptionProps extends Option {
-  isHighlighted?: boolean;
-  itemIndex?: number;
-}
-
-export function MultiSelectOption(option: MultiSelectOptionProps) {
+export const MultiSelectOption = forwardRef<
+  HTMLDivElement,
+  Option & { isHighlighted?: boolean; itemIndex?: number }
+>(function MultiSelectOption(option, forwardedRef: ForwardedRef<HTMLDivElement>) {
+  const id = useId();
   const {
-    value,
     label,
+    value,
     enabled = true,
+    keywords,
     readOnly,
     children,
     isHighlighted = false,
@@ -29,21 +28,11 @@ export function MultiSelectOption(option: MultiSelectOptionProps) {
     setSelectedIndex,
     optionRenderer,
   } = useSelect();
-
-  const optionRef = useRef<HTMLDivElement>(null);
-
   const selected = useMemo(() => {
     return Array.isArray(selectedValue) && multiSelect
       ? selectedValue.map((v) => String(v)).includes(value)
       : String(selectedValue) === String(value);
   }, [selectedValue, value, multiSelect]);
-
-  // Scroll into view when highlighted
-  useEffect(() => {
-    if (isHighlighted && optionRef.current) {
-      optionRef.current.scrollIntoView({ block: "nearest", behavior: "smooth" });
-    }
-  }, [isHighlighted]);
 
   const handleClick = () => {
     if (readOnly) {
@@ -51,13 +40,14 @@ export function MultiSelectOption(option: MultiSelectOptionProps) {
       return;
     }
     if (enabled) {
-      onChange?.(value);
+      onChange(value);
     }
   };
 
   return (
     <div
-      ref={optionRef}
+      id={id}
+      ref={forwardedRef}
       role="option"
       aria-disabled={!enabled}
       aria-selected={selected}
@@ -79,7 +69,7 @@ export function MultiSelectOption(option: MultiSelectOptionProps) {
     >
       <div className={styles.multiSelectOptionContent}>
         {optionRenderer ? (
-          optionRenderer({ label, value, enabled }, selectedValue as any, false)
+          optionRenderer({ label, value, enabled, keywords }, selectedValue as any, false)
         ) : (
           <>
             {children || label}
@@ -89,4 +79,4 @@ export function MultiSelectOption(option: MultiSelectOptionProps) {
       </div>
     </div>
   );
-}
+});

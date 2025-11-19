@@ -1,43 +1,85 @@
-import { useEffect, useMemo, type ReactNode } from "react";
-import * as RadixSelect from "@radix-ui/react-select";
+import { forwardRef, useEffect, useMemo, useRef } from "react";
+import type { Option } from "../abstractions";
+import { Item, ItemIndicator, ItemText } from "@radix-ui/react-select";
+import { useSelect } from "./SelectContext";
+import { useOption } from "./OptionContext";
 import classnames from "classnames";
 import styles from "./Select.module.scss";
-
-import type { Option } from "../abstractions";
-import { useOption } from "./OptionContext";
 import Icon from "../Icon/IconNative";
 
-export function SelectOption(option: Option) {
-  const { value, label, enabled = true, children } = option;
-  const { onOptionAdd } = useOption();
+export const SelectOption = forwardRef<React.ElementRef<typeof Item>, Option>(
+  function SelectOption(option, ref) {
+    const visibleContentRef = useRef<HTMLDivElement>(null);
+    const { value, label, enabled = true, children, className } = option;
+    const { value: selectedValue, optionRenderer } = useSelect();
+    const { onOptionRemove, onOptionAdd } = useOption();
 
-  const opt: Option = useMemo(() => {
-    return {
-      ...option,
-      label: label ?? "",
-      keywords: option.keywords || [label ?? ""],
-    };
-  }, [option, label]);
+    const opt: Option = useMemo(() => {
+      return {
+        ...option,
+        label: label ?? "",
+        keywords: [label ?? ""],
+      };
+    }, [option, label]);
 
-  useEffect(() => {
-    onOptionAdd(opt);
-    // Don't remove options when component unmounts - they should persist
-  }, [opt, onOptionAdd]);
+    useEffect(() => {
+      onOptionAdd(opt);
+      return () => onOptionRemove(opt);
+    }, [opt, onOptionAdd, onOptionRemove]);
 
-  return (
-    <RadixSelect.Item
-      value={value}
-      disabled={!enabled}
-      className={classnames(styles.multiSelectOption, {
-        [styles.disabledOption]: !enabled,
-      })}
-    >
-      <div className={styles.multiSelectOptionContent}>
-        <RadixSelect.ItemText>{children || label}</RadixSelect.ItemText>
-        <RadixSelect.ItemIndicator>
-          <Icon name="checkmark" />
-        </RadixSelect.ItemIndicator>
-      </div>
-    </RadixSelect.Item>
-  );
-}
+    return (
+      <Item
+        ref={ref}
+        className={classnames(className, styles.selectOption)}
+        value={value}
+        textValue={label}
+        disabled={!enabled}
+        onClick={(event) => {
+          event.stopPropagation();
+        }}
+        data-state={selectedValue === value && "checked"}
+      >
+        {/* SelectItemText is used by SelectValue to display the selected value */}
+        <span style={{ display: "none" }}>
+          <ItemText>{label}</ItemText>
+        </span>
+        {/* Visible content in the dropdown */}
+        {children ? (
+          <>
+            <div className={styles.selectOptionContent} ref={visibleContentRef}>
+              {children}
+            </div>
+            {selectedValue === value && (
+              <ItemIndicator className={styles.selectOptionIndicator}>
+                <Icon name="checkmark" />
+              </ItemIndicator>
+            )}
+          </>
+        ) : optionRenderer ? (
+          <div className={styles.selectOptionContent} ref={visibleContentRef}>
+            {optionRenderer(
+              {
+                label,
+                value,
+                enabled,
+              },
+              selectedValue as any,
+              false,
+            )}
+          </div>
+        ) : (
+          <>
+            <div className={styles.selectOptionContent} ref={visibleContentRef}>
+              {label}
+            </div>
+            {selectedValue === value && (
+              <ItemIndicator className={styles.selectItemIndicator}>
+                <Icon name="checkmark" />
+              </ItemIndicator>
+            )}
+          </>
+        )}
+      </Item>
+    );
+  },
+);
