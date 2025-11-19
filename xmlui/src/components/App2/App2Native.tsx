@@ -23,8 +23,8 @@ import { useTheme, useThemes } from "../../components-core/theming/ThemeContext"
 import { useScrollbarWidth } from "../../components-core/utils/css-utils";
 import { Sheet, SheetContent } from "../../components/App/Sheet";
 import { AppContextAwareAppHeader } from "../../components/AppHeader/AppHeaderNative";
-import type { AppLayoutType, IAppLayoutContext } from "./AppLayoutContext";
-import { AppLayoutContext } from "./AppLayoutContext";
+import type { AppLayoutType, IAppLayoutContext } from "../App/AppLayoutContext";
+import { AppLayoutContext } from "../App/AppLayoutContext";
 import { SearchContextProvider } from "./SearchContext";
 import type { NavHierarchyNode } from "../NavPanel/NavPanelNative";
 import { LinkInfoContext } from "./LinkInfoContext";
@@ -112,10 +112,16 @@ export function App2({
   const { setActiveThemeTone, setActiveThemeId, themes } = useThemes();
   const mounted = useRef(false);
 
+  // Issue 1 Fix: Validate and sanitize layout input to prevent invalid values
+  // 1. Get layout from props, theme, or default to "condensed-sticky"
+  // 2. Trim whitespace and replace Unicode dashes (en-dash, em-dash, non-breaking hyphen) with regular hyphens
+  // 3. Fall back to default if result is empty string (whitespace-only input)
+  // 4. Validate against allowed layout types (error will be thrown by switch default case if invalid)
   const layoutWithDefaultValue = layout || getThemeVar("layout-App") || "condensed-sticky";
-  const safeLayout = layoutWithDefaultValue
+  const sanitizedLayout = layoutWithDefaultValue
     ?.trim()
-    .replace(/[\u2013\u2014\u2011]/g, "-") as AppLayoutType; //It replaces all &ndash; (–) and &mdash; (—) and non-breaking hyphen '‑' symbols with simple dashes (-).
+    .replace(/[\u2013\u2014\u2011]/g, "-");
+  const safeLayout = (sanitizedLayout || "condensed-sticky") as AppLayoutType;
   const appContext = useAppContext();
   const { setLoggedInUser, mediaSize, forceRefreshAnchorScroll, appGlobals } = appContext;
   const hasRegisteredHeader = header !== undefined;

@@ -6,52 +6,52 @@ import { expect, test } from "../../testing/fixtures";
 
 test.describe("Basic Functionality", () => {
   test("renders with basic props", async ({ initTestBed, page }) => {
-    await initTestBed(`<App name="Test App" testId="app"/>`);
+    await initTestBed(`<App2 name="Test App" testId="app"/>`);
     await expect(page.getByTestId("app")).toBeVisible();
   });
 
   test("renders with horizontal layout", async ({ initTestBed, page }) => {
-    await initTestBed(`<App layout="horizontal">test text</App>`);
+    await initTestBed(`<App2 layout="horizontal">test text</App2>`);
     await expect(page.getByText("test text")).toBeVisible();
   });
 
   test("renders with horizontal-sticky layout", async ({ initTestBed, page }) => {
-    await initTestBed(`<App layout="horizontal-sticky">test text</App>`);
+    await initTestBed(`<App2 layout="horizontal-sticky">test text</App2>`);
     await expect(page.getByText("test text")).toBeVisible();
   });
 
   test("renders with condensed layout", async ({ initTestBed, page }) => {
-    await initTestBed(`<App layout="condensed">test text</App>`);
+    await initTestBed(`<App2 layout="condensed">test text</App2>`);
     await expect(page.getByText("test text")).toBeVisible();
   });
 
   test("renders with condensed-sticky layout", async ({ initTestBed, page }) => {
-    await initTestBed(`<App layout="condensed-sticky">test text</App>`);
+    await initTestBed(`<App2 layout="condensed-sticky">test text</App2>`);
     await expect(page.getByText("test text")).toBeVisible();
   });
 
   test("renders with vertical layout", async ({ initTestBed, page }) => {
-    await initTestBed(`<App layout="vertical">test text</App>`);
+    await initTestBed(`<App2 layout="vertical">test text</App2>`);
     await expect(page.getByText("test text")).toBeVisible();
   });
 
   test("renders with vertical-sticky layout", async ({ initTestBed, page }) => {
-    await initTestBed(`<App layout="vertical-sticky">test text</App>`);
+    await initTestBed(`<App2 layout="vertical-sticky">test text</App2>`);
     await expect(page.getByText("test text")).toBeVisible();
   });
 
   test("renders with vertical-full-header layout", async ({ initTestBed, page }) => {
-    await initTestBed(`<App layout="vertical-full-header">test text</App>`);
+    await initTestBed(`<App2 layout="vertical-full-header">test text</App2>`);
     await expect(page.getByText("test text")).toBeVisible();
   });
 
   test("renders with desktop layout", async ({ initTestBed, page }) => {
-    await initTestBed(`<App layout="desktop">test text</App>`);
+    await initTestBed(`<App2 layout="desktop">test text</App2>`);
     await expect(page.getByText("test text")).toBeVisible();
   });
 
   test("desktop layout fills viewport dimensions", async ({ initTestBed, page }) => {
-    await initTestBed(`<App layout="desktop" testId="app">test content</App>`);
+    await initTestBed(`<App2 layout="desktop" testId="app">test content</App2>`);
     
     const app = page.getByTestId("app");
     await expect(app).toBeVisible();
@@ -60,7 +60,7 @@ test.describe("Basic Functionality", () => {
 
   test("desktop layout renders with header and footer", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <App layout="desktop" testId="app">
+      <App2 layout="desktop" testId="app">
         <AppHeader testId="header">
           <property name="logoTemplate">
             <Text value="Desktop App" />
@@ -72,7 +72,7 @@ test.describe("Basic Functionality", () => {
           </Page>
         </Pages>
         <Footer testId="footer">Footer Content</Footer>
-      </App>
+      </App2>
     `);
 
     await expect(page.getByTestId("app")).toBeVisible();
@@ -85,14 +85,14 @@ test.describe("Basic Functionality", () => {
 
   test("desktop layout works without header", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <App layout="desktop" testId="app">
+      <App2 layout="desktop" testId="app">
         <Pages fallbackPath="/">
           <Page url="/">
             <Text testId="content">Content without header</Text>
           </Page>
         </Pages>
         <Footer testId="footer">Footer</Footer>
-      </App>
+      </App2>
     `);
 
     await expect(page.getByTestId("app")).toBeVisible();
@@ -102,7 +102,7 @@ test.describe("Basic Functionality", () => {
 
   test("desktop layout works without footer", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <App layout="desktop" testId="app">
+      <App2 layout="desktop" testId="app">
         <AppHeader testId="header">
           <property name="logoTemplate">
             <Text value="Header Only" />
@@ -113,7 +113,7 @@ test.describe("Basic Functionality", () => {
             <Text testId="content">Content without footer</Text>
           </Page>
         </Pages>
-      </App>
+      </App2>
     `);
 
     await expect(page.getByTestId("app")).toBeVisible();
@@ -124,13 +124,13 @@ test.describe("Basic Functionality", () => {
 
   test("desktop layout works with only content", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <App layout="desktop" testId="app">
+      <App2 layout="desktop" testId="app">
         <Pages fallbackPath="/">
           <Page url="/">
             <Text testId="content">Content only</Text>
           </Page>
         </Pages>
-      </App>
+      </App2>
     `);
 
     await expect(page.getByTestId("app")).toBeVisible();
@@ -143,9 +143,9 @@ test.describe("Basic Functionality", () => {
     createButtonDriver,
   }) => {
     await initTestBed(`
-      <App var.lo="vertical" layout="{lo}" testId="app">
+      <App2 var.lo="vertical" layout="{lo}" testId="app">
         <Button testId="toggleLayout" label="Toggle" onClick="lo = 'horizontal'" />
-      </App>
+      </App2>
     `);
 
     const buttonDriver = await createButtonDriver("toggleLayout");
@@ -156,7 +156,7 @@ test.describe("Basic Functionality", () => {
 
   test("sets document title from name prop", async ({ initTestBed, page }) => {
     const APP_NAME = "My Test Application";
-    await initTestBed(`<App name="${APP_NAME}" testId="app"/>`);
+    await initTestBed(`<App2 name="${APP_NAME}" testId="app"/>`);
 
     await expect(page.getByTestId("app")).toBeVisible();
     expect(await page.title()).toBe(APP_NAME);
@@ -164,12 +164,12 @@ test.describe("Basic Functionality", () => {
 
   test("handles different visual states with scrolling options", async ({ initTestBed, page }) => {
     // Test with scrollWholePage=true
-    await initTestBed(`<App scrollWholePage="true" testId="app"/>`);
+    await initTestBed(`<App2 scrollWholePage="true" testId="app"/>`);
 
     await expect(page.getByTestId("app")).toHaveClass(/scrollWholePage/);
 
     // Test with scrollWholePage=false
-    await initTestBed(`<App scrollWholePage="false" testId="app"/>`);
+    await initTestBed(`<App2 scrollWholePage="false" testId="app"/>`);
 
     await expect(page.getByTestId("app")).not.toHaveClass(/scrollWholePage/);
   });
@@ -181,7 +181,7 @@ test.describe("Basic Functionality", () => {
 
 test.describe("Edge Cases", () => {
   test("handles undefined props gracefully", async ({ initTestBed, page }) => {
-    await initTestBed(`<App testId="app" />`);
+    await initTestBed(`<App2 testId="app" />`);
 
     await expect(page.getByTestId("app")).toBeVisible();
 
@@ -191,9 +191,9 @@ test.describe("Edge Cases", () => {
 
   test("works correctly with basic content structure", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <App testId="app">
+      <App2 testId="app">
         <Text testId="content">Content</Text>
-      </App>`);
+      </App2>`);
 
     await expect(page.getByTestId("app")).toBeVisible();
     await expect(page.getByTestId("content")).toBeVisible();
@@ -202,7 +202,7 @@ test.describe("Edge Cases", () => {
 
   test("works correctly with complex content structure", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <App testId="app">
+      <App2 testId="app">
         <AppHeader testId="header">Header Content</AppHeader>
         <NavPanel testId="nav">
           <NavLink testId="link1" to="#">Link 1</NavLink>
@@ -216,7 +216,7 @@ test.describe("Edge Cases", () => {
           </Page>
         </Pages>
         <Footer testId="footer">Footer Content</Footer>
-      </App>`);
+      </App2>`);
 
     await expect(page.getByTestId("app")).toBeVisible();
 
@@ -243,7 +243,7 @@ test.describe("Event Handling", () => {
     initTestBed,
   }) => {
     const { testStateDriver } = await initTestBed(`
-      <App
+      <App2
         onReady="() => testState = 'app-ready'"
         testId="app"
       />
@@ -255,7 +255,7 @@ test.describe("Event Handling", () => {
 
   test("ready event is triggered for App with complex content", async ({ initTestBed }) => {
     const { testStateDriver } = await initTestBed(`
-      <App
+      <App2
         onReady="() => testState = 'complex-app-ready'"
         layout="horizontal"
         testId="app"
@@ -273,7 +273,7 @@ test.describe("Event Handling", () => {
         <Footer>
           <Text value="Footer Content" />
         </Footer>
-      </App>
+      </App2>
     `);
 
     // Verify the ready event was fired even with complex content
@@ -282,7 +282,7 @@ test.describe("Event Handling", () => {
 
   test("ready event fires only once during component lifecycle", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
-      <App
+      <App2
         var.counter="{0}"
         onReady="() => { counter = counter + 1; testState = counter; }"
         testId="app"
@@ -292,7 +292,7 @@ test.describe("Event Handling", () => {
           label="Re-render"
           onClick="counter = counter"
         />
-      </App>
+      </App2>
     `);
 
     // Initial ready event should fire
@@ -310,7 +310,7 @@ test.describe("Event Handling", () => {
     page,
   }) => {
     const { testStateDriver } = await initTestBed(`
-      <App
+      <App2
         onMessageReceived="(msg, ev) => testState = msg"
         testId="app"
       />
@@ -330,7 +330,7 @@ test.describe("Event Handling", () => {
     page,
   }) => {
     const { testStateDriver } = await initTestBed(`
-      <App
+      <App2
         onMessageReceived="(msg, ev) => testState = { message: msg, eventType: ev.type, origin: ev.origin }"
         testId="app"
       />
@@ -351,7 +351,7 @@ test.describe("Event Handling", () => {
 
   test("messageReceived event handles complex data objects", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
-      <App
+      <App2
         onMessageReceived="(msg, ev) => testState = msg"
         testId="app"
       />
@@ -381,7 +381,7 @@ test.describe("Drawer Handling", () => {
     await page.setViewportSize({ width: 400, height: 600 });
 
     await initTestBed(`
-      <App layout="condensed">
+      <App2 layout="condensed">
         <AppHeader testId="appHeader"/>
         <NavPanel>
           <NavGroup label="Pages">
@@ -389,7 +389,7 @@ test.describe("Drawer Handling", () => {
             <NavLink label="Page 2" to="/page2"/>
           </NavGroup>
         </NavPanel>
-      </App>
+      </App2>
     `);
 
     // Open drawer by clicking hamburger button
@@ -406,7 +406,7 @@ test.describe("Drawer Handling", () => {
     await page.setViewportSize({ width: 400, height: 600 });
 
     await initTestBed(`
-      <App layout="condensed">
+      <App2 layout="condensed">
         <AppHeader testId="appHeader"/>
         <NavPanel when="true">
           <NavGroup label="Pages">
@@ -414,7 +414,7 @@ test.describe("Drawer Handling", () => {
             <NavLink label="Page 2" to="/page2"/>
           </NavGroup>
         </NavPanel>
-      </App>
+      </App2>
     `);
 
     // Open drawer by clicking hamburger button
@@ -431,7 +431,7 @@ test.describe("Drawer Handling", () => {
     await page.setViewportSize({ width: 400, height: 600 });
 
     await initTestBed(`
-      <App layout="condensed">
+      <App2 layout="condensed">
         <AppHeader testId="appHeader"/>
         <NavPanel when="{true}">
           <NavGroup label="Pages">
@@ -439,7 +439,7 @@ test.describe("Drawer Handling", () => {
             <NavLink label="Page 2" to="/page2"/>
           </NavGroup>
         </NavPanel>
-      </App>
+      </App2>
     `);
 
     // Open drawer by clicking hamburger button
@@ -456,7 +456,7 @@ test.describe("Drawer Handling", () => {
     await page.setViewportSize({ width: 400, height: 600 });
 
     await initTestBed(`
-      <App layout="condensed">
+      <App2 layout="condensed">
         <AppHeader testId="appHeader"/>
         <NavPanel when="false">
           <NavGroup label="Pages">
@@ -464,7 +464,7 @@ test.describe("Drawer Handling", () => {
             <NavLink label="Page 2" to="/page2"/>
           </NavGroup>
         </NavPanel>
-      </App>
+      </App2>
     `);
 
     // Open drawer by clicking hamburger button
@@ -481,7 +481,7 @@ test.describe("Drawer Handling", () => {
     await page.setViewportSize({ width: 400, height: 600 });
 
     await initTestBed(`
-      <App layout="condensed">
+      <App2 layout="condensed">
         <AppHeader testId="appHeader"/>
         <NavPanel when="{false}">
           <NavGroup label="Pages">
@@ -489,7 +489,7 @@ test.describe("Drawer Handling", () => {
             <NavLink label="Page 2" to="/page2"/>
           </NavGroup>
         </NavPanel>
-      </App>
+      </App2>
     `);
 
     // Open drawer by clicking hamburger button
@@ -507,7 +507,7 @@ test.describe("Desktop Layout", () => {
   test("desktop layout applies nested-app class when used in NestedApp context", async ({ initTestBed, page }) => {
     // Note: In actual nested context (playground), isNested would be true automatically
     // This test verifies the class is applied when the condition is met
-    await initTestBed(`<App layout="desktop" testId="app">test content</App>`);
+    await initTestBed(`<App2 layout="desktop" testId="app">test content</App2>`);
     
     const app = page.getByTestId("app");
     await expect(app).toBeVisible();
@@ -516,7 +516,7 @@ test.describe("Desktop Layout", () => {
 
   test("desktop layout stretches content area vertically", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <App layout="desktop" testId="app">
+      <App2 layout="desktop" testId="app">
         <AppHeader testId="header">Header</AppHeader>
         <Pages fallbackPath="/">
           <Page url="/">
@@ -524,7 +524,7 @@ test.describe("Desktop Layout", () => {
           </Page>
         </Pages>
         <Footer testId="footer">Footer</Footer>
-      </App>
+      </App2>
     `);
 
     await expect(page.getByTestId("app")).toBeVisible();
@@ -535,7 +535,7 @@ test.describe("Desktop Layout", () => {
 
   test("desktop layout handles scrolling content", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <App layout="desktop" testId="app">
+      <App2 layout="desktop" testId="app">
         <AppHeader testId="header">Header</AppHeader>
         <Pages fallbackPath="/">
           <Page url="/">
@@ -549,7 +549,7 @@ test.describe("Desktop Layout", () => {
           </Page>
         </Pages>
         <Footer testId="footer">Footer</Footer>
-      </App>
+      </App2>
     `);
 
     await expect(page.getByTestId("app")).toBeVisible();
@@ -559,9 +559,9 @@ test.describe("Desktop Layout", () => {
 
   test("desktop layout ignores scrollWholePage property", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <App layout="desktop" scrollWholePage="false" testId="app">
+      <App2 layout="desktop" scrollWholePage="false" testId="app">
         <Text testId="content">Content</Text>
-      </App>
+      </App2>
     `);
 
     const app = page.getByTestId("app");
@@ -572,7 +572,7 @@ test.describe("Desktop Layout", () => {
 
   test("desktop layout with NavPanel does not display navigation", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <App layout="desktop" testId="app">
+      <App2 layout="desktop" testId="app">
         <AppHeader testId="header">Header</AppHeader>
         <NavPanel testId="nav">
           <NavLink label="Home" to="/" />
@@ -584,7 +584,7 @@ test.describe("Desktop Layout", () => {
           </Page>
         </Pages>
         <Footer testId="footer">Footer</Footer>
-      </App>
+      </App2>
     `);
 
     await expect(page.getByTestId("app")).toBeVisible();
@@ -599,7 +599,7 @@ test.describe("Desktop Layout", () => {
 
   test("desktop layout switches from other layout correctly", async ({ initTestBed, page, createButtonDriver }) => {
     await initTestBed(`
-      <App var.currentLayout="horizontal" layout="{currentLayout}" testId="app">
+      <App2 var.currentLayout="horizontal" layout="{currentLayout}" testId="app">
         <AppHeader testId="header">Header</AppHeader>
         <Button testId="switchBtn" label="Switch to Desktop" onClick="currentLayout = 'desktop'" />
         <Pages fallbackPath="/">
@@ -608,7 +608,7 @@ test.describe("Desktop Layout", () => {
           </Page>
         </Pages>
         <Footer testId="footer">Footer</Footer>
-      </App>
+      </App2>
     `);
 
     const app = page.getByTestId("app");
@@ -622,5 +622,86 @@ test.describe("Desktop Layout", () => {
     await buttonDriver.click();
     await expect(app).toHaveClass(/desktop/);
     await expect(app).not.toHaveClass(/horizontal/);
+  });
+});
+
+// =============================================================================
+// LAYOUT INPUT VALIDATION TESTS (Issue 1)
+// =============================================================================
+
+test.describe("Layout Input Validation", () => {
+  test("handles layout with Unicode en-dash (–)", async ({ initTestBed, page }) => {
+    // U+2013 en-dash should be converted to regular hyphen
+    await initTestBed(`<App2 layout="vertical–sticky" testId="app">test text</App2>`);
+    await expect(page.getByTestId("app")).toBeVisible();
+    await expect(page.getByText("test text")).toBeVisible();
+    // Should behave like vertical-sticky
+    await expect(page.getByTestId("app")).toHaveClass(/vertical/);
+    await expect(page.getByTestId("app")).toHaveClass(/sticky/);
+  });
+
+  test("handles layout with Unicode em-dash (—)", async ({ initTestBed, page }) => {
+    // U+2014 em-dash should be converted to regular hyphen
+    await initTestBed(`<App2 layout="horizontal—sticky" testId="app">test text</App2>`);
+    await expect(page.getByTestId("app")).toBeVisible();
+    await expect(page.getByText("test text")).toBeVisible();
+    // Should behave like horizontal-sticky
+    await expect(page.getByTestId("app")).toHaveClass(/horizontal/);
+    await expect(page.getByTestId("app")).toHaveClass(/sticky/);
+  });
+
+  test("handles layout with non-breaking hyphen (‑)", async ({ initTestBed, page }) => {
+    // U+2011 non-breaking hyphen should be converted to regular hyphen
+    await initTestBed(`<App2 layout="condensed‑sticky" testId="app">test text</App2>`);
+    await expect(page.getByTestId("app")).toBeVisible();
+    await expect(page.getByText("test text")).toBeVisible();
+    // Should behave like condensed-sticky
+    await expect(page.getByTestId("app")).toHaveClass(/horizontal/);
+    await expect(page.getByTestId("app")).toHaveClass(/sticky/);
+  });
+
+  test("throws error for completely invalid layout", async ({ initTestBed, page }) => {
+    // This should throw an error with message "layout type not supported: invalid-layout"
+    let consoleErrors: string[] = [];
+    
+    page.on('console', msg => {
+      if (msg.type() === 'error') {
+        consoleErrors.push(msg.text());
+      }
+    });
+
+    page.on('pageerror', error => {
+      consoleErrors.push(error.message);
+    });
+
+    await initTestBed(`<App2 layout="invalid-layout" testId="app">test text</App2>`);
+    
+    // Wait a bit for any errors to be logged
+    await page.waitForTimeout(100);
+    
+    // Should have an error about unsupported layout
+    const hasLayoutError = consoleErrors.some(err => 
+      err.includes('layout type not supported') || 
+      err.includes('invalid-layout')
+    );
+    
+    expect(hasLayoutError).toBe(true);
+  });
+
+  test("handles whitespace-only layout by falling back to default", async ({ initTestBed, page }) => {
+    // Whitespace gets trimmed, resulting in empty string, which falls back to default
+    await initTestBed(`<App2 layout="   " testId="app">test text</App2>`);
+    await expect(page.getByTestId("app")).toBeVisible();
+    await expect(page.getByText("test text")).toBeVisible();
+    // Should use default layout (condensed-sticky)
+    await expect(page.getByTestId("app")).toHaveClass(/horizontal/);
+  });
+
+  test("handles layout with extra whitespace", async ({ initTestBed, page }) => {
+    await initTestBed(`<App2 layout="  vertical-sticky  " testId="app">test text</App2>`);
+    await expect(page.getByTestId("app")).toBeVisible();
+    await expect(page.getByText("test text")).toBeVisible();
+    await expect(page.getByTestId("app")).toHaveClass(/vertical/);
+    await expect(page.getByTestId("app")).toHaveClass(/sticky/);
   });
 });
