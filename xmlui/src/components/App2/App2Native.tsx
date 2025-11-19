@@ -432,7 +432,7 @@ export function App2({
           <div className={styles.contentWrapper} ref={pageScrollRef}>
             <header
               ref={headerRefCallback}
-              className={classnames(styles.headerWrapper, footerShouldBeNonSticky && styles.sticky)}
+              className={classnames(styles.headerWrapper, styles.sticky)}
             >
               {header}
             </header>
