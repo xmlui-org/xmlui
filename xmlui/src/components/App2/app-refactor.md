@@ -147,12 +147,40 @@ Follow the layout definitions from app-next.md:
   - Whitespace-only layout test now passes
 **Note:** Also fixed App2.spec.ts to use `<App2>` instead of `<App>` throughout (was testing wrong component)
 
-#### Issue 2: **NavPanel `when` Condition May Not Update**
-**Location:** Lines 126-133
-**Problem:** `navPanelShouldRender` uses `useMemo` with `[navPanelDef, appContext]` dependencies
-**Risk:** If `appContext` is a stable object but its internal values change, the memo won't recompute
-**Severity:** Medium (could cause stale UI when NavPanel should show/hide based on context changes)
-**Recommendation:** Either add specific appContext properties to dependency array, or use a ref comparison approach
+#### Issue 2: **NavPanel `when` Condition Not Reactive - Hamburger Menu Visibility Bug** ✅ FIXED
+**Location:** Lines 126-135 (App2Native.tsx)
+**Problem:** Hamburger menu displayed even when `NavPanel` had `when='false'`, and didn't update reactively when `when` condition changed
+**Root Cause:** 
+  - Initial approach tried to pre-evaluate `when` condition with empty state `{}` in `useMemo`, which returned incorrect values
+  - Attempted complex notification mechanism from NavPanel back to App2Native, but NavPanel doesn't unmount/remount when `when` changes
+  - NavPanel stays mounted even when `when='false'` - `renderChild.tsx` just returns `null` instead of content
+**Severity:** High (hamburger menu showing when it shouldn't, core functionality broken)
+**Test Coverage:** ✅ 8 tests covering all scenarios
+  - **Drawer Handling tests** (5 tests): Verify hamburger visibility matches NavPanel's actual render state
+    - "Drawer displayed if NavPanel has no 'when'" - hamburger should be visible
+    - "Drawer displayed if NavPanel has when='true'" - hamburger should be visible
+    - "Drawer displayed if NavPanel has when='{true}'" - hamburger should be visible  
+    - "Drawer not displayed if NavPanel has when='false'" - hamburger should be hidden
+    - "Drawer not displayed if NavPanel has when='{false}'" - hamburger should be hidden
+  - **NavPanel When Condition Reactivity tests** (3 tests): Verify reactivity when state changes
+    - Test 1: NavPanel with `when="{showNav}"` - toggle button changes state, hamburger appears/disappears
+    - Test 2: NavPanel with `when="{userLoggedIn}"` - login/logout changes state, hamburger appears/disappears
+    - Test 3: NavPanel with `when="{count > 0 && count < 5}"` - counter changes, hamburger appears/disappears
+**Status:** ✅ **FULLY FIXED** - All 8 tests passing (5 drawer + 3 reactivity)
+**Solution:** Simple and elegant - check if `navPanel` prop is actually rendered
+  1. `App2.tsx` calls `renderChild(NavPanel)` which evaluates the `when` condition with actual component state
+  2. When `when='false'`, `renderChild` returns `null` 
+  3. `App2Native` receives the rendered result as `navPanel` prop
+  4. Check: `navPanelActuallyRendered = navPanel !== null && navPanel !== undefined`
+  5. `hasRegisteredNavPanel = navPanelDef !== undefined && navPanelActuallyRendered`
+  6. React's rendering pipeline automatically handles reactivity - when state changes, App2 re-renders, `renderChild` re-evaluates, `navPanel` prop updates
+**Key Insight:** No need for complex notification mechanism - the rendered `navPanel` prop IS the notification!
+**Files Changed:**
+  - `App2Native.tsx` (lines 128-134): Added logic to check if navPanel actually rendered
+  - Removed attempted notification mechanism from `AppLayoutContext.ts` and `NavPanelNative.tsx`
+**Test Results:**
+  - ✅ All 46 App2 tests passing
+  - ✅ All 37 App tests passing (no regression)
 
 #### Issue 3: **Race Condition in onReady Callback**
 **Location:** Lines 165-167

@@ -126,16 +126,12 @@ export function App2({
   const { setLoggedInUser, mediaSize, forceRefreshAnchorScroll, appGlobals } = appContext;
   const hasRegisteredHeader = header !== undefined;
   
-  // --- Check if NavPanel's "when" condition allows it to be rendered
-  // --- This ensures the drawer and hamburger menu are hidden when NavPanel.when evaluates to false
-  const navPanelShouldRender = useMemo(() => {
-    if (!navPanelDef) return false;
-    // Use shouldKeep to evaluate the NavPanel's when condition
-    // Pass empty state {} and appContext since we're evaluating at the App level
-    return shouldKeep(navPanelDef.when, {}, appContext);
-  }, [navPanelDef, appContext]);
-  
-  const hasRegisteredNavPanel = navPanelDef !== undefined && navPanelShouldRender;
+  // Check if NavPanel is actually displayed by checking if it rendered (not just if it's defined)
+  // navPanel is null when the 'when' condition evaluates to false
+  // navPanelDef !== undefined means a NavPanel is defined in the markup
+  // navPanel !== null means the NavPanel actually rendered (when condition is true)
+  const navPanelActuallyRendered = navPanel !== null && navPanel !== undefined;
+  const hasRegisteredNavPanel = navPanelDef !== undefined && navPanelActuallyRendered;
 
   useEffect(() => {
     setLoggedInUser(loggedInUser);
@@ -325,6 +321,8 @@ export function App2({
       logoContentDef,
       registerSubNavPanelSlot,
       subNavPanelSlot,
+      scrollWholePage,
+      isFullVerticalWidth: false,
       isNested: appGlobals?.isNested || false,
     };
   }, [
@@ -341,6 +339,7 @@ export function App2({
     logoContentDef,
     registerSubNavPanelSlot,
     subNavPanelSlot,
+    scrollWholePage,
     appGlobals?.isNested,
   ]);
 

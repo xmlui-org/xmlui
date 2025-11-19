@@ -458,7 +458,7 @@ test.describe("Drawer Handling", () => {
     await initTestBed(`
       <App2 layout="condensed">
         <AppHeader testId="appHeader"/>
-        <NavPanel when="false">
+        <NavPanel when="{false}">
           <NavGroup label="Pages">
             <NavLink label="Page 1" to="/page1"/>
             <NavLink label="Page 2" to="/page2"/>
@@ -703,5 +703,155 @@ test.describe("Layout Input Validation", () => {
     await expect(page.getByText("test text")).toBeVisible();
     await expect(page.getByTestId("app")).toHaveClass(/vertical/);
     await expect(page.getByTestId("app")).toHaveClass(/sticky/);
+  });
+});
+
+// =============================================================================
+// NAVPANEL WHEN CONDITION REACTIVITY TESTS (Issue 2)
+// =============================================================================
+
+test.describe("NavPanel When Condition Reactivity", () => {
+  test("NavPanel appears when 'when' condition changes from false to true", async ({ 
+    initTestBed, 
+    page,
+    createButtonDriver
+  }) => {
+    // Set small viewport to check if hamburger appears/disappears with NavPanel visibility
+    await page.setViewportSize({ width: 400, height: 600 });
+
+    await initTestBed(`
+      <App2 layout="condensed" var.showNav="{false}">
+        <AppHeader testId="appHeader">Header</AppHeader>
+        <NavPanel when="{showNav}" testId="nav">
+          <NavLink label="Link 1" to="/page1"/>
+        </NavPanel>
+        <Button testId="toggleBtn" label="Toggle Nav" onClick="showNav = !showNav; console.log(showNav)" />
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Text testId="content">Main Content</Text>
+          </Page>
+        </Pages>
+      </App2>
+    `);
+
+    const appHeader = page.getByTestId("appHeader");
+    const hamburger = appHeader.locator('[data-part-id="hamburger"]').first();
+    const toggleBtn = await createButtonDriver("toggleBtn");
+
+    // Initially showNav is false, so hamburger should NOT be visible
+    await expect(hamburger).not.toBeVisible();
+
+    // Toggle showNav to true
+    await toggleBtn.click();
+    
+    // Wait a bit for state to update
+    await page.waitForTimeout(1000);
+
+    // Now hamburger should be visible because NavPanel.when is true
+    await expect(hamburger).toBeVisible();
+
+    // Toggle back to false
+    await toggleBtn.click();
+    await page.waitForTimeout(100);
+
+    // Hamburger should hide again
+    await expect(hamburger).not.toBeVisible();
+  });
+
+  test("NavPanel visibility updates when appContext property changes", async ({ 
+    initTestBed, 
+    page,
+    createButtonDriver
+  }) => {
+    // This test checks if navPanelShouldRender properly reacts to changes in appContext properties
+    await page.setViewportSize({ width: 400, height: 600 });
+
+    await initTestBed(`
+      <App2 layout="condensed" var.userLoggedIn="false">
+        <AppHeader testId="appHeader">Header</AppHeader>
+        <NavPanel when="{userLoggedIn}" testId="nav">
+          <NavLink label="Dashboard" to="/dashboard"/>
+        </NavPanel>
+        <Button testId="loginBtn" label="Login" onClick="userLoggedIn = true" />
+        <Button testId="logoutBtn" label="Logout" onClick="userLoggedIn = false" />
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Text testId="content">Content</Text>
+          </Page>
+        </Pages>
+      </App2>
+    `);
+
+    const appHeader = page.getByTestId("appHeader");
+    const hamburger = appHeader.locator('[data-part-id="hamburger"]').first();
+    const loginBtn = await createButtonDriver("loginBtn");
+    const logoutBtn = await createButtonDriver("logoutBtn");
+
+    // Initially not logged in, hamburger should not be visible
+    await expect(hamburger).not.toBeVisible();
+
+    // Login
+    await loginBtn.click();
+    await page.waitForTimeout(100);
+
+    // Hamburger should appear
+    await expect(hamburger).toBeVisible();
+
+    // Logout
+    await logoutBtn.click();
+    await page.waitForTimeout(100);
+
+    // Hamburger should disappear
+    await expect(hamburger).not.toBeVisible();
+  });
+
+  test("NavPanel with complex when expression updates correctly", async ({ 
+    initTestBed, 
+    page,
+    createButtonDriver
+  }) => {
+    await page.setViewportSize({ width: 400, height: 600 });
+
+    await initTestBed(`
+      <App2 layout="condensed" var.count="0">
+        <AppHeader testId="appHeader">Header</AppHeader>
+        <NavPanel when="{count > 0 && count < 5}" testId="nav">
+          <NavLink label="Item" to="/item"/>
+        </NavPanel>
+        <Button testId="incBtn" label="Increment" onClick="count = count + 1" />
+        <Button testId="resetBtn" label="Reset" onClick="count = 0" />
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Text testId="countDisplay">Count: {count}</Text>
+          </Page>
+        </Pages>
+      </App2>
+    `);
+
+    const appHeader = page.getByTestId("appHeader");
+    const hamburger = appHeader.locator('[data-part-id="hamburger"]').first();
+    const incBtn = await createButtonDriver("incBtn");
+    const resetBtn = await createButtonDriver("resetBtn");
+
+    // Initially count=0, condition is false
+    await expect(hamburger).not.toBeVisible();
+
+    // Increment to 1, condition becomes true (1 > 0 && 1 < 5)
+    await incBtn.click();
+    await page.waitForTimeout(100);
+    await expect(hamburger).toBeVisible();
+
+    // Increment to 5, condition becomes false (5 > 0 but not 5 < 5)
+    await incBtn.click();
+    await incBtn.click();
+    await incBtn.click();
+    await incBtn.click();
+    await page.waitForTimeout(100);
+    await expect(hamburger).not.toBeVisible();
+
+    // Reset to 0
+    await resetBtn.click();
+    await page.waitForTimeout(100);
+    await expect(hamburger).not.toBeVisible();
   });
 });
