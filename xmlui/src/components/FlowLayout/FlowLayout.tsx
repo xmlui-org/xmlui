@@ -60,6 +60,9 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
             if (hints?.opaque) {
               return renderedChild;
             }
+            if (hints?.nonVisual) {
+              return renderedChild;
+            }
             // Handle SpaceFiller as flow item break
             if (node.type === "SpaceFiller") {
               return <FlowItemBreak force={true} />;

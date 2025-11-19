@@ -6,6 +6,7 @@ const COMP = "ChangeListener";
 
 export const ChangeListenerMd = createMetadata({
   status: "stable",
+  nonVisual: true,
   description:
     "`ChangeListener` is an invisible component that watches for changes in values " +
     "and triggers actions in response. It's essential for creating reactive behavior " +

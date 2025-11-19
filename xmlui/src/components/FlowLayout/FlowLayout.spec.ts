@@ -578,3 +578,218 @@ test.describe("Edge cases", () => {
     expect(blueWidth).toEqual(100);
   });
 });
+
+// =============================================================================
+// NON-VISUAL COMPONENT TESTS
+// =============================================================================
+
+test.describe("Non-visual components", () => {
+  test("ChangeListener does not create wrapper div or affect layout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="300px" gap="10px">
+        <Stack testId="item1" backgroundColor="red" height="64px" width="100px"/>
+        <ChangeListener testId="changeListener" onDidChange="testState = 'changed'"/>
+        <Stack testId="item2" backgroundColor="blue" height="64px" width="100px"/>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const { height: layoutHeight } = await getBounds(page.getByTestId("layout"));
+
+    // ChangeListener should not appear in the layout
+    // The two Stack items should be side by side
+    expect(rect1.y).toBe(rect2.y);
+    expect(rect2.x).toBeGreaterThan(rect1.x + rect1.width);
+    expect(layoutHeight).toBe(64);
+
+    // Verify ChangeListener doesn't create any visible wrapper
+    const changeListenerWrapper = page.getByTestId("changeListener");
+    await expect(changeListenerWrapper).not.toBeAttached();
+  });
+
+  test("ChangeListener still works in layout", async ({ page, initTestBed }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FlowLayout testId="layout" width="300px" gap="10px">
+        <Stack testId="item1" backgroundColor="red" height="64px" width="100px"/>
+        <ChangeListener testId="changeListener" listenTo="{item2}" onDidChange="testState = 'changed'"/>
+        <TextBox id="item2" />
+      </FlowLayout>
+    `);
+    await page.getByRole("textbox").fill("test");
+
+    await expect.poll(testStateDriver.testState).toBe("changed");
+  });
+
+  test("Queue does not create wrapper div or affect layout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="300px" gap="10px">
+        <Stack testId="item1" backgroundColor="red" height="64px" width="100px"/>
+        <Queue id="queue" onProcess="testState = 'processed'"/>
+        <Stack testId="item2" backgroundColor="blue" height="64px" width="100px"/>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const { height: layoutHeight } = await getBounds(page.getByTestId("layout"));
+
+    // Queue should not appear in the layout
+    // The two Stack items should be side by side
+    expect(rect1.y).toBe(rect2.y);
+    expect(rect2.x).toBeGreaterThan(rect1.x + rect1.width);
+    expect(layoutHeight).toBe(64);
+
+    // Verify Queue doesn't create any visible wrapper
+    const queueWrapper = page.getByTestId("queue");
+    await expect(queueWrapper).not.toBeAttached();
+  });
+
+  test("Queue still works in layout", async ({ page, initTestBed }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FlowLayout testId="layout" width="300px" gap="10px">
+        <Stack testId="item1" backgroundColor="red" height="64px" width="100px"/>
+        <Queue id="queue" onProcess="testState = 'processed'"/>
+        <Button id="item2" backgroundColor="blue" height="64px" width="100px" onClick="queue.enqueueItem(Math.random())"/>
+      </FlowLayout>
+    `);
+    const button = page.getByRole("button");
+    await button.click();
+
+    const queueWrapper = page.getByTestId("queue");
+
+    // Verify Queue doesn't create any visible wrapper
+    await expect.poll(testStateDriver.testState).toBe("processed");
+  });
+
+  test("AppState does not create wrapper div or affect layout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="300px" gap="10px">
+        <Stack testId="item1" backgroundColor="red" height="64px" width="100px"/>
+        <AppState testId="appState" />
+        <Stack testId="item2" backgroundColor="blue" height="64px" width="100px"/>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const { height: layoutHeight } = await getBounds(page.getByTestId("layout"));
+
+    // AppState should not appear in the layout
+    // The two Stack items should be side by side
+    expect(rect1.y).toBe(rect2.y);
+    expect(rect2.x).toBeGreaterThan(rect1.x + rect1.width);
+    expect(layoutHeight).toBe(64);
+
+    // Verify AppState doesn't create any visible wrapper
+    const appStateWrapper = page.getByTestId("appState");
+    await expect(appStateWrapper).not.toBeAttached();
+  });
+
+  test("AppState still works in layout", async ({ page, initTestBed }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FlowLayout testId="layout" width="300px" gap="10px">
+        <Stack testId="item1" backgroundColor="red" height="64px" width="100px"/>
+        <AppState id="appState" initialValue="{{ item: 'initial' }}" />
+        <ChangeListener testId="changeListener" listenTo="{appState.value.item}" onDidChange="testState = appState.value.item"/>
+        <Button testId="item2" backgroundColor="blue" height="64px" width="100px" onClick="appState.update({ item: 'clicked' })" />
+      </FlowLayout>
+    `);
+    const button = page.getByTestId("item2");
+    await button.click();
+
+    await expect.poll(testStateDriver.testState).toBe("clicked");
+  });
+
+  test("multiple non-visual components do not affect layout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="300px" gap="10px">
+        <ChangeListener listenTo="$var1"/>
+        <Stack testId="item1" backgroundColor="red" height="64px" width="100px"/>
+        <Queue id="queue1" onProcess="testState = 'processed'"/>
+        <AppState bucket="bucket1"/>
+        <Stack testId="item2" backgroundColor="blue" height="64px" width="100px"/>
+        <ChangeListener listenTo="$var2"/>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const { height: layoutHeight } = await getBounds(page.getByTestId("layout"));
+
+    // Multiple non-visual components should not affect the layout
+    // The two Stack items should be side by side
+    expect(rect1.y).toBe(rect2.y);
+    expect(rect2.x).toBeGreaterThan(rect1.x + rect1.width);
+    expect(layoutHeight).toBe(64);
+  });
+
+  test("non-visual component between items that wrap", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="250px" gap="10px">
+        <Stack testId="item1" backgroundColor="red" height="64px" width="150px"/>
+        <ChangeListener listenTo="$var1"/>
+        <Stack testId="item2" backgroundColor="blue" height="64px" width="150px"/>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const { height: layoutHeight } = await getBounds(page.getByTestId("layout"));
+
+    // Non-visual component should not affect wrapping
+    // item2 should wrap to the next line
+    expect(rect2.y).toBeGreaterThan(rect1.y);
+    expect(rect1.x).toBe(rect2.x);
+    expect(layoutHeight).toBe(138); // 64 + 10 (gap) + 64
+  });
+
+  test("only non-visual components in FlowLayout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="300px" gap="10px">
+        <ChangeListener listenTo="$var1"/>
+        <Queue id="queue1"/>
+        <AppState bucket="bucket1"/>
+      </FlowLayout>
+    `);
+
+    const { height: layoutHeight } = await getBounds(page.getByTestId("layout"));
+
+    // FlowLayout with only non-visual components should have minimal height
+    expect(layoutHeight).toBeLessThan(10);
+  });
+
+  test("non-visual component with visual feedback templates", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="400px" gap="10px">
+        <Stack testId="item1" backgroundColor="red" height="64px" width="100px"/>
+        <Queue id="testQueue">
+          <property name="progressFeedback">
+            <Text testId="progress">Processing...</Text>
+          </property>
+        </Queue>
+        <Stack testId="item2" backgroundColor="blue" height="64px" width="100px"/>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+
+    // Queue with template properties should still not affect layout
+    // (templates only render when queue is active)
+    expect(rect1.y).toBe(rect2.y);
+    expect(rect2.x).toBeGreaterThan(rect1.x + rect1.width);
+  });
+});
