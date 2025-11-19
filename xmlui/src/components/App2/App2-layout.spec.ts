@@ -513,3 +513,476 @@ test.describe("Horizontal Layout - scrollWholePage=false, noScrollbarGutters=fal
     await verifyMainContentScrollbarGutters(page, true);
   });
 });
+
+test.describe("Horizontal-Sticky Layout - scrollWholePage=true, noScrollbarGutters=true", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 1080 });
+  });
+
+  test("renders header, nav panel, main content, and footer in correct positions", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("horizontal-sticky", true, true, "200px"));
+
+    await verifyAllBlocksVisible(page);
+
+    // Get bounding boxes to verify layout structure
+    const header = page.getByTestId("appHeader");
+    const navPanel = page.getByTestId("navPanel");
+    const mainContent = page.getByTestId("mainContent");
+    const footer = page.getByTestId("footer");
+
+    const headerBox = await header.boundingBox();
+    const navPanelBox = await navPanel.boundingBox();
+    const mainContentBox = await mainContent.boundingBox();
+    const footerBox = await footer.boundingBox();
+
+    expect(headerBox).not.toBeNull();
+    expect(navPanelBox).not.toBeNull();
+    expect(mainContentBox).not.toBeNull();
+    expect(footerBox).not.toBeNull();
+
+    // Verify vertical stacking order
+    expect(headerBox!.y).toBeLessThan(navPanelBox!.y);
+    expect(navPanelBox!.y).toBeGreaterThan(headerBox!.y);
+    expect(mainContentBox!.y).toBeGreaterThan(navPanelBox!.y + navPanelBox!.height);
+    expect(footerBox!.y).toBeGreaterThan(mainContentBox!.y + mainContentBox!.height);
+
+    // Verify full width blocks
+    expect(headerBox!.width).toBeGreaterThan(1200);
+    expect(navPanelBox!.width).toBeGreaterThan(1200);
+    expect(footerBox!.width).toBeGreaterThan(1200);
+
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "footer"]);
+    await verifyAppContainerScrollable(page, false);
+    await verifyScrollbarGutters(page, false);
+  });
+
+  test("tall content at top: header and nav sticky at top, footer outside viewport, app container scrolls", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("horizontal-sticky", true, true, "2000px"));
+
+    await expect(page.getByTestId("mainContent")).toBeVisible();
+
+    const initialScrollY = await page.evaluate(() => window.scrollY);
+    expect(initialScrollY).toBe(0);
+
+    await verifyAppContainerScrollable(page, true);
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "footer"]);
+  });
+
+  test("tall content at mid-scroll: header and nav remain sticky at top, footer sticky at bottom", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("horizontal-sticky", true, true, "2000px"));
+
+    await scrollAppContainerTo(page, "mid");
+
+    // Header, nav, and footer should all remain sticky and visible
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "footer"]);
+  });
+
+  test("tall content at bottom: header and nav remain sticky at top, footer visible in viewport", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("horizontal-sticky", true, true, "2000px"));
+
+    await scrollAppContainerTo(page, "bottom");
+
+    // Header and nav should remain sticky at top
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "footer"]);
+  });
+});
+
+test.describe("Horizontal-Sticky Layout - scrollWholePage=true, noScrollbarGutters=false", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 1080 });
+  });
+
+  test("short content: all blocks visible, no scrollbar, gutters reserved", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("horizontal-sticky", false, true, "200px"));
+    await verifyAllBlocksVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "mainContent", "footer"]);
+    await verifyAppContainerScrollable(page, false);
+    await verifyScrollbarGutters(page, true);
+  });
+
+  test("tall content at top: app container scrolls with reserved gutters, header/nav/footer sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("horizontal-sticky", false, true, "2000px"));
+    await verifyAllBlocksVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "footer"]);
+    await verifyAppContainerScrollable(page, true);
+    await verifyScrollbarGutters(page, true);
+  });
+
+  test("tall content at mid-scroll: header and nav remain sticky, footer sticky at bottom", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("horizontal-sticky", false, true, "2000px"));
+    await scrollAppContainerTo(page, "mid");
+    await verifyAllBlocksVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "footer"]);
+    await verifyScrollbarGutters(page, true);
+  });
+
+  test("tall content at bottom: header and nav remain sticky, footer visible", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("horizontal-sticky", false, true, "2000px"));
+    await scrollAppContainerTo(page, "bottom");
+    await verifyAllBlocksVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "footer"]);
+    await verifyScrollbarGutters(page, true);
+  });
+});
+
+test.describe("Horizontal-Sticky Layout - scrollWholePage=false, noScrollbarGutters=true", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 1080 });
+  });
+
+  test("short content: all blocks visible, main content is scroll container, no gutters", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("horizontal-sticky", true, false, "200px"));
+    await verifyAllBlocksVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "mainContent", "footer"]);
+    await verifyMainContentIsScrollContainer(page);
+    await verifyAppContainerNotScrollable(page);
+  });
+
+  test("tall content at top: main content scrolls, header/nav/footer sticky, no gutters", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("horizontal-sticky", true, false, "2000px"));
+    await verifyAllBlocksVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "footer"]);
+    await verifyMainContentIsScrollContainer(page);
+    await verifyMainContentScrollbarGutters(page, false);
+    await verifyAppContainerNotScrollable(page);
+  });
+
+  test("tall content at mid-scroll: only main content scrolls, header/nav/footer remain sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("horizontal-sticky", true, false, "2000px"));
+    await scrollMainContentTo(page, "mid");
+    await verifyAllBlocksVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "footer"]);
+  });
+
+  test("tall content at bottom: only main content scrolls, header/nav/footer remain sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("horizontal-sticky", true, false, "2000px"));
+    await scrollMainContentTo(page, "bottom");
+    await verifyAllBlocksVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "footer"]);
+  });
+});
+
+test.describe("Horizontal-Sticky Layout - scrollWholePage=false, noScrollbarGutters=false", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 1080 });
+  });
+
+  test("short content: main content is scroll container with reserved gutters", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("horizontal-sticky", false, false, "200px"));
+    await verifyAllBlocksVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "mainContent", "footer"]);
+    await verifyMainContentIsScrollContainer(page);
+    await verifyMainContentScrollbarGutters(page, true);
+    await verifyAppContainerNotScrollable(page);
+  });
+
+  test("tall content at top: main content scrolls with reserved gutters, header/nav/footer sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("horizontal-sticky", false, false, "2000px"));
+    await verifyAllBlocksVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "footer"]);
+    await verifyMainContentIsScrollContainer(page);
+    await verifyMainContentScrollbarGutters(page, true);
+  });
+
+  test("tall content at mid-scroll: only main content scrolls, header/nav/footer sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("horizontal-sticky", false, false, "2000px"));
+    await scrollMainContentTo(page, "mid");
+    await verifyAllBlocksVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "footer"]);
+  });
+
+  test("tall content at bottom: only main content scrolls, header/nav/footer sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("horizontal-sticky", false, false, "2000px"));
+    await scrollMainContentTo(page, "bottom");
+    await verifyAllBlocksVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "footer"]);
+  });
+});
+
+test.describe("Condensed Layout - scrollWholePage=true, noScrollbarGutters=true", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 1080 });
+  });
+
+  test("renders header with embedded nav panel, main content, and footer in correct positions", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("condensed", true, true, "200px"));
+
+    await verifyAllBlocksVisible(page);
+
+    // Get bounding boxes to verify layout structure
+    const header = page.getByTestId("appHeader");
+    const navPanel = page.getByTestId("navPanel");
+    const mainContent = page.getByTestId("mainContent");
+    const footer = page.getByTestId("footer");
+
+    const headerBox = await header.boundingBox();
+    const navPanelBox = await navPanel.boundingBox();
+    const mainContentBox = await mainContent.boundingBox();
+    const footerBox = await footer.boundingBox();
+
+    expect(headerBox).not.toBeNull();
+    expect(navPanelBox).not.toBeNull();
+    expect(mainContentBox).not.toBeNull();
+    expect(footerBox).not.toBeNull();
+
+    // Verify NavPanel is within header boundary (condensed layout characteristic)
+    expect(navPanelBox!.y).toBeGreaterThanOrEqual(headerBox!.y);
+    expect(navPanelBox!.y + navPanelBox!.height).toBeLessThanOrEqual(
+      headerBox!.y + headerBox!.height
+    );
+
+    // Verify vertical stacking order
+    expect(mainContentBox!.y).toBeGreaterThan(headerBox!.y + headerBox!.height);
+    expect(footerBox!.y).toBeGreaterThan(mainContentBox!.y + mainContentBox!.height);
+
+    // Verify full width blocks
+    expect(headerBox!.width).toBeGreaterThan(1200);
+    expect(footerBox!.width).toBeGreaterThan(1200);
+
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "footer"]);
+    await verifyAppContainerScrollable(page, false);
+    await verifyScrollbarGutters(page, false);
+  });
+
+  test("tall content at top: header with nav visible, footer outside viewport, app container scrolls", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("condensed", true, true, "2000px"));
+
+    await expect(page.getByTestId("mainContent")).toBeVisible();
+
+    const initialScrollY = await page.evaluate(() => window.scrollY);
+    expect(initialScrollY).toBe(0);
+
+    await verifyAppContainerScrollable(page, true);
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel"]);
+    await verifyBlocksBelowViewport(page, ["footer"]);
+  });
+
+  test("tall content at mid-scroll: header and nav scrolled out, footer still below viewport", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("condensed", true, true, "2000px"));
+
+    await scrollAppContainerTo(page, "mid");
+
+    await verifyBlocksAboveViewport(page, ["appHeader", "navPanel"]);
+    await verifyBlocksBelowViewport(page, ["footer"]);
+  });
+
+  test("tall content at bottom: header and nav scrolled out, footer visible in viewport", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("condensed", true, true, "2000px"));
+
+    await scrollAppContainerTo(page, "bottom");
+
+    await verifyBlocksAboveViewport(page, ["appHeader", "navPanel"]);
+    await verifyBlocksInViewport(page, ["footer"]);
+  });
+});
+
+test.describe("Condensed Layout - scrollWholePage=true, noScrollbarGutters=false", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 1080 });
+  });
+
+  test("short content: all blocks visible, no scrollbar, gutters reserved", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("condensed", false, true, "200px"));
+    await verifyAllBlocksVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "mainContent", "footer"]);
+    await verifyAppContainerScrollable(page, false);
+    await verifyScrollbarGutters(page, true);
+  });
+
+  test("tall content at top: app container scrolls with reserved gutters", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("condensed", false, true, "2000px"));
+    await verifyAllBlocksVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel"]);
+    await verifyBlocksBelowViewport(page, ["footer"]);
+    await verifyAppContainerScrollable(page, true);
+    await verifyScrollbarGutters(page, true);
+  });
+
+  test("tall content at mid-scroll: header and nav scrolled out, footer still below viewport", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("condensed", false, true, "2000px"));
+    await scrollAppContainerTo(page, "mid");
+    await verifyAllBlocksVisible(page);
+    await verifyBlocksAboveViewport(page, ["appHeader", "navPanel"]);
+    await verifyBlocksBelowViewport(page, ["footer"]);
+    await verifyScrollbarGutters(page, true);
+  });
+
+  test("tall content at bottom: header and nav scrolled out, footer visible", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("condensed", false, true, "2000px"));
+    await scrollAppContainerTo(page, "bottom");
+    await verifyAllBlocksVisible(page);
+    await verifyBlocksAboveViewport(page, ["appHeader", "navPanel"]);
+    await verifyBlocksInViewport(page, ["footer"]);
+    await verifyScrollbarGutters(page, true);
+  });
+});
+
+test.describe("Condensed Layout - scrollWholePage=false, noScrollbarGutters=true", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 1080 });
+  });
+
+  test("short content: all blocks visible, main content is scroll container, no gutters", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("condensed", true, false, "200px"));
+    await verifyAllBlocksVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "mainContent", "footer"]);
+    await verifyMainContentIsScrollContainer(page);
+    await verifyAppContainerNotScrollable(page);
+  });
+
+  test("tall content at top: main content scrolls, header/footer static, no gutters", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("condensed", true, false, "2000px"));
+    await verifyAllBlocksVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "footer"]);
+    await verifyMainContentIsScrollContainer(page);
+    await verifyMainContentScrollbarGutters(page, false);
+    await verifyAppContainerNotScrollable(page);
+  });
+
+  test("tall content at mid-scroll: only main content scrolls, header/footer remain static", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("condensed", true, false, "2000px"));
+    await scrollMainContentTo(page, "mid");
+    await verifyAllBlocksVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "footer"]);
+  });
+
+  test("tall content at bottom: only main content scrolls, header/footer remain static", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("condensed", true, false, "2000px"));
+    await scrollMainContentTo(page, "bottom");
+    await verifyAllBlocksVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "footer"]);
+  });
+});
+
+test.describe("Condensed Layout - scrollWholePage=false, noScrollbarGutters=false", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 1080 });
+  });
+
+  test("short content: main content is scroll container with reserved gutters", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("condensed", false, false, "200px"));
+    await verifyAllBlocksVisible(page);
+    await verifyMainContentIsScrollContainer(page);
+    await verifyMainContentScrollbarGutters(page, true);
+  });
+
+  test("tall content: main content scrolls with reserved gutters, header/footer static", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("condensed", false, false, "2000px"));
+    await verifyAllBlocksVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "footer"]);
+    await verifyMainContentIsScrollContainer(page);
+    await verifyMainContentScrollbarGutters(page, true);
+  });
+
+  test("tall content at mid-scroll: main content scrolls with gutters, header/footer remain static", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("condensed", false, false, "2000px"));
+    await scrollMainContentTo(page, "mid");
+    await verifyAllBlocksVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "footer"]);
+    await verifyMainContentScrollbarGutters(page, true);
+  });
+
+  test("tall content at bottom: main content scrolls with gutters, header/footer remain static", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("condensed", false, false, "2000px"));
+    await scrollMainContentTo(page, "bottom");
+    await verifyAllBlocksVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "navPanel", "footer"]);
+    await verifyMainContentScrollbarGutters(page, true);
+  });
+});
