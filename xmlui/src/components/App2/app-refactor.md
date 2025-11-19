@@ -182,12 +182,38 @@ Follow the layout definitions from app-next.md:
   - ✅ All 46 App2 tests passing
   - ✅ All 37 App tests passing (no regression)
 
-#### Issue 3: **Race Condition in onReady Callback**
-**Location:** Lines 165-167
-**Problem:** `onReady()` is called in useEffect with only `[onReady]` dependency
-**Risk:** If onReady changes, it will be called again; also called before layout is fully rendered/measured
-**Severity:** Low (minor timing issue)
-**Recommendation:** Add comment explaining when onReady fires, or use `useLayoutEffect` if measurements are needed
+#### Issue 3: **Race Condition in onReady Callback** ✅ FIXED
+**Location:** Lines 162-164 (App2Native.tsx - original), now lines 272-284
+**Original Problem:** 
+```typescript
+useEffect(() => {
+  onReady();
+}, [onReady]);
+```
+- `onReady()` would be called again if the `onReady` function reference changed
+- Dependency on `[onReady]` meant effect re-ran whenever parent passed a new function reference
+**Severity:** Low (minor timing issue, but could cause multiple calls)
+**Solution:** ✅ **FIXED** - Use ref to track if onReady has been called, only fire once on mount
+```typescript
+const onReadyCalledRef = useRef(false);
+
+useEffect(() => {
+  if (!onReadyCalledRef.current) {
+    onReadyCalledRef.current = true;
+    onReady();
+  }
+  // Empty deps - only run once on mount, regardless of onReady reference changes
+}, []);
+```
+**Fix Details:**
+  - Added `onReadyCalledRef` to track whether onReady has been called
+  - Changed to empty dependency array `[]` so effect only runs once on mount
+  - onReady fires after initial render, regardless of what children exist (header/footer/nav panel optional)
+  - No longer re-runs if onReady function reference changes
+**Test Coverage:** ✅ All existing onReady tests pass
+  - "ready event is triggered when App component finishes rendering" - works with minimal App
+  - "ready event is triggered for App with complex content" - works with full header/footer/nav
+  - "ready event fires only once during component lifecycle" - confirms no duplicate calls
 
 #### Issue 4: **Scroll Container Ref Logic Complexity**
 **Location:** Lines 201-206

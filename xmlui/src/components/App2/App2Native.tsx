@@ -160,10 +160,6 @@ export function App2({
   }, [defaultTone, defaultTheme, autoDetectTone, setActiveThemeTone, setActiveThemeId, themes]);
 
   useEffect(() => {
-    onReady();
-  }, [onReady]);
-
-  useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       onMessageReceived?.(event.data, event);
     };
@@ -266,6 +262,19 @@ export function App2({
     scrollbarWidth,
     style,
   ]);
+
+  // Track whether onReady has been called to ensure it only fires once
+  const onReadyCalledRef = useRef(false);
+  
+  // Call onReady once after the component and its children have rendered
+  // Use effect (not layout effect) to ensure it runs after paint
+  useEffect(() => {
+    if (!onReadyCalledRef.current) {
+      onReadyCalledRef.current = true;
+      onReady();
+    }
+    // Empty deps - only run once on mount, regardless of onReady reference changes
+  }, []);
 
   const [drawerVisible, setDrawerVisible] = useState(false);
   const location = useLocation();
