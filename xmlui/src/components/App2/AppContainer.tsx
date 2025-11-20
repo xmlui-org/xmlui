@@ -13,7 +13,7 @@ interface AppContainerProps extends React.HTMLAttributes<HTMLDivElement> {
 export const AppContainer = forwardRef<HTMLDivElement, AppContainerProps>(
   ({ className, children, ...rest }, ref) => {
     return (
-      <div {...rest} className={classnames(styles.appContainer, className)} ref={ref}>
+      <div {...rest} className={className} ref={ref}>
         {children}
       </div>
     );

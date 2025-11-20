@@ -12,6 +12,11 @@ $themeVars: ();
     flex: 1;
     isolation: isolate;
   }
+
+  // Horizontal layout specific styles
+  :global(.wrapper.horizontal) .pagesSlot {
+    min-height: initial;
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer

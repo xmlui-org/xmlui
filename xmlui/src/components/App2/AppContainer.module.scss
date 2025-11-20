@@ -7,6 +7,8 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
+
 @layer components {
   .appContainer {
     width: 100%;
@@ -15,6 +17,12 @@ $themeVars: ();
     display: flex;
     flex-direction: column;
     isolation: isolate;
+  }
+
+  // Horizontal layout specific styles
+  :global(.wrapper.horizontal) .appContainer {
+    overflow: auto;
+    scroll-padding-block: $scrollPaddingBlockPage;
   }
 }
 

@@ -11,6 +11,11 @@ $themeVars: ();
   .footerSlot {
     flex-shrink: 0;
   }
+
+  // Horizontal layout specific styles
+  :global(.wrapper.horizontal) .footerSlot {
+    position: static;
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer

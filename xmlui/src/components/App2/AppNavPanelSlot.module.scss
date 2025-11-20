@@ -7,6 +7,9 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$borderBottom-NavPanel: createThemeVar("borderBottom-AppHeader");
+$backgroundColor-navPanel-App: createThemeVar("backgroundColor-navPanel-App");
+
 @layer components {
   .navPanelSlot {
     display: flex;
@@ -16,6 +19,14 @@ $themeVars: ();
     &:empty {
       display: none;
     }
+  }
+
+  // Horizontal layout specific styles
+  :global(.wrapper.horizontal) .navPanelSlot {
+    border-bottom: $borderBottom-NavPanel;
+    justify-content: end;
+    background-color: $backgroundColor-navPanel-App;
+    padding: 0;
   }
 }
 

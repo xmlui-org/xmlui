@@ -1,6 +1,6 @@
 import React, { forwardRef } from "react";
 import classnames from "classnames";
-import styles from "./AppNavPanelSlot.module.scss";
+import styles from "./App2.module.scss";
 
 interface AppNavPanelSlotProps extends React.HTMLAttributes<HTMLDivElement> {
   // Props for controlling nav panel behavior will be added when applying to layouts
@@ -13,7 +13,7 @@ interface AppNavPanelSlotProps extends React.HTMLAttributes<HTMLDivElement> {
 export const AppNavPanelSlot = forwardRef<HTMLDivElement, AppNavPanelSlotProps>(
   ({ className, children, ...rest }, ref) => {
     return (
-      <div {...rest} className={classnames(styles.navPanelSlot, className)} ref={ref}>
+      <div {...rest} className={classnames(styles.navPanelWrapper, className)} ref={ref}>
         {children}
       </div>
     );

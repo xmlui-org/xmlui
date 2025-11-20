@@ -14,6 +14,12 @@ import { noop } from "lodash-es";
 import classnames from "classnames";
 
 import styles from "./App2.module.scss";
+import { AppContainer } from "./AppContainer";
+import { AppHeaderSlot } from "./AppHeaderSlot";
+import { AppFooterSlot } from "./AppFooterSlot";
+import { AppNavPanelSlot } from "./AppNavPanelSlot";
+import { AppContentSlot } from "./AppContentSlot";
+import { AppPagesSlot } from "./AppPagesSlot";
 
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { RenderChildFn, RegisterComponentApiFn } from "../../abstractions/RendererDefs";
@@ -401,7 +407,7 @@ export function App2({
   switch (safeLayout) {
     case "vertical":
       content = (
-        <div
+        <AppContainer
           {...rest}
           className={classnames(wrapperBaseClasses, styles.vertical)}
           style={styleWithHelpers}
@@ -418,12 +424,12 @@ export function App2({
               {footer}
             </div>
           </div>
-        </div>
+        </AppContainer>
       );
       break;
     case "vertical-sticky":
       content = (
-        <div
+        <AppContainer
           {...rest}
           className={classnames(wrapperBaseClasses, styles.vertical, styles.sticky)}
           style={styleWithHelpers}
@@ -448,12 +454,12 @@ export function App2({
               {footer}
             </div>
           </div>
-        </div>
+        </AppContainer>
       );
       break;
     case "vertical-full-header":
       content = (
-        <div
+        <AppContainer
           {...rest}
           className={classnames(wrapperBaseClasses, styles.verticalFullHeader)}
           style={styleWithHelpers}
@@ -481,13 +487,13 @@ export function App2({
           >
             {footer}
           </div>
-        </div>
+        </AppContainer>
       );
       break;
     case "condensed":
     case "condensed-sticky":
       content = (
-        <div
+        <AppContainer
           {...rest}
           className={classnames(wrapperBaseClasses, styles.horizontal, {
             [styles.sticky]: safeLayout === "condensed-sticky",
@@ -517,34 +523,34 @@ export function App2({
           >
             {footer}
           </div>
-        </div>
+        </AppContainer>
       );
       break;
     case "horizontal": {
       content = (
-        <div
-          {...rest}
+        <AppContainer
           className={classnames(wrapperBaseClasses, styles.horizontal)}
           style={styleWithHelpers}
           ref={pageScrollRef}
+          {...rest}
         >
-          <header className={classnames(styles.headerWrapper)} ref={headerRefCallback}>
+          <AppHeaderSlot ref={headerRefCallback}>
             {header}
-            {navPanelVisible && <div className={styles.navPanelWrapper}>{navPanel}</div>}
-          </header>
-          <div className={styles.PagesWrapper} ref={contentScrollRef}>
+            {navPanelVisible && <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>}
+          </AppHeaderSlot>
+          <AppPagesSlot ref={contentScrollRef}>
             <div className={pagesWrapperClasses}>{children}</div>
-          </div>
-          <div className={styles.footerWrapper} ref={footerRefCallback}>
+          </AppPagesSlot>
+          <AppFooterSlot ref={footerRefCallback}>
             {footer}
-          </div>
-        </div>
+          </AppFooterSlot>
+        </AppContainer>
       );
       break;
     }
     case "horizontal-sticky":
       content = (
-        <div
+        <AppContainer
           {...rest}
           className={classnames(wrapperBaseClasses, styles.horizontal, styles.sticky)}
           style={styleWithHelpers}
@@ -568,12 +574,12 @@ export function App2({
           >
             {footer}
           </div>
-        </div>
+        </AppContainer>
       );
       break;
     case "desktop":
       content = (
-        <div
+        <AppContainer
           {...rest}
           className={classnames(wrapperBaseClasses, styles.desktop)}
           style={styleWithHelpers}
@@ -599,7 +605,7 @@ export function App2({
               {footer}
             </div>
           )}
-        </div>
+        </AppContainer>
       );
       break;
     default:

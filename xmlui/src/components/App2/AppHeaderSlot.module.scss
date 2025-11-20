@@ -19,6 +19,15 @@ $backgroundColor-AppHeader: createThemeVar("backgroundColor-AppHeader");
     box-shadow: $boxShadow-header-App;
     background-color: $backgroundColor-AppHeader;
   }
+
+  // Horizontal layout specific styles
+  :global(.wrapper.horizontal) .headerSlot {
+    padding-inline: 0;
+
+    > div {
+      padding-inline: 0;
+    }
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer
