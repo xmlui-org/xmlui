@@ -216,6 +216,13 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     }
 
     &.verticalFullHeader {
+      // Set effective footer height based on whether footer is sticky
+      --effective-footer-height: var(--footer-height);
+      
+      &.noFooter {
+        --effective-footer-height: 0px;
+      }
+
       min-height: 100%;
       height: 100%;
       overflow: auto;
@@ -223,7 +230,9 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       .navPanelWrapper {
         width: $width-navPanel-App;
         position: sticky;
-        height: calc(var(--containerHeight, 100vh) - var(--footer-height) - var(--header-height));
+        height: calc(
+          var(--containerHeight, 100vh) - var(--header-height) - var(--effective-footer-height)
+        );
         top: var(--header-height);
 
         &::before {
@@ -237,27 +246,13 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
           background-color: $backgroundColor-navPanel-App;
         }
       }
-      
-      // When no footer is sticky (footer sticky=false), don't subtract footer height
-      &.noFooter {
-        .navPanelWrapper {
-          height: calc(var(--containerHeight, 100vh) - var(--header-height));
-        }
-      }
 
       .PagesWrapper {
         overflow: initial;
         min-height: calc(
-          var(--containerHeight, 100vh) - var(--header-height) - var(--footer-height)
+          var(--containerHeight, 100vh) - var(--header-height) - var(--effective-footer-height)
         );
         height: 100%;
-      }
-      
-      // When no footer is sticky (footer sticky=false), don't subtract footer height
-      &.noFooter {
-        .PagesWrapper {
-          min-height: calc(var(--containerHeight, 100vh) - var(--header-height));
-        }
       }
 
       .PagesWrapperInner {

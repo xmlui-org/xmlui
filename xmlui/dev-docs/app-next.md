@@ -2977,7 +2977,9 @@ This pattern follows the principle of "convention over configuration" - sticky i
 
 ---
 
-**4. Repeated Height Calculation Pattern**
+**4. Repeated Height Calculation Pattern** ✅ COMPLETED
+
+**Issue**: The same height calculation appears 4 times with slight variations:
 ```scss
 .navPanelWrapper {
   height: calc(var(--containerHeight, 100vh) - var(--footer-height) - var(--header-height));
@@ -2991,7 +2993,9 @@ This pattern follows the principle of "convention over configuration" - sticky i
 
 // Same pattern for .PagesWrapper
 .PagesWrapper {
-  min-height: calc(var(--containerHeight, 100vh) - var(--header-height) - var(--footer-height));
+  min-height: calc(
+    var(--containerHeight, 100vh) - var(--header-height) - var(--footer-height)
+  );
 }
 
 &.noFooter {
@@ -3001,26 +3005,20 @@ This pattern follows the principle of "convention over configuration" - sticky i
 }
 ```
 
-**Problem**: The same height calculation appears 4 times with slight variations:
-1. `navPanelWrapper height` with footer
-2. `navPanelWrapper height` without footer  
-3. `PagesWrapper min-height` with footer
-4. `PagesWrapper min-height` without footer
-
 **Analysis**:
 The `.noFooter` class is added when `footerSticky` is `false`, which signals that footer height should not be subtracted from available space. This creates duplication because we need two versions of each calculation.
 
-**Recommendation**: Use CSS custom property with conditional value
+**Solution Implemented**: CSS custom property with conditional value
 
 ```scss
-// Set footer height variable conditionally
 &.verticalFullHeader {
+  // Set effective footer height based on whether footer is sticky
   --effective-footer-height: var(--footer-height);
   
   &.noFooter {
     --effective-footer-height: 0px;
   }
-  
+
   .navPanelWrapper {
     height: calc(
       var(--containerHeight, 100vh) 
@@ -3039,37 +3037,28 @@ The `.noFooter` class is added when `footerSticky` is `false`, which signals tha
 }
 ```
 
-**Alternative**: Use CSS comparison functions (modern CSS)
-```scss
-// Set footer-height to 0 when noFooter is present
-.navPanelWrapper {
-  height: calc(
-    var(--containerHeight, 100vh) 
-    - var(--header-height) 
-    - max(var(--footer-height) * var(--footer-enabled, 1), 0px)
-  );
-}
+**Changes Made**:
+- Added `--effective-footer-height` CSS custom property at `verticalFullHeader` scope
+- Set to `var(--footer-height)` by default
+- Override to `0px` when `.noFooter` class is present
+- Updated `.navPanelWrapper` height calculation to use `--effective-footer-height`
+- Updated `.PagesWrapper` min-height calculation to use `--effective-footer-height`
+- Removed duplicate `.noFooter` override blocks (8 lines)
 
-// Set --footer-enabled CSS variable in TypeScript
-&.noFooter {
-  --footer-enabled: 0;
-}
-```
+**Test Results**: All 170 e2e tests passing
 
-**Benefits**:
-- Eliminates duplicate calc() expressions
-- Single source of truth for height calculations
-- Easier to maintain and modify
-- More declarative (the variable name explains intent)
-
-**Challenges**:
-- Slightly more abstract (uses intermediate CSS variable)
-- May require updating TypeScript side for variable setting
+**Benefits Achieved**:
+- ✅ Eliminated 8 lines of duplicate calc() expressions
+- ✅ Single source of truth for footer height in calculations
+- ✅ More declarative approach (variable name explains intent)
+- ✅ Easier to maintain - only need to update calculations once
+- ✅ Cleaner CSS structure without nested overrides
+- ✅ Same functionality, better organization
 
 **Impact**: Medium (reduces duplication significantly)  
 **Complexity**: Simple  
 **Risk**: Low  
-**Lines Saved**: ~8 lines (4 duplicate rules eliminated)
+**Lines Saved**: 8 lines (4 duplicate rules eliminated)
 
 ---
 
@@ -3285,31 +3274,39 @@ If there's a specific reason for the current placement (performance, specificity
 
 #### Summary of Refactoring Opportunities
 
-| # | Issue | Impact | Complexity | Risk | Priority | Lines Saved |
-|---|-------|--------|------------|------|----------|-------------|
-| 1 | Duplicate `$maxWidth-App` declaration | Low | Simple | None | High (quick win) | 2 |
-| 2 | Excessive `!important` in desktop layout | Medium | Medium (A) / Low (B) | Medium (A) / Low (B) | Medium | 20-30 |
-| 3 | Repetitive sticky footer logic | Low | Simple | Low | Medium | 5-10 |
-| 4 | Repeated height calculation pattern | Medium | Simple | Low | High | 8 |
-| 5 | Scrollbar gutter compensation complexity | Medium | Medium | Low | Medium | 0 (clarity) |
-| 6 | Media query isolation | Low | Simple | Very Low | Low | 0 (organization) |
+| # | Issue | Impact | Complexity | Risk | Priority | Lines Saved | Status |
+|---|-------|--------|------------|------|----------|-------------|--------|
+| 1 | Duplicate `$maxWidth-App` declaration | Low | Simple | None | High (quick win) | 2 | ✅ COMPLETED |
+| 2 | Excessive `!important` in desktop layout | Medium | Medium (A) / Low (B) | Medium (A) / Low (B) | Medium | 28 | ✅ COMPLETED |
+| 3 | Repetitive sticky footer logic | Low | Simple | Low | Medium | 0 | ❌ REVERTED (correct by design) |
+| 4 | Repeated height calculation pattern | Medium | Simple | Low | High | 8 | ✅ COMPLETED |
+| 5 | Scrollbar gutter compensation complexity | Medium | Medium | Low | Medium | 0 (clarity) | Not started |
+| 6 | Media query isolation | Low | Simple | Very Low | Low | 0 (organization) | Not started |
+
+**Implementation Progress**:
+1. ✅ **Issue #1** (Duplicate declaration) - Completed, 2 lines saved, all 170 tests passing
+2. ✅ **Issue #2** (Desktop !important) - Completed with mixins, 28 lines saved, all 170 tests passing
+3. ❌ **Issue #3** (Sticky footer) - Attempted but reverted, original design is correct
+4. ✅ **Issue #4** (Height calculations) - Completed with CSS custom property, 8 lines saved, all 170 tests passing
+5. ⏸️ **Issue #5** (Scrollbar compensation) - Not started
+6. ⏸️ **Issue #6** (Media query) - Not started
 
 **Recommended Implementation Order**:
-1. **Issue #1** (Duplicate declaration) - Quick, safe cleanup
-2. **Issue #4** (Height calculations) - High impact, low risk
-3. **Issue #3** (Sticky footer) - Improves clarity, low risk
+1. ✅ **Issue #1** (Duplicate declaration) - Quick, safe cleanup
+2. ✅ **Issue #4** (Height calculations) - High impact, low risk
+3. ❌ **Issue #3** (Sticky footer) - Attempted, reverted (correct by design)
 4. **Issue #6** (Media query) - Simple organization improvement
 5. **Issue #5** (Scrollbar compensation) - Requires careful testing
-6. **Issue #2** (Desktop !important) - Highest impact but needs architectural decision
+6. ✅ **Issue #2** (Desktop !important) - Completed with mixin approach
 
-**Total Potential Lines Saved**: 35-50 lines (excluding mixin definitions)
-**Total Clarity Improvement**: High (especially issues #2, #4, #5)
+**Total Lines Saved So Far**: 38 lines (2 + 28 + 8)
+**Total Clarity Improvement**: High (especially issues #2, #4)
 
 **Testing Requirements**:
-- All 170 e2e tests must pass after each refactoring
-- Visual regression testing for desktop layout (Issue #2)
-- Scroll behavior testing for scrollbar compensation (Issue #5)
-- Footer positioning testing (Issue #3)
-- Height calculation testing for verticalFullHeader (Issue #4)
+- All 170 e2e tests must pass after each refactoring ✅
+- Visual regression testing for desktop layout (Issue #2) ✅
+- Scroll behavior testing for scrollbar compensation (Issue #5) ⏸️
+- Footer positioning testing (Issue #3) ✅ (reverted)
+- Height calculation testing for verticalFullHeader (Issue #4) ✅
 
 ---
