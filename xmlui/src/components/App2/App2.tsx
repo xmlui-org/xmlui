@@ -9,7 +9,7 @@ import { createMetadata, dComponent } from "../../components/metadata-helpers";
 import { appLayoutMd } from "../App/AppLayoutContext";
 import { App2 as App2Component, defaultProps } from "./App2Native";
 import type { CSSProperties } from "react";
-import { useCallback, useMemo, useRef } from "react";
+import { useRef } from "react";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import { SearchIndexCollector } from "./SearchIndexCollector";
 
@@ -144,42 +144,34 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
   const processedNavRef = useRef(false);
 
   // --- Extract app components
-  const extracted = useMemo(
-    () => extractAppComponents(node.children),
-    [node.children]
-  );
-
+  const extracted = extractAppComponents(node.children);
   const { AppHeader, Footer, Pages, restChildren } = extracted;
   
   // --- Enhance NavPanel with page navigation inline
-  const NavPanel = useMemo(() => {
-    const { NavPanel: originalNavPanel } = extracted;
-    
-    if (!Pages || processedNavRef.current) {
-      return originalNavPanel;
-    }
-    
+  const { NavPanel: originalNavPanel } = extracted;
+  
+  let NavPanel = originalNavPanel;
+  
+  if (Pages && !processedNavRef.current) {
     processedNavRef.current = true;
     
     const extraNavs = extractNavPanelFromPages(Pages, originalNavPanel, extractValue);
     
-    if (!extraNavs?.length) {
-      return originalNavPanel;
+    if (extraNavs?.length) {
+      if (originalNavPanel) {
+        NavPanel = {
+          ...originalNavPanel,
+          children: originalNavPanel.children ? [...originalNavPanel.children, ...extraNavs] : extraNavs,
+        };
+      } else {
+        NavPanel = {
+          type: "NavPanel",
+          props: {},
+          children: extraNavs,
+        };
+      }
     }
-    
-    if (originalNavPanel) {
-      return {
-        ...originalNavPanel,
-        children: originalNavPanel.children ? [...originalNavPanel.children, ...extraNavs] : extraNavs,
-      };
-    }
-    
-    return {
-      type: "NavPanel",
-      props: {},
-      children: extraNavs,
-    };
-  }, [extracted, Pages, extractValue]);
+  }
 
   const applyDefaultContentPadding = !Pages;
   const footerSticky = Footer?.props?.sticky ?? true;
@@ -328,42 +320,6 @@ function extractDirectChild(child: ComponentDef, result: ExtractedComponents): v
     default:
       result.restChildren.push(child);
   }
-}
-
-/**
- * Extract a property from a component definition, handling Theme wrapper unwrapping.
- * @param component - The component definition to extract from
- * @param propName - The property name to extract
- * @param defaultValue - Default value if property is not found
- * @param extractValue - The extract value utility from XMLUI renderer
- * @returns The extracted property value
- */
-function extractComponentProp<T>(
-  component: ComponentDef | undefined,
-  propName: string,
-  defaultValue: T,
-  extractValue: any
-): T {
-  if (!component) return defaultValue;
-
-  // Unwrap Theme if present
-  let targetNode = component;
-  if (component.type === "Theme" && component.children?.length > 0) {
-    targetNode = component.children.find(
-      (child) => child.type === component.type
-    );
-  }
-
-  if (!targetNode?.props?.[propName]) {
-    return defaultValue;
-  }
-
-  // Use asOptionalBoolean for boolean properties
-  if (typeof defaultValue === 'boolean') {
-    return extractValue.asOptionalBoolean(targetNode.props[propName], defaultValue) as T;
-  }
-
-  return extractValue(targetNode.props[propName]) ?? defaultValue;
 }
 
 /**
