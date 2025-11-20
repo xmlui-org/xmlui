@@ -331,12 +331,12 @@ export function App2({
     // Empty deps - only run once on mount, regardless of onReady reference changes
   }, []);
 
-  const [drawerVisible, setDrawerVisible] = useState(false);
   const location = useLocation();
-
-  const toggleDrawer = useCallback(() => {
-    setDrawerVisible((prev) => !prev);
-  }, []);
+  const { drawerVisible, toggleDrawer, handleOpenChange, showDrawer, hideDrawer } = useDrawerState(
+    location,
+    navPanelVisible,
+    safeLayout
+  );
 
   useIsomorphicLayoutEffect(() => {
     scrollContainerRef.current?.scrollTo({
@@ -374,7 +374,8 @@ export function App2({
     hasRegisteredHeader,
     navPanelVisible,
     drawerVisible,
-    setDrawerVisible,
+    showDrawer,
+    hideDrawer,
     layout: safeLayout,
     logo,
     logoDark,
@@ -394,12 +395,6 @@ export function App2({
       registerLinkMap,
     };
   }, [linkMap, registerLinkMap]);
-
-  // Close drawer when: 1) nav panel becomes visible (large screen), 2) location/layout changes
-  // This ensures drawer is closed when it's no longer needed or context has changed
-  useEffect(() => {
-    setDrawerVisible(false);
-  }, [navPanelVisible, location, safeLayout]);
 
   const wrapperBaseClasses = [
     className,
@@ -606,11 +601,6 @@ export function App2({
     [name],
   );
 
-  // Memoize the onOpenChange callback
-  const handleOpenChange = useCallback((open) => {
-    setDrawerVisible(open);
-  }, []);
-
   return (
     <>
       {memoizedHelmet}
@@ -640,8 +630,42 @@ export function getAppLayoutOrientation(appLayout?: AppLayoutType) {
 }
 
 /**
+ * Custom hook to manage drawer state with auto-close behavior.
+ * Consolidates all drawer-related state updates in one place.
+ */
+function useDrawerState(
+  location: ReturnType<typeof useLocation>,
+  navPanelVisible: boolean,
+  safeLayout: AppLayoutType
+) {
+  const [drawerVisible, setDrawerVisible] = useState(false);
+
+  const toggleDrawer = useCallback(() => {
+    setDrawerVisible((prev) => !prev);
+  }, []);
+
+  const handleOpenChange = useCallback((open: boolean) => {
+    setDrawerVisible(open);
+  }, []);
+
+  // Close drawer when: 1) nav panel becomes visible (large screen), 2) location/layout changes
+  // This ensures drawer is closed when it's no longer needed or context has changed
+  useEffect(() => {
+    setDrawerVisible(false);
+  }, [navPanelVisible, location, safeLayout]);
+
+  return {
+    drawerVisible,
+    toggleDrawer,
+    handleOpenChange,
+    showDrawer: useCallback(() => setDrawerVisible(true), []),
+    hideDrawer: useCallback(() => setDrawerVisible(false), []),
+  };
+}
+
+/**
  * Custom hook for observing element size changes.
- * Returns a ref callback and the current size (width and height).
+ * Returns a ref callback and the observed size dimensions.
  */
 function useElementSizeObserver() {
   const ref = useRef<HTMLElement | null>(null);
@@ -761,7 +785,8 @@ function useAppLayoutContextValue({
   hasRegisteredHeader,
   navPanelVisible,
   drawerVisible,
-  setDrawerVisible,
+  showDrawer,
+  hideDrawer,
   layout,
   logo,
   logoDark,
@@ -778,7 +803,8 @@ function useAppLayoutContextValue({
   hasRegisteredHeader: boolean;
   navPanelVisible: boolean;
   drawerVisible: boolean;
-  setDrawerVisible: (value: boolean) => void;
+  showDrawer: () => void;
+  hideDrawer: () => void;
   layout: AppLayoutType;
   logo?: string;
   logoDark?: string;
@@ -801,8 +827,8 @@ function useAppLayoutContextValue({
       logo,
       logoDark,
       logoLight,
-      showDrawer: () => setDrawerVisible(true),
-      hideDrawer: () => setDrawerVisible(false),
+      showDrawer,
+      hideDrawer,
       toggleDrawer,
       navPanelDef,
       logoContentDef,
@@ -821,7 +847,8 @@ function useAppLayoutContextValue({
       logo,
       logoDark,
       logoLight,
-      setDrawerVisible,
+      showDrawer,
+      hideDrawer,
       toggleDrawer,
       navPanelDef,
       logoContentDef,
