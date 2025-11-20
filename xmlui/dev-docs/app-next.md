@@ -3062,7 +3062,9 @@ The `.noFooter` class is added when `footerSticky` is `false`, which signals tha
 
 ---
 
-**5. Scrollbar Gutter Compensation Logic Complexity**
+**5. Scrollbar Gutter Compensation Logic Complexity** ✅ COMPLETED
+
+**Issue**: The scrollbar gutter compensation system was complex with multiple levels of compensation scattered throughout the code:
 ```scss
 &.scrollWholePage {
   scrollbar-gutter: stable both-edges;
@@ -3090,45 +3092,33 @@ The `.noFooter` class is added when `footerSticky` is `false`, which signals tha
       padding-inline: var(--scrollbar-width);
     }
   }
-
-  &.desktop {
-    scrollbar-gutter: auto;
-    // Resets all the above rules
-  }
-}
-
-&:not(.scrollWholePage) {
-  overflow: hidden;
-  .content {
-    min-height: 0;
-    height: 100%;
-  }
-  // ... different rules
+  // ... more compensation code
 }
 ```
 
-**Problem**: The scrollbar gutter compensation system is complex:
-1. Base behavior applies negative margins and padding compensation
-2. `verticalFullHeader` needs additional compensation for `.content` wrapper
-3. `desktop` layout undoes all compensation
-4. `:not(.scrollWholePage)` has entirely different overflow rules
-
 **Analysis**:
-The scrollbar gutter system tries to:
-- Reserve space for scrollbars (`scrollbar-gutter: stable both-edges`)
-- Compensate for that reserved space by negative margins on containers
-- Re-add the space as padding on inner content
-- This creates visual full-width appearance while maintaining scrollbar space
+The scrollbar gutter system creates visual full-width appearance while maintaining scrollbar space:
+1. Reserve space for scrollbars (`scrollbar-gutter: stable both-edges`)
+2. Apply negative margins to containers to extend beyond reserved space
+3. Add padding to inner content to push content back into visible area
+4. Special handling for `verticalFullHeader` layout with width adjustments
+5. Desktop layout disables all compensation
 
-**Issues**:
-1. Multiple levels of compensation (margins, padding, width adjustments)
-2. Different layouts need different compensation strategies
-3. Desktop layout disables the entire system
-4. Complex interaction between `scrollWholePage`, layout type, and `noScrollbarGutters`
+**Problems**:
+- Multiple levels of compensation (margins, padding, width adjustments)
+- Repeated `calc(-1 * var(--scrollbar-width))` and `var(--scrollbar-width)` patterns
+- Different layouts need different compensation strategies
+- Hard to understand the compensation strategy at a glance
+- Difficult to maintain consistency when adding new layouts
 
-**Recommendation**: Extract scrollbar compensation into CSS mixins
+**Solution Implemented**: Extracted compensation logic into semantic CSS mixins
 
+**Mixins Created**:
 ```scss
+// --- Mixins for scrollbar gutter compensation ---
+// When scrollbar-gutter: stable both-edges is used, the browser reserves space for scrollbars.
+// These mixins compensate for that reserved space to achieve full-width appearance
+// while maintaining the scrollbar reservation for consistent layout.
 @mixin scrollbar-compensation-container {
   margin-inline: calc(-1 * var(--scrollbar-width));
 }
@@ -3140,7 +3130,10 @@ The scrollbar gutter system tries to:
 @mixin scrollbar-compensation-full-width {
   width: calc(100% + (2 * var(--scrollbar-width)));
 }
+```
 
+**Refactored Code**:
+```scss
 &.scrollWholePage {
   scrollbar-gutter: stable both-edges;
 
@@ -3170,8 +3163,13 @@ The scrollbar gutter system tries to:
 
   &.desktop {
     scrollbar-gutter: auto;
-    // Override: no compensation needed
-    .headerWrapper,
+    // Override: reset compensation for desktop layout
+    .headerWrapper {
+      margin-inline: 0;
+      & > div {
+        padding-inline: 0;
+      }
+    }
     .footerWrapper {
       margin-inline: 0;
       & > div {
@@ -3182,25 +3180,31 @@ The scrollbar gutter system tries to:
 }
 ```
 
-**Benefits**:
-- Clearer intent through named mixins
-- Easier to understand compensation strategy
-- Reusable for future layouts
-- Better documentation through semantic names
-- Simpler to disable/modify compensation
+**Changes Made**:
+- Created three semantic mixins with clear documentation
+- `scrollbar-compensation-container`: Applies negative margin to extend container
+- `scrollbar-compensation-content`: Adds padding to inner content
+- `scrollbar-compensation-full-width`: Adjusts width for full-width appearance
+- Replaced all repeated compensation patterns with mixin calls
+- Added comprehensive comment explaining the compensation strategy
+- Maintained exact same functionality with clearer intent
 
-**Alternative Approach**: Consider CSS Container Queries
-If browser support allows, container queries could eliminate some compensation logic:
-```scss
-@container (min-width: 100cqw) {
-  // Full-width containers don't need compensation
-}
-```
+**Test Results**: All 170 e2e tests passing
 
-**Impact**: Medium (improves code clarity and maintainability)  
+**Benefits Achieved**:
+- ✅ Clearer intent through semantic mixin names
+- ✅ Single source of truth for compensation calculations
+- ✅ Easier to understand compensation strategy
+- ✅ Reusable mixins for future layouts
+- ✅ Better documentation through mixin names and comments
+- ✅ Simpler to modify compensation if needed
+- ✅ Reduced code duplication (same patterns now use mixins)
+- ✅ Improved maintainability and readability
+
+**Impact**: Medium (improves code clarity and maintainability significantly)  
 **Complexity**: Medium  
-**Risk**: Low (primarily refactoring, not logic changes)  
-**Lines Saved**: Minimal (adds mixin definitions but improves readability)
+**Risk**: Low (primarily refactoring, no logic changes)  
+**Lines Saved**: Neutral (added mixin definitions but improved organization and readability)
 
 ---
 
@@ -3280,7 +3284,7 @@ If there's a specific reason for the current placement (performance, specificity
 | 2 | Excessive `!important` in desktop layout | Medium | Medium (A) / Low (B) | Medium (A) / Low (B) | Medium | 28 | ✅ COMPLETED |
 | 3 | Repetitive sticky footer logic | Low | Simple | Low | Medium | 0 | ❌ REVERTED (correct by design) |
 | 4 | Repeated height calculation pattern | Medium | Simple | Low | High | 8 | ✅ COMPLETED |
-| 5 | Scrollbar gutter compensation complexity | Medium | Medium | Low | Medium | 0 (clarity) | Not started |
+| 5 | Scrollbar gutter compensation complexity | Medium | Medium | Low | Medium | 0 (clarity) | ✅ COMPLETED |
 | 6 | Media query isolation | Low | Simple | Very Low | Low | 0 (organization) | Not started |
 
 **Implementation Progress**:
@@ -3288,7 +3292,7 @@ If there's a specific reason for the current placement (performance, specificity
 2. ✅ **Issue #2** (Desktop !important) - Completed with mixins, 28 lines saved, all 170 tests passing
 3. ❌ **Issue #3** (Sticky footer) - Attempted but reverted, original design is correct
 4. ✅ **Issue #4** (Height calculations) - Completed with CSS custom property, 8 lines saved, all 170 tests passing
-5. ⏸️ **Issue #5** (Scrollbar compensation) - Not started
+5. ✅ **Issue #5** (Scrollbar compensation) - Completed with mixins, clarity improved, all 170 tests passing
 6. ⏸️ **Issue #6** (Media query) - Not started
 
 **Recommended Implementation Order**:
@@ -3296,16 +3300,16 @@ If there's a specific reason for the current placement (performance, specificity
 2. ✅ **Issue #4** (Height calculations) - High impact, low risk
 3. ❌ **Issue #3** (Sticky footer) - Attempted, reverted (correct by design)
 4. **Issue #6** (Media query) - Simple organization improvement
-5. **Issue #5** (Scrollbar compensation) - Requires careful testing
+5. ✅ **Issue #5** (Scrollbar compensation) - Completed with mixin approach
 6. ✅ **Issue #2** (Desktop !important) - Completed with mixin approach
 
 **Total Lines Saved So Far**: 38 lines (2 + 28 + 8)
-**Total Clarity Improvement**: High (especially issues #2, #4)
+**Total Clarity Improvement**: Very High (especially issues #2, #4, #5)
 
 **Testing Requirements**:
 - All 170 e2e tests must pass after each refactoring ✅
 - Visual regression testing for desktop layout (Issue #2) ✅
-- Scroll behavior testing for scrollbar compensation (Issue #5) ⏸️
+- Scroll behavior testing for scrollbar compensation (Issue #5) ✅
 - Footer positioning testing (Issue #3) ✅ (reverted)
 - Height calculation testing for verticalFullHeader (Issue #4) ✅
 
