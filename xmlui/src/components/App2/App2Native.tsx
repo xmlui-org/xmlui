@@ -35,7 +35,6 @@ import { SearchContextProvider } from "./SearchContext";
 import type { NavHierarchyNode } from "../NavPanel/NavPanelNative";
 import { LinkInfoContext } from "./LinkInfoContext";
 import { EMPTY_OBJECT } from "../../components-core/constants";
-import { shouldKeep } from "../../components-core/utils/extractParam";
 
 type Props = {
   children: ReactNode;
@@ -580,30 +579,30 @@ export function App2({
     case "desktop":
       content = (
         <AppContainer
-          {...rest}
           className={classnames(wrapperBaseClasses, styles.desktop)}
           style={styleWithHelpers}
+          {...rest}
         >
           {header && (
-            <header
-              className={classnames(styles.headerWrapper, styles.sticky)}
+            <AppHeaderSlot
+              className={styles.sticky}
               ref={headerRefCallback}
             >
               {header}
-            </header>
+            </AppHeaderSlot>
           )}
-          <div className={styles.PagesWrapper} ref={contentScrollRef}>
+          <AppPagesSlot ref={contentScrollRef}>
             <div className={styles.PagesWrapperInner}>{children}</div>
-          </div>
+          </AppPagesSlot>
           {footer && (
-            <div 
-              className={classnames(styles.footerWrapper, {
+            <AppFooterSlot
+              className={classnames({
                 [styles.nonSticky]: footerShouldBeNonSticky,
-              })} 
+              })}
               ref={footerRefCallback}
             >
               {footer}
-            </div>
+            </AppFooterSlot>
           )}
         </AppContainer>
       );
