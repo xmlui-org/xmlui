@@ -369,37 +369,13 @@ export function App2({
     setLinkMap(newLinkMap);
   }, []);
 
-  const layoutContextValue = useMemo<IAppLayoutContext>(() => {
-    return {
-      hasRegisteredNavPanel,
-      hasRegisteredHeader,
-      navPanelVisible,
-      drawerVisible,
-      layout: safeLayout,
-      logo: logo,
-      logoDark: logoDark,
-      logoLight: logoLight,
-      showDrawer: () => {
-        setDrawerVisible(true);
-      },
-      hideDrawer: () => {
-        setDrawerVisible(false);
-      },
-      toggleDrawer,
-      navPanelDef,
-      logoContentDef,
-      registerSubNavPanelSlot,
-      subNavPanelSlot,
-      scrollWholePage,
-      isFullVerticalWidth: false,
-      isNested: appGlobals?.isNested || false,
-    };
-  }, [
+  const layoutContextValue = useAppLayoutContextValue({
     hasRegisteredNavPanel,
     hasRegisteredHeader,
     navPanelVisible,
     drawerVisible,
-    safeLayout,
+    setDrawerVisible,
+    layout: safeLayout,
     logo,
     logoDark,
     logoLight,
@@ -409,8 +385,8 @@ export function App2({
     registerSubNavPanelSlot,
     subNavPanelSlot,
     scrollWholePage,
-    appGlobals?.isNested,
-  ]);
+    isNested: appGlobals?.isNested || false,
+  });
 
   const linkInfoContextValue = useMemo(() => {
     return {
@@ -727,6 +703,87 @@ function useElementSizeObserver() {
   );
   
   return { refCallback, size, height: size.height, width: size.width };
+}
+
+/**
+ * Custom hook for creating the App layout context value.
+ * Encapsulates the logic for building the layout context and its dependencies.
+ */
+function useAppLayoutContextValue({
+  hasRegisteredNavPanel,
+  hasRegisteredHeader,
+  navPanelVisible,
+  drawerVisible,
+  setDrawerVisible,
+  layout,
+  logo,
+  logoDark,
+  logoLight,
+  toggleDrawer,
+  navPanelDef,
+  logoContentDef,
+  registerSubNavPanelSlot,
+  subNavPanelSlot,
+  scrollWholePage,
+  isNested,
+}: {
+  hasRegisteredNavPanel: boolean;
+  hasRegisteredHeader: boolean;
+  navPanelVisible: boolean;
+  drawerVisible: boolean;
+  setDrawerVisible: (value: boolean) => void;
+  layout: AppLayoutType;
+  logo?: string;
+  logoDark?: string;
+  logoLight?: string;
+  toggleDrawer: () => void;
+  navPanelDef?: ComponentDef;
+  logoContentDef?: ComponentDef;
+  registerSubNavPanelSlot: (element: any) => void;
+  subNavPanelSlot: any;
+  scrollWholePage: boolean;
+  isNested: boolean;
+}): IAppLayoutContext {
+  return useMemo<IAppLayoutContext>(
+    () => ({
+      hasRegisteredNavPanel,
+      hasRegisteredHeader,
+      navPanelVisible,
+      drawerVisible,
+      layout,
+      logo,
+      logoDark,
+      logoLight,
+      showDrawer: () => setDrawerVisible(true),
+      hideDrawer: () => setDrawerVisible(false),
+      toggleDrawer,
+      navPanelDef,
+      logoContentDef,
+      registerSubNavPanelSlot,
+      subNavPanelSlot,
+      scrollWholePage,
+      isFullVerticalWidth: false,
+      isNested,
+    }),
+    [
+      hasRegisteredNavPanel,
+      hasRegisteredHeader,
+      navPanelVisible,
+      drawerVisible,
+      layout,
+      logo,
+      logoDark,
+      logoLight,
+      setDrawerVisible,
+      toggleDrawer,
+      navPanelDef,
+      logoContentDef,
+      registerSubNavPanelSlot,
+      subNavPanelSlot,
+      scrollWholePage,
+      isNested,
+    ]
+  );
 }
 
 /**
