@@ -299,12 +299,19 @@ export function App2({
 
   const styleWithHelpers = useMemo(() => {
     // Determine if we need header/footer height compensation for sticky layouts
-    const heightConfig = getLayoutHeightConfig(safeLayout, scrollWholePage);
+    // Non-sticky layouts with whole-page scroll don't need height compensation
+    const needsHeightCompensation = !(
+      scrollWholePage && (
+        safeLayout === "vertical" ||
+        safeLayout === "horizontal" ||
+        safeLayout === "condensed"
+      )
+    );
     
     return {
       ...style,
-      "--header-height": heightConfig.useHeaderHeight ? `${headerSize.height}px` : "0px",
-      "--footer-height": heightConfig.useFooterHeight ? `${footerSize.height}px` : "0px",
+      "--header-height": needsHeightCompensation ? `${headerSize.height}px` : "0px",
+      "--footer-height": needsHeightCompensation ? `${footerSize.height}px` : "0px",
       "--header-abs-height": headerSize.height + "px",
       "--footer-abs-height": footerSize.height + "px",
       "--scrollbar-width": noScrollbarGutters ? "0px" : scrollbarWidth + "px",
@@ -846,19 +853,3 @@ function useAppLayoutContextValue({
  * Sticky layouts (vertical-sticky, vertical-full-header, desktop) or content-only scroll
  * need height compensation so content can be positioned correctly.
  */
-function getLayoutHeightConfig(
-  layout: AppLayoutType,
-  scrollWholePage: boolean
-): { useHeaderHeight: boolean; useFooterHeight: boolean } {
-  // Non-sticky layouts with whole-page scroll don't need height compensation
-  if (scrollWholePage && (
-    layout === "vertical" ||
-    layout === "horizontal" ||
-    layout === "condensed"
-  )) {
-    return { useHeaderHeight: false, useFooterHeight: false };
-  }
-  
-  // All other cases need height compensation (sticky layouts or content-only scroll)
-  return { useHeaderHeight: true, useFooterHeight: true };
-}
