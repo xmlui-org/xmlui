@@ -31,7 +31,7 @@ export const SearchMd = createMetadata({
     [`fontSize-${COMP_INPUT}`]: "14px",
     [`fontWeight-${COMP_INPUT}`]: "400",
     [`backgroundColor-${COMP_INPUT}`]: "$color-surface-50",
-    [`fontFamily-${COMP_INPUT}`]: "$fontFamily-monospace",
+    [`fontFamily-${COMP_INPUT}`]: "$fontFamily",
     [`width-${COMP_INPUT}`]: "258px",
     [`height-${COMP_INPUT}`]: "32px",
     [`textColor-placeholder-${COMP_INPUT}`]: "$color-secondary-500",
