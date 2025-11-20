@@ -33,89 +33,33 @@ import { EMPTY_OBJECT } from "../../components-core/constants";
 
 // --- Slot Components ---
 
-interface AppContainerProps extends React.HTMLAttributes<HTMLDivElement> {}
+// --- Slot Components Factory ---
 
-const AppContainer = forwardRef<HTMLDivElement, AppContainerProps>(
-  ({ className, children, ...rest }, ref) => {
-    return (
-      <div {...rest} className={className} ref={ref}>
-        {children}
-      </div>
-    );
-  }
-);
+function createSlot<T extends HTMLElement = HTMLDivElement>(
+  displayName: string,
+  className?: string,
+  elementType: keyof JSX.IntrinsicElements = "div"
+) {
+  const Slot = forwardRef<T, React.HTMLAttributes<T>>(
+    ({ className: customClass, children, ...rest }, ref) => {
+      const Element = elementType as any;
+      return (
+        <Element {...rest} className={classnames(className, customClass)} ref={ref}>
+          {children}
+        </Element>
+      );
+    }
+  );
+  Slot.displayName = displayName;
+  return Slot;
+}
 
-AppContainer.displayName = "AppContainer";
-
-interface AppHeaderSlotProps extends React.HTMLAttributes<HTMLElement> {}
-
-const AppHeaderSlot = forwardRef<HTMLElement, AppHeaderSlotProps>(
-  ({ className, children, ...rest }, ref) => {
-    return (
-      <header {...rest} className={classnames(styles.headerWrapper, className)} ref={ref}>
-        {children}
-      </header>
-    );
-  }
-);
-
-AppHeaderSlot.displayName = "AppHeaderSlot";
-
-interface AppFooterSlotProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-const AppFooterSlot = forwardRef<HTMLDivElement, AppFooterSlotProps>(
-  ({ className, children, ...rest }, ref) => {
-    return (
-      <div {...rest} className={classnames(styles.footerWrapper, className)} ref={ref}>
-        {children}
-      </div>
-    );
-  }
-);
-
-AppFooterSlot.displayName = "AppFooterSlot";
-
-interface AppNavPanelSlotProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-const AppNavPanelSlot = forwardRef<HTMLDivElement, AppNavPanelSlotProps>(
-  ({ className, children, ...rest }, ref) => {
-    return (
-      <div {...rest} className={classnames(styles.navPanelWrapper, className)} ref={ref}>
-        {children}
-      </div>
-    );
-  }
-);
-
-AppNavPanelSlot.displayName = "AppNavPanelSlot";
-
-interface AppContentSlotProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-const AppContentSlot = forwardRef<HTMLDivElement, AppContentSlotProps>(
-  ({ className, children, ...rest }, ref) => {
-    return (
-      <div {...rest} className={classnames(styles.contentWrapper, className)} ref={ref}>
-        {children}
-      </div>
-    );
-  }
-);
-
-AppContentSlot.displayName = "AppContentSlot";
-
-interface AppPagesSlotProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-const AppPagesSlot = forwardRef<HTMLDivElement, AppPagesSlotProps>(
-  ({ className, children, ...rest }, ref) => {
-    return (
-      <div {...rest} className={classnames(styles.PagesWrapper, className)} ref={ref}>
-        {children}
-      </div>
-    );
-  }
-);
-
-AppPagesSlot.displayName = "AppPagesSlot";
+const AppContainer = createSlot("AppContainer");
+const AppHeaderSlot = createSlot<HTMLElement>("AppHeaderSlot", styles.headerWrapper, "header");
+const AppFooterSlot = createSlot("AppFooterSlot", styles.footerWrapper);
+const AppNavPanelSlot = createSlot("AppNavPanelSlot", styles.navPanelWrapper);
+const AppContentSlot = createSlot("AppContentSlot", styles.contentWrapper);
+const AppPagesSlot = createSlot("AppPagesSlot", styles.PagesWrapper);
 
 // --- Component Types ---
 
