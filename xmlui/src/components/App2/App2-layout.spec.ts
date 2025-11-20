@@ -82,7 +82,7 @@ async function verifyBlocksBelowViewport(page: Page, blockIds: string[]) {
 
 async function verifyAppContainerScrollable(page: Page, shouldBeScrollable: boolean) {
   const info = await page.evaluate(() => {
-    const appWrapper = document.querySelector('[class*="appContainer"], [class*="wrapper"]');
+    const appWrapper = document.querySelector('[class*="appContainer"]');
     if (!appWrapper || appWrapper.className.includes("pagesContainer")) {
       return { found: false, isScrollable: false };
     }
@@ -91,7 +91,7 @@ async function verifyAppContainerScrollable(page: Page, shouldBeScrollable: bool
     const isVerticalFullHeader = appWrapper.className.includes('verticalFullHeader');
     
     // Check if there's a mainContentArea inside (vertical layout)
-    const mainContentArea = appWrapper.querySelector('[class*="mainContentArea"], [class*="contentWrapper"]');
+    const mainContentArea = appWrapper.querySelector('[class*="mainContentArea"]');
     
     // Priority: appWrapper with verticalFullHeader > mainContentArea > appWrapper
     const scrollContainer = (isVerticalFullHeader ? appWrapper : (mainContentArea || appWrapper)) as HTMLElement;
@@ -119,7 +119,7 @@ async function verifyAppContainerScrollable(page: Page, shouldBeScrollable: bool
 
 async function verifyScrollbarGutters(page: Page, shouldHaveGutters: boolean) {
   const info = await page.evaluate(() => {
-    const appWrapper = document.querySelector('[class*="appContainer"], [class*="wrapper"]');
+    const appWrapper = document.querySelector('[class*="appContainer"]');
     if (!appWrapper || appWrapper.className.includes("pagesContainer")) {
       return { found: false };
     }
@@ -128,7 +128,7 @@ async function verifyScrollbarGutters(page: Page, shouldHaveGutters: boolean) {
     const isVerticalFullHeader = appWrapper.className.includes('verticalFullHeader');
     
     // Check if there's a mainContentArea inside (vertical layout)
-    const mainContentArea = appWrapper.querySelector('[class*="mainContentArea"], [class*="contentWrapper"]');
+    const mainContentArea = appWrapper.querySelector('[class*="mainContentArea"]');
     
     // Priority: appWrapper with verticalFullHeader > mainContentArea > appWrapper
     const scrollContainer = isVerticalFullHeader ? appWrapper : (mainContentArea || appWrapper);
@@ -188,13 +188,13 @@ async function verifyMainContentIsScrollContainer(page: Page) {
 
 async function verifyAppContainerNotScrollable(page: Page) {
   const info = await page.evaluate(() => {
-    const appWrapper = document.querySelector('[class*="appContainer"], [class*="wrapper"]');
+    const appWrapper = document.querySelector('[class*="appContainer"]');
     if (!appWrapper || appWrapper.className.includes("pagesContainer")) {
       return { found: false };
     }
 
     // Check if there's a mainContentArea inside (vertical layout)
-    const mainContentArea = appWrapper.querySelector('[class*="mainContentArea"], [class*="contentWrapper"]');
+    const mainContentArea = appWrapper.querySelector('[class*="mainContentArea"]');
     const scrollContainer = mainContentArea || appWrapper;
 
     const styles = window.getComputedStyle(scrollContainer);
@@ -211,14 +211,14 @@ async function verifyAppContainerNotScrollable(page: Page) {
 
 async function scrollAppContainerTo(page: Page, position: "top" | "mid" | "bottom") {
   await page.evaluate((pos) => {
-    const appWrapper = document.querySelector('[class*="appContainer"], [class*="wrapper"]') as HTMLElement;
+    const appWrapper = document.querySelector('[class*="appContainer"]') as HTMLElement;
     if (!appWrapper || appWrapper.className.includes("pagesContainer")) return;
 
     // For vertical-full-header layout, check if appWrapper itself has verticalFullHeader class
     const isVerticalFullHeader = appWrapper.className.includes('verticalFullHeader');
     
     // Check if there's a mainContentArea inside (vertical layout)
-    const mainContentArea = appWrapper.querySelector('[class*="mainContentArea"], [class*="contentWrapper"]') as HTMLElement;
+    const mainContentArea = appWrapper.querySelector('[class*="mainContentArea"]') as HTMLElement;
     
     // Priority: appWrapper with verticalFullHeader > mainContentArea > appWrapper
     const scrollContainer = isVerticalFullHeader ? appWrapper : (mainContentArea || appWrapper);
@@ -2436,7 +2436,7 @@ test.describe("Desktop Layout - with Header and Footer", () => {
 
     // Desktop layout should not have scrollbar gutters
     const info = await page.evaluate(() => {
-      const appWrapper = document.querySelector('[class*="appContainer"], [class*="wrapper"]');
+      const appWrapper = document.querySelector('[class*="appContainer"]');
       if (!appWrapper) return { found: false };
 
       const styles = window.getComputedStyle(appWrapper);
@@ -2473,7 +2473,7 @@ test.describe("Desktop Layout - with Header and Footer", () => {
     `);
 
     const containerInfo = await page.evaluate(() => {
-      const appWrapper = document.querySelector('[class*="appContainer"], [class*="wrapper"]') as HTMLElement;
+      const appWrapper = document.querySelector('[class*="appContainer"]') as HTMLElement;
       if (!appWrapper) return { found: false };
 
       const rect = appWrapper.getBoundingClientRect();
@@ -2625,7 +2625,7 @@ test.describe("Desktop Layout - scrollWholePage and noScrollbarGutters props", (
 
     // Desktop layout never uses scrollbar gutters
     const info = await page.evaluate(() => {
-      const appWrapper = document.querySelector('[class*="appContainer"], [class*="wrapper"]');
+      const appWrapper = document.querySelector('[class*="appContainer"]');
       if (!appWrapper) return { found: false };
 
       const styles = window.getComputedStyle(appWrapper);
