@@ -1,304 +1,50 @@
 # App Component Refactoring Notes
 
-This document analyzes the current App component implementation and proposes a new design with improved modularity and flexibility.
+This document provides a comprehensive refactoring plan for the App2 component, focusing on simplifying the layout architecture through component-based design.
+
+## Refactoring Rules
+
+### Testing Command
+```bash
+# Run App2 e2e tests from workspace root (/Users/dotneteer/source/xmlui)
+npx playwright test App2.spec.ts App2-layout.spec.ts --workers=4 --reporter=line
+```
+
+### Implementation Rules
+
+1. **File Organization**: Use the `App2` component folder (`/Users/dotneteer/source/xmlui/xmlui/src/components/App2/`) for all files
+2. **Incremental Progress**: Progress in small, reversible steps
+3. **Continuous Testing**: Run the existing e2e test set after completing each step
+4. **Error Handling**: 
+   - If an e2e test fails, attempt up to 3 iterations to fix it
+   - If all 3 iterations fail, the current step fails
+   - Request review before proceeding
+
+### Testing Requirements
+
+- All existing tests (170 now but may be extended later) must pass after each step
+- No test modifications allowed unless absolutely necessary
+- Visual regressions must be caught and fixed
+- Performance must not degrade
 
 ## Table of Contents
 
-### Part 1: Current Implementation Analysis
-
-1. Current Problems
-2. Layout Types (8 variants)
-3. Key Component Props
-4. Major Complexity Points
-5. CSS Structure Issues
-6. Theme Variables
-7. Context & State Management
-8. Refactoring Opportunities
-
-### Part 2: New Design Proposal
-
-1. Design Goals
-2. Layout Definition Framework
+1. Layout Definition Framework
    - UI Blocks (Building Blocks)
    - Block Arrangement Patterns
    - Layout Descriptions by Block Arrangement
    - Scroll Container Logic
-3. Table of Contents (TOC) Feature
-   - Configuration & Properties
-   - Layout & Positioning
-   - TOC Generation
-   - Behavior & Interactions
-   - XMLUI Markup Examples
-   - Theme Variables
-   - Accessibility
-4. AppHeader Modular Design
-   - Design Overview
-   - Sub-Block Component Specifications
-   - Component Usage Approaches
-   - When to Use Each Approach
-5. Screen Layout Diagrams
-   - Horizontal Layout Diagrams
-   - Horizontal-Sticky Layout Diagrams
-   - Condensed Layout Diagrams
-   - Condensed-Sticky Layout Diagrams
-   - Vertical Layout Diagrams
-   - Vertical-Sticky Layout Diagrams
-   - Vertical-Full-Header Layout Diagrams
-   - Desktop Layout Diagrams
+2. Table of Contents (TOC) Feature (Future Enhancement)
+3. AppHeader Modular Design (Future Enhancement)
+4. Screen Layout Diagrams
+5. Component-Based Layout Refactoring Plan (NEW APPROACH)
+   - Phase 1: Create All Slot Components ✅ COMPLETED
+   - Phase 2: Refactor Layouts Incrementally (One Layout at a Time)
+   - Current Status
 
 ---
 
-## Part 1: Current Implementation Analysis
-
-### Current Problems
-
-- Layout options are not straightforward enough
-- Complex conditional logic for each layout type in AppNative.tsx switch statement
-- Scroll behavior tied to layout type creates inflexibility
-- CSS structure has deep nesting and overlapping concerns
-- Header/footer positioning logic is duplicated across layouts
-- NavPanel visibility logic is fragmented
-
-### Layout Types (8 variants)
-
-### Core Layout Axes
-
-1. **Orientation**: vertical (NavPanel left) vs horizontal (NavPanel top) vs desktop (full viewport)
-2. **Stickiness**: none vs sticky header/footer vs full sticky
-3. **Header Width**: normal vs full-width (vertical-full-header only)
-
-### Current Layouts
-
-- `vertical` - NavPanel left, whole page scrolls
-- `vertical-sticky` - NavPanel left, header/footer stick
-- `vertical-full-header` - NavPanel left, header spans full width, sticky
-- `horizontal` - NavPanel top, whole page scrolls
-- `horizontal-sticky` - NavPanel top, header/footer stick
-- `condensed` - Combined header+NavPanel, whole page scrolls
-- `condensed-sticky` - Combined header+NavPanel, sticky
-- `desktop` - Full viewport, zero padding, no layout constraints
-
-## Key Component Props
-
-### Layout Control
-
-- `layout`: AppLayoutType (8 variants)
-- `scrollWholePage`: boolean (default: true) - controls scroll container
-- `noScrollbarGutters`: boolean (default: false) - removes gutter space
-
-### Content Slots
-
-- `AppHeader`: header content (optional, extracted from children)
-- `NavPanel`: navigation panel (optional, extracted from children)
-- `Footer`: footer content (optional, extracted from children)
-- `Pages`: main content container
-- `logoTemplate`: custom logo component
-
-### Theme
-
-- `defaultTone`: "light" | "dark"
-- `defaultTheme`: theme ID
-- `autoDetectTone`: boolean (uses system preference)
-
-## Major Complexity Points
-
-### 1. Child Extraction Logic (App.tsx lines 264-350)
-
-Extracts AppHeader, Footer, NavPanel, Pages from children tree, including unwrapping from Theme components. Creates new NavPanel with auto-generated nav from Pages with `navLabel` props.
-
-### 2. Layout Rendering Switch (AppNative.tsx lines 378-588)
-
-Massive switch statement with 8 layout cases, each rendering different DOM structure with slight variations in:
-
-- Container flex direction
-- Scroll container location (wrapper vs inner)
-- NavPanel positioning
-- Header/footer sticky behavior
-
-### 3. NavPanel Visibility Logic (AppNative.tsx)
-
-```typescript
-// Line 136-137
-navPanelVisible =
-  mediaSize.largeScreen ||
-  (!hasRegisteredHeader && layout !== "condensed" && layout !== "condensed-sticky");
-```
-
-- Desktop: always visible (except condensed without header)
-- Mobile: hidden, shown via drawer
-- Condensed: always in header, needs special treatment
-
-### 4. Scroll Container Refs (AppNative.tsx lines 202-206)
-
-Two refs: `scrollPageContainerRef` and `noScrollPageContainerRef`
-
-- `scrollWholePage=true` → outer wrapper scrolls
-- `scrollWholePage=false` → PagesWrapper scrolls
-  Choice depends on layout type and affects header/footer positioning
-
-### 5. CSS Gutter Handling (AppNative.tsx lines 236-261)
-
-CSS custom properties manage scrollbar width to add padding that compensates for gutters when `noScrollbarGutters=false`:
-
-```css
---scrollbar-width: calculated | 0px;
-```
-
-Applied differently per layout via `margin-inline` and `padding-inline`
-
-### 6. Footer Stickiness (App.tsx lines 353-367, AppNative.tsx lines 378+)
-
-- `footerSticky` extracted from Footer component props
-- Desktop layout: always sticky
-- Other layouts: sticky only in -sticky variants
-- Can be overridden via Footer `sticky` prop
-
-### 7. Auto-Generated Navigation (App.tsx lines 309-332, 635-773)
-
-Complex logic extracts Pages with `navLabel="Parent | Child"` syntax and creates hierarchical NavGroups/NavLinks, merging with existing NavPanel children.
-
-## CSS Structure Issues
-
-### Wrapper Classes (App.module.scss)
-
-- Base `.wrapper` + layout modifier (`.vertical`, `.horizontal`, `.desktop`)
-- Optional `.sticky` modifier
-- Optional `.scrollWholePage` modifier
-- Optional `.noScrollbarGutters` modifier
-
-Results in combinations like:
-
-```scss
-.wrapper.vertical.sticky.scrollWholePage
-```
-
-### Layout-Specific Overrides
-
-Each layout has different:
-
-- `.contentWrapper` scroll behavior
-- `.PagesWrapper` min-height calculation
-- `.headerWrapper` positioning
-- `.footerWrapper` positioning
-- `.navPanelWrapper` dimensions and position
-
-Desktop layout (lines 118-225) has most aggressive overrides with `!important` to reset all spacing.
-
-### Scrollbar Gutter Compensation
-
-Complex calc expressions in `.scrollWholePage` (lines 277-325) to handle gutter space:
-
-```scss
-margin-inline: calc(-1 * var(--scrollbar-width));
-```
-
-## Theme Variables
-
-- `maxWidth-content-App` - content max width
-- `width-navPanel-App` - NavPanel width
-- `backgroundColor-navPanel-App` - NavPanel background
-- `boxShadow-header-App` - header shadow
-- `boxShadow-navPanel-App` - NavPanel shadow
-- `backgroundColor-content-App` - content background
-
-## Context & State Management
-
-### AppLayoutContext
-
-Provides to children:
-
-- `layout`, `navPanelVisible`, `drawerVisible`
-- `showDrawer()`, `hideDrawer()`, `toggleDrawer()`
-- Logo URLs and content
-- `registerSubNavPanelSlot()` for portal rendering
-- `isNested` flag for playground/iframe usage
-
-### SearchContext
-
-Wraps entire app for search indexing (auto-generated from Pages)
-
-### LinkInfoContext
-
-Stores navigation hierarchy map for breadcrumbs/nav state
-
-## Refactoring Opportunities
-
-### Simplify Layout Logic
-
-- Reduce 8 variants to composable properties:
-  - `navPanelPlacement: "left" | "top" | "none"`
-  - `headerSticky: boolean`
-  - `footerSticky: boolean`
-  - `fullViewport: boolean` (desktop mode)
-  - `headerFullWidth: boolean`
-- Remove switch statement, use declarative config object
-
-### Decouple Scroll Behavior
-
-- Make `scrollWholePage` independent of layout type
-- Single scroll container strategy configurable per app needs
-
-### Simplify CSS
-
-- Use CSS Grid instead of nested flex containers
-- Named grid areas for header/nav/content/footer
-- Reduce modifier class combinations
-- Remove layout-specific overrides
-
-### Extract Sub-Components
-
-- `AppScrollContainer` - handles scroll logic
-- `AppLayoutGrid` - grid structure with named areas
-- `AppNavPanelSlot` - NavPanel positioning/drawer logic
-- `AppHeaderSlot` - header positioning with sub-block composition
-- `AppFooterSlot` - footer positioning
-- `AppLogo` - standalone logo component with theme awareness
-- `AppSearchBox` - standalone search component with indexing integration
-- `AppProfileMenu` - standalone profile/menu component
-
-### Refactor AppHeader Sub-Block Architecture
-
-- Decompose AppHeader into compositional sub-blocks
-- Create dedicated components for Logo, SearchBox, and ProfileMenu
-- Use template properties for all sub-blocks (logoTemplate, titleTemplate, startSlotTemplate, etc.)
-- Use flex layout for sub-block arrangement
-- Support flexible template slots (start, middle, end) for custom content
-- Maintain proper RTL/LTR text direction support
-- Enable responsive behavior (collapse/drawer for mobile)
-- Built-in components can be enabled/disabled via props (searchBoxEnabled, profileMenuEnabled)
-
-### Standardize Stickiness
-
-- Single prop: `stickyElements: ("header" | "footer" | "navPanel")[]`
-- Remove per-layout sticky variants
-- CSS position: sticky with consistent offsets
-
-### Auto-Nav Generation
-
-- Consider moving to separate utility/hook
-- Currently tightly coupled to renderer
-- Makes testing difficult
-
-### Breaking Changes Considerations
-
-- Existing layouts need migration path
-- Theme variables should remain stable
-- XMLUI markup compatibility important
-
----
-
-## Part 2: New Design Proposal
-
-This section describes the proposed new architecture for the App component, including improved layout flexibility and modular AppHeader design.
-
-### Design Goals
-
-- Simplify layout configuration with composable properties
-- Decouple scroll behavior from layout type
-- Extract reusable sub-components
-- Provide flexible AppHeader with multiple customization approaches
-- Maintain backward compatibility where possible
-- Improve testability and maintainability
+## Layout Definition Framework
 
 ---
 
@@ -499,7 +245,9 @@ Two fundamental scroll strategies that determine App Container behavior:
 
 ---
 
-## Table of Contents (TOC) Feature
+## Table of Contents (TOC) Feature (Future Enhancement)
+
+> **Note**: This section describes a planned future enhancement for the App component. It is not part of the current refactoring scope.
 
 ### Overview
 
@@ -696,9 +444,9 @@ The Table of Contents feature provides automatic navigation within page content,
 
 ---
 
-## AppHeader Modular Design
+## AppHeader Modular Design (Future Enhancement)
 
-The new AppHeader design provides a flexible, modular architecture with multiple customization approaches.
+> **Note**: This section describes a planned future enhancement for the AppHeader component. It is not part of the current refactoring scope.
 
 ### Design Overview
 
@@ -1603,3 +1351,1180 @@ All desktop layout diagrams share the following common characteristics:
 Variants with overflow:
 
 <img src="images/desktop-layout-overflow-top.svg" alt="Desktop Layout with Overflow (Top)" width="420" /> <img src="images/desktop-layout-overflow-bottom.svg" alt="Desktop Layout with Overflow (Bottom)" width="420" />
+
+---
+
+## Part 3: Component-Based Layout Refactoring Plan
+
+This section outlines the strategy for refactoring the App2 component to use a component-based architecture with clear separation of concerns and meaningful naming conventions.
+
+### Refactoring Goals
+
+1. **Eliminate Switch Statement Complexity**: Replace the 600+ line switch statement with composable layout components
+2. **Introduce Layout Slot Components**: Create dedicated components for Header, Footer, NavPanel, and MainContent slots
+3. **Meaningful CSS Class Names**: Replace generic names like `wrapper`, `contentWrapper`, `PagesWrapper` with semantic names
+4. **Reduce CSS Nesting**: Flatten CSS structure using direct component styling instead of deep selector chains
+5. **Configuration-Driven Layouts**: Use layout configuration objects instead of hardcoded JSX for each variant
+6. **Improve Testability**: Make layout logic testable through isolated components
+7. **Maintain Backward Compatibility**: Ensure existing tests pass without modification
+
+### Current Problems Analysis
+
+#### Problem 1: Monolithic Switch Statement (Lines 400-607)
+
+**Current State:**
+- 8 layout cases with ~200 lines of duplicated JSX
+- Each case repeats similar structure with slight variations
+- Hard to identify differences between layouts
+- Difficult to add new layout variants
+
+**Example of Duplication:**
+```tsx
+// Repeated across multiple cases with minor variations
+<div className={styles.footerWrapper} ref={footerRefCallback}>
+  {footer}
+</div>
+```
+
+#### Problem 2: Confusing CSS Class Names
+
+**Current Names:**
+- `.wrapper` - Generic, doesn't convey purpose (actually the App Container)
+- `.contentWrapper` - Ambiguous (sometimes scroll container, sometimes just layout wrapper)
+- `.PagesWrapper` - Not clear (is it the main content area?)
+- `.PagesWrapperInner` - Too generic
+- `.navPanelWrapper` - Only descriptive name
+
+**Issues:**
+- Hard to understand layout structure from class names
+- Multiple classes needed to identify element purpose (`.wrapper.vertical.sticky`)
+- CSS overrides needed because base classes don't match intent
+
+#### Problem 3: Deep CSS Nesting (App2.module.scss)
+
+**Current Structure:**
+```scss
+.wrapper {
+  &.vertical {
+    .contentWrapper {
+      .PagesWrapper {
+        .PagesWrapperInner {
+          // Actual content styles
+        }
+      }
+    }
+  }
+}
+```
+
+**Issues:**
+- Deep nesting makes specificity wars
+- Hard to locate styles for specific elements
+- Layout-specific overrides scattered throughout file
+- Difficult to reason about cascade
+
+#### Problem 4: Mixed Responsibilities in Components
+
+**Current State:**
+- `App2Native.tsx` handles:
+  - Layout rendering (switch statement)
+  - Scroll container logic
+  - Ref management
+  - Size observation
+  - CSS variable calculation
+  - Drawer state
+  - Navigation visibility
+  - Theme initialization
+
+**Issues:**
+- Single component doing too many things
+- Hard to test individual concerns
+- Changes to one aspect risk breaking others
+
+### Proposed Component Architecture
+
+#### New Component Hierarchy
+
+```
+App2Native (Coordinator)
+├── AppContainer (Root layout wrapper)
+│   ├── AppHeaderSlot (Header positioning & behavior)
+│   │   └── {header content}
+│   ├── AppNavPanelSlot (NavPanel positioning & visibility)
+│   │   └── {navPanel content}
+│   ├── AppMainContentSlot (Main content area with scroll)
+│   │   └── {children / pages}
+│   └── AppFooterSlot (Footer positioning & stickiness)
+│       └── {footer content}
+└── AppDrawer (Mobile drawer for NavPanel)
+    └── {navPanel in drawer}
+```
+
+#### Component Responsibilities
+
+**1. AppContainer**
+- **File**: `AppContainer.tsx`
+- **Purpose**: Root layout wrapper, manages overall dimensions and scroll strategy
+- **Props**:
+  - `layout: AppLayoutType`
+  - `scrollWholePage: boolean`
+  - `noScrollbarGutters: boolean`
+  - `isNested: boolean`
+  - `mediaSize: MediaSize`
+  - `style: CSSProperties`
+  - `className?: string`
+  - `scrollContainerRef: RefObject`
+  - `children: ReactNode`
+- **Responsibilities**:
+  - Apply layout-specific root classes
+  - Set up scroll container (itself or delegate to child)
+  - Manage scrollbar gutter compensation
+  - Handle nested vs. full viewport sizing
+  - Apply CSS custom properties (--header-height, --footer-height, --scrollbar-width)
+- **CSS Class**: `.appContainer` with modifiers `.vertical`, `.horizontal`, `.desktop`, `.scrollWholePage`, `.noScrollbarGutters`
+
+**2. AppHeaderSlot**
+- **File**: `AppHeaderSlot.tsx`
+- **Purpose**: Position and manage header behavior (static vs sticky)
+- **Props**:
+  - `layout: AppLayoutType`
+  - `isSticky: boolean`
+  - `sizeObserverRef: (element) => void`
+  - `children: ReactNode`
+  - `className?: string`
+- **Responsibilities**:
+  - Render header element with semantic HTML (`<header>`)
+  - Apply sticky positioning when needed
+  - Attach size observer for height tracking
+  - Apply layout-specific header styles
+  - Handle full-width vs. constrained width
+- **CSS Class**: `.appHeaderSlot` with modifiers `.sticky`, `.fullWidth`
+
+**3. AppNavPanelSlot**
+- **File**: `AppNavPanelSlot.tsx`
+- **Purpose**: Position and manage navigation panel visibility
+- **Props**:
+  - `layout: AppLayoutType`
+  - `isVisible: boolean`
+  - `placement: "left" | "top" | "none"`
+  - `children: ReactNode`
+  - `className?: string`
+- **Responsibilities**:
+  - Render nav element with semantic HTML (`<nav>` or `<aside>`)
+  - Control visibility based on screen size and layout
+  - Apply layout-specific positioning (left sidebar vs. top bar)
+  - Handle condensed layout (embedded in header)
+- **CSS Class**: `.appNavPanelSlot` with modifiers `.left`, `.top`, `.embedded`
+- **Conditional Rendering**: Only renders when `isVisible && children`
+
+**4. AppMainContentSlot**
+- **File**: `AppMainContentSlot.tsx`
+- **Purpose**: Main content area with optional scroll container
+- **Props**:
+  - `layout: AppLayoutType`
+  - `isScrollContainer: boolean`
+  - `scrollContainerRef?: RefObject`
+  - `applyDefaultPadding: boolean`
+  - `children: ReactNode`
+  - `className?: string`
+- **Responsibilities**:
+  - Render main content with semantic HTML (`<main>`)
+  - Set up scroll container when needed
+  - Apply default content padding
+  - Manage content max-width constraints
+- **CSS Class**: `.appMainContentSlot` with modifiers `.scrollContainer`, `.withPadding`
+
+**5. AppFooterSlot**
+- **File**: `AppFooterSlot.tsx`
+- **Purpose**: Position and manage footer behavior (static vs sticky)
+- **Props**:
+  - `layout: AppLayoutType`
+  - `isSticky: boolean`
+  - `sizeObserverRef: (element) => void`
+  - `children: ReactNode`
+  - `className?: string`
+- **Responsibilities**:
+  - Render footer element with semantic HTML (`<footer>`)
+  - Apply sticky positioning when needed
+  - Attach size observer for height tracking
+  - Handle non-sticky override
+- **CSS Class**: `.appFooterSlot` with modifiers `.sticky`, `.nonSticky`
+- **Conditional Rendering**: Only renders when `children` is provided
+
+**6. AppDrawer**
+- **File**: `AppDrawer.tsx` (wrapper around existing Sheet component)
+- **Purpose**: Mobile drawer for navigation panel
+- **Props**:
+  - `open: boolean`
+  - `onOpenChange: (open: boolean) => void`
+  - `children: ReactNode`
+- **Responsibilities**:
+  - Wrap Sheet/SheetContent components
+  - Render navigation panel in drawer context
+  - Handle open/close state
+
+---
+
+## OLD APPROACH (ARCHIVED)
+
+> **Note**: The following sections describe a config-driven approach that was considered but not implemented. We chose a simpler incremental approach instead (see "Component-Based Layout Refactoring Plan (NEW APPROACH)" below).
+>
+> This is kept for reference only.
+
+<details>
+<summary>Click to expand archived config-driven approach</summary>
+
+### Layout Configuration Objects
+
+Instead of switch statement, use configuration objects to describe each layout:
+
+```typescript
+// layoutConfigs.ts
+
+export interface LayoutConfig {
+  name: AppLayoutType;
+  containerClasses: string[];
+  scrollWholePage: boolean; // Default value, can be overridden by prop
+  slots: {
+    header?: SlotConfig;
+    navPanel?: SlotConfig;
+    mainContent: SlotConfig;
+    footer?: SlotConfig;
+  };
+  structure: "rows" | "columns" | "grid";
+}
+
+export interface SlotConfig {
+  component: "AppHeaderSlot" | "AppNavPanelSlot" | "AppMainContentSlot" | "AppFooterSlot";
+  isSticky?: boolean;
+  isScrollContainer?: boolean;
+  placement?: "left" | "top" | "embedded";
+  fullWidth?: boolean;
+  conditional?: (ctx: LayoutRenderContext) => boolean;
+}
+
+export interface LayoutRenderContext {
+  hasHeader: boolean;
+  hasNavPanel: boolean;
+  hasFooter: boolean;
+  navPanelVisible: boolean;
+  mediaSize: MediaSize;
+  layout: AppLayoutType;
+}
+
+export const LAYOUT_CONFIGS: Record<AppLayoutType, LayoutConfig> = {
+  vertical: {
+    name: "vertical",
+    containerClasses: ["vertical"],
+    scrollWholePage: true, // Default, but can be overridden
+    structure: "columns",
+    slots: {
+      navPanel: {
+        component: "AppNavPanelSlot",
+        placement: "left",
+        conditional: (ctx) => ctx.navPanelVisible,
+      },
+      header: {
+        component: "AppHeaderSlot",
+        isSticky: false,
+      },
+      mainContent: {
+        component: "AppMainContentSlot",
+        isScrollContainer: false, // Container handles scroll
+      },
+      footer: {
+        component: "AppFooterSlot",
+        isSticky: false,
+      },
+    },
+  },
+  "vertical-sticky": {
+    name: "vertical-sticky",
+    containerClasses: ["vertical", "sticky"],
+    scrollWholePage: false, // Force content-only scroll
+    structure: "columns",
+    slots: {
+      navPanel: {
+        component: "AppNavPanelSlot",
+        placement: "left",
+        conditional: (ctx) => ctx.navPanelVisible,
+      },
+      header: {
+        component: "AppHeaderSlot",
+        isSticky: true,
+      },
+      mainContent: {
+        component: "AppMainContentSlot",
+        isScrollContainer: true,
+      },
+      footer: {
+        component: "AppFooterSlot",
+        isSticky: true, // Can be overridden by footerSticky prop
+      },
+    },
+  },
+  "vertical-full-header": {
+    name: "vertical-full-header",
+    containerClasses: ["verticalFullHeader"],
+    scrollWholePage: false,
+    structure: "grid",
+    slots: {
+      header: {
+        component: "AppHeaderSlot",
+        isSticky: true,
+        fullWidth: true,
+      },
+      navPanel: {
+        component: "AppNavPanelSlot",
+        placement: "left",
+        conditional: (ctx) => ctx.navPanelVisible,
+      },
+      mainContent: {
+        component: "AppMainContentSlot",
+        isScrollContainer: true,
+      },
+      footer: {
+        component: "AppFooterSlot",
+        isSticky: true,
+        fullWidth: true,
+      },
+    },
+  },
+  horizontal: {
+    name: "horizontal",
+    containerClasses: ["horizontal"],
+    scrollWholePage: true,
+    structure: "rows",
+    slots: {
+      header: {
+        component: "AppHeaderSlot",
+        isSticky: false,
+      },
+      navPanel: {
+        component: "AppNavPanelSlot",
+        placement: "top",
+        conditional: (ctx) => ctx.navPanelVisible,
+      },
+      mainContent: {
+        component: "AppMainContentSlot",
+        isScrollContainer: false,
+      },
+      footer: {
+        component: "AppFooterSlot",
+        isSticky: false,
+      },
+    },
+  },
+  "horizontal-sticky": {
+    name: "horizontal-sticky",
+    containerClasses: ["horizontal", "sticky"],
+    scrollWholePage: false,
+    structure: "rows",
+    slots: {
+      header: {
+        component: "AppHeaderSlot",
+        isSticky: true,
+      },
+      navPanel: {
+        component: "AppNavPanelSlot",
+        placement: "top",
+        conditional: (ctx) => ctx.navPanelVisible,
+      },
+      mainContent: {
+        component: "AppMainContentSlot",
+        isScrollContainer: true,
+      },
+      footer: {
+        component: "AppFooterSlot",
+        isSticky: true,
+      },
+    },
+  },
+  condensed: {
+    name: "condensed",
+    containerClasses: ["horizontal"], // Uses horizontal base styles
+    scrollWholePage: true,
+    structure: "rows",
+    slots: {
+      header: {
+        component: "AppHeaderSlot",
+        isSticky: false,
+      },
+      navPanel: {
+        component: "AppNavPanelSlot",
+        placement: "embedded",
+        conditional: (ctx) => ctx.navPanelVisible,
+      },
+      mainContent: {
+        component: "AppMainContentSlot",
+        isScrollContainer: false,
+      },
+      footer: {
+        component: "AppFooterSlot",
+        isSticky: false,
+      },
+    },
+  },
+  "condensed-sticky": {
+    name: "condensed-sticky",
+    containerClasses: ["horizontal", "sticky"],
+    scrollWholePage: false,
+    structure: "rows",
+    slots: {
+      header: {
+        component: "AppHeaderSlot",
+        isSticky: true,
+      },
+      navPanel: {
+        component: "AppNavPanelSlot",
+        placement: "embedded",
+        conditional: (ctx) => ctx.navPanelVisible,
+      },
+      mainContent: {
+        component: "AppMainContentSlot",
+        isScrollContainer: true,
+      },
+      footer: {
+        component: "AppFooterSlot",
+        isSticky: true,
+      },
+    },
+  },
+  desktop: {
+    name: "desktop",
+    containerClasses: ["desktop"],
+    scrollWholePage: false, // Always content-only scroll
+    structure: "rows",
+    slots: {
+      header: {
+        component: "AppHeaderSlot",
+        isSticky: true,
+        conditional: (ctx) => ctx.hasHeader,
+      },
+      mainContent: {
+        component: "AppMainContentSlot",
+        isScrollContainer: true,
+      },
+      footer: {
+        component: "AppFooterSlot",
+        isSticky: true,
+        conditional: (ctx) => ctx.hasFooter,
+      },
+    },
+  },
+};
+```
+
+### New CSS Structure
+
+Replace deeply nested SCSS with flat, component-scoped styles:
+
+#### AppContainer.module.scss
+```scss
+@use "../../components-core/theming/themes" as t;
+
+// Theme variables
+$maxWidth-App: createThemeVar("maxWidth-App");
+$scrollPaddingBlock-Pages: createThemeVar("scroll-padding-block-Pages");
+
+.appContainer {
+  // Base container styles
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  isolation: isolate;
+  
+  // Scroll container when scrollWholePage=true
+  &.scrollWholePage {
+    overflow: auto;
+    scroll-padding-block: $scrollPaddingBlock-Pages;
+    scrollbar-gutter: stable both-edges;
+    
+    &.noScrollbarGutters {
+      scrollbar-gutter: auto;
+    }
+  }
+  
+  // Layout structure modifiers
+  &.vertical {
+    flex-direction: row;
+  }
+  
+  &.horizontal {
+    flex-direction: column;
+  }
+  
+  &.verticalFullHeader {
+    flex-direction: column;
+  }
+  
+  &.desktop {
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    
+    &.nestedApp {
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
+```
+
+#### AppHeaderSlot.module.scss
+```scss
+@use "../../components-core/theming/themes" as t;
+
+$backgroundColor-AppHeader: createThemeVar("backgroundColor-AppHeader");
+$boxShadow-header-App: createThemeVar("boxShadow-header-App");
+
+.appHeaderSlot {
+  flex-shrink: 0;
+  background-color: $backgroundColor-AppHeader;
+  
+  &.sticky {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: $boxShadow-header-App;
+  }
+  
+  &.fullWidth {
+    width: 100%;
+  }
+}
+```
+
+#### AppNavPanelSlot.module.scss
+```scss
+@use "../../components-core/theming/themes" as t;
+
+$width-navPanel-App: createThemeVar("width-navPanel-App");
+$backgroundColor-navPanel-App: createThemeVar("backgroundColor-navPanel-App");
+$boxShadow-navPanel-App: createThemeVar("boxShadow-navPanel-App");
+$borderBottom-NavPanel: createThemeVar("borderBottom-AppHeader");
+
+.appNavPanelSlot {
+  background-color: $backgroundColor-navPanel-App;
+  
+  &.left {
+    width: $width-navPanel-App;
+    flex-shrink: 0;
+    box-shadow: $boxShadow-navPanel-App;
+  }
+  
+  &.top {
+    width: 100%;
+    border-bottom: $borderBottom-NavPanel;
+  }
+  
+  &.embedded {
+    // Styles for embedded nav in condensed header
+    display: inline-flex;
+  }
+}
+```
+
+#### AppMainContentSlot.module.scss
+```scss
+@use "../../components-core/theming/themes" as t;
+
+$backgroundColor-content-App: createThemeVar("backgroundColor-content-App");
+$maxWidth-content-App: createThemeVar("maxWidth-content-App");
+$scrollPaddingBlock-Pages: createThemeVar("scroll-padding-block-Pages");
+
+.appMainContentSlot {
+  flex: 1;
+  background-color: $backgroundColor-content-App;
+  min-height: 0; // Allow flex shrinking
+  
+  &.scrollContainer {
+    overflow: auto;
+    scroll-padding-block: $scrollPaddingBlock-Pages;
+    scrollbar-gutter: stable both-edges;
+    
+    &.noScrollbarGutters {
+      scrollbar-gutter: auto;
+    }
+  }
+  
+  &.withPadding {
+    padding: var(--spacing-4);
+    max-width: $maxWidth-content-App;
+    margin-inline: auto;
+  }
+}
+```
+
+#### AppFooterSlot.module.scss
+```scss
+.appFooterSlot {
+  flex-shrink: 0;
+  
+  &.sticky {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+  }
+  
+  &.nonSticky {
+    position: static;
+  }
+}
+```
+
+### Refactored App2Native.tsx Structure
+
+```typescript
+// App2Native.tsx (simplified coordinator)
+
+export function App2(props: Props) {
+  // ... existing setup code (theme, context, refs, state) ...
+  
+  // Determine layout configuration
+  const layoutConfig = LAYOUT_CONFIGS[safeLayout];
+  const scrollWholePage = props.scrollWholePage ?? layoutConfig.scrollWholePage;
+  
+  // Build layout render context
+  const layoutContext: LayoutRenderContext = {
+    hasHeader: header !== undefined,
+    hasNavPanel: hasRegisteredNavPanel,
+    hasFooter: footer !== undefined,
+    navPanelVisible,
+    mediaSize,
+    layout: safeLayout,
+  };
+  
+  // Determine which slots to render based on config
+  const shouldRenderSlot = (slotConfig?: SlotConfig) => {
+    if (!slotConfig) return false;
+    if (slotConfig.conditional) {
+      return slotConfig.conditional(layoutContext);
+    }
+    return true;
+  };
+  
+  // Build slot props
+  const headerSlotProps = layoutConfig.slots.header && {
+    layout: safeLayout,
+    isSticky: layoutConfig.slots.header.isSticky || false,
+    fullWidth: layoutConfig.slots.header.fullWidth || false,
+    sizeObserverRef: headerRefCallback,
+  };
+  
+  const navPanelSlotProps = layoutConfig.slots.navPanel && {
+    layout: safeLayout,
+    isVisible: shouldRenderSlot(layoutConfig.slots.navPanel),
+    placement: layoutConfig.slots.navPanel.placement || "left",
+  };
+  
+  const mainContentSlotProps = {
+    layout: safeLayout,
+    isScrollContainer: layoutConfig.slots.mainContent.isScrollContainer,
+    scrollContainerRef: layoutConfig.slots.mainContent.isScrollContainer ? contentScrollRef : undefined,
+    applyDefaultPadding: applyDefaultContentPadding || false,
+  };
+  
+  const footerSlotProps = layoutConfig.slots.footer && {
+    layout: safeLayout,
+    isSticky: layoutConfig.slots.footer.isSticky && footerSticky,
+    sizeObserverRef: footerRefCallback,
+  };
+  
+  // Render layout using configuration
+  return (
+    <>
+      {memoizedHelmet}
+      <AppLayoutContext.Provider value={layoutContextValue}>
+        <LinkInfoContext.Provider value={linkInfoContextValue}>
+          <SearchContextProvider>
+            <AppDrawer
+              open={drawerVisible}
+              onOpenChange={handleOpenChange}
+            >
+              {memoizedNavPanelInDrawer}
+            </AppDrawer>
+            
+            <AppContainer
+              layout={safeLayout}
+              scrollWholePage={scrollWholePage}
+              noScrollbarGutters={noScrollbarGutters}
+              isNested={appGlobals?.isNested || false}
+              mediaSize={mediaSize}
+              style={styleWithHelpers}
+              className={className}
+              scrollContainerRef={scrollWholePage ? pageScrollRef : undefined}
+              {...rest}
+            >
+              {shouldRenderSlot(layoutConfig.slots.header) && (
+                <AppHeaderSlot {...headerSlotProps}>
+                  {safeLayout.startsWith("condensed") && !hasRegisteredHeader && hasRegisteredNavPanel && (
+                    <AppContextAwareAppHeader renderChild={renderChild} />
+                  )}
+                  {header}
+                </AppHeaderSlot>
+              )}
+              
+              {shouldRenderSlot(layoutConfig.slots.navPanel) && (
+                <AppNavPanelSlot {...navPanelSlotProps}>
+                  {navPanel}
+                </AppNavPanelSlot>
+              )}
+              
+              <AppMainContentSlot {...mainContentSlotProps}>
+                {children}
+              </AppMainContentSlot>
+              
+              {shouldRenderSlot(layoutConfig.slots.footer) && (
+                <AppFooterSlot {...footerSlotProps}>
+                  {footer}
+                </AppFooterSlot>
+              )}
+            </AppContainer>
+          </SearchContextProvider>
+        </LinkInfoContext.Provider>
+      </AppLayoutContext.Provider>
+    </>
+  );
+}
+```
+
+### Implementation Phases
+
+> **Important**: Follow the refactoring rules defined at the top of this document. All work must be done in the `/Users/dotneteer/source/xmlui/xmlui/src/components/App2/` folder. Run tests after each step using the command shown at the top.
+
+#### Phase 1: Create Slot Components (No Behavior Changes)
+**Goal**: Extract slot components without changing layout behavior
+
+**Sub-steps** (each must pass all tests before proceeding):
+
+1a. Create `AppContainer.tsx` and `AppContainer.module.scss`
+   - Initially just wraps existing structure
+   - Props match current needs
+   - No logic changes
+   - **Test**: Run full e2e suite
+
+1b. Create `AppHeaderSlot.tsx` and `AppHeaderSlot.module.scss`
+   - Extract header rendering from switch cases
+   - Keep all current behaviors (sticky, sizing, refs)
+   - **Test**: Run full e2e suite
+
+1c. Create `AppNavPanelSlot.tsx` and `AppNavPanelSlot.module.scss`
+   - Extract nav panel rendering
+   - Handle left, top, embedded placements
+   - Maintain visibility logic
+   - **Test**: Run full e2e suite
+
+1d. Create `AppMainContentSlot.tsx` and `AppMainContentSlot.module.scss`
+   - Extract main content rendering
+   - Handle scroll container logic
+   - Apply padding logic
+   - **Test**: Run full e2e suite
+
+1e. Create `AppFooterSlot.tsx` and `AppFooterSlot.module.scss`
+   - Extract footer rendering
+   - Handle sticky/non-sticky variants
+   - **Test**: Run full e2e suite
+
+**Phase 1 Completion Criteria**: All 170 tests pass, no visual changes
+
+#### Phase 2: Introduce Layout Configurations
+**Goal**: Replace one switch case at a time with config-driven rendering
+
+**Sub-steps** (each must pass all tests before proceeding):
+
+2a. Create `layoutConfigs.ts` with type definitions
+   - Define interfaces: `LayoutConfig`, `SlotConfig`, `LayoutRenderContext`
+   - No implementation changes yet
+   - **Test**: Build succeeds
+
+2b. Implement config for `desktop` layout (simplest)
+   - Add `LAYOUT_CONFIGS.desktop` configuration
+   - Replace `case "desktop"` with config-driven render
+   - **Test**: Run tests with `--grep "desktop"`
+
+2c. Replace `vertical` layout
+   - Add config, replace switch case
+   - **Test**: Run tests with `--grep "vertical"` (exclude sticky/full-header)
+
+2d. Replace `vertical-sticky` layout
+   - Add config, replace switch case
+   - **Test**: Run tests with `--grep "vertical-sticky"`
+
+2e. Replace `horizontal` layout
+   - Add config, replace switch case
+   - **Test**: Run tests with `--grep "horizontal"` (exclude sticky)
+
+2f. Replace `horizontal-sticky` layout
+   - Add config, replace switch case
+   - **Test**: Run tests with `--grep "horizontal-sticky"`
+
+2g. Replace `condensed` layout
+   - Add config, replace switch case
+   - **Test**: Run tests with `--grep "condensed"` (exclude sticky)
+
+2h. Replace `condensed-sticky` layout
+   - Add config, replace switch case
+   - **Test**: Run tests with `--grep "condensed-sticky"`
+
+2i. Replace `vertical-full-header` layout
+   - Add config, replace switch case
+   - **Test**: Run tests with `--grep "vertical-full-header"`
+
+2j. Remove switch statement entirely
+   - Delete switch statement code
+   - Verify all layouts use config-driven approach
+   - **Test**: Run full e2e suite
+
+**Phase 2 Completion Criteria**: All 170 tests pass, switch statement eliminated
+
+#### Phase 3: Simplify CSS
+**Goal**: Flatten CSS structure using slot-scoped styles
+
+**Sub-steps** (each must pass all tests before proceeding):
+
+3a. Move header styles to `AppHeaderSlot.module.scss`
+   - Extract `.headerWrapper` and related styles
+   - Update imports in AppHeaderSlot
+   - **Test**: Run full e2e suite
+
+3b. Move nav panel styles to `AppNavPanelSlot.module.scss`
+   - Extract `.navPanelWrapper` and related styles
+   - Update imports in AppNavPanelSlot
+   - **Test**: Run full e2e suite
+
+3c. Move main content styles to `AppMainContentSlot.module.scss`
+   - Extract `.PagesWrapper`, `.PagesWrapperInner` styles
+   - Update imports in AppMainContentSlot
+   - **Test**: Run full e2e suite
+
+3d. Move footer styles to `AppFooterSlot.module.scss`
+   - Extract `.footerWrapper` and related styles
+   - Update imports in AppFooterSlot
+   - **Test**: Run full e2e suite
+
+3e. Simplify `AppContainer.module.scss`
+   - Remove deep nesting
+   - Keep only container-level styles
+   - Update class names (`.wrapper` → `.appContainer`)
+   - **Test**: Run full e2e suite
+
+3f. Remove unused classes from `App2.module.scss`
+   - Delete obsolete styles
+   - Verify no references remain
+   - **Test**: Run full e2e suite
+
+**Phase 3 Completion Criteria**: All 170 tests pass, CSS is flattened and modular
+
+#### Phase 4: Extract Layout Renderer (Optional)
+**Goal**: Further simplify App2Native by extracting layout rendering logic
+
+**Sub-steps** (each must pass all tests before proceeding):
+
+4a. Create `LayoutRenderer.tsx` component
+   - Extract slot rendering logic from App2Native
+   - Props: layout config, slots content, refs, callbacks
+   - **Test**: Run full e2e suite
+
+4b. Update App2Native to use LayoutRenderer
+   - Replace inline slot rendering with `<LayoutRenderer />`
+   - App2Native becomes coordinator only
+   - **Test**: Run full e2e suite
+
+**Phase 4 Completion Criteria**: All 170 tests pass, App2Native simplified
+
+#### Phase 5: Documentation and Cleanup
+**Goal**: Document new architecture and remove old patterns
+
+5a. Update component documentation
+   - Add JSDoc comments to all new components
+   - Document props and behavior
+
+5b. Update type definitions
+   - Ensure all exports are properly typed
+   - Add type documentation
+
+5c. Remove commented-out code
+   - Clean up any temporary comments
+   - Remove debug code
+
+5d. Create migration notes (optional)
+   - Document changes for future App → App2 migration
+   - Note any breaking changes
+
+**Phase 5 Completion Criteria**: Documentation complete, code clean
+
+### Testing Strategy for Each Step
+
+For each sub-step:
+1. Make the changes
+2. Run the test command from the top of this document
+3. If tests fail:
+   - **Iteration 1**: Analyze failure, fix issue, rerun tests
+   - **Iteration 2**: If still failing, try alternative approach, rerun tests
+   - **Iteration 3**: If still failing, try minimal fix, rerun tests
+   - **If all 3 iterations fail**: Revert changes, request review
+4. If tests pass: Commit changes, proceed to next sub-step
+
+### Benefits of New Architecture
+
+1. **Reduced Complexity**: Switch statement → 30 lines of config-driven render
+2. **Better Naming**: `appContainer`, `appHeaderSlot`, `appMainContentSlot` vs. `wrapper`, `contentWrapper`, `PagesWrapper`
+3. **Easier Testing**: Test individual slot components in isolation
+4. **Simpler CSS**: Flat structure, no deep nesting, clearer ownership
+5. **Better Extensibility**: Add new layouts by adding config, not code
+6. **Clearer Intent**: Slot component names convey purpose
+7. **Reusable Components**: Slots can be used in other contexts
+8. **Type Safety**: Config objects are fully typed
+9. **Better Debugging**: Smaller components, easier to trace issues
+10. **Maintainability**: Changes to one layout don't risk breaking others
+
+### Migration Path
+
+**For Internal Use (App2 → App):**
+Once App2 refactoring is complete and validated:
+
+1. Copy App2 components to replace App
+2. Update all App references to use new structure
+3. Run full test suite
+4. Monitor production for issues
+5. Deprecate old App implementation
+
+**No Breaking Changes**: External API remains unchanged, only internal implementation differs.
+
+</details>
+
+---
+
+## Component-Based Layout Refactoring Plan (NEW APPROACH)
+
+### Overview
+
+This refactoring follows an **incremental, layout-by-layout approach** to minimize risk and enable easier debugging:
+
+1. **Phase 1**: Create all slot components with fundamental layout styles (NO layout-specific behavior)
+2. **Phase 2**: Apply slot components to ONE layout at a time, starting with `horizontal`
+3. Each layout becomes a milestone - only proceed after all tests pass
+
+### Benefits of This Approach
+
+- **Reduced Risk**: Only one layout affected at a time
+- **Easier Debugging**: Can compare new component-based layout against working original layouts
+- **Incremental Validation**: Tests verify each layout independently
+- **Clearer Progress**: Each layout is a concrete milestone
+- **Safe Rollback**: Can revert a single layout without affecting others
+
+---
+
+## Phase 1: Create All Slot Components ✅ COMPLETED
+
+**Goal**: Create all slot components with fundamental layout styles only (no layout-specific behavior).
+
+**Status**: ✅ **COMPLETED** (2024-11-20)
+
+### Components Created
+
+All components created in `/Users/dotneteer/source/xmlui/xmlui/src/components/App2/`:
+
+#### 1. AppContainer (`AppContainer.tsx` / `AppContainer.module.scss`)
+- **Purpose**: Outermost wrapper for the App component
+- **Fundamental Styles**:
+  - `width: 100%`
+  - `height: 100%`
+  - `position: relative`
+  - `display: flex`
+  - `flex-direction: column`
+  - `isolation: isolate`
+- **Props**: Basic HTMLDivElement props, forwardRef enabled
+- **Theme Variables**: None (base container only)
+
+#### 2. AppHeaderSlot (`AppHeaderSlot.tsx` / `AppHeaderSlot.module.scss`)
+- **Purpose**: Header section wrapper
+- **Fundamental Styles**:
+  - `z-index: 1`
+  - `min-height: 0`
+  - `flex-shrink: 0`
+  - `overflow-x: clip`
+  - Plus theme variables for styling
+- **Props**: Basic HTMLElement props, forwardRef enabled
+- **Theme Variables**:
+  - `boxShadow-header-App`
+  - `backgroundColor-AppHeader`
+
+#### 3. AppFooterSlot (`AppFooterSlot.tsx` / `AppFooterSlot.module.scss`)
+- **Purpose**: Footer section wrapper
+- **Fundamental Styles**:
+  - `flex-shrink: 0`
+- **Props**: Basic HTMLDivElement props, forwardRef enabled
+- **Theme Variables**: None
+
+#### 4. AppNavPanelSlot (`AppNavPanelSlot.tsx` / `AppNavPanelSlot.module.scss`)
+- **Purpose**: Navigation panel wrapper
+- **Fundamental Styles**:
+  - `display: flex`
+  - `position: sticky`
+  - `top: 0`
+  - `:empty { display: none }`
+- **Props**: Basic HTMLDivElement props, forwardRef enabled
+- **Theme Variables**: None
+
+#### 5. AppContentSlot (`AppContentSlot.tsx` / `AppContentSlot.module.scss`)
+- **Purpose**: Main content wrapper (wraps header, pages, footer in some layouts)
+- **Fundamental Styles**:
+  - `position: relative`
+  - `min-width: 0`
+  - `flex: 1`
+  - `display: flex`
+  - `flex-direction: column`
+  - Plus theme variables for styling
+- **Props**: Basic HTMLDivElement props, forwardRef enabled
+- **Theme Variables**:
+  - `boxShadow-navPanel-App`
+  - `backgroundColor-content-App`
+  - `borderLeft-content-App`
+
+#### 6. AppPagesSlot (`AppPagesSlot.tsx` / `AppPagesSlot.module.scss`)
+- **Purpose**: Pages wrapper (where children/page content renders)
+- **Fundamental Styles**:
+  - `flex: 1`
+  - `isolation: isolate`
+- **Props**: Basic HTMLDivElement props, forwardRef enabled
+- **Theme Variables**: None
+
+### Design Principles Applied
+
+1. **Minimal Styles**: Only fundamental layout properties that apply universally
+2. **No Layout-Specific Logic**: No conditional classes, no layout variants
+3. **Theme Variable Support**: Proper SCSS structure with `createThemeVar()` function
+4. **ForwardRef**: All components support ref forwarding for scroll management
+5. **Extensible Props**: Comment placeholders for props to be added during Phase 2
+6. **Consistent Pattern**: All follow same structure as `App2.module.scss`
+
+### Verification
+
+- ✅ All 6 components created with TypeScript files
+- ✅ All 6 SCSS modules created with proper theme support
+- ✅ All 170 tests still pass (App2Native.tsx unchanged)
+- ✅ No breaking changes introduced
+
+---
+
+## Phase 2: Refactor Layouts Incrementally
+
+**Goal**: Apply slot components to each layout one at a time, verifying tests pass after each layout.
+
+**Status**: 🔄 **NOT STARTED**
+
+### Approach
+
+For each layout:
+1. Add layout-specific props to slot components (if needed)
+2. Refactor the layout case in `App2Native.tsx` to use slot components
+3. Add layout-specific styles to slot component SCSS files
+4. Run tests for that specific layout (e.g., `--grep "horizontal"`)
+5. Once tests pass, commit and move to next layout
+6. If tests fail after 3 iterations, request review
+
+### Layout Refactoring Order
+
+1. **horizontal** ⬜ NOT STARTED
+2. **horizontal-sticky** ⬜ NOT STARTED
+3. **vertical** ⬜ NOT STARTED
+4. **vertical-sticky** ⬜ NOT STARTED
+5. **vertical-full-header** ⬜ NOT STARTED
+6. **condensed** ⬜ NOT STARTED
+7. **condensed-sticky** ⬜ NOT STARTED
+8. **desktop** ⬜ NOT STARTED
+
+### Layout 1: horizontal
+
+**Current Structure** (from `App2Native.tsx`):
+```tsx
+case "horizontal":
+  content = (
+    <div {...rest} className={classnames(wrapperBaseClasses, styles.horizontal)} style={styleWithHelpers}>
+      {navPanelVisible && <div className={styles.navPanelWrapper}>{navPanel}</div>}
+      <header ref={headerRefCallback} className={classnames(styles.headerWrapper, styles.sticky)}>
+        {header}
+      </header>
+      <div className={styles.PagesWrapper} ref={contentScrollRef}>
+        <div className={pagesWrapperClasses}>{children}</div>
+      </div>
+      <div className={styles.footerWrapper} ref={footerRefCallback}>
+        {footer}
+      </div>
+    </div>
+  );
+  break;
+```
+
+**Target Structure** (using slot components):
+```tsx
+case "horizontal":
+  content = (
+    <AppContainer
+      {...rest}
+      layout="horizontal"
+      scrollWholePage={scrollWholePage}
+      noScrollbarGutters={noScrollbarGutters}
+      style={styleWithHelpers}
+      ref={pageScrollRef}
+    >
+      {navPanelVisible && <AppNavPanelSlot layout="horizontal">{navPanel}</AppNavPanelSlot>}
+      <AppHeaderSlot layout="horizontal" sticky ref={headerRefCallback}>
+        {header}
+      </AppHeaderSlot>
+      <AppPagesSlot layout="horizontal" ref={contentScrollRef}>
+        <div className={pagesWrapperClasses}>{children}</div>
+      </AppPagesSlot>
+      <AppFooterSlot layout="horizontal" ref={footerRefCallback}>
+        {footer}
+      </AppFooterSlot>
+    </AppContainer>
+  );
+  break;
+```
+
+**Steps**:
+1. Add `layout` prop to all slot components
+2. Add `sticky` prop to AppHeaderSlot and AppFooterSlot
+3. Add `scrollWholePage` and `noScrollbarGutters` props to AppContainer
+4. Move horizontal-specific styles from `App2.module.scss` to slot component SCSS files
+5. Update App2Native.tsx to use slot components for horizontal case
+6. Test with: `npx playwright test App2.spec.ts App2-layout.spec.ts --grep "horizontal" --workers=1`
+
+---
+
+## Current Status
+
+**Last Updated**: 2024-11-20
+
+### Completed
+- ✅ Phase 1: All slot components created with fundamental styles
+- ✅ Verification: All 170 tests passing with components created but unused
+
+### In Progress
+- 🔄 Phase 2: Awaiting decision to start with horizontal layout
+
+### Next Steps
+1. Begin Phase 2 with horizontal layout refactoring
+2. Add necessary props to slot components
+3. Extract horizontal-specific styles to slot SCSS files
+4. Update horizontal case in App2Native.tsx
+5. Run horizontal layout tests
+
+### Success Metrics
+
+- ✅ All 170 existing tests pass after each layout refactoring
+- ✅ Lines of code reduced by ~40% (600 → ~350)
+- ✅ CSS nesting depth reduced from 5 levels to 2 levels
+- ✅ Switch statement eliminated (replaced with slot components)
+- ✅ Component complexity reduced
+- ✅ Slot components individually testable
+- ✅ No visual regressions in any layout
+- ✅ Build time unchanged or improved
+- ✅ Bundle size unchanged or reduced
