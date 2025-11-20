@@ -2916,7 +2916,9 @@ For a more architectural fix (Option A), desktop layout could be extracted into 
 
 ---
 
-**3. Repetitive Sticky Footer Logic**
+**3. Repetitive Sticky Footer Logic** ❌ ATTEMPTED BUT REVERTED
+
+**Issue**: This pattern appears in multiple layout contexts (vertical, horizontal, verticalFullHeader) with slight variations:
 ```scss
 .footerWrapper {
   position: static;
@@ -2932,67 +2934,46 @@ For a more architectural fix (Option A), desktop layout could be extracted into 
 }
 ```
 
-**Problem**: This pattern appears in multiple layout contexts (vertical, horizontal, verticalFullHeader) with slight variations. The base assumption is `static`, which is then conditionally overridden.
-
-**Current Flow**:
+**Initial Analysis**:
+The three-level cascade seemed unnecessarily complex:
 1. Default: `position: static`
 2. If parent has `.sticky`: `position: sticky; bottom: 0`
 3. If footer element has `.nonSticky`: back to `position: static`
 
-**Analysis**:
-The `.nonSticky` class is applied when `footerSticky` prop is `false`. This creates a three-level cascade:
-- Base rule → Layout-specific override → Component-specific override
+**Attempted Solution**:
+Tried to simplify by using a positive `.sticky` class on the footer element instead of negative `.nonSticky` class. This would eliminate the three-level cascade and make intent clearer.
 
-This is fragile because it relies on specificity ordering and makes the intended behavior unclear.
+**Why It Was Reverted**:
+After implementation and testing, discovered that the original three-level cascade is actually **correct by design** for this component architecture:
 
-**Recommendation**: Simplify with explicit positioning logic
+1. **Parent-driven sticky behavior**: The parent container's `.sticky` class controls whether child footers should be sticky. This is intentional because sticky behavior is a layout-level concern, not a component-level concern.
 
-**Option A: Single Source of Truth (Preferred)**
-```scss
-// Remove default static positioning
-// Let layout configs set the default explicitly
+2. **Component opt-out pattern**: The `.nonSticky` class on the footer element allows individual footer instances to opt out of the parent's sticky behavior when `footerSticky={false}`. This is the correct pattern because:
+   - It respects the separation of concerns (layout controls default, component can override)
+   - It maintains consistency across all footers in a sticky layout by default
+   - It only requires a class when deviating from the layout's default behavior
 
-&.vertical {
-  .footerWrapper {
-    // No default position - let it be static by CSS defaults
-  }
-  
-  &.sticky .footerWrapper:not(.nonSticky) {
-    position: sticky;
-    bottom: 0;
-  }
-}
-```
+3. **Test failures**: Switching to a positive class pattern broke 12 tests because:
+   - Footers appeared at wrong positions (1039px instead of >1080px)
+   - The parent container's `.sticky` state no longer controlled footer positioning
+   - Tests expect footers to be sticky by default in sticky layouts unless explicitly opted out
 
-**Option B: Positive Class Instead of Negative**
-```scss
-// Use .stickyFooter instead of .nonSticky
-.footerWrapper {
-  position: static; // explicit default
-  
-  &.stickyFooter {
-    position: sticky;
-    bottom: 0;
-  }
-}
+**Architectural Insight**:
+What initially appeared to be "repetitive" and "fragile" is actually a well-designed pattern where:
+- **Layout level** (parent `.sticky` class): Defines the default sticky behavior for all child elements
+- **Component level** (`.nonSticky` class): Allows specific instances to override when needed
+- **Three levels are necessary**: Base (static) → Layout default (sticky) → Component override (non-sticky)
 
-// Simpler, clearer intent
-```
+This pattern follows the principle of "convention over configuration" - sticky is the convention in sticky layouts, with explicit opt-out for exceptions.
 
-**Benefits**:
-- Clearer intent (positive class names are more intuitive)
-- Reduces specificity battles
-- Easier to trace behavior
-- Less repetitive code
+**Test Results**: Initial attempt passed TypeScript compilation but failed 12 e2e tests. After reversion, all 170 tests passing.
 
-**Challenges**:
-- Requires updating `App2Native.tsx` to apply positive class instead
-- May affect tests that look for `.nonSticky` class
+**Conclusion**: **No refactoring needed** - the current implementation is correct by design. The three-level cascade is not a code smell but an intentional architectural pattern that properly separates layout concerns from component concerns.
 
-**Impact**: Low (code clarity)  
-**Complexity**: Simple  
-**Risk**: Low (requires TypeScript changes + test validation)  
-**Lines Saved**: ~5-10 lines across multiple layout blocks
+**Impact**: None (no change made)  
+**Complexity**: N/A  
+**Risk**: N/A  
+**Lines Saved**: 0
 
 ---
 
