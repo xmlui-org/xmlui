@@ -416,7 +416,7 @@ export function App2({
       {config.useVerticalFullHeaderStructure ? (
         <>
           {renderHeaderSlot()}
-          <div className={styles.content}>
+          <div className={styles.mainContentRow}>
             {navPanelVisible && (
               <aside className={styles.navPanelWrapper}>
                 <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>

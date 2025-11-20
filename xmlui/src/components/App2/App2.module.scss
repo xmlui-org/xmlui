@@ -240,7 +240,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       }
 
       &.verticalFullHeader {
-        .content {
+        .mainContentRow {
           margin-inline: calc(-1 * var(--scrollbar-width));
           width: calc(100% + (2 * var(--scrollbar-width)));
         }
@@ -263,7 +263,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
     &:not(.scrollWholePage) {
       overflow: hidden;
-      .content {
+      .mainContentRow {
         min-height: 0;
         height: 100%;
       }
@@ -310,7 +310,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     }
   }
 
-  .content {
+  .mainContentRow {
     display: flex;
     flex-direction: row;
     isolation: isolate;
