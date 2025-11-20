@@ -184,6 +184,35 @@ const VALID_LAYOUTS: AppLayoutType[] = [
 ];
 
 /**
+ * Determines whether the NavPanel should be visible inline (not in a drawer).
+ * 
+ * @param hasNavPanel - Whether a NavPanel is defined and rendered
+ * @param isLargeScreen - Whether the viewport is large enough for sidebar layout
+ * @param hasHeader - Whether a header is registered
+ * @param layout - Current layout type
+ * @returns true if NavPanel should be shown inline, false if it should be in a drawer
+ * 
+ * Logic:
+ * - If no NavPanel exists, return false
+ * - On large screens: always show inline
+ * - On small screens: show inline only if there's no header to contain the drawer button,
+ *   except for condensed layouts which always use the header for the drawer button
+ */
+function shouldShowNavPanelInline(
+  hasNavPanel: boolean,
+  isLargeScreen: boolean,
+  hasHeader: boolean,
+  layout: AppLayoutType
+): boolean {
+  if (!hasNavPanel) return false;
+  if (isLargeScreen) return true;
+  
+  // On small screens, show inline only if no header (except condensed layouts which need header)
+  const isCondensedLayout = layout === "condensed" || layout === "condensed-sticky";
+  return !hasHeader && !isCondensedLayout;
+}
+
+/**
  * Validates and sanitizes layout input.
  * 
  * @param layout - Layout value from props (may be undefined)
@@ -250,7 +279,7 @@ export function App2({
   const { setLoggedInUser, mediaSize, forceRefreshAnchorScroll, appGlobals } = appContext;
   const hasRegisteredHeader = header !== undefined;
   
-  // Check if NavPanel is actually displayed by checking if it rendered (not just if it's defined)
+  // Check if NavPanel exists and is actually displayed
   // navPanel is null when the 'when' condition evaluates to false
   // navPanelDef !== undefined means a NavPanel is defined in the markup
   // navPanel !== null means the NavPanel actually rendered (when condition is true)
@@ -261,27 +290,14 @@ export function App2({
     setLoggedInUser(loggedInUser);
   }, [loggedInUser, setLoggedInUser]);
 
-  useEffect(() => {
-    if (mounted.current) return;
-    mounted.current = true;
-    
-    if (defaultTone === "dark" || defaultTone === "light") {
-      setActiveThemeTone(defaultTone as any);
-    } else if (autoDetectTone) {
-      // Auto-detect system theme preference when no defaultTone is set
-      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const detectedTone = systemPrefersDark ? "dark" : "light";
-      setActiveThemeTone(detectedTone);
-    }
-    
-    if (defaultTheme) {
-      setActiveThemeId(defaultTheme);
-    }
-
-    return () => {
-      mounted.current = false;
-    };
-  }, [defaultTone, defaultTheme, autoDetectTone, setActiveThemeTone, setActiveThemeId, themes]);
+  // Initialize theme and tone settings
+  useThemeInitialization({
+    defaultTone,
+    defaultTheme,
+    autoDetectTone,
+    setActiveThemeTone,
+    setActiveThemeId,
+  });
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -295,30 +311,14 @@ export function App2({
     };
   }, [onMessageReceived]);
 
-  // Listen for system theme changes when autoDetectTone is enabled
-  useEffect(() => {
-    if (!autoDetectTone || defaultTone) return;
-
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
-    const handleThemeChange = (e: MediaQueryListEvent) => {
-      const detectedTone = e.matches ? "dark" : "light";
-      setActiveThemeTone(detectedTone);
-    };
-
-    mediaQuery.addEventListener('change', handleThemeChange);
-
-    return () => {
-      mediaQuery.removeEventListener('change', handleThemeChange);
-    };
-  }, [autoDetectTone, defaultTone, setActiveThemeTone]);
-
-  // --- We don't hide the nav panel if there's no header; in that case, we don't have a show drawer
-  // --- button. The exception is the condensed layout because we render a header in that case (otherwise,
-  // --- we couldn't show the NavPanel)
-  const navPanelVisible =
-    mediaSize.largeScreen ||
-    (!hasRegisteredHeader && safeLayout !== "condensed" && safeLayout !== "condensed-sticky");
+  // Determine if NavPanel should be visible inline (not in drawer)
+  // Uses helper function to encapsulate the visibility logic
+  const navPanelVisible = shouldShowNavPanelInline(
+    hasRegisteredNavPanel,
+    mediaSize.largeScreen,
+    hasRegisteredHeader,
+    safeLayout
+  );
 
   // Refs for scroll containers - naming clarified for better understanding
   // pageScrollRef: used when scrollWholePage=true (entire page scrolls)
@@ -663,6 +663,74 @@ export function getAppLayoutOrientation(appLayout?: AppLayoutType) {
     default:
       return "horizontal";
   }
+}
+
+/**
+ * Custom hook to manage theme and tone initialization.
+ * Handles initial theme setup and system theme preference detection.
+ * 
+ * @param defaultTone - Initial tone preference ("dark", "light", or undefined for auto-detect)
+ * @param defaultTheme - Initial theme ID to activate
+ * @param autoDetectTone - Whether to auto-detect system theme preference
+ * @param setActiveThemeTone - Function to set the active theme tone
+ * @param setActiveThemeId - Function to set the active theme ID
+ */
+function useThemeInitialization({
+  defaultTone,
+  defaultTheme,
+  autoDetectTone,
+  setActiveThemeTone,
+  setActiveThemeId,
+}: {
+  defaultTone?: string;
+  defaultTheme?: string;
+  autoDetectTone: boolean;
+  setActiveThemeTone: (tone: "dark" | "light") => void;
+  setActiveThemeId: (id: string) => void;
+}) {
+  const mounted = useRef(false);
+
+  // Initial theme and tone setup - runs once on mount
+  useEffect(() => {
+    if (mounted.current) return;
+    mounted.current = true;
+
+    // Set tone: explicit defaultTone, or auto-detect from system
+    if (defaultTone === "dark" || defaultTone === "light") {
+      setActiveThemeTone(defaultTone as any);
+    } else if (autoDetectTone) {
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const detectedTone = systemPrefersDark ? "dark" : "light";
+      setActiveThemeTone(detectedTone);
+    }
+
+    // Set theme ID if provided
+    if (defaultTheme) {
+      setActiveThemeId(defaultTheme);
+    }
+
+    return () => {
+      mounted.current = false;
+    };
+  }, [defaultTone, defaultTheme, autoDetectTone, setActiveThemeTone, setActiveThemeId]);
+
+  // Listen for system theme changes when autoDetectTone is enabled
+  useEffect(() => {
+    if (!autoDetectTone || defaultTone) return;
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    const handleThemeChange = (e: MediaQueryListEvent) => {
+      const detectedTone = e.matches ? "dark" : "light";
+      setActiveThemeTone(detectedTone);
+    };
+
+    mediaQuery.addEventListener('change', handleThemeChange);
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleThemeChange);
+    };
+  }, [autoDetectTone, defaultTone, setActiveThemeTone]);
 }
 
 /**
