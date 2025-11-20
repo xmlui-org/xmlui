@@ -58,7 +58,7 @@ const AppContainer = createSlot("AppContainer");
 const AppHeaderSlot = createSlot<HTMLElement>("AppHeaderSlot", styles.headerWrapper, "header");
 const AppFooterSlot = createSlot("AppFooterSlot", styles.footerWrapper);
 const AppNavPanelSlot = createSlot("AppNavPanelSlot", styles.navPanelWrapper);
-const AppContentSlot = createSlot("AppContentSlot", styles.contentWrapper);
+const AppContentSlot = createSlot("AppContentSlot", styles.mainContentArea);
 const AppPagesSlot = createSlot("AppPagesSlot", styles.PagesWrapper);
 
 // --- Component Types ---
@@ -422,7 +422,7 @@ export function App2({
                 <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>
               </aside>
             )}
-            <main className={styles.contentWrapper}>
+            <main className={styles.mainContentArea}>
               {renderPagesSlot()}
             </main>
           </div>

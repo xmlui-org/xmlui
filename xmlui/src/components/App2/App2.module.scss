@@ -46,16 +46,16 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     &.vertical {
       flex-direction: row;
 
-      .contentWrapper {
+      .mainContentArea {
         scrollbar-gutter: stable both-edges;
       }
       &.noScrollbarGutters {
-        .contentWrapper {
+        .mainContentArea {
           scrollbar-gutter: auto;
         }
       }
       &:not(.scrollWholePage) {
-        .contentWrapper {
+        .mainContentArea {
           overflow: initial;
         }
       }
@@ -173,7 +173,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       height: 100%;
       overflow: auto;
       
-      .contentWrapper {
+      .mainContentArea {
         overflow: initial;
       }
       
@@ -244,7 +244,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
           margin-inline: calc(-1 * var(--scrollbar-width));
           width: calc(100% + (2 * var(--scrollbar-width)));
         }
-        .contentWrapper {
+        .mainContentArea {
           padding-inline: var(--scrollbar-width);
         }
       }
@@ -319,7 +319,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     max-width: $maxWidth-App;
   }
 
-  .contentWrapper {
+  .mainContentArea {
     position: relative;
     min-width: 0;
     flex: 1;
