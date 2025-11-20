@@ -448,181 +448,88 @@ export function App2({
     },
   ];
 
-  let pagesWrapperClasses = classnames(styles.PagesWrapperInner, {
+  const pagesWrapperClasses = classnames(styles.PagesWrapperInner, {
     [styles.withDefaultContentPadding]: applyDefaultContentPadding,
   });
   
-  // Determine if footer should have nonSticky class based on footerSticky prop
-  const footerShouldBeNonSticky = !footerSticky;
-  
-  // Get layout configuration
   const config = layoutConfigs[safeLayout];
   if (!config) {
     throw new Error("layout type not supported: " + safeLayout);
   }
 
-  // Render content based on configuration
-  let content: string | number | boolean | Iterable<ReactNode> | JSX.Element;
+  // Helper functions for rendering slots
+  const renderHeaderSlot = () => (
+    <AppHeaderSlot
+      ref={headerSize.refCallback}
+      className={classnames(
+        config.showCondensedHeader && "app-layout-condensed",
+        config.headerClasses
+      )}
+    >
+      {config.showCondensedHeader && !hasRegisteredHeader && hasRegisteredNavPanel && (
+        <AppContextAwareAppHeader renderChild={renderChild} />
+      )}
+      {header}
+      {config.navPanelInHeader && navPanelVisible && <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>}
+    </AppHeaderSlot>
+  );
 
-  if (config.useVerticalFullHeaderStructure) {
-    // vertical-full-header has a unique structure with .content div
-    content = (
-      <AppContainer
-        className={classnames(wrapperBaseClasses, ...config.containerClasses)}
-        style={styleWithHelpers}
-        ref={config.containerScrollRef ? pageScrollRef : undefined}
-        {...rest}
-      >
-        <AppHeaderSlot
-          className={classnames(config.headerClasses)}
-          ref={headerSize.refCallback}
-        >
-          {header}
-        </AppHeaderSlot>
-        <div className={styles.content}>
-          {navPanelVisible && (
-            <aside className={styles.navPanelWrapper}>
-              <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>
-            </aside>
-          )}
-          <main className={styles.contentWrapper}>
-            <AppPagesSlot ref={contentScrollRef}>
-              <div className={pagesWrapperClasses}>{children}</div>
-            </AppPagesSlot>
-          </main>
-        </div>
-        <AppFooterSlot
-          className={classnames({
-            [styles.nonSticky]: footerShouldBeNonSticky,
-          })}
-          ref={footerSize.refCallback}
-        >
-          {footer}
-        </AppFooterSlot>
-      </AppContainer>
-    );
-  } else if (config.navPanelPosition === "side") {
-    // vertical and vertical-sticky layouts
-    content = (
-      <AppContainer
-        className={classnames(wrapperBaseClasses, ...config.containerClasses)}
-        style={styleWithHelpers}
-        {...rest}
-      >
-        {navPanelVisible && <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>}
-        <AppContentSlot ref={pageScrollRef}>
-          <AppHeaderSlot
-            ref={headerSize.refCallback}
-            className={classnames(config.headerClasses)}
-          >
-            {header}
-          </AppHeaderSlot>
-          <AppPagesSlot ref={contentScrollRef}>
-            <div className={pagesWrapperClasses}>{children}</div>
-          </AppPagesSlot>
-          <AppFooterSlot
-            className={classnames({
-              [styles.nonSticky]: footerShouldBeNonSticky,
-            })}
-            ref={footerSize.refCallback}
-          >
-            {footer}
-          </AppFooterSlot>
-        </AppContentSlot>
-      </AppContainer>
-    );
-  } else if (config.navPanelInHeader) {
-    // horizontal and horizontal-sticky layouts
-    content = (
-      <AppContainer
-        className={classnames(wrapperBaseClasses, ...config.containerClasses)}
-        style={styleWithHelpers}
-        ref={config.containerScrollRef ? pageScrollRef : undefined}
-        {...rest}
-      >
-        <AppHeaderSlot
-          ref={headerSize.refCallback}
-          className={classnames(config.headerClasses)}
-        >
-          {header}
+  const renderFooterSlot = () => footer !== undefined || safeLayout !== "desktop" ? (
+    <AppFooterSlot
+      className={classnames({ [styles.nonSticky]: !footerSticky })}
+      ref={footerSize.refCallback}
+    >
+      {footer}
+    </AppFooterSlot>
+  ) : null;
+
+  const renderPagesSlot = () => (
+    <AppPagesSlot ref={contentScrollRef}>
+      <div className={pagesWrapperClasses}>{children}</div>
+    </AppPagesSlot>
+  );
+
+  // Unified rendering based on layout configuration
+  const content = (
+    <AppContainer
+      className={classnames(wrapperBaseClasses, ...config.containerClasses)}
+      style={styleWithHelpers}
+      ref={config.containerScrollRef ? pageScrollRef : undefined}
+      {...rest}
+    >
+      {config.useVerticalFullHeaderStructure ? (
+        <>
+          {renderHeaderSlot()}
+          <div className={styles.content}>
+            {navPanelVisible && (
+              <aside className={styles.navPanelWrapper}>
+                <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>
+              </aside>
+            )}
+            <main className={styles.contentWrapper}>
+              {renderPagesSlot()}
+            </main>
+          </div>
+          {renderFooterSlot()}
+        </>
+      ) : config.navPanelPosition === "side" ? (
+        <>
           {navPanelVisible && <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>}
-        </AppHeaderSlot>
-        <AppPagesSlot ref={contentScrollRef}>
-          <div className={pagesWrapperClasses}>{children}</div>
-        </AppPagesSlot>
-        <AppFooterSlot
-          className={classnames({
-            [styles.nonSticky]: footerShouldBeNonSticky,
-          })}
-          ref={footerSize.refCallback}
-        >
-          {footer}
-        </AppFooterSlot>
-      </AppContainer>
-    );
-  } else if (config.showCondensedHeader) {
-    // condensed and condensed-sticky layouts
-    content = (
-      <AppContainer
-        className={classnames(wrapperBaseClasses, ...config.containerClasses)}
-        style={styleWithHelpers}
-        ref={config.containerScrollRef ? pageScrollRef : undefined}
-        {...rest}
-      >
-        <AppHeaderSlot
-          className={classnames("app-layout-condensed", config.headerClasses)}
-          ref={headerSize.refCallback}
-        >
-          {!hasRegisteredHeader && hasRegisteredNavPanel && (
-            <AppContextAwareAppHeader renderChild={renderChild} />
-          )}
-          {header}
-        </AppHeaderSlot>
-        <AppPagesSlot ref={contentScrollRef}>
-          <div className={pagesWrapperClasses}>{children}</div>
-        </AppPagesSlot>
-        <AppFooterSlot
-          className={classnames({
-            [styles.nonSticky]: footerShouldBeNonSticky,
-          })}
-          ref={footerSize.refCallback}
-        >
-          {footer}
-        </AppFooterSlot>
-      </AppContainer>
-    );
-  } else {
-    // desktop layout
-    content = (
-      <AppContainer
-        className={classnames(wrapperBaseClasses, ...config.containerClasses)}
-        style={styleWithHelpers}
-        {...rest}
-      >
-        {header && (
-          <AppHeaderSlot
-            className={classnames(config.headerClasses)}
-            ref={headerSize.refCallback}
-          >
-            {header}
-          </AppHeaderSlot>
-        )}
-        <AppPagesSlot ref={contentScrollRef}>
-          <div className={styles.PagesWrapperInner}>{children}</div>
-        </AppPagesSlot>
-        {footer && (
-          <AppFooterSlot
-            className={classnames({
-              [styles.nonSticky]: footerShouldBeNonSticky,
-            })}
-            ref={footerSize.refCallback}
-          >
-            {footer}
-          </AppFooterSlot>
-        )}
-      </AppContainer>
-    );
-  }
+          <AppContentSlot ref={pageScrollRef}>
+            {renderHeaderSlot()}
+            {renderPagesSlot()}
+            {renderFooterSlot()}
+          </AppContentSlot>
+        </>
+      ) : (
+        <>
+          {(header || (config.showCondensedHeader && !hasRegisteredHeader && hasRegisteredNavPanel)) && renderHeaderSlot()}
+          {renderPagesSlot()}
+          {renderFooterSlot()}
+        </>
+      )}
+    </AppContainer>
+  );
 
   // Memoize the rendered nav panel in drawer to prevent unnecessary re-renders
   const memoizedNavPanelInDrawer = useMemo(

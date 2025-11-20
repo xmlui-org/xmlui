@@ -472,3 +472,197 @@ Variants with overflow:
 
 ---
 
+## Refactoring Opportunities
+
+After reviewing the App2 component against the requirements of **reducing code lines** and **minimizing file hops**, the following opportunities have been identified:
+
+### ✅ RECOMMENDED: Opportunities That Reduce Lines AND Minimize Hops
+
+#### 1. Inline and Simplify Navigation Processing
+
+**Current State:**
+- 300+ lines of navigation logic across multiple helper functions
+- Functions like `createParseHierarchyLabels`, `createLabelExistsInHierarchy` create closures with internal caches
+- Complex function nesting makes code hard to follow
+
+**Opportunity:**
+Simplify inline without creating new files:
+- Remove factory pattern (`createParseHierarchyLabels`, `createLabelExistsInHierarchy`) - use simple functions
+- Remove unnecessary caching (premature optimization)
+- Inline small helper functions directly where used
+- Simplify hierarchy parsing logic
+
+**Impact:** 
+- **Lines saved:** ~100 lines
+- **Hops:** 0 new files, everything stays in App2.tsx
+- **Readability:** Much better - linear flow instead of nested closures
+
+#### 2. Consolidate Layout Rendering Logic
+
+**Current State:**
+- 250+ lines of conditional rendering for 8 layout variants
+- 90% of JSX is duplicated across variants
+- Hard to see what's actually different between layouts
+
+**Opportunity:**
+Extract common structure, use configuration for differences:
+```typescript
+// Single render function using configuration
+const config = layoutConfigs[safeLayout];
+return (
+  <AppContainer {...containerProps}>
+    {config.headerPosition === 'top' && renderHeader()}
+    {config.contentStructure === 'side-by-side' ? (
+      <div className={styles.content}>
+        {config.showNavPanel && renderNavPanel()}
+        <main>{renderMainContent()}</main>
+      </div>
+    ) : (
+      <>
+        {config.showNavPanel && renderHeader && renderNavPanel()}
+        <main>{renderMainContent()}</main>
+      </>
+    )}
+    {renderFooter()}
+  </AppContainer>
+);
+```
+
+**Impact:**
+- **Lines saved:** ~150 lines
+- **Hops:** 0 new files, everything in same component
+- **Readability:** Dramatically better - differences are configuration, not code duplication
+
+#### 3. Eliminate Unnecessary Memoization
+
+**Current State:**
+- Extensive `useMemo` and `useCallback` usage with large dependency arrays
+- `appProps` object with 16+ dependencies that's only used once
+- Premature optimization that adds complexity
+
+**Opportunity:**
+Remove unnecessary memoization:
+- Delete `appProps` memoization - just pass props directly
+- Remove `useMemo` for simple calculations that aren't expensive
+- Keep only memoization that prevents actual performance issues
+
+**Impact:**
+- **Lines saved:** ~40 lines
+- **Hops:** None - simplification within same file
+- **Readability:** Better - less noise from memoization logic
+
+#### 4. Simplify Footer Sticky Logic
+
+**Current State:**
+- `footerSticky` extracted via complex `extractComponentProp` function
+- Then negated to `footerShouldBeNonSticky`
+- Used in multiple places with confusing naming
+
+**Opportunity:**
+Inline and simplify:
+```typescript
+const footerSticky = Footer?.props?.sticky ?? true;
+```
+
+**Impact:**
+- **Lines saved:** ~30 lines (removes `extractComponentProp` function)
+- **Hops:** None
+- **Readability:** Much clearer
+
+#### 5. Inline Small Utility Functions
+
+**Current State:**
+- Many small utility functions defined separately: `shouldShowNavPanelInline`, `validateLayout`, `getLayoutHeightConfig`
+- Each requires mental context switch
+
+**Opportunity:**
+Inline directly where used since they're only called once:
+```typescript
+// Instead of separate function
+const navPanelVisible = shouldShowNavPanelInline(hasNavPanel, isLarge, hasHeader, layout);
+
+// Inline the logic
+const navPanelVisible = hasNavPanel && (isLargeScreen || (!hasHeader && !isCondensed));
+```
+
+**Impact:**
+- **Lines saved:** ~50 lines
+- **Hops:** None - reduces jumping around in same file
+- **Readability:** Better - logic visible where it's used
+
+#### 6. Remove `AppNode` Wrapper Component
+
+**Current State:**
+- `AppNode` component wraps the main logic but only serves to organize code
+- Adds extra indirection without clear benefit
+- All logic could be in the renderer directly
+
+**Opportunity:**
+Move all `AppNode` logic directly into the renderer function:
+
+**Impact:**
+- **Lines saved:** ~15 lines (component declaration overhead)
+- **Hops:** None - one less function to trace through
+- **Readability:** Better - flatter structure
+
+### ⚠️ RECONSIDER: Opportunities That Add Hops or Don't Save Lines
+
+#### ❌ Extract Navigation Processing to Separate Module
+**Rejected because:** Creates new file to jump to, doesn't reduce lines (just moves them)
+
+#### ❌ Layout Strategy Pattern
+**Rejected because:** Creates 8+ new files, dramatically increases hops, actually adds ~200 lines of boilerplate
+
+#### ❌ Extract Slot Components
+**Rejected because:** Creates new file, adds import/export overhead, these are simple and local to App2
+
+#### ❌ Extract Custom Hooks (useThemeInitialization, useDrawerState, etc.)
+**Rejected because:** Creates new files or adds indirection within same file without reducing complexity
+
+#### ❌ Extract Element Size Observer
+**Rejected because:** Only used in App2, extracting adds file hop without benefit
+
+#### ❌ Separate Layout Components per Variant
+**Rejected because:** Creates 8 new files, massively increases hops, doesn't reduce total lines
+
+### 🤔 NEUTRAL: Minor Improvements
+
+#### 7. Use Positive Naming Convention
+- Change `noScrollbarGutters` → `reserveScrollbarGutters` throughout
+- Change `footerShouldBeNonSticky` → `footerIsSticky`
+- **Impact:** Same lines, same hops, better clarity
+
+#### 8. Simplify Ref Management Inline
+- Remove conditional logic by always creating both refs
+- **Impact:** ~5 lines saved, no new hops
+
+### Recommended Implementation Order
+
+1. **Quick Wins (Do First):**
+   - #3: Eliminate Unnecessary Memoization (~40 lines)
+   - #4: Simplify Footer Sticky Logic (~30 lines)
+   - #5: Inline Small Utility Functions (~50 lines)
+   - #6: Remove AppNode Wrapper (~15 lines)
+   - **Total: ~135 lines saved, 0 new files**
+
+2. **Major Refactor (Do Second):**
+   - #2: Consolidate Layout Rendering Logic (~150 lines)
+   - **Total: ~150 lines saved, 0 new files**
+
+3. **Deep Simplification (Do Third):**
+   - #1: Inline and Simplify Navigation Processing (~100 lines)
+   - **Total: ~100 lines saved, 0 new files**
+
+4. **Polish (Optional):**
+   - #7: Positive Naming Convention
+   - #8: Simplify Ref Management (~5 lines)
+
+### Expected Total Impact
+
+- **Lines Reduced:** ~385 lines from current ~993 lines = **~39% reduction**
+- **New Files Created:** 0
+- **File Hops Reduced:** Significant - removes factory patterns, wrapper components, utility indirection
+- **Readability:** Dramatically improved through consolidation and simplification
+
+---
+
