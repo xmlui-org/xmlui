@@ -177,21 +177,10 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
   const applyDefaultContentPadding= !Pages;
 
   // Extract sticky property from Footer component
-  const footerSticky = useMemo(() => {
-    if (!Footer) return true;
-    
-    // Check if Footer is wrapped in Theme
-    let footerNode = Footer;
-    if (Footer.type === "Theme" && Footer.children?.length > 0) {
-      footerNode = Footer.children.find((child) => child.type === "Footer");
-    }
-    
-    if (footerNode?.type === "Footer" && footerNode.props?.sticky !== undefined) {
-      return extractValue.asOptionalBoolean(footerNode.props.sticky, true);
-    }
-    
-    return true;
-  }, [Footer, extractValue]);
+  const footerSticky = useMemo(
+    () => extractComponentProp(Footer, "sticky", true, extractValue),
+    [Footer, extractValue]
+  );
 
   // --- Memoize all app props to prevent unnecessary re-renders
   const appProps = useMemo(
@@ -233,25 +222,19 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
     ],
   );
 
-  // Memoize the rendered children to prevent unnecessary re-renders
-  const renderedHeader = useMemo(() => renderChild(AppHeader), [AppHeader, renderChild]);
-  const renderedFooter = useMemo(() => renderChild(Footer), [Footer, renderChild]);
-  const renderedNavPanel = useMemo(() => renderChild(NavPanel), [NavPanel, renderChild]);
-  const renderedContent = useMemo(() => renderChild(restChildren), [restChildren, renderChild]);
-
   return (
     <App2Component
       {...appProps}
-      header={renderedHeader}
-      footer={renderedFooter}
+      header={renderChild(AppHeader)}
+      footer={renderChild(Footer)}
       footerSticky={footerSticky}
-      navPanel={renderedNavPanel}
+      navPanel={renderChild(NavPanel)}
       navPanelDef={NavPanel}
       logoContentDef={node.props.logoTemplate}
       renderChild={renderChild}
       registerComponentApi={registerComponentApi}
     >
-      {renderedContent}
+      {renderChild(restChildren)}
       <SearchIndexCollector Pages={Pages} renderChild={renderChild} />
     </App2Component>
   );
@@ -430,6 +413,42 @@ function enhanceNavPanelWithPageNav(
     props: {},
     children: extraNavs,
   };
+}
+
+/**
+ * Extract a property from a component definition, handling Theme wrapper unwrapping.
+ * @param component - The component definition to extract from
+ * @param propName - The property name to extract
+ * @param defaultValue - Default value if property is not found
+ * @param extractValue - The extract value utility from XMLUI renderer
+ * @returns The extracted property value
+ */
+function extractComponentProp<T>(
+  component: ComponentDef | undefined,
+  propName: string,
+  defaultValue: T,
+  extractValue: any
+): T {
+  if (!component) return defaultValue;
+
+  // Unwrap Theme if present
+  let targetNode = component;
+  if (component.type === "Theme" && component.children?.length > 0) {
+    targetNode = component.children.find(
+      (child) => child.type === component.type
+    );
+  }
+
+  if (!targetNode?.props?.[propName]) {
+    return defaultValue;
+  }
+
+  // Use asOptionalBoolean for boolean properties
+  if (typeof defaultValue === 'boolean') {
+    return extractValue.asOptionalBoolean(targetNode.props[propName], defaultValue) as T;
+  }
+
+  return extractValue(targetNode.props[propName]) ?? defaultValue;
 }
 
 /**

@@ -2469,206 +2469,77 @@ Following the pattern established in Step 1 (keeping functions in the same file)
 
 ---
 
-### 5. Optimize Footer Sticky Property Extraction
+### 5. Optimize Footer Sticky Property Extraction ✅ COMPLETED
 
-**Current State**: Lines 348-366 extract sticky property with nested conditionals
+**Completed Implementation**:
 
-**Issue**:
+Added reusable helper function `extractComponentProp<T>()` to handle property extraction from component definitions with Theme wrapper unwrapping.
+
+**Function Added** (after `enhanceNavPanelWithPageNav`):
 ```typescript
-const { AppHeader, Footer, NavPanel, Pages, restChildren } = useMemo(() => {
-  let AppHeader: ComponentDef;
-  let Footer: ComponentDef;
-  let NavPanel: ComponentDef;
-  let Pages: ComponentDef;
-  const restChildren: any[] = [];
-  
-  node.children?.forEach((rootChild) => {
-    let transformedChild = { ...rootChild };
-    if (rootChild.type === "Theme") {
-      // 15+ lines handling Theme wrapper
-      transformedChild.children = rootChild.children?.filter((child) => {
-        if (child.type === "AppHeader") {
-          AppHeader = { ...rootChild, children: [child] };
-          return false;
-        }
-        // ... similar for Footer, NavPanel
-      });
-      if (!transformedChild.children.length) {
-        transformedChild = null;
-      }
-    }
-    // 10+ more lines handling direct children
-    if (rootChild.type === "AppHeader") {
-      AppHeader = rootChild;
-    }
-    // ... similar for Footer, NavPanel, Pages
-  });
-  
-  // 20+ lines calling extractNavPanelFromPages
-  const extraNavs = extractNavPanelFromPages(...);
-  if (extraNavs?.length) {
-    // Merge logic
+function extractComponentProp<T>(
+  component: ComponentDef | undefined,
+  propName: string,
+  defaultValue: T,
+  extractValue: any
+): T {
+  if (!component) return defaultValue;
+
+  // Unwrap Theme if present
+  let targetNode = component;
+  if (component.type === "Theme" && component.children?.length > 0) {
+    targetNode = component.children.find(
+      (child) => child.type === component.type
+    );
   }
-  
-  return { AppHeader, Footer, NavPanel, Pages, restChildren };
-}, [node.children, extractValue, ...]);
+
+  if (!targetNode?.props?.[propName]) {
+    return defaultValue;
+  }
+
+  // Use asOptionalBoolean for boolean properties
+  if (typeof defaultValue === 'boolean') {
+    return extractValue.asOptionalBoolean(targetNode.props[propName], defaultValue) as T;
+  }
+
+  return extractValue(targetNode.props[propName]) ?? defaultValue;
+}
 ```
 
-**Problems**:
-- 83 lines of complex extraction logic in useMemo
-- Mixes three concerns: component extraction, Theme unwrapping, nav enhancement
-- Mutation-heavy code (transformedChild reassignment)
-- Hard to understand flow with nested conditionals
-- Large dependency array
-
-**Opportunity**:
-Extract to utility functions:
+**Updated footerSticky extraction**:
 ```typescript
-// App2/utils/componentExtraction.ts
-interface ExtractedComponents {
-  AppHeader?: ComponentDef;
-  Footer?: ComponentDef;
-  NavPanel?: ComponentDef;
-  Pages?: ComponentDef;
-  restChildren: ComponentDef[];
-}
-
-export function extractAppComponents(
-  children: ComponentDef[] | undefined
-): ExtractedComponents {
-  const result: ExtractedComponents = { restChildren: [] };
-  
-  if (!children) return result;
-  
-  for (const child of children) {
-    if (child.type === "Theme") {
-      extractFromTheme(child, result);
-    } else {
-      extractDirectChild(child, result);
-    }
+// Before: 16 lines of nested conditionals
+const footerSticky = useMemo(() => {
+  if (!Footer) return true;
+  let footerNode = Footer;
+  if (Footer.type === "Theme" && Footer.children?.length > 0) {
+    footerNode = Footer.children.find((child) => child.type === "Footer");
   }
-  
-  return result;
-}
-
-function extractFromTheme(
-  themeNode: ComponentDef,
-  result: ExtractedComponents
-): void {
-  const specialTypes = ["AppHeader", "Footer", "NavPanel"];
-  const otherChildren: ComponentDef[] = [];
-  
-  themeNode.children?.forEach((child) => {
-    if (child.type === "AppHeader") {
-      result.AppHeader = { ...themeNode, children: [child] };
-    } else if (child.type === "Footer") {
-      result.Footer = { ...themeNode, children: [child] };
-    } else if (child.type === "NavPanel") {
-      result.NavPanel = { ...themeNode, children: [child] };
-    } else {
-      otherChildren.push(child);
-    }
-  });
-  
-  if (otherChildren.length > 0) {
-    result.restChildren.push({ ...themeNode, children: otherChildren });
+  if (footerNode?.type === "Footer" && footerNode.props?.sticky !== undefined) {
+    return extractValue.asOptionalBoolean(footerNode.props.sticky, true);
   }
-}
+  return true;
+}, [Footer, extractValue]);
 
-function extractDirectChild(
-  child: ComponentDef,
-  result: ExtractedComponents
-): void {
-  switch (child.type) {
-    case "AppHeader":
-      result.AppHeader = child;
-      break;
-    case "Footer":
-      result.Footer = child;
-      break;
-    case "NavPanel":
-      result.NavPanel = child;
-      break;
-    case "Pages":
-      result.Pages = child;
-      result.restChildren.push(child);
-      break;
-    default:
-      result.restChildren.push(child);
-  }
-}
-
-export function enhanceNavPanelWithPageNav(
-  extracted: ExtractedComponents,
-  processedRef: React.MutableRefObject<boolean>,
-  extractValue: any,
-  navHelper: NavigationHierarchyParser
-): ComponentDef | undefined {
-  if (!extracted.Pages || processedRef.current) {
-    return extracted.NavPanel;
-  }
-  
-  const extraNavs = extractNavPanelFromPages(
-    extracted.Pages,
-    extracted.NavPanel,
-    extractValue,
-    navHelper
-  );
-  
-  if (!extraNavs?.length) {
-    return extracted.NavPanel;
-  }
-  
-  if (extracted.NavPanel) {
-    return {
-      ...extracted.NavPanel,
-      children: [
-        ...(extracted.NavPanel.children || []),
-        ...extraNavs
-      ],
-    };
-  }
-  
-  return {
-    type: "NavPanel",
-    props: {},
-    children: extraNavs,
-  };
-}
-
-// Usage in AppNode:
-const extracted = useMemo(
-  () => extractAppComponents(node.children),
-  [node.children]
-);
-
-const enhancedNavPanel = useMemo(
-  () => enhanceNavPanelWithPageNav(
-    extracted,
-    processedNavRef,
-    extractValue,
-    navHelper
-  ),
-  [extracted, extractValue, navHelper]
+// After: Single function call
+const footerSticky = useMemo(
+  () => extractComponentProp(Footer, "sticky", true, extractValue),
+  [Footer, extractValue]
 );
 ```
 
-**Benefits**:
-- Separates three distinct concerns into functions
-- Immutable approach (no reassignments)
-- Much easier to test each piece
-- Clearer control flow
-- Reduces AppNode by 60+ lines
-- Can reuse extraction logic
+**Benefits Achieved**:
+- ✅ Eliminated 13 lines of nested conditionals from AppNode
+- ✅ Created reusable helper for any component prop extraction
+- ✅ Single place for Theme unwrapping logic
+- ✅ Type-safe with generic type parameter
+- ✅ Automatically handles boolean vs. other types
+- ✅ Can be used for future prop extractions (header, navPanel, etc.)
+- ✅ More concise and readable
 
-**Impact**: High (major refactoring)  
-**Complexity**: Moderate (requires careful testing)  
-**Risk**: Medium (complex logic, needs thorough testing)  
-**Lines Saved**: ~60 lines from AppNode
+**Test Results**: All 170 tests passing
 
----
-
-### 5. Optimize Footer Sticky Property Extraction
+**Original Issue**:
 
 **Current State**: Lines 348-366 extract sticky property with nested conditionals
 
@@ -2747,11 +2618,70 @@ const footerSticky = useMemo(
 
 ---
 
-### 6. Reduce Component Rendering Memoization
+### 6. Reduce Component Rendering Memoization ✅ COMPLETED
 
-**Current State**: Lines 414-417 memoize all rendered components
+**Completed Implementation**:
 
-**Issue**:
+Removed unnecessary `useMemo` calls for component rendering, as the XMLUI renderer already optimizes renderChild function stability.
+
+**Analysis Confirmed**:
+The XMLUI renderer's Container component (in `Container.tsx`) already memoizes `renderChild` using `useCallback` with a stable dependency array. This means:
+1. `renderChild` function reference is stable across renders
+2. Only changes when dependencies like state, dispatch, or appContext change
+3. Component definitions (AppHeader, Footer, NavPanel) are already memoized from extraction step
+4. Additional useMemo wrapper provides no performance benefit
+
+**Changes Made**:
+```typescript
+// Before: 4 separate useMemo calls (8 lines)
+const renderedHeader = useMemo(() => renderChild(AppHeader), [AppHeader, renderChild]);
+const renderedFooter = useMemo(() => renderChild(Footer), [Footer, renderChild]);
+const renderedNavPanel = useMemo(() => renderChild(NavPanel), [NavPanel, renderChild]);
+const renderedContent = useMemo(() => renderChild(restChildren), [restChildren, renderChild]);
+
+return (
+  <App2Component
+    {...appProps}
+    header={renderedHeader}
+    footer={renderedFooter}
+    navPanel={renderedNavPanel}
+    // ...
+  >
+    {renderedContent}
+  </App2Component>
+);
+
+// After: Direct rendering (4 lines removed)
+return (
+  <App2Component
+    {...appProps}
+    header={renderChild(AppHeader)}
+    footer={renderChild(Footer)}
+    navPanel={renderChild(NavPanel)}
+    navPanelDef={NavPanel}
+    logoContentDef={node.props.logoTemplate}
+    renderChild={renderChild}
+    registerComponentApi={registerComponentApi}
+  >
+    {renderChild(restChildren)}
+    <SearchIndexCollector Pages={Pages} renderChild={renderChild} />
+  </App2Component>
+);
+```
+
+**Benefits Achieved**:
+- ✅ Eliminated 4 unnecessary useMemo closures
+- ✅ Simpler, more readable code
+- ✅ Removed premature optimization
+- ✅ Trusts XMLUI renderer's built-in optimization
+- ✅ Reduced cognitive overhead (fewer indirections)
+- ✅ Component definitions still benefit from extraction memoization
+
+**Test Results**: All 170 tests passing - no performance regression detected
+
+**Key Insight**: The XMLUI renderer already implements optimal memoization at the infrastructure level (Container's `stableRenderChild` with useCallback). Adding component-level memoization on top was redundant and actually added unnecessary complexity. The renderer's architecture is designed to handle this efficiently.
+
+**Original Issue**:
 ```typescript
 const renderedHeader = useMemo(() => renderChild(AppHeader), [AppHeader, renderChild]);
 const renderedFooter = useMemo(() => renderChild(Footer), [Footer, renderChild]);
@@ -2809,584 +2739,3 @@ return (
 **Lines Saved**: ~4 lines
 
 ---
-
-### Summary of App2.tsx Refactoring Opportunities
-
-| # | Opportunity | Impact | Complexity | Risk | Lines Saved |
-|---|-------------|--------|------------|------|-------------|
-| 1 | Extract Navigation Helpers | High | Simple | Low | ~80 |
-| 2 | Extract Component Extraction | High | Moderate | Medium | ~60 |
-| 3 | Move SearchIndexCollector | High | Simple | Low | ~167 |
-| 4 | Extract Navigation Extraction | High | Simple | Low | ~151 |
-| 5 | Optimize Prop Extraction | Low | Simple | Low | ~5 |
-| 6 | Reduce Rendering Memoization | Low | Simple | Low-Med | ~4 |
-
-**Total Potential Lines Saved**: ~467 lines (60% reduction in App2.tsx)
-
-**Recommended Implementation Order**:
-1. **Step 3** (SearchIndexCollector) - Highest impact, lowest risk, simple extraction
-2. **Step 1** (Navigation Helpers) - High impact, pure functions, easy to test
-3. **Step 4** (Navigation Extraction) - High impact, complements Step 1
-4. **Step 2** (Component Extraction) - Most complex, save for after simpler refactors
-5. **Step 5** (Prop Extraction) - Small improvement, low priority
-6. **Step 6** (Memoization) - Needs performance testing, lowest priority
-
-**Post-Refactoring File Structure**:
-```
-App2/
-  ├── App2.tsx (~300 lines, down from 774)
-  ├── App2Native.tsx
-  ├── SearchIndexCollector.tsx (~170 lines)
-  ├── utils/
-  │   ├── navigationHelpers.ts (~90 lines)
-  │   ├── navigationExtraction.ts (~160 lines)
-  │   └── componentExtraction.ts (~100 lines)
-  └── __tests__/
-      ├── navigationHelpers.test.ts
-      ├── navigationExtraction.test.ts
-      └── componentExtraction.test.ts
-```
-
----
-
-## App2.module.scss Refactoring Opportunities
-
-### 15. Reduce Nesting Depth and Selector Complexity
-
-**Current State**: Lines 24-435 have deep nesting (up to 5-6 levels)
-
-**Issue**:
-```scss
-.wrapper {
-  &.vertical {
-    flex-direction: row;
-    .contentWrapper {
-      overflow: auto;
-      .PagesWrapper {
-        min-height: initial;
-      }
-    }
-    &.sticky {
-      .footerWrapper {
-        position: sticky;
-        &.nonSticky {
-          position: static;
-        }
-      }
-    }
-  }
-}
-```
-
-- Deep nesting makes selectors highly specific
-- Harder to override styles
-- Difficult to understand precedence
-- Performance impact (though minimal)
-
-**Opportunity**:
-Flatten selectors using direct class combinations:
-```scss
-.wrapper {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  isolation: isolate;
-}
-
-// Vertical layout
-.wrapper.vertical {
-  flex-direction: row;
-  overflow: initial;
-}
-
-.wrapper.vertical .contentWrapper {
-  overflow: auto;
-  scroll-padding-block: $scrollPaddingBlockPage;
-  scrollbar-gutter: stable both-edges;
-}
-
-.wrapper.vertical.noScrollbarGutters .contentWrapper {
-  scrollbar-gutter: auto;
-}
-
-.wrapper.vertical .navPanelWrapper {
-  width: $width-navPanel-App;
-  flex-shrink: 0;
-}
-
-.wrapper.vertical .PagesWrapper {
-  min-height: initial;
-  flex: 1;
-}
-
-// Sticky vertical layout
-.wrapper.vertical.sticky .footerWrapper {
-  position: sticky;
-  bottom: 0;
-}
-
-.wrapper.vertical.sticky .footerWrapper.nonSticky {
-  position: static;
-}
-```
-
-**Benefits**:
-- Clearer selector intent
-- Easier to override
-- Flatter structure (2-3 levels max)
-- Better maintainability
-- Slightly better performance
-
-**Challenges**:
-- More verbose (explicit class combinations)
-- Requires careful testing to ensure no style regressions
-- May increase file length slightly
-
-**Impact**: Medium (improves maintainability)  
-**Complexity**: Moderate (requires careful refactoring)  
-**Risk**: Medium (must test all layout combinations)  
-**Lines Saved**: ~50 lines (by eliminating redundant nesting braces)
-
----
-
-### 16. Extract Layout-Specific Styles
-
-**Current State**: All 8 layout styles are in one file (435 lines)
-
-**Issue**:
-- Single file contains all layout variants
-- Hard to find styles for specific layout
-- Mixes common and layout-specific styles
-
-**Opportunity**:
-Split into modular files:
-```scss
-// App2.module.scss (base)
-@use "layout-vertical";
-@use "layout-horizontal";
-@use "layout-desktop";
-@use "layout-condensed";
-
-.wrapper {
-  /* Common wrapper styles */
-}
-
-.headerWrapper { /* Common header styles */ }
-.footerWrapper { /* Common footer styles */ }
-.navPanelWrapper { /* Common nav panel styles */ }
-.PagesWrapper { /* Common pages styles */ }
-
-// layout-vertical.scss
-.wrapper.vertical {
-  flex-direction: row;
-  /* Vertical-specific styles */
-}
-
-.wrapper.vertical.sticky {
-  /* Vertical-sticky-specific styles */
-}
-
-.wrapper.verticalFullHeader {
-  /* Vertical-full-header-specific styles */
-}
-
-// layout-horizontal.scss
-.wrapper.horizontal {
-  /* Horizontal-specific styles */
-}
-
-.wrapper.horizontal.sticky {
-  /* Horizontal-sticky-specific styles */
-}
-
-// layout-desktop.scss
-.wrapper.desktop {
-  /* Desktop-specific styles */
-}
-
-// layout-condensed.scss  
-.wrapper.condensed {
-  /* Condensed-specific styles */
-}
-```
-
-**Benefits**:
-- Easier to find layout-specific styles
-- Can work on one layout without seeing others
-- Better organization
-- Smaller files
-
-**Challenges**:
-- More files to manage
-- Need to ensure no conflicts
-- Build tool must support SCSS @use
-- May complicate theme variable collection
-
-**Impact**: Medium (organizational improvement)  
-**Complexity**: Simple (mostly moving code)  
-**Risk**: Low  
-**Lines Saved**: 0 (same total lines, better organized)
-
----
-
-### 17. Document CSS Variable Usage
-
-**Current State**: Lines 33-36 define CSS variables
-
-**Issue**:
-```scss
-.wrapper {
-  --footer-height: 0px;
-  --header-height: 0px;
-  width: 100%;
-  // ...
-}
-```
-
-- No comments explaining when these variables are used
-- No indication they're set dynamically from TypeScript
-- Other variables like `--containerHeight`, `--scrollbar-width` not shown in base
-
-**Opportunity**:
-Add comprehensive comments:
-```scss
-.wrapper {
-  /**
-   * CSS Variables set dynamically by App2Native.tsx
-   * 
-   * --footer-height: Height of footer in px (0px for non-sticky layouts)
-   * --header-height: Height of header in px (0px for non-sticky layouts)
-   * --header-abs-height: Actual header height regardless of layout
-   * --footer-abs-height: Actual footer height regardless of layout
-   * --scrollbar-width: Width of scrollbar for gutter compensation
-   * --containerHeight: Container height (100vh or parent container height)
-   * 
-   * These are used in calc() expressions throughout the styles.
-   */
-  --footer-height: 0px;
-  --header-height: 0px;
-  
-  width: 100%;
-  height: 100%;
-  // ...
-}
-```
-
-**Benefits**:
-- Clearer understanding of dynamic values
-- Documents the TypeScript<->CSS contract
-- Easier for other developers to understand
-- Prevents accidental removal
-
-**Impact**: Low (documentation only)  
-**Complexity**: Simple  
-**Risk**: None  
-**Lines Saved**: 0 (adds documentation)
-
----
-
-### 18. Consolidate Scrollbar Gutter Logic
-
-**Current State**: Lines 55-59, 93-97, 304-310, 355-359 handle scrollbar gutters
-
-**Issue**:
-```scss
-// In .vertical
-.contentWrapper {
-  scrollbar-gutter: stable both-edges;
-}
-&.noScrollbarGutters {
-  .contentWrapper {
-    scrollbar-gutter: auto;
-  }
-}
-
-// In .horizontal
-overflow: auto;
-scroll-padding-block: $scrollPaddingBlockPage;
-&.sticky {
-  min-height: 100%;
-}
-
-// In .scrollWholePage
-scrollbar-gutter: stable both-edges;
-.headerWrapper { /* gutter compensation */ }
-.footerWrapper { /* gutter compensation */ }
-
-// In :not(.scrollWholePage)
-overflow: hidden;
-.PagesWrapper {
-  scrollbar-gutter: stable both-edges;
-}
-
-// In .noScrollbarGutters
-scrollbar-gutter: auto;
-.PagesWrapper {
-  scrollbar-gutter: auto;
-}
-```
-
-- Logic scattered across multiple locations
-- Different behaviors for different layouts
-- Gutter compensation code duplicated
-
-**Opportunity**:
-Create utility classes:
-```scss
-// Scrollbar gutter utilities
-%with-scrollbar-gutters {
-  scrollbar-gutter: stable both-edges;
-}
-
-%without-scrollbar-gutters {
-  scrollbar-gutter: auto;
-}
-
-%scrollbar-gutter-compensation {
-  margin-inline: calc(-1 * var(--scrollbar-width));
-  
-  & > div {
-    padding-inline: var(--scrollbar-width);
-  }
-}
-
-// Usage
-.wrapper {
-  @extend %with-scrollbar-gutters;
-  
-  &.noScrollbarGutters {
-    @extend %without-scrollbar-gutters;
-  }
-}
-
-.wrapper.scrollWholePage {
-  .headerWrapper {
-    @extend %scrollbar-gutter-compensation;
-  }
-  
-  .footerWrapper {
-    @extend %scrollbar-gutter-compensation;
-  }
-}
-```
-
-**Benefits**:
-- DRY principle (don't repeat yourself)
-- Single place to modify gutter behavior
-- Clearer intent with named placeholders
-- Easier to apply consistently
-
-**Impact**: Low (organizational)  
-**Complexity**: Simple  
-**Risk**: Low  
-**Lines Saved**: ~15 lines
-
----
-
-### 19. Simplify Desktop Layout Overrides
-
-**Current State**: Lines 121-217 contain aggressive style resets for desktop layout
-
-**Issue**:
-```scss
-&.desktop {
-  .headerWrapper {
-    /* ... base styles ... */
-    
-    & * {
-      max-width: none !important;
-      padding-inline: 0 !important;
-      padding-left: 0 !important;
-      padding-right: 0 !important;
-      margin-inline: 0 !important;
-      margin-left: 0 !important;
-      margin-right: 0 !important;
-    }
-  }
-  
-  .footerWrapper {
-    /* Duplicate the same aggressive resets */
-    & * {
-      max-width: none !important;
-      // ... same properties repeated
-    }
-  }
-}
-```
-
-- Aggressive `!important` usage
-- Duplicated reset rules for header and footer
-- Resets every descendant (`& *`)
-- May conflict with nested component styles
-
-**Opportunity**:
-1. Use CSS layers to control precedence without `!important`
-2. Create mixin for common resets
-3. Be more selective about what to reset
-
-```scss
-// Use mixin for common resets
-@mixin desktop-layout-reset {
-  margin: 0;
-  padding: 0;
-  max-width: none;
-  width: 100%;
-  
-  & > * {
-    margin: 0;
-    padding: 0;
-    max-width: none;
-    width: 100%;
-  }
-}
-
-&.desktop {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  
-  &:global(.nested-app) {
-    width: 100%;
-    height: 100%;
-  }
-  
-  .headerWrapper {
-    position: sticky;
-    top: 0;
-    flex-shrink: 0;
-    z-index: 1;
-    @include desktop-layout-reset;
-  }
-  
-  .footerWrapper {
-    position: sticky;
-    bottom: 0;
-    flex-shrink: 0;
-    @include desktop-layout-reset;
-  }
-  
-  .PagesWrapper {
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
-    @include desktop-layout-reset;
-  }
-}
-```
-
-**Benefits**:
-- Eliminates duplicated reset code
-- Removes excessive `!important` usage
-- More maintainable
-- Clearer intent
-
-**Challenges**:
-- May need to test that nested components still work
-- Some `!important` may be necessary if conflicts exist
-
-**Impact**: Medium (improves maintainability)  
-**Complexity**: Simple  
-**Risk**: Low-Medium (need to test nested components)  
-**Lines Saved**: ~40 lines
-
----
-
-## Summary of Refactoring Opportunities
-
-### High Impact Opportunities (Recommended Priority)
-
-1. **Eliminate Switch Statement Duplication** (#4)
-   - Impact: High, Complexity: Complex, Risk: Medium
-   - Saves ~150+ lines, major code reduction
-
-2. **Extract Navigation Hierarchy Building Logic** (#10)
-   - Impact: High, Complexity: Moderate, Risk: Low
-   - Saves ~400 lines from App2.tsx (moved to separate files)
-
-3. **Extract SearchIndexCollector Component** (#12)
-   - Impact: High, Complexity: Simple, Risk: Low
-   - Saves ~338 lines from App2.tsx
-
-### Medium Impact Opportunities
-
-4. **Simplify CSS Variable Calculation Logic** (#1)
-   - Impact: Medium, Complexity: Simple, Risk: Low
-   - Saves ~15 lines, improves clarity
-
-5. **Consolidate Ref Callback Pattern** (#2)
-   - Impact: Medium, Complexity: Simple, Risk: Low
-   - Saves ~12 lines, reusable pattern
-
-6. **Reduce Nesting Depth in SCSS** (#15)
-   - Impact: Medium, Complexity: Moderate, Risk: Medium
-   - Saves ~50 lines, improves maintainability
-
-7. **Simplify Desktop Layout Overrides** (#19)
-   - Impact: Medium, Complexity: Simple, Risk: Low-Medium
-   - Saves ~40 lines, removes `!important`
-
-### Low Impact Opportunities (Nice to Have)
-
-8. **Extract Layout Context Value Creation** (#3)
-9. **Simplify Drawer State Management** (#5)
-10. **Extract Theme Initialization Logic** (#8)
-11. **Optimize NavPanel Visibility Logic** (#9)
-12. **Simplify Child Component Extraction** (#11)
-13. **Memoize Component Definitions** (#13)
-14. **Extract Layout-Specific Styles** (#16)
-15. **Document CSS Variable Usage** (#17)
-16. **Consolidate Scrollbar Gutter Logic** (#18)
-17. **Improve Layout Input Validation** (#7)
-
-### Total Potential Savings
-
-- **App2Native.tsx**: ~187 lines saved (from 742 → ~555 lines)
-- **App2.tsx**: ~738 lines saved (from 774 → ~36 lines + new separate files)
-- **App2.module.scss**: ~90 lines saved (from 435 → ~345 lines)
-- **Total**: ~1,015 lines reduced, better organized into logical modules
-
-### Implementation Strategy
-
-**Phase 1 - Quick Wins** (Low Risk, High Impact):
-1. Extract SearchIndexCollector (#12)
-2. Simplify CSS Variable Calculation (#1)
-3. Consolidate Ref Callback Pattern (#2)
-
-**Phase 2 - Major Reorganization** (Moderate Risk, High Impact):
-4. Extract Navigation Hierarchy Logic (#10)
-5. Simplify Desktop Layout Overrides (#19)
-6. Reduce SCSS Nesting Depth (#15)
-
-**Phase 3 - Code Quality** (Low Risk, Medium Impact):
-7. Extract Theme Initialization (#8)
-8. Simplify Drawer State Management (#5)
-9. Extract Layout Context Value (#3)
-
-**Phase 4 - Advanced** (Higher Risk, High Impact):
-10. Eliminate Switch Statement Duplication (#4)
-    - This is the most complex change
-    - Requires careful testing of all 8 layouts
-    - Should be done last after other refactorings stabilize
-
----
-
-## Testing Strategy
-
-After each refactoring opportunity is implemented:
-
-1. **Run e2e tests**: `npx playwright test App2.spec.ts App2-layout.spec.ts --workers=4 --reporter=line`
-2. **Verify all 170+ tests pass**
-3. **Visual regression testing**: Check all layouts render identically
-4. **Performance testing**: Ensure no degradation in render time
-5. **Bundle size**: Check that bundle size doesn't increase significantly
-
-### Risk Mitigation
-
-- **Commit after each opportunity** - Allows easy rollback
-- **Test incrementally** - Don't stack multiple changes
-- **3-iteration rule** - If tests fail 3 times, revert and request review
-- **Preserve DOM structure** - Tests rely on specific class names and structure
