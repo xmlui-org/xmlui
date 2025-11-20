@@ -476,3 +476,160 @@ Variants with overflow:
 
 After reviewing the App2 component against the requirements of **reducing code lines** and **minimizing file hops**, the following opportunities have been identified:
 
+### Current State Analysis
+
+**File Structure:**
+- `App2.tsx` (528 lines) - Component renderer and navigation extraction
+- `App2Native.tsx` (855 lines) - Main component implementation
+- `SearchIndexCollector.tsx` (179 lines) - Search indexing logic
+- `SearchContext.tsx` (47 lines) - Search state management
+- `Sheet.tsx` (95 lines) - Drawer/sheet component
+- `LinkInfoContext.ts` (13 lines) - Link hierarchy context
+- `IndexerContext.ts` (8 lines) - Indexer state context
+- `AppStateContext.ts` (12 lines) - App state context (unused in App2)
+- **Total production code: 1,737 lines** (excluding test files)
+
+**Key Observations:**
+1. The refactoring has successfully created a clean slot-based architecture
+2. Layout configurations are centralized in `layoutConfigs` object
+3. Helper functions are well-organized and focused
+4. Context usage is minimal and appropriate
+
+### Refactoring Opportunities
+
+#### 1. **Inline Small Helper Functions (Priority: Low)**
+
+**Current State:**
+Multiple small helper functions in `App2Native.tsx`:
+- `getAppLayoutOrientation()` (7 lines) - used in one location
+- Layout config structure has some repetition
+
+**Opportunity:**
+Consider inlining `getAppLayoutOrientation()` at its single call site, or move it to where it's used if it's in a different file.
+
+**Benefit:**
+- Reduces indirection
+- Saves 5-7 lines
+
+**Trade-off:** Slightly reduces testability for this single function
+
+#### 2. **Optimize Layout Configuration Structure (Priority: Medium)**
+
+**Current State:**
+The `layoutConfigs` object contains some redundant properties:
+- Many layouts share identical `headerClasses`, `footerClasses`, `contentWrapperRef`
+- Default values could be established with spread operators
+
+**Opportunity:**
+Create a base configuration and extend it:
+
+```typescript
+const baseConfig: LayoutConfig = {
+  containerClasses: [],
+  headerClasses: [],
+  footerClasses: [],
+  navPanelPosition: "none",
+  contentWrapperRef: "content",
+};
+
+const layoutConfigs: Record<AppLayoutType, LayoutConfig> = {
+  "vertical": {
+    ...baseConfig,
+    containerClasses: [styles.vertical],
+    navPanelPosition: "side",
+    contentWrapperRef: "page",
+  },
+  // ... other configs
+};
+```
+
+**Benefit:**
+- Reduces repetition
+- Saves ~40-50 lines
+- Makes config structure more maintainable
+
+**Estimated savings:** ~45 lines
+
+#### 3. **Extract Navigation Processing (Priority: Low)**
+
+**Current State:**
+`App2.tsx` contains 200+ lines of navigation extraction logic intermingled with the renderer setup.
+
+**Opportunity:**
+Extract all navigation-related functions into a separate `App2Navigation.ts` utility file:
+- `parseHierarchyLabels()`
+- `extractAppComponents()`
+- `extractFromThemeWrapper()`
+- `extractDirectChild()`
+- `findOrCreateNavGroup()`
+- `labelExistsInHierarchy()`
+- `processNavItems()`
+- `extractNavPanelFromPages()`
+
+**Benefit:**
+- Better separation of concerns
+- Easier to test navigation logic independently
+- Reduces `App2.tsx` from 528 to ~320 lines
+
+**Trade-off:** Adds one more file (but improves organization)
+
+**Estimated impact:** Better organization, no line count reduction
+
+#### 4. **Simplify SearchIndexCollector State Management (Priority: Low)**
+
+**Current State:**
+`SearchIndexCollector.tsx` and `PageIndexer` use multiple state variables and transitions:
+- `isClient`, `currentIndex`, `isDoneIndexing` in SearchIndexCollector
+- `isContentRendered`, `isCollected`, `isProcessing` in PageIndexer
+
+**Opportunity:**
+Consolidate related states into a single state machine or reducer pattern:
+
+```typescript
+type IndexingState = 
+  | { status: 'initializing' }
+  | { status: 'indexing', currentIndex: number }
+  | { status: 'complete' };
+```
+
+**Benefit:**
+- Clearer state transitions
+- Reduces state management complexity
+- Saves ~15-20 lines
+
+**Estimated savings:** ~18 lines
+
+#### 5. **Consolidate Slot Components (Priority: Low)**
+
+**Current State:**
+Six nearly identical slot components in `App2Native.tsx`:
+- `AppContainer`, `AppHeaderSlot`, `AppFooterSlot`, `AppNavPanelSlot`, `AppContentSlot`, `AppPagesSlot`
+
+**Opportunity:**
+Create a generic slot component factory:
+
+```typescript
+function createSlot(displayName: string, className?: string) {
+  const Slot = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+    ({ className: customClass, children, ...rest }, ref) => (
+      <div {...rest} className={classnames(className, customClass)} ref={ref}>
+        {children}
+      </div>
+    )
+  );
+  Slot.displayName = displayName;
+  return Slot;
+}
+
+const AppHeaderSlot = createSlot('AppHeaderSlot', styles.headerWrapper);
+// ... etc
+```
+
+**Benefit:**
+- Reduces repetition
+- Saves ~50-60 lines
+- Makes slot creation more maintainable
+
+**Trade-off:** Slightly more complex, but more DRY
+
+**Estimated savings:** ~55 lines

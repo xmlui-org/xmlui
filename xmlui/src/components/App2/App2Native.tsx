@@ -648,11 +648,11 @@ function useDrawerState(
 
 /**
  * Custom hook for observing element size changes.
- * Returns a ref callback and the observed size dimensions.
+ * Returns a ref callback and the observed height.
  */
 function useElementSizeObserver() {
   const ref = useRef<HTMLElement | null>(null);
-  const [size, setSize] = useState({ width: 0, height: 0 });
+  const [height, setHeight] = useState(0);
   
   const refCallback = useCallback((element: HTMLElement | null) => {
     ref.current = element;
@@ -663,12 +663,12 @@ function useElementSizeObserver() {
     useCallback((entries) => {
       const rect = entries?.[0]?.contentRect;
       if (rect) {
-        setSize({ width: rect.width, height: rect.height });
+        setHeight(rect.height);
       }
     }, [])
   );
   
-  return { refCallback, size, height: size.height, width: size.width };
+  return { refCallback, height };
 }
 
 /**
