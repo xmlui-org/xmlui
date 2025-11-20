@@ -48,13 +48,16 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       overflow: initial;
 
       .contentWrapper {
-        overflow: auto;
-        position: relative;
         scrollbar-gutter: stable both-edges;
       }
       &.noScrollbarGutters {
         .contentWrapper {
           scrollbar-gutter: auto;
+        }
+      }
+      &:not(.scrollWholePage) {
+        .contentWrapper {
+          overflow: initial;
         }
       }
       .navPanelWrapper {
@@ -178,6 +181,11 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       min-height: 100%;
       height: 100%;
       overflow: auto;
+      
+      .contentWrapper {
+        overflow: initial;
+      }
+      
       .navPanelWrapper {
         width: $width-navPanel-App;
         position: sticky;
@@ -277,9 +285,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
         min-height: 0;
         height: 100%;
       }
-      .contentWrapper {
-        overflow: initial;
-      }
       .PagesWrapper {
         overflow: auto;
         min-height: 0;
@@ -339,6 +344,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     flex: 1;
     display: flex;
     flex-direction: column;
+    overflow: auto;
     box-shadow: $boxShadow-navPanel-App;
     background-color: $backgroundColor-content-App;
     border-left: $borderLeft-content-App;
