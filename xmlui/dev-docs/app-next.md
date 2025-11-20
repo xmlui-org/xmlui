@@ -472,164 +472,156 @@ Variants with overflow:
 
 ---
 
-## Refactoring Opportunities
+## SCSS Refactoring Opportunities
 
-After reviewing the App2 component against the requirements of **reducing code lines** and **minimizing file hops**, the following opportunities have been identified:
+After reviewing `App2.module.scss` (438 lines), the following refactoring opportunities have been identified to make the style classes more straightforward and reduce file size:
 
-### Current State Analysis
+### 1. Consolidate Scrollbar Gutter Logic
 
-**File Structure:**
-- `App2.tsx` (528 lines) - Component renderer and navigation extraction
-- `App2Native.tsx` (855 lines) - Main component implementation
-- `SearchIndexCollector.tsx` (179 lines) - Search indexing logic
-- `SearchContext.tsx` (47 lines) - Search state management
-- `Sheet.tsx` (95 lines) - Drawer/sheet component
-- `LinkInfoContext.ts` (13 lines) - Link hierarchy context
-- `IndexerContext.ts` (8 lines) - Indexer state context
-- `AppStateContext.ts` (12 lines) - App state context (unused in App2)
-- **Total production code: 1,737 lines** (excluding test files)
+**Current State**: The scrollbar gutter compensation logic is spread across multiple mixins and modifier classes with repetitive patterns.
 
-**Key Observations:**
-1. The refactoring has successfully created a clean slot-based architecture
-2. Layout configurations are centralized in `layoutConfigs` object
-3. Helper functions are well-organized and focused
-4. Context usage is minimal and appropriate
+**Opportunity**: 
+- The `.scrollWholePage` and `.noScrollbarGutters` modifiers contain highly repetitive scrollbar-gutter management
+- The scrollbar compensation mixins (`scrollbar-compensation-container`, `scrollbar-compensation-content`, `scrollbar-compensation-full-width`) are only used in 3 places
+- Consider inline application or simplified conditional logic
 
-### Refactoring Opportunities
+**Potential Savings**: ~30-40 lines
 
-#### 1. **Inline Small Helper Functions (Priority: Low)**
+### 2. Simplify Desktop Layout Reset Logic
 
-**Current State:**
-Multiple small helper functions in `App2Native.tsx`:
-- `getAppLayoutOrientation()` (7 lines) - used in one location
-- Layout config structure has some repetition
+**Current State**: The desktop layout uses three separate mixins for spacing resets with significant overlap:
+- `reset-spacing-constraints` (5 properties)
+- `reset-inline-spacing` (6 properties)  
+- Applied multiple times with nested selectors (`& > *`, `& *`)
 
-**Opportunity:**
-Consider inlining `getAppLayoutOrientation()` at its single call site, or move it to where it's used if it's in a different file.
+**Opportunity**:
+- Merge into a single comprehensive reset mixin since they're always used together in desktop mode
+- The nested selector pattern (`& > *` then `& *`) creates redundancy
+- Many !important declarations could be consolidated
 
-**Benefit:**
-- Reduces indirection
-- Saves 5-7 lines
+**Potential Savings**: ~15-20 lines
 
-**Trade-off:** Slightly reduces testability for this single function
+### 3. Consolidate Sticky Footer Logic
 
-#### 2. **Optimize Layout Configuration Structure (Priority: Medium)**
+**Current State**: Footer sticky positioning is duplicated across multiple layout variants:
+- `.vertical .sticky .footerWrapper`
+- `.horizontal.sticky .footerWrapper`
+- `.verticalFullHeader .footerWrapper`
+- Each has identical `position: sticky; bottom: 0;` with the same `.nonSticky` override
 
-**Current State:**
-The `layoutConfigs` object contains some redundant properties:
-- Many layouts share identical `headerClasses`, `footerClasses`, `contentWrapperRef`
-- Default values could be established with spread operators
+**Opportunity**:
+- Extract common sticky footer behavior to a base class
+- Use a single `.sticky .footerWrapper` rule with layout-specific overrides only when needed
+- The `.nonSticky` override pattern is repeated 4 times
 
-**Opportunity:**
-Create a base configuration and extend it:
+**Potential Savings**: ~12-15 lines
 
-```typescript
-const baseConfig: LayoutConfig = {
-  containerClasses: [],
-  headerClasses: [],
-  footerClasses: [],
-  navPanelPosition: "none",
-  contentWrapperRef: "content",
-};
+### 4. Reduce scroll-padding-block Repetition
 
-const layoutConfigs: Record<AppLayoutType, LayoutConfig> = {
-  "vertical": {
-    ...baseConfig,
-    containerClasses: [styles.vertical],
-    navPanelPosition: "side",
-    contentWrapperRef: "page",
-  },
-  // ... other configs
-};
-```
+**Current State**: `scroll-padding-block: $scrollPaddingBlockPage;` appears 5 times across different layout variants.
 
-**Benefit:**
-- Reduces repetition
-- Saves ~40-50 lines
-- Makes config structure more maintainable
+**Opportunity**:
+- Set at the wrapper level once with strategic overrides
+- Most layouts need this value; exceptions are rare
 
-**Estimated savings:** ~45 lines
+**Potential Savings**: ~3-5 lines
 
-#### 3. **Extract Navigation Processing (Priority: Low)**
+### 5. Simplify Content/ContentWrapper Relationship
 
-**Current State:**
-`App2.tsx` contains 200+ lines of navigation extraction logic intermingled with the renderer setup.
+**Current State**: The `.content` and `.contentWrapper` classes have overlapping concerns with layout-specific variations scattered throughout the file.
 
-**Opportunity:**
-Extract all navigation-related functions into a separate `App2Navigation.ts` utility file:
-- `parseHierarchyLabels()`
-- `extractAppComponents()`
-- `extractFromThemeWrapper()`
-- `extractDirectChild()`
-- `findOrCreateNavGroup()`
-- `labelExistsInHierarchy()`
-- `processNavItems()`
-- `extractNavPanelFromPages()`
+**Opportunity**:
+- The base definitions are at the bottom (lines 368-392) but modifications are in layout-specific sections above
+- Reorganize to have all content-related styles together
+- The `overflow: initial` pattern appears multiple times for contentWrapper
 
-**Benefit:**
-- Better separation of concerns
-- Easier to test navigation logic independently
-- Reduces `App2.tsx` from 528 to ~320 lines
+**Potential Savings**: ~10-15 lines (through consolidation, not removal)
 
-**Trade-off:** Adds one more file (but improves organization)
+### 6. Eliminate Redundant Overflow Declarations
 
-**Estimated impact:** Better organization, no line count reduction
+**Current State**: Multiple redundant overflow declarations:
+- `.vertical .contentWrapper { overflow: auto; }` then later modified to `overflow: initial;`
+- `.desktop { overflow: hidden; }` at wrapper level
+- `.PagesWrapper` has various overflow values depending on context
 
-#### 4. **Simplify SearchIndexCollector State Management (Priority: Low)**
+**Opportunity**:
+- Establish clear overflow hierarchy with fewer overrides
+- Use more strategic defaults to reduce exceptions
 
-**Current State:**
-`SearchIndexCollector.tsx` and `PageIndexer` use multiple state variables and transitions:
-- `isClient`, `currentIndex`, `isDoneIndexing` in SearchIndexCollector
-- `isContentRendered`, `isCollected`, `isProcessing` in PageIndexer
+**Potential Savings**: ~5-8 lines
 
-**Opportunity:**
-Consolidate related states into a single state machine or reducer pattern:
+### 7. Consolidate Height/Min-Height Patterns
 
-```typescript
-type IndexingState = 
-  | { status: 'initializing' }
-  | { status: 'indexing', currentIndex: number }
-  | { status: 'complete' };
-```
+**Current State**: Height calculations using CSS variables appear multiple times with similar patterns:
+- `calc(var(--containerHeight, 100vh) - var(--header-height) - var(--effective-footer-height))`
+- Used for both `height` and `min-height` in navPanelWrapper and PagesWrapper in verticalFullHeader
 
-**Benefit:**
-- Clearer state transitions
-- Reduces state management complexity
-- Saves ~15-20 lines
+**Opportunity**:
+- Create a shared CSS custom property for this calculation
+- Reference it in multiple places instead of repeating the calc
 
-**Estimated savings:** ~18 lines
+**Potential Savings**: ~3-5 lines
 
-#### 5. **Consolidate Slot Components (Priority: Low)**
+### 8. Simplify PagesWrapper Layout Logic
 
-**Current State:**
-Six nearly identical slot components in `App2Native.tsx`:
-- `AppContainer`, `AppHeaderSlot`, `AppFooterSlot`, `AppNavPanelSlot`, `AppContentSlot`, `AppPagesSlot`
+**Current State**: PagesWrapper and PagesWrapperInner have complex, context-dependent styling:
+- Different min-height values across layouts (100%, initial, calc-based, 0)
+- Different display/flex settings
+- Height values that change based on scroll container
 
-**Opportunity:**
-Create a generic slot component factory:
+**Opportunity**:
+- Establish clearer base defaults
+- Reduce the number of overrides needed for each layout variant
+- The `height: 0` in `.PagesWrapperInner` (line 361) when not scrollWholePage seems like a workaround
 
-```typescript
-function createSlot(displayName: string, className?: string) {
-  const Slot = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-    ({ className: customClass, children, ...rest }, ref) => (
-      <div {...rest} className={classnames(className, customClass)} ref={ref}>
-        {children}
-      </div>
-    )
-  );
-  Slot.displayName = displayName;
-  return Slot;
+**Potential Savings**: ~8-12 lines
+
+### 9. Desktop Layout Specificity Reduction
+
+**Current State**: Desktop layout has deeply nested selectors with repetitive !important overrides:
+```scss
+.desktop {
+  .headerWrapper {
+    & > * { }
+    & * { }
+    :global(.headerInner) { }
+  }
 }
-
-const AppHeaderSlot = createSlot('AppHeaderSlot', styles.headerWrapper);
-// ... etc
 ```
 
-**Benefit:**
-- Reduces repetition
-- Saves ~50-60 lines
-- Makes slot creation more maintainable
+**Opportunity**:
+- Flatten selector hierarchy where possible
+- Use more targeted selectors to avoid `& *` universal child selectors
+- Reduce !important usage with better specificity planning
 
-**Trade-off:** Slightly more complex, but more DRY
+**Potential Savings**: ~10-15 lines
 
-**Estimated savings:** ~55 lines
+### 10. Extract Common Flex Container Pattern
+
+**Current State**: Several elements repeat the same flex container pattern:
+```scss
+display: flex;
+flex-direction: column;
+```
+
+**Opportunity**:
+- Used in: wrapper, contentWrapper, PagesWrapper, PagesWrapperInner, desktop PagesWrapper
+- Could be extracted to a mixin or base class for DRY
+
+**Potential Savings**: ~5-8 lines
+
+### Summary
+
+**Total Potential Line Reduction**: ~100-150 lines (23-34% reduction from 438 lines)
+
+**Priority Order** (by impact):
+1. Consolidate scrollbar gutter logic (#1)
+2. Simplify desktop layout resets (#2)  
+3. Consolidate sticky footer logic (#3)
+4. Simplify PagesWrapper layout logic (#8)
+5. Desktop layout specificity reduction (#9)
+6. Remaining smaller optimizations (#4, #5, #6, #7, #10)
+
+**Implementation Note**: These refactorings should be done incrementally with test validation after each change to ensure no visual regressions occur.
+
+---

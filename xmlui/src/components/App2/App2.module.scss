@@ -39,22 +39,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
   margin-right: 0 !important;
 }
 
-// --- Mixins for scrollbar gutter compensation ---
-// When scrollbar-gutter: stable both-edges is used, the browser reserves space for scrollbars.
-// These mixins compensate for that reserved space to achieve full-width appearance
-// while maintaining the scrollbar reservation for consistent layout.
-@mixin scrollbar-compensation-container {
-  margin-inline: calc(-1 * var(--scrollbar-width));
-}
-
-@mixin scrollbar-compensation-content {
-  padding-inline: var(--scrollbar-width);
-}
-
-@mixin scrollbar-compensation-full-width {
-  width: calc(100% + (2 * var(--scrollbar-width)));
-}
-
 @layer components {
   .wrapper {
     --footer-height: 0px;
@@ -290,39 +274,37 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       scrollbar-gutter: stable both-edges;
 
       .headerWrapper {
-        @include scrollbar-compensation-container;
+        margin-inline: calc(-1 * var(--scrollbar-width));
         & > div {
-          @include scrollbar-compensation-content;
+          padding-inline: var(--scrollbar-width);
         }
       }
 
       .footerWrapper {
-        @include scrollbar-compensation-container;
+        margin-inline: calc(-1 * var(--scrollbar-width));
         & > div {
-          @include scrollbar-compensation-content;
+          padding-inline: var(--scrollbar-width);
         }
       }
 
       &.verticalFullHeader {
         .content {
-          @include scrollbar-compensation-container;
-          @include scrollbar-compensation-full-width;
+          margin-inline: calc(-1 * var(--scrollbar-width));
+          width: calc(100% + (2 * var(--scrollbar-width)));
         }
         .contentWrapper {
-          @include scrollbar-compensation-content;
+          padding-inline: var(--scrollbar-width);
         }
       }
 
       &.desktop {
         scrollbar-gutter: auto;
-
         .headerWrapper {
           margin-inline: 0;
           & > div {
             padding-inline: 0;
           }
         }
-
         .footerWrapper {
           margin-inline: 0;
           & > div {
