@@ -171,6 +171,9 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     &.verticalFullHeader {
       // Set effective footer height based on whether footer is sticky
       --effective-footer-height: var(--footer-height);
+      --content-available-height: calc(
+        var(--containerHeight, 100vh) - var(--header-height) - var(--effective-footer-height)
+      );
       
       &.noFooter {
         --effective-footer-height: 0px;
@@ -187,9 +190,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       .navPanelWrapper {
         width: $width-navPanel-App;
         position: sticky;
-        height: calc(
-          var(--containerHeight, 100vh) - var(--header-height) - var(--effective-footer-height)
-        );
+        height: var(--content-available-height);
         top: var(--header-height);
 
         &::before {
@@ -211,9 +212,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
       .PagesWrapper {
         overflow: initial;
-        min-height: calc(
-          var(--containerHeight, 100vh) - var(--header-height) - var(--effective-footer-height)
-        );
+        min-height: var(--content-available-height);
         height: 100%;
       }
 
