@@ -1,6 +1,7 @@
 import {
   type CSSProperties,
   type ReactNode,
+  forwardRef,
   useCallback,
   useEffect,
   useMemo,
@@ -14,12 +15,6 @@ import { noop } from "lodash-es";
 import classnames from "classnames";
 
 import styles from "./App2.module.scss";
-import { AppContainer } from "./AppContainer";
-import { AppHeaderSlot } from "./AppHeaderSlot";
-import { AppFooterSlot } from "./AppFooterSlot";
-import { AppNavPanelSlot } from "./AppNavPanelSlot";
-import { AppContentSlot } from "./AppContentSlot";
-import { AppPagesSlot } from "./AppPagesSlot";
 
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { RenderChildFn, RegisterComponentApiFn } from "../../abstractions/RendererDefs";
@@ -35,6 +30,94 @@ import { SearchContextProvider } from "./SearchContext";
 import type { NavHierarchyNode } from "../NavPanel/NavPanelNative";
 import { LinkInfoContext } from "./LinkInfoContext";
 import { EMPTY_OBJECT } from "../../components-core/constants";
+
+// --- Slot Components ---
+
+interface AppContainerProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+const AppContainer = forwardRef<HTMLDivElement, AppContainerProps>(
+  ({ className, children, ...rest }, ref) => {
+    return (
+      <div {...rest} className={className} ref={ref}>
+        {children}
+      </div>
+    );
+  }
+);
+
+AppContainer.displayName = "AppContainer";
+
+interface AppHeaderSlotProps extends React.HTMLAttributes<HTMLElement> {}
+
+const AppHeaderSlot = forwardRef<HTMLElement, AppHeaderSlotProps>(
+  ({ className, children, ...rest }, ref) => {
+    return (
+      <header {...rest} className={classnames(styles.headerWrapper, className)} ref={ref}>
+        {children}
+      </header>
+    );
+  }
+);
+
+AppHeaderSlot.displayName = "AppHeaderSlot";
+
+interface AppFooterSlotProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+const AppFooterSlot = forwardRef<HTMLDivElement, AppFooterSlotProps>(
+  ({ className, children, ...rest }, ref) => {
+    return (
+      <div {...rest} className={classnames(styles.footerWrapper, className)} ref={ref}>
+        {children}
+      </div>
+    );
+  }
+);
+
+AppFooterSlot.displayName = "AppFooterSlot";
+
+interface AppNavPanelSlotProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+const AppNavPanelSlot = forwardRef<HTMLDivElement, AppNavPanelSlotProps>(
+  ({ className, children, ...rest }, ref) => {
+    return (
+      <div {...rest} className={classnames(styles.navPanelWrapper, className)} ref={ref}>
+        {children}
+      </div>
+    );
+  }
+);
+
+AppNavPanelSlot.displayName = "AppNavPanelSlot";
+
+interface AppContentSlotProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+const AppContentSlot = forwardRef<HTMLDivElement, AppContentSlotProps>(
+  ({ className, children, ...rest }, ref) => {
+    return (
+      <div {...rest} className={classnames(styles.contentWrapper, className)} ref={ref}>
+        {children}
+      </div>
+    );
+  }
+);
+
+AppContentSlot.displayName = "AppContentSlot";
+
+interface AppPagesSlotProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+const AppPagesSlot = forwardRef<HTMLDivElement, AppPagesSlotProps>(
+  ({ className, children, ...rest }, ref) => {
+    return (
+      <div {...rest} className={classnames(styles.PagesWrapper, className)} ref={ref}>
+        {children}
+      </div>
+    );
+  }
+);
+
+AppPagesSlot.displayName = "AppPagesSlot";
+
+// --- Component Types ---
 
 type Props = {
   children: ReactNode;
@@ -208,62 +291,26 @@ export function App2({
   const contentScrollRef = useRef(null);
 
   const scrollContainerRef = scrollWholePage ? pageScrollRef : contentScrollRef;
-  const [footerHeight, setFooterHeight] = useState(0);
-  const [headerHeight, setHeaderHeight] = useState(0);
   const scrollbarWidth = useScrollbarWidth();
 
-  const footerRef = useRef<HTMLDivElement | null>();
-  const footerRefCallback = useCallback((element: HTMLDivElement | null) => {
-    footerRef.current = element;
-  }, []);
-
-  const headerRef = useRef<HTMLDivElement | null>();
-  const headerRefCallback = useCallback((element: HTMLDivElement | null) => {
-    headerRef.current = element;
-  }, []);
-
-  useResizeObserver(
-    footerRef,
-    useCallback((entries) => {
-      setFooterHeight(entries?.[0]?.contentRect?.height);
-    }, []),
-  );
-
-  useResizeObserver(
-    headerRef,
-    useCallback((entries) => {
-      setHeaderHeight(entries?.[0]?.contentRect?.height);
-    }, []),
-  );
+  const footerSize = useElementSizeObserver();
+  const headerSize = useElementSizeObserver();
 
   const styleWithHelpers = useMemo(() => {
+    // Determine if we need header/footer height compensation for sticky layouts
+    const heightConfig = getLayoutHeightConfig(safeLayout, scrollWholePage);
+    
     return {
       ...style,
-      "--header-height":
-        !scrollWholePage ||
-        safeLayout === "vertical" ||
-        safeLayout === "horizontal" ||
-        safeLayout === "condensed"
-          ? "0px"
-          : safeLayout === "desktop"
-          ? headerHeight + "px"
-          : headerHeight + "px",
-      "--footer-height":
-        !scrollWholePage ||
-        safeLayout === "vertical" ||
-        safeLayout === "horizontal" ||
-        safeLayout === "condensed"
-          ? "0px"
-          : safeLayout === "desktop"
-          ? footerHeight + "px"
-          : footerHeight + "px",
-      "--header-abs-height": headerHeight + "px",
-      "--footer-abs-height": footerHeight + "px",
+      "--header-height": heightConfig.useHeaderHeight ? `${headerSize.height}px` : "0px",
+      "--footer-height": heightConfig.useFooterHeight ? `${footerSize.height}px` : "0px",
+      "--header-abs-height": headerSize.height + "px",
+      "--footer-abs-height": footerSize.height + "px",
       "--scrollbar-width": noScrollbarGutters ? "0px" : scrollbarWidth + "px",
     } as CSSProperties;
   }, [
-    footerHeight,
-    headerHeight,
+    footerSize.height,
+    headerSize.height,
     noScrollbarGutters,
     safeLayout,
     scrollWholePage,
@@ -413,13 +460,13 @@ export function App2({
         >
           {navPanelVisible && <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>}
           <AppContentSlot ref={pageScrollRef}>
-            <AppHeaderSlot ref={headerRefCallback}>
+            <AppHeaderSlot ref={headerSize.refCallback}>
               {header}
             </AppHeaderSlot>
             <AppPagesSlot ref={contentScrollRef}>
               <div className={pagesWrapperClasses}>{children}</div>
             </AppPagesSlot>
-            <AppFooterSlot ref={footerRefCallback}>
+            <AppFooterSlot ref={footerSize.refCallback}>
               {footer}
             </AppFooterSlot>
           </AppContentSlot>
@@ -436,7 +483,7 @@ export function App2({
           {navPanelVisible && <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>}
           <AppContentSlot ref={pageScrollRef}>
             <AppHeaderSlot
-              ref={headerRefCallback}
+              ref={headerSize.refCallback}
               className={styles.sticky}
             >
               {header}
@@ -448,7 +495,7 @@ export function App2({
               className={classnames({
                 [styles.nonSticky]: footerShouldBeNonSticky,
               })}
-              ref={footerRefCallback}
+              ref={footerSize.refCallback}
             >
               {footer}
             </AppFooterSlot>
@@ -466,7 +513,7 @@ export function App2({
         >
           <AppHeaderSlot
             className={styles.sticky}
-            ref={headerRefCallback}
+            ref={headerSize.refCallback}
           >
             {header}
           </AppHeaderSlot>
@@ -482,7 +529,7 @@ export function App2({
             className={classnames({
               [styles.nonSticky]: footerShouldBeNonSticky,
             })}
-            ref={footerRefCallback}
+            ref={footerSize.refCallback}
           >
             {footer}
           </AppFooterSlot>
@@ -504,7 +551,7 @@ export function App2({
             className={classnames("app-layout-condensed", {
               [styles.sticky]: safeLayout === "condensed-sticky",
             })}
-            ref={headerRefCallback}
+            ref={headerSize.refCallback}
           >
             {!hasRegisteredHeader && hasRegisteredNavPanel && (
               <AppContextAwareAppHeader renderChild={renderChild} />
@@ -518,7 +565,7 @@ export function App2({
             className={classnames({
               [styles.nonSticky]: footerShouldBeNonSticky,
             })}
-            ref={footerRefCallback}
+            ref={footerSize.refCallback}
           >
             {footer}
           </AppFooterSlot>
@@ -533,14 +580,14 @@ export function App2({
           ref={pageScrollRef}
           {...rest}
         >
-          <AppHeaderSlot ref={headerRefCallback}>
+          <AppHeaderSlot ref={headerSize.refCallback}>
             {header}
             {navPanelVisible && <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>}
           </AppHeaderSlot>
           <AppPagesSlot ref={contentScrollRef}>
             <div className={pagesWrapperClasses}>{children}</div>
           </AppPagesSlot>
-          <AppFooterSlot ref={footerRefCallback}>
+          <AppFooterSlot ref={footerSize.refCallback}>
             {footer}
           </AppFooterSlot>
         </AppContainer>
@@ -557,7 +604,7 @@ export function App2({
         >
           <AppHeaderSlot
             className={styles.sticky}
-            ref={headerRefCallback}
+            ref={headerSize.refCallback}
           >
             {header}
             {navPanelVisible && <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>}
@@ -569,7 +616,7 @@ export function App2({
             className={classnames({
               [styles.nonSticky]: footerShouldBeNonSticky,
             })}
-            ref={footerRefCallback}
+            ref={footerSize.refCallback}
           >
             {footer}
           </AppFooterSlot>
@@ -586,7 +633,7 @@ export function App2({
           {header && (
             <AppHeaderSlot
               className={styles.sticky}
-              ref={headerRefCallback}
+              ref={headerSize.refCallback}
             >
               {header}
             </AppHeaderSlot>
@@ -599,7 +646,7 @@ export function App2({
               className={classnames({
                 [styles.nonSticky]: footerShouldBeNonSticky,
               })}
-              ref={footerRefCallback}
+              ref={footerSize.refCallback}
             >
               {footer}
             </AppFooterSlot>
@@ -655,4 +702,56 @@ export function getAppLayoutOrientation(appLayout?: AppLayoutType) {
     default:
       return "horizontal";
   }
+}
+
+/**
+ * Custom hook for observing element size changes.
+ * Returns a ref callback and the current size (width and height).
+ */
+function useElementSizeObserver() {
+  const ref = useRef<HTMLElement | null>(null);
+  const [size, setSize] = useState({ width: 0, height: 0 });
+  
+  const refCallback = useCallback((element: HTMLElement | null) => {
+    ref.current = element;
+  }, []);
+  
+  useResizeObserver(
+    ref,
+    useCallback((entries) => {
+      const rect = entries?.[0]?.contentRect;
+      if (rect) {
+        setSize({ width: rect.width, height: rect.height });
+      }
+    }, [])
+  );
+  
+  return { refCallback, size, height: size.height, width: size.width };
+}
+
+/**
+ * Helper function to determine if header/footer height CSS variables should be set
+ * based on the layout type and scroll strategy.
+ * 
+ * Non-sticky layouts (vertical, horizontal, condensed) with scrollWholePage=true don't 
+ * need height compensation because the header/footer scroll with the page.
+ * 
+ * Sticky layouts (vertical-sticky, vertical-full-header, desktop) or content-only scroll
+ * need height compensation so content can be positioned correctly.
+ */
+function getLayoutHeightConfig(
+  layout: AppLayoutType,
+  scrollWholePage: boolean
+): { useHeaderHeight: boolean; useFooterHeight: boolean } {
+  // Non-sticky layouts with whole-page scroll don't need height compensation
+  if (scrollWholePage && (
+    layout === "vertical" ||
+    layout === "horizontal" ||
+    layout === "condensed"
+  )) {
+    return { useHeaderHeight: false, useFooterHeight: false };
+  }
+  
+  // All other cases need height compensation (sticky layouts or content-only scroll)
+  return { useHeaderHeight: true, useFooterHeight: true };
 }
