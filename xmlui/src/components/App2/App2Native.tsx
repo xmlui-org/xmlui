@@ -198,20 +198,6 @@ const VALID_LAYOUTS: AppLayoutType[] = [
  * - On small screens: show inline only if there's no header to contain the drawer button,
  *   except for condensed layouts which always use the header for the drawer button
  */
-function shouldShowNavPanelInline(
-  hasNavPanel: boolean,
-  isLargeScreen: boolean,
-  hasHeader: boolean,
-  layout: AppLayoutType
-): boolean {
-  if (!hasNavPanel) return false;
-  if (isLargeScreen) return true;
-  
-  // On small screens, show inline only if no header (except condensed layouts which need header)
-  const isCondensedLayout = layout === "condensed" || layout === "condensed-sticky";
-  return !hasHeader && !isCondensedLayout;
-}
-
 /**
  * Validates and sanitizes layout input.
  * 
@@ -312,13 +298,12 @@ export function App2({
   }, [onMessageReceived]);
 
   // Determine if NavPanel should be visible inline (not in drawer)
-  // Uses helper function to encapsulate the visibility logic
-  const navPanelVisible = shouldShowNavPanelInline(
-    hasRegisteredNavPanel,
-    mediaSize.largeScreen,
-    hasRegisteredHeader,
-    safeLayout
-  );
+  // On large screens: always show inline
+  // On small screens: show inline only if there's no header to contain the drawer button,
+  // except for condensed layouts which always use the header for the drawer button
+  const isCondensedLayout = safeLayout === "condensed" || safeLayout === "condensed-sticky";
+  const navPanelVisible = hasRegisteredNavPanel &&
+    (mediaSize.largeScreen || (!hasRegisteredHeader && !isCondensedLayout));
 
   // Refs for scroll containers - naming clarified for better understanding
   // pageScrollRef: used when scrollWholePage=true (entire page scrolls)
