@@ -494,15 +494,15 @@ export function App2({
     case "condensed-sticky":
       content = (
         <AppContainer
-          {...rest}
           className={classnames(wrapperBaseClasses, styles.horizontal, {
             [styles.sticky]: safeLayout === "condensed-sticky",
           })}
           style={styleWithHelpers}
           ref={pageScrollRef}
+          {...rest}
         >
-          <header
-            className={classnames("app-layout-condensed", styles.headerWrapper, {
+          <AppHeaderSlot
+            className={classnames("app-layout-condensed", {
               [styles.sticky]: safeLayout === "condensed-sticky",
             })}
             ref={headerRefCallback}
@@ -511,18 +511,18 @@ export function App2({
               <AppContextAwareAppHeader renderChild={renderChild} />
             )}
             {header}
-          </header>
-          <div className={styles.PagesWrapper} ref={contentScrollRef}>
+          </AppHeaderSlot>
+          <AppPagesSlot ref={contentScrollRef}>
             <div className={pagesWrapperClasses}>{children}</div>
-          </div>
-          <div 
-            className={classnames(styles.footerWrapper, {
+          </AppPagesSlot>
+          <AppFooterSlot
+            className={classnames({
               [styles.nonSticky]: footerShouldBeNonSticky,
-            })} 
+            })}
             ref={footerRefCallback}
           >
             {footer}
-          </div>
+          </AppFooterSlot>
         </AppContainer>
       );
       break;
