@@ -38,22 +38,22 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
 // Keyframe animations for collapsible search
 @keyframes expandSearch {
   from {
-    width: 0;
+    transform: scaleX(0);
     opacity: 0;
   }
   to {
-    width: $width-SearchInput;
+    transform: scaleX(1);
     opacity: 1;
   }
 }
 
 @keyframes collapseSearch {
   from {
-    width: $width-SearchInput;
+    transform: scaleX(1);
     opacity: 1;
   }
   to {
-    width: 0;
+    transform: scaleX(0);
     opacity: 0;
   }
 }
@@ -109,10 +109,12 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
   }
 
   &.expanding {
+    transform-origin: right center;
     animation: expandSearch 0.3s ease-out forwards;
   }
 
   &.collapsing {
+    transform-origin: right center;
     animation: collapseSearch 0.3s ease-in forwards;
   }
 
@@ -170,8 +172,6 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
   &.header:has(+ .content):not(:first-child) {
     margin-top: 0.5rem;
   }
-
-  &.content {}
 }
 
 :export{
