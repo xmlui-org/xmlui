@@ -59,7 +59,7 @@ const AppHeaderSlot = createSlot<HTMLElement>("AppHeaderSlot", styles.headerWrap
 const AppFooterSlot = createSlot("AppFooterSlot", styles.footerWrapper);
 const AppNavPanelSlot = createSlot("AppNavPanelSlot", styles.navPanelWrapper);
 const AppContentSlot = createSlot("AppContentSlot", styles.mainContentArea);
-const AppPagesSlot = createSlot("AppPagesSlot", styles.PagesWrapper);
+const AppPagesSlot = createSlot("AppPagesSlot", styles.pagesContainer);
 
 // --- Component Types ---
 
@@ -364,7 +364,7 @@ export function App2({
     },
   ];
 
-  const pagesWrapperClasses = classnames(styles.PagesWrapperInner, {
+  const pagesWrapperClasses = classnames(styles.pageContentContainer, {
     [styles.withDefaultContentPadding]: applyDefaultContentPadding,
   });
   

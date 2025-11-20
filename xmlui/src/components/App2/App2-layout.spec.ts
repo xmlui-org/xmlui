@@ -83,7 +83,7 @@ async function verifyBlocksBelowViewport(page: Page, blockIds: string[]) {
 async function verifyAppContainerScrollable(page: Page, shouldBeScrollable: boolean) {
   const info = await page.evaluate(() => {
     const appWrapper = document.querySelector('[class*="appContainer"], [class*="wrapper"]');
-    if (!appWrapper || appWrapper.className.includes("PagesWrapper")) {
+    if (!appWrapper || appWrapper.className.includes("pagesContainer")) {
       return { found: false, isScrollable: false };
     }
 
@@ -120,7 +120,7 @@ async function verifyAppContainerScrollable(page: Page, shouldBeScrollable: bool
 async function verifyScrollbarGutters(page: Page, shouldHaveGutters: boolean) {
   const info = await page.evaluate(() => {
     const appWrapper = document.querySelector('[class*="appContainer"], [class*="wrapper"]');
-    if (!appWrapper || appWrapper.className.includes("PagesWrapper")) {
+    if (!appWrapper || appWrapper.className.includes("pagesContainer")) {
       return { found: false };
     }
 
@@ -165,7 +165,8 @@ async function verifyMainContentIsScrollContainer(page: Page) {
       if (hasOverflow) {
         const className = scrollContainer.className || "";
         const isPagesWrapper =
-          className.includes("PagesWrapper") || className.includes("pagesWrapper");
+          className.includes("pagesContainer") || 
+          className.includes("pageContentContainer");
 
         return {
           found: true,
@@ -188,7 +189,7 @@ async function verifyMainContentIsScrollContainer(page: Page) {
 async function verifyAppContainerNotScrollable(page: Page) {
   const info = await page.evaluate(() => {
     const appWrapper = document.querySelector('[class*="appContainer"], [class*="wrapper"]');
-    if (!appWrapper || appWrapper.className.includes("PagesWrapper")) {
+    if (!appWrapper || appWrapper.className.includes("pagesContainer")) {
       return { found: false };
     }
 
@@ -211,7 +212,7 @@ async function verifyAppContainerNotScrollable(page: Page) {
 async function scrollAppContainerTo(page: Page, position: "top" | "mid" | "bottom") {
   await page.evaluate((pos) => {
     const appWrapper = document.querySelector('[class*="appContainer"], [class*="wrapper"]') as HTMLElement;
-    if (!appWrapper || appWrapper.className.includes("PagesWrapper")) return;
+    if (!appWrapper || appWrapper.className.includes("pagesContainer")) return;
 
     // For vertical-full-header layout, check if appWrapper itself has verticalFullHeader class
     const isVerticalFullHeader = appWrapper.className.includes('verticalFullHeader');

@@ -121,7 +121,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
         }
       }
 
-      .PagesWrapper {
+      .pagesContainer {
         flex: 1;
         min-height: 0;
         display: flex;
@@ -133,7 +133,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
         width: 100%;
       }
 
-      .PagesWrapperInner {
+      .pageContentContainer {
         flex: 1;
         min-height: 0;
         max-width: none;
@@ -200,13 +200,13 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
         }
       }
 
-      .PagesWrapper {
+      .pagesContainer {
         overflow: initial;
         min-height: var(--content-available-height);
         height: 100%;
       }
 
-      .PagesWrapperInner {
+      .pageContentContainer {
         height: 100%;
         & > :global(.xmlui-page-root) {
           height: 100%;
@@ -267,13 +267,13 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
         min-height: 0;
         height: 100%;
       }
-      .PagesWrapper {
+      .pagesContainer {
         overflow: auto;
         min-height: 0;
         height: 100%;
         scrollbar-gutter: stable both-edges;
       }
-      .PagesWrapperInner {
+      .pageContentContainer {
         min-height: 100%;
       }
     }
@@ -291,7 +291,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
     &.noScrollbarGutters {
       scrollbar-gutter: auto;
-      .PagesWrapper {
+      .pagesContainer {
         scrollbar-gutter: auto;
       }
     }
@@ -341,13 +341,13 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     }
   }
 
-  .PagesWrapper {
+  .pagesContainer {
     flex: 1;
     min-height: initial;
     isolation: isolate;
   }
 
-  .PagesWrapperInner {
+  .pageContentContainer {
     max-width: $maxWidth-content-App;
     width: 100%;
     margin: 0 auto;
