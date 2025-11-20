@@ -56,14 +56,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 }
 
 @layer components {
-  @include t.withMaxScreenSize(0) {
-    .wrapper.verticalFullHeader {
-      .navPanelWrapper {
-        display: none;
-      }
-    }
-  }
-
   .wrapper {
     --footer-height: 0px;
     --header-height: 0px;
@@ -260,6 +252,11 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
           width: 50vw;
           z-index: -1;
           background-color: $backgroundColor-navPanel-App;
+        }
+
+        // Hide on small screens
+        @include t.withMaxScreenSize(0) {
+          display: none;
         }
       }
 
