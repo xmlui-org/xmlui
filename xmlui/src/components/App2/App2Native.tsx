@@ -168,6 +168,50 @@ export const defaultProps: Pick<
   onMessageReceived: noop,
 };
 
+/**
+ * List of valid layout types for the App2 component.
+ * Used for runtime validation to provide helpful error messages.
+ */
+const VALID_LAYOUTS: AppLayoutType[] = [
+  "vertical",
+  "vertical-sticky",
+  "vertical-full-header",
+  "horizontal",
+  "horizontal-sticky",
+  "condensed",
+  "condensed-sticky",
+  "desktop",
+];
+
+/**
+ * Validates and sanitizes layout input.
+ * 
+ * @param layout - Layout value from props (may be undefined)
+ * @param getThemeVar - Function to retrieve theme variables
+ * @returns Valid AppLayoutType, falling back to "condensed-sticky" if invalid
+ * 
+ * Process:
+ * 1. Get layout from props, theme variable, or default
+ * 2. Trim whitespace and normalize Unicode dashes to regular hyphens
+ * 3. Validate against VALID_LAYOUTS array
+ * 4. Log error and return default if invalid
+ */
+function validateLayout(
+  layout: string | undefined,
+  getThemeVar: (key: string) => any
+): AppLayoutType {
+  const layoutWithDefault = layout || getThemeVar("layout-App") || "condensed-sticky";
+  const sanitized = layoutWithDefault.trim().replace(/[\u2013\u2014\u2011]/g, "-");
+  const normalized = sanitized || "condensed-sticky";
+  
+  if (!VALID_LAYOUTS.includes(normalized as AppLayoutType)) {
+    console.error(`App2: layout type not supported: ${normalized}. Falling back to "condensed-sticky". Valid layouts: ${VALID_LAYOUTS.join(", ")}`);
+    return "condensed-sticky";
+  }
+  
+  return normalized as AppLayoutType;
+}
+
 export function App2({
   children,
   style = EMPTY_OBJECT,
@@ -200,16 +244,8 @@ export function App2({
   const { setActiveThemeTone, setActiveThemeId, themes } = useThemes();
   const mounted = useRef(false);
 
-  // Issue 1 Fix: Validate and sanitize layout input to prevent invalid values
-  // 1. Get layout from props, theme, or default to "condensed-sticky"
-  // 2. Trim whitespace and replace Unicode dashes (en-dash, em-dash, non-breaking hyphen) with regular hyphens
-  // 3. Fall back to default if result is empty string (whitespace-only input)
-  // 4. Validate against allowed layout types (error will be thrown by switch default case if invalid)
-  const layoutWithDefaultValue = layout || getThemeVar("layout-App") || "condensed-sticky";
-  const sanitizedLayout = layoutWithDefaultValue
-    ?.trim()
-    .replace(/[\u2013\u2014\u2011]/g, "-");
-  const safeLayout = (sanitizedLayout || "condensed-sticky") as AppLayoutType;
+  // Validate and sanitize layout input with explicit validation
+  const safeLayout = validateLayout(layout, getThemeVar);
   const appContext = useAppContext();
   const { setLoggedInUser, mediaSize, forceRefreshAnchorScroll, appGlobals } = appContext;
   const hasRegisteredHeader = header !== undefined;
