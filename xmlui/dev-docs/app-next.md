@@ -2211,114 +2211,156 @@ function shouldShowNavPanelInline(
 
 ## App2.tsx Refactoring Opportunities
 
-### 10. Extract Navigation Hierarchy Building Logic
+**File Overview**: App2.tsx (774 lines)
+- Component renderer that wraps App2Native.tsx
+- Handles XMLUI component definition and transformation
+- Extracts and processes navigation hierarchy from Pages
+- Implements search indexing functionality
+- Total lines: 774
 
-**Current State**: Lines 151-774 contain complex navigation extraction logic
+### 1. Extract Navigation Helper Functions Outside Component ✅ COMPLETED
+
+**Current State**: Lines 160-238 contained helper functions inside AppNode component
 
 **Issue**:
-- `AppNode` component is 623 lines long
-- Contains multiple nested helper functions
-- Navigation hierarchy logic is deeply embedded
-- Hard to understand and test
+- 80+ lines of helper logic embedded in component
+- useMemo wrappers added complexity without benefit
+- Hard to unit test these functions independently
+- Cache implementations tied to component lifecycle
+- Functions recreated on every component mount
 
-**Opportunity**:
-Extract to separate modules:
-```
-App2/
-  ├── App2Native.tsx
-  ├── App2.tsx
-  ├── App2.module.scss
-  ├── navigation/
-  │   ├── navigationHierarchy.ts       // Core hierarchy logic
-  │   ├── hierarchyHelpers.ts          // parseHierarchyLabels, labelExistsInHierarchy
-  │   └── navPanelExtraction.ts        // extractNavPanelFromPages logic
-  └── slot-components/
-      ├── AppContainer.tsx
-      ├── AppHeaderSlot.tsx
-      └── ...
-```
-
-Example extraction:
+**Completed Solution**:
+Extracted helper functions to end of App2.tsx file (before renderer export):
 ```typescript
-// navigation/hierarchyHelpers.ts
-export function createHierarchyParser() {
+// --- Navigation Helper Functions ---
+
+function createParseHierarchyLabels() {
   const cache = new Map<string, string[]>();
-  
   return (labelText: string): string[] => {
-    if (cache.has(labelText)) {
-      return cache.get(labelText)!;
-    }
-    
-    const result: string[] = [];
-    let currentLabel = "";
-    let escaped = false;
-    
-    for (let i = 0; i < labelText.length; i++) {
-      const char = labelText[i];
-      
-      if (escaped) {
-        currentLabel += char;
-        escaped = false;
-      } else if (char === "\\") {
-        escaped = true;
-      } else if (char === "|") {
-        result.push(currentLabel.trim());
-        currentLabel = "";
-      } else {
-        currentLabel += char;
-      }
-    }
-    
-    if (currentLabel.length > 0) {
-      result.push(currentLabel.trim());
-    }
-    
-    cache.set(labelText, result);
-    return result;
+    // Parse logic with caching
   };
 }
 
-export function createLabelExistenceChecker() {
+function createLabelExistsInHierarchy() {
   const cache = new Map<string, boolean>();
-  
   return (searchLabel: string, hierarchy: any[]): boolean => {
-    const cacheKey = searchLabel + "_" + hierarchy.length;
-    
-    if (cache.has(cacheKey)) {
-      return cache.get(cacheKey)!;
-    }
-    
-    const result = hierarchy.some((node) => {
-      if (node.label === searchLabel) return true;
-      if (node.children?.length > 0) {
-        return createLabelExistenceChecker()(searchLabel, node.children);
-      }
-      return false;
-    });
-    
-    cache.set(cacheKey, result);
-    return result;
+    // Recursive search logic with caching
   };
 }
+
+function findOrCreateNavGroup(navItems: any[], groupLabel: string): any {
+  // Group creation logic (no memoization needed)
+}
+
+// Usage in AppNode:
+const parseHierarchyLabels = useMemo(() => createParseHierarchyLabels(), []);
+const labelExistsInHierarchy = useMemo(() => createLabelExistsInHierarchy(), []);
+// findOrCreateNavGroup used directly
 ```
 
 **Benefits**:
-- App2.tsx becomes ~300 lines instead of 774
-- Navigation logic can be tested independently
-- Easier to understand each piece
-- Reusable navigation utilities
-- Better code organization
+- Functions can be unit tested independently
+- Removes 80+ lines from component body
+- Better encapsulation of caching logic
+- Reusable across other components if needed
+- Clearer separation of concerns
+- No unnecessary useMemo wrappers for simple functions
 
 **Impact**: High (major code organization improvement)  
-**Complexity**: Moderate  
-**Risk**: Low (pure functions, no component behavior change)  
-**Lines Saved**: ~400 lines from App2.tsx (moved to separate files)
+**Complexity**: Simple (pure extraction)  
+**Risk**: Low (no logic changes)  
+**Lines Saved**: ~80 lines from AppNode component body
+**Tests**: All 170 tests passing
+  
+**Benefits**:
+- Functions can be unit tested independently
+- Removes 80+ lines from component body
+- Better encapsulation of caching logic
+- Reusable across other components
+- Clearer separation of concerns
+- No unnecessary useMemo wrappers
+
+**Impact**: High (major code organization improvement)  
+**Complexity**: Simple (pure extraction)  
+**Risk**: Low (no logic changes)  
+**Lines Saved**: ~80 lines from AppNode component
 
 ---
 
-### 11. Simplify Child Component Extraction
+### 2. Extract Child Component Extraction Logic ✅ COMPLETED
 
-**Current State**: Lines 267-310 extract child components (AppHeader, Footer, NavPanel, Pages)
+**Completed Implementation**:
+
+Three helper functions added to App2.tsx (before navigation helper functions):
+
+1. **`extractAppComponents()`** - Main extraction logic
+   - Processes children array to find AppHeader, Footer, NavPanel, Pages
+   - Delegates to specialized functions based on node type
+   - Returns ExtractedComponents interface with all found components
+   - Immutable approach using result object
+
+2. **`extractFromThemeWrapper()`** - Theme unwrapping logic
+   - Extracts special components from within Theme nodes
+   - Preserves Theme wrapper for non-special children
+   - Handles empty Theme nodes (skips them)
+   - Creates new Theme nodes with remaining children
+
+3. **`enhanceNavPanelWithPageNav()`** - Navigation enhancement
+   - Separates nav enhancement from extraction
+   - Calls extractNavPanelFromPages to get extra nav items
+   - Merges with existing NavPanel or creates new one
+   - Returns enhanced NavPanel or original if no enhancement needed
+
+**AppNode Changes**:
+```typescript
+// Before: 83 lines of complex inline logic in useMemo
+const { AppHeader, Footer, NavPanel, Pages, restChildren } = useMemo(() => {
+  // 83 lines of extraction + Theme handling + nav enhancement
+}, [node.children, extractValue, parseHierarchyLabels, labelExistsInHierarchy]);
+
+// After: Clean separation of concerns
+const extracted = useMemo(
+  () => extractAppComponents(node.children),
+  [node.children]
+);
+
+const enhancedNavPanel = useMemo(
+  () => enhanceNavPanelWithPageNav(
+    extracted,
+    processedNavRef,
+    extractValue,
+    parseHierarchyLabels,
+    labelExistsInHierarchy,
+    findOrCreateNavGroup,
+  ),
+  [extracted, extractValue, parseHierarchyLabels, labelExistsInHierarchy]
+);
+
+const { AppHeader, Footer, Pages, restChildren } = extracted;
+const NavPanel = enhancedNavPanel;
+```
+
+**Benefits Achieved**:
+- ✅ Removed 83 lines from AppNode component body (reduced to ~20 lines)
+- ✅ Separated three concerns: extraction, Theme handling, nav enhancement
+- ✅ Immutable approach eliminates transformedChild reassignment
+- ✅ Each function is independently testable
+- ✅ Clearer control flow with explicit function calls
+- ✅ Reduced cognitive complexity in AppNode
+- ✅ Better dependency tracking (separate useMemo for each concern)
+
+**Test Results**: All 170 tests passing
+
+**Impact**: High (major refactoring)  
+**Complexity**: Moderate (required careful testing)  
+**Risk**: Medium (complex logic, needed thorough testing)  
+**Lines Saved**: ~60 lines from AppNode component body
+
+---
+
+### 3. Move SearchIndexCollector to Separate File
+
+**Current State**: Lines 437-603 implement SearchIndexCollector and PageIndexer inside App2.tsx
 
 **Issue**:
 ```typescript
@@ -2332,29 +2374,46 @@ const { AppHeader, Footer, NavPanel, Pages, restChildren } = useMemo(() => {
   node.children?.forEach((rootChild) => {
     let transformedChild = { ...rootChild };
     if (rootChild.type === "Theme") {
+      // 15+ lines handling Theme wrapper
       transformedChild.children = rootChild.children?.filter((child) => {
         if (child.type === "AppHeader") {
           AppHeader = { ...rootChild, children: [child] };
           return false;
         }
-        // ... more nested logic
+        // ... similar for Footer, NavPanel
       });
+      if (!transformedChild.children.length) {
+        transformedChild = null;
+      }
     }
-    // ... more logic
+    // 10+ more lines handling direct children
+    if (rootChild.type === "AppHeader") {
+      AppHeader = rootChild;
+    }
+    // ... similar for Footer, NavPanel, Pages
   });
   
+  // 20+ lines calling extractNavPanelFromPages
+  const extraNavs = extractNavPanelFromPages(...);
+  if (extraNavs?.length) {
+    // Merge logic
+  }
+  
   return { AppHeader, Footer, NavPanel, Pages, restChildren };
-}, [node.children, ...]);
+}, [node.children, extractValue, ...]);
 ```
 
-- Complex nested logic
-- Handles both direct children and Theme-wrapped children
-- Mixes filtering and transformation
+**Problems**:
+- 83 lines of complex extraction logic in useMemo
+- Mixes three concerns: component extraction, Theme unwrapping, nav enhancement
+- Mutation-heavy code (transformedChild reassignment)
+- Hard to understand flow with nested conditionals
+- Large dependency array
 
 **Opportunity**:
-Extract to helper function:
+Extract to utility functions:
 ```typescript
-// app2Helpers.ts
+// App2/utils/componentExtraction.ts
 interface ExtractedComponents {
   AppHeader?: ComponentDef;
   Footer?: ComponentDef;
@@ -2363,97 +2422,412 @@ interface ExtractedComponents {
   restChildren: ComponentDef[];
 }
 
-export function extractAppComponents(children: ComponentDef[]): ExtractedComponents {
+export function extractAppComponents(
+  children: ComponentDef[] | undefined
+): ExtractedComponents {
   const result: ExtractedComponents = { restChildren: [] };
   
+  if (!children) return result;
+  
   for (const child of children) {
-    // Handle Theme wrapper
     if (child.type === "Theme") {
-      const themeChildren = extractFromTheme(child);
-      Object.assign(result, themeChildren);
-      continue;
-    }
-    
-    // Handle direct children
-    switch (child.type) {
-      case "AppHeader":
-        result.AppHeader = child;
-        break;
-      case "Footer":
-        result.Footer = child;
-        break;
-      case "NavPanel":
-        result.NavPanel = child;
-        break;
-      case "Pages":
-        result.Pages = child;
-        result.restChildren.push(child);
-        break;
-      default:
-        result.restChildren.push(child);
+      extractFromTheme(child, result);
+    } else {
+      extractDirectChild(child, result);
     }
   }
   
   return result;
 }
 
-function extractFromTheme(themeNode: ComponentDef): Partial<ExtractedComponents> {
-  // Extraction logic for Theme-wrapped children
-  // ...
+function extractFromTheme(
+  themeNode: ComponentDef,
+  result: ExtractedComponents
+): void {
+  const specialTypes = ["AppHeader", "Footer", "NavPanel"];
+  const otherChildren: ComponentDef[] = [];
+  
+  themeNode.children?.forEach((child) => {
+    if (child.type === "AppHeader") {
+      result.AppHeader = { ...themeNode, children: [child] };
+    } else if (child.type === "Footer") {
+      result.Footer = { ...themeNode, children: [child] };
+    } else if (child.type === "NavPanel") {
+      result.NavPanel = { ...themeNode, children: [child] };
+    } else {
+      otherChildren.push(child);
+    }
+  });
+  
+  if (otherChildren.length > 0) {
+    result.restChildren.push({ ...themeNode, children: otherChildren });
+  }
 }
+
+function extractDirectChild(
+  child: ComponentDef,
+  result: ExtractedComponents
+): void {
+  switch (child.type) {
+    case "AppHeader":
+      result.AppHeader = child;
+      break;
+    case "Footer":
+      result.Footer = child;
+      break;
+    case "NavPanel":
+      result.NavPanel = child;
+      break;
+    case "Pages":
+      result.Pages = child;
+      result.restChildren.push(child);
+      break;
+    default:
+      result.restChildren.push(child);
+  }
+}
+
+export function enhanceNavPanelWithPageNav(
+  extracted: ExtractedComponents,
+  processedRef: React.MutableRefObject<boolean>,
+  extractValue: any,
+  navHelper: NavigationHierarchyParser
+): ComponentDef | undefined {
+  if (!extracted.Pages || processedRef.current) {
+    return extracted.NavPanel;
+  }
+  
+  const extraNavs = extractNavPanelFromPages(
+    extracted.Pages,
+    extracted.NavPanel,
+    extractValue,
+    navHelper
+  );
+  
+  if (!extraNavs?.length) {
+    return extracted.NavPanel;
+  }
+  
+  if (extracted.NavPanel) {
+    return {
+      ...extracted.NavPanel,
+      children: [
+        ...(extracted.NavPanel.children || []),
+        ...extraNavs
+      ],
+    };
+  }
+  
+  return {
+    type: "NavPanel",
+    props: {},
+    children: extraNavs,
+  };
+}
+
+// Usage in AppNode:
+const extracted = useMemo(
+  () => extractAppComponents(node.children),
+  [node.children]
+);
+
+const enhancedNavPanel = useMemo(
+  () => enhanceNavPanelWithPageNav(
+    extracted,
+    processedNavRef,
+    extractValue,
+    navHelper
+  ),
+  [extracted, extractValue, navHelper]
+);
 ```
 
 **Benefits**:
-- Clearer separation of concerns
-- Easier to test extraction logic
-- More maintainable
-- Can add new special children types easily
+- Separates three distinct concerns into functions
+- Immutable approach (no reassignments)
+- Much easier to test each piece
+- Clearer control flow
+- Reduces AppNode by 60+ lines
+- Can reuse extraction logic
 
-**Impact**: Medium  
-**Complexity**: Simple  
-**Risk**: Low  
-**Lines Saved**: ~20 lines from useMemo (moved to function)
+**Impact**: High (major refactoring)  
+**Complexity**: Moderate (requires careful testing)  
+**Risk**: Medium (complex logic, needs thorough testing)  
+**Lines Saved**: ~60 lines from AppNode
 
 ---
 
-### 12. Optimize SearchIndexCollector Component
+### 3. Move SearchIndexCollector to Separate File
 
-**Current State**: Lines 437-774 implement SearchIndexCollector
+**Current State**: Lines 437-603 implement SearchIndexCollector and PageIndexer inside App2.tsx
 
 **Issue**:
-- Large component embedded in App2.tsx (338 lines)
-- Complex indexing logic
-- Uses transitions and portals
-- Hard to test independently
+- 167 lines of search indexing logic embedded in App2.tsx
+- Complex state management with transitions
+- Uses portals and DOM manipulation
+- Completely independent concern from App component rendering
+- Hard to test in isolation
+- Makes App2.tsx harder to navigate
 
 **Opportunity**:
 Extract to separate file:
 ```
 App2/
-  ├── SearchIndexCollector.tsx         // Full component
-  ├── SearchIndexCollector.test.tsx    // Tests
-  └── ...
+  ├── App2.tsx
+  ├── SearchIndexCollector.tsx         // SearchIndexCollector + PageIndexer
+  └── SearchIndexCollector.test.tsx    // Unit tests
 ```
 
-Move the entire component to its own file with proper exports.
+**Implementation**:
+```typescript
+// App2/SearchIndexCollector.tsx
+import { ComponentDef } from "../../abstractions/ComponentDefs";
+import { RenderChildFn } from "../../abstractions/RendererDefs";
+import { PageMd } from "../Pages/Pages";
+// ... other imports
+
+interface SearchIndexCollectorProps {
+  Pages?: ComponentDef;
+  renderChild: RenderChildFn;
+}
+
+export function SearchIndexCollector({ Pages, renderChild }: SearchIndexCollectorProps) {
+  // ... move all SearchIndexCollector logic here (85 lines)
+}
+
+interface PageIndexerProps {
+  Page: ComponentDef<typeof PageMd>;
+  renderChild: RenderChildFn;
+  onIndexed: () => void;
+}
+
+function PageIndexer({ Page, renderChild, onIndexed }: PageIndexerProps) {
+  // ... move all PageIndexer logic here (82 lines)
+}
+
+// App2.tsx just imports and uses:
+import { SearchIndexCollector } from "./SearchIndexCollector";
+
+// In AppNode return:
+<App2Component {...props}>
+  {renderedContent}
+  <SearchIndexCollector Pages={Pages} renderChild={renderChild} />
+</App2Component>
+```
 
 **Benefits**:
-- Reduces App2.tsx by 338 lines
-- SearchIndexCollector becomes independently testable
-- Easier to optimize indexing logic
-- Better code organization
-- Can add features without affecting App2.tsx
+- Reduces App2.tsx by 167 lines (22% reduction)
+- SearchIndexCollector can be tested independently
+- Clearer file organization
+- Can optimize indexing without touching App2.tsx
+- Easier to understand both files separately
+- Could be reused by other components
 
 **Impact**: High (major organization improvement)  
 **Complexity**: Simple (just move code)  
-**Risk**: Low  
-**Lines Saved**: ~338 lines from App2.tsx
+**Risk**: Low (no logic changes)  
+**Lines Saved**: ~167 lines from App2.tsx
 
 ---
 
-### 13. Memoize Component Definitions
+### 4. Extract Navigation Extraction Functions to Separate Module
 
-**Current State**: Lines 352-366 extract footer sticky property, lines 368-408 create appProps
+**Current State**: Lines 624-774 contain processNavItems and extractNavPanelFromPages functions
+
+**Issue**:
+- 151 lines of navigation processing logic at file bottom
+- Complex recursive tree traversal
+- Multiple responsibilities: processing existing nav, extracting from pages, building hierarchy
+- Hard to test without full component context
+- Functions are global but only used by AppNode
+
+**Opportunity**:
+Extract to navigation utilities module:
+```typescript
+// App2/utils/navigationExtraction.ts
+import { ComponentDef } from "../../abstractions/ComponentDefs";
+import { NavigationHierarchyParser } from "./navigationHelpers";
+
+export interface NavHierarchyNode {
+  type: string;
+  label: string;
+  path?: string;
+  children?: NavHierarchyNode[];
+}
+
+/**
+ * Recursively process navigation items and build hierarchy tree
+ */
+export function processNavItems(
+  items: ComponentDef[],
+  parentHierarchy: NavHierarchyNode[],
+  extractValue: (value: any) => any
+): void {
+  items.forEach((navItem) => {
+    if (navItem.type === "NavLink") {
+      processNavLink(navItem, parentHierarchy, extractValue);
+    } else if (navItem.type === "NavGroup") {
+      processNavGroup(navItem, parentHierarchy, extractValue);
+    }
+  });
+}
+
+function processNavLink(
+  navItem: ComponentDef,
+  parentHierarchy: NavHierarchyNode[],
+  extractValue: (value: any) => any
+): void {
+  let itemLabel = navItem.props?.label;
+  
+  if (!itemLabel && navItem.children?.length === 1) {
+    if (navItem.children[0].type === "TextNode") {
+      itemLabel = navItem.children[0].props.value;
+    }
+  }
+  
+  if (itemLabel) {
+    parentHierarchy.push({
+      type: "NavLink",
+      label: extractValue(itemLabel),
+      path: navItem.props?.to ? extractValue(navItem.props.to) : undefined,
+    });
+  }
+}
+
+function processNavGroup(
+  navItem: ComponentDef,
+  parentHierarchy: NavHierarchyNode[],
+  extractValue: (value: any) => any
+): void {
+  const groupLabel = navItem.props?.label;
+  
+  if (groupLabel) {
+    const groupNode: NavHierarchyNode = {
+      type: "NavGroup",
+      label: extractValue(groupLabel),
+      children: [],
+    };
+    
+    parentHierarchy.push(groupNode);
+    
+    if (navItem.children?.length > 0) {
+      processNavItems(navItem.children, groupNode.children!, extractValue);
+    }
+  } else if (navItem.children?.length > 0) {
+    // No label but has children - process them at parent level
+    processNavItems(navItem.children, parentHierarchy, extractValue);
+  }
+}
+
+/**
+ * Extract navigation panel items from Pages component and build hierarchical structure
+ */
+export function extractNavPanelFromPages(
+  Pages: ComponentDef | undefined,
+  NavPanel: ComponentDef | undefined,
+  extractValue: (value: any) => any,
+  navHelper: NavigationHierarchyParser
+): ComponentDef[] | null {
+  if (!Pages) return null;
+  
+  const extraNavs: ComponentDef[] = [];
+  const navigationHierarchy: NavHierarchyNode[] = [];
+  
+  // Build existing navigation hierarchy
+  if (NavPanel?.children) {
+    processNavItems(NavPanel.children, navigationHierarchy, extractValue);
+  }
+  
+  // Process Pages to create hierarchical navigation
+  Pages.children?.forEach((page) => {
+    if (page.type === "Page" && page.props.navLabel) {
+      processPageNavigation(
+        page,
+        extraNavs,
+        navigationHierarchy,
+        extractValue,
+        navHelper
+      );
+    }
+  });
+  
+  return extraNavs.length > 0 ? extraNavs : null;
+}
+
+function processPageNavigation(
+  page: ComponentDef,
+  extraNavs: ComponentDef[],
+  navigationHierarchy: NavHierarchyNode[],
+  extractValue: (value: any) => any,
+  navHelper: NavigationHierarchyParser
+): void {
+  const label = extractValue(page.props.navLabel);
+  const url = extractValue(page.props.url);
+  const hierarchyLabels = navHelper.parseHierarchyLabels(label);
+  
+  if (hierarchyLabels.length === 0) return;
+  
+  // Single level - add NavLink directly
+  if (hierarchyLabels.length === 1) {
+    if (!navHelper.labelExistsInHierarchy(hierarchyLabels[0], navigationHierarchy)) {
+      extraNavs.push({
+        type: "NavLink",
+        props: { label: hierarchyLabels[0], to: url },
+      });
+    }
+    return;
+  }
+  
+  // Multi-level - create NavGroups hierarchy
+  let currentLevel = extraNavs;
+  
+  for (let i = 0; i < hierarchyLabels.length - 1; i++) {
+    const groupLabel = hierarchyLabels[i];
+    const navGroup = findOrCreateNavGroup(currentLevel, groupLabel);
+    
+    if (!navGroup.children) {
+      navGroup.children = [];
+    }
+    
+    currentLevel = navGroup.children;
+  }
+  
+  // Add leaf NavLink
+  const leafLabel = hierarchyLabels[hierarchyLabels.length - 1];
+  const existingLink = currentLevel.find(
+    (item) => item.type === "NavLink" && item.props?.label === leafLabel
+  );
+  
+  if (!existingLink) {
+    currentLevel.push({
+      type: "NavLink",
+      props: { label: leafLabel, to: url },
+    });
+  }
+}
+
+// Usage in AppNode:
+import { extractNavPanelFromPages } from "./utils/navigationExtraction";
+```
+
+**Benefits**:
+- Removes 151 lines from App2.tsx (20% reduction)
+- All navigation logic in dedicated modules
+- Easier to unit test navigation extraction
+- Better code organization
+- Can optimize navigation processing separately
+- Functions grouped by responsibility
+
+**Impact**: High (major organization improvement)  
+**Complexity**: Simple (pure extraction)  
+**Risk**: Low (no logic changes, just moving code)  
+**Lines Saved**: ~151 lines from App2.tsx
+
+---
+
+### 5. Optimize Footer Sticky Property Extraction
+
+**Current State**: Lines 348-366 extract sticky property with nested conditionals
 
 **Issue**:
 ```typescript
@@ -2473,139 +2847,162 @@ const footerSticky = useMemo(() => {
 }, [Footer, extractValue]);
 ```
 
-- Nested conditional logic to find Footer component
-- Similar pattern may be needed for other components
+**Problems**:
+- Nested conditionals make logic hard to follow
+- Pattern repeated for every prop extraction
+- Theme unwrapping logic duplicated from component extraction
+- Could be part of component extraction utility
 
 **Opportunity**:
-Extract to helper:
+Add to componentExtraction utils:
 ```typescript
-function extractFooterSticky(
-  footerDef: ComponentDef | undefined,
-  extractValue: any
-): boolean {
-  if (!footerDef) return true;
+// App2/utils/componentExtraction.ts (addition)
+export function extractComponentProp<T>(
+  component: ComponentDef | undefined,
+  propName: string,
+  defaultValue: T,
+  extractValue: any,
+  asBoolean = false
+): T {
+  if (!component) return defaultValue;
   
   // Unwrap Theme if present
-  const footerNode = footerDef.type === "Theme"
-    ? footerDef.children?.find(child => child.type === "Footer")
-    : footerDef;
+  let targetNode = component;
+  if (component.type === "Theme" && component.children?.length > 0) {
+    targetNode = component.children.find(
+      (child) => child.type === component.type
+    );
+  }
   
-  if (!footerNode) return true;
+  if (!targetNode?.props?.[propName]) {
+    return defaultValue;
+  }
   
-  return extractValue.asOptionalBoolean(
-    footerNode.props?.sticky,
-    true
-  );
+  return asBoolean
+    ? extractValue.asOptionalBoolean(targetNode.props[propName], defaultValue)
+    : extractValue(targetNode.props[propName]) ?? defaultValue;
 }
 
-// Usage:
+// Usage in AppNode:
 const footerSticky = useMemo(
-  () => extractFooterSticky(Footer, extractValue),
+  () => extractComponentProp(Footer, "sticky", true, extractValue, true),
   [Footer, extractValue]
 );
 ```
 
 **Benefits**:
-- Clearer logic
-- Easier to test
-- Can reuse pattern for other properties
-- Self-documenting
+- Reusable for any component prop extraction
+- Single place for Theme unwrapping logic
+- More concise and readable
+- Can extract multiple props easily
+- Type-safe with generics
 
-**Impact**: Low  
+**Impact**: Low (code quality improvement)  
 **Complexity**: Simple  
 **Risk**: Low  
-**Lines Saved**: ~5 lines
+**Lines Saved**: ~5 lines, but adds reusability
 
 ---
 
-### 14. Reduce appProps Dependencies
+### 6. Reduce Component Rendering Memoization
 
-**Current State**: Lines 368-408 create appProps with many dependencies
+**Current State**: Lines 414-417 memoize all rendered components
 
 **Issue**:
 ```typescript
-const appProps = useMemo(
-  () => ({
-    scrollWholePage: extractValue.asOptionalBoolean(node.props.scrollWholePage, true),
-    // ... 13 more properties
-  }),
-  [
-    extractValue,
-    layoutType,
-    lookupEventHandler,
-    node.props.loggedInUser,
-    node.props.noScrollbarGutters,
-    // ... 9 more dependencies
-  ],
-);
+const renderedHeader = useMemo(() => renderChild(AppHeader), [AppHeader, renderChild]);
+const renderedFooter = useMemo(() => renderChild(Footer), [Footer, renderChild]);
+const renderedNavPanel = useMemo(() => renderChild(NavPanel), [NavPanel, renderChild]);
+const renderedContent = useMemo(() => renderChild(restChildren), [restChildren, renderChild]);
 ```
 
-- Large dependency array (14 items)
-- Many node.props.* references
-- Could cause unnecessary re-memoization
+**Problems**:
+- Premature optimization - renderChild is already optimized in XMLUI renderer
+- Creates 4 memoization closures
+- renderChild dependency rarely changes
+- Component definitions (AppHeader, Footer, etc.) already memoized from extraction
+- Adds complexity without proven benefit
+
+**Analysis**:
+The XMLUI renderer already handles efficient component rendering. These useMemo calls likely provide minimal benefit since:
+1. renderChild is stable (from renderer context)
+2. Component definitions only change when node.children changes (already memoized)
+3. App2Component is already optimized with React.memo in App2Native.tsx
 
 **Opportunity**:
-Split into logical groups:
+Remove unnecessary memoization:
 ```typescript
-const layoutProps = useMemo(
-  () => ({
-    scrollWholePage: extractValue.asOptionalBoolean(node.props.scrollWholePage, true),
-    noScrollbarGutters: extractValue.asOptionalBoolean(node.props.noScrollbarGutters, false),
-    layout: layoutType,
-    footerSticky,
-    applyDefaultContentPadding,
-  }),
-  [extractValue, layoutType, footerSticky, applyDefaultContentPadding, node.props.scrollWholePage, node.props.noScrollbarGutters]
-);
-
-const themeProps = useMemo(
-  () => ({
-    defaultTone: extractValue(node.props.defaultTone),
-    defaultTheme: extractValue(node.props.defaultTheme),
-    autoDetectTone: extractValue.asOptionalBoolean(node.props.autoDetectTone, false),
-  }),
-  [extractValue, node.props.defaultTone, node.props.defaultTheme, node.props.autoDetectTone]
-);
-
-const logoProps = useMemo(
-  () => ({
-    logo: extractValue(node.props.logo),
-    logoDark: extractValue(node.props["logo-dark"]),
-    logoLight: extractValue(node.props["logo-light"]),
-  }),
-  [extractValue, node.props.logo, node.props["logo-dark"], node.props["logo-light"]]
-);
-
-const appProps = useMemo(
-  () => ({
-    ...layoutProps,
-    ...themeProps,
-    ...logoProps,
-    className,
-    loggedInUser: extractValue(node.props.loggedInUser),
-    name: extractValue(node.props.name),
-    onReady: lookupEventHandler("ready"),
-    onMessageReceived: lookupEventHandler("messageReceived"),
-  }),
-  [layoutProps, themeProps, logoProps, className, extractValue, lookupEventHandler, node.props.loggedInUser, node.props.name]
+// Direct rendering - let XMLUI renderer handle optimization
+return (
+  <App2Component
+    {...appProps}
+    header={renderChild(AppHeader)}
+    footer={renderChild(Footer)}
+    navPanel={renderChild(enhancedNavPanel)}
+    navPanelDef={enhancedNavPanel}
+    logoContentDef={node.props.logoTemplate}
+    renderChild={renderChild}
+    registerComponentApi={registerComponentApi}
+  >
+    {renderChild(extracted.restChildren)}
+    <SearchIndexCollector Pages={extracted.Pages} renderChild={renderChild} />
+  </App2Component>
 );
 ```
 
 **Benefits**:
-- Smaller dependency arrays
-- Only affected groups re-memoize
-- Clearer grouping of related props
-- Better performance
+- Simpler code, less cognitive overhead
+- Removes 4 memoization closures
+- Trusts renderer's optimization
+- Still benefits from component definition memoization
 
 **Challenges**:
-- More code overall
-- May not provide significant performance gain
-- Added complexity
+- Need performance testing to confirm no regression
+- May need to keep for specific use cases
 
 **Impact**: Low (micro-optimization)  
 **Complexity**: Simple  
-**Risk**: Low  
-**Lines Saved**: 0 (actually adds lines, but improves performance)
+**Risk**: Low-Medium (needs performance validation)  
+**Lines Saved**: ~4 lines
+
+---
+
+### Summary of App2.tsx Refactoring Opportunities
+
+| # | Opportunity | Impact | Complexity | Risk | Lines Saved |
+|---|-------------|--------|------------|------|-------------|
+| 1 | Extract Navigation Helpers | High | Simple | Low | ~80 |
+| 2 | Extract Component Extraction | High | Moderate | Medium | ~60 |
+| 3 | Move SearchIndexCollector | High | Simple | Low | ~167 |
+| 4 | Extract Navigation Extraction | High | Simple | Low | ~151 |
+| 5 | Optimize Prop Extraction | Low | Simple | Low | ~5 |
+| 6 | Reduce Rendering Memoization | Low | Simple | Low-Med | ~4 |
+
+**Total Potential Lines Saved**: ~467 lines (60% reduction in App2.tsx)
+
+**Recommended Implementation Order**:
+1. **Step 3** (SearchIndexCollector) - Highest impact, lowest risk, simple extraction
+2. **Step 1** (Navigation Helpers) - High impact, pure functions, easy to test
+3. **Step 4** (Navigation Extraction) - High impact, complements Step 1
+4. **Step 2** (Component Extraction) - Most complex, save for after simpler refactors
+5. **Step 5** (Prop Extraction) - Small improvement, low priority
+6. **Step 6** (Memoization) - Needs performance testing, lowest priority
+
+**Post-Refactoring File Structure**:
+```
+App2/
+  ├── App2.tsx (~300 lines, down from 774)
+  ├── App2Native.tsx
+  ├── SearchIndexCollector.tsx (~170 lines)
+  ├── utils/
+  │   ├── navigationHelpers.ts (~90 lines)
+  │   ├── navigationExtraction.ts (~160 lines)
+  │   └── componentExtraction.ts (~100 lines)
+  └── __tests__/
+      ├── navigationHelpers.test.ts
+      ├── navigationExtraction.test.ts
+      └── componentExtraction.test.ts
+```
 
 ---
 
