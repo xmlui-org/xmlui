@@ -19,18 +19,43 @@ $backgroundColor-AppHeader: createThemeVar("backgroundColor-AppHeader");
 $borderBottom-NavPanel: createThemeVar("borderBottom-AppHeader");
 $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
-// Variables for @layer section
-$maxWidth-App: createThemeVar("maxWidth-App");
+// --- Mixins for desktop layout spacing reset ---
+// Desktop layout requires full viewport coverage with zero constraints.
+// These !important declarations override theme system defaults (padding/margins)
+// and layout-specific max-width constraints that would otherwise limit the desktop layout.
+@mixin reset-spacing-constraints {
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: none !important;
+  width: 100% !important;
+}
+
+@mixin reset-inline-spacing {
+  padding-inline: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-inline: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+// --- Mixins for scrollbar gutter compensation ---
+// When scrollbar-gutter: stable both-edges is used, the browser reserves space for scrollbars.
+// These mixins compensate for that reserved space to achieve full-width appearance
+// while maintaining the scrollbar reservation for consistent layout.
+@mixin scrollbar-compensation-container {
+  margin-inline: calc(-1 * var(--scrollbar-width));
+}
+
+@mixin scrollbar-compensation-content {
+  padding-inline: var(--scrollbar-width);
+}
+
+@mixin scrollbar-compensation-full-width {
+  width: calc(100% + (2 * var(--scrollbar-width)));
+}
 
 @layer components {
-  @include t.withMaxScreenSize(0) {
-    .wrapper.verticalFullHeader {
-      .navPanelWrapper {
-        display: none;
-      }
-    }
-  }
-
   .wrapper {
     --footer-height: 0px;
     --header-height: 0px;
@@ -136,26 +161,15 @@ $maxWidth-App: createThemeVar("maxWidth-App");
         top: 0;
         flex-shrink: 0;
         z-index: 1;
-        margin: 0 !important;
-        padding: 0 !important;
-        max-width: none !important;
-        width: 100% !important;
+        @include reset-spacing-constraints;
 
         & > * {
-          margin: 0 !important;
-          padding: 0 !important;
-          max-width: none !important;
-          width: 100% !important;
+          @include reset-spacing-constraints;
         }
 
         & * {
           max-width: none !important;
-          padding-inline: 0 !important;
-          padding-left: 0 !important;
-          padding-right: 0 !important;
-          margin-inline: 0 !important;
-          margin-left: 0 !important;
-          margin-right: 0 !important;
+          @include reset-inline-spacing;
         }
 
         :global(.headerInner) {
@@ -196,31 +210,27 @@ $maxWidth-App: createThemeVar("maxWidth-App");
         position: sticky;
         bottom: 0;
         flex-shrink: 0;
-        margin: 0 !important;
-        padding: 0 !important;
-        max-width: none !important;
-        width: 100% !important;
+        @include reset-spacing-constraints;
 
         & > * {
-          margin: 0 !important;
-          padding: 0 !important;
-          max-width: none !important;
-          width: 100% !important;
+          @include reset-spacing-constraints;
         }
 
         & * {
           max-width: none !important;
-          padding-inline: 0 !important;
-          padding-left: 0 !important;
-          padding-right: 0 !important;
-          margin-inline: 0 !important;
-          margin-left: 0 !important;
-          margin-right: 0 !important;
+          @include reset-inline-spacing;
         }
       }
     }
 
     &.verticalFullHeader {
+      // Set effective footer height based on whether footer is sticky
+      --effective-footer-height: var(--footer-height);
+      
+      &.noFooter {
+        --effective-footer-height: 0px;
+      }
+
       min-height: 100%;
       height: 100%;
       overflow: auto;
@@ -228,7 +238,9 @@ $maxWidth-App: createThemeVar("maxWidth-App");
       .navPanelWrapper {
         width: $width-navPanel-App;
         position: sticky;
-        height: calc(var(--containerHeight, 100vh) - var(--footer-height) - var(--header-height));
+        height: calc(
+          var(--containerHeight, 100vh) - var(--header-height) - var(--effective-footer-height)
+        );
         top: var(--header-height);
 
         &::before {
@@ -241,28 +253,19 @@ $maxWidth-App: createThemeVar("maxWidth-App");
           z-index: -1;
           background-color: $backgroundColor-navPanel-App;
         }
-      }
-      
-      // When no footer is sticky (footer sticky=false), don't subtract footer height
-      &.noFooter {
-        .navPanelWrapper {
-          height: calc(var(--containerHeight, 100vh) - var(--header-height));
+
+        // Hide on small screens
+        @include t.withMaxScreenSize(0) {
+          display: none;
         }
       }
 
       .PagesWrapper {
         overflow: initial;
         min-height: calc(
-          var(--containerHeight, 100vh) - var(--header-height) - var(--footer-height)
+          var(--containerHeight, 100vh) - var(--header-height) - var(--effective-footer-height)
         );
         height: 100%;
-      }
-      
-      // When no footer is sticky (footer sticky=false), don't subtract footer height
-      &.noFooter {
-        .PagesWrapper {
-          min-height: calc(var(--containerHeight, 100vh) - var(--header-height));
-        }
       }
 
       .PagesWrapperInner {
@@ -287,26 +290,26 @@ $maxWidth-App: createThemeVar("maxWidth-App");
       scrollbar-gutter: stable both-edges;
 
       .headerWrapper {
+        @include scrollbar-compensation-container;
         & > div {
-          padding-inline: var(--scrollbar-width);
+          @include scrollbar-compensation-content;
         }
-        margin-inline: calc(-1 * var(--scrollbar-width));
       }
 
       .footerWrapper {
-        margin-inline: calc(-1 * var(--scrollbar-width));
+        @include scrollbar-compensation-container;
         & > div {
-          padding-inline: var(--scrollbar-width);
+          @include scrollbar-compensation-content;
         }
       }
 
       &.verticalFullHeader {
         .content {
-          margin-inline: calc(-1 * var(--scrollbar-width));
-          width: calc(100% + (2 * var(--scrollbar-width)));
+          @include scrollbar-compensation-container;
+          @include scrollbar-compensation-full-width;
         }
         .contentWrapper {
-          padding-inline: var(--scrollbar-width);
+          @include scrollbar-compensation-content;
         }
       }
 
@@ -314,10 +317,10 @@ $maxWidth-App: createThemeVar("maxWidth-App");
         scrollbar-gutter: auto;
 
         .headerWrapper {
+          margin-inline: 0;
           & > div {
             padding-inline: 0;
           }
-          margin-inline: 0;
         }
 
         .footerWrapper {

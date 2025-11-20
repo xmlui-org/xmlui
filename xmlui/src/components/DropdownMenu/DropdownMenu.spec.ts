@@ -585,22 +585,22 @@ test.describe("Nested DropdownMenu and Select", () => {
     const confirmDialog = page.getByRole("dialog", { name: "Confirm action" });
     await expect(confirmDialog).toBeVisible();
 
-    await page.mouse.click(10, 10); // Click outside all dialogs
+    await page.mouse.click(10, 10, {delay: 100}); // Click outside all dialogs
     await expect(confirmDialog).not.toBeVisible();
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Item 1")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10);
+    await page.mouse.click(10, 10, {delay: 100});
     await expect(page.getByText("Option 1")).not.toBeVisible();
     await expect(page.getByText("Item 1")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10);
+    await page.mouse.click(10, 10, {delay: 100});
     await expect(page.getByText("Item 1")).not.toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10);
+    await page.mouse.click(10, 10, {delay: 100});
     await expect(page.getByText("Outer Dialog")).not.toBeVisible();
   });
 
@@ -664,22 +664,22 @@ test.describe("Nested DropdownMenu and Select", () => {
     const confirmDialog = page.getByRole("dialog", { name: "Confirm action" });
     await expect(confirmDialog).toBeVisible();
 
-    await page.mouse.click(10, 10); // Click outside all dialogs
+    await page.mouse.click(10, 10, {delay: 100}); // Click outside all dialogs
     await expect(confirmDialog).not.toBeVisible();
     await expect(page.getByText("Item 1")).toBeVisible();
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10);
+    await page.mouse.click(10, 10, {delay: 100});
     await expect(page.getByText("Item 1")).not.toBeVisible();
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10);
+    await page.mouse.click(10, 10, {delay: 100});
     await expect(page.getByText("Option 1")).not.toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10);
+    await page.mouse.click(10, 10, {delay: 100});
     await expect(page.getByText("Outer Dialog")).not.toBeVisible();
   });
 });

@@ -917,22 +917,22 @@ test.describe("Nested DropdownMenu and AutoComplete", () => {
     const confirmDialog = page.getByRole("dialog", { name: "Confirm action" });
     await expect(confirmDialog).toBeVisible();
 
-    await page.mouse.click(10, 10); // Click outside all dialogs
+    await page.mouse.click(10, 10, {delay: 100}); // Click outside all dialogs
     await expect(confirmDialog).not.toBeVisible();
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Item 1")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10);
+    await page.mouse.click(10, 10, {delay: 100});
     await expect(page.getByText("Option 1")).not.toBeVisible();
     await expect(page.getByText("Item 1")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10);
+    await page.mouse.click(10, 10, {delay: 100});
     await expect(page.getByText("Item 1")).not.toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10);
+    await page.mouse.click(10, 10, {delay: 100});
     await expect(page.getByText("Outer Dialog")).not.toBeVisible();
   });
 
@@ -942,7 +942,7 @@ test.describe("Nested DropdownMenu and AutoComplete", () => {
     createDropdownMenuDriver,
     createAutoCompleteDriver,
   }) => {
-    const { testStateDriver } = await initTestBed(`
+    await initTestBed(`
       <Fragment>
         <Button testId="openBtn" onClick="outerDialog.open()">Open Dialog</Button>
         <ModalDialog id="outerDialog" title="Outer Dialog">
@@ -996,22 +996,22 @@ test.describe("Nested DropdownMenu and AutoComplete", () => {
     const confirmDialog = page.getByRole("dialog", { name: "Confirm action" });
     await expect(confirmDialog).toBeVisible();
 
-    await page.mouse.click(10, 10); // Click outside all dialogs
+    await page.mouse.click(10, 10, {delay: 100}); // Click outside all dialogs
     await expect(confirmDialog).not.toBeVisible();
     await expect(page.getByText("Item 1")).toBeVisible();
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10);
+    await page.mouse.click(10, 10, {delay: 100});
     await expect(page.getByText("Item 1")).not.toBeVisible();
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10);
+    await page.mouse.click(10, 10, {delay: 100});
     await expect(page.getByText("Option 1")).not.toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10);
+    await page.mouse.click(10, 10, {delay: 100});
     await expect(page.getByText("Outer Dialog")).not.toBeVisible();
   });
 });
