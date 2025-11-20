@@ -116,8 +116,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
         z-index: 1;
         @include desktop-reset-all;
 
-        & > *,
-        & * {
+        & > * {
           @include desktop-reset-all;
         }
       }
@@ -153,8 +152,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
         flex-shrink: 0;
         @include desktop-reset-all;
 
-        & > *,
-        & * {
+        & > * {
           @include desktop-reset-all;
         }
       }
@@ -253,15 +251,10 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
       &.desktop {
         scrollbar-gutter: auto;
-        .headerWrapper {
-          margin-inline: 0;
-          & > div {
-            padding-inline: 0;
-          }
-        }
+        .headerWrapper,
         .footerWrapper {
           margin-inline: 0;
-          & > div {
+          & > * {
             padding-inline: 0;
           }
         }
