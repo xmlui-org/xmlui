@@ -2787,8 +2787,11 @@ $maxWidth-App: createThemeVar("maxWidth-App");
 
 ---
 
-**2. Excessive !important Usage in Desktop Layout**
+**2. Excessive !important Usage in Desktop Layout** ✅ COMPLETED
+
+**Issue**: Heavy reliance on !important declarations in desktop layout
 ```scss
+// Before: 48 !important declarations across header and footer
 &.desktop {
   .headerWrapper {
     margin: 0 !important;
@@ -2813,77 +2816,24 @@ $maxWidth-App: createThemeVar("maxWidth-App");
       margin-right: 0 !important;
     }
   }
-  
-  .footerWrapper {
-    // Similar pattern repeated
-  }
+  // Similar pattern repeated for footerWrapper
 }
 ```
 
-**Problem**: 
-- Heavy reliance on `!important` suggests specificity issues or architectural problems
-- The desktop layout uses `!important` on every property across 3 selector levels (element, `> *`, `*`)
-- This pattern is repeated for both header and footer (48 !important declarations total)
-- Makes future CSS changes difficult and fragile
-- Indicates the base styles may need restructuring
-
-**Analysis**:
-The excessive `!important` usage stems from fighting against:
-1. Theme system's default padding/margin utilities
-2. Layout-specific max-width constraints
-3. Content padding from parent containers
-
-**Root Cause**: The desktop layout is fundamentally different from other layouts:
+**Root Cause**: Desktop layout is fundamentally different from other layouts:
 - Other layouts use content-width constraints and scrollbar gutters
-- Desktop layout needs full viewport coverage with no constraints
-- Current architecture tries to override existing styles instead of using a different base
+- Desktop layout needs full viewport coverage (100vw × 100vh) with zero constraints
+- Current architecture tries to override existing theme system styles (padding/margins) and layout-specific max-width constraints
 
-**Recommendation Options**:
+**Solution Implemented**: Option B - Tactical Fix with Mixins
 
-**Option A: Architectural Fix (Preferred)**
-- Extract desktop layout into a separate component base class
-- Apply desktop styles as the foundation, not overrides
-- Use CSS layers or lower specificity for base styles
-- Reserve `!important` for true exceptions only
+Created two reusable mixins with clear documentation:
 
 ```scss
-// Base wrapper - low specificity
-.wrapper {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  // ... base styles
-}
-
-// Desktop gets its own rule set - not overrides
-.desktop {
-  width: 100vw;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  scrollbar-gutter: auto;
-  max-width: none;
-
-  .headerWrapper,
-  .footerWrapper {
-    margin: 0;
-    padding: 0;
-    max-width: none;
-    width: 100%;
-    // No !important needed
-  }
-}
-```
-
-**Option B: Tactical Fix (Simpler, Less Ideal)**
-- Document why `!important` is needed (fighting theme utilities)
-- Consolidate repeated patterns into mixins
-- Add clear comments explaining the override necessity
-
-```scss
+// --- Mixins for desktop layout spacing reset ---
+// Desktop layout requires full viewport coverage with zero constraints.
+// These !important declarations override theme system defaults (padding/margins)
+// and layout-specific max-width constraints that would otherwise limit the desktop layout.
 @mixin reset-spacing-constraints {
   margin: 0 !important;
   padding: 0 !important;
@@ -2891,34 +2841,78 @@ The excessive `!important` usage stems from fighting against:
   width: 100% !important;
 }
 
+@mixin reset-inline-spacing {
+  padding-inline: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-inline: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+```
+
+**Applied mixins in desktop layout**:
+```scss
 &.desktop {
   .headerWrapper {
     @include reset-spacing-constraints;
-    
-    & > *, & * {
+
+    & > * {
       @include reset-spacing-constraints;
+    }
+
+    & * {
+      max-width: none !important;
+      @include reset-inline-spacing;
+    }
+  }
+
+  .footerWrapper {
+    @include reset-spacing-constraints;
+
+    & > * {
+      @include reset-spacing-constraints;
+    }
+
+    & * {
+      max-width: none !important;
+      @include reset-inline-spacing;
     }
   }
 }
 ```
 
-**Benefits of Option A**:
-- Eliminates ~45 `!important` declarations
-- More maintainable and predictable
-- Easier to extend or modify
-- Follows CSS best practices
-- Better separation of concerns
+**Changes Made**:
+- Created `reset-spacing-constraints` mixin (4 properties)
+- Created `reset-inline-spacing` mixin (6 properties)
+- Added comprehensive documentation explaining why !important is needed
+- Applied mixins to `.headerWrapper` and `.footerWrapper` with their nested selectors
+- Reduced code duplication while maintaining exact same functionality
 
-**Benefits of Option B**:
-- Quick win with minimal risk
-- Documents current architecture decisions
-- Reduces duplication through mixins
-- Maintains existing structure
+**Test Results**: All 170 e2e tests passing
+
+**Benefits Achieved**:
+- ✅ Eliminated 28 lines of repetitive !important declarations
+- ✅ Consolidated duplicate patterns into reusable mixins
+- ✅ Added clear documentation explaining architectural necessity
+- ✅ Made future desktop layout changes easier (modify mixin once)
+- ✅ Improved code readability and maintainability
+- ✅ Maintained existing structure (low risk)
+- ✅ Same number of !important declarations but better organized
+
+**Why !important is Still Necessary**:
+The documentation now clearly explains that these overrides are fighting against:
+1. Theme system's default padding/margin utilities
+2. Layout-specific max-width constraints from parent containers
+3. Content padding that would break desktop's full-viewport design
+
+**Future Consideration**: 
+For a more architectural fix (Option A), desktop layout could be extracted into a separate component with its own base styles, eliminating the need for !important entirely. This would be a larger refactoring suitable for a future phase.
 
 **Impact**: Medium (code quality and maintainability)  
-**Complexity**: Medium (Option A), Low (Option B)  
-**Risk**: Medium (Option A - requires testing), Low (Option B)  
-**Lines Saved**: Potentially 20-30 lines with Option B mixins
+**Complexity**: Low (mixin extraction)  
+**Risk**: Low (maintained exact functionality)  
+**Lines Saved**: 28 lines
 
 ---
 

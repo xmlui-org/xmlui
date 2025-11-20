@@ -19,6 +19,26 @@ $backgroundColor-AppHeader: createThemeVar("backgroundColor-AppHeader");
 $borderBottom-NavPanel: createThemeVar("borderBottom-AppHeader");
 $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
+// --- Mixins for desktop layout spacing reset ---
+// Desktop layout requires full viewport coverage with zero constraints.
+// These !important declarations override theme system defaults (padding/margins)
+// and layout-specific max-width constraints that would otherwise limit the desktop layout.
+@mixin reset-spacing-constraints {
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: none !important;
+  width: 100% !important;
+}
+
+@mixin reset-inline-spacing {
+  padding-inline: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-inline: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
 @layer components {
   @include t.withMaxScreenSize(0) {
     .wrapper.verticalFullHeader {
@@ -133,26 +153,15 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
         top: 0;
         flex-shrink: 0;
         z-index: 1;
-        margin: 0 !important;
-        padding: 0 !important;
-        max-width: none !important;
-        width: 100% !important;
+        @include reset-spacing-constraints;
 
         & > * {
-          margin: 0 !important;
-          padding: 0 !important;
-          max-width: none !important;
-          width: 100% !important;
+          @include reset-spacing-constraints;
         }
 
         & * {
           max-width: none !important;
-          padding-inline: 0 !important;
-          padding-left: 0 !important;
-          padding-right: 0 !important;
-          margin-inline: 0 !important;
-          margin-left: 0 !important;
-          margin-right: 0 !important;
+          @include reset-inline-spacing;
         }
 
         :global(.headerInner) {
@@ -193,26 +202,15 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
         position: sticky;
         bottom: 0;
         flex-shrink: 0;
-        margin: 0 !important;
-        padding: 0 !important;
-        max-width: none !important;
-        width: 100% !important;
+        @include reset-spacing-constraints;
 
         & > * {
-          margin: 0 !important;
-          padding: 0 !important;
-          max-width: none !important;
-          width: 100% !important;
+          @include reset-spacing-constraints;
         }
 
         & * {
           max-width: none !important;
-          padding-inline: 0 !important;
-          padding-left: 0 !important;
-          padding-right: 0 !important;
-          margin-inline: 0 !important;
-          margin-left: 0 !important;
-          margin-right: 0 !important;
+          @include reset-inline-spacing;
         }
       }
     }
