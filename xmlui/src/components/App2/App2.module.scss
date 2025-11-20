@@ -32,7 +32,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 }
 
 @layer components {
-  .wrapper {
+  .appContainer {
     --footer-height: 0px;
     --header-height: 0px;
     width: 100%;

@@ -350,7 +350,7 @@ export function App2({
 
   const wrapperBaseClasses = [
     className,
-    styles.wrapper,
+    styles.appContainer,
     {
       [styles.scrollWholePage]: scrollWholePage,
       [styles.noScrollbarGutters]: noScrollbarGutters,
