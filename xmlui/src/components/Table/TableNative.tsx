@@ -950,6 +950,9 @@ export const Table = forwardRef(
                       if (target.tagName.toLowerCase() === "input") {
                         return;
                       }
+                      if (target.closest("button")) {
+                        return;
+                      }
 
                       // Check if click is within checkbox boundary
                       const currentRow = event.currentTarget as HTMLElement;
@@ -975,7 +978,6 @@ export const Table = forwardRef(
                           return;
                         }
                       }
-
                       toggleRow(row.original, event);
                     }}
                     onMouseMove={(event) => {
