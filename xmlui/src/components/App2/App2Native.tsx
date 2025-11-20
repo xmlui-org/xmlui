@@ -430,30 +430,30 @@ export function App2({
     case "vertical-sticky":
       content = (
         <AppContainer
-          {...rest}
           className={classnames(wrapperBaseClasses, styles.vertical, styles.sticky)}
           style={styleWithHelpers}
+          {...rest}
         >
-          {navPanelVisible && <div className={classnames(styles.navPanelWrapper)}>{navPanel}</div>}
-          <div className={styles.contentWrapper} ref={pageScrollRef}>
-            <header
+          {navPanelVisible && <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>}
+          <AppContentSlot ref={pageScrollRef}>
+            <AppHeaderSlot
               ref={headerRefCallback}
-              className={classnames(styles.headerWrapper, styles.sticky)}
+              className={styles.sticky}
             >
               {header}
-            </header>
-            <div className={styles.PagesWrapper} ref={contentScrollRef}>
+            </AppHeaderSlot>
+            <AppPagesSlot ref={contentScrollRef}>
               <div className={pagesWrapperClasses}>{children}</div>
-            </div>
-            <div 
-              className={classnames(styles.footerWrapper, {
+            </AppPagesSlot>
+            <AppFooterSlot
+              className={classnames({
                 [styles.nonSticky]: footerShouldBeNonSticky,
-              })} 
+              })}
               ref={footerRefCallback}
             >
               {footer}
-            </div>
-          </div>
+            </AppFooterSlot>
+          </AppContentSlot>
         </AppContainer>
       );
       break;
