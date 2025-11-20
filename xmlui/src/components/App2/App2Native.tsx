@@ -687,75 +687,74 @@ interface LayoutConfig {
 }
 
 /**
+ * Base layout configuration with common defaults.
+ */
+const baseLayoutConfig: LayoutConfig = {
+  containerClasses: [],
+  headerClasses: [],
+  footerClasses: [],
+  navPanelPosition: "none",
+  contentWrapperRef: "content",
+};
+
+/**
  * Layout configurations for all supported layout types.
  * Defines the structure and styling for each layout variant.
  */
 const layoutConfigs: Record<AppLayoutType, LayoutConfig> = {
   "vertical": {
+    ...baseLayoutConfig,
     containerClasses: [styles.vertical],
-    headerClasses: [],
-    footerClasses: [],
     navPanelPosition: "side",
     contentWrapperRef: "page",
   },
   "vertical-sticky": {
+    ...baseLayoutConfig,
     containerClasses: [styles.vertical, styles.sticky],
     headerClasses: [styles.sticky],
-    footerClasses: [],
     navPanelPosition: "side",
     contentWrapperRef: "page",
   },
   "vertical-full-header": {
+    ...baseLayoutConfig,
     containerClasses: [styles.verticalFullHeader],
     containerScrollRef: true,
     headerClasses: [styles.sticky],
-    footerClasses: [],
     navPanelPosition: "side",
-    contentWrapperRef: "content",
     useVerticalFullHeaderStructure: true,
   },
   "horizontal": {
+    ...baseLayoutConfig,
     containerClasses: [styles.horizontal],
     containerScrollRef: true,
-    headerClasses: [],
-    footerClasses: [],
     navPanelPosition: "header",
-    contentWrapperRef: "content",
     navPanelInHeader: true,
   },
   "horizontal-sticky": {
+    ...baseLayoutConfig,
     containerClasses: [styles.horizontal, styles.sticky],
     containerScrollRef: true,
     headerClasses: [styles.sticky],
-    footerClasses: [],
     navPanelPosition: "header",
-    contentWrapperRef: "content",
     navPanelInHeader: true,
   },
   "condensed": {
+    ...baseLayoutConfig,
     containerClasses: [styles.horizontal],
     containerScrollRef: true,
-    headerClasses: [],
-    footerClasses: [],
-    navPanelPosition: "none",
-    contentWrapperRef: "content",
     showCondensedHeader: true,
   },
   "condensed-sticky": {
+    ...baseLayoutConfig,
     containerClasses: [styles.horizontal, styles.sticky],
     containerScrollRef: true,
     headerClasses: [styles.sticky],
-    footerClasses: [],
-    navPanelPosition: "none",
-    contentWrapperRef: "content",
     showCondensedHeader: true,
   },
   "desktop": {
+    ...baseLayoutConfig,
     containerClasses: [styles.desktop],
     headerClasses: [styles.sticky],
-    footerClasses: [],
-    navPanelPosition: "none",
-    contentWrapperRef: "content",
   },
 };
 
