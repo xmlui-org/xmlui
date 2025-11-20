@@ -19,6 +19,15 @@ npx playwright test App2.spec.ts App2-layout.spec.ts --workers=4 --reporter=line
    - If an e2e test fails, attempt up to 3 iterations to fix it
    - If all 3 iterations fail, the current step fails
    - Request review before proceeding
+5. **CSS Class Names**: 
+   - Slot components MUST use original `App2.module.scss` class names (e.g., `headerWrapper`, `navPanelWrapper`, `PagesWrapper`, `footerWrapper`)
+   - Do NOT create new class names during refactoring (e.g., do NOT use `headerSlot`, `pagesSlot`, etc.)
+   - Tests depend on these exact class names for element identification
+   - CSS renaming will be done as a final step after all layouts are refactored
+6. **Component Type Consistency**:
+   - All layout cases must use the same wrapper component type (AppContainer)
+   - This prevents React unmount/remount issues when switching layouts dynamically
+   - Required for `data-testid` and class-based test selectors to work across layout changes
 
 ### Testing Requirements
 
@@ -2403,13 +2412,30 @@ All components created in `/Users/dotneteer/source/xmlui/xmlui/src/components/Ap
 4. **ForwardRef**: All components support ref forwarding for scroll management
 5. **Extensible Props**: Comment placeholders for props to be added during Phase 2
 6. **Consistent Pattern**: All follow same structure as `App2.module.scss`
+7. **Original Class Names**: Components use original `App2.module.scss` class names (`headerWrapper`, `navPanelWrapper`, `PagesWrapper`, `footerWrapper`) for test compatibility
+8. **AppContainer Universality**: AppContainer wraps ALL layout cases to ensure consistent React component type across layouts (prevents unmount/remount on layout switches)
+
+### Key Learnings
+
+**CSS Class Names Must Match Original**:
+- Tests use class name patterns like `className.includes("PagesWrapper")` to identify elements
+- Creating new class names (e.g., `pagesSlot`, `headerSlot`) breaks tests
+- Slot components must import and use classes from `App2.module.scss`
+- CSS renaming will be a separate phase after all layouts are refactored
+
+**Component Type Consistency Required**:
+- React unmounts/remounts when switching between different component types (e.g., `<div>` → `<AppContainer>`)
+- This breaks `data-testid` selectors during layout transitions
+- Solution: ALL layout cases must use AppContainer as the wrapper
+- Each layout can have different internal structure, but outer wrapper must be consistent
 
 ### Verification
 
 - ✅ All 6 components created with TypeScript files
-- ✅ All 6 SCSS modules created with proper theme support
-- ✅ All 170 tests still pass (App2Native.tsx unchanged)
+- ✅ All 6 SCSS modules created with proper theme support (initially separate, later consolidated to use App2.module.scss)
+- ✅ All 170 tests passing after wrapping all layouts with AppContainer
 - ✅ No breaking changes introduced
+- ✅ Horizontal layout successfully refactored to use all slot components
 
 ---
 
@@ -2462,40 +2488,41 @@ case "horizontal":
   break;
 ```
 
-**Target Structure** (using slot components):
+**Actual Implementation** (completed):
 ```tsx
-case "horizontal":
+case "horizontal": {
   content = (
     <AppContainer
-      {...rest}
-      layout="horizontal"
-      scrollWholePage={scrollWholePage}
-      noScrollbarGutters={noScrollbarGutters}
+      className={classnames(wrapperBaseClasses, styles.horizontal)}
       style={styleWithHelpers}
       ref={pageScrollRef}
+      {...rest}
     >
-      {navPanelVisible && <AppNavPanelSlot layout="horizontal">{navPanel}</AppNavPanelSlot>}
-      <AppHeaderSlot layout="horizontal" sticky ref={headerRefCallback}>
+      <AppHeaderSlot ref={headerRefCallback}>
         {header}
+        {navPanelVisible && <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>}
       </AppHeaderSlot>
-      <AppPagesSlot layout="horizontal" ref={contentScrollRef}>
+      <AppPagesSlot ref={contentScrollRef}>
         <div className={pagesWrapperClasses}>{children}</div>
       </AppPagesSlot>
-      <AppFooterSlot layout="horizontal" ref={footerRefCallback}>
+      <AppFooterSlot ref={footerRefCallback}>
         {footer}
       </AppFooterSlot>
     </AppContainer>
   );
   break;
+}
 ```
 
-**Steps**:
-1. Add `layout` prop to all slot components
-2. Add `sticky` prop to AppHeaderSlot and AppFooterSlot
-3. Add `scrollWholePage` and `noScrollbarGutters` props to AppContainer
-4. Move horizontal-specific styles from `App2.module.scss` to slot component SCSS files
-5. Update App2Native.tsx to use slot components for horizontal case
-6. Test with: `npx playwright test App2.spec.ts App2-layout.spec.ts --grep "horizontal" --workers=1`
+**Key Implementation Details**:
+1. AppContainer passes className (with `styles.horizontal`) instead of layout prop
+2. Slot components use original class names from `App2.module.scss`
+3. All slot components reference styles directly from `App2.module.scss` (not separate SCSS files)
+4. `{...rest}` placed after other props to ensure `data-testid` and other attributes are passed through
+5. No layout-specific props needed - CSS classes handle all layout variations
+6. ALL layout cases wrapped with AppContainer (not just horizontal) to ensure consistent React component type
+
+**Status**: ✅ **COMPLETED** - All 34 horizontal layout tests passing, all 170 total tests passing
 
 ---
 
@@ -2505,10 +2532,22 @@ case "horizontal":
 
 ### Completed
 - ✅ Phase 1: All slot components created with fundamental styles
-- ✅ Verification: All 170 tests passing with components created but unused
+- ✅ Phase 2 - Layout 1 (horizontal): Refactored to use all slot components
+  - AppContainer wraps all layout cases for component type consistency
+  - Horizontal layout uses AppHeaderSlot, AppNavPanelSlot, AppPagesSlot, AppFooterSlot
+  - All 34 horizontal layout tests passing
+  - All 170 total tests passing
 
-### In Progress
-- 🔄 Phase 2: Awaiting decision to start with horizontal layout
+### Lessons Learned
+1. **CSS Class Names**: Must use original `App2.module.scss` class names - tests depend on them
+2. **Component Type Consistency**: All layouts must use AppContainer to prevent React unmount/remount
+3. **Props Strategy**: Use className-based styling, not component props (simpler, less refactoring needed)
+
+### Next Steps
+1. Choose next layout to refactor (horizontal-sticky recommended as it's similar to horizontal)
+2. Apply same slot component pattern
+3. Run tests after each layout
+4. Repeat for remaining 6 layouts
 
 ### Next Steps
 1. Begin Phase 2 with horizontal layout refactoring
