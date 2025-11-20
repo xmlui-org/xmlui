@@ -198,34 +198,6 @@ const VALID_LAYOUTS: AppLayoutType[] = [
  * - On small screens: show inline only if there's no header to contain the drawer button,
  *   except for condensed layouts which always use the header for the drawer button
  */
-/**
- * Validates and sanitizes layout input.
- * 
- * @param layout - Layout value from props (may be undefined)
- * @param getThemeVar - Function to retrieve theme variables
- * @returns Valid AppLayoutType, falling back to "condensed-sticky" if invalid
- * 
- * Process:
- * 1. Get layout from props, theme variable, or default
- * 2. Trim whitespace and normalize Unicode dashes to regular hyphens
- * 3. Validate against VALID_LAYOUTS array
- * 4. Log error and return default if invalid
- */
-function validateLayout(
-  layout: string | undefined,
-  getThemeVar: (key: string) => any
-): AppLayoutType {
-  const layoutWithDefault = layout || getThemeVar("layout-App") || "condensed-sticky";
-  const sanitized = layoutWithDefault.trim().replace(/[\u2013\u2014\u2011]/g, "-");
-  const normalized = sanitized || "condensed-sticky";
-  
-  if (!VALID_LAYOUTS.includes(normalized as AppLayoutType)) {
-    console.error(`App2: layout type not supported: ${normalized}. Falling back to "condensed-sticky". Valid layouts: ${VALID_LAYOUTS.join(", ")}`);
-    return "condensed-sticky";
-  }
-  
-  return normalized as AppLayoutType;
-}
 
 export function App2({
   children,
@@ -260,7 +232,15 @@ export function App2({
   const mounted = useRef(false);
 
   // Validate and sanitize layout input with explicit validation
-  const safeLayout = validateLayout(layout, getThemeVar);
+  const layoutWithDefault = layout || getThemeVar("layout-App") || "condensed-sticky";
+  const sanitized = layoutWithDefault.trim().replace(/[\u2013\u2014\u2011]/g, "-");
+  const normalized = sanitized || "condensed-sticky";
+  
+  if (!VALID_LAYOUTS.includes(normalized as AppLayoutType)) {
+    console.error(`App2: layout type not supported: ${normalized}. Falling back to "condensed-sticky". Valid layouts: ${VALID_LAYOUTS.join(", ")}`);
+  }
+  
+  const safeLayout = VALID_LAYOUTS.includes(normalized as AppLayoutType) ? normalized as AppLayoutType : "condensed-sticky";
   const appContext = useAppContext();
   const { setLoggedInUser, mediaSize, forceRefreshAnchorScroll, appGlobals } = appContext;
   const hasRegisteredHeader = header !== undefined;
