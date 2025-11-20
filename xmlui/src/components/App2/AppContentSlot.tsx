@@ -1,6 +1,6 @@
 import React, { forwardRef } from "react";
 import classnames from "classnames";
-import styles from "./AppContentSlot.module.scss";
+import styles from "./App2.module.scss";
 
 interface AppContentSlotProps extends React.HTMLAttributes<HTMLDivElement> {
   // Props for controlling content wrapper behavior will be added when applying to layouts
@@ -13,7 +13,7 @@ interface AppContentSlotProps extends React.HTMLAttributes<HTMLDivElement> {
 export const AppContentSlot = forwardRef<HTMLDivElement, AppContentSlotProps>(
   ({ className, children, ...rest }, ref) => {
     return (
-      <div {...rest} className={classnames(styles.contentSlot, className)} ref={ref}>
+      <div {...rest} className={classnames(styles.contentWrapper, className)} ref={ref}>
         {children}
       </div>
     );

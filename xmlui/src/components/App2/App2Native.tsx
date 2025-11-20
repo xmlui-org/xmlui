@@ -408,22 +408,22 @@ export function App2({
     case "vertical":
       content = (
         <AppContainer
-          {...rest}
           className={classnames(wrapperBaseClasses, styles.vertical)}
           style={styleWithHelpers}
+          {...rest}
         >
-          {navPanelVisible && <div className={classnames(styles.navPanelWrapper)}>{navPanel}</div>}
-          <div className={styles.contentWrapper} ref={pageScrollRef}>
-            <header ref={headerRefCallback} className={classnames(styles.headerWrapper)}>
+          {navPanelVisible && <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>}
+          <AppContentSlot ref={pageScrollRef}>
+            <AppHeaderSlot ref={headerRefCallback}>
               {header}
-            </header>
-            <div className={styles.PagesWrapper} ref={contentScrollRef}>
+            </AppHeaderSlot>
+            <AppPagesSlot ref={contentScrollRef}>
               <div className={pagesWrapperClasses}>{children}</div>
-            </div>
-            <div className={styles.footerWrapper} ref={footerRefCallback}>
+            </AppPagesSlot>
+            <AppFooterSlot ref={footerRefCallback}>
               {footer}
-            </div>
-          </div>
+            </AppFooterSlot>
+          </AppContentSlot>
         </AppContainer>
       );
       break;
