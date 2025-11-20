@@ -19,9 +19,6 @@ $backgroundColor-AppHeader: createThemeVar("backgroundColor-AppHeader");
 $borderBottom-NavPanel: createThemeVar("borderBottom-AppHeader");
 $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
-// Variables for @layer section
-$maxWidth-App: createThemeVar("maxWidth-App");
-
 @layer components {
   @include t.withMaxScreenSize(0) {
     .wrapper.verticalFullHeader {

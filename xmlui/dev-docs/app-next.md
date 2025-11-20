@@ -2739,3 +2739,602 @@ return (
 **Lines Saved**: ~4 lines
 
 ---
+
+### 7. App2.module.scss Refactoring Opportunities
+
+**Current State Analysis**:
+
+The `App2.module.scss` file (435 lines) handles complex layout scenarios through nested class combinations. After reviewing both the SCSS and its usage in `App2Native.tsx`, several refactoring opportunities exist to simplify and improve maintainability.
+
+#### Current Structure Overview:
+- **Theme Variables**: 20 theme variables defined (width, backgroundColor, boxShadow, borders, maxWidths)
+- **Layout Classes**: 8 layout modifier classes (vertical, horizontal, verticalFullHeader, desktop, scrollWholePage, noScrollbarGutters, noFooter, sticky)
+- **Component Wrapper Classes**: 6 core slot wrappers (wrapper, headerWrapper, footerWrapper, navPanelWrapper, contentWrapper, PagesWrapper, PagesWrapperInner)
+- **Responsive Breakpoint**: One media query for small screens (`@layer components` with `withMaxScreenSize(0)`)
+
+#### Identified Issues:
+
+**1. Duplicate Theme Variable Declaration** ✅ COMPLETED
+
+**Issue**: `$maxWidth-App` was declared twice in App2.module.scss
+```scss
+// Line 17: First declaration
+$maxWidth-App: createThemeVar("maxWidth-App");
+
+// Lines 22-23: Duplicate declaration (REMOVED)
+// Variables for @layer section
+$maxWidth-App: createThemeVar("maxWidth-App");
+```
+
+**Solution**: Removed lines 22-23 (comment and duplicate variable declaration)
+
+**Changes Made**:
+- Deleted the redundant comment "Variables for @layer section"
+- Deleted the duplicate `$maxWidth-App` variable declaration
+- Theme variable is now declared only once at line 17
+
+**Test Results**: All 170 e2e tests passing
+
+**Benefits Achieved**:
+- ✅ Eliminated redundant code
+- ✅ Removed potential confusion from duplicate declarations
+- ✅ Cleaner, more maintainable SCSS
+- ✅ No functional impact (as expected)
+
+**Impact**: Low (cleanup)  
+**Risk**: None  
+**Lines Saved**: 2 lines
+
+---
+
+**2. Excessive !important Usage in Desktop Layout**
+```scss
+&.desktop {
+  .headerWrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+
+    & > * {
+      margin: 0 !important;
+      padding: 0 !important;
+      max-width: none !important;
+      width: 100% !important;
+    }
+
+    & * {
+      max-width: none !important;
+      padding-inline: 0 !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      margin-inline: 0 !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+  }
+  
+  .footerWrapper {
+    // Similar pattern repeated
+  }
+}
+```
+
+**Problem**: 
+- Heavy reliance on `!important` suggests specificity issues or architectural problems
+- The desktop layout uses `!important` on every property across 3 selector levels (element, `> *`, `*`)
+- This pattern is repeated for both header and footer (48 !important declarations total)
+- Makes future CSS changes difficult and fragile
+- Indicates the base styles may need restructuring
+
+**Analysis**:
+The excessive `!important` usage stems from fighting against:
+1. Theme system's default padding/margin utilities
+2. Layout-specific max-width constraints
+3. Content padding from parent containers
+
+**Root Cause**: The desktop layout is fundamentally different from other layouts:
+- Other layouts use content-width constraints and scrollbar gutters
+- Desktop layout needs full viewport coverage with no constraints
+- Current architecture tries to override existing styles instead of using a different base
+
+**Recommendation Options**:
+
+**Option A: Architectural Fix (Preferred)**
+- Extract desktop layout into a separate component base class
+- Apply desktop styles as the foundation, not overrides
+- Use CSS layers or lower specificity for base styles
+- Reserve `!important` for true exceptions only
+
+```scss
+// Base wrapper - low specificity
+.wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  // ... base styles
+}
+
+// Desktop gets its own rule set - not overrides
+.desktop {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  scrollbar-gutter: auto;
+  max-width: none;
+
+  .headerWrapper,
+  .footerWrapper {
+    margin: 0;
+    padding: 0;
+    max-width: none;
+    width: 100%;
+    // No !important needed
+  }
+}
+```
+
+**Option B: Tactical Fix (Simpler, Less Ideal)**
+- Document why `!important` is needed (fighting theme utilities)
+- Consolidate repeated patterns into mixins
+- Add clear comments explaining the override necessity
+
+```scss
+@mixin reset-spacing-constraints {
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: none !important;
+  width: 100% !important;
+}
+
+&.desktop {
+  .headerWrapper {
+    @include reset-spacing-constraints;
+    
+    & > *, & * {
+      @include reset-spacing-constraints;
+    }
+  }
+}
+```
+
+**Benefits of Option A**:
+- Eliminates ~45 `!important` declarations
+- More maintainable and predictable
+- Easier to extend or modify
+- Follows CSS best practices
+- Better separation of concerns
+
+**Benefits of Option B**:
+- Quick win with minimal risk
+- Documents current architecture decisions
+- Reduces duplication through mixins
+- Maintains existing structure
+
+**Impact**: Medium (code quality and maintainability)  
+**Complexity**: Medium (Option A), Low (Option B)  
+**Risk**: Medium (Option A - requires testing), Low (Option B)  
+**Lines Saved**: Potentially 20-30 lines with Option B mixins
+
+---
+
+**3. Repetitive Sticky Footer Logic**
+```scss
+.footerWrapper {
+  position: static;
+}
+&.sticky {
+  .footerWrapper {
+    position: sticky;
+    bottom: 0;
+  }
+  .footerWrapper.nonSticky {
+    position: static;
+  }
+}
+```
+
+**Problem**: This pattern appears in multiple layout contexts (vertical, horizontal, verticalFullHeader) with slight variations. The base assumption is `static`, which is then conditionally overridden.
+
+**Current Flow**:
+1. Default: `position: static`
+2. If parent has `.sticky`: `position: sticky; bottom: 0`
+3. If footer element has `.nonSticky`: back to `position: static`
+
+**Analysis**:
+The `.nonSticky` class is applied when `footerSticky` prop is `false`. This creates a three-level cascade:
+- Base rule → Layout-specific override → Component-specific override
+
+This is fragile because it relies on specificity ordering and makes the intended behavior unclear.
+
+**Recommendation**: Simplify with explicit positioning logic
+
+**Option A: Single Source of Truth (Preferred)**
+```scss
+// Remove default static positioning
+// Let layout configs set the default explicitly
+
+&.vertical {
+  .footerWrapper {
+    // No default position - let it be static by CSS defaults
+  }
+  
+  &.sticky .footerWrapper:not(.nonSticky) {
+    position: sticky;
+    bottom: 0;
+  }
+}
+```
+
+**Option B: Positive Class Instead of Negative**
+```scss
+// Use .stickyFooter instead of .nonSticky
+.footerWrapper {
+  position: static; // explicit default
+  
+  &.stickyFooter {
+    position: sticky;
+    bottom: 0;
+  }
+}
+
+// Simpler, clearer intent
+```
+
+**Benefits**:
+- Clearer intent (positive class names are more intuitive)
+- Reduces specificity battles
+- Easier to trace behavior
+- Less repetitive code
+
+**Challenges**:
+- Requires updating `App2Native.tsx` to apply positive class instead
+- May affect tests that look for `.nonSticky` class
+
+**Impact**: Low (code clarity)  
+**Complexity**: Simple  
+**Risk**: Low (requires TypeScript changes + test validation)  
+**Lines Saved**: ~5-10 lines across multiple layout blocks
+
+---
+
+**4. Repeated Height Calculation Pattern**
+```scss
+.navPanelWrapper {
+  height: calc(var(--containerHeight, 100vh) - var(--footer-height) - var(--header-height));
+}
+
+&.noFooter {
+  .navPanelWrapper {
+    height: calc(var(--containerHeight, 100vh) - var(--header-height));
+  }
+}
+
+// Same pattern for .PagesWrapper
+.PagesWrapper {
+  min-height: calc(var(--containerHeight, 100vh) - var(--header-height) - var(--footer-height));
+}
+
+&.noFooter {
+  .PagesWrapper {
+    min-height: calc(var(--containerHeight, 100vh) - var(--header-height));
+  }
+}
+```
+
+**Problem**: The same height calculation appears 4 times with slight variations:
+1. `navPanelWrapper height` with footer
+2. `navPanelWrapper height` without footer  
+3. `PagesWrapper min-height` with footer
+4. `PagesWrapper min-height` without footer
+
+**Analysis**:
+The `.noFooter` class is added when `footerSticky` is `false`, which signals that footer height should not be subtracted from available space. This creates duplication because we need two versions of each calculation.
+
+**Recommendation**: Use CSS custom property with conditional value
+
+```scss
+// Set footer height variable conditionally
+&.verticalFullHeader {
+  --effective-footer-height: var(--footer-height);
+  
+  &.noFooter {
+    --effective-footer-height: 0px;
+  }
+  
+  .navPanelWrapper {
+    height: calc(
+      var(--containerHeight, 100vh) 
+      - var(--header-height) 
+      - var(--effective-footer-height)
+    );
+  }
+
+  .PagesWrapper {
+    min-height: calc(
+      var(--containerHeight, 100vh) 
+      - var(--header-height) 
+      - var(--effective-footer-height)
+    );
+  }
+}
+```
+
+**Alternative**: Use CSS comparison functions (modern CSS)
+```scss
+// Set footer-height to 0 when noFooter is present
+.navPanelWrapper {
+  height: calc(
+    var(--containerHeight, 100vh) 
+    - var(--header-height) 
+    - max(var(--footer-height) * var(--footer-enabled, 1), 0px)
+  );
+}
+
+// Set --footer-enabled CSS variable in TypeScript
+&.noFooter {
+  --footer-enabled: 0;
+}
+```
+
+**Benefits**:
+- Eliminates duplicate calc() expressions
+- Single source of truth for height calculations
+- Easier to maintain and modify
+- More declarative (the variable name explains intent)
+
+**Challenges**:
+- Slightly more abstract (uses intermediate CSS variable)
+- May require updating TypeScript side for variable setting
+
+**Impact**: Medium (reduces duplication significantly)  
+**Complexity**: Simple  
+**Risk**: Low  
+**Lines Saved**: ~8 lines (4 duplicate rules eliminated)
+
+---
+
+**5. Scrollbar Gutter Compensation Logic Complexity**
+```scss
+&.scrollWholePage {
+  scrollbar-gutter: stable both-edges;
+
+  .headerWrapper {
+    & > div {
+      padding-inline: var(--scrollbar-width);
+    }
+    margin-inline: calc(-1 * var(--scrollbar-width));
+  }
+
+  .footerWrapper {
+    margin-inline: calc(-1 * var(--scrollbar-width));
+    & > div {
+      padding-inline: var(--scrollbar-width);
+    }
+  }
+
+  &.verticalFullHeader {
+    .content {
+      margin-inline: calc(-1 * var(--scrollbar-width));
+      width: calc(100% + (2 * var(--scrollbar-width)));
+    }
+    .contentWrapper {
+      padding-inline: var(--scrollbar-width);
+    }
+  }
+
+  &.desktop {
+    scrollbar-gutter: auto;
+    // Resets all the above rules
+  }
+}
+
+&:not(.scrollWholePage) {
+  overflow: hidden;
+  .content {
+    min-height: 0;
+    height: 100%;
+  }
+  // ... different rules
+}
+```
+
+**Problem**: The scrollbar gutter compensation system is complex:
+1. Base behavior applies negative margins and padding compensation
+2. `verticalFullHeader` needs additional compensation for `.content` wrapper
+3. `desktop` layout undoes all compensation
+4. `:not(.scrollWholePage)` has entirely different overflow rules
+
+**Analysis**:
+The scrollbar gutter system tries to:
+- Reserve space for scrollbars (`scrollbar-gutter: stable both-edges`)
+- Compensate for that reserved space by negative margins on containers
+- Re-add the space as padding on inner content
+- This creates visual full-width appearance while maintaining scrollbar space
+
+**Issues**:
+1. Multiple levels of compensation (margins, padding, width adjustments)
+2. Different layouts need different compensation strategies
+3. Desktop layout disables the entire system
+4. Complex interaction between `scrollWholePage`, layout type, and `noScrollbarGutters`
+
+**Recommendation**: Extract scrollbar compensation into CSS mixins
+
+```scss
+@mixin scrollbar-compensation-container {
+  margin-inline: calc(-1 * var(--scrollbar-width));
+}
+
+@mixin scrollbar-compensation-content {
+  padding-inline: var(--scrollbar-width);
+}
+
+@mixin scrollbar-compensation-full-width {
+  width: calc(100% + (2 * var(--scrollbar-width)));
+}
+
+&.scrollWholePage {
+  scrollbar-gutter: stable both-edges;
+
+  .headerWrapper {
+    @include scrollbar-compensation-container;
+    & > div {
+      @include scrollbar-compensation-content;
+    }
+  }
+
+  .footerWrapper {
+    @include scrollbar-compensation-container;
+    & > div {
+      @include scrollbar-compensation-content;
+    }
+  }
+
+  &.verticalFullHeader {
+    .content {
+      @include scrollbar-compensation-container;
+      @include scrollbar-compensation-full-width;
+    }
+    .contentWrapper {
+      @include scrollbar-compensation-content;
+    }
+  }
+
+  &.desktop {
+    scrollbar-gutter: auto;
+    // Override: no compensation needed
+    .headerWrapper,
+    .footerWrapper {
+      margin-inline: 0;
+      & > div {
+        padding-inline: 0;
+      }
+    }
+  }
+}
+```
+
+**Benefits**:
+- Clearer intent through named mixins
+- Easier to understand compensation strategy
+- Reusable for future layouts
+- Better documentation through semantic names
+- Simpler to disable/modify compensation
+
+**Alternative Approach**: Consider CSS Container Queries
+If browser support allows, container queries could eliminate some compensation logic:
+```scss
+@container (min-width: 100cqw) {
+  // Full-width containers don't need compensation
+}
+```
+
+**Impact**: Medium (improves code clarity and maintainability)  
+**Complexity**: Medium  
+**Risk**: Low (primarily refactoring, not logic changes)  
+**Lines Saved**: Minimal (adds mixin definitions but improves readability)
+
+---
+
+**6. Media Query Isolation**
+```scss
+@include t.withMaxScreenSize(0) {
+  .wrapper.verticalFullHeader {
+    .navPanelWrapper {
+      display: none;
+    }
+  }
+}
+```
+
+**Problem**: Only one media query exists in the entire file, and it's placed at the top of `@layer components` block, isolated from the `.verticalFullHeader` rules it modifies (which appear 200+ lines later).
+
+**Analysis**:
+- The media query hides `navPanelWrapper` on small screens for `verticalFullHeader` layout
+- This is the only responsive behavior defined in SCSS (other responsive logic is in TypeScript via `mediaSize` and `navPanelVisible`)
+- Placing it at the top separates it from related `.verticalFullHeader` styles
+
+**Recommendation**: Move media query closer to the related rules
+
+```scss
+&.verticalFullHeader {
+  min-height: 100%;
+  height: 100%;
+  overflow: auto;
+  
+  .navPanelWrapper {
+    width: $width-navPanel-App;
+    position: sticky;
+    // ... styles
+    
+    // Responsive behavior inline with element styles
+    @include t.withMaxScreenSize(0) {
+      display: none;
+    }
+  }
+  
+  // ... rest of verticalFullHeader rules
+}
+```
+
+**Benefits**:
+- Co-locates related responsive behavior
+- Easier to understand component behavior at a glance
+- Follows CSS best practice of grouping related rules
+- Reduces cognitive load when maintaining code
+
+**Alternative**: Document why it's at the top
+If there's a specific reason for the current placement (performance, specificity, etc.), add a comment:
+```scss
+// Media query placed at top of @layer for specificity control
+// Overrides .navPanelWrapper display in .verticalFullHeader on small screens
+@include t.withMaxScreenSize(0) {
+  .wrapper.verticalFullHeader {
+    .navPanelWrapper {
+      display: none;
+    }
+  }
+}
+```
+
+**Impact**: Low (code organization)  
+**Complexity**: Simple  
+**Risk**: Very Low (just moving code)  
+**Lines Saved**: 0 (neutral, improves organization)
+
+---
+
+#### Summary of Refactoring Opportunities
+
+| # | Issue | Impact | Complexity | Risk | Priority | Lines Saved |
+|---|-------|--------|------------|------|----------|-------------|
+| 1 | Duplicate `$maxWidth-App` declaration | Low | Simple | None | High (quick win) | 2 |
+| 2 | Excessive `!important` in desktop layout | Medium | Medium (A) / Low (B) | Medium (A) / Low (B) | Medium | 20-30 |
+| 3 | Repetitive sticky footer logic | Low | Simple | Low | Medium | 5-10 |
+| 4 | Repeated height calculation pattern | Medium | Simple | Low | High | 8 |
+| 5 | Scrollbar gutter compensation complexity | Medium | Medium | Low | Medium | 0 (clarity) |
+| 6 | Media query isolation | Low | Simple | Very Low | Low | 0 (organization) |
+
+**Recommended Implementation Order**:
+1. **Issue #1** (Duplicate declaration) - Quick, safe cleanup
+2. **Issue #4** (Height calculations) - High impact, low risk
+3. **Issue #3** (Sticky footer) - Improves clarity, low risk
+4. **Issue #6** (Media query) - Simple organization improvement
+5. **Issue #5** (Scrollbar compensation) - Requires careful testing
+6. **Issue #2** (Desktop !important) - Highest impact but needs architectural decision
+
+**Total Potential Lines Saved**: 35-50 lines (excluding mixin definitions)
+**Total Clarity Improvement**: High (especially issues #2, #4, #5)
+
+**Testing Requirements**:
+- All 170 e2e tests must pass after each refactoring
+- Visual regression testing for desktop layout (Issue #2)
+- Scroll behavior testing for scrollbar compensation (Issue #5)
+- Footer positioning testing (Issue #3)
+- Height calculation testing for verticalFullHeader (Issue #4)
+
+---
