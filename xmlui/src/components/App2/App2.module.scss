@@ -45,7 +45,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
     &.vertical {
       flex-direction: row;
-      overflow: initial;
 
       .contentWrapper {
         scrollbar-gutter: stable both-edges;
@@ -134,7 +133,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       .PagesWrapper {
         flex: 1;
         min-height: 0;
-        overflow: hidden;
         display: flex;
         flex-direction: column;
         scrollbar-gutter: auto;
