@@ -64,11 +64,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
         flex-shrink: 0;
       }
 
-      .PagesWrapper {
-        min-height: initial;
-        flex: 1;
-      }
-
       .footerWrapper {
         position: static;
       }
@@ -76,9 +71,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
     &.horizontal {
       overflow: auto;
-      .PagesWrapper {
-        min-height: initial;
-      }
       .footerWrapper {
         position: static;
       }
@@ -290,7 +282,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       }
       .PagesWrapperInner {
         min-height: 100%;
-        height: 0;
       }
     }
 
@@ -359,6 +350,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
   .PagesWrapper {
     flex: 1;
+    min-height: initial;
     isolation: isolate;
   }
 
