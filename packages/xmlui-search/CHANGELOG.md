@@ -1,5 +1,11 @@
 # xmlui-search
 
+## 0.1.5
+
+### Patch Changes
+
+- a952601: fix: use transform instead of width for Search expand/collapse animations, use the default font type instead of monospace
+
 ## 0.1.4
 
 ### Patch Changes
