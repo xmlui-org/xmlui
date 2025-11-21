@@ -1489,3 +1489,212 @@ test.describe("Vertical Layout Mobile - scrollWholePage=false, noScrollbarGutter
   });
 });
 
+// =============================================================================
+// MOBILE LAYOUT TESTS - VERTICAL-STICKY
+// =============================================================================
+// Note: Vertical-sticky layout keeps header/footer fixed in viewport (sticky).
+// Main content scrolls but header/footer remain visible.
+
+test.describe("Vertical-Sticky Layout Mobile - scrollWholePage=true, noScrollbarGutters=true", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+  });
+
+  test("renders header with hamburger, main content, and footer with sticky positioning", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("vertical-sticky", true, true, "200px"));
+
+    await verifyAllBlocksVisible(page);
+    await verifyNavPanelNotInline(page);
+    await verifyHamburgerMenuVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "mainContent", "footer"]);
+  });
+
+  test("tall content at top: header and footer sticky, main content visible", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("vertical-sticky", true, true, "2000px"));
+
+    await verifyAllBlocksVisible(page);
+    await verifyNavPanelNotInline(page);
+    await verifyHamburgerMenuVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "mainContent", "footer"]);
+    await verifyMainContentAreaScrollable(page, true);
+  });
+
+  test("tall content at mid-scroll: header and footer remain sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("vertical-sticky", true, true, "2000px"));
+    
+    await scrollMainContentAreaTo(page, "mid");
+    
+    // Header and footer should remain in viewport (sticky)
+    await verifyBlocksInViewport(page, ["appHeader", "footer"]);
+  });
+
+  test("tall content at bottom: header and footer remain sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("vertical-sticky", true, true, "2000px"));
+    
+    await scrollMainContentAreaTo(page, "bottom");
+    
+    await verifyBlocksInViewport(page, ["appHeader", "mainContent", "footer"]);
+  });
+});
+
+test.describe("Vertical-Sticky Layout Mobile - scrollWholePage=true, noScrollbarGutters=false", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+  });
+
+  test("short content: all blocks visible, no scrollbar, gutters reserved", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("vertical-sticky", false, true, "200px"));
+
+    await verifyAllBlocksVisible(page);
+    await verifyNavPanelNotInline(page);
+    await verifyScrollbarGutters(page, true);
+  });
+
+  test("tall content at top: main content area scrolls with reserved gutters, header/footer sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("vertical-sticky", false, true, "2000px"));
+
+    await verifyMainContentAreaScrollable(page, true);
+    await verifyScrollbarGutters(page, true);
+    await verifyBlocksInViewport(page, ["appHeader", "footer"]);
+  });
+
+  test("tall content at mid-scroll: header and footer remain sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("vertical-sticky", false, true, "2000px"));
+    
+    await scrollMainContentAreaTo(page, "mid");
+    
+    await verifyBlocksInViewport(page, ["appHeader", "footer"]);
+  });
+
+  test("tall content at bottom: header and footer remain sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("vertical-sticky", false, true, "2000px"));
+    
+    await scrollMainContentAreaTo(page, "bottom");
+    
+    await verifyBlocksInViewport(page, ["appHeader", "mainContent", "footer"]);
+  });
+});
+
+test.describe("Vertical-Sticky Layout Mobile - scrollWholePage=false, noScrollbarGutters=true", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+  });
+
+  test("short content: all blocks visible, main content is scroll container, no gutters", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("vertical-sticky", true, false, "200px"));
+
+    await verifyAllBlocksVisible(page);
+    await verifyNavPanelNotInline(page);
+    await verifyAppContainerNotScrollable(page);
+  });
+
+  test("tall content at top: main content scrolls, header/footer sticky, no gutters", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("vertical-sticky", true, false, "2000px"));
+
+    await verifyMainContentIsScrollContainer(page);
+    await verifyMainContentScrollbarGutters(page, false);
+    await verifyBlocksInViewport(page, ["appHeader", "mainContent", "footer"]);
+  });
+
+  test("tall content at mid-scroll: only main content scrolls, header/footer remain sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("vertical-sticky", true, false, "2000px"));
+    
+    await scrollMainContentTo(page, "mid");
+    
+    await verifyBlocksInViewport(page, ["appHeader", "footer"]);
+  });
+
+  test("tall content at bottom: only main content scrolls, header/footer remain sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("vertical-sticky", true, false, "2000px"));
+    
+    await scrollMainContentTo(page, "bottom");
+    
+    await verifyBlocksInViewport(page, ["appHeader", "footer"]);
+  });
+});
+
+test.describe("Vertical-Sticky Layout Mobile - scrollWholePage=false, noScrollbarGutters=false", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+  });
+
+  test("short content: main content is scroll container with reserved gutters", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("vertical-sticky", false, false, "200px"));
+
+    await verifyMainContentScrollbarGutters(page, true);
+    await verifyBlocksInViewport(page, ["appHeader", "mainContent", "footer"]);
+  });
+
+  test("tall content at top: main content scrolls with reserved gutters, header/footer sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("vertical-sticky", false, false, "2000px"));
+
+    await verifyMainContentIsScrollContainer(page);
+    await verifyMainContentScrollbarGutters(page, true);
+    await verifyBlocksInViewport(page, ["appHeader", "mainContent", "footer"]);
+  });
+
+  test("tall content at mid-scroll: only main content scrolls, header/footer sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("vertical-sticky", false, false, "2000px"));
+    
+    await scrollMainContentTo(page, "mid");
+    
+    await verifyBlocksInViewport(page, ["appHeader", "footer"]);
+  });
+
+  test("tall content at bottom: only main content scrolls, header/footer sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("vertical-sticky", false, false, "2000px"));
+    
+    await scrollMainContentTo(page, "bottom");
+    
+    await verifyBlocksInViewport(page, ["appHeader", "footer"]);
+  });
+});
+
