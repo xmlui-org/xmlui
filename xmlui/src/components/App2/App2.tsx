@@ -9,17 +9,11 @@ import { createMetadata, dComponent } from "../../components/metadata-helpers";
 import { appLayoutMd } from "../App/AppLayoutContext";
 import { App2 as App2Component, defaultProps } from "./App2Native";
 import type { CSSProperties } from "react";
-import { useCallback, useMemo, useRef } from "react";
+import { useRef } from "react";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import { SearchIndexCollector } from "./SearchIndexCollector";
-
-// --- Define a structure to represent navigation hierarchy
-interface NavHierarchyNode {
-  type: string;
-  label: string;
-  path?: string;
-  children?: NavHierarchyNode[];
-}
+import { extractAppComponents, extractNavPanelFromPages } from "./App2Navigation";
+import type { ExtractedComponents } from "./App2Navigation";
 
 const COMP = "App2";
 
@@ -143,88 +137,56 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
   // --- Use ref to track if we've already processed the navigation to avoid duplicates in strict mode
   const processedNavRef = useRef(false);
 
-  // --- Memoize the layout type to avoid unnecessary re-extraction
-  const layoutType = useMemo(
-    () => extractValue(node.props.layout),
-    [node.props.layout, extractValue],
-  );
-
-  // --- Create helper function instances for this component
-  const parseHierarchyLabels = useMemo(() => createParseHierarchyLabels(), []);
-  const labelExistsInHierarchy = useMemo(() => createLabelExistsInHierarchy(), []);
-
-  // --- Extract app components and enhance NavPanel with page navigation
-  const extracted = useMemo(
-    () => extractAppComponents(node.children),
-    [node.children]
-  );
-
-  const enhancedNavPanel = useMemo(
-    () => enhanceNavPanelWithPageNav(
-      extracted,
-      processedNavRef,
-      extractValue,
-      parseHierarchyLabels,
-      labelExistsInHierarchy,
-      findOrCreateNavGroup,
-    ),
-    [extracted, extractValue, parseHierarchyLabels, labelExistsInHierarchy]
-  );
-
+  // --- Extract app components
+  const extracted = extractAppComponents(node.children);
   const { AppHeader, Footer, Pages, restChildren } = extracted;
-  const NavPanel = enhancedNavPanel;
+  
+  // --- Enhance NavPanel with page navigation inline
+  const { NavPanel: originalNavPanel } = extracted;
+  
+  let NavPanel = originalNavPanel;
+  
+  if (Pages && !processedNavRef.current) {
+    processedNavRef.current = true;
+    
+    const extraNavs = extractNavPanelFromPages(Pages, originalNavPanel, extractValue);
+    
+    if (extraNavs?.length) {
+      if (originalNavPanel) {
+        NavPanel = {
+          ...originalNavPanel,
+          children: originalNavPanel.children ? [...originalNavPanel.children, ...extraNavs] : extraNavs,
+        };
+      } else {
+        NavPanel = {
+          type: "NavPanel",
+          props: {},
+          children: extraNavs,
+        };
+      }
+    }
+  }
 
-  const applyDefaultContentPadding= !Pages;
-
-  // Extract sticky property from Footer component
-  const footerSticky = useMemo(
-    () => extractComponentProp(Footer, "sticky", true, extractValue),
-    [Footer, extractValue]
-  );
-
-  // --- Memoize all app props to prevent unnecessary re-renders
-  const appProps = useMemo(
-    () => ({
-      scrollWholePage: extractValue.asOptionalBoolean(node.props.scrollWholePage, true),
-      noScrollbarGutters: extractValue.asOptionalBoolean(node.props.noScrollbarGutters, false),
-      className,
-      layout: layoutType,
-      loggedInUser: extractValue(node.props.loggedInUser),
-      onReady: lookupEventHandler("ready"),
-      onMessageReceived: lookupEventHandler("messageReceived"),
-      name: extractValue(node.props.name),
-      logo: extractValue(node.props.logo),
-      logoDark: extractValue(node.props["logo-dark"]),
-      logoLight: extractValue(node.props["logo-light"]),
-      defaultTone: extractValue(node.props.defaultTone),
-      defaultTheme: extractValue(node.props.defaultTheme),
-      autoDetectTone: extractValue.asOptionalBoolean(node.props.autoDetectTone, false),
-      applyDefaultContentPadding,
-      footerSticky,
-    }),
-    [
-      extractValue,
-      layoutType,
-      lookupEventHandler,
-      node.props.loggedInUser,
-      node.props.noScrollbarGutters,
-      node.props.scrollWholePage,
-      node.props.name,
-      node.props.logo,
-      node.props["logo-dark"],
-      node.props["logo-light"],
-      node.props.defaultTone,
-      node.props.defaultTheme,
-      node.props.autoDetectTone,
-      className,
-      applyDefaultContentPadding,
-      footerSticky,
-    ],
-  );
+  const applyDefaultContentPadding = !Pages;
+  const footerSticky = Footer?.props?.sticky ?? true;
 
   return (
     <App2Component
-      {...appProps}
+      scrollWholePage={extractValue.asOptionalBoolean(node.props.scrollWholePage, true)}
+      noScrollbarGutters={extractValue.asOptionalBoolean(node.props.noScrollbarGutters, false)}
+      className={className}
+      layout={extractValue(node.props.layout)}
+      loggedInUser={extractValue(node.props.loggedInUser)}
+      onReady={lookupEventHandler("ready")}
+      onMessageReceived={lookupEventHandler("messageReceived")}
+      name={extractValue(node.props.name)}
+      logo={extractValue(node.props.logo)}
+      logoDark={extractValue(node.props["logo-dark"])}
+      logoLight={extractValue(node.props["logo-light"])}
+      defaultTone={extractValue(node.props.defaultTone)}
+      defaultTheme={extractValue(node.props.defaultTheme)}
+      autoDetectTone={extractValue.asOptionalBoolean(node.props.autoDetectTone, false)}
+      applyDefaultContentPadding={applyDefaultContentPadding}
       header={renderChild(AppHeader)}
       footer={renderChild(Footer)}
       footerSticky={footerSticky}
@@ -238,273 +200,6 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
       <SearchIndexCollector Pages={Pages} renderChild={renderChild} />
     </App2Component>
   );
-}
-
-// --- Navigation Helper Functions ---
-
-/**
- * Parse a string into hierarchy labels, handling escaped pipe characters.
- * Uses caching to avoid reprocessing the same label text.
- */
-function createParseHierarchyLabels() {
-  const cache = new Map<string, string[]>();
-
-  return (labelText: string): string[] => {
-    if (cache.has(labelText)) {
-      return cache.get(labelText)!;
-    }
-
-    const result: string[] = [];
-    let currentLabel = "";
-    let escaped = false;
-
-    for (let i = 0; i < labelText.length; i++) {
-      const char = labelText[i];
-
-      if (escaped) {
-        currentLabel += char;
-        escaped = false;
-      } else if (char === "\\") {
-        escaped = true;
-      } else if (char === "|") {
-        result.push(currentLabel.trim());
-        currentLabel = "";
-      } else {
-        currentLabel += char;
-      }
-    }
-
-    if (currentLabel.length > 0) {
-      result.push(currentLabel.trim());
-    }
-
-    cache.set(labelText, result);
-    return result;
-  };
-}
-
-// --- Component Extraction Helper Functions ---
-
-interface ExtractedComponents {
-  AppHeader?: ComponentDef;
-  Footer?: ComponentDef;
-  NavPanel?: ComponentDef;
-  Pages?: ComponentDef;
-  restChildren: ComponentDef[];
-}
-
-/**
- * Extract App2 special components (AppHeader, Footer, NavPanel, Pages) from children.
- * Handles Theme wrappers by unwrapping special components while preserving Theme for others.
- */
-function extractAppComponents(children: ComponentDef[] | undefined): ExtractedComponents {
-  const result: ExtractedComponents = { restChildren: [] };
-
-  if (!children) return result;
-
-  for (const child of children) {
-    if (child.type === "Theme") {
-      extractFromThemeWrapper(child, result);
-    } else {
-      extractDirectChild(child, result);
-    }
-  }
-
-  return result;
-}
-
-/**
- * Extract special components from within a Theme wrapper.
- * Special components are unwrapped while other children remain in the Theme.
- */
-function extractFromThemeWrapper(
-  themeNode: ComponentDef,
-  result: ExtractedComponents
-): void {
-  const otherChildren: ComponentDef[] = [];
-
-  themeNode.children?.forEach((child) => {
-    if (child.type === "AppHeader") {
-      result.AppHeader = { ...themeNode, children: [child] };
-    } else if (child.type === "Footer") {
-      result.Footer = { ...themeNode, children: [child] };
-    } else if (child.type === "NavPanel") {
-      result.NavPanel = { ...themeNode, children: [child] };
-    } else {
-      otherChildren.push(child);
-    }
-  });
-
-  // Only add Theme to restChildren if it has remaining children
-  if (otherChildren.length > 0) {
-    result.restChildren.push({ ...themeNode, children: otherChildren });
-  }
-}
-
-/**
- * Extract a direct (non-Theme-wrapped) child component.
- */
-function extractDirectChild(child: ComponentDef, result: ExtractedComponents): void {
-  switch (child.type) {
-    case "AppHeader":
-      result.AppHeader = child;
-      break;
-    case "Footer":
-      result.Footer = child;
-      break;
-    case "NavPanel":
-      result.NavPanel = child;
-      break;
-    case "Pages":
-      result.Pages = child;
-      result.restChildren.push(child);
-      break;
-    default:
-      result.restChildren.push(child);
-  }
-}
-
-/**
- * Enhance NavPanel with navigation items extracted from Pages component.
- * Returns the enhanced NavPanel or the original if no enhancement needed.
- */
-function enhanceNavPanelWithPageNav(
-  extracted: ExtractedComponents,
-  processedRef: React.MutableRefObject<boolean>,
-  extractValue: any,
-  parseHierarchyLabels: ReturnType<typeof createParseHierarchyLabels>,
-  labelExistsInHierarchy: ReturnType<typeof createLabelExistsInHierarchy>,
-  findOrCreateNavGroup: (navItems: any[], groupLabel: string) => any
-): ComponentDef | undefined {
-  const { Pages, NavPanel } = extracted;
-
-  // No Pages component or already processed
-  if (!Pages) {
-    return NavPanel;
-  }
-
-  // Extract navigation items from Pages
-  const extraNavs = extractNavPanelFromPages(
-    Pages,
-    NavPanel,
-    processedRef,
-    extractValue,
-    parseHierarchyLabels,
-    labelExistsInHierarchy,
-    findOrCreateNavGroup,
-  );
-
-  // No extra navigation items found
-  if (!extraNavs?.length) {
-    return NavPanel;
-  }
-
-  // Merge extra navigation items with existing NavPanel
-  if (NavPanel) {
-    return {
-      ...NavPanel,
-      children: NavPanel.children ? [...NavPanel.children, ...extraNavs] : extraNavs,
-    };
-  }
-
-  // Create new NavPanel with extracted navigation items
-  return {
-    type: "NavPanel",
-    props: {},
-    children: extraNavs,
-  };
-}
-
-/**
- * Extract a property from a component definition, handling Theme wrapper unwrapping.
- * @param component - The component definition to extract from
- * @param propName - The property name to extract
- * @param defaultValue - Default value if property is not found
- * @param extractValue - The extract value utility from XMLUI renderer
- * @returns The extracted property value
- */
-function extractComponentProp<T>(
-  component: ComponentDef | undefined,
-  propName: string,
-  defaultValue: T,
-  extractValue: any
-): T {
-  if (!component) return defaultValue;
-
-  // Unwrap Theme if present
-  let targetNode = component;
-  if (component.type === "Theme" && component.children?.length > 0) {
-    targetNode = component.children.find(
-      (child) => child.type === component.type
-    );
-  }
-
-  if (!targetNode?.props?.[propName]) {
-    return defaultValue;
-  }
-
-  // Use asOptionalBoolean for boolean properties
-  if (typeof defaultValue === 'boolean') {
-    return extractValue.asOptionalBoolean(targetNode.props[propName], defaultValue) as T;
-  }
-
-  return extractValue(targetNode.props[propName]) ?? defaultValue;
-}
-
-/**
- * Creates a function that checks if a label exists in a navigation hierarchy.
- * Uses caching to avoid redundant searches.
- */
-function createLabelExistsInHierarchy() {
-  const cache = new Map<string, boolean>();
-
-  return (searchLabel: string, hierarchy: any[]): boolean => {
-    const cacheKey = searchLabel + "_" + hierarchy.length;
-
-    if (cache.has(cacheKey)) {
-      return cache.get(cacheKey)!;
-    }
-
-    const labelExistsInHierarchy = createLabelExistsInHierarchy();
-    const result = hierarchy.some((node) => {
-      if (node.label === searchLabel) {
-        return true;
-      }
-
-      if (node.children && node.children.length > 0) {
-        return labelExistsInHierarchy(searchLabel, node.children);
-      }
-
-      return false;
-    });
-
-    cache.set(cacheKey, result);
-    return result;
-  };
-}
-
-/**
- * Find or create a NavGroup with the given label in the navItems array.
- */
-function findOrCreateNavGroup(navItems: any[], groupLabel: string): any {
-  const existingGroup = navItems.find(
-    (item) => item.type === "NavGroup" && item.props?.label === groupLabel,
-  );
-
-  if (existingGroup) {
-    return existingGroup;
-  }
-
-  const newGroup = {
-    type: "NavGroup",
-    props: {
-      label: groupLabel,
-    },
-    children: [],
-  };
-
-  navItems.push(newGroup);
-  return newGroup;
 }
 
 export const app2Renderer = createComponentRenderer(
@@ -523,177 +218,3 @@ export const app2Renderer = createComponentRenderer(
     );
   },
 );
-
-// --- Navigation Extraction Functions ---
-
-/**
- * Process navigation items recursively and build hierarchy tree.
- * Handles NavLink and NavGroup items, extracting labels and building a tree structure.
- */
-function processNavItems(
-  items: ComponentDef[],
-  parentHierarchy: NavHierarchyNode[],
-  extractValue: (value: any) => any,
-) {
-  items.forEach((navItem) => {
-    // --- Process NavLink items
-    if (navItem.type === "NavLink") {
-      let itemLabel = navItem.props?.label;
-      let itemPath = navItem.props?.to;
-
-      if (!itemLabel) {
-        if (navItem.children?.length === 1 && navItem.children[0].type === "TextNode") {
-          itemLabel = navItem.children[0].props.value;
-        }
-      }
-
-      if (itemLabel) {
-        const labelValue = extractValue(itemLabel);
-
-        // --- Add to hierarchy
-        parentHierarchy.push({
-          type: "NavLink",
-          label: labelValue,
-          path: itemPath ? extractValue(itemPath) : undefined,
-        });
-      }
-    }
-    // --- Process NavGroup items (which may contain nested NavLink or NavGroup items)
-    else if (navItem.type === "NavGroup") {
-      let groupLabel = navItem.props?.label;
-
-      if (groupLabel) {
-        const labelValue = extractValue(groupLabel);
-
-        // --- Create group node
-        const groupNode: NavHierarchyNode = {
-          type: "NavGroup",
-          label: labelValue,
-          children: [],
-        };
-
-        // --- Add to parent hierarchy
-        parentHierarchy.push(groupNode);
-
-        // --- Recursively process children of the NavGroup
-        if (navItem.children && navItem.children.length > 0) {
-          processNavItems(navItem.children, groupNode.children, extractValue);
-        }
-      } else if (navItem.children && navItem.children.length > 0) {
-        // --- If no label but has children, still process them under parent
-        processNavItems(navItem.children, parentHierarchy, extractValue);
-      }
-    }
-  });
-}
-
-/**
- * Extract navigation panel items from Pages component and build hierarchical structure.
- * 
- * Creates NavLink and NavGroup components based on Page navLabel props.
- * Handles multi-level hierarchies using pipe-separated labels (e.g., "Parent|Child").
- * Prevents duplicates and integrates with existing NavPanel structure.
- * 
- * @param Pages - Pages component definition containing Page children
- * @param NavPanel - Existing NavPanel component (if any)
- * @param processedNavRef - Ref to track if navigation has been processed (prevents duplicates in strict mode)
- * @param extractValue - Function to extract prop values
- * @param parseHierarchyLabels - Function to parse pipe-separated hierarchy labels
- * @param labelExistsInHierarchy - Function to check if a label already exists
- * @param findOrCreateNavGroup - Function to find or create NavGroup components
- * @returns Array of navigation ComponentDef items or null if no Pages
- */
-function extractNavPanelFromPages(
-  Pages: ComponentDef,
-  NavPanel: ComponentDef | undefined,
-  processedNavRef: React.MutableRefObject<boolean>,
-  extractValue: (value: any) => any,
-  parseHierarchyLabels: (labelText: string) => string[],
-  labelExistsInHierarchy: (searchLabel: string, hierarchy: NavHierarchyNode[]) => boolean,
-  findOrCreateNavGroup: (navItems: ComponentDef[], groupLabel: string) => ComponentDef,
-): ComponentDef[] | null {
-  // --- Skip extraction if we've already processed this navigation structure
-  // --- This prevents duplicate items when React renders twice in strict mode
-  if (!Pages || processedNavRef.current) return null;
-
-  // --- Mark as processed
-  processedNavRef.current = true;
-
-  const extraNavs: ComponentDef[] = [];
-
-  // --- Root of navigation hierarchy
-  const navigationHierarchy: NavHierarchyNode[] = [];
-
-  // --- Start processing the navigation tree if NavPanel exists
-  if (NavPanel?.children) {
-    processNavItems(NavPanel.children, navigationHierarchy, extractValue);
-  }
-
-  // --- Process Pages to create hierarchical navigation structure
-  Pages.children?.forEach((page) => {
-    if (page.type === "Page" && page.props.navLabel) {
-      const label = extractValue(page.props.navLabel);
-      const url = extractValue(page.props.url);
-
-      // --- Parse hierarchy labels separated by unescaped pipe characters
-      const hierarchyLabels = parseHierarchyLabels(label);
-
-      // --- Skip if we have no labels
-      if (hierarchyLabels.length === 0) {
-        return;
-      }
-
-      // --- For a single level, just add a NavLink directly
-      if (hierarchyLabels.length === 1) {
-        // --- Check if this exact NavLink already exists in the navigation hierarchy
-        if (!labelExistsInHierarchy(hierarchyLabels[0], navigationHierarchy)) {
-          extraNavs.push({
-            type: "NavLink",
-            props: {
-              label: hierarchyLabels[0],
-              to: url,
-            },
-          });
-        }
-        return;
-      }
-
-      // --- For multi-level hierarchies, create NavGroups and a final NavLink
-      let currentLevel = extraNavs;
-
-      // --- Create NavGroups for all levels except the last one
-      for (let i = 0; i < hierarchyLabels.length - 1; i++) {
-        const groupLabel = hierarchyLabels[i];
-        const navGroup = findOrCreateNavGroup(currentLevel, groupLabel);
-
-        // --- Initialize children array if it doesn't exist
-        if (!navGroup.children) {
-          navGroup.children = [];
-        }
-
-        // --- Move to the next level
-        currentLevel = navGroup.children;
-      }
-
-      // --- Add the leaf NavLink to the deepest NavGroup
-      const leafLabel = hierarchyLabels[hierarchyLabels.length - 1];
-
-      // --- Check if this NavLink already exists at this level
-      const existingNavLink = currentLevel.find(
-        (item) => item.type === "NavLink" && item.props?.label === leafLabel,
-      );
-
-      if (!existingNavLink) {
-        currentLevel.push({
-          type: "NavLink",
-          props: {
-            label: leafLabel,
-            to: url,
-          },
-        });
-      }
-    }
-  });
-
-  return extraNavs;
-}

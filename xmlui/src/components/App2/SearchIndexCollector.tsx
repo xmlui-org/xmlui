@@ -27,10 +27,12 @@ export function SearchIndexCollector({ Pages, renderChild }: SearchIndexCollecto
   const appContext = useAppContext();
   const setIndexing = useSearchContextSetIndexing();
 
-  const [isClient, setIsClient] = useState(false);
-  useEffect(() => {
-    setIsClient(true); // Ensure document.body is available
+  const [indexState, setIndexState] = useState<{ index: number; done: boolean }>({
+    index: 0,
+    done: false,
+  });
 
+  useEffect(() => {
     return () => {
       setIndexing(false);
     };
@@ -49,35 +51,30 @@ export function SearchIndexCollector({ Pages, renderChild }: SearchIndexCollecto
     );
   }, [Pages?.children]);
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isDoneIndexing, setIsDoneIndexing] = useState(false);
   const [, startTransitionParent] = useTransition(); // Transition for parent updates
 
   const handlePageIndexed = useCallback(() => {
     startTransitionParent(() => {
-      // Transition the update to the next page
-      setCurrentIndex((prevIndex) => {
-        const nextIndex = prevIndex + 1;
-        if (nextIndex >= pagesToIndex.length) {
-          // console.log("All pages indexed.");
-          setIsDoneIndexing(true); // All pages processed
-        }
-        return nextIndex;
+      setIndexState((prev) => {
+        const nextIndex = prev.index + 1;
+        return {
+          index: nextIndex,
+          done: nextIndex >= pagesToIndex.length,
+        };
       });
     });
   }, [pagesToIndex.length]); // Recreate if the total number of pages changes
 
-  if (!appContext.appGlobals?.searchIndexEnabled || isDoneIndexing || !isClient) {
+  if (!appContext.appGlobals?.searchIndexEnabled || indexState.done) {
     return null;
   }
 
-  const currentPageToProcess = pagesToIndex[currentIndex];
+  const currentPageToProcess = pagesToIndex[indexState.index];
 
   if (!currentPageToProcess) {
     // This can happen if pagesToIndex is empty or currentIndex went out of bounds unexpectedly.
-    // Setting isDoneIndexing if pagesToIndex is empty initially.
-    if (pagesToIndex.length === 0 && currentIndex === 0 && !isDoneIndexing) {
-      setIsDoneIndexing(true);
+    if (pagesToIndex.length === 0 && !indexState.done) {
+      setIndexState({ index: 0, done: true });
     }
     return null;
   }
@@ -91,7 +88,7 @@ export function SearchIndexCollector({ Pages, renderChild }: SearchIndexCollecto
             Page={currentPageToProcess}
             renderChild={renderChild}
             onIndexed={handlePageIndexed}
-            key={currentPageToProcess.props?.url || currentIndex} // Key ensures re-mount
+            key={currentPageToProcess.props?.url || indexState.index} // Key ensures re-mount
           />
         </div>,
         document.body,
@@ -112,26 +109,24 @@ function PageIndexer({ Page, renderChild, onIndexed }: PageIndexerProps) {
   const navLabel = Page.props?.navLabel || "";
   const searchContextUpdater = useSearchContextUpdater();
 
-  const [isContentRendered, setIsContentRendered] = useState(false);
-  const [isCollected, setIsCollected] = useState(false);
-  const [isProcessing, startTransition] = useTransition();
+  const [phase, setPhase] = useState<"rendering" | "extracting" | "done">("rendering");
+  const [, startTransition] = useTransition();
 
   // Effect 1: Schedule the rendering of the Page's children (low priority)
   useEffect(() => {
-    // console.log(`PageIndexer (${pageUrl}): Scheduling content render.`);
     startTransition(() => {
-      setIsContentRendered(true); // This will trigger rendering of Page.children
+      setPhase("rendering"); // Ensure we're in rendering phase
     });
-  }, [pageUrl]); // Re-run if the Page prop itself changes identity (due to key in parent)
+  }, [pageUrl]);
 
   // Effect 2: Extract content once Page.children is rendered and ref is available (low priority)
   useEffect(() => {
-    if (isContentRendered && contentRef.current && !isCollected && !isProcessing) {
-      // console.log(`PageIndexer (${pageUrl}): Content rendered, scheduling extraction.`);
+    if (phase === "rendering" && contentRef.current) {
       startTransition(() => {
-        // console.log(`PageIndexer (${pageUrl}): Starting extraction...`);
-        const currentContent = contentRef.current; // Capture ref value
+        const currentContent = contentRef.current;
         if (!currentContent) return;
+
+        setPhase("extracting");
 
         const clone = currentContent.cloneNode(true) as HTMLDivElement;
         const elementsToRemove = clone.querySelectorAll("style, script");
@@ -140,40 +135,24 @@ function PageIndexer({ Page, renderChild, onIndexed }: PageIndexerProps) {
         const title = titleElement
           ? titleElement.innerText
           : navLabel || pageUrl.split("/").pop() || pageUrl;
-        titleElement?.remove(); // Remove title element from clone to avoid duplication
+        titleElement?.remove();
         const textContent = (clone.textContent || "").trim().replace(/\s+/g, " ");
 
-        const entry = {
-          title: title,
+        searchContextUpdater({
+          title,
           content: textContent,
           path: pageUrl,
-        };
+        });
 
-        searchContextUpdater(entry);
-        // console.log(`PageIndexer (${pageUrl}): Extraction complete, signaling parent.`);
-        onIndexed(); // Signal completion to parent
-        setIsCollected(true); // Mark as collected
+        onIndexed();
+        setPhase("done");
       });
     }
-  }, [
-    isContentRendered,
-    pageUrl,
-    searchContextUpdater,
-    onIndexed,
-    isCollected,
-    isProcessing,
-    navLabel,
-  ]); // Ensure all dependencies are listed
+  }, [phase, pageUrl, searchContextUpdater, onIndexed, navLabel]);
 
-  // If this PageIndexer instance's work is done, or content not yet rendered, render nothing.
-  // The parent (SearchIndexCollector) will unmount this and mount the next one.
-  if (isCollected || !isContentRendered) {
-    // console.log(`PageIndexer (${pageUrl}): Null render (isCollected: ${isCollected}, isContentRendered: ${isContentRendered})`);
+  if (phase === "done") {
     return null;
   }
 
-  // This part renders when isContentRendered is true and isCollected is false.
-  // The content needs to be in the DOM for contentRef.current to be populated.
-  // console.log(`PageIndexer (${pageUrl}): Rendering content for ref population.`);
   return <div ref={contentRef}>{renderChild(Page.children)}</div>;
 }

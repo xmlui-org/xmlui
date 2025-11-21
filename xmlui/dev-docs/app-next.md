@@ -472,3 +472,156 @@ Variants with overflow:
 
 ---
 
+## SCSS Refactoring Opportunities
+
+After reviewing `App2.module.scss` (438 lines), the following refactoring opportunities have been identified to make the style classes more straightforward and reduce file size:
+
+### 1. Consolidate Scrollbar Gutter Logic
+
+**Current State**: The scrollbar gutter compensation logic is spread across multiple mixins and modifier classes with repetitive patterns.
+
+**Opportunity**: 
+- The `.scrollWholePage` and `.noScrollbarGutters` modifiers contain highly repetitive scrollbar-gutter management
+- The scrollbar compensation mixins (`scrollbar-compensation-container`, `scrollbar-compensation-content`, `scrollbar-compensation-full-width`) are only used in 3 places
+- Consider inline application or simplified conditional logic
+
+**Potential Savings**: ~30-40 lines
+
+### 2. Simplify Desktop Layout Reset Logic
+
+**Current State**: The desktop layout uses three separate mixins for spacing resets with significant overlap:
+- `reset-spacing-constraints` (5 properties)
+- `reset-inline-spacing` (6 properties)  
+- Applied multiple times with nested selectors (`& > *`, `& *`)
+
+**Opportunity**:
+- Merge into a single comprehensive reset mixin since they're always used together in desktop mode
+- The nested selector pattern (`& > *` then `& *`) creates redundancy
+- Many !important declarations could be consolidated
+
+**Potential Savings**: ~15-20 lines
+
+### 3. Consolidate Sticky Footer Logic
+
+**Current State**: Footer sticky positioning is duplicated across multiple layout variants:
+- `.vertical .sticky .footerWrapper`
+- `.horizontal.sticky .footerWrapper`
+- `.verticalFullHeader .footerWrapper`
+- Each has identical `position: sticky; bottom: 0;` with the same `.nonSticky` override
+
+**Opportunity**:
+- Extract common sticky footer behavior to a base class
+- Use a single `.sticky .footerWrapper` rule with layout-specific overrides only when needed
+- The `.nonSticky` override pattern is repeated 4 times
+
+**Potential Savings**: ~12-15 lines
+
+### 4. Reduce scroll-padding-block Repetition
+
+**Current State**: `scroll-padding-block: $scrollPaddingBlockPage;` appears 5 times across different layout variants.
+
+**Opportunity**:
+- Set at the wrapper level once with strategic overrides
+- Most layouts need this value; exceptions are rare
+
+**Potential Savings**: ~3-5 lines
+
+### 5. Simplify Content/ContentWrapper Relationship
+
+**Current State**: The `.content` and `.contentWrapper` classes have overlapping concerns with layout-specific variations scattered throughout the file.
+
+**Opportunity**:
+- The base definitions are at the bottom (lines 368-392) but modifications are in layout-specific sections above
+- Reorganize to have all content-related styles together
+- The `overflow: initial` pattern appears multiple times for contentWrapper
+
+**Potential Savings**: ~10-15 lines (through consolidation, not removal)
+
+### 6. Eliminate Redundant Overflow Declarations
+
+**Current State**: Multiple redundant overflow declarations:
+- `.vertical .contentWrapper { overflow: auto; }` then later modified to `overflow: initial;`
+- `.desktop { overflow: hidden; }` at wrapper level
+- `.PagesWrapper` has various overflow values depending on context
+
+**Opportunity**:
+- Establish clear overflow hierarchy with fewer overrides
+- Use more strategic defaults to reduce exceptions
+
+**Potential Savings**: ~5-8 lines
+
+### 7. Consolidate Height/Min-Height Patterns
+
+**Current State**: Height calculations using CSS variables appear multiple times with similar patterns:
+- `calc(var(--containerHeight, 100vh) - var(--header-height) - var(--effective-footer-height))`
+- Used for both `height` and `min-height` in navPanelWrapper and PagesWrapper in verticalFullHeader
+
+**Opportunity**:
+- Create a shared CSS custom property for this calculation
+- Reference it in multiple places instead of repeating the calc
+
+**Potential Savings**: ~3-5 lines
+
+### 8. Simplify PagesWrapper Layout Logic
+
+**Current State**: PagesWrapper and PagesWrapperInner have complex, context-dependent styling:
+- Different min-height values across layouts (100%, initial, calc-based, 0)
+- Different display/flex settings
+- Height values that change based on scroll container
+
+**Opportunity**:
+- Establish clearer base defaults
+- Reduce the number of overrides needed for each layout variant
+- The `height: 0` in `.PagesWrapperInner` (line 361) when not scrollWholePage seems like a workaround
+
+**Potential Savings**: ~8-12 lines
+
+### 9. Desktop Layout Specificity Reduction
+
+**Current State**: Desktop layout has deeply nested selectors with repetitive !important overrides:
+```scss
+.desktop {
+  .headerWrapper {
+    & > * { }
+    & * { }
+    :global(.headerInner) { }
+  }
+}
+```
+
+**Opportunity**:
+- Flatten selector hierarchy where possible
+- Use more targeted selectors to avoid `& *` universal child selectors
+- Reduce !important usage with better specificity planning
+
+**Potential Savings**: ~10-15 lines
+
+### 10. Extract Common Flex Container Pattern
+
+**Current State**: Several elements repeat the same flex container pattern:
+```scss
+display: flex;
+flex-direction: column;
+```
+
+**Opportunity**:
+- Used in: wrapper, contentWrapper, PagesWrapper, PagesWrapperInner, desktop PagesWrapper
+- Could be extracted to a mixin or base class for DRY
+
+**Potential Savings**: ~5-8 lines
+
+### Summary
+
+**Total Potential Line Reduction**: ~100-150 lines (23-34% reduction from 438 lines)
+
+**Priority Order** (by impact):
+1. Consolidate scrollbar gutter logic (#1)
+2. Simplify desktop layout resets (#2)  
+3. Consolidate sticky footer logic (#3)
+4. Simplify PagesWrapper layout logic (#8)
+5. Desktop layout specificity reduction (#9)
+6. Remaining smaller optimizations (#4, #5, #6, #7, #10)
+
+**Implementation Note**: These refactorings should be done incrementally with test validation after each change to ensure no visual regressions occur.
+
+---
