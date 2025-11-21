@@ -662,10 +662,18 @@ const LinkAwareHeading = ({ level, children, showHeadingAnchors }: LinkAwareHead
 
 function getHeadingId(children: React.ReactNode): string {
   const text = getHeadingText(children);
-  return text
+  let id = text
     .toLowerCase()
     .replace(/[^\w]+/g, "-")
     .replace(/^-+|-+$/g, "");
+  
+  // Ensure ID starts with a letter or underscore (not a digit)
+  // This is required for querySelector to work without escaping
+  if (id && /^[0-9]/.test(id)) {
+    id = "heading-" + id;
+  }
+  
+  return id;
 }
 
 function getHeadingText(children: React.ReactNode): string {
