@@ -817,10 +817,10 @@ export class ComponentRegistry {
     this.registerLoaderRenderer(mockLoaderRenderer);
     this.registerLoaderRenderer(dataLoaderRenderer);
 
-    this.registerBehavior(variantBehavior);
-    this.registerBehavior(tooltipBehavior);
-    this.registerBehavior(animationBehavior);
     this.registerBehavior(labelBehavior);
+    this.registerBehavior(animationBehavior);
+    this.registerBehavior(tooltipBehavior);
+    this.registerBehavior(variantBehavior);
 
     // Register external behaviors from contributes
     contributes.behaviors?.forEach((behavior) => {
