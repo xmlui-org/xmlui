@@ -1908,3 +1908,207 @@ test.describe("Vertical-Full-Header Layout Mobile - scrollWholePage=false, noScr
   });
 });
 
+// =============================================================================
+// MOBILE LAYOUT TESTS - DESKTOP
+// =============================================================================
+// Note: "desktop" layout variant in mobile viewport behaves with sticky header/footer.
+// Despite the name, this tests the "desktop" layout configuration in a mobile viewport.
+
+test.describe("Desktop Layout Mobile - scrollWholePage=true, noScrollbarGutters=true", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+  });
+
+  test("renders header with hamburger, main content, and footer with sticky positioning", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("desktop", true, true, "200px"));
+
+    await verifyAllBlocksVisible(page);
+    await verifyNavPanelNotInline(page);
+    await verifyHamburgerMenuVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "mainContent", "footer"]);
+  });
+
+  test("tall content at top: header and footer sticky, main content visible", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("desktop", true, true, "2000px"));
+
+    await verifyAllBlocksVisible(page);
+    await verifyNavPanelNotInline(page);
+    await verifyHamburgerMenuVisible(page);
+    await verifyBlocksInViewport(page, ["appHeader", "mainContent", "footer"]);
+  });
+
+  test("tall content at mid-scroll: header and footer remain sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("desktop", true, true, "2000px"));
+    
+    await scrollMainContentTo(page, "mid");
+    
+    // Header and footer should remain in viewport (sticky)
+    await verifyBlocksInViewport(page, ["appHeader", "footer"]);
+  });
+
+  test("tall content at bottom: header and footer remain sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("desktop", true, true, "2000px"));
+    
+    await scrollMainContentTo(page, "bottom");
+    
+    await verifyBlocksInViewport(page, ["appHeader", "mainContent", "footer"]);
+  });
+});
+
+test.describe("Desktop Layout Mobile - scrollWholePage=true, noScrollbarGutters=false", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+  });
+
+  test("short content: all blocks visible, no scrollbar", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("desktop", false, true, "200px"));
+
+    await verifyAllBlocksVisible(page);
+    await verifyNavPanelNotInline(page);
+    await verifyBlocksInViewport(page, ["appHeader", "mainContent", "footer"]);
+  });
+
+  test("tall content at top: main content scrolls, header/footer sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("desktop", false, true, "2000px"));
+
+    await verifyBlocksInViewport(page, ["appHeader", "footer"]);
+  });
+
+  test("tall content at mid-scroll: header and footer remain sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("desktop", false, true, "2000px"));
+    
+    await scrollMainContentTo(page, "mid");
+    
+    await verifyBlocksInViewport(page, ["appHeader", "footer"]);
+  });
+
+  test("tall content at bottom: header and footer remain sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("desktop", false, true, "2000px"));
+    
+    await scrollMainContentTo(page, "bottom");
+    
+    await verifyBlocksInViewport(page, ["appHeader", "mainContent", "footer"]);
+  });
+});
+
+test.describe("Desktop Layout Mobile - scrollWholePage=false, noScrollbarGutters=true", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+  });
+
+  test("short content: all blocks visible, main content is scroll container, no gutters", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("desktop", true, false, "200px"));
+
+    await verifyAllBlocksVisible(page);
+    await verifyNavPanelNotInline(page);
+    await verifyHamburgerMenuVisible(page);
+    await verifyAppContainerNotScrollable(page);
+  });
+
+  test("tall content at top: main content scrolls, header/footer sticky, no gutters", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("desktop", true, false, "2000px"));
+
+    await verifyMainContentIsScrollContainer(page);
+    await verifyMainContentScrollbarGutters(page, false);
+    await verifyBlocksInViewport(page, ["appHeader", "mainContent", "footer"]);
+  });
+
+  test("tall content at mid-scroll: only main content scrolls, header/footer remain sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("desktop", true, false, "2000px"));
+    
+    await scrollMainContentTo(page, "mid");
+    
+    await verifyBlocksInViewport(page, ["appHeader", "footer"]);
+  });
+
+  test("tall content at bottom: only main content scrolls, header/footer remain sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("desktop", true, false, "2000px"));
+    
+    await scrollMainContentTo(page, "bottom");
+    
+    await verifyBlocksInViewport(page, ["appHeader", "footer"]);
+  });
+});
+
+test.describe("Desktop Layout Mobile - scrollWholePage=false, noScrollbarGutters=false", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+  });
+
+  test("short content: main content is scroll container", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("desktop", false, false, "200px"));
+
+    await verifyBlocksInViewport(page, ["appHeader", "mainContent", "footer"]);
+  });
+
+  test("tall content at top: main content scrolls, header/footer sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("desktop", false, false, "2000px"));
+
+    await verifyMainContentIsScrollContainer(page);
+    await verifyBlocksInViewport(page, ["appHeader", "mainContent", "footer"]);
+  });
+
+  test("tall content at mid-scroll: only main content scrolls, header/footer sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("desktop", false, false, "2000px"));
+    
+    await scrollMainContentTo(page, "mid");
+    
+    await verifyBlocksInViewport(page, ["appHeader", "footer"]);
+  });
+
+  test("tall content at bottom: only main content scrolls, header/footer sticky", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createLayoutMarkup("desktop", false, false, "2000px"));
+    
+    await scrollMainContentTo(page, "bottom");
+    
+    await verifyBlocksInViewport(page, ["appHeader", "footer"]);
+  });
+});
