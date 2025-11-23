@@ -1,28 +1,27 @@
 import { createContext, useContext } from "react";
 import type { ReactNode } from "react";
 
-import type { SingleValueType, ValueType } from "./SelectNative";
-import type { Option } from "../abstractions";
+import type { Option, SingleOptionValue, OptionValue } from "../abstractions";
 
 type SelectContextValue = {
   multiSelect?: boolean;
   readOnly?: boolean;
-  value: ValueType | null;
-  onChange?: (selectedValue: SingleValueType) => void;
+  value: OptionValue | null;
+  onChange?: (selectedValue: SingleOptionValue) => void;
   setOpen: (open: boolean) => void;
   setSelectedIndex?: (index: number) => void;
   options: Set<Option>;
-  highlightedValue?: string;
+  highlightedValue?: SingleOptionValue;
   optionRenderer?: (
     option: Option,
-    selectedValue: SingleValueType,
+    selectedValue: SingleOptionValue,
     inTrigger: boolean,
   ) => ReactNode;
 };
 
 export const SelectContext = createContext<SelectContextValue>({
   value: null,
-  onChange: (selectedValue: SingleValueType) => {},
+  onChange: (selectedValue: SingleOptionValue) => {},
   setOpen: (open: boolean) => {},
   setSelectedIndex: (index: number) => {},
   options: new Set<Option>(),

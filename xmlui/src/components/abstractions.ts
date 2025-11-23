@@ -1,12 +1,20 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { PropertyValueDescription } from "../abstractions/ComponentDefs";
 
+export type SingleOptionValue =
+  | string
+  | number
+  | boolean
+  | object
+  | (string | number | boolean | object)[];
+export type OptionValue = SingleOptionValue | SingleOptionValue[];
+
 /**
  * Several components offer a list of options to select from. This type describes such an option.
  */
 export type Option = {
   label: string;
-  value: string;
+  value: string | number | boolean | object | any[];
   enabled?: boolean;
   style?: CSSProperties;
   className?: string;
@@ -383,7 +391,7 @@ const TextVariantMapping = [
   "h6",
   "span",
 ] as const;
-type TextVariantMappingType = typeof TextVariantMapping[number];
+type TextVariantMappingType = (typeof TextVariantMapping)[number];
 
 export const TextVariantElement: Record<TextVariant, TextVariantMappingType> = {
   abbr: "abbr",

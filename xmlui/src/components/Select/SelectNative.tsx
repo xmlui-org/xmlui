@@ -17,13 +17,14 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import { noop } from "../../components-core/constants";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { useEvent } from "../../components-core/utils/misc";
-import type { Option, ValidationStatus } from "../abstractions";
+import type { Option, OptionValue, SingleOptionValue, ValidationStatus } from "../abstractions";
 import Icon from "../Icon/IconNative";
 import { SelectContext, useSelect } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { OptionContext, useOption } from "./OptionContext";
 import { HiddenOption } from "./HiddenOption";
 import { Part } from "../Part/Part";
+import { isEqual } from "lodash-es";
 
 const PART_LIST_WRAPPER = "listWrapper";
 const PART_CLEAR_BUTTON = "clearButton";
@@ -43,15 +44,12 @@ export const defaultProps = {
   clearable: false,
 };
 
-export type SingleValueType = string | number;
-export type ValueType = SingleValueType | SingleValueType[];
-
 // Core Select component props
 interface SelectProps {
   // Basic props
   id?: string;
-  initialValue?: ValueType;
-  value?: ValueType;
+  initialValue?: OptionValue;
+  value?: OptionValue;
   enabled?: boolean;
   placeholder?: string;
   autoFocus?: boolean;
@@ -67,7 +65,7 @@ interface SelectProps {
   validationStatus?: ValidationStatus;
 
   // Event handlers
-  onDidChange?: (newValue: ValueType) => void;
+  onDidChange?: (newValue: OptionValue) => void;
   onFocus?: () => void;
   onBlur?: () => void;
 
@@ -94,13 +92,13 @@ interface SelectProps {
 
 // Common trigger value display props
 interface SelectTriggerValueProps {
-  value: ValueType;
+  value: OptionValue;
   placeholder: string;
   readOnly: boolean;
   multiSelect: boolean;
   options: Set<Option>;
   valueRenderer?: (item: Option, removeItem: () => void) => ReactNode;
-  toggleOption: (value: SingleValueType) => void;
+  toggleOption: (value: SingleOptionValue) => void;
 }
 
 // Common trigger value display component
@@ -153,7 +151,9 @@ const SelectTriggerValue = ({
 
   // Single select
   if (value !== undefined && value !== null && value !== "") {
-    const selectedOption = Array.from(options).find((o) => o.value === value);
+    const selectedOption = Array.from(options).find((o) => {
+      return o.value === value
+    });
     return <div className={styles.selectValue}>{selectedOption?.label}</div>;
   }
 
@@ -166,7 +166,7 @@ const SelectTriggerValue = ({
 
 // Common trigger actions (clear button + chevron)
 interface SelectTriggerActionsProps {
-  value: ValueType;
+  value: OptionValue;
   multiSelect: boolean;
   enabled: boolean;
   readOnly: boolean;
@@ -192,15 +192,15 @@ const SelectTriggerActions = ({
     <div className={styles.actions}>
       {hasValue && enabled && !readOnly && clearable && (
         <Part partId={PART_CLEAR_BUTTON}>
-        <span
-          className={styles.action}
-          onClick={(event) => {
-            event.stopPropagation();
-            clearValue();
-          }}
-        >
-          <Icon name="close" />
-        </span>
+          <span
+            className={styles.action}
+            onClick={(event) => {
+              event.stopPropagation();
+              clearValue();
+            }}
+          >
+            <Icon name="close" />
+          </span>
         </Part>
       )}
       {showChevron && (
@@ -292,10 +292,17 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
 
   // Set initial state based on the initialValue prop
   useEffect(() => {
-    if (initialValue !== undefined) {
-      updateState({ value: initialValue }, { initial: true });
+    if (multiSelect) {
+      updateState({ value: Array.isArray(initialValue) ? initialValue : [] }, { initial: true });
+    } else {
+      const initial = Array.from(options).find((o) => {
+        return o.value === initialValue
+      })
+        ? initialValue
+        : undefined;
+      updateState({ value: initial }, { initial: true });
     }
-  }, [initialValue, updateState]);
+  }, [initialValue, updateState, multiSelect, options]);
 
   // Observe the size of the reference element
   useEffect(() => {
@@ -314,16 +321,25 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
 
   // Handle option selection
   const toggleOption = useCallback(
-    (selectedValue: SingleValueType) => {
-      const newSelectedValue = multiSelect
-        ? Array.isArray(value)
-          ? value.map((v) => String(v)).includes(String(selectedValue))
-            ? value.filter((v) => String(v) !== String(selectedValue))
-            : [...value, selectedValue]
-          : [selectedValue]
-        : String(selectedValue) === String(value)
-          ? null
-          : selectedValue;
+    (selectedValue: SingleOptionValue) => {
+      let newSelectedValue: OptionValue;
+      
+      if (multiSelect) {
+        const currentValues = Array.isArray(value) ? value : [];
+        const isAlreadySelected = currentValues.some((v) => isEqual(v, selectedValue));
+        
+        if (isAlreadySelected) {
+          // Remove the value
+          newSelectedValue = currentValues.filter((v) => !isEqual(v, selectedValue));
+        } else {
+          // Add the value
+          newSelectedValue = [...currentValues, selectedValue];
+        }
+      } else {
+        // Single select: toggle between selected value and null
+        const isSameValue = isEqual(selectedValue, value);
+        newSelectedValue = isSameValue ? null : selectedValue;
+      }
       updateState({ value: newSelectedValue });
       onDidChange(newSelectedValue);
       if (!multiSelect) {
@@ -633,7 +649,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                         />
                       </div>
                     ) : (
-                      <button aria-hidden="true" className={styles.srOnly} />
+                      <button tabIndex={-1} aria-hidden="true" className={styles.srOnly} />
                     )}
                     <div role="listbox" className={styles.commandList}>
                       {inProgress ? (
@@ -645,7 +661,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                         ) : (
                           filteredOptions.map(({ value, label, enabled, keywords }, index) => (
                             <SelectOptionItem
-                              key={value}
+                              key={JSON.stringify(value)}
                               readOnly={readOnly}
                               value={value}
                               label={label}
@@ -712,12 +728,12 @@ function VisibleSelectOption(option: Option) {
 
   const selected = useMemo(() => {
     return Array.isArray(selectedValue) && multiSelect
-      ? selectedValue.map((v) => String(v)).includes(value)
-      : String(selectedValue) === String(value);
+      ? selectedValue.find((v) => isEqual(v, value)) !== undefined
+      : isEqual(selectedValue, value);
   }, [selectedValue, value, multiSelect]);
 
   const isHighlighted = useMemo(() => {
-    return highlightedValue !== undefined && String(highlightedValue) === String(value);
+    return highlightedValue !== undefined && isEqual(highlightedValue, value);
   }, [highlightedValue, value]);
 
   // Scroll into view when highlighted
@@ -792,8 +808,8 @@ function SelectOptionItem(option: Option & { isHighlighted?: boolean; itemIndex?
 
   const selected = useMemo(() => {
     return Array.isArray(selectedValue) && multiSelect
-      ? selectedValue.map((v) => String(v)).includes(value)
-      : String(selectedValue) === String(value);
+      ? selectedValue.find((v) => isEqual(v, value)) !== undefined
+      : isEqual(selectedValue, value);
   }, [selectedValue, value, multiSelect]);
 
   // Scroll into view when highlighted

@@ -61,7 +61,7 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByText("One", { exact: true })).not.toBeVisible();
   });
 
-  test("initialValue set to non-existant option", async ({ page, initTestBed }) => {
+  test("initialValue set to non-existent option", async ({ page, initTestBed }) => {
     await initTestBed(`
     <Fragment>
       <Select id="mySelect" initialValue="{42}">
@@ -72,7 +72,21 @@ test.describe("Basic Functionality", () => {
       <Text testId="text">Selected value: {mySelect.value}</Text>
     </Fragment>
   `);
-    await expect(page.getByTestId("text")).toHaveText("Selected value: 42");
+    await expect(page.getByTestId("mySelect")).toHaveText("");
+  });
+
+  test("initialValue set to non-existent option - Text value", async ({ page, initTestBed }) => {
+    await initTestBed(`
+    <Fragment>
+      <Select id="mySelect" initialValue="{42}">
+        <Option value="{0}" label="Zero"/>
+        <Option value="{1}" label="One"/>
+        <Option value="{2}" label="Two"/>
+      </Select>
+      <Text testId="text">Selected value: {mySelect.value}</Text>
+    </Fragment>
+  `);
+    await expect(page.getByTestId("text")).toHaveText("Selected value: ");
   });
 
   test("reset works with initialValue", async ({
