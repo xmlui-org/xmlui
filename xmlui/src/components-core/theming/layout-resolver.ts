@@ -34,26 +34,26 @@ export function resolveLayoutProps(
     result.cssProps.flexShrink = 0;
   }
 
-  // --- Dimensions
-  collectCss("width", disableInlineStyle);
+  // --- Dimensions: widht and height is not considered to be inline styles
+  collectCss("width", false);
   const horizontalStarSize = getHorizontalStarSize(result.cssProps.width, layoutContext);
   if (horizontalStarSize !== null) {
     // --- We use "flex" when width is in start-size and allow shrinking
     result.cssProps.flex = horizontalStarSize;
     result.cssProps.flexShrink = 1;
   }
-  collectCss("minWidth", disableInlineStyle);
-  collectCss("maxWidth", disableInlineStyle);
+  collectCss("minWidth", false);
+  collectCss("maxWidth", false);
 
-  collectCss("height", disableInlineStyle);
+  collectCss("height", false);
   const verticalStarSize = getVerticalStarSize(result.cssProps.height, layoutContext);
   if (verticalStarSize !== null) {
     // --- We use "flex" when width is in start-size and allow shrinking
     result.cssProps.flex = verticalStarSize;
     result.cssProps.flexShrink = 1;
   }
-  collectCss("minHeight", disableInlineStyle);
-  collectCss("maxHeight", disableInlineStyle);
+  collectCss("minHeight", false);
+  collectCss("maxHeight", false);
 
   // --- Positions
   collectCss("top", disableInlineStyle);
@@ -273,6 +273,7 @@ export function resolveLayoutProps(
   }
 
   function collectCss(prop: string, disableInlineStyle = false, propCssName = ""): void {
+    if (disableInlineStyle) return;
     const value = transformLayoutValue(prop);
     if (value) {
       result.cssProps[propCssName || prop] = value;

@@ -193,6 +193,7 @@ export type TestBedDescription = Omit<
 > & {
   testThemeVars?: Record<string, string>;
   components?: string[];
+  appGlobals?: Record<string, any>;
 };
 
 export const test = baseTest.extend<TestDriverExtenderProps>({
