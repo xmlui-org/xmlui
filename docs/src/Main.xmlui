@@ -229,6 +229,11 @@
                 label="Use ModalDialog's onClose() method"
                 to="/howto/use-modal-dialog-onclose"
             />
+            <NavLink
+                label="Copy billing data to shipping"
+                to="/howto/copy-billing-to-shipping"
+            />
+
 
             <!-- Add more links as additional files are created -->
         </NavGroup
@@ -676,7 +681,11 @@
                 url="/pages/howto/use-modal-dialog-onclose.md"
             />
         </Page>
-
+        <Page url="/howto/copy-billing-to-shipping">
+            <DocumentPageNoTOC
+                url="/pages/howto/copy-billing-to-shipping.md"
+            />
+        </Page>
 
         <!-- Add more pages as additional files are created -->
         <Page url="/hosted-deployment">
