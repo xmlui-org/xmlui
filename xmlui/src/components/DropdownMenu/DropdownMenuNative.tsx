@@ -171,6 +171,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
               [styles.compact]: compact,
             })}
             tabIndex={-1}
+            loop={true}
           >
             {children}
           </DropdownMenuPrimitive.Content>
@@ -266,7 +267,11 @@ export const SubMenuItem = forwardRef<HTMLDivElement, SubMenuItemProps>(function
         {triggerTemplate ? triggerTemplate : <div>{label}</div>}
       </DropdownMenuPrimitive.SubTrigger>
       <DropdownMenuPrimitive.Portal container={root}>
-        <DropdownMenuPrimitive.SubContent className={styles.DropdownMenuSubContent} sideOffset={2}>
+        <DropdownMenuPrimitive.SubContent
+          className={styles.DropdownMenuSubContent}
+          sideOffset={2}
+          loop={true}
+        >
           {children}
         </DropdownMenuPrimitive.SubContent>
       </DropdownMenuPrimitive.Portal>
