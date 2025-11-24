@@ -52,7 +52,7 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper(
   ref: any,
 ) {
   const { rowGap, columnGap, setNumberOfChildren } = useContext(FlowLayoutContext);
-  const { mediaSize } = useAppContext();
+  const { mediaSize, appGlobals } = useAppContext();
   useIsomorphicLayoutEffect(() => {
     setNumberOfChildren((prev) => prev + 1);
     return () => {
@@ -78,6 +78,7 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper(
           type: "Stack",
           orientation: "horizontal",
         },
+        appGlobals?.disableInlineStyle,
       ).cssProps || {}
 
       // --- Old layout resolution
@@ -90,7 +91,7 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper(
       //   },
       // ).cssProps || {}
     );
-  }, [_maxWidth, _minWidth, _width]);
+  }, [_maxWidth, _minWidth, _width, appGlobals]);
 
   const resolvedWidth = useMemo(() => {
     if (width && typeof width === "string" && width.startsWith("var(")) {

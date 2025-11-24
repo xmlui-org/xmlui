@@ -21,6 +21,7 @@ const defaultCompResult: ResolvedLayout = {
 export function resolveLayoutProps(
   layoutProps: LayoutProps = EMPTY_OBJECT,
   layoutContext?: LayoutContext,
+  disableInlineStyle?: boolean,
 ): ResolvedLayout {
   const result: ResolvedLayout = {
     cssProps: {},
@@ -34,152 +35,152 @@ export function resolveLayoutProps(
   }
 
   // --- Dimensions
-  collectCss("width");
+  collectCss("width", disableInlineStyle);
   const horizontalStarSize = getHorizontalStarSize(result.cssProps.width, layoutContext);
   if (horizontalStarSize !== null) {
     // --- We use "flex" when width is in start-size and allow shrinking
     result.cssProps.flex = horizontalStarSize;
     result.cssProps.flexShrink = 1;
   }
-  collectCss("minWidth");
-  collectCss("maxWidth");
+  collectCss("minWidth", disableInlineStyle);
+  collectCss("maxWidth", disableInlineStyle);
 
-  collectCss("height");
+  collectCss("height", disableInlineStyle);
   const verticalStarSize = getVerticalStarSize(result.cssProps.height, layoutContext);
   if (verticalStarSize !== null) {
     // --- We use "flex" when width is in start-size and allow shrinking
     result.cssProps.flex = verticalStarSize;
     result.cssProps.flexShrink = 1;
   }
-  collectCss("minHeight");
-  collectCss("maxHeight");
+  collectCss("minHeight", disableInlineStyle);
+  collectCss("maxHeight", disableInlineStyle);
 
   // --- Positions
-  collectCss("top");
-  collectCss("right");
-  collectCss("bottom");
-  collectCss("left");
+  collectCss("top", disableInlineStyle);
+  collectCss("right", disableInlineStyle);
+  collectCss("bottom", disableInlineStyle);
+  collectCss("left", disableInlineStyle);
 
   // --- Paddings and gap
-  collectCss("gap");
-  collectCss("padding");
+  collectCss("gap", disableInlineStyle);
+  collectCss("padding", disableInlineStyle);
   const paddingHorizontal = transformLayoutValue("paddingHorizontal");
   if (paddingHorizontal) {
     result.cssProps.paddingLeft = paddingHorizontal;
     result.cssProps.paddingRight = paddingHorizontal;
   }
-  collectCss("paddingRight");
-  collectCss("paddingLeft");
+  collectCss("paddingRight", disableInlineStyle);
+  collectCss("paddingLeft", disableInlineStyle);
 
   const paddingVertical = transformLayoutValue("paddingVertical");
   if (paddingVertical) {
     result.cssProps.paddingTop = paddingVertical;
     result.cssProps.paddingBottom = paddingVertical;
   }
-  collectCss("paddingTop");
-  collectCss("paddingBottom");
+  collectCss("paddingTop", disableInlineStyle);
+  collectCss("paddingBottom", disableInlineStyle);
 
   // --- Margins
-  collectCss("margin");
+  collectCss("margin", disableInlineStyle);
   const marginHorizontal = transformLayoutValue("marginHorizontal");
   if (marginHorizontal) {
     result.cssProps.marginLeft = marginHorizontal;
     result.cssProps.marginRight = marginHorizontal;
   }
-  collectCss("marginRight");
-  collectCss("marginLeft");
+  collectCss("marginRight", disableInlineStyle);
+  collectCss("marginLeft", disableInlineStyle);
 
   const marginVertical = transformLayoutValue("marginVertical");
   if (marginVertical) {
     result.cssProps.marginTop = marginVertical;
     result.cssProps.marginBottom = marginVertical;
   }
-  collectCss("marginTop");
-  collectCss("marginBottom");
+  collectCss("marginTop", disableInlineStyle);
+  collectCss("marginBottom", disableInlineStyle);
 
   // --- Borders
-  collectCss("border");
+  collectCss("border", disableInlineStyle);
   const horizontalBorder = transformLayoutValue("borderHorizontal");
   if (horizontalBorder) {
     result.cssProps.borderLeft = horizontalBorder;
     result.cssProps.borderRight = horizontalBorder;
   }
-  collectCss("borderRight");
-  collectCss("borderLeft");
+  collectCss("borderRight", disableInlineStyle);
+  collectCss("borderLeft", disableInlineStyle);
 
   const verticalBorder = transformLayoutValue("borderVertical");
   if (verticalBorder) {
     result.cssProps.borderTop = verticalBorder;
     result.cssProps.borderBottom = verticalBorder;
   }
-  collectCss("borderTop");
-  collectCss("borderBottom");
-  collectCss("borderColor");
-  collectCss("borderStyle");
-  collectCss("borderWidth");
+  collectCss("borderTop", disableInlineStyle);
+  collectCss("borderBottom", disableInlineStyle);
+  collectCss("borderColor", disableInlineStyle);
+  collectCss("borderStyle", disableInlineStyle);
+  collectCss("borderWidth", disableInlineStyle);
 
   // --- Radius
-  collectCss("borderRadius");
-  collectCss("radiusTopLeft", "borderTopLeftRadius");
-  collectCss("radiusTopRight", "borderTopRightRadius");
-  collectCss("radiusBottomLeft", "borderBottomLeftRadius");
-  collectCss("radiusBottomRight", "borderBottomRightRadius");
+  collectCss("borderRadius", disableInlineStyle);
+  collectCss("radiusTopLeft", disableInlineStyle, "borderTopLeftRadius");
+  collectCss("radiusTopRight", disableInlineStyle, "borderTopRightRadius");
+  collectCss("radiusBottomLeft", disableInlineStyle, "borderBottomLeftRadius");
+  collectCss("radiusBottomRight", disableInlineStyle, "borderBottomRightRadius");
 
   // --- Typography
-  collectCss("color");
-  collectCss("fontFamily");
-  collectCss("fontSize");
-  collectCss("fontWeight");
-  collectCss("fontStyle");
-  collectCss("fontVariant");
-  collectCss("lineBreak");
-  collectCss("textDecoration");
-  collectCss("textDecorationLine");
-  collectCss("textDecorationColor");
-  collectCss("textDecorationStyle");
-  collectCss("textDecorationThickness");
-  collectCss("textIndent");
-  collectCss("textShadow");
-  collectCss("textUnderlineOffset");
-  collectCss("userSelect");
-  collectCss("letterSpacing");
-  collectCss("textTransform");
-  collectCss("lineHeight");
-  collectCss("textAlign");
-  collectCss("textAlignLast");
-  collectCss("textWrap");
-  collectCss("wordBreak");
-  collectCss("wordSpacing");
-  collectCss("wordWrap");
-  collectCss("writingMode");
+  collectCss("color", disableInlineStyle);
+  collectCss("fontFamily", disableInlineStyle);
+  collectCss("fontSize", disableInlineStyle);
+  collectCss("fontWeight", disableInlineStyle);
+  collectCss("fontStyle", disableInlineStyle);
+  collectCss("fontVariant", disableInlineStyle);
+  collectCss("lineBreak", disableInlineStyle);
+  collectCss("textDecoration", disableInlineStyle);
+  collectCss("textDecorationLine", disableInlineStyle);
+  collectCss("textDecorationColor", disableInlineStyle);
+  collectCss("textDecorationStyle", disableInlineStyle);
+  collectCss("textDecorationThickness", disableInlineStyle);
+  collectCss("textIndent", disableInlineStyle);
+  collectCss("textShadow", disableInlineStyle);
+  collectCss("textUnderlineOffset", disableInlineStyle);
+  collectCss("userSelect", disableInlineStyle);
+  collectCss("letterSpacing", disableInlineStyle);
+  collectCss("textTransform", disableInlineStyle);
+  collectCss("lineHeight", disableInlineStyle);
+  collectCss("textAlign", disableInlineStyle);
+  collectCss("textAlignLast", disableInlineStyle);
+  collectCss("textWrap", disableInlineStyle);
+  collectCss("wordBreak", disableInlineStyle);
+  collectCss("wordSpacing", disableInlineStyle);
+  collectCss("wordWrap", disableInlineStyle);
+  collectCss("writingMode", disableInlineStyle);
 
   // --- Other
-  collectCss("backgroundColor");
-  collectCss("background");
-  collectCss("boxShadow");
-  collectCss("direction");
-  collectCss("overflowX");
-  collectCss("overflowY");
-  collectCss("zIndex");
-  collectCss("opacity");
-  collectCss("zoom");
-  collectCss("cursor");
-  collectCss("whiteSpace");
-  collectCss("transform");
+  collectCss("backgroundColor", disableInlineStyle);
+  collectCss("background", disableInlineStyle);
+  collectCss("boxShadow", disableInlineStyle);
+  collectCss("direction", disableInlineStyle);
+  collectCss("overflowX", disableInlineStyle);
+  collectCss("overflowY", disableInlineStyle);
+  collectCss("zIndex", disableInlineStyle);
+  collectCss("opacity", disableInlineStyle);
+  collectCss("zoom", disableInlineStyle);
+  collectCss("cursor", disableInlineStyle);
+  collectCss("whiteSpace", disableInlineStyle);
+  collectCss("transform", disableInlineStyle);
 
   // --- Outline
-  collectCss("outline");
-  collectCss("outlineWidth");
-  collectCss("outlineColor");
-  collectCss("outlineStyle");
-  collectCss("outlineOffset");
+  collectCss("outline", disableInlineStyle);
+  collectCss("outlineWidth", disableInlineStyle);
+  collectCss("outlineColor", disableInlineStyle);
+  collectCss("outlineStyle", disableInlineStyle);
+  collectCss("outlineOffset", disableInlineStyle);
 
   // --- Content rendering
   const wrapContent = transformLayoutValue("wrapContent");
   if (wrapContent) {
     result.cssProps.flexWrap = wrapContent === "true" ? "wrap" : "nowrap";
   }
-  collectCss("canShrink", "flexShrink");
+  collectCss("canShrink", disableInlineStyle, "flexShrink");
   const canShrink = transformLayoutValue("canShrink");
   if (canShrink) {
     result.cssProps.flexShrink = canShrink === "true" ? 1 : 0;
@@ -271,7 +272,7 @@ export function resolveLayoutProps(
     }
   }
 
-  function collectCss(prop: string, propCssName = ""): void {
+  function collectCss(prop: string, disableInlineStyle = false, propCssName = ""): void {
     const value = transformLayoutValue(prop);
     if (value) {
       result.cssProps[propCssName || prop] = value;

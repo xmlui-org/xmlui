@@ -639,6 +639,7 @@ export const FormWithContextVar = forwardRef(function (
     className,
     lookupEventHandler,
     registerComponentApi,
+    appContext,
   }: {
     node: FormComponentDef;
     renderChild: RenderChildFn;
@@ -647,6 +648,7 @@ export const FormWithContextVar = forwardRef(function (
     className?: string;
     lookupEventHandler: LookupEventHandlerFn<typeof FormMd>;
     registerComponentApi: RegisterComponentApiFn;
+    appContext?: any;
   },
   ref: ForwardedRef<HTMLDivElement>,
 ) {
@@ -696,7 +698,7 @@ export const FormWithContextVar = forwardRef(function (
     extractValue.asOptionalString(node.props._data_url);
 
   const itemLabelWidth = extractValue.asOptionalString(node.props.itemLabelWidth);
-  const { cssProps: itemLabelWidthCssProps } = resolveLayoutProps({ width: itemLabelWidth });
+  const { cssProps: itemLabelWidthCssProps } = resolveLayoutProps({ width: itemLabelWidth }, undefined, appContext?.appGlobals?.disableInlineStyle);
 
   return (
     <Slot ref={ref} style={style}>
