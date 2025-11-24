@@ -213,10 +213,14 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     });
 
     // --- New layout property resolution
-    return resolveLayoutProps(resolvedLayoutProps, {
-      ...layoutContextRef?.current,
-      mediaSize: appContext.mediaSize,
-    });
+    return resolveLayoutProps(
+      resolvedLayoutProps,
+      {
+        ...layoutContextRef?.current,
+        mediaSize: appContext.mediaSize,
+      },
+      appContext.appGlobals?.disableInlineStyle,
+    );
 
     // --- Old layout property resolution
     // return compileLayout(resolvedLayoutProps, themeVars, {
