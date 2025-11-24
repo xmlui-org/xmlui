@@ -24,12 +24,14 @@ type Props = {
   aspectRatio?: string;
   animation?: object;
   inline?: boolean;
+  grayscale?: boolean;
 } & Pick<HTMLAttributes<HTMLImageElement>, "onClick">;
 
-export const defaultProps: Pick<Props, "fit" | "lazyLoad" | "inline"> = {
+export const defaultProps: Pick<Props, "fit" | "lazyLoad" | "inline" | "grayscale"> = {
   fit: "contain",
   lazyLoad: false,
   inline: false,
+  grayscale: false,
 };
 
 export const Image = forwardRef(function Img(
@@ -44,6 +46,7 @@ export const Image = forwardRef(function Img(
     aspectRatio,
     lazyLoad = defaultProps.lazyLoad,
     inline = defaultProps.inline,
+    grayscale = defaultProps.grayscale,
     ...rest
   }: Props,
   ref,
@@ -93,6 +96,7 @@ export const Image = forwardRef(function Img(
         styles.img,
         {
           [styles.clickable]: !!onClick,
+          [styles.grayscale]: grayscale,
         },
         className,
       )}

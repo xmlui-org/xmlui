@@ -51,6 +51,13 @@ export const MarkdownMd = createMetadata({
         "next to headings.",
       valueType: "boolean",
     },
+    grayscale: {
+      description:
+        "This boolean property specifies whether images should be displayed in " +
+        "grayscale. If set to `true`, all images within the markdown will be " +
+        "rendered in grayscale.",
+      valueType: "boolean",
+    },
   },
 
   defaultThemeVars: {
@@ -135,6 +142,7 @@ export const markdownComponentRenderer = createComponentRenderer(
         codeHighlighter={extractValue(node.props.codeHighlighter)}
         extractValue={extractValue}
         showHeadingAnchors={extractValue.asOptionalBoolean(node.props.showHeadingAnchors)}
+        grayscale={extractValue.asOptionalBoolean(node.props.grayscale)}
       >
         {renderedChildren}
       </TransformedMarkdown>
@@ -149,6 +157,7 @@ type TransformedMarkdownProps = {
   extractValue: ValueExtractor;
   codeHighlighter?: CodeHighlighter;
   showHeadingAnchors?: boolean;
+  grayscale?: boolean;
 };
 
 const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>(
@@ -160,6 +169,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
       extractValue,
       codeHighlighter,
       showHeadingAnchors,
+      grayscale,
     }: TransformedMarkdownProps,
     ref,
   ) => {
@@ -202,6 +212,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
         codeHighlighter={codeHighlighter}
         className={className}
         showHeadingAnchors={showHeadingAnchors}
+        grayscale={grayscale}
       >
         {markdownContent}
       </Markdown>
