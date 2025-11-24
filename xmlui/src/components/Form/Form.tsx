@@ -161,6 +161,11 @@ export const FormMd = createMetadata({
       signature: "validate(): Promise<{ isValid: boolean, data: Record<string, any>, errors: ValidationResult[], warnings: ValidationResult[], validationResults: Record<string, ValidationResult> }>",
       returns: "A promise that resolves to an object containing validation status, cleaned data, and detailed validation results.",
     },
+    getData: {
+      description: "This method returns a deep clone of the current form data object. Changes to the returned object do not affect the form's internal state.",
+      signature: "getData(): Record<string, any>",
+      returns: "A deep clone of the current form data object.",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
