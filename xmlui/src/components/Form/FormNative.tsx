@@ -26,6 +26,7 @@ import type {
 import type { ContainerAction } from "../../components-core/rendering/containers";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import type { GenericBackendError } from "../../components-core/EngineError";
+import { useCallback } from "react";
 import { useEvent } from "../../components-core/utils/misc";
 import {
   backendValidationArrived,
@@ -46,7 +47,7 @@ import { type FormAction, formReset } from "../Form/formActions";
 import type { FormMd } from "./Form";
 import type { InteractionFlags, SingleValidationResult, ValidationResult } from "./FormContext";
 import { FormContext } from "./FormContext";
-import { get, set } from "lodash-es";
+import { cloneDeep, get, set } from "lodash-es";
 import classnames from "classnames";
 import { Slot } from "@radix-ui/react-slot";
 import { resolveLayoutProps } from "../../components-core/theming/layout-resolver";
@@ -559,13 +560,18 @@ const Form = forwardRef(function (
     [isEnabled, enableSubmit, formState.submitInProgress, saveInProgressLabel, saveLabel],
   );
 
+  const getData = useCallback(() => {
+    return cloneDeep(cleanUpSubject(formState.subject, formState.noSubmitFields));
+  }, [formState.subject, formState.noSubmitFields]);
+
   useEffect(() => {
     registerComponentApi?.({
       reset: doReset,
       update: updateData,
       validate: doValidate,
+      getData,
     });
-  }, [doReset, updateData, doValidate, registerComponentApi]);
+  }, [doReset, updateData, doValidate, getData, registerComponentApi]);
 
   let safeButtonRow = (
     <>
