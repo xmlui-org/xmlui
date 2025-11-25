@@ -51,6 +51,7 @@ import { Icon } from "../Icon/IconNative";
 import { type OurColumnMetadata } from "../Column/TableContext";
 import useRowSelection from "./useRowSelection";
 import { PaginationNative, type Position } from "../Pagination/PaginationNative";
+import { Part } from "../Part/Part";
 
 // =====================================================================================================================
 // Helper types
@@ -869,18 +870,25 @@ export const Table = forwardRef(
                               ) as ReactNode
                             }
                             {header.column.columnDef.enableSorting && (
-                              <span style={{ display: "inline-flex", maxWidth: 16 }}>
-                                <ColumnOrderingIndicator
-                                  iconSortAsc={iconSortAsc}
-                                  iconSortDesc={iconSortDesc}
-                                  iconNoSort={iconNoSort}
-                                  direction={
-                                    header.column.columnDef.meta?.accessorKey === _sortBy
-                                      ? _sortingDirection
-                                      : undefined
-                                  }
-                                />
-                              </span>
+                              <Part partId="orderIndicator">
+                                <span
+                                  className={classnames(styles.orderingIndicator, {
+                                    [styles.activeOrdering]:
+                                      header.column.columnDef.meta?.accessorKey === _sortBy,
+                                  })}
+                                >
+                                  <ColumnOrderingIndicator
+                                    iconSortAsc={iconSortAsc}
+                                    iconSortDesc={iconSortDesc}
+                                    iconNoSort={iconNoSort}
+                                    direction={
+                                      header.column.columnDef.meta?.accessorKey === _sortBy
+                                        ? _sortingDirection
+                                        : undefined
+                                    }
+                                  />
+                                </span>
+                              </Part>
                             )}
                           </div>
                         </ClickableHeader>

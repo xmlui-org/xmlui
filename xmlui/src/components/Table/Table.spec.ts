@@ -689,6 +689,50 @@ test.describe("Basic Functionality", () => {
       await expect(page.getByText(/no data/i)).not.toBeVisible();
     });
   });
+
+  test("order indicators are not visible by default", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' testId="table">
+        <Column bindTo="name" header="Name" canSort="true"/>
+        <Column bindTo="quantity" header="Quantity"/>
+      </Table>
+    `);
+    for (const indicator of await page.locator("[data-part-id='orderIndicator']").all()) {
+      await expect(indicator).not.toBeVisible();
+    }
+  });
+
+  test("order indicator appears on sortable columns on hover", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' testId="table">
+        <Column bindTo="name" header="Name" canSort="true"/>
+        <Column bindTo="quantity" header="Quantity"/>
+      </Table>
+    `);
+    const nameHeader = page.getByRole("button").filter({ hasText: "Name" }).first();
+    await nameHeader.hover();
+    await expect(nameHeader.locator("[data-part-id='orderIndicator']")).toBeVisible();
+    
+    // all other indicators should remain hidden
+    const quantityHeader = page.getByRole("columnheader").filter({ hasText: "Quantity" }).first();
+    await expect(quantityHeader.locator("[data-part-id='orderIndicator']")).not.toBeVisible();
+  });
+
+  test("order indicator stays visible when table is sorted by column", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' testId="table">
+        <Column bindTo="name" header="Name" canSort="true"/>
+        <Column bindTo="quantity" header="Quantity"/>
+      </Table>
+    `);
+    const nameHeader = page.getByRole("button").filter({ hasText: "Name" }).first();
+    await nameHeader.click();
+    await expect(nameHeader.locator("[data-part-id='orderIndicator']")).toBeVisible();
+
+    // all other indicators should remain hidden
+    const quantityHeader = page.getByRole("columnheader").filter({ hasText: "Quantity" }).first();
+    await expect(quantityHeader.locator("[data-part-id='orderIndicator']")).not.toBeVisible();
+  });
 });
 
 // =============================================================================
