@@ -194,8 +194,8 @@ export const autoCompleteComponentRenderer = createComponentRenderer(
                 return (
                   <MemoizedItem
                     node={node.props.optionTemplate}
-                    item={item}
-                    context={{
+                    contextVars={{
+                      $item: item,
                       $selectedValue: val,
                       $inTrigger: inTrigger,
                     }}

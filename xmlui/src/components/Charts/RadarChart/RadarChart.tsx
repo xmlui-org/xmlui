@@ -118,7 +118,6 @@ export const radarChartComponentRenderer = createComponentRenderer(
                 return (
                   <MemoizedItem
                     node={node.props.tooltipTemplate}
-                    item={tooltipData}
                     contextVars={{
                       $tooltip: tooltipData,
                     }}

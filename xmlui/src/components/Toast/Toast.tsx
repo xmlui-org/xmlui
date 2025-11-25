@@ -39,8 +39,6 @@ export const toastComponentRenderer = createComponentRenderer(
           return (
             <MemoizedItem
               node={template || node.children}
-              itemKey={"$_TEMP"}    //todo TEMP HACK, to make itemKey === contextKey true inside MemoizedItem
-              contextKey={"$_TEMP"}
               contextVars={{
                 $param: context,
               }}

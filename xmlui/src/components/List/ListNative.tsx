@@ -591,11 +591,8 @@ export function MemoizedSection({
     <MemoizedItem
       node={node}
       renderChild={renderChild}
-      item={item}
-      context={sectionContext}
-      itemKey="$group"
-      contextKey="$group"
       contextVars={{
+        $group: { ...item, ...sectionContext },
         ...contextVars,
         $isFirst: item.index === 0,
         $isLast: item.index === item.count - 1,
