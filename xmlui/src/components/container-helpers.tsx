@@ -31,23 +31,29 @@ export const MemoizedItem = memo(
   }: MemoizedItemProps) => {
     const shallowMemoedContextVars = useShallowCompareMemoize(contextVars);
     const nodeWithItem = useMemo(() => {
+      // Build contextVars object, only including item/context if they're defined
+      const mergedContextVars: Record<string, any> = { ...shallowMemoedContextVars };
+      
       if (itemKey === contextKey) {
-        return {
-          type: "Container",
-          contextVars: {
-            [itemKey]: { ...item, ...context },
-            ...shallowMemoedContextVars,
-          },
-          children: Array.isArray(node) ? node : [node],
-        } as ContainerWrapperDef;
+        // Merge item and context into a single key
+        const merged = { ...item, ...context };
+        // Only add if there's actual content
+        if (item !== undefined || context !== undefined) {
+          mergedContextVars[itemKey] = merged;
+        }
+      } else {
+        // Add item and context as separate keys, but only if defined
+        if (item !== undefined) {
+          mergedContextVars[itemKey] = item;
+        }
+        if (context !== undefined) {
+          mergedContextVars[contextKey] = context;
+        }
       }
+      
       return {
         type: "Container",
-        contextVars: {
-          [itemKey]: item,
-          [contextKey]: context,
-          ...shallowMemoedContextVars,
-        },
+        contextVars: mergedContextVars,
         children: Array.isArray(node) ? node : [node],
       } as ContainerWrapperDef;
     }, [context, item, node, shallowMemoedContextVars, itemKey, contextKey]);

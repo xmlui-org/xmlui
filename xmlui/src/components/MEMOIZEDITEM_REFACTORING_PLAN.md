@@ -2,7 +2,7 @@
 
 ## 🎯 Current Progress Status (Updated 2025-11-25)
 
-### ✅ COMPLETED - 12 Components (19 locations)
+### ✅ COMPLETED - ALL 14 Components! (21 locations)
 - **Column** - 107 Table tests pass
 - **Accordion** - 47 tests pass
 - **List** - 107 tests pass (3 locations refactored)
@@ -14,17 +14,58 @@
 - **RadarChart** - included in 128 chart tests
 - **Tree** - 86/90 tests pass (2 locations)
 - **Toast** - 7/7 tests pass (removed itemKey/contextKey HACK)
-
-### ⏸️ DEFERRED - 2 Components
-- **TabItem** - itemKey affects parent context propagation (needs deeper analysis)
-- **Tabs** - same issue as TabItem
+- **TabItem** - 57 Tabs tests pass (fixed context propagation!)
+- **Tabs** - 57 tests pass (fixed context propagation!)
 
 ### ✅ VERIFIED ALREADY CORRECT - 6 Components
 - Items, Checkbox, ModalDialog, Option, FormItem, Queue
 
-**Status**: 12/20 components refactored! Only TabItem and Tabs remain (both have context propagation issues requiring deeper Container analysis)
+**Status**: 🎉 **100% COMPLETE!** All 20 components refactored!
 
-**Next Steps**: Consider revisiting TabItem/Tabs or move to simplifying MemoizedItem component itself
+**Breakthrough**: Fixed MemoizedItem to not overwrite parent context variables with undefined values. This solved the TabItem/Tabs context propagation issue.
+
+**Next Steps**: Simplify MemoizedItem component by removing deprecated props (item, context, itemKey, contextKey)
+
+---
+
+## 🔬 Key Discovery: Context Propagation Issue & Solution
+
+### The Problem
+TabItem and Tabs components appeared to need `itemKey` for context propagation. The test "headerTemplate works with dynamic content from Items" would fail without it:
+
+```typescript
+<Items data="{[1, 2, 3]}">
+  <TabItem label="Account {$item}">
+    <property name="headerTemplate">
+      <Text>{$header.label} | {$item}</Text>  <!-- Needs both $header and $item -->
+    </property>
+  </TabItem>
+</Items>
+```
+
+### The Root Cause
+When MemoizedItem was called without explicit `itemKey`:
+1. It defaulted to `itemKey="$item"`
+2. Since `item` prop was undefined, it created `$item: undefined` in contextVars
+3. This **OVERWROTE** the parent Items component's `$item` context variable!
+
+### The Solution
+Modified MemoizedItem in `container-helpers.tsx` to:
+- **Only add item/context to contextVars if they're defined**
+- Skip creating keys for undefined values
+- This prevents pollution of parent context variables
+
+```typescript
+// NEW LOGIC - Only add if defined
+if (item !== undefined) {
+  mergedContextVars[itemKey] = item;
+}
+if (context !== undefined) {
+  mergedContextVars[contextKey] = context;
+}
+```
+
+This simple change fixed the context propagation issue and allowed us to remove `itemKey` from all components!
 
 ---
 
@@ -212,13 +253,13 @@ These components have straightforward usage patterns and minimal complexity.
 - **Testing**: ✅ All 47 Accordion e2e tests pass
 - **Completed**: 2025-11-25
 
-#### 1.7 TabItem Component ⚠️ DEFERRED - NEEDS DEEPER ANALYSIS
+#### 1.7 TabItem Component ✅ REFACTORED
 - **File**: `xmlui/src/components/Tabs/TabItem.tsx` (line 46)
-- **Current Pattern**: Uses both `contextVars` AND `itemKey` prop
+- **Original Pattern**: Used both `contextVars` AND `itemKey` prop
   ```typescript
   <MemoizedItem
     node={node.props.headerTemplate}
-    itemKey="$header"  // ❌ Uses itemKey
+    itemKey="$header"  // ❌ Used itemKey
     contextVars={{
       $header: {
         id: item.id,
@@ -230,28 +271,41 @@ These components have straightforward usage patterns and minimal complexity.
     renderChild={renderChild}
   />
   ```
-- **Investigation Findings**: 
-  - Initially appeared redundant since `$header` is in contextVars
-  - Testing revealed `itemKey` is actually needed for parent context propagation
-  - Test "headerTemplate works with dynamic content from Items" fails without `itemKey`
-  - The test uses Items component which provides `$item` context, and headerTemplate needs access to both `$header` and `$item`
-  - Removing `itemKey` breaks the ability to access parent context variables like `$item`
-- **Root Cause**: The `itemKey` parameter affects how the Container merges contextVars with parent context, even when `item` prop is undefined
-- **Refactoring Strategy**: DEFERRED - requires understanding Container's context merging logic
+- **Refactored Pattern**: Removed `itemKey`, kept only `contextVars`
+  ```typescript
+  <MemoizedItem
+    node={node.props.headerTemplate}
+    contextVars={{
+      $header: {  // ✅ Only contextVars
+        id: item.id,
+        index: item.index,
+        label: item.label,
+        isActive: item.isActive,
+      },
+    }}
+    renderChild={renderChild}
+  />
+  ```
+- **Root Cause Discovery**: 
+  - Without explicit `itemKey="$header"`, MemoizedItem defaulted to `itemKey="$item"`
+  - Since `item` prop was undefined, it created `$item: undefined` in contextVars
+  - This OVERWROTE the parent Items component's `$item` context variable!
+  - **Solution**: Modified MemoizedItem to skip adding keys for undefined item/context props
+- **Refactoring Strategy**: Fixed MemoizedItem to not pollute contextVars with undefined values
 - **Context Variables Exposed**: `$header` (with id, index, label, isActive)  
-- **Action**: ⏸️ Skip for now - revisit after understanding context propagation better
-- **E2E Tests**: `tests-e2e/tabs.spec.ts` - 57 tests total, 1 fails without `itemKey`
+- **Testing**: ✅ All 57 Tabs e2e tests pass (including the Items integration test)
+- **Completed**: 2025-11-25
 
-#### 1.8 Tabs Component ⚠️ DEFERRED - NEEDS DEEPER ANALYSIS
+#### 1.8 Tabs Component ✅ REFACTORED
 - **File**: `xmlui/src/components/Tabs/Tabs.tsx` (line 105)
-- **Current Pattern**: Uses both `contextVars` AND `itemKey` prop
+- **Original Pattern**: Used both `contextVars` AND `itemKey` prop
   ```typescript
   headerRenderer={
     node?.props?.headerTemplate
       ? (item) => (
           <MemoizedItem
             node={node.props.headerTemplate! as any}
-            itemKey="$header"  // ❌ Uses itemKey
+            itemKey="$header"  // ❌ Used itemKey
             contextVars={{
               $header: item,
             }}
@@ -261,11 +315,26 @@ These components have straightforward usage patterns and minimal complexity.
       : undefined
   }
   ```
-- **Investigation Findings**: Same issue as TabItem - `itemKey` affects parent context propagation
-- **Refactoring Strategy**: DEFERRED - requires understanding Container's context merging logic
+- **Refactored Pattern**: Removed `itemKey`, kept only `contextVars`
+  ```typescript
+  headerRenderer={
+    node?.props?.headerTemplate
+      ? (item) => (
+          <MemoizedItem
+            node={node.props.headerTemplate! as any}
+            contextVars={{
+              $header: item,  // ✅ Only contextVars
+            }}
+            renderChild={renderChild}
+          />
+        )
+      : undefined
+  }
+  ```
+- **Refactoring Strategy**: Same fix as TabItem - MemoizedItem no longer pollutes with undefined values
 - **Context Variables Exposed**: `$header`
-- **Action**: ⏸️ Skip for now - revisit with TabItem
-- **E2E Tests**: `tests-e2e/tabs.spec.ts`
+- **Testing**: ✅ All 57 Tabs e2e tests pass
+- **Completed**: 2025-11-25
 
 ### Phase 2: Medium Complexity Components
 These components use `item` prop and need context variable mapping.
@@ -633,8 +702,8 @@ For each component, follow this process:
 8. ✅ AreaChart - removed redundant `item` prop (128 chart tests pass total)
 9. ✅ BarChart - removed redundant `item` prop
 10. ✅ RadarChart - removed redundant `item` prop
-11. ⏸️ TabItem - DEFERRED (itemKey affects context propagation)
-12. ⏸️ Tabs - DEFERRED (itemKey affects context propagation)
+11. ✅ TabItem - removed itemKey (57 tests pass after MemoizedItem fix)
+12. ✅ Tabs - removed itemKey (57 tests pass after MemoizedItem fix)
 
 **Week 3: Medium Complexity (Merge item into contextVars)**
 13. ✅ Column - merged `item` into contextVars (107 Table tests pass)
@@ -646,7 +715,7 @@ For each component, follow this process:
 **Week 4: Complex & Special Cases**
 18. ✅ Toast - removed HACK (itemKey/contextKey) - 7 tests pass
 19. ✅ List - complex refactoring done, 3 locations (107 tests pass)
-20. **Final Step: Update MemoizedItem component** (remove deprecated props)
+20. **🎯 READY: Simplify MemoizedItem component** (remove deprecated props)
 
 ## Testing Strategy
 
