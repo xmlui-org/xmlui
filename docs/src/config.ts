@@ -95,15 +95,14 @@ Object.keys(contentRuntime).map((filePath) => {
   navPanelContent.push(urlFragment);
 });
 
-const pagesRuntime: Record<string, any> = import.meta.glob(`/public/pages/**/*.md`, {
+const pagesRuntime: Record<string, any> = import.meta.glob(`/pages/**/*.md`, {
   eager: true,
   query: "?raw",
 });
 
 const prefetchedContent: Record<string, any> = {};
 Object.keys(pagesRuntime).map((filePath) => {
-  const urlFragment = filePath.substring("/public".length);
-  prefetchedContent[urlFragment] = pagesRuntime[filePath].default;
+  prefetchedContent[filePath] = pagesRuntime[filePath].default;
 });
 
 const shikiHighlighter = createHighlighterCoreSync({

@@ -65,7 +65,7 @@ type RuntimeProps = {
   component?: ComponentDef | CompoundComponentDef;
   file?: string;
   src?: string;
-}
+};
 
 // --- The properties of the standalone app
 type StandaloneAppProps = {
@@ -166,6 +166,7 @@ function StandaloneApp({
   // --- An app can turn off the default hash routing.
   const useHashBasedRouting = appGlobals?.useHashBasedRouting ?? true;
 
+  console.log(appGlobals);
   return (
     <ApiInterceptorProvider
       interceptor={mockedApi}
