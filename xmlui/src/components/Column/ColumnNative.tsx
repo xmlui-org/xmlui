@@ -25,8 +25,8 @@ export function Column({ nodeChildren, renderChild, ...columnMetadata }: Props) 
       return (
         <MemoizedItem
           node={nodeChildren!}
-          item={row}
           contextVars={{
+            $item: row,
             $rowIndex: rowIndex,
             $colIndex: colIndex,
             $row: row,

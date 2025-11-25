@@ -227,10 +227,10 @@ export const selectComponentRenderer = createComponentRenderer(
                 return (
                   <MemoizedItem
                     contextVars={{
+                      $item: item,
                       $itemContext: { removeItem },
                     }}
                     node={node.props.valueTemplate}
-                    item={item}
                     renderChild={renderChild}
                   />
                 );
@@ -243,8 +243,8 @@ export const selectComponentRenderer = createComponentRenderer(
                 return (
                   <MemoizedItem
                     node={node.props.optionTemplate}
-                    item={item}
                     contextVars={{
+                      $item: item,
                       $selectedValue: val,
                       $inTrigger: inTrigger,
                     }}
