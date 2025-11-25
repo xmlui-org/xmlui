@@ -26,6 +26,7 @@ type Props = {
   id?: string;
   isRoot?: boolean;
   applyIf?: boolean;
+  disableInlineStyle?: boolean;
   layoutContext?: LayoutContext;
   renderChild?: RenderChildFn;
   node?: ComponentDef;
@@ -47,6 +48,7 @@ export function Theme({
   id,
   isRoot = defaultProps.isRoot,
   applyIf,
+  disableInlineStyle,
   renderChild,
   node,
   tone,
@@ -157,6 +159,7 @@ export function Theme({
       themeVars: allThemeVarsWithResolvedHierarchicalVars,
       getResourceUrl,
       getThemeVar,
+      disableInlineStyle,
     };
     return themeVal;
   }, [
@@ -168,6 +171,7 @@ export function Theme({
     getThemeVar,
     themeCssVars,
     themeTone,
+    disableInlineStyle,
   ]);
 
   const { indexing } = useIndexerContext();

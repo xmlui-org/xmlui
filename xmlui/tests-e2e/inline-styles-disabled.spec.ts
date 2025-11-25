@@ -162,4 +162,205 @@ test.describe("Inline Styles Disabled", () => {
     await expect(page.getByTestId("blueText")).toHaveCSS("color", "rgb(255, 255, 0)");
     await expect(page.getByTestId("greenText")).toHaveCSS("color", "rgb(0, 0, 0)");
   });
+
+  test("Theme with disableInlineStyle=true removes inline styles within its scope", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <Theme disableInlineStyle="true">
+          <Stack width="200px" height="100px" backgroundColor="purple" color="white" testId="themedStack">
+            <H3 testId="themedHeading">This is inside a themed section</H3>
+          </Stack>
+        </Theme>
+      </App>
+    `);
+
+    const themedStack = page.getByTestId("themedStack");
+    const themedHeading = page.getByTestId("themedHeading");
+
+    // Verify the Stack is visible
+    await expect(themedStack).toBeVisible();
+
+    // Verify background color is NOT applied when Theme disables inline styles
+    const backgroundColor = await themedStack.evaluate((el) =>
+      window.getComputedStyle(el).backgroundColor,
+    );
+    expect(backgroundColor).not.toEqual("rgb(128, 0, 128)");
+
+    // Verify text color is NOT applied when Theme disables inline styles
+    const textColor = await themedHeading.evaluate((el) => window.getComputedStyle(el).color);
+    expect(textColor).not.toEqual("rgb(255, 255, 255)");
+  });
+
+  test("Theme with disableInlineStyle=false preserves inline styles within its scope", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <Theme disableInlineStyle="false">
+          <Stack width="200px" height="100px" backgroundColor="purple" color="white" testId="themedStack">
+            <H3 testId="themedHeading">This is inside a themed section</H3>
+          </Stack>
+        </Theme>
+      </App>
+    `);
+
+    const themedStack = page.getByTestId("themedStack");
+    const themedHeading = page.getByTestId("themedHeading");
+
+    // Verify the Stack is visible
+    await expect(themedStack).toBeVisible();
+
+    // Verify background color IS applied when Theme explicitly enables inline styles
+    await expect(themedStack).toHaveCSS("background-color", "rgb(128, 0, 128)");
+
+    // Verify text color IS applied
+    await expect(themedHeading).toHaveCSS("color", "rgb(255, 255, 255)");
+  });
+
+  test("Theme disableInlineStyle property overrides appGlobals setting", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
+      <App>
+        <Theme disableInlineStyle="false">
+          <Stack width="200px" height="100px" backgroundColor="purple" color="white" testId="themedStack">
+            <H3 testId="themedHeading">Theme overrides global setting</H3>
+          </Stack>
+        </Theme>
+      </App>
+    `,
+      {
+        appGlobals: {
+          disableInlineStyle: true,
+        },
+      },
+    );
+
+    const themedStack = page.getByTestId("themedStack");
+    const themedHeading = page.getByTestId("themedHeading");
+
+    // Theme's disableInlineStyle=false should override appGlobals.disableInlineStyle=true
+    await expect(themedStack).toHaveCSS("background-color", "rgb(128, 0, 128)");
+    await expect(themedHeading).toHaveCSS("color", "rgb(255, 255, 255)");
+  });
+
+  test("Theme without disableInlineStyle property uses appGlobals setting", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
+      <App>
+        <Theme>
+          <Stack width="200px" height="100px" backgroundColor="purple" color="white" testId="themedStack">
+            <H3 testId="themedHeading">Uses global setting</H3>
+          </Stack>
+        </Theme>
+      </App>
+    `,
+      {
+        appGlobals: {
+          disableInlineStyle: true,
+        },
+      },
+    );
+
+    const themedStack = page.getByTestId("themedStack");
+    const themedHeading = page.getByTestId("themedHeading");
+
+    // Should use appGlobals.disableInlineStyle=true when Theme property is undefined
+    const backgroundColor = await themedStack.evaluate((el) =>
+      window.getComputedStyle(el).backgroundColor,
+    );
+    expect(backgroundColor).not.toEqual("rgb(128, 0, 128)");
+
+    const textColor = await themedHeading.evaluate((el) => window.getComputedStyle(el).color);
+    expect(textColor).not.toEqual("rgb(255, 255, 255)");
+  });
+
+  test("nested Themes with different disableInlineStyle settings", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <Theme disableInlineStyle="true">
+          <Stack width="200px" height="100px" backgroundColor="red" color="white" testId="outerStack">
+            <H3 testId="outerHeading">Outer theme disables styles</H3>
+          </Stack>
+          <Theme disableInlineStyle="false">
+            <Stack width="200px" height="100px" backgroundColor="blue" color="yellow" testId="innerStack">
+              <H3 testId="innerHeading">Inner theme enables styles</H3>
+            </Stack>
+          </Theme>
+        </Theme>
+      </App>
+    `);
+
+    const outerStack = page.getByTestId("outerStack");
+    const outerHeading = page.getByTestId("outerHeading");
+    const innerStack = page.getByTestId("innerStack");
+    const innerHeading = page.getByTestId("innerHeading");
+
+    // Outer theme disables inline styles
+    const outerBgColor = await outerStack.evaluate((el) =>
+      window.getComputedStyle(el).backgroundColor,
+    );
+    expect(outerBgColor).not.toEqual("rgb(255, 0, 0)");
+
+    const outerTextColor = await outerHeading.evaluate((el) => window.getComputedStyle(el).color);
+    expect(outerTextColor).not.toEqual("rgb(255, 255, 255)");
+
+    // Inner theme overrides and enables inline styles
+    await expect(innerStack).toHaveCSS("background-color", "rgb(0, 0, 255)");
+    await expect(innerHeading).toHaveCSS("color", "rgb(255, 255, 0)");
+  });
+
+  test("multiple Themes with different settings affect their respective scopes", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <HStack gap="2">
+          <Theme disableInlineStyle="true">
+            <Stack width="150px" height="100px" backgroundColor="purple" color="white" testId="disabledThemeStack">
+              <H3 testId="disabledText">Styles disabled</H3>
+            </Stack>
+          </Theme>
+          <Theme disableInlineStyle="false">
+            <Stack width="150px" height="100px" backgroundColor="green" color="black" testId="enabledThemeStack">
+              <H3 testId="enabledText">Styles enabled</H3>
+            </Stack>
+          </Theme>
+        </HStack>
+      </App>
+    `);
+
+    const disabledStack = page.getByTestId("disabledThemeStack");
+    const disabledText = page.getByTestId("disabledText");
+    const enabledStack = page.getByTestId("enabledThemeStack");
+    const enabledText = page.getByTestId("enabledText");
+
+    // First theme disables inline styles
+    const disabledBgColor = await disabledStack.evaluate((el) =>
+      window.getComputedStyle(el).backgroundColor,
+    );
+    expect(disabledBgColor).not.toEqual("rgb(128, 0, 128)");
+
+    const disabledTextColor = await disabledText.evaluate((el) =>
+      window.getComputedStyle(el).color,
+    );
+    expect(disabledTextColor).not.toEqual("rgb(255, 255, 255)");
+
+    // Second theme enables inline styles
+    await expect(enabledStack).toHaveCSS("background-color", "rgb(0, 128, 0)");
+    await expect(enabledText).toHaveCSS("color", "rgb(0, 0, 0)");
+  });
 });

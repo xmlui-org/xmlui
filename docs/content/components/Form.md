@@ -190,6 +190,12 @@ The following example allows saving customer data only when the age is an even n
 
 ## Exposed Methods [#exposed-methods]
 
+### `getData` [#getdata]
+
+This method returns a deep clone of the current form data object. Changes to the returned object do not affect the form's internal state.
+
+**Signature**: `getData(): Record<string, any>`
+
 ### `reset` [#reset]
 
 This method resets the form to its initial state, clearing all user input.

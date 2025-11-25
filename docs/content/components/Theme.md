@@ -78,6 +78,10 @@ This property is particularly useful for:
 - **Progressive enhancement**: Provide fallback styling when themes fail to load
 - **Dynamic theming**: Switch themes on and off based on user interactions or data conditions
 
+### `disableInlineStyle` [#disableinlinestyle]
+
+This property controls whether inline styles are disabled for components within this theme. When undefined, uses the appGlobals.disableInlineStyle setting.
+
 ### `root` (default: false) [#root-default-false]
 
 This property indicates whether the component is at the root of the application.
