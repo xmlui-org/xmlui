@@ -7,7 +7,7 @@ import {
   useCallback,
 } from "react";
 import { useEffect, useState, useRef } from "react";
-import { Popover, PopoverTrigger, PopoverContent, Portal } from "@radix-ui/react-popover";
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import classnames from "classnames";
 
 import styles from "./DropdownMenu.module.scss";
@@ -88,7 +88,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
     modal = false,
     ...rest
   }: DropdownMenuProps,
-  ref,
+  ref: React.ForwardedRef<HTMLButtonElement>,
 ) {
   const { root } = useTheme();
   const [open, setOpen] = useState(false);
@@ -116,49 +116,9 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
 
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
-    if (event.key === "Escape") {
-      setOpen(false);
-      return;
-    }
-
-    // Handle ArrowDown and ArrowUp for navigation
-    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-      event.preventDefault();
-      const content = contentRef.current;
-      if (!content) return;
-
-      const menuItems = Array.from(
-        content.querySelectorAll('[role="menuitem"]:not([class*="disabled"])'),
-      ) as HTMLElement[];
-
-      if (menuItems.length === 0) return;
-
-      const currentIndex = menuItems.findIndex((item) => item === document.activeElement);
-
-      let nextIndex: number;
-      if (currentIndex === -1) {
-        // No item focused, focus the first one on ArrowDown, last on ArrowUp
-        nextIndex = event.key === "ArrowDown" ? 0 : menuItems.length - 1;
-      } else if (event.key === "ArrowDown") {
-        nextIndex = currentIndex < menuItems.length - 1 ? currentIndex + 1 : 0;
-      } else {
-        nextIndex = currentIndex > 0 ? currentIndex - 1 : menuItems.length - 1;
-      }
-
-      menuItems[nextIndex]?.focus();
-    }
-
-    // Let Enter and Space bubble down to the focused menu item
-    if (event.key === "Enter" || event.key === " ") {
-      // Don't prevent default here - let the menu item handle it
-      return;
-    }
-  }, []);
-
   return (
     <DropdownMenuContext.Provider value={{ closeMenu }}>
-      <Popover
+      <DropdownMenuPrimitive.Root
         open={open}
         onOpenChange={async (isOpen) => {
           if (disabled) return;
@@ -186,14 +146,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
         }}
         modal={modal}
       >
-        <PopoverTrigger
-          {...rest}
-          asChild
-          disabled={disabled}
-          ref={ref as any}
-          aria-haspopup="menu"
-          aria-expanded={open}
-        >
+        <DropdownMenuPrimitive.Trigger {...rest} asChild disabled={disabled} ref={ref}>
           {triggerTemplate ? (
             triggerTemplate
           ) : (
@@ -208,28 +161,22 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
               {label}
             </Button>
           )}
-        </PopoverTrigger>
-        <Portal container={root}>
-          <PopoverContent
+        </DropdownMenuPrimitive.Trigger>
+        <DropdownMenuPrimitive.Portal container={root}>
+          <DropdownMenuPrimitive.Content
             ref={contentRef}
             align={alignment}
             style={style}
             className={classnames(styles.DropdownMenuContent, className, {
               [styles.compact]: compact,
             })}
-            onOpenAutoFocus={(e) => {
-              // Allow focus on the popover content so keyboard events work
-              e.preventDefault();
-              contentRef.current?.focus();
-            }}
-            onKeyDownCapture={handleKeyDown}
-            role="menu"
             tabIndex={-1}
+            loop={true}
           >
             {children}
-          </PopoverContent>
-        </Portal>
-      </Popover>
+          </DropdownMenuPrimitive.Content>
+        </DropdownMenuPrimitive.Portal>
+      </DropdownMenuPrimitive.Root>
     </DropdownMenuContext.Provider>
   );
 });
@@ -281,27 +228,8 @@ export const MenuItem = forwardRef(function MenuItem(
     [enabled, onClick, context],
   );
 
-  const handleKeyDown = useCallback(
-    (event: React.KeyboardEvent) => {
-      if (!enabled) return;
-
-      if (event.key === "Enter") {
-        event.preventDefault();
-        event.stopPropagation();
-        onClick(event as any);
-        context?.closeMenu();
-      } else if (event.key === " ") {
-        event.preventDefault();
-        event.stopPropagation();
-        onClick(event as any);
-        context?.closeMenu();
-      }
-    },
-    [enabled, onClick, context],
-  );
-
   return (
-    <div
+    <DropdownMenuPrimitive.Item
       style={style}
       className={classnames(className, styles.DropdownMenuItem, {
         [styles.active]: active,
@@ -310,14 +238,13 @@ export const MenuItem = forwardRef(function MenuItem(
       })}
       ref={ref as any}
       onClick={handleClick}
-      onKeyDown={handleKeyDown}
       role="menuitem"
       tabIndex={enabled ? 0 : -1}
     >
       {iconToStart && icon}
       <div className={styles.wrapper}>{label ?? children}</div>
       {!iconToStart && icon}
-    </div>
+    </DropdownMenuPrimitive.Item>
   );
 });
 
@@ -329,38 +256,26 @@ type SubMenuItemProps = {
 
 export const SubMenuItem = forwardRef<HTMLDivElement, SubMenuItemProps>(function SubMenuItem(
   { children, label, triggerTemplate },
-  ref,
+  ref: React.ForwardedRef<HTMLDivElement>,
 ) {
   const { root } = useTheme();
   const [open, setOpen] = useState(false);
 
   return (
-    <Popover open={open} onOpenChange={setOpen} modal={false}>
-      <PopoverTrigger asChild>
-        <div
-          className={styles.DropdownMenuSubTrigger}
-          role="menuitem"
-          tabIndex={0}
-          ref={ref}
-          onMouseEnter={() => setOpen(true)}
-          onMouseLeave={() => setOpen(false)}
-        >
-          {triggerTemplate ? triggerTemplate : <div>{label}</div>}
-        </div>
-      </PopoverTrigger>
-      <Portal container={root}>
-        <PopoverContent
+    <DropdownMenuPrimitive.Sub open={open} onOpenChange={setOpen}>
+      <DropdownMenuPrimitive.SubTrigger ref={ref} className={styles.DropdownMenuSubTrigger} asChild>
+        {triggerTemplate ? triggerTemplate : <div>{label}</div>}
+      </DropdownMenuPrimitive.SubTrigger>
+      <DropdownMenuPrimitive.Portal container={root}>
+        <DropdownMenuPrimitive.SubContent
           className={styles.DropdownMenuSubContent}
-          side="right"
-          align="start"
-          onMouseEnter={() => setOpen(true)}
-          onMouseLeave={() => setOpen(false)}
-          onOpenAutoFocus={(e) => e.preventDefault()}
+          sideOffset={2}
+          loop={true}
         >
           {children}
-        </PopoverContent>
-      </Portal>
-    </Popover>
+        </DropdownMenuPrimitive.SubContent>
+      </DropdownMenuPrimitive.Portal>
+    </DropdownMenuPrimitive.Sub>
   );
 });
 
