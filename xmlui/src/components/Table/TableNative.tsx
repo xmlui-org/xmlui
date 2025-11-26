@@ -129,6 +129,7 @@ type TableProps = {
   hideHeader?: boolean;
   hideNoDataView?: boolean;
   alwaysShowSelectionHeader?: boolean;
+  alwaysShowSortingIndicator?: boolean;
   registerComponentApi: RegisterComponentApiFn;
   noBottomBorder?: boolean;
   cellVerticalAlign?: CellVerticalAlign;
@@ -258,6 +259,7 @@ export const Table = forwardRef(
       hideHeader = defaultProps.hideHeader,
       hideNoDataView = defaultProps.hideNoDataView,
       alwaysShowSelectionHeader = defaultProps.alwaysShowSelectionHeader,
+      alwaysShowSortingIndicator = defaultProps.alwaysShowSortingIndicator,
       registerComponentApi,
       onSelectionDidChange,
       noBottomBorder = defaultProps.noBottomBorder,
@@ -875,6 +877,7 @@ export const Table = forwardRef(
                                   className={classnames(styles.orderingIndicator, {
                                     [styles.activeOrdering]:
                                       header.column.columnDef.meta?.accessorKey === _sortBy,
+                                    [styles.alwaysShow]: alwaysShowSortingIndicator,
                                   })}
                                 >
                                   <ColumnOrderingIndicator
@@ -1163,6 +1166,7 @@ export const defaultProps = {
   hideHeader: false,
   hideNoDataView: false,
   alwaysShowSelectionHeader: false,
+  alwaysShowSortingIndicator: false,
   noBottomBorder: false,
   paginationControlsLocation: "bottom" as TablePaginationControlsLocation,
   cellVerticalAlign: "center" as CellVerticalAlign,

@@ -84,7 +84,8 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
         display: inline-flex;
         visibility: hidden;
 
-        &.activeOrdering {
+        &.activeOrdering,
+        &.alwaysShow {
           visibility: visible;
         }
       }

@@ -733,6 +733,75 @@ test.describe("Basic Functionality", () => {
     const quantityHeader = page.getByRole("columnheader").filter({ hasText: "Quantity" }).first();
     await expect(quantityHeader.locator("[data-part-id='orderIndicator']")).not.toBeVisible();
   });
+
+  test.describe("alwaysShowSortingIndicator property", () => {
+    test("shows all sorting indicators when alwaysShowSortingIndicator is true", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' alwaysShowSortingIndicator="true" testId="table">
+          <Column bindTo="name" header="Name" canSort="true"/>
+          <Column bindTo="quantity" header="Quantity" canSort="true"/>
+          <Column bindTo="category" header="Category"/>
+        </Table>
+      `);
+      
+      // All sortable columns should show their indicators without hover
+      const nameHeader = page.getByRole("button").filter({ hasText: "Name" }).first();
+      const quantityHeader = page.getByRole("button").filter({ hasText: "Quantity" }).first();
+      
+      await expect(nameHeader.locator("[data-part-id='orderIndicator']")).toBeVisible();
+      await expect(quantityHeader.locator("[data-part-id='orderIndicator']")).toBeVisible();
+    });
+
+    test("hides sorting indicators by default when alwaysShowSortingIndicator is false", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' alwaysShowSortingIndicator="false" testId="table">
+          <Column bindTo="name" header="Name" canSort="true"/>
+          <Column bindTo="quantity" header="Quantity" canSort="true"/>
+        </Table>
+      `);
+      
+      // All indicators should be hidden without hover
+      for (const indicator of await page.locator("[data-part-id='orderIndicator']").all()) {
+        await expect(indicator).not.toBeVisible();
+      }
+    });
+
+    test("sorting indicators remain visible after sorting when alwaysShowSortingIndicator is true", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' alwaysShowSortingIndicator="true" testId="table">
+          <Column bindTo="name" header="Name" canSort="true"/>
+          <Column bindTo="quantity" header="Quantity" canSort="true"/>
+        </Table>
+      `);
+      
+      const nameHeader = page.getByRole("button").filter({ hasText: "Name" }).first();
+      const quantityHeader = page.getByRole("button").filter({ hasText: "Quantity" }).first();
+      
+      // Click to sort by name
+      await nameHeader.click();
+      
+      // Both indicators should still be visible
+      await expect(nameHeader.locator("[data-part-id='orderIndicator']")).toBeVisible();
+      await expect(quantityHeader.locator("[data-part-id='orderIndicator']")).toBeVisible();
+    });
+
+    test("non-sortable columns do not show indicators even with alwaysShowSortingIndicator", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' alwaysShowSortingIndicator="true" testId="table">
+          <Column bindTo="name" header="Name" canSort="true"/>
+          <Column bindTo="quantity" header="Quantity"/>
+        </Table>
+      `);
+      
+      // Sortable column should show indicator
+      const nameHeader = page.getByRole("button").filter({ hasText: "Name" }).first();
+      await expect(nameHeader.locator("[data-part-id='orderIndicator']")).toBeVisible();
+      
+      // Non-sortable column should not have an indicator at all
+      const quantityHeader = page.getByRole("columnheader").filter({ hasText: "Quantity" }).first();
+      await expect(quantityHeader.locator("[data-part-id='orderIndicator']")).toHaveCount(0);
+    });
+  });
 });
 
 // =============================================================================
