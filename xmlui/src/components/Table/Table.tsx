@@ -179,14 +179,22 @@ export const TableMd = createMetadata({
         "`true,` the selection header is always visible. Otherwise, it is displayed only " +
         "when hovered.",
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.alwaysShowSelectionHeader,
+    },
+    alwaysShowSortingIndicator: {
+      description:
+        `This property indicates whether the sorting indicator is always visible in the column ` +
+        `headers. When set to \`true\`, the sorting indicator is always visible. Otherwise, it is ` +
+        `visible only when the user hovers over/focuses the column header or the column is sorted.`,
+      valueType: "boolean",
+      defaultValue: defaultProps.alwaysShowSortingIndicator,
     },
     noBottomBorder: {
       description:
         `This property indicates whether the table should have a bottom border. When set to ` +
         `\`true\`, the table does not have a bottom border. Otherwise, it has a bottom border.`,
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.noBottomBorder,
     },
     paginationControlsLocation: {
       description:
@@ -202,7 +210,7 @@ export const TableMd = createMetadata({
         `It can be set to \`top\`, \`center\`, or \`bottom\`.`,
       valueType: "string",
       availableValues: ["top", "center", "bottom"],
-      defaultValue: "center",
+      defaultValue: defaultProps.cellVerticalAlign,
     },
     checkboxTolerance: {
       description:
@@ -272,6 +280,7 @@ export const TableMd = createMetadata({
     [`outlineWidth-heading-${COMP}--focus`]: "$outlineWidth--focus",
     [`outlineStyle-heading-${COMP}--focus`]: "$outlineStyle--focus",
     [`outlineOffset-heading-${COMP}--focus`]: "$outlineOffset--focus",
+    [`outlineColor-heading-${COMP}--focus`]: "$outlineColor--focus",
     [`fontSize-heading-${COMP}`]: "$fontSize-tiny",
     [`fontWeight-heading-${COMP}`]: "$fontWeight-bold",
     [`textTransform-heading-${COMP}`]: "uppercase",
@@ -280,7 +289,6 @@ export const TableMd = createMetadata({
     // [`backgroundColor-row-${COMP}`]: "inherit",
     [`backgroundColor-selected-${COMP}--hover`]: `$backgroundColor-row-${COMP}--hover`,
     [`backgroundColor-pagination-${COMP}`]: `$backgroundColor-${COMP}`,
-    [`outlineColor-heading-${COMP}--focus`]: "$outlineColor--focus",
     [`textColor-pagination-${COMP}`]: "$color-secondary",
     [`backgroundColor-row-${COMP}--hover`]: "$color-primary-50",
     [`backgroundColor-selected-${COMP}`]: "$color-primary-100",
@@ -426,6 +434,9 @@ const TableWithColumns = memo(
             )}
             alwaysShowSelectionHeader={extractValue.asOptionalBoolean(
               node.props.alwaysShowSelectionHeader,
+            )}
+            alwaysShowSortingIndicator={extractValue.asOptionalBoolean(
+              node.props.alwaysShowSortingIndicator,
             )}
             noBottomBorder={extractValue.asOptionalBoolean(node.props.noBottomBorder)}
             paginationControlsLocation={extractValue.asOptionalString(

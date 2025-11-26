@@ -78,11 +78,26 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
 
     .headerContent {
       padding: 0;
+
+      .orderingIndicator {
+        width: 16px;
+        display: inline-flex;
+        visibility: hidden;
+
+        &.activeOrdering,
+        &.alwaysShow {
+          visibility: visible;
+        }
+      }
     }
 
     &:not([disabled]) {
       &:hover {
         background-color: $backgroundColor-heading-Table--hover;
+
+        .headerContent > .orderingIndicator {
+          visibility: visible;
+        }
       }
 
       &:active {
@@ -95,6 +110,9 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
         outline-style: $outlineStyle-heading-Table--focus;
         outline-offset: $outlineOffset-heading-Table--focus;
 
+        .headerContent > .orderingIndicator {
+          opacity: 1;
+        }
       }
     }
   }
