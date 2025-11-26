@@ -14,21 +14,12 @@ if (require.main === module) {
 }
 
 function processEnvVars() {
-  if (!process.env.GITHUB_TOKEN) {
-    console.error(
-      `No GitHub token provided. Skipping updating releases.
-If you want to update the info about the releases, set the GITHUB_TOKEN environment variable to your Personal Access Token`,
-    );
-    exit(0);
-  }
-  const githubToken = process.env.GITHUB_TOKEN;
   const owner = process.env.GITHUB_REPOSITORY?.split("/")[0] || "xmlui-org";
   const repo = process.env.GITHUB_REPOSITORY?.split("/")[1] || "xmlui";
   const maxReleases = process.env.DOCS_XMLUI_MAX_RELEASES_LENGTH;
   return {
     owner,
     repo,
-    githubToken,
     maxReleases,
   };
 }
@@ -59,9 +50,7 @@ function processOptions(args) {
 async function getXmluiReleases(options) {
   try {
     const { Octokit } = await import("@octokit/rest");
-    const octokit = new Octokit({
-      auth: options.githubToken,
-    });
+    const octokit = new Octokit();
     console.error("Fetching releases from GitHub API...");
     const { data: releases } = await octokit.rest.repos.listReleases({
       owner: options.owner,
@@ -99,9 +88,7 @@ async function getXmluiReleases(options) {
     return availableVersions;
   } catch (error) {
     console.error("Error fetching xmlui releases:", error.message);
-    if (error.status === 401) {
-      console.error("Authentication failed. Please check your GitHub token");
-    } else if (error.status === 403) {
+    if (error.status === 403) {
       console.error("Rate limit exceeded or insufficient permissions.");
     }
     return null;
@@ -151,8 +138,6 @@ function handleHelpOption(args) {
   if (args.includes("--help") || args.includes("-h")) {
     const helpMessage = `
   Fetches xmlui release information from GitHub and outputs it in JSON format.
-  This script relies on the GITHUB_TOKEN environment variable for authentication
-  when fetching data directly from the GitHub API.
 
   Usage:
     ./get-releases.js [options]
@@ -166,11 +151,6 @@ function handleHelpOption(args) {
     --help, -h         Display this help message and exit.
 
   Environment Variables:
-    GITHUB_TOKEN                    Required for fetching data from the GitHub API.
-                                    A GitHub Personal Access Token with 'repo' scope (or at least
-                                    permissions to read repository releases).
-                                    The script will fail if this is not set
-                                    and API access is attempted.
     GITHUB_REPOSITORY               Optional. The 'owner/repo' string.
                                     Defaults to "xmlui-org/xmlui".
     DOCS_XMLUI_MAX_RELEASES_LENGTH  Optional. The maximum number of xmlui releases to include.

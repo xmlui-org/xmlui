@@ -214,7 +214,7 @@ export const FormItem = memo(function FormItem({
     getByPath(value?.originalSubject, formItemId),
   );
   const initialValue =
-    initialValueFromSubject === undefined ? initialValueFromProps : initialValueFromSubject;
+    (initialValueFromSubject === undefined || initialValueFromSubject === null) ? initialValueFromProps : initialValueFromSubject;
 
   const value = useFormContextPart<any>((value) => getByPath(value?.subject, formItemId));
 
