@@ -233,7 +233,10 @@
                 label="Copy billing data to shipping"
                 to="/howto/copy-billing-to-shipping"
             />
-
+            <NavLink
+                label="Implement an authentication gate"
+                to="/howto/implement-an-authentication-gate"
+            />
 
             <!-- Add more links as additional files are created -->
         </NavGroup
@@ -686,6 +689,12 @@
                 url="/pages/howto/copy-billing-to-shipping.md"
             />
         </Page>
+        <Page url="/howto/implement-an-authentication-gate">
+            <DocumentPageNoTOC
+                url="/pages/howto/implement-an-authentication-gate.md"
+            />
+        </Page>
+
 
         <!-- Add more pages as additional files are created -->
         <Page url="/hosted-deployment">
