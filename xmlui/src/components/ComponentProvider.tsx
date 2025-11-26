@@ -266,6 +266,7 @@ import { radarChartComponentRenderer } from "./Charts/RadarChart/RadarChart";
 
 import { paginationComponentRenderer } from "./Pagination/Pagination";
 import { tooltipComponentRenderer } from "./Tooltip/Tooltip";
+import { toastComponentRenderer } from "./Toast/Toast";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -597,6 +598,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(accordionComponentRenderer);
       this.registerCoreComponent(sliderComponentRenderer);
       this.registerCoreComponent(backdropComponentRenderer);
+      this.registerCoreComponent(toastComponentRenderer);
     }
     this.registerCoreComponent(breakoutComponentRenderer);
     this.registerCoreComponent(themeComponentRenderer);
@@ -817,10 +819,10 @@ export class ComponentRegistry {
     this.registerLoaderRenderer(mockLoaderRenderer);
     this.registerLoaderRenderer(dataLoaderRenderer);
 
-    this.registerBehavior(variantBehavior);
-    this.registerBehavior(tooltipBehavior);
-    this.registerBehavior(animationBehavior);
     this.registerBehavior(labelBehavior);
+    this.registerBehavior(animationBehavior);
+    this.registerBehavior(tooltipBehavior);
+    this.registerBehavior(variantBehavior);
 
     // Register external behaviors from contributes
     contributes.behaviors?.forEach((behavior) => {

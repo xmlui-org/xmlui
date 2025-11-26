@@ -239,3 +239,151 @@ test("removeIndents=false: 4space/1 tab indent maps to a code block", async ({
   await expect(driver.component).toHaveText("_I did not expect this_");
   expect(await driver.hasHtmlElement(["pre", "code"])).toBeTruthy();
 });
+
+// =============================================================================
+// REGRESSION TESTS
+// =============================================================================
+
+test.describe("Heading ID Generation Regression", () => {
+  test("heading starting with number renders without querySelector error", async ({
+    initTestBed,
+    page,
+  }) => {
+    // This is the user-reported bug: headings starting with numbers cause querySelector errors
+    const SOURCE = "## 1. Install the management tool";
+    await initTestBed(`<Markdown showHeadingAnchors="true"><![CDATA[${SOURCE}]]></Markdown>`);
+    
+    // Verify the component renders without errors
+    const heading = page.getByRole("heading", { level: 2, name: /1\. Install the management tool/ });
+    await expect(heading).toBeVisible();
+    await expect(heading).toHaveText("1. Install the management tool");
+    
+    // Check if anchor link renders
+    await heading.hover();
+    const anchorLink = heading.locator("a");
+    await expect(anchorLink).toBeVisible();
+  });
+
+  test("heading ID generation creates valid ID with prefix for numbers", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = "## 1. Install the management tool";
+    await initTestBed(`<Markdown showHeadingAnchors="true"><![CDATA[${SOURCE}]]></Markdown>`);
+    
+    const heading = page.getByRole("heading", { level: 2 });
+    await heading.hover();
+    
+    // Get the anchor link's href
+    const anchorLink = heading.locator("a");
+    const href = await anchorLink.getAttribute("href");
+    
+    // After fix: the href should be "#heading-1-install-the-management-tool"
+    // which starts with a letter, making it valid for querySelector
+    expect(href).toBe("#heading-1-install-the-management-tool");
+    
+    // The generated ID should start with a letter or underscore
+    const generatedId = href?.substring(1); // Remove the #
+    expect(generatedId).toMatch(/^[a-zA-Z_]/); // Now starts with valid character
+  });
+
+  test("querySelector works with valid ID", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = "## 1. Install the management tool";
+    await initTestBed(`<Markdown showHeadingAnchors="true"><![CDATA[${SOURCE}]]></Markdown>`);
+    
+    const heading = page.getByRole("heading", { level: 2 });
+    await heading.hover();
+    
+    const anchorLink = heading.locator("a");
+    const href = await anchorLink.getAttribute("href");
+    const anchorId = href?.substring(1); // Remove the #
+    
+    // Verify that querySelector works without errors
+    const querySelectorResult = await page.evaluate((id) => {
+      try {
+        const element = document.querySelector(`#${id}`);
+        return element !== null ? "found" : "not-found";
+      } catch (error) {
+        return "error: " + (error as Error).message;
+      }
+    }, anchorId);
+    
+    // After fix: querySelector should work without errors
+    expect(querySelectorResult).not.toContain("error");
+  });
+
+  test("heading with only numbers generates valid ID with prefix", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = "## 123";
+    await initTestBed(`<Markdown showHeadingAnchors="true"><![CDATA[${SOURCE}]]></Markdown>`);
+    
+    const heading = page.getByRole("heading", { level: 2, name: "123" });
+    await expect(heading).toBeVisible();
+    await heading.hover();
+    
+    const anchorLink = heading.locator("a");
+    const href = await anchorLink.getAttribute("href");
+    
+    // After fix: generates "#heading-123" which is valid for querySelector
+    expect(href).toBe("#heading-123");
+    expect(href).toMatch(/^#[a-zA-Z_]/);
+  });
+
+  test("multiple headings starting with numbers all have valid IDs", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = `
+## 1. First step
+## 2. Second step  
+## 3. Third step
+    `;
+    await initTestBed(`<Markdown showHeadingAnchors="true"><![CDATA[${SOURCE}]]></Markdown>`);
+    
+    // All headings should render
+    const headings = page.getByRole("heading", { level: 2 });
+    await expect(headings).toHaveCount(3);
+    
+    // Check each anchor link has valid ID format
+    const expectedHrefs = [
+      "#heading-1-first-step",
+      "#heading-2-second-step",
+      "#heading-3-third-step"
+    ];
+    
+    for (let i = 0; i < 3; i++) {
+      const heading = headings.nth(i);
+      await heading.hover();
+      const anchorLink = heading.locator("a");
+      const href = await anchorLink.getAttribute("href");
+      
+      // After fix: all start with "heading-" prefix
+      expect(href).toBe(expectedHrefs[i]);
+      expect(href).toMatch(/^#heading-[1-3]-/);
+    }
+  });
+
+  test("heading starting with special character that resolves to digit gets valid ID", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = "## $100 Budget Planning";
+    await initTestBed(`<Markdown showHeadingAnchors="true"><![CDATA[${SOURCE}]]></Markdown>`);
+    
+    const heading = page.getByRole("heading", { level: 2, name: /\$100 Budget Planning/ });
+    await expect(heading).toBeVisible();
+    await heading.hover();
+    
+    const anchorLink = heading.locator("a");
+    const href = await anchorLink.getAttribute("href");
+    
+    // After fix: the $ gets stripped, leaving "100-budget-planning" which gets prefixed
+    expect(href).toBe("#heading-100-budget-planning");
+    expect(href?.substring(1)).toMatch(/^[a-zA-Z_]/);
+  });
+});

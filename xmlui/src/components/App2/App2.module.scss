@@ -19,19 +19,20 @@ $backgroundColor-AppHeader: createThemeVar("backgroundColor-AppHeader");
 $borderBottom-NavPanel: createThemeVar("borderBottom-AppHeader");
 $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
-// Variables for @layer section
-$maxWidth-App: createThemeVar("maxWidth-App");
+// --- Mixin for desktop layout spacing reset ---
+// Desktop layout requires full viewport coverage with zero constraints.
+// These !important declarations override theme system defaults (padding/margins)
+// and layout-specific max-width constraints that would otherwise limit the desktop layout.
+@mixin desktop-reset-all {
+  margin: 0 !important;
+  padding: 0 !important;
+  padding-inline: 0 !important;
+  max-width: none !important;
+  width: 100% !important;
+}
 
 @layer components {
-  @include t.withMaxScreenSize(0) {
-    .wrapper.verticalFullHeader {
-      .navPanelWrapper {
-        display: none;
-      }
-    }
-  }
-
-  .wrapper {
+  .appContainer {
     --footer-height: 0px;
     --header-height: 0px;
     width: 100%;
@@ -40,20 +41,22 @@ $maxWidth-App: createThemeVar("maxWidth-App");
     display: flex;
     flex-direction: column;
     isolation: isolate;
+    scroll-padding-block: $scrollPaddingBlockPage;
 
     &.vertical {
       flex-direction: row;
-      overflow: initial;
 
-      .contentWrapper {
-        overflow: auto;
-        scroll-padding-block: $scrollPaddingBlockPage;
-        position: relative;
+      .mainContentArea {
         scrollbar-gutter: stable both-edges;
       }
       &.noScrollbarGutters {
-        .contentWrapper {
+        .mainContentArea {
           scrollbar-gutter: auto;
+        }
+      }
+      &:not(.scrollWholePage) {
+        .mainContentArea {
+          overflow: initial;
         }
       }
       .navPanelWrapper {
@@ -61,43 +64,18 @@ $maxWidth-App: createThemeVar("maxWidth-App");
         flex-shrink: 0;
       }
 
-      .PagesWrapper {
-        min-height: initial;
-        flex: 1;
-      }
-
       .footerWrapper {
         position: static;
-      }
-      &.sticky {
-        .footerWrapper {
-          position: sticky;
-          bottom: 0;
-        }
-        .footerWrapper.nonSticky {
-          position: static;
-        }
       }
     }
 
     &.horizontal {
       overflow: auto;
-      scroll-padding-block: $scrollPaddingBlockPage;
-      .PagesWrapper {
-        min-height: initial;
-      }
       .footerWrapper {
         position: static;
       }
       &.sticky {
         min-height: 100%;
-        .footerWrapper {
-          position: sticky;
-          bottom: 0;
-        }
-        .footerWrapper.nonSticky {
-          position: static;
-        }
       }
       .navPanelWrapper {
         border-bottom: $borderBottom-NavPanel;
@@ -136,40 +114,16 @@ $maxWidth-App: createThemeVar("maxWidth-App");
         top: 0;
         flex-shrink: 0;
         z-index: 1;
-        margin: 0 !important;
-        padding: 0 !important;
-        max-width: none !important;
-        width: 100% !important;
+        @include desktop-reset-all;
 
         & > * {
-          margin: 0 !important;
-          padding: 0 !important;
-          max-width: none !important;
-          width: 100% !important;
-        }
-
-        & * {
-          max-width: none !important;
-          padding-inline: 0 !important;
-          padding-left: 0 !important;
-          padding-right: 0 !important;
-          margin-inline: 0 !important;
-          margin-left: 0 !important;
-          margin-right: 0 !important;
-        }
-
-        :global(.headerInner) {
-          padding: 0 !important;
-          margin: 0 !important;
-          padding-inline: 0 !important;
-          max-width: none !important;
+          @include desktop-reset-all;
         }
       }
 
-      .PagesWrapper {
+      .pagesContainer {
         flex: 1;
         min-height: 0;
-        overflow: hidden;
         display: flex;
         flex-direction: column;
         scrollbar-gutter: auto;
@@ -179,7 +133,7 @@ $maxWidth-App: createThemeVar("maxWidth-App");
         width: 100%;
       }
 
-      .PagesWrapperInner {
+      .pageContentContainer {
         flex: 1;
         min-height: 0;
         max-width: none;
@@ -196,39 +150,37 @@ $maxWidth-App: createThemeVar("maxWidth-App");
         position: sticky;
         bottom: 0;
         flex-shrink: 0;
-        margin: 0 !important;
-        padding: 0 !important;
-        max-width: none !important;
-        width: 100% !important;
+        @include desktop-reset-all;
 
         & > * {
-          margin: 0 !important;
-          padding: 0 !important;
-          max-width: none !important;
-          width: 100% !important;
-        }
-
-        & * {
-          max-width: none !important;
-          padding-inline: 0 !important;
-          padding-left: 0 !important;
-          padding-right: 0 !important;
-          margin-inline: 0 !important;
-          margin-left: 0 !important;
-          margin-right: 0 !important;
+          @include desktop-reset-all;
         }
       }
     }
 
     &.verticalFullHeader {
+      // Set effective footer height based on whether footer is sticky
+      --effective-footer-height: var(--footer-height);
+      --content-available-height: calc(
+        var(--containerHeight, 100vh) - var(--header-height) - var(--effective-footer-height)
+      );
+      
+      &.noFooter {
+        --effective-footer-height: 0px;
+      }
+
       min-height: 100%;
       height: 100%;
       overflow: auto;
-      scroll-padding-block: $scrollPaddingBlockPage;
+      
+      .mainContentArea {
+        overflow: initial;
+      }
+      
       .navPanelWrapper {
         width: $width-navPanel-App;
         position: sticky;
-        height: calc(var(--containerHeight, 100vh) - var(--footer-height) - var(--header-height));
+        height: var(--content-available-height);
         top: var(--header-height);
 
         &::before {
@@ -241,31 +193,20 @@ $maxWidth-App: createThemeVar("maxWidth-App");
           z-index: -1;
           background-color: $backgroundColor-navPanel-App;
         }
-      }
-      
-      // When no footer is sticky (footer sticky=false), don't subtract footer height
-      &.noFooter {
-        .navPanelWrapper {
-          height: calc(var(--containerHeight, 100vh) - var(--header-height));
+
+        // Hide on small screens
+        @include t.withMaxScreenSize(0) {
+          display: none;
         }
       }
 
-      .PagesWrapper {
+      .pagesContainer {
         overflow: initial;
-        min-height: calc(
-          var(--containerHeight, 100vh) - var(--header-height) - var(--footer-height)
-        );
+        min-height: var(--content-available-height);
         height: 100%;
       }
-      
-      // When no footer is sticky (footer sticky=false), don't subtract footer height
-      &.noFooter {
-        .PagesWrapper {
-          min-height: calc(var(--containerHeight, 100vh) - var(--header-height));
-        }
-      }
 
-      .PagesWrapperInner {
+      .pageContentContainer {
         height: 100%;
         & > :global(.xmlui-page-root) {
           height: 100%;
@@ -274,8 +215,6 @@ $maxWidth-App: createThemeVar("maxWidth-App");
 
       .footerWrapper {
         position: sticky;
-        left: 0;
-        right: 0;
         bottom: 0;
         &.nonSticky {
           position: static;
@@ -287,10 +226,10 @@ $maxWidth-App: createThemeVar("maxWidth-App");
       scrollbar-gutter: stable both-edges;
 
       .headerWrapper {
+        margin-inline: calc(-1 * var(--scrollbar-width));
         & > div {
           padding-inline: var(--scrollbar-width);
         }
-        margin-inline: calc(-1 * var(--scrollbar-width));
       }
 
       .footerWrapper {
@@ -301,28 +240,21 @@ $maxWidth-App: createThemeVar("maxWidth-App");
       }
 
       &.verticalFullHeader {
-        .content {
+        .mainContentRow {
           margin-inline: calc(-1 * var(--scrollbar-width));
           width: calc(100% + (2 * var(--scrollbar-width)));
         }
-        .contentWrapper {
+        .mainContentArea {
           padding-inline: var(--scrollbar-width);
         }
       }
 
       &.desktop {
         scrollbar-gutter: auto;
-
-        .headerWrapper {
-          & > div {
-            padding-inline: 0;
-          }
-          margin-inline: 0;
-        }
-
+        .headerWrapper,
         .footerWrapper {
           margin-inline: 0;
-          & > div {
+          & > * {
             padding-inline: 0;
           }
         }
@@ -331,29 +263,35 @@ $maxWidth-App: createThemeVar("maxWidth-App");
 
     &:not(.scrollWholePage) {
       overflow: hidden;
-      .content {
+      .mainContentRow {
         min-height: 0;
         height: 100%;
       }
-      .contentWrapper {
-        overflow: initial;
-      }
-      .PagesWrapper {
+      .pagesContainer {
         overflow: auto;
-        scroll-padding-block: $scrollPaddingBlockPage;
         min-height: 0;
         height: 100%;
         scrollbar-gutter: stable both-edges;
       }
-      .PagesWrapperInner {
+      .pageContentContainer {
         min-height: 100%;
-        height: 0;
+      }
+    }
+
+    // Common sticky footer positioning for sticky layouts
+    &.sticky {
+      .footerWrapper {
+        position: sticky;
+        bottom: 0;
+        &.nonSticky {
+          position: static;
+        }
       }
     }
 
     &.noScrollbarGutters {
       scrollbar-gutter: auto;
-      .PagesWrapper {
+      .pagesContainer {
         scrollbar-gutter: auto;
       }
     }
@@ -372,7 +310,7 @@ $maxWidth-App: createThemeVar("maxWidth-App");
     }
   }
 
-  .content {
+  .mainContentRow {
     display: flex;
     flex-direction: row;
     isolation: isolate;
@@ -381,12 +319,13 @@ $maxWidth-App: createThemeVar("maxWidth-App");
     max-width: $maxWidth-App;
   }
 
-  .contentWrapper {
+  .mainContentArea {
     position: relative;
     min-width: 0;
     flex: 1;
     display: flex;
     flex-direction: column;
+    overflow: auto;
     box-shadow: $boxShadow-navPanel-App;
     background-color: $backgroundColor-content-App;
     border-left: $borderLeft-content-App;
@@ -402,12 +341,13 @@ $maxWidth-App: createThemeVar("maxWidth-App");
     }
   }
 
-  .PagesWrapper {
+  .pagesContainer {
     flex: 1;
+    min-height: initial;
     isolation: isolate;
   }
 
-  .PagesWrapperInner {
+  .pageContentContainer {
     max-width: $maxWidth-content-App;
     width: 100%;
     margin: 0 auto;

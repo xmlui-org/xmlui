@@ -1,5 +1,13 @@
 # xmlui
 
+## 0.11.19
+
+### Patch Changes
+
+- c649cd5: fix: portal issue - AutoComplete, DatePicker
+- d9d98d3: test: add nested DropdownMenu and Select/AutoComplete component interaction tests
+- 60399c6: Fix the showHeadingAnchors issue with numbered markdown headings
+
 ## 0.11.18
 
 ### Patch Changes

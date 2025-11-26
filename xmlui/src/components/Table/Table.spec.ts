@@ -233,6 +233,65 @@ test.describe("Basic Functionality", () => {
       const checkboxes = page.locator("input[type='checkbox']");
       await expect(checkboxes).toHaveCount(0);
     });
+
+    test("row is not selected if input field is clicked in row", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" testId="table">
+          <Column bindTo="name">
+            <TextBox testId="{'input' + $itemIndex}" initialValue="{$cell}" />
+          </Column>
+        </Table>
+      `);
+      const input = page.getByTestId('input0').getByRole('textbox');
+      await input.click();
+      await expect(input).toBeFocused();
+      
+      // Verify that no checkbox is checked
+      const checkboxes = page.locator("input[type='checkbox']");
+      for (let i = 1; i < await checkboxes.count(); i++) {
+        await expect(checkboxes.nth(i)).not.toBeChecked();
+      }
+    });
+
+    test("row is not selected if button is clicked in row", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" testId="table">
+          <Column bindTo="name">
+            <Button testId="{'button' + $itemIndex}" label="{$cell}" />
+          </Column>
+        </Table>
+      `);
+      const button = page.getByTestId('button0');
+      await button.click();
+      
+      // Verify that no checkbox is checked
+      const checkboxes = page.locator("input[type='checkbox']");
+      for (let i = 1; i < await checkboxes.count(); i++) {
+        await expect(checkboxes.nth(i)).not.toBeChecked();
+      }
+    });
+
+    test("row is not selected if dropdown trigger is clicked in row", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" testId="table">
+          <Column bindTo="name" />
+          <Column id="action">
+            <DropdownMenu testId="{'dropdown' + $itemIndex}">
+              <MenuItem label="Test Item" />
+            </DropdownMenu>
+          </Column>
+        </Table>
+      `);
+      const dropdownTrigger = page.getByTestId('dropdown0');
+      await dropdownTrigger.click();
+      await expect(page.getByText('Test Item')).toBeVisible();
+
+      // Verify that no checkbox is checked
+      const checkboxes = page.locator("input[type='checkbox']");
+      for (let i = 1; i < await checkboxes.count(); i++) {
+        await expect(checkboxes.nth(i)).not.toBeChecked();
+      }
+    });
   });
 
   test.describe("autoFocus property", () => {

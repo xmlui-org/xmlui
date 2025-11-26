@@ -184,7 +184,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   );
 
   // --- Use the current theme to obtain resources and collect theme variables
-  const { getResourceUrl } = useTheme();
+  const { getResourceUrl, disableInlineStyle: themeDisableInlineStyle } = useTheme();
 
   // --- Obtain a function that can extract a resource URL from a logical URL
   const extractResourceUrl = useCallback(
@@ -213,10 +213,14 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     });
 
     // --- New layout property resolution
-    return resolveLayoutProps(resolvedLayoutProps, {
-      ...layoutContextRef?.current,
-      mediaSize: appContext.mediaSize,
-    });
+    return resolveLayoutProps(
+      resolvedLayoutProps,
+      {
+        ...layoutContextRef?.current,
+        mediaSize: appContext.mediaSize,
+      },
+      themeDisableInlineStyle ?? appContext.appGlobals?.disableInlineStyle,
+    );
 
     // --- Old layout property resolution
     // return compileLayout(resolvedLayoutProps, themeVars, {

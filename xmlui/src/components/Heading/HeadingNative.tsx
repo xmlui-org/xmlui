@@ -110,11 +110,18 @@ export const Heading = forwardRef(function Heading(
 
   useEffect(() => {
     if (elementRef.current) {
-      const newAnchorId = elementRef.current.textContent
+      let newAnchorId = elementRef.current.textContent
         ?.trim()
         ?.replace(/[^\w\s-]/g, "")
         ?.replace(/\s+/g, "-")
         ?.toLowerCase();
+      
+      // Ensure ID starts with a letter or underscore (not a digit)
+      // This is required for querySelector to work without escaping
+      if (newAnchorId && /^[0-9]/.test(newAnchorId)) {
+        newAnchorId = "toc-" + newAnchorId;
+      }
+      
       setAnchorId(newAnchorId || null);
     }
   }, []);

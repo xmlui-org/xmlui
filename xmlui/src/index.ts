@@ -102,6 +102,7 @@ import { ToneSwitch } from "./components/ToneSwitch/ToneSwitchNative";
 import { Tooltip } from "./components/Tooltip/TooltipNative";
 import { DropdownMenu, MenuItem } from "./components/DropdownMenu/DropdownMenuNative";
 import { ContentSeparator } from "./components/ContentSeparator/ContentSeparatorNative";
+import { MemoizedItem } from "./components/container-helpers";
 
 export type {
   ThemeDefinition,
@@ -206,4 +207,5 @@ export {
   DropdownMenu,
   MenuItem,
   ContentSeparator,
+  MemoizedItem,
 };
