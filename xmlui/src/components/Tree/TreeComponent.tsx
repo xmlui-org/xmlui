@@ -362,9 +362,9 @@ export const treeComponentRenderer = createComponentRenderer(
           };
 
           return node.props.itemTemplate ? (
-            <MemoizedItem node={node.props.itemTemplate} item={itemContext} renderChild={renderChild} />
+            <MemoizedItem node={node.props.itemTemplate} contextVars={{ $item: itemContext }} renderChild={renderChild} />
           ) : (
-            <MemoizedItem node={defaultItemTemplate} item={itemContext} renderChild={renderChild} />
+            <MemoizedItem node={defaultItemTemplate} contextVars={{ $item: itemContext }} renderChild={renderChild} />
           );
         }}
       />

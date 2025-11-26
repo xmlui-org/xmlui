@@ -175,11 +175,11 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
             return (
               <MemoizedItem
                 node={itemTemplate as any}
-                item={item}
                 key={key}
                 renderChild={renderChild}
                 layoutContext={layoutContext}
                 contextVars={{
+                  $item: item,
                   $itemIndex: rowIndex,
                   $isFirst: rowIndex === 0,
                   $isLast: rowIndex === count - 1,
@@ -207,11 +207,11 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
                 (item.items?.length ?? 0) > 0 || !hideEmptyGroups ? (
                   <MemoizedItem
                     node={node.props.groupFooterTemplate ?? ({ type: "Fragment" } as any)}
-                    item={item}
                     renderChild={renderChild}
                     key={key}
-                    itemKey="$group"
-                    contextKey="$group"
+                    contextVars={{
+                      $group: item,
+                    }}
                   />
                 ) : null
             : undefined

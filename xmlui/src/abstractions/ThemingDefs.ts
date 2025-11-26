@@ -41,6 +41,10 @@ export type ThemeScope = {
 
   // This function gets the value of the specified theme variable.
   getThemeVar: (themeVar: string) => string | undefined;
+
+  // Controls whether inline styles are disabled within this theme scope.
+  // When undefined, the appGlobals.disableInlineStyle setting is used.
+  disableInlineStyle?: boolean;
 };
 
 // This type represents the object managing app themes. When an app runs, styles are

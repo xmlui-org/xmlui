@@ -45,7 +45,9 @@ export const accordionItemComponentRenderer = createComponentRenderer(
             ? (item) => (
                 <MemoizedItem
                   node={node.props.headerTemplate ?? ({ type: "Fragment" } as any)}
-                  item={item}
+                  contextVars={{
+                    $item: item,
+                  }}
                   renderChild={renderChild}
                 />
               )

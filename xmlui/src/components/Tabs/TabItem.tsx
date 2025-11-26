@@ -45,7 +45,6 @@ export const tabItemComponentRenderer = createComponentRenderer(
                 return (
                   <MemoizedItem
                     node={node.props.headerTemplate}
-                    itemKey="$header"
                     contextVars={{
                       $header: {
                         id: item.id,

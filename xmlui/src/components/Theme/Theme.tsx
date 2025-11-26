@@ -31,6 +31,11 @@ export const ThemeMd = createMetadata({
       "boolean",
       true,
     ),
+    disableInlineStyle: d(
+      `This property controls whether inline styles are disabled for components within this theme. When undefined, uses the appGlobals.disableInlineStyle setting.`,
+      undefined,
+      "boolean",
+    ),
   },
   opaque: true,
 });
@@ -50,6 +55,7 @@ export const themeComponentRenderer = createComponentRenderer(
         id={extractValue.asOptionalString(node.props.themeId)}
         isRoot={extractValue.asOptionalBoolean(node.props.root)}
         applyIf={extractValue.asOptionalBoolean(node.props.applyIf)}
+        disableInlineStyle={extractValue.asOptionalBoolean(node.props.disableInlineStyle)}
         layoutContext={layoutContext}
         renderChild={renderChild}
         tone={themeTone as ThemeTone}
