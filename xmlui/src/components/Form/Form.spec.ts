@@ -864,7 +864,10 @@ test.describe("Basic Functionality", () => {
       await expect.poll(testStateDriver.testState).toEqual({ name: "John" });
     });
 
-    test("onWillSubmit allows submission when returning undefined", async ({ initTestBed, page }) => {
+    test("onWillSubmit allows submission when returning undefined", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Form 
           data="{{ name: 'Jane' }}"
@@ -879,7 +882,10 @@ test.describe("Basic Functionality", () => {
       await expect.poll(testStateDriver.testState).toEqual({ name: "Jane" });
     });
 
-    test("onWillSubmit allows submission when returning empty string", async ({ initTestBed, page }) => {
+    test("onWillSubmit allows submission when returning empty string", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Form 
           data="{{ name: 'Bob' }}"
@@ -909,7 +915,10 @@ test.describe("Basic Functionality", () => {
       await expect.poll(testStateDriver.testState).toEqual({ name: "Alice" });
     });
 
-    test("onWillSubmit allows submission when returning a number", async ({ initTestBed, page }) => {
+    test("onWillSubmit allows submission when returning a number", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Form 
           data="{{ name: 'Charlie' }}"
@@ -941,7 +950,10 @@ test.describe("Basic Functionality", () => {
       await expect.poll(testStateDriver.testState).toEqual(null);
     });
 
-    test("onWillSubmit submits modified data when returning a plain object", async ({ initTestBed, page }) => {
+    test("onWillSubmit submits modified data when returning a plain object", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Form 
           data="{{ name: 'Original', email: 'old@test.com' }}"
@@ -954,10 +966,10 @@ test.describe("Basic Functionality", () => {
 
       await page.getByRole("button", { name: "Save" }).click();
 
-      await expect.poll(testStateDriver.testState).toEqual({ 
-        name: "Modified", 
+      await expect.poll(testStateDriver.testState).toEqual({
+        name: "Modified",
         email: "new@test.com",
-        extra: "added"
+        extra: "added",
       });
     });
 
@@ -973,10 +985,10 @@ test.describe("Basic Functionality", () => {
 
       await page.getByRole("button", { name: "Save" }).click();
 
-      await expect.poll(testStateDriver.testState).toEqual({ 
+      await expect.poll(testStateDriver.testState).toEqual({
         name: "User",
         timestamp: 1234567890,
-        source: "web"
+        source: "web",
       });
     });
 
@@ -994,9 +1006,9 @@ test.describe("Basic Functionality", () => {
 
       await page.getByRole("button", { name: "Save" }).click();
 
-      await expect.poll(testStateDriver.testState).toEqual({ 
+      await expect.poll(testStateDriver.testState).toEqual({
         name: "User",
-        email: "user@test.com"
+        email: "user@test.com",
       });
     });
 
@@ -1030,9 +1042,9 @@ test.describe("Basic Functionality", () => {
 
       await page.getByRole("button", { name: "Save" }).click();
 
-      await expect.poll(testStateDriver.testState).toEqual({ 
+      await expect.poll(testStateDriver.testState).toEqual({
         fullName: "John Doe",
-        age: 30
+        age: 30,
       });
     });
   });
@@ -2539,7 +2551,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(submitButton).toHaveText("Save");
   });
 
-  test("cancelButton part is not present when cancelLabel is empty", async ({ page, initTestBed }) => {
+  test("cancelButton part is not present when cancelLabel is empty", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`<Form testId="test" cancelLabel="" />`);
     const cancelButton = page.locator("[data-part-id='cancelButton']");
     await expect(cancelButton).not.toBeVisible();
@@ -2547,10 +2562,10 @@ test.describe("Behaviors and Parts", () => {
 
   test("both parts are visible with default props", async ({ page, initTestBed }) => {
     await initTestBed(`<Form testId="test" />`);
-    
+
     const cancelButton = page.locator("[data-part-id='cancelButton']");
     const submitButton = page.locator("[data-part-id='submitButton']");
-    
+
     await expect(cancelButton).toBeVisible();
     await expect(submitButton).toBeVisible();
   });
@@ -2574,14 +2589,19 @@ test.describe("Api", () => {
 
     await page.getByTestId("getDataBtn").click();
     const data = await testStateDriver.testState();
-    
+
     expect(data).toEqual({
       name: "John",
       email: "john@example.com",
     });
   });
 
-  test("getData returns updated data after field changes", async ({ initTestBed, page, createTextBoxDriver, createFormItemDriver }) => {
+  test("getData returns updated data after field changes", async ({
+    initTestBed,
+    page,
+    createTextBoxDriver,
+    createFormItemDriver,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Form id="myForm">
@@ -2597,7 +2617,7 @@ test.describe("Api", () => {
     await fieldDriver.field.fill("Jane");
     await page.getByTestId("getDataBtn").click();
     const data = await testStateDriver.testState();
-    
+
     expect(data.name).toEqual("Jane");
   });
 
@@ -2611,11 +2631,16 @@ test.describe("Api", () => {
 
     await page.getByTestId("getDataBtn").click();
     const data = await testStateDriver.testState();
-    
+
     expect(data).toEqual({});
   });
 
-  test("getData returns deep clone - modifications do not affect form state", async ({ initTestBed, page, createTextBoxDriver, createFormItemDriver }) => {
+  test("getData returns deep clone - modifications do not affect form state", async ({
+    initTestBed,
+    page,
+    createTextBoxDriver,
+    createFormItemDriver,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Form id="myForm">
@@ -2636,7 +2661,10 @@ test.describe("Api", () => {
     expect(data.name).toEqual("John");
   });
 
-  test("getData excludes unbound fields (fields ending with __UNBOUND_FIELD__)", async ({ initTestBed, page }) => {
+  test("getData excludes unbound fields (fields ending with __UNBOUND_FIELD__)", async ({
+    initTestBed,
+    page,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Form id="myForm">
@@ -2649,7 +2677,7 @@ test.describe("Api", () => {
 
     await page.getByTestId("getDataBtn").click();
     const data = await testStateDriver.testState();
-    
+
     expect(data).toEqual({
       name: "John",
     });
@@ -2669,14 +2697,19 @@ test.describe("Api", () => {
 
     await page.getByTestId("getDataBtn").click();
     const data = await testStateDriver.testState();
-    
+
     expect(data).toEqual({
       name: "John",
     });
     expect(data.password).toBeUndefined();
   });
 
-  test("getData works with complex nested data structures", async ({ initTestBed, page, createTextBoxDriver, createFormItemDriver }) => {
+  test("getData works with complex nested data structures", async ({
+    initTestBed,
+    page,
+    createTextBoxDriver,
+    createFormItemDriver,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Form id="myForm" data="{{address: {street: '123 Main St', city: 'Springfield'}}}">
@@ -2693,7 +2726,7 @@ test.describe("Api", () => {
 
     await page.getByTestId("getDataBtn").click();
     const data = await testStateDriver.testState();
-    
+
     expect(data).toEqual({
       address: {
         street: "456 Oak Ave",
@@ -2702,7 +2735,10 @@ test.describe("Api", () => {
     });
   });
 
-  test("getData can be called multiple times without side effects", async ({ initTestBed, page }) => {
+  test("getData can be called multiple times without side effects", async ({
+    initTestBed,
+    page,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Form id="myForm">
@@ -2725,7 +2761,12 @@ test.describe("Api", () => {
     expect(counter).toEqual(3);
   });
 
-  test("getData with empty field values", async ({ initTestBed, page, createTextBoxDriver, createFormItemDriver }) => {
+  test("getData with empty field values", async ({
+    initTestBed,
+    page,
+    createTextBoxDriver,
+    createFormItemDriver,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Form id="myForm">
@@ -2742,12 +2783,17 @@ test.describe("Api", () => {
 
     await page.getByTestId("getDataBtn").click();
     const data = await testStateDriver.testState();
-    
+
     expect(data.name).toEqual("");
     expect(data.email).toBeUndefined();
   });
 
-  test("getData with multiple calls returns consistent data", async ({ initTestBed, page, createTextBoxDriver, createFormItemDriver }) => {
+  test("getData with multiple calls returns consistent data", async ({
+    initTestBed,
+    page,
+    createTextBoxDriver,
+    createFormItemDriver,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Form id="myForm">
@@ -2776,7 +2822,10 @@ test.describe("Api", () => {
   // IMMUTABILITY TESTS - Proves that modifications to returned data don't affect form
   // =============================================================================
 
-  test("modifying returned data property does not affect form data - simple property", async ({ initTestBed, page }) => {
+  test("modifying returned data property does not affect form data - simple property", async ({
+    initTestBed,
+    page,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Form id="myForm">
@@ -2788,11 +2837,14 @@ test.describe("Api", () => {
 
     await page.getByTestId("getAndModifyBtn").click();
     const data = await testStateDriver.testState();
-    
+
     expect(data.name).toEqual("John");
   });
 
-  test("modifying returned data property does not affect form data - adding new property", async ({ initTestBed, page }) => {
+  test("modifying returned data property does not affect form data - adding new property", async ({
+    initTestBed,
+    page,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Form id="myForm">
@@ -2804,12 +2856,15 @@ test.describe("Api", () => {
 
     await page.getByTestId("getAndModifyBtn").click();
     const data = await testStateDriver.testState();
-    
+
     expect(data.name).toEqual("John");
     expect(data.injected).toBeUndefined();
   });
 
-  test("modifying returned data property does not affect form data - nested object", async ({ initTestBed, page }) => {
+  test("modifying returned data property does not affect form data - nested object", async ({
+    initTestBed,
+    page,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Form id="myForm" data="{{address: {street: '123 Main St', city: 'Springfield'}}}">
@@ -2822,12 +2877,15 @@ test.describe("Api", () => {
 
     await page.getByTestId("getAndModifyBtn").click();
     const data = await testStateDriver.testState();
-    
+
     expect(data.address.street).toEqual("123 Main St");
     expect(data.address.city).toEqual("Springfield");
   });
 
-  test("modifying returned data property does not affect form data - setting nested property to null", async ({ initTestBed, page }) => {
+  test("modifying returned data property does not affect form data - setting nested property to null", async ({
+    initTestBed,
+    page,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Form id="myForm" data="{{address: {street: '123 Main St', city: 'Springfield'}}}">
@@ -2840,12 +2898,15 @@ test.describe("Api", () => {
 
     await page.getByTestId("getAndModifyBtn").click();
     const data = await testStateDriver.testState();
-    
+
     expect(data.address).not.toBeNull();
     expect(data.address.street).toEqual("123 Main St");
   });
 
-  test("modifying returned data by deleting property does not affect form data", async ({ initTestBed, page }) => {
+  test("modifying returned data by deleting property does not affect form data", async ({
+    initTestBed,
+    page,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Form id="myForm">
@@ -2858,12 +2919,15 @@ test.describe("Api", () => {
 
     await page.getByTestId("getAndModifyBtn").click();
     const data = await testStateDriver.testState();
-    
+
     expect(data.name).toEqual("John");
     expect(data.email).toEqual("john@example.com");
   });
 
-  test("modifying returned data array property does not affect form data", async ({ initTestBed, page }) => {
+  test("modifying returned data array property does not affect form data", async ({
+    initTestBed,
+    page,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Form id="myForm" data="{{tags: ['tag1', 'tag2']}}">
@@ -2875,12 +2939,15 @@ test.describe("Api", () => {
 
     await page.getByTestId("getAndModifyBtn").click();
     const data = await testStateDriver.testState();
-    
-    expect(data.tags).toEqual(['tag1', 'tag2']);
+
+    expect(data.tags).toEqual(["tag1", "tag2"]);
     expect(data.tags.length).toEqual(2);
   });
 
-  test("modifying returned data by assigning new object does not affect form data", async ({ initTestBed, page }) => {
+  test("modifying returned data by assigning new object does not affect form data", async ({
+    initTestBed,
+    page,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Form id="myForm">
@@ -2893,12 +2960,15 @@ test.describe("Api", () => {
 
     await page.getByTestId("getAndModifyBtn").click();
     const data = await testStateDriver.testState();
-    
+
     expect(data.name).toEqual("John");
     expect(data.email).toEqual("john@example.com");
   });
 
-  test("each call to getData returns independent copy - modifying first does not affect second", async ({ initTestBed, page }) => {
+  test("each call to getData returns independent copy - modifying first does not affect second", async ({
+    initTestBed,
+    page,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Form id="myForm">
@@ -2910,13 +2980,16 @@ test.describe("Api", () => {
 
     await page.getByTestId("testBtn").click();
     const result = await testStateDriver.testState();
-    
+
     expect(result.first.name).toEqual("Modified");
     expect(result.second.name).toEqual("John");
     expect(result.current.name).toEqual("John");
   });
 
-  test("modifying returned data in multiple ways simultaneously does not affect form", async ({ initTestBed, page }) => {
+  test("modifying returned data in multiple ways simultaneously does not affect form", async ({
+    initTestBed,
+    page,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Form id="myForm" data="{{user: {name: 'John', age: 30}, tags: ['a', 'b']}}">
@@ -2930,10 +3003,49 @@ test.describe("Api", () => {
 
     await page.getByTestId("getAndModifyBtn").click();
     const data = await testStateDriver.testState();
-    
+
     expect(data.user.name).toEqual("John");
     expect(data.user.age).toEqual(30);
-    expect(data.tags).toEqual(['a', 'b']);
+    expect(data.tags).toEqual(["a", "b"]);
     expect(data.newField).toBeUndefined();
+  });
+
+  test("initialValue works with undefined and null fields", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(
+      `
+      <Fragment>
+        <Form id="myForm" data="/formData">
+          <FormItem label="First name" bindTo="firstName" initialValue="Lucy" testId="firstNameField" />
+          <FormItem label="Last name" bindTo="lastName" initialValue="Rose" testId="lastNameField"/>
+        </Form>
+        <Button testId="getBtn" onClick="testState = myForm.getData()" />
+      </Fragment>
+    `,
+      {
+        apiInterceptor: {
+          operations: {
+            read: {
+              url: "/formData",
+              method: "get",
+              handler: `() => {
+                  return {
+                    firstName: null
+                  };
+              }`,
+            },
+          },
+        },
+      },
+    );
+
+    await expect(page.getByTestId("firstNameField").getByRole("textbox")).toBeEnabled(); //wait for form to load
+    await expect(page.getByTestId("firstNameField").getByRole("textbox")).toHaveValue("Lucy");
+    await expect(page.getByTestId("lastNameField").getByRole("textbox")).toHaveValue("Rose");
+
+    await page.getByTestId("getBtn").click();
+    const data = await testStateDriver.testState();
+
+    expect(data.firstName).toEqual("Lucy");
+    expect(data.lastName).toEqual("Rose");
   });
 });
