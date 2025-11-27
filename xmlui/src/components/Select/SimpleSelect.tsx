@@ -18,6 +18,9 @@ import {
   Portal,
   Group,
   Label,
+  Item,
+  ItemText,
+  ItemIndicator,
 } from "@radix-ui/react-select";
 
 interface SimpleSelectProps {
@@ -173,23 +176,47 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
             </ScrollUpButton>
             <Viewport className={styles.selectViewport} role="listbox" data-part-id="listWrapper">
               {groupBy && groupedOptions ? (
-                // Render grouped options
-                Object.keys(groupedOptions).length === 0 ? (
-                  emptyListNode
-                ) : (
-                  Object.entries(groupedOptions).map(([groupName, _]) => (
-                    <Group key={groupName}>
-                      <Label className={styles.groupHeader}>
-                        {groupHeaderRenderer ? groupHeaderRenderer(groupName) : groupName}
-                      </Label>
-                      {children}
-                    </Group>
-                  ))
-                )
+                // Render grouped options directly from options array
+                <>
+                  {Object.keys(groupedOptions).length === 0
+                    ? emptyListNode
+                    : Object.entries(groupedOptions).map(([groupName, groupOptions]) => (
+                        <Group key={groupName}>
+                          <Label className={styles.groupHeader}>
+                            {groupHeaderRenderer ? groupHeaderRenderer(groupName) : groupName}
+                          </Label>
+                          {groupOptions.map((option) => (
+                            <Item
+                              key={option.value}
+                              value={option.value}
+                              disabled={option?.enabled === false}
+                              className={styles.selectOption}
+                            >
+                              <ItemText>{option.label}</ItemText>
+                              <ItemIndicator className={styles.selectItemIndicator}>
+                                <Icon name="checkmark" />
+                              </ItemIndicator>
+                            </Item>
+                          ))}
+                        </Group>
+                      ))}
+                </>
               ) : (
                 // Render flat options
                 <>
-                  {children}
+                  {optionsArray.map((option) => (
+                    <Item
+                      key={option.value}
+                      value={option.value}
+                      disabled={option?.enabled === false}
+                      className={styles.selectOption}
+                    >
+                      <ItemText>{option.label}</ItemText>
+                      <ItemIndicator className={styles.selectItemIndicator}>
+                        <Icon name="checkmark" />
+                      </ItemIndicator>
+                    </Item>
+                  ))}
                   {optionsArray.length === 0 && emptyListNode}
                 </>
               )}
