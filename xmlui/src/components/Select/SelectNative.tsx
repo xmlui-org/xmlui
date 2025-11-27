@@ -23,6 +23,8 @@ import { SelectContext, useSelect } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { OptionContext, useOption } from "./OptionContext";
 import { HiddenOption } from "./HiddenOption";
+import { SimpleSelect } from "./SimpleSelect";
+import { SelectOption } from "./SelectOption";
 
 const PART_LIST_WRAPPER = "listWrapper";
 const PART_CLEAR_BUTTON = "clearButton";
@@ -581,221 +583,256 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     ],
   );
 
+  // Use SimpleSelect for non-searchable, single-select mode
+  const useSimpleSelect = !searchable && !multiSelect;
+
   return (
     <SelectContext.Provider value={selectContextValue}>
       <OptionContext.Provider value={optionContextValue}>
-        <OptionTypeProvider Component={VisibleSelectOption}>
-          <Popover
-            open={open}
-            onOpenChange={(isOpen) => {
-              if (!enabled) return;
-              setOpen(isOpen);
-              // Reset highlighted option when dropdown closes
-              setSelectedIndex(-1);
-            }}
-            modal={modal}
-          >
-            <PopoverTrigger
-              {...rest}
-              ref={composeRefs(setReferenceElement, forwardedRef)}
+        {useSimpleSelect ? (
+          // SimpleSelect mode (Radix UI Select)
+          <OptionTypeProvider Component={SelectOption}>
+            <SimpleSelect
+              value={value as SingleValueType}
+              onValueChange={(val) => toggleOption(val)}
               id={id}
-              aria-haspopup="listbox"
               style={style}
+              className={className}
               onFocus={onFocus}
               onBlur={onBlur}
-              disabled={!enabled}
-              aria-expanded={open}
-              data-part-id={PART_LIST_WRAPPER}
-              className={classnames(className, styles.selectTrigger, styles[validationStatus], {
-                [styles.disabled]: !enabled,
-                [styles.multi]: multiSelect,
-              })}
-              role="combobox"
-              onClick={(event) => {
-                if (!enabled) return;
-                event.stopPropagation();
-                setOpen((prev) => !prev);
-              }}
-              onKeyDown={(event) => {
-                if (!enabled || readOnly) return;
-
-                // Handle opening dropdown with keyboard
-                if (
-                  !open &&
-                  (event.key === "ArrowDown" ||
-                    event.key === "ArrowUp" ||
-                    event.key === " " ||
-                    event.key === "Enter")
-                ) {
-                  event.preventDefault();
-                  setOpen(true);
-                  // Set initial selectedIndex to first enabled option if options exist
-                  if (filteredOptions.length > 0) {
-                    const firstEnabledIndex = findNextEnabledIndex(-1);
-                    setSelectedIndex(firstEnabledIndex !== -1 ? firstEnabledIndex : 0);
-                  }
-                  return;
-                }
-
-                // Handle keyboard navigation when dropdown is open
-                if (open) {
-                  handleKeyDown(event);
-                }
-              }}
+              enabled={enabled}
+              validationStatus={validationStatus}
+              triggerRef={setReferenceElement}
               autoFocus={autoFocus}
+              placeholder={placeholder}
+              height={dropdownHeight}
+              width={width}
+              readOnly={readOnly}
+              emptyListNode={emptyListNode}
+              modal={modal}
             >
-              <SelectTriggerValue
-                value={value}
-                placeholder={placeholder}
-                readOnly={readOnly}
-                multiSelect={multiSelect}
-                options={options}
-                valueRenderer={valueRenderer}
-                toggleOption={toggleOption}
-              />
-              <SelectTriggerActions
-                value={value}
-                multiSelect={multiSelect}
-                enabled={enabled}
-                readOnly={readOnly}
-                clearable={clearable}
-                clearValue={clearValue}
-              />
-            </PopoverTrigger>
-            {open && (
-              <Portal container={root}>
-                <PopoverContent
-                  style={{ minWidth: width, height: dropdownHeight }}
-                  className={classnames(styles.selectContent, styles[validationStatus])}
-                  onKeyDown={handleKeyDown}
-                >
-                  <div className={styles.command}>
-                    {searchable ? (
-                      <div className={styles.commandInputContainer}>
-                        <Icon name="search" />
-                        <input
-                          role="searchbox"
-                          className={classnames(styles.commandInput)}
-                          placeholder="Search..."
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                      </div>
-                    ) : (
-                      <button aria-hidden="true" className={styles.srOnly} />
-                    )}
-                    <div role="listbox" className={styles.commandList}>
-                      {inProgress ? (
-                        <div className={styles.loading}>{inProgressNotificationMessage}</div>
-                      ) : searchable && searchTerm ? (
-                        // When searching, show filtered options (with or without grouping)
-                        filteredOptions.length === 0 ? (
-                          <div>{emptyListNode}</div>
-                        ) : groupBy && groupedOptions ? (
-                          // Render grouped filtered options
-                          Object.entries(groupedOptions).map(([groupName, groupOptions]) => (
-                            <div key={groupName}>
-                              {groupHeaderRenderer ? (
-                                <div className={styles.groupHeader}>
-                                  {groupHeaderRenderer(groupName)}
-                                </div>
-                              ) : (
-                                <div className={styles.groupHeader}>{groupName}</div>
-                              )}
-                              {groupOptions.map(
-                                ({ value, label, enabled, keywords }, groupIndex) => {
-                                  const globalIndex = filteredOptions.findIndex(
-                                    (opt) => opt.value === value,
-                                  );
-                                  return (
-                                    <SelectOptionItem
-                                      key={value}
-                                      readOnly={readOnly}
-                                      value={value}
-                                      label={label}
-                                      enabled={enabled}
-                                      keywords={keywords}
-                                      isHighlighted={selectedIndex === globalIndex}
-                                      itemIndex={globalIndex}
-                                    />
-                                  );
-                                },
-                              )}
-                            </div>
-                          ))
-                        ) : (
-                          // Render flat filtered options
-                          filteredOptions.map(({ value, label, enabled, keywords }, index) => (
-                            <SelectOptionItem
-                              key={value}
-                              readOnly={readOnly}
-                              value={value}
-                              label={label}
-                              enabled={enabled}
-                              keywords={keywords}
-                              isHighlighted={selectedIndex === index}
-                              itemIndex={index}
-                            />
-                          ))
-                        )
-                      ) : groupBy && groupedOptions ? (
-                        // When not searching and grouping is enabled, render grouped options
-                        Object.keys(groupedOptions).length === 0 ? (
-                          <div>{emptyListNode}</div>
-                        ) : (
-                          <>
-                            {(() => {
-                              let globalIndex = 0;
-                              return Object.entries(groupedOptions).map(
-                                ([groupName, groupOptions]) => (
-                                  <div key={groupName}>
-                                    {groupHeaderRenderer ? (
-                                      <div className={styles.groupHeader}>
-                                        {groupHeaderRenderer(groupName)}
-                                      </div>
-                                    ) : (
-                                      <div className={styles.groupHeader}>{groupName}</div>
-                                    )}
-                                    {groupOptions.map(({ value, label, enabled, keywords }) => {
-                                      const currentIndex = globalIndex++;
-                                      return (
-                                        <SelectOptionItem
-                                          key={value}
-                                          readOnly={readOnly}
-                                          value={value}
-                                          label={label}
-                                          enabled={enabled}
-                                          keywords={keywords}
-                                          isHighlighted={selectedIndex === currentIndex}
-                                          itemIndex={currentIndex}
-                                        />
-                                      );
-                                    })}
-                                  </div>
-                                ),
-                              );
-                            })()}
-                          </>
-                        )
+              {children}
+            </SimpleSelect>
+            {/* Hidden render to collect options when dropdown is closed */}
+            <div style={{ display: "none" }}>
+              <OptionTypeProvider Component={HiddenOption}>{children}</OptionTypeProvider>
+            </div>
+          </OptionTypeProvider>
+        ) : (
+          // Popover mode (searchable or multi-select)
+          <OptionTypeProvider Component={VisibleSelectOption}>
+            <Popover
+              open={open}
+              onOpenChange={(isOpen) => {
+                if (!enabled) return;
+                setOpen(isOpen);
+                // Reset highlighted option when dropdown closes
+                setSelectedIndex(-1);
+              }}
+              modal={modal}
+            >
+              <PopoverTrigger
+                {...rest}
+                ref={composeRefs(setReferenceElement, forwardedRef)}
+                id={id}
+                aria-haspopup="listbox"
+                style={style}
+                onFocus={onFocus}
+                onBlur={onBlur}
+                disabled={!enabled}
+                aria-expanded={open}
+                data-part-id={PART_LIST_WRAPPER}
+                className={classnames(className, styles.selectTrigger, styles[validationStatus], {
+                  [styles.disabled]: !enabled,
+                  [styles.multi]: multiSelect,
+                })}
+                role="combobox"
+                onClick={(event) => {
+                  if (!enabled) return;
+                  event.stopPropagation();
+                  setOpen((prev) => !prev);
+                }}
+                onKeyDown={(event) => {
+                  if (!enabled || readOnly) return;
+
+                  // Handle opening dropdown with keyboard
+                  if (
+                    !open &&
+                    (event.key === "ArrowDown" ||
+                      event.key === "ArrowUp" ||
+                      event.key === " " ||
+                      event.key === "Enter")
+                  ) {
+                    event.preventDefault();
+                    setOpen(true);
+                    // Set initial selectedIndex to first enabled option if options exist
+                    if (filteredOptions.length > 0) {
+                      const firstEnabledIndex = findNextEnabledIndex(-1);
+                      setSelectedIndex(firstEnabledIndex !== -1 ? firstEnabledIndex : 0);
+                    }
+                    return;
+                  }
+
+                  // Handle keyboard navigation when dropdown is open
+                  if (open) {
+                    handleKeyDown(event);
+                  }
+                }}
+                autoFocus={autoFocus}
+              >
+                <SelectTriggerValue
+                  value={value}
+                  placeholder={placeholder}
+                  readOnly={readOnly}
+                  multiSelect={multiSelect}
+                  options={options}
+                  valueRenderer={valueRenderer}
+                  toggleOption={toggleOption}
+                />
+                <SelectTriggerActions
+                  value={value}
+                  multiSelect={multiSelect}
+                  enabled={enabled}
+                  readOnly={readOnly}
+                  clearable={clearable}
+                  clearValue={clearValue}
+                />
+              </PopoverTrigger>
+              {open && (
+                <Portal container={root}>
+                  <PopoverContent
+                    style={{ minWidth: width, height: dropdownHeight }}
+                    className={classnames(styles.selectContent, styles[validationStatus])}
+                    onKeyDown={handleKeyDown}
+                  >
+                    <div className={styles.command}>
+                      {searchable ? (
+                        <div className={styles.commandInputContainer}>
+                          <Icon name="search" />
+                          <input
+                            role="searchbox"
+                            className={classnames(styles.commandInput)}
+                            placeholder="Search..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                          />
+                        </div>
                       ) : (
-                        // When not searching and no grouping, show all children
-                        <>
-                          {children}
-                          {options.size === 0 && <div>{emptyListNode}</div>}
-                        </>
+                        <button aria-hidden="true" className={styles.srOnly} />
                       )}
+                      <div role="listbox" className={styles.commandList}>
+                        {inProgress ? (
+                          <div className={styles.loading}>{inProgressNotificationMessage}</div>
+                        ) : searchable && searchTerm ? (
+                          // When searching, show filtered options (with or without grouping)
+                          filteredOptions.length === 0 ? (
+                            <div>{emptyListNode}</div>
+                          ) : groupBy && groupedOptions ? (
+                            // Render grouped filtered options
+                            Object.entries(groupedOptions).map(([groupName, groupOptions]) => (
+                              <div key={groupName}>
+                                {groupHeaderRenderer ? (
+                                  <div className={styles.groupHeader}>
+                                    {groupHeaderRenderer(groupName)}
+                                  </div>
+                                ) : (
+                                  <div className={styles.groupHeader}>{groupName}</div>
+                                )}
+                                {groupOptions.map(
+                                  ({ value, label, enabled, keywords }, groupIndex) => {
+                                    const globalIndex = filteredOptions.findIndex(
+                                      (opt) => opt.value === value,
+                                    );
+                                    return (
+                                      <SelectOptionItem
+                                        key={value}
+                                        readOnly={readOnly}
+                                        value={value}
+                                        label={label}
+                                        enabled={enabled}
+                                        keywords={keywords}
+                                        isHighlighted={selectedIndex === globalIndex}
+                                        itemIndex={globalIndex}
+                                      />
+                                    );
+                                  },
+                                )}
+                              </div>
+                            ))
+                          ) : (
+                            // Render flat filtered options
+                            filteredOptions.map(({ value, label, enabled, keywords }, index) => (
+                              <SelectOptionItem
+                                key={value}
+                                readOnly={readOnly}
+                                value={value}
+                                label={label}
+                                enabled={enabled}
+                                keywords={keywords}
+                                isHighlighted={selectedIndex === index}
+                                itemIndex={index}
+                              />
+                            ))
+                          )
+                        ) : groupBy && groupedOptions ? (
+                          // When not searching and grouping is enabled, render grouped options
+                          Object.keys(groupedOptions).length === 0 ? (
+                            <div>{emptyListNode}</div>
+                          ) : (
+                            <>
+                              {(() => {
+                                let globalIndex = 0;
+                                return Object.entries(groupedOptions).map(
+                                  ([groupName, groupOptions]) => (
+                                    <div key={groupName}>
+                                      {groupHeaderRenderer ? (
+                                        <div className={styles.groupHeader}>
+                                          {groupHeaderRenderer(groupName)}
+                                        </div>
+                                      ) : (
+                                        <div className={styles.groupHeader}>{groupName}</div>
+                                      )}
+                                      {groupOptions.map(({ value, label, enabled, keywords }) => {
+                                        const currentIndex = globalIndex++;
+                                        return (
+                                          <SelectOptionItem
+                                            key={value}
+                                            readOnly={readOnly}
+                                            value={value}
+                                            label={label}
+                                            enabled={enabled}
+                                            keywords={keywords}
+                                            isHighlighted={selectedIndex === currentIndex}
+                                            itemIndex={currentIndex}
+                                          />
+                                        );
+                                      })}
+                                    </div>
+                                  ),
+                                );
+                              })()}
+                            </>
+                          )
+                        ) : (
+                          // When not searching and no grouping, show all children
+                          <>
+                            {children}
+                            {options.size === 0 && <div>{emptyListNode}</div>}
+                          </>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </PopoverContent>
-              </Portal>
+                  </PopoverContent>
+                </Portal>
+              )}
+            </Popover>
+            {/* Hidden render to collect options when dropdown is closed */}
+            {!open && (
+              <div style={{ display: "none" }}>
+                <OptionTypeProvider Component={HiddenOption}>{children}</OptionTypeProvider>
+              </div>
             )}
-          </Popover>
-        </OptionTypeProvider>
-        {/* Hidden render to collect options when dropdown is closed */}
-        {!open && (
-          <div style={{ display: "none" }}>
-            <OptionTypeProvider Component={HiddenOption}>{children}</OptionTypeProvider>
-          </div>
+          </OptionTypeProvider>
         )}
       </OptionContext.Provider>
     </SelectContext.Provider>
