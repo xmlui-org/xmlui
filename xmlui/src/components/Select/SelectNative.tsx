@@ -589,9 +589,9 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   return (
     <SelectContext.Provider value={selectContextValue}>
       <OptionContext.Provider value={optionContextValue}>
-        {useSimpleSelect ? (
-          // SimpleSelect mode (Radix UI Select)
-          <OptionTypeProvider Component={SelectOption}>
+        <OptionTypeProvider Component={HiddenOption}>
+          {useSimpleSelect ? (
+            // SimpleSelect mode (Radix UI Select)
             <SimpleSelect
               value={value as SingleValueType}
               onValueChange={(val) => toggleOption(val)}
@@ -614,17 +614,9 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
               groupHeaderRenderer={groupHeaderRenderer}
               clearable={clearable}
               onClear={clearValue}
-            >
-              {children}
-            </SimpleSelect>
-            {/* Hidden render to collect options when dropdown is closed */}
-            <div style={{ display: "none" }}>
-              <OptionTypeProvider Component={HiddenOption}>{children}</OptionTypeProvider>
-            </div>
-          </OptionTypeProvider>
-        ) : (
-          // Popover mode (searchable or multi-select)
-          <OptionTypeProvider Component={VisibleSelectOption}>
+            />
+          ) : (
+            // Popover mode (searchable or multi-select)
             <Popover
               open={open}
               onOpenChange={(isOpen) => {
@@ -830,14 +822,9 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                 </Portal>
               )}
             </Popover>
-            {/* Hidden render to collect options when dropdown is closed */}
-            {!open && (
-              <div style={{ display: "none" }}>
-                <OptionTypeProvider Component={HiddenOption}>{children}</OptionTypeProvider>
-              </div>
-            )}
-          </OptionTypeProvider>
-        )}
+          )}
+          {children}
+        </OptionTypeProvider>
       </OptionContext.Provider>
     </SelectContext.Provider>
   );

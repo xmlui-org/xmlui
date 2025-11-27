@@ -18,10 +18,8 @@ import {
   Portal,
   Group,
   Label,
-  Item,
-  ItemText,
-  ItemIndicator,
 } from "@radix-ui/react-select";
+import { SelectOption } from "./SelectOption";
 
 interface SimpleSelectProps {
   value: SingleValueType;
@@ -38,7 +36,6 @@ interface SimpleSelectProps {
   placeholder: string;
   height: CSSProperties["height"];
   width: number;
-  children: ReactNode;
   readOnly: boolean;
   emptyListNode: ReactNode;
   modal?: boolean;
@@ -65,7 +62,6 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       triggerRef,
       onFocus,
       width,
-      children,
       readOnly,
       emptyListNode,
       className,
@@ -186,17 +182,13 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                             {groupHeaderRenderer ? groupHeaderRenderer(groupName) : groupName}
                           </Label>
                           {groupOptions.map((option) => (
-                            <Item
+                            <SelectOption
                               key={option.value}
                               value={option.value}
-                              disabled={option?.enabled === false}
+                              label={option.label}
+                              enabled={option.enabled}
                               className={styles.selectOption}
-                            >
-                              <ItemText>{option.label}</ItemText>
-                              <ItemIndicator className={styles.selectItemIndicator}>
-                                <Icon name="checkmark" />
-                              </ItemIndicator>
-                            </Item>
+                            />
                           ))}
                         </Group>
                       ))}
@@ -205,17 +197,13 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                 // Render flat options
                 <>
                   {optionsArray.map((option) => (
-                    <Item
+                    <SelectOption
                       key={option.value}
                       value={option.value}
+                      label={option.label}
                       disabled={option?.enabled === false}
                       className={styles.selectOption}
-                    >
-                      <ItemText>{option.label}</ItemText>
-                      <ItemIndicator className={styles.selectItemIndicator}>
-                        <Icon name="checkmark" />
-                      </ItemIndicator>
-                    </Item>
+                    />
                   ))}
                   {optionsArray.length === 0 && emptyListNode}
                 </>
