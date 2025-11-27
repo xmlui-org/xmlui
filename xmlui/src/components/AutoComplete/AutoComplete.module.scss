@@ -165,7 +165,6 @@ $textColor-item-AutoComplete--disabled: createThemeVar("textColor-item-#{$compon
 
     &.disabled {
       cursor: not-allowed;
-      opacity: 0.5;
       background-color: $backgroundColor-AutoComplete--disabled;
       color: $textColor-AutoComplete--disabled;
       border-color: $borderColor-AutoComplete--disabled;
@@ -232,7 +231,6 @@ $textColor-item-AutoComplete--disabled: createThemeVar("textColor-item-#{$compon
 
     &:disabled {
       cursor: not-allowed;
-      opacity: 0.5;
     }
 
     &::placeholder {
@@ -252,6 +250,10 @@ $textColor-item-AutoComplete--disabled: createThemeVar("textColor-item-#{$compon
 
   .action {
     cursor: pointer;
+
+    &.disabled {
+      cursor: not-allowed;
+    }
   }
 
   .autoCompleteEmpty {

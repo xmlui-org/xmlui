@@ -474,7 +474,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
         <Popover
           open={open}
           onOpenChange={(isOpen) => {
-            if (readOnly) return;
+            if (readOnly || !enabled) return;
             setOpen(isOpen);
             if (!isOpen) {
               // Reset highlighted option when dropdown closes
@@ -499,7 +499,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
                 )}
                 aria-expanded={open}
                 onClick={(event) => {
-                  if (readOnly) return;
+                  if (readOnly || !enabled) return;
                   // In multi mode, only open the dropdown, don't toggle
                   // In single mode, toggle as usual
                   if (multi && open) {
@@ -595,9 +595,10 @@ export const AutoComplete = forwardRef(function AutoComplete(
                       </span>
                     )}
                     <span
-                      className={styles.action}
+                      className={classnames(styles.action, { [styles.disabled]: !enabled || readOnly })}
+                      aria-disabled={!enabled || readOnly}
                       onClick={() => {
-                        if (readOnly) return;
+                        if (readOnly || !enabled) return;
                         setOpen(!open);
                         // Focus the input after opening dropdown
                         inputRef.current?.focus();
