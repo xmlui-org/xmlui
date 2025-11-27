@@ -377,13 +377,9 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
    * Group header for grouped options
    */
   .groupHeader {
-    padding: t.$space-2 t.$space-3;
-    font-weight: 600;
-    font-size: 0.875rem;
+    @include t.paddingVars($themeVars, "item-#{$componentName}");
+    font-weight: t.$fontWeight-bold;
     opacity: 0.7;
-    position: sticky;
-    top: 0;
-    z-index: 1;
   }
 
   /**

@@ -16,6 +16,8 @@ import {
   ScrollUpButton,
   ScrollDownButton,
   Portal,
+  Group,
+  Label,
 } from "@radix-ui/react-select";
 
 interface SimpleSelectProps {
@@ -37,6 +39,8 @@ interface SimpleSelectProps {
   readOnly: boolean;
   emptyListNode: ReactNode;
   modal?: boolean;
+  groupBy?: string;
+  groupHeaderRenderer?: (groupName: string) => ReactNode;
 }
 
 export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
@@ -61,6 +65,8 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       emptyListNode,
       className,
       modal,
+      groupBy,
+      groupHeaderRenderer,
       ...rest
     } = props;
 
@@ -86,6 +92,23 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
     const selectedOption = useMemo(() => {
       return optionsArray.find((option) => String(option.value) === String(value));
     }, [optionsArray, value]);
+
+    // Group options if groupBy is provided
+    const groupedOptions = useMemo(() => {
+      if (!groupBy) return null;
+
+      const groups: Record<string, typeof optionsArray> = {};
+
+      optionsArray.forEach((option) => {
+        const groupKey = (option as any)[groupBy] || "Ungrouped";
+        if (!groups[groupKey]) {
+          groups[groupKey] = [];
+        }
+        groups[groupKey].push(option);
+      });
+
+      return groups;
+    }, [groupBy, optionsArray]);
 
     return (
       <Root value={stringValue} onValueChange={handleValueChange}>
@@ -131,8 +154,27 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
               <Icon name="chevronup" />
             </ScrollUpButton>
             <Viewport className={styles.selectViewport} role="listbox">
-              {children}
-              {optionsArray.length === 0 && emptyListNode}
+              {groupBy && groupedOptions ? (
+                // Render grouped options
+                Object.keys(groupedOptions).length === 0 ? (
+                  emptyListNode
+                ) : (
+                  Object.entries(groupedOptions).map(([groupName, _]) => (
+                    <Group key={groupName}>
+                      <Label className={styles.groupHeader}>
+                        {groupHeaderRenderer ? groupHeaderRenderer(groupName) : groupName}
+                      </Label>
+                      {children}
+                    </Group>
+                  ))
+                )
+              ) : (
+                // Render flat options
+                <>
+                  {children}
+                  {optionsArray.length === 0 && emptyListNode}
+                </>
+              )}
             </Viewport>
             <ScrollDownButton className={styles.selectScrollDownButton}>
               <Icon name="chevrondown" />

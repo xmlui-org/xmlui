@@ -610,6 +610,8 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
               readOnly={readOnly}
               emptyListNode={emptyListNode}
               modal={modal}
+              groupBy={groupBy}
+              groupHeaderRenderer={groupHeaderRenderer}
             >
               {children}
             </SimpleSelect>
