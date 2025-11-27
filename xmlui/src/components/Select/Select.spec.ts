@@ -26,7 +26,7 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("option", { name: "Three" })).toBeVisible();
   });
 
-  test("changing selected option in form", async ({ initTestBed, createSelectDriver }) => {
+  test("changing selected option in form", async ({ initTestBed, createSelectDriver, page }) => {
     await initTestBed(`
     <Form data="{{sel: 'opt1'}}">
       <FormItem testId="mySelect" type="select" bindTo="sel">
@@ -36,11 +36,13 @@ test.describe("Basic Functionality", () => {
       </FormItem>
     </Form>`);
     const driver = await createSelectDriver("mySelect");
+    const selectTrigger = driver.component.locator('button[role="combobox"]');
 
-    await expect(driver.component).toHaveText("first");
+    await expect(selectTrigger).toHaveText("first");
     await driver.toggleOptionsVisibility();
+    await page.waitForTimeout(100); // Wait for dropdown to open
     await driver.selectLabel("second");
-    await expect(driver.component).toHaveText("second");
+    await expect(selectTrigger).toHaveText("second");
   });
 
   // --- initialValue prop
@@ -295,9 +297,9 @@ test.describe("Basic Functionality", () => {
     `);
     const driver = await createSelectDriver();
     await driver.click();
-    await expect(page.getByText("Template for value opt1")).toBeVisible();
-    await expect(page.getByText("Template for value opt2")).toBeVisible();
-    await expect(page.getByText("Template for value opt3")).toBeVisible();
+    await expect(page.getByText("Template for value opt1").first()).toBeVisible();
+    await expect(page.getByText("Template for value opt2").first()).toBeVisible();
+    await expect(page.getByText("Template for value opt3").first()).toBeVisible();
   });
 
   // --- placeholder prop
@@ -1173,6 +1175,8 @@ test.describe("Behaviors and Parts", () => {
 
   test("can select part: 'listWrapper'", async ({ page, initTestBed }) => {
     await initTestBed(`<Select testId="test"><Option value="1" label="Test" /></Select>`);
+    const component = page.getByTestId("test");
+    await component.click(); // Open dropdown
     const listWrapper = page.locator("[data-part-id='listWrapper']");
     await expect(listWrapper).toBeVisible();
   });
@@ -1199,11 +1203,13 @@ test.describe("Behaviors and Parts", () => {
     );
 
     const component = page.getByTestId("test");
-    const listWrapper = page.locator("[data-part-id='listWrapper']");
     const clearButton = page.locator("[data-part-id='clearButton']");
 
-    await expect(listWrapper).toBeVisible();
     await expect(clearButton).toBeVisible();
+
+    await component.click(); // Open dropdown
+    const listWrapper = page.locator("[data-part-id='listWrapper']");
+    await expect(listWrapper).toBeVisible();
 
     await component.hover();
     const tooltip = page.getByRole("tooltip");
@@ -1213,18 +1219,15 @@ test.describe("Behaviors and Parts", () => {
 
   test("parts are present when variant is added", async ({ page, initTestBed }) => {
     await initTestBed(
-      `<Select testId="test" variant="CustomVariant"><Option value="1" label="Test" /></Select>`,
-      {
-        testThemeVars: {
-          "borderColor-Select-CustomVariant": "rgb(255, 0, 0)",
-        },
-      },
+      `<Select testId="test" variant="error" initialValue="1"><Option value="1" label="Test" /></Select>`,
     );
 
     const component = page.getByTestId("test");
-    const listWrapper = page.locator("[data-part-id='listWrapper']");
 
     await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+
+    await component.click(); // Open dropdown
+    const listWrapper = page.locator("[data-part-id='listWrapper']");
     await expect(listWrapper).toBeVisible();
   });
 

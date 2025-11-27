@@ -41,6 +41,8 @@ interface SimpleSelectProps {
   modal?: boolean;
   groupBy?: string;
   groupHeaderRenderer?: (groupName: string) => ReactNode;
+  clearable?: boolean;
+  onClear?: () => void;
 }
 
 export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
@@ -67,6 +69,8 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       modal,
       groupBy,
       groupHeaderRenderer,
+      clearable,
+      onClear,
       ...rest
     } = props;
 
@@ -140,6 +144,20 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
           >
             {selectedOption ? selectedOption.label : readOnly ? "" : placeholder}
           </div>
+          {clearable && value !== undefined && !readOnly && (
+            <button
+              type="button"
+              className={styles.clearButton}
+              data-part-id="clearButton"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClear?.();
+              }}
+              tabIndex={-1}
+            >
+              <Icon name="close" />
+            </button>
+          )}
           <span className={styles.action}>
             <Icon name="chevrondown" />
           </span>
@@ -153,7 +171,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
             <ScrollUpButton className={styles.selectScrollUpButton}>
               <Icon name="chevronup" />
             </ScrollUpButton>
-            <Viewport className={styles.selectViewport} role="listbox">
+            <Viewport className={styles.selectViewport} role="listbox" data-part-id="listWrapper">
               {groupBy && groupedOptions ? (
                 // Render grouped options
                 Object.keys(groupedOptions).length === 0 ? (

@@ -612,6 +612,8 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
               modal={modal}
               groupBy={groupBy}
               groupHeaderRenderer={groupHeaderRenderer}
+              clearable={clearable}
+              onClear={clearValue}
             >
               {children}
             </SimpleSelect>
