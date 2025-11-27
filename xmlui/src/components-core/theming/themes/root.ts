@@ -275,7 +275,7 @@ export const RootThemeDefinition: ThemeDefinition = {
 
     // --- Border colors
     borderColor: "rgb(from $color-surface-900 r g b / 0.1)",
-    "borderColor--disabled": $colorSurface100,
+    "borderColor--disabled": $colorSurface200,
 
     // --- Text colors
     "textColor-secondary": $colorSurface600,

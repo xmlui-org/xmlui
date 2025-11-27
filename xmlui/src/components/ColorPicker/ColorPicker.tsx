@@ -52,6 +52,9 @@ export const ColorPickerMd = createMetadata({
     },
   },
   themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`width-${COMP}`]: "48px",
+  },
 });
 
 export const colorPickerComponentRenderer = createComponentRenderer(

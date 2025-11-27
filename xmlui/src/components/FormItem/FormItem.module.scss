@@ -76,11 +76,6 @@ $textColor-FormItemLabel-requiredMark: createThemeVar("textColor-FormItemLabel-r
       word-break: normal;
       white-space: nowrap;
 
-      &.disabled {
-        cursor: not-allowed;
-        color: t.$textColor--disabled;
-      }
-
       &.labelBreak {
         white-space: normal;
         word-break: normal;
@@ -93,6 +88,11 @@ $textColor-FormItemLabel-requiredMark: createThemeVar("textColor-FormItemLabel-r
         font-weight: $fontWeight-FormItemLabel-required;
         font-style: $fontStyle-FormItemLabel-required;
         text-transform: $textTransform-FormItemLabel-required;
+      }
+
+      &.disabled {
+        cursor: not-allowed;
+        color: t.$textColor--disabled;
       }
 
       .requiredMark {

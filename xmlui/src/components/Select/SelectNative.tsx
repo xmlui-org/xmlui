@@ -23,6 +23,7 @@ import { SelectContext, useSelect } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { OptionContext, useOption } from "./OptionContext";
 import { HiddenOption } from "./HiddenOption";
+import { Part } from "../Part/Part";
 
 const PART_LIST_WRAPPER = "listWrapper";
 const PART_CLEAR_BUTTON = "clearButton";
@@ -190,19 +191,23 @@ const SelectTriggerActions = ({
   return (
     <div className={styles.actions}>
       {hasValue && enabled && !readOnly && clearable && (
-        <span
-          data-part-id={PART_CLEAR_BUTTON}
-          className={styles.action}
-          onClick={(event) => {
-            event.stopPropagation();
-            clearValue();
-          }}
-        >
-          <Icon name="close" />
-        </span>
+        <Part partId={PART_CLEAR_BUTTON}>
+          <span
+            className={styles.action}
+            onClick={(event) => {
+              event.stopPropagation();
+              clearValue();
+            }}
+          >
+            <Icon name="close" />
+          </span>
+        </Part>
       )}
       {showChevron && (
-        <span className={styles.action}>
+        <span
+          className={classnames(styles.action, { [styles.disabled]: !enabled || readOnly })}
+          aria-disabled={!enabled || readOnly}
+        >
           <Icon name="chevrondown" />
         </span>
       )}
@@ -544,73 +549,74 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
             }}
             modal={modal}
           >
-            <PopoverTrigger
-              {...rest}
-              ref={composeRefs(setReferenceElement, forwardedRef)}
-              id={id}
-              aria-haspopup="listbox"
-              style={style}
-              onFocus={onFocus}
-              onBlur={onBlur}
-              disabled={!enabled}
-              aria-expanded={open}
-              data-part-id={PART_LIST_WRAPPER}
-              className={classnames(className, styles.selectTrigger, styles[validationStatus], {
-                [styles.disabled]: !enabled,
-                [styles.multi]: multiSelect,
-              })}
-              role="combobox"
-              onClick={(event) => {
-                if (!enabled) return;
-                event.stopPropagation();
-                setOpen((prev) => !prev);
-              }}
-              onKeyDown={(event) => {
-                if (!enabled || readOnly) return;
+            <Part partId={PART_LIST_WRAPPER}>
+              <PopoverTrigger
+                {...rest}
+                ref={composeRefs(setReferenceElement, forwardedRef)}
+                id={id}
+                aria-haspopup="listbox"
+                style={style}
+                onFocus={onFocus}
+                onBlur={onBlur}
+                disabled={!enabled}
+                aria-expanded={open}
+                className={classnames(className, styles.selectTrigger, styles[validationStatus], {
+                  [styles.disabled]: !enabled,
+                  [styles.multi]: multiSelect,
+                })}
+                role="combobox"
+                onClick={(event) => {
+                  if (!enabled) return;
+                  event.stopPropagation();
+                  setOpen((prev) => !prev);
+                }}
+                onKeyDown={(event) => {
+                  if (!enabled || readOnly) return;
 
-                // Handle opening dropdown with keyboard
-                if (
-                  !open &&
-                  (event.key === "ArrowDown" ||
-                    event.key === "ArrowUp" ||
-                    event.key === " " ||
-                    event.key === "Enter")
-                ) {
-                  event.preventDefault();
-                  setOpen(true);
-                  // Set initial selectedIndex to first enabled option if options exist
-                  if (filteredOptions.length > 0) {
-                    const firstEnabledIndex = findNextEnabledIndex(-1);
-                    setSelectedIndex(firstEnabledIndex !== -1 ? firstEnabledIndex : 0);
+                  // Handle opening dropdown with keyboard
+                  if (
+                    !open &&
+                    (event.key === "ArrowDown" ||
+                      event.key === "ArrowUp" ||
+                      event.key === " " ||
+                      event.key === "Enter")
+                  ) {
+                    event.preventDefault();
+                    setOpen(true);
+                    // Set initial selectedIndex to first enabled option if options exist
+                    if (filteredOptions.length > 0) {
+                      const firstEnabledIndex = findNextEnabledIndex(-1);
+                      setSelectedIndex(firstEnabledIndex !== -1 ? firstEnabledIndex : 0);
+                    }
+                    return;
                   }
-                  return;
-                }
 
-                // Handle keyboard navigation when dropdown is open
-                if (open) {
-                  handleKeyDown(event);
-                }
-              }}
-              autoFocus={autoFocus}
-            >
-              <SelectTriggerValue
-                value={value}
-                placeholder={placeholder}
-                readOnly={readOnly}
-                multiSelect={multiSelect}
-                options={options}
-                valueRenderer={valueRenderer}
-                toggleOption={toggleOption}
-              />
-              <SelectTriggerActions
-                value={value}
-                multiSelect={multiSelect}
-                enabled={enabled}
-                readOnly={readOnly}
-                clearable={clearable}
-                clearValue={clearValue}
-              />
-            </PopoverTrigger>
+                  // Handle keyboard navigation when dropdown is open
+                  if (open) {
+                    handleKeyDown(event);
+                  }
+                }}
+                autoFocus={autoFocus}
+              >
+                <SelectTriggerValue
+                  value={value}
+                  placeholder={placeholder}
+                  readOnly={readOnly}
+                  multiSelect={multiSelect}
+                  options={options}
+                  valueRenderer={valueRenderer}
+                  toggleOption={toggleOption}
+                />
+                <SelectTriggerActions
+                  value={value}
+                  multiSelect={multiSelect}
+                  enabled={enabled}
+                  readOnly={readOnly}
+                  clearable={clearable}
+                  clearValue={clearValue}
+                />
+              </PopoverTrigger>
+            </Part>
             {open && (
               <Portal container={root}>
                 <PopoverContent

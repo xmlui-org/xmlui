@@ -44,7 +44,7 @@ $backgroundColor-checked-RadioGroupOption--disabled: createThemeVar(
 
 // --- Foreground
 
-$color-RadioGroupOption--disabled: createThemeVar("Input:color-RadioGroupOption--disabled");
+$textColor-RadioGroupOption--disabled: createThemeVar("Input:textColor-RadioGroupOption--disabled");
 
 // --- Text
 
@@ -103,7 +103,7 @@ $outlineOffset-RadioGroupOption--focus: createThemeVar("Input:outlineOffset-Radi
     }
     &:disabled + label {
       cursor: not-allowed;
-      color: $color-RadioGroupOption--disabled;
+      color: $textColor-RadioGroupOption--disabled;
     }
     &:not(:disabled) {
       &.checked:not(.error):not(.warning):not(.valid) {
@@ -176,6 +176,10 @@ $outlineOffset-RadioGroupOption--focus: createThemeVar("Input:outlineOffset-Radi
     }
     &.valid {
       color: $textColor-RadioGroupOption--success;
+    }
+    &.disabled {
+      cursor: not-allowed;
+      color: $textColor-RadioGroupOption--disabled;
     }
   }
 }

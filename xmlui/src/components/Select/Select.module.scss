@@ -194,7 +194,6 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
 
     &.disabled {
       cursor: not-allowed;
-      opacity: 0.5;
       background-color: $backgroundColor-Select--disabled;
       color: $textColor-Select--disabled;
       border-color: $borderColor-Select--disabled;
@@ -236,6 +235,10 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
 
   .action {
     cursor: pointer;
+
+    &.disabled {
+      cursor: not-allowed;
+    }
   }
 
   /**
@@ -358,11 +361,7 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
 
     &:disabled {
       cursor: not-allowed;
-      opacity: 0.5;
     }
-
-
-
     &:focus-within {
       outline: none;
     }
