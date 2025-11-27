@@ -163,9 +163,11 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
         </Trigger>
         <Portal container={root}>
           <Content
+            collisionPadding={0}
             className={styles.selectDropdownContent}
             position="popper"
-            style={{ maxHeight: height, minWidth: width }}
+            align="start"
+            style={{ maxHeight: height, width: width }}
           >
             <ScrollUpButton className={styles.selectScrollUpButton}>
               <Icon name="chevronup" />
