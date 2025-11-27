@@ -203,7 +203,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                       key={option.value}
                       value={option.value}
                       label={option.label}
-                      disabled={option?.enabled === false}
+                      enabled={option?.enabled}
                       className={styles.selectOption}
                     />
                   ))}

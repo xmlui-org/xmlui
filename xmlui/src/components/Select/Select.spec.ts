@@ -208,9 +208,7 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("option", { name: "Two" })).toBeVisible();
   });
 
-  test(
-    "clicking label brings up the options",
-    { tag: "@smoke" },
+  test("clicking label brings up the options",{ tag: "@smoke" },
     async ({ initTestBed, page, createSelectDriver }) => {
       await initTestBed(`
     <Select label="Choose an option">
@@ -1432,5 +1430,285 @@ test.describe("Nested DropdownMenu and Select", () => {
 
     await page.mouse.click(10, 10);
     await expect(page.getByText("Outer Dialog")).not.toBeVisible();
+  });
+});
+
+test.describe("Grouping Functionality", () => {
+  test("simple Select with groupBy displays grouped options", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select groupBy="category" placeholder="Select a product">
+        <Option value="1" label="Apple" category="Fruit" />
+        <Option value="2" label="Banana" category="Fruit" />
+        <Option value="3" label="Carrot" category="Vegetable" />
+        <Option value="4" label="Tomato" category="Vegetable" />
+      </Select>
+    `);
+
+    const driver = await createSelectDriver();
+    await driver.click();
+
+    // Check group headers are visible
+    await expect(page.getByText("Fruit")).toBeVisible();
+    await expect(page.getByText("Vegetable")).toBeVisible();
+
+    // Check options are visible
+    await expect(page.getByRole("option", { name: "Apple" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Banana" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Carrot" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Tomato" })).toBeVisible();
+  });
+
+  test("simple Select with groupBy and custom groupHeaderTemplate", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select groupBy="type" placeholder="Select a product">
+        <property name="groupHeaderTemplate">
+          <Text variant='h3'>{$group}</Text>
+        </property>
+        <Items items="{[
+          { id: 1, name: 'MacBook Pro', type: 'Apple' },
+          { id: 2, name: 'iPad Air', type: 'Apple' },
+          { id: 3, name: 'Dell XPS', type: 'Dell' },
+          { id: 4, name: 'Samsung Tab', type: 'Samsung' }
+        ]}">
+          <Option value="{$item.id}" label="{$item.name}" type="{$item.type}" />
+        </Items>
+      </Select>
+    `);
+
+    const driver = await createSelectDriver();
+    await driver.click();
+
+    // Check group headers with custom template
+    await expect(page.getByText("Apple")).toBeVisible();
+    await expect(page.getByText("Dell")).toBeVisible();
+    await expect(page.getByText("Samsung")).toBeVisible();
+
+    // Check options
+    await expect(page.getByRole("option", { name: "MacBook Pro" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "iPad Air" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Dell XPS" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Samsung Tab" })).toBeVisible();
+  });
+
+  test("simple Select with groupBy can select options", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select groupBy="category" placeholder="Select a product" testId="mySelect">
+        <Option value="1" label="Apple" category="Fruit" />
+        <Option value="2" label="Banana" category="Fruit" />
+        <Option value="3" label="Carrot" category="Vegetable" />
+      </Select>
+    `);
+
+    const driver = await createSelectDriver("mySelect");
+    const selectTrigger = driver.component.locator('button[role="combobox"]');
+
+    await driver.click();
+    await driver.selectLabel("Carrot");
+
+    await expect(selectTrigger).toHaveText("Carrot");
+  });
+
+  test("searchable Select with groupBy displays filtered grouped options", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select searchable groupBy="category" placeholder="Search products">
+        <Option value="1" label="Apple" category="Fruit" />
+        <Option value="2" label="Banana" category="Fruit" />
+        <Option value="3" label="Carrot" category="Vegetable" />
+        <Option value="4" label="Tomato" category="Vegetable" />
+      </Select>
+    `);
+
+    const driver = await createSelectDriver();
+    await driver.click();
+
+    // Initially all groups visible
+    await expect(page.getByText("Fruit")).toBeVisible();
+    await expect(page.getByText("Vegetable")).toBeVisible();
+
+    // Search for "Car"
+    await driver.searchFor("Car");
+    await expect(page.getByRole("option", { name: "Carrot" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Apple" })).not.toBeVisible();
+
+    // Group header should still be visible
+    await expect(page.getByText("Vegetable")).toBeVisible();
+  });
+
+  test("multiSelect with groupBy displays grouped options", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select multiSelect groupBy="category" placeholder="Select products">
+        <Option value="1" label="Apple" category="Fruit" />
+        <Option value="2" label="Banana" category="Fruit" />
+        <Option value="3" label="Carrot" category="Vegetable" />
+        <Option value="4" label="Tomato" category="Vegetable" />
+      </Select>
+    `);
+
+    const driver = await createSelectDriver();
+    await driver.click();
+
+    // Check group headers
+    await expect(page.getByText("Fruit")).toBeVisible();
+    await expect(page.getByText("Vegetable")).toBeVisible();
+
+    // Select multiple options from different groups
+    await driver.selectMultipleLabels(["Apple", "Carrot"]);
+
+    // Check both are selected
+    await expect(page.getByText("Apple")).toBeVisible();
+    await expect(page.getByText("Carrot")).toBeVisible();
+  });
+
+  test("clearable Select with groupBy can clear selection", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select clearable groupBy="category" placeholder="Select a product" testId="mySelect">
+        <Option value="1" label="Apple" category="Fruit" />
+        <Option value="2" label="Carrot" category="Vegetable" />
+      </Select>
+    `);
+
+    const driver = await createSelectDriver("mySelect");
+    const selectTrigger = driver.component.locator('button[role="combobox"]');
+
+    // Select an option
+    await driver.click();
+    await driver.selectLabel("Apple");
+    await expect(selectTrigger).toHaveText("Apple");
+
+    // Clear the selection
+    await driver.clearButton.click();
+    await expect(selectTrigger).not.toHaveText("Apple");
+    await expect(driver.clearButton).not.toBeVisible();
+  });
+
+  test("searchable multiSelect with groupBy works correctly", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select searchable multiSelect groupBy="type" placeholder="Search and select">
+        <Option value="1" label="React" type="Frontend" />
+        <Option value="2" label="Vue" type="Frontend" />
+        <Option value="3" label="Node.js" type="Backend" />
+        <Option value="4" label="Django" type="Backend" />
+      </Select>
+    `);
+
+    const driver = await createSelectDriver();
+    await driver.click();
+
+    // Check initial groups
+    await expect(page.getByText("Frontend")).toBeVisible();
+    await expect(page.getByText("Backend")).toBeVisible();
+
+    // Search for "Node"
+    await driver.searchFor("Node");
+    await expect(page.getByRole("option", { name: "Node.js" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "React" })).not.toBeVisible();
+
+    // Select the filtered option
+    await page.getByRole("option", { name: "Node.js" }).click();
+    await expect(page.getByText("Node.js")).toBeVisible();
+  });
+
+  test("grouped options keyboard navigation works", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select groupBy="category" placeholder="Select a product">
+        <Option value="1" label="Apple" category="Fruit" />
+        <Option value="2" label="Banana" category="Fruit" />
+        <Option value="3" label="Carrot" category="Vegetable" />
+      </Select>
+    `);
+
+    const driver = await createSelectDriver();
+    await driver.click();
+
+    // Navigate with arrow keys
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("Enter");
+
+    const selectTrigger = driver.component.locator('button[role="combobox"]');
+    // Should select Banana (second option)
+    await expect(selectTrigger).toHaveText("Banana");
+  });
+
+  test("empty group not displayed when no options match", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select searchable groupBy="category" placeholder="Search">
+        <Option value="1" label="Apple" category="Fruit" />
+        <Option value="2" label="Carrot" category="Vegetable" />
+      </Select>
+    `);
+
+    const driver = await createSelectDriver();
+    await driver.click();
+
+    // Search for something that only matches Fruit
+    await driver.searchFor("Apple");
+    await expect(page.getByText("Fruit")).toBeVisible();
+    await expect(page.getByText("Vegetable")).not.toBeVisible();
+  });
+
+  test("grouped select with clearable and searchable combined", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select searchable clearable groupBy="type" placeholder="Search" testId="mySelect">
+        <Option value="1" label="JavaScript" type="Language" />
+        <Option value="2" label="Python" type="Language" />
+        <Option value="3" label="VSCode" type="Tool" />
+      </Select>
+    `);
+
+    const driver = await createSelectDriver("mySelect");
+    await driver.click();
+
+    // Search and select
+    await driver.searchFor("Java");
+    await page.getByRole("option", { name: "JavaScript" }).click();
+
+    // Check selection
+    const input = page.getByRole("searchbox");
+    await expect(input).toHaveValue("JavaScript");
+
+    // Clear selection
+    await driver.clearButton.click();
+    await expect(input).toHaveValue("");
   });
 });

@@ -128,18 +128,18 @@ const SelectTriggerValue = ({
                 valueRenderer(
                   Array.from(options).find((o) => o.value === `${v}`),
                   () => {
-                    toggleOption(v);
+                    if (!readOnly) toggleOption(v);
                   },
                 )
               ) : (
                 <span key={v} className={styles.badge}>
-                  {Array.from(options).find((o) => o.value === `${v}`)?.label}
+                  {Array.from(options).find((o) => String(o.value) === String(v))?.label}
                   <Icon
                     name="close"
                     size="sm"
                     onClick={(event) => {
                       event.stopPropagation();
-                      toggleOption(v);
+                      if (!readOnly) toggleOption(v);
                     }}
                   />
                 </span>
@@ -719,103 +719,55 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                       <div role="listbox" className={styles.commandList}>
                         {inProgress ? (
                           <div className={styles.loading}>{inProgressNotificationMessage}</div>
-                        ) : searchable && searchTerm ? (
-                          // When searching, show filtered options (with or without grouping)
-                          filteredOptions.length === 0 ? (
-                            <div>{emptyListNode}</div>
-                          ) : groupBy && groupedOptions ? (
-                            // Render grouped filtered options
-                            Object.entries(groupedOptions).map(([groupName, groupOptions]) => (
-                              <div key={groupName}>
-                                {groupHeaderRenderer ? (
-                                  <div className={styles.groupHeader}>
-                                    {groupHeaderRenderer(groupName)}
-                                  </div>
-                                ) : (
-                                  <div className={styles.groupHeader}>{groupName}</div>
-                                )}
-                                {groupOptions.map(
-                                  ({ value, label, enabled, keywords }, groupIndex) => {
-                                    const globalIndex = filteredOptions.findIndex(
-                                      (opt) => opt.value === value,
-                                    );
-                                    return (
-                                      <SelectOptionItem
-                                        key={value}
-                                        readOnly={readOnly}
-                                        value={value}
-                                        label={label}
-                                        enabled={enabled}
-                                        keywords={keywords}
-                                        isHighlighted={selectedIndex === globalIndex}
-                                        itemIndex={globalIndex}
-                                      />
-                                    );
-                                  },
-                                )}
-                              </div>
-                            ))
-                          ) : (
-                            // Render flat filtered options
-                            filteredOptions.map(({ value, label, enabled, keywords }, index) => (
-                              <SelectOptionItem
-                                key={value}
-                                readOnly={readOnly}
-                                value={value}
-                                label={label}
-                                enabled={enabled}
-                                keywords={keywords}
-                                isHighlighted={selectedIndex === index}
-                                itemIndex={index}
-                              />
-                            ))
-                          )
-                        ) : groupBy && groupedOptions ? (
-                          // When not searching and grouping is enabled, render grouped options
-                          Object.keys(groupedOptions).length === 0 ? (
-                            <div>{emptyListNode}</div>
-                          ) : (
-                            <>
-                              {(() => {
-                                let globalIndex = 0;
-                                return Object.entries(groupedOptions).map(
-                                  ([groupName, groupOptions]) => (
-                                    <div key={groupName}>
-                                      {groupHeaderRenderer ? (
-                                        <div className={styles.groupHeader}>
-                                          {groupHeaderRenderer(groupName)}
-                                        </div>
-                                      ) : (
-                                        <div className={styles.groupHeader}>{groupName}</div>
-                                      )}
-                                      {groupOptions.map(({ value, label, enabled, keywords }) => {
-                                        const currentIndex = globalIndex++;
-                                        return (
-                                          <SelectOptionItem
-                                            key={value}
-                                            readOnly={readOnly}
-                                            value={value}
-                                            label={label}
-                                            enabled={enabled}
-                                            keywords={keywords}
-                                            isHighlighted={selectedIndex === currentIndex}
-                                            itemIndex={currentIndex}
-                                          />
-                                        );
-                                      })}
-                                    </div>
-                                  ),
-                                );
-                              })()}
-                            </>
-                          )
+                        ) : // When searching, show filtered options (with or without grouping)
+                        groupBy && groupedOptions ? (
+                          // Render grouped filtered options
+                          Object.entries(groupedOptions).map(([groupName, groupOptions]) => (
+                            <div key={groupName}>
+                              {groupHeaderRenderer ? (
+                                <div className={styles.groupHeader}>
+                                  {groupHeaderRenderer(groupName)}
+                                </div>
+                              ) : (
+                                <div className={styles.groupHeader}>{groupName}</div>
+                              )}
+                              {groupOptions.map(
+                                ({ value, label, enabled, keywords }, groupIndex) => {
+                                  const globalIndex = filteredOptions.findIndex(
+                                    (opt) => opt.value === value,
+                                  );
+                                  return (
+                                    <SelectOptionItem
+                                      key={value}
+                                      readOnly={readOnly}
+                                      value={value}
+                                      label={label}
+                                      enabled={enabled}
+                                      keywords={keywords}
+                                      isHighlighted={selectedIndex === globalIndex}
+                                      itemIndex={globalIndex}
+                                    />
+                                  );
+                                },
+                              )}
+                            </div>
+                          ))
                         ) : (
-                          // When not searching and no grouping, show all children
-                          <>
-                            {children}
-                            {options.size === 0 && <div>{emptyListNode}</div>}
-                          </>
+                          // Render flat filtered options
+                          filteredOptions.map(({ value, label, enabled, keywords }, index) => (
+                            <SelectOptionItem
+                              key={value}
+                              readOnly={readOnly}
+                              value={value}
+                              label={label}
+                              enabled={enabled}
+                              keywords={keywords}
+                              isHighlighted={selectedIndex === index}
+                              itemIndex={index}
+                            />
+                          ))
                         )}
+                        {filteredOptions.length === 0 && emptyListNode}
                       </div>
                     </div>
                   </PopoverContent>
