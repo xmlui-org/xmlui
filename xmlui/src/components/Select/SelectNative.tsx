@@ -307,6 +307,17 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     return groups;
   }, [groupBy, options, filteredOptions, searchTerm]);
 
+  // Create a flat list from grouped options for keyboard navigation
+  const flattenedGroupedOptions = useMemo(() => {
+    if (!groupedOptions) return null;
+
+    const flattened: Option[] = [];
+    Object.entries(groupedOptions).forEach(([_, groupOptions]) => {
+      flattened.push(...groupOptions);
+    });
+    return flattened;
+  }, [groupedOptions]);
+
   // Reset selected index when options change or dropdown closes
   useEffect(() => {
     if (!open) {
@@ -368,52 +379,64 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   // Helper functions to find next/previous enabled option
   const findNextEnabledIndex = useCallback(
     (currentIndex: number) => {
-      if (filteredOptions.length === 0) return -1;
+      // Use the appropriate options list based on grouping and search state
+      const optionsList =
+        !searchTerm && flattenedGroupedOptions ? flattenedGroupedOptions : filteredOptions;
 
-      for (let i = currentIndex + 1; i < filteredOptions.length; i++) {
-        const item = filteredOptions[i];
+      if (optionsList.length === 0) return -1;
+
+      for (let i = currentIndex + 1; i < optionsList.length; i++) {
+        const item = optionsList[i];
         if (item && item.enabled !== false) {
           return i;
         }
       }
       // Wrap around to beginning
       for (let i = 0; i <= currentIndex; i++) {
-        const item = filteredOptions[i];
+        const item = optionsList[i];
         if (item && item.enabled !== false) {
           return i;
         }
       }
       return -1;
     },
-    [filteredOptions],
+    [filteredOptions, flattenedGroupedOptions, searchTerm],
   );
 
   const findPreviousEnabledIndex = useCallback(
     (currentIndex: number) => {
-      if (filteredOptions.length === 0) return -1;
+      // Use the appropriate options list based on grouping and search state
+      const optionsList =
+        !searchTerm && flattenedGroupedOptions ? flattenedGroupedOptions : filteredOptions;
+
+      if (optionsList.length === 0) return -1;
 
       for (let i = currentIndex - 1; i >= 0; i--) {
-        const item = filteredOptions[i];
+        const item = optionsList[i];
         if (item && item.enabled !== false) {
           return i;
         }
       }
       // Wrap around to end
-      for (let i = filteredOptions.length - 1; i >= currentIndex; i--) {
-        const item = filteredOptions[i];
+      for (let i = optionsList.length - 1; i >= currentIndex; i--) {
+        const item = optionsList[i];
         if (item && item.enabled !== false) {
           return i;
         }
       }
       return -1;
     },
-    [filteredOptions],
+    [filteredOptions, flattenedGroupedOptions, searchTerm],
   );
 
   // Keyboard navigation
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
       if (!open) return;
+
+      // Use the appropriate options list based on grouping and search state
+      const optionsList =
+        !searchTerm && flattenedGroupedOptions ? flattenedGroupedOptions : filteredOptions;
 
       switch (event.key) {
         case "ArrowDown":
@@ -432,8 +455,8 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
           break;
         case "Enter":
           event.preventDefault();
-          if (selectedIndex >= 0 && selectedIndex < filteredOptions.length) {
-            const selectedItem = filteredOptions[selectedIndex];
+          if (selectedIndex >= 0 && selectedIndex < optionsList.length) {
+            const selectedItem = optionsList[selectedIndex];
             if (selectedItem && selectedItem.enabled !== false) {
               toggleOption(selectedItem.value);
               // Close dropdown after selecting in single-select mode
@@ -453,6 +476,8 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
       open,
       selectedIndex,
       filteredOptions,
+      flattenedGroupedOptions,
+      searchTerm,
       toggleOption,
       multiSelect,
       findNextEnabledIndex,
@@ -719,28 +744,37 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                           <div>{emptyListNode}</div>
                         ) : (
                           <>
-                            {Object.entries(groupedOptions).map(([groupName, groupOptions]) => (
-                              <div key={groupName}>
-                                {groupHeaderRenderer ? (
-                                  <div className={styles.groupHeader}>
-                                    {groupHeaderRenderer(groupName)}
+                            {(() => {
+                              let globalIndex = 0;
+                              return Object.entries(groupedOptions).map(
+                                ([groupName, groupOptions]) => (
+                                  <div key={groupName}>
+                                    {groupHeaderRenderer ? (
+                                      <div className={styles.groupHeader}>
+                                        {groupHeaderRenderer(groupName)}
+                                      </div>
+                                    ) : (
+                                      <div className={styles.groupHeader}>{groupName}</div>
+                                    )}
+                                    {groupOptions.map(({ value, label, enabled, keywords }) => {
+                                      const currentIndex = globalIndex++;
+                                      return (
+                                        <SelectOptionItem
+                                          key={value}
+                                          readOnly={readOnly}
+                                          value={value}
+                                          label={label}
+                                          enabled={enabled}
+                                          keywords={keywords}
+                                          isHighlighted={selectedIndex === currentIndex}
+                                          itemIndex={currentIndex}
+                                        />
+                                      );
+                                    })}
                                   </div>
-                                ) : (
-                                  <div className={styles.groupHeader}>{groupName}</div>
-                                )}
-                                {groupOptions.map(({ value, label, enabled, keywords }) => (
-                                  <SelectOptionItem
-                                    key={value}
-                                    readOnly={readOnly}
-                                    value={value}
-                                    label={label}
-                                    enabled={enabled}
-                                    keywords={keywords}
-                                    isHighlighted={false}
-                                  />
-                                ))}
-                              </div>
-                            ))}
+                                ),
+                              );
+                            })()}
                           </>
                         )
                       ) : (
