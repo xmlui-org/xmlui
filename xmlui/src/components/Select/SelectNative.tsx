@@ -84,6 +84,10 @@ interface SelectProps {
   inProgress?: boolean;
   inProgressNotificationMessage?: string;
 
+  // Grouping
+  groupBy?: string;
+  groupHeaderRenderer?: (groupName: string) => ReactNode;
+
   // Internal
   updateState?: UpdateStateFn;
   registerComponentApi?: RegisterComponentApiFn;
@@ -248,6 +252,10 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     inProgress = defaultProps.inProgress,
     inProgressNotificationMessage = defaultProps.inProgressNotificationMessage,
 
+    // Grouping
+    groupBy,
+    groupHeaderRenderer,
+
     // Internal
     updateState = noop,
     registerComponentApi,
@@ -280,6 +288,24 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
       return extendedValue.toLowerCase().includes(searchLower);
     });
   }, [options, searchTerm]);
+
+  // Group options if groupBy is provided
+  const groupedOptions = useMemo(() => {
+    if (!groupBy) return null;
+
+    const optionsToGroup = searchTerm ? filteredOptions : Array.from(options);
+    const groups: Record<string, Option[]> = {};
+
+    optionsToGroup.forEach((option) => {
+      const groupKey = (option as any)[groupBy] || "Ungrouped";
+      if (!groups[groupKey]) {
+        groups[groupKey] = [];
+      }
+      groups[groupKey].push(option);
+    });
+
+    return groups;
+  }, [groupBy, options, filteredOptions, searchTerm]);
 
   // Reset selected index when options change or dropdown closes
   useEffect(() => {
@@ -637,10 +663,43 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                       {inProgress ? (
                         <div className={styles.loading}>{inProgressNotificationMessage}</div>
                       ) : searchable && searchTerm ? (
-                        // When searching, show only filtered options
+                        // When searching, show filtered options (with or without grouping)
                         filteredOptions.length === 0 ? (
                           <div>{emptyListNode}</div>
+                        ) : groupBy && groupedOptions ? (
+                          // Render grouped filtered options
+                          Object.entries(groupedOptions).map(([groupName, groupOptions]) => (
+                            <div key={groupName}>
+                              {groupHeaderRenderer ? (
+                                <div className={styles.groupHeader}>
+                                  {groupHeaderRenderer(groupName)}
+                                </div>
+                              ) : (
+                                <div className={styles.groupHeader}>{groupName}</div>
+                              )}
+                              {groupOptions.map(
+                                ({ value, label, enabled, keywords }, groupIndex) => {
+                                  const globalIndex = filteredOptions.findIndex(
+                                    (opt) => opt.value === value,
+                                  );
+                                  return (
+                                    <SelectOptionItem
+                                      key={value}
+                                      readOnly={readOnly}
+                                      value={value}
+                                      label={label}
+                                      enabled={enabled}
+                                      keywords={keywords}
+                                      isHighlighted={selectedIndex === globalIndex}
+                                      itemIndex={globalIndex}
+                                    />
+                                  );
+                                },
+                              )}
+                            </div>
+                          ))
                         ) : (
+                          // Render flat filtered options
                           filteredOptions.map(({ value, label, enabled, keywords }, index) => (
                             <SelectOptionItem
                               key={value}
@@ -654,8 +713,38 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                             />
                           ))
                         )
+                      ) : groupBy && groupedOptions ? (
+                        // When not searching and grouping is enabled, render grouped options
+                        Object.keys(groupedOptions).length === 0 ? (
+                          <div>{emptyListNode}</div>
+                        ) : (
+                          <>
+                            {Object.entries(groupedOptions).map(([groupName, groupOptions]) => (
+                              <div key={groupName}>
+                                {groupHeaderRenderer ? (
+                                  <div className={styles.groupHeader}>
+                                    {groupHeaderRenderer(groupName)}
+                                  </div>
+                                ) : (
+                                  <div className={styles.groupHeader}>{groupName}</div>
+                                )}
+                                {groupOptions.map(({ value, label, enabled, keywords }) => (
+                                  <SelectOptionItem
+                                    key={value}
+                                    readOnly={readOnly}
+                                    value={value}
+                                    label={label}
+                                    enabled={enabled}
+                                    keywords={keywords}
+                                    isHighlighted={false}
+                                  />
+                                ))}
+                              </div>
+                            ))}
+                          </>
+                        )
                       ) : (
-                        // When not searching, show all children (includes Options and other components like Button)
+                        // When not searching and no grouping, show all children
                         <>
                           {children}
                           {options.size === 0 && <div>{emptyListNode}</div>}
