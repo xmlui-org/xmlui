@@ -10,26 +10,43 @@ export abstract class EngineError extends Error {
 }
 
 /**
- * Extracts information from the error object received from the backend
+ * Extracts information from the error object received from the backend.
+ * Handles common API error response formats including:
+ * - RFC 7807 Problem Details
+ * - Simple message pattern
+ * - Code + message pattern
+ * - Nested errors (validation)
+ * - Google/Microsoft style
+ * 
+ * (Generated using AI)
  */
 export class GenericBackendError extends EngineError {
   readonly errorCategory = "GenericBackendError";
   details: any;
   statusCode: number | undefined;
+
   constructor(public readonly info: any, errorCode: number | undefined) {
-    // `The backend raised an error. (reasonCode: ${info.reasonCode}, isBusiness: ${info.isBusiness}, message: ${info.message})`
-    let message = "";
-    if (info?.code) {
-      message += `[Error code: ${info.code}]\n`;
-    }
-    if (info?.details && typeof info.details === "string") {
-      message += `${info.details}`;
-    } else if(info?.message){
-      message += `${info.message}`;
-    }
-    super(message || info?.message || "Unknown error");
-    
-    this.details = info;
+    // Extract the main message (various field names across API formats)
+    const message =
+      info?.message ||
+      info?.error?.message ||
+      info?.title ||           // RFC 7807
+      (typeof info?.error === "string" ? info.error : null) ||
+      (typeof info === "string" ? info : null) ||
+      "Unknown error";
+
+    // Extract details (various field names across API formats)
+    const details =
+      info?.details ||
+      info?.detail ||          // RFC 7807
+      info?.error?.details ||
+      info?.errors ||          // Validation errors array
+      (info?.error && typeof info.error === "object" ? info.error : null) ||
+      null;
+
+    super(message);
+
+    this.details = details;
     this.statusCode = errorCode;
     // --- Set the prototype explicitly.
     Object.setPrototypeOf(this, GenericBackendError.prototype);
@@ -82,5 +99,13 @@ export class ThrowStatementError extends EngineError {
     super(message);
     this.message = message;
     Object.setPrototypeOf(this, ThrowStatementError.prototype);
+  }
+}
+
+export function createContextVariableError(err: GenericBackendError) {
+  return {
+    statusCode: err.statusCode || 500,
+    message: err.message || "An error occurred",
+    details: err.details || { },
   }
 }
