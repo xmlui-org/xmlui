@@ -14,7 +14,7 @@ This property customizes the success message displayed in a toast after the fini
 
 ```xmlui copy
  <APICall
-  id="ds"
+  id="api"
   method="post"
   url="/api/shopping-list" 
   completedNotificationMessage="Result: {JSON.stringify($result).substring(0, 100)}" />
@@ -27,8 +27,8 @@ This property customizes the success message displayed in a toast after the fini
 This property customizes the message displayed in a toast when the API invocation results in an error. Use the `$error` context object to get the error code (`$error.statusCode`) optional message (`$error.message`), or details coming from the response body (`$error.details`). For example, you can use the following code snippet to display the status code and the details:
 
 ```xmlui copy
- <DataSource
-  id="ds"
+ <APICall
+  id="api"
   method="post"
   url="/api/shopping-list"
   errorNotificationMessage="${error.statusCode}, ${error.message} {JSON.stringify($error.details)}" />
