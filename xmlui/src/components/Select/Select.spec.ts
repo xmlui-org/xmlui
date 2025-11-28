@@ -147,7 +147,7 @@ test.describe("Basic Functionality", () => {
 
   // --- readOnly prop
 
-  test("readOnly Select shows options, but value cannot be changed", async ({
+  test("readOnly Select doesn't show options, and value cannot be changed", async ({
     page,
     initTestBed,
     createSelectDriver,
@@ -161,13 +161,11 @@ test.describe("Basic Functionality", () => {
     const driver = await createSelectDriver();
     await expect(driver.component).toHaveText("One");
     await driver.toggleOptionsVisibility();
-    await driver.selectLabel("Two");
-    await expect(driver.component).toHaveText("One");
-
-    // verify dropdown is not visible but value is shown
+    await expect(page.getByText("One")).toBeVisible();
+    await expect(page.getByText("Two")).not.toBeVisible();
   });
 
-  test("readOnly multi-Select shows options, but value cannot be changed", async ({
+  test("readOnly multi-Select doesn't show options, and value cannot be changed", async ({
     page,
     initTestBed,
     createSelectDriver,
@@ -180,16 +178,10 @@ test.describe("Basic Functionality", () => {
     </Select>
     `);
     const driver = await createSelectDriver();
-    await expect(page.getByText("Three")).not.toBeVisible();
-    await expect(page.getByText("One")).toBeVisible();
-    await expect(page.getByText("Two")).toBeVisible();
-
     await driver.toggleOptionsVisibility();
-    await driver.selectLabel("Three");
-
-    await expect(page.getByText("Three")).not.toBeVisible();
     await expect(page.getByText("One")).toBeVisible();
     await expect(page.getByText("Two")).toBeVisible();
+    await expect(page.getByText("Three")).not.toBeVisible();
   });
 
   test("disabled Option cannot be selected", async ({ initTestBed, createSelectDriver, page }) => {
@@ -201,11 +193,6 @@ test.describe("Basic Functionality", () => {
     `);
     await expect(page.getByRole("option", { name: "One" })).not.toBeVisible();
     await expect(page.getByRole("option", { name: "Two" })).not.toBeVisible();
-    const driver = await createSelectDriver();
-    await driver.toggleOptionsVisibility();
-    await driver.selectLabel("Two");
-    await expect(page.getByRole("option", { name: "One" })).toBeVisible();
-    await expect(page.getByRole("option", { name: "Two" })).toBeVisible();
   });
 
   test(

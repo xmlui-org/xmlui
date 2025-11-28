@@ -1,12 +1,12 @@
 import type { CSSProperties, ReactNode } from "react";
-import { forwardRef, useCallback, useMemo } from "react";
+import { forwardRef, useCallback, useMemo, useState } from "react";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import styles from "./Select.module.scss";
 import Icon from "../Icon/IconNative";
 import classnames from "classnames";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import type { SingleValueType } from "./SelectNative";
-import type { Option, ValidationStatus } from "../abstractions";
+import type { ValidationStatus } from "../abstractions";
 import {
   Root,
   Trigger,
@@ -43,6 +43,7 @@ interface SimpleSelectProps {
   groupHeaderRenderer?: (groupName: string) => ReactNode;
   clearable?: boolean;
   onClear?: () => void;
+  children?: ReactNode;
 }
 
 export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
@@ -71,10 +72,12 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       groupHeaderRenderer,
       clearable,
       onClear,
+      children,
       ...rest
     } = props;
 
     const composedRef = forwardRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;
+    const [open, setOpen] = useState(false);
 
     // Convert value to string for Radix UI compatibility
     const stringValue = useMemo(() => {
@@ -114,7 +117,12 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
     }, [groupBy, options]);
 
     return (
-      <Root value={stringValue} onValueChange={handleValueChange}>
+      <Root
+        open={open}
+        value={stringValue}
+        onValueChange={handleValueChange}
+        onOpenChange={() => enabled && !readOnly && setOpen(!open)}
+      >
         <Trigger
           {...rest}
           id={id}
@@ -215,6 +223,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                   {Array.from(options).length === 0 && emptyListNode}
                 </>
               )}
+              {children}
             </Viewport>
             <ScrollDownButton className={styles.selectScrollDownButton}>
               <Icon name="chevrondown" />
