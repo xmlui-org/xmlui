@@ -2260,10 +2260,10 @@ test("general error messages are rendered in the summary", async ({
 
   // TODO: strip this down -> it's verbose but hard to read
   const warningDisplay = await createValidationDisplayDriver(
-    await formDriver.getValidationDisplaysBySeverity("warning"),
+    formDriver.getValidationDisplaysBySeverity("warning"),
   );
   const errorDisplay = await createValidationDisplayDriver(
-    await formDriver.getValidationDisplaysBySeverity("error"),
+    formDriver.getValidationDisplaysBySeverity("error"),
   );
 
   expect(await warningDisplay.getText()).toContain("Warning for the whole form");
