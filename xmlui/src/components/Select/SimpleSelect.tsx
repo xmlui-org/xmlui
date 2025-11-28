@@ -20,6 +20,7 @@ import {
 } from "@radix-ui/react-select";
 import { SelectOption } from "./SelectOption";
 import { useSelect } from "./SelectContext";
+import { Part } from "../Part/Part";
 
 interface SimpleSelectProps {
   value: SingleValueType;
@@ -123,53 +124,56 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
         onValueChange={handleValueChange}
         onOpenChange={() => enabled && !readOnly && setOpen(!open)}
       >
-        <Trigger
-          {...rest}
-          id={id}
-          ref={composedRef}
-          aria-haspopup="listbox"
-          style={style}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          disabled={!enabled}
-          className={classnames(className, styles.selectTrigger, {
-            [styles.error]: validationStatus === "error",
-            [styles.warning]: validationStatus === "warning",
-            [styles.valid]: validationStatus === "valid",
-          })}
-          onClick={(event) => {
-            // Prevent event propagation to parent elements (e.g., DropdownMenu)
-            // This ensures that clicking the Select trigger doesn't close the containing DropdownMenu
-            event.stopPropagation();
-          }}
-          autoFocus={autoFocus}
-        >
-          <div
-            className={classnames(styles.selectValue, {
-              [styles.placeholder]: value === undefined,
+        <Part partId="listWrapper">
+          <Trigger
+            {...rest}
+            id={id}
+            ref={composedRef}
+            aria-haspopup="listbox"
+            style={style}
+            onFocus={onFocus}
+            onBlur={onBlur}
+            disabled={!enabled}
+            className={classnames(className, styles.selectTrigger, {
+              [styles.error]: validationStatus === "error",
+              [styles.warning]: validationStatus === "warning",
+              [styles.valid]: validationStatus === "valid",
             })}
+            onClick={(event) => {
+              // Prevent event propagation to parent elements (e.g., DropdownMenu)
+              // This ensures that clicking the Select trigger doesn't close the containing DropdownMenu
+              event.stopPropagation();
+            }}
+            autoFocus={autoFocus}
           >
-            {selectedOption ? selectedOption.label : readOnly ? "" : placeholder}
-          </div>
-          {clearable && value !== undefined && value !== "" && !readOnly && enabled && (
-            <button
-              type="button"
-              className={styles.clearButton}
-              data-part-id="clearButton"
-              onPointerDown={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onClear?.();
-              }}
-              tabIndex={-1}
+            <div
+              className={classnames(styles.selectValue, {
+                [styles.placeholder]: value === undefined,
+              })}
             >
-              <Icon name="close" />
-            </button>
-          )}
-          <span className={styles.action}>
-            <Icon name="chevrondown" />
-          </span>
-        </Trigger>
+              {selectedOption ? selectedOption.label : readOnly ? "" : placeholder}
+            </div>
+            {clearable && value !== undefined && value !== "" && !readOnly && enabled && (
+              <Part partId="clearButton">
+                <button
+                  type="button"
+                  className={styles.clearButton}
+                  onPointerDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onClear?.();
+                  }}
+                  tabIndex={-1}
+                >
+                  <Icon name="close" />
+                </button>
+              </Part>
+            )}
+            <span className={styles.action}>
+              <Icon name="chevrondown" />
+            </span>
+          </Trigger>
+        </Part>
         <Portal container={root}>
           <Content
             collisionPadding={0}
