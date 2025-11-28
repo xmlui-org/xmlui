@@ -43,6 +43,9 @@ export const SelectOption = forwardRef<React.ElementRef<typeof Item>, Option>(
         {children ? (
           <>
             <div className={styles.selectOptionContent} ref={visibleContentRef}>
+              <span style={{ visibility: "hidden", position: "absolute", width: 0, height: 0 }}>
+                <ItemText>{label}</ItemText>
+              </span>
               {children}
             </div>
             {selectedValue === value && (
@@ -53,6 +56,9 @@ export const SelectOption = forwardRef<React.ElementRef<typeof Item>, Option>(
           </>
         ) : optionRenderer ? (
           <div className={styles.selectOptionContent} ref={visibleContentRef}>
+            <span style={{ visibility: "hidden", position: "absolute", width: 0, height: 0 }}>
+              <ItemText>{label}</ItemText>
+            </span>
             {optionRenderer(
               {
                 label,
@@ -66,7 +72,7 @@ export const SelectOption = forwardRef<React.ElementRef<typeof Item>, Option>(
         ) : (
           <>
             <div className={styles.selectOptionContent} ref={visibleContentRef}>
-              {label}
+              <ItemText>{label}</ItemText>
             </div>
             {selectedValue === value && (
               <ItemIndicator className={styles.selectItemIndicator}>
