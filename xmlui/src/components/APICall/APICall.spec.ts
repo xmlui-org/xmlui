@@ -866,6 +866,31 @@ test.describe("Basic Functionality", () => {
       await expect(page.getByText("Error 400: Bad request, Details: Invalid data")).toBeVisible();
     });
 
+    test("shows not found error notification on incorrect endpoint", async ({ initTestBed, createButtonDriver, page }) => {
+      await initTestBed(
+        `
+        <Fragment>
+          <APICall 
+            id="api" 
+            url="/api/error" 
+            method="post"
+            errorNotificationMessage="Error {$error.statusCode}: {$error.message}"
+          />
+          <Button testId="trigger" onClick="api.execute()" label="Execute" />
+        </Fragment>
+      `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const button = await createButtonDriver("trigger");
+      await button.click();
+
+      // Check for error notification
+      await expect(page.getByText("Error 404: <No error description>")).toBeVisible();
+    });
+
     test("shows unknown error notification", async ({ initTestBed, createButtonDriver, page }) => {
       await initTestBed(
         `
@@ -1097,9 +1122,9 @@ test.describe("Basic Functionality", () => {
         <Fragment>
           <APICall 
             id="api" 
-            url="/api/error" 
+            url="/api/error/400" 
             method="post"
-            onError="error => testState = error.statusCode + ' - ' + error.details.message"
+            onError="error => testState = error.statusCode + ' - ' + error.message"
           />
           <Button testId="trigger" onClick="api.execute()" label="Execute" />
         </Fragment>
