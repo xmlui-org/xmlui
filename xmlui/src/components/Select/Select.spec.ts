@@ -1198,7 +1198,13 @@ test.describe("Behaviors and Parts", () => {
     const listWrapper = page.locator("[data-part-id='listWrapper']");
     await expect(listWrapper).toBeVisible();
 
-    await component.hover();
+    // Close dropdown before hovering to show tooltip (modal overlay blocks hover)
+    await page.keyboard.press("Escape");
+    await expect(listWrapper).not.toBeVisible();
+
+    // Hover over the trigger (combobox role) specifically, not the tooltip wrapper
+    const trigger = page.getByRole("combobox");
+    await trigger.hover();
     const tooltip = page.getByRole("tooltip");
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toHaveText("Tooltip text");
@@ -1206,7 +1212,12 @@ test.describe("Behaviors and Parts", () => {
 
   test("parts are present when variant is added", async ({ page, initTestBed }) => {
     await initTestBed(
-      `<Select testId="test" variant="error" initialValue="1"><Option value="1" label="Test" /></Select>`,
+      `<Select testId="test" variant="CustomVariant" initialValue="1"><Option value="1" label="Test" /></Select>`,
+      {
+        testThemeVars: {
+          "borderColor-Select-CustomVariant": "rgb(255, 0, 0)",
+        },
+      },
     );
 
     const component = page.getByTestId("test");

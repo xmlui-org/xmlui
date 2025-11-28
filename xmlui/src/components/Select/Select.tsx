@@ -198,6 +198,7 @@ export const selectComponentRenderer = createComponentRenderer(
     lookupEventHandler,
     className,
     registerComponentApi,
+    ...rest
   }) => {
     const multiSelect = extractValue.asOptionalBoolean(node.props.multiSelect);
     const searchable = extractValue.asOptionalBoolean(node.props.searchable);
@@ -279,6 +280,7 @@ export const selectComponentRenderer = createComponentRenderer(
               }
             : undefined
         }
+        {...rest}
       >
         {renderChild(node.children)}
       </Select>
