@@ -39,10 +39,6 @@ export const SelectOption = forwardRef<React.ElementRef<typeof Item>, Option>(
         }}
         data-state={selectedValue === value && "checked"}
       >
-        {/* SelectItemText is used by SelectValue to display the selected value */}
-        <span style={{ display: "none" }}>
-          <ItemText>{label}</ItemText>
-        </span>
         {/* Visible content in the dropdown */}
         {children ? (
           <>
