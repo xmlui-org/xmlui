@@ -48,7 +48,6 @@ This property customizes the message displayed in a toast when the API invocatio
 ```xmlui copy
  <DataSource
   id="ds"
-  method="post"
   url="/api/shopping-list"
   errorNotificationMessage="${error.statusCode}, ${error.message} {JSON.stringify($error.details)}" />
 ```
