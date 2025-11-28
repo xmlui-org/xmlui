@@ -619,6 +619,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
               groupHeaderRenderer={groupHeaderRenderer}
               clearable={clearable}
               onClear={clearValue}
+              {...rest}
             >
               {children}
             </SimpleSelect>

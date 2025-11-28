@@ -1160,10 +1160,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip).toHaveText("Tooltip text");
   });
 
-  test("can select part: 'listWrapper'", async ({ page, initTestBed }) => {
+  test("can select part: 'listWrapper'", async ({ page, initTestBed, createSelectDriver }) => {
     await initTestBed(`<Select testId="test"><Option value="1" label="Test" /></Select>`);
-    const component = page.getByTestId("test");
-    await component.click(); // Open dropdown
+    const driver = await createSelectDriver("test");
+    await driver.toggleOptionsVisibility(); // Open dropdown
     const listWrapper = page.locator("[data-part-id='listWrapper']");
     await expect(listWrapper).toBeVisible();
   });

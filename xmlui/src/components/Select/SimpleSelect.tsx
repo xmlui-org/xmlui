@@ -124,56 +124,54 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
         onValueChange={handleValueChange}
         onOpenChange={() => enabled && !readOnly && setOpen(!open)}
       >
-        <Part partId="listWrapper">
-          <Trigger
-            {...rest}
-            id={id}
-            ref={composedRef}
-            aria-haspopup="listbox"
-            style={style}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            disabled={!enabled}
-            className={classnames(className, styles.selectTrigger, {
-              [styles.error]: validationStatus === "error",
-              [styles.warning]: validationStatus === "warning",
-              [styles.valid]: validationStatus === "valid",
+        <Trigger
+          {...rest}
+          id={id}
+          ref={composedRef}
+          aria-haspopup="listbox"
+          style={style}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          disabled={!enabled}
+          className={classnames(className, styles.selectTrigger, {
+            [styles.error]: validationStatus === "error",
+            [styles.warning]: validationStatus === "warning",
+            [styles.valid]: validationStatus === "valid",
+          })}
+          onClick={(event) => {
+            // Prevent event propagation to parent elements (e.g., DropdownMenu)
+            // This ensures that clicking the Select trigger doesn't close the containing DropdownMenu
+            event.stopPropagation();
+          }}
+          autoFocus={autoFocus}
+        >
+          <div
+            className={classnames(styles.selectValue, {
+              [styles.placeholder]: value === undefined,
             })}
-            onClick={(event) => {
-              // Prevent event propagation to parent elements (e.g., DropdownMenu)
-              // This ensures that clicking the Select trigger doesn't close the containing DropdownMenu
-              event.stopPropagation();
-            }}
-            autoFocus={autoFocus}
           >
-            <div
-              className={classnames(styles.selectValue, {
-                [styles.placeholder]: value === undefined,
-              })}
-            >
-              {selectedOption ? selectedOption.label : readOnly ? "" : placeholder}
-            </div>
-            {clearable && value !== undefined && value !== "" && !readOnly && enabled && (
-              <Part partId="clearButton">
-                <button
-                  type="button"
-                  className={styles.clearButton}
-                  onPointerDown={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    onClear?.();
-                  }}
-                  tabIndex={-1}
-                >
-                  <Icon name="close" />
-                </button>
-              </Part>
-            )}
-            <span className={styles.action}>
-              <Icon name="chevrondown" />
-            </span>
-          </Trigger>
-        </Part>
+            {selectedOption ? selectedOption.label : readOnly ? "" : placeholder}
+          </div>
+          {clearable && value !== undefined && value !== "" && !readOnly && enabled && (
+            <Part partId="clearButton">
+              <button
+                type="button"
+                className={styles.clearButton}
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onClear?.();
+                }}
+                tabIndex={-1}
+              >
+                <Icon name="close" />
+              </button>
+            </Part>
+          )}
+          <span className={styles.action}>
+            <Icon name="chevrondown" />
+          </span>
+        </Trigger>
         <Portal container={root}>
           <Content
             collisionPadding={0}
@@ -185,50 +183,52 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
             <ScrollUpButton className={styles.selectScrollUpButton}>
               <Icon name="chevronup" />
             </ScrollUpButton>
-            <Viewport className={styles.selectViewport} role="listbox" data-part-id="listWrapper">
-              {groupBy && groupedOptions ? (
-                // Render grouped options directly from options array
-                <>
-                  {Object.keys(groupedOptions).length === 0
-                    ? emptyListNode
-                    : Object.entries(groupedOptions).map(([groupName, groupOptions]) => (
-                        <Group key={groupName}>
-                          <Label className={styles.groupHeader}>
-                            {groupHeaderRenderer ? groupHeaderRenderer(groupName) : groupName}
-                          </Label>
-                          {groupOptions.map((option) => (
-                            <SelectOption
-                              key={option.value}
-                              value={option.value}
-                              label={option.label}
-                              enabled={option.enabled}
-                              className={styles.selectOption}
-                            >
-                              {option.children}
-                            </SelectOption>
-                          ))}
-                        </Group>
-                      ))}
-                </>
-              ) : (
-                // Render flat options
-                <>
-                  {Array.from(options).map((option) => (
-                    <SelectOption
-                      key={option.value}
-                      value={option.value}
-                      label={option.label}
-                      enabled={option?.enabled}
-                      className={styles.selectOption}
-                    >
-                      {option.children}
-                    </SelectOption>
-                  ))}
-                  {Array.from(options).length === 0 && emptyListNode}
-                </>
-              )}
-              {children}
-            </Viewport>
+            <Part partId="listWrapper">
+              <Viewport className={styles.selectViewport} role="listbox">
+                {groupBy && groupedOptions ? (
+                  // Render grouped options directly from options array
+                  <>
+                    {Object.keys(groupedOptions).length === 0
+                      ? emptyListNode
+                      : Object.entries(groupedOptions).map(([groupName, groupOptions]) => (
+                          <Group key={groupName}>
+                            <Label className={styles.groupHeader}>
+                              {groupHeaderRenderer ? groupHeaderRenderer(groupName) : groupName}
+                            </Label>
+                            {groupOptions.map((option) => (
+                              <SelectOption
+                                key={option.value}
+                                value={option.value}
+                                label={option.label}
+                                enabled={option.enabled}
+                                className={styles.selectOption}
+                              >
+                                {option.children}
+                              </SelectOption>
+                            ))}
+                          </Group>
+                        ))}
+                  </>
+                ) : (
+                  // Render flat options
+                  <>
+                    {Array.from(options).map((option) => (
+                      <SelectOption
+                        key={option.value}
+                        value={option.value}
+                        label={option.label}
+                        enabled={option?.enabled}
+                        className={styles.selectOption}
+                      >
+                        {option.children}
+                      </SelectOption>
+                    ))}
+                    {Array.from(options).length === 0 && emptyListNode}
+                  </>
+                )}
+                {children}
+              </Viewport>
+            </Part>
             <ScrollDownButton className={styles.selectScrollDownButton}>
               <Icon name="chevrondown" />
             </ScrollDownButton>
