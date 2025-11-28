@@ -24,7 +24,6 @@ import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { OptionContext, useOption } from "./OptionContext";
 import { HiddenOption } from "./HiddenOption";
 import { SimpleSelect } from "./SimpleSelect";
-import { SelectOption } from "./SelectOption";
 
 const PART_LIST_WRAPPER = "listWrapper";
 const PART_CLEAR_BUTTON = "clearButton";

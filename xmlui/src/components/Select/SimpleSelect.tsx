@@ -190,7 +190,9 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                               label={option.label}
                               enabled={option.enabled}
                               className={styles.selectOption}
-                            />
+                            >
+                              {option.children}
+                            </SelectOption>
                           ))}
                         </Group>
                       ))}
@@ -205,7 +207,9 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                       label={option.label}
                       enabled={option?.enabled}
                       className={styles.selectOption}
-                    />
+                    >
+                      {option.children}
+                    </SelectOption>
                   ))}
                   {optionsArray.length === 0 && emptyListNode}
                 </>

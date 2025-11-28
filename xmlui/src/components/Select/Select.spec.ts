@@ -208,7 +208,9 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("option", { name: "Two" })).toBeVisible();
   });
 
-  test("clicking label brings up the options",{ tag: "@smoke" },
+  test(
+    "clicking label brings up the options",
+    { tag: "@smoke" },
     async ({ initTestBed, page, createSelectDriver }) => {
       await initTestBed(`
     <Select label="Choose an option">
