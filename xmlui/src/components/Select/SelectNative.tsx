@@ -276,6 +276,10 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
+  // Use initialValue as fallback when value is undefined
+  // This ensures the component displays the initial value immediately on first render
+  const currentValue = value !== undefined ? value : initialValue;
+
   // Filter options based on search term
   const filteredOptions = useMemo(() => {
     if (!searchTerm || searchTerm.trim() === "") {
@@ -353,12 +357,12 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   const toggleOption = useCallback(
     (selectedValue: SingleValueType) => {
       const newSelectedValue = multiSelect
-        ? Array.isArray(value)
-          ? value.map((v) => String(v)).includes(String(selectedValue))
-            ? value.filter((v) => String(v) !== String(selectedValue))
-            : [...value, selectedValue]
+        ? Array.isArray(currentValue)
+          ? currentValue.map((v) => String(v)).includes(String(selectedValue))
+            ? currentValue.filter((v) => String(v) !== String(selectedValue))
+            : [...currentValue, selectedValue]
           : [selectedValue]
-        : String(selectedValue) === String(value)
+        : String(selectedValue) === String(currentValue)
           ? null
           : selectedValue;
       updateState({ value: newSelectedValue });
@@ -367,7 +371,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
         setOpen(false);
       }
     },
-    [multiSelect, value, updateState, onDidChange],
+    [multiSelect, currentValue, updateState, onDidChange],
   );
 
   // Clear selected value
@@ -557,7 +561,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     () => ({
       multiSelect,
       readOnly,
-      value,
+      value: currentValue,
       onChange: toggleOption,
       setOpen,
       setSelectedIndex,
@@ -573,7 +577,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     [
       multiSelect,
       readOnly,
-      value,
+      currentValue,
       toggleOption,
       options,
       selectedIndex,
@@ -592,7 +596,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
           {useSimpleSelect ? (
             // SimpleSelect mode (Radix UI Select)
             <SimpleSelect
-              value={value as SingleValueType}
+              value={currentValue as SingleValueType}
               onValueChange={(val) => toggleOption(val)}
               id={id}
               style={style}
@@ -676,7 +680,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                 autoFocus={autoFocus}
               >
                 <SelectTriggerValue
-                  value={value}
+                  value={currentValue}
                   placeholder={placeholder}
                   readOnly={readOnly}
                   multiSelect={multiSelect}
@@ -685,7 +689,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                   toggleOption={toggleOption}
                 />
                 <SelectTriggerActions
-                  value={value}
+                  value={currentValue}
                   multiSelect={multiSelect}
                   enabled={enabled}
                   readOnly={readOnly}

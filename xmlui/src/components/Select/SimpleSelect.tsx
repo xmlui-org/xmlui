@@ -2,12 +2,11 @@ import type { CSSProperties, ReactNode } from "react";
 import { forwardRef, useCallback, useMemo } from "react";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import styles from "./Select.module.scss";
-import { useSelect } from "./SelectContext";
 import Icon from "../Icon/IconNative";
 import classnames from "classnames";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import type { SingleValueType } from "./SelectNative";
-import type { ValidationStatus } from "../abstractions";
+import type { Option, ValidationStatus } from "../abstractions";
 import {
   Root,
   Trigger,
@@ -20,6 +19,7 @@ import {
   Label,
 } from "@radix-ui/react-select";
 import { SelectOption } from "./SelectOption";
+import { useSelect } from "./SelectContext";
 
 interface SimpleSelectProps {
   value: SingleValueType;
@@ -48,6 +48,7 @@ interface SimpleSelectProps {
 export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
   function SimpleSelect(props, forwardedRef) {
     const { root } = useTheme();
+    const { options } = useSelect();
     const {
       enabled,
       onBlur,
@@ -73,7 +74,6 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       ...rest
     } = props;
 
-    const { options } = useSelect();
     const composedRef = forwardRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;
 
     // Convert value to string for Radix UI compatibility
@@ -90,15 +90,15 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       [onValueChange, readOnly],
     );
 
-    const optionsArray = useMemo(() => Array.from(options), [options]);
-
     const selectedOption = useMemo(() => {
-      return optionsArray.find((option) => String(option.value) === String(value));
-    }, [optionsArray, value]);
+      return Array.from(options).find((option) => String(option.value) === String(value));
+    }, [options, value]);
 
     // Group options if groupBy is provided
     const groupedOptions = useMemo(() => {
       if (!groupBy) return null;
+
+      const optionsArray = Array.from(options);
 
       const groups: Record<string, typeof optionsArray> = {};
 
@@ -111,7 +111,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       });
 
       return groups;
-    }, [groupBy, optionsArray]);
+    }, [groupBy, options]);
 
     return (
       <Root value={stringValue} onValueChange={handleValueChange}>
@@ -143,12 +143,13 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
           >
             {selectedOption ? selectedOption.label : readOnly ? "" : placeholder}
           </div>
-          {clearable && value !== undefined && !readOnly && (
+          {clearable && value !== undefined && value !== "" && !readOnly && enabled && (
             <button
               type="button"
               className={styles.clearButton}
               data-part-id="clearButton"
-              onClick={(e) => {
+              onPointerDown={(e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 onClear?.();
               }}
@@ -200,7 +201,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
               ) : (
                 // Render flat options
                 <>
-                  {optionsArray.map((option) => (
+                  {Array.from(options).map((option) => (
                     <SelectOption
                       key={option.value}
                       value={option.value}
@@ -211,7 +212,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                       {option.children}
                     </SelectOption>
                   ))}
-                  {optionsArray.length === 0 && emptyListNode}
+                  {Array.from(options).length === 0 && emptyListNode}
                 </>
               )}
             </Viewport>
