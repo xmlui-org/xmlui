@@ -36,13 +36,18 @@ export class GenericBackendError extends EngineError {
       "Unknown error";
 
     // Extract details (various field names across API formats)
-    const details =
+    const extractedDetails =
       info?.details ||
       info?.detail ||          // RFC 7807
       info?.error?.details ||
       info?.errors ||          // Validation errors array
       (info?.error && typeof info.error === "object" ? info.error : null) ||
       null;
+
+    // Build details object, including issues if present at top level
+    const details = extractedDetails 
+      ? (info?.issues ? { ...extractedDetails, issues: info.issues } : extractedDetails)
+      : (info?.issues ? { issues: info.issues } : null);
 
     super(message);
 
