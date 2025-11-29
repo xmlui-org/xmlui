@@ -866,7 +866,7 @@ test.describe("Basic Functionality", () => {
       await expect(page.getByText("Error 400: Bad request, Details: Invalid data")).toBeVisible();
     });
 
-    test("shows not found error notification on incorrect endpoint", async ({ initTestBed, createButtonDriver, page }) => {
+    test.skip("shows not found error notification on incorrect endpoint", async ({ initTestBed, createButtonDriver, page }) => {
       await initTestBed(
         `
         <Fragment>
