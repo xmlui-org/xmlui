@@ -39,6 +39,7 @@ type MarkdownProps = {
   className?: string;
   codeHighlighter?: CodeHighlighter;
   showHeadingAnchors?: boolean;
+  grayscale?: boolean;
 };
 
 function PreTagComponent({ id, children, codeHighlighter }) {
@@ -91,6 +92,7 @@ export const Markdown = memo(
       className,
       codeHighlighter,
       showHeadingAnchors,
+      grayscale,
       ...rest
     }: MarkdownProps,
     ref,
@@ -122,7 +124,11 @@ export const Markdown = memo(
       <div
         {...rest}
         ref={ref}
-        className={classnames(styles.markdownContent, className)}
+        className={classnames(
+          styles.markdownContent,
+          { [styles.grayscale]: grayscale },
+          className
+        )}
         style={style}
       >
         <ReactMarkdown

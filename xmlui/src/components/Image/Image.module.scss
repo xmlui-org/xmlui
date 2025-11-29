@@ -23,6 +23,10 @@ $borderColor-Image: createThemeVar("borderColor-Image");
     &.clickable {
       cursor: pointer;
     }
+
+    &.grayscale {
+      filter: grayscale(100%);
+    }
   }
 }
 
