@@ -11,6 +11,7 @@ import { randomUUID } from "../utils/misc";
 import type { ApiActionOptions, ApiOperationDef } from "../RestApiProxy";
 import RestApiProxy from "../RestApiProxy";
 import { createAction } from "./actions";
+import { createContextVariableError } from "../EngineError";
 
 function findQueryKeysToUpdate(updates: string | string[], queryClient: QueryClient) {
   const queryKeysToUpdate: Array<QueryKey> = [];
@@ -384,7 +385,7 @@ export async function callApi(
       toast.dismiss(loadingToastId);
     }
     return result;
-  } catch (e) {
+  } catch (e: any) {
     if (optimisticValuesByQueryKeys.size) {
       await appContext.queryClient!.invalidateQueries();
     }
@@ -393,7 +394,7 @@ export async function callApi(
     });
     const result = await onErrorFn?.(e, stateContext["$param"]);
     const errorMessage = extractParam(
-      { ...stateContext, $error: e },
+      { ...stateContext, $error: createContextVariableError(e) },
       errorNotificationMessage,
       appContext,
     );

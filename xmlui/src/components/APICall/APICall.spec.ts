@@ -34,10 +34,20 @@ const basicApiInterceptor: ApiInterceptorDefinition = {
       method: "get",
       handler: `console.log('hd', $requestHeaders); return { headers: $requestHeaders };`,
     },
-    "error-test": {
-      url: "/api/error",
+    "error-test-400": {
+      url: "/api/error/400",
       method: "post",
       handler: `throw Errors.HttpError(400, { message: "Bad request", details: "Invalid data" });`,
+    },
+    "error-test-500": {
+      url: "/api/error/500",
+      method: "post",
+      handler: `throw Errors.HttpError(500, { message: "Internal server error", details: "Something went wrong" });`,
+    },
+    "error-test-unknown": {
+      url: "/api/error/unknown",
+      method: "post",
+      handler: `throw new Error("Unknown error occurred");`,
     },
     "slow-test": {
       url: "/api/slow",
@@ -731,7 +741,7 @@ test.describe("Basic Functionality", () => {
       await expect(page.getByText("Success: GET success")).toBeVisible();
     });
 
-    test("shows error notification with error details", async ({
+    test("shows error notification: code 400", async ({
       initTestBed,
       createButtonDriver,
       page,
@@ -741,9 +751,9 @@ test.describe("Basic Functionality", () => {
         <Fragment>
           <APICall 
             id="api" 
-            url="/api/error" 
+            url="/api/error/400" 
             method="post"
-            errorNotificationMessage="Error {$error.statusCode}: {$error.details.message}"
+            errorNotificationMessage="Error {$error.statusCode}: {$error.message}"
           />
           <Button testId="trigger" onClick="api.execute()" label="Execute" />
         </Fragment>
@@ -759,7 +769,154 @@ test.describe("Basic Functionality", () => {
       // Check for error notification
       await expect(page.getByText("Error 400: Bad request")).toBeVisible();
     });
+
+    test("shows error notification and onError show the same", async ({
+      initTestBed,
+      createButtonDriver,
+      page,
+    }) => {
+      const { testStateDriver } = await initTestBed(
+        `
+        <Fragment>
+          <APICall 
+            id="api" 
+            url="/api/error/400" 
+            method="post"
+            errorNotificationMessage="Error {$error.statusCode}: {$error.message}"
+            onError="(error) => testState = 'Error ' + error.statusCode + ': ' + error.message"
+          />
+          <Button testId="trigger" onClick="api.execute()" label="Execute" />
+        </Fragment>
+      `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const button = await createButtonDriver("trigger");
+      await button.click();
+
+      // Check for error notification
+      await expect(
+        page
+          .locator("div")
+          .filter({ hasText: /^Error 400: Bad request$/ })
+          .nth(3),
+      ).toBeVisible();
+      await expect
+        .poll(testStateDriver.testState, { timeout: 2000 })
+        .toEqual("Error 400: Bad request");
+    });
+
+    test("shows error notification: code 500", async ({
+      initTestBed,
+      createButtonDriver,
+      page,
+    }) => {
+      await initTestBed(
+        `
+        <Fragment>
+          <APICall 
+            id="api" 
+            url="/api/error/500" 
+            method="post"
+            errorNotificationMessage="Error {$error.statusCode}: {$error.message}"
+          />
+          <Button testId="trigger" onClick="api.execute()" label="Execute" />
+        </Fragment>
+      `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const button = await createButtonDriver("trigger");
+      await button.click();
+
+      // Check for error notification
+      await expect(page.getByText("Error 500: Internal server error")).toBeVisible();
+    });
+
+    test("shows error notification with error details", async ({
+      initTestBed,
+      createButtonDriver,
+      page,
+    }) => {
+      await initTestBed(
+        `
+        <Fragment>
+          <APICall 
+            id="api" 
+            url="/api/error/400" 
+            method="post"
+            errorNotificationMessage="Error {$error.statusCode}: {$error.message}, Details: {$error.details}"
+          />
+          <Button testId="trigger" onClick="api.execute()" label="Execute" />
+        </Fragment>
+      `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const button = await createButtonDriver("trigger");
+      await button.click();
+
+      // Check for error notification
+      await expect(page.getByText("Error 400: Bad request, Details: Invalid data")).toBeVisible();
+    });
+
+    test.skip("shows not found error notification on incorrect endpoint", async ({ initTestBed, createButtonDriver, page }) => {
+      await initTestBed(
+        `
+        <Fragment>
+          <APICall 
+            id="api" 
+            url="/api/error" 
+            method="post"
+            errorNotificationMessage="Error {$error.statusCode}: {$error.message}"
+          />
+          <Button testId="trigger" onClick="api.execute()" label="Execute" />
+        </Fragment>
+      `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const button = await createButtonDriver("trigger");
+      await button.click();
+
+      // Check for error notification
+      await expect(page.getByText("Error 404: <No error description>")).toBeVisible();
+    });
+
+    test("shows unknown error notification", async ({ initTestBed, createButtonDriver, page }) => {
+      await initTestBed(
+        `
+        <Fragment>
+          <APICall 
+            id="api" 
+            url="/api/error/unknown" 
+            method="post"
+            errorNotificationMessage="Error {$error.statusCode}: {$error.message}, Details: {JSON.stringify($error.details)}"
+          />
+          <Button testId="trigger" onClick="api.execute()" label="Execute" />
+        </Fragment>
+      `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const button = await createButtonDriver("trigger");
+      await button.click();
+
+      // Check for error notification
+      await expect(page.getByText("Error 500: Error without message, Details: {}")).toBeVisible();
+    });
   });
+  
   // =============================================================================
   // EXECUTE METHOD TESTS
   // =============================================================================
@@ -965,9 +1122,9 @@ test.describe("Basic Functionality", () => {
         <Fragment>
           <APICall 
             id="api" 
-            url="/api/error" 
+            url="/api/error/400" 
             method="post"
-            onError="error => testState = error.statusCode + ' - ' + error.details.message"
+            onError="error => testState = error.statusCode + ' - ' + error.message"
           />
           <Button testId="trigger" onClick="api.execute()" label="Execute" />
         </Fragment>

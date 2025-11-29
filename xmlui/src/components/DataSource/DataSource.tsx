@@ -67,10 +67,7 @@ export const DataSourceMd = createMetadata({
       valueType: "string",
     },
     errorNotificationMessage: {
-      description:
-        "Set the message to display when the there is an error. " +
-        "You can use the `$error` context value in an expression to " +
-        "refer to the original error message.",
+      description: "",
       valueType: "string",
     },
     resultSelector: {

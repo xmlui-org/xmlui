@@ -66,8 +66,8 @@ export enum HttpStatusCode {
 }
 
 export class HttpError extends Error {
-  status;
-  details;
+  status: number;
+  details: Record<string, any> | undefined;
 
   constructor(status: number, details?: Record<string, any>) {
     super(details?.message || "Not found");
@@ -100,7 +100,7 @@ export class ConflictError extends HttpError {
 }
 
 function convertErrorDetails(messageOrDetails: string | Record<string, any>) {
-  let details;
+  let details : Record<string, any> | undefined = undefined;
   if (messageOrDetails) {
     if (typeof messageOrDetails === "string") {
       details = {

@@ -23,6 +23,7 @@ import { useShallowCompareMemoize } from "../utils/hooks";
 import { useIndexerContext } from "../../components/App/IndexerContext";
 import { createMetadata, d } from "../../components/metadata-helpers";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
+import { createContextVariableError } from "../EngineError";
 
 type LoaderProps = {
   loader: DataLoaderDef;
@@ -351,7 +352,7 @@ function DataLoader({
     async (error) => {
       loaderError(error);
       if (onError) {
-        const result = await onError(error);
+        const result = await onError(createContextVariableError(error));
         if (result === false) {
           if (loadingToastIdRef.current) {
             toast.dismiss(loadingToastIdRef.current);
@@ -362,7 +363,7 @@ function DataLoader({
       const errorMessage = extractParam(
         {
           ...stateRef.current.state,
-          $error: error?.toString(),
+          $error: createContextVariableError(error),
         },
         loader.props.errorNotificationMessage,
         stateRef.current.appContext,

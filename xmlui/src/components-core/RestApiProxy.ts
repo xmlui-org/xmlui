@@ -512,7 +512,7 @@ export default class RestApiProxy {
       body: requestBody,
     };
     if (onUploadProgress) {
-      console.log("Falling back to axios. Reason: onUploadProgress specified");
+      //console.log("Falling back to axios. Reason: onUploadProgress specified");
       const axios = (await import("axios")).default;
       try {
         const response = await axios.request({
