@@ -11,7 +11,7 @@ import {
 import { Portal } from "@ark-ui/react/portal";
 import { Select as ArkSelect, createListCollection } from "@ark-ui/react/select";
 import classnames from "classnames";
-import styles from "./Select.module.scss";
+import styles from "./Select2.module.scss";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
