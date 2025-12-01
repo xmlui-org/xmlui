@@ -537,7 +537,7 @@ const Form = forwardRef(function (
 
   const cancelButton =
     cancelLabel === "" ? null : (
-      <Part partId={PART_CANCEL_BUTTON}>
+      <Part partId={PART_CANCEL_BUTTON} key={PART_CANCEL_BUTTON}>
         <Button
           key="cancel"
           type="button"
@@ -551,7 +551,7 @@ const Form = forwardRef(function (
     );
   const submitButton = useMemo(
     () => (
-      <Part partId={PART_SUBMIT_BUTTON}>
+      <Part partId={PART_SUBMIT_BUTTON} key={PART_SUBMIT_BUTTON}>
         <Button key="submit" type={"submit"} disabled={!isEnabled || !enableSubmit}>
           {formState.submitInProgress ? saveInProgressLabel : saveLabel}
         </Button>
@@ -564,14 +564,20 @@ const Form = forwardRef(function (
     return cloneDeep(cleanUpSubject(formState.subject, formState.noSubmitFields));
   }, [formState.subject, formState.noSubmitFields]);
 
+  const getIsDirtyFlag = useCallback(()=>{
+    return isDirty;
+  }, [isDirty]);
+
+
   useEffect(() => {
     registerComponentApi?.({
       reset: doReset,
       update: updateData,
       validate: doValidate,
       getData,
+      isDirty: getIsDirtyFlag
     });
-  }, [doReset, updateData, doValidate, getData, registerComponentApi]);
+  }, [doReset, updateData, doValidate, getData, registerComponentApi, getIsDirtyFlag]);
 
   let safeButtonRow = (
     <>
