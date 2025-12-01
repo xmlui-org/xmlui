@@ -224,6 +224,14 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     overflow: hidden;
   }
 
+  .selectTriggerContent {
+    display: flex;
+    flex: 1;
+    justify-content: start;
+    align-items: center;
+    color: $textColor-placeholder-Select;
+  }
+
   /**
    * Common trigger value and actions
    */

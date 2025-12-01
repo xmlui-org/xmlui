@@ -24,6 +24,7 @@
     "gen:langserver-metadata": "node scripts/get-langserver-metadata.js > src/language-server/xmlui-metadata-generated.js"
   },
   "dependencies": {
+    "@ark-ui/react": "5.29.1",
     "@eslint-community/regexpp": "4.10.0",
     "@formkit/auto-animate": "0.7.0",
     "@modyfi/vite-plugin-yaml": "1.1.0",
