@@ -14,6 +14,8 @@ export type Option = {
   keywords?: string[];
   children?: ReactNode;
   optionRenderer?: (contextVars: any) => ReactNode;
+  // Allow any additional properties for grouping
+  [key: string]: any;
 };
 
 export type Accordion = {
@@ -383,7 +385,7 @@ const TextVariantMapping = [
   "h6",
   "span",
 ] as const;
-type TextVariantMappingType = typeof TextVariantMapping[number];
+type TextVariantMappingType = (typeof TextVariantMapping)[number];
 
 export const TextVariantElement: Record<TextVariant, TextVariantMappingType> = {
   abbr: "abbr",

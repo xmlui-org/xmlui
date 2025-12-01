@@ -58,6 +58,40 @@ A dropdown component for selecting options from a list, built on top of Ark UI's
 </Select2>
 ```
 
+### With Grouping
+
+You can group options by any custom property. Just add the property to each `Option` and specify its name in `groupBy`:
+
+```xml
+<Select2 groupBy="type">
+  <Option value="apple" label="Apple" type="fruit"/>
+  <Option value="banana" label="Banana" type="fruit"/>
+  <Option value="carrot" label="Carrot" type="vegetable"/>
+  <Option value="lettuce" label="Lettuce" type="vegetable"/>
+</Select2>
+```
+
+You can use any property name for grouping:
+
+```xml
+<Select2 groupBy="category">
+  <Option value="react" label="React" category="Frontend"/>
+  <Option value="node" label="Node.js" category="Backend"/>
+  <Option value="postgres" label="PostgreSQL" category="Database"/>
+</Select2>
+```
+
+Combined with multi-select, searchable, and clearable:
+
+```xml
+<Select2 multiSelect="{true}" searchable="{true}" clearable="{true}" groupBy="type">
+  <Option value="apple" label="Apple" type="fruit"/>
+  <Option value="banana" label="Banana" type="fruit"/>
+  <Option value="carrot" label="Carrot" type="vegetable"/>
+  <Option value="lettuce" label="Lettuce" type="vegetable"/>
+</Select2>
+```
+
 ### Dynamic Options with Items
 
 ```xml
@@ -92,6 +126,7 @@ All props from the original `Select` component are supported:
 - `searchable`: Enable search functionality (default: false)
 - `multiSelect`: Enable multiple selection (default: false)
 - `clearable`: Show clear button (default: false)
+- `groupBy`: Group options by any custom property name (e.g., "type", "category"). Add the property to each `Option` and specify its name here.
 
 ### Event Handlers
 - `onDidChange`: Called when value changes

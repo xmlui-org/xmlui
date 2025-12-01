@@ -72,6 +72,7 @@ interface Select2Props {
   searchable?: boolean;
   multiSelect?: boolean;
   clearable?: boolean;
+  groupBy?: string;
 
   // Templates and renderers (legacy - kept for compatibility)
   valueRenderer?: (item: Option, removeItem: () => void) => ReactNode;
@@ -151,6 +152,7 @@ export const Select2 = forwardRef<HTMLDivElement, Select2Props>(function Select2
     searchable = defaultProps.searchable,
     multiSelect = defaultProps.multiSelect,
     clearable = defaultProps.clearable,
+    groupBy,
 
     emptyListTemplate,
     valueRenderer,
@@ -197,13 +199,38 @@ export const Select2 = forwardRef<HTMLDivElement, Select2Props>(function Select2
 
   // Create collection for ark-ui
   const collection = useMemo(() => {
-    const items = filteredOptions.map((opt) => ({
-      label: opt.label || opt.value,
-      value: String(opt.value),
-      disabled: opt.enabled === false,
-    }));
-    return createListCollection({ items });
-  }, [filteredOptions]);
+    const items = filteredOptions.map((opt) => {
+      const item: any = {
+        label: opt.label || opt.value,
+        value: String(opt.value),
+        disabled: opt.enabled === false,
+      };
+      // Copy all additional properties from the option
+      Object.keys(opt).forEach((key) => {
+        if (
+          ![
+            "label",
+            "value",
+            "enabled",
+            "style",
+            "className",
+            "readOnly",
+            "keywords",
+            "children",
+            "optionRenderer",
+          ].includes(key)
+        ) {
+          item[key] = (opt as any)[key];
+        }
+      });
+      return item;
+    });
+    return createListCollection({
+      items,
+      // Use groupBy function if groupBy prop is provided - group by the property name specified
+      ...(groupBy ? { groupBy: (item: any) => item[groupBy] || "" } : {}),
+    });
+  }, [filteredOptions, groupBy]);
 
   // Convert value to string array for ark-ui
   const arkValue = useMemo(() => valueToStringArray(value, multiSelect), [value, multiSelect]);
@@ -459,7 +486,43 @@ export const Select2 = forwardRef<HTMLDivElement, Select2Props>(function Select2
                         <div className={styles.loading}>{inProgressNotificationMessage}</div>
                       ) : collection.items.length === 0 ? (
                         <div>{emptyListNode}</div>
+                      ) : groupBy ? (
+                        // Render grouped items
+                        collection.group().map(([groupLabel, groupItems]) => (
+                          <ArkSelect.ItemGroup key={groupLabel}>
+                            <ArkSelect.ItemGroupLabel>{groupLabel}</ArkSelect.ItemGroupLabel>
+                            {groupItems.map((item: any) => {
+                              const option = Array.from(options).find(
+                                (o) => String(o.value) === item.value,
+                              );
+                              const isSelected = arkValue.includes(item.value);
+
+                              return (
+                                <ArkSelect.Item
+                                  key={item.value}
+                                  item={item}
+                                  className={classnames(styles.multiSelectOption, {
+                                    [styles.disabledOption]: item.disabled,
+                                  })}
+                                  data-state={isSelected ? "checked" : undefined}
+                                >
+                                  <div className={styles.multiSelectOptionContent}>
+                                    {optionRenderer && option ? (
+                                      optionRenderer(option, value, false)
+                                    ) : (
+                                      <>
+                                        <ArkSelect.ItemText>{item.label}</ArkSelect.ItemText>
+                                        {isSelected && <Icon name="checkmark" />}
+                                      </>
+                                    )}
+                                  </div>
+                                </ArkSelect.Item>
+                              );
+                            })}
+                          </ArkSelect.ItemGroup>
+                        ))
                       ) : (
+                        // Render ungrouped items
                         <ArkSelect.ItemGroup>
                           {collection.items.map((item) => {
                             const option = Array.from(options).find(

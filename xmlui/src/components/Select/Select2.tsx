@@ -109,6 +109,13 @@ export const Select2Md = createMetadata({
       description: `This property enables a clear button that allows the user to clear the selected value(s).`,
       defaultValue: defaultProps.clearable,
     },
+    groupBy: {
+      description:
+        `This property enables grouping of options by any custom property name. ` +
+        `Specify the property name (e.g., "type", "category") that exists on your Option components. ` +
+        `Options will be automatically grouped based on the value of that property.`,
+      valueType: "string",
+    },
     modal: {
       isInternal: true,
       description: "internal modal prop",
@@ -194,6 +201,7 @@ export const select2ComponentRenderer = createComponentRenderer(
     const multiSelect = extractValue.asOptionalBoolean(node.props.multiSelect);
     const searchable = extractValue.asOptionalBoolean(node.props.searchable);
     const clearable = extractValue.asOptionalBoolean(node.props.clearable);
+    const groupBy = extractValue.asOptionalString(node.props.groupBy);
 
     const isControlled = node.props.value !== undefined;
     return (
@@ -208,6 +216,7 @@ export const select2ComponentRenderer = createComponentRenderer(
         updateState={isControlled ? undefined : updateState}
         searchable={searchable}
         clearable={clearable}
+        groupBy={groupBy}
         initialValue={extractValue(node.props.initialValue)}
         value={isControlled ? extractValue(node.props.value) : state?.value}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
