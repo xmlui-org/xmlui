@@ -89,29 +89,29 @@ type RowSelectionOperations = {
 
 /**
  * Hook for managing table row selection with optional bidirectional AppState synchronization.
- * 
+ *
  * ## AppState Synchronization Mechanism
- * 
+ *
  * When `syncWithAppState` is provided, this hook implements a robust bidirectional synchronization
  * between the table's selection state and an AppState instance. The synchronization prevents
  * infinite loops using a state machine approach.
- * 
+ *
  * ### State Machine Design
- * 
+ *
  * The sync operates through three states:
  * - `idle`: Normal state, ready to respond to changes from either side
  * - `updating_to_appstate`: Currently propagating table selection → AppState (blocks AppState → table)
  * - `updating_from_appstate`: Currently propagating AppState → table selection (blocks table → AppState)
- * 
+ *
  * ### Synchronization Flow
- * 
+ *
  * **AppState → Table (External Updates)**:
  * 1. AppState.value.selectedIds changes externally (e.g., from another component)
  * 2. Effect detects change and validates it's not from our own update (using source tracking)
  * 3. Sets state to `updating_from_appstate` to block reverse sync
  * 4. Updates table selection via setSelectedRowIds()
  * 5. Uses requestAnimationFrame to reset state to `idle` after update completes
- * 
+ *
  * **Table → AppState (User Interaction)**:
  * 1. User interacts with table (clicks, keyboard navigation)
  * 2. selectedItems changes through normal table selection logic
@@ -119,39 +119,39 @@ type RowSelectionOperations = {
  * 4. Sets state to `updating_to_appstate` to block reverse sync
  * 5. Calls syncWithAppState.update({ selectedIds: [...] })
  * 6. Uses requestAnimationFrame to reset state to `idle` after update completes
- * 
+ *
  * ### Loop Prevention Strategy
- * 
+ *
  * Multiple mechanisms prevent infinite loops:
  * - **State Machine**: Directional blocking prevents simultaneous updates
  * - **Source Tracking**: lastUpdateSourceRef tracks whether the last change came from 'table' or 'appstate'
  * - **Value Tracking**: lastAppStateSelectionRef and lastTableSelectionRef track last known values
  * - **Change Detection**: Only triggers updates when values actually differ using JSON.stringify comparison
  * - **Frame-Based Reset**: Uses requestAnimationFrame instead of setTimeout for deterministic timing
- * 
+ *
  * ### Usage with AppState
- * 
+ *
  * ```typescript
  * // In your component
  * const appState = useAppState('myBucket');
- * 
+ *
  * // Pass to Table
- * <Table 
+ * <Table
  *   items={data}
  *   syncWithAppState={appState}
  *   // ... other props
  * />
- * 
+ *
  * // AppState will contain: { selectedIds: ['id1', 'id2', ...] }
  * // Changes from either side are automatically synchronized
  * ```
- * 
+ *
  * ### Precedence Rules
- * 
+ *
  * - When both `initiallySelected` and `syncWithAppState` are provided, `syncWithAppState` takes precedence
  * - Multi-row selection limits are respected (single selection truncates to first ID)
  * - Only valid item IDs (present in current `items` array) are synchronized
- * 
+ *
  * @param options Configuration object for row selection behavior
  * @returns Row selection operations and state management interface
  */
@@ -161,6 +161,7 @@ export default function useRowSelection({
   rowsSelectable,
   enableMultiRowSelection,
   rowDisabledPredicate,
+  rowUnselectablePredicate,
   onSelectionDidChange,
   initiallySelected = EMPTY_ARRAY,
   syncWithAppState,
@@ -170,6 +171,7 @@ export default function useRowSelection({
   rowsSelectable: boolean;
   enableMultiRowSelection: boolean;
   rowDisabledPredicate?: (item: any) => boolean;
+  rowUnselectablePredicate?: (item: any) => boolean;
   onSelectionDidChange?: (newSelection: Item[]) => Promise<void>;
   initiallySelected?: string[];
   syncWithAppState?: any;
@@ -547,7 +549,7 @@ export default function useRowSelection({
     setSelectedRowIds(
       checked
         ? items
-            .filter((item) => (rowDisabledPredicate ? !rowDisabledPredicate(item) : true))
+            .filter((item) => !(rowDisabledPredicate?.(item) || rowUnselectablePredicate?.(item)))
             .map((item) => item[idKey])
         : [],
     );
