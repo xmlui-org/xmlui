@@ -168,7 +168,13 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
   /**
    * Common trigger styles for both SimpleSelect and searchable/multiSelect
    */
+
+
+ 
+
+
   .selectTrigger {
+    --x: 0;
     outline: none;
     width: 100%;
     gap: t.$space-1;
@@ -349,6 +355,10 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     width: 100%;
     height: auto;
     overflow: visible;
+  }
+
+  [data-scope='select'][data-part='positioner'] {
+    --x: 0 !important;
   }
 
   .commandInputContainer {

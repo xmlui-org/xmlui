@@ -21,6 +21,7 @@ import { SelectContext } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { OptionContext } from "./OptionContext";
 import { HiddenOption } from "./HiddenOption";
+import { useTheme, useThemes } from "../../components-core/theming/ThemeContext";
 
 const PART_LIST_WRAPPER = "listWrapper";
 const PART_CLEAR_BUTTON = "clearButton";
@@ -175,6 +176,7 @@ export const Select2 = forwardRef<HTMLDivElement, Select2Props>(function Select2
   const [options, setOptions] = useState(new Set<Option>());
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const { root } = useTheme();
 
   // Set initial state based on the initialValue prop
   useEffect(() => {
@@ -385,20 +387,17 @@ export const Select2 = forwardRef<HTMLDivElement, Select2Props>(function Select2
             open={isOpen}
             positioning={{
               sameWidth: true,
+              fitViewport: true,
             }}
           >
-            <ArkSelect.Control
-              ref={forwardedRef}
-              id={id}
-              style={style}
-              className={classnames(className, styles[validationStatus], {
-                [styles.disabled]: !enabled,
-                [styles.multi]: multiSelect,
-              })}
-              data-part-id={PART_LIST_WRAPPER}
-            >
+            <ArkSelect.Control ref={forwardedRef} data-part-id={PART_LIST_WRAPPER}>
               <ArkSelect.Trigger
-                className={styles.selectTrigger}
+                id={id}
+                style={style}
+                className={classnames(className, styles.selectTrigger, styles[validationStatus], {
+                  [styles.disabled]: !enabled,
+                  [styles.multi]: multiSelect,
+                })}
                 onFocus={onFocus}
                 onBlur={onBlur}
                 autoFocus={autoFocus}
@@ -460,107 +459,109 @@ export const Select2 = forwardRef<HTMLDivElement, Select2Props>(function Select2
                 </div>
               </ArkSelect.Trigger>
             </ArkSelect.Control>
+            {isOpen && (
+              <>
+                <Portal>
+                  <ArkSelect.Positioner>
+                    <ArkSelect.Content
+                      style={{ height: dropdownHeight }}
+                      className={classnames(styles.selectContent, styles[validationStatus])}
+                    >
+                      <div className={styles.command}>
+                        {searchable && (
+                          <div className={styles.commandInputContainer}>
+                            <Icon name="search" />
+                            <input
+                              role="searchbox"
+                              className={styles.commandInput}
+                              placeholder="Search..."
+                              value={searchTerm}
+                              onChange={(e) => setSearchTerm(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          </div>
+                        )}
+                        <div className={styles.commandList}>
+                          {inProgress ? (
+                            <div className={styles.loading}>{inProgressNotificationMessage}</div>
+                          ) : collection.items.length === 0 ? (
+                            <div>{emptyListNode}</div>
+                          ) : groupBy ? (
+                            // Render grouped items
+                            collection.group().map(([groupLabel, groupItems]) => (
+                              <ArkSelect.ItemGroup key={groupLabel}>
+                                <ArkSelect.ItemGroupLabel>{groupLabel}</ArkSelect.ItemGroupLabel>
+                                {groupItems.map((item: any) => {
+                                  const option = Array.from(options).find(
+                                    (o) => String(o.value) === item.value,
+                                  );
+                                  const isSelected = arkValue.includes(item.value);
 
-            <Portal>
-              <ArkSelect.Positioner>
-                <ArkSelect.Content
-                  style={{ height: dropdownHeight }}
-                  className={classnames(styles.selectContent, styles[validationStatus])}
-                >
-                  <div className={styles.command}>
-                    {searchable && (
-                      <div className={styles.commandInputContainer}>
-                        <Icon name="search" />
-                        <input
-                          role="searchbox"
-                          className={styles.commandInput}
-                          placeholder="Search..."
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                      </div>
-                    )}
-                    <div className={styles.commandList}>
-                      {inProgress ? (
-                        <div className={styles.loading}>{inProgressNotificationMessage}</div>
-                      ) : collection.items.length === 0 ? (
-                        <div>{emptyListNode}</div>
-                      ) : groupBy ? (
-                        // Render grouped items
-                        collection.group().map(([groupLabel, groupItems]) => (
-                          <ArkSelect.ItemGroup key={groupLabel}>
-                            <ArkSelect.ItemGroupLabel>{groupLabel}</ArkSelect.ItemGroupLabel>
-                            {groupItems.map((item: any) => {
-                              const option = Array.from(options).find(
-                                (o) => String(o.value) === item.value,
-                              );
-                              const isSelected = arkValue.includes(item.value);
-
-                              return (
-                                <ArkSelect.Item
-                                  key={item.value}
-                                  item={item}
-                                  className={classnames(styles.multiSelectOption, {
-                                    [styles.disabledOption]: item.disabled,
-                                  })}
-                                  data-state={isSelected ? "checked" : undefined}
-                                >
-                                  <div className={styles.multiSelectOptionContent}>
-                                    {optionRenderer && option ? (
-                                      optionRenderer(option, value, false)
-                                    ) : (
-                                      <>
-                                        <ArkSelect.ItemText>{item.label}</ArkSelect.ItemText>
-                                        {isSelected && <Icon name="checkmark" />}
-                                      </>
-                                    )}
-                                  </div>
-                                </ArkSelect.Item>
-                              );
-                            })}
-                          </ArkSelect.ItemGroup>
-                        ))
-                      ) : (
-                        // Render ungrouped items
-                        <ArkSelect.ItemGroup>
-                          {collection.items.map((item) => {
-                            const option = Array.from(options).find(
-                              (o) => String(o.value) === item.value,
-                            );
-                            const isSelected = arkValue.includes(item.value);
-
-                            return (
-                              <ArkSelect.Item
-                                key={item.value}
-                                item={item}
-                                className={classnames(styles.multiSelectOption, {
-                                  [styles.disabledOption]: item.disabled,
+                                  return (
+                                    <ArkSelect.Item
+                                      key={item.value}
+                                      item={item}
+                                      className={classnames(styles.multiSelectOption, {
+                                        [styles.disabledOption]: item.disabled,
+                                      })}
+                                      data-state={isSelected ? "checked" : undefined}
+                                    >
+                                      <div className={styles.multiSelectOptionContent}>
+                                        {optionRenderer && option ? (
+                                          optionRenderer(option, value, false)
+                                        ) : (
+                                          <>
+                                            <ArkSelect.ItemText>{item.label}</ArkSelect.ItemText>
+                                            {isSelected && <Icon name="checkmark" />}
+                                          </>
+                                        )}
+                                      </div>
+                                    </ArkSelect.Item>
+                                  );
                                 })}
-                                data-state={isSelected ? "checked" : undefined}
-                              >
-                                <div className={styles.multiSelectOptionContent}>
-                                  {optionRenderer && option ? (
-                                    optionRenderer(option, value, false)
-                                  ) : (
-                                    <>
-                                      <ArkSelect.ItemText>{item.label}</ArkSelect.ItemText>
-                                      {isSelected && <Icon name="checkmark" />}
-                                    </>
-                                  )}
-                                </div>
-                              </ArkSelect.Item>
-                            );
-                          })}
-                        </ArkSelect.ItemGroup>
-                      )}
-                    </div>
-                  </div>
-                </ArkSelect.Content>
-              </ArkSelect.Positioner>
-            </Portal>
+                              </ArkSelect.ItemGroup>
+                            ))
+                          ) : (
+                            // Render ungrouped items
+                            <ArkSelect.ItemGroup>
+                              {collection.items.map((item) => {
+                                const option = Array.from(options).find(
+                                  (o) => String(o.value) === item.value,
+                                );
+                                const isSelected = arkValue.includes(item.value);
 
-            <ArkSelect.HiddenSelect />
+                                return (
+                                  <ArkSelect.Item
+                                    key={item.value}
+                                    item={item}
+                                    className={classnames(styles.multiSelectOption, {
+                                      [styles.disabledOption]: item.disabled,
+                                    })}
+                                    data-state={isSelected ? "checked" : undefined}
+                                  >
+                                    <div className={styles.multiSelectOptionContent}>
+                                      {optionRenderer && option ? (
+                                        optionRenderer(option, value, false)
+                                      ) : (
+                                        <>
+                                          <ArkSelect.ItemText>{item.label}</ArkSelect.ItemText>
+                                          {isSelected && <Icon name="checkmark" />}
+                                        </>
+                                      )}
+                                    </div>
+                                  </ArkSelect.Item>
+                                );
+                              })}
+                            </ArkSelect.ItemGroup>
+                          )}
+                        </div>
+                      </div>
+                    </ArkSelect.Content>
+                  </ArkSelect.Positioner>
+                </Portal>
+                <ArkSelect.HiddenSelect />
+              </>
+            )}
           </ArkSelect.Root>
         </OptionContext.Provider>
       </SelectContext.Provider>
