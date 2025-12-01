@@ -357,10 +357,6 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     overflow: visible;
   }
 
-  [data-scope='select'][data-part='positioner'] {
-    --x: 0 !important;
-  }
-
   .commandInputContainer {
     display: flex;
     align-items: center;
