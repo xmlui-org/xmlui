@@ -1,5 +1,18 @@
 # xmlui
 
+## 0.11.20
+
+### Patch Changes
+
+- aaaeb59: Only show sorting indicators in the Table when the user hovers/focuses or orders by a column.
+- d5d08fd: Add isDirty() API to Form
+- 28317be: fix formItem initialValue with async loaded null field value
+- 2097a64: Add getData() API to Form
+- 4828156: Add disableInlineStyle property to Theme
+- 0481073: refactor: improve Breakout component to handle different layouts
+- 4686bfd: refactor: use radix for dropdown menu implementation
+- 710e72b: Inline styles can be disabled witht "appGlobals.disableInlineStyle: true" setting
+
 ## 0.11.19
 
 ### Patch Changes
