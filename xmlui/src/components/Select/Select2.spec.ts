@@ -744,7 +744,7 @@ test.describe("multiSelect", () => {
         <Option value="1" label="One"/>
         <Option value="2" label="Two"/>
       </Select2>
-      <Select2 testId="focused-select" multmultiSelect autoFocus>
+      <Select2 testId="focused-select" multiSelect autoFocus>
         <Option value="1" label="One"/>
         <Option value="2" label="Two"/>
       </Select2>

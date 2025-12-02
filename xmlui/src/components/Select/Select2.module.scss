@@ -387,13 +387,13 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
       justify-content: space-between;
     }
 
-    &:hover, &[data-highlighted] {
-      background-color: $backgroundColor-item-Select--hover;
-    }
-
     &[data-state="checked"], 
     &[aria-selected="true"] {
       background-color: $backgroundColor-item-Select--active;
+    }
+
+    &:hover, &[data-highlighted] {
+      background-color: $backgroundColor-item-Select--hover;
     }
 
     &[aria-disabled="true"],
@@ -430,94 +430,6 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     align-items: center;
     font-size: 14px;
     width: 100%;
-  }
-
-  // =============================================================================
-  // UTILITY CLASSES
-  // =============================================================================
-
-  .loading {
-    padding: 0.5rem 1rem;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-
-    to {
-      opacity: 1;
-    }
-  }
-
-  @keyframes fadeOut {
-    from {
-      opacity: 1;
-    }
-
-    to {
-      opacity: 0;
-    }
-  }
-
-  @keyframes zoomIn {
-    from {
-      transform: scale(0.95);
-    }
-
-    to {
-      transform: scale(1);
-    }
-  }
-
-  @keyframes zoomOut {
-    from {
-      transform: scale(1);
-    }
-
-    to {
-      transform: scale(0.95);
-    }
-  }
-
-  @keyframes slideInFromTop {
-    from {
-      transform: translateY(-0.75rem);
-    }
-
-    to {
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes slideInFromBottom {
-    from {
-      transform: translateY(0.75rem);
-    }
-
-    to {
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes slideInFromLeft {
-    from {
-      transform: translateX(-100%);
-    }
-
-    to {
-      transform: translateX(0);
-    }
-  }
-
-  @keyframes slideInFromRight {
-    from {
-      transform: translateX(100%);
-    }
-
-    to {
-      transform: translateX(0);
-    }
   }
 }
 

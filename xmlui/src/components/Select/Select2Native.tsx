@@ -171,12 +171,11 @@ export const Select2 = forwardRef<HTMLButtonElement, Select2Props>(function Sele
     modal,
     ...rest
   },
-  forwardedRef: ForwardedRef<HTMLButtonElement>,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const [options, setOptions] = useState(new Set<Option>());
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const { root } = useTheme();
 
   // Set initial state based on the initialValue prop
   useEffect(() => {
@@ -382,7 +381,9 @@ export const Select2 = forwardRef<HTMLButtonElement, Select2Props>(function Sele
       <SelectContext.Provider value={selectContextValue}>
         <OptionContext.Provider value={optionContextValue}>
           <ArkSelect.Root
+            autoFocus={autoFocus}
             id={id}
+            ref={forwardedRef}
             collection={collection}
             value={arkValue}
             onValueChange={handleValueChange}
@@ -401,8 +402,8 @@ export const Select2 = forwardRef<HTMLButtonElement, Select2Props>(function Sele
             <ArkSelect.Control data-part-id={PART_LIST_WRAPPER}>
               <ArkSelect.Trigger
                 id={id}
-                ref={forwardedRef}
                 {...rest}
+                autoFocus={autoFocus}
                 style={style}
                 className={classnames(className, styles.selectTrigger, styles[validationStatus], {
                   [styles.disabled]: !enabled,
@@ -410,7 +411,6 @@ export const Select2 = forwardRef<HTMLButtonElement, Select2Props>(function Sele
                 })}
                 onFocus={onFocus}
                 onBlur={onBlur}
-                autoFocus={autoFocus}
               >
                 {/* Value display */}
                 <div className={styles.selectTriggerContent}>
