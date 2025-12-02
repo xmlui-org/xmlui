@@ -5,13 +5,13 @@ import {
   useMemo,
   useState,
   type CSSProperties,
-  type ForwardedRef,
   type ReactNode,
 } from "react";
 import { Portal } from "@ark-ui/react/portal";
-import { Select as ArkSelect, createListCollection } from "@ark-ui/react/select";
+import { Select as ArkSelect, createListCollection, useSelect } from "@ark-ui/react/select";
 import classnames from "classnames";
 import styles from "./Select2.module.scss";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
@@ -22,7 +22,6 @@ import { SelectContext } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { OptionContext } from "./OptionContext";
 import { HiddenOption } from "./HiddenOption";
-import { useTheme, useThemes } from "../../components-core/theming/ThemeContext";
 
 const PART_LIST_WRAPPER = "listWrapper";
 const PART_CLEAR_BUTTON = "clearButton";
@@ -171,11 +170,12 @@ export const Select2 = forwardRef<HTMLButtonElement, Select2Props>(function Sele
     modal,
     ...rest
   },
-  forwardedRef: ForwardedRef<HTMLDivElement>,
+  forwardedRef,
 ) {
   const [options, setOptions] = useState(new Set<Option>());
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
 
   // Set initial state based on the initialValue prop
   useEffect(() => {
@@ -274,8 +274,10 @@ export const Select2 = forwardRef<HTMLButtonElement, Select2Props>(function Sele
 
   // Register component API for external interactions
   const focus = useCallback(() => {
-    // Ark-ui doesn't expose a focus method directly
-  }, []);
+    referenceElement?.focus();
+    console.log("focus");
+    onFocus?.();
+  }, [referenceElement, onFocus]);
 
   const setValue = useEvent((newValue: string) => {
     toggleOption(newValue);
@@ -367,172 +369,138 @@ export const Select2 = forwardRef<HTMLButtonElement, Select2Props>(function Sele
   }, [isOpen]);
 
   return (
-    <>
-      {/* Collect options as hidden - they're only used to build the collection */}
-      <SelectContext.Provider value={selectContextValue}>
-        <OptionContext.Provider value={optionContextValue}>
-          <div style={{ display: "none" }}>
-            <OptionTypeProvider Component={HiddenOption}>{children}</OptionTypeProvider>
-          </div>
-        </OptionContext.Provider>
-      </SelectContext.Provider>
-
-      {/* Render the actual select */}
-      <SelectContext.Provider value={selectContextValue}>
-        <OptionContext.Provider value={optionContextValue}>
-          <ArkSelect.Root
-            autoFocus={autoFocus}
-            id={id}
-            ref={forwardedRef}
-            collection={collection}
-            value={arkValue}
-            onValueChange={handleValueChange}
-            disabled={!enabled}
-            readOnly={readOnly}
-            required={required}
-            multiple={multiSelect}
-            closeOnSelect={!multiSelect}
-            onOpenChange={(details) => setIsOpen(details.open)}
-            open={isOpen}
-            positioning={{
-              sameWidth: true,
-              fitViewport: true,
-            }}
-          >
-            <ArkSelect.Control data-part-id={PART_LIST_WRAPPER}>
-              <ArkSelect.Trigger
-                id={id}
-                {...rest}
-                autoFocus={autoFocus}
-                style={style}
-                className={classnames(className, styles.selectTrigger, styles[validationStatus], {
-                  [styles.disabled]: !enabled,
-                  [styles.multi]: multiSelect,
-                })}
-                onFocus={onFocus}
-                onBlur={onBlur}
-              >
-                {/* Value display */}
-                <div className={styles.selectTriggerContent}>
-                  {multiSelect ? (
-                    arkValue.length > 0 ? (
-                      <div className={styles.badgeListContainer}>
-                        <div className={styles.badgeList}>
-                          {arkValue.map((v) => {
-                            const option = Array.from(options).find((o) => String(o.value) === v);
-                            return valueRenderer && option ? (
-                              valueRenderer(option, () => toggleOption(v))
-                            ) : (
-                              <span key={v} className={styles.badge}>
-                                {option?.label || v}
-                                <Icon
-                                  name="close"
-                                  size="sm"
-                                  onClick={(event) => {
-                                    event.stopPropagation();
-                                    toggleOption(v);
-                                  }}
-                                />
-                              </span>
-                            );
-                          })}
-                        </div>
+    <SelectContext.Provider value={selectContextValue}>
+      <OptionContext.Provider value={optionContextValue}>
+        <div style={{ display: "none" }}>
+          <OptionTypeProvider Component={HiddenOption}>{children}</OptionTypeProvider>
+        </div>
+        <ArkSelect.Root
+          id={id}
+          className={styles.select}
+          collection={collection}
+          value={arkValue}
+          onValueChange={handleValueChange}
+          disabled={!enabled}
+          readOnly={readOnly}
+          required={required}
+          multiple={multiSelect}
+          closeOnSelect={!multiSelect}
+          onOpenChange={(details) => setIsOpen(details.open)}
+          open={isOpen}
+          positioning={{
+            sameWidth: true,
+            fitViewport: true,
+          }}
+        >
+          <ArkSelect.Control data-part-id={PART_LIST_WRAPPER}>
+            <ArkSelect.Trigger
+              id={id}
+              ref={composeRefs(forwardedRef, setReferenceElement)}
+              {...rest}
+              autoFocus={autoFocus}
+              style={style}
+              className={classnames(className, styles.selectTrigger, styles[validationStatus], {
+                [styles.disabled]: !enabled,
+                [styles.multi]: multiSelect,
+              })}
+              onFocus={focus}
+              onBlur={onBlur}
+            >
+              {/* Value display */}
+              <div className={styles.selectTriggerContent}>
+                {multiSelect ? (
+                  arkValue.length > 0 ? (
+                    <div className={styles.badgeListContainer}>
+                      <div className={styles.badgeList}>
+                        {arkValue.map((v) => {
+                          const option = Array.from(options).find((o) => String(o.value) === v);
+                          return valueRenderer && option ? (
+                            valueRenderer(option, () => toggleOption(v))
+                          ) : (
+                            <span key={v} className={styles.badge}>
+                              {option?.label || v}
+                              <Icon
+                                name="close"
+                                size="sm"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  toggleOption(v);
+                                }}
+                              />
+                            </span>
+                          );
+                        })}
                       </div>
-                    ) : (
-                      <span className={styles.placeholder}>{placeholder}</span>
-                    )
+                    </div>
                   ) : (
-                    <ArkSelect.ValueText
-                      placeholder={placeholder}
-                      className={arkValue.length > 0 ? styles.selectValue : styles.placeholder}
-                    />
-                  )}
-                </div>
+                    <span className={styles.placeholder}>{placeholder}</span>
+                  )
+                ) : arkValue.length > 0 ? (
+                  <div className={styles.selectValue}>
+                    {(() => {
+                      const selectedValue = arkValue[0];
+                      const selectedOption = Array.from(options).find(
+                        (o) => String(o.value) === selectedValue,
+                      );
+                      return selectedOption?.label || selectedValue;
+                    })()}
+                  </div>
+                ) : (
+                  <span className={styles.placeholder}>{placeholder}</span>
+                )}
+              </div>
 
-                {/* Actions (clear + chevron) */}
-                <div className={styles.actions}>
-                  {arkValue.length > 0 && enabled && !readOnly && clearable && (
-                    <span
-                      data-part-id={PART_CLEAR_BUTTON}
-                      className={styles.action}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        clearValue();
-                      }}
-                    >
-                      <Icon name="close" />
-                    </span>
+              {/* Actions (clear + chevron) */}
+              <div className={styles.actions}>
+                {arkValue.length > 0 && enabled && !readOnly && clearable && (
+                  <span
+                    data-part-id={PART_CLEAR_BUTTON}
+                    className={styles.action}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      clearValue();
+                    }}
+                  >
+                    <Icon name="close" />
+                  </span>
+                )}
+                <ArkSelect.Indicator className={styles.action}>
+                  <Icon name="chevrondown" />
+                </ArkSelect.Indicator>
+              </div>
+            </ArkSelect.Trigger>
+          </ArkSelect.Control>
+          <Portal>
+            <ArkSelect.Positioner>
+              <ArkSelect.Content
+                style={{ height: dropdownHeight }}
+                className={classnames(styles.selectContent, styles[validationStatus])}
+              >
+                <div className={styles.command}>
+                  {searchable && (
+                    <div className={styles.commandInputContainer}>
+                      <Icon name="search" />
+                      <input
+                        role="searchbox"
+                        className={styles.commandInput}
+                        placeholder="Search..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </div>
                   )}
-                  <ArkSelect.Indicator className={styles.action}>
-                    <Icon name="chevrondown" />
-                  </ArkSelect.Indicator>
-                </div>
-              </ArkSelect.Trigger>
-            </ArkSelect.Control>
-            <Portal>
-              <ArkSelect.Positioner>
-                <ArkSelect.Content
-                  style={{ height: dropdownHeight }}
-                  className={classnames(styles.selectContent, styles[validationStatus])}
-                >
-                  <div className={styles.command}>
-                    {searchable && (
-                      <div className={styles.commandInputContainer}>
-                        <Icon name="search" />
-                        <input
-                          role="searchbox"
-                          className={styles.commandInput}
-                          placeholder="Search..."
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                      </div>
-                    )}
-                    <div className={styles.commandList}>
-                      {inProgress ? (
-                        <div className={styles.loading}>{inProgressNotificationMessage}</div>
-                      ) : collection.items.length === 0 ? (
-                        <div>{emptyListNode}</div>
-                      ) : groupBy ? (
-                        // Render grouped items
-                        collection.group().map(([groupLabel, groupItems]) => (
-                          <ArkSelect.ItemGroup key={groupLabel}>
-                            <ArkSelect.ItemGroupLabel>{groupLabel}</ArkSelect.ItemGroupLabel>
-                            {groupItems.map((item: any) => {
-                              const option = Array.from(options).find(
-                                (o) => String(o.value) === item.value,
-                              );
-                              const isSelected = arkValue.includes(item.value);
-
-                              return (
-                                <ArkSelect.Item
-                                  key={item.value}
-                                  item={item}
-                                  className={classnames(styles.multiSelectOption, {
-                                    [styles.disabledOption]: item.disabled,
-                                  })}
-                                  data-state={isSelected ? "checked" : undefined}
-                                >
-                                  <div className={styles.multiSelectOptionContent}>
-                                    {optionRenderer && option ? (
-                                      optionRenderer(option, value, false)
-                                    ) : (
-                                      <>
-                                        <ArkSelect.ItemText>{item.label}</ArkSelect.ItemText>
-                                        {isSelected && <Icon name="checkmark" />}
-                                      </>
-                                    )}
-                                  </div>
-                                </ArkSelect.Item>
-                              );
-                            })}
-                          </ArkSelect.ItemGroup>
-                        ))
-                      ) : (
-                        // Render ungrouped items
-                        <ArkSelect.ItemGroup>
-                          {collection.items.map((item) => {
+                  <div className={styles.commandList}>
+                    {inProgress ? (
+                      <div className={styles.loading}>{inProgressNotificationMessage}</div>
+                    ) : collection.items.length === 0 ? (
+                      <div>{emptyListNode}</div>
+                    ) : groupBy ? (
+                      // Render grouped items
+                      collection.group().map(([groupLabel, groupItems]) => (
+                        <ArkSelect.ItemGroup key={groupLabel}>
+                          <ArkSelect.ItemGroupLabel>{groupLabel}</ArkSelect.ItemGroupLabel>
+                          {groupItems.map((item: any) => {
                             const option = Array.from(options).find(
                               (o) => String(o.value) === item.value,
                             );
@@ -561,16 +529,48 @@ export const Select2 = forwardRef<HTMLButtonElement, Select2Props>(function Sele
                             );
                           })}
                         </ArkSelect.ItemGroup>
-                      )}
-                    </div>
+                      ))
+                    ) : (
+                      // Render ungrouped items
+                      <ArkSelect.ItemGroup>
+                        {collection.items.map((item) => {
+                          const option = Array.from(options).find(
+                            (o) => String(o.value) === item.value,
+                          );
+                          const isSelected = arkValue.includes(item.value);
+
+                          return (
+                            <ArkSelect.Item
+                              key={item.value}
+                              item={item}
+                              className={classnames(styles.multiSelectOption, {
+                                [styles.disabledOption]: item.disabled,
+                              })}
+                              data-state={isSelected ? "checked" : undefined}
+                            >
+                              <div className={styles.multiSelectOptionContent}>
+                                {optionRenderer && option ? (
+                                  optionRenderer(option, value, false)
+                                ) : (
+                                  <>
+                                    <ArkSelect.ItemText>{item.label}</ArkSelect.ItemText>
+                                    {isSelected && <Icon name="checkmark" />}
+                                  </>
+                                )}
+                              </div>
+                            </ArkSelect.Item>
+                          );
+                        })}
+                      </ArkSelect.ItemGroup>
+                    )}
                   </div>
-                </ArkSelect.Content>
-              </ArkSelect.Positioner>
-            </Portal>
-            <ArkSelect.HiddenSelect />
-          </ArkSelect.Root>
-        </OptionContext.Provider>
-      </SelectContext.Provider>
-    </>
+                </div>
+              </ArkSelect.Content>
+            </ArkSelect.Positioner>
+          </Portal>
+          <ArkSelect.HiddenSelect />
+        </ArkSelect.Root>
+      </OptionContext.Provider>
+    </SelectContext.Provider>
   );
 });

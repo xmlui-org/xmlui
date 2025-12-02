@@ -102,7 +102,7 @@ export function useFormContextPart<T = unknown>(selector: (value?: IFormContext)
   return useContextSelector(FormContext, selector);
 }
 
-export function useIsInsideForm(){
+export function useIsInsideForm() {
   const contextPart = useFormContextPart((value) => value?.dispatch);
   return contextPart !== undefined;
 }
@@ -118,6 +118,7 @@ export const formControlTypes = [
   "integer2",
   "file",
   "select",
+  "select2",
   "autocomplete",
   "datePicker",
   "radioGroup",
@@ -172,6 +173,10 @@ export const formControlTypesMd: PropertyValueDescription[] = [
   {
     value: "select",
     description: "Renders Select",
+  },
+  {
+    value: "select2",
+    description: "Renders Select2",
   },
   {
     value: "autocomplete",

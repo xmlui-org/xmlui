@@ -29,7 +29,7 @@ test.describe("Basic Functionality", () => {
   test("changing selected option in form", async ({ initTestBed, createSelectDriver }) => {
     await initTestBed(`
     <Form data="{{sel: 'opt1'}}">
-      <FormItem testId="mySelect" type="select" bindTo="sel">
+      <FormItem testId="mySelect" type="select2" bindTo="sel">
         <Option value="opt1" label="first"/>
         <Option value="opt2" label="second"/>
         <Option value="opt3" label="third"/>

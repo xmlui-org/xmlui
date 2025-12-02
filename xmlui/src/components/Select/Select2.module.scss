@@ -171,6 +171,9 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
 
 
  
+  .select {
+    width: 100%;
+  }
 
 
   .selectTrigger {
