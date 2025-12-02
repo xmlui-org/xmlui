@@ -175,7 +175,6 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select
   const [options, setOptions] = useState(new Set<Option>());
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
 
   // Set initial state based on the initialValue prop
   useEffect(() => {
@@ -274,10 +273,8 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select
 
   // Register component API for external interactions
   const focus = useCallback(() => {
-    referenceElement?.focus();
-    console.log("focus");
     onFocus?.();
-  }, [referenceElement, onFocus]);
+  }, [onFocus]);
 
   const setValue = useEvent((newValue: string) => {
     toggleOption(newValue);
@@ -395,7 +392,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select
           <ArkSelect.Control data-part-id={PART_LIST_WRAPPER}>
             <ArkSelect.Trigger
               id={id}
-              ref={composeRefs(forwardedRef, setReferenceElement)}
+              ref={forwardedRef}
               {...rest}
               autoFocus={autoFocus}
               style={style}
