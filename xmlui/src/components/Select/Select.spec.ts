@@ -13,14 +13,13 @@ test.describe("Basic Functionality", () => {
     page,
   }) => {
     await initTestBed(`
-      <Select>
+      <Select testId="mySelect">
         <Items data="{['One', 'Two', 'Three']}" >
           <Option value="{$itemIndex}" label="{$item}" />
         </Items>
       </Select>`);
-    const driver = await createSelectDriver();
-
-    await driver.click();
+    const driver = await createSelectDriver("mySelect");
+    await driver.toggleOptionsVisibility();
     await expect(page.getByRole("option", { name: "One" })).toBeVisible();
     await expect(page.getByRole("option", { name: "Two" })).toBeVisible();
     await expect(page.getByRole("option", { name: "Three" })).toBeVisible();
@@ -145,7 +144,7 @@ test.describe("Basic Functionality", () => {
 
   // --- readOnly prop
 
-  test("readOnly Select shows options, but value cannot be changed", async ({
+  test("readOnly Select does not show options and value cannot be changed", async ({
     page,
     initTestBed,
     createSelectDriver,
@@ -159,13 +158,12 @@ test.describe("Basic Functionality", () => {
     const driver = await createSelectDriver();
     await expect(driver.component).toHaveText("One");
     await driver.toggleOptionsVisibility();
-    await driver.selectLabel("Two");
-    await expect(driver.component).toHaveText("One");
+    await expect(page.getByText("Two")).not.toBeVisible();
 
     // verify dropdown is not visible but value is shown
   });
 
-  test("readOnly multi-Select shows options, but value cannot be changed", async ({
+  test("readOnly multi-Select does not show options and value cannot be changed", async ({
     page,
     initTestBed,
     createSelectDriver,
@@ -183,8 +181,6 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByText("Two")).toBeVisible();
 
     await driver.toggleOptionsVisibility();
-    await driver.selectLabel("Three");
-
     await expect(page.getByText("Three")).not.toBeVisible();
     await expect(page.getByText("One")).toBeVisible();
     await expect(page.getByText("Two")).toBeVisible();
