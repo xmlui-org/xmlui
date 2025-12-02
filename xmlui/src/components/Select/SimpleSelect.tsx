@@ -6,7 +6,7 @@ import Icon from "../Icon/IconNative";
 import classnames from "classnames";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import type { SingleValueType } from "./SelectNative";
-import type { ValidationStatus } from "../abstractions";
+import type { Option, ValidationStatus } from "../abstractions";
 import {
   Root,
   Trigger,
@@ -19,7 +19,6 @@ import {
   Label,
 } from "@radix-ui/react-select";
 import { SelectOption } from "./SelectOption";
-import { useSelect } from "./SelectContext";
 import { Part } from "../Part/Part";
 
 interface SimpleSelectProps {
@@ -45,12 +44,12 @@ interface SimpleSelectProps {
   clearable?: boolean;
   onClear?: () => void;
   children?: ReactNode;
+  options: Option[];
 }
 
 export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
   function SimpleSelect(props, forwardedRef) {
     const { root } = useTheme();
-    const { options } = useSelect();
     const {
       enabled,
       onBlur,
@@ -73,6 +72,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       groupHeaderRenderer,
       clearable,
       onClear,
+      options,
       children,
       ...rest
     } = props;
@@ -95,18 +95,16 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
     );
 
     const selectedOption = useMemo(() => {
-      return Array.from(options).find((option) => String(option.value) === String(value));
+      return options.find((option) => String(option.value) === String(value));
     }, [options, value]);
 
     // Group options if groupBy is provided
     const groupedOptions = useMemo(() => {
       if (!groupBy) return null;
 
-      const optionsArray = Array.from(options);
+      const groups: Record<string, typeof options> = {};
 
-      const groups: Record<string, typeof optionsArray> = {};
-
-      optionsArray.forEach((option) => {
+      options.forEach((option) => {
         const groupKey = (option as any)[groupBy] || "Ungrouped";
         if (!groups[groupKey]) {
           groups[groupKey] = [];
@@ -212,7 +210,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                 ) : (
                   // Render flat options
                   <>
-                    {Array.from(options).map((option) => (
+                    {options.map((option) => (
                       <SelectOption
                         key={option.value}
                         value={option.value}
@@ -223,7 +221,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                         {option.children}
                       </SelectOption>
                     ))}
-                    {Array.from(options).length === 0 && emptyListNode}
+                    {options.length === 0 && emptyListNode}
                   </>
                 )}
                 {children}

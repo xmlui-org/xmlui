@@ -21,7 +21,6 @@ import type { Option, ValidationStatus } from "../abstractions";
 import Icon from "../Icon/IconNative";
 import { SelectContext, useSelect } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
-import { OptionContext, useOption } from "./OptionContext";
 import { HiddenOption } from "./HiddenOption";
 import { SimpleSelect } from "./SimpleSelect";
 import { Part } from "../Part/Part";
@@ -99,47 +98,42 @@ interface SelectProps {
 
 // Common trigger value display props
 interface SelectTriggerValueProps {
-  value: ValueType;
   placeholder: string;
   readOnly: boolean;
   multiSelect: boolean;
-  options: Set<Option>;
+  selectedOptions: Option[];
   valueRenderer?: (item: Option, removeItem: () => void) => ReactNode;
   toggleOption: (value: SingleValueType) => void;
 }
 
 // Common trigger value display component
 const SelectTriggerValue = ({
-  value,
   placeholder,
   readOnly,
   multiSelect,
-  options,
+  selectedOptions,
   valueRenderer,
   toggleOption,
 }: SelectTriggerValueProps) => {
-  if (multiSelect) {
-    if (Array.isArray(value) && value.length > 0) {
+  if (selectedOptions.length) {
+    if (multiSelect) {
       return (
         <div className={styles.badgeListContainer}>
           <div className={styles.badgeList}>
-            {value.map((v) =>
+            {selectedOptions.map((option) =>
               valueRenderer ? (
-                valueRenderer(
-                  Array.from(options).find((o) => o.value === `${v}`),
-                  () => {
-                    if (!readOnly) toggleOption(v);
-                  },
-                )
+                valueRenderer(option, () => {
+                  if (!readOnly) toggleOption(option.value);
+                })
               ) : (
-                <span key={v} className={styles.badge}>
-                  {Array.from(options).find((o) => String(o.value) === String(v))?.label}
+                <span key={option.value} className={styles.badge}>
+                  {option.label}
                   <Icon
                     name="close"
                     size="sm"
                     onClick={(event) => {
                       event.stopPropagation();
-                      if (!readOnly) toggleOption(v);
+                      if (!readOnly) toggleOption(option.value);
                     }}
                   />
                 </span>
@@ -148,24 +142,15 @@ const SelectTriggerValue = ({
           </div>
         </div>
       );
+    } else {
+      return <div className={styles.selectValue}>{selectedOptions[0]?.label}</div>;
     }
-    return (
-      <span placeholder={placeholder} className={styles.placeholder}>
-        {placeholder}
-      </span>
-    );
-  }
-
-  // Single select
-  if (value !== undefined && value !== null && value !== "") {
-    const selectedOption = Array.from(options).find((o) => o.value === value);
-    return <div className={styles.selectValue}>{selectedOption?.label}</div>;
   }
 
   return (
-    <div aria-placeholder={placeholder} className={styles.placeholder}>
-      {readOnly ? "" : placeholder || ""}
-    </div>
+    <span placeholder={placeholder} className={styles.placeholder}>
+      {placeholder}
+    </span>
   );
 };
 
@@ -274,9 +259,19 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   const [width, setWidth] = useState(0);
   const observer = useRef<ResizeObserver>();
   const { root } = useTheme();
-  const [options, setOptions] = useState(new Set<Option>());
+  const [options, setOptions] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(-1);
+
+  const selectedOptions = useMemo(() => {
+    if (!multiSelect) {
+      return options.filter((option) => `${option.value}` === `${value}`);
+    } else {
+      return Array.isArray(value) 
+        ? options.filter((option) => value.map(v => String(v)).includes(String(option.value)))
+        : [];
+    }
+  }, [multiSelect, options, value]);
 
   // Use initialValue as fallback when value is undefined
   // This ensures the component displays the initial value immediately on first render
@@ -537,38 +532,12 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   );
 
   const onOptionAdd = useCallback((option: Option) => {
-    setOptions((prev) => {
-      // Check if option with same value already exists
-      const exists = Array.from(prev).some((opt) => opt.value === option.value);
-      if (exists) {
-        return prev;
-      }
-      const newSet = new Set(prev);
-      newSet.add(option);
-      return newSet;
-    });
+    setOptions((prev) => [...prev, option]);
   }, []);
 
   const onOptionRemove = useCallback((option: Option) => {
-    setOptions((prev) => {
-      const newSet = new Set<Option>();
-      // Remove by value comparison instead of reference
-      prev.forEach((opt) => {
-        if (opt.value !== option.value) {
-          newSet.add(opt);
-        }
-      });
-      return newSet;
-    });
+    setOptions((prev) => prev.filter((opt) => opt.value !== option.value));
   }, []);
-
-  const optionContextValue = useMemo(
-    () => ({
-      onOptionAdd,
-      onOptionRemove,
-    }),
-    [onOptionAdd, onOptionRemove],
-  );
 
   const selectContextValue = useMemo(
     () => ({
@@ -578,7 +547,6 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
       onChange: toggleOption,
       setOpen,
       setSelectedIndex,
-      options,
       highlightedValue:
         selectedIndex >= 0 &&
         selectedIndex < filteredOptions.length &&
@@ -586,16 +554,19 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
           ? filteredOptions[selectedIndex].value
           : undefined,
       optionRenderer,
+      onOptionAdd,
+      onOptionRemove,
     }),
     [
       multiSelect,
       readOnly,
       currentValue,
       toggleOption,
-      options,
       selectedIndex,
       filteredOptions,
       optionRenderer,
+      onOptionAdd,
+      onOptionRemove,
     ],
   );
 
@@ -604,207 +575,198 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
 
   return (
     <SelectContext.Provider value={selectContextValue}>
-      <OptionContext.Provider value={optionContextValue}>
-        <OptionTypeProvider Component={HiddenOption}>
-          {useSimpleSelect ? (
-            // SimpleSelect mode (Radix UI Select)
-            <SimpleSelect
-              value={currentValue as SingleValueType}
-              onValueChange={(val) => toggleOption(val)}
-              id={id}
-              style={style}
-              className={className}
-              onFocus={onFocus}
-              onBlur={onBlur}
-              enabled={enabled}
-              validationStatus={validationStatus}
-              triggerRef={setReferenceElement}
-              autoFocus={autoFocus}
-              placeholder={placeholder}
-              height={dropdownHeight}
-              width={width}
-              readOnly={readOnly}
-              emptyListNode={emptyListNode}
+      <OptionTypeProvider Component={HiddenOption}>
+        {useSimpleSelect ? (
+          // SimpleSelect mode (Radix UI Select)
+          <SimpleSelect
+            value={currentValue as SingleValueType}
+            onValueChange={(val) => toggleOption(val)}
+            id={id}
+            options={options}
+            style={style}
+            className={className}
+            onFocus={onFocus}
+            onBlur={onBlur}
+            enabled={enabled}
+            validationStatus={validationStatus}
+            triggerRef={setReferenceElement}
+            autoFocus={autoFocus}
+            placeholder={placeholder}
+            height={dropdownHeight}
+            width={width}
+            readOnly={readOnly}
+            emptyListNode={emptyListNode}
+            modal={modal}
+            groupBy={groupBy}
+            groupHeaderRenderer={groupHeaderRenderer}
+            clearable={clearable}
+            onClear={clearValue}
+            {...rest}
+          >
+            {children}
+          </SimpleSelect>
+        ) : (
+          // Popover mode (searchable or multi-select)
+          <>
+            <Popover
+              open={open}
+              onOpenChange={(isOpen) => {
+                if (!enabled || readOnly) return;
+                setOpen(isOpen);
+              }}
               modal={modal}
-              groupBy={groupBy}
-              groupHeaderRenderer={groupHeaderRenderer}
-              clearable={clearable}
-              onClear={clearValue}
-              {...rest}
             >
-              {children}
-            </SimpleSelect>
-          ) : (
-            // Popover mode (searchable or multi-select)
-            <>
-              {children}
-              <Popover
-                open={open}
-                onOpenChange={(isOpen) => {
-                  if (!enabled || readOnly) return;
-                  setOpen(isOpen);
-                  // Reset highlighted option when dropdown closes
-                  setSelectedIndex(-1);
-                }}
-                modal={modal}
-              >
-                <Part partId={PART_LIST_WRAPPER}>
-                  <PopoverTrigger
-                    {...rest}
-                    ref={composeRefs(setReferenceElement, forwardedRef)}
-                    id={id}
-                    aria-haspopup="listbox"
-                    style={style}
-                    onFocus={onFocus}
-                    onBlur={onBlur}
-                    disabled={!enabled}
-                    aria-expanded={open}
-                    className={classnames(
-                      className,
-                      styles.selectTrigger,
-                      styles[validationStatus],
-                      {
-                        [styles.disabled]: !enabled,
-                        [styles.multi]: multiSelect,
-                      },
-                    )}
-                    role="combobox"
-                    onClick={(event) => {
-                      if (!enabled || readOnly) return;
-                      event.stopPropagation();
-                      setOpen((prev) => !prev);
-                    }}
-                    onKeyDown={(event) => {
-                      if (!enabled || readOnly) return;
+              <Part partId={PART_LIST_WRAPPER}>
+                <PopoverTrigger
+                  {...rest}
+                  ref={composeRefs(setReferenceElement, forwardedRef)}
+                  id={id}
+                  aria-haspopup="listbox"
+                  style={style}
+                  onFocus={onFocus}
+                  onBlur={onBlur}
+                  disabled={!enabled}
+                  aria-expanded={open}
+                  className={classnames(className, styles.selectTrigger, styles[validationStatus], {
+                    [styles.disabled]: !enabled,
+                    [styles.multi]: multiSelect,
+                  })}
+                  role="combobox"
+                  onClick={(event) => {
+                    if (!enabled || readOnly) return;
+                    event.stopPropagation();
+                    setOpen((prev) => !prev);
+                  }}
+                  onKeyDown={(event) => {
+                    if (!enabled || readOnly) return;
 
-                      // Handle opening dropdown with keyboard
-                      if (
-                        !open &&
-                        (event.key === "ArrowDown" ||
-                          event.key === "ArrowUp" ||
-                          event.key === " " ||
-                          event.key === "Enter")
-                      ) {
-                        event.preventDefault();
-                        setOpen(true);
-                        // Set initial selectedIndex to first enabled option if options exist
-                        if (filteredOptions.length > 0) {
-                          const firstEnabledIndex = findNextEnabledIndex(-1);
-                          setSelectedIndex(firstEnabledIndex !== -1 ? firstEnabledIndex : 0);
-                        }
-                        return;
+                    // Handle opening dropdown with keyboard
+                    if (
+                      !open &&
+                      (event.key === "ArrowDown" ||
+                        event.key === "ArrowUp" ||
+                        event.key === " " ||
+                        event.key === "Enter")
+                    ) {
+                      event.preventDefault();
+                      setOpen(true);
+                      // Set initial selectedIndex to first enabled option if options exist
+                      if (filteredOptions.length > 0) {
+                        const firstEnabledIndex = findNextEnabledIndex(-1);
+                        setSelectedIndex(firstEnabledIndex !== -1 ? firstEnabledIndex : 0);
                       }
+                      return;
+                    }
 
-                      // Handle keyboard navigation when dropdown is open
-                      if (open) {
-                        handleKeyDown(event);
-                      }
-                    }}
-                    autoFocus={autoFocus}
+                    // Handle keyboard navigation when dropdown is open
+                    if (open) {
+                      handleKeyDown(event);
+                    }
+                  }}
+                  autoFocus={autoFocus}
+                >
+                  <SelectTriggerValue
+                    readOnly={readOnly}
+                    placeholder={placeholder}
+                    multiSelect={multiSelect}
+                    selectedOptions={selectedOptions}
+                    valueRenderer={valueRenderer}
+                    toggleOption={toggleOption}
+                  />
+                  <SelectTriggerActions
+                    value={currentValue}
+                    multiSelect={multiSelect}
+                    enabled={enabled}
+                    readOnly={readOnly}
+                    clearable={clearable}
+                    clearValue={clearValue}
+                  />
+                </PopoverTrigger>
+              </Part>
+              {open && (
+                <Portal container={root}>
+                  <PopoverContent
+                    style={{ minWidth: width, height: dropdownHeight }}
+                    className={classnames(styles.selectContent, styles[validationStatus])}
+                    onKeyDown={handleKeyDown}
                   >
-                    <SelectTriggerValue
-                      value={currentValue}
-                      placeholder={placeholder}
-                      readOnly={readOnly}
-                      multiSelect={multiSelect}
-                      options={options}
-                      valueRenderer={valueRenderer}
-                      toggleOption={toggleOption}
-                    />
-                    <SelectTriggerActions
-                      value={currentValue}
-                      multiSelect={multiSelect}
-                      enabled={enabled}
-                      readOnly={readOnly}
-                      clearable={clearable}
-                      clearValue={clearValue}
-                    />
-                  </PopoverTrigger>
-                </Part>
-                {open && (
-                  <Portal container={root}>
-                    <PopoverContent
-                      style={{ minWidth: width, height: dropdownHeight }}
-                      className={classnames(styles.selectContent, styles[validationStatus])}
-                      onKeyDown={handleKeyDown}
-                    >
-                      <div className={styles.command}>
-                        {searchable ? (
-                          <div className={styles.commandInputContainer}>
-                            <Icon name="search" />
-                            <input
-                              role="searchbox"
-                              className={classnames(styles.commandInput)}
-                              placeholder="Search..."
-                              value={searchTerm}
-                              onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                          </div>
-                        ) : (
-                          <button aria-hidden="true" className={styles.srOnly} />
-                        )}
-                        <div role="listbox" className={styles.commandList}>
-                          {inProgress ? (
-                            <div className={styles.loading}>{inProgressNotificationMessage}</div>
-                          ) : // When searching, show filtered options (with or without grouping)
-                          groupBy && groupedOptions ? (
-                            // Render grouped filtered options
-                            Object.entries(groupedOptions).map(([groupName, groupOptions]) => (
-                              <div key={groupName}>
-                                {groupHeaderRenderer ? (
-                                  <div className={styles.groupHeader}>
-                                    {groupHeaderRenderer(groupName)}
-                                  </div>
-                                ) : (
-                                  <div className={styles.groupHeader}>{groupName}</div>
-                                )}
-                                {groupOptions.map(
-                                  ({ value, label, enabled, keywords }, groupIndex) => {
-                                    const globalIndex = filteredOptions.findIndex(
-                                      (opt) => opt.value === value,
-                                    );
-                                    return (
-                                      <SelectOptionItem
-                                        key={value}
-                                        readOnly={readOnly}
-                                        value={value}
-                                        label={label}
-                                        enabled={enabled}
-                                        keywords={keywords}
-                                        isHighlighted={selectedIndex === globalIndex}
-                                        itemIndex={globalIndex}
-                                      />
-                                    );
-                                  },
-                                )}
-                              </div>
-                            ))
-                          ) : (
-                            // Render flat filtered options
-                            filteredOptions.map(({ value, label, enabled, keywords }, index) => (
-                              <SelectOptionItem
-                                key={value}
-                                readOnly={readOnly}
-                                value={value}
-                                label={label}
-                                enabled={enabled}
-                                keywords={keywords}
-                                isHighlighted={selectedIndex === index}
-                                itemIndex={index}
-                              />
-                            ))
-                          )}
-                          {filteredOptions.length === 0 && emptyListNode}
+                    <div className={styles.command}>
+                      {searchable ? (
+                        <div className={styles.commandInputContainer}>
+                          <Icon name="search" />
+                          <input
+                            role="searchbox"
+                            className={classnames(styles.commandInput)}
+                            placeholder="Search..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                          />
                         </div>
+                      ) : (
+                        <button aria-hidden="true" className={styles.srOnly} />
+                      )}
+                      <div role="listbox" className={styles.commandList}>
+                        {inProgress ? (
+                          <div className={styles.loading}>{inProgressNotificationMessage}</div>
+                        ) : // When searching, show filtered options (with or without grouping)
+                        groupBy && groupedOptions ? (
+                          // Render grouped filtered options
+                          Object.entries(groupedOptions).map(([groupName, groupOptions]) => (
+                            <div key={groupName}>
+                              {groupHeaderRenderer ? (
+                                <div className={styles.groupHeader}>
+                                  {groupHeaderRenderer(groupName)}
+                                </div>
+                              ) : (
+                                <div className={styles.groupHeader}>{groupName}</div>
+                              )}
+                              {groupOptions.map(
+                                ({ value, label, enabled, keywords }, groupIndex) => {
+                                  const globalIndex = filteredOptions.findIndex(
+                                    (opt) => opt.value === value,
+                                  );
+                                  return (
+                                    <SelectOptionItem
+                                      key={value}
+                                      readOnly={readOnly}
+                                      value={value}
+                                      label={label}
+                                      enabled={enabled}
+                                      keywords={keywords}
+                                      isHighlighted={selectedIndex === globalIndex}
+                                      itemIndex={globalIndex}
+                                    />
+                                  );
+                                },
+                              )}
+                            </div>
+                          ))
+                        ) : (
+                          // Render flat filtered options
+                          filteredOptions.map(({ value, label, enabled, keywords }, index) => (
+                            <SelectOptionItem
+                              key={value}
+                              readOnly={readOnly}
+                              value={value}
+                              label={label}
+                              enabled={enabled}
+                              keywords={keywords}
+                              isHighlighted={selectedIndex === index}
+                              itemIndex={index}
+                            />
+                          ))
+                        )}
+                        {filteredOptions.length === 0 && emptyListNode}
                       </div>
-                    </PopoverContent>
-                  </Portal>
-                )}
-              </Popover>
-            </>
-          )}
-        </OptionTypeProvider>
-      </OptionContext.Provider>
+                    </div>
+                  </PopoverContent>
+                </Portal>
+              )}
+            </Popover>
+            {children}
+          </>
+        )}
+      </OptionTypeProvider>
     </SelectContext.Provider>
   );
 });

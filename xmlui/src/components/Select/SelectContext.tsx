@@ -11,13 +11,14 @@ type SelectContextValue = {
   onChange?: (selectedValue: SingleValueType) => void;
   setOpen: (open: boolean) => void;
   setSelectedIndex?: (index: number) => void;
-  options: Set<Option>;
   highlightedValue?: string;
   optionRenderer?: (
     option: Option,
     selectedValue: SingleValueType,
     inTrigger: boolean,
   ) => ReactNode;
+  onOptionAdd?: (option: Option) => void;
+  onOptionRemove?: (option: Option) => void;
 };
 
 export const SelectContext = createContext<SelectContextValue>({
@@ -25,8 +26,9 @@ export const SelectContext = createContext<SelectContextValue>({
   onChange: (selectedValue: SingleValueType) => {},
   setOpen: (open: boolean) => {},
   setSelectedIndex: (index: number) => {},
-  options: new Set<Option>(),
   optionRenderer: undefined,
+  onOptionAdd: () => {},
+  onOptionRemove: () => {},
 });
 
 export function useSelect() {
