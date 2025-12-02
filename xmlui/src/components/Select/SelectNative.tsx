@@ -6,6 +6,8 @@ import {
   useState,
   type CSSProperties,
   type ReactNode,
+  type ForwardedRef,
+  useRef,
 } from "react";
 import { Portal } from "@ark-ui/react/portal";
 import { Select as ArkSelect, createListCollection, useSelect } from "@ark-ui/react/select";
@@ -22,6 +24,7 @@ import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { OptionContext } from "./OptionContext";
 import { HiddenOption } from "./HiddenOption";
 import { Part } from "../Part/Part";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 
 const PART_LIST_WRAPPER = "listWrapper";
 const PART_CLEAR_BUTTON = "clearButton";
@@ -170,11 +173,12 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select
     modal,
     ...rest
   },
-  forwardedRef,
+  forwardedRef: ForwardedRef<any>,
 ) {
   const [options, setOptions] = useState(new Set<Option>());
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | null>(null);
 
   // Set initial state based on the initialValue prop
   useEffect(() => {
@@ -270,6 +274,14 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select
     },
     [multiSelect, arkValue, value, updateState, onDidChange],
   );
+
+  useEffect(() => {
+    if (autoFocus) {
+      setTimeout(() => {
+        referenceElement.focus();
+      }, 0);
+    }
+  }, [autoFocus, referenceElement]);
 
   // Register component API for external interactions
   const focus = useCallback(() => {
@@ -370,6 +382,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select
       <OptionContext.Provider value={optionContextValue}>
         <OptionTypeProvider Component={HiddenOption}>
           <ArkSelect.Root
+            ref={forwardedRef}
             className={styles.select}
             collection={collection}
             value={arkValue}
@@ -389,10 +402,9 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select
             <Part partId={PART_LIST_WRAPPER}>
               <ArkSelect.Control>
                 <ArkSelect.Trigger
-                  id={id}
                   {...rest}
-                  ref={forwardedRef}
-                  autoFocus={autoFocus}
+                  ref={composeRefs(setReferenceElement, forwardedRef)}
+                  id={id}
                   style={style}
                   className={classnames(className, styles.selectTrigger, styles[validationStatus], {
                     [styles.disabled]: !enabled,
