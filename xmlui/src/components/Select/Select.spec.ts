@@ -736,14 +736,16 @@ test.describe("multiSelect", () => {
     createSelectDriver,
   }) => {
     await initTestBed(`
-      <Select multiSelect>
-        <Option value="1" label="One"/>
-        <Option value="2" label="Two"/>
-      </Select>
-      <Select testId="focused-select" multiSelect autoFocus>
-        <Option value="1" label="One"/>
-        <Option value="2" label="Two"/>
-      </Select>
+      <Fragment>
+        <Select multiSelect>
+          <Option value="1" label="One"/>
+          <Option value="2" label="Two"/>
+        </Select>
+        <Select testId="focused-select" multiSelect autoFocus>
+          <Option value="1" label="One"/>
+          <Option value="2" label="Two"/>
+        </Select>
+      </Fragment>
     `);
     const driver = await createSelectDriver("focused-select");
 

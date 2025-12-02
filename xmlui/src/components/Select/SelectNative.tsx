@@ -10,7 +10,7 @@ import {
   useRef,
 } from "react";
 import { Portal } from "@ark-ui/react/portal";
-import { Select as ArkSelect, createListCollection, useSelect } from "@ark-ui/react/select";
+import { Select as ArkSelect, createListCollection } from "@ark-ui/react/select";
 import classnames from "classnames";
 import styles from "./Select.module.scss";
 
@@ -177,7 +177,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select
   const [options, setOptions] = useState(new Set<Option>());
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   // Set initial state based on the initialValue prop
   useEffect(() => {
@@ -274,13 +274,9 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select
     [multiSelect, arkValue, value, updateState, onDidChange],
   );
 
-  const triggerRef = useRef<HTMLButtonElement>(null);
-
   useEffect(() => {
-    if (autoFocus) {
-      setTimeout(() => {
-        triggerRef?.current?.focus();
-      }, 0);
+    if (autoFocus && triggerRef?.current) {
+      triggerRef.current.focus();
     }
   }, [autoFocus]);
 
@@ -383,6 +379,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select
       <OptionContext.Provider value={optionContextValue}>
         <OptionTypeProvider Component={HiddenOption}>
           <ArkSelect.Root
+            {...rest}
             ref={forwardedRef}
             className={styles.select}
             collection={collection}
@@ -399,11 +396,13 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select
               sameWidth: true,
               fitViewport: true,
             }}
+            onFocus={onFocus}
+            onBlur={onBlur}
+            tabIndex={-1}
           >
             <Part partId={PART_LIST_WRAPPER}>
               <ArkSelect.Control>
                 <ArkSelect.Trigger
-                  {...rest}
                   ref={triggerRef}
                   id={id}
                   style={style}
@@ -411,8 +410,6 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select
                     [styles.disabled]: !enabled,
                     [styles.multi]: multiSelect,
                   })}
-                  onFocus={focus}
-                  onBlur={onBlur}
                 >
                   {/* Value display */}
                   <div className={styles.selectTriggerContent}>
