@@ -24,7 +24,6 @@ import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { OptionContext } from "./OptionContext";
 import { HiddenOption } from "./HiddenOption";
 import { Part } from "../Part/Part";
-import { composeRefs } from "@radix-ui/react-compose-refs";
 
 const PART_LIST_WRAPPER = "listWrapper";
 const PART_CLEAR_BUTTON = "clearButton";
@@ -275,13 +274,15 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select
     [multiSelect, arkValue, value, updateState, onDidChange],
   );
 
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
     if (autoFocus) {
       setTimeout(() => {
-        referenceElement.focus();
+        triggerRef?.current?.focus();
       }, 0);
     }
-  }, [autoFocus, referenceElement]);
+  }, [autoFocus]);
 
   // Register component API for external interactions
   const focus = useCallback(() => {
@@ -403,7 +404,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select
               <ArkSelect.Control>
                 <ArkSelect.Trigger
                   {...rest}
-                  ref={composeRefs(setReferenceElement, forwardedRef)}
+                  ref={triggerRef}
                   id={id}
                   style={style}
                   className={classnames(className, styles.selectTrigger, styles[validationStatus], {
