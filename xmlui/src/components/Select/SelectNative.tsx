@@ -343,15 +343,21 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   // Observe the size of the reference element
   useEffect(() => {
     const current = referenceElement;
-    observer.current?.disconnect();
+    const currentObserver = observer.current;
+    currentObserver?.disconnect();
 
     if (current) {
-      observer.current = new ResizeObserver(() => setWidth(current.clientWidth));
-      observer.current.observe(current);
+      const newObserver = new ResizeObserver(() => setWidth(current.clientWidth));
+      observer.current = newObserver;
+      newObserver.observe(current);
+
+      return () => {
+        newObserver.disconnect();
+      };
     }
 
     return () => {
-      observer.current?.disconnect();
+      currentObserver?.disconnect();
     };
   }, [referenceElement]);
 
@@ -545,9 +551,14 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
 
   const onOptionRemove = useCallback((option: Option) => {
     setOptions((prev) => {
-      const optionsSet = new Set(prev);
-      optionsSet.delete(option);
-      return optionsSet;
+      const newSet = new Set<Option>();
+      // Remove by value comparison instead of reference
+      prev.forEach((opt) => {
+        if (opt.value !== option.value) {
+          newSet.add(opt);
+        }
+      });
+      return newSet;
     });
   }, []);
 

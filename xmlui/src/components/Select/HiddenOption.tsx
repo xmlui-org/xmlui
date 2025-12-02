@@ -1,10 +1,10 @@
 import type { Option } from "../abstractions";
 import { useOption } from "./OptionContext";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export function HiddenOption(option: Option) {
   const { label } = option;
-  const { onOptionAdd } = useOption();
+  const { onOptionAdd, onOptionRemove } = useOption();
   const [node, setNode] = useState(null);
 
   const opt: Option = useMemo(() => {
@@ -17,9 +17,14 @@ export function HiddenOption(option: Option) {
   }, [option, node, label]);
 
   useEffect(() => {
+    // Add the option when it's created or updated
     onOptionAdd(opt);
-    // Don't remove options when component unmounts - they should persist
-  }, [opt, onOptionAdd]);
+
+    // Remove the same option object when unmounting or before re-adding with new values
+    return () => {
+      onOptionRemove(opt);
+    };
+  }, [opt, onOptionAdd, onOptionRemove]);
 
   return null;
 }
