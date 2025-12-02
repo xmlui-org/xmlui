@@ -22,10 +22,9 @@
                             </HStack>
                             <VStack paddingLeft="$padding-normal">
                                 <Items items="{$item.changes}">
-                                    <HStack verticalAlignment="start">
+                                    <HStack>
                                         <Link
                                             to="https://github.com/xmlui-org/xmlui/commit/{$item.commit_sha}"
-                                            paddingTop="$space-1_5"
                                             target="_blank">
                                             <Icon name="new-window" size="1rem" />
                                         </Link>

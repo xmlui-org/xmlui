@@ -99,10 +99,7 @@ export const APICallMd = createMetadata({
       valueType: "string",
     },
     errorNotificationMessage: {
-      description:
-        "This property defines the message to display automatically when the operation " +
-        "results in an error. You can use the `$error` context value in an expression to " +
-        "refer to the original error message.",
+      description: "",
       valueType: "string",
     },
     completedNotificationMessage: {
