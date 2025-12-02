@@ -29,7 +29,7 @@ This property customizes the success message displayed in a toast after the fini
 
 ```xmlui copy
  <APICall
-  id="ds"
+  id="api"
   method="post"
   url="/api/shopping-list" 
   completedNotificationMessage="Result: {JSON.stringify($result).substring(0, 100)}" />
@@ -49,16 +49,37 @@ This optional string sets the title in the confirmation dialog that is displayed
 
 ### `errorNotificationMessage` [#errornotificationmessage]
 
-This property defines the message to display automatically when the operation results in an error. You can use the `$error` context value in an expression to refer to the original error message.
-
-This property customizes the message displayed in a toast when the API invocation results in an error. The `$error.statusCode` context variable can refer to the response's status code, while `$error. details` to the response body. For example, you can use the following code snippet to display the status code and the details:
+This property customizes the message displayed in a toast when the API invocation results in an error. Use the `$error` context object to get the error code (`$error.statusCode`) optional message (`$error.message`), or details coming from the response body (`$error.details`). For example, you can use the following code snippet to display the status code and the details:
 
 ```xmlui copy
  <APICall
-  id="ds"
+  id="api"
   method="post"
-  url="/api/shopping-list" 
-  errorNotificationMessage="${error.statusCode}, {JSON.stringify($error.details)}" />
+  url="/api/shopping-list"
+  errorNotificationMessage="${error.statusCode}, ${error.message} {JSON.stringify($error.details)}" />
+```
+
+**NOTE:** While we support Microsoft/Google-style and RFC 7807 errors, not all response shapes can be accounted for.
+Because of this, there is an attribute available in the `configuration` file called `errorResponseTransform` under `appGlobals`. This exposes the error response using the `$response` context variable.
+Here is an example on how to use it (note that this is evaluated as a `binding expression`):
+
+Error looks the following coming from the backend:
+
+```js
+{
+  code: number,
+  error: string
+}
+```
+
+This is how to transform it in config:
+
+```json
+{
+  "appGlobals": {
+    "errorResponseTransform": "{{ statusCode: $response.code, message: $response.error }}"
+  }
+}
 ```
 
 ### `headers` [#headers]

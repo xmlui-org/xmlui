@@ -15,6 +15,7 @@ import type {
   ColumnDef,
   HeaderContext,
   PaginationState,
+  Row,
   RowData,
 } from "@tanstack/react-table";
 import {
@@ -113,6 +114,7 @@ type TableProps = {
   pageSize?: number;
   paginationControlsLocation?: TablePaginationControlsLocation;
   rowDisabledPredicate?: (item: any) => boolean;
+  rowUnselectablePredicate?: (item: any) => boolean;
   sortBy?: string;
   sortingDirection?: SortingDirection;
   iconSortAsc?: string;
@@ -143,6 +145,10 @@ type TableProps = {
 };
 
 function defaultIsRowDisabled(_: any) {
+  return false;
+}
+
+function defaultIsRowUnselectable(_: any) {
   return false;
 }
 
@@ -245,6 +251,7 @@ export const Table = forwardRef(
       pageSize = pageSizeOptions?.[0] || DEFAULT_PAGE_SIZES[0],
       currentPageIndex = 0,
       rowDisabledPredicate = defaultIsRowDisabled,
+      rowUnselectablePredicate = defaultIsRowUnselectable,
       sortBy,
       sortingDirection = defaultProps.sortingDirection,
       iconSortAsc,
@@ -327,6 +334,7 @@ export const Table = forwardRef(
       rowsSelectable,
       enableMultiRowSelection,
       rowDisabledPredicate,
+      rowUnselectablePredicate,
       onSelectionDidChange,
       initiallySelected,
       syncWithAppState,
@@ -482,14 +490,20 @@ export const Table = forwardRef(
                 onDidChange: () => {
                   const allSelected = table
                     .getRowModel()
-                    .rows.every((row) => rowDisabledPredicate(row.original) || row.getIsSelected());
+                    .rows.every(
+                      (row) =>
+                        rowDisabledPredicate(row.original) ||
+                        rowUnselectablePredicate(row.original) ||
+                        row.getIsSelected(),
+                    );
                   checkAllRows(!allSelected);
                 },
               }}
             />
           ) : null,
         cell: ({ row }: CellContext<any, unknown>) => {
-          return (
+          return <>
+            {row.getCanSelect() &&
             <Toggle
               {...{
                 className: classnames(styles.checkBoxWrapper, {
@@ -507,8 +521,8 @@ export const Table = forwardRef(
                   }
                 },
               }}
-            />
-          );
+            />}
+          </>;
         },
       };
       return rowsSelectable ? [selectColumn, ...columnsWithCustomCell] : columnsWithCustomCell;
@@ -520,6 +534,7 @@ export const Table = forwardRef(
       checkAllRows,
       toggleRow,
       rowDisabledPredicate,
+      rowUnselectablePredicate,
       hoveredRowId,
       headerCheckboxHovered,
     ]);
@@ -572,13 +587,21 @@ export const Table = forwardRef(
       };
     }, [columnsWithSelectColumn]);
 
+    // --- Memoize the row selection predicate to ensure it's stable across renders
+    const enableRowSelectionFn = useCallback(
+      (row: Row<RowWithOrder>) => {
+        return rowsSelectable && !rowUnselectablePredicate(row.original);
+      },
+      [rowUnselectablePredicate, rowsSelectable],
+    );
+
     // --- Use the @tanstack/core-table component that manages a table
     const table = useReactTable<RowWithOrder>({
       columns: columnsWithSelectColumn,
       data: sortedData,
       getCoreRowModel: getCoreRowModel(),
       getPaginationRowModel: isPaginated ? getPaginationRowModel() : undefined,
-      enableRowSelection: rowsSelectable,
+      enableRowSelection: enableRowSelectionFn,
       enableMultiRowSelection,
       columnResizeMode: "onChange",
       getRowId: useCallback(
@@ -774,7 +797,10 @@ export const Table = forwardRef(
                             const allSelected = table
                               .getRowModel()
                               .rows.every(
-                                (row) => rowDisabledPredicate(row.original) || row.getIsSelected(),
+                                (row) =>
+                                  rowDisabledPredicate(row.original) ||
+                                  rowUnselectablePredicate(row.original) ||
+                                  row.getIsSelected(),
                               );
                             checkAllRows(!allSelected);
                           }
@@ -954,6 +980,9 @@ export const Table = forwardRef(
                       rowVirtualizer.measureElement(el);
                     }}
                     onClick={(event) => {
+                      if (!row.getCanSelect()) {
+                        return;
+                      }
                       if (event?.defaultPrevented) {
                         return;
                       }

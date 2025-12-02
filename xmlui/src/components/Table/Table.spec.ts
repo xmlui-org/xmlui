@@ -653,6 +653,345 @@ test.describe("Basic Functionality", () => {
     });
   });
 
+  test.describe("Selectable and Disabled Rows", () => {
+    test.describe("rowDisabledPredicate property", () => {
+      test("applies disabled styling to rows matching predicate", async ({ initTestBed, page }) => {
+        await initTestBed(`
+          <Table 
+            data='{${JSON.stringify(sampleData)}}' 
+            rowDisabledPredicate="{item => item.category === 'Vegetable'}"
+            testId="table"
+          >
+            <Column bindTo="name"/>
+            <Column bindTo="category"/>
+          </Table>
+        `);
+        
+        // Get all data rows (skip header row)
+        const rows = page.locator("tbody tr");
+        
+        // Apple and Banana rows should not have disabled class
+        const appleRow = rows.filter({ hasText: "Apple" });
+        await expect(appleRow).not.toHaveClass(/disabled/);
+        
+        const bananaRow = rows.filter({ hasText: "Banana" });
+        await expect(bananaRow).not.toHaveClass(/disabled/);
+        
+        // Carrot and Spinach rows should have disabled class
+        const carrotRow = rows.filter({ hasText: "Carrot" });
+        await expect(carrotRow).toHaveClass(/disabled/);
+        
+        const spinachRow = rows.filter({ hasText: "Spinach" });
+        await expect(spinachRow).toHaveClass(/disabled/);
+      });
+
+      test("disabled rows cannot be selected via checkbox click", async ({ initTestBed, page }) => {
+        await initTestBed(`
+          <Table 
+            data='{${JSON.stringify(sampleData)}}' 
+            rowsSelectable="true"
+            rowDisabledPredicate="{item => item.category === 'Vegetable'}"
+            testId="table"
+          >
+            <Column bindTo="name"/>
+            <Column bindTo="category"/>
+          </Table>
+        `);
+        
+        // All rows should have checkboxes (4 data rows + 1 header)
+        const checkboxes = page.locator("input[type='checkbox']");
+        await expect(checkboxes).toHaveCount(5);
+        
+        // Disabled rows have pointer-events: none so clicking won't work
+        // Verify the disabled row's checkbox is not checked
+        const carrotRow = page.locator("tbody tr").filter({ hasText: "Carrot" });
+        const carrotCheckbox = carrotRow.locator("input[type='checkbox']");
+        await expect(carrotCheckbox).not.toBeChecked();
+      });
+
+      test("disabled predicate receives the row item as parameter", async ({ initTestBed, page }) => {
+        await initTestBed(`
+          <Table 
+            data='{${JSON.stringify(sampleData)}}' 
+            rowDisabledPredicate="{item => item.quantity < 5}"
+            testId="table"
+          >
+            <Column bindTo="name"/>
+            <Column bindTo="quantity"/>
+          </Table>
+        `);
+        
+        const rows = page.locator("tbody tr");
+        
+        // Apple (5) should not be disabled
+        const appleRow = rows.filter({ hasText: "Apple" });
+        await expect(appleRow).not.toHaveClass(/disabled/);
+        
+        // Banana (3), Spinach (2) should be disabled
+        const bananaRow = rows.filter({ hasText: "Banana" });
+        await expect(bananaRow).toHaveClass(/disabled/);
+        
+        const spinachRow = rows.filter({ hasText: "Spinach" });
+        await expect(spinachRow).toHaveClass(/disabled/);
+        
+        // Carrot (10) should not be disabled
+        const carrotRow = rows.filter({ hasText: "Carrot" });
+        await expect(carrotRow).not.toHaveClass(/disabled/);
+      });
+
+      test("all rows are enabled when no predicate is provided", async ({ initTestBed, page }) => {
+        await initTestBed(`
+          <Table data='{${JSON.stringify(sampleData)}}' testId="table">
+            <Column bindTo="name"/>
+          </Table>
+        `);
+        
+        const rows = page.locator("tbody tr");
+        const rowCount = await rows.count();
+        
+        for (let i = 0; i < rowCount; i++) {
+          await expect(rows.nth(i)).not.toHaveClass(/disabled/);
+        }
+      });
+    });
+
+    test.describe("rowUnselectablePredicate property", () => {
+      test("hides checkbox for rows matching predicate", async ({ initTestBed, page }) => {
+        await initTestBed(`
+          <Table 
+            data='{${JSON.stringify(sampleData)}}' 
+            rowsSelectable="true"
+            rowUnselectablePredicate="{item => item.category === 'Vegetable'}"
+            testId="table"
+          >
+            <Column bindTo="name"/>
+            <Column bindTo="category"/>
+          </Table>
+        `);
+        
+        // Should have header checkbox + 2 fruit row checkboxes = 3 total
+        // Vegetable rows (Carrot, Spinach) should not have checkboxes
+        const checkboxes = page.locator("input[type='checkbox']");
+        await expect(checkboxes).toHaveCount(3);
+      });
+
+      test("unselectable rows cannot be selected via click", async ({ initTestBed, page }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Table 
+            data='{${JSON.stringify(sampleData)}}' 
+            rowsSelectable="true"
+            rowUnselectablePredicate="{item => item.category === 'Vegetable'}"
+            onSelectionDidChange="items => testState = items.length"
+            testId="table"
+          >
+            <Column bindTo="name"/>
+            <Column bindTo="category"/>
+          </Table>
+        `);
+        
+        // Click on a vegetable row (unselectable)
+        const carrotRow = page.locator("tbody tr").filter({ hasText: "Carrot" });
+        await carrotRow.click();
+        
+        // Selection should not change (or be 0)
+        await expect.poll(testStateDriver.testState).toBe(0);
+      });
+
+      test("selectable rows can still be selected", async ({ initTestBed, page }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Table 
+            data='{${JSON.stringify(sampleData)}}' 
+            rowsSelectable="true"
+            rowUnselectablePredicate="{item => item.category === 'Vegetable'}"
+            onSelectionDidChange="items => testState = items.length"
+            testId="table"
+          >
+            <Column bindTo="name"/>
+            <Column bindTo="category"/>
+          </Table>
+        `);
+        
+        // Click on a fruit row (selectable)
+        const appleRow = page.locator("tbody tr").filter({ hasText: "Apple" });
+        await appleRow.click();
+        
+        // Selection should have 1 item
+        await expect.poll(testStateDriver.testState).toBe(1);
+      });
+
+      test("select all checkbox only selects selectable rows", async ({ initTestBed, page }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Table 
+            data='{${JSON.stringify(sampleData)}}' 
+            rowsSelectable="true"
+            enableMultiRowSelection="true"
+            rowUnselectablePredicate="{item => item.category === 'Vegetable'}"
+            onSelectionDidChange="items => testState = items.length"
+            testId="table"
+          >
+            <Column bindTo="name"/>
+            <Column bindTo="category"/>
+          </Table>
+        `);
+        
+        // Click the header checkbox to select all
+        const headerCheckbox = page.locator("thead input[type='checkbox']");
+        await headerCheckbox.check({ force: true });
+        
+        // Should only select 2 items (Apple and Banana - the fruits)
+        await expect.poll(testStateDriver.testState).toBe(2);
+      });
+
+      test("has no effect when rowsSelectable is false", async ({ initTestBed, page }) => {
+        await initTestBed(`
+          <Table 
+            data='{${JSON.stringify(sampleData)}}' 
+            rowsSelectable="false"
+            rowUnselectablePredicate="{item => item.category === 'Vegetable'}"
+            testId="table"
+          >
+            <Column bindTo="name"/>
+            <Column bindTo="category"/>
+          </Table>
+        `);
+        
+        // No checkboxes should be present at all
+        const checkboxes = page.locator("input[type='checkbox']");
+        await expect(checkboxes).toHaveCount(0);
+      });
+
+      test("predicate is evaluated for all rows", async ({ initTestBed, page }) => {
+        // Test with more rows to ensure predicate is called for all
+        const moreData = [
+          { id: 1, name: "Item 1", selectable: true },
+          { id: 2, name: "Item 2", selectable: false },
+          { id: 3, name: "Item 3", selectable: true },
+          { id: 4, name: "Item 4", selectable: false },
+          { id: 5, name: "Item 5", selectable: true },
+          { id: 6, name: "Item 6", selectable: false },
+        ];
+        
+        await initTestBed(`
+          <Table 
+            data='{${JSON.stringify(moreData)}}' 
+            rowsSelectable="true"
+            rowUnselectablePredicate="{item => !item.selectable}"
+            testId="table"
+          >
+            <Column bindTo="name"/>
+          </Table>
+        `);
+        
+        // Should have header checkbox + 3 selectable row checkboxes = 4 total
+        const checkboxes = page.locator("input[type='checkbox']");
+        await expect(checkboxes).toHaveCount(4);
+      });
+    });
+
+    test.describe("rowDisabledPredicate and rowUnselectablePredicate combined", () => {
+      test("row can be both disabled and unselectable", async ({ initTestBed, page }) => {
+        await initTestBed(`
+          <Table 
+            data='{${JSON.stringify(sampleData)}}' 
+            rowsSelectable="true"
+            rowDisabledPredicate="{item => item.category === 'Vegetable'}"
+            rowUnselectablePredicate="{item => item.category === 'Vegetable'}"
+            testId="table"
+          >
+            <Column bindTo="name"/>
+            <Column bindTo="category"/>
+          </Table>
+        `);
+        
+        // Vegetable rows should be disabled
+        const carrotRow = page.locator("tbody tr").filter({ hasText: "Carrot" });
+        await expect(carrotRow).toHaveClass(/disabled/);
+        
+        // And should not have checkbox (3 checkboxes: header + 2 fruit rows)
+        const checkboxes = page.locator("input[type='checkbox']");
+        await expect(checkboxes).toHaveCount(3);
+      });
+
+      test("row can be disabled which prevents interaction (has pointer-events: none)", async ({ initTestBed, page }) => {
+        await initTestBed(`
+          <Table 
+            data='{${JSON.stringify(sampleData)}}' 
+            rowsSelectable="true"
+            rowDisabledPredicate="{item => item.category === 'Vegetable'}"
+            testId="table"
+          >
+            <Column bindTo="name"/>
+            <Column bindTo="category"/>
+          </Table>
+        `);
+        
+        // Vegetable rows should be disabled but have checkboxes
+        const carrotRow = page.locator("tbody tr").filter({ hasText: "Carrot" });
+        await expect(carrotRow).toHaveClass(/disabled/);
+        
+        // All rows should have checkboxes (5 total: header + 4 data rows)
+        const checkboxes = page.locator("input[type='checkbox']");
+        await expect(checkboxes).toHaveCount(5);
+        
+        // Disabled rows have pointer-events: none, so the checkbox exists but is not interactable
+        // The checkbox is also hidden by default (visibility: hidden) and only shows on hover,
+        // but disabled rows cannot be hovered due to pointer-events: none
+        const carrotCheckbox = carrotRow.locator("input[type='checkbox']");
+        await expect(carrotCheckbox).toHaveCount(1);
+        await expect(carrotCheckbox).not.toBeChecked();
+      });
+
+      test("row can be unselectable but not disabled (no disabled styling)", async ({ initTestBed, page }) => {
+        await initTestBed(`
+          <Table 
+            data='{${JSON.stringify(sampleData)}}' 
+            rowsSelectable="true"
+            rowUnselectablePredicate="{item => item.category === 'Vegetable'}"
+            testId="table"
+          >
+            <Column bindTo="name"/>
+            <Column bindTo="category"/>
+          </Table>
+        `);
+        
+        // Vegetable rows should NOT have disabled class
+        const carrotRow = page.locator("tbody tr").filter({ hasText: "Carrot" });
+        await expect(carrotRow).not.toHaveClass(/disabled/);
+        
+        // But should not have checkbox
+        const checkboxes = page.locator("input[type='checkbox']");
+        await expect(checkboxes).toHaveCount(3);
+      });
+
+      test("different predicates can target different rows", async ({ initTestBed, page }) => {
+        await initTestBed(`
+          <Table 
+            data='{${JSON.stringify(sampleData)}}' 
+            rowsSelectable="true"
+            rowDisabledPredicate="{item => item.name === 'Apple'}"
+            rowUnselectablePredicate="{item => item.name === 'Banana'}"
+            testId="table"
+          >
+            <Column bindTo="name"/>
+            <Column bindTo="category"/>
+          </Table>
+        `);
+        
+        // Apple should be disabled but selectable
+        const appleRow = page.locator("tbody tr").filter({ hasText: "Apple" });
+        await expect(appleRow).toHaveClass(/disabled/);
+        
+        // Banana should not be disabled but unselectable (no checkbox)
+        const bananaRow = page.locator("tbody tr").filter({ hasText: "Banana" });
+        await expect(bananaRow).not.toHaveClass(/disabled/);
+        
+        // Should have 4 checkboxes: header + Apple + Carrot + Spinach (Banana has no checkbox)
+        const checkboxes = page.locator("input[type='checkbox']");
+        await expect(checkboxes).toHaveCount(4);
+      });
+    });
+  });
+
   test.describe("noDataTemplate property", () => {
     test("shows custom no data template when data is empty", async ({ initTestBed, page }) => {
       await initTestBed(`

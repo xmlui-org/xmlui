@@ -42,6 +42,10 @@ All samples use table columns with the following definition unless noted otherwi
 
 This property indicates when the row selection header is displayed. When the value is `true,` the selection header is always visible. Otherwise, it is displayed only when hovered.
 
+### `alwaysShowSortingIndicator` (default: false) [#alwaysshowsortingindicator-default-false]
+
+This property indicates whether the sorting indicator is always visible in the column headers. When set to `true`, the sorting indicator is always visible. Otherwise, it is visible only when the user hovers over/focuses the column header, or the column is sorted.
+
 ### `autoFocus` (default: false) [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.

@@ -131,6 +131,11 @@ export const TableMd = createMetadata({
         `row should be disabled. The function retrieves the item to display and should return ` +
         `a Boolean-like value.`,
     ),
+    rowUnselectablePredicate: {
+      description: `This property defines a predicate function with a return value that determines if the ` +
+        `row should be unselectable. The function retrieves the item to display and should return ` +
+        `a Boolean-like value. This property only has an effect when the \`rowsSelectable\` property is set to \`true\`.`,
+    },
     noDataTemplate: dComponent(
       `A property to customize what to display if the table does not contain any data.`,
     ),
@@ -418,6 +423,7 @@ const TableWithColumns = memo(
             isPaginated={extractValue.asOptionalBoolean(node.props?.isPaginated)}
             headerHeight={extractValue.asSize(node.props.headerHeight)}
             rowDisabledPredicate={lookupSyncCallback(node.props.rowDisabledPredicate)}
+            rowUnselectablePredicate={lookupSyncCallback(node.props.rowUnselectablePredicate)}
             sortBy={extractValue(node.props?.sortBy)}
             sortingDirection={extractValue(node.props?.sortDirection)}
             iconSortAsc={extractValue.asOptionalString(node.props?.iconSortAsc)}

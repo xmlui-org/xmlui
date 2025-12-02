@@ -1,6 +1,6 @@
 # Animation [#animation]
 
-No description provided.
+The `Animation` component represents a generic animation wrapper that can apply various animations to its children.
 
 ## Properties
 
