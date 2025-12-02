@@ -95,7 +95,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
     );
 
     const selectedOption = useMemo(() => {
-      return options.find((option) => String(option.value) === String(value));
+      return options.find((option) => `${option.value}` === `${value}`);
     }, [options, value]);
 
     // Group options if groupBy is provided

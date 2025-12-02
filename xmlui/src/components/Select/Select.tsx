@@ -280,7 +280,6 @@ export const selectComponentRenderer = createComponentRenderer(
               }
             : undefined
         }
-        {...rest}
       >
         {renderChild(node.children)}
       </Select>
