@@ -11,7 +11,6 @@ import { Portal } from "@ark-ui/react/portal";
 import { Select as ArkSelect, createListCollection, useSelect } from "@ark-ui/react/select";
 import classnames from "classnames";
 import styles from "./Select.module.scss";
-import { composeRefs } from "@radix-ui/react-compose-refs";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
@@ -22,6 +21,7 @@ import { SelectContext } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { OptionContext } from "./OptionContext";
 import { HiddenOption } from "./HiddenOption";
+import { Part } from "../Part/Part";
 
 const PART_LIST_WRAPPER = "listWrapper";
 const PART_CLEAR_BUTTON = "clearButton";
@@ -389,84 +389,87 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select
             fitViewport: true,
           }}
         >
-          <ArkSelect.Control data-part-id={PART_LIST_WRAPPER}>
-            <ArkSelect.Trigger
-              id={id}
-              ref={forwardedRef}
-              {...rest}
-              autoFocus={autoFocus}
-              style={style}
-              className={classnames(className, styles.selectTrigger, styles[validationStatus], {
-                [styles.disabled]: !enabled,
-                [styles.multi]: multiSelect,
-              })}
-              onFocus={focus}
-              onBlur={onBlur}
-            >
-              {/* Value display */}
-              <div className={styles.selectTriggerContent}>
-                {multiSelect ? (
-                  arkValue.length > 0 ? (
-                    <div className={styles.badgeListContainer}>
-                      <div className={styles.badgeList}>
-                        {arkValue.map((v) => {
-                          const option = Array.from(options).find((o) => String(o.value) === v);
-                          return valueRenderer && option ? (
-                            valueRenderer(option, () => toggleOption(v))
-                          ) : (
-                            <span key={v} className={styles.badge}>
-                              {option?.label || v}
-                              <Icon
-                                name="close"
-                                size="sm"
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  toggleOption(v);
-                                }}
-                              />
-                            </span>
-                          );
-                        })}
+          <Part partId={PART_LIST_WRAPPER}>
+            <ArkSelect.Control>
+              <ArkSelect.Trigger
+                id={id}
+                ref={forwardedRef}
+                {...rest}
+                autoFocus={autoFocus}
+                style={style}
+                className={classnames(className, styles.selectTrigger, styles[validationStatus], {
+                  [styles.disabled]: !enabled,
+                  [styles.multi]: multiSelect,
+                })}
+                onFocus={focus}
+                onBlur={onBlur}
+              >
+                {/* Value display */}
+                <div className={styles.selectTriggerContent}>
+                  {multiSelect ? (
+                    arkValue.length > 0 ? (
+                      <div className={styles.badgeListContainer}>
+                        <div className={styles.badgeList}>
+                          {arkValue.map((v) => {
+                            const option = Array.from(options).find((o) => String(o.value) === v);
+                            return valueRenderer && option ? (
+                              valueRenderer(option, () => toggleOption(v))
+                            ) : (
+                              <span key={v} className={styles.badge}>
+                                {option?.label || v}
+                                <Icon
+                                  name="close"
+                                  size="sm"
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    toggleOption(v);
+                                  }}
+                                />
+                              </span>
+                            );
+                          })}
+                        </div>
                       </div>
+                    ) : (
+                      <span className={styles.placeholder}>{placeholder}</span>
+                    )
+                  ) : arkValue.length > 0 ? (
+                    <div className={styles.selectValue}>
+                      {(() => {
+                        const selectedValue = arkValue[0];
+                        const selectedOption = Array.from(options).find(
+                          (o) => String(o.value) === selectedValue,
+                        );
+                        return selectedOption?.label || selectedValue;
+                      })()}
                     </div>
                   ) : (
                     <span className={styles.placeholder}>{placeholder}</span>
-                  )
-                ) : arkValue.length > 0 ? (
-                  <div className={styles.selectValue}>
-                    {(() => {
-                      const selectedValue = arkValue[0];
-                      const selectedOption = Array.from(options).find(
-                        (o) => String(o.value) === selectedValue,
-                      );
-                      return selectedOption?.label || selectedValue;
-                    })()}
-                  </div>
-                ) : (
-                  <span className={styles.placeholder}>{placeholder}</span>
-                )}
-              </div>
+                  )}
+                </div>
 
-              {/* Actions (clear + chevron) */}
-              <div className={styles.actions}>
-                {arkValue.length > 0 && enabled && !readOnly && clearable && (
-                  <span
-                    data-part-id={PART_CLEAR_BUTTON}
-                    className={styles.action}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      clearValue();
-                    }}
-                  >
-                    <Icon name="close" />
-                  </span>
-                )}
-                <ArkSelect.Indicator className={styles.action}>
-                  <Icon name="chevrondown" />
-                </ArkSelect.Indicator>
-              </div>
-            </ArkSelect.Trigger>
-          </ArkSelect.Control>
+                {/* Actions (clear + chevron) */}
+                <div className={styles.actions}>
+                  {arkValue.length > 0 && enabled && !readOnly && clearable && (
+                    <Part partId={PART_CLEAR_BUTTON}>
+                      <span
+                        className={styles.action}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          clearValue();
+                        }}
+                      >
+                        <Icon name="close" />
+                      </span>
+                    </Part>
+                  )}
+                  <ArkSelect.Indicator className={styles.action}>
+                    <Icon name="chevrondown" />
+                  </ArkSelect.Indicator>
+                </div>
+              </ArkSelect.Trigger>
+            </ArkSelect.Control>
+          </Part>
           <Portal>
             <ArkSelect.Positioner>
               <ArkSelect.Content
