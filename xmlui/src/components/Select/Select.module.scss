@@ -171,6 +171,9 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
 
 
  
+  .select {
+    width: 100%;
+  }
 
 
   .selectTrigger {
@@ -252,19 +255,6 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     cursor: pointer;
   }
 
-  /**
-   * Common empty state
-   */
-  .emptyList {
-    display: flex;
-    gap: .2rem;
-    padding: 10px 0;
-    justify-content: center;
-    align-items: center;
-    font-size: 14px;
-    width: 100%;
-  }
-
   // =============================================================================
   // MULTI-SELECT SPECIFIC (searchable + multiSelect)
   // =============================================================================
@@ -285,14 +275,6 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     display: flex;
     flex-wrap: wrap;
     gap: 0.25rem;
-  }
-
-  .inputWrapper {
-    display: flex;
-    align-items: center;
-    min-width: fit-content;
-    flex: 1;
-    gap: t.$space-1;
   }
 
   .badge {
@@ -408,27 +390,16 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
       justify-content: space-between;
     }
 
+    &[data-state="checked"], 
     &[aria-selected="true"] {
       background-color: $backgroundColor-item-Select--active;
     }
 
-    &:hover,
-    &.highlighted {
+    &:hover, &[data-highlighted] {
       background-color: $backgroundColor-item-Select--hover;
     }
 
-    &[data-selected=true] {
-      background-color: $backgroundColor-item-Select--active;
-    }
-
     &[aria-disabled="true"],
-    &.disabledOption {
-      pointer-events: none;
-      cursor: not-allowed;
-      color: $textColor-item-Select--disabled;
-      font-style: italic;
-    }
-
     &[data-disabled=true] {
       pointer-events: none;
       opacity: $opacity-text-item-Select--disabled;
@@ -453,71 +424,6 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     // Inherit font-size from parent .selectTrigger which has variant-specific fontSize
   }
 
-  /**
-   * Dropdown content container
-   */
-  .selectDropdownContent {
-    position: relative;
-    width: 100%;
-    max-height: 280px;
-    overflow: auto;
-    background-color: $backgroundColor-menu-Select;
-    border-radius: $borderRadius-menu-Select;
-    box-shadow: $boxShadow-menu-Select;
-    border: $borderWidth-menu-Select solid $borderColor-menu-Select;
-
-    &[data-state='open'] {
-      animation: fadeIn $animDuration ease-in-out, zoomIn $animDuration ease-in-out;
-    }
-
-    &[data-state='closed'] {
-      animation: fadeOut $animDuration ease-in-out, zoomOut $animDuration ease-in-out;
-    }
-
-    &[data-side='bottom'] {
-      animation: slideInFromTop 0.08s ease-in-out;
-      transform: translateY(0.15rem);
-    }
-
-    &[data-side='left'] {
-      animation: slideInFromRight $animDuration ease-in-out;
-      transform: translateX(-0.15rem);
-    }
-
-    &[data-side='right'] {
-      animation: slideInFromLeft $animDuration ease-in-out;
-      transform: translateX(0.15rem);
-    }
-
-    &[data-side='top'] {
-      animation: slideInFromBottom $animDuration ease-in-out;
-      transform: translateY(-0.15rem);
-    }
-  }
-
-  .selectViewport {
-    height: fit-content;
-    width: 100%;
-  }
-
-  .selectScrollUpButton {
-    display: flex;
-    cursor: default;
-    align-items: center;
-    justify-content: center;
-    padding-top: 0.25rem;
-    padding-bottom: 0.25rem;
-  }
-
-  .selectScrollDownButton {
-    display: flex;
-    cursor: default;
-    align-items: center;
-    justify-content: center;
-    padding-top: 0.25rem;
-    padding-bottom: 0.25rem;
-  }
-
   .selectEmpty {
     display: flex;
     gap: .2rem;
@@ -527,159 +433,6 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     align-items: center;
     font-size: 14px;
     width: 100%;
-  }
-
-  /**
-   * SelectOption component (used in SimpleSelect dropdown)
-   */
-  .selectOption {
-    @include t.paddingVars($themeVars, "item-#{$componentName}");
-    transition: background-color 0.2s ease;
-    background-color: $backgroundColor-item-Select;
-    gap: t.$space-1;
-    position: relative;
-    display: flex;
-    cursor: pointer;
-    user-select: none;
-    align-items: center;
-    outline: none;
-    justify-content: space-between;
-    min-height: $minHeight-item-Select;
-
-    &[data-state=checked] {
-      background-color: $backgroundColor-item-Select--active;
-    }
-
-    &[data-highlighted] {
-      background-color: $backgroundColor-item-Select--hover;
-    }
-
-    .selectOptionContent {
-      display: flex;
-      flex: 1;
-      cursor: pointer;
-      user-select: none;
-      align-items: center;
-      outline: none;
-    }
-
-    &[data-disabled] {
-      pointer-events: none;
-      opacity: $opacity-text-item-Select--disabled;
-      cursor: not-allowed;
-      font-style: italic;
-    }
-  }
-
-  .selectOptionIndicator {
-    display: flex;
-    margin-right: 0.5rem;
-    flex-shrink: 0;
-    height: 0.875rem;
-    width: 0.875rem;
-    align-items: center;
-    justify-content: center;
-    color: $textColor-indicator-Select;
-  }
-
-  // =============================================================================
-  // UTILITY CLASSES
-  // =============================================================================
-
-  .loading {
-    padding: 0.5rem 1rem;
-  }
-
-  .srOnly {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-
-    to {
-      opacity: 1;
-    }
-  }
-
-  @keyframes fadeOut {
-    from {
-      opacity: 1;
-    }
-
-    to {
-      opacity: 0;
-    }
-  }
-
-  @keyframes zoomIn {
-    from {
-      transform: scale(0.95);
-    }
-
-    to {
-      transform: scale(1);
-    }
-  }
-
-  @keyframes zoomOut {
-    from {
-      transform: scale(1);
-    }
-
-    to {
-      transform: scale(0.95);
-    }
-  }
-
-  @keyframes slideInFromTop {
-    from {
-      transform: translateY(-0.75rem);
-    }
-
-    to {
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes slideInFromBottom {
-    from {
-      transform: translateY(0.75rem);
-    }
-
-    to {
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes slideInFromLeft {
-    from {
-      transform: translateX(-100%);
-    }
-
-    to {
-      transform: translateX(0);
-    }
-  }
-
-  @keyframes slideInFromRight {
-    from {
-      transform: translateX(100%);
-    }
-
-    to {
-      transform: translateX(0);
-    }
   }
 }
 

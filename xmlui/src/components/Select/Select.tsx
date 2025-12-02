@@ -27,9 +27,9 @@ export const SelectMd = createMetadata({
   status: "stable",
   description:
     "`Select` provides a dropdown interface for choosing from a list of options, " +
-    "supporting both single and multiple selection modes. It offers extensive " +
-    "customization capabilities including search functionality, custom templates, " +
-    "and comprehensive form integration.",
+    "supporting both single and multiple selection modes. Built on top of Ark UI, " +
+    "it offers extensive customization capabilities including search functionality, " +
+    "custom templates, and comprehensive form integration.",
   parts: {
     clearButton: {
       description: "The button to clear the selected value(s).",
@@ -49,7 +49,7 @@ export const SelectMd = createMetadata({
     initialValue: dInitialValue(),
     value: {
       description: "This property sets the current value of the component.",
-      isInternal: true, //TODO illesg temp
+      isInternal: true,
     },
     autoFocus: {
       ...dAutoFocus(),
@@ -108,9 +108,16 @@ export const SelectMd = createMetadata({
       description: `This property enables a clear button that allows the user to clear the selected value(s).`,
       defaultValue: defaultProps.clearable,
     },
+    groupBy: {
+      description:
+        `This property enables grouping of options by any custom property name. ` +
+        `Specify the property name (e.g., "type", "category") that exists on your Option components. ` +
+        `Options will be automatically grouped based on the value of that property.`,
+      valueType: "string",
+    },
     modal: {
       isInternal: true,
-      description: "internal radix modal prop",
+      description: "internal modal prop",
       valueType: "boolean",
     },
   },
@@ -193,6 +200,7 @@ export const selectComponentRenderer = createComponentRenderer(
     const multiSelect = extractValue.asOptionalBoolean(node.props.multiSelect);
     const searchable = extractValue.asOptionalBoolean(node.props.searchable);
     const clearable = extractValue.asOptionalBoolean(node.props.clearable);
+    const groupBy = extractValue.asOptionalString(node.props.groupBy);
 
     const isControlled = node.props.value !== undefined;
     return (
@@ -207,6 +215,7 @@ export const selectComponentRenderer = createComponentRenderer(
         updateState={isControlled ? undefined : updateState}
         searchable={searchable}
         clearable={clearable}
+        groupBy={groupBy}
         initialValue={extractValue(node.props.initialValue)}
         value={isControlled ? extractValue(node.props.value) : state?.value}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}

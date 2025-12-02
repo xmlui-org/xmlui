@@ -52,7 +52,6 @@ import { Items } from "../Items/ItemsNative";
 import { EMPTY_ARRAY } from "../../components-core/constants";
 import { useShallowCompareMemoize } from "../../components-core/utils/hooks";
 import styles from "./FormItem.module.scss";
-import { Select2 } from "../Select/Select2Native";
 
 const DEFAULT_LABEL_POSITIONS: Record<FormControlType | string, LabelPosition> = {
   checkbox: "end",
@@ -283,23 +282,6 @@ export const FormItem = memo(function FormItem({
         >
           {children}
         </Select>
-      );
-      break;
-    }
-    case "select2": {
-      formControl = (
-        <Select2
-          {...rest}
-          value={value}
-          updateState={onStateChange}
-          registerComponentApi={registerComponentApi}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          enabled={isEnabled}
-          validationStatus={validationStatus}
-        >
-          {children}
-        </Select2>
       );
       break;
     }

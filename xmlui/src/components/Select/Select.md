@@ -1,303 +1,163 @@
-%-DESC-START
+# Select
 
-**Key features:**
-- **Flexible selection modes**: Single selection by default, with optional multi-select capability
-- **Option containers**: Uses Option components to define selectable items with separate values and labels
-- **Search functionality**: Optional filtering to quickly find options in large lists
-- **Custom templates**: Configurable option display, value presentation, and empty state templates
-- **Dynamic options**: Supports both static [Option](/components/Option) children and dynamic lists via [Items](/components/Items).
+A dropdown component for selecting options from a list, built on top of Ark UI's Select component.
 
-## Using `Select`
+## Overview
 
-The component accepts `Option` components as children defining a particular option's label-value pair.
-`Option` requires a `value` property and while also having a `label` that is displayed in the list.
-If the `label` is not specified `value` is shown.
+`Select` provides a powerful dropdown interface for choosing from a list of options, built using `@ark-ui/react`. It offers robust accessibility, keyboard navigation, and extensive customization capabilities.
 
-```xmlui-pg copy display name="Example: using Select" height="200px"
-<App>
-  <Select>
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
-  </Select>
-</App>
+## Key Features
+
+- **Full API Compatibility**: Accepts the same props and provides the same functionality as the original Select
+- **Single & Multi-Select**: Support for both single selection and multiple selection modes
+- **Searchable**: Built-in search functionality to filter options
+- **Clearable**: Optional clear button to reset selections
+- **Custom Templates**: Support for custom value and option rendering
+- **Form Integration**: Works seamlessly with XMLUI forms
+- **Accessibility**: Built on Ark UI's accessible Select component
+
+## Usage
+
+### Basic Example
+
+```xml
+<Select>
+  <Option value="1" label="Option 1"/>
+  <Option value="2" label="Option 2"/>
+  <Option value="3" label="Option 3"/>
+</Select>
 ```
 
-You can use `Select` with dynamic options:
+### Multi-Select
 
-```xmlui-pg copy display name="Example: using Select with dynamic options" height="200px"
-<App>
-  <Select>
-    <Items data="{['one', 'two', 'three']}" >
-      <Option value="{$itemIndex}" label="{$item}" />
-    </Items>
-  </Select>
-</App>
+```xml
+<Select multiSelect="{true}" clearable="{true}">
+  <Option value="1" label="Option 1"/>
+  <Option value="2" label="Option 2"/>
+  <Option value="3" label="Option 3"/>
+</Select>
 ```
 
-%-DESC-END
+### Searchable
 
-%-PROP-START initialValue
-
-```xmlui-pg copy display name="Example: initialValue" height="200px"
-<App>
-  <Select initialValue="opt3">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
-  </Select>
-</App>
+```xml
+<Select searchable="{true}" placeholder="Search options...">
+  <Option value="1" label="Apple"/>
+  <Option value="2" label="Banana"/>
+  <Option value="3" label="Cherry"/>
+</Select>
 ```
 
-%-PROP-END
+### With Initial Value
 
-%-PROP-START optionTemplate
-
-```xmlui-pg copy display name="Example: optionTemplate" height="200px"
-<App>
-  <Select>
-    <property name="optionTemplate">
-      <HStack verticalAlignment="center" gap="$space-0_5">
-        <Icon name="info" />
-        <Text value="{$item.label}" variant="strong" />
-      </HStack>
-    </property>
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
-  </Select>
-</App>
+```xml
+<Select initialValue="{2}">
+  <Option value="1" label="Option 1"/>
+  <Option value="2" label="Option 2"/>
+  <Option value="3" label="Option 3"/>
+</Select>
 ```
 
-%-PROP-END
+### With Grouping
 
-%-PROP-START placeholder
+You can group options by any custom property. Just add the property to each `Option` and specify its name in `groupBy`:
 
-```xmlui-pg copy display name="Example: placeholder" height="200px"
-<App>
-  <Select placeholder="Please select an item">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
-  </Select>
-</App>
+```xml
+<Select groupBy="type">
+  <Option value="apple" label="Apple" type="fruit"/>
+  <Option value="banana" label="Banana" type="fruit"/>
+  <Option value="carrot" label="Carrot" type="vegetable"/>
+  <Option value="lettuce" label="Lettuce" type="vegetable"/>
+</Select>
 ```
 
-%-PROP-END
+You can use any property name for grouping:
 
-%-PROP-START validationStatus
-
-```xmlui-pg copy display name="Example: validationStatus" height="280px"
-<App>
-  <Select />
-  <Select validationStatus="valid" />
-  <Select validationStatus="warning" />
-  <Select validationStatus="error" />
-</App>
+```xml
+<Select groupBy="category">
+  <Option value="react" label="React" category="Frontend"/>
+  <Option value="node" label="Node.js" category="Backend"/>
+  <Option value="postgres" label="PostgreSQL" category="Database"/>
+</Select>
 ```
 
-%-PROP-END
+Combined with multi-select, searchable, and clearable:
 
-%-PROP-START enabled
-
-```xmlui-pg copy display name="Example: enabled"
-<App>
-  <Select enabled="false" />
-</App>
+```xml
+<Select multiSelect="{true}" searchable="{true}" clearable="{true}" groupBy="type">
+  <Option value="apple" label="Apple" type="fruit"/>
+  <Option value="banana" label="Banana" type="fruit"/>
+  <Option value="carrot" label="Carrot" type="vegetable"/>
+  <Option value="lettuce" label="Lettuce" type="vegetable"/>
+</Select>
 ```
 
-%-PROP-END
+### Dynamic Options with Items
 
-%-PROP-START emptyListTemplate
-
-Click on the second field to see the custom empty list indicator.
-
-```xmlui-pg copy {9-11} display name="Example: emptyListTemplate" height="260px"
-<App>
-  <VStack>
-    <Text value="Default:" />
-    <Select />
-  </VStack>
-  <VStack>
-    <Text value="Custom:" />
-    <Select>
-      <property name="emptyListTemplate">
-        <Text variant="strong" value="Nothing to see here!" />
-      </property>
-    </Select>
-  </VStack>
-</App>
+```xml
+<Select>
+  <Items data="{['React', 'Vue', 'Angular']}">
+    <Option value="{$itemIndex}" label="{$item}" />
+  </Items>
+</Select>
 ```
 
-%-PROP-END
+## Props
 
-%-PROP-START dropdownHeight
+All props from the original `Select` component are supported:
 
-```xmlui-pg copy display name="Example: dropdownHeight" height="300px"
-<App>
-  <Select dropdownHeight="180px">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
-    <Option value="opt4" label="fourth"/>
-    <Option value="opt5" label="fifth"/>
-    <Option value="opt6" label="sixth"/>
-    <Option value="opt7" label="seventh"/>
-    <Option value="opt8" label="eighth"/>
-    <Option value="opt9" label="ninth"/>
-    <Option value="opt10" label="tenth"/>
-    <Option value="opt11" label="eleventh"/>
-    <Option value="opt12" label="twelfth"/>
-  </Select>
-</App>
-```
+### Basic Props
+- `id`: Unique identifier
+- `initialValue`: Initial selected value(s)
+- `value`: Controlled value
+- `enabled`: Enable/disable the select (default: true)
+- `placeholder`: Placeholder text
+- `autoFocus`: Auto-focus on mount
+- `readOnly`: Make the select read-only
+- `required`: Mark as required for forms
 
-%-PROP-END
+### Styling Props
+- `style`: Custom CSS styles
+- `className`: Custom CSS class names
+- `dropdownHeight`: Height of the dropdown menu
+- `validationStatus`: Validation state ("none", "valid", "invalid", "warning")
 
-%-PROP-START multiSelect
+### Feature Props
+- `searchable`: Enable search functionality (default: false)
+- `multiSelect`: Enable multiple selection (default: false)
+- `clearable`: Show clear button (default: false)
+- `groupBy`: Group options by any custom property name (e.g., "type", "category"). Add the property to each `Option` and specify its name here.
 
-```xmlui-pg copy display name="Example: multiSelect" height="300px"
-<App>
-  <Select multiSelect="true" dropdownHeight="180px" >
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
-    <Option value="opt4" label="fourth"/>
-    <Option value="opt5" label="fifth"/>
-    <Option value="opt6" label="sixth"/>
-    <Option value="opt7" label="seventh"/>
-    <Option value="opt8" label="eighth"/>
-    <Option value="opt9" label="ninth"/>
-    <Option value="opt10" label="tenth"/>
-    <Option value="opt11" label="eleventh"/>
-    <Option value="opt12" label="twelfth"/>
-  </Select>
-</App>
-```
+### Event Handlers
+- `onDidChange`: Called when value changes
+- `onFocus`: Called when select gains focus
+- `onBlur`: Called when select loses focus
 
-%-PROP-END
+### Advanced Props
+- `valueRenderer`: Custom renderer for selected values (multi-select)
+- `optionRenderer`: Custom renderer for options in dropdown
+- `emptyListTemplate`: Custom template for empty list state
+- `inProgress`: Show loading state
+- `inProgressNotificationMessage`: Loading message
 
-%-PROP-START optionLabelTemplate
+## API Methods
 
-In the template definition, you can use the `$item` context property to access the particular item's `label` and `value`.
+- `focus()`: Programmatically focus the select
+- `setValue(value)`: Set the value programmatically
+- `reset()`: Reset to initial value
+- `value`: Get current value (read-only property)
 
-```xmlui-pg copy {3-9} display name="Example: optionLabelTemplate" height="300px"
-<App>
-  <Select initialValue="{0}" placeholder="Select..." searchable>
-    <property name="optionLabelTemplate">
-      <HStack
-        paddingHorizontal="$padding-tight"
-        border="2px dotted $color-primary-500">
-        <Text>{$item.label}</Text>
-      </HStack>
-    </property>
-    <Option value="{0}" label="zero"/>
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
-  </Select>
-</App>
-```
+## Key Implementation Features
 
-%-PROP-END
+- Built on Ark UI's accessible Select component for best-in-class accessibility
+- Robust keyboard navigation and screen reader support
+- Smart positioning and portal handling
+- Future-proof implementation based on modern UI primitives
 
-%-PROP-START valueTemplate
+## Implementation Details
 
-In the template definition, you can use the `$item` context property to access the particular item's `label` and `value`.  The `$itemContext` property provides a `removeItem` method to delete a value from the current selection.
-
-```xmlui-pg copy {3-15} display name="Example: valueTemplate" height="300px"
-<App>
-  <Select initialValue="{0}" placeholder="Select..." multiSelect>
-    <property name="valueTemplate">
-      <HStack
-        paddingLeft="$padding-tight"
-        border="2px dotted $color-primary-500"
-        verticalAlignment="center">
-        <Text>{$item.label}</Text>
-        <Button
-          variant="ghost"
-          icon="close"
-          size="xs"
-          onClick="$itemContext.removeItem()"/>
-      </HStack>
-    </property>
-    <Option value="{0}" label="zero"/>
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
-  </Select>
-</App>
-```
-
-%-PROP-END
-
-%-EVENT-START didChange
-
-```xmlui-pg copy display name="Example: didChange" height="260px"
-<App>
-  <variable name="newValue" value="(none)" />
-  <Text value="{newValue}" />
-  <Select onDidChange="(newItem) => newValue = newItem">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
-  </Select>
-</App>
-```
-
-%-EVENT-END
-
-%-EVENT-START gotFocus
-
-```xmlui-pg copy {5-6} display name="Example: gotFocus/lostFocus" height="260px"
-<App>
-  <variable name="isFocused" value="{false}" />
-  <Text value="Input control is focused: {isFocused}" />
-  <Select
-    onGotFocus="isFocused = true"
-    onLostFocus="isFocused = false">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
-  </Select>
-</App>
-```
-
-%-EVENT-END
-
-%-API-START focus
-
-```xmlui-pg copy display name="Example: focus()" height="260px"
-<App>
-  <Button label="Focus Input" onClick="inputControl.focus()" />
-  <Select id="inputControl">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
-  </Select>
-</App>
-```
-
-%-API-END
-
-%-API-START setValue
-
-```xmlui-pg copy display name="Example: setValue()" height="260px"
-<App>
-  <Select id="inputControl">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
-  </Select>
-  <HStack>
-    <Button
-      label="Select 2nd Item"
-      onClick="inputControl.setValue('opt2')" />
-    <Button
-      label="Remove Selection"
-      onClick="inputControl.setValue('')" />
-  </HStack>
-</App>
-```
-
-%-API-END
+- Built on `@ark-ui/react` Select component
+- Uses `createListCollection` for managing options
+- Maintains backward compatibility with string/number value types
+- Supports the same styling classes as the original Select
+- Reuses existing Select styles and theme variables

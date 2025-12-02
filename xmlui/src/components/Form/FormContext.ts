@@ -118,7 +118,6 @@ export const formControlTypes = [
   "integer2",
   "file",
   "select",
-  "select2",
   "autocomplete",
   "datePicker",
   "radioGroup",
@@ -172,11 +171,7 @@ export const formControlTypesMd: PropertyValueDescription[] = [
   },
   {
     value: "select",
-    description: "Renders Select",
-  },
-  {
-    value: "select2",
-    description: "Renders Select2",
+    description: "Renders Select (with Ark UI support)",
   },
   {
     value: "autocomplete",
