@@ -917,22 +917,22 @@ test.describe("Nested DropdownMenu and AutoComplete", () => {
     const confirmDialog = page.getByRole("dialog", { name: "Confirm action" });
     await expect(confirmDialog).toBeVisible();
 
-    await page.mouse.click(10, 10, {delay: 100}); // Click outside all dialogs
+    await page.mouse.click(10, 10, { delay: 100 }); // Click outside all dialogs
     await expect(confirmDialog).not.toBeVisible();
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Item 1")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10, {delay: 100});
+    await page.mouse.click(10, 10, { delay: 100 });
     await expect(page.getByText("Option 1")).not.toBeVisible();
     await expect(page.getByText("Item 1")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10, {delay: 100});
+    await page.mouse.click(10, 10, { delay: 100 });
     await expect(page.getByText("Item 1")).not.toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10, {delay: 100});
+    await page.mouse.click(10, 10, { delay: 100 });
     await expect(page.getByText("Outer Dialog")).not.toBeVisible();
   });
 
@@ -978,11 +978,14 @@ test.describe("Nested DropdownMenu and AutoComplete", () => {
     await expect(autoCompleteDriver.component).toBeVisible();
 
     await autoCompleteDriver.click();
+    await page.waitForTimeout(100);
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Option 2")).toBeVisible();
 
     const dropdownDriver = await createDropdownMenuDriver("nested-dropdown");
     await dropdownDriver.open();
+    await page.waitForTimeout(100);
+
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Option 2")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
@@ -990,26 +993,26 @@ test.describe("Nested DropdownMenu and AutoComplete", () => {
     await expect(page.getByText("Item 1")).toBeVisible();
     await expect(page.getByText("Item 2")).toBeVisible();
 
-    await page.getByText("Confirm action").click();
+    await page.getByText("Confirm action").click({ delay: 100 });
     const confirmDialog = page.getByRole("dialog", { name: "Confirm action" });
     await expect(confirmDialog).toBeVisible();
 
-    await page.mouse.click(10, 10, {delay: 100}); // Click outside all dialogs
+    await page.mouse.click(10, 10, { delay: 100 }); // Click outside all dialogs
     await expect(confirmDialog).not.toBeVisible();
     await expect(page.getByText("Item 1")).toBeVisible();
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10, {delay: 100});
+    await page.mouse.click(10, 10, { delay: 100 });
     await expect(page.getByText("Item 1")).not.toBeVisible();
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10, {delay: 100});
+    await page.mouse.click(10, 10, { delay: 100 });
     await expect(page.getByText("Option 1")).not.toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10, {delay: 100});
+    await page.mouse.click(10, 10, { delay: 100 });
     await expect(page.getByText("Outer Dialog")).not.toBeVisible();
   });
 });

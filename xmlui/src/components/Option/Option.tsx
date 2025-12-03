@@ -45,6 +45,11 @@ export const optionComponentRenderer = createComponentRenderer(
       return null;
     }
 
+    const hasTextNodeChild =
+      node.children?.length === 1 &&
+      (node.children[0].type === "TextNode" || node.children[0].type === "TextNodeCData");
+    const textNodeChild = hasTextNodeChild ? (renderChild(node.children) as string) : undefined;
+
     // Extract all extra properties (like category, etc.) for grouping and filtering
     const extraProps: Record<string, any> = {};
     const knownProps = new Set(["label", "value", "enabled", "keywords"]);
@@ -56,26 +61,28 @@ export const optionComponentRenderer = createComponentRenderer(
 
     return (
       <OptionNative
-        label={label}
+        label={label || textNodeChild}
         value={value !== undefined && value !== "" ? value : label}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         keywords={extractValue.asOptionalStringArray(node.props.keywords)}
         className={className}
-        {...extraProps}
         optionRenderer={
           node.children?.length > 0
-            ? (contextVars) => (
-                <MemoizedItem
-                  node={node.children}
-                  renderChild={renderChild}
-                  contextVars={contextVars}
-                  layoutContext={layoutContext}
-                />
-              )
+            ? !hasTextNodeChild
+              ? (contextVars) => (
+                  <MemoizedItem
+                    node={node.children}
+                    renderChild={renderChild}
+                    contextVars={contextVars}
+                    layoutContext={layoutContext}
+                  />
+                )
+              : undefined
             : undefined
         }
+        {...extraProps}
       >
-        {renderChild(node.children)}
+        {!hasTextNodeChild && renderChild(node.children)}
       </OptionNative>
     );
   },
