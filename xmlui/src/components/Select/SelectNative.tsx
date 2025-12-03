@@ -196,7 +196,10 @@ const SelectTriggerActions = ({
         </Part>
       )}
       {showChevron && (
-        <span className={styles.action}>
+        <span
+          className={classnames(styles.action, { [styles.disabled]: !enabled || readOnly })}
+          aria-disabled={!enabled || readOnly}
+        >
           <Icon name="chevrondown" />
         </span>
       )}
