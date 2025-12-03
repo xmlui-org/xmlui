@@ -44,7 +44,7 @@ This property indicates when the row selection header is displayed. When the val
 
 ### `alwaysShowSortingIndicator` (default: false) [#alwaysshowsortingindicator-default-false]
 
-This property indicates whether the sorting indicator is always visible in the column headers. When set to `true`, the sorting indicator is always visible. Otherwise, it is visible only when the user hovers over/focuses the column header, or the column is sorted.
+This property indicates whether the sorting indicator is always visible in the column headers. When set to `true`, the sorting indicator is always visible. Otherwise, it is visible only when the user hovers over/focuses the column header or the column is sorted.
 
 ### `autoFocus` (default: false) [#autofocus-default-false]
 
@@ -1162,6 +1162,10 @@ The default value is `false`.
   </Table>
 </App>
 ```
+
+### `rowUnselectablePredicate` [#rowunselectablepredicate]
+
+This property defines a predicate function with a return value that determines if the row should be unselectable. The function retrieves the item to display and should return a Boolean-like value. This property only has an effect when the `rowsSelectable` property is set to `true`.
 
 ### `showCurrentPage` (default: true) [#showcurrentpage-default-true]
 
