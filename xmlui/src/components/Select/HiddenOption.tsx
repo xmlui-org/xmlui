@@ -1,14 +1,13 @@
 import type { Option } from "../abstractions";
 import { useEffect, useRef } from "react";
-import { useSelect } from "./SelectContext";
+import { useOption } from "./OptionContext";
 
 export function HiddenOption(option: Option) {
-  const { onOptionAdd, onOptionRemove } = useSelect();
-  const nodeRef = useRef<HTMLSpanElement>(null)
+  const { onOptionAdd, onOptionRemove } = useOption();
+  const nodeRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     // Add the option when it's created or updated
-
     let textNode: string | undefined;
     if (nodeRef.current) {
       textNode = nodeRef.current.textContent;
@@ -16,7 +15,7 @@ export function HiddenOption(option: Option) {
     const opt = {
       ...option,
       label: option.label || textNode || option.value,
-    }
+    };
     onOptionAdd(opt);
 
     // Remove the same option object when unmounting or before re-adding with new values

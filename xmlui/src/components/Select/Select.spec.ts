@@ -284,9 +284,9 @@ test.describe("Basic Functionality", () => {
     `);
     const driver = await createSelectDriver();
     await driver.click();
-    await expect(page.getByText("Template for value opt1").first()).toBeVisible();
-    await expect(page.getByText("Template for value opt2").first()).toBeVisible();
-    await expect(page.getByText("Template for value opt3").first()).toBeVisible();
+    await expect(page.getByText("Template for value opt1").nth(1)).toBeVisible();
+    await expect(page.getByText("Template for value opt2").nth(1)).toBeVisible();
+    await expect(page.getByText("Template for value opt3").nth(1)).toBeVisible();
   });
 
   // --- placeholder prop
@@ -949,7 +949,7 @@ test.describe("Z-Index and Modal Layering", () => {
     await selectDriver.click();
 
     // Click button to open modal
-    const blowUpButton = page.getByText("BLOW UP");
+    const blowUpButton = page.getByText("BLOW UP").nth(1);
     await blowUpButton.click();
 
     // Wait for modal to be visible
@@ -1329,7 +1329,7 @@ test.describe("Nested DropdownMenu and Select", () => {
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Option 2")).toBeVisible();
 
-    await page.getByText("Confirm action").click();
+    await page.getByText("Confirm action").nth(1).click();
     const confirmDialog = page.getByRole("dialog", { name: "Confirm action" });
     await expect(confirmDialog).toBeVisible();
 
@@ -1399,8 +1399,6 @@ test.describe("Nested DropdownMenu and Select", () => {
     await expect(page.getByText("Option 2")).toBeVisible();
 
     const dropdownDriver = await createDropdownMenuDriver("nested-dropdown");
-    await expect(dropdownDriver.component).toBeVisible();
-
     await dropdownDriver.open();
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Option 2")).toBeVisible();

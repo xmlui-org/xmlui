@@ -20,6 +20,7 @@ import {
 } from "@radix-ui/react-select";
 import { SelectOption } from "./SelectOption";
 import { Part } from "../Part/Part";
+import OptionTypeProvider from "../Option/OptionTypeProvider";
 
 interface SimpleSelectProps {
   value: SingleValueType;
@@ -210,21 +211,10 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                 ) : (
                   // Render flat options
                   <>
-                    {options.map((option) => (
-                      <SelectOption
-                        key={option.value}
-                        value={option.value}
-                        label={option.label}
-                        enabled={option?.enabled}
-                        className={styles.selectOption}
-                      >
-                        {option.children}
-                      </SelectOption>
-                    ))}
+                    {<OptionTypeProvider Component={SelectOption}>{children}</OptionTypeProvider>}
                     {options.length === 0 && emptyListNode}
                   </>
                 )}
-                {children}
               </Viewport>
             </Part>
             <ScrollDownButton className={styles.selectScrollDownButton}>
