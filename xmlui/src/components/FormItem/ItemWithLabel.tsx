@@ -1,5 +1,5 @@
 import type { CSSProperties, ForwardedRef, ReactElement, ReactNode } from "react";
-import { cloneElement, forwardRef, useId } from "react";
+import { cloneElement, forwardRef, useId, useRef } from "react";
 import classnames from "classnames";
 import { Slot } from "@radix-ui/react-slot";
 
@@ -67,16 +67,16 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
 ) {
   const generatedId = useId();
   const inputId = id || generatedId;
+  const inputRef = useRef<HTMLDivElement>(null);
+
+  const inputHeight = inputRef.current?.offsetHeight;
+  const labelWrapperHeight =
+    labelPosition === "start" || labelPosition === "end" ? inputHeight : "auto";
+
   if (label === undefined && !validationResult) {
     return (
       <Part partId={PART_LABELED_ITEM}>
-        <Slot
-          {...rest}
-          style={style}
-          className={className}
-          id={inputId}
-          ref={ref}
-        >
+        <Slot {...rest} style={style} className={className} id={inputId} ref={ref}>
           {children}
         </Slot>
       </Part>
@@ -93,40 +93,53 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
           [styles.shrinkToLabel]: shrinkToLabel,
         })}
       >
-        {label && (
-          <Part partId={PART_LABEL}>
-            <label
-              htmlFor={inputId}
-              onClick={onLabelClick || (() => document.getElementById(inputId)?.focus())}
-              style={{
-                ...labelStyle,
-                width: labelWidth && numberRegex.test(labelWidth) ? `${labelWidth}px` : labelWidth,
-                flexShrink: labelWidth !== undefined ? 0 : undefined,
-              }}
-              className={classnames(styles.inputLabel, {
-                [styles.required]: required,
-                [styles.disabled]: !enabled,
-                [styles.labelBreak]: labelBreak,
-              })}
-            >
-              {label} {required && <span className={styles.requiredMark}>*</span>}
-              {validationInProgress && (
-                <Spinner
-                  style={{ height: "1em", width: "1em", marginLeft: "1em", alignSelf: "center" }}
-                />
-              )}
-            </label>
+        <div
+          className={styles.labelWrapper}
+          style={{
+            height: labelWrapperHeight,
+          }}
+        >
+          {label && (
+            <Part partId={PART_LABEL}>
+              <label
+                htmlFor={inputId}
+                onClick={onLabelClick || (() => document.getElementById(inputId)?.focus())}
+                style={{
+                  ...labelStyle,
+                  width:
+                    labelWidth && numberRegex.test(labelWidth) ? `${labelWidth}px` : labelWidth,
+                  flexShrink: labelWidth !== undefined ? 0 : undefined,
+                }}
+                className={classnames(styles.inputLabel, {
+                  [styles.required]: required,
+                  [styles.disabled]: !enabled,
+                  [styles.labelBreak]: labelBreak,
+                })}
+              >
+                {label} {required && <span className={styles.requiredMark}>*</span>}
+                {validationInProgress && (
+                  <Spinner
+                    style={{ height: "1em", width: "1em", marginLeft: "1em", alignSelf: "center" }}
+                  />
+                )}
+              </label>
+            </Part>
+          )}
+        </div>
+        <div className={styles.wrapper}>
+          <Part partId={PART_LABELED_ITEM}>
+            {cloneElement(children as ReactElement, {
+              id: !isInputTemplateUsed ? inputId : undefined,
+              style: undefined,
+              className: undefined,
+              ref: inputRef,
+            })}
           </Part>
-        )}
-        <Part partId={PART_LABELED_ITEM}>
-          {cloneElement(children as ReactElement, {
-            id: !isInputTemplateUsed ? inputId : undefined,
-            style: undefined,
-            className: undefined,
-          })}
-        </Part>
+          {validationResult && (
+            <div className={styles.validationResultWrapper}>{validationResult}</div>
+          )}
+        </div>
       </div>
-      {validationResult}
     </div>
   );
 });
