@@ -113,18 +113,25 @@ export const SelectMd = createMetadata({
       description: "internal radix modal prop",
       valueType: "boolean",
     },
-    groupBy: d(
-      "This property sets which data item property is used to group the options. If not set, " +
-        "no grouping is done.",
-    ),
-    groupHeaderTemplate: dComponent(
-      `Enables the customization of how option groups are displayed in the dropdown. You can use the \`$group\` context variable to access ` +
-        `the group name.`,
-    ),
-    ungroupedHeaderTemplate: dComponent(
-      `Enables the customization of how the ungrouped options header is displayed in the dropdown. ` +
+    groupBy: {
+      description:
+        "This property sets which attribute should be used to group the available options. " +
+        "No grouping is done if omitted. Use it with the \`category\` attribute on \`Options\` to " +
+        "define groups. If no options belong to a group, that group will not be shown.",
+      valueType: "string",
+    },
+    groupHeaderTemplate: {
+      description:
+        `Enables the customization of how option groups are displayed in the dropdown. ` +
+        `You can use the \`$group\` context variable to access the group name.`,
+      valueType: "ComponentDef",
+    },
+    ungroupedHeaderTemplate: {
+      description:
+        `Enables the customization of how the ungrouped options header is displayed in the dropdown. ` +
         `If not provided, ungrouped options will not have a header.`,
-    ),
+      valueType: "ComponentDef",
+    },
   },
   events: {
     gotFocus: dGotFocus(COMP),

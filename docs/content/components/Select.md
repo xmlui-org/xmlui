@@ -39,6 +39,7 @@ You can use `Select` with dynamic options:
 
 **Context variables available during execution:**
 
+- `$group`: Group name when using `groupBy` (available in group header templates)
 - `$item`: Represents the current option's data (label and value properties)
 - `$itemContext`: Provides utility methods like `removeItem()` for multi-select scenarios
 
@@ -105,6 +106,44 @@ This boolean property value indicates whether the component responds to user eve
 ```xmlui-pg copy display name="Example: enabled"
 <App>
   <Select enabled="false" />
+</App>
+```
+
+### `groupBy` [#groupby]
+
+This property sets which attribute should be used to group the available options. No grouping is done if omitted. Use it with the `category` attribute on `Options` to define groups. If no options belong to a group, that group will not be shown.
+
+```xmlui-pg copy display name="Example: groupBy" height="400px" /groupBy="category"/
+<App>
+  <Select groupBy="category" placeholder="Select a product">
+    <Option value="1" label="Apple" category="Fruit" />
+    <Option value="2" label="Banana" category="Fruit" />
+    <Option value="3" label="Other" />
+    <Option value="4" label="Misc" />
+    <Option value="5" label="Carrot" category="Vegetable" />
+  </Select>
+</App>
+```
+
+### `groupHeaderTemplate` [#groupheadertemplate]
+
+Enables the customization of how option groups are displayed in the dropdown. You can use the `$group` context variable to access the group name.
+
+```xmlui-pg copy display name="Example: groupHeaderTemplate" height="400px" {3-5}
+<App>
+  <Select groupBy="type" placeholder="Select a product">
+    <property name="groupHeaderTemplate">
+      <H3>{$group}</H3>
+    </property>
+    <Items items="{[
+      { id: 1, name: 'MacBook Pro', type: 'Apple' },
+      { id: 2, name: 'iPad Air', type: 'Apple' },
+      { id: 3, name: 'XPS', type: 'Dell' },
+      { id: 4, name: 'Tab', type: 'Samsung' }
+    ]}">
+      <Option value="{$item.id}" label="{$item.name}" type="{$item.type}" />
+    </Items>
+  </Select>
 </App>
 ```
 
@@ -222,6 +261,25 @@ Set this property to `true` to indicate it must have a value before submitting t
 ### `searchable` (default: false) [#searchable-default-false]
 
 This property enables the search functionality in the dropdown list.
+
+### `ungroupedHeaderTemplate` [#ungroupedheadertemplate]
+
+Enables the customization of how the ungrouped options header is displayed in the dropdown. If not provided, ungrouped options will not have a header.
+
+```xmlui-pg copy display name="Example: ungroupedHeaderTemplate" height="400px" {3-5}
+<App>
+  <Select groupBy="category" placeholder="Select a product">
+    <property name="ungroupedHeaderTemplate">
+      <H3>Other Items</H3>
+    </property>
+    <Option value="1" label="Apple" category="Fruit" />
+    <Option value="2" label="Banana" category="Fruit" />
+    <Option value="3" label="Other" />
+    <Option value="4" label="Misc" />
+    <Option value="5" label="Carrot" category="Vegetable" />
+  </Select>
+</App>
+```
 
 ### `validationStatus` (default: "none") [#validationstatus-default-none]
 

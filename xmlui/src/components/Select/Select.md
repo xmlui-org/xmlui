@@ -231,6 +231,63 @@ In the template definition, you can use the `$item` context property to access t
 
 %-PROP-END
 
+%-PROP-START groupBy
+
+```xmlui-pg copy display name="Example: groupBy" height="400px" /groupBy="category"/
+<App>
+  <Select groupBy="category" placeholder="Select a product">
+    <Option value="1" label="Apple" category="Fruit" />
+    <Option value="2" label="Banana" category="Fruit" />
+    <Option value="3" label="Other" />
+    <Option value="4" label="Misc" />
+    <Option value="5" label="Carrot" category="Vegetable" />
+  </Select>
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START groupHeaderTemplate
+
+```xmlui-pg copy display name="Example: groupHeaderTemplate" height="400px" {3-5}
+<App>
+  <Select groupBy="type" placeholder="Select a product">
+    <property name="groupHeaderTemplate">
+      <H3>{$group}</H3>
+    </property>
+    <Items items="{[
+      { id: 1, name: 'MacBook Pro', type: 'Apple' },
+      { id: 2, name: 'iPad Air', type: 'Apple' },
+      { id: 3, name: 'XPS', type: 'Dell' },
+      { id: 4, name: 'Tab', type: 'Samsung' }
+    ]}">
+      <Option value="{$item.id}" label="{$item.name}" type="{$item.type}" />
+    </Items>
+  </Select>
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START ungroupedHeaderTemplate
+
+```xmlui-pg copy display name="Example: ungroupedHeaderTemplate" height="400px" {3-5}
+<App>
+  <Select groupBy="category" placeholder="Select a product">
+    <property name="ungroupedHeaderTemplate">
+      <H3>Other Items</H3>
+    </property>
+    <Option value="1" label="Apple" category="Fruit" />
+    <Option value="2" label="Banana" category="Fruit" />
+    <Option value="3" label="Other" />
+    <Option value="4" label="Misc" />
+    <Option value="5" label="Carrot" category="Vegetable" />
+  </Select>
+</App>
+```
+
+%-PROP-END
+
 %-EVENT-START didChange
 
 ```xmlui-pg copy display name="Example: didChange" height="260px"
