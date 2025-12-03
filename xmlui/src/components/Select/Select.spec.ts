@@ -1713,4 +1713,306 @@ test.describe("Grouping Functionality", () => {
     await driver.clearButton.click();
     await expect(page.getByText("JavaScript")).not.toBeVisible();
   });
+
+  test("ungrouped options appear first without header", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select groupBy="category" placeholder="Select a product">
+        <Option value="1" label="Apple" category="Fruit" />
+        <Option value="2" label="Banana" category="Fruit" />
+        <Option value="3" label="Other" />
+        <Option value="4" label="Misc" />
+        <Option value="5" label="Carrot" category="Vegetable" />
+      </Select>
+    `);
+
+    const driver = await createSelectDriver();
+    await driver.click({ delay: 100 });
+
+    // Get all options
+    const options = page.locator('[role="option"]');
+
+    // Check that ungrouped options (Other, Misc) appear first
+    await expect(options.nth(0)).toHaveText("Other");
+    await expect(options.nth(1)).toHaveText("Misc");
+
+    // Check that grouped options appear after
+    await expect(options.nth(2)).toHaveText("Apple");
+    await expect(options.nth(3)).toHaveText("Banana");
+    await expect(options.nth(4)).toHaveText("Carrot");
+
+    // Check group headers are visible for named groups
+    await expect(page.getByText("Fruit")).toBeVisible();
+    await expect(page.getByText("Vegetable")).toBeVisible();
+
+    // Check that "Ungrouped" header is NOT visible
+    await expect(page.getByText("Ungrouped")).not.toBeVisible();
+  });
+
+  test("ungrouped options with custom ungroupedHeaderTemplate", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select groupBy="category" placeholder="Select a product">
+        <property name="ungroupedHeaderTemplate">
+          <Text variant='h3'>Other Items</Text>
+        </property>
+        <Option value="1" label="Apple" category="Fruit" />
+        <Option value="2" label="Banana" category="Fruit" />
+        <Option value="3" label="Other" />
+        <Option value="4" label="Misc" />
+        <Option value="5" label="Carrot" category="Vegetable" />
+      </Select>
+    `);
+
+    const driver = await createSelectDriver();
+    await driver.click({ delay: 100 });
+
+    // Get all options
+    const options = page.locator('[role="option"]');
+
+    // Check that ungrouped options (Other, Misc) appear first
+    await expect(options.nth(0)).toHaveText("Other");
+    await expect(options.nth(1)).toHaveText("Misc");
+
+    // Check that grouped options appear after
+    await expect(options.nth(2)).toHaveText("Apple");
+    await expect(options.nth(3)).toHaveText("Banana");
+    await expect(options.nth(4)).toHaveText("Carrot");
+
+    // Check custom ungrouped header is visible
+    await expect(page.getByText("Other Items")).toBeVisible();
+
+    // Check group headers are visible for named groups
+    await expect(page.getByText("Fruit")).toBeVisible();
+    await expect(page.getByText("Vegetable")).toBeVisible();
+
+    // Check that default "Ungrouped" header is NOT visible
+    await expect(page.getByText("Ungrouped")).not.toBeVisible();
+  });
+
+  test("searchable Select with ungrouped options appear first without header", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select searchable groupBy="category" placeholder="Search products">
+        <Option value="1" label="Apple" category="Fruit" />
+        <Option value="2" label="Banana" category="Fruit" />
+        <Option value="3" label="Other" />
+        <Option value="4" label="Misc" />
+        <Option value="5" label="Carrot" category="Vegetable" />
+      </Select>
+    `);
+
+    const driver = await createSelectDriver();
+    await driver.click({ delay: 100 });
+
+    // Get all options
+    const options = page.locator('[role="option"]');
+
+    // Check that ungrouped options (Other, Misc) appear first
+    await expect(options.nth(0)).toHaveText("Other");
+    await expect(options.nth(1)).toHaveText("Misc");
+
+    // Check that grouped options appear after
+    await expect(options.nth(2)).toHaveText("Apple");
+    await expect(options.nth(3)).toHaveText("Banana");
+    await expect(options.nth(4)).toHaveText("Carrot");
+
+    // Check group headers are visible for named groups
+    await expect(page.getByText("Fruit")).toBeVisible();
+    await expect(page.getByText("Vegetable")).toBeVisible();
+
+    // Check that "Ungrouped" header is NOT visible
+    await expect(page.getByText("Ungrouped")).not.toBeVisible();
+  });
+
+  test("searchable Select with ungrouped options and custom ungroupedHeaderTemplate", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select searchable groupBy="category" placeholder="Search products">
+        <property name="ungroupedHeaderTemplate">
+          <Text variant='h3'>Miscellaneous</Text>
+        </property>
+        <Option value="1" label="Apple" category="Fruit" />
+        <Option value="2" label="Banana" category="Fruit" />
+        <Option value="3" label="Other" />
+        <Option value="4" label="Misc" />
+        <Option value="5" label="Carrot" category="Vegetable" />
+      </Select>
+    `);
+
+    const driver = await createSelectDriver();
+    await driver.click({ delay: 100 });
+
+    // Check custom ungrouped header is visible
+    await expect(page.getByText("Miscellaneous")).toBeVisible();
+
+    // Check group headers are visible for named groups
+    await expect(page.getByText("Fruit")).toBeVisible();
+    await expect(page.getByText("Vegetable")).toBeVisible();
+
+    // Search for ungrouped item
+    await driver.searchFor("Other");
+
+    // After search, only "Other" should be visible
+    const options = page.locator('[role="option"]');
+    await expect(options).toHaveCount(1);
+    await expect(options.first()).toHaveText("Other");
+
+    // Miscellaneous header should still be visible
+    await expect(page.getByText("Miscellaneous")).toBeVisible();
+  });
+
+  test("multiSelect with ungrouped options appear first without header", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select multiSelect groupBy="category" placeholder="Select products">
+        <Option value="1" label="Apple" category="Fruit" />
+        <Option value="2" label="Banana" category="Fruit" />
+        <Option value="3" label="Other" />
+        <Option value="4" label="Misc" />
+        <Option value="5" label="Carrot" category="Vegetable" />
+      </Select>
+    `);
+
+    const driver = await createSelectDriver();
+    await driver.click({ delay: 100 });
+
+    // Get all options
+    const options = page.locator('[role="option"]');
+
+    // Check that ungrouped options (Other, Misc) appear first
+    await expect(options.nth(0)).toHaveText("Other");
+    await expect(options.nth(1)).toHaveText("Misc");
+
+    // Check that grouped options appear after
+    await expect(options.nth(2)).toHaveText("Apple");
+    await expect(options.nth(3)).toHaveText("Banana");
+    await expect(options.nth(4)).toHaveText("Carrot");
+
+    // Check group headers are visible for named groups
+    await expect(page.getByText("Fruit")).toBeVisible();
+    await expect(page.getByText("Vegetable")).toBeVisible();
+
+    // Check that "Ungrouped" header is NOT visible
+    await expect(page.getByText("Ungrouped")).not.toBeVisible();
+
+    // Select multiple items including ungrouped
+    await driver.selectLabel("Other");
+    await driver.selectLabel("Apple");
+
+    // Check both are selected (look for badges in the trigger)
+    const trigger = page.locator('[role="combobox"]');
+    await expect(trigger.getByText("Other")).toBeVisible();
+    await expect(trigger.getByText("Apple")).toBeVisible();
+  });
+
+  test("multiSelect with ungrouped options and custom ungroupedHeaderTemplate", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select multiSelect groupBy="category" placeholder="Select products">
+        <property name="ungroupedHeaderTemplate">
+          <Text variant='h3'>No Category</Text>
+        </property>
+        <Option value="1" label="Apple" category="Fruit" />
+        <Option value="2" label="Banana" category="Fruit" />
+        <Option value="3" label="Other" />
+        <Option value="4" label="Misc" />
+        <Option value="5" label="Carrot" category="Vegetable" />
+      </Select>
+    `);
+
+    const driver = await createSelectDriver();
+    await driver.click({ delay: 100 });
+
+    // Get all options
+    const options = page.locator('[role="option"]');
+
+    // Check that ungrouped options (Other, Misc) appear first
+    await expect(options.nth(0)).toHaveText("Other");
+    await expect(options.nth(1)).toHaveText("Misc");
+
+    // Check custom ungrouped header is visible
+    await expect(page.getByText("No Category")).toBeVisible();
+
+    // Check group headers are visible for named groups
+    await expect(page.getByText("Fruit")).toBeVisible();
+    await expect(page.getByText("Vegetable")).toBeVisible();
+
+    // Select items from different groups including ungrouped
+    await driver.selectLabel("Misc");
+    await driver.selectLabel("Banana");
+    await driver.selectLabel("Carrot");
+
+    // Check all are selected (look for badges in the trigger)
+    const trigger = page.locator('[role="combobox"]');
+    await expect(trigger.getByText("Misc")).toBeVisible();
+    await expect(trigger.getByText("Banana")).toBeVisible();
+    await expect(trigger.getByText("Carrot")).toBeVisible();
+  });
+
+  test("searchable multiSelect with ungrouped options and custom ungroupedHeaderTemplate", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select searchable multiSelect groupBy="category" placeholder="Search and select">
+        <property name="ungroupedHeaderTemplate">
+          <Text variant='h3'>Uncategorized</Text>
+        </property>
+        <Option value="1" label="Apple" category="Fruit" />
+        <Option value="2" label="Banana" category="Fruit" />
+        <Option value="3" label="Other" />
+        <Option value="4" label="Misc" />
+        <Option value="5" label="Carrot" category="Vegetable" />
+      </Select>
+    `);
+
+    const driver = await createSelectDriver();
+    await driver.click({ delay: 100 });
+
+    // Check custom ungrouped header is visible
+    await expect(page.getByText("Uncategorized")).toBeVisible();
+
+    // Search for items
+    await driver.searchFor("a");
+
+    // Should show Apple, Banana, Carrot (all contain 'a')
+    const options = page.locator('[role="option"]');
+    await expect(options).toHaveCount(3);
+
+    // Select filtered items
+    await driver.selectLabel("Apple");
+    await driver.selectLabel("Carrot");
+
+    // Clear search
+    await page.locator('input[role="searchbox"]').clear();
+
+    // Check selections are still visible (look for badges in the trigger)
+    const trigger = page.locator('[role="combobox"]');
+    await expect(trigger.getByText("Apple")).toBeVisible();
+    await expect(trigger.getByText("Carrot")).toBeVisible();
+
+    // Now select an ungrouped item
+    await driver.selectLabel("Misc");
+    await expect(trigger.getByText("Misc")).toBeVisible();
+  });
 });

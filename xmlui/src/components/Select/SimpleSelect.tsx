@@ -42,6 +42,7 @@ interface SimpleSelectProps {
   modal?: boolean;
   groupBy?: string;
   groupHeaderRenderer?: (groupName: string) => ReactNode;
+  ungroupedHeaderRenderer?: () => ReactNode;
   clearable?: boolean;
   onClear?: () => void;
   children?: ReactNode;
@@ -71,6 +72,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       modal,
       groupBy,
       groupHeaderRenderer,
+      ungroupedHeaderRenderer,
       clearable,
       onClear,
       options,
@@ -113,7 +115,19 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
         groups[groupKey].push(option);
       });
 
-      return groups;
+      // Sort groups to put "Ungrouped" first
+      const sortedGroups: Record<string, typeof options> = {};
+      if (groups["Ungrouped"]) {
+        sortedGroups["Ungrouped"] = groups["Ungrouped"];
+      }
+      Object.keys(groups)
+        .filter((key) => key !== "Ungrouped")
+        .sort()
+        .forEach((key) => {
+          sortedGroups[key] = groups[key];
+        });
+
+      return sortedGroups;
     }, [groupBy, options]);
 
     return (
@@ -191,9 +205,17 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                       ? emptyListNode
                       : Object.entries(groupedOptions).map(([groupName, groupOptions]) => (
                           <Group key={groupName}>
-                            <Label className={styles.groupHeader}>
-                              {groupHeaderRenderer ? groupHeaderRenderer(groupName) : groupName}
-                            </Label>
+                            {groupName === "Ungrouped" ? (
+                              ungroupedHeaderRenderer && (
+                                <Label className={styles.groupHeader}>
+                                  {ungroupedHeaderRenderer()}
+                                </Label>
+                              )
+                            ) : (
+                              <Label className={styles.groupHeader}>
+                                {groupHeaderRenderer ? groupHeaderRenderer(groupName) : groupName}
+                              </Label>
+                            )}
                             {groupOptions.map((option) => (
                               <SelectOption
                                 key={option.value}
