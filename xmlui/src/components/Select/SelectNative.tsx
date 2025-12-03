@@ -307,7 +307,19 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
       groups[groupKey].push(option);
     });
 
-    return groups;
+    // Sort groups to put "Ungrouped" first
+    const sortedGroups: Record<string, Option[]> = {};
+    if (groups["Ungrouped"]) {
+      sortedGroups["Ungrouped"] = groups["Ungrouped"];
+    }
+    Object.keys(groups)
+      .filter((key) => key !== "Ungrouped")
+      .sort()
+      .forEach((key) => {
+        sortedGroups[key] = groups[key];
+      });
+
+    return sortedGroups;
   }, [groupBy, options, filteredOptions, searchTerm]);
 
   // Create a flat list from grouped options for keyboard navigation
@@ -717,13 +729,14 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                         // Render grouped filtered options
                         Object.entries(groupedOptions).map(([groupName, groupOptions]) => (
                           <div key={groupName}>
-                            {groupHeaderRenderer ? (
-                              <div className={styles.groupHeader}>
-                                {groupHeaderRenderer(groupName)}
-                              </div>
-                            ) : (
-                              <div className={styles.groupHeader}>{groupName}</div>
-                            )}
+                            {groupName !== "Ungrouped" &&
+                              (groupHeaderRenderer ? (
+                                <div className={styles.groupHeader}>
+                                  {groupHeaderRenderer(groupName)}
+                                </div>
+                              ) : (
+                                <div className={styles.groupHeader}>{groupName}</div>
+                              ))}
                             {groupOptions.map(({ value, label, enabled, keywords }, groupIndex) => {
                               const globalIndex = filteredOptions.findIndex(
                                 (opt) => opt.value === value,

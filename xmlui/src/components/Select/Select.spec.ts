@@ -1713,4 +1713,42 @@ test.describe("Grouping Functionality", () => {
     await driver.clearButton.click();
     await expect(page.getByText("JavaScript")).not.toBeVisible();
   });
+
+  test("ungrouped options appear first without header", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select groupBy="category" placeholder="Select a product">
+        <Option value="1" label="Apple" category="Fruit" />
+        <Option value="2" label="Banana" category="Fruit" />
+        <Option value="3" label="Other" />
+        <Option value="4" label="Misc" />
+        <Option value="5" label="Carrot" category="Vegetable" />
+      </Select>
+    `);
+
+    const driver = await createSelectDriver();
+    await driver.click({ delay: 100 });
+
+    // Get all options
+    const options = page.locator('[role="option"]');
+
+    // Check that ungrouped options (Other, Misc) appear first
+    await expect(options.nth(0)).toHaveText("Other");
+    await expect(options.nth(1)).toHaveText("Misc");
+
+    // Check that grouped options appear after
+    await expect(options.nth(2)).toHaveText("Apple");
+    await expect(options.nth(3)).toHaveText("Banana");
+    await expect(options.nth(4)).toHaveText("Carrot");
+
+    // Check group headers are visible for named groups
+    await expect(page.getByText("Fruit")).toBeVisible();
+    await expect(page.getByText("Vegetable")).toBeVisible();
+
+    // Check that "Ungrouped" header is NOT visible
+    await expect(page.getByText("Ungrouped")).not.toBeVisible();
+  });
 });
