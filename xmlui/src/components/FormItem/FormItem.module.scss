@@ -41,7 +41,6 @@ $textColor-FormItemLabel-requiredMark: createThemeVar("textColor-FormItemLabel-r
 
     &.end {
       flex-direction: row-reverse;
-      align-items: center;
       justify-content: start;
       gap: 0.5em;
     }
@@ -54,7 +53,6 @@ $textColor-FormItemLabel-requiredMark: createThemeVar("textColor-FormItemLabel-r
 
     &.start {
       flex-direction: row;
-      align-items: center;
       justify-content: start;
       gap: 0.5em;
     }
@@ -64,7 +62,6 @@ $textColor-FormItemLabel-requiredMark: createThemeVar("textColor-FormItemLabel-r
     }
 
     .inputLabel {
-      display: flex;
       color: $textColor-FormItemLabel;
       font-family: $fontFamily-FormItemLabel;
       font-size: $fontSize-FormItemLabel;
@@ -75,6 +72,7 @@ $textColor-FormItemLabel-requiredMark: createThemeVar("textColor-FormItemLabel-r
       cursor: pointer;
       word-break: normal;
       white-space: nowrap;
+      height: fit-content;
 
       &.disabled {
         cursor: not-allowed;
@@ -104,13 +102,31 @@ $textColor-FormItemLabel-requiredMark: createThemeVar("textColor-FormItemLabel-r
 
   .itemWithLabel {
    display: flex;
-   justify-content: center;
    align-items: center;
    flex-direction: column;
   }
 
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    width: 100%;
+    flex: 1;
+  }
+
+  .validationResultWrapper {
+    width: 100%;
+  }
+
   .helperTextContainer {
     width: 100%;
+  }
+
+  .labelWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 }
 
