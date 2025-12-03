@@ -89,6 +89,7 @@ interface SelectProps {
   // Grouping
   groupBy?: string;
   groupHeaderRenderer?: (groupName: string) => ReactNode;
+  ungroupedHeaderRenderer?: () => ReactNode;
 
   // Internal
   updateState?: UpdateStateFn;
@@ -244,6 +245,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     // Grouping
     groupBy,
     groupHeaderRenderer,
+    ungroupedHeaderRenderer,
 
     // Internal
     updateState = noop,
@@ -616,6 +618,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
             modal={modal}
             groupBy={groupBy}
             groupHeaderRenderer={groupHeaderRenderer}
+            ungroupedHeaderRenderer={ungroupedHeaderRenderer}
             clearable={clearable}
             onClear={clearValue}
             {...rest}
@@ -729,14 +732,19 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                         // Render grouped filtered options
                         Object.entries(groupedOptions).map(([groupName, groupOptions]) => (
                           <div key={groupName}>
-                            {groupName !== "Ungrouped" &&
-                              (groupHeaderRenderer ? (
+                            {groupName === "Ungrouped" ? (
+                              ungroupedHeaderRenderer && (
                                 <div className={styles.groupHeader}>
-                                  {groupHeaderRenderer(groupName)}
+                                  {ungroupedHeaderRenderer()}
                                 </div>
-                              ) : (
-                                <div className={styles.groupHeader}>{groupName}</div>
-                              ))}
+                              )
+                            ) : groupHeaderRenderer ? (
+                              <div className={styles.groupHeader}>
+                                {groupHeaderRenderer(groupName)}
+                              </div>
+                            ) : (
+                              <div className={styles.groupHeader}>{groupName}</div>
+                            )}
                             {groupOptions.map(({ value, label, enabled, keywords }, groupIndex) => {
                               const globalIndex = filteredOptions.findIndex(
                                 (opt) => opt.value === value,

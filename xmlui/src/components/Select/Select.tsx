@@ -121,6 +121,10 @@ export const SelectMd = createMetadata({
       `Enables the customization of how option groups are displayed in the dropdown. You can use the \`$group\` context variable to access ` +
         `the group name.`,
     ),
+    ungroupedHeaderTemplate: dComponent(
+      `Enables the customization of how the ungrouped options header is displayed in the dropdown. ` +
+        `If not provided, ungrouped options will not have a header.`,
+    ),
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -241,6 +245,19 @@ export const selectComponentRenderer = createComponentRenderer(
                       $group: groupName,
                     }}
                     node={node.props.groupHeaderTemplate}
+                    renderChild={renderChild}
+                  />
+                );
+              }
+            : undefined
+        }
+        ungroupedHeaderRenderer={
+          node.props.ungroupedHeaderTemplate
+            ? () => {
+                return (
+                  <MemoizedItem
+                    contextVars={{}}
+                    node={node.props.ungroupedHeaderTemplate}
                     renderChild={renderChild}
                   />
                 );
