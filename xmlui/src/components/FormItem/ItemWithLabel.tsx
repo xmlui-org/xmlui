@@ -72,6 +72,8 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
   const composedRef = composeRefs(ref, inputRef);
 
   const inputHeight = inputRef.current?.offsetHeight;
+  const labelWrapperHeight =
+    labelPosition === "start" || labelPosition === "end" ? inputHeight : "auto";
 
   if (label === undefined && !validationResult) {
     return (
@@ -96,7 +98,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
         <div
           className={styles.labelWrapper}
           style={{
-            height: labelPosition === "start" || labelPosition === "end" ? inputHeight : "auto",
+            height: labelWrapperHeight,
           }}
         >
           {label && (
