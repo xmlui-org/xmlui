@@ -403,8 +403,8 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   const findNextEnabledIndex = useCallback(
     (currentIndex: number) => {
       // Use the appropriate options list based on grouping and search state
-      const optionsList =
-        !searchTerm && flattenedGroupedOptions ? flattenedGroupedOptions : filteredOptions;
+      // When groupBy is set, always use flattenedGroupedOptions to maintain correct order
+      const optionsList = flattenedGroupedOptions ? flattenedGroupedOptions : filteredOptions;
 
       if (optionsList.length === 0) return -1;
 
@@ -423,14 +423,14 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
       }
       return -1;
     },
-    [filteredOptions, flattenedGroupedOptions, searchTerm],
+    [filteredOptions, flattenedGroupedOptions],
   );
 
   const findPreviousEnabledIndex = useCallback(
     (currentIndex: number) => {
       // Use the appropriate options list based on grouping and search state
-      const optionsList =
-        !searchTerm && flattenedGroupedOptions ? flattenedGroupedOptions : filteredOptions;
+      // When groupBy is set, always use flattenedGroupedOptions to maintain correct order
+      const optionsList = flattenedGroupedOptions ? flattenedGroupedOptions : filteredOptions;
 
       if (optionsList.length === 0) return -1;
 
@@ -449,7 +449,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
       }
       return -1;
     },
-    [filteredOptions, flattenedGroupedOptions, searchTerm],
+    [filteredOptions, flattenedGroupedOptions],
   );
 
   // Keyboard navigation
@@ -458,8 +458,8 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
       if (!open) return;
 
       // Use the appropriate options list based on grouping and search state
-      const optionsList =
-        !searchTerm && flattenedGroupedOptions ? flattenedGroupedOptions : filteredOptions;
+      // When groupBy is set, always use flattenedGroupedOptions to maintain correct order
+      const optionsList = flattenedGroupedOptions ? flattenedGroupedOptions : filteredOptions;
 
       switch (event.key) {
         case "ArrowDown":
@@ -500,7 +500,6 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
       selectedIndex,
       filteredOptions,
       flattenedGroupedOptions,
-      searchTerm,
       toggleOption,
       multiSelect,
       findNextEnabledIndex,
@@ -746,7 +745,9 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                               <div className={styles.groupHeader}>{groupName}</div>
                             )}
                             {groupOptions.map(({ value, label, enabled, keywords }, groupIndex) => {
-                              const globalIndex = filteredOptions.findIndex(
+                              // Use flattenedGroupedOptions for correct index when groupBy is set
+                              const optionsList = flattenedGroupedOptions || filteredOptions;
+                              const globalIndex = optionsList.findIndex(
                                 (opt) => opt.value === value,
                               );
                               return (
