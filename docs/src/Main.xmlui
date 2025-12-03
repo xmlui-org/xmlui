@@ -237,6 +237,10 @@
                 label="Implement an authentication gate"
                 to="/howto/implement-an-authentication-gate"
             />
+            <NavLink
+                label="Set the Width of an Input Field in an HStack"
+                to="/howto/set-width-for-input-fields-in-a-horizontal-layout"
+            />
 
             <!-- Add more links as additional files are created -->
         </NavGroup
@@ -691,6 +695,11 @@
         <Page url="/howto/implement-an-authentication-gate">
             <DocumentPageNoTOC
                 url="/pages/howto/implement-an-authentication-gate.md"
+            />
+        </Page>
+        <Page url="/howto/set-width-for-input-fields-in-a-horizontal-layout">
+            <DocumentPageNoTOC
+                url="/pages/howto/set-width-for-input-fields-in-a-horizontal-layout.md"
             />
         </Page>
 
