@@ -9,7 +9,6 @@ import type { LabelPosition } from "../abstractions";
 import { Spinner } from "../Spinner/SpinnerNative";
 import { PART_LABELED_ITEM, PART_LABEL } from "../../components-core/parts";
 import { Part } from "../Part/Part";
-import { composeRefs } from "@radix-ui/react-compose-refs";
 
 // Component part names
 
@@ -69,7 +68,6 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
   const generatedId = useId();
   const inputId = id || generatedId;
   const inputRef = useRef<HTMLDivElement>(null);
-  const composedRef = composeRefs(ref, inputRef);
 
   const inputHeight = inputRef.current?.offsetHeight;
   const labelWrapperHeight =
@@ -134,7 +132,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
               id: !isInputTemplateUsed ? inputId : undefined,
               style: undefined,
               className: undefined,
-              ref: composedRef,
+              ref: inputRef,
             })}
           </Part>
           {validationResult && (
