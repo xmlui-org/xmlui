@@ -117,12 +117,14 @@ export const RadioGroup = forwardRef(function RadioGroup(
   const focusActiveOption = useCallback(() => {
     if (radioGroupRef.current) {
       // First try to find the currently selected radio option
-      const selectedRadio = radioGroupRef.current.querySelector('[role="radio"][aria-checked="true"]');
+      const selectedRadio = radioGroupRef.current.querySelector(
+        '[role="radio"][aria-checked="true"]',
+      );
       if (selectedRadio) {
         (selectedRadio as HTMLElement).focus();
         return;
       }
-      
+
       // If no option is selected, focus the first one
       const firstRadio = radioGroupRef.current.querySelector('[role="radio"]');
       if (firstRadio) {

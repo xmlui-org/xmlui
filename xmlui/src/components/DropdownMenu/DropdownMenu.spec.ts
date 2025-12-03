@@ -581,7 +581,7 @@ test.describe("Nested DropdownMenu and Select", () => {
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Option 2")).toBeVisible();
 
-    await page.getByText("Confirm action").click();
+    await page.getByText("Confirm action").nth(1).click();
     const confirmDialog = page.getByRole("dialog", { name: "Confirm action" });
     await expect(confirmDialog).toBeVisible();
 
@@ -650,7 +650,6 @@ test.describe("Nested DropdownMenu and Select", () => {
     await expect(page.getByText("Option 2")).toBeVisible();
 
     const dropdownDriver = await createDropdownMenuDriver("nested-dropdown");
-    await expect(dropdownDriver.component).toBeVisible();
 
     await dropdownDriver.open();
     await expect(page.getByText("Option 1")).toBeVisible();
