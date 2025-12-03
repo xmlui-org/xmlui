@@ -10,7 +10,7 @@ type AutoCompleteContextValue = {
   onChange?: (selectedValue: string) => void;
   inputValue: string;
   searchTerm: string;
-  options: Set<Option>;
+  options: Option[];
   open?: boolean;
   setOpen?: (open: boolean) => void;
   setSelectedIndex?: (index: number) => void;
@@ -23,7 +23,7 @@ export const AutoCompleteContext = createContext<AutoCompleteContextValue>({
   onChange: (selectedValue: string) => {},
   inputValue: "",
   searchTerm: "",
-  options: new Set<Option>(),
+  options: [],
   open: false,
   setOpen: (open: boolean) => {},
   setSelectedIndex: (index: number) => {},

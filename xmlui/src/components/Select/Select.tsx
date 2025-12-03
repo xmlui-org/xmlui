@@ -113,6 +113,14 @@ export const SelectMd = createMetadata({
       description: "internal radix modal prop",
       valueType: "boolean",
     },
+    groupBy: d(
+      "This property sets which data item property is used to group the options. If not set, " +
+        "no grouping is done.",
+    ),
+    groupHeaderTemplate: dComponent(
+      `Enables the customization of how option groups are displayed in the dropdown. You can use the \`$group\` context variable to access ` +
+        `the group name.`,
+    ),
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -144,6 +152,7 @@ export const SelectMd = createMetadata({
   contextVars: {
     $item: d("Represents the current option's data (label and value properties)"),
     $itemContext: d("Provides utility methods like `removeItem()` for multi-select scenarios"),
+    $group: d("Group name when using `groupBy` (available in group header templates)"),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -189,6 +198,7 @@ export const selectComponentRenderer = createComponentRenderer(
     lookupEventHandler,
     className,
     registerComponentApi,
+    ...rest
   }) => {
     const multiSelect = extractValue.asOptionalBoolean(node.props.multiSelect);
     const searchable = extractValue.asOptionalBoolean(node.props.searchable);
@@ -221,6 +231,22 @@ export const selectComponentRenderer = createComponentRenderer(
         dropdownHeight={extractValue(node.props.dropdownHeight)}
         required={extractValue.asOptionalBoolean(node.props.required)}
         modal={extractValue.asOptionalBoolean(node.props.modal)}
+        groupBy={extractValue(node.props.groupBy)}
+        groupHeaderRenderer={
+          node.props.groupHeaderTemplate
+            ? (groupName) => {
+                return (
+                  <MemoizedItem
+                    contextVars={{
+                      $group: groupName,
+                    }}
+                    node={node.props.groupHeaderTemplate}
+                    renderChild={renderChild}
+                  />
+                );
+              }
+            : undefined
+        }
         valueRenderer={
           node.props.valueTemplate
             ? (item, removeItem) => {

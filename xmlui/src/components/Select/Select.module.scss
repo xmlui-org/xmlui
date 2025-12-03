@@ -374,6 +374,15 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
   }
 
   /**
+   * Group header for grouped options
+   */
+  .groupHeader {
+    @include t.paddingVars($themeVars, "item-#{$componentName}");
+    font-weight: t.$fontWeight-bold;
+    opacity: 0.7;
+  }
+
+  /**
    * MultiSelectOption component (used in searchable/multi-select dropdown)
    */
   .multiSelectOption {

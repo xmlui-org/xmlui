@@ -16,12 +16,12 @@ export const OptionMd = createMetadata({
   props: {
     label: d(
       `This property defines the text to display for the option. If \`label\` is not defined, ` +
-      `\`Option\` will use the \`value\` as the label.`,
+        `\`Option\` will use the \`value\` as the label.`,
     ),
     value: d(
       "This property defines the value of the option. If `value` is not defined, " +
-      "`Option` will use the `label` as the value. If neither is defined, " +
-      "the option is not displayed.",
+        "`Option` will use the `label` as the value. If neither is defined, " +
+        "the option is not displayed.",
     ),
     enabled: {
       description: "This boolean property indicates whether the option is enabled or disabled.",
@@ -30,7 +30,7 @@ export const OptionMd = createMetadata({
     },
     keywords: d(
       "An array of keywords that can be used for searching and filtering the option. " +
-      "These keywords are not displayed but help users find the option through search.",
+        "These keywords are not displayed but help users find the option through search.",
     ),
   },
 });
@@ -45,8 +45,19 @@ export const optionComponentRenderer = createComponentRenderer(
       return null;
     }
 
-    const hasTextNodeChild = node.children?.length === 1 && (node.children[0].type === "TextNode" || node.children[0].type === "TextNodeCData");
-    const textNodeChild = hasTextNodeChild ? renderChild(node.children) as string : undefined;
+    const hasTextNodeChild =
+      node.children?.length === 1 &&
+      (node.children[0].type === "TextNode" || node.children[0].type === "TextNodeCData");
+    const textNodeChild = hasTextNodeChild ? (renderChild(node.children) as string) : undefined;
+
+    // Extract all extra properties (like category, etc.) for grouping and filtering
+    const extraProps: Record<string, any> = {};
+    const knownProps = new Set(["label", "value", "enabled", "keywords"]);
+    Object.keys(node.props).forEach((key) => {
+      if (!knownProps.has(key)) {
+        extraProps[key] = extractValue(node.props[key]);
+      }
+    });
 
     return (
       <OptionNative
@@ -57,16 +68,19 @@ export const optionComponentRenderer = createComponentRenderer(
         className={className}
         optionRenderer={
           node.children?.length > 0
-            ? !hasTextNodeChild ? (contextVars) => (
-              <MemoizedItem
-                node={node.children}
-                renderChild={renderChild}
-                contextVars={contextVars}
-                layoutContext={layoutContext}
-              />
-            ) : undefined
+            ? !hasTextNodeChild
+              ? (contextVars) => (
+                  <MemoizedItem
+                    node={node.children}
+                    renderChild={renderChild}
+                    contextVars={contextVars}
+                    layoutContext={layoutContext}
+                  />
+                )
+              : undefined
             : undefined
         }
+        {...extraProps}
       >
         {!hasTextNodeChild && renderChild(node.children)}
       </OptionNative>

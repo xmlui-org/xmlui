@@ -1,13 +1,12 @@
 import type { CSSProperties, ReactNode } from "react";
-import { forwardRef, useCallback, useMemo } from "react";
+import { forwardRef, useCallback, useMemo, useState } from "react";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import styles from "./Select.module.scss";
-import { useSelect } from "./SelectContext";
 import Icon from "../Icon/IconNative";
 import classnames from "classnames";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import type { SingleValueType } from "./SelectNative";
-import type { ValidationStatus } from "../abstractions";
+import type { Option, ValidationStatus } from "../abstractions";
 import {
   Root,
   Trigger,
@@ -16,7 +15,12 @@ import {
   ScrollUpButton,
   ScrollDownButton,
   Portal,
+  Group,
+  Label,
 } from "@radix-ui/react-select";
+import { SelectOption } from "./SelectOption";
+import { Part } from "../Part/Part";
+import OptionTypeProvider from "../Option/OptionTypeProvider";
 
 interface SimpleSelectProps {
   value: SingleValueType;
@@ -33,10 +37,15 @@ interface SimpleSelectProps {
   placeholder: string;
   height: CSSProperties["height"];
   width: number;
-  children: ReactNode;
   readOnly: boolean;
   emptyListNode: ReactNode;
   modal?: boolean;
+  groupBy?: string;
+  groupHeaderRenderer?: (groupName: string) => ReactNode;
+  clearable?: boolean;
+  onClear?: () => void;
+  children?: ReactNode;
+  options: Option[];
 }
 
 export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
@@ -56,16 +65,21 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       triggerRef,
       onFocus,
       width,
-      children,
       readOnly,
       emptyListNode,
       className,
       modal,
+      groupBy,
+      groupHeaderRenderer,
+      clearable,
+      onClear,
+      options,
+      children,
       ...rest
     } = props;
 
-    const { options } = useSelect();
     const composedRef = forwardRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;
+    const [open, setOpen] = useState(false);
 
     // Convert value to string for Radix UI compatibility
     const stringValue = useMemo(() => {
@@ -81,14 +95,34 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       [onValueChange, readOnly],
     );
 
-    const optionsArray = useMemo(() => Array.from(options), [options]);
-
     const selectedOption = useMemo(() => {
-      return optionsArray.find((option) => String(option.value) === String(value));
-    }, [optionsArray, value]);
+      return options.find((option) => `${option.value}` === `${value}`);
+    }, [options, value]);
+
+    // Group options if groupBy is provided
+    const groupedOptions = useMemo(() => {
+      if (!groupBy) return null;
+
+      const groups: Record<string, typeof options> = {};
+
+      options.forEach((option) => {
+        const groupKey = (option as any)[groupBy] || "Ungrouped";
+        if (!groups[groupKey]) {
+          groups[groupKey] = [];
+        }
+        groups[groupKey].push(option);
+      });
+
+      return groups;
+    }, [groupBy, options]);
 
     return (
-      <Root value={stringValue} onValueChange={handleValueChange}>
+      <Root
+        open={open}
+        value={stringValue}
+        onValueChange={handleValueChange}
+        onOpenChange={() => enabled && !readOnly && setOpen(!open)}
+      >
         <Trigger
           {...rest}
           id={id}
@@ -117,23 +151,72 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
           >
             {selectedOption ? selectedOption.label : readOnly ? "" : placeholder}
           </div>
+          {clearable && value !== undefined && value !== "" && !readOnly && enabled && (
+            <Part partId="clearButton">
+              <button
+                type="button"
+                className={styles.clearButton}
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onClear?.();
+                }}
+                tabIndex={-1}
+              >
+                <Icon name="close" />
+              </button>
+            </Part>
+          )}
           <span className={styles.action}>
             <Icon name="chevrondown" />
           </span>
         </Trigger>
         <Portal container={root}>
           <Content
+            collisionPadding={0}
             className={styles.selectDropdownContent}
             position="popper"
-            style={{ maxHeight: height, minWidth: width }}
+            align="start"
+            style={{ maxHeight: height, width: width }}
           >
             <ScrollUpButton className={styles.selectScrollUpButton}>
               <Icon name="chevronup" />
             </ScrollUpButton>
-            <Viewport className={styles.selectViewport} role="listbox">
-              {children}
-              {optionsArray.length === 0 && emptyListNode}
-            </Viewport>
+            <Part partId="listWrapper">
+              <Viewport className={styles.selectViewport} role="listbox">
+                {groupBy && groupedOptions ? (
+                  // Render grouped options directly from options array
+                  <>
+                    {Object.keys(groupedOptions).length === 0
+                      ? emptyListNode
+                      : Object.entries(groupedOptions).map(([groupName, groupOptions]) => (
+                          <Group key={groupName}>
+                            <Label className={styles.groupHeader}>
+                              {groupHeaderRenderer ? groupHeaderRenderer(groupName) : groupName}
+                            </Label>
+                            {groupOptions.map((option) => (
+                              <SelectOption
+                                key={option.value}
+                                value={option.value}
+                                label={option.label}
+                                enabled={option.enabled}
+                                className={styles.selectOption}
+                              >
+                                {option.children}
+                              </SelectOption>
+                            ))}
+                          </Group>
+                        ))}
+                  </>
+                ) : (
+                  // Render flat options
+                  <>
+                    {<OptionTypeProvider Component={SelectOption}>{children}</OptionTypeProvider>}
+                    {options.length === 0 && emptyListNode}
+                  </>
+                )}
+              </Viewport>
+            </Part>
             <ScrollDownButton className={styles.selectScrollDownButton}>
               <Icon name="chevrondown" />
             </ScrollDownButton>

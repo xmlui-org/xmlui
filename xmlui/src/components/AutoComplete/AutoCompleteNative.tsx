@@ -57,9 +57,9 @@ type AutoCompleteProps = {
   modal?: boolean;
 };
 
-function isOptionsExist(options: Set<Option>, newOptions: Option[]) {
+function isOptionsExist(options: Option[], newOptions: Option[]) {
   return newOptions.some((option) =>
-    Array.from(options).some((o) => o.value === option.value || o.label === option.label),
+    options.some((o) => o.value === option.value || o.label === option.label),
   );
 }
 
@@ -113,7 +113,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(initiallyOpen);
-  const [options, setOptions] = useState(new Set<Option>());
+  const [options, setOptions] = useState([]);
   const [inputValue, setInputValue] = useState("");
   const { root } = useTheme();
   const [width, setWidth] = useState(0);
@@ -125,11 +125,11 @@ export const AutoComplete = forwardRef(function AutoComplete(
   // Filter options based on search term
   const filteredOptions = useMemo(() => {
     if (!searchTerm || searchTerm.trim() === "") {
-      return Array.from(options);
+      return options;
     }
 
     const searchLower = searchTerm.toLowerCase();
-    return Array.from(options).filter((option) => {
+    return options.filter((option) => {
       const extendedValue =
         option.value + " " + option.label + " " + (option.keywords || []).join(" ");
       return extendedValue.toLowerCase().includes(searchLower);
@@ -141,7 +141,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
     if (!creatable || !searchTerm || searchTerm.trim() === "") return false;
 
     // Check if the search term already exists as an option
-    const searchTermExists = Array.from(options).some(
+    const searchTermExists = options.some(
       (option) => option.value === searchTerm || option.label === searchTerm,
     );
 
@@ -178,14 +178,12 @@ export const AutoComplete = forwardRef(function AutoComplete(
   }, [referenceElement]);
 
   const selectedValue = useMemo(() => {
-    const optionsArray = Array.from(options);
-
     if (Array.isArray(value)) {
       if (value.length === 0) return [];
-      return optionsArray.filter((o) => value.includes(`${o.value}`));
+      return options.filter((o) => value.includes(`${o.value}`));
     }
 
-    return optionsArray.find((o) => `${o.value}` === `${value}`);
+    return options.find((o) => `${o.value}` === `${value}`);
   }, [value, options]);
 
   const toggleOption = useCallback(
@@ -193,7 +191,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
       if (selectedItem === "") return;
 
       // Check if the option is enabled
-      const option = Array.from(options).find((opt) => opt.value === selectedItem);
+      const option = options.find((opt) => opt.value === selectedItem);
       if (option && option.enabled === false) return;
 
       const newSelectedValue = multi
@@ -229,7 +227,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
       setInputValue(selectedValue?.label || "");
       setSearchTerm("");
     }
-  }, [multi, selectedValue]);
+  }, [selectedValue]);
 
   // Clear selected value
   const clearValue = useCallback(() => {
@@ -240,24 +238,11 @@ export const AutoComplete = forwardRef(function AutoComplete(
   }, [multi, updateState, onDidChange]);
 
   const onOptionAdd = useCallback((option: Option) => {
-    setOptions((prev) => {
-      const newSet = new Set(prev);
-      // Remove old version if exists, then add the new one to ensure updates
-      const existing = Array.from(prev).find((opt) => opt.value === option.value);
-      if (existing) {
-        newSet.delete(existing);
-      }
-      newSet.add(option);
-      return newSet;
-    });
+    setOptions((prev) => [...prev, option]);
   }, []);
 
   const onOptionRemove = useCallback((option: Option) => {
-    setOptions((prev) => {
-      const optionsSet = new Set(prev);
-      optionsSet.delete(option);
-      return optionsSet;
-    });
+    setOptions((prev) => prev.filter((opt) => opt.value !== option.value));
   }, []);
 
   // Combined list of all items (creatable + filtered options)
@@ -610,69 +595,51 @@ export const AutoComplete = forwardRef(function AutoComplete(
               </div>
             </PopoverTrigger>
           </Part>
-          {open && (
-            <Portal container={root}>
-              <PopoverContent
-                style={{ width, height: dropdownHeight }}
-                className={styles.popoverContent}
-                align="start"
-                onOpenAutoFocus={(e) => e.preventDefault()}
-              >
-                <div
-                  role="listbox"
-                  className={styles.commandList}
-                  style={{ height: dropdownHeight }}
-                >
-                  {searchTerm ? (
-                    // When searching, show only filtered options
-                    <>
-                      {filteredOptions.length === 0 && !shouldShowCreatable && (
-                        <div>{emptyListNode}</div>
-                      )}
-                      {shouldShowCreatable && (
-                        <CreatableItem
-                          onNewItem={onItemCreated}
-                          isHighlighted={selectedIndex === 0}
+          <Portal container={root}>
+            <PopoverContent
+              style={{ width, height: dropdownHeight }}
+              className={styles.popoverContent}
+              align="start"
+              onOpenAutoFocus={(e) => e.preventDefault()}
+            >
+              <div role="listbox" className={styles.commandList} style={{ height: dropdownHeight }}>
+                {searchTerm ? (
+                  <>
+                    {filteredOptions.map(({ value, label, enabled, keywords }, index) => {
+                      const itemIndex = shouldShowCreatable ? index + 1 : index;
+                      return (
+                        <AutoCompleteOption
+                          key={value}
+                          value={value}
+                          label={label}
+                          enabled={enabled}
+                          keywords={keywords}
+                          readOnly={readOnly}
+                          isHighlighted={selectedIndex === itemIndex}
+                          itemIndex={itemIndex}
                         />
-                      )}
-                      <div>
-                        {filteredOptions.map(({ value, label, enabled, keywords }, index) => {
-                          const itemIndex = shouldShowCreatable ? index + 1 : index;
-                          return (
-                            <AutoCompleteOption
-                              key={value}
-                              value={value}
-                              label={label}
-                              enabled={enabled}
-                              keywords={keywords}
-                              readOnly={readOnly}
-                              isHighlighted={selectedIndex === itemIndex}
-                              itemIndex={itemIndex}
-                            />
-                          );
-                        })}
-                      </div>
-                    </>
-                  ) : (
-                    // When not searching, show all children directly (includes Options and other components like Button)
-                    <OptionTypeProvider Component={VisibleAutoCompleteOption}>
-                      <>
-                        {children}
-                        {options.size === 0 && <div>{emptyListNode}</div>}
-                      </>
-                    </OptionTypeProvider>
-                  )}
-                </div>
-              </PopoverContent>
-            </Portal>
-          )}
+                      );
+                    })}
+                    {shouldShowCreatable && (
+                      <CreatableItem
+                        onNewItem={onItemCreated}
+                        isHighlighted={selectedIndex === 0}
+                      />
+                    )}
+                    {filteredOptions.length === 0 && !shouldShowCreatable && (
+                      <div>{emptyListNode}</div>
+                    )}
+                  </>
+                ) : (
+                  <OptionTypeProvider Component={AutoCompleteOption}>{children}</OptionTypeProvider>
+                )}
+              </div>
+            </PopoverContent>
+          </Portal>
         </Popover>
-        {/* Hidden render to collect options when dropdown is closed */}
-        {!open && (
-          <div style={{ display: "none" }}>
-            <OptionTypeProvider Component={HiddenOption}>{children}</OptionTypeProvider>
-          </div>
-        )}
+        <div style={{ display: "none"}}>
+          <OptionTypeProvider Component={HiddenOption}>{children}</OptionTypeProvider>
+        </div>
       </OptionContext.Provider>
     </AutoCompleteContext.Provider>
   );
@@ -734,79 +701,6 @@ function CreatableItem({ onNewItem, isHighlighted = false }: CreatableItemProps)
   }
 
   return <span style={{ display: "none" }} />;
-}
-
-// Visible option component for rendering items in the dropdown (used by OptionTypeProvider)
-function VisibleAutoCompleteOption(option: Option) {
-  const { value, label, enabled = true, children } = option;
-  const { onOptionAdd } = useOption();
-  const {
-    value: selectedValue,
-    onChange,
-    multi,
-    setOpen,
-    readOnly, // Use readOnly from AutoComplete context value
-    optionRenderer,
-  } = useAutoComplete();
-
-  const opt: Option = useMemo(() => {
-    return {
-      ...option,
-      label: label ?? "",
-      keywords: option.keywords || [label ?? ""],
-    };
-  }, [option, label]);
-
-  useEffect(() => {
-    onOptionAdd(opt);
-    // Don't remove options when component unmounts - they should persist
-  }, [opt, onOptionAdd]);
-
-  const selected = multi ? selectedValue?.includes(value) : selectedValue === value;
-
-  const handleClick = () => {
-    if (readOnly) {
-      setOpen(false);
-      return;
-    }
-    if (enabled) {
-      onChange(value);
-      // Only close dropdown for single select mode
-      if (!multi) {
-        setOpen(false);
-      }
-    }
-  };
-
-  return (
-    <div
-      role="option"
-      aria-disabled={!enabled}
-      aria-selected={selected}
-      className={classnames(styles.autoCompleteOption, {
-        [styles.disabledOption]: !enabled,
-      })}
-      onMouseDown={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      }}
-      onClick={handleClick}
-    >
-      {children ? (
-        <>
-          <div className={styles.autoCompleteOptionContent}>{children}</div>
-          {selected && <Icon name="checkmark" />}
-        </>
-      ) : optionRenderer ? (
-        optionRenderer({ label, value, enabled }, selectedValue as any, false)
-      ) : (
-        <>
-          <div className={styles.autoCompleteOptionContent}>{label}</div>
-          {selected && <Icon name="checkmark" />}
-        </>
-      )}
-    </div>
-  );
 }
 
 function AutoCompleteOption(option: Option & { isHighlighted?: boolean; itemIndex?: number }) {

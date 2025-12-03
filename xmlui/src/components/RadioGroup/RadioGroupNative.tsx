@@ -117,12 +117,14 @@ export const RadioGroup = forwardRef(function RadioGroup(
   const focusActiveOption = useCallback(() => {
     if (radioGroupRef.current) {
       // First try to find the currently selected radio option
-      const selectedRadio = radioGroupRef.current.querySelector('[role="radio"][aria-checked="true"]');
+      const selectedRadio = radioGroupRef.current.querySelector(
+        '[role="radio"][aria-checked="true"]',
+      );
       if (selectedRadio) {
         (selectedRadio as HTMLElement).focus();
         return;
       }
-      
+
       // If no option is selected, focus the first one
       const firstRadio = radioGroupRef.current.querySelector('[role="radio"]');
       if (firstRadio) {
@@ -229,8 +231,23 @@ export const RadioGroupOption = ({
     [enabled, radioGroupContext, value],
   );
 
-  const item = useMemo(
-    () => (
+  const item = useMemo(() => {
+    // When optionRenderer is present, it will render the children in the outer label
+    // So we only render the radio button itself, not a separate label
+    if (optionRenderer) {
+      return (
+        <UnwrappedRadioItem
+          id={id}
+          value={value}
+          checked={value === radioGroupContext.value}
+          disabled={!enabled}
+          statusStyles={statusStyles}
+        />
+      );
+    }
+
+    // Without optionRenderer, render the standard radio + label structure
+    return (
       <>
         <UnwrappedRadioItem
           id={id}
@@ -243,9 +260,8 @@ export const RadioGroupOption = ({
           {label ?? value}
         </label>
       </>
-    ),
-    [enabled, id, label, statusStyles, value, radioGroupContext],
-  );
+    );
+  }, [enabled, id, label, optionRenderer, statusStyles, value, radioGroupContext]);
 
   return (
     <div
@@ -255,7 +271,7 @@ export const RadioGroupOption = ({
       data-radio-item
     >
       {!!optionRenderer ? (
-        <label className={styles.optionLabel}>
+        <label htmlFor={id} className={styles.optionLabel}>
           <div className={styles.itemContainer}>{item}</div>
           {optionRenderer({
             $checked: value === radioGroupContext.value,

@@ -1707,7 +1707,7 @@ test.describe("Edge Cases", () => {
     const textfieldDriver = await createTextBoxDriver(textfieldElement);
 
     await selectDriver.component.click();
-    await page.getByText("Public Key").click();
+    await page.getByText("Public Key").nth(1).click();
     await textfieldDriver.field.fill("John");
     await formDriver.submitForm();
 
@@ -2491,7 +2491,7 @@ test("can submit with invisible required field", async ({
   const textfieldDriver = await createTextBoxDriver(textfieldElement);
 
   await selectDriver.component.click();
-  await page.getByText("Public Key").click();
+  await page.getByText("Public Key").nth(1).click();
   await textfieldDriver.field.fill("John");
   await formDriver.submitForm();
 
@@ -2656,7 +2656,7 @@ test.describe("Api", () => {
     expect(data.name).toEqual("Modified");
 
     // Get data again to verify form still has original value
-    await page.getByTestId("getDataAgainBtn").click();
+    await page.getByTestId("getDataAgainBtn").click({ delay: 100 });
     data = await testStateDriver.testState();
     expect(data.name).toEqual("John");
   });
