@@ -1,5 +1,16 @@
 # xmlui
 
+## 0.11.21
+
+### Patch Changes
+
+- 62f10d6: Reworked and standardized disabled input control visuals.
+- 10b5305: fix: validationResult's position
+- 3a5c730: Matched the structure of the $error context value and the returned object in onError. Updated APICall and Datasource docs to detail changes.
+- 304c247: feat: Select - handle option groups in the dropdown list
+- 160726e: Added property rowUnselectablePredicate to Table to manage per row selection.
+- 7ca51e1: feat: Select - handle ungrouped options, ungroupedHeaderTemplate
+
 ## 0.11.20
 
 ### Patch Changes
