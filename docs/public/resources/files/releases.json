@@ -1,5 +1,125 @@
 [
   {
+    "tag_name": "xmlui@0.11.22",
+    "published_at": "2025-12-09T14:18:28Z",
+    "changes": [
+      {
+        "description": "feat: pagination controls should only appear in a Table as necessary, alwaysShowPagination - explicitly toggles pagination controls visibility",
+        "commit_sha": "154ae26"
+      },
+      {
+        "description": "Extend ModalDialog with titleTemplate and title-related theme variables",
+        "commit_sha": "865710f"
+      },
+      {
+        "description": "Add grayscale prop to Image and Markdown components. Images can now be displayed in grayscale by setting `grayscale=\"true\"` on either the Image component or the Markdown component (which applies to all images within the markdown content).",
+        "commit_sha": "b4c1da8"
+      },
+      {
+        "description": "fix: table pagination design on mobile",
+        "commit_sha": "f127399"
+      },
+      {
+        "description": "App component refactored",
+        "commit_sha": "cebc0d3"
+      },
+      {
+        "description": "Add app state management with global functions",
+        "commit_sha": "8ad6968"
+      },
+      {
+        "description": "Add a removeBr property to Markdown",
+        "commit_sha": "fa04809"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.11.22.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.22/xmlui-0.11.22.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.11.21",
+    "published_at": "2025-12-04T12:24:28Z",
+    "changes": [
+      {
+        "description": "Reworked and standardized disabled input control visuals.",
+        "commit_sha": "62f10d6"
+      },
+      {
+        "description": "fix: validationResult's position",
+        "commit_sha": "10b5305"
+      },
+      {
+        "description": "Matched the structure of the $error context value and the returned object in onError. Updated APICall and Datasource docs to detail changes.",
+        "commit_sha": "3a5c730"
+      },
+      {
+        "description": "feat: Select - handle option groups in the dropdown list",
+        "commit_sha": "304c247"
+      },
+      {
+        "description": "Added property rowUnselectablePredicate to Table to manage per row selection.",
+        "commit_sha": "160726e"
+      },
+      {
+        "description": "feat: Select - handle ungrouped options, ungroupedHeaderTemplate",
+        "commit_sha": "7ca51e1"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.11.21.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.21/xmlui-0.11.21.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.11.20",
+    "published_at": "2025-12-01T13:41:09Z",
+    "changes": [
+      {
+        "description": "Only show sorting indicators in the Table when the user hovers/focuses or orders by a column.",
+        "commit_sha": "aaaeb59"
+      },
+      {
+        "description": "Add isDirty() API to Form",
+        "commit_sha": "d5d08fd"
+      },
+      {
+        "description": "fix formItem initialValue with async loaded null field value",
+        "commit_sha": "28317be"
+      },
+      {
+        "description": "Add getData() API to Form",
+        "commit_sha": "2097a64"
+      },
+      {
+        "description": "Add disableInlineStyle property to Theme",
+        "commit_sha": "4828156"
+      },
+      {
+        "description": "refactor: improve Breakout component to handle different layouts",
+        "commit_sha": "0481073"
+      },
+      {
+        "description": "refactor: use radix for dropdown menu implementation",
+        "commit_sha": "4686bfd"
+      },
+      {
+        "description": "Inline styles can be disabled witht \"appGlobals.disableInlineStyle: true\" setting",
+        "commit_sha": "710e72b"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.11.20.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.20/xmlui-0.11.20.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.11.19",
     "published_at": "2025-11-21T14:06:08Z",
     "changes": [
@@ -128,58 +248,6 @@
       {
         "name": "xmlui-0.11.12.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.12/xmlui-0.11.12.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.11",
-    "published_at": "2025-11-13T08:21:13Z",
-    "changes": [
-      {
-        "description": "New themes created: xmlui-docs, xmlui-blog, xmlui-web",
-        "commit_sha": "d32fef2"
-      },
-      {
-        "description": "The \"contextVars\" warning with inspect=\"true\" is fixed",
-        "commit_sha": "c882b72"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.11.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.11/xmlui-0.11.11.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.10",
-    "published_at": "2025-11-12T13:55:19Z",
-    "changes": [
-      {
-        "description": "refactor: rename size prop to thickness and add length prop in ContentSeparator",
-        "commit_sha": "741f760"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.10.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.10/xmlui-0.11.10.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.9",
-    "published_at": "2025-11-12T07:26:09Z",
-    "changes": [
-      {
-        "description": "Add noIndicator property to NavLink and NavGroup",
-        "commit_sha": "9c42826"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.9.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.9/xmlui-0.11.9.js"
       }
     ]
   }

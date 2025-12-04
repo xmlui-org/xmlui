@@ -87,22 +87,15 @@ const content: Record<string, any> = {};
 const plainTextContent: Record<string, string> = {};
 const navPanelContent: any[] = [];
 Object.keys(contentRuntime).map((filePath) => {
-  const urlFragment = filePath.substring("/content/".length).replace(".mdx", "").replace(".md", "");
-  content[omitIndexFromPath(urlFragment)] = contentRuntime[filePath].default;
-  plainTextContent[omitIndexFromPath(urlFragment)] = markdownToPlainText(
-    contentRuntime[filePath].default,
-  );
-  navPanelContent.push(urlFragment);
-});
-
-const pagesRuntime: Record<string, any> = import.meta.glob(`/pages/**/*.md`, {
-  eager: true,
-  query: "?raw",
-});
-
-const prefetchedContent: Record<string, any> = {};
-Object.keys(pagesRuntime).map((filePath) => {
-  prefetchedContent[filePath] = pagesRuntime[filePath].default;
+  let urlFragment: string;
+  if (filePath.startsWith("/content/pages/")) {
+    urlFragment = filePath.substring("/content/".length);
+  } else {
+    urlFragment = filePath.substring("/content/".length).replace(".md", "");
+    navPanelContent.push(urlFragment);
+    plainTextContent[urlFragment] = markdownToPlainText(contentRuntime[filePath].default);
+  }
+  content[urlFragment] = contentRuntime[filePath].default;
 });
 
 const shikiHighlighter = createHighlighterCoreSync({
@@ -164,7 +157,8 @@ type TreeNode = {
 type MetaJson = Record<string, any>;
 
 function omitIndexFromPath(path: string) {
-  return path.endsWith("index") ? path.substring(0, path.length - "index".length) : path;
+  const res = path.endsWith("index") ? path.substring(0, path.length - "index".length) : path;
+  return res;
 }
 
 // generated with chatgpt
@@ -276,7 +270,6 @@ const App: StandaloneAppDescription = {
       availableLangs: shikiHighlighter.getLoadedLanguages(),
       highlight,
     },
-    prefetchedContent,
     lintSeverity: "skip", // Turn off xmlui linting
     popOutUrl: "https://playground.xmlui.org/#/playground",
   },
