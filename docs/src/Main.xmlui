@@ -130,6 +130,10 @@
                 to="/howto/react-to-button-click-not-keystrokes"
             />
             <NavLink
+                label="Buffer a reactive edit"
+                to="/howto/buffer-a-reactive-edit"
+            />
+            <NavLink
                 label="Modify a value reported in a Column"
                 to="/howto/modify-a-value-reported-in-a-column"
             />
@@ -562,6 +566,11 @@
         <Page url="/howto/react-to-button-click-not-keystrokes">
             <DocumentPageNoTOC
                 url="/pages/howto/react-to-button-click-not-keystrokes.md"
+            />
+        </Page>
+        <Page url="/howto/buffer-a-reactive-edit">
+            <DocumentPageNoTOC
+                url="/pages/howto/buffer-a-reactive-edit.md"
             />
         </Page>
         <Page url="/howto/modify-a-value-reported-in-a-column">
