@@ -42,17 +42,6 @@ export const BadgeMd = createMetadata({
         `The \`${COMP}\` component supports the mapping of a list of colors using the \`value\` prop as the ` +
         `key. If this property is not set, no color mapping is used.`,
     },
-    themeColor: dInternal(`(**NOT IMPLEMENTED YET**) The theme color of the component.`),
-    indicatorText: dInternal(
-      `(**NOT IMPLEMENTED YET**) This property defines the text to display in the indicator. If it is not ` +
-        `defined or empty, no indicator is displayed unless the \`forceIndicator\` property is set.`,
-    ),
-    forceIndicator: dInternal(
-      `(**NOT IMPLEMENTED YET**) This property forces the display of the indicator, even if ` +
-        `the \`indicatorText\` property is not defined or empty.`,
-    ),
-    indicatorThemeColor: dInternal(`(**NOT IMPLEMENTED YET**) The theme color of the indicator.`),
-    indicatorPosition: dInternal(`(**NOT IMPLEMENTED YET**) The position of the indicator.`),
   },
   events: {},
   themeVars: parseScssVar(styles.themeVars),
