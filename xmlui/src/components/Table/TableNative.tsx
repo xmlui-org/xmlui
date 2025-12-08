@@ -132,6 +132,7 @@ type TableProps = {
   hideNoDataView?: boolean;
   alwaysShowSelectionHeader?: boolean;
   alwaysShowSortingIndicator?: boolean;
+  alwaysShowPagination?: boolean;
   registerComponentApi: RegisterComponentApiFn;
   noBottomBorder?: boolean;
   cellVerticalAlign?: CellVerticalAlign;
@@ -240,7 +241,7 @@ export const Table = forwardRef(
     {
       data = defaultProps.data,
       columns = defaultProps.columns,
-      isPaginated = defaultProps.isPaginated,
+      isPaginated,
       loading = defaultProps.loading,
       headerHeight,
       rowsSelectable = defaultProps.rowsSelectable,
@@ -248,7 +249,7 @@ export const Table = forwardRef(
       initiallySelected = defaultProps.initiallySelected,
       syncWithAppState,
       pageSizeOptions = defaultProps.pageSizeOptions,
-      pageSize = pageSizeOptions?.[0] || DEFAULT_PAGE_SIZES[0],
+      pageSize,
       currentPageIndex = 0,
       rowDisabledPredicate = defaultIsRowDisabled,
       rowUnselectablePredicate = defaultIsRowUnselectable,
@@ -265,6 +266,7 @@ export const Table = forwardRef(
       autoFocus = defaultProps.autoFocus,
       hideHeader = defaultProps.hideHeader,
       hideNoDataView = defaultProps.hideNoDataView,
+      alwaysShowPagination = false,
       alwaysShowSelectionHeader = defaultProps.alwaysShowSelectionHeader,
       alwaysShowSortingIndicator = defaultProps.alwaysShowSortingIndicator,
       registerComponentApi,
@@ -290,6 +292,18 @@ export const Table = forwardRef(
     const ref = forwardedRef ? composeRefs(wrapperRef, forwardedRef) : wrapperRef;
     const tableRef = useRef<HTMLTableElement>(null);
     const estimatedHeightRef = useRef<number | null>(null);
+
+    const effectivePageSize = pageSize ?? (pageSizeOptions?.[0] || DEFAULT_PAGE_SIZES[0]);
+
+    const effectiveIsPaginated = useMemo(() => {
+      if (isPaginated !== undefined) {
+        return isPaginated;
+      }
+      if (pageSize !== undefined) {
+        return safeData.length > effectivePageSize;
+      }
+      return defaultProps.isPaginated;
+    }, [isPaginated, pageSize, safeData.length, effectivePageSize]);
 
     const safeColumns: OurColumnMetadata[] = useMemo(() => {
       if (columns) {
@@ -542,23 +556,23 @@ export const Table = forwardRef(
     // --- Set up page information (using the first page size option)
     // const [pagination, setPagination] = useState<PaginationState>();
     const [pagination, setPagination] = useState<PaginationState>({
-      pageSize: isPaginated ? pageSize : Number.MAX_VALUE,
+      pageSize: effectiveIsPaginated ? effectivePageSize : Number.MAX_VALUE,
       pageIndex: currentPageIndex,
     });
 
-    const prevIsPaginated = usePrevious(isPaginated);
+    const prevIsPaginated = usePrevious(effectiveIsPaginated);
 
     useEffect(() => {
-      if (!prevIsPaginated && isPaginated) {
+      if (!prevIsPaginated && effectiveIsPaginated) {
         setPagination((prev) => {
           return {
             ...prev,
-            pageSize: pageSize,
+            pageSize: effectivePageSize,
             pageIndex: 0,
           };
         });
       }
-      if (prevIsPaginated && !isPaginated) {
+      if (prevIsPaginated && !effectiveIsPaginated) {
         setPagination(() => {
           return {
             pageIndex: 0,
@@ -566,7 +580,7 @@ export const Table = forwardRef(
           };
         });
       }
-    }, [isPaginated, pageSizeOptions, prevIsPaginated, pageSize]);
+    }, [effectiveIsPaginated, pageSizeOptions, prevIsPaginated, effectivePageSize]);
 
     const [columnSizing, setColumnSizing] = useState<Record<string, number>>({});
 
@@ -600,7 +614,7 @@ export const Table = forwardRef(
       columns: columnsWithSelectColumn,
       data: sortedData,
       getCoreRowModel: getCoreRowModel(),
-      getPaginationRowModel: isPaginated ? getPaginationRowModel() : undefined,
+      getPaginationRowModel: effectiveIsPaginated ? getPaginationRowModel() : undefined,
       enableRowSelection: enableRowSelectionFn,
       enableMultiRowSelection,
       columnResizeMode: "onChange",
@@ -747,10 +761,11 @@ export const Table = forwardRef(
         ref={ref}
         style={style}
       >
-        {isPaginated &&
+        {effectiveIsPaginated &&
           hasData &&
           rows.length > 0 &&
           pagination &&
+          (alwaysShowPagination || table.getPageCount() > 1) &&
           (paginationControlsLocation === "top" || paginationControlsLocation === "both") &&
           paginationControls}
 
@@ -1128,10 +1143,11 @@ export const Table = forwardRef(
             <div className={styles.noRows}>No data available</div>
           ))}
 
-        {isPaginated &&
+        {effectiveIsPaginated &&
           hasData &&
           rows.length > 0 &&
           pagination &&
+          (alwaysShowPagination || table.getPageCount() > 1) &&
           (paginationControlsLocation === "bottom" || paginationControlsLocation === "both") &&
           paginationControls}
       </div>

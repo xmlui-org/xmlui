@@ -209,6 +209,15 @@ export const TableMd = createMetadata({
       availableValues: TablePaginationControlsLocationValues,
       defaultValue: defaultProps.paginationControlsLocation,
     },
+    alwaysShowPagination: {
+      description:
+        `This property explicitly toggles pagination controls visibility. ` +
+        `If set to \`true\`, controls are always shown even if there is only one page. ` +
+        `If set to \`false\` (default), controls are hidden when there is only one page. ` +
+        `This property only has effect when pagination is enabled.`,
+      valueType: "boolean",
+      defaultValue: false,
+    },
     cellVerticalAlign: {
       description:
         `This property controls the vertical alignment of cell content. ` +
@@ -447,6 +456,9 @@ const TableWithColumns = memo(
             noBottomBorder={extractValue.asOptionalBoolean(node.props.noBottomBorder)}
             paginationControlsLocation={extractValue.asOptionalString(
               node.props.paginationControlsLocation,
+            )}
+            alwaysShowPagination={extractValue.asOptionalBoolean(
+              node.props.alwaysShowPagination,
             )}
             cellVerticalAlign={extractValue.asOptionalString(node.props.cellVerticalAlign)}
             buttonRowPosition={extractValue.asOptionalString(node.props.buttonRowPosition)}
