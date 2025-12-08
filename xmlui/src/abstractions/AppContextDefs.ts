@@ -11,6 +11,7 @@ import type {
 import type { ActionFunction } from "./ActionDefs";
 import type { SetupWorker } from "msw/browser";
 import type { ApiInterceptor } from "../components-core/interception/ApiInterceptor";
+import type { AppState } from "../components-core/rendering/appState";
 
 // This interface defines the properties and services of an app context that the 
 // application components can use when implementing their behavior.
@@ -242,6 +243,13 @@ export type AppContextObject = {
   readonly embed: { isInIFrame: boolean };
   distinct: (arr: any[]) => any[];
   forceRefreshAnchorScroll: () => void;
+
+  // ==============================================================================================
+  // AppState Global State Management
+
+  // This object provides methods for managing global application state with support for
+  // nested paths, array operations, and immutable state updates.
+  AppState: AppState;
 };
 
 export const MediaBreakpointKeys = ["xs", "sm", "md", "lg", "xl", "xxl"] as const;
