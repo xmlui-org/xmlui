@@ -21,6 +21,7 @@ import { useApiInterceptorContext } from "../interception/useApiInterceptorConte
 import { EMPTY_OBJECT } from "../constants";
 import type { IAppStateContext } from "../../components/App/AppStateContext";
 import { AppStateContext } from "../../components/App/AppStateContext";
+import { createAppState, type AppState } from "./appState";
 import { delay, formatFileSizeInBytes, getFileExtension } from "../utils/misc";
 import { useDebugView } from "../DebugViewProvider";
 import { miscellaneousUtils } from "../appContext/misc-utils";
@@ -339,6 +340,35 @@ export function AppContent({
     return globalProps ? { ...globalProps } : EMPTY_OBJECT;
   }, [globalProps]);
 
+  // --- We prepare the helper infrastructure for the `AppState` component, which manages
+  // --- app-wide state using buckets (state sections).
+  const [appState, setAppState] = useState<Record<string, Record<string, any>>>(EMPTY_OBJECT);
+
+  const update = useCallback((bucket: string, patch: any) => {
+    setAppState((prev) => {
+      return {
+        ...prev,
+        [bucket]: {
+          ...(prev[bucket] || {}),
+          ...patch,
+        },
+      };
+    });
+  }, []);
+
+  const appStateContextValue: IAppStateContext = useMemo(() => {
+    return {
+      appState,
+      update,
+    };
+  }, [appState, update]);
+
+  // --- Create AppState object with global state management functions
+  const AppState = useMemo(
+    () => createAppState(appStateContextValue),
+    [appStateContextValue]
+  );
+
   // --- We assemble the app context object form the collected information
   const appContextValue = useMemo(() => {
     const ret: AppContextObject = {
@@ -401,6 +431,9 @@ export function AppContent({
       ...miscellaneousUtils,
 
       forceRefreshAnchorScroll,
+
+      // --- AppState global state management
+      AppState,
     };
     return ret;
   }, [
@@ -425,30 +458,8 @@ export function AppContent({
     apiInterceptorContext,
     forceRefreshAnchorScroll,
     root,
+    AppState,
   ]);
-
-  // --- We prepare the helper infrastructure for the `AppState` component, which manages
-  // --- app-wide state using buckets (state sections).
-  const [appState, setAppState] = useState<Record<string, Record<string, any>>>(EMPTY_OBJECT);
-
-  const update = useCallback((bucket: string, patch: any) => {
-    setAppState((prev) => {
-      return {
-        ...prev,
-        [bucket]: {
-          ...(prev[bucket] || {}),
-          ...patch,
-        },
-      };
-    });
-  }, []);
-
-  const appStateContextValue: IAppStateContext = useMemo(() => {
-    return {
-      appState,
-      update,
-    };
-  }, [appState, update]);
 
   return (
     <AppContext.Provider value={appContextValue}>
