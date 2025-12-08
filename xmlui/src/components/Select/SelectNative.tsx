@@ -42,6 +42,7 @@ export const defaultProps = {
   validationStatus: "none" as ValidationStatus,
   labelBreak: false,
   clearable: false,
+  modal: false,
 };
 
 export type SingleValueType = string | number;
@@ -254,7 +255,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     updateState = noop,
     registerComponentApi,
     children,
-    modal,
+    modal = defaultProps.modal,
 
     ...rest
   },
