@@ -15,6 +15,7 @@ import { Button } from "../../components/Button/ButtonNative";
 import { NavLink } from "../../components/NavLink/NavLinkNative";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { Part } from "../Part/Part";
+import { useRequireAppContext } from "../App/AppComponentContext";
 
 const PART_HAMBURGER = "hamburger";
 
@@ -156,6 +157,9 @@ export function AppContextAwareAppHeader({
   showLogo = true,
   renderChild,
 }: AppContextAwareAppHeaderProps) {
+  // Validate that AppHeader is used within App component
+  useRequireAppContext("AppHeader");
+  
   const appLayoutContext = useAppLayoutContext();
 
   const {

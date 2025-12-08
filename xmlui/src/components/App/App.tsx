@@ -16,6 +16,7 @@ import { IndexerContext } from "./IndexerContext";
 import { createPortal } from "react-dom";
 import { useAppContext } from "../../components-core/AppContext";
 import { useSearchContextSetIndexing, useSearchContextUpdater } from "./SearchContext";
+import { AppComponentProvider } from "./AppComponentContext";
 
 // --- Define a structure to represent navigation hierarchy
 interface NavHierarchyNode {
@@ -411,26 +412,29 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
   );
 
   // Memoize the rendered children to prevent unnecessary re-renders
+  const appContextValue = useMemo(() => ({ insideApp: true }), []);
   const renderedHeader = useMemo(() => renderChild(AppHeader), [AppHeader, renderChild]);
   const renderedFooter = useMemo(() => renderChild(Footer), [Footer, renderChild]);
   const renderedNavPanel = useMemo(() => renderChild(NavPanel), [NavPanel, renderChild]);
   const renderedContent = useMemo(() => renderChild(restChildren), [restChildren, renderChild]);
 
   return (
-    <App
-      {...appProps}
-      header={renderedHeader}
-      footer={renderedFooter}
-      footerSticky={footerSticky}
-      navPanel={renderedNavPanel}
-      navPanelDef={NavPanel}
-      logoContentDef={node.props.logoTemplate}
-      renderChild={renderChild}
-      registerComponentApi={registerComponentApi}
-    >
-      {renderedContent}
-      <SearchIndexCollector Pages={Pages} renderChild={renderChild} />
-    </App>
+    <AppComponentProvider value={appContextValue}>
+      <App
+        {...appProps}
+        header={renderedHeader}
+        footer={renderedFooter}
+        footerSticky={footerSticky}
+        navPanel={renderedNavPanel}
+        navPanelDef={NavPanel}
+        logoContentDef={node.props.logoTemplate}
+        renderChild={renderChild}
+        registerComponentApi={registerComponentApi}
+      >
+        {renderedContent}
+        <SearchIndexCollector Pages={Pages} renderChild={renderChild} />
+      </App>
+    </AppComponentProvider>
   );
 }
 

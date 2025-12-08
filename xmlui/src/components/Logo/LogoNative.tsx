@@ -3,6 +3,7 @@ import { forwardRef } from "react";
 
 import { Image } from "../Image/ImageNative";
 import { useLogoUrl } from "../AppHeader/AppHeaderNative";
+import { useRequireAppContext } from "../App/AppComponentContext";
 
 // Default props for Logo component
 export const defaultProps = {
@@ -21,6 +22,9 @@ export const Logo = forwardRef(function Logo(
   { style, alt = defaultProps.alt, inline = defaultProps.inline, className, ...rest }: LogoProps,
   forwardedRef: ForwardedRef<HTMLImageElement>,
 ) {
+  // Validate that Logo is used within App component
+  useRequireAppContext("Logo");
+  
   const logoUrl = useLogoUrl();
   if (!logoUrl) {
     return null;

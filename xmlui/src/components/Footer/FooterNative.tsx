@@ -6,6 +6,7 @@ import classnames from "classnames";
 import styles from "./Footer.module.scss";
 
 import { useAppLayoutContext } from "../App/AppLayoutContext";
+import { useRequireAppContext } from "../App/AppComponentContext";
 
 // =====================================================================================================================
 // React Footer component implementation
@@ -29,6 +30,9 @@ export const Footer = forwardRef(function Footer(
   },
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
+  // Validate that Footer is used within App component
+  useRequireAppContext("Footer");
+  
   const { layout } = useAppLayoutContext() || {};
   const canRestrictContentWidth = layout !== "vertical-full-header";
   return (

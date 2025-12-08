@@ -8,6 +8,7 @@ import { Logo } from "../Logo/LogoNative";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { getAppLayoutOrientation } from "../App/AppNative";
 import { useLinkInfoContext } from "../App/LinkInfoContext";
+import { useRequireAppContext } from "../App/AppComponentContext";
 
 // Define navigation hierarchy node structure
 export interface NavHierarchyNode {
@@ -258,6 +259,9 @@ export const NavPanel = forwardRef(function NavPanel(
   }: Props,
   forwardedRef: React.ForwardedRef<any>,
 ) {
+  // Validate that NavPanel is used within App component
+  useRequireAppContext("NavPanel");
+  
   const appLayoutContext = useAppLayoutContext();
   const linkInfoContext = useLinkInfoContext();
   const horizontal = getAppLayoutOrientation(appLayoutContext?.layout) === "horizontal";

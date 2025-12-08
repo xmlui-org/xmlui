@@ -9,11 +9,12 @@ import { createMetadata, dComponent } from "../../components/metadata-helpers";
 import { appLayoutMd } from "../App/AppLayoutContext";
 import { App2 as App2Component, defaultProps } from "./App2Native";
 import type { CSSProperties } from "react";
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import { SearchIndexCollector } from "./SearchIndexCollector";
 import { extractAppComponents, extractNavPanelFromPages } from "./App2Navigation";
 import type { ExtractedComponents } from "./App2Navigation";
+import { AppComponentProvider } from "../App/AppComponentContext";
 
 const COMP = "App2";
 
@@ -169,36 +170,39 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
 
   const applyDefaultContentPadding = !Pages;
   const footerSticky = Footer?.props?.sticky ?? true;
+  const appContextValue = useMemo(() => ({ insideApp: true }), []);
 
   return (
-    <App2Component
-      scrollWholePage={extractValue.asOptionalBoolean(node.props.scrollWholePage, true)}
-      noScrollbarGutters={extractValue.asOptionalBoolean(node.props.noScrollbarGutters, false)}
-      className={className}
-      layout={extractValue(node.props.layout)}
-      loggedInUser={extractValue(node.props.loggedInUser)}
-      onReady={lookupEventHandler("ready")}
-      onMessageReceived={lookupEventHandler("messageReceived")}
-      name={extractValue(node.props.name)}
-      logo={extractValue(node.props.logo)}
-      logoDark={extractValue(node.props["logo-dark"])}
-      logoLight={extractValue(node.props["logo-light"])}
-      defaultTone={extractValue(node.props.defaultTone)}
-      defaultTheme={extractValue(node.props.defaultTheme)}
-      autoDetectTone={extractValue.asOptionalBoolean(node.props.autoDetectTone, false)}
-      applyDefaultContentPadding={applyDefaultContentPadding}
-      header={renderChild(AppHeader)}
-      footer={renderChild(Footer)}
-      footerSticky={footerSticky}
-      navPanel={renderChild(NavPanel)}
-      navPanelDef={NavPanel}
-      logoContentDef={node.props.logoTemplate}
-      renderChild={renderChild}
-      registerComponentApi={registerComponentApi}
-    >
-      {renderChild(restChildren)}
-      <SearchIndexCollector Pages={Pages} renderChild={renderChild} />
-    </App2Component>
+    <AppComponentProvider value={appContextValue}>
+      <App2Component
+        scrollWholePage={extractValue.asOptionalBoolean(node.props.scrollWholePage, true)}
+        noScrollbarGutters={extractValue.asOptionalBoolean(node.props.noScrollbarGutters, false)}
+        className={className}
+        layout={extractValue(node.props.layout)}
+        loggedInUser={extractValue(node.props.loggedInUser)}
+        onReady={lookupEventHandler("ready")}
+        onMessageReceived={lookupEventHandler("messageReceived")}
+        name={extractValue(node.props.name)}
+        logo={extractValue(node.props.logo)}
+        logoDark={extractValue(node.props["logo-dark"])}
+        logoLight={extractValue(node.props["logo-light"])}
+        defaultTone={extractValue(node.props.defaultTone)}
+        defaultTheme={extractValue(node.props.defaultTheme)}
+        autoDetectTone={extractValue.asOptionalBoolean(node.props.autoDetectTone, false)}
+        applyDefaultContentPadding={applyDefaultContentPadding}
+        header={renderChild(AppHeader)}
+        footer={renderChild(Footer)}
+        footerSticky={footerSticky}
+        navPanel={renderChild(NavPanel)}
+        navPanelDef={NavPanel}
+        logoContentDef={node.props.logoTemplate}
+        renderChild={renderChild}
+        registerComponentApi={registerComponentApi}
+      >
+        {renderChild(restChildren)}
+        <SearchIndexCollector Pages={Pages} renderChild={renderChild} />
+      </App2Component>
+    </AppComponentProvider>
   );
 }
 

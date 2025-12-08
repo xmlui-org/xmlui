@@ -8,6 +8,7 @@ import type { LayoutContext, RenderChildFn, ValueExtractor } from "../../abstrac
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
 import type { PageMd } from "./Pages";
 import styles from "./Pages.module.scss";
+import { useRequireAppContext } from "../App/AppComponentContext";
 
 // Default props for Pages component
 export const defaultProps = {
@@ -83,6 +84,9 @@ export function Pages({
   extractValue,
   fallbackPath = defaultProps.fallbackPath,
 }: PagesProps) {
+  // Validate that Pages is used within App component
+  useRequireAppContext("Pages");
+  
   const routes: Array<PageComponentDef> = [];
   const restChildren: Array<ComponentDef> = [];
   node.children?.forEach((child) => {
