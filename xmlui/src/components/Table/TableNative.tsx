@@ -266,7 +266,7 @@ export const Table = forwardRef(
       autoFocus = defaultProps.autoFocus,
       hideHeader = defaultProps.hideHeader,
       hideNoDataView = defaultProps.hideNoDataView,
-      alwaysShowPagination = false,
+      alwaysShowPagination,
       alwaysShowSelectionHeader = defaultProps.alwaysShowSelectionHeader,
       alwaysShowSortingIndicator = defaultProps.alwaysShowSortingIndicator,
       registerComponentApi,
@@ -554,7 +554,6 @@ export const Table = forwardRef(
     ]);
 
     // --- Set up page information (using the first page size option)
-    // const [pagination, setPagination] = useState<PaginationState>();
     const [pagination, setPagination] = useState<PaginationState>({
       pageSize: effectiveIsPaginated ? effectivePageSize : Number.MAX_VALUE,
       pageIndex: currentPageIndex,
@@ -752,6 +751,16 @@ export const Table = forwardRef(
       />
     );
 
+    const shouldShowPagination = useMemo(() => {
+      if (alwaysShowPagination !== undefined) {
+        return alwaysShowPagination;
+      }
+      if (!effectiveIsPaginated || !hasData || rows.length === 0 || !pagination) {
+        return false;
+      }
+      return table.getPageCount() > 1;
+    }, [effectiveIsPaginated, hasData, rows.length, pagination, alwaysShowPagination, table]);
+
     return (
       <div
         {...rest}
@@ -761,11 +770,7 @@ export const Table = forwardRef(
         ref={ref}
         style={style}
       >
-        {effectiveIsPaginated &&
-          hasData &&
-          rows.length > 0 &&
-          pagination &&
-          (alwaysShowPagination || table.getPageCount() > 1) &&
+        {shouldShowPagination &&
           (paginationControlsLocation === "top" || paginationControlsLocation === "both") &&
           paginationControls}
 
@@ -1143,11 +1148,7 @@ export const Table = forwardRef(
             <div className={styles.noRows}>No data available</div>
           ))}
 
-        {effectiveIsPaginated &&
-          hasData &&
-          rows.length > 0 &&
-          pagination &&
-          (alwaysShowPagination || table.getPageCount() > 1) &&
+        {shouldShowPagination &&
           (paginationControlsLocation === "bottom" || paginationControlsLocation === "both") &&
           paginationControls}
       </div>

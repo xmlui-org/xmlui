@@ -1421,21 +1421,21 @@ test.describe("Pagination Features", () => {
     });
   });
 
-  test.describe("showPaginationControls property", () => {
-    test("explicitly shows pagination controls when showPaginationControls=true even with one page", async ({ initTestBed, page }) => {
+  test.describe("alwaysShowPagination property", () => {
+    test("explicitly shows pagination controls when alwaysShowPagination=true even with one page", async ({ initTestBed, page }) => {
       await initTestBed(`
         <Table 
           data='{${JSON.stringify(smallDataSet)}}' 
           isPaginated="true"
           pageSize="10"
-          showPaginationControls="true"
+          alwaysShowPagination="true"
           testId="table"
         >
           <Column bindTo="name"/>
         </Table>
       `);
       
-      // Pagination controls should be visible because showPaginationControls=true
+      // Pagination controls should be visible because alwaysShowPagination=true
       await expect(page.locator("button[aria-label*='Previous page']")).toBeVisible();
       await expect(page.locator("button[aria-label*='Next page']")).toBeVisible();
     });
@@ -1446,14 +1446,14 @@ test.describe("Pagination Features", () => {
           data='{${JSON.stringify(largeDataSet)}}' 
           isPaginated="true"
           pageSize="5"
-          alwaysShowPagination="{false}"
+          alwaysShowPagination="false"
           testId="table"
         >
           <Column bindTo="name"/>
         </Table>
       `);
       
-      // Pagination controls should be hidden because showPaginationControls=false
+      // Pagination controls should be hidden because a=false
       await expect(page.locator("button[aria-label*='Previous page']")).toHaveCount(0);
       await expect(page.locator("button[aria-label*='Next page']")).toHaveCount(0);
       
@@ -1462,7 +1462,7 @@ test.describe("Pagination Features", () => {
       await expect(visibleRows).toHaveCount(5);
     });
 
-    test("uses implicit hiding when showPaginationControls is omitted", async ({ initTestBed, page }) => {
+    test("uses implicit hiding when alwaysShowPagination is omitted", async ({ initTestBed, page }) => {
       // Test with one page - should hide
       await initTestBed(`
         <Table 
@@ -1495,14 +1495,12 @@ test.describe("Pagination Features", () => {
     });
 
     test("alwaysShowPagination overrides implicit hiding behavior", async ({ initTestBed, page }) => {
-      // With one page, normally controls would be hidden, but showPaginationControls=true should show them
+      // With one page, normally controls would be hidden, but alwaysShowPagination=true should show them
       await initTestBed(`
         <Table 
           data='{${JSON.stringify(smallDataSet)}}' 
-          isPaginated="true"
-          pageSize="10"
-          alwaysShowPagination="{true}"
           testId="table"
+          alwaysShowPagination="true"
         >
           <Column bindTo="name"/>
         </Table>
@@ -1510,22 +1508,6 @@ test.describe("Pagination Features", () => {
       
       await expect(page.locator("button[aria-label*='Previous page']")).toBeVisible();
       await expect(page.locator("button[aria-label*='Next page']")).toBeVisible();
-      
-      // With multiple pages, normally controls would be shown, but showPaginationControls=false should hide them
-      await initTestBed(`
-        <Table 
-          data='{${JSON.stringify(largeDataSet)}}' 
-          isPaginated="true"
-          pageSize="5"
-          alwaysShowPagination="{false}"
-          testId="table"
-        >
-          <Column bindTo="name"/>
-        </Table>
-      `);
-      
-      await expect(page.locator("button[aria-label*='Previous page']")).toHaveCount(0);
-      await expect(page.locator("button[aria-label*='Next page']")).toHaveCount(0);
     });
   });
 

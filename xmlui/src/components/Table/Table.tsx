@@ -213,10 +213,11 @@ export const TableMd = createMetadata({
       description:
         `This property explicitly toggles pagination controls visibility. ` +
         `If set to \`true\`, controls are always shown even if there is only one page. ` +
-        `If set to \`false\` (default), controls are hidden when there is only one page. ` +
-        `This property only has effect when pagination is enabled.`,
+        `If set to \`false\`, controls are hidden. ` +
+        `If omitted, controls are hidden when there is only one page and shown otherwise. ` +
+        `This property only has effect when pagination is enabled. ` +
+        `It acts as an alias for showPaginationControls.`,
       valueType: "boolean",
-      defaultValue: false,
     },
     cellVerticalAlign: {
       description:
