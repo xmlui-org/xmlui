@@ -12,10 +12,11 @@ type AppState = {
   get(bucket: string, path?: string): any; // Returns the current state of the bucket or nested property. Objects/arrays are deep-cloned and frozen; primitives returned as-is.
   set(bucket: string, pathOrValue: string | any, value?: any): any; // Two forms: set(bucket, value) replaces entire bucket; set(bucket, path, value) sets nested property. Returns the new value (frozen/cloned if object).
   update(bucket: string, pathOrUpdater: string | any, updater?: any): any; // Two forms: update(bucket, patch) merges object into bucket (only for object buckets); update(bucket, path, updater) updates nested property. Returns updated value.
-  updateWith(bucket: string, updater: (prev: any) => any): any; // Updates bucket using updater function that receives current value and returns new value. Works with primitives, objects, and arrays. Returns the new value.
+  updateWith(bucket: string, updater: (prev: any) => any | Promise<any>): Promise<any>; // Updates bucket using updater function that receives current value and returns new value. Works with primitives, objects, and arrays. Supports both sync and async updater functions. Returns the new value.
 
   // The following methods work when the bucket's content is an array. Otherwise, they log a warning and have no effect.
-  remove(bucket: string, path?: string): void; // Two forms: remove(bucket) removes entire bucket; remove(bucket, path) removes nested property.
+  remove(bucket: string, value: any): void; // Removes the first item matching with "value" from the array bucket. Uses deep equality comparison (all properties must match).
+  removeBy(bucket: string, predicate: (item: any) => boolean): void; // Removes the first item where predicate returns true. Useful for partial matching or complex conditions.
   removeAt(bucket: string, index: number): any; // Removes the item at the specified index from the array bucket. Returns a frozen deep-cloned instance of the removed item.
   append(bucket: string, value: any): any; // Appends a new item to the array. Returns the updated array (frozen/cloned).
   push(bucket: string, value: any): any; // An alias to "append"
@@ -122,9 +123,14 @@ This example demonstrates array manipulation methods for a todo list:
   <Button onClick="AppState.shift('todos')">Remove First Todo</Button>
   <Button onClick="AppState.removeAt('todos', 1)">Remove Second Todo</Button>
   
-  <!-- Remove by value (searches for matching todo) -->
-  <Button onClick="AppState.remove('todos', { text: 'Buy groceries' })">
+  <!-- Remove by matching property (most common use case) -->
+  <Button onClick="AppState.removeBy('todos', (item) => item.text === 'Buy groceries')">
     Remove 'Buy groceries'
+  </Button>
+  
+  <!-- Remove by predicate (complex matching) -->
+  <Button onClick="AppState.removeBy('todos', (item) => item.done === true)">
+    Remove First Completed Todo
   </Button>
   
   <!-- Insert at specific position -->
@@ -203,9 +209,13 @@ This example demonstrates array manipulation methods for a todo list:
 - "insertAt() returns updated frozen array"
 - "insertAt() handles negative indices"
 - "insertAt() handles index at array length (append behavior)"
-- "remove() with two arguments removes entire bucket"
-- "remove() with path removes nested property"
-- "remove() handles non-existent paths gracefully"
+- "remove() removes first item matching by value from array"
+- "remove() uses deep equality for object comparison"
+- "remove() has no effect if value not found"
+- "removeBy() removes first item matching predicate"
+- "removeBy() uses predicate for partial property matching"
+- "removeBy() handles complex conditions in predicate"
+- "removeBy() has no effect if predicate never returns true"
 
 ### Array Method Tests - Edge Cases
 - "array methods validate bucket contains an array"

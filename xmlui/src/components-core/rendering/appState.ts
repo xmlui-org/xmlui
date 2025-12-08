@@ -8,9 +8,10 @@ export type AppState = {
   define(bucket: string, initialState: any): any;
   get(bucket: string, path?: string): any;
   set(bucket: string, pathOrValue: string | any, value?: any): any;
-  update(bucket: string, pathOrUpdater: string | Function, updater?: Function): any;
+  update(bucket: string, pathOrUpdater: string | Function | any, updater?: Function | ((prev: any) => any | Promise<any>)): Promise<any>;
   updateWith(bucket: string, updater: (prev: any) => any | Promise<any>): Promise<any>;
-  remove(bucket: string, path?: string): void;
+  remove(bucket: string, value: any): void;
+  removeBy(bucket: string, predicate: (item: any) => boolean | Promise<boolean>): Promise<void>;
   removeAt(bucket: string, index: number): any;
   append(bucket: string, value: any): any;
   push(bucket: string, value: any): any;
@@ -193,7 +194,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
      * @param pathOrUpdater - If updater is provided, this is the path; otherwise the update value or function
      * @param updater - Optional updater function when path is specified
      */
-    update(bucket: string, pathOrUpdater: string | Function | any, updater?: Function): any {
+    async update(bucket: string, pathOrUpdater: string | Function | any, updater?: Function): Promise<any> {
       try {
         const bucketValue = getBucketValue(bucket);
         
@@ -201,7 +202,13 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
         if (updater !== undefined) {
           const path = pathOrUpdater as string;
           const currentValue = lodashGet(bucketValue, path);
-          const newValue = typeof updater === 'function' ? updater(currentValue) : updater;
+          let newValue;
+          if (typeof updater === 'function') {
+            const result = updater(currentValue);
+            newValue = result instanceof Promise ? await result : result;
+          } else {
+            newValue = updater;
+          }
           const clonedValue = cloneDeep(bucketValue || {});
           lodashSet(clonedValue, path, newValue);
           setBucketValue(bucket, clonedValue);
@@ -211,7 +218,8 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
         // Two-argument form: update(bucket, updaterOrValue)
         if (typeof pathOrUpdater === 'function') {
           // Updater function: update(bucket, (current) => newValue)
-          const newValue = pathOrUpdater(bucketValue);
+          const result = pathOrUpdater(bucketValue);
+          const newValue = result instanceof Promise ? await result : result;
           setBucketValue(bucket, newValue);
           // Return the new value, but only clone/freeze if it's an object
           if (newValue !== null && typeof newValue === 'object') {
@@ -278,6 +286,35 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
     },
 
     /**
+     * Remove first item matching the predicate from the array bucket
+     */
+    async removeBy(bucket: string, predicate: (item: any) => boolean | Promise<boolean>): Promise<void> {
+      try {
+        const array = getArrayFromBucket(bucket);
+        if (!array) return;
+
+        // Handle both sync and async predicates - test each item sequentially
+        let index = -1;
+        for (let i = 0; i < array.length; i++) {
+          const result = predicate(array[i]);
+          // Handle both sync (boolean) and async (Promise<boolean>) results
+          const matched = result instanceof Promise ? await result : result;
+          if (matched) {
+            index = i;
+            break;
+          }
+        }
+        
+        if (index !== -1) {
+          const newArray = [...array.slice(0, index), ...array.slice(index + 1)];
+          setBucketValue(bucket, newArray);
+        }
+      } catch (error) {
+        console.warn(`[AppState] Error in removeBy('${bucket}'):`, error);
+      }
+    },
+
+    /**
      * Remove item at the specified index from the array bucket
      */
     removeAt(bucket: string, index: number): any {
@@ -285,13 +322,16 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
         const array = getArrayFromBucket(bucket);
         if (!array) return undefined;
 
-        if (index < 0 || index >= array.length) {
+        // Handle negative indices like JavaScript arrays
+        const actualIndex = index < 0 ? array.length + index : index;
+        
+        if (actualIndex < 0 || actualIndex >= array.length) {
           console.warn(`[AppState] Index ${index} out of bounds for bucket '${bucket}'`);
           return undefined;
         }
 
-        const removedItem = array[index];
-        const newArray = [...array.slice(0, index), ...array.slice(index + 1)];
+        const removedItem = array[actualIndex];
+        const newArray = [...array.slice(0, actualIndex), ...array.slice(actualIndex + 1)];
         setBucketValue(bucket, newArray);
         return deepFreeze(cloneDeep(removedItem));
       } catch (error) {
@@ -305,7 +345,10 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
      */
     append(bucket: string, value: any): any {
       try {
-        const array = getArrayFromBucket(bucket) || [];
+        const array = getArrayFromBucket(bucket);
+        if (!array) {
+          return undefined;
+        }
         const newArray = [...array, value];
         setBucketValue(bucket, newArray);
         return deepFreeze(cloneDeep(newArray));
@@ -367,7 +410,10 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
      */
     unshift(bucket: string, value: any): any {
       try {
-        const array = getArrayFromBucket(bucket) || [];
+        const array = getArrayFromBucket(bucket);
+        if (!array) {
+          return undefined;
+        }
         const newArray = [value, ...array];
         setBucketValue(bucket, newArray);
         return deepFreeze(cloneDeep(newArray));
@@ -382,7 +428,10 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
      */
     insertAt(bucket: string, index: number, value: any): any {
       try {
-        const array = getArrayFromBucket(bucket) || [];
+        const array = getArrayFromBucket(bucket);
+        if (!array) {
+          return undefined;
+        }
         
         // Handle negative indices
         const actualIndex = index < 0 ? Math.max(0, array.length + index) : index;
