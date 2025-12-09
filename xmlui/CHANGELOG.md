@@ -1,5 +1,17 @@
 # xmlui
 
+## 0.11.22
+
+### Patch Changes
+
+- 154ae26: feat: pagination controls should only appear in a Table as necessary, alwaysShowPagination - explicitly toggles pagination controls visibility
+- 865710f: Extend ModalDialog with titleTemplate and title-related theme variables
+- b4c1da8: Add grayscale prop to Image and Markdown components. Images can now be displayed in grayscale by setting `grayscale="true"` on either the Image component or the Markdown component (which applies to all images within the markdown content).
+- f127399: fix: table pagination design on mobile
+- cebc0d3: App component refactored
+- 8ad6968: Add app state management with global functions
+- fa04809: Add a removeBr property to Markdown
+
 ## 0.11.21
 
 ### Patch Changes
