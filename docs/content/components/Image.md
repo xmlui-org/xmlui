@@ -60,6 +60,10 @@ This property sets how the image content should be resized to fit its container.
 </App>
 ```
 
+### `grayscale` (default: false) [#grayscale-default-false]
+
+When set to true, the image will be displayed in grayscale.
+
 ### `inline` (default: false) [#inline-default-false]
 
 When set to true, the image will be displayed as an inline element instead of a block element.

@@ -473,8 +473,8 @@ The component has some parts that can be styled through layout properties and th
 | [borderColor](../styles-and-themes/common-units/#color)-Select | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Select--default | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Select--default--hover | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-Select--disabled | initial | initial |
-| [borderColor](../styles-and-themes/common-units/#color)-Select--disabled | initial | initial |
+| [borderColor](../styles-and-themes/common-units/#color)-Select--disabled | $borderColor--disabled | $borderColor--disabled |
+| [borderColor](../styles-and-themes/common-units/#color)-Select--disabled | $borderColor--disabled | $borderColor--disabled |
 | [borderColor](../styles-and-themes/common-units/#color)-Select--error | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Select--error--hover | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Select--success | *none* | *none* |
@@ -546,8 +546,7 @@ The component has some parts that can be styled through layout properties and th
 | [fontSize](../styles-and-themes/common-units/#size)-Select-badge | $fontSize-sm | $fontSize-sm |
 | [minHeight](../styles-and-themes/common-units/#size)-item-Select | $space-7 | $space-7 |
 | [minHeight](../styles-and-themes/common-units/#size)-Select | $space-7 | $space-7 |
-| [opacity](../styles-and-themes/common-units/#opacity)-Select--disabled | 0.5 | 0.5 |
-| [opacity](../styles-and-themes/common-units/#opacity)-text-item-Select--disabled | 0.5 | 0.5 |
+| [opacity](../styles-and-themes/common-units/#opacity)-text-item-Select--disabled | *none* | *none* |
 | [outlineColor](../styles-and-themes/common-units/#color)-Select--default--focus | *none* | *none* |
 | [outlineColor](../styles-and-themes/common-units/#color)-Select--error--focus | *none* | *none* |
 | [outlineColor](../styles-and-themes/common-units/#color)-Select--focus | *none* | *none* |
@@ -585,7 +584,7 @@ The component has some parts that can be styled through layout properties and th
 | [paddingVertical](../styles-and-themes/common-units/#size)-Select | $space-2 | $space-2 |
 | [paddingVertical](../styles-and-themes/common-units/#size)-Select-badge | $space-0_5 | $space-0_5 |
 | [textColor](../styles-and-themes/common-units/#color)-indicator-Select | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-item-Select--disabled | $color-surface-200 | $color-surface-200 |
+| [textColor](../styles-and-themes/common-units/#color)-item-Select--disabled | $color-surface-300 | $color-surface-300 |
 | [textColor](../styles-and-themes/common-units/#color)-placeholder-Select | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-placeholder-Select--default | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-placeholder-Select--error | *none* | *none* |
@@ -593,7 +592,8 @@ The component has some parts that can be styled through layout properties and th
 | [textColor](../styles-and-themes/common-units/#color)-placeholder-Select--warning | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Select--default | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Select--default--hover | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-Select--disabled | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-Select--disabled | $textColor--disabled | $textColor--disabled |
+| [textColor](../styles-and-themes/common-units/#color)-Select--disabled | $textColor--disabled | $textColor--disabled |
 | [textColor](../styles-and-themes/common-units/#color)-Select--error | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Select--error--hover | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Select--success | *none* | *none* |

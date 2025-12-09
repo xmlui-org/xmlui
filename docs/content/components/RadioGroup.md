@@ -171,7 +171,6 @@ The component has some parts that can be styled through layout properties and th
 | [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption--warning | $borderColor-Input--warning | $borderColor-Input--warning |
 | [borderWidth](../styles-and-themes/common-units/#size)-RadioGroupOption | 1px | 1px |
 | [borderWidth](../styles-and-themes/common-units/#size)-RadioGroupOption-validation | 2px | 2px |
-| [color](../styles-and-themes/common-units/#color)-RadioGroupOption--disabled | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-RadioGroupOption | $fontSize-sm | $fontSize-sm |
 | [fontSize](../styles-and-themes/common-units/#size)-RadioGroupOption | $fontSize-sm | $fontSize-sm |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-RadioGroupOption | $fontWeight-bold | $fontWeight-bold |
@@ -182,6 +181,8 @@ The component has some parts that can be styled through layout properties and th
 | [outlineStyle](../styles-and-themes/common-units/#border)-RadioGroupOption--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-RadioGroupOption--focus | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption--default | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption--disabled | $textColor--disabled | $textColor--disabled |
+| [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption--disabled | $textColor--disabled | $textColor--disabled |
 | [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption--error | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption--success | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption--warning | *none* | *none* |

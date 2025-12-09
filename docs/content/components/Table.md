@@ -38,6 +38,10 @@ All samples use table columns with the following definition unless noted otherwi
 
 ## Properties [#properties]
 
+### `alwaysShowPagination` [#alwaysshowpagination]
+
+This property explicitly toggles pagination controls visibility. If set to `true`, controls are always shown even if there is only one page. If set to `false`, controls are hidden. If omitted, controls are hidden when there is only one page and shown otherwise. This property only has effect when pagination is enabled. It acts as an alias for showPaginationControls.
+
 ### `alwaysShowSelectionHeader` (default: false) [#alwaysshowselectionheader-default-false]
 
 This property indicates when the row selection header is displayed. When the value is `true,` the selection header is always visible. Otherwise, it is displayed only when hovered.
