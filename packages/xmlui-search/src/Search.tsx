@@ -108,7 +108,6 @@ export const Search = ({
 
   // render-related state
   const [show, setShow] = useState(false);
-  console.log({ content, data });
   // --- Step 2: Convert data to a format better handled by the search engine
   const dataFromMd = useMemo(
     () =>

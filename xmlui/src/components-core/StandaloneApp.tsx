@@ -166,7 +166,6 @@ function StandaloneApp({
   // --- An app can turn off the default hash routing.
   const useHashBasedRouting = appGlobals?.useHashBasedRouting ?? true;
 
-  console.log(appGlobals);
   return (
     <ApiInterceptorProvider
       interceptor={mockedApi}
