@@ -45,6 +45,11 @@ export const ImageMd = createMetadata({
       type: "boolean",
       defaultValue: defaultProps.inline,
     },
+    grayscale: {
+      description: `When set to true, the image will be displayed in grayscale.`,
+      type: "boolean",
+      defaultValue: defaultProps.grayscale,
+    },
     animation: dInternal(`The optional animation object to be applied to the component`),
   },
   events: {
@@ -66,6 +71,7 @@ export const imageComponentRenderer = createComponentRenderer(
         lazyLoad={extractValue.asOptionalBoolean(node.props.lazyLoad)}
         inline={extractValue.asOptionalBoolean(node.props.inline)}
         aspectRatio={extractValue(node.props.aspectRatio)}
+        grayscale={extractValue.asOptionalBoolean(node.props.grayscale)}
         className={className}
         animation={extractValue(node.props.animation)}
       />

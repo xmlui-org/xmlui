@@ -176,6 +176,12 @@ $marginBottom-HtmlDetails: createThemeVar("marginBottom-HtmlDetails");
     overflow-wrap: break-word;
     @include t.textVars($themeVars, "Text");
 
+    &.grayscale {
+      img {
+        filter: grayscale(100%);
+      }
+    }
+
     // Force word breaking ONLY for inline code elements (not code blocks)
     // Code blocks are wrapped in <pre><code>, so we exclude those
     code:not(pre code) {
