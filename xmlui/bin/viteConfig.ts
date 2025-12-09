@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { createLogger, defineConfig } from "vite";
 import type { UserConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
@@ -10,6 +10,15 @@ type ViteConfigData = {
   flatDist?: boolean;
   withRelativeRoot?: boolean;
   flatDistUiPrefix?: string;
+};
+
+const logger = createLogger();
+const loggerWarn = logger.warn;
+
+logger.warn = (msg, options) => {
+  // TODO: we ignore the remix HMR warnings, because we do not use the remix vite plugin. Revisit after updating to react-router@7
+  if (msg.includes('Failed to resolve "remix:manifest"')) return;
+  loggerWarn(msg, options);
 };
 
 export async function getViteConfig({
@@ -28,6 +37,7 @@ export async function getViteConfig({
 
   return defineConfig({
     plugins: [react(), svgr(), ViteYaml(), ViteXmlui({}), ...(overrides.plugins || [])],
+    customLogger: logger,
     base: withRelativeRoot ? "" : undefined,
     // experimental: {
     //   renderBuiltUrl: (filename, {type, hostType, hostId}) =>{

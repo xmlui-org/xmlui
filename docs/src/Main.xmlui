@@ -370,13 +370,6 @@
                 <NavLink label="ScaleAnimation" to="/extensions/xmlui-animations/ScaleAnimation" />
                 <NavLink label="SlideInAnimation" to="/extensions/xmlui-animations/SlideInAnimation" />
                 </NavGroup>
-                <NavGroup label="Xmlui Website Blocks">
-                <NavLink label="Extension Overview" to="/extensions/xmlui-website-blocks/_overview" />
-                <NavLink label="Carousel" to="/extensions/xmlui-website-blocks/Carousel" />
-                <NavLink label="HelloMd" to="/extensions/xmlui-website-blocks/HelloMd" />
-                <NavLink label="HeroSection" to="/extensions/xmlui-website-blocks/HeroSection" />
-                <NavLink label="ScrollToTop" to="/extensions/xmlui-website-blocks/ScrollToTop" />
-                </NavGroup>
                 <!-- END GENERATED CONTENT/Extension references links -->
             </NavGroup
             >
@@ -417,52 +410,52 @@
     </NavPanel>
     <Pages fallbackPath="/404">
         <Page url="/">
-            <DocumentPageNoTOC url="/pages/intro.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/intro.md']}" />
         </Page>
         <Page url="/reactive-intro">
-            <DocumentPageNoTOC url="/pages/reactive-intro.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/reactive-intro.md']}" />
         </Page>
         <Page url="/components-intro">
-            <DocumentPageNoTOC url="/pages/components-intro.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/components-intro.md']}" />
         </Page>
         <Page url="/themes-intro">
             <ThemesIntro />
         </Page>
         <Page url="/tutorial-01">
-            <DocumentPageNoTOC url="/pages/tutorial-01.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-01.md']}" />
         </Page>
         <Page url="/tutorial-02">
-            <DocumentPageNoTOC url="/pages/tutorial-02.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-02.md']}" />
         </Page>
         <Page url="/tutorial-03">
-            <DocumentPageNoTOC url="/pages/tutorial-03.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-03.md']}" />
         </Page>
         <Page url="/tutorial-04">
-            <DocumentPageNoTOC url="/pages/tutorial-04.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-04.md']}" />
         </Page>
         <Page url="/tutorial-05">
-            <DocumentPageNoTOC url="/pages/tutorial-05.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-05.md']}" />
         </Page>
         <Page url="/tutorial-06">
-            <DocumentPageNoTOC url="/pages/tutorial-06.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-06.md']}" />
         </Page>
         <Page url="/tutorial-07">
-            <DocumentPageNoTOC url="/pages/tutorial-07.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-07.md']}" />
         </Page>
         <Page url="/tutorial-08">
-            <DocumentPageNoTOC url="/pages/tutorial-08.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-08.md']}" />
         </Page>
         <Page url="/tutorial-09">
-            <DocumentPageNoTOC url="/pages/tutorial-09.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-09.md']}" />
         </Page>
         <Page url="/tutorial-10">
-            <DocumentPageNoTOC url="/pages/tutorial-10.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-10.md']}" />
         </Page>
         <Page url="/tutorial-11">
-            <DocumentPageNoTOC url="/pages/tutorial-11.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-11.md']}" />
         </Page>
         <Page url="/tutorial-12">
-            <DocumentPageNoTOC url="/pages/tutorial-12.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-12.md']}" />
         </Page>
         <Page url="/blog">
             <BlogOverview posts="{posts}" />
@@ -474,72 +467,72 @@
             <BlogPage post="{posts[1]}" />
         </Page>
         <Page url="/app-structure">
-            <DocumentPageNoTOC url="/pages/app-structure.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/app-structure.md']}" />
         </Page>
         <Page url="/markup">
-            <DocumentPage url="/pages/markup.md" />
+            <DocumentPage content="{appGlobals.content['pages/markup.md']}" />
         </Page>
         <Page url="/scoping">
-            <DocumentPage url="/pages/scoping.md" />
+            <DocumentPage content="{appGlobals.content['pages/scoping.md']}" />
         </Page>
         <Page url="/scripting">
-            <DocumentPage url="/pages/scripting.md" />
+            <DocumentPage content="{appGlobals.content['pages/scripting.md']}" />
         </Page>
         <Page url="/layout">
-            <DocumentPage url="/pages/layout.md" />
+            <DocumentPage content="{appGlobals.content['pages/layout.md']}" />
         </Page>
         <Page url="/working-with-text">
-            <DocumentPage url="/pages/working-with-text.md" />
+            <DocumentPage content="{appGlobals.content['pages/working-with-text.md']}" />
         </Page>
         <Page url="/working-with-markdown">
-            <DocumentPage url="/pages/working-with-markdown.md" />
+            <DocumentPage content="{appGlobals.content['pages/working-with-markdown.md']}" />
         </Page>
         <Page url="/routing-and-links">
-            <DocumentPage url="/pages/routing-and-links.md" />
+            <DocumentPage content="{appGlobals.content['pages/routing-and-links.md']}" />
         </Page>
         <Page url="/forms">
-            <DocumentPage url="/pages/forms.md" />
+            <DocumentPage content="{appGlobals.content['pages/forms.md']}" />
         </Page>
         <Page url="/resources">
-            <DocumentPage url="/pages/resources.md" />
+            <DocumentPage content="{appGlobals.content['pages/resources.md']}" />
         </Page>
         <Page url="/modal-dialogs">
-            <DocumentPageNoTOC url="/pages/modal-dialogs.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/modal-dialogs.md']}" />
         </Page>
         <Page url="/user-defined-components">
-            <DocumentPageNoTOC url="/pages/user-defined-components.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/user-defined-components.md']}" />
         </Page>
         <Page url="/refactoring">
-            <DocumentPageNoTOC url="/pages/refactoring.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/refactoring.md']}" />
         </Page>
         <Page url="/styles-and-themes/layout-props">
-            <DocumentPage url="/pages/styles-and-themes/layout-props.md" />
+            <DocumentPage content="{appGlobals.content['pages/styles-and-themes/layout-props.md']}" />
         </Page>
         <Page url="/styles-and-themes/theme-variables">
-            <DocumentPage url="/pages/styles-and-themes/theme-variables.md" />
+            <DocumentPage content="{appGlobals.content['pages/styles-and-themes/theme-variables.md']}" />
         </Page>
         <Page url="/styles-and-themes/theme-variable-defaults">
             <DocumentPageNoTOC
-                url="/pages/styles-and-themes/theme-variable-defaults.md"
+                content="{appGlobals.content['pages/styles-and-themes/theme-variable-defaults.md']}"
             />
         </Page>
         <Page url="/styles-and-themes/common-units">
-            <DocumentPage url="/pages/styles-and-themes/common-units.md" />
+            <DocumentPage content="{appGlobals.content['pages/styles-and-themes/common-units.md']}" />
         </Page>
         <Page url="/context-variables">
-            <DocumentPage url="/pages/context-variables.md" />
+            <DocumentPage content="{appGlobals.content['pages/context-variables.md']}" />
         </Page>
         <Page url="/globals">
-            <DocumentPage url="pages/globals.md" />
+            <DocumentPage content="{appGlobals.content['pages/globals.md']}" />
         </Page>
         <Page url="/helper-tags">
-            <DocumentPage url="pages/helper-tags.md" />
+            <DocumentPage content="{appGlobals.content['pages/helper-tags.md']}" />
         </Page>
         <Page url="/universal-properties">
-            <DocumentPage url="pages/universal-properties.md" />
+            <DocumentPage content="{appGlobals.content['pages/universal-properties.md']}" />
         </Page>
         <Page url="/template-properties">
-            <DocumentPage url="pages/template-properties.md" />
+            <DocumentPage content="{appGlobals.content['pages/template-properties.md']}" />
         </Page>
         <Page url="/icons">
             <Icons />
@@ -548,187 +541,187 @@
             <Palettes />
         </Page>
         <Page url="/glossary">
-            <DocumentPageNoTOC url="/pages/glossary.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/glossary.md']}" />
         </Page>
         <Page url="/build-hello-world-component">
-            <DocumentPage url="/pages/build-hello-world-component.md" />
+            <DocumentPage content="{appGlobals.content['pages/build-hello-world-component.md']}" />
         </Page>
         <Page url="/build-editor-component">
-            <DocumentPage url="/pages/build-editor-component.md" />
+            <DocumentPage content="{appGlobals.content['pages/build-editor-component.md']}" />
         </Page>
         <Page url="/howto/expose-a-method-from-a-component">
             <DocumentPageNoTOC
-                url="/pages/howto/expose-a-method-from-a-component.md"
+                content="{appGlobals.content['pages/howto/expose-a-method-from-a-component.md']}"
             />
         </Page>
         <Page url="/howto/delegate-a-method">
-            <DocumentPageNoTOC url="/pages/howto/delegate-a-method.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/howto/delegate-a-method.md']}" />
         </Page>
         <Page url="/howto/react-to-button-click-not-keystrokes">
             <DocumentPageNoTOC
-                url="/pages/howto/react-to-button-click-not-keystrokes.md"
+                content="{appGlobals.content['pages/howto/react-to-button-click-not-keystrokes.md']}"
             />
         </Page>
         <Page url="/howto/buffer-a-reactive-edit">
             <DocumentPageNoTOC
-                url="/pages/howto/buffer-a-reactive-edit.md"
+                content="{appGlobals.content['pages/howto/buffer-a-reactive-edit.md']}"
             />
         </Page>
         <Page url="/howto/modify-a-value-reported-in-a-column">
             <DocumentPageNoTOC
-                url="/pages/howto/modify-a-value-reported-in-a-column.md"
+                content="{appGlobals.content['pages/howto/modify-a-value-reported-in-a-column.md']}"
             />
         </Page>
         <Page url="/howto/filter-and-transform-data-from-an-api">
             <DocumentPageNoTOC
-                url="/pages/howto/filter-and-transform-data-from-an-api.md"
+                content="{appGlobals.content['pages/howto/filter-and-transform-data-from-an-api.md']}"
             />
         </Page>
         <Page url="/howto/group-items-in-list-by-a-property">
             <DocumentPageNoTOC
-                url="/pages/howto/group-items-in-list-by-a-property.md"
+                content="{appGlobals.content['pages/howto/group-items-in-list-by-a-property.md']}"
             />
         </Page>
         <Page
             url="/howto/delay-a-datasource-until-another-datasource-is-ready"
         >
             <DocumentPageNoTOC
-                url="/pages/howto/delay-a-datasource-until-another-datasource-is-ready.md"
+                content="{appGlobals.content['pages/howto/delay-a-datasource-until-another-datasource-is-ready.md']}"
             />
         </Page>
         <Page url="/howto/hide-an-element-until-its-datasource-is-ready">
             <DocumentPageNoTOC
-                url="/pages/howto/hide-an-element-until-its-datasource-is-ready.md"
+                content="{appGlobals.content['pages/howto/hide-an-element-until-its-datasource-is-ready.md']}"
             />
         </Page>
         <Page url="/howto/use-built-in-form-validation">
             <DocumentPageNoTOC
-                url="/pages/howto/use-built-in-form-validation.md"
+                content="{appGlobals.content['pages/howto/use-built-in-form-validation.md']}"
             />
         </Page>
         <Page url="/howto/do-custom-form-validation">
             <DocumentPageNoTOC
-                url="/pages/howto/do-custom-form-validation.md"
+                content="{appGlobals.content['pages/howto/do-custom-form-validation.md']}"
             />
         </Page>
         <Page
             url="/howto/assign-a-complex-json-literal-to-a-component-variable"
         >
             <DocumentPageNoTOC
-                url="/pages/howto/assign-a-complex-json-literal-to-a-component-variable.md"
+                content="{appGlobals.content['pages/howto/assign-a-complex-json-literal-to-a-component-variable.md']}"
             />
         </Page>
         <Page url="/howto/make-a-set-of-equal-width-cards">
             <DocumentPageNoTOC
-                url="/pages/howto/make-a-set-of-equal-width-cards.md"
+                content="{appGlobals.content['pages/howto/make-a-set-of-equal-width-cards.md']}"
             />
         </Page>
         <Page
             url="/howto/set-the-initial-value-of-a-select-from-fetched-data"
         >
             <DocumentPageNoTOC
-                url="/pages/howto/set-the-initial-value-of-a-select-from-fetched-data.md"
+                content="{appGlobals.content['pages/howto/set-the-initial-value-of-a-select-from-fetched-data.md']}"
             />
         </Page>
         <Page url="/howto/pass-data-to-a-modal-dialog">
             <DocumentPageNoTOC
-                url="/pages/howto/pass-data-to-a-modal-dialog.md"
+                content="{appGlobals.content['pages/howto/pass-data-to-a-modal-dialog.md']}"
             />
         </Page>
         <Page url="/howto/debug-a-component">
-            <DocumentPageNoTOC url="/pages/howto/debug-a-component.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/howto/debug-a-component.md']}" />
         </Page>
         <Page url="/howto/share-a-modaldialog-across-components">
             <DocumentPageNoTOC
-                url="/pages/howto/share-a-modaldialog-across-components.md"
+                content="{appGlobals.content['pages/howto/share-a-modaldialog-across-components.md']}"
             />
         </Page>
         <Page url="/howto/use-the-same-modaldialog-to-add-or-edit">
             <DocumentPageNoTOC
-                url="/pages/howto/use-the-same-modaldialog-to-add-or-edit.md"
+                content="{appGlobals.content['pages/howto/use-the-same-modaldialog-to-add-or-edit.md']}"
             />
         </Page>
         <Page url="/howto/paginate-a-list">
-            <DocumentPageNoTOC url="/pages/howto/paginate-a-list.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/howto/paginate-a-list.md']}" />
         </Page>
         <Page url="/howto/chain-a-refetch">
-            <DocumentPageNoTOC url="/pages/howto/chain-a-refetch.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/howto/chain-a-refetch.md']}" />
         </Page>
         <Page url="/howto/control-cache-invalidation">
-            <DocumentPageNoTOC url="/pages/howto/control-cache-invalidation.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/howto/control-cache-invalidation.md']}" />
         </Page>
         <Page url="/howto/handle-background-operations">
             <DocumentPageNoTOC
-                url="/pages/howto/handle-background-operations.md"
+                content="{appGlobals.content['pages/howto/handle-background-operations.md']}"
             />
         </Page>
         <Page url="/howto/update-ui-optimistically">
             <DocumentPageNoTOC
-                url="/pages/howto/update-ui-optimistically.md"
+                content="{appGlobals.content['pages/howto/update-ui-optimistically.md']}"
             />
         </Page>
         <Page url="/howto/make-a-table-responsive">
             <DocumentPageNoTOC
-                url="/pages/howto/make-a-table-responsive.md"
+                content="{appGlobals.content['pages/howto/make-a-table-responsive.md']}"
             />
         </Page>
         <Page url="/howto/sync-selections-between-table-and-list-views">
             <DocumentPageNoTOC
-                url="/pages/howto/sync-selections-between-table-and-list-views.md"
+                content="{appGlobals.content['pages/howto/sync-selections-between-table-and-list-views.md']}"
             />
         </Page>
         <Page url="/howto/make-navpanel-width-responsive">
             <DocumentPageNoTOC
-                url="/pages/howto/make-navpanel-width-responsive.md"
+                content="{appGlobals.content['pages/howto/make-navpanel-width-responsive.md']}"
             />
         </Page>
         <Page url="/howto/debounce-user-input-for-api-calls">
             <DocumentPageNoTOC
-                url="/pages/howto/debounce-user-input-for-api-calls.md"
+                content="{appGlobals.content['pages/howto/debounce-user-input-for-api-calls.md']}"
             />
         </Page>
         <Page url="/howto/debounce-with-changelistener">
             <DocumentPageNoTOC
-                url="/pages/howto/debounce-with-changelistener.md"
+                content="{appGlobals.content['pages/howto/debounce-with-changelistener.md']}"
             />
         </Page>
         <Page url="/howto/use-modal-dialog-onclose">
             <DocumentPageNoTOC
-                url="/pages/howto/use-modal-dialog-onclose.md"
+                content="{appGlobals.content['pages/howto/use-modal-dialog-onclose.md']}"
             />
         </Page>
         <Page url="/howto/copy-billing-to-shipping">
             <DocumentPageNoTOC
-                url="/pages/howto/copy-billing-to-shipping.md"
+                content="{appGlobals.content['pages/howto/copy-billing-to-shipping.md']}"
             />
         </Page>
         <Page url="/howto/implement-an-authentication-gate">
             <DocumentPageNoTOC
-                url="/pages/howto/implement-an-authentication-gate.md"
+                content="{appGlobals.content['pages/howto/implement-an-authentication-gate.md']}"
             />
         </Page>
         <Page url="/howto/set-width-for-input-fields-in-a-horizontal-layout">
             <DocumentPageNoTOC
-                url="/pages/howto/set-width-for-input-fields-in-a-horizontal-layout.md"
+                content="{appGlobals.content['pages/howto/set-width-for-input-fields-in-a-horizontal-layout.md']}"
             />
         </Page>
 
 
         <!-- Add more pages as additional files are created -->
         <Page url="/hosted-deployment">
-            <DocumentPage url="/pages/hosted-deployment.md" />
+            <DocumentPage content="{appGlobals.content['pages/hosted-deployment.md']}" />
         </Page>
         <Page url="/change-log">
             <ChangeLog />
         </Page>
         <Page url="/mcp">
-            <DocumentPageNoTOC url="/pages/mcp.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/mcp.md']}" />
         </Page>
         <Page url="/news-and-reviews">
-            <DocumentPageNoTOC url="/pages/news-and-reviews.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/news-and-reviews.md']}" />
         </Page>
         <Page url="/vscode">
-            <DocumentPageNoTOC url="/pages/vscode.md" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/vscode.md']}" />
         </Page>
         <Page url="/components/*">
             <script>

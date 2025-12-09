@@ -65,7 +65,7 @@ type RuntimeProps = {
   component?: ComponentDef | CompoundComponentDef;
   file?: string;
   src?: string;
-}
+};
 
 // --- The properties of the standalone app
 type StandaloneAppProps = {

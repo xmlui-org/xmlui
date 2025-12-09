@@ -249,7 +249,7 @@ export const EXTENSIONS_NAVIGATION = {
   },
   OVERVIEW_LINK: {
     LABEL: "Extension Overview",
-    TO: (packageName) => `/extensions/${packageName}/_overview`
+    TO: (packageName) => `/extensions/${packageName}/_overview`,
   },
   TEMPLATES: {
     NAVGROUP: (label, children) => `<NavGroup label="${label}">\n${children}\n</NavGroup>`,
