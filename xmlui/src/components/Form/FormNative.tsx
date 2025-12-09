@@ -52,6 +52,7 @@ import classnames from "classnames";
 import { Slot } from "@radix-ui/react-slot";
 import { resolveLayoutProps } from "../../components-core/theming/layout-resolver";
 import { Part } from "../Part/Part";
+import { MemoizedItem } from "../container-helpers";
 
 const PART_CANCEL_BUTTON = "cancelButton";
 const PART_SUBMIT_BUTTON = "submitButton";
@@ -760,7 +761,17 @@ export const FormWithContextVar = forwardRef(function (
           },
         })}
         initialValue={initialValue}
-        buttonRow={renderChild(node.props.buttonRowTemplate)}
+        buttonRow={
+          node.props.buttonRowTemplate ? (
+            <MemoizedItem
+              node={node.props.buttonRowTemplate}
+              renderChild={renderChild}
+              contextVars={{
+                $data,
+              }}
+            />
+          ) : undefined
+        }
         registerComponentApi={registerComponentApi}
         enabled={
           extractValue.asOptionalBoolean(node.props.enabled, true) &&
