@@ -386,4 +386,36 @@ test.describe("Heading ID Generation Regression", () => {
     expect(href).toBe("#heading-100-budget-planning");
     expect(href?.substring(1)).toMatch(/^[a-zA-Z_]/);
   });
+
+  test("renders <br/> as line break by default", async ({ initTestBed, page }) => {
+    const SOURCE = `First line<br/>Second line`;
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    
+    const brElement = page.locator("br");
+    await expect(brElement).toBeAttached();
+  });
+
+  test("renders <br/> as line break when removeBr is false", async ({ initTestBed, page }) => {
+    const SOURCE = `First line<br/>Second line`;
+    await initTestBed(`<Markdown removeBr="false"><![CDATA[${SOURCE}]]></Markdown>`);
+    
+    const brElement = page.locator("br");
+    await expect(brElement).toBeAttached();
+  });
+
+  test("omits <br/> when removeBr is true", async ({ initTestBed, page }) => {
+    const SOURCE = `First line<br/>Second line`;
+    await initTestBed(`<Markdown removeBr="true"><![CDATA[${SOURCE}]]></Markdown>`);
+    
+    const brElement = page.locator("br");
+    await expect(brElement).not.toBeAttached();
+  });
+
+  test("omits multiple <br/> elements when removeBr is true", async ({ initTestBed, page }) => {
+    const SOURCE = `First<br/>Second<br/>Third<br/>Fourth`;
+    await initTestBed(`<Markdown removeBr="true"><![CDATA[${SOURCE}]]></Markdown>`);
+    
+    const brElements = page.locator("br");
+    await expect(brElements).toHaveCount(0);
+  });
 });
