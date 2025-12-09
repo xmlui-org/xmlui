@@ -44,6 +44,15 @@ export const MarkdownMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.removeIndents,
     },
+    removeBr: {
+      description:
+        "This boolean property specifies whether `<br>` (line break) elements should be " +
+        "omitted from the rendered output. When set to `true`, `<br/>` tags in the " +
+        "markdown content will not be rendered. When `false` (default), `<br/>` tags " +
+        "render as horizontal bars.",
+      valueType: "boolean",
+      defaultValue: defaultProps.removeBr,
+    },
     showHeadingAnchors: {
       description:
         "This boolean property specifies whether heading anchors should be " +
@@ -92,6 +101,10 @@ export const MarkdownMd = createMetadata({
     "fontSize-Text-markdown": "fontSize-${COMP}",
     "fontWeight-Text-markdown": "fontWeight-Text",
 
+    "borderColor-HorizontalRule": "$borderColor",
+    "borderStyle-HorizontalRule": "solid",
+    "borderWidth-HorizontalRule": "2px",
+
     light: {
       // --- No light-specific theme vars
     },
@@ -132,6 +145,7 @@ export const markdownComponentRenderer = createComponentRenderer(
       <TransformedMarkdown
         className={className}
         removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
+        removeBr={extractValue.asOptionalBoolean(node.props.removeBr, false)}
         codeHighlighter={extractValue(node.props.codeHighlighter)}
         extractValue={extractValue}
         showHeadingAnchors={extractValue.asOptionalBoolean(node.props.showHeadingAnchors)}
@@ -145,6 +159,7 @@ export const markdownComponentRenderer = createComponentRenderer(
 type TransformedMarkdownProps = {
   children: React.ReactNode;
   removeIndents?: boolean;
+  removeBr?: boolean;
   className?: string;
   extractValue: ValueExtractor;
   codeHighlighter?: CodeHighlighter;
@@ -156,6 +171,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
     {
       children,
       removeIndents,
+      removeBr,
       className,
       extractValue,
       codeHighlighter,
@@ -199,6 +215,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
       <Markdown
         ref={ref}
         removeIndents={removeIndents}
+        removeBr={removeBr}
         codeHighlighter={codeHighlighter}
         className={className}
         showHeadingAnchors={showHeadingAnchors}

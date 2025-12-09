@@ -30,10 +30,12 @@ import { decodeFromBase64 } from "../../components-core/utils/base64-utils";
 // Default props for the Markdown component
 export const defaultProps = {
   removeIndents: true,
+  removeBr: false,
 };
 
 type MarkdownProps = {
   removeIndents?: boolean;
+  removeBr?: boolean;
   children: ReactNode;
   style?: CSSProperties;
   className?: string;
@@ -86,6 +88,7 @@ export const Markdown = memo(
   forwardRef<HTMLDivElement, MarkdownProps>(function Markdown(
     {
       removeIndents = defaultProps.removeIndents,
+      removeBr = defaultProps.removeBr,
       children,
       style,
       className,
@@ -289,6 +292,9 @@ export const Markdown = memo(
             },
             hr() {
               return <HorizontalRule />;
+            },
+            br() {
+              return removeBr ? null : <br />;
             },
 
             a({ children, href, ...props }) {
