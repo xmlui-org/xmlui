@@ -25,6 +25,7 @@ import {
 import { parseSeverity } from "./Validations";
 import { CustomFormItem, FormItem, defaultProps } from "./FormItemNative";
 import { MemoizedItem } from "../container-helpers";
+import { partitionObject } from "../../components-core/utils/misc";
 
 const COMP = "FormItem";
 
@@ -40,7 +41,7 @@ export const FormItemMd = createMetadata({
     "`FormItem` wraps individual input controls within a `Form`, providing data " +
     "binding, validation, labeling, and layout functionality. It connects form " +
     "controls to the parent form's data model and handles validation feedback " +
-    "automatically. " + 
+    "automatically. " +
     "**Note:** `FormItem` must be used inside a `Form` component.",
   props: {
     bindTo: {
@@ -282,7 +283,33 @@ export const formItemComponentRenderer = createComponentRenderer(
       ...rest
     } = node.props;
 
-    const resolvedRestProps = extractValue(rest);
+    // Separate template props from regular props
+    // i.e. props like groupHeaderTemplate
+    const [templateProps, nonTemplateProps] = partitionObject(rest, (key) =>
+      key.endsWith("Template"),
+    );
+    // Remove the *Template suffix and create renderer functions with the same name + Renderer
+    const resolvedRestProps: Record<string | number | symbol, any> = {
+      ...Object.fromEntries(
+        Object.entries(nonTemplateProps).map(([key, value]) => [key, extractValue(value)]),
+      ),
+      ...Object.fromEntries(
+        Object.entries(templateProps).map(([key, value]) => [
+          key.replace(/Template$/, "Renderer"),
+          (contextVars: Record<string, any>) => {
+            return (
+              <MemoizedItem
+                contextVars={contextVars}
+                node={value}
+                renderChild={renderChild}
+                layoutContext={layoutContext}
+              />
+            );
+          },
+        ]),
+      ),
+    };
+
     const formItemType = extractValue.asOptionalString(type);
     const isCustomFormItem =
       (formItemType === undefined || formItemType === "custom") && !!node.children;
@@ -319,7 +346,7 @@ export const formItemComponentRenderer = createComponentRenderer(
         enabled={extractValue.asOptionalBoolean(enabled)}
         label={extractValue.asOptionalString(label)}
         labelPosition={extractValue.asOptionalString(labelPosition)}
-        type={isCustomFormItem ? "custom" : formItemType}
+        type={isCustomFormItem ? "custom" : (formItemType as any)}
         onValidate={lookupEventHandler("validate")}
         customValidationsDebounce={extractValue.asOptionalNumber(customValidationsDebounce)}
         validationMode={extractValue.asOptionalString(validationMode)}
@@ -330,7 +357,7 @@ export const formItemComponentRenderer = createComponentRenderer(
         noSubmit={extractValue.asOptionalBoolean(noSubmit)}
         inputRenderer={
           inputTemplate
-            ? (contextVars) => (
+            ? (contextVars: Record<string, any>) => (
                 <MemoizedItem
                   contextVars={contextVars}
                   node={inputTemplate}

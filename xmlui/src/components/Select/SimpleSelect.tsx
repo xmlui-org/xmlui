@@ -41,7 +41,7 @@ interface SimpleSelectProps {
   emptyListNode: ReactNode;
   modal?: boolean;
   groupBy?: string;
-  groupHeaderRenderer?: (groupName: string) => ReactNode;
+  groupHeaderRenderer?: (contextVars: Record<string, any>) => ReactNode;
   ungroupedHeaderRenderer?: () => ReactNode;
   clearable?: boolean;
   onClear?: () => void;
@@ -105,10 +105,14 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
     const groupedOptions = useMemo(() => {
       if (!groupBy) return null;
 
+      // Early return if no options to group - prevents empty dropdown issue
+      if (options.length === 0) return null;
+
       const groups: Record<string, typeof options> = {};
 
       options.forEach((option) => {
-        const groupKey = (option as any)[groupBy] || "Ungrouped";
+        // Use nullish coalescing to properly handle falsy values like 0, "", or false
+        const groupKey = (option as any)[groupBy] ?? "Ungrouped";
         if (!groups[groupKey]) {
           groups[groupKey] = [];
         }
@@ -127,7 +131,8 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
           sortedGroups[key] = groups[key];
         });
 
-      return sortedGroups;
+      // Return null if no groups have any options
+      return Object.keys(sortedGroups).length > 0 ? sortedGroups : null;
     }, [groupBy, options]);
 
     return (
@@ -213,7 +218,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                               )
                             ) : (
                               <Label className={styles.groupHeader}>
-                                {groupHeaderRenderer ? groupHeaderRenderer(groupName) : groupName}
+                                {groupHeaderRenderer ? groupHeaderRenderer({ $group: groupName }) : groupName}
                               </Label>
                             )}
                             {groupOptions.map((option) => (

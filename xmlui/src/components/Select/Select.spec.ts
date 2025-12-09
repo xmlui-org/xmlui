@@ -2015,4 +2015,136 @@ test.describe("Grouping Functionality", () => {
     await driver.selectLabel("Misc");
     await expect(trigger.getByText("Misc")).toBeVisible();
   });
+
+  test("Select in FormItem with groupBy", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem
+          testId="productSelect"
+          label="Product"
+          type="select"
+          placeholder="Select a product"
+          groupBy="type"
+        >
+          <Items items="{[
+            { id: 1, name: 'MacBook Pro', type: 'Apple' },
+            { id: 2, name: 'iPad Air', type: 'Apple' },
+            { id: 3, name: 'XPS', type: 'Dell' },
+            { id: 4, name: 'Tab', type: 'Samsung' }
+          ]}">
+            <Option value="{$item.id}" label="{$item.name}" type="{$item.type}" />
+          </Items>
+        </FormItem>
+      </Form>
+    `);
+
+    const driver = await createSelectDriver("productSelect");
+    await driver.toggleOptionsVisibility();
+
+    // Check options
+    await expect(page.getByRole("option", { name: "MacBook Pro" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "iPad Air" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "XPS" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Tab" })).toBeVisible();
+  });
+
+  test("Select in FormItem with groupBy and custom groupHeaderTemplate", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem
+          testId="productSelect"
+          label="Product"
+          type="select"
+          placeholder="Select a product"
+          groupBy="type"
+        >
+          <property name="groupHeaderTemplate">
+            <HStack>
+              <Checkbox testId="box" />
+              <H3>{$group}</H3>
+            </HStack>
+          </property>
+          <Items items="{[
+            { id: 1, name: 'MacBook Pro', type: 'Apple' },
+            { id: 2, name: 'iPad Air', type: 'Apple' },
+            { id: 3, name: 'XPS', type: 'Dell' },
+            { id: 4, name: 'Tab', type: 'Samsung' }
+          ]}">
+            <Option value="{$item.id}" label="{$item.name}" type="{$item.type}" />
+          </Items>
+        </FormItem>
+      </Form>
+    `);
+
+    const driver = await createSelectDriver("productSelect");
+    await driver.toggleOptionsVisibility();
+
+    // Check group headers with custom template
+    await expect(page.getByText("Apple")).toBeVisible();
+    await expect(page.getByText("Dell")).toBeVisible();
+    await expect(page.getByText("Samsung")).toBeVisible();
+    for (const checkbox of await page.getByTestId("box").all()) {
+      await expect(checkbox).toBeVisible();
+    }
+
+    // Check options
+    await expect(page.getByRole("option", { name: "MacBook Pro" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "iPad Air" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "XPS" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Tab" })).toBeVisible();
+  });
+
+  test("Select in FormItem with groupBy and custom ungroupedHeaderTemplate", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem
+          testId="productSelect"
+          label="Product"
+          type="select"
+          placeholder="Select a product"
+          groupBy="type"
+        >
+          <property name="ungroupedHeaderTemplate">
+            <HStack>
+              <Checkbox testId="box" />
+              <H3>Ungrouped</H3>
+            </HStack>
+          </property>
+          <Items items="{[
+            { id: 1, name: 'MacBook Pro', type: null },
+            { id: 2, name: 'iPad Air', type: null },
+            { id: 3, name: 'XPS', type: 'Dell' },
+            { id: 4, name: 'Tab', type: 'Samsung' }
+          ]}">
+            <Option value="{$item.id}" label="{$item.name}" type="{$item.type}" />
+          </Items>
+        </FormItem>
+      </Form>
+    `);
+
+    const driver = await createSelectDriver("productSelect");
+    await driver.toggleOptionsVisibility();
+
+    const count = await page.getByTestId("box").count();
+    expect(count).toBe(1);
+    await expect(page.getByText("Ungrouped")).toBeVisible();
+
+    // Check options
+    await expect(page.getByRole("option", { name: "MacBook Pro" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "iPad Air" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "XPS" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Tab" })).toBeVisible();
+  });
 });

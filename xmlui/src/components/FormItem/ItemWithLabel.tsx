@@ -9,6 +9,7 @@ import type { LabelPosition } from "../abstractions";
 import { Spinner } from "../Spinner/SpinnerNative";
 import { PART_LABELED_ITEM, PART_LABEL } from "../../components-core/parts";
 import { Part } from "../Part/Part";
+import type { LayoutContext } from "../../abstractions/RendererDefs";
 
 // Component part names
 
@@ -31,7 +32,7 @@ type ItemWithLabelProps = {
   isInputTemplateUsed?: boolean;
   onLabelClick?: () => void;
   validationResult?: ReactNode;
-  layoutContext?: any;
+  layoutContext?: LayoutContext;
   testId?: string;
 };
 export const defaultProps: Pick<ItemWithLabelProps, "labelBreak"> = {
