@@ -69,7 +69,7 @@ These things are optional. XMLUI's mission is to ensure what you build looks goo
 </AppHeader>
 ```
 
-Our demo uses `profileMenuTemplate`, one of the templates [AppHeader](/components/AppHeader) provides so you can compose what goes into common header slots.
+Our demo uses `profileMenuTemplate`, one of the templates [AppHeader](/components/AppHeader) provides so you can compose what goes into common header slots. In XMLUI a `property` is a reusable chunk of UI structure that renders in a particular context.
 
 ## NavPanel
 
@@ -142,7 +142,7 @@ The [NavPanel](/components/NavPanel) defines [NavLink](/components/NavLink)s whi
   </Pages>
 ```
 
-Each [Page](/components/Pages) is a container that binds to a route and holds XMLUI markup. Although you can put anything in there, our demo shows what we think is a best practice: use [Components](/components-intro) to encapsulate your business logic.
+Each [Page](/components/Page) is a container that binds to a route and holds XMLUI markup. Although you can put anything in there, our demo shows what we think is a best practice: use [Components](/components-intro) to encapsulate UI constructs.
 
 ## Footer
 

@@ -1,6 +1,6 @@
 # Navigation
 
-Let's explore a subset of the app's navigation.
+Let's explore a subset of the app's navigation. The `App`'s `layout` property can be `vertical`.
 
 ```xmlui-pg name="vertical layout"
 ---app display {3}
@@ -41,7 +41,7 @@ Let's explore a subset of the app's navigation.
 
 ## Horizontal
 
-We've seen `vertical`, here's `horizontal`.
+Or it can be `horizontal`.
 
 ```xmlui-pg name="horizontal layout"
 ---app display {3}
@@ -79,3 +79,7 @@ We've seen `vertical`, here's `horizontal`.
   This is Invoices.
 </Component>
 ```
+
+## Other layouts
+
+There are a number of other layouts, see [App](/components/App#layout) for details.

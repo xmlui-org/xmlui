@@ -1,13 +1,6 @@
 # Components
 
-We've already seen a number of XMLUI components in action: [DataSource](/components/DataSource),
-
-[Items](/components/Items),
-[List](/components/List),
-[Markdown](/components/Markdown),
-[Select](/components/Select),
-[Option](/components/Option),
-[Table](/components/Table).
+We've already seen a number of XMLUI components in action: [DataSource](/components/DataSource), [Items](/components/Items), [List](/components/List), [Markdown](/components/Markdown), [Select](/components/Select), [Option](/components/Option), and [Table](/components/Table).
 
 ## Built-in components
 
@@ -42,7 +35,7 @@ As an XMLUI developer you'll create user interfaces by combining these with othe
 [Tabs](/components/Tabs),
 [TabItem](/components/TabItem) ...
 
-## Custom components
+## User-defined components
 
 You'll also create your own components to combine and extend the built-ins. For example, here's a component that represents the stops on a London tube line.
 
@@ -57,7 +50,7 @@ You'll also create your own components to combine and extend the built-ins. For 
     id="stops"
     when="{$props.line}"
     url="https://api.tfl.gov.uk/Line/{$props.line}/StopPoints"
-    transformResult="{window.transformStops}"
+    transformResult="{transformStops}"
   />
   <Text variant="strong">{$props.line}</Text>
 
@@ -77,31 +70,6 @@ You'll also create your own components to combine and extend the built-ins. For 
   </Table>
 
 </Component>
-```
-
-```javascript
-window.transformStops = function(stops) {
-  return stops.map(function(stop) {
-  // Helper to extract a value from additionalProperties by key
-    function getProp(key) {
-      if (!stop.additionalProperties) return '';
-      var propObj = stop.additionalProperties.find(function(p) {
-        return p.key === key;
-      });
-      return propObj ? propObj.value : '';
-    }
-    return {
-      name: stop.commonName,
-      zone: getProp('Zone'),
-      wifi: getProp('WiFi'),
-      toilets: getProp('Toilets'),
-      // A comma-separated list of line names that serve this stop
-      lines: stop.lines
-        ? stop.lines.map(function(line) { return line.name; }).join(', ')
-        : ''
-    };
-  });
-}
 ```
 
 An instance of `TubeStops` extracts details for a given tube line. Multiple instances can be arranged on the display using layout components. For example, here's a two-column layout.
@@ -124,7 +92,7 @@ An instance of `TubeStops` extracts details for a given tube line. Multiple inst
     id="stops"
     when="{$props.line}"
     url="https://api.tfl.gov.uk/Line/{$props.line}/StopPoints"
-    transformResult="{window.transformStops}"
+    transformResult="{transformStops}"
   />
   <Text variant="strong">{$props.line}</Text>
 
@@ -149,11 +117,45 @@ An instance of `TubeStops` extracts details for a given tube line. Multiple inst
 
 The `TubeStops` component:
 
-- **Lives in the `components` folder**. The full path is `components/TubeStops.xmlui`.
-- **Can handle any properties passed in the `$props` [context variable](/context-variables)**. A calling component can send one or more `name="value"` pairs like `line="Bakerloo"`.
-- **Defines a dynamic data source**. When this page embeds `<TubeStops line="Bakerloo"/>`, the `TubeStops` component receives a `line` property used to form the URL that fetches data.
-- **Transforms data**. When API responses are complex, the expressions needed to unpack them can clutter your XMLUI markup. In this case the  component offloads that work to the `transformStops` function so it can work with a simplified structure.
-- **Enriches data**. The transformed data has `yes`/`no` values for `wifi` and `toilets`. `TubeStops` uses [Fragment](/components/Fragment) to display an [Icon](/components/Icon) only for `yes` values.
+**Lives in the `components` folder**. The full path is `components/TubeStops.xmlui`.
+
+**Can handle any properties passed in the `$props` [context variable](/context-variables)**. A calling component can send one or more `name="value"` pairs like `line="Bakerloo"`.
+
+**Defines a dynamic data source**. When this page embeds `<TubeStops line="Bakerloo"/>`, the `TubeStops` component receives a `line` property used to form the URL that fetches data.
+
+**Transforms data**. When API responses are complex, the expressions needed to unpack them can clutter your XMLUI markup. In this case the  component offloads that work to the `transformStops` function so it can work with a simplified structure. The `transformStops` function is defined in a `<script>` tag in `index.html`. See [Scripting](https://docs.xmlui.org/scripting) for more on how to use JavaScript in XMLUI.
+
+<details>
+  <summary>view the transformStops function</summary>
+<pre>
+window.transformStops = function(stops) {
+  return stops.map(function(stop) {
+  // Helper to extract a value from additionalProperties by key
+    function getProp(key) {
+      if (!stop.additionalProperties) return '';
+      var propObj = stop.additionalProperties.find(function(p) {
+        return p.key === key;
+      });
+      return propObj ? propObj.value : '';
+    }
+    return {
+      name: stop.commonName,
+      zone: getProp('Zone'),
+      wifi: getProp('WiFi'),
+      toilets: getProp('Toilets'),
+      // A comma-separated list of line names that serve this stop
+      lines: stop.lines
+        ? stop.lines.map(function(line) { return line.name; }).join(', ')
+        : ''
+    };
+  });
+}
+</pre>
+</details>
+
+
+**Enriches data**. The transformed data has `yes`/`no` values for `wifi` and `toilets`. `TubeStops` uses [Fragment](/components/Fragment) to display an [Icon](/components/Icon) only for `yes` values.
+
 
 When you use custom components to access, transform, and present data, your XMLUI markup stays clean, readable, and easy to read and maintain.
 
