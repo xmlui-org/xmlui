@@ -1047,6 +1047,137 @@ test.describe("Basic Functionality", () => {
         age: 30,
       });
     });
+
+    test("nested form submit does not trigger parent form submit", async ({
+      initTestBed,
+      page,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <App>
+          <Form testId="outerForm" onSubmit="data => testState = { outer: 'triggered', data: data }">
+            <FormItem label="host" bindTo="host" />
+
+            <Button testId="openModal" onClick="testEmailModal.open()">
+              Send test email
+            </Button>
+
+            <ModalDialog id="testEmailModal" var.outerData="{$data}">
+              <Form testId="innerForm" onSubmit="data => testState = { inner: 'triggered', data: data }">
+                <FormItem bindTo="emailAddress" />
+              </Form>
+            </ModalDialog>
+          </Form>
+        </App>
+      `);
+
+      // Open the modal
+      await page.getByTestId("openModal").click();
+
+      // Fill the inner form
+      const innerFormInput = page.getByTestId("innerForm").getByRole("textbox");
+      await innerFormInput.fill("test@example.com");
+
+      // Submit the inner form
+      const innerFormSaveButton = page
+        .getByTestId("innerForm")
+        .getByRole("button", { name: "Save" });
+      await innerFormSaveButton.click();
+
+      // Verify only inner form's submit was triggered
+      const result = await testStateDriver.testState();
+      expect(result).toEqual({
+        inner: "triggered",
+        data: { emailAddress: "test@example.com" },
+      });
+      expect(result.outer).toBeUndefined();
+    });
+
+    test("nested form in modal can access parent form data via context variable", async ({
+      initTestBed,
+      page,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <App>
+          <Form 
+            testId="outerForm" 
+            data="{{ host: 'example.com' }}"
+            onSubmit="data => testState = { outer: 'submitted' }">
+            <FormItem label="host" bindTo="host" />
+
+            <Button testId="openModal" onClick="testEmailModal.open()">
+              Send test email
+            </Button>
+
+            <ModalDialog id="testEmailModal" var.outerData="{$data}">
+              <Form testId="innerForm" onSubmit="data => testState = { inner: 'submitted', outerHost: outerData.host, innerEmail: data.emailAddress }">
+                <FormItem bindTo="emailAddress" />
+              </Form>
+            </ModalDialog>
+          </Form>
+        </App>
+      `);
+
+      // Open the modal
+      await page.getByTestId("openModal").click();
+
+      // Fill the inner form
+      const innerFormInput = page.getByTestId("innerForm").getByRole("textbox");
+      await innerFormInput.fill("user@test.com");
+
+      // Submit the inner form
+      const innerFormSaveButton = page
+        .getByTestId("innerForm")
+        .getByRole("button", { name: "Save" });
+      await innerFormSaveButton.click();
+
+      // Verify inner form received parent context and submitted correctly
+      const result = await testStateDriver.testState();
+      expect(result).toEqual({
+        inner: "submitted",
+        outerHost: "example.com",
+        innerEmail: "user@test.com",
+      });
+    });
+
+    test("parent form submit works after modal with nested form closes", async ({
+      initTestBed,
+      page,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <App>
+          <Form 
+            testId="outerForm" 
+            data="{{ host: 'example.com' }}"
+            onSubmit="data => testState = { outer: 'submitted', host: data.host }">
+            <FormItem label="host" bindTo="host" />
+
+            <Button testId="openModal" onClick="testEmailModal.open()">
+              Send test email
+            </Button>
+
+            <ModalDialog id="testEmailModal">
+              <Form testId="innerForm" onSubmit="data => console.log('inner submitted')">
+                <FormItem bindTo="emailAddress" />
+              </Form>
+            </ModalDialog>
+          </Form>
+        </App>
+      `);
+
+      // Open and close modal with inner form
+      await page.getByTestId("openModal").click();
+      await page.getByRole("button", { name: "Cancel" }).click();
+
+      // Submit the outer form
+      await page.getByTestId("outerForm").getByRole("button", { name: "Save" }).click();
+
+      // Verify outer form submitted correctly
+      const result = await testStateDriver.testState();
+      expect(result).toEqual({
+        outer: "submitted",
+        host: "example.com",
+      });
+    });
   });
 
   // =============================================================================
