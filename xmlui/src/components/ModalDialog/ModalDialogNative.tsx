@@ -45,6 +45,7 @@ type ModalProps = {
   children?: ReactNode;
   fullScreen?: boolean;
   title?: string;
+  titleTemplate?: ReactNode;
   closeButtonVisible?: boolean;
   externalAnimation?: boolean;
 };
@@ -135,6 +136,7 @@ export const ModalDialog = React.forwardRef(
       isInitiallyOpen,
       fullScreen = defaultProps.fullScreen,
       title,
+      titleTemplate,
       closeButtonVisible = defaultProps.closeButtonVisible,
       className,
       onOpen,
@@ -237,11 +239,11 @@ export const ModalDialog = React.forwardRef(
           ref={composedRef}
           style={{ ...style, gap: undefined }}
         >
-          {!!title && (
+          {(!!title || !!titleTemplate) && (
             <Part partId={PART_TITLE}>
               <Dialog.Title style={{ marginTop: 0 }}>
                 <header id="dialogTitle" className={styles.dialogTitle}>
-                  {title}
+                  {titleTemplate || title}
                 </header>
               </Dialog.Title>
             </Part>

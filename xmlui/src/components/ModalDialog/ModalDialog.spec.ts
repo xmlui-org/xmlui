@@ -387,3 +387,37 @@ test.describe("Behaviors and Parts", () => {
     await expect(contentPart).toBeVisible();
   });
 });
+
+// =============================================================================
+// THEME VARIABLE TESTS
+// =============================================================================
+
+test.describe("Theme Variables", () => {
+  test("applies title theme variables", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="button" onClick="modal.open()">open</Button>
+        <ModalDialog id="modal" title="Styled Title">
+          <Text>Content</Text>
+        </ModalDialog>
+      </Fragment>
+    `, {
+      testThemeVars: {
+        "textColor-title-ModalDialog": "rgb(255, 0, 0)",
+        "fontSize-title-ModalDialog": "32px",
+        "fontWeight-title-ModalDialog": "700",
+      },
+    });
+
+    await page.getByTestId("button").click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+
+    // The style is applied to the header element inside the title part
+    const titleHeader = page.locator("[data-part-id='title'] header");
+    await expect(titleHeader).toBeVisible();
+    
+    await expect(titleHeader).toHaveCSS("color", "rgb(255, 0, 0)");
+    await expect(titleHeader).toHaveCSS("font-size", "32px");
+    await expect(titleHeader).toHaveCSS("font-weight", "700");
+  });
+});
