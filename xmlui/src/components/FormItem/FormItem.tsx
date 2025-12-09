@@ -285,7 +285,7 @@ export const formItemComponentRenderer = createComponentRenderer(
 
     // Separate template props from regular props
     // i.e. props like groupHeaderTemplate
-    const [templateProps, nonTemplateProps] = partitionObject(rest, (key) =>
+    const [templateProps, nonTemplateProps] = partitionObject(extractValue(rest), (key) =>
       key.endsWith("Template"),
     );
     // Remove the *Template suffix and create renderer functions with the same name + Renderer

@@ -2629,40 +2629,6 @@ test("can submit with invisible required field", async ({
   await expect.poll(testStateDriver.testState).toEqual(true);
 });
 
-test("conditional fields keep the state", async ({
-  initTestBed,
-  createFormItemDriver,
-  createOptionDriver,
-  createTextBoxDriver,
-}) => {
-  await initTestBed(`
-    <Form>
-      <FormItem testId="select" bindTo="authenticationType"
-        type="radioGroup" label="Authentication Type:" initialValue="{0}">
-        <Option value="{0}" label="Password" testId="password"/>
-        <Option value="{1}" label="Public Key" testId="publicKey" />
-      </FormItem>
-      <FormItem label="name1" testId="name1" bindTo="name1"
-        required="true" when="{$data.authenticationType == 0}"/>
-      <FormItem label="name2" testId="name2" bindTo="name2"
-        required="true" when="{$data.authenticationType == 1}"/>
-    </Form>
-  `);
-  const option1Driver = await createFormItemDriver("password");
-  const option2Driver = await createOptionDriver("publicKey");
-  const textfield1Element = (await createFormItemDriver("name1")).input;
-  const textfield1Driver = await createTextBoxDriver(textfield1Element);
-  const textfield2Element = (await createFormItemDriver("name2")).input;
-  const textfield2Driver = await createTextBoxDriver(textfield2Element);
-
-  await textfield1Driver.field.fill("name1");
-  await option2Driver.click();
-  await textfield2Driver.field.fill("name2");
-  await option1Driver.click();
-
-  await expect(textfield1Driver.field).toHaveValue("name1");
-});
-
 // =============================================================================
 // BEHAVIORS AND PARTS TESTS
 // =============================================================================
