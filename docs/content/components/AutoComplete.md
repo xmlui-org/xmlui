@@ -216,8 +216,8 @@ This API allows you to get or set the value of the component. If no value is set
 | [borderColor](../styles-and-themes/common-units/#color)-AutoComplete | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-AutoComplete--default | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-AutoComplete--default--hover | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-AutoComplete--disabled | initial | initial |
-| [borderColor](../styles-and-themes/common-units/#color)-AutoComplete--disabled | initial | initial |
+| [borderColor](../styles-and-themes/common-units/#color)-AutoComplete--disabled | $borderColor--disabled | $borderColor--disabled |
+| [borderColor](../styles-and-themes/common-units/#color)-AutoComplete--disabled | $borderColor--disabled | $borderColor--disabled |
 | [borderColor](../styles-and-themes/common-units/#color)-AutoComplete--error | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-AutoComplete--error--hover | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-AutoComplete--success | *none* | *none* |
@@ -290,8 +290,6 @@ This API allows you to get or set the value of the component. If no value is set
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-AutoComplete--success | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-AutoComplete--warning | *none* | *none* |
 | [gap](../styles-and-themes/common-units/#size)-adornment-AutoComplete | *none* | *none* |
-| [opacity](../styles-and-themes/common-units/#opacity)-AutoComplete--disabled | 0.5 | 0.5 |
-| [opacity](../styles-and-themes/common-units/#opacity)-text-item-AutoComplete--disabled | 0.5 | 0.5 |
 | [outlineColor](../styles-and-themes/common-units/#color)-AutoComplete--focus | *none* | *none* |
 | [outlineOffset](../styles-and-themes/common-units/#size)-AutoComplete--focus | *none* | *none* |
 | [outlineStyle](../styles-and-themes/common-units/#border)-AutoComplete--focus | *none* | *none* |
@@ -314,7 +312,8 @@ This API allows you to get or set the value of the component. If no value is set
 | [paddingVertical](../styles-and-themes/common-units/#size)-item-AutoComplete | $space-2 | $space-2 |
 | [textColor](../styles-and-themes/common-units/#color)-AutoComplete--default | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-AutoComplete--default--hover | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-AutoComplete--disabled | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-AutoComplete--disabled | $textColor--disabled | $textColor--disabled |
+| [textColor](../styles-and-themes/common-units/#color)-AutoComplete--disabled | $textColor--disabled | $textColor--disabled |
 | [textColor](../styles-and-themes/common-units/#color)-AutoComplete--error | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-AutoComplete--error--hover | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-AutoComplete--success | *none* | *none* |
@@ -325,7 +324,7 @@ This API allows you to get or set the value of the component. If no value is set
 | [textColor](../styles-and-themes/common-units/#color)-AutoComplete-badge | $const-color-surface-50 | $const-color-surface-50 |
 | [textColor](../styles-and-themes/common-units/#color)-AutoComplete-badge--active | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-AutoComplete-badge--hover | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-item-AutoComplete--disabled | $color-surface-200 | $color-surface-200 |
+| [textColor](../styles-and-themes/common-units/#color)-item-AutoComplete--disabled | $color-surface-300 | $color-surface-300 |
 | [textColor](../styles-and-themes/common-units/#color)-placeholder-AutoComplete | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-placeholder-AutoComplete--default | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-placeholder-AutoComplete--error | *none* | *none* |

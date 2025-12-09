@@ -99,6 +99,14 @@ This property sets the markdown content to display. Alternatively, you can nest 
 
 Use this property when the text you provide is not static but a result of calculations (you assemble the text or get it from other components).
 
+### `grayscale` [#grayscale]
+
+This boolean property specifies whether images should be displayed in grayscale. If set to `true`, all images within the markdown will be rendered in grayscale.
+
+### `removeBr` (default: false) [#removebr-default-false]
+
+This boolean property specifies whether `<br>` (line break) elements should be omitted from the rendered output. When set to `true`, `<br/>` tags in the markdown content will not be rendered. When `false` (default), `<br/>` tags render as horizontal bars.
+
 ### `removeIndents` (default: true) [#removeindents-default-true]
 
 This boolean property specifies whether leading indents should be removed from the markdown content. If set to `true`, the shortest indent found at the start of the content lines is removed from the beginning of every line.
@@ -228,7 +236,7 @@ The component itself cannot be styled, but the components that render the final 
 | [borderColor](../styles-and-themes/common-units/#color)-Admonition-tip | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Admonition-warning | $color-warn-300 | $color-warn-300 |
 | [borderColor](../styles-and-themes/common-units/#color)-Blockquote | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-HorizontalRule | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-HorizontalRule | $borderColor | $borderColor |
 | [borderColor](../styles-and-themes/common-units/#color)-HtmlDetails | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-HtmlLi | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-HtmlOl | *none* | *none* |
@@ -418,7 +426,7 @@ The component itself cannot be styled, but the components that render the final 
 | [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-HtmlUl | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Admonition | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Blockquote | *none* | *none* |
-| [borderStyle](../styles-and-themes/common-units/#border-style)-HorizontalRule | *none* | *none* |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-HorizontalRule | solid | solid |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-HtmlDetails | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-HtmlLi | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-HtmlOl | *none* | *none* |
@@ -518,7 +526,7 @@ The component itself cannot be styled, but the components that render the final 
 | [borderVerticalWidth](../styles-and-themes/common-units/#size)-HtmlUl | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-Admonition | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-Blockquote | *none* | *none* |
-| [borderWidth](../styles-and-themes/common-units/#size)-HorizontalRule | *none* | *none* |
+| [borderWidth](../styles-and-themes/common-units/#size)-HorizontalRule | 2px | 2px |
 | [borderWidth](../styles-and-themes/common-units/#size)-HtmlDetails | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-HtmlLi | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-HtmlOl | *none* | *none* |

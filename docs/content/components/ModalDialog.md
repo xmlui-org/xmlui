@@ -126,6 +126,10 @@ Provides a prestyled heading to display the intent of the dialog.
 </App>
 ```
 
+### `titleTemplate` [#titletemplate]
+
+A custom template to render the dialog title.
+
 ## Events [#events]
 
 ### `close` [#close]
@@ -209,10 +213,21 @@ The component has some parts that can be styled through layout properties and th
 | [backgroundColor](../styles-and-themes/common-units/#color)-ModalDialog | $backgroundColor-primary | $backgroundColor-primary |
 | [backgroundColor](../styles-and-themes/common-units/#color)-overlay-ModalDialog | $backgroundColor-overlay | $backgroundColor-overlay |
 | [backgroundColor](../styles-and-themes/common-units/#color)-overlay-ModalDialog | $backgroundColor-overlay | $backgroundColor-overlay |
+| [backgroundColor](../styles-and-themes/common-units/#color)-title-ModalDialog | *none* | *none* |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-ModalDialog | $borderRadius | $borderRadius |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-ModalDialog | $borderRadius | $borderRadius |
+| [direction](../styles-and-themes/layout-props#direction)-title-ModalDialog | *none* | *none* |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-ModalDialog | $fontFamily | $fontFamily |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-ModalDialog | $fontFamily | $fontFamily |
+| [fontFamily](../styles-and-themes/common-units/#fontFamily)-title-ModalDialog | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-title-ModalDialog | $fontSize-2xl | $fontSize-2xl |
+| [fontStretch](../styles-and-themes/common-units/#fontStretch)-title-ModalDialog | *none* | *none* |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-title-ModalDialog | *none* | *none* |
+| [fontVariant](../styles-and-themes/common-units/#font-variant)-title-ModalDialog | *none* | *none* |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-title-ModalDialog | *none* | *none* |
+| [letterSpacing](../styles-and-themes/common-units/#size)-title-ModalDialog | *none* | *none* |
+| [lineBreak](../styles-and-themes/common-units/#line-break)-title-ModalDialog | *none* | *none* |
+| [lineHeight](../styles-and-themes/common-units/#size)-title-ModalDialog | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-title-ModalDialog | 0 | 0 |
 | [marginBottom](../styles-and-themes/common-units/#size)-title-ModalDialog | 0 | 0 |
 | [maxWidth](../styles-and-themes/common-units/#size)-ModalDialog | 450px | 450px |
@@ -232,5 +247,20 @@ The component has some parts that can be styled through layout properties and th
 | [paddingTop](../styles-and-themes/common-units/#size)-overlay-ModalDialog | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-ModalDialog | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-overlay-ModalDialog | *none* | *none* |
+| [textAlign](../styles-and-themes/common-units/#text-align)-title-ModalDialog | *none* | *none* |
+| [textAlignLast](../styles-and-themes/common-units/#text-align)-title-ModalDialog | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-ModalDialog | $textColor-primary | $textColor-primary |
 | [textColor](../styles-and-themes/common-units/#color)-ModalDialog | $textColor-primary | $textColor-primary |
+| [textColor](../styles-and-themes/common-units/#color)-title-ModalDialog | *none* | *none* |
+| [textDecorationColor](../styles-and-themes/common-units/#color)-title-ModalDialog | *none* | *none* |
+| [textDecorationLine](../styles-and-themes/common-units/#textDecoration)-title-ModalDialog | *none* | *none* |
+| [textDecorationStyle](../styles-and-themes/common-units/#textDecoration)-title-ModalDialog | *none* | *none* |
+| [textDecorationThickness](../styles-and-themes/common-units/#textDecoration)-title-ModalDialog | *none* | *none* |
+| [textIndent](../styles-and-themes/common-units/#text-indent)-title-ModalDialog | *none* | *none* |
+| [textShadow](../styles-and-themes/common-units/#text-shadow)-title-ModalDialog | *none* | *none* |
+| [textTransform](../styles-and-themes/common-units/#textTransform)-title-ModalDialog | *none* | *none* |
+| [textUnderlineOffset](../styles-and-themes/common-units/#size)-title-ModalDialog | *none* | *none* |
+| [wordBreak](../styles-and-themes/common-units/#word-break)-title-ModalDialog | *none* | *none* |
+| [wordSpacing](../styles-and-themes/common-units/#word-spacing)-title-ModalDialog | *none* | *none* |
+| [wordWrap](../styles-and-themes/common-units/#word-wrap)-title-ModalDialog | *none* | *none* |
+| [writingMode](../styles-and-themes/common-units/#writing-mode)-title-ModalDialog | *none* | *none* |
