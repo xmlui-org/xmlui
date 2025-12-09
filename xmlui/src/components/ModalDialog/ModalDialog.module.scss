@@ -11,6 +11,7 @@ $themeVars: ();
 // --- Theme vars for paddings
 $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, "overlay-#{$component}");
+$themeVars: t.composeTextVars($themeVars, "title-#{$component}");
 $padding-ModalDialog: createThemeVar("padding-#{$component}");
 $backgroundColor-ModalDialog: createThemeVar("Dialog:backgroundColor-#{$component}");
 $backgroundColor-overlay-ModalDialog: createThemeVar("Dialog:backgroundColor-overlay-#{$component}");
@@ -94,7 +95,7 @@ $marginBottom-title-ModalDialog: createThemeVar("Dialog:marginBottom-title-#{$co
   .dialogTitle {
     flex: 1;
     margin-bottom: $marginBottom-title-ModalDialog;
-    font-size: t.$fontSize-2xl;
+    @include t.textVars($themeVars, "title-#{$component}");
   }
 
   .innerContent {

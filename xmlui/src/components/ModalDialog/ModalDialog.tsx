@@ -2,7 +2,7 @@ import styles from "./ModalDialog.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { paddingSubject } from "../../components-core/theming/themes/base-utils";
+import { paddingSubject, textSubject } from "../../components-core/theming/themes/base-utils";
 import { MemoizedItem } from "../container-helpers";
 import { ModalDialog, ModalDialogFrame, defaultProps } from "./ModalDialogNative";
 import { createMetadata, d } from "../metadata-helpers";
@@ -33,6 +33,9 @@ export const ModalDialogMd = createMetadata({
       defaultValue: defaultProps.fullScreen,
     },
     title: d(`Provides a prestyled heading to display the intent of the dialog.`),
+    titleTemplate: {
+      description: "A custom template to render the dialog title.",
+    },
     closeButtonVisible: {
       description: `Shows (\`true\`) or hides (\`false\`) the visibility of the close button on the dialog.`,
       valueType: "boolean",
@@ -76,6 +79,7 @@ export const ModalDialogMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     ...paddingSubject(COMP, { all: "$space-7" }),
+    ...textSubject(`title-${COMP}`, { size: "$fontSize-2xl" }),
     [`backgroundColor-${COMP}`]: "$backgroundColor-primary",
     [`backgroundColor-overlay-${COMP}`]: "$backgroundColor-overlay",
     [`textColor-${COMP}`]: "$textColor-primary",
@@ -131,6 +135,7 @@ export const modalViewComponentRenderer = createComponentRenderer(
         className={className}
         fullScreen={extractValue.asOptionalBoolean(node.props?.fullScreen)}
         title={extractValue(node.props?.title)}
+        titleTemplate={renderChild(node.props?.titleTemplate)}
         closeButtonVisible={extractValue.asOptionalBoolean(node.props.closeButtonVisible)}
         externalAnimation={extractValue.asOptionalBoolean(node.props.externalAnimation)}
       >
