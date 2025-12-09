@@ -88,13 +88,20 @@ const plainTextContent: Record<string, string> = {};
 const navPanelContent: any[] = [];
 Object.keys(contentRuntime).map((filePath) => {
   let urlFragment: string;
+  
+  // For files in /content/pages/, keep the full path with 'pages/' prefix and .md extension
+  // For other files (components, extensions), strip /content/ and just use the path without extension
   if (filePath.startsWith("/content/pages/")) {
+    // Keep: pages/intro.md, pages/howto/foo.md, etc.
     urlFragment = filePath.substring("/content/".length);
   } else {
-    urlFragment = filePath.substring("/content/".length).replace(".md", "");
+    // For components/extensions: strip /content/ and remove extension
+    // /content/components/Button.md -> components/Button
+    urlFragment = filePath.substring("/content/".length).replace(/\.(md|mdx)$/, "");
     navPanelContent.push(urlFragment);
     plainTextContent[urlFragment] = markdownToPlainText(contentRuntime[filePath].default);
   }
+  
   content[urlFragment] = contentRuntime[filePath].default;
 });
 
