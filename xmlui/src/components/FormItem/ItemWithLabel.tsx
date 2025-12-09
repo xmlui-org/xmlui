@@ -60,7 +60,8 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     validationResult,
     isInputTemplateUsed = false,
     onLabelClick,
-    layoutContext,
+    layoutContext, // Destructured to prevent passing to DOM
+    testId,
     ...rest
   }: ItemWithLabelProps,
   ref: ForwardedRef<HTMLDivElement>,

@@ -414,6 +414,7 @@ const Form = forwardRef(function (
       emptyObjectType: typeof EMPTY_OBJECT
     }); */
     event?.preventDefault();
+    event?.stopPropagation(); // Prevent event from bubbling to parent forms
     if (!isEnabled) {
       return;
     }

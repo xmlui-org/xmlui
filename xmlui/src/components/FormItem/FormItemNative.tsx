@@ -165,8 +165,9 @@ export const FormItem = memo(function FormItem({
   initialValue: initialValueFromProps,
   gap,
   noSubmit = defaultProps.noSubmit,
+  layoutContext, // Destructured to prevent passing to ItemWithLabel
   ...rest
-}: Props) {
+}: Props & { layoutContext?: any }) {
   const validations: FormItemValidations = useShallowCompareMemoize({
     required,
     requiredInvalidMessage,
