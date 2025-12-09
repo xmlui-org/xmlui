@@ -4,7 +4,7 @@ import type { Page } from "@playwright/test";
 // =============================================================================
 // MOBILE LAYOUT TEST SUITE
 // =============================================================================
-// This test suite verifies App2 component behavior in mobile viewports (375x667px).
+// This test suite verifies App component behavior in mobile viewports (375x667px).
 // 
 // KEY MOBILE-SPECIFIC BEHAVIORS DISCOVERED:
 // 1. NavPanel is ALWAYS hidden in mobile view and accessible via hamburger menu in drawer
@@ -29,7 +29,7 @@ function createLayoutMarkup(
   contentHeight: string
 ) {
   return `
-    <App2
+    <App
       layout="${layout}"
       noScrollbarGutters="${noScrollbarGutters}"
       scrollWholePage="${scrollWholePage}"
@@ -53,7 +53,7 @@ function createLayoutMarkup(
       <Footer testId="footer">
         Footer
       </Footer>
-    </App2>
+    </App>
   `;
 }
 
@@ -385,7 +385,7 @@ async function verifyDrawerOpen(page: Page) {
 // =============================================================================
 // MOBILE LAYOUT TESTS - HORIZONTAL
 // =============================================================================
-// These tests verify that the App2 component correctly positions and displays
+// These tests verify that the App component correctly positions and displays
 // its layout blocks in mobile viewports (small screens) where the NavPanel
 // moves into a drawer and a hamburger menu appears in the header.
 //

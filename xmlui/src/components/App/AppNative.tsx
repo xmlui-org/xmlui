@@ -1,6 +1,7 @@
 import {
   type CSSProperties,
   type ReactNode,
+  forwardRef,
   useCallback,
   useEffect,
   useMemo,
@@ -21,15 +22,46 @@ import { useAppContext } from "../../components-core/AppContext";
 import { useIsomorphicLayoutEffect, useResizeObserver } from "../../components-core/utils/hooks";
 import { useTheme, useThemes } from "../../components-core/theming/ThemeContext";
 import { useScrollbarWidth } from "../../components-core/utils/css-utils";
-import { Sheet, SheetContent } from "../../components/App/Sheet";
-import { AppContextAwareAppHeader } from "../../components/AppHeader/AppHeaderNative";
-import type { AppLayoutType, IAppLayoutContext } from "./AppLayoutContext";
-import { AppLayoutContext } from "./AppLayoutContext";
+import { Sheet, SheetContent } from "./Sheet";
+import { AppContextAwareAppHeader } from "../AppHeader/AppHeaderNative";
+import type { AppLayoutType, IAppLayoutContext } from "../App/AppLayoutContext";
+import { AppLayoutContext } from "../App/AppLayoutContext";
 import { SearchContextProvider } from "./SearchContext";
 import type { NavHierarchyNode } from "../NavPanel/NavPanelNative";
 import { LinkInfoContext } from "./LinkInfoContext";
 import { EMPTY_OBJECT } from "../../components-core/constants";
-import { shouldKeep } from "../../components-core/utils/extractParam";
+
+// --- Slot Components ---
+
+// --- Slot Components Factory ---
+
+function createSlot<T extends HTMLElement = HTMLDivElement>(
+  displayName: string,
+  className?: string,
+  elementType: keyof JSX.IntrinsicElements = "div"
+) {
+  const Slot = forwardRef<T, React.HTMLAttributes<T>>(
+    ({ className: customClass, children, ...rest }, ref) => {
+      const Element = elementType as any;
+      return (
+        <Element {...rest} className={classnames(className, customClass)} ref={ref}>
+          {children}
+        </Element>
+      );
+    }
+  );
+  Slot.displayName = displayName;
+  return Slot;
+}
+
+const AppContainer = createSlot("AppContainer");
+const AppHeaderSlot = createSlot<HTMLElement>("AppHeaderSlot", styles.headerWrapper, "header");
+const AppFooterSlot = createSlot("AppFooterSlot", styles.footerWrapper);
+const AppNavPanelSlot = createSlot("AppNavPanelSlot", styles.navPanelWrapper);
+const AppContentSlot = createSlot("AppContentSlot", styles.mainContentArea);
+const AppPagesSlot = createSlot("AppPagesSlot", styles.pagesContainer);
+
+// --- Component Types ---
 
 type Props = {
   children: ReactNode;
@@ -80,6 +112,37 @@ export const defaultProps: Pick<
   onMessageReceived: noop,
 };
 
+/**
+ * List of valid layout types for the App component.
+ * Used for runtime validation to provide helpful error messages.
+ */
+const VALID_LAYOUTS: AppLayoutType[] = [
+  "vertical",
+  "vertical-sticky",
+  "vertical-full-header",
+  "horizontal",
+  "horizontal-sticky",
+  "condensed",
+  "condensed-sticky",
+  "desktop",
+];
+
+/**
+ * Determines whether the NavPanel should be visible inline (not in a drawer).
+ * 
+ * @param hasNavPanel - Whether a NavPanel is defined and rendered
+ * @param isLargeScreen - Whether the viewport is large enough for sidebar layout
+ * @param hasHeader - Whether a header is registered
+ * @param layout - Current layout type
+ * @returns true if NavPanel should be shown inline, false if it should be in a drawer
+ * 
+ * Logic:
+ * - If no NavPanel exists, return false
+ * - On large screens: always show inline
+ * - On small screens: show inline only if there's no header to contain the drawer button,
+ *   except for condensed layouts which always use the header for the drawer button
+ */
+
 export function App({
   children,
   style = EMPTY_OBJECT,
@@ -112,54 +175,39 @@ export function App({
   const { setActiveThemeTone, setActiveThemeId, themes } = useThemes();
   const mounted = useRef(false);
 
-  const layoutWithDefaultValue = layout || getThemeVar("layout-App") || "condensed-sticky";
-  const safeLayout = layoutWithDefaultValue
-    ?.trim()
-    .replace(/[\u2013\u2014\u2011]/g, "-") as AppLayoutType; //It replaces all &ndash; (–) and &mdash; (—) and non-breaking hyphen '‑' symbols with simple dashes (-).
+  // Validate and sanitize layout input with explicit validation
+  const layoutWithDefault = layout || getThemeVar("layout-App") || "condensed-sticky";
+  const sanitized = layoutWithDefault.trim().replace(/[\u2013\u2014\u2011]/g, "-");
+  const normalized = sanitized || "condensed-sticky";
+  
+  if (!VALID_LAYOUTS.includes(normalized as AppLayoutType)) {
+    console.error(`App: layout type not supported: ${normalized}. Falling back to "condensed-sticky". Valid layouts: ${VALID_LAYOUTS.join(", ")}`);
+  }
+  
+  const safeLayout = VALID_LAYOUTS.includes(normalized as AppLayoutType) ? normalized as AppLayoutType : "condensed-sticky";
   const appContext = useAppContext();
   const { setLoggedInUser, mediaSize, forceRefreshAnchorScroll, appGlobals } = appContext;
   const hasRegisteredHeader = header !== undefined;
   
-  // --- Check if NavPanel's "when" condition allows it to be rendered
-  // --- This ensures the drawer and hamburger menu are hidden when NavPanel.when evaluates to false
-  const navPanelShouldRender = useMemo(() => {
-    if (!navPanelDef) return false;
-    // Use shouldKeep to evaluate the NavPanel's when condition
-    // Pass empty state {} and appContext since we're evaluating at the App level
-    return shouldKeep(navPanelDef.when, {}, appContext);
-  }, [navPanelDef, appContext]);
-  
-  const hasRegisteredNavPanel = navPanelDef !== undefined && navPanelShouldRender;
+  // Check if NavPanel exists and is actually displayed
+  // navPanel is null when the 'when' condition evaluates to false
+  // navPanelDef !== undefined means a NavPanel is defined in the markup
+  // navPanel !== null means the NavPanel actually rendered (when condition is true)
+  const navPanelActuallyRendered = navPanel !== null && navPanel !== undefined;
+  const hasRegisteredNavPanel = navPanelDef !== undefined && navPanelActuallyRendered;
 
   useEffect(() => {
     setLoggedInUser(loggedInUser);
   }, [loggedInUser, setLoggedInUser]);
 
-  useEffect(() => {
-    if (mounted.current) return;
-    mounted.current = true;
-    
-    if (defaultTone === "dark" || defaultTone === "light") {
-      setActiveThemeTone(defaultTone as any);
-    } else if (autoDetectTone) {
-      // Auto-detect system theme preference when no defaultTone is set
-      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const detectedTone = systemPrefersDark ? "dark" : "light";
-      setActiveThemeTone(detectedTone);
-    }
-    
-    if (defaultTheme) {
-      setActiveThemeId(defaultTheme);
-    }
-
-    return () => {
-      mounted.current = false;
-    };
-  }, [defaultTone, defaultTheme, autoDetectTone, setActiveThemeTone, setActiveThemeId, themes]);
-
-  useEffect(() => {
-    onReady();
-  }, [onReady]);
+  // Initialize theme and tone settings
+  useThemeInitialization({
+    defaultTone,
+    defaultTheme,
+    autoDetectTone,
+    setActiveThemeTone,
+    setActiveThemeId,
+  });
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -173,91 +221,48 @@ export function App({
     };
   }, [onMessageReceived]);
 
-  // Listen for system theme changes when autoDetectTone is enabled
-  useEffect(() => {
-    if (!autoDetectTone || defaultTone) return;
+  // Determine if NavPanel should be visible inline (not in drawer)
+  // On large screens: always show inline
+  // On small screens: show inline only if there's no header to contain the drawer button,
+  // except for condensed layouts which always use the header for the drawer button
+  const isCondensedLayout = safeLayout === "condensed" || safeLayout === "condensed-sticky";
+  const navPanelVisible = hasRegisteredNavPanel &&
+    (mediaSize.largeScreen || (!hasRegisteredHeader && !isCondensedLayout));
 
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
-    const handleThemeChange = (e: MediaQueryListEvent) => {
-      const detectedTone = e.matches ? "dark" : "light";
-      setActiveThemeTone(detectedTone);
-    };
+  // Refs for scroll containers - naming clarified for better understanding
+  // pageScrollRef: used when scrollWholePage=true (entire page scrolls)
+  // contentScrollRef: used when scrollWholePage=false (only content area scrolls)
+  const pageScrollRef = useRef(null);
+  const contentScrollRef = useRef(null);
 
-    mediaQuery.addEventListener('change', handleThemeChange);
-
-    return () => {
-      mediaQuery.removeEventListener('change', handleThemeChange);
-    };
-  }, [autoDetectTone, defaultTone, setActiveThemeTone]);
-
-  // --- We don't hide the nav panel if there's no header; in that case, we don't have a show drawer
-  // --- button. The exception is the condensed layout because we render a header in that case (otherwise,
-  // --- we couldn't show the NavPanel)
-  const navPanelVisible =
-    mediaSize.largeScreen ||
-    (!hasRegisteredHeader && safeLayout !== "condensed" && safeLayout !== "condensed-sticky");
-
-  const scrollPageContainerRef = useRef(null);
-  const noScrollPageContainerRef = useRef(null);
-
-  const scrollContainerRef = scrollWholePage ? scrollPageContainerRef : noScrollPageContainerRef;
-  const [footerHeight, setFooterHeight] = useState(0);
-  const [headerHeight, setHeaderHeight] = useState(0);
+  const scrollContainerRef = scrollWholePage ? pageScrollRef : contentScrollRef;
   const scrollbarWidth = useScrollbarWidth();
 
-  const footerRef = useRef<HTMLDivElement | null>();
-  const footerRefCallback = useCallback((element: HTMLDivElement | null) => {
-    footerRef.current = element;
-  }, []);
-
-  const headerRef = useRef<HTMLDivElement | null>();
-  const headerRefCallback = useCallback((element: HTMLDivElement | null) => {
-    headerRef.current = element;
-  }, []);
-
-  useResizeObserver(
-    footerRef,
-    useCallback((entries) => {
-      setFooterHeight(entries?.[0]?.contentRect?.height);
-    }, []),
-  );
-
-  useResizeObserver(
-    headerRef,
-    useCallback((entries) => {
-      setHeaderHeight(entries?.[0]?.contentRect?.height);
-    }, []),
-  );
+  const footerSize = useElementSizeObserver();
+  const headerSize = useElementSizeObserver();
 
   const styleWithHelpers = useMemo(() => {
+    // Determine if we need header/footer height compensation for sticky layouts
+    // Non-sticky layouts with whole-page scroll don't need height compensation
+    const needsHeightCompensation = !(
+      scrollWholePage && (
+        safeLayout === "vertical" ||
+        safeLayout === "horizontal" ||
+        safeLayout === "condensed"
+      )
+    );
+    
     return {
       ...style,
-      "--header-height":
-        !scrollWholePage ||
-        safeLayout === "vertical" ||
-        safeLayout === "horizontal" ||
-        safeLayout === "condensed"
-          ? "0px"
-          : safeLayout === "desktop"
-          ? headerHeight + "px"
-          : headerHeight + "px",
-      "--footer-height":
-        !scrollWholePage ||
-        safeLayout === "vertical" ||
-        safeLayout === "horizontal" ||
-        safeLayout === "condensed"
-          ? "0px"
-          : safeLayout === "desktop"
-          ? footerHeight + "px"
-          : footerHeight + "px",
-      "--header-abs-height": headerHeight + "px",
-      "--footer-abs-height": footerHeight + "px",
+      "--header-height": needsHeightCompensation ? `${headerSize.height}px` : "0px",
+      "--footer-height": needsHeightCompensation ? `${footerSize.height}px` : "0px",
+      "--header-abs-height": headerSize.height + "px",
+      "--footer-abs-height": footerSize.height + "px",
       "--scrollbar-width": noScrollbarGutters ? "0px" : scrollbarWidth + "px",
     } as CSSProperties;
   }, [
-    footerHeight,
-    headerHeight,
+    footerSize.height,
+    headerSize.height,
     noScrollbarGutters,
     safeLayout,
     scrollWholePage,
@@ -265,12 +270,25 @@ export function App({
     style,
   ]);
 
-  const [drawerVisible, setDrawerVisible] = useState(false);
-  const location = useLocation();
-
-  const toggleDrawer = useCallback(() => {
-    setDrawerVisible((prev) => !prev);
+  // Track whether onReady has been called to ensure it only fires once
+  const onReadyCalledRef = useRef(false);
+  
+  // Call onReady once after the component and its children have rendered
+  // Use effect (not layout effect) to ensure it runs after paint
+  useEffect(() => {
+    if (!onReadyCalledRef.current) {
+      onReadyCalledRef.current = true;
+      onReady();
+    }
+    // Empty deps - only run once on mount, regardless of onReady reference changes
   }, []);
+
+  const location = useLocation();
+  const { drawerVisible, toggleDrawer, handleOpenChange, showDrawer, hideDrawer } = useDrawerState(
+    location,
+    navPanelVisible,
+    safeLayout
+  );
 
   useIsomorphicLayoutEffect(() => {
     scrollContainerRef.current?.scrollTo({
@@ -281,10 +299,15 @@ export function App({
   }, [location.pathname]);
 
   useEffect(() => {
-    requestAnimationFrame(() => {
+    const frameId = requestAnimationFrame(() => {
       // we have to force refresh the anchor scroll to pos, because it depends on the header height (scroll-margin-top on anchors)
       forceRefreshAnchorScroll();
     });
+    
+    // Cleanup: cancel animation frame if component unmounts before it executes
+    return () => {
+      cancelAnimationFrame(frameId);
+    };
   }, [forceRefreshAnchorScroll]);
 
   const [subNavPanelSlot, setSubNavPanelSlot] = useState(null);
@@ -298,35 +321,14 @@ export function App({
     setLinkMap(newLinkMap);
   }, []);
 
-  const layoutContextValue = useMemo<IAppLayoutContext>(() => {
-    return {
-      hasRegisteredNavPanel,
-      hasRegisteredHeader,
-      navPanelVisible,
-      drawerVisible,
-      layout: safeLayout,
-      logo: logo,
-      logoDark: logoDark,
-      logoLight: logoLight,
-      showDrawer: () => {
-        setDrawerVisible(true);
-      },
-      hideDrawer: () => {
-        setDrawerVisible(false);
-      },
-      toggleDrawer,
-      navPanelDef,
-      logoContentDef,
-      registerSubNavPanelSlot,
-      subNavPanelSlot,
-      isNested: appGlobals?.isNested || false,
-    };
-  }, [
+  const layoutContextValue = useAppLayoutContextValue({
     hasRegisteredNavPanel,
     hasRegisteredHeader,
     navPanelVisible,
     drawerVisible,
-    safeLayout,
+    showDrawer,
+    hideDrawer,
+    layout: safeLayout,
     logo,
     logoDark,
     logoLight,
@@ -335,8 +337,9 @@ export function App({
     logoContentDef,
     registerSubNavPanelSlot,
     subNavPanelSlot,
-    appGlobals?.isNested,
-  ]);
+    scrollWholePage,
+    isNested: appGlobals?.isNested || false,
+  });
 
   const linkInfoContextValue = useMemo(() => {
     return {
@@ -345,19 +348,9 @@ export function App({
     };
   }, [linkMap, registerLinkMap]);
 
-  useEffect(() => {
-    if (navPanelVisible) {
-      setDrawerVisible(false);
-    }
-  }, [navPanelVisible]);
-
-  useEffect(() => {
-    setDrawerVisible(false);
-  }, [location, safeLayout]);
-
   const wrapperBaseClasses = [
     className,
-    styles.wrapper,
+    styles.appContainer,
     {
       [styles.scrollWholePage]: scrollWholePage,
       [styles.noScrollbarGutters]: noScrollbarGutters,
@@ -371,216 +364,91 @@ export function App({
     },
   ];
 
-  let content: string | number | boolean | Iterable<ReactNode> | JSX.Element;
-  let pagesWrapperClasses = classnames(styles.PagesWrapperInner, {
+  const pagesWrapperClasses = classnames(styles.pageContentContainer, {
     [styles.withDefaultContentPadding]: applyDefaultContentPadding,
   });
   
-  // Determine if footer should have nonSticky class (when sticky=false for non-desktop layouts)
-  const footerShouldBeNonSticky = !footerSticky && safeLayout !== "desktop";
-  
-  switch (safeLayout) {
-    case "vertical":
-      content = (
-        <div
-          {...rest}
-          className={classnames(wrapperBaseClasses, styles.vertical)}
-          style={styleWithHelpers}
-        >
-          {navPanelVisible && <div className={classnames(styles.navPanelWrapper)}>{navPanel}</div>}
-          <div className={styles.contentWrapper} ref={scrollPageContainerRef}>
-            <header ref={headerRefCallback} className={classnames(styles.headerWrapper)}>
-              {header}
-            </header>
-            <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
-              <div className={pagesWrapperClasses}>{children}</div>
-            </div>
-            <div className={styles.footerWrapper} ref={footerRefCallback}>
-              {footer}
-            </div>
-          </div>
-        </div>
-      );
-      break;
-    case "vertical-sticky":
-      content = (
-        <div
-          {...rest}
-          className={classnames(wrapperBaseClasses, styles.vertical, styles.sticky)}
-          style={styleWithHelpers}
-        >
-          {navPanelVisible && <div className={classnames(styles.navPanelWrapper)}>{navPanel}</div>}
-          <div className={styles.contentWrapper} ref={scrollPageContainerRef}>
-            <header
-              ref={headerRefCallback}
-              className={classnames(styles.headerWrapper, styles.sticky)}
-            >
-              {header}
-            </header>
-            <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
-              <div className={pagesWrapperClasses}>{children}</div>
-            </div>
-            <div 
-              className={classnames(styles.footerWrapper, {
-                [styles.nonSticky]: footerShouldBeNonSticky,
-              })} 
-              ref={footerRefCallback}
-            >
-              {footer}
-            </div>
-          </div>
-        </div>
-      );
-      break;
-    case "vertical-full-header":
-      content = (
-        <div
-          {...rest}
-          className={classnames(wrapperBaseClasses, styles.verticalFullHeader)}
-          style={styleWithHelpers}
-          ref={scrollPageContainerRef}
-        >
-          <header
-            className={classnames(styles.headerWrapper, styles.sticky)}
-            ref={headerRefCallback}
-          >
-            {header}
-          </header>
-          <div className={styles.content}>
-            {navPanelVisible && <aside className={styles.navPanelWrapper}>{navPanel}</aside>}
-            <main className={styles.contentWrapper}>
-              <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
-                <div className={pagesWrapperClasses}>{children}</div>
-              </div>
+  const config = layoutConfigs[safeLayout];
+  if (!config) {
+    throw new Error("layout type not supported: " + safeLayout);
+  }
+
+  // Helper functions for rendering slots
+  const renderHeaderSlot = () => (
+    <AppHeaderSlot
+      ref={headerSize.refCallback}
+      className={classnames(
+        config.showCondensedHeader && "app-layout-condensed",
+        config.headerClasses
+      )}
+    >
+      {config.showCondensedHeader && !hasRegisteredHeader && hasRegisteredNavPanel && (
+        <AppContextAwareAppHeader renderChild={renderChild} />
+      )}
+      {header}
+      {config.navPanelInHeader && navPanelVisible && <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>}
+    </AppHeaderSlot>
+  );
+
+  const renderFooterSlot = () => footer !== undefined || safeLayout !== "desktop" ? (
+    <AppFooterSlot
+      className={classnames({ [styles.nonSticky]: !footerSticky })}
+      ref={footerSize.refCallback}
+    >
+      {footer}
+    </AppFooterSlot>
+  ) : null;
+
+  const renderPagesSlot = () => (
+    <AppPagesSlot ref={contentScrollRef}>
+      <div className={pagesWrapperClasses}>{children}</div>
+    </AppPagesSlot>
+  );
+
+  // Unified rendering based on layout configuration
+  const content = (
+    <AppContainer
+      className={classnames(wrapperBaseClasses, ...config.containerClasses)}
+      style={styleWithHelpers}
+      ref={config.containerScrollRef ? pageScrollRef : undefined}
+      {...rest}
+    >
+      {config.useVerticalFullHeaderStructure ? (
+        <>
+          {renderHeaderSlot()}
+          <div className={styles.mainContentRow}>
+            {navPanelVisible && (
+              <aside className={styles.navPanelWrapper}>
+                <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>
+              </aside>
+            )}
+            <main className={styles.mainContentArea}>
+              {renderPagesSlot()}
             </main>
           </div>
-          <div 
-            className={classnames(styles.footerWrapper, {
-              [styles.nonSticky]: footerShouldBeNonSticky,
-            })} 
-            ref={footerRefCallback}
-          >
-            {footer}
-          </div>
-        </div>
-      );
-      break;
-    case "condensed":
-    case "condensed-sticky":
-      content = (
-        <div
-          {...rest}
-          className={classnames(wrapperBaseClasses, styles.horizontal, {
-            [styles.sticky]: safeLayout === "condensed-sticky",
-          })}
-          style={styleWithHelpers}
-          ref={scrollPageContainerRef}
-        >
-          <header
-            className={classnames("app-layout-condensed", styles.headerWrapper, {
-              [styles.sticky]: safeLayout === "condensed-sticky",
-            })}
-            ref={headerRefCallback}
-          >
-            {!hasRegisteredHeader && hasRegisteredNavPanel && (
-              <AppContextAwareAppHeader renderChild={renderChild} />
-            )}
-            {header}
-          </header>
-          <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
-            <div className={pagesWrapperClasses}>{children}</div>
-          </div>
-          <div 
-            className={classnames(styles.footerWrapper, {
-              [styles.nonSticky]: footerShouldBeNonSticky,
-            })} 
-            ref={footerRefCallback}
-          >
-            {footer}
-          </div>
-        </div>
-      );
-      break;
-    case "horizontal": {
-      content = (
-        <div
-          {...rest}
-          className={classnames(wrapperBaseClasses, styles.horizontal)}
-          style={styleWithHelpers}
-          ref={scrollPageContainerRef}
-        >
-          <header className={classnames(styles.headerWrapper)} ref={headerRefCallback}>
-            {header}
-            {navPanelVisible && <div className={styles.navPanelWrapper}>{navPanel}</div>}
-          </header>
-          <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
-            <div className={pagesWrapperClasses}>{children}</div>
-          </div>
-          <div className={styles.footerWrapper} ref={footerRefCallback}>
-            {footer}
-          </div>
-        </div>
-      );
-      break;
-    }
-    case "horizontal-sticky":
-      content = (
-        <div
-          {...rest}
-          className={classnames(wrapperBaseClasses, styles.horizontal, styles.sticky)}
-          style={styleWithHelpers}
-          ref={scrollPageContainerRef}
-        >
-          <header
-            className={classnames(styles.headerWrapper, styles.sticky)}
-            ref={headerRefCallback}
-          >
-            {header}
-            {navPanelVisible && <div className={styles.navPanelWrapper}>{navPanel}</div>}
-          </header>
-          <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
-            <div className={pagesWrapperClasses}>{children}</div>
-          </div>
-          <div 
-            className={classnames(styles.footerWrapper, {
-              [styles.nonSticky]: footerShouldBeNonSticky,
-            })} 
-            ref={footerRefCallback}
-          >
-            {footer}
-          </div>
-        </div>
-      );
-      break;
-    case "desktop":
-      content = (
-        <div
-          {...rest}
-          className={classnames(wrapperBaseClasses, styles.desktop)}
-          style={styleWithHelpers}
-        >
-          {header && (
-            <header
-              className={classnames(styles.headerWrapper, styles.sticky)}
-              ref={headerRefCallback}
-            >
-              {header}
-            </header>
-          )}
-          <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
-            <div className={styles.PagesWrapperInner}>{children}</div>
-          </div>
-          {footer && (
-            <div className={classnames(styles.footerWrapper, styles.sticky)} ref={footerRefCallback}>
-              {footer}
-            </div>
-          )}
-        </div>
-      );
-      break;
-    default:
-      throw new Error("layout type not supported: " + safeLayout);
-  }
+          {renderFooterSlot()}
+        </>
+      ) : config.navPanelPosition === "side" ? (
+        <>
+          {navPanelVisible && <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>}
+          <AppContentSlot ref={pageScrollRef}>
+            {renderHeaderSlot()}
+            {renderPagesSlot()}
+            {renderFooterSlot()}
+          </AppContentSlot>
+        </>
+      ) : (
+        <>
+          {(header ||
+            (config.showCondensedHeader && !hasRegisteredHeader && hasRegisteredNavPanel) ||
+            (config.navPanelInHeader && navPanelVisible)) &&
+            renderHeaderSlot()}
+          {renderPagesSlot()}
+          {renderFooterSlot()}
+        </>
+      )}
+    </AppContainer>
+  );
 
   // Memoize the rendered nav panel in drawer to prevent unnecessary re-renders
   const memoizedNavPanelInDrawer = useMemo(
@@ -594,11 +462,6 @@ export function App({
       name !== undefined ? <Helmet defaultTitle={name} titleTemplate={`%s | ${name}`} /> : null,
     [name],
   );
-
-  // Memoize the onOpenChange callback
-  const handleOpenChange = useCallback((open) => {
-    setDrawerVisible(open);
-  }, []);
 
   return (
     <>
@@ -627,3 +490,312 @@ export function getAppLayoutOrientation(appLayout?: AppLayoutType) {
       return "horizontal";
   }
 }
+
+/**
+ * Custom hook to manage theme and tone initialization.
+ * Handles initial theme setup and system theme preference detection.
+ * 
+ * @param defaultTone - Initial tone preference ("dark", "light", or undefined for auto-detect)
+ * @param defaultTheme - Initial theme ID to activate
+ * @param autoDetectTone - Whether to auto-detect system theme preference
+ * @param setActiveThemeTone - Function to set the active theme tone
+ * @param setActiveThemeId - Function to set the active theme ID
+ */
+function useThemeInitialization({
+  defaultTone,
+  defaultTheme,
+  autoDetectTone,
+  setActiveThemeTone,
+  setActiveThemeId,
+}: {
+  defaultTone?: string;
+  defaultTheme?: string;
+  autoDetectTone: boolean;
+  setActiveThemeTone: (tone: "dark" | "light") => void;
+  setActiveThemeId: (id: string) => void;
+}) {
+  const mounted = useRef(false);
+
+  // Initial theme and tone setup - runs once on mount
+  useEffect(() => {
+    if (mounted.current) return;
+    mounted.current = true;
+
+    // Set tone: explicit defaultTone, or auto-detect from system
+    if (defaultTone === "dark" || defaultTone === "light") {
+      setActiveThemeTone(defaultTone as any);
+    } else if (autoDetectTone) {
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const detectedTone = systemPrefersDark ? "dark" : "light";
+      setActiveThemeTone(detectedTone);
+    }
+
+    // Set theme ID if provided
+    if (defaultTheme) {
+      setActiveThemeId(defaultTheme);
+    }
+
+    return () => {
+      mounted.current = false;
+    };
+  }, [defaultTone, defaultTheme, autoDetectTone, setActiveThemeTone, setActiveThemeId]);
+
+  // Listen for system theme changes when autoDetectTone is enabled
+  useEffect(() => {
+    if (!autoDetectTone || defaultTone) return;
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    const handleThemeChange = (e: MediaQueryListEvent) => {
+      const detectedTone = e.matches ? "dark" : "light";
+      setActiveThemeTone(detectedTone);
+    };
+
+    mediaQuery.addEventListener('change', handleThemeChange);
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleThemeChange);
+    };
+  }, [autoDetectTone, defaultTone, setActiveThemeTone]);
+}
+
+/**
+ * Custom hook to manage drawer state with auto-close behavior.
+ * Consolidates all drawer-related state updates in one place.
+ */
+function useDrawerState(
+  location: ReturnType<typeof useLocation>,
+  navPanelVisible: boolean,
+  safeLayout: AppLayoutType
+) {
+  const [drawerVisible, setDrawerVisible] = useState(false);
+
+  const toggleDrawer = useCallback(() => {
+    setDrawerVisible((prev) => !prev);
+  }, []);
+
+  const handleOpenChange = useCallback((open: boolean) => {
+    setDrawerVisible(open);
+  }, []);
+
+  // Close drawer when: 1) nav panel becomes visible (large screen), 2) location/layout changes
+  // This ensures drawer is closed when it's no longer needed or context has changed
+  useEffect(() => {
+    setDrawerVisible(false);
+  }, [navPanelVisible, location, safeLayout]);
+
+  return {
+    drawerVisible,
+    toggleDrawer,
+    handleOpenChange,
+    showDrawer: useCallback(() => setDrawerVisible(true), []),
+    hideDrawer: useCallback(() => setDrawerVisible(false), []),
+  };
+}
+
+/**
+ * Custom hook for observing element size changes.
+ * Returns a ref callback and the observed height.
+ */
+function useElementSizeObserver() {
+  const ref = useRef<HTMLElement | null>(null);
+  const [height, setHeight] = useState(0);
+  
+  const refCallback = useCallback((element: HTMLElement | null) => {
+    ref.current = element;
+  }, []);
+  
+  useResizeObserver(
+    ref,
+    useCallback((entries) => {
+      const rect = entries?.[0]?.contentRect;
+      if (rect) {
+        setHeight(rect.height);
+      }
+    }, [])
+  );
+  
+  return { refCallback, height };
+}
+
+/**
+ * Layout configuration interface defining how each layout variant should be rendered.
+ */
+interface LayoutConfig {
+  containerClasses: string[];
+  containerScrollRef?: boolean;
+  headerClasses: string[];
+  footerClasses: string[];
+  navPanelPosition: "side" | "header" | "none";
+  contentWrapperRef: "page" | "content";
+  useVerticalFullHeaderStructure?: boolean;
+  navPanelInHeader?: boolean;
+  showCondensedHeader?: boolean;
+}
+
+/**
+ * Base layout configuration with common defaults.
+ */
+const baseLayoutConfig: LayoutConfig = {
+  containerClasses: [],
+  headerClasses: [],
+  footerClasses: [],
+  navPanelPosition: "none",
+  contentWrapperRef: "content",
+};
+
+/**
+ * Layout configurations for all supported layout types.
+ * Defines the structure and styling for each layout variant.
+ */
+const layoutConfigs: Record<AppLayoutType, LayoutConfig> = {
+  "vertical": {
+    ...baseLayoutConfig,
+    containerClasses: [styles.vertical],
+    navPanelPosition: "side",
+    contentWrapperRef: "page",
+  },
+  "vertical-sticky": {
+    ...baseLayoutConfig,
+    containerClasses: [styles.vertical, styles.sticky],
+    headerClasses: [styles.sticky],
+    navPanelPosition: "side",
+    contentWrapperRef: "page",
+  },
+  "vertical-full-header": {
+    ...baseLayoutConfig,
+    containerClasses: [styles.verticalFullHeader],
+    containerScrollRef: true,
+    headerClasses: [styles.sticky],
+    navPanelPosition: "side",
+    useVerticalFullHeaderStructure: true,
+  },
+  "horizontal": {
+    ...baseLayoutConfig,
+    containerClasses: [styles.horizontal],
+    containerScrollRef: true,
+    navPanelPosition: "header",
+    navPanelInHeader: true,
+  },
+  "horizontal-sticky": {
+    ...baseLayoutConfig,
+    containerClasses: [styles.horizontal, styles.sticky],
+    containerScrollRef: true,
+    headerClasses: [styles.sticky],
+    navPanelPosition: "header",
+    navPanelInHeader: true,
+  },
+  "condensed": {
+    ...baseLayoutConfig,
+    containerClasses: [styles.horizontal],
+    containerScrollRef: true,
+    showCondensedHeader: true,
+  },
+  "condensed-sticky": {
+    ...baseLayoutConfig,
+    containerClasses: [styles.horizontal, styles.sticky],
+    containerScrollRef: true,
+    headerClasses: [styles.sticky],
+    showCondensedHeader: true,
+  },
+  "desktop": {
+    ...baseLayoutConfig,
+    containerClasses: [styles.desktop],
+    headerClasses: [styles.sticky],
+  },
+};
+
+/**
+ * Custom hook for creating the App layout context value.
+ * Encapsulates the logic for building the layout context and its dependencies.
+ */
+function useAppLayoutContextValue({
+  hasRegisteredNavPanel,
+  hasRegisteredHeader,
+  navPanelVisible,
+  drawerVisible,
+  showDrawer,
+  hideDrawer,
+  layout,
+  logo,
+  logoDark,
+  logoLight,
+  toggleDrawer,
+  navPanelDef,
+  logoContentDef,
+  registerSubNavPanelSlot,
+  subNavPanelSlot,
+  scrollWholePage,
+  isNested,
+}: {
+  hasRegisteredNavPanel: boolean;
+  hasRegisteredHeader: boolean;
+  navPanelVisible: boolean;
+  drawerVisible: boolean;
+  showDrawer: () => void;
+  hideDrawer: () => void;
+  layout: AppLayoutType;
+  logo?: string;
+  logoDark?: string;
+  logoLight?: string;
+  toggleDrawer: () => void;
+  navPanelDef?: ComponentDef;
+  logoContentDef?: ComponentDef;
+  registerSubNavPanelSlot: (element: any) => void;
+  subNavPanelSlot: any;
+  scrollWholePage: boolean;
+  isNested: boolean;
+}): IAppLayoutContext {
+  return useMemo<IAppLayoutContext>(
+    () => ({
+      hasRegisteredNavPanel,
+      hasRegisteredHeader,
+      navPanelVisible,
+      drawerVisible,
+      layout,
+      logo,
+      logoDark,
+      logoLight,
+      showDrawer,
+      hideDrawer,
+      toggleDrawer,
+      navPanelDef,
+      logoContentDef,
+      registerSubNavPanelSlot,
+      subNavPanelSlot,
+      scrollWholePage,
+      isFullVerticalWidth: false,
+      isNested,
+    }),
+    [
+      hasRegisteredNavPanel,
+      hasRegisteredHeader,
+      navPanelVisible,
+      drawerVisible,
+      layout,
+      logo,
+      logoDark,
+      logoLight,
+      showDrawer,
+      hideDrawer,
+      toggleDrawer,
+      navPanelDef,
+      logoContentDef,
+      registerSubNavPanelSlot,
+      subNavPanelSlot,
+      scrollWholePage,
+      isNested,
+    ]
+  );
+}
+
+/**
+ * Helper function to determine if header/footer height CSS variables should be set
+ * based on the layout type and scroll strategy.
+ * 
+ * Non-sticky layouts (vertical, horizontal, condensed) with scrollWholePage=true don't 
+ * need height compensation because the header/footer scroll with the page.
+ * 
+ * Sticky layouts (vertical-sticky, vertical-full-header, desktop) or content-only scroll
+ * need height compensation so content can be positioned correctly.
+ */

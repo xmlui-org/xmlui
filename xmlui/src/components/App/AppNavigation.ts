@@ -13,9 +13,9 @@ export interface NavHierarchyNode {
 }
 
 /**
- * Result of extracting special App2 components from children.
+ * Result of extracting special App components from children.
  */
-export interface ExtractedComponents {
+interface ExtractedComponents {
   AppHeader?: ComponentDef;
   Footer?: ComponentDef;
   NavPanel?: ComponentDef;
@@ -59,7 +59,7 @@ export function parseHierarchyLabels(labelText: string): string[] {
 // --- Component Extraction Helper Functions ---
 
 /**
- * Extract App2 special components (AppHeader, Footer, NavPanel, Pages) from children.
+ * Extract App special components (AppHeader, Footer, NavPanel, Pages) from children.
  * Handles Theme wrappers by unwrapping special components while preserving Theme for others.
  */
 export function extractAppComponents(children: ComponentDef[] | undefined): ExtractedComponents {
