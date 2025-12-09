@@ -21,6 +21,26 @@ export function partition<T>(array: Array<T>, discriminator: (v: T) => boolean) 
 }
 
 /**
+ * Partition a single object into two based on a discriminator function.
+ * @param obj Input object
+ * @param discriminator Does the separation of data - receives optional key and/or value parameters
+ * @returns An array containing the two disjunct objects
+ */
+export function partitionObject<T extends Record<string, any>>(
+  obj: T,
+  discriminator: (k?: string, v?: any) => boolean,
+): [T, T] {
+  return Object.entries(obj).reduce(
+    ([pass, fail], [key, value]) => {
+      return discriminator(key, value)
+        ? [{ ...pass, [key]: value }, fail]
+        : [pass, { ...fail, [key]: value }];
+    },
+    [{} as T, {} as T],
+  );
+}
+
+/**
  * The value used last time for ID generation
  */
 let lastIdValue = 1;

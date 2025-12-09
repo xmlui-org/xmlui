@@ -89,7 +89,7 @@ interface SelectProps {
 
   // Grouping
   groupBy?: string;
-  groupHeaderRenderer?: (groupName: string) => ReactNode;
+  groupHeaderRenderer?: (contextVars: Record<string, any>) => ReactNode;
   ungroupedHeaderRenderer?: () => ReactNode;
 
   // Internal
@@ -303,10 +303,15 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     if (!groupBy) return null;
 
     const optionsToGroup = searchTerm ? filteredOptions : Array.from(options);
+
+    // Early return if no options to group - prevents empty dropdown issue
+    if (optionsToGroup.length === 0) return null;
+
     const groups: Record<string, Option[]> = {};
 
     optionsToGroup.forEach((option) => {
-      const groupKey = (option as any)[groupBy] || "Ungrouped";
+      // Use nullish coalescing to properly handle falsy values like 0, "", or false
+      const groupKey = (option as any)[groupBy] ?? "Ungrouped";
       if (!groups[groupKey]) {
         groups[groupKey] = [];
       }
@@ -325,7 +330,8 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
         sortedGroups[key] = groups[key];
       });
 
-    return sortedGroups;
+    // Return null if no groups have any options
+    return Object.keys(sortedGroups).length > 0 ? sortedGroups : null;
   }, [groupBy, options, filteredOptions, searchTerm]);
 
   // Create a flat list from grouped options for keyboard navigation
@@ -743,7 +749,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                               )
                             ) : groupHeaderRenderer ? (
                               <div className={styles.groupHeader}>
-                                {groupHeaderRenderer(groupName)}
+                                {groupHeaderRenderer({ $group: groupName })}
                               </div>
                             ) : (
                               <div className={styles.groupHeader}>{groupName}</div>

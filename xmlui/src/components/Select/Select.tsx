@@ -243,12 +243,10 @@ export const selectComponentRenderer = createComponentRenderer(
         groupBy={extractValue(node.props.groupBy)}
         groupHeaderRenderer={
           node.props.groupHeaderTemplate
-            ? (groupName) => {
+            ? (contextVars) => {
                 return (
                   <MemoizedItem
-                    contextVars={{
-                      $group: groupName,
-                    }}
+                    contextVars={contextVars}
                     node={node.props.groupHeaderTemplate}
                     renderChild={renderChild}
                   />
