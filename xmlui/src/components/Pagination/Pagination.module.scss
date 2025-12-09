@@ -77,6 +77,16 @@ $gap-buttonRow-Pagination: createThemeVar("gap-buttonRow-Pagination");
       &:has(.startSlot):has(.endSlot):not(:has(.centerSlot)) {
         grid-template-columns: 1fr 1fr;
         grid-template-areas: "a c";
+
+        @media (max-width: 600px) {
+          grid-template-columns: 1fr;
+          grid-template-rows: auto auto;
+          grid-template-areas: "a" "c";
+
+          .startSlot,.endSlot {
+            justify-self: start;
+          }
+        }
       }
       
       // 1-column layout when only one slot is present
