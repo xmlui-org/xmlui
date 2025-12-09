@@ -439,7 +439,10 @@ export function App({
         </>
       ) : (
         <>
-          {(header || (config.showCondensedHeader && !hasRegisteredHeader && hasRegisteredNavPanel)) && renderHeaderSlot()}
+          {(header ||
+            (config.showCondensedHeader && !hasRegisteredHeader && hasRegisteredNavPanel) ||
+            (config.navPanelInHeader && navPanelVisible)) &&
+            renderHeaderSlot()}
           {renderPagesSlot()}
           {renderFooterSlot()}
         </>
