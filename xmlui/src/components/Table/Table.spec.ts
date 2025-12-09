@@ -6,7 +6,7 @@
  * accessibility features, and edge cases.
  * 
  * Test Results Summary:
- * - ✅ 25 tests passing
+ * - ✅ 25+ tests passing
  * - ⏭️ 6 tests skipped (require additional implementation investigation)
  * 
  * Key Testing Insights:
@@ -1222,22 +1222,369 @@ test.describe("Features Needing Investigation", () => {
       await expect(cells.nth(3)).toHaveText("10");
     }
   );
+});
 
-  test("pagination works correctly",
-    async ({ initTestBed, page }) => {
+// =============================================================================
+// PAGINATION FEATURES TESTS
+// =============================================================================
+
+test.describe("Pagination Features", () => {
+  // Create data sets for testing
+  const smallDataSet = [
+    { id: 1, name: "Item 1" },
+    { id: 2, name: "Item 2" },
+  ];
+
+  const largeDataSet = [
+    { id: 1, name: "Item 1" },
+    { id: 2, name: "Item 2" },
+    { id: 3, name: "Item 3" },
+    { id: 4, name: "Item 4" },
+    { id: 5, name: "Item 5" },
+    { id: 6, name: "Item 6" },
+    { id: 7, name: "Item 7" },
+    { id: 8, name: "Item 8" },
+    { id: 9, name: "Item 9" },
+    { id: 10, name: "Item 10" },
+    { id: 11, name: "Item 11" },
+    { id: 12, name: "Item 12" },
+  ];
+
+  test.describe("Auto-inference of isPaginated", () => {
+    test("auto-enables pagination when pageSize is set and data length exceeds pageSize", async ({ initTestBed, page }) => {
       await initTestBed(`
         <Table 
-          data='{${JSON.stringify(sampleData)}}' 
-          isPaginated="true" 
+          data='{${JSON.stringify(largeDataSet)}}' 
+          pageSize="5"
           testId="table"
         >
           <Column bindTo="name"/>
         </Table>
       `);
+      
+      // Pagination controls should be visible because data length (12) > pageSize (5)
       await expect(page.locator("button[aria-label*='Previous page']")).toBeVisible();
       await expect(page.locator("button[aria-label*='Next page']")).toBeVisible();
-    }
-  );
+      
+      // Should only show 5 items per page
+      const visibleRows = page.locator("tbody tr");
+      await expect(visibleRows).toHaveCount(5);
+    });
+
+    test("does not auto-enable pagination when data length is less than or equal to pageSize", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(smallDataSet)}}' 
+          pageSize="5"
+          testId="table"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      
+      // Pagination controls should NOT be visible because data length (2) <= pageSize (5)
+      await expect(page.locator("button[aria-label*='Previous page']")).toHaveCount(0);
+      await expect(page.locator("button[aria-label*='Next page']")).toHaveCount(0);
+      
+      // Should show all items
+      const visibleRows = page.locator("tbody tr");
+      await expect(visibleRows).toHaveCount(2);
+    });
+
+    test("respects explicit isPaginated=false even when pageSize is set", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(largeDataSet)}}' 
+          isPaginated="false"
+          pageSize="5"
+          testId="table"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      
+      // Pagination controls should NOT be visible because isPaginated is explicitly false
+      await expect(page.locator("button[aria-label*='Previous page']")).toHaveCount(0);
+      await expect(page.locator("button[aria-label*='Next page']")).toHaveCount(0);
+      
+      // Should show all items (no pagination)
+      const visibleRows = page.locator("tbody tr");
+      await expect(visibleRows).toHaveCount(12);
+    });
+
+    test("respects explicit isPaginated=true even when data length is less than pageSize", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(smallDataSet)}}' 
+          isPaginated="true"
+          pageSize="5"
+          testId="table"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      
+      // Pagination controls should NOT be visible because there's only one page
+      // (implicit hiding when totalPages <= 1)
+      await expect(page.locator("button[aria-label*='Previous page']")).toHaveCount(0);
+      await expect(page.locator("button[aria-label*='Next page']")).toHaveCount(0);
+      
+      // Should show all items
+      const visibleRows = page.locator("tbody tr");
+      await expect(visibleRows).toHaveCount(2);
+    });
+
+    test("auto-enables pagination when pageSize equals data length (edge case)", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(smallDataSet)}}' 
+          pageSize="2"
+          testId="table"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      
+      // Pagination controls should NOT be visible because data length (2) is not > pageSize (2)
+      await expect(page.locator("button[aria-label*='Previous page']")).toHaveCount(0);
+      await expect(page.locator("button[aria-label*='Next page']")).toHaveCount(0);
+    });
+  });
+
+  test.describe("Implicit hiding of pagination controls", () => {
+    test("hides pagination controls when there is only one page", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(smallDataSet)}}' 
+          isPaginated="true"
+          pageSize="10"
+          testId="table"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      
+      // Pagination controls should be hidden because totalPages = 1
+      await expect(page.locator("button[aria-label*='Previous page']")).toHaveCount(0);
+      await expect(page.locator("button[aria-label*='Next page']")).toHaveCount(0);
+    });
+
+    test("shows pagination controls when there are multiple pages", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(largeDataSet)}}' 
+          isPaginated="true"
+          pageSize="5"
+          testId="table"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      
+      // Pagination controls should be visible because totalPages > 1
+      await expect(page.locator("button[aria-label*='Previous page']")).toBeVisible();
+      await expect(page.locator("button[aria-label*='Next page']")).toBeVisible();
+    });
+
+    test("hides pagination controls when data is empty", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table 
+          data='{[]}' 
+          isPaginated="true"
+          pageSize="5"
+          testId="table"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      
+      // Pagination controls should be hidden because there's no data (0 pages)
+      await expect(page.locator("button[aria-label*='Previous page']")).toHaveCount(0);
+      await expect(page.locator("button[aria-label*='Next page']")).toHaveCount(0);
+    });
+
+    test("hides pagination controls when pageSize is larger than data", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(smallDataSet)}}' 
+          isPaginated="true"
+          pageSize="100"
+          testId="table"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      
+      // Pagination controls should be hidden because totalPages = 1
+      await expect(page.locator("button[aria-label*='Previous page']")).toHaveCount(0);
+      await expect(page.locator("button[aria-label*='Next page']")).toHaveCount(0);
+    });
+  });
+
+  test.describe("alwaysShowPagination property", () => {
+    test("explicitly shows pagination controls when alwaysShowPagination=true even with one page", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(smallDataSet)}}' 
+          isPaginated="true"
+          pageSize="10"
+          alwaysShowPagination="true"
+          testId="table"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      
+      // Pagination controls should be visible because alwaysShowPagination=true
+      await expect(page.locator("button[aria-label*='Previous page']")).toBeVisible();
+      await expect(page.locator("button[aria-label*='Next page']")).toBeVisible();
+    });
+
+    test("explicitly hides pagination controls when alwaysShowPagination=false even with multiple pages", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(largeDataSet)}}' 
+          isPaginated="true"
+          pageSize="5"
+          alwaysShowPagination="false"
+          testId="table"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      
+      // Pagination controls should be hidden because a=false
+      await expect(page.locator("button[aria-label*='Previous page']")).toHaveCount(0);
+      await expect(page.locator("button[aria-label*='Next page']")).toHaveCount(0);
+      
+      // But pagination should still work (only showing first page)
+      const visibleRows = page.locator("tbody tr");
+      await expect(visibleRows).toHaveCount(5);
+    });
+
+    test("uses implicit hiding when alwaysShowPagination is omitted", async ({ initTestBed, page }) => {
+      // Test with one page - should hide
+      await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(smallDataSet)}}' 
+          isPaginated="true"
+          pageSize="10"
+          testId="table"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      
+      await expect(page.locator("button[aria-label*='Previous page']")).toHaveCount(0);
+      await expect(page.locator("button[aria-label*='Next page']")).toHaveCount(0);
+      
+      // Test with multiple pages - should show
+      await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(largeDataSet)}}' 
+          isPaginated="true"
+          pageSize="5"
+          testId="table"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      
+      await expect(page.locator("button[aria-label*='Previous page']")).toBeVisible();
+      await expect(page.locator("button[aria-label*='Next page']")).toBeVisible();
+    });
+
+    test("alwaysShowPagination overrides implicit hiding behavior", async ({ initTestBed, page }) => {
+      // With one page, normally controls would be hidden, but alwaysShowPagination=true should show them
+      await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(smallDataSet)}}' 
+          testId="table"
+          alwaysShowPagination="true"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      
+      await expect(page.locator("button[aria-label*='Previous page']")).toBeVisible();
+      await expect(page.locator("button[aria-label*='Next page']")).toBeVisible();
+    });
+  });
+
+  test.describe("Combined pagination features", () => {
+    test("auto-inference and implicit hiding work together", async ({ initTestBed, page }) => {
+      // pageSize set, data length > pageSize -> auto-enable pagination
+      // But if only one page results, controls should be hidden
+      const exactlyOnePageData = [
+        { id: 1, name: "Item 1" },
+        { id: 2, name: "Item 2" },
+        { id: 3, name: "Item 3" },
+        { id: 4, name: "Item 4" },
+        { id: 5, name: "Item 5" },
+      ];
+      
+      await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(exactlyOnePageData)}}' 
+          pageSize="5"
+          testId="table"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      
+      // Pagination should be enabled (data length = pageSize, so not auto-enabled)
+      // But controls should be hidden because totalPages = 1
+      await expect(page.locator("button[aria-label*='Previous page']")).toHaveCount(0);
+      await expect(page.locator("button[aria-label*='Next page']")).toHaveCount(0);
+    });
+
+    test("pagination controls location respects visibility rules", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(largeDataSet)}}' 
+          isPaginated="true"
+          pageSize="5"
+          paginationControlsLocation="both"
+          testId="table"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      
+      // Should show controls at both top and bottom when there are multiple pages
+      const paginationControls = page.locator("nav[aria-label='Pagination']");
+      const controlCount = await paginationControls.count();
+      await expect(controlCount).toBeGreaterThan(0);
+      
+      // Controls should be visible
+      await expect(page.locator("button[aria-label*='Previous page']").first()).toBeVisible();
+      await expect(page.locator("button[aria-label*='Next page']").first()).toBeVisible();
+    });
+
+    test("pagination works correctly with pageSizeOptions", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(largeDataSet)}}' 
+          isPaginated="true"
+          pageSize="5"
+          pageSizeOptions="{[5, 10, 20]}"
+          testId="table"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      
+      // Pagination controls should be visible
+      await expect(page.locator("button[aria-label*='Previous page']")).toBeVisible();
+      await expect(page.locator("button[aria-label*='Next page']")).toBeVisible();
+      
+      // Should show page size selector (if enabled)
+      // Note: This depends on showPageSizeSelector default value
+      const visibleRows = page.locator("tbody tr");
+      await expect(visibleRows).toHaveCount(5);
+    });
+  });
 });
 
 // =============================================================================
