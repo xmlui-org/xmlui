@@ -8,9 +8,9 @@
       <Select
         id="pickTheme"
         width="30%"
-        initialValue="default"
+        initialValue="xmlui"
         onDidChange="(newTheme) => setTheme(newTheme)">
-        <Option value="default" label="xmlui"/>
+        <Option value="xmlui" label="xmlui"/>
         <Option value="earthtone" label="earthtone"/>
         <Option value="xmlui-green-on-default" label="xmlui-green"/>
         <Option value="xmlui-orange-on-default" label="xmlui-orange"/>
