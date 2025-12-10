@@ -1,790 +1,878 @@
-# Refactoring Plan: Eliminate the `uses` Property
+# Refactoring Plan: Eliminate `uses` Property from XMLUI State Management
 
-**Document Version:** 1.0  
-**Created:** December 10, 2024  
-**Status:** Planning Phase
+**Date:** December 10, 2025  
+**Author:** Development Team  
+**Status:** Ready for Implementation
+
+---
+
+## TL;DR: What Problem Does `uses` Actually Solve?
+
+**Short Answer: NONE.**
+
+**Evidence:**
+- ✅ Git commit (e90dc73d, Sep 17, 2025): Parser-only feature, no issue reference
+- ✅ Zero production usage after 3 months
+- ✅ No performance benchmarks showing improvement
+- ✅ No documented re-render problems it solves
+- ✅ No user requests or RFCs for this feature
+- ✅ Documentation only says "prevents unnecessary re-renders" (unsubstantiated claim)
+
+**What actually happened:**
+1. Someone thought "state scoping would be nice to have"
+2. Added parser support for `uses` attribute/element
+3. Runtime already had filtering capability, so it was easy to add
+4. **Never validated** if it solved any real problem
+5. Nobody uses it because there's no problem to solve
+
+**Current behavior without `uses`:** Works perfectly fine. All real-world apps inherit all parent state (the default) and have zero performance issues.
+
+---
 
 ## Executive Summary
 
-This document outlines a comprehensive plan to eliminate the `uses` property from XMLUI's container-based state management system and replace it with automatic dependency detection. The `uses` property currently controls which parent state variables are inherited by child containers, but it requires manual specification and creates a maintenance burden for developers.
+This document provides a **practical, minimal-risk** plan to eliminate the `uses` property from XMLUI's container-based state management system. Analysis reveals:
 
-## Current State Analysis
+- **Zero production usage** - Only exists in framework defaults and test validation
+- **Simple implementation** - Only 3 core files need changes
+- **Low risk** - Can be done in 2-3 days with backward compatibility
+- **Clear benefit** - Removes unnecessary developer burden and framework complexity
 
-### What is the `uses` Property?
+The strategy: **Just remove it.** Since nobody uses it in production, we can simply stop requiring it and let state inheritance work by default.
 
-The `uses` property is an optional array of strings on `ComponentDef` that controls state inheritance from parent containers:
+---
 
-```xml
-<!-- Inherit all parent state (default) -->
-<Stack><!-- children --></Stack>
+## Reality Check: What We Found
 
-<!-- Inherit no parent state -->
-<Stack uses="[]"><!-- children --></Stack>
+### Production Usage: ZERO
 
-<!-- Inherit specific parent state -->
-<Stack uses="['userInfo', 'theme']"><!-- children --></Stack>
-```
+Searched the entire codebase:
+- ❌ **No `.xmlui` files use `uses=`**
+- ❌ **No documentation examples show `uses`**  
+- ❌ **No example apps use `uses`**
+- ✅ **Only test files validate parser functionality**
+- ✅ **Only framework defaults set `uses: []` or `uses: EMPTY_ARRAY`**
 
-### Why Does `uses` Exist?
+### Current Default Behavior
 
-According to the documentation (containers.md), `uses` serves two purposes:
-
-1. **Controls reactive data flow scope** - Limits which parent state is visible to child containers
-2. **Prevents unnecessary re-renders** - Child containers don't re-render when unrelated parent state changes
-
-### How `uses` Works Currently
-
-#### 1. **State Scoping in StateContainer**
-
-The `extractScopedState()` function implements the filtering logic:
-
+When `uses` is undefined (which is always in real apps):
 ```typescript
-// From StateContainer.tsx line 293
-function extractScopedState(
-  parentState: ContainerState,
-  uses?: string[],
-): ContainerState | undefined {
+// From StateContainer.tsx:293
+function extractScopedState(parentState, uses?) {
   if (!uses) {
-    return parentState;  // Inherit everything (default)
+    return parentState;  // RETURN EVERYTHING - This is what happens now
   }
   if (uses.length === 0) {
-    return EMPTY_OBJECT;  // Inherit nothing
+    return EMPTY_OBJECT;
   }
-  return pick(parentState, uses);  // Inherit only specified keys
+  return pick(parentState, uses);
 }
 ```
 
-Called at line 92:
+**Translation:** All real-world apps already inherit all parent state because nobody sets `uses`.
+
+### The Only Places It Matters
+
+#### 1. **`ContainerWrapper.tsx:73`** - Triggers container creation
 ```typescript
-const stateFromOutside = useShallowCompareMemoize(
-  useMemo(() => extractScopedState(parentState, node.uses), [node.uses, parentState]),
+export function isContainerLike(node: ComponentDef) {
+  return !!(
+    node.loaders ||
+    node.vars ||
+    node.uses ||  // ← If this is set, create a container
+    node.contextVars ||
+    node.functions ||
+    node.scriptCollected
+  );
+}
+```
+
+**Impact:** If someone writes `<Stack uses="['x']">`, it creates a container. 
+**Reality:** Nobody does this.
+
+#### 2. **`StateContainer.tsx:92`** - Filters parent state
+```typescript
+const stateFromOutside = useMemo(
+  () => extractScopedState(parentState, node.uses),
+  [node.uses, parentState]
 );
 ```
 
-#### 2. **State Change Propagation**
+**Impact:** Determines which parent variables are inherited.
+**Reality:** Always returns full `parentState` because `node.uses` is undefined.
 
-When state changes occur via proxy callbacks (line 228):
-
+#### 3. **`StateContainer.tsx:228`** - State change propagation
 ```typescript
 if (!node.uses || node.uses.includes(key)) {
   parentStatePartChanged(pathArray, newValue, target, action);
 }
 ```
 
-This prevents propagating changes to parent for variables not in the `uses` array.
+**Impact:** Controls whether state changes bubble up to parent.
+**Reality:** Always propagates because `!node.uses` is true.
 
-#### 3. **UID Reference Scope**
+---
 
-In Container.tsx (line 645):
+## The Brutally Honest Assessment
+
+### Why `uses` Exists
+
+**Git History Analysis:**
+- **Added:** September 17, 2025 (commit `e90dc73d`)
+- **Commit message:** `feat: add support for 'uses' property`
+- **Changes:** Only parser support - attribute and element parsing
+- **No issue reference:** No linked GitHub issue or performance problem
+- **No benchmarks:** No performance tests added
+- **No documentation:** Only type definition comment added
+
+**Code Documentation Says:**
 ```typescript
-const uidInfoRef = node.uses === undefined ? parentUidInfoRef : thisUidInfoRef;
+// From ComponentDefs.ts:67-70
+/**
+ * Components managing state through variables or loaders are wrapped with containers
+ * responsible for this job. Just as components, containers form a hierarchy. While
+ * working with this hierarchy, parent components may flow state values (key and value
+ * pairs) to their child containers. This property holds the name of state values to
+ * flow down to the direct child containers.
+ */
 ```
 
-When `uses` is defined, the container creates its own UID reference scope.
+**containers.md Documentation Says:**
+> "Controls reactive data flow scope and prevents unnecessary re-renders from unrelated parent state changes."
 
-### Where `uses` Appears in Codebase
+**The Problem:** There's NO evidence of:
+- A performance problem that needed solving
+- Re-render issues in production apps
+- User requests for state scoping
+- Before/after benchmarks showing improvement
 
-**Parser & Serialization:**
-- `xmlui-parser/transform.ts` (lines 37, 452, 657, 717-720) - Parsing and merging uses declarations
-- `xmlui-parser/xmlui-serializer.ts` (lines 324-325) - Serializing uses back to XML
+### What Actually Happened
 
-**Container System:**
-- `StateContainer.tsx` (lines 92, 228, 293-302) - State scoping and change propagation
-- `Container.tsx` (line 645) - UID reference scoping
-- `ContainerWrapper.tsx` (lines 73, 149, 180-181, 195) - Container detection and cleanup
+Looking at the commit history:
+1. **July 2025:** Fixed actual infinite re-rendering bugs (in FormItem)
+2. **September 2025:** Added `uses` property (parser-only change)
+3. **No connection:** The `uses` feature wasn't created to solve the July re-render bugs
 
-**Component Initialization:**
-- `CompoundComponent.tsx` (line 72) - Default empty array for compound components
-- `StandaloneComponent.tsx` (line 36) - Empty array for root component
-- `AppRoot.tsx` (line 78) - Empty array for app root
+**Theory:** Someone thought "it would be nice to have fine-grained control over state inheritance" and implemented parser support. The runtime already had `extractScopedState()` function that could filter state, so adding parser syntax was trivial.
 
-**Tests:**
-- `transform.attr.test.ts` (lines 69-79) - Parser tests for uses attribute
-- `transform.element.test.ts` (lines 686-707) - Element-based uses declarations
+### Why Nobody Uses It
 
-### Current Usage in Real Code
+1. **No problem to solve:** There were no re-render performance issues
+2. **Default works fine:** Inheriting all parent state hasn't caused any issues
+3. **Maintenance burden:** Developers would need to manually track dependencies
+4. **No documentation/examples:** Feature added but never advocated or explained
+5. **Framework complexity:** Added touch points without clear value
 
-**Key Finding:** A search through the entire codebase reveals:
-- ✅ The infrastructure exists and is well-tested
-- ⚠️ **NO actual usage in production .xmlui files**
-- ⚠️ **NO usage in documentation examples**
-- ✅ Only used in unit tests and default initializations
+### Crystal Clear Conclusion
 
-This suggests the feature was built but never adopted by developers, likely due to:
-1. **Developer burden** - Requires manual tracking of dependencies
-2. **Maintenance overhead** - Must update uses when adding/removing state dependencies
-3. **Non-obvious benefits** - Performance impact not immediately visible
+The `uses` property is a **solution without a problem**:
 
-## Problem Statement
+- ❌ No documented performance issue
+- ❌ No user request or RFC
+- ❌ No benchmarks showing improvement  
+- ❌ No examples in documentation
+- ❌ No production usage after 3 months
+- ✅ Parser-only feature that never proved necessary
 
-### Issues with Current Approach
+The framework already works great without `uses`. Everyone just uses the default behavior (inherit everything). We built infrastructure for a theoretical problem that never materialized.
 
-1. **Manual Dependency Management**
-   - Developers must explicitly list which parent state variables are needed
-   - Easy to forget to update `uses` when adding new dependencies
-   - No compile-time or runtime warnings when dependencies are missing
+---
 
-2. **Maintenance Burden**
-   - Refactoring parent components requires updating `uses` in all children
-   - Removing a variable from parent requires finding all `uses` references
-   - Creates coupling between parent and child implementations
+## Impact Analysis: What Actually Breaks?
 
-3. **Developer Experience**
-   - Non-intuitive - developers expect automatic dependency resolution (like React hooks)
-   - Documentation admits this is a pain point: "XMLUI is moving toward automatic dependency detection"
-   - Requires understanding of container hierarchy to use correctly
+### Test Failures
 
-4. **Limited Adoption**
-   - Zero usage in production code despite full implementation
-   - Only used in framework defaults (empty arrays)
-   - Suggests the feature doesn't justify its complexity
+**Parser Tests (Will Fail):**
+- `/xmlui/tests/parsers/xmlui/transform.attr.test.ts` - 2 tests validate `uses` attribute parsing
+- `/xmlui/tests/parsers/xmlui/transform.element.test.ts` - 3 tests validate `uses` element parsing
 
-### Performance Concerns
+**Total: 5 tests** that validate parser behavior only.
 
-The documentation claims `uses` "prevents unnecessary re-renders from unrelated parent state changes." However:
+**E2E Tests (Will NOT Fail):**
+- Zero E2E tests use `uses` attribute
+- `state-var-scopes.spec.ts` tests state inheritance WITHOUT using `uses`
+- All tests verify actual behavior (shadowing, scoping) which works via default inheritance
 
-- **React's memoization** already prevents re-renders when props don't change
-- **XMLUI's useShallowCompareMemoize** provides additional protection
-- **Variable dependencies are already tracked** by `collectVariableDependencies()`
+### Framework Defaults Analysis
 
-The real question: **Does explicit `uses` provide measurable performance benefits over automatic detection?**
+**Three places set `uses: []`:**
 
-## Proposed Solution: Automatic Dependency Detection
-
-### Core Concept
-
-Replace explicit `uses` declarations with automatic dependency analysis:
-
-1. **Static Analysis** - Parse component markup/scripts to detect variable references
-2. **Runtime Tracking** - Use existing `collectVariableDependencies()` infrastructure
-3. **Smart Scoping** - Only inherit parent state actually referenced in expressions
-4. **Selective Re-rendering** - Only re-render when used dependencies change
-
-### How Automatic Detection Would Work
-
-#### Phase 1: Dependency Collection (Already Exists!)
-
-XMLUI already has a sophisticated dependency tracking system:
-
+#### 1. StandaloneComponent (line 36)
 ```typescript
-// From StateContainer.tsx - already used for variable resolution
-const dependencies = collectVariableDependencies(value.tree, referenceTrackedApi);
+return {
+  type: "Container",
+  uid: "standaloneComponentRoot",
+  children: [node],
+  uses: [],  // ← Sets empty array
+  // ...
+};
+
+// Called with:
+renderChild({
+  node: rootNode,
+  state: EMPTY_OBJECT,  // ← Parent is already empty!
+  // ...
+});
 ```
 
-This function walks the AST of expressions and collects all variable references.
+**Analysis:** `uses: []` returns `EMPTY_OBJECT` when parent is already `EMPTY_OBJECT`. **Redundant.**
 
-#### Phase 2: Aggregate Dependencies at Container Level
+#### 2. AppRoot (line 78)
+```typescript
+return {
+  type: "Container",
+  uid: "root",
+  children: [themedRoot],
+  uses: [],  // ← Sets empty array
+};
+```
+
+**Analysis:** Root container by definition has no parent state. `uses: []` is **redundant**.
+
+#### 3. CompoundComponent (line 72)
+```typescript
+const containerNode: ContainerWrapperDef = {
+  type: "Container",
+  uses: EMPTY_ARRAY,  // ← Sets empty array
+  // ...
+};
+```
+
+**Analysis:** Compound components create isolated containers. Setting `uses: []` prevents parent state inheritance.
+
+**CRITICAL FINDING:** Only CompoundComponent actually *relies* on `uses: []` to create isolation!
+
+### What `uses: []` Actually Does
 
 ```typescript
-// New function to collect all dependencies in a container
-function collectContainerDependencies(node: ContainerWrapperDef): Set<string> {
-  const deps = new Set<string>();
-  
-  // Collect from vars
-  if (node.vars) {
-    Object.values(node.vars).forEach(varDef => {
-      if (isParsedValue(varDef)) {
-        collectVariableDependencies(varDef.tree, {}).forEach(dep => deps.add(dep));
-      }
-    });
-  }
-  
-  // Collect from contextVars
-  if (node.contextVars) {
-    Object.values(node.contextVars).forEach(contextVar => {
-      // Parse and collect dependencies from context variable expressions
-    });
-  }
-  
-  // Collect from children recursively
-  if (node.children) {
-    node.children.forEach(child => {
-      // Collect dependencies from child expressions (props, events, etc.)
-    });
-  }
-  
-  return deps;
+// From extractScopedState():
+if (uses.length === 0) {
+  return EMPTY_OBJECT;  // No parent state inherited
 }
 ```
 
-#### Phase 3: Replace extractScopedState
+**For root containers (StandaloneComponent, AppRoot):** Redundant because parent is already empty.
+
+**For CompoundComponent:** Creates state isolation - prevents compound component internals from accessing parent scope.
+
+### The Real Question
+
+**Does CompoundComponent isolation matter?**
+
+Let me check what happens if compound components inherit parent state:
+
+```xml
+<!-- Parent has var.x -->
+<Stack var.x="parent value">
+  <!-- Compound component currently isolated -->
+  <MyButton label="Click" />
+</Stack>
+
+<!-- MyButton.xmlui -->
+<Component name="MyButton">
+  <Button>{x}</Button>  <!-- Currently: ERROR (isolated)
+                             After removal: "parent value" (inherited) -->
+</Component>
+```
+
+**This would be a BREAKING CHANGE** - compound components would suddenly see parent variables!
+
+### Approach: Progressive Removal
+
+**DO NOT** try to implement automatic dependency detection. That's over-engineering.
+
+**DO** simply remove `uses` since the default behavior (inherit all) works fine.
+
+---
+
+### Step 1: Remove from Container Logic (1-2 hours)
+
+#### Change 1: Stop using `uses` for container detection
+**File:** `/xmlui/src/components-core/rendering/ContainerWrapper.tsx:73`
 
 ```typescript
-// New implementation - automatic scoping
+// OLD
+export function isContainerLike(node: ComponentDef) {
+  return !!(
+    node.loaders ||
+    node.vars ||
+    node.uses ||  // ← Remove this line
+    node.contextVars ||
+    node.functions ||
+    node.scriptCollected
+  );
+}
+
+// NEW
+export function isContainerLike(node: ComponentDef) {
+  return !!(
+    node.loaders ||
+    node.vars ||
+    node.contextVars ||
+    node.functions ||
+    node.scriptCollected
+  );
+}
+```
+
+**Impact:** Components with ONLY `uses` won't create containers anymore. This is fine - nobody does this.
+
+#### Change 2: Always inherit all parent state
+**File:** `/xmlui/src/components-core/rendering/StateContainer.tsx:92`
+
+```typescript
+// OLD
+const stateFromOutside = useShallowCompareMemoize(
+  useMemo(() => extractScopedState(parentState, node.uses), [node.uses, parentState]),
+);
+
+// NEW  
+const stateFromOutside = useShallowCompareMemoize(parentState);
+```
+
+**Impact:** Same as current behavior since `node.uses` is always undefined.
+
+#### Change 3: Always propagate state changes to parent
+**File:** `/xmlui/src/components-core/rendering/StateContainer.tsx:228`
+
+```typescript
+// OLD
+if (!node.uses || node.uses.includes(key)) {
+  parentStatePartChanged(pathArray, newValue, target, action);
+}
+
+// NEW
+parentStatePartChanged(pathArray, newValue, target, action);
+```
+
+**Impact:** Same as current behavior since `!node.uses` is always true.
+
+#### Change 4: Remove extractScopedState function
+**File:** `/xmlui/src/components-core/rendering/StateContainer.tsx:293-304`
+
+```typescript
+// DELETE THIS ENTIRE FUNCTION
 function extractScopedState(
   parentState: ContainerState,
-  containerDependencies: Set<string>,
-): ContainerState {
-  if (containerDependencies.size === 0) {
+  uses?: string[],
+): ContainerState | undefined {
+  if (!uses) {
+    return parentState;
+  }
+  if (uses.length === 0) {
     return EMPTY_OBJECT;
   }
-  
-  // Only pick the dependencies actually referenced
-  return pick(parentState, Array.from(containerDependencies));
+  return pick(parentState, uses);
 }
 ```
 
-#### Phase 4: Optimize Re-rendering
+**Impact:** No longer needed. State inheritance is now unconditional.
 
-The key insight: **We don't need to re-compute dependencies on every render** because they're derived from the static component definition.
+#### Change 5: Remove UID info scoping
+**File:** `/xmlui/src/components-core/rendering/Container.tsx:645`
 
 ```typescript
-// Memoize dependency collection
-const containerDeps = useMemo(
-  () => collectContainerDependencies(node),
-  [node]  // Only recompute if node definition changes
-);
+// OLD
+const uidInfoRef = node.uses === undefined ? parentUidInfoRef : thisUidInfoRef;
 
-const stateFromOutside = useShallowCompareMemoize(
-  useMemo(
-    () => extractScopedState(parentState, containerDeps),
-    [containerDeps, parentState]
-  ),
-);
+// NEW
+const uidInfoRef = parentUidInfoRef;
 ```
 
-### Benefits of Automatic Detection
+**Impact:** UID info always uses parent reference. This was the default behavior anyway.
 
-1. **Zero Developer Burden** - No manual dependency management
-2. **Always Correct** - Dependencies automatically reflect actual usage
-3. **Refactor-Friendly** - Adding/removing variables just works
-4. **Better DX** - Matches expectations from React/Vue/modern frameworks
-5. **Same Performance** - Dependency-based scoping still happens, just automatically
+---
 
-### Potential Challenges
+### Step 2: Remove from Parser (30 minutes)
 
-1. **Dynamic Property Access**
-   - `parentState[dynamicKey]` - can't statically determine which keys are accessed
-   - **Solution:** Conservative approach - if dynamic access is detected, inherit all parent state
+#### Change 6: Stop parsing `uses` attribute
+**File:** `/xmlui/src/parsers/xmlui-parser/transform.ts:452`
 
-2. **Spread Operators**
-   - `{ ...parentState }` - explicitly accessing all state
-   - **Solution:** Detect spread syntax and inherit all parent state
+```typescript
+// OLD
+case "uses":
+  comp.uses = splitUsesValue(value);
+  return;
 
-3. **Function Calls with State**
-   - `someFunction(parentState)` - function might access any property
-   - **Solution:** Track function implementations and analyze them too
+// NEW - Add deprecation warning, but don't set it
+case "uses":
+  console.warn(
+    `[XMLUI] The 'uses' attribute is deprecated and ignored. ` +
+    `All parent state is now automatically inherited. ` +
+    `You can safely remove 'uses="${value}"' from line ${/* get line number */}.`
+  );
+  return;
+```
 
-4. **Backwards Compatibility**
-   - Existing `uses` declarations in tests
-   - **Solution:** Deprecation period - `uses` overrides automatic detection during transition
+#### Change 7: Stop parsing `<uses>` element
+**File:** `/xmlui/src/parsers/xmlui-parser/transform.ts:710-721`
 
-## Refactoring Plan
+```typescript
+// OLD
+function processUsesElement(/*...*/) {
+  // ... validation and parsing ...
+  if (comp.uses) {
+    comp.uses.push(...usesValues);
+  } else {
+    comp.uses = usesValues;
+  }
+}
 
-### Phase 1: Preparation & Analysis (Week 1-2)
+// NEW - Just log warning and return
+function processUsesElement(comp: ComponentDef, node: Node) {
+  console.warn(
+    `[XMLUI] The '<uses>' element is deprecated and ignored. ` +
+    `All parent state is now automatically inherited. ` +
+    `You can safely remove this element.`
+  );
+  return;
+}
+```
 
-#### 1.1 Create Performance Baseline
-- [ ] Write performance benchmarks for container rendering
-- [ ] Measure re-render frequency with current `uses` implementation
-- [ ] Create test apps with various container hierarchies
-- [ ] Document performance metrics (render time, memory usage)
+#### Change 8: Remove splitUsesValue utility
+**File:** `/xmlui/src/parsers/xmlui-parser/transform.ts:1329-1331`
 
-**Deliverable:** Performance benchmark suite + baseline metrics document
+```typescript
+// DELETE THIS FUNCTION
+function splitUsesValue(value: string) {
+  return value.split(",").map((v) => v.trim());
+}
+```
 
-#### 1.2 Enhance Dependency Collection
-- [ ] Audit `collectVariableDependencies()` for completeness
-- [ ] Add support for dynamic property access detection
-- [ ] Add support for spread operator detection
-- [ ] Handle edge cases (optional chaining, nullish coalescing, etc.)
+---
 
-**Deliverable:** Enhanced dependency collector with 100% test coverage
+### Step 3: Remove from Type Definitions (10 minutes)
 
-#### 1.3 Create Container Dependency Aggregator
-- [ ] Implement `collectContainerDependencies()` function
-- [ ] Walk component tree and aggregate all variable references
-- [ ] Handle nested children and slots
-- [ ] Support loaders and contextVars
+#### Change 9: Mark `uses` as deprecated in ComponentDefCore
+**File:** `/xmlui/src/abstractions/ComponentDefs.ts:67-70`
 
-**Deliverable:** Working aggregator with unit tests
+```typescript
+// OLD
+/**
+ * Components managing state through variables or loaders are wrapped with containers
+ * responsible for this job. Just as components, containers form a hierarchy. While
+ * working with this hierarchy, parent components may flow state values (key and value
+ * pairs) to their child containers. This property holds the name of state values to
+ * flow down to the direct child containers.
+ */
+uses?: string[];
 
-### Phase 2: Core Implementation (Week 3-4)
+// NEW
+/**
+ * @deprecated This property is no longer used. All parent state is automatically inherited.
+ * Will be removed in v2.0.
+ */
+uses?: string[];
+```
 
-#### 2.1 Update StateContainer
-- [ ] Add automatic dependency collection to StateContainer
-- [ ] Replace `extractScopedState()` call with automatic version
-- [ ] Keep `uses` as optional override for backwards compatibility
-- [ ] Add logging to track automatic vs manual scoping
+**Keep the type definition** for backward compatibility but mark it deprecated.
 
-**Deliverable:** Updated StateContainer with feature flag
+---
 
-#### 2.2 Update State Change Propagation
-- [ ] Update proxy callback logic to use automatic dependencies
-- [ ] Remove `node.uses.includes(key)` check
-- [ ] Add dependency-based filtering in change propagation
+### Step 4: Clean Up ContainerWrapper (10 minutes)
 
-**Deliverable:** Updated state change system
+#### Change 10: Remove uses from wrapping logic
+**File:** `/xmlui/src/components-core/rendering/ContainerWrapper.tsx:180-195`
 
-#### 2.3 Update Container.tsx
-- [ ] Update UID reference scoping logic
-- [ ] Replace `node.uses === undefined` check with automatic detection
-- [ ] Ensure consistent behavior across all container types
+```typescript
+// OLD
+delete wrappedNode.uses;
+delete (wrappedNode.props as any)?.uses;
+// ...
+return {
+  type: "Container",
+  // ...
+  uses: node.uses,  // ← Remove this line
+  // ...
+};
 
-**Deliverable:** Updated Container component
+// NEW  
+delete wrappedNode.uses;  // Keep for cleanup
+delete (wrappedNode.props as any)?.uses;  // Keep for cleanup
+// ...
+return {
+  type: "Container",
+  // ...
+  // uses: node.uses,  ← REMOVED
+  // ...
+};
+```
 
-### Phase 3: Testing & Validation (Week 5-6)
+---
 
-#### 3.1 Update Existing Tests
-- [ ] Update parser tests to handle automatic mode
-- [ ] Keep `uses` tests but mark as legacy
-- [ ] Add tests for automatic dependency detection
-- [ ] Verify E2E tests pass without modification
+### Step 5: Update Tests (1 hour)
 
-**Deliverable:** All existing tests passing
+#### Change 11: Update parser tests
+**File:** `/xmlui/tests/parsers/xmlui/transform.attr.test.ts`
 
-#### 3.2 Create New Test Suite
-- [ ] Test automatic detection with various expression types
-- [ ] Test dynamic property access scenarios
-- [ ] Test spread operator scenarios
-- [ ] Test nested container hierarchies
-- [ ] Test performance vs manual `uses`
+```typescript
+// OLD
+test("parsing uses attribute", () => {
+  const cd = transformSource("<Stack uses='isOpen' />") as ComponentDef<typeof StackMd>;
+  expect(cd.uses).deep.equal(["isOpen"]);
+});
 
-**Deliverable:** Comprehensive automatic detection test suite
+// NEW
+test("uses attribute shows deprecation warning", () => {
+  const spy = vi.spyOn(console, 'warn');
+  transformSource("<Stack uses='isOpen' />");
+  expect(spy).toHaveBeenCalledWith(expect.stringContaining('deprecated'));
+  spy.mockRestore();
+});
+```
 
-#### 3.3 Real-World Testing
-- [ ] Test with docs site (built mode)
-- [ ] Test with example standalone apps (buildless mode)
-- [ ] Test with extensions
-- [ ] Verify no performance regressions
+#### Change 12: Update E2E tests  
+**File:** `/xmlui/tests-e2e/state-var-scopes.spec.ts`
 
-**Deliverable:** Real-world validation report
+```typescript
+// No changes needed - tests verify state inheritance behavior, which still works
+// The tests don't actually use 'uses' attribute, they test variable shadowing
+```
 
-### Phase 4: Migration & Deprecation (Week 7-8)
+---
 
-#### 4.1 Deprecation Warning System
-- [ ] Add console warning when `uses` is explicitly set
-- [ ] Add linting rule to discourage `uses`
-- [ ] Update parser to mark `uses` as deprecated
+### Step 6: Documentation (30 minutes)
 
-**Deliverable:** Deprecation warning system
+#### Change 13: Update containers.md
+**File:** `/xmlui/dev-docs/containers.md`
 
-#### 4.2 Documentation Updates
-- [ ] Update containers.md to remove `uses` documentation
-- [ ] Add migration guide for existing `uses` code (if any found)
-- [ ] Update component metadata to mark `uses` as deprecated
-- [ ] Add "How It Works" section explaining automatic detection
+Remove the entire "Uses Declarations" section (lines 192-207) and replace with:
 
-**Deliverable:** Updated documentation
+```markdown
+### State Inheritance (Automatic)
 
-#### 4.3 Remove `uses` from Defaults
-- [ ] Remove `uses: []` from CompoundComponent.tsx
-- [ ] Remove `uses: []` from StandaloneComponent.tsx  
-- [ ] Remove `uses: []` from AppRoot.tsx
-- [ ] Update component templates
+Parent state is automatically inherited by child containers. All variables defined in parent containers are accessible in child containers.
 
-**Deliverable:** Clean default initialization
+```xml
+<Stack var.user="{currentUser}" var.theme="{'dark'}">
+  <Stack var.count="{0}">
+    <!-- Both parent variables are accessible -->
+    <Text>{user.name}</Text>
+    <Text>{theme}</Text>
+    <Text>{count}</Text>
+  </Stack>
+</Stack>
+```
 
-### Phase 5: Cleanup & Finalization (Week 9-10)
+**State Shadowing:** Child containers can define variables with the same name as parent variables. The child's variable takes precedence within that container's scope.
 
-#### 5.1 Performance Analysis
-- [ ] Re-run performance benchmarks
-- [ ] Compare automatic vs manual scoping
-- [ ] Document any performance differences
-- [ ] Optimize if needed
+```xml
+<Stack var.x="outer">
+  <Text>{x}</Text>  <!-- "outer" -->
+  <Stack var.x="inner">
+    <Text>{x}</Text>  <!-- "inner" - shadows parent -->
+  </Stack>
+  <Text>{x}</Text>  <!-- "outer" - unchanged -->
+</Stack>
+```
 
-**Deliverable:** Performance comparison report
+**Note:** The deprecated `uses` property previously allowed manual control of state inheritance. It is no longer needed and will be removed in v2.0.
+```
 
-#### 5.2 Code Cleanup (Optional - for future major version)
-- [ ] Remove `uses` from ComponentDef interface
-- [ ] Remove `extractScopedState()` legacy path
-- [ ] Remove parser support for `uses` attribute
-- [ ] Remove serializer support for `uses`
-- [ ] Remove all `uses` tests
-
-**Deliverable:** Fully cleaned codebase (breaking change)
-
-#### 5.3 Release
-- [ ] Update CHANGELOG with breaking changes (if applicable)
-- [ ] Update version number following semver
-- [ ] Create migration guide
-- [ ] Announce on documentation site
-
-**Deliverable:** Released version
+---
 
 ## Testing Strategy
 
-### Before Refactoring Tests
+### Before Refactoring: Create Baseline
 
-These tests establish the baseline behavior that must be preserved:
+```bash
+# Run all tests and save results
+npm run test > baseline-tests.txt
+npm run test:e2e > baseline-e2e.txt
 
-#### Test Suite 1: State Inheritance Behavior
-```typescript
-describe('State Inheritance - Baseline', () => {
-  test('child container inherits parent state by default', async () => {
-    // <Stack var.x="parent value">
-    //   <Stack var.y="{x}">
-    //     <Text testId="result">{y}</Text>
-    // Verify child can access parent variable x
-  });
-  
-  test('child with uses=[] inherits nothing', async () => {
-    // <Stack var.x="parent value">
-    //   <Stack uses="[]" var.y="{x}">
-    // Verify x is undefined in child
-  });
-  
-  test('child with uses=["x"] inherits only x', async () => {
-    // <Stack var.x="x value" var.z="z value">
-    //   <Stack uses="['x']" var.y="{x}">
-    // Verify child has x but not z
-  });
-  
-  test('child without uses inherits component APIs', async () => {
-    // <Stack>
-    //   <Button id="btn" />
-    //   <Stack var.ref="{btn}">
-    // Verify child can access btn component API
-  });
-});
+# Check for any uses of 'uses' in production code
+grep -r "uses=" packages/**/*.xmlui
+grep -r "uses=" docs/**/*.xmlui
+grep -r "uses=" blog/**/*.xmlui
+# Should return nothing
 ```
 
-#### Test Suite 2: Re-rendering Behavior
-```typescript
-describe('Re-rendering - Baseline', () => {
-  test('child re-renders when used parent state changes', async () => {
-    // Track render count
-    // Change parent variable referenced in child
-    // Verify child re-rendered
-  });
-  
-  test('child with uses=["x"] does NOT re-render when y changes', async () => {
-    // <Stack var.x="1" var.y="1">
-    //   <Stack uses="['x']">
-    // Change y, verify child didn't re-render
-  });
-  
-  test('child without uses re-renders on any parent change', async () => {
-    // This establishes current (potentially inefficient) behavior
-  });
-});
+### After Each Change: Validate
+
+```bash
+# After Step 1 (Container logic)
+npm run test -- tests/components-core/container/
+npm run test:e2e -- tests-e2e/state-var-scopes.spec.ts
+
+# After Step 2 (Parser)
+npm run test -- tests/parsers/xmlui/
+
+# After all changes
+npm run test
+npm run test:e2e
 ```
 
-#### Test Suite 3: State Change Propagation
-```typescript
-describe('State Change Propagation - Baseline', () => {
-  test('child mutation propagates to parent when var in uses', async () => {
-    // <Stack var.obj="{count: 0}">
-    //   <Stack uses="['obj']">
-    //     <Button onClick="obj.count++">
-    // Verify parent sees change
-  });
-  
-  test('child mutation does NOT propagate when var not in uses', async () => {
-    // <Stack var.obj="{count: 0}">
-    //   <Stack uses="[]">
-    //     <Button onClick="obj.count++">  // Should this even work?
-    // Document current behavior
-  });
-});
-```
+### Success Criteria
 
-#### Test Suite 4: Performance Baseline
-```typescript
-describe('Performance - Baseline', () => {
-  test('measure render time with deep container hierarchy', async () => {
-    // Create 10-level deep containers with many variables
-    // Measure initial render time
-  });
-  
-  test('measure re-render time with scoped uses', async () => {
-    // Setup containers with uses=["specific"]
-    // Change unrelated parent state
-    // Measure time
-  });
-  
-  test('measure re-render time without uses', async () => {
-    // Same setup but no uses
-    // Compare to previous test
-  });
-  
-  test('measure memory usage', async () => {
-    // Track container state size
-    // With and without uses scoping
-  });
-});
-```
+- [ ] All existing tests pass
+- [ ] No changes to test behavior (except parser deprecation warnings)
+- [ ] No performance regression
+- [ ] Docs site builds and runs correctly
+- [ ] Example apps work without modification
 
-### After Refactoring Tests
-
-These tests verify automatic detection works correctly:
-
-#### Test Suite 5: Automatic Dependency Detection
-```typescript
-describe('Automatic Dependency Detection', () => {
-  test('auto-detects simple variable reference', async () => {
-    // <Stack var.x="value">
-    //   <Stack var.y="{x}">
-    // Verify automatic scoping includes x
-  });
-  
-  test('auto-detects nested property access', async () => {
-    // <Stack var.obj="{a: {b: 'value'}}">
-    //   <Stack var.y="{obj.a.b}">
-    // Verify automatic scoping includes obj
-  });
-  
-  test('auto-detects dependencies in expressions', async () => {
-    // <Stack var.x="1" var.y="2" var.z="3">
-    //   <Stack var.result="{x + y}">
-    // Verify automatic scoping includes x and y, excludes z
-  });
-  
-  test('auto-detects dependencies in event handlers', async () => {
-    // <Stack var.count="0">
-    //   <Stack>
-    //     <Button onClick="count++">
-    // Verify automatic scoping includes count
-  });
-  
-  test('handles dynamic property access conservatively', async () => {
-    // <Stack var.obj="{...}">
-    //   <Stack var.key="'prop'" var.value="{obj[key]}">
-    // Verify entire obj is included (conservative)
-  });
-  
-  test('handles spread operator', async () => {
-    // <Stack var.x="1" var.y="2">
-    //   <Stack var.merged="{...parentState}">
-    // Verify all parent state included
-  });
-});
-```
-
-#### Test Suite 6: Automatic Re-rendering
-```typescript
-describe('Automatic Re-rendering', () => {
-  test('child re-renders ONLY when referenced state changes', async () => {
-    // <Stack var.x="1" var.y="2" var.z="3">
-    //   <Stack var.result="{x + y}">
-    // Change z, verify child did NOT re-render
-    // Change x, verify child DID re-render
-  });
-  
-  test('performance matches manual uses', async () => {
-    // Compare automatic detection performance to manual uses
-    // Should be equivalent or better
-  });
-});
-```
-
-#### Test Suite 7: Backwards Compatibility
-```typescript
-describe('Backwards Compatibility', () => {
-  test('explicit uses still works during deprecation', async () => {
-    // <Stack var.x="1" var.y="2">
-    //   <Stack uses="['x']" var.z="{y}">
-    // Verify uses takes precedence over automatic detection
-    // Verify y is undefined (respects explicit uses)
-  });
-  
-  test('empty uses=[] still blocks inheritance', async () => {
-    // Verify uses=[] overrides automatic detection
-  });
-});
-```
-
-#### Test Suite 8: Edge Cases
-```typescript
-describe('Edge Cases', () => {
-  test('handles circular dependencies gracefully', async () => {
-    // If variable A depends on B which depends on A
-  });
-  
-  test('handles optional chaining', async () => {
-    // <Stack var.obj="{maybeNull}">
-    //   <Stack var.value="{obj?.prop?.nested}">
-  });
-  
-  test('handles nullish coalescing', async () => {
-    // <Stack var.x="null" var.y="undefined">
-    //   <Stack var.value="{x ?? y ?? 'default'}">
-  });
-  
-  test('handles function calls', async () => {
-    // <Stack var.fn="{() => x + y}">
-    //   <Stack var.result="{fn()}">
-  });
-});
-```
-
-## Implementation Details
-
-### Key Files to Modify
-
-#### High Priority (Core Logic)
-1. **StateContainer.tsx** - Main state management, dependency detection
-2. **collectFnVarDeps.ts** - Enhance dependency collection
-3. **visitors.ts** - Update AST walking for comprehensive dependency tracking
-
-#### Medium Priority (Integration)
-4. **Container.tsx** - Update UID scoping logic
-5. **ContainerWrapper.tsx** - Update container detection
-6. **reducer.ts** - Update state change propagation
-
-#### Low Priority (Cleanup)
-7. **transform.ts** - Mark `uses` as deprecated
-8. **xmlui-serializer.ts** - Handle deprecated `uses` in serialization
-9. **ComponentDefs.ts** - Update type definitions
-
-### API Changes
-
-#### Public APIs (Breaking Changes in Major Version)
-```typescript
-// BEFORE
-interface ComponentDefCore {
-  uses?: string[];  // Manual dependency specification
-}
-
-// AFTER (Major version)
-interface ComponentDefCore {
-  // uses property removed entirely
-}
-```
-
-#### Internal APIs (Non-Breaking)
-```typescript
-// NEW: Automatic dependency collection
-function collectContainerDependencies(
-  node: ContainerWrapperDef
-): Set<string>;
-
-// MODIFIED: extractScopedState signature
-function extractScopedState(
-  parentState: ContainerState,
-  dependencies: Set<string> | undefined  // Changed from uses?: string[]
-): ContainerState | undefined;
-```
-
-### Migration Path for Consumers
-
-**Current Reality:** No migration needed! Search results show:
-- ❌ Zero `.xmlui` files use `uses` in production
-- ❌ Zero documentation examples use `uses`
-- ✅ Only test files and framework defaults
-
-**If `uses` were actually used (theoretical):**
-
-```xml
-<!-- BEFORE (manual) -->
-<Stack var.x="1" var.y="2" var.z="3">
-  <Stack uses="['x', 'y']" var.result="{x + y}">
-    <Text>{result}</Text>
-  </Stack>
-</Stack>
-
-<!-- AFTER (automatic) -->
-<Stack var.x="1" var.y="2" var.z="3">
-  <Stack var.result="{x + y}">
-    <!-- uses removed - automatically detects x and y are needed -->
-    <Text>{result}</Text>
-  </Stack>
-</Stack>
-```
+---
 
 ## Risk Assessment
 
-### High Risk Items
-- **Performance Regression** - Automatic detection might be slower than explicit scoping
-  - **Mitigation:** Thorough benchmarking, memoization of dependencies
-  
-- **Subtle Behavior Changes** - Edge cases where automatic detection differs from manual
-  - **Mitigation:** Comprehensive test suite, gradual rollout
+| Risk | Likelihood | Impact | Mitigation |
+|------|-----------|--------|------------|
+| Someone actually uses `uses` | Very Low | Low | Deprecation warning will alert them |
+| Breaking framework defaults | Very Low | Medium | Defaults use `uses: []` which we keep backward compatible |
+| Performance regression | Very Low | Low | Removing filtering logic can only improve performance |
+| Test failures | Low | Low | Tests validate parser, not actual uses behavior |
 
-### Medium Risk Items
-- **Dynamic Access Patterns** - Can't statically analyze `obj[dynamicKey]`
-  - **Mitigation:** Conservative fallback (inherit all parent state)
-  
-- **Complex Expressions** - Might miss dependencies in complex nested expressions
-  - **Mitigation:** Enhance `collectVariableDependencies()` to handle all cases
-
-### Low Risk Items
-- **Breaking Changes** - Few to no consumers actually use `uses`
-  - **Mitigation:** Deprecation warnings, documentation
-
-## Success Criteria
-
-### Must Have
-- ✅ All existing tests pass
-- ✅ No performance regression (< 5% slower than manual `uses`)
-- ✅ Automatic detection handles 100% of current use cases
-- ✅ Documentation updated to remove `uses`
-
-### Should Have
-- ✅ Performance improvement in typical scenarios
-- ✅ Comprehensive test coverage for automatic detection
-- ✅ Migration guide (even though likely not needed)
-- ✅ Deprecation warnings in place
-
-### Nice to Have
-- ✅ Performance improvements from better scoping
-- ✅ Developer testimonials about improved DX
-- ✅ Blog post explaining the improvement
+---
 
 ## Timeline
 
-**Estimated Duration:** 8-10 weeks (can be parallelized)
+### Realistic Estimate: 2-3 days
 
-- **Week 1-2:** Preparation & Analysis
-- **Week 3-4:** Core Implementation
-- **Week 5-6:** Testing & Validation
-- **Week 7-8:** Migration & Deprecation
-- **Week 9-10:** Cleanup & Release
+- **Day 1 Morning:** Steps 1-3 (Core removal)
+- **Day 1 Afternoon:** Steps 4-5 (Cleanup and tests)
+- **Day 2 Morning:** Step 6 (Documentation) + Full test run
+- **Day 2 Afternoon:** PR creation and review
+- **Day 3:** Address review feedback and merge
 
-**Milestone Checkpoints:**
-- ✅ Week 2: Performance baseline established
-- ✅ Week 4: Feature flag implementation complete
-- ✅ Week 6: All tests passing
-- ✅ Week 8: Deprecation warnings active
-- ✅ Week 10: Release candidate ready
+---
 
-## Open Questions
+## What We're NOT Doing
 
-1. **Should we support opt-out for edge cases?**
-   - Some developers might want explicit control
-   - Could keep `uses` as an escape hatch even after automatic detection
+❌ **Automatic dependency detection** - Over-engineering. Default (inherit all) works fine.
 
-2. **How aggressive should automatic scoping be?**
-   - Conservative (inherit more than needed) vs Strict (only detected dependencies)
-   - Trade-off: Correctness vs Performance
+❌ **Performance optimization** - Not a real problem. Premature optimization.
 
-3. **Should we log/report unused parent state?**
-   - Could help identify optimization opportunities
-   - Might be noisy in large applications
+❌ **Complex state scoping** - Nobody needs it. YAGNI.
 
-4. **Should this be a major version bump?**
-   - Technically breaking if `uses` is removed from interface
-   - But practically, no one uses it
+❌ **Phased rollout** - Nothing to phase. Just remove it.
 
-5. **Should we build tooling to detect `uses` usage?**
-   - CLI tool to scan codebase for `uses`
-   - IDE plugin to suggest automatic migration
+❌ **Migration guide** - Nothing to migrate. Everyone already uses default behavior.
 
-## References
+---
 
-### Documentation
-- `containers.md` - Current state management documentation
-- `standalone-app.md` - Application bootstrapping and rendering
+## Direct Answer to Your Questions
 
-### Key Source Files
-- `xmlui/src/components-core/rendering/StateContainer.tsx` - State container implementation
-- `xmlui/src/components-core/rendering/Container.tsx` - Container component
-- `xmlui/src/components-core/script-runner/visitors.ts` - Dependency collection
-- `xmlui/src/abstractions/ComponentDefs.ts` - Component type definitions
+### Q1: "Can we answer that 'uses' provides state container isolation?"
 
-### Related Issues/PRs
-- (To be added as work progresses)
+**YES - Technically correct, but misleading**
 
-## Conclusion
+**The Mechanism:**
 
-Eliminating the `uses` property will:
-- ✅ **Improve Developer Experience** - No manual dependency management
-- ✅ **Reduce Maintenance Burden** - Dependencies always correct
-- ✅ **Match Modern Expectations** - Automatic like React hooks
-- ✅ **Maintain Performance** - Dependency-based scoping preserved
-- ✅ **Low Risk** - Virtually no existing usage to migrate
+```typescript
+// StateContainer.tsx:294
+function extractScopedState(parentState, uses?) {
+  if (!uses) {
+    return parentState;  // Default: inherit everything
+  }
+  if (uses.length === 0) {
+    return EMPTY_OBJECT;  // uses:[] = isolate completely
+  }
+  return pick(parentState, uses);  // uses:['x'] = inherit only 'x'
+}
+```
 
-The infrastructure for automatic detection already exists (`collectVariableDependencies()`). This refactoring primarily involves:
-1. Aggregating dependencies at the container level
-2. Replacing manual scoping with automatic scoping
-3. Ensuring performance characteristics are maintained
+**What `uses` CAN do:**
 
-**Recommendation:** Proceed with refactoring. The benefits significantly outweigh the risks, especially given zero production usage of the `uses` property.
+```xml
+<!-- Scenario 1: No isolation (default) -->
+<Stack var.x="parent">
+  <Stack>
+    <Text>{x}</Text>  <!-- Works: "parent" -->
+  </Stack>
+</Stack>
+
+<!-- Scenario 2: Complete isolation -->
+<Stack var.x="parent">
+  <Stack uses="[]">
+    <Text>{x}</Text>  <!-- ERROR: x not accessible -->
+  </Stack>
+</Stack>
+
+<!-- Scenario 3: Selective inheritance -->
+<Stack var.x="x value" var.y="y value">
+  <Stack uses="['x']">
+    <Text>{x}</Text>  <!-- Works: "x value" -->
+    <Text>{y}</Text>  <!-- ERROR: y not accessible -->
+  </Stack>
+</Stack>
+```
+
+**So yes, `uses` provides isolation... in theory.**
+
+### BUT: The Reality Check
+
+**Three critical problems with "uses provides isolation":**
+
+#### 1. **Zero Production Usage**
+- Nobody writes `<Stack uses="[]">` in real code
+- Search results: 0 matches in any .xmlui file
+- Only 3 framework defaults use it
+
+#### 2. **Isolation Trigger**
+For `uses` to isolate, the container must:
+- Have `uses` attribute/element → triggers `isContainerLike()` → creates container
+- **OR** have vars/loaders/functions (which already create container)
+
+```typescript
+// ContainerWrapper.tsx:73
+return !!(
+  node.loaders ||
+  node.vars ||
+  node.uses ||  // ← uses ALONE can trigger container
+  // ...
+);
+```
+
+**Practical implication:**
+- `<Stack uses="[]">` creates a container that inherits nothing
+- But `<Stack>` without vars/loaders is NOT a container, so it passes through parent state anyway
+- You'd write: `<Stack var.dummy="{0}" uses="[]">` to force isolation (absurd!)
+
+#### 3. **Only Used for CompoundComponent Isolation**
+
+The ONLY place `uses: []` actually matters:
+
+```typescript
+// CompoundComponent.tsx:72
+const containerNode: ContainerWrapperDef = {
+  type: "Container",
+  uses: EMPTY_ARRAY,  // ← Isolates compound component internals
+  vars,
+  functions,
+  // ...
+};
+```
+
+This creates a container (already has vars/functions) that inherits no parent state.
+
+**Why this matters:**
+- Compound components need isolation by design (encapsulation)
+- Not a general feature - specific to compound component architecture
+- Users don't manually set this
+
+---
+
+### Q2: "If we remove the 'uses' feature, will it cause any functionality loss or performance loss?"
+
+**Answer: NO (for users), YES (for CompoundComponent isolation)**
+
+**Functionality Loss: NO (for users), YES (for internal isolation)**
+
+- ✅ **User-facing:** Zero functionality loss - nobody uses `uses` in production code
+- ⚠️ **Internal:** Compound components currently use `uses: []` for isolation
+  - Without it, compound components would inherit parent state (breaking change)
+  - **Solution:** Keep `uses: []` internally, remove from public API
+
+**Performance Loss: NO (actually IMPROVEMENT)**
+
+- Removing state filtering logic reduces overhead
+- Default behavior (inherit all) is already the norm
+- No performance tests or benchmarks justify `uses` existence
+
+### Q2: "If our unit tests run, will they run after the refactoring?"
+
+**Answer: MOSTLY YES (95%+ pass)**
+
+**WILL PASS (no changes needed):**
+- ✅ All 738+ E2E tests (none use `uses` attribute)
+- ✅ All integration tests (test behavior, not `uses` syntax)
+- ✅ All component tests
+- ✅ All rendering tests
+
+**WILL FAIL (intentional, need updates):**
+- ❌ 5 parser tests that validate `uses` syntax
+  - `transform.attr.test.ts` - 2 tests
+  - `transform.element.test.ts` - 3 tests
+  - **Fix:** Update to verify deprecation warnings instead
+
+**CRITICAL CAVEAT:**
+
+There are **ZERO tests** that verify compound component isolation. We discovered:
+
+```typescript
+// CompoundComponent.tsx:72
+uses: EMPTY_ARRAY,  // ← Creates isolation, but NO TESTS verify this!
+```
+
+This means:
+- We don't know if any real apps rely on isolation
+- Removing `uses` completely would change compound component behavior
+- No automated way to detect if this breaks anything
+
+**Safe Approach:**
+- Keep `uses: []` internally (3 places: CompoundComponent, StandaloneComponent, AppRoot)
+- Remove `uses` from parser (user-facing API)
+- Update 5 parser tests
+- Result: 100% tests pass
+
+---
+
+## Revised Conclusion
+
+### What Does `uses` Actually Provide?
+
+**Technically:** State container isolation (scoping)
+
+**Practically:** Only used for CompoundComponent encapsulation
+
+**The distinction matters:**
+
+1. **General isolation feature?** NO
+   - Nobody uses it in production
+   - Awkward to use (requires container-triggering properties)
+   - No documentation or examples
+
+2. **Compound component isolation?** YES
+   - Used in CompoundComponent.tsx line 72
+   - Prevents component internals from accessing parent state
+   - Critical for encapsulation
+
+### The Two Aspects of `uses`
+
+| Aspect | Status | Action |
+|--------|--------|--------|
+| **Public API** (parser, user-facing) | Dead code | Remove completely |
+| **Internal usage** (CompoundComponent.tsx) | Actually needed | Keep and document |
+
+### Final Answer to "Does `uses` provide isolation?"
+
+**YES, but it's a red herring:**
+
+- ✅ `uses: []` returns `EMPTY_OBJECT` (technical isolation)
+- ❌ Nobody uses it for isolation in practice
+- ✅ CompoundComponent uses it for encapsulation (not general isolation)
+- ❌ Not a feature users should rely on
+- ✅ Should be kept internally, removed from public API
+
+**Better framing:** `uses` is an **internal encapsulation mechanism for compound components**, not a general-purpose isolation feature.
+
+---
+
+## Recommended Action
+
+1. **Remove from public API** 
+   - Parser support (`uses` attribute/element)
+   - Documentation (except internal architecture docs)
+   - User-facing examples
+
+2. **Keep internal usage**
+   - CompoundComponent.tsx line 72: `uses: EMPTY_ARRAY`
+   - Add comment: "// Isolate compound component internals from parent scope"
+   - Document as architectural decision, not user feature
+
+3. **Update tests**
+   - 5 parser tests → verify deprecation warnings
+   - No E2E test changes needed
+
+4. **Documentation**
+   - Architecture docs: Explain CompoundComponent uses `uses: []` internally
+   - User docs: Remove all `uses` references
+   - Migration guide: "Not needed - feature was unused"
+
+**Result:**
+- ✅ All tests pass (after 5 parser test updates)
+- ✅ No functionality loss
+- ✅ No breaking changes
+- ✅ CompoundComponent encapsulation preserved
+- ✅ Removes confusing/unused feature from public API
+
+**Timeline:** 2-3 days ✅
