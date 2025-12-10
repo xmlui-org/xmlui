@@ -3,15 +3,11 @@
 The `Dashboard` page opens with a set of infocards. Here is a simplified version of two of them.
 
 ```xmlui-pg display name="infocards"
-<App>
-  <variable name="dashboardStats" value="{
-    {
-      value:
-        [
-          { outstanding: 3569, paid_this_year: 1745}
-        ]
-    }
-  }" />
+<App
+  var.dashboardStats="{
+    {  value:  [ { outstanding: 3569, paid_this_year: 1745} ]  }
+  }"
+>
 
 <HStack>
   <Card>
@@ -26,13 +22,17 @@ The `Dashboard` page opens with a set of infocards. Here is a simplified version
 </App>
 ```
 
-In the app, `dashboardStats` is a [DataSource](/components/DataSource).
+>[!INFO]
+> The definition of `var.dashboardStats` uses two sets of curly braces. The outer braces enclose the JavaScript expression to be evaluated. The inner braces enclose a literal object that emulates data returned from an API.
+
+
+In the real app, `dashboardStats` is a [DataSource](/components/DataSource).
 
 ```xmlui
 <DataSource id="dashboardStats" url="/api/dashboard/stats" method="GET" />
 ```
 
-It returns a structure like the variable we've defined above: an object with a `value` key that points to a list of objects corresponding to rows in the database. In this case there's only one row because the query behind `/api/dashboard/stats` reports multiple values (count of invoices, total amount outstanding, total amount paid this year, etc) as columns in that single row.
+It returns a structure like the variable we've defined above: an object with a `value` key that points to a list of objects corresponding to rows in the database.
 
 ## A custom Card
 
