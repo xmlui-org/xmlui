@@ -128,6 +128,33 @@ describe("Xmlui transform - errors", () => {
     }
   });
 
+  it("Invalid attribute in template", () => {
+    try {
+      transformSource("<Stack><template name='my' blabal='123'/></Stack>");
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(err.toString()).includes("T011");
+    }
+  });
+
+  it("Name required in template #1", () => {
+    try {
+      transformSource("<Stack><template /></Stack>");
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(err.toString()).includes("T012");
+    }
+  });
+
+  it("Name required in template #2", () => {
+    try {
+      transformSource("<Stack><template name='' /></Stack>");
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(err.toString()).includes("T012");
+    }
+  });
+
   it("Name required in event #1", () => {
     try {
       transformSource("<Stack><event /></Stack>");
@@ -209,6 +236,15 @@ describe("Xmlui transform - errors", () => {
     }
   });
 
+  it("A 'template' can have 'field' and 'item' child", () => {
+    try {
+      transformSource("<Stack><template name='my'><dummy /></template></Stack>");
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(err.toString()).includes("T016");
+    }
+  });
+
   it("Cannot mix field and item children #1", () => {
     try {
       transformSource(
@@ -236,9 +272,45 @@ describe("Xmlui transform - errors", () => {
     }
   });
 
+  it("Cannot mix field and item children in template #1", () => {
+    try {
+      transformSource(
+        "<Stack><template name='my'><field name='my' /><item value='3'/></template></Stack>",
+      );
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(err.toString()).includes("T017");
+    }
+  });
+
+  it("Cannot mix field and item children in template #2", () => {
+    try {
+      transformSource(
+        `<Stack>
+          <template name='my'>
+            <item value='3'/>
+            <field name='my' />
+          </template>
+        </Stack>`,
+      );
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(err.toString()).includes("T017");
+    }
+  });
+
   it("Item cannot have a 'name' attribute", () => {
     try {
       transformSource("<Stack><property name='my'><item name='my' value='3'/></property></Stack>");
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(err.toString()).includes("T018");
+    }
+  });
+
+  it("Item in template cannot have a 'name' attribute", () => {
+    try {
+      transformSource("<Stack><template name='my'><item name='my' value='3'/></template></Stack>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString()).includes("T018");

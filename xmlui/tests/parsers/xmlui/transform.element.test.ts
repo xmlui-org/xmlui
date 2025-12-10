@@ -328,6 +328,147 @@ describe("Xmlui transform - child elements", () => {
     });
   });
 
+  // --- Template (alias for property)
+  describe("template", () => {
+    it("template fails with invalid attribute", () => {
+      try {
+        transformSource("<Stack><template blabla='123'/></Stack>");
+        assert.fail("Exception expected");
+      } catch (err) {
+        expect(err.toString()).includes("T011");
+      }
+    });
+
+    it("template fails with missing name attribute", () => {
+      try {
+        transformSource("<Stack><template/></Stack>");
+        assert.fail("Exception expected");
+      } catch (err) {
+        expect(err.toString()).includes("T012");
+      }
+    });
+
+    it("template fails with empty name attribute", () => {
+      try {
+        transformSource("<Stack><template name=''/></Stack>");
+        assert.fail("Exception expected");
+      } catch (err) {
+        expect(err.toString()).includes("T012");
+      }
+    });
+
+    it("template with name/value attr works #1", () => {
+      const cd = transformSource(
+        "<Stack><template name='myProp' value='123'/></Stack>",
+      ) as ComponentDef;
+      expect(cd.type).equal("Stack");
+      expect((cd.props! as any).myProp).equal("123");
+    });
+
+    it("template with name/value attr works #2", () => {
+      const cd = transformSource(`
+      <Stack>
+        <template name='myProp' value='123'/>
+        <template name='other' value='234'/>
+      </Stack>
+    `) as ComponentDef;
+      expect(cd.type).equal("Stack");
+      expect((cd.props! as any).myProp).equal("123");
+      expect((cd.props! as any).other).equal("234");
+    });
+
+    it("template with name and text works #1", () => {
+      const cd = transformSource(
+        "<Stack><template name='myProp'>123</template></Stack>",
+      ) as ComponentDef;
+      expect(cd.type).equal("Stack");
+      const prop = (cd.props! as any).myProp;
+      expect(prop.type).equal("TextNode");
+      expect(prop.props.value).equal("123");
+    });
+
+    it("template with name and text works #2", () => {
+      const cd = transformSource(`
+      <Stack>
+        <template name="myProp">123</template>
+        <template name="other">234</template>
+      </Stack>
+    `) as ComponentDef;
+      expect(cd.type).equal("Stack");
+      let prop = (cd.props! as any).myProp as ComponentDef;
+      expect(prop.type).equal("TextNode");
+      expect((prop.props as any).value).equal("123");
+      prop = (cd.props! as any).other as ComponentDef;
+      expect(prop.type).equal("TextNode");
+      expect((prop.props as any).value).equal("234");
+    });
+
+    it("template with name results null", () => {
+      const cd = transformSource("<Stack><template name='myProp' /></Stack>") as ComponentDef;
+      expect(cd.type).equal("Stack");
+      expect((cd.props! as any).myProp).equal(null);
+    });
+
+    it("template becomes array #1", () => {
+      const cd = transformSource(
+        "<Stack><template name='myProp' value='123'/><template name='myProp' value='234'/></Stack>",
+      ) as ComponentDef;
+      expect(cd.type).equal("Stack");
+      expect((cd.props! as any).myProp).deep.equal(["123", "234"]);
+    });
+
+    it("template with component #1", () => {
+      const cd = transformSource(`
+    <Stack>
+      <template name='myProp'>
+        <Button />
+      </template>
+    </Stack>`) as ComponentDef;
+      expect(cd.type).equal("Stack");
+      expect((cd.props! as any).myProp).toMatchObject({ type: "Button" });
+    });
+
+    it("template with component #2", () => {
+      const cd = transformSource(`
+    <Stack>
+      <template name='myProp'>
+        <Button />
+        <Text />
+      </template>
+    </Stack>`) as ComponentDef;
+      expect(cd.type).equal("Stack");
+      expect((cd.props! as any).myProp).toMatchObject([{ type: "Button" }, { type: "Text" }]);
+    });
+
+    it("template and property can be mixed", () => {
+      const cd = transformSource(`
+      <Stack>
+        <property name='prop1' value='123'/>
+        <template name='prop2' value='456'/>
+        <property name='prop3'>
+          <Button />
+        </property>
+        <template name='prop4'>
+          <Text />
+        </template>
+      </Stack>
+    `) as ComponentDef;
+      expect(cd.type).equal("Stack");
+      expect((cd.props! as any).prop1).equal("123");
+      expect((cd.props! as any).prop2).equal("456");
+      expect((cd.props! as any).prop3).toMatchObject({ type: "Button" });
+      expect((cd.props! as any).prop4).toMatchObject({ type: "Text" });
+    });
+
+    it("template and property with same name become array", () => {
+      const cd = transformSource(
+        "<Stack><property name='myProp' value='123'/><template name='myProp' value='234'/></Stack>",
+      ) as ComponentDef;
+      expect(cd.type).equal("Stack");
+      expect((cd.props! as any).myProp).deep.equal(["123", "234"]);
+    });
+  });
+
   describe("event", () => {
     it("event fails with invalid attribute", () => {
       try {
