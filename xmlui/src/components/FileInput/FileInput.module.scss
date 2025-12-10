@@ -25,6 +25,7 @@ $outlineOffset-FileInput--focus: createThemeVar("Input:outlineOffset-FileInput--
   .container {
     gap: t.$space-2;
     width: 100%;
+    height: max-content;
     display: flex;
     flex-direction: row;
     align-items: center;
