@@ -30,6 +30,7 @@ interface TransformNode extends Node {
 
 const HelperNode = {
   property: "property",
+  template: "template",
   event: "event",
   variable: "variable",
   loaders: "loaders",
@@ -297,6 +298,7 @@ export function nodeToComponentDef(
       // --- Element with a lowercase start letter, it must be some traits of the host component
       switch (childName) {
         case "property":
+        case "template":
           collectElementHelper(
             usesStack,
             comp,
@@ -770,7 +772,7 @@ export function nodeToComponentDef(
     const childNodes: TransformNode[] = getChildNodes(node);
     const tagName = getComponentName(node, getText);
     const hasComponentName = !(tagName in HelperNode);
-    const shouldUseTextNodeElement = hasComponentName || tagName === "property";
+    const shouldUseTextNodeElement = hasComponentName || tagName === "property" || tagName === "template";
     const shouldCollapseWhitespace = tagName !== "event" && tagName !== "method";
     const attrs = getAttributes(node);
 
