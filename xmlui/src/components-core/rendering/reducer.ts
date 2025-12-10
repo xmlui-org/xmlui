@@ -55,6 +55,7 @@ export function createContainerReducer(debugView: IDebugViewContext) {
         const { data, pageInfo } = action.payload;
         state[uid] = {
           value: data,
+          _VALUE_PROP_: "value",
           byId: Array.isArray(data) ? keyBy(data, (item) => item.$id) : undefined,
           inProgress: false,
           loaded: data !== undefined,

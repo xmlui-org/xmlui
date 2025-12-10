@@ -69,6 +69,7 @@ export const {
   T_PREFIX_OP_EXPRESSION,
   T_POSTFIX_OP_EXPRESSION,
   T_REACTIVE_VAR_DECLARATION,
+  T_VALUE_ACCESSOR_EXPRESSION,
   
   // Other node type values
   T_VAR_DECLARATION,
@@ -120,6 +121,7 @@ type ARROW_EXPRESSION = typeof T_ARROW_EXPRESSION;
 type PREFIX_OP_EXPRESSION = typeof T_PREFIX_OP_EXPRESSION;
 type POSTFIX_OP_EXPRESSION = typeof T_POSTFIX_OP_EXPRESSION;
 type REACTIVE_VAR_DECLARATION = typeof T_REACTIVE_VAR_DECLARATION;
+type VALUE_ACCESSOR_EXPRESSION = typeof T_VALUE_ACCESSOR_EXPRESSION;
 
 // --- Other node types
 type VAR_DECLARATION = typeof T_VAR_DECLARATION;
@@ -338,6 +340,7 @@ export type Expression =
   | PrefixOpExpression
   | PostfixOpExpression
   | ReactiveVarDeclaration
+  | ValueAccessorExpression
   | VarDeclaration
   | Destructure
   | ObjectDestructure
@@ -502,6 +505,11 @@ export interface PrefixOpExpression extends ExpressionBase {
 export interface PostfixOpExpression extends ExpressionBase {
   type: POSTFIX_OP_EXPRESSION;
   op: PrefixOpSymbol;
+  expr: Expression;
+}
+
+export interface ValueAccessorExpression extends ExpressionBase {
+  type: VALUE_ACCESSOR_EXPRESSION;
   expr: Expression;
 }
 
