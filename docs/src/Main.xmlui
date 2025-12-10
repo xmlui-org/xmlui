@@ -166,6 +166,10 @@
                 to="/howto/assign-a-complex-json-literal-to-a-component-variable"
             />
             <NavLink
+                label="Use accessors to simplify complex expressions"
+                to="/howto/use-accessors-to-simplify-complex-expressions"
+            />
+            <NavLink
                 label="Make a set of equal-width cards"
                 to="/howto/make-a-set-of-equal-width-cards"
             />
@@ -609,6 +613,11 @@
         >
             <DocumentPageNoTOC
                 content="{appGlobals.content['pages/howto/assign-a-complex-json-literal-to-a-component-variable.md']}"
+            />
+        </Page>
+        <Page url="/howto/use-accessors-to-simplify-complex-expressions">
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/howto/use-accessors-to-simplify-complex-expressions.md']}"
             />
         </Page>
         <Page url="/howto/make-a-set-of-equal-width-cards">
