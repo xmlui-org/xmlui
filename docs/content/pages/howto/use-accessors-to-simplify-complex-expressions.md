@@ -61,32 +61,3 @@ When working with complex API responses, you can use `var.*` accessors to extrac
 }
 ```
 
-## Key benefits
-
-**Cleaner markup**: Extract complex paths once at the component level, then use simple variable names throughout your component.
-
-**Better maintainability**: If the API structure changes, update the accessor in one place rather than searching through multiple nested expressions.
-
-**Improved readability**: Short variable names like `condition` and `location` are easier to understand than long chains like `weatherData.value.current_condition[0]`.
-
-## Pattern
-
-Use the `var.*` prefix to declare accessors on the component where you need the data:
-
-```xmlui
-<Card
-  var.myData="{ source.deeply.nested.array[0] }"
-  var.otherData="{ source.another.path[0].item }">
-
-  <!-- Now use the simple variable names -->
-  <Text>{myData.property}</Text>
-  <Text>{otherData.value}</Text>
-</Card>
-```
-
-## When to use accessors
-
-- Working with API responses that have single-element arrays
-- Dealing with deeply nested object structures
-- When the same nested path is used multiple times
-- To make component code more self-documenting
