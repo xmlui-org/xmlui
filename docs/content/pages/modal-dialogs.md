@@ -103,5 +103,27 @@ When embedding a form in a dialog, the form's cancel and successful submit actio
 </App>
 ```
 
-
 See the [ModalDialog](/components/ModalDialog) reference for all properties and events.
+
+## When to use declarative vs. imperative modals
+
+
+**Imperative (`dialog.open()`):**
+- Use for event-driven triggers (button clicks, user actions)
+- Pass dynamic parameters (`$param`, `$params`) with the action
+- Simplest approach for one-off actions or direct user interactions
+- Good fit for complex event chains or code-initiated triggers
+- Modal state is not reflected in the URL
+
+**Declarative (`when="{expression}"`):**
+- Use when modal visibility should be determined by a condition or state
+- Essential for deep-linking: tie modal state to URL query parameters using `$queryParams` (e.g., `when="{$queryParams.showSettings}"` opens the modal when URL contains `?showSettings=true`)
+- Useful when multiple parts of the app need to react to the same state that controls the modal
+- Good for deriving visibility from application state or context variables
+- Modal automatically opens/closes when the condition changes
+
+**Mixed approach:**
+- Combine both: use `when` to bind modal to URL or shared state, then add imperative methods (`dialog.open()`) for programmatic control from within your app
+- Example: `when="{$queryParams.dialog === 'settings'}"` for deep-linking, plus `onClick="dialog.close()"` for a manual close button
+
+**Key distinction:** Imperative is about **actions** ("open this now"), declarative is about **state** ("be open when this condition is true"). Choose imperative for user-triggered events, declarative when visibility should track a condition or be URL-addressable.
