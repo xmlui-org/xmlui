@@ -17,14 +17,20 @@ This document explains how the XMLUI framework package itself is built using Vit
 9. [Build Performance](#build-performance)
 10. [Troubleshooting](#troubleshooting)
 
+## ESM Migration
+
+XMLUI has migrated to ES Modules (ESM). All packages use `"type": "module"` in package.json, and the build system outputs ESM by default. The CLI tools are built with tsdown, producing both ESM (`index.js`) and CommonJS (`index.cjs`) for compatibility.
+
 ## Overview
 
 The XMLUI framework package is built using **Vite** with multiple build modes. The build configuration is defined in `xmlui/vite.config.ts` and supports three distinct modes.
 
 **Build System:**
 
-- **Build Tool:** Vite 5.x with Rollup
+- **Build Tool:** Vite 7.x with Rollup
+- **Module System:** ES Modules (ESM)
 - **Configuration:** `xmlui/vite.config.ts`
+- **CLI Build:** tsdown (outputs ESM + CommonJS)
 - **Package Manager:** npm with clean-package for publishing
 - **Task Orchestration:** Turborepo (see [XMLUI Repository Structure](./xmlui-repo.md))
 
@@ -92,12 +98,11 @@ The library build creates multiple entry points:
 ```typescript
 {
   outDir: "dist/lib",
-  formats: ["es"],              // ES modules only
+  formats: ["es"],              // ES modules
   minify: "terser",            // Terser minification
-  treeshake: undefined,        // Standard tree-shaking
   rollupOptions: {
     external: [
-      // All dependencies marked as external (not bundled)
+      // Dependencies not bundled
       ...Object.keys(packageJson.dependencies),
       "react/jsx-runtime"
     ]
@@ -135,17 +140,24 @@ copy({
 ### Output Structure
 
 ```
-dist/lib/
-  ├── xmlui.js                          # Main framework bundle
-  ├── xmlui.d.ts                         # Bundled type definitions
-  ├── xmlui-parser.js                   # Parser bundle
-  ├── language-server.js                # LSP server bundle
-  ├── language-server-web-worker.js     # Browser LSP bundle
-  ├── syntax-monaco.js                  # Monaco syntax bundle
-  ├── syntax-textmate.js                # TextMate syntax bundle
-  ├── *.css                              # Extracted component styles
-  └── scss/                              # Source SCSS files
-      └── (mirrors src/ structure)
+dist/
+  ├── lib/
+  │   ├── xmlui.js                      # Main framework (ESM)
+  │   ├── xmlui.d.ts                    # Type definitions
+  │   ├── xmlui-parser.js               # Parser (ESM)
+  │   ├── language-server.js            # LSP server (ESM)
+  │   ├── language-server-web-worker.js # Browser LSP (ESM)
+  │   ├── syntax-monaco.js              # Monaco syntax (ESM)
+  │   ├── syntax-textmate.js            # TextMate grammar (ESM)
+  │   ├── *.css                         # Component styles
+  │   ├── vite-xmlui-plugin/
+  │   │   └── index.js                  # Vite plugin (ESM)
+  │   └── scss/                         # Source SCSS files
+  ├── bin/
+  │   ├── index.js                      # CLI entry (ESM)
+  │   └── index.cjs                     # CLI entry (CommonJS)
+  └── standalone/
+      └── xmlui-standalone.umd.js       # UMD bundle
 ```
 
 ### NPM Package Exports
@@ -378,8 +390,8 @@ This internally runs in order:
 ```bash
 # 1. Build CLI tools
 npm run build:bin
-# Compiles TypeScript in bin/ folder using tsdown (see tsdown.config.ts)
-# Output: dist/bin/
+# Compiles bin/index.ts using tsdown to ESM + CommonJS
+# Output: dist/bin/index.js (ESM), dist/bin/index.cjs (CommonJS)
 
 # 2. Build library for npm
 npm run build:xmlui
@@ -545,8 +557,8 @@ npm run test:e2e-summary
 
 - **Library build:** ~30-60 seconds
 - **Standalone build:** ~60-90 seconds (includes all dependencies)
-- **Metadata build:** ~10-20 seconds (minimal processing)
-- **CLI tools build:** ~5-10 seconds
+- **Metadata build:** ~10-20 seconds
+- **CLI tools build:** ~5-10 seconds (tsdown dual-format output)
 
 **Full pipeline:**
 
@@ -556,8 +568,8 @@ npm run test:e2e-summary
 
 ### Output Sizes
 
-- **Library bundle (xmlui.mjs):** ~400KB (minified, no deps)
-- **Standalone bundle:** ~2MB (includes React, all deps)
+- **Library bundle (xmlui.js):** ~400KB (ESM, minified, no deps)
+- **Standalone bundle:** ~2MB (UMD, includes all deps)
 - **CSS files:** ~100KB total
 - **Type definitions:** ~200KB
 - **SCSS sources:** ~50KB

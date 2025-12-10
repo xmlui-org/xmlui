@@ -4,6 +4,10 @@ This document explains XMLUI's build system architecture, CLI tools, and build c
 
 > **Note:** For building the XMLUI framework package itself, see [Building the XMLUI Core Package](./build-xmlui.md).
 
+## ESM Migration
+
+XMLUI now uses ES Modules (ESM) exclusively. All packages declare `"type": "module"` in package.json, and builds output ESM by default. The CLI tools use tsdown to generate both ESM and CommonJS for compatibility.
+
 ## Table of Contents
 
 1. [Overview](#overview)
@@ -334,7 +338,7 @@ XMLUI uses Vite with mode-specific configurations for different build targets.
 - `syntax-monaco` - Monaco editor syntax support
 - `syntax-textmate` - TextMate grammar support
 
-**Output Format:** ES modules
+**Output Format:** ES modules (ESM)
 
 **Key Features:**
 
@@ -445,7 +449,7 @@ dist/
 
 ```
 bin/
-  ├── bootstrap.js                # CLI entry for development (uses tsx)
+  ├── bootstrap.js                # CLI entry (imports index.ts via tsx)
   ├── index.ts                    # Command router
   ├── build.ts                    # Build implementation
   ├── build-lib.ts                # Library build
@@ -479,13 +483,13 @@ Extensions use standard npm scripts that invoke the `xmlui` CLI:
 
 **Command Reference:**
 
-| Command                   | CLI Equivalent                    | Purpose                    | Output                        |
-| ------------------------- | --------------------------------- | -------------------------- | ----------------------------- |
-| `npm start`               | `xmlui start`                     | Dev server for demo app    | Dev server with HMR           |
-| `npm run build:extension` | `xmlui build-lib`                 | Build extension library    | `dist/` with .js, .d.ts, .css |
-| `npm run build-watch`     | `xmlui build-lib --watch`         | Watch mode for development | Continuous rebuilds           |
-| `npm run build:demo`      | `xmlui build`                     | Build demo application     | Production demo build         |
-| `npm run build:meta`      | `xmlui build-lib --mode=metadata` | Extract component metadata | Metadata for docs/LSP         |
+| Command                   | CLI Equivalent                    | Purpose                    | Output                            |
+| ------------------------- | --------------------------------- | -------------------------- | --------------------------------- |
+| `npm start`               | `xmlui start`                     | Dev server for demo app    | Dev server with HMR               |
+| `npm run build:extension` | `xmlui build-lib`                 | Build extension library    | `dist/` with ESM .js, .d.ts, .css |
+| `npm run build-watch`     | `xmlui build-lib --watch`         | Watch mode for development | Continuous rebuilds               |
+| `npm run build:demo`      | `xmlui build`                     | Build demo application     | Production demo build             |
+| `npm run build:meta`      | `xmlui build-lib --mode=metadata` | Extract component metadata | Metadata for docs/LSP             |
 
 ### Extension Build Workflow
 
@@ -503,10 +507,9 @@ npm start
 
 ```
 dist/
-  ├── xmlui-extension-name.js      # CommonJS bundle
-  ├── xmlui-extension-name.mjs     # ES module bundle
+  ├── xmlui-extension-name.js      # ES module bundle
   ├── xmlui-extension-name.d.ts    # TypeScript declarations
-  └── *.css                        # Extracted component styles
+  └── *.css                        # Component styles
 ```
 
 ### Extension Distribution
@@ -527,17 +530,12 @@ npm publish
 ```json
 {
   "name": "xmlui-myextension",
+  "type": "module",
   "main": "./dist/xmlui-myextension.js",
-  "module": "./dist/xmlui-myextension.mjs",
+  "types": "./dist/xmlui-myextension.d.ts",
   "exports": {
-    ".": {
-      "import": "./dist/xmlui-myextension.mjs",
-      "require": "./dist/xmlui-myextension.js"
-    },
-    "./*.css": {
-      "import": "./dist/*.css",
-      "require": "./dist/*.css"
-    }
+    ".": "./dist/xmlui-myextension.js",
+    "./*.css": "./dist/*.css"
   },
   "files": ["dist"]
 }
@@ -725,10 +723,10 @@ This table summarizes when to run builds across different contexts:
 | **xmlui/**     | Building standalone       | `npm run build:xmlui-standalone` | `vite build --mode standalone`                  | For CDN/buildless                              | Creates self-contained UMD bundle for `<script>` tag usage; framework builds itself with Vite directly                                                                                                                                                              |
 | **xmlui/**     | Generating metadata       | `npm run build:xmlui-metadata`   | `vite build --mode metadata`                    | After component changes, before doc generation | Extracts component metadata into `xmlui-metadata.js` for documentation generation and language server autocomplete. This is the source of truth for component APIs, props, and descriptions. Framework uses Vite directly.                                          |
 | **xmlui/**     | Full doc generation       | `npm run generate-all-docs`      | Node scripts (not CLI)                          | After metadata changes                         | Runs three scripts: (1) `build:xmlui-metadata` - extracts metadata, (2) `generate-docs` - creates component .md files from metadata, (3) `generate-docs-summaries` - creates overview/summary files. This is the complete pipeline from source code → documentation |
-| **xmlui/**     | Compile bin scripts       | `npm run build:bin`              | `tsdown`                                        | After changes to bin/\*.ts files               | Compiles TypeScript bin scripts (CLI tools) to JavaScript using tsdown (see tsdown.config.ts); needed when modifying build system or CLI commands                                                                                                                   |
+| **xmlui/**     | Compile bin scripts       | `npm run build:bin`              | `tsdown`                                        | After changes to bin/\*.ts files               | Compiles TypeScript bin scripts to ESM + CommonJS using tsdown; outputs both formats for compatibility                                                                                                                                                             |
 | **extension/** | Development               | `npm start`                      | `xmlui start`                                   | Keep running during dev                        | Runs dev server with HMR for demo app; use with build-watch in separate terminal                                                                                                                                                                                    |
 | **extension/** | Watch mode build          | `npm run build-watch`            | `xmlui build-lib --watch`                       | Keep running during dev                        | Continuously rebuilds extension library on changes; pair with `npm start` for rapid iteration                                                                                                                                                                       |
-| **extension/** | Building for publish      | `npm run build:extension`        | `xmlui build-lib`                               | Before npm publish                             | Creates distributable library bundle (.mjs, .js, .d.ts, CSS) for npm package                                                                                                                                                                                        |
+| **extension/** | Building for publish      | `npm run build:extension`        | `xmlui build-lib`                               | Before npm publish                             | Creates distributable ESM library bundle (.js, .d.ts, CSS) for npm package                                                                                                                                                                                          |
 | **extension/** | Build demo app            | `npm run build:demo`             | `xmlui build`                                   | For demo deployment                            | Builds the demo application (not the extension itself) for hosting                                                                                                                                                                                                  |
 | **extension/** | Extract metadata          | `npm run build:meta`             | `xmlui build-lib --mode=metadata`               | For LSP/docs support                           | Extracts extension component metadata for language server and documentation                                                                                                                                                                                         |
 

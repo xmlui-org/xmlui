@@ -19,21 +19,12 @@ This document explains the XMLUI monorepo architecture, workspace organization, 
 
 ## Overview
 
-XMLUI uses a **monorepo architecture** managed by **npm workspaces** with **Turborepo** for efficient task orchestration. This structure allows:
+XMLUI uses a **monorepo** with **npm workspaces** and **Turborepo** for task orchestration, providing shared dependencies, unified builds, parallel execution, and intelligent caching.
 
-- **Shared dependencies** across packages
-- **Cross-package dependency management**
-- **Unified build pipeline** with caching
-- **Parallel task execution**
-- **Incremental builds** with intelligent caching
-
-**Key Technologies:**
-
-- **Monorepo Manager:** npm workspaces
-- **Task Orchestration:** Turborepo 2.x
-- **Package Manager:** npm@10.9.2
-- **Version Management:** @changesets/cli
-- **Build Tool:** Vite 5.x (within packages)
+**Stack:**
+- npm workspaces + Turborepo 2.x + npm@10.9.2
+- @changesets/cli for versioning
+- Vite 7.x for builds
 
 ## Monorepo Architecture
 
@@ -127,315 +118,64 @@ xmlui-repo-root/
 
 ### Workspace Benefits
 
-**Dependency Hoisting:**
-
-```bash
-# Shared dependencies installed once at root
-node_modules/
-  ├── react/
-  ├── typescript/
-  └── vite/
-```
-
-**Cross-Package Dependencies:**
-
-```json
-{
-  "dependencies": {
-    "xmlui": "workspace:*",
-    "@xmlui/animations": "workspace:*"
-  }
-}
-```
-
-**Unified Scripts:**
-
-```bash
-# Run command in all workspaces
-npm run build --workspaces
-
-# Run command in specific workspace
-npm run build --workspace=xmlui
-```
+- **Dependency hoisting** - Shared deps installed once at root
+- **Cross-package deps** - Use `"xmlui": "workspace:*"`
+- **Unified scripts** - `npm run build --workspaces` or `--workspace=xmlui`
 
 ## Turborepo Build Orchestration
 
-Turborepo manages the build pipeline with task dependencies, caching, and parallel execution.
-
-### turbo.json Configuration
-
-The `turbo.json` file at the repository root defines all tasks and their orchestration:
-
-```json
-{
-  "$schema": "https://turbo.build/schema.json",
-  "globalEnv": ["CI"],
-  "tasks": {
-    "build:xmlui-all": { ... },
-    "test:xmlui-all": { ... },
-    "build:extension": { ... },
-    "generate-docs": { ... }
-  }
-}
-```
+Turborepo manages the build pipeline with task dependencies, caching, and parallel execution via `turbo.json`.
 
 ### Core Task Definitions
 
-#### XMLUI Core Package Tasks
+**XMLUI Core:**
+- `build:bin` - Compile CLI tools → `dist/bin/**`
+- `build:xmlui` - Build library (ESM) → `dist/lib/**`
+- `build:xmlui-standalone` - Build UMD bundle → `dist/standalone/**`
+- `build:xmlui-metadata` - Extract metadata → `dist/metadata/**`
 
-**build:bin**
+- `build:xmlui-all` - Master task (depends on all above + `build:extension`)
 
-```json
-{
-  "outputs": ["dist/bin/**"]
-}
-```
+**Extensions:**
+- `build:extension` - Builds extension packages (uses `^` for dependency resolution)
 
-Compiles CLI tools in `xmlui/bin/` folder.
+**Documentation:**
+- `generate-docs` - Generate from metadata (`cache: false`)
+- `build:docs` - Build complete site (depends on extensions, releases, summaries)
 
-**build:xmlui**
-
-```json
-{
-  "outputs": ["dist/lib/**"]
-}
-```
-
-Builds library mode (ES modules for npm distribution).
-
-**build:xmlui-standalone**
-
-```json
-{
-  "outputs": ["dist/standalone/**"]
-}
-```
-
-Builds standalone UMD bundle for CDN deployment.
-
-**build:xmlui-metadata**
-
-```json
-{
-  "inputs": ["$TURBO_DEFAULT$", "!src/language-server/xmlui-metadata-generated.js"],
-  "outputs": ["dist/metadata/**"]
-}
-```
-
-Extracts component metadata for documentation and LSP.
-
-**build:xmlui-all**
-
-```json
-{
-  "dependsOn": [
-    "build:bin",
-    "build:xmlui-metadata",
-    "build:xmlui",
-    "build:xmlui-standalone",
-    "build:extension"
-  ],
-  "outputs": ["dist/**"]
-}
-```
-
-Master task that builds entire XMLUI core package.
-
-#### Extension Package Tasks
-
-**build:extension**
-
-```json
-{
-  "dependsOn": ["^build:extension"],
-  "outputs": ["dist/**"]
-}
-```
-
-Builds extension packages. The `^` prefix means "wait for dependencies' build:extension".
-
-#### Documentation Tasks
-
-**generate-docs**
-
-```json
-{
-  "dependsOn": ["build:xmlui-metadata", "build:meta"],
-  "outputs": ["public/pages/**", "content/**/*.md", "content/**/*.mdx"],
-  "cache": false
-}
-```
-
-Generates documentation from component metadata.
-
-**build:docs**
-
-```json
-{
-  "dependsOn": [
-    "^build:extension",
-    "^build:xmlui",
-    "gen:releases",
-    "gen:download-latest-xmlui-release",
-    "generate-docs-summaries"
-  ],
-  "outputs": ["dist/**", "xmlui-optimized-output/**"]
-}
-```
-
-Builds complete documentation site.
-
-#### Testing Tasks
-
-**test:unit**
-
-```json
-{
-  "outputs": ["coverage/**"],
-  "cache": false
-}
-```
-
-Runs unit tests with Vitest.
-
-**test:e2e-smoke**
-
-```json
-{
-  "dependsOn": ["build:test-bed", "build:xmlui-test-bed"],
-  "outputs": ["playwright-report/**", "test-results/**", "tests-e2e/screenshots/**"],
-  "cache": false
-}
-```
-
-Runs smoke E2E tests with Playwright.
-
-**test:xmlui-all**
-
-```json
-{
-  "dependsOn": ["test:unit", "test:e2e-non-smoke"],
-  "cache": false
-}
-```
-
-Runs complete test suite.
+**Testing:**
+- `test:unit` - Vitest (`cache: false`)
+- `test:e2e-smoke` - Playwright smoke tests (`cache: false`)
+- `test:xmlui-all` - Complete suite (unit + E2E)
 
 ### Turborepo Features
 
 #### Caching
 
-**How it works:**
+Turborepo hashes inputs and replays cached outputs for matching hashes.
 
-- Turborepo hashes task inputs (source files, dependencies, env vars)
-- If hash matches previous run, replays cached outputs
-- Dramatically speeds up incremental builds
+**Locations:** `node_modules/.cache/turbo/` (local), remote via `turbo login`
 
-**Cache locations:**
-
+**Control:**
 ```bash
-# Local cache
-node_modules/.cache/turbo/
-
-# Remote cache (optional)
-# Configure with turbo login
-```
-
-**Cache configuration:**
-
-```json
-{
-  "inputs": ["$TURBO_DEFAULT$", "!**/*.test.ts"],
-  "outputs": ["dist/**"]
-}
-```
-
-**Cache control:**
-
-```bash
-# Use cache (default)
-turbo run build:xmlui-all
-
-# Ignore cache, force rebuild
-turbo run build:xmlui-all --force
-
-# Show cache hits/misses
-turbo run build:xmlui-all --verbosity=3
+turbo run build:xmlui-all          # Use cache
+turbo run build:xmlui-all --force  # Ignore cache
+turbo run build:xmlui-all --verbosity=3  # Show hits/misses
 ```
 
 #### Parallel Execution
 
-**Dependency-based parallelization:**
-
-```
-build:xmlui-all
-  ├── build:bin                    ⎤
-  ├── build:xmlui-metadata         ⎥ Run in parallel
-  └── build:xmlui                  ⎦
-      └── build:xmlui-standalone   → Runs after build:xmlui
-```
-
-**Concurrency control:**
-
-```bash
-# Limit parallel tasks
-turbo run build:xmlui-all --concurrency=4
-
-# No limit (use all CPU cores)
-turbo run build:xmlui-all --concurrency=100
-```
+Tasks run in parallel when dependencies allow. Control with `--concurrency=N` (default uses all cores).
 
 #### Output Management
 
-**Inputs:**
-
-- `$TURBO_DEFAULT$` - All files except ignored ones
-- Specific patterns: `src/**/*.ts`, `package.json`
-- Negations: `!**/*.test.ts`
-
-**Outputs:**
-
-- Define what gets cached: `["dist/**"]`
-- Must be deterministic
-- Should not include timestamps or random content
-
-**Global environment variables:**
-
-```json
-{
-  "globalEnv": ["CI", "NODE_ENV"]
-}
-```
-
-These affect cache keys.
+**Inputs:** `$TURBO_DEFAULT$` (all files), specific patterns, negations (`!**/*.test.ts`)
+**Outputs:** Must be deterministic (no timestamps/random content)
+**Global env:** `["CI", "NODE_ENV"]` affect cache keys
 
 #### Cross-Package Dependencies
 
-**Prefix operators:**
-
-```json
-{
-  "dependsOn": [
-    "^build:extension" // Dependencies must complete first
-  ]
-}
-```
-
-The `^` means: "Before running this task, run the same task in all dependencies."
-
-**Example:**
-
-```
-packages/xmlui-website-blocks/
-  dependencies:
-    - xmlui
-    - @xmlui/animations
-
-turbo run build:extension
-  → First builds xmlui
-  → Then builds @xmlui/animations
-  → Finally builds xmlui-website-blocks
-```
+The `^` prefix (e.g., `^build:extension`) runs the task in all dependencies first, ensuring correct build order.
 
 ## Build Commands Reference
 
@@ -583,27 +323,9 @@ tools/vscode#build:vsix
 
 ## CI/CD Integration
 
-### Environment Variables
-
-**Global variables (affect cache):**
-
-```json
-{
-  "globalEnv": ["CI"]
-}
-```
-
-**CI detection:**
-
-```bash
-# Unix/Linux/macOS
-npm run test-xmlui:ci
-# Sets: CI=true turbo run test:xmlui-all
-
-# Windows
-npm run test-xmlui:ci-win
-# Sets: set CI=true && turbo run test:xmlui-all
-```
+**CI commands:**
+- Unix: `npm run test-xmlui:ci` (sets `CI=true`)
+- Windows: `npm run test-xmlui:ci-win`
 
 ### CI Pipeline Example
 
@@ -635,23 +357,7 @@ jobs:
         run: npm run build-extensions
 ```
 
-### Remote Caching (Optional)
-
-**Setup:**
-
-```bash
-# Login to Vercel/Turbo
-turbo login
-
-# Link repository
-turbo link
-```
-
-**Benefits:**
-
-- Share cache across CI runs
-- Share cache across team members
-- Faster CI builds
+**Remote caching:** `turbo login && turbo link` (shares cache across CI/team)
 
 ## Development Workflow
 
@@ -764,63 +470,17 @@ git push --follow-tags
 
 ### Changesets
 
-XMLUI uses `@changesets/cli` for coordinated version management across packages.
-
-**Add changeset:**
+XMLUI uses `@changesets/cli` for version management.
 
 ```bash
-npm run changeset:add
-
-# Interactive prompts:
-# 1. Select packages to version
-# 2. Choose version bump (major/minor/patch)
-# 3. Write summary of changes
-```
-
-**Version packages:**
-
-```bash
-npm run changeset:version
-
-# This:
-# 1. Reads all changesets
-# 2. Updates package.json versions
-# 3. Updates CHANGELOG.md files
-# 4. Deletes consumed changesets
-```
-
-**Publish packages:**
-
-```bash
-npm run changeset:publish
-
-# This:
-# 1. Builds packages (via prepublishOnly)
-# 2. Publishes to npm
-# 3. Creates git tags
+npm run changeset:add      # Select packages, bump type, write summary
+npm run changeset:version  # Update versions, CHANGELOGs
+npm run changeset:publish  # Build, publish to npm, create tags
 ```
 
 ### Workspace Protocol
 
-Dependencies between workspace packages use `workspace:*`:
-
-```json
-{
-  "dependencies": {
-    "xmlui": "workspace:*"
-  }
-}
-```
-
-**During publish:**
-
-```json
-{
-  "dependencies": {
-    "xmlui": "^0.10.19" // Replaced with actual version
-  }
-}
-```
+Use `"xmlui": "workspace:*"` in dev; replaced with actual version on publish.
 
 ### Package Scripts
 
