@@ -155,6 +155,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     flex-direction: row;
     width: 100%;
     min-height: $minHeight;
+    height: max-content;
     border-width: 1px;
     border-style: solid;
     transition: background-color ease-in 0.1s;

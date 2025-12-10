@@ -195,6 +195,7 @@ $borderColor-TextBox--disabled: createThemeVar("Input:borderColor-#{$componentNa
     align-items: center;
     gap: $gap-adornment-TextBox;
     width: 100%;
+    height: max-content;
     border-style: solid;
     border-width: 1px;
     transition: background-color ease-in 0.1s;
