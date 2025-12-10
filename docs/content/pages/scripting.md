@@ -36,7 +36,18 @@ A function call:
 >
 ```
 
-The last example uses a JavaScript [arrow function expression](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions), a concise way to define and use a function in an XMLUI attribute. The function receives the value of a selected theme in the `newTheme` argument (a name of your choosing) and calls the [global](/globals) `setTheme` function with that value.
+A function call with an argument:
+
+```xmlui !/(newTheme) => setTheme(newTheme)/
+<Select
+  id="pickTheme"
+  initialValue="xmlui"
+  onDidChange="(newTheme) => setTheme(newTheme)">
+</Select>
+```
+
+> [!INFO]
+> The JavaScript [arrow function expression](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions), `=>`, is a concise way to define and use a function in an XMLUI attribute.
 
 ## Writing longer functions
 
