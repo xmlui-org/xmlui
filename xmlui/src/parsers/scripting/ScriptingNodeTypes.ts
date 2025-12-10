@@ -40,6 +40,7 @@ export const T_ARROW_EXPRESSION = 115;
 export const T_PREFIX_OP_EXPRESSION = 116;
 export const T_POSTFIX_OP_EXPRESSION = 117;
 export const T_REACTIVE_VAR_DECLARATION = 118;
+export const T_VALUE_ACCESSOR_EXPRESSION = 119;
 
 // --- Other node type values
 export const T_VAR_DECLARATION = 200;

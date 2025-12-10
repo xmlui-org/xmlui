@@ -15,6 +15,7 @@ import {
   type PostfixOpExpression,
   type PrefixOpExpression,
   type UnaryExpression,
+  type ValueAccessorExpression,
 } from "./ScriptingSourceTree";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
@@ -214,6 +215,29 @@ export function evalCalculatedMemberAccessCore(
   thisStack.push(value);
 
   // --- Done.
+  return value;
+}
+
+// --- Evaluates a value accessor expression (sync & async context)
+export function evalValueAccessorCore(
+  thisStack: any[],
+  expr: ValueAccessorExpression,
+  thread: LogicalThread,
+): any {
+  const obj = thisStack[thisStack.length - 1];
+  
+  // --- Apply value accessor logic
+  let value = obj;
+  if (obj !== null && obj !== undefined && typeof obj === 'object' && '_VALUE_PROP_' in obj) {
+    const propName = obj._VALUE_PROP_;
+    if (typeof propName === 'string') {
+      value = obj[propName];
+      thisStack.pop();
+      thisStack.push(value);
+    }
+  }
+  
+  setExprValue(expr, { value }, thread);
   return value;
 }
 
