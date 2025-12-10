@@ -40,6 +40,7 @@ When the browser loads `index.html`, the standalone runtime automatically:
 
 ```typescript
 // From index-standalone.ts (bundled in xmlui-standalone.umd.js)
+// ESM module that auto-starts on DOMContentLoaded
 startApp(undefined, undefined, Xmlui);
 ```
 
@@ -65,10 +66,10 @@ docs/
 The `index.ts` entry point uses Vite's `import.meta.glob()` to pre-compile all source files:
 
 ```typescript
-// From docs/index.ts
+// From docs/index.ts (ESM module)
 import { startApp } from "xmlui";
 
-export const runtime = import.meta.glob(`/src/**`, { eager: true });
+const runtime = import.meta.glob(`/src/**`, { eager: true });
 startApp(runtime, usedExtensions);
 ```
 
@@ -86,7 +87,7 @@ The build-hello-world-component tutorial shows an interesting hybrid pattern - a
 
 Extension development uses a build step:
 ```bash
-npm run build:extension  # Creates dist/xmlui-hello-world.js
+npm run build:extension  # Creates dist/xmlui-hello-world.js (ESM)
 ```
 
 But the resulting extension is consumed by buildless standalone apps:
@@ -225,15 +226,14 @@ This buildless approach enables rapid prototyping and simple deployment scenario
 
 Built apps represent XMLUI's production-ready deployment approach where source files are pre-compiled during build time, resulting in optimized bundles with faster startup times and reduced runtime overhead.
 
-Built apps use the vite development server with hot module reloading. If you change the XMLUI app's source code, the app is updated in the browser automatically without manual refresh. XMLUI has a vite plugin that compiles xmlui source files to their internal definition and so do not require the parsing cycles a buildless app executes. So, the app starts faster.
+Built apps use Vite with HMR. The vite-xmlui-plugin compiles `.xmlui` files to component definitions at build time, eliminating runtime parsing overhead for faster startup.
 
 **How Built Apps Bootstrap:**
-1. Build process pre-compiles all .xmlui and .xmlui.xs files using the vite-xmlui-plugin
-2. Source files are transformed into component definitions and bundled into JavaScript modules
-3. Browser loads index.html which includes the compiled JavaScript and CSS bundles
-4. Pre-compiled component definitions are already available in memory - no fetching required
-5. StandaloneApp receives the pre-compiled runtime object with all app definitions ready
-6. Rendering begins immediately without parsing delays since everything is pre-processed
+1. Vite pre-compiles `.xmlui`/`.xmlui.xs` files via vite-xmlui-plugin during build
+2. Compiled definitions are bundled into ESM modules
+3. Browser loads bundled JS/CSS
+4. `StandaloneApp` receives pre-compiled `runtime` object
+5. Rendering begins immediately without parsing
 
 **Key Characteristics of Built Deployment:**
 - **Optimized Performance**: All source files are pre-parsed and bundled
@@ -327,45 +327,39 @@ AppRoot
   └── ComponentProvider (component registry)
       └── StyleProvider (CSS-in-JS)
           └── DebugViewProvider (debug context)
-              └── AppWrapper (multiple providers)
+              └── AppWrapper
 ```
 
-This segment establishes the core rendering infrastructure and development environment. ComponentProvider sets up the component registry that maps component names to their renderers. StyleProvider enables CSS-in-JS styling capabilities, while DebugViewProvider configures development tooling and debugging context throughout the application.
+AppRoot establishes the core rendering infrastructure. ComponentProvider manages the component registry, StyleProvider enables theming, and DebugViewProvider configures development tooling.
 
 #### AppWrapper Hierarchy
 
 ```
 AppWrapper
-  └── Router (BrowserRouter/HashRouter/MemoryRouter)
+  └── Router (Browser/Hash/MemoryRouter)
       └── QueryClientProvider (React Query)
-          └── HelmetProvider (document head management)
-              └── LoggerProvider (logging context)
-                  └── IconProvider (icon registry)
-                      └── ThemeProvider (theme context)
+          └── HelmetProvider (document head)
+              └── LoggerProvider (logging)
+                  └── IconProvider (icons)
+                      └── ThemeProvider (themes)
                           └── InspectorProvider (dev tools)
-                              └── ConfirmationModalContextProvider (modal dialogs)
-                                  └── AppContent (app context + state)
+                              └── ConfirmationModalContextProvider (modals)
+                                  └── AppContent
 ```
 
-This segment creates the comprehensive application runtime environment through multiple provider layers. Router handles navigation and URL management, QueryClientProvider manages data fetching and caching, while HelmetProvider controls document metadata.
-
-The remaining providers establish essential app services: LoggerProvider for application-wide logging, IconProvider for icon registry and rendering, ThemeProvider for theme management, InspectorProvider for development tools, and ConfirmationModalContextProvider for modal dialog interactions.
+AppWrapper creates the application runtime environment with provider layers for routing, data fetching (React Query), document management (Helmet), logging, icons, theming, dev tools, and modal dialogs.
 
 #### AppContent Hierarchy
 
 ```
 AppContent
-  └── AppContext.Provider (global app functions)
-      └── AppStateContext.Provider (app state management)
+  └── AppContext.Provider (global functions)
+      └── AppStateContext.Provider (bucket state)
           └── StandaloneComponent (root container)
               └── renderChild() → ComponentWrapper → ContainerWrapper/ComponentAdapter
 ```
 
-This segment provides the final application context and initiates the actual component rendering process. AppContext.Provider supplies global app functions like navigation, toast notifications, and utility functions. AppStateContext.Provider manages application state in organized "buckets" to avoid prop drilling.
-
-StandaloneComponent wraps the app definition in a root Container and calls renderChild() to begin the recursive component rendering process, routing through ComponentWrapper to either ContainerWrapper for stateful components or ComponentAdapter for regular components.
-
-This architecture ensures proper separation of concerns, with each layer providing specific functionality needed for XMLUI app rendering and execution.
+AppContent provides global app functions (navigate, toast, confirm) via AppContext and bucket-based state management via AppStateContext. StandaloneComponent wraps the app in a root Container and begins recursive rendering through ComponentWrapper.
 
 ## Implementation Details
 
@@ -537,11 +531,10 @@ The framework may translate those props into a dynamic CSS class applied to the 
 
 #### Behavior
 
-- `AppWrapper` selects the router implementation: `MemoryRouter` for preview mode, `HashRouter` when `useHashBasedRouting` is true (the default), or `BrowserRouter` otherwise.
-- In preview mode or REMIX environments the app may skip mounting a client-side router entirely and rely on server or parent-frame routing.
-- The router receives a `basename` prop (from `routerBaseName`) which prefixes all routes. `HashRouter` ignores `basename` since hash routing uses fragment identifiers.
-- XMLUI components use router hooks (`useNavigate`, `useLocation`, etc.) from `react-router-dom` to read or update URL state. The `navigate` function exposed in `AppContext` wraps the router's navigation API.
-- The router integrates with XMLUI's `Link`, `NavLink`, and `Redirect` components to enable declarative navigation in markup.
+- `AppWrapper` selects the router: `MemoryRouter` for preview mode, `HashRouter` when `useHashBasedRouting` is true (default), or `BrowserRouter` otherwise.
+- The router receives a `basename` prop from `routerBaseName`. `HashRouter` ignores `basename` (uses fragment identifiers).
+- XMLUI components use `react-router-dom` hooks (`useNavigate`, `useLocation`) to read/update URL state. `AppContext.navigate` wraps the router API.
+- Integrates with XMLUI's `Link`, `NavLink`, and `Redirect` components for declarative navigation.
 
 #### See Also
 
@@ -557,11 +550,10 @@ The framework may translate those props into a dynamic CSS class applied to the 
 
 #### Behavior
 
-- `AppRoot` creates the singleton `queryClient` instance at module scope with default options: `refetchOnWindowFocus` is disabled to prevent unnecessary refetches when switching browser tabs.
-- `AppWrapper` wraps the entire app in `QueryClientProvider` and passes the singleton client. The provider sits at the outermost layer (alongside `ErrorBoundary`) so all nested components can access React Query hooks.
-- XMLUI components like `DataSource`, `APICall`, and `FileUpload` use React Query internally to handle async data operations, automatic retries, background refetching, and optimistic updates.
-- The client is shared across all components and routes so query results are cached and deduplicated. Multiple components requesting the same query key receive the same cached data.
-- In development mode XMLUI can optionally mount `@tanstack/react-query-devtools` to provide query inspection and cache debugging tools.
+- `AppRoot` creates the singleton `queryClient` with `refetchOnWindowFocus: false` to prevent unnecessary refetches.
+- `AppWrapper` provides the client at the outermost layer so all components can use React Query hooks.
+- Components like `DataSource`, `APICall`, and `FileUpload` use React Query for async operations, retries, and caching.
+- The client is shared across routes; query results are cached and deduplicated by query key.
 
 #### See Also
 
@@ -722,14 +714,12 @@ The framework may translate those props into a dynamic CSS class applied to the 
 
 #### Behavior
 
-- Provides `navigate` function wrapping `react-router-dom`'s navigation API for programmatic routing. Components call `appContext.navigate(path)` to change routes.
-- Provides `toast` function from `react-hot-toast` for displaying temporary notifications. Supports success/error/info variants with customizable duration and positioning.
-- Provides `confirm` function from `ConfirmationModalContextProvider` for displaying modal dialogs that return promises. Components use `await appContext.confirm(title, message)` for user confirmations.
-- Exposes theme controls (`activeThemeId`, `activeThemeTone`, `setTheme`, `setThemeTone`, `toggleThemeTone`) so components can query or change the active theme and tone.
-- Exposes viewport information via `mediaSize` object containing breakpoint flags (`isPhone`, `isTablet`, `isDesktop`, etc.) and dimension values. Components use this for responsive behavior.
-- Provides environment flags including `standalone` (standalone app mode), `debugEnabled` (debug tooling active), `appIsInShadowDom` (shadow DOM detection), `isInIFrame`, and `isWindowFocused`.
-- Exposes utility functions including date formatting, math operations, file utilities (`formatFileSizeInBytes`, `getFileExtension`), delay functions, and path-based property access via Lodash `get`.
-- Provides `queryClient` (React Query singleton), `apiInterceptorContext` (API mocking state), `loggedInUser` (authentication state), and `Actions` (registered action functions).
+- Provides `navigate` (routing), `toast` (notifications), and `confirm` (modal dialogs) functions.
+- Exposes theme controls (`activeThemeId`, `setTheme`, `toggleThemeTone`) for theme management.
+- Provides `mediaSize` object with breakpoint flags (`isPhone`, `isTablet`, `isDesktop`) for responsive behavior.
+- Exposes environment flags: `standalone`, `debugEnabled`, `appIsInShadowDom`, `isInIFrame`, `isWindowFocused`.
+- Provides utilities: date formatting, math operations, file utilities, and Lodash `get` for property access.
+- Includes `queryClient` (React Query), `apiInterceptorContext` (API mocking), and `Actions` (registered functions).
 
 #### See Also
 
@@ -744,12 +734,11 @@ The framework may translate those props into a dynamic CSS class applied to the 
 
 #### Behavior
 
-- Maintains `appState` as a two-level object where top-level keys are bucket names and values are bucket-specific state objects. Each bucket is isolated from others.
-- Provides `update(bucket, patch)` function that merges the patch object into the specified bucket. Uses shallow merge so components can update individual properties without replacing the entire bucket.
-- Supports optimized context selection via `useAppStateContextPart(selector)` hook from `use-context-selector`. Components specify a selector function to subscribe only to specific buckets or values.
-- Enables components to share state without parent-child prop passing. Any component can read or write to any bucket by name, making it useful for cross-cutting concerns like form state, UI preferences, or feature flags.
-- Initializes with empty state (`EMPTY_OBJECT`) and populates buckets on-demand as components write to them. Buckets are created lazily when first accessed.
-- The provider sits immediately inside `AppContext.Provider` so state management has access to the full app context for utilities and environment information.
+- Maintains `appState` as a two-level object: top-level keys are bucket names, values are bucket state objects.
+- Provides `update(bucket, patch)` function for shallow-merging patches into buckets.
+- Uses `use-context-selector` for optimized re-rendering—components only re-render when their selected bucket changes.
+- Enables state sharing without prop drilling; any component can read/write any bucket by name.
+- Initializes empty and populates buckets lazily on first write.
 
 #### See Also
 
@@ -924,12 +913,11 @@ The framework may translate those props into a dynamic CSS class applied to the 
 
 #### Behavior
 
-- Accepts an `attr` object containing attribute name-value pairs to inject into the child component's DOM element. Common attributes include `data-testid` (for E2E testing) and `data-inspectId` (for component inspection).
-- Attempts to access the child component's DOM node via ref forwarding. If the component handles refs the decorator attaches directly to that ref.
-- When ref forwarding isn't available renders hidden helper `<span>` elements before and after the child component. Uses these siblings' refs to locate the actual DOM node via `nextElementSibling` traversal.
-- Sets attributes on the located DOM node via `setAttribute` in a `useLayoutEffect` hook. Removes attributes when their values are undefined to clean up no-longer-needed attributes.
-- Supports `allowOnlyRefdChild` mode where decoration only happens if the component properly handles refs. Used for compound components or modal dialogs where sibling-based location isn't reliable.
-- Calls `onTargetMounted` callback when the target DOM node is located and mounted. Used by inspector tools to refresh inspection state after dynamic component mounting.
+- Injects attributes (e.g., `data-testid`, `data-inspectId`) into the child component's DOM node.
+- Attempts ref forwarding first; if unavailable, uses hidden helper `<span>` elements to locate the DOM node via sibling traversal.
+- Sets attributes via `setAttribute` in `useLayoutEffect`; removes attributes when values are undefined.
+- Supports `allowOnlyRefdChild` mode for compound components where sibling-based location isn't reliable.
+- Calls `onTargetMounted` callback when the DOM node is located, enabling inspector tools to refresh state.
 
 #### See Also
 
@@ -944,12 +932,12 @@ The framework may translate those props into a dynamic CSS class applied to the 
 
 #### Behavior
 
-- Receives slot content as `node` (component definition or array of definitions) from the parent component where the compound component is used with custom child markup.
-- Transforms slot props (passed from the compound component) into context variables prefixed with `$`. For example a slot prop `item` becomes context variable `$item` accessible in the slot content.
-- Wraps the slot content in a Container with `contextVars` set to the transformed slot props. This Container creates a new state scope where slot content can access compound component data.
-- Delegates to `renderChild` to render the containerized slot content through the standard rendering pipeline (ComponentWrapper → ContainerWrapper/ComponentAdapter).
-- Memoized with `React.memo` and uses shallow comparison memoization for slot props to prevent unnecessary re-renders when slot props haven't changed.
-- Enables compound components to inject data into parent-provided templates. For example a `List` compound component can pass `$item` and `$index` to custom slot content for each list item.
+- Receives slot content as `node` from the parent component.
+- Transforms slot props into context variables prefixed with `$` (e.g., `item` → `$item`).
+- Wraps slot content in a Container with `contextVars` for the new state scope.
+- Delegates to `renderChild` for standard rendering through ComponentWrapper.
+- Memoized with shallow comparison to prevent unnecessary re-renders.
+- Enables compound components to inject data into parent-provided templates (e.g., `List` passing `$item` and `$index`).
 
 #### See Also
 

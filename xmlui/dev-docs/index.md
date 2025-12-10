@@ -11,13 +11,20 @@ This article helps you understand the implementation details of xmlui so that yo
 - [React Fundamentals](./react-fundamentals.md)
 - [Standalone Rendering Architecture](./standalone-app.md)
 - [Container-Based State Management](./containers.md)
+- [Theming and Styling Architecture](./theming-styling.md)
 - ...
 
 **Rendering Techniques**
 - [Component Behaviors](./component-behaviors.md)
 - [User-Defined Components](./ud-components.md)
 - [Components with Options](./components-with-options.md)
+- [Data Operations](./data-operations.md)
+- [XMLUI Form Infrastructure](./form-infrastructure.md)
 - ...
+
+**Conventions to use with AI**
+- [Creating XMLUI Components](./conv-create-components.md)
+- [Testing XMLUI Components]()
 
 Topics to elaborate on:
 

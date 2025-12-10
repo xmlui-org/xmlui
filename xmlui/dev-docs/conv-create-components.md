@@ -1,6 +1,6 @@
-# Creating XMLUI Components
+# Conventions: Creating XMLUI Components
 
-This document outlines the conventions, patterns, and best practices for creating new XMLUI components.
+This document defines conventions, patterns, and best practices for creating XMLUI components.
 
 ## Table of Contents
 
@@ -11,87 +11,62 @@ This document outlines the conventions, patterns, and best practices for creatin
 5. [Theme and Styling](#theme-and-styling)
 6. [Component Implementation](#component-implementation)
 7. [Testing](#testing)
-8. [Component Implementation Patterns](#component-implementation-patterns)
-9. [Default Values Pattern](#default-values-pattern)
-10. [ForwardRef Pattern](#forwardref-pattern)
-11. [State Management Patterns](#state-management-patterns)
-12. [Event Handling Patterns](#event-handling-patterns)
-13. [API Registration and Programmatic Control Patterns](#api-registration-and-programmatic-control-patterns)
-14. [XMLUI Renderer Patterns](#xmlui-renderer-patterns)
-15. [Performance Patterns](#performance-patterns)
+8. [Implementation Patterns](#implementation-patterns)
 
 ## Component Structure
 
-XMLUI components are built from four crucial concepts:
+XMLUI components consist of four elements:
 
-1. **Native React Component**: The actual UI implementation using standard React patterns
-2. **Metadata**: Complete API description including props, events, APIs, and theme variables
+1. **Native React Component**: UI implementation using React patterns
+2. **Metadata**: Complete API description (props, events, APIs, theme variables)
 3. **Renderer Function**: Maps XMLUI markup to React component calls
-4. **Component Registration**: Makes the component available in XMLUI markup
+4. **Component Registration**: Makes component available in XMLUI markup
 
-### Core Component Concepts
+### Core Concepts
 
-XMLUI components expose several key concepts that enable rich interactivity:
+- **Properties**: Configuration values (e.g., `size`, `variant`, `disabled`)
+- **Events**: User interactions (e.g., `click`, `change`, `focus`)
+- **Event Handlers**: Functions responding to events
+- **Exposed Methods**: Programmatic APIs (e.g., `setValue()`, `focus()`)
+- **Context Variables**: Data exposed to children via `$variableName` syntax
 
-- **Properties**: Configuration values passed to components (e.g., `size`, `variant`, `disabled`)
-- **Events**: User interactions that components can emit (e.g., `click`, `change`, `focus`)
-- **Event Handlers**: Functions that respond to events, often updating application state
-- **Exposed Methods**: Programmatic APIs that allow parent components to control child behavior (e.g., `setValue()`, `focus()`)
-- **Context Variables**: Data that components expose to their children, accessible via `$variableName` syntax
+### Creation Rules
 
-### Component Creation Conventions
+❌ **Never create:**
+- `index.ts` files
+- Example files
+- Entries in `package.json`
 
-When creating new XMLUI components, follow these strict conventions:
+✅ **Only when requested:**
+- End-to-end tests
+- Documentation
 
-**File Structure:**
-- **Never create `index.ts` files** when creating components
-- **Never create example files** to demonstrate the component
-- **Only create end-to-end tests and documentation when explicitly requested**
-- **Do not add the React component to the xmlui folder's package.json file**
-
-**Focus on Core Functionality:**
-- Prioritize the component's core functionality and API design
-- Ensure proper XMLUI integration and registration
-- Examples and comprehensive documentation are secondary concerns unless specifically requested
+✅ **Focus on:**
+- Core functionality and API design
+- Proper XMLUI integration
+- Component registration
 
 ### File Organization
 
-Each component should have its own directory under `src/components/` with the following structure:
+Each component has its own directory under `src/components/`:
 
 ```
 ComponentName/
-├── ComponentName.tsx              # Component definition (required)
-├── ComponentNameNative.tsx        # Native implementation (dual-file pattern)
-└── ComponentName.module.scss      # Component styles (optional)
+├── ComponentName.tsx              # Metadata + renderer (required)
+├── ComponentNameNative.tsx        # React implementation (required for complex components)
+└── ComponentName.module.scss      # Styles (optional, visual components only)
 ```
 
-**Key files:**
-- **Component definition**: Always named exactly like the component (e.g., `Avatar.tsx`)
-- **Native file**: Appended with "Native" suffix (e.g., `AvatarNative.tsx`)
-- **SCSS module**: Always follows `.module.scss` pattern for scoped styles
+**Naming:**
+- Component definition: `Avatar.tsx`
+- Native implementation: `AvatarNative.tsx`
+- SCSS module: `Avatar.module.scss`
 
-**Important conventions:**
-- **Never create `index.ts` files** when creating components - components should be imported directly from their main files
-- **Never create example files** to demonstrate the component - examples should be in documentation or playground only
-- **Create end-to-end tests and documentation only when explicitly requested** - focus on core functionality first
+**Dual-File Pattern:**
+- **Component Definition** (`ComponentName.tsx`): Metadata, renderer, theme variables
+- **Native Component** (`ComponentNameNative.tsx`): React implementation with `forwardRef`, TypeScript interfaces, `defaultProps`
 
-### Standard Dual-File Pattern
-
-Most XMLUI components use a dual-file pattern that separates concerns:
-
-- **Component Definition** (`ComponentName.tsx`)
-  - Contains component metadata using `createMetadata`
-  - Defines the renderer function with `createComponentRenderer`
-  - Specifies theme variables and their defaults
-  - Maps XMLUI props to native component props
-
-- **Native Component** (`ComponentNameNative.tsx`)
-  - Pure React implementation using `forwardRef`
-  - Contains actual rendering logic and component behavior
-  - Defines TypeScript interfaces for props
-  - Exports `defaultProps` object
-
-> **Note**: For very simple components, the native implementation can be included directly in the component definition file instead of creating a separate `*Native.tsx` file.
+> **Note**: Simple components can combine both into a single file.
 
 ### Component Registration
 
@@ -107,19 +82,17 @@ this.registerCoreComponent(avatarComponentRenderer);
 
 ## Component Metadata
 
-Component metadata is a **fundamental and critical concept** in XMLUI. It serves as the single source of truth that describes a component's complete API surface, including properties, events, exposed methods, context variables, and theme variables. This metadata is not just documentation—it's actively used by:
+Metadata is the **single source of truth** for a component's API. It describes properties, events, exposed methods, context variables, and theme variables. Used by:
 
-- **XMLUI Documentation System**: Auto-generates component documentation
-- **VS Code Extension**: Provides IntelliSense, auto-completion, and validation
-- **Type Checking**: Validates component usage at build time  
-- **Developer Tools**: Powers debugging and inspection features
-- **Code Generation**: Enables automated tooling and scaffolding
+- Documentation generation
+- VS Code IntelliSense and validation
+- Build-time type checking
+- Developer tools and debugging
+- Code generation and tooling
 
 ### Metadata Structure
 
-Component metadata is defined using the `createMetadata` helper. Some components are non-visual and do not render any UI - these use the `nonVisual` metadata property set to `true`.
-
-Component metadata is defined using the `createMetadata` helper:
+Use `createMetadata` helper. Set `nonVisual: true` for non-visual components.
 
 ```typescript
 import { createMetadata, d, dClick } from "../metadata-helpers";
@@ -165,19 +138,17 @@ export const ComponentNameMd = createMetadata({
 
 ### Metadata Helper Functions
 
-- `d(description, availableValues?, valueType?, defaultValue?, isValid?, isRequired?)` - General property descriptor
-- `dClick(componentName)` - Standard click event descriptor
-- `dGotFocus(componentName)` - Focus event descriptor
-- `dLostFocus(componentName)` - Blur event descriptor
-- `dInternal(description?)` - Internal-only property descriptor
+- `d(...)` - General property descriptor
+- `dClick(name)` - Click event
+- `dGotFocus(name)` - Focus event
+- `dLostFocus(name)` - Blur event
+- `dInternal(...)` - Internal-only property
 
 ## Component Parts Pattern
 
-The **parts pattern** is a metadata-driven approach that allows referencing and styling nested sub-components within complex XMLUI components. This pattern adds metadata to components that enables targeting specific parts for testing, styling, and layout applications.
+The **parts pattern** enables referencing and styling nested sub-components. Used for complex components with multiple visual elements.
 
-### Parts Metadata Structure
-
-Components that use the parts pattern define a `parts` object in their metadata, where each part has a descriptive name and description:
+### Parts Metadata
 
 ```typescript
 export const ComponentNameMd = createMetadata({
@@ -244,117 +215,65 @@ XMLUI defines common part constants for consistency across components:
 - `PART_START_ADORNMENT` - For decorative elements at the start
 - `PART_END_ADORNMENT` - For decorative elements at the end
 
-### Component Examples Using Parts
+### Benefits & Usage
 
-#### TextBox Component Parts
-```typescript
-parts: {
-  label: { description: "The label displayed for the text box." },
-  startAdornment: { description: "The adornment displayed at the start of the text box." },
-  endAdornment: { description: "The adornment displayed at the end of the text box." },
-  input: { description: "The text box input area." }
-},
-defaultPart: "input"
-```
+**Benefits:**
+- Stable selectors for testing (e.g., `_PART_input_`)
+- Targeted styling via theme variables
+- Precise layout control
+- Auto-generated documentation
 
-#### TimeInput Component Parts
-```typescript
-parts: {
-  hour: { description: "The hour input field." },
-  minute: { description: "The minute input field." },
-  second: { description: "The second input field." },
-  ampm: { description: "The AM/PM indicator." },
-  clearButton: { description: "The button to clear the time input." }
-}
-```
+**When to use:**
+- Multiple visual elements needing separate styling
+- Input elements with labels/adornments
+- Complex internal structure
 
-#### Checkbox Component Parts
-```typescript
-parts: {
-  label: { description: "The label displayed for the checkbox." },
-  input: { description: "The checkbox input area." }
-}
-```
-
-### Benefits of the Parts Pattern
-
-1. **Testing**: Parts provide stable selectors for automated testing by generating predictable CSS classes like `_PART_input_`
-2. **Styling**: Theme variables and CSS can target specific parts of complex components
-3. **Layout**: Layout properties can be applied to specific parts rather than the entire component
-4. **Documentation**: Auto-generated documentation includes part descriptions for better developer understanding
-5. **Consistency**: Standardized part names create consistent patterns across the component library
-
-### When to Use Parts
-
-Use the parts pattern for components that:
-- Have multiple distinct visual elements that users might want to style separately
-- Contain input elements alongside labels, adornments, or other decorative elements
-- Have complex internal structure that benefits from targeted styling or testing
-- Need fine-grained control over layout application to sub-elements
-
-Simple components with a single visual element typically don't need the parts pattern.
+**When to skip:**
+- Simple single-element components
 
 ## Component Renderers
 
-Component renderers are functions that bridge XMLUI markup and React components. They receive a `RendererContext` object containing all necessary information to render the component and return a React element.
+Renderers bridge XMLUI markup and React components. They receive `RendererContext` and return React elements.
 
 ### Renderer Context
 
-The `RendererContext` provides these key properties for accessing component data and functionality:
+Key properties:
 
-- **`node`**: The component definition containing props, children, and metadata
-- **`state`**: The current state of the container in which the component is rendered
-- **`appContext`**: The application context for binding expressions and component usage
-- **`renderChild`**: Renders child components with optional layout context
-- **`layoutContext`**: Information about the layout context in which the component is rendered
-- **`uid`**: Unique identifier for the component instance
-- **`updateState`**: Updates component's internal state using reducer pattern
-- **`extractValue`**: Extracts and evaluates property values (handles binding expressions)
-- **`extractResourceUrl`**: Converts logical resource URLs to physical URLs
-- **`lookupEventHandler`**: Creates event handler functions from XMLUI event definitions  
-- **`lookupAction`**: Obtains async action handlers by name with specified options
-- **`lookupSyncCallback`**: Retrieves synchronous callback functions
-- **`layoutCss`**: Pre-computed CSS properties for layout (position, size, etc.)
-- **`registerComponentApi`**: Registers component methods for programmatic access
+- **`node`** - Component definition (props, children, metadata)
+- **`state`** - Current container state
+- **`renderChild`** - Renders children with optional layout context
+- **`uid`** - Unique component identifier
+- **`updateState`** - Updates state via reducer pattern
+- **`extractValue`** - Evaluates properties (handles bindings)
+- **`lookupEventHandler`** - Creates event handlers
+- **`registerComponentApi`** - Registers component methods
+- **`layoutCss`** - Pre-computed layout styles
+- **`appContext`**, **`layoutContext`**, **`extractResourceUrl`**, **`lookupAction`**, **`lookupSyncCallback`** - Additional context
 
-### Value Extraction Patterns
-
-The `extractValue` function handles different data types with specialized methods:
+### Value Extraction
 
 ```typescript
-// Basic extraction (any type)
 const value = extractValue(node.props.someProperty);
-
-// Typed extraction with defaults
 const size = extractValue.asOptionalString(node.props.size, "medium");
 const enabled = extractValue.asOptionalBoolean(node.props.enabled, true);
 const count = extractValue.asOptionalNumber(node.props.count, 0);
-
-// Display text (handles spacing properly)
 const label = extractValue.asDisplayText(node.props.label);
-
-// CSS size values (with units)
 const width = extractValue.asSize(node.props.width);
 ```
 
-### Event Handler Patterns
-
-Event handlers are created through `lookupEventHandler` and connected to React component events:
+### Event Handlers
 
 ```typescript
-// Simple event handlers
 onClick={lookupEventHandler("click")}
 onFocus={lookupEventHandler("gotFocus")}
 onBlur={lookupEventHandler("lostFocus")}
-
-// Custom events with specific payloads
 onDidChange={lookupEventHandler("didChange")}
-onSelectionChanged={lookupEventHandler("selectionDidChange")}
 ```
 
 ### Renderer Examples
 
-#### Complex Component Renderer with Children
+**Component with children:**
+
 ```typescript
 export const buttonComponentRenderer = createComponentRenderer(
   "Button",
@@ -379,7 +298,8 @@ export const buttonComponentRenderer = createComponentRenderer(
 );
 ```
 
-#### Component with State and API Registration
+**Component with state and API:**
+
 ```typescript
 export const colorPickerComponentRenderer = createComponentRenderer(
   "ColorPicker", 
@@ -402,9 +322,9 @@ export const colorPickerComponentRenderer = createComponentRenderer(
 
 ## Theme and Styling
 
-Non-visual components do not use styling or theme variables.
+Non-visual components don't use styling or theme variables.
 
-Each visual component requires a SCSS module file with this structure:
+Visual components require a SCSS module with this structure:
 
 ```scss
 // ComponentName.module.scss
@@ -441,23 +361,23 @@ $textColor-ComponentName: createThemeVar("textColor-ComponentName");
 }
 ```
 
-This structure is important because it helps collect all theme variables a particular component supports for documentation purposes. The pattern uses the `createThemeVar()` function to define theme variables that can be customized through the design system, then uses those variables in CSS styles, and finally exports them for the component renderer.
+This structure collects theme variables for documentation, defines customizable variables via `createThemeVar()`, uses them in CSS, and exports them for the renderer.
 
 ## Component Implementation
 
-Follow this implementation flow for creating new XMLUI components:
+Implementation flow:
 
-1. **Create the component metadata** - This information helps understand the component design and facilitates discussion
-2. **Create the renderer function and export it** - Use the native component and pass XMLUI component properties and events to it (the code won't build yet as no native component exists)
-3. **Create a rudimentary version of the native component** - Make the code compile with basic functionality
-4. **Add component registration** - At this point you can test the rudimentary component in XMLUI markup
-5. **Implement the native component in full** - Add complete functionality, styling, and behavior
+1. **Create metadata** - Define component API
+2. **Create renderer** - Map XMLUI props to native component (won't build yet)
+3. **Create basic native component** - Make code compile
+4. **Register component** - Test in XMLUI markup
+5. **Complete implementation** - Full functionality, styling, behavior
 
-**Note**: End-to-end tests and comprehensive documentation should only be created when explicitly requested. Focus on core functionality first.
+> **Note**: Create tests/documentation only when explicitly requested.
 
 ### Native Component Structure
 
-Native components must follow these patterns:
+Native components follow this pattern:
 
 ```typescript
 import React, { forwardRef, useRef, useEffect } from "react";
@@ -519,41 +439,19 @@ export const ComponentName = forwardRef(function ComponentName(
 // React.displayName is not used in our component convention
 ```
 
-**Key patterns**: Always use `forwardRef`, define clear TypeScript interfaces, provide sensible defaults via `defaultProps`, use scoped CSS modules, support standard HTML attributes, handle accessibility through proper ARIA attributes, and do **not** set `displayName` on components.
+**Key conventions:** Always use `forwardRef`, define TypeScript interfaces, export `defaultProps`, use scoped CSS modules, support standard HTML attributes via `...rest`, handle accessibility (ARIA), and do NOT set `displayName`.
 
 ## Testing
 
-Component testing follows established patterns and conventions detailed in [testing-conventions.md](./testing-conventions.md). This includes component driver patterns, test structure, and best practices for ensuring component reliability and functionality.
+Follow patterns in [testing-conventions.md](./testing-conventions.md).
 
----
+## Implementation Patterns
 
-## Component Implementation Patterns
+### Default Values Pattern
 
-*Note: This is a temporary list for detailed expansion later*
+Ensure consistent defaults while allowing customization.
 
-### XMLUI Component Patterns
-
-**Specialized Component Patterns:**
-- Form components: Integration with FormContext, validation handling
-- Data-driven components: List virtualization, table column management
-- Interactive components: Complex state management, event propagation
-- Container components: Layout management, child component orchestration
-
-### React Native Component Patterns
-
-**Accessibility Patterns:**
-- ARIA attribute management
-- Focus management and trap patterns
-- Screen reader optimization
-- High contrast and reduced motion support
-
----
-
-## Default Values Pattern
-
-**Purpose**: Components need consistent, predictable default behavior while allowing customization. This pattern solves the problem of ensuring components work correctly when properties are omitted, reducing the need for consumers to specify every property explicitly.
-
-**Implementation Pattern**:
+**Steps:**
 
 1. **Define defaults object in Native component**:
 ```typescript
@@ -640,16 +538,13 @@ export const componentRenderer = createComponentRenderer(
 
 ## ForwardRef Pattern
 
-**Purpose**: React components need to expose DOM element references to parent components for imperative operations like focusing, scrolling, or measuring. The forwardRef pattern solves the problem of ref forwarding through component boundaries, enabling parent components to directly interact with child DOM elements and supporting imperative APIs.
+Expose DOM references and imperative APIs to parent components.
 
-**React API Overview**:
-- **`forwardRef`**: A React function that enables a component to receive a `ref` from its parent and forward it to a child element or expose custom APIs
+> **⚠️ Important**: Do NOT use `useImperativeHandle` - it's an antipattern. Use `registerComponentApi` instead.
 
-> **⚠️ Important - useImperativeHandle Antipattern**: The XMLUI team has determined that `useImperativeHandle` is an antipattern and **should NOT be used** in XMLUI components. All instances have been removed from the codebase. Instead, imperative APIs should be exposed through the XMLUI `registerComponentApi` mechanism, which provides better framework integration and more predictable behavior.
+**Patterns:**
 
-**Implementation Pattern**:
-
-1. **Basic forwardRef structure with typed ref**:
+1. Basic forwardRef:
 ```typescript
 import React, { forwardRef } from "react";
 
@@ -670,7 +565,8 @@ export const ComponentNative = forwardRef<HTMLDivElement, Props>(
 );
 ```
 
-2. **ForwardRef with internal ref composition**:
+2. With internal ref composition:
+
 ```typescript
 import React, { forwardRef, useRef } from "react";
 import { composeRefs } from "../../utils/ref-utils";
@@ -694,7 +590,8 @@ export const ComponentNative = forwardRef<HTMLDivElement, Props>(
 );
 ```
 
-3. **ForwardRef with imperative API exposure via registerComponentApi** (recommended pattern):
+3. With imperative API (recommended):
+
 ```typescript
 import React, { forwardRef, useRef, useState, useEffect } from "react";
 
@@ -746,7 +643,8 @@ export const ComponentNative = forwardRef<HTMLInputElement, Props>(
 );
 ```
 
-4. **Registration in XMLUI renderer with API exposure**:
+4. XMLUI renderer registration:
+
 ```typescript
 export const componentRenderer = createComponentRenderer(
   COMP,
@@ -764,31 +662,18 @@ export const componentRenderer = createComponentRenderer(
 );
 ```
 
-**Key Benefits**:
-- Enables parent components to access child DOM elements directly
-- Supports imperative APIs for programmatic component control through `registerComponentApi`
-- Maintains clean separation between declarative props and imperative methods
-- Allows XMLUI components to expose methods callable from event handlers
-- Facilitates complex component interactions (focus management, animations, measurements)
-- Essential for form components that need validation and value access
-- Provides better framework integration compared to `useImperativeHandle` antipattern
-
 ## State Management Patterns
 
-**Purpose**: React components need different approaches to manage state depending on their complexity, interaction patterns, and integration requirements. These patterns solve various state-related challenges from simple local state to complex cross-component communication and XMLUI framework integration.
+Different approaches for managing component state based on complexity and integration requirements.
 
-**React Hooks Overview**:
-- **`useState`**: Manages component-local state with getter/setter pattern
-- **`useRef`**: Creates mutable references that persist across renders without causing re-renders
-- **`useMemo`**: Memoizes expensive calculations to prevent unnecessary recomputation
-- **`useCallback`**: Memoizes functions to prevent unnecessary re-creation and child re-renders
-- **`useEffect`**: Handles side effects, subscriptions, and cleanup operations
+**React Hooks:**
+- `useState` - Local state
+- `useRef` - Mutable references (no re-render)
+- `useMemo` - Memoize calculations
+- `useCallback` - Memoize functions
+- `useEffect` - Side effects and cleanup
 
-### Controlled vs Uncontrolled Component Pattern
-
-**Purpose**: Components need to handle user input and data flow in predictable ways, either allowing parent components to control the state (controlled) or managing it internally (uncontrolled).
-
-**Implementation Pattern**:
+### Controlled vs Uncontrolled
 
 ```typescript
 // Uncontrolled component - manages its own state
@@ -830,11 +715,7 @@ export const FlexibleComponent = ({ value, defaultValue, onChange }: Props) => {
 };
 ```
 
-### Internal State with External Synchronization Pattern
-
-**Purpose**: Components need to maintain internal state while staying synchronized with external data sources or parent component changes.
-
-**Implementation Pattern**:
+### External Synchronization
 
 ```typescript
 export const SynchronizedComponent = ({ externalValue, onValueChange }: Props) => {
@@ -879,11 +760,7 @@ export const SynchronizedComponent = ({ externalValue, onValueChange }: Props) =
 };
 ```
 
-### Context Consumption for Shared State Pattern
-
-**Purpose**: Components need access to shared state across component trees without prop drilling, such as themes, user authentication, or application-wide settings.
-
-**Implementation Pattern**:
+### Context Consumption
 
 ```typescript
 // Theme context example
@@ -945,11 +822,7 @@ export const FormFieldComponent = ({ fieldName }: { fieldName: string }) => {
 };
 ```
 
-### Effect Hooks for Side Effects and Cleanup Pattern
-
-**Purpose**: Components need to handle side effects like data fetching, subscriptions, timers, and external API interactions while ensuring proper cleanup to prevent memory leaks.
-
-**Implementation Pattern**:
+### Effect Hooks
 
 ```typescript
 export const EffectfulComponent = ({ url, pollingInterval }: Props) => {
@@ -1028,11 +901,7 @@ export const EffectfulComponent = ({ url, pollingInterval }: Props) => {
 };
 ```
 
-### XMLUI State Management using updateState/state Reducer Pattern
-
-**Purpose**: XMLUI components need to integrate with the framework's container-based state management system, enabling complex state sharing across component hierarchies and integration with XMLUI's binding expressions and event system.
-
-**Implementation Pattern**:
+### XMLUI State Management
 
 ```typescript
 // XMLUI component renderer using updateState/state pattern
@@ -1134,22 +1003,9 @@ export const ComplexStateComponent = ({ state, updateState }: Props) => {
 };
 ```
 
-**Key Benefits of Each Pattern**:
-- **Controlled/Uncontrolled**: Clear data flow, predictable behavior, flexible usage patterns
-- **External Synchronization**: Maintains UI responsiveness while staying in sync with external data
-- **Context Consumption**: Eliminates prop drilling, centralizes shared state, improves maintainability
-- **Effect Hooks**: Proper lifecycle management, memory leak prevention, external system integration
-- **XMLUI State Management**: Framework integration, binding expression support, container hierarchy benefits, imperative API registration
-
 ## Event Handling Patterns
 
-**Purpose**: Components need robust, accessible, and performant event handling to respond to user interactions, manage complex input scenarios, and integrate with both React and XMLUI event systems. These patterns solve challenges around event propagation, accessibility, keyboard navigation, and framework integration.
-
-### Event Callback Prop Pattern
-
-**Purpose**: Components need flexible event handling that supports optional callbacks while maintaining predictable behavior when handlers are not provided.
-
-**Implementation Pattern**:
+### Event Callback Props
 
 ```typescript
 interface Props {
@@ -1214,11 +1070,7 @@ export const EventHandlerComponent = ({
 };
 ```
 
-### Event Object Creation and Propagation Pattern
-
-**Purpose**: Components need to create custom event objects and control event propagation for complex interactions and framework integration.
-
-**Implementation Pattern**:
+### Custom Event Objects
 
 ```typescript
 // Custom event types
@@ -1312,11 +1164,7 @@ export const CustomEventComponent = ({
 };
 ```
 
-### Keyboard Event Handling with Accessibility Pattern
-
-**Purpose**: Components need comprehensive keyboard support for accessibility compliance and enhanced user experience, following ARIA patterns and keyboard navigation standards.
-
-**Implementation Pattern**:
+### Keyboard Navigation
 
 ```typescript
 export const AccessibleComponent = ({
@@ -1449,11 +1297,7 @@ export const AccessibleComponent = ({
 };
 ```
 
-### Mouse/Touch Interaction Pattern
-
-**Purpose**: Components need to handle complex mouse and touch interactions including drag and drop, gestures, and multi-touch scenarios while maintaining performance.
-
-**Implementation Pattern**:
+### Mouse/Touch Interactions
 
 ```typescript
 export const InteractiveComponent = ({
@@ -1613,21 +1457,9 @@ export const InteractiveComponent = ({
 };
 ```
 
-**Key Benefits of Each Pattern**:
-- **Event Callback Props**: Flexible, optional event handling with predictable defaults
-- **Custom Event Objects**: Rich event data, controlled propagation, framework integration
-- **Keyboard Accessibility**: WCAG compliance, enhanced UX, comprehensive navigation support
-- **Mouse/Touch Interactions**: Cross-platform compatibility, gesture recognition, performance optimization
+## API Registration Patterns
 
-## API Registration and Programmatic Control Patterns
-
-**Purpose**: XMLUI components need to expose programmatic APIs that allow parent components and external systems to control behavior imperatively. This enables complex interactions like focus management, value manipulation, data refresh, and animation control beyond what declarative props can provide.
-
-### Basic API Registration Pattern
-
-**Purpose**: Components need to expose simple methods for common operations like focus, blur, and value access that can be called from XMLUI event handlers or external JavaScript.
-
-**Implementation Pattern**:
+### Basic API Registration
 
 ```typescript
 // Native component with imperative API
@@ -1696,11 +1528,7 @@ export const inputComponentRenderer = createComponentRenderer(
 );
 ```
 
-### Async API Operations Pattern
-
-**Purpose**: Components need to expose asynchronous operations like data fetching, file operations, or animations that return promises and can be awaited by calling code.
-
-**Implementation Pattern**:
+### Async API Operations
 
 ```typescript
 export const DataTableNative = forwardRef<DataTableAPI, Props>(
@@ -1818,11 +1646,7 @@ export const DataTableNative = forwardRef<DataTableAPI, Props>(
 );
 ```
 
-### Complex State Management API Pattern
-
-**Purpose**: Components with complex internal state need APIs that allow external control over multiple state aspects while maintaining internal consistency and validation.
-
-**Implementation Pattern**:
+### Complex State Management API
 
 ```typescript
 interface FormState {
@@ -2017,11 +1841,7 @@ export const FormNative = forwardRef<FormAPI, Props>(
 );
 ```
 
-### Animation and Media Control API Pattern
-
-**Purpose**: Components that handle animations, media playback, or complex visual effects need APIs for controlling timing, playback state, and visual transitions.
-
-**Implementation Pattern**:
+### Animation and Media Control API
 
 ```typescript
 export const VideoPlayerNative = forwardRef<VideoPlayerAPI, Props>(
@@ -2188,21 +2008,9 @@ export const VideoPlayerNative = forwardRef<VideoPlayerAPI, Props>(
 );
 ```
 
-**Key Benefits of API Registration Patterns**:
-- **Basic API Registration**: Simple imperative operations, consistent interface, framework integration
-- **Async Operations**: Promise-based APIs, error handling, progress tracking, external system integration
-- **Complex State Management**: Multi-faceted control, validation integration, state consistency, external synchronization
-- **Animation/Media Control**: Real-time control, frame-accurate operations, hardware integration, performance optimization
-
 ## XMLUI Renderer Patterns
 
-**Purpose**: XMLUI renderer functions need consistent, efficient patterns for translating component markup into React elements while handling complex scenarios like child rendering, state management, and dynamic property passing. These patterns solve architectural challenges and ensure optimal performance across the component ecosystem.
-
-### Standard Component Renderer Structure Pattern
-
-**Purpose**: All XMLUI components need consistent renderer structure for maintainability, debugging, and framework integration. This pattern provides a standardized template that handles common concerns and reduces boilerplate.
-
-**Implementation Pattern**:
+### Standard Renderer Structure
 
 ```typescript
 // Import dependencies
@@ -2304,10 +2112,6 @@ export { componentNameComponentRenderer as componentNameRenderer };
 ```
 
 ### Child Rendering Patterns
-
-**Purpose**: Components need different strategies for rendering child content depending on their role as containers, the type of children they accept, and the layout context they provide. This pattern optimizes performance and provides proper component composition.
-
-**Implementation Pattern**:
 
 ```typescript
 // Pattern 1: Simple pass-through rendering
@@ -2494,11 +2298,7 @@ export const dataListRenderer = createComponentRenderer(
 );
 ```
 
-### Conditional Property Passing Pattern
-
-**Purpose**: Components need dynamic behavior based on state, props, or context conditions. This pattern enables responsive component behavior while maintaining performance and preventing unnecessary re-renders.
-
-**Implementation Pattern**:
+### Conditional Properties
 
 ```typescript
 // Pattern 1: State-based conditional props
@@ -2740,20 +2540,9 @@ export const optimizedDataTableRenderer = createComponentRenderer(
 );
 ```
 
-**Key Benefits of Renderer Patterns**:
-- **Standard Structure**: Consistent architecture, reduced boilerplate, easier maintenance, debugging support
-- **Child Rendering**: Flexible composition, performance optimization, layout context awareness, selective rendering
-- **Conditional Properties**: Dynamic behavior, performance optimization, context awareness, responsive design support
-
 ## Performance Patterns
 
-**Purpose**: React components need optimization strategies to handle large datasets, complex computations, and frequent updates without degrading user experience. These patterns solve performance bottlenecks through memoization, virtualization, lazy loading, and efficient update strategies.
-
-### Memoization with useMemo and useCallback Pattern
-
-**Purpose**: Components need to prevent expensive recalculations and avoid unnecessary re-renders of child components by memoizing computed values and stable function references.
-
-**Implementation Pattern**:
+### Memoization
 
 ```typescript
 export const OptimizedDataProcessor = ({ 
@@ -2934,11 +2723,7 @@ const MemoizedDataItem = React.memo(({
 });
 ```
 
-### Lazy Loading and Code Splitting Pattern
-
-**Purpose**: Components need to load content and code on-demand to reduce initial bundle size and improve perceived performance by deferring non-critical resources.
-
-**Implementation Pattern**:
+### Lazy Loading
 
 ```typescript
 // Dynamic component import with lazy loading
@@ -3167,11 +2952,7 @@ export const LazyLoadingContainer = ({
 };
 ```
 
-### Debouncing for Expensive Operations Pattern
-
-**Purpose**: Components need to optimize user input handling and expensive operations by reducing the frequency of execution through debouncing and throttling techniques.
-
-**Implementation Pattern**:
+### Debouncing
 
 ```typescript
 export const OptimizedSearchComponent = ({ 
@@ -3453,8 +3234,3 @@ function throttle<T extends (...args: any[]) => any>(
   return throttled as T & { cancel: () => void };
 }
 ```
-
-**Key Benefits of Performance Patterns**:
-- **Memoization**: Prevents expensive recalculations, reduces child re-renders, optimizes function stability, improves large dataset handling
-- **Lazy Loading**: Reduces initial bundle size, improves perceived performance, loads content on-demand, supports code splitting
-- **Debouncing**: Optimizes user input handling, reduces API calls, prevents excessive operations, includes request cancellation and auto-save features

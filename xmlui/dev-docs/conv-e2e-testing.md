@@ -1,12 +1,12 @@
-# XMLUI Component Testing Conventions
+# Conventions: XMLUI Component E2E Testing
 
 This document outlines the testing conventions and standards for XMLUI components using Playwright for end-to-end testing.
 
 ## Test Categories
 
-XMLUI components must be tested across four categories:
+Test components across these categories:
 
-1. **Basic Functionality** - Core behavior but also test cases for each property, event, exposed method of the component. Each such item can be it's own category, if there are sufficiently numerous test cases for it (like >= 5, but that's not a hard requirement). It might make sense to combine multiple properties into the group, like `icon` and `iconPosition` under the `icon prop` group. For the props, also handle edge cases like null, undefined, unexpected input types like objects where text is expected for props, invalid values (like -5 pixels for a width prop), specially long unicode characters like 👨‍👩‍👧‍👦, or chinese characters. For interactive componenets, test interactivity with keyboard and mouse. For Layout Components, test arrangement, spacing
+1. **Basic Functionality** - Core behavior, properties, events, methods. Group related props (e.g., `icon` and `iconPosition`). Test edge cases: null, undefined, invalid values, unicode characters. Test keyboard/mouse interactions for interactive components, arrangement/spacing for layout components.
 
 ```typescript
 test("renders with basic props", async ({ initTestBed, page }) => {
@@ -15,10 +15,7 @@ test("renders with basic props", async ({ initTestBed, page }) => {
 });
 ```
 
-2. **Accessibility**
-
-Has ARIA attributes, keyboard navigation and conforms to Accessibility standards.
-These tests are partially to conform to WCAG and to reach a better score on benchmarks for them.
+2. **Accessibility** - ARIA attributes, keyboard navigation, WCAG compliance.
 
 ```typescript
 test("has correct accessibility attributes", async ({ initTestBed, page }) => {
@@ -28,7 +25,7 @@ test("has correct accessibility attributes", async ({ initTestBed, page }) => {
 });
 ```
 
-3. **Theme Variables** - CSS custom properties and fallback behavior. Use exact browser values: `"rgb(255, 0, 0)"` not `"red"`. **Only include this category for components that support theme variables** (check component metadata for theme variable documentation).
+3. **Theme Variables** - CSS custom properties. Use exact values: `"rgb(255, 0, 0)"` not `"red"`. **Only for components with theme variable support**.
 
 ```typescript
 test("applies theme variables", async ({ initTestBed, page }) => {
@@ -39,7 +36,7 @@ test("applies theme variables", async ({ initTestBed, page }) => {
 });
 ```
 
-4. **Other Edge Cases** - These are the test cases that fall into the edge cases category, but not within one particular property. So a button with an object variant should still live in the basic functionality category, within the variant prop group. Here could be a test for a datepicker stating that it covers the text below it (the text is not visible), when the user clicks on it, because the detepicker menu appears. This doesn't belong to a property, but is still an edge case.
+4. **Other Edge Cases** - General edge cases not tied to specific properties.
 
 ```typescript
 test("handles no props gracefully", async ({ initTestBed, page }) => {
@@ -48,19 +45,16 @@ test("handles no props gracefully", async ({ initTestBed, page }) => {
 });
 ```
 
-5. **Behaviors and Parts** - Tests for XMLUI's behavior system (tooltip, variant, animation) and component part selection system. **Only include this category for components that support behaviors or have identifiable parts**.
+5. **Behaviors and Parts** - Behavior system (tooltip, variant, animation) and part selection. **Only for components with behaviors or parts**.
 
 ## Behaviors and Parts Testing
 
 ### Behavior Testing
 
-XMLUI has a behavior system that automatically wraps components with additional functionality when certain props are present. Common behaviors include:
-
-- **tooltipBehavior**: Wraps component in a Tooltip when `tooltip` or `tooltipMarkdown` props are present
-- **variantBehavior**: Applies CSS classes and theme variables based on `variant` prop
-- **animationBehavior**: Wraps component in an Animation when `animation` prop is present
-
-Test these behaviors systematically:
+Common behaviors:
+- **tooltipBehavior**: `tooltip` or `tooltipMarkdown` props
+- **variantBehavior**: `variant` prop → CSS classes/theme variables
+- **animationBehavior**: `animation` prop
 
 ```typescript
 test.describe("Behaviors and Parts", () => {
@@ -124,9 +118,9 @@ test.describe("Behaviors and Parts", () => {
 
 ### Parts Testing
 
-Components can expose internal elements as "parts" using `<Part partId="partName">`. This allows users to style or reference specific internal elements. 
+Components expose internal elements as "parts" using `<Part partId="partName">`.
 
-**Important**: Always check the component's native implementation file (e.g., `ComponentNameNative.tsx`) to find the actual `partId` values used in the code, as they may differ from metadata documentation.
+**Important**: Check `ComponentNameNative.tsx` for actual `partId` values (may differ from metadata).
 
 ```typescript
 test.describe("Behaviors and Parts", () => {
@@ -197,15 +191,14 @@ test.describe("Behaviors and Parts", () => {
 });
 ```
 
-**Key Testing Patterns:**
-- Use `page.getByTestId("test").locator("[data-part-id='partName']")` to select parts
-- Test both unconditional parts and parts that require specific props to be visible
-- Verify that behaviors (tooltips, variants, animations) don't interfere with part accessibility
-- For variant testing, use theme variables with the pattern `"property-ComponentName-VariantName"`
-- Always verify actual `partId` values in the native implementation before writing tests
+**Key Patterns:**
+- Select parts: `page.getByTestId("test").locator("[data-part-id='partName']")`
+- Test conditional and unconditional parts
+- Verify behaviors don't interfere with parts
+- Variant theme variables: `"property-ComponentName-VariantName"`
+- Check native implementation for actual `partId` values
 
-**Parts That Wrap testId Elements:**
-Some components have parts that wrap the element with the `testId` attribute. In these cases:
+**Parts Wrapping testId:**
 - You cannot scope from `testId` to the part (the part is the parent)
 - Select such parts without testId scoping: `page.locator("[data-part-id='partName']")`
 - Example from AutoComplete component:
@@ -219,11 +212,11 @@ Some components have parts that wrap the element with the `testId` attribute. In
   ```
 - Use `.first()` if multiple instances exist on the page: `page.locator("[data-part-id='partName']").first()`
 
-**CSS Property Selection for Variant Testing:**
-- Choose CSS properties that the component actually supports and applies at the top level
-- Use `borderColor` as a reliable property for most components
-- Avoid `backgroundColor` on components that don't apply it directly (may be transparent)
-- Test only one or two CSS properties per variant test to keep tests focused
+**CSS Property Selection:**
+- Choose properties the component supports at top level
+- Use `borderColor` (reliable for most components)
+- Avoid `backgroundColor` if not directly applied
+- Test 1-2 properties per variant test
 
 **Important Limitations:**
 - **CSS Pseudo-classes**: Do NOT test `:hover`, `:focus`, or `:active` pseudo-class states using `.toHaveCSS()` assertions. Playwright's `.hover()` action triggers JavaScript behaviors but does not activate CSS pseudo-class selectors for CSS inspection.
@@ -249,22 +242,20 @@ Some components have parts that wrap the element with the `testId` attribute. In
 
 ## Context Information
 
-Xmlui is a declarative, reactive, component based web framework.
+XMLUI is a declarative, reactive, component-based web framework.
 
-Checkbox.spec.ts is an excellent testing file with good examples, and it's a great resource on how to write tests.
+`Checkbox.spec.ts` is an excellent reference for test patterns.
 
-### Documentation location
+### Documentation Location
 
-There's documentation for the components, which we call metadata. They lives in the component's file, like `Button.tsx` next to the testing file `Button.spec.ts`, but not in the native implementation file `ButtonNative.tsx`. Generally, you should not read or rely on the native implementation details.
-There's also documentation in the `.md` files, next to the component's file.
+Component metadata lives in `Button.tsx` (not `ButtonNative.tsx`). Documentation is in `.md` files.
 
-#### Component Metadata (Required Reading)
+#### Component Metadata (Required)
 
-**ALWAYS read the component's `.tsx` file before creating tests.** The component files contain essential metadata that documents:
-
-- **Properties**: All available props with their types and descriptions
-- **Events**: Available event handlers and their parameters
-- **Theme Variables**: Default values and names for CSS custom properties used in theme testing
+**ALWAYS read the `.tsx` file before testing.** Contains:
+- Properties with types/descriptions
+- Events and parameters
+- Theme variable names and defaults
 
 Use the documented theme variable names when creating theme tests instead of guessing:
 
@@ -278,26 +269,15 @@ test("applies theme variables", async ({ initTestBed, page }) => {
 });
 ```
 
-#### Documentation Files (Highly Recommended)
+#### Documentation Files (Recommended)
 
-**ALWAYS check for and read the component's `.md` documentation file** in the same directory. This documentation:
+**Check for `.md` files** - provide examples, advanced features, usage context.
 
-- **Merges with metadata** to provide complete component information
-- **Contains comprehensive examples** showing real usage patterns
-- **Documents advanced features** and edge cases
-- **Provides context** for proper testing scenarios
-
-Example documentation locations:
-
-- `Button.tsx` - Contains metadata
-- `Button.md` - Contains examples and detailed usage
-- `Button.spec.ts` - Your test file
-
-**Best Practice**: Read both the `.tsx` metadata AND the `.md` documentation before writing any tests to ensure comprehensive coverage of all documented features.
+Read both `.tsx` metadata AND `.md` docs before writing tests.
 
 ### Commands
 
-**IMPORTANT**: All Playwright test commands must be run from the workspace root directory (`/Users/dotneteer/source/xmlui`), NOT from subdirectories. The workspace root is the monorepo directory that contains multiple packages including the `xmlui` subdirectory.
+**IMPORTANT**: Run from workspace root (`/Users/dotneteer/source/xmlui`), not subdirectories.
 
 ```bash
 # Standard execution (run from workspace root)
@@ -318,19 +298,17 @@ npx playwright test ComponentName.spec.ts --workers=1 --reporter=line
 
 ### Timeout Configuration
 
-XMLUI uses optimized timeout settings for faster feedback during development:
+Optimized timeouts for fast feedback:
+- **Expect timeout**: 1000ms
+- **Test timeout**: 5 seconds
 
-- **Expect timeout**: 1000ms (1 second) - How long to wait for assertions like `expect.poll()`
-- **Test timeout**: 5 seconds - Maximum time for entire test execution
-- **Global timeout**: Configured in `playwright.config.ts`
+Tests fail quickly when conditions aren't met.
 
-These settings ensure tests fail quickly when conditions aren't met, providing rapid feedback during development. The shorter expect timeout helps identify issues faster than the default 5-second timeout.
+**Important**: Use `--reporter=line` for immediate feedback without browser windows.
 
-**Important**: Never manually show the HTML report or wait for Ctrl+C during test development. Use `--reporter=line` to get immediate console feedback without browser interference.
+### Development Commands
 
-### Development Testing Commands
-
-For comprehensive debugging and development, use these command combinations:
+Best practice combinations:
 
 ```bash
 # Best practice during test development - single worker + line reporter
@@ -342,8 +320,6 @@ npx playwright test ComponentName.spec.ts --grep "test name pattern" --reporter=
 # Run specific test categories during development
 npx playwright test ComponentName.spec.ts --grep "Basic Functionality" --reporter=line
 ```
-
-The line reporter provides detailed progress information and immediate feedback about test failures without opening browser windows or HTML reports, making it ideal for iterative test development.
 
 ### Event Handler Naming
 
@@ -359,32 +335,27 @@ click = "testState = 'clicked'";
 willOpen = "testState = 'opening'";
 ```
 
-**Event vs Handler distinction:**
-
-- **Event names** (no "on"): Used in `<event name="click">` tags
-- **Event handlers** (with "on"): Used as attributes `onClick="..."`
+**Event vs Handler:**
+- **Event names** (no "on"): `<event name="click">`
+- **Event handlers** (with "on"): `onClick="..."`
 
 ### Event Handler Parameters
 
-**ALWAYS use arrow function syntax:**
+**Use arrow functions:**
 
 ```typescript
 // ✅ CORRECT
 onExpandedChange = "arg => testState = arg";
-onClick = "event => testState = event.type";
 
-// ❌ INCORRECT - arguments object doesn't work
+// ❌ INCORRECT
 onExpandedChange = "testState = arguments[0]";
 ```
 
-most of the time (when the event handler does not need to access the event object),
-you can omit the arrow function and write the handler body directly.
+When not accessing the event object, omit the arrow function.
 
 ### XMLUI Script Limitations
 
-XMLUI scripts have important JavaScript syntax limitations that must be followed:
-
-**NO "new" operator support:**
+**NO "new" operator:**
 
 ```typescript
 // ❌ INCORRECT - "new" operator not supported
@@ -411,9 +382,9 @@ const dateStr = "2025-08-07";
 const pattern = "test";
 ```
 
-### Non-Visual Component Testing
+### Non-Visual Components
 
-For non-visual components (like Queue, DataStore), use Button click handlers to access APIs:
+Access APIs through Button click handlers:
 
 ```typescript
 // ✅ CORRECT - Access APIs through Button onClick
@@ -431,11 +402,11 @@ const { testStateDriver } = await initTestBed(`
 `);
 ```
 
-**Important**: Non-visual components often require event handlers (like `onProcess`) to exhibit expected behavior. Without processing handlers, queue-like components may not retain items as expected.
+**Important**: Non-visual components often need event handlers (e.g., `onProcess`) to exhibit expected behavior.
 
 ### Template Properties
 
-**ALWAYS wrap template properties in `<property>` tags:**
+**Wrap in `<property>` tags:**
 
 ```typescript
 // ✅ CORRECT
@@ -453,10 +424,9 @@ const { testStateDriver } = await initTestBed(`
 </ComponentName>
 ```
 
-## Mandatory Test Structure
+## Test Structure
 
-Use `test.describe("category name")` to group test cases.
-Don't need a top level group that encompuses every test case.
+Use `test.describe("category")` to group tests. No top-level wrapper needed.
 
 ```typescript
 // =============================================================================
@@ -504,16 +474,13 @@ test.describe("Other Edge Cases", () => {
 
 ### Test Initialization
 
-**Always use XMLUI test function from `fixtures.ts`:**
+**Use XMLUI test function:**
 
 ```typescript
 import { test, expect } from "../../testing/fixtures";
 
 test("component renders correctly", async ({ initTestBed }) => {
   await initTestBed(`<ComponentName prop="value"/>`, {});
-  // This will create a webpage where the whole content of it is the top level xmlui component,
-  // specified in the initTestBed's first parameter as source code.
-
   // Test implementation
 });
 ```
@@ -537,25 +504,18 @@ const { testStateDriver } = await initTestBed(`
 
 ## Testing Approaches
 
-### Obtaining a locator (element)
+### Obtaining Locators
 
-Locate elements in a way a user would locate them guided by their intention. For example `const checkboxLocator = await page.getByRole('checkbox')`, rather than relying on internal structure like `page.locator("input").nth(2)`. If and only if there are more elements of the same type and it does not make sense to use text (because the test is not about labels or content text, or because the layout would change due to the presence of the content), prefer to use `testId`-s in the source code and use those test ids to locate the elements. You should aviod using `page.locator()` in test cases.
+Locate by user intent: `page.getByRole('checkbox')` not `page.locator("input").nth(2)`. Use `testId` only when necessary. Avoid `page.locator()` in tests.
 
-If it is possible to test something at the time of locationg the element, prefer that. `page.getByRole` is the prime example of this, because it also tests for accessibility and intent (the user is not looking for a div with a certain class on it, they are looking for an image or a button). Avoid long selectors, that could be more readable by adding some assertions. For example, this is better:
+Test at location time when possible:
 
 ```ts
 const cb = page.getByRole("checkbox");
 await expect(cb).toBeDisabled();
 ```
 
-and this is worse:
-
-```ts
-const cb = page.getByRole("checkbox", { disabled: true });
-await expect(cb).toBeVisible();
-```
-
-However, if there are multiple elements of the same type and an option could differentiate them and assertions would need to be written out after locating the element anyway, this approach is better than using test ids. For example, this is a good use of the `{disabled: true}` option:
+However, use options to differentiate when multiple elements exist:
 
 ```ts
 await initTestBed(`
@@ -567,11 +527,9 @@ const cb = page.getByRole("checkbox", { disabled: true });
 // do something with the disabled checkbox
 ```
 
-### Event testing
+### Event Testing
 
-Sometimes you need to test events. The easiest way is to do something like this:
-
-Don't worry about how the testState is actually obtained. Just know that inside an event handler, you can write javascript and access the `testState` variable, which you can make assertions against later by polling that value. Just make it obvious that testState is actually changed, so use an obvious name like 'changed', or if you need to test the handler multiple times, use a counter like `onDidChange="testState = testState == null ? 1 : testState + 1"` Test state is initialized to be null.
+Use `testState` in event handlers to verify events fire:
 
 ```typescript
 test("click event fires on click", async ({ initTestBed, page }) => {
@@ -582,7 +540,7 @@ test("click event fires on click", async ({ initTestBed, page }) => {
 });
 ```
 
-**Testing API Returns vs Component State**: For non-visual components, focus on testing API return values rather than internal component state, as the latter may not behave as expected without proper event handlers:
+**API Returns vs State**: Test API return values, not internal state (may not persist without handlers):
 
 ```typescript
 // ✅ CORRECT - Test API return values
@@ -615,11 +573,9 @@ test("queue length increases", async ({ initTestBed, createButtonDriver }) => {
 });
 ```
 
-### Writing actions and drivers
+### Actions and Drivers
 
-Not all tests need actions. Some are just instantiating the webpage with a given component and then making assertions on that.
-
-Actions are the most varried part of writing component tests. If and only if the action is super simple and consists of one step, and the action's name gives clarity on what it is doing, should you use actions directly on the locators. For example, this is good, because it is clear what the actions are doing, as the `check` and `uncheck` actions are complete in themselves:
+Not all tests need actions. Use actions directly only for simple, clear operations:
 
 ```ts
 const cb = page.getByRole("checkbox");
@@ -629,7 +585,7 @@ await cb.uncheck();
 await expect(cb).not.toBeChecked();
 ```
 
-However, in any other case, you should use a component driver to encapsulate the logic of the action. For example:
+For complex actions, use component drivers with meaningful names:
 
 ```ts
 test("search filters option labels", async ({ initTestBed, page, createSelectDriver }) => {
@@ -649,31 +605,28 @@ test("search filters option labels", async ({ initTestBed, page, createSelectDri
 });
 ```
 
-In this case, if the `searchFor` method were to be substituted with clicking on the locator and typing into the input field the label text, that would not convey the intent of the action, which is searching. Actions should have componenet-specific names. For example, a Dropdown can have a `toggleDropdownVisibility` method, which is pretty much just a click, but with a more meaningful name. You would not call it `click`.
+Drivers encapsulate component-specific actions. Use meaningful names (e.g., `toggleDropdownVisibility` not `click`).
 
-Drivers are derived from a base ComponentDriver class. Not every component needs a driver, so don't just create one for each component. In fact, if you can avoid it, you should, as they are a layer of abstraction.
+Drivers are optional - only create when needed.
 
-### Drivers for internal component structure
+### Internal Structure Drivers
 
-In extremely rare cases, you need to access the DOM structure of the component. This is usually a sign that the component is not well designed, and lacking accessibility features. In these cases, if you are an AI express the best approach that has accessability baked in. For example, you might be asked to test a spinner's border. You cound use the internal structure of the top level component, but it's better to encourage the programmer to implement role="status" on the component, so you can use `page.getByRole("status")`.
-In some RARE cases, they are the right approach though.
-For example, if the component is purely visual and has no accessibility attributes, or we actually want to assert something about a particular DOM element (like an internal element's border has a certain width): you can use the driver to obtain the locator, but only for that.
+Rarely needed - usually indicates missing accessibility features. Express the accessible approach.
+
+For purely visual components or specific DOM assertions, drivers can return locators.
 
 Drivers should NOT:
+- Have expectations/assertions (return locators for tests to assert)
+- Reimplement Playwright API (`click`, `hover` wrappers)
 
-- have expectations and assertions in them. Those belong to the test case. Instead, return the locator from a method (in case driver is used for obtaining internal structure) and assert against it in the test case.
-- reimplement the playwright API, such as having a `click` or `hover` method which just wraps the playwright API and executes it on one of it's internal element'.
+### Assertions
 
-### Writing assertions
+Use web-first assertions: `await expect(checkbox).not.toBeChecked()`. Prefer built-in assertions over attribute checks.
 
-Use web-first assertions, like `await expect(checkboxLocator).not.toBeChecked()`. If there is a built-in assertion, prefer that over an assertion checking against a the dom attributes. This is an antipattern: `await expect(checkboxLocator).toHaveAttribute("type", "checkbox");` because it relies on the element being an input element.
+## Test Naming
 
-## Test Naming & Patterns
-
-### Naming Standards
-
-- Avoid using the "component" word in names, it's redundant
-- Use concrete property, event, api, attribute, etc.
+- Avoid "component" - it's redundant
+- Use concrete names: property, event, API, attribute
 
 - ✅ `"renders with 'variant' property"`
 - ✅ `"has correct 'aria-clickable'"`
@@ -682,28 +635,21 @@ Use web-first assertions, like `await expect(checkboxLocator).not.toBeChecked()`
 
 ## Best Practices
 
-### Avoid Frontend Code in E2E Tests
+### Avoid Frontend Imports
 
-It is crucial to avoid importing frontend code into E2E tests, especially if it transitively imports stylesheets. This can lead to unexpected issues with the test runner and slow down test execution.
+Don't import frontend code (especially with stylesheets) into E2E tests - causes issues and slows execution.
 
-For example, importing `defaultProps` from a component file like `ButtonNative.tsx` into a test file like `Button.spec.ts` is an anti-pattern. The component file likely imports SCSS or CSS files, which should not be part of the test environment.
+Define shared data in separate files importable by both.
 
-Instead, if you need to share data between your component and your tests, define it in a separate file that can be imported safely by both.
+### Skipping Tests
 
-### Skipping tests
-
-#### Skipping For coverage
-
-Use `test.skip` for comprehensive coverage, when you know which tests you want to write, but you haven't gotten around to implementing them yet.
+**For coverage** - tests planned but not implemented:
 
 ```typescript
 test.skip("placeholder defaults to 'example.com'", async ({ initTestBed, page }) => {});
 ```
 
-#### Skipping for any other reason
-
-There are other reasons to skip tests, such as when a feature is not yet implemented or when a bug is present.
-After becoming certain the test is well written, skip the test with the appropriate skip reason.
+**For bugs/unimplemented features** - use `test.fixme` with skip reason:
 
 ```typescript
 test.fixme(
@@ -719,9 +665,9 @@ test.fixme(
 );
 ```
 
-### Systematic Testing
+### Parameterized Tests
 
-In case there would be a lot of duplication for testing a property that has the exact same structure, use parameterized tests.
+Avoid duplication with data-driven tests:
 
 ```typescript
 // Data type testing
@@ -738,20 +684,17 @@ In case there would be a lot of duplication for testing a property that has the 
 });
 ```
 
-## Good test case patterns
+## Layout Testing
 
-### Layout/Positioning Tests
+Verify visual arrangement using `getBounds` utility.
 
-Components that support layout properties (like `labelPosition`, `direction`, positioning, sizing) should include tests that verify visual arrangement using the `getBounds` utility function.
+**Best Practices:**
+- Import from `"../../testing/component-test-helpers"`
+- Destructure specific properties: `{ left, right, top, bottom }`
+- Test RTL when direction affects layout
+- Verify invalid value handling
 
-#### Best Practices for Layout Testing
-
-- **Import getBounds**: Import from `"../../testing/component-test-helpers"`
-- **Use descriptive coordinates**: Destructure specific properties like `{ left, right, top, bottom }`
-- **Test both directions**: Include RTL tests when direction affects layout
-- **Verify invalid values**: Test graceful handling of invalid layout properties
-
-#### Testing Element Positioning
+### Element Positioning
 
 Use `getBounds()` to get element coordinates and verify relative positioning:
 
@@ -774,9 +717,7 @@ test("ComponentName appears at the correct side of ComponentName2", async ({
 });
 ```
 
-#### Testing Directional Layout (RTL/LTR)
-
-Test layout behavior in both directions when applicable:
+### Directional Layout (RTL/LTR)
 
 ```typescript
 test("startText displays at beginning of input (rtl)", async ({ initTestBed, page }) => {
@@ -790,9 +731,7 @@ test("startText displays at beginning of input (rtl)", async ({ initTestBed, pag
 });
 ```
 
-#### Testing Size Properties
-
-Verify width, height, and other sizing properties:
+### Size Properties
 
 ```typescript
 test("labelWidth applies custom label width", async ({ initTestBed, page }) => {
@@ -803,9 +742,7 @@ test("labelWidth applies custom label width", async ({ initTestBed, page }) => {
 });
 ```
 
-#### Testing Complex Layout Arrangements
-
-For components with multiple positioned elements, test their relative arrangement:
+### Complex Layouts
 
 ```typescript
 test("all adornments appear in the right place", async ({ initTestBed, page }) => {
@@ -828,15 +765,14 @@ test("all adornments appear in the right place", async ({ initTestBed, page }) =
 });
 ```
 
-### Testing Input Component API
+## Input Component API
 
-Test the following in a `test.describe("Api", () => {...})` block for input components (such as TextBox, Checkbox, Slider, etc.):
-
+Test in `test.describe("Api")` for input components:
 - value
-- setValue
+- setValue  
 - focus
 
-#### Example
+**Example:**
 
 ```typescript
 test("component setValue API updates state", async ({ initTestBed, page }) => {
@@ -850,7 +786,3 @@ test("component setValue API updates state", async ({ initTestBed, page }) => {
   await expect(page.getByRole("textbox")).toHaveValue("api value");
 });
 ```
-
-## Bad test case patterns
-
-fill in later

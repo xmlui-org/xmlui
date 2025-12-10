@@ -4,51 +4,41 @@ A deep dive into XMLUI's hierarchical container system for managing component st
 
 ## Fundamentals of XMLUI Reactivity
 
-XMLUI implements **automatic reactivity** - a programming model where UI updates happen automatically when underlying data changes, without requiring manual DOM manipulation or explicit update calls.
+XMLUI implements **automatic reactivity** where UI updates happen automatically when data changes, without manual DOM manipulation.
 
 ### The Reactive Loop
 
-XMLUI follows a simple reactive cycle:
-1. **Initial Render**: Framework renders the complete UI from declarative markup
+1. **Initial Render**: Framework renders UI from declarative markup
 2. **Event Occurrence**: User interactions or system events trigger changes
-3. **Automatic State Detection**: Framework detects state mutations transparently
-4. **Selective UI Refresh**: Only components affected by the state change re-render
+3. **State Detection**: Framework detects state mutations transparently
+4. **Selective Refresh**: Only affected components re-render
 5. **Loop Continuation**: Process repeats for subsequent events
 
-From a developer perspective, reactivity means:
-- **Write declarative expressions**: Use `{count}` to display values, `count++` to modify them
-- **No manual updates**: Framework automatically handles UI synchronization
-- **Transparent mutations**: Change variables directly without special APIs
-- **Predictable behavior**: UI always reflects current state consistently
+Developers write declarative expressions (`{count}` to display, `count++` to modify) and the framework handles UI synchronization automatically.
 
-### The Role of Containers in Reactivity Implementation
+### The Role of Containers
 
-Containers are the **core mechanism** that enables XMLUI's automatic reactivity. They provide the infrastructure necessary to detect state changes, coordinate updates, and maintain UI consistency.
-
-Reactivity requires several technical capabilities:
-- **State Storage**: A place to hold component variables and data
-- **Change Detection**: Mechanism to detect when state mutations occur  
-- **Update Coordination**: System to propagate changes to affected UI components
-- **Scope Management**: Control over which components can access which state
-- **Performance Optimization**: Efficient updates that don't block the UI
-
-Containers provide all these capabilities through a hierarchical architecture that mirrors the component structure.
+Containers enable reactivity by providing:
+- **State Storage**: Variables and data holders
+- **Change Detection**: Proxy-based mutation tracking
+- **Update Coordination**: Change propagation to affected components
+- **Scope Management**: Control over state visibility
+- **Performance**: Efficient updates without UI blocking
 
 ## Automatic Container Wrapping
 
-XMLUI **automatically wraps components with containers** when they need reactive capabilities. You declare variables or data sources, and the framework creates the container infrastructure.
+XMLUI automatically wraps components in containers when they need reactive capabilities. Containers are created for:
 
-The framework creates containers for these cases:
-- **App Root Container** - Wraps the entire application entry point
-- **User-Defined Component Containers** - Each component instance gets isolated state
-- **Variables** - Reactive state holders that trigger UI updates
-- **Loaders** - Handle asynchronous data operations
-- **Uses Declarations** - Control state inheritance from parents
-- **Context Variables** - Framework-injected variables (routing, forms)
-- **Scripts** - JavaScript blocks with variables and functions
-- **Code-Behind Files** - External script files for application root or component roots
+- **App Root** - Wraps the entire application
+- **User-Defined Components** - Each instance gets isolated state
+- **Variables** (`var.*`) - Reactive state holders
+- **Loaders** - Asynchronous data operations
+- **Uses Declarations** - Explicit state inheritance control
+- **Context Variables** - Framework-injected variables
+- **Scripts** - JavaScript blocks with variables/functions
+- **Code-Behind Files** - External script files
 
-Every component receives an identifier (user-defined or framework-assigned). **User-defined IDs enable programmatic component interaction** - accessing methods, properties, and APIs. Framework IDs handle internal state. Component IDs scope to their declaring file (.xmlui). These IDs are stored in the App Root and User-Defined Component Containers.
+Every component receives a unique identifier (user-defined or framework-assigned). User-defined IDs enable programmatic access to component methods and properties. Component IDs are scoped to their declaring file and stored in the nearest parent container.
 
 ### App Root Container
 For every XMLUI application, a root container is automatically created to wrap the entire application entry point (typically Main.xmlui). This ensures there's always a top-level container to manage application-wide state.
@@ -134,25 +124,22 @@ block-beta
 Each `MyButton` instance gets its own container with isolated `count` variable - clicking one button doesn't affect the others.
 
 ### Variables
-Variables in XMLUI are reactive state holders that automatically trigger UI updates when changed. They can contain any JavaScript value, including functions. Variables can declare functions, and those functions can be invoked.
 
-**Simple Variable Example:**
+Variables are reactive state holders that trigger UI updates when changed. They can hold any JavaScript value, including functions.
+
+**Variable Examples:**
 ```xml
+<!-- Simple variable -->
 <Stack var.count="{0}">
   <Button onClick="count++" label="Count: {count}" />
 </Stack>
-```
 
-**Function Variable Example:**
-```xml
+<!-- Function variable -->
 <Stack var.count="{0}" var.increment="{() => count++}">
   <Button onClick="increment()" label="Count: {count}" />
 </Stack>
-```
 
-Variables and functions can also be defined in `<script>` tags:
-
-```xml
+<!-- Script-defined variables -->
 <Stack>
   <script>
     let count = 0;
@@ -164,27 +151,29 @@ Variables and functions can also be defined in `<script>` tags:
 </Stack>
 ```
 
-**Role in Reactivity**: Variables provide the state storage layer for reactive data binding. When a variable changes, the container detects this through proxy-based change detection and triggers selective UI updates. Functions participate in dependency tracking - when they reference other variables, the system tracks these dependencies and re-evaluates when dependencies change.
+**Role**: Variables provide reactive state storage. The container detects changes via proxy-based tracking and triggers selective UI updates.
 
-### Loaders (`loaders`)
-Loaders are XMLUI's mechanism for handling asynchronous data operations. The framework automatically creates loaders when it recognizes that components contain data-handling requirements. This happens through the **ApiBoundComponent** system.
+### Loaders
 
-**Automatic Loader Creation Cases:**
+Loaders handle asynchronous data operations. The framework creates them automatically when components have data requirements via the **ApiBoundComponent** system.
 
-1. **Properties with DataSource/DataSourceRef types**: When a component property contains a `DataSource` or `DataSourceRef` object
-2. **Events with API action types**: When a component event contains `APICall`, `FileDownload`, or `FileUpload` objects
-3. **Components with data properties**: Any component with URL-based `data` properties
+**Automatic Loader Creation:**
+
+1. **Properties with DataSource/DataSourceRef types**
+2. **Events with API action types** (APICall, FileDownload, FileUpload)
+3. **Components with URL-based data properties**
 
 ```xml
-<!-- Property-based loader creation -->
-<Table data="{users}" />
-<!-- Framework creates internal DataLoader when 'users' references a DataSource -->
-
-<!-- Direct URL pattern (frequently used) -->
+<!-- Direct URL (most common) -->
 <Table data="/api/users" />
-<!-- Framework automatically creates DataLoader for URL-based data properties -->
+<!-- Framework creates DataLoader automatically -->
 
-<!-- Event-based loader creation -->  
+<!-- Explicit DataSource -->
+<DataSource id="users" url="/api/users" />
+<Table data="{users}" />
+<!-- Creates DataLoader managing loading states, errors, caching, polling -->
+
+<!-- Event-based loader -->
 <Button>
   Save
   <event name="click">
@@ -192,75 +181,59 @@ Loaders are XMLUI's mechanism for handling asynchronous data operations. The fra
   </event>
 </Button>
 <!-- Framework creates APICall handler -->
-
-<!-- Explicit DataSource (also creates loaders) -->
-<DataSource id="users" url="/api/users" />
-<Table data="{users}" />
-<!-- Creates DataLoader managing: loading states, error states, caching, polling -->
 ```
 
-**Framework Detection Process**: The `ComponentAdapter` scans component properties and events for specific object types that require API operations. It looks for:
-- **Properties**: Objects with `type: "DataSource"` or `type: "DataSourceRef"`  
-- **Events**: Objects with `type: "APICall"`, `type: "FileDownload"`, or `type: "FileUpload"`
+**Detection**: `ComponentAdapter` scans for specific object types requiring API operations and wraps the component in `ApiBoundComponent`.
 
-When any of these object types are found, the framework wraps the component in an `ApiBoundComponent`, which automatically generates the necessary loaders and wires them into the container system.
+**Role**: Loaders manage async state transitions (loading → loaded/error) and provide reactive properties like `users.value`, `users.inProgress`, `users.loaded`.
 
-**Role in Reactivity**: Loaders manage asynchronous state transitions (loading → loaded/error) and integrate with the container's reducer system via actions like `LOADER_LOADED`, `LOADER_IN_PROGRESS_CHANGED`, etc. They provide reactive properties like `users.value`, `users.inProgress`, `users.loaded`.
+### Uses Declarations
 
-### Uses Declarations (`uses`)
-The `uses` property provides explicit control over state inheritance from parent containers:
+The `uses` property controls state inheritance from parent containers:
 
 ```xml
 <!-- Inherit all parent state (default) -->
-<Stack>
-  <!-- children -->
-</Stack>
+<Stack><!-- children --></Stack>
 
 <!-- Inherit no parent state -->
-<Stack uses="[]">
-  <!-- children -->
-</Stack>
+<Stack uses="[]"><!-- children --></Stack>
 
-<!-- Inherit only specific parent state -->
-<Stack uses="['userInfo', 'theme']">
-  <!-- children -->
-</Stack>
+<!-- Inherit specific parent state -->
+<Stack uses="['userInfo', 'theme']"><!-- children --></Stack>
 ```
 
-**Note**: XMLUI is moving toward automating the use of `uses` declarations, with plans to eliminate this property in favor of automatic dependency detection.
+> **Note**: XMLUI is moving toward automatic dependency detection to eliminate this property.
 
-**Role in Reactivity**: Controls the scope of reactive data flow between parent and child containers. This prevents unnecessary re-renders when unrelated parent state changes and provides explicit data dependencies.
+**Role**: Controls reactive data flow scope and prevents unnecessary re-renders from unrelated parent state changes.
 
 ### Context Variables
-Context variables are automatically injected by the framework and component implementations to provide contextual information to child components. These cannot be declared through attributes but are provided by the React implementation of XMLUI components.
 
-**Naming Convention**: Context variables start with `$` by convention to distinguish them from user-defined variables.
+Context variables are framework-injected variables that provide contextual information. They start with `$` and cannot be declared via attributes.
 
-**Examples of Context Variables** (not exhaustive):
+**Examples** (not exhaustive):
 - **Routing**: `$pathname`, `$routeParams`, `$queryParams`, `$linkInfo`
-- **Iterators**: `$item`, `$itemIndex` (in Lists, Tables, etc.)
-- **Forms**: `$data`, `$validationResult`, `$value`, `$setValue` (in FormItems)
-- **Events**: `$param` (in event handlers)
-
-Different components may inject additional context variables specific to their functionality.
+- **Iterators**: `$item`, `$itemIndex` (Lists, Tables)
+- **Forms**: `$data`, `$validationResult`, `$value`, `$setValue` (FormItems)
+- **Events**: `$param` (event handlers)
 
 ```xml
-<!-- Context variables are automatically available -->
+<!-- Automatically available in context -->
 <Table data="/api/users">
   <Column bindTo="name">
-    <Text>{$item.name}</Text>  <!-- $item provided by Table -->
+    <Text>{$item.name}</Text>  <!-- $item from Table -->
   </Column>
 </Table>
 
 <Page url="/users/:id">
-  <Text>User ID: {$routeParams.id}</Text>  <!-- $routeParams provided by Page -->
+  <Text>User ID: {$routeParams.id}</Text>  <!-- $routeParams from Page -->
 </Page>
 ```
 
-**Role in Reactivity**: Context variables are automatically injected into the container state, making them available for reactive data binding. When these variables change (e.g., route changes, current item changes), all dependent UI elements automatically update.
+**Role**: Injected into container state for reactive binding. When they change (route, current item), dependent UI updates automatically.
 
 ### Scripts
-JavaScript code blocks that declare variables and functions:
+
+JavaScript blocks declaring variables and functions:
 
 ```xml
 <Stack>
@@ -273,51 +246,47 @@ JavaScript code blocks that declare variables and functions:
 </Stack>
 ```
 
-**Role in Reactivity**: Scripts are parsed and their declarations (variables, functions) become part of the container's reactive state. The scripting system integrates with the dependency tracking and memoization systems to ensure efficient updates.
+**Role**: Script declarations become part of the container's reactive state with automatic dependency tracking.
 
 ### Code-Behind Files
-Code-behind files provide a way to define scripts in separate files rather than inline within components. The framework automatically treats these external script files as if they were `<script>` declarations within the application root or user-defined component root.
 
-**File Naming Convention:**
+External script files for separating logic from markup.
+
+**Naming Convention:**
 - **Application Root**: `Main.xmlui.xs` (for `Main.xmlui`)
 - **User-Defined Component**: `ComponentName.xmlui.xs` (for `ComponentName.xmlui`)
 
-**Role in Reactivity**: Code-behind files are processed identically to inline `<script>` blocks. Their variable and function declarations become part of the container's reactive state, with the same dependency tracking and memoization behavior. The framework automatically imports and executes code-behind files during component initialization, making their exports available in the component's reactive scope.
+**Role**: Processed identically to inline `<script>` blocks. Exports become part of container's reactive state with dependency tracking.
 
-### Examples
+### Container Creation Logic
 
-**Important**: Simply having an `id` attribute does NOT automatically create a container. Component IDs are handled differently and are stored in the nearest parent container.
+**Important**: An `id` attribute alone does NOT create a container. Component IDs are stored in the nearest parent container.
 
-Components are wrapped in containers when they have any of these characteristics (determined by the `isContainerLike` function):
+Containers are created when components have these characteristics (via `isContainerLike` function):
 
 ```tsx
-// From ContainerWrapper.tsx - Container creation logic
+// From ContainerWrapper.tsx
 export function isContainerLike(node: ComponentDef) {
-  if (node.type === "Container") {
-    return true;
-  }
-
-  // If any of the following properties have a value, we need a container
+  if (node.type === "Container") return true;
+  
   return !!(
-    node.loaders ||      // Data loading operations
+    node.loaders ||      // Data loading
     node.vars ||         // Variable declarations  
     node.uses ||         // Parent state scoping
-    node.contextVars ||  // Context variable provision
+    node.contextVars ||  // Context variables
     node.functions ||    // Function declarations
     node.scriptCollected // Script blocks
   );
 }
 ```
 
-**Container Creation Examples:**
+**Examples:**
 ```xml
 <!-- Creates container - has variable -->
 <Stack var.count="{0}" />
 
 <!-- Creates container - has script -->
-<Stack>
-  <script>let x = 1;</script>
-</Stack>
+<Stack><script>let x = 1;</script></Stack>
 
 <!-- Creates container - has data loading -->
 <Table data="/api/users" />
@@ -329,13 +298,11 @@ export function isContainerLike(node: ComponentDef) {
 <Stack direction="horizontal" />
 ```
 
-## Container Structure, Hierarchy, and Features
-
-This section explores the architectural design of containers, their hierarchical organization, and how they support XMLUI's special concepts like loaders, user-defined components, and reactive variables.
+## Container Architecture
 
 ### Container Hierarchy
 
-The container system consists of three main React components working together:
+Three React components work together:
 
 ```
 ContainerWrapper
@@ -345,29 +312,20 @@ ContainerWrapper
             └── Container
 ```
 
-### Core Container Components
+### Core Components
 
-#### ContainerWrapper
-- **Purpose**: Outer wrapper that converts components into containerized form
-- **Location**: `/xmlui/src/components-core/rendering/ContainerWrapper.tsx`
-- **Key Responsibility**: Determines if a component needs containerization and wraps it accordingly
+**ContainerWrapper** (`/xmlui/src/components-core/rendering/ContainerWrapper.tsx`)
+- Determines if a component needs containerization
+- Wraps components with container characteristics
 
-Components are wrapped in containers if they have any of these characteristics:
-- Loaders (data management operations)
-- Variables declared (`vars`)  
-- Context variables (`contextVars`)
-- Scripts (`script` or `scriptCollected`)
-- Explicit state usage declarations (`uses` property)
+**StateContainer** (`/xmlui/src/components-core/rendering/StateContainer.tsx`)
+- Manages state storage and composition
+- Assembles state from multiple sources
+- Handles state lifecycle
 
-#### StateContainer
-- **Purpose**: Manages the actual state storage and state composition
-- **Location**: `/xmlui/src/components-core/rendering/StateContainer.tsx`
-- **Key Responsibility**: Assembles state from multiple sources and manages state lifecycle
-
-#### Container
-- **Purpose**: Executes event handlers and manages state changes while maintaining UI responsiveness
-- **Location**: `/xmlui/src/components-core/rendering/Container.tsx`
-- **Key Responsibility**: Asynchronous event handler execution and state synchronization
+**Container** (`/xmlui/src/components-core/rendering/Container.tsx`)
+- Executes event handlers asynchronously
+- Manages state changes while maintaining UI responsiveness
 
 ## State Composition and Management
 
