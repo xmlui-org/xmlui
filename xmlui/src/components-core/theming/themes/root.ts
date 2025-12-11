@@ -197,21 +197,21 @@ export const RootThemeDefinition: ThemeDefinition = {
     fontFamily: "$fontFamily-sans-serif",
 
     // --- Various font sizes (relative to the current context)
-    "fontSize-tiny": "0.625rem",
-    "fontSize-xs": "0.75rem",
-    "fontSize-code": "0.85rem",
-    "fontSize-sm": "0.875rem",
-    "fontSize-base": "1rem",
-    "fontSize-lg": "1.125rem",
-    "fontSize-xl": "1.25rem",
-    "fontSize-2xl": "1.5rem",
-    "fontSize-3xl": "1.875rem",
-    "fontSize-4xl": "2.25rem",
-    "fontSize-5xl": "3rem",
-    "fontSize-6xl": "3.75rem",
-    "fontSize-7xl": "4.5rem",
-    "fontSize-8xl": "6rem",
-    "fontSize-9xl": "8rem",
+    "fontSize-tiny": "0.625em",
+    "fontSize-xs": "0.75em",
+    "fontSize-code": "0.85em",
+    "fontSize-sm": "0.875em",
+    "fontSize-base": "1em",
+    "fontSize-lg": "1.125em",
+    "fontSize-xl": "1.25em",
+    "fontSize-2xl": "1.5em",
+    "fontSize-3xl": "1.875em",
+    "fontSize-4xl": "2.25em",
+    "fontSize-5xl": "3em",
+    "fontSize-6xl": "3.75em",
+    "fontSize-7xl": "4.5em",
+    "fontSize-8xl": "6em",
+    "fontSize-9xl": "8em",
 
     // --- The default font size
     fontSize: "$fontSize-base",
@@ -224,6 +224,16 @@ export const RootThemeDefinition: ThemeDefinition = {
     "lineHeight-normal": "1.5",
     "lineHeight-relaxed": "1.625",
     "lineHeight-loose": "2",
+    "lineHeight": "$lineHeight-relaxed",
+
+    // --- Letter spacing values
+    "letterSpacing-tighter": "-0.05em",
+    "letterSpacing-tight": "-0.025em",
+    "letterSpacing-normal": "0em",
+    "letterSpacing-wide": "0.025em",
+    "letterSpacing-wider": "0.05em",
+    "letterSpacing-widest": "0.1em",
+    letterSpacing: "letterSpacing-normal",
 
     // --- Predefined gap sizes
     "gap-none": "$space-0",

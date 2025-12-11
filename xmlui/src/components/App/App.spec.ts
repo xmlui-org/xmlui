@@ -660,29 +660,39 @@ test.describe("Layout Input Validation", () => {
     await expect(page.getByTestId("app")).toHaveClass(/sticky/);
   });
 
-  test("throws error for completely invalid layout", async ({ initTestBed, page }) => {
-    // This should throw an error with message "layout type not supported: invalid-layout"
-    let consoleErrors: string[] = [];
+  test("renders with fallback layout for invalid layout value", async ({ initTestBed, page }) => {
+    // App should render successfully with fallback to default layout when given invalid value
+    await initTestBed(`<App layout="invalid-layout" testId="app">test text</App>`);
+    
+    // App should still render despite invalid layout
+    await expect(page.getByTestId("app")).toBeVisible();
+    await expect(page.getByText("test text")).toBeVisible();
+    
+    // Should fall back to default layout (condensed-sticky which uses horizontal)
+    await expect(page.getByTestId("app")).toHaveClass(/horizontal/);
+  });
+
+  test("logs console error for invalid layout value", async ({ initTestBed, page }) => {
+    // App should log a console error when an invalid layout is provided
+    const consoleMessages: { type: string; text: string }[] = [];
     
     page.on('console', msg => {
-      if (msg.type() === 'error') {
-        consoleErrors.push(msg.text());
-      }
-    });
-
-    page.on('pageerror', error => {
-      consoleErrors.push(error.message);
+      consoleMessages.push({
+        type: msg.type(),
+        text: msg.text()
+      });
     });
 
     await initTestBed(`<App layout="invalid-layout" testId="app">test text</App>`);
     
-    // Wait a bit for any errors to be logged
+    // Wait for console messages
     await page.waitForTimeout(100);
     
-    // Should have an error about unsupported layout
-    const hasLayoutError = consoleErrors.some(err => 
-      err.includes('layout type not supported') || 
-      err.includes('invalid-layout')
+    // Should have a console log about unsupported layout
+    const hasLayoutError = consoleMessages.some(msg => 
+      (msg.type === 'log' || msg.type === 'error' || msg.type === 'warning') &&
+      (msg.text.includes('layout type not supported') || 
+       msg.text.includes('invalid-layout'))
     );
     
     expect(hasLayoutError).toBe(true);

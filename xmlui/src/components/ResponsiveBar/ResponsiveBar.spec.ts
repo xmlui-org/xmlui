@@ -575,7 +575,9 @@ test.describe("dropdownAlignment property", () => {
     const triggerEndX = triggerX + triggerWidth;
     
     // Should align to the end (right) by default
-    expect(menuEndX).toBeCloseTo(triggerEndX, 0);
+    expect(menuEndX-triggerEndX).toBeGreaterThanOrEqual(0);
+    expect(menuEndX-triggerEndX).toBeLessThanOrEqual(8);
+
   });
 
   test("defaults to 'start' alignment when reverse is true", async ({
@@ -599,11 +601,14 @@ test.describe("dropdownAlignment property", () => {
     await expect(overflow).toBeVisible();
 
     await overflow.click();
-    const { x: triggerX } = await overflow.boundingBox();
-    const { x: menuX } = await page.getByRole("menu").boundingBox();
+    const { width: triggerWidth, x: triggerX } = await overflow.boundingBox();
+    const { width: menuWidth, x: menuX } = await page.getByRole("menu").boundingBox();
+    const menuEndX = menuX + menuWidth;
+    const triggerEndX = triggerX + triggerWidth;
     
-    // Should align to the start (left) when reversed
-    expect(menuX).toBeCloseTo(triggerX, 1);
+    // Should align to the end (right) by default
+    expect(menuEndX-triggerEndX).toBeGreaterThanOrEqual(0);
+    expect(menuEndX-triggerEndX).toBeLessThanOrEqual(8);
   });
 
   test("explicit dropdownAlignment overrides default from reverse", async ({

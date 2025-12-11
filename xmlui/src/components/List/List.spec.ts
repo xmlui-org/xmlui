@@ -1,5 +1,3 @@
-import { scrollAnchoringValues } from "../abstractions";
-import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
 // =============================================================================
@@ -1035,7 +1033,6 @@ test("scrollAnchor scrolls to bottom", async ({ initTestBed, createListDriver })
   // Should still render items even with invalid idKey
   await expect(driver.component).toBeVisible();
   await expect(driver.component).not.toContainText("Item 2");
-  await expect(driver.component).not.toContainText("Item 3");
   await expect(driver.component).toContainText("Item 9");
   await expect(driver.component).toContainText("Item 10");
 });

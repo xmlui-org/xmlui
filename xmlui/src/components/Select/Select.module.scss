@@ -242,19 +242,6 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     }
   }
 
-  /**
-   * Common empty state
-   */
-  .emptyList {
-    display: flex;
-    gap: .2rem;
-    padding: 10px 0;
-    justify-content: center;
-    align-items: center;
-    font-size: 14px;
-    width: 100%;
-  }
-
   // =============================================================================
   // MULTI-SELECT SPECIFIC (searchable + multiSelect)
   // =============================================================================
@@ -515,12 +502,12 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
 
   .selectEmpty {
     display: flex;
-    gap: .2rem;
     height: 100%;
     padding: 10px 0;
     justify-content: center;
     align-items: center;
-    font-size: 14px;
+    font-size: t.$fontSize;
+    gap: t.$space-4;
     width: 100%;
   }
 

@@ -4,17 +4,31 @@
   .wrapper{
     //it makes the wrapper element behave like an 'invisible' element, so does not affect layout
     display: contents;
+
+    // --- Default typography and layout styles
+    background-color: t.$backgroundColor;
+    color: t.$textColor-primary;
+    font-family: t.$fontFamily;
+    font-feature-settings: t.$font-feature-settings;
+    font-size: t.$fontSize;
+    font-weight: t.$fontWeight-normal;
+    line-height: t.$lineHeight;
+    letter-spacing: t.$letterSpacing;
   }
 
   .root{
-    font-family: t.$fontFamily;
-    background-color: t.$backgroundColor;
-    font-size: t.$fontSize;
-    font-weight: t.$fontWeight;
-    color: t.$textColor-primary;
     direction: t.$direction;
-    font-feature-settings: t.$font-feature-settings;
     --stack-gap-default: #{t.$space-4};
+
+    // --- Default typography and layout styles
+    background-color: t.$backgroundColor;
+    color: t.$textColor-primary;
+    font-family: t.$fontFamily;
+    font-feature-settings: t.$font-feature-settings;
+    font-size: t.$fontSize;
+    font-weight: t.$fontWeight-normal;
+    line-height: t.$lineHeight;
+    letter-spacing: t.$letterSpacing;
   }
 
   .baseRootComponent {

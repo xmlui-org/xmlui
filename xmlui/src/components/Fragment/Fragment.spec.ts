@@ -24,18 +24,20 @@ test.describe("Basic Functionality", () => {
   });
 
   test("parent style affects children", async ({ page, initTestBed }) => {
-    const expectedFontSize = "14px";
+    const expectedFontSize = "20px";
     await initTestBed(`
-      <Stack testId="container" fontSize="${expectedFontSize}">
-        <Fragment>
-          <Text value='Item #1' />
-          <Text value='Item #2' />
-          <Text value='Item #3' />
-        </Fragment>
-      </Stack>`,
+      <App>
+        <Stack testId="container">
+          <Fragment>
+            <Text value='Item #1' />
+            <Text value='Item #2' />
+            <Text value='Item #3' />
+          </Fragment>
+        </Stack>
+      </App>`,
       {
         testThemeVars: {
-          "font-size": "16px",
+          "fontSize": "20px",
         },
       },
     );

@@ -72,6 +72,7 @@ $textColor-Text-marked: createThemeVar("textColor-#{$component}-marked");
 $fontWeight-Text-marked: createThemeVar("fontWeight-#{$component}-marked");
 $fontStyle-Text-marked: createThemeVar("fontStyle-#{$component}-marked");
 $lineHeight-Text-marked: createThemeVar("lineHeight-#{$component}-marked");
+$paddingHorizontal-Text-marked: createThemeVar("paddingHorizontal-#{$component}-marked");
 
 // Variables for mono variant
 $fontFamily-Text-mono: createThemeVar("fontFamily-#{$component}-mono");
@@ -102,6 +103,7 @@ $letterSpacing-Text-caption: createThemeVar("letterSpacing-#{$component}-caption
 
 // Variables for placeholder variant
 $textColor-Text-placeholder: createThemeVar("textColor-#{$component}-placeholder");
+$textColor-Text-placeholder--hover: createThemeVar("textColor-#{$component}-placeholder--hover");
 $fontStyle-Text-placeholder: createThemeVar("fontStyle-#{$component}-placeholder");
 $fontWeight-Text-placeholder: createThemeVar("fontWeight-#{$component}-placeholder");
 $fontSize-Text-placeholder: createThemeVar("fontSize-#{$component}-placeholder");
@@ -117,6 +119,8 @@ $fontStyle-Text-subheading: createThemeVar("fontStyle-#{$component}-subheading")
 $letterSpacing-Text-subheading: createThemeVar("letterSpacing-#{$component}-subheading");
 $textTransform-Text-subheading: createThemeVar("textTransform-#{$component}-subheading");
 $textColor-Text-subheading: createThemeVar("textColor-#{$component}-subheading");
+$textColor-Text-subheading--hover: createThemeVar("textColor-#{$component}-subheading--hover");
+
 
 // Variables for tableheading variant
 $marginTop-Text-tableheading: createThemeVar("marginTop-#{$component}-tableheading");
@@ -128,6 +132,7 @@ $fontWeight-Text-tableheading: createThemeVar("fontWeight-#{$component}-tablehea
 // Variables for secondary variant
 $fontSize-Text-secondary: createThemeVar("fontSize-#{$component}-secondary");
 $textColor-Text-secondary: createThemeVar("textColor-#{$component}-secondary");
+$textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-secondary--hover");
 
 @mixin textVariant($variant) {
   $variantName: if($variant == "", "#{$component}", "#{$component}-#{$variant}");
@@ -156,6 +161,7 @@ $textColor-Text-secondary: createThemeVar("textColor-#{$component}-secondary");
     margin: 0;
     padding: 0;
     min-height: fit-content;
+    font-size: t.$fontSize;
 
     &.default {
       @include textVariant("");
@@ -250,6 +256,8 @@ $textColor-Text-secondary: createThemeVar("textColor-#{$component}-secondary");
       font-weight: $fontWeight-Text-marked;
       font-style: $fontStyle-Text-marked;
       line-height: $lineHeight-Text-marked;
+      padding-left: $paddingHorizontal-Text-marked;
+      padding-right: $paddingHorizontal-Text-marked;
 
       // Based on accessibility concerns
       // Source: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/mark
@@ -319,6 +327,10 @@ $textColor-Text-secondary: createThemeVar("textColor-#{$component}-secondary");
       font-style: $fontStyle-Text-placeholder;
       font-weight: $fontWeight-Text-placeholder;
       font-size: $fontSize-Text-placeholder;
+
+      &:hover {
+        color: $textColor-Text-placeholder--hover;
+      }
     }
 
     &.paragraph {

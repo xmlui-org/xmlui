@@ -276,9 +276,6 @@ $borderColor-DateInput--disabled: createThemeVar("Input:borderColor-#{$component
     padding: $padding-input-DateInput;
     border: 0;
     background: none;
-    color: currentColor;
-    font: inherit;
-    font-size: inherit;
     box-sizing: content-box;
     border-radius: $borderRadius-input-DateInput;
     -webkit-appearance: textfield;

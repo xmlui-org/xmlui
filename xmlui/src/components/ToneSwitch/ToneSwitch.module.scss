@@ -19,13 +19,13 @@ $color-ToneSwitch-dark: createThemeVar("color-ToneSwitch-dark");
   .iconSwitch {
     display: flex;
     align-items: center;
-    padding: 4px;
-    border-radius: 1rem;
+    padding: calc(t.$fontSize / 4);
+    border-radius: t.$fontSize;
     border: 1px solid $borderColor-ToneSwitch;
     transition: background-color 0.3s ease, border-color 0.3s ease;
     cursor: pointer;
-    min-height: 1rem;
-    width: calc(1rem * 3);
+    min-height: t.$fontSize;
+    width: calc(t.$fontSize * 3);
     position: relative;
     pointer-events: auto;
 
@@ -38,8 +38,8 @@ $color-ToneSwitch-dark: createThemeVar("color-ToneSwitch-dark");
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 1rem;
-    height: 1rem;
+    width: t.$fontSize;
+    height: t.$fontSize;
     border-radius: 50%;
     background-color: white;
     transition: transform 0.3s ease;
@@ -52,7 +52,7 @@ $color-ToneSwitch-dark: createThemeVar("color-ToneSwitch-dark");
   }
 
   .iconSwitch.dark .iconThumb {
-    transform: translateX(calc(1rem + 4px));
+    transform: translateX(calc(t.$fontSize + t.$fontSize / 4));
   }
 
 
@@ -76,9 +76,9 @@ $color-ToneSwitch-dark: createThemeVar("color-ToneSwitch-dark");
   }
 
   .icon {
-    font-size: 12px;
-    width: 12px;
-    height: 12px;
+    // font-size: t.$fontSize;
+    width: t.$fontSize;
+    height: t.$fontSize;
     display: flex;
     align-items: center;
     justify-content: center;

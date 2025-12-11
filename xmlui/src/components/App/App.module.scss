@@ -35,6 +35,18 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
   .appContainer {
     --footer-height: 0px;
     --header-height: 0px;
+
+    // --- Default typography and layout styles
+    background-color: t.$backgroundColor;
+    color: t.$textColor-primary;
+    font-family: t.$fontFamily;
+    font-feature-settings: t.$font-feature-settings;
+    font-size: t.$fontSize;
+    font-weight: t.$fontWeight-normal;
+    line-height: t.$lineHeight;
+    letter-spacing: t.$letterSpacing;
+
+    // --- Layout styles
     width: 100%;
     height: 100%;
     position: relative; //leave it here, otherwise there could be double scrollbars because of the absolute positionings (typically radix's visuallyHidden)

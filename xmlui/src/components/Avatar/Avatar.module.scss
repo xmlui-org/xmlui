@@ -28,7 +28,6 @@ $fontWeight-Avatar: createThemeVar("fontWeight-#{$component}");
     font-weight: $fontWeight-Avatar;
     white-space: nowrap;
     user-select: none;
-    font-size: 12px;
     box-shadow: $boxShadow-Avatar;
 
     &.xs {

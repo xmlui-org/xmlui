@@ -259,11 +259,11 @@ $textColor-item-AutoComplete--disabled: createThemeVar("textColor-item-#{$compon
 
   .autoCompleteEmpty {
     display: flex;
-    gap: 0.2rem;
     padding: 10px 0;
     justify-content: center;
     align-items: center;
-    font-size: 14px;
+    font-size: t.$fontSize;
+    gap: t.$space-4;
     width: 100%;
   }
 
