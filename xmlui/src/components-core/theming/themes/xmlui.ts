@@ -79,7 +79,10 @@ export const XmlUiDocsThemeDefinition: ThemeDefinition = {
   id: "xmlui-docs",
   extends: "xmlui",
   color: "$color-primary-500",
-  themeVars: {},
+  themeVars: {
+    "backgroundColor-Text-code": "rgb(from $color-surface-200 r g b / 0.4)",
+    "padding-Text-code": "$space-0_5",
+  },
 };
 
 export const XmlUiBlogThemeDefinition: ThemeDefinition = {

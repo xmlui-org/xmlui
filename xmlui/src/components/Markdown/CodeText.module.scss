@@ -73,6 +73,8 @@ $component: "Text";
       display: inline-block;
       min-width: 100%;
       box-sizing: border-box;
+      border: createThemeVar("border-#{$component}-codefence");
+      background-color: createThemeVar("backgroundColor-#{$component}-codefence");
     }
 
     &.codefence > code::before {
