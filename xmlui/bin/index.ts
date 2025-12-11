@@ -81,119 +81,125 @@ interface ZipDistArgs {
   source?: string;
 }
 
-const argv = yargs(hideBin(process.argv))
-  .command<BuildArgs>("build", "Build the project", (yargs) => {
-    return yargs
-      .option("flatDist", {
-        type: "boolean",
-        description: "Create flat distribution",
-      })
-      .option("prod", {
-        type: "boolean",
-        description: "Production build",
-      })
-      .option("buildMode", {
-        type: "string",
-        description: "Build mode",
-      })
-      .option("withMock", {
-        type: "boolean",
-        description: "Include mock data",
-      })
-      .option("withHostingMetaFiles", {
-        type: "boolean",
-        description: "Include hosting meta files",
-      })
-      .option("withRelativeRoot", {
-        type: "boolean",
-        description: "Use relative root",
+yargs(hideBin(process.argv))
+  .command<BuildArgs>(
+    "build",
+    "Build the project",
+    (yargs) => {
+      return yargs
+        .option("flatDist", {
+          type: "boolean",
+          description: "Create flat distribution",
+        })
+        .option("prod", {
+          type: "boolean",
+          description: "Production build",
+        })
+        .option("buildMode", {
+          type: "string",
+          description: "Build mode",
+        })
+        .option("withMock", {
+          type: "boolean",
+          description: "Include mock data",
+        })
+        .option("withHostingMetaFiles", {
+          type: "boolean",
+          description: "Include hosting meta files",
+        })
+        .option("withRelativeRoot", {
+          type: "boolean",
+          description: "Use relative root",
+        });
+    },
+    (argv) => {
+      const { flatDist, prod, buildMode, withMock, withHostingMetaFiles, withRelativeRoot } = argv;
+
+      build({
+        buildMode: getStringArg(buildMode, prod ? "CONFIG_ONLY" : undefined),
+        withMock: getBoolArg(withMock, prod ? false : undefined),
+        withHostingMetaFiles: getBoolArg(withHostingMetaFiles, prod ? false : undefined),
+        withRelativeRoot: getBoolArg(withRelativeRoot, prod ? true : undefined),
+        flatDist: getBoolArg(flatDist, prod ? true : undefined),
       });
-  })
-  .command<BuildLibArgs>("build-lib", "Build library", (yargs) => {
-    return yargs
-      .option("watch", {
-        type: "boolean",
-        description: "Watch mode",
-      })
-      .option("mode", {
-        type: "string",
-        description: "Build mode",
-      });
-  })
-  .command<StartArgs>("start", "Start development server", (yargs) => {
-    return yargs
-      .option("port", {
-        type: "number",
-        description: "Port number",
-      })
-      .option("withMock", {
-        type: "boolean",
-        description: "Include mock data",
-      })
-      .option("proxy", {
+    },
+  )
+  .command<BuildLibArgs>(
+    "build-lib",
+    "Build library",
+    (yargs) => {
+      return yargs
+        .option("watch", {
+          type: "boolean",
+          description: "Watch mode",
+        })
+        .option("mode", {
+          type: "string",
+          description: "Build mode",
+        });
+    },
+    (argv) => {
+      const { watch, mode } = argv;
+      buildLib({ watchMode: getBoolArg(watch, false), mode: getStringArg(mode, "") });
+    },
+  )
+  .command<StartArgs>(
+    "start",
+    "Start development server",
+    (yargs) => {
+      return yargs
+        .option("port", {
+          type: "number",
+          description: "Port number",
+        })
+        .option("withMock", {
+          type: "boolean",
+          description: "Include mock data",
+        })
+        .option("proxy", {
+          type: "string",
+          description: "Proxy target",
+        });
+    },
+    (argv) => {
+      const { port, withMock, proxy } = argv;
+      start({ port, withMock: getBoolArg(withMock), proxy });
+    },
+  )
+  .command<PreviewArgs>(
+    "preview",
+    "Preview build",
+    (yargs) => {
+      return yargs.option("proxy", {
         type: "string",
         description: "Proxy target",
       });
-  })
-  .command<PreviewArgs>("preview", "Preview build", (yargs) => {
-    return yargs.option("proxy", {
-      type: "string",
-      description: "Proxy target",
-    });
-  })
-  .command<ZipDistArgs>("zip-dist", "Zip distribution", (yargs) => {
-    return yargs
-      .option("target", {
-        type: "string",
-        description: "Target zip file",
-      })
-      .option("source", {
-        type: "string",
-        description: "Source directory",
-      });
-  })
+    },
+    (argv) => {
+      const { proxy } = argv;
+      preview({ proxy });
+    },
+  )
+  .command<ZipDistArgs>(
+    "zip-dist",
+    "Zip distribution",
+    (yargs) => {
+      return yargs
+        .option("target", {
+          type: "string",
+          description: "Target zip file",
+        })
+        .option("source", {
+          type: "string",
+          description: "Source directory",
+        });
+    },
+    (argv) => {
+      const { target, source } = argv;
+      zipDist({ target, source });
+    },
+  )
+  .strict()
+  .demandCommand(1, "You need to provide a command")
   .help()
-  .parseSync();
-
-const command = argv._[0] as string;
-
-switch (command) {
-  case "build": {
-    const { flatDist, prod, buildMode, withMock, withHostingMetaFiles, withRelativeRoot } =
-      argv as BuildArgs;
-
-    build({
-      buildMode: getStringArg(buildMode, prod ? "CONFIG_ONLY" : undefined),
-      withMock: getBoolArg(withMock, prod ? false : undefined),
-      withHostingMetaFiles: getBoolArg(withHostingMetaFiles, prod ? false : undefined),
-      withRelativeRoot: getBoolArg(withRelativeRoot, prod ? true : undefined),
-      flatDist: getBoolArg(flatDist, prod ? true : undefined),
-    });
-    break;
-  }
-  case "build-lib": {
-    const { watch, mode } = argv as BuildLibArgs;
-    buildLib({ watchMode: getBoolArg(watch, false), mode: getStringArg(mode, "") });
-    break;
-  }
-  case "start": {
-    const { port, withMock, proxy } = argv as StartArgs;
-    start({ port, withMock: getBoolArg(withMock), proxy });
-    break;
-  }
-  case "preview": {
-    const { proxy } = argv as PreviewArgs;
-    preview({ proxy });
-    break;
-  }
-  case "zip-dist": {
-    const { target, source } = argv as ZipDistArgs;
-    zipDist({ target, source });
-    break;
-  }
-  default: {
-    console.log('Unknown command "' + command + '".');
-    console.log("Perhaps you need to update xmlui?");
-    process.exit(1);
-  }
-}
+  .parse();
