@@ -22,13 +22,13 @@ jobs:
 
       - run: npm ci --prefer-offline
 
-      - run: npm run build-blog
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build blog
+        run: npm run build-blog
 
-      - name: "Run Azure webapp deploy action using publish profile credentials"
-        uses: azure/webapps-deploy@v2
+      - name: Deploy site
+        uses: azure/static-web-apps-deploy@v1
         with:
-          package: "blog/ui.zip"
-          app-name: xmlui-blog
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_XMLUI_BLOG }}
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_WEBAPP_DEPLOYMENT_TOKEN_XMLUI_BLOG }}
+          action: "upload"
+          app_location: "blog/dist"
+          skip_app_build: true
