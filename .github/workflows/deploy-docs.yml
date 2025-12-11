@@ -1,13 +1,6 @@
 name: Deploy docs
-
 on:
   workflow_dispatch:
-    inputs:
-      max_releases:
-        description: "Maximum number of releases to include in docs"
-        type: number
-        required: false
-        default: 10
 
 jobs:
   build-and-deploy:
@@ -28,14 +21,13 @@ jobs:
 
       - run: npm ci --prefer-offline
 
-      - run: npm run release-docs
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DOCS_XMLUI_MAX_RELEASES_LENGTH: ${{ github.event.inputs.max_releases }}
+      - name: Build docs
+        run: npm run build-docs
 
-      - name: "Run Azure webapp deploy action using publish profile credentials"
-        uses: azure/webapps-deploy@v2
+      - name: Deploy site
+        uses: azure/static-web-apps-deploy@v1
         with:
-          package: "docs/dist/ui.zip"
-          app-name: xmlui-docs
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_XMLUI_DOCS }}
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_WEBAPP_DEPLOYMENT_TOKEN_XMLUI_DOCS }}
+          action: "upload"
+          app_location: "docs/dist"
+          skip_app_build: true
