@@ -197,7 +197,7 @@ export function AppWithCodeViewNative({
   }
   return (
     <>
-      {!!markdown && <Markdown>{markdown}</Markdown>}
+      {!!markdown && <Markdown className="">{markdown}</Markdown>}
       <IndexAwareNestedApp
         height={height}
         app={app}

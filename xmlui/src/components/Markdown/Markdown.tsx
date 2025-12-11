@@ -105,7 +105,7 @@ export const MarkdownMd = createMetadata({
 
     "marginTop-Text-markdown": "$space-3",
     "marginBottom-Text-markdown": "$space-6",
-    "fontSize-Text-markdown": "$fontSize-Text",
+    "fontSize-Text-markdown": "$fontSize-sm",
     "fontWeight-Text-markdown": "fontWeight-Text",
 
     "borderColor-HorizontalRule": "$borderColor",

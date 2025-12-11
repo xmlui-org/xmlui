@@ -184,13 +184,6 @@ $border-NestedApp: createThemeVar("border-#{$component}");
 
       .splitViewMarkdown {
         height: 100%;
-
-        :global(.global-codeBlock) {
-          background-color: $backgroundColor-code-splitView-NestedApp;
-          height: 100%;
-          border: none;
-          border-radius: 0;
-        }
       }
     }
   }

@@ -199,7 +199,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     // --- Various font sizes (relative to the current context)
     "fontSize-tiny": "0.625em",
     "fontSize-xs": "0.75em",
-    "fontSize-code": "0.85em",
+    "fontSize-code": "0.92em",
     "fontSize-sm": "0.875em",
     "fontSize-base": "1em",
     "fontSize-lg": "1.125em",
