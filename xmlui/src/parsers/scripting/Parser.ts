@@ -44,7 +44,6 @@ import {
   type UnaryExpression,
   type VarDeclaration,
   type VarStatement,
-  type ValueAccessorExpression,
   type WhileStatement,
   type TemplateLiteralExpression,
   T_EMPTY_STATEMENT,
@@ -89,7 +88,6 @@ import {
   T_PREFIX_OP_EXPRESSION,
   T_LITERAL,
   T_TEMPLATE_LITERAL_EXPRESSION,
-  T_VALUE_ACCESSOR_EXPRESSION,
   T_DESTRUCTURE,
 } from "../../components-core/script-runner/ScriptingSourceTree";
 import type { GenericToken } from "../common/GenericToken";
@@ -2158,7 +2156,6 @@ export class Parser {
   /**
    * memberOrInvocationExpr
    *   : primaryExpr "(" functionArgs ")"
-   *   | primaryExpr "!" 
    *   | primaryExpr "." identifier
    *   | primaryExpr "?." identifier
    *   | primaryExpr "[" expr "]"
@@ -2176,20 +2173,6 @@ export class Parser {
       const currentStart = this._lexer.peek();
 
       switch (currentStart.type) {
-        case TokenType.LogicalNot: {
-          // --- Value accessor operator
-          const endToken = this._lexer.get();
-          primary = this.createExpressionNode<ValueAccessorExpression>(
-            T_VALUE_ACCESSOR_EXPRESSION,
-            {
-              expr: primary,
-            },
-            startToken,
-            endToken,
-          );
-          break;
-        }
-
         case TokenType.LParent: {
           this._lexer.get();
           let args: Expression[] = [];

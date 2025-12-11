@@ -24,7 +24,6 @@ import {
   T_TEMPLATE_LITERAL_EXPRESSION,
   T_UNARY_EXPRESSION,
   T_VAR_DECLARATION,
-  T_VALUE_ACCESSOR_EXPRESSION,
   type ArrayLiteral,
   type ArrowExpression,
   type AssignmentExpression,
@@ -40,7 +39,6 @@ import {
   type SequenceExpression,
   type Statement,
   type UnaryExpression,
-  type ValueAccessorExpression,
   type VarDeclaration,
 } from "./ScriptingSourceTree";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
@@ -50,7 +48,6 @@ import { isBannedFunction } from "./bannedFunctions";
 import {
   evalArrow,
   evalAssignmentCore,
-  evalValueAccessorCore,
   evalBinaryCore,
   evalCalculatedMemberAccessCore,
   evalIdentifier,
@@ -195,9 +192,6 @@ function evalBindingExpressionTree(
     case T_CALCULATED_MEMBER_ACCESS_EXPRESSION:
       return evalCalculatedMemberAccess(evaluator, thisStack, expr, evalContext, thread);
 
-    case T_VALUE_ACCESSOR_EXPRESSION:
-      return evalValueAccessor(evaluator, thisStack, expr, evalContext, thread);
-
     case T_SEQUENCE_EXPRESSION:
       return evalSequence(evaluator, thisStack, expr, evalContext, thread);
 
@@ -287,17 +281,6 @@ function evalCalculatedMemberAccess(
 
   thisStack.pop();
   return evalCalculatedMemberAccessCore(thisStack, expr, evalContext, thread);
-}
-
-function evalValueAccessor(
-  evaluator: EvaluatorFunction,
-  thisStack: any[],
-  expr: ValueAccessorExpression,
-  evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
-): any {
-  evaluator(thisStack, expr.expr, evalContext, thread);
-  return evalValueAccessorCore(thisStack, expr, thread);
 }
 
 function evalSequence(

@@ -25,7 +25,6 @@ import {
   T_TEMPLATE_LITERAL_EXPRESSION,
   T_UNARY_EXPRESSION,
   T_VAR_DECLARATION,
-  T_VALUE_ACCESSOR_EXPRESSION,
   type ArrayLiteral,
   type ArrowExpression,
   type AssignmentExpression,
@@ -43,7 +42,6 @@ import {
   type SequenceExpression,
   type Statement,
   type UnaryExpression,
-  type ValueAccessorExpression,
   type VarDeclaration,
 } from "./ScriptingSourceTree";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
@@ -53,7 +51,6 @@ import { processDeclarationsAsync, processStatementQueueAsync } from "./process-
 import {
   evalArrow,
   evalAssignmentCore,
-  evalValueAccessorCore,
   evalBinaryCore,
   evalCalculatedMemberAccessCore,
   evalIdentifier,
@@ -185,9 +182,6 @@ async function evalBindingExpressionTreeAsync(
           thread,
         );
 
-      case T_VALUE_ACCESSOR_EXPRESSION:
-        return await evalValueAccessorAsync(evaluator, thisStack, expr, evalContext, thread);
-
       case T_SEQUENCE_EXPRESSION:
         return await evalSequenceAsync(evaluator, thisStack, expr, evalContext, thread);
 
@@ -260,18 +254,6 @@ async function evalCalculatedMemberAccessAsync(
   thisStack.pop();
   await completeExprValue(expr.member, thread);
   return evalCalculatedMemberAccessCore(thisStack, expr, evalContext, thread);
-}
-
-async function evalValueAccessorAsync(
-  evaluator: EvaluatorAsyncFunction,
-  thisStack: any[],
-  expr: ValueAccessorExpression,
-  evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
-): Promise<any> {
-  await evaluator(thisStack, expr.expr, evalContext, thread);
-  await completeExprValue(expr.expr, thread);
-  return evalValueAccessorCore(thisStack, expr, thread);
 }
 
 function evalSequenceAsync(
