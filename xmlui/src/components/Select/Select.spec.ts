@@ -1,3 +1,4 @@
+import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
 // =============================================================================
@@ -2016,11 +2017,7 @@ test.describe("Grouping Functionality", () => {
     await expect(trigger.getByText("Misc")).toBeVisible();
   });
 
-  test("Select in FormItem with groupBy", async ({
-    page,
-    initTestBed,
-    createSelectDriver,
-  }) => {
+  test("Select in FormItem with groupBy", async ({ page, initTestBed, createSelectDriver }) => {
     await initTestBed(`
       <Form>
         <FormItem
@@ -2148,3 +2145,139 @@ test.describe("Grouping Functionality", () => {
     await expect(page.getByRole("option", { name: "Tab" })).toBeVisible();
   });
 });
+
+// Regression tests for the value synchronization issue with Select
+// NOTE: These tests are currently skipped due to known issues.
+test.describe.skip(
+  "Form Value Synchronization",
+  SKIP_REASON.UNSURE(
+    "We have not decided how to tackle this data vs UI inconsistency yet. A number of proposals are being evaluated.",
+  ),
+  () => {
+    test("invalid single value in Form - SimpleSelect", async ({ page, initTestBed }) => {
+      const { testStateDriver } = await initTestBed(`
+      <Form data="{ { sel: 'invalid' } }" onSubmit="(data) => { testState = data.sel; }">
+        <FormItem testId="mySelect" type="select" bindTo="sel">
+          <Option value="opt1" label="first"/>
+          <Option value="opt2" label="second"/>
+          <Option value="opt3" label="third"/>
+        </FormItem>
+      </Form>  
+    `);
+      await page.getByRole("button", { name: "Save" }).click();
+
+      const selectTrigger = page.getByTestId("mySelect").locator('button[role="combobox"]');
+      await expect(selectTrigger).toContainText("");
+      await expect.poll(testStateDriver.testState).toBe("invalid");
+    });
+
+    test("invalid single value in Form - Select", async ({ page, initTestBed }) => {
+      const { testStateDriver } = await initTestBed(`
+      <Form data="{ { sel: 'invalid' } }" onSubmit="(data) => { testState = data.sel; }">
+        <FormItem testId="mySelect" type="select" bindTo="sel" searchable>
+          <Option value="opt1" label="first"/>
+          <Option value="opt2" label="second"/>
+          <Option value="opt3" label="third"/>
+        </FormItem>
+      </Form>  
+    `);
+      await page.getByRole("button", { name: "Save" }).click();
+
+      const selectTrigger = page.getByTestId("mySelect").locator('button[role="combobox"]');
+      await expect(selectTrigger).toContainText("");
+      await expect.poll(testStateDriver.testState).toBe("invalid");
+    });
+
+    test("changing options does not update value - SimpleSelect", async ({ page, initTestBed }) => {
+      const { testStateDriver } = await initTestBed(`
+      <Form
+        var.switchData="{true}"
+        data="{{ select2: 'item4' }}"
+        var.data1="{[
+          { id: 'item1', name: 'MacBook Pro' },
+          { id: 'item2', name: 'iPad Air' },
+          { id: 'item3', name: 'XPS' },
+          { id: 'item4', name: 'Tab' }
+        ]}"
+        var.data2="{[
+          { id: 'item1', name: 'Item 1' },
+          { id: 'item2', name: 'Item 2' },
+          { id: 'item3', name: 'Item 3' }
+        ]}"
+        onSubmit="(data) => { testState = data.select2; }"
+      >
+        <Select label="select1" initialValue="select1"
+          onDidChange="(value) => { value === 'opt1' ? switchData = true : switchData = false; }">
+          <Option value="opt1" label="first"/>
+          <Option value="opt2" label="second"/>
+        </Select>
+        <FormItem label="select2" type="select" bindTo="select2">
+          <Items items="{switchData ? data1 : data2}">
+            <Option value="{$item.id}" label="{$item.name}" />
+          </Items>
+        </FormItem>
+      </Form>
+    `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      const selectTrigger = page.getByRole("combobox", { name: "select2" });
+      await expect(selectTrigger).toContainText("Tab");
+      await expect.poll(testStateDriver.testState).toBe("item4");
+
+      // Change the first select to switch options
+      await page.getByRole("combobox", { name: "select1" }).click();
+      await page.getByRole("option", { name: "second" }).click();
+      await page.getByRole("button", { name: "Save" }).click();
+
+      await expect(selectTrigger).toContainText("");
+      await expect.poll(testStateDriver.testState).toBe("item4");
+    });
+
+    test("changing options does not update value - Select", async ({ page, initTestBed }) => {
+      const { testStateDriver } = await initTestBed(`
+      <Form
+        var.switchData="{true}"
+        data="{{ select2: 'item4' }}"
+        var.data1="{[
+          { id: 'item1', name: 'MacBook Pro' },
+          { id: 'item2', name: 'iPad Air' },
+          { id: 'item3', name: 'XPS' },
+          { id: 'item4', name: 'Tab' }
+        ]}"
+        var.data2="{[
+          { id: 'item1', name: 'Item 1' },
+          { id: 'item2', name: 'Item 2' },
+          { id: 'item3', name: 'Item 3' }
+        ]}"
+        onSubmit="(data) => { testState = data.select2; }"
+      >
+        <Select label="select1" initialValue="select1"
+          onDidChange="(value) => { value === 'opt1' ? switchData = true : switchData = false; }">
+          <Option value="opt1" label="first"/>
+          <Option value="opt2" label="second"/>
+        </Select>
+        <FormItem label="select2" type="select" bindTo="select2" searchable>
+          <Items items="{switchData ? data1 : data2}">
+            <Option value="{$item.id}" label="{$item.name}" />
+          </Items>
+        </FormItem>
+      </Form>
+    `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      const selectTrigger = page.getByRole("combobox", { name: "select2" });
+      await expect(selectTrigger).toContainText("Tab");
+      await expect.poll(testStateDriver.testState).toBe("item4");
+
+      // Change the first select to switch options
+      await page.getByRole("combobox", { name: "select1" }).click();
+      await page.getByRole("option", { name: "second" }).click();
+      await page.getByRole("button", { name: "Save" }).click();
+
+      await expect(selectTrigger).toContainText("");
+      await expect.poll(testStateDriver.testState).toBe("item4");
+    });
+  },
+);
