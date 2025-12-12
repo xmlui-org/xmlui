@@ -161,7 +161,6 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
     margin: 0;
     padding: 0;
     min-height: fit-content;
-    font-size: t.$fontSize;
 
     &.default {
       @include textVariant("");

@@ -77,7 +77,6 @@ export const NavLinkMd = createMetadata({
     [`backgroundColor-${COMP}`]: "transparent",
     [`paddingHorizontal-${COMP}`]: "$space-4",
     [`paddingVertical-${COMP}`]: "$space-2",
-    [`fontSize-${COMP}`]: "$fontSize-sm",
     [`fontWeight-${COMP}`]: "$fontWeight-normal",
     [`fontFamily-${COMP}`]: "$fontFamily",
     [`lineHeight-${COMP}`]: "$lineHeight-relaxed",

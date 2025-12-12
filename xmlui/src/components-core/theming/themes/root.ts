@@ -199,7 +199,6 @@ export const RootThemeDefinition: ThemeDefinition = {
     // --- Various font sizes (relative to the current context)
     "fontSize-tiny": "0.625em",
     "fontSize-xs": "0.75em",
-    "fontSize-code": "0.92em",
     "fontSize-sm": "0.875em",
     "fontSize-base": "1em",
     "fontSize-lg": "1.125em",
@@ -212,9 +211,12 @@ export const RootThemeDefinition: ThemeDefinition = {
     "fontSize-7xl": "4.5em",
     "fontSize-8xl": "6em",
     "fontSize-9xl": "8em",
-
-    // --- The default font size
+    "fontSize-code": "0.85rem", // --- Not, this is intentionally in "rem"
     fontSize: "$fontSize-base",
+
+    // --- The font size used in body
+    "fontSize-root": "14px",
+   
 
     // --- Various line height values
     // --- Default line height values (relative to the base unit, "space-base")
@@ -223,8 +225,9 @@ export const RootThemeDefinition: ThemeDefinition = {
     "lineHeight-snug": "1.375",
     "lineHeight-normal": "1.5",
     "lineHeight-relaxed": "1.625",
+    "lineHeight-relaxed-2": "1.7",
     "lineHeight-loose": "2",
-    "lineHeight": "$lineHeight-relaxed",
+    "lineHeight": "$lineHeight-relaxed-2",
 
     // --- Letter spacing values
     "letterSpacing-tighter": "-0.05em",

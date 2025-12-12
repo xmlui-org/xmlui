@@ -175,6 +175,7 @@ $marginBottom-HtmlDetails: createThemeVar("marginBottom-HtmlDetails");
     width: 100%;
     overflow-wrap: break-word;
     @include t.textVars($themeVars, "Text");
+    font-size: t.$fontSize;
 
     &.grayscale {
       img {

@@ -101,6 +101,7 @@ export function AppWithCodeViewNative({
   }, [app, components, title, activeTheme, api, activeTone, safePopOutUrl]);
 
   if (withFrame) {
+    console.log(markdown);  
     return (
       <>
         {!!markdown && !splitView && <Markdown>{markdown}</Markdown>}
@@ -197,7 +198,7 @@ export function AppWithCodeViewNative({
   }
   return (
     <>
-      {!!markdown && <Markdown className="">{markdown}</Markdown>}
+      {!!markdown && <Markdown>{markdown}</Markdown>}
       <IndexAwareNestedApp
         height={height}
         app={app}

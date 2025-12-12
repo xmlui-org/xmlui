@@ -491,7 +491,7 @@ $THEME-VAR-PREFIX: xmlui;
   ) !global;
   $tmp: if(
     $default,
-    appendThemeVarWithFallback($tmp, "fontSize-#{$subject}", "fontSize"),
+    appendThemeVar($tmp, "fontSize-#{$subject}"),
     appendThemeVar($tmp, "fontSize-#{$subject}")
   ) !global;
   $tmp: if(
@@ -561,7 +561,7 @@ $THEME-VAR-PREFIX: xmlui;
   ) !global;
   $tmp: if(
     $default,
-    appendThemeVarWithFallback($tmp, "lineHeight-#{$subject}", "lineHeight"),
+    appendThemeVar($tmp, "lineHeight-#{$subject}"),
     appendThemeVar($tmp, "lineHeight-#{$subject}")
   ) !global;
   $tmp: if(
@@ -875,5 +875,5 @@ $fontWeight-bold: createVar(fontWeight-bold);
 $borderRadius: createVar(borderRadius);
 
 // body
-$fontSize: createVar(fontSize);
+$fontSize-root: createVar(fontSize-root);
 $fontWeight: createVar(fontWeight);
