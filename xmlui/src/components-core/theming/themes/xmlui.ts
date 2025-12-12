@@ -101,6 +101,20 @@ export const XmlUiBlogThemeDefinition: ThemeDefinition = {
   },
 };
 
+// Theme supporting richer layouts for business applications
+// - Wider content area
+// - Smaller input sizes for denser forms
+export const XmlUiBusinessThemeDefinition: ThemeDefinition = {
+  id: "xmlui-business",
+  extends: "xmlui",
+  color: "$color-primary-500",
+  themeVars: {
+    // Note: This comes from Alketta's feedback on the default theme not being wide enough for business apps
+    "maxWidth-content": "100%",
+    "width-navPanel-App": "200px",
+  },
+};
+
 export const XmlUiWebThemeDefinition: ThemeDefinition = {
   id: "xmlui-web",
   extends: "xmlui",

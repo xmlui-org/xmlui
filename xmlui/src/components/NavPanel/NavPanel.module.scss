@@ -19,6 +19,7 @@ $marginBottom-logo-NavPanel: createThemeVar("marginBottom-logo-#{$component}");
 
 $maxWidth-content-NavPanel: createThemeVar("maxWidth-content-App");
 
+// These theme variables only get applied when the nav panel is in a horizontal layout
 $height-NavPanel: createThemeVar("height-AppHeader");
 $paddingVertical-AppHeader: createThemeVar("paddingVertical-AppHeader");
 $alignment-content-AppHeader: createThemeVar("alignment-content-AppHeader");
