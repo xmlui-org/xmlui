@@ -12,7 +12,7 @@ $paddingHorizontal-Pages: createThemeVar("paddingHorizontal-Pages");
 $gap-Pages: createThemeVar("gap-Pages");
 
 @layer components {
-  .wrapper{
+  .pageWrapper{
     padding-top: $paddingVertical-Pages;
     padding-bottom: $paddingVertical-Pages;
     padding-right: $paddingHorizontal-Pages;

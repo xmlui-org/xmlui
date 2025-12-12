@@ -347,6 +347,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     flex: 1;
     min-height: initial;
     isolation: isolate;
+    background-color: t.$backgroundColor;
   }
 
   .pageContentContainer {

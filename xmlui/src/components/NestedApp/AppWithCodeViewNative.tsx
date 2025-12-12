@@ -101,7 +101,6 @@ export function AppWithCodeViewNative({
   }, [app, components, title, activeTheme, api, activeTone, safePopOutUrl]);
 
   if (withFrame) {
-    console.log(markdown);  
     return (
       <>
         {!!markdown && !splitView && <Markdown>{markdown}</Markdown>}

@@ -13,27 +13,27 @@ $paddingTop-MarkDown: createThemeVar("paddingTop-Markdown");
 $paddingBottom-MarkDown: createThemeVar("paddingBottom-Markdown");
 $backgroundColor-MarkDown: createThemeVar("backgroundColor-Markdown");
 
-$themeVars: t.composePaddingVars($themeVars, "Blockquote");
-$themeVars: t.composeBorderVars($themeVars, "Blockquote");
-$color-accent-Blockquote: createThemeVar("color-accent-Blockquote");
-$width-accent-Blockquote: createThemeVar("width-accent-Blockquote");
-$backgroundColor-Blockquote: createThemeVar("backgroundColor-Blockquote");
-$paddingLeft-Blockquote: createThemeVar("paddingLeft-Blockquote");
-$borderRadius-Blockquote: createThemeVar("borderRadius-Blockquote");
-$marginTop-Blockquote: createThemeVar("marginTop-Blockquote");
-$marginBottom-Blockquote: createThemeVar("marginBottom-Blockquote");
+$themeVars: t.composePaddingVars($themeVars, "Blockquote-markdown");
+$themeVars: t.composeBorderVars($themeVars, "Blockquote-markdown");
+$color-accent-Blockquote-markdown: createThemeVar("color-accent-Blockquote-markdown");
+$width-accent-Blockquote-markdown: createThemeVar("width-accent-Blockquote-markdown");
+$backgroundColor-Blockquote-markdown: createThemeVar("backgroundColor-Blockquote-markdown");
+$paddingLeft-Blockquote-markdown: createThemeVar("paddingLeft-Blockquote-markdown");
+$borderRadius-Blockquote-markdown: createThemeVar("borderRadius-Blockquote-markdown");
+$marginTop-Blockquote-markdown: createThemeVar("marginTop-Blockquote-markdown");
+$marginBottom-Blockquote-markdown: createThemeVar("marginBottom-Blockquote-markdown");
 
-$themeVars: t.composePaddingVars($themeVars, "Admonition");
-$themeVars: t.composeBorderVars($themeVars, "Admonition");
-$backgroundColor-Admonition: createThemeVar("backgroundColor-Admonition");
-$borderRadius-Admonition: createThemeVar("borderRadius-Admonition");
-$size-icon-Admonition: createThemeVar("size-icon-Admonition");
-$marginTop-Admonition: createThemeVar("marginTop-Admonition");
-$marginBottom-Admonition: createThemeVar("marginBottom-Admonition");
-$marginLeft-Admonition-content: createThemeVar("marginLeft-Admonition-content");
+$themeVars: t.composePaddingVars($themeVars, "Admonition-markdown");
+$themeVars: t.composeBorderVars($themeVars, "Admonition-markdown");
+$backgroundColor-Admonition-markdown: createThemeVar("backgroundColor-Admonition-markdown");
+$borderRadius-Admonition-markdown: createThemeVar("borderRadius-Admonition-markdown");
+$size-icon-Admonition-markdown: createThemeVar("size-icon-Admonition-markdown");
+$marginTop-Admonition-markdown: createThemeVar("marginTop-Admonition-markdown");
+$marginBottom-Admonition-markdown: createThemeVar("marginBottom-Admonition-markdown");
+$marginLeft-content-Admonition-markdown: createThemeVar("marginLeft-content-Admonition-markdown");
 
-$marginTop-HtmlVideo: createThemeVar("marginTop-HtmlVideo");
-$marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
+$marginTop-Video-markdown: createThemeVar("marginTop-Video-markdown");
+$marginBottom-Video-markdown: createThemeVar("marginBottom-Video-markdown");
 
 // Variables for @layer section - Text-markdown
 $marginTop-Text-markdown: createThemeVar("marginTop-Text-markdown");
@@ -63,75 +63,75 @@ $marginLeft-Image-markdown: createThemeVar("marginLeft-Image-markdown");
 $marginRight-Image-markdown: createThemeVar("marginRight-Image-markdown");
 
 // Variables for @layer section - Admonition variants
-$backgroundColor-Admonition-info: createThemeVar("backgroundColor-Admonition-info");
-$borderColor-Admonition-info: createThemeVar("borderColor-Admonition-info");
-$backgroundColor-Admonition-warning: createThemeVar("backgroundColor-Admonition-warning");
-$borderColor-Admonition-warning: createThemeVar("borderColor-Admonition-warning");
-$backgroundColor-Admonition-danger: createThemeVar("backgroundColor-Admonition-danger");
-$borderColor-Admonition-danger: createThemeVar("borderColor-Admonition-danger");
-$backgroundColor-Admonition-note: createThemeVar("backgroundColor-Admonition-note");
-$borderColor-Admonition-note: createThemeVar("borderColor-Admonition-note");
-$backgroundColor-Admonition-tip: createThemeVar("backgroundColor-Admonition-tip");
-$borderColor-Admonition-tip: createThemeVar("borderColor-Admonition-tip");
+$backgroundColor-Admonition-markdown-info: createThemeVar("backgroundColor-Admonition-markdown-info");
+$borderColor-Admonition-markdown-info: createThemeVar("borderColor-Admonition-markdown-info");
+$backgroundColor-Admonition-markdown-warning: createThemeVar("backgroundColor-Admonition-markdown-warning");
+$borderColor-Admonition-markdown-warning: createThemeVar("borderColor-Admonition-markdown-warning");
+$backgroundColor-Admonition-markdown-danger: createThemeVar("backgroundColor-Admonition-markdown-danger");
+$borderColor-Admonition-markdown-danger: createThemeVar("borderColor-Admonition-markdown-danger");
+$backgroundColor-Admonition-markdown-note: createThemeVar("backgroundColor-Admonition-markdown-note");
+$borderColor-Admonition-markdown-note: createThemeVar("borderColor-Admonition-markdown-note");
+$backgroundColor-Admonition-markdown-tip: createThemeVar("backgroundColor-Admonition-markdown-tip");
+$borderColor-Admonition-markdown-tip: createThemeVar("borderColor-Admonition-markdown-tip");
 
 // Variables for @layer section - HorizontalRule
-$borderColor-HorizontalRule: createThemeVar("borderColor-HorizontalRule");
-$borderStyle-HorizontalRule: createThemeVar("borderStyle-HorizontalRule");
-$borderWidth-HorizontalRule: createThemeVar("borderWidth-HorizontalRule");
+$borderColor-HorizontalRule-markdown: createThemeVar("borderColor-HorizontalRule-markdown");
+$borderStyle-HorizontalRule-markdown: createThemeVar("borderStyle-HorizontalRule-markdown");
+$borderWidth-HorizontalRule-markdown: createThemeVar("borderWidth-HorizontalRule-markdown");
 
 // --- HTML Tags variables (formerly from HtmlTags.module.scss)
 
 // --- Table
-$textColor-HtmlTable: createThemeVar("textColor-HtmlTable");
-$backgroundColor-HtmlTable: createThemeVar("backgroundColor-HtmlTable");
-$fontFamily-HtmlTable: createThemeVar("fontFamily-HtmlTable");
-$fontSize-HtmlTable: createThemeVar("fontSize-HtmlTable");
-$fontWeight-HtmlTable: createThemeVar("fontWeight-HtmlTable");
-$textTransform-HtmlTable: createThemeVar("textTransform-HtmlTable");
-$marginTop-HtmlTable: createThemeVar("marginTop-HtmlTable");
-$marginBottom-HtmlTable: createThemeVar("marginBottom-HtmlTable");
-$width-HtmlTable: createThemeVar("width-HtmlTable");
-$themeVars: t.composeBorderVars($themeVars, "HtmlTable");
-$themeVars: t.composePaddingVars($themeVars, "HtmlTable");
+$textColor-Table-markdown: createThemeVar("textColor-Table-markdown");
+$backgroundColor-Table-markdown: createThemeVar("backgroundColor-Table-markdown");
+$fontFamily-Table-markdown: createThemeVar("fontFamily-Table-markdown");
+$fontSize-Table-markdown: createThemeVar("fontSize-Table-markdown");
+$fontWeight-Table-markdown: createThemeVar("fontWeight-Table-markdown");
+$textTransform-Table-markdown: createThemeVar("textTransform-Table-markdown");
+$marginTop-Table-markdown: createThemeVar("marginTop-Table-markdown");
+$marginBottom-Table-markdown: createThemeVar("marginBottom-Table-markdown");
+$width-Table-markdown: createThemeVar("width-Table-markdown");
+$themeVars: t.composeBorderVars($themeVars, "Table-markdown");
+$themeVars: t.composePaddingVars($themeVars, "Table-markdown");
 
 // --- thead
-$backgroundColor-HtmlThead: createThemeVar("backgroundColor-HtmlThead");
-$textColor-HtmlThead: createThemeVar("textColor-HtmlThead");
-$fontWeight-HtmlThead: createThemeVar("fontWeight-HtmlThead");
-$fontSize-HtmlThead: createThemeVar("fontSize-HtmlThead");
-$textTransform-HtmlThead: createThemeVar("textTransform-HtmlThead");
+$backgroundColor-Thead-markdown: createThemeVar("backgroundColor-Thead-markdown");
+$textColor-Thead-markdown: createThemeVar("textColor-Thead-markdown");
+$fontWeight-Thead-markdown: createThemeVar("fontWeight-Thead-markdown");
+$fontSize-Thead-markdown: createThemeVar("fontSize-Thead-markdown");
+$textTransform-Thead-markdown: createThemeVar("textTransform-Thead-markdown");
 $themeVars: t.composeBorderVars($themeVars, "HtmlThead");
 $themeVars: t.composePaddingVars($themeVars, "HtmlThead");
 
 // --- tbody
-$backgroundColor-HtmlTbody: createThemeVar("backgroundColor-HtmlTbody");
-$textColor-HtmlTbody: createThemeVar("textColor-HtmlTbody");
-$textAlign-HtmlTbody: createThemeVar("textAlign-HtmlTbody");
-$verticalAlignment-HtmlTbody: createThemeVar("verticalAlignment-HtmlTbody");
-$textTransform-HtmlTbody: createThemeVar("textTransform-HtmlTbody");
+$backgroundColor-Tbody-markdown: createThemeVar("backgroundColor-Tbody-markdown");
+$textColor-Tbody-markdown: createThemeVar("textColor-Tbody-markdown");
+$textAlign-Tbody-markdown: createThemeVar("textAlign-Tbody-markdown");
+$verticalAlignment-Tbody-markdown: createThemeVar("verticalAlignment-Tbody-markdown");
+$textTransform-Tbody-markdown: createThemeVar("textTransform-Tbody-markdown");
 
 // --- tfoot
-$backgroundColor-HtmlTfoot: createThemeVar("backgroundColor-HtmlTfoot");
-$textColor-HtmlTfoot: createThemeVar("textColor-HtmlTfoot");
+$backgroundColor-Tfoot-markdown: createThemeVar("backgroundColor-Tfoot-markdown");
+$textColor-Tfoot-markdown: createThemeVar("textColor-Tfoot-markdown");
 
 // --- th
-$backgroundColor-HtmlTh: createThemeVar("backgroundColor-HtmlTh");
-$textColor-HtmlTh: createThemeVar("textColor-HtmlTh");
-$fontWeight-HtmlTh: createThemeVar("fontWeight-HtmlTh");
-$fontSize-HtmlTh: createThemeVar("fontSize-HtmlTh");
-$backgroundColor-HtmlTh--hover: createThemeVar("backgroundColor-HtmlTh--hover");
-$themeVars: t.composeBorderVars($themeVars, "HtmlTh");
-$themeVars: t.composePaddingVars($themeVars, "HtmlTh");
+$backgroundColor-Th-markdown: createThemeVar("backgroundColor-Th-markdown");
+$textColor-Th-markdown: createThemeVar("textColor-Th-markdown");
+$fontWeight-Th-markdown: createThemeVar("fontWeight-Th-markdown");
+$fontSize-Th-markdown: createThemeVar("fontSize-Th-markdown");
+$backgroundColor-Th-markdown--hover: createThemeVar("backgroundColor-Th-markdown--hover");
+$themeVars: t.composeBorderVars($themeVars, "Th-markdown");
+$themeVars: t.composePaddingVars($themeVars, "Th-markdown");
 
 // --- tr
-$backgroundColor-HtmlTr: createThemeVar("backgroundColor-HtmlTr");
-$backgroundColor-HtmlTr--hover: createThemeVar("backgroundColor-HtmlTr--hover");
-$backgroundColor-even-HtmlTr: createThemeVar("backgroundColor-even-HtmlTr");
-$textColor-HtmlTr: createThemeVar("textColor-HtmlTr");
-$textColor-HtmlTr--hover: createThemeVar("textColor-HtmlTr--hover");
-$fontSize-HtmlTr: createThemeVar("fontSize-HtmlTr");
-$fontWeight-HtmlTr: createThemeVar("fontWeight-HtmlTr");
-$themeVars: t.composeBorderVars($themeVars, "HtmlTr");
+$backgroundColor-Tr-markdown: createThemeVar("backgroundColor-Tr-markdown");
+$backgroundColor-Tr-markdown--hover: createThemeVar("backgroundColor-Tr-markdown--hover");
+$backgroundColor-even-Tr-markdown: createThemeVar("backgroundColor-even-Tr-markdown");
+$textColor-Tr-markdown: createThemeVar("textColor-Tr-markdown");
+$textColor-Tr-markdown--hover: createThemeVar("textColor-Tr-markdown--hover");
+$fontSize-Tr-markdown: createThemeVar("fontSize-Tr-markdown");
+$fontWeight-Tr-markdown: createThemeVar("fontWeight-Tr-markdown");
+$themeVars: t.composeBorderVars($themeVars, "Tr-markdown");
 
 // --- td
 $backgroundColor-HtmlTd: createThemeVar("backgroundColor-HtmlTd");
@@ -143,28 +143,30 @@ $themeVars: t.composeBorderVars($themeVars, "HtmlTd");
 $themeVars: t.composePaddingVars($themeVars, "HtmlTd");
 
 // --- List styling (for both ul and ol)
-$themeVars: t.composeBorderVars($themeVars, "HtmlOl");
-$themeVars: t.composePaddingVars($themeVars, "HtmlOl");
-$marginTop-HtmlOl: createThemeVar("marginTop-HtmlOl");
-$marginBottom-HtmlOl: createThemeVar("marginBottom-HtmlOl");
+$themeVars: t.composeBorderVars($themeVars, "Ol-markdown");
+$themeVars: t.composePaddingVars($themeVars, "Ol-markdown");
+$marginTop-Ol-markdown: createThemeVar("marginTop-Ol-markdown");
+$marginBottom-Ol-markdown: createThemeVar("marginBottom-Ol-markdown");
 
-$themeVars: t.composeBorderVars($themeVars, "HtmlUl");
-$themeVars: t.composePaddingVars($themeVars, "HtmlUl");
-$marginTop-HtmlUl: createThemeVar("marginTop-HtmlUl");
-$marginBottom-HtmlUl: createThemeVar("marginBottom-HtmlUl");
+$themeVars: t.composeBorderVars($themeVars, "Ul-markdown");
+$themeVars: t.composePaddingVars($themeVars, "Ul-markdown");
+$marginTop-Ul-markdown: createThemeVar("marginTop-Ul-markdown");
+$marginBottom-Ul-markdown: createThemeVar("marginBottom-Ul-markdown");
+$marginLeft-Ul-markdown: createThemeVar("marginLeft-Ul-markdown");
+$marginRight-Ul-markdown: createThemeVar("marginRight-Ul-markdown");
 
-$themeVars: t.composeBorderVars($themeVars, "HtmlLi");
-$themeVars: t.composePaddingVars($themeVars, "HtmlLi");
-$marginLeft-HtmlLi: createThemeVar("marginLeft-HtmlLi");
-$marginTop-HtmlLi: createThemeVar("marginTop-HtmlLi");
-$marginBottom-HtmlLi: createThemeVar("marginBottom-HtmlLi");
-$listStyleType-HtmlLi: createThemeVar("listStyleType-HtmlLi");
+$themeVars: t.composeBorderVars($themeVars, "Li-markdown");
+$themeVars: t.composePaddingVars($themeVars, "Li-markdown");
+$marginLeft-Li-markdown: createThemeVar("marginLeft-Li-markdown");
+$marginTop-Li-markdown: createThemeVar("marginTop-Li-markdown");
+$marginBottom-Li-markdown: createThemeVar("marginBottom-Li-markdown");
+$listStyleType-Li-markdown: createThemeVar("listStyleType-Li-markdown");
 
 // --- Details
-$themeVars: t.composeBorderVars($themeVars, "HtmlDetails");
-$themeVars: t.composePaddingVars($themeVars, "HtmlDetails");
-$marginTop-HtmlDetails: createThemeVar("marginTop-HtmlDetails");
-$marginBottom-HtmlDetails: createThemeVar("marginBottom-HtmlDetails");
+$themeVars: t.composeBorderVars($themeVars, "Details-markdown");
+$themeVars: t.composePaddingVars($themeVars, "Details-markdown");
+$marginTop-Details-markdown: createThemeVar("marginTop-Details-markdown");
+$marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
 
 @layer components {
   .markdownContent {
@@ -256,7 +258,7 @@ $marginBottom-HtmlDetails: createThemeVar("marginBottom-HtmlDetails");
     }
 
     // --- Image
-    .block {
+    .image {
       margin-top: $marginTop-Image-markdown;
       margin-bottom: $marginBottom-Image-markdown;
       margin-left: $marginLeft-Image-markdown;
@@ -267,54 +269,54 @@ $marginBottom-HtmlDetails: createThemeVar("marginBottom-HtmlDetails");
 
     .blockquote {
       position: relative;
-      margin-top: $marginTop-Blockquote;
-      margin-bottom: $marginBottom-Blockquote;
-      background-color: $backgroundColor-Blockquote;
+      margin-top: $marginTop-Blockquote-markdown;
+      margin-bottom: $marginBottom-Blockquote-markdown;
+      background-color: $backgroundColor-Blockquote-markdown;
 
       &::before {
-        background-color: $color-accent-Blockquote;
+        background-color: $color-accent-Blockquote-markdown;
         position: absolute;
         top: 0;
         left: 0;
         display: block;
         content: "";
         height: 100%;
-        width: $width-accent-Blockquote;
+        width: $width-accent-Blockquote-markdown;
       }
     }
 
     .blockquoteContainer {
-      @include t.borderVars($themeVars, "Blockquote");
-      @include t.paddingVars($themeVars, "Blockquote");
+      @include t.borderVars($themeVars, "Blockquote-markdown");
+      @include t.paddingVars($themeVars, "Blockquote-markdown");
     }
 
     .admonitionBlockquote {
-      margin-top: $marginTop-Admonition;
-      margin-bottom: $marginBottom-Admonition;
-      background-color: $backgroundColor-Admonition;
-      border-radius: $borderRadius-Admonition;
+      margin-top: $marginTop-Admonition-markdown;
+      margin-bottom: $marginBottom-Admonition-markdown;
+      background-color: $backgroundColor-Admonition-markdown;
+      border-radius: $borderRadius-Admonition-markdown;
       @include t.borderVars($themeVars, "Admonition");
       @include t.paddingVars($themeVars, "Admonition");
 
       &.info {
-        background-color: $backgroundColor-Admonition-info;
-        border-color: $borderColor-Admonition-info;
+        background-color: $backgroundColor-Admonition-markdown-info;
+        border-color: $borderColor-Admonition-markdown-info;
       }
       &.warning {
-        background-color: $backgroundColor-Admonition-warning;
-        border-color: $borderColor-Admonition-warning;
+        background-color: $backgroundColor-Admonition-markdown-warning;
+        border-color: $borderColor-Admonition-markdown-warning;
       }
       &.danger {
-        background-color: $backgroundColor-Admonition-danger;
-        border-color: $borderColor-Admonition-danger;
+        background-color: $backgroundColor-Admonition-markdown-danger;
+        border-color: $borderColor-Admonition-markdown-danger;
       }
       &.note {
-        background-color: $backgroundColor-Admonition-note;
-        border-color: $borderColor-Admonition-note;
+        background-color: $backgroundColor-Admonition-markdown-note;
+        border-color: $borderColor-Admonition-markdown-note;
       }
       &.tip {
-        background-color: $backgroundColor-Admonition-tip;
-        border-color: $borderColor-Admonition-tip;
+        background-color: $backgroundColor-Admonition-markdown-tip;
+        border-color: $borderColor-Admonition-markdown-tip;
       }
     }
 
@@ -325,12 +327,12 @@ $marginBottom-HtmlDetails: createThemeVar("marginBottom-HtmlDetails");
     }
 
     .admonitionIcon {
-      font-size: $size-icon-Admonition;
+      font-size: $size-icon-Admonition-markdown;
       line-height: 1;
     }
 
     .admonitionContent {
-      margin-left: $marginLeft-Admonition-content;
+      margin-left: $marginLeft-content-Admonition-markdown;
       flex: 1;
       min-width: 0;
     }
@@ -347,9 +349,9 @@ $marginBottom-HtmlDetails: createThemeVar("marginBottom-HtmlDetails");
     }
 
     .horizontalRule {
-      border-top-color: $borderColor-HorizontalRule;
-      border-top-style: $borderStyle-HorizontalRule;
-      border-top-width: $borderWidth-HorizontalRule;
+      border-top-color: $borderColor-HorizontalRule-markdown;
+      border-top-style: $borderStyle-HorizontalRule-markdown;
+      border-top-width: $borderWidth-HorizontalRule-markdown;
     }
 
     li:has(> input[type="checkbox"]),
@@ -364,15 +366,15 @@ $marginBottom-HtmlDetails: createThemeVar("marginBottom-HtmlDetails");
       }
     }
 
-    // First element should have no top margin
-    > *:first-child {
-      margin-top: 0;
-    }
+    // // First element should have no top margin
+    // > *:first-child {
+    //   margin-top: 0;
+    // }
 
-    // Last element should have no bottom margin
-    > *:last-child {
-      margin-bottom: 0;
-    }
+    // // Last element should have no bottom margin
+    // > *:last-child {
+    //   margin-bottom: 0;
+    // }
 
     // --- Table
     .tableScrollContainer {
@@ -382,10 +384,10 @@ $marginBottom-HtmlDetails: createThemeVar("marginBottom-HtmlDetails");
 
     // --- Details adornment
     .detailsAdornment {
-      margin-top: $marginTop-Admonition;
-      margin-bottom: $marginBottom-Admonition;
-      border-radius: $borderRadius-Admonition;
-      background-color: $backgroundColor-Admonition;
+      margin-top: $marginTop-Admonition-markdown;
+      margin-bottom: $marginBottom-Admonition-markdown;
+      border-radius: $borderRadius-Admonition-markdown;
+      background-color: $backgroundColor-Admonition-markdown;
       @include t.borderVars($themeVars, "Admonition");
 
       // Override ExpandableItem styles for better integration
@@ -403,53 +405,51 @@ $marginBottom-HtmlDetails: createThemeVar("marginBottom-HtmlDetails");
 
     // --- Table
     .htmlTable {
-      background-color: $backgroundColor-HtmlTable;
-      color: $textColor-HtmlTable;
-      font-family: $fontFamily-HtmlTable;
-      font-size: $fontSize-HtmlTable;
-      font-weight: $fontWeight-HtmlTable;
-      text-transform: $textTransform-HtmlTable;
-      margin-top: $marginTop-HtmlTable;
-      margin-bottom: $marginBottom-HtmlTable;
-      width: $width-HtmlTable;
-      @include t.borderVars($themeVars, "HtmlTable");
-      @include t.paddingVars($themeVars, "HtmlTable");
+      background-color: $backgroundColor-Table-markdown;
+      color: $textColor-Table-markdown;
+      font-family: $fontFamily-Table-markdown;
+      font-size: $fontSize-Table-markdown;
+      font-weight: $fontWeight-Table-markdown;
+      text-transform: $textTransform-Table-markdown;
+      margin-top: $marginTop-Table-markdown;
+      margin-bottom: $marginBottom-Table-markdown;
+      width: $width-Table-markdown;
+      @include t.borderVars($themeVars, "Table-markdown");
+      @include t.paddingVars($themeVars, "Table-markdown");
     }
 
     // --- thead
     .htmlThead {
-      background-color: $backgroundColor-HtmlThead;
-      color: $textColor-HtmlThead;
-      font-weight: $fontWeight-HtmlThead;
-      font-size: $fontSize-HtmlThead;
-      text-transform: $textTransform-HtmlThead;
-      @include t.borderVars($themeVars, "HtmlThead");
-      @include t.paddingVars($themeVars, "HtmlThead");
+      background-color: $backgroundColor-Thead-markdown;
+      color: $textColor-Thead-markdown;
+      font-weight: $fontWeight-Thead-markdown;
+      font-size: $fontSize-Thead-markdown;
+      text-transform: $textTransform-Thead-markdown;
     }
 
     // --- tbody
     .htmlTbody {
-      background-color: $backgroundColor-HtmlTbody;
-      color: $textColor-HtmlTbody;
-      text-align: $textAlign-HtmlTbody;
-      vertical-align: $verticalAlignment-HtmlTbody;
-      text-transform: $textTransform-HtmlTbody;
+      background-color: $backgroundColor-Tbody-markdown;
+      color: $textColor-Tbody-markdown;
+      text-align: $textAlign-Tbody-markdown;
+      vertical-align: $verticalAlignment-Tbody-markdown;
+      text-transform: $textTransform-Tbody-markdown;
     }
 
     // --- tfoot
     .htmlTfoot {
-      background-color: $backgroundColor-HtmlTfoot;
-      color: $textColor-HtmlTfoot;
+      background-color: $backgroundColor-Tfoot-markdown;
+      color: $textColor-Tfoot-markdown;
     }
 
     // --- th
     .htmlTh {
-      background-color: $backgroundColor-HtmlTh;
-      color: $textColor-HtmlTh;
-      font-weight: $fontWeight-HtmlTh;
-      font-size: $fontSize-HtmlTh;
-      @include t.borderVars($themeVars, "HtmlTh");
-      @include t.paddingVars($themeVars, "HtmlTh");
+      background-color: $backgroundColor-Th-markdown;
+      color: $textColor-Th-markdown;
+      font-weight: $fontWeight-Th-markdown;
+      font-size: $fontSize-Th-markdown;
+      @include t.borderVars($themeVars, "Th-markdown");
+      @include t.paddingVars($themeVars, "Th-markdown");
       
       // Allow wrapping at word boundaries (spaces) and hyphens, but never break within words
       white-space: normal;
@@ -458,26 +458,26 @@ $marginBottom-HtmlDetails: createThemeVar("marginBottom-HtmlDetails");
       word-wrap: normal !important;
 
       &:hover {
-        background-color: $backgroundColor-HtmlTh--hover;
+        background-color: $backgroundColor-Th-markdown--hover;
       }
     }
 
     // --- tr
     .htmlTr {
-      background-color: $backgroundColor-HtmlTr;
-      color: $textColor-HtmlTr;
-      font-weight: $fontWeight-HtmlTr;
-      font-size: $fontSize-HtmlTr;
+      background-color: $backgroundColor-Tr-markdown;
+      color: $textColor-Tr-markdown;
+      font-weight: $fontWeight-Tr-markdown;
+      font-size: $fontSize-Tr-markdown;
       @include t.borderVars($themeVars, "HtmlTr");
 
       &:nth-child(even) {
-        background-color: $backgroundColor-even-HtmlTr;
+        background-color: $backgroundColor-even-Tr-markdown;
       }
 
       // Apply hover effect for rows with mixed th, td elements
       &:hover {
-        background-color: $backgroundColor-HtmlTr--hover;
-        color: $textColor-HtmlTr--hover;
+        background-color: $backgroundColor-Tr-markdown--hover;
+        color: $textColor-Tr-markdown--hover;
       }
 
       // Remove hover effect for rows with only th elements
@@ -505,40 +505,42 @@ $marginBottom-HtmlDetails: createThemeVar("marginBottom-HtmlDetails");
 
     // --- Lists
     .htmlUl {
-      margin-top: $marginTop-HtmlUl;
-      margin-bottom: $marginBottom-HtmlUl;
-      @include t.borderVars($themeVars, "HtmlUl");
-      @include t.paddingVars($themeVars, "HtmlUl");
+      margin-top: $marginTop-Ul-markdown;
+      margin-bottom: $marginBottom-Ul-markdown;
+      margin-left: $marginLeft-Ul-markdown;
+      margin-right: $marginRight-Ul-markdown;
+      @include t.borderVars($themeVars, "Ul-markdown");
+      @include t.paddingVars($themeVars, "Ul-markdown");
     }
 
     .htmlOl {
-      margin-top: $marginTop-HtmlOl;
-      margin-bottom: $marginBottom-HtmlOl;
-      @include t.borderVars($themeVars, "HtmlOl");
-      @include t.paddingVars($themeVars, "HtmlOl");
+      margin-top: $marginTop-Ol-markdown;
+      margin-bottom: $marginBottom-Ol-markdown;
+      @include t.borderVars($themeVars, "Ol-markdown");
+      @include t.paddingVars($themeVars, "Ol-markdown");
     }
 
     .htmlLi {
-      margin-top: $marginTop-HtmlLi;
-      margin-bottom: $marginBottom-HtmlLi;
-      list-style-type: $listStyleType-HtmlLi;
-      margin-left: $marginLeft-HtmlLi;
-      @include t.borderVars($themeVars, "HtmlLi");
-      @include t.paddingVars($themeVars, "HtmlLi");
+      margin-top: $marginTop-Li-markdown;
+      margin-bottom: $marginBottom-Li-markdown;
+      list-style-type: $listStyleType-Li-markdown;
+      margin-left: $marginLeft-Li-markdown;
+      @include t.borderVars($themeVars, "Li-markdown");
+      @include t.paddingVars($themeVars, "Li-markdown");
     }
 
     // --- Video
     .htmlVideo {
-      margin-top: $marginTop-HtmlVideo;
-      margin-bottom: $marginBottom-HtmlVideo;
+      margin-top: $marginTop-Video-markdown;
+      margin-bottom: $marginBottom-Video-markdown;
     }
 
     // --- Details
     .htmlDetails {
-      margin-top: $marginTop-HtmlDetails;
-      margin-bottom: $marginBottom-HtmlDetails;
-      @include t.borderVars($themeVars, "HtmlDetails");
-      @include t.paddingVars($themeVars, "HtmlDetails");
+      margin-top: $marginTop-Details-markdown;
+      margin-bottom: $marginBottom-Details-markdown;
+      @include t.borderVars($themeVars, "Details-markdown");
+      @include t.paddingVars($themeVars, "Details-markdown");
     }
   }
 

@@ -9,7 +9,7 @@
     background-color: t.$backgroundColor;
     color: t.$textColor-primary;
     font-family: t.$fontFamily;
-    font-size: t.$fontSize;
+    font-size: t.$fontSize-root;
     font-feature-settings: t.$font-feature-settings;
     font-weight: t.$fontWeight-normal;
     line-height: t.$lineHeight;
@@ -23,7 +23,7 @@
     // --- Default typography and layout styles
     background-color: t.$backgroundColor;
     color: t.$textColor-primary;
-    font-size: t.$fontSize;
+    font-size: t.$fontSize-root;
     font-family: t.$fontFamily;
     font-feature-settings: t.$font-feature-settings;
     font-weight: t.$fontWeight-normal;

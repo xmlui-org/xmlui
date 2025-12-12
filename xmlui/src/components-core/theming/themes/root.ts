@@ -211,7 +211,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "fontSize-7xl": "4.5em",
     "fontSize-8xl": "6em",
     "fontSize-9xl": "8em",
-    "fontSize-code": "0.85rem", // --- Not, this is intentionally in "rem"
+    "fontSize-code": "0.97rem", // --- Not, this is intentionally in "rem"
     fontSize: "$fontSize-base",
 
     // --- The font size used in body

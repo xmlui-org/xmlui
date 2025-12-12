@@ -181,7 +181,7 @@ export const Markdown = memo(
                     alt={alt}
                     style={imgStyle}
                     {...props}
-                    className={classnames({ [styles.block]: !isInline })}
+                    className={classnames({ [styles.image]: !isInline })}
                   >
                     {children}
                   </img>
