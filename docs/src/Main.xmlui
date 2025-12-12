@@ -74,20 +74,6 @@
                 <NavLink label="Themes" to="/themes-intro" />
             </NavGroup>
         </Stack>
-        <NavGroup label="Tutorial">
-            <NavLink label="XMLUI Invoice" to="/tutorial-01" />
-            <NavLink label="Main.xmlui" to="/tutorial-02" />
-            <NavLink label="Navigation" to="/tutorial-03" />
-            <NavLink label="InfoCards" to="/tutorial-04" />
-            <NavLink label="Charts" to="/tutorial-05" />
-            <NavLink label="Slider" to="/tutorial-06" />
-            <NavLink label="Invoices" to="/tutorial-07" />
-            <NavLink label="Create Invoice" to="/tutorial-08" />
-            <NavLink label="Invoice Details" to="/tutorial-09" />
-            <NavLink label="Search" to="/tutorial-10" />
-            <NavLink label="Import" to="/tutorial-11" />
-            <NavLink label="Settings" to="/tutorial-12" />
-        </NavGroup>
         <NavGroup label="Guides">
             <NavLink label="App Structure" to="/app-structure" />
             <NavLink label="Markup" to="/markup" />
@@ -115,6 +101,20 @@
                 to="/build-hello-world-component"
             />
             <NavLink label="Hosted Deployment" to="/hosted-deployment" />
+        </NavGroup>
+        <NavGroup label="Tutorial">
+            <NavLink label="XMLUI Invoice" to="/tutorial-01" />
+            <NavLink label="Main.xmlui" to="/tutorial-02" />
+            <NavLink label="Navigation" to="/tutorial-03" />
+            <NavLink label="InfoCards" to="/tutorial-04" />
+            <NavLink label="Charts" to="/tutorial-05" />
+            <NavLink label="Slider" to="/tutorial-06" />
+            <NavLink label="Invoices" to="/tutorial-07" />
+            <NavLink label="Create Invoice" to="/tutorial-08" />
+            <NavLink label="Invoice Details" to="/tutorial-09" />
+            <NavLink label="Search" to="/tutorial-10" />
+            <NavLink label="Import" to="/tutorial-11" />
+            <NavLink label="Settings" to="/tutorial-12" />
         </NavGroup>
         <NavGroup label="How To">
             <NavLink
@@ -164,6 +164,10 @@
             <NavLink
                 label="Assign a complex JSON literal to a component variable"
                 to="/howto/assign-a-complex-json-literal-to-a-component-variable"
+            />
+            <NavLink
+                label="Use accessors to simplify complex expressions"
+                to="/howto/use-accessors-to-simplify-complex-expressions"
             />
             <NavLink
                 label="Make a set of equal-width cards"
@@ -609,6 +613,11 @@
         >
             <DocumentPageNoTOC
                 content="{appGlobals.content['pages/howto/assign-a-complex-json-literal-to-a-component-variable.md']}"
+            />
+        </Page>
+        <Page url="/howto/use-accessors-to-simplify-complex-expressions">
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/howto/use-accessors-to-simplify-complex-expressions.md']}"
             />
         </Page>
         <Page url="/howto/make-a-set-of-equal-width-cards">

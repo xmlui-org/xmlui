@@ -54,13 +54,11 @@
       "outputs": ["public/resources/files/for-download/xmlui/xmlui-standalone.umd.js"]
     },
     "generate-docs": {
-      "outputs": ["scripts/generate-docs/metadata/**", "$TURBO_ROOT$/docs/content/**"],
-      "inputs": ["$TURBO_DEFAULT$"],
+      "cache": false,
       "dependsOn": ["build:xmlui-metadata", "build:meta"]
     },
     "generate-docs-summaries": {
-      "outputs": ["$TURBO_ROOT$/docs/content/**"],
-      "inputs": ["$TURBO_DEFAULT$", "dist/metadata/**"],
+      "cache": false,
       "dependsOn": ["generate-docs"]
     },
     "build:docs": {
@@ -71,7 +69,6 @@
         "gen:download-latest-xmlui-release",
         "generate-docs-summaries"
       ],
-      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/docs/content/**"],
       "outputs": ["dist/**"]
     },
     "release:docs": {
