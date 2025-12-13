@@ -674,7 +674,7 @@ test.describe("Basic Functionality", () => {
     test("handles theme variable", async ({ initTestBed, createFormItemDriver }) => {
       const spaceBase = 0.25; //rem
       const labelSize = 10;
-      const widthInPx = labelSize * spaceBase * 16; //px
+      const widthInPx = labelSize * spaceBase * 14; //px
       await initTestBed(`
         <Theme space-base="${spaceBase}rem">
           <Form itemLabelWidth="$space-${labelSize}">
@@ -1629,7 +1629,7 @@ test.describe("Theme Variables", () => {
     });
 
     const driver = await createFormDriver("form");
-    await expect(driver.component).toHaveCSS("gap", "32px");
+    await expect(driver.component).toHaveCSS("gap", "28px");
   });
 
   test("applies custom button row gap theme variable", async ({

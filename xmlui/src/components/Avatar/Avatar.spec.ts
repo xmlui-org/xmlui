@@ -129,22 +129,22 @@ test("size property affects font size for initials", async ({
   // Test xs size font scaling
   await initTestBed(`<Avatar name="XS" size="xs"/>`, {});
   const xsDriver = await createAvatarDriver();
-  await expect(xsDriver.component).toHaveCSS("font-size", "12px");
+  await expect(xsDriver.component).toHaveCSS("font-size", "12.25px");
 
   // Test sm size font scaling
   await initTestBed(`<Avatar name="SM" size="sm"/>`, {});
   const smDriver = await createAvatarDriver();
-  await expect(smDriver.component).toHaveCSS("font-size", "16px");
+  await expect(smDriver.component).toHaveCSS("font-size", "14px");
 
   // Test md size font scaling
   await initTestBed(`<Avatar name="MD" size="md"/>`, {});
   const mdDriver = await createAvatarDriver();
-  await expect(mdDriver.component).toHaveCSS("font-size", "20px");
+  await expect(mdDriver.component).toHaveCSS("font-size", "21px");
 
   // Test lg size font scaling
   await initTestBed(`<Avatar name="LG" size="lg"/>`, {});
   const lgDriver = await createAvatarDriver();
-  await expect(lgDriver.component).toHaveCSS("font-size", "32px");
+  await expect(lgDriver.component).toHaveCSS("font-size", "28px");
 });
 
 // --- Image URL Property Tests ---
@@ -807,7 +807,7 @@ test("avatar handles rapid prop changes efficiently", async ({
 
   await expect(driver.component).toBeVisible();
   await expect(driver.component).toContainText("UO");
-  await expect(driver.component).toHaveCSS("width", "48px"); // sm size
+  await expect(driver.component).toHaveCSS("width", "42px"); // sm size
 
   // Change to different size
   await initTestBed(`<Avatar name="User One" size="md"/>`, {});
@@ -815,7 +815,7 @@ test("avatar handles rapid prop changes efficiently", async ({
 
   await expect(driver2.component).toBeVisible();
   await expect(driver2.component).toContainText("UO");
-  await expect(driver2.component).toHaveCSS("width", "64px"); // md size
+  await expect(driver2.component).toHaveCSS("width", "56px"); // md size
 
   // Change name while keeping size
   await initTestBed(`<Avatar name="Different User" size="md"/>`, {});
@@ -823,7 +823,7 @@ test("avatar handles rapid prop changes efficiently", async ({
 
   await expect(driver3.component).toBeVisible();
   await expect(driver3.component).toContainText("DU");
-  await expect(driver3.component).toHaveCSS("width", "64px"); // md size
+  await expect(driver3.component).toHaveCSS("width", "56px"); // md size
 
   // Switch to image avatar
   await initTestBed(`<Avatar name="Image User" url="https://example.com/avatar.jpg"/>`, {});
@@ -966,7 +966,7 @@ test("avatar handles null and undefined props gracefully", async ({
 
   await expect(driver5.component).toBeVisible();
   await expect(driver5.component).toContainText("SU");
-  await expect(driver5.component).toHaveCSS("width", "48px"); // default sm size
+  await expect(driver5.component).toHaveCSS("width", "42px"); // default sm size
 });
 
 test("avatar handles extremely long URLs", async ({ initTestBed, createAvatarDriver }) => {
@@ -1002,7 +1002,7 @@ test("avatar handles concurrent prop updates correctly", async ({
 
   await expect(driver2.component).toBeVisible();
   await expect(driver2.component).toContainText("UU");
-  await expect(driver2.component).toHaveCSS("width", "64px"); // md size
+  await expect(driver2.component).toHaveCSS("width", "56px"); // md size
 
   // Change to image avatar
   await initTestBed(`<Avatar name="Image User" url="https://example.com/user.jpg"/>`, {});
@@ -1017,7 +1017,7 @@ test("avatar handles concurrent prop updates correctly", async ({
 
   await expect(driver4.component).toBeVisible();
   await expect(driver4.component).toContainText("FU");
-  await expect(driver4.component).toHaveCSS("width", "96px"); // lg size
+  await expect(driver4.component).toHaveCSS("width", "84px"); // lg size
 
   // Verify final state is correct (no race condition artifacts)
   const tagName = await driver4.getComponentTagName();
@@ -1065,7 +1065,7 @@ test("avatar memory usage stays stable", async ({ initTestBed, createAvatarDrive
 
   await expect(finalDriver.component).toBeVisible();
   await expect(finalDriver.component).toContainText("FT");
-  await expect(finalDriver.component).toHaveCSS("width", "48px");
+  await expect(finalDriver.component).toHaveCSS("width", "42px");
 
   // This test verifies that multiple avatar creations don't cause memory leaks
   // by ensuring the component continues to function correctly after multiple instantiations

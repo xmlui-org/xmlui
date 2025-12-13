@@ -31,9 +31,9 @@ $fontWeight-Avatar: createThemeVar("fontWeight-#{$component}");
     box-shadow: $boxShadow-Avatar;
 
     &.xs {
-      width: t.$space-8;
-      height: t.$space-8;
-      font-size: t.$space-3;
+      width: t.$space-10;
+      height: t.$space-10;
+      font-size: t.$space-3_5;
     }
 
     &.sm {
@@ -45,7 +45,7 @@ $fontWeight-Avatar: createThemeVar("fontWeight-#{$component}");
     &.md {
       width: t.$space-16;
       height: t.$space-16;
-      font-size: t.$space-5;
+      font-size: t.$space-6;
     }
 
     &.lg {

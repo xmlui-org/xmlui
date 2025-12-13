@@ -164,8 +164,8 @@ function mapSizeToIconPack(size: string) {
     {
       xs: "0.75em",
       sm: "1em",
-      md: "1.5rem",
-      lg: "2em",
+      md: "1.75rem",
+      lg: "2.25em",
     }[size] || size
   );
 }
