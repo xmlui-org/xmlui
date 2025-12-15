@@ -1394,3 +1394,106 @@ test.describe("Other Edge Cases", () => {
   });
 });
 
+// =============================================================================
+// PHONE PATTERN VALIDATION TESTS
+// =============================================================================
+
+test.describe("Phone Pattern Validation", () => {
+  test("shows warning for phone number without digits", async ({
+    initTestBed,
+    page,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form id="testForm">
+        <FormItem
+          testId="phoneField"
+          bindTo="mobile"
+          pattern="phone"
+          patternInvalidSeverity="warning"
+          label="Phone" />
+        <Button onClick="testForm.validate()" label="Validate" testId="validateBtn" />
+      </Form>
+    `);
+
+    const phoneDriver = await createFormItemDriver("phoneField");
+    const phoneInput = await createTextBoxDriver(phoneDriver.input);
+
+    // Enter a value with no digits - should be invalid
+    await phoneInput.field.fill("xxxxxx");
+    await phoneInput.field.blur();
+
+    await page.getByTestId("validateBtn").click();
+
+    // Validation warning should be displayed
+    const phoneField = page.getByTestId("phoneField");
+    await expect(phoneField).toContainText("Not a valid phone number");
+  });
+
+  test("does not show warning for valid phone number with digits", async ({
+    initTestBed,
+    page,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form id="testForm">
+        <FormItem
+          testId="phoneField"
+          bindTo="mobile"
+          pattern="phone"
+          patternInvalidSeverity="warning"
+          label="Phone" />
+        <Button onClick="testForm.validate()" label="Validate" testId="validateBtn" />
+      </Form>
+    `);
+
+    const phoneDriver = await createFormItemDriver("phoneField");
+    const phoneInput = await createTextBoxDriver(phoneDriver.input);
+
+    // Enter a valid phone number with digits
+    await phoneInput.field.fill("+1-555-123-4567");
+    await phoneInput.field.blur();
+
+    await page.getByTestId("validateBtn").click();
+
+    // No validation warning should be displayed
+    const phoneField = page.getByTestId("phoneField");
+    await expect(phoneField).not.toContainText("Not a valid phone number");
+  });
+
+  test("shows warning for empty phone number", async ({
+    initTestBed,
+    page,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form id="testForm">
+        <FormItem
+          testId="phoneField"
+          bindTo="mobile"
+          pattern="phone"
+          patternInvalidSeverity="warning"
+          label="Phone" />
+        <Button onClick="testForm.validate()" label="Validate" testId="validateBtn" />
+      </Form>
+    `);
+
+    const phoneDriver = await createFormItemDriver("phoneField");
+    const phoneInput = await createTextBoxDriver(phoneDriver.input);
+
+    // Make the field dirty by typing and clearing
+    await phoneInput.field.fill("x");
+    await phoneInput.field.clear();
+    await phoneInput.field.blur();
+
+    await page.getByTestId("validateBtn").click();
+
+    // Validation warning should be displayed
+    const phoneField = page.getByTestId("phoneField");
+    await expect(phoneField).toContainText("Not a valid phone number");
+  });
+});
+
