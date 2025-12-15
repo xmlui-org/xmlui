@@ -45,6 +45,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     isolation: isolate;
     scroll-padding-block: $scrollPaddingBlockPage;
 
+
     &.vertical {
       flex-direction: row;
 

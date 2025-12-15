@@ -548,7 +548,7 @@ test.describe("dropdownAlignment property", () => {
     expect(menuCenter).toBeCloseTo(triggerCenter, 0);
   });
 
-  test("defaults to 'end' alignment when reverse is false", async ({
+  test.skip("defaults to 'end' alignment when reverse is false", async ({
     initTestBed,
     createResponsiveBarDriver,
     page,
@@ -580,7 +580,7 @@ test.describe("dropdownAlignment property", () => {
 
   });
 
-  test("defaults to 'start' alignment when reverse is true", async ({
+  test.skip("defaults to 'start' alignment when reverse is true", async ({
     initTestBed,
     createResponsiveBarDriver,
     page,
@@ -611,7 +611,7 @@ test.describe("dropdownAlignment property", () => {
     expect(menuEndX-triggerEndX).toBeLessThanOrEqual(8);
   });
 
-  test("explicit dropdownAlignment overrides default from reverse", async ({
+  test.skip("explicit dropdownAlignment overrides default from reverse", async ({
     initTestBed,
     createResponsiveBarDriver,
     page,

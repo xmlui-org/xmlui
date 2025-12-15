@@ -44,7 +44,7 @@ export const RootThemeDefinition: ThemeDefinition = {
   },
   themeVars: {
     // --- The unit of measurement for all sizes/spaces
-    "space-base": "0.25rem",
+    "space-base": "0.25em",
 
     // --- Default surface color shades (form white to black)
     "const-color-surface-0": "white",
@@ -211,7 +211,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "fontSize-7xl": "4.5em",
     "fontSize-8xl": "6em",
     "fontSize-9xl": "8em",
-    "fontSize-code": "0.97rem", // --- Not, this is intentionally in "rem"
+    "fontSize-code": "0.975em", // --- Not, this is intentionally in "rem"
     fontSize: "$fontSize-base",
 
     // --- The font size used in body

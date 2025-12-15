@@ -758,7 +758,8 @@ $space-96: createVar(space-96);
 // ---------------------------------------------------------------------------------------------------------------------
 // Generic style variables
 
-$textColor-primary: createVar(textColor-primary);
+$textColor: createVar(textColor);
+$textColor-primary: createVar(textColor);
 $textColor-attention: createVar(textColor-attention);
 $backgroundColor-attention: createVar(backgroundColor-attention);
 $textColor-subtitle: createVar(textColor-subtitle);

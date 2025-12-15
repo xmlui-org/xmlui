@@ -107,7 +107,7 @@ export const TextMd = createMetadata({
     [`borderRadius-${COMP}`]: "$borderRadius",
     [`borderStyle-${COMP}`]: "solid",
     [`borderWidth-${COMP}`]: "$space-0",
-    [`textColor-${COMP}`]: "$textColor-primary",
+    [`textColor-${COMP}`]: "$textColor",
     [`fontFamily-${COMP}`]: "$fontFamily",
     [`fontWeight-${COMP}`]: "$fontWeight-normal",
 
