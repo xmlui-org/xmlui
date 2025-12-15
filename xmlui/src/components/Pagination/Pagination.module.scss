@@ -177,6 +177,7 @@ $gap-buttonRow-Pagination: createThemeVar("gap-buttonRow-Pagination");
     border-radius: $borderRadius-selector-Pagination;
     padding: t.$space-0_5 !important;
     font-size: t.$fontSize-sm;
+    min-width: max-content !important;
 
     .paginationVertical & {
       align-self: center;
