@@ -78,6 +78,8 @@ export function generateBaseFontSizes(theme: Record<string, string> | undefined)
   if (!theme) {
     return {};
   }
+
+  //TODO if the fontSize is not px, we need to handle that case (use this: 1em, 1rem = 16px)
   const resolvedTheme = resolveThemeVars(theme);
   const base = resolvedTheme["fontSize"];
   if (!base || typeof base !== "string") {
