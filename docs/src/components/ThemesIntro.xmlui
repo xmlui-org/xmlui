@@ -11,11 +11,11 @@ We've seen how XMLUI enables reactive data binding without requiring you to mast
       <Select
         id="pickTheme"
         width="30%"
-        initialValue="docs-theme"
+        initialValue="xmlui-docs"
         onDidChange="{ (newTheme) => setTheme(newTheme) }"
       >
+        <Option value="xmlui-docs" label="xmlui"/>
         <Option value="earthtone" label="earthtone"/>
-        <Option value="docs-theme" label="xmlui"/>
       </Select>
       <ToneSwitch/>
     </HStack>
