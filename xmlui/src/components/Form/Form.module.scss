@@ -10,12 +10,14 @@ $themeVars: ();
 $gap-Form: createThemeVar("gap-Form");
 $gap-buttonRow-Form: createThemeVar("gap-buttonRow-Form");
 $marginTop-buttonRow-Form: createThemeVar("marginTop-buttonRow-Form");
+$backgroundColor-Form: createThemeVar("backgroundColor-Form");
 
 @layer components {
-  .wrapper {
+  .formWrapper {
     display: flex;
     flex-direction: column;
     gap: $gap-Form;
+    background-color: $backgroundColor-Form;
   }
 
   .buttonRow {

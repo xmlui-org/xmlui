@@ -188,6 +188,7 @@ export const DateInputMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     // DateInput specific theme variables (matching TimeInput structure)
+    [`backgroundColor-${COMP}`]: "$backgroundColor",
     [`paddingHorizontal-${COMP}`]: "$space-2",
     [`paddingVertical-${COMP}`]: "$space-2",
     [`color-divider-${COMP}`]: "$textColor-secondary",

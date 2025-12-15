@@ -30,7 +30,7 @@ export const BackdropMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`backgroundColor-${COMP}`]: "black",
+    [`backgroundColor-${COMP}`]: "transparent",
     [`opacity-${COMP}`]: "0.1",
   }
 });

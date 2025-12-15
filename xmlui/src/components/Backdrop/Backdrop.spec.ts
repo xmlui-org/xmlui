@@ -119,7 +119,7 @@ test("component handles empty string props gracefully", async ({
   const backdropDriver = await createBackdropDriver();
   const backdropElement = backdropDriver.getBackdrop();
 
-  await expect(backdropElement).toHaveCSS("background-color", "rgb(0, 0, 0)"); // Default transparent color
+  await expect(backdropElement).toHaveCSS("background-color", "rgba(0, 0, 0, 0)"); // Default transparent color
   await expect(backdropElement).toHaveCSS("opacity", "0.1");
 });
 

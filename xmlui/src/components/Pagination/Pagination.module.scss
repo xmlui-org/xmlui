@@ -25,6 +25,7 @@ $gap-buttonRow-Pagination: createThemeVar("gap-buttonRow-Pagination");
     align-items: center;
     padding: $padding-Pagination;
     gap: t.$space-4;
+    background-color: $backgroundColor-Pagination;
     
     // Default 3-column layout
     grid-template-columns: 1fr 1fr 1fr;

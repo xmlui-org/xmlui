@@ -273,6 +273,26 @@ test("component applies boxShadow-ColorPicker theme variable", async ({ page, in
   await expect(colorInput).toHaveCSS("box-shadow", "rgba(0, 0, 0, 0.1) 0px 2px 4px 0px");
 });
 
+test("component applies width-ColorPicker theme variable", async ({ page, initTestBed }) => {
+  await initTestBed(`<ColorPicker testId="test" />`, {
+    testThemeVars: {
+      "width-ColorPicker": "100px",
+    },
+  });
+  const colorInput = page.getByTestId("test");
+  await expect(colorInput).toHaveCSS("width", "100px");
+});
+
+test("component applies height-ColorPicker theme variable", async ({ page, initTestBed }) => {
+  await initTestBed(`<ColorPicker testId="test" />`, {
+    testThemeVars: {
+      "height-ColorPicker": "50px",
+    },
+  });
+  const colorInput = page.getByTestId("test");
+  await expect(colorInput).toHaveCSS("height", "50px");
+});
+
 // =============================================================================
 // EDGE CASE TESTS
 // =============================================================================

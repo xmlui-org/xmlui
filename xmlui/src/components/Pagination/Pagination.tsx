@@ -139,7 +139,7 @@ export const PaginationMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     "padding-Pagination": "$space-4",
-    "backgroundColor-Pagination": "transparent",
+    "backgroundColor-Pagination": "$backgroundColor",
     "borderColor-Pagination": "$color-gray-300",
     "textColor-Pagination": "$color-gray-600",
     "backgroundColor-selector-Pagination": "transparent",

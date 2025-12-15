@@ -134,6 +134,9 @@ export const ListMd = createMetadata({
     $group: dComponent("Group information when using `groupBy` (available in group templates)"),
   },
   themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`backgroundColor-${COMP}`]: "$backgroundColor",
+  },
 });
 
 export const dynamicHeightListComponentRenderer = createComponentRenderer(
