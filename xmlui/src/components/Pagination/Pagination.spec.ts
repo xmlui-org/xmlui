@@ -878,11 +878,12 @@ test.describe("Accessibility", () => {
     await expect(page.getByRole("button", { name: "Page 2" })).toBeFocused();
   });
 
-  test("page size selector is focused when label is clicked", async ({ initTestBed, page }) => {
+  test("page size selector is activated when label is clicked", async ({ initTestBed, page }) => {
     await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}"/>`);
+    const trigger = page.getByLabel("Items per page");
     await page.getByText("Items per page").click();
-    await page.waitForTimeout(100);
-    await expect(page.getByRole("listbox")).toBeFocused();
+    // Clicking the label activates the Select and opens the dropdown
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
   });
 });
 
