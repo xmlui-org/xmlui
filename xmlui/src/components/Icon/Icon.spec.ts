@@ -120,7 +120,7 @@ test.describe("size Property", () => {
       const style = window.getComputedStyle(el);
       return { width: style.width, height: style.height };
     });
-    expect(computedStyle.width).toBe("10.5px"); // 0.75em calculated
+    expect(computedStyle.width).toBe("12px"); // 0.75em calculated
   });
 
   test("renders with predefined size 'sm'", async ({ initTestBed, createIconDriver }) => {
@@ -132,7 +132,7 @@ test.describe("size Property", () => {
       const style = window.getComputedStyle(el);
       return { width: style.width, height: style.height };
     });
-    expect(computedStyle.width).toBe("14px"); // 1em calculated
+    expect(computedStyle.width).toBe("16px"); // 1em calculated
   });
 
   test("renders with predefined size 'md'", async ({ initTestBed, createIconDriver }) => {
@@ -144,7 +144,7 @@ test.describe("size Property", () => {
       const style = window.getComputedStyle(el);
       return { width: style.width, height: style.height };
     });
-    expect(computedStyle.width).toBe("24.5px"); // 1.5rem calculated
+    expect(computedStyle.width).toBe("24px"); // 1.5rem calculated
   });
 
   test("renders with predefined size 'lg'", async ({ initTestBed, createIconDriver }) => {
@@ -156,7 +156,7 @@ test.describe("size Property", () => {
       const style = window.getComputedStyle(el);
       return { width: style.width, height: style.height };
     });
-    expect(computedStyle.width).toBe("31.5px"); // 2em calculated
+    expect(computedStyle.width).toBe("32px"); // 2em calculated
   });
 
   test("renders with custom pixel size", async ({ initTestBed, createIconDriver }) => {
