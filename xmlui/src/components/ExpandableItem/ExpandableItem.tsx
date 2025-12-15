@@ -80,7 +80,7 @@ export const ExpandableItemMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
   defaultThemeVars: {
-    [`backgroundColor-${COMP}`]: "transparent",
+    [`backgroundColor-${COMP}`]: "$backgroundColor",
     [`color-${COMP}`]: "$textColor-primary",
     [`color-${COMP}--disabled`]: "$textColor--disabled",
     [`fontFamily-${COMP}`]: "$fontFamily",

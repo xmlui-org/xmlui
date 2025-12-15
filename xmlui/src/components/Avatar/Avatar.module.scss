@@ -28,31 +28,30 @@ $fontWeight-Avatar: createThemeVar("fontWeight-#{$component}");
     font-weight: $fontWeight-Avatar;
     white-space: nowrap;
     user-select: none;
-    font-size: 12px;
     box-shadow: $boxShadow-Avatar;
 
     &.xs {
-      width: t.$space-8;
-      height: t.$space-8;
-      font-size: t.$space-3;
+      width: 2em;
+      height: 2em;
+      font-size: 0.75em;
     }
 
     &.sm {
-      width: t.$space-12;
-      height: t.$space-12;
-      font-size: t.$space-4;
+      width: 3em;
+      height: 3em;
+      font-size: 1em;
     }
 
     &.md {
-      width: t.$space-16;
-      height: t.$space-16;
-      font-size: t.$space-5;
+      width: 4em;
+      height: 4em;
+      font-size: 1.25em;
     }
 
     &.lg {
-      width: t.$space-24;
-      height: t.$space-24;
-      font-size: t.$space-8;
+      width: 6em;
+      height: 6em;
+      font-size: 2em;
     }
 
     &.clickable {
@@ -60,7 +59,6 @@ $fontWeight-Avatar: createThemeVar("fontWeight-#{$component}");
     }
   }
 }
-
 
 // --- We export the theme variables to add them to the component renderer
 :export {

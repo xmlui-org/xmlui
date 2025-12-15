@@ -141,7 +141,7 @@ $backgroundColor-item-DatePicker--hover: createThemeVar("Input:backgroundColor-i
   );
 $rdp-selected-color: createThemeVar("Input:textColor-value-DatePicker");
 $rdp-cell-size: 40px;
-$rdp-caption-font-size: 18px;
+$rdp-caption-font-size: t.$fontSize-lg;
 $rdp-outline: 2px solid t.useVar($rdp-accent-color);
 $rdp-outline-selected: 3px solid t.useVar($rdp-accent-color);
 $minHeight: createThemeVar("Input:minHeight-#{$componentName}");
@@ -461,7 +461,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     padding: t.$space-3 t.$space-3 t.$space-3 t.$space-1;
     height: var(--rdp-nav-height);
     font-weight: bold;
-    font-size: large;
+    font-size: t.$fontSize-lg;
   }
 
   .root[data-nav-layout="around"] .month,

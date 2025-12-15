@@ -58,6 +58,7 @@ $boxShadow-ColorPicker--success--focus: createThemeVar("Input:boxShadow-#{$compo
 // Variables for @layer section
 $backgroundColor-ColorPicker: createThemeVar("Input:backgroundColor-#{$componentName}");
 $width-ColorPicker: createThemeVar("Input:width-#{$componentName}");
+$height-ColorPicker: createThemeVar("Input:height-#{$componentName}");
 
 @mixin variant($variantName) {
   border-radius: createThemeVar("Input:borderRadius-#{$componentName}--#{$variantName}");
@@ -80,6 +81,7 @@ $width-ColorPicker: createThemeVar("Input:width-#{$componentName}");
 @layer components {
   .colorInput {
     width: $width-ColorPicker;
+    height: $height-ColorPicker;
     background-color: $backgroundColor-ColorPicker;
     outline: none;
     appearance: none;

@@ -17,6 +17,7 @@ $backgroundColor-NavLink--active: createThemeVar("backgroundColor-#{$component}-
 $backgroundColor-NavLink--pressed: createThemeVar("backgroundColor-#{$component}--pressed");
 $backgroundColor-NavLink--pressed--active: createThemeVar("backgroundColor-#{$component}--pressed--active");
 $fontSize-NavLink: createThemeVar("fontSize-#{$component}");
+$lineHeight-NavLink: createThemeVar("lineHeight-#{$component}");
 $wordWrap-NavLink: createThemeVar("wordWrap-#{$component}");
 $textColor-NavLink: createThemeVar("textColor-#{$component}");
 $textColor-NavLink--hover: createThemeVar("textColor-#{$component}--hover");
@@ -64,6 +65,7 @@ $transition: color 0.1s, background-color 0.1s;
       font-size: $fontSize-NavLink;
       font-weight: $fontWeight-NavLink;
       font-family: $fontFamily-NavLink;
+      line-height: $lineHeight-NavLink;
       word-wrap: $wordWrap-NavLink;
       position: relative;
       transition: $transition;

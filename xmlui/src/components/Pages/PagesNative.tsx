@@ -58,7 +58,7 @@ export function RouteWrapper({
   return (
     <div
       key={JSON.stringify(params)}
-      className={classnames(className, styles.wrapper, "xmlui-page-root")}
+      className={classnames(className, styles.pageWrapper, "xmlui-page-root")}
       style={style}
     >
       {renderChild(wrappedWithContainer, layoutContext)}

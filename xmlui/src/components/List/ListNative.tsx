@@ -487,7 +487,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
           ref={rootRef}
           style={style}
           className={classnames(
-            styles.outerWrapper,
+            styles.outerListWrapper,
             {
               [styles.hasOutsideScroll]: hasOutsideScroll,
             },
@@ -508,7 +508,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
             ))}
           {rows.length > 0 && (
             <div
-              className={classnames(styles.innerWrapper, {
+              className={classnames(styles.innerListWrapper, {
                 [styles.reverse]: scrollAnchor === "bottom",
                 [styles.borderCollapse]: borderCollapse,
                 [styles.sectioned]: groupBy !== undefined,

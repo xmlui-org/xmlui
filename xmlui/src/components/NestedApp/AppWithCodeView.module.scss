@@ -49,6 +49,11 @@ $gap-sideBySide-AppWithCode: createThemeVar("gap-sideBySide-#{$component}");
     align-items: center;
     justify-content: center;
   }
+
+  .resetFontSize {
+    font-size: t.$fontSize-base;
+    border: 2px solid green;
+  } 
 }
 
 

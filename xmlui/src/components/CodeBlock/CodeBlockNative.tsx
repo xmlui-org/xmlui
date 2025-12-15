@@ -34,7 +34,6 @@ export function CodeBlock({
   className,
   ...rest
 }: CodeBlockProps) {
-  // 'global-codeBlock' class is there so we could apply styles if this codeblock is used inside a splitView nested app
   if (!meta) {
     return (
       <div
@@ -47,7 +46,7 @@ export function CodeBlock({
     );
   }
   return (
-    <div className={classnames(styles.codeBlock, "global-codeBlock")} style={style}>
+    <div className={classnames(styles.codeBlock)} style={style}>
       {meta.filename && (
         <div className={styles.codeBlockHeader}>
           <Text variant="em">{meta.filename}</Text>

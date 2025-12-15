@@ -100,7 +100,7 @@ $border-NestedApp: createThemeVar("border-#{$component}");
     margin-right: 12px;
     font-family:
       -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    font-size: 16px;
+    font-size: t.$fontSize-sm;
     /* Increased by 20% from 16px */
     font-weight: 500;
     color: $color-loadingText-NestedApp;
@@ -184,13 +184,6 @@ $border-NestedApp: createThemeVar("border-#{$component}");
 
       .splitViewMarkdown {
         height: 100%;
-
-        :global(.global-codeBlock) {
-          background-color: $backgroundColor-code-splitView-NestedApp;
-          height: 100%;
-          border: none;
-          border-radius: 0;
-        }
       }
     }
   }

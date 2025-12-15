@@ -83,7 +83,7 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-ExpandableItem | transparent | transparent |
+| [backgroundColor](../styles-and-themes/common-units/#color)-ExpandableItem | $backgroundColor | $backgroundColor |
 | [border](../styles-and-themes/common-units/#border)-ExpandableItem | *none* | *none* |
 | [borderBottom](../styles-and-themes/common-units/#border)-ExpandableItem | *none* | *none* |
 | [borderBottomColor](../styles-and-themes/common-units/#color)-ExpandableItem | *none* | *none* |

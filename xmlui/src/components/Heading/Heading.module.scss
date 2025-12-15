@@ -112,6 +112,7 @@ $textUnderlineOffset-H6: createThemeVar("Heading:textUnderlineOffset-H6");
   @include t.borderVars($themeVars, $level);
   @include t.textVars($themeVars, $level);
   color: createThemeVar("Heading:textColor-#{$level}");
+  background-color: createThemeVar("Heading:backgroundColor-#{$level}");
   letter-spacing: createThemeVar("Heading:letterSpacing-#{$level}");
   font-family: createThemeVar("Heading:fontFamily-#{$level}");
   font-weight: createThemeVar("Heading:fontWeight-#{$level}");

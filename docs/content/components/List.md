@@ -1506,3 +1506,9 @@ See the [`scrollToBottom`](#scrolltobottom) example.
 
 `List` is a layout container; its purpose is to render nested child components.
 `List` has no theme variables to change its visual appearance.
+
+### Theme Variables [#theme-variables]
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-List | $backgroundColor | $backgroundColor |

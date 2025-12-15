@@ -296,8 +296,6 @@ $borderColor-TimeInput--disabled: createThemeVar("Input:borderColor-#{$component
     border: 0;
     background: none;
     color: currentColor;
-    font: inherit;
-    font-size: inherit;
     box-sizing: content-box;
     border-radius: $borderRadius-input-TimeInput;
     -webkit-appearance: textfield;

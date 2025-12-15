@@ -22,6 +22,7 @@ $boxShadow-CodeBlock: createThemeVar("boxShadow-CodeBlock");
 $height-CodeBlock: createThemeVar("height-CodeBlock");
 $paddingHorizontal-content-CodeBlock: createThemeVar("paddingHorizontal-content-CodeBlock");
 $paddingVertical-content-CodeBlock: createThemeVar("paddingVertical-content-CodeBlock");
+$fontSize-CodeBlock: createThemeVar("fontSize-CodeBlock");
 
 @layer components {
   .codeBlock {
@@ -35,6 +36,7 @@ $paddingVertical-content-CodeBlock: createThemeVar("paddingVertical-content-Code
     //overflow: hidden;
     border: $border-CodeBlock;
     box-shadow: $boxShadow-CodeBlock;
+    font-size: $fontSize-CodeBlock;
   }
 
   .copyButton {
@@ -50,7 +52,7 @@ $paddingVertical-content-CodeBlock: createThemeVar("paddingVertical-content-Code
     padding-left: t.$space-3;
     background-color: $backgroundColor-CodeBlock-header;
     border-bottom: $color-CodeBlock-headerSeparator solid 2px;
-    font-size: t.$fontSize-sm;
+    font-size: t.$fontSize-code;
     border-start-start-radius: t.getThemeVar($themeVars, "borderStartStartRadius-CodeBlock");
     border-start-end-radius: t.getThemeVar($themeVars, "borderStartEndRadius-CodeBlock");
   }
@@ -63,6 +65,7 @@ $paddingVertical-content-CodeBlock: createThemeVar("paddingVertical-content-Code
     min-height: 48px;
     height: 100%;
     overflow: auto;
+    font-size: t.$fontSize-code;
 
     .codeBlockCopyButton {
       position: absolute;

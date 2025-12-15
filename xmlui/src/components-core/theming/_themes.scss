@@ -481,17 +481,17 @@ $THEME-VAR-PREFIX: xmlui;
 @function composeTextVars($themeVars, $subject, $default: false) {
   $tmp: if(
     $default,
-    appendThemeVarWithFallback($themeVars, "textColor-#{$subject}", "textColor-#{$default}"),
+    appendThemeVarWithFallback($themeVars, "textColor-#{$subject}", "textColor"),
     appendThemeVar($themeVars, "textColor-#{$subject}")
   ) !global;
   $tmp: if(
     $default,
-    appendThemeVarWithFallback($tmp, "fontFamily-#{$subject}", "fontFamily-#{$default}"),
+    appendThemeVarWithFallback($tmp, "fontFamily-#{$subject}", "fontFamily"),
     appendThemeVar($tmp, "fontFamily-#{$subject}")
   ) !global;
   $tmp: if(
     $default,
-    appendThemeVarWithFallback($tmp, "fontSize-#{$subject}", "fontSize-#{$default}"),
+    appendThemeVar($tmp, "fontSize-#{$subject}"),
     appendThemeVar($tmp, "fontSize-#{$subject}")
   ) !global;
   $tmp: if(
@@ -561,7 +561,7 @@ $THEME-VAR-PREFIX: xmlui;
   ) !global;
   $tmp: if(
     $default,
-    appendThemeVarWithFallback($tmp, "lineHeight-#{$subject}", "lineHeight-#{$default}"),
+    appendThemeVar($tmp, "lineHeight-#{$subject}"),
     appendThemeVar($tmp, "lineHeight-#{$subject}")
   ) !global;
   $tmp: if(
@@ -576,7 +576,7 @@ $THEME-VAR-PREFIX: xmlui;
   ) !global;
   $tmp: if(
     $default,
-    appendThemeVarWithFallback($tmp, "letterSpacing-#{$subject}", "letterSpacing-#{$default}"),
+    appendThemeVarWithFallback($tmp, "letterSpacing-#{$subject}", "letterSpacing"),
     appendThemeVar($tmp, "letterSpacing-#{$subject}")
   ) !global;
   $tmp: if(
@@ -769,13 +769,40 @@ $textColor--disabled: createVar(textColor--disabled);
 $backgroundColor--disabled: createVar(backgroundColor--disabled);
 $borderColor--disabled: createVar(borderColor--disabled);
 $backgroundColor--selected: createVar(backgroundColor--selected);
+
 $fontFamily: createVar(fontFamily);
 $fontSize-tiny: createVar(fontSize-tiny);
 $fontSize-xs: createVar(fontSize-xs);
+$fontSize-code: createVar(fontSize-code);
 $fontSize-sm: createVar(fontSize-sm);
 $fontSize-base: createVar(fontSize-base);
+$fontSize-lg: createVar(fontSize-lg);
 $fontSize-xl: createVar(fontSize-xl);
 $fontSize-2xl: createVar(fontSize-2xl);
+$fontSize-3xl: createVar(fontSize-3xl);
+$fontSize-4xl: createVar(fontSize-4xl);
+$fontSize-5xl: createVar(fontSize-5xl);
+$fontSize-6xl: createVar(fontSize-6xl);
+$fontSize-7xl: createVar(fontSize-7xl);
+$fontSize-8xl: createVar(fontSize-8xl);
+$fontSize-9xl: createVar(fontSize-9xl);
+$fontSize: createVar(fontSize);
+
+$lineHeight-none: createVar(lineHeight-none);
+$lineHeight-tight: createVar(lineHeight-tight);
+$lineHeight-snug: createVar(lineHeight-snug);
+$lineHeight-normal: createVar(lineHeight-normal);
+$lineHeight-relaxed: createVar(lineHeight-relaxed);
+$lineHeight-loose: createVar(lineHeight-loose);
+$lineHeight: createVar(lineHeight);
+
+$letterSpacing-tighter: createVar(letterSpacing-tighter);
+$letterSpacing-tight: createVar(letterSpacing-tight);
+$letterSpacing-normal: createVar(letterSpacing-normal);
+$letterSpacing-wide: createVar(letterSpacing-wide);
+$letterSpacing-wider: createVar(letterSpacing-wider);
+$letterSpacing-widest: createVar(letterSpacing-widest);
+$letterSpacing: createVar(letterSpacing);
 
 $backgroundColor-overlay: createVar(backgroundColor-overlay);
 $color-info: createVar(color-info);
@@ -848,5 +875,5 @@ $fontWeight-bold: createVar(fontWeight-bold);
 $borderRadius: createVar(borderRadius);
 
 // body
-$fontSize: createVar(fontSize);
+$fontSize-root: createVar(fontSize-root);
 $fontWeight: createVar(fontWeight);

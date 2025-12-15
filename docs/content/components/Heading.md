@@ -157,6 +157,12 @@ Scrolls the heading into view.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-H1 | *none* | *none* |
+| [backgroundColor](../styles-and-themes/common-units/#color)-H2 | *none* | *none* |
+| [backgroundColor](../styles-and-themes/common-units/#color)-H3 | *none* | *none* |
+| [backgroundColor](../styles-and-themes/common-units/#color)-H4 | *none* | *none* |
+| [backgroundColor](../styles-and-themes/common-units/#color)-H5 | *none* | *none* |
+| [backgroundColor](../styles-and-themes/common-units/#color)-H6 | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-anchor-Heading | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-anchor-Heading  | $color-surface-400 | $color-surface-400 |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-H1 | *none* | *none* |

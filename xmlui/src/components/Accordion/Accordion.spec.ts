@@ -63,7 +63,7 @@ test("AccordionItem has correct accessibility attributes", async ({ initTestBed,
   await expect(header).toContainText("header-here");
   await expect(header).toHaveAttribute("aria-expanded", "false");
 
-  await header.click();
+  await header.click({delay: 100});
   await expect(header).toHaveAttribute("aria-expanded", "true");
 });
 

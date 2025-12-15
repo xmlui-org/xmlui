@@ -26,8 +26,8 @@ export const SpinnerMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`size-${COMP}`]: "$space-10",
-    [`thickness-${COMP}`]: "$space-0_5",
+    [`size-${COMP}`]: "2.5em",
+    [`thickness-${COMP}`]: "0.125em",
     [`borderColor-${COMP}`]: "$color-surface-400",
   },
 });

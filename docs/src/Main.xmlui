@@ -374,6 +374,13 @@
                 <NavLink label="ScaleAnimation" to="/extensions/xmlui-animations/ScaleAnimation" />
                 <NavLink label="SlideInAnimation" to="/extensions/xmlui-animations/SlideInAnimation" />
                 </NavGroup>
+                <NavGroup label="Xmlui Website Blocks">
+                <NavLink label="Extension Overview" to="/extensions/xmlui-website-blocks/_overview" />
+                <NavLink label="Carousel" to="/extensions/xmlui-website-blocks/Carousel" />
+                <NavLink label="HelloMd" to="/extensions/xmlui-website-blocks/HelloMd" />
+                <NavLink label="HeroSection" to="/extensions/xmlui-website-blocks/HeroSection" />
+                <NavLink label="ScrollToTop" to="/extensions/xmlui-website-blocks/ScrollToTop" />
+                </NavGroup>
                 <!-- END GENERATED CONTENT/Extension references links -->
             </NavGroup
             >

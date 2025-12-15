@@ -140,7 +140,7 @@ export function useCompiledTheme(
       },
       {
         ...omit(themeDefChain[themeDefChain.length - 1].themeVars, "light", "dark"),
-        ...generateTextFontSizes(mergedThemeVars),
+        //...generateTextFontSizes(mergedThemeVars),
         ...(themeDefChain[themeDefChain.length - 1].themeVars?.[activeTone] as unknown as Record<
           string,
           string

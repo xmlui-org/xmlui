@@ -41,7 +41,7 @@ This component does not expose any methods.
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | [backgroundColor](../styles-and-themes/common-units/#color)-ProgressBar | $color-surface-200 | $color-surface-200 |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-indicator-ProgressBar | 0px | 0px |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-ProgressBar | $borderRadius | $borderRadius |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-indicator-ProgressBar | 999em | 999em |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-ProgressBar | 999em | 999em |
 | [color](../styles-and-themes/common-units/#color)-indicator-ProgressBar | $color-primary-500 | $color-primary-500 |
-| [thickness](../styles-and-themes/common-units/#size)-ProgressBar | $space-2 | $space-2 |
+| [thickness](../styles-and-themes/common-units/#size)-ProgressBar | 0.5em | 0.5em |

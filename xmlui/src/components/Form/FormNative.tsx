@@ -596,7 +596,7 @@ const Form = forwardRef(function (
       <form
         {...rest}
         style={style}
-        className={classnames(styles.wrapper, className)}
+        className={classnames(styles.formWrapper, className)}
         onSubmit={doSubmit}
         onReset={doReset}
         id={id}

@@ -118,6 +118,7 @@ export const TextBoxMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     // TODO: When FormItem is themed, move these defaults there
+    "backgroundColor-Input": "$backgroundColor",
     "borderRadius-Input": "$borderRadius",
     "textColor-Input": "$textColor-primary",
     "backgroundColor-Input--disabled": "$backgroundColor--disabled",

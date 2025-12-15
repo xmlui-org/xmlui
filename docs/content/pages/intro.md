@@ -45,7 +45,7 @@ How to deploy it as a standalone web application?
 
 1. Create an `index.html` that loads the XMLUI engine which is a single JavaScript file.
 
-```
+```html
 <!doctype html>
 <html lang="en">
 <head>

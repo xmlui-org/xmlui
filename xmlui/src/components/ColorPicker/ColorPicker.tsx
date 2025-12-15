@@ -53,7 +53,8 @@ export const ColorPickerMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`width-${COMP}`]: "48px",
+    [`width-${COMP}`]: "3em",
+    [`height-${COMP}`]: "1.5em",
   },
 });
 

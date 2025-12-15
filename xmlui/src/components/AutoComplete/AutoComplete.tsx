@@ -125,6 +125,7 @@ export const AutoCompleteMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
+    [`backgroundColor-${COMP}`]: "$backgroundColor",
     [`backgroundColor-menu-${COMP}`]: "$color-surface-raised",
     [`boxShadow-menu-${COMP}`]: "$boxShadow-md",
     [`borderRadius-menu-${COMP}`]: "$borderRadius",

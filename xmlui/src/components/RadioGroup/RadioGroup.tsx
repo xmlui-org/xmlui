@@ -66,7 +66,7 @@ export const RadioGroupMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`gap-${RGOption}`]: "$space-1_5",
+    [`gap-${RGOption}`]: "0.25em",
     [`borderWidth-${RGOption}`]: "1px",
     [`borderWidth-${RGOption}-validation`]: `2px`,
 

@@ -12,13 +12,15 @@ $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composeBorderVars($themeVars, $component);
 $gap-icon-NoResult: createThemeVar("gap-icon-#{$component}");
 $size-icon-NoResult: createThemeVar("size-icon-#{$component}");
+$backgroundColor-NoResult: createThemeVar("backgroundColor-#{$component}");
 
 @layer components {
-  .wrapper {
+  .noResultWrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    background-color: $backgroundColor-NoResult;
     @include t.borderVars($themeVars, $component);
     @include t.paddingVars($themeVars, $component);
   }

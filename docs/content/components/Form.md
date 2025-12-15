@@ -254,6 +254,7 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Form | $backgroundColor | $backgroundColor |
 | [backgroundColor](../styles-and-themes/common-units/#color)-ValidationDisplay-error | $color-danger-100 | $color-danger-100 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-ValidationDisplay-info | $color-primary-100 | $color-primary-100 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-ValidationDisplay-valid | $color-success-100 | $color-success-100 |

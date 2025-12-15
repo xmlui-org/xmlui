@@ -188,6 +188,7 @@ export const DateInputMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     // DateInput specific theme variables (matching TimeInput structure)
+    [`backgroundColor-${COMP}`]: "$backgroundColor",
     [`paddingHorizontal-${COMP}`]: "$space-2",
     [`paddingVertical-${COMP}`]: "$space-2",
     [`color-divider-${COMP}`]: "$textColor-secondary",
@@ -196,7 +197,6 @@ export const DateInputMd = createMetadata({
     [`minWidth-input-${COMP}`]: "0.54em",
     [`padding-input-${COMP}`]: "0 2px",
     [`textAlign-input-${COMP}`]: "center",
-    [`fontSize-input-${COMP}`]: "inherit",
     [`borderRadius-input-${COMP}`]: "$borderRadius",
     [`backgroundColor-input-${COMP}-invalid`]: "rgba(220, 53, 69, 0.15)",
     [`padding-button-${COMP}`]: "4px 6px",
@@ -206,8 +206,6 @@ export const DateInputMd = createMetadata({
     [`outlineColor-button-${COMP}--focused`]: "$color-accent-500",
     [`outlineWidth-button-${COMP}--focused`]: "2px",
     [`outlineOffset-button-${COMP}--focused`]: "2px",
-    [`minWidth-ampm-${COMP}`]: "2em",
-    [`fontSize-ampm-${COMP}`]: "inherit",
   },
 });
 

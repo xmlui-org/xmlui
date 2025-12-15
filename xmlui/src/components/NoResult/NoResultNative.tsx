@@ -34,7 +34,7 @@ export const NoResult = forwardRef(function NoResult(
   return (
     <div
       {...rest}
-      className={classnames(styles.wrapper, className)}
+      className={classnames(styles.noResultWrapper, className)}
       style={style}
       ref={forwardedRef}
     >

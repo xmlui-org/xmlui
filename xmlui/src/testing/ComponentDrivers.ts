@@ -540,7 +540,7 @@ export class BackdropDriver extends ComponentDriver {
   }
 
   getDefaultBackgroundColor() {
-    return "rgb(0, 0, 0)"; // Default backdrop color
+    return "rgba(0, 0, 0, 0)"; // Default backdrop color
   }
 
   getDefaultOpacity() {

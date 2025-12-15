@@ -220,7 +220,7 @@ export function Theme({
 
   return (
     <ThemeContext.Provider value={currentThemeContextValue}>
-      <div className={classnames(styles.wrapper, className)}>
+      <div className={classnames(styles.themeWrapper, className)}>
         {renderChild && renderChild(node.children, { ...layoutContext, themeClassName: className })}
         {children}
       </div>

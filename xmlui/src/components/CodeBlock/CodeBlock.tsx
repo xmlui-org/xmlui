@@ -23,8 +23,8 @@ export const CodeBlockMd = createMetadata({
   defaultThemeVars: {
     "backgroundColor-CodeBlock": "$color-primary-50",
     "backgroundColor-CodeBlock-header": "$color-primary-100",
-    "marginTop-CodeBlock": "$space-5",
-    "marginBottom-CodeBlock": "$space-5",
+    "marginTop-CodeBlock": "$space-6",
+    "marginBottom-CodeBlock": "$space-6",
     "backgroundColor-CodeBlock-highlightRow": "rgb(from $color-primary-200 r g b / 0.25)",
     "backgroundColor-CodeBlock-highlightString": "rgb(from $color-primary-200 r g b / 0.5)",
 

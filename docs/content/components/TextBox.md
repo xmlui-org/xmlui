@@ -289,6 +289,7 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Input | $backgroundColor | $backgroundColor |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Input--disabled | $backgroundColor--disabled | $backgroundColor--disabled |
 | [backgroundColor](../styles-and-themes/common-units/#color)-TextBox--default | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-TextBox--default--focus | *none* | *none* |

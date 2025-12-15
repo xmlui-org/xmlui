@@ -341,6 +341,7 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-DateInput | $backgroundColor | $backgroundColor |
 | [backgroundColor](../styles-and-themes/common-units/#color)-DateInput--default | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-DateInput--default--focus | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-DateInput--default--hover | *none* | *none* |
@@ -433,12 +434,11 @@ The component has some parts that can be styled through layout properties and th
 | [color](../styles-and-themes/common-units/#color)-adornment-DateInput--warning | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-divider-DateInput | $textColor-secondary | $textColor-secondary |
 | disabledColor-button-DateInput | $textColor-disabled | $textColor-disabled |
-| [fontSize](../styles-and-themes/common-units/#size)-ampm-DateInput | inherit | inherit |
 | [fontSize](../styles-and-themes/common-units/#size)-DateInput--default | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-DateInput--error | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-DateInput--success | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-DateInput--warning | *none* | *none* |
-| [fontSize](../styles-and-themes/common-units/#size)-input-DateInput | inherit | inherit |
+| [fontSize](../styles-and-themes/common-units/#size)-input-DateInput | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-input-DateInput--default | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-input-DateInput--error | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-input-DateInput--success | *none* | *none* |
@@ -446,7 +446,6 @@ The component has some parts that can be styled through layout properties and th
 | [gap](../styles-and-themes/common-units/#size)-adornment-DateInput | *none* | *none* |
 | hoverColor-button-DateInput | $color-surface-800 | $color-surface-800 |
 | [margin](../styles-and-themes/common-units/#size)-input-DateInput | *none* | *none* |
-| [minWidth](../styles-and-themes/common-units/#size)-ampm-DateInput | 2em | 2em |
 | [minWidth](../styles-and-themes/common-units/#size)-input-DateInput | 0.54em | 0.54em |
 | [opacity](../styles-and-themes/common-units/#opacity)-DateInput--disabled | *none* | *none* |
 | [outlineColor](../styles-and-themes/common-units/#color)-button-DateInput--focused | $color-accent-500 | $color-accent-500 |

@@ -173,5 +173,7 @@ This method returns the current value of the ColorPicker.
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-ColorPicker--warning | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-ColorPicker--warning--focus | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-ColorPicker--warning--hover | *none* | *none* |
-| [width](../styles-and-themes/common-units/#size)-ColorPicker | 48px | 48px |
-| [width](../styles-and-themes/common-units/#size)-ColorPicker | 48px | 48px |
+| [height](../styles-and-themes/common-units/#size)-ColorPicker | 1.5em | 1.5em |
+| [height](../styles-and-themes/common-units/#size)-ColorPicker | 1.5em | 1.5em |
+| [width](../styles-and-themes/common-units/#size)-ColorPicker | 3em | 3em |
+| [width](../styles-and-themes/common-units/#size)-ColorPicker | 3em | 3em |

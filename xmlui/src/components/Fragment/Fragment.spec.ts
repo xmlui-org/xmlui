@@ -24,20 +24,19 @@ test.describe("Basic Functionality", () => {
   });
 
   test("parent style affects children", async ({ page, initTestBed }) => {
-    const expectedFontSize = "14px";
+    const expectedFontSize = "20px";
     await initTestBed(`
-      <Stack testId="container" fontSize="${expectedFontSize}">
-        <Fragment>
-          <Text value='Item #1' />
-          <Text value='Item #2' />
-          <Text value='Item #3' />
-        </Fragment>
-      </Stack>`,
-      {
-        testThemeVars: {
-          "font-size": "16px",
-        },
-      },
+      <Theme fontSize="${expectedFontSize}">
+        <App>
+          <Stack testId="container">
+            <Fragment>
+              <Text value='Item #1' />
+              <Text value='Item #2' />
+              <Text value='Item #3' />
+            </Fragment>
+          </Stack>
+        </App>
+      </Theme>`,
     );
     for (const child of await page.locator(`[data-testid="container"] > *`).all()) {
       await expect(child).toHaveCSS("font-size", expectedFontSize);
