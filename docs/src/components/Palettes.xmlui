@@ -4,7 +4,7 @@
       Color Palettes
     </H1>
     Select a theme from the dropdown to see the colors associated with that theme. Use the tone changer button to the right of the dropdown to switch between light and dark tones.
-    <HStack>
+    <HStack verticalAlignment="center">
       <Select
         id="pickTheme"
         width="30%"

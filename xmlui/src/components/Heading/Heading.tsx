@@ -1,5 +1,3 @@
-import type { CSSProperties } from "react";
-
 import styles from "./Heading.module.scss";
 
 import { type ComponentDef } from "../../abstractions/ComponentDefs";
@@ -132,7 +130,7 @@ export const HeadingMd = createMetadata({
   limitThemeVarsToComponent: true,
   defaultThemeVars: {
     [`fontFamily-${COMP}`]: "$fontFamily",
-    [`textColor-${COMP}`]: "inherit",
+    [`textColor-${COMP}`]: "$textColor",
     [`fontWeight-${COMP}`]: "$fontWeight-bold",
     [`letterSpacing-${COMP} `]: "0",
     [`color-anchor-${COMP} `]: "$color-surface-400",
