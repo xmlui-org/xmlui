@@ -881,7 +881,8 @@ test.describe("Accessibility", () => {
   test("page size selector is focused when label is clicked", async ({ initTestBed, page }) => {
     await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}"/>`);
     await page.getByText("Items per page").click();
-    await expect(page.getByLabel("Items per page")).toBeFocused();
+    await page.waitForTimeout(100);
+    await expect(page.getByRole("listbox")).toBeFocused();
   });
 });
 
