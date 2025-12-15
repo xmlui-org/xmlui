@@ -310,7 +310,7 @@ This component does not expose any methods.
 | [color](../styles-and-themes/common-units/#color)-Tooltip | *none* | *none* |
 | [borderLeftStyle](../styles-and-themes/common-units/#border-style)-Tooltip | *none* | *none* |
 | [borderLeftWidth](../styles-and-themes/common-units/#size)-Tooltip | *none* | *none* |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Tooltip | 4px | 4px |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Tooltip | 0.25em | 0.25em |
 | [borderRight](../styles-and-themes/common-units/#border)-Tooltip | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-Tooltip | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-Tooltip | *none* | *none* |
@@ -329,14 +329,14 @@ This component does not expose any methods.
 | [borderWidth](../styles-and-themes/common-units/#size)-Tooltip | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Tooltip | hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px | hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px |
 | [fill](../styles-and-themes/common-units/#color)-arrow-Tooltip | $color-surface-200 | $color-surface-200 |
-| [fontSize](../styles-and-themes/common-units/#size)-Tooltip | 15px | 15px |
+| [fontSize](../styles-and-themes/common-units/#size)-Tooltip | 1em | 1em |
 | [lineHeight](../styles-and-themes/common-units/#size)-Tooltip | 1 | 1 |
 | [padding](../styles-and-themes/common-units/#size)-Tooltip | *none* | *none* |
-| [paddingBottom](../styles-and-themes/common-units/#size)-Tooltip | 10px | 10px |
+| [paddingBottom](../styles-and-themes/common-units/#size)-Tooltip | 0.625em | 0.625em |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Tooltip | *none* | *none* |
-| [paddingLeft](../styles-and-themes/common-units/#size)-Tooltip | 15px | 15px |
-| [paddingRight](../styles-and-themes/common-units/#size)-Tooltip | 15px | 15px |
-| [paddingTop](../styles-and-themes/common-units/#size)-Tooltip | 10px | 10px |
+| [paddingLeft](../styles-and-themes/common-units/#size)-Tooltip | 0.9375em | 0.9375em |
+| [paddingRight](../styles-and-themes/common-units/#size)-Tooltip | 0.9375em | 0.9375em |
+| [paddingTop](../styles-and-themes/common-units/#size)-Tooltip | 0.625em | 0.625em |
 | [paddingVertical](../styles-and-themes/common-units/#size)-Tooltip | *none* | *none* |
 | [stroke](../styles-and-themes/common-units/#color)-arrow-Tooltip | $color-surface-200 | $color-surface-200 |
 | [strokeWidth](../styles-and-themes/common-units/#size)-arrow-Tooltip | 0 | 0 |

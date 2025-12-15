@@ -152,6 +152,7 @@ The component has some parts that can be styled through layout properties and th
 | [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption | $color-primary-500 | $color-primary-500 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption--disabled | $textColor--disabled | $textColor--disabled |
 | [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption--disabled | $textColor--disabled | $textColor--disabled |
+| [backgroundColor](../styles-and-themes/common-units/#color)-RadioGroup | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-RadioGroupOption--default | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-RadioGroupOption--disabled | $backgroundColor--disabled | $backgroundColor--disabled |
 | [borderColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption | $color-primary-500 | $color-primary-500 |
@@ -175,7 +176,7 @@ The component has some parts that can be styled through layout properties and th
 | [fontSize](../styles-and-themes/common-units/#size)-RadioGroupOption | $fontSize-sm | $fontSize-sm |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-RadioGroupOption | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-RadioGroupOption | $fontWeight-bold | $fontWeight-bold |
-| [gap](../styles-and-themes/common-units/#size)-RadioGroupOption | $space-1_5 | $space-1_5 |
+| [gap](../styles-and-themes/common-units/#size)-RadioGroupOption | 0.25em | 0.25em |
 | [outlineColor](../styles-and-themes/common-units/#color)-RadioGroupOption--focus | *none* | *none* |
 | [outlineOffset](../styles-and-themes/common-units/#size)-RadioGroupOption--focus | *none* | *none* |
 | [outlineStyle](../styles-and-themes/common-units/#border)-RadioGroupOption--focus | *none* | *none* |

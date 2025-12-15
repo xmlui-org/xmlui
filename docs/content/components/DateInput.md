@@ -341,6 +341,7 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-DateInput | $backgroundColor | $backgroundColor |
 | [backgroundColor](../styles-and-themes/common-units/#color)-DateInput--default | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-DateInput--default--focus | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-DateInput--default--hover | *none* | *none* |

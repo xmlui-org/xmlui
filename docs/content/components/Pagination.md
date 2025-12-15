@@ -189,7 +189,7 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Pagination | transparent | transparent |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Pagination | $backgroundColor | $backgroundColor |
 | [backgroundColor](../styles-and-themes/common-units/#color)-selector-Pagination | transparent | transparent |
 | [borderColor](../styles-and-themes/common-units/#color)-Pagination | $color-gray-300 | $color-gray-300 |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-selector-Pagination | $borderRadius | $borderRadius |

@@ -188,6 +188,7 @@ This API allows you to get or set the value of the component. If no value is set
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-AutoComplete | $backgroundColor | $backgroundColor |
 | [backgroundColor](../styles-and-themes/common-units/#color)-AutoComplete--default | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-AutoComplete--default--hover | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-AutoComplete--disabled | *none* | *none* |
