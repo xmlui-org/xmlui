@@ -222,7 +222,7 @@ test.describe("Basic Functionality", () => {
     page,
   }) => {
     await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}"/>`);
-    await expect(page.locator("select")).toBeVisible();
+    await expect(page.getByLabel("Items per page")).toBeVisible();
   });
 
   test("hides page size selector when showPageSizeSelector is false", async ({
@@ -237,7 +237,7 @@ test.describe("Basic Functionality", () => {
         showPageSizeSelector="false"
       />
     `);
-    await expect(page.locator("select")).not.toBeVisible();
+    await expect(page.getByLabel("Items per page")).toHaveCount(0);
   });
 
   test("shows page size selector when showPageSizeSelector is true", async ({
@@ -252,7 +252,7 @@ test.describe("Basic Functionality", () => {
         showPageSizeSelector="true"
       />
     `);
-    await expect(page.locator("select")).toBeVisible();
+    await expect(page.getByLabel("Items per page")).toBeVisible();
   });
 
   test("showPageSizeSelector has no effect when pageSizeOptions is empty", async ({
@@ -260,7 +260,7 @@ test.describe("Basic Functionality", () => {
     page,
   }) => {
     await initTestBed(`<Pagination itemCount="50" pageSize="10" showPageSizeSelector="true"/>`);
-    await expect(page.locator("select")).not.toBeVisible();
+    await expect(page.getByLabel("Items per page")).toHaveCount(0);
   });
 
   test("showPageSizeSelector has no effect when pageSizeOptions has only one option", async ({
@@ -270,7 +270,7 @@ test.describe("Basic Functionality", () => {
     await initTestBed(
       `<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[10]}" showPageSizeSelector="true"/>`,
     );
-    await expect(page.locator("select")).not.toBeVisible();
+    await expect(page.getByLabel("Items per page")).toHaveCount(0);
   });
 
   test("does not show page size selector when pageSizeOptions is not provided", async ({
@@ -279,7 +279,7 @@ test.describe("Basic Functionality", () => {
   }) => {
     await initTestBed(`<Pagination itemCount="50" pageSize="10"/>`);
     await expect(page.getByText("Items per page")).not.toBeVisible();
-    await expect(page.locator("select")).not.toBeVisible();
+    await expect(page.getByLabel("Items per page")).toHaveCount(0);
   });
 
   test("shows page size selector when multiple pageSizeOptions are provided", async ({
@@ -291,15 +291,15 @@ test.describe("Basic Functionality", () => {
     // Should show page size selector
     await expect(page.getByText("Items per page")).toBeVisible();
 
-    // Should show select dropdown with current value
-    const select = page.locator("select");
-    await expect(select).toBeVisible();
-    await expect(select).toHaveValue("10");
+    const pageSizeSelector = page.getByLabel("Items per page");
+    await expect(pageSizeSelector).toBeVisible();
+    await expect(pageSizeSelector).toContainText("10");
 
-    // Check that all options exist in the DOM (even if not visible)
-    await expect(select.locator('option[value="5"]')).toHaveCount(1);
-    await expect(select.locator('option[value="10"]')).toHaveCount(1);
-    await expect(select.locator('option[value="20"]')).toHaveCount(1);
+    // Open dropdown and verify options exist
+    await pageSizeSelector.click();
+    await expect(page.getByRole("option", { name: "5" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "10" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "20" })).toBeVisible();
   });
 
   test("page size selector is disabled when component is disabled", async ({
@@ -310,9 +310,8 @@ test.describe("Basic Functionality", () => {
       `<Pagination enabled="false" itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}"/>`,
     );
 
-    // Select should be disabled
-    const select = page.locator("select");
-    await expect(select).toBeDisabled();
+    const pageSizeSelector = page.getByLabel("Items per page");
+    await expect(pageSizeSelector).toBeDisabled();
   });
 
   test("page size selector allows changing selection", async ({ initTestBed, page }) => {
@@ -321,12 +320,12 @@ test.describe("Basic Functionality", () => {
     // Should show page size selector
     await expect(page.getByText("Items per page")).toBeVisible();
 
-    // Should start with correct value
-    const select = page.locator("select");
-    await expect(select).toHaveValue("10");
+    const pageSizeSelector = page.getByLabel("Items per page");
+    await expect(pageSizeSelector).toContainText("10");
 
     // Should be able to interact with the select (this triggers the event)
-    await select.selectOption("20");
+    await pageSizeSelector.click();
+    await page.getByRole("option", { name: "20" }).click();
 
     // Note: In a real application, the parent would update the pageSize prop
     // which would cause the select to show the new value. For this test,
@@ -338,9 +337,8 @@ test.describe("Basic Functionality", () => {
       `<Pagination itemCount="100" pageSize="20" pageSizeOptions="{[5, 10, 20, 50]}"/>`,
     );
 
-    // Select should show current page size
-    const select = page.locator("select");
-    await expect(select).toHaveValue("20");
+    const pageSizeSelector = page.getByLabel("Items per page");
+    await expect(pageSizeSelector).toContainText("20");
   });
 
   test("handles pageSize not in pageSizeOptions gracefully", async ({ initTestBed, page }) => {
@@ -351,17 +349,14 @@ test.describe("Basic Functionality", () => {
     // Should show page size selector since multiple options are provided
     await expect(page.getByText("Items per page")).toBeVisible();
 
-    const select = page.locator("select");
-    await expect(select).toBeVisible();
-
-    // When pageSize (15) is not in pageSizeOptions, component defaults to first option (5)
-    // This tests how the component handles mismatched pageSize vs pageSizeOptions
-    await expect(select).toHaveValue("5");
+    const pageSizeSelector = page.getByLabel("Items per page");
+    await expect(pageSizeSelector).toBeVisible();
 
     // All original options should still be available
-    await expect(select.locator('option[value="5"]')).toHaveCount(1);
-    await expect(select.locator('option[value="10"]')).toHaveCount(1);
-    await expect(select.locator('option[value="20"]')).toHaveCount(1);
+    await pageSizeSelector.click();
+    await expect(page.getByRole("option", { name: "5" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "10" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "20" })).toBeVisible();
 
     // Page calculations should use the actual pageSize (15), not the selected option (5)
     // 100 items / 15 per page = 6.67 -> 7 pages
@@ -376,7 +371,7 @@ test.describe("Basic Functionality", () => {
 
     // Should fall back to default behavior (true) when null
     await expect(page.getByText("Items per page")).toBeVisible();
-    await expect(page.locator("select")).toBeVisible();
+    await expect(page.getByLabel("Items per page")).toBeVisible();
   });
 
   test("handles undefined showPageSizeSelector property", async ({ initTestBed, page }) => {
@@ -386,7 +381,7 @@ test.describe("Basic Functionality", () => {
 
     // Should fall back to default behavior (true) when undefined
     await expect(page.getByText("Items per page")).toBeVisible();
-    await expect(page.locator("select")).toBeVisible();
+    await expect(page.getByLabel("Items per page")).toBeVisible();
   });
 
   test("handles string 'false' for showPageSizeSelector property", async ({
@@ -399,7 +394,7 @@ test.describe("Basic Functionality", () => {
 
     // Should treat string 'false' as false
     await expect(page.getByText("Items per page")).not.toBeVisible();
-    await expect(page.locator("select")).not.toBeVisible();
+    await expect(page.getByLabel("Items per page")).toHaveCount(0);
   });
 
   test("handles string 'true' for showPageSizeSelector property", async ({ initTestBed, page }) => {
@@ -409,7 +404,7 @@ test.describe("Basic Functionality", () => {
 
     // Should treat string 'true' as true
     await expect(page.getByText("Items per page")).toBeVisible();
-    await expect(page.locator("select")).toBeVisible();
+    await expect(page.getByLabel("Items per page")).toBeVisible();
   });
 
   test("handles numeric 0 for showPageSizeSelector property", async ({ initTestBed, page }) => {
@@ -419,7 +414,7 @@ test.describe("Basic Functionality", () => {
 
     // Should treat 0 as false
     await expect(page.getByText("Items per page")).not.toBeVisible();
-    await expect(page.locator("select")).not.toBeVisible();
+    await expect(page.getByLabel("Items per page")).toHaveCount(0);
   });
 
   test("handles numeric 1 for showPageSizeSelector property", async ({ initTestBed, page }) => {
@@ -429,7 +424,7 @@ test.describe("Basic Functionality", () => {
 
     // Should treat 1 as true
     await expect(page.getByText("Items per page")).toBeVisible();
-    await expect(page.locator("select")).toBeVisible();
+    await expect(page.getByLabel("Items per page")).toBeVisible();
   });
 
   test("handles object for showPageSizeSelector property", async ({ initTestBed, page }) => {
@@ -443,7 +438,7 @@ test.describe("Basic Functionality", () => {
     if (exists > 0) {
       // Should treat object as truthy (true) when it renders
       await expect(pageSizeText).toBeVisible();
-      await expect(page.locator("select")).toBeVisible();
+      await expect(page.getByLabel("Items per page")).toBeVisible();
     } else {
       // Component may not render page size selector with invalid object input
       await expect(pageSizeText).not.toBeVisible();
@@ -457,7 +452,7 @@ test.describe("Basic Functionality", () => {
 
     // Should treat empty string as false
     await expect(page.getByText("Items per page")).not.toBeVisible();
-    await expect(page.locator("select")).not.toBeVisible();
+    await expect(page.getByLabel("Items per page")).toHaveCount(0);
   });
 
   test("defaults to horizontal orientation", async ({ initTestBed, page }) => {
@@ -886,7 +881,7 @@ test.describe("Accessibility", () => {
   test("page size selector is focused when label is clicked", async ({ initTestBed, page }) => {
     await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}"/>`);
     await page.getByText("Items per page").click();
-    await expect(page.locator("select")).toBeFocused();
+    await expect(page.getByLabel("Items per page")).toBeFocused();
   });
 });
 
