@@ -31,7 +31,7 @@ $borderColor-RadioGroupOption--warning: createThemeVar("Input:borderColor-RadioG
 $borderColor-RadioGroupOption--success: createThemeVar("Input:borderColor-RadioGroupOption--success");
 
 // --- Backgrounds
-
+$backgroundColor-RadioGroup: createThemeVar("Input:backgroundColor-RadioGroup");
 $backgroundColor-RadioGroupOption--default: createThemeVar(
   "Input:backgroundColor-RadioGroupOption--default"
 );
@@ -68,6 +68,7 @@ $outlineOffset-RadioGroupOption--focus: createThemeVar("Input:outlineOffset-Radi
     display: flex;
     flex-direction: column;
     gap: t.$space-2;
+    background-color: $backgroundColor-RadioGroup;
   }
 
   .radioOptionContainer {
@@ -78,8 +79,8 @@ $outlineOffset-RadioGroupOption--focus: createThemeVar("Input:outlineOffset-Radi
 
   .radioOption {
     flex-shrink: 0;
-    width: 18px;
-    height: 18px;
+    width: 1.2em;
+    height: 1.2em;
     border-radius: 100%;
     background: $backgroundColor-RadioGroupOption--default;
     border-width: $borderWidth-RadioGroupOption;

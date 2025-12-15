@@ -23,9 +23,9 @@ export const ProgressBarMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`borderRadius-${COMP}`]: "$borderRadius",
-    [`borderRadius-indicator-${COMP}`]: "0px",
-    [`thickness-${COMP}`]: "$space-2",
+    [`borderRadius-${COMP}`]: "999em",
+    [`borderRadius-indicator-${COMP}`]: "999em",
+    [`thickness-${COMP}`]: "0.5em",
     [`backgroundColor-${COMP}`]: "$color-surface-200",
     [`color-indicator-${COMP}`]: "$color-primary-500",
   },

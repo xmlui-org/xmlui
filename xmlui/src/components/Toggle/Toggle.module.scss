@@ -240,10 +240,10 @@ $borderColor-Switch--success: createThemeVar("Input:borderColor-Switch--success"
   // --------------- Switch ---------------
 
   .switch {
-    --thumb-size: 1rem;
+    --thumb-size: 1em;
     --thumb-position: 0%;
     --track-size: calc(var(--thumb-size) * 3);
-    --padding-size: 4px;
+    --padding-size: 0.25em;
 
     &:not([readonly]) {
       cursor: pointer;
@@ -258,8 +258,8 @@ $borderColor-Switch--success: createThemeVar("Input:borderColor-Switch--success"
     min-height: var(--thumb-size);
 
     padding: var(--padding-size);
-    border: 1px solid $borderColor-Switch;
-    border-radius: 1rem;
+    border: 0.0625em solid $borderColor-Switch;
+    border-radius: 999em;
 
     &::before {
       content: "";
@@ -279,7 +279,7 @@ $borderColor-Switch--success: createThemeVar("Input:borderColor-Switch--success"
       &::before {
         background: $backgroundColor-indicator-checked-Switch;
         --thumb-position: calc(
-          var(--track-size) - var(--thumb-size) - 2 * var(--padding-size) - 2px
+          var(--track-size) - var(--thumb-size) - 2 * var(--padding-size) - 0.125em
         );
       }
     }

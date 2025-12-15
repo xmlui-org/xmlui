@@ -109,17 +109,17 @@ $borderColor-Slider--success: createThemeVar("Input:borderColor-#{$componentName
     touch-action: none;
     user-select: none;
     align-items: center;
-    height: 20px;
+    height: 1.25em;
   }
 
   // Track element
   .sliderTrack {
     position: relative;
-    height: 8px;
+    height: 0.5em;
     width: 100%;
     flex-grow: 1;
     overflow: hidden;
-    border-radius: 9999px;
+    border-radius: 999em;
     background-color: $backgroundColor-track-Slider;
 
     @include variant("default");
@@ -148,7 +148,7 @@ $borderColor-Slider--success: createThemeVar("Input:borderColor-#{$componentName
     position: absolute;
     height: 100%;
     background-color: $backgroundColor-range-Slider;
-    border-radius: 9999px;
+    border-radius: 999em;
 
     &.disabled, &[data-disabled] {
       background-color: $backgroundColor-range-Slider--disabled;
@@ -159,8 +159,8 @@ $borderColor-Slider--success: createThemeVar("Input:borderColor-#{$componentName
   .sliderThumb {
     cursor: pointer;
     display: block;
-    width: 20px;
-    height: 20px;
+    width: 1.25em;
+    height: 1.25em;
     border-radius: 50%;
     border: $borderWidth-thumb-Slider
     $borderStyle-thumb-Slider
