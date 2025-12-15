@@ -31,13 +31,35 @@ export const Avatar = memo(forwardRef(function Avatar(
     }
   };
 
+  // Check if size is a predefined value or a custom CSS value
+  const predefinedSizes = ['xs', 'sm', 'md', 'lg'];
+  const isCustomSize = size && !predefinedSizes.includes(size);
+  
   // Simplified className generation by directly mapping size to styles
   const commonClassNames = classnames(
     className,
     styles.container,
-    styles[size as keyof typeof styles] || styles.sm, // Fallback to sm if size not found
+    !isCustomSize && (styles[size as keyof typeof styles] || styles.sm), // Only apply predefined size class
     { [styles.clickable]: !!onClick }
   );
+  
+  // Calculate font size for custom sizes based on pattern: fontSize ≈ 33% of width
+  const calculateFontSize = (sizeValue: string): string => {
+    const match = sizeValue.match(/^([\d.]+)(.*)$/);
+    if (match) {
+      const [, num, unit] = match;
+      const numericValue = parseFloat(num);
+      const fontSize = numericValue * 0.33; // ~33% ratio observed in predefined sizes
+      return `${fontSize}${unit || 'px'}`;
+    }
+    return '1em'; // fallback
+  };
+  
+  // Merge custom size into style if it's not a predefined value
+  const mergedStyle = isCustomSize
+    ? { ...style, width: size, height: size, fontSize: calculateFontSize(size!) }
+    : style;
+  
   const altTxt = !!name ? `Avatar of ${name}` : "Avatar";
 
   if (url) {
@@ -48,7 +70,7 @@ export const Avatar = memo(forwardRef(function Avatar(
         src={url}
         alt={altTxt}
         className={commonClassNames}
-        style={style}
+        style={mergedStyle}
         onClick={onClick}
         onKeyDown={handleKeyDown}
         tabIndex={onClick ? 0 : undefined}
@@ -60,7 +82,7 @@ export const Avatar = memo(forwardRef(function Avatar(
         {...rest}
         ref={ref}
         className={commonClassNames}
-        style={style}
+        style={mergedStyle}
         onClick={onClick}
         onKeyDown={handleKeyDown}
         role="img"

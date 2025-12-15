@@ -4,6 +4,10 @@
     textColor-Link="$textColor-DocumentLinks"
     textColor-Link--hover="textColor-DocumentLinks--hover">
     <VStack width="{$props.width ? $props.width : '100%'}">
+      <ContentSeparator
+        marginVertical="$space-2"
+        thickness="0"
+        when="{$linkInfo.prevLink || $linkInfo.nextLink}" />
       <HStack verticalAlignment="center" gap="$space-2">
         <Link when="{$linkInfo.prevLink}" to="{$linkInfo.prevLink.to}">
           <Icon name="chevronleft" />

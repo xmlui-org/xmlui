@@ -4,7 +4,7 @@
 
 **Key features:**
 - **Automatic fallback**: Shows initials when no image URL is provided or image fails to load
-- **Multiple sizes**: From `xs` (extra small) to `lg` (large) to fit different contexts
+- **Multiple sizes**: Predefined sizes (xs, sm, md, lg) scale with font size, or use custom CSS values for precise control
 - **Clickable**: Supports click events for profile actions, modals, or navigation
 - **Accessible**: Automatically generates appropriate alt text from the name
 
@@ -22,7 +22,7 @@ This property sets the name value the Avatar uses to display initials. If neithe
 
 ### `size` (default: "sm") [#size-default-sm]
 
-This property defines the display size of the Avatar.
+This property defines the display size of the Avatar. Predefined sizes (xs, sm, md, lg) scale with the current font size (using em units). Custom CSS values (e.g., '50px', '3rem', '5em') are supported for both width and height, with font-size automatically calculated at approximately 33% of the width for proper initial display.
 
 Available values:
 
@@ -34,7 +34,9 @@ Available values:
 | `lg` | Large |
 | `xl` | Extra large |
 
-```xmlui-pg copy display name="Example: size"
+Predefined sizes scale with the current font size:
+
+```xmlui-pg copy display name="Example: Predefined sizes"
 <App>
   <HStack>
     <Avatar name="Dorothy Ellen Fuller" />
@@ -42,6 +44,19 @@ Available values:
     <Avatar name="Sebastien Moore" size="sm" />
     <Avatar name="Molly Dough" size="md" />
     <Avatar name="Lynn Gilbert" size="lg" />
+  </HStack>
+</App>
+```
+
+Custom CSS values can be used for precise sizing:
+
+```xmlui-pg copy display name="Example: Custom sizes"
+<App>
+  <HStack verticalAlignment="center">
+    <Avatar name="John Doe" size="40px" />
+    <Avatar name="Jane Smith" size="60px" />
+    <Avatar name="Bob Wilson" size="80px" />
+    <Avatar name="Alice Brown" size="6rem" />
   </HStack>
 </App>
 ```

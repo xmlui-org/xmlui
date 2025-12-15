@@ -17,7 +17,10 @@ export const AvatarMd = createMetadata({
     "person or organization.",
   props: {
     size: {
-      description: `This property defines the display size of the ${COMP}.`,
+      description: `This property defines the display size of the ${COMP}. ` +
+        `Predefined sizes (xs, sm, md, lg) scale with the current font size (using em units). ` +
+        `Custom CSS values (e.g., '50px', '3rem', '5em') are supported for both width and height, ` +
+        `with font-size automatically calculated at approximately 33% of the width for proper initial display.`,
       availableValues: sizeMd,
       valueType: "string",
       defaultValue: defaultProps.size,
@@ -56,7 +59,7 @@ export const avatarComponentRenderer = createComponentRenderer(
     return (
       <Avatar
         className={className}
-        size={node.props?.size}
+        size={extractValue.asOptionalString(node.props?.size)}
         url={node.props.url ? extractResourceUrl(node.props.url) : undefined}
         name={extractValue(node.props.name)}
         onClick={lookupEventHandler("click")}

@@ -215,7 +215,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     fontSize: "$fontSize-base",
 
     // --- The font size used in body
-    "fontSize-root": "14px",
+    "fontSize-root": "16px",
    
 
     // --- Various line height values

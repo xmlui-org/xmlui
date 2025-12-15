@@ -572,7 +572,7 @@ When using custom variants, you can style them using theme variables with the na
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text-keyboard | $fontFamily-monospace | $fontFamily-monospace |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text-mono | $fontFamily-monospace | $fontFamily-monospace |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text-sample | $fontFamily-monospace | $fontFamily-monospace |
-| [fontSize](../styles-and-themes/common-units/#size)-Text | $fontSize-sm | $fontSize-sm |
+| [fontSize](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-code | $fontSize-sm | $fontSize-sm |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-codefence | $fontSize-code | $fontSize-code |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-keyboard | $fontSize-sm | $fontSize-sm |
@@ -629,6 +629,7 @@ When using custom variants, you can style them using theme variables with the na
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-code | $space-0_5 | $space-0_5 |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-codefence | $space-4 | $space-4 |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-keyboard | $space-1 | $space-1 |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-marked | $space-1 | $space-1 |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-tableheading | $space-1 | $space-1 |
 | [paddingVertical](../styles-and-themes/common-units/#size)-Text-codefence | $space-3 | $space-3 |
 | [paddingVertical](../styles-and-themes/common-units/#size)-Text-paragraph | $space-1 | $space-1 |
@@ -640,9 +641,12 @@ When using custom variants, you can style them using theme variables with the na
 | [textColor](../styles-and-themes/common-units/#color)-Text-codefence | $color-surface-900 | $color-surface-900 |
 | [textColor](../styles-and-themes/common-units/#color)-Text-marked | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Text-placeholder | $color-surface-500 | $color-surface-500 |
+| [textColor](../styles-and-themes/common-units/#color)-Text-placeholder--hover | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Text-secondary | $textColor-secondary | $textColor-secondary |
+| [textColor](../styles-and-themes/common-units/#color)-Text-secondary--hover | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Text-small--hover | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Text-subheading | $textColor-secondary | $textColor-secondary |
+| [textColor](../styles-and-themes/common-units/#color)-Text-subheading--hover | *none* | *none* |
 | [textDecorationColor](../styles-and-themes/common-units/#color)-Text | *none* | *none* |
 | [textDecorationColor](../styles-and-themes/common-units/#color)-Text-deleted | *none* | *none* |
 | [textDecorationColor](../styles-and-themes/common-units/#color)-Text-inserted | *none* | *none* |

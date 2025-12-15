@@ -286,10 +286,11 @@ The component has some parts that can be styled through layout properties and th
 | [color](../styles-and-themes/common-units/#color)-indicator-NavLink--hover | $color-primary-600 | $color-primary-600 |
 | [color](../styles-and-themes/common-units/#color)-indicator-NavLink--pressed | $color-primary-500 | $color-primary-500 |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-NavLink | $fontFamily | $fontFamily |
-| [fontSize](../styles-and-themes/common-units/#size)-NavLink | $fontSize-sm | $fontSize-sm |
+| [fontSize](../styles-and-themes/common-units/#size)-NavLink | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink | $fontWeight-normal | $fontWeight-normal |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink--active | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink--pressed | *none* | *none* |
+| [lineHeight](../styles-and-themes/common-units/#size)-NavLink | $lineHeight-relaxed | $lineHeight-relaxed |
 | [outlineColor](../styles-and-themes/common-units/#color)-NavLink--focus | $outlineColor--focus | $outlineColor--focus |
 | [outlineOffset](../styles-and-themes/common-units/#size)-NavLink--focus | -1px | -1px |
 | [outlineStyle](../styles-and-themes/common-units/#border)-NavLink--focus | $outlineStyle--focus | $outlineStyle--focus |
