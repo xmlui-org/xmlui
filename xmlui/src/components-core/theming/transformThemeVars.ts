@@ -97,21 +97,21 @@ export function generateBaseFontSizes(theme: Record<string, string> | undefined)
     return {};
   }
   const ret: Record<string, string> = {};
-  ret[`fontSize-tiny`] = `${0.625 * baseNum}${baseUnit}`;
-  ret[`fontSize-xs`] = `${0.75 * baseNum}${baseUnit}`;
-  ret[`fontSize-code`] = `${0.85 * baseNum}${baseUnit}`;
-  ret[`fontSize-sm`] = `${0.875 * baseNum}${baseUnit}`;
-  ret[`fontSize-base`] = base;
-  ret[`fontSize-lg`] = `${1.125 * baseNum}${baseUnit}`;
-  ret[`fontSize-xl`] = `${1.25 * baseNum}${baseUnit}`;
-  ret[`fontSize-2xl`] = `${1.5 * baseNum}${baseUnit}`;
-  ret[`fontSize-3xl`] = `${1.875 * baseNum}${baseUnit}`;
-  ret[`fontSize-4xl`] = `${2.25 * baseNum}${baseUnit}`;
-  ret[`fontSize-5xl`] = `${3 * baseNum}${baseUnit}`;
-  ret[`fontSize-6xl`] = `${3.75 * baseNum}${baseUnit}`;
-  ret[`fontSize-7xl`] = `${4.5 * baseNum}${baseUnit}`;
-  ret[`fontSize-8xl`] = `${6 * baseNum}${baseUnit}`;
-  ret[`fontSize-9xl`] = `${8 * baseNum}${baseUnit}`;
+  ret[`const-fontSize-tiny`] = `${0.625 * baseNum}${baseUnit}`;
+  ret[`const-fontSize-xs`] = `${0.75 * baseNum}${baseUnit}`;
+  ret[`const-fontSize-code`] = `${0.85 * baseNum}${baseUnit}`;
+  ret[`const-fontSize-sm`] = `${0.875 * baseNum}${baseUnit}`;
+  ret[`const-fontSize-base`] = base;
+  ret[`const-fontSize-lg`] = `${1.125 * baseNum}${baseUnit}`;
+  ret[`const-fontSize-xl`] = `${1.25 * baseNum}${baseUnit}`;
+  ret[`const-fontSize-2xl`] = `${1.5 * baseNum}${baseUnit}`;
+  ret[`const-fontSize-3xl`] = `${1.875 * baseNum}${baseUnit}`;
+  ret[`const-fontSize-4xl`] = `${2.25 * baseNum}${baseUnit}`;
+  ret[`const-fontSize-5xl`] = `${3 * baseNum}${baseUnit}`;
+  ret[`const-fontSize-6xl`] = `${3.75 * baseNum}${baseUnit}`;
+  ret[`const-fontSize-7xl`] = `${4.5 * baseNum}${baseUnit}`;
+  ret[`const-fontSize-8xl`] = `${6 * baseNum}${baseUnit}`;
+  ret[`const-fontSize-9xl`] = `${8 * baseNum}${baseUnit}`;
 
   return ret;
 }

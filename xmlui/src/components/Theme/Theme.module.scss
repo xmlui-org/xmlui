@@ -1,9 +1,9 @@
 @use "../../components-core/theming/themes" as t;
 
 @layer components {
-  .themeWrapper{
-    //it makes the wrapper element behave like an 'invisible' element, so does not affect layout
-    display: contents;
+  .root, .themeWrapper{
+    direction: t.$direction;
+    --stack-gap-default: #{t.$space-4};
 
     // --- Default typography and layout styles
     background-color: t.$backgroundColor;
@@ -16,19 +16,9 @@
     letter-spacing: t.$letterSpacing;
   }
 
-  .root{
-    direction: t.$direction;
-    --stack-gap-default: #{t.$space-4};
-
-    // --- Default typography and layout styles
-    background-color: t.$backgroundColor;
-    color: t.$textColor-primary;
-    font-size: t.$fontSize-root;
-    font-family: t.$fontFamily;
-    font-feature-settings: t.$font-feature-settings;
-    font-weight: t.$fontWeight-normal;
-    line-height: t.$lineHeight;
-    letter-spacing: t.$letterSpacing;
+  .themeWrapper{
+    //it makes the wrapper element behave like an 'invisible' element, so does not affect layout
+    display: contents;
   }
 
   .baseRootComponent {

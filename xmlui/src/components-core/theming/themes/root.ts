@@ -215,7 +215,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     fontSize: "$fontSize-base",
 
     // --- The font size used in body
-    "fontSize-root": "16px",
+    // "fontSize-root": "16px",
    
 
     // --- Various line height values
@@ -419,6 +419,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     },
     dark: {
       themeVars: {
+        "textColor": "white",
         // --- Default surface color shades (form white to black)
         "color-surface-0": "$const-color-surface-1000",
         "color-surface-50": "$const-color-surface-950",
