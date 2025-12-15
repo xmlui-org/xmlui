@@ -226,7 +226,9 @@ class FormItemValidator {
         };
       case "phone":
         return {
-          isValid: /^[a-zA-Z0-9#*)(+.\-_&']+$/g.test(this.value),
+          // Phone must contain at least one digit and only allowed characters
+          isValid:
+            /^[a-zA-Z0-9#*)(+.\-_&']+$/.test(this.value) && /[0-9]/.test(this.value),
           invalidMessage: patternInvalidMessage || "Not a valid phone number",
           severity: patternInvalidSeverity,
         };
