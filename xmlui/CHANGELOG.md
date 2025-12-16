@@ -1,5 +1,21 @@
 # xmlui
 
+## 0.11.23
+
+### Patch Changes
+
+- 7dfb281: Introduce theme-context-relative fontSize theme variables
+- 7780fc4: Fix Form submit with nested Forms (ModalDialog)
+- 7160bc8: fix: patternInvalidSeverity - phone pattern
+- b3b10a2: fix: DatePicker to adjust its font size and spacing to the current font size
+- 965e23e: fix: NumberBox startText and endText uses different color than TextBox
+- 184b7f8: Implement the ideal text (attributes) typography flow
+- 9936586: Form's $data is now available in buttonRowTemplate
+- e7914aa: Fixed FormItem not passing the ungroupedHeaderTemplate and groupHeaderTemplate properties to underlying Select.
+- 1f436da: Experimental <template> helper tag added
+- 36b1352: fix: update disabled text color
+- 74a81b4: improve: use the Select component in the Table as the page size selector
+
 ## 0.11.22
 
 ### Patch Changes
