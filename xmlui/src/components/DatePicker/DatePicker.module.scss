@@ -425,6 +425,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   .dropdown {
 
     /* Reset */
+    z-index: 2;
     opacity: 0;
     appearance: none;
     position: absolute;
@@ -434,7 +435,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     width: 100%;
     margin: 0;
     padding: 0;
-    cursor: inherit;
+    cursor: pointer;
     border: none;
     line-height: inherit;
   }
