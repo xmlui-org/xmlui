@@ -11,6 +11,7 @@ $time: 0.3s;
 $backgroundColor-dropdown-NavGroup: createThemeVar("backgroundColor-dropdown-NavGroup");
 $boxShadow-dropdown-NavGroup: createThemeVar("boxShadow-dropdown-NavGroup");
 $borderRadius-dropdown-NavGroup: createThemeVar("borderRadius-dropdown-NavGroup");
+$minWidth-dropdown-NavGroup: createThemeVar("minWidth-dropdown-NavGroup");
 
 @layer components {
   .dropdownList {
@@ -25,7 +26,7 @@ $borderRadius-dropdown-NavGroup: createThemeVar("borderRadius-dropdown-NavGroup"
     height: fit-content;
     transition: height 0.2s ease;
     box-shadow: $boxShadow-dropdown-NavGroup;
-    min-width: 11rem;
+    min-width: $minWidth-dropdown-NavGroup;
     border-radius: $borderRadius-dropdown-NavGroup;
 
     &:focus,

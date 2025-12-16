@@ -773,6 +773,7 @@ $backgroundColor--selected: createVar(backgroundColor--selected);
 
 $fontFamily: createVar(fontFamily);
 $fontSize-tiny: createVar(fontSize-tiny);
+
 $fontSize-xs: createVar(fontSize-xs);
 $fontSize-code: createVar(fontSize-code);
 $fontSize-sm: createVar(fontSize-sm);
@@ -876,5 +877,4 @@ $fontWeight-bold: createVar(fontWeight-bold);
 $borderRadius: createVar(borderRadius);
 
 // body
-$fontSize-root: createVar(fontSize-root);
 $fontWeight: createVar(fontWeight);

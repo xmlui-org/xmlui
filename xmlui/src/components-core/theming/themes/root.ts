@@ -211,12 +211,25 @@ export const RootThemeDefinition: ThemeDefinition = {
     "fontSize-7xl": "4.5em",
     "fontSize-8xl": "6em",
     "fontSize-9xl": "8em",
-    "fontSize-code": "0.975em", // --- Not, this is intentionally in "rem"
+    "fontSize-code": "0.975em",
     fontSize: "$fontSize-base",
 
-    // --- The font size used in body
-    "fontSize-root": "16px",
-   
+    // --- Various font sizes (absolute values)
+    "theme-fontSize-tiny": "10px",
+    "theme-fontSize-xs": "12px",
+    "theme-fontSize-sm": "14px",
+    "theme-fontSize-base": "16px",
+    "theme-fontSize-lg": "18px",
+    "theme-fontSize-xl": "20px",
+    "theme-fontSize-2xl": "24px",
+    "theme-fontSize-3xl": "30px",
+    "theme-fontSize-4xl": "36px",
+    "theme-fontSize-5xl": "48px",
+    "theme-fontSize-6xl": "60px",
+    "theme-fontSize-7xl": "72px",
+    "theme-fontSize-8xl": "96px",
+    "theme-fontSize-9xl": "128px",
+    "theme-fontSize-code": "15.6px",
 
     // --- Various line height values
     // --- Default line height values (relative to the base unit, "space-base")
@@ -419,6 +432,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     },
     dark: {
       themeVars: {
+        "textColor": "white",
         // --- Default surface color shades (form white to black)
         "color-surface-0": "$const-color-surface-1000",
         "color-surface-50": "$const-color-surface-950",

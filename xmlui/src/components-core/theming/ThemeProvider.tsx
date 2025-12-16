@@ -132,11 +132,12 @@ export function useCompiledTheme(
         .slice(0, themeDefChain.length - 1),
       {
         ...generateBaseSpacings(mergedThemeVars),
-        ...generateBaseFontSizes(mergedThemeVars),
         ...generatePaddingSegments(mergedThemeVars),
         ...generateBorderSegments(mergedThemeVars),
         ...generateBaseTones(mergedThemeVars),
         ...generateButtonTones(mergedThemeVars),
+        ...generateBaseFontSizes(mergedThemeVars),
+        ...generateTextFontSizes(mergedThemeVars),
       },
       {
         ...omit(themeDefChain[themeDefChain.length - 1].themeVars, "light", "dark"),

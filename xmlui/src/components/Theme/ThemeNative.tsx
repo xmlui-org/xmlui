@@ -227,7 +227,7 @@ export function Theme({
       {root &&
         createPortal(
           <div
-            className={classnames(className)}
+            className={classnames(styles.themeWrapper, className)}
             ref={(el) => {
               if (el) {
                 setCurrentThemeRoot(el);

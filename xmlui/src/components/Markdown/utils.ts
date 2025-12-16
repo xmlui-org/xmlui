@@ -171,6 +171,37 @@ export function parseSegmentProps(input: string): SegmentProps {
   return segment;
 }
 
+/**
+ * Extract defaultTone and defaultTheme from an App component XML string
+ * @param appContent The XML markup content containing an App component
+ * @returns An object with defaultTone and defaultTheme if found
+ */
+export function extractAppAttributes(appContent: string): { defaultTone?: string; defaultTheme?: string } {
+  if (!appContent) return {};
+  
+  const result: { defaultTone?: string; defaultTheme?: string } = {};
+  
+  // Match <App ...> or <App .../>
+  const appTagMatch = appContent.match(/<App\s+([^>]+)>/);
+  if (!appTagMatch) return result;
+  
+  const attributes = appTagMatch[1];
+  
+  // Extract defaultTone attribute - handles both quoted and unquoted values
+  const toneMatch = attributes.match(/defaultTone=["']?([^"'\s/>]+)["']?/);
+  if (toneMatch) {
+    result.defaultTone = toneMatch[1];
+  }
+  
+  // Extract defaultTheme attribute - handles both quoted and unquoted values
+  const themeMatch = attributes.match(/defaultTheme=["']?([^"'\s/>]+)["']?/);
+  if (themeMatch) {
+    result.defaultTheme = themeMatch[1];
+  }
+  
+  return result;
+}
+
 export function parsePlaygroundPattern(content: string): PlaygroundPattern {
   const pattern: PlaygroundPattern = {};
   const match = observePlaygroundPattern(content);
@@ -375,6 +406,15 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
           markdownContent += "```xmlui " + segmentAttrs + "\n" + segment.content + "```\n\n";
         }
         pgContent.app = segment.content;
+        
+        // Extract defaultTone and defaultTheme from the App component
+        const appAttrs = extractAppAttributes(segment.content);
+        if (appAttrs.defaultTone) {
+          pgContent.activeTone = appAttrs.defaultTone;
+        }
+        if (appAttrs.defaultTheme) {
+          pgContent.activeTheme = appAttrs.defaultTheme;
+        }
         break;
       case "config":
         if (segment.display) {

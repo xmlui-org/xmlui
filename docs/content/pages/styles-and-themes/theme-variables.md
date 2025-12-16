@@ -191,21 +191,20 @@ You can use these app-bound theme variables within an app:
 | **`fontFamily‑monospace`**                         | This theme variable specifies the font family for text elements marked with "monospace".                                                                                                                                                                                                                 |
 | **`fontFamily‑sans‑serif`**                        | This theme variable specifies the font family for text elements marked with "sans-serif".                                                                                                                                                                                                                |
 | **`fontSize`**                                     | This theme variable sets the default font size of text elements.                                                                                                                                                                                                                                         |
-| **`fontSize-root`**                                | This theme variable sets the default font size for the root of the HTML page that displays your xmlui app. If you set it to a different size, all text element and many components change their size accordingly.                                                                                        |
-| **`fontSize‑tiny`**                                | The smallest font size available in the XMLUI styling system.                                                                                                                                                                                                                                            |
-| **`fontSize‑xs`**                                  | A font size between `fontSize-tiny` and `fonstSize‑sm`.                                                                                                                                                                                                                                                  |
-| **`fontSize‑sm`**                                  | A font size between `fontSize-xs` and `fonstSize-base`.                                                                                                                                                                                                                                                  |
-| **`fontSize‑base`**                                | A font size between `fontSize-sm` and `fonstSize-lg`.                                                                                                                                                                                                                                                    |
-| **`fontSize‑code`**                                | A font size to be used in markdown codefences                                                                                                                                                                                                                                                            |
-| **`fontSize‑lg`**                                  | A font size between `fontSize-base` and `fonstSize-xl`.                                                                                                                                                                                                                                                  |
-| **`fontSize‑xl`**                                  | A font size between `fontSize-lg` and `fonstSize-2xl`.                                                                                                                                                                                                                                                   |
-| **`fontSize‑2xl`**                                 | A font size between `fontSize-xl` and `fonstSize-3xl`.                                                                                                                                                                                                                                                   |
-| **`fontSize‑3xl`**                                 | A font size between `fontSize-2xl` and `fonstSize-4xl`.                                                                                                                                                                                                                                                  |
-| **`fontSize‑4xl`**                                 | A font size between `fontSize-3xl` and `fonstSize-5xl`.                                                                                                                                                                                                                                                  |
-| **`fontSize‑5xl`**                                 | A font size between `fontSize-4xl` and `fonstSize-6xl`.                                                                                                                                                                                                                                                  |
-| **`fontSize‑6xl`**                                 | A font size between `fontSize-5l` and `fonstSize-7xl`.                                                                                                                                                                                                                                                   |
-| **`fontSize‑7xl`**                                 | A font size between `fontSize-6l` and `fonstSize-8xl`.                                                                                                                                                                                                                                                   |
-| **`fontSize‑8xl`**                                 | A font size between `fontSize-7xl` and `fonstSize-9xl`.                                                                                                                                                                                                                                                  |
+| **`fontSize‑tiny`**                                | The smallest font size available in the XMLUI styling system (relative to the parent font size).                                                                                                                                                                                                         |
+| **`fontSize‑xs`**                                  | A font size between `fontSize-tiny` and `fonstSize‑sm` (relative to the parent font size).                                                                                                                                                                                                               |
+| **`fontSize‑sm`**                                  | A font size between `fontSize-xs` and `fonstSize-base` (relative to the parent font size).                                                                                                                                                                                                               |
+| **`fontSize‑base`**                                | A font size between `fontSize-sm` and `fonstSize-lg` (relative to the parent font size).                                                                                                                                                                                                                 |
+| **`fontSize‑code`**                                | A font size to be used in markdown codefences (relative to the parent font size).                                                                                                                                                                                                                        |
+| **`fontSize‑lg`**                                  | A font size between `fontSize-base` and `fonstSize-xl` (relative to the parent font size).                                                                                                                                                                                                               |
+| **`fontSize‑xl`**                                  | A font size between `fontSize-lg` and `fonstSize-2xl` (relative to the parent font size).                                                                                                                                                                                                                |
+| **`fontSize‑2xl`**                                 | A font size between `fontSize-xl` and `fonstSize-3xl` (relative to the parent font size).                                                                                                                                                                                                                |
+| **`fontSize‑3xl`**                                 | A font size between `fontSize-2xl` and `fonstSize-4xl` (relative to the parent font size).                                                                                                                                                                                                               |
+| **`fontSize‑4xl`**                                 | A font size between `fontSize-3xl` and `fonstSize-5xl` (relative to the parent font size).                                                                                                                                                                                                               |
+| **`fontSize‑5xl`**                                 | A font size between `fontSize-4xl` and `fonstSize-6xl` (relative to the parent font size).                                                                                                                                                                                                               |
+| **`fontSize‑6xl`**                                 | A font size between `fontSize-5l` and `fonstSize-7xl` (relative to the parent font size).                                                                                                                                                                                                                |
+| **`fontSize‑7xl`**                                 | A font size between `fontSize-6l` and `fonstSize-8xl` (relative to the parent font size).                                                                                                                                                                                                                |
+| **`fontSize‑8xl`**                                 | A font size between `fontSize-7xl` and `fonstSize-9xl` (relative to the parent font size).                                                                                                                                                                                                               |
 | **`fontSize‑9xl`**                                 | The tallest font size available in the XMLUI styling system.                                                                                                                                                                                                                                             |
 | **`fontWeight`**                                   | This theme variable sets the weight of the default font.                                                                                                                                                                                                                                                 |
 | **`fontWeight‑bold`**                              | This theme variable sets the font's weight marked as bold (when using any text variant with a weight set to `bold`).                                                                                                                                                                                     |
@@ -716,6 +715,108 @@ These colors represent validation states:
 </Component>
 ```
 
+### Colors and Tones
+
+The color schemes of xmlui are tone-aware. With a light tone, the lower the indicator number for a particular shade, the lighter the rendered color. For example, `$color-surface-200` is lighter than `$color-surface-700`. However, with a dark tone, the shades are reversed, `$color-surface-200` is lighter than `$color-surface-700`.
+
+```xmlui-pg name="Shades with light tone"
+---app
+<App>
+  <FlowLayout>
+    <Swatch color="$color-surface-200" width="50%" textColor="$textColor-primary" />
+    <Swatch color="$color-surface-700" width="50%" textColor="$const-color-primary-0" />
+  </FlowLayout>
+</App>
+---comp
+<Component name="Swatch">
+  <VStack gap="0.25rem">
+    <Stack
+      height="50px"
+      border="1px solid black"
+      backgroundColor="{$props.color}"
+      horizontalAlignment="center"
+      verticalAlignment="center">
+      <Text value="{$props.color.substring(1) || 'color token'}" color="{$props.textColor}" />
+    </Stack>
+  </VStack>
+</Component>
+```
+
+```xmlui-pg name="Shades with dark tone"
+---app
+<App defaultTone="dark">
+  <FlowLayout>
+    <Swatch color="$color-surface-200" width="50%" textColor="$textColor-primary" />
+    <Swatch color="$color-surface-700" width="50%" textColor="$textColor-primary" />
+  </FlowLayout>
+</App>
+---comp
+<Component name="Swatch">
+  <VStack gap="0.25rem">
+    <Stack
+      height="50px"
+      border="1px solid black"
+      backgroundColor="{$props.color}"
+      horizontalAlignment="center"
+      verticalAlignment="center">
+      <Text value="{$props.color.substring(1) || 'color token'}" color="{$props.textColor}" />
+    </Stack>
+  </VStack>
+</Component>
+```
+
+### Absolute Color Scale
+
+In situations when you need an absolute color scale, you can use the theme variables with `$const-color-<shade-set>-<shade>` names. In these names, `<shade-set>` is one of the following: `surface`, `primary`, `secondary`, `warn`, `danger`, `success`, or `info`. The `<shade>` value is one of the following numbers: 0, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950, or 1000.
+
+Independent of the tone, the lower the indicator number for a particular shade, the lighter the rendered color:
+
+```xmlui-pg name="Absolute shade values with light tone"
+---app
+<App>
+  <FlowLayout>
+    <Swatch color="$const-color-success-200" width="50%" textColor="$const-color-primary-1000" />
+    <Swatch color="$const-color-success-700" width="50%" textColor="$const-color-primary-0" />
+  </FlowLayout>
+</App>
+---comp
+<Component name="Swatch">
+  <VStack gap="0.25rem">
+    <Stack
+      height="50px"
+      border="1px solid black"
+      backgroundColor="{$props.color}"
+      horizontalAlignment="center"
+      verticalAlignment="center">
+      <Text value="{$props.color.substring(1) || 'color token'}" color="{$props.textColor}" />
+    </Stack>
+  </VStack>
+</Component>
+```
+
+```xmlui-pg name="Absolute shade values with dark tone"
+---app
+<App defaultTone="dark">
+  <FlowLayout>
+    <Swatch color="$const-color-success-200" width="50%" textColor="$const-color-primary-1000" />
+    <Swatch color="$const-color-success-700" width="50%" textColor="$const-color-primary-0" />
+  </FlowLayout>
+</App>
+---comp
+<Component name="Swatch">
+  <VStack gap="0.25rem">
+    <Stack
+      height="50px"
+      border="1px solid black"
+      backgroundColor="{$props.color}"
+      horizontalAlignment="center"
+      verticalAlignment="center">
+      <Text value="{$props.color.substring(1) || 'color token'}" color="{$props.textColor}" />
+    </Stack>
+  </VStack>
+</Component>
+```
+
 ## Fonts
 
 You can influence the default font settings of a particular theme with the following theme variables:
@@ -743,6 +844,163 @@ These theme variables set the default font styles:
   <HStack>
     <Text width="200px" variant="strong">Monospace font family:</Text>
     <Text fontFamily="$fontFamily-monospace">This is an example text</Text>
+  </HStack>
+</App>
+```
+
+### Font Size
+
+The `fontSize` app-bound theme variable sets the font size value of a particular theming context. When an xmlui app starts, this value is set to "16px", which matches the default font size of the most major browsers.
+
+The xmlui components set the text segments (and other elements sized with a particular text segment) using a font size relative to the parent element.
+
+XMLUI defines these font-size-related theme variables:
+
+```xmlui-pg name="Font size theme variables" height="400px"
+<App>
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">fontSize-tiny:</Text>
+    <Text fontSize="$fontSize-tiny">Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">fontSize-xs:</Text>
+    <Text fontSize="$fontSize-xs">Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">fontSize-sm:</Text>
+    <Text fontSize="$fontSize-sm">Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">fontSize-base:</Text>
+    <Text fontSize="$fontSize-base">Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">fontSize-xl:</Text>
+    <Text fontSize="$fontSize-xl">Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">fontSize-2xl:</Text>
+    <Text fontSize="$fontSize-2xl">Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">fontSize-3xl:</Text>
+    <Text fontSize="$fontSize-3xl">Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">fontSize-4xl:</Text>
+    <Text fontSize="$fontSize-4xl">Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">fontSize-5xl:</Text>
+    <Text fontSize="$fontSize-5xl">Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">fontSize-6xl:</Text>
+    <Text fontSize="$fontSize-6xl">Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">fontSize-7xl:</Text>
+    <Text fontSize="$fontSize-7xl">Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">fontSize-8xl:</Text>
+    <Text fontSize="$fontSize-8xl">Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">fontSize-9xl:</Text>
+    <Text fontSize="$fontSize-9xl">Example</Text>
+  </HStack>
+</App>
+```
+
+The following example demonstrates how components use these theme variables to perform font-size calculations. In this code snippet, the second `H2` component has a nested `Text` using the `fontSize-sm` theme variable.
+
+```xmlui-pg display copy name="Parent-relative font size" /$fontSize-sm/
+<App>
+  <Text>fontSize: 16px, fontSize-H2: 1.25em, fontSize-sm: 0.875em</Text>
+  <H2>Heading 2 (1.25em x 16px ⇒ 20px)</H2>
+  <H2>
+    Heading 2
+    <Text>
+      text with standard font size (20px from H2)
+    </Text>
+  </H2>
+  <H2>
+    Heading 2
+    <Text fontSize="$fontSize-sm">
+      text with "fontSize-sm" (0.875em x 20px ⇒ 17.5px)
+    </Text>
+  </H2>
+</App>
+```
+
+XMLUI also declares font-size-related theme variables that are relative to the innermost theme context root, not to the component's parent. The `theme-` prefix of them marks this nature; each of them from `fontSize-xs` to `fontSize-9xl` has its `theme-` pair.
+
+```xmlui-pg display copy name="Parent-relative vs. theme-context-relative font size" /$fontSize-sm/ /$theme-fontSize-sm/
+<App>
+  <Text>fontSize-sm: 0.875em, fontSize-H2: 1.25em</Text>
+  <Theme fontSize="24px">
+    <H2>Heading 2 (1.25em x 24px ⇒ 30px)</H2>
+    <H2>
+      Heading 2
+      <Text fontSize="$fontSize-sm">
+        parent-relative (0.875em x 30px ⇒ 26.25px)
+      </Text>
+    </H2>
+      <H2>
+        Heading 2 (1.25em x 24px ⇒ 30px)
+      </H2>
+      <H2>
+        Heading 2
+        <Text fontSize="$theme-fontSize-sm">
+          theme-relative  (0.875em x 24px ⇒ 21px)
+        </Text>
+      </H2>
+  </Theme>
+</App>
+```
+
+### Font Weight
+
+The `fontWeight` theme variables allow you to set your themes' normal font weight (`fontWeight-normal`). You can use this set of theme variables to define font sizes relative to `fontWeight`:
+
+```xmlui-pg name="Font Weight"
+<App>
+  <HStack>
+    <Text width="200px" variant="strong">fontWeight-light:</Text>
+    <Text fontWeight="$fontWeight-light">This is an example text</Text>
+  </HStack>
+
+  <HStack>
+    <Text width="200px" variant="strong">fontWeight-normal:</Text>
+    <Text fontWeight="$fontWeight-normal">This is an example text</Text>
+  </HStack>
+
+  <HStack>
+    <Text width="200px" variant="strong">fontWeight-medium:</Text>
+    <Text fontWeight="$fontWeight-medium">This is an example text</Text>
+  </HStack>
+
+  <HStack>
+    <Text width="200px" variant="strong">fontWeight-bold:</Text>
+    <Text fontWeight="$fontWeight-bold">This is an example text</Text>
+  </HStack>
+
+  <HStack>
+    <Text width="200px" variant="strong">fontWeight-extra-bold:</Text>
+    <Text fontWeight="$fontWeight-extra-bold">This is an example text</Text>
   </HStack>
 </App>
 ```
@@ -821,117 +1079,11 @@ These theme variables define a set of line heights relative to the font size:
 </App>
 ```
 
-### Font Size
-
-The `fontSize` theme variables allow you to set your themes' normal font size (`fontSize-base`). You can use this set of theme variables to define font sizes relative to `fontSize`:
-
-```xmlui-pg name="Font Size" height="400px"
-<App>
-  <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">fontSize-tiny:</Text>
-    <Text fontSize="$fontSize-tiny">Example</Text>
-  </HStack>
-
-  <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">fontSize-xs:</Text>
-    <Text fontSize="$fontSize-xs">Example</Text>
-  </HStack>
-
-  <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">fontSize-sm:</Text>
-    <Text fontSize="$fontSize-sm">Example</Text>
-  </HStack>
-
-  <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">fontSize-base:</Text>
-    <Text fontSize="$fontSize-base">Example</Text>
-  </HStack>
-
-  <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">fontSize-xl:</Text>
-    <Text fontSize="$fontSize-xl">Example</Text>
-  </HStack>
-
-  <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">fontSize-2xl:</Text>
-    <Text fontSize="$fontSize-2xl">Example</Text>
-  </HStack>
-
-  <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">fontSize-3xl:</Text>
-    <Text fontSize="$fontSize-3xl">Example</Text>
-  </HStack>
-
-  <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">fontSize-4xl:</Text>
-    <Text fontSize="$fontSize-4xl">Example</Text>
-  </HStack>
-
-  <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">fontSize-5xl:</Text>
-    <Text fontSize="$fontSize-5xl">Example</Text>
-  </HStack>
-
-  <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">fontSize-6xl:</Text>
-    <Text fontSize="$fontSize-6xl">Example</Text>
-  </HStack>
-
-  <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">fontSize-7xl:</Text>
-    <Text fontSize="$fontSize-7xl">Example</Text>
-  </HStack>
-
-  <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">fontSize-8xl:</Text>
-    <Text fontSize="$fontSize-8xl">Example</Text>
-  </HStack>
-
-  <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">fontSize-9xl:</Text>
-    <Text fontSize="$fontSize-9xl">Example</Text>
-  </HStack>
-</App>
-```
-
-### Font Weight
-
-The `fontWeight` theme variables allow you to set your themes' normal font weight (`fontWeight-normal`). You can use this set of theme variables to define font sizes relative to `fontWeight`:
-
-```xmlui-pg name="Font Weight"
-<App>
-  <HStack>
-    <Text width="200px" variant="strong">fontWeight-light:</Text>
-    <Text fontWeight="$fontWeight-light">This is an example text</Text>
-  </HStack>
-
-  <HStack>
-    <Text width="200px" variant="strong">fontWeight-normal:</Text>
-    <Text fontWeight="$fontWeight-normal">This is an example text</Text>
-  </HStack>
-
-  <HStack>
-    <Text width="200px" variant="strong">fontWeight-medium:</Text>
-    <Text fontWeight="$fontWeight-medium">This is an example text</Text>
-  </HStack>
-
-  <HStack>
-    <Text width="200px" variant="strong">fontWeight-bold:</Text>
-    <Text fontWeight="$fontWeight-bold">This is an example text</Text>
-  </HStack>
-
-  <HStack>
-    <Text width="200px" variant="strong">fontWeight-extra-bold:</Text>
-    <Text fontWeight="$fontWeight-extra-bold">This is an example text</Text>
-  </HStack>
-</App>
-```
-
 ## Shadows
 
 XMLUI defines a few stock shadow resources:
 
-```xmlui-pg name="Shadows" height="320px"
+```xmlui-pg name="Shadows" height="260px"
 <App>
   <HStack padding="1.5rem" gap="1.5rem">
     <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" boxShadow="$boxShadow" >
@@ -964,7 +1116,7 @@ XMLUI uses a relative scale with spacing (paddings, margins, gaps, etc.). This s
 
 ```xmlui-pg name="Spacing"
 <App gap="$gap-tight">
-  <Text value="The base value is: 0.25rem" variant="strong" />
+  <Text value="The base value is: 0.25em" variant="strong" />
 
   <HStack>
     <Text value="space-0" width="$space-20" />

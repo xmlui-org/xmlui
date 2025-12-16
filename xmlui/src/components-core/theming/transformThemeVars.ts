@@ -78,6 +78,8 @@ export function generateBaseFontSizes(theme: Record<string, string> | undefined)
   if (!theme) {
     return {};
   }
+
+  //TODO if the fontSize is not px, we need to handle that case (use this: 1em, 1rem = 16px)
   const resolvedTheme = resolveThemeVars(theme);
   const base = resolvedTheme["fontSize"];
   if (!base || typeof base !== "string") {
@@ -89,30 +91,30 @@ export function generateBaseFontSizes(theme: Record<string, string> | undefined)
     //if we have something like .5rem
     baseTrimmed = `0${baseTrimmed}`;
   }
-  const baseNum = parseFloat(baseTrimmed);
+  let baseNum = parseFloat(baseTrimmed);
   let baseUnit = baseTrimmed.replace(baseNum + "", "") || "px";
-
-  //  a) non-baseNum -> "0px"
-  if (Number.isNaN(baseNum)) {
-    return {};
+  if (baseUnit !== "px" || Number.isNaN(baseNum)) {
+    // --- We fall back to 16px base if not px
+    baseUnit = "px";
+    baseNum = 16;
   }
-  const ret: Record<string, string> = {};
-  ret[`fontSize-tiny`] = `${0.625 * baseNum}${baseUnit}`;
-  ret[`fontSize-xs`] = `${0.75 * baseNum}${baseUnit}`;
-  ret[`fontSize-code`] = `${0.85 * baseNum}${baseUnit}`;
-  ret[`fontSize-sm`] = `${0.875 * baseNum}${baseUnit}`;
-  ret[`fontSize-base`] = base;
-  ret[`fontSize-lg`] = `${1.125 * baseNum}${baseUnit}`;
-  ret[`fontSize-xl`] = `${1.25 * baseNum}${baseUnit}`;
-  ret[`fontSize-2xl`] = `${1.5 * baseNum}${baseUnit}`;
-  ret[`fontSize-3xl`] = `${1.875 * baseNum}${baseUnit}`;
-  ret[`fontSize-4xl`] = `${2.25 * baseNum}${baseUnit}`;
-  ret[`fontSize-5xl`] = `${3 * baseNum}${baseUnit}`;
-  ret[`fontSize-6xl`] = `${3.75 * baseNum}${baseUnit}`;
-  ret[`fontSize-7xl`] = `${4.5 * baseNum}${baseUnit}`;
-  ret[`fontSize-8xl`] = `${6 * baseNum}${baseUnit}`;
-  ret[`fontSize-9xl`] = `${8 * baseNum}${baseUnit}`;
 
+  const ret: Record<string, string> = {};
+  ret[`theme-fontSize-tiny`] = `${0.625 * baseNum}${baseUnit}`;
+  ret[`theme-fontSize-xs`] = `${0.75 * baseNum}${baseUnit}`;
+  ret[`theme-fontSize-code`] = `${0.85 * baseNum}${baseUnit}`;
+  ret[`theme-fontSize-sm`] = `${0.875 * baseNum}${baseUnit}`;
+  ret[`theme-fontSize-base`] = base;
+  ret[`theme-fontSize-lg`] = `${1.125 * baseNum}${baseUnit}`;
+  ret[`theme-fontSize-xl`] = `${1.25 * baseNum}${baseUnit}`;
+  ret[`theme-fontSize-2xl`] = `${1.5 * baseNum}${baseUnit}`;
+  ret[`theme-fontSize-3xl`] = `${1.875 * baseNum}${baseUnit}`;
+  ret[`theme-fontSize-4xl`] = `${2.25 * baseNum}${baseUnit}`;
+  ret[`theme-fontSize-5xl`] = `${3 * baseNum}${baseUnit}`;
+  ret[`theme-fontSize-6xl`] = `${3.75 * baseNum}${baseUnit}`;
+  ret[`theme-fontSize-7xl`] = `${4.5 * baseNum}${baseUnit}`;
+  ret[`theme-fontSize-8xl`] = `${6 * baseNum}${baseUnit}`;
+  ret[`theme-fontSize-9xl`] = `${8 * baseNum}${baseUnit}`;
   return ret;
 }
 

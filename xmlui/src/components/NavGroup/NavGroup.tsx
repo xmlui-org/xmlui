@@ -73,6 +73,7 @@ export const NavGroupMd = createMetadata({
     [`backgroundColor-dropdown-${COMP}`]: "$backgroundColor-primary",
     [`borderRadius-dropdown-${COMP}`]: "$borderRadius",
     [`boxShadow-dropdown-${COMP}`]: "$boxShadow-spread",
+    [`minWidth-dropdown-${COMP}`]: "11em",
   },
 });
 
