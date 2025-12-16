@@ -91,13 +91,14 @@ export function generateBaseFontSizes(theme: Record<string, string> | undefined)
     //if we have something like .5rem
     baseTrimmed = `0${baseTrimmed}`;
   }
-  const baseNum = parseFloat(baseTrimmed);
+  let baseNum = parseFloat(baseTrimmed);
   let baseUnit = baseTrimmed.replace(baseNum + "", "") || "px";
-
-  //  a) non-baseNum -> "0px"
-  if (Number.isNaN(baseNum)) {
-    return {};
+  if (baseUnit !== "px" || Number.isNaN(baseNum)) {
+    // --- We fall back to 16px base if not px
+    baseUnit = "px";
+    baseNum = 16;
   }
+
   const ret: Record<string, string> = {};
   ret[`const-fontSize-tiny`] = `${0.625 * baseNum}${baseUnit}`;
   ret[`const-fontSize-xs`] = `${0.75 * baseNum}${baseUnit}`;
@@ -114,7 +115,6 @@ export function generateBaseFontSizes(theme: Record<string, string> | undefined)
   ret[`const-fontSize-7xl`] = `${4.5 * baseNum}${baseUnit}`;
   ret[`const-fontSize-8xl`] = `${6 * baseNum}${baseUnit}`;
   ret[`const-fontSize-9xl`] = `${8 * baseNum}${baseUnit}`;
-
   return ret;
 }
 

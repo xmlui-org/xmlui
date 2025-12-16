@@ -211,12 +211,25 @@ export const RootThemeDefinition: ThemeDefinition = {
     "fontSize-7xl": "4.5em",
     "fontSize-8xl": "6em",
     "fontSize-9xl": "8em",
-    "fontSize-code": "0.975em", // --- Not, this is intentionally in "rem"
+    "fontSize-code": "0.975em",
     fontSize: "$fontSize-base",
 
-    // --- The font size used in body
-    // "fontSize-root": "16px",
-   
+    // --- Various font sizes (absolute values)
+    "const-fontSize-tiny": "10px",
+    "const-fontSize-xs": "12px",
+    "const-fontSize-sm": "14px",
+    "const-fontSize-base": "16px",
+    "const-fontSize-lg": "18px",
+    "const-fontSize-xl": "20px",
+    "const-fontSize-2xl": "24px",
+    "const-fontSize-3xl": "30px",
+    "const-fontSize-4xl": "36px",
+    "const-fontSize-5xl": "48px",
+    "const-fontSize-6xl": "60px",
+    "const-fontSize-7xl": "72px",
+    "const-fontSize-8xl": "96px",
+    "const-fontSize-9xl": "128px",
+    "const-fontSize-code": "15.6px",
 
     // --- Various line height values
     // --- Default line height values (relative to the base unit, "space-base")
