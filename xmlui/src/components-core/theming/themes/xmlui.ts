@@ -95,6 +95,7 @@ export const XmlUiBlogThemeDefinition: ThemeDefinition = {
     "maxWidth-content-App": "800px",
     // --- Fundamental colors & typography
     backgroundColor: "$color-surface-0",
+    "fontSize": "14px",
     "fontWeight-Text": "400",
     "fontWeight-bold": "700",
     "textColor-primary": "$color-surface-800",
