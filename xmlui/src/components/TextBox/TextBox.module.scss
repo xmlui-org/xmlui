@@ -171,6 +171,10 @@ $borderColor-TextBox--disabled: createThemeVar("Input:borderColor-#{$componentNa
 
   .adornment {
     color: createThemeVar("Input:color-adornment-#{$componentName}--#{$variantName}");
+
+    * {
+      color: inherit;
+    }
   }
 
   .passwordToggle {
