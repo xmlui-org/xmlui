@@ -946,9 +946,9 @@ The following example demonstrates how components use these theme variables to p
 </App>
 ```
 
-XMLUI also declares font-size-related theme variables that are relative to the innermost theme context root, not to the component's parent. The `theme-` prefix of them marks this nature; each of them from `fontSize-xs` to `fontSize-9xl` has its `theme-` pair.
+XMLUI also declares font-size-related theme variables that are relative to the innermost theme context root, not to the component's parent. The `const-` prefix of them marks this nature; each of them from `fontSize-xs` to `fontSize-9xl` has its `const-` pair.
 
-```xmlui-pg display copy name="Parent-relative vs. theme-context-relative font size" /$fontSize-sm/ /$theme-fontSize-sm/
+```xmlui-pg display copy name="Parent-relative vs. theme-context-relative font size" /$fontSize-sm/ /$const-fontSize-sm/
 <App>
   <Text>fontSize-sm: 0.875em, fontSize-H2: 1.25em</Text>
   <Theme fontSize="24px">
@@ -964,7 +964,7 @@ XMLUI also declares font-size-related theme variables that are relative to the i
       </H2>
       <H2>
         Heading 2
-        <Text fontSize="$theme-fontSize-sm">
+        <Text fontSize="$const-fontSize-sm">
           theme-relative  (0.875em x 24px ⇒ 21px)
         </Text>
       </H2>
