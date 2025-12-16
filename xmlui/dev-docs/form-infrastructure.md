@@ -2,7 +2,24 @@
 
 A deep dive into XMLUI's Form and FormItem components - how they manage state, bind data, validate input, and handle submission.
 
-## What Forms Do
+## Table of Contents
+1. [Overview](#overview)
+2. [Core Concepts](#core-concepts)
+3. [Data Binding](#data-binding)
+4. [Validation](#validation)
+5. [Form Controls](#form-controls)
+6. [Submission & APIs](#submission--apis)
+7. [Advanced Features](#advanced-features)
+8. [Styling](#styling)
+9. [Implementation Details](#implementation-details)
+10. [Quick Reference](#quick-reference)
+11. [Future Proposals](#future-proposals)
+
+---
+
+## Overview
+
+### What Forms Do
 
 Forms in XMLUI provide **automatic data management** for user input. You declare fields with `bindTo`, and the framework handles:
 
@@ -17,7 +34,7 @@ From a developer perspective:
 - **Access data anywhere**: Reference `$data.email` in any child component
 - **Handle errors gracefully**: Backend validation errors display on the correct fields
 
-## Architecture Overview
+### Architecture Diagram
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -27,7 +44,7 @@ From a developer perspective:
 │   Exposes $data context variable                                        │
 │                              ↓                                          │
 │  ┌───────────────────────────────────────────────────────────────────┐  │
-│  │                          Form (Native)                             │  │
+│  │                          Form (Native)                            │  │
 │  │  • Wraps children in <form> element                               │  │
 │  │  • Provides FormContext.Provider                                  │  │
 │  │  • Handles submit/cancel/reset                                    │  │
@@ -35,13 +52,13 @@ From a developer perspective:
 │  └───────────────────────────────────────────────────────────────────┘  │
 │                              ↓                                          │
 │  ┌───────────────────────────────────────────────────────────────────┐  │
-│  │                     FormContext.Provider                           │  │
+│  │                     FormContext.Provider                          │  │
 │  │  subject, originalSubject, validationResults, interactionFlags,   │  │
 │  │  dispatch, enabled, itemLabelWidth, itemLabelBreak, itemLabelPos  │  │
 │  └───────────────────────────────────────────────────────────────────┘  │
 │                              ↓                                          │
 │  ┌───────────────────────────────────────────────────────────────────┐  │
-│  │                        FormItem                                    │  │
+│  │                        FormItem                                   │  │
 │  │  • Subscribes to FormContext via useFormContextPart()             │  │
 │  │  • Dispatches field actions (init, change, focus, blur)           │  │
 │  │  • Runs validation via useValidation() hook                       │  │
@@ -52,30 +69,11 @@ From a developer perspective:
 
 **Key insight:** Form owns all state via `useReducer`. FormItems are stateless consumers that dispatch actions and read slices of context.
 
-## File Organization
-
-```
-src/components/Form/
-├── Form.tsx              # Metadata + component renderer entry
-├── FormNative.tsx        # Form + FormWithContextVar implementations
-├── FormContext.ts        # Context types, hooks, validation types
-├── formActions.ts        # Action creators and action types
-├── Form.module.scss      # Styles and theme variables
-└── Form.md               # User documentation
-
-src/components/FormItem/
-├── FormItem.tsx          # Metadata + component renderer entry
-├── FormItemNative.tsx    # FormItem implementation
-├── ItemWithLabel.tsx     # Label wrapper component
-├── HelperText.tsx        # Validation message display
-├── Validations.ts        # Validation logic + useValidation hook
-├── FormItem.module.scss  # Styles and theme variables
-└── FormItem.md           # User documentation
-```
-
 ---
 
-## State Management
+## Core Concepts
+
+### State Management
 
 Form uses `useReducer` with Immer for immutable updates. All form state lives in one place.
 
@@ -164,9 +162,7 @@ const formReducer = produce((state: FormState, action: FormAction) => {
 
 **Key insight:** Immer's `produce()` allows direct mutations that become immutable updates. Lodash `set()` handles nested paths like `address.city`.
 
----
-
-## Context System
+### Context System
 
 Form provides context; FormItem consumes it. But there's a performance optimization.
 
@@ -271,7 +267,7 @@ function cleanUpSubject(subject: any, noSubmitFields: Record<string, boolean>) {
 
 ---
 
-## Validation System
+## Validation
 
 ### Validation Types
 
@@ -439,7 +435,9 @@ export function useValidationDisplay(
 
 ---
 
-## FormItem Control Types
+## Form Controls
+
+### FormItem Control Types
 
 FormItem renders different controls based on `type`:
 
@@ -476,7 +474,9 @@ Context variables for custom controls:
 
 ---
 
-## Submission Flow
+## Submission & APIs
+
+### Submission Flow
 
 ```
 User clicks Save
@@ -554,10 +554,6 @@ catch (e) {
 }
 ```
 
----
-
-## Component APIs
-
 ### Form API
 
 ```typescript
@@ -596,9 +592,11 @@ catch (e) {
 
 ---
 
-## Context Variables
+## Advanced Features
 
-### $data (Form)
+### Context Variables
+
+#### $data (Form)
 
 Available to all Form children:
 
@@ -618,7 +616,7 @@ const $data = useMemo(() => ({
 </Form>
 ```
 
-### Custom FormItem Context
+#### Custom FormItem Context
 
 For `type="custom"`, FormItem injects:
 
@@ -628,9 +626,7 @@ For `type="custom"`, FormItem injects:
 | `$setValue` | `(newValue) => void` |
 | `$validationResult` | Current validation state |
 
----
-
-## Nested FormItem Support
+### Nested FormItem Support
 
 FormItem supports nested data structures for array editing:
 
@@ -659,9 +655,11 @@ const formItemId = useMemo(() => {
 
 ---
 
-## Theme Variables
+## Styling
 
-### Form
+### Theme Variables
+
+#### Form
 
 ```scss
 $gap-Form                    // Gap between form elements (default: $space-4)
@@ -669,7 +667,7 @@ $gap-buttonRow-Form          // Gap between buttons (default: $space-4)
 $marginTop-buttonRow-Form    // Margin above button row (default: $space-4)
 ```
 
-### FormItem Labels
+#### FormItem Labels
 
 ```scss
 $textColor-FormItemLabel
@@ -680,7 +678,7 @@ $textTransform-FormItemLabel
 $textColor-FormItemLabel-requiredMark  // default: $color-danger-400
 ```
 
-### Validation Display
+#### Validation Display
 
 ```scss
 $backgroundColor-ValidationDisplay-error    // default: $color-danger-100
@@ -692,7 +690,7 @@ $textColor-ValidationDisplay-*
 
 ---
 
-## Implementation Notes
+## Implementation Details
 
 ### Performance: Context Selector Pattern
 
@@ -797,3 +795,54 @@ return <div ref={animateContainerRef}>{validationMessages}</div>;
   onSuccess="() => toast.success('Saved!')"
 />
 ```
+
+---
+
+## Future Proposals
+
+### Proposal: Helpers for Working with Data and Forms
+
+This section is a proposal to provide a better way of handling data being submitted in a Form. Currently, data transformation before submission involves heavy Javascript use. The aim is to reduce imperative code needed to be written by the user and provide tools (such as global functions and component properties) to easily send the data in the shape the user's API expects.
+
+#### Basic Idea
+
+Use same imperative operations that we use in components. Expose these in Globals. Determine which operations should be exposed and invoked and which should remain tied to components.
+
+#### Mathematical Calculations
+
+Proposal: expose a simplified version of [Intl.NumberFormat](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat) with a well defined API for currency, date and number parsing.
+
+- parsing numbers (string -> number -> string) 
+- handling currency
+- handling dates (account for timezones using date-fns)
+- basic operations for all formats: just numbers, date, currency (+, -, /, *, avg, sum)
+- specify decimal places
+
+#### String Manipulation
+
+- capitalize first letter
+- transform to different cases (snake case, camel case, pascal case, kebab case, uppercase)
+- separate on word boundaries
+
+#### File Operations
+
+- Get data from csv, json, yaml
+- Transform from/to: json, csv, yaml
+
+#### Other Utilities
+
+- Access deeply nested array and object values using a string path (e.g. nestedObject['level1.level2.level3.endNode']) 
+- Transform nested objects/arrays: flatten, extract
+- Add computed fields
+- Add, remove and rename fields: pick, omit, rename
+- Aggregate fields: define operation and operand fields
+
+### Adding Data Transform Properties
+
+Currently, there is **no** "right way" to create a declarative approach to data transformations.
+
+Some research has been done in the field but no solution proved to be:
+- intuitive for users without confusing them
+- requiring minimal markup
+- declarative in nature
+- fitting into the framework without introducing new concepts
