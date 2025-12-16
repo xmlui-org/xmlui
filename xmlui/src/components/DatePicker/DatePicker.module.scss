@@ -140,10 +140,10 @@ $rdp-accent-color: createThemeVar("Input:backgroundColor-item-DatePicker--active
 $backgroundColor-item-DatePicker--hover: createThemeVar("Input:backgroundColor-item-DatePicker--hover"
   );
 $rdp-selected-color: createThemeVar("Input:textColor-value-DatePicker");
-$rdp-cell-size: 2.5em; // ~40px at 16px font size
+$rdp-cell-size: t.$space-10; // 2.5em
 $rdp-caption-font-size: t.$fontSize-lg;
-$rdp-outline: 0.125em solid t.useVar($rdp-accent-color);
-$rdp-outline-selected: 0.1875em solid t.useVar($rdp-accent-color);
+$rdp-outline: t.$space-0_5 solid t.useVar($rdp-accent-color);
+$rdp-outline-selected: t.$space-0_5 solid t.useVar($rdp-accent-color);
 $minHeight: createThemeVar("Input:minHeight-#{$componentName}");
 $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selectedItem-DatePicker");
 
@@ -156,11 +156,11 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     width: 100%;
     min-height: $minHeight;
     height: max-content;
-    border-width: 0.0625em;
+    border-width: 1px;
     border-style: solid;
     transition: background-color ease-in 0.1s;
     overflow: hidden;
-    gap: 0.5em;
+    gap: t.$space-2;
     font-size: $fontSize-DatePicker;
     @include t.paddingVars($themeVars, $componentName);
 
@@ -214,72 +214,72 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   }
 
   .datePickerMenu {
-    padding: 1em;
+    padding: t.$space-4;
     overflow-y: auto;
     height: fit-content;
     box-shadow: $boxShadow-menu-DatePicker;
     background-color: $backgroundColor-menu-DatePicker;
     border-radius: $borderRadius-menu-DatePicker;
-    border: 0.0625em solid $rdp-accent-color;
+    border: 1px solid $rdp-accent-color;
   }
 
   /* Variables declaration */
   /* prettier-ignore */
   .root {
-    --rdp-day-height: 2.75em;
-    /* The height of the day cells. (~44px at 16px font) */
-    --rdp-day-width: 2.75em;
-    /* The width of the day cells. (~44px at 16px font) */
+    --rdp-day-height: #{t.$space-11};
+    /* The height of the day cells. (2.75em) */
+    --rdp-day-width: #{t.$space-11};
+    /* The width of the day cells. (2.75em) */
 
     --rdp-day_button-border-radius: 100%;
     /* The border radius of the day cells. */
-    --rdp-day_button-border: 0.125em solid transparent;
+    --rdp-day_button-border: #{t.$space-0_5} solid transparent;
     /* The border of the day cells. */
-    --rdp-day_button-height: 2.625em;
-    /* The height of the day cells. (~42px at 16px font) */
-    --rdp-day_button-width: 2.625em;
-    /* The width of the day cells. (~42px at 16px font) */
+    --rdp-day_button-height: #{t.$space-10};
+    /* The height of the day cells. (2.5em) */
+    --rdp-day_button-width: #{t.$space-10};
+    /* The width of the day cells. (2.5em) */
 
     --rdp-disabled-opacity: 0.5;
     /* The opacity of the disabled days. */
     --rdp-outside-opacity: 0.75;
     /* The opacity of the days outside the current month. */
 
-    --rdp-dropdown-gap: 0.5em;
+    --rdp-dropdown-gap: #{t.$space-2};
     /* The gap between the dropdowns used in the month captons. */
 
-    --rdp-months-gap: 2em;
+    --rdp-months-gap: #{t.$space-8};
     /* The gap between the months in the multi-month view. */
 
     --rdp-nav_button-disabled-opacity: 0.5;
     /* The opacity of the disabled navigation buttons. */
-    --rdp-nav_button-height: 2.25em;
-    /* The height of the navigation buttons. */
-    --rdp-nav_button-width: 2.25em;
-    /* The width of the navigation buttons. */
-    --rdp-nav-height: 2.75em;
-    /* The height of the navigation bar. */
+    --rdp-nav_button-height: #{t.$space-9};
+    /* The height of the navigation buttons. (2.25em) */
+    --rdp-nav_button-width: #{t.$space-9};
+    /* The width of the navigation buttons. (2.25em) */
+    --rdp-nav-height: #{t.$space-11};
+    /* The height of the navigation bar. (2.75em) */
 
     --rdp-range_middle-color: inherit;
     /* The color of the range text. */
 
     --rdp-range_start-color: white;
     /* The color of the range text. */
-    --rdp-range_start-background: linear-gradient(var(--rdp-gradient-direction), transparent 50%, $backgroundColor-item-DatePicker--hover 50%);
+    --rdp-range_start-background: linear-gradient(var(--rdp-gradient-direction), transparent 50%, #{$backgroundColor-item-DatePicker--hover} 50%);
     /* Used for the background of the start of the selected range. */
-    --rdp-range_start-date-background-color: $rdp-accent-color;
+    --rdp-range_start-date-background-color: #{$rdp-accent-color};
     /* The background color of the date when at the start of the selected range. */
 
     --rdp-range_end-background: linear-gradient(var(--rdp-gradient-direction), var(--rdp-range_middle-background-color) 50%, transparent 50%);
     /* Used for the background of the end of the selected range. */
     --rdp-range_end-color: white;
     /* The color of the range text. */
-    --rdp-range_end-date-background-color: $rdp-accent-color;
+    --rdp-range_end-date-background-color: #{$rdp-accent-color};
     /* The background color of the date when at the end of the selected range. */
 
     --rdp-week_number-border-radius: 100%;
     /* The border radius of the week number. */
-    --rdp-week_number-border: 0.125em solid transparent;
+    --rdp-week_number-border: #{t.$space-0_5} solid transparent;
     /* The border of the week number. */
 
     --rdp-week_number-height: var(--rdp-day-height);
@@ -293,7 +293,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
 
     --rdp-weekday-opacity: 0.75;
     /* The opacity of the weekday. */
-    --rdp-weekday-padding: 0.5em 0em;
+    --rdp-weekday-padding: #{t.$space-2} 0;
     /* The padding of the weekday. */
     --rdp-weekday-text-align: center;
     /* The text alignment of the weekday cells. */
@@ -360,15 +360,15 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     position: relative;
     display: inline-flex;
     align-items: center;
-    padding-left: 0.5em;
-    padding-right: 0.5em;
+    padding-left: t.$space-2;
+    padding-right: t.$space-2;
 
     white-space: nowrap;
     border: 0;
   }
 
   .dropdown:focus-visible~.caption_label {
-    outline: 0.3125em auto t.$outlineColor--focus;
+    outline: t.$outlineWidth--focus auto t.$outlineColor--focus;
   }
 
   .button_next,
@@ -443,7 +443,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     position: relative;
     display: inline-flex;
     align-items: center;
-    padding: 0.375em;
+    padding: t.$space-1_5;
 
     &:hover {
       background-color: $backgroundColor-item-DatePicker--hover;
@@ -458,10 +458,10 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   .month_caption {
     display: flex;
     align-content: center;
-    padding: 0.75em 0.75em 0.75em 0.25em;
+    padding: t.$space-3 t.$space-3 t.$space-3 t.$space-1;
     height: var(--rdp-nav-height);
-    font-weight: bold;
-    font-size: 1.125em;
+    font-weight: t.$fontWeight-bold;
+    font-size: t.$fontSize-lg;
   }
 
   .root[data-nav-layout="around"] .month,
@@ -519,8 +519,8 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   .weekday {
     opacity: var(--rdp-weekday-opacity);
     padding: var(--rdp-weekday-padding);
-    font-weight: 500;
-    font-size: 0.875em;
+    font-weight: t.$fontWeight-medium;
+    font-size: t.$fontSize-sm;
     color: t.$textColor-secondary;
     text-align: var(--rdp-weekday-text-align);
     text-transform: var(--rdp-weekday-text-transform);
@@ -528,8 +528,8 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
 
   .week_number {
     opacity: var(--rdp-week_number-opacity);
-    font-weight: 400;
-    font-size: 0.875em;
+    font-weight: t.$fontWeight-normal;
+    font-size: t.$fontSize-sm;
     height: var(--rdp-week_number-height);
     width: var(--rdp-week_number-width);
     border: var(--rdp-week_number-border);
@@ -543,11 +543,11 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   }
 
   .selected {
-    font-weight: bold;
+    font-weight: t.$fontWeight-bold;
   }
 
   .selected .day_button {
-    border: 0.125em solid $borderColor-selectedItem-DatePicker;
+    border: t.$space-0_5 solid $borderColor-selectedItem-DatePicker;
   }
 
   .outside {
