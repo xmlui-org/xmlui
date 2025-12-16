@@ -299,26 +299,6 @@ export const htmlBlockquoteTagRenderer = createComponentRenderer(
   },
 );
 
-export const HtmlBrMd = createMetadata({
-  status: "deprecated",
-  description: "This component renders an HTML `br` tag.",
-  isHtmlTag: true,
-});
-
-export const htmlBrTagRenderer = createComponentRenderer(
-  "br",
-  HtmlBrMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <br className={className} {...props}>
-        {renderChild(node.children)}
-      </br>
-    );
-  },
-);
-
 export const HtmlButtonMd = createMetadata({
   status: "deprecated",
   description: "This component renders an HTML `button` tag.",

@@ -147,6 +147,7 @@ import type StandaloneExtensionManager from "../components-core/StandaloneExtens
 import { backdropComponentRenderer } from "./Backdrop/Backdrop";
 import type { ThemeDefinition } from "../abstractions/ThemingDefs";
 import type { Extension } from "../abstractions/ExtensionDefs";
+import { brComponentRenderer, BrComponentRenderer } from "./Br/Br";
 import {
   htmlAbbrTagRenderer,
   htmlAddressTagRenderer,
@@ -158,7 +159,6 @@ import {
   htmlBdiTagRenderer,
   htmlBdoTagRenderer,
   htmlBlockquoteTagRenderer,
-  htmlBrTagRenderer,
   htmlBTagRenderer,
   htmlButtonTagRenderer,
   htmlCanvasTagRenderer,
@@ -613,7 +613,8 @@ export class ComponentRegistry {
       this.registerCoreComponent(htmlBdiTagRenderer);
       this.registerCoreComponent(htmlBdoTagRenderer);
       this.registerCoreComponent(htmlBlockquoteTagRenderer);
-      this.registerCoreComponent(htmlBrTagRenderer);
+      this.registerCoreComponent(brComponentRenderer);
+      this.registerCoreComponent(BrComponentRenderer);
       this.registerCoreComponent(htmlButtonTagRenderer);
       this.registerCoreComponent(htmlCanvasTagRenderer);
       this.registerCoreComponent(htmlCaptionTagRenderer);
@@ -713,7 +714,8 @@ export class ComponentRegistry {
       this.registerCoreComponent(htmlBdiTagRenderer);
       this.registerCoreComponent(htmlBdoTagRenderer);
       this.registerCoreComponent(htmlBlockquoteTagRenderer);
-      this.registerCoreComponent(htmlBrTagRenderer);
+      this.registerCoreComponent(brComponentRenderer);
+      this.registerCoreComponent(BrComponentRenderer);
       this.registerCoreComponent(htmlButtonTagRenderer);
       this.registerCoreComponent(htmlCanvasTagRenderer);
       this.registerCoreComponent(htmlCaptionTagRenderer);

@@ -77,6 +77,7 @@ import { ToneSwitchMd } from "./ToneSwitch/ToneSwitch";
 import { OptionMd } from "./Option/Option";
 import { AutoCompleteMd } from "./AutoComplete/AutoComplete";
 import { BackdropMd } from "./Backdrop/Backdrop";
+import { BrMd } from "./Br/Br";
 import {
   HtmlAddressMd,
   HtmlAMd,
@@ -88,7 +89,6 @@ import {
   HtmlBdoMd,
   HtmlBlockquoteMd,
   HtmlBMd,
-  HtmlBrMd,
   HtmlButtonMd,
   HtmlCanvasMd,
   HtmlCaptionMd,
@@ -222,7 +222,7 @@ export const collectedComponentMetadata = {
   bdi: HtmlBdiMd,
   bdo: HtmlBdoMd,
   blockquote: HtmlBlockquoteMd,
-  br: HtmlBrMd,
+  br: BrMd,
   button: HtmlButtonMd,
   canvas: HtmlCanvasMd,
   caption: HtmlCaptionMd,
