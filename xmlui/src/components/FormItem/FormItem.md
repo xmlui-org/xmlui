@@ -195,7 +195,7 @@ In the demo below, enter an input smaller than 18 or just submit the form as is.
 | Value   | Description                                                                                                                                                |
 | :------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `email` | Accepts the `[username]@[second level domain].[top level domain]` format                                                                                     |
-| `phone` | Accepts a wide range of characters: numbers, upper- and lowercase letters and the following symbols: `#`, `*`, `)`, `(`, `+`, `.`, `\`, `-`, `_`, `&`, `'` |
+| `phone` | Requires at least one digit and accepts: numbers, upper- and lowercase letters and the following symbols: `#`, `*`, `)`, `(`, `+`, `.`, `\`, `-`, `_`, `&`, `'` |
 | `url`   | Accepts URLs and URIs starting with either `http` or `https`                                                                                               |
 
 > **Note:** To define custom patterns and regular expressions, see the [regex section](#regex).

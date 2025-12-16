@@ -42,6 +42,7 @@ $textColor-FormItemLabel-requiredMark: createThemeVar("textColor-FormItemLabel-r
     &.end {
       flex-direction: row-reverse;
       justify-content: start;
+      align-items: center;
       gap: 0.5em;
     }
 
@@ -53,6 +54,7 @@ $textColor-FormItemLabel-requiredMark: createThemeVar("textColor-FormItemLabel-r
 
     &.start {
       flex-direction: row;
+      align-items: center;
       justify-content: start;
       gap: 0.5em;
     }

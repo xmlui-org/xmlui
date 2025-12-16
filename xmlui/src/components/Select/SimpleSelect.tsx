@@ -202,7 +202,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
               <Icon name="chevronup" />
             </ScrollUpButton>
             <Part partId="listWrapper">
-              <Viewport className={styles.selectViewport} role="listbox">
+              <Viewport className={styles.selectViewport}>
                 {groupBy && groupedOptions ? (
                   // Render grouped options directly from options array
                   <>

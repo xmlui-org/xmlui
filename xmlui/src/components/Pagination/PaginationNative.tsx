@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useState, useCallback, useMemo, useRef } from "react";
+import { forwardRef, useEffect, useState, useCallback, useMemo, useRef, useId } from "react";
 import classnames from "classnames";
 import type { CSSProperties, ReactNode } from "react";
 
@@ -11,6 +11,8 @@ import type { OrientationOptions } from "../abstractions";
 import type { ComponentApi } from "../../components-core/rendering/ContainerWrapper";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import { Part } from "../Part/Part";
+import { Select } from "../Select/SelectNative";
+import { convertOptionValue, OptionNative } from "../Option/OptionNative";
 
 export const PageNumberValues = [1, 3, 5] as const;
 export type PageNumber = (typeof PageNumberValues)[number];
@@ -400,6 +402,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
       </ul>
     </Part>
   );
+
   const pageSizeSelector = showPageSizeSelector &&
     pageSizeOptions &&
     pageSizeOptions.length > 1 && (
@@ -409,23 +412,20 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
             id={`${id}-page-size-selector`}
             label={"Items per page"}
             enabled={enabled}
-            style={style}
-            className={className}
+            cloneStyle={true}
             labelPosition={orientation === "vertical" ? "top" : "start"}
           >
-            <select
+            <Select
               id={`${id}-page-size-selector`}
+              className={classnames(styles.pageSizeSelect)}
               value={pageSize}
-              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-              disabled={!enabled}
-              className={styles.pageSizeSelect}
+              onDidChange={(newValue) => handlePageSizeChange(newValue as number)}
+              enabled={enabled}
             >
               {pageSizeOptions.map((size) => (
-                <option key={size} value={size}>
-                  {size}
-                </option>
+                <OptionNative key={size} value={convertOptionValue(size)} label={`${size}`} />
               ))}
-            </select>
+            </Select>
           </ItemWithLabel>
         </div>
       </Part>

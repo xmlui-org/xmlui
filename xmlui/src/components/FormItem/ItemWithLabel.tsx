@@ -34,6 +34,8 @@ type ItemWithLabelProps = {
   validationResult?: ReactNode;
   layoutContext?: LayoutContext;
   testId?: string;
+  cloneStyle?: boolean;
+
 };
 export const defaultProps: Pick<ItemWithLabelProps, "labelBreak"> = {
   labelBreak: true,
@@ -63,6 +65,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     onLabelClick,
     layoutContext, // Destructured to prevent passing to DOM
     testId,
+    cloneStyle = false,
     ...rest
   }: ItemWithLabelProps,
   ref: ForwardedRef<HTMLDivElement>,
@@ -132,9 +135,8 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
           <Part partId={PART_LABELED_ITEM}>
             {cloneElement(children as ReactElement, {
               id: !isInputTemplateUsed ? inputId : undefined,
-              style: undefined,
-              className: undefined,
               ref: inputRef,
+              ...(cloneStyle ? {} : { style: undefined, className: undefined }),
             })}
           </Part>
           {validationResult && (
