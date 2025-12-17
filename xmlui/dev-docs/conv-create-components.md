@@ -140,6 +140,7 @@ export const ComponentNameMd = createMetadata({
 
 - `d(...)` - General property descriptor
 - `dClick(name)` - Click event
+- `dInit(name)` - Init event (triggered when component is about to be rendered for the first time)
 - `dGotFocus(name)` - Focus event
 - `dLostFocus(name)` - Blur event
 - `dInternal(...)` - Internal-only property

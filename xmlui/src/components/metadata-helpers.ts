@@ -43,6 +43,12 @@ export function dClick(comp: string): ComponentPropertyMetadata {
   };
 }
 
+export function dInit(comp: string): ComponentPropertyMetadata {
+  return {
+    description: `This event is triggered when the ${comp} is about to be rendered for the first time.`,
+  };
+}
+
 export function dGotFocus(comp: string): ComponentPropertyMetadata {
   return {
     description: `This event is triggered when the ${comp} has received the focus.`,

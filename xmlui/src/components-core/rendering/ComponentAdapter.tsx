@@ -13,7 +13,7 @@ import type {
 } from "../../abstractions/RendererDefs";
 import type { LookupAsyncFn, LookupSyncFn } from "../../abstractions/ActionDefs";
 
-import { extractParam } from "../utils/extractParam";
+import { extractParam, shouldKeep } from "../utils/extractParam";
 import { useTheme } from "../theming/ThemeContext";
 import { useComponentStyle } from "../theming/StyleContext";
 import { mergeProps } from "../utils/mergeProps";
@@ -184,6 +184,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   );
 
   // --- Use the current theme to obtain resources and collect theme variables
+  // --- (Must be called before any conditional returns to follow Rules of Hooks)
   const { getResourceUrl, disableInlineStyle: themeDisableInlineStyle } = useTheme();
 
   // --- Obtain a function that can extract a resource URL from a logical URL
@@ -268,6 +269,27 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     layoutContext: layoutContextRef?.current,
     uid,
   };
+
+  // --- Invoke the init event handler only once on first render (synchronously during render phase)
+  // --- This must happen after all hooks are called to avoid hooks order issues
+  const hasInitialized = useRef(false);
+  if (!hasInitialized.current) {
+    hasInitialized.current = true;
+    const initHandler = memoedLookupEventHandler("init" as any);
+    if (initHandler) {
+      try {
+        initHandler();
+      } catch (e) {
+        console.error("Error in init event handler:", e);
+      }
+    }
+  }
+
+  // --- After init event runs, check the when condition
+  // --- If when is false, don't render the component
+  if (!shouldKeep(safeNode.when, state, appContext)) {
+    return null;
+  }
 
   // --- No special behavior, let's render the component according to its definition.
   let renderedNode: ReactNode = null;
