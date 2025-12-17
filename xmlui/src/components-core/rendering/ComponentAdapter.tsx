@@ -1,5 +1,5 @@
 import type { MutableRefObject, ReactElement, ReactNode } from "react";
-import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo, useRef } from "react";
+import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { isEmpty, isPlainObject } from "lodash-es";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
@@ -81,11 +81,23 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- Each component receives a unique identifier
   const uid = useMemo(() => Symbol(safeNode.uid), [safeNode.uid]);
 
+  // --- Track the previous "when" condition value to detect transitions
+  const prevWhenValueRef = useRef<boolean | undefined>(undefined);
+  const cleanupHandlerRef = useRef<(() => void) | null>(null);
+
   // --- Takes care the component cleanup function is called when the component
   // --- is about to be disposed
   useEffect(() => {
     return () => {
       onUnmount(uid);
+      // --- Call cleanup event handler on unmount
+      if (cleanupHandlerRef.current) {
+        try {
+          cleanupHandlerRef.current();
+        } catch (e) {
+          console.error("Error in cleanup event handler:", e);
+        }
+      }
     };
   }, [onUnmount, uid]);
 
@@ -167,6 +179,17 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   const { renderer, descriptor, isCompoundComponent } =
     componentRegistry.lookupComponentRenderer(safeNode.type) || {};
 
+  // --- Extract context variables (keys starting with "$") from state
+  const contextVars = useMemo(() => {
+    const vars: Record<string, any> = {};
+    for (const key of Object.keys(state)) {
+      if (key.startsWith("$")) {
+        vars[key] = state[key];
+      }
+    }
+    return vars;
+  }, [state]);
+
   // --- Obtain a function that can lookup an event handler, which is bound to a
   // --- particular event of this component instance
   const memoedLookupEventHandler: LookupEventHandlerFn = useCallback(
@@ -228,7 +251,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     //   ...layoutContextRef?.current,
     //   mediaSize: appContext.mediaSize,
     // });
-  }, [appContext.mediaSize, layoutContextRef, safeNode.props, valueExtractor]);
+  }, [appContext.mediaSize, layoutContextRef, safeNode.props, valueExtractor, themeDisableInlineStyle]);
 
   // const className = useComponentStyle(cssProps);
 
@@ -240,16 +263,52 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
   const { inspectId, refreshInspection } = useInspector(safeNode, uid);
 
-  // --- Extract context variables (keys starting with "$") from state
-  const contextVars = useMemo(() => {
-    const vars: Record<string, any> = {};
-    for (const key of Object.keys(state)) {
-      if (key.startsWith("$")) {
-        vars[key] = state[key];
+  // --- Evaluate the current "when" condition
+  const currentWhenValue = shouldKeep(safeNode.when, state, appContext);
+
+  // --- Handle init and cleanup events based on "when" condition transitions
+  useEffect(() => {
+    const initHandler = memoedLookupEventHandler("init" as any);
+    cleanupHandlerRef.current = memoedLookupEventHandler("cleanup" as any);
+
+    const prevWhenValue = prevWhenValueRef.current;
+
+    // --- Determine if we should call init
+    const shouldCallInit = 
+      // Case 1: First render and when is not set (implicitly true) or is true
+      (prevWhenValue === undefined && currentWhenValue) ||
+      // Case 2: Transition from false to true
+      (prevWhenValue === false && currentWhenValue === true);
+
+    // --- Determine if we should call cleanup
+    const shouldCallCleanup = 
+      // Transition from true to false
+      prevWhenValue === true && currentWhenValue === false;
+
+    if (shouldCallInit && initHandler) {
+      try {
+        initHandler();
+      } catch (e) {
+        console.error("Error in init event handler:", e);
       }
     }
-    return vars;
-  }, [state]);
+
+    if (shouldCallCleanup && cleanupHandlerRef.current) {
+      try {
+        cleanupHandlerRef.current();
+      } catch (e) {
+        console.error("Error in cleanup event handler:", e);
+      }
+    }
+
+    // --- Update the previous "when" value for next render
+    prevWhenValueRef.current = currentWhenValue;
+  }, [currentWhenValue, memoedLookupEventHandler]);
+
+  // --- If when is false, don't render the component
+  if (!currentWhenValue) {
+    return null;
+  }
 
   // --- Assemble the renderer context we pass down the rendering chain
   const rendererContext: RendererContext<any> = {
@@ -269,27 +328,6 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     layoutContext: layoutContextRef?.current,
     uid,
   };
-
-  // --- Invoke the init event handler only once on first render (synchronously during render phase)
-  // --- This must happen after all hooks are called to avoid hooks order issues
-  const hasInitialized = useRef(false);
-  if (!hasInitialized.current) {
-    hasInitialized.current = true;
-    const initHandler = memoedLookupEventHandler("init" as any);
-    if (initHandler) {
-      try {
-        initHandler();
-      } catch (e) {
-        console.error("Error in init event handler:", e);
-      }
-    }
-  }
-
-  // --- After init event runs, check the when condition
-  // --- If when is false, don't render the component
-  if (!shouldKeep(safeNode.when, state, appContext)) {
-    return null;
-  }
 
   // --- No special behavior, let's render the component according to its definition.
   let renderedNode: ReactNode = null;
