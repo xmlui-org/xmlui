@@ -95,6 +95,10 @@ This property allows you to define a custom trigger instead of the default one p
 
 This event is triggered when the ResponsiveBar is clicked.
 
+**Signature**: `click(event: MouseEvent): void`
+
+- `event`: The mouse event object.
+
 ```xmlui-pg copy display name="Example: Click event" height="200px"
 <App>
   <variable name="clickCount" value="{0}" />
@@ -116,6 +120,8 @@ This event is triggered when the ResponsiveBar is clicked.
 ### `willOpen` [#willopen]
 
 This event fires when the `ResponsiveBar` overflow dropdown menu is about to be opened. You can prevent opening the menu by returning `false` from the event handler. Otherwise, the menu will open at the end of the event handler like normal.
+
+**Signature**: `willOpen(): boolean | void`
 
 ## Exposed Methods [#exposed-methods]
 

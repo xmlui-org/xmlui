@@ -280,6 +280,10 @@ By default, this property is set to `false`.
 
 This event is triggered when value of NumberBox has changed.
 
+**Signature**: `didChange(newValue: any): void`
+
+- `newValue`: The new value of the component.
+
 This event is triggered after the user has changed the field value.
 
 Write in the input field and see how the `Text` underneath it is updated in parallel.
@@ -294,6 +298,8 @@ Write in the input field and see how the `Text` underneath it is updated in para
 ### `gotFocus` [#gotfocus]
 
 This event is triggered when the NumberBox has received the focus.
+
+**Signature**: `gotFocus(): void`
 
 This event is triggered when the `NumberBox` receives focus. The following sample demonstrates this event.
 
@@ -312,6 +318,8 @@ Click into the `NumberBox` (and then click the text below):
 ### `lostFocus` [#lostfocus]
 
 This event is triggered when the NumberBox has lost the focus.
+
+**Signature**: `lostFocus(): void`
 
 This event is triggered when the `NumberBox` loses focus.
 

@@ -55,9 +55,14 @@ export const ExpandableItemMd = createMetadata({
     },
   },
   events: {
-    expandedChange: d(
-      `This event fires when the expandable item is expanded or collapsed. It provides a boolean value indicating the new state.`,
-    ),
+    expandedChange: {
+      description:
+        `This event fires when the expandable item is expanded or collapsed. It provides a boolean value indicating the new state.`,
+      signature: "expandedChange(isExpanded: boolean): void",
+      parameters: {
+        isExpanded: "A boolean indicating whether the item is now expanded (true) or collapsed (false).",
+      },
+    },
   },
   apis: {
     expand: {

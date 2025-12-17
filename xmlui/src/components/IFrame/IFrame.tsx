@@ -51,6 +51,8 @@ export const IFrameMd = createMetadata({
   events: {
     load: {
       description: `This event is triggered when the ${COMP} content has finished loading.`,
+      signature: "load(): void",
+      parameters: {},
     },
   },
   apis: {

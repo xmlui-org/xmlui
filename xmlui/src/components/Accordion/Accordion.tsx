@@ -59,7 +59,13 @@ export const AccordionMd = createMetadata({
     },
   },
   events: {
-    displayDidChange: dDidChange(COMP),
+    displayDidChange: {
+      description: `This event fires when the displayed state of the ${COMP} changes (items are expanded or collapsed).`,
+      signature: "(changedValue: string[]) => void",
+      parameters: {
+        changedValue: "An array of IDs representing the currently expanded accordion items.",
+      },
+    },
   },
   apis: {
     expanded: {

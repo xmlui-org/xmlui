@@ -90,9 +90,15 @@ export const AppMd = createMetadata({
   events: {
     ready: {
       description: `This event fires when the \`${COMP}\` component finishes rendering on the page.`,
+      signature: "() => void",
+      parameters: {},
     },
     messageReceived: {
       description: `This event fires when the \`${COMP}\` component receives a message from another window or iframe via the window.postMessage API.`,
+      signature: "(data: any) => void",
+      parameters: {
+        data: "The data sent from the other window via postMessage.",
+      },
     },
   },
   themeVars: { ...parseScssVar(styles.themeVars), ...parseScssVar(drawerStyles.themeVars) },

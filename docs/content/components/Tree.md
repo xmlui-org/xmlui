@@ -369,17 +369,25 @@ The selected item ID in source data format.
 
 Fired when a tree node needs to load children dynamically. Should return an array of child data.
 
+**Signature**: `(node: FlatTreeNode) => any[]`
+
 ### `nodeDidCollapse` [#nodedidcollapse]
 
 Fired when a tree node is collapsed.
+
+**Signature**: `(node: FlatTreeNode) => void`
 
 ### `nodeDidExpand` [#nodedidexpand]
 
 Fired when a tree node is expanded.
 
+**Signature**: `(node: FlatTreeNode) => void`
+
 ### `selectionDidChange` [#selectiondidchange]
 
 Fired when the tree selection changes.
+
+**Signature**: `(event: TreeSelectionEvent) => void`
 
 ## Exposed Methods [#exposed-methods]
 

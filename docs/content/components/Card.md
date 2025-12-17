@@ -124,6 +124,10 @@ This prop sets the prestyled title.
 
 This event is triggered when the Card is clicked.
 
+**Signature**: `click(event: MouseEvent): void`
+
+- `event`: The mouse event object.
+
 This event is triggered when the `Card` is clicked.
 
 ```xmlui-pg copy display name="Example: click"

@@ -237,9 +237,18 @@ Set the URL.
 
 This event fires when a request results in an error.
 
+**Signature**: `error(error: Error): void`
+
+- `error`: The error object that occurred during the request.
+
 ### `loaded` [#loaded]
 
 The component triggers this event when the fetch operation has been completed and the data is loaded. The event has two arguments. The first is the data loaded; the second indicates if the event is a result of a refetch.
+
+**Signature**: `loaded(data: any, isRefetch: boolean): void`
+
+- `data`: The data loaded from the fetch operation.
+- `isRefetch`: Indicates whether this is a result of a refetch operation.
 
 ## Exposed Methods [#exposed-methods]
 

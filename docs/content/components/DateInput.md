@@ -246,6 +246,10 @@ Available values:
 
 This event is triggered when value of DateInput has changed.
 
+**Signature**: `didChange(newValue: any): void`
+
+- `newValue`: The new value of the component.
+
 Fired when the date value changes. Receives the new date value as a parameter.
 
 > [!INFO] The date value changes when the edited input part (day, month, year) loses focus and contains a valid value.
@@ -263,6 +267,8 @@ Fired when the date value changes. Receives the new date value as a parameter.
 ### `gotFocus` [#gotfocus]
 
 This event is triggered when the DateInput has received the focus.
+
+**Signature**: `gotFocus(): void`
 
 Fired when the date input receives focus.
 
@@ -283,6 +289,8 @@ Fired when the date input receives focus.
 ### `lostFocus` [#lostfocus]
 
 This event is triggered when the DateInput has lost the focus.
+
+**Signature**: `lostFocus(): void`
 
 ## Exposed Methods [#exposed-methods]
 

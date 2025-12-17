@@ -241,6 +241,10 @@ Makes tabs fill the full width of the container, distributing them evenly:
 
 This event is triggered when value of Tabs has changed.
 
+**Signature**: `didChange(newValue: any): void`
+
+- `newValue`: The new value of the component.
+
 The event handler gets these parameters, which refer to the active tab after the change:
 - `index`: The active tab index
 - `id`: The identifier of the active tab (if not defined, the framework provides an auto-generated id)

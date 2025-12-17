@@ -199,7 +199,13 @@ export const FormItemMd = createMetadata({
     },
   },
   events: {
-    validate: d(`This event is used to define a custom validation function.`),
+    validate: {
+      description: `This event is used to define a custom validation function.`,
+      signature: "validate(value: any): string | null | undefined | void",
+      parameters: {
+        value: "The current value of the FormItem to validate.",
+      },
+    },
   },
   apis: {
     addItem: {

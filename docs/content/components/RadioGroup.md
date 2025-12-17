@@ -107,6 +107,10 @@ This prop is used to visually indicate status changes reacting to form field val
 
 This event is triggered when value of RadioGroup has changed.
 
+**Signature**: `didChange(newValue: any): void`
+
+- `newValue`: The new value of the component.
+
 This event is triggered after the user has changed the field value. The following example uses this event to display the selected option's value:
 
 ```xmlui-pg
@@ -126,9 +130,13 @@ Select one of the available options and see how the `Text` underneath it is upda
 
 This event is triggered when the RadioGroup has received the focus.
 
+**Signature**: `gotFocus(): void`
+
 ### `lostFocus` [#lostfocus]
 
 This event is triggered when the RadioGroup has lost the focus.
+
+**Signature**: `lostFocus(): void`
 
 ## Exposed Methods [#exposed-methods]
 

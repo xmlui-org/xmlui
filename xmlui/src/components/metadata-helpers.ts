@@ -1,4 +1,5 @@
 import type {
+  ComponentEventMetadata,
   ComponentMetadata,
   ComponentPropertyMetadata,
   IsValidFunction,
@@ -37,33 +38,49 @@ export function dInternal(description?: string): ComponentPropertyMetadata {
   };
 }
 
-export function dClick(comp: string): ComponentPropertyMetadata {
+export function dClick(comp: string): ComponentEventMetadata {
   return {
     description: `This event is triggered when the ${comp} is clicked.`,
+    signature: "click(event: MouseEvent): void",
+    parameters: {
+      event: "The mouse event object.",
+    },
   };
 }
 
-export function dInit(comp: string): ComponentPropertyMetadata {
+export function dInit(comp: string): ComponentEventMetadata {
   return {
     description: `This event is triggered when the ${comp} is about to be rendered for the first time.`,
+    signature: "init(): void",
+    parameters: {},
   };
 }
 
-export function dGotFocus(comp: string): ComponentPropertyMetadata {
+export function dGotFocus(comp: string): ComponentEventMetadata {
   return {
     description: `This event is triggered when the ${comp} has received the focus.`,
+    signature: "gotFocus(): void",
+    parameters: {
+    },
   };
 }
 
-export function dLostFocus(comp: string): ComponentPropertyMetadata {
+export function dLostFocus(comp: string): ComponentEventMetadata {
   return {
     description: `This event is triggered when the ${comp} has lost the focus.`,
+    signature: "lostFocus(): void",
+    parameters: {
+    },
   };
 }
 
-export function dDidChange(comp: string): ComponentPropertyMetadata {
+export function dDidChange(comp: string): ComponentEventMetadata {
   return {
     description: `This event is triggered when value of ${comp} has changed.`,
+    signature: "didChange(newValue: any): void",
+    parameters: {
+      newValue: "The new value of the component.",
+    },
   };
 }
 

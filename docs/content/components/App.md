@@ -403,6 +403,10 @@ The default value is `true`.
 
 This event fires when the `App` component receives a message from another window or iframe via the window.postMessage API.
 
+**Signature**: `(data: any) => void`
+
+- `data`: The data sent from the other window via postMessage.
+
 The event handler method has two parameters. The first is the message sent; the second is the entire native event object.
 
 ```xmlui-pg copy display name="Example: messageReceived" /onMessageReceived/ /window.postMessage/
@@ -421,6 +425,8 @@ The event handler method has two parameters. The first is the message sent; the 
 ### `ready` [#ready]
 
 This event fires when the `App` component finishes rendering on the page.
+
+**Signature**: `() => void`
 
 This event fires when the `App` component finishes rendering on the page.
 Use it as `onReady` when inlining it on the component.

@@ -180,7 +180,11 @@ This property indicates the duration of the transition between slides in millise
 
 ### `displayDidChange` [#displaydidchange]
 
-This event is triggered when value of Carousel has changed.
+This event fires when the active slide of the Carousel changes.
+
+**Signature**: `displayDidChange(activeSlide: number): void`
+
+- `activeSlide`: The index of the currently active slide.
 
 This event is triggered when the active slide changes.
 

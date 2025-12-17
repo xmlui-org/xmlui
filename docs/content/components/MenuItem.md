@@ -80,6 +80,10 @@ This property defines the URL of the menu item. If this property is defined (and
 
 This event is triggered when the MenuItem is clicked.
 
+**Signature**: `click(event: MouseEvent): void`
+
+- `event`: The mouse event object.
+
 This event is fired when the user clicks the menu item. With an event handler, you can define how to respond to the user's click. If this event does not have an associated event handler but the `to` property has a value, clicking the component navigates the URL set in `to`.
 
 If both properties are defined, `click` takes precedence.

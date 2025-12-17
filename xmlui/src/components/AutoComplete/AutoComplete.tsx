@@ -93,6 +93,10 @@ export const AutoCompleteMd = createMetadata({
       description:
         "This event is triggered when a new item is created by the user " +
         "(if `creatable` is enabled).",
+      signature: "(item: string) => void",
+      parameters: {
+        item: "The newly created item value.",
+      },
     },
   },
   apis: {

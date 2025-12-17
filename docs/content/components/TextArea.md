@@ -193,6 +193,10 @@ This prop is used to visually indicate status changes reacting to form field val
 
 This event is triggered when value of TextArea has changed.
 
+**Signature**: `didChange(newValue: any): void`
+
+- `newValue`: The new value of the component.
+
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
 ```xmlui-pg copy display name="Example: didChange"
@@ -208,6 +212,8 @@ Write in the input field and see how the `Text` underneath it is updated in para
 ### `gotFocus` [#gotfocus]
 
 This event is triggered when the TextArea has received the focus.
+
+**Signature**: `gotFocus(): void`
 
 Clicking on the `TextArea` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
@@ -225,6 +231,8 @@ Note how clicking elsewhere resets the text to the original.
 ### `lostFocus` [#lostfocus]
 
 This event is triggered when the TextArea has lost the focus.
+
+**Signature**: `lostFocus(): void`
 
 ## Exposed Methods [#exposed-methods]
 

@@ -103,12 +103,24 @@ export const DataSourceMd = createMetadata({
     },
   },
   events: {
-    loaded: d(
-      "The component triggers this event when the fetch operation has been completed " +
+    loaded: {
+      description:
+        "The component triggers this event when the fetch operation has been completed " +
         "and the data is loaded. The event has two arguments. The first is the data " +
         "loaded; the second indicates if the event is a result of a refetch.",
-    ),
-    error: d(`This event fires when a request results in an error.`),
+      signature: "loaded(data: any, isRefetch: boolean): void",
+      parameters: {
+        data: "The data loaded from the fetch operation.",
+        isRefetch: "Indicates whether this is a result of a refetch operation.",
+      },
+    },
+    error: {
+      description: `This event fires when a request results in an error.`,
+      signature: "error(error: Error): void",
+      parameters: {
+        error: "The error object that occurred during the request.",
+      },
+    },
   },
   apis: {
     value: {

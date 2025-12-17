@@ -119,13 +119,23 @@ export const APICallMd = createMetadata({
       description:
         "This event fires before the request is sent. Returning an explicit boolean" +
         "\`false\` value will prevent the request from being sent.",
+      signature: "() => boolean | void",
+      parameters: {},
     },
     success: {
       description: "This event fires when a request results in a success.",
+      signature: "(result: any) => void",
+      parameters: {
+        result: "The response data returned from the successful API request.",
+      },
     },
     // This event fires when a request results in an error.
     error: {
       description: "This event fires when a request results in an error.",
+      signature: "(error: any) => void",
+      parameters: {
+        error: "The error object containing details about what went wrong with the API request.",
+      },
     },
     progress: dInternal(),
   },

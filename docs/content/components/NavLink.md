@@ -203,6 +203,10 @@ The default value for this property is `false`.
 
 This event is triggered when the NavLink is clicked.
 
+**Signature**: `click(event: MouseEvent): void`
+
+- `event`: The mouse event object.
+
 The following example shows a message and navigates to the "/status" link after closing the message window:
 
 ```xmlui-pg copy {7} display name="Example: click" height="250px"

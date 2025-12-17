@@ -73,7 +73,13 @@ export const CarouselMd = createMetadata({
     },
   },
   events: {
-    displayDidChange: dDidChange(COMP),
+    displayDidChange: {
+      description: `This event fires when the active slide of the ${COMP} changes.`,
+      signature: "displayDidChange(activeSlide: number): void",
+      parameters: {
+        activeSlide: "The index of the currently active slide.",
+      },
+    },
   },
   apis: {
     canScrollPrev: {

@@ -14,7 +14,13 @@ export const RealTimeAdapterMd = createMetadata({
     },
   },
   events: {
-    eventArrived: d(`This event is raised when data arrives from the backend using long-polling.`),
+    eventArrived: {
+      description: `This event is raised when data arrives from the backend using long-polling.`,
+      signature: "eventArrived(data: any): void",
+      parameters: {
+        data: "The data received from the backend.",
+      },
+    },
   },
 });
 

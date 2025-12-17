@@ -136,13 +136,21 @@ By default, the Cancel button is to the left of the Save button. Set this proper
 
 The form infrastructure fires this event when the form is canceled.
 
+**Signature**: `cancel(): void`
+
 ### `reset` [#reset]
 
 The form infrastructure fires this event when the form is reset.
 
+**Signature**: `reset(): void`
+
 ### `submit` [#submit]
 
 The form infrastructure fires this event when the form is submitted. The event argument is the current `data` value to save.
+
+**Signature**: `submit(data: Record<string, any>): void`
+
+- `data`: The current form data being submitted.
 
 ```xmlui-pg copy {4} display name="Example: submit"
 <App>
@@ -162,9 +170,17 @@ The form infrastructure fires this event when the form is submitted. The event a
 
 The form infrastructure fires this event when the form is submitted successfully.
 
+**Signature**: `success(response: any): void`
+
+- `response`: The response from the successful form submission.
+
 ### `willSubmit` [#willsubmit]
 
 The form infrastructure fires this event just before the form is submitted. The event argument is the current `data` value to be submitted. The return value controls submission behavior: returning `false` cancels the submission; returning a plain object submits that object instead; returning `null`, `undefined`, an empty string, or any non-object value proceeds with normal submission.
+
+**Signature**: `willSubmit(data: Record<string, any>): false | Record<string, any> | null | undefined | void`
+
+- `data`: The current form data to be submitted.
 
 The following example allows saving customer data only when the age is an even number. The `willSubmit` event handler returns `false` if this condition is not met.
 

@@ -75,7 +75,11 @@ This property specifies the URL of the image to display in the Avatar. If neithe
 
 ### `click` [#click]
 
-This event is triggered when the avatar is clicked.
+This event is triggered when the Avatar is clicked.
+
+**Signature**: `click(event: MouseEvent): void`
+
+- `event`: The mouse event object.
 
 ```xmlui-pg copy display name="Example: click"
 <App>

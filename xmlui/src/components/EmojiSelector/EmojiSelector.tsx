@@ -18,7 +18,13 @@ export const EmojiSelectorMd = createMetadata({
     },
   },
   events: {
-    select: d(`This event is fired when the user selects an emoticon from this component.`),
+    select: {
+      description: `This event is fired when the user selects an emoticon from this component.`,
+      signature: "select(emoji: string): void",
+      parameters: {
+        emoji: "The selected emoji character.",
+      },
+    },
   },
 });
 

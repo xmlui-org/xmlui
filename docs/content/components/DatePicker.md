@@ -276,6 +276,10 @@ Available values:
 
 This event is triggered when value of DatePicker has changed.
 
+**Signature**: `didChange(newValue: any): void`
+
+- `newValue`: The new value of the component.
+
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
 ```xmlui-pg copy {2} display name="Example: didChange" height="520px"
@@ -291,6 +295,8 @@ Write in the input field and see how the `Text` underneath it is updated in para
 ### `gotFocus` [#gotfocus]
 
 This event is triggered when the DatePicker has received the focus.
+
+**Signature**: `gotFocus(): void`
 
 Clicking on the `DatePicker` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
@@ -310,6 +316,8 @@ Note how clicking elsewhere resets the text to the original.
 ### `lostFocus` [#lostfocus]
 
 This event is triggered when the DatePicker has lost the focus.
+
+**Signature**: `lostFocus(): void`
 
 ## Exposed Methods [#exposed-methods]
 

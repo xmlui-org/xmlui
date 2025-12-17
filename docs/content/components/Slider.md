@@ -91,13 +91,21 @@ This property allows you to customize how the values are displayed.
 
 This event is triggered when value of Slider has changed.
 
+**Signature**: `didChange(newValue: any): void`
+
+- `newValue`: The new value of the component.
+
 ### `gotFocus` [#gotfocus]
 
 This event is triggered when the Slider has received the focus.
 
+**Signature**: `gotFocus(): void`
+
 ### `lostFocus` [#lostfocus]
 
 This event is triggered when the Slider has lost the focus.
+
+**Signature**: `lostFocus(): void`
 
 ## Exposed Methods [#exposed-methods]
 

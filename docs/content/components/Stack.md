@@ -122,6 +122,10 @@ Optional boolean which wraps the content if set to true and the available space 
 
 This event is triggered when the Stack is clicked.
 
+**Signature**: `click(event: MouseEvent): void`
+
+- `event`: The mouse event object.
+
 Describes the logic that fires when the component is clicked.
 
 ```xmlui-pg copy display name="Example: click"
