@@ -389,6 +389,9 @@ export function nodeToComponentDef(
       // --- We parse the module file to catch parsing errors
       parser.parseStatements();
       comp.scriptCollected = collectCodeBehindFromSource("Main", comp.script);
+      if (comp.scriptCollected.hasInvalidStatements) {
+        comp.scriptError = new Error(`Only reactive variable and function definitions are allowed in a code-behind module.`)
+      }
     } catch (err) {
       if (parser.errors && parser.errors.length > 0) {
         const errMsg = parser.errors[0];

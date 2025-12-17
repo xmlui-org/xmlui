@@ -24,6 +24,7 @@ export function collectCodeBehindFromSource(
     vars: {},
     moduleErrors: {},
     functions: {},
+    hasInvalidStatements: false,
   };
 
   const collectedFunctions: Record<string, CodeDeclaration> = {};
@@ -52,7 +53,7 @@ export function collectCodeBehindFromSource(
         addFunctionDeclaration(stmt);
         break;
       default:
-        throw new Error(`Only reactive variable and function definitions are allowed in a code-behind module.`);
+        result.hasInvalidStatements = true;
     }
   });
   return result;
