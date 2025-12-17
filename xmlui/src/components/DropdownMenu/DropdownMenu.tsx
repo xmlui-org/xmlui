@@ -78,11 +78,14 @@ export const DropdownMenuMd = createMetadata({
     }
   },
   events: {
-    willOpen: d(
-      `This event fires when the \`${DDMCOMP}\` component is about to be opened. ` +
+    willOpen: {
+      description:
+        `This event fires when the \`${DDMCOMP}\` component is about to be opened. ` +
         `You can prevent opening the menu by returning \`false\` from the event handler. ` +
         `Otherwise, the menu will open at the end of the event handler like normal.`,
-    ),
+      signature: "willOpen(): boolean | void",
+      parameters: {},
+    },
   },
   apis: {
     close: {

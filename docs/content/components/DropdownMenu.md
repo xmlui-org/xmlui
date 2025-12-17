@@ -152,6 +152,8 @@ This property allows you to define a custom trigger instead of the default one p
 
 This event fires when the `DropdownMenu` component is about to be opened. You can prevent opening the menu by returning `false` from the event handler. Otherwise, the menu will open at the end of the event handler like normal.
 
+**Signature**: `willOpen(): boolean | void`
+
 ```xmlui-pg copy {6} display name="Example: willOpen" height="240px"
 <App>
   <variable name="counter" value="{0}" />

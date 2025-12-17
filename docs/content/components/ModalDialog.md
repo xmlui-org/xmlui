@@ -136,6 +136,8 @@ A custom template to render the dialog title.
 
 This event is fired when the close button is pressed or the user clicks outside the `ModalDialog`.
 
+**Signature**: `close(): void`
+
 In this example, the `close` event counts how many times you closed the dialog:
 
 ```xmlui-pg height="220px"
@@ -157,6 +159,10 @@ Open and close the dialog several times to test that it changes the counter.
 ### `open` [#open]
 
 This event is fired when the `ModalDialog` is opened either via a `when` or an imperative API call (`open()`).
+
+**Signature**: `open(...params: any[]): void`
+
+- `params`: Parameters passed to the open() method, accessible via $param and $params context variables.
 
 In this example, the `open` event counts how many times you opened the dialog:
 

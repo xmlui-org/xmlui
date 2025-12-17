@@ -97,6 +97,10 @@ This property defines the URL of the link. If the value is not defined, the link
 
 This event is triggered when the link is clicked.
 
+**Signature**: `click(event: MouseEvent): void`
+
+- `event`: The mouse event that triggered the click.
+
 ## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.

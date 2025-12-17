@@ -52,6 +52,8 @@ This property sets the label of the component.  If not set, the component will n
 
 This event is triggered when the tab is activated.
 
+**Signature**: `activated(): void`
+
 ```xmlui-pg copy display name="Example: activated" /onActivated/ height="200px" 
 <App var.activationCount="{0}">
   <Tabs>

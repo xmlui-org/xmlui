@@ -28,7 +28,14 @@ export const ChangeListenerMd = createMetadata({
     },
   },
   events: {
-    didChange: dDidChange(COMP),
+    didChange: {
+      description: `This event is triggered when the value specified in the \`listenTo\` property changes.`,
+      signature: "(oldValue: any, newValue: any) => void",
+      parameters: {
+        oldValue: "The previous value of the property being listened to.",
+        newValue: "The new value of the property being listened to.",
+      },
+    },
   },
 });
 

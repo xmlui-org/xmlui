@@ -20,6 +20,10 @@ If this property is set to `true`, the component gets the focus automatically wh
 
 This event is fired when the user selects an emoticon from this component.
 
+**Signature**: `select(emoji: string): void`
+
+- `emoji`: The selected emoji character.
+
 ```xmlui-pg copy display name="Example: select" height="420px"
 <App>
   <HStack var.selected="">

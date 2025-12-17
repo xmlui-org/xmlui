@@ -160,6 +160,10 @@ Available values:
 
 This event is triggered when value of TimeInput has changed.
 
+**Signature**: `didChange(newValue: any): void`
+
+- `newValue`: The new value of the component.
+
 Fired when the time value changes. Receives the new time value as a parameter.
 
 > [!INFO] The time value changes when the edited input part (hour, minute, second) loses focus or the AM/PM selectro changes.
@@ -177,6 +181,8 @@ Fired when the time value changes. Receives the new time value as a parameter.
 ### `gotFocus` [#gotfocus]
 
 This event is triggered when the TimeInput has received the focus.
+
+**Signature**: `gotFocus(): void`
 
 Fired when the time picker receives focus.
 
@@ -198,6 +204,10 @@ Fired when the time picker receives focus.
 
 Fired when the user enters an invalid time
 
+**Signature**: `invalidTime(value: string): void`
+
+- `value`: The invalid time value that was entered.
+
 Fired when the user enters an invalid time value.
 
 ```xmlui-pg copy {2} display name="Example: invalidTime"
@@ -212,6 +222,8 @@ Fired when the user enters an invalid time value.
 ### `lostFocus` [#lostfocus]
 
 This event is triggered when the TimeInput has lost the focus.
+
+**Signature**: `lostFocus(): void`
 
 ## Exposed Methods [#exposed-methods]
 

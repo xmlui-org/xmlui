@@ -38,12 +38,17 @@ export const FileUploadDropZoneMd = createMetadata({
     maxFiles: d(`The maximum number of files that can be selected.`),
   },
   events: {
-    upload: d(
-      `This component accepts files for upload but does not perform the actual operation. It fires ` +
+    upload: {
+      description:
+        `This component accepts files for upload but does not perform the actual operation. It fires ` +
         `the \`upload\` event and passes the list files to upload in the method's argument. You can ` +
         `use the passed file information to implement the upload (according to the protocol your ` +
         `backend supports).`,
-    ),
+      signature: "upload(files: File[]): void",
+      parameters: {
+        files: "An array of File objects to be uploaded.",
+      },
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

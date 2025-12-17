@@ -4,7 +4,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { sizeMd } from "../../components/abstractions";
 import { Avatar, defaultProps } from "./AvatarNative";
-import { createMetadata, d } from "../metadata-helpers";
+import { createMetadata, dClick } from "../metadata-helpers";
 
 const COMP = "Avatar";
 
@@ -39,7 +39,7 @@ export const AvatarMd = createMetadata({
     },
   },
   events: {
-    click: d("This event is triggered when the avatar is clicked."),
+    click: dClick(COMP),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

@@ -572,7 +572,7 @@ When using custom variants, you can style them using theme variables with the na
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text-keyboard | $fontFamily-monospace | $fontFamily-monospace |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text-mono | $fontFamily-monospace | $fontFamily-monospace |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text-sample | $fontFamily-monospace | $fontFamily-monospace |
-| [fontSize](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-Text | $fontSize | $fontSize |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-code | $fontSize-sm | $fontSize-sm |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-codefence | $fontSize-code | $fontSize-code |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-keyboard | $fontSize-sm | $fontSize-sm |
@@ -635,7 +635,7 @@ When using custom variants, you can style them using theme variables with the na
 | [paddingVertical](../styles-and-themes/common-units/#size)-Text-paragraph | $space-1 | $space-1 |
 | [textAlign](../styles-and-themes/common-units/#text-align)-Text | *none* | *none* |
 | [textAlignLast](../styles-and-themes/common-units/#text-align)-Text | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-Text | $textColor-primary | $textColor-primary |
+| [textColor](../styles-and-themes/common-units/#color)-Text | $textColor | $textColor |
 | [textColor](../styles-and-themes/common-units/#color)-Text--hover | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Text-code--hover | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Text-codefence | $color-surface-900 | $color-surface-900 |

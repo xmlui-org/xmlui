@@ -119,6 +119,10 @@ This property contains the initial state value. Though you can use multiple `App
 
 This event is fired when the AppState value is updated. The event provides the new state value as its parameter.
 
+**Signature**: `(updateInfo: { bucket: string; value: any; previousValue: any }) => void`
+
+- `updateInfo`: An object containing the bucket name, the new state value, and the previous value.
+
 ## Exposed Methods [#exposed-methods]
 
 ### `appendToList` [#appendtolist]

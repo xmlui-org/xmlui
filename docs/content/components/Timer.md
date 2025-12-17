@@ -53,7 +53,9 @@ Whether the timer should stop after firing its first tick event.
 
 ### `tick` [#tick]
 
-This event is triggered at each interval when the ${COMP} is enabled.
+This event is triggered at each interval when the Timer is enabled.
+
+**Signature**: `tick(): void`
 
 ## Exposed Methods [#exposed-methods]
 

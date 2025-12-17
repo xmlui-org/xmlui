@@ -119,19 +119,43 @@ export const FormMd = createMetadata({
     _data_url: dInternal("when we have an api bound data prop, we inject the url here"),
   },
   events: {
-    willSubmit: d(
-      `The form infrastructure fires this event just before the form is submitted. The event argument ` +
+    willSubmit: {
+      description:
+        `The form infrastructure fires this event just before the form is submitted. The event argument ` +
         `is the current \`data\` value to be submitted. The return value controls submission behavior: ` +
         `returning \`false\` cancels the submission; returning a plain object submits that object instead; ` +
         `returning \`null\`, \`undefined\`, an empty string, or any non-object value proceeds with normal submission.`,
-    ),
-    submit: d(
-      `The form infrastructure fires this event when the form is submitted. The event argument ` +
+      signature: "willSubmit(data: Record<string, any>): false | Record<string, any> | null | undefined | void",
+      parameters: {
+        data: "The current form data to be submitted.",
+      },
+    },
+    submit: {
+      description:
+        `The form infrastructure fires this event when the form is submitted. The event argument ` +
         `is the current \`data\` value to save.`,
-    ),
-    success: d("The form infrastructure fires this event when the form is submitted successfully."),
-    cancel: d(`The form infrastructure fires this event when the form is canceled.`),
-    reset: d(`The form infrastructure fires this event when the form is reset.`),
+      signature: "submit(data: Record<string, any>): void",
+      parameters: {
+        data: "The current form data being submitted.",
+      },
+    },
+    success: {
+      description: "The form infrastructure fires this event when the form is submitted successfully.",
+      signature: "success(response: any): void",
+      parameters: {
+        response: "The response from the successful form submission.",
+      },
+    },
+    cancel: {
+      description: `The form infrastructure fires this event when the form is canceled.`,
+      signature: "cancel(): void",
+      parameters: {},
+    },
+    reset: {
+      description: `The form infrastructure fires this event when the form is reset.`,
+      signature: "reset(): void",
+      parameters: {},
+    },
   },
   contextVars: {
     $data: d(

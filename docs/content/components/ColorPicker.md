@@ -78,13 +78,21 @@ Available values:
 
 This event is triggered when value of ColorPicker has changed.
 
+**Signature**: `didChange(newValue: any): void`
+
+- `newValue`: The new value of the component.
+
 ### `gotFocus` [#gotfocus]
 
 This event is triggered when the ColorPicker has received the focus.
 
+**Signature**: `gotFocus(): void`
+
 ### `lostFocus` [#lostfocus]
 
 This event is triggered when the ColorPicker has lost the focus.
+
+**Signature**: `lostFocus(): void`
 
 ## Exposed Methods [#exposed-methods]
 

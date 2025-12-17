@@ -109,8 +109,20 @@ export const PaginationMd = createMetadata({
     ),
   },
   events: {
-    pageDidChange: d("Fired when the current page changes"),
-    pageSizeDidChange: d("Fired when the page size changes"),
+    pageDidChange: {
+      description: "Fired when the current page changes",
+      signature: "pageDidChange(pageIndex: number): void",
+      parameters: {
+        pageIndex: "The new page index (0-based).",
+      },
+    },
+    pageSizeDidChange: {
+      description: "Fired when the page size changes",
+      signature: "pageSizeDidChange(pageSize: number): void",
+      parameters: {
+        pageSize: "The new page size.",
+      },
+    },
   },
   apis: {
     moveFirst: {

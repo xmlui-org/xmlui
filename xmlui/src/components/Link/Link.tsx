@@ -44,8 +44,12 @@ export const LinkMd = createMetadata({
   },
   events: {
     click: {
-      description: "This event is triggered when the link is clicked."
-    }
+      description: "This event is triggered when the link is clicked.",
+      signature: "click(event: MouseEvent): void",
+      parameters: {
+        event: "The mouse event that triggered the click.",
+      },
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   themeVarDescriptions: {

@@ -137,9 +137,17 @@ Whether to show the page size selector
 
 Fired when the current page changes
 
+**Signature**: `pageDidChange(pageIndex: number): void`
+
+- `pageIndex`: The new page index (0-based).
+
 ### `pageSizeDidChange` [#pagesizedidchange]
 
 Fired when the page size changes
+
+**Signature**: `pageSizeDidChange(pageSize: number): void`
+
+- `pageSize`: The new page size.
 
 ## Exposed Methods [#exposed-methods]
 

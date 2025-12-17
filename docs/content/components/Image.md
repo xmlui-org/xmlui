@@ -85,6 +85,10 @@ This property is used to indicate the source (path) of the image to display. Whe
 
 This event is triggered when the Image is clicked.
 
+**Signature**: `click(event: MouseEvent): void`
+
+- `event`: The mouse event object.
+
 This event is triggered when the image is clicked.
 
 ```xmlui-pg copy {6} display name="Example: click"

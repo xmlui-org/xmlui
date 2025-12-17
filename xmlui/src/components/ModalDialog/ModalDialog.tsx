@@ -43,14 +43,22 @@ export const ModalDialogMd = createMetadata({
     },
   },
   events: {
-    open: d(
-      `This event is fired when the \`${COMP}\` is opened either via a \`when\` or an ` +
+    open: {
+      description:
+        `This event is fired when the \`${COMP}\` is opened either via a \`when\` or an ` +
         `imperative API call (\`open()\`).`,
-    ),
-    close: d(
-      `This event is fired when the close button is pressed or the user clicks outside ` +
+      signature: "open(...params: any[]): void",
+      parameters: {
+        params: "Parameters passed to the open() method, accessible via $param and $params context variables.",
+      },
+    },
+    close: {
+      description:
+        `This event is fired when the close button is pressed or the user clicks outside ` +
         `the \`${COMP}\`.`,
-    ),
+      signature: "close(): void",
+      parameters: {},
+    },
   },
   apis: {
     close: {

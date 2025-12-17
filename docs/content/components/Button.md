@@ -226,6 +226,10 @@ Available values:
 
 This event is triggered when the Button is clicked.
 
+**Signature**: `click(event: MouseEvent): void`
+
+- `event`: The mouse event object.
+
 ```xmlui-pg copy display name="Example: click"
 <App>
   <Button label="Click me!" onClick="toast('Button clicked')" />
@@ -235,6 +239,8 @@ This event is triggered when the Button is clicked.
 ### `gotFocus` [#gotfocus]
 
 This event is triggered when the Button has received the focus.
+
+**Signature**: `gotFocus(): void`
 
 ```xmlui-pg copy display name="Example: gotFocus"
 <App var.text="No event" >
@@ -251,6 +257,8 @@ This event is triggered when the Button has received the focus.
 ### `lostFocus` [#lostfocus]
 
 This event is triggered when the Button has lost the focus.
+
+**Signature**: `lostFocus(): void`
 
 (See the example above)
 

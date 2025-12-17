@@ -156,10 +156,8 @@ Note how clicking elsewhere resets the text to the original.
 
 ```xmlui-pg copy /fileInputComponent.focus()/ display name="Example: focus"
 <App>
-  <HStack>
-    <Button label="Focus FileInput" onClick="fileInputComponent.focus()" />
-    <FileInput id="fileInputComponent" />
-  </HStack>
+  <Button label="Focus FileInput" onClick="fileInputComponent.focus()" />
+  <FileInput id="fileInputComponent" />
 </App>
 ```
 
@@ -169,10 +167,8 @@ Note how clicking elsewhere resets the text to the original.
 
 ```xmlui-pg copy /fileInputComponent.open()/ display name="Example: open"
 <App>
-  <HStack>
-    <Button label="Open FileInput" onClick="fileInputComponent.open()" />
-    <FileInput id="fileInputComponent" />
-  </HStack>
+  <Button label="Open FileInput" onClick="fileInputComponent.open()" />
+  <FileInput id="fileInputComponent" />
 </App>
 ```
 
@@ -191,10 +187,8 @@ and note how the `Text` component displays the selected file's name:
 
 ```xmlui-pg copy {3-4} display name="Example: value"
 <App>
-  <HStack>
-    <Text value="Selected file name: {fileInputComponent.value}" />
-    <FileInput id="fileInputComponent" />
-  </HStack>
+  <Text value="Selected file name: {fileInputComponent.value}" />
+  <FileInput id="fileInputComponent" />
 </App>
 ```
 

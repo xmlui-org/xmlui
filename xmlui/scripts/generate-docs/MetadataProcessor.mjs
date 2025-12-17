@@ -327,7 +327,18 @@ function addEventsSection(data, component) {
   // Use pattern utility for processing events
   processComponentSection(component.events, (eventName, event) => {
     buffer += `### \`${eventName}\`\n\n`;
-    buffer += combineDescriptionAndDescriptionRef(data, event, METADATA_SECTIONS.EVENTS);
+    buffer += getComponentDescription(event);
+    buffer += "\n\n";
+    if (event.signature) {
+      buffer += `**Signature**: \`${event.signature}\`\n\n`;
+      if (event.parameters && Object.keys(event.parameters).length > 0) {
+        Object.entries(event.parameters).forEach(([name, param]) => {
+          buffer += `- \`${name}\`: ${param}\n`;
+        });
+        buffer += `\n`;
+      }
+    }
+    buffer += getComponentDescriptionRef(data, event, METADATA_SECTIONS.EVENTS);
     buffer += "\n\n";
   });
 

@@ -131,13 +131,23 @@ Available values:
 
 This event is triggered when value of AutoComplete has changed.
 
+**Signature**: `didChange(newValue: any): void`
+
+- `newValue`: The new value of the component.
+
 ### `gotFocus` [#gotfocus]
 
 This event is triggered when the AutoComplete has received the focus.
 
+**Signature**: `gotFocus(): void`
+
 ### `itemCreated` [#itemcreated]
 
 This event is triggered when a new item is created by the user (if `creatable` is enabled).
+
+**Signature**: `(item: string) => void`
+
+- `item`: The newly created item value.
 
 Add a few new items not in the options list. The following markup will display them:
 
@@ -159,6 +169,8 @@ Add a few new items not in the options list. The following markup will display t
 ### `lostFocus` [#lostfocus]
 
 This event is triggered when the AutoComplete has lost the focus.
+
+**Signature**: `lostFocus(): void`
 
 ## Exposed Methods [#exposed-methods]
 

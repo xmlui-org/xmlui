@@ -194,7 +194,7 @@ Scrolls the heading into view.
 | [textColor](../styles-and-themes/common-units/#color)-H4 | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-H5 | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-H6 | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-Heading | inherit | inherit |
+| [textColor](../styles-and-themes/common-units/#color)-Heading | $textColor | $textColor |
 | [textDecorationColor](../styles-and-themes/common-units/#color)-H1 | *none* | *none* |
 | [textDecorationColor](../styles-and-themes/common-units/#color)-H2 | *none* | *none* |
 | [textDecorationColor](../styles-and-themes/common-units/#color)-H3 | *none* | *none* |

@@ -104,6 +104,8 @@ Specifies the HTML content to display in the iframe. Either `src` or `srcdoc` sh
 
 This event is triggered when the IFrame content has finished loading.
 
+**Signature**: `load(): void`
+
 ```xmlui-pg copy display name="Example: load"
 <App var.loadStatus="Loading...">
   <VStack gap="$space-2">

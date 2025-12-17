@@ -178,3 +178,4 @@ This component does not expose any methods.
 | [backgroundColor](../styles-and-themes/common-units/#color)-dropdown-NavGroup | $backgroundColor-primary | $backgroundColor-primary |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-dropdown-NavGroup | $borderRadius | $borderRadius |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-dropdown-NavGroup | $boxShadow-spread | $boxShadow-spread |
+| [minWidth](../styles-and-themes/common-units/#size)-dropdown-NavGroup | 11em | 11em |

@@ -338,6 +338,10 @@ In the template definition, you can use the `$item` context property to access t
 
 This event is triggered when value of Select has changed.
 
+**Signature**: `didChange(newValue: any): void`
+
+- `newValue`: The new value of the component.
+
 ```xmlui-pg copy display name="Example: didChange" height="260px"
 <App>
   <variable name="newValue" value="(none)" />
@@ -353,6 +357,8 @@ This event is triggered when value of Select has changed.
 ### `gotFocus` [#gotfocus]
 
 This event is triggered when the Select has received the focus.
+
+**Signature**: `gotFocus(): void`
 
 ```xmlui-pg copy {5-6} display name="Example: gotFocus/lostFocus" height="260px"
 <App>
@@ -371,6 +377,8 @@ This event is triggered when the Select has received the focus.
 ### `lostFocus` [#lostfocus]
 
 This event is triggered when the Select has lost the focus.
+
+**Signature**: `lostFocus(): void`
 
 ## Exposed Methods [#exposed-methods]
 

@@ -222,6 +222,21 @@ export type ComponentPropertyMetadata = {
   isRequired?: boolean;
 };
 
+// This type defines the metadata of a component event. It is used to describe the
+// event handlers that the component exposes for interaction.
+export type ComponentEventMetadata = {
+  // This field defines the description explaining the property. You can use markdown,
+  // as the UI may display this value.
+  readonly description: string;
+
+  // This field defines the signature of the event handler method using TypeScript-like syntax.
+  readonly signature?: string;
+
+  // This field defines the parameters of the event handler. It is an object where each key
+  // is the parameter name, and the value is its description.
+  readonly parameters?: Record<string, string>;
+};
+
 // This type defines the metadata of a component API. It is used to describe the
 // methods that the component exposes for interaction.
 export type ComponentApiMetadata = {
@@ -251,7 +266,7 @@ export type ComponentPartMetadata = {
 // type.
 export type ComponentMetadata<
   TProps extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
-  TEvents extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
+  TEvents extends Record<string, ComponentEventMetadata> = Record<string, any>,
   TContextValues extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
   TApis extends Record<string, ComponentApiMetadata> = Record<string, any>,
 > = {

@@ -107,7 +107,13 @@ export const TimeInputMd = createMetadata({
     didChange: dDidChange(COMP),
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
-    invalidTime: d("Fired when the user enters an invalid time"),
+    invalidTime: {
+      description: "Fired when the user enters an invalid time",
+      signature: "invalidTime(value: string): void",
+      parameters: {
+        value: "The invalid time value that was entered.",
+      },
+    },
   },
   apis: {
     focus: {

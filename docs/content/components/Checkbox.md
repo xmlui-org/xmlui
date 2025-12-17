@@ -134,9 +134,17 @@ Available values:
 
 This event is triggered when the Checkbox is clicked.
 
+**Signature**: `click(event: MouseEvent): void`
+
+- `event`: The mouse event object.
+
 ### `didChange` [#didchange]
 
 This event is triggered when value of Checkbox has changed.
+
+**Signature**: `didChange(newValue: any): void`
+
+- `newValue`: The new value of the component.
 
 ```xmlui-pg copy display name="Example: didChange"
 <App verticalAlignment="center" var.changes="">
@@ -152,6 +160,8 @@ This event is triggered when value of Checkbox has changed.
 ### `gotFocus` [#gotfocus]
 
 This event is triggered when the Checkbox has received the focus.
+
+**Signature**: `gotFocus(): void`
 
 Click the `Checkbox` in the example demo to change the label text. Note how clicking elsewhere resets the text to the original.
 
@@ -169,6 +179,8 @@ Click the `Checkbox` in the example demo to change the label text. Note how clic
 ### `lostFocus` [#lostfocus]
 
 This event is triggered when the Checkbox has lost the focus.
+
+**Signature**: `lostFocus(): void`
 
 (See the example above)
 

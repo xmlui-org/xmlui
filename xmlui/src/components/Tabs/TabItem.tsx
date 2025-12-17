@@ -20,6 +20,8 @@ export const TabItemMd = createMetadata({
   events: {
     activated: {
       description: "This event is triggered when the tab is activated.",
+      signature: "activated(): void",
+      parameters: {},
     },
   },
   contextVars: {

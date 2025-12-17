@@ -31,6 +31,10 @@ The icon displayed when the theme is in light mode and will switch to dark. You 
 
 This event is triggered when the ToneChangerButton is clicked.
 
+**Signature**: `click(event: MouseEvent): void`
+
+- `event`: The mouse event object.
+
 ## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.

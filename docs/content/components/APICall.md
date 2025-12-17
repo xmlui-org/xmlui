@@ -114,13 +114,23 @@ Use this property to set the URL to which data will be sent. If not provided, an
 
 This event fires before the request is sent. Returning an explicit boolean`false` value will prevent the request from being sent.
 
+**Signature**: `() => boolean | void`
+
 ### `error` [#error]
 
 This event fires when a request results in an error.
 
+**Signature**: `(error: any) => void`
+
+- `error`: The error object containing details about what went wrong with the API request.
+
 ### `success` [#success]
 
 This event fires when a request results in a success.
+
+**Signature**: `(result: any) => void`
+
+- `result`: The response data returned from the successful API request.
 
 ## Exposed Methods [#exposed-methods]
 

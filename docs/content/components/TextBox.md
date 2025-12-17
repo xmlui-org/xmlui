@@ -186,6 +186,10 @@ Available values:
 
 This event is triggered when value of TextBox has changed.
 
+**Signature**: `didChange(newValue: any): void`
+
+- `newValue`: The new value of the component.
+
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
 ```xmlui-pg copy {3} display name="Example: didChange"
@@ -198,6 +202,8 @@ Write in the input field and see how the `Text` underneath it is updated in para
 ### `gotFocus` [#gotfocus]
 
 This event is triggered when the TextBox has received the focus.
+
+**Signature**: `gotFocus(): void`
 
 Clicking on the `TextBox` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to its original.
@@ -216,6 +222,8 @@ Note how clicking elsewhere resets the text to its original.
 ### `lostFocus` [#lostfocus]
 
 This event is triggered when the TextBox has lost the focus.
+
+**Signature**: `lostFocus(): void`
 
 ## Exposed Methods [#exposed-methods]
 

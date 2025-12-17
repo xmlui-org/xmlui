@@ -268,7 +268,7 @@ This value specifies a predefined regular expression to test the input value. If
 | Value   | Description                                                                                                                                                |
 | :------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `email` | Accepts the `[username]@[second level domain].[top level domain]` format                                                                                     |
-| `phone` | Accepts a wide range of characters: numbers, upper- and lowercase letters and the following symbols: `#`, `*`, `)`, `(`, `+`, `.`, `\`, `-`, `_`, `&`, `'` |
+| `phone` | Requires at least one digit and accepts: numbers, upper- and lowercase letters and the following symbols: `#`, `*`, `)`, `(`, `+`, `.`, `\`, `-`, `_`, `&`, `'` |
 | `url`   | Accepts URLs and URIs starting with either `http` or `https`                                                                                               |
 
 > **Note:** To define custom patterns and regular expressions, see the [regex section](#regex).
@@ -507,6 +507,10 @@ Available values:
 
 This event is used to define a custom validation function.
 
+**Signature**: `validate(value: any): string | null | undefined | void`
+
+- `value`: The current value of the FormItem to validate.
+
 In the demo below, leave the field as is and submit the form or enter an input that is not all capital letters.
 
 ```xmlui-pg copy {7} display name="Example: validate"
@@ -552,7 +556,7 @@ Removes the item specified by its index from the list held by the FormItem. The 
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-FormItemLabel-required | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-FormItemLabel | $fontWeight-medium | $fontWeight-medium |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-FormItemLabel-required | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-FormItemLabel | $textColor-primary | $textColor-primary |
+| [textColor](../styles-and-themes/common-units/#color)-FormItemLabel | $textColor | $textColor |
 | [textColor](../styles-and-themes/common-units/#color)-FormItemLabel-required | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-FormItemLabel-requiredMark | $color-danger-400 | $color-danger-400 |
 | [textTransform](../styles-and-themes/common-units/#textTransform)-FormItemLabel | none | none |

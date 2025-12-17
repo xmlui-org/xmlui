@@ -12,10 +12,15 @@ export const AppStateMd = createMetadata({
     "locally, AppState allows any component to access and update shared state " +
     "without prop drilling.",
   events: {
-    didUpdate: d(
-      "This event is fired when the AppState value is updated. The event provides " +
+    didUpdate: {
+      description:
+        "This event is fired when the AppState value is updated. The event provides " +
         "the new state value as its parameter.",
-    ),
+      signature: "(updateInfo: { bucket: string; value: any; previousValue: any }) => void",
+      parameters: {
+        updateInfo: "An object containing the bucket name, the new state value, and the previous value.",
+      },
+    },
   },
   props: {
     bucket: {

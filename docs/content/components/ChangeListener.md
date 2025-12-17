@@ -52,7 +52,12 @@ The following example works like the previous one (in the `listen` prop's descri
 
 ### `didChange` [#didchange]
 
-This event is triggered when value of ChangeListener has changed.
+This event is triggered when the value specified in the `listenTo` property changes.
+
+**Signature**: `(oldValue: any, newValue: any) => void`
+
+- `oldValue`: The previous value of the property being listened to.
+- `newValue`: The new value of the property being listened to.
 
 This event is fired when the component observes a value change (within the specified throttling interval). Define the event handler that responds to that change (as the previous samples demonstrate).
 

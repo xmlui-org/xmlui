@@ -163,6 +163,10 @@ Available values:
 
 This event is triggered when value of FileInput has changed.
 
+**Signature**: `didChange(newValue: any): void`
+
+- `newValue`: The new value of the component.
+
 Write in the input field and see how the `Text` underneath it is updated in accordingly.
 
 ```xmlui-pg copy {2} display name="Example: didChange"
@@ -175,6 +179,8 @@ Write in the input field and see how the `Text` underneath it is updated in acco
 ### `gotFocus` [#gotfocus]
 
 This event is triggered when the FileInput has received the focus.
+
+**Signature**: `gotFocus(): void`
 
 Clicking on the `FileInput` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
@@ -194,6 +200,8 @@ Note how clicking elsewhere resets the text to the original.
 
 This event is triggered when the FileInput has lost the focus.
 
+**Signature**: `lostFocus(): void`
+
 (See the example above)
 
 ## Exposed Methods [#exposed-methods]
@@ -206,10 +214,8 @@ This API command focuses the input field of the component.
 
 ```xmlui-pg copy /fileInputComponent.focus()/ display name="Example: focus"
 <App>
-  <HStack>
-    <Button label="Focus FileInput" onClick="fileInputComponent.focus()" />
-    <FileInput id="fileInputComponent" />
-  </HStack>
+  <Button label="Focus FileInput" onClick="fileInputComponent.focus()" />
+  <FileInput id="fileInputComponent" />
 </App>
 ```
 
@@ -221,10 +227,8 @@ This API command triggers the file browsing dialog to open.
 
 ```xmlui-pg copy /fileInputComponent.open()/ display name="Example: open"
 <App>
-  <HStack>
-    <Button label="Open FileInput" onClick="fileInputComponent.open()" />
-    <FileInput id="fileInputComponent" />
-  </HStack>
+  <Button label="Open FileInput" onClick="fileInputComponent.open()" />
+  <FileInput id="fileInputComponent" />
 </App>
 ```
 
@@ -249,10 +253,8 @@ and note how the `Text` component displays the selected file's name:
 
 ```xmlui-pg copy {3-4} display name="Example: value"
 <App>
-  <HStack>
-    <Text value="Selected file name: {fileInputComponent.value}" />
-    <FileInput id="fileInputComponent" />
-  </HStack>
+  <Text value="Selected file name: {fileInputComponent.value}" />
+  <FileInput id="fileInputComponent" />
 </App>
 ```
 

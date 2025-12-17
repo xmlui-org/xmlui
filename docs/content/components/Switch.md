@@ -79,9 +79,17 @@ Available values:
 
 This event is triggered when the Switch is clicked.
 
+**Signature**: `click(event: MouseEvent): void`
+
+- `event`: The mouse event object.
+
 ### `didChange` [#didchange]
 
 This event is triggered when value of Switch has changed.
+
+**Signature**: `didChange(newValue: any): void`
+
+- `newValue`: The new value of the component.
 
 This event is triggered when the `Switch` is toggled due to user interaction.
 A read-only switch never fires this event, and it won't fire if the switch's value is set programmatically.
@@ -97,6 +105,8 @@ A read-only switch never fires this event, and it won't fire if the switch's val
 ### `gotFocus` [#gotfocus]
 
 This event is triggered when the Switch has received the focus.
+
+**Signature**: `gotFocus(): void`
 
 This event is triggered when the `Switch` receives focus.
 
@@ -116,6 +126,8 @@ Click the `Switch` in the example demo to change the label text. Note how clicki
 ### `lostFocus` [#lostfocus]
 
 This event is triggered when the Switch has lost the focus.
+
+**Signature**: `lostFocus(): void`
 
 ## Exposed Methods [#exposed-methods]
 

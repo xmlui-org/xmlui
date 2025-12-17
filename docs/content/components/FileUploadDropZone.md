@@ -66,6 +66,10 @@ With this property, you can change the default text to display when files are dr
 
 This component accepts files for upload but does not perform the actual operation. It fires the `upload` event and passes the list files to upload in the method's argument. You can use the passed file information to implement the upload (according to the protocol your backend supports).
 
+**Signature**: `upload(files: File[]): void`
+
+- `files`: An array of File objects to be uploaded.
+
 Each item passed in the event argument is an instance of [File](https://developer.mozilla.org/en-US/docs/Web/API/File).
 
 ## Exposed Methods [#exposed-methods]

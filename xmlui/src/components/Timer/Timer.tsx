@@ -34,7 +34,9 @@ export const TimerMd = createMetadata({
   },
   events: {
     tick: {
-      description: "This event is triggered at each interval when the ${COMP} is enabled.",
+      description: `This event is triggered at each interval when the ${COMP} is enabled.`,
+      signature: "tick(): void",
+      parameters: {},
     },
   },
   apis: {
