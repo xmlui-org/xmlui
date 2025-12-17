@@ -159,6 +159,8 @@ This creates the core React component with:
 
 ## Step 4: Create basic styles
 
+Create `src/HelloWorld.module.scss` with the basic styles.
+
 ```xmlui copy
 .container {
   background-color: #f5f5f5;
@@ -270,14 +272,12 @@ This pattern enables XMLUI to:
 Create `src/index.tsx` which exports your component as an extension.
 
 ```xmlui copy
-cat > src/index.tsx << 'EOF'
 import { helloWorldComponentRenderer } from "./HelloWorld";
 
 export default {
   namespace: "XMLUIExtensions",
   components: [helloWorldComponentRenderer],
 };
-EOF
 ```
 
 This creates the main entry point that exports your HelloWorld component under the XMLUIExtensions namespace.
@@ -302,6 +302,7 @@ packages/xmlui-hello-world
   HelloWorld.module.scss
  dist
   xmlui-hello-world.js
+  xmlui-hello-world.mjs
  " />
 ```
 
@@ -320,13 +321,6 @@ Since we've integrated it into the docs site, you can see it live right here.
     </Card>
 
   </VStack>
-
-  <script>
-    // Event handlers for the HelloWorld component
-    window.addEventListener('helloWorldClick', (event) => {
-      console.log('HelloWorld clicked!', event.detail);
-    });
-  </script>
 </App>
 ```
 
@@ -346,7 +340,7 @@ Now, copy your built component into the `xmlui` subdirectory:
 cp ../dist/xmlui-hello-world.js xmlui/xmlui-hello-world.js
 ```
 
-Create the `Main.xmlui` file with your component's markup:
+Create the `test-app/Main.xmlui` file with your component's markup:
 
 ```xmlui copy
 <App>
@@ -354,17 +348,10 @@ Create the `Main.xmlui` file with your component's markup:
     <Heading>HelloWorld Component Test</Heading>
     <HelloWorld message="Hello from standalone app!" />
   </VStack>
-
-  <script>
-    // Event handlers for the HelloWorld component
-    window.addEventListener('helloWorldClick', (event) => {
-      console.log('HelloWorld clicked!', event.detail);
-    });
-  </script>
 </App>
 ```
 
-Finally, create a simple `index.html` file to load the XMLUI engine from CDN and your component:
+Finally, create a simple `test-app/index.html` file to load the XMLUI engine from CDN and your component:
 
 ```xmlui copy
 <!DOCTYPE html>
@@ -392,7 +379,7 @@ python -m http.server # visit 8000
 With Node.js:
 
 ```xmlui copy
-npx server # visit 3000
+npx -y http-server -p 3000 -c-1 -o
 ```
 
 ## Step 9: Add theming support
@@ -410,7 +397,7 @@ XMLUI provides a sophisticated theming system that:
 
 **Adding theme variables**
 
-Let's update our SCSS to use XMLUI's theme system:
+Let's update our SCSS (`src/HelloWorld.module.scss`) to use XMLUI's theme system:
 
 ```xmlui copy
 @use "xmlui/themes.scss" as t;
@@ -585,13 +572,13 @@ const HelloWorldMd = createMetadata({
     },
   },
   events: {
-    onClick: {
+    click: {
       description:
         "Triggered when the click button is pressed. " + 
         "Receives the current click count.",
       type: "function",
     },
-    onReset: {
+    reset: {
       description:
         "Triggered when the reset button is pressed. " + 
         "Called when count is reset to 0.",
@@ -627,16 +614,16 @@ export const helloWorldComponentRenderer = createComponentRenderer(
 );
 ```
 
-**New props**
+**Metadata changes:**
 
-- `onClick?: (event: React.MouseEvent) => void` - Called when the click button is pressed
-- `onReset?: (event: React.MouseEvent) => void` - Called when the reset button is pressed
+- Added `events` section defining `click` and `reset` events
+- Each event includes description and type information for documentation
 
-**Event handler changes:**
+**Renderer changes:**
 
-- `handleClick` now calls `onClick?.(event)` after updating internal state
-- `handleReset` now calls `onReset?.(event)` after resetting the counter
-- Both pass the DOM event object (not custom data) to match XMLUI's event system
+- Added `lookupEventHandler` to the renderer context
+- `lookupEventHandler("click")` and `lookupEventHandler("reset")` convert XMLUI event bindings to function references
+- These function references are passed to the native React component
 
 **Update the native component**
 
@@ -709,21 +696,22 @@ export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
 );
 ```
 
-**Metadata changes:**
+**New props**
 
-- Added `events` section defining `onClick` and `onReset` event handlers
-- Each event includes description and type information for documentation
+- `onClick?: (event: React.MouseEvent) => void` - Called when the click button is pressed
+- `onReset?: (event: React.MouseEvent) => void` - Called when the reset button is pressed
 
-**Renderer changes:**
+**Event handler changes:**
 
-- Added `lookupEventHandler` to the renderer context
-- `lookupEventHandler("onClick")` and `lookupEventHandler("onReset")` convert XMLUI event bindings to function references
-- These function references are passed to the native React component
+- `handleClick` now calls `onClick?.(event)` after updating internal state
+- `handleReset` now calls `onReset?.(event)` after resetting the counter
+- Both pass the DOM event object (not custom data) to match XMLUI's event system
+
 
 **The event flow:**
 
 1. XMLUI markup: `<HelloWorld onClick="handleHelloClick" />`
-2. Renderer: `lookupEventHandler("onClick")` finds the `handleHelloClick` function
+2. Renderer: `lookupEventHandler("click")` finds the `handleHelloClick` function
 3. Native component: Receives the function as `onClick` prop
 4. User interaction: Triggers the function with the DOM event
 
@@ -760,10 +748,10 @@ Now you can use the component with event handling.
 ```xmlui-pg
 ---app display copy
 <App>
-    <HelloWorld
-          onClick="handleHelloClick"
-          onReset="handleHelloReset"
-        />
+  <HelloWorld
+    onClick="handleHelloClick"
+    onReset="handleHelloReset"
+  />
 </App>
 ```
 
@@ -871,10 +859,9 @@ export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
 
 This enables XMLUI markup to directly call `demo.setValue(5)` and read `demo.value`.
 
-Update `src/HelloWorldNative.tsx`.
+Update `src/HelloWorld.tsx`.
 
 ```xmlui copy
-cat > src/HelloWorld.tsx << 'EOF'
 import styles from "./HelloWorld.module.scss";
 import { createComponentRenderer, parseScssVar, createMetadata } from "xmlui";
 import { HelloWorld, defaultProps } from "./HelloWorldNative";
@@ -892,13 +879,13 @@ const HelloWorldMd = createMetadata({
     },
   },
   events: {
-    onClick: {
+    click: {
       description:
         "Triggered when the click button is pressed. " + 
         "Receives the current click count.",
       type: "function",
     },
-    onReset: {
+    reset: {
       description:
         "Triggered when the reset button is pressed. " + 
         "Called when count is reset to 0.",
@@ -935,15 +922,14 @@ export const helloWorldComponentRenderer = createComponentRenderer(
       <HelloWorld
         id={extractValue.asOptionalString(node.props?.id)}
         message={extractValue.asOptionalString(node.props?.message)}
-        onClick={lookupEventHandler("onClick")}
-        onReset={lookupEventHandler("onReset")}
+        onClick={lookupEventHandler("click")}
+        onReset={lookupEventHandler("reset")}
         className={className}
         registerComponentApi={registerComponentApi}
       />
     );
   },
 );
-EOF
 ```
 
 **Metadata**

@@ -120,6 +120,10 @@ export const MarkdownMd = createMetadata({
     "marginRight-Ul-markdown": "$space-0",
     "marginTop-Ul-markdown": "$space-2_5",
     "marginBottom-Ul-markdown": "$space-5",
+    "marginLeft-Ol-markdown": "$space-8",
+    "marginRight-Ol-markdown": "$space-0",
+    "marginTop-Ol-markdown": "$space-2_5",
+    "marginBottom-Ol-markdown": "$space-5",
     "marginTop-Li-markdown": "$space-2_5",
     "marginBottom-Li-markdown": "$space-2_5",
 
