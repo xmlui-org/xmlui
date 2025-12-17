@@ -147,6 +147,8 @@ $themeVars: t.composeBorderVars($themeVars, "Ol-markdown");
 $themeVars: t.composePaddingVars($themeVars, "Ol-markdown");
 $marginTop-Ol-markdown: createThemeVar("marginTop-Ol-markdown");
 $marginBottom-Ol-markdown: createThemeVar("marginBottom-Ol-markdown");
+$marginLeft-Ol-markdown: createThemeVar("marginLeft-Ol-markdown");
+$marginRight-Ol-markdown: createThemeVar("marginRight-Ol-markdown");
 
 $themeVars: t.composeBorderVars($themeVars, "Ul-markdown");
 $themeVars: t.composePaddingVars($themeVars, "Ul-markdown");
@@ -516,6 +518,8 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
     .htmlOl {
       margin-top: $marginTop-Ol-markdown;
       margin-bottom: $marginBottom-Ol-markdown;
+      margin-left: $marginLeft-Ol-markdown;
+      margin-right: $marginRight-Ol-markdown;
       @include t.borderVars($themeVars, "Ol-markdown");
       @include t.paddingVars($themeVars, "Ol-markdown");
     }
