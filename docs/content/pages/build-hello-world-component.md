@@ -587,12 +587,14 @@ const HelloWorldMd = createMetadata({
   events: {
     onClick: {
       description:
-        "Triggered when the click button is pressed. " + "Receives the current click count.",
+        "Triggered when the click button is pressed. " + 
+        "Receives the current click count.",
       type: "function",
     },
     onReset: {
       description:
-        "Triggered when the reset button is pressed. " + "Called when count is reset to 0.",
+        "Triggered when the reset button is pressed. " + 
+        "Called when count is reset to 0.",
       type: "function",
     },
   },
@@ -616,8 +618,8 @@ export const helloWorldComponentRenderer = createComponentRenderer(
       <HelloWorld
         id={extractValue.asOptionalString(node.props?.id)}
         message={extractValue.asOptionalString(node.props?.message)}
-        onClick={lookupEventHandler("onClick")}
-        onReset={lookupEventHandler("onReset")}
+        onClick={lookupEventHandler("click")}
+        onReset={lookupEventHandler("reset")}
         className={className}
       />
     );
@@ -892,12 +894,14 @@ const HelloWorldMd = createMetadata({
   events: {
     onClick: {
       description:
-        "Triggered when the click button is pressed. " + "Receives the current click count.",
+        "Triggered when the click button is pressed. " + 
+        "Receives the current click count.",
       type: "function",
     },
     onReset: {
       description:
-        "Triggered when the reset button is pressed. " + "Called when count is reset to 0.",
+        "Triggered when the reset button is pressed. " + 
+        "Called when count is reset to 0.",
       type: "function",
     },
   },
