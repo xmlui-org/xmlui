@@ -119,6 +119,10 @@ This optional booelan property indicates whether the `Splitter` sections are lay
 
 This event fires when the component is resized.
 
+**Signature**: `resize(primarySize: number): void`
+
+- `primarySize`: The new size of the primary panel in pixels.
+
 ```xmlui-pg copy {2} display name="Example: resize"
 <App height="200px" var.counter="{0}">
   <Splitter onResize="counter++">

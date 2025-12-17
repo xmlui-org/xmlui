@@ -19,7 +19,7 @@ import { spaceFillerComponentRenderer } from "./SpaceFiller/SpaceFiller";
 import { textAreaComponentRenderer } from "./TextArea/TextArea";
 import { navLinkComponentRenderer } from "./NavLink/NavLink";
 import { localLinkComponentRenderer } from "./Link/Link";
-import { treeComponentRenderer } from "./Tree/TreeComponent";
+import { treeComponentRenderer } from "./Tree/Tree";
 import { treeDisplayComponentRenderer } from "./TreeDisplay/TreeDisplay";
 import { buttonComponentRenderer } from "./Button/Button";
 import {

@@ -66,7 +66,7 @@ import { TextAreaMd } from "./TextArea/TextArea";
 import { AccordionMd } from "./Accordion/Accordion";
 import { TabItemMd } from "./Tabs/TabItem";
 import { FragmentMd } from "./Fragment/Fragment";
-import { TreeMd } from "./Tree/TreeComponent";
+import { TreeMd } from "./Tree/Tree";
 import { APICallMd } from "./APICall/APICall";
 import { DataSourceMd } from "./DataSource/DataSource";
 import { FormSectionMd } from "./FormSection/FormSection";

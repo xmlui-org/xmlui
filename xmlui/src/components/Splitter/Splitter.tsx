@@ -83,7 +83,13 @@ const baseSplitterMd = createMetadata({
     },
   },
   events: {
-    resize: d(`This event fires when the component is resized.`),
+    resize: {
+      description: `This event fires when the component is resized.`,
+      signature: "resize(primarySize: number): void",
+      parameters: {
+        primarySize: "The new size of the primary panel in pixels.",
+      },
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

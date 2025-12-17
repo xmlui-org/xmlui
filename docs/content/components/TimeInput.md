@@ -204,6 +204,10 @@ Fired when the time picker receives focus.
 
 Fired when the user enters an invalid time
 
+**Signature**: `invalidTime(value: string): void`
+
+- `value`: The invalid time value that was entered.
+
 Fired when the user enters an invalid time value.
 
 ```xmlui-pg copy {2} display name="Example: invalidTime"

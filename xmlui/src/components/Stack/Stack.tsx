@@ -75,7 +75,12 @@ const stackMd = createMetadata({
   },
   events: {
     click: dClick(COMP),
-    mounted: dInternal("Reserved for future use"),
+    mounted: {
+      description: "Reserved for future use",
+      signature: "mounted(): void",
+      parameters: {},
+      isInternal: true,
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
 });

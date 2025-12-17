@@ -240,20 +240,37 @@ export const TableMd = createMetadata({
     },
   },
   events: {
-    sortingDidChange: d(
-      `This event is fired when the table data sorting has changed. It has two arguments: ` +
+    sortingDidChange: {
+      description:
+        `This event is fired when the table data sorting has changed. It has two arguments: ` +
         `the column's name and the sort direction. When the column name is empty, the table ` +
         `displays the data list as it received it.`,
-    ),
-    willSort: d(
-      `This event is fired before the table data is sorted. It has two arguments: the ` +
+      signature: "sortingDidChange(columnName: string, sortDirection: 'asc' | 'desc' | null): void",
+      parameters: {
+        columnName: "The name of the column being sorted.",
+        sortDirection: "The sort direction: 'asc' for ascending, 'desc' for descending, or null for unsorted.",
+      },
+    },
+    willSort: {
+      description:
+        `This event is fired before the table data is sorted. It has two arguments: the ` +
         `column's name and the sort direction. When the method returns a literal \`false\` ` +
         `value (and not any other falsy one), the method indicates that the sorting should be aborted.`,
-    ),
-    selectionDidChange: d(
-      `This event is triggered when the table's current selection (the rows selected) changes. ` +
+      signature: "willSort(columnName: string, sortDirection: 'asc' | 'desc'): boolean | void",
+      parameters: {
+        columnName: "The name of the column about to be sorted.",
+        sortDirection: "The intended sort direction: 'asc' for ascending or 'desc' for descending.",
+      },
+    },
+    selectionDidChange: {
+      description:
+        `This event is triggered when the table's current selection (the rows selected) changes. ` +
         `Its parameter is an array of the selected table row items. `,
-    ),
+      signature: "selectionDidChange(selectedItems: any[]): void",
+      parameters: {
+        selectedItems: "An array of the selected table row items.",
+      },
+    },
   },
   apis: {
     clearSelection: {

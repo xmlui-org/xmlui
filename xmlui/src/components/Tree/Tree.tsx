@@ -122,19 +122,31 @@ export const TreeMd = createMetadata({
   events: {
     selectionDidChange: {
       description: `Fired when the tree selection changes.`,
-      signature: `(event: TreeSelectionEvent) => void`,
+      signature: "selectionDidChange(event: { selectedNode: FlatTreeNode | null, previousNode: FlatTreeNode | null }): void",
+      parameters: {
+        event: "An object containing selectedNode (the newly selected node) and previousNode (the previously selected node).",
+      },
     },
     nodeDidExpand: {
       description: `Fired when a tree node is expanded.`,
-      signature: `(node: FlatTreeNode) => void`,
+      signature: "nodeDidExpand(node: FlatTreeNode): void",
+      parameters: {
+        node: "The tree node that was expanded.",
+      },
     },
     nodeDidCollapse: {
       description: `Fired when a tree node is collapsed.`,
-      signature: `(node: FlatTreeNode) => void`,
+      signature: "nodeDidCollapse(node: FlatTreeNode): void",
+      parameters: {
+        node: "The tree node that was collapsed.",
+      },
     },
     loadChildren: {
       description: `Fired when a tree node needs to load children dynamically. Should return an array of child data.`,
-      signature: `(node: FlatTreeNode) => any[]`,
+      signature: "loadChildren(node: FlatTreeNode): any[]",
+      parameters: {
+        node: "The tree node that needs to load its children.",
+      },
     },
   },
   apis: {
