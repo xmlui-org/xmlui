@@ -177,6 +177,25 @@ var b = 2;
     expect((collected.vars.b.tree as Expression).type).equal(T_ARROW_EXPRESSION);
   });
 
+  it("Script collect - Multiple var and statement", () => {
+    // --- Act
+    const cd = transformSource(`
+      <Stack>
+        <script>
+          var a = 3, b = () => Math.floor(c/d);
+          console.log(a, b);
+        </script>
+      </Stack>
+    `) as ComponentDef;
+
+    // --- Assert
+    const collected = cd.scriptCollected!;
+    expect(collected.hasInvalidStatements).equal(true);
+    expect(Object.keys(collected.vars).length).equal(2);
+    expect((collected.vars.a.tree as Expression).type).equal(T_LITERAL);
+    expect((collected.vars.b.tree as Expression).type).equal(T_ARROW_EXPRESSION);
+  });
+
   it("Script collect - Duplicated var fails", () => {
     // --- Act
     const cd = transformSource(`

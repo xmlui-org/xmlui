@@ -526,6 +526,7 @@ export type CollectedDeclarations = {
   vars: Record<string, CodeDeclaration>;
   functions: Record<string, CodeDeclaration>;
   moduleErrors?: ModuleErrors;
+  hasInvalidStatements?: boolean;
 };
 
 export type CodeDeclaration = {
