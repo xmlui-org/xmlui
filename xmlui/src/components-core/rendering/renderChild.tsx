@@ -47,8 +47,13 @@ export function renderChild({
   cleanup,
   uidInfoRef,
 }: ChildRendererContext): ReactNode {
-  // --- Render only visible components
-  if (!shouldKeep(node.when, state, appContext)) {
+  // --- Special handling for init event: if component has init event and when=false,
+  // --- we still need to let it render once to trigger init, which may change the when condition
+  const hasInitEvent = node.events?.init;
+  const shouldCheckWhen = !hasInitEvent || node.type === "TextNode" || node.type === "TextNodeCData";
+  
+  // --- Render only visible components (skip when check if component has init event)
+  if (shouldCheckWhen && !shouldKeep(node.when, state, appContext)) {
     return null;
   }
 
