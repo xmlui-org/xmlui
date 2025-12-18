@@ -239,7 +239,7 @@
       "patterns": [{ "include": "#attribute" }, { "include": "#comments" }]
     },
     "componentTag": {
-      "begin": "(\\s*</?)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)([a-zA-Z][\\w\\.\\-]*)",
+      "begin": "(\\s*</?\\s*)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)([a-zA-Z][\\w\\.\\-]*)",
       "beginCaptures": {
         "1": { "name": "punctuation.definition.tag.xmlui" },
         "2": { "name": "keyword.operator.namespace.xmlui" },
