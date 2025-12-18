@@ -263,7 +263,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
 ) {
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const [open, setOpen] = useState(false);
-  const [width, setWidth] = useState(0);
+  const [panelWidth, setPanelWidth] = useState(0);
   const observer = useRef<ResizeObserver>();
   const { root } = useTheme();
   const [options, setOptions] = useState([]);
@@ -367,7 +367,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     currentObserver?.disconnect();
 
     if (current) {
-      const newObserver = new ResizeObserver(() => setWidth(current.clientWidth));
+      const newObserver = new ResizeObserver(() => setPanelWidth(current.clientWidth));
       observer.current = newObserver;
       newObserver.observe(current);
 
@@ -621,7 +621,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
             autoFocus={autoFocus}
             placeholder={placeholder}
             height={dropdownHeight}
-            width={width}
+            panelWidth={panelWidth}
             readOnly={readOnly}
             emptyListNode={emptyListNode}
             modal={modal}
@@ -714,7 +714,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
               </Part>
               <Portal container={root}>
                 <PopoverContent
-                  style={{ minWidth: width, height: dropdownHeight }}
+                  style={{ minWidth: panelWidth, height: dropdownHeight }}
                   className={classnames(styles.selectContent, styles[validationStatus])}
                   onKeyDown={handleKeyDown}
                 >

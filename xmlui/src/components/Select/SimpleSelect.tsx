@@ -36,7 +36,7 @@ interface SimpleSelectProps {
   autoFocus: boolean;
   placeholder: string;
   height: CSSProperties["height"];
-  width: number;
+  panelWidth: number;
   readOnly: boolean;
   emptyListNode: ReactNode;
   modal?: boolean;
@@ -65,7 +65,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       id,
       triggerRef,
       onFocus,
-      width,
+      panelWidth,
       readOnly,
       emptyListNode,
       className,
@@ -196,7 +196,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
             className={styles.selectDropdownContent}
             position="popper"
             align="start"
-            style={{ maxHeight: height, width: width }}
+            style={{ maxHeight: height, minWidth: panelWidth }}
           >
             <ScrollUpButton className={styles.selectScrollUpButton}>
               <Icon name="chevronup" />
