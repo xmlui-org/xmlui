@@ -222,7 +222,13 @@ function VariantWrapper({
       continue;
     }
 
-    const { property, states } = parsed;
+    const { property, component, states } = parsed;
+
+    // Only process themeVars that match the current component type
+    // This prevents e.g., "color-anchor-Heading" from overwriting "textColor-H1" when rendering H1
+    if (component && component !== componentType) {
+      continue;
+    }
 
     // Convert camelCase property to CSS property name
     const cssProperty = toCssPropertyName(property);

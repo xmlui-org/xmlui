@@ -169,7 +169,9 @@ export function useCompiledTheme(
         result &&
         result.forValue &&
         result.matchedValue &&
-        result.forValue !== result.matchedValue
+        result.forValue !== result.matchedValue &&
+        // Only add fallback if the user hasn't explicitly defined the specific theme var
+        mergedThemeVars[result.forValue] === undefined
       ) {
         resolvedThemeVarsFromChains[result.forValue] = `$${result.matchedValue}`;
       }
