@@ -15,6 +15,7 @@ import { noop } from "lodash-es";
 import classnames from "classnames";
 
 import styles from "./App.module.scss";
+import { useScrollRestoration } from "../Pages/ScrollRestorationContext";
 
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { RenderChildFn, RegisterComponentApiFn } from "../../abstractions/RendererDefs";
@@ -290,13 +291,63 @@ export function App({
     safeLayout
   );
 
+  // Scroll restoration state
+  const { restoreScrollOnBack } = useScrollRestoration();
+  const scrollPositions = useRef<Map<string, number>>(new Map());
+  const isBackNavigation = useRef(false);
+  const previousPathname = useRef(location.pathname);
+
+  // Track navigation direction via popstate events
+  useEffect(() => {
+    if (!restoreScrollOnBack) return;
+
+    const handlePopState = () => {
+      isBackNavigation.current = true;
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [restoreScrollOnBack]);
+
+  // Save scroll position before pathname changes
+  useEffect(() => {
+    if (!restoreScrollOnBack) return;
+
+    // Save current scroll position before navigating away
+    return () => {
+      if (scrollContainerRef.current) {
+        scrollPositions.current.set(
+          previousPathname.current,
+          scrollContainerRef.current.scrollTop
+        );
+      }
+    };
+  }, [location.pathname, restoreScrollOnBack]);
+
   useIsomorphicLayoutEffect(() => {
-    scrollContainerRef.current?.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: "instant", // Optional if you want to skip the scrolling animation
-    });
-  }, [location.pathname]);
+    if (restoreScrollOnBack && isBackNavigation.current) {
+      // Restore scroll position for back navigation
+      const savedPosition = scrollPositions.current.get(location.pathname);
+      if (savedPosition !== undefined && scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTo({
+          top: savedPosition,
+          left: 0,
+          behavior: "instant",
+        });
+      }
+      isBackNavigation.current = false;
+    } else {
+      // Regular navigation: scroll to top
+      scrollContainerRef.current?.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "instant",
+      });
+    }
+    previousPathname.current = location.pathname;
+  }, [location.pathname, restoreScrollOnBack]);
 
   useEffect(() => {
     const frameId = requestAnimationFrame(() => {

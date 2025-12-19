@@ -55,6 +55,39 @@ The fallback path when the current URL does not match any of the paths of the pa
 </App>
 ```
 
+### `restoreScrollOnBack` (default: false) [#restorescrollonback-default-false]
+
+When set to `true`, navigating back via the browser back button will restore the previous scroll position of the page. This provides a better user experience when browsing through pages with long content.
+
+```xmlui-pg copy display name="Example: restoreScrollOnBack" height="300px"
+<App>
+  <NavPanel>
+    <NavLink label="Home" to="/" icon="home"/>
+    <NavLink label="Long Page" to="/long" icon="file"/>
+  </NavPanel>
+  <Pages restoreScrollOnBack="true">
+    <Page url="/">
+      <Text>Navigate to the long page, scroll down, then use the browser back button.</Text>
+    </Page>
+    <Page url="/long">
+      <VStack>
+        <Text>Scroll down and then use browser back button...</Text>
+        <Text>...</Text>
+        <Text>...</Text>
+        <Text>...</Text>
+        <Text>...</Text>
+        <Text>...</Text>
+        <Text>...</Text>
+        <Text>...</Text>
+        <Text>...</Text>
+        <Text>...</Text>
+        <Text>Bottom of page</Text>
+      </VStack>
+    </Page>
+  </Pages>
+</App>
+```
+
 ## Events [#events]
 
 This component does not have any events.

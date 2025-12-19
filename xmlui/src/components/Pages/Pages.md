@@ -52,3 +52,38 @@ No page is fetched from the server, thus the application operates as a [Single P
 ```
 
 %-PROP-END
+
+%-PROP-START restoreScrollOnBack
+
+When enabled, navigating back via the browser's back button will restore the scroll position to where the user was before navigating away. This provides a better user experience when browsing through pages with long content.
+
+```xmlui-pg copy display name="Example: restoreScrollOnBack" height="300px"
+<App>
+  <NavPanel>
+    <NavLink label="Home" to="/" icon="home"/>
+    <NavLink label="Long Page" to="/long" icon="file"/>
+  </NavPanel>
+  <Pages restoreScrollOnBack="true">
+    <Page url="/">
+      <Text>Navigate to the long page, scroll down, then use the browser back button.</Text>
+    </Page>
+    <Page url="/long">
+      <VStack>
+        <Text>Scroll down and then use browser back button...</Text>
+        <Text>...</Text>
+        <Text>...</Text>
+        <Text>...</Text>
+        <Text>...</Text>
+        <Text>...</Text>
+        <Text>...</Text>
+        <Text>...</Text>
+        <Text>...</Text>
+        <Text>...</Text>
+        <Text>Bottom of page</Text>
+      </VStack>
+    </Page>
+  </Pages>
+</App>
+```
+
+%-PROP-END

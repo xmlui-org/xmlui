@@ -8,10 +8,12 @@ import type { LayoutContext, RenderChildFn, ValueExtractor } from "../../abstrac
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
 import type { PageMd } from "./Pages";
 import styles from "./Pages.module.scss";
+import { ScrollRestorationContext } from "./ScrollRestorationContext";
 
 // Default props for Pages component
 export const defaultProps = {
   fallbackPath: "/",
+  restoreScrollOnBack: false,
 };
 
 // --- We need this component to make sure all the child routes are wrapped in a
@@ -70,6 +72,7 @@ type PageComponentDef = ComponentDef<typeof PageMd>;
 
 type PagesProps = {
   fallbackPath?: string;
+  restoreScrollOnBack?: boolean;
   node?: ComponentDef;
   renderChild: RenderChildFn;
   extractValue: ValueExtractor;
@@ -82,6 +85,7 @@ export function Pages({
   renderChild,
   extractValue,
   fallbackPath = defaultProps.fallbackPath,
+  restoreScrollOnBack = defaultProps.restoreScrollOnBack,
 }: PagesProps) {
   const routes: Array<PageComponentDef> = [];
   const restChildren: Array<ComponentDef> = [];
@@ -92,8 +96,14 @@ export function Pages({
       restChildren.push(child);
     }
   });
+
+  const scrollRestorationValue = useMemo(
+    () => ({ restoreScrollOnBack }),
+    [restoreScrollOnBack]
+  );
+
   return (
-    <>
+    <ScrollRestorationContext.Provider value={scrollRestorationValue}>
       <Routes>
         {routes.map((child, i) => {
           return (
@@ -103,6 +113,6 @@ export function Pages({
         {fallbackPath && <Route path="*" element={<Navigate to={fallbackPath} replace  />} />}
       </Routes>
       {renderChild(restChildren)}
-    </>
+    </ScrollRestorationContext.Provider>
   );
 }
