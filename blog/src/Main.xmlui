@@ -60,7 +60,7 @@
                     to="https://blog.xmlui.org"
                     active
                 />
-                <NavLink to="https://www.xmlui.org/get-started" noIndicator label="Download"/>
+                <NavLink to="https://www.xmlui.org/get-started" noIndicator label="Start"/>
             </HStack>
         </Theme>
         <property name="profileMenuTemplate">

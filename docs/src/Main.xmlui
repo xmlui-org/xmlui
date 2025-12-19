@@ -17,7 +17,7 @@
             />
             <NavLink noIndicator label="Docs" to="/" active />
             <NavLink noIndicator label="Blog" to="https://blog.xmlui.org" />
-            <NavLink to="https://www.xmlui.org/get-started" noIndicator label="Download"/>
+            <NavLink to="https://www.xmlui.org/get-started" noIndicator label="Start"/>
         </HStack>
         <SpaceFiller />
         <Search
