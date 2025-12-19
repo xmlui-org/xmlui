@@ -2,6 +2,14 @@
     layout="vertical-full-header"
     var.posts=`{[
         {
+        title: "Introducing the XMLUI CLI",
+        slug: "introducing-the-xmlui-cli",
+        description: "Your all-in-one tool for working with XMLUI.",
+        author: "Jon Udell",
+        date: "2025-12-19",
+        image: "cli-blog-header.svg"
+        },
+        {
         title: "An XMLUI-powered blog",
         slug: "xmlui-powered-blog",
         description: "How we made this blog with a few dozen lines of XMLUI.",
@@ -97,22 +105,6 @@
         <NavLink to="https://www.xmlui.org/get-started" noIndicator label="Download"/>
     </NavPanel>
 
-    <!--
-        <NavPanel>
-           <NavGroup label="Recent posts" to="/blog" initiallyExpanded>
-                <NavLink
-                    label="An XMLUI-powered blog"
-                    to="/blog/{posts[0].slug}" />
-                <NavLink
-                    label="Reproducible XMLUI"
-                    to="/blog/{posts[1].slug}" />
-                <NavLink
-                    label="Introducing XMLUI"
-                    to="/blog/{posts[2].slug}" />
-
-            </NavGroup>
-        </NavPanel>
-        -->
     <Pages fallbackPath="/404">
         <Page url="/">
             <BlogOverview posts="{posts}" />
@@ -129,6 +121,10 @@
         <Page url="/blog/{posts[2].slug}">
             <BlogPage post="{posts[2]}" />
         </Page>
+        <Page url="/blog/{posts[3].slug}">
+            <BlogPage post="{posts[3]}" />
+        </Page>
+
     </Pages>
     <Footer sticky="false">
         <Text fontWeight="400">
