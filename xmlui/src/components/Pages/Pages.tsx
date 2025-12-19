@@ -61,6 +61,11 @@ export const PagesMd = createMetadata({
       description: `The fallback path when the current URL does not match any of the paths of the pages.`,
       defaultValue: defaultProps.fallbackPath,
     },
+    defaultScrollRestoration: {
+      description: "When set to true, the page scroll position is restored when navigating back via browser history.",
+      type: "boolean",
+      defaultValue: false,
+    },
   },
     themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -77,6 +82,7 @@ export const pagesRenderer = createComponentRenderer(
     return (
       <Pages
         fallbackPath={extractValue(node.props.fallbackPath)}
+        defaultScrollRestoration={extractValue(node.props.defaultScrollRestoration)}
         node={node}
         renderChild={renderChild}
         extractValue={extractValue}

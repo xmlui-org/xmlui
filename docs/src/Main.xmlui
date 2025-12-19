@@ -419,7 +419,7 @@
         <NavLink label="VSCode extension" to="/vscode" />
         <NavLink label="Change Log" to="/change-log" />
     </NavPanel>
-    <Pages fallbackPath="/404">
+    <Pages fallbackPath="/404" defaultScrollRestoration="true">
         <Page url="/">
             <DocumentPageNoTOC content="{appGlobals.content['pages/intro.md']}" />
         </Page>

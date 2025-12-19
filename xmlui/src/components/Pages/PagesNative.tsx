@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { Navigate, Route, Routes, useParams } from "@remix-run/react";
 import classnames from "classnames";
 
@@ -8,6 +8,7 @@ import type { LayoutContext, RenderChildFn, ValueExtractor } from "../../abstrac
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
 import type { PageMd } from "./Pages";
 import styles from "./Pages.module.scss";
+import { useAppLayoutContext } from "../App/AppLayoutContext";
 
 // Default props for Pages component
 export const defaultProps = {
@@ -70,6 +71,7 @@ type PageComponentDef = ComponentDef<typeof PageMd>;
 
 type PagesProps = {
   fallbackPath?: string;
+  defaultScrollRestoration?: boolean;
   node?: ComponentDef;
   renderChild: RenderChildFn;
   extractValue: ValueExtractor;
@@ -82,7 +84,14 @@ export function Pages({
   renderChild,
   extractValue,
   fallbackPath = defaultProps.fallbackPath,
+  defaultScrollRestoration,
 }: PagesProps) {
+  const context = useAppLayoutContext();
+
+  useEffect(() => {
+    context?.setScrollRestorationEnabled?.(!!defaultScrollRestoration);
+  }, [defaultScrollRestoration, context]);
+
   const routes: Array<PageComponentDef> = [];
   const restChildren: Array<ComponentDef> = [];
   node.children?.forEach((child) => {

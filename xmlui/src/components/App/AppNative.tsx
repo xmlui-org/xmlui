@@ -10,8 +10,8 @@ import {
 } from "react";
 import type { JSX } from "react/jsx-runtime";
 import { Helmet } from "react-helmet-async";
-import { useLocation } from "@remix-run/react";
-import { noop } from "lodash-es";
+import { useLocation, useNavigationType } from "@remix-run/react";
+import { noop, debounce } from "lodash-es";
 import classnames from "classnames";
 
 import styles from "./App.module.scss";
@@ -284,6 +284,8 @@ export function App({
   }, []);
 
   const location = useLocation();
+  const navigationType = useNavigationType();
+  const [scrollRestorationEnabled, setScrollRestorationEnabled] = useState(false);
   const { drawerVisible, toggleDrawer, handleOpenChange, showDrawer, hideDrawer } = useDrawerState(
     location,
     navPanelVisible,
@@ -291,12 +293,47 @@ export function App({
   );
 
   useIsomorphicLayoutEffect(() => {
+    if (scrollRestorationEnabled && navigationType === "POP") {
+      const key = `xmlui_scroll_${location.key}`;
+      const saved = sessionStorage.getItem(key);
+      if (saved) {
+        try {
+          const { x, y } = JSON.parse(saved);
+          scrollContainerRef.current?.scrollTo({
+            top: y,
+            left: x,
+            behavior: "instant",
+          });
+          return;
+        } catch (e) {
+          // ignore error
+        }
+      }
+    }
     scrollContainerRef.current?.scrollTo({
       top: 0,
       left: 0,
       behavior: "instant", // Optional if you want to skip the scrolling animation
     });
-  }, [location.pathname]);
+  }, [location.pathname, scrollRestorationEnabled, navigationType]);
+
+  useEffect(() => {
+    if (!scrollRestorationEnabled) return;
+    const el = scrollContainerRef.current;
+    if (!el) return;
+
+    const saveScroll = debounce(() => {
+      const key = `xmlui_scroll_${location.key}`;
+      const pos = { x: el.scrollLeft, y: el.scrollTop };
+      sessionStorage.setItem(key, JSON.stringify(pos));
+    }, 100);
+
+    el.addEventListener("scroll", saveScroll);
+    return () => {
+      el.removeEventListener("scroll", saveScroll);
+      saveScroll.cancel();
+    };
+  }, [scrollRestorationEnabled, location.key, scrollContainerRef]);
 
   useEffect(() => {
     const frameId = requestAnimationFrame(() => {
@@ -339,6 +376,7 @@ export function App({
     subNavPanelSlot,
     scrollWholePage,
     isNested: appGlobals?.isNested || false,
+    setScrollRestorationEnabled,
   });
 
   const linkInfoContextValue = useMemo(() => {
@@ -727,6 +765,7 @@ function useAppLayoutContextValue({
   subNavPanelSlot,
   scrollWholePage,
   isNested,
+  setScrollRestorationEnabled,
 }: {
   hasRegisteredNavPanel: boolean;
   hasRegisteredHeader: boolean;
@@ -745,6 +784,7 @@ function useAppLayoutContextValue({
   subNavPanelSlot: any;
   scrollWholePage: boolean;
   isNested: boolean;
+  setScrollRestorationEnabled: (enabled: boolean) => void;
 }): IAppLayoutContext {
   return useMemo<IAppLayoutContext>(
     () => ({
@@ -766,6 +806,7 @@ function useAppLayoutContextValue({
       scrollWholePage,
       isFullVerticalWidth: false,
       isNested,
+      setScrollRestorationEnabled,
     }),
     [
       hasRegisteredNavPanel,
@@ -785,6 +826,7 @@ function useAppLayoutContextValue({
       subNavPanelSlot,
       scrollWholePage,
       isNested,
+      setScrollRestorationEnabled,
     ]
   );
 }
