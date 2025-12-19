@@ -76,6 +76,7 @@ export interface IAppLayoutContext {
   scrollWholePage?: boolean;
   isFullVerticalWidth?: boolean;
   isNested?: boolean;
+  setScrollRestorationEnabled?: (enabled: boolean) => void;
 }
 
 export const AppLayoutContext = createContext<IAppLayoutContext | null>(null);
