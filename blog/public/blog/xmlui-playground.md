@@ -35,7 +35,7 @@ It starts as conventional Markdown codefence bounded by triple backtics. You can
 
 Many of these small playgrounds are woven into the component docs. You'll also find more ambitious playgrounds in the How To section of the docs where we illustrate important app patterns, like <a target="_blank" href="https://docs.xmlui.org/howto/use-the-same-modaldialog-to-add-or-edit">How to use the same ModalDialog to add or edit</a>.
 
-If you [view the XMLUI source](https://github.com/xmlui-org/xmlui/blob/main/docs/public/pages/howto/use-the-same-modaldialog-to-add-or-edit.md) for that example, you'll see that the codefence defines an `App` and two user-defined components, `Test` and `ProductModal`. It also defines an API with operations `get-products`, `get-product`, `insert-product`, `update-product`, and `delete-product`.
+If you [view the XMLUI source](https://github.com/xmlui-org/xmlui/blob/main/docs/content/pages/howto/use-the-same-modaldialog-to-add-or-edit.md) for that example, you'll see that the codefence defines an `App` and two user-defined components, `Test` and `ProductModal`. It also defines an API with operations `get-products`, `get-product`, `insert-product`, `update-product`, and `delete-product`.
 
  This is a concise way to express the rich set of behaviors seen in this video.
 
