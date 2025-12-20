@@ -79,6 +79,7 @@
             <NavLink label="Markup" to="/markup" />
             <NavLink label="Scoping" to="/scoping" />
             <NavLink label="Scripting" to="/scripting" />
+            <NavLink label="Codefences and playgrounds" to="/playground-and-codefence" />
             <NavLink label="Layout" to="/layout" />
             <NavLink label="Working with Text" to="/working-with-text" />
             <NavLink
@@ -495,6 +496,10 @@
         <Page url="/working-with-text">
             <DocumentPage content="{appGlobals.content['pages/working-with-text.md']}" />
         </Page>
+        <Page url="/playground-and-codefence">
+            <DocumentPage maxHeadingLevel="2" content="{appGlobals.content['pages/playground-and-codefence.md']}" />
+        </Page>
+
         <Page url="/working-with-markdown">
             <DocumentPage content="{appGlobals.content['pages/working-with-markdown.md']}" />
         </Page>

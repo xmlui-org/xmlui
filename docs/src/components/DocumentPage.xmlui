@@ -11,7 +11,7 @@
         <TableOfContents
             width="$space-64"
             when="{mediaSize.sizeIndex > 3 && !$props.hideToc}"
-            maxHeadingLevel="3" />
+            maxHeadingLevel="{$props.maxHeadingLevel ? $props.maxHeadingLevel : 3}" />
         <VStack width="$space-64" when="{mediaSize.sizeIndex > 3 && $props.hideToc}" />
     </HStack>
 </Component>
