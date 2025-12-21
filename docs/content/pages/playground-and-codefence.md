@@ -30,7 +30,7 @@ produces this playground:
 
 See [Reproducible XMLUI](https://blog.xmlui.org/blog/xmlui-playground) for an overview of how these playgrounds support the XMLUI documentation and also enable XMLUI developers to share issues and bug reports in a reproducible way.
 
-If you click the ![popout](/resources/pg-popout.svg) icon on the playground above you land in [this](
+If you click the ![popout](/resources/pg-popout.svg) icon on the playground above you land in [this playground](
 https://playground.xmlui.org/#/playground/#H4sIAAAAAAAAE1WRQWvcQAyF%2F8rwCCQBu3FLchmaHppLLz01tIc6lFmP7B0yloYZbeJm8X8v42wDuek9SR8P6Yiijr2LwgR7hEsJFp%2B%2FHlSFTXQ7irc9vlGMYn5Jjr6HEb6LYXi87aHiil6cD1WeX%2Fa4%2BtIzGgwyJ2FiLbC%2FH6rmMUwVr3uaqbpHBA%2BLZY6H0HoZChrQosS%2B%2FLc3UJQMi7OtaFMOs8t%2F25uuQ%2FPK%2BulyqeBRWH%2BEF4LFx%2Bu0oMHODY9TlgP7u235nhZtB%2FF1JE%2B7izHLbE7gcsijG6j91HUmm8nszJXpPlxfokFy3gee3q2flVSnuz83WNeHdW0gSYPwa5KwkL%2Bv2WBHFws1KM8uJfJvOmV6CvT8faOdPMmBWF3FwGIvObwIq4to4AYNT3RCvj%2FZqbU9DzFMe92uxkqssNs31%2FUfPnQFWOQBAAA%3D) where you can run and modify the app. Changes you make there won't persist in the URL, but you can use [this codefence authoring tool](https://xmlui-codefence-runner.netlify.app/) to write playgrounds that do produce persistent shareable URLs.
 
 > [!INFO]
@@ -311,6 +311,16 @@ This markup:
 ˋˋˋ
 </pre>
 
+produces this playground:
+
+```xmlui-pg
+---app display
+<App>
+  <Text>This is a named example</Text>
+</App>
+```
+
+
 
 ### filename
 Specifies a filename for the code block, useful for multi-file examples or showing file context.
@@ -318,7 +328,7 @@ Specifies a filename for the code block, useful for multi-file examples or showi
 This markup:
 
 <pre>
-```xmlui copy filename="Main.xmlui"
+```xmlui filename="Main.xmlui"
 &lt;App>
   &lt;Button label="Main App" />
 &lt;/App>
@@ -327,7 +337,7 @@ This markup:
 
 produces this rendering:
 
-```xmlui copy filename="Main.xmlui"
+```xmlui filename="Main.xmlui"
 <App>
   <Button label="Main App" />
 </App>
@@ -455,7 +465,9 @@ produces this rendering:
 ```
 
 
-### Attributes
+### Matches
+
+## Attribute name and value
 
 This markup:
 
@@ -479,15 +491,15 @@ produces this rendering:
 ```
 
 
-### Attribute name only
+### Attribute names
 
 This markup:
 
 <pre>
 ˋˋˋxmlui-pg
----app display  /variant="outlined"/
+---app display  /name/ /size/
 &lt;App>
-  &lt;Button label="Highlighted Attribute" variant="outlined" themeColor="primary" />
+    &lt;Icon name="star" size="lg" />
 &lt;/App>
 ```
 </pre>
