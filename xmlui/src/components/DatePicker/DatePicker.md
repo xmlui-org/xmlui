@@ -31,7 +31,7 @@
 ```xmlui-pg copy display name="Example: initialValue" height="440px"
 <App>
   <DatePicker inline initialValue="05/25/2024" />
-</App>  
+</App>
 ```
 
 %-PROP-END
@@ -41,7 +41,7 @@
 ```xmlui-pg copy display name="Example: placeholder" height="500px"
 <App>
   <DatePicker placeholder="This is a placeholder" />
-</App>  
+</App>
 ```
 
 %-PROP-END
@@ -51,7 +51,7 @@
 ```xmlui-pg copy display name="Example: enabled" height="120px"
 <App>
   <DatePicker enabled="false" />
-</App>  
+</App>
 ```
 
 %-PROP-END
@@ -106,10 +106,12 @@ The table below shows the available date formats:
 
 ```xmlui-pg copy display name="Example: dateFormat" height="440px"
 <App>
-  <DatePicker 
-    inline 
-    dateFormat="dd-MM-yyyy" 
-    initialValue="05/25/2024" />
+  <DatePicker
+    inline
+    dateFormat="dd-MM-yyyy"
+    initialValue="01-01-2024"
+    endDate="01-01-2027"
+/>
 </App>
 ```
 
@@ -181,11 +183,11 @@ The `disabledDates` prop supports multiple patterns for disabling specific dates
 
 ```xmlui-pg copy display name="Example: Disable specific dates" height="440px"
 <App>
-  <DatePicker 
-    inline 
-    disabledDates="{['05/26/2024', '05/27/2024']}" 
+  <DatePicker
+    inline
+    disabledDates="{['05/26/2024', '05/27/2024']}"
     initialValue="05/25/2024" />
-</App>  
+</App>
 ```
 
 **Advanced patterns:**
@@ -202,48 +204,48 @@ The `disabledDates` prop supports multiple patterns for disabling specific dates
 ```xmlui-pg copy display name="Example: Disable weekends" height="440px"
 <App>
   <DatePicker inline disabledDates="{{dayOfWeek: [0, 6]}}" />
-</App>  
+</App>
 ```
 
 ```xmlui-pg copy display name="Example: Disable date range" height="440px"
 <App>
-  <DatePicker 
-    inline 
-    disabledDates="{{from: '05/20/2024', to: '05/25/2024'}}" 
+  <DatePicker
+    inline
+    disabledDates="{{from: '05/20/2024', to: '05/25/2024'}}"
     initialValue="05/18/2024" />
-</App>  
+</App>
 ```
 
 ```xmlui-pg copy display name="Example: Disable dates before today" height="440px"
 <App>
   <DatePicker
-    inline 
+    inline
     disabledDates="{{before: getDate()}}"
     intialValue="{getDate()}"/>
-</App>  
+</App>
 ```
 
 ```xmlui-pg copy display name="Example: Disable dates today and after" height="440px"
 <App>
   <DatePicker
-    inline 
+    inline
     disabledDates="{[getDate(), {after: getDate()}]}"
     intialValue="{getDate()}"/>
-</App>  
+</App>
 ```
 
 
 ```xmlui-pg copy display name="Example: Complex combination" height="440px"
 <App>
-  <DatePicker 
+  <DatePicker
     inline
     disabledDates="{[
-    {dayOfWeek: [0, 6]}, 
-    {from: '12/24/2024', to: '12/26/2024'}, 
-    '01/01/2025']}" 
+    {dayOfWeek: [0, 6]},
+    {from: '12/24/2024', to: '12/26/2024'},
+    '01/01/2025']}"
     initialValue="12/20/2024"
 />
-</App>  
+</App>
 ```
 
 %-PROP-END
@@ -255,9 +257,9 @@ Write in the input field and see how the `Text` underneath it is updated in para
 ```xmlui-pg copy {2} display name="Example: didChange" height="520px"
 <App var.field="(none)">
   <Text value="{field}" />
-  <DatePicker 
+  <DatePicker
     inline
-    initialValue="{field}" 
+    initialValue="{field}"
     onDidChange="(val) => field = val" />
 </App>
 ```
@@ -271,8 +273,8 @@ Note how clicking elsewhere resets the text to the original.
 
 ```xmlui-pg copy {4-5} display name="Example: gotFocus/lostFocus" height="540px"
 <App var.isFocused="false">
-  <Text value="{isFocused === true 
-    ? 'DatePicker focused' : 'DatePicker lost focus'}" 
+  <Text value="{isFocused === true
+    ? 'DatePicker focused' : 'DatePicker lost focus'}"
   />
   <DatePicker
     onGotFocus="isFocused = true"
