@@ -1,6 +1,7 @@
 {
   "editor.tabSize": 2,
-  // "prettier.configPath": ".prettierrc.js",
+  //"prettier.configPath": ".prettierrc.js",
+  "files.eol": "\n",
   "[html]": {
     "editor.defaultFormatter": "vscode.html-language-features"
   },
