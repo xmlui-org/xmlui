@@ -23,6 +23,9 @@ This example demonstrates the core elements: [Form](/components/Form) and [FormI
   - `type` determines the kind of input field needed for a given piece of data (number field, text area field, radio buttons, etc.)
   - other properties support styling or validation
 
+> [!INFO]
+>  When a component is instantiated inside a <tt>Form</tt>, the form creates a runtime context ($data) that is automatically available to all nested components — including components declared in separate files — so <tt>FormItem</tt>'s <tt>bindTo</tt> can target form fields without passing the form data via props.
+
 ## Form Layouts
 
 You can use any of XMLUI's layout mechanisms with a `Form`. Here is a single-column format using `FlowLayout`.
