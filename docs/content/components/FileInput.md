@@ -180,6 +180,36 @@ When `parseAs` is set, `acceptsFileType` is automatically inferred (`.csv` or `.
 
 Right-click and save: [sample-products.csv](/resources/files/sample-products.csv)
 
+```xmlui-pg copy display name="Example: parseAs JSON"
+<App var.products="{[]}">
+  <FileInput
+    parseAs="json"
+    onDidChange="data => products = data"
+  />
+  <List data="{products}" when="{products.length > 0}">
+    <Text value="{$item.name}: ${$item.price} ({$item.category})" />
+  </List>
+</App>
+```
+
+Right-click and save: [sample-products.json](/resources/files/sample-products.json)
+
+> **Note**: JSON parsing automatically converts single objects to arrays. If your JSON file contains a single object `{...}`, it will be wrapped as `[{...}]` for consistent handling.
+
+```xmlui-pg copy display name="Example: JSON single object"
+<App var.config="{[]}">
+  <FileInput
+    parseAs="json"
+    onDidChange="data => config = data"
+  />
+  <List data="{config}" when="{config.length > 0}">
+    <Text value="App: {$item.appName} v{$item.version}" />
+  </List>
+</App>
+```
+
+Right-click and save: [sample-config.json](/resources/files/sample-config.json)
+
 ### `csvOptions` [#csvoptions]
 
 Configuration options for CSV parsing (used when `parseAs="csv"`). Supports all [Papa Parse configuration options](https://www.papaparse.com/docs#config).
@@ -332,6 +362,22 @@ This event is triggered when file parsing fails (when using `parseAs`). If not p
 ```
 
 Right-click and save: [sample-broken.csv](/resources/files/sample-broken.csv)
+
+```xmlui-pg copy display name="Example: JSON parseError"
+<App var.errorMessage="" var.data="{[]}">
+  <FileInput
+    parseAs="json"
+    onDidChange="data => data = data"
+    onParseError="(err, file) => errorMessage = file.name + ': ' + err.message"
+  />
+  <Text value="{errorMessage}" color="$color-danger-500" when="{errorMessage}" />
+  <List data="{data}" when="{data.length > 0}">
+    <Text value="{$item.name}: ${$item.price}" />
+  </List>
+</App>
+```
+
+Right-click and save: [sample-broken.json](/resources/files/sample-broken.json)
 
 ## Parsing Multiple Files [#parsing-multiple-files]
 
