@@ -4,6 +4,7 @@
 
 **Key features:**
 - **File type filtering**: Restrict selection to specific file types using `acceptsFileType`
+- **Built-in parsing**: Automatically parse CSV and JSON files with `parseAs`
 - **Multiple file selection**: Enable users to select multiple files simultaneously
 - **Directory selection**: Allow folder selection instead of individual files
 - **Customizable button**: Configure button text, icons, position, and styling to match your design
@@ -157,6 +158,81 @@ Available values:
 | `warning` | Visual indicator for an input that produced a warning |
 | `error` | Visual indicator for an input that produced an error |
 
+### `parseAs` [#parseas]
+
+Automatically parse file contents as CSV or JSON. When set, the `onDidChange` event receives parsed data instead of raw File objects.
+
+Available values: `"csv"`, `"json"`, `undefined` **(default)**
+
+When `parseAs` is set, `acceptsFileType` is automatically inferred (`.csv` or `.json`) unless explicitly overridden.
+
+```xmlui-pg copy display name="Example: parseAs CSV"
+<App var.products="{[]}">
+  <FileInput
+    parseAs="csv"
+    onDidChange="data => products = data"
+  />
+  <List data="{products}" when="{products.length > 0}">
+    <Text value="{$item.name}: ${$item.price}" />
+  </List>
+</App>
+```
+
+Right-click and save: [sample-products.csv](/resources/files/sample-products.csv)
+
+### `csvOptions` [#csvoptions]
+
+Configuration options for CSV parsing (used when `parseAs="csv"`). Supports all [Papa Parse configuration options](https://www.papaparse.com/docs#config).
+
+**Default options**: `{ header: true, skipEmptyLines: true }`
+
+Common options:
+- `delimiter`: Column separator (default: `","`)
+- `header`: First row contains column names (default: `true`)
+- `dynamicTyping`: Auto-convert numbers and booleans (default: `false`)
+- `skipEmptyLines`: Ignore empty rows (default: `true`)
+- `transform`: Function to transform values during parsing
+
+```xmlui-pg copy display name="Example: CSV with semicolon delimiter"
+<App var.data="[]">
+  <FileInput
+    parseAs="csv"
+    csvOptions="{{ delimiter: ';' }}"
+    onDidChange="rows => data = rows"
+  />
+  <Table data="{data}" when="{data.length > 0}" />
+</App>
+```
+
+Right-click and save: [sample-products-semicolon.csv](/resources/files/sample-products-semicolon.csv)
+
+```xmlui-pg copy display name="Example: CSV with type conversion"
+<App var.products="[]">
+  <FileInput
+    parseAs="csv"
+    csvOptions="{{ dynamicTyping: true }}"
+    onDidChange="data => products = data"
+  />
+  <Table data="{products}" when="{products.length > 0}" />
+</App>
+```
+
+> **Note**: `dynamicTyping: true` is not a default. It converts string values to numbers and booleans during parsing.
+
+```xmlui-pg copy display name="Example: TSV (tab-delimited) files"
+<App var.products="[]">
+  <FileInput
+    parseAs="csv"
+    acceptsFileType=".tsv"
+    csvOptions="{{ delimiter: '\t' }}"
+    onDidChange="data => products = data"
+  />
+  <Table data="{products}" when="{products.length > 0}" />
+</App>
+```
+
+Right-click and save: [sample-products-tsv.tsv](/resources/files/sample-products-tsv.tsv)
+
 ## Events [#events]
 
 ### `didChange` [#didchange]
@@ -204,6 +280,101 @@ This event is triggered when the FileInput has lost the focus.
 
 (See the example above)
 
+### `parseError` [#parseerror]
+
+This event is triggered when file parsing fails (when using `parseAs`). If not provided, parse errors are logged to the console.
+
+**Signature**: `parseError(error: Error, file: File): void`
+
+- `error`: The parsing error that occurred
+- `file`: The file that failed to parse
+
+```xmlui-pg copy display name="Example: parseError"
+<App var.errorMessage="" var.items="[]">
+  <FileInput
+    parseAs="csv"
+    onDidChange="data => items = data"
+    onParseError="(err, file) => errorMessage = file.name + ': ' + err.message"
+  />
+  <Text value="{errorMessage}" color="$color-danger-500" when="{errorMessage}" />
+  <Table data="{items}" when="{items.length > 0}" />
+</App>
+```
+
+Right-click and save: [sample-broken.csv](/resources/files/sample-broken.csv)
+
+## Parsing Multiple Files [#parsing-multiple-files]
+
+When using `parseAs` with `multiple="true"`, the `onDidChange` event receives an array of parse results. Each result contains the original file, parsed data, and any error that occurred.
+
+**Type signature**:
+```typescript
+type ParseResult = {
+  file: File;      // Original file reference
+  data: any[];     // Parsed data (empty array if error)
+  error?: Error;   // Parse error, if any
+};
+```
+
+```xmlui-pg copy display name="Example: Multiple CSV files"
+<App var.results="[]">
+  <FileInput
+    parseAs="csv"
+    multiple="true"
+    onDidChange="data => results = data"
+  />
+  <List data="{results}" when="{results.length > 0}">
+    <Text value="{$item.file.name}: {$item.data.length} rows" when="{!$item.error}" />
+    <Text value="{$item.file.name}: {$item.error.message}" color="$color-danger-500" when="{$item.error}" />
+  </List>
+</App>
+```
+
+```xmlui-pg copy display name="Example: Multiple CSV with success/fail counts"
+<App var.successCount="{0}" var.failCount="{0}">
+  <FileInput
+    parseAs="csv"
+    multiple="true"
+    csvOptions="{{ dynamicTyping: true }}"
+    onDidChange="{results => {
+      successCount = results.filter(r => !r.error).length;
+      failCount = results.filter(r => r.error).length;
+    }}"
+  />
+  <HStack when="{successCount + failCount > 0}">
+    <Text value="Success: {successCount}" color="$color-success-500" />
+    <Text value="Failed: {failCount}" color="$color-danger-500" />
+  </HStack>
+</App>
+```
+
+## Migration from window.parseCsv [#migration]
+
+If you're using the `window.parseCsv()` pattern from earlier tutorials, you can simplify your code with built-in parsing:
+
+**Before**:
+```xmlui
+<FileInput
+  acceptsFileType="{['.csv']}"
+  onDidChange="{ (val) => {
+    parsedCsv = window.parseCsv(val[0]).map((item, idx) => {
+      return {...item, id: idx};
+    });
+  }}"
+/>
+```
+
+**After**:
+```xmlui
+<FileInput
+  parseAs="csv"
+  onDidChange="data => parsedCsv = data"
+/>
+<Table data="{parsedCsv}" idKey="name" />
+```
+
+**Note**: Manual ID mapping is no longer needed since Table now supports the `idKey` property.
+
 ## Exposed Methods [#exposed-methods]
 
 ### `focus` [#focus]
@@ -231,16 +402,6 @@ This API command triggers the file browsing dialog to open.
   <FileInput id="fileInputComponent" />
 </App>
 ```
-
-### `setValue` [#setvalue]
-
-This method sets the current value of the component.
-
-**Signature**: `setValue(files: File[]): void`
-
-- `files`: An array of File objects to set as the current value of the component.
-
-(**NOT IMPLEMENTED YET**) You can use this method to set the component's current value programmatically.
 
 ### `value` [#value]
 
