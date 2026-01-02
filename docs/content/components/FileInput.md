@@ -239,6 +239,28 @@ Right-click and save: [sample-products-semicolon.csv](/resources/files/sample-pr
 
 Right-click and save: [sample-products-tsv.tsv](/resources/files/sample-products-tsv.tsv)
 
+```xmlui-pg copy display name="Example: Large file with loading spinner"
+<App var.inventory="{[]}">
+  <FileInput
+    id="fileInput"
+    parseAs="csv"
+    csvOptions="{{ dynamicTyping: true }}"
+    onDidChange="data => inventory = data"
+  />
+  <HStack>
+    <Spinner when="{fileInput.inProgress}" delay="{200}" />
+    <Text value="Parsing..." when="{fileInput.inProgress}" />
+    <Text value="{inventory.length} items loaded" when="{!fileInput.inProgress && inventory.length > 0}" />
+  </HStack>
+  <List data="{inventory.slice(0, 10)}" when="{!fileInput.inProgress && inventory.length > 0}">
+    <Text value="{$item.sku}: {$item.name} - ${$item.price}" />
+  </List>
+  <Text value="Showing first 10 of {inventory.length} items" when="{inventory.length > 10}" />
+</App>
+```
+
+Right-click and save: [sample-inventory.csv](/resources/files/sample-inventory.csv) (5000 rows)
+
 ## Events [#events]
 
 ### `didChange` [#didchange]
@@ -408,6 +430,26 @@ This API command triggers the file browsing dialog to open.
 <App>
   <Button label="Open FileInput" onClick="fileInputComponent.open()" />
   <FileInput id="fileInputComponent" />
+</App>
+```
+
+### `inProgress` [#inprogress]
+
+This property indicates whether file parsing is currently in progress (when using `parseAs`).
+
+**Signature**: `get inProgress(): boolean`
+
+Use this property to show loading indicators while files are being parsed. See the "Large file with loading spinner" example above for usage.
+
+```xmlui-pg copy display name="Example: inProgress"
+<App var.data="{[]}">
+  <FileInput
+    id="csvInput"
+    parseAs="csv"
+    onDidChange="rows => data = rows"
+  />
+  <Text value="Parsing file..." when="{csvInput.inProgress}" />
+  <Text value="{data.length} rows loaded" when="{!csvInput.inProgress && data.length > 0}" />
 </App>
 ```
 

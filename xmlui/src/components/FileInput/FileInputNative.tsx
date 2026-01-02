@@ -130,6 +130,7 @@ export const FileInput = ({
   const _value: File[] | undefined = isFileArray(value) ? value : undefined;
 
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Auto-infer file types based on parseAs
   const inferredFileType = parseAs === "csv" ? ".csv" : parseAs === "json" ? ".json" : undefined;
@@ -187,6 +188,8 @@ export const FileInput = ({
         return;
       }
 
+      // Start loading spinner
+      setIsLoading(true);
       loggerService.log(["[FileInput] parseAs =", parseAs, "- starting file parsing"]);
 
       // Helper function to parse a single file
@@ -308,6 +311,9 @@ export const FileInput = ({
       }
 
       loggerService.log(["[FileInput] onDrop completed"]);
+
+      // Stop loading spinner
+      setIsLoading(false);
     },
     [updateState, onDidChange, parseAs, csvOptions, onParseError, multiple, directory],
   );
@@ -330,8 +336,11 @@ export const FileInput = ({
     registerComponentApi?.({
       focus,
       open: doOpen,
+      get inProgress() {
+        return isLoading;
+      },
     });
-  }, [focus, doOpen, registerComponentApi]);
+  }, [focus, doOpen, registerComponentApi, isLoading]);
 
   // Solution source: https://stackoverflow.com/questions/1084925/input-type-file-show-only-button
   return (

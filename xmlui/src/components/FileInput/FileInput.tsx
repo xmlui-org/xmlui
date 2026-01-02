@@ -140,6 +140,10 @@ export const FileInputMd = createMetadata({
       description: "This API command triggers the file browsing dialog to open.",
       signature: "open(): void",
     },
+    inProgress: {
+      description: "This property indicates whether file parsing is currently in progress (when using parseAs).",
+      signature: "get inProgress(): boolean",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
 });
