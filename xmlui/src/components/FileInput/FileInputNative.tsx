@@ -213,7 +213,13 @@ export const FileInput = ({
                     loggerService.log(["[FileInput] Papa.parse complete callback called for:", file.name]);
                     loggerService.log(["[FileInput] results.data.length:", results.data.length]);
                     loggerService.log(["[FileInput] results.errors.length:", results.errors.length]);
-                    loggerService.log(["[FileInput] First 2 rows:", results.data.slice(0, 2)]);
+
+                    // Log sample row structure
+                    if (results.data.length > 0) {
+                      const sampleRow = results.data[0];
+                      loggerService.log(["[FileInput] Sample row keys:", Object.keys(sampleRow)]);
+                      loggerService.log(["[FileInput] Sample row:", sampleRow]);
+                    }
 
                     if (results.errors && results.errors.length > 0) {
                       loggerService.log(["[FileInput] First 3 errors:", results.errors.slice(0, 3)]);

@@ -200,7 +200,9 @@ Common options:
     csvOptions="{{ delimiter: ';' }}"
     onDidChange="rows => data = rows"
   />
-  <Table data="{data}" when="{data.length > 0}" />
+  <List data="{data}" when="{data.length > 0}">
+    <Text value="{$item.name}: ${$item.price} ({$item.category})" />
+  </List>
 </App>
 ```
 
@@ -213,7 +215,9 @@ Right-click and save: [sample-products-semicolon.csv](/resources/files/sample-pr
     csvOptions="{{ dynamicTyping: true }}"
     onDidChange="data => products = data"
   />
-  <Table data="{products}" when="{products.length > 0}" />
+  <List data="{products}" when="{products.length > 0}">
+    <Text value="{$item.name}: ${$item.price} (inStock: {$item.inStock})" />
+  </List>
 </App>
 ```
 
@@ -227,7 +231,9 @@ Right-click and save: [sample-products-semicolon.csv](/resources/files/sample-pr
     csvOptions="{{ delimiter: '\t' }}"
     onDidChange="data => products = data"
   />
-  <Table data="{products}" when="{products.length > 0}" />
+  <List data="{products}" when="{products.length > 0}">
+    <Text value="{$item.name}: ${$item.price} - {$item.category}" />
+  </List>
 </App>
 ```
 
@@ -297,7 +303,9 @@ This event is triggered when file parsing fails (when using `parseAs`). If not p
     onParseError="(err, file) => errorMessage = file.name + ': ' + err.message"
   />
   <Text value="{errorMessage}" color="$color-danger-500" when="{errorMessage}" />
-  <Table data="{items}" when="{items.length > 0}" />
+  <List data="{items}" when="{items.length > 0}">
+    <Text value="{$item.name}: ${$item.price}" />
+  </List>
 </App>
 ```
 
