@@ -213,8 +213,10 @@ export const FileInput = ({
                     loggerService.log(["[FileInput] Papa.parse complete callback called for:", file.name]);
                     loggerService.log(["[FileInput] results.data.length:", results.data.length]);
                     loggerService.log(["[FileInput] results.errors.length:", results.errors.length]);
+                    loggerService.log(["[FileInput] First 2 rows:", results.data.slice(0, 2)]);
 
                     if (results.errors && results.errors.length > 0) {
+                      loggerService.log(["[FileInput] First 3 errors:", results.errors.slice(0, 3)]);
                       const firstFewErrors = results.errors.slice(0, 3).map(e => e.message).join(", ");
                       const errorSummary = results.errors.length > 3
                         ? `${firstFewErrors} (and ${results.errors.length - 3} more)`

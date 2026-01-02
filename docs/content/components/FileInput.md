@@ -194,7 +194,7 @@ Common options:
 - `transform`: Function to transform values during parsing
 
 ```xmlui-pg copy display name="Example: CSV with semicolon delimiter"
-<App var.data="[]">
+<App var.data="{[]}">
   <FileInput
     parseAs="csv"
     csvOptions="{{ delimiter: ';' }}"
@@ -207,7 +207,7 @@ Common options:
 Right-click and save: [sample-products-semicolon.csv](/resources/files/sample-products-semicolon.csv)
 
 ```xmlui-pg copy display name="Example: CSV with type conversion"
-<App var.products="[]">
+<App var.products="{[]}">
   <FileInput
     parseAs="csv"
     csvOptions="{{ dynamicTyping: true }}"
@@ -220,7 +220,7 @@ Right-click and save: [sample-products-semicolon.csv](/resources/files/sample-pr
 > **Note**: `dynamicTyping: true` is not a default. It converts string values to numbers and booleans during parsing.
 
 ```xmlui-pg copy display name="Example: TSV (tab-delimited) files"
-<App var.products="[]">
+<App var.products="{[]}">
   <FileInput
     parseAs="csv"
     acceptsFileType=".tsv"
@@ -290,7 +290,7 @@ This event is triggered when file parsing fails (when using `parseAs`). If not p
 - `file`: The file that failed to parse
 
 ```xmlui-pg copy display name="Example: parseError"
-<App var.errorMessage="" var.items="[]">
+<App var.errorMessage="" var.items="{[]}">
   <FileInput
     parseAs="csv"
     onDidChange="data => items = data"
@@ -317,7 +317,7 @@ type ParseResult = {
 ```
 
 ```xmlui-pg copy display name="Example: Multiple CSV files"
-<App var.results="[]">
+<App var.results="{[]}">
   <FileInput
     parseAs="csv"
     multiple="true"
