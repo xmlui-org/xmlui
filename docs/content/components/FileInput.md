@@ -507,8 +507,6 @@ This method sets the current value of the component.
 
 - `files`: An array of File objects to set as the current value of the component.
 
-(**NOT IMPLEMENTED YET**) You can use this method to set the component's current value programmatically.
-
 ### `value` [#value]
 
 This property holds the current value of the component, which is an array of files.
