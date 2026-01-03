@@ -167,6 +167,7 @@ Available values: `"csv"`, `"json"`, `undefined` **(default)**
 When `parseAs` is set, `acceptsFileType` is automatically inferred (`.csv` or `.json`) unless explicitly overridden.
 
 ```xmlui-pg copy display name="Example: parseAs CSV"
+---app
 <App var.products="{[]}">
   <FileInput
     parseAs="csv"
@@ -176,11 +177,12 @@ When `parseAs` is set, `acceptsFileType` is automatically inferred (`.csv` or `.
     <Text value="{$item.name}: ${$item.price}" />
   </List>
 </App>
+---desc
+Right-click and save: [sample-products.csv](/resources/files/sample-products.csv). Then browse to sample-products.csv.
 ```
 
-Right-click and save: [sample-products.csv](/resources/files/sample-products.csv)
-
 ```xmlui-pg copy display name="Example: parseAs JSON"
+---app
 <App var.products="{[]}">
   <FileInput
     parseAs="json"
@@ -190,13 +192,14 @@ Right-click and save: [sample-products.csv](/resources/files/sample-products.csv
     <Text value="{$item.name}: ${$item.price} ({$item.category})" />
   </List>
 </App>
+---desc
+Right-click and save: [sample-products.json](/resources/files/sample-products.json). Then browse to sample-products.json.
 ```
-
-Right-click and save: [sample-products.json](/resources/files/sample-products.json)
 
 > **Note**: JSON parsing automatically converts single objects to arrays. If your JSON file contains a single object `{...}`, it will be wrapped as `[{...}]` for consistent handling.
 
 ```xmlui-pg copy display name="Example: JSON single object"
+---app
 <App var.config="{[]}">
   <FileInput
     parseAs="json"
@@ -206,9 +209,9 @@ Right-click and save: [sample-products.json](/resources/files/sample-products.js
     <Text value="App: {$item.appName} v{$item.version}" />
   </List>
 </App>
+---desc
+Right-click and save: [sample-config.json](/resources/files/sample-config.json). Then browse to sample-config.json.
 ```
-
-Right-click and save: [sample-config.json](/resources/files/sample-config.json)
 
 ### `csvOptions` [#csvoptions]
 
@@ -224,6 +227,7 @@ Common options:
 - `transform`: Function to transform values during parsing
 
 ```xmlui-pg copy display name="Example: CSV with semicolon delimiter"
+ ---app
 <App var.data="{[]}">
   <FileInput
     parseAs="csv"
@@ -234,11 +238,12 @@ Common options:
     <Text value="{$item.name}: ${$item.price} ({$item.category})" />
   </List>
 </App>
+---desc
+Right-click and save: [sample-products-semicolon.csv](/resources/files/sample-products-semicolon.csv). Then browse to sample-products-semicolon.csv.
 ```
 
-Right-click and save: [sample-products-semicolon.csv](/resources/files/sample-products-semicolon.csv)
-
 ```xmlui-pg copy display name="Example: CSV with type conversion"
+---app
 <App var.products="{[]}">
   <FileInput
     parseAs="csv"
@@ -249,11 +254,14 @@ Right-click and save: [sample-products-semicolon.csv](/resources/files/sample-pr
     <Text value="{$item.name}: ${$item.price} (inStock: {$item.inStock})" />
   </List>
 </App>
+---desc
+Right-click and save: [sample-products-typed.csv](/resources/files/sample-products-typed.csv). Then browse to sample-products-typed.csv.
 ```
 
 > **Note**: `dynamicTyping: true` is not a default. It converts string values to numbers and booleans during parsing.
 
 ```xmlui-pg copy display name="Example: TSV (tab-delimited) files"
+---app
 <App var.products="{[]}">
   <FileInput
     parseAs="csv"
@@ -265,11 +273,12 @@ Right-click and save: [sample-products-semicolon.csv](/resources/files/sample-pr
     <Text value="{$item.name}: ${$item.price} - {$item.category}" />
   </List>
 </App>
+---desc
+Right-click and save: [sample-products-tsv.tsv](/resources/files/sample-products-tsv.tsv). Then browse to sample-products-tsv.tsv.
 ```
 
-Right-click and save: [sample-products-tsv.tsv](/resources/files/sample-products-tsv.tsv)
-
 ```xmlui-pg copy display name="Example: Large file with loading spinner"
+---app
 <App var.inventory="{[]}">
   <FileInput
     id="fileInput"
@@ -287,9 +296,9 @@ Right-click and save: [sample-products-tsv.tsv](/resources/files/sample-products
   </List>
   <Text value="Showing first 10 of {inventory.length} items" when="{inventory.length > 10}" />
 </App>
+---desc
+Right-click and save: [sample-inventory.csv](/resources/files/sample-inventory.csv) (5000 rows). Then browse to sample-inventory.csv.
 ```
-
-Right-click and save: [sample-inventory.csv](/resources/files/sample-inventory.csv) (5000 rows)
 
 ## Events [#events]
 
@@ -348,6 +357,7 @@ This event is triggered when file parsing fails (when using `parseAs`). If not p
 - `file`: The file that failed to parse
 
 ```xmlui-pg copy display name="Example: parseError"
+ ---app
 <App var.errorMessage="" var.items="{[]}">
   <FileInput
     parseAs="csv"
@@ -359,11 +369,12 @@ This event is triggered when file parsing fails (when using `parseAs`). If not p
     <Text value="{$item.name}: ${$item.price}" />
   </List>
 </App>
+---desc
+Right-click and save: [sample-broken.csv](/resources/files/sample-broken.csv). Then browse to sample-broken.csv.
 ```
 
-Right-click and save: [sample-broken.csv](/resources/files/sample-broken.csv)
-
 ```xmlui-pg copy display name="Example: JSON parseError"
+---app
 <App var.errorMessage="" var.data="{[]}">
   <FileInput
     parseAs="json"
@@ -375,9 +386,9 @@ Right-click and save: [sample-broken.csv](/resources/files/sample-broken.csv)
     <Text value="{$item.name}: ${$item.price}" />
   </List>
 </App>
+---desc
+Right-click and save: [sample-broken.json](/resources/files/sample-broken.json). Then browse to sample-broken.json.
 ```
-
-Right-click and save: [sample-broken.json](/resources/files/sample-broken.json)
 
 ## Parsing Multiple Files [#parsing-multiple-files]
 
