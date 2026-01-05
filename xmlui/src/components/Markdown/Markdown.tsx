@@ -67,6 +67,13 @@ export const MarkdownMd = createMetadata({
         "rendered in grayscale.",
       valueType: "boolean",
     },
+    truncateLinks: {
+      description:
+        "This boolean property specifies whether long links should be " +
+        "truncated with ellipsis. If set to `true`, links will be displayed " +
+        "with a maximum width and overflow will be hidden with text-overflow: ellipsis.",
+      valueType: "boolean",
+    },
   },
 
   defaultThemeVars: {
@@ -186,6 +193,7 @@ export const markdownComponentRenderer = createComponentRenderer(
         extractValue={extractValue}
         showHeadingAnchors={extractValue.asOptionalBoolean(node.props.showHeadingAnchors)}
         grayscale={extractValue.asOptionalBoolean(node.props.grayscale)}
+        truncateLinks={extractValue.asOptionalBoolean(node.props.truncateLinks)}
       >
         {renderedChildren}
       </TransformedMarkdown>
@@ -202,6 +210,7 @@ type TransformedMarkdownProps = {
   codeHighlighter?: CodeHighlighter;
   showHeadingAnchors?: boolean;
   grayscale?: boolean;
+  truncateLinks?: boolean;
 };
 
 const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>(
@@ -215,6 +224,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
       codeHighlighter,
       showHeadingAnchors,
       grayscale,
+      truncateLinks,
     }: TransformedMarkdownProps,
     ref,
   ) => {
@@ -259,6 +269,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
         className={className}
         showHeadingAnchors={showHeadingAnchors}
         grayscale={grayscale}
+        truncateLinks={truncateLinks}
       >
         {markdownContent}
       </Markdown>
