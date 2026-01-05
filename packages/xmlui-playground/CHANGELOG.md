@@ -1,5 +1,13 @@
 # xmlui-playground
 
+## 0.1.14
+
+### Patch Changes
+
+- f36a70a: use the latest xmlui version
+- Updated dependencies [f36a70a]
+  - xmlui-devtools@0.1.22
+
 ## 0.1.13
 
 ### Patch Changes
