@@ -45,6 +45,65 @@ describe("XML Formatter", () => {
       );
     });
 
+    test("should indent script tag", () => {
+      const input = `<App>
+<script>
+    var dummy="Hello World";
+    console.log("Select initialized");
+    </script>
+      <H1>
+    {dummy}
+  </H1>
+</App>`;
+      const result = formatTwice(input);
+
+      expect(result).toEqual(
+        `<App>
+  <script>
+    var dummy="Hello World";
+    console.log("Select initialized");
+  </script>
+  <H1>
+    {dummy}
+  </H1>
+</App>`,
+      );
+    });
+
+    test("should format single line script tag", () => {
+      const input = `<App>
+<script>console.log("Select initialized");    </script>
+    <Button/>
+</App>`;
+      const result = formatTwice(input);
+
+      expect(result).toEqual(
+        `<App>
+  <script> console.log("Select initialized"); </script>
+  <Button />
+</App>`,
+      );
+    });
+
+    test("should format content right before closing script tag", () => {
+      const input = `<App>
+<script>
+    console.log("Select initialized");
+    console.log("Select initialized");</script>
+    <Button/>
+</App>`;
+      const result = formatTwice(input);
+
+      expect(result).toEqual(
+        `<App>
+  <script>
+    console.log("Select initialized");
+    console.log("Select initialized");
+  </script>
+  <Button />
+</App>`,
+      );
+    });
     test("should format nested xmlui elements", () => {
       const input =
         '<Fragment><Text testId="textShort" width="200px">Short</Text><Text testId="textLong" width="200px" maxLines="2">Long text content</Text></Fragment>';
