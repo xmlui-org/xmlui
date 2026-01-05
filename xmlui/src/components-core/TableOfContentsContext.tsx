@@ -139,24 +139,16 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
           behavior: smoothScrolling ? "smooth" : "auto",
         });
         notify(id);
-        requestAnimationFrame(() => {
-          navigate(
-            {
-              hash: `#${value.id}`,
-            },
-            {
-              state: {
-                preventHashScroll: true,
-              },
-            },
-          );
-          //we clear the preventHashScroll route state:  https://stackoverflow.com/questions/72121228/how-to-update-location-state-in-react-router-v6
-          requestAnimationFrame(()=>{
-            navigate({
-              hash: `#${value.id}`,
-            }, { replace: true });
-          })
-        });
+        // Update the URL hash without triggering additional scroll
+        navigate(
+          {
+            hash: `#${value.id}`,
+          },
+          {
+            preventScrollReset: true,
+            replace: true,
+          },
+        );
       }
     },
     [headings, navigate, notify],
