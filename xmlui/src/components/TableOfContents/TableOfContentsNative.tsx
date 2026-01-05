@@ -106,7 +106,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
                   to={`#${value.id}`}
                   onClick={(event) => {
                     // cmd/ctrl + click - open in new tab, don't prevent that
-                    if (!event.ctrlKey && !event.metaKey && !event.metaKey) {
+                    if (!event.ctrlKey && !event.metaKey) {
                       event.preventDefault();
                     }
                     scrollToAnchor(value.id, smoothScrolling);
