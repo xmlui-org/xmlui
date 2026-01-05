@@ -5,4 +5,5 @@ export default {
   components: [devToolsComponentRenderer],
 };
 
+
 export { Editor } from "./editor/Editor";
