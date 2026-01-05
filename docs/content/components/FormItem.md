@@ -15,8 +15,6 @@ See [this guide](/forms) for details.
 - `$setValue`: Function to set the FormItem's value programmatically
 - `$validationResult`: Current validation state and error messages for this field
 - `$value`: Current value of the FormItem, accessible in expressions and code snippets
-- `$item`: When inside a `type="items"` FormItem, represents the current array element
-- `$itemIndex`: When inside a `type="items"` FormItem, the zero-based index of the current element
 
 ## Properties [#properties]
 
@@ -491,106 +489,6 @@ Available values:
 > For custom controls, there is no need to explicitly set the `type` to `custom`.
 > Omitting the type and providing child components implicitly sets it to custom.
 
-#### Working with `type="items"` for Array Iteration [#working-with-type-items]
-
-When `type` is set to `"items"`, the FormItem creates an iteration context over an array, allowing you to nest FormItem components inside to bind to properties of individual array elements. This pattern is useful for dynamic form sections like invoice line items, order details, or any repeating data structure.
-
-**Key concepts:**
-
-1. **Array binding**: The outer FormItem with `type="items"` binds to an array property in the form data
-2. **Nested FormItems**: Child FormItem components bind to properties of each array element using `bindTo`
-3. **Context variables**: Inside the nested FormItems, you have access to:
-   - `$item`: The current array element being iterated
-   - `$itemIndex`: The zero-based index of the current element
-4. **Dynamic manipulation**: Use the exposed methods to add/remove items:
-   - `addItem(data)`: Adds a new item to the array
-   - `removeItem(index)`: Removes an item at the specified index
-
-**Example: Invoice Line Items**
-
-```xmlui
-<Form id="invoiceForm">
-  <!-- Outer FormItem creates the array iteration context -->
-  <FormItem
-    bindTo="lineItems"
-    type="items"
-    id="lineItemsForm"
-    required="true"
-    requiredInvalidMessage="At least one line item is required."
-  >
-    <!-- Layout for each line item row -->
-    <FlowLayout width="100%" gap="$space-2">
-      <!-- Nested FormItems bind to properties of each array element -->
-      <FormItem
-        bindTo="product"
-        type="select"
-        placeholder="select product"
-        width="30%"
-      >
-        <Items data="{products}">
-          <Option value="{$item.name}" label="{$item.name}" />
-        </Items>
-      </FormItem>
-      
-      <FormItem
-        bindTo="quantity"
-        type="number"
-        initialValue="1"
-        minValue="1"
-        width="20%"
-      />
-      
-      <FormItem
-        bindTo="price"
-        startText="$"
-        width="20%"
-      />
-      
-      <FormItem
-        bindTo="amount"
-        startText="$"
-        enabled="false"
-        initialValue="{$item.quantity * $item.price}"
-        width="20%"
-      />
-      
-      <!-- Use $itemIndex to remove specific items -->
-      <Button onClick="lineItemsForm.removeItem($itemIndex)">
-        Remove
-      </Button>
-    </FlowLayout>
-  </FormItem>
-  
-  <!-- Add new items to the array -->
-  <Button onClick="lineItemsForm.addItem()">
-    Add Line Item
-  </Button>
-</Form>
-```
-
-**Resulting data structure:**
-
-```json
-{
-  "lineItems": [
-    {
-      "product": "Widget A",
-      "quantity": 2,
-      "price": 10.50,
-      "amount": 21.00
-    },
-    {
-      "product": "Widget B",
-      "quantity": 1,
-      "price": 25.00,
-      "amount": 25.00
-    }
-  ]
-}
-```
-
-See the [Invoice Tutorial](/tutorial-08) for a complete working example.
-
 ### `validationMode` (default: "errorLate") [#validationmode-default-errorlate]
 
 This property sets what kind of validation mode or strategy to employ for a particular input field.
@@ -631,48 +529,19 @@ In the demo below, leave the field as is and submit the form or enter an input t
 
 ### `addItem` [#additem]
 
-This method adds a new item to the array managed by a FormItem with `type="items"`. The new item is appended to the end of the array. If no data is provided, an empty object is added.
+This method adds a new item to the list held by the FormItem. The function has a single parameter, the data to add to the FormItem. The new item is appended to the end of the list.
 
-**Signature**: `addItem(data?: any): void`
+**Signature**: `addItem(data: any): void`
 
-- `data`: (Optional) The data to add to the FormItem's array. If omitted, adds an empty object `{}`
-
-**Example:**
-```xmlui
-<FormItem bindTo="lineItems" type="items" id="itemsList">
-  <!-- nested FormItems here -->
-</FormItem>
-
-<!-- Add an empty item -->
-<Button onClick="itemsList.addItem()">Add Empty Item</Button>
-
-<!-- Add a pre-populated item -->
-<Button onClick="itemsList.addItem({ product: 'Default', quantity: 1 })">
-  Add Default Item
-</Button>
-```
+- `data`: The data to add to the FormItem's list.
 
 ### `removeItem` [#removeitem]
 
-Removes the item at the specified index from the array managed by a FormItem with `type="items"`.
+Removes the item specified by its index from the list held by the FormItem. The function has a single argument, the index to remove.
 
 **Signature**: `removeItem(index: number): void`
 
-- `index`: The zero-based index of the item to remove from the array
-
-**Example:**
-```xmlui
-<FormItem bindTo="lineItems" type="items" id="itemsList">
-  <FlowLayout>
-    <!-- nested FormItems here -->
-    
-    <!-- Use $itemIndex to remove the current item -->
-    <Button onClick="itemsList.removeItem($itemIndex)">
-      Remove
-    </Button>
-  </FlowLayout>
-</FormItem>
-```
+- `index`: The index of the item to remove from the FormItem's list.
 
 ## Styling [#styling]
 
