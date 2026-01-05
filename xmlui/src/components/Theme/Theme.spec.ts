@@ -503,4 +503,92 @@ test.describe("applyIf Edge Cases", () => {
     await expect(page.getByTestId("header")).toHaveText("Header");
     await expect(page.getByTestId("second-button")).toHaveText("Second");
   });
+
+  test("empty Theme tag without attributes does not create wrapper", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <App>
+        <Theme>
+          <VStack testId="container" gap="20px">
+            <Button testId="first-button">First</Button>
+            <H1 testId="header">Header</H1>
+          </VStack>
+        </Theme>
+      </App>
+    `);
+
+    // Content should render normally
+    await expect(page.getByTestId("container")).toBeVisible();
+    await expect(page.getByTestId("first-button")).toBeVisible();
+    await expect(page.getByTestId("header")).toBeVisible();
+
+    // Get the container element's parent - should not be a theme wrapper div
+    const container = page.getByTestId("container");
+    const parentClass = await container.evaluate(el => el.parentElement?.className || '');
+    
+    // The parent should NOT have themeWrapper class since the Theme is empty
+    expect(parentClass).not.toContain('themeWrapper');
+  });
+
+  test("Theme with tone creates wrapper even without other props", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <App>
+        <Theme tone="dark">
+          <VStack testId="container">
+            <Button testId="button">Test</Button>
+          </VStack>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("container")).toBeVisible();
+    
+    // Get the container element's parent - should be a theme wrapper div
+    const container = page.getByTestId("container");
+    const parentClass = await container.evaluate(el => el.parentElement?.className || '');
+    
+    // The parent SHOULD have themeWrapper class since tone is specified
+    expect(parentClass).toContain('themeWrapper');
+  });
+
+  test("Theme with themeVars creates wrapper even without other props", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <App>
+        <Theme backgroundColor-App="rgb(255, 0, 0)">
+          <VStack testId="container">
+            <Button testId="button">Test</Button>
+          </VStack>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("container")).toBeVisible();
+    
+    // Get the container element's parent - should be a theme wrapper div
+    const container = page.getByTestId("container");
+    const parentClass = await container.evaluate(el => el.parentElement?.className || '');
+    
+    // The parent SHOULD have themeWrapper class since theme vars are specified
+    expect(parentClass).toContain('themeWrapper');
+  });
+
+  test("explicit applyIf=true creates wrapper even without meaningful props", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <App>
+        <Theme applyIf="true">
+          <VStack testId="container">
+            <Button testId="button">Test</Button>
+          </VStack>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("container")).toBeVisible();
+    
+    // Get the container element's parent - should be a theme wrapper div
+    const container = page.getByTestId("container");
+    const parentClass = await container.evaluate(el => el.parentElement?.className || '');
+    
+    // The parent SHOULD have themeWrapper class because applyIf is explicitly true
+    expect(parentClass).toContain('themeWrapper');
+  });
 });
