@@ -3,7 +3,7 @@
 import { cp, mkdir, rm, writeFile } from "fs/promises";
 import * as dotenv from "dotenv";
 import { existsSync } from "fs";
-import glob from "glob";
+import { glob } from "glob";
 import type { InlineConfig } from "vite";
 import { build as viteBuild } from "vite";
 import { getViteConfig } from "./viteConfig";
@@ -30,16 +30,13 @@ type StandaloneJsonConfig = {
 };
 
 async function getExportedJsObjects<T>(path: string): Promise<Array<T>> {
-  return await new Promise((resolve, reject) => {
-    glob(`${process.cwd()}/${path}`, (err: any, matches = []) => {
-      const modules = Promise.all(
-        matches.map(async (file: string) => {
-          return (await import(file)).default;
-        }),
-      );
-      resolve(modules);
-    });
-  });
+  const matches = await glob(`${process.cwd()}/${path}`);
+  const modules = await Promise.all(
+    matches.map(async (file: string) => {
+      return (await import(file)).default;
+    })
+  );
+  return modules;
 }
 
 async function convertResourcesDir(distRoot: string, flatDist: boolean, filePrefix: string) {
@@ -51,11 +48,7 @@ async function convertResourcesDir(distRoot: string, flatDist: boolean, filePref
   if (!existsSync(resourcesDir)) {
     return undefined;
   }
-  const files = await new Promise<string[]>((resolve, reject) => {
-    glob(`${resourcesDir}/**/*`, (err: any, matches = []) => {
-      resolve(matches);
-    });
-  });
+  const files = await glob(`${resourcesDir}/**/*`);
 
   const ret: Record<string, string> = {};
   for (let i = 0; i < files.length; i++) {
