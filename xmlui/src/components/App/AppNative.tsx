@@ -331,7 +331,7 @@ export function App({
     el.addEventListener("scroll", saveScroll);
     return () => {
       el.removeEventListener("scroll", saveScroll);
-      saveScroll.cancel();
+      saveScroll.flush();
     };
   }, [scrollRestorationEnabled, location.key, scrollContainerRef]);
 

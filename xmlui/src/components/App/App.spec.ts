@@ -1,4 +1,5 @@
 import { expect, test } from "../../testing/fixtures";
+import type { Page } from "@playwright/test";
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
@@ -863,5 +864,138 @@ test.describe("NavPanel When Condition Reactivity", () => {
     await resetBtn.click();
     await page.waitForTimeout(100);
     await expect(hamburger).not.toBeVisible();
+  });
+});
+
+// =============================================================================
+// SCROLL RESTORATION TESTS
+// =============================================================================
+
+test.describe("Scroll Restoration", () => {
+  async function getScrollPosition(page: Page) {
+    return await page.evaluate(() => {
+      // Try to find the scroll container
+      const appWrapper = document.querySelector('[class*="appContainer"]');
+      if (!appWrapper) return 0;
+      
+      // Check if appWrapper handles scroll (scrollWholePage=true default)
+      if (window.getComputedStyle(appWrapper).overflowY === 'auto' || window.getComputedStyle(appWrapper).overflowY === 'scroll') {
+        return appWrapper.scrollTop;
+      }
+      
+      // Check main content area
+      const mainContent = appWrapper.querySelector('main') || appWrapper.querySelector('[class*="mainContentArea"]');
+      if (mainContent && (window.getComputedStyle(mainContent as Element).overflowY === 'auto' || window.getComputedStyle(mainContent as Element).overflowY === 'scroll')) {
+        return (mainContent as HTMLElement).scrollTop;
+      }
+  
+      return document.documentElement.scrollTop || document.body.scrollTop;
+    });
+  }
+  
+  async function scrollToPosition(page: Page, top: number) {
+    await page.evaluate((topPos) => {
+      const appWrapper = document.querySelector('[class*="appContainer"]');
+      if (appWrapper) {
+        if (window.getComputedStyle(appWrapper).overflowY === 'auto' || window.getComputedStyle(appWrapper).overflowY === 'scroll') {
+          appWrapper.scrollTo({ top: topPos });
+          return;
+        }
+        const mainContent = appWrapper.querySelector('main') || appWrapper.querySelector('[class*="mainContentArea"]');
+        if (mainContent && (window.getComputedStyle(mainContent as Element).overflowY === 'auto' || window.getComputedStyle(mainContent as Element).overflowY === 'scroll')) {
+          (mainContent as HTMLElement).scrollTo({ top: topPos });
+          return;
+        }
+      }
+      window.scrollTo({ top: topPos });
+    }, top);
+    
+    // Wait for scroll to settle
+    await page.waitForTimeout(100);
+  }
+
+  function createAppMarkup(defaultScrollRestoration: boolean) {
+    return `
+      <App>
+        <Pages defaultScrollRestoration="${defaultScrollRestoration}" fallbackPath="/">
+          <Page url="/">
+            <VStack spacing="1rem">
+              <Text variant="title">Page 1</Text>
+              <Stack height="2000px" backgroundColor="#f0f0f0">
+                <Text>Long content...</Text>
+              </Stack>
+              <Link to="/page2" label="Go to Page 2" testId="linkToPage2" />
+            </VStack>
+          </Page>
+          <Page url="/page2">
+            <VStack spacing="1rem">
+              <Text variant="title">Page 2</Text>
+              <Link to="/" label="Go to Page 1" testId="linkToPage1" />
+            </VStack>
+          </Page>
+        </Pages>
+      </App>
+    `;
+  }
+
+  test("preserves scroll position when navigating back with defaultScrollRestoration=true", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createAppMarkup(true));
+
+    // Wait for initial effects to settle (specifically setScrollRestorationEnabled)
+    await page.waitForTimeout(500); 
+
+    // 1. We are on Page 1. Scroll down.
+    const scrollTarget = 500;
+    await scrollToPosition(page, scrollTarget);
+    
+    // Wait for debounce to save scroll position (100ms debounce in AppNative.tsx)
+    await page.waitForTimeout(300);
+    
+    // Verify we actually scrolled
+    let currentScroll = await getScrollPosition(page);
+    expect(currentScroll).toBeCloseTo(scrollTarget, -1); 
+
+    // 2. Navigate to Page 2
+    await page.click('[data-testid="linkToPage2"]');
+    await expect(page.getByText("Page 2")).toBeVisible();
+
+    // 3. Navigate back to Page 1 using browser back button (POP navigation)
+    await page.goBack();
+    await expect(page.getByText("Page 1")).toBeVisible();
+
+    // 4. Verify scroll position is restored
+    // Use expect.poll to wait for the scroll restoration to happen
+    await expect.poll(async () => getScrollPosition(page)).toBeCloseTo(scrollTarget, -1);
+  });
+
+  test("does NOT preserve scroll position when defaultScrollRestoration=false", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(createAppMarkup(false));
+
+    // 1. We are on Page 1. Scroll down.
+    const scrollTarget = 500;
+    await scrollToPosition(page, scrollTarget);
+    
+    let currentScroll = await getScrollPosition(page);
+    expect(currentScroll).toBeCloseTo(scrollTarget, -1);
+
+    // 2. Navigate to Page 2
+    await page.click('[data-testid="linkToPage2"]');
+    await expect(page.getByText("Page 2")).toBeVisible();
+
+    // 3. Navigate back to Page 1
+    await page.goBack();
+    await expect(page.getByText("Page 1")).toBeVisible();
+
+    // 4. Verify scroll position is NOT restored (should be 0)
+    await page.waitForTimeout(200);
+    
+    currentScroll = await getScrollPosition(page);
+    expect(currentScroll).toBe(0);
   });
 });
