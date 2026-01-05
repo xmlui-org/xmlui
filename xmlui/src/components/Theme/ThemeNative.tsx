@@ -218,24 +218,37 @@ export function Theme({
     );
   }
 
+  // Only create a wrapper div if we're actually changing the theme context
+  // or if we have explicit theme styles that need a CSS scope
+  const needsWrapper = id !== undefined || Object.keys(themeVars).length > 0 || Object.keys(themeCssVars).length > 0;
+
   return (
     <ThemeContext.Provider value={currentThemeContextValue}>
-      <div className={classnames(styles.themeWrapper, className)}>
-        {renderChild && renderChild(node.children, { ...layoutContext, themeClassName: className })}
-        {children}
-      </div>
-      {root &&
-        createPortal(
-          <div
-            className={classnames(styles.themeWrapper, className)}
-            ref={(el) => {
-              if (el) {
-                setCurrentThemeRoot(el);
-              }
-            }}
-          ></div>,
-          root,
-        )}
+      {needsWrapper ? (
+        <>
+          <div className={classnames(styles.themeWrapper, className)}>
+            {renderChild && renderChild(node.children, { ...layoutContext, themeClassName: className })}
+            {children}
+          </div>
+          {root &&
+            createPortal(
+              <div
+                className={classnames(styles.themeWrapper, className)}
+                ref={(el) => {
+                  if (el) {
+                    setCurrentThemeRoot(el);
+                  }
+                }}
+              ></div>,
+              root,
+            )}
+        </>
+      ) : (
+        <>
+          {renderChild && renderChild(node.children, layoutContext)}
+          {children}
+        </>
+      )}
     </ThemeContext.Provider>
   );
 }
