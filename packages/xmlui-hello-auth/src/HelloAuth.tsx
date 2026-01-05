@@ -7,6 +7,11 @@ const HelloAuthMd = createMetadata({
   props: {
     issuer: { description: "OIDC issuer.", type: "string", isRequired: false },
     client_id: { description: "OIDC client id.", type: "string", isRequired: false },
+    client_secret: {
+      description: "OAuth client secret (INSECURE for browser apps!).",
+      type: "string",
+      isRequired: false,
+    },
     redirect_uri: { description: "Redirect URI.", type: "string", isRequired: false },
     scopes: {
       description: "Scopes (space-separated).",
@@ -58,7 +63,8 @@ export const helloAuthComponentRenderer = createComponentRenderer(
   "HelloAuth",
   HelloAuthMd,
   ({ node, extractValue, registerComponentApi, updateState }) => {
-    const authorizeParamsValue = extractValue(node.props?.authorize_params);
+    const props = node.props as any;
+    const authorizeParamsValue = extractValue(props?.authorize_params);
     const authorizeParams =
       authorizeParamsValue && typeof authorizeParamsValue === "object" && !Array.isArray(authorizeParamsValue)
         ? (authorizeParamsValue as Record<string, string | undefined>)
@@ -66,15 +72,16 @@ export const helloAuthComponentRenderer = createComponentRenderer(
 
     return (
       <HelloAuth
-        id={extractValue.asOptionalString(node.props?.id)}
-        issuer={extractValue.asOptionalString(node.props?.issuer)}
-        client_id={extractValue.asOptionalString(node.props?.client_id)}
-        redirect_uri={extractValue.asOptionalString(node.props?.redirect_uri)}
-        scopes={extractValue.asOptionalString(node.props?.scopes)}
-        storage={extractValue.asOptionalString(node.props?.storage)}
-        autoLogin={extractValue.asOptionalBoolean(node.props?.autoLogin)}
-        debug={extractValue.asOptionalBoolean(node.props?.debug)}
-        proxy_base_url={extractValue.asOptionalString(node.props?.proxy_base_url)}
+        id={extractValue.asOptionalString(props?.id)}
+        issuer={extractValue.asOptionalString(props?.issuer)}
+        client_id={extractValue.asOptionalString(props?.client_id)}
+        client_secret={extractValue.asOptionalString(props?.client_secret)}
+        redirect_uri={extractValue.asOptionalString(props?.redirect_uri)}
+        scopes={extractValue.asOptionalString(props?.scopes)}
+        storage={extractValue.asOptionalString(props?.storage)}
+        autoLogin={extractValue.asOptionalBoolean(props?.autoLogin)}
+        debug={extractValue.asOptionalBoolean(props?.debug)}
+        proxy_base_url={extractValue.asOptionalString(props?.proxy_base_url)}
         authorize_params={authorizeParams}
         registerComponentApi={registerComponentApi}
         updateState={updateState}
