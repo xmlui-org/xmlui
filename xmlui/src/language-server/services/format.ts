@@ -305,11 +305,39 @@ class XmluiFormatter {
   printTagLike(node: Node): string {
     switch (node.kind) {
       case SyntaxKind.Script:
+        return this.printScriptTag(node);
       case SyntaxKind.CData:
         return this.getText(node);
       default:
         return this.printElementNode(node);
     }
+  }
+
+  private printScriptTag(node: Node): string {
+    const text = this.getText(node);
+    const closingTag = "</script>";
+    if (text.endsWith(closingTag)) {
+      const contentEnd = text.lastIndexOf(closingTag);
+      const tokenBeforeClosing = text.substring(0, contentEnd);
+      const multiline = tokenBeforeClosing.includes("\n");
+
+      if (multiline) {
+        return (
+          tokenBeforeClosing.trimEnd() +
+          this.newlineToken +
+          this.indent(this.indentationLvl) +
+          closingTag
+        );
+      } else {
+        const openTagEnd = tokenBeforeClosing.indexOf(">");
+        if (openTagEnd !== -1) {
+          const openTag = tokenBeforeClosing.substring(0, openTagEnd + 1);
+          const innerContent = tokenBeforeClosing.substring(openTagEnd + 1);
+          return `${openTag} ${innerContent.trim()} ${closingTag}`;
+        }
+      }
+    }
+    return text;
   }
 
   printElementNode(node: Node): string {
