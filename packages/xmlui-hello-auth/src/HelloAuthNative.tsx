@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { RegisterComponentApiFn, UpdateStateFn } from "xmlui";
+import type { RegisterComponentApiFn } from "xmlui";
 
 /* -------------------- PKCE + helpers (TS/DOM safe) -------------------- */
 function parseJwt(token: string): Record<string, any> | null {
@@ -64,6 +64,7 @@ type Props = {
   id?: string;
   issuer?: string;
   client_id?: string;
+  client_secret?: string;
   redirect_uri?: string;
   scopes?: string;
   storage?: "session" | "local" | string;
@@ -73,7 +74,7 @@ type Props = {
   authorize_params?: Record<string, string | undefined>;
 
   registerComponentApi?: RegisterComponentApiFn;
-  updateState?: UpdateStateFn;
+  updateState?: (state: Record<string, any>) => void;
 };
 export const defaultProps = {
   scopes: "openid email profile",
@@ -153,6 +154,7 @@ export const HelloAuth = React.forwardRef<HTMLDivElement, Props>(function HelloA
   {
     issuer,
     client_id,
+    client_secret,
     redirect_uri,
     scopes = defaultProps.scopes,
     storage = defaultProps.storage,
@@ -193,6 +195,7 @@ export const HelloAuth = React.forwardRef<HTMLDivElement, Props>(function HelloA
     () => ({
       issuer,
       client_id,
+      client_secret,
       redirect_uri,
       scopes,
       storage,
@@ -203,6 +206,7 @@ export const HelloAuth = React.forwardRef<HTMLDivElement, Props>(function HelloA
     [
       issuer,
       client_id,
+      client_secret,
       redirect_uri,
       scopes,
       storage,
@@ -315,6 +319,11 @@ export const HelloAuth = React.forwardRef<HTMLDivElement, Props>(function HelloA
           code_verifier: temp.code_verifier || "", // required for PKCE
         });
 
+        if (client_secret) {
+          body.append("client_secret", client_secret);
+          if (debug) console.warn("[HelloAuth] ⚠️ Using client_secret (INSECURE for production!)");
+        }
+
         if (debug) {
           console.debug("[HelloAuth] token POST →", tokenUrl);
           console.debug("[HelloAuth] token body →", Object.fromEntries(body.entries()));
@@ -370,7 +379,7 @@ export const HelloAuth = React.forwardRef<HTMLDivElement, Props>(function HelloA
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [temp?.code, endpoints?.token_endpoint, client_id, redirect_uri, proxy_base_url]);
+  }, [temp?.code, endpoints?.token_endpoint, client_id, client_secret, redirect_uri, proxy_base_url]);
 
   // --- Step 5: verify id_token & hydrate user/session ---
   useEffect(() => {
