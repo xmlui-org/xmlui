@@ -44,7 +44,7 @@ The `allow` property controls which browser features the embedded content can ac
 ```xmlui-pg copy display name="Example: allow"
 <App>
   <IFrame
-      src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+      src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ"
       allow="camera; microphone; geolocation"
       width="560px"
       height="315px"
@@ -62,7 +62,7 @@ The `allow` property controls which browser features the embedded content can ac
   <VStack gap="$space-2">
     <Button 
       label="Open 'Kraftwerk: The Model' in IFrame" 
-      onClick="window.open('https://www.youtube.com/embed/-s4zRw16tMA', 'myFrame')" 
+      onClick="window.open('https://www.youtube-nocookie.com/embed/-s4zRw16tMA', 'myFrame')" 
     />
     <IFrame 
       src="https://example.com"

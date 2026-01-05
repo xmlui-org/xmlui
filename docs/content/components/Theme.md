@@ -41,9 +41,9 @@ and sets several theme variables to style the `ProgressBar` component:
 
 ## Properties [#properties]
 
-### `applyIf` (default: true) [#applyif-default-true]
+### `applyIf` (default: "auto") [#applyif-default-auto]
 
-This property controls whether the theme wrapper is applied. When true (default), the theme wraps the children. When false, children are rendered unwrapped.
+This property controls whether the theme wrapper is applied. When true, the theme wraps the children. When false, children are rendered unwrapped. If not explicitly set, defaults to true only when the Theme has meaningful properties (themeId, tone, themeVars, or disableInlineStyle); otherwise defaults to false to avoid unnecessary wrapper elements.
 
 The `applyIf` property controls whether the theme is conditionally applied to its children. When set to `false`, the children are rendered without the theme wrapper, effectively bypassing the theme styling.
 
