@@ -1,7 +1,7 @@
 {
   "name": "xmlui-docs",
   "private": true,
-  "version": "0.0.10",
+  "version": "0.0.11",
   "scripts": {
     "start": "echo '====================================================================\nExecuting \"npm run watch-docs-content\" in the project root,\nyou get automatic content generation based on xmlui metadata!\n====================================================================\n' && xmlui start",
     "preview": "xmlui preview",
