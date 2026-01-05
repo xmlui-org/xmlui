@@ -42,6 +42,7 @@ type MarkdownProps = {
   codeHighlighter?: CodeHighlighter;
   showHeadingAnchors?: boolean;
   grayscale?: boolean;
+  truncateLinks?: boolean;
 };
 
 function PreTagComponent({ id, children, codeHighlighter }) {
@@ -96,6 +97,7 @@ export const Markdown = memo(
       codeHighlighter,
       showHeadingAnchors,
       grayscale,
+      truncateLinks,
       ...rest
     }: MarkdownProps,
     ref,
@@ -130,6 +132,7 @@ export const Markdown = memo(
         className={classnames(
           styles.markdownContent,
           { [styles.grayscale]: grayscale },
+          { [styles.truncateLinks]: truncateLinks },
           className
         )}
         style={style}

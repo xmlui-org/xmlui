@@ -187,6 +187,25 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
       }
     }
 
+    &.truncateLinks {
+      a[href] {
+        display: inline-block;
+        max-width: 300px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: bottom;
+      }
+
+      a[href] span.ellipsis {
+        display: inline;
+      }
+
+      a[href] span.invisible {
+        display: none;
+      }
+    }
+
     // Force word breaking ONLY for inline code elements (not code blocks)
     // Code blocks are wrapped in <pre><code>, so we exclude those
     code:not(pre code) {
