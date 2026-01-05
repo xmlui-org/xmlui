@@ -9,6 +9,7 @@ These are the key context variables available in XMLUI components.
 | `$item`             | Iterators           | The current item in a list/array              |
 | `$itemIndex`        | Iterators           | The current index in a list/array             |
 | `$group`            | List                | Groups defined by `groupBy`                   |
+| `$itemContext`      | Select              | Provides the `removeItem()` method            |
 | `$param`            | Event handlers      | The event's payload (e.g., form data)         |
 | `$data`             | Forms               | Consolidated data from FormItems              |
 | `$validationResult` | Forms               | Result of latest validation                   |
@@ -70,6 +71,26 @@ These are the key context variables available in XMLUI components.
   <Items data="{products}">
     <Text>Index: {$itemIndex}, Name: {$item.name}</Text>
   </Items>
+  ```
+
+## Select
+
+### `$itemContext`
+
+- **Scope:** Available inside `valueTemplate` of a `<Select>` component with `multiSelect` enabled.
+- **What it is:** Provides the `removeItem()` method to remove a selected value from a multi-select.
+- **Example:**
+  ```xmlui
+  <Select multiSelect>
+    <property name="valueTemplate">
+      <HStack>
+        <Text>{$item.label}</Text>
+        <Button icon="close" onClick="$itemContext.removeItem()" />
+      </HStack>
+    </property>
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+  </Select>
   ```
 
 ## Event handlers

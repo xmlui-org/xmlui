@@ -108,6 +108,7 @@ export function NestedApp({
   className,
 }: NestedAppProps) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const shadowRef = useRef(null);
   const contentRootRef = useRef<Root | null>(null);
   const theme = useTheme();
@@ -116,6 +117,25 @@ export function NestedApp({
   const parentInterceptorContext = useApiInterceptorContext();
   const [initialized, setInitialized] = useState(!withSplashScreen);
   const [revealAnimationFinished, setRevealAnimationFinished] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+
+  // Handle click outside to reset focus
+  useEffect(() => {
+    const handleDocumentClick = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsFocused(false);
+      }
+    };
+
+    document.addEventListener("click", handleDocumentClick);
+    return () => {
+      document.removeEventListener("click", handleDocumentClick);
+    };
+  }, []);
+
+  const handleContainerClick = useCallback(() => {
+    setIsFocused(true);
+  }, []);
 
   //TODO illesg: we should come up with something to make sure that nestedApps don't overwrite each other's mocked api endpoints
   //   disabled for now, as it messes up the paths of not mocked APIs (e.g. resources/{staticJsonfiles})
@@ -303,8 +323,15 @@ export function NestedApp({
   }, []);
 
   const shouldAnimate = withSplashScreen && !revealAnimationFinished;
+  const containerStyle = isFocused ? { zIndex: 1 } : undefined;
+
   return (
-    <div className={classnames(styles.nestedAppPlaceholder, className)}>
+    <div
+      ref={containerRef}
+      onClick={handleContainerClick}
+      style={containerStyle}
+      className={classnames(styles.nestedAppPlaceholder, className)}
+    >
       {shouldAnimate && <AnimatedLogo />}
       <div
         ref={rootRef}

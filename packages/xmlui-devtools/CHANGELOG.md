@@ -1,5 +1,11 @@
 # xmlui-devtools
 
+## 0.1.22
+
+### Patch Changes
+
+- f36a70a: use the latest xmlui version
+
 ## 0.1.21
 
 ### Patch Changes

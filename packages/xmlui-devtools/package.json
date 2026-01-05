@@ -1,6 +1,6 @@
 {
   "name": "xmlui-devtools",
-  "version": "0.1.21",
+  "version": "0.1.22",
   "sideEffects": false,
   "type": "module",
   "scripts": {

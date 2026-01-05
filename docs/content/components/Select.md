@@ -41,7 +41,7 @@ You can use `Select` with dynamic options:
 
 - `$group`: Group name when using `groupBy` (available in group header templates)
 - `$item`: Represents the current option's data (label and value properties)
-- `$itemContext`: Provides utility methods like `removeItem()` for multi-select scenarios
+- `$itemContext`: Provides the `removeItem()` method for multi-select scenarios
 
 ## Properties [#properties]
 

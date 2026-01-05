@@ -162,7 +162,7 @@ export const SelectMd = createMetadata({
   },
   contextVars: {
     $item: d("Represents the current option's data (label and value properties)"),
-    $itemContext: d("Provides utility methods like `removeItem()` for multi-select scenarios"),
+    $itemContext: d("Provides the `removeItem()` method for multi-select scenarios"),
     $group: d("Group name when using `groupBy` (available in group header templates)"),
   },
   themeVars: parseScssVar(styles.themeVars),

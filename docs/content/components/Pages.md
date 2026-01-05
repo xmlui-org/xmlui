@@ -34,6 +34,10 @@ No page is fetched from the server, thus the application operates as a [Single P
 
 ## Properties [#properties]
 
+### `defaultScrollRestoration` (default: false) [#defaultscrollrestoration-default-false]
+
+When set to true, the page scroll position is restored when navigating back via browser history.
+
 ### `fallbackPath` (default: "/") [#fallbackpath-default-]
 
 The fallback path when the current URL does not match any of the paths of the pages.

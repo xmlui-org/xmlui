@@ -1,0 +1,15 @@
+{
+  "name": "xmlui-standalone-playground",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "start": "xmlui start",
+    "build:playground": "xmlui build --buildMode=INLINE_ALL --withMock ",
+    "preview": "xmlui preview",
+    "release-ci": "npm run build && xmlui zip-dist"
+  },
+  "dependencies": {
+    "xmlui": "*",
+    "xmlui-playground": "*"
+  }
+}

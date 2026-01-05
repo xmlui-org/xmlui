@@ -573,7 +573,7 @@ The component itself cannot be styled, but the components that render the final 
 | [marginBottom](../styles-and-themes/common-units/#size)-H6-markdown | $space-2_5 | $space-2_5 |
 | [marginBottom](../styles-and-themes/common-units/#size)-Image-markdown | $space-6 | $space-6 |
 | [marginBottom](../styles-and-themes/common-units/#size)-Li-markdown | $space-2_5 | $space-2_5 |
-| [marginBottom](../styles-and-themes/common-units/#size)-Ol-markdown | *none* | *none* |
+| [marginBottom](../styles-and-themes/common-units/#size)-Ol-markdown | $space-5 | $space-5 |
 | [marginBottom](../styles-and-themes/common-units/#size)-Table-markdown | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-markdown | $space-6 | $space-6 |
 | [marginBottom](../styles-and-themes/common-units/#size)-Ul-markdown | $space-5 | $space-5 |
@@ -581,9 +581,11 @@ The component itself cannot be styled, but the components that render the final 
 | [marginLeft](../styles-and-themes/common-units/#size)-content-Admonition-markdown | $space-1_5 | $space-1_5 |
 | [marginLeft](../styles-and-themes/common-units/#size)-Image-markdown | $space-0 | $space-0 |
 | [marginLeft](../styles-and-themes/common-units/#size)-Li-markdown | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Ol-markdown | $space-8 | $space-8 |
 | [marginLeft](../styles-and-themes/common-units/#size)-Text-markdown | *none* | *none* |
 | [marginLeft](../styles-and-themes/common-units/#size)-Ul-markdown | $space-8 | $space-8 |
 | [marginRight](../styles-and-themes/common-units/#size)-Image-markdown | $space-0 | $space-0 |
+| [marginRight](../styles-and-themes/common-units/#size)-Ol-markdown | $space-0 | $space-0 |
 | [marginRight](../styles-and-themes/common-units/#size)-Text-markdown | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Ul-markdown | $space-0 | $space-0 |
 | [marginTop](../styles-and-themes/common-units/#size)-Admonition-markdown | $space-6 | $space-6 |
@@ -597,7 +599,7 @@ The component itself cannot be styled, but the components that render the final 
 | [marginTop](../styles-and-themes/common-units/#size)-H6-markdown | $space-4 | $space-4 |
 | [marginTop](../styles-and-themes/common-units/#size)-Image-markdown | $space-6 | $space-6 |
 | [marginTop](../styles-and-themes/common-units/#size)-Li-markdown | $space-2_5 | $space-2_5 |
-| [marginTop](../styles-and-themes/common-units/#size)-Ol-markdown | *none* | *none* |
+| [marginTop](../styles-and-themes/common-units/#size)-Ol-markdown | $space-2_5 | $space-2_5 |
 | [marginTop](../styles-and-themes/common-units/#size)-Table-markdown | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-markdown | $space-3 | $space-3 |
 | [marginTop](../styles-and-themes/common-units/#size)-Ul-markdown | $space-2_5 | $space-2_5 |

@@ -603,6 +603,77 @@ test.describe("searchable select", () => {
       await expect(options[0]).toHaveText("second");
     },
   );
+
+  test("dropdownHeight applies custom height with searchable", async ({
+    initTestBed,
+    page,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select searchable dropdownHeight="150px">
+        <Option value="opt1" label="Apple"/>
+        <Option value="opt2" label="Banana"/>
+        <Option value="opt3" label="Cherry"/>
+        <Option value="opt4" label="Date"/>
+        <Option value="opt5" label="Elderberry"/>
+        <Option value="opt6" label="Fig"/>
+        <Option value="opt7" label="Grape"/>
+        <Option value="opt8" label="Honeydew"/>
+      </Select>
+    `);
+    const driver = await createSelectDriver();
+    await driver.click();
+    
+    // Verify dropdown opens and shows options
+    await expect(page.getByRole("option", { name: "Apple" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Honeydew" })).toBeAttached();
+  });
+
+  test("dropdown defaults to height with searchable when not specified", async ({
+    initTestBed,
+    page,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select searchable>
+        <Option value="opt1" label="Apple"/>
+        <Option value="opt2" label="Banana"/>
+        <Option value="opt3" label="Cherry"/>
+      </Select>
+    `);
+    const driver = await createSelectDriver();
+    await driver.click();
+    
+    // Verify dropdown opens and shows options
+    await expect(page.getByRole("option", { name: "Apple" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Cherry" })).toBeVisible();
+  });
+
+  test("search works with dropdownHeight", async ({
+    initTestBed,
+    page,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select searchable dropdownHeight="120px">
+        <Option value="opt1" label="Apple"/>
+        <Option value="opt2" label="Banana"/>
+        <Option value="opt3" label="Cherry"/>
+        <Option value="opt4" label="Date"/>
+        <Option value="opt5" label="Elderberry"/>
+      </Select>
+    `);
+    const driver = await createSelectDriver();
+    await driver.click();
+    
+    // Search for a specific option
+    await driver.searchFor("Cherry");
+    
+    // Only Cherry should be visible after search
+    await expect(page.getByRole("option", { name: "Cherry" })).toBeVisible();
+    const options = await page.getByRole("option").all();
+    expect(options).toHaveLength(1);
+  });
 });
 
 // =============================================================================

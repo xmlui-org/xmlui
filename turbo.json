@@ -79,6 +79,10 @@
       "dependsOn": ["^build:extension", "^build:xmlui"],
       "outputs": ["dist/**"]
     },
+    "build:playground": {
+      "dependsOn": ["^build:extension", "^build:xmlui"],
+      "outputs": ["dist/**"]
+    },
     "xmlui#build:xmlui-test-bed": {
       "dependsOn": ["build:extension"],
       "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts"],
