@@ -1,5 +1,22 @@
 # xmlui
 
+## 0.11.24
+
+### Patch Changes
+
+- ada1e74: Fix the rendering issues with an attributeless Theme component
+- 1c230fb: Add "Br" component as an alias to "br"
+- 82fcb62: Fix the TableOfContents navigation issue
+- 6313178: Fix the wrong Select height with searchable="true"
+- 6303921: feat: Pages - remember scroll-state of page
+- c55b2c6: Fixed regular Select (non-searchable/multiSelect) not having a wide enough dropdown list if input is sized using percentages.
+- 2a5e9f9: fix: building a projcet in configOnly mode no longer throws the error 'glob.glob is not a function'
+- ff03158: Experiment with "init" and "cleanup" component events
+- 17bc1e4: The <script> tag will hoist declarations and ignores non-declaration statements
+- f1e1fd9: Add experimental "init" event to components
+- fdca99c: fix: variant styling issue
+- 38dd6f0: Add signature and parameter descriptions to component event metadata
+
 ## 0.11.23
 
 ### Patch Changes
