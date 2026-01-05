@@ -3,7 +3,7 @@
 import { cp, mkdir, rm, writeFile } from "fs/promises";
 import * as dotenv from "dotenv";
 import { existsSync } from "fs";
-import * as glob from "glob";
+import glob from "glob";
 import type { InlineConfig } from "vite";
 import { build as viteBuild } from "vite";
 import { getViteConfig } from "./viteConfig";
@@ -31,11 +31,11 @@ type StandaloneJsonConfig = {
 
 async function getExportedJsObjects<T>(path: string): Promise<Array<T>> {
   return await new Promise((resolve, reject) => {
-    glob.glob(`${process.cwd()}/${path}`, (err: any, matches = []) => {
+    glob(`${process.cwd()}/${path}`, (err: any, matches = []) => {
       const modules = Promise.all(
         matches.map(async (file: string) => {
           return (await import(file)).default;
-        })
+        }),
       );
       resolve(modules);
     });
@@ -52,7 +52,7 @@ async function convertResourcesDir(distRoot: string, flatDist: boolean, filePref
     return undefined;
   }
   const files = await new Promise<string[]>((resolve, reject) => {
-    glob.glob(`${resourcesDir}/**/*`, (err: any, matches = []) => {
+    glob(`${resourcesDir}/**/*`, (err: any, matches = []) => {
       resolve(matches);
     });
   });
@@ -116,56 +116,136 @@ export const build = async ({
       "process.env.VITE_APP_VERSION": JSON.stringify(process.env.VITE_APP_VERSION),
 
       "process.env.VITE_USED_COMPONENTS_App": JSON.stringify(process.env.VITE_USED_COMPONENTS_App),
-      "process.env.VITE_USED_COMPONENTS_Chart": JSON.stringify(process.env.VITE_USED_COMPONENTS_Chart),
-      "process.env.VITE_USED_COMPONENTS_AppHeader": JSON.stringify(process.env.VITE_USED_COMPONENTS_AppHeader),
-      "process.env.VITE_USED_COMPONENTS_Stack": JSON.stringify(process.env.VITE_USED_COMPONENTS_Stack),
-      "process.env.VITE_USED_COMPONENTS_Link": JSON.stringify(process.env.VITE_USED_COMPONENTS_Link),
-      "process.env.VITE_USED_COMPONENTS_Text": JSON.stringify(process.env.VITE_USED_COMPONENTS_Text),
-      "process.env.VITE_USED_COMPONENTS_Button": JSON.stringify(process.env.VITE_USED_COMPONENTS_Button),
-      "process.env.VITE_USED_COMPONENTS_Card": JSON.stringify(process.env.VITE_USED_COMPONENTS_Card),
-      "process.env.VITE_USED_COMPONENTS_Image": JSON.stringify(process.env.VITE_USED_COMPONENTS_Image),
-      "process.env.VITE_USED_COMPONENTS_Footer": JSON.stringify(process.env.VITE_USED_COMPONENTS_Footer),
-      "process.env.VITE_USED_COMPONENTS_SpaceFiller": JSON.stringify(process.env.VITE_USED_COMPONENTS_SpaceFiller),
+      "process.env.VITE_USED_COMPONENTS_Chart": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Chart,
+      ),
+      "process.env.VITE_USED_COMPONENTS_AppHeader": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_AppHeader,
+      ),
+      "process.env.VITE_USED_COMPONENTS_Stack": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Stack,
+      ),
+      "process.env.VITE_USED_COMPONENTS_Link": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Link,
+      ),
+      "process.env.VITE_USED_COMPONENTS_Text": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Text,
+      ),
+      "process.env.VITE_USED_COMPONENTS_Button": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Button,
+      ),
+      "process.env.VITE_USED_COMPONENTS_Card": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Card,
+      ),
+      "process.env.VITE_USED_COMPONENTS_Image": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Image,
+      ),
+      "process.env.VITE_USED_COMPONENTS_Footer": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Footer,
+      ),
+      "process.env.VITE_USED_COMPONENTS_SpaceFiller": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_SpaceFiller,
+      ),
       "process.env.VITE_USED_COMPONENTS_Pdf": JSON.stringify(process.env.VITE_USED_COMPONENTS_Pdf),
-      "process.env.VITE_USED_COMPONENTS_Textarea": JSON.stringify(process.env.VITE_USED_COMPONENTS_Textarea),
-      "process.env.VITE_USED_COMPONENTS_Logo": JSON.stringify(process.env.VITE_USED_COMPONENTS_Logo),
-      "process.env.VITE_USED_COMPONENTS_NavLink": JSON.stringify(process.env.VITE_USED_COMPONENTS_NavLink),
-      "process.env.VITE_USED_COMPONENTS_NavGroup": JSON.stringify(process.env.VITE_USED_COMPONENTS_NavGroup),
-      "process.env.VITE_USED_COMPONENTS_Form": JSON.stringify(process.env.VITE_USED_COMPONENTS_Form),
-      "process.env.VITE_USED_COMPONENTS_Tree": JSON.stringify(process.env.VITE_USED_COMPONENTS_Tree),
-      "process.env.VITE_USED_COMPONENTS_Checkbox": JSON.stringify(process.env.VITE_USED_COMPONENTS_Checkbox),
-      "process.env.VITE_USED_COMPONENTS_Switch": JSON.stringify(process.env.VITE_USED_COMPONENTS_Switch),
-      "process.env.VITE_USED_COMPONENTS_DotMenu": JSON.stringify(process.env.VITE_USED_COMPONENTS_DotMenu),
-      "process.env.VITE_USED_COMPONENTS_Heading": JSON.stringify(process.env.VITE_USED_COMPONENTS_Heading),
-      "process.env.VITE_USED_COMPONENTS_Fragment": JSON.stringify(process.env.VITE_USED_COMPONENTS_Fragment),
-      "process.env.VITE_USED_COMPONENTS_Table": JSON.stringify(process.env.VITE_USED_COMPONENTS_Table),
-      "process.env.VITE_USED_COMPONENTS_List": JSON.stringify(process.env.VITE_USED_COMPONENTS_List),
-      "process.env.VITE_USED_COMPONENTS_XmluiCodeHightlighter": JSON.stringify(process.env.VITE_USED_COMPONENTS_XmluiCodeHightlighter),
-      "process.env.VITE_USED_COMPONENTS_Charts": JSON.stringify(process.env.VITE_USED_COMPONENTS_Charts),
-      "process.env.VITE_INCLUDE_HTML_COMPONENTS": JSON.stringify(process.env.VITE_INCLUDE_HTML_COMPONENTS),
-      "process.env.VITE_USED_COMPONENTS_DatePicker": JSON.stringify(process.env.VITE_USED_COMPONENTS_DatePicker),
-      "process.env.VITE_USED_COMPONENTS_NavPanel": JSON.stringify(process.env.VITE_USED_COMPONENTS_NavPanel),
-      "process.env.VITE_USED_COMPONENTS_Pages": JSON.stringify(process.env.VITE_USED_COMPONENTS_Pages),
-      "process.env.VITE_USED_COMPONENTS_StickyBox": JSON.stringify(process.env.VITE_USED_COMPONENTS_StickyBox),
-      "process.env.VITE_USED_COMPONENTS_Badge": JSON.stringify(process.env.VITE_USED_COMPONENTS_Badge),
-      "process.env.VITE_USED_COMPONENTS_Avatar": JSON.stringify(process.env.VITE_USED_COMPONENTS_Avatar),
+      "process.env.VITE_USED_COMPONENTS_Textarea": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Textarea,
+      ),
+      "process.env.VITE_USED_COMPONENTS_Logo": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Logo,
+      ),
+      "process.env.VITE_USED_COMPONENTS_NavLink": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_NavLink,
+      ),
+      "process.env.VITE_USED_COMPONENTS_NavGroup": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_NavGroup,
+      ),
+      "process.env.VITE_USED_COMPONENTS_Form": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Form,
+      ),
+      "process.env.VITE_USED_COMPONENTS_Tree": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Tree,
+      ),
+      "process.env.VITE_USED_COMPONENTS_Checkbox": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Checkbox,
+      ),
+      "process.env.VITE_USED_COMPONENTS_Switch": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Switch,
+      ),
+      "process.env.VITE_USED_COMPONENTS_DotMenu": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_DotMenu,
+      ),
+      "process.env.VITE_USED_COMPONENTS_Heading": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Heading,
+      ),
+      "process.env.VITE_USED_COMPONENTS_Fragment": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Fragment,
+      ),
+      "process.env.VITE_USED_COMPONENTS_Table": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Table,
+      ),
+      "process.env.VITE_USED_COMPONENTS_List": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_List,
+      ),
+      "process.env.VITE_USED_COMPONENTS_XmluiCodeHightlighter": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_XmluiCodeHightlighter,
+      ),
+      "process.env.VITE_USED_COMPONENTS_Charts": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Charts,
+      ),
+      "process.env.VITE_INCLUDE_HTML_COMPONENTS": JSON.stringify(
+        process.env.VITE_INCLUDE_HTML_COMPONENTS,
+      ),
+      "process.env.VITE_USED_COMPONENTS_DatePicker": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_DatePicker,
+      ),
+      "process.env.VITE_USED_COMPONENTS_NavPanel": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_NavPanel,
+      ),
+      "process.env.VITE_USED_COMPONENTS_Pages": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Pages,
+      ),
+      "process.env.VITE_USED_COMPONENTS_StickyBox": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_StickyBox,
+      ),
+      "process.env.VITE_USED_COMPONENTS_Badge": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Badge,
+      ),
+      "process.env.VITE_USED_COMPONENTS_Avatar": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Avatar,
+      ),
       "process.env.VITE_USED_COMPONENTS_ContentSeparator": JSON.stringify(
-        process.env.VITE_USED_COMPONENTS_ContentSeparator
+        process.env.VITE_USED_COMPONENTS_ContentSeparator,
       ),
-      "process.env.VITE_USED_COMPONENTS_FlowLayout": JSON.stringify(process.env.VITE_USED_COMPONENTS_FlowLayout),
-      "process.env.VITE_USED_COMPONENTS_ModalDialog": JSON.stringify(process.env.VITE_USED_COMPONENTS_ModalDialog),
-      "process.env.VITE_USED_COMPONENTS_NoResult": JSON.stringify(process.env.VITE_USED_COMPONENTS_NoResult),
-      "process.env.VITE_USED_COMPONENTS_Option": JSON.stringify(process.env.VITE_USED_COMPONENTS_Option),
+      "process.env.VITE_USED_COMPONENTS_FlowLayout": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_FlowLayout,
+      ),
+      "process.env.VITE_USED_COMPONENTS_ModalDialog": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_ModalDialog,
+      ),
+      "process.env.VITE_USED_COMPONENTS_NoResult": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_NoResult,
+      ),
+      "process.env.VITE_USED_COMPONENTS_Option": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Option,
+      ),
       "process.env.VITE_USED_COMPONENTS_FileUploadDropZone": JSON.stringify(
-        process.env.VITE_USED_COMPONENTS_FileUploadDropZone
+        process.env.VITE_USED_COMPONENTS_FileUploadDropZone,
       ),
-      "process.env.VITE_USED_COMPONENTS_Icon": JSON.stringify(process.env.VITE_USED_COMPONENTS_Icon),
-      "process.env.VITE_USED_COMPONENTS_Items": JSON.stringify(process.env.VITE_USED_COMPONENTS_Items),
+      "process.env.VITE_USED_COMPONENTS_Icon": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Icon,
+      ),
+      "process.env.VITE_USED_COMPONENTS_Items": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Items,
+      ),
       "process.env.VITE_USED_COMPONENTS_SelectionStore": JSON.stringify(
-        process.env.VITE_USED_COMPONENTS_SelectionStore
+        process.env.VITE_USED_COMPONENTS_SelectionStore,
       ),
-      "process.env.VITE_INCLUDE_REST_COMPONENTS": JSON.stringify(process.env.VITE_INCLUDE_REST_COMPONENTS),
-      "process.env.VITE_USED_COMPONENTS_EmojiSelector": JSON.stringify(process.env.VITE_USED_COMPONENTS_EmojiSelector),
+      "process.env.VITE_INCLUDE_REST_COMPONENTS": JSON.stringify(
+        process.env.VITE_INCLUDE_REST_COMPONENTS,
+      ),
+      "process.env.VITE_USED_COMPONENTS_EmojiSelector": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_EmojiSelector,
+      ),
     },
   } as InlineConfig);
 
@@ -208,9 +288,11 @@ export const build = async ({
         }
         await writeFile(
           `${process.cwd()}${themesFolderPath}/${getThemeFileName(theme)}.json`,
-          JSON.stringify(theme, null, 4)
+          JSON.stringify(theme, null, 4),
         );
-        themePaths.push(removeLeadingSlashForPath(`${themesFolder}/${getThemeFileName(theme)}.json`));
+        themePaths.push(
+          removeLeadingSlashForPath(`${themesFolder}/${getThemeFileName(theme)}.json`),
+        );
       }
     }
 
