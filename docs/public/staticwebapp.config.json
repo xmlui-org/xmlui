@@ -1,6 +1,6 @@
 {
   "globalHeaders": {
-    "Content-Security-Policy": "frame-src https://www.youtube.com https://www.youtube-nocookie.com;"
+    "Referrer-Policy": "strict-origin-when-cross-origin"
   },
   "navigationFallback": {
     "rewrite": "/index.html",
