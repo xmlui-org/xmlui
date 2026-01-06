@@ -93,7 +93,19 @@ export const defaultProps: Pick<
   noSubmit: false,
 };
 
-const FormItemContext = createContext<any>({ parentFormItemId: null });
+export const FormItemContext = createContext<{ parentFormItemId: string | null; isInsideFormItem: boolean }>({
+  parentFormItemId: null,
+  isInsideFormItem: false,
+});
+
+/**
+ * Hook to check if a component is rendered inside a FormItem.
+ * This is used by FormBindingBehavior to avoid double-wrapping inputs.
+ */
+export function useIsInsideFormItem(): boolean {
+  const context = useContext(FormItemContext);
+  return context.isInsideFormItem;
+}
 
 function ArrayLikeFormItem({
   children,
@@ -105,6 +117,7 @@ function ArrayLikeFormItem({
   const formContextValue = useMemo(() => {
     return {
       parentFormItemId: formItemId,
+      isInsideFormItem: true,
     };
   }, [formItemId]);
 
@@ -501,8 +514,16 @@ export const FormItem = memo(function FormItem({
   if (!isInsideForm) {
     throw new Error("FormItem must be used inside a Form");
   }
+
+  // Provide FormItem context for children to know they're inside a FormItem
+  const formItemContextValue = useMemo(() => ({
+    parentFormItemId: formItemId ?? null,
+    isInsideFormItem: true,
+  }), [formItemId]);
+
   return (
-    <ItemWithLabel
+    <FormItemContext.Provider value={formItemContextValue}>
+      <ItemWithLabel
       labelPosition={labelPositionValue}
       label={label}
       labelWidth={labelWidthValue}
@@ -540,6 +561,7 @@ export const FormItem = memo(function FormItem({
     >
       {formControl}
     </ItemWithLabel>
+    </FormItemContext.Provider>
   );
 });
 

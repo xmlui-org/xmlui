@@ -112,6 +112,7 @@ import {
   animationBehavior,
   labelBehavior,
   variantBehavior,
+  formBindingBehavior,
 } from "../components-core/behaviors/CoreBehaviors";
 import type {
   LoaderRenderer,
@@ -821,6 +822,7 @@ export class ComponentRegistry {
     this.registerBehavior(animationBehavior);
     this.registerBehavior(tooltipBehavior);
     this.registerBehavior(variantBehavior);
+    this.registerBehavior(formBindingBehavior);
 
     // Register external behaviors from contributes
     contributes.behaviors?.forEach((behavior) => {
