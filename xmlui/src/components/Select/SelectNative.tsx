@@ -146,6 +146,12 @@ const SelectTriggerValue = ({
         </div>
       );
     } else {
+      // Single-select mode: use valueRenderer if provided, otherwise use default label display
+      if (valueRenderer) {
+        return valueRenderer(selectedOptions[0], () => {
+          if (!readOnly) toggleOption(selectedOptions[0].value);
+        });
+      }
       return <div className={styles.selectValue}>{selectedOptions[0]?.label}</div>;
     }
   }
@@ -630,6 +636,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
             ungroupedHeaderRenderer={ungroupedHeaderRenderer}
             clearable={clearable}
             onClear={clearValue}
+            valueRenderer={valueRenderer}
             {...rest}
           >
             {children}

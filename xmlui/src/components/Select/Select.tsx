@@ -78,8 +78,8 @@ export const SelectMd = createMetadata({
       `This property allows replacing the default template to display an option in the dropdown list.`,
     ),
     valueTemplate: dComponent(
-      `This property allows replacing the default template to display a selected value when ` +
-        `multiple selections (\`multiSelect\` is \`true\`) are enabled.`,
+      `This property allows replacing the default template to display a selected value. ` +
+        `It works in both single-select and multi-select modes (\`multiSelect\` is \`true\`).`,
     ),
     dropdownHeight: d(
       "This property sets the height of the dropdown list. If not set, the height is determined automatically.",
