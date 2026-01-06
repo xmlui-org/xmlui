@@ -167,15 +167,40 @@ export const APICallMd = createMetadata({
         params: "An arbitrary number of parameters that can be used in the API call.",
       },
     },
+    inProgress: {
+      description:
+        "Boolean flag indicating whether the API call is currently in progress.",
+      signature: "inProgress: boolean",
+    },
+    loaded: {
+      description:
+        "Boolean flag indicating whether at least one successful API call has completed.",
+      signature: "loaded: boolean",
+    },
+    lastResult: {
+      description:
+        "The result from the most recent successful API call execution.",
+      signature: "lastResult: any",
+    },
+    lastError: {
+      description:
+        "The error from the most recent failed API call execution.",
+      signature: "lastError: any",
+    },
   },
 });
 
 export const apiCallRenderer = createComponentRenderer(
   COMP,
   APICallMd,
-  ({ node, registerComponentApi, uid }) => {
+  ({ node, registerComponentApi, uid, updateState }) => {
     return (
-      <APICallNative registerComponentApi={registerComponentApi} node={node as any} uid={uid} />
+      <APICallNative 
+        registerComponentApi={registerComponentApi} 
+        node={node as any} 
+        uid={uid}
+        updateState={updateState}
+      />
     );
   },
 );
