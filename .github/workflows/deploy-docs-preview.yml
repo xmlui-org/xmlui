@@ -22,6 +22,13 @@ jobs:
 
       - run: npm ci --prefer-offline
 
+      - name: Build standalone xmlui
+        run: npm run build:xmlui-standalone
+        working-directory: ./xmlui
+
+      - name: Copy standalone build to docs
+        run: cp xmlui/dist/standalone/xmlui-standalone.umd.js docs/public/resources/files/for-download/xmlui/xmlui-standalone.umd.js
+
       - name: Build docs
         run: npm run build-docs
 
