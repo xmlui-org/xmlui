@@ -148,4 +148,111 @@ test.describe("Basic Functionality", () => {
     );
     await expect(page.getByText("Error 500: Error without message, Details: {}")).toBeVisible();
   });
+
+  // =============================================================================
+  // CREDENTIALS PROPERTY TESTS
+  // =============================================================================
+
+  test.describe("credentials property", () => {
+    test("accepts 'omit' value", async ({ initTestBed, page }) => {
+      await initTestBed(
+        `
+        <Fragment>
+          <DataSource id="ds" url="/api/test" credentials="omit" />
+          <Text testId="output" value="{ds.value}" />
+        </Fragment>
+        `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const component = page.getByTestId("output");
+      await expect(component).toHaveText("GET success");
+    });
+
+    test("accepts 'same-origin' value", async ({ initTestBed, page }) => {
+      await initTestBed(
+        `
+        <Fragment>
+          <DataSource id="ds" url="/api/test" credentials="same-origin" />
+          <Text testId="output" value="{ds.value}" />
+        </Fragment>
+        `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const component = page.getByTestId("output");
+      await expect(component).toHaveText("GET success");
+    });
+
+    test("accepts 'include' value", async ({ initTestBed, page }) => {
+      await initTestBed(
+        `
+        <Fragment>
+          <DataSource id="ds" url="/api/test" credentials="include" />
+          <Text testId="output" value="{ds.value}" />
+        </Fragment>
+        `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const component = page.getByTestId("output");
+      await expect(component).toHaveText("GET success");
+    });
+
+    test("works without credentials property (default behavior)", async ({ initTestBed, page }) => {
+      await initTestBed(
+        `
+        <Fragment>
+          <DataSource id="ds" url="/api/test" />
+          <Text testId="output" value="{ds.value}" />
+        </Fragment>
+        `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const component = page.getByTestId("output");
+      await expect(component).toHaveText("GET success");
+    });
+
+    test("credentials property works with POST method", async ({ initTestBed, page }) => {
+      const postApiInterceptor: ApiInterceptorDefinition = {
+        operations: {
+          "post-with-credentials": {
+            url: "/api/submit",
+            method: "post",
+            handler: `return { message: "POST with credentials", body: $requestBody };`,
+          },
+        },
+      };
+
+      await initTestBed(
+        `
+        <Fragment>
+          <DataSource 
+            id="ds" 
+            url="/api/submit" 
+            method="post" 
+            body='{{"test": "data"}}' 
+            credentials="include" 
+          />
+          <Text testId="output" value="{ds.value.message}" />
+        </Fragment>
+        `,
+        {
+          apiInterceptor: postApiInterceptor,
+        },
+      );
+
+      const component = page.getByTestId("output");
+      await expect(component).toHaveText("POST with credentials");
+    });
+  });
 });

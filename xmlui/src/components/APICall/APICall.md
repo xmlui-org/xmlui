@@ -59,6 +59,28 @@ This is how to transform it in config:
 
 %-PROP-END
 
+%-PROP-START credentials
+
+**Important**: When using `credentials="include"` for cross-origin requests, the server must respond with the `Access-Control-Allow-Credentials: true` header, and the `Access-Control-Allow-Origin` header cannot be `*` (it must be a specific origin).
+
+**Example**: Submitting a form with authentication
+
+```xmlui copy
+<Form>
+  <TextBox id="message" label="Message" />
+  <event name="submit">
+    <APICall 
+      url="https://api.example.com/messages"
+      method="post"
+      body='{{"message": message.value}}'
+      credentials="include"
+    />
+  </event>
+</Form>
+```
+
+%-PROP-END
+
 %-PROP-START invalidates
 
 This property takes either a string or a list of strings representing URL endpoints to invalidate the local data cache based on the given URL routes.

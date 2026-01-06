@@ -47,6 +47,36 @@ This optional string sets the message in the confirmation dialog that is display
 
 This optional string sets the title in the confirmation dialog that is displayed before the `APICall` is executed.
 
+### `credentials` [#credentials]
+
+Controls whether cookies and other credentials are sent with the request. Set to `"include"` to send credentials in cross-origin requests (requires `Access-Control-Allow-Credentials: true` header on the server).
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `omit` | Never send credentials |
+| `same-origin` | Send credentials only for same-origin requests (default browser behavior) |
+| `include` | Always send credentials, even for cross-origin requests |
+
+**Important**: When using `credentials="include"` for cross-origin requests, the server must respond with the `Access-Control-Allow-Credentials: true` header, and the `Access-Control-Allow-Origin` header cannot be `*` (it must be a specific origin).
+
+**Example**: Submitting a form with authentication
+
+```xmlui copy
+<Form>
+  <TextBox id="message" label="Message" />
+  <event name="submit">
+    <APICall 
+      url="https://api.example.com/messages"
+      method="post"
+      body='{{"message": message.value}}'
+      credentials="include"
+    />
+  </event>
+</Form>
+```
+
 ### `errorNotificationMessage` [#errornotificationmessage]
 
 This property customizes the message displayed in a toast when the API invocation results in an error. Use the `$error` context object to get the error code (`$error.statusCode`) optional message (`$error.message`), or details coming from the response body (`$error.details`). For example, you can use the following code snippet to display the status code and the details:

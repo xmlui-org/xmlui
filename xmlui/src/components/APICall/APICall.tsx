@@ -74,6 +74,18 @@ export const APICallMd = createMetadata({
         "You can optionally define request header values as key-value pairs, where the key is the ID " +
         "of the particular header and the value is that header's corresponding value.",
     },
+    credentials: {
+      description:
+        `Controls whether cookies and other credentials are sent with the request. ` +
+        `Set to \`"include"\` to send credentials in cross-origin requests (requires ` +
+        `\`Access-Control-Allow-Credentials: true\` header on the server).`,
+      availableValues: [
+        { value: "omit", description: "Never send credentials" },
+        { value: "same-origin", description: "Send credentials only for same-origin requests (default browser behavior)" },
+        { value: "include", description: "Always send credentials, even for cross-origin requests" },
+      ],
+      valueType: "string",
+    },
     confirmTitle: {
       description:
         "This optional string sets the title in the confirmation dialog that is displayed before " +
