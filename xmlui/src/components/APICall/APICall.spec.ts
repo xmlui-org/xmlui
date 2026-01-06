@@ -681,6 +681,173 @@ test.describe("Basic Functionality", () => {
   });
 
   // =============================================================================
+  // CREDENTIALS PROPERTY TESTS
+  // =============================================================================
+
+  test.describe("credentials property", () => {
+    test("accepts 'omit' value", async ({ initTestBed, createButtonDriver }) => {
+      const { testStateDriver } = await initTestBed(
+        `
+        <Fragment>
+          <APICall 
+            id="api" 
+            url="/api/test" 
+            method="get" 
+            credentials="omit"
+            onSuccess="arg => testState = arg.message" 
+          />
+          <Button testId="trigger" onClick="api.execute()" label="Execute" />
+        </Fragment>
+      `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const button = await createButtonDriver("trigger");
+      await button.click();
+
+      await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual("GET success");
+    });
+
+    test("accepts 'same-origin' value", async ({ initTestBed, createButtonDriver }) => {
+      const { testStateDriver } = await initTestBed(
+        `
+        <Fragment>
+          <APICall 
+            id="api" 
+            url="/api/test" 
+            method="get" 
+            credentials="same-origin"
+            onSuccess="arg => testState = arg.message" 
+          />
+          <Button testId="trigger" onClick="api.execute()" label="Execute" />
+        </Fragment>
+      `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const button = await createButtonDriver("trigger");
+      await button.click();
+
+      await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual("GET success");
+    });
+
+    test("accepts 'include' value", async ({ initTestBed, createButtonDriver }) => {
+      const { testStateDriver } = await initTestBed(
+        `
+        <Fragment>
+          <APICall 
+            id="api" 
+            url="/api/test" 
+            method="get" 
+            credentials="include"
+            onSuccess="arg => testState = arg.message" 
+          />
+          <Button testId="trigger" onClick="api.execute()" label="Execute" />
+        </Fragment>
+      `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const button = await createButtonDriver("trigger");
+      await button.click();
+
+      await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual("GET success");
+    });
+
+    test("works without credentials property (default behavior)", async ({
+      initTestBed,
+      createButtonDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(
+        `
+        <Fragment>
+          <APICall 
+            id="api" 
+            url="/api/test" 
+            method="get"
+            onSuccess="arg => testState = arg.message" 
+          />
+          <Button testId="trigger" onClick="api.execute()" label="Execute" />
+        </Fragment>
+      `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const button = await createButtonDriver("trigger");
+      await button.click();
+
+      await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual("GET success");
+    });
+
+    test("credentials property works with POST method", async ({ initTestBed, createButtonDriver }) => {
+      const { testStateDriver } = await initTestBed(
+        `
+        <Fragment>
+          <APICall 
+            id="api" 
+            url="/api/test/1" 
+            method="post" 
+            body='{{"test": "data"}}' 
+            credentials="include"
+            onSuccess="arg => testState = arg.message" 
+          />
+          <Button testId="trigger" onClick="api.execute()" label="Execute" />
+        </Fragment>
+      `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const button = await createButtonDriver("trigger");
+      await button.click();
+
+      await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual("POST success");
+    });
+
+    test("credentials property works with form submission", async ({
+      initTestBed,
+      createButtonDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(
+        `
+        <Fragment>
+          <Form testId="form">
+            <TextBox id="message" value="test message" />
+            <Button testId="submit" label="Submit" type="submit" />
+            <event name="submit">
+              <APICall 
+                url="/api/test/1" 
+                method="post" 
+                body='{{"message": message.value}}' 
+                credentials="include"
+                onSuccess="arg => testState = arg.message"
+              />
+            </event>
+          </Form>
+        </Fragment>
+      `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const button = await createButtonDriver("submit");
+      await button.click();
+
+      await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual("POST success");
+    });
+  });
+
+  // =============================================================================
   // NOTIFICATION MESSAGE TESTS
   // =============================================================================
 

@@ -30,6 +30,7 @@ export type ApiOperationDef = {
   queryParams?: Record<string, any>;
   headers?: Record<string, any>;
   payloadType?: string;
+  credentials?: "omit" | "same-origin" | "include";
 };
 
 export type UploadOperationDef = ApiOperationDef & {
@@ -443,6 +444,11 @@ export default class RestApiProxy {
       operation.payloadType,
       contextParams,
     ) || "json",
+    credentials = this.extractParam(
+      resolveBindingExpressions,
+      operation.credentials,
+      contextParams,
+    ),
     onUploadProgress,
     parseResponse = this.tryParseResponse,
     transactionId,
@@ -457,6 +463,7 @@ export default class RestApiProxy {
     rawBody?: any;
     headers?: Record<string, string>;
     payloadType?: "form" | "multipart-form" | "json";
+    credentials?: "omit" | "same-origin" | "include";
     onUploadProgress?: OnProgressFn;
     parseResponse?: (response: Response | AxiosResponse, logError: boolean) => any;
     transactionId: string;
@@ -510,6 +517,7 @@ export default class RestApiProxy {
       headers: aggregatedHeaders,
       signal: abortSignal,
       body: requestBody,
+      ...(credentials && { credentials }),
     };
     if (onUploadProgress) {
       //console.log("Falling back to axios. Reason: onUploadProgress specified");
@@ -521,6 +529,7 @@ export default class RestApiProxy {
           headers: aggregatedHeaders,
           data: options.body,
           onUploadProgress,
+          withCredentials: credentials === "include",
         });
         return await parseResponse(
           response,

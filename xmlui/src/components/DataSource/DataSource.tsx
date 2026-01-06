@@ -47,6 +47,18 @@ export const DataSourceMd = createMetadata({
       description: `Set request headers. Pass an object whose keys are header names and values are header values.`,
       valueType: "any",
     },
+    credentials: {
+      description:
+        `Controls whether cookies and other credentials are sent with the request. ` +
+        `Set to \`"include"\` to send credentials in cross-origin requests (requires ` +
+        `\`Access-Control-Allow-Credentials: true\` header on the server).`,
+      availableValues: [
+        { value: "omit", description: "Never send credentials" },
+        { value: "same-origin", description: "Send credentials only for same-origin requests (default browser behavior)" },
+        { value: "include", description: "Always send credentials, even for cross-origin requests" },
+      ],
+      valueType: "string",
+    },
     pollIntervalInSeconds: {
       description:
         "Set the interval for periodic data fetching. If the data changes on refresh, " +
