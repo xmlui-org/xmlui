@@ -1,4 +1,7 @@
 {
+  "globalHeaders": {
+    "Content-Security-Policy": "default-src 'self'; frame-src https://www.youtube.com https://www.youtube-nocookie.com;"
+  },
   "navigationFallback": {
     "rewrite": "/index.html",
     "exclude": [
