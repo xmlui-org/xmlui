@@ -354,6 +354,7 @@ export async function callApi(
       resolveBindingExpressions,
       onProgress: _onProgress,
     });
+    console.log("API call result:", result);
 
     const onSuccessFn = lookupAction(onSuccess, uid, {
       eventName: "success",

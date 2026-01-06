@@ -142,6 +142,30 @@ This method triggers the invocation of the API. You can pass an arbitrary number
 
 - `params`: An arbitrary number of parameters that can be used in the API call.
 
+### `inProgress` [#inprogress]
+
+Boolean flag indicating whether the API call is currently in progress.
+
+**Signature**: `inProgress: boolean`
+
+### `lastError` [#lasterror]
+
+The error from the most recent failed API call execution.
+
+**Signature**: `lastError: any`
+
+### `lastResult` [#lastresult]
+
+The result from the most recent successful API call execution.
+
+**Signature**: `lastResult: any`
+
+### `loaded` [#loaded]
+
+Boolean flag indicating whether at least one successful API call has completed.
+
+**Signature**: `loaded: boolean`
+
 ## Styling [#styling]
 
 This component does not have any styles.
