@@ -4,8 +4,8 @@
   "ui": "tui",
   "envMode": "loose",
   "tasks": {
-    "build:bin": {
-      "outputs": ["dist/bin/**"]
+    "build:for-node": {
+      "outputs": ["dist/bin/**", "dist/for-node/**"]
     },
     "build:xmlui": {
       "outputs": ["dist/lib/**"]
@@ -38,7 +38,7 @@
     },
     "build:xmlui-all": {
       "dependsOn": [
-        "build:bin",
+        "build:for-node",
         "build:xmlui-metadata",
         "build:xmlui",
         "build:xmlui-standalone",
