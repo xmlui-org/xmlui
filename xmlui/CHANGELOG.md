@@ -1,5 +1,15 @@
 # xmlui
 
+## 0.11.25
+
+### Patch Changes
+
+- 0abc5a0: Add Add status/progress to APICall
+- 42c9bf8: Make valueTemplate of Select available in single-select mode
+- bc0f328: fix: building in CONFIG_ONLY mode handles windows paths
+- c4ac21c: Fix standalone app component discovery in templates
+- 8b5c6e8: Add credentials option to DataSource/APICall
+
 ## 0.11.24
 
 ### Patch Changes
