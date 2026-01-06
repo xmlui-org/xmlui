@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+import "tsx";
 import { cp, mkdir, rm, writeFile } from "fs/promises";
 import * as dotenv from "dotenv";
 import { existsSync } from "fs";
@@ -35,8 +35,8 @@ async function getExportedJsObjects<T>(globPattern: string): Promise<Array<T>> {
   const matches = await glob(path.join(process.cwd(), globPattern).replaceAll("\\", "/"));
   const modules = await Promise.all(
     matches.map(async (file: string) => {
-      return (await import(file)).default;
-    })
+      return (await import(pathToFileURL(file).href)).default;
+    }),
   );
   return modules;
 }
@@ -302,7 +302,10 @@ export const build = async ({
     if (!withMock) {
       delete configJson.apiInterceptor;
     }
-    await writeFile(path.join(process.cwd(), distPath, "config.json"), JSON.stringify(configJson, null, 4));
+    await writeFile(
+      path.join(process.cwd(), distPath, "config.json"),
+      JSON.stringify(configJson, null, 4),
+    );
   } else if (buildMode === "ALL") {
     // const componentPaths: string[] = [];
     //   const components = await getExportedJsObjects<CompoundComponentDef>("/src/components/**.*");

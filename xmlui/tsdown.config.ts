@@ -3,7 +3,7 @@ import { defineConfig } from "tsdown";
 export default defineConfig([
   // Binary build
   {
-    external: ["vite"],
+    external: ["vite", "tsx"],
     entry: "bin/index.ts",
     outDir: "dist/bin",
     format: ["esm", "commonjs"],
