@@ -5,10 +5,10 @@
   "envMode": "loose",
   "tasks": {
     "build:for-node": {
-      "outputs": ["dist/bin/**", "dist/lib/vite-xmlui-plugin*"]
+      "outputs": ["dist/bin/**", "dist/for-node/**"]
     },
     "build:xmlui": {
-      "outputs": ["!dist/lib/vite-xmlui-plugin*", "dist/lib/**"]
+      "outputs": ["dist/lib/**"]
     },
     "build:xmlui-standalone": {
       "outputs": ["dist/standalone/**"]

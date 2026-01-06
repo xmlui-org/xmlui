@@ -177,8 +177,8 @@
           "require": "./dist/lib/scss/components-core/theming/_themes.scss"
         },
         "./vite-xmlui-plugin": {
-          "import": "./dist/lib/vite-xmlui-plugin.js",
-          "require": "./dist/lib/vite-xmlui-plugin.js"
+          "import": "./dist/for-node/vite-xmlui-plugin.js",
+          "require": "./dist/for-node/vite-xmlui-plugin.js"
         },
         "./syntax/monaco": {
           "import": "./dist/lib/syntax-monaco.js",

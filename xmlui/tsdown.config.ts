@@ -12,7 +12,7 @@ export default defineConfig([
   // Vite plugin build
   {
     entry: "bin/vite-xmlui-plugin.ts",
-    outDir: "dist/lib",
+    outDir: "dist/for-node",
     format: ["esm", "commonjs"],
     shims: true,
     dts: true,
