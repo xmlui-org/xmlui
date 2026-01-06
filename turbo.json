@@ -4,11 +4,11 @@
   "ui": "tui",
   "envMode": "loose",
   "tasks": {
-    "build:bin": {
-      "outputs": ["dist/bin/**"]
+    "build:for-node": {
+      "outputs": ["dist/bin/**", "dist/lib/vite-xmlui-plugin*"]
     },
     "build:xmlui": {
-      "outputs": ["dist/lib/**"]
+      "outputs": ["!dist/lib/vite-xmlui-plugin*", "dist/lib/**"]
     },
     "build:xmlui-standalone": {
       "outputs": ["dist/standalone/**"]
@@ -38,7 +38,7 @@
     },
     "build:xmlui-all": {
       "dependsOn": [
-        "build:bin",
+        "build:for-node",
         "build:xmlui-metadata",
         "build:xmlui",
         "build:xmlui-standalone",
