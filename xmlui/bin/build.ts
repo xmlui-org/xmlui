@@ -16,8 +16,8 @@ type CompoundComponentDef = any;
 type ThemeDefinition = any;
 
 // --- Set up the configuration
-dotenv.config({ path: `${process.cwd()}/.env` });
-dotenv.config({ path: `${process.cwd()}/.env.local`, override: true });
+dotenv.config({ path: path.join(process.cwd(), ".env") });
+dotenv.config({ path: path.join(process.cwd(), ".env.local"), override: true });
 
 type StandaloneJsonConfig = {
   name: string;
@@ -45,12 +45,11 @@ async function convertResourcesDir(distRoot: string, flatDist: boolean, filePref
   if (!flatDist) {
     return undefined;
   }
-  distRoot = distRoot.replaceAll("\\", "/");
-  const resourcesDir = `${distRoot}/resources`;
+  const resourcesDir = path.join(distRoot, "resources");
   if (!existsSync(resourcesDir)) {
     return undefined;
   }
-  const files = await glob(`${resourcesDir}/**/*`);
+  const files = await glob(`${resourcesDir.replaceAll("\\", "/")}/**/*`);
 
   const ret: Record<string, string> = {};
   for (let i = 0; i < files.length; i++) {
@@ -58,10 +57,10 @@ async function convertResourcesDir(distRoot: string, flatDist: boolean, filePref
     if (fs.statSync(file).isDirectory()) {
       continue;
     }
-    const relativePath = file.replace(`${distRoot}/`, "");
+    const relativePath = path.relative(distRoot, file).replaceAll("\\", "/");
     const convertedResource = `${filePrefix}${relativePath.replaceAll("/", "_")}`;
 
-    await cp(file, `${distRoot}/${convertedResource}`);
+    await cp(file, path.join(distRoot, convertedResource));
     ret[relativePath] = convertedResource;
   }
   return ret;
@@ -250,8 +249,8 @@ export const build = async ({
   const distPath = "/dist";
   const themesFolder = flatDist ? "" : "themes";
   const componentsFolder = flatDist ? "" : "components";
-  const themesFolderPath = flatDist ? distPath : `${distPath}/${themesFolder}`;
-  const componentsFolderPath = flatDist ? distPath : `${distPath}/${componentsFolder}`;
+  const themesFolderPath = flatDist ? distPath : path.join(distPath, themesFolder);
+  const componentsFolderPath = flatDist ? distPath : path.join(distPath, componentsFolder);
 
   function getThemeFileName(theme: ThemeDefinition) {
     return flatDist ? `${flatDistUiPrefix}theme_${theme.id}` : theme.id;
@@ -287,7 +286,7 @@ export const build = async ({
           JSON.stringify(theme, null, 4),
         );
         themePaths.push(
-          removeLeadingSlashForPath(`${themesFolder}/${getThemeFileName(theme)}.json`),
+          removeLeadingSlashForPath(path.join(themesFolder, `${getThemeFileName(theme)}.json`)),
         );
       }
     }
