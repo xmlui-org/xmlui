@@ -97,6 +97,9 @@
   },
   "devDependencies": {
     "@rollup/pluginutils": "5.1.0",
+    "@testing-library/react": "^16.3.1",
+    "@testing-library/user-event": "^14.5.1",
+    "@testing-library/jest-dom": "^6.1.5",
     "@types/adm-zip": "0.5.4",
     "@types/chroma-js": "^3.1.2",
     "@types/color": "3.0.6",
@@ -114,13 +117,14 @@
     "eslint-plugin-import": "2.28.1",
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "jsdom": "^27.4.0",
     "prettier": "^3.3.3",
     "rollup-plugin-copy": "^3.5.0",
     "serve": "14.2.0",
     "terser": "^5.44.0",
     "tsdown": "^0.15.12",
     "typescript": "5.7.3",
-    "vitest": "^3.0.3"
+    "vitest": "^4.0.16"
   },
   "optionalDependencies": {
     "@esbuild/linux-x64": "0.25.2",
