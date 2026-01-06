@@ -34,7 +34,7 @@ import {
   removeCodeBehindTokensFromTree,
 } from "../parsers/scripting/code-behind-collect";
 import { ComponentRegistry } from "../components/ComponentProvider";
-import { checkXmlUiMarkup } from "./markup-check";
+import { checkXmlUiMarkup, MetadataHandler, visitComponent } from "./markup-check";
 import StandaloneExtensionManager from "./StandaloneExtensionManager";
 import { builtInThemes } from "./theming/ThemeProvider";
 import type { Extension } from "../abstractions/ExtensionDefs";
@@ -1013,7 +1013,7 @@ function collectMissingComponents(
   );
 
   // --- Check the xmlui markup. This check will find all unloaded components
-  const result = checkXmlUiMarkup(entryPoint as ComponentDef, components, {
+  const metadataHandler: MetadataHandler = {
     getComponentProps: (componentName) => {
       return componentRegistry.lookupComponentRenderer(componentName)?.descriptor?.props;
     },
@@ -1026,21 +1026,41 @@ function collectMissingComponents(
     getComponentEvents: () => {
       return null;
     },
-    componentRegistered: (componentName) => {
+    componentRegistered: (componentName: string) => {
       return componentRegistry.hasComponent(componentName);
     },
-  });
+  };
+  const result = checkXmlUiMarkup(entryPoint as ComponentDef, components, metadataHandler);
 
   componentRegistry.destroy();
 
   // --- Collect all missing components.
   // Omit the components that failed to load and the ones that are not in #app-ns namespace
-  return new Set(
+  const baseSet = new Set(
     result
       .filter((r) => r.code === "M001")
       .map((r) => r.args[0].replace("#app-ns.", ""))
       .filter((comp) => !componentsFailedToLoad.has(comp) && !comp.includes(".")),
   );
+  const visitor = (
+    compDef: ComponentDef,
+    parent: ComponentDef | null | undefined,
+    before: boolean,
+    continuation: { cancel?: boolean; abort?: boolean },
+  ) => {
+    if (!compDef.props) return;
+    Object.entries(compDef.props).forEach(([propKey, propValue]) => {
+      if (!propKey.endsWith("Template")) return;
+      if (
+        typeof propValue.type === "string" &&
+        !metadataHandler.componentRegistered(propValue.type)
+      ) {
+        baseSet.add(propValue.type);
+      }
+    });
+  };
+  visitComponent(entryPoint as ComponentDef, null, visitor, {}, metadataHandler);
+  return baseSet;
 }
 
 // --- This React hook logs the app's version number to the browser's console at startup
