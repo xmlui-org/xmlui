@@ -94,11 +94,31 @@ export const FileInputMd = createMetadata({
       "string",
       defaultProps.buttonThemeColor,
     ),
+    parseAs: d(
+      `Automatically parse file contents as CSV or JSON. When set, the \`onDidChange\` event receives ` +
+        `parsed data instead of raw File objects. When \`parseAs\` is set, \`acceptsFileType\` is automatically ` +
+        `inferred (e.g., ".csv" or ".json") unless explicitly overridden.`,
+      ["csv", "json"],
+    ),
+    csvOptions: d(
+      `Configuration options for CSV parsing (used when \`parseAs="csv"\`). Supports all Papa Parse ` +
+        `configuration options. Default options: \`{ header: true, skipEmptyLines: true }\`. ` +
+        `Common options include \`delimiter\`, \`header\`, \`dynamicTyping\`, \`skipEmptyLines\`, and \`transform\`.`,
+    ),
   },
   events: {
     didChange: dDidChange(COMP),
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
+    parseError: {
+      description:
+        "This event is triggered when file parsing fails. Receives the error and the file that failed to parse.",
+      signature: "parseError(error: Error, file: File): void",
+      parameters: {
+        error: "The parsing error that occurred",
+        file: "The file that failed to parse",
+      },
+    },
   },
   apis: {
     value: {
@@ -119,6 +139,10 @@ export const FileInputMd = createMetadata({
     open: {
       description: "This API command triggers the file browsing dialog to open.",
       signature: "open(): void",
+    },
+    inProgress: {
+      description: "This property indicates whether file parsing is currently in progress (when using parseAs).",
+      signature: "get inProgress(): boolean",
     },
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -153,6 +177,9 @@ export const fileInputRenderer = createComponentRenderer(
         initialValue={extractValue(node.props.initialValue)}
         acceptsFileType={extractValue(node.props.acceptsFileType)}
         required={extractValue.asOptionalBoolean(node.props.required)}
+        parseAs={extractValue.asOptionalString(node.props.parseAs) as "csv" | "json" | undefined}
+        csvOptions={extractValue(node.props.csvOptions)}
+        onParseError={lookupEventHandler("parseError")}
         className={className}
       />
     );

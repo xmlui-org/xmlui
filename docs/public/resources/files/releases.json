@@ -1,5 +1,61 @@
 [
   {
+    "tag_name": "xmlui@0.11.23",
+    "published_at": "2025-12-16T13:38:50Z",
+    "changes": [
+      {
+        "description": "Introduce theme-context-relative fontSize theme variables",
+        "commit_sha": "7dfb281"
+      },
+      {
+        "description": "Fix Form submit with nested Forms (ModalDialog)",
+        "commit_sha": "7780fc4"
+      },
+      {
+        "description": "fix: patternInvalidSeverity - phone pattern",
+        "commit_sha": "7160bc8"
+      },
+      {
+        "description": "fix: DatePicker to adjust its font size and spacing to the current font size",
+        "commit_sha": "b3b10a2"
+      },
+      {
+        "description": "fix: NumberBox startText and endText uses different color than TextBox",
+        "commit_sha": "965e23e"
+      },
+      {
+        "description": "Implement the ideal text (attributes) typography flow",
+        "commit_sha": "184b7f8"
+      },
+      {
+        "description": "Form's $data is now available in buttonRowTemplate",
+        "commit_sha": "9936586"
+      },
+      {
+        "description": "Fixed FormItem not passing the ungroupedHeaderTemplate and groupHeaderTemplate properties to underlying Select.",
+        "commit_sha": "e7914aa"
+      },
+      {
+        "description": "Experimental <template> helper tag added",
+        "commit_sha": "1f436da"
+      },
+      {
+        "description": "fix: update disabled text color",
+        "commit_sha": "36b1352"
+      },
+      {
+        "description": "improve: use the Select component in the Table as the page size selector",
+        "commit_sha": "74a81b4"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.11.23.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.23/xmlui-0.11.23.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.11.22",
     "published_at": "2025-12-09T14:18:28Z",
     "changes": [
@@ -224,30 +280,6 @@
       {
         "name": "xmlui-0.11.13.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.13/xmlui-0.11.13.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.12",
-    "published_at": "2025-11-14T07:03:25Z",
-    "changes": [
-      {
-        "description": "fix: DropdownMenu - portal issue",
-        "commit_sha": "cef5d43"
-      },
-      {
-        "description": "Modify behaviors to use extractValue on attached properties",
-        "commit_sha": "a9e3115"
-      },
-      {
-        "description": "Fix clearable issue with DateInput (and TimeInput)",
-        "commit_sha": "72d968e"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.12.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.12/xmlui-0.11.12.js"
       }
     ]
   }

@@ -1,0 +1,7 @@
+name,price,category
+Widget,9.99,Tools
+{{{INVALID JSON/CSV SYNTAX}}}
+@#$%^&*()
+This is not CSV at all!
+<<ERROR>>
+Gadget,19.99
