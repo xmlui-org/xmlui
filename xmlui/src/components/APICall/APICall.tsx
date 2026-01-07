@@ -34,7 +34,7 @@ export const APICallMd = createMetadata({
     "`APICall` creates, updates or deletes data on the backend, versus [`DataSource`]" +
     "(/components/DataSource) which fetches data. Unlike DataSource, APICall doesn't " +
     "automatically execute - you must trigger it manually with the `execute()` method, " +
-    "typically from form submissions or button clicks. See also [Actions.callAPI](globals#actionscallapi).",
+    "typically from form submissions or button clicks. See also [Actions.callAPI](/globals#actionscallapi).",
   props: {
     method: {
       description: "The method of data manipulation can be done via setting this property.",
