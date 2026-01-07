@@ -44,12 +44,8 @@ export function buildProxy(
         // --- the same reference every time. e.g. this wouldn't be true otherwise: 
         // --- proxiedObject['field'] === proxiedObject['field']
         if (!proxiedValues.has(value)) {
-          console.log("Creating new proxy for", getPath(prop));
           proxiedValues.set(value, buildProxy(value, callback, tree.concat(prop)));
-        } else {
-          console.log("Reusing existing proxy for", getPath(prop));
         }
-        console.log("Getting", proxiedValues.get(value) , "for", getPath(prop));
         return proxiedValues.get(value);
       }
 
@@ -70,7 +66,6 @@ export function buildProxy(
 
       // --- Execute the change.
       // --- Note, any error raised in the callback will prevent from changing the property value
-      console.log("Setting", getPath(prop), "to", value);
       return Reflect.set(target, prop, value, receiver);
     },
 

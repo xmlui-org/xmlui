@@ -424,6 +424,9 @@ async function evalAssignmentAsync(
   thread: LogicalThread,
 ): Promise<any> {
   const leftValue = expr.leftValue;
+  if ((leftValue as any)?.name === "projects") {
+    console.log("projects leftValue", leftValue);
+  }
   const rootScope = getRootIdScope(leftValue, evalContext, thread);
   const updatesState = rootScope && rootScope.type !== "block";
   if (updatesState && evalContext.onWillUpdate) {

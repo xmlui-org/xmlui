@@ -1,16 +1,5 @@
-import type {
-  MutableRefObject,
-  ReactNode,
-  RefObject} from "react";
-import {
-  forwardRef,
-  memo,
-  useCallback,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
+import type { MutableRefObject, ReactNode, RefObject } from "react";
+import { forwardRef, memo, useCallback, useMemo, useReducer, useRef, useState } from "react";
 import produce from "immer";
 import { cloneDeep, isEmpty, isPlainObject, merge, pick } from "lodash-es";
 import memoizeOne from "memoize-one";
@@ -21,12 +10,8 @@ import type { ContainerState } from "../../abstractions/ContainerDefs";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
 import type { ContainerDispatcher, MemoedVars } from "../abstractions/ComponentRenderer";
 import { ContainerActionKind } from "./containers";
-import type {
-  CodeDeclaration,
-  ModuleErrors} from "../script-runner/ScriptingSourceTree";
-import {
-  T_ARROW_EXPRESSION,
-} from "../script-runner/ScriptingSourceTree";
+import type { CodeDeclaration, ModuleErrors } from "../script-runner/ScriptingSourceTree";
+import { T_ARROW_EXPRESSION } from "../script-runner/ScriptingSourceTree";
 import { EMPTY_OBJECT } from "../constants";
 import { collectFnVarDeps } from "../rendering/collectFnVarDeps";
 import { createContainerReducer } from "../rendering/reducer";
@@ -189,6 +174,9 @@ export const StateContainer = memo(
       mergedWithVars,
       routingParams,
     );
+    console.log("Merged with vars", JSON.stringify(mergedWithVars));
+    console.log("Local vars state context", JSON.stringify(localVarsStateContext));
+    console.log("Combined state for container", JSON.stringify(combinedState));
 
     const registerComponentApi: RegisterComponentApiFnInner = useCallback((uid, api) => {
       setComponentApis(
@@ -333,14 +321,21 @@ function useMergedState(localVars: ContainerState, componentState: ContainerStat
       if (ret[key] === undefined) {
         ret[key] = value;
       } else {
-        if (
-          (isPlainObject(ret[key]) && isPlainObject(value)) ||
-          (Array.isArray(ret[key]) && Array.isArray(value))
-        ) {
+        if (isPlainObject(ret[key]) && isPlainObject(value)) {
           ret[key] = merge(cloneDeep(ret[key]), value);
         } else {
           ret[key] = value;
         }
+
+        // if (
+        //   (isPlainObject(ret[key]) && isPlainObject(value)) ||
+        //   (Array.isArray(ret[key]) && Array.isArray(value))
+        // ) {
+        //   debugger;
+        //   ret[key] = merge(cloneDeep(ret[key]), value);
+        // } else {
+        //   ret[key] = value;
+        // }
       }
     });
     return ret;

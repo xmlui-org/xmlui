@@ -100,6 +100,7 @@ export function createContainerReducer(debugView: IDebugViewContext) {
         break;
       }
       case ContainerActionKind.STATE_PART_CHANGED: {
+        console.log("State before", JSON.stringify(state));
         const { path, value, target, actionType, localVars } = action.payload;
         if (actionType === "unset") {
           unset(state, path);
@@ -126,6 +127,7 @@ export function createContainerReducer(debugView: IDebugViewContext) {
           });
           storeNextValue(state);
         }
+        console.log("State after", JSON.stringify(state));
         break;
       }
       default:

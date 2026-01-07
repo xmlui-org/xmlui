@@ -114,6 +114,10 @@ export function getIdentifierScope(
     }
   }
 
+  if (expr.name === "projects") {
+    console.log("ID Scope:", expr.name, "->", type, JSON.stringify(scope.projects));
+  }
+
   // --- Done
   return { type, scope: scope };
 }
@@ -393,6 +397,7 @@ export function evalAssignmentCore(
   thisStack.pop();
   switch (expr.op) {
     case "=":
+      console.log("asgn: ", JSON.stringify(newValue));
       leftScope[leftIndex] = newValue;
       break;
     case "+=":
