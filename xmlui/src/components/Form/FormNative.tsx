@@ -595,6 +595,7 @@ const Form = forwardRef(function (
     <>
       <form
         {...rest}
+        noValidate={true}
         style={style}
         className={classnames(styles.formWrapper, className)}
         onSubmit={doSubmit}

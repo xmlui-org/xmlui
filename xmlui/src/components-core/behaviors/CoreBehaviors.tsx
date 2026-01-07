@@ -1,10 +1,11 @@
-import { cloneElement, type ReactElement } from "react";
+import { cloneElement, type ReactElement, type ReactNode } from "react";
 import {
   Animation,
   parseAnimation,
   parseAnimationOptions,
 } from "../../components/Animation/AnimationNative";
 import { ItemWithLabel } from "../../components/FormItem/ItemWithLabel";
+import { FormBindingWrapper } from "../../components/FormItem/FormBindingWrapper";
 import { parseTooltipOptions, Tooltip } from "../../components/Tooltip/TooltipNative";
 import { useStyles } from "../theming/StyleContext";
 import { THEME_VAR_PREFIX, toCssVar } from "../theming/layout-resolver";
@@ -85,6 +86,14 @@ export const labelBehavior: Behavior = {
     if (!label) {
       return false;
     }
+    
+    // Don't attach if formBindingBehavior will handle this component
+    // (form-bindable components with bindTo prop will get label from FormBindingWrapper)
+    const bindTo = extractValue(node.props?.bindTo, true);
+    if (bindTo && FORM_BINDABLE_COMPONENTS.includes(node.type as any)) {
+      return false;
+    }
+    
     return true;
   },
   attach: (context, node, metadata) => {
@@ -278,3 +287,126 @@ function VariantWrapper({
     className: newClassName,
   });
 }
+
+/**
+ * List of component types that support form binding behavior.
+ * These are input components that can be bound to form data.
+ */
+const FORM_BINDABLE_COMPONENTS = [
+  "TextBox",
+  "TextArea",
+  "NumberBox",
+  "Toggle",
+  "Checkbox",
+  "Switch",
+  "FileInput",
+  "Select",
+  "AutoComplete",
+  "DatePicker",
+  "RadioGroup",
+  "Slider",
+  "ColorPicker",
+] as const;
+
+/**
+ * Behavior for binding input components directly to a Form without requiring
+ * a FormItem wrapper. When a component has a `bindTo` prop and is inside a Form,
+ * this behavior wraps it with form binding logic (validation, state management, etc.)
+ */
+export const formBindingBehavior: Behavior = {
+  name: "formBinding",
+  canAttach: (context, node) => {
+    const { extractValue } = context;
+
+    // Check if the component has a bindTo prop
+    const bindTo = extractValue(node.props?.bindTo, true);
+    if (!bindTo) {
+      return false;
+    }
+
+    // Check if the component type is a form-bindable input
+    if (!FORM_BINDABLE_COMPONENTS.includes(node.type as any)) {
+      return false;
+    }
+
+    return true;
+  },
+  attach: (context, node, metadata) => {
+    const { extractValue, node: componentNode, lookupEventHandler } = context;
+
+    const bindTo = extractValue.asOptionalString(componentNode.props?.bindTo);
+    const initialValue = extractValue(componentNode.props?.initialValue);
+    const noSubmit = extractValue.asOptionalBoolean(componentNode.props?.noSubmit, false);
+
+    // Validation props
+    const required = extractValue.asOptionalBoolean(componentNode.props?.required);
+    const requiredInvalidMessage = extractValue.asOptionalString(componentNode.props?.requiredInvalidMessage);
+    const minLength = extractValue.asOptionalNumber(componentNode.props?.minLength);
+    const maxLength = extractValue.asOptionalNumber(componentNode.props?.maxLength);
+    const lengthInvalidMessage = extractValue.asOptionalString(componentNode.props?.lengthInvalidMessage);
+    const lengthInvalidSeverity = extractValue.asOptionalString(componentNode.props?.lengthInvalidSeverity);
+    const minValue = extractValue.asOptionalNumber(componentNode.props?.minValue);
+    const maxValue = extractValue.asOptionalNumber(componentNode.props?.maxValue);
+    const rangeInvalidMessage = extractValue.asOptionalString(componentNode.props?.rangeInvalidMessage);
+    const rangeInvalidSeverity = extractValue.asOptionalString(componentNode.props?.rangeInvalidSeverity);
+    const pattern = extractValue.asOptionalString(componentNode.props?.pattern);
+    const patternInvalidMessage = extractValue.asOptionalString(componentNode.props?.patternInvalidMessage);
+    const patternInvalidSeverity = extractValue.asOptionalString(componentNode.props?.patternInvalidSeverity);
+    const regex = extractValue.asOptionalString(componentNode.props?.regex);
+    const regexInvalidMessage = extractValue.asOptionalString(componentNode.props?.regexInvalidMessage);
+    const regexInvalidSeverity = extractValue.asOptionalString(componentNode.props?.regexInvalidSeverity);
+    const customValidationsDebounce = extractValue.asOptionalNumber(componentNode.props?.customValidationsDebounce, 0);
+    const validationMode = extractValue.asOptionalString(componentNode.props?.validationMode);
+
+    // Label props (optional, for standalone use)
+    const label = extractValue.asOptionalString(componentNode.props?.label);
+    const labelPosition = extractValue(componentNode.props?.labelPosition);
+    const labelWidth = extractValue.asOptionalString(componentNode.props?.labelWidth);
+    const labelBreak = extractValue.asOptionalBoolean(componentNode.props?.labelBreak);
+
+    // Other props
+    const enabled = extractValue.asOptionalBoolean(componentNode.props?.enabled, true);
+
+    // Event handlers
+    const onValidate = lookupEventHandler("validate");
+
+    const validations = {
+      required,
+      requiredInvalidMessage,
+      minLength,
+      maxLength,
+      lengthInvalidMessage,
+      lengthInvalidSeverity: lengthInvalidSeverity as any,
+      minValue,
+      maxValue,
+      rangeInvalidMessage,
+      rangeInvalidSeverity: rangeInvalidSeverity as any,
+      pattern,
+      patternInvalidMessage,
+      patternInvalidSeverity: patternInvalidSeverity as any,
+      regex,
+      regexInvalidMessage,
+      regexInvalidSeverity: regexInvalidSeverity as any,
+    };
+
+    return (
+      <FormBindingWrapper
+        key={bindTo}
+        bindTo={bindTo!}
+        initialValue={initialValue}
+        noSubmit={noSubmit}
+        validations={validations}
+        onValidate={onValidate}
+        customValidationsDebounce={customValidationsDebounce}
+        validationMode={validationMode as any}
+        label={label}
+        labelPosition={labelPosition as any}
+        labelWidth={labelWidth}
+        labelBreak={labelBreak}
+        enabled={enabled}
+      >
+        {node as ReactElement}
+      </FormBindingWrapper>
+    );
+  },
+};
