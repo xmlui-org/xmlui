@@ -160,6 +160,93 @@ test.describe("Basic Functionality", () => {
       enabled: true,
     });
   });
+
+  test("RadioGroup with 'bindTo' works correctly", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form onSubmit="data => testState = data">
+        <RadioGroup testId="radiogroup" bindTo="option" initialValue="a">
+          <RadioItem value="a" label="Option A" />
+          <RadioItem value="b" label="Option B" />
+        </RadioGroup>
+      </Form>
+    `);
+
+    // Use generic radio locator if specific label/name is flaky
+    const radios = page.locator('[role="radio"]');
+    await expect(radios).toHaveCount(2);
+    await radios.nth(1).click(); // Click the second option (value="b")
+    
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect.poll(testStateDriver.testState).toEqual({
+      option: "b",
+    });
+  });
+
+  test("Slider with 'bindTo' works correctly", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form onSubmit="data => testState = data">
+        <Slider testId="slider" bindTo="value" initialValue="{0}" min="{0}" max="{100}" />
+      </Form>
+    `);
+
+    // Focus slider and move it
+    const slider = page.getByRole("slider");
+    await slider.focus();
+    // Move it significantly
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowRight");
+
+    await page.getByRole("button", { name: "Save" }).click();
+
+    // Verify value changed from 0
+    await expect.poll(testStateDriver.testState).not.toEqual({
+      value: 0,
+    });
+  });
+
+  test("ColorPicker with 'bindTo' works correctly", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form onSubmit="data => testState = data">
+        <ColorPicker testId="colorpicker" bindTo="color" initialValue="#000000" />
+      </Form>
+    `);
+
+    // Verifying binding works by checking submission of initial value
+    await page.getByRole("button", { name: "Save" }).click();
+    await expect.poll(testStateDriver.testState).toEqual({
+      color: "#000000",
+    });
+  });
+
+  test("DatePicker with 'bindTo' works correctly", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form onSubmit="data => testState = data">
+        <DatePicker testId="datepicker" bindTo="date" initialValue="2023-01-01" />
+      </Form>
+    `);
+
+    await page.getByRole("button", { name: "Save" }).click();
+    await expect.poll(testStateDriver.testState).toEqual({
+      date: "2023-01-01",
+    });
+  });
+
+  test("AutoComplete with 'bindTo' works correctly", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form onSubmit="data => testState = data">
+        <AutoComplete testId="autocomplete" bindTo="selection" initialValue="Apple">
+          <AutoCompleteOption value="Apple" label="Apple" />
+          <AutoCompleteOption value="Banana" label="Banana" />
+        </AutoComplete>
+      </Form>
+    `);
+
+    await page.getByRole("button", { name: "Save" }).click();
+    await expect.poll(testStateDriver.testState).toEqual({
+      selection: "Apple",
+    });
+  });
 });
 
 // =============================================================================

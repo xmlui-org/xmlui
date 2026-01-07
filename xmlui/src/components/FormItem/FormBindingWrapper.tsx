@@ -2,14 +2,12 @@ import type { CSSProperties, ReactElement, ReactNode } from "react";
 import {
   cloneElement,
   Fragment,
-  memo,
   useCallback,
   useEffect,
   useId,
   useMemo,
 } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { useContext } from "use-context-selector";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import type {
@@ -17,7 +15,7 @@ import type {
   ValidateEventHandler,
   ValidationMode,
 } from "../Form/FormContext";
-import { FormContext, useFormContextPart, useIsInsideForm } from "../Form/FormContext";
+import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
 import { useIsInsideFormItem } from "./FormItemNative";
 import {
   fieldChanged,
@@ -25,7 +23,6 @@ import {
   fieldInitialized,
   fieldLostFocus,
   fieldRemoved,
-  UNBOUND_FIELD_SUFFIX,
 } from "../Form/formActions";
 import { getByPath } from "../Form/FormNative";
 import { useEvent } from "../../components-core/utils/misc";
