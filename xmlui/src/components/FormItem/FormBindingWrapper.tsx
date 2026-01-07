@@ -9,6 +9,7 @@ import {
   useMemo,
 } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { useContext } from "use-context-selector";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import type {
@@ -16,7 +17,7 @@ import type {
   ValidateEventHandler,
   ValidationMode,
 } from "../Form/FormContext";
-import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
+import { FormContext, useFormContextPart, useIsInsideForm } from "../Form/FormContext";
 import { useIsInsideFormItem } from "./FormItemNative";
 import {
   fieldChanged,
@@ -55,20 +56,7 @@ type FormBindingWrapperProps = {
   registerComponentApi?: RegisterComponentApiFn;
 };
 
-/**
- * FormBindingWrapper wraps an input component and provides form binding functionality.
- * This component handles:
- * - Field initialization and cleanup with the parent Form
- * - Value synchronization with Form state
- * - Validation (built-in and custom)
- * - Validation result display
- * - Focus/blur tracking for validation modes
- * 
- * This wrapper is used by:
- * 1. The formBindingBehavior to enhance standalone inputs in a Form
- * 2. The FormItem component for its internal form binding logic
- */
-export const FormBindingWrapper = memo(function FormBindingWrapper({
+export function FormBindingWrapper({
   children,
   bindTo,
   initialValue: initialValueFromProps,
@@ -88,10 +76,8 @@ export const FormBindingWrapper = memo(function FormBindingWrapper({
 }: FormBindingWrapperProps) {
   const validations = useShallowCompareMemoize(validationsInput);
   const defaultId = useId();
-  
-  // Calculate the form item ID
   const formItemId = useMemo(() => {
-    return bindTo || `${defaultId}${UNBOUND_FIELD_SUFFIX}`;
+    return bindTo || defaultId;
   }, [bindTo, defaultId]);
 
   // Check if we're inside a form and/or inside a FormItem
@@ -151,12 +137,24 @@ export const FormBindingWrapper = memo(function FormBindingWrapper({
   }, [formItemId, dispatch, isInsideForm]);
 
   // Get validation display state
-  const { validationStatus, isHelperTextShown } = useValidationDisplay(
+  const { validationStatus, isHelperTextShown: isHelperTextShownHook } = useValidationDisplay(
     formItemId,
     value,
     validationResult,
-    validationMode,
+    validationMode ?? "errorLate",
   );
+
+  useEffect(() => {
+    console.log("validationResult", validationResult, isHelperTextShownHook);
+  }, [validationResult, isHelperTextShownHook]);
+
+  // We need to access forceShowValidationResult directly from the context because
+  // sometimes the selector in useValidationDisplay doesn't update correctly or in time.
+  // Using the full context ensures we get the latest value on re-renders triggered by context changes.
+  const formContext = useContext(FormContext);
+  const forceShowValidationResult = formContext?.interactionFlags[formItemId]?.forceShowValidationResult;
+  
+  const isHelperTextShown = isHelperTextShownHook || !!forceShowValidationResult;
 
   // Focus/blur handlers for validation modes
   const onFocus = useEvent(() => {
@@ -231,7 +229,7 @@ export const FormBindingWrapper = memo(function FormBindingWrapper({
       {enhancedInput}
     </ItemWithLabel>
   );
-});
+}
 
 /**
  * Hook that provides form binding functionality for use in components.
@@ -245,65 +243,11 @@ export function useFormBinding(bindTo: string, options?: {
   const isInsideForm = useIsInsideForm();
   
   const formItemId = useMemo(() => {
-    return bindTo || `${defaultId}${UNBOUND_FIELD_SUFFIX}`;
+    return bindTo || defaultId;
   }, [bindTo, defaultId]);
-
-  const dispatch = useFormContextPart((value) => value?.dispatch);
-  const value = useFormContextPart<any>((value) => getByPath(value?.subject, formItemId));
-  const validationResult = useFormContextPart((value) => value?.validationResults[formItemId]);
-  const formEnabled = useFormContextPart((value) => value?.enabled);
-
-  const initialValueFromSubject = useFormContextPart<any>((formCtx) =>
-    getByPath(formCtx?.originalSubject, formItemId),
-  );
   
-  const initialValue =
-    (initialValueFromSubject === undefined || initialValueFromSubject === null)
-      ? options?.initialValue
-      : initialValueFromSubject;
-
-  // Initialize field
-  useEffect(() => {
-    if (!isInsideForm) return;
-    dispatch(fieldInitialized(formItemId, initialValue, false, options?.noSubmit ?? false));
-  }, [dispatch, formItemId, initialValue, options?.noSubmit, isInsideForm]);
-
-  // Cleanup
-  useEffect(() => {
-    if (!isInsideForm) return;
-    return () => {
-      dispatch(fieldRemoved(formItemId));
-    };
-  }, [formItemId, dispatch, isInsideForm]);
-
-  const setValue = useCallback(
-    (newValue: any) => {
-      if (!isInsideForm) return;
-      dispatch(fieldChanged(formItemId, newValue));
-    },
-    [formItemId, dispatch, isInsideForm],
-  );
-
-  const onFocus = useCallback(() => {
-    if (!isInsideForm) return;
-    dispatch(fieldFocused(formItemId));
-  }, [formItemId, dispatch, isInsideForm]);
-
-  const onBlur = useCallback(() => {
-    if (!isInsideForm) return;
-    dispatch(fieldLostFocus(formItemId));
-  }, [formItemId, dispatch, isInsideForm]);
-
   return {
     isInsideForm,
-    formItemId,
-    value,
-    setValue,
-    validationResult,
-    formEnabled,
-    onFocus,
-    onBlur,
-    dispatch,
+    formItemId
   };
 }
-

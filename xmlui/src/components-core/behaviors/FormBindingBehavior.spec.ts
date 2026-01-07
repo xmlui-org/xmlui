@@ -226,6 +226,154 @@ test.describe("Behavior Context", () => {
 });
 
 // =============================================================================
+// VALIDATION TESTS
+// =============================================================================
+
+test.describe("Validation", () => {
+  test("'required' validation shows error with validationMode onChanged", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <TextBox testId="textbox" bindTo="name" required="true" requiredInvalidMessage="This field is required" label="Test" validationMode="onChanged" />
+      </Form>
+    `);
+
+    const textbox = page.getByRole("textbox");
+    
+    // Type something to make the field dirty
+    await textbox.fill("test");
+    // Clear it to trigger required validation
+    await textbox.fill("");
+
+    await expect(page.getByText("This field is required")).toBeVisible();
+  });
+
+  test("'required' validation shows error when isDirty and losing focus", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <TextBox testId="textbox" bindTo="name" required="true" requiredInvalidMessage="This field is required" label="Test" />
+        <TextBox testId="other" bindTo="other" label="Other" />
+      </Form>
+    `);
+
+    const textbox = page.getByRole("textbox").first();
+    
+    // Type and clear to make dirty, then lose focus
+    await textbox.fill("test");
+    await textbox.fill("");
+    
+    // Tab to lose focus (blur)
+    await page.getByRole("textbox").last().focus();
+
+    await expect(page.getByText("This field is required")).toBeVisible();
+  });
+
+  test("'required' validation shows error on form submit (like FormItem)", async ({
+    initTestBed,
+    page,
+    createFormDriver,
+  }) => {
+    page.on('console', msg => console.log('PAGE LOG:', msg.text()));
+
+    // This is a direct copy of FormItem.spec.ts test, just with TextBox+bindTo instead of FormItem
+    await initTestBed(`
+      <Form>
+        <TextBox 
+          testId="textbox" 
+          bindTo="standaloneField" 
+          label="Required Field" 
+          required="true" 
+          requiredInvalidMessage="This field is required"
+        />
+      </Form>
+    `);
+
+    const formDriver = await createFormDriver();
+
+    // Submit form to trigger validation
+    await formDriver.submitForm();
+
+    // Check that validation message appears somewhere on the page
+    await expect(page.getByText("This field is required")).toBeVisible();
+  });
+
+  test("'minLength' validation shows error on form submit", async ({
+    initTestBed,
+    page,
+    createFormDriver,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <TextBox 
+          testId="textbox" 
+          bindTo="field" 
+          minLength="5" 
+          lengthInvalidMessage="Too short" 
+          label="Min Length" 
+        />
+      </Form>
+    `);
+
+    const formDriver = await createFormDriver();
+    const textbox = page.getByRole("textbox");
+    
+    // Type something short
+    await textbox.fill("abc");
+    
+    // Submit
+    await formDriver.submitForm();
+
+    await expect(page.getByText("Too short")).toBeVisible();
+  });
+
+  test("'required' validation shows error on submit after interaction (dirty)", async ({
+    initTestBed,
+    page,
+    createFormDriver,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <TextBox testId="textbox" bindTo="name" required="true" requiredInvalidMessage="Required error" />
+      </Form>
+    `);
+
+    const formDriver = await createFormDriver();
+    const textbox = page.getByRole("textbox");
+    
+    // Make it dirty
+    await textbox.fill("a");
+    await textbox.fill(""); // Empty again
+    
+    // Submit (trigger blur)
+    await formDriver.submitForm();
+
+    await expect(page.getByText("Required error")).toBeVisible();
+  });
+
+  test("comparing: FormItem validation works", async ({
+    initTestBed,
+    page,
+    createFormDriver,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem bindTo="name" type="text" required="true" requiredInvalidMessage="FormItem required" label="FormItem Test" />
+      </Form>
+    `);
+
+    const formDriver = await createFormDriver();
+    await formDriver.submitForm();
+
+    await expect(page.getByText("FormItem required")).toBeVisible();
+  });
+});
+
+// =============================================================================
 // NOSUBMIT PROPERTY TESTS
 // =============================================================================
 

@@ -86,6 +86,14 @@ export const labelBehavior: Behavior = {
     if (!label) {
       return false;
     }
+    
+    // Don't attach if formBindingBehavior will handle this component
+    // (form-bindable components with bindTo prop will get label from FormBindingWrapper)
+    const bindTo = extractValue(node.props?.bindTo, true);
+    if (bindTo && FORM_BINDABLE_COMPONENTS.includes(node.type as any)) {
+      return false;
+    }
+    
     return true;
   },
   attach: (context, node, metadata) => {
@@ -383,6 +391,7 @@ export const formBindingBehavior: Behavior = {
 
     return (
       <FormBindingWrapper
+        key={bindTo}
         bindTo={bindTo!}
         initialValue={initialValue}
         noSubmit={noSubmit}
