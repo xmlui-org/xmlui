@@ -2,7 +2,7 @@
 
 | Component | Description |
 | :---: | --- |
-| [APICall](./APICall) | `APICall` creates, updates or deletes data on the backend, versus [`DataSource`](/components/DataSource) which fetches data. Unlike DataSource, APICall doesn't automatically execute - you must trigger it manually with the `execute()` method, typically from form submissions or button clicks. |
+| [APICall](./APICall) | `APICall` creates, updates or deletes data on the backend, versus [`DataSource`](/components/DataSource) which fetches data. Unlike DataSource, APICall doesn't automatically execute - you must trigger it manually with the `execute()` method, typically from form submissions or button clicks. See also [Actions.callAPI](globals#actionscallapi). |
 | [App](./App) | The `App` component is the root container that defines your application's overall structure and layout. It provides a complete UI framework with built-in navigation, header, footer, and content areas that work together seamlessly. |
 | [AppHeader](./AppHeader) | `AppHeader` defines the top navigation bar of your application within the [`App`](/components/App) component. It automatically handles logo placement, application title, and user profile areas with built-in responsive behavior. |
 | [AppState](./AppState) | `AppState` is an invisible component that provides global state management across your entire application. Unlike component variables that are scoped locally, AppState allows any component to access and update shared state without prop drilling. |
@@ -14,15 +14,15 @@
 | [Bookmark](./Bookmark) | As its name suggests, this component places a bookmark into its parent component's view. The component has an `id` that you can use in links to navigate (scroll to) the bookmark's location. |
 | [Breakout](./Breakout) | The `Breakout` component creates a breakout section. It allows its child to occupy the entire width of the UI even if the app or the parent container constrains the maximum content width. |
 | [Button](./Button) | `Button` is the primary interactive component for triggering actions like form submissions, navigation, opening modals, and API calls. It supports multiple visual styles and sizes to match different UI contexts and importance levels. |
-| [CHStack](./CHStack) | This component represents a stack that renders its contents horizontally and aligns that in the center along both axes. |
-| [CVStack](./CVStack) | This component represents a stack that renders its contents vertically and aligns that in the center along both axes. |
 | [Card](./Card) | `Card` is a versatile container that groups related content with a visual boundary, typically featuring background color, padding, borders, and rounded corners. It's ideal for organizing information, creating sections, and establishing visual hierarchy in your interface. |
 | [Carousel](./Carousel) | This component displays a slideshow by cycling through elements (images, text, or custom slides) like a carousel. |
 | [ChangeListener](./ChangeListener) | `ChangeListener` is an invisible component that watches for changes in values and triggers actions in response. It's essential for creating reactive behavior when you need to respond to data changes, state updates, or component property modifications outside of normal event handlers. |
 | [Checkbox](./Checkbox) | `Checkbox` allows users to make binary choices with a clickable box that shows checked/unchecked states. It's essential for settings, preferences, multi-select lists, and accepting terms or conditions. |
+| [CHStack](./CHStack) | This component represents a stack that renders its contents horizontally and aligns that in the center along both axes. |
 | [ColorPicker](./ColorPicker) | `ColorPicker` enables users to choose colors by specifying RGB, HSL, or HEX values. |
 | [Column](./Column) | `Column` defines the structure and behavior of individual table columns within a [`Table`](/components/Table) component. Each Column controls data binding, header display, sorting capabilities, sizing, and can contain any XMLUI components for rich cell content. |
 | [ContentSeparator](./ContentSeparator) | `ContentSeparator` creates visual dividers between content sections using horizontal or vertical lines. It's essential for improving readability by breaking up dense content, separating list items, or creating clear boundaries between different UI sections. |
+| [CVStack](./CVStack) | This component represents a stack that renders its contents vertically and aligns that in the center along both axes. |
 | [DataSource](./DataSource) | `DataSource` fetches and caches data from API endpoints, versus [`APICall`](/components/APICall) which creates, updates or deletes data. |
 | [DateInput](./DateInput) | `DateInput` provides a text-based date input interface for selecting single dates or date ranges, with direct keyboard input similar to TimeInput. It offers customizable formatting and validation options without dropdown calendars. |
 | [DatePicker](./DatePicker) | `DatePicker` provides an interactive calendar interface for selecting single dates or date ranges, with customizable formatting and validation options. It displays a text input that opens a calendar popup when clicked, offering both keyboard and mouse interaction. |
@@ -44,11 +44,11 @@
 | [H4](./H4) | Represents a heading level 4 text |
 | [H5](./H5) | Represents a heading level 5 text |
 | [H6](./H6) | Represents a heading level 6 text |
+| [Heading](./Heading) | `Heading` displays hierarchical text headings with semantic importance levels from H1 to H6, following HTML heading standards. It provides text overflow handling, anchor link generation, and integrates with [TableOfContents](/components/TableOfContents). |
 | [HSplitter](./HSplitter) | `Splitter` component divides a container into two resizable sections. These are are identified by their names: primary and secondary. They have a draggable bar between them. When only a single child is visible (due to conditional rendering with `when` attributes), the splitter bar is not displayed and the single panel stretches to fill the entire viewport of the splitter container. |
 | [HStack](./HStack) | This component represents a stack rendering its contents horizontally. |
-| [Heading](./Heading) | `Heading` displays hierarchical text headings with semantic importance levels from H1 to H6, following HTML heading standards. It provides text overflow handling, anchor link generation, and integrates with [TableOfContents](/components/TableOfContents). |
-| [IFrame](./IFrame) | `IFrame` embeds external content from another HTML document into the current page. It provides security controls through sandbox and allow attributes, and supports features like fullscreen display and referrer policy configuration. |
 | [Icon](./Icon) | `Icon` displays scalable vector icons from XMLUI's built-in icon registry using simple name references. Icons are commonly used in buttons, navigation elements, and status indicators. |
+| [IFrame](./IFrame) | `IFrame` embeds external content from another HTML document into the current page. It provides security controls through sandbox and allow attributes, and supports features like fullscreen display and referrer policy configuration. |
 | [Image](./Image) | `Image` displays pictures from URLs or local sources with built-in responsive sizing, aspect ratio control, and accessibility features. It handles different image formats and provides options for lazy loading and click interactions. |
 | [Items](./Items) | `Items` renders data arrays without built-in layout or styling, providing a lightweight alternative to `List`. Unlike `List`, it provides no virtualization, grouping, or visual formatting — just pure data iteration. |
 | [LabelList](./LabelList) | `LabelList` adds custom data labels to chart components when automatic labeling isn't sufficient. It's a specialized component for advanced chart customization scenarios where you need precise control over label positioning and appearance. |
@@ -105,3 +105,4 @@
 | [Tree](./Tree) | The `Tree` component is a virtualized tree component that displays hierarchical data with support for flat and hierarchy data formats. |
 | [VSplitter](./VSplitter) | `Splitter` component divides a container into two resizable sections. These are are identified by their names: primary and secondary. They have a draggable bar between them. When only a single child is visible (due to conditional rendering with `when` attributes), the splitter bar is not displayed and the single panel stretches to fill the entire viewport of the splitter container. |
 | [VStack](./VStack) | This component represents a stack rendering its contents vertically. |
+
