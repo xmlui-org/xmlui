@@ -4,14 +4,9 @@ import type {
   TextDocumentPositionParams,
   InitializeResult,
   HoverParams,
-  TextDocumentContentChangeEvent,
-  TextDocumentChangeEvent,
-  Diagnostic,
-  Position,
   DocumentFormattingParams,
 } from "vscode-languageserver";
 import {
-  MarkupKind,
   TextDocumentSyncKind,
   DidChangeConfigurationNotification,
   TextDocuments,
@@ -22,12 +17,7 @@ import type { XmluiCompletionItem } from "./services/completion";
 import { handleCompletion, handleCompletionResolve } from "./services/completion";
 import { handleHover } from "./services/hover";
 import { handleDocumentFormatting } from "./services/format";
-import {
-  createXmlUiParser,
-  Error,
-  type GetText,
-  type ParseResult,
-} from "../parsers/xmlui-parser/parser";
+import { createXmlUiParser, type GetText, type ParseResult } from "../parsers/xmlui-parser/parser";
 import {
   MetadataProvider,
   type ComponentMetadataCollection,

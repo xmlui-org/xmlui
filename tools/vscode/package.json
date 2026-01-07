@@ -78,7 +78,6 @@
   "scripts": {
     "build:vsix": "vsce package",
     "build": "node esbuild.js --production",
-    "build:all": "./build.sh",
     "type-check": "tsc --noEmit",
     "watch": "npm-run-all -p watch:*",
     "watch:esbuild": "node esbuild.js --watch",

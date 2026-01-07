@@ -2,12 +2,12 @@ import type { AppContextObject } from "../abstractions/AppContextDefs";
 import type { AsyncFunction, SyncFunction } from "./FunctionDefs";
 import type { ContainerState } from "./ContainerDefs";
 import type { ArrowExpression } from "../components-core/script-runner/ScriptingSourceTree";
-import type { ApiInterceptor } from "../components-core/interception/ApiInterceptor";
+import type { IApiInterceptor } from "../components-core/interception/abstractions";
 
 // This type represents the options to use for looking up actions.
 export type LookupActionOptions = {
-  // This property (by default, true) indicates that any error should be signed 
-  // while executing an event handler. Set it to `false` to suppress error 
+  // This property (by default, true) indicates that any error should be signed
+  // while executing an event handler. Set it to `false` to suppress error
   // indication.
   signError?: boolean;
 
@@ -16,7 +16,7 @@ export type LookupActionOptions = {
   eventName?: string;
 
   // By default, we cache resolved action functions. This property signs that we
-  // don't want to cache this function. Use true on one-off handlers, like the 
+  // don't want to cache this function. Use true on one-off handlers, like the
   // ones in Actions (e.g., `MutateAction`).
   ephemeral?: boolean;
 
@@ -35,22 +35,25 @@ export type LookupAsyncFnInner = (
   action: string | undefined,
   // The unique identifier of the container that the action is executed in.
   uid: symbol,
-  actionOptions?: LookupActionOptions
+  actionOptions?: LookupActionOptions,
 ) => AsyncFunction | undefined;
 
 // This function resolves an action by its name with the specified options and
 // returns the action function if found. Otherwise, return undefined.
 export type LookupAsyncFn = (
   action: string | undefined,
-  actionOptions?: LookupActionOptions
+  actionOptions?: LookupActionOptions,
 ) => AsyncFunction | undefined;
 
 // This function resolves a sync action by its name (within the component node
 // running it) and returns the action function if found. Otherwise, it returns
 // undefined.
-export type LookupSyncFnInner = (action: ArrowExpression | undefined, uid: symbol) => SyncFunction | undefined;
+export type LookupSyncFnInner = (
+  action: ArrowExpression | undefined,
+  uid: symbol,
+) => SyncFunction | undefined;
 
-// This function resolves a sync action by its name and returns the action 
+// This function resolves a sync action by its name and returns the action
 // function if it is found. Otherwise, it returns undefined.
 export type LookupSyncFn = (action: string | undefined) => SyncFunction | undefined;
 
@@ -61,7 +64,7 @@ export type LookupSyncFn = (action: string | undefined) => SyncFunction | undefi
 export interface ActionRendererDef {
   // The name of the action that will be used to reference it in XMLUI.
   actionName: string;
-  
+
   // The function that executes the action.
   actionFn: ActionFunction;
 }
@@ -74,18 +77,18 @@ export interface ActionExecutionContext {
   // The state of the container that the action is executed in.
   state: ContainerState;
 
-  getCurrentState: ()=>ContainerState;
+  getCurrentState: () => ContainerState;
 
   // The appContext object passed to the current app
   appContext: AppContextObject;
-  apiInstance?: ApiInterceptor;
+  apiInstance?: IApiInterceptor;
 
   // The lookup function to resolve a sync action by its name.
   lookupAction: LookupAsyncFnInner;
   navigate: any; // TEMPORARY stuff, we could use the one in the appContext, but until
-                 // https://github.com/remix-run/react-router/issues/7634 fixed we can't
+  // https://github.com/remix-run/react-router/issues/7634 fixed we can't
   location: any; // TEMPORARY stuff, we could use the one in the appContext, but until
-                 // https://github.com/remix-run/react-router/issues/7634 fixed we can't
+  // https://github.com/remix-run/react-router/issues/7634 fixed we can't
 }
 
 // This type represents a function that executes a particular action within the

@@ -1,34 +1,34 @@
 import type { DelayMode } from "msw";
 
 export type AuthDefinition = {
-  defaultLoggedInUser?: any
+  defaultLoggedInUser?: any;
 };
 
 export type TableDescriptor = {
-  name: string,
-  fields?: Record<string, any>,
+  name: string;
+  fields?: Record<string, any>;
   pk: Array<string>;
   indexes?: Array<string>;
-}
+};
 
 export type SchemaDescriptor = {
-  tables: Array<TableDescriptor>,
+  tables: Array<TableDescriptor>;
   relationships?: any;
   dtos?: any;
-}
+};
 
 // Represents an interceptor between API consumers (UI in the browser) and their backend
 export type ApiInterceptorDefinition = {
   // Type of backend interceptor
   type?: string;
-  
+
   // Interceptor configuration
   config?: Record<string, any>;
 
   artificialDelay?: number | DelayMode;
-  
+
   // Information for code generators
-  schemaDescriptor?: SchemaDescriptor
+  schemaDescriptor?: SchemaDescriptor;
 
   // URL to particular interceptor is bound to
   apiUrl?: string;
@@ -41,7 +41,7 @@ export type ApiInterceptorDefinition = {
 
   // Available operations
   operations?: Record<string, InterceptorOperationDef>;
-  
+
   auth?: AuthDefinition;
 
   useWorker?: boolean;
@@ -60,13 +60,13 @@ export type InterceptorOperationDef = {
 
   // Shape of the request this operation expects
   requestShape?: any;
-  
+
   // Shape of the response this operation returns
   responseShape?: any;
-  
+
   // Type mappings of path parameters
-  pathParamTypes?: Record<string, string>
-  
+  pathParamTypes?: Record<string, string>;
+
   // Type mappings of query parameters
   queryParamTypes?: Record<string, string>;
 
@@ -100,10 +100,10 @@ export type RequestParams = {
   queryParams: Record<string, any>;
 
   // The body of a request
-  requestBody: any; 
-  
+  requestBody: any;
+
   cookies: any;
-  
+
   requestHeaders: Record<string, string>;
 };
 
@@ -114,3 +114,8 @@ export type BackendDefinition = {
   helpers?: Record<string, any>;
   operations: Record<string, string>;
 };
+
+export interface IApiInterceptor<TRequestInit = any> {
+  hasMockForRequest(url: string, options: TRequestInit): boolean;
+  executeMockedFetch(url: string, options: TRequestInit): Promise<any>;
+}

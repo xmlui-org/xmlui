@@ -3205,13 +3205,13 @@ export class Parser {
     for (const prop of objLit.props) {
       if (Array.isArray(prop)) {
       } else {
-        reportError("W018");
+        this.reportError("W018");
         return null;
       }
 
       const [propKey, propValue] = prop;
       if (propKey.type !== T_IDENTIFIER) {
-        reportError("W018");
+        this.reportError("W018");
         return null;
       }
 

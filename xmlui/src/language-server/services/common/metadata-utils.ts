@@ -1,12 +1,24 @@
-import { RiEmpathizeFill } from "react-icons/ri";
-import type { ComponentMetadata, ComponentPropertyMetadata } from "../../../abstractions/ComponentDefs"
+import type {
+  ComponentMetadata,
+  ComponentPropertyMetadata,
+} from "../../../abstractions/ComponentDefs";
 import { layoutOptionKeys } from "../../../components-core/descriptorHelper";
 import { onPrefixRegex, stripOnPrefix } from "../../../parsers/xmlui-parser";
 import { viewportSizeMd } from "../../../components/abstractions";
 
-type RestrictedComponentMetadata = Pick<ComponentMetadata, "description" | "status" | "props" | "events" | "apis" | "contextVars" | "allowArbitraryProps" | "shortDescription">
+type RestrictedComponentMetadata = Pick<
+  ComponentMetadata,
+  | "description"
+  | "status"
+  | "props"
+  | "events"
+  | "apis"
+  | "contextVars"
+  | "allowArbitraryProps"
+  | "shortDescription"
+>;
 
-export type ComponentMetadataCollection = Record<string, RestrictedComponentMetadata>
+export type ComponentMetadataCollection = Record<string, RestrictedComponentMetadata>;
 
 export class MetadataProvider {
   constructor(private readonly metadataCollection: ComponentMetadataCollection) {}
@@ -25,8 +37,8 @@ export class MetadataProvider {
   }
 }
 
-export type AttributeKind = "prop" | "event" | "api" | "implicit" | "layout"
-export type TaggedAttribute = { name: string, kind: AttributeKind };
+export type AttributeKind = "prop" | "event" | "api" | "implicit" | "layout";
+export type TaggedAttribute = { name: string; kind: AttributeKind };
 
 export class ComponentMetadataProvider {
   constructor(private readonly metadata: RestrictedComponentMetadata) {}
@@ -41,8 +53,8 @@ export class ComponentMetadataProvider {
   }
 
   getAttr(name: string) {
-    if (onPrefixRegex.test(name)){
-      const eventName = stripOnPrefix(name)
+    if (onPrefixRegex.test(name)) {
+      const eventName = stripOnPrefix(name);
       const event = this.metadata.events?.[eventName];
       if (event) {
         return event;
@@ -64,8 +76,8 @@ export class ComponentMetadataProvider {
     return implicitPropsMetadata[name];
   }
 
-  getAttrForKind({ name, kind}: TaggedAttribute){
-    switch (kind){
+  getAttrForKind({ name, kind }: TaggedAttribute) {
+    switch (kind) {
       case "api":
         return this.metadata.apis[name];
       case "event":
@@ -75,7 +87,7 @@ export class ComponentMetadataProvider {
       case "implicit":
         return implicitPropsMetadata[name];
       case "layout":
-        return layoutMdForKey(name)
+        return layoutMdForKey(name);
     }
   }
 
@@ -90,21 +102,21 @@ export class ComponentMetadataProvider {
     for (const key of Object.keys(this.metadata.apis ?? {})) {
       attrNames.push({ name: key, kind: "api" });
     }
-    for (const layoutKey of layoutOptionKeys){
-      attrNames.push({name: layoutKey, kind: "layout"})
+    for (const layoutKey of layoutOptionKeys) {
+      attrNames.push({ name: layoutKey, kind: "layout" });
     }
-    for (const implicitPropKey of Object.keys(implicitPropsMetadata)){
-      attrNames.push({name: implicitPropKey, kind: "implicit"})
+    for (const implicitPropKey of Object.keys(implicitPropsMetadata)) {
+      attrNames.push({ name: implicitPropKey, kind: "implicit" });
     }
 
     return attrNames;
   }
 
-  getEvent(name: string){
+  getEvent(name: string) {
     return this.metadata.events?.[name];
   }
 
-  getApi(name: string){
+  getApi(name: string) {
     return this.metadata.apis?.[name];
   }
 
@@ -137,18 +149,22 @@ function layoutMdForKey(name: string): ComponentPropertyMetadata {
   const metadata = {
     description: "Layout property. Not yet documented",
   };
-  if (layoutOptionKeys.includes(name)){
+  if (layoutOptionKeys.includes(name)) {
     return metadata;
   }
-  for(const size of viewportSizeMd){
-    const suffix = "-" + ((size as {
-      value: string | number;
-      description: string;
-    }).value);
+  for (const size of viewportSizeMd) {
+    const suffix =
+      "-" +
+      (
+        size as {
+          value: string | number;
+          description: string;
+        }
+      ).value;
 
-    if(name.endsWith(suffix)){
+    if (name.endsWith(suffix)) {
       const nameWithoutSize = name.slice(0, -suffix.length);
-      if(layoutOptionKeys.includes(nameWithoutSize)){
+      if (layoutOptionKeys.includes(nameWithoutSize)) {
         return metadata;
       }
     }
@@ -163,13 +179,14 @@ const implicitPropsMetadata: Record<string, ComponentPropertyMetadata> = {
     valueType: "boolean",
   },
   data: {
-    description: "Specifies the data source for a component. Can be a URL string (fetched automatically), a DataSource or an expression to evaluate. Changes to this property trigger UI updates once data is loaded.",
+    description:
+      "Specifies the data source for a component. Can be a URL string (fetched automatically), a DataSource or an expression to evaluate. Changes to this property trigger UI updates once data is loaded.",
   },
   when: {
     description: "Specifies a condition that must be met for the component to be displayed",
     defaultValue: true,
     valueType: "boolean",
-  }
+  },
 };
 
 export function addOnPrefix(name: string) {
