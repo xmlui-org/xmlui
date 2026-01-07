@@ -293,9 +293,14 @@ export function App({
   );
 
   useIsomorphicLayoutEffect(() => {
+    if (window.history.scrollRestoration !== "manual") {
+      window.history.scrollRestoration = "manual";
+    }
+
     if (scrollRestorationEnabled && navigationType === "POP") {
       const key = `xmlui_scroll_${location.key}`;
       const saved = sessionStorage.getItem(key);
+
       if (saved) {
         try {
           const { x, y } = JSON.parse(saved);
@@ -310,12 +315,14 @@ export function App({
         }
       }
     }
-    scrollContainerRef.current?.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: "instant", // Optional if you want to skip the scrolling animation
-    });
-  }, [location.pathname, scrollRestorationEnabled, navigationType]);
+    if(navigationType !== "POP"){
+      scrollContainerRef.current?.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "instant", // Optional if you want to skip the scrolling animation
+      });
+    }
+  }, [location.key, scrollRestorationEnabled, navigationType]);
 
   useEffect(() => {
     if (!scrollRestorationEnabled) return;
@@ -331,7 +338,7 @@ export function App({
     el.addEventListener("scroll", saveScroll);
     return () => {
       el.removeEventListener("scroll", saveScroll);
-      saveScroll.cancel();
+      saveScroll.flush();
     };
   }, [scrollRestorationEnabled, location.key, scrollContainerRef]);
 

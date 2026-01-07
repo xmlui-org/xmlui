@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import React from "react";
-import { BrowserRouter, HashRouter, MemoryRouter } from "react-router-dom";
+import { BrowserRouter, HashRouter, MemoryRouter, ScrollRestoration } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 

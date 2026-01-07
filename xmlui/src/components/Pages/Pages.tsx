@@ -82,7 +82,7 @@ export const pagesRenderer = createComponentRenderer(
     return (
       <Pages
         fallbackPath={extractValue(node.props.fallbackPath)}
-        defaultScrollRestoration={extractValue(node.props.defaultScrollRestoration)}
+        defaultScrollRestoration={extractValue.asOptionalBoolean(node.props.defaultScrollRestoration)}
         node={node}
         renderChild={renderChild}
         extractValue={extractValue}
