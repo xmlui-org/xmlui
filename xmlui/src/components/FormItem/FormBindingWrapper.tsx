@@ -141,10 +141,6 @@ export function FormBindingWrapper({
     validationMode ?? "errorLate",
   );
 
-  useEffect(() => {
-    console.log("validationResult", validationResult, isHelperTextShownHook);
-  }, [validationResult, isHelperTextShownHook]);
-
   // We use useFormContextPart to access forceShowValidationResult efficiently.
   // This avoids re-rendering the component on every form state change which happens
   // when using useContext(FormContext).
