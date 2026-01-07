@@ -5,12 +5,13 @@ import { isPlainObject, isString } from "lodash-es";
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import type { MemoedVars } from "../abstractions/ComponentRenderer";
 import { parseParameterString } from "../script-runner/ParameterParser";
-import type { ComponentApi, ContainerState } from "../rendering/ContainerWrapper";
+import type { ContainerState } from "../rendering/ContainerWrapper";
 import { isPrimitive, pickFromObject, shallowCompare } from "../utils/misc";
 import { collectVariableDependencies } from "../script-runner/visitors";
 import { extractParam } from "../utils/extractParam";
 import { StyleParser, toCssVar } from "../../parsers/style-parser/StyleParser";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
+import type { ComponentApi } from "../../abstractions/ApiDefs";
 
 function parseStringArray(input: string): string[] {
   const trimmedInput = input.trim();
@@ -44,22 +45,26 @@ function collectParams(expression: any) {
 
 export function asOptionalBoolean(value: any, defValue?: boolean | undefined) {
   if (value === undefined || value === null) return defValue;
-  
+
   // Empty array returns false
   if (Array.isArray(value) && value.length === 0) {
     return false;
   }
-  
+
   // Empty object returns false
-  if (typeof value === "object" && value !== null && !Array.isArray(value) && Object.keys(value).length === 0) {
+  if (
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value) &&
+    Object.keys(value).length === 0
+  ) {
     return false;
   }
-  
+
   if (typeof value === "number") {
     return value !== 0;
   }
   if (typeof value === "string") {
-
     value = value.trim().toLowerCase();
     if (value === "") {
       return false;
@@ -85,7 +90,7 @@ export function createValueExtractor(
   state: ContainerState,
   appContext: AppContextObject | undefined,
   referenceTrackedApi: Record<string, ComponentApi>,
-  memoedVarsRef: MutableRefObject<MemoedVars>
+  memoedVarsRef: MutableRefObject<MemoedVars>,
 ): ValueExtractor {
   // --- Extract the parameter and retrieve as is is
   const extractor = (expression?: any, strict?: boolean): any => {
@@ -111,7 +116,10 @@ export function createValueExtractor(
           let ret = new Set<string>();
           params.forEach((param) => {
             if (param.type === "expression") {
-              ret = new Set([...ret, ...collectVariableDependencies(param.value, referenceTrackedApi)]);
+              ret = new Set([
+                ...ret,
+                ...collectVariableDependencies(param.value, referenceTrackedApi),
+              ]);
             }
           });
           return Array.from(ret);
@@ -123,10 +131,20 @@ export function createValueExtractor(
           },
           (
             [_newExpression, _newState, _newAppContext, _newStrict, newDeps, newAppContextDeps],
-            [_lastExpression, _lastState, _lastAppContext, _lastStrict, lastDeps, lastAppContextDeps]
+            [
+              _lastExpression,
+              _lastState,
+              _lastAppContext,
+              _lastStrict,
+              lastDeps,
+              lastAppContextDeps,
+            ],
           ) => {
-            return shallowCompare(newDeps, lastDeps) && shallowCompare(newAppContextDeps, lastAppContextDeps);
-          }
+            return (
+              shallowCompare(newDeps, lastDeps) &&
+              shallowCompare(newAppContextDeps, lastAppContextDeps)
+            );
+          },
         ),
       });
     }
@@ -142,7 +160,7 @@ export function createValueExtractor(
       appContext,
       strict,
       depValues,
-      appContextDepValues
+      appContextDepValues,
     );
   };
 

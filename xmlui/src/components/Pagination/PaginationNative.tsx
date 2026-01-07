@@ -8,11 +8,11 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import { Text } from "../Text/TextNative";
 import { Icon } from "../Icon/IconNative";
 import type { OrientationOptions } from "../abstractions";
-import type { ComponentApi } from "../../components-core/rendering/ContainerWrapper";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import { Part } from "../Part/Part";
 import { Select } from "../Select/SelectNative";
 import { convertOptionValue, OptionNative } from "../Option/OptionNative";
+import type { ComponentApi } from "../../abstractions/ApiDefs";
 
 export const PageNumberValues = [1, 3, 5] as const;
 export type PageNumber = (typeof PageNumberValues)[number];

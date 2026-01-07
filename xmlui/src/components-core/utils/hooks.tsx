@@ -2,13 +2,14 @@ import type { MutableRefObject } from "react";
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { isEqual } from "lodash-es";
 
-import type { ComponentApi, ContainerState } from "../rendering/ContainerWrapper";
+import type { ContainerState } from "../rendering/ContainerWrapper";
 import type { ColorDef } from "./css-utils";
 
 import { shallowCompare, useEvent } from "../utils/misc";
 import { useTheme } from "../theming/ThemeContext";
 import { EMPTY_OBJECT } from "../constants";
 import Color from "color";
+import type { ComponentApi } from "../../abstractions/ApiDefs";
 
 /**
  * This hook invokes a callback when the size of the specified DOM element changes.
