@@ -166,7 +166,9 @@ export const Container = memo(
           changes.length = 0;
           const poj = cloneDeep({ ...stateRef.current, ...(options?.context || {}) });
           poj["$this"] = stateRef.current[componentUid];
+          console.log("Creating proxy for localContext:", poj);
           return buildProxy(poj, (changeInfo) => {
+            console.log("Proxy change detected:", changeInfo);
             const idRoot = (changeInfo.pathArray as string[])?.[0];
             if (idRoot?.startsWith("$")) {
               throw new Error("Cannot update a read-only variable");

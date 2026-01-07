@@ -357,7 +357,6 @@ export async function callApi(
       resolveBindingExpressions,
       onProgress: _onProgress,
     });
-    console.log("API call result:", result);
 
     const onSuccessFn = lookupAction(onSuccess, uid, {
       eventName: "success",
@@ -403,6 +402,7 @@ export async function callApi(
       appContext,
     );
     if (errorMessage) {
+      console.log("Showing error toast:", errorMessage);
       toast.error(errorMessage, {
         id: loadingToastId,
       });

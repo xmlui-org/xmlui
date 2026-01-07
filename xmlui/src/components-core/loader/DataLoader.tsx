@@ -369,6 +369,7 @@ function DataLoader({
         stateRef.current.appContext,
       );
       if (errorMessage) {
+        console.log("Showing error toast:", errorMessage);
         toast.error(errorMessage, {
           id: loadingToastIdRef.current,
         });

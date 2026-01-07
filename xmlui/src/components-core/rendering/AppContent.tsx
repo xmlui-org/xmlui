@@ -472,6 +472,7 @@ export function AppContent({
 
 // --- We pass this funtion to the global app context
 function signError(error: Error | string) {
+  console.error("Error signaled:", error);
   toast.error(typeof error === "string" ? error : error.message || "Something went wrong");
 }
 

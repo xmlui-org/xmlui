@@ -469,6 +469,7 @@ export default class RestApiProxy {
     transactionId: string;
     resolveBindingExpressions: boolean;
   }) => {
+    console.log("Executing API operation:", operation);
     const includeClientTxId = method && method !== "get" && !!transactionId;
     const headersWithoutContentType = { ...this.getHeaders(), ["Content-Type"]: undefined };
     let url = this.generateFullApiUrl(relativePath, queryParams);

@@ -115,6 +115,7 @@ export function evalBinding(
   evalContext: BindingTreeEvaluationContext,
   thread?: LogicalThread,
 ): any {
+  console.log("Evaluating binding expression:", expr);
   const thisStack: any[] = [];
   ensureMainThread(evalContext);
   thread ??= evalContext.mainThread;

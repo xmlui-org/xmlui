@@ -53,6 +53,7 @@ import type {
 } from "../abstractions/scripting/Compilation";
 import { MetadataProvider } from "../language-server/services/common/metadata-utils";
 import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
+import { relative } from "path";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
