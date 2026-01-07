@@ -148,11 +148,12 @@ export function FormBindingWrapper({
     console.log("validationResult", validationResult, isHelperTextShownHook);
   }, [validationResult, isHelperTextShownHook]);
 
-  // We need to access forceShowValidationResult directly from the context because
-  // sometimes the selector in useValidationDisplay doesn't update correctly or in time.
-  // Using the full context ensures we get the latest value on re-renders triggered by context changes.
-  const formContext = useContext(FormContext);
-  const forceShowValidationResult = formContext?.interactionFlags[formItemId]?.forceShowValidationResult;
+  // We use useFormContextPart to access forceShowValidationResult efficiently.
+  // This avoids re-rendering the component on every form state change which happens
+  // when using useContext(FormContext).
+  const forceShowValidationResult = useFormContextPart(
+    (value) => value?.interactionFlags[formItemId]?.forceShowValidationResult
+  );
   
   const isHelperTextShown = isHelperTextShownHook || !!forceShowValidationResult;
 
