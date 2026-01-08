@@ -1,5 +1,15 @@
 # xmlui
 
+## 0.11.26
+
+### Patch Changes
+
+- b736b85: Add verticalAlignment support to FlowLayout
+- 9ebc8e5: feat: implement formBindingBehavior
+- 01ef62b: Clip pixel artifacts experienced with Text overflowMode
+- 5d715a3: Fix issues with empty script tag rendering
+- bd035dd: Fix state variables
+
 ## 0.11.25
 
 ### Patch Changes
