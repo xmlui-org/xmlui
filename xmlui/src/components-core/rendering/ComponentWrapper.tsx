@@ -1,14 +1,15 @@
-import type { ReactNode, RefObject} from "react";
+import type { ReactNode, RefObject } from "react";
 import { forwardRef, memo, useMemo, useRef } from "react";
 
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import { extractParam } from "../utils/extractParam";
 import type { ChildRendererContext } from "./renderChild";
-import type { ContainerWrapperDef} from "./ContainerWrapper";
+import type { ContainerWrapperDef } from "./ContainerWrapper";
 import { ContainerWrapper, isContainerLike } from "./ContainerWrapper";
 import ComponentAdapter from "./ComponentAdapter";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
 import { EMPTY_ARRAY } from "../constants";
+import { to } from "@react-spring/web";
 
 /**
  * The ComponentNode it the outermost React component wrapping an xmlui component.
@@ -33,7 +34,7 @@ export const ComponentWrapper = memo(
       uidInfoRef,
       children,
       ...rest
-    }: ChildRendererContext & { resolvedKey: string, children?: ReactNode },
+    }: ChildRendererContext & { resolvedKey: string; children?: ReactNode },
     ref,
   ) {
     // --- We pass the layout context to the child components, so we need to
@@ -53,6 +54,10 @@ export const ComponentWrapper = memo(
       transformed = transformNodeWithChildDatasource(transformed);
       transformed = transformNodeWithDataSourceRefProp(transformed, uidInfoRef);
       transformed = transformNodeWithRawDataProp(transformed);
+
+      if (node.type === "Table" && node.uid === "lineItemsTable") {
+        console.log("Transformed Table node:", transformed);
+      }
 
       return transformed;
     }, [descriptor?.childrenAsTemplate, node, uidInfoRef]);
@@ -79,7 +84,6 @@ export const ComponentWrapper = memo(
       );
     }, [nodeWithTransformedLoaders, resolvedDataPropIsString, uidInfoRef]);
 
-
     if (isContainerLike(nodeWithTransformedDatasourceProp)) {
       // --- This component should be rendered as a container
       return (
@@ -94,7 +98,10 @@ export const ComponentWrapper = memo(
           parentRegisterComponentApi={registerComponentApi}
           uidInfoRef={uidInfoRef}
           ref={ref}
-          {...rest}>{children}</ContainerWrapper>
+          {...rest}
+        >
+          {children}
+        </ContainerWrapper>
       );
     } else {
       // --- This component should be rendered as a regular component
@@ -114,7 +121,10 @@ export const ComponentWrapper = memo(
           layoutContextRef={stableLayoutContext}
           ref={ref}
           uidInfoRef={uidInfoRef}
-          {...rest}>{children}</ComponentAdapter>
+          {...rest}
+        >
+          {children}
+        </ComponentAdapter>
       );
     }
   }),
@@ -190,7 +200,7 @@ function transformNodeWithDataSourceRefProp(
   let ret = { ...node };
   let resolved = false;
   Object.entries(node.props).forEach(([key, value]) => {
-    let uidInfoForDatasource: { type: string; uid: any; };
+    let uidInfoForDatasource: { type: string; uid: any };
     try {
       uidInfoForDatasource = extractParam(uidInfoRef.current, value);
     } catch (e) {}
@@ -220,6 +230,15 @@ function transformNodeWithDataProp(
   resolvedDataPropIsString: boolean,
   uidInfoRef: RefObject<Record<string, any>>,
 ): ComponentDef {
+  let toLog = false;
+  if (node.type === "Table" && node.uid === "lineItemsTable") {
+    console.log("transformNodeWithDataProp", node);
+    console.log("__DATA_RESOLVED:", node.props?.__DATA_RESOLVED);
+    console.log("data prop:", node.props?.data);
+    console.log("resolvedDataPropIsString:", resolvedDataPropIsString);
+    toLog = true;
+  }
+
   if (
     !node.props?.__DATA_RESOLVED &&
     node.props &&
@@ -229,7 +248,13 @@ function transformNodeWithDataProp(
     // --- We skip the transformation if the data property is a binding expression
     // --- for a loader value
     if (extractParam(uidInfoRef.current, node.props.data) === "loaderValue") {
+      if (toLog) {
+        console.log("  - skipping transformation because of loaderValue");
+      }
       return node;
+    }
+    if (toLog) {
+      console.log("  - transforming 'data' prop to DataSource");
     }
     return {
       ...node,

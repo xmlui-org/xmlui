@@ -112,6 +112,7 @@ export default ({ mode = "lib" }) => {
     define,
     esbuild: {
       target: "es2020",
+      drop: mode === "standalone" ? [] : undefined,
     },
     optimizeDeps: {
       esbuildOptions: {
@@ -126,7 +127,7 @@ export default ({ mode = "lib" }) => {
       },
     },
     build: {
-      minify: "terser",
+      minify: mode === "standalone" ? false : "terser",
       emptyOutDir: true,
       outDir: `dist/${distSubDirName}`,
       lib,

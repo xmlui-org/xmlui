@@ -117,6 +117,8 @@ export function Loader({
     retry: false,
   });
 
+  console.log("Lopader info:", { uid, status, isFetching, isLoading, isRefetching, error, data });
+
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
     if (pollIntervalInSeconds) {

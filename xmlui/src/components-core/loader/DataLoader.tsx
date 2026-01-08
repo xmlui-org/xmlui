@@ -252,6 +252,7 @@ function DataLoader({
           throw error;
         }
       } else {
+        console.log("DataLoader loading with RestApiProxy", loader.props);
         return await api.execute({
           abortSignal,
           operation: loader.props as any,

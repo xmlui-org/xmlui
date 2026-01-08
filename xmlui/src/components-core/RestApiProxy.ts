@@ -243,6 +243,8 @@ export default class RestApiProxy {
     resolveBindingExpressions?: boolean;
     onProgress?: OnProgressFn;
   }): Promise<any> => {
+    console.log("RestApiProxy.execute", operation);
+
     return await this.executeOperation({
       operation,
       abortSignal,
@@ -395,6 +397,9 @@ export default class RestApiProxy {
     params = {},
     strict?: boolean,
   ) => {
+    if (value?.endsWith("newInvoice.items}")) {
+      debugger;
+    }
     const localContext = { $adapterConfig: this.config, ...params };
     if (resolveAsBindingExpression) {
       return extractParam(localContext, value, this.appContext, strict);
@@ -430,7 +435,8 @@ export default class RestApiProxy {
     contextParams,
     abortSignal,
     resolveBindingExpressions,
-    relativePath = this.extractParam(resolveBindingExpressions, operation.url, contextParams),
+    relativePath = (console.log("Resolving URL for operation", operation.url, contextParams),
+    this.extractParam(resolveBindingExpressions, operation.url, contextParams)),
     method = this.extractParam(resolveBindingExpressions, operation.method, contextParams),
     queryParams = this.extractParam(
       resolveBindingExpressions,
@@ -470,6 +476,7 @@ export default class RestApiProxy {
     transactionId: string;
     resolveBindingExpressions: boolean;
   }) => {
+    console.log("RestApiProxy.executeOperation", operation);
     const includeClientTxId = method && method !== "get" && !!transactionId;
     const headersWithoutContentType = { ...this.getHeaders(), ["Content-Type"]: undefined };
     let url = this.generateFullApiUrl(relativePath, queryParams);

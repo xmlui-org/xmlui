@@ -8,7 +8,7 @@
     "build:xmlui-test-bed": "cd src/testing/infrastructure && xmlui build --build-mode=INLINE_ALL --withHostingMetaFiles --withMock",
     "build:for-node": "tsdown",
     "build:xmlui": "vite build --mode lib",
-    "build:xmlui-standalone": "vite build --mode standalone",
+    "build:xmlui-standalone": "vite build --mode standalone --minify false",
     "build:xmlui-metadata": "vite build --mode metadata",
     "test:unit": "vitest run",
     "test:e2e": "playwright test -c ..",
