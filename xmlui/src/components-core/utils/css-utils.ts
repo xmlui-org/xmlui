@@ -116,6 +116,7 @@ export function getMaxLinesStyle(maxLines: number | undefined) {
           WebkitBoxOrient: "vertical",
           boxOrient: "vertical",
           whiteSpace: "initial",
+          overflow: "hidden",
         }
       : EMPTY_OBJECT;
   return maxLinesStyles;

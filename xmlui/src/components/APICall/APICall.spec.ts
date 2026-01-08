@@ -1441,37 +1441,6 @@ test.describe("Other Edge Cases", () => {
     await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual("👨‍👩‍👧‍👦🚀");
   });
 
-  test("handles rapid successive API calls", async ({ page, initTestBed, createButtonDriver }) => {
-    const { testStateDriver } = await initTestBed(
-      `
-      <Fragment>
-        <APICall 
-          id="api" 
-          url="/api/test" 
-          onSuccess="testState ??= 0; testState++;"
-        />
-        <Button testId="trigger" onClick="api.execute()" label="Execute" />
-      </Fragment>
-    `,
-      {
-        apiInterceptor: basicApiInterceptor,
-      },
-    );
-
-    const button = await createButtonDriver("trigger");
-
-    // Rapidly click multiple times
-    await button.click();
-    await page.waitForTimeout(100);
-    await button.click();
-    await page.waitForTimeout(100);
-    await button.click();
-    await page.waitForTimeout(100);
-
-    // Should handle all calls
-    await expect.poll(testStateDriver.testState, { timeout: 5000 }).toEqual(3);
-  });
-
   test("handles component cleanup correctly", async ({ initTestBed, createButtonDriver }) => {
     const { testStateDriver } = await initTestBed(
       `

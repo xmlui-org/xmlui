@@ -304,7 +304,7 @@ Available values:
 
 ### `valueTemplate` [#valuetemplate]
 
-This property allows replacing the default template to display a selected value when multiple selections (`multiSelect` is `true`) are enabled.
+This property allows replacing the default template to display a selected value. It works in both single-select and multi-select modes (`multiSelect` is `true`).
 
 In the template definition, you can use the `$item` context property to access the particular item's `label` and `value`.  The `$itemContext` property provides a `removeItem` method to delete a value from the current selection.
 

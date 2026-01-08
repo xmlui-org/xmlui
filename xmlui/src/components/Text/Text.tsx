@@ -81,12 +81,12 @@ export const TextMd = createMetadata({
       availableValues: [
         {
           value: "none",
-          description: "No wrapping, text stays on a single line with no overflow indicator",
+          description: "No wrapping, text stays on a single line with no overflow indicator (ignores maxLines)",
         },
         { value: "ellipsis", description: "Truncates with an ellipsis (default)" },
         {
           value: "scroll",
-          description: "Forces single line with horizontal scrolling when content overflows",
+          description: "Forces single line with horizontal scrolling when content overflows (ignores maxLines)",
         },
         {
           value: "flow",
