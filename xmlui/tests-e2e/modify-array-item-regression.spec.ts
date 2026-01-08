@@ -63,3 +63,25 @@ test("modify simple array item 3", async ({ page, initTestBed }) => {
     ]),
   );
 });
+
+test("push and filter", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <Fragment
+      var.initialProject="{ {id: 1, name: 'Project 2'} }"
+      var.projects="{ [{id: 1, name: 'Project 2'}]}"
+    >
+      <Button testId="modifyButton" onClick="()=> {
+        let projId = projects[0].id; 
+        projects = projects.filter(project => (project.id + '') !== (projId + ''));
+      }">
+        Play the scenario
+      </Button>
+      <Text testId="array_text">{JSON.stringify(projects)}</Text>
+    </Fragment>
+  `);
+  await expect(page.getByTestId("array_text")).toHaveText(
+    JSON.stringify([{ id: 1, name: "Project 2" }]),
+  );
+  await page.getByTestId("modifyButton").click();
+  await expect(page.getByTestId("array_text")).toHaveText(JSON.stringify([]));
+});
