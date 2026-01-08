@@ -2,7 +2,7 @@ import produce from "immer";
 import { cloneDeep, isPlainObject, keyBy, setWith, unset } from "lodash-es";
 
 import type { ContainerState } from "../../abstractions/ContainerDefs";
-import type { ContainerAction} from "./containers";
+import type { ContainerAction } from "./containers";
 import { ContainerActionKind } from "./containers";
 import type { IDebugViewContext } from "../DebugViewProvider";
 
@@ -105,7 +105,7 @@ export function createContainerReducer(debugView: IDebugViewContext) {
           unset(state, path);
         } else {
           let tempValueInLocalVars = localVars;
-          setWith(state, path, value, (nsValue, key, nsObject) => {
+          setWith(state, path, value, (nsValue, key) => {
             tempValueInLocalVars = tempValueInLocalVars?.[key];
             if (
               nsValue === undefined &&
@@ -120,8 +120,15 @@ export function createContainerReducer(debugView: IDebugViewContext) {
               // a number (an id in our case), lodash thinks it has to create an array after this 'set'. This way we
               // can force it, because in the target we have the target object value (given by the proxy change),so if
               // it's an object, it should be an object. Otherwise, we let lodash decide)
-              const next = Object(nsValue);
-              return next;
+              return Object(nsValue);
+            } else if (
+              nsValue === undefined &&
+              Array.isArray(tempValueInLocalVars) &&
+              Array.isArray(target)
+            ) {
+              return target;
+            } else if (nsValue === undefined) {
+              return tempValueInLocalVars;
             }
           });
           storeNextValue(state);

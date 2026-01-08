@@ -334,8 +334,7 @@ function useMergedState(localVars: ContainerState, componentState: ContainerStat
         ret[key] = value;
       } else {
         if (
-          (isPlainObject(ret[key]) && isPlainObject(value)) ||
-          (Array.isArray(ret[key]) && Array.isArray(value))
+          (isPlainObject(ret[key]) && isPlainObject(value))
         ) {
           ret[key] = merge(cloneDeep(ret[key]), value);
         } else {
