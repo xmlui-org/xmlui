@@ -304,10 +304,13 @@ export function App({
       if (saved) {
         try {
           const { x, y } = JSON.parse(saved);
-          scrollContainerRef.current?.scrollTo({
-            top: y,
-            left: x,
-            behavior: "instant",
+          
+          requestAnimationFrame(() => {
+              scrollContainerRef.current?.scrollTo({
+                top: y,
+                left: x,
+                behavior: "instant",
+              });
           });
           return;
         } catch (e) {
