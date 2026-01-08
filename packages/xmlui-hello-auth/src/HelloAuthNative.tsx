@@ -182,6 +182,8 @@ export const HelloAuth = React.forwardRef<HTMLDivElement, Props>(function HelloA
     () => `xmlui.auth:${issuer || "unknown"}:${client_id || "unknown"}`,
     [issuer, client_id],
   );
+
+
   const normalizedAuthorizeParams = useMemo(() => {
     if (!authorize_params) return undefined;
     const normalized: Record<string, string> = {};
@@ -250,6 +252,60 @@ export const HelloAuth = React.forwardRef<HTMLDivElement, Props>(function HelloA
     if (debug) console.debug("[HelloAuth] publish →", snapshot);
     updateState?.(snapshot);
   }
+
+  // -------------------- Step 0: Hydrate from session storage --------------------
+useEffect(() => {
+  if (typeof window === 'undefined') return;
+
+  const kv = getKV(storage) as any;
+  try {
+    const raw = kv.getItem(`${storageKey}:session`);
+    if (!raw) return;
+
+    const saved = JSON.parse(raw) as {
+      tokens?: Tokens;
+      claims?: IdClaims;
+      user?: User;
+      // some versions used `expiresat`, others `expires_at`
+      expiresat?: number;
+      expires_at?: number;
+    };
+
+    if (debug) {
+      console.debug('[HelloAuth] Hydrating from session storage', saved);
+    }
+
+    // ======= EXPIRATION CHECK =======
+    const expires = (saved as any).expires_at ?? (saved as any).expiresat;
+    if (expires) {
+      const now = Date.now();
+      const bufferMs = 5 * 60 * 1000; // 5 minutes buffer
+      if (now + bufferMs >= expires) {
+        if (debug) {
+          console.warn('[HelloAuth] Session expired or expires soon, clearing storage');
+        }
+        try {
+          kv.removeItem(`${storageKey}:session`);
+          kv.removeItem(storageKey);
+        } catch {}
+        return; // do not restore expired session
+      }
+    }
+
+    // Restore state (only if token is valid)
+    if (saved.tokens) setTokens(saved.tokens);
+    if (saved.claims) setClaims(saved.claims);
+    if (saved.user) setUser(saved.user);
+    if (expires) setExpiresAt(expires);
+
+    setTimeout(() => publish(), 0);
+  } catch (err) {
+    if (debug) {
+      console.warn('[HelloAuth] Failed to hydrate session', err);
+    }
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [storageKey, storage]);
 
   /* -------------------- Step 3: callback handling -------------------- */
   useEffect(() => {
