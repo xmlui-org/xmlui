@@ -386,6 +386,24 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
     text-overflow: clip;
   }
 
+  // Prevents pixel artifacts from descenders when using line-clamp
+  // by ensuring a clean clip boundary without interfering with padding
+  .multiLineClamp {
+    position: relative;
+    
+    // Add a subtle mask at the bottom to hide any descender artifacts
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: inherit;
+      pointer-events: none;
+    }
+  }
+
   // --- Overflow behavior classes
   .overflowNone {
     // Force single line as per metadata: "No wrapping, text stays on a single line"

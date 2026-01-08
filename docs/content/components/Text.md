@@ -160,82 +160,106 @@ Available values:
 
 | Value | Description |
 | --- | --- |
-| `none` | No wrapping, text stays on a single line with no overflow indicator |
+| `none` | No wrapping, text stays on a single line with no overflow indicator (ignores maxLines) |
 | `ellipsis` | Truncates with an ellipsis (default) |
-| `scroll` | Forces single line with horizontal scrolling when content overflows |
+| `scroll` | Forces single line with horizontal scrolling when content overflows (ignores maxLines) |
 | `flow` | Allows text to wrap into multiple lines with vertical scrolling when container height is constrained (ignores maxLines) |
 
-```xmlui-pg copy display name="Example: overflowMode"
-<App>
-  <VStack gap="16px">
-    <VStack gap="8px">
-      <Text variant="strong">overflowMode="none"</Text>
-      <Text
-        width="200px"
-        backgroundColor="lightcoral"
-        padding="8px"
-        overflowMode="none"
-        maxLines="2">
-        This is a very long text that will be clipped cleanly without 
-        any overflow indicator when it exceeds the specified lines.
-      </Text>
-    </VStack>
+Here are a few examples.
 
-    <VStack gap="8px">
-      <Text variant="strong">overflowMode="ellipsis" (default)</Text>
-      <Text
-        width="200px"
-        backgroundColor="lightblue"
-        padding="8px"
-        overflowMode="ellipsis"
-        maxLines="1">
-        This is a very long text that will show ellipsis when it 
-        overflows the container width.
-      </Text>
-    </VStack>
-    
-    <VStack gap="8px">
-      <Text variant="strong">overflowMode="scroll"</Text>
-      <Text
-        width="200px"
-        backgroundColor="lightgreen"
-        padding="8px"
-        overflowMode="scroll">
-        This is a very long text that will enable horizontal scrolling 
-        when it overflows the container width.
-      </Text>
-    </VStack>
-    
-    <VStack gap="8px">
-      <Text variant="strong">overflowMode="flow"</Text>
-      <Text
-        width="200px"
-        height="100px"
-        backgroundColor="lightyellow"
-        padding="8px"
-        overflowMode="flow">
-        This is a very long text that will wrap to multiple lines and show 
-        a vertical scrollbar when the content exceeds the container height. 
-        This mode ignores maxLines and allows unlimited text wrapping with 
-        vertical scrolling when needed.
-      </Text>
-    </VStack>
-    
-    <VStack gap="8px">
-      <Text variant="strong">overflowMode="flow" (no height constraint)</Text>
-      <Text
-        width="200px"
-        backgroundColor="lightpink"
-        padding="8px"
-        overflowMode="flow">
-        This is a very long text that demonstrates flow mode without a 
-        height constraint. The text will wrap to multiple lines naturally 
-        and the container will grow to accommodate all the content. No 
-        scrollbar will appear since there's no height limitation - the text 
-        flows freely across as many lines as needed.
-      </Text>
-    </VStack>
-  </VStack>
+```xmlui-pg copy display name="Example: overflowMode not specified (maxlines='2')" /maxLines/
+<App>
+  <Text
+    width="200px"
+    backgroundColor="lightblue"
+    padding="8px"
+    maxLines="2">
+    This is a very long text that will be clipped with an 
+    ellipsis indicator when it exceeds the specified lines.
+  </Text>
+</App>
+```
+
+```xmlui-pg copy display name="overflowMode='none' (maxlines='2')" /overflowMode/ /maxLines/
+<App>
+  <Text
+    width="200px"
+    backgroundColor="lightblue"
+    padding="8px"
+    overflowMode="none"
+    maxLines="2">
+    This is a very long text that will be clipped cleanly without 
+    any overflow indicator when it exceeds the specified lines.
+  </Text>
+</App>
+```
+
+```xmlui-pg copy display name="overflowMode='ellipsis'" /overflowMode/ /maxLines/
+<App>
+  <Text variant="strong">overflowMode="ellipsis" (default, maxlines='1')</Text>
+  <Text
+    width="200px"
+    backgroundColor="lightblue"
+    padding="8px"
+    overflowMode="ellipsis"
+    maxLines="1">
+    This is a very long text that will show ellipsis when it 
+    overflows the container width.
+  </Text>
+
+  <Text variant="strong">overflowMode="ellipsis" (default, maxlines='2')</Text>
+  <Text
+    width="200px"
+    backgroundColor="lightblue"
+    padding="8px"
+    overflowMode="ellipsis"
+    maxLines="2">
+    This is a very long text that will show ellipsis when it 
+    overflows the container width.
+  </Text>
+</App>
+```
+
+```xmlui-pg copy display name="overflowMode='scroll'" /overflowMode/
+<App>
+  <Text
+    width="200px"
+    backgroundColor="lightblue"
+    padding="8px"
+    overflowMode="scroll">
+    This is a very long text that will enable horizontal scrolling 
+    when it overflows the container width.
+  </Text>
+</App>
+```
+
+```xmlui-pg copy display name="overflowMode='flow'" /overflowMode/ /height/
+<App>
+  <Text variant="strong">overflowMode="flow"</Text>
+  <Text
+    width="200px"
+    height="100px"
+    backgroundColor="lightblue"
+    padding="8px"
+    overflowMode="flow">
+    This is a very long text that will wrap to multiple lines and show 
+    a vertical scrollbar when the content exceeds the container height. 
+    This mode ignores maxLines and allows unlimited text wrapping with 
+    vertical scrolling when needed.
+  </Text>
+  
+  <Text variant="strong">overflowMode="flow" (no height constraint)</Text>
+  <Text
+    width="200px"
+    backgroundColor="lightblue"
+    padding="8px"
+    overflowMode="flow">
+    This is a very long text that demonstrates flow mode without a 
+    height constraint. The text will wrap to multiple lines naturally 
+    and the container will grow to accommodate all the content. No 
+    scrollbar will appear since there's no height limitation - the text 
+    flows freely across as many lines as needed.
+  </Text>
 </App>
 ```
 
