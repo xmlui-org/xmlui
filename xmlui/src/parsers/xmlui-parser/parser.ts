@@ -1,25 +1,11 @@
 import { Node } from "./syntax-node";
 import type { ScannerErrorCallback } from "./scanner";
-import type {
-  ScannerDiagnosticMessage,
-  GeneralDiagnosticMessage,
-  DiagnosticCategory,
-} from "./diagnostics";
+import type { ScannerDiagnosticMessage, ParserDiagPositionless, ParserDiag } from "./diagnostics";
 import { CharacterCodes } from "./CharacterCodes";
 import { createScanner } from "./scanner";
 import { SyntaxKind, getSyntaxKindStrRepr } from "./syntax-kind";
 import { tagNameNodesWithoutErrorsMatch } from "./utils";
-import { ErrCodes, DIAGS } from "./diagnostics";
-
-export interface Error {
-  readonly category: DiagnosticCategory;
-  readonly code: ErrCodes;
-  readonly message: string;
-  readonly pos: number;
-  readonly end: number;
-  readonly contextPos: number;
-  readonly contextEnd: number;
-}
+import { ErrCodesParser, DIAGS_PARSER } from "./diagnostics";
 
 type IncompleteNode = {
   children: Node[];
@@ -27,7 +13,7 @@ type IncompleteNode = {
 
 export type GetText = (n: Node, ignoreTrivia?: boolean) => string;
 
-export type ParseResult = { node: Node; errors: Error[] };
+export type ParseResult = { node: Node; errors: ParserDiag[] };
 
 const RECOVER_FILE = [SyntaxKind.CData, SyntaxKind.Script, SyntaxKind.OpenNodeStart] as const;
 const RECOVER_OPEN_TAG = [
@@ -56,16 +42,16 @@ const RECOVER_CLOSE_TAG = [
 ] as const;
 
 const needsExtendedContext = [
-  ErrCodes.unexpectedCloseTag,
-  ErrCodes.expCloseStartWithName,
-  ErrCodes.expCloseStart,
-  ErrCodes.tagNameMismatch,
-  ErrCodes.expEnd,
-  ErrCodes.expTagName,
-  ErrCodes.expTagOpen,
-  ErrCodes.expEndOrClose,
-  ErrCodes.expTagNameAfterNamespace,
-  ErrCodes.expTagNameAfterCloseStart,
+  ErrCodesParser.unexpectedCloseTag,
+  ErrCodesParser.expCloseStartWithName,
+  ErrCodesParser.expCloseStart,
+  ErrCodesParser.tagNameMismatch,
+  ErrCodesParser.expEnd,
+  ErrCodesParser.expTagName,
+  ErrCodesParser.expTagOpen,
+  ErrCodesParser.expEndOrClose,
+  ErrCodesParser.expTagNameAfterNamespace,
+  ErrCodesParser.expTagNameAfterCloseStart,
 ];
 
 export function createXmlUiParser(source: string): {
@@ -80,7 +66,7 @@ export function createXmlUiParser(source: string): {
 }
 
 export function parseXmlUiMarkup(text: string): ParseResult {
-  const errors: Error[] = [];
+  const errors: ParserDiag[] = [];
   const parents: (IncompleteNode | Node)[] = [];
   let peekedToken: Node | undefined;
   let node: Node | IncompleteNode = { children: [] };
@@ -121,12 +107,12 @@ export function parseXmlUiMarkup(text: string): ParseResult {
           break;
         case SyntaxKind.CloseNodeStart: {
           const errNode = errNodeUntil(RECOVER_FILE);
-          errorAt(DIAGS.unexpectedCloseTag, errNode!.pos, errNode!.end);
+          errorAt(DIAGS_PARSER.unexpectedCloseTag, errNode!.pos, errNode!.end);
           break;
         }
         default:
           const errNode = errNodeUntil(RECOVER_FILE);
-          errorAt(DIAGS.expTagOpen, errNode!.pos, errNode!.end);
+          errorAt(DIAGS_PARSER.expTagOpen, errNode!.pos, errNode!.end);
           break;
       }
     }
@@ -151,7 +137,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
           break loop;
         default:
           const errNode = errNodeUntil(RECOVER_CONTENT_LIST);
-          errorAt(DIAGS.expTagOpen, errNode!.pos, errNode!.end);
+          errorAt(DIAGS_PARSER.expTagOpen, errNode!.pos, errNode!.end);
           break;
       }
     }
@@ -174,9 +160,9 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     } else {
       const errNode = errNodeUntil(RECOVER_OPEN_TAG);
       if (errNode) {
-        errorAt(DIAGS.expTagName, errNode.pos, errNode.end);
+        errorAt(DIAGS_PARSER.expTagName, errNode.pos, errNode.end);
       } else {
-        error(DIAGS.expTagName);
+        error(DIAGS_PARSER.expTagName);
       }
     }
 
@@ -201,7 +187,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
 
       default: {
         completeNode(SyntaxKind.ElementNode);
-        error(DIAGS.expEndOrClose);
+        error(DIAGS_PARSER.expEndOrClose);
         return;
       }
     }
@@ -214,7 +200,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       const nameNodeWithColon = completeNode(SyntaxKind.TagNameNode);
       const namespaceName = getText(identNode);
       errorAt(
-        DIAGS.expTagNameAfterNamespace(namespaceName),
+        DIAGS_PARSER.expTagNameAfterNamespace(namespaceName),
         nameNodeWithColon.pos,
         nameNodeWithColon.end,
       );
@@ -261,14 +247,14 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       const errNode = errNodeUntil(RECOVER_ATTR);
       if (errNode) {
         if (at(SyntaxKind.Equal)) {
-          errorAt(DIAGS.expAttrNameBeforeEq, errNode.pos, errNode.end);
+          errorAt(DIAGS_PARSER.expAttrNameBeforeEq, errNode.pos, errNode.end);
         } else {
-          errorAt(DIAGS.expAttrName, errNode.pos, errNode.end);
+          errorAt(DIAGS_PARSER.expAttrName, errNode.pos, errNode.end);
         }
         completeNode(SyntaxKind.AttributeNode);
       } else {
         abandonNode();
-        error(DIAGS.expAttrName);
+        error(DIAGS_PARSER.expAttrName);
       }
       return;
     }
@@ -277,9 +263,9 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       if (!eat(SyntaxKind.StringLiteral)) {
         const errNode = errNodeUntil(RECOVER_ATTR);
         if (errNode) {
-          errorAt(DIAGS.expAttrStr, errNode.pos, errNode.end);
+          errorAt(DIAGS_PARSER.expAttrStr, errNode.pos, errNode.end);
         } else {
-          error(DIAGS.expAttrStr);
+          error(DIAGS_PARSER.expAttrStr);
         }
       }
     }
@@ -306,9 +292,9 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         ]);
 
         if (errNode) {
-          errorAt(DIAGS.expAttrNameAfterNamespace(namespaceName), errNode.pos, errNode.end);
+          errorAt(DIAGS_PARSER.expAttrNameAfterNamespace(namespaceName), errNode.pos, errNode.end);
         } else {
-          error(DIAGS.expAttrNameAfterNamespace(namespaceName));
+          error(DIAGS_PARSER.expAttrNameAfterNamespace(namespaceName));
         }
       }
     }
@@ -325,30 +311,30 @@ export function parseXmlUiMarkup(text: string): ParseResult {
             openTagName !== null &&
             !tagNameNodesWithoutErrorsMatch(openTagName, closeTagName, getText);
           if (namesMismatch) {
-            const msg = DIAGS.tagNameMismatch(getText(openTagName!), getText(closeTagName));
+            const msg = DIAGS_PARSER.tagNameMismatch(getText(openTagName!), getText(closeTagName));
             errorAt(msg, closeTagName.pos, closeTagName.end);
           }
         }
       } else {
         const errNode = errNodeUntil(RECOVER_CLOSE_TAG);
         if (errNode) {
-          errorAt(DIAGS.expTagNameAfterCloseStart, errNode.pos, errNode.end);
+          errorAt(DIAGS_PARSER.expTagNameAfterCloseStart, errNode.pos, errNode.end);
         } else {
-          error(DIAGS.expTagNameAfterCloseStart);
+          error(DIAGS_PARSER.expTagNameAfterCloseStart);
         }
       }
       if (!eat(SyntaxKind.NodeEnd)) {
-        error(DIAGS.expEnd);
+        error(DIAGS_PARSER.expEnd);
       }
     } else {
       if (openTagName) {
         errorAt(
-          DIAGS.expCloseStartWithName(getText(openTagName)),
+          DIAGS_PARSER.expCloseStartWithName(getText(openTagName)),
           openTagName.pos,
           openTagName.end,
         );
       } else {
-        error(DIAGS.expCloseStart);
+        error(DIAGS_PARSER.expCloseStart);
       }
     }
   }
@@ -359,7 +345,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     if (eat(SyntaxKind.Colon) && !eat(SyntaxKind.Identifier)) {
       const nameNodeWithColon = completeNode(SyntaxKind.TagNameNode);
       errorAt(
-        DIAGS.expTagNameAfterNamespace(getText(identNode)),
+        DIAGS_PARSER.expTagNameAfterNamespace(getText(identNode)),
         nameNodeWithColon.pos,
         nameNodeWithColon.end,
       );
@@ -389,10 +375,10 @@ export function parseXmlUiMarkup(text: string): ParseResult {
 
     //TODO: account for the namespace as well
     if (isDuplicate) {
-      errorAt(DIAGS.duplAttr(attrName), nameIdent.pos, nameIdent.end);
+      errorAt(DIAGS_PARSER.duplAttr(attrName), nameIdent.pos, nameIdent.end);
     }
     if (!nsIdent && nameStartsWithUppercase) {
-      errorAt(DIAGS.uppercaseAttr(attrName), nameIdent.pos, nameIdent.end);
+      errorAt(DIAGS_PARSER.uppercaseAttr(attrName), nameIdent.pos, nameIdent.end);
     }
     if (!faultyName) {
       attrNames.push({ name: attrName, ns: attrNs });
@@ -446,7 +432,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     return { contextPos, contextEnd };
   }
 
-  function error({ code, message, category }: GeneralDiagnosticMessage) {
+  function error({ code, message, category }: ParserDiagPositionless) {
     const { pos, end } = peek();
 
     const { contextPos, contextEnd } = getContextWithSurroundingLines(pos, end, 1);
@@ -462,11 +448,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     });
   }
 
-  function errorAt(
-    { code, message, category }: GeneralDiagnosticMessage,
-    pos: number,
-    end: number,
-  ) {
+  function errorAt({ code, message, category }: ParserDiagPositionless, pos: number, end: number) {
     const { contextPos, contextEnd } = getContextWithSurroundingLines(pos, end, 1);
 
     errors.push({
@@ -662,9 +644,9 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       }
       //handle error from scanner
       if (errFromScanner !== undefined) {
-        let err: GeneralDiagnosticMessage;
-        if (errFromScanner.message.code === ErrCodes.invalidChar) {
-          err = DIAGS.invalidChar(scanner.getTokenText());
+        let err: ParserDiagPositionless;
+        if (errFromScanner.message.code === ErrCodesParser.invalidChar) {
+          err = DIAGS_PARSER.invalidChar(scanner.getTokenText());
         } else {
           err = errFromScanner.message;
         }
@@ -673,7 +655,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         const triviaBefore = triviaCollected.length > 0 ? triviaCollected : undefined;
 
         triviaCollected = [];
-        if (inContent && err.code === ErrCodes.invalidChar) {
+        if (inContent && err.code === ErrCodesParser.invalidChar) {
           errFromScanner = undefined;
           return new Node(kind, pos, scanner.getTokenEnd(), triviaBefore);
         }

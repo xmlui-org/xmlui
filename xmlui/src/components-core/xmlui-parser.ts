@@ -1,15 +1,15 @@
 import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
 import { createXmlUiParser } from "../parsers/xmlui-parser/parser";
 import { nodeToComponentDef } from "../parsers/xmlui-parser/transform";
-import { DiagnosticCategory, ErrCodes } from "../parsers/xmlui-parser/diagnostics";
-import type { GetText, Error as ParseError } from "../parsers/xmlui-parser/parser";
-import type { ParserError } from "../parsers/xmlui-parser/ParserError";
+import { DiagnosticCategory, ErrCodesParser } from "../parsers/xmlui-parser/diagnostics";
+import type { GetText } from "../parsers/xmlui-parser/parser";
+import type { ParserDiag } from "../parsers/xmlui-parser/diagnostics";
 import { SyntaxKind } from "../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../parsers/xmlui-parser/syntax-node";
 import type { ScriptParserErrorMessage } from "../abstractions/scripting/ScriptParserError";
 import type { ModuleErrors } from "./script-runner/ScriptingSourceTree";
 
-interface ErrorForDisplay extends ParseError {
+interface ErrorForDisplay extends ParserDiag {
   contextStartLine: number;
   contextSource: string;
   errPosLine: number;
@@ -42,10 +42,10 @@ export function xmlUiMarkupToComponent(source: string, fileId: string | number =
   } catch (e) {
     const erroneousCompoundComponentName = getCompoundCompName(node, getText);
     const singleErr: ErrorForDisplay = {
-      message: (e as ParserError).message,
+      message: e.message,
       errPosCol: 0,
       errPosLine: 0,
-      code: ErrCodes.expEq,
+      code: ErrCodesParser.expEq,
       category: DiagnosticCategory.Error,
       pos: 0,
       end: 0,
@@ -547,7 +547,7 @@ function getCompoundCompName(node: Node, getText: GetText) {
   return undefined;
 }
 
-function addDisplayFieldsToErrors(errors: ParseError[], source: string): ErrorForDisplay[] {
+function addDisplayFieldsToErrors(errors: ParserDiag[], source: string): ErrorForDisplay[] {
   const { offsetToPosForDisplay } = createDocumentCursor(source);
   return errors.map((err) => {
     const { line: errPosLine, character: errPosCol } = offsetToPosForDisplay(err.pos);

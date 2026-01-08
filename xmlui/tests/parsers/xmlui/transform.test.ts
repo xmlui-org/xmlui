@@ -36,20 +36,22 @@ describe("Xmlui transform", () => {
       transformSource("<Component name='haho'><Stack/></Component>");
       assert.fail("Exception expected");
     } catch (err) {
-      expect(err.toString().includes("T004")).equal(true);
+      expect(err.toString().includes("T002")).equal(true);
     }
   });
 
   it("Compound component needs a component child #1", () => {
-    const cd = transformSource("<Component name='MyComp'><!-- comment--></Component>") as CompoundComponentDef;
-    expect((cd.component).type).equal("TextNode");
-    expect(((cd.component).props as any).value).equal("");
+    const cd = transformSource(
+      "<Component name='MyComp'><!-- comment--></Component>",
+    ) as CompoundComponentDef;
+    expect(cd.component.type).equal("TextNode");
+    expect((cd.component.props as any).value).equal("");
   });
 
   it("Compound component needs a component child #2", () => {
     const cd = transformSource("<Component name='MyComp'></Component>") as CompoundComponentDef;
-    expect((cd.component).type).equal("TextNode");
-    expect(((cd.component).props as any).value).equal("");
+    expect(cd.component.type).equal("TextNode");
+    expect((cd.component.props as any).value).equal("");
   });
 
   it("Compound component cannot nest another one", () => {

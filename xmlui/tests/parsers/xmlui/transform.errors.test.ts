@@ -16,7 +16,7 @@ describe("Xmlui transform - errors", () => {
       transformSource("<Component name=''/>");
       assert.fail("Exception expected");
     } catch (err) {
-      expect(err.toString()).includes("T004");
+      expect(err.toString()).includes("T002");
     }
   });
 
@@ -25,7 +25,7 @@ describe("Xmlui transform - errors", () => {
       transformSource("<Component name='alma'/>");
       assert.fail("Exception expected");
     } catch (err) {
-      expect(err.toString()).includes("T004");
+      expect(err.toString()).includes("T002");
     }
   });
 
@@ -330,6 +330,28 @@ describe("Xmlui transform - errors", () => {
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString()).include("W001");
+    }
+  });
+
+  it("script error has correct line-col number", () => {
+    try {
+      transformSource(`<Form
+onSubmit="
+  console.log();
+}"/>`);
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(err.toString()).include("[4:1]");
+    }
+  });
+
+  it("script error has correct line-col number in single line script", () => {
+    try {
+      transformSource(`<Form
+onSubmit="console.log(); }"/>`);
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(err.toString()).include("[2:26]");
     }
   });
 });

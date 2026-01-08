@@ -1,13 +1,12 @@
 import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import { collectCodeBehindFromSource } from "../scripting/code-behind-collect";
 import { Node } from "./syntax-node";
-import type { ErrorCodes } from "./ParserError";
 import { SyntaxKind } from "./syntax-kind";
-import { ParserError, errorMessages } from "./ParserError";
 import { Parser } from "../scripting/Parser";
 import { CharacterCodes } from "./CharacterCodes";
 import type { GetText } from "./parser";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
+import { DIAGS_TRANSFORM, type TransformDiagPositionless } from "./diagnostics";
 
 export const COMPOUND_COMP_ID = "Component";
 export const UCRegex = /^[A-Z]/;
@@ -90,7 +89,7 @@ export function nodeToComponentDef(
     const name = getNamespaceResolvedComponentName(node, getText, namespaceStack);
 
     if (name === COMPOUND_COMP_ID) {
-      reportError("T006");
+      reportError(DIAGS_TRANSFORM.nestedCompDefs);
     }
 
     let component: ComponentDef = {
@@ -114,10 +113,11 @@ export function nodeToComponentDef(
     // --- Validate component name
     const compoundName = attrs.find((attr) => attr.name === "name");
     if (!compoundName) {
-      reportError("T003");
+      reportError(DIAGS_TRANSFORM.compDefNameExp);
     }
+
     if (!UCRegex.test(compoundName.value)) {
-      reportError("T004");
+      reportError(DIAGS_TRANSFORM.compDefNameUppercase);
     }
 
     const codeBehind = attrs.find((attr) => attr.name === "codeBehind");
@@ -246,7 +246,7 @@ export function nodeToComponentDef(
     childNodes.forEach((child: Node) => {
       if (child.kind === SyntaxKind.Script) {
         if (getAttributes(child).length > 0) {
-          reportError("T022");
+          reportError(DIAGS_TRANSFORM.scriptNoAttrs);
         }
         const scriptText = getText(child);
         const scriptContent = scriptText.slice(
@@ -327,7 +327,7 @@ export function nodeToComponentDef(
             },
             (name) => {
               if (onPrefixRegex.test(name)) {
-                reportError("T008", name);
+                reportError(DIAGS_TRANSFORM.eventNoOnPrefix(name));
               }
             },
           );
@@ -371,7 +371,7 @@ export function nodeToComponentDef(
           return;
 
         default:
-          reportError("T009", childName);
+          reportError(DIAGS_TRANSFORM.invalidNodeName(childName));
           return;
       }
     });
@@ -390,12 +390,14 @@ export function nodeToComponentDef(
       parser.parseStatements();
       comp.scriptCollected = collectCodeBehindFromSource("Main", comp.script);
       if (comp.scriptCollected.hasInvalidStatements) {
-        comp.scriptError = new Error(`Only reactive variable and function definitions are allowed in a code-behind module.`)
+        comp.scriptError = new Error(
+          `Only reactive variable and function definitions are allowed in a code-behind module.`,
+        );
       }
     } catch (err) {
       if (parser.errors && parser.errors.length > 0) {
         const errMsg = parser.errors[0];
-        throw new ParserError(`${errMsg.text} [${errMsg.line}: ${errMsg.column}]`, errMsg.code);
+        throw new TransformError(`${errMsg.text} [${errMsg.line}: ${errMsg.column}]`, errMsg.code);
       } else {
         comp.scriptError = err;
       }
@@ -419,7 +421,7 @@ export function nodeToComponentDef(
     // --- Handle single-word attributes
     if (isCompound) {
       if (startSegment && startSegment !== "method" && startSegment !== "var") {
-        reportError("T021");
+        reportError(DIAGS_TRANSFORM.invalidReusableCompAttr(nsKey));
         return;
       }
 
@@ -435,7 +437,7 @@ export function nodeToComponentDef(
 
       // --- Compound components do not have any other attributable props
       if (!startSegment && name) {
-        reportError("T021", name);
+        reportError(DIAGS_TRANSFORM.invalidReusableCompAttr(name));
       }
       return;
     }
@@ -493,7 +495,7 @@ export function nodeToComponentDef(
       const childName = getComponentName(child, getText);
       // --- The only element names we accept are "field" or "item"
       if (childName !== "field" && childName !== "item") {
-        reportError("T016");
+        reportError(DIAGS_TRANSFORM.onlyFieldOrItemChild);
         return;
       }
 
@@ -503,7 +505,7 @@ export function nodeToComponentDef(
           nestedElementType = childName;
           result = {};
         } else if (nestedElementType !== childName) {
-          reportError("T017");
+          reportError(DIAGS_TRANSFORM.cannotMixFieldItem);
           return;
         }
       } else if (childName === "item") {
@@ -512,7 +514,7 @@ export function nodeToComponentDef(
           nestedElementType = childName;
           result = [];
         } else if (nestedElementType !== childName) {
-          reportError("T017");
+          reportError(DIAGS_TRANSFORM.cannotMixFieldItem);
           return;
         }
       }
@@ -551,7 +553,7 @@ export function nodeToComponentDef(
 
     const attrProps = attributes.filter((attr) => propAttrs.indexOf(attr.name) >= 0);
     if (attributes.length > attrProps.length) {
-      reportError("T011", elementName);
+      reportError(DIAGS_TRANSFORM.onlyNameValueAttrs(elementName));
       return null;
     }
 
@@ -559,12 +561,12 @@ export function nodeToComponentDef(
     const nameAttr = attrProps.find((attr) => attr.name === "name");
     if (allowName) {
       if (!nameAttr?.value) {
-        reportError("T012", elementName);
+        reportError(DIAGS_TRANSFORM.nameAttrRequired(elementName));
         return null;
       }
     } else {
       if (nameAttr) {
-        reportError("T018", elementName);
+        reportError(DIAGS_TRANSFORM.cantHaveNameAttr(elementName));
         return null;
       }
     }
@@ -573,14 +575,14 @@ export function nodeToComponentDef(
     // --- Get the value attribute
     const valueAttr = attrProps.find((attr) => attr.name === "value");
     if (valueAttr && valueAttr.value === undefined) {
-      reportError("T019", elementName);
+      reportError(DIAGS_TRANSFORM.valueAttrRequired(elementName));
       return null;
     }
 
     // --- Let's handle a special case, when the value is a component definition
     if (name && nestedComponents.length >= 1) {
       if (nestedElements.length > 0) {
-        reportError("T020");
+        reportError(DIAGS_TRANSFORM.cannotMixCompNonComp);
         return null;
       }
       // --- We expect a component definition here!
@@ -611,7 +613,7 @@ export function nodeToComponentDef(
     loaders: Node,
   ): void {
     if (!isComponent(comp)) {
-      reportError("T009", "loaders");
+      reportError(DIAGS_TRANSFORM.invalidNodeName("loaders"));
       return;
     }
 
@@ -623,14 +625,14 @@ export function nodeToComponentDef(
 
     const hasAttribute = loaders.children?.some((c) => c.kind === SyntaxKind.AttributeListNode);
     if (hasAttribute) {
-      reportError("T014", "attributes");
+      reportError(DIAGS_TRANSFORM.loaderCantHave("attributes"));
       return;
     }
 
     children.forEach((loader) => {
       // --- Test is not supported
       if (loader.kind === SyntaxKind.TextNode) {
-        reportError("T010", "loader");
+        reportError(DIAGS_TRANSFORM.noTextChild("loader"));
         return;
       }
 
@@ -642,23 +644,23 @@ export function nodeToComponentDef(
 
       // --- Get the uid value
       if (!loaderDef.uid) {
-        reportError("T013");
+        reportError(DIAGS_TRANSFORM.loaderIdRequired);
         return;
       }
 
       // --- Check props that a loader must not have
       if ((loaderDef as any).vars) {
-        reportError("T014", "vars");
+        reportError(DIAGS_TRANSFORM.loaderCantHave("vars"));
         return;
       }
 
       if ((loaderDef as any).loaders) {
-        reportError("T014", "loaders");
+        reportError(DIAGS_TRANSFORM.loaderCantHave("loaders"));
         return;
       }
 
       if ((loaderDef as any).uses) {
-        reportError("T014", "uses");
+        reportError(DIAGS_TRANSFORM.loaderCantHave("uses"));
         return;
       }
 
@@ -704,14 +706,14 @@ export function nodeToComponentDef(
   function collectUsesElements(comp: ComponentDef | CompoundComponentDef, usesNode: Node): void {
     // --- Compound component do not have a uses
     if (!isComponent(comp)) {
-      reportError("T009", "uses");
+      reportError(DIAGS_TRANSFORM.invalidNodeName("uses"));
       return;
     }
 
     const attributes = getAttributes(usesNode).map(segmentAttr);
     const valueAttr = attributes.find((attr) => attr.name === "value");
     if (!valueAttr?.value || attributes.length !== 1) {
-      reportError("T015", "uses");
+      reportError(DIAGS_TRANSFORM.usesValueOnly);
       return;
     }
 
@@ -740,7 +742,7 @@ export function nodeToComponentDef(
     let unsegmentedName = getText(key.children![key.children!.length - 1]);
     const segments = unsegmentedName.split(".");
     if (segments.length > 2) {
-      reportError("T007", attr, key);
+      reportError(DIAGS_TRANSFORM.invalidAttrName(unsegmentedName));
     }
 
     let name: string | undefined;
@@ -750,7 +752,7 @@ export function nodeToComponentDef(
       startSegment = segments[0];
       name = segments[1];
       if (name.trim() === "") {
-        reportError("T007", attr, name);
+        reportError(DIAGS_TRANSFORM.invalidAttrName(name));
       }
     } else {
       //TODO: remove asigning name when name === unsegmentedName. It is there for backwards compat
@@ -775,7 +777,8 @@ export function nodeToComponentDef(
     const childNodes: TransformNode[] = getChildNodes(node);
     const tagName = getComponentName(node, getText);
     const hasComponentName = !(tagName in HelperNode);
-    const shouldUseTextNodeElement = hasComponentName || tagName === "property" || tagName === "template";
+    const shouldUseTextNodeElement =
+      hasComponentName || tagName === "property" || tagName === "template";
     const shouldCollapseWhitespace = tagName !== "event" && tagName !== "method";
     const attrs = getAttributes(node);
 
@@ -1057,7 +1060,7 @@ export function nodeToComponentDef(
     } catch {
       if (parser.errors.length > 0) {
         const errMsg = parser.errors[0];
-        throw new ParserError(`${errMsg.text} [${errMsg.line}: ${errMsg.column}]`, errMsg.code);
+        throw new TransformError(`${errMsg.text} [${errMsg.line}: ${errMsg.column}]`, errMsg.code);
       }
     }
   }
@@ -1122,25 +1125,13 @@ function createTextNodeElement(textValue: string): Node {
     ],
   } as Node;
 }
-
 /**
  * Reports the specified error
  * @param errorCode Error code
  * @param options Error message options
  */
-function reportError(errorCode: ErrorCodes, ...options: any[]): void {
-  let errorText: string = errorMessages[errorCode] ?? "Unknown error";
-  if (options) {
-    options.forEach((o, idx) => (errorText = replace(errorText, `{${idx}}`, o.toString())));
-  }
-  throw new ParserError(errorText, errorCode);
-
-  function replace(input: string, placeholder: string, replacement: string): string {
-    do {
-      input = input.replace(placeholder, replacement);
-    } while (input.includes(placeholder));
-    return input;
-  }
+function reportError(diagnostic: TransformDiagPositionless): void {
+  throw diagnostic;
 }
 
 function isComponent(obj: ComponentDef | CompoundComponentDef): obj is ComponentDef {
@@ -1236,19 +1227,23 @@ function addToNamespaces(
 ) {
   let nsCommaSeparated = value.split(":");
   if (nsCommaSeparated.length > 2) {
-    return reportError("T028", value, "Namespace cannot contain multiple ':' (colon).");
+    return reportError(
+      DIAGS_TRANSFORM.nsValueIncorrect(value, "Namespace cannot contain multiple ':' (colon)."),
+    );
   }
 
   let nsValue = value;
   if (nsCommaSeparated.length === 2) {
     if (nsCommaSeparated[0] != COMPONENT_NAMESPACE_SCHEME) {
-      return reportError("T029", value, COMPONENT_NAMESPACE_SCHEME);
+      return reportError(DIAGS_TRANSFORM.nsSchemeIncorrect(value, COMPONENT_NAMESPACE_SCHEME));
     }
     nsValue = nsCommaSeparated[1];
   }
 
   if (nsValue.includes("#")) {
-    return reportError("T028", nsValue, "Namespace cannot contain character '#'.");
+    return reportError(
+      DIAGS_TRANSFORM.nsValueIncorrect(nsValue, "Namespace cannot contain character '#'."),
+    );
   }
 
   switch (nsValue) {
@@ -1265,7 +1260,7 @@ function addToNamespaces(
 
   const compNamespaces = namespaceStack[namespaceStack.length - 1];
   if (compNamespaces.has(nsKey)) {
-    return reportError("T025", nsKey);
+    return reportError(DIAGS_TRANSFORM.duplXmlns(nsKey));
   }
   compNamespaces.set(nsKey, nsValue);
 }
@@ -1273,13 +1268,13 @@ function addToNamespaces(
 function getTopLvlElement(node: Node, getText: GetText): Node {
   // --- Check that the nodes contains exactly only a single component root element before the EoF token
   if (node.children!.length !== 2) {
-    reportError("T001");
+    reportError(DIAGS_TRANSFORM.singleRootElem);
   }
 
   // --- Ensure it's a component
   const element = node.children![0];
   if (element.kind !== SyntaxKind.ElementNode) {
-    reportError("T001");
+    reportError(DIAGS_TRANSFORM.singleRootElem);
   }
   return element;
 }
@@ -1305,7 +1300,7 @@ function getNamespaceResolvedComponentName(
   const namespace = getText(nameTokens[0]);
 
   if (namespaceStack.length === 0) {
-    reportError("T026");
+    reportError(DIAGS_TRANSFORM.rootCompNoNamespace);
   }
 
   let resolvedNamespace = undefined;
@@ -1316,7 +1311,7 @@ function getNamespaceResolvedComponentName(
     }
   }
   if (resolvedNamespace === undefined) {
-    reportError("T027", namespace);
+    reportError(DIAGS_TRANSFORM.nsNotFound(namespace));
   }
 
   return resolvedNamespace + "." + name;
