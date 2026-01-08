@@ -89,7 +89,21 @@ function extractFromThemeWrapper(
   const otherChildren: ComponentDef[] = [];
 
   themeNode.children?.forEach((child) => {
-    if (child.type === "AppHeader") {
+    // When script tags are present inside Theme, children may be wrapped in a Fragment
+    if (child.type === "Fragment" && child.children) {
+      // Process Fragment children
+      child.children.forEach((fragmentChild) => {
+        if (fragmentChild.type === "AppHeader") {
+          result.AppHeader = { ...themeNode, children: [fragmentChild] };
+        } else if (fragmentChild.type === "Footer") {
+          result.Footer = { ...themeNode, children: [fragmentChild] };
+        } else if (fragmentChild.type === "NavPanel") {
+          result.NavPanel = { ...themeNode, children: [fragmentChild] };
+        } else {
+          otherChildren.push(fragmentChild);
+        }
+      });
+    } else if (child.type === "AppHeader") {
       result.AppHeader = { ...themeNode, children: [child] };
     } else if (child.type === "Footer") {
       result.Footer = { ...themeNode, children: [child] };
@@ -110,6 +124,16 @@ function extractFromThemeWrapper(
  * Extract a direct (non-Theme-wrapped) child component.
  */
 function extractDirectChild(child: ComponentDef, result: ExtractedComponents): void {
+  // When script tags are present, the parser wraps other children in a Fragment.
+  // We need to unwrap the Fragment to properly extract App special components.
+  if (child.type === "Fragment" && child.children) {
+    // Recursively process Fragment children
+    child.children.forEach((fragmentChild) => {
+      extractDirectChild(fragmentChild, result);
+    });
+    return;
+  }
+
   switch (child.type) {
     case "AppHeader":
       result.AppHeader = child;

@@ -232,6 +232,75 @@ test.describe("Edge Cases", () => {
     await expect(page.getByText("Home Content")).toBeVisible();
     await expect(page.getByText("Footer Content")).toBeVisible();
   });
+
+  test("handles script tags without layout issues", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App layout="desktop">
+        <script>
+          var testVar = "test";
+        </script>
+        <AppHeader>
+          <Text>Header</Text>
+        </AppHeader>
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Card testId="main-card" height="83vh">
+              <Text testId="content">Main Content</Text>
+            </Card>
+          </Page>
+        </Pages>
+        <Footer>
+          <Text testId="footer-text">Built with XMLUI</Text>
+        </Footer>
+      </App>
+    `);
+
+    // Verify all components render correctly
+    await expect(page.getByText("Header")).toBeVisible();
+    await expect(page.getByTestId("content")).toBeVisible();
+    await expect(page.getByTestId("footer-text")).toBeVisible();
+    
+    // Verify the card takes up expected space
+    const card = page.getByTestId("main-card");
+    await expect(card).toBeVisible();
+  });
+
+  test("handles empty script tags", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App layout="desktop">
+        <script>
+        </script>
+        <AppHeader testId="header">Header</AppHeader>
+        <Footer testId="footer">Footer</Footer>
+      </App>
+    `);
+
+    await expect(page.getByTestId("header")).toBeVisible();
+    await expect(page.getByTestId("footer")).toBeVisible();
+  });
+
+  test("handles script tags inside Theme wrapper", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App layout="desktop">
+        <Theme>
+          <script>
+            var themeVar = "test";
+          </script>
+          <AppHeader testId="themed-header">
+            <Text>Themed Header</Text>
+          </AppHeader>
+          <Footer testId="themed-footer">
+            <Text>Themed Footer</Text>
+          </Footer>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("themed-header")).toBeVisible();
+    await expect(page.getByTestId("themed-footer")).toBeVisible();
+    await expect(page.getByText("Themed Header")).toBeVisible();
+    await expect(page.getByText("Themed Footer")).toBeVisible();
+  });
 });
 
 // =============================================================================
