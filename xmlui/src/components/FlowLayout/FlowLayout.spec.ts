@@ -210,6 +210,111 @@ test.describe("Basic functionality", () => {
     expect(rect3.x).toBe(rect1.x);
     expect(rect3.y - (rect2.y + rect2.height)).toBe(19);
   });
+
+  test("verticalAlignment='start' aligns items at the top of row", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout verticalAlignment="start">
+        <Stack testId="item1" width="100px" height="50px">Item 1</Stack>
+        <Stack testId="item2" width="100px" height="80px">Item 2</Stack>
+        <Stack testId="item3" width="100px" height="30px">Item 3</Stack>
+      </FlowLayout>
+    `);
+
+    const { top: top1 } = await getBounds(page.getByTestId("item1"));
+    const { top: top2 } = await getBounds(page.getByTestId("item2"));
+    const { top: top3 } = await getBounds(page.getByTestId("item3"));
+
+    // All items in the same row should have the same top position with "start" alignment
+    expect(top1).toBe(top2);
+    expect(top2).toBe(top3);
+  });
+
+  test("verticalAlignment='center' centers items vertically in row", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout verticalAlignment="center">
+        <Stack testId="item1" width="100px" height="40px">Item 1</Stack>
+        <Stack testId="item2" width="100px" height="80px">Item 2</Stack>
+        <Stack testId="item3" width="100px" height="40px">Item 3</Stack>
+      </FlowLayout>
+    `);
+
+    const { top: top1, bottom: bottom1 } = await getBounds(page.getByTestId("item1"));
+    const { top: top2, bottom: bottom2 } = await getBounds(page.getByTestId("item2"));
+    const { top: top3, bottom: bottom3 } = await getBounds(page.getByTestId("item3"));
+
+    // Calculate vertical centers
+    const center1 = (top1 + bottom1) / 2;
+    const center2 = (top2 + bottom2) / 2;
+    const center3 = (top3 + bottom3) / 2;
+
+    // All items should be centered vertically relative to each other
+    expect(Math.abs(center1 - center2)).toBeLessThan(1); // Allow for sub-pixel differences
+    expect(Math.abs(center2 - center3)).toBeLessThan(1);
+  });
+
+  test("verticalAlignment='end' aligns items at the bottom of row", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout verticalAlignment="end">
+        <Stack testId="item1" width="100px" height="50px">Item 1</Stack>
+        <Stack testId="item2" width="100px" height="80px">Item 2</Stack>
+        <Stack testId="item3" width="100px" height="30px">Item 3</Stack>
+      </FlowLayout>
+    `);
+
+    const { bottom: bottom1 } = await getBounds(page.getByTestId("item1"));
+    const { bottom: bottom2 } = await getBounds(page.getByTestId("item2"));
+    const { bottom: bottom3 } = await getBounds(page.getByTestId("item3"));
+
+    // All items in the same row should have the same bottom position with "end" alignment
+    expect(Math.abs(bottom1 - bottom2)).toBeLessThan(1); // Allow for sub-pixel differences
+    expect(Math.abs(bottom2 - bottom3)).toBeLessThan(1);
+  });
+
+  test("verticalAlignment applies to each row independently", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout width="250px" verticalAlignment="center">
+        <Stack testId="item1" width="100px" height="40px">Item 1</Stack>
+        <Stack testId="item2" width="100px" height="80px">Item 2</Stack>
+        <Stack testId="item3" width="100px" height="60px">Item 3</Stack>
+        <Stack testId="item4" width="100px" height="40px">Item 4</Stack>
+      </FlowLayout>
+    `);
+
+    const { top: top1, bottom: bottom1, left: left1 } = await getBounds(page.getByTestId("item1"));
+    const { top: top2, bottom: bottom2, left: left2 } = await getBounds(page.getByTestId("item2"));
+    const { top: top3, bottom: bottom3, left: left3 } = await getBounds(page.getByTestId("item3"));
+    const { top: top4, bottom: bottom4, left: left4 } = await getBounds(page.getByTestId("item4"));
+
+    // First row: item1 and item2 should be centered with each other
+    const center1 = (top1 + bottom1) / 2;
+    const center2 = (top2 + bottom2) / 2;
+    expect(Math.abs(center1 - center2)).toBeLessThan(1);
+    expect(left1).toBeLessThan(left2);
+
+    // Second row: item3 and item4 should be centered with each other
+    const center3 = (top3 + bottom3) / 2;
+    const center4 = (top4 + bottom4) / 2;
+    expect(Math.abs(center3 - center4)).toBeLessThan(1);
+    expect(left3).toBeLessThan(left4);
+
+    // Verify items wrapped to different rows
+    expect(top3).toBeGreaterThan(bottom1);
+  });
+
+  test("verticalAlignment handles default value", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout>
+        <Stack testId="item1" width="100px" height="40px">Item 1</Stack>
+        <Stack testId="item2" width="100px" height="80px">Item 2</Stack>
+      </FlowLayout>
+    `);
+
+    const { top: top1 } = await getBounds(page.getByTestId("item1"));
+    const { top: top2 } = await getBounds(page.getByTestId("item2"));
+
+    // Default should be "start" alignment
+    expect(top1).toBe(top2);
+  });
 });
 
 // =============================================================================

@@ -170,16 +170,18 @@ type FlowLayoutProps = {
   className?: string;
   columnGap: string | number;
   rowGap: string | number;
+  verticalAlignment?: string;
   children: ReactNode;
 };
 
-export const defaultProps: Pick<FlowLayoutProps, "columnGap" | "rowGap"> = {
+export const defaultProps: Pick<FlowLayoutProps, "columnGap" | "rowGap" | "verticalAlignment"> = {
   columnGap: "$gap-normal",
   rowGap: "$gap-normal",
+  verticalAlignment: "start",
 };
 
 export const FlowLayout = forwardRef(function FlowLayout(
-  { style, className, columnGap = 0, rowGap = 0, children, ...rest }: FlowLayoutProps,
+  { style, className, columnGap = 0, rowGap = 0, verticalAlignment = defaultProps.verticalAlignment, children, ...rest }: FlowLayoutProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const [numberOfChildren, setNumberOfChildren] = useState(0);
@@ -188,6 +190,13 @@ export const FlowLayout = forwardRef(function FlowLayout(
   // --- Be smart about rowGap
   const _rowGap = getSizeString(rowGap);
   const _columnGap = getSizeString(safeColumnGap);
+
+  // --- Determine alignment class
+  const alignmentClass = useMemo(() => {
+    if (verticalAlignment === "center") return styles.alignItemsCenter;
+    if (verticalAlignment === "end") return styles.alignItemsEnd;
+    return styles.alignItemsStart;
+  }, [verticalAlignment]);
 
   const innerStyle = useMemo(
     () => ({
@@ -209,7 +218,7 @@ export const FlowLayout = forwardRef(function FlowLayout(
     <FlowLayoutContext.Provider value={flowLayoutContextValue}>
       <div style={style} className={className} ref={forwardedRef} {...rest}>
         <div className={styles.outer}>
-          <div className={classnames(styles.flowContainer, styles.horizontal)} style={innerStyle}>
+          <div className={classnames(styles.flowContainer, styles.horizontal, alignmentClass)} style={innerStyle}>
             {children}
           </div>
         </div>

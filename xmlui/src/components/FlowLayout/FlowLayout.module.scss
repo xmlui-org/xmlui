@@ -59,6 +59,17 @@ $themeVars: ();
     flex-basis: 100%;
     height: 0;
   }
+
+  /* Cross axis alignment for FlowLayout */
+  .alignItemsStart {
+    align-items: flex-start;
+  }
+  .alignItemsCenter {
+    align-items: center;
+  }
+  .alignItemsEnd {
+    align-items: flex-end;
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer
