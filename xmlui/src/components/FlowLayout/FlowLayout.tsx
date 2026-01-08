@@ -6,6 +6,7 @@ import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { FlowItemBreak, FlowItemWrapper, FlowLayout, defaultProps } from "./FlowLayoutNative";
 import { createMetadata } from "../metadata-helpers";
+import { alignmentOptionValues } from "../abstractions";
 
 const COMP = "FlowLayout";
 
@@ -34,6 +35,14 @@ export const FlowLayoutMd = createMetadata({
         `the \`gap\` value.`,
       defaultValue: defaultProps.rowGap,
     },
+    verticalAlignment: {
+      description:
+        "Manages the vertical content alignment for each child element within the same row. " +
+        "This aligns items along the cross-axis of the flex container.",
+      availableValues: alignmentOptionValues,
+      valueType: "string",
+      defaultValue: "start",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
 });
@@ -52,9 +61,10 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
       extractValue.asSize("$space-4");
     const rowGap =
       extractValue.asSize(node.props?.rowGap) || extractValue.asSize(node.props?.gap) || extractValue.asSize("$space-4");
+    const verticalAlignment = extractValue.asOptionalString(node.props?.verticalAlignment, "start");
 
     return (
-      <FlowLayout className={className} columnGap={columnGap} rowGap={rowGap}>
+      <FlowLayout className={className} columnGap={columnGap} rowGap={rowGap} verticalAlignment={verticalAlignment}>
         {renderChild(node.children, {
           wrapChild: ({ node, extractValue }, renderedChild, hints) => {
             if (hints?.opaque) {
