@@ -113,8 +113,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       }
 
       .headerWrapper {
-        position: sticky;
-        top: 0;
         flex-shrink: 0;
         z-index: 1;
         @include desktop-reset-all;
@@ -150,8 +148,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       }
 
       .footerWrapper {
-        position: sticky;
-        bottom: 0;
         flex-shrink: 0;
         @include desktop-reset-all;
 
