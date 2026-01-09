@@ -41,30 +41,6 @@ import { Text } from "../Text/TextNative";
 import { MemoizedItem } from "../container-helpers";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 
-// Helper function to check if element has explicit height
-function checkHasExplicitHeight(element: HTMLElement): boolean {
-  const computedStyles = window.getComputedStyle(element);
-  const hasMaxHeight = computedStyles.maxHeight !== "none";
-  const originalHeight = computedStyles.height;
-  
-  // Store original inline style to restore it later
-  const originalInlineHeight = element.style.height || "";
-  
-  // Temporarily set height to auto and get the new computed height
-  element.style.height = "auto";
-  const autoHeight = window.getComputedStyle(element).height;
-  
-  // Restore the original inline style immediately
-  element.style.height = originalInlineHeight;
-  
-  // If the original height is different from what the browser
-  // calculates for 'auto', it means a height was explicitly set.
-  const hasHeight = originalHeight !== autoHeight || !!originalInlineHeight;
-  
-  const isFlex = computedStyles.display === "flex";
-  return hasMaxHeight || hasHeight || isFlex;
-}
-
 // Default props for List component
 export const defaultProps = {
   idKey: "id",
@@ -341,7 +317,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
   // Create a ref for the Virtualizer's scroll container
   // When using outside scroll, we need a ref that points to the scroll parent
   const scrollElementRef = useRef<HTMLElement | null>(null);
-  
+
   useEffect(() => {
     if (hasOutsideScroll && scrollRef.current) {
       scrollElementRef.current = scrollRef.current;
@@ -566,19 +542,19 @@ export const ListNative = forwardRef(function DynamicHeightList(
                   switch (row._row_type) {
                     case RowType.SECTION:
                       return (
-                        <div key={key} data-index={rowIndex}>{sectionRenderer?.(row, key) || <div />}</div>
+                        <Fragment key={key}>{sectionRenderer?.(row, key) || <div />}</Fragment>
                       );
                     case RowType.SECTION_FOOTER:
                       return (
-                        <div key={key} data-index={rowIndex}>
+                        <Fragment key={key}>
                           {sectionFooterRenderer?.(row, key) || <div />}
-                        </div>
+                        </Fragment>
                       );
                     default:
                       return (
-                        <div key={key} data-index={rowIndex}>
+                        <Fragment key={key}>
                           {itemRenderer(row, key, rowIndex, rowCount) || <div />}
-                        </div>
+                        </Fragment>
                       );
                   }
                 }}
