@@ -762,3 +762,204 @@ test.describe("Layout", () => {
     expect(scrollHeight).toBeGreaterThan(clientHeight);
   });
 });
+
+// =============================================================================
+// STRETCH PROPERTY TESTS
+// =============================================================================
+
+test.describe("Stretch Property", () => {
+  test("stretch property makes Stack fill available height in desktop layout", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <App layout="desktop">
+        <AppHeader testId="header">Header Content</AppHeader>
+        <Stack testId="stack" stretch backgroundColor="lightblue">
+          <Text>Short content</Text>
+        </Stack>
+        <Footer testId="footer">Footer Content</Footer>
+      </App>
+    `);
+
+    const stack = page.getByTestId("stack");
+    await expect(stack).toBeVisible();
+
+    // Get the heights
+    const { height: stackHeight } = await getBounds(stack);
+    const header = page.getByTestId("header");
+    const footer = page.getByTestId("footer");
+    const { height: headerHeight } = await getBounds(header);
+    const { height: footerHeight } = await getBounds(footer);
+
+    // Stack should fill the space between header and footer
+    const expectedHeight = PAGE_HEIGHT - headerHeight - footerHeight;
+    expect(stackHeight).toBeGreaterThan(expectedHeight * 0.9); // Allow some tolerance
+  });
+
+  test("stretch property with overflow content makes Stack scrollable", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <App layout="desktop">
+        <AppHeader testId="header">Header Content</AppHeader>
+        <Stack testId="stack" stretch backgroundColor="lightblue">
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Integer posuere erat a ante venenatis dapibus posuere velit aliquet.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Integer posuere erat a ante venenatis dapibus posuere velit aliquet.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Integer posuere erat a ante venenatis dapibus posuere velit aliquet.</Text>
+        </Stack>
+        <Footer testId="footer">Footer Content</Footer>
+      </App>
+    `);
+
+    const stack = page.getByTestId("stack");
+    await expect(stack).toBeVisible();
+
+    // Verify we can scroll
+    const { scrollHeight, clientHeight } = await stack.evaluate((elem) => ({
+      scrollHeight: elem.scrollHeight,
+      clientHeight: elem.clientHeight,
+    }));
+    expect(scrollHeight).toBeGreaterThan(clientHeight);
+  });
+
+  test("stretch property works without AppHeader", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <App layout="desktop">
+        <Stack testId="stack" stretch backgroundColor="lightblue">
+          <Text>Content without header</Text>
+        </Stack>
+        <Footer testId="footer">Footer Content</Footer>
+      </App>
+    `);
+
+    const stack = page.getByTestId("stack");
+    await expect(stack).toBeVisible();
+
+    const { height: stackHeight } = await getBounds(stack);
+    const footer = page.getByTestId("footer");
+    const { height: footerHeight } = await getBounds(footer);
+
+    // Stack should fill the space between top and footer
+    const expectedHeight = PAGE_HEIGHT - footerHeight;
+    expect(stackHeight).toBeGreaterThan(expectedHeight * 0.9);
+  });
+
+  test("stretch property works without Footer", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <App layout="desktop">
+        <AppHeader testId="header">Header Content</AppHeader>
+        <Stack testId="stack" stretch backgroundColor="lightblue">
+          <Text>Content without footer</Text>
+        </Stack>
+      </App>
+    `);
+
+    const stack = page.getByTestId("stack");
+    await expect(stack).toBeVisible();
+
+    const { height: stackHeight } = await getBounds(stack);
+    const header = page.getByTestId("header");
+    const { height: headerHeight } = await getBounds(header);
+
+    // Stack should fill the space between header and bottom
+    const expectedHeight = PAGE_HEIGHT - headerHeight;
+    expect(stackHeight).toBeGreaterThan(expectedHeight * 0.9);
+  });
+
+  test("stretch property works without both AppHeader and Footer", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <App layout="desktop">
+        <Stack testId="stack" stretch backgroundColor="lightblue">
+          <Text>Content fills entire viewport</Text>
+        </Stack>
+      </App>
+    `);
+
+    const stack = page.getByTestId("stack");
+    await expect(stack).toBeVisible();
+
+    const { height: stackHeight } = await getBounds(stack);
+
+    // Stack should fill almost the entire viewport height
+    expect(stackHeight).toBeGreaterThan(PAGE_HEIGHT * 0.9);
+  });
+
+  test("Stack without stretch property does not fill available height", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <App layout="desktop">
+        <AppHeader testId="header">Header Content</AppHeader>
+        <Stack testId="stack" backgroundColor="lightblue">
+          <Text>Short content</Text>
+        </Stack>
+        <Footer testId="footer">Footer Content</Footer>
+      </App>
+    `);
+
+    const stack = page.getByTestId("stack");
+    await expect(stack).toBeVisible();
+
+    const { height: stackHeight } = await getBounds(stack);
+    const header = page.getByTestId("header");
+    const footer = page.getByTestId("footer");
+    const { height: headerHeight } = await getBounds(header);
+    const { height: footerHeight } = await getBounds(footer);
+
+    // Stack should NOT fill the available height - it should be much smaller
+    const availableHeight = PAGE_HEIGHT - headerHeight - footerHeight;
+    expect(stackHeight).toBeLessThan(availableHeight * 0.5);
+  });
+
+  test("stretch property maintains background color throughout scrollable area", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <App layout="desktop">
+        <AppHeader testId="header">Header Content</AppHeader>
+        <Stack testId="stack" stretch backgroundColor="lightblue">
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.</Text>
+        </Stack>
+        <Footer testId="footer">Footer Content</Footer>
+      </App>
+    `);
+
+    const stack = page.getByTestId("stack");
+    await expect(stack).toBeVisible();
+
+    // Check background color is applied
+    await expect(stack).toHaveCSS("background-color", "rgb(173, 216, 230)");
+
+    // Scroll to bottom
+    await stack.evaluate((elem) => {
+      elem.scrollTop = elem.scrollHeight;
+    });
+
+    // Background color should still be visible
+    await expect(stack).toHaveCSS("background-color", "rgb(173, 216, 230)");
+  });
+});

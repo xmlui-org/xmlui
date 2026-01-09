@@ -13,6 +13,7 @@ export const defaultProps = {
   reverse: false,
   hoverContainer: false,
   visibleOnHover: false,
+  stretch: false,
 };
 
 type Props = {
@@ -26,6 +27,7 @@ type Props = {
   reverse?: boolean;
   hoverContainer?: boolean;
   visibleOnHover?: boolean;
+  stretch?: boolean;
   onClick?: any;
   onMount?: any;
 };
@@ -44,6 +46,7 @@ export const Stack = forwardRef(function Stack(
     reverse = defaultProps.reverse,
     hoverContainer = defaultProps.hoverContainer,
     visibleOnHover = defaultProps.visibleOnHover,
+    stretch = defaultProps.stretch,
     onClick,
     onMount,
     className,
@@ -73,6 +76,7 @@ export const Stack = forwardRef(function Stack(
           [styles.hoverContainer]: hoverContainer,
           "display-on-hover": visibleOnHover,
           [styles.handlesClick]: !!onClick,
+          [styles.stretch]: stretch,
         },
         horizontal ?? "",
         vertical ?? "",
