@@ -134,6 +134,9 @@ $fontSize-Text-secondary: createThemeVar("fontSize-#{$component}-secondary");
 $textColor-Text-secondary: createThemeVar("textColor-#{$component}-secondary");
 $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-secondary--hover");
 
+// Variables for red variant
+$textColor-Text-red: createThemeVar("textColor-#{$component}-red");
+
 @mixin textVariant($variant) {
   $variantName: if($variant == "", "#{$component}", "#{$component}-#{$variant}");
   $themeVars: t.composePaddingVars($themeVars, $variantName);
@@ -359,6 +362,10 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
     &.secondary {
       font-size: $fontSize-Text-secondary;
       color: $textColor-Text-secondary;
+    }
+
+    &.red {
+      color: $textColor-Text-red;
     }
 
     &.strong{

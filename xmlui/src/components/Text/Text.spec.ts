@@ -1692,6 +1692,17 @@ test.describe("Theme Variables", () => {
     const component = page.getByTestId("text");
     await expect(component).toHaveCSS("background-color", "rgb(255, 255, 0)");
   });
+
+  test("variant='red' applies red theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme textColor-Text-red="rgb(255, 0, 0)">
+        <Text variant="red" testId="text">Red text</Text>
+      </Theme>
+    `);
+
+    const component = page.getByTestId("text");
+    await expect(component).toHaveCSS("color", "rgb(255, 0, 0)");
+  });
 });
 
 // =============================================================================

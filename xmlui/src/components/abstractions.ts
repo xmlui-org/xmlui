@@ -438,8 +438,7 @@ export const variantOptionsMd: TextPropertyValueDescription[] = [
     description: "Represents text which is marked or highlighted for reference or notation",
   },
   { value: "mono", description: "Text using a mono style font family" },
-  { value: "paragraph", description: "Represents a paragraph" },
-  {
+  { value: "paragraph", description: "Represents a paragraph" },  { value: "red", description: "Text displayed in red color" },  {
     value: "placeholder",
     description: "Text that is mostly used as the placeholder style in input controls",
   },

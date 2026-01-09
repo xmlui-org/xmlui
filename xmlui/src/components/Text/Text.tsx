@@ -115,6 +115,8 @@ export const TextMd = createMetadata({
     [`fontSize-${COMP}-secondary`]: "$fontSize-sm",
     [`textColor-${COMP}-secondary`]: "$textColor-secondary",
 
+    [`textColor-${COMP}-red`]: "red",
+
     [`fontWeight-${COMP}-abbr`]: "$fontWeight-bold",
     [`textTransform-${COMP}-abbr`]: "uppercase",
     [`fontStyle-${COMP}-cite`]: "italic",
