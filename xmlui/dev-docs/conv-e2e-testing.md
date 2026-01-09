@@ -772,15 +772,18 @@ XMLUI provides a predefined scale of spacing values in relative units, affected 
 When testing components that support spacing-related props (gap, padding, margin, width, height), verify that they correctly apply spacing theme variables.
 
 **Best Practices:**
+- **Always verify component metadata first** - Not all components support all spacing props (e.g., Stack only supports `gap`, not `padding`)
 - Test with common spacing values: `space-2`, `space-4`, `space-8`
 - Use `getBounds()` to verify actual rendered spacing
-- Test gap properties on layout containers
-- Test padding on components that expose padding props
+- **Use `toBeCloseTo()` for pixel assertions** - Floating point arithmetic and sub-pixel rendering can cause exact equality checks to fail
+- Test gap properties on layout containers (HStack, VStack, FlowLayout, Stack)
+- Test padding on components that expose padding props (Card, Box, Pages - but NOT Stack)
 - Calculate expected pixel values based on `space-base` (typically 0.25rem = 4px at default font size)
+- **Gap behavior differs**: Gap + percentage sizing causes overflow, gap + star sizing accounts for gaps in available space
 
 ### Gap Spacing
 
-Test gap properties on layout containers (Grid, HStack, VStack, FlowLayout):
+Test gap properties on layout containers (HStack, VStack, FlowLayout):
 
 ```typescript
 test("gap applies spacing correctly", async ({ initTestBed, page }) => {
@@ -876,6 +879,55 @@ test("padding-loose applies larger padding", async ({ initTestBed, page }) => {
   const padding = contentLeft - cardLeft;
   // padding-loose is typically space-6 or space-8 (24-32px)
   expect(padding).toBeGreaterThan(20);
+});
+```
+
+### Important Considerations
+
+**Component Metadata Verification:**
+Before writing spacing tests, check the component's metadata file (e.g., `Stack.tsx`, `Card.tsx`) to verify which spacing props are supported. Different components support different spacing props:
+- **Stack**: Supports `gap` only (not padding)
+- **Card/Box/Pages**: Support `padding`, `paddingHorizontal`, `paddingVertical`
+- **FlowLayout**: Supports `gap`
+
+**Spacing Assertions:**
+Use `toBeCloseTo(expectedValue, 0)` instead of `toEqual()` for pixel-based spacing assertions to handle floating point precision and sub-pixel rendering:
+
+```typescript
+// ✅ CORRECT - handles floating point precision
+expect(gap).toBeCloseTo(16, 0);
+
+// ❌ INCORRECT - may fail due to sub-pixel values
+expect(gap).toEqual(16);
+```
+
+**Gap Behavior with Different Sizing:**
+- **Gap + Percentage**: Gaps push content out of the container, causing overflow when percentages sum to 100%
+- **Gap + Star Sizing**: Star sizing accounts for gaps when calculating available space, preventing overflow
+
+```typescript
+// Gap + percentage causes overflow
+test("gap with percentage causes overflow", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <Stack testId="stack" orientation="horizontal" gap="$space-4">
+      <Text width="50%">First</Text>
+      <Text width="50%">Second</Text>
+    </Stack>
+  `);
+  const isOverflown = await overflows(page.getByTestId("stack"), "x");
+  expect(isOverflown).toEqual(true); // Gap pushes content out
+});
+
+// Gap + star sizing doesn't overflow
+test("gap with star sizing doesn't overflow", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <Stack testId="stack" orientation="horizontal" gap="$space-4">
+      <Text width="*">First</Text>
+      <Text width="*">Second</Text>
+    </Stack>
+  `);
+  const isOverflown = await overflows(page.getByTestId("stack"), "x");
+  expect(isOverflown).toEqual(false); // Star sizing accounts for gaps
 });
 ```
 
