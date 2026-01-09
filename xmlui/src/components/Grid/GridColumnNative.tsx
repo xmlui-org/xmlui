@@ -1,4 +1,4 @@
-import React, { forwardRef } from "react";
+import { forwardRef } from "react";
 import classnames from "classnames";
 import styles from "./GridColumn.module.scss";
 
@@ -26,47 +26,11 @@ export const GridColumnNative = forwardRef<HTMLDivElement, Props>(function GridC
   },
   ref,
 ) {
+  // Use display: contents to make children behave as grid items
   const columnStyles: React.CSSProperties = {
     ...style,
     display: "contents",
   };
-
-  // Create a wrapper for column-specific styling if needed
-  const hasColumnStyling = width || horizontalAlignment || verticalAlignment || rowGap;
-
-  if (!hasColumnStyling) {
-    // Simple contents display - children flow directly into grid
-    return (
-      <div
-        ref={ref}
-        className={classnames(styles.gridColumn, className)}
-        style={columnStyles}
-        {...rest}
-      >
-        {children}
-      </div>
-    );
-  }
-
-  // With column-specific styling, we need to wrap children
-  const wrapperStyles: React.CSSProperties = {};
-  
-  if (width) {
-    wrapperStyles.gridColumn = `span 1`;
-    wrapperStyles.width = width;
-  }
-  
-  if (horizontalAlignment) {
-    wrapperStyles.justifyItems = horizontalAlignment;
-  }
-  
-  if (verticalAlignment) {
-    wrapperStyles.alignItems = verticalAlignment;
-  }
-  
-  if (rowGap) {
-    wrapperStyles.rowGap = rowGap;
-  }
 
   return (
     <div
@@ -75,11 +39,7 @@ export const GridColumnNative = forwardRef<HTMLDivElement, Props>(function GridC
       style={columnStyles}
       {...rest}
     >
-      {React.Children.map(children, (child, index) => (
-        <div key={index} style={wrapperStyles}>
-          {child}
-        </div>
-      ))}
+      {children}
     </div>
   );
 });

@@ -30,12 +30,10 @@ export const GridMd = createMetadata({
     },
     columnGap: {
       description: "Gap between columns.",
-      defaultValue: defaultProps.columnGap,
       type: "string",
     },
     rowGap: {
       description: "Gap between rows.",
-      defaultValue: defaultProps.rowGap,
       type: "string",
     },
     gap: {
@@ -112,7 +110,7 @@ export const gridComponentRenderer = createComponentRenderer(
  * Supports:
  * - Star sizing: * becomes 1fr, 2* becomes 2fr
  * - Percentages: 50%
- * - Fixed sizes: 100px, $size-10
+ * - Fixed sizes: 100px, $space-10
  * - Auto: auto
  */
 function parseGridSizes(sizes: string, extractor: ValueExtractor) {

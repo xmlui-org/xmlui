@@ -76,7 +76,7 @@ Further examples:
 </Grid>
 <!-- OR -->
 <!-- Column-first grid, where rows can be specified in a property. Star sizing does nothing on heights. -->
-<Grid rowHeights="$size-10 10%">
+<Grid rowHeights="$space-10 10%">
   <GridColumn>
     <Text variant="secondary" fontSize="$fontSize-sm" wordWrap="true">
       Total Outstanding Receivables
@@ -127,7 +127,7 @@ Further examples:
 In either case, you can define column and row widths and heights as necessary:
 
 ```xml
-<Grid columnWidths="* *" rowHeights="$size-10 10%">
+<Grid columnWidths="* *" rowHeights="$space-10 10%">
   <GridRow>
     <Text variant="secondary" fontSize="$fontSize-sm" wordWrap="true">
       Total Outstanding Receivables
@@ -147,7 +147,7 @@ In either case, you can define column and row widths and heights as necessary:
 </Grid>
 <!-- OR -->
 <Grid columnWidths="* *">
-  <GridRow height="$size-10">
+  <GridRow height="$space-10">
     <Text variant="secondary" fontSize="$fontSize-sm" wordWrap="true">
       Total Outstanding Receivables
     </Text>
@@ -170,7 +170,7 @@ Positioning in a grid cell could be done using vertical- and horizontalAlignment
 
 ```xml
 <Grid columnWidths="50% *">
-  <GridRow height="$size-20">
+  <GridRow height="$space-20">
     <Text variant="secondary" fontSize="$fontSize-sm" wordWrap="true" verticalAlignment="start" horizontalAlignment="end">
       Total Outstanding Receivables
     </Text>

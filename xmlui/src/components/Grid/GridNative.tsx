@@ -18,8 +18,6 @@ type Props = {
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export const defaultProps = {
-  columnGap: "0",
-  rowGap: "0",
   horizontalAlignment: "stretch" as const,
   verticalAlignment: "stretch" as const,
 };
@@ -30,8 +28,8 @@ export const GridNative = forwardRef<HTMLDivElement, Props>(function GridNative(
     rowHeights,
     columns,
     rows,
-    columnGap = defaultProps.columnGap,
-    rowGap = defaultProps.rowGap,
+    columnGap,
+    rowGap,
     gap,
     horizontalAlignment = defaultProps.horizontalAlignment,
     verticalAlignment = defaultProps.verticalAlignment,
@@ -62,13 +60,9 @@ export const GridNative = forwardRef<HTMLDivElement, Props>(function GridNative(
       styles.gridTemplateRows = `repeat(${rows}, auto)`;
     }
 
-    // Apply gaps
-    if (columnGap) {
-      styles.columnGap = gap ?? columnGap;
-    }
-    if (rowGap) {
-      styles.rowGap = gap ?? rowGap;
-    }
+    // Apply gaps - columnGap/rowGap override gap if specified
+    styles.columnGap = columnGap || gap;
+    styles.rowGap = rowGap || gap;
 
     // Apply default alignment
     if (horizontalAlignment) {
