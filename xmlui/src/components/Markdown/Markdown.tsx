@@ -67,6 +67,14 @@ export const MarkdownMd = createMetadata({
         "rendered in grayscale.",
       valueType: "boolean",
     },
+    openLinkInNewTab: {
+      description:
+        "This boolean property specifies whether links should open in a new tab. " +
+        "If set to `true`, all links within the markdown will open in a new tab " +
+        "with `target=\"_blank\"`. Links that explicitly specify their own target " +
+        "using the `| target=...` syntax will override this setting.",
+      valueType: "boolean",
+    },
   },
 
   defaultThemeVars: {
@@ -186,6 +194,7 @@ export const markdownComponentRenderer = createComponentRenderer(
         extractValue={extractValue}
         showHeadingAnchors={extractValue.asOptionalBoolean(node.props.showHeadingAnchors)}
         grayscale={extractValue.asOptionalBoolean(node.props.grayscale)}
+        openLinkInNewTab={extractValue.asOptionalBoolean(node.props.openLinkInNewTab)}
       >
         {renderedChildren}
       </TransformedMarkdown>
@@ -202,6 +211,7 @@ type TransformedMarkdownProps = {
   codeHighlighter?: CodeHighlighter;
   showHeadingAnchors?: boolean;
   grayscale?: boolean;
+  openLinkInNewTab?: boolean;
 };
 
 const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>(
@@ -215,6 +225,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
       codeHighlighter,
       showHeadingAnchors,
       grayscale,
+      openLinkInNewTab,
     }: TransformedMarkdownProps,
     ref,
   ) => {
@@ -259,6 +270,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
         className={className}
         showHeadingAnchors={showHeadingAnchors}
         grayscale={grayscale}
+        openLinkInNewTab={openLinkInNewTab}
       >
         {markdownContent}
       </Markdown>
