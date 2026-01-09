@@ -225,6 +225,11 @@ What if rowHeights are explicity set but we don't want to specify a height?
 
 **Proposal:** Use `columns` and `rows` as a property to set number.
 
+**TODO:**
+- column and row spans
+- check out WPF Grid ColumnDefinition/RowDefinition
+- find more examples in Alketta's code that should be a grid layout
+
 ---
 
 ## Implementation Learnings
