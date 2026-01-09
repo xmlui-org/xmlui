@@ -762,3 +762,111 @@ test.describe("Layout", () => {
     expect(scrollHeight).toBeGreaterThan(clientHeight);
   });
 });
+
+// =============================================================================
+// SPACING THEME VARIABLES TESTS
+// =============================================================================
+
+test.describe("Spacing Theme Variables", () => {
+  test("(horizontal) gap with $space-4", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Stack testId="stack" orientation="horizontal" gap="$space-4">
+        <Stack testId="item_0" backgroundColor="red" height="36px" width="36px" />
+        <Stack testId="item_1" backgroundColor="green" height="36px" width="36px" />
+        <Stack testId="item_2" backgroundColor="blue" height="36px" width="36px" />
+      </Stack>
+    `);
+
+    const { right: item0Right } = await getBounds(page.getByTestId("item_0"));
+    const { left: item1Left } = await getBounds(page.getByTestId("item_1"));
+    const { right: item1Right } = await getBounds(page.getByTestId("item_1"));
+    const { left: item2Left } = await getBounds(page.getByTestId("item_2"));
+
+    const gap1 = item1Left - item0Right;
+    const gap2 = item2Left - item1Right;
+
+    // space-4 = 4 * 0.25rem = 1rem = 16px at default font size
+    expect(gap1).toBeCloseTo(16, 0);
+    expect(gap2).toBeCloseTo(16, 0);
+  });
+
+  test("(vertical) gap with $space-8", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Stack testId="stack" orientation="vertical" gap="$space-8">
+        <Stack testId="item_0" backgroundColor="red" height="36px" width="36px" />
+        <Stack testId="item_1" backgroundColor="green" height="36px" width="36px" />
+        <Stack testId="item_2" backgroundColor="blue" height="36px" width="36px" />
+      </Stack>
+    `);
+
+    const { bottom: item0Bottom } = await getBounds(page.getByTestId("item_0"));
+    const { top: item1Top } = await getBounds(page.getByTestId("item_1"));
+    const { bottom: item1Bottom } = await getBounds(page.getByTestId("item_1"));
+    const { top: item2Top } = await getBounds(page.getByTestId("item_2"));
+
+    const gap1 = item1Top - item0Bottom;
+    const gap2 = item2Top - item1Bottom;
+
+    // space-8 = 8 * 0.25rem = 2rem = 32px at default font size
+    expect(gap1).toBeCloseTo(32, 0);
+    expect(gap2).toBeCloseTo(32, 0);
+  });
+
+  // Note: Stack does not have padding props in its metadata, so we skip these tests
+  // Stack uses CSS gap for spacing between items, not padding
+  // If padding is needed, wrap Stack in a Box or other container with padding support
+
+  test("width and height with spacing variables", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Stack testId="stack" width="$space-32" height="$space-16" backgroundColor="lightblue" />
+    `);
+
+    const { width, height } = await getBounds(page.getByTestId("stack"));
+
+    // space-32 = 32 * 0.25rem = 8rem = 128px at default font size
+    expect(width).toBeCloseTo(128, 0);
+    // space-16 = 16 * 0.25rem = 4rem = 64px at default font size
+    expect(height).toBeCloseTo(64, 0);
+  });
+
+  test("(horizontal) gap + star sizing with spacing variables", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Stack testId="stack" orientation="horizontal" backgroundColor="lightgray" gap="$space-8">
+        <Stack testId="item_0" backgroundColor="red" height="36px" width="*" />
+        <Stack testId="item_1" backgroundColor="green" height="36px" width="*" />
+        <Stack testId="item_2" backgroundColor="blue" height="36px" width="*" />
+      </Stack>
+    `);
+
+    const { right: item0Right } = await getBounds(page.getByTestId("item_0"));
+    const { left: item1Left, right: item1Right } = await getBounds(page.getByTestId("item_1"));
+    const { left: item2Left } = await getBounds(page.getByTestId("item_2"));
+
+    const gap1 = item1Left - item0Right;
+    const gap2 = item2Left - item1Right;
+
+    // space-8 = 8 * 0.25rem = 2rem = 32px at default font size
+    expect(gap1).toBeCloseTo(32, 0);
+    expect(gap2).toBeCloseTo(32, 0);
+
+    // Verify no overflow
+    const isOverflown = await overflows(page.getByTestId("stack"), "x");
+    expect(isOverflown).toEqual(false);
+  });
+
+  test("(vertical) gap + percentage with spacing variables causes overflow", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <Stack testId="stack" orientation="vertical" height="200px" backgroundColor="lightgray" gap="$space-8">
+        <Stack backgroundColor="red" width="100%" height="30%" />
+        <Stack backgroundColor="green" width="100%" height="40%" />
+        <Stack backgroundColor="blue" width="100%" height="30%" />
+      </Stack>
+    `);
+
+    const isOverflown = await overflows(page.getByTestId("stack"), "y");
+    expect(isOverflown).toEqual(true);
+  });
+});
