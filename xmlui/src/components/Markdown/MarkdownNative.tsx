@@ -42,6 +42,7 @@ type MarkdownProps = {
   codeHighlighter?: CodeHighlighter;
   showHeadingAnchors?: boolean;
   grayscale?: boolean;
+  openLinkInNewTab?: boolean;
 };
 
 function PreTagComponent({ id, children, codeHighlighter }) {
@@ -96,6 +97,7 @@ export const Markdown = memo(
       codeHighlighter,
       showHeadingAnchors,
       grayscale,
+      openLinkInNewTab,
       ...rest
     }: MarkdownProps,
     ref,
@@ -321,6 +323,11 @@ export const Markdown = memo(
                   // If no target specification, unescape any escaped pipes in the whole text
                   label = children.replace(/\\\|/g, "|");
                 }
+              }
+
+              // Use openLinkInNewTab as default if no explicit target is set
+              if (!target && openLinkInNewTab) {
+                target = "_blank";
               }
 
               return (
