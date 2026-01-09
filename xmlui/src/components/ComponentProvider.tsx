@@ -40,6 +40,9 @@ import { avatarComponentRenderer } from "./Avatar/Avatar";
 import { contentSeparatorComponentRenderer } from "./ContentSeparator/ContentSeparator";
 import { cardComponentRenderer } from "./Card/Card";
 import { flowLayoutComponentRenderer } from "./FlowLayout/FlowLayout";
+import { gridComponentRenderer } from "./Grid/Grid";
+import { gridRowComponentRenderer } from "./Grid/GridRow";
+import { gridColumnComponentRenderer } from "./Grid/GridColumn";
 import { modalViewComponentRenderer } from "./ModalDialog/ModalDialog";
 import { noResultComponentRenderer } from "./NoResult/NoResult";
 import { fileUploadDropZoneComponentRenderer } from "./FileUploadDropZone/FileUploadDropZone";
@@ -484,6 +487,11 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_FlowLayout !== "false") {
       this.registerCoreComponent(flowLayoutComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_Grid !== "false") {
+      this.registerCoreComponent(gridComponentRenderer);
+      this.registerCoreComponent(gridRowComponentRenderer);
+      this.registerCoreComponent(gridColumnComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_ModalDialog !== "false") {
       this.registerCoreComponent(modalViewComponentRenderer);
