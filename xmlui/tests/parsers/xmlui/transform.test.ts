@@ -8,7 +8,7 @@ describe("Xmlui transform", () => {
       transformSource("");
       assert.fail("Exception expected");
     } catch (err) {
-      expect(err.toString().includes("T001")).equal(true);
+      expect(err.toString()).includes("T001");
     }
   });
 
@@ -27,7 +27,7 @@ describe("Xmlui transform", () => {
       transformSource("<Component><Stack/></Component>");
       assert.fail("Exception expected");
     } catch (err) {
-      expect(err.toString().includes("T003")).equal(true);
+      expect(err.toString()).includes("T003");
     }
   });
 
@@ -36,7 +36,7 @@ describe("Xmlui transform", () => {
       transformSource("<Component name='haho'><Stack/></Component>");
       assert.fail("Exception expected");
     } catch (err) {
-      expect(err.toString().includes("T002")).equal(true);
+      expect(err.toString()).includes("T002");
     }
   });
 
@@ -59,7 +59,7 @@ describe("Xmlui transform", () => {
       transformSource("<Component name='MyComp'><Component name='Other'/></Component>");
       assert.fail("Exception expected");
     } catch (err) {
-      expect(err.toString().includes("T006")).equal(true);
+      expect(err.toString()).includes("T006");
     }
   });
 });

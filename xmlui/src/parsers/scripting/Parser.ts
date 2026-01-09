@@ -2699,6 +2699,8 @@ export class Parser {
       text: errorText,
       line: token.startLine,
       column: token.startColumn,
+      position: token.startPosition,
+      end: token.endPosition,
     });
     throw new ParserError(errorText, errorCode);
 

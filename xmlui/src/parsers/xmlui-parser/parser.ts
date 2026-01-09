@@ -432,13 +432,12 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     return { contextPos, contextEnd };
   }
 
-  function error({ code, message, category }: ParserDiagPositionless) {
+  function error({ code, message }: ParserDiagPositionless) {
     const { pos, end } = peek();
 
     const { contextPos, contextEnd } = getContextWithSurroundingLines(pos, end, 1);
 
     errors.push({
-      category,
       code,
       message,
       pos,
@@ -448,11 +447,10 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     });
   }
 
-  function errorAt({ code, message, category }: ParserDiagPositionless, pos: number, end: number) {
+  function errorAt({ code, message }: ParserDiagPositionless, pos: number, end: number) {
     const { contextPos, contextEnd } = getContextWithSurroundingLines(pos, end, 1);
 
     errors.push({
-      category,
       code,
       message,
       pos,
@@ -669,7 +667,6 @@ export function parseXmlUiMarkup(text: string): ParseResult {
 
         const { contextPos, contextEnd } = getContextWithSurroundingLines(pos, badPrefixEnd, 0);
         errors.push({
-          category: err.category,
           code: err.code,
           message: err.message,
           pos,

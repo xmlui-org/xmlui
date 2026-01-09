@@ -1,15 +1,15 @@
 import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
 import { createXmlUiParser } from "../parsers/xmlui-parser/parser";
 import { nodeToComponentDef } from "../parsers/xmlui-parser/transform";
-import { DiagnosticCategory, ErrCodesParser } from "../parsers/xmlui-parser/diagnostics";
+import { DiagnosticCategory, TransformDiag } from "../parsers/xmlui-parser/diagnostics";
 import type { GetText } from "../parsers/xmlui-parser/parser";
-import type { ParserDiag } from "../parsers/xmlui-parser/diagnostics";
+import type { GeneralDiag, ParserDiag } from "../parsers/xmlui-parser/diagnostics";
 import { SyntaxKind } from "../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../parsers/xmlui-parser/syntax-node";
 import type { ScriptParserErrorMessage } from "../abstractions/scripting/ScriptParserError";
 import type { ModuleErrors } from "./script-runner/ScriptingSourceTree";
 
-interface ErrorForDisplay extends ParserDiag {
+interface ErrorForDisplay extends GeneralDiag {
   contextStartLine: number;
   contextSource: string;
   errPosLine: number;
@@ -41,24 +41,27 @@ export function xmlUiMarkupToComponent(source: string, fileId: string | number =
     return transformResult;
   } catch (e) {
     const erroneousCompoundComponentName = getCompoundCompName(node, getText);
-    const singleErr: ErrorForDisplay = {
-      message: e.message,
-      errPosCol: 0,
-      errPosLine: 0,
-      code: ErrCodesParser.expEq,
-      category: DiagnosticCategory.Error,
-      pos: 0,
-      end: 0,
-      contextPos: 0,
-      contextEnd: 0,
-      contextSource: "",
-      contextStartLine: 0,
-    };
-    return {
-      component: null,
-      erroneousCompoundComponentName,
-      errors: [singleErr],
-    };
+    if (e instanceof TransformDiag) {
+      const singleErr: ErrorForDisplay = {
+        message: e.message,
+        errPosCol: 0,
+        errPosLine: 0,
+        code: e.code,
+        pos: e.pos ?? 0,
+        end: e.end ?? 0,
+        contextPos: 0,
+        contextEnd: 0,
+        contextSource: "",
+        contextStartLine: 0,
+      };
+      return {
+        component: null,
+        erroneousCompoundComponentName,
+        errors: [singleErr],
+      };
+    } else {
+      throw e;
+    }
   }
 }
 

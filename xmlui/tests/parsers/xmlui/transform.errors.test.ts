@@ -1,5 +1,6 @@
 import { describe, expect, it, assert } from "vitest";
 import { transformSource } from "./xmlui";
+import { GeneralDiag } from "../../../src/parsers/xmlui-parser";
 
 describe("Xmlui transform - errors", () => {
   it("Missing name in compound component", () => {
@@ -333,25 +334,64 @@ describe("Xmlui transform - errors", () => {
     }
   });
 
-  it("script error has correct line-col number", () => {
-    try {
-      transformSource(`<Form
+  it("script error has correct pos", () => {
+    const src = `<Form
 onSubmit="
   console.log();
-}"/>`);
+}"/>`;
+    try {
+      transformSource(src);
       assert.fail("Exception expected");
     } catch (err) {
-      expect(err.toString()).include("[4:1]");
+      expect(src[(err as GeneralDiag).pos]).toBe("}");
+      expect((err as GeneralDiag).pos).toBe(34);
+      expect((err as GeneralDiag).end).toBe(35);
     }
   });
 
-  it("script error has correct line-col number in single line script", () => {
+  it("script error has correct pos number in single line script", () => {
+    const src = `<A onSubmit="console.log(); }"/>`;
     try {
-      transformSource(`<Form
-onSubmit="console.log(); }"/>`);
+      transformSource(src);
       assert.fail("Exception expected");
     } catch (err) {
-      expect(err.toString()).include("[2:26]");
+      expect(src[(err as GeneralDiag).pos]).toBe("}");
+      expect((err as GeneralDiag).pos).toBe(28);
+      expect((err as GeneralDiag).end).toBe(29);
+    }
+  });
+
+  it("script error in content text has correct pos", () => {
+    const src = `<Form><event name="submit">console.log(); }</event></Form>`;
+    try {
+      transformSource(src);
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(src[(err as GeneralDiag).pos]).toBe("}");
+    }
+  });
+
+  it("script error in script tag has correct pos", () => {
+    const src = `<App><script>console.log(); }</script></App>`;
+    try {
+      transformSource(src);
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(src[(err as GeneralDiag).pos]).toBe("}");
+    }
+  });
+
+  it("script error in multiline script tag has correct pos", () => {
+    const src = `<App>
+  <script>
+    console.log(); }
+  </script>
+</App>`;
+    try {
+      transformSource(src);
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(src[(err as GeneralDiag).pos]).toBe("}");
     }
   });
 });

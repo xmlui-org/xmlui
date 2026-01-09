@@ -1,4 +1,8 @@
-import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
+import type {
+  ComponentDef,
+  ComponentMetadata,
+  CompoundComponentDef,
+} from "../../abstractions/ComponentDefs";
 import { collectCodeBehindFromSource } from "../scripting/code-behind-collect";
 import { Node } from "./syntax-node";
 import { SyntaxKind } from "./syntax-kind";
@@ -6,7 +10,13 @@ import { Parser } from "../scripting/Parser";
 import { CharacterCodes } from "./CharacterCodes";
 import type { GetText } from "./parser";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
-import { DIAGS_TRANSFORM, type TransformDiagPositionless } from "./diagnostics";
+import {
+  DiagnosticCategory,
+  DIAGS_TRANSFORM,
+  TransformDiag,
+  type TransformDiagPositionless,
+} from "./diagnostics";
+import { VscFileSymlinkDirectory } from "react-icons/vsc";
 
 export const COMPOUND_COMP_ID = "Component";
 export const UCRegex = /^[A-Z]/;
@@ -245,20 +255,7 @@ export function nodeToComponentDef(
     // --- Process child nodes
     childNodes.forEach((child: Node) => {
       if (child.kind === SyntaxKind.Script) {
-        if (getAttributes(child).length > 0) {
-          reportError(DIAGS_TRANSFORM.scriptNoAttrs);
-        }
-        const scriptText = getText(child);
-        const scriptContent = scriptText.slice(
-          scriptText.indexOf(">") + 1,
-          scriptText.lastIndexOf("</"),
-        );
-
-        comp.script ??= "";
-        if (comp.script.length > 0) {
-          comp.script += "\n";
-        }
-        comp.script += scriptContent;
+        processScriptTag(comp, child, getText);
         return;
       }
 
@@ -320,10 +317,10 @@ export function nodeToComponentDef(
             child,
 
             (name) => (isComponent(comp) ? comp.events?.[name] : undefined),
-            (name, value) => {
+            (name, value, nodeScriptContent) => {
               if (!isComponent(comp)) return;
               comp.events ??= {};
-              comp.events[name] = parseEvent(value);
+              comp.events[name] = parseEvent(value, nodeScriptContent);
             },
             (name) => {
               if (onPrefixRegex.test(name)) {
@@ -377,41 +374,12 @@ export function nodeToComponentDef(
     });
 
     namespaceStack.pop();
-
-    if (!comp.script || comp.script.trim().length === 0) {
-      // --- No (or whitespace only) script
-      return;
-    }
-
-    // --- Run the parse and collect on scripts
-    const parser = new Parser(comp.script);
-    try {
-      // --- We parse the module file to catch parsing errors
-      parser.parseStatements();
-      comp.scriptCollected = collectCodeBehindFromSource("Main", comp.script);
-      if (comp.scriptCollected.hasInvalidStatements) {
-        comp.scriptError = new Error(
-          `Only reactive variable and function definitions are allowed in a code-behind module.`,
-        );
-      }
-    } catch (err) {
-      if (parser.errors && parser.errors.length > 0) {
-        const errMsg = parser.errors[0];
-        throw new TransformError(`${errMsg.text} [${errMsg.line}: ${errMsg.column}]`, errMsg.code);
-      } else {
-        comp.scriptError = err;
-      }
-    }
-
-    // --- We may have module parsing/execution errors
-    const moduleErrors = comp.scriptCollected?.moduleErrors ?? {};
-    if (Object.keys(moduleErrors).length > 0) {
-      comp.scriptError = moduleErrors;
-    }
   }
 
   function collectAttribute(comp: ComponentDef | CompoundComponentDef, attr: Node) {
     const { namespace, startSegment, name, value, unsegmentedName: nsKey } = segmentAttr(attr);
+
+    const attrValueStringNode = attr.children![2];
 
     if (namespace === "xmlns") {
       return addToNamespaces(namespaceStack, comp, nsKey, value);
@@ -465,11 +433,11 @@ export function nodeToComponentDef(
           comp.api[name] = value;
         } else if (startSegment === "event") {
           comp.events ??= {};
-          comp.events[name] = parseEvent(value);
+          comp.events[name] = parseEvent(value, attrValueStringNode);
         } else if (onPrefixRegex.test(name)) {
           comp.events ??= {};
           const eventName = name[2].toLowerCase() + name.substring(3);
-          comp.events[eventName] = parseEvent(value);
+          comp.events[eventName] = parseEvent(value, attrValueStringNode);
         } else {
           comp.props ??= {};
           comp.props[name] = value;
@@ -539,20 +507,21 @@ export function nodeToComponentDef(
     usesStack: Map<string, string>[],
     element: Node,
     allowName = true,
-  ): { name?: string; value: any } | null {
+  ): { name?: string; value: any; valueContentNode?: Node } | null {
     const elementName = getComponentName(element, getText);
     // --- Accept only "name", "value"
     const childNodes = getChildNodes(element);
     const nestedComponents = childNodes.filter(
       (c) => c.kind === SyntaxKind.ElementNode && UCRegex.test(getComponentName(c, getText)),
     );
-    const nestedElements = childNodes.filter(
+    const nestedHelpers = childNodes.filter(
       (c) => c.kind === SyntaxKind.ElementNode && !UCRegex.test(getComponentName(c, getText)),
     );
-    const attributes = getAttributes(element).map(segmentAttr);
+    const attrNodes = getAttributes(element);
+    const attrsSegmented = attrNodes.map(segmentAttr);
 
-    const attrProps = attributes.filter((attr) => propAttrs.indexOf(attr.name) >= 0);
-    if (attributes.length > attrProps.length) {
+    const attrProps = attrsSegmented.filter((attr) => propAttrs.indexOf(attr.name) >= 0);
+    if (attrsSegmented.length > attrProps.length) {
       reportError(DIAGS_TRANSFORM.onlyNameValueAttrs(elementName));
       return null;
     }
@@ -581,7 +550,7 @@ export function nodeToComponentDef(
 
     // --- Let's handle a special case, when the value is a component definition
     if (name && nestedComponents.length >= 1) {
-      if (nestedElements.length > 0) {
+      if (nestedHelpers.length > 0) {
         reportError(DIAGS_TRANSFORM.cannotMixCompNonComp);
         return null;
       }
@@ -601,10 +570,16 @@ export function nodeToComponentDef(
     }
 
     if (typeof value === "string") {
-      return { name, value };
+      const valueAttrIdx = attrProps.findIndex((attr) => attr.name === "value");
+      const valueAttrNode = attrNodes[valueAttrIdx];
+      return { name, value, valueContentNode: valueAttrNode };
     }
 
-    return { name, value: collectObjectOrArray(usesStack, childNodes) };
+    let valueContentNode: Node;
+    if (childNodes?.[0]?.kind === SyntaxKind.TextNode) {
+      valueContentNode = childNodes[0];
+    }
+    return { name, value: collectObjectOrArray(usesStack, childNodes), valueContentNode };
   }
 
   function collectLoadersElements(
@@ -675,7 +650,7 @@ export function nodeToComponentDef(
     comp: ComponentDef | CompoundComponentDef,
     child: Node,
     getter: (name: string) => any,
-    setter: (name: string, value: string) => void,
+    setter: (name: string, value: string, valueNode?: Node) => void,
     nameValidator?: (name: string) => void,
   ): void {
     // --- Compound component do not have a uses
@@ -692,7 +667,7 @@ export function nodeToComponentDef(
     const name = valueInfo.name!;
     const value = valueInfo.value;
     if (valueInfo?.value !== undefined) {
-      setter(name, mergeValue(getter(name), value));
+      setter(name, mergeValue(getter(name), value), valueInfo.valueContentNode);
     } else {
       // --- Consider the value to be null; check optional child items
       const children = getChildNodes(child);
@@ -1040,7 +1015,7 @@ export function nodeToComponentDef(
     }
   }
 
-  function parseEvent(value: any): any {
+  function parseEvent(value: any, nodeContainingValue: Node): any {
     if (typeof value !== "string") {
       // --- It must be a component definition in the event code
       return value;
@@ -1060,7 +1035,25 @@ export function nodeToComponentDef(
     } catch {
       if (parser.errors.length > 0) {
         const errMsg = parser.errors[0];
-        throw new TransformError(`${errMsg.text} [${errMsg.line}: ${errMsg.column}]`, errMsg.code);
+        const diag = {
+          code: errMsg.code,
+          message: errMsg.text,
+        };
+        if (nodeContainingValue) {
+          let diagPos: number;
+          let diagEnd: number;
+          if (nodeContainingValue.kind === SyntaxKind.StringLiteral) {
+            const afterQuotePos = nodeContainingValue.pos + 1;
+            diagPos = afterQuotePos + errMsg.position;
+            diagEnd = afterQuotePos + errMsg.end;
+          } else if (nodeContainingValue.kind === SyntaxKind.TextNode) {
+            diagPos = errMsg.position;
+            diagEnd = errMsg.end;
+          }
+          reportError(diag, diagPos, diagEnd);
+        } else {
+          reportError(diag);
+        }
       }
     }
   }
@@ -1125,13 +1118,15 @@ function createTextNodeElement(textValue: string): Node {
     ],
   } as Node;
 }
-/**
- * Reports the specified error
- * @param errorCode Error code
- * @param options Error message options
- */
-function reportError(diagnostic: TransformDiagPositionless): void {
-  throw diagnostic;
+
+function reportError(
+  diagnostic: TransformDiagPositionless,
+  pos?: number,
+  end?: number,
+  contextPos?: number,
+  contextEnd?: number,
+): void {
+  throw new TransformDiag(diagnostic, pos, end, contextPos, contextEnd);
 }
 
 function isComponent(obj: ComponentDef | CompoundComponentDef): obj is ComponentDef {
@@ -1326,4 +1321,59 @@ export function stripOnPrefix(name: string) {
 
 function splitUsesValue(value: string) {
   return value.split(",").map((v) => v.trim());
+}
+
+/**
+ * Parse the script tag and add it to its containing componenet's definition.
+ * Reports errors encountered during script parsing.
+ * @param comp The component containing the script tag
+ */
+function processScriptTag(
+  comp: ComponentDef | CompoundComponentDef,
+  scriptTag: Node,
+  getText: GetText,
+) {
+  if (getAttributes(scriptTag).length > 0) {
+    reportError(DIAGS_TRANSFORM.scriptNoAttrs);
+  }
+  const scriptText = getText(scriptTag);
+  const scriptContentPos = scriptText.indexOf(">") + 1;
+  const scriptContent = scriptText.slice(scriptContentPos, scriptText.lastIndexOf("</"));
+
+  if (scriptContent.trim().length === 0) {
+    return;
+  }
+
+  comp.script = scriptContent;
+  // --- Run the parse and collect on scripts
+  const parser = new Parser(scriptContent);
+  try {
+    // --- We parse the module file to catch parsing errors
+    parser.parseStatements();
+    comp.scriptCollected = collectCodeBehindFromSource("Main", scriptContent);
+    if (comp.scriptCollected.hasInvalidStatements) {
+      comp.scriptError = new Error(
+        `Only reactive variable and function definitions are allowed in a code-behind module.`,
+      );
+    }
+  } catch (err) {
+    if (parser.errors && parser.errors.length > 0) {
+      const errMsg = parser.errors[0];
+      const diag: TransformDiagPositionless = {
+        code: errMsg.code,
+        message: errMsg.text,
+      };
+      const errPos = scriptTag.pos + scriptContentPos + errMsg.position;
+      const errEnd = scriptTag.pos + scriptContentPos + errMsg.end;
+      reportError(diag, errPos, errEnd);
+    } else {
+      comp.scriptError = err;
+    }
+  }
+
+  // --- We may have module parsing/execution errors
+  const moduleErrors = comp.scriptCollected?.moduleErrors ?? {};
+  if (Object.keys(moduleErrors).length > 0) {
+    comp.scriptError = moduleErrors;
+  }
 }
