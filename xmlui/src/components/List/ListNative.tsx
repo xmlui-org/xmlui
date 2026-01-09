@@ -41,6 +41,30 @@ import { Text } from "../Text/TextNative";
 import { MemoizedItem } from "../container-helpers";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 
+// Helper function to check if element has explicit height
+function checkHasExplicitHeight(element: HTMLElement): boolean {
+  const computedStyles = window.getComputedStyle(element);
+  const hasMaxHeight = computedStyles.maxHeight !== "none";
+  const originalHeight = computedStyles.height;
+  
+  // Store original inline style to restore it later
+  const originalInlineHeight = element.style.height || "";
+  
+  // Temporarily set height to auto and get the new computed height
+  element.style.height = "auto";
+  const autoHeight = window.getComputedStyle(element).height;
+  
+  // Restore the original inline style immediately
+  element.style.height = originalInlineHeight;
+  
+  // If the original height is different from what the browser
+  // calculates for 'auto', it means a height was explicitly set.
+  const hasHeight = originalHeight !== autoHeight || !!originalInlineHeight;
+  
+  const isFlex = computedStyles.display === "flex";
+  return hasMaxHeight || hasHeight || isFlex;
+}
+
 // Default props for List component
 export const defaultProps = {
   idKey: "id",
@@ -314,7 +338,17 @@ export const ListNative = forwardRef(function DynamicHeightList(
   const hasHeight = useHasExplicitHeight(parentRef);
   const hasOutsideScroll = scrollRef.current && !hasHeight;
 
-  const scrollElementRef = hasOutsideScroll ? scrollRef : parentRef;
+  // Create a ref for the Virtualizer's scroll container
+  // When using outside scroll, we need a ref that points to the scroll parent
+  const scrollElementRef = useRef<HTMLElement | null>(null);
+  
+  useEffect(() => {
+    if (hasOutsideScroll && scrollRef.current) {
+      scrollElementRef.current = scrollRef.current;
+    } else if (!hasOutsideScroll && parentRef.current) {
+      scrollElementRef.current = parentRef.current;
+    }
+  }, [hasOutsideScroll, scrollRef.current, parentRef.current]);
 
   const shouldStickToBottom = useRef(scrollAnchor === "bottom");
   const [expanded, setExpanded] = useState<Record<any, boolean>>(EMPTY_OBJECT);
@@ -340,6 +374,57 @@ export const ListNative = forwardRef(function DynamicHeightList(
     orderBy,
     availableGroups,
   });
+
+  // Diagnostic logging - after rows is available
+  useEffect(() => {
+    const scrollEl = scrollElementRef.current;
+    const parentEl = parentRef.current;
+    
+    // Count actual rendered items in DOM
+    const listContainer = parentEl?.querySelector('[data-list-container]');
+    const renderedItems = listContainer?.querySelectorAll('[data-index]').length || 0;
+    
+    console.log('🔍 List Diagnostics:', {
+      hasParentRef: !!parentEl,
+      parentRefTag: parentEl?.tagName,
+      scrollParentTag: scrollParent?.tagName || 'null',
+      scrollParentHasOverflow: scrollParent ? getComputedStyle(scrollParent).overflow : 'N/A',
+      hasHeight,
+      hasOutsideScroll,
+      scrollElementTag: scrollEl?.tagName || 'null',
+      virtualizerScrollRef: hasOutsideScroll ? 'OUTSIDE (App)' : 'SELF (List)',
+      // Height diagnostics
+      parentHeight: parentEl ? getComputedStyle(parentEl).height : 'N/A',
+      parentMaxHeight: parentEl ? getComputedStyle(parentEl).maxHeight : 'N/A',
+      scrollElHeight: scrollEl ? getComputedStyle(scrollEl).height : 'N/A',
+      scrollElClientHeight: scrollEl?.clientHeight || 'N/A',
+      scrollElScrollHeight: scrollEl?.scrollHeight || 'N/A',
+      rowCount: rows.length,
+      // ⭐ KEY METRIC: How many items are actually in DOM?
+      renderedItemsInDOM: renderedItems,
+      // Virtualizer check
+      virtualizerExists: !!virtualizerRef.current,
+      virtualizerViewportSize: virtualizerRef.current?.viewportSize || 'N/A',
+      virtualizerScrollSize: virtualizerRef.current?.scrollSize || 'N/A',
+      visibleRange: virtualizerRef.current ? 
+        `${virtualizerRef.current.findStartIndex()}-${virtualizerRef.current.findEndIndex()}` : 'N/A',
+    });
+    
+    // Add scroll event listener to see if events are being received
+    if (scrollEl && hasOutsideScroll) {
+      const handleScroll = () => {
+        console.log('📜 Scroll event detected:', {
+          scrollTop: scrollEl.scrollTop,
+          scrollHeight: scrollEl.scrollHeight,
+          clientHeight: scrollEl.clientHeight,
+          visibleRange: virtualizerRef.current ? 
+            `${virtualizerRef.current.findStartIndex()}-${virtualizerRef.current.findEndIndex()}` : 'N/A',
+        });
+      };
+      scrollEl.addEventListener('scroll', handleScroll);
+      return () => scrollEl.removeEventListener('scroll', handleScroll);
+    }
+  }, [scrollParent, hasHeight, hasOutsideScroll, rows.length]);
 
   const shift = useShift(rows, idKey);
 
@@ -525,6 +610,11 @@ export const ListNative = forwardRef(function DynamicHeightList(
                 count={rowCount}
               >
                 {(rowIndex) => {
+                  // Log first few renders to see what's being called
+                  if (rowIndex < 3 || rowIndex > rowCount - 3) {
+                    console.log(`🎯 Virtualizer rendering index: ${rowIndex} of ${rowCount}`);
+                  }
+                  
                   // REVIEW: I changed this code line because in the build version rows[rowIndex]
                   // was undefined
                   // const row = rows[rowIndex];
@@ -538,19 +628,19 @@ export const ListNative = forwardRef(function DynamicHeightList(
                   switch (row._row_type) {
                     case RowType.SECTION:
                       return (
-                        <Fragment key={key}>{sectionRenderer?.(row, key) || <div />}</Fragment>
+                        <div key={key} data-index={rowIndex}>{sectionRenderer?.(row, key) || <div />}</div>
                       );
                     case RowType.SECTION_FOOTER:
                       return (
-                        <Fragment key={key}>
+                        <div key={key} data-index={rowIndex}>
                           {sectionFooterRenderer?.(row, key) || <div />}
-                        </Fragment>
+                        </div>
                       );
                     default:
                       return (
-                        <Fragment key={key}>
+                        <div key={key} data-index={rowIndex}>
                           {itemRenderer(row, key, rowIndex, rowCount) || <div />}
-                        </Fragment>
+                        </div>
                       );
                   }
                 }}
