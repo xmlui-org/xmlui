@@ -41,6 +41,30 @@ import { Text } from "../Text/TextNative";
 import { MemoizedItem } from "../container-helpers";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 
+// Helper function to check if element has explicit height
+function checkHasExplicitHeight(element: HTMLElement): boolean {
+  const computedStyles = window.getComputedStyle(element);
+  const hasMaxHeight = computedStyles.maxHeight !== "none";
+  const originalHeight = computedStyles.height;
+  
+  // Store original inline style to restore it later
+  const originalInlineHeight = element.style.height || "";
+  
+  // Temporarily set height to auto and get the new computed height
+  element.style.height = "auto";
+  const autoHeight = window.getComputedStyle(element).height;
+  
+  // Restore the original inline style immediately
+  element.style.height = originalInlineHeight;
+  
+  // If the original height is different from what the browser
+  // calculates for 'auto', it means a height was explicitly set.
+  const hasHeight = originalHeight !== autoHeight || !!originalInlineHeight;
+  
+  const isFlex = computedStyles.display === "flex";
+  return hasMaxHeight || hasHeight || isFlex;
+}
+
 // Default props for List component
 export const defaultProps = {
   idKey: "id",
@@ -314,7 +338,17 @@ export const ListNative = forwardRef(function DynamicHeightList(
   const hasHeight = useHasExplicitHeight(parentRef);
   const hasOutsideScroll = scrollRef.current && !hasHeight;
 
-  const scrollElementRef = hasOutsideScroll ? scrollRef : parentRef;
+  // Create a ref for the Virtualizer's scroll container
+  // When using outside scroll, we need a ref that points to the scroll parent
+  const scrollElementRef = useRef<HTMLElement | null>(null);
+  
+  useEffect(() => {
+    if (hasOutsideScroll && scrollRef.current) {
+      scrollElementRef.current = scrollRef.current;
+    } else if (!hasOutsideScroll && parentRef.current) {
+      scrollElementRef.current = parentRef.current;
+    }
+  }, [hasOutsideScroll, scrollRef.current, parentRef.current]);
 
   const shouldStickToBottom = useRef(scrollAnchor === "bottom");
   const [expanded, setExpanded] = useState<Record<any, boolean>>(EMPTY_OBJECT);
@@ -430,29 +464,23 @@ export const ListNative = forwardRef(function DynamicHeightList(
   );
 
   const scrollToBottom = useEvent(() => {
-    const scrollPaddingTop =
-      parseInt(getComputedStyle(scrollRef.current).scrollPaddingTop, 10) || 0;
     if (rows.length) {
       virtualizerRef.current?.scrollToIndex(rows.length + 1, {
         align: "end",
-        offset: scrollPaddingTop,
+        offset: startMargin,
       });
     }
   });
 
   const scrollToTop = useEvent(() => {
-    const scrollPaddingTop =
-      parseInt(getComputedStyle(scrollRef.current).scrollPaddingTop, 10) || 0;
     if (rows.length) {
-      virtualizerRef.current?.scrollToIndex(0, { align: "start", offset: -scrollPaddingTop });
+      virtualizerRef.current?.scrollToIndex(0, { align: "start", offset: -startMargin });
     }
   });
 
   const scrollToIndex = useEvent((index) => {
-    const scrollPaddingTop =
-      parseInt(getComputedStyle(scrollRef.current).scrollPaddingTop, 10) || 0;
     virtualizerRef.current?.scrollToIndex(index, {
-      offset: -scrollPaddingTop,
+      offset: -startMargin,
     });
   });
 
@@ -538,19 +566,19 @@ export const ListNative = forwardRef(function DynamicHeightList(
                   switch (row._row_type) {
                     case RowType.SECTION:
                       return (
-                        <Fragment key={key}>{sectionRenderer?.(row, key) || <div />}</Fragment>
+                        <div key={key} data-index={rowIndex}>{sectionRenderer?.(row, key) || <div />}</div>
                       );
                     case RowType.SECTION_FOOTER:
                       return (
-                        <Fragment key={key}>
+                        <div key={key} data-index={rowIndex}>
                           {sectionFooterRenderer?.(row, key) || <div />}
-                        </Fragment>
+                        </div>
                       );
                     default:
                       return (
-                        <Fragment key={key}>
+                        <div key={key} data-index={rowIndex}>
                           {itemRenderer(row, key, rowIndex, rowCount) || <div />}
-                        </Fragment>
+                        </div>
                       );
                   }
                 }}

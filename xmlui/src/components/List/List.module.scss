@@ -18,7 +18,14 @@ $backgroundColor-List: createThemeVar("backgroundColor-#{$component}");
     background-color: $backgroundColor-List;
 
     &.hasOutsideScroll {
-      overflow: initial;
+      overflow: visible; // Let content overflow so parent can scroll
+      flex: 1 1 0; // Grow to fill available space
+      min-height: 0; // Allow flex shrinking
+      position: relative; // Establish positioning context for Virtualizer
+      
+      .innerListWrapper {
+        position: relative; // Needed for Virtualizer to measure its offset
+      }
     }
   }
 

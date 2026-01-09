@@ -356,8 +356,6 @@ export const useStartMargin = (
   parentRef: MutableRefObject<HTMLElement | null | undefined>,
   scrollRef: MutableRefObject<HTMLElement | null | undefined>,
 ) => {
-  const [startMargin, setStartMargin] = useState<number>(0);
-
   const calculateStartMargin = useEvent(() => {
     if (!hasOutsideScroll) {
       return 0;
@@ -379,9 +377,28 @@ export const useStartMargin = (
     return 0;
   });
 
+  // Initialize with calculated value if possible
+  const [startMargin, setStartMargin] = useState<number>(() => calculateStartMargin());
+
   useResizeObserver(scrollRef, () => {
     setStartMargin(calculateStartMargin());
   });
+
+  // Recalculate on mount and when hasOutsideScroll changes
+  useLayoutEffect(() => {
+    const newMargin = calculateStartMargin();
+    setStartMargin(newMargin);
+    
+    // If we got 0 but hasOutsideScroll is true, try again after layout settles
+    if (newMargin === 0 && hasOutsideScroll && parentRef.current && scrollRef.current) {
+      requestAnimationFrame(() => {
+        const recalculated = calculateStartMargin();
+        if (recalculated !== 0) {
+          setStartMargin(recalculated);
+        }
+      });
+    }
+  }, [hasOutsideScroll, calculateStartMargin]);
 
   return startMargin;
 };
