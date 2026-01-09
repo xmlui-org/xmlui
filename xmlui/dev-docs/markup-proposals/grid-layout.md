@@ -224,3 +224,75 @@ Issues:
 What if rowHeights are explicity set but we don't want to specify a height?
 
 **Proposal:** Use `columns` and `rows` as a property to set number.
+
+---
+
+## Implementation Learnings
+
+### Gap Properties
+
+Grid supports three gap properties that follow CSS Grid conventions:
+- `gap`: Shorthand for setting both column and row gaps
+- `columnGap`: Specific gap between columns (overrides `gap` for columns)
+- `rowGap`: Specific gap between rows (overrides `gap` for rows)
+
+**Implementation detail**: `columnGap` and `rowGap` take precedence over `gap` when specified together. This allows setting a default gap with specific overrides.
+
+```xml
+<!-- Both column and row gaps set to 15px -->
+<Grid gap="15px" columnWidths="* *">
+  <Text>Item 1</Text>
+  <Text>Item 2</Text>
+</Grid>
+
+<!-- Different gaps for columns (30px) and rows (10px) -->
+<Grid gap="10px" columnGap="30px" columnWidths="* *">
+  <Text>Item 1</Text>
+  <Text>Item 2</Text>
+  <Text>Item 3</Text>
+  <Text>Item 4</Text>
+</Grid>
+```
+
+### Star Sizing Implementation
+
+Star sizing (`*`, `2*`, etc.) is converted to CSS `fr` units:
+- `*` becomes `1fr`
+- `2*` becomes `2fr`
+- `3*` becomes `3fr`
+
+This ensures proper proportional sizing using CSS Grid's fractional unit system.
+
+### Spacing Theme Variables Support
+
+Grid supports spacing theme variables in all sizing properties:
+- `columnWidths`: Can use `$space-*` values (e.g., `$space-10 $space-20 *`)
+- `rowHeights`: Can use `$space-*` values
+- `gap`, `columnGap`, `rowGap`: Can use `$gap-*` named variables (e.g., `$gap-normal`, `$gap-tight`)
+
+Example:
+```xml
+<Grid columnWidths="$space-10 $space-20 *" columnGap="$gap-normal">
+  <Text>Fixed col 1 (40px)</Text>
+  <Text>Fixed col 2 (80px)</Text>
+  <Text>Flexible col 3</Text>
+</Grid>
+```
+
+### Default Alignment Behavior
+
+Grid provides default alignment for all items via `horizontalAlignment` and `verticalAlignment` props:
+- **Default `horizontalAlignment`**: `"stretch"` (items fill their grid cell horizontally)
+- **Default `verticalAlignment`**: `"stretch"` (items fill their grid cell vertically)
+- Other values: `"start"`, `"center"`, `"end"`
+
+Individual items can override these defaults using their own alignment props.
+
+### Parsing and Validation
+
+The Grid parser handles edge cases gracefully:
+- Empty strings (`""`) for sizing properties are ignored
+- Whitespace-only strings are treated as empty
+- Supports mixed sizing: `"100px 2* 50%"` combines fixed, fractional, and percentage units
+- Design tokens (e.g., `$space-10`) are resolved at render time
+- `auto` keyword is supported for content-based sizing
