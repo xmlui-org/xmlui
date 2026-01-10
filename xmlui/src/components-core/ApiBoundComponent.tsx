@@ -4,6 +4,7 @@ import React, { useMemo } from "react";
 import type { ComponentDef, ParentRenderContext } from "../abstractions/ComponentDefs";
 import type { LayoutContext, RenderChildFn } from "../abstractions/RendererDefs";
 import { parseAttributeValue } from "./script-runner/AttributeValueParser";
+import { isSourcedString, trimSourcedString } from "../abstractions/SourcedString";
 
 type ApiBoundComponentProps = {
   uid: symbol;
@@ -203,7 +204,10 @@ export function ApiBoundComponent({
       }
       //illesg really experimental
       let prefetchKey = null;
-      const { segments } = parseAttributeValue(operation.url?.trim());
+      const urlValue = isSourcedString(operation.url)
+        ? trimSourcedString(operation.url)
+        : operation.url?.trim();
+      const { segments } = parseAttributeValue(urlValue);
       if (segments?.length === 1) {
         if (segments[0].literal) {
           prefetchKey = `"${segments[0].literal}"`;

@@ -1,6 +1,11 @@
 import type { ParsedPropertyValue } from "../../abstractions/scripting/Compilation";
 import type { Expression } from "./ScriptingSourceTree";
 import { Parser } from "../../parsers/scripting/Parser";
+import {
+  getSourcedStringSource,
+  getSourcedStringValue,
+  type SourcedString,
+} from "../../abstractions/SourcedString";
 
 let lastParseId = 0;
 
@@ -9,7 +14,7 @@ let lastParseId = 0;
  * @param source String to parse
  * @returns Parameter string sections
  */
-export function parseAttributeValue(source: string): ParsedPropertyValue {
+export function parseAttributeValue(source: string | SourcedString): ParsedPropertyValue {
   const result: ParsedPropertyValue = {
     __PARSED: true,
     parseId: ++lastParseId,
@@ -17,11 +22,18 @@ export function parseAttributeValue(source: string): ParsedPropertyValue {
   };
   if (source === undefined || source === null) return result;
 
+  const sourceText = getSourcedStringValue(source);
+  if (sourceText === undefined) return result;
+  const sourceInfo = getSourcedStringSource(source);
+  const indexPositions = sourceInfo
+    ? buildIndexPositions(sourceText, sourceInfo.startLine, sourceInfo.startColumn)
+    : null;
+
   let phase = ParsePhase.StringLiteral;
   let section = "";
   let escape = "";
-  for (let i = 0; i < source.length; i++) {
-    const ch = source[i];
+  for (let i = 0; i < sourceText.length; i++) {
+    const ch = sourceText[i];
     switch (phase) {
       case ParsePhase.StringLiteral:
         if (ch === "\\") {
@@ -60,8 +72,12 @@ export function parseAttributeValue(source: string): ParsedPropertyValue {
         break;
 
       case ParsePhase.ExprStart:
-        const exprSource = source.substring(i);
-        const parser = new Parser(source.substring(i));
+        const exprSource = sourceText.substring(i);
+        const exprPos = indexPositions?.[i];
+        const parser = new Parser(sourceText.substring(i), {
+          startLine: exprPos?.line,
+          startColumn: exprPos?.column,
+        });
         let expr: Expression | null = null;
         try {
           expr = parser.parseExpr();
@@ -71,7 +87,7 @@ export function parseAttributeValue(source: string): ParsedPropertyValue {
         const tail = parser.getTail();
         if (!tail || tail.trim().length < 1 || tail.trim()[0] !== "}") {
           // --- Unclosed expression, back to its beginning
-          throw new Error(`Unclosed expression: '${source}'\n'${exprSource}'`);
+          throw new Error(`Unclosed expression: '${sourceText}'\n'${exprSource}'`);
         } else {
           // --- Successfully parsed expression, get dependencies
           result.segments.push({
@@ -79,7 +95,7 @@ export function parseAttributeValue(source: string): ParsedPropertyValue {
           });
 
           // --- Skip the parsed part of the expression, and start a new literal section
-          i = source.length - tail.length;
+          i = sourceText.length - tail.length;
           section = "";
         }
         phase = ParsePhase.StringLiteral;
@@ -116,4 +132,27 @@ enum ParsePhase {
   StringLiteral,
   Escape,
   ExprStart,
+}
+
+type Position = {
+  line: number;
+  column: number;
+};
+
+function buildIndexPositions(source: string, startLine: number, startColumn: number): Position[] {
+  const positions: Position[] = new Array(source.length + 1);
+  let line = startLine;
+  let column = startColumn;
+  positions[0] = { line, column };
+  for (let i = 0; i < source.length; i++) {
+    const ch = source[i];
+    if (ch === "\n") {
+      line += 1;
+      column = 0;
+    } else {
+      column += 1;
+    }
+    positions[i + 1] = { line, column };
+  }
+  return positions;
 }

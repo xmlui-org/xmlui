@@ -74,6 +74,7 @@ export default ({ mode = "lib" }) => {
       };
     }
   }
+  const enableSourcemaps = mode === "standalone";
   let plugins =
     mode === "metadata"
       ? [ViteXmlui({})]
@@ -127,6 +128,7 @@ export default ({ mode = "lib" }) => {
     },
     build: {
       minify: "terser",
+      sourcemap: enableSourcemaps,
       emptyOutDir: true,
       outDir: `dist/${distSubDirName}`,
       lib,

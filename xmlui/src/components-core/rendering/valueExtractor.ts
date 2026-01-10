@@ -12,6 +12,7 @@ import { extractParam } from "../utils/extractParam";
 import { StyleParser, toCssVar } from "../../parsers/style-parser/StyleParser";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import type { ComponentApi } from "../../abstractions/ApiDefs";
+import { isSourcedString } from "../../abstractions/SourcedString";
 
 function parseStringArray(input: string): string[] {
   const trimmedInput = input.trim();
@@ -28,7 +29,7 @@ function parseStringArray(input: string): string[] {
 function collectParams(expression: any) {
   const params = [];
 
-  if (typeof expression === "string") {
+  if (typeof expression === "string" || isSourcedString(expression)) {
     params.push(...parseParameterString(expression));
   } else if (Array.isArray(expression)) {
     expression.forEach((exp) => {
@@ -102,7 +103,9 @@ export function createValueExtractor(
     }
 
     let expressionString = expression;
-    if (typeof expression !== "string") {
+    if (isSourcedString(expression)) {
+      expressionString = expression.value;
+    } else if (typeof expression !== "string") {
       if (strict) {
         return expression;
       }

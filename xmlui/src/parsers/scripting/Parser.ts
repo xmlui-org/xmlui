@@ -143,17 +143,35 @@ export class Parser {
   /**
    * Initializes the parser with the specified source code
    * @param source Source code to parse
+   * @param options Optional starting line and column for source mapping
    */
-  constructor(source?: string) {
-    this._lexer = new Lexer(new InputStream(source ?? ""));
+  constructor(
+    source?: string,
+    options?: {
+      startLine?: number;
+      startColumn?: number;
+    },
+  ) {
+    this._lexer = new Lexer(
+      new InputStream(source ?? "", options?.startLine ?? 1, options?.startColumn ?? 0),
+    );
   }
 
   /**
    * Sets the source code to parse
    * @param source Source code to parse
+   * @param options Optional starting line and column for source mapping
    */
-  setSource(source: string): void {
-    this._lexer = new Lexer(new InputStream(source));
+  setSource(
+    source: string,
+    options?: {
+      startLine?: number;
+      startColumn?: number;
+    },
+  ): void {
+    this._lexer = new Lexer(
+      new InputStream(source, options?.startLine ?? 1, options?.startColumn ?? 0),
+    );
   }
 
   /**

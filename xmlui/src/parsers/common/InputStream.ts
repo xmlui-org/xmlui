@@ -10,7 +10,10 @@ export class InputStream {
   private _column = 0;
 
   // Creates a stream that uses the specified source code
-  constructor (public readonly source: string) {}
+  constructor (public readonly source: string, startLine: number = 1, startColumn: number = 0) {
+    this._line = startLine;
+    this._column = startColumn;
+  }
 
   // Gets the current position in the stream. Starts from 0.
   get position (): number {

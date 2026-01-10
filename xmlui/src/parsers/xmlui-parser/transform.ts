@@ -8,6 +8,12 @@ import { Parser } from "../scripting/Parser";
 import { CharacterCodes } from "./CharacterCodes";
 import type { GetText } from "./parser";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
+import {
+  createSourcedString,
+  getSourcedStringSource,
+  getSourcedStringValue,
+  type SourcedStringSource,
+} from "../../abstractions/SourcedString";
 
 export const COMPOUND_COMP_ID = "Component";
 export const UCRegex = /^[A-Z]/;
@@ -46,10 +52,12 @@ export function nodeToComponentDef(
   node: Node,
   originalGetText: GetText,
   fileId: string | number,
+  sourceText?: string,
 ): ComponentDef | CompoundComponentDef | null {
   const getText = (node: TransformNode) => {
     return node.text ?? originalGetText(node);
   };
+  const offsetToPos = createOffsetToPos(sourceText);
 
   const element = getTopLvlElement(node, getText);
   const preppedElement = prepNode(element);
@@ -116,7 +124,8 @@ export function nodeToComponentDef(
     if (!compoundName) {
       reportError("T003");
     }
-    if (!UCRegex.test(compoundName.value)) {
+    const compoundNameValue = getSourcedStringValue(compoundName.value) ?? "";
+    if (!UCRegex.test(compoundNameValue)) {
       reportError("T004");
     }
 
@@ -179,14 +188,19 @@ export function nodeToComponentDef(
     const nsAttrs = attrs
       .filter((attr) => attr.namespace === "xmlns")
       .forEach((attr) => {
-        addToNamespaces(namespaceStack, element, attr.unsegmentedName, attr.value);
+        addToNamespaces(
+          namespaceStack,
+          element,
+          attr.unsegmentedName,
+          getSourcedStringValue(attr.value) ?? "",
+        );
       });
 
     let nestedComponent: ComponentDef = transformInnerElement(usesStack, element)! as ComponentDef;
     namespaceStack.pop();
 
     const component: CompoundComponentDef = {
-      name: compoundName.value,
+      name: compoundNameValue,
       component: nestedComponent,
       debug: {
         source: {
@@ -204,7 +218,7 @@ export function nodeToComponentDef(
       nestedComponent.vars = { ...nestedComponent.vars, ...vars };
     }
     if (codeBehind) {
-      component.codeBehind = codeBehind.value;
+      component.codeBehind = getSourcedStringValue(codeBehind.value) ?? "";
     }
 
     nestedComponent.debug = {
@@ -231,6 +245,8 @@ export function nodeToComponentDef(
     element: Node,
   ): void {
     const isCompound = !isComponent(comp);
+    let scriptStartLine: number | undefined;
+    let scriptStartColumn: number | undefined;
 
     const attributes = getAttributes(element);
 
@@ -259,6 +275,13 @@ export function nodeToComponentDef(
           comp.script += "\n";
         }
         comp.script += scriptContent;
+        if (sourceText && offsetToPos && scriptStartLine === undefined) {
+          const scriptContentStart = scriptText.indexOf(">") + 1;
+          const scriptOffset = child.pos + scriptContentStart;
+          const pos = offsetToPos(scriptOffset);
+          scriptStartLine = pos.line;
+          scriptStartColumn = pos.column;
+        }
         return;
       }
 
@@ -384,7 +407,10 @@ export function nodeToComponentDef(
     }
 
     // --- Run the parse and collect on scripts
-    const parser = new Parser(comp.script);
+    const parser = new Parser(comp.script, {
+      startLine: scriptStartLine,
+      startColumn: scriptStartColumn,
+    });
     try {
       // --- We parse the module file to catch parsing errors
       parser.parseStatements();
@@ -395,7 +421,9 @@ export function nodeToComponentDef(
     } catch (err) {
       if (parser.errors && parser.errors.length > 0) {
         const errMsg = parser.errors[0];
-        throw new ParserError(`${errMsg.text} [${errMsg.line}: ${errMsg.column}]`, errMsg.code);
+        const err = new ParserError(`${errMsg.text} [${errMsg.line}: ${errMsg.column}]`, errMsg.code);
+        (err as any).scriptContext = "script-tag";
+        throw err;
       } else {
         comp.scriptError = err;
       }
@@ -409,10 +437,11 @@ export function nodeToComponentDef(
   }
 
   function collectAttribute(comp: ComponentDef | CompoundComponentDef, attr: Node) {
-    const { namespace, startSegment, name, value, unsegmentedName: nsKey } = segmentAttr(attr);
+    const { namespace, startSegment, name, value, unsegmentedName: nsKey, source } =
+      segmentAttr(attr);
 
     if (namespace === "xmlns") {
-      return addToNamespaces(namespaceStack, comp, nsKey, value);
+      return addToNamespaces(namespaceStack, comp, nsKey, getSourcedStringValue(value) ?? "");
     }
 
     const isCompound = !isComponent(comp);
@@ -443,16 +472,16 @@ export function nodeToComponentDef(
     // --- Recognize special attributes by component definition type
     switch (name) {
       case "id":
-        comp.uid = value;
+        comp.uid = getSourcedStringValue(value) ?? "";
         return;
       case "testId":
-        comp.testId = value;
+        comp.testId = getSourcedStringValue(value) ?? "";
         return;
       case "when":
-        comp.when = value;
+        comp.when = getSourcedStringValue(value) ?? "";
         return;
       case "uses":
-        comp.uses = splitUsesValue(value);
+        comp.uses = splitUsesValue(getSourcedStringValue(value) ?? "");
         return;
       default:
         if (startSegment === "var") {
@@ -463,11 +492,11 @@ export function nodeToComponentDef(
           comp.api[name] = value;
         } else if (startSegment === "event") {
           comp.events ??= {};
-          comp.events[name] = parseEvent(value);
+          comp.events[name] = parseEvent(value, source);
         } else if (onPrefixRegex.test(name)) {
           comp.events ??= {};
           const eventName = name[2].toLowerCase() + name.substring(3);
-          comp.events[eventName] = parseEvent(value);
+          comp.events[eventName] = parseEvent(value, source);
         } else {
           comp.props ??= {};
           comp.props[name] = value;
@@ -568,7 +597,7 @@ export function nodeToComponentDef(
         return null;
       }
     }
-    const name = nameAttr?.value;
+    const name = nameAttr ? getSourcedStringValue(nameAttr.value) ?? "" : undefined;
 
     // --- Get the value attribute
     const valueAttr = attrProps.find((attr) => attr.name === "value");
@@ -598,7 +627,7 @@ export function nodeToComponentDef(
       return null;
     }
 
-    if (typeof value === "string") {
+    if (getSourcedStringValue(value) !== undefined) {
       return { name, value };
     }
 
@@ -716,7 +745,8 @@ export function nodeToComponentDef(
     }
 
     // --- Extract the value
-    const usesValues = splitUsesValue(valueAttr.value);
+    const usesValue = getSourcedStringValue(valueAttr.value) ?? "";
+    const usesValues = splitUsesValue(usesValue);
     if (comp.uses) {
       comp.uses.push(...usesValues);
     } else {
@@ -728,8 +758,9 @@ export function nodeToComponentDef(
     namespace?: string;
     startSegment?: string;
     name?: string;
-    value: string;
+    value: string | ReturnType<typeof createSourcedString>;
     unsegmentedName: string;
+    source?: SourcedStringSource;
   } {
     let key = attr.children![0];
     const hasNamespace = key.children!.length === 3;
@@ -756,9 +787,13 @@ export function nodeToComponentDef(
       //TODO: remove asigning name when name === unsegmentedName. It is there for backwards compat
       name = unsegmentedName;
     }
-    const valueText = getText(attr.children![2]);
+    const valueNode = attr.children![2];
+    const valueText = getText(valueNode);
     const value = valueText.substring(1, valueText.length - 1);
-    return { namespace, startSegment, name, value, unsegmentedName };
+    const source = getSourceInfo(offsetToPos, valueNode, fileId);
+    const valueWithSource =
+      source && value.includes("{") ? createSourcedString(value, source) : value;
+    return { namespace, startSegment, name, value: valueWithSource, unsegmentedName, source };
   }
 
   function parseEscapeCharactersInAttrValues(attrs: Node[]) {
@@ -1037,14 +1072,19 @@ export function nodeToComponentDef(
     }
   }
 
-  function parseEvent(value: any): any {
-    if (typeof value !== "string") {
+  function parseEvent(value: any, sourceInfo?: SourcedStringSource): any {
+    const valueText = getSourcedStringValue(value);
+    if (valueText === undefined) {
       // --- It must be a component definition in the event code
       return value;
     }
 
     // --- Parse the event code
-    const parser = new Parser(value);
+    const effectiveSource = sourceInfo ?? getSourcedStringSource(value);
+    const parser = new Parser(valueText, {
+      startLine: effectiveSource?.startLine,
+      startColumn: effectiveSource?.startColumn,
+    });
     try {
       const statements = parser.parseStatements();
       return {
@@ -1052,15 +1092,68 @@ export function nodeToComponentDef(
         statements,
         parseId: ++lastParseId,
         // TODO: retrieve the event source code only in dev mode
-        source: value,
+        source: valueText,
       } as ParsedEventValue;
     } catch {
       if (parser.errors.length > 0) {
         const errMsg = parser.errors[0];
-        throw new ParserError(`${errMsg.text} [${errMsg.line}: ${errMsg.column}]`, errMsg.code);
+        const err = new ParserError(`${errMsg.text} [${errMsg.line}: ${errMsg.column}]`, errMsg.code);
+        (err as any).line = errMsg.line;
+        (err as any).column = errMsg.column;
+        (err as any).position = errMsg.position;
+        (err as any).scriptContext = "inline";
+        throw err;
       }
     }
   }
+}
+
+type OffsetPosition = {
+  line: number;
+  column: number;
+};
+
+function createOffsetToPos(sourceText?: string): ((offset: number) => OffsetPosition) | null {
+  if (!sourceText) return null;
+  const newlinePositions: number[] = [];
+  for (let i = 0; i < sourceText.length; ++i) {
+    if (sourceText[i] === "\n") {
+      newlinePositions.push(i);
+    }
+  }
+  return (offset: number) => {
+    let left = 0;
+    let right = newlinePositions.length;
+    while (left < right) {
+      const mid = Math.floor((left + right) / 2);
+      if (newlinePositions[mid] < offset) {
+        left = mid + 1;
+      } else {
+        right = mid;
+      }
+    }
+    const line = left + 1;
+    const column = left === 0 ? offset : offset - newlinePositions[left - 1] - 1;
+    return { line, column };
+  };
+}
+
+function getSourceInfo(
+  offsetToPos: ((offset: number) => OffsetPosition) | null,
+  valueNode: Node,
+  fileId: string | number,
+): SourcedStringSource | undefined {
+  if (!offsetToPos || typeof valueNode.pos !== "number") {
+    return undefined;
+  }
+  const startOffset = valueNode.pos + 1;
+  const pos = offsetToPos(startOffset);
+  return {
+    fileId,
+    startLine: pos.line,
+    startColumn: pos.column,
+    startOffset,
+  };
 }
 
 function createTextNodeCDataElement(textValue: string): Node {

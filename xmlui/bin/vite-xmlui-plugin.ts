@@ -1,5 +1,6 @@
 import { dataToEsm } from "@rollup/pluginutils";
 import type { Plugin } from "vite";
+import MagicString from "magic-string";
 import {
   collectCodeBehindFromSource,
   removeCodeBehindTokensFromTree,
@@ -20,6 +21,20 @@ export type PluginOptions = {
 const xmluiExtension = new RegExp(`.${componentFileExtension}$`);
 const xmluiScriptExtension = new RegExp(`.${codeBehindFileExtension}$`);
 const moduleScriptExtension = new RegExp(`.${moduleFileExtension}$`);
+
+function toEsmWithSourceMap(sourceCode: string, id: string, data: unknown) {
+  const esm = dataToEsm(data);
+  const magic = new MagicString(sourceCode);
+  magic.overwrite(0, sourceCode.length, esm);
+  const map = magic.generateMap({ hires: true, source: id, includeContent: true });
+  map.sources = [id];
+  map.sourcesContent = [sourceCode];
+  map.file = id;
+  return {
+    code: magic.toString(),
+    map,
+  };
+}
 
 /**
  * Transform XMLUI files to JS objects.
@@ -49,10 +64,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
           file: fileId,
         };
 
-        return {
-          code: dataToEsm(file),
-          map: { mappings: "" },
-        };
+        return toEsmWithSourceMap(code, id, file);
       }
 
       const hasXmluiScriptExtension = xmluiScriptExtension.test(id);
@@ -73,10 +85,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         // Check, if codeBehind.moduleErrors is not empty (Record<string, ModuleErrors[]>); each module
         // should be checked for errors and warnings. If there are errors, throw an error.
 
-        return {
-          code: dataToEsm({ ...codeBehind, src: code }),
-          map: { mappings: "" },
-        };
+        return toEsmWithSourceMap(code, id, { ...codeBehind, src: code });
       }
       return null;
     },

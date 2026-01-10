@@ -14,6 +14,7 @@ interface ErrorForDisplay extends ParseError {
   contextSource: string;
   errPosLine: number;
   errPosCol: number;
+  scriptContext?: "inline" | "script-tag";
 }
 
 export type ParserResult = {
@@ -36,15 +37,28 @@ export function xmlUiMarkupToComponent(source: string, fileId: string | number =
     return { component: null, errors: errorsForDisplay, erroneousCompoundComponentName };
   }
   try {
-    const component = nodeToComponentDef(node, getText, fileId);
+    const component = nodeToComponentDef(node, getText, fileId, source);
     const transformResult = { component, errors: [] };
     return transformResult;
   } catch (e) {
     const erroneousCompoundComponentName = getCompoundCompName(node, getText);
+    const rawLine = typeof (e as any)?.line === "number" ? (e as any).line : 0;
+    const rawCol = typeof (e as any)?.column === "number" ? (e as any).column : 0;
+    const message = (e as ParserError).message ?? "";
+    let errLine = rawLine;
+    let errCol = rawCol;
+    if (!errLine && !errCol && message) {
+      const match = /\[(\d+)\s*:\s*(\d+)\]\s*$/.exec(message);
+      if (match) {
+        errLine = Number(match[1]);
+        errCol = Number(match[2]);
+      }
+    }
     const singleErr: ErrorForDisplay = {
-      message: (e as ParserError).message,
-      errPosCol: 0,
-      errPosLine: 0,
+      message,
+      errPosCol: errCol,
+      errPosLine: errLine,
+      scriptContext: (e as any)?.scriptContext,
       code: ErrCodes.expEq,
       category: DiagnosticCategory.Error,
       pos: 0,
@@ -276,13 +290,15 @@ function createErrorReportComponent(
 
         currentPos = lineEnd + 1; // +1 for newline character
       }
+      const { line: displayLine, column: displayCol } = normalizeErrorLocation(e);
+      const hint = getFriendlyErrorHint(e.message, e.contextSource, e.scriptContext);
       const errMsgComponenet: ComponentDef = {
         type: "Text",
         children: [
           {
             type: "Text",
             props: {
-              value: `#${idx + 1}: ${fileName} (${e.errPosLine}:${e.errPosCol}):`,
+              value: `#${idx + 1}: ${fileName} (${displayLine}:${displayCol}):`,
               // color: "hsl(204, 30.3%, 27%)",
             },
           },
@@ -295,6 +311,15 @@ function createErrorReportComponent(
           },
         ],
       };
+      const hintComponent: ComponentDef | undefined = hint
+        ? {
+            type: "Text",
+            props: {
+              value: `Hint: ${hint}`,
+              color: "$color-info",
+            },
+          }
+        : undefined;
       const context = {
         type: "HStack",
         props: {
@@ -321,7 +346,7 @@ function createErrorReportComponent(
           backgroundColor: "white",
           borderRadius: RADIUS,
         },
-        children: [errMsgComponenet],
+        children: hintComponent ? [errMsgComponenet, hintComponent] : [errMsgComponenet],
       };
       if (!(e.contextSource === "" && e.pos === 0 && e.end === 0)) {
         errComponent.children.push(context);
@@ -405,6 +430,16 @@ function createScriptErrorComponent(
   error: ScriptParserErrorMessage,
   fileName: number | string,
 ): ComponentDef {
+  const hint = getScriptHintForCode(error.code, "code-behind");
+  const hintComponent: ComponentDef | undefined = hint
+    ? {
+        type: "Text",
+        props: {
+          value: `Hint: ${hint}`,
+          color: "$color-info",
+        },
+      }
+    : undefined;
   const comp: ComponentDef = {
     type: "VStack",
     props: { padding: "$padding-normal", gap: 0 },
@@ -442,11 +477,64 @@ function createScriptErrorComponent(
               },
             ],
           },
+          ...(hintComponent ? [hintComponent] : []),
         ],
       },
     ],
   };
   return comp;
+}
+
+function normalizeErrorLocation(error: ErrorForDisplay): { line: number; column: number } {
+  if (error.errPosLine || error.errPosCol) {
+    return { line: error.errPosLine, column: error.errPosCol };
+  }
+  const match = /\[(\d+)\s*:\s*(\d+)\]\s*$/.exec(error.message);
+  if (match) {
+    return { line: Number(match[1]), column: Number(match[2]) };
+  }
+  return { line: 0, column: 0 };
+}
+
+function getScriptErrorCode(message: string): string | undefined {
+  const match = /\bW\d{3}\b/.exec(message);
+  return match?.[0];
+}
+
+function getScriptHintForCode(
+  code: string,
+  context: "inline" | "script-tag" | "code-behind",
+): string | undefined {
+  let prefix = "Script parse error.";
+  if (context === "inline") {
+    prefix = "Inline script parse error in a binding expression.";
+  } else if (context === "script-tag") {
+    prefix = "Script tag parse error.";
+  } else if (context === "code-behind") {
+    prefix = "Code-behind script parse error.";
+  }
+
+  if (code === "W006") {
+    return `${prefix} Check for a missing ).`;
+  }
+  if (code === "W001") {
+    return `${prefix} An expression is expected.`;
+  }
+  return undefined;
+}
+
+function getFriendlyErrorHint(
+  message: string,
+  contextSource: string,
+  scriptContext: "inline" | "script-tag" | undefined,
+): string | undefined {
+  const code = getScriptErrorCode(message);
+  if (!code) {
+    return undefined;
+  }
+  const context =
+    scriptContext ?? (/<script\b/i.test(contextSource) ? "script-tag" : "inline");
+  return getScriptHintForCode(code, context);
 }
 
 export function errReportScriptError(error: ScriptParserErrorMessage, fileName: number | string) {
@@ -467,6 +555,16 @@ function createModuleErrorsComponent(
   Object.keys(errors).map((key) => {
     const e = errors[key];
     for (let err of e) {
+      const hint = getScriptHintForCode(err.code, "code-behind");
+      const hintComponent: ComponentDef | undefined = hint
+        ? {
+            type: "Text",
+            props: {
+              value: `Hint: ${hint}`,
+              color: "$color-info",
+            },
+          }
+        : undefined;
       errList.push({
         type: "VStack",
         props: { gap: "0px" },
@@ -488,6 +586,7 @@ function createModuleErrorsComponent(
               },
             ],
           },
+          ...(hintComponent ? [hintComponent] : []),
         ],
       });
     }
@@ -559,8 +658,25 @@ function addDisplayFieldsToErrors(errors: ParseError[], source: string): ErrorFo
       errPosCol,
       contextStartLine,
       contextSource: source.substring(err.contextPos, err.contextEnd),
+      scriptContext: getScriptContextFromSource(source, err.pos),
     };
   });
+}
+
+function getScriptContextFromSource(
+  source: string,
+  pos: number,
+): "inline" | "script-tag" | undefined {
+  const before = source.slice(0, pos);
+  const lastOpen = before.lastIndexOf("<script");
+  if (lastOpen === -1) {
+    return "inline";
+  }
+  const lastClose = before.lastIndexOf("</script>");
+  if (lastClose > lastOpen) {
+    return "inline";
+  }
+  return "script-tag";
 }
 
 type Position = { line: number; character: number };

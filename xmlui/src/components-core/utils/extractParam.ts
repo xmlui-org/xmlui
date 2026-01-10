@@ -10,6 +10,7 @@ import { LRUCache } from "../utils/LruCache";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { layoutOptionKeys } from "../descriptorHelper";
 import { asOptionalBoolean } from "../rendering/valueExtractor";
+import { isSourcedString } from "../../abstractions/SourcedString";
 
 /**
  * Extract the value of the specified parameter from the given view container state
@@ -27,11 +28,12 @@ export function extractParam(
   strict: boolean = false, // --- In this case we only allow string binding expression
   extractContext: { didResolve: boolean } = { didResolve: false },
 ): any {
-  if (typeof param === "string") {
+  if (typeof param === "string" || isSourcedString(param)) {
     const paramSegments = parseParameterString(param);
+    const paramText = isSourcedString(param) ? param.value : param;
     if (paramSegments.length === 0) {
       // --- The param is an empty string, retrieve it
-      return param;
+      return paramText;
     }
 
     // --- Cut the first segment, if it is whitespace-only
@@ -40,7 +42,7 @@ export function extractParam(
     }
     if (paramSegments.length === 0) {
       // --- The param is an empty string, retrieve it
-      return param;
+      return paramText;
     }
 
     // --- Cut the last segment, if it is whitespace-only
@@ -50,7 +52,7 @@ export function extractParam(
     }
     if (paramSegments.length === 0) {
       // --- The param is an empty string, retrieve it
-      return param;
+      return paramText;
     }
 
     if (paramSegments.length === 1) {
