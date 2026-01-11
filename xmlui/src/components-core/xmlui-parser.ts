@@ -14,6 +14,7 @@ interface ErrorForDisplay extends ParseError {
   contextSource: string;
   errPosLine: number;
   errPosCol: number;
+  scriptContext?: "inline" | "script-tag";
 }
 
 export type ParserResult = {
@@ -41,10 +42,23 @@ export function xmlUiMarkupToComponent(source: string, fileId: string | number =
     return transformResult;
   } catch (e) {
     const erroneousCompoundComponentName = getCompoundCompName(node, getText);
+    const rawLine = typeof (e as any)?.line === "number" ? (e as any).line : 0;
+    const rawCol = typeof (e as any)?.column === "number" ? (e as any).column : 0;
+    const message = (e as ParserError).message ?? "";
+    let errLine = rawLine;
+    let errCol = rawCol;
+    if (!errLine && !errCol && message) {
+      const match = /\[(\d+)\s*:\s*(\d+)\]\s*$/.exec(message);
+      if (match) {
+        errLine = Number(match[1]);
+        errCol = Number(match[2]);
+      }
+    }
     const singleErr: ErrorForDisplay = {
-      message: (e as ParserError).message,
-      errPosCol: 0,
-      errPosLine: 0,
+      message,
+      errPosCol: errCol,
+      errPosLine: errLine,
+      scriptContext: (e as any)?.scriptContext,
       code: ErrCodes.expEq,
       category: DiagnosticCategory.Error,
       pos: 0,
@@ -276,6 +290,7 @@ function createErrorReportComponent(
 
         currentPos = lineEnd + 1; // +1 for newline character
       }
+      const hint = getFriendlyErrorHint(e.message, e.contextSource, e.scriptContext);
       const errMsgComponenet: ComponentDef = {
         type: "Text",
         children: [
@@ -295,6 +310,15 @@ function createErrorReportComponent(
           },
         ],
       };
+      const hintComponent: ComponentDef | undefined = hint
+        ? {
+            type: "Text",
+            props: {
+              value: `Hint: ${hint}`,
+              color: "$color-info",
+            },
+          }
+        : undefined;
       const context = {
         type: "HStack",
         props: {
@@ -321,7 +345,7 @@ function createErrorReportComponent(
           backgroundColor: "white",
           borderRadius: RADIUS,
         },
-        children: [errMsgComponenet],
+        children: hintComponent ? [errMsgComponenet, hintComponent] : [errMsgComponenet],
       };
       if (!(e.contextSource === "" && e.pos === 0 && e.end === 0)) {
         errComponent.children.push(context);
@@ -398,6 +422,84 @@ export function errReportComponent(
   return comp;
 }
 
+function getScriptErrorCode(message: string): string | undefined {
+  const match = /\bW\d{3}\b/.exec(message);
+  return match?.[0];
+}
+
+function getScriptHintForCode(
+  code: string,
+  context: "inline" | "script-tag" | "code-behind",
+): string | undefined {
+  let prefix = "Script parse error.";
+  if (context === "inline") {
+    prefix = "Inline script parse error in a binding expression.";
+  } else if (context === "script-tag") {
+    prefix = "Script tag parse error.";
+  } else if (context === "code-behind") {
+    prefix = "Code-behind script parse error.";
+  }
+
+  // Syntax errors - missing delimiters
+  if (code === "W001") return `${prefix} An expression is expected.`;
+  if (code === "W003") return `${prefix} An identifier (variable or function name) is expected.`;
+  if (code === "W004") return `${prefix} Check for a missing closing brace }.`;
+  if (code === "W005") return `${prefix} Check for a missing closing bracket ].`;
+  if (code === "W006") return `${prefix} Check for a missing closing parenthesis ).`;
+  if (code === "W008") return `${prefix} A colon : is expected (object properties need key: value).`;
+  if (code === "W009") return `${prefix} An equals sign = is expected.`;
+  if (code === "W012") return `${prefix} An opening brace { is expected.`;
+  if (code === "W014") return `${prefix} An opening parenthesis ( is expected.`;
+
+  // Unexpected token
+  if (code === "W002") return `${prefix} Unexpected token found. Check for typos or missing operators.`;
+
+  // Structure errors
+  if (code === "W007") return `${prefix} Invalid object property name. Property names must be strings or identifiers.`;
+  if (code === "W010") return `${prefix} Invalid argument list. Check function call syntax.`;
+  if (code === "W017") return `${prefix} Invalid sequence expression. Check comma placement.`;
+  if (code === "W018") return `${prefix} Invalid object literal. Check object syntax { key: value }.`;
+
+  // Control flow errors
+  if (code === "W011") return `${prefix} For loop variable must be initialized (e.g., let i = 0).`;
+  if (code === "W013") return `${prefix} A 'catch' or 'finally' block is required after 'try'.`;
+  if (code === "W015") return `${prefix} 'case' or 'default' expected in switch statement.`;
+  if (code === "W016") return `${prefix} Only one 'default' case is allowed per switch statement.`;
+
+  // Module/import errors (code-behind only)
+  if (code === "W019") return `${prefix} This identifier is already imported.`;
+  if (code === "W020") return `${prefix} This function name is already defined in the module.`;
+  if (code === "W021") return `${prefix} This identifier is already exported from the module.`;
+  if (code === "W022") return `${prefix} Cannot find the specified module. Check the import path.`;
+  if (code === "W023") return `${prefix} The module does not export this identifier.`;
+  if (code === "W024") return `${prefix} The keyword 'function' is expected.`;
+  if (code === "W025") return `${prefix} The keyword 'from' is expected in import statement.`;
+  if (code === "W026") return `${prefix} A string literal is expected (use quotes).`;
+  if (code === "W027") return `${prefix} Cannot declare 'var' in an imported module (use exported functions instead).`;
+  if (code === "W028") return `${prefix} Invalid statement in module. Modules can only contain imports, exports, and function declarations.`;
+  if (code === "W029") return `${prefix} Imported modules can only contain exported functions.`;
+  if (code === "W030") return `${prefix} Nested declarations cannot be exported. Only top-level functions can be exported.`;
+
+  // Special restrictions
+  if (code === "W031") return `${prefix} Variable names cannot start with $ (reserved for context variables).`;
+
+  return undefined;
+}
+
+function getFriendlyErrorHint(
+  message: string,
+  contextSource: string,
+  scriptContext: "inline" | "script-tag" | undefined,
+): string | undefined {
+  const code = getScriptErrorCode(message);
+  if (!code) {
+    return undefined;
+  }
+  const context =
+    scriptContext ?? (/<script\b/i.test(contextSource) ? "script-tag" : "inline");
+  return getScriptHintForCode(code, context);
+}
+
 /** returns a component definition containing the errors.
  * It is a component and a compound component definition at the same time,
  * so that it can be used to render the errors for a compound component as well*/
@@ -405,6 +507,16 @@ function createScriptErrorComponent(
   error: ScriptParserErrorMessage,
   fileName: number | string,
 ): ComponentDef {
+  const hint = getScriptHintForCode(error.code, "code-behind");
+  const hintComponent: ComponentDef | undefined = hint
+    ? {
+        type: "Text",
+        props: {
+          value: `Hint: ${hint}`,
+          color: "$color-info",
+        },
+      }
+    : undefined;
   const comp: ComponentDef = {
     type: "VStack",
     props: { padding: "$padding-normal", gap: 0 },
@@ -442,6 +554,7 @@ function createScriptErrorComponent(
               },
             ],
           },
+          ...(hintComponent ? [hintComponent] : []),
         ],
       },
     ],
@@ -467,6 +580,16 @@ function createModuleErrorsComponent(
   Object.keys(errors).map((key) => {
     const e = errors[key];
     for (let err of e) {
+      const hint = getScriptHintForCode(err.code, "code-behind");
+      const hintComponent: ComponentDef | undefined = hint
+        ? {
+            type: "Text",
+            props: {
+              value: `Hint: ${hint}`,
+              color: "$color-info",
+            },
+          }
+        : undefined;
       errList.push({
         type: "VStack",
         props: { gap: "0px" },
@@ -488,6 +611,7 @@ function createModuleErrorsComponent(
               },
             ],
           },
+          ...(hintComponent ? [hintComponent] : []),
         ],
       });
     }

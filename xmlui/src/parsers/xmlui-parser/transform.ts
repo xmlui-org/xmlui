@@ -395,7 +395,9 @@ export function nodeToComponentDef(
     } catch (err) {
       if (parser.errors && parser.errors.length > 0) {
         const errMsg = parser.errors[0];
-        throw new ParserError(`${errMsg.text} [${errMsg.line}: ${errMsg.column}]`, errMsg.code);
+        const error = new ParserError(`${errMsg.text} [${errMsg.line}: ${errMsg.column}]`, errMsg.code);
+        (error as any).scriptContext = "script-tag";
+        throw error;
       } else {
         comp.scriptError = err;
       }
@@ -1057,7 +1059,9 @@ export function nodeToComponentDef(
     } catch {
       if (parser.errors.length > 0) {
         const errMsg = parser.errors[0];
-        throw new ParserError(`${errMsg.text} [${errMsg.line}: ${errMsg.column}]`, errMsg.code);
+        const error = new ParserError(`${errMsg.text} [${errMsg.line}: ${errMsg.column}]`, errMsg.code);
+        (error as any).scriptContext = "inline";
+        throw error;
       }
     }
   }
