@@ -37,7 +37,7 @@ export function xmlUiMarkupToComponent(source: string, fileId: string | number =
     return { component: null, errors: errorsForDisplay, erroneousCompoundComponentName };
   }
   try {
-    const component = nodeToComponentDef(node, getText, fileId);
+    const component = nodeToComponentDef(node, getText, fileId, source);
     const transformResult = { component, errors: [] };
     return transformResult;
   } catch (e) {

@@ -46,9 +46,16 @@ export function nodeToComponentDef(
   node: Node,
   originalGetText: GetText,
   fileId: string | number,
+  sourceText?: string,
 ): ComponentDef | CompoundComponentDef | null {
   const getText = (node: TransformNode) => {
     return node.text ?? originalGetText(node);
+  };
+
+  // Helper to calculate line number from character offset
+  const getLineFromOffset = (offset: number): number => {
+    if (!sourceText) return 1;
+    return sourceText.substring(0, offset).split('\n').length;
   };
 
   const element = getTopLvlElement(node, getText);
@@ -242,6 +249,9 @@ export function nodeToComponentDef(
     });
     const childNodes = getChildNodes(element);
 
+    // Track script tag starting line for error reporting
+    let scriptStartLine: number | undefined;
+
     // --- Process child nodes
     childNodes.forEach((child: Node) => {
       if (child.kind === SyntaxKind.Script) {
@@ -253,6 +263,12 @@ export function nodeToComponentDef(
           scriptText.indexOf(">") + 1,
           scriptText.lastIndexOf("</"),
         );
+
+        // Track the line where script content starts (first time only)
+        if (scriptStartLine === undefined && sourceText) {
+          const scriptOpenTagEnd = child.pos + scriptText.indexOf(">") + 1;
+          scriptStartLine = getLineFromOffset(scriptOpenTagEnd);
+        }
 
         comp.script ??= "";
         if (comp.script.length > 0) {
@@ -320,10 +336,10 @@ export function nodeToComponentDef(
             child,
 
             (name) => (isComponent(comp) ? comp.events?.[name] : undefined),
-            (name, value) => {
+            (name, value, attrNode) => {
               if (!isComponent(comp)) return;
               comp.events ??= {};
-              comp.events[name] = parseEvent(value);
+              comp.events[name] = parseEvent(value, attrNode);
             },
             (name) => {
               if (onPrefixRegex.test(name)) {
@@ -395,7 +411,17 @@ export function nodeToComponentDef(
     } catch (err) {
       if (parser.errors && parser.errors.length > 0) {
         const errMsg = parser.errors[0];
-        const error = new ParserError(`${errMsg.text} [${errMsg.line}: ${errMsg.column}]`, errMsg.code);
+        let line = errMsg.line;
+        let column = errMsg.column;
+
+        // Adjust line number to be relative to source file
+        if (scriptStartLine !== undefined) {
+          line = scriptStartLine + errMsg.line - 1;
+        }
+
+        const error = new ParserError(`${errMsg.text} [${line}: ${column}]`, errMsg.code);
+        (error as any).line = line;
+        (error as any).column = column;
         (error as any).scriptContext = "script-tag";
         throw error;
       } else {
@@ -465,11 +491,11 @@ export function nodeToComponentDef(
           comp.api[name] = value;
         } else if (startSegment === "event") {
           comp.events ??= {};
-          comp.events[name] = parseEvent(value);
+          comp.events[name] = parseEvent(value, attr);
         } else if (onPrefixRegex.test(name)) {
           comp.events ??= {};
           const eventName = name[2].toLowerCase() + name.substring(3);
-          comp.events[eventName] = parseEvent(value);
+          comp.events[eventName] = parseEvent(value, attr);
         } else {
           comp.props ??= {};
           comp.props[name] = value;
@@ -675,7 +701,7 @@ export function nodeToComponentDef(
     comp: ComponentDef | CompoundComponentDef,
     child: Node,
     getter: (name: string) => any,
-    setter: (name: string, value: string) => void,
+    setter: (name: string, value: string, attrNode?: Node) => void,
     nameValidator?: (name: string) => void,
   ): void {
     // --- Compound component do not have a uses
@@ -692,7 +718,14 @@ export function nodeToComponentDef(
     const name = valueInfo.name!;
     const value = valueInfo.value;
     if (valueInfo?.value !== undefined) {
-      setter(name, mergeValue(getter(name), value));
+      // Find the attribute node for this name
+      const attrs = getAttributes(child);
+      const attrNode = attrs.find(a => {
+        const key = a.children![0];
+        const attrName = getText(key.children![key.children!.length - 1]);
+        return attrName === name;
+      });
+      setter(name, mergeValue(getter(name), value), attrNode);
     } else {
       // --- Consider the value to be null; check optional child items
       const children = getChildNodes(child);
@@ -1039,7 +1072,7 @@ export function nodeToComponentDef(
     }
   }
 
-  function parseEvent(value: any): any {
+  function parseEvent(value: any, attrNode?: Node): any {
     if (typeof value !== "string") {
       // --- It must be a component definition in the event code
       return value;
@@ -1059,7 +1092,24 @@ export function nodeToComponentDef(
     } catch {
       if (parser.errors.length > 0) {
         const errMsg = parser.errors[0];
-        const error = new ParserError(`${errMsg.text} [${errMsg.line}: ${errMsg.column}]`, errMsg.code);
+        let line = errMsg.line;
+        let column = errMsg.column;
+
+        // Adjust line number to be relative to source file
+        if (attrNode && sourceText) {
+          // Get the attribute value node (the string containing the script)
+          const valueNode = attrNode.children?.[2];
+          if (valueNode) {
+            // Calculate line of attribute in source file
+            const attrLine = getLineFromOffset(valueNode.pos);
+            // Add the line offset (errMsg.line is 1-based within the script)
+            line = attrLine + errMsg.line - 1;
+          }
+        }
+
+        const error = new ParserError(`${errMsg.text} [${line}: ${column}]`, errMsg.code);
+        (error as any).line = line;
+        (error as any).column = column;
         (error as any).scriptContext = "inline";
         throw error;
       }
