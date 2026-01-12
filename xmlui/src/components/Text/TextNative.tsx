@@ -237,6 +237,8 @@ export const Text = forwardRef(function Text(
     if (!overflowMode) {
       classes[styles.truncateOverflow] = maxLines > 0;
       classes[styles.noEllipsis] = !ellipses;
+      // Add multiLineClamp class when using maxLines > 1 to prevent descender artifacts
+      classes[styles.multiLineClamp] = maxLines > 1;
       return classes;
     }
 
@@ -256,6 +258,8 @@ export const Text = forwardRef(function Text(
         // Effect: Shows "..." when text is truncated, respects maxLines for multi-line truncation
         classes[styles.truncateOverflow] = true;
         classes[styles.noEllipsis] = !ellipses;
+        // Add multiLineClamp class when using maxLines > 1 to prevent descender artifacts
+        classes[styles.multiLineClamp] = maxLines > 1;
         break;
       case "flow":
         // CSS: white-space: normal + overflow-y: auto + overflow-x: hidden

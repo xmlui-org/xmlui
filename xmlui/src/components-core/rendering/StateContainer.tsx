@@ -1,16 +1,5 @@
-import type {
-  MutableRefObject,
-  ReactNode,
-  RefObject} from "react";
-import {
-  forwardRef,
-  memo,
-  useCallback,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
+import type { MutableRefObject, ReactNode, RefObject } from "react";
+import { forwardRef, memo, useCallback, useMemo, useReducer, useRef, useState } from "react";
 import produce from "immer";
 import { cloneDeep, isEmpty, isPlainObject, merge, pick } from "lodash-es";
 import memoizeOne from "memoize-one";
@@ -21,12 +10,8 @@ import type { ContainerState } from "../../abstractions/ContainerDefs";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
 import type { ContainerDispatcher, MemoedVars } from "../abstractions/ComponentRenderer";
 import { ContainerActionKind } from "./containers";
-import type {
-  CodeDeclaration,
-  ModuleErrors} from "../script-runner/ScriptingSourceTree";
-import {
-  T_ARROW_EXPRESSION,
-} from "../script-runner/ScriptingSourceTree";
+import type { CodeDeclaration, ModuleErrors } from "../script-runner/ScriptingSourceTree";
+import { T_ARROW_EXPRESSION } from "../script-runner/ScriptingSourceTree";
 import { EMPTY_OBJECT } from "../constants";
 import { collectFnVarDeps } from "../rendering/collectFnVarDeps";
 import { createContainerReducer } from "../rendering/reducer";
@@ -42,11 +27,12 @@ import { evalBinding } from "../script-runner/eval-tree-sync";
 import { extractParam } from "../utils/extractParam";
 import { pickFromObject, shallowCompare } from "../utils/misc";
 import type {
-  ComponentApi,
   ContainerWrapperDef,
   RegisterComponentApiFnInner,
   StatePartChangedFn,
 } from "./ContainerWrapper";
+import type { ComponentApi } from "../../abstractions/ApiDefs";
+
 import { useLinkInfoContext } from "../../components/App/LinkInfoContext";
 
 // --- Properties of the MemoizedErrorProneContainer component
@@ -143,10 +129,10 @@ export const StateContainer = memo(
     const referenceTrackedApi = useReferenceTrackedApi(componentState);
 
     const varDefinitions = useShallowCompareMemoize({
-      ...parsedScriptPart?.functions,
       ...node.functions,
-      ...parsedScriptPart?.vars,
+      ...parsedScriptPart?.functions,
       ...node.vars,
+      ...parsedScriptPart?.vars,
     });
 
     //first: collection function (arrowExpressions) dependencies
@@ -334,8 +320,7 @@ function useMergedState(localVars: ContainerState, componentState: ContainerStat
         ret[key] = value;
       } else {
         if (
-          (isPlainObject(ret[key]) && isPlainObject(value)) ||
-          (Array.isArray(ret[key]) && Array.isArray(value))
+          (isPlainObject(ret[key]) && isPlainObject(value))
         ) {
           ret[key] = merge(cloneDeep(ret[key]), value);
         } else {

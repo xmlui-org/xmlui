@@ -5,14 +5,11 @@ import type { LookupAsyncFnInner, LookupSyncFnInner } from "../../abstractions/A
 import type { CodeDeclaration } from "../script-runner/ScriptingSourceTree";
 import type { ComponentMetadata, ParentRenderContext } from "../../abstractions/ComponentDefs";
 import type { ComponentRendererContextBase } from "../../abstractions/RendererDefs";
-import type {
-  ComponentApi,
-  ContainerState,
-  RegisterComponentApiFnInner,
-} from "../rendering/ContainerWrapper";
+import type { ContainerState, RegisterComponentApiFnInner } from "../rendering/ContainerWrapper";
+import type { ComponentApi } from "../../abstractions/ApiDefs";
 import type { ContainerAction } from "../rendering/containers";
 
-// This interface defines the renderer context for the XMLUI core framework 
+// This interface defines the renderer context for the XMLUI core framework
 // components. Its implementations are used only within the component core.
 export interface InnerRendererContext<T extends ComponentMetadata = ComponentMetadata>
   extends ComponentRendererContextBase<T> {
@@ -40,7 +37,7 @@ export interface InnerRendererContext<T extends ComponentMetadata = ComponentMet
 export type ContainerDispatcher = Dispatch<ContainerAction>;
 
 // This type represents a map of objects providing access to memoed variables within the
-// container of a particular component. The key is an expression; the value is an 
+// container of a particular component. The key is an expression; the value is an
 // accessor object.
 export type MemoedVars = Map<
   any,

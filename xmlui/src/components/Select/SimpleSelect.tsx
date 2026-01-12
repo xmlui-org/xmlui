@@ -45,6 +45,7 @@ interface SimpleSelectProps {
   ungroupedHeaderRenderer?: () => ReactNode;
   clearable?: boolean;
   onClear?: () => void;
+  valueRenderer?: (item: Option, removeItem: () => void) => ReactNode;
   children?: ReactNode;
   options: Option[];
 }
@@ -75,6 +76,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       ungroupedHeaderRenderer,
       clearable,
       onClear,
+      valueRenderer,
       options,
       children,
       ...rest
@@ -168,7 +170,15 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
               [styles.placeholder]: value === undefined,
             })}
           >
-            {selectedOption ? selectedOption.label : readOnly ? "" : placeholder}
+            {selectedOption
+              ? valueRenderer
+                ? valueRenderer(selectedOption, () => {
+                    if (!readOnly) onClear?.();
+                  })
+                : selectedOption.label
+              : readOnly
+                ? ""
+                : placeholder}
           </div>
           {clearable && value !== undefined && value !== "" && !readOnly && enabled && (
             <Part partId="clearButton">

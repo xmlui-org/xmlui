@@ -63,6 +63,16 @@ This event is fired when the component observes a value change (within the speci
 
 The event argument is an object with `prevValue` and `newValue` properties that (as their name suggests) contain the previous and the new values.
 
+```xmlui-pg copy display name="Example: prevValue and newValue"
+<App var.counter="{0}">
+  <Button label="Increment counter" onClick="{counter++}" />
+  <ChangeListener
+    listenTo="{counter}"
+    onDidChange="(change) => changeLog.setValue('prev: ' + change.prevValue + ' new: ' + change.newValue)"
+  />
+  <TextArea id="changeLog" />
+</App>
+
 ## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.

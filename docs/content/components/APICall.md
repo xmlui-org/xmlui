@@ -1,6 +1,6 @@
 # APICall [#apicall]
 
-`APICall` creates, updates or deletes data on the backend, versus [`DataSource`](/components/DataSource) which fetches data. Unlike DataSource, APICall doesn't automatically execute - you must trigger it manually with the `execute()` method, typically from form submissions or button clicks.
+`APICall` creates, updates or deletes data on the backend, versus [`DataSource`](/components/DataSource) which fetches data. Unlike DataSource, APICall doesn't automatically execute - you must trigger it manually with the `execute()` method, typically from form submissions or button clicks. See also [Actions.callAPI](/globals#actionscallapi).
 
 **Key characteristics:**
 - **Manual execution**: Call `execute()` method to trigger the API request
@@ -46,6 +46,36 @@ This optional string sets the message in the confirmation dialog that is display
 ### `confirmTitle` [#confirmtitle]
 
 This optional string sets the title in the confirmation dialog that is displayed before the `APICall` is executed.
+
+### `credentials` [#credentials]
+
+Controls whether cookies and other credentials are sent with the request. Set to `"include"` to send credentials in cross-origin requests (requires `Access-Control-Allow-Credentials: true` header on the server).
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `omit` | Never send credentials |
+| `same-origin` | Send credentials only for same-origin requests (default browser behavior) |
+| `include` | Always send credentials, even for cross-origin requests |
+
+**Important**: When using `credentials="include"` for cross-origin requests, the server must respond with the `Access-Control-Allow-Credentials: true` header, and the `Access-Control-Allow-Origin` header cannot be `*` (it must be a specific origin).
+
+**Example**: Submitting a form with authentication
+
+```xmlui copy
+<Form>
+  <TextBox id="message" label="Message" />
+  <event name="submit">
+    <APICall 
+      url="https://api.example.com/messages"
+      method="post"
+      body='{{"message": message.value}}'
+      credentials="include"
+    />
+  </event>
+</Form>
+```
 
 ### `errorNotificationMessage` [#errornotificationmessage]
 
@@ -141,6 +171,30 @@ This method triggers the invocation of the API. You can pass an arbitrary number
 **Signature**: `execute(...params: any[])`
 
 - `params`: An arbitrary number of parameters that can be used in the API call.
+
+### `inProgress` [#inprogress]
+
+Boolean flag indicating whether the API call is currently in progress.
+
+**Signature**: `inProgress: boolean`
+
+### `lastError` [#lasterror]
+
+The error from the most recent failed API call execution.
+
+**Signature**: `lastError: any`
+
+### `lastResult` [#lastresult]
+
+The result from the most recent successful API call execution.
+
+**Signature**: `lastResult: any`
+
+### `loaded` [#loaded]
+
+Boolean flag indicating whether at least one successful API call has completed.
+
+**Signature**: `loaded: boolean`
 
 ## Styling [#styling]
 

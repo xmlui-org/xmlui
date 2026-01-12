@@ -247,6 +247,7 @@ type APICall = {
   inProgressNotificationMessage?: string;
   completedNotificationMessage?: string;
   errorNotificationMessage?: string;
+  credentials?: "omit" | "same-origin" | "include";
 
   uid?: string | symbol;
   when?: string;
@@ -286,6 +287,7 @@ export async function callApi(
     rawBody,
     method,
     body,
+    credentials,
   }: APICall,
   { resolveBindingExpressions }: ApiActionOptions = {},
 ) {
@@ -343,6 +345,7 @@ export async function callApi(
       method,
       body,
       payloadType,
+      credentials,
     };
     const _onProgress = lookupAction(onProgress, uid, {
       eventName: "progress",
@@ -354,6 +357,7 @@ export async function callApi(
       resolveBindingExpressions,
       onProgress: _onProgress,
     });
+    console.log("API call result:", result);
 
     const onSuccessFn = lookupAction(onSuccess, uid, {
       eventName: "success",

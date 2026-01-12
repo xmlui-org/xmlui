@@ -77,6 +77,23 @@ This is how to transform it in config:
 
 %-PROP-END
 
+%-PROP-START credentials
+
+**Important**: When using `credentials="include"` for cross-origin requests, the server must respond with the `Access-Control-Allow-Credentials: true` header, and the `Access-Control-Allow-Origin` header cannot be `*` (it must be a specific origin).
+
+**Example**: Fetching user authentication status with credentials
+
+```xmlui copy
+<DataSource 
+  id="authStatus"
+  url="https://api.example.com/auth/status"
+  credentials="include"
+/>
+<Text>{authStatus.value.authenticated ? 'Logged in' : 'Not logged in'}</Text>
+```
+
+%-PROP-END
+
 %-PROP-START resultSelector
 
 The selector can be a simple dot notation path (e.g., `value.results`) or a JavaScript expression that processes the data (e.g., `results.filter(item => item.type === 'active')`). The selector has access to standard JavaScript functions like `map` and `filter`, and operates on the full response body.

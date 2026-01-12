@@ -189,7 +189,7 @@ registerBehavior(myBehavior, "after", "tooltip");
 
 ## Framework-Implemented Behaviors
 
-XMLUI currently implements three behaviors that handle common cross-cutting concerns. These serve as examples of the behavior pattern and provide essential functionality across all visual components:
+XMLUI currently implements several behaviors that handle common cross-cutting concerns. These serve as examples of the behavior pattern and provide essential functionality across all visual components:
 
 ### Tooltip Behavior
 
@@ -297,6 +297,99 @@ canAttach: (node, metadata) => {
 The label behavior checks `metadata?.props?.label` to determine if a component has explicit label property metadata defined. Components like Checkbox or Radio that include label rendering as part of their core functionality define `label` in their metadata. For these components, the label behavior does not attach - they handle their own labels.
 
 Components like TextBox or Select do not define `label` in their metadata because they expect the label behavior to handle labeling. The presence of a `label` prop in the component instance (but absence in metadata) signals that the behavior should attach.
+
+### Bookmark Behavior
+
+Adds bookmark functionality to any visual component, enabling scroll-to navigation and table of contecore behaviors first, followed by any behaviors contributed by external packages:
+
+```typescript
+// Framework behaviors registered in ComponentRegistry constructor
+this.registerBehavior(labelBehavior);
+this.registerBehavior(animationBehavior);
+this.registerBehavior(tooltipBehavior);
+this.registerBehavior(variantBehavior);
+this.registerBehavior(bookmarkBehavior);
+this.registerBehavior(formBindingBehavior);
+
+// External behaviors registered after
+contributes.behaviors?.forEach((behavior) => {
+  this.registerBehavior(behavior);
+});
+```
+
+**Order Significance:**
+
+The registration order matters because behaviors wrap sequentially. The current order produces this nesting for a component with label, animation, and tooltip
+  <Stack bookmark="section1" height="1200px" 
+    <Tooltip>            ← Tooltip behavior
+      <Button />         ← Original component
+    </Tooltip>
+  </Animation>
+</ItemWithLabel>
+```
+
+For a component with bookmark behavior, the bookmark attributes are added directly without wrapping:
+
+```
+<ItemWithLabel>          ← Label behavior (if present)
+  <Animation>            ← Animation behavior (if present)
+    <Tooltip>            ← Tooltip behavior (if present)
+      <BookmarkWrapper>  ← Bookmark behavior wrapper (manages functionality)
+        <Stack           ← Original component with added attributes
+          id="myBookmark"
+          data-anchor={true}
+          ref={elementRef}
+        />
+      </BookmarkWrapper>
+    </Tooltip>
+  </Animation>
+</ItemWithLabel>
+```
+
+This order ensures:
+- Tooltips appear on the actual interactive component
+- Animations affect the component and its tooltip together
+- Labels encompass the entire animated, tooltip-enabled component
+- Bookmark attributes are added to the core component element
+- Variant and form binding behaviors wrap appropriately based on component type
+**Transformation Process:**
+
+Unlike other behaviors that wrap components, the bookmark behavior uses `React.cloneElement()` to add bookmark-related attributes directly to the component without introducing extra DOM wrappers:
+
+1. Extracts bookmark-related properties: `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc`
+2. Wraps the component in a `BookmarkWrapper` component that manages bookmark functionality
+3. The wrapper uses `cloneElement()` to add `id`, `ref`, and `data-anchor` attributes to the original component
+4. Registers the bookmark with TableOfContentsContext for TOC integration and intersection observation
+5. Provides a `scrollIntoView` API method for programmatic scrolling
+
+**Key Features:**
+- No extra DOM wrapper - attributes added directly to the target component
+- Integrates with TableOfContentsContext for TOC and active anchor tracking
+- Supports scrollIntoView API for smooth or instant scrolling
+- Works with `scrollBookmarkIntoView()` global function for navigation
+- Handles both shadow DOM and light DOM scenarios
+
+**Comparison with Bookmark Component:**
+
+The bookmark behavior provides the same functionality as the standalone Bookmark component but applies to any visual component:
+
+```xmlui
+<!-- Using Bookmark component (adds wrapper element) -->
+<Bookmark id="myBookmark">
+  <Stack height="200px" backgroundColor="blue"/>
+</Bookmark>
+
+<!-- Using bookmark behavior (no wrapper element) -->
+<Stack bookmark="myBookmark" height="200px" backgroundColor="blue"/>
+```
+
+Both approaches:
+- Register with TableOfContentsContext
+- Support scrollIntoView API
+- Work with link navigation (`<Link to="#myBookmark"/>`)
+- Integrate with the global `scrollBookmarkIntoView()` function
+
+The behavior approach is cleaner when you want bookmark functionality on an existing component without an extra wrapper element.
 
 ### Behavior Execution Order
 
@@ -406,25 +499,55 @@ let renderedNode: ReactNode = null;
 try {
   if (safeNode.type === "Slot") {
     renderedNode = slotRenderer(rendererContext, parentRenderContext);
-  } else {
-    if (!renderer) {
-      return <UnknownComponent message={`${safeNode.type}`} />;
-    }
-    renderedNode = renderer(rendererContext);
-  }
+  Multiple Behaviors:**
 
-  /**
-   * Apply behaviors to the component.
-   */
-  const behaviors = componentRegistry.getBehaviors();
-  if (!isCompoundComponent) {
-    for (const behavior of behaviors) {
-      if (behavior.canAttach(rendererContext.node, descriptor)) {
-        renderedNode = behavior.attach(rendererContext, renderedNode, descriptor);
-      }
-    }
-  }
+```xmlui
+<TextBox 
+  label="Email"
+  tooltip="Enter your email address"
+  animation="slideIn" />
+```
 
+Produces:
+```jsx
+<ItemWithLabel label="Email">
+  <Animation animation={slideInAnimation}>
+    <Tooltip text="Enter your email address">
+      <input type="text" className="xmlui-textbox" />
+    </Tooltip>
+  </Animation>
+</ItemWithLabel>
+```
+
+**Bookmark Behavior (Using cloneElement):**
+
+```xmlui
+<Stack 
+  bookmark="section1"
+  bookmarkTitle="Introduction"
+  height="200px"
+  backgroundColor="blue" />
+```
+
+Produces:
+```jsx
+<BookmarkWrapper 
+  bookmarkId="section1"
+  title="Introduction"
+  level={1}
+  omitFromToc={false}
+  registerComponentApi={...}>
+  <div 
+    className="xmlui-stack"
+    id="section1"
+    data-anchor={true}
+    ref={elementRef}
+    style={{ height: "200px", backgroundColor: "blue" }}
+  />
+</BookmarkWrapper>
+```
+
+Note: The BookmarkWrapper uses `React.cloneElement()` to add the `id`, `ref`, and `data-anchor` attributes directly to the Stack component without introducing an extra DOM wrapper between the wrapper and the Stack.
   // --- Components may have a `testId` property for E2E testing purposes
   if ((appContext?.decorateComponentsWithTestId && ...) || inspectId !== undefined) {
     renderedNode = (
@@ -476,23 +599,35 @@ Produces:
 ```jsx
 <Tooltip text="Save your changes">
   <button className="xmlui-button">Save</button>
-</Tooltip>
-```
-
-**Multiple Behaviors (Tooltip + Animation):**
-
-```xmlui
-<Card 
-  title="Welcome" 
-  tooltip="Dashboard card"
-  animation="fadeIn" />
-```
-
-Produces:
-```jsx
-<Animation animation={fadeInAnimation}>
-  <Tooltip text="Dashboard card">
-    <div className="xmlui-card">
+</Tooltip>Label Behavior Check]
+    C --> D{Metadata has label prop?}
+    D -->|Yes| E[Skip - component handles own label]
+    D -->|No| F{Instance has label prop?}
+    F -->|Yes| G[Wrap in ItemWithLabel component]
+    F -->|No| H[Animation Behavior Check]
+    E --> H
+    G --> H
+    H --> I{Has animation prop?}
+    I -->|Yes| J[Wrap in Animation component]
+    I -->|No| K[Tooltip Behavior Check]
+    J --> K
+    K --> L{Has tooltip or tooltipMarkdown prop?}
+    L -->|Yes| M[Wrap in Tooltip component]
+    L -->|No| N[Variant Behavior Check]
+    M --> N
+    N --> O{Has non-standard variant prop?}
+    O -->|Yes| P[Wrap in VariantWrapper component]
+    O -->|No| Q[Bookmark Behavior Check]
+    P --> Q
+    Q --> R{Has bookmark prop AND not nonVisual?}
+    R -->|Yes| S[Wrap in BookmarkWrapper, add attributes via cloneElement]
+    R -->|No| T[Form Binding Behavior Check]
+    S --> T
+    T --> U{Has bindTo prop AND is form-bindable?}
+    U -->|Yes| V[Wrap in FormBindingWrapper component]
+    U -->|No| W[Return transformed node]
+    V --> W
+    Z --> WassName="xmlui-card">
       <div className="card-title">Welcome</div>
     </div>
   </Tooltip>

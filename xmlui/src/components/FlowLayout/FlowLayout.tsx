@@ -6,6 +6,7 @@ import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { FlowItemBreak, FlowItemWrapper, FlowLayout, defaultProps } from "./FlowLayoutNative";
 import { createMetadata } from "../metadata-helpers";
+import { alignmentOptionValues } from "../abstractions";
 
 const COMP = "FlowLayout";
 
@@ -34,6 +35,32 @@ export const FlowLayoutMd = createMetadata({
         `the \`gap\` value.`,
       defaultValue: defaultProps.rowGap,
     },
+    verticalAlignment: {
+      description:
+        "Manages the vertical content alignment for each child element within the same row. " +
+        "This aligns items along the cross-axis of the flex container.",
+      availableValues: alignmentOptionValues,
+      valueType: "string",
+      defaultValue: "start",
+    },
+    stretch: {
+      description:
+        "When set to true, the FlowLayout takes the full height of its parent container. " +
+        "This is particularly useful in desktop layouts where you want content to fill " +
+        "the available vertical space between fixed header and footer elements.",
+      valueType: "boolean",
+      defaultValue: defaultProps.stretch,
+    },
+  },
+  apis: {
+    scrollToTop: {
+      description: "Scrolls the FlowLayout container to the top. Works when the FlowLayout has an explicit height and overflowY is set to 'scroll'.",
+      signature: "scrollToTop(behavior?: 'auto' | 'instant' | 'smooth'): void",
+    },
+    scrollToBottom: {
+      description: "Scrolls the FlowLayout container to the bottom. Works when the FlowLayout has an explicit height and overflowY is set to 'scroll'.",
+      signature: "scrollToBottom(behavior?: 'auto' | 'instant' | 'smooth'): void",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
 });
@@ -41,7 +68,7 @@ export const FlowLayoutMd = createMetadata({
 export const flowLayoutComponentRenderer = createComponentRenderer(
   COMP,
   FlowLayoutMd,
-  ({ node, renderChild, className, extractValue }) => {
+  ({ node, renderChild, className, extractValue, registerComponentApi }) => {
     if (!isComponentDefChildren(node.children)) {
       throw new NotAComponentDefError();
     }
@@ -52,9 +79,11 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
       extractValue.asSize("$space-4");
     const rowGap =
       extractValue.asSize(node.props?.rowGap) || extractValue.asSize(node.props?.gap) || extractValue.asSize("$space-4");
+    const verticalAlignment = extractValue.asOptionalString(node.props?.verticalAlignment, "start");
+    const stretch = extractValue.asOptionalBoolean(node.props?.stretch);
 
     return (
-      <FlowLayout className={className} columnGap={columnGap} rowGap={rowGap}>
+      <FlowLayout className={className} columnGap={columnGap} rowGap={rowGap} verticalAlignment={verticalAlignment} stretch={stretch} registerComponentApi={registerComponentApi}>
         {renderChild(node.children, {
           wrapChild: ({ node, extractValue }, renderedChild, hints) => {
             if (hints?.opaque) {

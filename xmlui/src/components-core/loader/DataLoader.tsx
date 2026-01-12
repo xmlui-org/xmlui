@@ -432,6 +432,7 @@ export const DataLoaderMd = createMetadata({
     body: d("The body of the request to be sent as JSON"),
     queryParams: d("Query parameters to send with the request"),
     headers: d("Headers to send with the request"),
+    credentials: d("Controls whether cookies and credentials are sent with the request (omit, same-origin, or include)"),
     pollIntervalInSeconds: d("The interval in seconds to poll the API for refreshing data"),
     resultSelector: d("An expression to extract the result from the response"),
     prevPageSelector: d("An expression to extract the previous page parameter from the response"),

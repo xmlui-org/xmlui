@@ -2,7 +2,7 @@
 
 | Component | Description |
 | :---: | --- |
-| [APICall](./APICall) | `APICall` creates, updates or deletes data on the backend, versus [`DataSource`](/components/DataSource) which fetches data. Unlike DataSource, APICall doesn't automatically execute - you must trigger it manually with the `execute()` method, typically from form submissions or button clicks. |
+| [APICall](./APICall) | `APICall` creates, updates or deletes data on the backend, versus [`DataSource`](/components/DataSource) which fetches data. Unlike DataSource, APICall doesn't automatically execute - you must trigger it manually with the `execute()` method, typically from form submissions or button clicks. See also [Actions.callAPI](/globals#actionscallapi). |
 | [App](./App) | The `App` component is the root container that defines your application's overall structure and layout. It provides a complete UI framework with built-in navigation, header, footer, and content areas that work together seamlessly. |
 | [AppHeader](./AppHeader) | `AppHeader` defines the top navigation bar of your application within the [`App`](/components/App) component. It automatically handles logo placement, application title, and user profile areas with built-in responsive behavior. |
 | [AppState](./AppState) | `AppState` is an invisible component that provides global state management across your entire application. Unlike component variables that are scoped locally, AppState allows any component to access and update shared state without prop drilling. |

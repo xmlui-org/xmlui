@@ -1,13 +1,13 @@
 {
   "name": "xmlui",
-  "version": "0.11.24",
+  "version": "0.11.27",
   "sideEffects": false,
   "type": "module",
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
     "build:xmlui-test-bed": "cd src/testing/infrastructure && xmlui build --build-mode=INLINE_ALL --withHostingMetaFiles --withMock",
-    "build:bin": "tsdown",
-    "build:xmlui": "vite build --mode lib && tsdown --no-config --no-clean --out-dir='dist/lib' --shims --dts bin/vite-xmlui-plugin.ts",
+    "build:for-node": "tsdown",
+    "build:xmlui": "vite build --mode lib",
     "build:xmlui-standalone": "vite build --mode standalone",
     "build:xmlui-metadata": "vite build --mode metadata",
     "test:unit": "vitest run",
@@ -97,6 +97,9 @@
   },
   "devDependencies": {
     "@rollup/pluginutils": "5.1.0",
+    "@testing-library/react": "^16.3.1",
+    "@testing-library/user-event": "^14.5.1",
+    "@testing-library/jest-dom": "^6.1.5",
     "@types/adm-zip": "0.5.4",
     "@types/chroma-js": "^3.1.2",
     "@types/color": "3.0.6",
@@ -114,13 +117,14 @@
     "eslint-plugin-import": "2.28.1",
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "jsdom": "^27.4.0",
     "prettier": "^3.3.3",
     "rollup-plugin-copy": "^3.5.0",
     "serve": "14.2.0",
     "terser": "^5.44.0",
     "tsdown": "^0.15.12",
     "typescript": "5.7.3",
-    "vitest": "^3.0.3"
+    "vitest": "^4.0.16"
   },
   "optionalDependencies": {
     "@esbuild/linux-x64": "0.25.2",
@@ -173,8 +177,8 @@
           "require": "./dist/lib/scss/components-core/theming/_themes.scss"
         },
         "./vite-xmlui-plugin": {
-          "import": "./dist/lib/vite-xmlui-plugin.js",
-          "require": "./dist/lib/vite-xmlui-plugin.js"
+          "import": "./dist/for-node/vite-xmlui-plugin.js",
+          "require": "./dist/for-node/vite-xmlui-plugin.js"
         },
         "./syntax/monaco": {
           "import": "./dist/lib/syntax-monaco.js",

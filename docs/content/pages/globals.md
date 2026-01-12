@@ -391,6 +391,36 @@ function navigate(url: string): void;
 
 This function navigates to the specified `url`.
 
+### `scrollBookmarkIntoView`
+
+```ts
+function scrollBookmarkIntoView(bookmarkId: string, smoothScrolling?: boolean): void;
+```
+
+This function scrolls the element with the specified bookmark ID into view. The `bookmarkId` can refer to:
+- A `Bookmark` component's `id` property
+- Any visual component's `bookmark` property
+
+The optional `smoothScrolling` parameter controls the scroll behavior (default: `false`):
+- `true`: Smooth animated scrolling
+- `false`: Instant scrolling
+
+This function works with both the Table of Contents system and standalone bookmarks. It handles both shadow DOM and light DOM scenarios automatically.
+
+**Example:**
+
+```xmlui
+<App>
+  <Button label="Scroll to section" onClick="scrollBookmarkIntoView('section1')" />
+  <Button label="Smooth scroll" onClick="scrollBookmarkIntoView('section2', true)" />
+  
+  <VStack height="600px" overflowY="scroll">
+    <Stack bookmark="section1" height="1200px" backgroundColor="lightblue" />
+    <Stack bookmark="section2" height="1200px" backgroundColor="lightgreen" />
+  </VStack>
+</App>
+```
+
 ### `routerBaseName`
 
 ```ts

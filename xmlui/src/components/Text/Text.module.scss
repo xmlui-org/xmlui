@@ -153,14 +153,16 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
   }
 }
 
-@layer components {
+  @layer components {
   .text {
-    display: inline;
+    display: inline-block;
     overflow: hidden;
     text-overflow: ellipsis;
     margin: 0;
     padding: 0;
     min-height: fit-content;
+    line-height: normal;
+    vertical-align: top;
 
     &.default {
       @include textVariant("");
@@ -371,10 +373,13 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
   See this source for details: https://css-tricks.com/line-clampin/
   */
   .truncateOverflow {
+    display: inline-block;
     overflow: hidden;
     overflow-wrap: break-word;
     white-space: nowrap;
     max-width: 100%;
+    vertical-align: top;
+    line-height: normal;
   }
 
   .preserveLinebreaks {
@@ -384,6 +389,24 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
 
   .noEllipsis {
     text-overflow: clip;
+  }
+
+  // Prevents pixel artifacts from descenders when using line-clamp
+  // by ensuring a clean clip boundary without interfering with padding
+  .multiLineClamp {
+    position: relative;
+    
+    // Add a subtle mask at the bottom to hide any descender artifacts
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: inherit;
+      pointer-events: none;
+    }
   }
 
   // --- Overflow behavior classes

@@ -846,6 +846,34 @@ test.describe("multiSelect", () => {
     await page.getByTestId("remove-item-btn").click();
     await expect(page.getByText("opt1=first", { exact: true })).not.toBeVisible();
   });
+
+  test("valueTemplate works in single-select mode", async ({
+    initTestBed,
+    page,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select initialValue="opt1" placeholder="Select...">
+          <property name="valueTemplate">
+              <HStack>
+              <Text testId="custom-value">{$item.value}={$item.label}</Text>
+              </HStack>
+          </property>
+          <Option value="opt1" label="first"/>
+          <Option value="opt2" label="second"/>
+          <Option value="opt3" label="third"/>
+      </Select>
+    `);
+
+    await expect(page.getByTestId("custom-value")).toBeVisible();
+    await expect(page.getByTestId("custom-value")).toHaveText("opt1=first");
+    
+    const driver = await createSelectDriver();
+    await driver.toggleOptionsVisibility();
+    await driver.selectLabel("second");
+
+    await expect(page.getByTestId("custom-value")).toHaveText("opt2=second");
+  });
 });
 
 // =============================================================================
@@ -1459,14 +1487,14 @@ test.describe("Nested DropdownMenu and Select", () => {
 
     const selectDriver = await createSelectDriver("testSelect");
 
-    await page.getByTestId("openBtn").click();
+    await page.getByTestId("openBtn").click({delay: 100});
 
     const outerDialog = page.getByRole("dialog", { name: "Outer Dialog" });
     await expect(outerDialog).toBeVisible();
 
     await expect(selectDriver.component).toBeVisible();
 
-    await selectDriver.click();
+    await selectDriver.click({delay: 100});
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Option 2")).toBeVisible();
 
@@ -1483,22 +1511,22 @@ test.describe("Nested DropdownMenu and Select", () => {
     const confirmDialog = page.getByRole("dialog", { name: "Confirm action" });
     await expect(confirmDialog).toBeVisible();
 
-    await page.mouse.click(10, 10); // Click outside all dialogs
+    await page.mouse.click(10, 10, {delay: 100}); // Click outside all dialogs
     await expect(confirmDialog).not.toBeVisible();
     await expect(page.getByText("Item 1")).toBeVisible();
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10);
+    await page.mouse.click(10, 10, {delay: 100});
     await expect(page.getByText("Item 1")).not.toBeVisible();
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10);
+    await page.mouse.click(10, 10, {delay: 100});
     await expect(page.getByText("Option 1")).not.toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10);
+    await page.mouse.click(10, 10, {delay: 100});
     await expect(page.getByText("Outer Dialog")).not.toBeVisible();
   });
 });

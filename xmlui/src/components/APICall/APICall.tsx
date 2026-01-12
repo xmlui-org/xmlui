@@ -34,7 +34,7 @@ export const APICallMd = createMetadata({
     "`APICall` creates, updates or deletes data on the backend, versus [`DataSource`]" +
     "(/components/DataSource) which fetches data. Unlike DataSource, APICall doesn't " +
     "automatically execute - you must trigger it manually with the `execute()` method, " +
-    "typically from form submissions or button clicks.",
+    "typically from form submissions or button clicks. See also [Actions.callAPI](/globals#actionscallapi).",
   props: {
     method: {
       description: "The method of data manipulation can be done via setting this property.",
@@ -73,6 +73,18 @@ export const APICallMd = createMetadata({
       description:
         "You can optionally define request header values as key-value pairs, where the key is the ID " +
         "of the particular header and the value is that header's corresponding value.",
+    },
+    credentials: {
+      description:
+        `Controls whether cookies and other credentials are sent with the request. ` +
+        `Set to \`"include"\` to send credentials in cross-origin requests (requires ` +
+        `\`Access-Control-Allow-Credentials: true\` header on the server).`,
+      availableValues: [
+        { value: "omit", description: "Never send credentials" },
+        { value: "same-origin", description: "Send credentials only for same-origin requests (default browser behavior)" },
+        { value: "include", description: "Always send credentials, even for cross-origin requests" },
+      ],
+      valueType: "string",
     },
     confirmTitle: {
       description:
@@ -167,15 +179,40 @@ export const APICallMd = createMetadata({
         params: "An arbitrary number of parameters that can be used in the API call.",
       },
     },
+    inProgress: {
+      description:
+        "Boolean flag indicating whether the API call is currently in progress.",
+      signature: "inProgress: boolean",
+    },
+    loaded: {
+      description:
+        "Boolean flag indicating whether at least one successful API call has completed.",
+      signature: "loaded: boolean",
+    },
+    lastResult: {
+      description:
+        "The result from the most recent successful API call execution.",
+      signature: "lastResult: any",
+    },
+    lastError: {
+      description:
+        "The error from the most recent failed API call execution.",
+      signature: "lastError: any",
+    },
   },
 });
 
 export const apiCallRenderer = createComponentRenderer(
   COMP,
   APICallMd,
-  ({ node, registerComponentApi, uid }) => {
+  ({ node, registerComponentApi, uid, updateState }) => {
     return (
-      <APICallNative registerComponentApi={registerComponentApi} node={node as any} uid={uid} />
+      <APICallNative 
+        registerComponentApi={registerComponentApi} 
+        node={node as any} 
+        uid={uid}
+        updateState={updateState}
+      />
     );
   },
 );

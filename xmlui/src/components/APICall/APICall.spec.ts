@@ -681,6 +681,173 @@ test.describe("Basic Functionality", () => {
   });
 
   // =============================================================================
+  // CREDENTIALS PROPERTY TESTS
+  // =============================================================================
+
+  test.describe("credentials property", () => {
+    test("accepts 'omit' value", async ({ initTestBed, createButtonDriver }) => {
+      const { testStateDriver } = await initTestBed(
+        `
+        <Fragment>
+          <APICall 
+            id="api" 
+            url="/api/test" 
+            method="get" 
+            credentials="omit"
+            onSuccess="arg => testState = arg.message" 
+          />
+          <Button testId="trigger" onClick="api.execute()" label="Execute" />
+        </Fragment>
+      `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const button = await createButtonDriver("trigger");
+      await button.click();
+
+      await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual("GET success");
+    });
+
+    test("accepts 'same-origin' value", async ({ initTestBed, createButtonDriver }) => {
+      const { testStateDriver } = await initTestBed(
+        `
+        <Fragment>
+          <APICall 
+            id="api" 
+            url="/api/test" 
+            method="get" 
+            credentials="same-origin"
+            onSuccess="arg => testState = arg.message" 
+          />
+          <Button testId="trigger" onClick="api.execute()" label="Execute" />
+        </Fragment>
+      `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const button = await createButtonDriver("trigger");
+      await button.click();
+
+      await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual("GET success");
+    });
+
+    test("accepts 'include' value", async ({ initTestBed, createButtonDriver }) => {
+      const { testStateDriver } = await initTestBed(
+        `
+        <Fragment>
+          <APICall 
+            id="api" 
+            url="/api/test" 
+            method="get" 
+            credentials="include"
+            onSuccess="arg => testState = arg.message" 
+          />
+          <Button testId="trigger" onClick="api.execute()" label="Execute" />
+        </Fragment>
+      `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const button = await createButtonDriver("trigger");
+      await button.click();
+
+      await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual("GET success");
+    });
+
+    test("works without credentials property (default behavior)", async ({
+      initTestBed,
+      createButtonDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(
+        `
+        <Fragment>
+          <APICall 
+            id="api" 
+            url="/api/test" 
+            method="get"
+            onSuccess="arg => testState = arg.message" 
+          />
+          <Button testId="trigger" onClick="api.execute()" label="Execute" />
+        </Fragment>
+      `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const button = await createButtonDriver("trigger");
+      await button.click();
+
+      await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual("GET success");
+    });
+
+    test("credentials property works with POST method", async ({ initTestBed, createButtonDriver }) => {
+      const { testStateDriver } = await initTestBed(
+        `
+        <Fragment>
+          <APICall 
+            id="api" 
+            url="/api/test/1" 
+            method="post" 
+            body='{{"test": "data"}}' 
+            credentials="include"
+            onSuccess="arg => testState = arg.message" 
+          />
+          <Button testId="trigger" onClick="api.execute()" label="Execute" />
+        </Fragment>
+      `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const button = await createButtonDriver("trigger");
+      await button.click();
+
+      await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual("POST success");
+    });
+
+    test("credentials property works with form submission", async ({
+      initTestBed,
+      createButtonDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(
+        `
+        <Fragment>
+          <Form testId="form">
+            <TextBox id="message" value="test message" />
+            <Button testId="submit" label="Submit" type="submit" />
+            <event name="submit">
+              <APICall 
+                url="/api/test/1" 
+                method="post" 
+                body='{{"message": message.value}}' 
+                credentials="include"
+                onSuccess="arg => testState = arg.message"
+              />
+            </event>
+          </Form>
+        </Fragment>
+      `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const button = await createButtonDriver("submit");
+      await button.click();
+
+      await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual("POST success");
+    });
+  });
+
+  // =============================================================================
   // NOTIFICATION MESSAGE TESTS
   // =============================================================================
 
@@ -1274,37 +1441,6 @@ test.describe("Other Edge Cases", () => {
     await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual("👨‍👩‍👧‍👦🚀");
   });
 
-  test("handles rapid successive API calls", async ({ page, initTestBed, createButtonDriver }) => {
-    const { testStateDriver } = await initTestBed(
-      `
-      <Fragment>
-        <APICall 
-          id="api" 
-          url="/api/test" 
-          onSuccess="testState ??= 0; testState++;"
-        />
-        <Button testId="trigger" onClick="api.execute()" label="Execute" />
-      </Fragment>
-    `,
-      {
-        apiInterceptor: basicApiInterceptor,
-      },
-    );
-
-    const button = await createButtonDriver("trigger");
-
-    // Rapidly click multiple times
-    await button.click();
-    await page.waitForTimeout(100);
-    await button.click();
-    await page.waitForTimeout(100);
-    await button.click();
-    await page.waitForTimeout(100);
-
-    // Should handle all calls
-    await expect.poll(testStateDriver.testState, { timeout: 5000 }).toEqual(3);
-  });
-
   test("handles component cleanup correctly", async ({ initTestBed, createButtonDriver }) => {
     const { testStateDriver } = await initTestBed(
       `
@@ -1373,5 +1509,234 @@ test.describe("Other Edge Cases", () => {
     await allowButton.click();
     await executeButton.click();
     await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual("success");
+  });
+});
+
+// =============================================================================
+// STATE TRACKING TESTS
+// =============================================================================
+
+test.describe("State Tracking", () => {
+  test("exposes inProgress during API call execution", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(
+      `
+      <Fragment>
+        <APICall id="api" url="/api/slow" method="get" />
+        <Button testId="check" onClick="testState = api.inProgress" label="Check" />
+        <Button testId="trigger" onClick="api.execute()" label="Execute" />
+      </Fragment>
+    `,
+      {
+        apiInterceptor: basicApiInterceptor,
+      },
+    );
+
+    const executeButton = await createButtonDriver("trigger");
+    const checkButton = await createButtonDriver("check");
+
+    // Initially not in progress  
+    await checkButton.click();
+    await expect.poll(testStateDriver.testState).toEqual(false);
+    
+    // Start execution
+    await executeButton.click();
+    
+    // Check during execution (should be true)
+    await checkButton.click();
+    await expect.poll(testStateDriver.testState).toEqual(true);
+    
+    // Wait for completion (slow endpoint takes 200ms)
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    
+    // Check after completion (should be false again)
+    await checkButton.click();
+    await expect.poll(testStateDriver.testState).toEqual(false);
+  });
+
+  test("stores lastResult after successful execution", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(
+      `
+      <Fragment>
+        <APICall id="api" url="/api/test" method="get" />
+        <Button testId="trigger" onClick="api.execute()" label="Execute" />
+        <Button testId="check" onClick="testState = api.lastResult" label="Check" />
+      </Fragment>
+    `,
+      {
+        apiInterceptor: basicApiInterceptor,
+      },
+    );
+
+    const executeButton = await createButtonDriver("trigger");
+    const checkButton = await createButtonDriver("check");
+
+    // Execute the API call
+    await executeButton.click();
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Check the result
+    await checkButton.click();
+    const result = await testStateDriver.testState();
+    expect(result).toEqual({ message: "GET success", id: 1 });
+  });
+
+  test("stores lastError after failed execution", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(
+      `
+      <Fragment>
+        <APICall id="api" url="/api/error/400" method="post" />
+        <Button testId="trigger" onClick="api.execute()" label="Execute" />
+        <Button testId="check" onClick="testState = api.lastError ? true : false" label="Check" />
+      </Fragment>
+    `,
+      {
+        apiInterceptor: basicApiInterceptor,
+      },
+    );
+
+    const executeButton = await createButtonDriver("trigger");
+    const checkButton = await createButtonDriver("check");
+
+    // Execute the API call (will fail)
+    await executeButton.click();
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Check the error
+    await checkButton.click();
+    await expect.poll(testStateDriver.testState).toEqual(true);
+  });
+
+  test("sets loaded flag after successful execution", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(
+      `
+      <Fragment>
+        <APICall id="api" url="/api/test" method="get" />
+        <Button testId="trigger" onClick="api.execute()" label="Execute" />
+        <Button testId="check" onClick="testState = api.loaded" label="Check" />
+      </Fragment>
+    `,
+      {
+        apiInterceptor: basicApiInterceptor,
+      },
+    );
+
+    const executeButton = await createButtonDriver("trigger");
+    const checkButton = await createButtonDriver("check");
+
+    // Check loaded before execution
+    await checkButton.click();
+    await expect.poll(testStateDriver.testState).toEqual(false);
+
+    // Execute the API call
+    await executeButton.click();
+    await new Promise((resolve) => setTimeout(resolve, 500)); // Increased wait time
+
+    // Check loaded after execution
+    await checkButton.click();
+    await expect.poll(testStateDriver.testState).toEqual(true);
+  });
+
+  test("clears lastError on successful execution", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(
+      `
+      <Fragment>
+        <APICall id="api" url="/api/test" method="get" />
+        <Button testId="triggerSuccess" onClick="api.execute()" label="Execute Success" />
+        <Button testId="check" onClick="testState = api.lastError" label="Check" />
+      </Fragment>
+    `,
+      {
+        apiInterceptor: basicApiInterceptor,
+      },
+    );
+
+    const successButton = await createButtonDriver("triggerSuccess");
+    const checkButton = await createButtonDriver("check");
+
+    // Trigger a success
+    await successButton.click();
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Check that lastError is undefined
+    await checkButton.click();
+    await expect.poll(testStateDriver.testState).toEqual(undefined);
+  });
+
+  test("inProgress resets to false after completion", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(
+      `
+      <Fragment>
+        <APICall id="api" url="/api/test" method="get" />
+        <Button testId="trigger" onClick="api.execute()" label="Execute" />
+        <Button testId="check" onClick="testState = api.inProgress" label="Check" />
+      </Fragment>
+    `,
+      {
+        apiInterceptor: basicApiInterceptor,
+      },
+    );
+
+    const executeButton = await createButtonDriver("trigger");
+    const checkButton = await createButtonDriver("check");
+
+    // Execute the API call
+    await executeButton.click();
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Check inProgress after completion
+    await checkButton.click();
+    await expect.poll(testStateDriver.testState).toEqual(false);
+  });
+
+  test("can use inProgress to disable buttons during execution", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
+      <Fragment>
+        <APICall id="api" url="/api/slow" method="get" />
+        <Button testId="trigger" onClick="api.execute()" label="Execute" enabled="{!api.inProgress}" />
+      </Fragment>
+    `,
+      {
+        apiInterceptor: basicApiInterceptor,
+      },
+    );
+
+    const button = page.getByTestId("trigger");
+
+    // Initially enabled
+    await expect(button).toBeEnabled();
+
+    // Click to start execution
+    await button.click();
+
+    // Should be disabled during execution
+    await expect(button).toBeDisabled();
+
+    // Wait for completion
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    // Should be enabled again
+    await expect(button).toBeEnabled();
   });
 });

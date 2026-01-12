@@ -43,6 +43,7 @@ type MarkdownProps = {
   showHeadingAnchors?: boolean;
   grayscale?: boolean;
   truncateLinks?: boolean;
+  openLinkInNewTab?: boolean;
 };
 
 function PreTagComponent({ id, children, codeHighlighter }) {
@@ -98,6 +99,7 @@ export const Markdown = memo(
       showHeadingAnchors,
       grayscale,
       truncateLinks,
+      openLinkInNewTab,
       ...rest
     }: MarkdownProps,
     ref,
@@ -326,6 +328,11 @@ export const Markdown = memo(
                 }
               }
 
+              // Use openLinkInNewTab as default if no explicit target is set
+              if (!target && openLinkInNewTab) {
+                target = "_blank";
+              }
+
               return (
                 <LinkNative to={href} target={target} {...(props as any)}>
                   {label}
@@ -352,14 +359,14 @@ export const Markdown = memo(
                 </div>
               );
             },
-            tr({ children }) {
-              return <tr className={styles.htmlTr}>{children}</tr>;
+            tr({ children, ...props }) {
+              return <tr className={styles.htmlTr} {...props}>{children}</tr>;
             },
-            td({ children }) {
-              return <td className={styles.htmlTd}>{children}</td>;
+            td({ children, ...props }) {
+              return <td className={styles.htmlTd} {...props}>{children}</td>;
             },
-            th({ children }) {
-              return <th className={styles.htmlTh}>{children}</th>;
+            th({ children, ...props }) {
+              return <th className={styles.htmlTh} {...props}>{children}</th>;
             },
             thead({ children }) {
               return <thead className={styles.htmlThead}>{children}</thead>;

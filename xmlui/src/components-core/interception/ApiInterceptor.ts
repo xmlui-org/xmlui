@@ -11,6 +11,7 @@ import { InMemoryDb } from "../interception/InMemoryDb";
 import type {
   ApiInterceptorDefinition,
   AuthDefinition,
+  IApiInterceptor,
   IDatabase,
   InterceptorOperationDef,
   RequestParams,
@@ -86,7 +87,7 @@ async function initDb(apiDef: ApiInterceptorDefinition) {
 }
 
 // An API interceptor implementation
-export class ApiInterceptor {
+export class ApiInterceptor implements IApiInterceptor<RequestInit> {
   private backend: Backend | null = null;
   // public id = crypto.randomUUID();
 
@@ -185,7 +186,7 @@ export class ApiInterceptor {
       if (ret instanceof File) {
         headers.append("Content-type", ret.type);
         headers.append("Content-Length", ret.size + "");
-        
+
         // Properly encode filename for Content-Disposition header
         // Use percent-encoding for non-ASCII characters in filename*
         const encodedFilename = encodeURIComponent(ret.name);

@@ -1,4 +1,4 @@
-import { type CSSProperties, forwardRef, type ReactNode, type Ref } from "react";
+import { type CSSProperties, forwardRef, type ReactNode, type Ref, useImperativeHandle, useRef, useEffect } from "react";
 import classnames from "classnames";
 
 import styles from "./Stack.module.scss";
@@ -13,6 +13,7 @@ export const defaultProps = {
   reverse: false,
   hoverContainer: false,
   visibleOnHover: false,
+  stretch: false,
 };
 
 type Props = {
@@ -26,8 +27,10 @@ type Props = {
   reverse?: boolean;
   hoverContainer?: boolean;
   visibleOnHover?: boolean;
+  stretch?: boolean;
   onClick?: any;
   onMount?: any;
+  registerComponentApi?: (api: any) => void;
 };
 
 // =====================================================================================================================
@@ -44,24 +47,72 @@ export const Stack = forwardRef(function Stack(
     reverse = defaultProps.reverse,
     hoverContainer = defaultProps.hoverContainer,
     visibleOnHover = defaultProps.visibleOnHover,
+    stretch = defaultProps.stretch,
     onClick,
     onMount,
     className,
+    registerComponentApi,
     ...rest
   }: Props,
   ref: Ref<any>,
 ) {
   useOnMount(onMount);
+  const containerRef = useRef<HTMLDivElement>(null);
+  
   const { horizontal, vertical } = useContentAlignment(
     orientation,
     horizontalAlignment,
     verticalAlignment,
   );
+
+  // Expose ref to parent
+  useImperativeHandle(ref, () => containerRef.current as HTMLDivElement);
+
+  // Register API methods
+  useEffect(() => {
+    if (registerComponentApi) {
+      registerComponentApi({
+        scrollToTop: (behavior: ScrollBehavior = 'instant') => {
+          if (containerRef.current) {
+            containerRef.current.scrollTo({
+              top: 0,
+              behavior
+            });
+          }
+        },
+        scrollToBottom: (behavior: ScrollBehavior = 'instant') => {
+          if (containerRef.current) {
+            containerRef.current.scrollTo({
+              top: containerRef.current.scrollHeight,
+              behavior
+            });
+          }
+        },
+        scrollToStart: (behavior: ScrollBehavior = 'instant') => {
+          if (containerRef.current) {
+            containerRef.current.scrollTo({
+              left: 0,
+              behavior
+            });
+          }
+        },
+        scrollToEnd: (behavior: ScrollBehavior = 'instant') => {
+          if (containerRef.current) {
+            containerRef.current.scrollTo({
+              left: containerRef.current.scrollWidth,
+              behavior
+            });
+          }
+        },
+      });
+    }
+  }, [registerComponentApi]);
+
   return (
     <div
       {...rest}
       onClick={onClick}
-      ref={ref}
+      ref={containerRef}
       style={style}
       className={classnames(
         className,
@@ -73,6 +124,7 @@ export const Stack = forwardRef(function Stack(
           [styles.hoverContainer]: hoverContainer,
           "display-on-hover": visibleOnHover,
           [styles.handlesClick]: !!onClick,
+          [styles.stretch]: stretch,
         },
         horizontal ?? "",
         vertical ?? "",

@@ -1,15 +1,16 @@
 import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
 import { createXmlUiParser } from "../parsers/xmlui-parser/parser";
 import { nodeToComponentDef } from "../parsers/xmlui-parser/transform";
-import { DiagnosticCategory, ErrCodes } from "../parsers/xmlui-parser/diagnostics";
-import type { GetText, Error as ParseError } from "../parsers/xmlui-parser/parser";
-import type { ParserError } from "../parsers/xmlui-parser/ParserError";
+import { TransformDiag } from "../parsers/xmlui-parser/diagnostics";
+import type { GetText } from "../parsers/xmlui-parser/parser";
+import type { GeneralDiag, ParserDiag } from "../parsers/xmlui-parser/diagnostics";
 import { SyntaxKind } from "../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../parsers/xmlui-parser/syntax-node";
 import type { ScriptParserErrorMessage } from "../abstractions/scripting/ScriptParserError";
 import type { ModuleErrors } from "./script-runner/ScriptingSourceTree";
+import { forEach } from "lodash-es";
 
-interface ErrorForDisplay extends ParseError {
+interface ErrorForDisplay extends GeneralDiag {
   contextStartLine: number;
   contextSource: string;
   errPosLine: number;
@@ -30,35 +31,62 @@ const RADIUS = "0.5rem";
 export function xmlUiMarkupToComponent(source: string, fileId: string | number = 0): ParserResult {
   const { parse, getText } = createXmlUiParser(source);
   const { node, errors } = parse();
+  const cursor = createDocumentCursor(source);
   if (errors.length > 0) {
-    const errorsForDisplay = addDisplayFieldsToErrors(errors, source);
+    const errorsToDisplay = errors.map((err) => {
+      return errorWithDisplayFields(err, cursor, source);
+    });
     const erroneousCompoundComponentName = getCompoundCompName(node, getText);
-    return { component: null, errors: errorsForDisplay, erroneousCompoundComponentName };
+    return {
+      component: null,
+      errors: errorsToDisplay as ErrorForDisplay[],
+      erroneousCompoundComponentName,
+    };
   }
+
   try {
     const component = nodeToComponentDef(node, getText, fileId);
     const transformResult = { component, errors: [] };
     return transformResult;
   } catch (e) {
     const erroneousCompoundComponentName = getCompoundCompName(node, getText);
-    const singleErr: ErrorForDisplay = {
-      message: (e as ParserError).message,
-      errPosCol: 0,
-      errPosLine: 0,
-      code: ErrCodes.expEq,
-      category: DiagnosticCategory.Error,
-      pos: 0,
-      end: 0,
-      contextPos: 0,
-      contextEnd: 0,
-      contextSource: "",
-      contextStartLine: 0,
-    };
-    return {
-      component: null,
-      erroneousCompoundComponentName,
-      errors: [singleErr],
-    };
+    if (e instanceof TransformDiag) {
+      let errForDisplay: ErrorForDisplay;
+      if (e.pos && e.end) {
+        const { contextPos, contextEnd } = cursor.getSurroundingContext(e.pos, e.end, 1);
+        const singleErr: GeneralDiag = {
+          message: e.message,
+          code: e.code,
+          pos: e.pos,
+          end: e.end,
+          contextPos,
+          contextEnd,
+        };
+
+        errForDisplay = errorWithDisplayFields(singleErr, cursor, source);
+      } else {
+        errForDisplay = {
+          message: e.message,
+          code: e.code,
+          pos: 0,
+          end: 0,
+          contextPos: 0,
+          contextEnd: 0,
+          contextSource: "",
+          contextStartLine: 0,
+          errPosCol: 0,
+          errPosLine: 0,
+        };
+      }
+
+      return {
+        component: null,
+        erroneousCompoundComponentName,
+        errors: [errForDisplay],
+      };
+    } else {
+      throw e;
+    }
   }
 }
 
@@ -547,26 +575,32 @@ function getCompoundCompName(node: Node, getText: GetText) {
   return undefined;
 }
 
-function addDisplayFieldsToErrors(errors: ParseError[], source: string): ErrorForDisplay[] {
-  const { offsetToPosForDisplay } = createDocumentCursor(source);
-  return errors.map((err) => {
-    const { line: errPosLine, character: errPosCol } = offsetToPosForDisplay(err.pos);
-    const { line: contextStartLine } = offsetToPosForDisplay(err.contextPos);
+function errorWithDisplayFields(
+  err: GeneralDiag,
+  cursor: DocumentCursor,
+  source: string,
+): ErrorForDisplay {
+  const { line: errPosLine, character: errPosCol } = cursor.offsetToPosForDisplay(err.pos);
+  const { line: contextStartLine } = cursor.offsetToPosForDisplay(err.contextPos);
 
-    return {
-      ...err,
-      errPosLine,
-      errPosCol,
-      contextStartLine,
-      contextSource: source.substring(err.contextPos, err.contextEnd),
-    };
-  });
+  return {
+    ...err,
+    errPosLine,
+    errPosCol,
+    contextStartLine,
+    contextSource: source.substring(err.contextPos, err.contextEnd),
+  };
 }
 
 type Position = { line: number; character: number };
 type DocumentCursor = {
   offsetToPos: (offset: number) => Position;
   offsetToPosForDisplay: (offset: number) => Position;
+  getSurroundingContext: (
+    offsetPos: number,
+    offsetEnd: number,
+    surroundingLines: number,
+  ) => { contextPos: number; contextEnd: number };
 };
 
 export function createDocumentCursor(text: string): DocumentCursor {
@@ -580,6 +614,7 @@ export function createDocumentCursor(text: string): DocumentCursor {
   return {
     offsetToPos,
     offsetToPosForDisplay,
+    getSurroundingContext,
   };
 
   /**
@@ -613,5 +648,52 @@ export function createDocumentCursor(text: string): DocumentCursor {
     pos.line += 1;
     pos.character += 1;
     return pos;
+  }
+
+  function getSurroundingContext(
+    pos: number,
+    end: number,
+    surroundingLines: number,
+  ): { contextPos: number; contextEnd: number } {
+    let newlinesFound: number;
+    let cursor: number;
+
+    let contextPos: number;
+    cursor = pos;
+    newlinesFound = 0;
+    while (cursor >= 0) {
+      if (text[cursor] === "\n") {
+        newlinesFound++;
+        if (newlinesFound > surroundingLines) {
+          break;
+        }
+      }
+      cursor--;
+    }
+    contextPos = cursor + 1;
+
+    let contextEnd: number;
+    cursor = end;
+    newlinesFound = 0;
+    while (cursor < text.length) {
+      if (text[cursor] === "\n") {
+        newlinesFound++;
+        if (newlinesFound > surroundingLines) {
+          break;
+        }
+        cursor++;
+      } else if (text[cursor] === "\r" && text[cursor + 1] === "\n") {
+        newlinesFound++;
+        if (newlinesFound > surroundingLines) {
+          break;
+        }
+        cursor += 2;
+      } else {
+        cursor++;
+      }
+    }
+    contextEnd = cursor;
+
+    return { contextPos, contextEnd };
   }
 }

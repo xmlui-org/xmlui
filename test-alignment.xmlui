@@ -1,0 +1,23 @@
+<App>
+  <Card>
+    <FlowLayout verticalAlignment="center">
+      <Text overflowMode="ellipsis" width="470px" style="background-color: lightblue;">
+        lorem ipsum dolor sit amet eiusmod tempor incididunt
+      </Text>
+      <Text width="130px" style="background-color: lightcoral;">
+        Jan 01, 2024 10:00
+      </Text>
+    </FlowLayout>
+  </Card>
+  
+  <Card marginTop="20px">
+    <FlowLayout verticalAlignment="center">
+      <Text width="470px" style="background-color: lightblue;">
+        lorem ipsum dolor sit amet eiusmod tempor incididunt
+      </Text>
+      <Text width="130px" style="background-color: lightcoral;">
+        Jan 01, 2024 10:00
+      </Text>
+    </FlowLayout>
+  </Card>
+</App>

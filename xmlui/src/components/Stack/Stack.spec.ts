@@ -762,3 +762,649 @@ test.describe("Layout", () => {
     expect(scrollHeight).toBeGreaterThan(clientHeight);
   });
 });
+
+// =============================================================================
+// STRETCH PROPERTY TESTS
+// =============================================================================
+
+test.describe("Stretch Property", () => {
+  test("stretch property makes Stack fill available height in desktop layout", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <App layout="desktop">
+        <AppHeader testId="header">Header Content</AppHeader>
+        <Stack testId="stack" stretch backgroundColor="lightblue">
+          <Text>Short content</Text>
+        </Stack>
+        <Footer testId="footer">Footer Content</Footer>
+      </App>
+    `);
+
+    const stack = page.getByTestId("stack");
+    await expect(stack).toBeVisible();
+
+    // Get the heights
+    const { height: stackHeight } = await getBounds(stack);
+    const header = page.getByTestId("header");
+    const footer = page.getByTestId("footer");
+    const { height: headerHeight } = await getBounds(header);
+    const { height: footerHeight } = await getBounds(footer);
+
+    // Stack should fill the space between header and footer
+    const expectedHeight = PAGE_HEIGHT - headerHeight - footerHeight;
+    expect(stackHeight).toBeGreaterThan(expectedHeight * 0.9); // Allow some tolerance
+  });
+
+  test("stretch property with overflow content makes Stack scrollable", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <App layout="desktop">
+        <AppHeader testId="header">Header Content</AppHeader>
+        <Stack testId="stack" stretch backgroundColor="lightblue">
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Integer posuere erat a ante venenatis dapibus posuere velit aliquet.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Integer posuere erat a ante venenatis dapibus posuere velit aliquet.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Integer posuere erat a ante venenatis dapibus posuere velit aliquet.</Text>
+        </Stack>
+        <Footer testId="footer">Footer Content</Footer>
+      </App>
+    `);
+
+    const stack = page.getByTestId("stack");
+    await expect(stack).toBeVisible();
+
+    // Verify we can scroll
+    const { scrollHeight, clientHeight } = await stack.evaluate((elem) => ({
+      scrollHeight: elem.scrollHeight,
+      clientHeight: elem.clientHeight,
+    }));
+    expect(scrollHeight).toBeGreaterThan(clientHeight);
+  });
+
+  test("stretch property works without AppHeader", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <App layout="desktop">
+        <Stack testId="stack" stretch backgroundColor="lightblue">
+          <Text>Content without header</Text>
+        </Stack>
+        <Footer testId="footer">Footer Content</Footer>
+      </App>
+    `);
+
+    const stack = page.getByTestId("stack");
+    await expect(stack).toBeVisible();
+
+    const { height: stackHeight } = await getBounds(stack);
+    const footer = page.getByTestId("footer");
+    const { height: footerHeight } = await getBounds(footer);
+
+    // Stack should fill the space between top and footer
+    const expectedHeight = PAGE_HEIGHT - footerHeight;
+    expect(stackHeight).toBeGreaterThan(expectedHeight * 0.9);
+  });
+
+  test("stretch property works without Footer", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <App layout="desktop">
+        <AppHeader testId="header">Header Content</AppHeader>
+        <Stack testId="stack" stretch backgroundColor="lightblue">
+          <Text>Content without footer</Text>
+        </Stack>
+      </App>
+    `);
+
+    const stack = page.getByTestId("stack");
+    await expect(stack).toBeVisible();
+
+    const { height: stackHeight } = await getBounds(stack);
+    const header = page.getByTestId("header");
+    const { height: headerHeight } = await getBounds(header);
+
+    // Stack should fill the space between header and bottom
+    const expectedHeight = PAGE_HEIGHT - headerHeight;
+    expect(stackHeight).toBeGreaterThan(expectedHeight * 0.9);
+  });
+
+  test("stretch property works without both AppHeader and Footer", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <App layout="desktop">
+        <Stack testId="stack" stretch backgroundColor="lightblue">
+          <Text>Content fills entire viewport</Text>
+        </Stack>
+      </App>
+    `);
+
+    const stack = page.getByTestId("stack");
+    await expect(stack).toBeVisible();
+
+    const { height: stackHeight } = await getBounds(stack);
+
+    // Stack should fill almost the entire viewport height
+    expect(stackHeight).toBeGreaterThan(PAGE_HEIGHT * 0.9);
+  });
+
+  test("Stack without stretch property does not fill available height", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <App layout="desktop">
+        <AppHeader testId="header">Header Content</AppHeader>
+        <Stack testId="stack" backgroundColor="lightblue">
+          <Text>Short content</Text>
+        </Stack>
+        <Footer testId="footer">Footer Content</Footer>
+      </App>
+    `);
+
+    const stack = page.getByTestId("stack");
+    await expect(stack).toBeVisible();
+
+    const { height: stackHeight } = await getBounds(stack);
+    const header = page.getByTestId("header");
+    const footer = page.getByTestId("footer");
+    const { height: headerHeight } = await getBounds(header);
+    const { height: footerHeight } = await getBounds(footer);
+
+    // Stack should NOT fill the available height - it should be much smaller
+    const availableHeight = PAGE_HEIGHT - headerHeight - footerHeight;
+    expect(stackHeight).toBeLessThan(availableHeight * 0.5);
+  });
+
+  test("stretch property maintains background color throughout scrollable area", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <App layout="desktop">
+        <AppHeader testId="header">Header Content</AppHeader>
+        <Stack testId="stack" stretch backgroundColor="lightblue">
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</Text>
+          <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.</Text>
+        </Stack>
+        <Footer testId="footer">Footer Content</Footer>
+      </App>
+    `);
+
+    const stack = page.getByTestId("stack");
+    await expect(stack).toBeVisible();
+
+    // Check background color is applied
+    await expect(stack).toHaveCSS("background-color", "rgb(173, 216, 230)");
+
+    // Scroll to bottom
+    await stack.evaluate((elem) => {
+      elem.scrollTop = elem.scrollHeight;
+    });
+
+    // Background color should still be visible
+    await expect(stack).toHaveCSS("background-color", "rgb(173, 216, 230)");
+  });
+});
+
+// =============================================================================
+// API TESTS
+// =============================================================================
+
+test.describe("Api", () => {
+  test("scrollToTop scrolls to the top of a scrollable Stack", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <VStack id="myStack" height="200px" overflowY="scroll" testId="stack">
+          <Stack height="300px" backgroundColor="lightblue"/>
+          <Stack height="300px" backgroundColor="lightgreen"/>
+          <Stack height="300px" backgroundColor="lightcoral"/>
+        </VStack>
+        <Button testId="scrollBtn" onClick="myStack.scrollToTop()" />
+      </Fragment>
+    `);
+
+    const stack = page.getByTestId("stack");
+    
+    // Scroll to bottom first
+    await stack.evaluate((elem) => {
+      elem.scrollTop = elem.scrollHeight;
+    });
+
+    // Verify we're scrolled down
+    const scrollTopBefore = await stack.evaluate((elem) => elem.scrollTop);
+    expect(scrollTopBefore).toBeGreaterThan(0);
+
+    // Click button to scroll to top
+    await page.getByTestId("scrollBtn").click();
+    
+    // Wait for scroll to complete
+    await page.waitForTimeout(100);
+
+    // Verify we're at the top
+    const scrollTopAfter = await stack.evaluate((elem) => elem.scrollTop);
+    expect(scrollTopAfter).toBe(0);
+  });
+
+  test("scrollToBottom scrolls to the bottom of a scrollable Stack", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <VStack id="myStack" height="200px" overflowY="scroll" testId="stack">
+          <Stack height="300px" backgroundColor="lightblue"/>
+          <Stack height="300px" backgroundColor="lightgreen"/>
+          <Stack height="300px" backgroundColor="lightcoral"/>
+        </VStack>
+        <Button testId="scrollBtn" onClick="myStack.scrollToBottom()" />
+      </Fragment>
+    `);
+
+    const stack = page.getByTestId("stack");
+    
+    // Verify we start at the top
+    const scrollTopBefore = await stack.evaluate((elem) => elem.scrollTop);
+    expect(scrollTopBefore).toBe(0);
+
+    // Click button to scroll to bottom
+    await page.getByTestId("scrollBtn").click();
+    
+    // Wait for scroll to complete
+    await page.waitForTimeout(100);
+
+    // Verify we're at the bottom
+    const scrollTopAfter = await stack.evaluate((elem) => elem.scrollTop);
+    const scrollHeight = await stack.evaluate((elem) => elem.scrollHeight);
+    const clientHeight = await stack.evaluate((elem) => elem.clientHeight);
+    
+    expect(scrollTopAfter).toBeCloseTo(scrollHeight - clientHeight, 0);
+  });
+
+  test("scrollToTop with 'smooth' behavior parameter", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <VStack id="myStack" height="200px" overflowY="scroll" testId="stack">
+          <Stack height="300px" backgroundColor="lightblue"/>
+          <Stack height="300px" backgroundColor="lightgreen"/>
+          <Stack height="300px" backgroundColor="lightcoral"/>
+        </VStack>
+        <Button testId="scrollBtn" onClick="myStack.scrollToTop('smooth')" />
+      </Fragment>
+    `);
+
+    const stack = page.getByTestId("stack");
+    
+    // Scroll to bottom first
+    await stack.evaluate((elem) => {
+      elem.scrollTop = elem.scrollHeight;
+    });
+
+    // Click button to scroll to top with smooth behavior
+    await page.getByTestId("scrollBtn").click();
+    
+    // Wait for smooth scroll to complete
+    await page.waitForTimeout(500);
+
+    // Verify we're at the top
+    const scrollTopAfter = await stack.evaluate((elem) => elem.scrollTop);
+    expect(scrollTopAfter).toBe(0);
+  });
+
+  test("scrollToBottom with 'instant' behavior parameter", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <VStack id="myStack" height="200px" overflowY="scroll" testId="stack">
+          <Stack height="300px" backgroundColor="lightblue"/>
+          <Stack height="300px" backgroundColor="lightgreen"/>
+          <Stack height="300px" backgroundColor="lightcoral"/>
+        </VStack>
+        <Button testId="scrollBtn" onClick="myStack.scrollToBottom('instant')" />
+      </Fragment>
+    `);
+
+    const stack = page.getByTestId("stack");
+
+    // Click button to scroll to bottom with instant behavior
+    await page.getByTestId("scrollBtn").click();
+    
+    // Wait minimal time for instant scroll
+    await page.waitForTimeout(50);
+
+    // Verify we're at the bottom
+    const scrollTopAfter = await stack.evaluate((elem) => elem.scrollTop);
+    const scrollHeight = await stack.evaluate((elem) => elem.scrollHeight);
+    const clientHeight = await stack.evaluate((elem) => elem.clientHeight);
+    
+    expect(scrollTopAfter).toBeCloseTo(scrollHeight - clientHeight, 0);
+  });
+
+  test("scrollToTop works on HStack with horizontal scroll", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <HStack id="myStack" width="200px" height="100px" overflowX="scroll" testId="stack">
+          <Stack width="300px" height="50px" backgroundColor="lightblue"/>
+          <Stack width="300px" height="50px" backgroundColor="lightgreen"/>
+          <Stack width="300px" height="50px" backgroundColor="lightcoral"/>
+        </HStack>
+        <Button testId="scrollBtn" onClick="myStack.scrollToTop()" />
+      </Fragment>
+    `);
+
+    const stack = page.getByTestId("stack");
+    
+    // Note: scrollToTop affects vertical scroll even in HStack
+    // This test verifies the API doesn't error on HStack
+    await page.getByTestId("scrollBtn").click();
+    await page.waitForTimeout(50);
+    
+    // Should complete without error
+    await expect(stack).toBeVisible();
+  });
+
+  test("scrollToTop with default behavior uses instant", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <VStack id="myStack" height="200px" overflowY="scroll" testId="stack">
+          <Stack height="300px" backgroundColor="lightblue"/>
+          <Stack height="300px" backgroundColor="lightgreen"/>
+          <Stack height="300px" backgroundColor="lightcoral"/>
+        </VStack>
+        <Button testId="scrollBtn" onClick="myStack.scrollToTop()" />
+      </Fragment>
+    `);
+
+    const stack = page.getByTestId("stack");
+    
+    // Scroll to bottom first
+    await stack.evaluate((elem) => {
+      elem.scrollTop = elem.scrollHeight;
+    });
+
+    // Click button to scroll to top (default behavior)
+    await page.getByTestId("scrollBtn").click();
+    
+    // With instant behavior, should be immediate
+    await page.waitForTimeout(50);
+
+    // Verify we're at the top
+    const scrollTopAfter = await stack.evaluate((elem) => elem.scrollTop);
+    expect(scrollTopAfter).toBe(0);
+  });
+
+  test("multiple scrollToTop calls work correctly", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <VStack id="myStack" height="200px" overflowY="scroll" testId="stack">
+          <Stack height="300px" backgroundColor="lightblue"/>
+          <Stack height="300px" backgroundColor="lightgreen"/>
+          <Stack height="300px" backgroundColor="lightcoral"/>
+        </VStack>
+        <Button testId="scrollBtn" onClick="myStack.scrollToTop()" />
+      </Fragment>
+    `);
+
+    const stack = page.getByTestId("stack");
+    
+    // Scroll to bottom
+    await stack.evaluate((elem) => {
+      elem.scrollTop = elem.scrollHeight;
+    });
+
+    // Call scrollToTop multiple times
+    await page.getByTestId("scrollBtn").click();
+    await page.waitForTimeout(50);
+    await page.getByTestId("scrollBtn").click();
+    await page.waitForTimeout(50);
+    await page.getByTestId("scrollBtn").click();
+    await page.waitForTimeout(50);
+
+    // Verify we're at the top
+    const scrollTopAfter = await stack.evaluate((elem) => elem.scrollTop);
+    expect(scrollTopAfter).toBe(0);
+  });
+
+  test("scrollToBottom followed by scrollToTop", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <VStack id="myStack" height="200px" overflowY="scroll" testId="stack">
+          <Stack height="300px" backgroundColor="lightblue"/>
+          <Stack height="300px" backgroundColor="lightgreen"/>
+          <Stack height="300px" backgroundColor="lightcoral"/>
+        </VStack>
+        <Button testId="scrollBottomBtn" onClick="myStack.scrollToBottom()" />
+        <Button testId="scrollTopBtn" onClick="myStack.scrollToTop()" />
+      </Fragment>
+    `);
+
+    const stack = page.getByTestId("stack");
+    
+    // Scroll to bottom
+    await page.getByTestId("scrollBottomBtn").click();
+    await page.waitForTimeout(100);
+
+    const scrollHeight = await stack.evaluate((elem) => elem.scrollHeight);
+    const clientHeight = await stack.evaluate((elem) => elem.clientHeight);
+    let scrollTop = await stack.evaluate((elem) => elem.scrollTop);
+    
+    expect(scrollTop).toBeCloseTo(scrollHeight - clientHeight, 0);
+
+    // Now scroll back to top
+    await page.getByTestId("scrollTopBtn").click();
+    await page.waitForTimeout(100);
+
+    scrollTop = await stack.evaluate((elem) => elem.scrollTop);
+    expect(scrollTop).toBe(0);
+  });
+
+  test("scrollToStart scrolls to the start of a horizontally scrollable Stack", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <HStack id="myStack" width="200px" height="100px" overflowX="scroll" testId="stack">
+          <Stack width="300px" height="50px" backgroundColor="lightblue"/>
+          <Stack width="300px" height="50px" backgroundColor="lightgreen"/>
+          <Stack width="300px" height="50px" backgroundColor="lightcoral"/>
+        </HStack>
+        <Button testId="scrollBtn" onClick="myStack.scrollToStart()" />
+      </Fragment>
+    `);
+
+    const stack = page.getByTestId("stack");
+    
+    // Scroll to end first
+    await stack.evaluate((elem) => {
+      elem.scrollLeft = elem.scrollWidth;
+    });
+
+    // Verify we're scrolled right
+    const scrollLeftBefore = await stack.evaluate((elem) => elem.scrollLeft);
+    expect(scrollLeftBefore).toBeGreaterThan(0);
+
+    // Click button to scroll to start
+    await page.getByTestId("scrollBtn").click();
+    
+    // Wait for scroll to complete
+    await page.waitForTimeout(100);
+
+    // Verify we're at the start
+    const scrollLeftAfter = await stack.evaluate((elem) => elem.scrollLeft);
+    expect(scrollLeftAfter).toBe(0);
+  });
+
+  test("scrollToEnd scrolls to the end of a horizontally scrollable Stack", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <HStack id="myStack" width="200px" height="100px" overflowX="scroll" testId="stack">
+          <Stack width="300px" height="50px" backgroundColor="lightblue"/>
+          <Stack width="300px" height="50px" backgroundColor="lightgreen"/>
+          <Stack width="300px" height="50px" backgroundColor="lightcoral"/>
+        </HStack>
+        <Button testId="scrollBtn" onClick="myStack.scrollToEnd()" />
+      </Fragment>
+    `);
+
+    const stack = page.getByTestId("stack");
+    
+    // Verify we start at the start
+    const scrollLeftBefore = await stack.evaluate((elem) => elem.scrollLeft);
+    expect(scrollLeftBefore).toBe(0);
+
+    // Click button to scroll to end
+    await page.getByTestId("scrollBtn").click();
+    
+    // Wait for scroll to complete
+    await page.waitForTimeout(100);
+
+    // Verify we're at the end
+    const scrollLeftAfter = await stack.evaluate((elem) => elem.scrollLeft);
+    const scrollWidth = await stack.evaluate((elem) => elem.scrollWidth);
+    const clientWidth = await stack.evaluate((elem) => elem.clientWidth);
+    
+    expect(scrollLeftAfter).toBeCloseTo(scrollWidth - clientWidth, 0);
+  });
+
+  test("scrollToStart with 'smooth' behavior parameter", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <HStack id="myStack" width="200px" height="100px" overflowX="scroll" testId="stack">
+          <Stack width="300px" height="50px" backgroundColor="lightblue"/>
+          <Stack width="300px" height="50px" backgroundColor="lightgreen"/>
+          <Stack width="300px" height="50px" backgroundColor="lightcoral"/>
+        </HStack>
+        <Button testId="scrollBtn" onClick="myStack.scrollToStart('smooth')" />
+      </Fragment>
+    `);
+
+    const stack = page.getByTestId("stack");
+    
+    // Scroll to end first
+    await stack.evaluate((elem) => {
+      elem.scrollLeft = elem.scrollWidth;
+    });
+
+    // Click button to scroll to start with smooth behavior
+    await page.getByTestId("scrollBtn").click();
+    
+    // Wait for smooth scroll to complete
+    await page.waitForTimeout(500);
+
+    // Verify we're at the start
+    const scrollLeftAfter = await stack.evaluate((elem) => elem.scrollLeft);
+    expect(scrollLeftAfter).toBe(0);
+  });
+
+  test("scrollToEnd with 'instant' behavior parameter", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <HStack id="myStack" width="200px" height="100px" overflowX="scroll" testId="stack">
+          <Stack width="300px" height="50px" backgroundColor="lightblue"/>
+          <Stack width="300px" height="50px" backgroundColor="lightgreen"/>
+          <Stack width="300px" height="50px" backgroundColor="lightcoral"/>
+        </HStack>
+        <Button testId="scrollBtn" onClick="myStack.scrollToEnd('instant')" />
+      </Fragment>
+    `);
+
+    const stack = page.getByTestId("stack");
+
+    // Click button to scroll to end with instant behavior
+    await page.getByTestId("scrollBtn").click();
+    
+    // Wait minimal time for instant scroll
+    await page.waitForTimeout(50);
+
+    // Verify we're at the end
+    const scrollLeftAfter = await stack.evaluate((elem) => elem.scrollLeft);
+    const scrollWidth = await stack.evaluate((elem) => elem.scrollWidth);
+    const clientWidth = await stack.evaluate((elem) => elem.clientWidth);
+    
+    expect(scrollLeftAfter).toBeCloseTo(scrollWidth - clientWidth, 0);
+  });
+
+  test("scrollToEnd followed by scrollToStart", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <HStack id="myStack" width="200px" height="100px" overflowX="scroll" testId="stack">
+          <Stack width="300px" height="50px" backgroundColor="lightblue"/>
+          <Stack width="300px" height="50px" backgroundColor="lightgreen"/>
+          <Stack width="300px" height="50px" backgroundColor="lightcoral"/>
+        </HStack>
+        <Button testId="scrollEndBtn" onClick="myStack.scrollToEnd()" />
+        <Button testId="scrollStartBtn" onClick="myStack.scrollToStart()" />
+      </Fragment>
+    `);
+
+    const stack = page.getByTestId("stack");
+    
+    // Scroll to end
+    await page.getByTestId("scrollEndBtn").click();
+    await page.waitForTimeout(100);
+
+    const scrollWidth = await stack.evaluate((elem) => elem.scrollWidth);
+    const clientWidth = await stack.evaluate((elem) => elem.clientWidth);
+    let scrollLeft = await stack.evaluate((elem) => elem.scrollLeft);
+    
+    expect(scrollLeft).toBeCloseTo(scrollWidth - clientWidth, 0);
+
+    // Now scroll back to start
+    await page.getByTestId("scrollStartBtn").click();
+    await page.waitForTimeout(100);
+
+    scrollLeft = await stack.evaluate((elem) => elem.scrollLeft);
+    expect(scrollLeft).toBe(0);
+  });
+
+  test("all scroll APIs work together", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Stack id="myStack" width="200px" height="200px" overflowX="scroll" overflowY="scroll" testId="stack">
+          <HStack gap="0">
+            <Stack width="300px" height="300px" backgroundColor="lightblue"/>
+            <Stack width="300px" height="300px" backgroundColor="lightgreen"/>
+            <Stack width="300px" height="300px" backgroundColor="lightcoral"/>
+          </HStack>
+        </Stack>
+        <Button testId="scrollTopBtn" onClick="myStack.scrollToTop()" />
+        <Button testId="scrollBottomBtn" onClick="myStack.scrollToBottom()" />
+        <Button testId="scrollStartBtn" onClick="myStack.scrollToStart()" />
+        <Button testId="scrollEndBtn" onClick="myStack.scrollToEnd()" />
+      </Fragment>
+    `);
+
+    const stack = page.getByTestId("stack");
+    
+    // Scroll to bottom-end
+    await page.getByTestId("scrollBottomBtn").click();
+    await page.getByTestId("scrollEndBtn").click();
+    await page.waitForTimeout(100);
+
+    let scrollTop = await stack.evaluate((elem) => elem.scrollTop);
+    let scrollLeft = await stack.evaluate((elem) => elem.scrollLeft);
+    expect(scrollTop).toBeGreaterThan(0);
+    expect(scrollLeft).toBeGreaterThan(0);
+
+    // Scroll to top-start
+    await page.getByTestId("scrollTopBtn").click();
+    await page.getByTestId("scrollStartBtn").click();
+    await page.waitForTimeout(100);
+
+    scrollTop = await stack.evaluate((elem) => elem.scrollTop);
+    scrollLeft = await stack.evaluate((elem) => elem.scrollLeft);
+    expect(scrollTop).toBe(0);
+    expect(scrollLeft).toBe(0);
+  });
+});

@@ -2699,6 +2699,8 @@ export class Parser {
       text: errorText,
       line: token.startLine,
       column: token.startColumn,
+      position: token.startPosition,
+      end: token.endPosition,
     });
     throw new ParserError(errorText, errorCode);
 
@@ -3205,13 +3207,13 @@ export class Parser {
     for (const prop of objLit.props) {
       if (Array.isArray(prop)) {
       } else {
-        reportError("W018");
+        this.reportError("W018");
         return null;
       }
 
       const [propKey, propValue] = prop;
       if (propKey.type !== T_IDENTIFIER) {
-        reportError("W018");
+        this.reportError("W018");
         return null;
       }
 

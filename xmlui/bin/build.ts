@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+import "tsx";
 import { cp, mkdir, rm, writeFile } from "fs/promises";
 import * as dotenv from "dotenv";
 import { existsSync } from "fs";
@@ -8,14 +8,16 @@ import type { InlineConfig } from "vite";
 import { build as viteBuild } from "vite";
 import { getViteConfig } from "./viteConfig";
 import * as fs from "node:fs";
+import { pathToFileURL } from "node:url";
+import path from "node:path";
 
 type ApiInterceptorDefinition = any;
 type CompoundComponentDef = any;
 type ThemeDefinition = any;
 
 // --- Set up the configuration
-dotenv.config({ path: `${process.cwd()}/.env` });
-dotenv.config({ path: `${process.cwd()}/.env.local`, override: true });
+dotenv.config({ path: path.join(process.cwd(), ".env") });
+dotenv.config({ path: path.join(process.cwd(), ".env.local"), override: true });
 
 type StandaloneJsonConfig = {
   name: string;
@@ -29,12 +31,12 @@ type StandaloneJsonConfig = {
   resourceMap?: Record<string, string>;
 };
 
-async function getExportedJsObjects<T>(path: string): Promise<Array<T>> {
-  const matches = await glob(`${process.cwd()}/${path}`);
+async function getExportedJsObjects<T>(globPattern: string): Promise<Array<T>> {
+  const matches = await glob(path.join(process.cwd(), globPattern).replaceAll("\\", "/"));
   const modules = await Promise.all(
     matches.map(async (file: string) => {
-      return (await import(file)).default;
-    })
+      return (await import(pathToFileURL(file).href)).default;
+    }),
   );
   return modules;
 }
@@ -43,12 +45,11 @@ async function convertResourcesDir(distRoot: string, flatDist: boolean, filePref
   if (!flatDist) {
     return undefined;
   }
-  distRoot = distRoot.replaceAll("\\", "/");
-  const resourcesDir = `${distRoot}/resources`;
+  const resourcesDir = path.join(distRoot, "resources");
   if (!existsSync(resourcesDir)) {
     return undefined;
   }
-  const files = await glob(`${resourcesDir}/**/*`);
+  const files = await glob(`${resourcesDir.replaceAll("\\", "/")}/**/*`);
 
   const ret: Record<string, string> = {};
   for (let i = 0; i < files.length; i++) {
@@ -56,10 +57,10 @@ async function convertResourcesDir(distRoot: string, flatDist: boolean, filePref
     if (fs.statSync(file).isDirectory()) {
       continue;
     }
-    const relativePath = file.replace(`${distRoot}/`, "");
+    const relativePath = path.relative(distRoot, file).replaceAll("\\", "/");
     const convertedResource = `${filePrefix}${relativePath.replaceAll("/", "_")}`;
 
-    await cp(file, `${distRoot}/${convertedResource}`);
+    await cp(file, path.join(distRoot, convertedResource));
     ret[relativePath] = convertedResource;
   }
   return ret;
@@ -248,8 +249,8 @@ export const build = async ({
   const distPath = "/dist";
   const themesFolder = flatDist ? "" : "themes";
   const componentsFolder = flatDist ? "" : "components";
-  const themesFolderPath = flatDist ? distPath : `${distPath}/${themesFolder}`;
-  const componentsFolderPath = flatDist ? distPath : `${distPath}/${componentsFolder}`;
+  const themesFolderPath = flatDist ? distPath : path.join(distPath, themesFolder);
+  const componentsFolderPath = flatDist ? distPath : path.join(distPath, componentsFolder);
 
   function getThemeFileName(theme: ThemeDefinition) {
     return flatDist ? `${flatDistUiPrefix}theme_${theme.id}` : theme.id;
@@ -266,25 +267,26 @@ export const build = async ({
   if (buildMode === "CONFIG_ONLY") {
     let appDef;
     try {
-      appDef = (await import(process.cwd() + "/src/config")).default;
+      const configPath = path.join(process.cwd(), "src", "config");
+      appDef = (await import(pathToFileURL(configPath).href)).default;
     } catch (e) {
       console.log("couldn't find config");
     }
 
     const themePaths: string[] = [];
     const themes = await getExportedJsObjects<ThemeDefinition>("/src/themes/**.*");
-    const fullDistPath = `${process.cwd()}${distPath}`;
+    const fullDistPath = path.join(process.cwd(), distPath);
     if (themes) {
       for (const theme of themes) {
-        if (!existsSync(process.cwd() + themesFolderPath)) {
-          await mkdir(process.cwd() + themesFolderPath, { recursive: true });
+        if (!existsSync(path.join(process.cwd(), themesFolderPath))) {
+          await mkdir(path.join(process.cwd(), themesFolderPath), { recursive: true });
         }
         await writeFile(
-          `${process.cwd()}${themesFolderPath}/${getThemeFileName(theme)}.json`,
+          path.join(process.cwd(), themesFolderPath, `${getThemeFileName(theme)}.json`),
           JSON.stringify(theme, null, 4),
         );
         themePaths.push(
-          removeLeadingSlashForPath(`${themesFolder}/${getThemeFileName(theme)}.json`),
+          removeLeadingSlashForPath(path.join(themesFolder, `${getThemeFileName(theme)}.json`)),
         );
       }
     }
@@ -299,7 +301,10 @@ export const build = async ({
     if (!withMock) {
       delete configJson.apiInterceptor;
     }
-    await writeFile(`${process.cwd()}${distPath}/config.json`, JSON.stringify(configJson, null, 4));
+    await writeFile(
+      path.join(process.cwd(), distPath, "config.json"),
+      JSON.stringify(configJson, null, 4),
+    );
   } else if (buildMode === "ALL") {
     // const componentPaths: string[] = [];
     //   const components = await getExportedJsObjects<CompoundComponentDef>("/src/components/**.*");
@@ -330,23 +335,23 @@ export const build = async ({
 
   //TODO temp, we should enforce user(who writes the metadata)-added-resources to be put in the resources folder
   if (flatDist) {
-    await rm(`${process.cwd()}${distPath}/resources`, { recursive: true, force: true });
+    await rm(path.join(process.cwd(), distPath, "resources"), { recursive: true, force: true });
   }
   if (!withMock) {
     try {
-      await rm(`${process.cwd()}${distPath}/mockServiceWorker.js`);
+      await rm(path.join(process.cwd(), distPath, "mockServiceWorker.js"));
     } catch (ignored) {}
   }
   if (!withHostingMetaFiles) {
     try {
-      await rm(`${process.cwd()}${distPath}/serve.json`);
+      await rm(path.join(process.cwd(), distPath, "serve.json"));
     } catch (ignored) {}
 
     try {
-      await rm(`${process.cwd()}${distPath}/web.config`);
+      await rm(path.join(process.cwd(), distPath, "web.config"));
     } catch (ignored) {}
     try {
-      await rm(`${process.cwd()}${distPath}/_redirects`);
+      await rm(path.join(process.cwd(), distPath, "_redirects"));
     } catch (ignored) {}
   }
 };

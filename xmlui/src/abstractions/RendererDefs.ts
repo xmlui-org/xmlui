@@ -1,18 +1,19 @@
-import type { CSSProperties, ForwardedRef, ReactNode, RefObject } from "react";
+import type { ForwardedRef, ReactNode, RefObject } from "react";
 
 import type { AppContextObject } from "./AppContextDefs";
 import type {
   ComponentDef,
   ComponentMetadata,
   CompoundComponentDef,
-  DynamicChildComponentDef, ParentRenderContext,
+  DynamicChildComponentDef,
+  ParentRenderContext,
 } from "./ComponentDefs";
 import type { ContainerState } from "./ContainerDefs";
 import type { LookupActionOptions, LookupAsyncFn, LookupSyncFn } from "./ActionDefs";
 import type { AsyncFunction } from "./FunctionDefs";
-import type {ComponentApi} from "../components-core/rendering/ContainerWrapper";
+import type { ComponentApi } from "./ApiDefs";
 
-// This interface defines the renderer context for the exposed components of the 
+// This interface defines the renderer context for the exposed components of the
 // XMLUI framework.
 export interface RendererContext<TMd extends ComponentMetadata = ComponentMetadata>
   extends ComponentRendererContextBase<TMd> {
@@ -71,7 +72,7 @@ export type ValueExtractor = {
   asOptionalBoolean(expression?: any, defValue?: boolean): boolean | undefined;
 
   // Get a CSS size value from an expression
-  asSize(expression?: any): string; 
+  asSize(expression?: any): string;
 };
 
 // This function retrieves an async function for a particular component's specified
@@ -97,7 +98,7 @@ export type RenderChildFn<L extends ComponentDef = ComponentDef> = (
   parentRenderContext?: ParentRenderContext,
   uidInfoRef?: RefObject<Record<string, any>>,
   ref?: ForwardedRef<any>,
-  rest?: Record<string, any>
+  rest?: Record<string, any>,
 ) => ReactNode | ReactNode[];
 
 // Each component is rendered in a particular layout context (for example, within a
@@ -151,8 +152,8 @@ export type ComponentRendererDef<T extends ComponentDef = any> = {
   metadata?: ComponentMetadata;
 };
 
-// Rendering components (turning component definitions into their React node 
-// representation) is a complicated process that requires information describing the 
+// Rendering components (turning component definitions into their React node
+// representation) is a complicated process that requires information describing the
 // actual context. This interface defines the common properties of that context.
 export interface ComponentRendererContextBase<TMd extends ComponentMetadata = ComponentMetadata> {
   // The definition of the component to render

@@ -58,6 +58,11 @@ $themeVars: ();
     }
   }
 
+  .stretch {
+    flex: 1;
+    min-height: 0;
+  }
+
   /* Main axis */
   .justifyItemsStart {
     justify-content: flex-start;

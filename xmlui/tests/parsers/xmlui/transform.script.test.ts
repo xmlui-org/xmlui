@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { assert, describe, expect, it } from "vitest";
 import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
 import {
   type Expression,
@@ -14,7 +14,7 @@ describe("Xmlui transform - script", () => {
     const cd = transformSource(`<Stack><script>   </script></Stack>`) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.children).equal(undefined);
-    expect(cd.script).equal("   ");
+    expect(cd.script).toBeUndefined();
   });
 
   it("Script works with text #1", () => {
@@ -76,38 +76,15 @@ var b = 2;
     expect(cd.script).equal("\nvar a = 1;\nvar b = 2;\n");
   });
 
-  it("Multiple scripts merge #1", () => {
-    const cd = transformSource(`
-      <Stack>
-        <script>var a = 1;</script>
-        <script>var b = 2;</script>
-      </Stack>
-    `) as ComponentDef;
-    expect(cd.type).equal("Stack");
-    expect(cd.script).equal("var a = 1;\nvar b = 2;");
-  });
-
-  it("Multiple scripts merge #2", () => {
-    const cd = transformSource(`
-      <Stack>
-        <script>  var a = 1;  </script>
-        <script>var b = 2;  </script>
-      </Stack>
-    `) as ComponentDef;
-    expect(cd.type).equal("Stack");
-    expect(cd.script).equal("  var a = 1;  \nvar b = 2;  ");
-  });
-
   it("Script works with CompoundComponent", () => {
     const cd = transformSource(`
       <Component name="MyComp">
-        <script>  var a = 1;  </script>
         <script>var b = 2;  </script>
         <Stack/>
       </Component>
     `) as CompoundComponentDef;
     expect((cd.component as any).type).equal("Fragment");
-    expect((cd.component as any).script).equal("  var a = 1;  \nvar b = 2;  ");
+    expect((cd.component as any).script).equal("var b = 2;  ");
     expect((cd.component as any).children?.length).equal(1);
     expect((cd.component as any).children[0].type).equal("Stack");
   });
@@ -277,7 +254,6 @@ var b = 2;
     // --- Assert
     const err = cd.scriptError as Record<string, ModuleErrors[]>;
     expect(Object.keys(err).length).equal(1);
-    console.log(JSON.stringify(err, null, 2));
     expect(err["Main"][0].code).equal("W020");
   });
 

@@ -72,6 +72,12 @@ export const MarkdownMd = createMetadata({
         "This boolean property specifies whether long links should be " +
         "truncated with ellipsis. If set to `true`, links will be displayed " +
         "with a maximum width and overflow will be hidden with text-overflow: ellipsis.",
+    openLinkInNewTab: {
+      description:
+        "This boolean property specifies whether links should open in a new tab. " +
+        "If set to `true`, all links within the markdown will open in a new tab " +
+        "with `target=\"_blank\"`. Links that explicitly specify their own target " +
+        "using the `| target=...` syntax will override this setting.",
       valueType: "boolean",
     },
   },
@@ -194,6 +200,7 @@ export const markdownComponentRenderer = createComponentRenderer(
         showHeadingAnchors={extractValue.asOptionalBoolean(node.props.showHeadingAnchors)}
         grayscale={extractValue.asOptionalBoolean(node.props.grayscale)}
         truncateLinks={extractValue.asOptionalBoolean(node.props.truncateLinks)}
+        openLinkInNewTab={extractValue.asOptionalBoolean(node.props.openLinkInNewTab)}
       >
         {renderedChildren}
       </TransformedMarkdown>
@@ -211,6 +218,7 @@ type TransformedMarkdownProps = {
   showHeadingAnchors?: boolean;
   grayscale?: boolean;
   truncateLinks?: boolean;
+  openLinkInNewTab?: boolean;
 };
 
 const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>(
@@ -225,6 +233,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
       showHeadingAnchors,
       grayscale,
       truncateLinks,
+      openLinkInNewTab,
     }: TransformedMarkdownProps,
     ref,
   ) => {
@@ -270,6 +279,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
         showHeadingAnchors={showHeadingAnchors}
         grayscale={grayscale}
         truncateLinks={truncateLinks}
+        openLinkInNewTab={openLinkInNewTab}
       >
         {markdownContent}
       </Markdown>

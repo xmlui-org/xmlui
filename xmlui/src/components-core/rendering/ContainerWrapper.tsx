@@ -6,6 +6,7 @@ import {
   type RefObject,
   useMemo,
 } from "react";
+import type { ComponentApi } from "../../abstractions/ApiDefs";
 import type { ComponentDef, ParentRenderContext } from "../../abstractions/ComponentDefs";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
 import type { ContainerDispatcher } from "../abstractions/ComponentRenderer";
@@ -35,13 +36,6 @@ export interface ContainerWrapperDef extends ComponentDef {
  * stored as key and value pairs.
  */
 export type ContainerState = Record<string | symbol, any>;
-
-/**
- * Components can provide an API that other components can invoke (using
- * the host component ID). This type defines the shape of a hash object that
- * stores the API endpoints.
- */
-export type ComponentApi = Record<string, ((...args: any[]) => any) | boolean | number | string>;
 
 /**
  * This type declares that function's signature, which registers an exposed

@@ -35,7 +35,6 @@ type ItemWithLabelProps = {
   layoutContext?: LayoutContext;
   testId?: string;
   cloneStyle?: boolean;
-
 };
 export const defaultProps: Pick<ItemWithLabelProps, "labelBreak"> = {
   labelBreak: true,

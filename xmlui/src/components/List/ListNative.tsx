@@ -314,7 +314,17 @@ export const ListNative = forwardRef(function DynamicHeightList(
   const hasHeight = useHasExplicitHeight(parentRef);
   const hasOutsideScroll = scrollRef.current && !hasHeight;
 
-  const scrollElementRef = hasOutsideScroll ? scrollRef : parentRef;
+  // Create a ref for the Virtualizer's scroll container
+  // When using outside scroll, we need a ref that points to the scroll parent
+  const scrollElementRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (hasOutsideScroll && scrollRef.current) {
+      scrollElementRef.current = scrollRef.current;
+    } else if (!hasOutsideScroll && parentRef.current) {
+      scrollElementRef.current = parentRef.current;
+    }
+  }, [hasOutsideScroll, scrollRef.current, parentRef.current]);
 
   const shouldStickToBottom = useRef(scrollAnchor === "bottom");
   const [expanded, setExpanded] = useState<Record<any, boolean>>(EMPTY_OBJECT);
@@ -430,29 +440,23 @@ export const ListNative = forwardRef(function DynamicHeightList(
   );
 
   const scrollToBottom = useEvent(() => {
-    const scrollPaddingTop =
-      parseInt(getComputedStyle(scrollRef.current).scrollPaddingTop, 10) || 0;
     if (rows.length) {
       virtualizerRef.current?.scrollToIndex(rows.length + 1, {
         align: "end",
-        offset: scrollPaddingTop,
+        offset: startMargin,
       });
     }
   });
 
   const scrollToTop = useEvent(() => {
-    const scrollPaddingTop =
-      parseInt(getComputedStyle(scrollRef.current).scrollPaddingTop, 10) || 0;
     if (rows.length) {
-      virtualizerRef.current?.scrollToIndex(0, { align: "start", offset: -scrollPaddingTop });
+      virtualizerRef.current?.scrollToIndex(0, { align: "start", offset: -startMargin });
     }
   });
 
   const scrollToIndex = useEvent((index) => {
-    const scrollPaddingTop =
-      parseInt(getComputedStyle(scrollRef.current).scrollPaddingTop, 10) || 0;
     virtualizerRef.current?.scrollToIndex(index, {
-      offset: -scrollPaddingTop,
+      offset: -startMargin,
     });
   });
 

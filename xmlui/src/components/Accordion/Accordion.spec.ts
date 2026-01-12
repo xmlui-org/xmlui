@@ -43,7 +43,7 @@ test("component renders custom header with headerTemplate prop", async ({ initTe
   await expect(content).not.toBeVisible();
 
   const templatedButton = page.getByText("Click me");
-  await templatedButton.click();
+  await templatedButton.click({delay: 100});
 
   await expect(content).toBeVisible();
 });

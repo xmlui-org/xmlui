@@ -85,6 +85,10 @@ Default is **false**, which indicates a left-to-right layout.
 </App>
 ```
 
+### `stretch` (default: false) [#stretch-default-false]
+
+When set to true, the Stack takes the full height of its parent container. This is particularly useful in desktop layouts where you want content to fill the available vertical space between fixed header and footer elements.
+
 ### `verticalAlignment` (default: "start") [#verticalalignment-default-start]
 
 Manages the vertical content alignment for each child element in the Stack.

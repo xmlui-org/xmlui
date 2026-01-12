@@ -10,10 +10,10 @@ import type {
 } from "react-hot-toast";
 import type { ActionFunction } from "./ActionDefs";
 import type { SetupWorker } from "msw/browser";
-import type { ApiInterceptor } from "../components-core/interception/ApiInterceptor";
+import type { IApiInterceptor } from "../components-core/interception/abstractions";
 import type { AppState } from "../components-core/rendering/appState";
 
-// This interface defines the properties and services of an app context that the 
+// This interface defines the properties and services of an app context that the
 // application components can use when implementing their behavior.
 export type AppContextObject = {
   // Accept other methods
@@ -51,7 +51,7 @@ export type AppContextObject = {
   // This property returns an object with information about the current media size.
   mediaSize: MediaSize;
 
-  // The `QueryClient` object of the react-query library XMLUI uses for data 
+  // The `QueryClient` object of the react-query library XMLUI uses for data
   // fetching purposes
   queryClient: QueryClient | null;
 
@@ -92,7 +92,7 @@ export type AppContextObject = {
   // This function calculates the difference between the current date and the
   // provided one and returns it in a human-readable form, such as "1 month",
   // "2 weeks", etc.
-  
+
   getDateUntilNow: (date?: string | number | Date, nowLabel?: string, time?: string) => string;
 
   // This function converts the input string into a date value and returns
@@ -128,7 +128,7 @@ export type AppContextObject = {
   isThisYear: (date: Date | number) => boolean;
 
   // Formats a date into a human-readable elapsed time string.
-  // Returns strings like "now", "12 seconds ago", "3 hours ago", 
+  // Returns strings like "now", "12 seconds ago", "3 hours ago",
   // "today", "yesterday", "3 weeks ago", etc.
   formatHumanElapsedTime: (date: string | Date) => string;
 
@@ -163,8 +163,8 @@ export type AppContextObject = {
   // ==============================================================================================
   // Notifications and Dialogs
 
-  // Instructs the browser to display a dialog with an optional message, and to 
-  // wait until the user either confirms or cancels the dialog. It returns a 
+  // Instructs the browser to display a dialog with an optional message, and to
+  // wait until the user either confirms or cancels the dialog. It returns a
   // boolean indicating whether OK (`true`) or Cancel (`false`) was selected.
   confirm: (title: string, message?: string, actionLabel?: string) => Promise<boolean>;
 
@@ -233,16 +233,13 @@ export type AppContextObject = {
   capitalize: (s?: string) => string;
   pluralize: (number: number, singular: string, plural: string) => string;
   delay: (timeInMs: number, callback?: any) => Promise<void>;
-  debounce: <F extends (...args: any[]) => any>(
-    delayMs: number,
-    func: F,
-    ...args: any[]
-  ) => void;
+  debounce: <F extends (...args: any[]) => any>(delayMs: number, func: F, ...args: any[]) => void;
   toHashObject: (arr: any[], keyProp: string, valueProp: string) => any;
   findByField: (arr: any[], field: string, value: any) => any;
   readonly embed: { isInIFrame: boolean };
   distinct: (arr: any[]) => any[];
   forceRefreshAnchorScroll: () => void;
+  scrollBookmarkIntoView: (bookmarkId: string, smoothScrolling?: boolean) => void;
 
   // ==============================================================================================
   // AppState Global State Management
@@ -279,9 +276,9 @@ export type LoggedInUserDto = {
 export interface IApiInterceptorContext {
   isMocked: (url: string) => boolean;
   initialized: boolean;
-  forceInitialize: ()=>void;
+  forceInitialize: () => void;
   interceptorWorker: SetupWorker | null;
-  apiInstance: ApiInterceptor | null;
+  apiInstance: IApiInterceptor | null;
 }
 
 type Message = ValueOrFunction<Renderable, Toast>;

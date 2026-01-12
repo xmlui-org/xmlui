@@ -12,6 +12,11 @@ $themeVars: ();
     contain: layout;
   }
 
+  .stretch {
+    flex: 1;
+    min-height: 0;
+  }
+
   .flowContainer {
     display: flex;
     flex-wrap: wrap;
@@ -21,11 +26,12 @@ $themeVars: ();
 
       .flowItem {
         flex-shrink: 0;
+        min-width: 0;
+        max-width: 100%;
 
         & > * {
-          width: 100% !important; //reset the wrapped content's width-like properties to their default
-          min-width: 0 !important;
-          max-width: none !important;
+          width: 100%;
+          min-width: 0;
         }
       }
     }
@@ -58,6 +64,17 @@ $themeVars: ();
   .forceBreak {
     flex-basis: 100%;
     height: 0;
+  }
+
+  /* Cross axis alignment for FlowLayout */
+  .alignItemsStart {
+    align-items: flex-start;
+  }
+  .alignItemsCenter {
+    align-items: center;
+  }
+  .alignItemsEnd {
+    align-items: flex-end;
   }
 }
 

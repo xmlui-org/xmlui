@@ -293,16 +293,24 @@ export function App({
   );
 
   useIsomorphicLayoutEffect(() => {
+    if (window.history.scrollRestoration !== "manual") {
+      window.history.scrollRestoration = "manual";
+    }
+
     if (scrollRestorationEnabled && navigationType === "POP") {
       const key = `xmlui_scroll_${location.key}`;
       const saved = sessionStorage.getItem(key);
+
       if (saved) {
         try {
           const { x, y } = JSON.parse(saved);
-          scrollContainerRef.current?.scrollTo({
-            top: y,
-            left: x,
-            behavior: "instant",
+          
+          requestAnimationFrame(() => {
+              scrollContainerRef.current?.scrollTo({
+                top: y,
+                left: x,
+                behavior: "instant",
+              });
           });
           return;
         } catch (e) {
@@ -310,12 +318,14 @@ export function App({
         }
       }
     }
-    scrollContainerRef.current?.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: "instant", // Optional if you want to skip the scrolling animation
-    });
-  }, [location.pathname, scrollRestorationEnabled, navigationType]);
+    if(navigationType !== "POP"){
+      scrollContainerRef.current?.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "instant", // Optional if you want to skip the scrolling animation
+      });
+    }
+  }, [location.key, scrollRestorationEnabled, navigationType]);
 
   useEffect(() => {
     if (!scrollRestorationEnabled) return;
@@ -331,7 +341,7 @@ export function App({
     el.addEventListener("scroll", saveScroll);
     return () => {
       el.removeEventListener("scroll", saveScroll);
-      saveScroll.cancel();
+      saveScroll.flush();
     };
   }, [scrollRestorationEnabled, location.key, scrollContainerRef]);
 
@@ -428,14 +438,30 @@ export function App({
     </AppHeaderSlot>
   );
 
-  const renderFooterSlot = () => footer !== undefined || safeLayout !== "desktop" ? (
-    <AppFooterSlot
-      className={classnames({ [styles.nonSticky]: !footerSticky })}
-      ref={footerSize.refCallback}
-    >
-      {footer}
-    </AppFooterSlot>
-  ) : null;
+  const renderFooterSlot = () => {
+    // For desktop layout, always render footer wrapper to maintain flex structure
+    // even if footer content is undefined
+    if (safeLayout === "desktop") {
+      return (
+        <AppFooterSlot
+          className={classnames({ [styles.nonSticky]: !footerSticky })}
+          ref={footerSize.refCallback}
+        >
+          {footer}
+        </AppFooterSlot>
+      );
+    }
+    
+    // For other layouts, only render if footer is defined
+    return footer !== undefined ? (
+      <AppFooterSlot
+        className={classnames({ [styles.nonSticky]: !footerSticky })}
+        ref={footerSize.refCallback}
+      >
+        {footer}
+      </AppFooterSlot>
+    ) : null;
+  };
 
   const renderPagesSlot = () => (
     <AppPagesSlot ref={contentScrollRef}>
@@ -739,7 +765,6 @@ const layoutConfigs: Record<AppLayoutType, LayoutConfig> = {
   "desktop": {
     ...baseLayoutConfig,
     containerClasses: [styles.desktop],
-    headerClasses: [styles.sticky],
   },
 };
 

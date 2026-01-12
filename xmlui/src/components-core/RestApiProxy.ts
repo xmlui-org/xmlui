@@ -12,7 +12,7 @@ import { extractParam } from "./utils/extractParam";
 import { randomUUID, readCookie } from "./utils/misc";
 import { GenericBackendError } from "./EngineError";
 import { processStatementQueue } from "./script-runner/process-statement-sync";
-import type { ApiInterceptor } from "./interception/ApiInterceptor";
+import type { IApiInterceptor } from "./interception/abstractions";
 
 type OnProgressFn = (progressEvent: { loaded: number; total?: number; progress?: number }) => void;
 
@@ -30,6 +30,7 @@ export type ApiOperationDef = {
   queryParams?: Record<string, any>;
   headers?: Record<string, any>;
   payloadType?: string;
+  credentials?: "omit" | "same-origin" | "include";
 };
 
 export type UploadOperationDef = ApiOperationDef & {
@@ -58,9 +59,9 @@ function isAxiosResponse(response: AxiosResponse | Response): response is AxiosR
 
 function getContentType(response: AxiosResponse | Response): string {
   if (isAxiosResponse(response)) {
-    return response.headers['content-type'] || response.headers['Content-Type'] || '';
+    return response.headers["content-type"] || response.headers["Content-Type"] || "";
   } else {
-    return response.headers.get('content-type') || '';
+    return response.headers.get("content-type") || "";
   }
 }
 
@@ -68,43 +69,43 @@ function getContentType(response: AxiosResponse | Response): string {
 function isBinaryContentType(contentType: string): boolean {
   const binaryTypes = [
     // Images
-    'image/',
+    "image/",
     // Audio
-    'audio/',
+    "audio/",
     // Video
-    'video/',
+    "video/",
     // Documents
-    'application/pdf',
-    'application/msword',
-    'application/vnd.openxmlformats-officedocument.',
-    'application/vnd.ms-excel',
-    'application/vnd.ms-powerpoint',
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.",
+    "application/vnd.ms-excel",
+    "application/vnd.ms-powerpoint",
     // Archives
-    'application/zip',
-    'application/x-rar-compressed',
-    'application/x-tar',
-    'application/gzip',
-    'application/x-7z-compressed',
+    "application/zip",
+    "application/x-rar-compressed",
+    "application/x-tar",
+    "application/gzip",
+    "application/x-7z-compressed",
     // Other binary
-    'application/octet-stream',
-    'application/x-binary',
+    "application/octet-stream",
+    "application/x-binary",
   ];
-  
-  return binaryTypes.some(type => contentType.toLowerCase().includes(type.toLowerCase()));
+
+  return binaryTypes.some((type) => contentType.toLowerCase().includes(type.toLowerCase()));
 }
 
 // --- Tests if a particular content type returns an ArrayBuffer
 function shouldReturnAsArrayBuffer(contentType: string): boolean {
   const arrayBufferTypes = [
-    'application/zip',
-    'application/x-rar-compressed',
-    'application/x-tar',
-    'application/gzip',
-    'application/x-7z-compressed',
-    'application/x-binary',
+    "application/zip",
+    "application/x-rar-compressed",
+    "application/x-tar",
+    "application/gzip",
+    "application/x-7z-compressed",
+    "application/x-binary",
   ];
-  
-  return arrayBufferTypes.some(type => contentType.toLowerCase().includes(type.toLowerCase()));
+
+  return arrayBufferTypes.some((type) => contentType.toLowerCase().includes(type.toLowerCase()));
 }
 
 async function parseResponseBody(response: AxiosResponse | Response, logError = false) {
@@ -113,7 +114,7 @@ async function parseResponseBody(response: AxiosResponse | Response, logError = 
     resp = response.data;
   } else {
     const contentType = getContentType(response);
-    
+
     // Handle binary content types
     if (isBinaryContentType(contentType)) {
       try {
@@ -131,7 +132,10 @@ async function parseResponseBody(response: AxiosResponse | Response, logError = 
           resp = await response.clone().text();
         } catch (textError) {
           if (logError) {
-            console.error("Failed to parse response as text after binary parsing failed", textError);
+            console.error(
+              "Failed to parse response as text after binary parsing failed",
+              textError,
+            );
           }
         }
       }
@@ -187,8 +191,7 @@ function appendFormFieldValue(
   }
 }
 
-
-const origin = (typeof window !== "undefined" && window.location?.href) || 'http://localhost';
+const origin = (typeof window !== "undefined" && window.location?.href) || "http://localhost";
 const originUrl = new URL(origin);
 function isURLSameOrigin(url: string): boolean {
   const urlObj = new URL(url, origin);
@@ -198,15 +201,14 @@ function isURLSameOrigin(url: string): boolean {
     originUrl.host === urlObj.host &&
     originUrl.port === urlObj.port
   );
-  
 }
 
 export default class RestApiProxy {
   private config: RestAPIAdapterPropsV2;
   private appContext?: AppContextObject;
-  public apiInstance?: ApiInterceptor;
+  public apiInstance?: IApiInterceptor;
 
-  constructor(appContext?: AppContextObject, apiInstance?: ApiInterceptor) {
+  constructor(appContext?: AppContextObject, apiInstance?: IApiInterceptor) {
     const conf = appContext?.appGlobals || { apiUrl: "" };
     const { apiUrl, errorResponseTransform } = conf;
     this.appContext = appContext;
@@ -443,6 +445,11 @@ export default class RestApiProxy {
       operation.payloadType,
       contextParams,
     ) || "json",
+    credentials = this.extractParam(
+      resolveBindingExpressions,
+      operation.credentials,
+      contextParams,
+    ),
     onUploadProgress,
     parseResponse = this.tryParseResponse,
     transactionId,
@@ -457,6 +464,7 @@ export default class RestApiProxy {
     rawBody?: any;
     headers?: Record<string, string>;
     payloadType?: "form" | "multipart-form" | "json";
+    credentials?: "omit" | "same-origin" | "include";
     onUploadProgress?: OnProgressFn;
     parseResponse?: (response: Response | AxiosResponse, logError: boolean) => any;
     transactionId: string;
@@ -477,7 +485,7 @@ export default class RestApiProxy {
 
     if (this.appContext.appGlobals?.withXSRFToken !== false && isURLSameOrigin(url)) {
       const xsrfToken = readCookie("XSRF-TOKEN");
-      if(xsrfToken) {
+      if (xsrfToken) {
         aggregatedHeaders["X-XSRF-TOKEN"] = xsrfToken;
       }
     }
@@ -510,6 +518,7 @@ export default class RestApiProxy {
       headers: aggregatedHeaders,
       signal: abortSignal,
       body: requestBody,
+      ...(credentials && { credentials }),
     };
     if (onUploadProgress) {
       //console.log("Falling back to axios. Reason: onUploadProgress specified");
@@ -521,6 +530,7 @@ export default class RestApiProxy {
           headers: aggregatedHeaders,
           data: options.body,
           onUploadProgress,
+          withCredentials: credentials === "include",
         });
         return await parseResponse(
           response,

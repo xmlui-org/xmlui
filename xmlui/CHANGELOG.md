@@ -1,5 +1,39 @@
 # xmlui
 
+## 0.11.27
+
+### Patch Changes
+
+- bc1090d: Add experimental bookmark behavior
+- fd9a901: feat: add context, line-col numbers to script parse errors
+- 79701ad: Add "stretch" property to Stack
+- bc67363: Add scroll APIs to Stack, Card, and FlowLayout
+- ff49047: Variables defined in <script> override variables in component attributes
+- 79701ad: Add stretch property to Stack, Splitter, and FlowLayout
+- 357946d: Fix vertically-aligned Text with overflowType="ellipsis"
+- 0d04660: Fix FlowLayout issue with nested Text using ellipsis
+- 539b718: Fix the issues with the List scroll API
+
+## 0.11.26
+
+### Patch Changes
+
+- b736b85: Add verticalAlignment support to FlowLayout
+- 9ebc8e5: feat: implement formBindingBehavior
+- 01ef62b: Clip pixel artifacts experienced with Text overflowMode
+- 5d715a3: Fix issues with empty script tag rendering
+- bd035dd: Fix state variables
+
+## 0.11.25
+
+### Patch Changes
+
+- 0abc5a0: Add Add status/progress to APICall
+- 42c9bf8: Make valueTemplate of Select available in single-select mode
+- bc0f328: fix: building in CONFIG_ONLY mode handles windows paths
+- c4ac21c: Fix standalone app component discovery in templates
+- 8b5c6e8: Add credentials option to DataSource/APICall
+
 ## 0.11.24
 
 ### Patch Changes
