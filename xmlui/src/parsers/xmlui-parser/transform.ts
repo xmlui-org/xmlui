@@ -785,7 +785,6 @@ export function nodeToComponentDef(
         textValue = textValue.slice(1, -1);
       } else if (child.kind === SyntaxKind.CData) {
         shouldUseCData = true;
-      } else if (child.kind === SyntaxKind.TextNode) {
       }
 
       if (shouldUseTextNodeElement) {
@@ -798,6 +797,8 @@ export function nodeToComponentDef(
         newChild = {
           kind: SyntaxKind.TextNode,
           text: textValue,
+          pos: child.pos,
+          end: child.end,
         } as TransformNode;
       }
       childNodes[i] = newChild;
@@ -974,24 +975,32 @@ export function nodeToComponentDef(
 
       if (node.kind === SyntaxKind.StringLiteral && nextNode.kind === SyntaxKind.CData) {
         childNodes[i - 1] = {
+          pos: node.pos,
+          end: nextNode.end,
           kind: SyntaxKind.CData,
           text: getText(node).slice(1, -1) + getText(nextNode),
         } as TransformNode;
         childNodes.pop();
       } else if (node.kind === SyntaxKind.CData && nextNode.kind === SyntaxKind.StringLiteral) {
         childNodes[i - 1] = {
+          pos: node.pos,
+          end: nextNode.end,
           kind: SyntaxKind.CData,
           text: getText(node) + getText(nextNode).slice(1, -1),
         } as TransformNode;
         childNodes.pop();
       } else if (node.kind === SyntaxKind.CData && nextNode.kind === SyntaxKind.TextNode) {
         childNodes[i - 1] = {
+          pos: node.pos,
+          end: nextNode.end,
           kind: SyntaxKind.CData,
           text: getText(node) + getText(nextNode),
         } as TransformNode;
         childNodes.pop();
       } else if (node.kind === SyntaxKind.CData && nextNode.kind === SyntaxKind.CData) {
         childNodes[i - 1] = {
+          pos: node.pos,
+          end: nextNode.end,
           kind: SyntaxKind.CData,
           text: getText(node) + getText(nextNode),
         } as TransformNode;
@@ -1001,12 +1010,16 @@ export function nodeToComponentDef(
           node.text = getText(node).trimEnd();
         }
         childNodes[i - 1] = {
+          pos: node.pos,
+          end: nextNode.end,
           kind: SyntaxKind.TextNode,
           text: getText(node) + getText(nextNode),
         } as TransformNode;
         childNodes.pop();
       } else if (node.kind === SyntaxKind.TextNode && nextNode.kind === SyntaxKind.CData) {
         childNodes[i - 1] = {
+          pos: node.pos,
+          end: nextNode.end,
           kind: SyntaxKind.CData,
           text: getText(node) + getText(nextNode),
         } as TransformNode;
@@ -1047,8 +1060,8 @@ export function nodeToComponentDef(
             diagPos = afterQuotePos + errMsg.position;
             diagEnd = afterQuotePos + errMsg.end;
           } else if (nodeContainingValue.kind === SyntaxKind.TextNode) {
-            diagPos = errMsg.position;
-            diagEnd = errMsg.end;
+            diagPos = nodeContainingValue.pos + errMsg.position;
+            diagEnd = nodeContainingValue.pos + errMsg.end;
           }
           reportError(diag, diagPos, diagEnd);
         } else {
