@@ -438,14 +438,30 @@ export function App({
     </AppHeaderSlot>
   );
 
-  const renderFooterSlot = () => footer !== undefined || safeLayout !== "desktop" ? (
-    <AppFooterSlot
-      className={classnames({ [styles.nonSticky]: !footerSticky })}
-      ref={footerSize.refCallback}
-    >
-      {footer}
-    </AppFooterSlot>
-  ) : null;
+  const renderFooterSlot = () => {
+    // For desktop layout, always render footer wrapper to maintain flex structure
+    // even if footer content is undefined
+    if (safeLayout === "desktop") {
+      return (
+        <AppFooterSlot
+          className={classnames({ [styles.nonSticky]: !footerSticky })}
+          ref={footerSize.refCallback}
+        >
+          {footer}
+        </AppFooterSlot>
+      );
+    }
+    
+    // For other layouts, only render if footer is defined
+    return footer !== undefined ? (
+      <AppFooterSlot
+        className={classnames({ [styles.nonSticky]: !footerSticky })}
+        ref={footerSize.refCallback}
+      >
+        {footer}
+      </AppFooterSlot>
+    ) : null;
+  };
 
   const renderPagesSlot = () => (
     <AppPagesSlot ref={contentScrollRef}>
@@ -749,7 +765,6 @@ const layoutConfigs: Record<AppLayoutType, LayoutConfig> = {
   "desktop": {
     ...baseLayoutConfig,
     containerClasses: [styles.desktop],
-    headerClasses: [styles.sticky],
   },
 };
 

@@ -318,6 +318,95 @@ test.describe("Basic functionality", () => {
 });
 
 // =============================================================================
+// STRETCH PROPERTY TESTS
+// =============================================================================
+
+test.describe("stretch property", () => {
+  test("stretch='true' makes FlowLayout take full height of parent", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack height="400px" testId="container">
+        <FlowLayout stretch="true" testId="flowLayout">
+          <Text testId="item1" width="100px">Item 1</Text>
+          <Text testId="item2" width="100px">Item 2</Text>
+        </FlowLayout>
+      </VStack>
+    `);
+
+    const container = page.getByTestId("container");
+    const flowLayout = page.getByTestId("flowLayout");
+    
+    const containerBounds = await getBounds(container);
+    const flowLayoutBounds = await getBounds(flowLayout);
+    
+    // FlowLayout should take the full height of its parent container
+    const tolerance = 5;
+    expect(Math.abs(flowLayoutBounds.height - containerBounds.height)).toBeLessThan(tolerance);
+  });
+
+  test("stretch='false' does not stretch FlowLayout", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack height="400px" testId="container">
+        <FlowLayout stretch="false" height="200px" testId="flowLayout">
+          <Text testId="item1" width="100px">Item 1</Text>
+          <Text testId="item2" width="100px">Item 2</Text>
+        </FlowLayout>
+      </VStack>
+    `);
+
+    const flowLayout = page.getByTestId("flowLayout");
+    const flowLayoutBounds = await getBounds(flowLayout);
+    
+    // FlowLayout should maintain its explicit height
+    expect(flowLayoutBounds.height).toBe(200);
+  });
+
+  test("defaults to stretch='false'", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack height="400px" testId="container">
+        <FlowLayout height="200px" testId="flowLayout">
+          <Text testId="item1" width="100px">Item 1</Text>
+          <Text testId="item2" width="100px">Item 2</Text>
+        </FlowLayout>
+      </VStack>
+    `);
+
+    const flowLayout = page.getByTestId("flowLayout");
+    const flowLayoutBounds = await getBounds(flowLayout);
+    
+    // Default should not stretch, maintaining explicit height
+    expect(flowLayoutBounds.height).toBe(200);
+  });
+
+  test("stretch fills available space in complex layout", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack height="500px" testId="container">
+        <Stack height="100px" backgroundColor="lightblue" testId="header">Header</Stack>
+        <FlowLayout stretch="true" testId="flowLayout">
+          <Text testId="item1" width="100px">Item 1</Text>
+          <Text testId="item2" width="100px">Item 2</Text>
+        </FlowLayout>
+        <Stack height="100px" backgroundColor="lightcoral" testId="footer">Footer</Stack>
+      </VStack>
+    `);
+
+    const container = page.getByTestId("container");
+    const header = page.getByTestId("header");
+    const footer = page.getByTestId("footer");
+    const flowLayout = page.getByTestId("flowLayout");
+    
+    const containerBounds = await getBounds(container);
+    const headerBounds = await getBounds(header);
+    const footerBounds = await getBounds(footer);
+    const flowLayoutBounds = await getBounds(flowLayout);
+    
+    // FlowLayout should fill the space between header and footer
+    const expectedHeight = containerBounds.height - headerBounds.height - footerBounds.height;
+    const tolerance = 50; // Increased tolerance to account for gaps, margins, etc.
+    expect(Math.abs(flowLayoutBounds.height - expectedHeight)).toBeLessThan(tolerance);
+  });
+});
+
+// =============================================================================
 // EDGE CASE TESTS
 // =============================================================================
 
