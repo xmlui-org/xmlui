@@ -239,6 +239,7 @@ export type AppContextObject = {
   readonly embed: { isInIFrame: boolean };
   distinct: (arr: any[]) => any[];
   forceRefreshAnchorScroll: () => void;
+  scrollBookmarkIntoView: (bookmarkId: string, smoothScrolling?: boolean) => void;
 
   // ==============================================================================================
   // AppState Global State Management
