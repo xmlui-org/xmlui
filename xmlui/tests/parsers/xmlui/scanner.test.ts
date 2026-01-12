@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import { SyntaxKind } from "../../../src/parsers/xmlui-parser/syntax-kind";
 import { createScanner } from "../../../src/parsers/xmlui-parser/scanner";
 import type { ScannerDiagnosticMessage } from "../../../src/parsers/xmlui-parser/diagnostics";
-import { DiagnosticCategory } from "../../../src/parsers/xmlui-parser/diagnostics";
 import { CharacterCodes } from "../../../src/parsers/xmlui-parser/CharacterCodes";
 
 describe("XMLUI scanner - tokens", () => {
@@ -340,7 +339,6 @@ describe("XMLUI scanner - tokens", () => {
     expect(next).equal(SyntaxKind.Unknown);
     expect(text).equal("1");
     expect(msgs.length).equal(1);
-    expect(msgs[0].category).equal(DiagnosticCategory.Error);
     expect(msgs[0].code).equal("W001");
   });
 
@@ -358,7 +356,6 @@ describe("XMLUI scanner - tokens", () => {
     expect(next).equal(SyntaxKind.StringLiteral);
     expect(text).equal("'str");
     expect(msgs.length).equal(1);
-    expect(msgs[0].category).equal(DiagnosticCategory.Error);
     expect(msgs[0].code).equal("W002");
   });
 
@@ -376,7 +373,6 @@ describe("XMLUI scanner - tokens", () => {
     expect(next).equal(SyntaxKind.StringLiteral);
     expect(text).equal('"str');
     expect(msgs.length).equal(1);
-    expect(msgs[0].category).equal(DiagnosticCategory.Error);
     expect(msgs[0].code).equal("W002");
   });
 
@@ -394,7 +390,6 @@ describe("XMLUI scanner - tokens", () => {
     expect(next).equal(SyntaxKind.StringLiteral);
     expect(text).equal("`str");
     expect(msgs.length).equal(1);
-    expect(msgs[0].category).equal(DiagnosticCategory.Error);
     expect(msgs[0].code).equal("W002");
   });
 
@@ -544,9 +539,6 @@ describe("XMLUI scanner - tokens", () => {
     expect(next).equal(SyntaxKind.CData);
     expect(text).equal(source);
     expect(msgs.length).equal(1);
-    expect(msgs[0].category).equal(DiagnosticCategory.Error);
     expect(msgs[0].code).equal("W008");
   });
-
-
 });

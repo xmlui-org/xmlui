@@ -182,6 +182,7 @@ export const ErrCodesTransform = {
   singleRootElem: "T001",
   compDefNameUppercase: "T002",
   compDefNameExp: "T003",
+  multipleScriptTags: "T004",
   compDefNesedElem: "T005",
   nestedCompDefs: "T006",
   invalidAttrName: "T007",
@@ -224,6 +225,10 @@ export const DIAGS_TRANSFORM = {
   compDefNameExp: {
     code: ErrCodesTransform.compDefNameExp,
     message: "A reusable component must have a non-empty name.",
+  },
+  multipleScriptTags: {
+    code: ErrCodesTransform.multipleScriptTags,
+    message: "Cannot have multiple <script> tags in the same tag.",
   },
   compDefNesedElem: {
     code: ErrCodesTransform.compDefNesedElem,

@@ -6,6 +6,7 @@ import { createScanner } from "./scanner";
 import { SyntaxKind, getSyntaxKindStrRepr } from "./syntax-kind";
 import { tagNameNodesWithoutErrorsMatch } from "./utils";
 import { ErrCodesParser, DIAGS_PARSER } from "./diagnostics";
+import { createDocumentCursor } from "../../components-core/xmlui-parser";
 
 type IncompleteNode = {
   children: Node[];
@@ -41,19 +42,6 @@ const RECOVER_CLOSE_TAG = [
   SyntaxKind.Script,
 ] as const;
 
-const needsExtendedContext = [
-  ErrCodesParser.unexpectedCloseTag,
-  ErrCodesParser.expCloseStartWithName,
-  ErrCodesParser.expCloseStart,
-  ErrCodesParser.tagNameMismatch,
-  ErrCodesParser.expEnd,
-  ErrCodesParser.expTagName,
-  ErrCodesParser.expTagOpen,
-  ErrCodesParser.expEndOrClose,
-  ErrCodesParser.expTagNameAfterNamespace,
-  ErrCodesParser.expTagNameAfterCloseStart,
-];
-
 export function createXmlUiParser(source: string): {
   parse: () => ParseResult;
   getText: GetText;
@@ -66,6 +54,7 @@ export function createXmlUiParser(source: string): {
 }
 
 export function parseXmlUiMarkup(text: string): ParseResult {
+  const cursor = createDocumentCursor(text);
   const errors: ParserDiag[] = [];
   const parents: (IncompleteNode | Node)[] = [];
   let peekedToken: Node | undefined;
@@ -385,57 +374,10 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
   }
 
-  function getContextWithSurroundingLines(
-    pos: number,
-    end: number,
-    surroundingContextLines: number,
-  ): { contextPos: number; contextEnd: number } {
-    let newlinesFound: number;
-    let cursor: number;
-
-    let contextPos: number;
-    cursor = pos;
-    newlinesFound = 0;
-    while (cursor >= 0) {
-      if (text[cursor] === "\n") {
-        newlinesFound++;
-        if (newlinesFound > surroundingContextLines) {
-          break;
-        }
-      }
-      cursor--;
-    }
-    contextPos = cursor + 1;
-
-    let contextEnd: number;
-    cursor = end;
-    newlinesFound = 0;
-    while (cursor < text.length) {
-      if (text[cursor] === "\n") {
-        newlinesFound++;
-        if (newlinesFound > surroundingContextLines) {
-          break;
-        }
-        cursor++;
-      } else if (text[cursor] === "\r" && text[cursor + 1] === "\n") {
-        newlinesFound++;
-        if (newlinesFound > surroundingContextLines) {
-          break;
-        }
-        cursor += 2;
-      } else {
-        cursor++;
-      }
-    }
-    contextEnd = cursor;
-
-    return { contextPos, contextEnd };
-  }
-
   function error({ code, message }: ParserDiagPositionless) {
     const { pos, end } = peek();
 
-    const { contextPos, contextEnd } = getContextWithSurroundingLines(pos, end, 1);
+    const { contextPos, contextEnd } = cursor.getSurroundingContext(pos, end, 1);
 
     errors.push({
       code,
@@ -448,7 +390,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
   }
 
   function errorAt({ code, message }: ParserDiagPositionless, pos: number, end: number) {
-    const { contextPos, contextEnd } = getContextWithSurroundingLines(pos, end, 1);
+    const { contextPos, contextEnd } = cursor.getSurroundingContext(pos, end, 1);
 
     errors.push({
       code,
@@ -665,7 +607,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         startNode();
         node.children!.push(token);
 
-        const { contextPos, contextEnd } = getContextWithSurroundingLines(pos, badPrefixEnd, 0);
+        const { contextPos, contextEnd } = cursor.getSurroundingContext(pos, badPrefixEnd, 0);
         errors.push({
           code: err.code,
           message: err.message,

@@ -1,6 +1,6 @@
 import { describe, expect, it, assert } from "vitest";
 import { transformSource } from "./xmlui";
-import { GeneralDiag } from "../../../src/parsers/xmlui-parser";
+import { ErrCodesTransform, GeneralDiag, TransformDiag } from "../../../src/parsers/xmlui-parser";
 
 describe("Xmlui transform - errors", () => {
   it("Missing name in compound component", () => {
@@ -318,6 +318,20 @@ describe("Xmlui transform - errors", () => {
     }
   });
 
+  it("Multiple script tags errors", () => {
+    try {
+      transformSource(`
+        <Stack>
+          <script>var a = 1;</script>
+          <script>var b = 2;</script>
+        </Stack>
+      `);
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect((err as TransformDiag).code).toBe(ErrCodesTransform.multipleScriptTags);
+    }
+  });
+
   it("throws script errors in script tag", () => {
     try {
       transformSource(`
@@ -363,6 +377,18 @@ onSubmit="
 
   it("script error in content text has correct pos", () => {
     const src = `<Form><event name="submit">console.log(); }</event></Form>`;
+    try {
+      transformSource(src);
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(src[(err as GeneralDiag).pos]).toBe("}");
+    }
+  });
+
+  it.todo("script error in content text as str literal has correct pos", () => {
+    const src = `<App>
+  <event name="click">"console.log(); }"</event>
+</App>`;
     try {
       transformSource(src);
       assert.fail("Exception expected");

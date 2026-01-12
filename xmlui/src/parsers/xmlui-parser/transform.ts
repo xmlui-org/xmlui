@@ -252,10 +252,15 @@ export function nodeToComponentDef(
     });
     const childNodes = getChildNodes(element);
 
+    let hasScriptNode = false;
     // --- Process child nodes
     childNodes.forEach((child: Node) => {
       if (child.kind === SyntaxKind.Script) {
+        if (hasScriptNode) {
+          reportError(DIAGS_TRANSFORM.multipleScriptTags, child.pos, child.end);
+        }
         processScriptTag(comp, child, getText);
+        hasScriptNode = true;
         return;
       }
 
