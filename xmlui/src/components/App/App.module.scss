@@ -298,8 +298,9 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       .pageContentContainer {
         flex: 1;
         min-height: 0;
-        overflow: auto;
-        scrollbar-gutter: stable both-edges;
+        overflow: hidden; // Children with star sizing handle their own scrolling
+        display: flex;
+        flex-direction: column;
       }
     }
 
