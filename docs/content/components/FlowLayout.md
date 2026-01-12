@@ -118,6 +118,16 @@ The `rowGap` property specifies the space between the `FlowLayout` rows; it over
 You can observe no gap between the items in a single row of the `FlowLayout`, as `rowGap` keeps the gap within a row intact:
 ```
 
+### `stretch` (default: false) [#stretch-default-false]
+
+When set to true, the FlowLayout takes the full height of its parent container. This is particularly useful in desktop layouts where you want content to fill the available vertical space between fixed header and footer elements.
+
+### `verticalAlignment` (default: "start") [#verticalalignment-default-start]
+
+Manages the vertical content alignment for each child element within the same row. This aligns items along the cross-axis of the flex container.
+
+Available values: `start` **(default)**, `center`, `end`
+
 ## Events [#events]
 
 This component does not have any events.

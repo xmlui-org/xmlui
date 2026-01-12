@@ -1898,7 +1898,7 @@ export default {
   },
   "APICall": {
     "status": "stable",
-    "description": "`APICall` creates, updates or deletes data on the backend, versus [`DataSource`](/components/DataSource) which fetches data. Unlike DataSource, APICall doesn't automatically execute - you must trigger it manually with the `execute()` method, typically from form submissions or button clicks.",
+    "description": "`APICall` creates, updates or deletes data on the backend, versus [`DataSource`](/components/DataSource) which fetches data. Unlike DataSource, APICall doesn't automatically execute - you must trigger it manually with the `execute()` method, typically from form submissions or button clicks. See also [Actions.callAPI](/globals#actionscallapi).",
     "props": {
       "method": {
         "description": "The method of data manipulation can be done via setting this property.",
@@ -1934,6 +1934,24 @@ export default {
       },
       "headers": {
         "description": "You can optionally define request header values as key-value pairs, where the key is the ID of the particular header and the value is that header's corresponding value."
+      },
+      "credentials": {
+        "description": "Controls whether cookies and other credentials are sent with the request. Set to `\"include\"` to send credentials in cross-origin requests (requires `Access-Control-Allow-Credentials: true` header on the server).",
+        "availableValues": [
+          {
+            "value": "omit",
+            "description": "Never send credentials"
+          },
+          {
+            "value": "same-origin",
+            "description": "Send credentials only for same-origin requests (default browser behavior)"
+          },
+          {
+            "value": "include",
+            "description": "Always send credentials, even for cross-origin requests"
+          }
+        ],
+        "valueType": "string"
       },
       "confirmTitle": {
         "description": "This optional string sets the title in the confirmation dialog that is displayed before the `APICall` is executed.",
@@ -2026,6 +2044,22 @@ export default {
         "parameters": {
           "params": "An arbitrary number of parameters that can be used in the API call."
         }
+      },
+      "inProgress": {
+        "description": "Boolean flag indicating whether the API call is currently in progress.",
+        "signature": "inProgress: boolean"
+      },
+      "loaded": {
+        "description": "Boolean flag indicating whether at least one successful API call has completed.",
+        "signature": "loaded: boolean"
+      },
+      "lastResult": {
+        "description": "The result from the most recent successful API call execution.",
+        "signature": "lastResult: any"
+      },
+      "lastError": {
+        "description": "The error from the most recent failed API call execution.",
+        "signature": "lastError: any"
       }
     }
   },
@@ -4231,6 +4265,24 @@ export default {
         "description": "Set request headers. Pass an object whose keys are header names and values are header values.",
         "valueType": "any"
       },
+      "credentials": {
+        "description": "Controls whether cookies and other credentials are sent with the request. Set to `\"include\"` to send credentials in cross-origin requests (requires `Access-Control-Allow-Credentials: true` header on the server).",
+        "availableValues": [
+          {
+            "value": "omit",
+            "description": "Never send credentials"
+          },
+          {
+            "value": "same-origin",
+            "description": "Send credentials only for same-origin requests (default browser behavior)"
+          },
+          {
+            "value": "include",
+            "description": "Always send credentials, even for cross-origin requests"
+          }
+        ],
+        "valueType": "string"
+      },
       "pollIntervalInSeconds": {
         "description": "Set the interval for periodic data fetching. If the data changes on refresh, XMLUI will re-render components that refer directly or indirectly to the `DataSource`. If not set or set to zero, the component does not poll for data.",
         "valueType": "number"
@@ -5704,6 +5756,16 @@ export default {
       "rowGap": {
         "description": "The `rowGap` property specifies the space between the FlowLayout rows; it overrides the `gap` value.",
         "defaultValue": "$gap-normal"
+      },
+      "verticalAlignment": {
+        "description": "Manages the vertical content alignment for each child element within the same row. This aligns items along the cross-axis of the flex container.",
+        "availableValues": [
+          "start",
+          "center",
+          "end"
+        ],
+        "valueType": "string",
+        "defaultValue": "start"
       }
     },
     "themeVars": []
@@ -11035,6 +11097,8 @@ export default {
       "paddingBottom-Ol-markdown": "var(--xmlui-paddingBottom-Ol-markdown, var(--xmlui-paddingVertical-Ol-markdown, var(--xmlui-padding-Ol-markdown)))",
       "marginTop-Ol-markdown": "var(--xmlui-marginTop-Ol-markdown)",
       "marginBottom-Ol-markdown": "var(--xmlui-marginBottom-Ol-markdown)",
+      "marginLeft-Ol-markdown": "var(--xmlui-marginLeft-Ol-markdown)",
+      "marginRight-Ol-markdown": "var(--xmlui-marginRight-Ol-markdown)",
       "border-Ul-markdown": "var(--xmlui-border-Ul-markdown)",
       "borderHorizontal-Ul-markdown": "var(--xmlui-borderHorizontal-Ul-markdown, var(--xmlui-border-Ul-markdown))",
       "borderVertical-Ul-markdown": "var(--xmlui-borderVertical-Ul-markdown, var(--xmlui-border-Ul-markdown))",
@@ -11237,6 +11301,10 @@ export default {
       "marginRight-Ul-markdown": "$space-0",
       "marginTop-Ul-markdown": "$space-2_5",
       "marginBottom-Ul-markdown": "$space-5",
+      "marginLeft-Ol-markdown": "$space-8",
+      "marginRight-Ol-markdown": "$space-0",
+      "marginTop-Ol-markdown": "$space-2_5",
+      "marginBottom-Ol-markdown": "$space-5",
       "marginTop-Li-markdown": "$space-2_5",
       "marginBottom-Li-markdown": "$space-2_5",
       "marginTop-Image-markdown": "$space-6",
@@ -11330,10 +11398,16 @@ export default {
     },
     "events": {
       "open": {
-        "description": "This event is fired when the `ModalDialog` is opened either via a `when` or an imperative API call (`open()`)."
+        "description": "This event is fired when the `ModalDialog` is opened either via a `when` or an imperative API call (`open()`).",
+        "signature": "open(...params: any[]): void",
+        "parameters": {
+          "params": "Parameters passed to the open() method, accessible via $param and $params context variables."
+        }
       },
       "close": {
-        "description": "This event is fired when the close button is pressed or the user clicks outside the `ModalDialog`."
+        "description": "This event is fired when the close button is pressed or the user clicks outside the `ModalDialog`.",
+        "signature": "close(): void",
+        "parameters": {}
       }
     },
     "apis": {
@@ -12170,6 +12244,11 @@ export default {
       "fallbackPath": {
         "description": "The fallback path when the current URL does not match any of the paths of the pages.",
         "defaultValue": "/"
+      },
+      "defaultScrollRestoration": {
+        "description": "When set to true, the page scroll position is restored when navigating back via browser history.",
+        "type": "boolean",
+        "defaultValue": false
       }
     },
     "themeVars": {
@@ -12305,10 +12384,18 @@ export default {
     },
     "events": {
       "pageDidChange": {
-        "description": "Fired when the current page changes"
+        "description": "Fired when the current page changes",
+        "signature": "pageDidChange(pageIndex: number): void",
+        "parameters": {
+          "pageIndex": "The new page index (0-based)."
+        }
       },
       "pageSizeDidChange": {
-        "description": "Fired when the page size changes"
+        "description": "Fired when the page size changes",
+        "signature": "pageSizeDidChange(pageSize: number): void",
+        "parameters": {
+          "pageSize": "The new page size."
+        }
       }
     },
     "apis": {
@@ -12409,19 +12496,39 @@ export default {
     "nonVisual": true,
     "events": {
       "willProcess": {
-        "description": "This event is triggered to process a particular item."
+        "description": "This event is triggered to process a particular item.",
+        "signature": "willProcess(item: any): void | boolean",
+        "parameters": {
+          "item": "The item about to be processed."
+        }
       },
       "process": {
-        "description": "This event is fired to process the next item in the queue. If the processing cannot proceed because of some error, raise an exception, and the queue will handle that."
+        "description": "This event is fired to process the next item in the queue. If the processing cannot proceed because of some error, raise an exception, and the queue will handle that.",
+        "signature": "process(item: any): any",
+        "parameters": {
+          "item": "The item to process."
+        }
       },
       "didProcess": {
-        "description": "This event is fired when the processing of a queued item has been successfully processed."
+        "description": "This event is fired when the processing of a queued item has been successfully processed.",
+        "signature": "didProcess(item: any, result: any): void",
+        "parameters": {
+          "item": "The item that was processed.",
+          "result": "The result of the processing operation."
+        }
       },
       "processError": {
-        "description": "This event is fired when processing an item raises an error. The event handler method receives two parameters. The first is the error raised during the processing of the item; the second is an object with these properties:"
+        "description": "This event is fired when processing an item raises an error. The event handler method receives two parameters. The first is the error raised during the processing of the item; the second is an object with these properties:",
+        "signature": "processError(error: Error, context: { item: any, itemId: string }): void",
+        "parameters": {
+          "error": "The error that occurred during processing.",
+          "context": "An object containing the item and itemId that failed processing."
+        }
       },
       "complete": {
-        "description": "The queue fires this event when the queue gets empty after processing all items. The event handler has no arguments."
+        "description": "The queue fires this event when the queue gets empty after processing all items. The event handler has no arguments.",
+        "signature": "complete(): void",
+        "parameters": {}
       }
     },
     "apis": {
@@ -12597,7 +12704,11 @@ export default {
     },
     "events": {
       "eventArrived": {
-        "description": "This event is raised when data arrives from the backend using long-polling."
+        "description": "This event is raised when data arrives from the backend using long-polling.",
+        "signature": "eventArrived(data: any): void",
+        "parameters": {
+          "data": "The data received from the backend."
+        }
       }
     }
   },
@@ -12681,7 +12792,9 @@ export default {
         }
       },
       "willOpen": {
-        "description": "This event fires when the `ResponsiveBar` overflow dropdown menu is about to be opened. You can prevent opening the menu by returning `false` from the event handler. Otherwise, the menu will open at the end of the event handler like normal."
+        "description": "This event fires when the `ResponsiveBar` overflow dropdown menu is about to be opened. You can prevent opening the menu by returning `false` from the event handler. Otherwise, the menu will open at the end of the event handler like normal.",
+        "signature": "willOpen(): boolean | void",
+        "parameters": {}
       }
     },
     "apis": {
@@ -12790,7 +12903,7 @@ export default {
         "valueType": "ComponentDef"
       },
       "valueTemplate": {
-        "description": "This property allows replacing the default template to display a selected value when multiple selections (`multiSelect` is `true`) are enabled.",
+        "description": "This property allows replacing the default template to display a selected value. It works in both single-select and multi-select modes (`multiSelect` is `true`).",
         "valueType": "ComponentDef"
       },
       "dropdownHeight": {
@@ -12884,7 +12997,7 @@ export default {
         "description": "Represents the current option's data (label and value properties)"
       },
       "$itemContext": {
-        "description": "Provides utility methods like `removeItem()` for multi-select scenarios"
+        "description": "Provides the `removeItem()` method for multi-select scenarios"
       },
       "$group": {
         "description": "Group name when using `groupBy` (available in group header templates)"
@@ -13387,7 +13500,11 @@ export default {
     },
     "events": {
       "resize": {
-        "description": "This event fires when the component is resized."
+        "description": "This event fires when the component is resized.",
+        "signature": "resize(primarySize: number): void",
+        "parameters": {
+          "primarySize": "The new size of the primary panel in pixels."
+        }
       }
     },
     "themeVars": {
@@ -13616,7 +13733,11 @@ export default {
     },
     "events": {
       "resize": {
-        "description": "This event fires when the component is resized."
+        "description": "This event fires when the component is resized.",
+        "signature": "resize(primarySize: number): void",
+        "parameters": {
+          "primarySize": "The new size of the primary panel in pixels."
+        }
       }
     },
     "themeVars": {
@@ -13693,7 +13814,11 @@ export default {
     },
     "events": {
       "resize": {
-        "description": "This event fires when the component is resized."
+        "description": "This event fires when the component is resized.",
+        "signature": "resize(primarySize: number): void",
+        "parameters": {
+          "primarySize": "The new size of the primary panel in pixels."
+        }
       }
     },
     "themeVars": {
@@ -13786,6 +13911,8 @@ export default {
       },
       "mounted": {
         "description": "Reserved for future use",
+        "signature": "mounted(): void",
+        "parameters": {},
         "isInternal": true
       }
     },
@@ -13860,6 +13987,8 @@ export default {
       },
       "mounted": {
         "description": "Reserved for future use",
+        "signature": "mounted(): void",
+        "parameters": {},
         "isInternal": true
       }
     },
@@ -13935,6 +14064,8 @@ export default {
       },
       "mounted": {
         "description": "Reserved for future use",
+        "signature": "mounted(): void",
+        "parameters": {},
         "isInternal": true
       }
     },
@@ -14010,6 +14141,8 @@ export default {
       },
       "mounted": {
         "description": "Reserved for future use",
+        "signature": "mounted(): void",
+        "parameters": {},
         "isInternal": true
       }
     },
@@ -14085,6 +14218,8 @@ export default {
       },
       "mounted": {
         "description": "Reserved for future use",
+        "signature": "mounted(): void",
+        "parameters": {},
         "isInternal": true
       }
     },
@@ -14484,13 +14619,27 @@ export default {
     },
     "events": {
       "sortingDidChange": {
-        "description": "This event is fired when the table data sorting has changed. It has two arguments: the column's name and the sort direction. When the column name is empty, the table displays the data list as it received it."
+        "description": "This event is fired when the table data sorting has changed. It has two arguments: the column's name and the sort direction. When the column name is empty, the table displays the data list as it received it.",
+        "signature": "sortingDidChange(columnName: string, sortDirection: 'asc' | 'desc' | null): void",
+        "parameters": {
+          "columnName": "The name of the column being sorted.",
+          "sortDirection": "The sort direction: 'asc' for ascending, 'desc' for descending, or null for unsorted."
+        }
       },
       "willSort": {
-        "description": "This event is fired before the table data is sorted. It has two arguments: the column's name and the sort direction. When the method returns a literal `false` value (and not any other falsy one), the method indicates that the sorting should be aborted."
+        "description": "This event is fired before the table data is sorted. It has two arguments: the column's name and the sort direction. When the method returns a literal `false` value (and not any other falsy one), the method indicates that the sorting should be aborted.",
+        "signature": "willSort(columnName: string, sortDirection: 'asc' | 'desc'): boolean | void",
+        "parameters": {
+          "columnName": "The name of the column about to be sorted.",
+          "sortDirection": "The intended sort direction: 'asc' for ascending or 'desc' for descending."
+        }
       },
       "selectionDidChange": {
-        "description": "This event is triggered when the table's current selection (the rows selected) changes. Its parameter is an array of the selected table row items. "
+        "description": "This event is triggered when the table's current selection (the rows selected) changes. Its parameter is an array of the selected table row items. ",
+        "signature": "selectionDidChange(selectedItems: any[]): void",
+        "parameters": {
+          "selectedItems": "An array of the selected table row items."
+        }
       }
     },
     "apis": {
@@ -15102,7 +15251,9 @@ export default {
     },
     "events": {
       "activated": {
-        "description": "This event is triggered when the tab is activated."
+        "description": "This event is triggered when the tab is activated.",
+        "signature": "activated(): void",
+        "parameters": {}
       }
     },
     "contextVars": {
@@ -15265,6 +15416,10 @@ export default {
             "description": "Represents a paragraph"
           },
           {
+            "value": "red",
+            "description": "Text displayed in red color"
+          },
+          {
             "value": "placeholder",
             "description": "Text that is mostly used as the placeholder style in input controls"
           },
@@ -15361,7 +15516,7 @@ export default {
         "availableValues": [
           {
             "value": "none",
-            "description": "No wrapping, text stays on a single line with no overflow indicator"
+            "description": "No wrapping, text stays on a single line with no overflow indicator (ignores maxLines)"
           },
           {
             "value": "ellipsis",
@@ -15369,7 +15524,7 @@ export default {
           },
           {
             "value": "scroll",
-            "description": "Forces single line with horizontal scrolling when content overflows"
+            "description": "Forces single line with horizontal scrolling when content overflows (ignores maxLines)"
           },
           {
             "value": "flow",
@@ -15488,7 +15643,8 @@ export default {
       "fontWeight-Text-tableheading": "var(--xmlui-fontWeight-Text-tableheading)",
       "fontSize-Text-secondary": "var(--xmlui-fontSize-Text-secondary)",
       "textColor-Text-secondary": "var(--xmlui-textColor-Text-secondary)",
-      "textColor-Text-secondary--hover": "var(--xmlui-textColor-Text-secondary--hover)"
+      "textColor-Text-secondary--hover": "var(--xmlui-textColor-Text-secondary--hover)",
+      "textColor-Text-red": "var(--xmlui-textColor-Text-red)"
     },
     "defaultThemeVars": {
       "borderRadius-Text": "$borderRadius",
@@ -15500,6 +15656,7 @@ export default {
       "fontWeight-Text": "$fontWeight-normal",
       "fontSize-Text-secondary": "$fontSize-sm",
       "textColor-Text-secondary": "$textColor-secondary",
+      "textColor-Text-red": "red",
       "fontWeight-Text-abbr": "$fontWeight-bold",
       "textTransform-Text-abbr": "uppercase",
       "fontStyle-Text-cite": "italic",
@@ -16392,9 +16549,9 @@ export default {
         "defaultValue": false
       },
       "applyIf": {
-        "description": "This property controls whether the theme wrapper is applied. When true (default), the theme wraps the children. When false, children are rendered unwrapped.",
+        "description": "This property controls whether the theme wrapper is applied. When true, the theme wraps the children. When false, children are rendered unwrapped. If not explicitly set, defaults to true only when the Theme has meaningful properties (themeId, tone, themeVars, or disableInlineStyle); otherwise defaults to false to avoid unnecessary wrapper elements.",
         "valueType": "boolean",
-        "defaultValue": true
+        "defaultValue": "auto"
       },
       "disableInlineStyle": {
         "description": "This property controls whether inline styles are disabled for components within this theme. When undefined, uses the appGlobals.disableInlineStyle setting.",
@@ -16542,7 +16699,11 @@ export default {
         "parameters": {}
       },
       "invalidTime": {
-        "description": "Fired when the user enters an invalid time"
+        "description": "Fired when the user enters an invalid time",
+        "signature": "invalidTime(value: string): void",
+        "parameters": {
+          "value": "The invalid time value that was entered."
+        }
       }
     },
     "apis": {
@@ -16747,7 +16908,9 @@ export default {
     },
     "events": {
       "tick": {
-        "description": "This event is triggered at each interval when the ${COMP} is enabled."
+        "description": "This event is triggered at each interval when the Timer is enabled.",
+        "signature": "tick(): void",
+        "parameters": {}
       }
     },
     "apis": {
@@ -16945,19 +17108,31 @@ export default {
     "events": {
       "selectionDidChange": {
         "description": "Fired when the tree selection changes.",
-        "signature": "(event: TreeSelectionEvent) => void"
+        "signature": "selectionDidChange(event: { selectedNode: FlatTreeNode | null, previousNode: FlatTreeNode | null }): void",
+        "parameters": {
+          "event": "An object containing selectedNode (the newly selected node) and previousNode (the previously selected node)."
+        }
       },
       "nodeDidExpand": {
         "description": "Fired when a tree node is expanded.",
-        "signature": "(node: FlatTreeNode) => void"
+        "signature": "nodeDidExpand(node: FlatTreeNode): void",
+        "parameters": {
+          "node": "The tree node that was expanded."
+        }
       },
       "nodeDidCollapse": {
         "description": "Fired when a tree node is collapsed.",
-        "signature": "(node: FlatTreeNode) => void"
+        "signature": "nodeDidCollapse(node: FlatTreeNode): void",
+        "parameters": {
+          "node": "The tree node that was collapsed."
+        }
       },
       "loadChildren": {
         "description": "Fired when a tree node needs to load children dynamically. Should return an array of child data.",
-        "signature": "(node: FlatTreeNode) => any[]"
+        "signature": "loadChildren(node: FlatTreeNode): any[]",
+        "parameters": {
+          "node": "The tree node that needs to load its children."
+        }
       }
     },
     "apis": {

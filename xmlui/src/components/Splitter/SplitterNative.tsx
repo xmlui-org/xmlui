@@ -14,6 +14,7 @@ export const defaultProps = {
   orientation: "vertical" as OrientationOptions,
   swapped: false,
   floating: false,
+  stretch: false,
 };
 
 type SplitterProps = {
@@ -29,6 +30,7 @@ type SplitterProps = {
   minPrimarySize?: string;
   maxPrimarySize?: string;
   visibleChildCount?: number;
+  stretch?: boolean;
 };
 
 export const Splitter = ({
@@ -41,6 +43,7 @@ export const Splitter = ({
   className,
   swapped = defaultProps.swapped,
   floating = defaultProps.floating,
+  stretch = defaultProps.stretch,
   splitterTemplate,
   resize = noop,
   visibleChildCount,
@@ -213,6 +216,7 @@ export const Splitter = ({
         {
           [styles.horizontal]: orientation === "horizontal",
           [styles.vertical]: orientation === "vertical",
+          [styles.stretch]: stretch,
         },
         className,
       )}

@@ -12,6 +12,11 @@ $themeVars: ();
     contain: layout;
   }
 
+  .stretch {
+    flex: 1;
+    min-height: 0;
+  }
+
   .flowContainer {
     display: flex;
     flex-wrap: wrap;

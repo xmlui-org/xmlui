@@ -38,7 +38,7 @@ Available values:
 | `condensed-sticky` | However, the header and the navigation bar are in a single header block. |
 | `horizontal` | This layout stacks the layout sections in a single column in this order: header, navigation bar, main content, and footer. The application is a single scroll container; every part moves as you scroll the page. |
 | `horizontal-sticky` | Similar to `horizontal`, the header and the navigation bar dock to the top of the viewport, while the footer sticks to the bottom. |
-| `desktop` | This layout stretches the app to fill the entire browser viewport with zero padding and margins. The header (if present) docks to the top, the footer (if present) docks to the bottom, and the main content stretches to fill the remaining vertical and horizontal space. |
+| `desktop` | This layout is designed for desktop applications with a fixed viewport structure. The app fills the entire browser viewport (100vw × 100vh) with zero padding and margins. The header remains fixed at the top, the footer remains fixed at the bottom, and the main content dynamically fills all remaining vertical space between them. When the content overflows, only the main content area scrolls while the header and footer remain visible. This creates a classic desktop application layout with persistent header and footer regions. |
 
 Here are a few samples demonstrating the usage of the `layout` property. All samples use this markup, except the value of `App`'s layout and a few marked code snippets:
 
