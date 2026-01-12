@@ -35,7 +35,6 @@ type ItemWithLabelProps = {
   layoutContext?: LayoutContext;
   testId?: string;
   cloneStyle?: boolean;
-
 };
 export const defaultProps: Pick<ItemWithLabelProps, "labelBreak"> = {
   labelBreak: true,
@@ -98,13 +97,13 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
           [styles.shrinkToLabel]: shrinkToLabel,
         })}
       >
-        <div
-          className={styles.labelWrapper}
-          style={{
-            height: labelWrapperHeight,
-          }}
-        >
-          {label && (
+        {label && (
+          <div
+            className={styles.labelWrapper}
+            style={{
+              height: labelWrapperHeight,
+            }}
+          >
             <Part partId={PART_LABEL}>
               <label
                 htmlFor={inputId}
@@ -129,8 +128,8 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
                 )}
               </label>
             </Part>
-          )}
-        </div>
+          </div>
+        )}
         <div className={styles.wrapper}>
           <Part partId={PART_LABELED_ITEM}>
             {cloneElement(children as ReactElement, {
