@@ -1,5 +1,19 @@
 # xmlui
 
+## 0.11.27
+
+### Patch Changes
+
+- bc1090d: Add experimental bookmark behavior
+- fd9a901: feat: add context, line-col numbers to script parse errors
+- 79701ad: Add "stretch" property to Stack
+- bc67363: Add scroll APIs to Stack, Card, and FlowLayout
+- ff49047: Variables defined in <script> override variables in component attributes
+- 79701ad: Add stretch property to Stack, Splitter, and FlowLayout
+- 357946d: Fix vertically-aligned Text with overflowType="ellipsis"
+- 0d04660: Fix FlowLayout issue with nested Text using ellipsis
+- 539b718: Fix the issues with the List scroll API
+
 ## 0.11.26
 
 ### Patch Changes
