@@ -371,6 +371,7 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
   See this source for details: https://css-tricks.com/line-clampin/
   */
   .truncateOverflow {
+    display: inline-block;
     overflow: hidden;
     overflow-wrap: break-word;
     white-space: nowrap;
