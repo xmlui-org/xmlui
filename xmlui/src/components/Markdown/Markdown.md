@@ -135,3 +135,17 @@ Use this property when the text you provide is not static but a result of calcul
 If this property is not set, the engine checks if `showHeadingAnchors` flag is turned on in the global configuration (in the `appGlobals` configuration object) and displays the heading anchor accordingly.
 
 %-PROP-END
+
++%-PROP-START truncateLinks
+
+```xmlui-pg copy display name="Example: truncateLinks property"
+<App>
+  <Markdown truncateLinks="true">
+    <![CDATA[
+This is a long link truncated for display: https://playground.xmlui.org/#/playground/#H4sIAAAAAAAAE1VSS2vjMBD%2BK2LIYRdsy7u0F%2BEGlvbYPSXspQmLYo0dUXskpHHqNvi%2FL1Lchd7m9T1mmCtE1mT04AhBXUF7DwqaX95vDyRE82wjC6NZPxzgzOyjklJ7W3E3VL27VNOrHCyhHJ1BydMJZWTNUzxAxgshmj3OvL1uLONYkR5xUWLNEnKXxzG%2B1MfqBt3hBYPl9yeMbbCeraOlkZklW5LJ0%2FZAjby5hAJaN3pHSBxBvRxTTp3t0z5JEBQ8OzKOxH46obgpQgF8xhET4grWgIJ5HCZbGtemJs6MZOJnOYsMLoCCTQ5KH%2Byow3t5X9efXH90iEm0c8Q7%2B5GEf9z5GQo46fa1D24i85jBaZuydSaNhP70rQtuFCtxnEKnWyx%2F1rUIohcnIUVd3X2HArw2xlL%2FBb6JPk3Xf%2B9hWY7LUoDLN7s5sTOaffIGqtNDxALim%2FYezf%2FcB7xYfPud2daaCxaJdaIBBWcX7Icj1gMUoFu2F1wpv55sbeVPgsH2Z85XI0ZiUPm1luUfOQ4%2BonECAAA%3D
+    ]]>
+  </Markdown>
+</App>
+```
+
+%-PROP-END
