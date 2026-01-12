@@ -356,14 +356,14 @@ export const Markdown = memo(
                 </div>
               );
             },
-            tr({ children }) {
-              return <tr className={styles.htmlTr}>{children}</tr>;
+            tr({ children, ...props }) {
+              return <tr className={styles.htmlTr} {...props}>{children}</tr>;
             },
-            td({ children }) {
-              return <td className={styles.htmlTd}>{children}</td>;
+            td({ children, ...props }) {
+              return <td className={styles.htmlTd} {...props}>{children}</td>;
             },
-            th({ children }) {
-              return <th className={styles.htmlTh}>{children}</th>;
+            th({ children, ...props }) {
+              return <th className={styles.htmlTh} {...props}>{children}</th>;
             },
             thead({ children }) {
               return <thead className={styles.htmlThead}>{children}</thead>;
