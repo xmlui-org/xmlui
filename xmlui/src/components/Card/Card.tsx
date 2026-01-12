@@ -74,6 +74,24 @@ export const CardMd = createMetadata({
   events: {
     click: dClick(COMP),
   },
+  apis: {
+    scrollToTop: {
+      description: "Scrolls the Card container to the top. Works when the Card has an explicit height and overflowY is set to 'scroll'.",
+      signature: "scrollToTop(behavior?: 'auto' | 'instant' | 'smooth'): void",
+    },
+    scrollToBottom: {
+      description: "Scrolls the Card container to the bottom. Works when the Card has an explicit height and overflowY is set to 'scroll'.",
+      signature: "scrollToBottom(behavior?: 'auto' | 'instant' | 'smooth'): void",
+    },
+    scrollToStart: {
+      description: "Scrolls the Card container to the start (left in LTR, right in RTL). Works when the Card has an explicit width and overflowX is set to 'scroll'.",
+      signature: "scrollToStart(behavior?: 'auto' | 'instant' | 'smooth'): void",
+    },
+    scrollToEnd: {
+      description: "Scrolls the Card container to the end (right in LTR, left in RTL). Works when the Card has an explicit width and overflowX is set to 'scroll'.",
+      signature: "scrollToEnd(behavior?: 'auto' | 'instant' | 'smooth'): void",
+    },
+  },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`padding-${COMP}`]: "$space-4",
@@ -100,7 +118,7 @@ export const CardMd = createMetadata({
 export const cardComponentRenderer = createComponentRenderer(
   "Card",
   CardMd,
-  ({ node, extractValue, renderChild, className }) => {
+  ({ node, extractValue, renderChild, className, registerComponentApi }) => {
     return (
       <Card
         className={className}
@@ -111,6 +129,7 @@ export const cardComponentRenderer = createComponentRenderer(
         showAvatar={extractValue.asOptionalBoolean(node.props.showAvatar)}
         avatarSize={extractValue.asOptionalString(node.props.avatarSize)}
         orientation={extractValue.asOptionalString(node.props.orientation)}
+        registerComponentApi={registerComponentApi}
       >
         {renderChild(node.children, {
           type: "Stack",

@@ -90,6 +90,24 @@ const stackMd = createMetadata({
       isInternal: true,
     },
   },
+  apis: {
+    scrollToTop: {
+      description: "Scrolls the Stack container to the top. Works when the Stack has an explicit height and overflowY is set to 'scroll'.",
+      signature: "scrollToTop(behavior?: 'auto' | 'instant' | 'smooth'): void",
+    },
+    scrollToBottom: {
+      description: "Scrolls the Stack container to the bottom. Works when the Stack has an explicit height and overflowY is set to 'scroll'.",
+      signature: "scrollToBottom(behavior?: 'auto' | 'instant' | 'smooth'): void",
+    },
+    scrollToStart: {
+      description: "Scrolls the Stack container to the start (left in LTR, right in RTL). Works when the Stack has an explicit width and overflowX is set to 'scroll'.",
+      signature: "scrollToStart(behavior?: 'auto' | 'instant' | 'smooth'): void",
+    },
+    scrollToEnd: {
+      description: "Scrolls the Stack container to the end (right in LTR, left in RTL). Works when the Stack has an explicit width and overflowX is set to 'scroll'.",
+      signature: "scrollToEnd(behavior?: 'auto' | 'instant' | 'smooth'): void",
+    },
+  },
   themeVars: parseScssVar(styles.themeVars),
 });
 
@@ -108,6 +126,9 @@ export const VStackMd = {
   props: {
     ...stackMd.props,
   },
+  apis: {
+    ...stackMd.apis,
+  },
 };
 type VStackComponentDef = ComponentDef<typeof VStackMd>;
 
@@ -118,6 +139,9 @@ export const HStackMd = {
   props: {
     ...stackMd.props,
   },
+  apis: {
+    ...stackMd.apis,
+  },
 };
 type HStackComponentDef = ComponentDef<typeof HStackMd>;
 
@@ -127,6 +151,9 @@ export const CVStackMd = {
   description:
     `This component represents a stack that renders its contents vertically ` +
     `and aligns that in the center along both axes.`,
+  apis: {
+    ...stackMd.apis,
+  },
 };
 type CVStackComponentDef = ComponentDef<typeof CVStackMd>;
 
@@ -136,16 +163,14 @@ export const CHStackMd = {
   description:
     `This component represents a stack that renders its contents horizontally ` +
     `and aligns that in the center along both axes.`,
+  apis: {
+    ...stackMd.apis,
+  },
 };
 type CHStackComponentDef = ComponentDef<typeof CHStackMd>;
 
 type RenderStackPars = {
-  node:
-    | StackComponentDef
-    | VStackComponentDef
-    | HStackComponentDef
-    | CVStackComponentDef
-    | CHStackComponentDef;
+  node: any;
   extractValue: ValueExtractor;
   className?: string;
   lookupEventHandler: (
@@ -155,6 +180,7 @@ type RenderStackPars = {
   orientation: string;
   horizontalAlignment: string;
   verticalAlignment: string;
+  registerComponentApi?: (api: any) => void;
 };
 
 function renderStack({
@@ -166,6 +192,7 @@ function renderStack({
   verticalAlignment,
   lookupEventHandler,
   renderChild,
+  registerComponentApi,
 }: RenderStackPars) {
   if (!isComponentDefChildren(node.children)) {
     throw new NotAComponentDefError();
@@ -181,6 +208,7 @@ function renderStack({
       stretch={extractValue(node.props?.stretch)}
       className={className}
       onMount={lookupEventHandler("mounted")}
+      registerComponentApi={registerComponentApi}
     >
       {renderChild(node.children, {
         type: "Stack",
@@ -193,7 +221,7 @@ function renderStack({
 export const stackComponentRenderer = createComponentRenderer(
   COMP,
   StackMd,
-  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
     const orientation = extractValue(node.props?.orientation) || DEFAULT_ORIENTATION;
     const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
     const verticalAlignment = extractValue(node.props?.verticalAlignment);
@@ -206,6 +234,7 @@ export const stackComponentRenderer = createComponentRenderer(
       verticalAlignment,
       lookupEventHandler,
       renderChild,
+      registerComponentApi,
     });
   },
 );
@@ -213,7 +242,7 @@ export const stackComponentRenderer = createComponentRenderer(
 export const vStackComponentRenderer = createComponentRenderer(
   "VStack",
   VStackMd,
-  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
     const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
     const verticalAlignment = extractValue(node.props?.verticalAlignment);
     return renderStack({
@@ -225,6 +254,7 @@ export const vStackComponentRenderer = createComponentRenderer(
       orientation: "vertical",
       horizontalAlignment,
       verticalAlignment,
+      registerComponentApi,
     });
   },
 );
@@ -232,7 +262,7 @@ export const vStackComponentRenderer = createComponentRenderer(
 export const hStackComponentRenderer = createComponentRenderer(
   "HStack",
   HStackMd,
-  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
     const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
     const verticalAlignment = extractValue(node.props?.verticalAlignment);
     return renderStack({
@@ -244,6 +274,7 @@ export const hStackComponentRenderer = createComponentRenderer(
       orientation: "horizontal",
       horizontalAlignment,
       verticalAlignment,
+      registerComponentApi,
     });
   },
 );
@@ -251,7 +282,7 @@ export const hStackComponentRenderer = createComponentRenderer(
 export const cvStackComponentRenderer = createComponentRenderer(
   "CVStack",
   CVStackMd,
-  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
     return renderStack({
       node,
       extractValue,
@@ -261,6 +292,7 @@ export const cvStackComponentRenderer = createComponentRenderer(
       orientation: "vertical",
       horizontalAlignment: "center",
       verticalAlignment: "center",
+      registerComponentApi,
     });
   },
 );
@@ -268,7 +300,7 @@ export const cvStackComponentRenderer = createComponentRenderer(
 export const chStackComponentRenderer = createComponentRenderer(
   "CHStack",
   CHStackMd,
-  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
     return renderStack({
       node,
       extractValue,
@@ -278,6 +310,7 @@ export const chStackComponentRenderer = createComponentRenderer(
       orientation: "horizontal",
       horizontalAlignment: "center",
       verticalAlignment: "center",
+      registerComponentApi,
     });
   },
 );
