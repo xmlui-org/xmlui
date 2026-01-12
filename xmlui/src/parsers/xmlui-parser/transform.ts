@@ -80,6 +80,7 @@ export function nodeToComponentDef(
 
     // --- Done
     collectTraits(usesStack, component, node);
+    hoistScriptCollectedFromFragments(component);
     return component;
   }
 
@@ -106,6 +107,7 @@ export function nodeToComponentDef(
 
     // --- Done
     collectTraits(usesStack, component, node);
+    hoistScriptCollectedFromFragments(component);
     return component;
   }
 
@@ -1184,6 +1186,37 @@ function wrapWithFragment(wrappedChildren: Node[]): TransformNode {
       { kind: SyntaxKind.NodeEnd },
     ],
   } as TransformNode;
+}
+
+/**
+ * Hoists scriptCollected from immediate Fragment children to the parent component.
+ * This handles the case where script tags cause the parser to wrap children in a Fragment.
+ */
+function hoistScriptCollectedFromFragments(component: ComponentDef): void {
+  if (!component.children || !Array.isArray(component.children)) {
+    return;
+  }
+
+  for (const child of component.children) {
+    if (child.type === "Fragment" && child.scriptCollected) {
+      // Merge the Fragment's scriptCollected into the parent
+      if (!component.scriptCollected) {
+        component.scriptCollected = child.scriptCollected;
+      } else {
+        // Merge vars and functions from the Fragment into the parent
+        component.scriptCollected.vars = {
+          ...component.scriptCollected.vars,
+          ...child.scriptCollected.vars,
+        };
+        component.scriptCollected.functions = {
+          ...component.scriptCollected.functions,
+          ...child.scriptCollected.functions,
+        };
+      }
+      // Remove scriptCollected from the Fragment since we've hoisted it
+      delete child.scriptCollected;
+    }
+  }
 }
 
 function getAttributes(node: Node): Node[] {

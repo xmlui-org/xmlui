@@ -24,5 +24,8 @@
     "[Material Theme Darker High Contrast]": {
       "comments": "#2aa034"
     }
+  },
+  "chat.tools.terminal.autoApprove": {
+    "npx playwright": true
   }
 }
