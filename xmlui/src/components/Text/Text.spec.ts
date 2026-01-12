@@ -484,6 +484,50 @@ test.describe("Visual States", () => {
     const driver = await createTextDriver();
     await expect(driver.component).toHaveText("test content here");
   });
+
+  test("maintains consistent vertical alignment in FlowLayout with and without ellipsis", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <VStack gap="20px">
+        <Card>
+          <FlowLayout verticalAlignment="center">
+            <Text testId="text1-ellipsis" overflowMode="ellipsis" width="470px">
+              lorem ipsum dolor sit amet eiusmod tempor incididunt
+            </Text>
+            <Text testId="text2-ellipsis" width="130px">
+              Jan 01, 2024 10:00
+            </Text>
+          </FlowLayout>
+        </Card>
+
+        <Card>
+          <FlowLayout verticalAlignment="center">
+            <Text testId="text1-no-ellipsis" width="470px">
+              lorem ipsum dolor sit amet eiusmod tempor incididunt
+            </Text>
+            <Text testId="text2-no-ellipsis" width="130px">
+              Jan 01, 2024 10:00
+            </Text>
+          </FlowLayout>
+        </Card>
+      </VStack>
+    `);
+
+    // Get vertical positions of both text pairs
+    const { top: text1EllipsisTop } = await getBounds(page.getByTestId("text1-ellipsis"));
+    const { top: text2EllipsisTop } = await getBounds(page.getByTestId("text2-ellipsis"));
+    const { top: text1NoEllipsisTop } = await getBounds(page.getByTestId("text1-no-ellipsis"));
+    const { top: text2NoEllipsisTop } = await getBounds(page.getByTestId("text2-no-ellipsis"));
+
+    // Calculate vertical alignment difference within each row
+    const alignmentDiffEllipsis = Math.abs(text1EllipsisTop - text2EllipsisTop);
+    const alignmentDiffNoEllipsis = Math.abs(text1NoEllipsisTop - text2NoEllipsisTop);
+
+    // Both rows should have similar vertical alignment (within 2px tolerance for sub-pixel rendering)
+    expect(Math.abs(alignmentDiffEllipsis - alignmentDiffNoEllipsis)).toBeLessThan(2);
+  });
 });
 
 // =============================================================================
