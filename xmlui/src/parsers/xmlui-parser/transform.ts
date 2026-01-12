@@ -1191,6 +1191,7 @@ function wrapWithFragment(wrappedChildren: Node[]): TransformNode {
 /**
  * Hoists scriptCollected from immediate Fragment children to the parent component.
  * This handles the case where script tags cause the parser to wrap children in a Fragment.
+ * Only hoists if the script doesn't reference context variables (starting with $).
  */
 function hoistScriptCollectedFromFragments(component: ComponentDef): void {
   if (!component.children || !Array.isArray(component.children)) {
@@ -1199,22 +1200,29 @@ function hoistScriptCollectedFromFragments(component: ComponentDef): void {
 
   for (const child of component.children) {
     if (child.type === "Fragment" && child.scriptCollected) {
-      // Merge the Fragment's scriptCollected into the parent
-      if (!component.scriptCollected) {
-        component.scriptCollected = child.scriptCollected;
-      } else {
-        // Merge vars and functions from the Fragment into the parent
-        component.scriptCollected.vars = {
-          ...component.scriptCollected.vars,
-          ...child.scriptCollected.vars,
-        };
-        component.scriptCollected.functions = {
-          ...component.scriptCollected.functions,
-          ...child.scriptCollected.functions,
-        };
+      // Check if the script references context variables (like $item, $itemIndex, etc.)
+      const hasContextVarReferences = child.script?.includes("$");
+      
+      // Only hoist if there are no context variable references
+      // Context variables are component-specific and should remain at the iteration level
+      if (!hasContextVarReferences) {
+        // Merge the Fragment's scriptCollected into the parent
+        if (!component.scriptCollected) {
+          component.scriptCollected = child.scriptCollected;
+        } else {
+          // Merge vars and functions from the Fragment into the parent
+          component.scriptCollected.vars = {
+            ...component.scriptCollected.vars,
+            ...child.scriptCollected.vars,
+          };
+          component.scriptCollected.functions = {
+            ...component.scriptCollected.functions,
+            ...child.scriptCollected.functions,
+          };
+        }
+        // Remove scriptCollected from the Fragment since we've hoisted it
+        delete child.scriptCollected;
       }
-      // Remove scriptCollected from the Fragment since we've hoisted it
-      delete child.scriptCollected;
     }
   }
 }
