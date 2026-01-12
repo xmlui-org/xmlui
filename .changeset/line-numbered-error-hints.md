@@ -2,4 +2,4 @@
 "xmlui": patch
 ---
 
-Fix the issues with the List scroll API
+Enhance script error line numbers and messages
