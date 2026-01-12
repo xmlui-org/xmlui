@@ -129,10 +129,10 @@ export const StateContainer = memo(
     const referenceTrackedApi = useReferenceTrackedApi(componentState);
 
     const varDefinitions = useShallowCompareMemoize({
-      ...parsedScriptPart?.functions,
       ...node.functions,
-      ...parsedScriptPart?.vars,
+      ...parsedScriptPart?.functions,
       ...node.vars,
+      ...parsedScriptPart?.vars,
     });
 
     //first: collection function (arrowExpressions) dependencies
