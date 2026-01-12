@@ -52,13 +52,23 @@ export const FlowLayoutMd = createMetadata({
       defaultValue: defaultProps.stretch,
     },
   },
+  apis: {
+    scrollToTop: {
+      description: "Scrolls the FlowLayout container to the top. Works when the FlowLayout has an explicit height and overflowY is set to 'scroll'.",
+      signature: "scrollToTop(behavior?: 'auto' | 'instant' | 'smooth'): void",
+    },
+    scrollToBottom: {
+      description: "Scrolls the FlowLayout container to the bottom. Works when the FlowLayout has an explicit height and overflowY is set to 'scroll'.",
+      signature: "scrollToBottom(behavior?: 'auto' | 'instant' | 'smooth'): void",
+    },
+  },
   themeVars: parseScssVar(styles.themeVars),
 });
 
 export const flowLayoutComponentRenderer = createComponentRenderer(
   COMP,
   FlowLayoutMd,
-  ({ node, renderChild, className, extractValue }) => {
+  ({ node, renderChild, className, extractValue, registerComponentApi }) => {
     if (!isComponentDefChildren(node.children)) {
       throw new NotAComponentDefError();
     }
@@ -73,7 +83,7 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
     const stretch = extractValue.asOptionalBoolean(node.props?.stretch);
 
     return (
-      <FlowLayout className={className} columnGap={columnGap} rowGap={rowGap} verticalAlignment={verticalAlignment} stretch={stretch}>
+      <FlowLayout className={className} columnGap={columnGap} rowGap={rowGap} verticalAlignment={verticalAlignment} stretch={stretch} registerComponentApi={registerComponentApi}>
         {renderChild(node.children, {
           wrapChild: ({ node, extractValue }, renderedChild, hints) => {
             if (hints?.opaque) {

@@ -1,4 +1,4 @@
-import { type CSSProperties, forwardRef, type ReactNode, type Ref } from "react";
+import { type CSSProperties, forwardRef, type ReactNode, type Ref, useImperativeHandle, useRef, useEffect } from "react";
 import classnames from "classnames";
 
 import styles from "./Stack.module.scss";
@@ -30,6 +30,7 @@ type Props = {
   stretch?: boolean;
   onClick?: any;
   onMount?: any;
+  registerComponentApi?: (api: any) => void;
 };
 
 // =====================================================================================================================
@@ -50,21 +51,68 @@ export const Stack = forwardRef(function Stack(
     onClick,
     onMount,
     className,
+    registerComponentApi,
     ...rest
   }: Props,
   ref: Ref<any>,
 ) {
   useOnMount(onMount);
+  const containerRef = useRef<HTMLDivElement>(null);
+  
   const { horizontal, vertical } = useContentAlignment(
     orientation,
     horizontalAlignment,
     verticalAlignment,
   );
+
+  // Expose ref to parent
+  useImperativeHandle(ref, () => containerRef.current as HTMLDivElement);
+
+  // Register API methods
+  useEffect(() => {
+    if (registerComponentApi) {
+      registerComponentApi({
+        scrollToTop: (behavior: ScrollBehavior = 'instant') => {
+          if (containerRef.current) {
+            containerRef.current.scrollTo({
+              top: 0,
+              behavior
+            });
+          }
+        },
+        scrollToBottom: (behavior: ScrollBehavior = 'instant') => {
+          if (containerRef.current) {
+            containerRef.current.scrollTo({
+              top: containerRef.current.scrollHeight,
+              behavior
+            });
+          }
+        },
+        scrollToStart: (behavior: ScrollBehavior = 'instant') => {
+          if (containerRef.current) {
+            containerRef.current.scrollTo({
+              left: 0,
+              behavior
+            });
+          }
+        },
+        scrollToEnd: (behavior: ScrollBehavior = 'instant') => {
+          if (containerRef.current) {
+            containerRef.current.scrollTo({
+              left: containerRef.current.scrollWidth,
+              behavior
+            });
+          }
+        },
+      });
+    }
+  }, [registerComponentApi]);
+
   return (
     <div
       {...rest}
       onClick={onClick}
-      ref={ref}
+      ref={containerRef}
       style={style}
       className={classnames(
         className,

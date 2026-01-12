@@ -1,4 +1,4 @@
-import { type CSSProperties, type ForwardedRef, type ReactNode, forwardRef } from "react";
+import { type CSSProperties, type ForwardedRef, type ReactNode, forwardRef, useRef, useEffect } from "react";
 import classnames from "classnames";
 
 import styles from "./Card.module.scss";
@@ -21,6 +21,7 @@ type Props = {
   avatarSize?: string;
   orientation?: string;
   onClick?: any;
+  registerComponentApi?: (api: any) => void;
 };
 
 export const defaultProps: Pick<Props, "orientation" | "showAvatar"> = {
@@ -41,18 +42,61 @@ export const Card = forwardRef(function Card(
     showAvatar = !!avatarUrl || defaultProps.showAvatar,
     avatarSize,
     onClick,
+    registerComponentApi,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const titleProps: Partial<HeadingProps> = {
     level: "h2",
     maxLines: 1,
   };
+
+  // Register API methods
+  useEffect(() => {
+    if (registerComponentApi) {
+      registerComponentApi({
+        scrollToTop: (behavior: ScrollBehavior = 'instant') => {
+          if (containerRef.current) {
+            containerRef.current.scrollTo({
+              top: 0,
+              behavior
+            });
+          }
+        },
+        scrollToBottom: (behavior: ScrollBehavior = 'instant') => {
+          if (containerRef.current) {
+            containerRef.current.scrollTo({
+              top: containerRef.current.scrollHeight,
+              behavior
+            });
+          }
+        },
+        scrollToStart: (behavior: ScrollBehavior = 'instant') => {
+          if (containerRef.current) {
+            containerRef.current.scrollTo({
+              left: 0,
+              behavior
+            });
+          }
+        },
+        scrollToEnd: (behavior: ScrollBehavior = 'instant') => {
+          if (containerRef.current) {
+            containerRef.current.scrollTo({
+              left: containerRef.current.scrollWidth,
+              behavior
+            });
+          }
+        },
+      });
+    }
+  }, [registerComponentApi]);
+
   return (
     <div
       {...rest}
-      ref={forwardedRef}
+      ref={containerRef}
       className={classnames(
         styles.wrapper,
         {
