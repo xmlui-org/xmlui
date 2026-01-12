@@ -72,6 +72,8 @@ export const MarkdownMd = createMetadata({
         "This boolean property specifies whether long links should be " +
         "truncated with ellipsis. If set to `true`, links will be displayed " +
         "with a maximum width and overflow will be hidden with text-overflow: ellipsis.",
+      valueType: "boolean",
+    },
     openLinkInNewTab: {
       description:
         "This boolean property specifies whether links should open in a new tab. " +
