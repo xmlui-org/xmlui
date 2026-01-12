@@ -42,6 +42,10 @@ export function resolveLayoutProps(
     result.cssProps.flex = horizontalStarSize;
     result.cssProps.flexShrink = 1;
   }
+  // Remove width if it's a star size (regardless of whether it was converted to flex)
+  if (result.cssProps.width && typeof result.cssProps.width === 'string' && starSizeRegex.test(result.cssProps.width)) {
+    delete result.cssProps.width;
+  }
   collectCss("minWidth", false);
   collectCss("maxWidth", false);
 
@@ -51,6 +55,10 @@ export function resolveLayoutProps(
     // --- We use "flex" when width is in start-size and allow shrinking
     result.cssProps.flex = verticalStarSize;
     result.cssProps.flexShrink = 1;
+  }
+  // Remove height if it's a star size (regardless of whether it was converted to flex)
+  if (result.cssProps.height && typeof result.cssProps.height === 'string' && starSizeRegex.test(result.cssProps.height)) {
+    delete result.cssProps.height;
   }
   collectCss("minHeight", false);
   collectCss("maxHeight", false);

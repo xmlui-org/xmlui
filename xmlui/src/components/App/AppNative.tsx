@@ -470,11 +470,14 @@ export function App({
   );
 
   // Unified rendering based on layout configuration
+  // When scrollWholePage is false, the container should not scroll (even for layouts with containerScrollRef)
+  const shouldContainerScroll = config.containerScrollRef && scrollWholePage;
+  
   const content = (
     <AppContainer
       className={classnames(wrapperBaseClasses, ...config.containerClasses)}
       style={styleWithHelpers}
-      ref={config.containerScrollRef ? pageScrollRef : undefined}
+      ref={shouldContainerScroll ? pageScrollRef : undefined}
       {...rest}
     >
       {config.useVerticalFullHeaderStructure ? (
