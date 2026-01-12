@@ -3,7 +3,8 @@
 **Key features:**
 - **Rich formatting**: Support for headings, bold, italic, lists, links, images, blockquotes, and code blocks
 - **Dynamic content**: Use &#64;{} binding expressions to inject variables and function results
-- **File loading**: Load markdown content from external files using the `data` property
+- **File loading**: Load Markdown content from external files using the `data` property
+- **HTML**: Use a subset of HTML directly in Markdown
 
 ## Acquiring content
 
@@ -64,6 +65,40 @@ The `Markdown` component supports these basic elements.
 - Table
 
 See [this markdown guide](https://www.markdownguide.org/cheat-sheet/).
+
+## Native HTML
+
+`Markdown` allows a subset of HTML. For example, while Markdown itself does not support `rowspan` and `colspan` in tables, you can use HTML directly.
+
+```xmlui-pg display name="HTML with colspan"
+<App>
+  <Markdown>
+    <![CDATA[
+<table>
+  <thead>
+    <tr>
+      <th colspan="2">Name</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Jill</td>
+      <td>Smith</td>
+      <td>43</td>
+    </tr>
+    <tr>
+      <td>Eve</td>
+      <td>Jackson</td>
+      <td>57</td>
+    </tr>
+  </tbody>
+</table>
+    ]]>
+  </Markdown>
+</App>
+```
+
 
 ## Binding Expressions
 
