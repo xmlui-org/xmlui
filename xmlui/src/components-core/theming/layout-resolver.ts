@@ -41,25 +41,13 @@ export function resolveLayoutProps(
     // --- We use "flex" when width is in start-size and allow shrinking
     result.cssProps.flex = horizontalStarSize;
     result.cssProps.flexShrink = 1;
-    // Prevent expanding beyond allocated space - children must handle their own scrolling
-    if (result.cssProps.overflowX === undefined) {
-      result.cssProps.overflowX = "hidden";
-    }
   }
   // Remove width if it's a star size (regardless of whether it was converted to flex)
   if (result.cssProps.width && typeof result.cssProps.width === 'string' && starSizeRegex.test(result.cssProps.width)) {
     delete result.cssProps.width;
   }
   collectCss("minWidth", false);
-  // Set minWidth to 0 for star-sized width if not explicitly set
-  if (horizontalStarSize !== null && result.cssProps.minWidth === undefined) {
-    result.cssProps.minWidth = 0;
-  }
   collectCss("maxWidth", false);
-  // Set maxWidth to 100% for star-sized width if not explicitly set
-  if (horizontalStarSize !== null && result.cssProps.maxWidth === undefined) {
-    result.cssProps.maxWidth = "100%";
-  }
 
   collectCss("height", false);
   const verticalStarSize = getVerticalStarSize(result.cssProps.height, layoutContext);
@@ -67,25 +55,13 @@ export function resolveLayoutProps(
     // --- We use "flex" when width is in start-size and allow shrinking
     result.cssProps.flex = verticalStarSize;
     result.cssProps.flexShrink = 1;
-    // Prevent expanding beyond allocated space - children must handle their own scrolling
-    if (result.cssProps.overflowY === undefined) {
-      result.cssProps.overflowY = "hidden";
-    }
   }
   // Remove height if it's a star size (regardless of whether it was converted to flex)
   if (result.cssProps.height && typeof result.cssProps.height === 'string' && starSizeRegex.test(result.cssProps.height)) {
     delete result.cssProps.height;
   }
   collectCss("minHeight", false);
-  // Set minHeight to 0 for star-sized height if not explicitly set
-  if (verticalStarSize !== null && result.cssProps.minHeight === undefined) {
-    result.cssProps.minHeight = 0;
-  }
   collectCss("maxHeight", false);
-  // Set maxHeight to 100% for star-sized height if not explicitly set
-  if (verticalStarSize !== null && result.cssProps.maxHeight === undefined) {
-    result.cssProps.maxHeight = "100%";
-  }
 
   // --- Positions
   collectCss("top", disableInlineStyle);
