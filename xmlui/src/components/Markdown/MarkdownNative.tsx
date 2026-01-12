@@ -42,6 +42,7 @@ type MarkdownProps = {
   codeHighlighter?: CodeHighlighter;
   showHeadingAnchors?: boolean;
   grayscale?: boolean;
+  truncateLinks?: boolean;
   openLinkInNewTab?: boolean;
 };
 
@@ -97,6 +98,7 @@ export const Markdown = memo(
       codeHighlighter,
       showHeadingAnchors,
       grayscale,
+      truncateLinks,
       openLinkInNewTab,
       ...rest
     }: MarkdownProps,
@@ -132,6 +134,7 @@ export const Markdown = memo(
         className={classnames(
           styles.markdownContent,
           { [styles.grayscale]: grayscale },
+          { [styles.truncateLinks]: truncateLinks },
           className
         )}
         style={style}
