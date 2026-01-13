@@ -103,11 +103,11 @@ export const AppMd = createMetadata({
   },
   apis: {
     scrollToTop: {
-      description: "Scrolls the App content container to the top. Works when scrollWholePage is false.",
+      description: "Scrolls the App's page content container to the top. Works with desktop layout.",
       signature: "scrollToTop(behavior?: 'auto' | 'instant' | 'smooth'): void",
     },
     scrollToBottom: {
-      description: "Scrolls the App content container to the bottom. Works when scrollWholePage is false.",
+      description: "Scrolls the App's page content container to the bottom. Works with desktop layout.",
       signature: "scrollToBottom(behavior?: 'auto' | 'instant' | 'smooth'): void",
     },
   },
