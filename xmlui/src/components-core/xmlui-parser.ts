@@ -9,6 +9,7 @@ import type { Node } from "../parsers/xmlui-parser/syntax-node";
 import type { ScriptParserErrorMessage } from "../abstractions/scripting/ScriptParserError";
 import type { ModuleErrors } from "./script-runner/ScriptingSourceTree";
 import { forEach } from "lodash-es";
+import { Position } from "../language-server/base/text-document";
 
 interface ErrorForDisplay extends GeneralDiag {
   contextStartLine: number;
@@ -580,8 +581,8 @@ function errorWithDisplayFields(
   cursor: DocumentCursor,
   source: string,
 ): ErrorForDisplay {
-  const { line: errPosLine, character: errPosCol } = cursor.offsetToPosForDisplay(err.pos);
-  const { line: contextStartLine } = cursor.offsetToPosForDisplay(err.contextPos);
+  const { line: errPosLine, character: errPosCol } = cursor.offsetToDisplayPos(err.pos);
+  const { line: contextStartLine } = cursor.offsetToDisplayPos(err.contextPos);
 
   return {
     ...err,
@@ -592,10 +593,9 @@ function errorWithDisplayFields(
   };
 }
 
-type Position = { line: number; character: number };
-type DocumentCursor = {
+export type DocumentCursor = {
   offsetToPos: (offset: number) => Position;
-  offsetToPosForDisplay: (offset: number) => Position;
+  offsetToDisplayPos: (offset: number) => Position;
   getSurroundingContext: (
     offsetPos: number,
     offsetEnd: number,
@@ -613,7 +613,7 @@ export function createDocumentCursor(text: string): DocumentCursor {
 
   return {
     offsetToPos,
-    offsetToPosForDisplay,
+    offsetToDisplayPos,
     getSurroundingContext,
   };
 
@@ -643,7 +643,7 @@ export function createDocumentCursor(text: string): DocumentCursor {
    * Converts a position in a string to base 1 line and column number.
    * @param offset the 0 based offset into the string
    */
-  function offsetToPosForDisplay(offset: number): Position {
+  function offsetToDisplayPos(offset: number): Position {
     let pos = offsetToPos(offset);
     pos.line += 1;
     pos.character += 1;

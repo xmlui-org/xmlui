@@ -61,11 +61,6 @@ export default ({ mode = "lib" }) => {
           xmlui: path.resolve("src", "index.ts"),
           "xmlui-parser": path.resolve("src", "parsers", "xmlui-parser", "index.ts"),
           "language-server": path.resolve("src", "language-server", "server.ts"),
-          "language-server-web-worker": path.resolve(
-            "src",
-            "language-server",
-            "server-web-worker.ts",
-          ),
           "syntax-monaco": path.resolve("src", "syntax", "monaco", "index.ts"),
           "syntax-textmate": path.resolve("src", "syntax", "textMate", "index.ts"),
           testing: path.resolve("src", "testing", "index.ts"),

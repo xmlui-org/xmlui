@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
-import { format, type FormatOptions } from "../../src/language-server/services/format";
-import { createXmlUiParser, toDbgString } from "../../src/parsers/xmlui-parser";
+import { format, type FormatOptions } from "../../../src/language-server/services/format";
+import { createXmlUiParser, toDbgString } from "../../../src/parsers/xmlui-parser";
 
 describe("XML Formatter", () => {
   describe("Format Options", () => {

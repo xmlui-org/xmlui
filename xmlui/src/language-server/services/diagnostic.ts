@@ -1,4 +1,4 @@
-import type { Diagnostic, Position } from "vscode-languageserver";
+import { DiagnosticSeverity, type Diagnostic, type Position } from "vscode-languageserver";
 import type { ParserDiag } from "../../parsers/xmlui-parser/diagnostics";
 import type { ParseResult } from "../../parsers/xmlui-parser/parser";
 import { offsetRangeToPosRange } from "./common/lsp-utils";
@@ -18,7 +18,7 @@ export function getDiagnostics(ctx: DiagnosticsContext): Diagnostic[] {
 
 export function errorToLspDiag(e: ParserDiag, offsetToPos: (n: number) => Position): Diagnostic {
   return {
-    severity: e.category,
+    severity: DiagnosticSeverity.Error,
     range: offsetRangeToPosRange(offsetToPos, e),
     message: e.message,
     code: e.code,

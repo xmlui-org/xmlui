@@ -2,14 +2,14 @@ import { describe, expect, it } from "vitest";
 import {
   handleCompletion,
   handleCompletionResolve,
-} from "../../src/language-server/services/completion";
-import { mockMetadata, mockMetadataProvider } from "./mockData";
+} from "../../../src/language-server/services/completion";
+import { mockMetadata, mockMetadataProvider } from "../mockData";
 import type { CompletionItem, MarkupContent } from "vscode-languageserver";
 import { CompletionItemKind } from "vscode-languageserver";
-import { layoutOptionKeys } from "../../src/components-core/descriptorHelper";
-import { capitalizeFirstLetter } from "../../src/components-core/utils/misc";
-import { createXmlUiParser } from "../../src/parsers/xmlui-parser";
-import { createDocumentCursor } from "../../src/components-core/xmlui-parser";
+import { layoutOptionKeys } from "../../../src/components-core/descriptorHelper";
+import { capitalizeFirstLetter } from "../../../src/components-core/utils/misc";
+import { createXmlUiParser } from "../../../src/parsers/xmlui-parser";
+import { TextDocument } from "../../../src/language-server/base/text-document";
 
 describe("Completion", () => {
   it("lists all component names after '<'", () => {
@@ -194,13 +194,14 @@ function completeAtPoundSign(source: string) {
   }
   source = source.replace(cursorIndicator, "");
   const parser = createXmlUiParser(source);
+  const document = TextDocument.create("file://test.xmlui", "xmlui", 0, source);
 
   return handleCompletion(
     {
       getText: parser.getText,
       parseResult: parser.parse(),
       metaByComp: mockMetadataProvider,
-      offsetToPos: createDocumentCursor(source).offsetToPos,
+      offsetToPos: (offset: number) => document.positionAt(offset),
     },
     position,
   );

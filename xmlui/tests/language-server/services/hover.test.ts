@@ -1,8 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { handleHoverCore } from "../../src/language-server/services/hover";
-import { createXmlUiParser } from "../../src/parsers/xmlui-parser";
-import { mockMetadataProvider } from "./mockData";
-import { MarkupContent } from "vscode-languageserver";
+import { handleHoverCore } from "../../../src/language-server/services/hover";
+import { createXmlUiParser } from "../../../src/parsers/xmlui-parser";
+import { mockMetadataProvider } from "../mockData";
 
 describe("Hover", () => {
   it("documents component description", () => {
@@ -45,12 +44,17 @@ function hoverAtPoundSign(source: string) {
   const cursorIndicator = "#";
   const position = source.indexOf(cursorIndicator);
   if (position === -1) {
-    throw new Error(`No '${cursorIndicator}' found in the tested source to denote the position of the cursor.`);
+    throw new Error(
+      `No '${cursorIndicator}' found in the tested source to denote the position of the cursor.`,
+    );
   }
   source = source.replace(cursorIndicator, "");
-  const parser = createXmlUiParser(source)
+  const parser = createXmlUiParser(source);
 
-  const { node } = parser.parse()
+  const { node } = parser.parse();
 
-  return handleHoverCore({ getText: parser.getText, node, metaByComp: mockMetadataProvider }, position)
+  return handleHoverCore(
+    { getText: parser.getText, node, metaByComp: mockMetadataProvider },
+    position,
+  );
 }
