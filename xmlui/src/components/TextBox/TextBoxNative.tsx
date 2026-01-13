@@ -1,4 +1,4 @@
-import { type CSSProperties, type ForwardedRef, forwardRef, useId, useState } from "react";
+import { type CSSProperties, type ForwardedRef, forwardRef, useState } from "react";
 import React, { useCallback, useEffect, useRef } from "react";
 import classnames from "classnames";
 
@@ -158,32 +158,6 @@ export const TextBox = forwardRef(function TextBox(
   const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "check";
   const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "error";
 
-  // Track if the field was ever invalid during this editing session
-  const [wasEverInvalid, setWasEverInvalid] = useState(false);
-
-  // Update wasEverInvalid when validationStatus changes to error
-  useEffect(() => {
-    if (validationStatus === "error") {
-      setWasEverInvalid(true);
-    }
-  }, [validationStatus]);
-
-  // Determine which validation icon to show and its status for styling
-  let validationIcon = null;
-  let feedbackStatus = validationStatus;
-  if (finalVerboseValidationFeedback) {
-    if (validationStatus === "error") {
-      // Always show error icon when there's an error
-      validationIcon = finalValidationIconError;
-    } else if (wasEverInvalid && validationStatus !== "warning") {
-      // Show success icon if the field was previously invalid and now it's valid or none
-      // (validationStatus can be "valid" or "none" when the error is cleared)
-      validationIcon = finalValidationIconSuccess;
-      // Force "valid" status for styling when showing success icon
-      feedbackStatus = "valid";
-    }
-  }
-
   useEffect(() => {
     if (autoFocus) {
       setTimeout(() => {
@@ -300,9 +274,10 @@ export const TextBox = forwardRef(function TextBox(
       {finalVerboseValidationFeedback && (
         <Part partId={PART_VERBOSE_VALIDATION_FEEDBACK}>
           <VerboseValidationFeedback
-            icon={validationIcon}
-            message={validationStatus === "error" ? invalidMessage : undefined}
-            validationStatus={feedbackStatus}
+            validationStatus={validationStatus}
+            successIcon={finalValidationIconSuccess}
+            errorIcon={finalValidationIconError}
+            invalidMessage={invalidMessage}
           />
         </Part>
       )}

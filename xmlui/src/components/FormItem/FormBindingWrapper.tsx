@@ -101,6 +101,7 @@ export function FormBindingWrapper({
   const validationResult = useFormContextPart((value) => value?.validationResults[formItemId]);
   const dispatch = useFormContextPart((value) => value?.dispatch);
   const formEnabled = useFormContextPart((value) => value?.enabled);
+  const verboseValidationFeedback = useFormContextPart((value) => value?.verboseValidationFeedback);
 
   const isEnabled = enabled && formEnabled;
 
@@ -186,8 +187,8 @@ export function FormBindingWrapper({
     registerComponentApi,
   });
 
-  // Create validation result display
-  const validationResultDisplay = (
+  // Create validation result display (hidden when verboseValidationFeedback is enabled)
+  const validationResultDisplay = verboseValidationFeedback ? null : (
     <div ref={animateContainerRef} className={styles.helperTextContainer}>
       {isHelperTextShown &&
         validationResult?.validations.map((singleValidation, i) => (

@@ -235,6 +235,7 @@ export const FormItem = memo(function FormItem({
   const validationResult = useFormContextPart((value) => value?.validationResults[formItemId]);
   const dispatch = useFormContextPart((value) => value?.dispatch);
   const formEnabled = useFormContextPart((value) => value?.enabled);
+  const verboseValidationFeedback = useFormContextPart((value) => value?.verboseValidationFeedback);
 
   const isEnabled = enabled && formEnabled;
 
@@ -536,27 +537,29 @@ export const FormItem = memo(function FormItem({
       style={style}
       className={className}
       validationResult={
-        <div ref={animateContainerRef} className={styles.helperTextContainer}>
-          {isHelperTextShown &&
-            validationResult?.validations.map((singleValidation, i) => (
-              <Fragment key={i}>
-                {singleValidation.isValid && !!singleValidation.validMessage && (
-                  <HelperText
-                    text={singleValidation.validMessage}
-                    status={"valid"}
-                    style={{ opacity: singleValidation.stale ? 0.5 : undefined }}
-                  />
-                )}
-                {!singleValidation.isValid && !!singleValidation.invalidMessage && (
-                  <HelperText
-                    text={singleValidation.invalidMessage}
-                    status={singleValidation.severity}
-                    style={{ opacity: singleValidation.stale ? 0.5 : undefined }}
-                  />
-                )}
-              </Fragment>
-            ))}
-        </div>
+        verboseValidationFeedback ? null : (
+          <div ref={animateContainerRef} className={styles.helperTextContainer}>
+            {isHelperTextShown &&
+              validationResult?.validations.map((singleValidation, i) => (
+                <Fragment key={i}>
+                  {singleValidation.isValid && !!singleValidation.validMessage && (
+                    <HelperText
+                      text={singleValidation.validMessage}
+                      status={"valid"}
+                      style={{ opacity: singleValidation.stale ? 0.5 : undefined }}
+                    />
+                  )}
+                  {!singleValidation.isValid && !!singleValidation.invalidMessage && (
+                    <HelperText
+                      text={singleValidation.invalidMessage}
+                      status={singleValidation.severity}
+                      style={{ opacity: singleValidation.stale ? 0.5 : undefined }}
+                    />
+                  )}
+                </Fragment>
+              ))}
+          </div>
+        )
       }
     >
       {formControl}
