@@ -54,6 +54,12 @@ export function resolveLayoutProps(
   if (!shouldIgnore("maxWidth")) {
     collectCss("maxWidth", false);
   }
+  // Remove width if it's a star size (regardless of whether it was converted to flex)
+  if (result.cssProps.width && typeof result.cssProps.width === 'string' && starSizeRegex.test(result.cssProps.width)) {
+    delete result.cssProps.width;
+  }
+  collectCss("minWidth", false);
+  collectCss("maxWidth", false);
 
   if (!shouldIgnore("height")) {
     collectCss("height", false);
@@ -70,6 +76,12 @@ export function resolveLayoutProps(
   if (!shouldIgnore("maxHeight")) {
     collectCss("maxHeight", false);
   }
+  // Remove height if it's a star size (regardless of whether it was converted to flex)
+  if (result.cssProps.height && typeof result.cssProps.height === 'string' && starSizeRegex.test(result.cssProps.height)) {
+    delete result.cssProps.height;
+  }
+  collectCss("minHeight", false);
+  collectCss("maxHeight", false);
 
   // --- Positions
   collectCss("top", disableInlineStyle);
