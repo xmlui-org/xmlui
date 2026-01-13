@@ -85,6 +85,8 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
     return (
       <FlowLayout className={className} columnGap={columnGap} rowGap={rowGap} verticalAlignment={verticalAlignment} stretch={stretch} registerComponentApi={registerComponentApi}>
         {renderChild(node.children, {
+          type: "FlowLayout",
+          ignoreLayoutProps: ["width", "minWidth", "maxWidth"],
           wrapChild: ({ node, extractValue }, renderedChild, hints) => {
             if (hints?.opaque) {
               return renderedChild;

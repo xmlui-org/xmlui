@@ -3,7 +3,8 @@
 **Key features:**
 - **Rich formatting**: Support for headings, bold, italic, lists, links, images, blockquotes, and code blocks
 - **Dynamic content**: Use &#64;{} binding expressions to inject variables and function results
-- **File loading**: Load markdown content from external files using the `data` property
+- **File loading**: Load Markdown content from external files using the `data` property
+- **HTML**: Use a subset of HTML directly in Markdown
 
 ## Acquiring content
 
@@ -64,6 +65,40 @@ The `Markdown` component supports these basic elements.
 - Table
 
 See [this markdown guide](https://www.markdownguide.org/cheat-sheet/).
+
+## Native HTML
+
+`Markdown` allows a subset of HTML. For example, while Markdown itself does not support `rowspan` and `colspan` in tables, you can use HTML directly.
+
+```xmlui-pg display name="HTML with colspan"
+<App>
+  <Markdown>
+    <![CDATA[
+<table>
+  <thead>
+    <tr>
+      <th colspan="2">Name</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Jill</td>
+      <td>Smith</td>
+      <td>43</td>
+    </tr>
+    <tr>
+      <td>Eve</td>
+      <td>Jackson</td>
+      <td>57</td>
+    </tr>
+  </tbody>
+</table>
+    ]]>
+  </Markdown>
+</App>
+```
+
 
 ## Binding Expressions
 
@@ -133,5 +168,19 @@ Use this property when the text you provide is not static but a result of calcul
 %-PROP-START showHeadingAnchors
 
 If this property is not set, the engine checks if `showHeadingAnchors` flag is turned on in the global configuration (in the `appGlobals` configuration object) and displays the heading anchor accordingly.
+
+%-PROP-END
+
++%-PROP-START truncateLinks
+
+```xmlui-pg copy display name="Example: truncateLinks property"
+<App>
+  <Markdown truncateLinks="true">
+    <![CDATA[
+This is a long link truncated for display: https://playground.xmlui.org/#/playground/#H4sIAAAAAAAAE1VSS2vjMBD%2BK2LIYRdsy7u0F%2BEGlvbYPSXspQmLYo0dUXskpHHqNvi%2FL1Lchd7m9T1mmCtE1mT04AhBXUF7DwqaX95vDyRE82wjC6NZPxzgzOyjklJ7W3E3VL27VNOrHCyhHJ1BydMJZWTNUzxAxgshmj3OvL1uLONYkR5xUWLNEnKXxzG%2B1MfqBt3hBYPl9yeMbbCeraOlkZklW5LJ0%2FZAjby5hAJaN3pHSBxBvRxTTp3t0z5JEBQ8OzKOxH46obgpQgF8xhET4grWgIJ5HCZbGtemJs6MZOJnOYsMLoCCTQ5KH%2Byow3t5X9efXH90iEm0c8Q7%2B5GEf9z5GQo46fa1D24i85jBaZuydSaNhP70rQtuFCtxnEKnWyx%2F1rUIohcnIUVd3X2HArw2xlL%2FBb6JPk3Xf%2B9hWY7LUoDLN7s5sTOaffIGqtNDxALim%2FYezf%2FcB7xYfPud2daaCxaJdaIBBWcX7Icj1gMUoFu2F1wpv55sbeVPgsH2Z85XI0ZiUPm1luUfOQ4%2BonECAAA%3D
+    ]]>
+  </Markdown>
+</App>
+```
 
 %-PROP-END
