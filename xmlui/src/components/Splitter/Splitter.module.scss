@@ -41,11 +41,6 @@ $cursor-resizer-vertical-Splitter: createThemeVar("cursor-resizer-vertical-#{$co
     &.horizontal {
       flex-direction: row;
     }
-
-    &.stretch {
-      flex: 1;
-      min-height: 0;
-    }
   }
 
   .panel {

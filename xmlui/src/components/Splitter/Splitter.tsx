@@ -81,14 +81,6 @@ const baseSplitterMd = createMetadata({
       availableValues: ["horizontal", "vertical"],
       defaultValue: defaultProps.orientation,
     },
-    stretch: {
-      description:
-        "When set to true, the Splitter takes the full height of its parent container. " +
-        "This is particularly useful in desktop layouts where you want content to fill " +
-        "the available vertical space between fixed header and footer elements.",
-      valueType: "boolean",
-      defaultValue: defaultProps.stretch,
-    },
   },
   events: {
     resize: {
@@ -175,7 +167,6 @@ function SplitterRenderer({
       minPrimarySize={extractValue(node.props?.minPrimarySize)}
       maxPrimarySize={extractValue(node.props?.maxPrimarySize)}
       floating={extractValue.asOptionalBoolean(node.props?.floating)}
-      stretch={extractValue.asOptionalBoolean(node.props?.stretch)}
       resize={lookupEventHandler("resize")}
       visibleChildCount={visibleChildCount}
     >
