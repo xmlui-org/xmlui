@@ -12,6 +12,7 @@ import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
 import Icon from "../Icon/IconNative";
 import { Part } from "../Part/Part";
+import { useFormContextPart } from "../Form/FormContext";
 
 // Component part names
 const PART_DAY = "day";
@@ -88,6 +89,9 @@ type Props = {
   readOnly?: boolean;
   autoFocus?: boolean;
   emptyCharacter?: string;
+  enableConciseValidationSummary?: boolean;
+  validationIconSuccess?: string;
+  validationIconError?: string;
 };
 
 export const defaultProps = {
@@ -143,6 +147,9 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     readOnly = defaultProps.readOnly,
     autoFocus = defaultProps.autoFocus,
     emptyCharacter = defaultProps.emptyCharacter,
+    enableConciseValidationSummary,
+    validationIconSuccess,
+    validationIconError,
     ...rest
   },
   ref,
@@ -190,6 +197,23 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
   const [isDayCurrentlyInvalid, setIsDayCurrentlyInvalid] = useState(false);
   const [isMonthCurrentlyInvalid, setIsMonthCurrentlyInvalid] = useState(false);
   const [isYearCurrentlyInvalid, setIsYearCurrentlyInvalid] = useState(false);
+
+  const contextEnableConciseValidationSummary = useFormContextPart((ctx) => ctx?.enableConciseValidationSummary);
+  const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
+  const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
+
+  const finalEnableConciseValidationSummary = enableConciseValidationSummary ?? contextEnableConciseValidationSummary;
+  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "check";
+  const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
+
+  let validationIcon = null;
+  if (finalEnableConciseValidationSummary) {
+    if (validationStatus === "valid") {
+      validationIcon = finalValidationIconSuccess;
+    } else if (validationStatus === "error") {
+      validationIcon = finalValidationIconError;
+    }
+  }
 
   useEffect(() => {
     // Initialize XMLUI state with initial value on first mount
@@ -772,6 +796,9 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
               {clearIconElement}
             </button>
           </Part>
+        )}
+        {validationIcon && (
+          <Adornment iconName={validationIcon} className={styles.adornment} />
         )}
       </div>
       {endAdornment}

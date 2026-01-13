@@ -158,6 +158,18 @@ export const DateInputMd = createMetadata({
     startIcon: dStartIcon(),
     endText: dEndText(),
     endIcon: dEndIcon(),
+    enableConciseValidationSummary: {
+      description: "Enables a concise validation summary (icon) in input components.",
+      type: "boolean",
+    },
+    validationIconSuccess: {
+      description: "Icon to display for valid state when concise validation summary is enabled.",
+      type: "string",
+    },
+    validationIconError: {
+      description: "Icon to display for error state when concise validation summary is enabled.",
+      type: "string",
+    },
   },
   events: {
     didChange: dDidChange(COMP),
@@ -254,6 +266,9 @@ export const dateInputComponentRenderer = createComponentRenderer(
         clearToInitialValue={extractValue.asOptionalBoolean(node.props.clearToInitialValue, defaultProps.clearToInitialValue)}
         gap={extractValue.asOptionalString(node.props.gap)}
         emptyCharacter={extractValue.asOptionalString(node.props.emptyCharacter)}
+        enableConciseValidationSummary={extractValue.asOptionalBoolean(node.props.enableConciseValidationSummary)}
+        validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
+        validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
       />
     );
   },

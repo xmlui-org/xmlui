@@ -33,6 +33,7 @@ import { Adornment } from "../Input/InputAdornment";
 import { Button } from "../Button/ButtonNative";
 import { PART_END_ADORNMENT, PART_INPUT, PART_START_ADORNMENT } from "../../components-core/parts";
 import { Part } from "../Part/Part";
+import { useFormContextPart } from "../Form/FormContext";
 
 const PART_SPINNER_UP = "spinnerUp";
 const PART_SPINNER_DOWN = "spinnerDown";
@@ -88,6 +89,9 @@ type Props = {
   readOnly?: boolean;
   required?: boolean;
   direction?: "ltr" | "rtl";
+  enableConciseValidationSummary?: boolean;
+  validationIconSuccess?: string;
+  validationIconError?: string;
 };
 
 export const NumberBox = forwardRef(function NumberBox(
@@ -123,6 +127,9 @@ export const NumberBox = forwardRef(function NumberBox(
     readOnly,
     required,
     direction,
+    enableConciseValidationSummary,
+    validationIconSuccess,
+    validationIconError,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -150,6 +157,23 @@ export const NumberBox = forwardRef(function NumberBox(
       }, 0);
     }
   }, [autoFocus]);
+
+  const contextEnableConciseValidationSummary = useFormContextPart((ctx) => ctx?.enableConciseValidationSummary);
+  const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
+  const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
+
+  const finalEnableConciseValidationSummary = enableConciseValidationSummary ?? contextEnableConciseValidationSummary;
+  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "check";
+  const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
+
+  let validationIcon = null;
+  if (finalEnableConciseValidationSummary) {
+    if (validationStatus === "valid") {
+      validationIcon = finalValidationIconSuccess;
+    } else if (validationStatus === "error") {
+      validationIcon = finalValidationIconError;
+    }
+  }
 
   // --- Convert to representable string value (from number | null | undefined)
   const [valueStrRep, setValueStrRep] = React.useState<string>(mapToRepresentation(value));
@@ -620,6 +644,11 @@ export const NumberBox = forwardRef(function NumberBox(
           required={required}
         />
       </Part>
+      {validationIcon && (
+        <Part partId={PART_END_ADORNMENT}>
+          <Adornment iconName={validationIcon} className={classnames(styles.adornment)} />
+        </Part>
+      )}
       <Part partId={PART_END_ADORNMENT}>
         <Adornment text={endText} iconName={endIcon} className={classnames(styles.adornment)} />
       </Part>

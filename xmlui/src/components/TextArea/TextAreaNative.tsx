@@ -23,6 +23,8 @@ import TextAreaResizable from "./TextAreaResizable";
 import { PART_INPUT } from "../../components-core/parts";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { Part } from "../Part/Part";
+import { useFormContextPart } from "../Form/FormContext";
+import { Adornment } from "../Input/InputAdornment";
 
 export const resizeOptionKeys = ["horizontal", "vertical", "both"] as const;
 export type ResizeOptions = (typeof resizeOptionKeys)[number];
@@ -54,6 +56,9 @@ type Props = {
   maxLength?: number;
   rows?: number;
   enabled?: boolean;
+  enableConciseValidationSummary?: boolean;
+  validationIconSuccess?: string;
+  validationIconError?: string;
 };
 
 export const defaultProps = {
@@ -102,6 +107,9 @@ export const TextArea = forwardRef(function TextArea(
     maxLength,
     rows = defaultProps.rows,
     enabled = defaultProps.enabled,
+    enableConciseValidationSummary,
+    validationIconSuccess,
+    validationIconError,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLTextAreaElement>,
@@ -111,6 +119,23 @@ export const TextArea = forwardRef(function TextArea(
   const ref = forwardRef ? composeRefs(forwardedRef, inputRef) : inputRef;
   const [cursorPosition, setCursorPosition] = useState(null);
   const [focused, setFocused] = React.useState(false);
+
+  const contextEnableConciseValidationSummary = useFormContextPart((ctx) => ctx?.enableConciseValidationSummary);
+  const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
+  const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
+
+  const finalEnableConciseValidationSummary = enableConciseValidationSummary ?? contextEnableConciseValidationSummary;
+  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "check";
+  const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
+
+  let validationIcon = null;
+  if (finalEnableConciseValidationSummary) {
+    if (validationStatus === "valid") {
+      validationIcon = finalValidationIconSuccess;
+    } else if (validationStatus === "error") {
+      validationIcon = finalValidationIconError;
+    }
+  }
 
   const updateValue = useCallback(
     (value: string) => {

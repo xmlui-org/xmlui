@@ -267,6 +267,9 @@ type Props = {
   hideButtonRowUntilDirty?: boolean;
   hideButtonRow?: boolean;
   enableSubmit?: boolean;
+  enableConciseValidationSummary?: boolean;
+  validationIconSuccess?: string;
+  validationIconError?: string;
 };
 
 export const defaultProps: Pick<
@@ -281,6 +284,8 @@ export const defaultProps: Pick<
   | "hideButtonRowUntilDirty"
   | "hideButtonRow"
   | "enableSubmit"
+  | "validationIconSuccess"
+  | "validationIconError"
 > = {
   cancelLabel: "Cancel",
   saveLabel: "Save",
@@ -292,6 +297,8 @@ export const defaultProps: Pick<
   hideButtonRowUntilDirty: false,
   hideButtonRow: false,
   enableSubmit: true,
+  validationIconSuccess: "check",
+  validationIconError: "close",
 };
 
 // --- Remove the properties from formState.subject where the property name ends with UNBOUND_FIELD_SUFFIX
@@ -336,6 +343,9 @@ const Form = forwardRef(function (
     hideButtonRowUntilDirty,
     hideButtonRow = defaultProps.hideButtonRow,
     enableSubmit = defaultProps.enableSubmit,
+    enableConciseValidationSummary,
+    validationIconSuccess = defaultProps.validationIconSuccess,
+    validationIconError = defaultProps.validationIconError,
     ...rest
   }: Props,
   ref: ForwardedRef<HTMLFormElement>,
@@ -365,6 +375,9 @@ const Form = forwardRef(function (
       interactionFlags: formState.interactionFlags,
       dispatch,
       enabled: isEnabled,
+      enableConciseValidationSummary,
+      validationIconSuccess,
+      validationIconError,
     };
   }, [
     dispatch,
@@ -376,6 +389,9 @@ const Form = forwardRef(function (
     itemLabelBreak,
     itemLabelPosition,
     itemLabelWidth,
+    enableConciseValidationSummary,
+    validationIconSuccess,
+    validationIconError,
   ]);
 
   const doCancel = useEvent(() => {
@@ -725,6 +741,9 @@ export const FormWithContextVar = forwardRef(function (
         hideButtonRowUntilDirty={extractValue.asOptionalBoolean(node.props.hideButtonRowUntilDirty)}
         hideButtonRow={extractValue.asOptionalBoolean(node.props.hideButtonRow)}
         enableSubmit={extractValue.asOptionalBoolean(node.props.enableSubmit)}
+        enableConciseValidationSummary={extractValue.asOptionalBoolean(node.props.enableConciseValidationSummary)}
+        validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
+        validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
         formState={formState}
         dispatch={dispatch}
         id={node.uid}

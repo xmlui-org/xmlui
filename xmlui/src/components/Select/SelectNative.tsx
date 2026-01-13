@@ -25,6 +25,7 @@ import { HiddenOption } from "./HiddenOption";
 import { SimpleSelect } from "./SimpleSelect";
 import { Part } from "../Part/Part";
 import { OptionContext } from "./OptionContext";
+import { useFormContextPart } from "../Form/FormContext";
 
 const PART_LIST_WRAPPER = "listWrapper";
 const PART_CLEAR_BUTTON = "clearButton";
@@ -97,6 +98,9 @@ interface SelectProps {
   registerComponentApi?: RegisterComponentApiFn;
   children?: ReactNode;
   modal?: boolean;
+  enableConciseValidationSummary?: boolean;
+  validationIconSuccess?: string;
+  validationIconError?: string;
 }
 
 // Common trigger value display props
@@ -172,6 +176,7 @@ interface SelectTriggerActionsProps {
   clearValue: () => void;
   showChevron?: boolean;
   clearable: boolean;
+  validationIcon?: string | null;
 }
 
 const SelectTriggerActions = ({
@@ -182,6 +187,7 @@ const SelectTriggerActions = ({
   clearable,
   clearValue,
   showChevron = true,
+  validationIcon,
 }: SelectTriggerActionsProps) => {
   const hasValue = multiSelect
     ? Array.isArray(value) && value.length > 0
@@ -201,6 +207,11 @@ const SelectTriggerActions = ({
             <Icon name="close" />
           </span>
         </Part>
+      )}
+      {validationIcon && (
+        <span className={classnames(styles.action)}>
+          <Icon name={validationIcon} />
+        </span>
       )}
       {showChevron && (
         <span
@@ -262,6 +273,9 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     registerComponentApi,
     children,
     modal = defaultProps.modal,
+    enableConciseValidationSummary,
+    validationIconSuccess,
+    validationIconError,
 
     ...rest
   },
@@ -275,6 +289,23 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   const [options, setOptions] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(-1);
+
+  const contextEnableConciseValidationSummary = useFormContextPart((ctx) => ctx?.enableConciseValidationSummary);
+  const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
+  const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
+
+  const finalEnableConciseValidationSummary = enableConciseValidationSummary ?? contextEnableConciseValidationSummary;
+  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "check";
+  const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
+
+  let validationIcon = null;
+  if (finalEnableConciseValidationSummary) {
+    if (validationStatus === "valid") {
+      validationIcon = finalValidationIconSuccess;
+    } else if (validationStatus === "error") {
+      validationIcon = finalValidationIconError;
+    }
+  }
 
   const selectedOptions = useMemo(() => {
     if (!multiSelect) {
@@ -637,6 +668,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
             clearable={clearable}
             onClear={clearValue}
             valueRenderer={valueRenderer}
+            validationIcon={validationIcon}
             {...rest}
           >
             {children}
@@ -716,6 +748,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                     readOnly={readOnly}
                     clearable={clearable}
                     clearValue={clearValue}
+                    validationIcon={validationIcon}
                   />
                 </PopoverTrigger>
               </Part>

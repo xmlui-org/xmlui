@@ -26,6 +26,7 @@ import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react
 import { HiddenOption } from "../Select/HiddenOption";
 import { PART_INPUT } from "../../components-core/parts";
 import { Part } from "../Part/Part";
+import { useFormContextPart } from "../Form/FormContext";
 
 const PART_LIST_WRAPPER = "listWrapper";
 
@@ -55,6 +56,9 @@ type AutoCompleteProps = {
   creatable?: boolean;
   initiallyOpen?: boolean;
   modal?: boolean;
+  enableConciseValidationSummary?: boolean;
+  validationIconSuccess?: string;
+  validationIconError?: string;
 };
 
 function isOptionsExist(options: Option[], newOptions: Option[]) {
@@ -106,6 +110,9 @@ export const AutoComplete = forwardRef(function AutoComplete(
     optionRenderer,
     initiallyOpen = defaultProps.initiallyOpen,
     modal,
+    enableConciseValidationSummary,
+    validationIconSuccess,
+    validationIconError,
     ...rest
   }: AutoCompleteProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -121,6 +128,23 @@ export const AutoComplete = forwardRef(function AutoComplete(
   const [searchTerm, setSearchTerm] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+
+  const contextEnableConciseValidationSummary = useFormContextPart((ctx) => ctx?.enableConciseValidationSummary);
+  const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
+  const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
+
+  const finalEnableConciseValidationSummary = enableConciseValidationSummary ?? contextEnableConciseValidationSummary;
+  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "check";
+  const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
+
+  let validationIcon = null;
+  if (finalEnableConciseValidationSummary) {
+    if (validationStatus === "valid") {
+      validationIcon = finalValidationIconSuccess;
+    } else if (validationStatus === "error") {
+      validationIcon = finalValidationIconError;
+    }
+  }
 
   // Filter options based on search term
   const filteredOptions = useMemo(() => {
@@ -577,6 +601,11 @@ export const AutoComplete = forwardRef(function AutoComplete(
                         }}
                       >
                         <Icon name="close" />
+                      </span>
+                    )}
+                    {validationIcon && (
+                      <span className={classnames(styles.action)}>
+                        <Icon name={validationIcon} />
                       </span>
                     )}
                     <span

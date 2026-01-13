@@ -26,6 +26,9 @@ interface IFormContext {
   itemLabelWidth?: string;
   itemLabelBreak?: boolean;
   itemLabelPosition?: string | LabelPosition;
+  enableConciseValidationSummary?: boolean;
+  validationIconSuccess?: string;
+  validationIconError?: string;
 }
 
 export type ValidationResult = {

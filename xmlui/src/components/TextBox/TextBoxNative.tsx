@@ -11,6 +11,7 @@ import { Adornment } from "../Input/InputAdornment";
 import type { ValidationStatus } from "../abstractions";
 import { PART_START_ADORNMENT, PART_INPUT, PART_END_ADORNMENT } from "../../components-core/parts";
 import { Part } from "../Part/Part";
+import { useFormContextPart } from "../Form/FormContext";
 
 /**
  * TextBox component that supports text input with various configurations.
@@ -62,6 +63,9 @@ type Props = {
    * Default: "eye-off"
    */
   passwordHiddenIcon?: string;
+  enableConciseValidationSummary?: boolean;
+  validationIconSuccess?: string;
+  validationIconError?: string;
 };
 
 export const defaultProps: Pick<
@@ -123,6 +127,9 @@ export const TextBox = forwardRef(function TextBox(
     showPasswordToggle,
     passwordVisibleIcon = defaultProps.passwordVisibleIcon,
     passwordHiddenIcon = defaultProps.passwordHiddenIcon,
+    enableConciseValidationSummary,
+    validationIconSuccess,
+    validationIconError,
     ...rest
   }: Props,
   ref: ForwardedRef<HTMLDivElement>,
@@ -139,6 +146,23 @@ export const TextBox = forwardRef(function TextBox(
   const togglePasswordVisibility = useCallback(() => {
     setShowPassword((prev) => !prev);
   }, []);
+
+  const contextEnableConciseValidationSummary = useFormContextPart((ctx) => ctx?.enableConciseValidationSummary);
+  const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
+  const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
+
+  const finalEnableConciseValidationSummary = enableConciseValidationSummary ?? contextEnableConciseValidationSummary;
+  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "check";
+  const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
+
+  let validationIcon = null;
+  if (finalEnableConciseValidationSummary) {
+    if (validationStatus === "valid") {
+      validationIcon = finalValidationIconSuccess;
+    } else if (validationStatus === "error") {
+      validationIcon = finalValidationIconError;
+    }
+  }
 
   useEffect(() => {
     if (autoFocus) {
@@ -251,6 +275,11 @@ export const TextBox = forwardRef(function TextBox(
             className={styles.adornment}
             onClick={() => updateValue("")}
           />
+        </Part>
+      )}
+      {validationIcon && (
+        <Part partId={PART_END_ADORNMENT}>
+          <Adornment iconName={validationIcon} className={styles.adornment} />
         </Part>
       )}
       {type === "password" && showPasswordToggle ? (

@@ -48,6 +48,7 @@ interface SimpleSelectProps {
   valueRenderer?: (item: Option, removeItem: () => void) => ReactNode;
   children?: ReactNode;
   options: Option[];
+  validationIcon?: string | null;
 }
 
 export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
@@ -79,6 +80,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       valueRenderer,
       options,
       children,
+      validationIcon,
       ...rest
     } = props;
 
@@ -195,6 +197,11 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                 <Icon name="close" />
               </button>
             </Part>
+          )}
+          {validationIcon && (
+            <span className={classnames(styles.action)}>
+              <Icon name={validationIcon} />
+            </span>
           )}
           <span className={styles.action}>
             <Icon name="chevrondown" />

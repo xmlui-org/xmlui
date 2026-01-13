@@ -92,6 +92,18 @@ export const TextBoxMd = createMetadata({
       valueType: "string",
       defaultValue: "eye-off",
     },
+    enableConciseValidationSummary: {
+      description: "Enables a concise validation summary (icon) in input components.",
+      type: "boolean",
+    },
+    validationIconSuccess: {
+      description: "Icon to display for valid state when concise validation summary is enabled.",
+      type: "string",
+    },
+    validationIconError: {
+      description: "Icon to display for error state when concise validation summary is enabled.",
+      type: "string",
+    },
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -196,6 +208,9 @@ function renderTextBox(
       showPasswordToggle={extractValue.asOptionalBoolean(node.props.showPasswordToggle, false)}
       passwordVisibleIcon={extractValue.asOptionalString(node.props.passwordVisibleIcon)}
       passwordHiddenIcon={extractValue.asOptionalString(node.props.passwordHiddenIcon)}
+      enableConciseValidationSummary={extractValue.asOptionalBoolean(node.props.enableConciseValidationSummary)}
+      validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
+      validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
     />
   );
 }

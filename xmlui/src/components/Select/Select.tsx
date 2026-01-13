@@ -132,6 +132,18 @@ export const SelectMd = createMetadata({
         `If not provided, ungrouped options will not have a header.`,
       valueType: "ComponentDef",
     },
+    enableConciseValidationSummary: {
+      description: "Enables a concise validation summary (icon) in input components.",
+      type: "boolean",
+    },
+    validationIconSuccess: {
+      description: "Icon to display for valid state when concise validation summary is enabled.",
+      type: "string",
+    },
+    validationIconError: {
+      description: "Icon to display for error state when concise validation summary is enabled.",
+      type: "string",
+    },
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -241,6 +253,9 @@ export const selectComponentRenderer = createComponentRenderer(
         required={extractValue.asOptionalBoolean(node.props.required)}
         modal={extractValue.asOptionalBoolean(node.props.modal)}
         groupBy={extractValue(node.props.groupBy)}
+        enableConciseValidationSummary={extractValue.asOptionalBoolean(node.props.enableConciseValidationSummary)}
+        validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
+        validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
         groupHeaderRenderer={
           node.props.groupHeaderTemplate
             ? (contextVars) => {

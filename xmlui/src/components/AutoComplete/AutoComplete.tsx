@@ -98,6 +98,18 @@ export const AutoCompleteMd = createMetadata({
         item: "The newly created item value.",
       },
     },
+    enableConciseValidationSummary: {
+      description: "Enables a concise validation summary (icon) in input components.",
+      type: "boolean",
+    },
+    validationIconSuccess: {
+      description: "Icon to display for valid state when concise validation summary is enabled.",
+      type: "string",
+    },
+    validationIconError: {
+      description: "Icon to display for error state when concise validation summary is enabled.",
+      type: "string",
+    },
   },
   apis: {
     focus: {
@@ -191,6 +203,9 @@ export const autoCompleteComponentRenderer = createComponentRenderer(
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
         initiallyOpen={extractValue.asOptionalBoolean(node.props.initiallyOpen)}
         modal={extractValue.asOptionalBoolean(node.props.modal)}
+        enableConciseValidationSummary={extractValue.asOptionalBoolean(node.props.enableConciseValidationSummary)}
+        validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
+        validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
         optionRenderer={
           node.props.optionTemplate
             ? (item, val, inTrigger) => {
