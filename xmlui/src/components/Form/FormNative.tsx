@@ -298,7 +298,7 @@ export const defaultProps: Pick<
   hideButtonRow: false,
   enableSubmit: true,
   validationIconSuccess: "check",
-  validationIconError: "close",
+  validationIconError: "error",
 };
 
 // --- Remove the properties from formState.subject where the property name ends with UNBOUND_FIELD_SUFFIX

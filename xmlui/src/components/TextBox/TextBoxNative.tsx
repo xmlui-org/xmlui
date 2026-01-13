@@ -9,9 +9,10 @@ import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import { Adornment } from "../Input/InputAdornment";
 import type { ValidationStatus } from "../abstractions";
-import { PART_START_ADORNMENT, PART_INPUT, PART_END_ADORNMENT } from "../../components-core/parts";
+import { PART_START_ADORNMENT, PART_INPUT, PART_END_ADORNMENT, PART_VERBOSE_VALIDATION_FEEDBACK } from "../../components-core/parts";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
+import { VerboseValidationFeedback } from "../VerboseValidationFeedback/VerboseValidationFeedback";
 
 /**
  * TextBox component that supports text input with various configurations.
@@ -66,6 +67,7 @@ type Props = {
   verboseValidationFeedback?: boolean;
   validationIconSuccess?: string;
   validationIconError?: string;
+  invalidMessage?: string;
 };
 
 export const defaultProps: Pick<
@@ -130,6 +132,7 @@ export const TextBox = forwardRef(function TextBox(
     verboseValidationFeedback,
     validationIconSuccess,
     validationIconError,
+    invalidMessage,
     ...rest
   }: Props,
   ref: ForwardedRef<HTMLDivElement>,
@@ -153,7 +156,7 @@ export const TextBox = forwardRef(function TextBox(
 
   const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback;
   const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "check";
-  const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
+  const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "error";
 
   // Track if the field was ever invalid during this editing session
   const [wasEverInvalid, setWasEverInvalid] = useState(false);
@@ -165,8 +168,9 @@ export const TextBox = forwardRef(function TextBox(
     }
   }, [validationStatus]);
 
-  // Determine which validation icon to show
+  // Determine which validation icon to show and its status for styling
   let validationIcon = null;
+  let feedbackStatus = validationStatus;
   if (finalVerboseValidationFeedback) {
     if (validationStatus === "error") {
       // Always show error icon when there's an error
@@ -175,6 +179,8 @@ export const TextBox = forwardRef(function TextBox(
       // Show success icon if the field was previously invalid and now it's valid or none
       // (validationStatus can be "valid" or "none" when the error is cleared)
       validationIcon = finalValidationIconSuccess;
+      // Force "valid" status for styling when showing success icon
+      feedbackStatus = "valid";
     }
   }
 
@@ -291,9 +297,13 @@ export const TextBox = forwardRef(function TextBox(
           />
         </Part>
       )}
-      {validationIcon && (
-        <Part partId={PART_END_ADORNMENT}>
-          <Adornment iconName={validationIcon} className={styles.adornment} />
+      {finalVerboseValidationFeedback && (
+        <Part partId={PART_VERBOSE_VALIDATION_FEEDBACK}>
+          <VerboseValidationFeedback
+            icon={validationIcon}
+            message={validationStatus === "error" ? invalidMessage : undefined}
+            validationStatus={feedbackStatus}
+          />
         </Part>
       )}
       {type === "password" && showPasswordToggle ? (
