@@ -63,7 +63,7 @@ type Props = {
    * Default: "eye-off"
    */
   passwordHiddenIcon?: string;
-  enableConciseValidationSummary?: boolean;
+  verboseValidationFeedback?: boolean;
   validationIconSuccess?: string;
   validationIconError?: string;
 };
@@ -127,7 +127,7 @@ export const TextBox = forwardRef(function TextBox(
     showPasswordToggle,
     passwordVisibleIcon = defaultProps.passwordVisibleIcon,
     passwordHiddenIcon = defaultProps.passwordHiddenIcon,
-    enableConciseValidationSummary,
+    verboseValidationFeedback,
     validationIconSuccess,
     validationIconError,
     ...rest
@@ -147,20 +147,34 @@ export const TextBox = forwardRef(function TextBox(
     setShowPassword((prev) => !prev);
   }, []);
 
-  const contextEnableConciseValidationSummary = useFormContextPart((ctx) => ctx?.enableConciseValidationSummary);
+  const contextVerboseValidationFeedback = useFormContextPart((ctx) => ctx?.verboseValidationFeedback);
   const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
   const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
 
-  const finalEnableConciseValidationSummary = enableConciseValidationSummary ?? contextEnableConciseValidationSummary;
+  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback;
   const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "check";
   const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
 
+  // Track if the field was ever invalid during this editing session
+  const [wasEverInvalid, setWasEverInvalid] = useState(false);
+
+  // Update wasEverInvalid when validationStatus changes to error
+  useEffect(() => {
+    if (validationStatus === "error") {
+      setWasEverInvalid(true);
+    }
+  }, [validationStatus]);
+
+  // Determine which validation icon to show
   let validationIcon = null;
-  if (finalEnableConciseValidationSummary) {
-    if (validationStatus === "valid") {
-      validationIcon = finalValidationIconSuccess;
-    } else if (validationStatus === "error") {
+  if (finalVerboseValidationFeedback) {
+    if (validationStatus === "error") {
+      // Always show error icon when there's an error
       validationIcon = finalValidationIconError;
+    } else if (wasEverInvalid && validationStatus !== "warning") {
+      // Show success icon if the field was previously invalid and now it's valid or none
+      // (validationStatus can be "valid" or "none" when the error is cleared)
+      validationIcon = finalValidationIconSuccess;
     }
   }
 

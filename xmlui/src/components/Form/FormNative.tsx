@@ -267,7 +267,7 @@ type Props = {
   hideButtonRowUntilDirty?: boolean;
   hideButtonRow?: boolean;
   enableSubmit?: boolean;
-  enableConciseValidationSummary?: boolean;
+  verboseValidationFeedback?: boolean;
   validationIconSuccess?: string;
   validationIconError?: string;
 };
@@ -343,7 +343,7 @@ const Form = forwardRef(function (
     hideButtonRowUntilDirty,
     hideButtonRow = defaultProps.hideButtonRow,
     enableSubmit = defaultProps.enableSubmit,
-    enableConciseValidationSummary,
+    verboseValidationFeedback,
     validationIconSuccess = defaultProps.validationIconSuccess,
     validationIconError = defaultProps.validationIconError,
     ...rest
@@ -375,7 +375,7 @@ const Form = forwardRef(function (
       interactionFlags: formState.interactionFlags,
       dispatch,
       enabled: isEnabled,
-      enableConciseValidationSummary,
+      verboseValidationFeedback,
       validationIconSuccess,
       validationIconError,
     };
@@ -389,7 +389,7 @@ const Form = forwardRef(function (
     itemLabelBreak,
     itemLabelPosition,
     itemLabelWidth,
-    enableConciseValidationSummary,
+    verboseValidationFeedback,
     validationIconSuccess,
     validationIconError,
   ]);
@@ -741,7 +741,7 @@ export const FormWithContextVar = forwardRef(function (
         hideButtonRowUntilDirty={extractValue.asOptionalBoolean(node.props.hideButtonRowUntilDirty)}
         hideButtonRow={extractValue.asOptionalBoolean(node.props.hideButtonRow)}
         enableSubmit={extractValue.asOptionalBoolean(node.props.enableSubmit)}
-        enableConciseValidationSummary={extractValue.asOptionalBoolean(node.props.enableConciseValidationSummary)}
+        verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
         validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
         validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
         formState={formState}

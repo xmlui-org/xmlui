@@ -26,7 +26,7 @@ interface IFormContext {
   itemLabelWidth?: string;
   itemLabelBreak?: boolean;
   itemLabelPosition?: string | LabelPosition;
-  enableConciseValidationSummary?: boolean;
+  verboseValidationFeedback?: boolean;
   validationIconSuccess?: string;
   validationIconError?: string;
 }

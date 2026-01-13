@@ -52,7 +52,7 @@ export const FormMd = createMetadata({
       type: "boolean",
       defaultValue: defaultProps.itemLabelBreak,
     },
-    enableConciseValidationSummary: {
+    verboseValidationFeedback: {
       description: "Enables a concise validation summary (icon) in input components.",
       type: "boolean",
     },

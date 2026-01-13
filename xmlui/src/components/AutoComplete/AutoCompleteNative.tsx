@@ -56,7 +56,7 @@ type AutoCompleteProps = {
   creatable?: boolean;
   initiallyOpen?: boolean;
   modal?: boolean;
-  enableConciseValidationSummary?: boolean;
+  verboseValidationFeedback?: boolean;
   validationIconSuccess?: string;
   validationIconError?: string;
 };
@@ -110,7 +110,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
     optionRenderer,
     initiallyOpen = defaultProps.initiallyOpen,
     modal,
-    enableConciseValidationSummary,
+    verboseValidationFeedback,
     validationIconSuccess,
     validationIconError,
     ...rest
@@ -129,16 +129,16 @@ export const AutoComplete = forwardRef(function AutoComplete(
   const [isFocused, setIsFocused] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
-  const contextEnableConciseValidationSummary = useFormContextPart((ctx) => ctx?.enableConciseValidationSummary);
+  const contextVerboseValidationFeedback = useFormContextPart((ctx) => ctx?.verboseValidationFeedback);
   const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
   const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
 
-  const finalEnableConciseValidationSummary = enableConciseValidationSummary ?? contextEnableConciseValidationSummary;
+  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback;
   const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "check";
   const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
 
   let validationIcon = null;
-  if (finalEnableConciseValidationSummary) {
+  if (finalVerboseValidationFeedback) {
     if (validationStatus === "valid") {
       validationIcon = finalValidationIconSuccess;
     } else if (validationStatus === "error") {

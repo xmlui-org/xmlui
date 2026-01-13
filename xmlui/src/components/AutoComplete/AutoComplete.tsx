@@ -98,7 +98,7 @@ export const AutoCompleteMd = createMetadata({
         item: "The newly created item value.",
       },
     },
-    enableConciseValidationSummary: {
+    verboseValidationFeedback: {
       description: "Enables a concise validation summary (icon) in input components.",
       type: "boolean",
     },
@@ -203,7 +203,7 @@ export const autoCompleteComponentRenderer = createComponentRenderer(
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
         initiallyOpen={extractValue.asOptionalBoolean(node.props.initiallyOpen)}
         modal={extractValue.asOptionalBoolean(node.props.modal)}
-        enableConciseValidationSummary={extractValue.asOptionalBoolean(node.props.enableConciseValidationSummary)}
+        verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
         validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
         validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
         optionRenderer={

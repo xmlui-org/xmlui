@@ -98,7 +98,7 @@ interface SelectProps {
   registerComponentApi?: RegisterComponentApiFn;
   children?: ReactNode;
   modal?: boolean;
-  enableConciseValidationSummary?: boolean;
+  verboseValidationFeedback?: boolean;
   validationIconSuccess?: string;
   validationIconError?: string;
 }
@@ -273,7 +273,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     registerComponentApi,
     children,
     modal = defaultProps.modal,
-    enableConciseValidationSummary,
+    verboseValidationFeedback,
     validationIconSuccess,
     validationIconError,
 
@@ -290,16 +290,16 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
-  const contextEnableConciseValidationSummary = useFormContextPart((ctx) => ctx?.enableConciseValidationSummary);
+  const contextVerboseValidationFeedback = useFormContextPart((ctx) => ctx?.verboseValidationFeedback);
   const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
   const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
 
-  const finalEnableConciseValidationSummary = enableConciseValidationSummary ?? contextEnableConciseValidationSummary;
+  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback;
   const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "check";
   const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
 
   let validationIcon = null;
-  if (finalEnableConciseValidationSummary) {
+  if (finalVerboseValidationFeedback) {
     if (validationStatus === "valid") {
       validationIcon = finalValidationIconSuccess;
     } else if (validationStatus === "error") {

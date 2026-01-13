@@ -92,7 +92,7 @@ export const TextBoxMd = createMetadata({
       valueType: "string",
       defaultValue: "eye-off",
     },
-    enableConciseValidationSummary: {
+    verboseValidationFeedback: {
       description: "Enables a concise validation summary (icon) in input components.",
       type: "boolean",
     },
@@ -208,7 +208,7 @@ function renderTextBox(
       showPasswordToggle={extractValue.asOptionalBoolean(node.props.showPasswordToggle, false)}
       passwordVisibleIcon={extractValue.asOptionalString(node.props.passwordVisibleIcon)}
       passwordHiddenIcon={extractValue.asOptionalString(node.props.passwordHiddenIcon)}
-      enableConciseValidationSummary={extractValue.asOptionalBoolean(node.props.enableConciseValidationSummary)}
+      verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
       validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
       validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
     />

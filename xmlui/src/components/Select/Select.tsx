@@ -132,7 +132,7 @@ export const SelectMd = createMetadata({
         `If not provided, ungrouped options will not have a header.`,
       valueType: "ComponentDef",
     },
-    enableConciseValidationSummary: {
+    verboseValidationFeedback: {
       description: "Enables a concise validation summary (icon) in input components.",
       type: "boolean",
     },
@@ -253,7 +253,7 @@ export const selectComponentRenderer = createComponentRenderer(
         required={extractValue.asOptionalBoolean(node.props.required)}
         modal={extractValue.asOptionalBoolean(node.props.modal)}
         groupBy={extractValue(node.props.groupBy)}
-        enableConciseValidationSummary={extractValue.asOptionalBoolean(node.props.enableConciseValidationSummary)}
+        verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
         validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
         validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
         groupHeaderRenderer={

@@ -89,7 +89,7 @@ type Props = {
   readOnly?: boolean;
   autoFocus?: boolean;
   emptyCharacter?: string;
-  enableConciseValidationSummary?: boolean;
+  verboseValidationFeedback?: boolean;
   validationIconSuccess?: string;
   validationIconError?: string;
 };
@@ -147,7 +147,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     readOnly = defaultProps.readOnly,
     autoFocus = defaultProps.autoFocus,
     emptyCharacter = defaultProps.emptyCharacter,
-    enableConciseValidationSummary,
+    verboseValidationFeedback,
     validationIconSuccess,
     validationIconError,
     ...rest
@@ -198,16 +198,16 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
   const [isMonthCurrentlyInvalid, setIsMonthCurrentlyInvalid] = useState(false);
   const [isYearCurrentlyInvalid, setIsYearCurrentlyInvalid] = useState(false);
 
-  const contextEnableConciseValidationSummary = useFormContextPart((ctx) => ctx?.enableConciseValidationSummary);
+  const contextVerboseValidationFeedback = useFormContextPart((ctx) => ctx?.verboseValidationFeedback);
   const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
   const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
 
-  const finalEnableConciseValidationSummary = enableConciseValidationSummary ?? contextEnableConciseValidationSummary;
+  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback;
   const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "check";
   const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
 
   let validationIcon = null;
-  if (finalEnableConciseValidationSummary) {
+  if (finalVerboseValidationFeedback) {
     if (validationStatus === "valid") {
       validationIcon = finalValidationIconSuccess;
     } else if (validationStatus === "error") {

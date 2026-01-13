@@ -158,7 +158,7 @@ export const DateInputMd = createMetadata({
     startIcon: dStartIcon(),
     endText: dEndText(),
     endIcon: dEndIcon(),
-    enableConciseValidationSummary: {
+    verboseValidationFeedback: {
       description: "Enables a concise validation summary (icon) in input components.",
       type: "boolean",
     },
@@ -266,7 +266,7 @@ export const dateInputComponentRenderer = createComponentRenderer(
         clearToInitialValue={extractValue.asOptionalBoolean(node.props.clearToInitialValue, defaultProps.clearToInitialValue)}
         gap={extractValue.asOptionalString(node.props.gap)}
         emptyCharacter={extractValue.asOptionalString(node.props.emptyCharacter)}
-        enableConciseValidationSummary={extractValue.asOptionalBoolean(node.props.enableConciseValidationSummary)}
+        verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
         validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
         validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
       />
