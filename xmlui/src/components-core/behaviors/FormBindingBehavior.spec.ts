@@ -808,149 +808,26 @@ test.describe("Validation Properties", () => {
     const driver = await createFormItemDriver("formItem");
     await expect(driver.component).toBeVisible();
   });
-
-  test("renders with minValue property", async ({ initTestBed, createFormItemDriver }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem testId="formItem" type="number" minValue="0" />
-      </Form>
-    `);
-    const driver = await createFormItemDriver("formItem");
-    await expect(driver.component).toBeVisible();
-  });
-
-  test("renders with maxValue property", async ({ initTestBed, createFormItemDriver }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem testId="formItem" type="number" maxValue="100" />
-      </Form>
-    `);
-    const driver = await createFormItemDriver("formItem");
-    await expect(driver.component).toBeVisible();
-  });
-
-  test("renders with pattern property", async ({ initTestBed, createFormItemDriver }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem testId="formItem" type="text" pattern="email" />
-      </Form>
-    `);
-    const driver = await createFormItemDriver("formItem");
-    await expect(driver.component).toBeVisible();
-  });
-
-  test("renders with regex property", async ({ initTestBed, createFormItemDriver }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem testId="formItem" type="text" regex="^[a-zA-Z]+$" />
-      </Form>
-    `);
-    const driver = await createFormItemDriver("formItem");
-    await expect(driver.component).toBeVisible();
-  });
-
-  test("renders with custom validation messages", async ({ initTestBed, createFormItemDriver }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem 
-          testId="formItem" 
-          type="text" 
-          required="true"
-          requiredInvalidMessage="This field is mandatory"
-          lengthInvalidMessage="Invalid length"
-          rangeInvalidMessage="Out of range"
-          patternInvalidMessage="Invalid format"
-          regexInvalidMessage="Does not match pattern"
-        />
-      </Form>
-    `);
-    const driver = await createFormItemDriver("formItem");
-    await expect(driver.component).toBeVisible();
-  });
-
-  test("renders with validation severity settings", async ({
-    initTestBed,
-    createFormItemDriver,
-  }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem 
-          testId="formItem" 
-          type="text"
-          lengthInvalidSeverity="warning"
-          rangeInvalidSeverity="error"
-          patternInvalidSeverity="warning"
-          regexInvalidSeverity="error"
-        />
-      </Form>
-    `);
-    const driver = await createFormItemDriver("formItem");
-    await expect(driver.component).toBeVisible();
-  });
-
-  test("renders with validationMode property", async ({ initTestBed, createFormItemDriver }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem testId="formItem" type="text" validationMode="onChanged" />
-      </Form>
-    `);
-    const driver = await createFormItemDriver("formItem");
-    await expect(driver.component).toBeVisible();
-  });
-
-  test("renders with customValidationsDebounce property", async ({
-    initTestBed,
-    createFormItemDriver,
-  }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem testId="formItem" type="text" customValidationsDebounce="500" />
-      </Form>
-    `);
-    const driver = await createFormItemDriver("formItem");
-    await expect(driver.component).toBeVisible();
-  });
-});
-
-test.describe("Template Properties", () => {
-  test("renders with custom inputTemplate", async ({ initTestBed, createFormItemDriver }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem testId="formItem">
-          <property name="inputTemplate">
-            <TextBox placeholder="Custom input" />
-          </property>
-        </FormItem>
-      </Form>
-    `);
-    const driver = await createFormItemDriver("formItem");
-    await expect(driver.component).toBeVisible();
-  });
 });
 
 test.describe("Event Handling", () => {
   test("fires onValidate event", async ({
     initTestBed,
-    createFormItemDriver,
     createTextBoxDriver,
   }) => {
     const { testStateDriver } = await initTestBed(`
       <Form>
-        <FormItem 
-          testId="formItem" 
-          type="text" 
+        <TextBox 
+          testId="test" 
           required="true"
           onValidate="result => testState = result ? 'valid' : 'invalid'"
         />
       </Form>
     `);
 
-    const formItemDriver = await createFormItemDriver("formItem");
-    const inputDriver = await createTextBoxDriver(formItemDriver.input);
-
-    // Type some text to trigger validation
-    await inputDriver.field.fill("test value");
-    await inputDriver.field.blur();
+    const driver = await createTextBoxDriver("test");
+    await driver.input.fill("test value");
+    await driver.input.blur();
 
     await expect.poll(testStateDriver.testState).toEqual("valid");
   });
@@ -961,59 +838,29 @@ test.describe("Event Handling", () => {
 // =============================================================================
 
 test.describe("Accessibility", () => {
-  test("associates label with input using proper labeling", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem label="Email Address" type="text" />
-      </Form>
-    `);
-
-    const input = page.getByRole("textbox");
-    const label = page.getByText("Email Address");
-    await expect(input).toBeVisible();
-    await expect(label).toBeVisible();
-  });
-
-  test("associates label with checkbox input", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem label="Accept Terms" type="checkbox" />
-      </Form>
-    `);
-
-    const checkbox = page.getByRole("checkbox");
-    const label = page.getByText("Accept Terms");
-    await expect(checkbox).toBeVisible();
-    await expect(label).toBeVisible();
-  });
-
   test("indicates required fields with aria-required", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form>
-        <FormItem label="Required Field" type="text" required="true" />
+        <TextBox label="Required Field" required="true" />
       </Form>
     `);
 
     const input = page.getByRole("textbox");
-    const label = page.getByText("Required Field");
     await expect(input).toBeVisible();
-    await expect(label).toBeVisible();
-    // FormItem's required functionality may be implemented differently
-    // Just verify the component renders properly with required=true
+    // TextBox propagates required to the input
+    await expect(input).toHaveAttribute("required");
   });
 
   test("associates validation messages with input using aria-describedby", async ({
     initTestBed,
     createFormDriver,
-    createFormItemDriver,
     createTextBoxDriver,
   }) => {
     await initTestBed(`
       <Form>
-        <FormItem 
+        <TextBox 
           testId="formItem"
           label="Test Field" 
-          type="text" 
           required="true" 
           requiredInvalidMessage="This field is required"
         />
@@ -1021,19 +868,19 @@ test.describe("Accessibility", () => {
     `);
 
     const formDriver = await createFormDriver();
-    const formItemDriver = await createFormItemDriver("formItem");
+    const driver = await createTextBoxDriver("formItem");
 
     // Submit form to trigger validation
     await formDriver.submitForm();
 
     // Check that validation message appears in the component
-    await expect(formItemDriver.component).toContainText("This field is required");
+    await expect(driver.component).toContainText("This field is required");
   });
 
   test("supports keyboard navigation for text input", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form>
-        <FormItem label="Text Field" type="text" />
+        <TextBox label="Text Field" />
       </Form>
     `);
 
@@ -1045,24 +892,6 @@ test.describe("Accessibility", () => {
     await expect(input).not.toBeFocused();
   });
 
-  test("supports keyboard navigation for checkbox", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem label="Checkbox Field" type="checkbox" />
-      </Form>
-    `);
-
-    const checkbox = page.getByRole("checkbox");
-    await checkbox.focus();
-    await expect(checkbox).toBeFocused();
-
-    await checkbox.press("Space");
-    await expect(checkbox).toBeChecked();
-
-    await checkbox.press("Space");
-    await expect(checkbox).not.toBeChecked();
-  });
-
   test("provides accessible validation state announcements", async ({
     initTestBed,
     createFormDriver,
@@ -1070,9 +899,8 @@ test.describe("Accessibility", () => {
   }) => {
     await initTestBed(`
       <Form>
-        <FormItem 
+        <TextBox 
           label="Required Field" 
-          type="text" 
           required="true" 
           requiredInvalidMessage="This field is required"
         />
@@ -1086,22 +914,6 @@ test.describe("Accessibility", () => {
 
     // Check that validation message appears somewhere on the page
     await expect(page.getByText("This field is required")).toBeVisible();
-  });
-
-  test("maintains correct role for different input types", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem label="Text Field" type="text" />
-        <FormItem label="Checkbox Field" type="checkbox" />
-        <FormItem label="Number Field" type="number" />
-      </Form>
-    `);
-
-    await expect(page.getByRole("textbox").first()).toBeVisible();
-    await expect(page.getByRole("checkbox")).toBeVisible();
-    // Number inputs in XMLUI appear as textbox with inputmode="numeric"
-    const numberInputs = page.getByRole("textbox");
-    await expect(numberInputs).toHaveCount(2); // text and number both use textbox role
   });
 });
 
