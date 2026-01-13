@@ -64,7 +64,6 @@ $outlineOffset-RadioGroupOption--focus: createThemeVar("Input:outlineOffset-Radi
 
 @layer components {
   .radioGroupContainer {
-    width: 100%;
     display: flex;
     flex-direction: column;
     gap: t.$space-2;

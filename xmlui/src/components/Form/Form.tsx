@@ -195,7 +195,7 @@ export const FormMd = createMetadata({
   defaultThemeVars: {
     "gap-Form": "$space-4",
     "gap-buttonRow-Form": "$space-4",
-    "backgroundColor-Form": "$backgroundColor",
+    "backgroundColor-Form": "transparent",
     "backgroundColor-ValidationDisplay-error": "$color-danger-100",
     "backgroundColor-ValidationDisplay-warning": "$color-warn-100",
     "backgroundColor-ValidationDisplay-info": "$color-primary-100",
