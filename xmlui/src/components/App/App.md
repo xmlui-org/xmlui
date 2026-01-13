@@ -303,7 +303,7 @@ The `desktop` layout is designed for full-screen desktop applications. It stretc
 This boolean property specifies whether the whole page should scroll (true) or just the content area (false).
 The default value is `true`.
 
-```xmlui-pg copy display name="Example: scrollWholePage" height="150px"
+```xmlui-pg copy display name="Example: scrollWholePage='false'" height="300px"
 <App scrollWholePage="false">
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
@@ -311,13 +311,55 @@ The default value is `true`.
   <Pages fallbackPath="/">
     <Page url="/">
       <Text>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-        Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
+        do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+        Ut enim ad minim veniam, quis nostrud exercitation ullamco 
+        laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure 
+        dolor in reprehenderit in voluptate velit esse cillum dolore eu 
+        fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, 
+        sunt in culpa qui officia deserunt mollit anim id est laborum.
       </Text>
     </Page>
   </Pages>
+</App>
+```
+
+When `scrollWholePage` is set to `false`, the main content panel's height is stretched to the remaining height of the viewport between the header and the footer.
+When you use star sizing, it calculates the effective height from the main content's height:
+
+```xmlui-pg copy display name="Example: scrollWholePage='false' (star-sizing)" height="300px"
+<App layout="horizontal" scrollWholePage="false">
+  <AppHeader>
+    Horizontal Splitter Example
+  </AppHeader>
+  <CHStack height="*" backgroundColor="lightblue">1/4</CHStack>
+  <CHStack height="3*" backgroundColor="lightcoral">3/4</CHStack>
+  <Footer>
+    Footer Content
+  </Footer>
+</App>
+```
+
+Here is a more complex example built on star-sizing:
+
+```xmlui-pg copy display name="Example: scrollWholePage='false' (with Splitter)" height="300px"
+<App layout="horizontal" scrollWholePage="false">
+  <AppHeader>
+    Horizontal Splitter Example
+  </AppHeader>
+  <HSplitter height="*" minPrimarySize="180px" maxPrimarySize="-180px">
+    <List
+      id="myList"
+      data="{ Array.from({ length: 100 }).map((_, i) => i) }"
+      height="*"
+    >
+      <Card title="Item #{$item}" />
+    </List>
+    <Card title="Details" />
+  </HSplitter>
+  <Footer>
+    Footer Content
+  </Footer>
 </App>
 ```
 
