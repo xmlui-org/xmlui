@@ -5,7 +5,7 @@ import { Slot } from "@radix-ui/react-slot";
 
 import styles from "./FormItem.module.scss";
 
-import type { LabelPosition } from "../abstractions";
+import type { LabelPosition, RequiredIndicatorMode } from "../abstractions";
 import { Spinner } from "../Spinner/SpinnerNative";
 import { PART_LABELED_ITEM, PART_LABEL } from "../../components-core/parts";
 import { Part } from "../Part/Part";
@@ -35,6 +35,7 @@ type ItemWithLabelProps = {
   layoutContext?: LayoutContext;
   testId?: string;
   cloneStyle?: boolean;
+  requiredIndicator?: RequiredIndicatorMode;
 };
 export const defaultProps: Pick<ItemWithLabelProps, "labelBreak"> = {
   labelBreak: true,
@@ -65,6 +66,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     layoutContext, // Destructured to prevent passing to DOM
     testId,
     cloneStyle = false,
+    requiredIndicator,
     ...rest
   }: ItemWithLabelProps,
   ref: ForwardedRef<HTMLDivElement>,
@@ -120,7 +122,13 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
                   [styles.labelBreak]: labelBreak,
                 })}
               >
-                {label} {required && <span className={styles.requiredMark}>*</span>}
+                {label}
+                {(requiredIndicator === "required" || requiredIndicator === "both") && required && (
+                  <span className={styles.requiredMark}>*</span>
+                )}
+                {(requiredIndicator === "optional" || requiredIndicator === "both") && !required && (
+                  <span className={styles.optionalTag}> (Optional)</span>
+                )}
                 {validationInProgress && (
                   <Spinner
                     style={{ height: "1em", width: "1em", marginLeft: "1em", alignSelf: "center" }}
