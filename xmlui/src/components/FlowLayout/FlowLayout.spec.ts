@@ -315,6 +315,142 @@ test.describe("Basic functionality", () => {
     // Default should be "start" alignment
     expect(top1).toBe(top2);
   });
+
+  test("Button with width='50%' renders correctly in FlowLayout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout testId="layout" width="600px">
+        <Button testId="button" width="50%">Hello World</Button>
+      </FlowLayout>
+    `);
+
+    const button = page.getByTestId("button");
+    const layout = page.getByTestId("layout");
+    
+    const buttonBox = await button.boundingBox();
+    const layoutBox = await layout.boundingBox();
+    
+    // The button should take approximately 50% of the container width
+    const expectedWidth = layoutBox.width * 0.5;
+    expect(buttonBox.width).toBeCloseTo(expectedWidth, -1); // Allow 10px tolerance
+  });
+
+  test("FormItem with width='50%' renders correctly in FlowLayout", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <FlowLayout testId="layout" width="600px" gap="0">
+          <FormItem testId="formitem" width="50%" />
+          <Button testId="button" width="50%">Save</Button>
+        </FlowLayout>
+      </Form>
+    `);
+
+    // Both items should be on the same row
+    const formItem = page.getByTestId("formitem");
+    const button = page.getByTestId("button");
+    const layout = page.getByTestId("layout");
+    
+    const formItemBox = await formItem.boundingBox();
+    const buttonBox = await button.boundingBox();
+    const layoutBox = await layout.boundingBox();
+    
+    // Items should be on the same row (same y position)
+    expect(formItemBox.y).toBe(buttonBox.y);
+    
+    // FormItem should be to the left of Button
+    expect(formItemBox.x).toBeLessThan(buttonBox.x);
+    
+    // Both items together should approximately fill the layout width
+    // (allowing for gaps and padding)
+    const totalItemsWidth = formItemBox.width + buttonBox.width;
+    expect(totalItemsWidth).toBeGreaterThan(layoutBox.width * 0.95);
+  });
+
+  test("width prop is not applied directly to child component", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout>
+        <Button testId="button" width="200px">Click Me</Button>
+      </FlowLayout>
+    `);
+
+    const button = page.getByTestId("button");
+    
+    // The button itself should not have width style applied directly
+    // It should fill its wrapper (which has the 200px width)
+    const computedStyle = await button.evaluate((el) => {
+      return window.getComputedStyle(el).width;
+    });
+    
+    // The button should be close to 200px (filling its wrapper)
+    // but should not be 50% of 200px (which would be 100px)
+    const width = parseFloat(computedStyle);
+    expect(width).toBeGreaterThan(150); // Should be close to 200px
+    expect(width).toBeLessThanOrEqual(200);
+  });
+
+  test("percentage width is not applied twice to child", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout width="400px">
+        <Stack testId="stack" width="50%" height="50px">
+          <Text>Content</Text>
+        </Stack>
+      </FlowLayout>
+    `);
+
+    const stack = page.getByTestId("stack");
+    const stackBox = await stack.boundingBox();
+    
+    // Stack should be approximately 200px (50% of 400px)
+    // NOT 100px (which would be 50% of 50% = 25% of 400px)
+    expect(stackBox.width).toBeGreaterThan(180);
+    expect(stackBox.width).toBeLessThanOrEqual(200);
+  });
+
+  test("minWidth and maxWidth are not applied to child component", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout>
+        <Button testId="button" minWidth="150px" maxWidth="300px">Variable Width Button</Button>
+      </FlowLayout>
+    `);
+
+    const button = page.getByTestId("button");
+    const buttonBox = await button.boundingBox();
+    
+    // The button should respect the constraints through its wrapper
+    expect(buttonBox.width).toBeGreaterThanOrEqual(150);
+    expect(buttonBox.width).toBeLessThanOrEqual(300);
+  });
+
+  test("multiple items with different widths render correctly", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout width="600px">
+        <Button testId="btn1" width="25%">25%</Button>
+        <Button testId="btn2" width="50%">50%</Button>
+        <Button testId="btn3" width="25%">25%</Button>
+      </FlowLayout>
+    `);
+
+    const btn1 = page.getByTestId("btn1");
+    const btn2 = page.getByTestId("btn2");
+    const btn3 = page.getByTestId("btn3");
+    
+    const box1 = await btn1.boundingBox();
+    const box2 = await btn2.boundingBox();
+    const box3 = await btn3.boundingBox();
+    
+    // All should be on the same row
+    expect(box1.y).toBe(box2.y);
+    expect(box2.y).toBe(box3.y);
+    
+    // Verify approximate widths (accounting for gaps)
+    expect(box1.width).toBeGreaterThan(130); // ~25% of 600 = 150px
+    expect(box1.width).toBeLessThanOrEqual(150);
+    
+    expect(box2.width).toBeGreaterThan(280); // ~50% of 600 = 300px
+    expect(box2.width).toBeLessThanOrEqual(300);
+    
+    expect(box3.width).toBeGreaterThan(130); // ~25% of 600 = 150px
+    expect(box3.width).toBeLessThanOrEqual(150);
+  });
 });
 
 // =============================================================================
