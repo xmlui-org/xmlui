@@ -67,7 +67,7 @@ type Props = {
   verboseValidationFeedback?: boolean;
   validationIconSuccess?: string;
   validationIconError?: string;
-  invalidMessage?: string;
+  invalidMessages?: string[];
 };
 
 export const defaultProps: Pick<
@@ -132,7 +132,7 @@ export const TextBox = forwardRef(function TextBox(
     verboseValidationFeedback,
     validationIconSuccess,
     validationIconError,
-    invalidMessage,
+    invalidMessages,
     ...rest
   }: Props,
   ref: ForwardedRef<HTMLDivElement>,
@@ -277,7 +277,7 @@ export const TextBox = forwardRef(function TextBox(
             validationStatus={validationStatus}
             successIcon={finalValidationIconSuccess}
             errorIcon={finalValidationIconError}
-            invalidMessage={invalidMessage}
+            invalidMessages={invalidMessages}
           />
         </Part>
       )}

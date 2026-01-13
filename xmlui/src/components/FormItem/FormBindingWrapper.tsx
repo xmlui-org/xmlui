@@ -170,10 +170,10 @@ export function FormBindingWrapper({
     return children;
   }
 
-  // Get the first invalid message from validation results
-  const invalidMessage = validationResult?.validations.find(
-    (v) => !v.isValid && v.invalidMessage
-  )?.invalidMessage;
+  // Get all invalid messages from validation results
+  const invalidMessages = validationResult?.validations
+    .filter((v) => !v.isValid && v.invalidMessage)
+    .map((v) => v.invalidMessage) ?? [];
 
   // Clone the input component and inject form-related props
   const enhancedInput = cloneElement(children, {
@@ -183,7 +183,7 @@ export function FormBindingWrapper({
     onBlur,
     enabled: isEnabled,
     validationStatus,
-    invalidMessage,
+    invalidMessages,
     registerComponentApi,
   });
 

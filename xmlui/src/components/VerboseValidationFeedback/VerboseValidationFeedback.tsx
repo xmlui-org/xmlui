@@ -11,14 +11,14 @@ type Props = {
   validationStatus?: ValidationStatus;
   successIcon?: string;
   errorIcon?: string;
-  invalidMessage?: string;
+  invalidMessages?: string[];
 };
 
 export const VerboseValidationFeedback = ({
   validationStatus,
   successIcon = "check",
   errorIcon = "error",
-  invalidMessage,
+  invalidMessages = [],
 }: Props) => {
   // Track if the field was ever invalid during this editing session
   const [wasEverInvalid, setWasEverInvalid] = useState(false);
@@ -59,9 +59,11 @@ export const VerboseValidationFeedback = ({
     />
   );
 
-  if (invalidMessage && validationStatus === "error") {
+  // Show tooltip with all error messages when there are errors
+  if (invalidMessages.length > 0 && validationStatus === "error") {
+    const tooltipContent = invalidMessages.join("\n");
     return (
-      <Tooltip text={invalidMessage} delayDuration={100}>
+      <Tooltip text={tooltipContent} delayDuration={100}>
         {iconElement}
       </Tooltip>
     );
