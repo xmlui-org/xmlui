@@ -100,10 +100,6 @@ The divider can be customized using XMLUI components via this property.
 </App>
 ```
 
-### `stretch` (default: false) [#stretch-default-false]
-
-When set to true, the Splitter takes the full height of its parent container. This is particularly useful in desktop layouts where you want content to fill the available vertical space between fixed header and footer elements.
-
 ### `swapped` (default: false) [#swapped-default-false]
 
 This optional booelan property indicates whether the `Splitter` sections are layed out as primary and secondary (`false`) or secondary and primary (`true`) from left to right.
