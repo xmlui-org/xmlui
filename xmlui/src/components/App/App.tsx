@@ -101,6 +101,16 @@ export const AppMd = createMetadata({
       },
     },
   },
+  apis: {
+    scrollToTop: {
+      description: "Scrolls the App content container to the top. Works when scrollWholePage is false.",
+      signature: "scrollToTop(behavior?: 'auto' | 'instant' | 'smooth'): void",
+    },
+    scrollToBottom: {
+      description: "Scrolls the App content container to the bottom. Works when scrollWholePage is false.",
+      signature: "scrollToBottom(behavior?: 'auto' | 'instant' | 'smooth'): void",
+    },
+  },
   themeVars: { ...parseScssVar(styles.themeVars), ...parseScssVar(drawerStyles.themeVars) },
   limitThemeVarsToComponent: true,
   themeVarDescriptions: {

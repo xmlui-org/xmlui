@@ -238,6 +238,33 @@ export function App({
   const scrollContainerRef = scrollWholePage ? pageScrollRef : contentScrollRef;
   const scrollbarWidth = useScrollbarWidth();
 
+  // Register scroll API methods
+  useEffect(() => {
+    if (registerComponentApi) {
+      registerComponentApi({
+        scrollToTop: (behavior: ScrollBehavior = 'instant') => {
+          // The actual scroll container is the pageContentContainer div (firstElementChild of AppPagesSlot)
+          const scrollElement = contentScrollRef.current?.firstElementChild as HTMLElement;
+          if (scrollElement) {
+            scrollElement.scrollTo({
+              top: 0,
+              behavior
+            });
+          }
+        },
+        scrollToBottom: (behavior: ScrollBehavior = 'instant') => {
+          const scrollElement = contentScrollRef.current?.firstElementChild as HTMLElement;
+          if (scrollElement) {
+            scrollElement.scrollTo({
+              top: scrollElement.scrollHeight,
+              behavior
+            });
+          }
+        },
+      });
+    }
+  }, [registerComponentApi]);
+
   const footerSize = useElementSizeObserver();
   const headerSize = useElementSizeObserver();
 
