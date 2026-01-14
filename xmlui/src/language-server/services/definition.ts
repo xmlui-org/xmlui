@@ -17,7 +17,6 @@ export function handleDefinition(
     parseResult: { node },
     getText,
   } = doc.parse();
-  console.log("received definition");
 
   const offset = doc.cursor.offsetAt(position);
   const findRes = findTokenAtOffset(node, offset);
@@ -40,10 +39,8 @@ export function handleDefinition(
   const targetCompName = getText(ident);
 
   const uris = project.documents.keys();
-  console.log({ uris, targetCompName });
   for (uri of uris) {
     const compName = path.basename(uri, ".xmlui");
-    console.log({ compName });
     if (targetCompName === compName) {
       const targetDoc = project.documents.get(uri);
       return {
