@@ -1,68 +1,43 @@
-# Refactoring Plan: Eliminating the `uses` Property
+# Refactoring Plan: Replace `uses` with `isolate` Boolean Flag
 
-Removing `uses` is **simple but requires touching 3 core files plus parser**. Nobody uses it in production, so the only real constraint is keeping CompoundComponent's internal `uses: []` for encapsulation.
+## Executive Summary
 
-## What Is `uses`?
+**Recommended: Option C** - Replace `uses: string[]` with `isolate: boolean`
+
+- **Current complexity:** 3-way choice (undefined/[]/['x','y']) with dead code for selective inheritance
+- **Proposed:** Binary flag (`isolate?: boolean`) for clear isolation semantics  
+- **Simplification:** ~45% code reduction, removes unused feature
+- **Risk:** Low - only CompoundComponent uses it, straightforward conversion
+
+---
+
+## Current State Analysis
+
+### What Is `uses`?
 
 Controls state inheritance between parent and child containers:
 
 ```typescript
 // extractScopedState() - StateContainer.tsx:279
-if (!uses) return parentState;              // Inherit ALL (current default)
-if (uses.length === 0) return EMPTY_OBJECT; // Inherit NONE
-return pick(parentState, uses);             // Inherit SPECIFIC keys
+if (!uses) return parentState;              // Inherit ALL (default)
+if (uses.length === 0) return EMPTY_OBJECT; // Inherit NONE (CompoundComponent)
+return pick(parentState, uses);             // Inherit SPECIFIC keys (NEVER USED)
 ```
 
 **Implementation Locations:**
-1. **Downward flow**: Filter parent state passed to child (StateContainer.tsx:78)
-2. **Upward propagation**: Control which changes bubble to parent (StateContainer.tsx:214)
-3. **Container detection**: Triggers container creation (ContainerWrapper.tsx:73)
+1. **State composition** (StateContainer.tsx:78): `extractScopedState(parentState, node.uses)`
+2. **State propagation** (StateContainer.tsx:214): `if (!node.uses || node.uses.includes(key))`
+3. **UID scoping** (Container.tsx:645): `node.uses === undefined ? parentUidInfoRef : thisUidInfoRef`
+4. **Container wrapping** (ContainerWrapper.tsx:189): `uses: node.uses`
+5. **Container detection** (ContainerWrapper.tsx:67): `node.uses ||` in isContainerLike check
 
----
+### Production Usage
 
-## Evidence It's Unnecessary
+- **User-facing:** ZERO (no `.xmlui` files, docs, or examples use it)
+- **Internal:** Only CompoundComponent.tsx:72 uses `uses: EMPTY_ARRAY` for isolation
+- **Dead code:** Selective inheritance (`['x', 'y']`) never used
 
-### Production Usage: ZERO
-
-- ❌ No `.xmlui` files use `uses` attribute
-- ❌ No documentation examples
-- ❌ No example applications
-- ✅ Only framework defaults (3 places)
-- ✅ Only parser validation tests (5 tests)
-
-### Framework Defaults Analysis
-
-**Three places set `uses: []`:**
-
-1. **StandaloneComponent** (line 36): Sets `uses: []` where parent is already `EMPTY_OBJECT` → **Redundant**
-2. **AppRoot** (line 78): Root container has no parent → **Redundant**
-3. **CompoundComponent** (line 72): Isolates component internals from parent scope → **Only legitimate use**
-
-### Current Behavior
-
-When `uses` is undefined (always in production):
-```typescript
-// StateContainer.tsx:78
-stateFromOutside = parentState  // Inherit everything
-
-// StateContainer.tsx:214  
-if (!node.uses || ...) {  // Always true, always propagates
-  parentStatePartChanged(...)
-}
-```
-
-### Performance Reality
-
-- React memoization optimized (`useShallowCompareMemoize`)
-- Variable resolution uses dependency tracking
-- Container components memoized
-- **Zero documented performance issues in 3+ months**
-
----
-
-## The CompoundComponent Exception
-
-**Critical Finding:** CompoundComponent uses `uses: []` to isolate internal state:
+### Why CompoundComponent Needs Isolation
 
 ```typescript
 // CompoundComponent.tsx:72
@@ -70,14 +45,11 @@ const containerNode: ContainerWrapperDef = {
   type: "Container",
   uses: EMPTY_ARRAY,  // Prevents parent state inheritance
   vars: { $props: resolvedProps },
-  // ...
+  // Component internals shouldn't access parent scope
 };
 ```
 
-**Why this matters:**
-- Compound components need encapsulation (internals shouldn't access parent scope)
-- This is an **internal architectural decision**, not a user-facing feature
-- Removing `uses` completely would break compound component isolation
+**Isolation is intentional** - compound component implementations should be encapsulated from parent containers.
 
 **Solution:** Keep `uses` internally, remove from public API.
 
@@ -126,9 +98,69 @@ export function isContainerLike(node: ComponentDef) {
 // KEEP AS IS - CompoundComponent needs this
 const stateFromOutside = useShallowCompareMemoize(
   useMemo(() => extractScopedState(parentState, node.uses), [node.uses, parentState]),
-);
+);Option C: Binary Isolation Flag (RECOMMENDED)
+
+### Proposal
+
+#### 1.1: Remove from container detection
+**File:** ContainerWrapper.tsx:73
+isolate?: boolean;  // true = isolated, undefined/false = inherit
+
+// Usage (CompoundComponent.tsx:72)
+containerNode: {
+  type: "Container",
+  isolate: true,  // Clear intent vs uses: EMPTY_ARRAY
+  // ...
+}
+
+// Implementation (StateContainer.tsx:279)
+const extractScopedState = (parentState: any, isolate?: boolean) => {
+  ret2.3: Keep extractScopedState function
+**File:** StateContainer.tsx:279-290
 ```
 
+### Benefits
+
+1. **Simpler semantics:** Binary choice vs 3-way array logic
+2. **Removes dead code:** Eliminates unused selective inheritance
+3. **Clearer intent:** `isolate: true` more explicit than `uses: []`
+4. **Type safety:** `boolean` simpler than `string[] | undefined`
+5. **No unused features:** Removes complexity nobody uses
+
+### Implementation Changes
+
+| Location | Current (uses) | New (isolate) | LOC Change |
+|----------|---------------|---------------|------------|
+| ComponentDefs.ts:67 | `uses?: string[]` | `isolate?: boolean` | Type simplified |
+| StateContainer.tsx:279 | 3-branch logic + pick() | 1-line ternary | -8 lines |
+| StateContainer.tsx:78 | `node.uses` | `node.isolate` | Property rename |
+---
+
+### Step 2: Keep Core Logic (DO NOT CHANGE)
+
+All core state management logic must remain for CompoundComponent isolation.
+
+#### 2.1: Keep state inheritance logic
+**File:** StateContainer.tsx:78? thisUidInfoRef : ...` | Logic flip |
+| ContainerWrapper.tsx:174 | `delete wrappedNode.uses` | `delete wrappedNode.isolate` | Property rename |
+| ContainerWrapper.tsx:189 | `uses: node.uses` | `isolate: node.isolate` | Property rename |
+| CompoundComponent.tsx:72 | `uses: EMPTY_ARRAY` | `isolate: true` | Clearer intent |
+
+**Tot2.2: Keep state change propagation logic
+**File:** StateContainer.tsx:214
+### Migration Steps
+
+See detailed implementation plan in [Option C Analysis](option-c-isolate-flag.md).
+
+---
+
+## Alternative: Parser-Only Removal (NOT RECOMMENDED)
+
+This was the original plan but achieves minimal simplification (~5%). Kept here for comparison.
+
+### Incremental Refactoring Plan (Parser Removal Only)
+
+### Step 1: Remove from Container Detection
 **Impact:** No change. CompoundComponent's `uses: []` continues to work.
 
 #### 1.3: Keep state change propagation logic (DO NOT CHANGE)
@@ -160,25 +192,8 @@ function extractScopedState(
   }
   return pick(parentState, uses);
 }
-```
-
-**Impact:** No change. Function remains for CompoundComponent isolation.
-
-#### 1.5: Keep UID info scoping (DO NOT CHANGE)
-**File:** `/xmlui/src/components-core/rendering/Container.tsx:645`
-
-```typescript
-// OLD
-const uidInfoRef = node.uses === undefined ? parentUidInfoRef : thisUidInfoRef;
-
-// NEW
-const uidInfoRef = parentUidInfoRef;
-```
-// KEEP AS IS - May be needed for uses functionality
-const uidInfoRef = node.uses === undefined ? parentUidInfoRef : thisUidInfoRef;
-```
-
-**Impact:** No change. Preserves existing behavior.
+```2.4: Keep UID info scoping
+**File:** Container.tsx:645
 **File:** `/xmlui/src/components-core/rendering/ContainerWrapper.tsx:180-195`
 
 ```typescrKeep uses in wrapping logic (DO NOT CHANGE)
@@ -209,7 +224,7 @@ return {
   type: "Container",
   uid: "standaloneComponentRoot",
   children: [node],
-  uses: [],  // ← Remove this line
+  uses: [],  // ← RRedundant emove this line
   functions,
   vars,
 };
@@ -218,7 +233,7 @@ return {
 return {
   type: "Container",
   uid: "standaloneComponentRoot",
-  children: [node],
+  childrenStandaloneComponent.tsx:36
   functions,
   vars,
 };
@@ -242,7 +257,7 @@ return {
   uid: "root",
   children: [themedRoot],
 };
-```
+```AppRoot.tsx:78
 
 #### 3.3: Keep in CompoundComponent (with comment)
 **File:** `/xmlui/src/components-core/CompoundComponent.tsx:72`
@@ -262,7 +277,7 @@ const containerNode: ContainerWrapperDef = useMemo(() => {
   };
 }, [/* ... */]);
 ```
-
+CompoundComponent.tsx:72
 **Test:** Run `npm run test`
 
 ---
@@ -280,12 +295,10 @@ const containerNode: ContainerWrapperDef = useMemo(() => {
  * flow down to the direct child containers.
  * Analysis: Does This Simplify Anything?
 
-**Answer: NO. This "refactoring" achieves almost nothing.**
+---
 
-### What Gets Removed
-- Parser support for `uses` attribute/element (deprecation warnings)
-- 5 parser validation tests
-- `splitUsesValue()` utility function
+### Step 4: Deprecate Type Definitions
+**File:** ComponentDefs.ts:67-74
 - Documentation of `uses` as user-facing feature
 - `uses: []` from StandaloneComponent and AppRoot (redundant anyway)
 
@@ -398,12 +411,12 @@ case "uses":
     `[XMLUI] The 'uses' attribute is deprecated and will be ignored. ` +
     `All parent state is now automatically inherited. ` +
     `You can safely remove 'uses="${value}"'.`
-  );
-  return;
-```
+---
 
-#### 5.2: Deprecate uses element parsing
-**File:** `/xmlui/src/parsers/xmlui-parser/transform.ts:710-721`
+### Step 5: Update Parser
+
+#### 5.1: Deprecate uses attribute parsing
+**File:** transform.ts:452721`
 
 ```typescript
 // OLD
@@ -422,7 +435,7 @@ function processUsesElement(comp: ComponentDef, node: Node) {
     `[XMLUI] The '<uses>' element is deprecated and will be ignored. ` +
     `All parent state is now automatically inherited. ` +
     `You can safely remove this element.`
-  );
+  );transform.ts:710-721
   return;
 }
 ```
@@ -442,12 +455,12 @@ function splitUsesValue(value: string) {
 ---
 
 ### Step 6: Update Parser Tests
-**File:** `/xmlui/tests/parsers/xmlui/transform.attr.test.ts`
 
-```typescript
+#### 6.1: Update attribute parsing tests
+**File:** transform.attr.test.ts
 // OLD
 test("parsing uses attribute", () => {
-  const cd = transformSource("<Stack uses='isOpen' />") as ComponentDef<typeof StackMd>;
+  const cdtransform.ts:1329-1331ntDef<typeof StackMd>;
   expect(cd.uses).deep.equal(["isOpen"]);
 });
 
@@ -473,7 +486,7 @@ test("uses attribute is ignored", () => {
 #### 6.2: Update element parsing tests
 **File:** `/xmlui/tests/parsers/xmlui/transform.element.test.ts`
 
-```typescript
+```typescrtransform.element.test.ts
 // OLD
 test("parsing uses element", () => {
   const cd = transformSource("<Stack><uses>isOpen</uses></Stack>");
@@ -510,11 +523,9 @@ test("uses element is ignored", () => {
 
 ### Step 7: Update Documentation
 
-**File:** `/xmlui/dev-docs/containers.md`
+**File:** containers.md
 
-**Remove** the entire "Uses Declarations" section (lines 192-207) and **replace** with:
-
-### State Inheritance (Automatic)
+Remove "Uses Declarations" section and replace
 
 Parent state is automatically inherited by child containers. All variables defined in parent containers are accessible in child containers.
 
@@ -547,12 +558,34 @@ Parent state is automatically inherited by child containers. All variables defin
 Search and remove any `uses` property documentation from component `.md` files.
 
 ---
+---
 
-## Testing Strategy
+## Why This Plan Is Not Recommended
 
-### Before Refactoring
+### Analysis: Does This Simplify Anything?
 
-```bash
+**Answer: NO. This achieves ~5% simplification.**
+
+#### What Gets Removed
+- Parser support for `uses` (deprecation warnings)
+- 5 parser validation tests
+- `splitUsesValue()` utility
+- `uses: []` from StandaloneComponent and AppRoot (redundant)
+
+#### What Stays (95% of Implementation)
+- `extractScopedState()` function (all 3 branches + pick())
+- State inheritance logic (StateContainer:78)
+- State propagation logic (StateContainer:214)
+- UID scoping logic (Container:645)
+- Container wrapping logic (ContainerWrapper)
+- Type definition (ComponentDef.uses)
+- CompoundComponent usage
+
+**This removes a feature nobody uses while keeping all implementation complexity. Effort/benefit ratio is terrible.**
+
+---
+
+## Testing Strategy (If Proceeding)
 # Create baseline
 npm run test > baseline-tests.txt
 npm run test:e2e > baseline-e2e.txt
