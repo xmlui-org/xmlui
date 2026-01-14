@@ -140,7 +140,7 @@ export function FormBindingWrapper({
     value,
     validationResult,
     validationMode ?? "errorLate",
-    !!verboseValidationFeedback
+    verboseValidationFeedback ?? true
   );
 
   // We use useFormContextPart to access forceShowValidationResult efficiently.
@@ -188,8 +188,8 @@ export function FormBindingWrapper({
     registerComponentApi,
   });
 
-  // Create validation result display (hidden when verboseValidationFeedback is enabled)
-  const validationResultDisplay = verboseValidationFeedback ? null : (
+  // Create validation result display (hidden when verboseValidationFeedback is false (concise mode))
+  const validationResultDisplay = (verboseValidationFeedback === false) ? null : (
     <div ref={animateContainerRef} className={styles.helperTextContainer}>
       {isHelperTextShown &&
         validationResult?.validations.map((singleValidation, i) => (

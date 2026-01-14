@@ -5,7 +5,7 @@ import { Tooltip } from "../Tooltip/TooltipNative";
 import type { ValidationMode } from "../Form/FormContext";
 import type { ValidationStatus } from "../abstractions";
 
-import styles from "./VerboseValidationFeedback.module.scss";
+import styles from "./ConciseValidationFeedback.module.scss";
 
 type Props = {
   validationStatus?: ValidationStatus;
@@ -15,7 +15,7 @@ type Props = {
   validationMode?: ValidationMode;
 };
 
-export const VerboseValidationFeedback = ({
+export const ConciseValidationFeedback = ({
   invalidMessages,
   validationStatus,
   successIcon = "check",

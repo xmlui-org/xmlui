@@ -12,7 +12,7 @@ import type { ValidationStatus } from "../abstractions";
 import { PART_START_ADORNMENT, PART_INPUT, PART_END_ADORNMENT, PART_VERBOSE_VALIDATION_FEEDBACK } from "../../components-core/parts";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
-import { VerboseValidationFeedback } from "../VerboseValidationFeedback/VerboseValidationFeedback";
+import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 
 /**
  * TextBox component that supports text input with various configurations.
@@ -156,7 +156,7 @@ export const TextBox = forwardRef(function TextBox(
   const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
   const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
 
-  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback;
+  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
   const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "check";
   const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "error";
 
@@ -273,9 +273,9 @@ export const TextBox = forwardRef(function TextBox(
           />
         </Part>
       )}
-      {finalVerboseValidationFeedback && (
+      {!finalVerboseValidationFeedback && (
         <Part partId={PART_VERBOSE_VALIDATION_FEEDBACK}>
-          <VerboseValidationFeedback
+          <ConciseValidationFeedback
             validationStatus={validationStatus}
             invalidMessages={invalidMessages}
             successIcon={finalValidationIconSuccess}

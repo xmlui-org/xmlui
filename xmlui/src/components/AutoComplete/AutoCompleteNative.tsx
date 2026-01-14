@@ -133,12 +133,12 @@ export const AutoComplete = forwardRef(function AutoComplete(
   const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
   const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
 
-  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback;
+  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
   const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "check";
   const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
 
   let validationIcon = null;
-  if (finalVerboseValidationFeedback) {
+  if (!finalVerboseValidationFeedback) {
     if (validationStatus === "valid") {
       validationIcon = finalValidationIconSuccess;
     } else if (validationStatus === "error") {

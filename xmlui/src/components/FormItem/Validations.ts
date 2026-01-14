@@ -354,7 +354,7 @@ export function useValidationDisplay(
   value: any,
   validationResult: ValidationResult | undefined,
   validationMode: ValidationMode = defaultValidationMode,
-  verboseValidationFeedback: boolean = false,
+  verboseValidationFeedback: boolean = true,
 ): {
   isHelperTextShown: boolean;
   validationStatus: ValidationSeverity;
@@ -390,7 +390,7 @@ export function useValidationDisplay(
     }
   }
 
-  if (highestValidationSeverity === "none" && hasValidValidation && verboseValidationFeedback) {
+  if (highestValidationSeverity === "none" && hasValidValidation && !verboseValidationFeedback) {
     highestValidationSeverity = "valid";
   }
 
