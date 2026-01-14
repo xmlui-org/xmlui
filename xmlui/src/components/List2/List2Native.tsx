@@ -88,9 +88,14 @@ export function useListData({
   availableGroups,
   defaultGroups = EMPTY_ARRAY,
 }: ListData) {
+  // Filter out null and undefined items
+  const validItems = useMemo(() => {
+    return items.filter((item) => item != null);
+  }, [items]);
+
   const sortedItems = useMemo(() => {
     if (!orderBy) {
-      return items;
+      return validItems;
     }
     let arrayOrderBy = orderBy;
     if (!Array.isArray(orderBy)) {
@@ -105,8 +110,8 @@ export function useListData({
     const fieldDirectionsToOrderBy = (arrayOrderBy as Array<FieldOrderBy>).map(
       (ob) => ob.direction,
     );
-    return lodashOrderBy(items, fieldSelectorsToOrderBy, fieldDirectionsToOrderBy);
-  }, [items, orderBy]);
+    return lodashOrderBy(validItems, fieldSelectorsToOrderBy, fieldDirectionsToOrderBy);
+  }, [validItems, orderBy]);
 
   const cappedItems = useMemo(() => {
     if (!limit) {
@@ -222,6 +227,7 @@ type DynamicHeightListProps = {
   defaultGroups: Array<string>;
   registerComponentApi?: RegisterComponentApiFn;
   borderCollapse?: boolean;
+  fixedItemSize?: boolean;
 };
 
 // eslint-disable-next-line react/display-name
@@ -298,6 +304,7 @@ export const List2Native = forwardRef(function DynamicHeightList2(
     defaultGroups = EMPTY_ARRAY,
     registerComponentApi,
     borderCollapse = defaultProps.borderCollapse,
+    fixedItemSize,
     ...rest
   }: DynamicHeightListProps,
   ref,
@@ -305,6 +312,10 @@ export const List2Native = forwardRef(function DynamicHeightList2(
   const virtualizerRef = useRef<VirtualizerHandle>(null);
   const parentRef = useRef<HTMLDivElement | null>(null);
   const rootRef = ref ? composeRefs(parentRef, ref) : parentRef;
+  
+  // State and ref for measuring first item size when fixedItemSize is enabled
+  const firstItemRef = useRef<HTMLDivElement>(null);
+  const [measuredItemSize, setMeasuredItemSize] = useState<number | undefined>(undefined);
 
   const scrollParent = useScrollParent(parentRef.current?.parentElement);
   const scrollRef = useRef(scrollParent);
@@ -343,6 +354,21 @@ export const List2Native = forwardRef(function DynamicHeightList2(
   });
 
   const shift = useShift(rows, idKey);
+
+  // Measure first item size when fixedItemSize is enabled
+  useEffect(() => {
+    if (fixedItemSize && firstItemRef.current && !measuredItemSize && rows.length > 0) {
+      // Add a small delay to ensure the item is rendered
+      requestAnimationFrame(() => {
+        if (firstItemRef.current) {
+          const height = firstItemRef.current.offsetHeight;
+          if (height > 0) {
+            setMeasuredItemSize(height);
+          }
+        }
+      });
+    }
+  }, [fixedItemSize, measuredItemSize, rows.length]);
 
   const initiallyScrolledToBottom = useRef(false);
   useEffect(() => {
@@ -518,18 +544,44 @@ export const List2Native = forwardRef(function DynamicHeightList2(
                 onScroll={onScroll}
                 startMargin={startMargin}
                 item={Item as CustomItemComponent}
-                itemSize={67}
+                itemSize={measuredItemSize || 67}
               >
                 {rows.map((row, rowIndex) => {
                   const key = row?.[idKey];
+                  const isFirstItem = rowIndex === 0;
+                  const shouldMeasure = isFirstItem && fixedItemSize && row != null;
                   // Render different row types
                   switch (row._row_type) {
                     case RowType.SECTION:
-                      return <React.Fragment key={key}>{sectionRenderer?.(row, key)}</React.Fragment>;
+                      return (
+                        <React.Fragment key={key}>
+                          {shouldMeasure ? (
+                            <div ref={firstItemRef}>{sectionRenderer?.(row, key)}</div>
+                          ) : (
+                            sectionRenderer?.(row, key)
+                          )}
+                        </React.Fragment>
+                      );
                     case RowType.SECTION_FOOTER:
-                      return <React.Fragment key={key}>{sectionFooterRenderer?.(row, key)}</React.Fragment>;
+                      return (
+                        <React.Fragment key={key}>
+                          {shouldMeasure ? (
+                            <div ref={firstItemRef}>{sectionFooterRenderer?.(row, key)}</div>
+                          ) : (
+                            sectionFooterRenderer?.(row, key)
+                          )}
+                        </React.Fragment>
+                      );
                     default:
-                      return <React.Fragment key={key}>{itemRenderer(row, key, rowIndex, rowCount)}</React.Fragment>;
+                      return (
+                        <React.Fragment key={key}>
+                          {shouldMeasure ? (
+                            <div ref={firstItemRef}>{itemRenderer(row, key, rowIndex, rowCount)}</div>
+                          ) : (
+                            itemRenderer(row, key, rowIndex, rowCount)
+                          )}
+                        </React.Fragment>
+                      );
                   }
                 })}
               </Virtualizer>
