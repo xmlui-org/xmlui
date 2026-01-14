@@ -268,6 +268,7 @@ export const FormItem = memo(function FormItem({
     value,
     validationResult,
     validationMode,
+    !!verboseValidationFeedback
   );
 
   const onFocus = useEvent(() => {

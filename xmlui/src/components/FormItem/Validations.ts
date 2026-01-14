@@ -354,6 +354,7 @@ export function useValidationDisplay(
   value: any,
   validationResult: ValidationResult | undefined,
   validationMode: ValidationMode = defaultValidationMode,
+  verboseValidationFeedback: boolean = false,
 ): {
   isHelperTextShown: boolean;
   validationStatus: ValidationSeverity;
@@ -371,8 +372,10 @@ export function useValidationDisplay(
   const isValid = validationResult?.isValid === true;
 
   let highestValidationSeverity: ValidationSeverity = "none";
+  let hasValidValidation = false;
   for (const val of validationResult?.validations || []) {
     if (val.isValid) {
+      hasValidValidation = true;
       continue;
     }
     if (
@@ -387,6 +390,10 @@ export function useValidationDisplay(
     }
   }
 
+  if (highestValidationSeverity === "none" && hasValidValidation && verboseValidationFeedback) {
+    highestValidationSeverity = "valid";
+  }
+
   let isHelperTextShown = false;
   switch (validationMode) {
     // This validation model was inspired by https://medium.com/wdstack/inline-validation-in-forms-designing-the-experience-123fb34088ce
@@ -398,12 +405,17 @@ export function useValidationDisplay(
         break;
       }
       // --- Show if losing focus and invalid
-      if (!focused && !isValidLostFocus) {
+      if (!focused && (!isValidLostFocus || highestValidationSeverity === "valid")) {
         isHelperTextShown = true;
         break;
       }
       // --- Show if focused, after first meaningful blur, was not valid on last focus and not changed to valid while typing
-      if (focused && afterFirstDirtyBlur && !isValidOnFocus && !invalidToValid) {
+      if (
+        focused &&
+        afterFirstDirtyBlur &&
+        !isValidOnFocus &&
+        (!invalidToValid || highestValidationSeverity === "valid")
+      ) {
         isHelperTextShown = true;
         break;
       }
@@ -414,7 +426,8 @@ export function useValidationDisplay(
       break;
     }
     case "onLostFocus": {
-      isHelperTextShown = isDirty && !focused && !isValidLostFocus;
+      isHelperTextShown =
+        isDirty && !focused && (!isValidLostFocus || highestValidationSeverity === "valid");
     }
   }
   isHelperTextShown = isHelperTextShown || forceShowValidationResult;

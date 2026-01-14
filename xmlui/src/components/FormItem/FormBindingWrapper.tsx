@@ -140,6 +140,7 @@ export function FormBindingWrapper({
     value,
     validationResult,
     validationMode ?? "errorLate",
+    !!verboseValidationFeedback
   );
 
   // We use useFormContextPart to access forceShowValidationResult efficiently.
