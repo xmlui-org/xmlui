@@ -2,7 +2,6 @@ import React, {
   createContext,
   type CSSProperties,
   forwardRef,
-  Fragment,
   type ReactNode,
   useCallback,
   useContext,
@@ -24,7 +23,7 @@ import type { RegisterComponentApiFn, RenderChildFn } from "../../abstractions/R
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
 import type { FieldOrderBy, ScrollAnchoring } from "../abstractions";
 import { Card } from "../Card/CardNative";
-import type { CustomItemComponent, CustomItemComponentProps, VListHandle } from "virtua";
+import type { CustomItemComponent, CustomItemComponentProps, VirtualizerHandle } from "virtua";
 import { Virtualizer } from "virtua";
 import {
   useHasExplicitHeight,
@@ -303,7 +302,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
   }: DynamicHeightListProps,
   ref,
 ) {
-  const virtualizerRef = useRef<VListHandle>(null);
+  const virtualizerRef = useRef<VirtualizerHandle>(null);
   const parentRef = useRef<HTMLDivElement | null>(null);
   const rootRef = ref ? composeRefs(parentRef, ref) : parentRef;
 
@@ -379,7 +378,8 @@ export const ListNative = forwardRef(function DynamicHeightList(
   const tryToFetchPrevPage = useCallback(() => {
     if (
       virtualizerRef.current &&
-      virtualizerRef.current.findStartIndex() < 10 &&
+      typeof virtualizerRef.current.findItemIndex === 'function' &&
+      virtualizerRef.current.findItemIndex(virtualizerRef.current.scrollOffset) < 10 &&
       pageInfo &&
       pageInfo.hasPrevPage &&
       !pageInfo.isFetchingPrevPage &&
@@ -400,7 +400,8 @@ export const ListNative = forwardRef(function DynamicHeightList(
   const tryToFetchNextPage = useCallback(() => {
     if (
       virtualizerRef.current &&
-      virtualizerRef.current.findEndIndex() + 10 > rows.length &&
+      typeof virtualizerRef.current.findItemIndex === 'function' &&
+      virtualizerRef.current.findItemIndex(virtualizerRef.current.scrollOffset + virtualizerRef.current.viewportSize) + 10 > rows.length &&
       pageInfo &&
       pageInfo.hasNextPage &&
       !pageInfo.isFetchingNextPage &&
@@ -526,38 +527,19 @@ export const ListNative = forwardRef(function DynamicHeightList(
                 onScroll={onScroll}
                 startMargin={startMargin}
                 item={Item as CustomItemComponent}
-                count={rowCount}
               >
-                {(rowIndex) => {
-                  // REVIEW: I changed this code line because in the build version rows[rowIndex]
-                  // was undefined
-                  // const row = rows[rowIndex];
-                  // const key = row[idKey];
-                  const row = rows?.[rowIndex];
+                {rows.map((row, rowIndex) => {
                   const key = row?.[idKey];
-                  if (!row) {
-                    return <Fragment key={rowIndex} />;
-                  }
-                  // --- End change
+                  // Render different row types
                   switch (row._row_type) {
                     case RowType.SECTION:
-                      return (
-                        <Fragment key={key}>{sectionRenderer?.(row, key) || <div />}</Fragment>
-                      );
+                      return <React.Fragment key={key}>{sectionRenderer?.(row, key)}</React.Fragment>;
                     case RowType.SECTION_FOOTER:
-                      return (
-                        <Fragment key={key}>
-                          {sectionFooterRenderer?.(row, key) || <div />}
-                        </Fragment>
-                      );
+                      return <React.Fragment key={key}>{sectionFooterRenderer?.(row, key)}</React.Fragment>;
                     default:
-                      return (
-                        <Fragment key={key}>
-                          {itemRenderer(row, key, rowIndex, rowCount) || <div />}
-                        </Fragment>
-                      );
+                      return <React.Fragment key={key}>{itemRenderer(row, key, rowIndex, rowCount)}</React.Fragment>;
                   }
-                }}
+                })}
               </Virtualizer>
             </div>
           )}
