@@ -57,13 +57,6 @@ export interface ParserDiag {
   readonly contextEnd: number;
 }
 
-export enum DiagnosticCategory {
-  Error = 1,
-  Warning = 2,
-  Information = 3,
-  Hint = 4,
-}
-
 export enum ErrCodesParser {
   onlyOneElem = "U002",
   expTagOpen = "U003",

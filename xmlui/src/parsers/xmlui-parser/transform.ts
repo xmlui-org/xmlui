@@ -1,8 +1,4 @@
-import type {
-  ComponentDef,
-  ComponentMetadata,
-  CompoundComponentDef,
-} from "../../abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import { collectCodeBehindFromSource } from "../scripting/code-behind-collect";
 import { Node } from "./syntax-node";
 import { SyntaxKind } from "./syntax-kind";
@@ -10,13 +6,7 @@ import { Parser } from "../scripting/Parser";
 import { CharacterCodes } from "./CharacterCodes";
 import type { GetText } from "./parser";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
-import {
-  DiagnosticCategory,
-  DIAGS_TRANSFORM,
-  TransformDiag,
-  type TransformDiagPositionless,
-} from "./diagnostics";
-import { VscFileSymlinkDirectory } from "react-icons/vsc";
+import { DIAGS_TRANSFORM, TransformDiag, type TransformDiagPositionless } from "./diagnostics";
 
 export const COMPOUND_COMP_ID = "Component";
 export const UCRegex = /^[A-Z]/;
@@ -384,19 +374,25 @@ export function nodeToComponentDef(
   }
 
   function collectAttribute(comp: ComponentDef | CompoundComponentDef, attr: Node) {
-    const { namespace, startSegment, name, value, unsegmentedName: nsKey } = segmentAttr(attr);
+    const {
+      namespace,
+      startSegment,
+      name,
+      value,
+      unsegmentedName: nameFullKey,
+    } = segmentAttr(attr);
 
     const attrValueStringNode = attr.children![2];
 
     if (namespace === "xmlns") {
-      return addToNamespaces(namespaceStack, comp, nsKey, value);
+      return addToNamespaces(namespaceStack, comp, nameFullKey, value);
     }
 
     const isCompound = !isComponent(comp);
     // --- Handle single-word attributes
     if (isCompound) {
       if (startSegment && startSegment !== "method" && startSegment !== "var") {
-        reportError(DIAGS_TRANSFORM.invalidReusableCompAttr(nsKey));
+        reportError(DIAGS_TRANSFORM.invalidReusableCompAttr(nameFullKey));
         return;
       }
 
@@ -1206,7 +1202,7 @@ function hoistScriptCollectedFromFragments(component: ComponentDef): void {
     if (child.type === "Fragment" && child.scriptCollected) {
       // Check if the script references context variables (like $item, $itemIndex, etc.)
       const hasContextVarReferences = child.script?.includes("$");
-      
+
       // Only hoist if there are no context variable references
       // Context variables are component-specific and should remain at the iteration level
       if (!hasContextVarReferences) {

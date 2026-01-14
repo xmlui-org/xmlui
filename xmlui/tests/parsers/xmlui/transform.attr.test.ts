@@ -78,4 +78,11 @@ describe("Xmlui transform - attributes", () => {
     expect(cd.props ?? {}).not.toHaveProperty("uses");
     expect(cd.uses).deep.equal(["isOpen", "isClosed"]);
   });
+
+  describe("attribute pre-parsing", () => {
+    it("event is pre-parsed", () => {
+      const cd = transformSource(`<Stack onClick="count++" />`) as ComponentDef<typeof StackMd>;
+      expect(cd.events.click).toMatchObject({ __PARSED: true });
+    });
+  });
 });

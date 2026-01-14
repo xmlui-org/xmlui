@@ -53,6 +53,7 @@ import type {
 } from "../abstractions/scripting/Compilation";
 import { MetadataProvider } from "../language-server/services/common/metadata-utils";
 import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
+import { discoverDirectComponentDependencies } from "./project-compilation/project-compilation";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -1159,34 +1160,4 @@ function discoverCompilationDependencies({
   }
 
   registry.destroy();
-}
-
-function discoverDirectComponentDependencies(
-  entrypoint: ComponentDef,
-  registry: ComponentRegistry,
-): Set<string> {
-  return discoverDirectComponentDependenciesHelp(entrypoint, registry, new Set<string>());
-}
-
-function discoverDirectComponentDependenciesHelp(
-  component: ComponentDef,
-  registry: ComponentRegistry,
-  deps: Set<string>,
-): Set<string> {
-  if (!component) {
-    return deps;
-  }
-  const compName = component.type;
-  if (!registry.hasComponent(compName)) {
-    deps.add(compName);
-  }
-  if (!component.children) {
-    return deps;
-  }
-
-  for (const child of component.children) {
-    discoverDirectComponentDependenciesHelp(child, registry, deps);
-  }
-
-  return deps;
 }

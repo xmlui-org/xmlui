@@ -91,39 +91,42 @@ export function AppRoot({
   resetErrors();
 
   // --- Add isNested to global props so it can be accessed throughout the app
-  const enhancedGlobalProps = useMemo(() => ({
-    ...globalProps,
-    isNested,
-  }), [globalProps, isNested]);
+  const enhancedGlobalProps = useMemo(
+    () => ({
+      ...globalProps,
+      isNested,
+    }),
+    [globalProps, isNested],
+  );
 
   // --- Render the app providing a component registry (in which the engine finds a
   // --- component definition by its name). Ensure the app has a context for debugging.
   return (
     <ComponentProvider contributes={contributes} extensionManager={extensionManager}>
       <StyleProvider>
-          <DebugViewProvider debugConfig={globalProps?.debug}>
-            <AppWrapper
-              projectCompilation={projectCompilation}
-              resourceMap={resourceMap}
-              apiInterceptor={apiInterceptor}
-              node={rootNode as ComponentLike}
-              contributes={contributes}
-              resources={resources}
-              routerBaseName={routerBaseName}
-              decorateComponentsWithTestId={decorateComponentsWithTestId}
-              debugEnabled={debugEnabled}
-              defaultTheme={defaultTheme}
-              defaultTone={defaultTone}
-              globalProps={enhancedGlobalProps}
-              standalone={standalone}
-              trackContainerHeight={trackContainerHeight}
-              previewMode={previewMode}
-              sources={sources}
-              onInit={onInit}
-            >
-              {children}
-            </AppWrapper>
-          </DebugViewProvider>
+        <DebugViewProvider debugConfig={globalProps?.debug}>
+          <AppWrapper
+            projectCompilation={projectCompilation}
+            resourceMap={resourceMap}
+            apiInterceptor={apiInterceptor}
+            node={rootNode as ComponentLike}
+            contributes={contributes}
+            resources={resources}
+            routerBaseName={routerBaseName}
+            decorateComponentsWithTestId={decorateComponentsWithTestId}
+            debugEnabled={debugEnabled}
+            defaultTheme={defaultTheme}
+            defaultTone={defaultTone}
+            globalProps={enhancedGlobalProps}
+            standalone={standalone}
+            trackContainerHeight={trackContainerHeight}
+            previewMode={previewMode}
+            sources={sources}
+            onInit={onInit}
+          >
+            {children}
+          </AppWrapper>
+        </DebugViewProvider>
       </StyleProvider>
     </ComponentProvider>
   );
