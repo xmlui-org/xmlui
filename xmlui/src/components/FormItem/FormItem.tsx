@@ -89,7 +89,6 @@ export const FormItemMd = createMetadata({
       description: "Controls how required/optional status is visually indicated in the label.",
       type: "string",
       availableValues: requiredIndicatorModeMd,
-      defaultValue: defaultProps.requiredIndicator,
       isRequired: false,
     },
     initialValue: dInitialValue(),
