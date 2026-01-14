@@ -115,11 +115,12 @@ export const Container = memo(
     const fnsRef = useRef<Record<symbol, any>>({});
 
     const stateRef = useRef(componentState);
-    //generally bad practise to write ref in render (https://react.dev/learn/referencing-values-with-refs#best-practices-for-refs), but:
-    // this stateRef is only used in runCodeSync/async functions, which are memoized, so it's safe to use it here (as I know:  illesg)
-    // In case we sync up the stateRef with the componentState in the useEffect/useInsertionEffect/useLayoutEffect, the stateRef would lag behind the componentState
-
-    stateRef.current = componentState;
+    
+    // Sync ref in layout effect to ensure consistency before browser paint
+    // This follows React best practices and avoids render-time ref mutations
+    useIsomorphicLayoutEffect(() => {
+      stateRef.current = componentState;
+    }, [componentState]);
 
     const parsedStatementsRef = useRef<Record<string, Array<Statement> | null>>({});
     const [_, startTransition] = useTransition();
