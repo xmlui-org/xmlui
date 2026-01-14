@@ -721,11 +721,13 @@ const resolvedLocalVars = useVars(
 
 ---
 
-### 8. Magic Symbols and Undocumented Conventions
+### 8. Magic Symbols and Undocumented Conventions ✅ COMPLETED
 
 **Files:** Multiple files
 
 **Issue:** The codebase uses several "magic" property names and symbols that are undocumented.
+
+**Status:** COMPLETED - Created src/abstractions/InternalMarkers.ts with centralized symbol definitions and type guards. Updated 14 source files to use type-safe imports. Tests passed ✓
 
 **Examples:**
 
@@ -868,7 +870,7 @@ if (isParsedCodeDeclaration(value)) {
 
 ## Architecture Improvements (Medium Priority)
 
-### 9. Implicit Container Logic is Hard to Follow
+### 9. Implicit Container Logic is Hard to Follow ✅ COMPLETED
 
 **File:** `ContainerWrapper.tsx`, `StateContainer.tsx`
 
@@ -947,6 +949,8 @@ const implicit = isImplicitContainer(node, containerizedNode);
   isImplicit={implicit}
 />
 ```
+
+**Status: COMPLETED** - Added `isImplicitContainer()` function with comprehensive 60+ line JSDoc documentation explaining implicit vs explicit containers, their impact on state flow, and practical examples. Updated ContainerWrapper.tsx line 196 to use the new function for better code clarity. Tests passed ✓
 
 **Benefits:**
 - Clear understanding of container boundaries
