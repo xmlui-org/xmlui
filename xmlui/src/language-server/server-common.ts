@@ -14,14 +14,14 @@ import {
 import { TextDocument } from "./base/text-document";
 import collectedComponentMetadata from "./xmlui-metadata-generated.js";
 import type { XmluiCompletionItem } from "./services/completion";
-import { handleCompletion, handleCompletionResolve } from "./services/completion";
+import { handleCompletionWithProject, handleCompletionResolve } from "./services/completion";
 import { handleHover } from "./services/hover";
-import { handleDocumentFormatting } from "./services/format";
+import { handleDocumentFormattingWithProject } from "./services/format";
 import {
   MetadataProvider,
   type ComponentMetadataCollection,
 } from "./services/common/metadata-utils";
-import { getDiagnostics } from "./services/diagnostic";
+import { getDiagnostics, getDiagnosticsForDocument } from "./services/diagnostic";
 import { Project } from "./base/project.js";
 import { handleDefinition } from "./services/definition.js";
 
@@ -30,7 +30,7 @@ const metadataProvider = new MetadataProvider(metaByComp);
 
 export function start(connection: Connection) {
   const documents = new TextDocuments(TextDocument);
-  const project = new Project(documents);
+  const project = new Project(documents, metadataProvider);
 
   let hasConfigurationCapability = false;
   let hasWorkspaceFolderCapability = false;
@@ -77,23 +77,7 @@ export function start(connection: Connection) {
   });
 
   connection.onCompletion(({ position, textDocument }: TextDocumentPositionParams) => {
-    const document = documents.get(textDocument.uri);
-    if (!document) {
-      return [];
-    }
-    const parsedDocument = project.getParsedDocument(document);
-    if (!parsedDocument) {
-      return [];
-    }
-    return handleCompletion(
-      {
-        parseResult: parsedDocument.parseResult,
-        getText: parsedDocument.getText,
-        metaByComp: metadataProvider,
-        offsetToPos: (offset: number) => document.positionAt(offset),
-      },
-      document.offsetAt(position),
-    );
+    return handleCompletionWithProject(project, textDocument.uri, position);
   });
 
   connection.onCompletionResolve((completionItem: XmluiCompletionItem) => {
@@ -101,22 +85,7 @@ export function start(connection: Connection) {
   });
 
   connection.onHover(({ position, textDocument }: HoverParams) => {
-    const document = documents.get(textDocument.uri);
-    if (!document) {
-      return null;
-    }
-    const parsedDocument = project.getParsedDocument(document);
-    if (!parsedDocument) {
-      return null;
-    }
-    const { parseResult, getText } = parsedDocument;
-    const ctx = {
-      node: parseResult.node,
-      getText,
-      metaByComp: metadataProvider,
-      offsetToPosition: (offset: number) => document.positionAt(offset),
-    };
-    return handleHover(ctx, document.offsetAt(position));
+    return handleHover(project, textDocument.uri, position);
   });
 
   connection.onDefinition(({ position, textDocument }) => {
@@ -124,36 +93,11 @@ export function start(connection: Connection) {
   });
 
   connection.onDocumentFormatting(({ textDocument, options }: DocumentFormattingParams) => {
-    const document = documents.get(textDocument.uri);
-    if (!document) {
-      return null;
-    }
-    const parsedDocument = project.getParsedDocument(document);
-    if (!parsedDocument) {
-      return null;
-    }
-    const {
-      parseResult: { node },
-      getText,
-    } = parsedDocument;
-    return handleDocumentFormatting({
-      node,
-      getText,
-      options,
-      offsetToPosition: (offset) => document.positionAt(offset),
-    });
+    return handleDocumentFormattingWithProject(project, textDocument.uri, options);
   });
 
   documents.onDidChangeContent(({ document }) => {
-    const parsedDocument = project.getParsedDocument(document);
-    if (!parsedDocument) {
-      return;
-    }
-    const ctx = {
-      parseResult: parsedDocument.parseResult,
-      offsetToPos: (offset: number) => document.positionAt(offset),
-    };
-    const diagnostics = getDiagnostics(ctx);
+    const diagnostics = getDiagnosticsForDocument(project, document.uri);
     void connection.sendDiagnostics({
       version: document.version,
       uri: document.uri,

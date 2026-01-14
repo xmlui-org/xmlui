@@ -1,5 +1,7 @@
 import type { FormattingOptions, TextEdit, Range, Position } from "vscode-languageserver";
 import { type GetText, type Node, SyntaxKind, toDbgString } from "../../parsers/xmlui-parser";
+import type { Project } from "../base/project";
+import type { DocumentUri } from "../base/text-document";
 
 type FormattingContex = {
   node: Node;
@@ -37,6 +39,24 @@ export function handleDocumentFormatting({
       newText: formatted,
     },
   ];
+}
+
+export function handleDocumentFormattingWithProject(
+  project: Project,
+  uri: DocumentUri,
+  options: FormatOptions,
+): TextEdit[] | null {
+  const document = project.documents.get(uri);
+  if (!document) {
+    return null;
+  }
+  const { parseResult, getText } = document.parse();
+  return handleDocumentFormatting({
+    node: parseResult.node,
+    getText,
+    options,
+    offsetToPosition: (offset: number) => document.positionAt(offset),
+  });
 }
 
 class XmluiFormatter {

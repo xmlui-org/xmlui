@@ -4,10 +4,12 @@ import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import { compNameForTagNameNode, findTagNameNodeInStack } from "./common/syntax-node-utilities";
 import * as docGen from "./common/docs-generation";
-import type { ComponentMetadataCollection, MetadataProvider } from "./common/metadata-utils";
+import type { MetadataProvider } from "./common/metadata-utils";
 import type { Hover, Position } from "vscode-languageserver";
 import { MarkupKind } from "vscode-languageserver";
 import { offsetRangeToPosRange } from "./common/lsp-utils";
+import type { Project } from "../base/project";
+import type { DocumentUri } from "../base/text-document";
 
 type SimpleHover = null | {
   value: string;
@@ -65,8 +67,22 @@ export function handleHoverCore(
   return null;
 }
 
-export function handleHover(ctx: HoverContex, position: number): Hover {
-  const hoverRes = handleHoverCore(ctx, position);
+export function handleHover(project: Project, uri: DocumentUri, position: Position): Hover {
+  const document = project.documents.get(uri);
+  if (!document) {
+    return null;
+  }
+  const offset = document.offsetAt(position);
+  const { parseResult, getText } = document.parse();
+  const ctx = {
+    node: parseResult.node,
+    getText,
+    metaByComp: project.metadataProvider,
+    offsetToPosition: (offset: number) => document.positionAt(offset),
+  };
+
+  const hoverRes = handleHoverCore(ctx, offset);
+
   if (hoverRes === null) {
     return null;
   }

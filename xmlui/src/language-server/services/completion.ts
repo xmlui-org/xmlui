@@ -18,6 +18,8 @@ import {
   type MetadataProvider,
   type TaggedAttribute,
 } from "./common/metadata-utils";
+import type { Project } from "../base/project";
+import type { DocumentUri } from "../base/text-document";
 
 type Override<Type, NewType extends { [key in keyof Type]?: NewType[key] }> = Omit<
   Type,
@@ -160,6 +162,28 @@ export function handleCompletion(
     return completionForNewAttr(compName, metaByComp);
   }
   return null;
+}
+
+export function handleCompletionWithProject(
+  project: Project,
+  uri: DocumentUri,
+  position: Position,
+): XmluiCompletionItem[] | null {
+  const document = project.documents.get(uri);
+  if (!document) {
+    return null;
+  }
+  const offset = document.offsetAt(position);
+  const { parseResult, getText } = document.parse();
+  return handleCompletion(
+    {
+      parseResult,
+      getText,
+      metaByComp: project.metadataProvider,
+      offsetToPos: (offset: number) => document.positionAt(offset),
+    },
+    offset,
+  );
 }
 
 function allComponentNames(md: MetadataProvider): XmluiCompletionItem[] {

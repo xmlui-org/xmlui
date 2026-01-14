@@ -2,6 +2,8 @@ import { DiagnosticSeverity, type Diagnostic, type Position } from "vscode-langu
 import type { ParserDiag } from "../../parsers/xmlui-parser/diagnostics";
 import type { ParseResult } from "../../parsers/xmlui-parser/parser";
 import { offsetRangeToPosRange } from "./common/lsp-utils";
+import type { Project } from "../base/project";
+import type { DocumentUri } from "../base/text-document";
 
 export type DiagnosticsContext = {
   offsetToPos: (pos: number) => Position;
@@ -23,4 +25,17 @@ export function errorToLspDiag(e: ParserDiag, offsetToPos: (n: number) => Positi
     message: e.message,
     code: e.code,
   };
+}
+
+export function getDiagnosticsForDocument(project: Project, uri: DocumentUri): Diagnostic[] {
+  const document = project.documents.get(uri);
+  if (!document) {
+    return [];
+  }
+  const { parseResult } = document.parse();
+  const ctx = {
+    parseResult,
+    offsetToPos: (offset: number) => document.positionAt(offset),
+  };
+  return getDiagnostics(ctx);
 }

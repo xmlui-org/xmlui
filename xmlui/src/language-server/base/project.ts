@@ -1,11 +1,5 @@
-import {
-  createXmlUiParser,
-  type GetText,
-  type ParseResult,
-} from "../../parsers/xmlui-parser/parser";
 import { type DocumentUri, TextDocument } from "./text-document";
-
-// base the implementation on Roc's PackageEnv and ModuleState structs. PackageEnv will be the Project and ModuleState is more like the documents
+import type { MetadataProvider } from "../services/common/metadata-utils";
 
 export interface DocumentStore {
   /**
@@ -56,11 +50,18 @@ class SimpleDocumentStore implements DocumentStore {
 }
 
 export class Project {
-  constructor(public documents: DocumentStore) {
+  constructor(
+    public documents: DocumentStore,
+    public metadataProvider: MetadataProvider,
+  ) {
     this.documents = documents;
+    this.metadataProvider = metadataProvider;
   }
 
-  public static fromFileContets(contentByUri: Record<DocumentUri, string>) {
-    return new Project(new SimpleDocumentStore(contentByUri));
+  public static fromFileContets(
+    contentByUri: Record<DocumentUri, string>,
+    metadataProvider: MetadataProvider,
+  ) {
+    return new Project(new SimpleDocumentStore(contentByUri), metadataProvider);
   }
 }
