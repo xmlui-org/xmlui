@@ -2,6 +2,7 @@ import type { AxiosResponse } from "axios";
 import { isPlainObject, isUndefined, omitBy } from "lodash-es";
 
 import type { AppContextObject } from "../abstractions/AppContextDefs";
+import { isArrowExpressionObject } from "../abstractions/InternalMarkers";
 import type { BindingTreeEvaluationContext } from "./script-runner/BindingTreeEvaluationContext";
 import {
   T_ARROW_EXPRESSION_STATEMENT,
@@ -399,7 +400,7 @@ export default class RestApiProxy {
     if (resolveAsBindingExpression) {
       return extractParam(localContext, value, this.appContext, strict);
     }
-    if (value?._ARROW_EXPR_) {
+    if (isArrowExpressionObject(value)) {
       //TODO illesg review, this whole processstatement is because of the chunked uploads (headers as function)
       const evalContext: BindingTreeEvaluationContext = {
         eventArgs: [localContext],

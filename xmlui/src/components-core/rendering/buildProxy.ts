@@ -1,4 +1,6 @@
 // The type of action we can use with a proxy
+import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
+
 export type ProxyAction = "set" | "unset";
 
 // Proxy operation callback parameters
@@ -35,7 +37,7 @@ export function buildProxy(
       // --- function expressions.
       if (
         value &&
-        !value._ARROW_EXPR_ &&
+        !isArrowExpressionObject(value) &&
         !Object.isFrozen(value) &&
         typeof value === "object" &&
         ["Array", "Object"].includes(value.constructor.name)

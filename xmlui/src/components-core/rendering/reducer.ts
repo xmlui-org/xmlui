@@ -53,7 +53,9 @@ export function createContainerReducer(debugView: IDebugViewContext) {
       }
       case ContainerActionKind.LOADER_LOADED: {
         const { data, pageInfo } = action.payload;
+        // Preserve any existing state properties (e.g., custom component state)
         state[uid] = {
+          ...state[uid],
           value: data,
           byId: Array.isArray(data) ? keyBy(data, (item) => item.$id) : undefined,
           inProgress: false,

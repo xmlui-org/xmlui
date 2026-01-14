@@ -3,7 +3,7 @@ import { isPlainObject } from "lodash-es";
 
 import type { ContainerState } from "../rendering/ContainerWrapper";
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
-
+import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 import { parseParameterString } from "../script-runner/ParameterParser";
 import { evalBinding } from "../script-runner/eval-tree-sync";
 import { LRUCache } from "../utils/LruCache";
@@ -146,7 +146,7 @@ export function withStableObjectReference(object: any) {
     //here could be some gnarly circular object references, JSON.stringify would blow up
     return object;
   }
-  if (object?._ARROW_EXPR_) {
+  if (isArrowExpressionObject(object)) {
     //here could be some gnarly circular object references, JSON.stringify would blow up
     return object;
   }
