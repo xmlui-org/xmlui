@@ -6,7 +6,7 @@ import { createScanner } from "./scanner";
 import { SyntaxKind, getSyntaxKindStrRepr } from "./syntax-kind";
 import { tagNameNodesWithoutErrorsMatch } from "./utils";
 import { ErrCodesParser, DIAGS_PARSER } from "./diagnostics";
-import { createDocumentCursor } from "../../components-core/xmlui-parser";
+import { DocumentCursor } from "../../language-server/base/text-document";
 
 type IncompleteNode = {
   children: Node[];
@@ -54,7 +54,7 @@ export function createXmlUiParser(source: string): {
 }
 
 export function parseXmlUiMarkup(text: string): ParseResult {
-  const cursor = createDocumentCursor(text);
+  const cursor = DocumentCursor.fromText(text);
   const errors: ParserDiag[] = [];
   const parents: (IncompleteNode | Node)[] = [];
   let peekedToken: Node | undefined;

@@ -244,11 +244,11 @@ export const TextDocument = {
 export class DocumentCursor {
   constructor(
     private readonly newlineOffsets: number[],
-    private readonly text: string,
+    private readonly textLength: number,
   ) {}
 
   public static fromText(text: string): DocumentCursor {
-    return new DocumentCursor(computeLineOffsets(text, true), text);
+    return new DocumentCursor(computeLineOffsets(text, true), text.length);
   }
 
   public get lineCount(): number {
@@ -268,7 +268,7 @@ export class DocumentCursor {
    * * position { line: 1, character: 1 } for `offset` 4.
    */
   public positionAt(offset: number): Position {
-    offset = Math.max(Math.min(offset, this.text.length), 0);
+    offset = Math.max(Math.min(offset, this.textLength), 0);
     const lineOffsets = this.newlineOffsets;
     let low = 0,
       high = lineOffsets.length;
@@ -286,7 +286,6 @@ export class DocumentCursor {
     // low is the least x for which the line offset is larger than the current offset
     // or array.length if no line offset is larger than the current offset
     const line = low - 1;
-    offset = this.ensureBeforeEOL(offset, lineOffsets[line]);
     return { line, character: offset - lineOffsets[line] };
   }
 
@@ -299,25 +298,47 @@ export class DocumentCursor {
    * @return A valid zero-based offset.
    */
   public offsetAt(position: Position): number {
-    const lineOffsets = this.newlineOffsets;
-    if (position.line >= lineOffsets.length) {
-      return this.text.length;
+    if (position.line >= this.newlineOffsets.length) {
+      return this.textLength;
     } else if (position.line < 0) {
       return 0;
     }
-    const lineOffset = lineOffsets[position.line];
+    const lineOffset = this.newlineOffsets[position.line];
     if (position.character <= 0) {
       return lineOffset;
     }
     const nextLineOffset =
-      position.line + 1 < lineOffsets.length ? lineOffsets[position.line + 1] : this.text.length;
-    const offset = Math.min(lineOffset + position.character, nextLineOffset);
-    return this.ensureBeforeEOL(offset, lineOffset);
+      position.line + 1 < this.newlineOffsets.length
+        ? this.newlineOffsets[position.line + 1]
+        : this.textLength;
+    return Math.min(lineOffset + position.character, nextLineOffset);
   }
 
   public offsetToDisplayPos(offset: number): { line: number; character: number } {
     const pos = this.positionAt(offset);
     return { line: pos.line + 1, character: pos.character + 1 };
+  }
+
+  public getSurroundingContext(
+    pos: number,
+    end: number,
+    surroundingLines: number,
+  ): { contextPos: number; contextEnd: number } {
+    const startLine = this.positionAt(pos).line;
+    const endLine = this.positionAt(end).line;
+
+    const contextStartLine = Math.max(0, startLine - surroundingLines);
+    const contextPos = this.newlineOffsets[contextStartLine];
+
+    const contextEndLineWithContent = Math.min(this.lineCount - 1, endLine + surroundingLines);
+
+    const nextLineAfterContext = contextEndLineWithContent + 1;
+    const contextEnd =
+      nextLineAfterContext < this.lineCount
+        ? this.newlineOffsets[nextLineAfterContext]
+        : this.textLength;
+
+    return { contextPos, contextEnd };
   }
 
   public rangeAt(range: { pos: number; end: number }): Range {
@@ -332,13 +353,6 @@ export class DocumentCursor {
       pos: this.offsetAt(range.start),
       end: this.offsetAt(range.end),
     };
-  }
-
-  private ensureBeforeEOL(offset: number, lineOffset: number): number {
-    while (offset > lineOffset && isEOL(this.text.charCodeAt(offset - 1))) {
-      offset--;
-    }
-    return offset;
   }
 }
 

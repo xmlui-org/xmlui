@@ -8,7 +8,7 @@ import { SyntaxKind } from "../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../parsers/xmlui-parser/syntax-node";
 import type { ScriptParserErrorMessage } from "../abstractions/scripting/ScriptParserError";
 import type { ModuleErrors } from "./script-runner/ScriptingSourceTree";
-import type { Position } from "../language-server/base/text-document";
+import { DocumentCursor } from "../language-server/base/text-document";
 
 interface ErrorForDisplay extends GeneralDiag {
   contextStartLine: number;
@@ -31,7 +31,7 @@ const RADIUS = "0.5rem";
 export function xmlUiMarkupToComponent(source: string, fileId: string | number = 0): ParserResult {
   const { parse, getText } = createXmlUiParser(source);
   const { node, errors } = parse();
-  const cursor = createDocumentCursor(source);
+  const cursor = DocumentCursor.fromText(source);
   if (errors.length > 0) {
     const errorsToDisplay = errors.map((err) => {
       return errorWithDisplayFields(err, cursor, source);
@@ -590,109 +590,4 @@ function errorWithDisplayFields(
     contextStartLine,
     contextSource: source.substring(err.contextPos, err.contextEnd),
   };
-}
-
-export type DocumentCursor = {
-  offsetToPos: (offset: number) => Position;
-  offsetToDisplayPos: (offset: number) => Position;
-  getSurroundingContext: (
-    offsetPos: number,
-    offsetEnd: number,
-    surroundingLines: number,
-  ) => { contextPos: number; contextEnd: number };
-};
-
-export function createDocumentCursor(text: string): DocumentCursor {
-  const newlinePositions = [];
-  for (let i = 0; i < text.length; ++i) {
-    if (text[i] === "\n") {
-      newlinePositions.push(i);
-    }
-  }
-
-  return {
-    offsetToPos,
-    offsetToDisplayPos,
-    getSurroundingContext,
-  };
-
-  /**
-   * Converts a position in a string to 0 based line and column number.
-   * @param offset the 0 based offset into the string
-   */
-  function offsetToPos(offset: number): Position {
-    let left = 0;
-    let right = newlinePositions.length;
-    while (left < right) {
-      const mid = Math.floor((left + right) / 2);
-
-      if (newlinePositions[mid] < offset) {
-        left = mid + 1;
-      } else {
-        right = mid;
-      }
-    }
-
-    let col = left === 0 ? offset : offset - newlinePositions[left - 1] - 1;
-
-    return { line: left, character: col };
-  }
-
-  /**
-   * Converts a position in a string to base 1 line and column number.
-   * @param offset the 0 based offset into the string
-   */
-  function offsetToDisplayPos(offset: number): Position {
-    let pos = offsetToPos(offset);
-    pos.line += 1;
-    pos.character += 1;
-    return pos;
-  }
-
-  function getSurroundingContext(
-    pos: number,
-    end: number,
-    surroundingLines: number,
-  ): { contextPos: number; contextEnd: number } {
-    let newlinesFound: number;
-    let cursor: number;
-
-    let contextPos: number;
-    cursor = pos;
-    newlinesFound = 0;
-    while (cursor >= 0) {
-      if (text[cursor] === "\n") {
-        newlinesFound++;
-        if (newlinesFound > surroundingLines) {
-          break;
-        }
-      }
-      cursor--;
-    }
-    contextPos = cursor + 1;
-
-    let contextEnd: number;
-    cursor = end;
-    newlinesFound = 0;
-    while (cursor < text.length) {
-      if (text[cursor] === "\n") {
-        newlinesFound++;
-        if (newlinesFound > surroundingLines) {
-          break;
-        }
-        cursor++;
-      } else if (text[cursor] === "\r" && text[cursor + 1] === "\n") {
-        newlinesFound++;
-        if (newlinesFound > surroundingLines) {
-          break;
-        }
-        cursor += 2;
-      } else {
-        cursor++;
-      }
-    }
-    contextEnd = cursor;
-
-    return { contextPos, contextEnd };
-  }
 }
