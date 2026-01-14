@@ -58,6 +58,7 @@ import {
 import { queueComponentRenderer } from "./Queue/Queue";
 import { CompoundComponent } from "../components-core/CompoundComponent";
 import { dynamicHeightListComponentRenderer } from "./List/List";
+import { dynamicHeightList2ComponentRenderer } from "./List2/List2";
 import { positionedContainerComponentRenderer } from "./PositionedContainer/PositionedContainer";
 import { changeListenerComponentRenderer } from "./ChangeListener/ChangeListener";
 import { formItemComponentRenderer } from "./FormItem/FormItem";
@@ -447,6 +448,9 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_List !== "false") {
       this.registerCoreComponent(dynamicHeightListComponentRenderer);
+    if (process.env.VITE_USED_COMPONENTS_List2 !== "false") {
+      this.registerCoreComponent(dynamicHeightList2ComponentRenderer);
+    }
     }
 
     if (process.env.VITE_USED_COMPONENTS_App !== "false") {
