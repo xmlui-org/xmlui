@@ -5,7 +5,8 @@
 **Key features:**
 - **Rich formatting**: Support for headings, bold, italic, lists, links, images, blockquotes, and code blocks
 - **Dynamic content**: Use &#64;{} binding expressions to inject variables and function results
-- **File loading**: Load markdown content from external files using the `data` property
+- **File loading**: Load Markdown content from external files using the `data` property
+- **HTML**: Use a subset of HTML directly in Markdown
 
 ## Acquiring content [#acquiring-content]
 
@@ -67,6 +68,39 @@ The `Markdown` component supports these basic elements.
 
 See [this markdown guide](https://www.markdownguide.org/cheat-sheet/).
 
+## Native HTML [#native-html]
+
+`Markdown` allows a subset of HTML. For example, while Markdown itself does not support `rowspan` and `colspan` in tables, you can use HTML directly.
+
+```xmlui-pg display name="HTML with colspan"
+<App>
+  <Markdown>
+    <![CDATA[
+<table>
+  <thead>
+    <tr>
+      <th colspan="2">Name</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Jill</td>
+      <td>Smith</td>
+      <td>43</td>
+    </tr>
+    <tr>
+      <td>Eve</td>
+      <td>Jackson</td>
+      <td>57</td>
+    </tr>
+  </tbody>
+</table>
+    ]]>
+  </Markdown>
+</App>
+```
+
 ## Binding Expressions [#binding-expressions]
 
 Our `Markdown` component is capable of evaluating binding expressions just as other XMLUI components.
@@ -103,6 +137,10 @@ Use this property when the text you provide is not static but a result of calcul
 
 This boolean property specifies whether images should be displayed in grayscale. If set to `true`, all images within the markdown will be rendered in grayscale.
 
+### `openLinkInNewTab` [#openlinkinnewtab]
+
+This boolean property specifies whether links should open in a new tab. If set to `true`, all links within the markdown will open in a new tab with `target="_blank"`. Links that explicitly specify their own target using the `| target=...` syntax will override this setting.
+
 ### `removeBr` (default: false) [#removebr-default-false]
 
 This boolean property specifies whether `<br>` (line break) elements should be omitted from the rendered output. When set to `true`, `<br/>` tags in the markdown content will not be rendered. When `false` (default), `<br/>` tags render as horizontal bars.
@@ -132,6 +170,20 @@ This boolean property specifies whether leading indents should be removed from t
 This boolean property specifies whether heading anchors should be displayed. If set to `true`, heading anchors will be displayed on hover next to headings.
 
 If this property is not set, the engine checks if `showHeadingAnchors` flag is turned on in the global configuration (in the `appGlobals` configuration object) and displays the heading anchor accordingly.
+
+### `truncateLinks` [#truncatelinks]
+
+This boolean property specifies whether long links should be truncated with ellipsis. If set to `true`, links will be displayed with a maximum width and overflow will be hidden with text-overflow: ellipsis.
+
+```xmlui-pg copy display name="Example: truncateLinks property"
+<App>
+  <Markdown truncateLinks="true">
+    <![CDATA[
+This is a long link truncated for display: https://playground.xmlui.org/#/playground/#H4sIAAAAAAAAE1VSS2vjMBD%2BK2LIYRdsy7u0F%2BEGlvbYPSXspQmLYo0dUXskpHHqNvi%2FL1Lchd7m9T1mmCtE1mT04AhBXUF7DwqaX95vDyRE82wjC6NZPxzgzOyjklJ7W3E3VL27VNOrHCyhHJ1BydMJZWTNUzxAxgshmj3OvL1uLONYkR5xUWLNEnKXxzG%2B1MfqBt3hBYPl9yeMbbCeraOlkZklW5LJ0%2FZAjby5hAJaN3pHSBxBvRxTTp3t0z5JEBQ8OzKOxH46obgpQgF8xhET4grWgIJ5HCZbGtemJs6MZOJnOYsMLoCCTQ5KH%2Byow3t5X9efXH90iEm0c8Q7%2B5GEf9z5GQo46fa1D24i85jBaZuydSaNhP70rQtuFCtxnEKnWyx%2F1rUIohcnIUVd3X2HArw2xlL%2FBb6JPk3Xf%2B9hWY7LUoDLN7s5sTOaffIGqtNDxALim%2FYezf%2FcB7xYfPud2daaCxaJdaIBBWcX7Icj1gMUoFu2F1wpv55sbeVPgsH2Z85XI0ZiUPm1luUfOQ4%2BonECAAA%3D
+    ]]>
+  </Markdown>
+</App>
+```
 
 ## Events [#events]
 

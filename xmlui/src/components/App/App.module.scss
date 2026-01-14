@@ -93,6 +93,20 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
           padding-inline: 0;
         }
       }
+      
+      // Override overflow when scrollWholePage is false
+      &:not(.scrollWholePage) {
+        overflow: hidden;
+        height: 100vh;
+        
+        &:global(.nested-app) {
+          height: 100%;
+        }
+        
+        &.sticky {
+          min-height: initial;
+        }
+      }
     }
 
     &.desktop {
@@ -262,18 +276,31 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
     &:not(.scrollWholePage) {
       overflow: hidden;
+      height: 100vh;
+      
+      // When nested (like in playground), use container dimensions instead of viewport
+      &:global(.nested-app) {
+        height: 100%;
+      }
+      
       .mainContentRow {
         min-height: 0;
         height: 100%;
       }
       .pagesContainer {
-        overflow: auto;
+        flex: 1;
         min-height: 0;
         height: 100%;
-        scrollbar-gutter: stable both-edges;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
       }
       .pageContentContainer {
-        min-height: 100%;
+        flex: 1;
+        min-height: 0;
+        overflow: hidden; // Children with star sizing handle their own scrolling
+        display: flex;
+        flex-direction: column;
       }
     }
 

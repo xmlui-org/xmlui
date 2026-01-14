@@ -81,14 +81,6 @@ const baseSplitterMd = createMetadata({
       availableValues: ["horizontal", "vertical"],
       defaultValue: defaultProps.orientation,
     },
-    stretch: {
-      description:
-        "When set to true, the Splitter takes the full height of its parent container. " +
-        "This is particularly useful in desktop layouts where you want content to fill " +
-        "the available vertical space between fixed header and footer elements.",
-      valueType: "boolean",
-      defaultValue: defaultProps.stretch,
-    },
   },
   events: {
     resize: {
@@ -147,16 +139,21 @@ function SplitterRenderer({
 
   // Let XMLUI handle the conditional rendering, then count the non-null results
   const renderedChildren = useMemo(() => {
+    const layoutContext = {
+      type: "Stack" as const,
+      orientation,
+    };
+    
     if (!Array.isArray(node.children)) {
-      const rendered = renderChild(node.children);
+      const rendered = renderChild(node.children, layoutContext);
       return rendered ? [rendered] : [];
     }
     
     return node.children
-      .map((child) => renderChild(child))
+      .map((child) => renderChild(child, layoutContext))
       .filter(child => child !== null && child !== undefined)
       .map((child, index) => React.cloneElement(child as React.ReactElement, { key: index }));
-  }, [node.children, renderChild]);
+  }, [node.children, renderChild, orientation]);
 
   const visibleChildCount = renderedChildren.length;
 
@@ -170,7 +167,6 @@ function SplitterRenderer({
       minPrimarySize={extractValue(node.props?.minPrimarySize)}
       maxPrimarySize={extractValue(node.props?.maxPrimarySize)}
       floating={extractValue.asOptionalBoolean(node.props?.floating)}
-      stretch={extractValue.asOptionalBoolean(node.props?.stretch)}
       resize={lookupEventHandler("resize")}
       visibleChildCount={visibleChildCount}
     >

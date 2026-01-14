@@ -55,7 +55,7 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-NoResult | $backgroundColor | $backgroundColor |
+| [backgroundColor](../styles-and-themes/common-units/#color)-NoResult | transparent | transparent |
 | [border](../styles-and-themes/common-units/#border)-NoResult | 0px solid $borderColor | 0px solid $borderColor |
 | [borderBottom](../styles-and-themes/common-units/#border)-NoResult | *none* | *none* |
 | [borderBottomColor](../styles-and-themes/common-units/#color)-NoResult | *none* | *none* |

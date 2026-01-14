@@ -12,8 +12,10 @@ import {
 import type { VisitorState } from "./tree-visitor";
 import { visitNode } from "./tree-visitor";
 import { isModuleErrors, parseScriptModule } from "./modules";
+import { PARSED_MARK_PROP } from "../../abstractions/InternalMarkers";
 
-export const PARSED_MARK_PROP = "__PARSED__";
+// Re-export for backward compatibility
+export { PARSED_MARK_PROP } from "../../abstractions/InternalMarkers";
 
 // --- Collect module statements from a parsed module
 export function collectCodeBehindFromSource(

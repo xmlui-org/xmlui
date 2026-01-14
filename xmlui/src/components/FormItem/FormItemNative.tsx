@@ -41,7 +41,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import { DatePicker } from "../DatePicker/DatePickerNative";
 import { getByPath } from "../Form/FormNative";
 import { AutoComplete } from "../AutoComplete/AutoCompleteNative";
-import type { LabelPosition } from "../abstractions";
+import type { LabelPosition, RequiredIndicatorMode } from "../abstractions";
 import type { FormItemMd } from "./FormItem";
 import { ItemWithLabel } from "./ItemWithLabel";
 import { useValidation, useValidationDisplay } from "./Validations";
@@ -72,6 +72,7 @@ type Props = {
   onValidate?: ValidateEventHandler;
   customValidationsDebounce?: number;
   validationMode?: ValidationMode;
+  requiredIndicator?: RequiredIndicatorMode;
   initialValue?: any;
   registerComponentApi?: RegisterComponentApiFn;
   maxTextLength?: number;
@@ -178,6 +179,7 @@ export const FormItem = memo(function FormItem({
   initialValue: initialValueFromProps,
   gap,
   noSubmit = defaultProps.noSubmit,
+  requiredIndicator,
   layoutContext, // Destructured to prevent passing to ItemWithLabel
   ...rest
 }: Props & { layoutContext?: any }) {
@@ -236,6 +238,7 @@ export const FormItem = memo(function FormItem({
   const dispatch = useFormContextPart((value) => value?.dispatch);
   const formEnabled = useFormContextPart((value) => value?.enabled);
   const verboseValidationFeedback = useFormContextPart((value) => value?.verboseValidationFeedback);
+  const itemRequiredIndicator = useFormContextPart((value) => value?.itemRequiredIndicator);
 
   const isEnabled = enabled && formEnabled;
 
@@ -536,6 +539,7 @@ export const FormItem = memo(function FormItem({
       onFocus={onFocus}
       onBlur={onBlur}
       style={style}
+      requiredIndicator={requiredIndicator ?? itemRequiredIndicator}
       className={className}
       validationResult={
         verboseValidationFeedback ? null : (

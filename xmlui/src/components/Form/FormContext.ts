@@ -3,7 +3,7 @@ import { createContext, useContext, useContextSelector } from "use-context-selec
 
 import type { ContainerAction } from "../../components-core/rendering/containers";
 import type { FormAction } from "../Form/formActions";
-import type { LabelPosition } from "../abstractions";
+import type { LabelPosition, RequiredIndicatorMode } from "../abstractions";
 import type { PropertyValueDescription } from "../../abstractions/ComponentDefs";
 
 export type InteractionFlags = {
@@ -29,6 +29,7 @@ interface IFormContext {
   verboseValidationFeedback?: boolean;
   validationIconSuccess?: string;
   validationIconError?: string;
+  itemRequiredIndicator?: RequiredIndicatorMode;
 }
 
 export type ValidationResult = {

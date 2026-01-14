@@ -171,10 +171,15 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
 
   const applyDefaultContentPadding = !Pages;
   const footerSticky = Footer?.props?.sticky ?? true;
+  const scrollWholePage = extractValue.asOptionalBoolean(node.props.scrollWholePage, true);
+  
+  // When scrollWholePage is false, pageContentContainer is a vertical flex container
+  // Pass layout context so children can properly resolve star sizing
+  const contentLayoutContext = !scrollWholePage ? { type: "Stack" as const, orientation: "vertical" as const } : undefined;
 
   return (
     <AppComponent
-      scrollWholePage={extractValue.asOptionalBoolean(node.props.scrollWholePage, true)}
+      scrollWholePage={scrollWholePage}
       noScrollbarGutters={extractValue.asOptionalBoolean(node.props.noScrollbarGutters, false)}
       className={className}
       layout={extractValue(node.props.layout)}
@@ -198,7 +203,7 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
       renderChild={renderChild}
       registerComponentApi={registerComponentApi}
     >
-      {renderChild(restChildren)}
+      {renderChild(restChildren, contentLayoutContext)}
       <SearchIndexCollector Pages={Pages} renderChild={renderChild} />
     </AppComponent>
   );

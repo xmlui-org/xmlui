@@ -85,10 +85,6 @@ Default is **false**, which indicates a left-to-right layout.
 </App>
 ```
 
-### `stretch` (default: false) [#stretch-default-false]
-
-When set to true, the Stack takes the full height of its parent container. This is particularly useful in desktop layouts where you want content to fill the available vertical space between fixed header and footer elements.
-
 ### `verticalAlignment` (default: "start") [#verticalalignment-default-start]
 
 Manages the vertical content alignment for each child element in the Stack.
@@ -143,7 +139,29 @@ Describes the logic that fires when the component is clicked.
 
 ## Exposed Methods [#exposed-methods]
 
-This component does not expose any methods.
+### `scrollToBottom` [#scrolltobottom]
+
+Scrolls the Stack container to the bottom. Works when the Stack has an explicit height and overflowY is set to 'scroll'.
+
+**Signature**: `scrollToBottom(behavior?: 'auto' | 'instant' | 'smooth'): void`
+
+### `scrollToEnd` [#scrolltoend]
+
+Scrolls the Stack container to the end (right in LTR, left in RTL). Works when the Stack has an explicit width and overflowX is set to 'scroll'.
+
+**Signature**: `scrollToEnd(behavior?: 'auto' | 'instant' | 'smooth'): void`
+
+### `scrollToStart` [#scrolltostart]
+
+Scrolls the Stack container to the start (left in LTR, right in RTL). Works when the Stack has an explicit width and overflowX is set to 'scroll'.
+
+**Signature**: `scrollToStart(behavior?: 'auto' | 'instant' | 'smooth'): void`
+
+### `scrollToTop` [#scrolltotop]
+
+Scrolls the Stack container to the top. Works when the Stack has an explicit height and overflowY is set to 'scroll'.
+
+**Signature**: `scrollToTop(behavior?: 'auto' | 'instant' | 'smooth'): void`
 
 ## Styling [#styling]
 

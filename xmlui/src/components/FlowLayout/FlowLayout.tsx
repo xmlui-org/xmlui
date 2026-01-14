@@ -43,22 +43,16 @@ export const FlowLayoutMd = createMetadata({
       valueType: "string",
       defaultValue: "start",
     },
-    stretch: {
-      description:
-        "When set to true, the FlowLayout takes the full height of its parent container. " +
-        "This is particularly useful in desktop layouts where you want content to fill " +
-        "the available vertical space between fixed header and footer elements.",
-      valueType: "boolean",
-      defaultValue: defaultProps.stretch,
-    },
   },
   apis: {
     scrollToTop: {
-      description: "Scrolls the FlowLayout container to the top. Works when the FlowLayout has an explicit height and overflowY is set to 'scroll'.",
+      description:
+        "Scrolls the FlowLayout container to the top. Works when the FlowLayout has an explicit height and overflowY is set to 'scroll'.",
       signature: "scrollToTop(behavior?: 'auto' | 'instant' | 'smooth'): void",
     },
     scrollToBottom: {
-      description: "Scrolls the FlowLayout container to the bottom. Works when the FlowLayout has an explicit height and overflowY is set to 'scroll'.",
+      description:
+        "Scrolls the FlowLayout container to the bottom. Works when the FlowLayout has an explicit height and overflowY is set to 'scroll'.",
       signature: "scrollToBottom(behavior?: 'auto' | 'instant' | 'smooth'): void",
     },
   },
@@ -78,12 +72,19 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
       extractValue.asSize(node.props?.gap) ||
       extractValue.asSize("$space-4");
     const rowGap =
-      extractValue.asSize(node.props?.rowGap) || extractValue.asSize(node.props?.gap) || extractValue.asSize("$space-4");
+      extractValue.asSize(node.props?.rowGap) ||
+      extractValue.asSize(node.props?.gap) ||
+      extractValue.asSize("$space-4");
     const verticalAlignment = extractValue.asOptionalString(node.props?.verticalAlignment, "start");
-    const stretch = extractValue.asOptionalBoolean(node.props?.stretch);
 
     return (
-      <FlowLayout className={className} columnGap={columnGap} rowGap={rowGap} verticalAlignment={verticalAlignment} stretch={stretch} registerComponentApi={registerComponentApi}>
+      <FlowLayout
+        className={className}
+        columnGap={columnGap}
+        rowGap={rowGap}
+        verticalAlignment={verticalAlignment}
+        registerComponentApi={registerComponentApi}
+      >
         {renderChild(node.children, {
           type: "FlowLayout",
           ignoreLayoutProps: ["width", "minWidth", "maxWidth"],

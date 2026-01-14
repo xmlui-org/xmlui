@@ -1,4 +1,5 @@
 import { isPlainObject } from "lodash-es";
+import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 
 import type { TemplateLiteralExpression } from "./ScriptingSourceTree";
 import {
@@ -493,7 +494,7 @@ async function evalFunctionInvocationAsync(
   const functionArgs: any[] = [];
 
   // --- The functionObj may be an ArrowExpression. In this care we need to create the invokable arrow function
-  if (functionObj?._ARROW_EXPR_) {
+  if (isArrowExpressionObject(functionObj)) {
     functionArgs.push(
       functionObj.args,
       evalContext,
@@ -531,7 +532,7 @@ async function evalFunctionInvocationAsync(
         } else {
           await evaluator([], arg, evalContext, thread);
           const funcArg = await completeExprValue(arg, thread);
-          if (funcArg?._ARROW_EXPR_) {
+          if (isArrowExpressionObject(funcArg)) {
             const wrappedFuncArg = createArrowFunctionAsync(evaluator, funcArg);
             const wrappedFunc = (...args: any[]) =>
               wrappedFuncArg(funcArg.args, evalContext, thread, ...args);

@@ -53,6 +53,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { resolveLayoutProps } from "../../components-core/theming/layout-resolver";
 import { Part } from "../Part/Part";
 import { MemoizedItem } from "../container-helpers";
+import type { RequiredIndicatorMode } from "../abstractions";
 
 const PART_CANCEL_BUTTON = "cancelButton";
 const PART_SUBMIT_BUTTON = "submitButton";
@@ -263,6 +264,7 @@ type Props = {
   itemLabelBreak?: boolean;
   itemLabelWidth?: string;
   itemLabelPosition?: string; // type LabelPosition
+  itemRequiredIndicator?: RequiredIndicatorMode;
   keepModalOpenOnSubmit?: boolean;
   hideButtonRowUntilDirty?: boolean;
   hideButtonRow?: boolean;
@@ -286,6 +288,7 @@ export const defaultProps: Pick<
   | "enableSubmit"
   | "validationIconSuccess"
   | "validationIconError"
+  | "itemRequiredIndicator"
 > = {
   cancelLabel: "Cancel",
   saveLabel: "Save",
@@ -299,6 +302,7 @@ export const defaultProps: Pick<
   enableSubmit: true,
   validationIconSuccess: "check",
   validationIconError: "error",
+  itemRequiredIndicator: "required",
 };
 
 // --- Remove the properties from formState.subject where the property name ends with UNBOUND_FIELD_SUFFIX
@@ -339,8 +343,9 @@ const Form = forwardRef(function (
     itemLabelBreak = defaultProps.itemLabelBreak,
     itemLabelWidth,
     itemLabelPosition = defaultProps.itemLabelPosition,
+    itemRequiredIndicator = defaultProps.itemRequiredIndicator,
     keepModalOpenOnSubmit = defaultProps.keepModalOpenOnSubmit,
-    hideButtonRowUntilDirty,
+    hideButtonRowUntilDirty = defaultProps.hideButtonRowUntilDirty,
     hideButtonRow = defaultProps.hideButtonRow,
     enableSubmit = defaultProps.enableSubmit,
     verboseValidationFeedback,
@@ -369,6 +374,7 @@ const Form = forwardRef(function (
       itemLabelBreak,
       itemLabelWidth,
       itemLabelPosition,
+      itemRequiredIndicator,
       subject: formState.subject,
       originalSubject: initialValue,
       validationResults: formState.validationResults,
@@ -392,6 +398,7 @@ const Form = forwardRef(function (
     verboseValidationFeedback,
     validationIconSuccess,
     validationIconError,
+    itemRequiredIndicator,
   ]);
 
   const doCancel = useEvent(() => {
@@ -452,7 +459,7 @@ const Form = forwardRef(function (
     try {
       const filteredSubject = validationResult.data;
       const willSubmitResult = await onWillSubmit?.(filteredSubject);
-      
+
       // Handle different return values from willSubmit
       if (willSubmitResult === false) {
         // --- We do not reset the form but allow the next submit.
@@ -461,13 +468,13 @@ const Form = forwardRef(function (
         );
         return;
       }
-      
+
       // Determine what data to submit
       let dataToSubmit = filteredSubject;
-      if (willSubmitResult !== null && 
-          willSubmitResult !== undefined && 
-          willSubmitResult !== "" && 
-          typeof willSubmitResult === "object" && 
+      if (willSubmitResult !== null &&
+          willSubmitResult !== undefined &&
+          willSubmitResult !== "" &&
+          typeof willSubmitResult === "object" &&
           !Array.isArray(willSubmitResult)) {
         // Submit the returned object instead
         dataToSubmit = willSubmitResult as Record<string, any>;
@@ -738,6 +745,7 @@ export const FormWithContextVar = forwardRef(function (
         itemLabelPosition={extractValue.asOptionalString(node.props.itemLabelPosition)}
         itemLabelBreak={extractValue.asOptionalBoolean(node.props.itemLabelBreak)}
         itemLabelWidth={itemLabelWidthCssProps.width as string}
+        itemRequiredIndicator={extractValue.asOptionalString(node.props.itemRequiredIndicator)}
         hideButtonRowUntilDirty={extractValue.asOptionalBoolean(node.props.hideButtonRowUntilDirty)}
         hideButtonRow={extractValue.asOptionalBoolean(node.props.hideButtonRow)}
         enableSubmit={extractValue.asOptionalBoolean(node.props.enableSubmit)}

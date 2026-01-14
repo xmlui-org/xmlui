@@ -1,4 +1,5 @@
 import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
+import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 import type { Identifier, TemplateLiteralExpression } from "./ScriptingSourceTree";
 import {
   T_ARRAY_LITERAL,
@@ -512,7 +513,7 @@ function evalFunctionInvocation(
   const functionArgs: any[] = [];
 
   // --- The functionObj may be an ArrowExpression. In this care we need to create the invokable arrow function
-  if (functionObj?._ARROW_EXPR_) {
+  if (isArrowExpressionObject(functionObj)) {
     functionArgs.push(
       functionObj.args,
       evalContext,
@@ -546,7 +547,7 @@ function evalFunctionInvocation(
           functionArgs.push(wrappedFunc);
         } else {
           const funcArg = evaluator([], arg, evalContext, thread);
-          if (funcArg?._ARROW_EXPR_) {
+          if (isArrowExpressionObject(funcArg)) {
             const wrappedFuncArg = createArrowFunction(evaluator, funcArg);
             const wrappedFunc = (...args: any[]) =>
               wrappedFuncArg(funcArg.args, evalContext, thread, ...args);

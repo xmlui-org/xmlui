@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactElement, ReactNode } from "react";
+import type { CSSProperties, ReactElement } from "react";
 import {
   cloneElement,
   Fragment,
@@ -26,7 +26,7 @@ import {
 } from "../Form/formActions";
 import { getByPath } from "../Form/FormNative";
 import { useEvent } from "../../components-core/utils/misc";
-import type { LabelPosition } from "../abstractions";
+import type { LabelPosition, RequiredIndicatorMode } from "../abstractions";
 import { ItemWithLabel } from "./ItemWithLabel";
 import { useValidation, useValidationDisplay } from "./Validations";
 import { HelperText } from "./HelperText";
@@ -39,6 +39,7 @@ type FormBindingWrapperProps = {
   initialValue?: any;
   noSubmit?: boolean;
   validations: FormItemValidations;
+  requiredIndicator?: RequiredIndicatorMode;
   onValidate?: ValidateEventHandler;
   customValidationsDebounce?: number;
   validationMode?: ValidationMode;
@@ -66,6 +67,7 @@ export function FormBindingWrapper({
   labelPosition,
   labelWidth,
   labelBreak,
+  requiredIndicator,
   enabled = true,
   style,
   className,
@@ -101,6 +103,7 @@ export function FormBindingWrapper({
   const validationResult = useFormContextPart((value) => value?.validationResults[formItemId]);
   const dispatch = useFormContextPart((value) => value?.dispatch);
   const formEnabled = useFormContextPart((value) => value?.enabled);
+  const formRequiredIndicator = useFormContextPart((value) => value?.itemRequiredIndicator);
   const verboseValidationFeedback = useFormContextPart((value) => value?.verboseValidationFeedback);
 
   const isEnabled = enabled && formEnabled;
@@ -149,7 +152,7 @@ export function FormBindingWrapper({
   const forceShowValidationResult = useFormContextPart(
     (value) => value?.interactionFlags[formItemId]?.forceShowValidationResult
   );
-  
+
   const isHelperTextShown = isHelperTextShownHook || !!forceShowValidationResult;
 
   // Focus/blur handlers for validation modes
@@ -227,6 +230,7 @@ export function FormBindingWrapper({
       style={style}
       className={className}
       validationResult={validationResultDisplay}
+      requiredIndicator={requiredIndicator ?? formRequiredIndicator}
     >
       {enhancedInput}
     </ItemWithLabel>
@@ -243,11 +247,11 @@ export function useFormBinding(bindTo: string, options?: {
 }) {
   const defaultId = useId();
   const isInsideForm = useIsInsideForm();
-  
+
   const formItemId = useMemo(() => {
     return bindTo || defaultId;
   }, [bindTo, defaultId]);
-  
+
   return {
     isInsideForm,
     formItemId

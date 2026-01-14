@@ -416,13 +416,44 @@ The event handler lifecycle actions (`EVENT_HANDLER_STARTED`, `EVENT_HANDLER_COM
 ```typescript
 // From reducer.ts - state preservation pattern
 case ContainerActionKind.EVENT_HANDLER_STARTED:
-  state[uid] = state[uid] 
-    ? { ...state[uid], [inProgressFlagName]: true }
-    : { [inProgressFlagName]: true };
+  // Skip if this reducer doesn't own this component's state
+  if (!(uid in state)) break;
+  const { eventName } = action.payload;
+  const inProgressFlagName = `${eventName}InProgress`;
+  // IMPORTANT: Preserve existing state properties when setting flags
+  state[uid] = { ...state[uid], [inProgressFlagName]: true };
+  storeNextValue(state[uid]);
   break;
 ```
 
 **Why This Matters**: Components with reducer state (like `DataSource` or `APICall`) maintain their `data`, `error`, and other properties throughout the event handler lifecycle. Without this preservation, setting the `inProgress` flag would replace the entire state object, losing critical data like loaded results or previous errors. This fix resolved issues where APIs would become non-functional after their first error because the state was being wiped out instead of updated.
+
+**State Preservation is Consistent**: The same preservation pattern is now applied uniformly across all state-modifying actions:
+
+```typescript
+// All actions now use the spread pattern to preserve existing state
+case ContainerActionKind.LOADER_LOADED:
+  state[uid] = {
+    ...state[uid],  // Preserve any existing state properties
+    value: data,
+    byId: Array.isArray(data) ? keyBy(data, item => item.$id) : undefined,
+    inProgress: false,
+    loaded: data !== undefined,
+    pageInfo,
+  };
+  break;
+
+case ContainerActionKind.LOADER_ERROR:
+  state[uid] = {
+    ...state[uid],  // Preserve existing state properties
+    error,
+    inProgress: false,
+    loaded: true
+  };
+  break;
+```
+
+This ensures that no state properties are lost during any state update, providing reliable behavior for complex component hierarchies.
 
 ### Partial State Changes
 

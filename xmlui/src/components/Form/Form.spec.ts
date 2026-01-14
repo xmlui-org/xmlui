@@ -716,6 +716,143 @@ test.describe("Basic Functionality", () => {
   });
 
   // =============================================================================
+  // ITEM REQUIRED INDICATOR TESTS
+  // =============================================================================
+
+  test.describe("itemRequiredIndicator property", () => {
+    test("sets 'required' indicator mode showing asterisk for required fields", async ({
+      initTestBed,
+      createFormItemDriver,
+    }) => {
+      await initTestBed(`
+        <Form itemRequiredIndicator="required">
+          <FormItem testId="formItem" label="Required Field" required="true" bindTo="test" />
+        </Form>
+      `);
+      const driver = await createFormItemDriver("formItem");
+      await expect(driver.label).toContainText("*");
+      await expect(driver.label).not.toContainText("(Optional)");
+    });
+
+    test("sets 'required' indicator mode hiding indicator for optional fields", async ({
+      initTestBed,
+      createFormItemDriver,
+    }) => {
+      await initTestBed(`
+        <Form itemRequiredIndicator="required">
+          <FormItem testId="formItem" label="Optional Field" required="false" bindTo="test" />
+        </Form>
+      `);
+      const driver = await createFormItemDriver("formItem");
+      await expect(driver.label).not.toContainText("*");
+      await expect(driver.label).not.toContainText("(Optional)");
+    });
+
+    test("sets 'optional' indicator mode showing optional tag for optional fields", async ({
+      initTestBed,
+      createFormItemDriver,
+    }) => {
+      await initTestBed(`
+        <Form itemRequiredIndicator="optional">
+          <FormItem testId="formItem" label="Optional Field" required="false" bindTo="test" />
+        </Form>
+      `);
+      const driver = await createFormItemDriver("formItem");
+      await expect(driver.label).toContainText("(Optional)");
+      await expect(driver.label).not.toContainText("*");
+    });
+
+    test("sets 'optional' indicator mode hiding indicator for required fields", async ({
+      initTestBed,
+      createFormItemDriver,
+    }) => {
+      await initTestBed(`
+        <Form itemRequiredIndicator="optional">
+          <FormItem testId="formItem" label="Required Field" required="true" bindTo="test" />
+        </Form>
+      `);
+      const driver = await createFormItemDriver("formItem");
+      await expect(driver.label).not.toContainText("*");
+      await expect(driver.label).not.toContainText("(Optional)");
+    });
+
+    test("sets 'both' indicator mode showing asterisk for required fields", async ({
+      initTestBed,
+      createFormItemDriver,
+    }) => {
+      await initTestBed(`
+        <Form itemRequiredIndicator="both">
+          <FormItem testId="formItem" label="Required Field" required="true" bindTo="test" />
+        </Form>
+      `);
+      const driver = await createFormItemDriver("formItem");
+      await expect(driver.label).toContainText("*");
+      await expect(driver.label).not.toContainText("(Optional)");
+    });
+
+    test("sets 'both' indicator mode showing optional tag for optional fields", async ({
+      initTestBed,
+      createFormItemDriver,
+    }) => {
+      await initTestBed(`
+        <Form itemRequiredIndicator="both">
+          <FormItem testId="formItem" label="Optional Field" required="false" bindTo="test" />
+        </Form>
+      `);
+      const driver = await createFormItemDriver("formItem");
+      await expect(driver.label).not.toContainText("*");
+      await expect(driver.label).toContainText("(Optional)");
+    });
+
+    test("applies to multiple FormItems consistently", async ({
+      initTestBed,
+      createFormItemDriver,
+    }) => {
+      await initTestBed(`
+        <Form itemRequiredIndicator="both">
+          <FormItem testId="formItem1" label="Required Field" required="true" bindTo="field1" />
+          <FormItem testId="formItem2" label="Optional Field" required="false" bindTo="field2" />
+          <FormItem testId="formItem3" label="Another Required" required="true" bindTo="field3" />
+        </Form>
+      `);
+      const driver1 = await createFormItemDriver("formItem1");
+      const driver2 = await createFormItemDriver("formItem2");
+      const driver3 = await createFormItemDriver("formItem3");
+      
+      await expect(driver1.label).toContainText("*");
+      await expect(driver1.label).not.toContainText("(Optional)");
+      
+      await expect(driver2.label).not.toContainText("*");
+      await expect(driver2.label).toContainText("(Optional)");
+      
+      await expect(driver3.label).toContainText("*");
+      await expect(driver3.label).not.toContainText("(Optional)");
+    });
+
+    test("FormItem requiredIndicator property overrides Form itemRequiredIndicator", async ({
+      initTestBed,
+      createFormItemDriver,
+    }) => {
+      await initTestBed(`
+        <Form itemRequiredIndicator="required">
+          <FormItem testId="formItem1" label="Form Default" required="false" bindTo="field1" />
+          <FormItem testId="formItem2" label="Overridden" required="false" bindTo="field2" requiredIndicator="optional" />
+        </Form>
+      `);
+      const driver1 = await createFormItemDriver("formItem1");
+      const driver2 = await createFormItemDriver("formItem2");
+      
+      // formItem1 uses Form's itemRequiredIndicator="required", so no indicator for optional field
+      await expect(driver1.label).not.toContainText("*");
+      await expect(driver1.label).not.toContainText("(Optional)");
+      
+      // formItem2 overrides with requiredIndicator="optional", so shows optional tag
+      await expect(driver2.label).not.toContainText("*");
+      await expect(driver2.label).toContainText("(Optional)");
+    });
+  });
+
+  // =============================================================================
   // ENABLED PROPERTY TESTS
   // =============================================================================
 
