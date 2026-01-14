@@ -84,7 +84,7 @@ type Props = {
 
 export const defaultProps: Pick<
   Props,
-  "type" | "labelBreak" | "enabled" | "customValidationsDebounce" | "gap" | "noSubmit" | "requiredIndicator"
+  "type" | "labelBreak" | "enabled" | "customValidationsDebounce" | "gap" | "noSubmit"
 > = {
   type: "text",
   labelBreak: true,
@@ -92,7 +92,6 @@ export const defaultProps: Pick<
   customValidationsDebounce: 0,
   gap: "0",
   noSubmit: false,
-  requiredIndicator: "required",
 };
 
 export const FormItemContext = createContext<{ parentFormItemId: string | null; isInsideFormItem: boolean }>({
@@ -180,7 +179,7 @@ export const FormItem = memo(function FormItem({
   initialValue: initialValueFromProps,
   gap,
   noSubmit = defaultProps.noSubmit,
-  requiredIndicator = defaultProps.requiredIndicator,
+  requiredIndicator,
   layoutContext, // Destructured to prevent passing to ItemWithLabel
   ...rest
 }: Props & { layoutContext?: any }) {
@@ -238,6 +237,7 @@ export const FormItem = memo(function FormItem({
   const validationResult = useFormContextPart((value) => value?.validationResults[formItemId]);
   const dispatch = useFormContextPart((value) => value?.dispatch);
   const formEnabled = useFormContextPart((value) => value?.enabled);
+  const itemRequiredIndicator = useFormContextPart((value) => value?.itemRequiredIndicator);
 
   const isEnabled = enabled && formEnabled;
 
@@ -537,7 +537,7 @@ export const FormItem = memo(function FormItem({
       onFocus={onFocus}
       onBlur={onBlur}
       style={style}
-      requiredIndicator={requiredIndicator}
+      requiredIndicator={requiredIndicator ?? itemRequiredIndicator}
       className={className}
       validationResult={
         <div ref={animateContainerRef} className={styles.helperTextContainer}>
