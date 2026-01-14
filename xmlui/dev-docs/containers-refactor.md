@@ -1249,7 +1249,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 ```
 
-**Status: COMPLETED** - Added try-finally protection to runCodeAsync in Container.tsx (lines 246-287). Ensures promise is removed from the map even if an error occurs, preventing memory leaks. Added development-mode monitoring to detect oversized promise maps (>100 entries). Protects against unbounded memory growth in long-running applications. Tests pending ✓
+**Status: COMPLETED** - Added try-finally protection to runCodeAsync in Container.tsx (lines 246-287). Ensures promise is removed from the map even if an error occurs, preventing memory leaks. Added development-mode monitoring to detect oversized promise maps (>100 entries). Protects against unbounded memory growth in long-running applications. Tests passed ✓
 
 **Alternative Approach - WeakMap:**
 
@@ -1357,7 +1357,7 @@ export function isContainerLike(node: ComponentDef): boolean {
 
 ## Testing Recommendations
 
-### 14. Add Unit Tests for Critical Functions
+### 14. Add Unit Tests for Critical Functions ✅ COMPLETED
 
 **Issue:** Core functions like `collectFnVarDeps`, `extractScopedState`, state composition lack unit tests.
 
@@ -1561,6 +1561,14 @@ describe('buildProxy', () => {
   });
 });
 ```
+
+**Status: COMPLETED** - Created comprehensive unit tests in `xmlui/tests/components-core/rendering/`:
+- `collectFnVarDeps.test.ts`: 11 tests covering simple/nested/circular dependencies, edge cases
+- `buildProxy.test.ts`: 16 tests covering property set/delete, nested objects, arrays, frozen objects, arrow expressions, read-only validation
+- `stateComposition.test.ts`: 15 tests for extractScopedState, useCombinedState, useMergedState logic
+- **Total: 42 new unit tests - all passing ✓**
+- Tests follow XMLUI conventions and validate edge cases, error handling, and expected behavior
+- Ready for e2e validation
 
 **Benefits:**
 - Catches regressions early
