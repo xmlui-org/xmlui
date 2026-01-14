@@ -1,12 +1,11 @@
 import { DiagnosticSeverity, type Diagnostic, type Position } from "vscode-languageserver";
 import type { ParserDiag } from "../../parsers/xmlui-parser/diagnostics";
 import type { ParseResult } from "../../parsers/xmlui-parser/parser";
-import { offsetRangeToPosRange } from "./common/lsp-utils";
 import type { Project } from "../base/project";
-import type { DocumentUri } from "../base/text-document";
+import type { DocumentUri, DocumentCursor } from "../base/text-document";
 
 export type DiagnosticsContext = {
-  offsetToPos: (pos: number) => Position;
+  cursor: DocumentCursor;
   parseResult: ParseResult;
 };
 
@@ -14,14 +13,14 @@ function getDiagnosticsInternal(ctx: DiagnosticsContext): Diagnostic[] {
   const { errors } = ctx.parseResult;
 
   return errors.map((e) => {
-    return errorToLspDiag(e, ctx.offsetToPos);
+    return errorToLspDiag(e, ctx.cursor);
   });
 }
 
-export function errorToLspDiag(e: ParserDiag, offsetToPos: (n: number) => Position): Diagnostic {
+export function errorToLspDiag(e: ParserDiag, cursor: DocumentCursor): Diagnostic {
   return {
     severity: DiagnosticSeverity.Error,
-    range: offsetRangeToPosRange(offsetToPos, e),
+    range: cursor.rangeAt(e),
     message: e.message,
     code: e.code,
   };
@@ -35,7 +34,7 @@ export function getDiagnostics(project: Project, uri: DocumentUri): Diagnostic[]
   const { parseResult } = document.parse();
   const ctx = {
     parseResult,
-    offsetToPos: (offset: number) => document.positionAt(offset),
+    cursor: document.cursor,
   };
   return getDiagnosticsInternal(ctx);
 }

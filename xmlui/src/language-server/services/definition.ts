@@ -4,7 +4,6 @@ import type { DocumentUri, Position } from "../base/text-document";
 import { findTokenAtOffset } from "../../parsers/xmlui-parser/utils";
 import { SyntaxKind } from "../../parsers/xmlui-parser";
 import path from "path";
-import { offsetRangeToPosRange } from "./common/lsp-utils";
 
 //TODO: handleDefinition is still immature, only works when the component's filename matches the hovered component name, needs project-wide discovery so that files don't need to be pre-opened to be discoverable and the returned range should point to the open tag named "Component" in the targe file, not the the very beginning of it.
 
@@ -20,7 +19,7 @@ export function handleDefinition(
   } = doc.parse();
   console.log("received definition");
 
-  const offset = doc.offsetAt(position);
+  const offset = doc.cursor.offsetAt(position);
   const findRes = findTokenAtOffset(node, offset);
   if (!findRes) {
     return null;
@@ -49,7 +48,7 @@ export function handleDefinition(
       const targetDoc = project.documents.get(uri);
       return {
         uri,
-        range: offsetRangeToPosRange((num) => targetDoc.positionAt(num), { pos: 0, end: 0 }),
+        range: targetDoc.cursor.rangeAt({ pos: 0, end: 0 }),
       };
     }
   }

@@ -81,11 +81,11 @@ export function handleCompletion(
   if (!document) {
     return null;
   }
-  const offset = document.offsetAt(position);
+  const offset = document.cursor.offsetAt(position);
   const { parseResult, getText } = document.parse();
   const node = parseResult.node;
   const metaByComp = project.metadataProvider;
-  const offsetToPos = (offset: number) => document.positionAt(offset);
+  const offsetToPos = (offset: number) => document.cursor.positionAt(offset);
 
   const findRes = findTokenAtOffset(node, offset);
   if (!findRes) {

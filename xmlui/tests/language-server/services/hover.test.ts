@@ -58,6 +58,6 @@ function hoverAtPoundSign(source: string) {
   const uri = "file://test.xmlui";
   const project = Project.fromFileContets({ [uri]: source }, mockMetadataProvider);
   const document = project.documents.get(uri);
-  const charPosition = document.positionAt(position);
+  const charPosition = document.cursor.positionAt(position);
   return handleHover(project, uri, charPosition);
 }

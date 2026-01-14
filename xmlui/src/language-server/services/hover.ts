@@ -7,7 +7,6 @@ import * as docGen from "./common/docs-generation";
 import type { MetadataProvider } from "./common/metadata-utils";
 import type { Hover, Position } from "vscode-languageserver";
 import { MarkupKind } from "vscode-languageserver";
-import { offsetRangeToPosRange } from "./common/lsp-utils";
 import type { Project } from "../base/project";
 import type { DocumentUri } from "../base/text-document";
 
@@ -24,11 +23,10 @@ export function handleHover(project: Project, uri: DocumentUri, position: Positi
   if (!document) {
     return null;
   }
-  const offset = document.offsetAt(position);
+  const offset = document.cursor.offsetAt(position);
   const { parseResult, getText } = document.parse();
   const node = parseResult.node;
   const metaByComp = project.metadataProvider;
-  const offsetToPosition = (offset: number) => document.positionAt(offset);
 
   const findRes = findTokenAtOffset(node, offset);
 
@@ -77,7 +75,7 @@ export function handleHover(project: Project, uri: DocumentUri, position: Positi
       kind: MarkupKind.Markdown,
       value,
     },
-    range: offsetRangeToPosRange(offsetToPosition, range),
+    range: document.cursor.rangeAt(range),
   };
 }
 

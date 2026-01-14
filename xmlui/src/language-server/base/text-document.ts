@@ -15,7 +15,6 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { createDocumentCursor, type DocumentCursor } from "../../components-core/xmlui-parser";
 import { createXmlUiParser, type GetText, type ParseResult } from "../../parsers/xmlui-parser";
 
 /**
@@ -65,7 +64,7 @@ export interface Position {
  * ```ts
  * {
  *     start: { line: 5, character: 23 }
- *     end : { line 6, character : 0 }
+ *     end : { line: 6, character : 0 }
  * }
  * ```
  */
@@ -169,28 +168,6 @@ export interface TextDocument {
    */
   getText(range?: Range): string;
   /**
-   * Converts a zero-based offset to a position.
-   *
-   * @param offset A zero-based offset.
-   * @return A valid {@link Position position}.
-   * @example The text document "ab\ncd" produces:
-   * * position { line: 0, character: 0 } for `offset` 0.
-   * * position { line: 0, character: 1 } for `offset` 1.
-   * * position { line: 0, character: 2 } for `offset` 2.
-   * * position { line: 1, character: 0 } for `offset` 3.
-   * * position { line: 1, character: 1 } for `offset` 4.
-   */
-  positionAt(offset: number): Position;
-  /**
-   * Converts the position to a zero-based offset.
-   * Invalid positions are adjusted as described in {@link Position.line}
-   * and {@link Position.character}.
-   *
-   * @param position A position.
-   * @return A valid zero-based offset.
-   */
-  offsetAt(position: Position): number;
-  /**
    * The number of lines in this document.
    *
    * @readonly
@@ -248,7 +225,7 @@ export const TextDocument = {
     let lastModifiedOffset = 0;
     const spans = [];
     for (const e of sortedEdits) {
-      const startOffset = document.offsetAt(e.range.start);
+      const startOffset = document.cursor.offsetAt(e.range.start);
       if (startOffset < lastModifiedOffset) {
         throw new Error("Overlapping edit");
       } else if (startOffset > lastModifiedOffset) {
@@ -257,16 +234,115 @@ export const TextDocument = {
       if (e.newText.length) {
         spans.push(e.newText);
       }
-      lastModifiedOffset = document.offsetAt(e.range.end);
+      lastModifiedOffset = document.cursor.offsetAt(e.range.end);
     }
     spans.push(text.substring(lastModifiedOffset));
     return spans.join("");
   },
 };
 
-class FullTextDocument implements TextDocument {
-  private _lineOffsets: number[] | undefined;
+export class DocumentCursor {
+  constructor(
+    private readonly newlineOffsets: number[],
+    private readonly text: string,
+  ) {}
 
+  public static fromText(text: string): DocumentCursor {
+    return new DocumentCursor(computeLineOffsets(text, true), text);
+  }
+
+  public get lineCount(): number {
+    return this.newlineOffsets.length;
+  }
+
+  /**
+   * Converts a zero-based offset to a position.
+   *
+   * @param offset A zero-based offset.
+   * @return A valid {@link Position position}.
+   * @example The text document "ab\ncd" produces:
+   * * position { line: 0, character: 0 } for `offset` 0.
+   * * position { line: 0, character: 1 } for `offset` 1.
+   * * position { line: 0, character: 2 } for `offset` 2.
+   * * position { line: 1, character: 0 } for `offset` 3.
+   * * position { line: 1, character: 1 } for `offset` 4.
+   */
+  public positionAt(offset: number): Position {
+    offset = Math.max(Math.min(offset, this.text.length), 0);
+    const lineOffsets = this.newlineOffsets;
+    let low = 0,
+      high = lineOffsets.length;
+    if (high === 0) {
+      return { line: 0, character: offset };
+    }
+    while (low < high) {
+      const mid = Math.floor((low + high) / 2);
+      if (lineOffsets[mid] > offset) {
+        high = mid;
+      } else {
+        low = mid + 1;
+      }
+    }
+    // low is the least x for which the line offset is larger than the current offset
+    // or array.length if no line offset is larger than the current offset
+    const line = low - 1;
+    offset = this.ensureBeforeEOL(offset, lineOffsets[line]);
+    return { line, character: offset - lineOffsets[line] };
+  }
+
+  /**
+   * Converts the position to a zero-based offset.
+   * Invalid positions are adjusted as described in {@link Position.line}
+   * and {@link Position.character}.
+   *
+   * @param position A position.
+   * @return A valid zero-based offset.
+   */
+  public offsetAt(position: Position): number {
+    const lineOffsets = this.newlineOffsets;
+    if (position.line >= lineOffsets.length) {
+      return this.text.length;
+    } else if (position.line < 0) {
+      return 0;
+    }
+    const lineOffset = lineOffsets[position.line];
+    if (position.character <= 0) {
+      return lineOffset;
+    }
+    const nextLineOffset =
+      position.line + 1 < lineOffsets.length ? lineOffsets[position.line + 1] : this.text.length;
+    const offset = Math.min(lineOffset + position.character, nextLineOffset);
+    return this.ensureBeforeEOL(offset, lineOffset);
+  }
+
+  public offsetToDisplayPos(offset: number): { line: number; character: number } {
+    const pos = this.positionAt(offset);
+    return { line: pos.line + 1, character: pos.character + 1 };
+  }
+
+  public rangeAt(range: { pos: number; end: number }): Range {
+    return {
+      start: this.positionAt(range.pos),
+      end: this.positionAt(range.end),
+    };
+  }
+
+  public offsetRangeAt(range: Range): { pos: number; end: number } {
+    return {
+      pos: this.offsetAt(range.start),
+      end: this.offsetAt(range.end),
+    };
+  }
+
+  private ensureBeforeEOL(offset: number, lineOffset: number): number {
+    while (offset > lineOffset && isEOL(this.text.charCodeAt(offset - 1))) {
+      offset--;
+    }
+    return offset;
+  }
+}
+
+class FullTextDocument implements TextDocument {
   private _cachedParse:
     | {
         getText: GetText;
@@ -292,18 +368,17 @@ class FullTextDocument implements TextDocument {
       parseResult: undefined,
       version: undefined,
     };
-    this._lineOffsets = undefined;
-    this.cursor = createDocumentCursor(_content);
+    this.cursor = DocumentCursor.fromText(_content);
   }
 
   public get lineCount(): number {
-    return this.getLineOffsets().length;
+    return this.cursor.lineCount;
   }
 
   public getText(range?: Range): string {
     if (range) {
-      const start = this.offsetAt(range.start);
-      const end = this.offsetAt(range.end);
+      const start = this.cursor.offsetAt(range.start);
+      const end = this.cursor.offsetAt(range.end);
       return this._content.substring(start, end);
     }
     return this._content;
@@ -332,108 +407,21 @@ class FullTextDocument implements TextDocument {
   public update(changes: TextDocumentContentChangeEvent[], version: number): void {
     for (const change of changes) {
       if (isIncremental(change)) {
-        // makes sure start is before end
         const range = getWellformedRange(change.range);
-        // update content
-        const startOffset = this.offsetAt(range.start);
-        const endOffset = this.offsetAt(range.end);
+        const startOffset = this.cursor.offsetAt(range.start);
+        const endOffset = this.cursor.offsetAt(range.end);
         this._content =
           this._content.substring(0, startOffset) +
           change.text +
           this._content.substring(endOffset, this._content.length);
-        // update the offsets
-        const startLine = Math.max(range.start.line, 0);
-        const endLine = Math.max(range.end.line, 0);
-        let lineOffsets = this._lineOffsets!;
-        const addedLineOffsets = computeLineOffsets(change.text, false, startOffset);
-        if (endLine - startLine === addedLineOffsets.length) {
-          for (let i = 0, len = addedLineOffsets.length; i < len; i++) {
-            lineOffsets[i + startLine + 1] = addedLineOffsets[i];
-          }
-        } else {
-          if (addedLineOffsets.length < 10000) {
-            lineOffsets.splice(startLine + 1, endLine - startLine, ...addedLineOffsets);
-          } else {
-            // avoid too many arguments for splice
-            this._lineOffsets = lineOffsets = lineOffsets
-              .slice(0, startLine + 1)
-              .concat(addedLineOffsets, lineOffsets.slice(endLine + 1));
-          }
-        }
-        const diff = change.text.length - (endOffset - startOffset);
-        if (diff !== 0) {
-          for (
-            let i = startLine + 1 + addedLineOffsets.length, len = lineOffsets.length;
-            i < len;
-            i++
-          ) {
-            lineOffsets[i] = lineOffsets[i] + diff;
-          }
-        }
       } else if (isFull(change)) {
         this._content = change.text;
-        this._lineOffsets = undefined;
       } else {
         throw new Error("Unknown change event received");
       }
     }
+    this.cursor = DocumentCursor.fromText(this._content);
     this.version = version;
-  }
-
-  private getLineOffsets(): number[] {
-    if (this._lineOffsets === undefined) {
-      this._lineOffsets = computeLineOffsets(this._content, true);
-    }
-    return this._lineOffsets;
-  }
-
-  public positionAt(offset: number): Position {
-    offset = Math.max(Math.min(offset, this._content.length), 0);
-    const lineOffsets = this.getLineOffsets();
-    let low = 0,
-      high = lineOffsets.length;
-    if (high === 0) {
-      return { line: 0, character: offset };
-    }
-    while (low < high) {
-      const mid = Math.floor((low + high) / 2);
-      if (lineOffsets[mid] > offset) {
-        high = mid;
-      } else {
-        low = mid + 1;
-      }
-    }
-    // low is the least x for which the line offset is larger than the current offset
-    // or array.length if no line offset is larger than the current offset
-    const line = low - 1;
-    offset = this.ensureBeforeEOL(offset, lineOffsets[line]);
-    return { line, character: offset - lineOffsets[line] };
-  }
-
-  public offsetAt(position: Position): number {
-    const lineOffsets = this.getLineOffsets();
-    if (position.line >= lineOffsets.length) {
-      return this._content.length;
-    } else if (position.line < 0) {
-      return 0;
-    }
-    const lineOffset = lineOffsets[position.line];
-    if (position.character <= 0) {
-      return lineOffset;
-    }
-    const nextLineOffset =
-      position.line + 1 < lineOffsets.length
-        ? lineOffsets[position.line + 1]
-        : this._content.length;
-    const offset = Math.min(lineOffset + position.character, nextLineOffset);
-    return this.ensureBeforeEOL(offset, lineOffset);
-  }
-
-  private ensureBeforeEOL(offset: number, lineOffset: number): number {
-    while (offset > lineOffset && isEOL(this._content.charCodeAt(offset - 1))) {
-      offset--;
-    }
-    return offset;
   }
 }
 
