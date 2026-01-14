@@ -24,7 +24,6 @@ import { PART_INPUT } from "../../components-core/parts";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
-import { Adornment } from "../Input/InputAdornment";
 
 export const resizeOptionKeys = ["horizontal", "vertical", "both"] as const;
 export type ResizeOptions = (typeof resizeOptionKeys)[number];

@@ -21,6 +21,8 @@ import {
 import { SelectOption } from "./SelectOption";
 import { Part } from "../Part/Part";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
+import { PART_VERBOSE_VALIDATION_FEEDBACK } from "../../components-core/parts";
+import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 
 interface SimpleSelectProps {
   value: SingleValueType;
@@ -31,7 +33,6 @@ interface SimpleSelectProps {
   onFocus: () => void;
   onBlur: () => void;
   enabled: boolean;
-  validationStatus: ValidationStatus;
   triggerRef: (value: ((prevState: HTMLElement) => HTMLElement) | HTMLElement) => void;
   autoFocus: boolean;
   placeholder: string;
@@ -49,6 +50,11 @@ interface SimpleSelectProps {
   children?: ReactNode;
   options: Option[];
   validationIcon?: string | null;
+  validationStatus: ValidationStatus;
+  invalidMessages: string[];
+  finalValidationIconSuccess: string;
+  finalValidationIconError: string;
+  finalVerboseValidationFeedback: boolean;
 }
 
 export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
@@ -59,7 +65,6 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       onBlur,
       autoFocus,
       onValueChange,
-      validationStatus,
       value,
       height,
       style,
@@ -81,6 +86,11 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       options,
       children,
       validationIcon,
+      validationStatus,
+      invalidMessages,
+      finalValidationIconSuccess,
+      finalValidationIconError,
+      finalVerboseValidationFeedback,
       ...rest
     } = props;
 
@@ -182,6 +192,16 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                 ? ""
                 : placeholder}
           </div>
+          {!finalVerboseValidationFeedback && (
+            <Part partId={PART_VERBOSE_VALIDATION_FEEDBACK}>
+              <ConciseValidationFeedback
+                validationStatus={validationStatus}
+                invalidMessages={invalidMessages}
+                successIcon={finalValidationIconSuccess}
+                errorIcon={finalValidationIconError}
+              />
+            </Part>
+          )}
           {clearable && value !== undefined && value !== "" && !readOnly && enabled && (
             <Part partId="clearButton">
               <button
@@ -197,11 +217,6 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                 <Icon name="close" />
               </button>
             </Part>
-          )}
-          {validationIcon && (
-            <span className={classnames(styles.action)}>
-              <Icon name={validationIcon} />
-            </span>
           )}
           <span className={styles.action}>
             <Icon name="chevrondown" />

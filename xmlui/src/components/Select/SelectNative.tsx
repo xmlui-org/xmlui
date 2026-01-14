@@ -23,12 +23,14 @@ import { SelectContext, useSelect } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { HiddenOption } from "./HiddenOption";
 import { SimpleSelect } from "./SimpleSelect";
+import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
 import { OptionContext } from "./OptionContext";
 import { useFormContextPart } from "../Form/FormContext";
 
 const PART_LIST_WRAPPER = "listWrapper";
 const PART_CLEAR_BUTTON = "clearButton";
+const PART_VERBOSE_VALIDATION_FEEDBACK = "verboseValidationFeedback";
 
 export const defaultProps = {
   enabled: true,
@@ -101,6 +103,7 @@ interface SelectProps {
   verboseValidationFeedback?: boolean;
   validationIconSuccess?: string;
   validationIconError?: string;
+  invalidMessages?: string[];
 }
 
 // Common trigger value display props
@@ -177,6 +180,11 @@ interface SelectTriggerActionsProps {
   showChevron?: boolean;
   clearable: boolean;
   validationIcon?: string | null;
+  validationStatus: ValidationStatus;
+  invalidMessages: string[];
+  finalValidationIconSuccess: string;
+  finalValidationIconError: string;
+  finalVerboseValidationFeedback: boolean;
 }
 
 const SelectTriggerActions = ({
@@ -187,7 +195,11 @@ const SelectTriggerActions = ({
   clearable,
   clearValue,
   showChevron = true,
-  validationIcon,
+  validationStatus,
+  invalidMessages,
+  finalValidationIconSuccess,
+  finalValidationIconError,
+  finalVerboseValidationFeedback,
 }: SelectTriggerActionsProps) => {
   const hasValue = multiSelect
     ? Array.isArray(value) && value.length > 0
@@ -208,10 +220,15 @@ const SelectTriggerActions = ({
           </span>
         </Part>
       )}
-      {validationIcon && (
-        <span className={classnames(styles.action)}>
-          <Icon name={validationIcon} />
-        </span>
+      {!finalVerboseValidationFeedback && (
+        <Part partId={PART_VERBOSE_VALIDATION_FEEDBACK}>
+          <ConciseValidationFeedback
+            validationStatus={validationStatus}
+            invalidMessages={invalidMessages}
+            successIcon={finalValidationIconSuccess}
+            errorIcon={finalValidationIconError}
+          />
+        </Part>
       )}
       {showChevron && (
         <span
@@ -276,6 +293,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     verboseValidationFeedback,
     validationIconSuccess,
     validationIconError,
+    invalidMessages,
 
     ...rest
   },
@@ -653,7 +671,6 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
             onFocus={onFocus}
             onBlur={onBlur}
             enabled={enabled}
-            validationStatus={validationStatus}
             triggerRef={setReferenceElement}
             autoFocus={autoFocus}
             placeholder={placeholder}
@@ -668,7 +685,11 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
             clearable={clearable}
             onClear={clearValue}
             valueRenderer={valueRenderer}
-            validationIcon={validationIcon}
+            validationStatus={validationStatus}
+            invalidMessages={invalidMessages}
+            finalValidationIconSuccess={finalValidationIconSuccess}
+            finalValidationIconError={finalValidationIconError}
+            finalVerboseValidationFeedback={finalVerboseValidationFeedback}
             {...rest}
           >
             {children}
@@ -749,6 +770,11 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                     clearable={clearable}
                     clearValue={clearValue}
                     validationIcon={validationIcon}
+                    validationStatus={validationStatus}
+                    invalidMessages={invalidMessages}
+                    finalValidationIconSuccess={finalValidationIconSuccess}
+                    finalValidationIconError={finalValidationIconError}
+                    finalVerboseValidationFeedback={finalVerboseValidationFeedback}
                   />
                 </PopoverTrigger>
               </Part>

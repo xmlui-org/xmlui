@@ -25,10 +25,12 @@ import { useTheme } from "../../components-core/theming/ThemeContext";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import { HiddenOption } from "../Select/HiddenOption";
 import { PART_INPUT } from "../../components-core/parts";
+import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
 
 const PART_LIST_WRAPPER = "listWrapper";
+const PART_VERBOSE_VALIDATION_FEEDBACK = "verboseValidationFeedback";
 
 type AutoCompleteProps = {
   id?: string;
@@ -59,6 +61,7 @@ type AutoCompleteProps = {
   verboseValidationFeedback?: boolean;
   validationIconSuccess?: string;
   validationIconError?: string;
+  invalidMessages?: string[];
 };
 
 function isOptionsExist(options: Option[], newOptions: Option[]) {
@@ -113,6 +116,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
     verboseValidationFeedback,
     validationIconSuccess,
     validationIconError,
+    invalidMessages,
     ...rest
   }: AutoCompleteProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -592,6 +596,16 @@ export const AutoComplete = forwardRef(function AutoComplete(
                     />
                   </Part>
                   <div className={styles.actions}>
+                    {!finalVerboseValidationFeedback && (
+                      <Part partId={PART_VERBOSE_VALIDATION_FEEDBACK}>
+                        <ConciseValidationFeedback
+                          validationStatus={validationStatus}
+                          invalidMessages={invalidMessages}
+                          successIcon={finalValidationIconSuccess}
+                          errorIcon={finalValidationIconError}
+                        />
+                      </Part>
+                    )}
                     {value?.length > 0 && enabled && !readOnly && (
                       <span
                         className={styles.action}
@@ -601,11 +615,6 @@ export const AutoComplete = forwardRef(function AutoComplete(
                         }}
                       >
                         <Icon name="close" />
-                      </span>
-                    )}
-                    {validationIcon && (
-                      <span className={classnames(styles.action)}>
-                        <Icon name={validationIcon} />
                       </span>
                     )}
                     <span
