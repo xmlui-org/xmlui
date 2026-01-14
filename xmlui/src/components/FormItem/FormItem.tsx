@@ -248,7 +248,6 @@ export const FormItemMd = createMetadata({
     "textTransform-FormItemLabel": "none",
     "textColor-FormItemLabel-requiredMark": "$color-danger-400",
     "textColor-FormItemLabel-optionalTag": "$textColor-secondary",
-    "fontSize-FormItemLabel-optionalTag": "$fontSize-xs",
   },
 });
 
