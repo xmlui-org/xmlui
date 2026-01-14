@@ -273,28 +273,47 @@ export const Container = memo(
               });
               const key = generatedId();
               statementPromises.current.set(key, resolve);
-              // We use this to tell react that this update is not high-priority.
-              //   If we don't put it to a transition, the whole app would be blocked if we run a long,
-              //   update intensive queue (e.g. an infinite loop which
-              //   increments a counter, see playground example learning/01_Experiments/01_Event_Framework/app ).
-              //   Before this solution, we used a setTimeout(..., 0); hack, but some browsers (chrome especially)
-              //   do some funky stuff with the background tabs (e.g. all the setTimeouts are
-              //   maximized to run in 1 time / minute, doesn't matter if it's timeout is 0)
-              //   As of 2023. June 20, this solution works with backgrounded tabs, too.
-              startTransition(() => {
-                setVersion((prev) => prev + 1);
-              });
+              
+              try {
+                // We use this to tell react that this update is not high-priority.
+                //   If we don't put it to a transition, the whole app would be blocked if we run a long,
+                //   update intensive queue (e.g. an infinite loop which
+                //   increments a counter, see playground example learning/01_Experiments/01_Event_Framework/app ).
+                //   Before this solution, we used a setTimeout(..., 0); hack, but some browsers (chrome especially)
+                //   do some funky stuff with the background tabs (e.g. all the setTimeouts are
+                //   maximized to run in 1 time / minute, doesn't matter if it's timeout is 0)
+                //   As of 2023. June 20, this solution works with backgrounded tabs, too.
+                startTransition(() => {
+                  setVersion((prev) => prev + 1);
+                });
 
-              //TODO this could be a problem - if this container gets unmounted, we still have to wait for the update,
-              //  but in that case this update probably happened in the parent (e.g. a button's event handler removes the whole container
-              //  where the button lives, but it still has some statements to run).
-              // with this solution the statement execution doesn't stop, and we fallback waiting with a setTimeout(0)
-              if (mountedRef.current) {
-                await stateUpdatedPromise;
-              } else {
-                await delay(0);
+                //TODO this could be a problem - if this container gets unmounted, we still have to wait for the update,
+                //  but in that case this update probably happened in the parent (e.g. a button's event handler removes the whole container
+                //  where the button lives, but it still has some statements to run).
+                // with this solution the statement execution doesn't stop, and we fallback waiting with a setTimeout(0)
+                if (mountedRef.current) {
+                  await stateUpdatedPromise;
+                } else {
+                  await delay(0);
+                }
+              } finally {
+                // Always remove from map, even if an error occurred
+                // This prevents memory leaks in long-running applications with frequent errors
+                statementPromises.current.delete(key);
+                
+                // Development-only monitoring for potential memory leaks
+                if (process.env.NODE_ENV === 'development') {
+                  const mapSize = statementPromises.current.size;
+                  if (mapSize > 100) {
+                    console.warn(
+                      `[Container] Statement promises map is large (${mapSize} entries). ` +
+                      `Possible memory leak or very complex event handler.`,
+                      { containerUid: componentUid }
+                    );
+                  }
+                }
               }
-              statementPromises.current.delete(key);
+              
               changes = [];
             } else {
               //in this else branch normally we block the main thread (we don't wait for any state promise to be resolved),

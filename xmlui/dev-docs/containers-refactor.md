@@ -1085,7 +1085,7 @@ if ((node.props as any)?.debug) {
 }
 ```
 
-**Status: COMPLETED** - Added comprehensive 100+ line state composition pipeline diagram and documentation to StateContainer.tsx (lines 77-155). Includes flow diagram with 6 stages, priority order explanation, multi-level composition example, and debugging tips. Self-documenting code makes the pipeline clear and maintainable. Tests pending ✓
+**Status: COMPLETED** - Added comprehensive 100+ line state composition pipeline diagram and documentation to StateContainer.tsx (lines 77-155). Includes flow diagram with 6 stages, priority order explanation, multi-level composition example, and debugging tips. Self-documenting code makes the pipeline clear and maintainable. Tests passed ✓
 
 **Benefits:**
 - Visual understanding of state composition
@@ -1174,7 +1174,7 @@ const stateFromOutside = useShallowCompareMemoize(
 
 ---
 
-### 12. Potential Memory Leak in Statement Promises
+### 12. Potential Memory Leak in Statement Promises ✅ COMPLETED
 
 **File:** `Container.tsx`
 
@@ -1248,6 +1248,8 @@ if (process.env.NODE_ENV === 'development') {
   }
 }
 ```
+
+**Status: COMPLETED** - Added try-finally protection to runCodeAsync in Container.tsx (lines 246-287). Ensures promise is removed from the map even if an error occurs, preventing memory leaks. Added development-mode monitoring to detect oversized promise maps (>100 entries). Protects against unbounded memory growth in long-running applications. Tests pending ✓
 
 **Alternative Approach - WeakMap:**
 
