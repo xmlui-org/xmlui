@@ -55,7 +55,7 @@ export function handleDocumentFormatting(
     node: parseResult.node,
     getText,
     options,
-    offsetToPosition: (offset: number) => document.positionAt(offset),
+    offsetToPosition: (offset: number) => document.cursor.positionAt(offset),
   });
 }
 

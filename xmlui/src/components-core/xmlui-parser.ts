@@ -31,7 +31,7 @@ const RADIUS = "0.5rem";
 export function xmlUiMarkupToComponent(source: string, fileId: string | number = 0): ParserResult {
   const { parse, getText } = createXmlUiParser(source);
   const { node, errors } = parse();
-  const cursor = DocumentCursor.fromText(source);
+  const cursor = new DocumentCursor(source);
   if (errors.length > 0) {
     const errorsToDisplay = errors.map((err) => {
       return errorWithDisplayFields(err, cursor, source);

@@ -242,13 +242,27 @@ export const TextDocument = {
 };
 
 export class DocumentCursor {
-  constructor(
-    private readonly newlineOffsets: number[],
-    private readonly textLength: number,
-  ) {}
+  private readonly newlineOffsets: number[];
 
-  public static fromText(text: string): DocumentCursor {
-    return new DocumentCursor(computeLineOffsets(text, true), text.length);
+  constructor(private readonly text: string) {
+    this.newlineOffsets = [0];
+    for (let i = 0; i < text.length; i++) {
+      const ch = text.charCodeAt(i);
+      if (isEOL(ch)) {
+        if (
+          ch === 13 /* CharCode.CarriageReturn */ &&
+          i + 1 < text.length &&
+          text.charCodeAt(i + 1) === 10 /* CharCode.LineFeed */
+        ) {
+          i++;
+        }
+        this.newlineOffsets.push(i + 1);
+      }
+    }
+  }
+
+  public get textLength(): number {
+    return this.text.length;
   }
 
   public get lineCount(): number {
@@ -333,10 +347,19 @@ export class DocumentCursor {
     const contextEndLineWithContent = Math.min(this.lineCount - 1, endLine + surroundingLines);
 
     const nextLineAfterContext = contextEndLineWithContent + 1;
-    const contextEnd =
-      nextLineAfterContext < this.lineCount
-        ? this.newlineOffsets[nextLineAfterContext]
-        : this.textLength;
+    let contextEnd: number;
+    if (nextLineAfterContext < this.lineCount) {
+      const nextLineStart = this.newlineOffsets[nextLineAfterContext];
+      let eolLength = 1;
+      if (nextLineStart > 0 && this.text.charCodeAt(nextLineStart - 1) === 10) {
+        if (nextLineStart > 1 && this.text.charCodeAt(nextLineStart - 2) === 13) {
+          eolLength = 2;
+        }
+      }
+      contextEnd = nextLineStart - eolLength;
+    } else {
+      contextEnd = this.textLength;
+    }
 
     return { contextPos, contextEnd };
   }
@@ -382,7 +405,7 @@ class FullTextDocument implements TextDocument {
       parseResult: undefined,
       version: undefined,
     };
-    this.cursor = DocumentCursor.fromText(_content);
+    this.cursor = new DocumentCursor(_content);
   }
 
   public get lineCount(): number {
@@ -434,7 +457,7 @@ class FullTextDocument implements TextDocument {
         throw new Error("Unknown change event received");
       }
     }
-    this.cursor = DocumentCursor.fromText(this._content);
+    this.cursor = new DocumentCursor(this._content);
     this.version = version;
   }
 }
@@ -493,24 +516,6 @@ function mergeSort<T>(data: T[], compare: (a: T, b: T) => number): T[] {
     data[i++] = right[rightIdx++];
   }
   return data;
-}
-
-function computeLineOffsets(text: string, isAtLineStart: boolean, textOffset = 0): number[] {
-  const result = isAtLineStart ? [textOffset] : [];
-  for (let i = 0; i < text.length; i++) {
-    const ch = text.charCodeAt(i);
-    if (isEOL(ch)) {
-      if (
-        ch === 13 /* CharCode.CarriageReturn */ &&
-        i + 1 < text.length &&
-        text.charCodeAt(i + 1) === 10 /* CharCode.LineFeed */
-      ) {
-        i++;
-      }
-      result.push(textOffset + i + 1);
-    }
-  }
-  return result;
 }
 
 function isEOL(char: number): boolean {

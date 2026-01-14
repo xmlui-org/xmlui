@@ -54,7 +54,7 @@ export function createXmlUiParser(source: string): {
 }
 
 export function parseXmlUiMarkup(text: string): ParseResult {
-  const cursor = DocumentCursor.fromText(text);
+  const cursor = new DocumentCursor(text);
   const errors: ParserDiag[] = [];
   const parents: (IncompleteNode | Node)[] = [];
   let peekedToken: Node | undefined;
