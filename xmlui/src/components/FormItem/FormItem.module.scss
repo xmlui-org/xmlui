@@ -23,7 +23,6 @@ $fontStyle-FormItemLabel-required: createThemeVar("fontStyle-FormItemLabel-requi
 $textTransform-FormItemLabel-required: createThemeVar("textTransform-FormItemLabel-required");
 $textColor-FormItemLabel-requiredMark: createThemeVar("textColor-FormItemLabel-requiredMark");
 $textColor-FormItemLabel-optionalTag: createThemeVar("textColor-FormItemLabel-optionalTag");
-$fontSize-FormItemLabel-optionalTag: createThemeVar("fontSize-FormItemLabel-optionalTag");
 
 // TODO: Add HelperText styles here, as HelperText React component is used only in FormItem
 
@@ -105,8 +104,6 @@ $fontSize-FormItemLabel-optionalTag: createThemeVar("fontSize-FormItemLabel-opti
       .optionalTag {
         margin-left: 0.2em;
         color: $textColor-FormItemLabel-optionalTag;
-        font-size: $fontSize-FormItemLabel-optionalTag;
-        font-style: italic;
       }
     }
   }
