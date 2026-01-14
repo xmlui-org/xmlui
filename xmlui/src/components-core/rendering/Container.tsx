@@ -23,6 +23,7 @@ import type {
 import type { ComponentDef, ParentRenderContext } from "../../abstractions/ComponentDefs";
 import type { ContainerState } from "../../abstractions/ContainerDefs";
 import type { LayoutContext, RenderChildFn } from "../../abstractions/RendererDefs";
+import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 import type {
   ArrowExpression,
   ArrowExpressionStatement,
@@ -463,7 +464,7 @@ export const Container = memo(
           return action;
         }
 
-        if (!(action as any)._ARROW_EXPR_) {
+        if (!isArrowExpressionObject(action)) {
           throw new Error("Only arrow expression allowed in sync callback");
         }
         return getOrCreateSyncCallbackFn(action, uid);
@@ -480,7 +481,7 @@ export const Container = memo(
         let safeAction = action;
         if (!action && uid.description && options?.eventName) {
           const handlerFnName = `${uid.description}_on${capitalizeFirstLetter(options?.eventName)}`;
-          if (componentState[handlerFnName] && componentState[handlerFnName]._ARROW_EXPR_) {
+          if (componentState[handlerFnName] && isArrowExpressionObject(componentState[handlerFnName])) {
             safeAction = componentState[handlerFnName] as ArrowExpression;
           }
         }

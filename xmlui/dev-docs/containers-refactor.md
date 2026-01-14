@@ -588,10 +588,12 @@ if (debugView.stateTransitions) {
 
 ---
 
-### 7. Complex Variable Resolution Logic
+### 7. Complex Variable Resolution Logic ✅ COMPLETED
 
 **File:** `StateContainer.tsx`  
 **Issue:** The variable resolution logic is complex and hard to follow, with nested memoization and multi-pass resolution.
+
+**Status:** COMPLETED - Comprehensive JSDoc documentation added (Lines 149-177, 30+ lines) explaining two-pass resolution strategy, Pass 1/Pass 2 purposes, concrete examples, and future optimization notes. Tests passed ✓
 
 **Current Code (Lines 150-170):**
 ```typescript

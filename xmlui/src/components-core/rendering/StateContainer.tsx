@@ -20,7 +20,7 @@ import { ErrorBoundary } from "../rendering/ErrorBoundary";
 import { collectVariableDependencies } from "../script-runner/visitors";
 import { useReferenceTrackedApi, useShallowCompareMemoize } from "../utils/hooks";
 import { Container } from "./Container";
-import { PARSED_MARK_PROP } from "../../parsers/scripting/code-behind-collect";
+import { isParsedCodeDeclaration } from "../../abstractions/InternalMarkers";
 import { useAppContext } from "../AppContext";
 import { parseParameterString } from "../script-runner/ParameterParser";
 import { evalBinding } from "../script-runner/eval-tree-sync";
@@ -523,5 +523,5 @@ class ParseVarError extends Error {
 
 //true if it's coming from a code behind or a script tag
 function isParsedValue(value: any): value is CodeDeclaration {
-  return value && typeof value === "object" && value[PARSED_MARK_PROP];
+  return isParsedCodeDeclaration(value);
 }
