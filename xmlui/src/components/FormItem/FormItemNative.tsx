@@ -41,7 +41,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import { DatePicker } from "../DatePicker/DatePickerNative";
 import { getByPath } from "../Form/FormNative";
 import { AutoComplete } from "../AutoComplete/AutoCompleteNative";
-import type { LabelPosition } from "../abstractions";
+import type { LabelPosition, RequiredIndicatorMode } from "../abstractions";
 import type { FormItemMd } from "./FormItem";
 import { ItemWithLabel } from "./ItemWithLabel";
 import { useValidation, useValidationDisplay } from "./Validations";
@@ -72,6 +72,7 @@ type Props = {
   onValidate?: ValidateEventHandler;
   customValidationsDebounce?: number;
   validationMode?: ValidationMode;
+  requiredIndicator?: RequiredIndicatorMode;
   initialValue?: any;
   registerComponentApi?: RegisterComponentApiFn;
   maxTextLength?: number;
@@ -83,7 +84,7 @@ type Props = {
 
 export const defaultProps: Pick<
   Props,
-  "type" | "labelBreak" | "enabled" | "customValidationsDebounce" | "gap" | "noSubmit"
+  "type" | "labelBreak" | "enabled" | "customValidationsDebounce" | "gap" | "noSubmit" | "requiredIndicator"
 > = {
   type: "text",
   labelBreak: true,
@@ -91,6 +92,7 @@ export const defaultProps: Pick<
   customValidationsDebounce: 0,
   gap: "0",
   noSubmit: false,
+  requiredIndicator: "required",
 };
 
 export const FormItemContext = createContext<{ parentFormItemId: string | null; isInsideFormItem: boolean }>({
@@ -178,6 +180,7 @@ export const FormItem = memo(function FormItem({
   initialValue: initialValueFromProps,
   gap,
   noSubmit = defaultProps.noSubmit,
+  requiredIndicator = defaultProps.requiredIndicator,
   layoutContext, // Destructured to prevent passing to ItemWithLabel
   ...rest
 }: Props & { layoutContext?: any }) {
@@ -534,6 +537,7 @@ export const FormItem = memo(function FormItem({
       onFocus={onFocus}
       onBlur={onBlur}
       style={style}
+      requiredIndicator={requiredIndicator}
       className={className}
       validationResult={
         <div ref={animateContainerRef} className={styles.helperTextContainer}>

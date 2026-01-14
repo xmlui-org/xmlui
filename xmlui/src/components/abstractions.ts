@@ -261,6 +261,16 @@ export const placementMd: PropertyValueDescription[] = [
   { value: "bottom", description: "The bottom of the window" },
 ];
 
+// --- Available indicator modes
+export const requiredIndicatorModeValues = ["required", "optional", "both"] as const;
+export const requiredIndicatorModeNames = [...requiredIndicatorModeValues];
+export type RequiredIndicatorMode = (typeof requiredIndicatorModeValues)[number];
+export const requiredIndicatorModeMd: PropertyValueDescription[] = [
+  { value: "required", description: 'Show "*" for required fields' },
+  { value: "optional", description: 'Show "(Optional)" for optional fields' },
+  { value: "both", description: 'Show "*" for required AND "(Optional)" for optional fields' },
+];
+
 // --- Available label positions
 export const labelPositionValues = ["top", "start", "end", "bottom"] as const;
 export const labelPositionNames = [...labelPositionValues];
