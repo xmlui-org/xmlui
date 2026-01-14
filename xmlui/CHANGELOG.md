@@ -1,5 +1,19 @@
 # xmlui
 
+## 0.11.28
+
+### Patch Changes
+
+- 7485959: FileInput: Automate parsing of csv/json.
+- 96d510c: Fixed a bug where gaps were still rendered even if there were no labels provided for input fields.
+- 13ebd58: Fixed incorrect background color for a number of components: AutoComplete, Form, NoResult, TextBox and other input controls.
+- 94f2354: Fixed FlowLayout passing down width incorrectly to its children.
+- cf6c6ef: Add openLinkNewTab property to Markdown.
+- cf6c6ef: Add Markdown property truncateLinks
+- 6c49cd2: Add support for rowspan and colspan attributes in Markdown tables
+- 1d9a5e7: Fix star-sizing in App layouts
+- 31e53a8: Fix state APICall and DataSource state references
+
 ## 0.11.27
 
 ### Patch Changes
