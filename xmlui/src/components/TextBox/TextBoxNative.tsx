@@ -77,6 +77,7 @@ export const defaultProps: Pick<
   | "initialValue"
   | "enabled"
   | "validationStatus"
+  | "invalidMessages"
   | "onDidChange"
   | "onFocus"
   | "onBlur"
@@ -90,6 +91,7 @@ export const defaultProps: Pick<
   initialValue: "",
   enabled: true,
   validationStatus: "none",
+  invalidMessages: [],
   onDidChange: noop,
   onFocus: noop,
   onBlur: noop,
@@ -112,6 +114,7 @@ export const TextBox = forwardRef(function TextBox(
     enabled = defaultProps.enabled,
     placeholder,
     validationStatus = defaultProps.validationStatus,
+    invalidMessages = defaultProps.invalidMessages,
     onDidChange = defaultProps.onDidChange,
     onFocus = defaultProps.onFocus,
     onBlur = defaultProps.onBlur,
@@ -132,7 +135,6 @@ export const TextBox = forwardRef(function TextBox(
     verboseValidationFeedback,
     validationIconSuccess,
     validationIconError,
-    invalidMessages,
     ...rest
   }: Props,
   ref: ForwardedRef<HTMLDivElement>,
@@ -275,9 +277,9 @@ export const TextBox = forwardRef(function TextBox(
         <Part partId={PART_VERBOSE_VALIDATION_FEEDBACK}>
           <VerboseValidationFeedback
             validationStatus={validationStatus}
+            invalidMessages={invalidMessages}
             successIcon={finalValidationIconSuccess}
             errorIcon={finalValidationIconError}
-            invalidMessages={invalidMessages}
           />
         </Part>
       )}

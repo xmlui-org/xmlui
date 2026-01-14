@@ -66,6 +66,11 @@ export const TextBoxMd = createMetadata({
       ...dValidationStatus(),
       defaultValue: defaultProps.validationStatus,
     },
+    invalidMessages: {
+      description: "The invalid messages to display for the input component.",
+      type: "array",
+      valueType: "string",
+    },
     startText: dStartText(),
     startIcon: dStartIcon(),
     endText: dEndText(),
@@ -193,6 +198,7 @@ function renderTextBox(
       enabled={extractValue.asOptionalBoolean(node.props.enabled)}
       placeholder={extractValue.asOptionalString(node.props.placeholder)}
       validationStatus={extractValue(node.props.validationStatus)}
+      invalidMessages={extractValue(node.props.invalidMessages)}
       onDidChange={lookupEventHandler("didChange")}
       onFocus={lookupEventHandler("gotFocus")}
       onBlur={lookupEventHandler("lostFocus")}
