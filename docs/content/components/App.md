@@ -427,7 +427,6 @@ Here is a more complex example built on star-sizing:
     <List
       id="myList"
       data="{ Array.from({ length: 100 }).map((_, i) => i) }"
-      height="*"
     >
       <Card title="Item #{$item}" />
     </List>
