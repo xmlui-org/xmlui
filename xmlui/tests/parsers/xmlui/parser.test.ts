@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ErrCodesParser } from "../../../src/parsers/xmlui-parser/diagnostics";
-import { findTokenAtPos } from "../../../src/parsers/xmlui-parser/utils";
+import { findTokenAtOffset } from "../../../src/parsers/xmlui-parser/utils";
 import { SyntaxKind } from "../../../src/parsers/xmlui-parser/syntax-kind";
 import { parseSource } from "./xmlui";
 
@@ -848,42 +848,42 @@ const selfCloseTag = '<A b="c"/> ';
 describe("find token at pos", () => {
   it("before first token", () => {
     const { node } = parseSource(selfCloseTag);
-    const { chainAtPos, chainBeforePos } = findTokenAtPos(node, 0)!;
+    const { chainAtPos, chainBeforePos } = findTokenAtOffset(node, 0)!;
     expect(chainBeforePos).toBeUndefined();
     expect(chainAtPos?.[chainAtPos.length - 1].kind).toBe(SyntaxKind.OpenNodeStart);
   });
 
   it("after last token", () => {
     const { node } = parseSource(selfCloseTag);
-    const { chainAtPos, chainBeforePos } = findTokenAtPos(node, selfCloseTag.length)!;
+    const { chainAtPos, chainBeforePos } = findTokenAtOffset(node, selfCloseTag.length)!;
     expect(chainBeforePos?.[chainBeforePos.length - 1].kind).toBe(SyntaxKind.NodeClose);
     expect(chainAtPos?.[chainAtPos.length - 1].kind).toBe(SyntaxKind.EndOfFileToken);
   });
 
   it("inside token", () => {
     const { node } = parseSource(selfCloseTag);
-    const { chainAtPos, chainBeforePos } = findTokenAtPos(node, 7)!;
+    const { chainAtPos, chainBeforePos } = findTokenAtOffset(node, 7)!;
     expect(chainBeforePos).toBeUndefined();
     expect(chainAtPos?.[chainAtPos.length - 1].kind).toBe(SyntaxKind.StringLiteral);
   });
 
   it("between 2 tokens", () => {
     const { node } = parseSource(selfCloseTag);
-    const { chainAtPos, chainBeforePos } = findTokenAtPos(node, 4)!;
+    const { chainAtPos, chainBeforePos } = findTokenAtOffset(node, 4)!;
     expect(chainBeforePos?.[chainBeforePos.length - 1].kind).toBe(SyntaxKind.Identifier);
     expect(chainAtPos?.[chainAtPos.length - 1].kind).toBe(SyntaxKind.Equal);
   });
 
   it("between 2 tokens, at trivia", () => {
     const { node } = parseSource(selfCloseTag);
-    const { chainAtPos, chainBeforePos } = findTokenAtPos(node, 3)!;
+    const { chainAtPos, chainBeforePos } = findTokenAtOffset(node, 3)!;
     expect(chainBeforePos?.[chainBeforePos.length - 1].kind).toBe(SyntaxKind.Identifier);
     expect(chainAtPos?.[chainAtPos.length - 1].kind).toBe(SyntaxKind.Identifier);
   });
 
   it("between token and Eof, at trivia", () => {
     const { node } = parseSource(selfCloseTag);
-    const { chainAtPos, chainBeforePos } = findTokenAtPos(node, 10)!;
+    const { chainAtPos, chainBeforePos } = findTokenAtOffset(node, 10)!;
     expect(chainBeforePos?.[chainBeforePos.length - 1].kind).toBe(SyntaxKind.NodeClose);
     expect(chainAtPos?.[chainAtPos.length - 1].kind).toBe(SyntaxKind.EndOfFileToken);
   });

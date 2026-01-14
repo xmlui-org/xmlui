@@ -34,7 +34,7 @@ import {
   removeCodeBehindTokensFromTree,
 } from "../parsers/scripting/code-behind-collect";
 import { ComponentRegistry } from "../components/ComponentProvider";
-import { checkXmlUiMarkup, MetadataHandler, visitComponent } from "./markup-check";
+import { checkXmlUiMarkup, type MetadataHandler, visitComponent } from "./markup-check";
 import StandaloneExtensionManager from "./StandaloneExtensionManager";
 import { builtInThemes } from "./theming/ThemeProvider";
 import type { Extension } from "../abstractions/ExtensionDefs";

@@ -63,11 +63,11 @@ export type FindTokenSuccess =
       sharedParents: undefined;
     };
 
-export function findTokenAtPos(node: Node, position: number): FindTokenSuccess | undefined {
+export function findTokenAtOffset(node: Node, offset: number): FindTokenSuccess | undefined {
   const chain: Node[] = [node];
   let sharedParents: number;
 
-  if (node.start > position || position > node.end) {
+  if (node.start > offset || offset > node.end) {
     return undefined;
   }
 
@@ -81,14 +81,14 @@ export function findTokenAtPos(node: Node, position: number): FindTokenSuccess |
     //todo: make it a binary search before finding a fork
     const nodeAtPosIdx = node.children.findIndex(
       (n) =>
-        n.start <= position &&
-        (position < n.end || (n.kind === SyntaxKind.EndOfFileToken && n.start <= n.end)),
+        n.start <= offset &&
+        (offset < n.end || (n.kind === SyntaxKind.EndOfFileToken && n.start <= n.end)),
     );
 
     const nodeAtPos = node.children[nodeAtPosIdx];
     const nodeBeforePos = node.children[nodeAtPosIdx - 1];
 
-    if (nodeBeforePos !== undefined && position <= nodeAtPos.pos) {
+    if (nodeBeforePos !== undefined && offset <= nodeAtPos.pos) {
       sharedParents = chain.length;
 
       return {

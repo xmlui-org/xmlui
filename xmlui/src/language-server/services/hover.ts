@@ -1,13 +1,14 @@
 import type { GetText } from "../../parsers/xmlui-parser/parser";
-import { findTokenAtPos } from "../../parsers/xmlui-parser/utils";
+import { findTokenAtOffset } from "../../parsers/xmlui-parser/utils";
 import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import { compNameForTagNameNode, findTagNameNodeInStack } from "./common/syntax-node-utilities";
 import * as docGen from "./common/docs-generation";
-import type { ComponentMetadataCollection, MetadataProvider } from "./common/metadata-utils";
+import type { MetadataProvider } from "./common/metadata-utils";
 import type { Hover, Position } from "vscode-languageserver";
 import { MarkupKind } from "vscode-languageserver";
-import { offsetRangeToPosRange } from "./common/lsp-utils";
+import type { Project } from "../base/project";
+import type { DocumentUri } from "../base/text-document";
 
 type SimpleHover = null | {
   value: string;
@@ -17,21 +18,17 @@ type SimpleHover = null | {
   };
 };
 
-type HoverContex = {
-  node: Node;
-  getText: GetText;
-  metaByComp: MetadataProvider;
-  offsetToPosition: (pos: number) => Position;
-};
+export function handleHover(project: Project, uri: DocumentUri, position: Position): Hover {
+  const document = project.documents.get(uri);
+  if (!document) {
+    return null;
+  }
+  const offset = document.cursor.offsetAt(position);
+  const { parseResult, getText } = document.parse();
+  const node = parseResult.node;
+  const metaByComp = project.metadataProvider;
 
-/**
- * @returns The hover content string
- */
-export function handleHoverCore(
-  { node, getText, metaByComp }: Omit<HoverContex, "offsetToPosition">,
-  position: number,
-): SimpleHover {
-  const findRes = findTokenAtPos(node, position);
+  const findRes = findTokenAtOffset(node, offset);
 
   if (findRes === undefined) {
     return null;
@@ -40,43 +37,45 @@ export function handleHoverCore(
 
   const atNode = chainAtPos.at(-1)!;
   const parentNode = chainAtPos.at(-2);
+
+  let simpleHover: SimpleHover = null;
+
   switch (atNode.kind) {
     case SyntaxKind.Identifier:
       switch (parentNode?.kind) {
         case SyntaxKind.TagNameNode: {
-          return hoverName({
+          simpleHover = hoverName({
             metaByComp: metaByComp,
             tagNameNode: parentNode,
             identNode: atNode,
             getText,
           });
+          break;
         }
         case SyntaxKind.AttributeKeyNode: {
-          return hoverAttr({
+          simpleHover = hoverAttr({
             metaByComp,
             attrKeyNode: parentNode,
             parentStack: chainAtPos.slice(0, -2),
             getText,
           });
+          break;
         }
       }
       break;
   }
-  return null;
-}
 
-export function handleHover(ctx: HoverContex, position: number): Hover {
-  const hoverRes = handleHoverCore(ctx, position);
-  if (hoverRes === null) {
+  if (simpleHover === null) {
     return null;
   }
-  const { value, range } = hoverRes;
+
+  const { value, range } = simpleHover;
   return {
     contents: {
       kind: MarkupKind.Markdown,
       value,
     },
-    range: offsetRangeToPosRange(ctx.offsetToPosition, range),
+    range: document.cursor.rangeAt(range),
   };
 }
 

@@ -92,7 +92,6 @@
     "vite-plugin-lib-inject-css": "1.3.0",
     "vite-plugin-svgr": "4.2.0",
     "vscode-languageserver": "^9.0.1",
-    "vscode-languageserver-textdocument": "^1.0.11",
     "yargs": "17.7.2"
   },
   "devDependencies": {
@@ -156,10 +155,6 @@
           "import": "./dist/lib/language-server.js",
           "require": "./dist/lib/language-server.js"
         },
-        "./language-server-web-worker": {
-          "import": "./dist/lib/language-server-web-worker.js",
-          "require": "./dist/lib/language-server-web-worker.js"
-        },
         "./parser": {
           "import": "./dist/lib/xmlui-parser.js",
           "require": "./dist/lib/xmlui-parser.js"
@@ -219,10 +214,6 @@
     "./language-server": {
       "import": "./src/language-server/server.ts",
       "require": "./src/language-server/server.ts"
-    },
-    "./language-server-web-worker": {
-      "import": "./src/language-server/server-web-worker.ts",
-      "require": "./src/language-server/server-web-worker.ts"
     },
     "./syntax/monaco": {
       "import": "./src/syntax/monaco/index.ts",
