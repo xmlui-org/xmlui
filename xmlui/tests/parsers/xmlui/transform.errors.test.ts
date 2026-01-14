@@ -1,6 +1,10 @@
 import { describe, expect, it, assert } from "vitest";
 import { transformSource } from "./xmlui";
-import { ErrCodesTransform, GeneralDiag, TransformDiag } from "../../../src/parsers/xmlui-parser";
+import {
+  ErrCodesTransform,
+  type GeneralDiag,
+  type TransformDiag,
+} from "../../../src/parsers/xmlui-parser";
 
 describe("Xmlui transform - errors", () => {
   it("Missing name in compound component", () => {

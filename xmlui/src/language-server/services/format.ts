@@ -14,7 +14,7 @@ export interface FormatOptions extends FormattingOptions {
   maxLineLength?: number;
 }
 
-export function handleDocumentFormatting({
+export function formatDocumentInternal({
   node,
   getText,
   options,
@@ -41,7 +41,7 @@ export function handleDocumentFormatting({
   ];
 }
 
-export function handleDocumentFormattingWithProject(
+export function handleDocumentFormatting(
   project: Project,
   uri: DocumentUri,
   options: FormatOptions,
@@ -51,7 +51,7 @@ export function handleDocumentFormattingWithProject(
     return null;
   }
   const { parseResult, getText } = document.parse();
-  return handleDocumentFormatting({
+  return formatDocumentInternal({
     node: parseResult.node,
     getText,
     options,

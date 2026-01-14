@@ -14,14 +14,14 @@ import {
 import { TextDocument } from "./base/text-document";
 import collectedComponentMetadata from "./xmlui-metadata-generated.js";
 import type { XmluiCompletionItem } from "./services/completion";
-import { handleCompletionWithProject, handleCompletionResolve } from "./services/completion";
+import { handleCompletion, handleCompletionResolve } from "./services/completion";
 import { handleHover } from "./services/hover";
-import { handleDocumentFormattingWithProject } from "./services/format";
+import { handleDocumentFormatting } from "./services/format";
 import {
   MetadataProvider,
   type ComponentMetadataCollection,
 } from "./services/common/metadata-utils";
-import { getDiagnostics, getDiagnosticsForDocument } from "./services/diagnostic";
+import { getDiagnostics } from "./services/diagnostic";
 import { Project } from "./base/project.js";
 import { handleDefinition } from "./services/definition.js";
 
@@ -53,6 +53,7 @@ export function start(connection: Connection) {
         },
         hoverProvider: true,
         documentFormattingProvider: true,
+        definitionProvider: true,
       },
     };
     if (hasWorkspaceFolderCapability) {
@@ -77,7 +78,7 @@ export function start(connection: Connection) {
   });
 
   connection.onCompletion(({ position, textDocument }: TextDocumentPositionParams) => {
-    return handleCompletionWithProject(project, textDocument.uri, position);
+    return handleCompletion(project, textDocument.uri, position);
   });
 
   connection.onCompletionResolve((completionItem: XmluiCompletionItem) => {
@@ -93,11 +94,11 @@ export function start(connection: Connection) {
   });
 
   connection.onDocumentFormatting(({ textDocument, options }: DocumentFormattingParams) => {
-    return handleDocumentFormattingWithProject(project, textDocument.uri, options);
+    return handleDocumentFormatting(project, textDocument.uri, options);
   });
 
   documents.onDidChangeContent(({ document }) => {
-    const diagnostics = getDiagnosticsForDocument(project, document.uri);
+    const diagnostics = getDiagnostics(project, document.uri);
     void connection.sendDiagnostics({
       version: document.version,
       uri: document.uri,

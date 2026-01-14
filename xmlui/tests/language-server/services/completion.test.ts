@@ -10,6 +10,7 @@ import { layoutOptionKeys } from "../../../src/components-core/descriptorHelper"
 import { capitalizeFirstLetter } from "../../../src/components-core/utils/misc";
 import { createXmlUiParser } from "../../../src/parsers/xmlui-parser";
 import { TextDocument } from "../../../src/language-server/base/text-document";
+import { Project } from "../../../src/language-server/base/project";
 
 describe("Completion", () => {
   it("lists all component names after '<'", () => {
@@ -193,18 +194,11 @@ function completeAtPoundSign(source: string) {
     );
   }
   source = source.replace(cursorIndicator, "");
-  const parser = createXmlUiParser(source);
-  const document = TextDocument.create("file://test.xmlui", "xmlui", 0, source);
-
-  return handleCompletion(
-    {
-      getText: parser.getText,
-      parseResult: parser.parse(),
-      metaByComp: mockMetadataProvider,
-      offsetToPos: (offset: number) => document.positionAt(offset),
-    },
-    position,
-  );
+  const uri = "file://test.xmlui";
+  const project = Project.fromFileContets({ [uri]: source }, mockMetadataProvider);
+  const document = project.documents.get(uri);
+  const charPosition = document.positionAt(position);
+  return handleCompletion(project, uri, charPosition);
 }
 
 function expectToContainExactly<T>(actual: T[], expected: T[]) {

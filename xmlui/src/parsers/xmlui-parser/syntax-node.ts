@@ -1,5 +1,5 @@
 import { SyntaxKind } from "./syntax-kind";
-import { findTokenAtPos } from "./utils";
+import { findTokenAtOffset } from "./utils";
 
 export class Node {
   public readonly kind: SyntaxKind;
@@ -64,8 +64,8 @@ export class Node {
     return this.kind === SyntaxKind.TagNameNode;
   }
 
-  findTokenAtPos(position: number) {
-    return findTokenAtPos(this, position);
+  findTokenAtOffset(position: number) {
+    return findTokenAtOffset(this, position);
   }
 
   getTriviaNodes(): Node[] | null {

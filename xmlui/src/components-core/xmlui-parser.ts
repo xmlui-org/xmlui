@@ -8,8 +8,7 @@ import { SyntaxKind } from "../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../parsers/xmlui-parser/syntax-node";
 import type { ScriptParserErrorMessage } from "../abstractions/scripting/ScriptParserError";
 import type { ModuleErrors } from "./script-runner/ScriptingSourceTree";
-import { forEach } from "lodash-es";
-import { Position } from "../language-server/base/text-document";
+import type { Position } from "../language-server/base/text-document";
 
 interface ErrorForDisplay extends GeneralDiag {
   contextStartLine: number;

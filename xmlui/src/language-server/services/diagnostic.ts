@@ -10,7 +10,7 @@ export type DiagnosticsContext = {
   parseResult: ParseResult;
 };
 
-export function getDiagnostics(ctx: DiagnosticsContext): Diagnostic[] {
+function getDiagnosticsInternal(ctx: DiagnosticsContext): Diagnostic[] {
   const { errors } = ctx.parseResult;
 
   return errors.map((e) => {
@@ -27,7 +27,7 @@ export function errorToLspDiag(e: ParserDiag, offsetToPos: (n: number) => Positi
   };
 }
 
-export function getDiagnosticsForDocument(project: Project, uri: DocumentUri): Diagnostic[] {
+export function getDiagnostics(project: Project, uri: DocumentUri): Diagnostic[] {
   const document = project.documents.get(uri);
   if (!document) {
     return [];
@@ -37,5 +37,5 @@ export function getDiagnosticsForDocument(project: Project, uri: DocumentUri): D
     parseResult,
     offsetToPos: (offset: number) => document.positionAt(offset),
   };
-  return getDiagnostics(ctx);
+  return getDiagnosticsInternal(ctx);
 }
