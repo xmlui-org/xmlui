@@ -37,8 +37,27 @@ type ItemWithLabelProps = {
   cloneStyle?: boolean;
   requiredIndicator?: RequiredIndicatorMode;
 };
-export const defaultProps: Pick<ItemWithLabelProps, "labelBreak"> = {
+export const defaultProps: Pick<
+  ItemWithLabelProps,
+  | "labelBreak"
+  | "enabled"
+  | "labelPosition"
+  | "required"
+  | "validationInProgress"
+  | "shrinkToLabel"
+  | "cloneStyle"
+  | "requiredIndicator"
+  | "isInputTemplateUsed"
+> = {
   labelBreak: true,
+  enabled: true,
+  labelPosition: "top",
+  required: false,
+  validationInProgress: false,
+  shrinkToLabel: false,
+  cloneStyle: false,
+  requiredIndicator: "required",
+  isInputTemplateUsed: false,
 };
 
 const numberRegex = /^[0-9]+$/;
@@ -52,21 +71,21 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     label,
     labelBreak = defaultProps.labelBreak,
     labelWidth,
-    enabled = true,
-    required = false,
+    enabled = defaultProps.enabled,
+    required = defaultProps.required,
     children,
-    validationInProgress = false,
-    shrinkToLabel = false,
+    validationInProgress = defaultProps.validationInProgress,
+    shrinkToLabel = defaultProps.shrinkToLabel,
     onFocus,
     onBlur,
     labelStyle,
     validationResult,
-    isInputTemplateUsed = false,
+    isInputTemplateUsed = defaultProps.isInputTemplateUsed,
     onLabelClick,
     layoutContext, // Destructured to prevent passing to DOM
     testId,
-    cloneStyle = false,
-    requiredIndicator,
+    cloneStyle = defaultProps.cloneStyle,
+    requiredIndicator = defaultProps.requiredIndicator,
     ...rest
   }: ItemWithLabelProps,
   ref: ForwardedRef<HTMLDivElement>,
@@ -126,9 +145,8 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
                 {(requiredIndicator === "required" || requiredIndicator === "both") && required && (
                   <span className={styles.requiredMark}>*</span>
                 )}
-                {(requiredIndicator === "optional" || requiredIndicator === "both") && !required && (
-                  <span className={styles.optionalTag}> (Optional)</span>
-                )}
+                {(requiredIndicator === "optional" || requiredIndicator === "both") &&
+                  !required && <span className={styles.optionalTag}> (Optional)</span>}
                 {validationInProgress && (
                   <Spinner
                     style={{ height: "1em", width: "1em", marginLeft: "1em", alignSelf: "center" }}
