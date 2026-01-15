@@ -307,6 +307,10 @@ The property name in source data for dynamic loading state (default: "dynamic").
 
 The number of degrees to rotate the collapsed icon when expanded in animate mode (default: 90).
 
+### `fixedItemSize` (default: false) [#fixeditemsize-default-false]
+
+When set to `true`, the tree will measure the height of the first item and use that as a fixed size hint for all items. This improves scroll performance when all items have the same height. If items have varying heights, leave this as `false`.
+
 ### `iconCollapsed` (default: "chevronright") [#iconcollapsed-default-chevronright]
 
 The icon name to use for collapsed nodes (default: "chevronright").
@@ -341,7 +345,7 @@ Whether clicking anywhere on a tree item should expand/collapse the node, not ju
 
 ### `itemHeight` (default: 32) [#itemheight-default-32]
 
-The height of each tree row in pixels (default: 35).
+The height of each tree row in pixels (default: 32).
 
 ### `itemTemplate` [#itemtemplate]
 

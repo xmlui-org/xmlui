@@ -106,6 +106,18 @@ Available values:
 
 This property sets the width of the item labels within the form. Individual `FormItem` instances can override this property. If this property is not set, each form item nested in the form uses its calculated label width. These widths may be different for each item.
 
+### `itemRequiredIndicator` (default: "required") [#itemrequiredindicator-default-required]
+
+This property controls how required indicators are displayed for required form items. Individual `FormItem` instances can override this property.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `required` | Show "*" for required fields **(default)** |
+| `optional` | Show "(Optional)" for optional fields |
+| `both` | Show "*" for required AND "(Optional)" for optional fields |
+
 ### `keepModalOpenOnSubmit` (default: false) [#keepmodalopenonsubmit-default-false]
 
 This property prevents the modal from closing when the form is submitted.

@@ -316,6 +316,7 @@
                 <NavLink label="Markdown" to="/components/Markdown" />
                 <NavLink label="MenuItem" to="/components/MenuItem" />
                 <NavLink label="MenuSeparator" to="/components/MenuSeparator" />
+                <NavLink label="MessageListener" to="/components/MessageListener" />
                 <NavLink label="ModalDialog" to="/components/ModalDialog" />
                 <NavLink label="NavGroup" to="/components/NavGroup" />
                 <NavLink label="NavLink" to="/components/NavLink" />

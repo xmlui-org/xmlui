@@ -58,6 +58,7 @@
   "Markdown": "Markdown",
   "MenuItem": "MenuItem",
   "MenuSeparator": "MenuSeparator",
+  "MessageListener": "MessageListener",
   "ModalDialog": "ModalDialog",
   "NavGroup": "NavGroup",
   "NavLink": "NavLink",

@@ -474,6 +474,10 @@ This property defines the template to display when the list is empty.
 </App>
 ```
 
+### `fixedItemSize` (default: false) [#fixeditemsize-default-false]
+
+When set to `true`, the list will measure the height of the first item and use that as a fixed size hint for all items. This improves scroll performance when all items have the same height. If items have varying heights, leave this as `false`.
+
 ### `groupBy` [#groupby]
 
 This property sets which data item property is used to group the list items. If not set, no grouping is done.
@@ -1512,3 +1516,4 @@ See the [`scrollToBottom`](#scrolltobottom) example.
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | [backgroundColor](../styles-and-themes/common-units/#color)-List | $backgroundColor | $backgroundColor |
+| [backgroundColor](../styles-and-themes/common-units/#color)-List2 | *none* | *none* |

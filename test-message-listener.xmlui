@@ -1,0 +1,12 @@
+<Fragment>
+  <MessageListener 
+    onMessageReceived="arg => testState = { received: true, data: arg }"
+  >
+    <VStack gap="$space-4">
+      <Text>MessageListener Test</Text>
+      <Button onClick="window.postMessage({ test: 'hello' }, '*')">
+        Send Test Message
+      </Button>
+    </VStack>
+  </MessageListener>
+</Fragment>
