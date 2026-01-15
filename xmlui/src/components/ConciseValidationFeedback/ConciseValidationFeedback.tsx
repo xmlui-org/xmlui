@@ -1,3 +1,4 @@
+import type { HTMLAttributes } from "react";
 import classnames from "classnames";
 
 import { Icon } from "../Icon/IconNative";
@@ -13,26 +14,31 @@ type Props = {
   successIcon?: string;
   errorIcon?: string;
   validationMode?: ValidationMode;
-};
+} & HTMLAttributes<HTMLSpanElement>;
 
 export const ConciseValidationFeedback = ({
-  invalidMessages,
+  invalidMessages = [],
   validationStatus,
   successIcon = "check",
   errorIcon = "error",
+  className,
+  ...rest
 }: Props) => {
-
   if (validationStatus === "error") {
     return (
-      <Tooltip text={invalidMessages.join("\n")} delayDuration={100}>
-        <Icon name={errorIcon} className={classnames(styles.icon, styles.error)} />
-      </Tooltip>
+      <span {...rest} className={classnames(className)}>
+        <Tooltip text={invalidMessages.join("\n")} delayDuration={100}>
+          <Icon name={errorIcon} className={classnames(styles.icon, styles.error)} />
+        </Tooltip>
+      </span>
     );
   }
 
   if (validationStatus === "valid") {
     return (
-      <Icon name={successIcon} className={classnames(styles.icon, styles.valid)} />
+      <span {...rest} className={classnames(className)}>
+        <Icon name={successIcon} className={classnames(styles.icon, styles.valid)} />
+      </span>
     );
   }
 

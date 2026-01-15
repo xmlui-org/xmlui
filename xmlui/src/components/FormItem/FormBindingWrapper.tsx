@@ -128,7 +128,10 @@ export function FormBindingWrapper({
     );
   }, [children]);
 
-  const verboseValidationFeedback = isForcedVerbose ? true : (contextVerboseValidationFeedback ?? true);
+  const childVerboseValidationFeedback = (children as any)?.props?.verboseValidationFeedback;
+  const verboseValidationFeedback = isForcedVerbose
+    ? true
+    : (childVerboseValidationFeedback ?? contextVerboseValidationFeedback ?? true);
 
   const isEnabled = enabled && formEnabled;
 
