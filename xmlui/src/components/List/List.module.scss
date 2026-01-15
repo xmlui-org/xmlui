@@ -30,7 +30,6 @@ $backgroundColor-List2: createThemeVar("backgroundColor-#{$component}");
   }
 
   .innerListWrapper {
-    visibility: hidden;
     display: flex;
     flex-direction: column;
     min-height: 100%;
