@@ -285,6 +285,7 @@ interface TreeComponentProps {
   iconExpanded?: string;
   iconSize?: string;
   itemHeight?: number;
+  fixedItemSize?: boolean;
   animateExpand?: boolean;
   expandRotation?: number;
   onItemClick?: (node: FlatTreeNode) => void;
@@ -319,6 +320,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     iconExpanded = defaultProps.iconExpanded,
     iconSize = defaultProps.iconSize,
     itemHeight = defaultProps.itemHeight,
+    fixedItemSize,
     animateExpand = defaultProps.animateExpand,
     expandRotation = defaultProps.expandRotation,
     onItemClick,
@@ -532,10 +534,29 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
   const treeContainerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<VirtualizerHandle>(null);
+  
+  // State and ref for measuring first item size when fixedItemSize is enabled
+  const firstItemRef = useRef<HTMLDivElement>(null);
+  const [measuredItemSize, setMeasuredItemSize] = useState<number | undefined>(undefined);
 
   const flatTreeData = useMemo(() => {
     return toFlatTree(treeData, expandedIds, fieldConfig.dynamicField, nodeStates);
   }, [expandedIds, treeData, fieldConfig.dynamicField, nodeStates]);
+  
+  // Measure first item size when fixedItemSize is enabled
+  useEffect(() => {
+    if (fixedItemSize && firstItemRef.current && !measuredItemSize && flatTreeData.length > 0) {
+      // Add a small delay to ensure the item is rendered
+      requestAnimationFrame(() => {
+        if (firstItemRef.current) {
+          const height = firstItemRef.current.offsetHeight;
+          if (height > 0) {
+            setMeasuredItemSize(height);
+          }
+        }
+      });
+    }
+  }, [fixedItemSize, measuredItemSize, flatTreeData.length]);
 
   // Tree node utilities for consistent ID mapping
   const findNodeById = useCallback(
@@ -1609,10 +1630,19 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       onKeyDown={handleKeyDown}
       style={{ height: "100%", overflow: "auto" }}
     >
-      <Virtualizer ref={listRef}>
-        {flatTreeData.map((node, index) => (
-          <TreeRow key={node.key} index={index} data={itemData} />
-        ))}
+      <Virtualizer ref={listRef} itemSize={measuredItemSize || itemHeight}>
+        {flatTreeData.map((node, index) => {
+          const isFirstItem = index === 0;
+          const shouldMeasure = isFirstItem && fixedItemSize;
+          
+          return shouldMeasure ? (
+            <div key={node.key} ref={firstItemRef}>
+              <TreeRow index={index} data={itemData} />
+            </div>
+          ) : (
+            <TreeRow key={node.key} index={index} data={itemData} />
+          );
+        })}
       </Virtualizer>
     </div>
   );
