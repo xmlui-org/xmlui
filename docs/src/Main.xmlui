@@ -68,26 +68,27 @@
             gap="0"
         >
             <NavGroup initiallyExpanded="{true}" label="Learn XMLUI">
-                <NavLink label="Introduction" to="/" />
-                <NavLink label="Reactive Data" to="/reactive-intro" />
-                <NavLink label="Components" to="/components-intro" />
-                <NavLink label="Themes" to="/themes-intro" />
+                <NavLink icon="school" label="Introduction" to="/" />
+                <NavLink icon="arrow-shuffle" label="Reactive Data" to="/reactive-intro" />
+                <NavLink icon="layout-dashboard" label="Components" to="/components-intro" />
+                <NavLink icon="palette" label="Themes" to="/themes-intro" />
             </NavGroup>
         </Stack>
         <NavGroup label="Guides">
-            <NavLink label="App Structure" to="/app-structure" />
-            <NavLink label="Markup" to="/markup" />
-            <NavLink label="Scoping" to="/scoping" />
-            <NavLink label="Scripting" to="/scripting" />
-            <NavLink label="Codefences and playgrounds" to="/playground-and-codefence" />
-            <NavLink label="Layout" to="/layout" />
-            <NavLink label="Working with Text" to="/working-with-text" />
+            <NavLink icon="hierarchy" label="App Structure" to="/app-structure" />
+            <NavLink icon="markup" label="Markup" to="/markup" />
+            <NavLink icon="boundary" label="Scoping" to="/scoping" />
+            <NavLink icon="bolt" label="Scripting" to="/scripting" />
+            <NavLink icon="playground" label="Codefences and playgrounds" to="/playground-and-codefence" />
+            <NavLink icon="layout" label="Layout" to="/layout" />
+            <NavLink icon="typography" label="Working with Text" to="/working-with-text" />
             <NavLink
+                icon="markdown"
                 label="Working with Markdown"
                 to="/working-with-markdown"
             />
-            <NavLink label="Routing and Links" to="/routing-and-links" />
-            <NavLink label="Forms" to="/forms" />
+            <NavLink icon="link" label="Routing and Links" to="/routing-and-links" />
+            <NavLink icon="form" label="Forms" to="/forms" />
             <NavLink label="Modal Dialogs" to="/modal-dialogs" />
             <NavLink
                 label="User-defined Components"

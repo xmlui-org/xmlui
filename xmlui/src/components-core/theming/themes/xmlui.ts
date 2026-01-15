@@ -81,6 +81,10 @@ export const XmlUiDocsThemeDefinition: ThemeDefinition = {
   color: "$color-primary-500",
   themeVars: {
     "fontSize": "14px",
+    "fontFamily": "Inter Variable",
+    "font-feature-settings": "'cv03', 'cv04'",
+
+    "width-navPanel-App": "280px",
     "backgroundColor-Text-code": "rgb(from $color-surface-200 r g b / 0.4)",
     "padding-Text-code": "$space-0_5",
   },
