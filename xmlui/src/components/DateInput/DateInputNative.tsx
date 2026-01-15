@@ -11,6 +11,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
 import Icon from "../Icon/IconNative";
+import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
 
@@ -19,6 +20,7 @@ const PART_DAY = "day";
 const PART_MONTH = "month";
 const PART_YEAR = "year";
 const PART_CLEAR_BUTTON = "clearButton";
+const PART_VERBOSE_VALIDATION_FEEDBACK = "verboseValidationFeedback";
 
 // Date validation constants
 const MIN_YEAR = 1900;
@@ -92,6 +94,7 @@ type Props = {
   verboseValidationFeedback?: boolean;
   validationIconSuccess?: string;
   validationIconError?: string;
+  invalidMessages?: string[];
 };
 
 export const defaultProps = {
@@ -150,6 +153,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     verboseValidationFeedback,
     validationIconSuccess,
     validationIconError,
+    invalidMessages,
     ...rest
   },
   ref,
@@ -797,8 +801,15 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
             </button>
           </Part>
         )}
-        {validationIcon && (
-          <Adornment iconName={validationIcon} className={styles.adornment} />
+        {!finalVerboseValidationFeedback && (
+          <Part partId={PART_VERBOSE_VALIDATION_FEEDBACK}>
+            <ConciseValidationFeedback
+              validationStatus={validationStatus}
+              invalidMessages={invalidMessages}
+              successIcon={finalValidationIconSuccess}
+              errorIcon={finalValidationIconError}
+            />
+          </Part>
         )}
       </div>
       {endAdornment}

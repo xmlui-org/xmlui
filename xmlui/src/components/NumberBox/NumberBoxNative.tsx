@@ -32,11 +32,13 @@ import { Icon } from "../Icon/IconNative";
 import { Adornment } from "../Input/InputAdornment";
 import { Button } from "../Button/ButtonNative";
 import { PART_END_ADORNMENT, PART_INPUT, PART_START_ADORNMENT } from "../../components-core/parts";
+import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
 
 const PART_SPINNER_UP = "spinnerUp";
 const PART_SPINNER_DOWN = "spinnerDown";
+const PART_VERBOSE_VALIDATION_FEEDBACK = "verboseValidationFeedback";
 
 // Default props for NumberBox component
 export const defaultProps = {
@@ -92,6 +94,7 @@ type Props = {
   verboseValidationFeedback?: boolean;
   validationIconSuccess?: string;
   validationIconError?: string;
+  invalidMessages?: string[];
 };
 
 export const NumberBox = forwardRef(function NumberBox(
@@ -130,6 +133,7 @@ export const NumberBox = forwardRef(function NumberBox(
     verboseValidationFeedback,
     validationIconSuccess,
     validationIconError,
+    invalidMessages,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -644,9 +648,14 @@ export const NumberBox = forwardRef(function NumberBox(
           required={required}
         />
       </Part>
-      {validationIcon && (
-        <Part partId={PART_END_ADORNMENT}>
-          <Adornment iconName={validationIcon} className={classnames(styles.adornment)} />
+      {!finalVerboseValidationFeedback && (
+        <Part partId={PART_VERBOSE_VALIDATION_FEEDBACK}>
+          <ConciseValidationFeedback
+            validationStatus={validationStatus}
+            invalidMessages={invalidMessages}
+            successIcon={finalValidationIconSuccess}
+            errorIcon={finalValidationIconError}
+          />
         </Part>
       )}
       <Part partId={PART_END_ADORNMENT}>
