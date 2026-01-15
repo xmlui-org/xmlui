@@ -156,13 +156,9 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
   @layer components {
   .text {
     display: inline-block;
-    overflow: hidden;
-    text-overflow: ellipsis;
     margin: 0;
     padding: 0;
-    min-height: fit-content;
-    line-height: normal;
-    vertical-align: top;
+    vertical-align: baseline;
 
     &.default {
       @include textVariant("");
@@ -378,8 +374,10 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
     overflow-wrap: break-word;
     white-space: nowrap;
     max-width: 100%;
-    vertical-align: top;
+    vertical-align: baseline;
     line-height: normal;
+    text-overflow: ellipsis;
+    min-height: fit-content;
   }
 
   .preserveLinebreaks {
