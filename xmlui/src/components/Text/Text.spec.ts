@@ -528,6 +528,36 @@ test.describe("Visual States", () => {
     // Both rows should have similar vertical alignment (within 2px tolerance for sub-pixel rendering)
     expect(Math.abs(alignmentDiffEllipsis - alignmentDiffNoEllipsis)).toBeLessThan(2);
   });
+
+  test("aligns inline elements (like strong) properly when mixed with text content", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <HStack testId="container" gap="10px">
+        <Text testId="text-with-strong">
+          <strong>From:</strong>
+          My Name [email@email.com]
+        </Text>
+        <Text testId="text-plain">Jan 01, 2024 10:00</Text>
+      </HStack>
+    `);
+
+    // Get vertical positions of both text elements
+    const textWithStrong = page.getByTestId("text-with-strong");
+    const textPlain = page.getByTestId("text-plain");
+
+    const { top: strongTop, left: strongLeft } = await getBounds(textWithStrong);
+    const { top: plainTop, left: plainLeft } = await getBounds(textPlain);
+
+    // Both texts should be aligned at approximately the same vertical position
+    // (within 2px tolerance for sub-pixel rendering and font rendering differences)
+    const verticalAlignmentDiff = Math.abs(strongTop - plainTop);
+    expect(verticalAlignmentDiff).toBeLessThan(2);
+
+    // Verify that texts are positioned side-by-side (not overlapping)
+    expect(plainLeft).toBeGreaterThan(strongLeft);
+  });
 });
 
 // =============================================================================
