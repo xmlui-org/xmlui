@@ -152,8 +152,8 @@
           "require": "./dist/standalone/xmlui-standalone.umd.js"
         },
         "./language-server": {
-          "import": "./dist/lib/language-server.js",
-          "require": "./dist/lib/language-server.js"
+          "import": "./dist/for-node/server.js",
+          "require": "./dist/for-node/server.js"
         },
         "./parser": {
           "import": "./dist/lib/xmlui-parser.js",

@@ -1,11 +1,11 @@
-import { type Location, type LocationLink } from "vscode-languageserver";
+import { type Location } from "vscode-languageserver";
 import type { Project } from "../base/project";
 import type { DocumentUri, Position } from "../base/text-document";
 import { findTokenAtOffset } from "../../parsers/xmlui-parser/utils";
 import { SyntaxKind } from "../../parsers/xmlui-parser";
 import path from "path";
 
-//TODO: handleDefinition is still immature, only works when the component's filename matches the hovered component name, needs project-wide discovery so that files don't need to be pre-opened to be discoverable and the returned range should point to the open tag named "Component" in the targe file, not the the very beginning of it.
+//TODO: handleDefinition is still immature, only works when the component's filename matches the hovered component name, and the returned range should point to the open tag named "Component" in the targe file, not the the very beginning of it.
 
 export function handleDefinition(
   project: Project,
