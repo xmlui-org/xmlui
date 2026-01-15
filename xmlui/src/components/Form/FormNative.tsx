@@ -300,7 +300,7 @@ export const defaultProps: Pick<
   hideButtonRowUntilDirty: false,
   hideButtonRow: false,
   enableSubmit: true,
-  validationIconSuccess: "check",
+  validationIconSuccess: "checkmark",
   validationIconError: "error",
   itemRequiredIndicator: "required",
 };

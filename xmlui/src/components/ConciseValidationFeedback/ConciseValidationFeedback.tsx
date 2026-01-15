@@ -19,7 +19,7 @@ type Props = {
 export const ConciseValidationFeedback = ({
   invalidMessages = [],
   validationStatus,
-  successIcon = "check",
+  successIcon = "checkmark",
   errorIcon = "error",
   className,
   ...rest

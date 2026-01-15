@@ -211,7 +211,7 @@ export const DatePicker = forwardRef(function DatePicker(
   const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
 
   const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
-  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "check";
+  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
   const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
 
   const selected: any = useMemo(() => {

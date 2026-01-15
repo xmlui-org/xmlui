@@ -157,7 +157,7 @@ export const TextBox = forwardRef(function TextBox(
   const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
 
   const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
-  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "check";
+  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
   const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "error";
 
   useEffect(() => {

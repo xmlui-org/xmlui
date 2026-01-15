@@ -1152,7 +1152,7 @@ test.describe("Validation Feedback", () => {
     
     const conciseFeedback = page.locator("[data-part-id='verboseValidationFeedback']");
     await expect(conciseFeedback).toBeVisible();
-    await expect(conciseFeedback.locator("[data-icon-name='check']")).toBeVisible();
+    await expect(conciseFeedback.locator("[data-icon-name='checkmark']")).toBeVisible();
   });
 
   test("concise mode tooltip shows error message on hover", async ({ initTestBed, page }) => {
