@@ -37,6 +37,7 @@ import { ListMd } from "./List/List";
 import { LogoMd } from "./Logo/Logo";
 import { MarkdownMd } from "./Markdown/Markdown";
 import { ModalDialogMd } from "./ModalDialog/ModalDialog";
+import { MessageListenerMd } from "./MessageListener/MessageListener";
 import { NavGroupMd } from "./NavGroup/NavGroup";
 import { NavLinkMd } from "./NavLink/NavLink";
 import { NavPanelMd } from "./NavPanel/NavPanel";
@@ -366,6 +367,7 @@ export const collectedComponentMetadata = {
   Logo: LogoMd,
   Markdown: MarkdownMd,
   MenuSeparator: MenuSeparatorMd,
+  MessageListener: MessageListenerMd,
   ModalDialog: ModalDialogMd,
   NavGroup: NavGroupMd,
   NavLink: NavLinkMd,

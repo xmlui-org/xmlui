@@ -439,6 +439,18 @@ Set this property to `true` to indicate it must have a value before submitting t
 </App>
 ```
 
+### `requiredIndicator` [#requiredindicator]
+
+Controls how required/optional status is visually indicated in the label.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `required` | Show "*" for required fields |
+| `optional` | Show "(Optional)" for optional fields |
+| `both` | Show "*" for required AND "(Optional)" for optional fields |
+
 ### `requiredInvalidMessage` [#requiredinvalidmessage]
 
 This optional string property is used to customize the message that is displayed if the field is not filled in. If not defined, the default message is used.
@@ -557,6 +569,7 @@ Removes the item specified by its index from the list held by the FormItem. The 
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-FormItemLabel | $fontWeight-medium | $fontWeight-medium |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-FormItemLabel-required | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-FormItemLabel | $textColor | $textColor |
+| [textColor](../styles-and-themes/common-units/#color)-FormItemLabel-optionalTag | $textColor-secondary | $textColor-secondary |
 | [textColor](../styles-and-themes/common-units/#color)-FormItemLabel-required | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-FormItemLabel-requiredMark | $color-danger-400 | $color-danger-400 |
 | [textTransform](../styles-and-themes/common-units/#textTransform)-FormItemLabel | none | none |
