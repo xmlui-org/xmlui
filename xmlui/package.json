@@ -59,7 +59,7 @@
     "emoji-picker-react": "4.4.10",
     "framer-motion": "^12.18.1",
     "get-user-locale": "^3.0.0",
-    "glob": "11.0.0",
+    "glob": "11.1.0",
     "immer": "9.0.16",
     "js-yaml": "^4.1.0",
     "lodash-es": "4.17.21",
