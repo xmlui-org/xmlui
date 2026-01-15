@@ -18,6 +18,7 @@ import { fieldValidated, type FormAction } from "../Form/formActions";
 
 function isInputEmpty(value: any) {
   if (value === undefined || value === null || value === "") return true;
+  if (typeof value === "boolean") return !value;
   if (typeof value === "string") return value.trim().length === 0;
   if (typeof value === "number") return false;
   return isEmpty(value);

@@ -22,8 +22,11 @@ import type { ValidationStatus } from "../abstractions";
 import TextAreaResizable from "./TextAreaResizable";
 import { PART_INPUT } from "../../components-core/parts";
 import { composeRefs } from "@radix-ui/react-compose-refs";
+import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
+
+const PART_VERBOSE_VALIDATION_FEEDBACK = "verboseValidationFeedback";
 
 export const resizeOptionKeys = ["horizontal", "vertical", "both"] as const;
 export type ResizeOptions = (typeof resizeOptionKeys)[number];
@@ -58,6 +61,7 @@ type Props = {
   verboseValidationFeedback?: boolean;
   validationIconSuccess?: string;
   validationIconError?: string;
+  invalidMessages?: string[];
 };
 
 export const defaultProps = {
@@ -109,6 +113,7 @@ export const TextArea = forwardRef(function TextArea(
     verboseValidationFeedback,
     validationIconSuccess,
     validationIconError,
+    invalidMessages,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLTextAreaElement>,
@@ -279,38 +284,62 @@ export const TextArea = forwardRef(function TextArea(
     autoComplete: "off",
   };
 
+  const renderConciseFeedback = () => (
+    !finalVerboseValidationFeedback && (
+      <Part partId={PART_VERBOSE_VALIDATION_FEEDBACK}>
+        <div className={styles.floatingFeedback}>
+          <ConciseValidationFeedback
+            validationStatus={validationStatus}
+            invalidMessages={invalidMessages}
+            successIcon={finalValidationIconSuccess}
+            errorIcon={finalValidationIconError}
+          />
+        </div>
+      </Part>
+    )
+  );
+
   if (resize === "both" || resize === "horizontal" || resize === "vertical") {
     return (
-      <Part partId={PART_INPUT}>
-        <TextAreaResizable
-          {...textareaProps}
-          style={style as any}
-          className={classnames(classes)}
-          maxRows={maxRows}
-          minRows={minRows}
-          rows={rows}
-        />
-      </Part>
+      <div className={styles.container}>
+        <Part partId={PART_INPUT}>
+          <TextAreaResizable
+            {...textareaProps}
+            style={style as any}
+            className={classnames(classes)}
+            maxRows={maxRows}
+            minRows={minRows}
+            rows={rows}
+          />
+        </Part>
+        {renderConciseFeedback()}
+      </div>
     );
   }
   if (autoSize || !isNil(maxRows) || !isNil(minRows)) {
     return (
-      <Part partId={PART_INPUT}>
-        <TextareaAutosize
-          {...textareaProps}
-          style={style as any}
-          className={classnames(classes)}
-          maxRows={maxRows}
-          minRows={minRows}
-          rows={rows}
-        />
-      </Part>
+      <div className={styles.container}>
+        <Part partId={PART_INPUT}>
+          <TextareaAutosize
+            {...textareaProps}
+            style={style as any}
+            className={classnames(classes)}
+            maxRows={maxRows}
+            minRows={minRows}
+            rows={rows}
+          />
+        </Part>
+        {renderConciseFeedback()}
+      </div>
     );
   }
 
   return (
-    <Part partId={PART_INPUT}>
-      <textarea {...textareaProps} rows={rows} className={classnames(classes)} />
-    </Part>
+    <div className={styles.container}>
+      <Part partId={PART_INPUT}>
+        <textarea {...textareaProps} rows={rows} className={classnames(classes)} />
+      </Part>
+      {renderConciseFeedback()}
+    </div>
   );
 });

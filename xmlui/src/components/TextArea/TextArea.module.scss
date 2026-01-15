@@ -201,6 +201,19 @@ $borderColor-TextArea--disabled: createThemeVar("Input:borderColor-#{$componentN
   .resizeBoth {
     resize: both;
   }
+
+  .container {
+    position: relative;
+    display: block;
+    width: 100%;
+  }
+
+  .floatingFeedback {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 1;
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer

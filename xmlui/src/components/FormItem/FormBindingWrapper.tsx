@@ -104,7 +104,31 @@ export function FormBindingWrapper({
   const dispatch = useFormContextPart((value) => value?.dispatch);
   const formEnabled = useFormContextPart((value) => value?.enabled);
   const formRequiredIndicator = useFormContextPart((value) => value?.itemRequiredIndicator);
-  const verboseValidationFeedback = useFormContextPart((value) => value?.verboseValidationFeedback);
+  const contextVerboseValidationFeedback = useFormContextPart((value) => value?.verboseValidationFeedback);
+  
+  // Logic to determine if verbose feedback should be forced based on component type
+  const isForcedVerbose = useMemo(() => {
+    const type = (children as any)?.type;
+    const props = (children as any)?.props;
+    const displayName = type?.displayName || type?.name || 
+                        type?.render?.displayName || type?.render?.name || // for forwardRef
+                        type?.type?.displayName || type?.type?.name || // for memo
+                        "";
+    
+    // Check for specific component display names
+    // We check for "Toggle" because both Checkbox and Switch use the Toggle component
+    return (
+      displayName.includes("Checkbox") ||
+      displayName.includes("Switch") ||
+      displayName.includes("RadioGroup") ||
+      displayName.includes("ColorPicker") ||
+      displayName.includes("Slider") ||
+      displayName.includes("Toggle") || 
+      (displayName.includes("DatePicker") && props?.inline)
+    );
+  }, [children]);
+
+  const verboseValidationFeedback = isForcedVerbose ? true : (contextVerboseValidationFeedback ?? true);
 
   const isEnabled = enabled && formEnabled;
 

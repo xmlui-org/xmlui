@@ -237,8 +237,18 @@ export const FormItem = memo(function FormItem({
   const validationResult = useFormContextPart((value) => value?.validationResults[formItemId]);
   const dispatch = useFormContextPart((value) => value?.dispatch);
   const formEnabled = useFormContextPart((value) => value?.enabled);
-  const verboseValidationFeedback = useFormContextPart((value) => value?.verboseValidationFeedback);
+  const contextVerboseValidationFeedback = useFormContextPart((value) => value?.verboseValidationFeedback);
   const itemRequiredIndicator = useFormContextPart((value) => value?.itemRequiredIndicator);
+  
+  const isForcedVerbose = 
+    type === "checkbox" || 
+    type === "switch" || 
+    type === "radioGroup" || 
+    type === "colorpicker" || 
+    type === "slider" || 
+    (type === "datePicker" && (rest as any).inline);
+
+  const verboseValidationFeedback = isForcedVerbose ? true : (contextVerboseValidationFeedback ?? true);
 
   const isEnabled = enabled && formEnabled;
 
@@ -542,7 +552,7 @@ export const FormItem = memo(function FormItem({
       requiredIndicator={requiredIndicator ?? itemRequiredIndicator}
       className={className}
       validationResult={
-        verboseValidationFeedback ? null : (
+        (verboseValidationFeedback === false) ? null : (
           <div ref={animateContainerRef} className={styles.helperTextContainer}>
             {isHelperTextShown &&
               validationResult?.validations.map((singleValidation, i) => (
