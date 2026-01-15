@@ -1,6 +1,5 @@
 import { expect, test } from "../../testing/fixtures";
 import type { Page } from "@playwright/test";
-import { F } from "../../testing/infrastructure/dist/internal/chunks/index.D2XAzRrx";
 
 // =============================================================================
 // TEST HELPERS

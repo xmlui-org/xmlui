@@ -10,6 +10,8 @@ import {
   TextDocumentSyncKind,
   DidChangeConfigurationNotification,
   TextDocuments,
+  DidChangeWatchedFilesNotification,
+  FileChangeType,
 } from "vscode-languageserver";
 import { TextDocument } from "./base/text-document";
 import collectedComponentMetadata from "./xmlui-metadata-generated.js";
@@ -24,13 +26,16 @@ import {
 import { getDiagnostics } from "./services/diagnostic";
 import { Project } from "./base/project.js";
 import { handleDefinition } from "./services/definition.js";
+import { ProjectDocumentManager } from "./base/project-document-manager";
+import { fileURLToPath } from "url";
 
 const metaByComp = collectedComponentMetadata as ComponentMetadataCollection;
 const metadataProvider = new MetadataProvider(metaByComp);
 
 export function start(connection: Connection) {
   const documents = new TextDocuments(TextDocument);
-  const project = new Project(documents, metadataProvider);
+  const documentManager = new ProjectDocumentManager(documents);
+  const project = new Project(documentManager, metadataProvider);
 
   let hasConfigurationCapability = false;
   let hasWorkspaceFolderCapability = false;
@@ -43,6 +48,16 @@ export function start(connection: Connection) {
     hasWorkspaceFolderCapability = !!(
       capabilities.workspace && !!capabilities.workspace.workspaceFolders
     );
+
+    const rootUri = params.workspaceFolders?.[0]?.uri || params.rootUri || null;
+    if (rootUri) {
+      try {
+        const rootPath = fileURLToPath(rootUri);
+        documentManager.scan(rootPath).catch((err) => connection.console.error(String(err)));
+      } catch (e) {
+        connection.console.error(`Failed to scan workspace: ${e}`);
+      }
+    }
 
     const result: InitializeResult = {
       capabilities: {
@@ -70,10 +85,26 @@ export function start(connection: Connection) {
     if (hasConfigurationCapability) {
       void connection.client.register(DidChangeConfigurationNotification.type, undefined);
     }
-    if (hasWorkspaceFolderCapability) {
-      connection.workspace.onDidChangeWorkspaceFolders((_event) => {
-        connection.console.log("Workspace folder change event received.");
-      });
+
+    // Register for file watchers to keep our manager up to date
+    void connection.client.register(DidChangeWatchedFilesNotification.type, {
+      watchers: [{ globPattern: "**/*.xmlui" }],
+    });
+  });
+
+  connection.onDidChangeWatchedFiles((params) => {
+    for (const change of params.changes) {
+      switch (change.type) {
+        case FileChangeType.Created:
+          documentManager.markCreated(change.uri);
+          break;
+        case FileChangeType.Changed:
+          documentManager.markChanged(change.uri);
+          break;
+        case FileChangeType.Deleted:
+          documentManager.markDeleted(change.uri);
+          break;
+      }
     }
   });
 
