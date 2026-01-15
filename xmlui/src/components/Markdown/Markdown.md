@@ -184,3 +184,120 @@ This is a long link truncated for display: https://playground.xmlui.org/#/playgr
 ```
 
 %-PROP-END
+
+%-PROP-START breakMode
+
+```xmlui-pg copy display name="Example: breakMode='word'" /breakMode="word"/
+<App>
+  <VStack gap="16px">
+    <VStack gap="8px">
+      <Text variant="strong">breakMode="normal" (default)</Text>
+      <Markdown
+        width="200px"
+        backgroundColor="lightblue"
+        padding="8px"
+        breakMode="normal">
+        <![CDATA[
+This text uses standardwordbreaking at natural boundaries like spaces and hyphens.
+        ]]>
+      </Markdown>
+    </VStack>
+
+    <VStack gap="8px">
+      <Text variant="strong">breakMode="word"</Text>
+      <Markdown
+        width="200px"
+        backgroundColor="lightgreen"
+        padding="8px"
+        breakMode="word">
+        <![CDATA[
+This text will breakverylongwordswhenneeded to prevent overflow while preserving readability.
+        ]]>
+      </Markdown>
+    </VStack>
+
+    <VStack gap="8px">
+      <Text variant="strong">breakMode="anywhere"</Text>
+      <Markdown
+        width="200px"
+        backgroundColor="lightyellow"
+        padding="8px"
+        breakMode="anywhere">
+        <![CDATA[
+Thistext willbreakanywhereif neededtofit thecontainer eveninthe middleofwords.
+        ]]>
+      </Markdown>
+    </VStack>
+  </VStack>
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START overflowMode
+
+```xmlui-pg copy display name="Example: overflowMode='flow'" /overflowMode="flow"/
+<App>
+  <VStack gap="16px">
+    <VStack gap="8px">
+      <Text variant="strong">overflowMode="flow"</Text>
+      <Markdown
+        width="300px"
+        backgroundColor="lightblue"
+        padding="8px"
+        overflowMode="flow">
+        <![CDATA[
+This markdown content wraps to multiple lines naturally. It can contain **bold text**, *italic text*, and even [links](https://example.com), all wrapping as needed.
+
+When you have comma-separated lists like: [reference-1](url1), [reference-2](url2), [reference-3](url3), [reference-4](url4), they will wrap appropriately.
+        ]]>
+      </Markdown>
+    </VStack>
+
+    <VStack gap="8px">
+      <Text variant="strong">overflowMode="scroll"</Text>
+      <Markdown
+        width="300px"
+        backgroundColor="lightgreen"
+        padding="8px"
+        overflowMode="scroll">
+        <![CDATA[
+This text stays on a single line with horizontal scrolling when content overflows the container width.
+        ]]>
+      </Markdown>
+    </VStack>
+
+    <VStack gap="8px">
+      <Text variant="strong">overflowMode="ellipsis"</Text>
+      <Markdown
+        width="300px"
+        backgroundColor="lightyellow"
+        padding="8px"
+        overflowMode="ellipsis">
+        <![CDATA[
+This text truncates with ellipsis when it exceeds the container width.
+        ]]>
+      </Markdown>
+    </VStack>
+  </VStack>
+</App>
+```
+
+For comma-separated markdown links (common in reference lists), use `overflowMode="flow"` with optional `breakMode="word"`:
+
+```xmlui-pg copy display name="Example: comma-separated references" /overflowMode="flow"/ /breakMode="word"/
+<App>
+  <Markdown
+    width="400px"
+    backgroundColor="lavender"
+    padding="8px"
+    overflowMode="flow"
+    breakMode="word">
+    <![CDATA[
+[issue #123](https://example.com/issue/123), [PR #456](https://example.com/pr/456), [issue #789](https://example.com/issue/789), [PR #1011](https://example.com/pr/1011), [issue #1213](https://example.com/issue/1213)
+    ]]>
+  </Markdown>
+</App>
+```
+
+%-PROP-END
