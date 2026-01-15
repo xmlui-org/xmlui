@@ -155,9 +155,10 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
 
   @layer components {
   .text {
-    display: inline;
+    display: inline-block;
     margin: 0;
     padding: 0;
+    vertical-align: baseline;
 
     &.default {
       @include textVariant("");

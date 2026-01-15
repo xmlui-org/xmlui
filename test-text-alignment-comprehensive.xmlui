@@ -1,0 +1,33 @@
+<App>
+  <VStack gap="20px">
+    <!-- Test 1: FlowLayout with ellipsis text and centered alignment -->
+    <Card>
+      <Text variant="subtitle">Test 1: FlowLayout with ellipsis + center alignment</Text>
+      <FlowLayout verticalAlignment="center" style="background-color: #f0f0f0; padding: 10px;">
+        <Text overflowMode="ellipsis" width="470px" style="background-color: lightblue;">
+          lorem ipsum dolor sit amet eiusmod tempor incididunt
+        </Text>
+        <Text width="130px" style="background-color: lightcoral;">
+          Jan 01, 2024 10:00
+        </Text>
+        <Text style="background-color: lightgreen;">
+          <strong>From:</strong> My Name [email@email.com]
+        </Text>
+      </FlowLayout>
+    </Card>
+
+    <!-- Test 2: FlowLayout without ellipsis + centered alignment -->
+    <Card>
+      <Text variant="subtitle">Test 2: FlowLayout without ellipsis + center alignment</Text>
+      <FlowLayout      <FlowLayout      <FlowLayout      <FlowLayout      <FlowLayout      <FlowLayout     xt width="470px" style="backgr      <FlowLayout      <FlowLayout      <FlowLayout      amet eiusmod temp     cididu      <FlowLayout      <FlowLayout      <FlowLayout      <FlowLayout      <FlowLayout           <FlowLayout      <FlowLayout      <FlowLayout      <FlowLayout      <FlowLayout      <Fl        <FlowLayout      <FlowLayout      <FlowLayout      <FlowLayout      <FlowLayout ayou      <FlowLayout      <FlowLayout      <FlowLayout      tag (i      <FlowLayal      <FlowLayout      <FlowLayout      <FlowLayout      <FlowLInli      <FlowLayout      <xt>
+            style="background-color: lightyellow;">
+        <strong>Fr        <strong>Fr        <strong>Fr        <strong>Fr   </        <s <!--         <stron with mixed text --        <strong>Fr        <strong>Fr        <strong>Fr        <strond         <t>        <strong>Fr        <strong>Fr        <strong>Fr        <strong>Fr   </        <Text style="background-color: lightblue;">
+          <strong>Label:</strong> Value here
+        </Text>
+        <Text style="background-color: lightcoral;">
+          Another text
+        </Text>
+      </HStack>
+    </Card>
+  </VStack>
+</App>
