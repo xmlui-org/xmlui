@@ -54,6 +54,8 @@ $fontWeight-TableOfContentsItem-level-3--active: createThemeVar("fontWeight-#{$c
 $fontWeight-TableOfContentsItem-level-4--active: createThemeVar("fontWeight-#{$componentItem}-level-4--active");
 $fontWeight-TableOfContentsItem-level-5--active: createThemeVar("fontWeight-#{$componentItem}-level-5--active");
 $fontWeight-TableOfContentsItem-level-6--active: createThemeVar("fontWeight-#{$componentItem}-level-6--active");
+$borderLeft-TableOfContentsItem: createThemeVar("borderLeft-#{$componentItem}");
+$borderLeft-TableOfContentsItem--active: createThemeVar("borderLeft-#{$componentItem}--active");
 
 @layer components {
   .nav {
@@ -85,7 +87,7 @@ $fontWeight-TableOfContentsItem-level-6--active: createThemeVar("fontWeight-#{$c
 
       .listItem {
         list-style-type: none;
-        @include t.borderVars($themeVars, $componentItem);
+        border-left: $borderLeft-TableOfContentsItem !important;
 
         .link {
           display: block;
@@ -157,6 +159,7 @@ $fontWeight-TableOfContentsItem-level-6--active: createThemeVar("fontWeight-#{$c
         &.active {
           @include t.borderVars($themeVars, "#{$componentItem}--active");
           background-color: $backgroundColor-TableOfContentsItem--active;
+          border-left: $borderLeft-TableOfContentsItem--active !important;
 
           .link {
             color: $textColor-TableOfContentsItem--active;

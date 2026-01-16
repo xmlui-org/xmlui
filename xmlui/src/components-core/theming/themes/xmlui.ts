@@ -107,6 +107,10 @@ export const XmlUiDocsThemeDefinition: ThemeDefinition = {
 
     // --- TOC
     "fontSize-TableOfContentsItem": "13px",
+    "borderLeft-TableOfContentsItem": "2px solid $color-surface-100",
+    "fontWeight-TableOfContentsItem--active": "$fontWeight-normal",
+    "textColor-TableOfContentsItem--active": "$color-surface-900",
+    "borderLeft-TableOfContentsItem--active": "2px solid $color-surface-900",
   },
 };
 
