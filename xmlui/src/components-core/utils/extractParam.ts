@@ -10,6 +10,7 @@ import { LRUCache } from "../utils/LruCache";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { layoutOptionKeys } from "../descriptorHelper";
 import { asOptionalBoolean } from "../rendering/valueExtractor";
+import { T_TEMPLATE_LITERAL_EXPRESSION } from "../../parsers/scripting/ScriptingNodeTypes";
 
 /**
  * Extract the value of the specified parameter from the given view container state
@@ -28,68 +29,16 @@ export function extractParam(
   extractContext: { didResolve: boolean } = { didResolve: false },
 ): any {
   if (typeof param === "string") {
-    const paramSegments = parseParameterString(param);
-    if (paramSegments.length === 0) {
-      // --- The param is an empty string, retrieve it
-      return param;
-    }
-
-    // --- Cut the first segment, if it is whitespace-only
-    if (paramSegments[0].type === "literal" && paramSegments[0].value.trim() === "") {
-      paramSegments.shift();
-    }
-    if (paramSegments.length === 0) {
-      // --- The param is an empty string, retrieve it
-      return param;
-    }
-
-    // --- Cut the last segment, if it is whitespace-only
-    const lastSegment = paramSegments[paramSegments.length - 1];
-    if (lastSegment.type === "literal" && lastSegment.value.trim() === "") {
-      paramSegments.pop();
-    }
-    if (paramSegments.length === 0) {
-      // --- The param is an empty string, retrieve it
-      return param;
-    }
-
-    if (paramSegments.length === 1) {
-      // --- We have a single string literal or expression
-      if (paramSegments[0].type === "literal") {
-        // --- No expression to evaluate
-        return paramSegments[0].value;
-      } else {
-        // --- We have a single expression to evaluate
-        extractContext.didResolve = true;
-        return evalBinding(paramSegments[0].value, {
-          localContext: state,
-          appContext,
-          options: {
-            defaultToOptionalMemberAccess: true,
-          },
-        });
-      }
-    }
-    // --- At this point, we have multiple segments. Evaluate all expressions and convert them to strings
-    let result = "";
-    paramSegments.forEach((ps) => {
-      if (ps.type === "literal") {
-        result += ps.value;
-      } else {
-        extractContext.didResolve = true;
-        const exprValue = evalBinding(ps.value, {
-          localContext: state,
-          appContext,
-          options: {
-            defaultToOptionalMemberAccess: true,
-          },
-        });
-        if (exprValue?.toString) {
-          result += exprValue.toString();
-        }
-      }
+    return param;
+  } else if (param?.type === T_TEMPLATE_LITERAL_EXPRESSION) {
+    extractContext.didResolve = true;
+    return evalBinding(param, {
+      localContext: state,
+      appContext,
+      options: {
+        defaultToOptionalMemberAccess: true,
+      },
     });
-    return result;
   }
 
   if (strict) {
@@ -228,9 +177,7 @@ export function resolveAndCleanProps<T extends Record<string, any>>(
  * @param nodeProps properties to clean
  * @returns only component-specific properties
  */
-export function removeStylesFromProps(
-  nodeProps: Record<string, any>,
-) {
+export function removeStylesFromProps(nodeProps: Record<string, any>) {
   if (nodeProps.hasOwnProperty("style")) {
     delete nodeProps["style"];
   }
@@ -239,9 +186,7 @@ export function removeStylesFromProps(
   }
 
   const filterKeys = layoutOptionKeys;
-  return Object.fromEntries(
-    Object.entries(nodeProps).filter(([key]) => !filterKeys.includes(key)),
-  );
+  return Object.fromEntries(Object.entries(nodeProps).filter(([key]) => !filterKeys.includes(key)));
 }
 
 type NodeProps = Record<string, any>;
@@ -263,11 +208,7 @@ export class PropsTrasform<T extends NodeProps> {
 
   private usedKeys: (keyof T)[] = [];
 
-  constructor(
-    extractValue: ValueExtractor,
-    extractResourceUrl: ResourceUrlExtractor,
-    props: T,
-  ) {
+  constructor(extractValue: ValueExtractor, extractResourceUrl: ResourceUrlExtractor, props: T) {
     this.extractValue = extractValue;
     this.extractResourceUrl = extractResourceUrl;
     this.nodeProps = removeStylesFromProps(props) as T;

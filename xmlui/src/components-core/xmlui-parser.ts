@@ -3,7 +3,7 @@ import { createXmlUiParser } from "../parsers/xmlui-parser/parser";
 import { nodeToComponentDef } from "../parsers/xmlui-parser/transform";
 import { TransformDiag } from "../parsers/xmlui-parser/diagnostics";
 import type { GetText } from "../parsers/xmlui-parser/parser";
-import type { GeneralDiag, ParserDiag } from "../parsers/xmlui-parser/diagnostics";
+import type { GeneralDiag } from "../parsers/xmlui-parser/diagnostics";
 import { SyntaxKind } from "../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../parsers/xmlui-parser/syntax-node";
 import type { ScriptParserErrorMessage } from "../abstractions/scripting/ScriptParserError";

@@ -84,5 +84,54 @@ describe("Xmlui transform - attributes", () => {
       const cd = transformSource(`<Stack onClick="count++" />`) as ComponentDef<typeof StackMd>;
       expect(cd.events.click).toMatchObject({ __PARSED: true });
     });
+
+    it("prop is pre-parsed", () => {
+      const cd = transformSource(`<Stack a="hi {name}" />`) as ComponentDef;
+      expect(cd.props.a).toMatchObject({
+        __PARSED: true,
+        parts: [{ type: "literal", value: "hi " }, { type: "expression" }],
+      });
+    });
+
+    it("var is pre-parsed", () => {
+      const cd = transformSource(`<Stack var.a="hi {name}" />`) as ComponentDef<typeof StackMd>;
+      expect(cd.vars.a).toMatchObject({
+        __PARSED: true,
+        parts: [{ type: "literal", value: "hi " }, { type: "expression" }],
+      });
+    });
+
+    it("when is pre-parsed", () => {
+      const cd = transformSource(`<Stack when="{isOpen}" />`) as ComponentDef<typeof StackMd>;
+      expect(cd.when).toMatchObject({
+        __PARSED: true,
+        parts: [{ type: "expression" }],
+      });
+    });
+
+    it("content is pre-parsed", () => {
+      const cd = transformSource(`<Stack>hello {a} there!</Stack>`) as ComponentDef<typeof StackMd>;
+      const child = cd.children![0] as ComponentDef;
+      expect(child.type).equal("TextNode");
+      expect(child.props.value).toMatchObject({
+        __PARSED: true,
+        parts: [
+          { type: "literal", value: "hello " },
+          { type: "expression" },
+          { type: "literal", value: " there!" },
+        ],
+      });
+    });
+
+    it("helper content (item) is pre-parsed", () => {
+      const cd = transformSource(
+        `<Stack><property name="foo"><item>hello {a}</item></property></Stack>`,
+      ) as ComponentDef<typeof StackMd>;
+      expect(cd.props.foo).toHaveLength(1);
+      expect(cd.props.foo[0]).toMatchObject({
+        __PARSED: true,
+        parts: [{ type: "literal", value: "hello " }, { type: "expression" }],
+      });
+    });
   });
 });

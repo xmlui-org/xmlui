@@ -6,7 +6,19 @@ import { Parser } from "../scripting/Parser";
 import { CharacterCodes } from "./CharacterCodes";
 import type { GetText } from "./parser";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
+import type {
+  ExpressionSection,
+  StringLiteralSection,
+} from "../../components-core/script-runner/ParameterParser";
+import { parseParameterString } from "../../components-core/script-runner/ParameterParser";
 import { DIAGS_TRANSFORM, TransformDiag, type TransformDiagPositionless } from "./diagnostics";
+import {
+  Expression,
+  Literal,
+  T_LITERAL,
+  TemplateLiteralExpression,
+} from "../../components-core/script-runner/ScriptingSourceTree";
+import { T_TEMPLATE_LITERAL_EXPRESSION } from "../scripting/ScriptingNodeTypes";
 
 export const COMPOUND_COMP_ID = "Component";
 export const UCRegex = /^[A-Z]/;
@@ -258,7 +270,7 @@ export function nodeToComponentDef(
 
       // --- Single text element, consider it a child name
       if (child.kind === SyntaxKind.TextNode && !isCompound) {
-        comp.children = mergeValue(comp.children, getText(child));
+        comp.children = mergeValue(comp.children, parseBinding(getText(child), child));
         return;
       }
 
@@ -422,7 +434,7 @@ export function nodeToComponentDef(
         comp.testId = value;
         return;
       case "when":
-        comp.when = value;
+        comp.when = parseBinding(value, attrValueStringNode);
         return;
       case "uses":
         comp.uses = splitUsesValue(value);
@@ -431,6 +443,7 @@ export function nodeToComponentDef(
         if (startSegment === "var") {
           comp.vars ??= {};
           comp.vars[name] = value;
+          // comp.vars[name] = parseBinding(value, attrValueStringNode);
         } else if (startSegment === "method") {
           comp.api ??= {};
           comp.api[name] = value;
@@ -443,7 +456,8 @@ export function nodeToComponentDef(
           comp.events[eventName] = parseEvent(value, attrValueStringNode);
         } else {
           comp.props ??= {};
-          comp.props[name] = value;
+          // comp.props[name] = value;
+          comp.props[name] = parseBinding(value, attrValueStringNode);
         }
         return;
     }
@@ -458,7 +472,7 @@ export function nodeToComponentDef(
 
     children.forEach((child) => {
       if (child.kind === SyntaxKind.TextNode) {
-        result = mergeValue(result, getText(child));
+        result = mergeValue(result, parseBinding(getText(child), child));
         return;
       }
 
@@ -1027,6 +1041,65 @@ export function nodeToComponentDef(
           text: getText(node) + getText(nextNode),
         } as TransformNode;
         childNodes.pop();
+      }
+    }
+  }
+
+  function parseBinding(value: string, nodeContainingValue: Node): string | Expression {
+    if (typeof value !== "string") {
+      return value;
+    }
+
+    try {
+      const parts = parseParameterString(value);
+      // --- The param is an empty string, retrieve it
+      if (parts.length === 0) {
+        return value;
+      }
+
+      // --- Cut the first segment, if it is whitespace-only
+      if (parts[0].type === "literal" && parts[0].value.trim() === "") {
+        parts.shift();
+      }
+      if (parts.length === 0) {
+        // --- The value is an empty string, retrieve it
+        return value;
+      }
+
+      // --- Cut the last segment, if it is whitespace-only
+      const lastSegment = parts[parts.length - 1];
+      if (lastSegment.type === "literal" && lastSegment.value.trim() === "") {
+        parts.pop();
+      }
+      if (parts.length === 0) {
+        // --- The value is an empty string, retrieve it
+        return value;
+      }
+
+      const segments = parts.map((part) => {
+        if (part.type === "expression") {
+          return part.value;
+        } else {
+          return {
+            type: T_LITERAL,
+            value: part.value,
+          } as Literal;
+        }
+      });
+      return {
+        type: T_TEMPLATE_LITERAL_EXPRESSION,
+        segments,
+      } as TemplateLiteralExpression;
+    } catch (err: any) {
+      if (nodeContainingValue) {
+        reportError(
+          {
+            code: "T022",
+            message: err.message,
+          },
+          nodeContainingValue.pos,
+          nodeContainingValue.end,
+        );
       }
     }
   }

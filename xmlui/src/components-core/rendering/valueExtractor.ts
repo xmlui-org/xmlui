@@ -12,6 +12,7 @@ import { extractParam } from "../utils/extractParam";
 import { StyleParser, toCssVar } from "../../parsers/style-parser/StyleParser";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import type { ComponentApi } from "../../abstractions/ApiDefs";
+import { T_TEMPLATE_LITERAL_EXPRESSION } from "../../parsers/scripting/ScriptingNodeTypes";
 
 function parseStringArray(input: string): string[] {
   const trimmedInput = input.trim();
@@ -110,18 +111,9 @@ export function createValueExtractor(
     }
 
     if (!memoedVarsRef.current.has(expressionString)) {
-      const params = collectParams(expression);
       memoedVarsRef.current.set(expressionString, {
         getDependencies: memoizeOne((_expressionString, referenceTrackedApi) => {
-          let ret = new Set<string>();
-          params.forEach((param) => {
-            if (param.type === "expression") {
-              ret = new Set([
-                ...ret,
-                ...collectVariableDependencies(param.value, referenceTrackedApi),
-              ]);
-            }
-          });
+          const ret = new Set([...collectVariableDependencies(expression, referenceTrackedApi)]);
           return Array.from(ret);
         }),
         obtainValue: memoizeOne(

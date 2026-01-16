@@ -6,7 +6,7 @@ import { Parser } from "../../parsers/scripting/Parser";
  * @param source String to parse
  * @returns Parameter string sections
  */
-export function parseParameterString (source: string): (StringLiteralSection | ExpressionSection)[] {
+export function parseParameterString(source: string): (StringLiteralSection | ExpressionSection)[] {
   const result: (StringLiteralSection | ExpressionSection)[] = [];
   if (source === undefined || source === null) return result;
 
@@ -25,7 +25,7 @@ export function parseParameterString (source: string): (StringLiteralSection | E
           if (section !== "") {
             result.push({
               type: "literal",
-              value: section
+              value: section,
             });
           }
           // --- Start a new section
@@ -70,7 +70,7 @@ export function parseParameterString (source: string): (StringLiteralSection | E
           // --- Successfully parsed expression
           result.push({
             type: "expression",
-            value: expr!
+            value: expr!,
           });
 
           // --- Skip the parsed part of the expression, and start a new literal section
@@ -88,20 +88,20 @@ export function parseParameterString (source: string): (StringLiteralSection | E
       if (section !== "") {
         result.push({
           type: "literal",
-          value: section
+          value: section,
         });
       }
       break;
     case ParsePhase.Escape:
       result.push({
         type: "literal",
-        value: section + escape
+        value: section + escape,
       });
       break;
     case ParsePhase.ExprStart:
       result.push({
         type: "literal",
-        value: section + "{"
+        value: section + "{",
       });
       break;
   }
@@ -113,19 +113,19 @@ export function parseParameterString (source: string): (StringLiteralSection | E
 enum ParsePhase {
   StringLiteral,
   Escape,
-  ExprStart
+  ExprStart,
 }
 /**
  * Represents a literal segment
  */
-type StringLiteralSection = {
+export type StringLiteralSection = {
   type: "literal";
 
   // --- The string literal
   value: string;
 };
 
-type ExpressionSection = {
+export type ExpressionSection = {
   type: "expression";
 
   // --- The expression string to parse

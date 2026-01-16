@@ -307,6 +307,6 @@ var b = 2;
     expect(child.children![0].type).equal("Stack");
     expect(child.children![0].children!.length).equal(1);
     const textNode = child.children![0].children![0];
-    expect((textNode.props as any).value).equal("{uppercaseItem}");
+    expect((textNode.props as any).value).toMatchObject({ __PARSED: true });
   });
 });

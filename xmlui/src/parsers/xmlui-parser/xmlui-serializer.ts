@@ -356,10 +356,7 @@ export class XmlUiHelper {
       } as XmlUiElement;
     }
 
-    const nested: XmlUiFragment = this.transformSimpleComponentDefinition(
-      def.component,
-      options,
-    );
+    const nested: XmlUiFragment = this.transformSimpleComponentDefinition(def.component, options);
     const componentNode: XmlUiElement = {
       type: "XmlUiElement",
       name: COMPOUND_COMP_ID,
