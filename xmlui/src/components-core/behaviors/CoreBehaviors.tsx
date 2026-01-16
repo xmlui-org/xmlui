@@ -314,6 +314,8 @@ const FORM_BINDABLE_COMPONENTS = [
   "Select",
   "AutoComplete",
   "DatePicker",
+  "DateInput",
+  "TimeInput",
   "RadioGroup",
   "Slider",
   "ColorPicker",
@@ -522,6 +524,9 @@ export const formBindingBehavior: Behavior = {
     const requiredIndicator = extractValue.asOptionalString(
       componentNode.props?.requiredIndicator,
     ) as RequiredIndicatorMode | undefined;
+    const verboseValidationFeedback = extractValue.asOptionalBoolean(
+      componentNode.props?.verboseValidationFeedback,
+    );
 
     // Label props (optional, for standalone use)
     const label = extractValue.asOptionalString(componentNode.props?.label);
@@ -570,6 +575,7 @@ export const formBindingBehavior: Behavior = {
         labelBreak={labelBreak}
         enabled={enabled}
         requiredIndicator={requiredIndicator}
+        verboseValidationFeedback={verboseValidationFeedback}
       >
         {node as ReactElement}
       </FormBindingWrapper>

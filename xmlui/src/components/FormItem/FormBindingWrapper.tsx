@@ -52,6 +52,7 @@ type FormBindingWrapperProps = {
   style?: CSSProperties;
   className?: string;
   registerComponentApi?: RegisterComponentApiFn;
+  verboseValidationFeedback?: boolean;
 };
 
 export function FormBindingWrapper({
@@ -72,6 +73,7 @@ export function FormBindingWrapper({
   style,
   className,
   registerComponentApi,
+  verboseValidationFeedback: verboseValidationFeedbackFromProps,
 }: FormBindingWrapperProps) {
   const validations = useShallowCompareMemoize(validationsInput);
   const defaultId = useId();
@@ -131,7 +133,7 @@ export function FormBindingWrapper({
   const childVerboseValidationFeedback = (children as any)?.props?.verboseValidationFeedback;
   const verboseValidationFeedback = isForcedVerbose
     ? true
-    : (childVerboseValidationFeedback ?? contextVerboseValidationFeedback ?? true);
+    : (verboseValidationFeedbackFromProps ?? childVerboseValidationFeedback ?? contextVerboseValidationFeedback ?? true);
 
   const isEnabled = enabled && formEnabled;
 
