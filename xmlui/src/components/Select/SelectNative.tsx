@@ -780,7 +780,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
               </Part>
               <Portal container={root}>
                 <PopoverContent
-                  style={{ minWidth: panelWidth, height: dropdownHeight || "280px" }}
+                  style={{ minWidth: panelWidth, height: dropdownHeight }}
                   className={classnames(styles.selectContent, styles[validationStatus])}
                   onKeyDown={handleKeyDown}
                 >

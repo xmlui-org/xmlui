@@ -232,6 +232,7 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     display: flex;
     align-items: center;
     flex-shrink: 0;
+    gap: t.$space-1_5;
   }
 
   .action {
