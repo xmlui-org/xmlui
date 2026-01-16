@@ -682,6 +682,9 @@ test.describe("Validation Feedback", () => {
     // Select any enabled date (usually first available in current view)
     await page.locator("[role='gridcell']:not([aria-disabled='true'])").first().click();
     
+    // Blur to ensure validation triggers if needed
+    await page.getByTestId("input").blur();
+
     const conciseFeedback = page.locator("[data-part-id='verboseValidationFeedback']");
     await expect(conciseFeedback).toBeVisible();
     await expect(conciseFeedback.locator("[data-icon-name='checkmark']")).toBeVisible();
