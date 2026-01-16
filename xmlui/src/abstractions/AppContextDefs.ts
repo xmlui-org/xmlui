@@ -142,6 +142,52 @@ export type AppContextObject = {
   sum: (values: number[]) => number;
 
   // ==============================================================================================
+  // Currency Utilities
+
+  // This function formats a number as currency using locale-aware formatting.
+  // Returns an empty string if the value is invalid.
+  currencyFormat: (
+    value: number | string | null | undefined,
+    currency: string,
+    locale?: string,
+    options?: Partial<Intl.NumberFormatOptions>
+  ) => string;
+
+  // This function parses a currency string to a numeric value.
+  // Handles various currency formats from different locales.
+  // Returns null if the value cannot be parsed.
+  currencyToNumber: (
+    value: string | number | null | undefined,
+    locale?: string
+  ) => number | null;
+
+  // This function validates a currency value against specified constraints.
+  // Returns an object with isValid flag, optional error message, and parsed value.
+  currencyValidate: (
+    value: string | number | null | undefined,
+    options?: {
+      required?: boolean;
+      min?: number;
+      max?: number;
+      allowNegative?: boolean;
+    }
+  ) => {
+    isValid: boolean;
+    invalidMessage?: string;
+    value?: number | null;
+  };
+
+  // This function converts an amount from one currency to another using a provided exchange rate.
+  // Returns null if the amount or exchange rate is invalid.
+  currencyConvert: (
+    amount: number | string | null | undefined,
+    fromCurrency: string,
+    toCurrency: string,
+    exchangeRate: number,
+    decimals?: number
+  ) => number | null;
+
+  // ==============================================================================================
   // File Utilities
 
   // This function returns the specified file size in a compact form, such as

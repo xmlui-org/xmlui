@@ -27,6 +27,7 @@ import { useDebugView } from "../DebugViewProvider";
 import { miscellaneousUtils } from "../appContext/misc-utils";
 import { dateFunctions } from "../appContext/date-functions";
 import { mathFunctions } from "../appContext/math-function";
+import { currencyFunctions } from "../appContext/currency-functions";
 import { TableOfContentsContext } from "../TableOfContentsContext";
 import { AppContext } from "../AppContext";
 import type { GlobalProps } from "./AppRoot";
@@ -420,6 +421,9 @@ export function AppContent({
 
       // --- Math-related
       ...mathFunctions,
+
+      // --- Currency-related
+      ...currencyFunctions,
 
       // --- File Utilities
       formatFileSizeInBytes,
