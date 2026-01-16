@@ -177,7 +177,6 @@ function createErrorReportComponent(
               },
             ],
           },
-          ,
         ];
 
         if (errorStartInContext >= lineStart && errorStartInContext < lineEnd) {
