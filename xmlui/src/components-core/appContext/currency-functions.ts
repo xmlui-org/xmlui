@@ -1,4 +1,4 @@
-import getUserLocale from 'get-user-locale';
+import getUserLocale from "get-user-locale";
 
 /**
  * Cache for currency formatters to improve performance
@@ -13,7 +13,7 @@ const currencyFormatterCache = new Map<string, Map<string, Intl.NumberFormat>>()
  * @param locale Optional locale (defaults to user's browser locale)
  * @param options Optional Intl.NumberFormatOptions for customization
  * @returns Formatted currency string
- * 
+ *
  * @example
  * currencyFormat(1234.56, 'USD') // "$1,234.56"
  * currencyFormat(1234.56, 'EUR', 'de-DE') // "1.234,56 €"
@@ -23,23 +23,23 @@ function currencyFormat(
   value: number | string | null | undefined,
   currency: string,
   locale?: string,
-  options?: Partial<Intl.NumberFormatOptions>
+  options?: Partial<Intl.NumberFormatOptions>,
 ): string {
   // Handle null/undefined/empty
-  if (value === null || value === undefined || value === '') {
-    return '';
+  if (value === null || value === undefined || value === "") {
+    return "";
   }
 
   // Convert string to number
-  const numericValue = typeof value === 'string' ? parseFloat(value) : value;
-  
+  const numericValue = typeof value === "string" ? parseFloat(value) : value;
+
   if (isNaN(numericValue)) {
     console.warn(`currencyFormat: Invalid numeric value "${value}"`);
-    return '';
+    return "";
   }
 
   const localeWithDefault = locale || getUserLocale();
-  
+
   // Create cache key from currency and options
   const cacheKey = `${currency}:${JSON.stringify(options || {})}`;
 
@@ -53,7 +53,7 @@ function currencyFormat(
   // Create or retrieve cached formatter
   if (!localeCache.has(cacheKey)) {
     const formatter = new Intl.NumberFormat(localeWithDefault, {
-      style: 'currency',
+      style: "currency",
       currency: currency,
       ...options,
     });
@@ -69,7 +69,7 @@ function currencyFormat(
  * @param value The currency string to parse (can also be a number)
  * @param locale Optional locale for parsing hints
  * @returns Numeric value or null if invalid
- * 
+ *
  * @example
  * currencyToNumber('$1,234.56') // 1234.56
  * currencyToNumber('1.234,56 €', 'de-DE') // 1234.56
@@ -78,53 +78,53 @@ function currencyFormat(
  */
 function currencyToNumber(
   value: string | number | null | undefined,
-  locale?: string
+  locale?: string,
 ): number | null {
   // Handle null/undefined/empty
-  if (value === null || value === undefined || value === '') {
+  if (value === null || value === undefined || value === "") {
     return null;
   }
 
   // Already a number
-  if (typeof value === 'number') {
+  if (typeof value === "number") {
     return value;
   }
 
   // Get locale-specific separators
   const localeWithDefault = locale || getUserLocale();
   const parts = new Intl.NumberFormat(localeWithDefault).formatToParts(1234.5);
-  const group = parts.find((p) => p.type === 'group')?.value || ',';
-  const decimal = parts.find((p) => p.type === 'decimal')?.value || '.';
+  const group = parts.find((p) => p.type === "group")?.value || ",";
+  const decimal = parts.find((p) => p.type === "decimal")?.value || ".";
 
   // Check if value contains parentheses (accounting format for negative)
-  const isNegativeAccounting = value.includes('(') && value.includes(')');
+  const isNegativeAccounting = value.includes("(") && value.includes(")");
 
   // Remove currency symbols, spaces, parentheses, and other non-numeric characters except digits, decimal, group, minus, plus
-  let cleaned = value
-    .replace(/[^\d\-+.,]/g, ''); // Remove currency symbols, letters, parentheses, and spaces
+  let cleaned = value.replace(/[^\d\-+.,]/g, ""); // Remove currency symbols, letters, parentheses, and spaces
 
   // Remove group separators (thousand separators)
-  const groupEscaped = group.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  cleaned = cleaned.replace(new RegExp(groupEscaped, 'g'), '');
+  const groupEscaped = group.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  cleaned = cleaned.replace(new RegExp(groupEscaped, "g"), "");
 
   // Normalize decimal separator to period
-  if (decimal !== '.') {
+  if (decimal !== ".") {
     // Replace the decimal separator with period
     // Only replace the last occurrence to handle cases where both separators might appear
     const lastDecimalIndex = cleaned.lastIndexOf(decimal);
     if (lastDecimalIndex !== -1) {
-      cleaned = cleaned.substring(0, lastDecimalIndex) + '.' + cleaned.substring(lastDecimalIndex + 1);
+      cleaned =
+        cleaned.substring(0, lastDecimalIndex) + "." + cleaned.substring(lastDecimalIndex + 1);
     }
   }
 
   // Remove any remaining non-numeric characters except minus, plus, and period
-  cleaned = cleaned.replace(/[^\d\-+.]/g, '');
+  cleaned = cleaned.replace(/[^\d\-+.]/g, "");
 
   const parsed = parseFloat(cleaned);
-  
+
   // Apply negative sign if accounting format
   const result = isNegativeAccounting && parsed > 0 ? -parsed : parsed;
-  
+
   return isNaN(result) ? null : result;
 }
 
@@ -133,15 +133,15 @@ function currencyToNumber(
  * @param value The value to validate
  * @param options Validation options
  * @returns Validation result object with isValid flag, optional error message, and parsed value
- * 
+ *
  * @example
- * currencyValidate('$100', { required: true, min: 0 }) 
+ * currencyValidate('$100', { required: true, min: 0 })
  * // { isValid: true, value: 100 }
- * 
- * currencyValidate('', { required: true }) 
+ *
+ * currencyValidate('', { required: true })
  * // { isValid: false, invalidMessage: 'Currency value is required', value: null }
- * 
- * currencyValidate('-$50', { allowNegative: false }) 
+ *
+ * currencyValidate('-$50', { allowNegative: false })
  * // { isValid: false, invalidMessage: 'Negative values are not allowed', value: -50 }
  */
 function currencyValidate(
@@ -151,7 +151,7 @@ function currencyValidate(
     min?: number;
     max?: number;
     allowNegative?: boolean;
-  } = {}
+  } = {},
 ): {
   isValid: boolean;
   invalidMessage?: string;
@@ -160,11 +160,11 @@ function currencyValidate(
   const { required = false, min, max, allowNegative = false } = options;
 
   // Check if empty
-  if (value === null || value === undefined || value === '') {
+  if (value === null || value === undefined || value === "") {
     if (required) {
       return {
         isValid: false,
-        invalidMessage: 'Currency value is required',
+        invalidMessage: "Currency value is required",
         value: null,
       };
     }
@@ -177,7 +177,7 @@ function currencyValidate(
   if (numericValue === null) {
     return {
       isValid: false,
-      invalidMessage: 'Invalid currency format',
+      invalidMessage: "Invalid currency format",
       value: null,
     };
   }
@@ -186,7 +186,7 @@ function currencyValidate(
   if (!allowNegative && numericValue < 0) {
     return {
       isValid: false,
-      invalidMessage: 'Negative values are not allowed',
+      invalidMessage: "Negative values are not allowed",
       value: numericValue,
     };
   }
@@ -212,60 +212,67 @@ function currencyValidate(
   return { isValid: true, value: numericValue };
 }
 
+// TODO: Need to rethink this, since it is difficult to design a good user-facing currency conversion function
 /**
  * Converts an amount from one currency to another using a provided exchange rate
- * @param amount The amount to convert
- * @param fromCurrency The source currency code (for reference, not used in calculation)
- * @param toCurrency The target currency code (for reference, not used in calculation)
+ * Parses formatted currency input, converts it, and formats it in the target currency
+ * @param amount The amount to convert (can be formatted string or number)
+ * @param fromCurrency The source currency code (e.g., 'USD')
+ * @param toCurrency The target currency code (e.g., 'EUR')
  * @param exchangeRate The exchange rate to apply (1 fromCurrency = exchangeRate toCurrency)
- * @param decimals Optional number of decimal places to round to (preserves full precision if not provided)
- * @returns Converted amount
- * 
+ * @param locale Optional locale for formatting the result (defaults to user's browser locale)
+ * @param decimals Optional number of decimal places to display (uses currency defaults if not provided)
+ * @returns Formatted currency string in target currency, or empty string if invalid
+ *
  * @example
- * currencyConvert(100, 'USD', 'EUR', 0.85) // 85
- * currencyConvert(100, 'USD', 'EUR', 0.85234, 2) // 85.23
- * currencyConvert(50, 'GBP', 'USD', 1.27) // 63.5
- * currencyConvert(50, 'GBP', 'USD', 1.27456, 4) // 63.7280
+ * currencyConvert(100, 'USD', 'EUR', 0.85) // "€85.00"
+ * currencyConvert('$100.00', 'USD', 'EUR', 0.85234, 'en-US', 2) // "€85.23"
+ * currencyConvert(50, 'GBP', 'USD', 1.27, 'en-US') // "$63.50"
+ * currencyConvert('£50.00', 'GBP', 'USD', 1.27456, 'en-US', 4) // "$63.7280"
  */
 function currencyConvert(
   amount: number | string | null | undefined,
   fromCurrency: string,
   toCurrency: string,
   exchangeRate: number,
-  decimals?: number
-): number | null {
+  locale?: string,
+  decimals?: number,
+): string {
   // Handle null/undefined/empty
-  if (amount === null || amount === undefined || amount === '') {
-    return null;
+  if (amount === null || amount === undefined || amount === "") {
+    return "";
   }
 
   // Convert to number if string
-  const numericAmount = typeof amount === 'string' ? currencyToNumber(amount) : amount;
+  const numericAmount = typeof amount === "string" ? currencyToNumber(amount) : amount;
 
   if (numericAmount === null || isNaN(numericAmount)) {
     console.warn(`currencyConvert: Invalid amount "${amount}"`);
-    return null;
+    return "";
   }
 
-  if (typeof exchangeRate !== 'number' || isNaN(exchangeRate)) {
+  if (typeof exchangeRate !== "number" || isNaN(exchangeRate)) {
     console.warn(`currencyConvert: Invalid exchange rate "${exchangeRate}"`);
-    return null;
+    return "";
   }
 
   // Perform conversion
   const converted = numericAmount * exchangeRate;
 
-  // Apply decimal rounding if specified
+  // Build formatting options
+  const formatOptions: Partial<Intl.NumberFormatOptions> = {};
   if (decimals !== undefined) {
-    return Number(converted.toFixed(decimals));
+    formatOptions.minimumFractionDigits = decimals;
+    formatOptions.maximumFractionDigits = decimals;
   }
 
-  return converted;
+  // Format as target currency
+  return currencyFormat(converted, toCurrency, locale, formatOptions);
 }
 
 export const currencyFunctions = {
   currencyFormat,
   currencyToNumber,
   currencyValidate,
-  currencyConvert,
+  //currencyConvert,
 };

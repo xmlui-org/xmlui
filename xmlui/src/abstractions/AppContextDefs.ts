@@ -177,15 +177,18 @@ export type AppContextObject = {
     value?: number | null;
   };
 
+  // TODO: Revise, see currency-functions.ts
   // This function converts an amount from one currency to another using a provided exchange rate.
-  // Returns null if the amount or exchange rate is invalid.
-  currencyConvert: (
+  // Parses formatted currency input, converts it, and formats it in the target currency.
+  // Returns an empty string if the amount or exchange rate is invalid.
+  /* currencyConvert: (
     amount: number | string | null | undefined,
     fromCurrency: string,
     toCurrency: string,
     exchangeRate: number,
+    locale?: string,
     decimals?: number
-  ) => number | null;
+  ) => string; */
 
   // ==============================================================================================
   // File Utilities
