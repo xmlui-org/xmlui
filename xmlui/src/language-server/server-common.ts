@@ -10,49 +10,54 @@ import {
   TextDocumentSyncKind,
   DidChangeConfigurationNotification,
   TextDocuments,
+  DidChangeWatchedFilesNotification,
+  FileChangeType,
 } from "vscode-languageserver";
-import { TextDocument } from "vscode-languageserver-textdocument";
+import { TextDocument } from "./base/text-document";
 import collectedComponentMetadata from "./xmlui-metadata-generated.js";
 import type { XmluiCompletionItem } from "./services/completion";
 import { handleCompletion, handleCompletionResolve } from "./services/completion";
 import { handleHover } from "./services/hover";
 import { handleDocumentFormatting } from "./services/format";
-import { createXmlUiParser, type GetText, type ParseResult } from "../parsers/xmlui-parser/parser";
 import {
   MetadataProvider,
   type ComponentMetadataCollection,
 } from "./services/common/metadata-utils";
 import { getDiagnostics } from "./services/diagnostic";
+import { Project } from "./base/project.js";
+import { handleDefinition } from "./services/definition.js";
+import { ProjectDocumentManager } from "./base/project-document-manager";
+import { fileURLToPath } from "url";
 
 const metaByComp = collectedComponentMetadata as ComponentMetadataCollection;
 const metadataProvider = new MetadataProvider(metaByComp);
 
 export function start(connection: Connection) {
-  // Also include all preview / proposed LSP features.
-  // Create a simple text document manager.
   const documents = new TextDocuments(TextDocument);
+  const documentManager = new ProjectDocumentManager(documents);
+  const project = new Project(documentManager, metadataProvider);
 
   let hasConfigurationCapability = false;
   let hasWorkspaceFolderCapability = false;
-  let hasDiagnosticRelatedInformationCapability = false;
 
   connection.onInitialize((params: InitializeParams) => {
-    connection.console.log("Initializing!");
     const capabilities = params.capabilities;
-
-    // Does the client support the `workspace/configuration` request?
-    // If not, we fall back using global settings.
     hasConfigurationCapability = !!(
       capabilities.workspace && !!capabilities.workspace.configuration
     );
     hasWorkspaceFolderCapability = !!(
       capabilities.workspace && !!capabilities.workspace.workspaceFolders
     );
-    hasDiagnosticRelatedInformationCapability = !!(
-      capabilities.textDocument &&
-      capabilities.textDocument.publishDiagnostics &&
-      capabilities.textDocument.publishDiagnostics.relatedInformation
-    );
+
+    const rootUri = params.workspaceFolders?.[0]?.uri || params.rootUri || null;
+    if (rootUri) {
+      try {
+        const rootPath = fileURLToPath(rootUri);
+        documentManager.scan(rootPath).catch((err) => connection.console.error(String(err)));
+      } catch (e) {
+        connection.console.error(`Failed to scan workspace: ${e}`);
+      }
+    }
 
     const result: InitializeResult = {
       capabilities: {
@@ -63,6 +68,7 @@ export function start(connection: Connection) {
         },
         hoverProvider: true,
         documentFormattingProvider: true,
+        definitionProvider: true,
       },
     };
     if (hasWorkspaceFolderCapability) {
@@ -77,31 +83,33 @@ export function start(connection: Connection) {
 
   connection.onInitialized(() => {
     if (hasConfigurationCapability) {
-      // Register for all configuration changes.
       void connection.client.register(DidChangeConfigurationNotification.type, undefined);
     }
-    if (hasWorkspaceFolderCapability) {
-      connection.workspace.onDidChangeWorkspaceFolders((_event) => {
-        connection.console.log("Workspace folder change event received.");
-      });
+
+    // Register for file watchers to keep our manager up to date
+    void connection.client.register(DidChangeWatchedFilesNotification.type, {
+      watchers: [{ globPattern: "**/*.xmlui" }],
+    });
+  });
+
+  connection.onDidChangeWatchedFiles((params) => {
+    for (const change of params.changes) {
+      switch (change.type) {
+        case FileChangeType.Created:
+          documentManager.markCreated(change.uri);
+          break;
+        case FileChangeType.Changed:
+          documentManager.markChanged(change.uri);
+          break;
+        case FileChangeType.Deleted:
+          documentManager.markDeleted(change.uri);
+          break;
+      }
     }
   });
 
   connection.onCompletion(({ position, textDocument }: TextDocumentPositionParams) => {
-    const document = documents.get(textDocument.uri);
-    if (!document) {
-      return [];
-    }
-    const parseResult = parseDocument(document);
-    return handleCompletion(
-      {
-        parseResult: parseResult.parseResult,
-        getText: parseResult.getText,
-        metaByComp: metadataProvider,
-        offsetToPos: (offset: number) => document.positionAt(offset),
-      },
-      document.offsetAt(position),
-    );
+    return handleCompletion(project, textDocument.uri, position);
   });
 
   connection.onCompletionResolve((completionItem: XmluiCompletionItem) => {
@@ -109,87 +117,26 @@ export function start(connection: Connection) {
   });
 
   connection.onHover(({ position, textDocument }: HoverParams) => {
-    const document = documents.get(textDocument.uri);
-    if (!document) {
-      return null;
-    }
+    return handleHover(project, textDocument.uri, position);
+  });
 
-    const { parseResult, getText } = parseDocument(document);
-    const ctx = {
-      node: parseResult.node,
-      getText,
-      metaByComp: metadataProvider,
-      offsetToPosition: (offset: number) => document.positionAt(offset),
-    };
-    return handleHover(ctx, document.offsetAt(position));
+  connection.onDefinition(({ position, textDocument }) => {
+    return handleDefinition(project, textDocument.uri, position);
   });
 
   connection.onDocumentFormatting(({ textDocument, options }: DocumentFormattingParams) => {
-    const document = documents.get(textDocument.uri);
-    if (!document) {
-      return null;
-    }
-    const {
-      parseResult: { node },
-      getText,
-    } = parseDocument(document);
-    return handleDocumentFormatting({
-      node,
-      getText,
-      options,
-      offsetToPosition: (offset) => document.positionAt(offset),
-    });
+    return handleDocumentFormatting(project, textDocument.uri, options);
   });
 
-  const parsedDocuments = new Map();
-  function parseDocument(document: TextDocument): {
-    parseResult: ParseResult;
-    getText: GetText;
-  } {
-    const parseForDoc = parsedDocuments.get(document.uri);
-    if (parseForDoc !== undefined) {
-      if (parseForDoc.version === document.version) {
-        return {
-          parseResult: parseForDoc.parseResult,
-          getText: parseForDoc.getText,
-        };
-      }
-    }
-    const parser = createXmlUiParser(document.getText());
-    const parseResult = parser.parse();
-    parsedDocuments.set(document.uri, {
-      parseResult,
-      version: document.version,
-      getText: parser.getText,
-    });
-    return { parseResult, getText: parser.getText };
-  }
-  documents.onDidClose(({ document }) => {
-    parsedDocuments.delete(document.uri);
-  });
-
-  documents.onDidChangeContent(handleDocunentContentChange);
-
-  function handleDocunentContentChange({ document }: { document: TextDocument }) {
-    const { parseResult } = parseDocument(document);
-    const ctx = {
-      parseResult,
-      offsetToPos: (offset: number) => document.positionAt(offset),
-    };
-
-    const diagnostics = getDiagnostics(ctx);
+  documents.onDidChangeContent(({ document }) => {
+    const diagnostics = getDiagnostics(project, document.uri);
     void connection.sendDiagnostics({
       version: document.version,
       uri: document.uri,
       diagnostics,
     });
-  }
+  });
 
-  // Make the text document manager listen on the connection
-  // for open, change and close text document events
   documents.listen(connection);
-
-  // Listen on the connection
-  console.log("starting to listen");
   connection.listen();
 }

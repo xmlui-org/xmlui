@@ -1110,18 +1110,21 @@ test.describe("Basic Functionality", () => {
         <Table data='{${JSON.stringify(sampleData)}}' alwaysShowSortingIndicator="true" testId="table">
           <Column bindTo="name" header="Name" canSort="true"/>
           <Column bindTo="quantity" header="Quantity" canSort="true"/>
+          <Column bindTo="category" header="Category" canSort="true"/>
         </Table>
       `);
       
       const nameHeader = page.getByRole("button").filter({ hasText: "Name" }).first();
       const quantityHeader = page.getByRole("button").filter({ hasText: "Quantity" }).first();
+      const categoryHeader = page.getByRole("button").filter({ hasText: "Category" }).first();
       
       // Click to sort by name
       await nameHeader.click();
       
-      // Both indicators should still be visible
+      // All sortable column indicators should still be visible after sorting
       await expect(nameHeader.locator("[data-part-id='orderIndicator']")).toBeVisible();
       await expect(quantityHeader.locator("[data-part-id='orderIndicator']")).toBeVisible();
+      await expect(categoryHeader.locator("[data-part-id='orderIndicator']")).toBeVisible();
     });
 
     test("non-sortable columns do not show indicators even with alwaysShowSortingIndicator", async ({ initTestBed, page }) => {

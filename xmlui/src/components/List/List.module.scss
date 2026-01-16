@@ -7,15 +7,15 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$component: "List";
-$backgroundColor-List: createThemeVar("backgroundColor-#{$component}");
+$component: "List2";
+$backgroundColor-List2: createThemeVar("backgroundColor-#{$component}");
 
 @layer components {
   .outerListWrapper {
     overflow: auto;
     //max-height: 100%;
     overflow-anchor: none;
-    background-color: $backgroundColor-List;
+    background-color: $backgroundColor-List2;
 
     &.hasOutsideScroll {
       overflow: visible; // Let content overflow so parent can scroll
@@ -30,7 +30,6 @@ $backgroundColor-List: createThemeVar("backgroundColor-#{$component}");
   }
 
   .innerListWrapper {
-    visibility: hidden;
     display: flex;
     flex-direction: column;
     min-height: 100%;

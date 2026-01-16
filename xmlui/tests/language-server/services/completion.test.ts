@@ -2,14 +2,15 @@ import { describe, expect, it } from "vitest";
 import {
   handleCompletion,
   handleCompletionResolve,
-} from "../../src/language-server/services/completion";
-import { mockMetadata, mockMetadataProvider } from "./mockData";
+} from "../../../src/language-server/services/completion";
+import { mockMetadata, mockMetadataProvider } from "../mockData";
 import type { CompletionItem, MarkupContent } from "vscode-languageserver";
 import { CompletionItemKind } from "vscode-languageserver";
-import { layoutOptionKeys } from "../../src/components-core/descriptorHelper";
-import { capitalizeFirstLetter } from "../../src/components-core/utils/misc";
-import { createXmlUiParser } from "../../src/parsers/xmlui-parser";
-import { createDocumentCursor } from "../../src/components-core/xmlui-parser";
+import { layoutOptionKeys } from "../../../src/components-core/descriptorHelper";
+import { capitalizeFirstLetter } from "../../../src/components-core/utils/misc";
+import { createXmlUiParser } from "../../../src/parsers/xmlui-parser";
+import { TextDocument } from "../../../src/language-server/base/text-document";
+import { Project } from "../../../src/language-server/base/project";
 
 describe("Completion", () => {
   it("lists all component names after '<'", () => {
@@ -193,17 +194,11 @@ function completeAtPoundSign(source: string) {
     );
   }
   source = source.replace(cursorIndicator, "");
-  const parser = createXmlUiParser(source);
-
-  return handleCompletion(
-    {
-      getText: parser.getText,
-      parseResult: parser.parse(),
-      metaByComp: mockMetadataProvider,
-      offsetToPos: createDocumentCursor(source).offsetToPos,
-    },
-    position,
-  );
+  const uri = "file://test.xmlui";
+  const project = Project.fromFileContets({ [uri]: source }, mockMetadataProvider);
+  const document = project.documents.get(uri);
+  const charPosition = document.cursor.positionAt(position);
+  return handleCompletion(project, uri, charPosition);
 }
 
 function expectToContainExactly<T>(actual: T[], expected: T[]) {

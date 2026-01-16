@@ -33,6 +33,7 @@ import {
 } from "./Heading/Heading";
 import { textComponentRenderer } from "./Text/Text";
 import { fragmentComponentRenderer } from "./Fragment/Fragment";
+import { messageListenerComponentRenderer } from "./MessageListener/MessageListener";
 import { tableComponentRenderer } from "./Table/Table";
 import { stickyBoxComponentRenderer } from "./StickyBox/StickyBox";
 import { badgeComponentRenderer } from "./Badge/Badge";
@@ -440,6 +441,9 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_Fragment !== "false") {
       this.registerCoreComponent(fragmentComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_MessageListener !== "false") {
+      this.registerCoreComponent(messageListenerComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Table !== "false") {
       this.registerCoreComponent(tableComponentRenderer);

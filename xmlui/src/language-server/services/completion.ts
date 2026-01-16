@@ -1,7 +1,7 @@
 import type { MarkupContent, CompletionItem, Position } from "vscode-languageserver";
 import { CompletionItemKind, MarkupKind } from "vscode-languageserver";
 import type { GetText, ParseResult } from "../../parsers/xmlui-parser/parser";
-import { findTokenAtPos } from "../../parsers/xmlui-parser/utils";
+import { findTokenAtOffset } from "../../parsers/xmlui-parser/utils";
 import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import * as docGen from "./common/docs-generation";
@@ -18,6 +18,8 @@ import {
   type MetadataProvider,
   type TaggedAttribute,
 } from "./common/metadata-utils";
+import type { Project } from "../base/project";
+import type { DocumentUri } from "../base/text-document";
 
 type Override<Type, NewType extends { [key in keyof Type]?: NewType[key] }> = Omit<
   Type,
@@ -70,25 +72,29 @@ export function handleCompletionResolve({
   return item;
 }
 
-type CompletionContext = {
-  parseResult: ParseResult;
-  getText: GetText;
-  metaByComp: MetadataProvider;
-  offsetToPos: (offset: number) => Position;
-};
-
 export function handleCompletion(
-  { parseResult: { node }, getText, metaByComp, offsetToPos }: CompletionContext,
-  position: number,
+  project: Project,
+  uri: DocumentUri,
+  position: Position,
 ): XmluiCompletionItem[] | null {
-  const findRes = findTokenAtPos(node, position);
+  const document = project.documents.get(uri);
+  if (!document) {
+    return null;
+  }
+  const offset = document.cursor.offsetAt(position);
+  const { parseResult, getText } = document.parse();
+  const node = parseResult.node;
+  const metaByComp = project.metadataProvider;
+  const offsetToPos = (offset: number) => document.cursor.positionAt(offset);
+
+  const findRes = findTokenAtOffset(node, offset);
   if (!findRes) {
     return null;
   }
   const { chainAtPos, chainBeforePos } = findRes;
 
   if (findRes.chainBeforePos === undefined) {
-    return handleCompletionInsideToken(chainAtPos, position, metaByComp, getText);
+    return handleCompletionInsideToken(chainAtPos, offset, metaByComp, getText);
   }
 
   const nodeBefore = chainBeforePos.at(-1);
@@ -107,7 +113,7 @@ export function handleCompletion(
         const compName = getNameFromElement(matchingNode, getText);
         if (!compName) return defaultCompNames;
 
-        const compNameSuggestion = closingComponentCompletionItem(compName, offsetToPos, position);
+        const compNameSuggestion = closingComponentCompletionItem(compName, offsetToPos, offset);
         return [compNameSuggestion, ...defaultCompNames.map((c) => ({ ...c, sortText: "1" }))];
       }
       return defaultCompNames;
@@ -130,7 +136,7 @@ export function handleCompletion(
       );
       const parentOfnodeBefore = chainBeforePos.at(-2);
       const completeCompName =
-        parentOfnodeBefore?.kind === SyntaxKind.TagNameNode && position === nodeBefore.end;
+        parentOfnodeBefore?.kind === SyntaxKind.TagNameNode && offset === nodeBefore.end;
       if (completeCompName) {
         if (pathToElementNode && insideClosingTag(pathToElementNode)) {
           const compName = getNameFromElement(pathToElementNode.at(-1), getText);

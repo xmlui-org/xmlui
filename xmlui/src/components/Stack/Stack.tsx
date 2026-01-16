@@ -197,7 +197,6 @@ function renderStack({
       reverse={extractValue(node.props?.reverse)}
       hoverContainer={extractValue(node.props?.hoverContainer)}
       visibleOnHover={extractValue(node.props?.visibleOnHover)}
-      stretch={extractValue(node.props?.stretch)}
       className={className}
       onMount={lookupEventHandler("mounted")}
       registerComponentApi={registerComponentApi}

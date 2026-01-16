@@ -40,6 +40,14 @@ export const ListMd = createMetadata({
       type: "string",
       defaultValue: defaultProps.scrollAnchor,
     },
+    fixedItemSize: {
+      description:
+        `When set to \`true\`, the list will measure the height of the first item and use that ` +
+        `as a fixed size hint for all items. This improves scroll performance when all items have ` +
+        `the same height. If items have varying heights, leave this as \`false\`.`,
+      type: "boolean",
+      defaultValue: false,
+    },
     groupBy: d(
       "This property sets which data item property is used to group the list items. If not set, " +
         "no grouping is done.",
@@ -172,6 +180,7 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
         groupsInitiallyExpanded={extractValue.asOptionalBoolean(node.props.groupsInitiallyExpanded)}
         defaultGroups={extractValue(node.props.defaultGroups)}
         borderCollapse={extractValue.asOptionalBoolean(node.props.borderCollapse, true)}
+        fixedItemSize={extractValue.asOptionalBoolean(node.props.fixedItemSize)}
         itemRenderer={
           itemTemplate &&
           ((item, key, rowIndex, count) => {

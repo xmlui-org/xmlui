@@ -1,0 +1,29 @@
+<App>
+  <VStack gap="20px">
+    <Card>
+      <Text style="background-color: lightblue;">
+        <strong>From:</strong> My Name [email@email.com]
+      </Text>
+    </Card>
+    
+    <Card>
+      <Text style="background-color: lightcoral;">
+        <strong>
+          From:
+        </strong>
+        My Name [email@email.com]
+      </Text>
+    </Card>
+    
+    <Card>
+      <HStack gap="10px">
+        <Text style="background-color: lightgreen;">
+          <strong>Label:</strong> Regular text after
+        </Text>
+        <Text style="background-color: lightyellow;">
+          More text
+        </Text>
+      </HStack>
+    </Card>
+  </VStack>
+</App>
