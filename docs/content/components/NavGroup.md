@@ -117,6 +117,19 @@ Look at this example:
 </App>
 ```
 
+### `iconAlignment` (default: "center") [#iconalignment-default-center]
+
+This property controls the vertical alignment of the icon when the label text wraps to multiple lines. Set to `baseline` to align with the first line of text, `start` to align to the top, `center` for middle alignment (default), or `end` for bottom alignment.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `baseline` | Align icon with the first line of text |
+| `start` | Align icon to the top |
+| `center` | Align icon to the center (default) **(default)** |
+| `end` | Align icon to the bottom |
+
 ### `iconHorizontalCollapsed` (default: "chevronright") [#iconhorizontalcollapsed-default-chevronright]
 
 Set a custom icon to display when the navigation menu is collapsed, is in a **horizontal** app layout, and is in a navigation submenu.

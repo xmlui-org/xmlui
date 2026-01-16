@@ -67,6 +67,19 @@ export const NavGroupMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.noIndicator,
     },
+    iconAlignment: {
+      description:
+        `This property controls the vertical alignment of the icon when the label text wraps to multiple lines. ` +
+        `Set to \`baseline\` to align with the first line of text, \`start\` to align to the top, \`center\` for middle alignment (default), or \`end\` for bottom alignment.`,
+      valueType: "string",
+      availableValues: [
+        { value: "baseline", description: "Align icon with the first line of text" },
+        { value: "start", description: "Align icon to the top" },
+        { value: "center", description: "Align icon to the center (default)" },
+        { value: "end", description: "Align icon to the bottom" },
+      ],
+      defaultValue: "center",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -95,6 +108,7 @@ export const navGroupComponentRenderer = createComponentRenderer(
         iconVerticalExpanded={extractValue.asOptionalString(node.props.iconVerticalExpanded)}
         iconHorizontalCollapsed={extractValue.asOptionalString(node.props.iconHorizontalCollapsed)}
         iconVerticalCollapsed={extractValue.asOptionalString(node.props.iconVerticalCollapsed)}
+        iconAlignment={extractValue.asOptionalString(node.props.iconAlignment, "center")}
       />
     );
   },

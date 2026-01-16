@@ -84,9 +84,11 @@ export const XmlUiDocsThemeDefinition: ThemeDefinition = {
     "fontFamily": "Inter Variable",
     "font-feature-settings": "'cv03', 'cv04'",
 
+    // --- Navigation layout
     "width-navPanel-App": "280px",
+    "iconAlignment-NavLink": "baseline",
     "backgroundColor-Text-code": "rgb(from $color-surface-200 r g b / 0.4)",
-    "padding-Text-code": "$space-0_5",
+    "paddingHorizontal-Text-code": "$space-1",
   },
 };
 

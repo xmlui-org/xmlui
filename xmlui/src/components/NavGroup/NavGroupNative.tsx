@@ -54,6 +54,7 @@ type Props = {
   iconHorizontalCollapsed?: string;
   iconVerticalExpanded?: string;
   iconVerticalCollapsed?: string;
+  iconAlignment?: "baseline" | "start" | "center" | "end";
 };
 
 export const defaultProps: Pick<
@@ -86,6 +87,7 @@ export const NavGroup = forwardRef(function NavGroup(
     iconHorizontalExpanded,
     iconVerticalCollapsed,
     iconVerticalExpanded,
+    iconAlignment = "center",
     ...rest
   }: Props,
   ref,
@@ -143,6 +145,7 @@ export const NavGroup = forwardRef(function NavGroup(
           initiallyExpanded={initiallyExpanded}
           disabled={disabled}
           noIndicator={noIndicator}
+          iconAlignment={iconAlignment}
         />
       ) : (
         <DropDownNavGroup
@@ -156,6 +159,7 @@ export const NavGroup = forwardRef(function NavGroup(
           initiallyExpanded={initiallyExpanded}
           disabled={disabled}
           noIndicator={noIndicator}
+          iconAlignment={iconAlignment}
         />
       )}
     </NavGroupContext.Provider>
@@ -172,6 +176,7 @@ type ExpandableNavGroupProps = {
   initiallyExpanded?: boolean;
   disabled?: boolean;
   noIndicator?: boolean;
+  iconAlignment?: "baseline" | "start" | "center" | "end";
 };
 
 const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
@@ -185,6 +190,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
     initiallyExpanded = false,
     disabled = false,
     noIndicator = false,
+    iconAlignment = "center",
     ...rest
   }: ExpandableNavGroupProps,
   ref,
@@ -224,6 +230,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
         to={to}
         disabled={disabled}
         noIndicator={noIndicator}
+        iconAlignment={iconAlignment}
         aria-expanded={expanded}
       >
         {label}
@@ -254,6 +261,7 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     disabled = false,
     initiallyExpanded = false,
     noIndicator = false,
+    iconAlignment = "center",
     ...rest
   }: {
     style?: CSSProperties;
@@ -265,6 +273,7 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     disabled?: boolean;
     initiallyExpanded?: boolean;
     noIndicator?: boolean;
+    iconAlignment?: "baseline" | "start" | "center" | "end";
   },
   ref,
 ) {
@@ -314,6 +323,7 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
           to={to}
           disabled={disabled}
           noIndicator={noIndicator}
+          iconAlignment={iconAlignment}
         >
           {label}
           <div style={{ flex: 1 }} />

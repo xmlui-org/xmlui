@@ -36,6 +36,7 @@ $color-indicator-NavLink: createThemeVar("color-indicator-#{$component}");
 $color-indicator-NavLink--hover: createThemeVar("color-indicator-#{$component}--hover");
 $color-indicator-NavLink--active: createThemeVar("color-indicator-#{$component}--active");
 $color-indicator-NavLink--pressed: createThemeVar("color-indicator-#{$component}--pressed");
+$iconAlignment-NavLink: createThemeVar("iconAlignment-#{$component}");
 
 // Variables for @layer section
 $outlineWidth-NavLink--focus: createThemeVar('outlineWidth-#{$component}--focus');
@@ -206,6 +207,31 @@ $transition: color 0.1s, background-color 0.1s;
     flex: 1;
     white-space: break-spaces;
     overflow-wrap: anywhere;
+
+    &.iconAlignBaseline {
+      align-items: flex-start;
+      
+      & > :first-child {
+        // Center icon with first line of text
+        margin-top: 0.125em;
+      }
+    }
+
+    &.iconAlignStart {
+      align-items: flex-start;
+    }
+
+    &.iconAlignCenter {
+      align-items: center;
+    }
+
+    &.iconAlignEnd {
+      align-items: flex-end;
+    }
+  }
+
+  .icon {
+    flex-shrink: 0;
   }
 }
 

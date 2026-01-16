@@ -12,6 +12,7 @@ import { getAppLayoutOrientation } from "../App/AppNative";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { NavPanelContext } from "../NavPanel/NavPanelNative";
 import { NavGroupContext } from "../NavGroup/NavGroupContext";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 
 // Default props for NavLink component
 export const defaultProps = {
@@ -34,6 +35,7 @@ type Props = {
   className?: string;
   onClick?: MouseEventHandler;
   icon?: React.ReactNode;
+  iconAlignment?: "baseline" | "start" | "center" | "end";
   accessibilityProps?: any;
 } & Pick<React.HTMLAttributes<HTMLAnchorElement>, LinkAria>;
 
@@ -50,12 +52,15 @@ export const NavLink = forwardRef(function NavLink(
     style,
     onClick,
     icon,
+    iconAlignment,
     forceActive,
     className,
     ...rest
   }: Props,
   ref: Ref<any>,
 ) {
+  const { getThemeVar } = useTheme();
+  const effectiveIconAlignment = iconAlignment ?? getThemeVar("iconAlignment-NavLink") ?? "center";
   const appLayoutContext = useAppLayoutContext();
   const layoutIsVertical =
     !!appLayoutContext && getAppLayoutOrientation(appLayoutContext.layout).includes("vertical");
@@ -89,7 +94,12 @@ export const NavLink = forwardRef(function NavLink(
   });
 
   let innerContent = (
-    <div className={styles.innerContent}>
+    <div className={classnames(styles.innerContent, {
+      [styles.iconAlignBaseline]: effectiveIconAlignment === "baseline",
+      [styles.iconAlignStart]: effectiveIconAlignment === "start",
+      [styles.iconAlignCenter]: effectiveIconAlignment === "center",
+      [styles.iconAlignEnd]: effectiveIconAlignment === "end",
+    })}>
       {icon}
       {children}
     </div>

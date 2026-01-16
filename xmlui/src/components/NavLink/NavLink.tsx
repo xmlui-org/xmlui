@@ -62,6 +62,19 @@ export const NavLinkMd = createMetadata({
     icon: d(
       `This property allows you to add an optional icon (specify the icon's name) to the navigation link.`,
     ),
+    iconAlignment: {
+      description:
+        `This property controls the vertical alignment of the icon when the label text wraps to multiple lines. ` +
+        `Set to \`baseline\` to align with the first line of text, \`start\` to align to the top, \`center\` for middle alignment (default), or \`end\` for bottom alignment.`,
+      valueType: "string",
+      availableValues: [
+        { value: "baseline", description: "Align icon with the first line of text" },
+        { value: "start", description: "Align icon to the top" },
+        { value: "center", description: "Align icon to the center (default)" },
+        { value: "end", description: "Align icon to the bottom" },
+      ],
+      defaultValue: "center",
+    },
   },
   events: {
     click: dClick(COMP),
@@ -70,6 +83,8 @@ export const NavLinkMd = createMetadata({
   themeVarDescriptions: {
     [`color-indicator-${COMP}`]:
       "Provides the following states: `--hover`, `--active`, `--pressed`",
+    [`iconAlignment-${COMP}`]:
+      "Sets the default vertical alignment of the icon when the label text wraps to multiple lines. Valid values: `baseline`, `start`, `center`, `end`",
   },
   defaultThemeVars: {
     [`border-${COMP}`]: "0px solid $borderColor",
@@ -114,6 +129,7 @@ export const navLinkComponentRenderer = createComponentRenderer(
         className={className}
         target={extractValue(node.props?.target)}
         icon={<Icon name={iconName} className={styles.icon} />}
+        iconAlignment={extractValue.asOptionalString(node.props.iconAlignment)}
       >
         {extractValue.asDisplayText(node.props.label) || renderChild(node.children)}
       </NavLink>
