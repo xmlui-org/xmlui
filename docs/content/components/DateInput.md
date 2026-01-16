@@ -11,11 +11,15 @@
 
 ## Properties [#properties]
 
-### `autoFocus` (default: false) [#autofocus-default-false]
+### `autoFocus` [#autofocus]
+
+-  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `clearable` (default: false) [#clearable-default-false]
+### `clearable` [#clearable]
+
+-  default: **false**
 
 Whether to show a clear button to reset the input
 
@@ -38,7 +42,9 @@ Icon name for the clear button
 </App>
 ```
 
-### `clearToInitialValue` (default: false) [#cleartoinitialvalue-default-false]
+### `clearToInitialValue` [#cleartoinitialvalue]
+
+-  default: **false**
 
 Whether clearing resets to initial value or null
 
@@ -57,7 +63,9 @@ When `true`, the clear button resets the input to its initial value. When `false
 </App>
 ```
 
-### `dateFormat` (default: "MM/dd/yyyy") [#dateformat-default-mm-dd-yyyy]
+### `dateFormat` [#dateformat]
+
+-  default: **"MM/dd/yyyy"**
 
 The format of the date displayed in the input field
 
@@ -91,7 +99,9 @@ The `dateFormat` prop controls how dates are displayed and entered. Different fo
 
 An optional array of dates that are disabled (compatibility with DatePicker, not used in DateInput)
 
-### `emptyCharacter` (default: "-") [#emptycharacter-default-]
+### `emptyCharacter` [#emptycharacter]
+
+-  default: **"-"**
 
 Character used to create placeholder text for empty input fields
 
@@ -105,7 +115,9 @@ Character to use as placeholder for empty date values. If longer than 1 characte
 </App>
 ```
 
-### `enabled` (default: true) [#enabled-default-true]
+### `enabled` [#enabled]
+
+-  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -137,7 +149,9 @@ This property sets the component's initial value.
 </App>  
 ```
 
-### `inline` (default: true) [#inline-default-true]
+### `inline` [#inline]
+
+-  default: **true**
 
 Whether to display the date input inline (compatibility with DatePicker, always true for DateInput)
 
@@ -149,7 +163,9 @@ The optional end date of the selectable date range. If not defined, the range al
 
 The optional start date of the selectable date range. If not defined, the range allows any dates in the past.
 
-### `mode` (default: "single") [#mode-default-single]
+### `mode` [#mode]
+
+-  default: **"single"**
 
 The mode of the date input (single or range)
 
@@ -162,7 +178,9 @@ Available values:
 | `single` | Single date selection **(default)** |
 | `range` | Date range selection |
 
-### `readOnly` (default: false) [#readonly-default-false]
+### `readOnly` [#readonly]
+
+-  default: **false**
 
 Set this property to `true` to disallow changing the component value.
 
@@ -174,7 +192,9 @@ Makes the date input read-only. Users can see the value but cannot modify it.
 </App>
 ```
 
-### `required` (default: false) [#required-default-false]
+### `required` [#required]
+
+-  default: **false**
 
 Whether the input is required
 
@@ -186,7 +206,9 @@ Marks the date input as required for form validation.
 </App>
 ```
 
-### `showWeekNumber` (default: false) [#showweeknumber-default-false]
+### `showWeekNumber` [#showweeknumber]
+
+-  default: **false**
 
 Whether to show the week number (compatibility with DatePicker, not used in DateInput)
 
@@ -198,7 +220,9 @@ This property sets an optional icon to appear at the start (left side when the l
 
 This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.
 
-### `validationStatus` (default: "none") [#validationstatus-default-none]
+### `validationStatus` [#validationstatus]
+
+-  default: **"none"**
 
 This property allows you to set the validation status of the input component.
 
@@ -224,7 +248,9 @@ Available values:
 </App>
 ```
 
-### `weekStartsOn` (default: 0) [#weekstartson-default-0]
+### `weekStartsOn` [#weekstartson]
+
+-  default: **0**
 
 The first day of the week. 0 is Sunday, 1 is Monday, etc. (compatibility with DatePicker, not used in DateInput)
 

@@ -137,7 +137,9 @@ This property is an array of group names that the `List` will display. If not se
 </App>
 ```
 
-### `borderCollapse` (default: true) [#bordercollapse-default-true]
+### `borderCollapse` [#bordercollapse]
+
+-  default: **true**
 
 Collapse items borders
 
@@ -474,7 +476,9 @@ This property defines the template to display when the list is empty.
 </App>
 ```
 
-### `fixedItemSize` (default: false) [#fixeditemsize-default-false]
+### `fixedItemSize` [#fixeditemsize]
+
+-  default: **false**
 
 When set to `true`, the list will measure the height of the first item and use that as a fixed size hint for all items. This improves scroll performance when all items have the same height. If items have varying heights, leave this as `false`.
 
@@ -747,7 +751,9 @@ The structure of `$group` in a `groupHeaderTemplate` is the following:
 </App>
 ```
 
-### `groupsInitiallyExpanded` (default: true) [#groupsinitiallyexpanded-default-true]
+### `groupsInitiallyExpanded` [#groupsinitiallyexpanded]
+
+-  default: **true**
 
 This Boolean property defines whether the list groups are initially expanded.
 
@@ -901,7 +907,9 @@ Note how the groups in the right `List` are expanded by default:
 </App>
 ```
 
-### `hideEmptyGroups` (default: true) [#hideemptygroups-default-true]
+### `hideEmptyGroups` [#hideemptygroups]
+
+-  default: **true**
 
 This boolean property indicates if empty groups should be hidden (no header and footer are displayed).
 
@@ -1059,7 +1067,9 @@ Note how the `meats` category is not displayed in the right `List`:
 </App>
 ```
 
-### `idKey` (default: "id") [#idkey-default-id]
+### `idKey` [#idkey]
+
+-  default: **"id"**
 
 Denotes which attribute of an item acts as the ID or key of the item
 
@@ -1372,7 +1382,9 @@ It contains the following boolean attributes:
 | `isFetchingPrevPage` | _TBD_                                |
 | `isFetchingNextPage` | _TBD_                                |
 
-### `scrollAnchor` (default: "top") [#scrollanchor-default-top]
+### `scrollAnchor` [#scrollanchor]
+
+-  default: **"top"**
 
 This property pins the scroll position to a specified location of the list. Available values are shown below.
 

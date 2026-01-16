@@ -11,11 +11,15 @@
 
 ## Properties [#properties]
 
-### `autoFocus` (default: false) [#autofocus-default-false]
+### `autoFocus` [#autofocus]
+
+-  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `clearable` (default: false) [#clearable-default-false]
+### `clearable` [#clearable]
+
+-  default: **false**
 
 Whether to show a clear button that allows clearing the selected time
 
@@ -38,11 +42,15 @@ The icon to display in the clear button.
 </App>
 ```
 
-### `clearToInitialValue` (default: false) [#cleartoinitialvalue-default-false]
+### `clearToInitialValue` [#cleartoinitialvalue]
+
+-  default: **false**
 
 Whether the clear button resets the time input to its initial value
 
-### `emptyCharacter` (default: "-") [#emptycharacter-default-]
+### `emptyCharacter` [#emptycharacter]
+
+-  default: **"-"**
 
 Character to use as placeholder for empty time values. If longer than 1 character, uses the first character. Defaults to '-'
 
@@ -56,7 +64,9 @@ Character to use as placeholder for empty time values. If longer than 1 characte
 </App>
 ```
 
-### `enabled` (default: true) [#enabled-default-true]
+### `enabled` [#enabled]
+
+-  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -78,7 +88,9 @@ This property sets an optional text to appear on the end (right side when the le
 
 This property defines the gap between the adornments and the input area. If not set, the gap declared by the current theme is used.
 
-### `hour24` (default: true) [#hour24-default-true]
+### `hour24` [#hour24]
+
+-  default: **true**
 
 Whether to use 24-hour format (true) or 12-hour format with AM/PM (false)
 
@@ -100,11 +112,15 @@ Maximum time that the user can select
 
 Minimum time that the user can select
 
-### `readOnly` (default: false) [#readonly-default-false]
+### `readOnly` [#readonly]
+
+-  default: **false**
 
 Set this property to `true` to disallow changing the component value.
 
-### `required` (default: false) [#required-default-false]
+### `required` [#required]
+
+-  default: **false**
 
 Whether the time input should be required
 
@@ -116,7 +132,9 @@ Marks the time input as required for form validation.
 </App>
 ```
 
-### `seconds` (default: false) [#seconds-default-false]
+### `seconds` [#seconds]
+
+-  default: **false**
 
 Whether to show and allow input of seconds
 
@@ -128,7 +146,9 @@ This property sets an optional icon to appear at the start (left side when the l
 
 This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.
 
-### `validationStatus` (default: "none") [#validationstatus-default-none]
+### `validationStatus` [#validationstatus]
+
+-  default: **"none"**
 
 This property allows you to set the validation status of the input component.
 

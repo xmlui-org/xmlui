@@ -4,7 +4,9 @@
 
 ## Properties [#properties]
 
-### `sticky` (default: true) [#sticky-default-true]
+### `sticky` [#sticky]
+
+-  default: **true**
 
 When set to true (default), keeps the Footer docked to the bottom of the page in sticky layouts. When set to false, allows the Footer to scroll with the main content for non-desktop layouts. In desktop layout, the Footer remains sticky regardless of this property.
 

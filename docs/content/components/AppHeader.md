@@ -63,7 +63,9 @@ It accepts component definitions.
 </App>
 ```
 
-### `showLogo` (default: true) [#showlogo-default-true]
+### `showLogo` [#showlogo]
+
+-  default: **true**
 
 Show the logo in the header
 

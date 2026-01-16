@@ -275,75 +275,111 @@ The following sample demonstrates this feature. Click the "Child Item 1.2" node 
 
 ## Properties [#properties]
 
-### `animateExpand` (default: false) [#animateexpand-default-false]
+### `animateExpand` [#animateexpand]
+
+-  default: **false**
 
 When true, uses only the collapsed icon and rotates it for expansion instead of switching icons (default: false).
 
-### `autoExpandToSelection` (default: true) [#autoexpandtoselection-default-true]
+### `autoExpandToSelection` [#autoexpandtoselection]
+
+-  default: **true**
 
 Automatically expand the path to the selected item.
 
-### `childrenField` (default: "children") [#childrenfield-default-children]
+### `childrenField` [#childrenfield]
+
+-  default: **"children"**
 
 The property name in source data for child arrays (used in hierarchy format).
 
-### `data` (required) [#data-required]
+### `data` [#data]
+
+-  This property is required.
 
 The data source of the tree. Format depends on the dataFormat property.
 
-### `dataFormat` (default: "flat") [#dataformat-default-flat]
+### `dataFormat` [#dataformat]
+
+-  default: **"flat"**
 
 The input data structure format: "flat" (array with parent relationships) or "hierarchy" (nested objects).
 
-### `defaultExpanded` (default: "none") [#defaultexpanded-default-none]
+### `defaultExpanded` [#defaultexpanded]
+
+-  default: **"none"**
 
 Initial expansion state: "none", "all", "first-level", or array of specific IDs.
 
-### `dynamicField` (default: "dynamic") [#dynamicfield-default-dynamic]
+### `dynamicField` [#dynamicfield]
+
+-  default: **"dynamic"**
 
 The property name in source data for dynamic loading state (default: "dynamic").
 
-### `expandRotation` (default: 90) [#expandrotation-default-90]
+### `expandRotation` [#expandrotation]
+
+-  default: **90**
 
 The number of degrees to rotate the collapsed icon when expanded in animate mode (default: 90).
 
-### `fixedItemSize` (default: false) [#fixeditemsize-default-false]
+### `fixedItemSize` [#fixeditemsize]
+
+-  default: **false**
 
 When set to `true`, the tree will measure the height of the first item and use that as a fixed size hint for all items. This improves scroll performance when all items have the same height. If items have varying heights, leave this as `false`.
 
-### `iconCollapsed` (default: "chevronright") [#iconcollapsed-default-chevronright]
+### `iconCollapsed` [#iconcollapsed]
+
+-  default: **"chevronright"**
 
 The icon name to use for collapsed nodes (default: "chevronright").
 
-### `iconCollapsedField` (default: "iconCollapsed") [#iconcollapsedfield-default-iconcollapsed]
+### `iconCollapsedField` [#iconcollapsedfield]
+
+-  default: **"iconCollapsed"**
 
 The property name in source data for collapsed state icons.
 
-### `iconExpanded` (default: "chevrondown") [#iconexpanded-default-chevrondown]
+### `iconExpanded` [#iconexpanded]
+
+-  default: **"chevrondown"**
 
 The icon name to use for expanded nodes (default: "chevrondown").
 
-### `iconExpandedField` (default: "iconExpanded") [#iconexpandedfield-default-iconexpanded]
+### `iconExpandedField` [#iconexpandedfield]
+
+-  default: **"iconExpanded"**
 
 The property name in source data for expanded state icons.
 
-### `iconField` (default: "icon") [#iconfield-default-icon]
+### `iconField` [#iconfield]
+
+-  default: **"icon"**
 
 The property name in source data for icon identifiers.
 
-### `iconSize` (default: "16") [#iconsize-default-16]
+### `iconSize` [#iconsize]
+
+-  default: **"16"**
 
 The size of the expand/collapse icons (default: "16").
 
-### `idField` (default: "id") [#idfield-default-id]
+### `idField` [#idfield]
+
+-  default: **"id"**
 
 The property name in source data for unique identifiers.
 
-### `itemClickExpands` (default: false) [#itemclickexpands-default-false]
+### `itemClickExpands` [#itemclickexpands]
+
+-  default: **false**
 
 Whether clicking anywhere on a tree item should expand/collapse the node, not just the expand/collapse icon.
 
-### `itemHeight` (default: 32) [#itemheight-default-32]
+### `itemHeight` [#itemheight]
+
+-  default: **32**
 
 The height of each tree row in pixels (default: 32).
 
@@ -351,15 +387,21 @@ The height of each tree row in pixels (default: 32).
 
 The template for each item in the tree.
 
-### `nameField` (default: "name") [#namefield-default-name]
+### `nameField` [#namefield]
+
+-  default: **"name"**
 
 The property name in source data for display text.
 
-### `parentIdField` (default: "parentId") [#parentidfield-default-parentid]
+### `parentIdField` [#parentidfield]
+
+-  default: **"parentId"**
 
 The property name in source data for parent relationships (used in flat format).
 
-### `selectableField` (default: "selectable") [#selectablefield-default-selectable]
+### `selectableField` [#selectablefield]
+
+-  default: **"selectable"**
 
 The property name in source data for selectable state (default: "selectable").
 

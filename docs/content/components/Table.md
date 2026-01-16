@@ -42,31 +42,43 @@ All samples use table columns with the following definition unless noted otherwi
 
 This property explicitly toggles pagination controls visibility. If set to `true`, controls are always shown even if there is only one page. If set to `false`, controls are hidden. If omitted, controls are hidden when there is only one page and shown otherwise. This property only has effect when pagination is enabled. It acts as an alias for showPaginationControls.
 
-### `alwaysShowSelectionHeader` (default: false) [#alwaysshowselectionheader-default-false]
+### `alwaysShowSelectionHeader` [#alwaysshowselectionheader]
+
+-  default: **false**
 
 This property indicates when the row selection header is displayed. When the value is `true,` the selection header is always visible. Otherwise, it is displayed only when hovered.
 
-### `alwaysShowSortingIndicator` (default: false) [#alwaysshowsortingindicator-default-false]
+### `alwaysShowSortingIndicator` [#alwaysshowsortingindicator]
+
+-  default: **false**
 
 This property indicates whether the sorting indicator is always visible in the column headers. When set to `true`, the sorting indicator is always visible. Otherwise, it is visible only when the user hovers over/focuses the column header or the column is sorted.
 
-### `autoFocus` (default: false) [#autofocus-default-false]
+### `autoFocus` [#autofocus]
+
+-  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `buttonRowPosition` (default: "center") [#buttonrowposition-default-center]
+### `buttonRowPosition` [#buttonrowposition]
+
+-  default: **"center"**
 
 Determines where to place the pagination button row in the layout. It works the same as the [Pagination component property](./Pagination#buttonrowposition).
 
 Available values: `start`, `center` **(default)**, `end`
 
-### `cellVerticalAlign` (default: "center") [#cellverticalalign-default-center]
+### `cellVerticalAlign` [#cellverticalalign]
+
+-  default: **"center"**
 
 This property controls the vertical alignment of cell content. It can be set to `top`, `center`, or `bottom`.
 
 Available values: `top`, `center` **(default)**, `bottom`
 
-### `checkboxTolerance` (default: "compact") [#checkboxtolerance-default-compact]
+### `checkboxTolerance` [#checkboxtolerance]
+
+-  default: **"compact"**
 
 This property controls the tolerance area around checkboxes for easier interaction. This property only has an effect when the rowsSelectable property is set to `true`. `none` provides no tolerance (0px), `compact` provides minimal tolerance (8px), `comfortable` provides medium tolerance (12px), and `spacious` provides generous tolerance (16px) for improved accessibility.
 
@@ -236,7 +248,9 @@ Here, the component displays rocket information coming from the official SpaceX 
 </App>
 ```
 
-### `enableMultiRowSelection` (default: true) [#enablemultirowselection-default-true]
+### `enableMultiRowSelection` [#enablemultirowselection]
+
+-  default: **true**
 
 This boolean property indicates whether you can select multiple rows in the table. This property only has an effect when the rowsSelectable property is set. Setting it to `false` limits selection to a single row.
 
@@ -395,7 +409,9 @@ It accepts common [size values](/styles-and-themes/common-units#size-values).
 </App>
 ```
 
-### `hideHeader` (default: false) [#hideheader-default-false]
+### `hideHeader` [#hideheader]
+
+-  default: **false**
 
 Set the header visibility using this property. Set it to `true` to hide the header.
 
@@ -705,7 +721,9 @@ Select a column header and set it to descending ordering.
 </App>
 ```
 
-### `idKey` (default: "id") [#idkey-default-id]
+### `idKey` [#idkey]
+
+-  default: **"id"**
 
 This property is used to specify the unique ID property in the data array. If the idKey points to a property that does not exist in the data items, that will result in incorrect behavior when using selectable rows.
 
@@ -729,7 +747,9 @@ This property is used to specify the unique ID property in the data array. If th
 
 An array of IDs that should be initially selected when the table is rendered. This property only has an effect when the rowsSelectable property is set to `true`.
 
-### `isPaginated` (default: false) [#ispaginated-default-false]
+### `isPaginated` [#ispaginated]
+
+-  default: **false**
 
 This property adds pagination controls to the `Table`.
 
@@ -819,7 +839,9 @@ This property is useful when data is loaded conditionally or receiving it takes 
 </App>
 ```
 
-### `noBottomBorder` (default: false) [#nobottomborder-default-false]
+### `noBottomBorder` [#nobottomborder]
+
+-  default: **false**
 
 This property indicates whether the table should have a bottom border. When set to `true`, the table does not have a bottom border. Otherwise, it has a bottom border.
 
@@ -1005,7 +1027,9 @@ Note that this property only works if the [`isPaginated`](#ispaginated) property
 
 Determines where to place the page size selector in the layout. It works the same as the [Pagination component property](./Pagination#pagesizeselectorposition).
 
-### `paginationControlsLocation` (default: "bottom") [#paginationcontrolslocation-default-bottom]
+### `paginationControlsLocation` [#paginationcontrolslocation]
+
+-  default: **"bottom"**
 
 This property determines the location of the pagination controls. It can be set to `top`, `bottom`, or `both`.
 
@@ -1171,15 +1195,21 @@ The default value is `false`.
 
 This property defines a predicate function with a return value that determines if the row should be unselectable. The function retrieves the item to display and should return a Boolean-like value. This property only has an effect when the `rowsSelectable` property is set to `true`.
 
-### `showCurrentPage` (default: true) [#showcurrentpage-default-true]
+### `showCurrentPage` [#showcurrentpage]
+
+-  default: **true**
 
 Whether to show the current page indicator. It works the same as the [Pagination component property](./Pagination#showcurrentpage).
 
-### `showPageInfo` (default: true) [#showpageinfo-default-true]
+### `showPageInfo` [#showpageinfo]
+
+-  default: **true**
 
 Whether to show page information. It works the same as the [Pagination component property](./Pagination#showpageinfo).
 
-### `showPageSizeSelector` (default: true) [#showpagesizeselector-default-true]
+### `showPageSizeSelector` [#showpagesizeselector]
+
+-  default: **true**
 
 Whether to show the page size selector. It works the same as the [Pagination component property](./Pagination#showpagesizeselector).
 

@@ -12,7 +12,9 @@
 
 ## Properties [#properties]
 
-### `inDrawer` (default: false) [#indrawer-default-false]
+### `inDrawer` [#indrawer]
+
+-  default: **false**
 
 This property determines if the navigation panel is displayed in a drawer.
 

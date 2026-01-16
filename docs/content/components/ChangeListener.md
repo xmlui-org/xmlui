@@ -26,7 +26,9 @@ The following sample demonstrates using this property. Every time the user click
 </App>
 ```
 
-### `throttleWaitInMs` (default: 0) [#throttlewaitinms-default-0]
+### `throttleWaitInMs` [#throttlewaitinms]
+
+-  default: **0**
 
 This variable sets a throttling time (in milliseconds) to apply when executing the `didChange` event handler. All changes within that throttling time will only fire the `didChange` event once.
 

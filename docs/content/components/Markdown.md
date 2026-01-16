@@ -141,11 +141,15 @@ This boolean property specifies whether images should be displayed in grayscale.
 
 This boolean property specifies whether links should open in a new tab. If set to `true`, all links within the markdown will open in a new tab with `target="_blank"`. Links that explicitly specify their own target using the `| target=...` syntax will override this setting.
 
-### `removeBr` (default: false) [#removebr-default-false]
+### `removeBr` [#removebr]
+
+-  default: **false**
 
 This boolean property specifies whether `<br>` (line break) elements should be omitted from the rendered output. When set to `true`, `<br/>` tags in the markdown content will not be rendered. When `false` (default), `<br/>` tags render as horizontal bars.
 
-### `removeIndents` (default: true) [#removeindents-default-true]
+### `removeIndents` [#removeindents]
+
+-  default: **true**
 
 This boolean property specifies whether leading indents should be removed from the markdown content. If set to `true`, the shortest indent found at the start of the content lines is removed from the beginning of every line.
 

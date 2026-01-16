@@ -8,7 +8,9 @@ The `FadeOutAnimation` component represents an animation that fades out the cont
 
 Indicates whether the animation should start when the component is in view
 
-### `delay` (default: 0)
+### `delay`
+
+-  default: **0**
 
 The delay before the animation starts in milliseconds
 
@@ -16,11 +18,15 @@ The delay before the animation starts in milliseconds
 
 The duration of the animation in milliseconds
 
-### `loop` (default: false)
+### `loop`
+
+-  default: **false**
 
 Indicates whether the animation should loop
 
-### `reverse` (default: false)
+### `reverse`
+
+-  default: **false**
 
 Indicates whether the animation should run in reverse
 

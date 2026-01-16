@@ -4,13 +4,17 @@
 
 ## Properties [#properties]
 
-### `align` (default: "center") [#align-default-center]
+### `align` [#align]
+
+-  default: **"center"**
 
 The alignment of the legend
 
 Available values: `left`, `right`, `center` **(default)**
 
-### `verticalAlign` (default: "bottom") [#verticalalign-default-bottom]
+### `verticalAlign` [#verticalalign]
+
+-  default: **"bottom"**
 
 The vertical alignment of the legend
 

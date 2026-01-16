@@ -10,6 +10,7 @@
         </VStack>
         <TableOfContents
             width="$space-64"
+            omitH1
             when="{mediaSize.sizeIndex > 3 && !$props.hideToc}"
             maxHeadingLevel="{$props.maxHeadingLevel ? $props.maxHeadingLevel : 3}" />
         <VStack width="$space-64" when="{mediaSize.sizeIndex > 3 && $props.hideToc}" />

@@ -33,19 +33,27 @@ The following sample demonstrates many aspects of the `Timer` component. Use the
 
 ## Properties [#properties]
 
-### `enabled` (default: true) [#enabled-default-true]
+### `enabled` [#enabled]
+
+-  default: **true**
 
 Whether the timer is enabled and should fire events.
 
-### `initialDelay` (default: 0) [#initialdelay-default-0]
+### `initialDelay` [#initialdelay]
+
+-  default: **0**
 
 The delay in milliseconds before the first timer event.
 
-### `interval` (default: 1000) [#interval-default-1000]
+### `interval` [#interval]
+
+-  default: **1000**
 
 The interval in milliseconds between timer events.
 
-### `once` (default: false) [#once-default-false]
+### `once` [#once]
+
+-  default: **false**
 
 Whether the timer should stop after firing its first tick event.
 

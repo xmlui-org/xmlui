@@ -80,15 +80,33 @@ export const XmlUiDocsThemeDefinition: ThemeDefinition = {
   extends: "xmlui",
   color: "$color-primary-500",
   themeVars: {
-    "fontSize": "14px",
+    // --- App layout
+    "width-navPanel-App": "280px",
+    "maxWidth-content-App": "900px",
+
+    // --- Colors & typography
+    "color-surface": "rgb(111, 110, 119)",
+    "backgroundColor": "color-surface-1",
+    "fontSize": "15px",
     "fontFamily": "Inter Variable",
-    "font-feature-settings": "'cv03', 'cv04'",
+    "font-feature-settings": "'cv01', 'ss03'",
+    "textColor-Text": "$color-surface-600",
 
     // --- Navigation layout
-    "width-navPanel-App": "280px",
     "iconAlignment-NavLink": "baseline",
+    "fontSize-NavLink": "14px",
+    "fontWeight-NavLink": "500",
+    "textColor-NavLink": "$color-surface-500",
+    "textColor-NavLink--active": "$color-surface-900",
+    "textColor-NavLink--hover": "$color-surface-700",
+    "textColor-NavLink--hover--active": "$color-surface-900",
+    "textColor-NavLink--pressed": "$color-surface-900",
+    "thickness-indicator-NavLink": "0",
     "backgroundColor-Text-code": "rgb(from $color-surface-200 r g b / 0.4)",
     "paddingHorizontal-Text-code": "$space-1",
+
+    // --- TOC
+    "fontSize-TableOfContentsItem": "13px",
   },
 };
 

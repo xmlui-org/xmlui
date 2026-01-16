@@ -58,7 +58,9 @@ The url for an avarar image. If not specified, but [`showAvatar`](#showAvatar) i
 
 This optional property wraps the title in a `Link` component that is clickable to navigate.
 
-### `orientation` (default: "vertical") [#orientation-default-vertical]
+### `orientation` [#orientation]
+
+-  default: **"vertical"**
 
 An optional property that governs the Card's orientation (whether the Card lays out its children in a row or a column). If the orientation is set to `horizontal`, the Card will display its children in a row, except for its [`title`](#title) and [`subtitle`](#subtitle).
 
@@ -80,7 +82,9 @@ Available values:
 </App>
 ```
 
-### `showAvatar` (default: false) [#showavatar-default-false]
+### `showAvatar` [#showavatar]
+
+-  default: **false**
 
 Indicates whether the avatar should be displayed
 
