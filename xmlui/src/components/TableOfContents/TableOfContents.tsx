@@ -61,10 +61,12 @@ export const TableOfContentsMd = createMetadata({
     [`fontWeight-${COMP_CHILD}-level-6`]: "$fontWeight-normal",
 
     [`fontStyle-${COMP_CHILD}-level-6`]: "italic",
-    [`borderLeft-${COMP_CHILD}`]: "2px solid $color-primary-100",
+    [`borderLeft-${COMP_CHILD}`]: "2px solid $color-surface-100",
     [`textColor-${COMP_CHILD}--active`]: "$color-primary-400",
     [`fontWeight-${COMP_CHILD}--active`]: "$fontWeight-bold",
-    [`borderLeft-${COMP_CHILD}--active`]: "2px solid $color-primary-500",
+    [`width-indicator-${COMP}`]: "2px",
+    [`color-indicator-${COMP}`]: "$color-surface-100",
+    [`color-indicator-${COMP}--active`]: "$color-surface-900",
   },
 });
 

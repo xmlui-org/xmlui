@@ -54,8 +54,9 @@ $fontWeight-TableOfContentsItem-level-3--active: createThemeVar("fontWeight-#{$c
 $fontWeight-TableOfContentsItem-level-4--active: createThemeVar("fontWeight-#{$componentItem}-level-4--active");
 $fontWeight-TableOfContentsItem-level-5--active: createThemeVar("fontWeight-#{$componentItem}-level-5--active");
 $fontWeight-TableOfContentsItem-level-6--active: createThemeVar("fontWeight-#{$componentItem}-level-6--active");
-$borderLeft-TableOfContentsItem: createThemeVar("borderLeft-#{$componentItem}");
-$borderLeft-TableOfContentsItem--active: createThemeVar("borderLeft-#{$componentItem}--active");
+$color-indicator-TableOfContents: createThemeVar("color-indicator-#{$component}");
+$width-indicator-TableOfContents: createThemeVar("width-indicator-#{$component}");
+$color-indicator-TableOfContents--active: createThemeVar("color-indicator-#{$component}--active");
 
 @layer components {
   .nav {
@@ -87,7 +88,7 @@ $borderLeft-TableOfContentsItem--active: createThemeVar("borderLeft-#{$component
 
       .listItem {
         list-style-type: none;
-        border-left: $borderLeft-TableOfContentsItem !important;
+        border-left: $width-indicator-TableOfContents solid $color-indicator-TableOfContents !important;
 
         .link {
           display: block;
@@ -157,9 +158,7 @@ $borderLeft-TableOfContentsItem--active: createThemeVar("borderLeft-#{$component
         }
 
         &.active {
-          @include t.borderVars($themeVars, "#{$componentItem}--active");
           background-color: $backgroundColor-TableOfContentsItem--active;
-          border-left: $borderLeft-TableOfContentsItem--active !important;
 
           .link {
             color: $textColor-TableOfContentsItem--active;
@@ -186,6 +185,16 @@ $borderLeft-TableOfContentsItem--active: createThemeVar("borderLeft-#{$component
           }
         }
       }
+    }
+
+    .indicator {
+      position: absolute;
+      left: 0;
+      width: 2px;
+      background-color: $color-indicator-TableOfContents--active;
+      transition: top 0.3s ease, height 0.3s ease;
+      pointer-events: none;
+      z-index: 10;
     }
   }
 }
