@@ -17,7 +17,11 @@
             />
             <NavLink noIndicator label="Docs" to="/" active />
             <NavLink noIndicator label="Blog" to="https://blog.xmlui.org" />
-            <NavLink to="https://www.xmlui.org/get-started" noIndicator label="Start"/>
+            <NavLink
+                to="https://www.xmlui.org/get-started"
+                noIndicator
+                label="Start"
+            />
         </HStack>
         <SpaceFiller />
         <Search
@@ -60,7 +64,11 @@
                 noIndicator
                 target="_blank"
             />
-            <NavLink to="https://www.xmlui.org/get-started" noIndicator label="Download"/>
+            <NavLink
+                to="https://www.xmlui.org/get-started"
+                noIndicator
+                label="Download"
+            />
         </Fragment>
         <Stack
             padding="0"
@@ -69,9 +77,17 @@
         >
             <NavGroup initiallyExpanded="{true}" label="Learn XMLUI">
                 <NavLink icon="school" label="Introduction" to="/" />
-                <NavLink icon="arrow-shuffle" label="Reactive Data" to="/reactive-intro" />
-                <NavLink icon="layout-dashboard" label="Components" to="/components-intro" />
-                <NavLink icon="palette" label="Themes" to="/themes-intro" />
+                <NavLink
+                    icon="arrow-shuffle"
+                    label="Reactive Data"
+                    to="/reactive-intro"
+                />
+                <NavLink
+                    icon="component"
+                    label="Components"
+                    to="/components-intro"
+                />
+                <NavLink icon="theme" label="Themes" to="/themes-intro" />
             </NavGroup>
         </Stack>
         <NavGroup label="Guides">
@@ -79,132 +95,177 @@
             <NavLink icon="markup" label="Markup" to="/markup" />
             <NavLink icon="boundary" label="Scoping" to="/scoping" />
             <NavLink icon="bolt" label="Scripting" to="/scripting" />
-            <NavLink icon="playground" label="Codefences and playgrounds" to="/playground-and-codefence" />
+            <NavLink
+                icon="playground"
+                label="Codefences and playgrounds"
+                to="/playground-and-codefence"
+            />
             <NavLink icon="layout" label="Layout" to="/layout" />
-            <NavLink icon="typography" label="Working with Text" to="/working-with-text" />
+            <NavLink
+                icon="typography"
+                label="Working with Text"
+                to="/working-with-text"
+            />
             <NavLink
                 icon="markdown"
                 label="Working with Markdown"
                 to="/working-with-markdown"
             />
-            <NavLink icon="link" label="Routing and Links" to="/routing-and-links" />
-            <NavLink icon="form" label="Forms" to="/forms" />
-            <NavLink label="Modal Dialogs" to="/modal-dialogs" />
             <NavLink
+                icon="link"
+                label="Routing and Links"
+                to="/routing-and-links"
+            />
+            <NavLink icon="form" label="Forms" to="/forms" />
+            <NavLink icon="dialog" label="Modal Dialogs" to="/modal-dialogs" />
+            <NavLink
+                icon="component"
                 label="User-defined Components"
                 to="/user-defined-components"
             />
             <NavLink
+                icon="refactor"
                 label="Refactoring"
                 to="/refactoring"
             />
             <NavLink
+                icon="build"
                 label="Build a HelloWorld Component"
                 to="/build-hello-world-component"
             />
-            <NavLink label="Hosted Deployment" to="/hosted-deployment" />
+            <NavLink
+                icon="deploy"
+                label="Hosted Deployment"
+                to="/hosted-deployment"
+            />
         </NavGroup>
         <NavGroup label="Tutorial">
-            <NavLink label="XMLUI Invoice" to="/tutorial-01" />
-            <NavLink label="Main.xmlui" to="/tutorial-02" />
-            <NavLink label="Navigation" to="/tutorial-03" />
-            <NavLink label="InfoCards" to="/tutorial-04" />
-            <NavLink label="Charts" to="/tutorial-05" />
-            <NavLink label="Slider" to="/tutorial-06" />
-            <NavLink label="Invoices" to="/tutorial-07" />
-            <NavLink label="Create Invoice" to="/tutorial-08" />
-            <NavLink label="Invoice Details" to="/tutorial-09" />
-            <NavLink label="Search" to="/tutorial-10" />
-            <NavLink label="Import" to="/tutorial-11" />
-            <NavLink label="Settings" to="/tutorial-12" />
+            <NavLink icon="invoice" label="XMLUI Invoice" to="/tutorial-01" />
+            <NavLink icon="file-code" label="Main.xmlui" to="/tutorial-02" />
+            <NavLink icon="menu" label="Navigation" to="/tutorial-03" />
+            <NavLink icon="cards" label="InfoCards" to="/tutorial-04" />
+            <NavLink icon="charts" label="Charts" to="/tutorial-05" />
+            <NavLink icon="slider" label="Slider" to="/tutorial-06" />
+            <NavLink icon="file-invoice" label="Invoices" to="/tutorial-07" />
+            <NavLink icon="create" label="Create Invoice" to="/tutorial-08" />
+            <NavLink icon="details" label="Invoice Details" to="/tutorial-09" />
+            <NavLink icon="search" label="Search" to="/tutorial-10" />
+            <NavLink icon="import" label="Import" to="/tutorial-11" />
+            <NavLink icon="settings" label="Settings" to="/tutorial-12" />
         </NavGroup>
         <NavGroup label="How To">
             <NavLink
+                icon="article"
                 label="Expose a method from a component"
                 to="/howto/expose-a-method-from-a-component"
             />
             <NavLink
+                icon="article"
                 label="Delegate a method"
                 to="/howto/delegate-a-method"
             />
             <NavLink
+                icon="article"
                 label="React to button click not keystrokes"
                 to="/howto/react-to-button-click-not-keystrokes"
             />
             <NavLink
+                icon="article"
                 label="Buffer a reactive edit"
                 to="/howto/buffer-a-reactive-edit"
             />
             <NavLink
+                icon="article"
                 label="Modify a value reported in a Column"
                 to="/howto/modify-a-value-reported-in-a-column"
             />
             <NavLink
+                icon="article"
                 label="Filter and transform data from an API"
                 to="/howto/filter-and-transform-data-from-an-api"
             />
             <NavLink
+                icon="article"
                 label="Group items in List by a property"
                 to="/howto/group-items-in-list-by-a-property"
             />
             <NavLink
+                icon="article"
                 label="Delay a DataSource until another DataSource is ready"
                 to="/howto/delay-a-datasource-until-another-datasource-is-ready"
             />
             <NavLink
+                icon="article"
                 label="Hide an element until its DataSource is ready"
                 to="/howto/hide-an-element-until-its-datasource-is-ready"
             />
             <NavLink
+                icon="article"
                 label="Use built-in form validation"
                 to="/howto/use-built-in-form-validation"
             />
             <NavLink
+                icon="article"
                 label="Do custom form validation"
                 to="/howto/do-custom-form-validation"
             />
             <NavLink
+                icon="article"
                 label="Assign a complex JSON literal to a component variable"
                 to="/howto/assign-a-complex-json-literal-to-a-component-variable"
             />
             <NavLink
+                icon="article"
                 label="Use accessors to simplify complex expressions"
                 to="/howto/use-accessors-to-simplify-complex-expressions"
             />
             <NavLink
+                icon="article"
                 label="Make a set of equal-width cards"
                 to="/howto/make-a-set-of-equal-width-cards"
             />
             <NavLink
+                icon="article"
                 label="Set the initial value of a Select from fetched data"
                 to="/howto/set-the-initial-value-of-a-select-from-fetched-data"
             />
             <NavLink
+                icon="article"
                 label="Pass data to a Modal Dialog"
                 to="/howto/pass-data-to-a-modal-dialog"
             />
             <NavLink
+                icon="article"
                 label="Debug a component"
                 to="/howto/debug-a-component"
             />
             <NavLink
+                icon="article"
                 label="Share a ModalDialog across components"
                 to="/howto/share-a-modaldialog-across-components"
             />
             <NavLink
+                icon="article"
                 label="Use the same ModalDialog to add or edit"
                 to="/howto/use-the-same-modaldialog-to-add-or-edit"
             />
-            <NavLink label="Paginate a List" to="/howto/paginate-a-list" />
             <NavLink
+                icon="article"
+                label="Validate dependent form fields"
+                to="/howto/validate-dependent-form-fields"
+            />
+            <NavLink
+                icon="article"
                 label="Chain a DataSource refetch from an APICall.execute"
                 to="/howto/chain-a-refetch"
             />
             <NavLink
+                icon="article"
                 label="Control cache invalidation"
                 to="/howto/control-cache-invalidation"
             />
             <NavLink
+                icon="article"
                 label="Handle background operations"
                 to="/howto/handle-background-operations"
             />
@@ -212,42 +273,52 @@
                 <NavLink label="Update UI optimistically" to="/howto/update-ui-optimistically" />
                 -->
             <NavLink
+                icon="article"
                 label="Make a table responsive"
                 to="/howto/make-a-table-responsive"
             />
             <NavLink
+                icon="article"
                 label="Update UI optimistically"
                 to="/howto/update-ui-optimistically"
             />
             <NavLink
+                icon="article"
                 label="Sync selections between table and list views"
                 to="/howto/sync-selections-between-table-and-list-views"
             />
             <NavLink
+                icon="article"
                 label="Make NavPanel width responsive"
                 to="/howto/make-navpanel-width-responsive"
             />
             <NavLink
+                icon="article"
                 label="Debounce user input for API calls"
                 to="/howto/debounce-user-input-for-api-calls"
             />
             <NavLink
+                icon="article"
                 label="Debounce with ChangeListener"
                 to="/howto/debounce-with-changelistener"
             />
             <NavLink
+                icon="article"
                 label="Use ModalDialog's onClose() method"
                 to="/howto/use-modal-dialog-onclose"
             />
             <NavLink
+                icon="article"
                 label="Copy billing data to shipping"
                 to="/howto/copy-billing-to-shipping"
             />
             <NavLink
+                icon="article"
                 label="Implement an authentication gate"
                 to="/howto/implement-an-authentication-gate"
             />
             <NavLink
+                icon="article"
                 label="Set the Width of an Input Field in an HStack"
                 to="/howto/set-width-for-input-fields-in-a-horizontal-layout"
             />
@@ -256,7 +327,7 @@
         </NavGroup
         >
         <NavGroup label="Reference">
-            <NavGroup label="Components">
+            <NavGroup icon="component" label="Components">
                 <!-- GENERATED CONTENT/Component references links -->
                 <NavLink label="Components Overview" to="/components/_overview" />
                 <NavLink label="APICall" to="/components/APICall" />
@@ -279,7 +350,10 @@
                 <NavLink label="Checkbox" to="/components/Checkbox" />
                 <NavLink label="ColorPicker" to="/components/ColorPicker" />
                 <NavLink label="Column" to="/components/Column" />
-                <NavLink label="ContentSeparator" to="/components/ContentSeparator" />
+                <NavLink
+                    label="ContentSeparator"
+                    to="/components/ContentSeparator"
+                />
                 <NavLink label="DataSource" to="/components/DataSource" />
                 <NavLink label="DateInput" to="/components/DateInput" />
                 <NavLink label="DatePicker" to="/components/DatePicker" />
@@ -288,7 +362,10 @@
                 <NavLink label="EmojiSelector" to="/components/EmojiSelector" />
                 <NavLink label="ExpandableItem" to="/components/ExpandableItem" />
                 <NavLink label="FileInput" to="/components/FileInput" />
-                <NavLink label="FileUploadDropZone" to="/components/FileUploadDropZone" />
+                <NavLink
+                    label="FileUploadDropZone"
+                    to="/components/FileUploadDropZone"
+                />
                 <NavLink label="FlowLayout" to="/components/FlowLayout" />
                 <NavLink label="Footer" to="/components/Footer" />
                 <NavLink label="Form" to="/components/Form" />
@@ -317,7 +394,10 @@
                 <NavLink label="Markdown" to="/components/Markdown" />
                 <NavLink label="MenuItem" to="/components/MenuItem" />
                 <NavLink label="MenuSeparator" to="/components/MenuSeparator" />
-                <NavLink label="MessageListener" to="/components/MessageListener" />
+                <NavLink
+                    label="MessageListener"
+                    to="/components/MessageListener"
+                />
                 <NavLink label="ModalDialog" to="/components/ModalDialog" />
                 <NavLink label="NavGroup" to="/components/NavGroup" />
                 <NavLink label="NavLink" to="/components/NavLink" />
@@ -334,7 +414,10 @@
                 <NavLink label="ProgressBar" to="/components/ProgressBar" />
                 <NavLink label="Queue" to="/components/Queue" />
                 <NavLink label="RadioGroup" to="/components/RadioGroup" />
-                <NavLink label="RealTimeAdapter" to="/components/RealTimeAdapter" />
+                <NavLink
+                    label="RealTimeAdapter"
+                    to="/components/RealTimeAdapter"
+                />
                 <NavLink label="Redirect" to="/components/Redirect" />
                 <NavLink label="ResponsiveBar" to="/components/ResponsiveBar" />
                 <NavLink label="Select" to="/components/Select" />
@@ -349,7 +432,10 @@
                 <NavLink label="Switch" to="/components/Switch" />
                 <NavLink label="TabItem" to="/components/TabItem" />
                 <NavLink label="Table" to="/components/Table" />
-                <NavLink label="TableOfContents" to="/components/TableOfContents" />
+                <NavLink
+                    label="TableOfContents"
+                    to="/components/TableOfContents"
+                />
                 <NavLink label="Tabs" to="/components/Tabs" />
                 <NavLink label="Text" to="/components/Text" />
                 <NavLink label="TextArea" to="/components/TextArea" />
@@ -357,7 +443,10 @@
                 <NavLink label="Theme" to="/components/Theme" />
                 <NavLink label="TimeInput" to="/components/TimeInput" />
                 <NavLink label="Timer" to="/components/Timer" />
-                <NavLink label="ToneChangerButton" to="/components/ToneChangerButton" />
+                <NavLink
+                    label="ToneChangerButton"
+                    to="/components/ToneChangerButton"
+                />
                 <NavLink label="ToneSwitch" to="/components/ToneSwitch" />
                 <NavLink label="Tooltip" to="/components/Tooltip" />
                 <NavLink label="Tree" to="/components/Tree" />
@@ -366,21 +455,42 @@
                 <!-- END GENERATED CONTENT/Component references links -->
             </NavGroup
             >
-            <NavGroup label="Extensions">
+            <NavGroup icon="puzzle" label="Extensions">
                 <!-- GENERATED CONTENT/Extension references links -->
                 <NavGroup label="Xmlui Animations">
-                <NavLink label="Extension Overview" to="/extensions/xmlui-animations/_overview" />
-                <NavLink label="Animation" to="/extensions/xmlui-animations/Animation" />
-                <NavLink label="FadeAnimation" to="/extensions/xmlui-animations/FadeAnimation" />
-                <NavLink label="FadeInAnimation" to="/extensions/xmlui-animations/FadeInAnimation" />
-                <NavLink label="FadeOutAnimation" to="/extensions/xmlui-animations/FadeOutAnimation" />
-                <NavLink label="ScaleAnimation" to="/extensions/xmlui-animations/ScaleAnimation" />
-                <NavLink label="SlideInAnimation" to="/extensions/xmlui-animations/SlideInAnimation" />
+                    <NavLink
+                        label="Extension Overview"
+                        to="/extensions/xmlui-animations/_overview"
+                    />
+                    <NavLink
+                        label="Animation"
+                        to="/extensions/xmlui-animations/Animation"
+                    />
+                    <NavLink
+                        label="FadeAnimation"
+                        to="/extensions/xmlui-animations/FadeAnimation"
+                    />
+                    <NavLink
+                        label="FadeInAnimation"
+                        to="/extensions/xmlui-animations/FadeInAnimation"
+                    />
+                    <NavLink
+                        label="FadeOutAnimation"
+                        to="/extensions/xmlui-animations/FadeOutAnimation"
+                    />
+                    <NavLink
+                        label="ScaleAnimation"
+                        to="/extensions/xmlui-animations/ScaleAnimation"
+                    />
+                    <NavLink
+                        label="SlideInAnimation"
+                        to="/extensions/xmlui-animations/SlideInAnimation"
+                    />
                 </NavGroup>
                 <!-- END GENERATED CONTENT/Extension references links -->
             </NavGroup
             >
-            <NavGroup label="Themes">
+            <NavGroup icon="theme" label="Themes">
                 <NavLink
                     label="Layout Properties"
                     to="/styles-and-themes/layout-props"
@@ -398,70 +508,107 @@
                     to="/styles-and-themes/common-units"
                 />
             </NavGroup>
-            <NavLink label="Context Variables" to="/context-variables" />
-            <NavLink label="Globals" to="/globals" />
-            <NavLink label="Helper Tags" to="/helper-tags" />
             <NavLink
+                icon="context"
+                label="Context Variables"
+                to="/context-variables"
+            />
+            <NavLink icon="globals" label="Globals" to="/globals" />
+            <NavLink icon="helper-tags" label="Helper Tags" to="/helper-tags" />
+            <NavLink
+                icon="universal-props"
                 label="Universal Properties"
                 to="/universal-properties"
             />
-            <NavLink label="Template Properties" to="/template-properties" />
-            <NavLink label="Palettes" to="/palettes" />
-            <NavLink label="Icons" to="/icons" />
-            <NavLink label="Glossary" to="/glossary" />
+            <NavLink
+                icon="template-props"
+                label="Template Properties"
+                to="/template-properties"
+            />
+            <NavLink icon="palette" label="Palettes" to="/palettes" />
+            <NavLink icon="icons" label="Icons" to="/icons" />
+            <NavLink icon="glossary" label="Glossary" to="/glossary" />
         </NavGroup>
-        <NavLink label="Model Context Protocol" to="/mcp" />
-        <NavLink label="VSCode extension" to="/vscode" />
-        <NavLink label="Change Log" to="/change-log" />
+        <NavLink icon="mcp" label="Model Context Protocol" to="/mcp" />
+        <NavLink icon="vscode-extension" label="VSCode extension" to="/vscode" />
+        <NavLink icon="logs" label="Change Log" to="/change-log" />
     </NavPanel>
     <Pages fallbackPath="/404" defaultScrollRestoration="true">
         <Page url="/">
             <DocumentPageNoTOC content="{appGlobals.content['pages/intro.md']}" />
         </Page>
         <Page url="/reactive-intro">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/reactive-intro.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/reactive-intro.md']}"
+            />
         </Page>
         <Page url="/components-intro">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/components-intro.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/components-intro.md']}"
+            />
         </Page>
         <Page url="/themes-intro">
             <ThemesIntro />
         </Page>
         <Page url="/tutorial-01">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-01.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/tutorial-01.md']}"
+            />
         </Page>
         <Page url="/tutorial-02">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-02.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/tutorial-02.md']}"
+            />
         </Page>
         <Page url="/tutorial-03">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-03.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/tutorial-03.md']}"
+            />
         </Page>
         <Page url="/tutorial-04">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-04.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/tutorial-04.md']}"
+            />
         </Page>
         <Page url="/tutorial-05">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-05.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/tutorial-05.md']}"
+            />
         </Page>
         <Page url="/tutorial-06">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-06.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/tutorial-06.md']}"
+            />
         </Page>
         <Page url="/tutorial-07">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-07.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/tutorial-07.md']}"
+            />
         </Page>
         <Page url="/tutorial-08">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-08.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/tutorial-08.md']}"
+            />
         </Page>
         <Page url="/tutorial-09">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-09.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/tutorial-09.md']}"
+            />
         </Page>
         <Page url="/tutorial-10">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-10.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/tutorial-10.md']}"
+            />
         </Page>
         <Page url="/tutorial-11">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-11.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/tutorial-11.md']}"
+            />
         </Page>
         <Page url="/tutorial-12">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/tutorial-12.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/tutorial-12.md']}"
+            />
         </Page>
         <Page url="/blog">
             <BlogOverview posts="{posts}" />
@@ -473,7 +620,9 @@
             <BlogPage post="{posts[1]}" />
         </Page>
         <Page url="/app-structure">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/app-structure.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/app-structure.md']}"
+            />
         </Page>
         <Page url="/markup">
             <DocumentPage content="{appGlobals.content['pages/markup.md']}" />
@@ -488,17 +637,26 @@
             <DocumentPage content="{appGlobals.content['pages/layout.md']}" />
         </Page>
         <Page url="/working-with-text">
-            <DocumentPage content="{appGlobals.content['pages/working-with-text.md']}" />
+            <DocumentPage
+                content="{appGlobals.content['pages/working-with-text.md']}"
+            />
         </Page>
         <Page url="/playground-and-codefence">
-            <DocumentPage maxHeadingLevel="2" content="{appGlobals.content['pages/playground-and-codefence.md']}" />
+            <DocumentPage
+                maxHeadingLevel="2"
+                content="{appGlobals.content['pages/playground-and-codefence.md']}"
+            />
         </Page>
 
         <Page url="/working-with-markdown">
-            <DocumentPage content="{appGlobals.content['pages/working-with-markdown.md']}" />
+            <DocumentPage
+                content="{appGlobals.content['pages/working-with-markdown.md']}"
+            />
         </Page>
         <Page url="/routing-and-links">
-            <DocumentPage content="{appGlobals.content['pages/routing-and-links.md']}" />
+            <DocumentPage
+                content="{appGlobals.content['pages/routing-and-links.md']}"
+            />
         </Page>
         <Page url="/forms">
             <DocumentPage content="{appGlobals.content['pages/forms.md']}" />
@@ -507,19 +665,29 @@
             <DocumentPage content="{appGlobals.content['pages/resources.md']}" />
         </Page>
         <Page url="/modal-dialogs">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/modal-dialogs.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/modal-dialogs.md']}"
+            />
         </Page>
         <Page url="/user-defined-components">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/user-defined-components.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/user-defined-components.md']}"
+            />
         </Page>
         <Page url="/refactoring">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/refactoring.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/refactoring.md']}"
+            />
         </Page>
         <Page url="/styles-and-themes/layout-props">
-            <DocumentPage content="{appGlobals.content['pages/styles-and-themes/layout-props.md']}" />
+            <DocumentPage
+                content="{appGlobals.content['pages/styles-and-themes/layout-props.md']}"
+            />
         </Page>
         <Page url="/styles-and-themes/theme-variables">
-            <DocumentPage content="{appGlobals.content['pages/styles-and-themes/theme-variables.md']}" />
+            <DocumentPage
+                content="{appGlobals.content['pages/styles-and-themes/theme-variables.md']}"
+            />
         </Page>
         <Page url="/styles-and-themes/theme-variable-defaults">
             <DocumentPageNoTOC
@@ -527,22 +695,32 @@
             />
         </Page>
         <Page url="/styles-and-themes/common-units">
-            <DocumentPage content="{appGlobals.content['pages/styles-and-themes/common-units.md']}" />
+            <DocumentPage
+                content="{appGlobals.content['pages/styles-and-themes/common-units.md']}"
+            />
         </Page>
         <Page url="/context-variables">
-            <DocumentPage content="{appGlobals.content['pages/context-variables.md']}" />
+            <DocumentPage
+                content="{appGlobals.content['pages/context-variables.md']}"
+            />
         </Page>
         <Page url="/globals">
             <DocumentPage content="{appGlobals.content['pages/globals.md']}" />
         </Page>
         <Page url="/helper-tags">
-            <DocumentPage content="{appGlobals.content['pages/helper-tags.md']}" />
+            <DocumentPage
+                content="{appGlobals.content['pages/helper-tags.md']}"
+            />
         </Page>
         <Page url="/universal-properties">
-            <DocumentPage content="{appGlobals.content['pages/universal-properties.md']}" />
+            <DocumentPage
+                content="{appGlobals.content['pages/universal-properties.md']}"
+            />
         </Page>
         <Page url="/template-properties">
-            <DocumentPage content="{appGlobals.content['pages/template-properties.md']}" />
+            <DocumentPage
+                content="{appGlobals.content['pages/template-properties.md']}"
+            />
         </Page>
         <Page url="/icons">
             <Icons />
@@ -551,13 +729,19 @@
             <Palettes />
         </Page>
         <Page url="/glossary">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/glossary.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/glossary.md']}"
+            />
         </Page>
         <Page url="/build-hello-world-component">
-            <DocumentPage content="{appGlobals.content['pages/build-hello-world-component.md']}" />
+            <DocumentPage
+                content="{appGlobals.content['pages/build-hello-world-component.md']}"
+            />
         </Page>
         <Page url="/build-editor-component">
-            <DocumentPage content="{appGlobals.content['pages/build-editor-component.md']}" />
+            <DocumentPage
+                content="{appGlobals.content['pages/build-editor-component.md']}"
+            />
         </Page>
         <Page url="/howto/expose-a-method-from-a-component">
             <DocumentPageNoTOC
@@ -565,7 +749,9 @@
             />
         </Page>
         <Page url="/howto/delegate-a-method">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/howto/delegate-a-method.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/howto/delegate-a-method.md']}"
+            />
         </Page>
         <Page url="/howto/react-to-button-click-not-keystrokes">
             <DocumentPageNoTOC
@@ -644,7 +830,9 @@
             />
         </Page>
         <Page url="/howto/debug-a-component">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/howto/debug-a-component.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/howto/debug-a-component.md']}"
+            />
         </Page>
         <Page url="/howto/share-a-modaldialog-across-components">
             <DocumentPageNoTOC
@@ -657,13 +845,19 @@
             />
         </Page>
         <Page url="/howto/paginate-a-list">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/howto/paginate-a-list.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/howto/paginate-a-list.md']}"
+            />
         </Page>
         <Page url="/howto/chain-a-refetch">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/howto/chain-a-refetch.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/howto/chain-a-refetch.md']}"
+            />
         </Page>
         <Page url="/howto/control-cache-invalidation">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/howto/control-cache-invalidation.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/howto/control-cache-invalidation.md']}"
+            />
         </Page>
         <Page url="/howto/handle-background-operations">
             <DocumentPageNoTOC
@@ -721,10 +915,11 @@
             />
         </Page>
 
-
         <!-- Add more pages as additional files are created -->
         <Page url="/hosted-deployment">
-            <DocumentPage content="{appGlobals.content['pages/hosted-deployment.md']}" />
+            <DocumentPage
+                content="{appGlobals.content['pages/hosted-deployment.md']}"
+            />
         </Page>
         <Page url="/change-log">
             <ChangeLog />
@@ -733,7 +928,9 @@
             <DocumentPageNoTOC content="{appGlobals.content['pages/mcp.md']}" />
         </Page>
         <Page url="/vscode">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/vscode.md']}" />
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/vscode.md']}"
+            />
         </Page>
         <Page url="/components/*">
             <script>
