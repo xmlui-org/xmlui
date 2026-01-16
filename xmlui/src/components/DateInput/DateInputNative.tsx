@@ -801,7 +801,8 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
             </button>
           </Part>
         )}
-        {!finalVerboseValidationFeedback && (
+      </div>
+      {!finalVerboseValidationFeedback && (
           <Part partId={PART_VERBOSE_VALIDATION_FEEDBACK}>
             <ConciseValidationFeedback
               validationStatus={validationStatus}
@@ -811,7 +812,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
             />
           </Part>
         )}
-      </div>
       {endAdornment}
     </div>
   );

@@ -53,6 +53,11 @@ export const DateInputMd = createMetadata({
     readOnly: dReadonly(),
     enabled: dEnabled(defaultProps.enabled),
     validationStatus: dValidationStatus(defaultProps.validationStatus),
+    invalidMessages: {
+      description: "The invalid messages to display for the input component.",
+      type: "array",
+      valueType: "string",
+    },
     mode: {
       description: "The mode of the date input (single or range)",
       valueType: "string",
@@ -242,6 +247,7 @@ export const dateInputComponentRenderer = createComponentRenderer(
         initialValue={extractValue(node.props.initialValue)}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         validationStatus={extractValue(node.props.validationStatus)}
+        invalidMessages={extractValue(node.props.invalidMessages)}
         updateState={updateState}
         onDidChange={lookupEventHandler("didChange")}
         onFocus={lookupEventHandler("gotFocus")}
