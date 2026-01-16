@@ -1,5 +1,5 @@
 import type { CSSProperties, ForwardedRef, ReactElement, ReactNode } from "react";
-import { cloneElement, forwardRef, useId, useRef } from "react";
+import { cloneElement, forwardRef, useId, useState, useLayoutEffect, useCallback } from "react";
 import classnames from "classnames";
 import { Slot } from "@radix-ui/react-slot";
 
@@ -92,9 +92,28 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
 ) {
   const generatedId = useId();
   const inputId = id || generatedId;
-  const inputRef = useRef<HTMLDivElement>(null);
+  const [inputElement, setInputElement] = useState<HTMLElement | null>(null);
+  const [inputHeight, setInputHeight] = useState<number | undefined>(undefined);
 
-  const inputHeight = inputRef.current?.offsetHeight;
+  const refCallback = useCallback((node: any) => {
+    setInputElement(node);
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!inputElement) return;
+
+    // Measure immediately
+    setInputHeight(inputElement.offsetHeight);
+
+    if (typeof ResizeObserver !== "undefined") {
+      const observer = new ResizeObserver(() => {
+        setInputHeight(inputElement.offsetHeight);
+      });
+      observer.observe(inputElement);
+      return () => observer.disconnect();
+    }
+  }, [inputElement]);
+
   const labelWrapperHeight =
     labelPosition === "start" || labelPosition === "end" ? inputHeight : "auto";
 
@@ -160,7 +179,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
           <Part partId={PART_LABELED_ITEM}>
             {cloneElement(children as ReactElement, {
               id: !isInputTemplateUsed ? inputId : undefined,
-              ref: inputRef,
+              ref: refCallback,
               ...(cloneStyle ? {} : { style: undefined, className: undefined }),
             })}
           </Part>
