@@ -19,7 +19,7 @@ import { parseTooltipOptions, Tooltip } from "../../components/Tooltip/TooltipNa
 import { useStyles } from "../theming/StyleContext";
 import { THEME_VAR_PREFIX } from "../theming/layout-resolver";
 import { parseLayoutProperty, toCssPropertyName } from "../theming/parse-layout-props";
-import { buttonVariantValues, type RequiredIndicatorMode } from "../../components/abstractions";
+import { buttonVariantValues, type RequireLabelMode } from "../../components/abstractions";
 import type { Behavior } from "./Behavior";
 import { badgeVariantValues } from "../../components/Badge/BadgeNative";
 import { TableOfContentsContext } from "../TableOfContentsContext";
@@ -519,9 +519,9 @@ export const formBindingBehavior: Behavior = {
       0,
     );
     const validationMode = extractValue.asOptionalString(componentNode.props?.validationMode);
-    const requiredIndicator = extractValue.asOptionalString(
-      componentNode.props?.requiredIndicator,
-    ) as RequiredIndicatorMode | undefined;
+    const requireLabelMode = extractValue.asOptionalString(
+      componentNode.props?.requireLabelMode,
+    ) as RequireLabelMode | undefined;
 
     // Label props (optional, for standalone use)
     const label = extractValue.asOptionalString(componentNode.props?.label);
@@ -569,7 +569,7 @@ export const formBindingBehavior: Behavior = {
         labelWidth={labelWidth}
         labelBreak={labelBreak}
         enabled={enabled}
-        requiredIndicator={requiredIndicator}
+        requireLabelMode={requireLabelMode}
       >
         {node as ReactElement}
       </FormBindingWrapper>

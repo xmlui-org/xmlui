@@ -1367,10 +1367,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip).toHaveText("Tooltip text");
   });
 
-  test("requiredIndicator='required' shows asterisk for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='required' shows asterisk for required fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <Select testId="test" label="Country" required="true" requiredIndicator="required" bindTo="country">
+        <Select testId="test" label="Country" required="true" requireLabelMode="required" bindTo="country">
           <Option value="1" label="USA" />
         </Select>
       </Form>
@@ -1381,10 +1381,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requiredIndicator='required' hides indicator for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='required' hides indicator for optional fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <Select testId="test" label="Country" required="false" requiredIndicator="required" bindTo="country">
+        <Select testId="test" label="Country" required="false" requireLabelMode="required" bindTo="country">
           <Option value="1" label="USA" />
         </Select>
       </Form>
@@ -1395,10 +1395,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requiredIndicator='optional' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='optional' shows optional tag for optional fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <Select testId="test" label="Country" required="false" requiredIndicator="optional" bindTo="country">
+        <Select testId="test" label="Country" required="false" requireLabelMode="optional" bindTo="country">
           <Option value="1" label="USA" />
         </Select>
       </Form>
@@ -1409,10 +1409,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("*");
   });
 
-  test("requiredIndicator='optional' hides indicator for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='optional' hides indicator for required fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <Select testId="test" label="Country" required="true" requiredIndicator="optional" bindTo="country">
+        <Select testId="test" label="Country" required="true" requireLabelMode="optional" bindTo="country">
           <Option value="1" label="USA" />
         </Select>
       </Form>
@@ -1423,10 +1423,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requiredIndicator='both' shows asterisk for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='both' shows asterisk for required fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <Select testId="test" label="Country" required="true" requiredIndicator="both" bindTo="country">
+        <Select testId="test" label="Country" required="true" requireLabelMode="both" bindTo="country">
           <Option value="1" label="USA" />
         </Select>
       </Form>
@@ -1437,10 +1437,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requiredIndicator='both' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='both' shows optional tag for optional fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <Select testId="test" label="Country" required="false" requiredIndicator="both" bindTo="country">
+        <Select testId="test" label="Country" required="false" requireLabelMode="both" bindTo="country">
           <Option value="1" label="USA" />
         </Select>
       </Form>
@@ -1451,10 +1451,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).toContainText("(Optional)");
   });
 
-  test("input requiredIndicator overrides Form itemRequiredIndicator", async ({ page, initTestBed }) => {
+  test("input requireLabelMode overrides Form itemRequireLabelMode", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <Form itemRequiredIndicator="required">
-        <Select testId="test" label="Country" required="false" requiredIndicator="optional" bindTo="country">
+      <Form itemRequireLabelMode="required">
+        <Select testId="test" label="Country" required="false" requireLabelMode="optional" bindTo="country">
           <Option value="1" label="USA" />
         </Select>
       </Form>
@@ -1465,9 +1465,9 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("*");
   });
 
-  test("input inherits Form itemRequiredIndicator when not specified", async ({ page, initTestBed }) => {
+  test("input inherits Form itemRequireLabelMode when not specified", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <Form itemRequiredIndicator="both">
+      <Form itemRequireLabelMode="both">
         <Select testId="test1" label="Required Field" required="true" bindTo="field1">
           <Option value="1" label="USA" />
         </Select>
