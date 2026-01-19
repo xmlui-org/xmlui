@@ -127,6 +127,65 @@ Function calls are executed: @{x()}
 
 ## Properties [#properties]
 
+### `breakMode` (default: "normal") [#breakmode-default-normal]
+
+This property controls how text breaks into multiple lines. `normal` uses standard word boundaries, `word` breaks long words to prevent overflow, `anywhere` breaks at any character, `keep` prevents word breaking, and `hyphenate` uses automatic hyphenation. When not specified, uses the default browser behavior or theme variables.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `normal` | Uses standard word boundaries for breaking **(default)** |
+| `word` | Breaks long words when necessary to prevent overflow |
+| `anywhere` | Breaks at any character if needed to fit content |
+| `keep` | Prevents breaking within words entirely |
+| `hyphenate` | Uses automatic hyphenation when breaking words |
+
+```xmlui-pg copy display name="Example: breakMode='word'" /breakMode="word"/
+<App>
+  <VStack gap="16px">
+    <VStack gap="8px">
+      <Text variant="strong">breakMode="normal" (default)</Text>
+      <Markdown
+        width="200px"
+        backgroundColor="lightblue"
+        padding="8px"
+        breakMode="normal">
+        <![CDATA[
+This text uses standardwordbreaking at natural boundaries like spaces and hyphens.
+        ]]>
+      </Markdown>
+    </VStack>
+
+    <VStack gap="8px">
+      <Text variant="strong">breakMode="word"</Text>
+      <Markdown
+        width="200px"
+        backgroundColor="lightgreen"
+        padding="8px"
+        breakMode="word">
+        <![CDATA[
+This text will breakverylongwordswhenneeded to prevent overflow while preserving readability.
+        ]]>
+      </Markdown>
+    </VStack>
+
+    <VStack gap="8px">
+      <Text variant="strong">breakMode="anywhere"</Text>
+      <Markdown
+        width="200px"
+        backgroundColor="lightyellow"
+        padding="8px"
+        breakMode="anywhere">
+        <![CDATA[
+Thistext willbreakanywhereif neededtofit thecontainer eveninthe middleofwords.
+        ]]>
+      </Markdown>
+    </VStack>
+  </VStack>
+</App>
+```
+
 ### `content` [#content]
 
 This property sets the markdown content to display. Alternatively, you can nest the markdown content as a child in a CDATA section. In neither this property value nor any child is defined, empty content is displayed.
@@ -141,9 +200,84 @@ This boolean property specifies whether images should be displayed in grayscale.
 
 This boolean property specifies whether links should open in a new tab. If set to `true`, all links within the markdown will open in a new tab with `target="_blank"`. Links that explicitly specify their own target using the `| target=...` syntax will override this setting.
 
-### `removeBr` [#removebr]
+### `overflowMode` (default: "not specified") [#overflowmode-default-not-specified]
 
--  default: **false**
+This property controls how text overflow is handled. `none` prevents wrapping and shows no overflow indicator, `ellipsis` shows ellipses when text is truncated, `scroll` forces single line with horizontal scrolling, and `flow` allows multi-line wrapping with vertical scrolling when needed. When not specified, uses the default text behavior.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `none` | No wrapping, text stays on a single line with no overflow indicator |
+| `ellipsis` | Truncates with an ellipsis |
+| `scroll` | Forces single line with horizontal scrolling when content overflows |
+| `flow` | Allows text to wrap into multiple lines with vertical scrolling when container height is constrained |
+
+```xmlui-pg copy display name="Example: overflowMode='flow'" /overflowMode="flow"/
+<App>
+  <VStack gap="16px">
+    <VStack gap="8px">
+      <Text variant="strong">overflowMode="flow"</Text>
+      <Markdown
+        width="300px"
+        backgroundColor="lightblue"
+        padding="8px"
+        overflowMode="flow">
+        <![CDATA[
+This markdown content wraps to multiple lines naturally. It can contain **bold text**, *italic text*, and even [links](https://example.com), all wrapping as needed.
+
+When you have comma-separated lists like: [reference-1](url1), [reference-2](url2), [reference-3](url3), [reference-4](url4), they will wrap appropriately.
+        ]]>
+      </Markdown>
+    </VStack>
+
+    <VStack gap="8px">
+      <Text variant="strong">overflowMode="scroll"</Text>
+      <Markdown
+        width="300px"
+        backgroundColor="lightgreen"
+        padding="8px"
+        overflowMode="scroll">
+        <![CDATA[
+This text stays on a single line with horizontal scrolling when content overflows the container width.
+        ]]>
+      </Markdown>
+    </VStack>
+
+    <VStack gap="8px">
+      <Text variant="strong">overflowMode="ellipsis"</Text>
+      <Markdown
+        width="300px"
+        backgroundColor="lightyellow"
+        padding="8px"
+        overflowMode="ellipsis">
+        <![CDATA[
+This text truncates with ellipsis when it exceeds the container width.
+        ]]>
+      </Markdown>
+    </VStack>
+  </VStack>
+</App>
+```
+
+For comma-separated markdown links (common in reference lists), use `overflowMode="flow"` with optional `breakMode="word"`:
+
+```xmlui-pg copy display name="Example: comma-separated references" /overflowMode="flow"/ /breakMode="word"/
+<App>
+  <Markdown
+    width="400px"
+    backgroundColor="lavender"
+    padding="8px"
+    overflowMode="flow"
+    breakMode="word">
+    <![CDATA[
+[issue #123](https://example.com/issue/123), [PR #456](https://example.com/pr/456), [issue #789](https://example.com/issue/789), [PR #1011](https://example.com/pr/1011), [issue #1213](https://example.com/issue/1213)
+    ]]>
+  </Markdown>
+</App>
+```
+
+### `removeBr` (default: false) [#removebr-default-false]
 
 This boolean property specifies whether `<br>` (line break) elements should be omitted from the rendered output. When set to `true`, `<br/>` tags in the markdown content will not be rendered. When `false` (default), `<br/>` tags render as horizontal bars.
 

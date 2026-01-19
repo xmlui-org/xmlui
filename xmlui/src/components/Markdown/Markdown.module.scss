@@ -233,6 +233,64 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
       }
     }
 
+    // --- Overflow behavior classes
+    &.overflowNone {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: clip;
+      max-width: 100%;
+    }
+
+    &.overflowScroll {
+      white-space: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      text-overflow: unset;
+      max-width: 100%;
+
+      &::-webkit-scrollbar {
+        height: 6px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.3);
+        border-radius: 3px;
+      }
+    }
+
+    &.overflowEllipsis {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    &.overflowFlow {
+      white-space: normal;
+      overflow-x: hidden;
+      overflow-y: auto;
+      text-overflow: unset;
+      max-width: 100%;
+      display: block;
+
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.3);
+        border-radius: 3px;
+      }
+    }
+
     // Force word breaking ONLY for inline code elements (not code blocks)
     // Code blocks are wrapped in <pre><code>, so we exclude those
     code:not(pre code) {
@@ -672,6 +730,30 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
     color: $color-marker-ListItem;
   }
   */
+}
+
+// --- Break mode classes
+.breakNormal {
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+.breakWord {
+  overflow-wrap: break-word;
+}
+
+.breakAnywhere {
+  word-break: break-all;
+  overflow-wrap: anywhere;
+}
+
+.breakKeep {
+  word-break: keep-all;
+}
+
+.breakHyphenate {
+  hyphens: auto;
+  overflow-wrap: break-word;
 }
 
 // --- We export the theme variables to add them to the component renderer

@@ -120,9 +120,7 @@ Available values:
 
 This property sets the width of the item labels within the form. Individual `FormItem` instances can override this property. If this property is not set, each form item nested in the form uses its calculated label width. These widths may be different for each item.
 
-### `itemRequiredIndicator` [#itemrequiredindicator]
-
--  default: **"required"**
+### `itemRequireLabelMode` (default: "markRequired") [#itemrequirelabelmode-default-markrequired]
 
 This property controls how required indicators are displayed for required form items. Individual `FormItem` instances can override this property.
 
@@ -130,9 +128,47 @@ Available values:
 
 | Value | Description |
 | --- | --- |
-| `required` | Show "*" for required fields **(default)** |
-| `optional` | Show "(Optional)" for optional fields |
-| `both` | Show "*" for required AND "(Optional)" for optional fields |
+| `markRequired` | Show "*" for required fields **(default)** |
+| `markOptional` | Show "(Optional)" for optional fields |
+| `markBoth` | Show "*" for required AND "(Optional)" for optional fields |
+
+```xmlui-pg copy display name="Example: label indicators for required and optional fields" /itemRequireLabelMode/
+<App>
+  <Form itemRequireLabelMode="markRequired">
+    <H2>Emphasize Required Fields</H2>
+    <FormItem label="Name" bindTo="name" required="true" />
+    <FormItem label="Occupation" bindTo="occupation" required="false" />
+  </Form>
+
+  <Form itemRequireLabelMode="markOptional">
+    <H2>Emphasize Optional Fields</H2>
+    <FormItem label="Name" bindTo="name" required="true" />
+    <FormItem label="Occupation" bindTo="occupation" required="false" />
+  </Form>
+
+  <Form itemRequireLabelMode="markBoth">
+    <H2>Emphasize All Fields</H2>
+    <FormItem label="Name" bindTo="name" required="true" />
+    <FormItem label="Occupation" bindTo="occupation" required="false" />
+  </Form>
+</App>
+```
+
+Fields can override `itemRequireLabelMode` with `requireLabelMode`:
+
+```xmlui-pg copy display name="Example: fields overriding label mode" /requireLabelMode="markOptional"/
+<App>
+  <Form itemRequireLabelMode="markRequired">
+    <FormItem label="Name" bindTo="name" required="true" />
+    <FormItem
+      label="Occupation"
+      bindTo="occupation"
+      required="false"
+      requireLabelMode="markOptional"
+    />
+  </Form>
+</App>
+```
 
 ### `keepModalOpenOnSubmit` [#keepmodalopenonsubmit]
 

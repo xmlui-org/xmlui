@@ -5,7 +5,7 @@ import { Slot } from "@radix-ui/react-slot";
 
 import styles from "./FormItem.module.scss";
 
-import type { LabelPosition, RequiredIndicatorMode } from "../abstractions";
+import type { LabelPosition, RequireLabelMode } from "../abstractions";
 import { Spinner } from "../Spinner/SpinnerNative";
 import { PART_LABELED_ITEM, PART_LABEL } from "../../components-core/parts";
 import { Part } from "../Part/Part";
@@ -35,7 +35,7 @@ type ItemWithLabelProps = {
   layoutContext?: LayoutContext;
   testId?: string;
   cloneStyle?: boolean;
-  requiredIndicator?: RequiredIndicatorMode;
+  requireLabelMode?: RequireLabelMode;
 };
 export const defaultProps: Pick<
   ItemWithLabelProps,
@@ -46,7 +46,7 @@ export const defaultProps: Pick<
   | "validationInProgress"
   | "shrinkToLabel"
   | "cloneStyle"
-  | "requiredIndicator"
+  | "requireLabelMode"
   | "isInputTemplateUsed"
 > = {
   labelBreak: true,
@@ -56,7 +56,7 @@ export const defaultProps: Pick<
   validationInProgress: false,
   shrinkToLabel: false,
   cloneStyle: false,
-  requiredIndicator: "required",
+  requireLabelMode: "markRequired",
   isInputTemplateUsed: false,
 };
 
@@ -85,7 +85,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     layoutContext, // Destructured to prevent passing to DOM
     testId,
     cloneStyle = defaultProps.cloneStyle,
-    requiredIndicator = defaultProps.requiredIndicator,
+    requireLabelMode = defaultProps.requireLabelMode,
     ...rest
   }: ItemWithLabelProps,
   ref: ForwardedRef<HTMLDivElement>,
@@ -142,10 +142,10 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
                 })}
               >
                 {label}
-                {(requiredIndicator === "required" || requiredIndicator === "both") && required && (
+                {(requireLabelMode === "markRequired" || requireLabelMode === "markBoth") && required && (
                   <span className={styles.requiredMark}>*</span>
                 )}
-                {(requiredIndicator === "optional" || requiredIndicator === "both") &&
+                {(requireLabelMode === "markOptional" || requireLabelMode === "markBoth") &&
                   !required && <span className={styles.optionalTag}> (Optional)</span>}
                 {validationInProgress && (
                   <Spinner
