@@ -21,7 +21,7 @@ import {
 import { SelectOption } from "./SelectOption";
 import { Part } from "../Part/Part";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
-import { PART_VERBOSE_VALIDATION_FEEDBACK } from "../../components-core/parts";
+import { PART_CONCISE_VALIDATION_FEEDBACK } from "../../components-core/parts";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 
 interface SimpleSelectProps {
@@ -193,7 +193,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                 : placeholder}
           </div>
           {!finalVerboseValidationFeedback && (
-            <Part partId={PART_VERBOSE_VALIDATION_FEEDBACK}>
+            <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
               <ConciseValidationFeedback
                 validationStatus={validationStatus}
                 invalidMessages={invalidMessages}

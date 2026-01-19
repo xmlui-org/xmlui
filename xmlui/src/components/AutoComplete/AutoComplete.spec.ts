@@ -1158,7 +1158,7 @@ test.describe("Validation Feedback", () => {
     await expect(page.getByText("This field is required")).toBeVisible();
     
     // Check absence of concise feedback icon
-    const conciseFeedback = page.locator("[data-part-id='verboseValidationFeedback']");
+    const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).not.toBeVisible();
   });
 
@@ -1179,7 +1179,7 @@ test.describe("Validation Feedback", () => {
     await expect(page.getByText("This field is required")).not.toBeVisible();
     
     // Check for concise feedback icon
-    const conciseFeedback = page.locator("[data-part-id='verboseValidationFeedback']");
+    const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).toBeVisible();
     
     // Check that it shows error icon
@@ -1202,7 +1202,7 @@ test.describe("Validation Feedback", () => {
     await expect(page.getByText("This field is required")).not.toBeVisible();
     
     // Concise feedback visible
-    const conciseFeedback = page.locator("[data-part-id='verboseValidationFeedback']");
+    const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).toBeVisible();
   });
 
@@ -1227,7 +1227,7 @@ test.describe("Validation Feedback", () => {
     // Blur to trigger validation if needed
     await page.getByRole("combobox").blur();
     
-    const conciseFeedback = page.locator("[data-part-id='verboseValidationFeedback']");
+    const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).toBeVisible();
     await expect(conciseFeedback.locator("[data-icon-name='checkmark']")).toBeVisible();
   });
@@ -1244,7 +1244,7 @@ test.describe("Validation Feedback", () => {
     
     await page.getByTestId("submit").click();
     
-    const conciseFeedback = page.locator("[data-part-id='verboseValidationFeedback']");
+    const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     // Hover over the icon
     await conciseFeedback.hover();
     

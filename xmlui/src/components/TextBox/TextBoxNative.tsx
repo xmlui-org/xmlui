@@ -9,7 +9,7 @@ import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import { Adornment } from "../Input/InputAdornment";
 import type { ValidationStatus } from "../abstractions";
-import { PART_START_ADORNMENT, PART_INPUT, PART_END_ADORNMENT, PART_VERBOSE_VALIDATION_FEEDBACK } from "../../components-core/parts";
+import { PART_START_ADORNMENT, PART_INPUT, PART_END_ADORNMENT, PART_CONCISE_VALIDATION_FEEDBACK } from "../../components-core/parts";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
@@ -274,7 +274,7 @@ export const TextBox = forwardRef(function TextBox(
         </Part>
       )}
       {!finalVerboseValidationFeedback && (
-        <Part partId={PART_VERBOSE_VALIDATION_FEEDBACK}>
+        <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
           <ConciseValidationFeedback
             validationStatus={validationStatus}
             invalidMessages={invalidMessages}

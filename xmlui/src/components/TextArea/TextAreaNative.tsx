@@ -26,7 +26,7 @@ import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseV
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
 
-const PART_VERBOSE_VALIDATION_FEEDBACK = "verboseValidationFeedback";
+const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
 
 export const resizeOptionKeys = ["horizontal", "vertical", "both"] as const;
 export type ResizeOptions = (typeof resizeOptionKeys)[number];
@@ -286,7 +286,7 @@ export const TextArea = forwardRef(function TextArea(
 
   const renderConciseFeedback = () => (
     !finalVerboseValidationFeedback && (
-      <Part partId={PART_VERBOSE_VALIDATION_FEEDBACK}>
+      <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
         <div className={styles.floatingFeedback}>
           <ConciseValidationFeedback
             validationStatus={validationStatus}

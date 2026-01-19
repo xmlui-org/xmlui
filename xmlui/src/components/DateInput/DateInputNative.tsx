@@ -20,7 +20,7 @@ const PART_DAY = "day";
 const PART_MONTH = "month";
 const PART_YEAR = "year";
 const PART_CLEAR_BUTTON = "clearButton";
-const PART_VERBOSE_VALIDATION_FEEDBACK = "verboseValidationFeedback";
+const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
 
 // Date validation constants
 const MIN_YEAR = 1900;
@@ -803,7 +803,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
         )}
       </div>
       {!finalVerboseValidationFeedback && (
-          <Part partId={PART_VERBOSE_VALIDATION_FEEDBACK}>
+          <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
             <ConciseValidationFeedback
               validationStatus={validationStatus}
               invalidMessages={invalidMessages}

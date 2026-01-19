@@ -30,7 +30,7 @@ import { useFormContextPart } from "../Form/FormContext";
 
 const PART_LIST_WRAPPER = "listWrapper";
 const PART_CLEAR_BUTTON = "clearButton";
-const PART_VERBOSE_VALIDATION_FEEDBACK = "verboseValidationFeedback";
+const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
 
 export const defaultProps = {
   enabled: true,
@@ -221,7 +221,7 @@ const SelectTriggerActions = ({
         </Part>
       )}
       {!finalVerboseValidationFeedback && (
-        <Part partId={PART_VERBOSE_VALIDATION_FEEDBACK}>
+        <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
           <ConciseValidationFeedback
             validationStatus={validationStatus}
             invalidMessages={invalidMessages}

@@ -38,7 +38,7 @@ import { useFormContextPart } from "../Form/FormContext";
 
 const PART_SPINNER_UP = "spinnerUp";
 const PART_SPINNER_DOWN = "spinnerDown";
-const PART_VERBOSE_VALIDATION_FEEDBACK = "verboseValidationFeedback";
+const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
 
 // Default props for NumberBox component
 export const defaultProps = {
@@ -649,7 +649,7 @@ export const NumberBox = forwardRef(function NumberBox(
         />
       </Part>
       {!finalVerboseValidationFeedback && (
-        <Part partId={PART_VERBOSE_VALIDATION_FEEDBACK}>
+        <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
           <ConciseValidationFeedback
             validationStatus={validationStatus}
             invalidMessages={invalidMessages}

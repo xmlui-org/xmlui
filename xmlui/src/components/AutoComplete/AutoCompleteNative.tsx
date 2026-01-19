@@ -30,7 +30,7 @@ import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
 
 const PART_LIST_WRAPPER = "listWrapper";
-const PART_VERBOSE_VALIDATION_FEEDBACK = "verboseValidationFeedback";
+const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
 
 type AutoCompleteProps = {
   id?: string;
@@ -597,7 +597,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
                   </Part>
                   <div className={styles.actions}>
                     {!finalVerboseValidationFeedback && (
-                      <Part partId={PART_VERBOSE_VALIDATION_FEEDBACK}>
+                      <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
                         <ConciseValidationFeedback
                           validationStatus={validationStatus}
                           invalidMessages={invalidMessages}

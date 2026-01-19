@@ -19,7 +19,7 @@ import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
 import Icon from "../Icon/IconNative";
 
-const PART_VERBOSE_VALIDATION_FEEDBACK = "verboseValidationFeedback";
+const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
 
 export const DatePickerModeValues = ["single", "range"] as const;
 type DatePickerMode = (typeof DatePickerModeValues)[number];
@@ -529,7 +529,7 @@ export const DatePicker = forwardRef(function DatePicker(
           )}
         </div>
         {!finalVerboseValidationFeedback && (
-          <Part partId={PART_VERBOSE_VALIDATION_FEEDBACK}>
+          <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
             <ConciseValidationFeedback
               validationStatus={validationStatus}
               invalidMessages={invalidMessages}
