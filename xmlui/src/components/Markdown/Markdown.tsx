@@ -15,6 +15,7 @@ import {
   observeTreeDisplay,
 } from "./utils";
 import { createMetadata, d } from "../metadata-helpers";
+import type { BreakMode, OverflowMode } from "../abstractions";
 
 const COMP = "Markdown";
 
@@ -81,6 +82,48 @@ export const MarkdownMd = createMetadata({
         "with `target=\"_blank\"`. Links that explicitly specify their own target " +
         "using the `| target=...` syntax will override this setting.",
       valueType: "boolean",
+    },
+    breakMode: {
+      description:
+        "This property controls how text breaks into multiple lines. " +
+        "`normal` uses standard word boundaries, `word` breaks long words to prevent overflow, " +
+        "`anywhere` breaks at any character, `keep` prevents word breaking, " +
+        "and `hyphenate` uses automatic hyphenation. When not specified, uses the default browser behavior or theme variables.",
+      valueType: "string",
+      defaultValue: "normal",
+      availableValues: [
+        { value: "normal", description: "Uses standard word boundaries for breaking" },
+        { value: "word", description: "Breaks long words when necessary to prevent overflow" },
+        { value: "anywhere", description: "Breaks at any character if needed to fit content" },
+        { value: "keep", description: "Prevents breaking within words entirely" },
+        { value: "hyphenate", description: "Uses automatic hyphenation when breaking words" },
+      ],
+    },
+    overflowMode: {
+      description:
+        "This property controls how text overflow is handled. " +
+        "`none` prevents wrapping and shows no overflow indicator, " +
+        "`ellipsis` shows ellipses when text is truncated, `scroll` forces single line with horizontal scrolling, " +
+        "and `flow` allows multi-line wrapping with vertical scrolling when needed. " +
+        "When not specified, uses the default text behavior.",
+      valueType: "string",
+      defaultValue: "not specified",
+      availableValues: [
+        {
+          value: "none",
+          description: "No wrapping, text stays on a single line with no overflow indicator",
+        },
+        { value: "ellipsis", description: "Truncates with an ellipsis" },
+        {
+          value: "scroll",
+          description: "Forces single line with horizontal scrolling when content overflows",
+        },
+        {
+          value: "flow",
+          description:
+            "Allows text to wrap into multiple lines with vertical scrolling when container height is constrained",
+        },
+      ],
     },
   },
 
@@ -203,6 +246,8 @@ export const markdownComponentRenderer = createComponentRenderer(
         grayscale={extractValue.asOptionalBoolean(node.props.grayscale)}
         truncateLinks={extractValue.asOptionalBoolean(node.props.truncateLinks)}
         openLinkInNewTab={extractValue.asOptionalBoolean(node.props.openLinkInNewTab)}
+        overflowMode={extractValue(node.props.overflowMode) as OverflowMode | undefined}
+        breakMode={extractValue(node.props.breakMode) as BreakMode | undefined}
       >
         {renderedChildren}
       </TransformedMarkdown>
@@ -221,6 +266,8 @@ type TransformedMarkdownProps = {
   grayscale?: boolean;
   truncateLinks?: boolean;
   openLinkInNewTab?: boolean;
+  overflowMode?: OverflowMode;
+  breakMode?: BreakMode;
 };
 
 const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>(
@@ -236,6 +283,8 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
       grayscale,
       truncateLinks,
       openLinkInNewTab,
+      overflowMode,
+      breakMode,
     }: TransformedMarkdownProps,
     ref,
   ) => {
@@ -282,6 +331,8 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
         grayscale={grayscale}
         truncateLinks={truncateLinks}
         openLinkInNewTab={openLinkInNewTab}
+        overflowMode={overflowMode}
+        breakMode={breakMode}
       >
         {markdownContent}
       </Markdown>
