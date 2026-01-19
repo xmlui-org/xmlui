@@ -305,6 +305,7 @@ function VariantWrapper({
  */
 const FORM_BINDABLE_COMPONENTS = [
   "TextBox",
+  "PasswordInput",
   "TextArea",
   "NumberBox",
   "Toggle",
@@ -535,7 +536,17 @@ export const formBindingBehavior: Behavior = {
     const enabled = extractValue.asOptionalBoolean(componentNode.props?.enabled, true);
 
     // Event handlers
-    const onValidate = lookupEventHandler("validate");
+    let onValidate = lookupEventHandler("validate");
+    if (!onValidate) {
+      const onValidateProp = componentNode.props?.onValidate;
+      if (onValidateProp) {
+        // If onValidate is passed as a prop (not in metadata events), we treat it as an action
+        const action = extractValue(onValidateProp);
+        if (action) {
+          onValidate = (value) => context.lookupAction(action)(value);
+        }
+      }
+    }
 
     const validations = {
       required,
