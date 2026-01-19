@@ -61,6 +61,48 @@ This example mimics a one-second search and turns off the submit button during t
 
 %-PROP-END
 
+%-PROP-START itemRequireLabelMode
+
+```xmlui-pg copy display name="Example: label indicators for required and optional fields" /itemRequireLabelMode/
+<App>
+  <Form itemRequireLabelMode="markRequired">
+    <H2>Emphasize Required Fields</H2>
+    <FormItem label="Name" bindTo="name" required="true" />
+    <FormItem label="Occupation" bindTo="occupation" required="false" />
+  </Form>
+
+  <Form itemRequireLabelMode="markOptional">
+    <H2>Emphasize Optional Fields</H2>
+    <FormItem label="Name" bindTo="name" required="true" />
+    <FormItem label="Occupation" bindTo="occupation" required="false" />
+  </Form>
+
+  <Form itemRequireLabelMode="markBoth">
+    <H2>Emphasize All Fields</H2>
+    <FormItem label="Name" bindTo="name" required="true" />
+    <FormItem label="Occupation" bindTo="occupation" required="false" />
+  </Form>
+</App>
+```
+
+Fields can override `itemRequireLabelMode` with `requireLabelMode`:
+
+```xmlui-pg copy display name="Example: fields overriding label mode" /requireLabelMode="markOptional"/
+<App>
+  <Form itemRequireLabelMode="markRequired">
+    <FormItem label="Name" bindTo="name" required="true" />
+    <FormItem
+      label="Occupation"
+      bindTo="occupation"
+      required="false"
+      requireLabelMode="markOptional"
+    />
+  </Form>
+</App>
+```
+
+%-PROP-END
+
 %-EVENT-START submit
 
 ```xmlui-pg copy {4} display name="Example: submit"

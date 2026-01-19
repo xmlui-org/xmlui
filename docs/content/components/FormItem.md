@@ -439,18 +439,6 @@ Set this property to `true` to indicate it must have a value before submitting t
 </App>
 ```
 
-### `requiredIndicator` [#requiredindicator]
-
-Controls how required/optional status is visually indicated in the label.
-
-Available values:
-
-| Value | Description |
-| --- | --- |
-| `required` | Show "*" for required fields |
-| `optional` | Show "(Optional)" for optional fields |
-| `both` | Show "*" for required AND "(Optional)" for optional fields |
-
 ### `requiredInvalidMessage` [#requiredinvalidmessage]
 
 This optional string property is used to customize the message that is displayed if the field is not filled in. If not defined, the default message is used.
@@ -471,6 +459,18 @@ In the demo below, leave the field empty and click outside to see the regular an
   </Form>
 </App>
 ```
+
+### `requireLabelMode` [#requirelabelmode]
+
+Controls how required/optional status is visually indicated in the label.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `markRequired` | Show "*" for required fields |
+| `markOptional` | Show "(Optional)" for optional fields |
+| `markBoth` | Show "*" for required AND "(Optional)" for optional fields |
 
 ### `type` (default: "text") [#type-default-text]
 
