@@ -1,5 +1,26 @@
 # xmlui
 
+## 0.11.29
+
+### Patch Changes
+
+- eead0f5: Add experimental MessageListener component
+- 5c9cd56: Fix scroll issues with List virtualization
+- 6021e4d: Added itemRequiredIndicator property to Form to control required/optional indicators for FormItems on the form level.
+- 1906b59: make goto-definition reach components across the whole opened workspace
+- 486588f: Change the indicator in TableOfContents
+- 486588f: Add iconAlignment to NavLink and NavGroup
+- 486588f: Add new Theme variables to NavLink and NavGroup
+- 486588f: Experiment with documentation theme
+- 45441eb: Add overflowMode and breakMode to Markdown
+- a43b636: Renamed requiredIndicator to requireLabelMode and itemRequiredIndicator to itemRequireLabelMode.
+- ee7ad5a: In the Search box, hitting Enter opens the first match when none selected.
+- 6c232bf: Added requiredIndicator property to FormItem to customize required/optional indicators next to labels. Options are: "required", "optional", "both". Default is "required".
+- beff0fc: Fix alignment issues with Text
+- 23c44d5: Fix Column sortable regression
+- 99039d4: Fix List visibility issue in Markdown
+- 626bede: Removed language-server-web-worker export from package.json
+
 ## 0.11.28
 
 ### Patch Changes
