@@ -31,6 +31,7 @@ type Props = {
   noIndicator?: boolean;
   forceActive?: boolean;
   vertical?: boolean;
+  level?: number;
   style?: CSSProperties;
   className?: string;
   onClick?: MouseEventHandler;
@@ -49,6 +50,7 @@ export const NavLink = forwardRef(function NavLink(
     displayActive = defaultProps.displayActive,
     noIndicator = defaultProps.noIndicator,
     vertical,
+    level: levelProp,
     style,
     onClick,
     icon,
@@ -67,7 +69,8 @@ export const NavLink = forwardRef(function NavLink(
   const navPanelContext = useContext(NavPanelContext);
   const inDrawer = navPanelContext?.inDrawer;
   
-  const { level } = useContext(NavGroupContext);
+  const { level: contextLevel } = useContext(NavGroupContext);
+  const effectiveLevel = levelProp ?? contextLevel;
   let safeVertical = vertical;
 
   if (safeVertical === undefined) {
@@ -81,16 +84,20 @@ export const NavLink = forwardRef(function NavLink(
 
   const styleObj = useMemo(() => {
     return {
-      "--nav-link-level": layoutIsVertical ? level + 1 : 0,
+      "--nav-link-level": layoutIsVertical ? effectiveLevel + 1 : 0,
       ...style,
     };
-  }, [level, style, layoutIsVertical]);
+  }, [effectiveLevel, style, layoutIsVertical]);
 
   const baseClasses = classnames(styles.content, styles.base, className, {
     [styles.disabled]: disabled,
     [styles.vertical]: safeVertical,
     [styles.includeHoverIndicator]: displayActive && !noIndicator,
     [styles.navItemActive]: displayActive && forceActive,
+    [styles.level1]: effectiveLevel === 0,
+    [styles.level2]: effectiveLevel === 1,
+    [styles.level3]: effectiveLevel === 2,
+    [styles.level4]: effectiveLevel === 3,
   });
 
   let innerContent = (

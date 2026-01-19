@@ -75,6 +75,14 @@ export const NavLinkMd = createMetadata({
       ],
       defaultValue: "center",
     },
+    level: {
+      description:
+        `This property specifies the nesting level (1-4) for the navigation link, which affects its padding. ` +
+        `Higher levels typically have more left padding to indicate hierarchy. When used inside a NavGroup, ` +
+        `the level is automatically inherited from the group context.`,
+      valueType: "number",
+      availableValues: [1, 2, 3, 4],
+    },
   },
   events: {
     click: dClick(COMP),
@@ -129,6 +137,7 @@ export const navLinkComponentRenderer = createComponentRenderer(
         displayActive={extractValue.asOptionalBoolean(node.props.displayActive)}
         noIndicator={extractValue.asOptionalBoolean(node.props.noIndicator)}
         forceActive={extractValue.asOptionalBoolean(node.props.active)}
+        level={extractValue.asOptionalNumber(node.props.level)}
         className={className}
         target={extractValue(node.props?.target)}
         icon={<Icon name={iconName} className={styles.icon} />}

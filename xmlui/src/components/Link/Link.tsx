@@ -3,7 +3,7 @@ import styles from "./Link.module.scss";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, d, dEnabled, dLabel } from "../metadata-helpers";
-import { LinkTargetMd } from "../abstractions";
+import { LinkTargetMd, alignmentOptionValues } from "../abstractions";
 import { LinkNative, defaultProps } from "./LinkNative";
 
 const COMP = "Link";
@@ -41,6 +41,18 @@ export const LinkMd = createMetadata({
     icon: d(
       `This property allows you to add an optional icon (specify the icon's name) to the link.`,
     ),
+    horizontalAlignment: {
+      description: "Manages the horizontal content alignment for child elements in the Link.",
+      availableValues: alignmentOptionValues,
+      valueType: "string",
+      defaultValue: "start",
+    },
+    verticalAlignment: {
+      description: "Manages the vertical content alignment for child elements in the Link.",
+      availableValues: alignmentOptionValues,
+      valueType: "string",
+      defaultValue: "start",
+    },
   },
   events: {
     click: {
@@ -99,6 +111,8 @@ export const localLinkComponentRenderer = createComponentRenderer(
         target={extractValue(node.props?.target)}
         className={className}
         disabled={!extractValue.asOptionalBoolean(node.props.enabled ?? true)}
+        horizontalAlignment={extractValue.asOptionalString(node.props.horizontalAlignment)}
+        verticalAlignment={extractValue.asOptionalString(node.props.verticalAlignment)}
         onClick={lookupEventHandler("click")}
       >
         {node.props.label

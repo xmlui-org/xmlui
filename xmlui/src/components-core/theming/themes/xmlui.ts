@@ -82,17 +82,17 @@ export const XmlUiDocsThemeDefinition: ThemeDefinition = {
   themeVars: {
     // --- App layout
     "width-navPanel-App": "280px",
-    "maxWidth-content-App": "900px",
-    "maxWidth-content-NoToc": "600px",
+    "maxWidth-content-App": "1000px",
+    "maxWidth-content-NoToc": "700px",
 
     // --- Colors & typography
     "color-surface": "rgb(111, 110, 119)",
     "backgroundColor": "color-surface-1",
     "fontSize": "15px",
     "fontFamily": "Inter Variable",
-    "fontFamily-monospace": "'JetBrains Mono Variable',Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace",
-    "font-feature-settings": "'cv01', 'ss03'",
-    "fontSize-code": "14px",
+    "fontFamily-monospace": "Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace",
+    "font-feature-settings": "'cv03', 'ss03'",
+    "fontSize-code": "13px",
     "textColor-Text": "$color-surface-600",
 
     // --- Navigation layout
@@ -110,8 +110,9 @@ export const XmlUiDocsThemeDefinition: ThemeDefinition = {
     "marginTop-items-NavGroup": "$space-3",
     "marginBottom-items-NavGroup": "$space-3",
     "expandIconAlignment-NavGroup": "end",
-    "paddingLeft-NavLink": "$space-0",
+    //"paddingLeft-NavLink": "$space-0",
     "paddingVertical-NavLink": "$space-1_5",
+    "paddingLeft-level1-NavLink": "$space-0",
 
     // --- TOC
     "fontSize-TableOfContentsItem": "13px",
@@ -133,8 +134,13 @@ export const XmlUiDocsThemeDefinition: ThemeDefinition = {
     "marginBottom-H3-markdown": "$space-1",
     "fontWeight-PrevNextLink": "500",
     "textColor-PrevNextLink": "$color-surface-900",
+    "padding-PrevNextLink": "4px",
     "fontSize-PrevNextText": "13px",
     "textColor-PrevNextText": "$color-surface-500",
+    "backgroundColor-Card--hover": "$color-surface-50",
+    "backgroundColor-CodeBlock": "$color-surface-100",
+    "textColor-Link": "$color-surface-600",
+    "textColor-Link--hover": "$color-surface-900",
   },
 };
 

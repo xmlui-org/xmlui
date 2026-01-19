@@ -70,14 +70,36 @@ $marginRight-Image-markdown: createThemeVar("marginRight-Image-markdown");
 // Variables for @layer section - Admonition variants
 $backgroundColor-Admonition-markdown-info: createThemeVar("backgroundColor-Admonition-markdown-info");
 $borderColor-Admonition-markdown-info: createThemeVar("borderColor-Admonition-markdown-info");
+$borderWidth-Admonition-markdown-info: createThemeVar("borderWidth-Admonition-markdown-info");
+$borderStyle-Admonition-markdown-info: createThemeVar("borderStyle-Admonition-markdown-info");
 $backgroundColor-Admonition-markdown-warning: createThemeVar("backgroundColor-Admonition-markdown-warning");
 $borderColor-Admonition-markdown-warning: createThemeVar("borderColor-Admonition-markdown-warning");
+$borderWidth-Admonition-markdown-warning: createThemeVar("borderWidth-Admonition-markdown-warning");
+$borderStyle-Admonition-markdown-warning: createThemeVar("borderStyle-Admonition-markdown-warning");
 $backgroundColor-Admonition-markdown-danger: createThemeVar("backgroundColor-Admonition-markdown-danger");
 $borderColor-Admonition-markdown-danger: createThemeVar("borderColor-Admonition-markdown-danger");
+$borderWidth-Admonition-markdown-danger: createThemeVar("borderWidth-Admonition-markdown-danger");
+$borderStyle-Admonition-markdown-danger: createThemeVar("borderStyle-Admonition-markdown-danger");
 $backgroundColor-Admonition-markdown-note: createThemeVar("backgroundColor-Admonition-markdown-note");
 $borderColor-Admonition-markdown-note: createThemeVar("borderColor-Admonition-markdown-note");
+$borderWidth-Admonition-markdown-note: createThemeVar("borderWidth-Admonition-markdown-note");
+$borderStyle-Admonition-markdown-note: createThemeVar("borderStyle-Admonition-markdown-note");
 $backgroundColor-Admonition-markdown-tip: createThemeVar("backgroundColor-Admonition-markdown-tip");
 $borderColor-Admonition-markdown-tip: createThemeVar("borderColor-Admonition-markdown-tip");
+$borderWidth-Admonition-markdown-tip: createThemeVar("borderWidth-Admonition-markdown-tip");
+$borderStyle-Admonition-markdown-tip: createThemeVar("borderStyle-Admonition-markdown-tip");
+$backgroundColor-Admonition-markdown-card: createThemeVar("backgroundColor-Admonition-markdown-card");
+$borderColor-Admonition-markdown-card: createThemeVar("borderColor-Admonition-markdown-card");
+$borderWidth-Admonition-markdown-card: createThemeVar("borderWidth-Admonition-markdown-card");
+$borderStyle-Admonition-markdown-card: createThemeVar("borderStyle-Admonition-markdown-card");
+$backgroundColor-Admonition-markdown-feat: createThemeVar("backgroundColor-Admonition-markdown-feat");
+$borderColor-Admonition-markdown-feat: createThemeVar("borderColor-Admonition-markdown-feat");
+$borderWidth-Admonition-markdown-feat: createThemeVar("borderWidth-Admonition-markdown-feat");
+$borderStyle-Admonition-markdown-feat: createThemeVar("borderStyle-Admonition-markdown-feat");
+$backgroundColor-Admonition-markdown-def: createThemeVar("backgroundColor-Admonition-markdown-def");
+$borderColor-Admonition-markdown-def: createThemeVar("borderColor-Admonition-markdown-def");
+$borderWidth-Admonition-markdown-def: createThemeVar("borderWidth-Admonition-markdown-def");
+$borderStyle-Admonition-markdown-def: createThemeVar("borderStyle-Admonition-markdown-def");
 
 // Variables for @layer section - HorizontalRule
 $borderColor-HorizontalRule-markdown: createThemeVar("borderColor-HorizontalRule-markdown");
@@ -332,22 +354,50 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
       &.info {
         background-color: $backgroundColor-Admonition-markdown-info;
         border-color: $borderColor-Admonition-markdown-info;
+        border-width: $borderWidth-Admonition-markdown-info;
+        border-style: $borderStyle-Admonition-markdown-info;
       }
       &.warning {
         background-color: $backgroundColor-Admonition-markdown-warning;
         border-color: $borderColor-Admonition-markdown-warning;
+        border-width: $borderWidth-Admonition-markdown-warning;
+        border-style: $borderStyle-Admonition-markdown-warning;
       }
       &.danger {
         background-color: $backgroundColor-Admonition-markdown-danger;
         border-color: $borderColor-Admonition-markdown-danger;
+        border-width: $borderWidth-Admonition-markdown-danger;
+        border-style: $borderStyle-Admonition-markdown-danger;
       }
       &.note {
         background-color: $backgroundColor-Admonition-markdown-note;
         border-color: $borderColor-Admonition-markdown-note;
+        border-width: $borderWidth-Admonition-markdown-note;
+        border-style: $borderStyle-Admonition-markdown-note;
       }
       &.tip {
         background-color: $backgroundColor-Admonition-markdown-tip;
         border-color: $borderColor-Admonition-markdown-tip;
+        border-width: $borderWidth-Admonition-markdown-tip;
+        border-style: $borderStyle-Admonition-markdown-tip;
+      }
+      &.card {
+        background-color: $backgroundColor-Admonition-markdown-card;
+        border-color: $borderColor-Admonition-markdown-card;
+        border-width: $borderWidth-Admonition-markdown-card;
+        border-style: $borderStyle-Admonition-markdown-card;
+      }
+      &.feat {
+        background-color: $backgroundColor-Admonition-markdown-feat;
+        border-color: $borderColor-Admonition-markdown-feat;
+        border-width: $borderWidth-Admonition-markdown-feat;
+        border-style: $borderStyle-Admonition-markdown-feat;
+      }
+      &.def {
+        background-color: $backgroundColor-Admonition-markdown-def;
+        border-color: $borderColor-Admonition-markdown-def;
+        border-width: $borderWidth-Admonition-markdown-def;
+        border-style: $borderStyle-Admonition-markdown-def;
       }
     }
 
@@ -355,6 +405,11 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
       padding: 0.5rem;
       display: flex;
       align-items: flex-start;
+
+      & > :first-child {
+        // Center icon with first line of text (baseline alignment)
+        margin-top: 0.1em;
+      }
     }
 
     .admonitionIcon {
@@ -560,6 +615,11 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
       margin-left: $marginLeft-Li-markdown;
       @include t.borderVars($themeVars, "Li-markdown");
       @include t.paddingVars($themeVars, "Li-markdown");
+      
+      // Force alignment at the first baseline
+      &::marker {
+        line-height: 1;
+      }
     }
 
     // --- Video

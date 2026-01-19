@@ -11,40 +11,59 @@
         when="{$linkInfo.prevLink || $linkInfo.nextLink}"
       />
       <FlowLayout verticalAlignment="center" gap="$space-6">
-        <Button
-          variant="outlined"
-          width="50%"
-          when="{$linkInfo.prevLink}"
-          onClick="console.log($linkInfo.prevLink.to)"
-        >
-          Previous
-        </Button>
-        <Card width="50%" when="{$linkInfo.prevLink}">
-          <Link to="{$linkInfo.prevLink.to}">
-            <Icon name="chevronleft" />
-            <Text variant="subtitle">
-              {$linkInfo.prevLink.label}
-            </Text>
+        <Card width="50%" when="{$linkInfo.prevLink}" padding="0" verticalAlignment="center">
+          <Link
+            to="{$linkInfo.prevLink.to}"
+            width="100%"
+            paddingHorizontal="$space-4"
+            paddingVertical="$space-2"
+          >
+            <VStack gap="0">
+              <HStack verticalAlignment="center" gap="0">
+                <Icon name="chevronleft" />
+                <Text
+                  fontSize="$fontSize-PrevNextText"
+                  color="$textColor-PrevNextText"
+                >
+                  Previous
+                </Text>
+              </HStack>
+              <Text
+                color="$textColor-PrevNextLink"
+                paddingLeft="$padding-PrevNextLink"
+              >
+                {$linkInfo.prevLink.label}
+              </Text>
+            </VStack>
           </Link>
         </Card>
-        <Card
-          width="50%"
-          when="{$linkInfo.nextLink}"
-          onClick="Actions.navigateTo($linkInfo.nextLink.to)"
-        >
+        <Card width="50%" when="{$linkInfo.nextLink}" padding="0">
+          <Link
+            to="{$linkInfo.nextLink.to}"
+            width="100%"
+            horizontalAlignment="end"
+            paddingHorizontal="$space-4"
+            paddingVertical="$space-2"
+          >
+            <VStack gap="0" horizontalAlignment="end">
+              <HStack verticalAlignment="center" gap="0">
+                <Text
+                  fontSize="$fontSize-PrevNextText"
+                  color="$textColor-PrevNextText"
+                >
+                  Next
+                </Text>
+                <Icon name="chevronright" />
+              </HStack>
+              <Text
+                color="$textColor-PrevNextLink"
+                paddingRight="$padding-PrevNextLink"
+              >
+                {$linkInfo.nextLink.label}
+              </Text>
+            </VStack>
+          </Link>
         </Card>
-        <Link when="{$linkInfo.prevLink}" to="{$linkInfo.prevLink.to}">
-          <Icon name="chevronleft" />
-          <Text variant="subtitle">
-            {$linkInfo.prevLink.label}
-          </Text>
-        </Link>
-        <Link when="{$linkInfo.nextLink}" to="{$linkInfo.nextLink.to}">
-          <Text variant="subtitle">
-            {$linkInfo.nextLink.label}
-          </Text>
-          <Icon name="chevronright" />
-        </Link>
       </FlowLayout>
     </VStack>
   </Theme>

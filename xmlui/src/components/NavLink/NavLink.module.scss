@@ -10,6 +10,40 @@ $themeVars: ();
 $component: "NavLink";
 $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composeBorderVars($themeVars, $component);
+
+// Compose level-specific padding variables (level1 to level4) with fallback to base NavLink
+$themeVars: t.appendThemeVarWithDefault($themeVars, "padding-level1-#{$component}", t.getThemeVar($themeVars, "padding-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingHorizontal-level1-#{$component}", t.getThemeVar($themeVars, "paddingHorizontal-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingVertical-level1-#{$component}", t.getThemeVar($themeVars, "paddingVertical-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingLeft-level1-#{$component}", t.getThemeVar($themeVars, "paddingLeft-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingRight-level1-#{$component}", t.getThemeVar($themeVars, "paddingRight-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingTop-level1-#{$component}", t.getThemeVar($themeVars, "paddingTop-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingBottom-level1-#{$component}", t.getThemeVar($themeVars, "paddingBottom-#{$component}")) !global;
+
+$themeVars: t.appendThemeVarWithDefault($themeVars, "padding-level2-#{$component}", t.getThemeVar($themeVars, "padding-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingHorizontal-level2-#{$component}", t.getThemeVar($themeVars, "paddingHorizontal-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingVertical-level2-#{$component}", t.getThemeVar($themeVars, "paddingVertical-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingLeft-level2-#{$component}", t.getThemeVar($themeVars, "paddingLeft-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingRight-level2-#{$component}", t.getThemeVar($themeVars, "paddingRight-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingTop-level2-#{$component}", t.getThemeVar($themeVars, "paddingTop-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingBottom-level2-#{$component}", t.getThemeVar($themeVars, "paddingBottom-#{$component}")) !global;
+
+$themeVars: t.appendThemeVarWithDefault($themeVars, "padding-level3-#{$component}", t.getThemeVar($themeVars, "padding-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingHorizontal-level3-#{$component}", t.getThemeVar($themeVars, "paddingHorizontal-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingVertical-level3-#{$component}", t.getThemeVar($themeVars, "paddingVertical-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingLeft-level3-#{$component}", t.getThemeVar($themeVars, "paddingLeft-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingRight-level3-#{$component}", t.getThemeVar($themeVars, "paddingRight-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingTop-level3-#{$component}", t.getThemeVar($themeVars, "paddingTop-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingBottom-level3-#{$component}", t.getThemeVar($themeVars, "paddingBottom-#{$component}")) !global;
+
+$themeVars: t.appendThemeVarWithDefault($themeVars, "padding-level4-#{$component}", t.getThemeVar($themeVars, "padding-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingHorizontal-level4-#{$component}", t.getThemeVar($themeVars, "paddingHorizontal-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingVertical-level4-#{$component}", t.getThemeVar($themeVars, "paddingVertical-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingLeft-level4-#{$component}", t.getThemeVar($themeVars, "paddingLeft-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingRight-level4-#{$component}", t.getThemeVar($themeVars, "paddingRight-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingTop-level4-#{$component}", t.getThemeVar($themeVars, "paddingTop-#{$component}")) !global;
+$themeVars: t.appendThemeVarWithDefault($themeVars, "paddingBottom-level4-#{$component}", t.getThemeVar($themeVars, "paddingBottom-#{$component}")) !global;
+
 $backgroundColor-NavLink: createThemeVar("backgroundColor-#{$component}");
 $backgroundColor-NavLink--hover: createThemeVar("backgroundColor-#{$component}--hover");
 $backgroundColor-NavLink--hover--active: createThemeVar("backgroundColor-#{$component}--hover--active");
@@ -199,6 +233,38 @@ $transition: color 0.1s, background-color 0.1s;
         flex-shrink: 0;
       }
     }
+  }
+
+  .level1 {
+    padding: t.getThemeVar($themeVars, "padding-level1-#{$component}") !important;
+    padding-left: t.getThemeVar($themeVars, "paddingLeft-level1-#{$component}") !important;
+    padding-right: t.getThemeVar($themeVars, "paddingRight-level1-#{$component}") !important;
+    padding-top: t.getThemeVar($themeVars, "paddingTop-level1-#{$component}") !important;
+    padding-bottom: t.getThemeVar($themeVars, "paddingBottom-level1-#{$component}") !important;
+  }
+
+  .level2 {
+    padding: t.getThemeVar($themeVars, "padding-level2-#{$component}") !important;
+    padding-left: t.getThemeVar($themeVars, "paddingLeft-level2-#{$component}") !important;
+    padding-right: t.getThemeVar($themeVars, "paddingRight-level2-#{$component}") !important;
+    padding-top: t.getThemeVar($themeVars, "paddingTop-level2-#{$component}") !important;
+    padding-bottom: t.getThemeVar($themeVars, "paddingBottom-level2-#{$component}") !important;
+  }
+
+  .level3 {
+    padding: t.getThemeVar($themeVars, "padding-level3-#{$component}") !important;
+    padding-left: t.getThemeVar($themeVars, "paddingLeft-level3-#{$component}") !important;
+    padding-right: t.getThemeVar($themeVars, "paddingRight-level3-#{$component}") !important;
+    padding-top: t.getThemeVar($themeVars, "paddingTop-level3-#{$component}") !important;
+    padding-bottom: t.getThemeVar($themeVars, "paddingBottom-level3-#{$component}") !important;
+  }
+
+  .level4 {
+    padding: t.getThemeVar($themeVars, "padding-level4-#{$component}") !important;
+    padding-left: t.getThemeVar($themeVars, "paddingLeft-level4-#{$component}") !important;
+    padding-right: t.getThemeVar($themeVars, "paddingRight-level4-#{$component}") !important;
+    padding-top: t.getThemeVar($themeVars, "paddingTop-level4-#{$component}") !important;
+    padding-bottom: t.getThemeVar($themeVars, "paddingBottom-level4-#{$component}") !important;
   }
 
   .innerContent{

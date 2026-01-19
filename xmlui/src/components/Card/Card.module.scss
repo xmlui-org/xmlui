@@ -62,6 +62,38 @@ $verticalAlignment-title-Card: createThemeVar("verticalAlignment-title-#{$compon
       cursor: pointer;
     }
   }
+
+  // Add alignment classes needed by useContentAlignment hook
+  /* Main axis */
+  .justifyItemsStart {
+    justify-content: flex-start;
+  }
+  .justifyItemsCenter {
+    justify-content: center;
+  }
+  .justifyItemsStretch {
+    justify-content: stretch;
+  }
+  .justifyItemsEnd {
+    justify-content: flex-end;
+  }
+
+  /* Cross axis */
+  .alignItemsStart {
+    align-items: flex-start;
+  }
+  .alignItemsCenter {
+    align-items: center;
+  }
+  .alignItemsStretch {
+    align-items: stretch;
+  }
+  .alignItemsEnd {
+    align-items: flex-end;
+  }
+  .alignItemsBaseline {
+    align-items: baseline;
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer
