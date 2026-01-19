@@ -26,7 +26,7 @@ import {
 } from "../Form/formActions";
 import { getByPath } from "../Form/FormNative";
 import { useEvent } from "../../components-core/utils/misc";
-import type { LabelPosition, RequiredIndicatorMode } from "../abstractions";
+import type { LabelPosition, RequireLabelMode } from "../abstractions";
 import { ItemWithLabel } from "./ItemWithLabel";
 import { useValidation, useValidationDisplay } from "./Validations";
 import { HelperText } from "./HelperText";
@@ -39,7 +39,7 @@ type FormBindingWrapperProps = {
   initialValue?: any;
   noSubmit?: boolean;
   validations: FormItemValidations;
-  requiredIndicator?: RequiredIndicatorMode;
+  requireLabelMode?: RequireLabelMode;
   onValidate?: ValidateEventHandler;
   customValidationsDebounce?: number;
   validationMode?: ValidationMode;
@@ -67,7 +67,7 @@ export function FormBindingWrapper({
   labelPosition,
   labelWidth,
   labelBreak,
-  requiredIndicator,
+  requireLabelMode,
   enabled = true,
   style,
   className,
@@ -103,7 +103,7 @@ export function FormBindingWrapper({
   const validationResult = useFormContextPart((value) => value?.validationResults[formItemId]);
   const dispatch = useFormContextPart((value) => value?.dispatch);
   const formEnabled = useFormContextPart((value) => value?.enabled);
-  const formRequiredIndicator = useFormContextPart((value) => value?.itemRequiredIndicator);
+  const formRequireLabelMode = useFormContextPart((value) => value?.itemRequireLabelMode);
 
   const isEnabled = enabled && formEnabled;
 
@@ -222,7 +222,7 @@ export function FormBindingWrapper({
       style={style}
       className={className}
       validationResult={validationResultDisplay}
-      requiredIndicator={requiredIndicator ?? formRequiredIndicator}
+      requireLabelMode={requireLabelMode ?? formRequireLabelMode}
     >
       {enhancedInput}
     </ItemWithLabel>

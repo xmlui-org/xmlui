@@ -41,7 +41,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import { DatePicker } from "../DatePicker/DatePickerNative";
 import { getByPath } from "../Form/FormNative";
 import { AutoComplete } from "../AutoComplete/AutoCompleteNative";
-import type { LabelPosition, RequiredIndicatorMode } from "../abstractions";
+import type { LabelPosition, RequireLabelMode } from "../abstractions";
 import type { FormItemMd } from "./FormItem";
 import { ItemWithLabel } from "./ItemWithLabel";
 import { useValidation, useValidationDisplay } from "./Validations";
@@ -72,7 +72,7 @@ type Props = {
   onValidate?: ValidateEventHandler;
   customValidationsDebounce?: number;
   validationMode?: ValidationMode;
-  requiredIndicator?: RequiredIndicatorMode;
+  requireLabelMode?: RequireLabelMode;
   initialValue?: any;
   registerComponentApi?: RegisterComponentApiFn;
   maxTextLength?: number;
@@ -94,7 +94,10 @@ export const defaultProps: Pick<
   noSubmit: false,
 };
 
-export const FormItemContext = createContext<{ parentFormItemId: string | null; isInsideFormItem: boolean }>({
+export const FormItemContext = createContext<{
+  parentFormItemId: string | null;
+  isInsideFormItem: boolean;
+}>({
   parentFormItemId: null,
   isInsideFormItem: false,
 });
@@ -179,7 +182,7 @@ export const FormItem = memo(function FormItem({
   initialValue: initialValueFromProps,
   gap,
   noSubmit = defaultProps.noSubmit,
-  requiredIndicator,
+  requireLabelMode,
   layoutContext, // Destructured to prevent passing to ItemWithLabel
   ...rest
 }: Props & { layoutContext?: any }) {
@@ -230,14 +233,16 @@ export const FormItem = memo(function FormItem({
     getByPath(value?.originalSubject, formItemId),
   );
   const initialValue =
-    (initialValueFromSubject === undefined || initialValueFromSubject === null) ? initialValueFromProps : initialValueFromSubject;
+    initialValueFromSubject === undefined || initialValueFromSubject === null
+      ? initialValueFromProps
+      : initialValueFromSubject;
 
   const value = useFormContextPart<any>((value) => getByPath(value?.subject, formItemId));
 
   const validationResult = useFormContextPart((value) => value?.validationResults[formItemId]);
   const dispatch = useFormContextPart((value) => value?.dispatch);
   const formEnabled = useFormContextPart((value) => value?.enabled);
-  const itemRequiredIndicator = useFormContextPart((value) => value?.itemRequiredIndicator);
+  const itemRequireLabelMode = useFormContextPart((value) => value?.itemRequireLabelMode);
 
   const isEnabled = enabled && formEnabled;
 
@@ -519,52 +524,55 @@ export const FormItem = memo(function FormItem({
   }
 
   // Provide FormItem context for children to know they're inside a FormItem
-  const formItemContextValue = useMemo(() => ({
-    parentFormItemId: formItemId ?? null,
-    isInsideFormItem: true,
-  }), [formItemId]);
+  const formItemContextValue = useMemo(
+    () => ({
+      parentFormItemId: formItemId ?? null,
+      isInsideFormItem: true,
+    }),
+    [formItemId],
+  );
 
   return (
     <FormItemContext.Provider value={formItemContextValue}>
       <ItemWithLabel
-      labelPosition={labelPositionValue}
-      label={label}
-      labelWidth={labelWidthValue}
-      labelBreak={labelBreakValue}
-      enabled={isEnabled}
-      required={validations.required}
-      validationInProgress={validationResult?.partial}
-      onFocus={onFocus}
-      onBlur={onBlur}
-      style={style}
-      requiredIndicator={requiredIndicator ?? itemRequiredIndicator}
-      className={className}
-      validationResult={
-        <div ref={animateContainerRef} className={styles.helperTextContainer}>
-          {isHelperTextShown &&
-            validationResult?.validations.map((singleValidation, i) => (
-              <Fragment key={i}>
-                {singleValidation.isValid && !!singleValidation.validMessage && (
-                  <HelperText
-                    text={singleValidation.validMessage}
-                    status={"valid"}
-                    style={{ opacity: singleValidation.stale ? 0.5 : undefined }}
-                  />
-                )}
-                {!singleValidation.isValid && !!singleValidation.invalidMessage && (
-                  <HelperText
-                    text={singleValidation.invalidMessage}
-                    status={singleValidation.severity}
-                    style={{ opacity: singleValidation.stale ? 0.5 : undefined }}
-                  />
-                )}
-              </Fragment>
-            ))}
-        </div>
-      }
-    >
-      {formControl}
-    </ItemWithLabel>
+        labelPosition={labelPositionValue}
+        label={label}
+        labelWidth={labelWidthValue}
+        labelBreak={labelBreakValue}
+        enabled={isEnabled}
+        required={validations.required}
+        validationInProgress={validationResult?.partial}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        style={style}
+        requireLabelMode={requireLabelMode ?? itemRequireLabelMode}
+        className={className}
+        validationResult={
+          <div ref={animateContainerRef} className={styles.helperTextContainer}>
+            {isHelperTextShown &&
+              validationResult?.validations.map((singleValidation, i) => (
+                <Fragment key={i}>
+                  {singleValidation.isValid && !!singleValidation.validMessage && (
+                    <HelperText
+                      text={singleValidation.validMessage}
+                      status={"valid"}
+                      style={{ opacity: singleValidation.stale ? 0.5 : undefined }}
+                    />
+                  )}
+                  {!singleValidation.isValid && !!singleValidation.invalidMessage && (
+                    <HelperText
+                      text={singleValidation.invalidMessage}
+                      status={singleValidation.severity}
+                      style={{ opacity: singleValidation.stale ? 0.5 : undefined }}
+                    />
+                  )}
+                </Fragment>
+              ))}
+          </div>
+        }
+      >
+        {formControl}
+      </ItemWithLabel>
     </FormItemContext.Provider>
   );
 });

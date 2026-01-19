@@ -1,9 +1,9 @@
 import type { Dispatch } from "react";
-import { createContext, useContext, useContextSelector } from "use-context-selector";
+import { createContext, useContextSelector } from "use-context-selector";
 
 import type { ContainerAction } from "../../components-core/rendering/containers";
 import type { FormAction } from "../Form/formActions";
-import type { LabelPosition, RequiredIndicatorMode } from "../abstractions";
+import type { LabelPosition, RequireLabelMode } from "../abstractions";
 import type { PropertyValueDescription } from "../../abstractions/ComponentDefs";
 
 export type InteractionFlags = {
@@ -26,7 +26,7 @@ interface IFormContext {
   itemLabelWidth?: string;
   itemLabelBreak?: boolean;
   itemLabelPosition?: string | LabelPosition;
-  itemRequiredIndicator?: RequiredIndicatorMode;
+  itemRequireLabelMode?: RequireLabelMode;
 }
 
 export type ValidationResult = {
