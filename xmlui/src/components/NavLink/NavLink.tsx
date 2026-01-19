@@ -85,6 +85,8 @@ export const NavLinkMd = createMetadata({
       "Provides the following states: `--hover`, `--active`, `--pressed`",
     [`iconAlignment-${COMP}`]:
       "Sets the default vertical alignment of the icon when the label text wraps to multiple lines. Valid values: `baseline`, `start`, `center`, `end`",
+    [`gap-icon-${COMP}`]:
+      "Sets the gap between the icon and the text label. Only applied when an icon is present.",
   },
   defaultThemeVars: {
     [`border-${COMP}`]: "0px solid $borderColor",
@@ -106,6 +108,7 @@ export const NavLinkMd = createMetadata({
     [`outlineOffset-${COMP}--focus`]: "-1px",
     [`borderRadius-indicator-${COMP}`]: "$borderRadius",
     [`color-icon-${COMP}`]: "$color-surface-500",
+    [`gap-icon-${COMP}`]: "$space-3",
     [`color-indicator-${COMP}--active`]: "$color-primary-500",
     [`color-indicator-${COMP}--pressed`]: "$color-primary-500",
     [`color-indicator-${COMP}--hover`]: "$color-primary-600",

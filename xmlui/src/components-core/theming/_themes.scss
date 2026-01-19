@@ -367,6 +367,31 @@ $THEME-VAR-PREFIX: xmlui;
   padding-bottom: getThemeVar($themeVars, "paddingBottom-#{$subject}");
 }
 
+// This function composes margin variables for a given subject taking into
+// account all possible margin directions
+@function composeMarginVars($themeVars, $subject) {
+  $tmp: appendThemeVar($themeVars, "margin-#{$subject}") !global;
+  $tmpAll: getThemeVar($tmp, "margin-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "marginHorizontal-#{$subject}", $tmpAll) !global;
+  $tmpHorizontal: getThemeVar($tmp, "marginHorizontal-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "marginVertical-#{$subject}", $tmpAll) !global;
+  $tmpVertical: getThemeVar($tmp, "marginVertical-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "marginLeft-#{$subject}", $tmpHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "marginRight-#{$subject}", $tmpHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "marginTop-#{$subject}", $tmpVertical) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "marginBottom-#{$subject}", $tmpVertical) !global;
+  @return $tmp;
+}
+
+// This mixin applies margin variables to a given subject
+@mixin marginVars($themeVars, $subject) {
+  margin: getThemeVar($themeVars, "margin-#{$subject}");
+  margin-left: getThemeVar($themeVars, "marginLeft-#{$subject}");
+  margin-right: getThemeVar($themeVars, "marginRight-#{$subject}");
+  margin-top: getThemeVar($themeVars, "marginTop-#{$subject}");
+  margin-bottom: getThemeVar($themeVars, "marginBottom-#{$subject}");
+}
+
 // This function composes padding variables for a given subject taking into
 // account all possible padding directions
 @function composeBorderVars($themeVars, $subject) {

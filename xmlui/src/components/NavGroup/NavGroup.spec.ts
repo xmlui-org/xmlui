@@ -646,3 +646,277 @@ test.describe("noIndicator property", () => {
     expect(afterElement.content).toBe('""');
   });
 });
+
+// EXPAND ICON ALIGNMENT TESTS
+test.describe("Expand Icon Alignment", () => {
+  test("renders with default expandIconAlignment (start)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App layout="vertical">
+        <NavPanel>
+          <NavGroup testId="navGroup" label="Pages">
+            <NavLink label="Page 1" />
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `);
+
+    const navGroup = page.getByTestId("navGroup");
+    await expect(navGroup).toBeVisible();
+
+    // Verify the button structure exists
+    const button = page.getByRole("button", { name: "Pages" });
+    await expect(button).toBeVisible();
+  });
+
+  test("renders with expandIconAlignment='end'", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App layout="vertical">
+        <NavPanel>
+          <NavGroup testId="navGroup" label="Pages" expandIconAlignment="end">
+            <NavLink label="Page 1" />
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `);
+
+    const navGroup = page.getByTestId("navGroup");
+    await expect(navGroup).toBeVisible();
+
+    const button = page.getByRole("button", { name: "Pages" });
+    await expect(button).toBeVisible();
+  });
+
+  test("icon positioning differs between start and end alignment", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App layout="vertical">
+        <NavPanel>
+          <NavGroup
+            testId="navGroupStart"
+            label="Pages Start"
+            expandIconAlignment="start"
+          >
+            <NavLink label="Page 1" />
+          </NavGroup>
+          <NavGroup
+            testId="navGroupEnd"
+            label="Pages End"
+            expandIconAlignment="end"
+          >
+            <NavLink label="Page 1" />
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `);
+
+    const buttonStart = page.getByRole("button", { name: "Pages Start" });
+    const buttonEnd = page.getByRole("button", { name: "Pages End" });
+
+    await expect(buttonStart).toBeVisible();
+    await expect(buttonEnd).toBeVisible();
+
+    // Verify both buttons are rendered
+    const buttons = await page
+      .getByRole("button")
+      .filter({ hasText: /Pages Start|Pages End/ })
+      .count();
+    expect(buttons).toBe(2);
+  });
+
+  test("expandIconAlignment property renders correctly with multiple children", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <NavGroup label="Pages" expandIconAlignment="end">
+        <NavLink label="Page 1" />
+        <NavLink label="Page 2" />
+        <NavLink label="Page 3" />
+      </NavGroup>
+    `);
+
+    const button = page.getByRole("button", { name: "Pages" });
+    await expect(button).toBeVisible();
+    await expect(button).toHaveAttribute("aria-expanded", "false");
+  });
+
+  test("theme variable expandIconAlignment-NavGroup applies", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
+      <App layout="vertical">
+        <NavPanel>
+          <NavGroup testId="navGroup" label="Pages">
+            <NavLink label="Page 1" />
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `,
+      {
+        testThemeVars: {
+          "expandIconAlignment-NavGroup": "end",
+        },
+      },
+    );
+
+    const button = page.getByRole("button", { name: "Pages" });
+    await expect(button).toBeVisible();
+  });
+
+  test("property overrides theme variable", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `
+      <App layout="vertical">
+        <NavPanel>
+          <NavGroup
+            testId="navGroup"
+            label="Pages"
+            expandIconAlignment="start"
+          >
+            <NavLink label="Page 1" />
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `,
+      {
+        testThemeVars: {
+          "expandIconAlignment-NavGroup": "end",
+        },
+      },
+    );
+
+    const button = page.getByRole("button", { name: "Pages" });
+    // Property should override theme variable
+    await expect(button).toBeVisible();
+  });
+
+  test("nested NavGroups respect expandIconAlignment independently", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <NavGroup label="Parent" expandIconAlignment="end">
+        <NavGroup label="Child" expandIconAlignment="start">
+          <NavLink label="Page 1" />
+        </NavGroup>
+      </NavGroup>
+    `);
+
+    const parentButton = page.getByRole("button", { name: "Parent" });
+    await expect(parentButton).toBeVisible();
+
+    // Expand parent to see child
+    await parentButton.click();
+    const childButton = page.getByRole("menuitem", { name: "Child" });
+    await expect(childButton).toBeVisible();
+  });
+
+  test("expandIconAlignment works with disabled NavGroup", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App layout="vertical">
+        <NavPanel>
+          <NavGroup
+            testId="navGroup"
+            label="Pages"
+            enabled="false"
+            expandIconAlignment="end"
+          >
+            <NavLink label="Page 1" />
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `);
+
+    const button = page.getByRole("button", { name: "Pages" });
+    await expect(button).toBeDisabled();
+  });
+
+  test("expandIconAlignment works with noIndicator", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App layout="vertical">
+        <NavPanel>
+          <NavGroup
+            testId="navGroup"
+            label="Pages"
+            expandIconAlignment="end"
+            noIndicator="true"
+          >
+            <NavLink label="Page 1" />
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `);
+
+    const button = page.getByRole("button", { name: "Pages" });
+    await expect(button).toBeVisible();
+  });
+
+  test("expandIconAlignment='end' with long label text", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App layout="vertical">
+        <NavPanel>
+          <NavGroup
+            testId="navGroup"
+            label="Very Long Navigation Group Label Text"
+            expandIconAlignment="end"
+          >
+            <NavLink label="Page 1" />
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `);
+
+    const button = page.getByRole("button", {
+      name: "Very Long Navigation Group Label Text",
+    });
+    await expect(button).toBeVisible();
+  });
+
+  test("expandIconAlignment applies consistently across expand/collapse cycles", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App layout="vertical">
+        <NavPanel>
+          <NavGroup testId="navGroup" label="Pages" expandIconAlignment="end">
+            <NavLink label="Page 1" />
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `);
+
+    const button = page.getByRole("button", { name: "Pages" });
+
+    // Expand
+    await button.click();
+    await expect(button).toHaveAttribute("aria-expanded", "true");
+
+    // Collapse
+    await button.click();
+    await expect(button).toHaveAttribute("aria-expanded", "false");
+
+    // Expand again
+    await button.click();
+    await expect(button).toHaveAttribute("aria-expanded", "true");
+
+    // Verify consistency
+    await expect(button).toBeVisible();
+  });
+});

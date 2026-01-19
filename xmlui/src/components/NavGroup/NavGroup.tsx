@@ -80,13 +80,42 @@ export const NavGroupMd = createMetadata({
       ],
       defaultValue: "center",
     },
+    expandIconAlignment: {
+      description:
+        `This property controls the horizontal alignment of the expand/collapse arrow icon. ` +
+        `Set to \`start\` to display the arrow immediately after the label, or \`end\` to push it to the right edge of the NavGroup (only applies when the NavGroup has a defined width).`,
+      valueType: "string",
+      availableValues: [
+        { value: "start", description: "Display arrow immediately after the label (default)" },
+        { value: "end", description: "Push arrow to the right edge of the NavGroup" },
+      ],
+      defaultValue: "start",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
+  themeVarDescriptions: {
+    [`marginTop-items-${COMP}`]:
+      "Sets the margin between the NavGroup header and the first child item. Does not affect margins between child items.",
+    [`marginBottom-items-${COMP}`]: "Sets the margin after the last child item in the NavGroup.",
+    [`paddingHorizontal-level1-${COMP}`]:
+      "Sets the horizontal padding for level 1 (top-level) NavGroup. Overrides paddingHorizontal-NavGroup when defined.",
+    [`paddingHorizontal-level2-${COMP}`]:
+      "Sets the horizontal padding for level 2 (nested once) NavGroup. Overrides paddingHorizontal-NavGroup when defined.",
+    [`paddingHorizontal-level3-${COMP}`]:
+      "Sets the horizontal padding for level 3 (nested twice) NavGroup. Overrides paddingHorizontal-NavGroup when defined.",
+    [`paddingHorizontal-level4-${COMP}`]:
+      "Sets the horizontal padding for level 4 (nested three times) NavGroup. Overrides paddingHorizontal-NavGroup when defined.",
+  },
   defaultThemeVars: {
     [`backgroundColor-dropdown-${COMP}`]: "$backgroundColor-primary",
     [`borderRadius-dropdown-${COMP}`]: "$borderRadius",
     [`boxShadow-dropdown-${COMP}`]: "$boxShadow-spread",
     [`minWidth-dropdown-${COMP}`]: "11em",
+    [`marginTop-items-${COMP}`]: "0",
+    [`marginBottom-items-${COMP}`]: "0",
+    [`expandIconAlignment-${COMP}`]: "start",
+    [`paddingHorizontal-${COMP}`]: "$space-4",
+    [`paddingVertical-${COMP}`]: "$space-2",
   },
 });
 
@@ -109,6 +138,7 @@ export const navGroupComponentRenderer = createComponentRenderer(
         iconHorizontalCollapsed={extractValue.asOptionalString(node.props.iconHorizontalCollapsed)}
         iconVerticalCollapsed={extractValue.asOptionalString(node.props.iconVerticalCollapsed)}
         iconAlignment={extractValue.asOptionalString(node.props.iconAlignment, "center")}
+        expandIconAlignment={extractValue(node.props.expandIconAlignment)}
       />
     );
   },

@@ -104,6 +104,11 @@ export const XmlUiDocsThemeDefinition: ThemeDefinition = {
     "thickness-indicator-NavLink": "0",
     "backgroundColor-Text-code": "rgb(from $color-surface-200 r g b / 0.4)",
     "paddingHorizontal-Text-code": "$space-1",
+    "marginTop-items-NavGroup": "$space-3",
+    "marginBottom-items-NavGroup": "$space-3",
+    "expandIconAlignment-NavGroup": "end",
+    "paddingHorizontal-level1-NavGroup": "$space-4",
+    "paddingHorizontal-level2-NavGroup": "$space-0",
 
     // --- TOC
     "fontSize-TableOfContentsItem": "13px",

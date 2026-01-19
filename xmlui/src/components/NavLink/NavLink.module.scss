@@ -37,6 +37,7 @@ $color-indicator-NavLink--hover: createThemeVar("color-indicator-#{$component}--
 $color-indicator-NavLink--active: createThemeVar("color-indicator-#{$component}--active");
 $color-indicator-NavLink--pressed: createThemeVar("color-indicator-#{$component}--pressed");
 $iconAlignment-NavLink: createThemeVar("iconAlignment-#{$component}");
+$gap-icon-NavLink: createThemeVar("gap-icon-#{$component}");
 
 // Variables for @layer section
 $outlineWidth-NavLink--focus: createThemeVar('outlineWidth-#{$component}--focus');
@@ -203,7 +204,7 @@ $transition: color 0.1s, background-color 0.1s;
   .innerContent{
     display: flex;
     align-items: center;
-    gap: t.$space-2;
+    gap: $gap-icon-NavLink;
     flex: 1;
     white-space: break-spaces;
     overflow-wrap: anywhere;
