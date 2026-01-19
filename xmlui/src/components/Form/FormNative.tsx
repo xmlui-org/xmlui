@@ -295,7 +295,7 @@ export const defaultProps: Pick<
   hideButtonRowUntilDirty: false,
   hideButtonRow: false,
   enableSubmit: true,
-  itemRequireLabelMode: "required",
+  itemRequireLabelMode: "markRequired",
 };
 
 // --- Remove the properties from formState.subject where the property name ends with UNBOUND_FIELD_SUFFIX

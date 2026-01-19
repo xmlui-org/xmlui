@@ -141,13 +141,13 @@ test.describe("Basic Functionality", () => {
     await expect(driver.label).toHaveText("Very Long Label That Should Break");
   });
 
-  test("renders with requireLabelMode set to 'required' showing asterisk for required fields", async ({
+  test("renders with requireLabelMode set to 'markRequired' showing asterisk for required fields", async ({
     initTestBed,
     createFormItemDriver,
   }) => {
     await initTestBed(`
       <Form>
-        <FormItem testId="formItem" label="Required Field" required="true" requireLabelMode="required" />
+        <FormItem testId="formItem" label="Required Field" required="true" requireLabelMode="markRequired" />
       </Form>
     `);
     const driver = await createFormItemDriver("formItem");
@@ -155,13 +155,13 @@ test.describe("Basic Functionality", () => {
     await expect(driver.label).not.toContainText("(Optional)");
   });
 
-  test("renders with requireLabelMode set to 'required' hiding indicator for optional fields", async ({
+  test("renders with requireLabelMode set to 'markRequired' hiding indicator for optional fields", async ({
     initTestBed,
     createFormItemDriver,
   }) => {
     await initTestBed(`
       <Form>
-        <FormItem testId="formItem" label="Optional Field" required="false" requireLabelMode="required" />
+        <FormItem testId="formItem" label="Optional Field" required="false" requireLabelMode="markRequired" />
       </Form>
     `);
     const driver = await createFormItemDriver("formItem");
@@ -169,13 +169,13 @@ test.describe("Basic Functionality", () => {
     await expect(driver.label).not.toContainText("(Optional)");
   });
 
-  test("renders with requireLabelMode set to 'optional' showing optional tag for optional fields", async ({
+  test("renders with requireLabelMode set to 'markOptional' showing optional tag for optional fields", async ({
     initTestBed,
     createFormItemDriver,
   }) => {
     await initTestBed(`
       <Form>
-        <FormItem testId="formItem" label="Optional Field" required="false" requireLabelMode="optional" />
+        <FormItem testId="formItem" label="Optional Field" required="false" requireLabelMode="markOptional" />
       </Form>
     `);
     const driver = await createFormItemDriver("formItem");
@@ -183,13 +183,13 @@ test.describe("Basic Functionality", () => {
     await expect(driver.label).not.toContainText("*");
   });
 
-  test("renders with requireLabelMode set to 'optional' hiding indicator for required fields", async ({
+  test("renders with requireLabelMode set to 'markOptional' hiding indicator for required fields", async ({
     initTestBed,
     createFormItemDriver,
   }) => {
     await initTestBed(`
       <Form>
-        <FormItem testId="formItem" label="Required Field" required="true" requireLabelMode="optional" />
+        <FormItem testId="formItem" label="Required Field" required="true" requireLabelMode="markOptional" />
       </Form>
     `);
     const driver = await createFormItemDriver("formItem");
@@ -197,13 +197,13 @@ test.describe("Basic Functionality", () => {
     await expect(driver.label).not.toContainText("(Optional)");
   });
 
-  test("renders with requireLabelMode set to 'both' showing asterisk for required fields", async ({
+  test("renders with requireLabelMode set to 'markBoth' showing asterisk for required fields", async ({
     initTestBed,
     createFormItemDriver,
   }) => {
     await initTestBed(`
       <Form>
-        <FormItem testId="formItem" label="Required Field" required="true" requireLabelMode="both" />
+        <FormItem testId="formItem" label="Required Field" required="true" requireLabelMode="markBoth" />
       </Form>
     `);
     const driver = await createFormItemDriver("formItem");
@@ -211,13 +211,13 @@ test.describe("Basic Functionality", () => {
     await expect(driver.label).not.toContainText("(Optional)");
   });
 
-  test("renders with requireLabelMode set to 'both' showing optional tag for optional fields", async ({
+  test("renders with requireLabelMode set to 'markBoth' showing optional tag for optional fields", async ({
     initTestBed,
     createFormItemDriver,
   }) => {
     await initTestBed(`
       <Form>
-        <FormItem testId="formItem" label="Optional Field" required="false" requireLabelMode="both" />
+        <FormItem testId="formItem" label="Optional Field" required="false" requireLabelMode="markBoth" />
       </Form>
     `);
     const driver = await createFormItemDriver("formItem");

@@ -500,10 +500,10 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
 // =============================================================================
 
 test.describe("Behaviors and Parts", () => {
-  test("requireLabelMode='required' shows asterisk for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markRequired' shows asterisk for required fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <DatePicker testId="test" label="Birth Date" required="true" requireLabelMode="required" bindTo="birthDate" />
+        <DatePicker testId="test" label="Birth Date" required="true" requireLabelMode="markRequired" bindTo="birthDate" />
       </Form>
     `);
     
@@ -512,10 +512,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='required' hides indicator for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markRequired' hides indicator for optional fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <DatePicker testId="test" label="Birth Date" required="false" requireLabelMode="required" bindTo="birthDate" />
+        <DatePicker testId="test" label="Birth Date" required="false" requireLabelMode="markRequired" bindTo="birthDate" />
       </Form>
     `);
     
@@ -524,10 +524,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='optional' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markOptional' shows optional tag for optional fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <DatePicker testId="test" label="Birth Date" required="false" requireLabelMode="optional" bindTo="birthDate" />
+        <DatePicker testId="test" label="Birth Date" required="false" requireLabelMode="markOptional" bindTo="birthDate" />
       </Form>
     `);
     
@@ -536,10 +536,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("*");
   });
 
-  test("requireLabelMode='optional' hides indicator for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markOptional' hides indicator for required fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <DatePicker testId="test" label="Birth Date" required="true" requireLabelMode="optional" bindTo="birthDate" />
+        <DatePicker testId="test" label="Birth Date" required="true" requireLabelMode="markOptional" bindTo="birthDate" />
       </Form>
     `);
     
@@ -548,10 +548,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='both' shows asterisk for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markBoth' shows asterisk for required fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <DatePicker testId="test" label="Birth Date" required="true" requireLabelMode="both" bindTo="birthDate" />
+        <DatePicker testId="test" label="Birth Date" required="true" requireLabelMode="markBoth" bindTo="birthDate" />
       </Form>
     `);
     
@@ -560,10 +560,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='both' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markBoth' shows optional tag for optional fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <DatePicker testId="test" label="Birth Date" required="false" requireLabelMode="both" bindTo="birthDate" />
+        <DatePicker testId="test" label="Birth Date" required="false" requireLabelMode="markBoth" bindTo="birthDate" />
       </Form>
     `);
     
@@ -574,8 +574,8 @@ test.describe("Behaviors and Parts", () => {
 
   test("input requireLabelMode overrides Form itemRequireLabelMode", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <Form itemRequireLabelMode="required">
-        <DatePicker testId="test" label="Birth Date" required="false" requireLabelMode="optional" bindTo="birthDate" />
+      <Form itemRequireLabelMode="markRequired">
+        <DatePicker testId="test" label="Birth Date" required="false" requireLabelMode="markOptional" bindTo="birthDate" />
       </Form>
     `);
     
@@ -586,7 +586,7 @@ test.describe("Behaviors and Parts", () => {
 
   test("input inherits Form itemRequireLabelMode when not specified", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <Form itemRequireLabelMode="both">
+      <Form itemRequireLabelMode="markBoth">
         <DatePicker testId="test1" label="Required Field" required="true" bindTo="field1" />
         <DatePicker testId="test2" label="Optional Field" required="false" bindTo="field2" />
       </Form>

@@ -56,7 +56,7 @@ export const defaultProps: Pick<
   validationInProgress: false,
   shrinkToLabel: false,
   cloneStyle: false,
-  requireLabelMode: "required",
+  requireLabelMode: "markRequired",
   isInputTemplateUsed: false,
 };
 
@@ -142,10 +142,10 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
                 })}
               >
                 {label}
-                {(requireLabelMode === "required" || requireLabelMode === "both") && required && (
+                {(requireLabelMode === "markRequired" || requireLabelMode === "markBoth") && required && (
                   <span className={styles.requiredMark}>*</span>
                 )}
-                {(requireLabelMode === "optional" || requireLabelMode === "both") &&
+                {(requireLabelMode === "markOptional" || requireLabelMode === "markBoth") &&
                   !required && <span className={styles.optionalTag}> (Optional)</span>}
                 {validationInProgress && (
                   <Spinner

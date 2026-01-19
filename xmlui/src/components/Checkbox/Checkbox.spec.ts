@@ -1187,10 +1187,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(inputPart).toBeVisible();
   });
 
-  test("requireLabelMode='required' shows asterisk for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markRequired' shows asterisk for required fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <Checkbox testId="test" label="Accept Terms" required="true" requireLabelMode="required" bindTo="terms" />
+        <Checkbox testId="test" label="Accept Terms" required="true" requireLabelMode="markRequired" bindTo="terms" />
       </Form>
     `);
     
@@ -1199,10 +1199,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='required' hides indicator for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markRequired' hides indicator for optional fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <Checkbox testId="test" label="Accept Terms" required="false" requireLabelMode="required" bindTo="terms" />
+        <Checkbox testId="test" label="Accept Terms" required="false" requireLabelMode="markRequired" bindTo="terms" />
       </Form>
     `);
     
@@ -1211,10 +1211,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='optional' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markOptional' shows optional tag for optional fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <Checkbox testId="test" label="Accept Terms" required="false" requireLabelMode="optional" bindTo="terms" />
+        <Checkbox testId="test" label="Accept Terms" required="false" requireLabelMode="markOptional" bindTo="terms" />
       </Form>
     `);
     
@@ -1223,10 +1223,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("*");
   });
 
-  test("requireLabelMode='optional' hides indicator for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markOptional' hides indicator for required fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <Checkbox testId="test" label="Accept Terms" required="true" requireLabelMode="optional" bindTo="terms" />
+        <Checkbox testId="test" label="Accept Terms" required="true" requireLabelMode="markOptional" bindTo="terms" />
       </Form>
     `);
     
@@ -1235,10 +1235,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='both' shows asterisk for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markBoth' shows asterisk for required fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <Checkbox testId="test" label="Accept Terms" required="true" requireLabelMode="both" bindTo="terms" />
+        <Checkbox testId="test" label="Accept Terms" required="true" requireLabelMode="markBoth" bindTo="terms" />
       </Form>
     `);
     
@@ -1247,10 +1247,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='both' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markBoth' shows optional tag for optional fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <Checkbox testId="test" label="Accept Terms" required="false" requireLabelMode="both" bindTo="terms" />
+        <Checkbox testId="test" label="Accept Terms" required="false" requireLabelMode="markBoth" bindTo="terms" />
       </Form>
     `);
     
@@ -1261,8 +1261,8 @@ test.describe("Behaviors and Parts", () => {
 
   test("input requireLabelMode overrides Form itemRequireLabelMode", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <Form itemRequireLabelMode="required">
-        <Checkbox testId="test" label="Accept Terms" required="false" requireLabelMode="optional" bindTo="terms" />
+      <Form itemRequireLabelMode="markRequired">
+        <Checkbox testId="test" label="Accept Terms" required="false" requireLabelMode="markOptional" bindTo="terms" />
       </Form>
     `);
     
@@ -1273,7 +1273,7 @@ test.describe("Behaviors and Parts", () => {
 
   test("input inherits Form itemRequireLabelMode when not specified", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <Form itemRequireLabelMode="both">
+      <Form itemRequireLabelMode="markBoth">
         <Checkbox testId="test1" label="Required Field" required="true" bindTo="field1" />
         <Checkbox testId="test2" label="Optional Field" required="false" bindTo="field2" />
       </Form>

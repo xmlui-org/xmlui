@@ -716,10 +716,10 @@ test.describe("Parsing", () => {
 // =============================================================================
 
 test.describe("Behaviors and Parts", () => {
-  test("requireLabelMode='required' shows asterisk for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markRequired' shows asterisk for required fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <FileInput testId="test" label="Upload Document" required="true" requireLabelMode="required" bindTo="document" />
+        <FileInput testId="test" label="Upload Document" required="true" requireLabelMode="markRequired" bindTo="document" />
       </Form>
     `);
     
@@ -728,10 +728,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='required' hides indicator for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markRequired' hides indicator for optional fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <FileInput testId="test" label="Upload Document" required="false" requireLabelMode="required" bindTo="document" />
+        <FileInput testId="test" label="Upload Document" required="false" requireLabelMode="markRequired" bindTo="document" />
       </Form>
     `);
     
@@ -740,10 +740,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='optional' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markOptional' shows optional tag for optional fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <FileInput testId="test" label="Upload Document" required="false" requireLabelMode="optional" bindTo="document" />
+        <FileInput testId="test" label="Upload Document" required="false" requireLabelMode="markOptional" bindTo="document" />
       </Form>
     `);
     
@@ -752,10 +752,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("*");
   });
 
-  test("requireLabelMode='optional' hides indicator for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markOptional' hides indicator for required fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <FileInput testId="test" label="Upload Document" required="true" requireLabelMode="optional" bindTo="document" />
+        <FileInput testId="test" label="Upload Document" required="true" requireLabelMode="markOptional" bindTo="document" />
       </Form>
     `);
     
@@ -764,10 +764,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='both' shows asterisk for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markBoth' shows asterisk for required fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <FileInput testId="test" label="Upload Document" required="true" requireLabelMode="both" bindTo="document" />
+        <FileInput testId="test" label="Upload Document" required="true" requireLabelMode="markBoth" bindTo="document" />
       </Form>
     `);
     
@@ -776,10 +776,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='both' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markBoth' shows optional tag for optional fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <FileInput testId="test" label="Upload Document" required="false" requireLabelMode="both" bindTo="document" />
+        <FileInput testId="test" label="Upload Document" required="false" requireLabelMode="markBoth" bindTo="document" />
       </Form>
     `);
     
@@ -790,8 +790,8 @@ test.describe("Behaviors and Parts", () => {
 
   test("input requireLabelMode overrides Form itemRequireLabelMode", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <Form itemRequireLabelMode="required">
-        <FileInput testId="test" label="Upload Document" required="false" requireLabelMode="optional" bindTo="document" />
+      <Form itemRequireLabelMode="markRequired">
+        <FileInput testId="test" label="Upload Document" required="false" requireLabelMode="markOptional" bindTo="document" />
       </Form>
     `);
     
@@ -802,7 +802,7 @@ test.describe("Behaviors and Parts", () => {
 
   test("input inherits Form itemRequireLabelMode when not specified", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <Form itemRequireLabelMode="both">
+      <Form itemRequireLabelMode="markBoth">
         <FileInput testId="test1" label="Required Field" required="true" bindTo="field1" />
         <FileInput testId="test2" label="Optional Field" required="false" bindTo="field2" />
       </Form>

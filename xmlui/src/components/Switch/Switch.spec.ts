@@ -1149,10 +1149,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(inputPart).toBeVisible();
   });
 
-  test("requireLabelMode='required' shows asterisk for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markRequired' shows asterisk for required fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <Switch testId="test" label="Enable Notifications" required="true" requireLabelMode="required" bindTo="notifications" />
+        <Switch testId="test" label="Enable Notifications" required="true" requireLabelMode="markRequired" bindTo="notifications" />
       </Form>
     `);
     
@@ -1161,10 +1161,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='required' hides indicator for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markRequired' hides indicator for optional fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <Switch testId="test" label="Enable Notifications" required="false" requireLabelMode="required" bindTo="notifications" />
+        <Switch testId="test" label="Enable Notifications" required="false" requireLabelMode="markRequired" bindTo="notifications" />
       </Form>
     `);
     
@@ -1173,10 +1173,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='optional' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markOptional' shows optional tag for optional fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <Switch testId="test" label="Enable Notifications" required="false" requireLabelMode="optional" bindTo="notifications" />
+        <Switch testId="test" label="Enable Notifications" required="false" requireLabelMode="markOptional" bindTo="notifications" />
       </Form>
     `);
     
@@ -1185,10 +1185,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("*");
   });
 
-  test("requireLabelMode='optional' hides indicator for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markOptional' hides indicator for required fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <Switch testId="test" label="Enable Notifications" required="true" requireLabelMode="optional" bindTo="notifications" />
+        <Switch testId="test" label="Enable Notifications" required="true" requireLabelMode="markOptional" bindTo="notifications" />
       </Form>
     `);
     
@@ -1197,10 +1197,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='both' shows asterisk for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markBoth' shows asterisk for required fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <Switch testId="test" label="Enable Notifications" required="true" requireLabelMode="both" bindTo="notifications" />
+        <Switch testId="test" label="Enable Notifications" required="true" requireLabelMode="markBoth" bindTo="notifications" />
       </Form>
     `);
     
@@ -1209,10 +1209,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='both' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markBoth' shows optional tag for optional fields", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
-        <Switch testId="test" label="Enable Notifications" required="false" requireLabelMode="both" bindTo="notifications" />
+        <Switch testId="test" label="Enable Notifications" required="false" requireLabelMode="markBoth" bindTo="notifications" />
       </Form>
     `);
     
@@ -1223,8 +1223,8 @@ test.describe("Behaviors and Parts", () => {
 
   test("input requireLabelMode overrides Form itemRequireLabelMode", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <Form itemRequireLabelMode="required">
-        <Switch testId="test" label="Enable Notifications" required="false" requireLabelMode="optional" bindTo="notifications" />
+      <Form itemRequireLabelMode="markRequired">
+        <Switch testId="test" label="Enable Notifications" required="false" requireLabelMode="markOptional" bindTo="notifications" />
       </Form>
     `);
     
@@ -1235,7 +1235,7 @@ test.describe("Behaviors and Parts", () => {
 
   test("input inherits Form itemRequireLabelMode when not specified", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <Form itemRequireLabelMode="both">
+      <Form itemRequireLabelMode="markBoth">
         <Switch testId="test1" label="Required Field" required="true" bindTo="field1" />
         <Switch testId="test2" label="Optional Field" required="false" bindTo="field2" />
       </Form>

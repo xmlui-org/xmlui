@@ -262,13 +262,13 @@ export const placementMd: PropertyValueDescription[] = [
 ];
 
 // --- Available indicator modes
-export const requireLabelModeValues = ["required", "optional", "both"] as const;
+export const requireLabelModeValues = ["markRequired", "markOptional", "markBoth"] as const;
 export const requireLabelModeNames = [...requireLabelModeValues];
 export type RequireLabelMode = (typeof requireLabelModeValues)[number];
 export const requireLabelModeMd: PropertyValueDescription[] = [
-  { value: "required", description: 'Show "*" for required fields' },
-  { value: "optional", description: 'Show "(Optional)" for optional fields' },
-  { value: "both", description: 'Show "*" for required AND "(Optional)" for optional fields' },
+  { value: "markRequired", description: 'Show "*" for required fields' },
+  { value: "markOptional", description: 'Show "(Optional)" for optional fields' },
+  { value: "markBoth", description: 'Show "*" for required AND "(Optional)" for optional fields' },
 ];
 
 // --- Available label positions
