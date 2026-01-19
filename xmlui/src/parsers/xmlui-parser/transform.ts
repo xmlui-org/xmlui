@@ -6,18 +6,14 @@ import { Parser } from "../scripting/Parser";
 import { CharacterCodes } from "./CharacterCodes";
 import type { GetText } from "./parser";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
-import type {
-  ExpressionSection,
-  StringLiteralSection,
-} from "../../components-core/script-runner/ParameterParser";
 import { parseParameterString } from "../../components-core/script-runner/ParameterParser";
 import { DIAGS_TRANSFORM, TransformDiag, type TransformDiagPositionless } from "./diagnostics";
-import {
+import type {
   Expression,
   Literal,
-  T_LITERAL,
   TemplateLiteralExpression,
 } from "../../components-core/script-runner/ScriptingSourceTree";
+import { T_LITERAL } from "../../components-core/script-runner/ScriptingSourceTree";
 import { T_TEMPLATE_LITERAL_EXPRESSION } from "../scripting/ScriptingNodeTypes";
 
 export const COMPOUND_COMP_ID = "Component";
@@ -442,8 +438,8 @@ export function nodeToComponentDef(
       default:
         if (startSegment === "var") {
           comp.vars ??= {};
-          comp.vars[name] = value;
-          // comp.vars[name] = parseBinding(value, attrValueStringNode);
+          // comp.vars[name] = value;
+          comp.vars[name] = parseBinding(value, attrValueStringNode);
         } else if (startSegment === "method") {
           comp.api ??= {};
           comp.api[name] = value;
@@ -1074,6 +1070,10 @@ export function nodeToComponentDef(
       if (parts.length === 0) {
         // --- The value is an empty string, retrieve it
         return value;
+      }
+
+      if (parts.length === 1 && parts[0].type === "literal") {
+        return parts[0].value;
       }
 
       const segments = parts.map((part) => {

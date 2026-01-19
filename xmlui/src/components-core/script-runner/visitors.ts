@@ -6,8 +6,8 @@ import type {
   ObjectDestructure,
   Statement,
   VarDeclaration,
-
-  Identifier} from "./ScriptingSourceTree";
+  Identifier,
+} from "./ScriptingSourceTree";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 import { getIdentifierScope } from "./eval-tree-common";
 import {
@@ -35,6 +35,7 @@ import {
   T_OBJECT_LITERAL,
   T_POSTFIX_OP_EXPRESSION,
   T_PREFIX_OP_EXPRESSION,
+  T_REACTIVE_VAR_DECLARATION,
   T_RETURN_STATEMENT,
   T_SEQUENCE_EXPRESSION,
   T_SPREAD_EXPRESSION,
@@ -48,6 +49,12 @@ import {
 } from "./ScriptingSourceTree";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 import { ensureMainThread, innermostBlockScope } from "./process-statement-common";
+import {
+  T_ARRAY_DESTRUCTURE,
+  T_NO_ARG_EXPRESSION,
+  T_OBJECT_DESTRUCTURE,
+  T_TEMPLATE_LITERAL_EXPRESSION,
+} from "../../parsers/scripting/ScriptingNodeTypes";
 
 /**
  * Collects the name of local context variables the specified program depends on
@@ -372,6 +379,27 @@ export function collectVariableDependencies(
 
         case T_SPREAD_EXPRESSION:
           return collectDependencies(program.expr, program, "spread");
+
+        case T_TEMPLATE_LITERAL_EXPRESSION: {
+          const accum = [];
+          for (const segment of program.segments) {
+            accum.push(...collectDependencies(segment));
+          }
+          return accum;
+        }
+        case T_REACTIVE_VAR_DECLARATION:
+          return collectDependencies(program.expr);
+
+        case T_LITERAL:
+        case T_DESTRUCTURE:
+        case T_OBJECT_DESTRUCTURE:
+        case T_ARRAY_DESTRUCTURE:
+        case T_SWITCH_CASE:
+        case T_NO_ARG_EXPRESSION:
+          return [];
+
+        default:
+          const _exhaustiveCheck: never = program;
       }
     }
 

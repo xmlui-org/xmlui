@@ -10,7 +10,11 @@ import type { ContainerState } from "../../abstractions/ContainerDefs";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
 import type { ContainerDispatcher, MemoedVars } from "../abstractions/ComponentRenderer";
 import { ContainerActionKind } from "./containers";
-import type { CodeDeclaration, ModuleErrors } from "../script-runner/ScriptingSourceTree";
+import type {
+  CodeDeclaration,
+  ModuleErrors,
+  Expression,
+} from "../script-runner/ScriptingSourceTree";
 import { T_ARROW_EXPRESSION } from "../script-runner/ScriptingSourceTree";
 import { EMPTY_OBJECT } from "../constants";
 import { collectFnVarDeps } from "../rendering/collectFnVarDeps";
@@ -226,8 +230,9 @@ export const StateContainer = memo(
     const functionDeps = useMemo(() => {
       const fnDeps: Record<string, Array<string>> = {};
       Object.entries(varDefinitions).forEach(([key, value]) => {
-        if (isParsedValue(value) && value.tree.type === T_ARROW_EXPRESSION) {
-          fnDeps[key] = collectVariableDependencies(value.tree, referenceTrackedApi);
+        const tree = isParsedValue(value) ? value.tree : value;
+        if (isPlainObject(tree) && tree.type === T_ARROW_EXPRESSION) {
+          fnDeps[key] = collectVariableDependencies(tree, referenceTrackedApi);
         }
       });
       return collectFnVarDeps(fnDeps);
@@ -461,28 +466,15 @@ function useVars(
         // --- We already resolved props in a compound component
         ret[key] = value;
       } else {
-        if (!isParsedValue(value) && typeof value !== "string") {
+        if (!isParsedValue(value) && !isExpression(value)) {
           ret[key] = value;
         } else {
           // --- Resolve each variable's value, without going into the details of arrays and objects
           if (!memoedVars.current.has(value)) {
             memoedVars.current.set(value, {
               getDependencies: memoizeOne((value, referenceTrackedApi) => {
-                if (isParsedValue(value)) {
-                  return collectVariableDependencies(value.tree, referenceTrackedApi);
-                }
-                // console.log(`GETTING DEPENDENCY FOR ${value} with:`, referenceTrackedApi);
-                const params = parseParameterString(value);
-                let ret = new Set<string>();
-                params.forEach((param) => {
-                  if (param.type === "expression") {
-                    ret = new Set([
-                      ...ret,
-                      ...collectVariableDependencies(param.value, referenceTrackedApi),
-                    ]);
-                  }
-                });
-                return Array.from(ret);
+                const tree = isParsedValue(value) ? value.tree : value;
+                return collectVariableDependencies(tree, referenceTrackedApi);
               }),
               obtainValue: memoizeOne(
                 (value, state, appContext, strict, deps, appContextDeps) => {
@@ -496,15 +488,14 @@ function useVars(
                   //   }
                   // );
                   try {
-                    return isParsedValue(value)
-                      ? evalBinding(value.tree, {
-                          localContext: state,
-                          appContext,
-                          options: {
-                            defaultToOptionalMemberAccess: true,
-                          },
-                        })
-                      : extractParam(state, value, appContext, strict);
+                    const tree = isParsedValue(value) ? value.tree : value;
+                    return evalBinding(tree, {
+                      localContext: state,
+                      appContext,
+                      options: {
+                        defaultToOptionalMemberAccess: true,
+                      },
+                    });
                   } catch (e) {
                     console.log(state);
                     throw new ParseVarError(value, e);
@@ -608,4 +599,8 @@ class ParseVarError extends Error {
 //true if it's coming from a code behind or a script tag
 function isParsedValue(value: any): value is CodeDeclaration {
   return isParsedCodeDeclaration(value);
+}
+
+function isExpression(value: any): value is Expression {
+  return isPlainObject(value) && typeof (value as any).type === "number";
 }

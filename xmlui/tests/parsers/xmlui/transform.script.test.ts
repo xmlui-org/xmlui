@@ -5,9 +5,11 @@ import {
   type ModuleErrors,
   T_ARROW_EXPRESSION,
   T_BINARY_EXPRESSION,
+  T_IDENTIFIER,
   T_LITERAL,
 } from "../../../src/components-core/script-runner/ScriptingSourceTree";
 import { transformSource } from "./xmlui";
+import { T_TEMPLATE_LITERAL_EXPRESSION } from "../../../src/parsers/scripting/ScriptingNodeTypes";
 
 describe("Xmlui transform - script", () => {
   it("Script works with empty text #2", () => {
@@ -307,6 +309,9 @@ var b = 2;
     expect(child.children![0].type).equal("Stack");
     expect(child.children![0].children!.length).equal(1);
     const textNode = child.children![0].children![0];
-    expect((textNode.props as any).value).toMatchObject({ __PARSED: true });
+    expect((textNode.props as any).value).toMatchObject({
+      type: T_TEMPLATE_LITERAL_EXPRESSION,
+      segments: [{ type: T_IDENTIFIER, name: "uppercaseItem" }],
+    });
   });
 });

@@ -3,6 +3,11 @@ import type { ComponentDef } from "../../../src/abstractions/ComponentDefs";
 import type { ButtonMd } from "../../../src/components/Button/Button";
 import { transformSource } from "./xmlui";
 import type { StackMd } from "../../../src/components/Stack/Stack";
+import { T_TEMPLATE_LITERAL_EXPRESSION } from "../../../src/parsers/scripting/ScriptingNodeTypes";
+import {
+  T_IDENTIFIER,
+  T_LITERAL,
+} from "../../../src/components-core/script-runner/ScriptingSourceTree";
 
 describe("Xmlui transform - attributes", () => {
   it("Invalid attribute name fails #1", () => {
@@ -88,24 +93,24 @@ describe("Xmlui transform - attributes", () => {
     it("prop is pre-parsed", () => {
       const cd = transformSource(`<Stack a="hi {name}" />`) as ComponentDef;
       expect(cd.props.a).toMatchObject({
-        __PARSED: true,
-        parts: [{ type: "literal", value: "hi " }, { type: "expression" }],
+        type: T_TEMPLATE_LITERAL_EXPRESSION,
+        segments: [{ type: T_LITERAL, value: "hi " }, { type: T_IDENTIFIER }],
       });
     });
 
     it("var is pre-parsed", () => {
       const cd = transformSource(`<Stack var.a="hi {name}" />`) as ComponentDef<typeof StackMd>;
       expect(cd.vars.a).toMatchObject({
-        __PARSED: true,
-        parts: [{ type: "literal", value: "hi " }, { type: "expression" }],
+        type: T_TEMPLATE_LITERAL_EXPRESSION,
+        segments: [{ type: T_LITERAL, value: "hi " }, { type: T_IDENTIFIER }],
       });
     });
 
     it("when is pre-parsed", () => {
       const cd = transformSource(`<Stack when="{isOpen}" />`) as ComponentDef<typeof StackMd>;
       expect(cd.when).toMatchObject({
-        __PARSED: true,
-        parts: [{ type: "expression" }],
+        type: T_TEMPLATE_LITERAL_EXPRESSION,
+        segments: [{ type: T_IDENTIFIER }],
       });
     });
 
@@ -114,11 +119,11 @@ describe("Xmlui transform - attributes", () => {
       const child = cd.children![0] as ComponentDef;
       expect(child.type).equal("TextNode");
       expect(child.props.value).toMatchObject({
-        __PARSED: true,
-        parts: [
-          { type: "literal", value: "hello " },
-          { type: "expression" },
-          { type: "literal", value: " there!" },
+        type: T_TEMPLATE_LITERAL_EXPRESSION,
+        segments: [
+          { type: T_LITERAL, value: "hello " },
+          { type: T_IDENTIFIER },
+          { type: T_LITERAL, value: " there!" },
         ],
       });
     });
@@ -127,10 +132,10 @@ describe("Xmlui transform - attributes", () => {
       const cd = transformSource(
         `<Stack><property name="foo"><item>hello {a}</item></property></Stack>`,
       ) as ComponentDef<typeof StackMd>;
-      expect(cd.props.foo).toHaveLength(1);
-      expect(cd.props.foo[0]).toMatchObject({
-        __PARSED: true,
-        parts: [{ type: "literal", value: "hello " }, { type: "expression" }],
+      expect((cd.props as any).foo).toHaveLength(1);
+      expect((cd.props as any).foo[0]).toMatchObject({
+        type: T_TEMPLATE_LITERAL_EXPRESSION,
+        segments: [{ type: T_LITERAL, value: "hello " }, { type: T_IDENTIFIER }],
       });
     });
   });

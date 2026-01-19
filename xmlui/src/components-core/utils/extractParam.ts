@@ -30,7 +30,7 @@ export function extractParam(
 ): any {
   if (typeof param === "string") {
     return param;
-  } else if (param?.type === T_TEMPLATE_LITERAL_EXPRESSION) {
+  } else if (isPlainObject(param) && typeof param.type === "number") {
     extractContext.didResolve = true;
     return evalBinding(param, {
       localContext: state,
