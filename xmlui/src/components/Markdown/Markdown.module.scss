@@ -47,14 +47,19 @@ $marginBottom-H1-markdown: createThemeVar("marginBottom-H1-markdown");
 $fontSize-H1-markdown: createThemeVar("fontSize-H1-markdown");
 $marginTop-H2-markdown: createThemeVar("marginTop-H2-markdown");
 $marginBottom-H2-markdown: createThemeVar("marginBottom-H2-markdown");
+$fontSize-H2-markdown: createThemeVar("fontSize-H2-markdown");
 $marginTop-H3-markdown: createThemeVar("marginTop-H3-markdown");
 $marginBottom-H3-markdown: createThemeVar("marginBottom-H3-markdown");
+$fontSize-H3-markdown: createThemeVar("fontSize-H3-markdown");
 $marginTop-H4-markdown: createThemeVar("marginTop-H4-markdown");
 $marginBottom-H4-markdown: createThemeVar("marginBottom-H4-markdown");
+$fontSize-H4-markdown: createThemeVar("fontSize-H4-markdown");
 $marginTop-H5-markdown: createThemeVar("marginTop-H5-markdown");
 $marginBottom-H5-markdown: createThemeVar("marginBottom-H5-markdown");
+$fontSize-H5-markdown: createThemeVar("fontSize-H5-markdown");
 $marginTop-H6-markdown: createThemeVar("marginTop-H6-markdown");
 $marginBottom-H6-markdown: createThemeVar("marginBottom-H6-markdown");
+$fontSize-H6-markdown: createThemeVar("fontSize-H6-markdown");
 
 // Variables for @layer section - Image in markdown
 $marginTop-Image-markdown: createThemeVar("marginTop-Image-markdown");
@@ -256,26 +261,31 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
     h2 {
       margin-top: $marginTop-H2-markdown !important;
       margin-bottom: $marginBottom-H2-markdown !important;
+      font-size: $fontSize-H2-markdown !important;
     }
 
     h3 {
       margin-top: $marginTop-H3-markdown !important;
       margin-bottom: $marginBottom-H3-markdown !important;
+      font-size: $fontSize-H3-markdown !important;
     }
 
     h4 {
       margin-top: $marginTop-H4-markdown !important;
       margin-bottom: $marginBottom-H4-markdown !important;
+      font-size: $fontSize-H4-markdown !important;
     }
 
     h5 {
       margin-top: $marginTop-H5-markdown !important;
       margin-bottom: $marginBottom-H5-markdown !important;
+      font-size: $fontSize-H5-markdown !important;
     }
 
     h6 {
       margin-top: $marginTop-H6-markdown !important;
       margin-bottom: $marginBottom-H6-markdown !important;
+      font-size: $fontSize-H6-markdown !important;
     }
 
     // --- Image

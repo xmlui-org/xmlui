@@ -83,13 +83,16 @@ export const XmlUiDocsThemeDefinition: ThemeDefinition = {
     // --- App layout
     "width-navPanel-App": "280px",
     "maxWidth-content-App": "900px",
+    "maxWidth-content-NoToc": "600px",
 
     // --- Colors & typography
     "color-surface": "rgb(111, 110, 119)",
     "backgroundColor": "color-surface-1",
     "fontSize": "15px",
     "fontFamily": "Inter Variable",
+    "fontFamily-monospace": "'JetBrains Mono Variable',Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace",
     "font-feature-settings": "'cv01', 'ss03'",
+    "fontSize-code": "14px",
     "textColor-Text": "$color-surface-600",
 
     // --- Navigation layout
@@ -107,8 +110,8 @@ export const XmlUiDocsThemeDefinition: ThemeDefinition = {
     "marginTop-items-NavGroup": "$space-3",
     "marginBottom-items-NavGroup": "$space-3",
     "expandIconAlignment-NavGroup": "end",
-    "paddingHorizontal-level1-NavGroup": "$space-4",
-    "paddingHorizontal-level2-NavGroup": "$space-0",
+    "paddingLeft-NavLink": "$space-0",
+    "paddingVertical-NavLink": "$space-1_5",
 
     // --- TOC
     "fontSize-TableOfContentsItem": "13px",
@@ -116,6 +119,22 @@ export const XmlUiDocsThemeDefinition: ThemeDefinition = {
     "fontWeight-TableOfContentsItem--active": "$fontWeight-normal",
     "textColor-TableOfContentsItem--active": "$color-surface-900",
     "borderLeft-TableOfContentsItem--active": "2px solid $color-surface-900",
+
+    // --- Content layout
+    "textColor-Heading": "$color-surface-900",
+    "fontSize-H1-markdown": "$fontSize-5xl",
+    "marginTop-H1-markdown": "$space-2",
+    "marginBottom-H1-markdown": "$space-2",
+    "fontSize-H2-markdown": "$fontSize-3xl",
+    "marginTop-H2-markdown": "$space-8",
+    "marginBottom-H2-markdown": "$space-1",
+    "fontSize-H3-markdown": "$fontSize-xl",
+    "marginTop-H3-markdown": "$space-8",
+    "marginBottom-H3-markdown": "$space-1",
+    "fontWeight-PrevNextLink": "500",
+    "textColor-PrevNextLink": "$color-surface-900",
+    "fontSize-PrevNextText": "13px",
+    "textColor-PrevNextText": "$color-surface-500",
   },
 };
 

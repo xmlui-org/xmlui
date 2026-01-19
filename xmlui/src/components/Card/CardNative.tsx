@@ -2,6 +2,7 @@ import { type CSSProperties, type ForwardedRef, type ReactNode, forwardRef, useR
 import classnames from "classnames";
 
 import styles from "./Card.module.scss";
+import { useContentAlignment } from "../../components-core/component-hooks";
 
 import { Avatar } from "../Avatar/AvatarNative";
 import { LinkNative } from "../Link/LinkNative";
@@ -20,6 +21,8 @@ type Props = {
   showAvatar?: boolean;
   avatarSize?: string;
   orientation?: string;
+  horizontalAlignment?: string;
+  verticalAlignment?: string;
   onClick?: any;
   registerComponentApi?: (api: any) => void;
 };
@@ -33,6 +36,8 @@ export const Card = forwardRef(function Card(
   {
     children,
     orientation = defaultProps.orientation,
+    horizontalAlignment,
+    verticalAlignment,
     style,
     className,
     title,
@@ -52,6 +57,12 @@ export const Card = forwardRef(function Card(
     level: "h2",
     maxLines: 1,
   };
+
+  const { horizontal, vertical } = useContentAlignment(
+    orientation,
+    horizontalAlignment,
+    verticalAlignment,
+  );
 
   // Register API methods
   useEffect(() => {
@@ -104,6 +115,8 @@ export const Card = forwardRef(function Card(
           [styles.vertical]: orientation === "vertical",
           [styles.horizontal]: orientation === "horizontal",
         },
+        horizontal ?? "",
+        vertical ?? "",
         className,
       )}
       style={style}

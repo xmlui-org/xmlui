@@ -10,15 +10,15 @@ $themeVars: ();
 $component: "Card";
 $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composeBorderVars($themeVars, $component);
-$boxShadow-Card: createThemeVar("boxShadow-Card");
-$backgroundColor-Card: createThemeVar("backgroundColor-Card");
-$borderRadius-Card: createThemeVar("borderRadius-Card");
-$gap-Card: createThemeVar("gap-Card");
-$gap-title-Card: createThemeVar("gap-title-Card");
-$gap-avatar-Card: createThemeVar("gap-avatar-Card");
-$horizontalAlignment-title-Card: createThemeVar("horizontalAlignment-title-Card");
-$verticalalAlignment-title-Card: createThemeVar("verticalAlignment-title-Card");
-
+$boxShadow-Card: createThemeVar("boxShadow-#{$component}");
+$backgroundColor-Card: createThemeVar("backgroundColor-#{$component}");
+$backgroundColor-Card--hover: createThemeVar("backgroundColor-#{$component}--hover");
+$borderRadius-Card: createThemeVar("borderRadius-#{$component}");
+$gap-Card: createThemeVar("gap-#{$component}");
+$gap-title-Card: createThemeVar("gap-title-#{$component}");
+$gap-avatar-Card: createThemeVar("gap-avatar-#{$component}");
+$horizontalAlignment-title-Card: createThemeVar("horizontalAlignment-title-#{$component}");
+$verticalAlignment-title-Card: createThemeVar("verticalAlignment-title-#{$component}");
 
 @layer components {
   .wrapper {
@@ -29,11 +29,13 @@ $verticalalAlignment-title-Card: createThemeVar("verticalAlignment-title-Card");
     display: flex;
     flex-direction: column;
     gap: $gap-Card;
-
+    &:hover {
+      background-color: $backgroundColor-Card--hover;
+    }
     .avatarWrapper {
       display: flex;
       flex-direction: row;
-      align-items: $verticalalAlignment-title-Card;
+      align-items: $verticalAlignment-title-Card;
       gap: $gap-avatar-Card;
       min-width: 0;
     }
@@ -63,6 +65,6 @@ $verticalalAlignment-title-Card: createThemeVar("verticalAlignment-title-Card");
 }
 
 // --- We export the theme variables to add them to the component renderer
-:export{
-  themeVars: t.json-stringify($themeVars)
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

@@ -1,7 +1,7 @@
 <Component name="DocumentPageNoTOC">
   <Stack
     width="{$props.width ? $props.width : '100%'}"
-    maxWidth="$maxWidth-columnContent">
+    maxWidth="$maxWidth-content-NoToc">
     <Markdown
       when="{$props.content || $props.url}"
       content="{$props.content}"

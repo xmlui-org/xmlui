@@ -2,27 +2,50 @@
   <Theme
     textDecorationLine-Link="none"
     textColor-Link="$textColor-DocumentLinks"
-    textColor-Link--hover="textColor-DocumentLinks--hover">
+    textColor-Link--hover="textColor-DocumentLinks--hover"
+  >
     <VStack width="{$props.width ? $props.width : '100%'}">
       <ContentSeparator
         marginVertical="$space-2"
         thickness="0"
-        when="{$linkInfo.prevLink || $linkInfo.nextLink}" />
-      <HStack verticalAlignment="center" gap="$space-2">
+        when="{$linkInfo.prevLink || $linkInfo.nextLink}"
+      />
+      <FlowLayout verticalAlignment="center" gap="$space-6">
+        <Button
+          variant="outlined"
+          width="50%"
+          when="{$linkInfo.prevLink}"
+          onClick="console.log($linkInfo.prevLink.to)"
+        >
+          Previous
+        </Button>
+        <Card width="50%" when="{$linkInfo.prevLink}">
+          <Link to="{$linkInfo.prevLink.to}">
+            <Icon name="chevronleft" />
+            <Text variant="subtitle">
+              {$linkInfo.prevLink.label}
+            </Text>
+          </Link>
+        </Card>
+        <Card
+          width="50%"
+          when="{$linkInfo.nextLink}"
+          onClick="Actions.navigateTo($linkInfo.nextLink.to)"
+        >
+        </Card>
         <Link when="{$linkInfo.prevLink}" to="{$linkInfo.prevLink.to}">
           <Icon name="chevronleft" />
           <Text variant="subtitle">
             {$linkInfo.prevLink.label}
           </Text>
         </Link>
-        <SpaceFiller />
         <Link when="{$linkInfo.nextLink}" to="{$linkInfo.nextLink.to}">
           <Text variant="subtitle">
             {$linkInfo.nextLink.label}
           </Text>
           <Icon name="chevronright" />
         </Link>
-      </HStack>
+      </FlowLayout>
     </VStack>
   </Theme>
 </Component>
