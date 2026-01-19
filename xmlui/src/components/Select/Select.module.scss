@@ -172,9 +172,9 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     outline: none;
     width: 100%;
     height: max-content;
-    gap: t.$space-1;
     display: flex;
     flex-direction: row;
+    align-items: center;
     flex-wrap: wrap;
     min-height: $minHeight-Select;
     @include t.paddingVars($themeVars, $componentName);
@@ -232,6 +232,7 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     display: flex;
     align-items: center;
     flex-shrink: 0;
+    gap: t.$space-1_5;
   }
 
   .action {

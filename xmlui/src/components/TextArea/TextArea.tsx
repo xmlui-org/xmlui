@@ -96,6 +96,18 @@ export const TextAreaMd = createMetadata({
         `be resized by the user.`,
       availableValues: resizeOptionsMd,
     },
+    verboseValidationFeedback: {
+      description: "Enables a concise validation summary (icon) in input components.",
+      type: "boolean",
+    },
+    validationIconSuccess: {
+      description: "Icon to display for valid state when concise validation summary is enabled.",
+      type: "string",
+    },
+    validationIconError: {
+      description: "Icon to display for error state when concise validation summary is enabled.",
+      type: "string",
+    },
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -156,6 +168,9 @@ export const textAreaComponentRenderer = createComponentRenderer(
         autoSize={extractValue.asOptionalBoolean(node.props.autoSize)}
         validationStatus={extractValue(node.props.validationStatus)}
         required={extractValue.asOptionalBoolean(node.props.required)}
+        verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
+        validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
+        validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
       />
     );
   },

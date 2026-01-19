@@ -32,10 +32,13 @@ import { Icon } from "../Icon/IconNative";
 import { Adornment } from "../Input/InputAdornment";
 import { Button } from "../Button/ButtonNative";
 import { PART_END_ADORNMENT, PART_INPUT, PART_START_ADORNMENT } from "../../components-core/parts";
+import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
+import { useFormContextPart } from "../Form/FormContext";
 
 const PART_SPINNER_UP = "spinnerUp";
 const PART_SPINNER_DOWN = "spinnerDown";
+const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
 
 // Default props for NumberBox component
 export const defaultProps = {
@@ -88,6 +91,10 @@ type Props = {
   readOnly?: boolean;
   required?: boolean;
   direction?: "ltr" | "rtl";
+  verboseValidationFeedback?: boolean;
+  validationIconSuccess?: string;
+  validationIconError?: string;
+  invalidMessages?: string[];
 };
 
 export const NumberBox = forwardRef(function NumberBox(
@@ -123,6 +130,10 @@ export const NumberBox = forwardRef(function NumberBox(
     readOnly,
     required,
     direction,
+    verboseValidationFeedback,
+    validationIconSuccess,
+    validationIconError,
+    invalidMessages,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -150,6 +161,23 @@ export const NumberBox = forwardRef(function NumberBox(
       }, 0);
     }
   }, [autoFocus]);
+
+  const contextVerboseValidationFeedback = useFormContextPart((ctx) => ctx?.verboseValidationFeedback);
+  const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
+  const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
+
+  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
+  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
+  const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
+
+  let validationIcon = null;
+  if (!finalVerboseValidationFeedback) {
+    if (validationStatus === "valid") {
+      validationIcon = finalValidationIconSuccess;
+    } else if (validationStatus === "error") {
+      validationIcon = finalValidationIconError;
+    }
+  }
 
   // --- Convert to representable string value (from number | null | undefined)
   const [valueStrRep, setValueStrRep] = React.useState<string>(mapToRepresentation(value));
@@ -620,6 +648,16 @@ export const NumberBox = forwardRef(function NumberBox(
           required={required}
         />
       </Part>
+      {!finalVerboseValidationFeedback && (
+        <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
+          <ConciseValidationFeedback
+            validationStatus={validationStatus}
+            invalidMessages={invalidMessages}
+            successIcon={finalValidationIconSuccess}
+            errorIcon={finalValidationIconError}
+          />
+        </Part>
+      )}
       <Part partId={PART_END_ADORNMENT}>
         <Adornment text={endText} iconName={endIcon} className={classnames(styles.adornment)} />
       </Part>

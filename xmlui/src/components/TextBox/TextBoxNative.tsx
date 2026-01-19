@@ -1,4 +1,4 @@
-import { type CSSProperties, type ForwardedRef, forwardRef, useId, useState } from "react";
+import { type CSSProperties, type ForwardedRef, forwardRef, useState } from "react";
 import React, { useCallback, useEffect, useRef } from "react";
 import classnames from "classnames";
 
@@ -9,8 +9,10 @@ import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import { Adornment } from "../Input/InputAdornment";
 import type { ValidationStatus } from "../abstractions";
-import { PART_START_ADORNMENT, PART_INPUT, PART_END_ADORNMENT } from "../../components-core/parts";
+import { PART_START_ADORNMENT, PART_INPUT, PART_END_ADORNMENT, PART_CONCISE_VALIDATION_FEEDBACK } from "../../components-core/parts";
 import { Part } from "../Part/Part";
+import { useFormContextPart } from "../Form/FormContext";
+import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 
 /**
  * TextBox component that supports text input with various configurations.
@@ -62,6 +64,10 @@ type Props = {
    * Default: "eye-off"
    */
   passwordHiddenIcon?: string;
+  verboseValidationFeedback?: boolean;
+  validationIconSuccess?: string;
+  validationIconError?: string;
+  invalidMessages?: string[];
 };
 
 export const defaultProps: Pick<
@@ -71,6 +77,7 @@ export const defaultProps: Pick<
   | "initialValue"
   | "enabled"
   | "validationStatus"
+  | "invalidMessages"
   | "onDidChange"
   | "onFocus"
   | "onBlur"
@@ -84,6 +91,7 @@ export const defaultProps: Pick<
   initialValue: "",
   enabled: true,
   validationStatus: "none",
+  invalidMessages: [],
   onDidChange: noop,
   onFocus: noop,
   onBlur: noop,
@@ -106,6 +114,7 @@ export const TextBox = forwardRef(function TextBox(
     enabled = defaultProps.enabled,
     placeholder,
     validationStatus = defaultProps.validationStatus,
+    invalidMessages = defaultProps.invalidMessages,
     onDidChange = defaultProps.onDidChange,
     onFocus = defaultProps.onFocus,
     onBlur = defaultProps.onBlur,
@@ -123,6 +132,9 @@ export const TextBox = forwardRef(function TextBox(
     showPasswordToggle,
     passwordVisibleIcon = defaultProps.passwordVisibleIcon,
     passwordHiddenIcon = defaultProps.passwordHiddenIcon,
+    verboseValidationFeedback,
+    validationIconSuccess,
+    validationIconError,
     ...rest
   }: Props,
   ref: ForwardedRef<HTMLDivElement>,
@@ -139,6 +151,14 @@ export const TextBox = forwardRef(function TextBox(
   const togglePasswordVisibility = useCallback(() => {
     setShowPassword((prev) => !prev);
   }, []);
+
+  const contextVerboseValidationFeedback = useFormContextPart((ctx) => ctx?.verboseValidationFeedback);
+  const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
+  const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
+
+  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
+  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
+  const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "error";
 
   useEffect(() => {
     if (autoFocus) {
@@ -250,6 +270,16 @@ export const TextBox = forwardRef(function TextBox(
             iconName="close"
             className={styles.adornment}
             onClick={() => updateValue("")}
+          />
+        </Part>
+      )}
+      {!finalVerboseValidationFeedback && (
+        <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
+          <ConciseValidationFeedback
+            validationStatus={validationStatus}
+            invalidMessages={invalidMessages}
+            successIcon={finalValidationIconSuccess}
+            errorIcon={finalValidationIconError}
           />
         </Part>
       )}

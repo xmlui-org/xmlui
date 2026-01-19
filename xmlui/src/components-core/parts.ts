@@ -7,3 +7,4 @@ export const PART_TRACK = "track";
 export const PART_RANGE = "range";
 export const PART_THUMB = "thumb";
 export const PART_ICON = "icon";
+export const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";

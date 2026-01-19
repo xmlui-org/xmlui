@@ -11,13 +11,16 @@ import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
 import Icon from "../Icon/IconNative";
+import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
+import { useFormContextPart } from "../Form/FormContext";
 
 // Component part names
 const PART_DAY = "day";
 const PART_MONTH = "month";
 const PART_YEAR = "year";
 const PART_CLEAR_BUTTON = "clearButton";
+const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
 
 // Date validation constants
 const MIN_YEAR = 1900;
@@ -88,6 +91,10 @@ type Props = {
   readOnly?: boolean;
   autoFocus?: boolean;
   emptyCharacter?: string;
+  verboseValidationFeedback?: boolean;
+  validationIconSuccess?: string;
+  validationIconError?: string;
+  invalidMessages?: string[];
 };
 
 export const defaultProps = {
@@ -143,6 +150,10 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     readOnly = defaultProps.readOnly,
     autoFocus = defaultProps.autoFocus,
     emptyCharacter = defaultProps.emptyCharacter,
+    verboseValidationFeedback,
+    validationIconSuccess,
+    validationIconError,
+    invalidMessages,
     ...rest
   },
   ref,
@@ -190,6 +201,23 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
   const [isDayCurrentlyInvalid, setIsDayCurrentlyInvalid] = useState(false);
   const [isMonthCurrentlyInvalid, setIsMonthCurrentlyInvalid] = useState(false);
   const [isYearCurrentlyInvalid, setIsYearCurrentlyInvalid] = useState(false);
+
+  const contextVerboseValidationFeedback = useFormContextPart((ctx) => ctx?.verboseValidationFeedback);
+  const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
+  const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
+
+  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
+  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
+  const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
+
+  let validationIcon = null;
+  if (!finalVerboseValidationFeedback) {
+    if (validationStatus === "valid") {
+      validationIcon = finalValidationIconSuccess;
+    } else if (validationStatus === "error") {
+      validationIcon = finalValidationIconError;
+    }
+  }
 
   useEffect(() => {
     // Initialize XMLUI state with initial value on first mount
@@ -774,6 +802,16 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
           </Part>
         )}
       </div>
+      {!finalVerboseValidationFeedback && (
+          <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
+            <ConciseValidationFeedback
+              validationStatus={validationStatus}
+              invalidMessages={invalidMessages}
+              successIcon={finalValidationIconSuccess}
+              errorIcon={finalValidationIconError}
+            />
+          </Part>
+        )}
       {endAdornment}
     </div>
   );

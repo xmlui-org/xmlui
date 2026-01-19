@@ -66,6 +66,11 @@ export const TextBoxMd = createMetadata({
       ...dValidationStatus(),
       defaultValue: defaultProps.validationStatus,
     },
+    invalidMessages: {
+      description: "The invalid messages to display for the input component.",
+      type: "array",
+      valueType: "string",
+    },
     startText: dStartText(),
     startIcon: dStartIcon(),
     endText: dEndText(),
@@ -91,6 +96,18 @@ export const TextBoxMd = createMetadata({
         "The icon to display when the password is hidden (when showPasswordToggle is true).",
       valueType: "string",
       defaultValue: "eye-off",
+    },
+    verboseValidationFeedback: {
+      description: "Enables a concise validation summary (icon) in input components.",
+      type: "boolean",
+    },
+    validationIconSuccess: {
+      description: "Icon to display for valid state when concise validation summary is enabled.",
+      type: "string",
+    },
+    validationIconError: {
+      description: "Icon to display for error state when concise validation summary is enabled.",
+      type: "string",
     },
   },
   events: {
@@ -181,6 +198,7 @@ function renderTextBox(
       enabled={extractValue.asOptionalBoolean(node.props.enabled)}
       placeholder={extractValue.asOptionalString(node.props.placeholder)}
       validationStatus={extractValue(node.props.validationStatus)}
+      invalidMessages={extractValue(node.props.invalidMessages)}
       onDidChange={lookupEventHandler("didChange")}
       onFocus={lookupEventHandler("gotFocus")}
       onBlur={lookupEventHandler("lostFocus")}
@@ -196,6 +214,9 @@ function renderTextBox(
       showPasswordToggle={extractValue.asOptionalBoolean(node.props.showPasswordToggle, false)}
       passwordVisibleIcon={extractValue.asOptionalString(node.props.passwordVisibleIcon)}
       passwordHiddenIcon={extractValue.asOptionalString(node.props.passwordHiddenIcon)}
+      verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
+      validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
+      validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
     />
   );
 }

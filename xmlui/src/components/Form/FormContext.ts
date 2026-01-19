@@ -27,6 +27,9 @@ interface IFormContext {
   itemLabelBreak?: boolean;
   itemLabelPosition?: string | LabelPosition;
   itemRequireLabelMode?: RequireLabelMode;
+  verboseValidationFeedback?: boolean;
+  validationIconSuccess?: string;
+  validationIconError?: string;
 }
 
 export type ValidationResult = {

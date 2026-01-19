@@ -52,6 +52,18 @@ export const FormMd = createMetadata({
       type: "boolean",
       defaultValue: defaultProps.itemLabelBreak,
     },
+    verboseValidationFeedback: {
+      description: "Enables a concise validation summary (icon) in input components.",
+      type: "boolean",
+    },
+    validationIconSuccess: {
+      description: "Icon to display for valid state when concise validation summary is enabled.",
+      type: "string",
+    },
+    validationIconError: {
+      description: "Icon to display for error state when concise validation summary is enabled.",
+      type: "string",
+    },
     keepModalOpenOnSubmit: {
       description: "This property prevents the modal from closing when the form is submitted.",
       type: "boolean",

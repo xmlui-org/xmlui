@@ -1,0 +1,18 @@
+@use "../../components-core/theming/themes" as t;
+
+
+.icon {
+  transition: color 0.2s ease;
+
+  &.valid {
+    color: t.$color-valid;
+  }
+  
+  &.warning {
+    color: t.$color-warning;
+  }
+  
+  &.error {
+    color: t.$color-error;
+  }
+}

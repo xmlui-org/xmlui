@@ -12,9 +12,14 @@ import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
+import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Popover, PopoverContent, PopoverPortal, PopoverTrigger } from "@radix-ui/react-popover";
-import Icon from "../Icon/IconNative";
 import { composeRefs } from "@radix-ui/react-compose-refs";
+import { Part } from "../Part/Part";
+import { useFormContextPart } from "../Form/FormContext";
+import Icon from "../Icon/IconNative";
+
+const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
 
 export const DatePickerModeValues = ["single", "range"] as const;
 type DatePickerMode = (typeof DatePickerModeValues)[number];
@@ -90,6 +95,10 @@ type Props = {
   readOnly?: boolean;
   required?: boolean;
   autoFocus?: boolean;
+  verboseValidationFeedback?: boolean;
+  validationIconSuccess?: string;
+  validationIconError?: string;
+  invalidMessages?: string[];
 };
 
 export const enum WeekDays {
@@ -182,6 +191,10 @@ export const DatePicker = forwardRef(function DatePicker(
     readOnly = false,
     required,
     autoFocus = false,
+    verboseValidationFeedback,
+    validationIconSuccess,
+    validationIconError,
+    invalidMessages,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -192,6 +205,14 @@ export const DatePicker = forwardRef(function DatePicker(
   const [inlineMonth, setInlineMonth] = useState<Date | undefined>();
   const inputRef = useRef<HTMLInputElement>(null);
   const ref = forwardedRef ? composeRefs(forwardedRef, inputRef) : inputRef;
+
+  const contextVerboseValidationFeedback = useFormContextPart((ctx) => ctx?.verboseValidationFeedback);
+  const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
+  const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
+
+  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
+  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
+  const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
 
   const selected: any = useMemo(() => {
     if (mode === "single" && typeof value === "string") {
@@ -507,6 +528,16 @@ export const DatePicker = forwardRef(function DatePicker(
             <span>&nbsp;</span>
           )}
         </div>
+        {!finalVerboseValidationFeedback && (
+          <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
+            <ConciseValidationFeedback
+              validationStatus={validationStatus}
+              invalidMessages={invalidMessages}
+              successIcon={finalValidationIconSuccess}
+              errorIcon={finalValidationIconError}
+            />
+          </Part>
+        )}
         <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
       </PopoverTrigger>
       <PopoverPortal container={root}>

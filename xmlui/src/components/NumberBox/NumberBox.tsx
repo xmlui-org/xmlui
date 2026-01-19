@@ -116,6 +116,18 @@ export const NumberBoxMd = createMetadata({
         "If not set, no maximum value check is done.",
       defaultValue: defaultProps.max,
     },
+    verboseValidationFeedback: {
+      description: "Enables a concise validation summary (icon) in input components.",
+      type: "boolean",
+    },
+    validationIconSuccess: {
+      description: "Icon to display for valid state when concise validation summary is enabled.",
+      type: "string",
+    },
+    validationIconError: {
+      description: "Icon to display for error state when concise validation summary is enabled.",
+      type: "string",
+    },
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -190,6 +202,9 @@ export const numberBoxComponentRenderer = createComponentRenderer(
         maxLength={extractValue(node.props.maxLength)}
         required={extractValue.asOptionalBoolean(node.props.required)}
         direction={extractValue(node.props.direction)}
+        verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
+        validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
+        validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
       />
     );
   },

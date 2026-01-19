@@ -25,9 +25,12 @@ import { useTheme } from "../../components-core/theming/ThemeContext";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import { HiddenOption } from "../Select/HiddenOption";
 import { PART_INPUT } from "../../components-core/parts";
+import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
+import { useFormContextPart } from "../Form/FormContext";
 
 const PART_LIST_WRAPPER = "listWrapper";
+const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
 
 type AutoCompleteProps = {
   id?: string;
@@ -55,6 +58,10 @@ type AutoCompleteProps = {
   creatable?: boolean;
   initiallyOpen?: boolean;
   modal?: boolean;
+  verboseValidationFeedback?: boolean;
+  validationIconSuccess?: string;
+  validationIconError?: string;
+  invalidMessages?: string[];
 };
 
 function isOptionsExist(options: Option[], newOptions: Option[]) {
@@ -106,6 +113,10 @@ export const AutoComplete = forwardRef(function AutoComplete(
     optionRenderer,
     initiallyOpen = defaultProps.initiallyOpen,
     modal,
+    verboseValidationFeedback,
+    validationIconSuccess,
+    validationIconError,
+    invalidMessages,
     ...rest
   }: AutoCompleteProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -121,6 +132,23 @@ export const AutoComplete = forwardRef(function AutoComplete(
   const [searchTerm, setSearchTerm] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+
+  const contextVerboseValidationFeedback = useFormContextPart((ctx) => ctx?.verboseValidationFeedback);
+  const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
+  const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
+
+  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
+  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
+  const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
+
+  let validationIcon = null;
+  if (!finalVerboseValidationFeedback) {
+    if (validationStatus === "valid") {
+      validationIcon = finalValidationIconSuccess;
+    } else if (validationStatus === "error") {
+      validationIcon = finalValidationIconError;
+    }
+  }
 
   // Filter options based on search term
   const filteredOptions = useMemo(() => {
@@ -568,6 +596,16 @@ export const AutoComplete = forwardRef(function AutoComplete(
                     />
                   </Part>
                   <div className={styles.actions}>
+                    {!finalVerboseValidationFeedback && (
+                      <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
+                        <ConciseValidationFeedback
+                          validationStatus={validationStatus}
+                          invalidMessages={invalidMessages}
+                          successIcon={finalValidationIconSuccess}
+                          errorIcon={finalValidationIconError}
+                        />
+                      </Part>
+                    )}
                     {value?.length > 0 && enabled && !readOnly && (
                       <span
                         className={styles.action}

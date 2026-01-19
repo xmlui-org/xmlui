@@ -269,6 +269,9 @@ type Props = {
   hideButtonRowUntilDirty?: boolean;
   hideButtonRow?: boolean;
   enableSubmit?: boolean;
+  verboseValidationFeedback?: boolean;
+  validationIconSuccess?: string;
+  validationIconError?: string;
 };
 
 export const defaultProps: Pick<
@@ -284,6 +287,8 @@ export const defaultProps: Pick<
   | "hideButtonRow"
   | "enableSubmit"
   | "itemRequireLabelMode"
+  | "validationIconSuccess"
+  | "validationIconError"
 > = {
   cancelLabel: "Cancel",
   saveLabel: "Save",
@@ -296,6 +301,8 @@ export const defaultProps: Pick<
   hideButtonRow: false,
   enableSubmit: true,
   itemRequireLabelMode: "markRequired",
+  validationIconSuccess: "checkmark",
+  validationIconError: "error",
 };
 
 // --- Remove the properties from formState.subject where the property name ends with UNBOUND_FIELD_SUFFIX
@@ -341,6 +348,9 @@ const Form = forwardRef(function (
     hideButtonRowUntilDirty = defaultProps.hideButtonRowUntilDirty,
     hideButtonRow = defaultProps.hideButtonRow,
     enableSubmit = defaultProps.enableSubmit,
+    verboseValidationFeedback,
+    validationIconSuccess = defaultProps.validationIconSuccess,
+    validationIconError = defaultProps.validationIconError,
     ...rest
   }: Props,
   ref: ForwardedRef<HTMLFormElement>,
@@ -371,6 +381,9 @@ const Form = forwardRef(function (
       interactionFlags: formState.interactionFlags,
       dispatch,
       enabled: isEnabled,
+      verboseValidationFeedback,
+      validationIconSuccess,
+      validationIconError,
     };
   }, [
     dispatch,
@@ -383,6 +396,9 @@ const Form = forwardRef(function (
     itemLabelPosition,
     itemLabelWidth,
     itemRequireLabelMode,
+    verboseValidationFeedback,
+    validationIconSuccess,
+    validationIconError,
   ]);
 
   const doCancel = useEvent(() => {
@@ -443,7 +459,7 @@ const Form = forwardRef(function (
     try {
       const filteredSubject = validationResult.data;
       const willSubmitResult = await onWillSubmit?.(filteredSubject);
-      
+
       // Handle different return values from willSubmit
       if (willSubmitResult === false) {
         // --- We do not reset the form but allow the next submit.
@@ -452,13 +468,13 @@ const Form = forwardRef(function (
         );
         return;
       }
-      
+
       // Determine what data to submit
       let dataToSubmit = filteredSubject;
-      if (willSubmitResult !== null && 
-          willSubmitResult !== undefined && 
-          willSubmitResult !== "" && 
-          typeof willSubmitResult === "object" && 
+      if (willSubmitResult !== null &&
+          willSubmitResult !== undefined &&
+          willSubmitResult !== "" &&
+          typeof willSubmitResult === "object" &&
           !Array.isArray(willSubmitResult)) {
         // Submit the returned object instead
         dataToSubmit = willSubmitResult as Record<string, any>;
@@ -733,6 +749,9 @@ export const FormWithContextVar = forwardRef(function (
         hideButtonRowUntilDirty={extractValue.asOptionalBoolean(node.props.hideButtonRowUntilDirty)}
         hideButtonRow={extractValue.asOptionalBoolean(node.props.hideButtonRow)}
         enableSubmit={extractValue.asOptionalBoolean(node.props.enableSubmit)}
+        verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
+        validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
+        validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
         formState={formState}
         dispatch={dispatch}
         id={node.uid}

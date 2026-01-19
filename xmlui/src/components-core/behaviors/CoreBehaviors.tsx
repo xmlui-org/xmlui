@@ -314,6 +314,8 @@ const FORM_BINDABLE_COMPONENTS = [
   "Select",
   "AutoComplete",
   "DatePicker",
+  "DateInput",
+  "TimeInput",
   "RadioGroup",
   "Slider",
   "ColorPicker",

@@ -243,6 +243,17 @@ export const FormItem = memo(function FormItem({
   const dispatch = useFormContextPart((value) => value?.dispatch);
   const formEnabled = useFormContextPart((value) => value?.enabled);
   const itemRequireLabelMode = useFormContextPart((value) => value?.itemRequireLabelMode);
+  const contextVerboseValidationFeedback = useFormContextPart((value) => value?.verboseValidationFeedback);
+
+  const isForcedVerbose =
+    type === "checkbox" ||
+    type === "switch" ||
+    type === "radioGroup" ||
+    type === "colorpicker" ||
+    type === "slider" ||
+    (type === "datePicker" && (rest as any).inline);
+
+  const verboseValidationFeedback = isForcedVerbose ? true : (contextVerboseValidationFeedback ?? true);
 
   const isEnabled = enabled && formEnabled;
 
@@ -275,6 +286,7 @@ export const FormItem = memo(function FormItem({
     value,
     validationResult,
     validationMode,
+    !!verboseValidationFeedback
   );
 
   const onFocus = useEvent(() => {
@@ -548,6 +560,7 @@ export const FormItem = memo(function FormItem({
         requireLabelMode={requireLabelMode ?? itemRequireLabelMode}
         className={className}
         validationResult={
+          (verboseValidationFeedback === false) ? null : (
           <div ref={animateContainerRef} className={styles.helperTextContainer}>
             {isHelperTextShown &&
               validationResult?.validations.map((singleValidation, i) => (
@@ -569,6 +582,7 @@ export const FormItem = memo(function FormItem({
                 </Fragment>
               ))}
           </div>
+          )
         }
       >
         {formControl}

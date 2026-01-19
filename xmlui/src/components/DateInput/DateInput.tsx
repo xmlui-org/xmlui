@@ -53,6 +53,11 @@ export const DateInputMd = createMetadata({
     readOnly: dReadonly(),
     enabled: dEnabled(defaultProps.enabled),
     validationStatus: dValidationStatus(defaultProps.validationStatus),
+    invalidMessages: {
+      description: "The invalid messages to display for the input component.",
+      type: "array",
+      valueType: "string",
+    },
     mode: {
       description: "The mode of the date input (single or range)",
       valueType: "string",
@@ -158,6 +163,18 @@ export const DateInputMd = createMetadata({
     startIcon: dStartIcon(),
     endText: dEndText(),
     endIcon: dEndIcon(),
+    verboseValidationFeedback: {
+      description: "Enables a concise validation summary (icon) in input components.",
+      type: "boolean",
+    },
+    validationIconSuccess: {
+      description: "Icon to display for valid state when concise validation summary is enabled.",
+      type: "string",
+    },
+    validationIconError: {
+      description: "Icon to display for error state when concise validation summary is enabled.",
+      type: "string",
+    },
   },
   events: {
     didChange: dDidChange(COMP),
@@ -230,6 +247,7 @@ export const dateInputComponentRenderer = createComponentRenderer(
         initialValue={extractValue(node.props.initialValue)}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         validationStatus={extractValue(node.props.validationStatus)}
+        invalidMessages={extractValue(node.props.invalidMessages)}
         updateState={updateState}
         onDidChange={lookupEventHandler("didChange")}
         onFocus={lookupEventHandler("gotFocus")}
@@ -254,6 +272,9 @@ export const dateInputComponentRenderer = createComponentRenderer(
         clearToInitialValue={extractValue.asOptionalBoolean(node.props.clearToInitialValue, defaultProps.clearToInitialValue)}
         gap={extractValue.asOptionalString(node.props.gap)}
         emptyCharacter={extractValue.asOptionalString(node.props.emptyCharacter)}
+        verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
+        validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
+        validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
       />
     );
   },

@@ -23,11 +23,14 @@ import { SelectContext, useSelect } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { HiddenOption } from "./HiddenOption";
 import { SimpleSelect } from "./SimpleSelect";
+import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
 import { OptionContext } from "./OptionContext";
+import { useFormContextPart } from "../Form/FormContext";
 
 const PART_LIST_WRAPPER = "listWrapper";
 const PART_CLEAR_BUTTON = "clearButton";
+const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
 
 export const defaultProps = {
   enabled: true,
@@ -97,6 +100,10 @@ interface SelectProps {
   registerComponentApi?: RegisterComponentApiFn;
   children?: ReactNode;
   modal?: boolean;
+  verboseValidationFeedback?: boolean;
+  validationIconSuccess?: string;
+  validationIconError?: string;
+  invalidMessages?: string[];
 }
 
 // Common trigger value display props
@@ -172,6 +179,12 @@ interface SelectTriggerActionsProps {
   clearValue: () => void;
   showChevron?: boolean;
   clearable: boolean;
+  validationIcon?: string | null;
+  validationStatus: ValidationStatus;
+  invalidMessages: string[];
+  finalValidationIconSuccess: string;
+  finalValidationIconError: string;
+  finalVerboseValidationFeedback: boolean;
 }
 
 const SelectTriggerActions = ({
@@ -182,6 +195,11 @@ const SelectTriggerActions = ({
   clearable,
   clearValue,
   showChevron = true,
+  validationStatus,
+  invalidMessages,
+  finalValidationIconSuccess,
+  finalValidationIconError,
+  finalVerboseValidationFeedback,
 }: SelectTriggerActionsProps) => {
   const hasValue = multiSelect
     ? Array.isArray(value) && value.length > 0
@@ -200,6 +218,16 @@ const SelectTriggerActions = ({
           >
             <Icon name="close" />
           </span>
+        </Part>
+      )}
+      {!finalVerboseValidationFeedback && (
+        <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
+          <ConciseValidationFeedback
+            validationStatus={validationStatus}
+            invalidMessages={invalidMessages}
+            successIcon={finalValidationIconSuccess}
+            errorIcon={finalValidationIconError}
+          />
         </Part>
       )}
       {showChevron && (
@@ -262,6 +290,10 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     registerComponentApi,
     children,
     modal = defaultProps.modal,
+    verboseValidationFeedback,
+    validationIconSuccess,
+    validationIconError,
+    invalidMessages,
 
     ...rest
   },
@@ -275,6 +307,23 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   const [options, setOptions] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(-1);
+
+  const contextVerboseValidationFeedback = useFormContextPart((ctx) => ctx?.verboseValidationFeedback);
+  const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
+  const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
+
+  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
+  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
+  const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
+
+  let validationIcon = null;
+  if (!finalVerboseValidationFeedback) {
+    if (validationStatus === "valid") {
+      validationIcon = finalValidationIconSuccess;
+    } else if (validationStatus === "error") {
+      validationIcon = finalValidationIconError;
+    }
+  }
 
   const selectedOptions = useMemo(() => {
     if (!multiSelect) {
@@ -622,7 +671,6 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
             onFocus={onFocus}
             onBlur={onBlur}
             enabled={enabled}
-            validationStatus={validationStatus}
             triggerRef={setReferenceElement}
             autoFocus={autoFocus}
             placeholder={placeholder}
@@ -637,6 +685,11 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
             clearable={clearable}
             onClear={clearValue}
             valueRenderer={valueRenderer}
+            validationStatus={validationStatus}
+            invalidMessages={invalidMessages}
+            finalValidationIconSuccess={finalValidationIconSuccess}
+            finalValidationIconError={finalValidationIconError}
+            finalVerboseValidationFeedback={finalVerboseValidationFeedback}
             {...rest}
           >
             {children}
@@ -716,12 +769,18 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                     readOnly={readOnly}
                     clearable={clearable}
                     clearValue={clearValue}
+                    validationIcon={validationIcon}
+                    validationStatus={validationStatus}
+                    invalidMessages={invalidMessages}
+                    finalValidationIconSuccess={finalValidationIconSuccess}
+                    finalValidationIconError={finalValidationIconError}
+                    finalVerboseValidationFeedback={finalVerboseValidationFeedback}
                   />
                 </PopoverTrigger>
               </Part>
               <Portal container={root}>
                 <PopoverContent
-                  style={{ minWidth: panelWidth, height: dropdownHeight || "280px" }}
+                  style={{ minWidth: panelWidth, height: dropdownHeight }}
                   className={classnames(styles.selectContent, styles[validationStatus])}
                   onKeyDown={handleKeyDown}
                 >

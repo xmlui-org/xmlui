@@ -158,7 +158,7 @@ test.describe("Basic Functionality", () => {
 
   test("autoSize enables automatic height adjustment", async ({ initTestBed, page }) => {
     await initTestBed(`<TextArea testId="input" autoSize="true" />`);
-    const textarea = page.getByTestId("input");
+    const textarea = page.getByTestId("input").locator("textarea");
     const areaField = page.getByRole("textbox");
 
     // Get initial height with single line
@@ -186,7 +186,7 @@ test.describe("Basic Functionality", () => {
 
   test("maxRows limits auto-size height", async ({ initTestBed, page }) => {
     await initTestBed(`<TextArea testId="input" autoSize="true" maxRows="3" />`);
-    const textarea = page.getByTestId("input");
+    const textarea = page.getByTestId("input").locator("textarea");
     const areaField = page.getByRole("textbox");
 
     // Fill with more content than maxRows should allow
@@ -209,7 +209,7 @@ test.describe("Basic Functionality", () => {
 
   test("minRows sets minimum auto-size height", async ({ initTestBed, page }) => {
     await initTestBed(`<TextArea testId="input" autoSize="true" minRows="4" />`);
-    const textarea = page.getByTestId("input");
+    const textarea = page.getByTestId("input").locator("textarea");
     const areaField = page.getByRole("textbox");
 
     await expect(textarea).toBeVisible();
@@ -484,8 +484,8 @@ test.describe("Visual States", () => {
         "textColor-TextArea--default": "rgb(0, 255, 0)",
       },
     });
-    await expect(page.getByTestId("input")).toHaveCSS("background-color", "rgb(255, 0, 0)");
-    await expect(page.getByTestId("input")).toHaveCSS("color", "rgb(0, 255, 0)");
+    await expect(page.getByTestId("input").locator("textarea")).toHaveCSS("background-color", "rgb(255, 0, 0)");
+    await expect(page.getByTestId("input").locator("textarea")).toHaveCSS("color", "rgb(0, 255, 0)");
   });
 
   test("component handles horizontal resize option", async ({ initTestBed, page }) => {
@@ -943,19 +943,19 @@ test.describe("Regression", () => {
     `);
 
     const tbDriver = await createTextBoxDriver("myTextBox");
-    const driver = await createTextAreaDriver("myTextArea");
+    const driver = (await createTextAreaDriver("myTextArea"));
 
     // Test basic layout integration
-    await expect(driver.component).toBeVisible();
+    await expect(driver.component.locator("textarea")).toBeVisible();
 
-    await driver.focus();
-    await expect(driver.component).toBeFocused();
-    await driver.component.fill("a");
-    await expect(driver.component).toHaveValue("a");
-    await driver.component.fill("abc");
-    await expect(driver.component).toHaveValue("abc");
-    await driver.component.fill("abcde");
-    await expect(driver.component).toHaveValue("abcde");
+    await driver.component.locator("textarea").focus();
+    await expect(driver.component.locator("textarea")).toBeFocused();
+    await driver.component.locator("textarea").fill("a");
+    await expect(driver.component.locator("textarea")).toHaveValue("a");
+    await driver.component.locator("textarea").fill("abc");
+    await expect(driver.component.locator("textarea")).toHaveValue("abc");
+    await driver.component.locator("textarea").fill("abcde");
+    await expect(driver.component.locator("textarea")).toHaveValue("abcde");
   });
 });
 
@@ -966,7 +966,7 @@ test.describe("Regression", () => {
 test("input has correct width in px", async ({ page, initTestBed }) => {
   await initTestBed(`<TextArea width="200px" testId="test"/>`, {});
 
-  const input = page.getByTestId("test");
+  const input = page.getByTestId("test").locator("textarea");
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
@@ -974,7 +974,7 @@ test("input has correct width in px", async ({ page, initTestBed }) => {
 test("input with label has correct width in px", async ({ page, initTestBed }) => {
   await initTestBed(`<TextArea width="200px" label="test" testId="test"/>`, {});
 
-  const input = page.getByTestId("test");
+  const input = page.getByTestId("test").locator("textarea");
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
@@ -983,7 +983,7 @@ test("input has correct width in %", async ({ page, initTestBed }) => {
   await page.setViewportSize({ width: 400, height: 300 });
   await initTestBed(`<TextArea width="50%" testId="test"/>`, {});
 
-  const input = page.getByTestId("test");
+  const input = page.getByTestId("test").locator("textarea");
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
@@ -992,7 +992,7 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
   await page.setViewportSize({ width: 400, height: 300 });
   await initTestBed(`<TextArea width="50%" label="test" testId="test"/>`, {});
 
-  const input = page.getByTestId("test");
+  const input = page.getByTestId("test").locator("textarea");
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
@@ -1012,42 +1012,42 @@ test.describe("Theme Variables", () => {
       await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
         testThemeVars: { [`borderRadius-TextArea${variant.value}`]: "12px" },
       });
-      await expect(page.getByTestId("test")).toHaveCSS("border-radius", "12px");
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS("border-radius", "12px");
     });
 
     test(`applies correct borderColor ${variant.value}`, async ({ initTestBed, page }) => {
       await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
         testThemeVars: { [`borderColor-TextArea${variant.value}`]: "rgb(255, 0, 0)" },
       });
-      await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(255, 0, 0)");
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS("border-color", "rgb(255, 0, 0)");
     });
 
     test(`applies correct borderWidth ${variant.value}`, async ({ initTestBed, page }) => {
       await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
         testThemeVars: { [`borderWidth-TextArea${variant.value}`]: "1px" },
       });
-      await expect(page.getByTestId("test")).toHaveCSS("border-width", "1px");
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS("border-width", "1px");
     });
 
     test(`applies correct borderStyle ${variant.value}`, async ({ initTestBed, page }) => {
       await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
         testThemeVars: { [`borderStyle-TextArea${variant.value}`]: "dashed" },
       });
-      await expect(page.getByTestId("test")).toHaveCSS("border-style", "dashed");
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS("border-style", "dashed");
     });
 
     test(`applies correct fontSize ${variant.value}`, async ({ initTestBed, page }) => {
       await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
         testThemeVars: { [`fontSize-TextArea${variant.value}`]: "14px" },
       });
-      await expect(page.getByTestId("test")).toHaveCSS("font-size", "14px");
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS("font-size", "14px");
     });
 
     test(`applies correct backgroundColor ${variant.value}`, async ({ initTestBed, page }) => {
       await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
         testThemeVars: { [`backgroundColor-TextArea${variant.value}`]: "rgb(240, 240, 240)" },
       });
-      await expect(page.getByTestId("test")).toHaveCSS("background-color", "rgb(240, 240, 240)");
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS("background-color", "rgb(240, 240, 240)");
     });
 
     test(`applies correct boxShadow ${variant.value}`, async ({ initTestBed, page }) => {
@@ -1056,7 +1056,7 @@ test.describe("Theme Variables", () => {
           [`boxShadow-TextArea${variant.value}`]: "0 2px 8px rgba(0, 0, 0, 0.1)",
         },
       });
-      await expect(page.getByTestId("test")).toHaveCSS(
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS(
         "box-shadow",
         "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
       );
@@ -1066,15 +1066,15 @@ test.describe("Theme Variables", () => {
       await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
         testThemeVars: { [`textColor-TextArea${variant.value}`]: "rgb(0, 0, 0)" },
       });
-      await expect(page.getByTestId("test")).toHaveCSS("color", "rgb(0, 0, 0)");
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS("color", "rgb(0, 0, 0)");
     });
 
     test(`applies correct borderColor on hover ${variant.value}`, async ({ initTestBed, page }) => {
       await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
         testThemeVars: { [`borderColor-TextArea${variant.value}--hover`]: "rgb(0, 0, 0)" },
       });
-      await page.getByTestId("test").hover();
-      await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(0, 0, 0)");
+      await page.getByTestId("test").locator("textarea").hover();
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS("border-color", "rgb(0, 0, 0)");
     });
 
     test(`applies correct backgroundColor on hover ${variant.value}`, async ({
@@ -1084,8 +1084,8 @@ test.describe("Theme Variables", () => {
       await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
         testThemeVars: { [`backgroundColor-TextArea${variant.value}--hover`]: "rgb(0, 0, 0)" },
       });
-      await page.getByTestId("test").hover();
-      await expect(page.getByTestId("test")).toHaveCSS("background-color", "rgb(0, 0, 0)");
+      await page.getByTestId("test").locator("textarea").hover();
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS("background-color", "rgb(0, 0, 0)");
     });
 
     test(`applies correct boxShadow on hover ${variant.value}`, async ({ initTestBed, page }) => {
@@ -1094,8 +1094,8 @@ test.describe("Theme Variables", () => {
           [`boxShadow-TextArea${variant.value}--hover`]: "0 2px 8px rgba(0, 0, 0, 0.1)",
         },
       });
-      await page.getByTestId("test").hover();
-      await expect(page.getByTestId("test")).toHaveCSS(
+      await page.getByTestId("test").locator("textarea").hover();
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS(
         "box-shadow",
         "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
       );
@@ -1105,8 +1105,8 @@ test.describe("Theme Variables", () => {
       await initTestBed(`<TextArea testId="test" ${variant.prop} />`, {
         testThemeVars: { [`textColor-TextArea${variant.value}--hover`]: "rgb(0, 0, 0)" },
       });
-      await page.getByTestId("test").hover();
-      await expect(page.getByTestId("test")).toHaveCSS("color", "rgb(0, 0, 0)");
+      await page.getByTestId("test").locator("textarea").hover();
+      await expect(page.getByTestId("test").locator("textarea")).toHaveCSS("color", "rgb(0, 0, 0)");
     });
   });
 });
@@ -1119,7 +1119,7 @@ test.describe("Behaviors and Parts", () => {
   test("handles tooltip", async ({ page, initTestBed }) => {
     await initTestBed(`<TextArea testId="test" tooltip="Tooltip text" />`);
     
-    const component = page.getByTestId("test");
+    const component = page.getByTestId("test").locator("textarea");
     await component.hover();
     const tooltip = page.getByRole("tooltip");
     
@@ -1130,7 +1130,7 @@ test.describe("Behaviors and Parts", () => {
   test("tooltip with markdown content", async ({ page, initTestBed }) => {
     await initTestBed(`<TextArea testId="test" tooltipMarkdown="**Bold text**" />`);
     
-    const component = page.getByTestId("test");
+    const component = page.getByTestId("test").locator("textarea");
     await component.hover();
     const tooltip = page.getByRole("tooltip");
     
@@ -1144,7 +1144,7 @@ test.describe("Behaviors and Parts", () => {
         "borderColor-TextArea-CustomVariant": "rgb(255, 0, 0)",
       },
     });
-    const component = page.getByTestId("test");
+    const component = page.getByTestId("test").locator("textarea");
     await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
   });
 
@@ -1154,21 +1154,21 @@ test.describe("Behaviors and Parts", () => {
         "backgroundColor-TextArea-CustomVariant": "rgb(0, 255, 0)",
       },
     });
-    const component = page.getByTestId("test");
+    const component = page.getByTestId("test").locator("textarea");
     await expect(component).toHaveCSS("background-color", "rgb(0, 255, 0)");
   });
 
   test("animation behavior", async ({ page, initTestBed }) => {
     await initTestBed(`<TextArea testId="test" animation="fadeIn" />`);
     
-    const component = page.getByTestId("test");
+    const component = page.getByTestId("test").locator("textarea");
     await expect(component).toBeVisible();
   });
 
   test("combined tooltip and animation", async ({ page, initTestBed }) => {
     await initTestBed(`<TextArea testId="test" tooltip="Tooltip text" animation="fadeIn" />`);
     
-    const component = page.getByTestId("test");
+    const component = page.getByTestId("test").locator("textarea");
     await expect(component).toBeVisible();
     
     await component.hover();
@@ -1202,7 +1202,7 @@ test.describe("Behaviors and Parts", () => {
       },
     });
     
-    const component = page.getByTestId("test");
+    const component = page.getByTestId("test").locator("textarea");
     const inputPart = component.locator("[data-part-id='input']");
     
     await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
@@ -1222,7 +1222,7 @@ test.describe("Behaviors and Parts", () => {
       },
     });
     
-    const component = page.getByTestId("test");
+    const component = page.getByTestId("test").locator("textarea");
     const inputPart = component.locator("[data-part-id='input']");
     
     // Verify variant applied
@@ -1331,5 +1331,112 @@ test.describe("Behaviors and Parts", () => {
     await expect(requiredLabel).not.toContainText("(Optional)");
     await expect(optionalLabel).toContainText("(Optional)");
     await expect(optionalLabel).not.toContainText("*");
+  });
+});
+
+// =============================================================================
+// VALIDATION FEEDBACK TESTS
+// =============================================================================
+
+test.describe("Validation Feedback", () => {
+  test("shows helper text and no icon when verboseValidationFeedback is true (default)", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form verboseValidationFeedback="{true}">
+        <TextArea testId="input" bindTo="input" required="{true}" />
+        <Button testId="submit" type="submit">Submit</Button>
+      </Form>
+    `);
+    
+    // Trigger validation by submitting empty required field
+    await page.getByTestId("submit").click();
+    
+    // Check for helper text
+    await expect(page.getByText("This field is required")).toBeVisible();
+    
+    // Check absence of concise feedback icon
+    const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
+    await expect(conciseFeedback).not.toBeVisible();
+  });
+
+  test("shows icon and no helper text when verboseValidationFeedback is false", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form verboseValidationFeedback="{false}">
+        <TextArea testId="input" bindTo="input" required="{true}" />
+        <Button testId="submit" type="submit">Submit</Button>
+      </Form>
+    `);
+    
+    // Trigger validation
+    await page.getByTestId("submit").click();
+    
+    // Check for helper text (should be hidden)
+    await expect(page.getByText("This field is required")).not.toBeVisible();
+    
+    // Check for concise feedback icon
+    const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
+    await expect(conciseFeedback).toBeVisible();
+    
+    // Check that it shows error icon
+    await expect(conciseFeedback.locator("[data-icon-name='error']")).toBeVisible();
+  });
+
+  test("prop on component overrides form default", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form verboseValidationFeedback="{true}">
+        <TextArea testId="input" bindTo="input" verboseValidationFeedback="{false}" required="{true}" />
+        <Button testId="submit" type="submit">Submit</Button>
+      </Form>
+    `);
+    
+    await page.getByTestId("submit").click();
+    
+    // Helper text hidden
+    await expect(page.getByText("This field is required")).not.toBeVisible();
+    
+    // Concise feedback visible
+    const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
+    await expect(conciseFeedback).toBeVisible();
+  });
+
+  test("shows valid icon in concise mode when valid", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form verboseValidationFeedback="{false}">
+        <TextArea testId="input" bindTo="input" required="{true}" />
+        <Button testId="submit" type="submit">Submit</Button>
+      </Form>
+    `);
+    
+    const textarea = page.getByRole("textbox");
+    
+    // First make it invalid
+    await page.getByTestId("submit").click();
+    
+    // Now make it valid
+    await textarea.fill("valid value");
+    await textarea.blur();
+    
+    const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
+    await expect(conciseFeedback).toBeVisible();
+    await expect(conciseFeedback.locator("[data-icon-name='checkmark']")).toBeVisible();
+  });
+
+  test("concise mode tooltip shows error message on hover", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form verboseValidationFeedback="{false}">
+        <TextArea testId="input" bindTo="input" required="{true}" />
+        <Button testId="submit" type="submit">Submit</Button>
+      </Form>
+    `);
+    
+    await page.getByTestId("submit").click();
+    
+    const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
+    // Hover over the icon
+    await conciseFeedback.hover();
+    
+    // Check tooltip content
+    const tooltip = page.locator("[data-tooltip-container]");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toContainText("This field is required");
   });
 });

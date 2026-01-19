@@ -52,6 +52,7 @@ type FormBindingWrapperProps = {
   style?: CSSProperties;
   className?: string;
   registerComponentApi?: RegisterComponentApiFn;
+  verboseValidationFeedback?: boolean;
 };
 
 export function FormBindingWrapper({
@@ -72,6 +73,7 @@ export function FormBindingWrapper({
   style,
   className,
   registerComponentApi,
+  verboseValidationFeedback: verboseValidationFeedbackFromProps,
 }: FormBindingWrapperProps) {
   const validations = useShallowCompareMemoize(validationsInput);
   const defaultId = useId();
@@ -104,6 +106,34 @@ export function FormBindingWrapper({
   const dispatch = useFormContextPart((value) => value?.dispatch);
   const formEnabled = useFormContextPart((value) => value?.enabled);
   const formRequireLabelMode = useFormContextPart((value) => value?.itemRequireLabelMode);
+  const contextVerboseValidationFeedback = useFormContextPart((value) => value?.verboseValidationFeedback);
+
+  // Logic to determine if verbose feedback should be forced based on component type
+  const isForcedVerbose = useMemo(() => {
+    const type = (children as any)?.type;
+    const props = (children as any)?.props;
+    const displayName = type?.displayName || type?.name ||
+                        type?.render?.displayName || type?.render?.name || // for forwardRef
+                        type?.type?.displayName || type?.type?.name || // for memo
+                        "";
+
+    // Check for specific component display names
+    // We check for "Toggle" because both Checkbox and Switch use the Toggle component
+    return (
+      displayName.includes("Checkbox") ||
+      displayName.includes("Switch") ||
+      displayName.includes("RadioGroup") ||
+      displayName.includes("ColorPicker") ||
+      displayName.includes("Slider") ||
+      displayName.includes("Toggle") ||
+      (displayName.includes("DatePicker") && props?.inline)
+    );
+  }, [children]);
+
+  const childVerboseValidationFeedback = (children as any)?.props?.verboseValidationFeedback;
+  const verboseValidationFeedback = isForcedVerbose
+    ? true
+    : (verboseValidationFeedbackFromProps ?? childVerboseValidationFeedback ?? contextVerboseValidationFeedback ?? true);
 
   const isEnabled = enabled && formEnabled;
 
@@ -142,6 +172,7 @@ export function FormBindingWrapper({
     value,
     validationResult,
     validationMode ?? "errorLate",
+    verboseValidationFeedback ?? true
   );
 
   // We use useFormContextPart to access forceShowValidationResult efficiently.
@@ -150,7 +181,7 @@ export function FormBindingWrapper({
   const forceShowValidationResult = useFormContextPart(
     (value) => value?.interactionFlags[formItemId]?.forceShowValidationResult
   );
-  
+
   const isHelperTextShown = isHelperTextShownHook || !!forceShowValidationResult;
 
   // Focus/blur handlers for validation modes
@@ -172,6 +203,11 @@ export function FormBindingWrapper({
     return children;
   }
 
+  // Get all invalid messages from validation results
+  const invalidMessages = validationResult?.validations
+    .filter((v) => !v.isValid && v.invalidMessage)
+    .map((v) => v.invalidMessage) ?? [];
+
   // Clone the input component and inject form-related props
   const enhancedInput = cloneElement(children, {
     value,
@@ -180,11 +216,12 @@ export function FormBindingWrapper({
     onBlur,
     enabled: isEnabled,
     validationStatus,
+    invalidMessages,
     registerComponentApi,
   });
 
-  // Create validation result display
-  const validationResultDisplay = (
+  // Create validation result display (hidden when verboseValidationFeedback is false (concise mode))
+  const validationResultDisplay = (verboseValidationFeedback === false) ? null : (
     <div ref={animateContainerRef} className={styles.helperTextContainer}>
       {isHelperTextShown &&
         validationResult?.validations.map((singleValidation, i) => (
@@ -239,11 +276,11 @@ export function useFormBinding(bindTo: string, options?: {
 }) {
   const defaultId = useId();
   const isInsideForm = useIsInsideForm();
-  
+
   const formItemId = useMemo(() => {
     return bindTo || defaultId;
   }, [bindTo, defaultId]);
-  
+
   return {
     isInsideForm,
     formItemId

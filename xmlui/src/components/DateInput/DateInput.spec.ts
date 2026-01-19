@@ -1645,3 +1645,112 @@ test.describe("Behaviors and Parts", () => {
   });
 });
 
+
+// =============================================================================
+// VALIDATION FEEDBACK TESTS
+// =============================================================================
+
+test.describe("Validation Feedback", () => {
+  test("shows helper text and no icon when verboseValidationFeedback is true (default)", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form verboseValidationFeedback="{true}">
+        <DateInput testId="input" bindTo="input" required="{true}" />
+        <Button testId="submit" type="submit">Submit</Button>
+      </Form>
+    `);
+    
+    // Trigger validation by submitting empty required field
+    await page.getByTestId("submit").click();
+    
+    // Check for helper text
+    await expect(page.getByText("This field is required")).toBeVisible();
+    
+    // Check absence of concise feedback icon
+    const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
+    await expect(conciseFeedback).not.toBeVisible();
+  });
+
+  test("shows icon and no helper text when verboseValidationFeedback is false", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form verboseValidationFeedback="{false}">
+        <DateInput testId="input" bindTo="input" required="{true}" />
+        <Button testId="submit" type="submit">Submit</Button>
+      </Form>
+    `);
+    
+    // Trigger validation
+    await page.getByTestId("submit").click();
+    
+    // Check for helper text (should be hidden)
+    await expect(page.getByText("This field is required")).not.toBeVisible();
+    
+    // Check for concise feedback icon
+    const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
+    await expect(conciseFeedback).toBeVisible();
+    
+    // Check that it shows error icon
+    await expect(conciseFeedback.locator("[data-icon-name='error']")).toBeVisible();
+  });
+
+  test("prop on component overrides form default", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form verboseValidationFeedback="{true}">
+        <DateInput testId="input" bindTo="input" verboseValidationFeedback="{false}" required="{true}" />
+        <Button testId="submit" type="submit">Submit</Button>
+      </Form>
+    `);
+    
+    await page.getByTestId("submit").click();
+    
+    // Helper text hidden
+    await expect(page.getByText("This field is required")).not.toBeVisible();
+    
+    // Concise feedback visible
+    const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
+    await expect(conciseFeedback).toBeVisible();
+  });
+
+  test("shows valid icon in concise mode when valid", async ({ initTestBed, page, createDateInputDriver }) => {
+    await initTestBed(`
+      <Form verboseValidationFeedback="{false}">
+        <DateInput testId="input" bindTo="input" required="{true}" />
+        <Button testId="submit" type="submit">Submit</Button>
+      </Form>
+    `);
+    
+    const driver = await createDateInputDriver("input");
+    
+    // First make it invalid
+    await page.getByTestId("submit").click();
+    
+    // Now make it valid
+    await driver.monthInput.fill("10");
+    await driver.dayInput.fill("10");
+    await driver.yearInput.fill("2023");
+    await driver.yearInput.blur();
+    
+    const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
+    await expect(conciseFeedback).toBeVisible();
+    await expect(conciseFeedback.locator("[data-icon-name='checkmark']")).toBeVisible();
+  });
+
+  test("concise mode tooltip shows error message on hover", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form verboseValidationFeedback="{false}">
+        <DateInput testId="input" bindTo="input" required="{true}" />
+        <Button testId="submit" type="submit">Submit</Button>
+      </Form>
+    `);
+    
+    await page.getByTestId("submit").click();
+    
+    const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
+    // Hover over the icon
+    await conciseFeedback.hover();
+    
+    // Check tooltip content
+    const tooltip = page.locator("[data-tooltip-container]");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toContainText("This field is required");
+  });
+});
