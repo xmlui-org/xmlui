@@ -819,6 +819,7 @@ test.describe("Event Handling", () => {
       <Form>
         <TextBox 
           testId="test" 
+          bindTo="test"
           required="true"
           onValidate="result => testState = result ? 'valid' : 'invalid'"
         />
@@ -860,6 +861,7 @@ test.describe("Accessibility", () => {
       <Form>
         <TextBox 
           testId="formItem"
+          bindTo="test"
           label="Test Field" 
           required="true" 
           requiredInvalidMessage="This field is required"
@@ -900,9 +902,9 @@ test.describe("Accessibility", () => {
     await initTestBed(`
       <Form>
         <TextBox 
+          bindTo="test"
           label="Required Field" 
           required="true" 
-          requiredInvalidMessage="This field is required"
         />
       </Form>
     `);
