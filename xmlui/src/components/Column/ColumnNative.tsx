@@ -12,7 +12,7 @@ type Props = OurColumnMetadata & {
 };
 
 export const defaultProps: Pick<Props, "canSort" | "canResize"> = {
-  canSort: false,
+  canSort: true,
   canResize: true,
 };
 
