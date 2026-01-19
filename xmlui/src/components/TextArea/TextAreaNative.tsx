@@ -120,7 +120,7 @@ export const TextArea = forwardRef(function TextArea(
 ) {
   // --- The component is initially unfocused
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const ref = forwardRef ? composeRefs(forwardedRef, inputRef) : inputRef;
+  const ref = forwardedRef ? composeRefs(forwardedRef, inputRef) : inputRef;
   const [cursorPosition, setCursorPosition] = useState(null);
   const [focused, setFocused] = React.useState(false);
 
@@ -304,6 +304,7 @@ export const TextArea = forwardRef(function TextArea(
       <div className={styles.container}>
         <Part partId={PART_INPUT}>
           <TextAreaResizable
+            ref={ref}
             {...textareaProps}
             style={style as any}
             className={classnames(classes)}
@@ -321,6 +322,7 @@ export const TextArea = forwardRef(function TextArea(
       <div className={styles.container}>
         <Part partId={PART_INPUT}>
           <TextareaAutosize
+            ref={ref}
             {...textareaProps}
             style={style as any}
             className={classnames(classes)}
@@ -337,7 +339,7 @@ export const TextArea = forwardRef(function TextArea(
   return (
     <div className={styles.container}>
       <Part partId={PART_INPUT}>
-        <textarea {...textareaProps} rows={rows} className={classnames(classes)} />
+        <textarea ref={ref} {...textareaProps} rows={rows} className={classnames(classes)} />
       </Part>
       {renderConciseFeedback()}
     </div>
