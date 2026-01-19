@@ -1,7 +1,8 @@
-import { type CSSProperties, type ForwardedRef, type ReactNode, forwardRef, useRef, useEffect } from "react";
+import { type CSSProperties, type ForwardedRef, type ReactNode, forwardRef, useRef, useEffect, useMemo } from "react";
 import classnames from "classnames";
 
 import styles from "./Card.module.scss";
+import { capitalizeFirstLetter } from "../../components-core/utils/misc";
 
 import { Avatar } from "../Avatar/AvatarNative";
 import { LinkNative } from "../Link/LinkNative";
@@ -20,6 +21,8 @@ type Props = {
   showAvatar?: boolean;
   avatarSize?: string;
   orientation?: string;
+  horizontalAlignment?: string;
+  verticalAlignment?: string;
   onClick?: any;
   registerComponentApi?: (api: any) => void;
 };
@@ -33,6 +36,8 @@ export const Card = forwardRef(function Card(
   {
     children,
     orientation = defaultProps.orientation,
+    horizontalAlignment,
+    verticalAlignment,
     style,
     className,
     title,
@@ -52,6 +57,22 @@ export const Card = forwardRef(function Card(
     level: "h2",
     maxLines: 1,
   };
+
+  // Create our own alignment classes using Card's styles
+  const alignmentClasses = useMemo(() => {
+    const horizontal = horizontalAlignment && styles[`alignItems${capitalizeFirstLetter(horizontalAlignment)}`];
+    const vertical = verticalAlignment && styles[`justifyItems${capitalizeFirstLetter(verticalAlignment)}`];
+    
+    return orientation === "horizontal"
+      ? {
+          horizontal: horizontalAlignment && styles[`justifyItems${capitalizeFirstLetter(horizontalAlignment)}`],
+          vertical: verticalAlignment && styles[`alignItems${capitalizeFirstLetter(verticalAlignment)}`],
+        }
+      : {
+          horizontal,
+          vertical,
+        };
+  }, [orientation, horizontalAlignment, verticalAlignment]);
 
   // Register API methods
   useEffect(() => {
@@ -104,6 +125,8 @@ export const Card = forwardRef(function Card(
           [styles.vertical]: orientation === "vertical",
           [styles.horizontal]: orientation === "horizontal",
         },
+        alignmentClasses.horizontal,
+        alignmentClasses.vertical,
         className,
       )}
       style={style}

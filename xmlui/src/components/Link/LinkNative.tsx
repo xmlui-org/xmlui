@@ -10,6 +10,7 @@ import { Link } from "@remix-run/react";
 import classnames from "classnames";
 
 import styles from "./Link.module.scss";
+import { capitalizeFirstLetter } from "../../components-core/utils/misc";
 
 import type { LinkTarget } from "../abstractions";
 import { createUrlWithQueryParams } from "../component-utils";
@@ -27,6 +28,8 @@ type Props = {
   icon?: string;
   active?: boolean;
   disabled?: boolean;
+  horizontalAlignment?: string;
+  verticalAlignment?: string;
   onClick?: () => void;
   style?: CSSProperties;
   className?: string;
@@ -54,6 +57,8 @@ export const LinkNative = forwardRef(function LinkNative(
     onClick,
     target,
     disabled = defaultProps.disabled,
+    horizontalAlignment,
+    verticalAlignment,
     style,
     className,
     ...anchorProps
@@ -63,6 +68,17 @@ export const LinkNative = forwardRef(function LinkNative(
   const smartTo = useMemo(() => {
     return createUrlWithQueryParams(to);
   }, [to]) as To;
+
+  // Create our own alignment classes using Link's styles
+  // Link has flex-direction: row, so:
+  // - horizontalAlignment controls justify-content (main axis)
+  // - verticalAlignment controls align-items (cross axis)
+  const alignmentClasses = useMemo(() => {
+    return {
+      horizontal: horizontalAlignment && styles[`justifyItems${capitalizeFirstLetter(horizontalAlignment)}`],
+      vertical: verticalAlignment && styles[`alignItems${capitalizeFirstLetter(verticalAlignment)}`],
+    };
+  }, [horizontalAlignment, verticalAlignment]);
 
   const Node = to ? Link : "div";
   return (
@@ -77,7 +93,7 @@ export const LinkNative = forwardRef(function LinkNative(
         [styles.iconLink]: iconLink,
         [styles.active]: active,
         [styles.disabled]: disabled,
-      })}
+      }, alignmentClasses.horizontal, alignmentClasses.vertical)}
     >
       {icon && (
         <Part partId={PART_ICON}>

@@ -87,7 +87,9 @@ The `ModalDialog` component is also a container such as the [`Card`](/components
 
 ## Properties [#properties]
 
-### `closeButtonVisible` (default: true) [#closebuttonvisible-default-true]
+### `closeButtonVisible` [#closebuttonvisible]
+
+-  default: **true**
 
 Shows (`true`) or hides (`false`) the visibility of the close button on the dialog.
 
@@ -101,7 +103,9 @@ Shows (`true`) or hides (`false`) the visibility of the close button on the dial
 Click outside the dialog to close it.
 ```
 
-### `fullScreen` (default: false) [#fullscreen-default-false]
+### `fullScreen` [#fullscreen]
+
+-  default: **false**
 
 Toggles whether the dialog encompasses the whole UI (`true`) or not and has a minimum width and height (`false`).
 

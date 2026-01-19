@@ -49,7 +49,9 @@ You can create `TabItem` children dynamically:
 
 ## Properties [#properties]
 
-### `accordionView` (default: false) [#accordionview-default-false]
+### `accordionView` [#accordionview]
+
+-  default: **false**
 
 When enabled, displays tabs in an accordion-like view where tab headers are stacked vertically and only the active tab's content is visible. Each tab header remains visible and clicking a header opens its content while closing others. When enabled, the orientation property is ignored.
 
@@ -163,13 +165,17 @@ Individual tab items have an optional identifier, which is passed to the header 
 
 > [!INFO] Individual `TabItem` children can customize their [header templates](./TabItem#headertemplate), too.
 
-### `orientation` (default: "horizontal") [#orientation-default-horizontal]
+### `orientation` [#orientation]
+
+-  default: **"horizontal"**
 
 This property indicates the orientation of the component. In horizontal orientation, the tab sections are laid out on the left side of the content panel, while in vertical orientation, the buttons are at the top. Note: This property is ignored when accordionView is set to true.
 
 Available values: `horizontal` **(default)**, `vertical`
 
-### `tabAlignment` (default: "start") [#tabalignment-default-start]
+### `tabAlignment` [#tabalignment]
+
+-  default: **"start"**
 
 This property controls how tabs are aligned within the tab header container in horizontal orientation. Use 'start' to align tabs to the left, 'end' to align to the right, 'center' to center the tabs, and 'stretch' to make tabs fill the full width of the header. Note: This property is ignored when orientation is set to 'vertical' or when accordionView is enabled.
 

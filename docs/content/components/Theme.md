@@ -41,7 +41,9 @@ and sets several theme variables to style the `ProgressBar` component:
 
 ## Properties [#properties]
 
-### `applyIf` (default: "auto") [#applyif-default-auto]
+### `applyIf` [#applyif]
+
+-  default: **"auto"**
 
 This property controls whether the theme wrapper is applied. When true, the theme wraps the children. When false, children are rendered unwrapped. If not explicitly set, defaults to true only when the Theme has meaningful properties (themeId, tone, themeVars, or disableInlineStyle); otherwise defaults to false to avoid unnecessary wrapper elements.
 
@@ -82,7 +84,9 @@ This property is particularly useful for:
 
 This property controls whether inline styles are disabled for components within this theme. When undefined, uses the appGlobals.disableInlineStyle setting.
 
-### `root` (default: false) [#root-default-false]
+### `root` [#root]
+
+-  default: **false**
 
 This property indicates whether the component is at the root of the application.
 
@@ -124,7 +128,9 @@ This property specifies which theme to use by setting the theme's id.
 </App>
 ```
 
-### `tone` (default: "light") [#tone-default-light]
+### `tone` [#tone]
+
+-  default: **"light"**
 
 This property allows the setting of the current theme's tone.
 

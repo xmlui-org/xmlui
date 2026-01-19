@@ -39,7 +39,9 @@
 
 ## Properties [#properties]
 
-### `enabled` (default: true) [#enabled-default-true]
+### `enabled` [#enabled]
+
+-  default: **true**
 
 This boolean property indicates whether the option is enabled or disabled.
 

@@ -268,13 +268,13 @@ function addPropsSection(data, component) {
 
   // Use pattern utility for processing props
   processComponentSection(component.props, (propName, prop) => {
-    const isRequired = prop.isRequired === true ? "(required)" : "";
+    const isRequired = prop.isRequired === true ? "This property is required." : "";
     const defaultValue =
       prop.defaultValue !== undefined
-        ? `(default: ${typeof prop.defaultValue === "string" ? `"${prop.defaultValue}"` : prop.defaultValue})`
+        ? `default: **${typeof prop.defaultValue === "string" ? `"${prop.defaultValue}"` : prop.defaultValue}**`
         : "";
     const propModifier = isRequired || defaultValue ? ` ${isRequired || defaultValue}` : "";
-    buffer += `### \`${propName}\`${propModifier}\n\n`;
+    buffer += `### \`${propName}\`\n\n${propModifier ? `- ${propModifier}\n\n` : ""}`;
 
     buffer += combineDescriptionAndDescriptionRef(data, prop, METADATA_SECTIONS.PROPS);
     buffer += "\n\n";

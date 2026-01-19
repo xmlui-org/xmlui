@@ -361,7 +361,7 @@ export const Markdown = memo(
             li({ children, node, ...props }) {
               return (
                 <li className={styles.htmlLi} {...props}>
-                  <Text>{children}</Text>
+                  {children}
                 </li>
               );
             },
@@ -630,6 +630,9 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
       danger: <Icon name="admonition_danger" />,
       note: <Icon name="admonition_note" />,
       tip: <Icon name="admonition_tip" />,
+      card: null,
+      feat: <Icon name="star" />,
+      def: <Icon name="definition" />,
     };
 
     // Render adornment blockquote with the updated structure
@@ -641,13 +644,18 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
           [styles.danger]: type === "danger",
           [styles.note]: type === "note",
           [styles.tip]: type === "tip",
+          [styles.card]: type === "card",
+          [styles.feat]: type === "feat",
+          [styles.def]: type === "def",
         })}
         style={style}
       >
         <div className={styles.admonitionContainer}>
-          <div className={`${styles.admonitionIcon} ${styles[type] || ""}`}>
-            {iconMap[type] || <Icon name="admonition_info" />}
-          </div>
+          {iconMap[type] !== null && (
+            <div className={`${styles.admonitionIcon} ${styles[type] || ""}`}>
+              {iconMap[type] || <Icon name="admonition_info" />}
+            </div>
+          )}
           <div className={styles.admonitionContent}>{processedChildren}</div>
         </div>
       </blockquote>

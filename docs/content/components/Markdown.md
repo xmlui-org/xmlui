@@ -281,7 +281,9 @@ For comma-separated markdown links (common in reference lists), use `overflowMod
 
 This boolean property specifies whether `<br>` (line break) elements should be omitted from the rendered output. When set to `true`, `<br/>` tags in the markdown content will not be rendered. When `false` (default), `<br/>` tags render as horizontal bars.
 
-### `removeIndents` (default: true) [#removeindents-default-true]
+### `removeIndents` [#removeindents]
+
+-  default: **true**
 
 This boolean property specifies whether leading indents should be removed from the markdown content. If set to `true`, the shortest indent found at the start of the content lines is removed from the beginning of every line.
 

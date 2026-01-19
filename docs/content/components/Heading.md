@@ -28,7 +28,9 @@ For the shorthand versions see: [H1](./H1), [H2](./H2), [H3](./H3), [H4](./H4), 
 
 ## Properties [#properties]
 
-### `ellipses` (default: true) [#ellipses-default-true]
+### `ellipses` [#ellipses]
+
+-  default: **true**
 
 This property indicates whether ellipses should be displayed (`true`) when the heading text is cropped or not (`false`).
 
@@ -50,7 +52,9 @@ This property indicates whether ellipses should be displayed (`true`) when the h
 </App>
 ```
 
-### `level` (default: "h1") [#level-default-h1]
+### `level` [#level]
+
+-  default: **"h1"**
 
 This property sets the visual significance (level) of the heading. Accepts multiple formats: `h1`-`h6`, `H1`-`H6`, or `1`-`6`.Invalid values default to `h1`.
 
@@ -80,11 +84,15 @@ This optional property determines the maximum number of lines the component can 
 </App>
 ```
 
-### `omitFromToc` (default: false) [#omitfromtoc-default-false]
+### `omitFromToc` [#omitfromtoc]
+
+-  default: **false**
 
 If true, this heading will be excluded from the table of contents.
 
-### `preserveLinebreaks` (default: false) [#preservelinebreaks-default-false]
+### `preserveLinebreaks` [#preservelinebreaks]
+
+-  default: **false**
 
 This property indicates whether linebreaks should be preserved when displaying text.
 
@@ -115,7 +123,9 @@ You can observe the effect of using `preserveLinebreaks`:
 > Remember to use the `value` property of `Heading`.
 > Linebreaks are converted to spaces when nesting the text in the `Heading` component.
 
-### `showAnchor` (default: false) [#showanchor-default-false]
+### `showAnchor` [#showanchor]
+
+-  default: **false**
 
 This property indicates whether an anchor link should be displayed next to the heading. If set to `true`, an anchor link will be displayed on hover next to the heading.
 

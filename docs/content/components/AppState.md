@@ -105,7 +105,9 @@ If you want to run the sample with explicit state buckets (for example, with the
 
 ## Properties [#properties]
 
-### `bucket` (default: "default") [#bucket-default-default]
+### `bucket` [#bucket]
+
+-  default: **"default"**
 
 This property is the identifier of the bucket to which the `AppState` instance is bound. Multiple `AppState` instances with the same bucket will share the same state object: any of them updating the state will cause the other instances to view the new, updated state.
 

@@ -235,8 +235,8 @@ export const COMPONENT_NAVIGATION = {
   },
   TEMPLATES: {
     NAVLINK: (componentName) =>
-      `<NavLink label="${componentName}" to="/components/${componentName}" />`,
-    OVERVIEW_NAVLINK: (label, to) => `<NavLink label="${label}" to="${to}" />`,
+      `<NavLink icon="component" label="${componentName}" to="/components/${componentName}" />`,
+    OVERVIEW_NAVLINK: (label, to) => `<NavLink icon="component" label="${label}" to="${to}" />`,
   },
 };
 

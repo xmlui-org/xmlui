@@ -49,7 +49,9 @@ The following example demonstrates using it:
 This example mimics a one-second search and turns off the submit button during the operation. Also, it adds a Test Search Server button:
 ```
 
-### `cancelLabel` (default: "Cancel") [#cancellabel-default-cancel]
+### `cancelLabel` [#cancellabel]
+
+-  default: **"Cancel"**
 
 This property defines the label of the Cancel button.
 
@@ -61,11 +63,15 @@ This property sets the message to display when the form is submitted successfull
 
 This property sets the initial value of the form's data structure. The form infrastructure uses this value to set the initial state of form items within the form. If this property isnot set, the form does not have an initial value.
 
-### `enabled` (default: true) [#enabled-default-true]
+### `enabled` [#enabled]
+
+-  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-### `enableSubmit` (default: true) [#enablesubmit-default-true]
+### `enableSubmit` [#enablesubmit]
+
+-  default: **true**
 
 This property controls whether the submit button is enabled. When set to false, the submit button is disabled and the form cannot be submitted.
 
@@ -73,11 +79,15 @@ This property controls whether the submit button is enabled. When set to false, 
 
 This property sets the message to display when the form submission fails.
 
-### `hideButtonRow` (default: false) [#hidebuttonrow-default-false]
+### `hideButtonRow` [#hidebuttonrow]
+
+-  default: **false**
 
 This property hides the button row entirely when set to true.
 
-### `hideButtonRowUntilDirty` (default: false) [#hidebuttonrowuntildirty-default-false]
+### `hideButtonRowUntilDirty` [#hidebuttonrowuntildirty]
+
+-  default: **false**
 
 This property hides the button row until the form data is modified (dirty).
 
@@ -85,11 +95,15 @@ This property hides the button row until the form data is modified (dirty).
 
 This property sets the message to display when the form is being submitted.
 
-### `itemLabelBreak` (default: true) [#itemlabelbreak-default-true]
+### `itemLabelBreak` [#itemlabelbreak]
+
+-  default: **true**
 
 This boolean value indicates if form item labels can be split into multiple lines if it would overflow the available label width. Individual `FormItem` instances can override this property.
 
-### `itemLabelPosition` (default: "top") [#itemlabelposition-default-top]
+### `itemLabelPosition` [#itemlabelposition]
+
+-  default: **"top"**
 
 This property sets the position of the item labels within the form.Individual `FormItem` instances can override this property.
 
@@ -156,15 +170,21 @@ Fields can override `itemRequireLabelMode` with `requireLabelMode`:
 </App>
 ```
 
-### `keepModalOpenOnSubmit` (default: false) [#keepmodalopenonsubmit-default-false]
+### `keepModalOpenOnSubmit` [#keepmodalopenonsubmit]
+
+-  default: **false**
 
 This property prevents the modal from closing when the form is submitted.
 
-### `saveInProgressLabel` (default: "Saving...") [#saveinprogresslabel-default-saving-]
+### `saveInProgressLabel` [#saveinprogresslabel]
+
+-  default: **"Saving..."**
 
 This property defines the label of the Save button to display during the form data submit (save) operation.
 
-### `saveLabel` (default: "Save") [#savelabel-default-save]
+### `saveLabel` [#savelabel]
+
+-  default: **"Save"**
 
 This property defines the label of the Save button.
 
@@ -176,7 +196,9 @@ This property sets the HTTP method to use when submitting the form data. If not 
 
 URL to submit the form data.
 
-### `swapCancelAndSave` (default: false) [#swapcancelandsave-default-false]
+### `swapCancelAndSave` [#swapcancelandsave]
+
+-  default: **false**
 
 By default, the Cancel button is to the left of the Save button. Set this property to `true` to swap them or `false` to keep their original location.
 

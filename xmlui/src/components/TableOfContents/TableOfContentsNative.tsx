@@ -41,6 +41,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const tocRef = useRef<HTMLDivElement>(null);
+  const indicatorRef = useRef<HTMLDivElement>(null);
   const {
     headings,
     scrollToAnchor,
@@ -75,6 +76,26 @@ export const TableOfContents = forwardRef(function TableOfContents(
     }
   }, [activeAnchorId, headings]);
 
+  // Position indicator over active item
+  useEffect(() => {
+    if (activeAnchorId && tocRef?.current && indicatorRef?.current) {
+      const activeItem = tocRef.current.querySelector(`li.${styles.active}`);
+      if (activeItem) {
+        const navRect = tocRef.current.getBoundingClientRect();
+        const itemRect = activeItem.getBoundingClientRect();
+        const relativeTop = itemRect.top - navRect.top + tocRef.current.scrollTop;
+        const relativeLeft = itemRect.left - navRect.left;
+        
+        indicatorRef.current.style.top = `${relativeTop}px`;
+        indicatorRef.current.style.left = `${relativeLeft}px`;
+        indicatorRef.current.style.height = `${itemRect.height}px`;
+        indicatorRef.current.style.display = 'block';
+      }
+    } else if (indicatorRef?.current) {
+      indicatorRef.current.style.display = 'none';
+    }
+  }, [activeAnchorId, headings]);
+
   return (
     <nav
       {...rest}
@@ -83,6 +104,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
       ref={ref}
       style={style}
     >
+      <div className={styles.indicator} ref={indicatorRef} />
       <ul className={styles.list}>
         {headings.map((value) => {
           if (value.level <= maxHeadingLevel && (!omitH1 || value.level !== 1)) {

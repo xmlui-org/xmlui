@@ -75,6 +75,38 @@ $outlineOffset-Link--focus: createThemeVar("outlineOffset-#{$component}--focus")
     }
   }
 
+  // Add alignment classes for Link component
+  /* Main axis */
+  .justifyItemsStart {
+    justify-content: flex-start;
+  }
+  .justifyItemsCenter {
+    justify-content: center;
+  }
+  .justifyItemsStretch {
+    justify-content: stretch;
+  }
+  .justifyItemsEnd {
+    justify-content: flex-end;
+  }
+
+  /* Cross axis */
+  .alignItemsStart {
+    align-items: flex-start;
+  }
+  .alignItemsCenter {
+    align-items: center;
+  }
+  .alignItemsStretch {
+    align-items: stretch;
+  }
+  .alignItemsEnd {
+    align-items: flex-end;
+  }
+  .alignItemsBaseline {
+    align-items: baseline;
+  }
+
   .iconWrapper {
     @include t.paddingVars($themeVars, "icon-#{$component}");
     padding-right: $gap-icon-Link;

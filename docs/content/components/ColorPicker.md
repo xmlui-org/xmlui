@@ -15,11 +15,15 @@ This component allows you to edit or select a color using RGB, HSL, or CSS HEX n
 
 ## Properties [#properties]
 
-### `autoFocus` (default: false) [#autofocus-default-false]
+### `autoFocus` [#autofocus]
+
+-  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `enabled` (default: true) [#enabled-default-true]
+### `enabled` [#enabled]
+
+-  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -38,7 +42,9 @@ This property sets the component's initial value.
 </App>
 ```
 
-### `readOnly` (default: false) [#readonly-default-false]
+### `readOnly` [#readonly]
+
+-  default: **false**
 
 Set this property to `true` to disallow changing the component value.
 
@@ -48,11 +54,15 @@ Set this property to `true` to disallow changing the component value.
 </App>
 ```
 
-### `required` (default: false) [#required-default-false]
+### `required` [#required]
+
+-  default: **false**
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `validationStatus` (default: "none") [#validationstatus-default-none]
+### `validationStatus` [#validationstatus]
+
+-  default: **"none"**
 
 This property allows you to set the validation status of the input component.
 

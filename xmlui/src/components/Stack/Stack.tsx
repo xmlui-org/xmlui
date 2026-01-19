@@ -122,7 +122,6 @@ export const VStackMd = {
     ...stackMd.apis,
   },
 };
-type VStackComponentDef = ComponentDef<typeof VStackMd>;
 
 export const HStackMd = {
   ...StackMd,
@@ -135,7 +134,6 @@ export const HStackMd = {
     ...stackMd.apis,
   },
 };
-type HStackComponentDef = ComponentDef<typeof HStackMd>;
 
 export const CVStackMd = {
   ...StackMd,
