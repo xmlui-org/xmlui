@@ -97,14 +97,6 @@ export const NavGroupMd = createMetadata({
     [`marginTop-items-${COMP}`]:
       "Sets the margin between the NavGroup header and the first child item. Does not affect margins between child items.",
     [`marginBottom-items-${COMP}`]: "Sets the margin after the last child item in the NavGroup.",
-    [`paddingHorizontal-level1-${COMP}`]:
-      "Sets the horizontal padding for level 1 (top-level) NavGroup. Overrides paddingHorizontal-NavGroup when defined.",
-    [`paddingHorizontal-level2-${COMP}`]:
-      "Sets the horizontal padding for level 2 (nested once) NavGroup. Overrides paddingHorizontal-NavGroup when defined.",
-    [`paddingHorizontal-level3-${COMP}`]:
-      "Sets the horizontal padding for level 3 (nested twice) NavGroup. Overrides paddingHorizontal-NavGroup when defined.",
-    [`paddingHorizontal-level4-${COMP}`]:
-      "Sets the horizontal padding for level 4 (nested three times) NavGroup. Overrides paddingHorizontal-NavGroup when defined.",
   },
   defaultThemeVars: {
     [`backgroundColor-dropdown-${COMP}`]: "$backgroundColor-primary",
