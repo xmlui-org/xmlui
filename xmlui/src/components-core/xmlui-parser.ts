@@ -1,15 +1,16 @@
 import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
 import { createXmlUiParser } from "../parsers/xmlui-parser/parser";
 import { nodeToComponentDef } from "../parsers/xmlui-parser/transform";
-import { DiagnosticCategory, ErrCodes } from "../parsers/xmlui-parser/diagnostics";
-import type { GetText, Error as ParseError } from "../parsers/xmlui-parser/parser";
-import type { ParserError } from "../parsers/xmlui-parser/ParserError";
+import { TransformDiag } from "../parsers/xmlui-parser/diagnostics";
+import type { GetText } from "../parsers/xmlui-parser/parser";
+import type { GeneralDiag, ParserDiag } from "../parsers/xmlui-parser/diagnostics";
 import { SyntaxKind } from "../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../parsers/xmlui-parser/syntax-node";
 import type { ScriptParserErrorMessage } from "../abstractions/scripting/ScriptParserError";
 import type { ModuleErrors } from "./script-runner/ScriptingSourceTree";
+import { DocumentCursor } from "../language-server/base/text-document";
 
-interface ErrorForDisplay extends ParseError {
+interface ErrorForDisplay extends GeneralDiag {
   contextStartLine: number;
   contextSource: string;
   errPosLine: number;
@@ -30,35 +31,62 @@ const RADIUS = "0.5rem";
 export function xmlUiMarkupToComponent(source: string, fileId: string | number = 0): ParserResult {
   const { parse, getText } = createXmlUiParser(source);
   const { node, errors } = parse();
+  const cursor = new DocumentCursor(source);
   if (errors.length > 0) {
-    const errorsForDisplay = addDisplayFieldsToErrors(errors, source);
+    const errorsToDisplay = errors.map((err) => {
+      return errorWithDisplayFields(err, cursor, source);
+    });
     const erroneousCompoundComponentName = getCompoundCompName(node, getText);
-    return { component: null, errors: errorsForDisplay, erroneousCompoundComponentName };
+    return {
+      component: null,
+      errors: errorsToDisplay as ErrorForDisplay[],
+      erroneousCompoundComponentName,
+    };
   }
+
   try {
     const component = nodeToComponentDef(node, getText, fileId);
     const transformResult = { component, errors: [] };
     return transformResult;
   } catch (e) {
     const erroneousCompoundComponentName = getCompoundCompName(node, getText);
-    const singleErr: ErrorForDisplay = {
-      message: (e as ParserError).message,
-      errPosCol: 0,
-      errPosLine: 0,
-      code: ErrCodes.expEq,
-      category: DiagnosticCategory.Error,
-      pos: 0,
-      end: 0,
-      contextPos: 0,
-      contextEnd: 0,
-      contextSource: "",
-      contextStartLine: 0,
-    };
-    return {
-      component: null,
-      erroneousCompoundComponentName,
-      errors: [singleErr],
-    };
+    if (e instanceof TransformDiag) {
+      let errForDisplay: ErrorForDisplay;
+      if (e.pos && e.end) {
+        const { contextPos, contextEnd } = cursor.getSurroundingContext(e.pos, e.end, 1);
+        const singleErr: GeneralDiag = {
+          message: e.message,
+          code: e.code,
+          pos: e.pos,
+          end: e.end,
+          contextPos,
+          contextEnd,
+        };
+
+        errForDisplay = errorWithDisplayFields(singleErr, cursor, source);
+      } else {
+        errForDisplay = {
+          message: e.message,
+          code: e.code,
+          pos: 0,
+          end: 0,
+          contextPos: 0,
+          contextEnd: 0,
+          contextSource: "",
+          contextStartLine: 0,
+          errPosCol: 0,
+          errPosLine: 0,
+        };
+      }
+
+      return {
+        component: null,
+        erroneousCompoundComponentName,
+        errors: [errForDisplay],
+      };
+    } else {
+      throw e;
+    }
   }
 }
 
@@ -149,7 +177,6 @@ function createErrorReportComponent(
               },
             ],
           },
-          ,
         ];
 
         if (errorStartInContext >= lineStart && errorStartInContext < lineEnd) {
@@ -547,71 +574,19 @@ function getCompoundCompName(node: Node, getText: GetText) {
   return undefined;
 }
 
-function addDisplayFieldsToErrors(errors: ParseError[], source: string): ErrorForDisplay[] {
-  const { offsetToPosForDisplay } = createDocumentCursor(source);
-  return errors.map((err) => {
-    const { line: errPosLine, character: errPosCol } = offsetToPosForDisplay(err.pos);
-    const { line: contextStartLine } = offsetToPosForDisplay(err.contextPos);
-
-    return {
-      ...err,
-      errPosLine,
-      errPosCol,
-      contextStartLine,
-      contextSource: source.substring(err.contextPos, err.contextEnd),
-    };
-  });
-}
-
-type Position = { line: number; character: number };
-type DocumentCursor = {
-  offsetToPos: (offset: number) => Position;
-  offsetToPosForDisplay: (offset: number) => Position;
-};
-
-export function createDocumentCursor(text: string): DocumentCursor {
-  const newlinePositions = [];
-  for (let i = 0; i < text.length; ++i) {
-    if (text[i] === "\n") {
-      newlinePositions.push(i);
-    }
-  }
+function errorWithDisplayFields(
+  err: GeneralDiag,
+  cursor: DocumentCursor,
+  source: string,
+): ErrorForDisplay {
+  const { line: errPosLine, character: errPosCol } = cursor.offsetToDisplayPos(err.pos);
+  const { line: contextStartLine } = cursor.offsetToDisplayPos(err.contextPos);
 
   return {
-    offsetToPos,
-    offsetToPosForDisplay,
+    ...err,
+    errPosLine,
+    errPosCol,
+    contextStartLine,
+    contextSource: source.substring(err.contextPos, err.contextEnd),
   };
-
-  /**
-   * Converts a position in a string to 0 based line and column number.
-   * @param offset the 0 based offset into the string
-   */
-  function offsetToPos(offset: number): Position {
-    let left = 0;
-    let right = newlinePositions.length;
-    while (left < right) {
-      const mid = Math.floor((left + right) / 2);
-
-      if (newlinePositions[mid] < offset) {
-        left = mid + 1;
-      } else {
-        right = mid;
-      }
-    }
-
-    let col = left === 0 ? offset : offset - newlinePositions[left - 1] - 1;
-
-    return { line: left, character: col };
-  }
-
-  /**
-   * Converts a position in a string to base 1 line and column number.
-   * @param offset the 0 based offset into the string
-   */
-  function offsetToPosForDisplay(offset: number): Position {
-    let pos = offsetToPos(offset);
-    pos.line += 1;
-    pos.character += 1;
-    return pos;
-  }
 }

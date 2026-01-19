@@ -20,7 +20,7 @@ import { ErrorBoundary } from "../rendering/ErrorBoundary";
 import { collectVariableDependencies } from "../script-runner/visitors";
 import { useReferenceTrackedApi, useShallowCompareMemoize } from "../utils/hooks";
 import { Container } from "./Container";
-import { PARSED_MARK_PROP } from "../../parsers/scripting/code-behind-collect";
+import { isParsedCodeDeclaration } from "../../abstractions/InternalMarkers";
 import { useAppContext } from "../AppContext";
 import { parseParameterString } from "../script-runner/ParameterParser";
 import { evalBinding } from "../script-runner/eval-tree-sync";
@@ -73,6 +73,92 @@ export const StateContainer = memo(
     const [version, setVersion] = useState(0);
     const routingParams = useRoutingParams();
     const memoedVars = useRef<MemoedVars>(new Map());
+
+    /**
+     * STATE COMPOSITION PIPELINE
+     * 
+     * The container state is assembled from multiple sources in a specific order and priority.
+     * Understanding this flow is critical for debugging state issues.
+     * 
+     * FLOW DIAGRAM:
+     * ┌─────────────────────────────────────────────────────────────┐
+     * │ 1. Parent State (scoped by `uses` property)                │
+     * │    - Inherited from parent container                       │
+     * │    - Filtered by `uses` property if present (creates boundary)
+     * │    - Lines 76-78: extractScopedState() filters parent     │
+     * └──────────────────────┬──────────────────────────────────────┘
+     *                        ↓
+     * ┌─────────────────────────────────────────────────────────────┐
+     * │ 2. Component Reducer State                                  │
+     * │    - Managed by container's reducer                        │
+     * │    - Contains loader states, event lifecycle flags         │
+     * │    - Examples: { dataLoader: { loaded: true, data: [...] },
+     * │               eventInProgress: true }                      │
+     * │    - Lines 83-84: useReducer creates this state           │
+     * └──────────────────────┬──────────────────────────────────────┘
+     *                        ↓
+     * ┌─────────────────────────────────────────────────────────────┐
+     * │ 3. Component APIs (exposed methods)                        │
+     * │    - Methods exposed by child components                   │
+     * │    - Registered via registerComponentApi callback          │
+     * │    - Examples: { getSelectedRows(), fetchData() }         │
+     * │    - Lines 86-87: useState manages component APIs         │
+     * └──────────────────────┬──────────────────────────────────────┘
+     *                        ↓
+     * ┌─────────────────────────────────────────────────────────────┐
+     * │ 4. Context Variables (framework-injected)                 │
+     * │    - Special variables like $item, $itemIndex             │
+     * │    - Provided by parent components (e.g., DataTable row)   │
+     * │    - Lines 108: localVarsStateContext combines these      │
+     * └──────────────────────┬──────────────────────────────────────┘
+     *                        ↓
+     * ┌─────────────────────────────────────────────────────────────┐
+     * │ 5. Local Variables (vars, functions, script)              │
+     * │    - Declared in component definition                     │
+     * │    - Resolved in two passes for forward references        │
+     * │    - Highest priority (can shadow parent state)           │
+     * │    - Two-pass resolution explained below                  │
+     * │    - Lines 123-184: Complex variable resolution           │
+     * └──────────────────────┬──────────────────────────────────────┘
+     *                        ↓
+     * ┌─────────────────────────────────────────────────────────────┐
+     * │ 6. Routing Parameters (app-level context)                 │
+     * │    - Added last, always available                         │
+     * │    - Examples: $pathname, $routeParams, $hash             │
+     * │    - Line 185-189: useCombinedState merges all sources   │
+     * └──────────────────────┬──────────────────────────────────────┘
+     *                        ↓
+     *                  FINAL COMBINED STATE
+     * 
+     * PRIORITY ORDER (later overrides earlier):
+     * 1. Parent State (lowest priority)
+     * 2. Component State + APIs
+     * 3. Context Variables
+     * 4. Local Variables (highest priority - can shadow parent state)
+     * 5. Routing Parameters (additive, always available)
+     * 
+     * EXAMPLE - Multi-level composition:
+     * 
+     * Parent Container (parentState):
+     * { user: { id: 1, name: "John" }, count: 0 }
+     * 
+     * <Stack uses="['user']" var.count="{10}">
+     *   - Parent State (after scoping): { user: { id: 1, name: "John" } }
+     *   - Local vars: { count: 10 }
+     *   - Result: { user: { id: 1, name: "John" }, count: 10 }
+     *   
+     *   CONTRAST: Without 'uses':
+     *   <Stack var.count="{10}">
+     *   - Parent State (no scoping): { user: { id: 1, name: "John" }, count: 0 }
+     *   - Local vars: { count: 10 }
+     *   - Result: { user: { id: 1, name: "John" }, count: 10 } (local vars override)
+     * 
+     * DEBUGGING TIPS:
+     * - Enable debug mode on component: <Stack debug>
+     * - Check debugView.stateTransitions for state changes
+     * - Each level can be inspected in React DevTools
+     * - Variable resolution errors logged to console
+     */
 
     const stateFromOutside = useShallowCompareMemoize(
       useMemo(() => extractScopedState(parentState, node.uses), [node.uses, parentState]),
@@ -129,10 +215,10 @@ export const StateContainer = memo(
     const referenceTrackedApi = useReferenceTrackedApi(componentState);
 
     const varDefinitions = useShallowCompareMemoize({
-      ...parsedScriptPart?.functions,
       ...node.functions,
-      ...parsedScriptPart?.vars,
+      ...parsedScriptPart?.functions,
       ...node.vars,
+      ...parsedScriptPart?.vars,
     });
 
     //first: collection function (arrowExpressions) dependencies
@@ -147,25 +233,51 @@ export const StateContainer = memo(
       return collectFnVarDeps(fnDeps);
     }, [referenceTrackedApi, varDefinitions]);
 
-    // then resolve vars and replace function deps with the collected deps for that function
-    //first resolve round (we do 2, to make sure that the order of the definitions doesn't cause problems)
-    // e.g. 'testFn' uses $props, but $props is not resolved yet
+    /**
+     * Variable Resolution Strategy
+     * 
+     * XMLUI variables can have dependencies on each other and on context variables.
+     * Resolution happens in two passes to handle all dependency orderings correctly:
+     * 
+     * Pass 1 (Pre-resolution):
+     * - Resolves variables using current state context
+     * - Handles forward references (e.g., function using $props defined later)
+     * - Results are temporary and may be incomplete
+     * - Uses a temporary memoization cache
+     * 
+     * Pass 2 (Final resolution):
+     * - Includes pre-resolved variables in the context
+     * - Ensures all dependencies are available
+     * - Results are memoized for performance
+     * - Uses the persistent memoization cache
+     * 
+     * Example: Given vars { fn: "$props.value", $props: "{x: 1}" }
+     * - Pass 1: fn tries to use $props (not yet resolved, gets undefined or default)
+     * - Pass 2: fn uses $props (now resolved to {x: 1}, works correctly)
+     * 
+     * Future: Consider topological sort of dependencies to enable single-pass resolution
+     */
+
+    // Pass 1: Pre-resolve variables to handle forward references
     const preResolvedLocalVars = useVars(
       varDefinitions,
       functionDeps,
       localVarsStateContext,
-      useRef<MemoedVars>(new Map()),
+      useRef<MemoedVars>(new Map()), // Temporary cache, discarded after this pass
     );
+    
+    // Merge pre-resolved variables into context for second pass
     const localVarsStateContextWithPreResolvedLocalVars = useShallowCompareMemoize({
       ...preResolvedLocalVars,
       ...localVarsStateContext,
     });
 
+    // Pass 2: Final resolution with complete context
     const resolvedLocalVars = useVars(
       varDefinitions,
       functionDeps,
       localVarsStateContextWithPreResolvedLocalVars,
-      memoedVars,
+      memoedVars, // Persistent cache for performance
     );
 
     const mergedWithVars = useMergedState(resolvedLocalVars, componentStateWithApis);
@@ -497,5 +609,5 @@ class ParseVarError extends Error {
 
 //true if it's coming from a code behind or a script tag
 function isParsedValue(value: any): value is CodeDeclaration {
-  return value && typeof value === "object" && value[PARSED_MARK_PROP];
+  return isParsedCodeDeclaration(value);
 }

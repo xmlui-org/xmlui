@@ -1,7 +1,7 @@
 import { describe, expect, assert, it } from "vitest";
 import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
 import { transformSource } from "./xmlui";
-import type { ParserError } from "../../../src/parsers/xmlui-parser";
+import { TransformDiag } from "../../../src/parsers/xmlui-parser";
 
 describe("Xmlui transform - regression", () => {
   it("prop with multiple component #1", () => {
@@ -125,7 +125,7 @@ const b = 2;
     try {
       transformSource(`<Button onClick="<" />`) as ComponentDef;
     } catch (e) {
-      expect((e as ParserError).code).toBe("W002");
+      expect((e as TransformDiag).code).toBe("W002");
       return;
     }
     assert.fail("Exception expected");

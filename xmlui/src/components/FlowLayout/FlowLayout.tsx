@@ -44,13 +44,25 @@ export const FlowLayoutMd = createMetadata({
       defaultValue: "start",
     },
   },
+  apis: {
+    scrollToTop: {
+      description:
+        "Scrolls the FlowLayout container to the top. Works when the FlowLayout has an explicit height and overflowY is set to 'scroll'.",
+      signature: "scrollToTop(behavior?: 'auto' | 'instant' | 'smooth'): void",
+    },
+    scrollToBottom: {
+      description:
+        "Scrolls the FlowLayout container to the bottom. Works when the FlowLayout has an explicit height and overflowY is set to 'scroll'.",
+      signature: "scrollToBottom(behavior?: 'auto' | 'instant' | 'smooth'): void",
+    },
+  },
   themeVars: parseScssVar(styles.themeVars),
 });
 
 export const flowLayoutComponentRenderer = createComponentRenderer(
   COMP,
   FlowLayoutMd,
-  ({ node, renderChild, className, extractValue }) => {
+  ({ node, renderChild, className, extractValue, registerComponentApi }) => {
     if (!isComponentDefChildren(node.children)) {
       throw new NotAComponentDefError();
     }
@@ -60,12 +72,22 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
       extractValue.asSize(node.props?.gap) ||
       extractValue.asSize("$space-4");
     const rowGap =
-      extractValue.asSize(node.props?.rowGap) || extractValue.asSize(node.props?.gap) || extractValue.asSize("$space-4");
+      extractValue.asSize(node.props?.rowGap) ||
+      extractValue.asSize(node.props?.gap) ||
+      extractValue.asSize("$space-4");
     const verticalAlignment = extractValue.asOptionalString(node.props?.verticalAlignment, "start");
 
     return (
-      <FlowLayout className={className} columnGap={columnGap} rowGap={rowGap} verticalAlignment={verticalAlignment}>
+      <FlowLayout
+        className={className}
+        columnGap={columnGap}
+        rowGap={rowGap}
+        verticalAlignment={verticalAlignment}
+        registerComponentApi={registerComponentApi}
+      >
         {renderChild(node.children, {
+          type: "FlowLayout",
+          ignoreLayoutProps: ["width", "minWidth", "maxWidth"],
           wrapChild: ({ node, extractValue }, renderedChild, hints) => {
             if (hints?.opaque) {
               return renderedChild;

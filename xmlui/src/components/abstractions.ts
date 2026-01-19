@@ -261,6 +261,16 @@ export const placementMd: PropertyValueDescription[] = [
   { value: "bottom", description: "The bottom of the window" },
 ];
 
+// --- Available indicator modes
+export const requireLabelModeValues = ["markRequired", "markOptional", "markBoth"] as const;
+export const requireLabelModeNames = [...requireLabelModeValues];
+export type RequireLabelMode = (typeof requireLabelModeValues)[number];
+export const requireLabelModeMd: PropertyValueDescription[] = [
+  { value: "markRequired", description: 'Show "*" for required fields' },
+  { value: "markOptional", description: 'Show "(Optional)" for optional fields' },
+  { value: "markBoth", description: 'Show "*" for required AND "(Optional)" for optional fields' },
+];
+
 // --- Available label positions
 export const labelPositionValues = ["top", "start", "end", "bottom"] as const;
 export const labelPositionNames = [...labelPositionValues];

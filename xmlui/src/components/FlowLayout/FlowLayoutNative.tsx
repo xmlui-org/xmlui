@@ -9,6 +9,8 @@ import {
   useContext,
   useMemo,
   useState,
+  useRef,
+  useEffect,
 } from "react";
 import classnames from "classnames";
 import { noop } from "lodash-es";
@@ -110,23 +112,23 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper(
   const _columnGap = normalizeCssValueForCalc(columnGap);
 
   let responsiveWidth;
-  if(isWidthPercentage){
+  if (isWidthPercentage) {
     const percNumber = parseFloat(resolvedWidth);
-    if(mediaSize.sizeIndex <= 1){
+    if (mediaSize.sizeIndex <= 1) {
       let percentage = percNumber * 4;
-      if(percentage > 50){
-        responsiveWidth = `100%`
+      if (percentage > 50) {
+        responsiveWidth = `100%`;
       } else {
-        responsiveWidth = `min(${percentage}%, 100%)`
+        responsiveWidth = `min(${percentage}%, 100%)`;
       }
-    } else if(mediaSize.sizeIndex <= 2){
+    } else if (mediaSize.sizeIndex <= 2) {
       let percentage = percNumber * 3;
-      if(percentage >= 50 && percentage <= 75){
-        responsiveWidth = `50%`
-      } else if(percentage > 75){
-        responsiveWidth = `100%`
+      if (percentage >= 50 && percentage <= 75) {
+        responsiveWidth = `50%`;
+      } else if (percentage > 75) {
+        responsiveWidth = `100%`;
       } else {
-        responsiveWidth = `min(${percentage}%, 100%)`
+        responsiveWidth = `min(${percentage}%, 100%)`;
       }
     } else {
       responsiveWidth = `min(${width}, 100%)`;
@@ -172,6 +174,7 @@ type FlowLayoutProps = {
   rowGap: string | number;
   verticalAlignment?: string;
   children: ReactNode;
+  registerComponentApi?: (api: any) => void;
 };
 
 export const defaultProps: Pick<FlowLayoutProps, "columnGap" | "rowGap" | "verticalAlignment"> = {
@@ -181,11 +184,45 @@ export const defaultProps: Pick<FlowLayoutProps, "columnGap" | "rowGap" | "verti
 };
 
 export const FlowLayout = forwardRef(function FlowLayout(
-  { style, className, columnGap = 0, rowGap = 0, verticalAlignment = defaultProps.verticalAlignment, children, ...rest }: FlowLayoutProps,
+  {
+    style,
+    className,
+    columnGap = 0,
+    rowGap = 0,
+    verticalAlignment = defaultProps.verticalAlignment,
+    children,
+    registerComponentApi,
+    ...rest
+  }: FlowLayoutProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const [numberOfChildren, setNumberOfChildren] = useState(0);
   const safeColumnGap = numberOfChildren === 1 ? 0 : columnGap;
+
+  // Register API methods
+  useEffect(() => {
+    if (registerComponentApi) {
+      registerComponentApi({
+        scrollToTop: (behavior: ScrollBehavior = "instant") => {
+          if (containerRef.current) {
+            containerRef.current.scrollTo({
+              top: 0,
+              behavior,
+            });
+          }
+        },
+        scrollToBottom: (behavior: ScrollBehavior = "instant") => {
+          if (containerRef.current) {
+            containerRef.current.scrollTo({
+              top: containerRef.current.scrollHeight,
+              behavior,
+            });
+          }
+        },
+      });
+    }
+  }, [registerComponentApi]);
 
   // --- Be smart about rowGap
   const _rowGap = getSizeString(rowGap);
@@ -216,9 +253,17 @@ export const FlowLayout = forwardRef(function FlowLayout(
   }, [_columnGap, _rowGap]);
   return (
     <FlowLayoutContext.Provider value={flowLayoutContextValue}>
-      <div style={style} className={className} ref={forwardedRef} {...rest}>
+      <div
+        style={style}
+        className={className}
+        ref={containerRef}
+        {...rest}
+      >
         <div className={styles.outer}>
-          <div className={classnames(styles.flowContainer, styles.horizontal, alignmentClass)} style={innerStyle}>
+          <div
+            className={classnames(styles.flowContainer, styles.horizontal, alignmentClass)}
+            style={innerStyle}
+          >
             {children}
           </div>
         </div>

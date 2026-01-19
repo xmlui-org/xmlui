@@ -4,15 +4,21 @@
 
 ## Properties [#properties]
 
-### `maxHeadingLevel` (default: 6) [#maxheadinglevel-default-6]
+### `maxHeadingLevel` [#maxheadinglevel]
+
+-  default: **6**
 
 Defines the maximum heading level (1 to 6) to include in the table of contents. For example, if it is 2, then `H1` and `H2` are displayed, but lower levels (`H3` to `H6`) are not.
 
-### `omitH1` (default: false) [#omith1-default-false]
+### `omitH1` [#omith1]
+
+-  default: **false**
 
 If true, the `H1` heading is not included in the table of contents. This is useful when the `H1` is used for the page title and you want to avoid duplication.
 
-### `smoothScrolling` (default: false) [#smoothscrolling-default-false]
+### `smoothScrolling` [#smoothscrolling]
+
+-  default: **false**
 
 This property indicates that smooth scrolling is used while scrolling the selected table of contents items into view.
 

@@ -34,10 +34,34 @@ export const Bookmark = ({
 
   const scrollIntoView = useCallback((options?: ScrollIntoViewOptions) => {
     if (elementRef.current) {
+      // Try to find and scroll the nearest scrollable ancestor
+      let scrollableParent = elementRef.current.parentElement;
+      while (scrollableParent) {
+        const style = window.getComputedStyle(scrollableParent);
+        const isScrollable = (style.overflowY === 'scroll' || style.overflowY === 'auto') &&
+                            scrollableParent.scrollHeight > scrollableParent.clientHeight;
+        
+        if (isScrollable) {
+          // Found a scrollable parent, calculate the position
+          const rect = elementRef.current.getBoundingClientRect();
+          const parentRect = scrollableParent.getBoundingClientRect();
+          
+          // Calculate where the element is relative to the parent's viewport
+          const relativeTop = rect.top - parentRect.top + scrollableParent.scrollTop;
+          
+          scrollableParent.scrollTo({
+            top: relativeTop,
+            behavior: options?.behavior || "smooth",
+          });
+          return;
+        }
+        scrollableParent = scrollableParent.parentElement;
+      }
+      
+      // Fallback to browser's default scrollIntoView
       elementRef.current.scrollIntoView({
-        behavior: "smooth",
+        behavior: options?.behavior || "smooth",
         block: "start",
-        ...options,
       });
     }
   }, []);

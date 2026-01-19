@@ -1366,6 +1366,125 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toHaveText("Tooltip text");
   });
+
+  test("requireLabelMode='markRequired' shows asterisk for required fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <Select testId="test" label="Country" required="true" requireLabelMode="markRequired" bindTo="country">
+          <Option value="1" label="USA" />
+        </Select>
+      </Form>
+    `);
+    
+    const label = page.getByText("Country");
+    await expect(label).toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markRequired' hides indicator for optional fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <Select testId="test" label="Country" required="false" requireLabelMode="markRequired" bindTo="country">
+          <Option value="1" label="USA" />
+        </Select>
+      </Form>
+    `);
+    
+    const label = page.getByText("Country");
+    await expect(label).not.toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markOptional' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <Select testId="test" label="Country" required="false" requireLabelMode="markOptional" bindTo="country">
+          <Option value="1" label="USA" />
+        </Select>
+      </Form>
+    `);
+    
+    const label = page.getByText("Country");
+    await expect(label).toContainText("(Optional)");
+    await expect(label).not.toContainText("*");
+  });
+
+  test("requireLabelMode='markOptional' hides indicator for required fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <Select testId="test" label="Country" required="true" requireLabelMode="markOptional" bindTo="country">
+          <Option value="1" label="USA" />
+        </Select>
+      </Form>
+    `);
+    
+    const label = page.getByText("Country");
+    await expect(label).not.toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markBoth' shows asterisk for required fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <Select testId="test" label="Country" required="true" requireLabelMode="markBoth" bindTo="country">
+          <Option value="1" label="USA" />
+        </Select>
+      </Form>
+    `);
+    
+    const label = page.getByText("Country");
+    await expect(label).toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markBoth' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <Select testId="test" label="Country" required="false" requireLabelMode="markBoth" bindTo="country">
+          <Option value="1" label="USA" />
+        </Select>
+      </Form>
+    `);
+    
+    const label = page.getByText("Country");
+    await expect(label).not.toContainText("*");
+    await expect(label).toContainText("(Optional)");
+  });
+
+  test("input requireLabelMode overrides Form itemRequireLabelMode", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form itemRequireLabelMode="required">
+        <Select testId="test" label="Country" required="false" requireLabelMode="markOptional" bindTo="country">
+          <Option value="1" label="USA" />
+        </Select>
+      </Form>
+    `);
+    
+    const label = page.getByText("Country");
+    await expect(label).toContainText("(Optional)");
+    await expect(label).not.toContainText("*");
+  });
+
+  test("input inherits Form itemRequireLabelMode when not specified", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form itemRequireLabelMode="markBoth">
+        <Select testId="test1" label="Required Field" required="true" bindTo="field1">
+          <Option value="1" label="USA" />
+        </Select>
+        <Select testId="test2" label="Optional Field" required="false" bindTo="field2">
+          <Option value="1" label="USA" />
+        </Select>
+      </Form>
+    `);
+    
+    const requiredLabel = page.getByText("Required Field");
+    const optionalLabel = page.getByText("Optional Field");
+    
+    await expect(requiredLabel).toContainText("*");
+    await expect(requiredLabel).not.toContainText("(Optional)");
+    await expect(optionalLabel).toContainText("(Optional)");
+    await expect(optionalLabel).not.toContainText("*");
+  });
 });
 
 // =============================================================================
@@ -1487,14 +1606,14 @@ test.describe("Nested DropdownMenu and Select", () => {
 
     const selectDriver = await createSelectDriver("testSelect");
 
-    await page.getByTestId("openBtn").click();
+    await page.getByTestId("openBtn").click({delay: 100});
 
     const outerDialog = page.getByRole("dialog", { name: "Outer Dialog" });
     await expect(outerDialog).toBeVisible();
 
     await expect(selectDriver.component).toBeVisible();
 
-    await selectDriver.click();
+    await selectDriver.click({delay: 100});
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Option 2")).toBeVisible();
 
@@ -1511,22 +1630,22 @@ test.describe("Nested DropdownMenu and Select", () => {
     const confirmDialog = page.getByRole("dialog", { name: "Confirm action" });
     await expect(confirmDialog).toBeVisible();
 
-    await page.mouse.click(10, 10); // Click outside all dialogs
+    await page.mouse.click(10, 10, {delay: 100}); // Click outside all dialogs
     await expect(confirmDialog).not.toBeVisible();
     await expect(page.getByText("Item 1")).toBeVisible();
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10);
+    await page.mouse.click(10, 10, {delay: 100});
     await expect(page.getByText("Item 1")).not.toBeVisible();
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10);
+    await page.mouse.click(10, 10, {delay: 100});
     await expect(page.getByText("Option 1")).not.toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10);
+    await page.mouse.click(10, 10, {delay: 100});
     await expect(page.getByText("Outer Dialog")).not.toBeVisible();
   });
 });

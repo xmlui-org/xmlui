@@ -120,7 +120,9 @@ You can optionally define request header values as key-value pairs, where the ke
 
 This property customizes the message that is displayed in a toast while the API operation is in progress. If not defined, no progress message is displayed.
 
-### `method` (default: "get") [#method-default-get]
+### `method` [#method]
+
+-  default: **"get"**
 
 The method of data manipulation can be done via setting this property.
 
@@ -134,7 +136,9 @@ This optional property sets the query parameters for the request. The object you
 
 This optional property sets the request body to the value provided here without any conversion. Use the * `body` property if you want the object sent in JSON. When you define `body` and `rawBody`, the latest one prevails.
 
-### `url` (required) [#url-required]
+### `url` [#url]
+
+-  This property is required.
 
 Use this property to set the URL to which data will be sent. If not provided, an empty URL is used.
 

@@ -5,7 +5,7 @@ import type { ComponentDef } from "../abstractions/ComponentDefs";
 import type { ContainerWrapperDef } from "./rendering/ContainerWrapper";
 import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 import type { RendererContext } from "../abstractions/RendererDefs";
-
+import { isArrowExpressionObject } from "../abstractions/InternalMarkers";
 import { useEvent } from "./utils/misc";
 import { useShallowCompareMemoize } from "./utils/hooks";
 import { isArray, isObject } from "lodash-es";
@@ -51,7 +51,7 @@ export const CompoundComponent = forwardRef(
       if (node.props) {
         Object.entries(node.props).forEach(([key, value]) => {
           const extractedProp = extractValue(value, true);
-          if (extractedProp?._ARROW_EXPR_) {
+          if (isArrowExpressionObject(extractedProp)) {
             // --- Ensure arrow functions are called synchronously
             resolvedProps[key] = lookupSyncCallback(extractedProp);
           } else {

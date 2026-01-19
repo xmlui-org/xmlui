@@ -1,5 +1,64 @@
 # xmlui
 
+## 0.11.29
+
+### Patch Changes
+
+- eead0f5: Add experimental MessageListener component
+- 5c9cd56: Fix scroll issues with List virtualization
+- 6021e4d: Added itemRequiredIndicator property to Form to control required/optional indicators for FormItems on the form level.
+- 1906b59: make goto-definition reach components across the whole opened workspace
+- 486588f: Change the indicator in TableOfContents
+- 486588f: Add iconAlignment to NavLink and NavGroup
+- 486588f: Add new Theme variables to NavLink and NavGroup
+- 486588f: Experiment with documentation theme
+- 45441eb: Add overflowMode and breakMode to Markdown
+- a43b636: Renamed requiredIndicator to requireLabelMode and itemRequiredIndicator to itemRequireLabelMode.
+- ee7ad5a: In the Search box, hitting Enter opens the first match when none selected.
+- 6c232bf: Added requiredIndicator property to FormItem to customize required/optional indicators next to labels. Options are: "required", "optional", "both". Default is "required".
+- beff0fc: Fix alignment issues with Text
+- 23c44d5: Fix Column sortable regression
+- 99039d4: Fix List visibility issue in Markdown
+- 626bede: Removed language-server-web-worker export from package.json
+
+## 0.11.28
+
+### Patch Changes
+
+- 7485959: FileInput: Automate parsing of csv/json.
+- 96d510c: Fixed a bug where gaps were still rendered even if there were no labels provided for input fields.
+- 13ebd58: Fixed incorrect background color for a number of components: AutoComplete, Form, NoResult, TextBox and other input controls.
+- 94f2354: Fixed FlowLayout passing down width incorrectly to its children.
+- cf6c6ef: Add openLinkNewTab property to Markdown.
+- cf6c6ef: Add Markdown property truncateLinks
+- 6c49cd2: Add support for rowspan and colspan attributes in Markdown tables
+- 1d9a5e7: Fix star-sizing in App layouts
+- 31e53a8: Fix state APICall and DataSource state references
+
+## 0.11.27
+
+### Patch Changes
+
+- bc1090d: Add experimental bookmark behavior
+- fd9a901: feat: add context, line-col numbers to script parse errors
+- 79701ad: Add "stretch" property to Stack
+- bc67363: Add scroll APIs to Stack, Card, and FlowLayout
+- ff49047: Variables defined in <script> override variables in component attributes
+- 79701ad: Add stretch property to Stack, Splitter, and FlowLayout
+- 357946d: Fix vertically-aligned Text with overflowType="ellipsis"
+- 0d04660: Fix FlowLayout issue with nested Text using ellipsis
+- 539b718: Fix the issues with the List scroll API
+
+## 0.11.26
+
+### Patch Changes
+
+- b736b85: Add verticalAlignment support to FlowLayout
+- 9ebc8e5: feat: implement formBindingBehavior
+- 01ef62b: Clip pixel artifacts experienced with Text overflowMode
+- 5d715a3: Fix issues with empty script tag rendering
+- bd035dd: Fix state variables
+
 ## 0.11.25
 
 ### Patch Changes

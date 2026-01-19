@@ -1,4 +1,3 @@
-import { xmlUiMarkupToComponent } from "../../components-core/xmlui-parser";
 import { getBounds } from "../../testing/component-test-helpers";
 import { test, expect } from "../../testing/fixtures";
 
@@ -533,9 +532,9 @@ test.describe("Basic Functionality", () => {
 
   test("applies buttonRowPosition correctly", async ({ initTestBed, page }) => {
     await initTestBed(
-      `<Pagination 
-        itemCount="50" 
-        pageSize="10" 
+      `<Pagination
+        itemCount="50"
+        pageSize="10"
         buttonRowPosition="start"
         pageSizeOptions="{[5, 10, 20]}"
         pageSizeSelectorPosition="end"
@@ -545,7 +544,7 @@ test.describe("Basic Functionality", () => {
 
     // Check that pagination controls exist and are rendered
     await expect(page.locator('[data-part-id="pagination-controls"]')).toBeVisible();
-    
+
     // Check the structure shows proper positioning (buttons should be rendered before page size selector)
     const nav = page.locator('nav[aria-label="Pagination"]');
     await expect(nav).toBeVisible();
@@ -553,9 +552,9 @@ test.describe("Basic Functionality", () => {
 
   test("applies pageSizeSelectorPosition correctly", async ({ initTestBed, page }) => {
     await initTestBed(
-      `<Pagination 
-        itemCount="50" 
-        pageSize="10" 
+      `<Pagination
+        itemCount="50"
+        pageSize="10"
         buttonRowPosition="center"
         pageSizeOptions="{[5, 10, 20]}"
         pageSizeSelectorPosition="start"
@@ -570,9 +569,9 @@ test.describe("Basic Functionality", () => {
 
   test("applies pageInfoPosition correctly", async ({ initTestBed, page }) => {
     await initTestBed(
-      `<Pagination 
-        itemCount="50" 
-        pageSize="10" 
+      `<Pagination
+        itemCount="50"
+        pageSize="10"
         buttonRowPosition="start"
         pageSizeSelectorPosition="center"
         pageInfoPosition="end"
@@ -586,9 +585,9 @@ test.describe("Basic Functionality", () => {
 
   test("renders only necessary components based on props", async ({ initTestBed, page }) => {
     await initTestBed(
-      `<Pagination 
-        itemCount="50" 
-        pageSize="10" 
+      `<Pagination
+        itemCount="50"
+        pageSize="10"
         buttonRowPosition="start"
         showPageInfo="false"
         showPageSizeSelector="false"
@@ -597,7 +596,7 @@ test.describe("Basic Functionality", () => {
 
     // Button row should be rendered
     await expect(page.locator('[data-part-id="pagination-controls"]')).toBeVisible();
-    
+
     // Page info and size selector should not be rendered
     await expect(page.locator('[data-part-id="page-info"]')).not.toBeVisible();
     await expect(page.locator('[data-part-id="page-size-selector-container"]')).not.toBeVisible();
@@ -605,9 +604,9 @@ test.describe("Basic Functionality", () => {
 
   test("renders multiple components when in different positions", async ({ initTestBed, page }) => {
     await initTestBed(
-      `<Pagination 
-        itemCount="50" 
-        pageSize="10" 
+      `<Pagination
+        itemCount="50"
+        pageSize="10"
         buttonRowPosition="start"
         pageSizeOptions="{[5, 10, 20]}"
         pageSizeSelectorPosition="center"
@@ -623,9 +622,9 @@ test.describe("Basic Functionality", () => {
 
   test("positions work correctly with vertical orientation", async ({ initTestBed, page }) => {
     await initTestBed(
-      `<Pagination 
-        itemCount="50" 
-        pageSize="10" 
+      `<Pagination
+        itemCount="50"
+        pageSize="10"
         orientation="vertical"
         buttonRowPosition="start"
         pageSizeOptions="{[5, 10, 20]}"
@@ -636,7 +635,7 @@ test.describe("Basic Functionality", () => {
 
     const nav = page.locator('nav[aria-label="Pagination"]');
     await expect(nav).toHaveClass(/paginationVertical/);
-    
+
     // All components should still be positioned correctly
     await expect(page.locator('[data-part-id="pagination-controls"]')).toBeVisible();
     await expect(page.locator('[data-part-id="page-size-selector-container"]')).toBeVisible();
@@ -645,9 +644,9 @@ test.describe("Basic Functionality", () => {
 
   test("grid layout maintains accessibility", async ({ initTestBed, page }) => {
     await initTestBed(
-      `<Pagination 
-        itemCount="50" 
-        pageSize="10" 
+      `<Pagination
+        itemCount="50"
+        pageSize="10"
         buttonRowPosition="center"
         pageSizeOptions="{[5, 10, 20]}"
         pageSizeSelectorPosition="start"
@@ -675,9 +674,9 @@ test.describe("Basic Functionality", () => {
 test.describe("Grid Layout and Positioning", () => {
   test("default positions work correctly", async ({ initTestBed, page }) => {
     await initTestBed(
-      `<Pagination 
-        itemCount="50" 
-        pageSize="10" 
+      `<Pagination
+        itemCount="50"
+        pageSize="10"
         pageSizeOptions="{[5, 10, 20]}"
       />`,
     );
@@ -691,9 +690,9 @@ test.describe("Grid Layout and Positioning", () => {
 
   test("multiple components can be positioned in same location", async ({ initTestBed, page }) => {
     await initTestBed(
-      `<Pagination 
-        itemCount="50" 
-        pageSize="10" 
+      `<Pagination
+        itemCount="50"
+        pageSize="10"
         buttonRowPosition="start"
         pageSizeOptions="{[5, 10, 20]}"
         pageSizeSelectorPosition="start"
@@ -709,9 +708,9 @@ test.describe("Grid Layout and Positioning", () => {
 
   test("handles invalid position values gracefully", async ({ initTestBed, page }) => {
     await initTestBed(
-      `<Pagination 
-        itemCount="50" 
-        pageSize="10" 
+      `<Pagination
+        itemCount="50"
+        pageSize="10"
         buttonRowPosition="invalid"
         pageSizeOptions="{[5, 10, 20]}"
         pageSizeSelectorPosition="invalid"
@@ -722,16 +721,16 @@ test.describe("Grid Layout and Positioning", () => {
     // Should still render the nav container even with invalid positions
     const nav = page.locator('nav[aria-label="Pagination"]');
     await expect(nav).toBeVisible();
-    
+
     // With invalid positions, components may not be placed in slots, but the nav should exist
     // The component should handle this gracefully by either falling back to defaults or not rendering slots
   });
 
   test("components are not rendered when disabled", async ({ initTestBed, page }) => {
     await initTestBed(
-      `<Pagination 
-        itemCount="50" 
-        pageSize="10" 
+      `<Pagination
+        itemCount="50"
+        pageSize="10"
         buttonRowPosition="center"
         showPageInfo="false"
         showPageSizeSelector="false"
@@ -746,9 +745,9 @@ test.describe("Grid Layout and Positioning", () => {
 
   test("grid adapts to content in vertical orientation", async ({ initTestBed, page }) => {
     await initTestBed(
-      `<Pagination 
-        itemCount="50" 
-        pageSize="10" 
+      `<Pagination
+        itemCount="50"
+        pageSize="10"
         orientation="vertical"
         buttonRowPosition="start"
         pageSizeOptions="{[5, 10, 20]}"
@@ -759,7 +758,7 @@ test.describe("Grid Layout and Positioning", () => {
 
     const nav = page.locator('nav[aria-label="Pagination"]');
     await expect(nav).toHaveClass(/paginationVertical/);
-    
+
     // Should have button row and page size selector
     await expect(page.locator('[data-part-id="pagination-controls"]')).toBeVisible();
     await expect(page.locator('[data-part-id="page-size-selector-container"]')).toBeVisible();
@@ -768,9 +767,9 @@ test.describe("Grid Layout and Positioning", () => {
 
   test("component order reflects positioning", async ({ initTestBed, page }) => {
     await initTestBed(
-      `<Pagination 
-        itemCount="50" 
-        pageSize="10" 
+      `<Pagination
+        itemCount="50"
+        pageSize="10"
         buttonRowPosition="end"
         pageSizeOptions="{[5, 10, 20]}"
         pageSizeSelectorPosition="start"
@@ -786,7 +785,7 @@ test.describe("Grid Layout and Positioning", () => {
 
   test("position properties work with minimal pagination", async ({ initTestBed, page }) => {
     await initTestBed(
-      `<Pagination 
+      `<Pagination
         buttonRowPosition="center"
         hasPrevPage="true"
         hasNextPage="true"
@@ -894,10 +893,10 @@ test.describe("Accessibility", () => {
 test.describe("User Interactions", () => {
   test("page button click triggers pageDidChange event", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
-      <Pagination 
-        itemCount="50" 
-        pageSize="10" 
-        pageIndex="0" 
+      <Pagination
+        itemCount="50"
+        pageSize="10"
+        pageIndex="0"
         maxVisiblePages="5"
         onPageDidChange="arg => testState = arg"
       />
@@ -909,9 +908,9 @@ test.describe("User Interactions", () => {
 
   test("next button click triggers pageDidChange event", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
-      <Pagination 
-        itemCount="50" 
-        pageSize="10" 
+      <Pagination
+        itemCount="50"
+        pageSize="10"
         pageIndex="0"
         onPageDidChange="arg => testState = arg"
       />
@@ -923,9 +922,9 @@ test.describe("User Interactions", () => {
 
   test("previous button click triggers pageDidChange event", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
-      <Pagination 
-        itemCount="50" 
-        pageSize="10" 
+      <Pagination
+        itemCount="50"
+        pageSize="10"
         pageIndex="2"
         onPageDidChange="arg => testState = arg"
       />
@@ -937,9 +936,9 @@ test.describe("User Interactions", () => {
 
   test("first page button click triggers pageDidChange event", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
-      <Pagination 
-        itemCount="50" 
-        pageSize="10" 
+      <Pagination
+        itemCount="50"
+        pageSize="10"
         pageIndex="3"
         onPageDidChange="arg => testState = arg"
       />
@@ -951,9 +950,9 @@ test.describe("User Interactions", () => {
 
   test("last page button click triggers pageDidChange event", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
-      <Pagination 
-        itemCount="50" 
-        pageSize="10" 
+      <Pagination
+        itemCount="50"
+        pageSize="10"
         pageIndex="0"
         onPageDidChange="arg => testState = arg"
       />
@@ -983,9 +982,9 @@ test.describe("User Interactions", () => {
 
   test("space key activates page buttons", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
-      <Pagination 
-        itemCount="50" 
-        pageSize="10" 
+      <Pagination
+        itemCount="50"
+        pageSize="10"
         pageIndex="0"
         maxVisiblePages="5"
         onPageDidChange="arg => testState = arg"
@@ -1001,9 +1000,9 @@ test.describe("User Interactions", () => {
 
   test("enter key activates page buttons", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
-      <Pagination 
-        itemCount="50" 
-        pageSize="10" 
+      <Pagination
+        itemCount="50"
+        pageSize="10"
         pageIndex="0"
         maxVisiblePages="5"
         onPageDidChange="arg => testState = arg"
@@ -1019,10 +1018,10 @@ test.describe("User Interactions", () => {
 
   test("pageDidChange fires correctly if itemCount is undefined", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
-      <Pagination 
+      <Pagination
         itemCount="{undefined}"
         hasNextPage="{true}"
-        pageSize="10" 
+        pageSize="10"
         pageIndex="0"
         onPageDidChange="page => testState = page"
       />
@@ -1042,10 +1041,10 @@ test.describe("Component APIs", () => {
   test("moveFirst API method works correctly", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
-        <Pagination 
+        <Pagination
           id="pagination"
-          itemCount="50" 
-          pageSize="10" 
+          itemCount="50"
+          pageSize="10"
           pageIndex="3"
           onPageDidChange="arg => testState = arg"
         />
@@ -1060,10 +1059,10 @@ test.describe("Component APIs", () => {
   test("moveLast API method works correctly", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
-        <Pagination 
+        <Pagination
           id="pagination"
-          itemCount="50" 
-          pageSize="10" 
+          itemCount="50"
+          pageSize="10"
           pageIndex="0"
           onPageDidChange="arg => testState = arg"
         />
@@ -1078,10 +1077,10 @@ test.describe("Component APIs", () => {
   test("movePrev API method works correctly", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
-        <Pagination 
+        <Pagination
           id="pagination"
-          itemCount="50" 
-          pageSize="10" 
+          itemCount="50"
+          pageSize="10"
           pageIndex="2"
           onPageDidChange="arg => testState = arg"
         />
@@ -1096,10 +1095,10 @@ test.describe("Component APIs", () => {
   test("moveNext API method works correctly", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
-        <Pagination 
+        <Pagination
           id="pagination"
-          itemCount="50" 
-          pageSize="10" 
+          itemCount="50"
+          pageSize="10"
           pageIndex="1"
           onPageDidChange="arg => testState = arg"
         />
@@ -1114,10 +1113,10 @@ test.describe("Component APIs", () => {
   test("currentPage API method returns correct value", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
-        <Pagination 
+        <Pagination
           id="pagination"
-          itemCount="50" 
-          pageSize="10" 
+          itemCount="50"
+          pageSize="10"
           pageIndex="2"
         />
         <Button onClick="testState = pagination.currentPage">Get Current Page</Button>
@@ -1131,9 +1130,9 @@ test.describe("Component APIs", () => {
   test("currentPageSize API method returns correct value", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
-        <Pagination 
+        <Pagination
           id="pagination"
-          itemCount="50" 
+          itemCount="50"
           pageSize="15"
         />
         <Button onClick="testState = pagination.currentPageSize">Get Page Size</Button>
@@ -1150,10 +1149,10 @@ test.describe("Component APIs", () => {
   }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
-        <Pagination 
+        <Pagination
           id="pagination"
-          itemCount="50" 
-          pageSize="10" 
+          itemCount="50"
+          pageSize="10"
           pageIndex="0"
           onPageDidChange="arg => testState = testState == null ? [arg] : [...testState, arg]"
         />
@@ -1176,10 +1175,10 @@ test.describe("Component APIs", () => {
   }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
-        <Pagination 
+        <Pagination
           id="pagination"
-          itemCount="50" 
-          pageSize="10" 
+          itemCount="50"
+          pageSize="10"
           pageIndex="5"
           onPageDidChange="arg => testState = testState == null ? [arg] : [...testState, arg]"
         />
@@ -1204,9 +1203,9 @@ test.describe("Component APIs", () => {
 test.describe("Other Edge Cases", () => {
   test("visible pages adjust correctly when navigating", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <Pagination 
-        itemCount="100" 
-        pageSize="10" 
+      <Pagination
+        itemCount="100"
+        pageSize="10"
         pageIndex="5"
         maxVisiblePages="3"
       />
@@ -1220,9 +1219,9 @@ test.describe("Other Edge Cases", () => {
 
   test("visible pages handle edge case near beginning", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <Pagination 
-        itemCount="100" 
-        pageSize="10" 
+      <Pagination
+        itemCount="100"
+        pageSize="10"
         pageIndex="0"
         maxVisiblePages="3"
       />
@@ -1236,9 +1235,9 @@ test.describe("Other Edge Cases", () => {
 
   test("visible pages handle edge case near end", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <Pagination 
-        itemCount="100" 
-        pageSize="10" 
+      <Pagination
+        itemCount="100"
+        pageSize="10"
         pageIndex="9"
         maxVisiblePages="3"
       />
@@ -1255,9 +1254,9 @@ test.describe("Other Edge Cases", () => {
     page,
   }) => {
     await initTestBed(`
-      <Pagination 
-        itemCount="30" 
-        pageSize="10" 
+      <Pagination
+        itemCount="30"
+        pageSize="10"
         maxVisiblePages="5"
       />
     `);
@@ -1336,7 +1335,7 @@ test.describe("Behaviors and Parts", () => {
     const component = page.getByTestId("test");
     await component.hover();
     const tooltip = page.getByRole("tooltip");
-    
+
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toHaveText("Tooltip text");
   });
@@ -1353,7 +1352,9 @@ test.describe("Behaviors and Parts", () => {
 
   test("can select part: 'pagination-controls'", async ({ page, initTestBed }) => {
     await initTestBed(`<Pagination testId="test" itemCount="100" />`);
-    const paginationControls = page.getByTestId("test").locator("[data-part-id='pagination-controls']");
+    const paginationControls = page
+      .getByTestId("test")
+      .locator("[data-part-id='pagination-controls']");
     await expect(paginationControls).toBeVisible();
   });
 
@@ -1369,35 +1370,39 @@ test.describe("Behaviors and Parts", () => {
         "backgroundColor-Pagination-CustomVariant": "rgb(255, 0, 0)",
       },
     });
-    
+
     const component = page.getByTestId("test");
     await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
   });
 
   test("tooltip with markdown content", async ({ page, initTestBed }) => {
-    await initTestBed(`<Pagination testId="test" tooltipMarkdown="**Bold text**" itemCount="100" />`);
-    
+    await initTestBed(
+      `<Pagination testId="test" tooltipMarkdown="**Bold text**" itemCount="100" />`,
+    );
+
     const component = page.getByTestId("test");
     await component.hover();
     const tooltip = page.getByRole("tooltip");
-    
+
     await expect(tooltip).toBeVisible();
     await expect(tooltip.locator("strong")).toHaveText("Bold text");
   });
 
   test("animation behavior", async ({ page, initTestBed }) => {
     await initTestBed(`<Pagination testId="test" animation="fadeIn" itemCount="100" />`);
-    
+
     const component = page.getByTestId("test");
     await expect(component).toBeVisible();
   });
 
   test("combined tooltip and animation", async ({ page, initTestBed }) => {
-    await initTestBed(`<Pagination testId="test" tooltip="Tooltip text" animation="fadeIn" itemCount="100" />`);
-    
+    await initTestBed(
+      `<Pagination testId="test" tooltip="Tooltip text" animation="fadeIn" itemCount="100" />`,
+    );
+
     const component = page.getByTestId("test");
     await expect(component).toBeVisible();
-    
+
     await component.hover();
     const tooltip = page.getByRole("tooltip");
     await expect(tooltip).toBeVisible();
@@ -1405,28 +1410,31 @@ test.describe("Behaviors and Parts", () => {
   });
 
   test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
-    await initTestBed(`
-      <Pagination 
-        testId="test" 
+    await initTestBed(
+      `
+      <Pagination
+        testId="test"
         variant="CustomVariant"
         itemCount="100"
         showPageInfo="true"
         animation="fadeIn"
         tooltip="Tooltip text"
       />
-    `, {
-      testThemeVars: {
-        "backgroundColor-Pagination-CustomVariant": "rgb(255, 0, 0)",
+    `,
+      {
+        testThemeVars: {
+          "backgroundColor-Pagination-CustomVariant": "rgb(255, 0, 0)",
+        },
       },
-    });
-    
+    );
+
     const component = page.getByTestId("test");
     const paginationControls = component.locator("[data-part-id='pagination-controls']");
     const pageInfo = component.locator("[data-part-id='page-info']");
-    
+
     // Verify variant applied
     await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
-    
+
     // Verify parts are visible
     await expect(paginationControls).toBeVisible();
     await expect(pageInfo).toBeVisible();
@@ -1437,4 +1445,3 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip).toHaveText("Tooltip text");
   });
 });
-

@@ -225,25 +225,35 @@ A `tooltipTemplate` may be able to use the `$tooltip` context variable.
 
 ## Properties [#properties]
 
-### `align` (default: "center") [#align-default-center]
+### `align` [#align]
+
+-  default: **"center"**
 
 The preferred alignment against the trigger
 
 Available values: `start`, `center` **(default)**, `end`
 
-### `alignOffset` (default: 0) [#alignoffset-default-0]
+### `alignOffset` [#alignoffset]
+
+-  default: **0**
 
 An offset in pixels from the 'start' or 'end' alignment options
 
-### `avoidCollisions` (default: true) [#avoidcollisions-default-true]
+### `avoidCollisions` [#avoidcollisions]
+
+-  default: **true**
 
 When true, overrides the side and align preferences to prevent collisions with boundary edges
 
-### `defaultOpen` (default: false) [#defaultopen-default-false]
+### `defaultOpen` [#defaultopen]
+
+-  default: **false**
 
 The open state of the tooltip when it is initially rendered
 
-### `delayDuration` (default: 700) [#delayduration-default-700]
+### `delayDuration` [#delayduration]
+
+-  default: **700**
 
 The duration from when the mouse enters a tooltip trigger until the tooltip opens (in ms)
 
@@ -251,21 +261,29 @@ The duration from when the mouse enters a tooltip trigger until the tooltip open
 
 The markdown content to display in the tooltip
 
-### `showArrow` (default: false) [#showarrow-default-false]
+### `showArrow` [#showarrow]
+
+-  default: **false**
 
 Whether to show the arrow pointing to the trigger element
 
-### `side` (default: "top") [#side-default-top]
+### `side` [#side]
+
+-  default: **"top"**
 
 The preferred side of the trigger to render against when open
 
 Available values: `top` **(default)**, `right`, `bottom`, `left`
 
-### `sideOffset` (default: 4) [#sideoffset-default-4]
+### `sideOffset` [#sideoffset]
+
+-  default: **4**
 
 The distance in pixels from the trigger
 
-### `skipDelayDuration` (default: 300) [#skipdelayduration-default-300]
+### `skipDelayDuration` [#skipdelayduration]
+
+-  default: **300**
 
 How much time a user has to enter another trigger without incurring a delay again (in ms)
 

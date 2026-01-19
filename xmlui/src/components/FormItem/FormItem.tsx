@@ -26,6 +26,7 @@ import { parseSeverity } from "./Validations";
 import { CustomFormItem, FormItem, defaultProps } from "./FormItemNative";
 import { MemoizedItem } from "../container-helpers";
 import { partitionObject } from "../../components-core/utils/misc";
+import { requireLabelModeMd } from "../abstractions";
 
 const COMP = "FormItem";
 
@@ -83,6 +84,12 @@ export const FormItemMd = createMetadata({
         `input field.`,
       availableValues: validationModeMd,
       defaultValue: defaultValidationMode,
+    },
+    requireLabelMode: {
+      description: "Controls how required/optional status is visually indicated in the label.",
+      type: "string",
+      availableValues: requireLabelModeMd,
+      isRequired: false,
     },
     initialValue: dInitialValue(),
     required: dRequired(),
@@ -240,6 +247,7 @@ export const FormItemMd = createMetadata({
     "fontStyle-FormItemLabel": "normal",
     "textTransform-FormItemLabel": "none",
     "textColor-FormItemLabel-requiredMark": "$color-danger-400",
+    "textColor-FormItemLabel-optionalTag": "$textColor-secondary",
   },
 });
 
@@ -356,6 +364,7 @@ export const formItemComponentRenderer = createComponentRenderer(
         onValidate={lookupEventHandler("validate")}
         customValidationsDebounce={extractValue.asOptionalNumber(customValidationsDebounce)}
         validationMode={extractValue.asOptionalString(validationMode)}
+        requireLabelMode={extractValue.asOptionalString(rest.requireLabelMode)}
         registerComponentApi={registerComponentApi}
         maxTextLength={extractValue(maxTextLength)}
         itemIndex={extractValue("{$itemIndex}")}

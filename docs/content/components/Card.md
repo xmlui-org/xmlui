@@ -58,7 +58,9 @@ The url for an avarar image. If not specified, but [`showAvatar`](#showAvatar) i
 
 This optional property wraps the title in a `Link` component that is clickable to navigate.
 
-### `orientation` (default: "vertical") [#orientation-default-vertical]
+### `orientation` [#orientation]
+
+-  default: **"vertical"**
 
 An optional property that governs the Card's orientation (whether the Card lays out its children in a row or a column). If the orientation is set to `horizontal`, the Card will display its children in a row, except for its [`title`](#title) and [`subtitle`](#subtitle).
 
@@ -80,7 +82,9 @@ Available values:
 </App>
 ```
 
-### `showAvatar` (default: false) [#showavatar-default-false]
+### `showAvatar` [#showavatar]
+
+-  default: **false**
 
 Indicates whether the avatar should be displayed
 
@@ -144,7 +148,29 @@ This event is triggered when the `Card` is clicked.
 
 ## Exposed Methods [#exposed-methods]
 
-This component does not expose any methods.
+### `scrollToBottom` [#scrolltobottom]
+
+Scrolls the Card container to the bottom. Works when the Card has an explicit height and overflowY is set to 'scroll'.
+
+**Signature**: `scrollToBottom(behavior?: 'auto' | 'instant' | 'smooth'): void`
+
+### `scrollToEnd` [#scrolltoend]
+
+Scrolls the Card container to the end (right in LTR, left in RTL). Works when the Card has an explicit width and overflowX is set to 'scroll'.
+
+**Signature**: `scrollToEnd(behavior?: 'auto' | 'instant' | 'smooth'): void`
+
+### `scrollToStart` [#scrolltostart]
+
+Scrolls the Card container to the start (left in LTR, right in RTL). Works when the Card has an explicit width and overflowX is set to 'scroll'.
+
+**Signature**: `scrollToStart(behavior?: 'auto' | 'instant' | 'smooth'): void`
+
+### `scrollToTop` [#scrolltotop]
+
+Scrolls the Card container to the top. Works when the Card has an explicit height and overflowY is set to 'scroll'.
+
+**Signature**: `scrollToTop(behavior?: 'auto' | 'instant' | 'smooth'): void`
 
 ## Parts [#parts]
 

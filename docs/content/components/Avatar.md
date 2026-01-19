@@ -20,7 +20,9 @@ This property sets the name value the Avatar uses to display initials. If neithe
 </App>
 ```
 
-### `size` (default: "sm") [#size-default-sm]
+### `size` [#size]
+
+-  default: **"sm"**
 
 This property defines the display size of the Avatar. Predefined sizes (xs, sm, md, lg) scale with the current font size (using em units). Custom CSS values (e.g., '50px', '3rem', '5em') are supported for both width and height, with font-size automatically calculated at approximately 33% of the width for proper initial display.
 

@@ -53,7 +53,9 @@ export function createContainerReducer(debugView: IDebugViewContext) {
       }
       case ContainerActionKind.LOADER_LOADED: {
         const { data, pageInfo } = action.payload;
+        // Preserve any existing state properties (e.g., custom component state)
         state[uid] = {
+          ...state[uid],
           value: data,
           byId: Array.isArray(data) ? keyBy(data, (item) => item.$id) : undefined,
           inProgress: false,
@@ -70,6 +72,8 @@ export function createContainerReducer(debugView: IDebugViewContext) {
         break;
       }
       case ContainerActionKind.EVENT_HANDLER_STARTED: {
+        // Skip if this reducer doesn't own this component's state
+        if (!(uid in state)) break;
         const { eventName } = action.payload;
         const inProgressFlagName = `${eventName}InProgress`;
         state[uid] = { ...state[uid], [inProgressFlagName]: true };
@@ -77,6 +81,8 @@ export function createContainerReducer(debugView: IDebugViewContext) {
         break;
       }
       case ContainerActionKind.EVENT_HANDLER_COMPLETED: {
+        // Skip if this reducer doesn't own this component's state
+        if (!(uid in state)) break;
         const { eventName } = action.payload;
         const inProgressFlagName = `${eventName}InProgress`;
         state[uid] = { ...state[uid], [inProgressFlagName]: false };
@@ -84,6 +90,8 @@ export function createContainerReducer(debugView: IDebugViewContext) {
         break;
       }
       case ContainerActionKind.EVENT_HANDLER_ERROR: {
+        // Skip if this reducer doesn't own this component's state
+        if (!(uid in state)) break;
         const { eventName } = action.payload;
         const inProgressFlagName = `${eventName}InProgress`;
         state[uid] = { ...state[uid], [inProgressFlagName]: false };

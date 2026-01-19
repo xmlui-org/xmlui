@@ -1,4 +1,4 @@
-import { SKIP_REASON } from "../../testing/component-test-helpers";
+import { getBounds, SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
 // =============================================================================
@@ -141,14 +141,172 @@ test.describe("Basic Functionality", () => {
     await expect(driver.label).toHaveText("Very Long Label That Should Break");
   });
 
+  test("renders with requireLabelMode set to 'markRequired' showing asterisk for required fields", async ({
+    initTestBed,
+    createFormItemDriver,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem testId="formItem" label="Required Field" required="true" requireLabelMode="markRequired" />
+      </Form>
+    `);
+    const driver = await createFormItemDriver("formItem");
+    await expect(driver.label).toContainText("*");
+    await expect(driver.label).not.toContainText("(Optional)");
+  });
+
+  test("renders with requireLabelMode set to 'markRequired' hiding indicator for optional fields", async ({
+    initTestBed,
+    createFormItemDriver,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem testId="formItem" label="Optional Field" required="false" requireLabelMode="markRequired" />
+      </Form>
+    `);
+    const driver = await createFormItemDriver("formItem");
+    await expect(driver.label).not.toContainText("*");
+    await expect(driver.label).not.toContainText("(Optional)");
+  });
+
+  test("renders with requireLabelMode set to 'markOptional' showing optional tag for optional fields", async ({
+    initTestBed,
+    createFormItemDriver,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem testId="formItem" label="Optional Field" required="false" requireLabelMode="markOptional" />
+      </Form>
+    `);
+    const driver = await createFormItemDriver("formItem");
+    await expect(driver.label).toContainText("(Optional)");
+    await expect(driver.label).not.toContainText("*");
+  });
+
+  test("renders with requireLabelMode set to 'markOptional' hiding indicator for required fields", async ({
+    initTestBed,
+    createFormItemDriver,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem testId="formItem" label="Required Field" required="true" requireLabelMode="markOptional" />
+      </Form>
+    `);
+    const driver = await createFormItemDriver("formItem");
+    await expect(driver.label).not.toContainText("*");
+    await expect(driver.label).not.toContainText("(Optional)");
+  });
+
+  test("renders with requireLabelMode set to 'markBoth' showing asterisk for required fields", async ({
+    initTestBed,
+    createFormItemDriver,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem testId="formItem" label="Required Field" required="true" requireLabelMode="markBoth" />
+      </Form>
+    `);
+    const driver = await createFormItemDriver("formItem");
+    await expect(driver.label).toContainText("*");
+    await expect(driver.label).not.toContainText("(Optional)");
+  });
+
+  test("renders with requireLabelMode set to 'markBoth' showing optional tag for optional fields", async ({
+    initTestBed,
+    createFormItemDriver,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem testId="formItem" label="Optional Field" required="false" requireLabelMode="markBoth" />
+      </Form>
+    `);
+    const driver = await createFormItemDriver("formItem");
+    await expect(driver.label).not.toContainText("*");
+    await expect(driver.label).toContainText("(Optional)");
+  });
+
   test("renders with gap property", async ({ initTestBed, createFormItemDriver }) => {
     await initTestBed(`
       <Form>
-        <FormItem testId="formItem" label="Gapped Item" gap="20px" />
+        <FormItem testId="formItem" gap="20px" type="number" />
       </Form>
     `);
     const driver = await createFormItemDriver("formItem");
     await expect(driver.component).toBeVisible();
+  });
+
+  test("no spacing above input if label is not present", async ({ initTestBed, createFormItemDriver }) => {
+    await initTestBed(`
+      <Form>
+        <FlowLayout>
+          <FormItem testId="formItem1" labelPosition="top" label="label1" />
+          <FormItem testId="formItem2" labelPosition="top" />
+        </FlowLayout>
+      </Form>
+    `);
+    const driver1 = await createFormItemDriver("formItem1");
+    const driver2 = await createFormItemDriver("formItem2");
+    const bounds1Label = await getBounds(driver1.label);
+    const val1 = (await getBounds(driver1.component)).height - bounds1Label.height;
+    const val2 = (await getBounds(driver2.component)).height;
+
+    expect(val1).toBeGreaterThan(val2);    
+  });
+
+  test("no spacing below input if label is not present in FlowLayout", async ({ initTestBed, createFormItemDriver }) => {
+    await initTestBed(`
+      <Form>
+        <FlowLayout>
+          <FormItem testId="formItem1" labelPosition="bottom" label="label1" />
+          <FormItem testId="formItem2" labelPosition="bottom" />
+        </FlowLayout>
+      </Form>
+    `);
+    const driver1 = await createFormItemDriver("formItem1");
+    const driver2 = await createFormItemDriver("formItem2");
+    const bounds1Label = await getBounds(driver1.label);
+    const val1 = (await getBounds(driver1.component)).height - bounds1Label.height;
+    const val2 = (await getBounds(driver2.component)).height;
+
+    expect(val1).toBeGreaterThan(val2);    
+  });
+
+  test("labelPosition start property adds correct spacing", async ({ initTestBed, createFormItemDriver, page }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem testId="formItem1" labelPosition="start" label="label1" type="text" />
+        <FormItem testId="formItem2" labelPosition="start" type="text" />
+      </Form>
+    `);
+    const driver1 = await createFormItemDriver("formItem1");
+    const driver2 = await createFormItemDriver("formItem2");
+    const bounds1Label = await getBounds(driver1.label);
+    const bounds1Input = await getBounds(driver1.textBox);
+    const bounds2Input = await getBounds(driver2.textBox);
+    const val1 = (await getBounds(page.getByTestId('formItem1'))).width - (bounds1Label.width + bounds1Input.width);
+    const val2 = (await getBounds(driver2.component)).width - bounds2Input.width;
+
+    expect(val1).toBeGreaterThan(val2);    
+  });
+
+  test("labelPosition end property adds correct spacing", async ({ initTestBed, createFormItemDriver, page }) => {
+    await initTestBed(`
+      <Form>
+        <FlowLayout>
+          <FormItem testId="formItem1" labelPosition="end" label="label1" type="text" />
+          <FormItem testId="formItem2" labelPosition="end" type="text" />
+        </FlowLayout>
+      </Form>
+    `);
+    const driver1 = await createFormItemDriver("formItem1");
+    const driver2 = await createFormItemDriver("formItem2");
+    const bounds1Label = await getBounds(driver1.label);
+    const bounds1Input = await getBounds(driver1.textBox);
+    const bounds2Input = await getBounds(driver2.textBox);
+    const val1 = (await getBounds(page.getByTestId('formItem1'))).width - (bounds1Label.width + bounds1Input.width);
+    const val2 = (await getBounds(driver2.component)).width - bounds2Input.width;
+
+    expect(val1).toBeGreaterThan(val2);    
   });
 });
 

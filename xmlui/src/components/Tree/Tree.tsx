@@ -95,9 +95,17 @@ export const TreeMd = createMetadata({
       defaultValue: defaultProps.iconSize,
     },
     itemHeight: {
-      description: `The height of each tree row in pixels (default: 35).`,
+      description: `The height of each tree row in pixels (default: 32).`,
       valueType: "number",
       defaultValue: defaultProps.itemHeight,
+    },
+    fixedItemSize: {
+      description:
+        `When set to \`true\`, the tree will measure the height of the first item and use that ` +
+        `as a fixed size hint for all items. This improves scroll performance when all items have ` +
+        `the same height. If items have varying heights, leave this as \`false\`.`,
+      type: "boolean",
+      defaultValue: false,
     },
     animateExpand: {
       description: `When true, uses only the collapsed icon and rotates it for expansion instead of switching icons (default: false).`,
@@ -354,6 +362,7 @@ export const treeComponentRenderer = createComponentRenderer(
         iconExpanded={extractValue(node.props.iconExpanded)}
         iconSize={extractValue(node.props.iconSize)}
         itemHeight={extractValue.asOptionalNumber(node.props.itemHeight, defaultProps.itemHeight)}
+        fixedItemSize={extractValue.asOptionalBoolean(node.props.fixedItemSize)}
         animateExpand={extractValue.asOptionalBoolean(node.props.animateExpand, defaultProps.animateExpand)}
         expandRotation={extractValue.asOptionalNumber(node.props.expandRotation, defaultProps.expandRotation)}
         onSelectionChanged={lookupEventHandler("selectionDidChange")}

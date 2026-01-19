@@ -782,3 +782,110 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
+
+// =============================================================================
+// BEHAVIORS AND PARTS TESTS
+// =============================================================================
+
+test.describe("Behaviors and Parts", () => {
+  test("requireLabelMode='markRequired' shows asterisk for required fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <Slider testId="test" label="Volume" required="true" requireLabelMode="markRequired" bindTo="volume" />
+      </Form>
+    `);
+    
+    const label = page.getByText("Volume");
+    await expect(label).toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markRequired' hides indicator for optional fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <Slider testId="test" label="Volume" required="false" requireLabelMode="markRequired" bindTo="volume" />
+      </Form>
+    `);
+    
+    const label = page.getByText("Volume");
+    await expect(label).not.toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markOptional' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <Slider testId="test" label="Volume" required="false" requireLabelMode="markOptional" bindTo="volume" />
+      </Form>
+    `);
+    
+    const label = page.getByText("Volume");
+    await expect(label).toContainText("(Optional)");
+    await expect(label).not.toContainText("*");
+  });
+
+  test("requireLabelMode='markOptional' hides indicator for required fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <Slider testId="test" label="Volume" required="true" requireLabelMode="markOptional" bindTo="volume" />
+      </Form>
+    `);
+    
+    const label = page.getByText("Volume");
+    await expect(label).not.toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markBoth' shows asterisk for required fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <Slider testId="test" label="Volume" required="true" requireLabelMode="markBoth" bindTo="volume" />
+      </Form>
+    `);
+    
+    const label = page.getByText("Volume");
+    await expect(label).toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markBoth' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <Slider testId="test" label="Volume" required="false" requireLabelMode="markBoth" bindTo="volume" />
+      </Form>
+    `);
+    
+    const label = page.getByText("Volume");
+    await expect(label).not.toContainText("*");
+    await expect(label).toContainText("(Optional)");
+  });
+
+  test("input requireLabelMode overrides Form itemRequireLabelMode", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form itemRequireLabelMode="markRequired">
+        <Slider testId="test" label="Volume" required="false" requireLabelMode="markOptional" bindTo="volume" />
+      </Form>
+    `);
+    
+    const label = page.getByText("Volume");
+    await expect(label).toContainText("(Optional)");
+    await expect(label).not.toContainText("*");
+  });
+
+  test("input inherits Form itemRequireLabelMode when not specified", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form itemRequireLabelMode="markBoth">
+        <Slider testId="test1" label="Required Field" required="true" bindTo="field1" />
+        <Slider testId="test2" label="Optional Field" required="false" bindTo="field2" />
+      </Form>
+    `);
+    
+    const requiredLabel = page.getByText("Required Field");
+    const optionalLabel = page.getByText("Optional Field");
+    
+    await expect(requiredLabel).toContainText("*");
+    await expect(requiredLabel).not.toContainText("(Optional)");
+    await expect(optionalLabel).toContainText("(Optional)");
+    await expect(optionalLabel).not.toContainText("*");
+  });
+});

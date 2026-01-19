@@ -2,7 +2,6 @@ import React, {
   createContext,
   type CSSProperties,
   forwardRef,
-  Fragment,
   type ReactNode,
   useCallback,
   useContext,
@@ -24,7 +23,7 @@ import type { RegisterComponentApiFn, RenderChildFn } from "../../abstractions/R
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
 import type { FieldOrderBy, ScrollAnchoring } from "../abstractions";
 import { Card } from "../Card/CardNative";
-import type { CustomItemComponent, CustomItemComponentProps, VListHandle } from "virtua";
+import type { CustomItemComponent, CustomItemComponentProps, VirtualizerHandle } from "virtua";
 import { Virtualizer } from "virtua";
 import {
   useHasExplicitHeight,
@@ -89,9 +88,14 @@ export function useListData({
   availableGroups,
   defaultGroups = EMPTY_ARRAY,
 }: ListData) {
+  // Filter out null and undefined items
+  const validItems = useMemo(() => {
+    return items.filter((item) => item != null);
+  }, [items]);
+
   const sortedItems = useMemo(() => {
     if (!orderBy) {
-      return items;
+      return validItems;
     }
     let arrayOrderBy = orderBy;
     if (!Array.isArray(orderBy)) {
@@ -106,8 +110,8 @@ export function useListData({
     const fieldDirectionsToOrderBy = (arrayOrderBy as Array<FieldOrderBy>).map(
       (ob) => ob.direction,
     );
-    return lodashOrderBy(items, fieldSelectorsToOrderBy, fieldDirectionsToOrderBy);
-  }, [items, orderBy]);
+    return lodashOrderBy(validItems, fieldSelectorsToOrderBy, fieldDirectionsToOrderBy);
+  }, [validItems, orderBy]);
 
   const cappedItems = useMemo(() => {
     if (!limit) {
@@ -223,6 +227,7 @@ type DynamicHeightListProps = {
   defaultGroups: Array<string>;
   registerComponentApi?: RegisterComponentApiFn;
   borderCollapse?: boolean;
+  fixedItemSize?: boolean;
 };
 
 // eslint-disable-next-line react/display-name
@@ -276,7 +281,7 @@ const useShift = (listData: any[], idKey: any) => {
   return shouldShift.current;
 };
 
-export const ListNative = forwardRef(function DynamicHeightList(
+export const ListNative = forwardRef(function DynamicHeightList2(
   {
     items = EMPTY_ARRAY,
     itemRenderer = defaultItemRenderer,
@@ -299,13 +304,18 @@ export const ListNative = forwardRef(function DynamicHeightList(
     defaultGroups = EMPTY_ARRAY,
     registerComponentApi,
     borderCollapse = defaultProps.borderCollapse,
+    fixedItemSize,
     ...rest
   }: DynamicHeightListProps,
   ref,
 ) {
-  const virtualizerRef = useRef<VListHandle>(null);
+  const virtualizerRef = useRef<VirtualizerHandle>(null);
   const parentRef = useRef<HTMLDivElement | null>(null);
   const rootRef = ref ? composeRefs(parentRef, ref) : parentRef;
+  
+  // State and ref for measuring first item size when fixedItemSize is enabled
+  const firstItemRef = useRef<HTMLDivElement>(null);
+  const [measuredItemSize, setMeasuredItemSize] = useState<number | undefined>(undefined);
 
   const scrollParent = useScrollParent(parentRef.current?.parentElement);
   const scrollRef = useRef(scrollParent);
@@ -314,6 +324,8 @@ export const ListNative = forwardRef(function DynamicHeightList(
   const hasHeight = useHasExplicitHeight(parentRef);
   const hasOutsideScroll = scrollRef.current && !hasHeight;
 
+  // Create a ref for the Virtualizer's scroll container
+  // When using outside scroll, we need a ref that points to the scroll parent
   const scrollElementRef = hasOutsideScroll ? scrollRef : parentRef;
 
   const shouldStickToBottom = useRef(scrollAnchor === "bottom");
@@ -343,6 +355,21 @@ export const ListNative = forwardRef(function DynamicHeightList(
 
   const shift = useShift(rows, idKey);
 
+  // Measure first item size when fixedItemSize is enabled
+  useEffect(() => {
+    if (fixedItemSize && firstItemRef.current && !measuredItemSize && rows.length > 0) {
+      // Add a small delay to ensure the item is rendered
+      requestAnimationFrame(() => {
+        if (firstItemRef.current) {
+          const height = firstItemRef.current.offsetHeight;
+          if (height > 0) {
+            setMeasuredItemSize(height);
+          }
+        }
+      });
+    }
+  }, [fixedItemSize, measuredItemSize, rows.length]);
+
   const initiallyScrolledToBottom = useRef(false);
   useEffect(() => {
     if (rows.length && scrollAnchor === "bottom" && !initiallyScrolledToBottom.current) {
@@ -369,7 +396,8 @@ export const ListNative = forwardRef(function DynamicHeightList(
   const tryToFetchPrevPage = useCallback(() => {
     if (
       virtualizerRef.current &&
-      virtualizerRef.current.findStartIndex() < 10 &&
+      typeof virtualizerRef.current.findItemIndex === 'function' &&
+      virtualizerRef.current.findItemIndex(virtualizerRef.current.scrollOffset) < 10 &&
       pageInfo &&
       pageInfo.hasPrevPage &&
       !pageInfo.isFetchingPrevPage &&
@@ -390,7 +418,8 @@ export const ListNative = forwardRef(function DynamicHeightList(
   const tryToFetchNextPage = useCallback(() => {
     if (
       virtualizerRef.current &&
-      virtualizerRef.current.findEndIndex() + 10 > rows.length &&
+      typeof virtualizerRef.current.findItemIndex === 'function' &&
+      virtualizerRef.current.findItemIndex(virtualizerRef.current.scrollOffset + virtualizerRef.current.viewportSize) + 10 > rows.length &&
       pageInfo &&
       pageInfo.hasNextPage &&
       !pageInfo.isFetchingNextPage &&
@@ -430,29 +459,23 @@ export const ListNative = forwardRef(function DynamicHeightList(
   );
 
   const scrollToBottom = useEvent(() => {
-    const scrollPaddingTop =
-      parseInt(getComputedStyle(scrollRef.current).scrollPaddingTop, 10) || 0;
     if (rows.length) {
       virtualizerRef.current?.scrollToIndex(rows.length + 1, {
         align: "end",
-        offset: scrollPaddingTop,
+        offset: startMargin,
       });
     }
   });
 
   const scrollToTop = useEvent(() => {
-    const scrollPaddingTop =
-      parseInt(getComputedStyle(scrollRef.current).scrollPaddingTop, 10) || 0;
     if (rows.length) {
-      virtualizerRef.current?.scrollToIndex(0, { align: "start", offset: -scrollPaddingTop });
+      virtualizerRef.current?.scrollToIndex(0, { align: "start", offset: -startMargin });
     }
   });
 
   const scrollToIndex = useEvent((index) => {
-    const scrollPaddingTop =
-      parseInt(getComputedStyle(scrollRef.current).scrollPaddingTop, 10) || 0;
     virtualizerRef.current?.scrollToIndex(index, {
-      offset: -scrollPaddingTop,
+      offset: -startMargin,
     });
   });
 
@@ -517,43 +540,50 @@ export const ListNative = forwardRef(function DynamicHeightList(
             >
               <Virtualizer
                 ref={virtualizerRef}
-                scrollRef={scrollElementRef}
                 shift={shift}
                 onScroll={onScroll}
                 startMargin={startMargin}
                 item={Item as CustomItemComponent}
-                count={rowCount}
+                itemSize={measuredItemSize || 67}
               >
-                {(rowIndex) => {
-                  // REVIEW: I changed this code line because in the build version rows[rowIndex]
-                  // was undefined
-                  // const row = rows[rowIndex];
-                  // const key = row[idKey];
-                  const row = rows?.[rowIndex];
+                {rows.map((row, rowIndex) => {
                   const key = row?.[idKey];
-                  if (!row) {
-                    return <Fragment key={rowIndex} />;
-                  }
-                  // --- End change
+                  const isFirstItem = rowIndex === 0;
+                  const shouldMeasure = isFirstItem && fixedItemSize && row != null;
+                  // Render different row types
                   switch (row._row_type) {
                     case RowType.SECTION:
                       return (
-                        <Fragment key={key}>{sectionRenderer?.(row, key) || <div />}</Fragment>
+                        <React.Fragment key={key}>
+                          {shouldMeasure ? (
+                            <div ref={firstItemRef}>{sectionRenderer?.(row, key)}</div>
+                          ) : (
+                            sectionRenderer?.(row, key)
+                          )}
+                        </React.Fragment>
                       );
                     case RowType.SECTION_FOOTER:
                       return (
-                        <Fragment key={key}>
-                          {sectionFooterRenderer?.(row, key) || <div />}
-                        </Fragment>
+                        <React.Fragment key={key}>
+                          {shouldMeasure ? (
+                            <div ref={firstItemRef}>{sectionFooterRenderer?.(row, key)}</div>
+                          ) : (
+                            sectionFooterRenderer?.(row, key)
+                          )}
+                        </React.Fragment>
                       );
                     default:
                       return (
-                        <Fragment key={key}>
-                          {itemRenderer(row, key, rowIndex, rowCount) || <div />}
-                        </Fragment>
+                        <React.Fragment key={key}>
+                          {shouldMeasure ? (
+                            <div ref={firstItemRef}>{itemRenderer(row, key, rowIndex, rowCount)}</div>
+                          ) : (
+                            itemRenderer(row, key, rowIndex, rowCount)
+                          )}
+                        </React.Fragment>
                       );
                   }
-                }}
+                })}
               </Virtualizer>
             </div>
           )}

@@ -75,9 +75,7 @@ export const Splitter = ({
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const newContainerSize =
-          orientation === "horizontal"
-            ? entry.contentRect.width
-            : entry.contentRect.height;
+          orientation === "horizontal" ? entry.contentRect.width : entry.contentRect.height;
         setContainerSize(newContainerSize);
       }
     });
@@ -96,15 +94,15 @@ export const Splitter = ({
         orientation === "horizontal"
           ? splitter.getBoundingClientRect().width
           : splitter.getBoundingClientRect().height;
-      
+
       setContainerSize(newContainerSize);
-      
+
       // Parse initial size and convert to percentage
       const initialParsedSize = parseSize(initialPrimarySize, newContainerSize);
       const initialPercentage = toPercentage(initialParsedSize, newContainerSize);
-      
+
       setSizePercentage(initialPercentage);
-      
+
       if (resize) {
         const actualPrimarySize = (initialPercentage / 100) * newContainerSize;
         resize([actualPrimarySize, newContainerSize - actualPrimarySize]);
@@ -134,12 +132,9 @@ export const Splitter = ({
 
         const newPercentage = toPercentage(newSize, containerSize);
         setSizePercentage(newPercentage);
-        
+
         if (resize) {
-          resize([
-            newPercentage,
-            100 - newPercentage,
-          ]);
+          resize([newPercentage, 100 - newPercentage]);
         }
       }
     };
@@ -165,7 +160,16 @@ export const Splitter = ({
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [minPrimarySize, maxPrimarySize, orientation, resize, floating, resizerElement, splitter, containerSize]);
+  }, [
+    minPrimarySize,
+    maxPrimarySize,
+    orientation,
+    resize,
+    floating,
+    resizerElement,
+    splitter,
+    containerSize,
+  ]);
 
   useEffect(() => {
     const watchResizer = (event: MouseEvent) => {
@@ -266,11 +270,7 @@ export const Splitter = ({
           )}
         </>
       ) : (
-        <>
-          {childrenArray?.[0] && (
-            <div className={styles.panel}>{childrenArray[0]}</div>
-          )}
-        </>
+        <>{childrenArray?.[0] && <div className={styles.panel}>{childrenArray[0]}</div>}</>
       )}
     </div>
   );

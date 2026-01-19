@@ -90,11 +90,15 @@ Indicates the name of the current row item's property, the value of which to lay
 </App>
 ```
 
-### `canResize` (default: true) [#canresize-default-true]
+### `canResize` [#canresize]
+
+-  default: **true**
 
 This property indicates whether the user can resize the column. If set to `true`, the column can be resized by dragging the column border. If set to `false`, the column cannot be resized. Double-clicking the column border resets to the original size.
 
-### `canSort` (default: true) [#cansort-default-true]
+### `canSort` [#cansort]
+
+-  default: **false**
 
 This property sets whether the user can sort by a column by clicking on its header (`true`) or not (`false`). If the `bindTo` property is not defined, the column is not sortable.
 

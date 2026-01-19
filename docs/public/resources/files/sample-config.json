@@ -1,0 +1,11 @@
+{
+  "appName": "My Application",
+  "version": "1.0.0",
+  "features": {
+    "darkMode": true,
+    "notifications": true,
+    "analytics": false
+  },
+  "maxUploadSize": 10485760,
+  "supportedFormats": ["csv", "json", "xml"]
+}

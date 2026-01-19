@@ -372,3 +372,448 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
+
+// =============================================================================
+// PARSING TESTS
+// =============================================================================
+
+test.describe("Parsing", () => {
+  test("infers acceptsFileType from parseAs csv", async ({ initTestBed, createFileInputDriver }) => {
+    await initTestBed(`<FileInput parseAs="csv" />`);
+    const driver = await createFileInputDriver();
+    // parseAs should auto-set the file input accept attribute unless overridden.
+    await expect(driver.getHiddenInput()).toHaveAttribute("accept", ".csv");
+  });
+
+  test("infers acceptsFileType from parseAs json", async ({ initTestBed, createFileInputDriver }) => {
+    await initTestBed(`<FileInput parseAs="json" />`);
+    const driver = await createFileInputDriver();
+    // Same inference logic for JSON.
+    await expect(driver.getHiddenInput()).toHaveAttribute("accept", ".json");
+  });
+
+  test("parses csv and emits row data", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput parseAs="csv" onDidChange="data => testState = data.length" />
+    `);
+    const driver = await createFileInputDriver();
+    // Upload a CSV file through the hidden input; onDidChange emits parsed rows.
+    await driver.getHiddenInput().setInputFiles({
+      name: "sample.csv",
+      mimeType: "text/csv",
+      buffer: Buffer.from("name,price\nWidget,10\nGadget,20\n"),
+    });
+
+    // Expect two parsed rows (header is consumed).
+    await expect.poll(testStateDriver.testState).toEqual(2);
+  });
+
+  test("parses json object as array", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput parseAs="json" onDidChange="data => testState = data.length" />
+    `);
+    const driver = await createFileInputDriver();
+    // Single JSON object is normalized into an array.
+    await driver.getHiddenInput().setInputFiles({
+      name: "sample.json",
+      mimeType: "application/json",
+      buffer: Buffer.from("{\"name\":\"Widget\",\"price\":10}"),
+    });
+
+    // Expect one array entry after normalization.
+    await expect.poll(testStateDriver.testState).toEqual(1);
+  });
+
+  test("returns parse results for multiple files", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput
+        parseAs="csv"
+        multiple="true"
+        onDidChange="results => testState = results.length"
+      />
+    `);
+    const driver = await createFileInputDriver();
+    // When multiple=true, onDidChange receives ParseResult[] for each file.
+    await driver.getHiddenInput().setInputFiles([
+      {
+        name: "first.csv",
+        mimeType: "text/csv",
+        buffer: Buffer.from("name,price\nWidget,10\n"),
+      },
+      {
+        name: "second.csv",
+        mimeType: "text/csv",
+        buffer: Buffer.from("name,price\nGadget,20\n"),
+      },
+    ]);
+
+    // Expect one ParseResult per file.
+    await expect.poll(testStateDriver.testState).toEqual(2);
+  });
+
+  test("parseError event fires on invalid json", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput parseAs="json" onParseError="testState = 'error'" />
+    `);
+    const driver = await createFileInputDriver();
+    // Invalid JSON triggers parseError, not onDidChange.
+    await driver.getHiddenInput().setInputFiles({
+      name: "bad.json",
+      mimeType: "application/json",
+      buffer: Buffer.from("{"),
+    });
+
+    await expect.poll(testStateDriver.testState).toEqual("error");
+  });
+
+  test("parses json array correctly", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput parseAs="json" onDidChange="data => testState = data.length" />
+    `);
+    const driver = await createFileInputDriver();
+    // JSON array should be passed through as-is.
+    await driver.getHiddenInput().setInputFiles({
+      name: "array.json",
+      mimeType: "application/json",
+      buffer: Buffer.from('[{"name":"Widget","price":10},{"name":"Gadget","price":20}]'),
+    });
+
+    await expect.poll(testStateDriver.testState).toEqual(2);
+  });
+
+  test("parses csv with custom delimiter", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput
+        parseAs="csv"
+        csvOptions="{{ delimiter: ';' }}"
+        onDidChange="data => testState = data.length"
+      />
+    `);
+    const driver = await createFileInputDriver();
+    // CSV with semicolon delimiter.
+    await driver.getHiddenInput().setInputFiles({
+      name: "semicolon.csv",
+      mimeType: "text/csv",
+      buffer: Buffer.from("name;price\nWidget;10\nGadget;20\n"),
+    });
+
+    await expect.poll(testStateDriver.testState).toEqual(2);
+  });
+
+  test("parses csv with dynamicTyping", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput
+        parseAs="csv"
+        csvOptions="{{ dynamicTyping: true }}"
+        onDidChange="data => testState = typeof data[0].price"
+      />
+    `);
+    const driver = await createFileInputDriver();
+    // dynamicTyping should convert "10" to number 10.
+    await driver.getHiddenInput().setInputFiles({
+      name: "typed.csv",
+      mimeType: "text/csv",
+      buffer: Buffer.from("name,price\nWidget,10\n"),
+    });
+
+    await expect.poll(testStateDriver.testState).toEqual("number");
+  });
+
+  test("parses csv without header option", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput
+        parseAs="csv"
+        csvOptions="{{ header: false }}"
+        onDidChange="data => testState = data.length"
+      />
+    `);
+    const driver = await createFileInputDriver();
+    // Without header, all rows are returned as arrays.
+    await driver.getHiddenInput().setInputFiles({
+      name: "noheader.csv",
+      mimeType: "text/csv",
+      buffer: Buffer.from("Widget,10\nGadget,20\n"),
+    });
+
+    await expect.poll(testStateDriver.testState).toEqual(2);
+  });
+
+  test("verifies parsed csv data structure", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput
+        parseAs="csv"
+        onDidChange="data => testState = { name: data[0].name, price: data[0].price }"
+      />
+    `);
+    const driver = await createFileInputDriver();
+    await driver.getHiddenInput().setInputFiles({
+      name: "data.csv",
+      mimeType: "text/csv",
+      buffer: Buffer.from("name,price\nWidget,10\n"),
+    });
+
+    await expect.poll(async () => {
+      const result = await testStateDriver.testState();
+      return result?.name;
+    }).toBe("Widget");
+
+    const result = await testStateDriver.testState();
+    expect(result.price).toBe("10");
+  });
+
+  test("verifies parsed json data structure", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput
+        parseAs="json"
+        onDidChange="data => testState = data[0]"
+      />
+    `);
+    const driver = await createFileInputDriver();
+    await driver.getHiddenInput().setInputFiles({
+      name: "data.json",
+      mimeType: "application/json",
+      buffer: Buffer.from('{"name":"Widget","price":10}'),
+    });
+
+    await expect.poll(async () => {
+      const result = await testStateDriver.testState();
+      return result?.name;
+    }).toBe("Widget");
+
+    const result = await testStateDriver.testState();
+    expect(result.price).toBe(10);
+  });
+
+  test("handles empty csv file", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput parseAs="csv" onDidChange="data => testState = data.length" />
+    `);
+    const driver = await createFileInputDriver();
+    await driver.getHiddenInput().setInputFiles({
+      name: "empty.csv",
+      mimeType: "text/csv",
+      buffer: Buffer.from(""),
+    });
+
+    await expect.poll(testStateDriver.testState).toEqual(0);
+  });
+
+  test("handles empty json file", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput parseAs="json" onParseError="testState = 'error'" />
+    `);
+    const driver = await createFileInputDriver();
+    // Empty JSON should trigger parse error.
+    await driver.getHiddenInput().setInputFiles({
+      name: "empty.json",
+      mimeType: "application/json",
+      buffer: Buffer.from(""),
+    });
+
+    await expect.poll(testStateDriver.testState).toEqual("error");
+  });
+
+  test("can override acceptsFileType when parseAs is set", async ({ initTestBed, createFileInputDriver }) => {
+    await initTestBed(`<FileInput parseAs="csv" acceptsFileType=".txt,.csv" />`);
+    const driver = await createFileInputDriver();
+    // Explicit acceptsFileType should override inference.
+    await expect(driver.getHiddenInput()).toHaveAttribute("accept", ".txt,.csv");
+  });
+
+  test("verifies ParseResult structure for multiple files", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput
+        parseAs="csv"
+        multiple="true"
+        onDidChange="results => testState = {
+          hasFile: !!results[0].file,
+          hasData: Array.isArray(results[0].data),
+          fileName: results[0].file.name
+        }"
+      />
+    `);
+    const driver = await createFileInputDriver();
+    await driver.getHiddenInput().setInputFiles([
+      {
+        name: "test.csv",
+        mimeType: "text/csv",
+        buffer: Buffer.from("name,price\nWidget,10\n"),
+      },
+    ]);
+
+    await expect.poll(async () => {
+      const result = await testStateDriver.testState();
+      return result?.hasFile;
+    }).toBe(true);
+
+    const result = await testStateDriver.testState();
+    expect(result.hasData).toBe(true);
+    expect(result.fileName).toBe("test.csv");
+  });
+
+  test("onParseError receives error and file", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput
+        parseAs="json"
+        onParseError="(error, file) => testState = { hasError: !!error, fileName: file.name }"
+      />
+    `);
+    const driver = await createFileInputDriver();
+    await driver.getHiddenInput().setInputFiles({
+      name: "bad.json",
+      mimeType: "application/json",
+      buffer: Buffer.from("{invalid"),
+    });
+
+    await expect.poll(async () => {
+      const result = await testStateDriver.testState();
+      return result?.hasError;
+    }).toBe(true);
+
+    const result = await testStateDriver.testState();
+    expect(result.fileName).toBe("bad.json");
+  });
+
+  test("handles mixed success and failure in multiple files", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput
+        parseAs="json"
+        multiple="true"
+        onDidChange="results => testState = {
+          total: results.length,
+          errors: results.filter(r => r.error).length,
+          success: results.filter(r => !r.error).length
+        }"
+      />
+    `);
+    const driver = await createFileInputDriver();
+    await driver.getHiddenInput().setInputFiles([
+      {
+        name: "good.json",
+        mimeType: "application/json",
+        buffer: Buffer.from('{"name":"Widget"}'),
+      },
+      {
+        name: "bad.json",
+        mimeType: "application/json",
+        buffer: Buffer.from("{invalid"),
+      },
+    ]);
+
+    await expect.poll(async () => {
+      const result = await testStateDriver.testState();
+      return result?.total;
+    }).toBe(2);
+
+    const result = await testStateDriver.testState();
+    expect(result.success).toBe(1);
+    expect(result.errors).toBe(1);
+  });
+});
+
+// =============================================================================
+// BEHAVIORS AND PARTS TESTS
+// =============================================================================
+
+test.describe("Behaviors and Parts", () => {
+  test("requireLabelMode='markRequired' shows asterisk for required fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <FileInput testId="test" label="Upload Document" required="true" requireLabelMode="markRequired" bindTo="document" />
+      </Form>
+    `);
+    
+    const label = page.getByText("Upload Document");
+    await expect(label).toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markRequired' hides indicator for optional fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <FileInput testId="test" label="Upload Document" required="false" requireLabelMode="markRequired" bindTo="document" />
+      </Form>
+    `);
+    
+    const label = page.getByText("Upload Document");
+    await expect(label).not.toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markOptional' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <FileInput testId="test" label="Upload Document" required="false" requireLabelMode="markOptional" bindTo="document" />
+      </Form>
+    `);
+    
+    const label = page.getByText("Upload Document");
+    await expect(label).toContainText("(Optional)");
+    await expect(label).not.toContainText("*");
+  });
+
+  test("requireLabelMode='markOptional' hides indicator for required fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <FileInput testId="test" label="Upload Document" required="true" requireLabelMode="markOptional" bindTo="document" />
+      </Form>
+    `);
+    
+    const label = page.getByText("Upload Document");
+    await expect(label).not.toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markBoth' shows asterisk for required fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <FileInput testId="test" label="Upload Document" required="true" requireLabelMode="markBoth" bindTo="document" />
+      </Form>
+    `);
+    
+    const label = page.getByText("Upload Document");
+    await expect(label).toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markBoth' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <FileInput testId="test" label="Upload Document" required="false" requireLabelMode="markBoth" bindTo="document" />
+      </Form>
+    `);
+    
+    const label = page.getByText("Upload Document");
+    await expect(label).not.toContainText("*");
+    await expect(label).toContainText("(Optional)");
+  });
+
+  test("input requireLabelMode overrides Form itemRequireLabelMode", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form itemRequireLabelMode="markRequired">
+        <FileInput testId="test" label="Upload Document" required="false" requireLabelMode="markOptional" bindTo="document" />
+      </Form>
+    `);
+    
+    const label = page.getByText("Upload Document");
+    await expect(label).toContainText("(Optional)");
+    await expect(label).not.toContainText("*");
+  });
+
+  test("input inherits Form itemRequireLabelMode when not specified", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form itemRequireLabelMode="markBoth">
+        <FileInput testId="test1" label="Required Field" required="true" bindTo="field1" />
+        <FileInput testId="test2" label="Optional Field" required="false" bindTo="field2" />
+      </Form>
+    `);
+    
+    const requiredLabel = page.getByText("Required Field");
+    const optionalLabel = page.getByText("Optional Field");
+    
+    await expect(requiredLabel).toContainText("*");
+    await expect(requiredLabel).not.toContainText("(Optional)");
+    await expect(optionalLabel).toContainText("(Optional)");
+    await expect(optionalLabel).not.toContainText("*");
+  });
+});

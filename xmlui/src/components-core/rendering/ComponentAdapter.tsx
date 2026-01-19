@@ -16,6 +16,7 @@ import type { LookupAsyncFn, LookupSyncFn } from "../../abstractions/ActionDefs"
 import { extractParam, shouldKeep } from "../utils/extractParam";
 import { useTheme } from "../theming/ThemeContext";
 import { useComponentStyle } from "../theming/StyleContext";
+import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 import { mergeProps } from "../utils/mergeProps";
 import ComponentDecorator from "../ComponentDecorator";
 import { createValueExtractor } from "../rendering/valueExtractor";
@@ -505,7 +506,7 @@ function slotRenderer(
     Object.keys(node.props).forEach((key) => {
       if (key !== "name") {
         let extractedValue = extractValue(node.props[key], true);
-        if (extractedValue?._ARROW_EXPR_) {
+        if (isArrowExpressionObject(extractedValue)) {
           extractedValue = lookupAction(extractedValue);
         }
         slotProps[key] = extractedValue;

@@ -573,3 +573,135 @@ test("setValue input value", async ({ initTestBed, page }) => {
   await page.getByTestId("setValueButton").click();
   await expect(valueDisplay).toHaveText("1");
 });
+
+// =============================================================================
+// BEHAVIORS AND PARTS TESTS
+// =============================================================================
+
+test.describe("Behaviors and Parts", () => {
+  test("requireLabelMode='markRequired' shows asterisk for required fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <RadioGroup testId="test" label="Gender" required="true" requireLabelMode="markRequired" bindTo="gender">
+          <Option value="male">Male</Option>
+          <Option value="female">Female</Option>
+        </RadioGroup>
+      </Form>
+    `);
+    
+    const label = page.getByText("Gender");
+    await expect(label).toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markRequired' hides indicator for optional fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <RadioGroup testId="test" label="Gender" required="false" requireLabelMode="markRequired" bindTo="gender">
+          <Option value="male">Male</Option>
+          <Option value="female">Female</Option>
+        </RadioGroup>
+      </Form>
+    `);
+    
+    const label = page.getByText("Gender");
+    await expect(label).not.toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markOptional' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <RadioGroup testId="test" label="Gender" required="false" requireLabelMode="markOptional" bindTo="gender">
+          <Option value="male">Male</Option>
+          <Option value="female">Female</Option>
+        </RadioGroup>
+      </Form>
+    `);
+    
+    const label = page.getByText("Gender");
+    await expect(label).toContainText("(Optional)");
+    await expect(label).not.toContainText("*");
+  });
+
+  test("requireLabelMode='markOptional' hides indicator for required fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <RadioGroup testId="test" label="Gender" required="true" requireLabelMode="markOptional" bindTo="gender">
+          <Option value="male">Male</Option>
+          <Option value="female">Female</Option>
+        </RadioGroup>
+      </Form>
+    `);
+    
+    const label = page.getByText("Gender");
+    await expect(label).not.toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markBoth' shows asterisk for required fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <RadioGroup testId="test" label="Gender" required="true" requireLabelMode="markBoth" bindTo="gender">
+          <Option value="male">Male</Option>
+          <Option value="female">Female</Option>
+        </RadioGroup>
+      </Form>
+    `);
+    
+    const label = page.getByText("Gender");
+    await expect(label).toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markBoth' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <RadioGroup testId="test" label="Gender" required="false" requireLabelMode="markBoth" bindTo="gender">
+          <Option value="male">Male</Option>
+          <Option value="female">Female</Option>
+        </RadioGroup>
+      </Form>
+    `);
+    
+    const label = page.getByText("Gender");
+    await expect(label).not.toContainText("*");
+    await expect(label).toContainText("(Optional)");
+  });
+
+  test("input requireLabelMode overrides Form itemRequireLabelMode", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form itemRequireLabelMode="markRequired">
+        <RadioGroup testId="test" label="Gender" required="false" requireLabelMode="markOptional" bindTo="gender">
+          <Option value="male">Male</Option>
+          <Option value="female">Female</Option>
+        </RadioGroup>
+      </Form>
+    `);
+    
+    const label = page.getByText("Gender");
+    await expect(label).toContainText("(Optional)");
+    await expect(label).not.toContainText("*");
+  });
+
+  test("input inherits Form itemRequireLabelMode when not specified", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form itemRequireLabelMode="markBoth">
+        <RadioGroup testId="test1" label="Required Field" required="true" bindTo="field1">
+          <Option value="1">Option 1</Option>
+        </RadioGroup>
+        <RadioGroup testId="test2" label="Optional Field" required="false" bindTo="field2">
+          <Option value="1">Option 1</Option>
+        </RadioGroup>
+      </Form>
+    `);
+    
+    const requiredLabel = page.getByText("Required Field");
+    const optionalLabel = page.getByText("Optional Field");
+    
+    await expect(requiredLabel).toContainText("*");
+    await expect(requiredLabel).not.toContainText("(Optional)");
+    await expect(optionalLabel).toContainText("(Optional)");
+    await expect(optionalLabel).not.toContainText("*");
+  });
+});

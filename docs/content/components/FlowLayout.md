@@ -11,7 +11,9 @@ See the [reference docs](/components/SpaceFiller) for details.
 
 ## Properties [#properties]
 
-### `columnGap` (default: "$gap-normal") [#columngap-default-gap-normal]
+### `columnGap` [#columngap]
+
+-  default: **"$gap-normal"**
 
 The `columnGap` property specifies the space between items in a single row; it overrides the `gap` value.
 
@@ -35,7 +37,9 @@ The `columnGap` property specifies the space between items in a single row; it o
 You can observe no gap between the rows of the `FlowLayout`, as `columnGap` keeps the space between rows intact:
 ```
 
-### `gap` (default: "$gap-normal") [#gap-default-gap-normal]
+### `gap` [#gap]
+
+-  default: **"$gap-normal"**
 
 This property defines the gap between items in the same row and between rows. The FlowLayout component creates a new row when an item is about to overflow the current row.
 
@@ -94,7 +98,9 @@ This markup demonstrates different `gap` values:
 All items within a `FlowLayout` instance fit in a single row, so `gap` affects only the space between items. The space between rows comes from the outermost `Stack`.
 ```
 
-### `rowGap` (default: "$gap-normal") [#rowgap-default-gap-normal]
+### `rowGap` [#rowgap]
+
+-  default: **"$gap-normal"**
 
 The `rowGap` property specifies the space between the FlowLayout rows; it overrides the `gap` value.
 
@@ -118,13 +124,31 @@ The `rowGap` property specifies the space between the `FlowLayout` rows; it over
 You can observe no gap between the items in a single row of the `FlowLayout`, as `rowGap` keeps the gap within a row intact:
 ```
 
+### `verticalAlignment` [#verticalalignment]
+
+-  default: **"start"**
+
+Manages the vertical content alignment for each child element within the same row. This aligns items along the cross-axis of the flex container.
+
+Available values: `start` **(default)**, `center`, `end`
+
 ## Events [#events]
 
 This component does not have any events.
 
 ## Exposed Methods [#exposed-methods]
 
-This component does not expose any methods.
+### `scrollToBottom` [#scrolltobottom]
+
+Scrolls the FlowLayout container to the bottom. Works when the FlowLayout has an explicit height and overflowY is set to 'scroll'.
+
+**Signature**: `scrollToBottom(behavior?: 'auto' | 'instant' | 'smooth'): void`
+
+### `scrollToTop` [#scrolltotop]
+
+Scrolls the FlowLayout container to the top. Works when the FlowLayout has an explicit height and overflowY is set to 'scroll'.
+
+**Signature**: `scrollToTop(behavior?: 'auto' | 'instant' | 'smooth'): void`
 
 ## Styling [#styling]
 

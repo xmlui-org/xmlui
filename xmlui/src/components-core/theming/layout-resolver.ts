@@ -28,6 +28,10 @@ export function resolveLayoutProps(
     issues: new Set(),
   };
 
+  // Get the list of layout properties to ignore from layout context
+  const ignoreLayoutProps = (layoutContext?.ignoreLayoutProps as string[]) || [];
+  const shouldIgnore = (prop: string) => ignoreLayoutProps.includes(prop);
+
   // --- Adjust flex
   if (!!getOrientation(layoutContext)) {
     // --- In a container, we always use "flex-shrink: 0"
@@ -35,22 +39,46 @@ export function resolveLayoutProps(
   }
 
   // --- Dimensions: widht and height is not considered to be inline styles
-  collectCss("width", false);
-  const horizontalStarSize = getHorizontalStarSize(result.cssProps.width, layoutContext);
-  if (horizontalStarSize !== null) {
-    // --- We use "flex" when width is in start-size and allow shrinking
-    result.cssProps.flex = horizontalStarSize;
-    result.cssProps.flexShrink = 1;
+  if (!shouldIgnore("width")) {
+    collectCss("width", false);
+    const horizontalStarSize = getHorizontalStarSize(result.cssProps.width, layoutContext);
+    if (horizontalStarSize !== null) {
+      // --- We use "flex" when width is in start-size and allow shrinking
+      result.cssProps.flex = horizontalStarSize;
+      result.cssProps.flexShrink = 1;
+    }
+  }
+  if (!shouldIgnore("minWidth")) {
+    collectCss("minWidth", false);
+  }
+  if (!shouldIgnore("maxWidth")) {
+    collectCss("maxWidth", false);
+  }
+  // Remove width if it's a star size (regardless of whether it was converted to flex)
+  if (result.cssProps.width && typeof result.cssProps.width === 'string' && starSizeRegex.test(result.cssProps.width)) {
+    delete result.cssProps.width;
   }
   collectCss("minWidth", false);
   collectCss("maxWidth", false);
 
-  collectCss("height", false);
-  const verticalStarSize = getVerticalStarSize(result.cssProps.height, layoutContext);
-  if (verticalStarSize !== null) {
-    // --- We use "flex" when width is in start-size and allow shrinking
-    result.cssProps.flex = verticalStarSize;
-    result.cssProps.flexShrink = 1;
+  if (!shouldIgnore("height")) {
+    collectCss("height", false);
+    const verticalStarSize = getVerticalStarSize(result.cssProps.height, layoutContext);
+    if (verticalStarSize !== null) {
+      // --- We use "flex" when width is in start-size and allow shrinking
+      result.cssProps.flex = verticalStarSize;
+      result.cssProps.flexShrink = 1;
+    }
+  }
+  if (!shouldIgnore("minHeight")) {
+    collectCss("minHeight", false);
+  }
+  if (!shouldIgnore("maxHeight")) {
+    collectCss("maxHeight", false);
+  }
+  // Remove height if it's a star size (regardless of whether it was converted to flex)
+  if (result.cssProps.height && typeof result.cssProps.height === 'string' && starSizeRegex.test(result.cssProps.height)) {
+    delete result.cssProps.height;
   }
   collectCss("minHeight", false);
   collectCss("maxHeight", false);

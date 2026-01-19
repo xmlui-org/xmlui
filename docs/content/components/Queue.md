@@ -54,7 +54,9 @@ Try the app by clicking the button several times. Check how the queue processes 
 
 ## Properties [#properties]
 
-### `clearAfterFinish` (default: false) [#clearafterfinish-default-false]
+### `clearAfterFinish` [#clearafterfinish]
+
+-  default: **false**
 
 This property indicates the completed items (successful or error) should be removed from the queue after completion.
 

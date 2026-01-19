@@ -26,11 +26,15 @@
 
 ## Properties [#properties]
 
-### `autoFocus` (default: false) [#autofocus-default-false]
+### `autoFocus` [#autofocus]
+
+-  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `creatable` (default: false) [#creatable-default-false]
+### `creatable` [#creatable]
+
+-  default: **false**
 
 This property allows the user to create new items that are not present in the list of options.
 
@@ -52,11 +56,15 @@ This property defines the template to display when the list of options is empty.
 </App>
 ```
 
-### `enabled` (default: true) [#enabled-default-true]
+### `enabled` [#enabled]
+
+-  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-### `initiallyOpen` (default: false) [#initiallyopen-default-false]
+### `initiallyOpen` [#initiallyopen]
+
+-  default: **false**
 
 This property determines whether the dropdown list is open when the component is first rendered.
 
@@ -68,7 +76,9 @@ This property sets the component's initial value.
 
 This property sets the maximum length of the input it accepts.
 
-### `multi` (default: false) [#multi-default-false]
+### `multi` [#multi]
+
+-  default: **false**
 
 The `true` value of the property indicates if the user can select multiple items.
 
@@ -105,15 +115,21 @@ This property enables the customization of list items. To access the attributes 
 
 An optional placeholder text that is visible in the input field when its empty.
 
-### `readOnly` (default: false) [#readonly-default-false]
+### `readOnly` [#readonly]
+
+-  default: **false**
 
 Set this property to `true` to disallow changing the component value.
 
-### `required` (default: false) [#required-default-false]
+### `required` [#required]
+
+-  default: **false**
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `validationStatus` (default: "none") [#validationstatus-default-none]
+### `validationStatus` [#validationstatus]
+
+-  default: **"none"**
 
 This property allows you to set the validation status of the input component.
 
@@ -200,7 +216,7 @@ This API allows you to get or set the value of the component. If no value is set
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-AutoComplete | $backgroundColor | $backgroundColor |
+| [backgroundColor](../styles-and-themes/common-units/#color)-AutoComplete | transparent | transparent |
 | [backgroundColor](../styles-and-themes/common-units/#color)-AutoComplete--default | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-AutoComplete--default--hover | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-AutoComplete--disabled | *none* | *none* |

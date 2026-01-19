@@ -12,6 +12,7 @@ import { getAppLayoutOrientation } from "../App/AppNative";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { NavPanelContext } from "../NavPanel/NavPanelNative";
 import { NavGroupContext } from "../NavGroup/NavGroupContext";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 
 // Default props for NavLink component
 export const defaultProps = {
@@ -30,10 +31,12 @@ type Props = {
   noIndicator?: boolean;
   forceActive?: boolean;
   vertical?: boolean;
+  level?: number;
   style?: CSSProperties;
   className?: string;
   onClick?: MouseEventHandler;
   icon?: React.ReactNode;
+  iconAlignment?: "baseline" | "start" | "center" | "end";
   accessibilityProps?: any;
 } & Pick<React.HTMLAttributes<HTMLAnchorElement>, LinkAria>;
 
@@ -47,22 +50,27 @@ export const NavLink = forwardRef(function NavLink(
     displayActive = defaultProps.displayActive,
     noIndicator = defaultProps.noIndicator,
     vertical,
+    level: levelProp,
     style,
     onClick,
     icon,
+    iconAlignment,
     forceActive,
     className,
     ...rest
   }: Props,
   ref: Ref<any>,
 ) {
+  const { getThemeVar } = useTheme();
+  const effectiveIconAlignment = iconAlignment ?? getThemeVar("iconAlignment-NavLink") ?? "center";
   const appLayoutContext = useAppLayoutContext();
   const layoutIsVertical =
     !!appLayoutContext && getAppLayoutOrientation(appLayoutContext.layout).includes("vertical");
   const navPanelContext = useContext(NavPanelContext);
   const inDrawer = navPanelContext?.inDrawer;
   
-  const { level } = useContext(NavGroupContext);
+  const { level: contextLevel } = useContext(NavGroupContext);
+  const effectiveLevel = levelProp ?? contextLevel;
   let safeVertical = vertical;
 
   if (safeVertical === undefined) {
@@ -76,20 +84,29 @@ export const NavLink = forwardRef(function NavLink(
 
   const styleObj = useMemo(() => {
     return {
-      "--nav-link-level": layoutIsVertical ? level + 1 : 0,
+      "--nav-link-level": layoutIsVertical ? effectiveLevel + 1 : 0,
       ...style,
     };
-  }, [level, style, layoutIsVertical]);
+  }, [effectiveLevel, style, layoutIsVertical]);
 
   const baseClasses = classnames(styles.content, styles.base, className, {
     [styles.disabled]: disabled,
     [styles.vertical]: safeVertical,
     [styles.includeHoverIndicator]: displayActive && !noIndicator,
     [styles.navItemActive]: displayActive && forceActive,
+    [styles.level1]: effectiveLevel === 0,
+    [styles.level2]: effectiveLevel === 1,
+    [styles.level3]: effectiveLevel === 2,
+    [styles.level4]: effectiveLevel === 3,
   });
 
   let innerContent = (
-    <div className={styles.innerContent}>
+    <div className={classnames(styles.innerContent, {
+      [styles.iconAlignBaseline]: effectiveIconAlignment === "baseline",
+      [styles.iconAlignStart]: effectiveIconAlignment === "start",
+      [styles.iconAlignCenter]: effectiveIconAlignment === "center",
+      [styles.iconAlignEnd]: effectiveIconAlignment === "end",
+    })}>
       {icon}
       {children}
     </div>

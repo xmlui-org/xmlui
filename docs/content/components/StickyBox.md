@@ -4,7 +4,9 @@
 
 ## Properties [#properties]
 
-### `to` (default: "top") [#to-default-top]
+### `to` [#to]
+
+-  default: **"top"**
 
 This property determines whether the StickyBox should be anchored to the `top` or `bottom`.
 

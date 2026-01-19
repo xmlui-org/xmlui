@@ -28,7 +28,9 @@ You can also paste files from the clipboard: click the drop zone (cyan area) and
 
 Accepted file MIME types, separated by commas. For example: 'image/*,application/pdf'.
 
-### `allowPaste` (default: true) [#allowpaste-default-true]
+### `allowPaste` [#allowpaste]
+
+-  default: **true**
 
 This property indicates if the drop zone accepts files pasted from the clipboard (`true`) or only dragged files (`false`).
 
@@ -48,7 +50,9 @@ The following example sets this property to `false` and, thus, it turns off past
 Try it! When you copy a file to a clipboard, you cannot paste it with the keyboard shortcut of your OS.
 ```
 
-### `enabled` (default: true) [#enabled-default-true]
+### `enabled` [#enabled]
+
+-  default: **true**
 
 If set to `false`, the drop zone will be disabled and users will not be able to upload files.
 
@@ -56,7 +60,9 @@ If set to `false`, the drop zone will be disabled and users will not be able to 
 
 The maximum number of files that can be selected.
 
-### `text` (default: "Drop files here") [#text-default-drop-files-here]
+### `text` [#text]
+
+-  default: **"Drop files here"**
 
 With this property, you can change the default text to display when files are dragged over the drop zone.
 

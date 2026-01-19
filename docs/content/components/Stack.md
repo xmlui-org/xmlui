@@ -14,7 +14,9 @@ For common scenarios, consider the specialized variants: [HStack](/components/HS
 
 ## Properties [#properties]
 
-### `gap` (default: "$gap-normal") [#gap-default-gap-normal]
+### `gap` [#gap]
+
+-  default: **"$gap-normal"**
 
 Optional size value indicating the gap between child elements.
 
@@ -39,7 +41,9 @@ In the following example we use pixels, characters (shorthand `ch`), and the `em
 </App>
 ```
 
-### `horizontalAlignment` (default: "start") [#horizontalalignment-default-start]
+### `horizontalAlignment` [#horizontalalignment]
+
+-  default: **"start"**
 
 Manages the horizontal content alignment for each child element in the Stack.
 
@@ -56,13 +60,17 @@ Available values: `start` **(default)**, `center`, `end`
 </App>
 ```
 
-### `orientation` (default: "vertical") [#orientation-default-vertical]
+### `orientation` [#orientation]
+
+-  default: **"vertical"**
 
 An optional property that governs the Stack's orientation (whether the Stack lays out its children in a row or a column).
 
 Available values: `horizontal`, `vertical` **(default)**
 
-### `reverse` (default: false) [#reverse-default-false]
+### `reverse` [#reverse]
+
+-  default: **false**
 
 Optional boolean property to reverse the order of child elements.
 
@@ -85,7 +93,9 @@ Default is **false**, which indicates a left-to-right layout.
 </App>
 ```
 
-### `verticalAlignment` (default: "start") [#verticalalignment-default-start]
+### `verticalAlignment` [#verticalalignment]
+
+-  default: **"start"**
 
 Manages the vertical content alignment for each child element in the Stack.
 
@@ -99,7 +109,9 @@ Available values: `start` **(default)**, `center`, `end`
 </App>
 ```
 
-### `wrapContent` (default: false) [#wrapcontent-default-false]
+### `wrapContent` [#wrapcontent]
+
+-  default: **false**
 
 Optional boolean which wraps the content if set to true and the available space is not big enough. Works only with horizontal orientations.
 
@@ -139,7 +151,29 @@ Describes the logic that fires when the component is clicked.
 
 ## Exposed Methods [#exposed-methods]
 
-This component does not expose any methods.
+### `scrollToBottom` [#scrolltobottom]
+
+Scrolls the Stack container to the bottom. Works when the Stack has an explicit height and overflowY is set to 'scroll'.
+
+**Signature**: `scrollToBottom(behavior?: 'auto' | 'instant' | 'smooth'): void`
+
+### `scrollToEnd` [#scrolltoend]
+
+Scrolls the Stack container to the end (right in LTR, left in RTL). Works when the Stack has an explicit width and overflowX is set to 'scroll'.
+
+**Signature**: `scrollToEnd(behavior?: 'auto' | 'instant' | 'smooth'): void`
+
+### `scrollToStart` [#scrolltostart]
+
+Scrolls the Stack container to the start (left in LTR, right in RTL). Works when the Stack has an explicit width and overflowX is set to 'scroll'.
+
+**Signature**: `scrollToStart(behavior?: 'auto' | 'instant' | 'smooth'): void`
+
+### `scrollToTop` [#scrolltotop]
+
+Scrolls the Stack container to the top. Works when the Stack has an explicit height and overflowY is set to 'scroll'.
+
+**Signature**: `scrollToTop(behavior?: 'auto' | 'instant' | 'smooth'): void`
 
 ## Styling [#styling]
 

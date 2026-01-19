@@ -190,3 +190,266 @@ test.describe("Event Handling", () => {
     await expect(textDriver.component).toBeVisible();
   });
 });
+
+// =============================================================================
+// API TESTS
+// =============================================================================
+
+test.describe("Api", () => {
+  test("scrollToTop scrolls to the top of a scrollable Card", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Card id="myCard" height="200px" overflowY="scroll" testId="card">
+          <Stack height="300px" backgroundColor="lightblue"/>
+          <Stack height="300px" backgroundColor="lightgreen"/>
+          <Stack height="300px" backgroundColor="lightcoral"/>
+        </Card>
+        <Button testId="scrollBtn" onClick="myCard.scrollToTop()" />
+      </Fragment>
+    `);
+
+    const card = page.getByTestId("card");
+    
+    // Scroll to bottom first
+    await card.evaluate((elem) => {
+      elem.scrollTop = elem.scrollHeight;
+    });
+
+    // Verify we're scrolled down
+    const scrollTopBefore = await card.evaluate((elem) => elem.scrollTop);
+    expect(scrollTopBefore).toBeGreaterThan(0);
+
+    // Click button to scroll to top
+    await page.getByTestId("scrollBtn").click();
+    
+    // Wait for scroll to complete
+    await page.waitForTimeout(100);
+
+    // Verify we're at the top
+    const scrollTopAfter = await card.evaluate((elem) => elem.scrollTop);
+    expect(scrollTopAfter).toBe(0);
+  });
+
+  test("scrollToBottom scrolls to the bottom of a scrollable Card", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Card id="myCard" height="200px" overflowY="scroll" testId="card">
+          <Stack height="300px" backgroundColor="lightblue"/>
+          <Stack height="300px" backgroundColor="lightgreen"/>
+          <Stack height="300px" backgroundColor="lightcoral"/>
+        </Card>
+        <Button testId="scrollBtn" onClick="myCard.scrollToBottom()" />
+      </Fragment>
+    `);
+
+    const card = page.getByTestId("card");
+    
+    // Verify we start at the top
+    const scrollTopBefore = await card.evaluate((elem) => elem.scrollTop);
+    expect(scrollTopBefore).toBe(0);
+
+    // Click button to scroll to bottom
+    await page.getByTestId("scrollBtn").click();
+    
+    // Wait for scroll to complete
+    await page.waitForTimeout(100);
+
+    // Verify we're at the bottom
+    const scrollTopAfter = await card.evaluate((elem) => elem.scrollTop);
+    const scrollHeight = await card.evaluate((elem) => elem.scrollHeight);
+    const clientHeight = await card.evaluate((elem) => elem.clientHeight);
+    
+    expect(scrollTopAfter).toBeCloseTo(scrollHeight - clientHeight, 0);
+  });
+
+  test("scrollToStart scrolls to the start of a horizontally scrollable Card", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Card id="myCard" width="200px" height="100px" overflowX="scroll" testId="card" orientation="horizontal">
+          <Stack width="300px" height="50px" backgroundColor="lightblue"/>
+          <Stack width="300px" height="50px" backgroundColor="lightgreen"/>
+          <Stack width="300px" height="50px" backgroundColor="lightcoral"/>
+        </Card>
+        <Button testId="scrollBtn" onClick="myCard.scrollToStart()" />
+      </Fragment>
+    `);
+
+    const card = page.getByTestId("card");
+    
+    // Scroll to end first
+    await card.evaluate((elem) => {
+      elem.scrollLeft = elem.scrollWidth;
+    });
+
+    // Verify we're scrolled right
+    const scrollLeftBefore = await card.evaluate((elem) => elem.scrollLeft);
+    expect(scrollLeftBefore).toBeGreaterThan(0);
+
+    // Click button to scroll to start
+    await page.getByTestId("scrollBtn").click();
+    
+    // Wait for scroll to complete
+    await page.waitForTimeout(100);
+
+    // Verify we're at the start
+    const scrollLeftAfter = await card.evaluate((elem) => elem.scrollLeft);
+    expect(scrollLeftAfter).toBe(0);
+  });
+
+  test("scrollToEnd scrolls to the end of a horizontally scrollable Card", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Card id="myCard" width="200px" height="100px" overflowX="scroll" testId="card" orientation="horizontal">
+          <Stack width="300px" height="50px" backgroundColor="lightblue"/>
+          <Stack width="300px" height="50px" backgroundColor="lightgreen"/>
+          <Stack width="300px" height="50px" backgroundColor="lightcoral"/>
+        </Card>
+        <Button testId="scrollBtn" onClick="myCard.scrollToEnd()" />
+      </Fragment>
+    `);
+
+    const card = page.getByTestId("card");
+    
+    // Verify we start at the start
+    const scrollLeftBefore = await card.evaluate((elem) => elem.scrollLeft);
+    expect(scrollLeftBefore).toBe(0);
+
+    // Click button to scroll to end
+    await page.getByTestId("scrollBtn").click();
+    
+    // Wait for scroll to complete
+    await page.waitForTimeout(100);
+
+    // Verify we're at the end
+    const scrollLeftAfter = await card.evaluate((elem) => elem.scrollLeft);
+    const scrollWidth = await card.evaluate((elem) => elem.scrollWidth);
+    const clientWidth = await card.evaluate((elem) => elem.clientWidth);
+    
+    expect(scrollLeftAfter).toBeCloseTo(scrollWidth - clientWidth, 0);
+  });
+
+  test("scrollToTop with 'smooth' behavior parameter", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Card id="myCard" height="200px" overflowY="scroll" testId="card">
+          <Stack height="300px" backgroundColor="lightblue"/>
+          <Stack height="300px" backgroundColor="lightgreen"/>
+          <Stack height="300px" backgroundColor="lightcoral"/>
+        </Card>
+        <Button testId="scrollBtn" onClick="myCard.scrollToTop('smooth')" />
+      </Fragment>
+    `);
+
+    const card = page.getByTestId("card");
+    
+    // Scroll to bottom first
+    await card.evaluate((elem) => {
+      elem.scrollTop = elem.scrollHeight;
+    });
+
+    // Click button to scroll to top with smooth behavior
+    await page.getByTestId("scrollBtn").click();
+    
+    // Wait for smooth scroll to complete
+    await page.waitForTimeout(500);
+
+    // Verify we're at the top
+    const scrollTopAfter = await card.evaluate((elem) => elem.scrollTop);
+    expect(scrollTopAfter).toBe(0);
+  });
+
+  test("scrollToBottom with default behavior uses instant", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Card id="myCard" height="200px" overflowY="scroll" testId="card">
+          <Stack height="300px" backgroundColor="lightblue"/>
+          <Stack height="300px" backgroundColor="lightgreen"/>
+          <Stack height="300px" backgroundColor="lightcoral"/>
+        </Card>
+        <Button testId="scrollBtn" onClick="myCard.scrollToBottom()" />
+      </Fragment>
+    `);
+
+    const card = page.getByTestId("card");
+
+    // Click button to scroll to bottom (default behavior)
+    await page.getByTestId("scrollBtn").click();
+    
+    // With instant behavior, should be immediate
+    await page.waitForTimeout(50);
+
+    // Verify we're at the bottom
+    const scrollTopAfter = await card.evaluate((elem) => elem.scrollTop);
+    const scrollHeight = await card.evaluate((elem) => elem.scrollHeight);
+    const clientHeight = await card.evaluate((elem) => elem.clientHeight);
+    
+    expect(scrollTopAfter).toBeCloseTo(scrollHeight - clientHeight, 0);
+  });
+
+  test("scrollToBottom followed by scrollToTop", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Card id="myCard" height="200px" overflowY="scroll" testId="card">
+          <Stack height="300px" backgroundColor="lightblue"/>
+          <Stack height="300px" backgroundColor="lightgreen"/>
+          <Stack height="300px" backgroundColor="lightcoral"/>
+        </Card>
+        <Button testId="scrollBottomBtn" onClick="myCard.scrollToBottom()" />
+        <Button testId="scrollTopBtn" onClick="myCard.scrollToTop()" />
+      </Fragment>
+    `);
+
+    const card = page.getByTestId("card");
+    
+    // Scroll to bottom
+    await page.getByTestId("scrollBottomBtn").click();
+    await page.waitForTimeout(100);
+
+    const scrollHeight = await card.evaluate((elem) => elem.scrollHeight);
+    const clientHeight = await card.evaluate((elem) => elem.clientHeight);
+    let scrollTop = await card.evaluate((elem) => elem.scrollTop);
+    
+    expect(scrollTop).toBeCloseTo(scrollHeight - clientHeight, 0);
+
+    // Now scroll back to top
+    await page.getByTestId("scrollTopBtn").click();
+    await page.waitForTimeout(100);
+
+    scrollTop = await card.evaluate((elem) => elem.scrollTop);
+    expect(scrollTop).toBe(0);
+  });
+
+  test("Card with title and subtitle scrolls correctly", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Card id="myCard" title="Card Title" subtitle="Card Subtitle" height="200px" overflowY="scroll" testId="card">
+          <Stack height="300px" backgroundColor="lightblue"/>
+          <Stack height="300px" backgroundColor="lightgreen"/>
+          <Stack height="300px" backgroundColor="lightcoral"/>
+        </Card>
+        <Button testId="scrollBottomBtn" onClick="myCard.scrollToBottom()" />
+        <Button testId="scrollTopBtn" onClick="myCard.scrollToTop()" />
+      </Fragment>
+    `);
+
+    const card = page.getByTestId("card");
+    
+    // Verify title and subtitle are visible
+    await expect(card.getByRole("heading")).toHaveText("Card Title");
+    await expect(card.getByText("Card Subtitle")).toBeVisible();
+    
+    // Scroll to bottom
+    await page.getByTestId("scrollBottomBtn").click();
+    await page.waitForTimeout(100);
+
+    let scrollTop = await card.evaluate((elem) => elem.scrollTop);
+    expect(scrollTop).toBeGreaterThan(0);
+
+    // Scroll back to top
+    await page.getByTestId("scrollTopBtn").click();
+    await page.waitForTimeout(100);
+
+    scrollTop = await card.evaluate((elem) => elem.scrollTop);
+    expect(scrollTop).toBe(0);
+  });
+});

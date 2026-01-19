@@ -1,5 +1,6 @@
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { T_ARROW_EXPRESSION } from "../../components-core/script-runner/ScriptingSourceTree";
+import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 
 /**
  * Finds and evaluates given binding expressions in markdown text.
@@ -54,7 +55,7 @@ export function parseBindingExpression(text: string, extractValue: ValueExtracto
     if (
       extracted.hasOwnProperty("type") &&
       extracted.type === T_ARROW_EXPRESSION &&
-      extracted?._ARROW_EXPR_
+      isArrowExpressionObject(extracted)
     ) {
       return "[xmlui function]";
     }

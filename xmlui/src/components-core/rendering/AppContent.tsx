@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { get } from "lodash-es";
 import toast from "react-hot-toast";
 
@@ -27,6 +27,7 @@ import { useDebugView } from "../DebugViewProvider";
 import { miscellaneousUtils } from "../appContext/misc-utils";
 import { dateFunctions } from "../appContext/date-functions";
 import { mathFunctions } from "../appContext/math-function";
+import { TableOfContentsContext } from "../TableOfContentsContext";
 import { AppContext } from "../AppContext";
 import type { GlobalProps } from "./AppRoot";
 import { queryClient } from "./AppRoot";
@@ -232,6 +233,7 @@ export function AppContent({
   const location = useLocation();
   const lastHash = useRef("");
   const [scrollForceRefresh, setScrollForceRefresh] = useState(0);
+  const tableOfContentsContext = useContext(TableOfContentsContext);
 
   useEffect(() => {
     onInit?.();
@@ -284,6 +286,28 @@ export function AppContent({
     lastHash.current = "";
     setScrollForceRefresh((prev) => prev + 1);
   }, []);
+
+  const scrollBookmarkIntoView = useCallback(
+    (bookmarkId: string, smoothScrolling: boolean = false) => {
+      if (tableOfContentsContext?.scrollToAnchor) {
+        tableOfContentsContext.scrollToAnchor(bookmarkId, smoothScrolling);
+      } else {
+        // Fallback if TableOfContentsContext is not available
+        const rootNode = root?.getRootNode();
+        if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
+          const el = (rootNode as any).getElementById(bookmarkId);
+          if (el) {
+            scrollAncestorsToView(el, smoothScrolling ? "smooth" : "auto");
+          }
+        } else {
+          document
+            .getElementById(bookmarkId)
+            ?.scrollIntoView({ behavior: smoothScrolling ? "smooth" : "auto", block: "start" });
+        }
+      }
+    },
+    [tableOfContentsContext, root],
+  );
 
   // --- We collect all the actions defined in the app and pass them to the app context
   const Actions = useMemo(() => {
@@ -431,6 +455,7 @@ export function AppContent({
       ...miscellaneousUtils,
 
       forceRefreshAnchorScroll,
+      scrollBookmarkIntoView,
 
       // --- AppState global state management
       AppState,
@@ -457,6 +482,7 @@ export function AppContent({
     embed,
     apiInterceptorContext,
     forceRefreshAnchorScroll,
+    scrollBookmarkIntoView,
     root,
     AppState,
   ]);

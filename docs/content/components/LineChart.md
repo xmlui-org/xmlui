@@ -47,23 +47,33 @@ The LineChart component accommodates the size of its parent unless you set it ex
 
 The data to be displayed in the line chart.It needs to be an array of objects, where each object represents a data point.
 
-### `hideTickX` (default: false) [#hidetickx-default-false]
+### `hideTickX` [#hidetickx]
+
+-  default: **false**
 
 Determines whether the X-axis ticks should be hidden. If set to (`true`), the ticks will not be displayed.
 
-### `hideTickY` (default: false) [#hideticky-default-false]
+### `hideTickY` [#hideticky]
+
+-  default: **false**
 
 Determines whether the Y-axis ticks should be hidden. If set to (`true`), the ticks will not be displayed.
 
-### `hideTooltip` (default: false) [#hidetooltip-default-false]
+### `hideTooltip` [#hidetooltip]
+
+-  default: **false**
 
 Determines whether the tooltip should be hidden.If set to (`true`), no tooltip will be shown when hovering over data points.
 
-### `hideX` (default: false) [#hidex-default-false]
+### `hideX` [#hidex]
+
+-  default: **false**
 
 Determines whether the X-axis should be hidden. If set to (`true`), the axis will not be displayed.
 
-### `hideY` (default: false) [#hidey-default-false]
+### `hideY` [#hidey]
+
+-  default: **false**
 
 Determines whether the Y-axis should be hidden. If set to (`true`), the axis will not be displayed.
 
@@ -83,7 +93,9 @@ The right margin of the chart
 
 The top margin of the chart
 
-### `showLegend` (default: false) [#showlegend-default-false]
+### `showLegend` [#showlegend]
+
+-  default: **false**
 
 Determines whether the legend should be displayed.
 

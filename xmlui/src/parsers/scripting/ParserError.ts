@@ -1,6 +1,9 @@
 // The common root class of all parser error objects
 export class ParserError extends Error {
-  constructor(message: string, public code?: string) {
+  constructor(
+    message: string,
+    public code?: string,
+  ) {
     super(message);
 
     // --- Set the prototype explicitly.
@@ -12,78 +15,82 @@ export class ParserError extends Error {
 export interface ParserErrorMessage {
   code: ErrorCodes;
   text: string;
-  position?: number;
-  line?: number;
-  column?: number;
+  position: number;
+  end: number;
+  line: number;
+  column: number;
 }
 
-export type ErrorCodes =
-  | "W001"
-  | "W002"
-  | "W003"
-  | "W004"
-  | "W005"
-  | "W006"
-  | "W007"
-  | "W008"
-  | "W009"
-  | "W010"
-  | "W011"
-  | "W012"
-  | "W013"
-  | "W014"
-  | "W015"
-  | "W016"
-  | "W017"
-  | "W018"
-  | "W019"
-  | "W020"
-  | "W021"
-  | "W022"
-  | "W023"
-  | "W024"
-  | "W025"
-  | "W026"
-  | "W027"
-  | "W028"
-  | "W029"
-  | "W030"
-  | "W031";
+export const ErrorCodes = {
+  expressionExpected: "W001",
+  unexpectedToken: "W002",
+  identifierExpected: "W003",
+  closeBraceExpected: "W004",
+  closeBracketExpected: "W005",
+  closeParenExpected: "W006",
+  invalidPropName: "W007",
+  colonExpected: "W008",
+  equalExpected: "W009",
+  invalidArgList: "W010",
+  forLoopVarRequired: "W011",
+  openBraceExpected: "W012",
+  catchOrFinallyExpected: "W013",
+  openParenExpected: "W014",
+  caseOrDefaultExpected: "W015",
+  defaultCaseOnce: "W016",
+  invalidSequence: "W017",
+  invalidObjLiteral: "W018",
+  alreadyImported: "W019",
+  funcAlreadyDefined: "W020",
+  alreadyExported: "W021",
+  moduleNotFound: "W022",
+  exportNotFound: "W023",
+  functionExpected: "W024",
+  fromExpected: "W025",
+  stringLiteralExpected: "W026",
+  varInImportedModule: "W027",
+  invalidModuleStatement: "W028",
+  moduleOnlyExports: "W029",
+  nestedExport: "W030",
+  dollarIdentifier: "W031",
+} as const;
+
+export type ErrorCodes = (typeof ErrorCodes)[keyof typeof ErrorCodes];
 
 // Error message type description
 type ErrorText = Record<string, string>;
 
 // The error messages of error codes
 export const errorMessages: ErrorText = {
-  W001: "An expression expected",
-  W002: "Unexpected token: {0}",
-  W003: "An identifier expected",
-  W004: "'}' expected",
-  W005: "']' expected",
-  W006: "')' expected",
-  W007: "Invalid object property name type",
-  W008: "':' expected",
-  W009: "'=' expected",
-  W010: "Invalid argument list",
-  W011: "For loop variable must be initialized",
-  W012: "'{' expected",
-  W013: "'catch' or 'finally' expected",
-  W014: "'(' or expected",
-  W015: "'case' or 'default' expected",
-  W016: "'default' case can be used only once within a switch statement",
-  W017: "Invalid sequence expression",
-  W018: "Invalid object literal",
-  W019: "Identifier '{0}' is already imported",
-  W020: "Function '{0}' is already defined in the module",
-  W021: "'{0}' is already exported from the module",
-  W022: "Cannot find module '{0}'",
-  W023: "Module '{0}' does not export '{1}'",
-  W024: "'function' expected",
-  W025: "'from' expected",
-  W026: "A string literal expected",
-  W027: "Cannot declare var ('{0}') in an imported module",
-  W028: "Invalid statement used in a module.",
-  W029: "An imported module can contain only exported functions",
-  W030: "Nested declarations cannot be exported",
-  W031: "An identifier in a declaration cannot start with '$'"
+  [ErrorCodes.expressionExpected]: "An expression expected",
+  [ErrorCodes.unexpectedToken]: "Unexpected token: {0}",
+  [ErrorCodes.identifierExpected]: "An identifier expected",
+  [ErrorCodes.closeBraceExpected]: "'}' expected",
+  [ErrorCodes.closeBracketExpected]: "']' expected",
+  [ErrorCodes.closeParenExpected]: "')' expected",
+  [ErrorCodes.invalidPropName]: "Invalid object property name type",
+  [ErrorCodes.colonExpected]: "':' expected",
+  [ErrorCodes.equalExpected]: "'=' expected",
+  [ErrorCodes.invalidArgList]: "Invalid argument list",
+  [ErrorCodes.forLoopVarRequired]: "For loop variable must be initialized",
+  [ErrorCodes.openBraceExpected]: "'{' expected",
+  [ErrorCodes.catchOrFinallyExpected]: "'catch' or 'finally' expected",
+  [ErrorCodes.openParenExpected]: "'(' or expected",
+  [ErrorCodes.caseOrDefaultExpected]: "'case' or 'default' expected",
+  [ErrorCodes.defaultCaseOnce]: "'default' case can be used only once within a switch statement",
+  [ErrorCodes.invalidSequence]: "Invalid sequence expression",
+  [ErrorCodes.invalidObjLiteral]: "Invalid object literal",
+  [ErrorCodes.alreadyImported]: "Identifier '{0}' is already imported",
+  [ErrorCodes.funcAlreadyDefined]: "Function '{0}' is already defined in the module",
+  [ErrorCodes.alreadyExported]: "'{0}' is already exported from the module",
+  [ErrorCodes.moduleNotFound]: "Cannot find module '{0}'",
+  [ErrorCodes.exportNotFound]: "Module '{0}' does not export '{1}'",
+  [ErrorCodes.functionExpected]: "'function' expected",
+  [ErrorCodes.fromExpected]: "'from' expected",
+  [ErrorCodes.stringLiteralExpected]: "A string literal expected",
+  [ErrorCodes.varInImportedModule]: "Cannot declare var ('{0}') in an imported module",
+  [ErrorCodes.invalidModuleStatement]: "Invalid statement used in a module.",
+  [ErrorCodes.moduleOnlyExports]: "An imported module can contain only exported functions",
+  [ErrorCodes.nestedExport]: "Nested declarations cannot be exported",
+  [ErrorCodes.dollarIdentifier]: "An identifier in a declaration cannot start with '$'",
 };

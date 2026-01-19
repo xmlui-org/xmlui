@@ -850,6 +850,125 @@ test.describe("Behaviors and Parts", () => {
     await expect(listWrapper).toBeVisible();
     await expect(inputPart).toBeVisible();
   });
+
+  test("requireLabelMode='markRequired' shows asterisk for required fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <AutoComplete testId="test" label="Username" required="true" requireLabelMode="markRequired" bindTo="username">
+          <Option value="1" label="Option 1" />
+        </AutoComplete>
+      </Form>
+    `);
+    
+    const label = page.getByText("Username");
+    await expect(label).toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markRequired' hides indicator for optional fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <AutoComplete testId="test" label="Username" required="false" requireLabelMode="markRequired" bindTo="username">
+          <Option value="1" label="Option 1" />
+        </AutoComplete>
+      </Form>
+    `);
+    
+    const label = page.getByText("Username");
+    await expect(label).not.toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markOptional' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <AutoComplete testId="test" label="Username" required="false" requireLabelMode="markOptional" bindTo="username">
+          <Option value="1" label="Option 1" />
+        </AutoComplete>
+      </Form>
+    `);
+    
+    const label = page.getByText("Username");
+    await expect(label).toContainText("(Optional)");
+    await expect(label).not.toContainText("*");
+  });
+
+  test("requireLabelMode='markOptional' hides indicator for required fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <AutoComplete testId="test" label="Username" required="true" requireLabelMode="markOptional" bindTo="username">
+          <Option value="1" label="Option 1" />
+        </AutoComplete>
+      </Form>
+    `);
+    
+    const label = page.getByText("Username");
+    await expect(label).not.toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markBoth' shows asterisk for required fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <AutoComplete testId="test" label="Username" required="true" requireLabelMode="markBoth" bindTo="username">
+          <Option value="1" label="Option 1" />
+        </AutoComplete>
+      </Form>
+    `);
+    
+    const label = page.getByText("Username");
+    await expect(label).toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markBoth' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <AutoComplete testId="test" label="Username" required="false" requireLabelMode="markBoth" bindTo="username">
+          <Option value="1" label="Option 1" />
+        </AutoComplete>
+      </Form>
+    `);
+    
+    const label = page.getByText("Username");
+    await expect(label).not.toContainText("*");
+    await expect(label).toContainText("(Optional)");
+  });
+
+  test("input requireLabelMode overrides Form itemRequireLabelMode", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form itemRequireLabelMode="markRequired">
+        <AutoComplete testId="test" label="Username" required="false" requireLabelMode="markOptional" bindTo="username">
+          <Option value="1" label="Option 1" />
+        </AutoComplete>
+      </Form>
+    `);
+    
+    const label = page.getByText("Username");
+    await expect(label).toContainText("(Optional)");
+    await expect(label).not.toContainText("*");
+  });
+
+  test("input inherits Form itemRequireLabelMode when not specified", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form itemRequireLabelMode="markBoth">
+        <AutoComplete testId="test1" label="Required Field" required="true" bindTo="field1">
+          <Option value="1" label="Option 1" />
+        </AutoComplete>
+        <AutoComplete testId="test2" label="Optional Field" required="false" bindTo="field2">
+          <Option value="1" label="Option 1" />
+        </AutoComplete>
+      </Form>
+    `);
+    
+    const requiredLabel = page.getByText("Required Field");
+    const optionalLabel = page.getByText("Optional Field");
+    
+    await expect(requiredLabel).toContainText("*");
+    await expect(requiredLabel).not.toContainText("(Optional)");
+    await expect(optionalLabel).toContainText("(Optional)");
+    await expect(optionalLabel).not.toContainText("*");
+  });
 });
 
 // =============================================================================

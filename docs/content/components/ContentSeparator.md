@@ -13,7 +13,9 @@
 
 This property defines the component's width (if the `orientation` is horizontal) or the height (if the `orientation` is vertical). If not defined, the component uses the theme variable `length-ContentSeparator` (default: 100%).
 
-### `orientation` (default: "horizontal") [#orientation-default-horizontal]
+### `orientation` [#orientation]
+
+-  default: **"horizontal"**
 
 Sets the main axis of the component
 

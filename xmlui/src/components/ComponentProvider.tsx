@@ -33,6 +33,7 @@ import {
 } from "./Heading/Heading";
 import { textComponentRenderer } from "./Text/Text";
 import { fragmentComponentRenderer } from "./Fragment/Fragment";
+import { messageListenerComponentRenderer } from "./MessageListener/MessageListener";
 import { tableComponentRenderer } from "./Table/Table";
 import { stickyBoxComponentRenderer } from "./StickyBox/StickyBox";
 import { badgeComponentRenderer } from "./Badge/Badge";
@@ -113,6 +114,7 @@ import {
   labelBehavior,
   variantBehavior,
   formBindingBehavior,
+  bookmarkBehavior,
 } from "../components-core/behaviors/CoreBehaviors";
 import type {
   LoaderRenderer,
@@ -439,6 +441,9 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_Fragment !== "false") {
       this.registerCoreComponent(fragmentComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_MessageListener !== "false") {
+      this.registerCoreComponent(messageListenerComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Table !== "false") {
       this.registerCoreComponent(tableComponentRenderer);
@@ -822,6 +827,7 @@ export class ComponentRegistry {
     this.registerBehavior(animationBehavior);
     this.registerBehavior(tooltipBehavior);
     this.registerBehavior(variantBehavior);
+    this.registerBehavior(bookmarkBehavior);
     this.registerBehavior(formBindingBehavior);
 
     // Register external behaviors from contributes

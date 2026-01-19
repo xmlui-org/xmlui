@@ -1,4 +1,6 @@
 // The type of action we can use with a proxy
+import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
+
 export type ProxyAction = "set" | "unset";
 
 // Proxy operation callback parameters
@@ -35,18 +37,28 @@ export function buildProxy(
       // --- function expressions.
       if (
         value &&
-        !value._ARROW_EXPR_ &&
-        !Object.isFrozen(value) &&
         typeof value === "object" &&
-        ["Array", "Object"].includes(value.constructor.name)
+        !Object.isFrozen(value)
       ) {
-        // --- Just to make sure that accessing the proxied objects' field gets 
-        // --- the same reference every time. e.g. this wouldn't be true otherwise: 
-        // --- proxiedObject['field'] === proxiedObject['field']
-        if (!proxiedValues.has(value)) {
-          proxiedValues.set(value, buildProxy(value, callback, tree.concat(prop)));
+        // Skip arrow expression objects
+        if (isArrowExpressionObject(value)) {
+          return value;
         }
-        return proxiedValues.get(value);
+        
+        // Check if it's a plain object or array
+        const obj = value as any;
+        if (
+          obj.constructor &&
+          ["Array", "Object"].includes(obj.constructor.name)
+        ) {
+          // --- Just to make sure that accessing the proxied objects' field gets 
+          // --- the same reference every time. e.g. this wouldn't be true otherwise: 
+          // --- proxiedObject['field'] === proxiedObject['field']
+          if (!proxiedValues.has(value)) {
+            proxiedValues.set(value, buildProxy(value, callback, tree.concat(prop)));
+          }
+          return proxiedValues.get(value);
+        }
       }
 
       // --- Do not create a proxy for other objects

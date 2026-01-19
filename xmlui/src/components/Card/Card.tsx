@@ -3,7 +3,7 @@ import styles from "./Card.module.scss";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dClick } from "../metadata-helpers";
-import { orientationOptionMd } from "../abstractions";
+import { orientationOptionMd, alignmentOptionValues } from "../abstractions";
 import { Card, defaultProps } from "./CardNative";
 
 const COMP = "Card";
@@ -70,9 +70,43 @@ export const CardMd = createMetadata({
       valueType: "string",
       defaultValue: defaultProps.orientation,
     },
+    horizontalAlignment: {
+      description: "Manages the horizontal content alignment for each child element in the Card.",
+      availableValues: alignmentOptionValues,
+      valueType: "string",
+      defaultValue: "start",
+    },
+    verticalAlignment: {
+      description: "Manages the vertical content alignment for each child element in the Card.",
+      availableValues: alignmentOptionValues,
+      valueType: "string",
+      defaultValue: "start",
+    },
   },
   events: {
     click: dClick(COMP),
+  },
+  apis: {
+    scrollToTop: {
+      description:
+        "Scrolls the Card container to the top. Works when the Card has an explicit height and overflowY is set to 'scroll'.",
+      signature: "scrollToTop(behavior?: 'auto' | 'instant' | 'smooth'): void",
+    },
+    scrollToBottom: {
+      description:
+        "Scrolls the Card container to the bottom. Works when the Card has an explicit height and overflowY is set to 'scroll'.",
+      signature: "scrollToBottom(behavior?: 'auto' | 'instant' | 'smooth'): void",
+    },
+    scrollToStart: {
+      description:
+        "Scrolls the Card container to the start (left in LTR, right in RTL). Works when the Card has an explicit width and overflowX is set to 'scroll'.",
+      signature: "scrollToStart(behavior?: 'auto' | 'instant' | 'smooth'): void",
+    },
+    scrollToEnd: {
+      description:
+        "Scrolls the Card container to the end (right in LTR, left in RTL). Works when the Card has an explicit width and overflowX is set to 'scroll'.",
+      signature: "scrollToEnd(behavior?: 'auto' | 'instant' | 'smooth'): void",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -81,12 +115,14 @@ export const CardMd = createMetadata({
     [`borderRadius-${COMP}`]: "$borderRadius",
     [`boxShadow-${COMP}`]: "none",
     [`backgroundColor-${COMP}`]: "$color-surface-raised",
+    [`backgroundColor-${COMP}--hover`]: "$color-surface-raised",
     [`gap-${COMP}`]: "var(--stack-gap-default)",
     [`gap-title-${COMP}`]: "$gap-none",
     [`gap-avatar-${COMP}`]: "$gap-normal",
     [`verticalAlignment-title-${COMP}`]: "center",
   },
   themeVarDescriptions: {
+    [`backgroundColor-${COMP}--hover`]: "The background color of the Card when hovered.",
     [`gap-${COMP}`]: "The gap between the component's children.",
     [`gap-title-${COMP}`]: "The gap between the title and the subtitle",
     [`gap-avatar-${COMP}`]: "The gap between the avatar and the title panel",
@@ -100,7 +136,7 @@ export const CardMd = createMetadata({
 export const cardComponentRenderer = createComponentRenderer(
   "Card",
   CardMd,
-  ({ node, extractValue, renderChild, className }) => {
+  ({ node, extractValue, renderChild, className, registerComponentApi, lookupEventHandler }) => {
     return (
       <Card
         className={className}
@@ -111,6 +147,10 @@ export const cardComponentRenderer = createComponentRenderer(
         showAvatar={extractValue.asOptionalBoolean(node.props.showAvatar)}
         avatarSize={extractValue.asOptionalString(node.props.avatarSize)}
         orientation={extractValue.asOptionalString(node.props.orientation)}
+        horizontalAlignment={extractValue.asOptionalString(node.props.horizontalAlignment)}
+        verticalAlignment={extractValue.asOptionalString(node.props.verticalAlignment)}
+        onClick={lookupEventHandler("click")}
+        registerComponentApi={registerComponentApi}
       >
         {renderChild(node.children, {
           type: "Stack",

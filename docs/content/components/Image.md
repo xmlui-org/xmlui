@@ -36,7 +36,9 @@ This property sets a preferred aspect ratio for the image, which will be used in
 
 This property contains the binary data that represents the image.
 
-### `fit` (default: "contain") [#fit-default-contain]
+### `fit` [#fit]
+
+-  default: **"contain"**
 
 This property sets how the image content should be resized to fit its container.
 
@@ -60,15 +62,21 @@ This property sets how the image content should be resized to fit its container.
 </App>
 ```
 
-### `grayscale` (default: false) [#grayscale-default-false]
+### `grayscale` [#grayscale]
+
+-  default: **false**
 
 When set to true, the image will be displayed in grayscale.
 
-### `inline` (default: false) [#inline-default-false]
+### `inline` [#inline]
+
+-  default: **false**
 
 When set to true, the image will be displayed as an inline element instead of a block element.
 
-### `lazyLoad` (default: false) [#lazyload-default-false]
+### `lazyLoad` [#lazyload]
+
+-  default: **false**
 
 Lazy loading instructs the browser to load the image only when it is imminently needed (e.g. user scrolls to it).
 

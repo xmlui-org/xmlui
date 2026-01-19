@@ -9,7 +9,9 @@ The `App` component is the root container that defines your application's overal
 
 ## Properties [#properties]
 
-### `autoDetectTone` (default: false) [#autodetecttone-default-false]
+### `autoDetectTone` [#autodetecttone]
+
+-  default: **false**
 
 This boolean property enables automatic detection of the system theme preference. When set to true and no defaultTone is specified, the app will automatically use "light" or "dark" tone based on the user's system theme setting. The app will also respond to changes in the system theme preference.
 
@@ -38,7 +40,7 @@ Available values:
 | `condensed-sticky` | However, the header and the navigation bar are in a single header block. |
 | `horizontal` | This layout stacks the layout sections in a single column in this order: header, navigation bar, main content, and footer. The application is a single scroll container; every part moves as you scroll the page. |
 | `horizontal-sticky` | Similar to `horizontal`, the header and the navigation bar dock to the top of the viewport, while the footer sticks to the bottom. |
-| `desktop` | This layout stretches the app to fill the entire browser viewport with zero padding and margins. The header (if present) docks to the top, the footer (if present) docks to the bottom, and the main content stretches to fill the remaining vertical and horizontal space. |
+| `desktop` | This layout is designed for desktop applications with a fixed viewport structure. The app fills the entire browser viewport (100vw × 100vh) with zero padding and margins. The header remains fixed at the top, the footer remains fixed at the bottom, and the main content dynamically fills all remaining vertical space between them. When the content overflows, only the main content area scrolls while the header and footer remain visible. This creates a classic desktop application layout with persistent header and footer regions. |
 
 Here are a few samples demonstrating the usage of the `layout` property. All samples use this markup, except the value of `App`'s layout and a few marked code snippets:
 
@@ -368,18 +370,22 @@ Optional template of the app logo
 
 Optional application name (visible in the browser tab). When you do not define this property, the tab name falls back to the one defined in the app's configuration. If the name is not configured, "XMLUI App" is displayed in the tab.
 
-### `noScrollbarGutters` (default: false) [#noscrollbargutters-default-false]
+### `noScrollbarGutters` [#noscrollbargutters]
+
+-  default: **false**
 
 This boolean property specifies whether the scrollbar gutters should be hidden.
 
-### `scrollWholePage` (default: true) [#scrollwholepage-default-true]
+### `scrollWholePage` [#scrollwholepage]
+
+-  default: **true**
 
 This boolean property specifies whether the whole page should scroll (`true`) or just the content area (`false`). The default value is `true`.
 
 This boolean property specifies whether the whole page should scroll (true) or just the content area (false).
 The default value is `true`.
 
-```xmlui-pg copy display name="Example: scrollWholePage" height="150px"
+```xmlui-pg copy display name="Example: scrollWholePage='false'" height="300px"
 <App scrollWholePage="false">
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
@@ -387,13 +393,54 @@ The default value is `true`.
   <Pages fallbackPath="/">
     <Page url="/">
       <Text>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-        Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
+        do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+        Ut enim ad minim veniam, quis nostrud exercitation ullamco 
+        laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure 
+        dolor in reprehenderit in voluptate velit esse cillum dolore eu 
+        fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, 
+        sunt in culpa qui officia deserunt mollit anim id est laborum.
       </Text>
     </Page>
   </Pages>
+</App>
+```
+
+When `scrollWholePage` is set to `false`, the main content panel's height is stretched to the remaining height of the viewport between the header and the footer.
+When you use star sizing, it calculates the effective height from the main content's height:
+
+```xmlui-pg copy display name="Example: scrollWholePage='false' (star-sizing)" height="300px"
+<App layout="horizontal" scrollWholePage="false">
+  <AppHeader>
+    Horizontal Splitter Example
+  </AppHeader>
+  <CHStack height="*" backgroundColor="lightblue">1/4</CHStack>
+  <CHStack height="3*" backgroundColor="lightcoral">3/4</CHStack>
+  <Footer>
+    Footer Content
+  </Footer>
+</App>
+```
+
+Here is a more complex example built on star-sizing:
+
+```xmlui-pg copy display name="Example: scrollWholePage='false' (with Splitter)" height="300px"
+<App layout="horizontal" scrollWholePage="false">
+  <AppHeader>
+    Horizontal Splitter Example
+  </AppHeader>
+  <HSplitter height="*" minPrimarySize="180px" maxPrimarySize="-180px">
+    <List
+      id="myList"
+      data="{ Array.from({ length: 100 }).map((_, i) => i) }"
+    >
+      <Card title="Item #{$item}" />
+    </List>
+    <Card title="Details" />
+  </HSplitter>
+  <Footer>
+    Footer Content
+  </Footer>
 </App>
 ```
 

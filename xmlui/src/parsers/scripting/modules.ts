@@ -1,5 +1,4 @@
-import type {
-  ScriptModule} from "../../components-core/script-runner/ScriptingSourceTree";
+import type { ScriptModule } from "../../components-core/script-runner/ScriptingSourceTree";
 import {
   T_FUNCTION_DECLARATION,
   type FunctionDeclaration,
@@ -31,10 +30,7 @@ export function isModuleErrors(result: ScriptModule | ModuleErrors): result is M
  * @param moduleResolver A function that resolves a module path to the text of the module
  * @returns The parsed and resolved module
  */
-export function parseScriptModule(
-  moduleName: string,
-  source: string
-): ScriptModule | ModuleErrors {
+export function parseScriptModule(moduleName: string, source: string): ScriptModule | ModuleErrors {
   // --- Keep track of parsed modules to avoid circular references
   const parsedModules = new Map<string, ScriptModule>();
   const moduleErrors: ModuleErrors = {};
@@ -43,10 +39,7 @@ export function parseScriptModule(
   return !parsedModule || Object.keys(moduleErrors).length > 0 ? moduleErrors : parsedModule;
 
   // --- Do the parsing, allow recursion
-  function doParseModule(
-    moduleName: string,
-    source: string
-  ): ScriptModule | null | undefined {
+  function doParseModule(moduleName: string, source: string): ScriptModule | null | undefined {
     // --- Do not parse the same module twice
     if (parsedModules.has(moduleName)) {
       return parsedModules.get(moduleName);
@@ -69,7 +62,8 @@ export function parseScriptModule(
       moduleErrors[moduleName].push({
         code: "W002",
         text: errorMessages["W002"].replace(/\{(\d+)}/g, () => lastToken.text),
-        position: lastToken.startLine,
+        position: lastToken.startPosition,
+        end: lastToken.endPosition,
         line: lastToken.startLine,
         column: lastToken.startColumn,
       });
@@ -122,9 +116,10 @@ export function parseScriptModule(
       errors.push({
         code,
         text: errorMessages[code].replace(/\{(\d+)}/g, (_, index) => args[index]),
-        position: stmt.startToken?.startPosition,
-        line: stmt.startToken?.startLine,
-        column: stmt.startToken?.startColumn,
+        position: stmt.startToken?.startPosition ?? 0,
+        end: stmt.startToken?.endPosition ?? 0,
+        line: stmt.startToken?.startLine ?? 1,
+        column: stmt.startToken?.startColumn ?? 1,
       });
     }
   }

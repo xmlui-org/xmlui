@@ -1,4 +1,4 @@
-import React, { type CSSProperties, forwardRef, memo, type ReactNode, useRef } from "react";
+import React, { type CSSProperties, forwardRef, memo, type ReactNode, useRef, useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
@@ -26,11 +26,14 @@ import { ExpandableItem } from "../ExpandableItem/ExpandableItemNative";
 import NestedAppAndCodeViewNative from "../NestedApp/AppWithCodeViewNative";
 import { CodeText } from "./CodeText";
 import { decodeFromBase64 } from "../../components-core/utils/base64-utils";
+import type { BreakMode, OverflowMode } from "../abstractions";
 
 // Default props for the Markdown component
 export const defaultProps = {
   removeIndents: true,
   removeBr: false,
+  overflowMode: undefined as OverflowMode | undefined,
+  breakMode: "normal" as BreakMode | undefined,
 };
 
 type MarkdownProps = {
@@ -42,6 +45,10 @@ type MarkdownProps = {
   codeHighlighter?: CodeHighlighter;
   showHeadingAnchors?: boolean;
   grayscale?: boolean;
+  truncateLinks?: boolean;
+  openLinkInNewTab?: boolean;
+  overflowMode?: OverflowMode;
+  breakMode?: BreakMode;
 };
 
 function PreTagComponent({ id, children, codeHighlighter }) {
@@ -96,6 +103,10 @@ export const Markdown = memo(
       codeHighlighter,
       showHeadingAnchors,
       grayscale,
+      truncateLinks,
+      openLinkInNewTab,
+      overflowMode = defaultProps.overflowMode,
+      breakMode = defaultProps.breakMode,
       ...rest
     }: MarkdownProps,
     ref,
@@ -123,6 +134,61 @@ export const Markdown = memo(
       }
     };
 
+    // Determine overflow mode classes based on overflowMode
+    const overflowClasses = useMemo(() => {
+      const classes: Record<string, boolean> = {};
+
+      // If overflowMode is not explicitly set, use original behavior
+      if (!overflowMode) {
+        return classes;
+      }
+
+      switch (overflowMode) {
+        case "none":
+          classes[styles.overflowNone] = true;
+          break;
+        case "scroll":
+          classes[styles.overflowScroll] = true;
+          break;
+        case "ellipsis":
+          classes[styles.overflowEllipsis] = true;
+          break;
+        case "flow":
+          classes[styles.overflowFlow] = true;
+          break;
+      }
+
+      return classes;
+    }, [overflowMode]);
+
+    // Determine break mode classes
+    const breakClasses = useMemo(() => {
+      const classes: Record<string, boolean> = {};
+
+      // Only apply break mode classes if explicitly set (preserves theme variable support)
+      if (breakMode) {
+        switch (breakMode) {
+          case "normal":
+            classes[styles.breakNormal] = true;
+            break;
+          case "word":
+            classes[styles.breakWord] = true;
+            break;
+          case "anywhere":
+            classes[styles.breakAnywhere] = true;
+            break;
+          case "keep":
+            classes[styles.breakKeep] = true;
+            break;
+          case "hyphenate":
+            classes[styles.breakHyphenate] = true;
+            break;
+        }
+      }
+
+      return classes;
+    }, [breakMode]);
+
     return (
       <div
         {...rest}
@@ -130,6 +196,9 @@ export const Markdown = memo(
         className={classnames(
           styles.markdownContent,
           { [styles.grayscale]: grayscale },
+          { [styles.truncateLinks]: truncateLinks },
+          overflowClasses,
+          breakClasses,
           className
         )}
         style={style}
@@ -292,7 +361,7 @@ export const Markdown = memo(
             li({ children, node, ...props }) {
               return (
                 <li className={styles.htmlLi} {...props}>
-                  <Text>{children}</Text>
+                  {children}
                 </li>
               );
             },
@@ -323,6 +392,11 @@ export const Markdown = memo(
                 }
               }
 
+              // Use openLinkInNewTab as default if no explicit target is set
+              if (!target && openLinkInNewTab) {
+                target = "_blank";
+              }
+
               return (
                 <LinkNative to={href} target={target} {...(props as any)}>
                   {label}
@@ -349,14 +423,14 @@ export const Markdown = memo(
                 </div>
               );
             },
-            tr({ children }) {
-              return <tr className={styles.htmlTr}>{children}</tr>;
+            tr({ children, ...props }) {
+              return <tr className={styles.htmlTr} {...props}>{children}</tr>;
             },
-            td({ children }) {
-              return <td className={styles.htmlTd}>{children}</td>;
+            td({ children, ...props }) {
+              return <td className={styles.htmlTd} {...props}>{children}</td>;
             },
-            th({ children }) {
-              return <th className={styles.htmlTh}>{children}</th>;
+            th({ children, ...props }) {
+              return <th className={styles.htmlTh} {...props}>{children}</th>;
             },
             thead({ children }) {
               return <thead className={styles.htmlThead}>{children}</thead>;
@@ -556,6 +630,9 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
       danger: <Icon name="admonition_danger" />,
       note: <Icon name="admonition_note" />,
       tip: <Icon name="admonition_tip" />,
+      card: null,
+      feat: <Icon name="star" />,
+      def: <Icon name="definition" />,
     };
 
     // Render adornment blockquote with the updated structure
@@ -567,13 +644,18 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
           [styles.danger]: type === "danger",
           [styles.note]: type === "note",
           [styles.tip]: type === "tip",
+          [styles.card]: type === "card",
+          [styles.feat]: type === "feat",
+          [styles.def]: type === "def",
         })}
         style={style}
       >
         <div className={styles.admonitionContainer}>
-          <div className={`${styles.admonitionIcon} ${styles[type] || ""}`}>
-            {iconMap[type] || <Icon name="admonition_info" />}
-          </div>
+          {iconMap[type] !== null && (
+            <div className={`${styles.admonitionIcon} ${styles[type] || ""}`}>
+              {iconMap[type] || <Icon name="admonition_info" />}
+            </div>
+          )}
           <div className={styles.admonitionContent}>{processedChildren}</div>
         </div>
       </blockquote>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { ErrCodes } from "../../../src/parsers/xmlui-parser/diagnostics";
-import { findTokenAtPos } from "../../../src/parsers/xmlui-parser/utils";
+import { ErrCodesParser } from "../../../src/parsers/xmlui-parser/diagnostics";
+import { findTokenAtOffset } from "../../../src/parsers/xmlui-parser/utils";
 import { SyntaxKind } from "../../../src/parsers/xmlui-parser/syntax-kind";
 import { parseSource } from "./xmlui";
 
@@ -163,7 +163,7 @@ describe("Xmlui parser", () => {
 
   it("Attribute quoteless", () => {
     const { errors } = parseSource("<Stack attr=val/>");
-    expect(errors[0].code).toEqual(ErrCodes.expAttrValue);
+    expect(errors[0].code).toEqual(ErrCodesParser.expAttrValue);
   });
 
   it("Attribute with dash works", () => {
@@ -260,7 +260,7 @@ describe("Xmlui parser - expected scanner errors", () => {
 
     expect(errors.length).toEqual(1);
     const err = errors[0];
-    expect(err.code).toEqual(ErrCodes.invalidChar);
+    expect(err.code).toEqual(ErrCodesParser.invalidChar);
     expect(err.pos).toEqual(3);
     expect(err.end).toEqual(4);
     expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<A #/>");
@@ -272,7 +272,7 @@ describe("Xmlui parser - expected scanner errors", () => {
 
     expect(errors).toHaveLength(1);
     const err = errors[0];
-    expect(err.code).toEqual(ErrCodes.invalidChar);
+    expect(err.code).toEqual(ErrCodesParser.invalidChar);
     expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<Stack ;></Stack>");
 
     const rootElem = node.children![0];
@@ -294,7 +294,7 @@ describe("Xmlui parser - expected scanner errors", () => {
 
     expect(errors.length).toEqual(1);
     const err = errors[0];
-    expect(err.code).toEqual(ErrCodes.untermComment);
+    expect(err.code).toEqual(ErrCodesParser.untermComment);
     expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<Stack><!--</Stack>");
 
     expect(childElements.children!.length).toEqual(1);
@@ -310,7 +310,7 @@ describe("Xmlui parser - expected scanner errors", () => {
 
     expect(childElements.children!.length).toEqual(1);
     const err = errors[0];
-    expect(err.code).toEqual(ErrCodes.untermStr);
+    expect(err.code).toEqual(ErrCodesParser.untermStr);
     expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<Stack> ' </Stack>");
   });
 
@@ -326,7 +326,7 @@ describe("Xmlui parser - expected scanner errors", () => {
 
     expect(errors.length).toEqual(1);
     const err = errors[0];
-    expect(err.code).toEqual(ErrCodes.untermCData);
+    expect(err.code).toEqual(ErrCodesParser.untermCData);
     expect(src.substring(err.contextPos, err.contextEnd)).toEqual(
       "<Stack> <![CDATA[hi there </Stack>",
     );
@@ -341,7 +341,7 @@ describe("Xmlui parser - expected scanner errors", () => {
     expect(node.children![0].kind).toEqual(SyntaxKind.ErrorNode);
     expect(node.children![1].kind).toEqual(SyntaxKind.TextNode);
     const err = errors[0];
-    expect(err.code).toEqual(ErrCodes.untermCData);
+    expect(err.code).toEqual(ErrCodesParser.untermCData);
     expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<![CDATA[hi there");
   });
 
@@ -357,7 +357,7 @@ describe("Xmlui parser - expected scanner errors", () => {
 
     expect(errors.length).toEqual(1);
     const err = errors[0];
-    expect(err.code).toEqual(ErrCodes.untermScript);
+    expect(err.code).toEqual(ErrCodesParser.untermScript);
     expect(src.substring(err.contextPos, err.contextEnd)).toEqual(
       "<Stack> <script>hi there </Stack>",
     );
@@ -370,7 +370,7 @@ describe("Xmlui parser - expected scanner errors", () => {
     const { errors } = parseSource(src);
     expect(errors).toHaveLength(1);
     const err = errors[0];
-    expect(err.code).toEqual(ErrCodes.invalidChar);
+    expect(err.code).toEqual(ErrCodesParser.invalidChar);
     expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<Stack ;>");
   });
 
@@ -381,7 +381,7 @@ describe("Xmlui parser - expected scanner errors", () => {
     const { errors } = parseSource(src);
     expect(errors).toHaveLength(1);
     const err = errors[0];
-    expect(err.code).toEqual(ErrCodes.invalidChar);
+    expect(err.code).toEqual(ErrCodesParser.invalidChar);
     expect(src.substring(err.contextPos, err.contextEnd)).toEqual("    <Button ;>Hello</Button>");
   });
 
@@ -390,7 +390,7 @@ describe("Xmlui parser - expected scanner errors", () => {
     const { errors } = parseSource(src);
     expect(errors).toHaveLength(1);
     const err = errors[0];
-    expect(err.code).toEqual(ErrCodes.invalidChar);
+    expect(err.code).toEqual(ErrCodesParser.invalidChar);
     expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<Button ;>Hello</Button>");
   });
 });
@@ -402,13 +402,13 @@ describe("Xmlui parser - expected parser errors", () => {
 
     expect(errors.length).toEqual(1);
     const err = errors[0];
-    expect(err.code).toEqual(ErrCodes.unexpectedCloseTag);
+    expect(err.code).toEqual(ErrCodesParser.unexpectedCloseTag);
     expect(src.substring(err.contextPos, err.contextEnd)).toEqual("</");
   });
 
   it("Uppercase attribute results in error", () => {
     const { errors } = parseSource("<Stack A='1' />");
-    expect(errors[0].code).toBe(ErrCodes.uppercaseAttr);
+    expect(errors[0].code).toBe(ErrCodesParser.uppercaseAttr);
   });
 
   it("Text after root element", () => {
@@ -423,49 +423,49 @@ describe("Xmlui parser - expected parser errors", () => {
     const src = "<>";
     const { errors } = parseSource(src);
     const err = errors[0];
-    expect(err.code).toBe(ErrCodes.expTagName);
+    expect(err.code).toBe(ErrCodesParser.expTagName);
     expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<>");
   });
 
   it("no closing with known name", () => {
     const { errors } = parseSource("<Text >");
-    expect(errors[0].code).toBe(ErrCodes.expCloseStartWithName);
+    expect(errors[0].code).toBe(ErrCodesParser.expCloseStartWithName);
   });
 
   it("Unmatched tag names", () => {
     const { errors } = parseSource("<Stack></NotStack>");
-    expect(errors[0].code).toBe(ErrCodes.tagNameMismatch);
+    expect(errors[0].code).toBe(ErrCodesParser.tagNameMismatch);
   });
 
   it("namespace without name has dedicated error, name matching turned off", () => {
     const { errors } = parseSource("<name:></A>");
     expect(errors).toHaveLength(1);
-    expect(errors[0].code).toBe(ErrCodes.expTagNameAfterNamespace);
+    expect(errors[0].code).toBe(ErrCodesParser.expTagNameAfterNamespace);
   });
 
   it("bad tokens in tag name and attrs result in only the 1st error", () => {
     const { errors } = parseSource("<: name= ></A>");
     expect(errors).toHaveLength(1);
-    expect(errors[0].code).toBe(ErrCodes.expTagName);
+    expect(errors[0].code).toBe(ErrCodesParser.expTagName);
   });
 
   it("bad tokens in tag name and attrs result in only the 1st error", () => {
     const { errors } = parseSource("<: name= >");
     expect(errors).toHaveLength(2);
-    expect(errors[0].code).toBe(ErrCodes.expTagName);
-    expect(errors[1].code).toBe(ErrCodes.expCloseStart);
+    expect(errors[0].code).toBe(ErrCodesParser.expTagName);
+    expect(errors[1].code).toBe(ErrCodesParser.expCloseStart);
   });
 
   it("bad token in attrList result in 1 error", () => {
     const { errors } = parseSource("<A '' = ''  ></A>");
     expect(errors).toHaveLength(1);
-    expect(errors[0].code).toBe(ErrCodes.expAttrName);
+    expect(errors[0].code).toBe(ErrCodesParser.expAttrName);
   });
 
   it("missing /> before </ results in 1 error", () => {
     const { errors, node } = parseSource("<A> <B </A>");
     expect(errors).toHaveLength(1);
-    expect(errors[0].code).toBe(ErrCodes.expEndOrClose);
+    expect(errors[0].code).toBe(ErrCodesParser.expEndOrClose);
     const tagA = node.children[0];
     const tagAList = tagA.children[3];
     const tagB = tagAList.children[0];
@@ -487,25 +487,25 @@ describe("Xmlui parser - expected parser errors", () => {
 </A>`,
     );
     expect(errors).toHaveLength(1);
-    expect(errors[0].code).toBe(ErrCodes.expEndOrClose);
+    expect(errors[0].code).toBe(ErrCodesParser.expEndOrClose);
   });
 
   it("duplicate attributes", () => {
     const { errors } = parseSource("<A enabled enabled/>");
     expect(errors).toHaveLength(1);
-    expect(errors[0].code).toBe(ErrCodes.duplAttr);
+    expect(errors[0].code).toBe(ErrCodesParser.duplAttr);
   });
 
   it("duplicate attributes with namespace", () => {
     const { errors } = parseSource("<A ns:enabled ns:enabled/>");
     expect(errors).toHaveLength(1);
-    expect(errors[0].code).toBe(ErrCodes.duplAttr);
+    expect(errors[0].code).toBe(ErrCodesParser.duplAttr);
   });
 
   it("namespace without attribute name", () => {
     const { errors } = parseSource("<A ns:='hi' enabled/>");
     expect(errors).toHaveLength(1);
-    expect(errors[0].code).toBe(ErrCodes.expAttrNameAfterNamespace);
+    expect(errors[0].code).toBe(ErrCodesParser.expAttrNameAfterNamespace);
   });
 
   it("multi-line unexpected close tag", () => {
@@ -516,7 +516,7 @@ describe("Xmlui parser - expected parser errors", () => {
     const { errors } = parseSource(src);
     expect(errors).toHaveLength(1);
     const err = errors[0];
-    expect(err.code).toBe(ErrCodes.unexpectedCloseTag);
+    expect(err.code).toBe(ErrCodesParser.unexpectedCloseTag);
     expect(src.substring(err.contextPos, err.contextEnd)).toEqual(`</Stack>
 </UnexpectedTag>`);
   });
@@ -530,7 +530,7 @@ describe("Xmlui parser - expected parser errors", () => {
     const { errors } = parseSource(src);
     expect(errors).toHaveLength(1);
     const err = errors[0];
-    expect(err.code).toBe(ErrCodes.tagNameMismatch);
+    expect(err.code).toBe(ErrCodesParser.tagNameMismatch);
     expect(src.substring(err.contextPos, err.contextEnd)).toEqual(`    <Button>Hello</Button>
 </NotStack>
 `);
@@ -542,7 +542,7 @@ describe("Xmlui parser - expected parser errors", () => {
     const { errors } = parseSource(src);
     expect(errors).toHaveLength(1);
     const err = errors[0];
-    expect(err.code).toBe(ErrCodes.tagNameMismatch);
+    expect(err.code).toBe(ErrCodesParser.tagNameMismatch);
     expect(src.substring(err.contextPos, err.contextEnd)).toEqual(
       `<Stack>\r\n<Button>Hello</NOTBUTTON>\r\n</Stack>`,
     );
@@ -554,7 +554,7 @@ describe("Xmlui parser - expected parser errors", () => {
 </Stack>`;
     const { errors } = parseSource(src);
     const err = errors[0];
-    expect(err.code).toBe(ErrCodes.expTagName);
+    expect(err.code).toBe(ErrCodesParser.expTagName);
     expect(src.substring(err.contextPos, err.contextEnd)).toEqual(`<Stack>
 <>
 </Stack>`);
@@ -804,16 +804,16 @@ describe("namescpaces", () => {
 
   it("Single node with namespace fails #1", () => {
     const { errors } = parseSource("<ns:Stack></Stack>");
-    expect(errors[0].code).toBe(ErrCodes.tagNameMismatch);
+    expect(errors[0].code).toBe(ErrCodesParser.tagNameMismatch);
   });
   it("Single node with namespace fails #2", () => {
     const { errors } = parseSource("<Stack></ns:Stack>");
-    expect(errors[0].code).toBe(ErrCodes.tagNameMismatch);
+    expect(errors[0].code).toBe(ErrCodesParser.tagNameMismatch);
   });
 
   it("Single node with namespace fails #3", () => {
     const { errors } = parseSource("<other:Stack></ns:Stack>");
-    expect(errors[0].code).toBe(ErrCodes.tagNameMismatch);
+    expect(errors[0].code).toBe(ErrCodesParser.tagNameMismatch);
   });
 
   it("has namespace on attribute", () => {
@@ -848,42 +848,42 @@ const selfCloseTag = '<A b="c"/> ';
 describe("find token at pos", () => {
   it("before first token", () => {
     const { node } = parseSource(selfCloseTag);
-    const { chainAtPos, chainBeforePos } = findTokenAtPos(node, 0)!;
+    const { chainAtPos, chainBeforePos } = findTokenAtOffset(node, 0)!;
     expect(chainBeforePos).toBeUndefined();
     expect(chainAtPos?.[chainAtPos.length - 1].kind).toBe(SyntaxKind.OpenNodeStart);
   });
 
   it("after last token", () => {
     const { node } = parseSource(selfCloseTag);
-    const { chainAtPos, chainBeforePos } = findTokenAtPos(node, selfCloseTag.length)!;
+    const { chainAtPos, chainBeforePos } = findTokenAtOffset(node, selfCloseTag.length)!;
     expect(chainBeforePos?.[chainBeforePos.length - 1].kind).toBe(SyntaxKind.NodeClose);
     expect(chainAtPos?.[chainAtPos.length - 1].kind).toBe(SyntaxKind.EndOfFileToken);
   });
 
   it("inside token", () => {
     const { node } = parseSource(selfCloseTag);
-    const { chainAtPos, chainBeforePos } = findTokenAtPos(node, 7)!;
+    const { chainAtPos, chainBeforePos } = findTokenAtOffset(node, 7)!;
     expect(chainBeforePos).toBeUndefined();
     expect(chainAtPos?.[chainAtPos.length - 1].kind).toBe(SyntaxKind.StringLiteral);
   });
 
   it("between 2 tokens", () => {
     const { node } = parseSource(selfCloseTag);
-    const { chainAtPos, chainBeforePos } = findTokenAtPos(node, 4)!;
+    const { chainAtPos, chainBeforePos } = findTokenAtOffset(node, 4)!;
     expect(chainBeforePos?.[chainBeforePos.length - 1].kind).toBe(SyntaxKind.Identifier);
     expect(chainAtPos?.[chainAtPos.length - 1].kind).toBe(SyntaxKind.Equal);
   });
 
   it("between 2 tokens, at trivia", () => {
     const { node } = parseSource(selfCloseTag);
-    const { chainAtPos, chainBeforePos } = findTokenAtPos(node, 3)!;
+    const { chainAtPos, chainBeforePos } = findTokenAtOffset(node, 3)!;
     expect(chainBeforePos?.[chainBeforePos.length - 1].kind).toBe(SyntaxKind.Identifier);
     expect(chainAtPos?.[chainAtPos.length - 1].kind).toBe(SyntaxKind.Identifier);
   });
 
   it("between token and Eof, at trivia", () => {
     const { node } = parseSource(selfCloseTag);
-    const { chainAtPos, chainBeforePos } = findTokenAtPos(node, 10)!;
+    const { chainAtPos, chainBeforePos } = findTokenAtOffset(node, 10)!;
     expect(chainBeforePos?.[chainBeforePos.length - 1].kind).toBe(SyntaxKind.NodeClose);
     expect(chainAtPos?.[chainAtPos.length - 1].kind).toBe(SyntaxKind.EndOfFileToken);
   });

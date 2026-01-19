@@ -139,16 +139,21 @@ function SplitterRenderer({
 
   // Let XMLUI handle the conditional rendering, then count the non-null results
   const renderedChildren = useMemo(() => {
+    const layoutContext = {
+      type: "Stack" as const,
+      orientation,
+    };
+    
     if (!Array.isArray(node.children)) {
-      const rendered = renderChild(node.children);
+      const rendered = renderChild(node.children, layoutContext);
       return rendered ? [rendered] : [];
     }
     
     return node.children
-      .map((child) => renderChild(child))
+      .map((child) => renderChild(child, layoutContext))
       .filter(child => child !== null && child !== undefined)
       .map((child, index) => React.cloneElement(child as React.ReactElement, { key: index }));
-  }, [node.children, renderChild]);
+  }, [node.children, renderChild, orientation]);
 
   const visibleChildCount = renderedChildren.length;
 

@@ -153,14 +153,12 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
   }
 }
 
-@layer components {
+  @layer components {
   .text {
-    display: inline;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    display: inline-block;
     margin: 0;
     padding: 0;
-    min-height: fit-content;
+    vertical-align: baseline;
 
     &.default {
       @include textVariant("");
@@ -371,10 +369,15 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
   See this source for details: https://css-tricks.com/line-clampin/
   */
   .truncateOverflow {
+    display: inline-block;
     overflow: hidden;
     overflow-wrap: break-word;
     white-space: nowrap;
     max-width: 100%;
+    vertical-align: baseline;
+    line-height: normal;
+    text-overflow: ellipsis;
+    min-height: fit-content;
   }
 
   .preserveLinebreaks {

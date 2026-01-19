@@ -1,7 +1,60 @@
-export interface GeneralDiagnosticMessage {
-  code: ErrCodes;
-  category: DiagnosticCategory;
+import { ErrorCodes } from "../scripting/ParserError";
+
+export interface GeneralDiag {
+  readonly code: ErrCodesParser | ErrCodesTransform;
+  readonly message: string;
+  readonly pos: number;
+  readonly end: number;
+  readonly contextPos: number;
+  readonly contextEnd: number;
+}
+
+export interface TransformDiagPositionless {
+  code: ErrCodesTransform;
   message: string;
+}
+
+export interface ParserDiagPositionless {
+  code: ErrCodesParser;
+  message: string;
+}
+
+export class TransformDiag extends Error {
+  public code: ErrCodesTransform;
+  public message: string;
+  public pos?: number;
+  public end?: number;
+  readonly contextPos?: number;
+  readonly contextEnd?: number;
+
+  constructor(
+    diagPositionless: TransformDiagPositionless,
+    pos?: number,
+    end?: number,
+    contextPos?: number,
+    contextEnd?: number,
+  ) {
+    super(diagPositionless.message);
+    this.code = diagPositionless.code;
+    this.message = diagPositionless.message;
+    this.pos = pos;
+    this.end = end;
+    this.contextPos = contextPos;
+    this.contextEnd = contextEnd;
+  }
+
+  override toString(): string {
+    return `${this.code}: ${this.message}`;
+  }
+}
+
+export interface ParserDiag {
+  readonly code: ErrCodesParser;
+  readonly message: string;
+  readonly pos: number;
+  readonly end: number;
+  readonly contextPos: number;
+  readonly contextEnd: number;
 }
 
 export enum DiagnosticCategory {
@@ -11,7 +64,7 @@ export enum DiagnosticCategory {
   Hint = 4,
 }
 
-export enum ErrCodes {
+export enum ErrCodesParser {
   onlyOneElem = "U002",
   expTagOpen = "U003",
   expTagName = "U004",
@@ -36,149 +89,295 @@ export enum ErrCodes {
   untermCData = "W008",
   untermScript = "W009",
 }
-
-export const DIAGS = {
+export const DIAGS_PARSER = {
   unexpectedCloseTag: {
-    category: DiagnosticCategory.Error,
-    code: ErrCodes.unexpectedCloseTag,
+    code: ErrCodesParser.unexpectedCloseTag,
     message: "Read '</', but there's no opening tag to close.",
   },
   expCloseStartWithName: function (openTagName: string) {
     return {
-      category: DiagnosticCategory.Error,
-      code: ErrCodes.expCloseStartWithName,
+      code: ErrCodesParser.expCloseStartWithName,
       message: `Opened tag has no closing pair. Expected to see '</${openTagName}>'.`,
     };
   },
   expCloseStart: {
-    category: DiagnosticCategory.Error,
-    code: ErrCodes.expCloseStart,
+    code: ErrCodesParser.expCloseStart,
     message: "A '</' token expected.",
   },
   uppercaseAttr: function (attrName: string) {
     return {
-      category: DiagnosticCategory.Error,
-      code: ErrCodes.uppercaseAttr,
+      code: ErrCodesParser.uppercaseAttr,
       message: `Attribute name '${attrName}' cannot start with an uppercase letter.`,
     };
   },
   duplAttr: function (attrName: string) {
     return {
-      category: DiagnosticCategory.Error,
-      code: ErrCodes.duplAttr,
+      code: ErrCodesParser.duplAttr,
       message: `Duplicated attribute: '${attrName}'.`,
     };
   },
   tagNameMismatch: function (openTagName: string, closeTagName: string) {
     return {
-      category: DiagnosticCategory.Error,
-      code: ErrCodes.tagNameMismatch,
+      code: ErrCodesParser.tagNameMismatch,
       message: `Opening and closing tag names should match. Opening tag has a name '${openTagName}', but the closing tag name is '${closeTagName}'.`,
     };
   },
   invalidChar: function (char: string) {
     return {
-      category: DiagnosticCategory.Error,
-      code: ErrCodes.invalidChar,
+      code: ErrCodesParser.invalidChar,
       message: `Invalid character '${char}'.`,
     };
   },
   expEnd: {
-    category: DiagnosticCategory.Error,
-    code: ErrCodes.expEnd,
+    code: ErrCodesParser.expEnd,
     message: "A '>' token expected.",
   },
   expTagName: {
-    category: DiagnosticCategory.Error,
-    code: ErrCodes.expTagName,
+    code: ErrCodesParser.expTagName,
     message: "A tag name expected.",
   },
   expAttrStr: {
-    category: DiagnosticCategory.Error,
-    code: ErrCodes.expAttrValue,
+    code: ErrCodesParser.expAttrValue,
     message: `A string expected as an attribute value after '='.`,
   },
   expEq: {
-    category: DiagnosticCategory.Error,
-    code: ErrCodes.expEq,
+    code: ErrCodesParser.expEq,
     message: "An '=' token expected.",
   },
   expTagOpen: {
-    category: DiagnosticCategory.Error,
-    code: ErrCodes.expTagOpen,
+    code: ErrCodesParser.expTagOpen,
     message: "A '<' token expected.",
   },
   expEndOrClose: {
-    category: DiagnosticCategory.Error,
-    code: ErrCodes.expEndOrClose,
+    code: ErrCodesParser.expEndOrClose,
     message: `A '>' or '/>' token expected.`,
   },
   expAttrName: {
-    category: DiagnosticCategory.Error,
-    code: ErrCodes.expAttrName,
+    code: ErrCodesParser.expAttrName,
     message: `An attribute name expected.`,
   },
   expAttrNameAfterNamespace: function (namespaceName: string) {
     return {
-      category: DiagnosticCategory.Error,
-      code: ErrCodes.expAttrNameAfterNamespace,
+      code: ErrCodesParser.expAttrNameAfterNamespace,
       message: `An attribute name expected after namespace '${namespaceName}'.`,
     };
   },
   expTagNameAfterNamespace: function (namespaceName: string) {
     return {
-      category: DiagnosticCategory.Error,
-      code: ErrCodes.expTagNameAfterNamespace,
+      code: ErrCodesParser.expTagNameAfterNamespace,
       message: `A tag name expected after namespace '${namespaceName}'.`,
     };
   },
   expTagNameAfterCloseStart: {
-    category: DiagnosticCategory.Error,
-    code: ErrCodes.expTagNameAfterCloseStart,
+    code: ErrCodesParser.expTagNameAfterCloseStart,
     message: "Expected tag name after '</'.",
   },
   expAttrNameBeforeEq: {
-    category: DiagnosticCategory.Error,
-    code: ErrCodes.expAttrNameBeforeEq,
+    code: ErrCodesParser.expAttrNameBeforeEq,
     message: "Expected attribute name before '='.",
   },
 } as const;
 
-export function diagnosticCategoryName(
-  d: { category: DiagnosticCategory },
-  lowerCase = true,
-): string {
-  const name = DiagnosticCategory[d.category];
-  return lowerCase ? name.toLowerCase() : name;
-}
+export const ErrCodesTransform = {
+  singleRootElem: "T001",
+  compDefNameUppercase: "T002",
+  compDefNameExp: "T003",
+  multipleScriptTags: "T004",
+  compDefNesedElem: "T005",
+  nestedCompDefs: "T006",
+  invalidAttrName: "T007",
+  eventNoOnPrefix: "T008",
+  invalidNodeName: "T009",
+  noTextChild: "T010",
+  onlyNameValueAttrs: "T011",
+  nameAttrRequired: "T012",
+  loaderIdRequired: "T013",
+  loaderCantHave: "T014",
+  usesValueOnly: "T015",
+  onlyFieldOrItemChild: "T016",
+  cannotMixFieldItem: "T017",
+  cantHaveNameAttr: "T018",
+  valueAttrRequired: "T019",
+  cannotMixCompNonComp: "T020",
+  invalidReusableCompAttr: "T021",
+  scriptNoAttrs: "T022",
+  cantPutReusableDefInSlot: "T024",
+  duplXmlns: "T025",
+  rootCompNoNamespace: "T026",
+  nsNotFound: "T027",
+  nsValueIncorrect: "T028",
+  nsSchemeIncorrect: "T029",
+  scriptParse: "T030",
+  ...ErrorCodes,
+} as const;
+
+export type ErrCodesTransform = (typeof ErrCodesTransform)[keyof typeof ErrCodesTransform];
+
+export const DIAGS_TRANSFORM = {
+  singleRootElem: {
+    code: ErrCodesTransform.singleRootElem,
+    message: "A component definition must have exactly one XMLUI element.",
+  },
+  compDefNameUppercase: {
+    code: ErrCodesTransform.compDefNameUppercase,
+    message: "A component definition's name must start with an uppercase letter.",
+  },
+  compDefNameExp: {
+    code: ErrCodesTransform.compDefNameExp,
+    message: "A reusable component must have a non-empty name.",
+  },
+  multipleScriptTags: {
+    code: ErrCodesTransform.multipleScriptTags,
+    message: "Cannot have multiple <script> tags in the same tag.",
+  },
+  compDefNesedElem: {
+    code: ErrCodesTransform.compDefNesedElem,
+    message: "A reusable component must have at least one nested component definition.",
+  },
+  nestedCompDefs: {
+    code: ErrCodesTransform.nestedCompDefs,
+    message: "A reusable component definition cannot nest another one.",
+  },
+  invalidAttrName: function (attrName: string) {
+    return {
+      code: ErrCodesTransform.invalidAttrName,
+      message: `Invalid attribute name: '${attrName}'.`,
+    };
+  },
+  eventNoOnPrefix: function (attrName: string) {
+    return {
+      code: ErrCodesTransform.eventNoOnPrefix,
+      message: `Event attribute names should not start with 'on' prefix: '${attrName}'.`,
+    };
+  },
+  invalidNodeName: function (nodeName: string) {
+    return {
+      code: ErrCodesTransform.invalidNodeName,
+      message: `Invalid node name '${nodeName}' in a component definition.`,
+    };
+  },
+  noTextChild: function (elementName: string) {
+    return {
+      code: ErrCodesTransform.noTextChild,
+      message: `The '${elementName}' element does not accept a text child.`,
+    };
+  },
+  onlyNameValueAttrs: function (elementName: string) {
+    return {
+      code: ErrCodesTransform.onlyNameValueAttrs,
+      message: `Only 'name', 'value', and type hint attributes are accepted in '${elementName}'.`,
+    };
+  },
+  nameAttrRequired: function (elementName: string) {
+    return {
+      code: ErrCodesTransform.nameAttrRequired,
+      message: `The 'name' attribute in '${elementName}' is required.`,
+    };
+  },
+  loaderIdRequired: {
+    code: ErrCodesTransform.loaderIdRequired,
+    message: "A loader element must have an id.",
+  },
+  loaderCantHave: function (attrName: string) {
+    return {
+      code: ErrCodesTransform.loaderCantHave,
+      message: `A loader element must not have '${attrName}'.`,
+    };
+  },
+  usesValueOnly: {
+    code: ErrCodesTransform.usesValueOnly,
+    message: "The uses element must define only a non-empty 'value' attribute.",
+  },
+  onlyFieldOrItemChild: {
+    code: ErrCodesTransform.onlyFieldOrItemChild,
+    message: "Only 'field' or 'item' are accepted as a child element.",
+  },
+  cannotMixFieldItem: {
+    code: ErrCodesTransform.cannotMixFieldItem,
+    message: "Cannot mix 'field' and 'item' nodes within an element.",
+  },
+  cantHaveNameAttr: function (nodeName: string) {
+    return {
+      code: ErrCodesTransform.cantHaveNameAttr,
+      message: `The '${nodeName}' node cannot have a 'name' attribute.`,
+    };
+  },
+  valueAttrRequired: function (elementName: string) {
+    return {
+      code: ErrCodesTransform.valueAttrRequired,
+      message: `The 'value' attribute in '${elementName}' is required.`,
+    };
+  },
+  cannotMixCompNonComp: {
+    code: ErrCodesTransform.cannotMixCompNonComp,
+    message: "Cannot mix nested components and non-component children.",
+  },
+  invalidReusableCompAttr: function (attrName: string) {
+    return {
+      code: ErrCodesTransform.invalidReusableCompAttr,
+      message: `Invalid reusable component attribute '${attrName}'.`,
+    };
+  },
+  scriptNoAttrs: {
+    code: ErrCodesTransform.scriptNoAttrs,
+    message: "The 'script' tag must not have any attribute.",
+  },
+  cantPutReusableDefInSlot: {
+    code: ErrCodesTransform.cantPutReusableDefInSlot,
+    message: "Cannot put a reusable component definitions into a slot.",
+  },
+  duplXmlns: function (namespace: string) {
+    return {
+      code: ErrCodesTransform.duplXmlns,
+      message: `Duplicate xmlns found: '${namespace}'.`,
+    };
+  },
+  rootCompNoNamespace: {
+    code: ErrCodesTransform.rootCompNoNamespace,
+    message: "The top level component's name cannot have a namespace.",
+  },
+  nsNotFound: function (namespace: string) {
+    return {
+      code: ErrCodesTransform.nsNotFound,
+      message: `Cannot resolve namespace '${namespace}'. It was not defined in any of the ancestor components.`,
+    };
+  },
+  nsValueIncorrect: function (namespace: string, details: string) {
+    return {
+      code: ErrCodesTransform.nsValueIncorrect,
+      message: `Incorrect namespace value '${namespace}'. ${details}`,
+    };
+  },
+  nsSchemeIncorrect: function (namespace: string, defaultScheme: string) {
+    return {
+      code: ErrCodesTransform.nsSchemeIncorrect,
+      message: `Incorrect scheme specified before ':' (colon) in namespace ${namespace}. Delete it to get the default '${defaultScheme}'.`,
+    };
+  },
+} as const;
 
 export const Diag_Invalid_Character = {
-  code: ErrCodes.invalidChar,
-  category: DiagnosticCategory.Error,
+  code: ErrCodesParser.invalidChar,
   message: "Invalid character.",
 } as const;
 
 export const Diag_Unterminated_String_Literal = {
-  code: ErrCodes.untermStr,
-  category: DiagnosticCategory.Error,
+  code: ErrCodesParser.untermStr,
   message: "Unterminated string literal.",
 } as const;
 
 export const Diag_Unterminated_Comment = {
-  code: ErrCodes.untermComment,
-  category: DiagnosticCategory.Error,
+  code: ErrCodesParser.untermComment,
   message: "Unterminated comment",
 } as const;
 
 export const Diag_Unterminated_CData = {
-  code: ErrCodes.untermCData,
-  category: DiagnosticCategory.Error,
+  code: ErrCodesParser.untermCData,
   message: "Unterminated CDATA section",
 } as const;
 
 export const Diag_Unterminated_Script = {
-  code: ErrCodes.untermScript,
-  category: DiagnosticCategory.Error,
+  code: ErrCodesParser.untermScript,
   message: "Unterminated script section",
 } as const;
 
