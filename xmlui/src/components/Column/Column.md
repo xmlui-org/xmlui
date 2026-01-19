@@ -81,13 +81,13 @@
 
 %-PROP-START canSort
 
-Click on either the `Name` or the `Quantity` column headers to order the data by that attribute.
+Columns with `bindTo` are sortable by default. Click on the `Name` or `Quantity` column headers to order the data. The `Unit` column has sorting explicitly disabled with `canSort="false"`.
 
 ```xmlui copy /canSort/
 <App>
   <Table data='{[...]}'>
-    <Column canSort="true" bindTo="name" />
-    <Column canSort="true" bindTo="quantity" />
+    <Column bindTo="name" />
+    <Column bindTo="quantity" />
     <Column canSort="false" bindTo="unit" />
   </Table>
 </App>
@@ -146,11 +146,21 @@ Click on either the `Name` or the `Quantity` column headers to order the data by
       key: 0,
     },
   ]}'>
-    <Column canSort="true" bindTo="name" />
-    <Column canSort="true" bindTo="quantity" />
+    <Column bindTo="name" />
+    <Column bindTo="quantity" />
     <Column canSort="false" bindTo="unit" />
   </Table>
 </App>
+```
+
+To change the default for all columns in your app, set `columnCanSortDefault` in `config.json`:
+
+```json
+{
+  "appGlobals": {
+    "columnCanSortDefault": false
+  }
+}
 ```
 
 %-PROP-END

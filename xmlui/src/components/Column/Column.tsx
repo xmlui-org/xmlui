@@ -93,13 +93,15 @@ export const columnComponentRenderer = createComponentRenderer(
   COMP,
   ColumnMd,
   (rendererContext) => {
-    const { node, renderChild, extractValue, className } = rendererContext;
+    const { node, renderChild, extractValue, className, appContext } = rendererContext;
+    // Allow config.json to override the default canSort value via appGlobals.columnCanSortDefault
+    const canSortDefault = appContext?.appGlobals?.columnCanSortDefault ?? defaultProps.canSort;
     return (
       <Column
         className={className}
         header={extractValue.asDisplayText(node.props.header)}
         accessorKey={extractValue.asOptionalString(node.props.bindTo)}
-        canSort={extractValue.asOptionalBoolean(node.props.canSort, defaultProps.canSort)}
+        canSort={extractValue.asOptionalBoolean(node.props.canSort, canSortDefault)}
         canResize={extractValue.asOptionalBoolean(node.props.canResize)}
         pinTo={extractValue.asOptionalString(node.props.pinTo)}
         width={extractValue(node.props.width)}

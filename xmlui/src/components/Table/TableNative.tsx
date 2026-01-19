@@ -430,7 +430,7 @@ export const Table = forwardRef(
           minSize: minWidth,
           maxSize: maxWidth,
           enableResizing: col.canResize,
-          enableSorting: col.canSort && !!col.accessorKey,
+          enableSorting: col.canSort !== false && !!col.accessorKey,
           enablePinning: col.pinTo !== undefined,
           meta: {
             starSizedWidth,
