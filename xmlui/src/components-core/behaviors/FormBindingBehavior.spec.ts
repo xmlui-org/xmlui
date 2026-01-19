@@ -15,6 +15,21 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("textbox")).toHaveValue("initial value");
   });
 
+  test("TextBox type='password' binds to Form data", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form onSubmit="data => testState = data">
+        <PasswordInput testId="password" bindTo="secret" />
+      </Form>
+    `);
+
+    await page.getByRole("textbox").fill("topsecret");
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect.poll(testStateDriver.testState).toEqual({
+      secret: "topsecret",
+    });
+  });
+
   test("TextBox with 'bindTo' updates Form data on change", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Form onSubmit="data => testState = data">
@@ -245,6 +260,33 @@ test.describe("Basic Functionality", () => {
     await page.getByRole("button", { name: "Save" }).click();
     await expect.poll(testStateDriver.testState).toEqual({
       selection: "Apple",
+    });
+  });
+
+  test("FileInput with 'bindTo' works correctly", async ({
+    initTestBed,
+    page,
+    createFileInputDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form onSubmit="data => testState = data">
+        <FileInput testId="fileInput" bindTo="files" parseAs="csv" />
+      </Form>
+    `);
+
+    const driver = await createFileInputDriver("fileInput");
+    await driver.getHiddenInput().setInputFiles({
+      name: "sample.csv",
+      mimeType: "text/csv",
+      buffer: Buffer.from("name,price\nWidget,10\nGadget,20\n"),
+    });
+
+    await page.getByRole("button", { name: "Save" }).click();
+    await expect.poll(testStateDriver.testState).toEqual({
+      files: [
+        { name: "Widget", price: "10" },
+        { name: "Gadget", price: "20" },
+      ],
     });
   });
 });

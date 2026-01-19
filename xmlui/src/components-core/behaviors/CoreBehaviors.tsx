@@ -305,6 +305,7 @@ function VariantWrapper({
  */
 const FORM_BINDABLE_COMPONENTS = [
   "TextBox",
+  "PasswordInput",
   "TextArea",
   "NumberBox",
   "Toggle",
