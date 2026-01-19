@@ -41,11 +41,15 @@ In the following example, the two Checkbox are functionally the same:
 
 ## Properties [#properties]
 
-### `autoFocus` (default: false) [#autofocus-default-false]
+### `autoFocus` [#autofocus]
+
+-  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `enabled` (default: true) [#enabled-default-true]
+### `enabled` [#enabled]
+
+-  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -64,7 +68,9 @@ This boolean property value indicates whether the component responds to user eve
 </App>
 ```
 
-### `indeterminate` (default: false) [#indeterminate-default-false]
+### `indeterminate` [#indeterminate]
+
+-  default: **false**
 
 The `true` value of this property signals that the component is in an _intedeterminate state_.
 
@@ -93,7 +99,9 @@ The following sample binds the state of two checkboxes to one and updates the st
 Try this sample by clicking the bottom group of checkboxes.
 ```
 
-### `initialValue` (default: false) [#initialvalue-default-false]
+### `initialValue` [#initialvalue]
+
+-  default: **false**
 
 This property sets the component's initial value.
 
@@ -101,7 +109,9 @@ This property sets the component's initial value.
 
 This property is used to define a custom checkbox input template
 
-### `readOnly` (default: false) [#readonly-default-false]
+### `readOnly` [#readonly]
+
+-  default: **false**
 
 Set this property to `true` to disallow changing the component value.
 
@@ -112,11 +122,15 @@ Set this property to `true` to disallow changing the component value.
 </App>
 ```
 
-### `required` (default: false) [#required-default-false]
+### `required` [#required]
+
+-  default: **false**
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `validationStatus` (default: "none") [#validationstatus-default-none]
+### `validationStatus` [#validationstatus]
+
+-  default: **"none"**
 
 This property allows you to set the validation status of the input component.
 

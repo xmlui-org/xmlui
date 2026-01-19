@@ -60,13 +60,17 @@ For a comprehensive example, see [How to paginate a List](../howto/paginate-a-li
 
 ## Properties [#properties]
 
-### `buttonRowPosition` (default: "center") [#buttonrowposition-default-center]
+### `buttonRowPosition` [#buttonrowposition]
+
+-  default: **"center"**
 
 Determines where to place the pagination button row in the layout.
 
 Available values: `start`, `center` **(default)**, `end`
 
-### `enabled` (default: true) [#enabled-default-true]
+### `enabled` [#enabled]
+
+-  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -82,7 +86,9 @@ Whether to disable the previous page button. Only takes effect if itemCount is n
 
 Total number of items to paginate. If not provided, the component renders simplified pagination controls that are enabled/disabled using the `hasPrevPage` and `hasNextPage` props.
 
-### `maxVisiblePages` (default: 1) [#maxvisiblepages-default-1]
+### `maxVisiblePages` [#maxvisiblepages]
+
+-  default: **1**
 
 Maximum number of page buttons to display. If the value is not among the allowed values, it will fall back to the default.
 
@@ -99,7 +105,9 @@ Available values:
 | `horizontal` | The component will fill the available space horizontally |
 | `vertical` | The component will fill the available space vertically |
 
-### `pageIndex` (default: 0) [#pageindex-default-0]
+### `pageIndex` [#pageindex]
+
+-  default: **0**
 
 Current page index (0-based)
 
@@ -107,7 +115,9 @@ Current page index (0-based)
 
 Determines where to place the page information in the layout.
 
-### `pageSize` (default: 10) [#pagesize-default-10]
+### `pageSize` [#pagesize]
+
+-  default: **10**
 
 Number of items per page
 
@@ -119,15 +129,21 @@ Array of page sizes the user can select from. If provided, shows a page size sel
 
 Determines where to place the page size selector in the layout.
 
-### `showCurrentPage` (default: true) [#showcurrentpage-default-true]
+### `showCurrentPage` [#showcurrentpage]
+
+-  default: **true**
 
 Whether to show the current page indicator
 
-### `showPageInfo` (default: true) [#showpageinfo-default-true]
+### `showPageInfo` [#showpageinfo]
+
+-  default: **true**
 
 Whether to show page information
 
-### `showPageSizeSelector` (default: true) [#showpagesizeselector-default-true]
+### `showPageSizeSelector` [#showpagesizeselector]
+
+-  default: **true**
 
 Whether to show the page size selector
 

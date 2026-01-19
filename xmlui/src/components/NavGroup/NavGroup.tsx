@@ -67,13 +67,47 @@ export const NavGroupMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.noIndicator,
     },
+    iconAlignment: {
+      description:
+        `This property controls the vertical alignment of the icon when the label text wraps to multiple lines. ` +
+        `Set to \`baseline\` to align with the first line of text, \`start\` to align to the top, \`center\` for middle alignment (default), or \`end\` for bottom alignment.`,
+      valueType: "string",
+      availableValues: [
+        { value: "baseline", description: "Align icon with the first line of text" },
+        { value: "start", description: "Align icon to the top" },
+        { value: "center", description: "Align icon to the center (default)" },
+        { value: "end", description: "Align icon to the bottom" },
+      ],
+      defaultValue: "center",
+    },
+    expandIconAlignment: {
+      description:
+        `This property controls the horizontal alignment of the expand/collapse arrow icon. ` +
+        `Set to \`start\` to display the arrow immediately after the label, or \`end\` to push it to the right edge of the NavGroup (only applies when the NavGroup has a defined width).`,
+      valueType: "string",
+      availableValues: [
+        { value: "start", description: "Display arrow immediately after the label (default)" },
+        { value: "end", description: "Push arrow to the right edge of the NavGroup" },
+      ],
+      defaultValue: "start",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
+  themeVarDescriptions: {
+    [`marginTop-items-${COMP}`]:
+      "Sets the margin between the NavGroup header and the first child item. Does not affect margins between child items.",
+    [`marginBottom-items-${COMP}`]: "Sets the margin after the last child item in the NavGroup.",
+  },
   defaultThemeVars: {
     [`backgroundColor-dropdown-${COMP}`]: "$backgroundColor-primary",
     [`borderRadius-dropdown-${COMP}`]: "$borderRadius",
     [`boxShadow-dropdown-${COMP}`]: "$boxShadow-spread",
     [`minWidth-dropdown-${COMP}`]: "11em",
+    [`marginTop-items-${COMP}`]: "0",
+    [`marginBottom-items-${COMP}`]: "0",
+    [`expandIconAlignment-${COMP}`]: "start",
+    [`paddingHorizontal-${COMP}`]: "$space-4",
+    [`paddingVertical-${COMP}`]: "$space-2",
   },
 });
 
@@ -95,6 +129,8 @@ export const navGroupComponentRenderer = createComponentRenderer(
         iconVerticalExpanded={extractValue.asOptionalString(node.props.iconVerticalExpanded)}
         iconHorizontalCollapsed={extractValue.asOptionalString(node.props.iconHorizontalCollapsed)}
         iconVerticalCollapsed={extractValue.asOptionalString(node.props.iconVerticalCollapsed)}
+        iconAlignment={extractValue.asOptionalString(node.props.iconAlignment, "center")}
+        expandIconAlignment={extractValue(node.props.expandIconAlignment)}
       />
     );
   },

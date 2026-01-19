@@ -17,11 +17,15 @@
 
 ## Properties [#properties]
 
-### `iconDark` (default: "moon") [#icondark-default-moon]
+### `iconDark` [#icondark]
+
+-  default: **"moon"**
 
 Icon to display for dark mode
 
-### `iconLight` (default: "sun") [#iconlight-default-sun]
+### `iconLight` [#iconlight]
+
+-  default: **"sun"**
 
 Icon to display for light mode
 

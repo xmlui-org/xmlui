@@ -21,7 +21,9 @@ The data to be displayed in the chart. Needs to be an array of objects.
 
 This property specifies the key in the data objects that will be used to render the chart.
 
-### `labelListPosition` (default: "inside") [#labellistposition-default-inside]
+### `labelListPosition` [#labellistposition]
+
+-  default: **"inside"**
 
 The position of the label list.
 
@@ -35,15 +37,21 @@ Specifies the key in the data objects that will be used to label the different d
 
 The outer radius of the pie chart, can be a number or a string (e.g., '100%').
 
-### `showLabel` (default: true) [#showlabel-default-true]
+### `showLabel` [#showlabel]
+
+-  default: **true**
 
 Toggles whether to show labels (`true`) or not (`false`).
 
-### `showLabelList` (default: false) [#showlabellist-default-false]
+### `showLabelList` [#showlabellist]
+
+-  default: **false**
 
 Whether to show labels in a list (`true`) or not (`false`).
 
-### `showLegend` (default: false) [#showlegend-default-false]
+### `showLegend` [#showlegend]
+
+-  default: **false**
 
 Toggles whether to show legend (`true`) or not (`false`).
 

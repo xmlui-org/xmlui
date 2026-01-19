@@ -78,11 +78,15 @@ You can try; this example works like the previous one:
 
 The unique identifier of the bookmark. You can use this identifier in links to navigate to this component's location. If this identifier is not set, you cannot programmatically visit this bookmark.
 
-### `level` (default: 1) [#level-default-1]
+### `level` [#level]
+
+-  default: **1**
 
 The level of the bookmark. The level is used to determine the bookmark's position in the table of contents.
 
-### `omitFromToc` (default: false) [#omitfromtoc-default-false]
+### `omitFromToc` [#omitfromtoc]
+
+-  default: **false**
 
 If true, this bookmark will be excluded from the table of contents.
 

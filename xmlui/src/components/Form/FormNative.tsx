@@ -53,7 +53,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { resolveLayoutProps } from "../../components-core/theming/layout-resolver";
 import { Part } from "../Part/Part";
 import { MemoizedItem } from "../container-helpers";
-import type { RequiredIndicatorMode } from "../abstractions";
+import type { RequireLabelMode } from "../abstractions";
 
 const PART_CANCEL_BUTTON = "cancelButton";
 const PART_SUBMIT_BUTTON = "submitButton";
@@ -264,7 +264,7 @@ type Props = {
   itemLabelBreak?: boolean;
   itemLabelWidth?: string;
   itemLabelPosition?: string; // type LabelPosition
-  itemRequiredIndicator?: RequiredIndicatorMode;
+  itemRequireLabelMode?: RequireLabelMode;
   keepModalOpenOnSubmit?: boolean;
   hideButtonRowUntilDirty?: boolean;
   hideButtonRow?: boolean;
@@ -286,9 +286,9 @@ export const defaultProps: Pick<
   | "hideButtonRowUntilDirty"
   | "hideButtonRow"
   | "enableSubmit"
+  | "itemRequireLabelMode"
   | "validationIconSuccess"
   | "validationIconError"
-  | "itemRequiredIndicator"
 > = {
   cancelLabel: "Cancel",
   saveLabel: "Save",
@@ -300,9 +300,9 @@ export const defaultProps: Pick<
   hideButtonRowUntilDirty: false,
   hideButtonRow: false,
   enableSubmit: true,
+  itemRequireLabelMode: "markRequired",
   validationIconSuccess: "checkmark",
   validationIconError: "error",
-  itemRequiredIndicator: "required",
 };
 
 // --- Remove the properties from formState.subject where the property name ends with UNBOUND_FIELD_SUFFIX
@@ -343,7 +343,7 @@ const Form = forwardRef(function (
     itemLabelBreak = defaultProps.itemLabelBreak,
     itemLabelWidth,
     itemLabelPosition = defaultProps.itemLabelPosition,
-    itemRequiredIndicator = defaultProps.itemRequiredIndicator,
+    itemRequireLabelMode = defaultProps.itemRequireLabelMode,
     keepModalOpenOnSubmit = defaultProps.keepModalOpenOnSubmit,
     hideButtonRowUntilDirty = defaultProps.hideButtonRowUntilDirty,
     hideButtonRow = defaultProps.hideButtonRow,
@@ -374,7 +374,7 @@ const Form = forwardRef(function (
       itemLabelBreak,
       itemLabelWidth,
       itemLabelPosition,
-      itemRequiredIndicator,
+      itemRequireLabelMode,
       subject: formState.subject,
       originalSubject: initialValue,
       validationResults: formState.validationResults,
@@ -395,10 +395,10 @@ const Form = forwardRef(function (
     itemLabelBreak,
     itemLabelPosition,
     itemLabelWidth,
+    itemRequireLabelMode,
     verboseValidationFeedback,
     validationIconSuccess,
     validationIconError,
-    itemRequiredIndicator,
   ]);
 
   const doCancel = useEvent(() => {
@@ -745,7 +745,7 @@ export const FormWithContextVar = forwardRef(function (
         itemLabelPosition={extractValue.asOptionalString(node.props.itemLabelPosition)}
         itemLabelBreak={extractValue.asOptionalBoolean(node.props.itemLabelBreak)}
         itemLabelWidth={itemLabelWidthCssProps.width as string}
-        itemRequiredIndicator={extractValue.asOptionalString(node.props.itemRequiredIndicator)}
+        itemRequireLabelMode={extractValue.asOptionalString(node.props.itemRequireLabelMode)}
         hideButtonRowUntilDirty={extractValue.asOptionalBoolean(node.props.hideButtonRowUntilDirty)}
         hideButtonRow={extractValue.asOptionalBoolean(node.props.hideButtonRow)}
         enableSubmit={extractValue.asOptionalBoolean(node.props.enableSubmit)}

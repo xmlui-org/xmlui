@@ -54,11 +54,15 @@ The markup displays the app's logo:
 
 ## Properties [#properties]
 
-### `alt` (default: "Logo") [#alt-default-logo]
+### `alt` [#alt]
+
+-  default: **"Logo"**
 
 Alternative text for the logo image for accessibility.
 
-### `inline` (default: false) [#inline-default-false]
+### `inline` [#inline]
+
+-  default: **false**
 
 When set to true, the image will be displayed as an inline element instead of a block element.
 

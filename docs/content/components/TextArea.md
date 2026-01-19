@@ -6,11 +6,15 @@ It is often used in forms, see [this guide](/forms) for details.
 
 ## Properties [#properties]
 
-### `autoFocus` (default: false) [#autofocus-default-false]
+### `autoFocus` [#autofocus]
+
+-  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `autoSize` (default: false) [#autosize-default-false]
+### `autoSize` [#autosize]
+
+-  default: **false**
 
 If set to `true`, this boolean property enables the `TextArea` to resize automatically based on the number of lines inside it.
 
@@ -24,7 +28,9 @@ Write multiple lines in the `TextArea` in the demo below to see how it resizes a
 </App>
 ```
 
-### `enabled` (default: true) [#enabled-default-true]
+### `enabled` [#enabled]
+
+-  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -34,7 +40,9 @@ This boolean property value indicates whether the component responds to user eve
 </App>
 ```
 
-### `enterSubmits` (default: true) [#entersubmits-default-true]
+### `enterSubmits` [#entersubmits]
+
+-  default: **true**
 
 This optional boolean property indicates whether pressing the `Enter` key on the keyboard prompts the parent `Form` component to submit.
 
@@ -52,7 +60,9 @@ See [Using Forms](/forms) for details.
 </App>
 ```
 
-### `escResets` (default: false) [#escresets-default-false]
+### `escResets` [#escresets]
+
+-  default: **false**
 
 This boolean property indicates whether the TextArea contents should be reset when pressing the ESC key.
 
@@ -112,7 +122,9 @@ An optional placeholder text that is visible in the input field when its empty.
 </App>
 ```
 
-### `readOnly` (default: false) [#readonly-default-false]
+### `readOnly` [#readonly]
+
+-  default: **false**
 
 Set this property to `true` to disallow changing the component value.
 
@@ -122,7 +134,9 @@ Set this property to `true` to disallow changing the component value.
 </App>
 ```
 
-### `required` (default: false) [#required-default-false]
+### `required` [#required]
+
+-  default: **false**
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
@@ -152,7 +166,9 @@ Drag the small resize indicators at the bottom right on each of the controls in 
 </App>
 ```
 
-### `rows` (default: 2) [#rows-default-2]
+### `rows` [#rows]
+
+-  default: **2**
 
 Specifies the number of rows the component initially has.
 
@@ -164,7 +180,9 @@ Specifies the number of rows the component initially has.
 </App>
 ```
 
-### `validationStatus` (default: "none") [#validationstatus-default-none]
+### `validationStatus` [#validationstatus]
+
+-  default: **"none"**
 
 This property allows you to set the validation status of the input component.
 

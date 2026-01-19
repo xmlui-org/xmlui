@@ -62,6 +62,27 @@ export const NavLinkMd = createMetadata({
     icon: d(
       `This property allows you to add an optional icon (specify the icon's name) to the navigation link.`,
     ),
+    iconAlignment: {
+      description:
+        `This property controls the vertical alignment of the icon when the label text wraps to multiple lines. ` +
+        `Set to \`baseline\` to align with the first line of text, \`start\` to align to the top, \`center\` for middle alignment (default), or \`end\` for bottom alignment.`,
+      valueType: "string",
+      availableValues: [
+        { value: "baseline", description: "Align icon with the first line of text" },
+        { value: "start", description: "Align icon to the top" },
+        { value: "center", description: "Align icon to the center (default)" },
+        { value: "end", description: "Align icon to the bottom" },
+      ],
+      defaultValue: "center",
+    },
+    level: {
+      description:
+        `This property specifies the nesting level (1-4) for the navigation link, which affects its padding. ` +
+        `Higher levels typically have more left padding to indicate hierarchy. When used inside a NavGroup, ` +
+        `the level is automatically inherited from the group context.`,
+      valueType: "number",
+      availableValues: [1, 2, 3, 4],
+    },
   },
   events: {
     click: dClick(COMP),
@@ -70,6 +91,10 @@ export const NavLinkMd = createMetadata({
   themeVarDescriptions: {
     [`color-indicator-${COMP}`]:
       "Provides the following states: `--hover`, `--active`, `--pressed`",
+    [`iconAlignment-${COMP}`]:
+      "Sets the default vertical alignment of the icon when the label text wraps to multiple lines. Valid values: `baseline`, `start`, `center`, `end`",
+    [`gap-icon-${COMP}`]:
+      "Sets the gap between the icon and the text label. Only applied when an icon is present.",
   },
   defaultThemeVars: {
     [`border-${COMP}`]: "0px solid $borderColor",
@@ -91,6 +116,7 @@ export const NavLinkMd = createMetadata({
     [`outlineOffset-${COMP}--focus`]: "-1px",
     [`borderRadius-indicator-${COMP}`]: "$borderRadius",
     [`color-icon-${COMP}`]: "$color-surface-500",
+    [`gap-icon-${COMP}`]: "$space-3",
     [`color-indicator-${COMP}--active`]: "$color-primary-500",
     [`color-indicator-${COMP}--pressed`]: "$color-primary-500",
     [`color-indicator-${COMP}--hover`]: "$color-primary-600",
@@ -111,9 +137,11 @@ export const navLinkComponentRenderer = createComponentRenderer(
         displayActive={extractValue.asOptionalBoolean(node.props.displayActive)}
         noIndicator={extractValue.asOptionalBoolean(node.props.noIndicator)}
         forceActive={extractValue.asOptionalBoolean(node.props.active)}
+        level={extractValue.asOptionalNumber(node.props.level)}
         className={className}
         target={extractValue(node.props?.target)}
         icon={<Icon name={iconName} className={styles.icon} />}
+        iconAlignment={extractValue.asOptionalString(node.props.iconAlignment)}
       >
         {extractValue.asDisplayText(node.props.label) || renderChild(node.children)}
       </NavLink>

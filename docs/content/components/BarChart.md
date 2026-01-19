@@ -49,37 +49,53 @@ The BarChart component accommodates the size of its parent unless you set it exp
 
 This property is used to provide the component with data to display.The data needs to be an array of objects.
 
-### `hideTickX` (default: false) [#hidetickx-default-false]
+### `hideTickX` [#hidetickx]
+
+-  default: **false**
 
 Controls the visibility of the X-axis ticks. If set to `true`, tick labels on the X-axis will be hidden.
 
-### `hideTickY` (default: false) [#hideticky-default-false]
+### `hideTickY` [#hideticky]
+
+-  default: **false**
 
 Controls the visibility of the Y-axis ticks. If set to `true`, tick labels on the Y-axis will be hidden.
 
-### `hideTooltip` (default: false) [#hidetooltip-default-false]
+### `hideTooltip` [#hidetooltip]
+
+-  default: **false**
 
 Determines whether the tooltip should be hidden. If set to `true`, tooltips will not appear on hover.
 
-### `hideX` (default: false) [#hidex-default-false]
+### `hideX` [#hidex]
+
+-  default: **false**
 
 Determines whether the X-axis should be hidden. If set to `true`, the axis will not be rendered.
 
-### `hideY` (default: false) [#hidey-default-false]
+### `hideY` [#hidey]
+
+-  default: **false**
 
 Determines whether the Y-axis should be hidden. If set to `true`, the axis will not be rendered.
 
-### `orientation` (default: "vertical") [#orientation-default-vertical]
+### `orientation` [#orientation]
+
+-  default: **"vertical"**
 
 This property determines the orientation of the bar chart. The `vertical` variant specifies the horizontal axis as the primary and lays out the bars from left to right. The `horizontal` variant specifies the vertical axis as the primary and has the bars spread from top to bottom.
 
 Available values: `horizontal`, `vertical` **(default)**
 
-### `showLegend` (default: false) [#showlegend-default-false]
+### `showLegend` [#showlegend]
+
+-  default: **false**
 
 Determines whether the legend should be displayed.
 
-### `stacked` (default: false) [#stacked-default-false]
+### `stacked` [#stacked]
+
+-  default: **false**
 
 This property determines how the bars are laid out.If set to `true`, bars with the same category will be stacked on top of each other rather than placed side by side.
 

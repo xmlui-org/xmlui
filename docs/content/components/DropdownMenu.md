@@ -28,7 +28,9 @@ Try this dropdown menu:
 
 ## Properties [#properties]
 
-### `alignment` (default: "start") [#alignment-default-start]
+### `alignment` [#alignment]
+
+-  default: **"start"**
 
 This property allows you to determine the alignment of the dropdown panel with the displayed menu items.
 
@@ -61,7 +63,9 @@ Available values are:
 </App>
 ```
 
-### `enabled` (default: true) [#enabled-default-true]
+### `enabled` [#enabled]
+
+-  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -90,11 +94,15 @@ This boolean property value indicates whether the component responds to user eve
 
 This property sets the label of the component.  If not set, the component will not display a label.
 
-### `triggerButtonIcon` (default: "triggerButton:DropdownMenu") [#triggerbuttonicon-default-triggerbutton-dropdownmenu]
+### `triggerButtonIcon` [#triggerbuttonicon]
+
+-  default: **"triggerButton:DropdownMenu"**
 
 This property defines the icon to display on the trigger button. You can change the default icon for all DropdownMenu instances with the "icon.triggerButton:DropdownMenu" declaration in the app configuration file.
 
-### `triggerButtonIconPosition` (default: "end") [#triggerbuttoniconposition-default-end]
+### `triggerButtonIconPosition` [#triggerbuttoniconposition]
+
+-  default: **"end"**
 
 This property defines the position of the icon on the trigger button.
 
@@ -105,7 +113,9 @@ Available values:
 | `start` | The icon will appear at the start (left side when the left-to-right direction is set) |
 | `end` | The icon will appear at the end (right side when the left-to-right direction is set) **(default)** |
 
-### `triggerButtonThemeColor` (default: "primary") [#triggerbuttonthemecolor-default-primary]
+### `triggerButtonThemeColor` [#triggerbuttonthemecolor]
+
+-  default: **"primary"**
 
 This property defines the theme color of the `Button` as the dropdown menu's trigger. It has no effect when a custom trigger is defined with `triggerTemplate`.
 
@@ -117,7 +127,9 @@ Available values:
 | `primary` | Primary theme color **(default)** |
 | `secondary` | Secondary theme color |
 
-### `triggerButtonVariant` (default: "ghost") [#triggerbuttonvariant-default-ghost]
+### `triggerButtonVariant` [#triggerbuttonvariant]
+
+-  default: **"ghost"**
 
 This property defines the theme variant of the `Button` as the dropdown menu's trigger. It has no effect when a custom trigger is defined with `triggerTemplate`.
 

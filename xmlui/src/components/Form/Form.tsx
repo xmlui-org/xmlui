@@ -3,7 +3,7 @@ import styles from "./Form.module.scss";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, d, dComponent, dEnabled, dInternal } from "../metadata-helpers";
-import { labelPositionMd, requiredIndicatorModeMd } from "../abstractions";
+import { labelPositionMd, requireLabelModeMd } from "../abstractions";
 import { FormWithContextVar, defaultProps } from "./FormNative";
 
 const COMP = "Form";
@@ -128,12 +128,12 @@ export const FormMd = createMetadata({
     completedNotificationMessage: d("This property sets the message to display when the form is submitted successfully."),
     errorNotificationMessage: d("This property sets the message to display when the form submission fails."),
     enabled: dEnabled(),
-    itemRequiredIndicator: {
+    itemRequireLabelMode: {
       description:
         `This property controls how required indicators are displayed for required form items. ` +
         `Individual \`FormItem\` instances can override this property.`,
-      availableValues: requiredIndicatorModeMd,
-      defaultValue: defaultProps.itemRequiredIndicator,
+      availableValues: requireLabelModeMd,
+      defaultValue: defaultProps.itemRequireLabelMode,
       type: "string",
     },
     _data_url: dInternal("when we have an api bound data prop, we inject the url here"),

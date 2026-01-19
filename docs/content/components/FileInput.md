@@ -20,7 +20,9 @@ An optional list of file types the input controls accepts provided as a string a
 </App>
 ```
 
-### `autoFocus` (default: false) [#autofocus-default-false]
+### `autoFocus` [#autofocus]
+
+-  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
@@ -35,7 +37,9 @@ The ID of the icon to display in the button. You can change the default icon for
 </App>
 ```
 
-### `buttonIconPosition` (default: "start") [#buttoniconposition-default-start]
+### `buttonIconPosition` [#buttoniconposition]
+
+-  default: **"start"**
 
 This optional string determines the location of the button icon.
 
@@ -60,7 +64,9 @@ This property is an optional string to set a label for the button part.
 </App>
 ```
 
-### `buttonPosition` (default: "end") [#buttonposition-default-end]
+### `buttonPosition` [#buttonposition]
+
+-  default: **"end"**
 
 This property determines the position of the button relative to the input field.
 
@@ -86,7 +92,9 @@ Available values:
 </App>
 ```
 
-### `buttonThemeColor` (default: "primary") [#buttonthemecolor-default-primary]
+### `buttonThemeColor` [#buttonthemecolor]
+
+-  default: **"primary"**
 
 The button color scheme (primary, secondary, attention)
 
@@ -199,11 +207,15 @@ Right-click and save: [sample-products-tsv.tsv](/resources/files/sample-products
 Right-click and save: [sample-inventory.csv](/resources/files/sample-inventory.csv) (5000 rows). Then browse to sample-inventory.csv.
 ```
 
-### `directory` (default: false) [#directory-default-false]
+### `directory` [#directory]
+
+-  default: **false**
 
 This boolean property indicates whether the component allows selecting directories (`true`) or files only (`false`).
 
-### `enabled` (default: true) [#enabled-default-true]
+### `enabled` [#enabled]
+
+-  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -211,7 +223,9 @@ This boolean property value indicates whether the component responds to user eve
 
 This property sets the component's initial value.
 
-### `multiple` (default: false) [#multiple-default-false]
+### `multiple` [#multiple]
+
+-  default: **false**
 
 This boolean property enables to add not just one (`false`), but multiple files to the field (`true`). This is done either by dragging onto the field or by selecting multiple files in the browser menu after clicking the input field button.
 
@@ -330,15 +344,21 @@ type ParseResult = {
 
 An optional placeholder text that is visible in the input field when its empty.
 
-### `readOnly` (default: false) [#readonly-default-false]
+### `readOnly` [#readonly]
+
+-  default: **false**
 
 Set this property to `true` to disallow changing the component value.
 
-### `required` (default: false) [#required-default-false]
+### `required` [#required]
+
+-  default: **false**
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `validationStatus` (default: "none") [#validationstatus-default-none]
+### `validationStatus` [#validationstatus]
+
+-  default: **"none"**
 
 This property allows you to set the validation status of the input component.
 

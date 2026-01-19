@@ -10,11 +10,15 @@
 
 ## Properties [#properties]
 
-### `autoFocus` (default: false) [#autofocus-default-false]
+### `autoFocus` [#autofocus]
+
+-  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `dateFormat` (default: "MM/dd/yyyy") [#dateformat-default-mm-dd-yyyy]
+### `dateFormat` [#dateformat]
+
+-  default: **"MM/dd/yyyy"**
 
 The format of the date displayed in the input field
 
@@ -128,7 +132,9 @@ The `disabledDates` prop supports multiple patterns for disabling specific dates
 </App>
 ```
 
-### `enabled` (default: true) [#enabled-default-true]
+### `enabled` [#enabled]
+
+-  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -160,11 +166,15 @@ This property sets the component's initial value.
 </App>
 ```
 
-### `inline` (default: false) [#inline-default-false]
+### `inline` [#inline]
+
+-  default: **false**
 
 If set to true, the calendar is always visible and its panel is rendered as part of the layout. If false, the calendar is shown in a popup when the input is focused or clicked.
 
-### `mode` (default: "single") [#mode-default-single]
+### `mode` [#mode]
+
+-  default: **"single"**
 
 The mode of the datepicker (single or range)
 
@@ -187,11 +197,15 @@ An optional placeholder text that is visible in the input field when its empty.
 </App>
 ```
 
-### `readOnly` (default: false) [#readonly-default-false]
+### `readOnly` [#readonly]
+
+-  default: **false**
 
 Set this property to `true` to disallow changing the component value.
 
-### `showWeekNumber` (default: false) [#showweeknumber-default-false]
+### `showWeekNumber` [#showweeknumber]
+
+-  default: **false**
 
 Whether to show the week number in the calendar
 
@@ -213,7 +227,9 @@ This property sets an optional icon to appear at the start (left side when the l
 
 This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.
 
-### `validationStatus` (default: "none") [#validationstatus-default-none]
+### `validationStatus` [#validationstatus]
+
+-  default: **"none"**
 
 This property allows you to set the validation status of the input component.
 
@@ -240,7 +256,9 @@ Available values:
 </App>
 ```
 
-### `weekStartsOn` (default: 0) [#weekstartson-default-0]
+### `weekStartsOn` [#weekstartson]
+
+-  default: **0**
 
 The first day of the week. 0 is Sunday, 1 is Monday, etc.
 

@@ -4,11 +4,15 @@
 
 ## Properties [#properties]
 
-### `autoFocus` (default: false) [#autofocus-default-false]
+### `autoFocus` [#autofocus]
+
+-  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `enabled` (default: true) [#enabled-default-true]
+### `enabled` [#enabled]
+
+-  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -24,7 +28,9 @@ This property sets an optional text to appear on the end (right side when the le
 
 This property defines the gap between the adornments and the input area. If not set, the gap declared by the current theme is used.
 
-### `initialValue` (default: "") [#initialvalue-default-]
+### `initialValue` [#initialvalue]
+
+-  default: **""**
 
 This property sets the component's initial value.
 
@@ -32,11 +38,15 @@ This property sets the component's initial value.
 
 This property sets the maximum length of the input it accepts.
 
-### `passwordHiddenIcon` (default: "eye-off") [#passwordhiddenicon-default-eye-off]
+### `passwordHiddenIcon` [#passwordhiddenicon]
+
+-  default: **"eye-off"**
 
 The icon to display when the password is hidden (when showPasswordToggle is true).
 
-### `passwordVisibleIcon` (default: "eye") [#passwordvisibleicon-default-eye]
+### `passwordVisibleIcon` [#passwordvisibleicon]
+
+-  default: **"eye"**
 
 The icon to display when the password is visible (when showPasswordToggle is true).
 
@@ -44,15 +54,21 @@ The icon to display when the password is visible (when showPasswordToggle is tru
 
 An optional placeholder text that is visible in the input field when its empty.
 
-### `readOnly` (default: false) [#readonly-default-false]
+### `readOnly` [#readonly]
+
+-  default: **false**
 
 Set this property to `true` to disallow changing the component value.
 
-### `required` (default: false) [#required-default-false]
+### `required` [#required]
+
+-  default: **false**
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `showPasswordToggle` (default: false) [#showpasswordtoggle-default-false]
+### `showPasswordToggle` [#showpasswordtoggle]
+
+-  default: **false**
 
 If `true`, a toggle button is displayed to switch between showing and hiding the password input.
 
@@ -64,7 +80,9 @@ This property sets an optional icon to appear at the start (left side when the l
 
 This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.
 
-### `validationStatus` (default: "none") [#validationstatus-default-none]
+### `validationStatus` [#validationstatus]
+
+-  default: **"none"**
 
 This property allows you to set the validation status of the input component.
 

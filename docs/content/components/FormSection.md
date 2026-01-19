@@ -4,7 +4,9 @@
 
 ## Properties [#properties]
 
-### `columnGap` (default: "3rem") [#columngap-default-3rem]
+### `columnGap` [#columngap]
+
+-  default: **"3rem"**
 
 The gap between columns of items within the section.
 
@@ -29,7 +31,9 @@ The heading text to be displayed at the top of the form section.
 </Form>
 ```
 
-### `headingLevel` (default: "h3") [#headinglevel-default-h3]
+### `headingLevel` [#headinglevel]
+
+-  default: **"h3"**
 
 The semantic and visual level of the heading.
 
@@ -43,7 +47,9 @@ Available values: `h1`, `h2`, `h3` **(default)**, `h4`, `h5`, `h6`
 </Form>
 ```
 
-### `headingWeight` (default: "bold") [#headingweight-default-bold]
+### `headingWeight` [#headingweight]
+
+-  default: **"bold"**
 
 The font weight of the heading.
 
@@ -69,7 +75,9 @@ Informational text displayed below the heading.
 </Form>
 ```
 
-### `infoFontSize` (default: "0.8rem") [#infofontsize-default-0-8rem]
+### `infoFontSize` [#infofontsize]
+
+-  default: **"0.8rem"**
 
 The font size of the informational text.
 
@@ -84,11 +92,15 @@ The font size of the informational text.
 </Form>
 ```
 
-### `paddingTop` (default: "$space-normal") [#paddingtop-default-space-normal]
+### `paddingTop` [#paddingtop]
+
+-  default: **"$space-normal"**
 
 The top padding of the FlowLayout where the section's children are placed.
 
-### `rowGap` (default: "$space-normal") [#rowgap-default-space-normal]
+### `rowGap` [#rowgap]
+
+-  default: **"$space-normal"**
 
 The gap between rows of items within the section.
 

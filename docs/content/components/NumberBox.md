@@ -14,13 +14,17 @@ The `NumberBox` is often used in forms. See the [this guide](/forms) for details
 
 ## Properties [#properties]
 
-### `autoFocus` (default: false) [#autofocus-default-false]
+### `autoFocus` [#autofocus]
+
+-  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
 If this boolean prop is set to true, the `NumberBox` input will be focused when appearing on the UI.
 
-### `enabled` (default: true) [#enabled-default-true]
+### `enabled` [#enabled]
+
+-  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -76,7 +80,9 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 
 This property defines the gap between the adornments and the input area.
 
-### `hasSpinBox` (default: true) [#hasspinbox-default-true]
+### `hasSpinBox` [#hasspinbox]
+
+-  default: **true**
 
 This boolean prop shows (`true`) or hides (`false`) the spinner buttons for the input field.
 
@@ -99,7 +105,9 @@ The initial value displayed in the input field.
 </App>
 ```
 
-### `integersOnly` (default: false) [#integersonly-default-false]
+### `integersOnly` [#integersonly]
+
+-  default: **false**
 
 This boolean property signs whether the input field accepts integers only (`true`) or not (`false`).
 
@@ -114,7 +122,9 @@ This boolean property signs whether the input field accepts integers only (`true
 
 This property sets the maximum length of the input it accepts.
 
-### `maxValue` (default: 999999999999999) [#maxvalue-default-999999999999999]
+### `maxValue` [#maxvalue]
+
+-  default: **999999999999999**
 
 The maximum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.If not set, no maximum value check is done.
 
@@ -130,7 +140,9 @@ Try to enter a bigger value into the input field below than the maximum allowed.
 </App>
 ```
 
-### `minValue` (default: -999999999999999) [#minvalue-default-999999999999999]
+### `minValue` [#minvalue]
+
+-  default: **-999999999999999**
 
 The minimum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.If not set, no minimum value check is done.
 
@@ -154,7 +166,9 @@ A placeholder text that is visible in the input field when its empty.
 </App>
 ```
 
-### `readOnly` (default: false) [#readonly-default-false]
+### `readOnly` [#readonly]
+
+-  default: **false**
 
 Set this property to `true` to disallow changing the component value.
 
@@ -166,7 +180,9 @@ If true, the component's value cannot be modified with user interactions.
 </App>
 ```
 
-### `required` (default: false) [#required-default-false]
+### `required` [#required]
+
+-  default: **false**
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
@@ -218,7 +234,9 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 </App>
 ```
 
-### `step` (default: 1) [#step-default-1]
+### `step` [#step]
+
+-  default: **1**
 
 This prop governs how big the step when clicking on the spinner of the field.
 
@@ -232,7 +250,9 @@ Note that only integers are allowed to be entered.
 </App>
 ```
 
-### `validationStatus` (default: "none") [#validationstatus-default-none]
+### `validationStatus` [#validationstatus]
+
+-  default: **"none"**
 
 This property allows you to set the validation status of the input component.
 
@@ -261,7 +281,9 @@ This prop is used to visually indicate status changes reacting to form field val
 </App>
 ```
 
-### `zeroOrPositive` (default: false) [#zeroorpositive-default-false]
+### `zeroOrPositive` [#zeroorpositive]
+
+-  default: **false**
 
 This boolean property determines whether the input value can only be 0 or positive numbers (`true`) or also negative (`false`).
 

@@ -46,21 +46,29 @@ Available values:
 | `start` | Justify the content to the left (to the right if in right-to-left) |
 | `end` | Justify the content to the right (to the left if in right-to-left) |
 
-### `dropdownText` (default: "More options") [#dropdowntext-default-more-options]
+### `dropdownText` [#dropdowntext]
+
+-  default: **"More options"**
 
 Text to display in the dropdown trigger button label when items overflow. This text is used for accessibility and appears alongside the overflow icon.
 
-### `gap` (default: 0) [#gap-default-0]
+### `gap` [#gap]
+
+-  default: **0**
 
 Gap between child elements in pixels. Controls the spacing between items in the responsive bar layout.
 
-### `orientation` (default: "horizontal") [#orientation-default-horizontal]
+### `orientation` [#orientation]
+
+-  default: **"horizontal"**
 
 Layout direction of the responsive bar. In horizontal mode, items are arranged left-to-right and overflow is based on container width. In vertical mode, items are arranged top-to-bottom and overflow is based on container height.
 
 Available values: `horizontal` **(default)**, `vertical`
 
-### `overflowIcon` (default: "ellipsisHorizontal:ResponsiveBar") [#overflowicon-default-ellipsishorizontal-responsivebar]
+### `overflowIcon` [#overflowicon]
+
+-  default: **"ellipsisHorizontal:ResponsiveBar"**
 
 Icon to display in the dropdown trigger button when items overflow. You can use component-specific icons in the format "iconName:ResponsiveBar".
 
@@ -81,7 +89,9 @@ You can customize the icon used for the overflow dropdown trigger:
 </App>
 ```
 
-### `reverse` (default: false) [#reverse-default-false]
+### `reverse` [#reverse]
+
+-  default: **false**
 
 Reverses the direction of child elements. In horizontal mode, items are arranged from right to left instead of left to right. In vertical mode, items are arranged from bottom to top instead of top to bottom. The dropdown menu position also adjusts to appear at the start (left/top) instead of the end (right/bottom).
 

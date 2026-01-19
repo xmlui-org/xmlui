@@ -1,6 +1,6 @@
 # Animation [#animation]
 
-No description provided.
+The `Animation` component represents a generic animation wrapper that can apply various animations to its children.
 
 ## Properties
 
@@ -12,7 +12,9 @@ Indicates whether the animation should start when the component is in view
 
 The animation object to be applied to the component
 
-### `delay` (default: 0)
+### `delay`
+
+-  default: **0**
 
 The delay before the animation starts in milliseconds
 
@@ -20,15 +22,21 @@ The delay before the animation starts in milliseconds
 
 The duration of the animation in milliseconds
 
-### `loop` (default: false)
+### `loop`
+
+-  default: **false**
 
 Indicates whether the animation should loop
 
-### `once` (default: false)
+### `once`
+
+-  default: **false**
 
 Indicates whether the animation should only run once
 
-### `reverse` (default: false)
+### `reverse`
+
+-  default: **false**
 
 Indicates whether the animation should run in reverse
 

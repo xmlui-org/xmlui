@@ -4,7 +4,9 @@
 
 ## Properties [#properties]
 
-### `url` (default: "") [#url-default-]
+### `url` [#url]
+
+-  default: **""**
 
 This property specifies the URL to use for long-polling.
 

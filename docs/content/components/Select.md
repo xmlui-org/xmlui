@@ -45,11 +45,15 @@ You can use `Select` with dynamic options:
 
 ## Properties [#properties]
 
-### `autoFocus` (default: false) [#autofocus-default-false]
+### `autoFocus` [#autofocus]
+
+-  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `clearable` (default: false) [#clearable-default-false]
+### `clearable` [#clearable]
+
+-  default: **false**
 
 This property enables a clear button that allows the user to clear the selected value(s).
 
@@ -99,7 +103,9 @@ Click on the second field to see the custom empty list indicator.
 </App>
 ```
 
-### `enabled` (default: true) [#enabled-default-true]
+### `enabled` [#enabled]
+
+-  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -161,15 +167,21 @@ This property sets the component's initial value.
 </App>
 ```
 
-### `inProgress` (default: false) [#inprogress-default-false]
+### `inProgress` [#inprogress]
+
+-  default: **false**
 
 This property indicates whether the component is in progress. It can be used to show a loading message.
 
-### `inProgressNotificationMessage` (default: "") [#inprogressnotificationmessage-default-]
+### `inProgressNotificationMessage` [#inprogressnotificationmessage]
+
+-  default: **""**
 
 This property indicates the message to display when the component is in progress.
 
-### `multiSelect` (default: false) [#multiselect-default-false]
+### `multiSelect` [#multiselect]
+
+-  default: **false**
 
 The `true` value of the property indicates if the user can select multiple items.
 
@@ -236,7 +248,9 @@ This property allows replacing the default template to display an option in the 
 </App>
 ```
 
-### `placeholder` (default: "") [#placeholder-default-]
+### `placeholder` [#placeholder]
+
+-  default: **""**
 
 An optional placeholder text that is visible in the input field when its empty.
 
@@ -250,15 +264,21 @@ An optional placeholder text that is visible in the input field when its empty.
 </App>
 ```
 
-### `readOnly` (default: false) [#readonly-default-false]
+### `readOnly` [#readonly]
+
+-  default: **false**
 
 Set this property to `true` to disallow changing the component value.
 
-### `required` (default: false) [#required-default-false]
+### `required` [#required]
+
+-  default: **false**
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `searchable` (default: false) [#searchable-default-false]
+### `searchable` [#searchable]
+
+-  default: **false**
 
 This property enables the search functionality in the dropdown list.
 
@@ -281,7 +301,9 @@ Enables the customization of how the ungrouped options header is displayed in th
 </App>
 ```
 
-### `validationStatus` (default: "none") [#validationstatus-default-none]
+### `validationStatus` [#validationstatus]
+
+-  default: **"none"**
 
 This property allows you to set the validation status of the input component.
 

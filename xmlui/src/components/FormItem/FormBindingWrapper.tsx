@@ -26,7 +26,7 @@ import {
 } from "../Form/formActions";
 import { getByPath } from "../Form/FormNative";
 import { useEvent } from "../../components-core/utils/misc";
-import type { LabelPosition, RequiredIndicatorMode } from "../abstractions";
+import type { LabelPosition, RequireLabelMode } from "../abstractions";
 import { ItemWithLabel } from "./ItemWithLabel";
 import { useValidation, useValidationDisplay } from "./Validations";
 import { HelperText } from "./HelperText";
@@ -39,7 +39,7 @@ type FormBindingWrapperProps = {
   initialValue?: any;
   noSubmit?: boolean;
   validations: FormItemValidations;
-  requiredIndicator?: RequiredIndicatorMode;
+  requireLabelMode?: RequireLabelMode;
   onValidate?: ValidateEventHandler;
   customValidationsDebounce?: number;
   validationMode?: ValidationMode;
@@ -68,7 +68,7 @@ export function FormBindingWrapper({
   labelPosition,
   labelWidth,
   labelBreak,
-  requiredIndicator,
+  requireLabelMode,
   enabled = true,
   style,
   className,
@@ -105,18 +105,18 @@ export function FormBindingWrapper({
   const validationResult = useFormContextPart((value) => value?.validationResults[formItemId]);
   const dispatch = useFormContextPart((value) => value?.dispatch);
   const formEnabled = useFormContextPart((value) => value?.enabled);
-  const formRequiredIndicator = useFormContextPart((value) => value?.itemRequiredIndicator);
+  const formRequireLabelMode = useFormContextPart((value) => value?.itemRequireLabelMode);
   const contextVerboseValidationFeedback = useFormContextPart((value) => value?.verboseValidationFeedback);
-  
+
   // Logic to determine if verbose feedback should be forced based on component type
   const isForcedVerbose = useMemo(() => {
     const type = (children as any)?.type;
     const props = (children as any)?.props;
-    const displayName = type?.displayName || type?.name || 
+    const displayName = type?.displayName || type?.name ||
                         type?.render?.displayName || type?.render?.name || // for forwardRef
                         type?.type?.displayName || type?.type?.name || // for memo
                         "";
-    
+
     // Check for specific component display names
     // We check for "Toggle" because both Checkbox and Switch use the Toggle component
     return (
@@ -125,7 +125,7 @@ export function FormBindingWrapper({
       displayName.includes("RadioGroup") ||
       displayName.includes("ColorPicker") ||
       displayName.includes("Slider") ||
-      displayName.includes("Toggle") || 
+      displayName.includes("Toggle") ||
       (displayName.includes("DatePicker") && props?.inline)
     );
   }, [children]);
@@ -259,7 +259,7 @@ export function FormBindingWrapper({
       style={style}
       className={className}
       validationResult={validationResultDisplay}
-      requiredIndicator={requiredIndicator ?? formRequiredIndicator}
+      requireLabelMode={requireLabelMode ?? formRequireLabelMode}
     >
       {enhancedInput}
     </ItemWithLabel>

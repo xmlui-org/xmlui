@@ -15,7 +15,9 @@ This component displays a slideshow by cycling through elements (images, text, o
 
 ## Properties [#properties]
 
-### `autoplay` (default: false) [#autoplay-default-false]
+### `autoplay` [#autoplay]
+
+-  default: **false**
 
 Start scrolling the carousel automatically (`true`) or not (`false`).
 
@@ -37,13 +39,17 @@ This property indicates whether the carousel automatically scrolls through slide
 </App>
 ```
 
-### `autoplayInterval` (default: 5000) [#autoplayinterval-default-5000]
+### `autoplayInterval` [#autoplayinterval]
+
+-  default: **5000**
 
 Specifies the interval between autoplay transitions.
 
 This property specifies the interval between autoplay transitions in milliseconds.
 
-### `controls` (default: true) [#controls-default-true]
+### `controls` [#controls]
+
+-  default: **true**
 
 Display the previous/next controls (`true`) or not (`false`).
 
@@ -58,7 +64,9 @@ This property indicates whether the carousel displays navigation controls (previ
 </App>
 ```
 
-### `indicators` (default: true) [#indicators-default-true]
+### `indicators` [#indicators]
+
+-  default: **true**
 
 Display the individual slides as buttons (`true`) or not (`false`).
 
@@ -74,7 +82,9 @@ This property indicates whether the carousel displays position indicators.
 </App>
 ```
 
-### `loop` (default: false) [#loop-default-false]
+### `loop` [#loop]
+
+-  default: **false**
 
 Sets whether the carousel should loop back to the start/end when it reaches the last/first slide.
 
@@ -112,7 +122,9 @@ This property specifies the icon to display for the next control button.
 </App>
 ```
 
-### `orientation` (default: "horizontal") [#orientation-default-horizontal]
+### `orientation` [#orientation]
+
+-  default: **"horizontal"**
 
 This property indicates the orientation of the carousel. The `horizontal` value indicates that the carousel moves horizontally, and the `vertical` value indicates that the carousel moves vertically.
 
@@ -147,7 +159,9 @@ The icon to display for the previous control.
 
 This property specifies the icon to display for the previous control button.
 
-### `startIndex` (default: 0) [#startindex-default-0]
+### `startIndex` [#startindex]
+
+-  default: **0**
 
 The index of the first slide to display.
 
@@ -164,13 +178,17 @@ This property indicates the index of the first slide to display when the carouse
 </App>
 ```
 
-### `stopAutoplayOnInteraction` (default: true) [#stopautoplayoninteraction-default-true]
+### `stopAutoplayOnInteraction` [#stopautoplayoninteraction]
+
+-  default: **true**
 
 This property indicates whether autoplay stops on user interaction.
 
 This property indicates whether autoplay stops when the user interacts with the carousel (clicking controls, indicators, or using keyboard navigation).
 
-### `transitionDuration` (default: 25) [#transitionduration-default-25]
+### `transitionDuration` [#transitionduration]
+
+-  default: **25**
 
 The duration of the transition between slides.
 

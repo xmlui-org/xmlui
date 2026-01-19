@@ -4,19 +4,27 @@
 
 ## Properties [#properties]
 
-### `enabled` (default: true) [#enabled-default-true]
+### `enabled` [#enabled]
+
+-  default: **true**
 
 When true, the expandable item can be opened and closed. When false, it cannot be toggled.
 
-### `iconCollapsed` (default: "chevronright") [#iconcollapsed-default-chevronright]
+### `iconCollapsed` [#iconcollapsed]
+
+-  default: **"chevronright"**
 
 The icon to display when the item is collapsed.
 
-### `iconExpanded` (default: "chevrondown") [#iconexpanded-default-chevrondown]
+### `iconExpanded` [#iconexpanded]
+
+-  default: **"chevrondown"**
 
 The icon to display when the item is expanded.
 
-### `iconPosition` (default: "end") [#iconposition-default-end]
+### `iconPosition` [#iconposition]
+
+-  default: **"end"**
 
 Determines the position of the icon (start or end).
 
@@ -27,7 +35,9 @@ Available values:
 | `start` | The icon will appear at the start (left side when the left-to-right direction is set) |
 | `end` | The icon will appear at the end (right side when the left-to-right direction is set) **(default)** |
 
-### `initiallyExpanded` (default: false) [#initiallyexpanded-default-false]
+### `initiallyExpanded` [#initiallyexpanded]
+
+-  default: **false**
 
 Determines if the component is initially expanded when rendered.
 
@@ -35,7 +45,9 @@ Determines if the component is initially expanded when rendered.
 
 The summary content that is always visible and acts as the trigger.
 
-### `withSwitch` (default: false) [#withswitch-default-false]
+### `withSwitch` [#withswitch]
+
+-  default: **false**
 
 When true, a switch is used instead of an icon to toggle the expanded state.
 

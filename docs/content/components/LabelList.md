@@ -8,7 +8,9 @@
 
 The key that needs to be matched to the data series.
 
-### `position` (default: "inside") [#position-default-inside]
+### `position` [#position]
+
+-  default: **"inside"**
 
 The position of the label list
 

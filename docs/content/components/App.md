@@ -9,7 +9,9 @@ The `App` component is the root container that defines your application's overal
 
 ## Properties [#properties]
 
-### `autoDetectTone` (default: false) [#autodetecttone-default-false]
+### `autoDetectTone` [#autodetecttone]
+
+-  default: **false**
 
 This boolean property enables automatic detection of the system theme preference. When set to true and no defaultTone is specified, the app will automatically use "light" or "dark" tone based on the user's system theme setting. The app will also respond to changes in the system theme preference.
 
@@ -368,11 +370,15 @@ Optional template of the app logo
 
 Optional application name (visible in the browser tab). When you do not define this property, the tab name falls back to the one defined in the app's configuration. If the name is not configured, "XMLUI App" is displayed in the tab.
 
-### `noScrollbarGutters` (default: false) [#noscrollbargutters-default-false]
+### `noScrollbarGutters` [#noscrollbargutters]
+
+-  default: **false**
 
 This boolean property specifies whether the scrollbar gutters should be hidden.
 
-### `scrollWholePage` (default: true) [#scrollwholepage-default-true]
+### `scrollWholePage` [#scrollwholepage]
+
+-  default: **true**
 
 This boolean property specifies whether the whole page should scroll (`true`) or just the content area (`false`). The default value is `true`.
 

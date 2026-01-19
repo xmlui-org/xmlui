@@ -13,7 +13,9 @@ Always used within menu containers like `DropdownMenu`. Use `to` for navigation 
 
 ## Properties [#properties]
 
-### `active` (default: false) [#active-default-false]
+### `active` [#active]
+
+-  default: **false**
 
 This property indicates if the specified menu item is active.
 
@@ -27,7 +29,9 @@ This property indicates if the specified menu item is active.
 </App>
 ```
 
-### `enabled` (default: true) [#enabled-default-true]
+### `enabled` [#enabled]
+
+-  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -45,7 +49,9 @@ This property names an optional icon to display with the menu item. You can use 
 </App>
 ```
 
-### `iconPosition` (default: "start") [#iconposition-default-start]
+### `iconPosition` [#iconposition]
+
+-  default: **"start"**
 
 This property allows you to determine the position of the icon displayed in the menu item.
 

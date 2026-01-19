@@ -183,11 +183,12 @@ export const Search = ({
         setActiveIndex((prev) => (prev <= 0 ? results.length - 1 : prev - 1));
         setNavigationSource("keyboard");
       } else if (e.key === "Enter") {
-        if (activeIndex >= 0 && activeIndex < results.length) {
-          setActiveIndex(-1);
-        }
+        if (results.length === 0) return;
+        e.preventDefault();
+        const targetIndex = activeIndex >= 0 ? activeIndex : 0;
+        setActiveIndex(-1);
         setShow(false);
-        itemLinkRefs.current[activeIndex]?.click();
+        itemLinkRefs.current[targetIndex]?.click();
       } else if (e.key === "Escape") {
         setActiveIndex(-1);
         setShow(false);

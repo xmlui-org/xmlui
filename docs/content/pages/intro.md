@@ -2,15 +2,15 @@
 
 XMLUI is a framework for building user interfaces declaratively, with XML markup and flexible theming. XMLUI apps are:
 
-**Easy to create**. Build on the web platform with little or no knowledge of React or CSS.
+> [!FEAT] **Easy to create**. Build on the web platform with little or no knowledge of React or CSS.
 
-**Clean and modern**. Enjoy themes that look great out of the box and are easy to modify. Create experiences that meet expectations for modern web apps.
+> [!FEAT] **Clean and modern**. Enjoy themes that look great out of the box and are easy to modify. Create experiences that meet expectations for modern web apps.
 
-**Connected**. Read and write APIs with little or no scripting.
+> [!FEAT] **Connected**. Read and write APIs with little or no scripting.
 
-**Modular**. Use a comprehensive suite of [components](/components/_overview) that you can extend with — again! — little or no scripting.
+> [!FEAT] **Modular**. Use a comprehensive suite of [components](/components/_overview) that you can extend with — again! — little or no scripting.
 
-**Easy to deploy**. Just drop a handful of files onto a static webserver.
+> [!FEAT] **Easy to deploy**. Just drop a handful of files onto a static webserver.
 
 This paragraph is static text displayed by XMLUI's [Markdown](/components/Markdown) component.
 
@@ -27,17 +27,17 @@ Here is a tiny app that reports the status of London's tube stations.
 
 Let's unpack the concepts behind this example.
 
-**Markup**. You write XMLUI apps in a declarative style using XML tags and attributes.
+> [!DEF] **Markup**. You write XMLUI apps in a declarative style using XML tags and attributes.
 
-**Components**. [App](https://docs.xmlui.org/components/App), [List](https://docs.xmlui.org/components/List), and [Text](https://docs.xmlui.org/components/Text) are some of the [components](/components/_overview) you can invoke in XMLUI markup.
+> [!DEF] **Components**. [App](https://docs.xmlui.org/components/App), [List](https://docs.xmlui.org/components/List), and [Text](https://docs.xmlui.org/components/Text) are some of the [components](/components/_overview) you can invoke in XMLUI markup.
 
-**Properties**. You configure components using properties like the `data` property on the `List`.
+> [!DEF] **Properties**. You configure components using properties like the `data` property on the `List`.
 
-**Data**. The `data` property fetches from a URL and provides a JSON object to components that use it.
+> [!DEF] **Data**. The `data` property fetches from a URL and provides a JSON object to components that use it.
 
-**Context**. A variety of [context variables](http://localhost:5173/context-variables) are available to certain components. Here `$item` implicitly receives each of the tube stations represented in the top-level array returned from the API.
+> [!DEF] **Context**. A variety of [context variables](http://localhost:5173/context-variables) are available to certain components. Here `$item` implicitly receives each of the tube stations represented in the top-level array returned from the API.
 
-**Expressions**. Inside the `Text` component there are two expressions delimited by curly braces, one extracts the name of the station and another drills deeper into the `$item` to retrieve status, using JavaScript dot notation and array indexing.
+> [!DEF] **Expressions**. Inside the `Text` component there are two expressions delimited by curly braces, one extracts the name of the station and another drills deeper into the `$item` to retrieve status, using JavaScript dot notation and array indexing.
 
 The app runs directly in this page, and you can open it for editing in a [playground](https://playground.xmlui.org/#/playground/#H4sIAAAAAAAAE1VRO2%2FCMBD%2BK9aJMcQsXawUqVJHOoG6AIPBB5yanC37wqNR%2FntlA626%2Bbv7XtYNkMSys61nBDOADQEMNG8hzDesVLOgJMpZsa8bOImEZLS2gWo5tPXRn%2Bv%2BS7fEqDvvUEu%2FQ53ESp82UPRKqWaFV5kPExLsarYdjkY9UFYuCx3Terat79IlnjGS3N4x7SMFIc9jo4tLqaRzp%2FmGG31vCRXsfRc8I0sCs95mzAc65v%2FkQDCw8Ow8q1W%2FQ3VPhArkhB1mxQDkwMC1a3uaOr%2FPS7wKskvPcQlpfQQDk%2FKYhkidjbfpy2z29Pq0MYEZxnE7jhX4Uj0P4EBXdKtMAXOwbcIK0sWGgO4Xh4hnwsuHd38cHwlZbLYBAycf6duz2BYqsHuhMz4s%2Fzd%2FrMpBoaXjSUp5FmQBUy48jj9OtjA1%2BAEAAA%3D%3D).
 

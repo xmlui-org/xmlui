@@ -58,11 +58,15 @@ However, you can create a link that executes an explicit action responding to th
 
 ## Properties [#properties]
 
-### `active` (default: false) [#active-default-false]
+### `active` [#active]
+
+-  default: **false**
 
 This property indicates if the particular navigation is an active link. An active link has a particular visual appearance, provided its [`displayActive`](#displayactive) property is set to `true`.
 
-### `displayActive` (default: true) [#displayactive-default-true]
+### `displayActive` [#displayactive]
+
+-  default: **true**
 
 This Boolean property indicates if the active state of a link should have a visual indication. Setting it to `false` removes the visual indication of an active link.
 
@@ -77,7 +81,9 @@ This Boolean property indicates if the active state of a link should have a visu
 </App>
 ```
 
-### `enabled` (default: true) [#enabled-default-true]
+### `enabled` [#enabled]
+
+-  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -121,6 +127,21 @@ This property allows you to add an optional icon (specify the icon's name) to th
 </App>
 ```
 
+### `iconAlignment` [#iconalignment]
+
+-  default: **"center"**
+
+This property controls the vertical alignment of the icon when the label text wraps to multiple lines. Set to `baseline` to align with the first line of text, `start` to align to the top, `center` for middle alignment (default), or `end` for bottom alignment.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `baseline` | Align icon with the first line of text |
+| `start` | Align icon to the top |
+| `center` | Align icon to the center (default) **(default)** |
+| `end` | Align icon to the bottom |
+
 ### `label` [#label]
 
 This property sets the label of the component.  If not set, the component will not display a label.
@@ -136,7 +157,9 @@ This property sets the label of the component.  If not set, the component will n
 </App>
 ```
 
-### `noIndicator` (default: false) [#noindicator-default-false]
+### `noIndicator` [#noindicator]
+
+-  default: **false**
 
 This Boolean property controls whether to hide the visual indicator for active and hovered states. When set to `true`, the indicator line will not be displayed.
 
@@ -294,6 +317,7 @@ The component has some parts that can be styled through layout properties and th
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink | $fontWeight-normal | $fontWeight-normal |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink--active | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink--pressed | *none* | *none* |
+| iconAlignment-NavLink | *none* | *none* |
 | [lineHeight](../styles-and-themes/common-units/#size)-NavLink | $lineHeight-relaxed | $lineHeight-relaxed |
 | [outlineColor](../styles-and-themes/common-units/#color)-NavLink--focus | $outlineColor--focus | $outlineColor--focus |
 | [outlineOffset](../styles-and-themes/common-units/#size)-NavLink--focus | -1px | -1px |
@@ -320,3 +344,4 @@ The component has some parts that can be styled through layout properties and th
 | Theme Variable | Description |
 | --- | --- |
 | **`color-indicator-NavLink`** | Provides the following states: `--hover`, `--active`, `--pressed` |
+| **`iconAlignment-NavLink`** | Sets the default vertical alignment of the icon when the label text wraps to multiple lines. Valid values: `baseline`, `start`, `center`, `end` |

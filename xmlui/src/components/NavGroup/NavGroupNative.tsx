@@ -54,6 +54,8 @@ type Props = {
   iconHorizontalCollapsed?: string;
   iconVerticalExpanded?: string;
   iconVerticalCollapsed?: string;
+  iconAlignment?: "baseline" | "start" | "center" | "end";
+  expandIconAlignment?: "start" | "end";
 };
 
 export const defaultProps: Pick<
@@ -63,12 +65,14 @@ export const defaultProps: Pick<
   | "iconVerticalExpanded"
   | "iconVerticalCollapsed"
   | "noIndicator"
+  | "expandIconAlignment"
 > = {
   iconHorizontalExpanded: "chevronright",
   iconHorizontalCollapsed: "chevronright",
   iconVerticalExpanded: "chevrondown",
   iconVerticalCollapsed: "chevronright",
   noIndicator: false,
+  expandIconAlignment: "start",
 };
 
 export const NavGroup = forwardRef(function NavGroup(
@@ -86,10 +90,14 @@ export const NavGroup = forwardRef(function NavGroup(
     iconHorizontalExpanded,
     iconVerticalCollapsed,
     iconVerticalExpanded,
+    iconAlignment = "center",
+    expandIconAlignment,
     ...rest
   }: Props,
   ref,
 ) {
+  const { getThemeVar } = useTheme();
+  const effectiveExpandIconAlignment = expandIconAlignment || (getThemeVar("expandIconAlignment-NavGroup") as "start" | "end" | undefined) || defaultProps.expandIconAlignment;
   const { level } = useContext(NavGroupContext);
   const appLayoutContext = useAppLayoutContext();
   const navPanelContext = useContext(NavPanelContext);
@@ -143,6 +151,8 @@ export const NavGroup = forwardRef(function NavGroup(
           initiallyExpanded={initiallyExpanded}
           disabled={disabled}
           noIndicator={noIndicator}
+          iconAlignment={iconAlignment}
+          expandIconAlignment={effectiveExpandIconAlignment}
         />
       ) : (
         <DropDownNavGroup
@@ -156,6 +166,8 @@ export const NavGroup = forwardRef(function NavGroup(
           initiallyExpanded={initiallyExpanded}
           disabled={disabled}
           noIndicator={noIndicator}
+          expandIconAlignment={effectiveExpandIconAlignment}
+          iconAlignment={iconAlignment}
         />
       )}
     </NavGroupContext.Provider>
@@ -172,6 +184,8 @@ type ExpandableNavGroupProps = {
   initiallyExpanded?: boolean;
   disabled?: boolean;
   noIndicator?: boolean;
+  iconAlignment?: "baseline" | "start" | "center" | "end";
+  expandIconAlignment?: "start" | "end";
 };
 
 const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
@@ -185,6 +199,8 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
     initiallyExpanded = false,
     disabled = false,
     noIndicator = false,
+    iconAlignment = "center",
+    expandIconAlignment = "start",
     ...rest
   }: ExpandableNavGroupProps,
   ref,
@@ -206,6 +222,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
   const toggleStyle = {
     ...style,
     "--nav-link-level": layoutIsVertical ? level : 0,
+    ...(expandIconAlignment === "end" && { width: "100%" }),
   };
 
   const handleClick = (e: React.MouseEvent) => {
@@ -215,19 +232,29 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
   };
 
   return (
-    <>
+    <div 
+      className={styles.groupWrapper}
+      style={expandIconAlignment === "end" ? { width: "100%" } : undefined}
+    >
       <NavLink
         {...rest}
+        className={classnames(styles.navLinkPadding, {
+          [styles.navLinkPaddingLevel1]: level === 0,
+          [styles.navLinkPaddingLevel2]: level === 1,
+          [styles.navLinkPaddingLevel3]: level === 2,
+          [styles.navLinkPaddingLevel4]: level === 3,
+        })}
         style={toggleStyle}
         onClick={handleClick}
         icon={icon}
         to={to}
         disabled={disabled}
         noIndicator={noIndicator}
+        iconAlignment={iconAlignment}
         aria-expanded={expanded}
       >
         {label}
-        <div style={{ flex: 1 }} />
+        {expandIconAlignment === "end" && <div style={{ flex: 1 }} />}
         <Icon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />
       </NavLink>
       <div
@@ -240,7 +267,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
           {renderChild(node.children)}
         </div>
       </div>
-    </>
+    </div>
   );
 });
 
@@ -254,6 +281,8 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     disabled = false,
     initiallyExpanded = false,
     noIndicator = false,
+    iconAlignment = "center",
+    expandIconAlignment = "start",
     ...rest
   }: {
     style?: CSSProperties;
@@ -265,6 +294,8 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     disabled?: boolean;
     initiallyExpanded?: boolean;
     noIndicator?: boolean;
+    iconAlignment?: "baseline" | "start" | "center" | "end";
+    expandIconAlignment?: "start" | "end";
   },
   ref,
 ) {
@@ -308,15 +339,22 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     >
       <Trigger asChild disabled={disabled}>
         <NavLink
+          className={classnames(styles.navLinkPadding, {
+            [styles.navLinkPaddingLevel1]: level === 0,
+            [styles.navLinkPaddingLevel2]: level === 1,
+            [styles.navLinkPaddingLevel3]: level === 2,
+            [styles.navLinkPaddingLevel4]: level === 3,
+          })}
           icon={icon}
           style={{ flexShrink: 0 }}
           vertical={level >= 1}
           to={to}
           disabled={disabled}
           noIndicator={noIndicator}
+          iconAlignment={iconAlignment}
         >
           {label}
-          <div style={{ flex: 1 }} />
+          {expandIconAlignment === "end" && <div style={{ flex: 1 }} />}
           {level === 0 && <Icon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />}
           {level >= 1 && (
             <Icon name={expanded ? iconHorizontalExpanded : iconHorizontalCollapsed} />
