@@ -34,6 +34,13 @@ export const NavPanelMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.inDrawer,
     },
+    scrollStyle: {
+      description: `This property determines the scrollbar style. When set to "overlay", the scrollbar ` +
+        `is displayed only when hovering over the scroll container.`,
+      valueType: "string",
+      allowedValues: ["normal", "overlay"],
+      defaultValue: defaultProps.scrollStyle,
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
@@ -63,6 +70,8 @@ function NavPanelWithBuiltNavHierarchy({
     return buildNavHierarchy(node.children, extractValue, undefined, []);
   }, [extractValue, node.children]);
 
+  const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
+
   return (
     <NavPanel
       logoContent={renderChild(node.props.logoTemplate)}
@@ -70,6 +79,7 @@ function NavPanelWithBuiltNavHierarchy({
       inDrawer={layoutContext?.inDrawer}
       renderChild={renderChild}
       navLinks={navLinks}
+      scrollStyle={scrollStyle}
     >
       {renderChild(node.children)}
     </NavPanel>
