@@ -163,6 +163,7 @@ export const H1Md = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H1}`]: "$fontSize-2xl",
+    [`lineHeight-${H1}`]: "$lineHeight-tight",
     [`marginTop-${H1}`]: "0",
     [`marginBottom-${H1}`]: "0",
     [`fontSize-${H1}-markdown`]: "$fontSize-2xl",
@@ -194,6 +195,7 @@ export const H2Md = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H2}`]: "$fontSize-xl",
+    [`lineHeight-${H2}`]: "$lineHeight-tight",
     [`marginTop-${H2}`]: "0",
     [`marginBottom-${H2}`]: "0",
     [`fontSize-${H2}-markdown`]: "$fontSize-xl",
@@ -225,6 +227,7 @@ export const H3Md = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H3}`]: "$fontSize-lg",
+    [`lineHeight-${H3}`]: "$lineHeight-tight",
     [`marginTop-${H3}`]: "0",
     [`marginBottom-${H3}`]: "0",
     [`fontSize-${H3}-markdown`]: "$fontSize-lg",
@@ -256,6 +259,7 @@ export const H4Md = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H4}`]: "$fontSize-base",
+    [`lineHeight-${H4}`]: "$lineHeight-tight",
     [`marginTop-${H4}`]: "0",
     [`marginBottom-${H4}`]: "0",
     [`fontSize-${H4}-markdown`]: "$fontSize-base",
@@ -287,6 +291,7 @@ export const H5Md = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H5}`]: "$fontSize-sm",
+    [`lineHeight-${H5}`]: "$lineHeight-tight",
     [`marginTop-${H5}`]: "0",
     [`marginBottom-${H5}`]: "0",
     [`fontSize-${H5}-markdown`]: "$fontSize-sm",
@@ -318,6 +323,7 @@ export const H6Md = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H6}`]: "$fontSize-xs",
+    [`lineHeight-${H6}`]: "$lineHeight-tight",
     [`marginTop-${H6}`]: "0",
     [`marginBottom-${H6}`]: "0",
     [`fontSize-${H6}-markdown`]: "$fontSize-xs",
