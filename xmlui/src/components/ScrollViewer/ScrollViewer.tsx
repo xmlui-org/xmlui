@@ -26,6 +26,15 @@ export const ScrollViewerMd = createMetadata({
       allowedValues: ["normal", "styled", "whenMouseOver", "whenScrolling"],
       defaultValue: defaultProps.scrollStyle,
     },
+    showScrollerFade: {
+      description:
+        "When enabled, displays gradient fade indicators at the top and bottom of the scroll container to visually indicate that more content is available in those directions. " +
+        "The fade indicators automatically appear/disappear based on the current scroll position. " +
+        "Top fade shows when scrolled down from the top, bottom fade shows when not at the bottom. " +
+        "Only works with styled scrollbar modes (not with `normal` mode).",
+      valueType: "boolean",
+      defaultValue: defaultProps.showScrollerFade,
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   themeVarDescriptions: {
@@ -62,6 +71,12 @@ export const ScrollViewerMd = createMetadata({
     [`transition-${SCROLLER}`]: "CSS transition for the scrollbar container (opacity, visibility, position changes)",
     [`transitionTrack-${SCROLLER}`]: "CSS transition for the scrollbar track (opacity, background-color, border-color)",
     [`transitionHandle-${SCROLLER}`]: "CSS transition for the scrollbar handle (opacity, background-color, border-color, size changes)",
+
+    // --- Fade overlays
+    [`height-fade-${SCROLLER}`]: "The height of the fade overlay gradients at the top and bottom of the scroll container",
+    [`backgroundColor-fadeTop-${SCROLLER}`]: "The background gradient for the top fade overlay (typically a gradient from opaque to transparent)",
+    [`backgroundColor-fadeBottom-${SCROLLER}`]: "The background gradient for the bottom fade overlay (typically a gradient from transparent to opaque)",
+    [`transition-fade-${SCROLLER}`]: "CSS transition for the fade overlays (opacity changes)",
   },
   defaultThemeVars: {
     // --- Scrollbar sizing
@@ -99,6 +114,12 @@ export const ScrollViewerMd = createMetadata({
     [`transitionTrack-${SCROLLER}`]: "opacity 0.15s, background-color 0.15s, border-color 0.15s",
     [`transitionHandle-${SCROLLER}`]:
       "opacity 0.15s, background-color 0.15s, border-color 0.15s, height 0.15s, width 0.15s",
+
+    // --- Fade overlays
+    [`height-fade-${SCROLLER}`]: "64px",
+    [`backgroundColor-fadeTop-${SCROLLER}`]: "linear-gradient(to bottom, rgba(255, 255, 255, 0.75), transparent)",
+    [`backgroundColor-fadeBottom-${SCROLLER}`]: "linear-gradient(to top, rgba(255, 255, 255, 0.75), transparent)",
+    [`transition-fade-${SCROLLER}`]: "opacity 0.3s ease-in-out",
   },
 });
 
@@ -107,9 +128,14 @@ export const scrollViewerComponentRenderer = createComponentRenderer(
   ScrollViewerMd,
   ({ node, extractValue, renderChild, className }) => {
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle);
+    const showScrollerFade = extractValue.asOptionalBoolean(node.props.showScrollerFade);
 
     return (
-      <ScrollViewer className={className} scrollStyle={scrollStyle as any}>
+      <ScrollViewer 
+        className={className} 
+        scrollStyle={scrollStyle as any}
+        showScrollerFade={showScrollerFade}
+      >
         {renderChild(node.children)}
       </ScrollViewer>
     );

@@ -4,6 +4,7 @@ import styles from "./ScrollViewer.module.scss";
 
 export const defaultProps = {
   scrollStyle: "normal" as ScrollStyle,
+  showScrollerFade: false,
 };
 
 type Props = {
@@ -11,6 +12,7 @@ type Props = {
   className?: string;
   style?: CSSProperties;
   scrollStyle?: ScrollStyle;
+  showScrollerFade?: boolean;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 /**
@@ -23,6 +25,7 @@ export const ScrollViewer = forwardRef<HTMLDivElement, Props>(function ScrollVie
     className,
     style,
     scrollStyle = defaultProps.scrollStyle,
+    showScrollerFade = defaultProps.showScrollerFade,
     ...rest
   },
   ref
@@ -40,6 +43,7 @@ export const ScrollViewer = forwardRef<HTMLDivElement, Props>(function ScrollVie
       className={className}
       style={containerStyle}
       scrollStyle={scrollStyle}
+      showScrollerFade={showScrollerFade}
       {...rest}
     >
       {children}
