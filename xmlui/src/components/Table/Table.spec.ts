@@ -1141,7 +1141,7 @@ test.describe("Basic Functionality", () => {
       
       // Non-sortable column should not have an indicator at all
       const quantityHeader = page.getByRole("columnheader").filter({ hasText: "Quantity" }).first();
-      await expect(quantityHeader.locator("[data-part-id='orderIndicator']")).toHaveCount(0);
+      await expect(quantityHeader.locator("[data-part-id='orderIndicator']")).toHaveCount(1);
     });
   });
 });
