@@ -95,7 +95,7 @@ This component does not expose any methods.
 | [borderHorizontalWidth](../styles-and-themes/common-units/#size)-TableOfContentsItem--active | *none* | *none* |
 | [borderHorizontalWidth](../styles-and-themes/common-units/#size)-TableOfContentsItem--hover | *none* | *none* |
 | [borderLeft](../styles-and-themes/common-units/#border)-TableOfContents | *none* | *none* |
-| [borderLeft](../styles-and-themes/common-units/#border)-TableOfContentsItem | *none* | *none* |
+| [borderLeft](../styles-and-themes/common-units/#border)-TableOfContentsItem | 2px solid $color-surface-100 | 2px solid $color-surface-100 |
 | [borderLeft](../styles-and-themes/common-units/#border)-TableOfContentsItem--active | *none* | *none* |
 | [borderLeft](../styles-and-themes/common-units/#border)-TableOfContentsItem--hover | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-TableOfContents | *none* | *none* |
@@ -174,6 +174,8 @@ This component does not expose any methods.
 | [borderWidth](../styles-and-themes/common-units/#size)-TableOfContentsItem | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-TableOfContentsItem--active | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-TableOfContentsItem--hover | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-indicator-TableOfContents | $color-surface-100 | $color-surface-100 |
+| [color](../styles-and-themes/common-units/#color)-indicator-TableOfContents--active | $color-surface-900 | $color-surface-900 |
 | [direction](../styles-and-themes/layout-props#direction)-TableOfContentsItem | *none* | *none* |
 | [direction](../styles-and-themes/layout-props#direction)-TableOfContentsItem-level-1 | *none* | *none* |
 | [direction](../styles-and-themes/layout-props#direction)-TableOfContentsItem-level-2 | *none* | *none* |
@@ -396,6 +398,7 @@ This component does not expose any methods.
 | [textUnderlineOffset](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-4 | *none* | *none* |
 | [textUnderlineOffset](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-5 | *none* | *none* |
 | [textUnderlineOffset](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-6 | *none* | *none* |
+| [width](../styles-and-themes/common-units/#size)-indicator-TableOfContents | 2px | 2px |
 | [width](../styles-and-themes/common-units/#size)-TableOfContents | *none* | *none* |
 | [wordBreak](../styles-and-themes/common-units/#word-break)-TableOfContentsItem | *none* | *none* |
 | [wordBreak](../styles-and-themes/common-units/#word-break)-TableOfContentsItem-level-1 | *none* | *none* |

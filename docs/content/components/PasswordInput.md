@@ -34,6 +34,10 @@ This property defines the gap between the adornments and the input area. If not 
 
 This property sets the component's initial value.
 
+### `invalidMessages` [#invalidmessages]
+
+The invalid messages to display for the input component.
+
 ### `maxLength` [#maxlength]
 
 This property sets the maximum length of the input it accepts.
@@ -80,6 +84,14 @@ This property sets an optional icon to appear at the start (left side when the l
 
 This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.
 
+### `validationIconError` [#validationiconerror]
+
+Icon to display for error state when concise validation summary is enabled.
+
+### `validationIconSuccess` [#validationiconsuccess]
+
+Icon to display for valid state when concise validation summary is enabled.
+
 ### `validationStatus` [#validationstatus]
 
 -  default: **"none"**
@@ -93,6 +105,10 @@ Available values:
 | `valid` | Visual indicator for an input that is accepted |
 | `warning` | Visual indicator for an input that produced a warning |
 | `error` | Visual indicator for an input that produced an error |
+
+### `verboseValidationFeedback` [#verbosevalidationfeedback]
+
+Enables a concise validation summary (icon) in input components.
 
 ## Events [#events]
 

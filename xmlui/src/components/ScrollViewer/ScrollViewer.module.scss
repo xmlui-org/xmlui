@@ -1,0 +1,95 @@
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$component: "Scroller";
+
+// --- Scrollbar sizing variables
+$size-Scroller: createThemeVar('size-Scroller');
+$padding-perpendicular-Scroller: createThemeVar('padding-perpendicular-Scroller');
+$padding-axis-Scroller: createThemeVar('padding-axis-Scroller');
+
+// --- Track styling variables
+$borderRadius-track-Scroller: createThemeVar('borderRadius-track-Scroller');
+$backgroundColor-track-Scroller: createThemeVar('backgroundColor-track-Scroller');
+$backgroundColor-track-Scroller--hover: createThemeVar('backgroundColor-track-Scroller--hover');
+$backgroundColor-track-Scroller--active: createThemeVar('backgroundColor-track-Scroller--active');
+$border-track-Scroller: createThemeVar('border-track-Scroller');
+$border-track-Scroller--hover: createThemeVar('border-track-Scroller--hover');
+$border-track-Scroller--active: createThemeVar('border-track-Scroller--active');
+
+// --- Handle styling variables
+$borderRadius-handle-Scroller: createThemeVar('borderRadius-handle-Scroller');
+$backgroundColor-handle-Scroller: createThemeVar('backgroundColor-handle-Scroller');
+$backgroundColor-handle-Scroller--hover: createThemeVar('backgroundColor-handle-Scroller--hover');
+$backgroundColor-handle-Scroller--active: createThemeVar('backgroundColor-handle-Scroller--active');
+$border-handle-Scroller: createThemeVar('border-handle-Scroller');
+$border-handle-Scroller--hover: createThemeVar('border-handle-Scroller--hover');
+$border-handle-Scroller--active: createThemeVar('border-handle-Scroller--active');
+$minSize-handle-Scroller: createThemeVar('minSize-handle-Scroller');
+$maxSize-handle-Scroller: createThemeVar('maxSize-handle-Scroller');
+$size-perpendicularHandle-Scroller: createThemeVar('size-perpendicularHandle-Scroller');
+$size-perpendicularHandle-Scroller--hover: createThemeVar('size-perpendicularHandle-Scroller--hover');
+$size-perpendicularHandle-Scroller--active: createThemeVar('size-perpendicularHandle-Scroller--active');
+$offset-handleInteractiveArea-Scroller: createThemeVar('offset-handleInteractiveArea-Scroller');
+
+// --- Transition variables
+$transition-Scroller: createThemeVar('transition-Scroller');
+$transition-track-Scroller: createThemeVar('transition-track-Scroller');
+$transition-handle-Scroller: createThemeVar('transition-handle-Scroller');
+
+// --- Apply theme variables to the scrollbar
+.wrapper {
+  :global(.os-scrollbar) {
+    --os-size: #{$size-Scroller};
+    --os-padding-perpendicular: #{$padding-perpendicular-Scroller};
+    --os-padding-axis: #{$padding-axis-Scroller};
+    --os-track-border-radius: #{$borderRadius-track-Scroller};
+    --os-track-bg: #{$backgroundColor-track-Scroller};
+    --os-track-bg-hover: #{$backgroundColor-track-Scroller--hover};
+    --os-track-bg-active: #{$backgroundColor-track-Scroller--active};
+    --os-track-border-hover: #{$border-track-Scroller--hover};
+    --os-track-border-active: #{$border-track-Scroller--active};
+    --os-handle-border-radius: #{$borderRadius-handle-Scroller};
+    --os-handle-bg: #{$backgroundColor-handle-Scroller};
+    --os-handle-bg-hover: #{$backgroundColor-handle-Scroller--hover};
+    --os-handle-bg-active: #{$backgroundColor-handle-Scroller--active};
+    --os-handle-border: #{$border-handle-Scroller};
+    --os-handle-border-hover: #{$border-handle-Scroller--hover};
+    --os-handle-border-active: #{$border-handle-Scroller--active};
+    --os-handle-min-size: #{$minSize-handle-Scroller};
+    --os-handle-max-size: #{$maxSize-handle-Scroller};
+    --os-handle-perpendicular-size: #{$size-perpendicularHandle-Scroller};
+    --os-handle-perpendicular-size-hover: #{$size-perpendicularHandle-Scroller--hover};
+    --os-handle-perpendicular-size-active: #{$size-perpendicularHandle-Scroller--active};
+    --os-handle-interactive-area-offset: #{$offset-handleInteractiveArea-Scroller};
+    transition: #{$transition-Scroller};
+  }
+
+  :global(.os-scrollbar-track) {
+    border: #{$border-track-Scroller} !important;
+    transition: #{$transition-track-Scroller} !important;
+
+    &:hover {
+      border: #{$border-track-Scroller--hover} !important;
+    }
+
+    &:active {
+      border: #{$border-track-Scroller--active} !important;
+    }
+  }
+
+  :global(.os-scrollbar-handle) {
+    transition: #{$transition-handle-Scroller};
+  }
+}
+
+// --- Export theme variables for registration
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

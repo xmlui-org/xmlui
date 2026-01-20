@@ -148,6 +148,7 @@ import { optionComponentRenderer } from "./Option/Option";
 import { autoCompleteComponentRenderer } from "./AutoComplete/AutoComplete";
 import type StandaloneExtensionManager from "../components-core/StandaloneExtensionManager";
 import { backdropComponentRenderer } from "./Backdrop/Backdrop";
+import { scrollViewerComponentRenderer } from "./ScrollViewer/ScrollViewer";
 import type { ThemeDefinition } from "../abstractions/ThemingDefs";
 import type { Extension } from "../abstractions/ExtensionDefs";
 import { brComponentRenderer, BrComponentRenderer } from "./Br/Br";
@@ -417,6 +418,9 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_TreeDisplay !== "false") {
       this.registerCoreComponent(treeDisplayComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_ScrollViewer !== "false") {
+      this.registerCoreComponent(scrollViewerComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Button !== "false") {
       this.registerCoreComponent(buttonComponentRenderer);

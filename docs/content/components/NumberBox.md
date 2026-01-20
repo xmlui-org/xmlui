@@ -250,6 +250,14 @@ Note that only integers are allowed to be entered.
 </App>
 ```
 
+### `validationIconError` [#validationiconerror]
+
+Icon to display for error state when concise validation summary is enabled.
+
+### `validationIconSuccess` [#validationiconsuccess]
+
+Icon to display for valid state when concise validation summary is enabled.
+
 ### `validationStatus` [#validationstatus]
 
 -  default: **"none"**
@@ -280,6 +288,10 @@ This prop is used to visually indicate status changes reacting to form field val
   <NumberBox validationStatus="error" />
 </App>
 ```
+
+### `verboseValidationFeedback` [#verbosevalidationfeedback]
+
+Enables a concise validation summary (icon) in input components.
 
 ### `zeroOrPositive` [#zeroorpositive]
 

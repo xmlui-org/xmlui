@@ -45,6 +45,12 @@ This property defines the logo template to display in the navigation panel with 
 </App>
 ```
 
+### `scrollStyle` [#scrollstyle]
+
+-  default: **"normal"**
+
+This property determines the scrollbar style. When set to "whenMouseOver", the scrollbar is displayed only when hovering over the scroll container. When set to "whenScrolling", the scrollbar is displayed only while scrolling is active and fades out after 400ms of inactivity.
+
 ## Events [#events]
 
 This component does not have any events.

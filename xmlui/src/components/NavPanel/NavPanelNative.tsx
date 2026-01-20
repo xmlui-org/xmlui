@@ -1,9 +1,8 @@
 import React, { forwardRef, type ReactNode, useEffect } from "react";
 import classnames from "classnames";
-import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
-import "overlayscrollbars/overlayscrollbars.css";
 
 import styles from "./NavPanel.module.scss";
+import { Scroller, type ScrollStyle } from "../ScrollViewer/Scroller";
 
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import { Logo } from "../Logo/LogoNative";
@@ -199,7 +198,7 @@ export function buildLinkMap(
 // Default props for NavPanel component
 export const defaultProps = {
   inDrawer: false,
-  scrollStyle: "normal" as "normal" | "overlay",
+  scrollStyle: "normal" as ScrollStyle,
 };
 
 interface INavPanelContext {
@@ -224,31 +223,17 @@ function DrawerNavPanel({
   className?: string;
   style?: React.CSSProperties;
   logoContent?: ReactNode;
-  scrollStyle?: "normal" | "overlay";
+  scrollStyle?: ScrollStyle;
 }) {
-  const wrapperInnerContent = <div className={styles.wrapperInner} style={style}>{children}</div>;
   return (
     <NavPanelContext.Provider value={contextValue}>
       <div {...rest} className={classnames(styles.wrapper, className)} style={style}>
         <div className={classnames(styles.logoWrapper, styles.inDrawer)}>
           {logoContent || <Logo />}
         </div>
-        {scrollStyle === "overlay" ? (
-          <OverlayScrollbarsComponent
-            className={styles.wrapperInner}
-            style={style}
-            options={{
-              scrollbars: {
-                autoHide: "leave",
-                autoHideDelay: 200,
-              },
-            }}
-          >
-            {children}
-          </OverlayScrollbarsComponent>
-        ) : (
-          wrapperInnerContent
-        )}
+        <Scroller className={styles.wrapperInner} style={style} scrollStyle={scrollStyle}>
+          {children}
+        </Scroller>
       </div>
     </NavPanelContext.Provider>
   );
@@ -262,7 +247,7 @@ type Props = {
   inDrawer?: boolean;
   renderChild: RenderChildFn;
   navLinks?: NavHierarchyNode[];
-  scrollStyle?: "normal" | "overlay";
+  scrollStyle?: ScrollStyle;
 };
 
 export const NavPanel = forwardRef(function NavPanel(
@@ -305,8 +290,6 @@ export const NavPanel = forwardRef(function NavPanel(
     );
   }
 
-  const wrapperInnerContent = <div className={styles.wrapperInner} style={style}>{children}</div>;
-
   return (
     <div
       {...rest}
@@ -321,22 +304,9 @@ export const NavPanel = forwardRef(function NavPanel(
       {showLogo && (
         <div className={classnames(styles.logoWrapper)}>{safeLogoContent || <Logo />}</div>
       )}
-      {scrollStyle === "overlay" ? (
-        <OverlayScrollbarsComponent
-          className={styles.wrapperInner}
-          style={style}
-          options={{
-            scrollbars: {
-              autoHide: "leave",
-              autoHideDelay: 200,
-            },
-          }}
-        >
-          {children}
-        </OverlayScrollbarsComponent>
-      ) : (
-        wrapperInnerContent
-      )}
+      <Scroller className={styles.wrapperInner} style={style} scrollStyle={scrollStyle}>
+        {children}
+      </Scroller>
     </div>
   );
 });

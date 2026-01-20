@@ -78,6 +78,7 @@
   "RealTimeAdapter": "RealTimeAdapter",
   "Redirect": "Redirect",
   "ResponsiveBar": "ResponsiveBar",
+  "ScrollViewer": "ScrollViewer",
   "Select": "Select",
   "Slider": "Slider",
   "Slot": "Slot",

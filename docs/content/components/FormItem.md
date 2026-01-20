@@ -496,7 +496,9 @@ Available values:
 | `markOptional` | Show "(Optional)" for optional fields |
 | `markBoth` | Show "*" for required AND "(Optional)" for optional fields |
 
-### `type` (default: "text") [#type-default-text]
+### `type` [#type]
+
+-  default: **"text"**
 
 This property is used to determine the specific input control the FormItem will wrap around. Note that the control names start with a lowercase letter and map to input components found in XMLUI.
 

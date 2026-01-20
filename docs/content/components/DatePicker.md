@@ -172,6 +172,10 @@ This property sets the component's initial value.
 
 If set to true, the calendar is always visible and its panel is rendered as part of the layout. If false, the calendar is shown in a popup when the input is focused or clicked.
 
+### `invalidMessages` [#invalidmessages]
+
+The invalid messages to display for the input component.
+
 ### `mode` [#mode]
 
 -  default: **"single"**
@@ -227,6 +231,14 @@ This property sets an optional icon to appear at the start (left side when the l
 
 This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.
 
+### `validationIconError` [#validationiconerror]
+
+Icon to display for error state when concise validation summary is enabled.
+
+### `validationIconSuccess` [#validationiconsuccess]
+
+Icon to display for valid state when concise validation summary is enabled.
+
 ### `validationStatus` [#validationstatus]
 
 -  default: **"none"**
@@ -255,6 +267,10 @@ Available values:
   <DatePicker validationStatus="error" />
 </App>
 ```
+
+### `verboseValidationFeedback` [#verbosevalidationfeedback]
+
+Enables a concise validation summary (icon) in input components.
 
 ### `weekStartsOn` [#weekstartson]
 

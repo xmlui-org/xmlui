@@ -35,10 +35,11 @@ export const NavPanelMd = createMetadata({
       defaultValue: defaultProps.inDrawer,
     },
     scrollStyle: {
-      description: `This property determines the scrollbar style. When set to "overlay", the scrollbar ` +
-        `is displayed only when hovering over the scroll container.`,
+      description: `This property determines the scrollbar style. When set to "whenMouseOver", the scrollbar ` +
+        `is displayed only when hovering over the scroll container. When set to "whenScrolling", the scrollbar ` +
+        `is displayed only while scrolling is active and fades out after 400ms of inactivity.`,
       valueType: "string",
-      allowedValues: ["normal", "overlay"],
+      allowedValues: ["normal", "whenMouseOver", "whenScrolling"],
       defaultValue: defaultProps.scrollStyle,
     },
   },

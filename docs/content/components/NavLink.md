@@ -157,6 +157,12 @@ This property sets the label of the component.  If not set, the component will n
 </App>
 ```
 
+### `level` [#level]
+
+This property specifies the nesting level (1-4) for the navigation link, which affects its padding. Higher levels typically have more left padding to indicate hierarchy. When used inside a NavGroup, the level is automatically inherited from the group context.
+
+Available values: `1`, `2`, `3`, `4`
+
 ### `noIndicator` [#noindicator]
 
 -  default: **false**
@@ -317,18 +323,47 @@ The component has some parts that can be styled through layout properties and th
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink | $fontWeight-normal | $fontWeight-normal |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink--active | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink--pressed | *none* | *none* |
+| [gap](../styles-and-themes/common-units/#size)-icon-NavLink | $space-3 | $space-3 |
 | iconAlignment-NavLink | *none* | *none* |
 | [lineHeight](../styles-and-themes/common-units/#size)-NavLink | $lineHeight-relaxed | $lineHeight-relaxed |
 | [outlineColor](../styles-and-themes/common-units/#color)-NavLink--focus | $outlineColor--focus | $outlineColor--focus |
 | [outlineOffset](../styles-and-themes/common-units/#size)-NavLink--focus | -1px | -1px |
 | [outlineStyle](../styles-and-themes/common-units/#border)-NavLink--focus | $outlineStyle--focus | $outlineStyle--focus |
 | [outlineWidth](../styles-and-themes/common-units/#size)-NavLink--focus | $outlineWidth--focus | $outlineWidth--focus |
+| [padding](../styles-and-themes/common-units/#size)-level1-NavLink | *none* | *none* |
+| [padding](../styles-and-themes/common-units/#size)-level2-NavLink | *none* | *none* |
+| [padding](../styles-and-themes/common-units/#size)-level3-NavLink | *none* | *none* |
+| [padding](../styles-and-themes/common-units/#size)-level4-NavLink | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-NavLink | *none* | *none* |
+| [paddingBottom](../styles-and-themes/common-units/#size)-level1-NavLink | *none* | *none* |
+| [paddingBottom](../styles-and-themes/common-units/#size)-level2-NavLink | *none* | *none* |
+| [paddingBottom](../styles-and-themes/common-units/#size)-level3-NavLink | *none* | *none* |
+| [paddingBottom](../styles-and-themes/common-units/#size)-level4-NavLink | *none* | *none* |
 | [paddingBottom](../styles-and-themes/common-units/#size)-NavLink | *none* | *none* |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-level1-NavLink | *none* | *none* |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-level2-NavLink | *none* | *none* |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-level3-NavLink | *none* | *none* |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-level4-NavLink | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-NavLink | $space-4 | $space-4 |
+| [paddingLeft](../styles-and-themes/common-units/#size)-level1-NavLink | *none* | *none* |
+| [paddingLeft](../styles-and-themes/common-units/#size)-level2-NavLink | *none* | *none* |
+| [paddingLeft](../styles-and-themes/common-units/#size)-level3-NavLink | *none* | *none* |
+| [paddingLeft](../styles-and-themes/common-units/#size)-level4-NavLink | *none* | *none* |
 | [paddingLeft](../styles-and-themes/common-units/#size)-NavLink | *none* | *none* |
+| [paddingRight](../styles-and-themes/common-units/#size)-level1-NavLink | *none* | *none* |
+| [paddingRight](../styles-and-themes/common-units/#size)-level2-NavLink | *none* | *none* |
+| [paddingRight](../styles-and-themes/common-units/#size)-level3-NavLink | *none* | *none* |
+| [paddingRight](../styles-and-themes/common-units/#size)-level4-NavLink | *none* | *none* |
 | [paddingRight](../styles-and-themes/common-units/#size)-NavLink | *none* | *none* |
+| [paddingTop](../styles-and-themes/common-units/#size)-level1-NavLink | *none* | *none* |
+| [paddingTop](../styles-and-themes/common-units/#size)-level2-NavLink | *none* | *none* |
+| [paddingTop](../styles-and-themes/common-units/#size)-level3-NavLink | *none* | *none* |
+| [paddingTop](../styles-and-themes/common-units/#size)-level4-NavLink | *none* | *none* |
 | [paddingTop](../styles-and-themes/common-units/#size)-NavLink | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-level1-NavLink | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-level2-NavLink | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-level3-NavLink | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-level4-NavLink | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-NavLink | $space-2 | $space-2 |
 | [textColor](../styles-and-themes/common-units/#color)-NavLink | $textColor-primary | $textColor-primary |
 | [textColor](../styles-and-themes/common-units/#color)-NavLink--active | $color-primary-500 | $color-primary-500 |
@@ -345,3 +380,4 @@ The component has some parts that can be styled through layout properties and th
 | --- | --- |
 | **`color-indicator-NavLink`** | Provides the following states: `--hover`, `--active`, `--pressed` |
 | **`iconAlignment-NavLink`** | Sets the default vertical alignment of the icon when the label text wraps to multiple lines. Valid values: `baseline`, `start`, `center`, `end` |
+| **`gap-icon-NavLink`** | Sets the gap between the icon and the text label. Only applied when an icon is present. |

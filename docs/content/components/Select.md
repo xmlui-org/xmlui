@@ -301,6 +301,14 @@ Enables the customization of how the ungrouped options header is displayed in th
 </App>
 ```
 
+### `validationIconError` [#validationiconerror]
+
+Icon to display for error state when concise validation summary is enabled.
+
+### `validationIconSuccess` [#validationiconsuccess]
+
+Icon to display for valid state when concise validation summary is enabled.
+
 ### `validationStatus` [#validationstatus]
 
 -  default: **"none"**
@@ -353,6 +361,10 @@ In the template definition, you can use the `$item` context property to access t
   </Select>
 </App>
 ```
+
+### `verboseValidationFeedback` [#verbosevalidationfeedback]
+
+Enables a concise validation summary (icon) in input components.
 
 ## Events [#events]
 

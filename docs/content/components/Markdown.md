@@ -127,7 +127,9 @@ Function calls are executed: @{x()}
 
 ## Properties [#properties]
 
-### `breakMode` (default: "normal") [#breakmode-default-normal]
+### `breakMode` [#breakmode]
+
+-  default: **"normal"**
 
 This property controls how text breaks into multiple lines. `normal` uses standard word boundaries, `word` breaks long words to prevent overflow, `anywhere` breaks at any character, `keep` prevents word breaking, and `hyphenate` uses automatic hyphenation. When not specified, uses the default browser behavior or theme variables.
 
@@ -200,7 +202,9 @@ This boolean property specifies whether images should be displayed in grayscale.
 
 This boolean property specifies whether links should open in a new tab. If set to `true`, all links within the markdown will open in a new tab with `target="_blank"`. Links that explicitly specify their own target using the `| target=...` syntax will override this setting.
 
-### `overflowMode` (default: "not specified") [#overflowmode-default-not-specified]
+### `overflowMode` [#overflowmode]
+
+-  default: **"not specified"**
 
 This property controls how text overflow is handled. `none` prevents wrapping and shows no overflow indicator, `ellipsis` shows ellipses when text is truncated, `scroll` forces single line with horizontal scrolling, and `flow` allows multi-line wrapping with vertical scrolling when needed. When not specified, uses the default text behavior.
 
@@ -277,7 +281,9 @@ For comma-separated markdown links (common in reference lists), use `overflowMod
 </App>
 ```
 
-### `removeBr` (default: false) [#removebr-default-false]
+### `removeBr` [#removebr]
+
+-  default: **false**
 
 This boolean property specifies whether `<br>` (line break) elements should be omitted from the rendered output. When set to `true`, `<br/>` tags in the markdown content will not be rendered. When `false` (default), `<br/>` tags render as horizontal bars.
 
@@ -345,8 +351,11 @@ The component itself cannot be styled, but the components that render the final 
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Admonition-markdown | $color-primary-100 | $color-primary-200 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Admonition-markdown | $color-surface-100 | $color-primary-200 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Admonition-markdown-card | $color-surface-50 | $color-surface-50 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Admonition-markdown-danger | $color-danger-100 | $color-danger-100 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Admonition-markdown-def | $color-surface-50 | $color-surface-50 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Admonition-markdown-feat | $color-surface-50 | $color-surface-50 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Admonition-markdown-info | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Admonition-markdown-note | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Admonition-markdown-tip | *none* | *none* |
@@ -364,7 +373,9 @@ The component itself cannot be styled, but the components that render the final 
 | [backgroundColor](../styles-and-themes/common-units/#color)-Thead-markdown | $color-surface-100 | $color-surface-100 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Tr-markdown | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Tr-markdown--hover | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)-Admonition-markdown | 1px solid $color-primary-300 | 1px solid $color-primary-300 |
+| [border](../styles-and-themes/common-units/#border)-Admonition-markdown | 0px solid $color-primary-300 | 0px solid $color-primary-300 |
+| [border](../styles-and-themes/common-units/#border)-Admonition-markdown-card | 1px solid $color-surface-200 | 1px solid $color-surface-200 |
+| [border](../styles-and-themes/common-units/#border)-Admonition-markdown-feat | 1px solid $color-surface-200 | 1px solid $color-surface-200 |
 | [border](../styles-and-themes/common-units/#border)-Blockquote-markdown | *none* | *none* |
 | [border](../styles-and-themes/common-units/#border)-Details-markdown | *none* | *none* |
 | [border](../styles-and-themes/common-units/#border)-HtmlTd | *none* | *none* |
@@ -420,7 +431,10 @@ The component itself cannot be styled, but the components that render the final 
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-Tr-markdown | *none* | *none* |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-Ul-markdown | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Admonition-markdown | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-Admonition-markdown-card | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Admonition-markdown-danger | $color-danger-300 | $color-danger-300 |
+| [borderColor](../styles-and-themes/common-units/#color)-Admonition-markdown-def | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-Admonition-markdown-feat | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Admonition-markdown-info | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Admonition-markdown-note | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Admonition-markdown-tip | *none* | *none* |
@@ -615,6 +629,14 @@ The component itself cannot be styled, but the components that render the final 
 | [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-Tr-markdown | *none* | *none* |
 | [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-Ul-markdown | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Admonition-markdown | *none* | *none* |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Admonition-markdown-card | *none* | *none* |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Admonition-markdown-danger | *none* | *none* |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Admonition-markdown-def | *none* | *none* |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Admonition-markdown-feat | *none* | *none* |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Admonition-markdown-info | *none* | *none* |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Admonition-markdown-note | *none* | *none* |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Admonition-markdown-tip | *none* | *none* |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Admonition-markdown-warning | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Blockquote-markdown | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Details-markdown | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-HorizontalRule-markdown | solid | solid |
@@ -715,6 +737,14 @@ The component itself cannot be styled, but the components that render the final 
 | [borderVerticalWidth](../styles-and-themes/common-units/#size)-Tr-markdown | *none* | *none* |
 | [borderVerticalWidth](../styles-and-themes/common-units/#size)-Ul-markdown | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-Admonition-markdown | *none* | *none* |
+| [borderWidth](../styles-and-themes/common-units/#size)-Admonition-markdown-card | *none* | *none* |
+| [borderWidth](../styles-and-themes/common-units/#size)-Admonition-markdown-danger | *none* | *none* |
+| [borderWidth](../styles-and-themes/common-units/#size)-Admonition-markdown-def | *none* | *none* |
+| [borderWidth](../styles-and-themes/common-units/#size)-Admonition-markdown-feat | *none* | *none* |
+| [borderWidth](../styles-and-themes/common-units/#size)-Admonition-markdown-info | *none* | *none* |
+| [borderWidth](../styles-and-themes/common-units/#size)-Admonition-markdown-note | *none* | *none* |
+| [borderWidth](../styles-and-themes/common-units/#size)-Admonition-markdown-tip | *none* | *none* |
+| [borderWidth](../styles-and-themes/common-units/#size)-Admonition-markdown-warning | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-Blockquote-markdown | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-Details-markdown | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-HorizontalRule-markdown | 2px | 2px |
@@ -731,6 +761,11 @@ The component itself cannot be styled, but the components that render the final 
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Table-markdown | *none* | *none* |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-H1-markdown | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-H2-markdown | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-H3-markdown | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-H4-markdown | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-H5-markdown | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-H6-markdown | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-HtmlTd | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Table-markdown | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
