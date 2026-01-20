@@ -31,7 +31,7 @@ export const ProgressBar = forwardRef(function ProgressBar(
         aria-valuemin={0}
         aria-valuemax={100}
         style={{ width: `${value * 100}%` }}
-        className={styles.bar}
+        className={classnames(styles.bar, { [styles.complete]: value === 1 })}
       />
     </div>
   );
