@@ -407,8 +407,6 @@ test.describe("Validation", () => {
     page,
     createFormDriver,
   }) => {
-    page.on('console', msg => console.log('PAGE LOG:', msg.text()));
-
     // This is a direct copy of FormItem.spec.ts test, just with TextBox+bindTo instead of FormItem
     await initTestBed(`
       <Form>
