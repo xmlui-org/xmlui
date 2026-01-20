@@ -109,9 +109,9 @@ export const XmlUiDocsThemeDefinition: ThemeDefinition = {
     "marginTop-items-NavGroup": "$space-3",
     "marginBottom-items-NavGroup": "$space-3",
     "expandIconAlignment-NavGroup": "end",
-    //"paddingLeft-NavLink": "$space-0",
     "paddingVertical-NavLink": "$space-1_5",
     "paddingLeft-level1-NavLink": "$space-0",
+    "paddingLeft-level2-NavGroup": "$space-0",
 
     // --- TOC
     "fontSize-TableOfContentsItem": "13px",
@@ -140,6 +140,7 @@ export const XmlUiDocsThemeDefinition: ThemeDefinition = {
     "backgroundColor-CodeBlock": "$color-surface-100",
     "textColor-Link": "$color-surface-600",
     "textColor-Link--hover": "$color-surface-900",
+    "fontSize-Text-code": "13px",
   },
 };
 
