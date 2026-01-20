@@ -16,6 +16,7 @@ import classnames from "classnames";
 import { noop } from "lodash-es";
 
 import styles from "./FlowLayout.module.scss";
+import { Scroller, type ScrollStyle } from "../ScrollViewer/Scroller";
 
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { normalizeCssValueForCalc, getSizeString } from "../../components-core/utils/css-utils";
@@ -173,14 +174,16 @@ type FlowLayoutProps = {
   columnGap: string | number;
   rowGap: string | number;
   verticalAlignment?: string;
+  scrollStyle?: ScrollStyle;
   children: ReactNode;
   registerComponentApi?: (api: any) => void;
 };
 
-export const defaultProps: Pick<FlowLayoutProps, "columnGap" | "rowGap" | "verticalAlignment"> = {
+export const defaultProps: Pick<FlowLayoutProps, "columnGap" | "rowGap" | "verticalAlignment" | "scrollStyle"> = {
   columnGap: "$gap-normal",
   rowGap: "$gap-normal",
   verticalAlignment: "start",
+  scrollStyle: "normal" as ScrollStyle,
 };
 
 export const FlowLayout = forwardRef(function FlowLayout(
@@ -190,6 +193,7 @@ export const FlowLayout = forwardRef(function FlowLayout(
     columnGap = 0,
     rowGap = 0,
     verticalAlignment = defaultProps.verticalAlignment,
+    scrollStyle = defaultProps.scrollStyle,
     children,
     registerComponentApi,
     ...rest
@@ -253,10 +257,11 @@ export const FlowLayout = forwardRef(function FlowLayout(
   }, [_columnGap, _rowGap]);
   return (
     <FlowLayoutContext.Provider value={flowLayoutContextValue}>
-      <div
+      <Scroller
         style={style}
         className={className}
         ref={containerRef}
+        scrollStyle={scrollStyle}
         {...rest}
       >
         <div className={styles.outer}>
@@ -267,7 +272,7 @@ export const FlowLayout = forwardRef(function FlowLayout(
             {children}
           </div>
         </div>
-      </div>
+      </Scroller>
     </FlowLayoutContext.Provider>
   );
 });

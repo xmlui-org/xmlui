@@ -35,11 +35,12 @@ export const NavPanelMd = createMetadata({
       defaultValue: defaultProps.inDrawer,
     },
     scrollStyle: {
-      description: `This property determines the scrollbar style. When set to "whenMouseOver", the scrollbar ` +
-        `is displayed only when hovering over the scroll container. When set to "whenScrolling", the scrollbar ` +
-        `is displayed only while scrolling is active and fades out after 400ms of inactivity.`,
+      description: `This property determines the scrollbar style. Options: "normal" uses the browser's default ` +
+        `scrollbar; "styled" displays a themed scrollbar that is always visible; "whenMouseOver" shows the ` +
+        `scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar ` +
+        `only while scrolling is active and fades out after 400ms of inactivity.`,
       valueType: "string",
-      allowedValues: ["normal", "whenMouseOver", "whenScrolling"],
+      availableValues: ["normal", "styled", "whenMouseOver", "whenScrolling"],
       defaultValue: defaultProps.scrollStyle,
     },
   },

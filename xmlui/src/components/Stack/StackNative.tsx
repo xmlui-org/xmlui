@@ -10,6 +10,7 @@ import {
 import classnames from "classnames";
 
 import styles from "./Stack.module.scss";
+import { Scroller, type ScrollStyle } from "../ScrollViewer/Scroller";
 
 import { useContentAlignment } from "../../components-core/component-hooks";
 import { useOnMount } from "../../components-core/utils/hooks";
@@ -21,6 +22,7 @@ export const defaultProps = {
   reverse: false,
   hoverContainer: false,
   visibleOnHover: false,
+  scrollStyle: "normal" as ScrollStyle,
 };
 
 type Props = {
@@ -34,6 +36,7 @@ type Props = {
   reverse?: boolean;
   hoverContainer?: boolean;
   visibleOnHover?: boolean;
+  scrollStyle?: ScrollStyle;
   onClick?: any;
   onMount?: any;
   registerComponentApi?: (api: any) => void;
@@ -53,6 +56,7 @@ export const Stack = forwardRef(function Stack(
     reverse = defaultProps.reverse,
     hoverContainer = defaultProps.hoverContainer,
     visibleOnHover = defaultProps.visibleOnHover,
+    scrollStyle = defaultProps.scrollStyle,
     onClick,
     onMount,
     className,
@@ -114,11 +118,12 @@ export const Stack = forwardRef(function Stack(
   }, [registerComponentApi]);
 
   return (
-    <div
+    <Scroller
       {...rest}
       onClick={onClick}
       ref={containerRef}
       style={style}
+      scrollStyle={scrollStyle}
       className={classnames(
         className,
         styles.base,
@@ -135,6 +140,6 @@ export const Stack = forwardRef(function Stack(
       )}
     >
       {children}
-    </div>
+    </Scroller>
   );
 });

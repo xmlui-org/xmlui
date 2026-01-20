@@ -72,6 +72,15 @@ const stackMd = createMetadata({
       ...dInternal("Reserved for future use"),
       defaultValue: defaultProps.visibleOnHover,
     },
+    scrollStyle: {
+      description: `This property determines the scrollbar style. Options: "normal" uses the browser's default ` +
+        `scrollbar; "styled" displays a themed scrollbar that is always visible; "whenMouseOver" shows the ` +
+        `scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar ` +
+        `only while scrolling is active and fades out after 400ms of inactivity.`,
+      valueType: "string",
+      availableValues: ["normal", "styled", "whenMouseOver", "whenScrolling"],
+      defaultValue: defaultProps.scrollStyle,
+    },
   },
   events: {
     click: dClick(COMP),
@@ -170,6 +179,7 @@ type RenderStackPars = {
   orientation: string;
   horizontalAlignment: string;
   verticalAlignment: string;
+  scrollStyle?: string;
   registerComponentApi?: (api: any) => void;
 };
 
@@ -182,6 +192,7 @@ function renderStack({
   verticalAlignment,
   lookupEventHandler,
   renderChild,
+  scrollStyle,
   registerComponentApi,
 }: RenderStackPars) {
   if (!isComponentDefChildren(node.children)) {
@@ -195,6 +206,7 @@ function renderStack({
       reverse={extractValue(node.props?.reverse)}
       hoverContainer={extractValue(node.props?.hoverContainer)}
       visibleOnHover={extractValue(node.props?.visibleOnHover)}
+      scrollStyle={scrollStyle as any}
       className={className}
       onMount={lookupEventHandler("mounted")}
       registerComponentApi={registerComponentApi}
@@ -214,6 +226,7 @@ export const stackComponentRenderer = createComponentRenderer(
     const orientation = extractValue(node.props?.orientation) || DEFAULT_ORIENTATION;
     const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
     const verticalAlignment = extractValue(node.props?.verticalAlignment);
+    const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
     return renderStack({
       node,
       extractValue,
@@ -221,6 +234,7 @@ export const stackComponentRenderer = createComponentRenderer(
       orientation,
       horizontalAlignment,
       verticalAlignment,
+      scrollStyle,
       lookupEventHandler,
       renderChild,
       registerComponentApi,
@@ -234,6 +248,7 @@ export const vStackComponentRenderer = createComponentRenderer(
   ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
     const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
     const verticalAlignment = extractValue(node.props?.verticalAlignment);
+    const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
     return renderStack({
       node,
       extractValue,
@@ -243,6 +258,7 @@ export const vStackComponentRenderer = createComponentRenderer(
       orientation: "vertical",
       horizontalAlignment,
       verticalAlignment,
+      scrollStyle,
       registerComponentApi,
     });
   },
@@ -254,6 +270,7 @@ export const hStackComponentRenderer = createComponentRenderer(
   ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
     const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
     const verticalAlignment = extractValue(node.props?.verticalAlignment);
+    const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
     return renderStack({
       node,
       extractValue,
@@ -263,6 +280,7 @@ export const hStackComponentRenderer = createComponentRenderer(
       orientation: "horizontal",
       horizontalAlignment,
       verticalAlignment,
+      scrollStyle,
       registerComponentApi,
     });
   },
@@ -272,6 +290,7 @@ export const cvStackComponentRenderer = createComponentRenderer(
   "CVStack",
   CVStackMd,
   ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
+    const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
     return renderStack({
       node,
       extractValue,
@@ -281,6 +300,7 @@ export const cvStackComponentRenderer = createComponentRenderer(
       orientation: "vertical",
       horizontalAlignment: "center",
       verticalAlignment: "center",
+      scrollStyle,
       registerComponentApi,
     });
   },
@@ -290,6 +310,7 @@ export const chStackComponentRenderer = createComponentRenderer(
   "CHStack",
   CHStackMd,
   ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
+    const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
     return renderStack({
       node,
       extractValue,
@@ -299,6 +320,7 @@ export const chStackComponentRenderer = createComponentRenderer(
       orientation: "horizontal",
       horizontalAlignment: "center",
       verticalAlignment: "center",
+      scrollStyle,
       registerComponentApi,
     });
   },
