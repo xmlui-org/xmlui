@@ -69,7 +69,6 @@ $component: "Text";
     &.codefence > code {
       font-family: createThemeVar("fontFamily-#{$component}-codefence");
       padding-left: 0;
-      padding-right: t.$space-3;
       display: inline-block;
       min-width: 100%;
       box-sizing: border-box;
