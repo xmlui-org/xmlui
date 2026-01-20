@@ -210,6 +210,8 @@ import { TimerMd } from "./Timer/Timer";
 import { DateInputMd } from "./DateInput/DateInput";
 import { PaginationMd } from "./Pagination/Pagination";
 import { ResponsiveBarMd } from "./ResponsiveBar/ResponsiveBar";
+import { ScrollViewer } from "./ScrollViewer/ScrollViewerNative";
+import { ScrollViewerMd } from "./ScrollViewer/ScrollViewer";
 
 export const collectedComponentMetadata = {
   // --- HTML tags
@@ -386,6 +388,7 @@ export const collectedComponentMetadata = {
   RealTimeAdapter: RealTimeAdapterMd,
   Redirect: RedirectMd,
   ResponsiveBar: ResponsiveBarMd,
+  ScrollViewer: ScrollViewerMd,
   Select: SelectMd,
   SelectionStore: SelectionStoreMd,
   Slider: SliderMd,

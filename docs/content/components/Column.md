@@ -98,17 +98,17 @@ This property indicates whether the user can resize the column. If set to `true`
 
 ### `canSort` [#cansort]
 
--  default: **false**
+-  default: **true**
 
 This property sets whether the user can sort by a column by clicking on its header (`true`) or not (`false`). If the `bindTo` property is not defined, the column is not sortable.
 
-Click on either the `Name` or the `Quantity` column headers to order the data by that attribute.
+Columns with `bindTo` are sortable by default. Click on the `Name` or `Quantity` column headers to order the data. The `Unit` column has sorting explicitly disabled with `canSort="false"`.
 
 ```xmlui copy /canSort/
 <App>
   <Table data='{[...]}'>
-    <Column canSort="true" bindTo="name" />
-    <Column canSort="true" bindTo="quantity" />
+    <Column bindTo="name" />
+    <Column bindTo="quantity" />
     <Column canSort="false" bindTo="unit" />
   </Table>
 </App>
@@ -167,11 +167,21 @@ Click on either the `Name` or the `Quantity` column headers to order the data by
       key: 0,
     },
   ]}'>
-    <Column canSort="true" bindTo="name" />
-    <Column canSort="true" bindTo="quantity" />
+    <Column bindTo="name" />
+    <Column bindTo="quantity" />
     <Column canSort="false" bindTo="unit" />
   </Table>
 </App>
+```
+
+To change the default for all columns in your app, set `columnCanSortDefault` in `config.json`:
+
+```json
+{
+  "appGlobals": {
+    "columnCanSortDefault": false
+  }
+}
 ```
 
 ### `header` [#header]

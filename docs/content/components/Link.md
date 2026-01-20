@@ -49,6 +49,14 @@ This boolean property value indicates whether the component responds to user eve
 </App>
 ```
 
+### `horizontalAlignment` [#horizontalalignment]
+
+-  default: **"start"**
+
+Manages the horizontal content alignment for child elements in the Link.
+
+Available values: `start` **(default)**, `center`, `end`
+
 ### `icon` [#icon]
 
 This property allows you to add an optional icon (specify the icon's name) to the link.
@@ -94,6 +102,14 @@ The following sample opens its link in a new tab:
 ### `to` [#to]
 
 This property defines the URL of the link. If the value is not defined, the link cannot be activated.
+
+### `verticalAlignment` [#verticalalignment]
+
+-  default: **"start"**
+
+Manages the vertical content alignment for child elements in the Link.
+
+Available values: `start` **(default)**, `center`, `end`
 
 ## Events [#events]
 

@@ -81,6 +81,10 @@ This property sets the component's initial value.
 </App>
 ```
 
+### `invalidMessages` [#invalidmessages]
+
+The invalid messages to display for the input component.
+
 ### `maxLength` [#maxlength]
 
 This property sets the maximum length of the input it accepts.
@@ -175,6 +179,14 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 </App>
 ```
 
+### `validationIconError` [#validationiconerror]
+
+Icon to display for error state when concise validation summary is enabled.
+
+### `validationIconSuccess` [#validationiconsuccess]
+
+Icon to display for valid state when concise validation summary is enabled.
+
 ### `validationStatus` [#validationstatus]
 
 -  default: **"none"**
@@ -197,6 +209,10 @@ Available values:
   <TextBox validationStatus="error" />
 </App>
 ```
+
+### `verboseValidationFeedback` [#verbosevalidationfeedback]
+
+Enables a concise validation summary (icon) in input components.
 
 ## Events [#events]
 

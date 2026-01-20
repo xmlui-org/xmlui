@@ -54,6 +54,14 @@ Available values: `xs`, `sm`, `md`, `lg`
 
 The url for an avarar image. If not specified, but [`showAvatar`](#showAvatar) is true, Card will show the first letters of the [`title`](#title).
 
+### `horizontalAlignment` [#horizontalalignment]
+
+-  default: **"start"**
+
+Manages the horizontal content alignment for each child element in the Card.
+
+Available values: `start` **(default)**, `center`, `end`
+
 ### `linkTo` [#linkto]
 
 This optional property wraps the title in a `Link` component that is clickable to navigate.
@@ -122,6 +130,14 @@ This prop sets the prestyled title.
 </App>
 ```
 
+### `verticalAlignment` [#verticalalignment]
+
+-  default: **"start"**
+
+Manages the vertical content alignment for each child element in the Card.
+
+Available values: `start` **(default)**, `center`, `end`
+
 ## Events [#events]
 
 ### `click` [#click]
@@ -187,6 +203,7 @@ The component has some parts that can be styled through layout properties and th
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Card | $color-surface-raised | $color-surface-raised |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Card--hover | $color-surface-raised | $color-surface-raised |
 | [border](../styles-and-themes/common-units/#border)-Card | 1px solid $borderColor | 1px solid $borderColor |
 | [borderBottom](../styles-and-themes/common-units/#border)-Card | *none* | *none* |
 | [borderBottomColor](../styles-and-themes/common-units/#color)-Card | *none* | *none* |
@@ -238,6 +255,7 @@ The component has some parts that can be styled through layout properties and th
 
 | Theme Variable | Description |
 | --- | --- |
+| **`backgroundColor-Card--hover`** | The background color of the Card when hovered. |
 | **`gap-Card`** | The gap between the component's children. |
 | **`gap-title-Card`** | The gap between the title and the subtitle |
 | **`gap-avatar-Card`** | The gap between the avatar and the title panel |

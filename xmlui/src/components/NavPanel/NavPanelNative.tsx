@@ -2,6 +2,7 @@ import React, { forwardRef, type ReactNode, useEffect } from "react";
 import classnames from "classnames";
 
 import styles from "./NavPanel.module.scss";
+import { Scroller, type ScrollStyle } from "../ScrollViewer/Scroller";
 
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import { Logo } from "../Logo/LogoNative";
@@ -197,6 +198,7 @@ export function buildLinkMap(
 // Default props for NavPanel component
 export const defaultProps = {
   inDrawer: false,
+  scrollStyle: "normal" as ScrollStyle,
 };
 
 interface INavPanelContext {
@@ -214,12 +216,14 @@ function DrawerNavPanel({
   children,
   className,
   style,
+  scrollStyle = defaultProps.scrollStyle,
   ...rest
 }: {
   children: ReactNode;
   className?: string;
   style?: React.CSSProperties;
   logoContent?: ReactNode;
+  scrollStyle?: ScrollStyle;
 }) {
   return (
     <NavPanelContext.Provider value={contextValue}>
@@ -227,9 +231,9 @@ function DrawerNavPanel({
         <div className={classnames(styles.logoWrapper, styles.inDrawer)}>
           {logoContent || <Logo />}
         </div>
-        <div className={styles.wrapperInner} style={style}>
+        <Scroller className={styles.wrapperInner} style={style} scrollStyle={scrollStyle}>
           {children}
-        </div>
+        </Scroller>
       </div>
     </NavPanelContext.Provider>
   );
@@ -243,6 +247,7 @@ type Props = {
   inDrawer?: boolean;
   renderChild: RenderChildFn;
   navLinks?: NavHierarchyNode[];
+  scrollStyle?: ScrollStyle;
 };
 
 export const NavPanel = forwardRef(function NavPanel(
@@ -254,6 +259,7 @@ export const NavPanel = forwardRef(function NavPanel(
     inDrawer = defaultProps.inDrawer,
     renderChild,
     navLinks,
+    scrollStyle = defaultProps.scrollStyle,
     ...rest
   }: Props,
   forwardedRef: React.ForwardedRef<any>,
@@ -278,7 +284,7 @@ export const NavPanel = forwardRef(function NavPanel(
 
   if (inDrawer) {
     return (
-      <DrawerNavPanel {...rest} style={style} logoContent={safeLogoContent} className={className}>
+      <DrawerNavPanel {...rest} style={style} logoContent={safeLogoContent} className={className} scrollStyle={scrollStyle}>
         {children}
       </DrawerNavPanel>
     );
@@ -298,9 +304,9 @@ export const NavPanel = forwardRef(function NavPanel(
       {showLogo && (
         <div className={classnames(styles.logoWrapper)}>{safeLogoContent || <Logo />}</div>
       )}
-      <div className={styles.wrapperInner} style={style}>
+      <Scroller className={styles.wrapperInner} style={style} scrollStyle={scrollStyle}>
         {children}
-      </div>
+      </Scroller>
     </div>
   );
 });

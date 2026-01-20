@@ -120,7 +120,9 @@ Available values:
 
 This property sets the width of the item labels within the form. Individual `FormItem` instances can override this property. If this property is not set, each form item nested in the form uses its calculated label width. These widths may be different for each item.
 
-### `itemRequireLabelMode` (default: "markRequired") [#itemrequirelabelmode-default-markrequired]
+### `itemRequireLabelMode` [#itemrequirelabelmode]
+
+-  default: **"markRequired"**
 
 This property controls how required indicators are displayed for required form items. Individual `FormItem` instances can override this property.
 
@@ -201,6 +203,18 @@ URL to submit the form data.
 -  default: **false**
 
 By default, the Cancel button is to the left of the Save button. Set this property to `true` to swap them or `false` to keep their original location.
+
+### `validationIconError` [#validationiconerror]
+
+Icon to display for error state when concise validation summary is enabled.
+
+### `validationIconSuccess` [#validationiconsuccess]
+
+Icon to display for valid state when concise validation summary is enabled.
+
+### `verboseValidationFeedback` [#verbosevalidationfeedback]
+
+Enables a concise validation summary (icon) in input components.
 
 ## Events [#events]
 

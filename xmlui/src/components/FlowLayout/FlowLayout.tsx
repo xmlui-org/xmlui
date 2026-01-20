@@ -43,6 +43,15 @@ export const FlowLayoutMd = createMetadata({
       valueType: "string",
       defaultValue: "start",
     },
+    scrollStyle: {
+      description: `This property determines the scrollbar style. Options: "normal" uses the browser's default ` +
+        `scrollbar; "styled" displays a themed scrollbar that is always visible; "whenMouseOver" shows the ` +
+        `scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar ` +
+        `only while scrolling is active and fades out after 400ms of inactivity.`,
+      valueType: "string",
+      availableValues: ["normal", "styled", "whenMouseOver", "whenScrolling"],
+      defaultValue: defaultProps.scrollStyle,
+    },
   },
   apis: {
     scrollToTop: {
@@ -76,6 +85,7 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
       extractValue.asSize(node.props?.gap) ||
       extractValue.asSize("$space-4");
     const verticalAlignment = extractValue.asOptionalString(node.props?.verticalAlignment, "start");
+    const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle) as any;
 
     return (
       <FlowLayout
@@ -83,6 +93,7 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
         columnGap={columnGap}
         rowGap={rowGap}
         verticalAlignment={verticalAlignment}
+        scrollStyle={scrollStyle}
         registerComponentApi={registerComponentApi}
       >
         {renderChild(node.children, {

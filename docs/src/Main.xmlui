@@ -32,6 +32,7 @@
     </AppHeader>
     <NavPanel
         when="{!window.location.hash.includes('/404') || mediaSize.sizeIndex <= 2}"
+        scrollStyle="styled"
     >
         <Stack
             paddingHorizontal="$space-4"
@@ -411,6 +412,7 @@
                 <NavLink icon="component" label="RealTimeAdapter" to="/components/RealTimeAdapter" />
                 <NavLink icon="component" label="Redirect" to="/components/Redirect" />
                 <NavLink icon="component" label="ResponsiveBar" to="/components/ResponsiveBar" />
+                <NavLink icon="component" label="ScrollViewer" to="/components/ScrollViewer" />
                 <NavLink icon="component" label="Select" to="/components/Select" />
                 <NavLink icon="component" label="Slider" to="/components/Slider" />
                 <NavLink icon="component" label="Slot" to="/components/Slot" />

@@ -45,6 +45,14 @@ This property defines the logo template to display in the navigation panel with 
 </App>
 ```
 
+### `scrollStyle` [#scrollstyle]
+
+-  default: **"normal"**
+
+This property determines the scrollbar style. Options: "normal" uses the browser's default scrollbar; "styled" displays a themed scrollbar that is always visible; "whenMouseOver" shows the scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.
+
+Available values: `normal` **(default)**, `styled`, `whenMouseOver`, `whenScrolling`
+
 ## Events [#events]
 
 This component does not have any events.

@@ -155,6 +155,10 @@ This property sets the component's initial value.
 
 Whether to display the date input inline (compatibility with DatePicker, always true for DateInput)
 
+### `invalidMessages` [#invalidmessages]
+
+The invalid messages to display for the input component.
+
 ### `maxValue` [#maxvalue]
 
 The optional end date of the selectable date range. If not defined, the range allows any future dates.
@@ -220,6 +224,14 @@ This property sets an optional icon to appear at the start (left side when the l
 
 This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.
 
+### `validationIconError` [#validationiconerror]
+
+Icon to display for error state when concise validation summary is enabled.
+
+### `validationIconSuccess` [#validationiconsuccess]
+
+Icon to display for valid state when concise validation summary is enabled.
+
 ### `validationStatus` [#validationstatus]
 
 -  default: **"none"**
@@ -247,6 +259,10 @@ Available values:
   <DateInput validationStatus="error" initialValue="05/25/2024" />
 </App>
 ```
+
+### `verboseValidationFeedback` [#verbosevalidationfeedback]
+
+Enables a concise validation summary (icon) in input components.
 
 ### `weekStartsOn` [#weekstartson]
 

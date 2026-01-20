@@ -97,6 +97,19 @@ See the following for an example of all variants:
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
+### `expandIconAlignment` [#expandiconalignment]
+
+-  default: **"start"**
+
+This property controls the horizontal alignment of the expand/collapse arrow icon. Set to `start` to display the arrow immediately after the label, or `end` to push it to the right edge of the NavGroup (only applies when the NavGroup has a defined width).
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `start` | Display arrow immediately after the label (default) **(default)** |
+| `end` | Push arrow to the right edge of the NavGroup |
+
 ### `icon` [#icon]
 
 This property defines an optional icon to display along with the `NavGroup` label.
@@ -205,4 +218,56 @@ This component does not expose any methods.
 | [backgroundColor](../styles-and-themes/common-units/#color)-dropdown-NavGroup | $backgroundColor-primary | $backgroundColor-primary |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-dropdown-NavGroup | $borderRadius | $borderRadius |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-dropdown-NavGroup | $boxShadow-spread | $boxShadow-spread |
+| expandIconAlignment-NavGroup | start | start |
+| [margin](../styles-and-themes/common-units/#size)-NavGroup | *none* | *none* |
+| [marginBottom](../styles-and-themes/common-units/#size)-items-NavGroup | 0 | 0 |
+| [marginBottom](../styles-and-themes/common-units/#size)-NavGroup | *none* | *none* |
+| [margin](../styles-and-themes/common-units/#size)Horizontal-NavGroup | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-NavGroup | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-NavGroup | *none* | *none* |
+| [marginTop](../styles-and-themes/common-units/#size)-items-NavGroup | 0 | 0 |
+| [marginTop](../styles-and-themes/common-units/#size)-NavGroup | *none* | *none* |
+| [margin](../styles-and-themes/common-units/#size)Vertical-NavGroup | *none* | *none* |
 | [minWidth](../styles-and-themes/common-units/#size)-dropdown-NavGroup | 11em | 11em |
+| [padding](../styles-and-themes/common-units/#size)-level1-NavGroup | *none* | *none* |
+| [padding](../styles-and-themes/common-units/#size)-level2-NavGroup | *none* | *none* |
+| [padding](../styles-and-themes/common-units/#size)-level3-NavGroup | *none* | *none* |
+| [padding](../styles-and-themes/common-units/#size)-level4-NavGroup | *none* | *none* |
+| [padding](../styles-and-themes/common-units/#size)-NavGroup | *none* | *none* |
+| [paddingBottom](../styles-and-themes/common-units/#size)-level1-NavGroup | *none* | *none* |
+| [paddingBottom](../styles-and-themes/common-units/#size)-level2-NavGroup | *none* | *none* |
+| [paddingBottom](../styles-and-themes/common-units/#size)-level3-NavGroup | *none* | *none* |
+| [paddingBottom](../styles-and-themes/common-units/#size)-level4-NavGroup | *none* | *none* |
+| [paddingBottom](../styles-and-themes/common-units/#size)-NavGroup | *none* | *none* |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-level1-NavGroup | *none* | *none* |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-level2-NavGroup | *none* | *none* |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-level3-NavGroup | *none* | *none* |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-level4-NavGroup | *none* | *none* |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-NavGroup | $space-4 | $space-4 |
+| [paddingLeft](../styles-and-themes/common-units/#size)-level1-NavGroup | *none* | *none* |
+| [paddingLeft](../styles-and-themes/common-units/#size)-level2-NavGroup | *none* | *none* |
+| [paddingLeft](../styles-and-themes/common-units/#size)-level3-NavGroup | *none* | *none* |
+| [paddingLeft](../styles-and-themes/common-units/#size)-level4-NavGroup | *none* | *none* |
+| [paddingLeft](../styles-and-themes/common-units/#size)-NavGroup | *none* | *none* |
+| [paddingRight](../styles-and-themes/common-units/#size)-level1-NavGroup | *none* | *none* |
+| [paddingRight](../styles-and-themes/common-units/#size)-level2-NavGroup | *none* | *none* |
+| [paddingRight](../styles-and-themes/common-units/#size)-level3-NavGroup | *none* | *none* |
+| [paddingRight](../styles-and-themes/common-units/#size)-level4-NavGroup | *none* | *none* |
+| [paddingRight](../styles-and-themes/common-units/#size)-NavGroup | *none* | *none* |
+| [paddingTop](../styles-and-themes/common-units/#size)-level1-NavGroup | *none* | *none* |
+| [paddingTop](../styles-and-themes/common-units/#size)-level2-NavGroup | *none* | *none* |
+| [paddingTop](../styles-and-themes/common-units/#size)-level3-NavGroup | *none* | *none* |
+| [paddingTop](../styles-and-themes/common-units/#size)-level4-NavGroup | *none* | *none* |
+| [paddingTop](../styles-and-themes/common-units/#size)-NavGroup | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-level1-NavGroup | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-level2-NavGroup | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-level3-NavGroup | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-level4-NavGroup | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-NavGroup | $space-2 | $space-2 |
+
+### Variable Explanations [#variable-explanations]
+
+| Theme Variable | Description |
+| --- | --- |
+| **`marginTop-items-NavGroup`** | Sets the margin between the NavGroup header and the first child item. Does not affect margins between child items. |
+| **`marginBottom-items-NavGroup`** | Sets the margin after the last child item in the NavGroup. |
