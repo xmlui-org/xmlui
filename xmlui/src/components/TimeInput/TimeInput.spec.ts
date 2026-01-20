@@ -1556,6 +1556,21 @@ test.describe("API", () => {
     await expect(driver.minuteInput).toHaveValue("45");
   });
 
+  test("bindTo syncs $data and value", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form hideButtonRow="true">
+        <TimeInput id="boundTimeInput" bindTo="timeValue" />
+        <Button testId="setBtn" onClick="boundTimeInput.setValue('09:15')" />
+        <Text testId="dataValue">{$data.timeValue}</Text>
+        <Text testId="compValue">{boundTimeInput.value}</Text>
+      </Form>
+    `);
+
+    await page.getByTestId("setBtn").click();
+    await expect(page.getByTestId("dataValue")).toHaveText("09:15");
+    await expect(page.getByTestId("compValue")).toHaveText("09:15");
+  });
+
   test("setValue() with empty string clears the value", async ({
     initTestBed,
     page,

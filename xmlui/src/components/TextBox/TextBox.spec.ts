@@ -378,6 +378,36 @@ test.describe("Api", () => {
     await expect(driver.input).toHaveValue("api value");
   });
 
+  test("bindTo syncs $data and value", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form hideButtonRow="true">
+        <TextBox id="boundTextBox" bindTo="boundValue" />
+        <Button testId="setBtn" onClick="boundTextBox.setValue('hello')" />
+        <Text testId="dataValue">{$data.boundValue}</Text>
+        <Text testId="compValue">{boundTextBox.value}</Text>
+      </Form>
+    `);
+
+    await page.getByTestId("setBtn").click();
+    await expect(page.getByTestId("dataValue")).toHaveText("hello");
+    await expect(page.getByTestId("compValue")).toHaveText("hello");
+  });
+
+  test("bindTo syncs $data and value for PasswordInput", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form hideButtonRow="true">
+        <PasswordInput id="boundPassword" bindTo="passwordValue" />
+        <Button testId="setBtn" onClick="boundPassword.setValue('secret')" />
+        <Text testId="dataValue">{$data.passwordValue}</Text>
+        <Text testId="compValue">{boundPassword.value}</Text>
+      </Form>
+    `);
+
+    await page.getByTestId("setBtn").click();
+    await expect(page.getByTestId("dataValue")).toHaveText("secret");
+    await expect(page.getByTestId("compValue")).toHaveText("secret");
+  });
+
   test("component setValue API triggers events", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>

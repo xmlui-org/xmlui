@@ -381,6 +381,21 @@ test("component setValue API works", async ({ page, initTestBed }) => {
   await expect(colorInput).toHaveValue("#00ff00");
 });
 
+test("bindTo syncs $data and value", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <Form hideButtonRow="true">
+      <ColorPicker id="boundColorPicker" bindTo="colorValue" />
+      <Button testId="setBtn" onClick="boundColorPicker.setValue('#00ff00')" />
+      <Text testId="dataValue">{$data.colorValue}</Text>
+      <Text testId="compValue">{boundColorPicker.value}</Text>
+    </Form>
+  `);
+
+  await page.getByTestId("setBtn").click();
+  await expect(page.getByTestId("dataValue")).toHaveText("#00ff00");
+  await expect(page.getByTestId("compValue")).toHaveText("#00ff00");
+});
+
 test("component focus API works", async ({ page, initTestBed }) => {
   const { testStateDriver } = await initTestBed(`
     <Fragment>

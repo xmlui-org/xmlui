@@ -480,6 +480,21 @@ test.describe("Api", () => {
     await expect(page.getByTestId("setBtn")).toHaveText("5");
   });
 
+  test("bindTo syncs $data and value", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form hideButtonRow="true">
+        <Slider id="boundSlider" bindTo="volume" />
+        <Button testId="setBtn" onClick="boundSlider.setValue(5)" />
+        <Text testId="dataValue">{$data.volume}</Text>
+        <Text testId="compValue">{boundSlider.value}</Text>
+      </Form>
+    `);
+
+    await page.getByTestId("setBtn").click();
+    await expect(page.getByTestId("dataValue")).toHaveText("5");
+    await expect(page.getByTestId("compValue")).toHaveText("5");
+  });
+
   test("setValue API triggers events", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>

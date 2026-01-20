@@ -531,6 +531,21 @@ test.describe("API", () => {
     await expect.poll(testStateDriver.testState).toBe(456);
   });
 
+  test("bindTo syncs $data and value", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form hideButtonRow="true">
+        <NumberBox id="boundNumberBox" bindTo="quantity" />
+        <Button testId="setBtn" onClick="boundNumberBox.setValue(42)" />
+        <Text testId="dataValue">{$data.quantity}</Text>
+        <Text testId="compValue">{boundNumberBox.value}</Text>
+      </Form>
+    `);
+
+    await page.getByTestId("setBtn").click();
+    await expect(page.getByTestId("dataValue")).toHaveText("42");
+    await expect(page.getByTestId("compValue")).toHaveText("42");
+  });
+
   test("setValue API updates state", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Fragment>

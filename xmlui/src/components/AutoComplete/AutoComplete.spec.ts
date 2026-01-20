@@ -397,6 +397,24 @@ test("setValue API works correctly", async ({ initTestBed, page }) => {
   await expect(page.getByRole("combobox")).toHaveValue("Clark Kent");
 });
 
+test("bindTo syncs $data and value", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <Form hideButtonRow="true">
+      <AutoComplete id="boundAutoComplete" bindTo="selection">
+        <Option value="1" label="One" />
+        <Option value="2" label="Two" />
+      </AutoComplete>
+      <Button testId="setBtn" onClick="boundAutoComplete.setValue('2')" />
+      <Text testId="dataValue">{$data.selection}</Text>
+      <Text testId="compValue">{boundAutoComplete.value}</Text>
+    </Form>
+  `);
+
+  await page.getByTestId("setBtn").click();
+  await expect(page.getByTestId("dataValue")).toHaveText("2");
+  await expect(page.getByTestId("compValue")).toHaveText("2");
+});
+
 test("focus API brings focus to the component", async ({ initTestBed, page }) => {
   await initTestBed(`
     <App var.isFocused="false">

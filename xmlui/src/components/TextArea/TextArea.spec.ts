@@ -926,6 +926,27 @@ test.describe("Integration", () => {
 });
 
 // =============================================================================
+// API TESTS
+// =============================================================================
+
+test.describe("Api", () => {
+  test("bindTo syncs $data and value", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form hideButtonRow="true">
+        <TextArea id="boundTextArea" bindTo="notes" />
+        <Button testId="setBtn" onClick="boundTextArea.setValue('notes')" />
+        <Text testId="dataValue">{$data.notes}</Text>
+        <Text testId="compValue">{boundTextArea.value}</Text>
+      </Form>
+    `);
+
+    await page.getByTestId("setBtn").click();
+    await expect(page.getByTestId("dataValue")).toHaveText("notes");
+    await expect(page.getByTestId("compValue")).toHaveText("notes");
+  });
+});
+
+// =============================================================================
 // REGRESSION TESTS
 // =============================================================================
 
