@@ -36,12 +36,21 @@ export const NavPanelMd = createMetadata({
     },
     scrollStyle: {
       description: `This property determines the scrollbar style. Options: "normal" uses the browser's default ` +
-        `scrollbar; "styled" displays a themed scrollbar that is always visible; "whenMouseOver" shows the ` +
+        `scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the ` +
         `scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar ` +
         `only while scrolling is active and fades out after 400ms of inactivity.`,
       valueType: "string",
-      availableValues: ["normal", "styled", "whenMouseOver", "whenScrolling"],
+      availableValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
       defaultValue: defaultProps.scrollStyle,
+    },
+    showScrollerFade: {
+      description: `When enabled, displays gradient fade indicators at the top and bottom edges of the navigation ` +
+        `panel when scrollable content extends beyond the visible area. The fade effect provides a visual cue ` +
+        `to users that additional content is available by scrolling. The indicators automatically appear and ` +
+        `disappear based on the scroll position. This property only works with "overlay", "whenMouseOver", and ` +
+        `"whenScrolling" scroll styles.`,
+      valueType: "boolean",
+      defaultValue: defaultProps.showScrollerFade,
     },
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -73,6 +82,7 @@ function NavPanelWithBuiltNavHierarchy({
   }, [extractValue, node.children]);
 
   const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
+  const showScrollerFade = extractValue.asOptionalBoolean(node.props.showScrollerFade);
 
   return (
     <NavPanel
@@ -82,6 +92,7 @@ function NavPanelWithBuiltNavHierarchy({
       renderChild={renderChild}
       navLinks={navLinks}
       scrollStyle={scrollStyle}
+      showScrollerFade={showScrollerFade}
     >
       {renderChild(node.children)}
     </NavPanel>

@@ -15,6 +15,109 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByTestId("stack")).toBeAttached();
     await expect(page.getByTestId("stack")).toBeEmpty();
   });
+
+  test("showScrollerFade is true by default", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stack testId="stack" height="200px" scrollStyle="overlay">
+        <Stack height="500px">
+          <Text>Tall content</Text>
+        </Stack>
+      </Stack>
+    `);
+
+    // Fade overlays should be visible
+    const fadeOverlays = page.locator("[class*='fadeOverlay']");
+    await expect(fadeOverlays).toHaveCount(2);
+  });
+
+  test("showScrollerFade displays fade indicators", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stack testId="stack" height="200px" scrollStyle="overlay" showScrollerFade="true">
+        <Stack height="500px">
+          <Text>Tall content</Text>
+        </Stack>
+      </Stack>
+    `);
+
+    // Fade overlays should exist (top and bottom)
+    const fadeOverlays = page.locator("[class*='fadeOverlay']");
+    await expect(fadeOverlays).toHaveCount(2);
+  });
+
+  test("bottom fade is visible when not at bottom", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stack testId="stack" height="200px" scrollStyle="overlay" showScrollerFade="true">
+        <Stack height="500px">
+          <Text>Tall content</Text>
+        </Stack>
+      </Stack>
+    `);
+
+    // Fade overlays should exist
+    const fadeOverlays = page.locator("[class*='fadeOverlay']");
+    await expect(fadeOverlays).toHaveCount(2);
+    
+    // Bottom fade overlay should exist
+    const bottomFade = page.locator("[class*='fadeBottom']");
+    await expect(bottomFade).toBeVisible();
+  });
+
+  test("top fade appears when scrolled down", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stack testId="stack" height="200px" scrollStyle="overlay" showScrollerFade="true">
+        <Stack height="500px">
+          <Text testId="content">Tall content</Text>
+        </Stack>
+      </Stack>
+    `);
+
+    // Scroll down
+    const stack = page.getByTestId("stack");
+    await stack.evaluate((el) => {
+      el.querySelector('[data-overlayscrollbars-viewport]')?.scrollTo(0, 50);
+    });
+
+    // Wait for fade to update
+    await page.waitForTimeout(100);
+
+    // Top fade overlay should exist
+    const topFade = page.locator("[class*='fadeTop']");
+    await expect(topFade).toBeVisible();
+  });
+
+  test("showScrollerFade works with whenMouseOver scrollStyle", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stack testId="stack" height="200px" scrollStyle="whenMouseOver" showScrollerFade="true">
+        <Stack height="500px">
+          <Text>Tall content</Text>
+        </Stack>
+      </Stack>
+    `);
+
+    // Wait for initialization
+    await page.waitForTimeout(100);
+
+    // Fade overlays should exist
+    const fadeOverlays = page.locator("[class*='fadeOverlay']");
+    await expect(fadeOverlays).toHaveCount(2);
+  });
+
+  test("showScrollerFade works with whenScrolling scrollStyle", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stack testId="stack" height="200px" scrollStyle="whenScrolling" showScrollerFade="true">
+        <Stack height="500px">
+          <Text>Tall content</Text>
+        </Stack>
+      </Stack>
+    `);
+
+    // Wait for initialization
+    await page.waitForTimeout(100);
+
+    // Fade overlays should exist
+    const fadeOverlays = page.locator("[class*='fadeOverlay']");
+    await expect(fadeOverlays).toHaveCount(2);
+  });
 });
 
 // =============================================================================

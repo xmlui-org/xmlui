@@ -185,7 +185,7 @@ export const defaultProps: Pick<FlowLayoutProps, "columnGap" | "rowGap" | "verti
   rowGap: "$gap-normal",
   verticalAlignment: "start",
   scrollStyle: "normal" as ScrollStyle,
-  showScrollerFade: false,
+  showScrollerFade: true,
 };
 
 export const FlowLayout = forwardRef(function FlowLayout(

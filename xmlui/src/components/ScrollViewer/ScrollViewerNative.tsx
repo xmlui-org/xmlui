@@ -4,7 +4,7 @@ import styles from "./ScrollViewer.module.scss";
 
 export const defaultProps = {
   scrollStyle: "normal" as ScrollStyle,
-  showScrollerFade: false,
+  showScrollerFade: true,
 };
 
 type Props = {

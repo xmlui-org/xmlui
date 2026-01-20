@@ -121,7 +121,7 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByText("Line 1", { exact: true })).toBeVisible();
   });
 
-  test("showScrollerFade is false by default", async ({ initTestBed, page }) => {
+  test("showScrollerFade is true by default", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Stack height="200px">
         <ScrollViewer testId="viewer" scrollStyle="overlay">
@@ -132,9 +132,9 @@ test.describe("Basic Functionality", () => {
       </Stack>
     `);
 
-    // Fade overlays should not be visible
+    // Fade overlays should be visible
     const fadeOverlays = page.locator("[class*='fadeOverlay']");
-    await expect(fadeOverlays).toHaveCount(0);
+    await expect(fadeOverlays).toHaveCount(2);
   });
 
   test("showScrollerFade displays fade indicators", async ({ initTestBed, page }) => {

@@ -23,7 +23,7 @@ export const defaultProps = {
   hoverContainer: false,
   visibleOnHover: false,
   scrollStyle: "normal" as ScrollStyle,
-  showScrollerFade: false,
+  showScrollerFade: true,
 };
 
 type Props = {
