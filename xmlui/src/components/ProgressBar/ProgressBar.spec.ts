@@ -206,4 +206,22 @@ test.describe("Theme Variables", () => {
     await expect(driver.component).toHaveCSS("background-color", "rgb(255, 0, 0)");
     await expect(driver.bar).toHaveCSS("background-color", "rgb(0, 255, 0)");
   });
+
+  test("applies completed state colors", async ({ initTestBed, createProgressBarDriver }) => {
+    await initTestBed(`
+      <Fragment>
+        <ProgressBar id="progress1" value="0.5" />
+        <ProgressBar id="progress2" value="1" />
+      </Fragment>
+      `, {
+      testThemeVars: {
+        "color-indicator-ProgressBar": "rgb(0, 255, 0)",
+        "color-indicator-ProgressBar--complete": "rgb(0, 0, 255)",
+      },
+    });
+    const driver1 = await createProgressBarDriver("progress1");
+    const driver2 = await createProgressBarDriver("progress2");
+    await expect(driver1.bar).toHaveCSS("background-color", "rgb(0, 255, 0)");
+    await expect(driver2.bar).toHaveCSS("background-color", "rgb(0, 0, 255)");
+  });
 });
