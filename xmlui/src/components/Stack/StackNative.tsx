@@ -23,6 +23,7 @@ export const defaultProps = {
   hoverContainer: false,
   visibleOnHover: false,
   scrollStyle: "normal" as ScrollStyle,
+  showScrollerFade: false,
 };
 
 type Props = {
@@ -37,6 +38,7 @@ type Props = {
   hoverContainer?: boolean;
   visibleOnHover?: boolean;
   scrollStyle?: ScrollStyle;
+  showScrollerFade?: boolean;
   onClick?: any;
   onMount?: any;
   registerComponentApi?: (api: any) => void;
@@ -57,6 +59,7 @@ export const Stack = forwardRef(function Stack(
     hoverContainer = defaultProps.hoverContainer,
     visibleOnHover = defaultProps.visibleOnHover,
     scrollStyle = defaultProps.scrollStyle,
+    showScrollerFade = defaultProps.showScrollerFade,
     onClick,
     onMount,
     className,
@@ -124,6 +127,7 @@ export const Stack = forwardRef(function Stack(
       ref={containerRef}
       style={style}
       scrollStyle={scrollStyle}
+      showScrollerFade={showScrollerFade}
       className={classnames(
         className,
         styles.base,

@@ -45,8 +45,7 @@ $transition-handle-Scroller: createThemeVar('transition-handle-Scroller');
 
 // --- Fade overlay variables
 $height-fade-Scroller: createThemeVar('height-fade-Scroller');
-$backgroundColor-fadeTop-Scroller: createThemeVar('backgroundColor-fadeTop-Scroller');
-$backgroundColor-fadeBottom-Scroller: createThemeVar('backgroundColor-fadeBottom-Scroller');
+$backgroundColor-fade-Scroller: createThemeVar('backgroundColor-fade-Scroller');
 $transition-fade-Scroller: createThemeVar('transition-fade-Scroller');
 
 // --- Apply theme variables to the scrollbar
@@ -116,12 +115,12 @@ $transition-fade-Scroller: createThemeVar('transition-fade-Scroller');
 
 .fadeTop {
   top: 0;
-  background: #{$backgroundColor-fadeTop-Scroller};
+  background: linear-gradient(to bottom, #{$backgroundColor-fade-Scroller}, transparent);
 }
 
 .fadeBottom {
   bottom: 0;
-  background: #{$backgroundColor-fadeBottom-Scroller};
+  background: linear-gradient(to top, #{$backgroundColor-fade-Scroller}, transparent);
 }
 
 .fadeVisible {

@@ -4,7 +4,7 @@ import type { OverlayScrollbars } from "overlayscrollbars";
 import "overlayscrollbars/styles/overlayscrollbars.css";
 import styles from "./ScrollViewer.module.scss";
 
-export type ScrollStyle = "normal" | "styled" | "whenMouseOver" | "whenScrolling";
+export type ScrollStyle = "normal" | "overlay" | "whenMouseOver" | "whenScrolling";
 
 export const defaultProps = {
   scrollStyle: "normal" as ScrollStyle,
@@ -24,7 +24,7 @@ type Props = {
  * 
  * @param scrollStyle - Determines the scrollbar behavior:
  *   - "normal": Standard browser scrollbar
- *   - "styled": Styled scrollbar using theme variables (always visible)
+ *   - "overlay": Overlay scrollbar using theme variables (always visible)
  *   - "whenMouseOver": Scrollbar appears only on hover (200ms delay)
  *   - "whenScrolling": Scrollbar appears during scrolling and fades out after 400ms of inactivity
  */
@@ -45,7 +45,7 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
   const [osReady, setOsReady] = useState(false);
 
   // Normalize scrollStyle to a valid value, defaulting to "normal" for unrecognized values
-  const normalizedScrollStyle = (["normal", "styled", "whenMouseOver", "whenScrolling"].includes(scrollStyle as string)
+  const normalizedScrollStyle = (["normal", "overlay", "whenMouseOver", "whenScrolling"].includes(scrollStyle as string)
     ? scrollStyle
     : "normal") as ScrollStyle;
 
@@ -102,8 +102,8 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
     );
   }
 
-  // Styled mode: styled scrollbar using theme variables (always visible)
-  if (normalizedScrollStyle === "styled") {
+  // Overlay mode: overlay scrollbar using theme variables (always visible)
+  if (normalizedScrollStyle === "overlay") {
     return (
       <div className={styles.fadeContainer}>
         <OverlayScrollbarsComponent

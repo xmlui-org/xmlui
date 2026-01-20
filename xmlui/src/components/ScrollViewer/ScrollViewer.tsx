@@ -12,18 +12,18 @@ export const ScrollViewerMd = createMetadata({
   description:
     "`ScrollViewer` is a simple layout container that stretches to fill its parent's viewport " +
     "and provides customizable scrollbar styles for scrollable content. It supports four scrollbar " +
-    "modes: normal (standard browser scrollbars), styled (themed scrollbars always visible), " +
+    "modes: normal (standard browser scrollbars), overlay (themed scrollbars always visible), " +
     "whenMouseOver (scrollbars appear on hover), and whenScrolling (scrollbars appear during scrolling).",
   props: {
     scrollStyle: {
       description:
         "This property determines the scrollbar style and behavior. " +
         "`normal` uses the standard browser scrollbar. " +
-        "`styled` uses themed scrollbars that are always visible and can be customized via theme variables. " +
+        "`overlay` uses themed scrollbars that are always visible and can be customized via theme variables. " +
         "`whenMouseOver` shows overlay scrollbars that appear when the mouse hovers over the scroll area and hide after 200ms when the mouse leaves. " +
         "`whenScrolling` shows overlay scrollbars only during active scrolling and hides them after 400ms of inactivity.",
       valueType: "string",
-      allowedValues: ["normal", "styled", "whenMouseOver", "whenScrolling"],
+      allowedValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
       defaultValue: defaultProps.scrollStyle,
     },
     showScrollerFade: {
@@ -31,7 +31,7 @@ export const ScrollViewerMd = createMetadata({
         "When enabled, displays gradient fade indicators at the top and bottom of the scroll container to visually indicate that more content is available in those directions. " +
         "The fade indicators automatically appear/disappear based on the current scroll position. " +
         "Top fade shows when scrolled down from the top, bottom fade shows when not at the bottom. " +
-        "Only works with styled scrollbar modes (not with `normal` mode).",
+        "Only works with overlay scrollbar modes (not with `normal` mode).",
       valueType: "boolean",
       defaultValue: defaultProps.showScrollerFade,
     },
@@ -117,8 +117,7 @@ export const ScrollViewerMd = createMetadata({
 
     // --- Fade overlays
     [`height-fade-${SCROLLER}`]: "64px",
-    [`backgroundColor-fadeTop-${SCROLLER}`]: "linear-gradient(to bottom, rgba(255, 255, 255, 0.75), transparent)",
-    [`backgroundColor-fadeBottom-${SCROLLER}`]: "linear-gradient(to top, rgba(255, 255, 255, 0.75), transparent)",
+    [`backgroundColor-fade-${SCROLLER}`]: "rgba(255, 255, 255, 0.75)",
     [`transition-fade-${SCROLLER}`]: "opacity 0.3s ease-in-out",
   },
 });
