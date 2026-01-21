@@ -67,6 +67,8 @@ type Props = {
   labelBreak?: boolean;
   onValidate?: ValidateEventHandler;
   customValidationsDebounce?: number;
+  customValidationsTimeout?: number;
+  customValidationsTimeoutMessage?: string;
   validationMode?: ValidationMode;
   requireLabelMode?: RequireLabelMode;
   initialValue?: any;
@@ -85,12 +87,13 @@ type Props = {
 
 export const defaultProps: Pick<
   Props,
-  "type" | "labelBreak" | "enabled" | "customValidationsDebounce" | "gap" | "noSubmit"
+  "type" | "labelBreak" | "enabled" | "customValidationsDebounce" | "customValidationsTimeout" | "gap" | "noSubmit"
 > = {
   type: "text",
   labelBreak: true,
   enabled: true,
   customValidationsDebounce: 0,
+  customValidationsTimeout: 3000,
   gap: "0",
   noSubmit: false,
 };
@@ -175,6 +178,8 @@ export const FormItem = memo(function FormItem({
   children,
   onValidate: _onValidate,
   customValidationsDebounce: _customValidationsDebounce = defaultProps.customValidationsDebounce,
+  customValidationsTimeout: _customValidationsTimeout = defaultProps.customValidationsTimeout,
+  customValidationsTimeoutMessage: _customValidationsTimeoutMessage,
   validationMode: _validationMode,
   registerComponentApi,
   maxTextLength,

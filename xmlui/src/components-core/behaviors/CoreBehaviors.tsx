@@ -647,6 +647,12 @@ export const validationBehavior: Behavior = {
       componentNode.props?.customValidationsDebounce,
       0,
     );
+    const customValidationsTimeout = extractValue.asOptionalNumber(
+      componentNode.props?.customValidationsTimeout,
+    );
+    const customValidationsTimeoutMessage = extractValue.asOptionalString(
+      componentNode.props?.customValidationsTimeoutMessage,
+    );
     const validationMode = extractValue.asOptionalString(componentNode.props?.validationMode);
 
     // Event handlers
@@ -689,6 +695,8 @@ export const validationBehavior: Behavior = {
         validations={validations}
         onValidate={onValidate}
         customValidationsDebounce={customValidationsDebounce}
+        customValidationsTimeout={customValidationsTimeout}
+        customValidationsTimeoutMessage={customValidationsTimeoutMessage}
         validationMode={validationMode as any}
         verboseValidationFeedback={verboseValidationFeedback}
         itemIndex={itemIndex}
