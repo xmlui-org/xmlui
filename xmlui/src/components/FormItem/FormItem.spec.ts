@@ -235,7 +235,10 @@ test.describe("Basic Functionality", () => {
     await expect(driver.component).toBeVisible();
   });
 
-  test("no spacing above input if label is not present", async ({ initTestBed, createFormItemDriver }) => {
+  test("no spacing above input if label is not present", async ({
+    initTestBed,
+    createFormItemDriver,
+  }) => {
     await initTestBed(`
       <Form>
         <FlowLayout>
@@ -250,10 +253,13 @@ test.describe("Basic Functionality", () => {
     const val1 = (await getBounds(driver1.component)).height - bounds1Label.height;
     const val2 = (await getBounds(driver2.component)).height;
 
-    expect(val1).toBeGreaterThan(val2);    
+    expect(val1).toBeGreaterThan(val2);
   });
 
-  test("no spacing below input if label is not present in FlowLayout", async ({ initTestBed, createFormItemDriver }) => {
+  test("no spacing below input if label is not present in FlowLayout", async ({
+    initTestBed,
+    createFormItemDriver,
+  }) => {
     await initTestBed(`
       <Form>
         <FlowLayout>
@@ -268,10 +274,14 @@ test.describe("Basic Functionality", () => {
     const val1 = (await getBounds(driver1.component)).height - bounds1Label.height;
     const val2 = (await getBounds(driver2.component)).height;
 
-    expect(val1).toBeGreaterThan(val2);    
+    expect(val1).toBeGreaterThan(val2);
   });
 
-  test("labelPosition start property adds correct spacing", async ({ initTestBed, createFormItemDriver, page }) => {
+  test("labelPosition start property adds correct spacing", async ({
+    initTestBed,
+    createFormItemDriver,
+    page,
+  }) => {
     await initTestBed(`
       <Form>
         <FormItem testId="formItem1" labelPosition="start" label="label1" type="text" />
@@ -283,13 +293,19 @@ test.describe("Basic Functionality", () => {
     const bounds1Label = await getBounds(driver1.label);
     const bounds1Input = await getBounds(driver1.textBox);
     const bounds2Input = await getBounds(driver2.textBox);
-    const val1 = (await getBounds(page.getByTestId('formItem1'))).width - (bounds1Label.width + bounds1Input.width);
+    const val1 =
+      (await getBounds(page.getByTestId("formItem1"))).width -
+      (bounds1Label.width + bounds1Input.width);
     const val2 = (await getBounds(driver2.component)).width - bounds2Input.width;
 
-    expect(val1).toBeGreaterThan(val2);    
+    expect(val1).toBeGreaterThan(val2);
   });
 
-  test("labelPosition end property adds correct spacing", async ({ initTestBed, createFormItemDriver, page }) => {
+  test("labelPosition end property adds correct spacing", async ({
+    initTestBed,
+    createFormItemDriver,
+    page,
+  }) => {
     await initTestBed(`
       <Form>
         <FlowLayout>
@@ -303,10 +319,12 @@ test.describe("Basic Functionality", () => {
     const bounds1Label = await getBounds(driver1.label);
     const bounds1Input = await getBounds(driver1.textBox);
     const bounds2Input = await getBounds(driver2.textBox);
-    const val1 = (await getBounds(page.getByTestId('formItem1'))).width - (bounds1Label.width + bounds1Input.width);
+    const val1 =
+      (await getBounds(page.getByTestId("formItem1"))).width -
+      (bounds1Label.width + bounds1Input.width);
     const val2 = (await getBounds(driver2.component)).width - bounds2Input.width;
 
-    expect(val1).toBeGreaterThan(val2);    
+    expect(val1).toBeGreaterThan(val2);
   });
 });
 
@@ -565,7 +583,7 @@ test.describe("Template Properties", () => {
 });
 
 test.describe("Event Handling", () => {
-  test("fires onValidate event", async ({
+  test("fires onValidate event with valid input", async ({
     initTestBed,
     createFormItemDriver,
     createTextBoxDriver,
@@ -590,6 +608,388 @@ test.describe("Event Handling", () => {
 
     await expect.poll(testStateDriver.testState).toEqual("valid");
   });
+
+  test("fires onValidate event with invalid input", async ({
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form>
+        <FormItem 
+          testId="formItem" 
+          type="text"
+          onValidate="value => { testState = value.length > 5 ? 'valid' : 'invalid'; return value.length > 5 }"
+        />
+      </Form>
+    `);
+
+    const formItemDriver = await createFormItemDriver("formItem");
+    const inputDriver = await createTextBoxDriver(formItemDriver.input);
+
+    // Type short text to trigger invalid validation
+    await inputDriver.field.fill("test");
+    await inputDriver.field.blur();
+
+    await expect.poll(testStateDriver.testState).toEqual("invalid");
+  });
+
+  test("onValidate receives current value as parameter", async ({
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form>
+        <FormItem 
+          testId="formItem" 
+          type="text"
+          onValidate="value => { testState = value; return true }"
+        />
+      </Form>
+    `);
+
+    const formItemDriver = await createFormItemDriver("formItem");
+    const inputDriver = await createTextBoxDriver(formItemDriver.input);
+
+    await inputDriver.field.fill("hello world");
+    await inputDriver.field.blur();
+
+    await expect.poll(testStateDriver.testState).toEqual("hello world");
+  });
+
+  test("onValidate returning SingleValidationResult shows custom error message", async ({
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem 
+          testId="formItem" 
+          type="text"
+          validationMode="onChanged"
+          onValidate="value => ({ isValid: value.length >= 5, invalidMessage: 'Must be at least 5 characters', severity: 'error' })"
+        />
+      </Form>
+    `);
+
+    const formItemDriver = await createFormItemDriver("formItem");
+    const inputDriver = await createTextBoxDriver(formItemDriver.input);
+
+    await inputDriver.field.fill("abc");
+    await inputDriver.field.blur();
+
+    await expect(formItemDriver.component).toContainText("Must be at least 5 characters");
+  });
+
+  test("onValidate with isValid true indicates valid input", async ({
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem 
+          testId="formItem" 
+          type="text"
+          validationMode="onChanged"
+          onValidate="value => ({ isValid: value.length >= 5, invalidMessage: 'Too short', severity: 'error' })"
+        />
+      </Form>
+    `);
+
+    const formItemDriver = await createFormItemDriver("formItem");
+    const inputDriver = await createTextBoxDriver(formItemDriver.input);
+
+    await inputDriver.field.fill("hello world");
+    await inputDriver.field.blur();
+
+    // Should not show error message when isValid is true
+    await expect(formItemDriver.component).not.toContainText("Too short");
+  });
+
+  test("onValidate returning boolean true indicates valid input", async ({
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem 
+          testId="formItem" 
+          type="text"
+          onValidate="value => value.length >= 3"
+        />
+      </Form>
+    `);
+
+    const formItemDriver = await createFormItemDriver("formItem");
+    const inputDriver = await createTextBoxDriver(formItemDriver.input);
+
+    await inputDriver.field.fill("test");
+    await inputDriver.field.blur();
+
+    // No error message should appear
+    await expect(page.getByText("Invalid input")).not.toBeVisible();
+  });
+
+  test("onValidate returning boolean false shows default error message", async ({
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem 
+          testId="formItem" 
+          type="text"
+          onValidate="value => value.length >= 5"
+        />
+      </Form>
+    `);
+
+    const formItemDriver = await createFormItemDriver("formItem");
+    const inputDriver = await createTextBoxDriver(formItemDriver.input);
+
+    await inputDriver.field.fill("ab");
+    await inputDriver.field.blur();
+
+    await expect(page.getByText("Invalid input")).toBeVisible();
+  });
+
+  test("onValidate runs asynchronously", async ({
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form>
+        <FormItem 
+          testId="formItem" 
+          type="text"
+          onValidate="value => { testState = 'validating'; return value.length > 3 }"
+        />
+      </Form>
+    `);
+
+    const formItemDriver = await createFormItemDriver("formItem");
+    const inputDriver = await createTextBoxDriver(formItemDriver.input);
+
+    await inputDriver.field.fill("test value");
+    await inputDriver.field.blur();
+
+    // Validation should run and update state
+    await expect.poll(testStateDriver.testState).toEqual("validating");
+  });
+
+  test("onValidate with customValidationsDebounce delays validation on change", async ({
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form>
+        <FormItem 
+          testId="formItem" 
+          type="text"
+          customValidationsDebounce="300"
+          validationMode="onChanged"
+          onValidate="value => { if (value === 'test') { testState = 'validated' }; return true }"
+        />
+      </Form>
+    `);
+
+    const formItemDriver = await createFormItemDriver("formItem");
+    const inputDriver = await createTextBoxDriver(formItemDriver.input);
+
+    // Type a value that will set the state
+    await inputDriver.field.fill("test");
+
+    // Should validate after debounce delay
+    await expect.poll(testStateDriver.testState, { timeout: 1000 }).toEqual("validated");
+  });
+
+  test("onValidate runs on value change", async ({
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form>
+        <FormItem 
+          testId="formItem" 
+          type="text"
+          validationMode="onChanged"
+          onValidate="value => { testState = value; return true }"
+        />
+      </Form>
+    `);
+
+    const formItemDriver = await createFormItemDriver("formItem");
+    const inputDriver = await createTextBoxDriver(formItemDriver.input);
+
+    await inputDriver.field.fill("a");
+    await expect.poll(testStateDriver.testState).toEqual("a");
+
+    await inputDriver.field.fill("ab");
+    await expect.poll(testStateDriver.testState).toEqual("ab");
+
+    await inputDriver.field.fill("abc");
+    await expect.poll(testStateDriver.testState).toEqual("abc");
+  });
+
+  test("onValidate works with number input type", async ({
+    initTestBed,
+    createFormItemDriver,
+    createNumberBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form>
+        <FormItem 
+          testId="formItem" 
+          type="number"
+          onValidate="value => { testState = value > 10 ? 'valid' : 'invalid'; return value > 10 }"
+        />
+      </Form>
+    `);
+
+    const formItemDriver = await createFormItemDriver("formItem");
+    const inputDriver = await createNumberBoxDriver(formItemDriver.input);
+
+    await inputDriver.field.fill("5");
+    await inputDriver.field.blur();
+    await expect.poll(testStateDriver.testState).toEqual("invalid");
+
+    await inputDriver.field.fill("15");
+    await inputDriver.field.blur();
+    await expect.poll(testStateDriver.testState).toEqual("valid");
+  });
+
+  test("onValidate works with checkbox input type", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form>
+        <FormItem 
+          testId="formItem" 
+          type="checkbox"
+          label="Accept terms"
+          onValidate="value => { testState = value ? 'accepted' : 'not accepted'; return value }"
+        />
+      </Form>
+    `);
+    const checkbox = page.getByRole("checkbox");
+
+    await checkbox.check();
+    await expect.poll(testStateDriver.testState).toEqual("accepted");
+
+    await checkbox.uncheck();
+    await expect.poll(testStateDriver.testState).toEqual("not accepted");
+  });
+
+  test("onValidate runs alongside built-in validations", async ({
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form>
+        <FormItem 
+          testId="formItem" 
+          type="text"
+          minLength="5"
+          lengthInvalidMessage="Too short"
+          validationMode="onChanged"
+          onValidate="value => { testState = 'custom validation ran'; return { isValid: value.includes('test'), invalidMessage: 'Must contain test', severity: 'error' } }"
+        />
+      </Form>
+    `);
+
+    const formItemDriver = await createFormItemDriver("formItem");
+    const inputDriver = await createTextBoxDriver(formItemDriver.input);
+
+    // Type a short value without 'test' - should trigger both validations
+    await inputDriver.field.fill("abc");
+    await expect.poll(testStateDriver.testState).toEqual("custom validation ran");
+    await expect(formItemDriver.component).toContainText("Too short");
+
+    // Type a longer value without 'test' - should only show custom validation
+    await inputDriver.field.fill("abcdef");
+    await expect(formItemDriver.component).not.toContainText("Too short");
+    await expect(formItemDriver.component).toContainText("Must contain test");
+
+    // Type a valid value - should show no errors
+    await inputDriver.field.fill("test value");
+    await expect(formItemDriver.component).not.toContainText("Must contain test");
+  });
+
+  test("onValidate with multiple validations", async ({
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem 
+          testId="formItem" 
+          type="text"
+          minLength="3"
+          lengthInvalidMessage="Too short"
+          validationMode="onChanged"
+          onValidate="value => ({ isValid: value.includes('@'), invalidMessage: 'Must contain @', severity: 'error' })"
+        />
+      </Form>
+    `);
+
+    const formItemDriver = await createFormItemDriver("formItem");
+    const inputDriver = await createTextBoxDriver(formItemDriver.input);
+
+    // Fails both validations
+    await inputDriver.field.fill("ab");
+    await expect(formItemDriver.component).toContainText("Too short");
+
+    // Passes length but fails custom
+    await inputDriver.field.fill("abc");
+    await expect(formItemDriver.component).not.toContainText("Too short");
+    await expect(formItemDriver.component).toContainText("Must contain @");
+
+    // Passes both validations
+    await inputDriver.field.fill("ab@c");
+    await expect(formItemDriver.component).not.toContainText("Must contain @");
+  });
+
+  test("onValidate returning array of ValidationResults shows multiple messages", async ({
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem 
+          testId="formItem"
+          validationMode="onChanged"
+          onValidate="value => {
+            const results = [];
+            if (value.length < 5) {
+              results.push({ isValid: false, invalidMessage: 'Too short', severity: 'error' });
+            }
+            if (!value.includes('@')) {
+              results.push({ isValid: false, invalidMessage: 'Missing @', severity: 'warning' });
+            }
+            return results.length > 0 ? results : true;
+          }"
+        />
+      </Form>
+    `);
+
+    const formItemDriver = await createFormItemDriver("formItem");
+    const inputDriver = await createTextBoxDriver(formItemDriver.input);
+
+    await inputDriver.field.fill("abc");
+    await expect(formItemDriver.component).toContainText("Too short");
+    await expect(formItemDriver.component).toContainText("Missing @");
+  });
 });
 
 // =============================================================================
@@ -597,10 +997,7 @@ test.describe("Event Handling", () => {
 // =============================================================================
 
 test.describe("Validation Behavior", () => {
-  test("checkbox forces verbose feedback when form is concise", async ({
-    initTestBed,
-    page,
-  }) => {
+  test("checkbox forces verbose feedback when form is concise", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form verboseValidationFeedback="{false}">
         <FormItem
@@ -1701,4 +2098,3 @@ test.describe("Phone Pattern Validation", () => {
     await expect(phoneField).toContainText("Not a valid phone number");
   });
 });
-
