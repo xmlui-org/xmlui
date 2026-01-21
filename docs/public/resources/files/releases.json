@@ -1,5 +1,301 @@
 [
   {
+    "tag_name": "xmlui@0.11.29",
+    "published_at": "2026-01-19T15:48:52Z",
+    "changes": [
+      {
+        "description": "Add experimental MessageListener component",
+        "commit_sha": "eead0f5"
+      },
+      {
+        "description": "Fix scroll issues with List virtualization",
+        "commit_sha": "5c9cd56"
+      },
+      {
+        "description": "Added itemRequiredIndicator property to Form to control required/optional indicators for FormItems on the form level.",
+        "commit_sha": "6021e4d"
+      },
+      {
+        "description": "make goto-definition reach components across the whole opened workspace",
+        "commit_sha": "1906b59"
+      },
+      {
+        "description": "Change the indicator in TableOfContents",
+        "commit_sha": "486588f"
+      },
+      {
+        "description": "Add iconAlignment to NavLink and NavGroup",
+        "commit_sha": "486588f"
+      },
+      {
+        "description": "Add new Theme variables to NavLink and NavGroup",
+        "commit_sha": "486588f"
+      },
+      {
+        "description": "Experiment with documentation theme",
+        "commit_sha": "486588f"
+      },
+      {
+        "description": "Add overflowMode and breakMode to Markdown",
+        "commit_sha": "45441eb"
+      },
+      {
+        "description": "Renamed requiredIndicator to requireLabelMode and itemRequiredIndicator to itemRequireLabelMode.",
+        "commit_sha": "a43b636"
+      },
+      {
+        "description": "In the Search box, hitting Enter opens the first match when none selected.",
+        "commit_sha": "ee7ad5a"
+      },
+      {
+        "description": "Added requiredIndicator property to FormItem to customize required/optional indicators next to labels. Options are: \"required\", \"optional\", \"both\". Default is \"required\".",
+        "commit_sha": "6c232bf"
+      },
+      {
+        "description": "Fix alignment issues with Text",
+        "commit_sha": "beff0fc"
+      },
+      {
+        "description": "Fix Column sortable regression",
+        "commit_sha": "23c44d5"
+      },
+      {
+        "description": "Fix List visibility issue in Markdown",
+        "commit_sha": "99039d4"
+      },
+      {
+        "description": "Removed language-server-web-worker export from package.json",
+        "commit_sha": "626bede"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.11.29.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.29/xmlui-0.11.29.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.11.28",
+    "published_at": "2026-01-14T06:30:16Z",
+    "changes": [
+      {
+        "description": "FileInput: Automate parsing of csv/json.",
+        "commit_sha": "7485959"
+      },
+      {
+        "description": "Fixed a bug where gaps were still rendered even if there were no labels provided for input fields.",
+        "commit_sha": "96d510c"
+      },
+      {
+        "description": "Fixed incorrect background color for a number of components: AutoComplete, Form, NoResult, TextBox and other input controls.",
+        "commit_sha": "13ebd58"
+      },
+      {
+        "description": "Fixed FlowLayout passing down width incorrectly to its children.",
+        "commit_sha": "94f2354"
+      },
+      {
+        "description": "Add openLinkNewTab property to Markdown.",
+        "commit_sha": "cf6c6ef"
+      },
+      {
+        "description": "Add Markdown property truncateLinks",
+        "commit_sha": "cf6c6ef"
+      },
+      {
+        "description": "Add support for rowspan and colspan attributes in Markdown tables",
+        "commit_sha": "6c49cd2"
+      },
+      {
+        "description": "Fix star-sizing in App layouts",
+        "commit_sha": "1d9a5e7"
+      },
+      {
+        "description": "Fix state APICall and DataSource state references",
+        "commit_sha": "31e53a8"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.11.28.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.28/xmlui-0.11.28.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.11.27",
+    "published_at": "2026-01-12T15:35:21Z",
+    "changes": [
+      {
+        "description": "Add experimental bookmark behavior",
+        "commit_sha": "bc1090d"
+      },
+      {
+        "description": "feat: add context, line-col numbers to script parse errors",
+        "commit_sha": "fd9a901"
+      },
+      {
+        "description": "Add \"stretch\" property to Stack",
+        "commit_sha": "79701ad"
+      },
+      {
+        "description": "Add scroll APIs to Stack, Card, and FlowLayout",
+        "commit_sha": "bc67363"
+      },
+      {
+        "description": "Variables defined in <script> override variables in component attributes",
+        "commit_sha": "ff49047"
+      },
+      {
+        "description": "Add stretch property to Stack, Splitter, and FlowLayout",
+        "commit_sha": "79701ad"
+      },
+      {
+        "description": "Fix vertically-aligned Text with overflowType=\"ellipsis\"",
+        "commit_sha": "357946d"
+      },
+      {
+        "description": "Fix FlowLayout issue with nested Text using ellipsis",
+        "commit_sha": "0d04660"
+      },
+      {
+        "description": "Fix the issues with the List scroll API",
+        "commit_sha": "539b718"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.11.27.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.27/xmlui-0.11.27.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.11.26",
+    "published_at": "2026-01-08T14:08:48Z",
+    "changes": [
+      {
+        "description": "Add verticalAlignment support to FlowLayout",
+        "commit_sha": "b736b85"
+      },
+      {
+        "description": "feat: implement formBindingBehavior",
+        "commit_sha": "9ebc8e5"
+      },
+      {
+        "description": "Clip pixel artifacts experienced with Text overflowMode",
+        "commit_sha": "01ef62b"
+      },
+      {
+        "description": "Fix issues with empty script tag rendering",
+        "commit_sha": "5d715a3"
+      },
+      {
+        "description": "Fix state variables",
+        "commit_sha": "bd035dd"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.11.26.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.26/xmlui-0.11.26.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.11.25",
+    "published_at": "2026-01-06T18:17:33Z",
+    "changes": [
+      {
+        "description": "Add Add status/progress to APICall",
+        "commit_sha": "0abc5a0"
+      },
+      {
+        "description": "Make valueTemplate of Select available in single-select mode",
+        "commit_sha": "42c9bf8"
+      },
+      {
+        "description": "fix: building in CONFIG_ONLY mode handles windows paths",
+        "commit_sha": "bc0f328"
+      },
+      {
+        "description": "Fix standalone app component discovery in templates",
+        "commit_sha": "c4ac21c"
+      },
+      {
+        "description": "Add credentials option to DataSource/APICall",
+        "commit_sha": "8b5c6e8"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.11.25.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.25/xmlui-0.11.25.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.11.24",
+    "published_at": "2026-01-05T13:00:14Z",
+    "changes": [
+      {
+        "description": "Fix the rendering issues with an attributeless Theme component",
+        "commit_sha": "ada1e74"
+      },
+      {
+        "description": "Add \"Br\" component as an alias to \"br\"",
+        "commit_sha": "1c230fb"
+      },
+      {
+        "description": "Fix the TableOfContents navigation issue",
+        "commit_sha": "82fcb62"
+      },
+      {
+        "description": "Fix the wrong Select height with searchable=\"true\"",
+        "commit_sha": "6313178"
+      },
+      {
+        "description": "feat: Pages - remember scroll-state of page",
+        "commit_sha": "6303921"
+      },
+      {
+        "description": "Fixed regular Select (non-searchable/multiSelect) not having a wide enough dropdown list if input is sized using percentages.",
+        "commit_sha": "c55b2c6"
+      },
+      {
+        "description": "fix: building a projcet in configOnly mode no longer throws the error 'glob.glob is not a function'",
+        "commit_sha": "2a5e9f9"
+      },
+      {
+        "description": "Experiment with \"init\" and \"cleanup\" component events",
+        "commit_sha": "ff03158"
+      },
+      {
+        "description": "The <script> tag will hoist declarations and ignores non-declaration statements",
+        "commit_sha": "17bc1e4"
+      },
+      {
+        "description": "Add experimental \"init\" event to components",
+        "commit_sha": "f1e1fd9"
+      },
+      {
+        "description": "fix: variant styling issue",
+        "commit_sha": "fdca99c"
+      },
+      {
+        "description": "Add signature and parameter descriptions to component event metadata",
+        "commit_sha": "38dd6f0"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.11.24.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.24/xmlui-0.11.24.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.11.23",
     "published_at": "2025-12-16T13:38:50Z",
     "changes": [
@@ -172,114 +468,6 @@
       {
         "name": "xmlui-0.11.20.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.20/xmlui-0.11.20.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.19",
-    "published_at": "2025-11-21T14:06:08Z",
-    "changes": [
-      {
-        "description": "fix: portal issue - AutoComplete, DatePicker",
-        "commit_sha": "c649cd5"
-      },
-      {
-        "description": "test: add nested DropdownMenu and Select/AutoComplete component interaction tests",
-        "commit_sha": "d9d98d3"
-      },
-      {
-        "description": "Fix the showHeadingAnchors issue with numbered markdown headings",
-        "commit_sha": "60399c6"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.19.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.19/xmlui-0.11.19.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.18",
-    "published_at": "2025-11-18T12:57:01Z",
-    "changes": [
-      {
-        "description": "consolidate radix dependency versions, fix ModalDialog, Select, DropdownMenu nesting",
-        "commit_sha": "0eaa966"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.18.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.18/xmlui-0.11.18.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.17",
-    "published_at": "2025-11-17T15:33:05Z",
-    "changes": [
-      {
-        "description": "fix: dropdownmenu issue in a dialog",
-        "commit_sha": "f11267b"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.17.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.17/xmlui-0.11.17.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.16",
-    "published_at": "2025-11-17T12:08:32Z",
-    "changes": [
-      {
-        "description": "Fix StateContainer issue with updateState",
-        "commit_sha": "212c7ad"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.16.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.16/xmlui-0.11.16.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.15",
-    "published_at": "2025-11-15T17:43:20Z",
-    "changes": [
-      {
-        "description": "Fix inaccurate ResponsiveBar e2e test",
-        "commit_sha": "8b1f851"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.15.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.15/xmlui-0.11.15.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.13",
-    "published_at": "2025-11-14T12:43:40Z",
-    "changes": [
-      {
-        "description": "Review NavLink theme varaible defaults",
-        "commit_sha": "225a580"
-      },
-      {
-        "description": "Fix null value handling in TextBox",
-        "commit_sha": "5e9bd24"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.13.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.13/xmlui-0.11.13.js"
       }
     ]
   }
