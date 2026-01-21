@@ -50,22 +50,22 @@ export type SingleValidationResult = {
 };
 
 export interface FormItemValidations {
-  required: boolean | undefined;
-  requiredInvalidMessage: string | undefined;
-  minLength: number | undefined;
-  maxLength: number | undefined;
-  lengthInvalidMessage: string | undefined;
-  lengthInvalidSeverity: ValidationSeverity | undefined;
-  minValue: number | undefined;
-  maxValue: number | undefined;
-  rangeInvalidMessage: string | undefined;
-  rangeInvalidSeverity: ValidationSeverity | undefined;
-  pattern: string | undefined;
-  patternInvalidMessage: string | undefined;
-  patternInvalidSeverity: ValidationSeverity | undefined;
-  regex: string | undefined;
-  regexInvalidMessage: string | undefined;
-  regexInvalidSeverity: ValidationSeverity | undefined;
+  required?: boolean;
+  requiredInvalidMessage?: string;
+  minLength?: number;
+  maxLength?: number;
+  lengthInvalidMessage?: string;
+  lengthInvalidSeverity?: ValidationSeverity;
+  minValue?: number;
+  maxValue?: number;
+  rangeInvalidMessage?: string;
+  rangeInvalidSeverity?: ValidationSeverity;
+  pattern?: string;
+  patternInvalidMessage?: string;
+  patternInvalidSeverity?: ValidationSeverity;
+  regex?: string;
+  regexInvalidMessage?: string;
+  regexInvalidSeverity?: ValidationSeverity;
 }
 
 export const validationSeverityValues = ["error", "warning", "valid", "none"] as const;
