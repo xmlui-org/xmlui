@@ -1,6 +1,7 @@
 %-DESC-START
 
 **Key features:**
+- **Drag and drop**: Drop files directly onto the input or use the file browser
 - **File type filtering**: Restrict selection to specific file types using `acceptsFileType`
 - **Multiple file selection**: Enable users to select multiple files simultaneously
 - **Directory selection**: Allow folder selection instead of individual files
@@ -124,7 +125,7 @@ When `parseAs` is set, `acceptsFileType` is automatically inferred (`.csv` or `.
   </List>
 </App>
 ---desc
-Right-click and save: [sample-products.csv](/resources/files/sample-products.csv). Then browse to sample-products.csv.
+Right-click and save: [sample-products.csv](/resources/files/sample-products.csv). Then drag it onto the input, or click Browse to select it.
 ```
 
 ```xmlui-pg copy display name="Example: parseAs JSON"
@@ -159,7 +160,7 @@ Right-click and save: [sample-products.json](/resources/files/sample-products.js
 Right-click and save: [sample-config.json](/resources/files/sample-config.json). Then browse to sample-config.json.
 ```
 
-## Parsing Multiple Files
+**Parsing Multiple Files**
 
 When using `parseAs` with `multiple="true"`, the `onDidChange` event receives an array of parse results. Each result contains the original file, parsed data, and any error that occurred.
 
