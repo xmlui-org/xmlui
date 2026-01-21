@@ -3,6 +3,7 @@ import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 import type { OverlayScrollbars } from "overlayscrollbars";
 import "overlayscrollbars/styles/overlayscrollbars.css";
 import styles from "./ScrollViewer.module.scss";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 
 export type ScrollStyle = "normal" | "overlay" | "whenMouseOver" | "whenScrolling";
 
@@ -43,6 +44,11 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
   const [showBottomFade, setShowBottomFade] = useState(false);
   const osInstanceRef = React.useRef<OverlayScrollbars | null>(null);
   const [osReady, setOsReady] = useState(false);
+  const { getThemeVar } = useTheme();
+
+  // Get auto-hide delay values from theme
+  const autoHideDelayMouseOver = parseInt(getThemeVar("autoHideDelay-whenMouseOver-Scroller") || "200", 10);
+  const autoHideDelayScrolling = parseInt(getThemeVar("autoHideDelay-whenScrolling-Scroller") || "400", 10);
 
   // Normalize scrollStyle to a valid value, defaulting to "normal" for unrecognized values
   const normalizedScrollStyle = (["normal", "overlay", "whenMouseOver", "whenScrolling"].includes(scrollStyle as string)
@@ -197,7 +203,7 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
           options={{
             scrollbars: {
               autoHide: "leave",
-              autoHideDelay: 400,
+              autoHideDelay: autoHideDelayMouseOver,
             },
           }}
           {...rest}
@@ -237,7 +243,7 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
         options={{
           scrollbars: {
             autoHide: "scroll",
-            autoHideDelay: 400,
+            autoHideDelay: autoHideDelayScrolling,
           },
         }}
         {...rest}

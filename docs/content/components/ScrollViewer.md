@@ -151,6 +151,8 @@ The `ScrollViewer` component uses shared theme variables with other layout conta
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| autoHideDelay-whenMouseOver-Scroller | 400 | 400 |
+| autoHideDelay-whenScrolling-Scroller | 400 | 400 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-fade-Scroller | rgba(255, 255, 255, 0.75) | rgba(255, 255, 255, 0.75) |
 | [backgroundColor](../styles-and-themes/common-units/#color)-handle-Scroller | $color-surface-200 | $color-surface-200 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-handle-Scroller--active | $color-surface-400 | $color-surface-400 |
@@ -159,7 +161,7 @@ The `ScrollViewer` component uses shared theme variables with other layout conta
 | [backgroundColor](../styles-and-themes/common-units/#color)-track-Scroller--active | transparent | transparent |
 | [backgroundColor](../styles-and-themes/common-units/#color)-track-Scroller--hover | transparent | transparent |
 | [border](../styles-and-themes/common-units/#border)-handle-Scroller | none | none |
-| [border](../styles-and-themes/common-units/#border)-handle-Scroller--active | 1px solid red | 1px solid red |
+| [border](../styles-and-themes/common-units/#border)-handle-Scroller--active | none | none |
 | [border](../styles-and-themes/common-units/#border)-handle-Scroller--hover | none | none |
 | [border](../styles-and-themes/common-units/#border)-track-Scroller | none | none |
 | [border](../styles-and-themes/common-units/#border)-track-Scroller--active | none | none |
@@ -217,3 +219,5 @@ The `ScrollViewer` component uses shared theme variables with other layout conta
 | **`backgroundColor-fadeTop-Scroller`** | The background gradient for the top fade overlay (typically a gradient from opaque to transparent) |
 | **`backgroundColor-fadeBottom-Scroller`** | The background gradient for the bottom fade overlay (typically a gradient from transparent to opaque) |
 | **`transition-fade-Scroller`** | CSS transition for the fade overlays (opacity changes) |
+| **`autoHideDelay-whenMouseOver-Scroller`** | Delay in milliseconds before hiding scrollbar after mouse leaves in whenMouseOver mode |
+| **`autoHideDelay-whenScrolling-Scroller`** | Delay in milliseconds before hiding scrollbar after scrolling stops in whenScrolling mode |
