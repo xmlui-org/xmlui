@@ -583,7 +583,8 @@ export const validationBehavior: Behavior = {
     const { extractValue } = context;
 
     const bindTo = extractValue(node.props?.bindTo, true);
-    if (bindTo === undefined || bindTo === null) {
+    const isFormItem = node.type === "FormItem";
+    if (!isFormItem && (bindTo === undefined || bindTo === null)) {
       return false;
     }
 

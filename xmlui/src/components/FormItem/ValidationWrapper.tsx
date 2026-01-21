@@ -111,6 +111,8 @@ export function ValidationWrapper({
     effectiveVerboseValidationFeedback,
   );
 
+  const [animateContainerRef] = useAutoAnimate({ duration: 100 });
+
   if (!isInsideForm) {
     return children;
   }
@@ -119,8 +121,6 @@ export function ValidationWrapper({
     validationResult?.validations
       .filter((validation) => !validation.isValid && validation.invalidMessage)
       .map((validation) => validation.invalidMessage!) ?? [];
-
-  const [animateContainerRef] = useAutoAnimate({ duration: 100 });
 
   const validationResultDisplay =
     effectiveVerboseValidationFeedback === false ? null : (
