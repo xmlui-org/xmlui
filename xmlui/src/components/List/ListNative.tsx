@@ -550,7 +550,7 @@ export const ListNative = forwardRef(function DynamicHeightList2(
                 itemSize={measuredItemSize || 67}
               >
                 {rows.map((row, rowIndex) => {
-                  const key = row?.[idKey];
+                  const key = row?.[idKey] ?? rowIndex;
                   const isFirstItem = rowIndex === 0;
                   const shouldMeasure = isFirstItem && fixedItemSize && row != null;
                   // Render different row types
