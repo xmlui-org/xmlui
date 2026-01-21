@@ -429,6 +429,28 @@ test.describe("Validation", () => {
     await expect(page.getByText("This field is required")).toBeVisible();
   });
 
+  test("checkbox forces verbose feedback when form is concise", async ({
+    initTestBed,
+    page,
+    createFormDriver,
+  }) => {
+    await initTestBed(`
+      <Form verboseValidationFeedback="{false}">
+        <Checkbox
+          bindTo="agree"
+          label="Agree"
+          required="true"
+          requiredInvalidMessage="Agree required"
+        />
+      </Form>
+    `);
+
+    const formDriver = await createFormDriver();
+    await formDriver.submitForm();
+
+    await expect(page.getByText("Agree required")).toBeVisible();
+  });
+
   test("'minLength' validation shows error on form submit", async ({
     initTestBed,
     page,

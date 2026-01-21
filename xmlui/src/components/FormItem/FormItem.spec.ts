@@ -593,6 +593,53 @@ test.describe("Event Handling", () => {
 });
 
 // =============================================================================
+// VALIDATION BEHAVIOR TESTS
+// =============================================================================
+
+test.describe("Validation Behavior", () => {
+  test("checkbox forces verbose feedback when form is concise", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form verboseValidationFeedback="{false}">
+        <FormItem
+          testId="formItem"
+          type="checkbox"
+          required="true"
+          requiredInvalidMessage="Checkbox required"
+        />
+      </Form>
+    `);
+
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect(page.getByText("Checkbox required")).toBeVisible();
+  });
+
+  test("inline datePicker forces verbose feedback when form is concise", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form verboseValidationFeedback="{false}">
+        <FormItem
+          testId="formItem"
+          type="datePicker"
+          inline="true"
+          required="true"
+          requiredInvalidMessage="Date required"
+        />
+      </Form>
+    `);
+
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect(page.getByText("Date required")).toBeVisible();
+  });
+});
+
+// =============================================================================
 // ACCESSIBILITY TESTS
 // =============================================================================
 
