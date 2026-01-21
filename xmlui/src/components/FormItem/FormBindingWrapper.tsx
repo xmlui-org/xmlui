@@ -147,6 +147,7 @@ export function FormBindingWrapper({
   useValidation(validations, onValidate, value, dispatch, formItemId, customValidationsDebounce);
 
   const childUpdateState = (children as any)?.props?.updateState;
+  const childRegisterComponentApi = (children as any)?.props?.registerComponentApi;
 
   // Handle value changes
   const onStateChange = useCallback(
@@ -220,7 +221,7 @@ export function FormBindingWrapper({
     enabled: isEnabled,
     validationStatus,
     invalidMessages,
-    registerComponentApi,
+    registerComponentApi: registerComponentApi ?? childRegisterComponentApi,
   });
 
   // Create validation result display (hidden when verboseValidationFeedback is false (concise mode))
