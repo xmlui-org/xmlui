@@ -49,17 +49,22 @@ export const ContextMenu = forwardRef(function ContextMenu(
   const { root } = useTheme();
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
+  const [enableClicks, setEnableClicks] = useState(true);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const closeMenu = useCallback(() => {
     setOpen(false);
     // Clear context data when closing
     updateState?.({ $context: undefined });
+    // Reset click enablement
+    setEnableClicks(true);
   }, [updateState]);
 
   const openAt = useCallback((event: MouseEvent | React.MouseEvent, context?: any) => {
     // Prevent the browser's default context menu
     event.preventDefault();
+    
+    console.log('ContextMenu openAt:', event.clientX, event.clientY);
     
     // Set the position where the menu should appear
     setPosition({
@@ -70,8 +75,21 @@ export const ContextMenu = forwardRef(function ContextMenu(
     // Store the context data in state
     updateState?.({ $context: context });
     
+    // Disable clicks temporarily
+    setEnableClicks(false);
+    
     // Open the menu
     setOpen(true);
+    
+    // Re-enable clicks after mouse button is released
+    const enableAfterRelease = () => {
+      console.log('Enabling clicks after mouseup');
+      setEnableClicks(true);
+    };
+    
+    // Listen for mouseup to re-enable clicks
+    window.addEventListener('mouseup', enableAfterRelease, { once: true });
+    window.addEventListener('pointerup', enableAfterRelease, { once: true });
   }, [updateState]);
 
   useEffect(() => {
@@ -131,6 +149,8 @@ export const ContextMenu = forwardRef(function ContextMenu(
               // Initial positioning - will be adjusted by useEffect
               left: position?.x ?? 0,
               top: position?.y ?? 0,
+              // Disable pointer events until mouse button is released
+              pointerEvents: enableClicks ? 'auto' : 'none',
             }}
             className={classnames(styles.ContextMenuContent, className, {
               [styles.compact]: compact,
