@@ -1,3 +1,7 @@
-<Fragment var.msg="{undefined}">
-    <Text value="you have {msg} messages"/>
-</Fragment>
+<Fragment>
+        <variable name="simpleColorMap"
+          value="{{ important: '${EXPECTED_BG_COLOR_IMP}', regular: '${EXPECTED_BG_COLOR_REG}' }}" />
+        <Badge testId="badgeImp" value="important" colorMap="{simpleColorMap}" />
+        <Badge testId="badgeReg" value="regular" colorMap="{simpleColorMap}" />
+        {simpleColorMap}
+      </Fragment>

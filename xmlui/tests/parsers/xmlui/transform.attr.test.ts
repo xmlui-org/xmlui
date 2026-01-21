@@ -94,7 +94,7 @@ describe("Xmlui transform - attributes", () => {
       const cd = transformSource(`<Stack a="hi {name}" />`) as ComponentDef;
       expect(cd.props.a).toMatchObject({
         type: T_TEMPLATE_LITERAL_EXPRESSION,
-        segments: [{ type: T_LITERAL, value: "hi " }, { type: T_IDENTIFIER }],
+        segments: [{ type: T_LITERAL, value: "hi " }, {}],
       });
     });
 
@@ -102,15 +102,14 @@ describe("Xmlui transform - attributes", () => {
       const cd = transformSource(`<Stack var.a="hi {name}" />`) as ComponentDef<typeof StackMd>;
       expect(cd.vars.a).toMatchObject({
         type: T_TEMPLATE_LITERAL_EXPRESSION,
-        segments: [{ type: T_LITERAL, value: "hi " }, { type: T_IDENTIFIER }],
+        segments: [{ type: T_LITERAL, value: "hi " }, {}],
       });
     });
 
     it("when is pre-parsed", () => {
       const cd = transformSource(`<Stack when="{isOpen}" />`) as ComponentDef<typeof StackMd>;
       expect(cd.when).toMatchObject({
-        type: T_TEMPLATE_LITERAL_EXPRESSION,
-        segments: [{ type: T_IDENTIFIER }],
+        type: T_IDENTIFIER,
       });
     });
 
@@ -120,11 +119,7 @@ describe("Xmlui transform - attributes", () => {
       expect(child.type).equal("TextNode");
       expect(child.props.value).toMatchObject({
         type: T_TEMPLATE_LITERAL_EXPRESSION,
-        segments: [
-          { type: T_LITERAL, value: "hello " },
-          { type: T_IDENTIFIER },
-          { type: T_LITERAL, value: " there!" },
-        ],
+        segments: [{ type: T_LITERAL, value: "hello " }, {}, { type: T_LITERAL, value: " there!" }],
       });
     });
 
@@ -135,7 +130,7 @@ describe("Xmlui transform - attributes", () => {
       expect((cd.props as any).foo).toHaveLength(1);
       expect((cd.props as any).foo[0]).toMatchObject({
         type: T_TEMPLATE_LITERAL_EXPRESSION,
-        segments: [{ type: T_LITERAL, value: "hello " }, { type: T_IDENTIFIER }],
+        segments: [{ type: T_LITERAL, value: "hello " }, {}],
       });
     });
   });

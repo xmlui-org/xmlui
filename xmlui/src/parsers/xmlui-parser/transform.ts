@@ -11,9 +11,20 @@ import { DIAGS_TRANSFORM, TransformDiag, type TransformDiagPositionless } from "
 import type {
   Expression,
   Literal,
-  TemplateLiteralExpression,
+  MemberAccessExpression,
+  FunctionInvocationExpression,
+  BinaryExpression,
+  ConditionalExpression,
+  Identifier,
 } from "../../components-core/script-runner/ScriptingSourceTree";
-import { T_LITERAL } from "../../components-core/script-runner/ScriptingSourceTree";
+import {
+  T_LITERAL,
+  T_MEMBER_ACCESS_EXPRESSION,
+  T_FUNCTION_INVOCATION_EXPRESSION,
+  T_BINARY_EXPRESSION,
+  T_CONDITIONAL_EXPRESSION,
+  T_IDENTIFIER,
+} from "../../components-core/script-runner/ScriptingSourceTree";
 import { T_TEMPLATE_LITERAL_EXPRESSION } from "../scripting/ScriptingNodeTypes";
 
 export const COMPOUND_COMP_ID = "Component";
@@ -424,10 +435,10 @@ export function nodeToComponentDef(
     // --- Recognize special attributes by component definition type
     switch (name) {
       case "id":
-        comp.uid = value;
+        comp.uid = parseBinding(value, attrValueStringNode);
         return;
       case "testId":
-        comp.testId = value;
+        comp.testId = parseBinding(value, attrValueStringNode);
         return;
       case "when":
         comp.when = parseBinding(value, attrValueStringNode);
@@ -1072,24 +1083,78 @@ export function nodeToComponentDef(
         return value;
       }
 
-      if (parts.length === 1 && parts[0].type === "literal") {
+      if (parts.length === 1) {
         return parts[0].value;
       }
 
-      const segments = parts.map((part) => {
+      // Build concatenation expression: (expr == null ? "" : expr.toString()) + ...
+      const expressionParts = parts.map((part) => {
         if (part.type === "expression") {
-          return part.value;
+          // Create literal for null (works for both null and undefined with ==)
+          const nullLiteral: Literal = {
+            type: T_LITERAL,
+            nodeId: 0,
+            value: null,
+          } as Literal;
+
+          const emptyStringLiteral: Literal = {
+            type: T_LITERAL,
+            nodeId: 0,
+            value: "",
+          } as Literal;
+
+          // Create equality check: part.value == null (covers both null and undefined)
+          const eqNull: BinaryExpression = {
+            type: T_BINARY_EXPRESSION,
+            nodeId: 0,
+            op: "==",
+            left: part.value,
+            right: nullLiteral,
+          } as BinaryExpression;
+
+          // Create toString() call
+          const memberAccess: MemberAccessExpression = {
+            type: T_MEMBER_ACCESS_EXPRESSION,
+            nodeId: 0,
+            obj: part.value,
+            member: "toString",
+            opt: false,
+          } as MemberAccessExpression;
+
+          const toStringCall: FunctionInvocationExpression = {
+            type: T_FUNCTION_INVOCATION_EXPRESSION,
+            nodeId: 0,
+            obj: memberAccess,
+            arguments: [],
+          } as FunctionInvocationExpression;
+
+          // Create conditional expression: eqNull ? "" : toStringCall
+          const conditionalExpr: ConditionalExpression = {
+            type: T_CONDITIONAL_EXPRESSION,
+            nodeId: 0,
+            cond: eqNull,
+            thenE: emptyStringLiteral,
+            elseE: toStringCall,
+          } as ConditionalExpression;
+
+          return conditionalExpr;
         } else {
+          // Literal string
           return {
             type: T_LITERAL,
+            nodeId: 0,
             value: part.value,
           } as Literal;
         }
       });
+
       return {
+        nodeId: 0,
         type: T_TEMPLATE_LITERAL_EXPRESSION,
-        segments,
-      } as TemplateLiteralExpression;
+        segments: expressionParts,
+      };
+
+      // concatenatedExpr;
     } catch (err: any) {
       if (nodeContainingValue) {
         reportError(

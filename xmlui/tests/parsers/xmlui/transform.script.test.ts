@@ -310,8 +310,8 @@ var b = 2;
     expect(child.children![0].children!.length).equal(1);
     const textNode = child.children![0].children![0];
     expect((textNode.props as any).value).toMatchObject({
-      type: T_TEMPLATE_LITERAL_EXPRESSION,
-      segments: [{ type: T_IDENTIFIER, name: "uppercaseItem" }],
+      type: T_IDENTIFIER,
+      name: "uppercaseItem",
     });
   });
 });
