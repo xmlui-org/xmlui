@@ -29,9 +29,9 @@ type DropdownMenuContextType = {
   closeMenu: () => void;
 };
 
-const DropdownMenuContext = createContext<DropdownMenuContextType | null>(null);
+export const DropdownMenuContext = createContext<DropdownMenuContextType | null>(null);
 
-const useDropdownMenuContext = () => {
+export const useDropdownMenuContext = () => {
   const context = useContext(DropdownMenuContext);
   return context;
 };

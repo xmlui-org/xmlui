@@ -1,0 +1,43 @@
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$backgroundColor-ContextMenu: createThemeVar("backgroundColor-ContextMenu");
+$borderRadius-ContextMenu: createThemeVar("borderRadius-ContextMenu");
+$boxShadow-ContextMenu: createThemeVar("boxShadow-ContextMenu");
+$borderColor-ContextMenu-content: createThemeVar("borderColor-ContextMenu-content");
+$borderWidth-ContextMenu-content: createThemeVar("borderWidth-ContextMenu-content");
+$borderStyle-ContextMenu-content: createThemeVar("borderStyle-ContextMenu-content");
+$minWidth-ContextMenu: createThemeVar("minWidth-ContextMenu");
+
+@layer components {
+
+  .ContextMenuContent {
+    max-height: var(--radix-dropdown-menu-content-available-height);
+    overflow: auto;
+    background-color: $backgroundColor-ContextMenu;
+    border-radius: $borderRadius-ContextMenu;
+    min-width: $minWidth-ContextMenu;
+    box-shadow: $boxShadow-ContextMenu;
+    animation-duration: 200ms;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
+    border: $borderWidth-ContextMenu-content $borderStyle-ContextMenu-content
+      $borderColor-ContextMenu-content;
+    z-index: 9999;
+
+    &.compact {
+      min-width: auto;
+    }
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}
