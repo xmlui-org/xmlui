@@ -114,6 +114,7 @@ import {
   labelBehavior,
   variantBehavior,
   formBindingBehavior,
+  validationBehavior,
   bookmarkBehavior,
 } from "../components-core/behaviors/CoreBehaviors";
 import type {
@@ -833,6 +834,7 @@ export class ComponentRegistry {
     this.registerBehavior(variantBehavior);
     this.registerBehavior(bookmarkBehavior);
     this.registerBehavior(formBindingBehavior);
+    this.registerBehavior(validationBehavior);
 
     // Register external behaviors from contributes
     contributes.behaviors?.forEach((behavior) => {
