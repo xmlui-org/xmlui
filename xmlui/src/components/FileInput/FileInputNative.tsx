@@ -1,6 +1,6 @@
 import type React from "react";
-import { type CSSProperties, useCallback, useEffect, useId, useRef, useState } from "react";
-import type { DropzoneRootProps } from "react-dropzone";
+import { type CSSProperties, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import type { Accept, DropzoneRootProps } from "react-dropzone";
 import * as dropzone from "react-dropzone";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import classnames from "classnames";
@@ -19,6 +19,17 @@ import { TextBox } from "../TextBox/TextBoxNative";
 
 // https://github.com/react-dropzone/react-dropzone/issues/1259
 const { useDropzone } = dropzone;
+
+/**
+ * Convert a file type string (e.g., ".csv" or ".txt,.jpg") to react-dropzone's Accept format
+ */
+function toDropzoneAccept(acceptsFileType: string | undefined): Accept | undefined {
+  if (!acceptsFileType) return undefined;
+
+  const extensions = acceptsFileType.split(",").map(ext => ext.trim());
+  // Use a wildcard MIME type to accept any file with the specified extensions
+  return { "application/octet-stream": extensions };
+}
 
 // ============================================================================
 // React FileInput component implementation
@@ -139,6 +150,7 @@ export const FileInput = ({
   const _acceptsFileType = acceptsFileType
     ? (typeof acceptsFileType === "string" ? acceptsFileType : acceptsFileType?.join(","))
     : inferredFileType;
+  const dropzoneAccept = useMemo(() => toDropzoneAccept(_acceptsFileType), [_acceptsFileType]);
 
   useEffect(() => {
     if (autoFocus) {
@@ -327,6 +339,7 @@ export const FileInput = ({
   );
 
   const { getRootProps, getInputProps, open } = useDropzone({
+    accept: dropzoneAccept,
     disabled: !enabled,
     multiple: multiple || directory,
     onDrop,
