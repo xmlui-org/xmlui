@@ -212,6 +212,7 @@ import { PaginationMd } from "./Pagination/Pagination";
 import { ResponsiveBarMd } from "./ResponsiveBar/ResponsiveBar";
 import { ScrollViewer } from "./ScrollViewer/ScrollViewerNative";
 import { ScrollViewerMd } from "./ScrollViewer/ScrollViewer";
+import { ContextMenuMd } from "./ContextMenu/ContextMenu";
 
 export const collectedComponentMetadata = {
   // --- HTML tags
@@ -334,6 +335,7 @@ export const collectedComponentMetadata = {
   CODE: HtmlCodeMd,
   ColorPicker: ColorPickerMd,
   Column: ColumnMd,
+  ContextMenu: ContextMenuMd,
   ContentSeparator: ContentSeparatorMd,
   DataSource: DataSourceMd,
   DatePicker: DatePickerMd,

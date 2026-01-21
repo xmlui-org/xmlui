@@ -39,10 +39,6 @@ export const ContextMenuMd = createMetadata({
       description: `This method closes the context menu.`,
       signature: "close(): void",
     },
-    open: {
-      description: `This method opens the context menu. Note: You should typically use openAt() instead to position the menu at specific coordinates.`,
-      signature: "open(): void",
-    },
     openAt: {
       description:
         `This method opens the context menu at the specified event position (e.g., mouse click coordinates). ` +

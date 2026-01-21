@@ -97,7 +97,6 @@ export const ContextMenu = forwardRef(function ContextMenu(
 
   useEffect(() => {
     registerComponentApi?.({
-      open: () => setOpen(true),
       close: closeMenu,
       openAt,
     });

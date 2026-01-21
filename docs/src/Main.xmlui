@@ -356,6 +356,7 @@
                 <NavLink icon="component" label="ColorPicker" to="/components/ColorPicker" />
                 <NavLink icon="component" label="Column" to="/components/Column" />
                 <NavLink icon="component" label="ContentSeparator" to="/components/ContentSeparator" />
+                <NavLink icon="component" label="ContextMenu" to="/components/ContextMenu" />
                 <NavLink icon="component" label="DataSource" to="/components/DataSource" />
                 <NavLink icon="component" label="DateInput" to="/components/DateInput" />
                 <NavLink icon="component" label="DatePicker" to="/components/DatePicker" />

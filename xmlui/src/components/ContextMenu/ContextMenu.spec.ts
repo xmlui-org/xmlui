@@ -231,27 +231,7 @@ test("handles disabled menu items", async ({ initTestBed, page, createContextMen
 // =============================================================================
 
 test.describe("API", () => {
-  test("open() API method works", async ({ initTestBed, page }) => {
-  await initTestBed(`
-    <VStack>
-      <Button testId="openBtn" onClick="menu.open()">Open Menu</Button>
-      <ContextMenu id="menu">
-        <MenuItem>Item 1</MenuItem>
-      </ContextMenu>
-    </VStack>
-  `);
-
-  // Menu should not be visible initially
-  await expect(page.getByRole("menuitem", { name: "Item 1" })).not.toBeVisible();
-
-  // Click button to open menu
-  await page.getByTestId("openBtn").click();
-
-  // Menu should be visible
-  await expect(page.getByRole("menuitem", { name: "Item 1" })).toBeVisible();
-});
-
-test("close() API method works", async ({ initTestBed, page }) => {
+  test("close() API method works", async ({ initTestBed, page }) => {
   await initTestBed(`
     <VStack>
       <Card testId="target" title="Target" onContextMenu="ev => menu.openAt(ev)">
