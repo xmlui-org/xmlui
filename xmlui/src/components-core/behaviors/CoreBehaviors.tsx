@@ -596,9 +596,12 @@ export const validationBehavior: Behavior = {
   },
   attach: (context, node, metadata) => {
     const { extractValue, node: componentNode, lookupEventHandler } = context;
+    const renderedNode = node as ReactElement;
 
     const bindTo = extractValue.asOptionalString(componentNode.props?.bindTo);
-    const itemIndex = extractValue.asOptionalNumber(componentNode.props?.itemIndex);
+    const itemIndex =
+      (renderedNode.props as any)?.itemIndex ??
+      extractValue.asOptionalNumber(componentNode.props?.itemIndex);
     const formItemType = extractValue.asOptionalString(componentNode.props?.type);
     const inline = extractValue.asOptionalBoolean(componentNode.props?.inline);
     const verboseValidationFeedback = extractValue.asOptionalBoolean(
