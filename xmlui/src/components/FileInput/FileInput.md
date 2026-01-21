@@ -446,6 +446,28 @@ Use this property to show loading indicators while files are being parsed. See t
 
 %-API-END
 
+%-API-START getFields
+
+Returns an array of column header names (available when `parseAs="csv"` and `header: true`, which is the default).
+
+Right-click and save: [sample-products.csv](/resources/files/sample-products.csv). Then browse to sample-products.csv.
+
+```xmlui-pg copy display name="Example: getFields"
+<App var.products="{[]}">
+  <FileInput
+    id="csvInput"
+    parseAs="csv"
+    onDidChange="data => products = data"
+  />
+  <Text value="Columns: {csvInput.getFields()?.join(', ')}" when="{csvInput.getFields()}" />
+  <List data="{products}" when="{products.length > 0}">
+    <Text value="{$item.name}: ${$item.price}" />
+  </List>
+</App>
+```
+
+%-API-END
+
 %-STYLE-START
 
 The `FileInput` component does not theme variables directly.

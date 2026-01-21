@@ -144,6 +144,10 @@ export const FileInputMd = createMetadata({
       description: "This property indicates whether file parsing is currently in progress (when using parseAs).",
       signature: "get inProgress(): boolean",
     },
+    getFields: {
+      description: "This method returns the column headers from the most recently parsed CSV file.",
+      signature: "getFields(): string[] | undefined",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
 });
