@@ -1,15 +1,18 @@
 <Component name="LinkButton">
-  <Link 
-    when="{mediaSize.sizeIndex > 2}" 
-    to="{$props.to}" 
-    target="{$props.blank ? '_blank' : ''}" 
-    active="true">
-    <Button 
-      padding="$space-2" 
-      variant="ghost" 
-      icon="{$props.icon}"
-      onClick="emitEvent('click')">
-      <Text>{$props.label}</Text>
-    </Button>
-  </Link>
+  <Theme
+    textDecorationLine-Link="none"
+    textColor-Link="$textColor-Text"
+    textColor-Link--hover="$textColor-Text"
+    textColor-Link--active="$textColor-Text">
+    <Link
+      when="{mediaSize.sizeIndex > 2}"
+      to="{$props.to}"
+      target="{$props.blank ? '_blank' : '_self'}"
+      active="true">
+      <HStack padding="$space-2" gap="$space-2" verticalAlignment="center">
+        <Icon name="{$props.icon}" when="{$props.icon}" />
+        <Text color="$textColor-Text">{$props.label}</Text>
+      </HStack>
+    </Link>
+  </Theme>
 </Component>
