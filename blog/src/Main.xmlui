@@ -45,12 +45,6 @@
             <HStack when="{mediaSize.sizeIndex > 2}" gap="0">
                 <NavLink
                     noIndicator
-                    label="Demo"
-                    paddingLeft="0"
-                    to="https://demo.xmlui.org"
-                />
-                <NavLink
-                    noIndicator
                     label="Docs"
                     to="https://docs.xmlui.org"
                 />
@@ -60,7 +54,7 @@
                     to="https://blog.xmlui.org"
                     active
                 />
-                <NavLink to="https://www.xmlui.org/get-started" noIndicator label="Start"/>
+                <NavLink to="https://xmlui.org/get-started" noIndicator label="Get started"/>
             </HStack>
         </Theme>
         <property name="profileMenuTemplate">
@@ -102,7 +96,6 @@
                 target="_blank"
             />
         </Fragment>
-        <NavLink to="https://www.xmlui.org/get-started" noIndicator label="Download"/>
     </NavPanel>
 
     <Pages fallbackPath="/404">
@@ -137,6 +130,11 @@
         <SpaceFiller />
         <HStack verticalAlignment="center">
             <Fragment when="{mediaSize.sizeIndex > 2}">
+                <LinkButton
+                    to="https://demo.xmlui.org"
+                    label="Gallery"
+                    blank="{true}"
+                />
                 <LinkButton
                     to="https://xmlui.org/news"
                     label="News & Reviews"
