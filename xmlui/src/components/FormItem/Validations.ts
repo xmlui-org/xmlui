@@ -70,10 +70,14 @@ function isRegexValid(value: any = "", regex: string) {
 }
 
 class FormItemValidator {
+  private abortController: AbortController | null = null;
+
   constructor(
     private validations: FormItemValidations,
     private onValidate: ValidateEventHandler,
     private value: any,
+    private timeout: number = 3000,
+    private timeoutMessage?: string,
   ) {}
 
   preValidate = () => {
@@ -276,22 +280,72 @@ class FormItemValidator {
     if (!this.onValidate) {
       return undefined;
     }
-    const validationFnResult = await this.onValidate(this.value);
 
-    if (typeof validationFnResult === "boolean") {
-      return [
-        {
-          isValid: validationFnResult,
-          invalidMessage: "Invalid input",
-          severity: "error",
-        },
-      ];
-    }
-    if (!isArray(validationFnResult)) {
-      return [validationFnResult];
+    // Cancel previous validation if still running
+    if (this.abortController) {
+      this.abortController.abort();
     }
 
-    return validationFnResult;
+    this.abortController = new AbortController();
+
+    try {
+      let validationFnResult: any;
+
+      // If timeout is 0 or not set, run without timeout
+      if (!this.timeout || this.timeout === 0) {
+        validationFnResult = await this.onValidate(this.value);
+      } else {
+        // Create timeout promise
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => {
+            if (this.abortController) {
+              this.abortController.abort();
+            }
+            reject(new Error("VALIDATION_TIMEOUT"));
+          }, this.timeout),
+        );
+
+        // Race validation against timeout
+        validationFnResult = await Promise.race([this.onValidate(this.value), timeoutPromise]);
+      }
+
+      if (typeof validationFnResult === "boolean") {
+        return [
+          {
+            isValid: validationFnResult,
+            invalidMessage: "Invalid input",
+            severity: "error",
+          },
+        ];
+      }
+      if (!isArray(validationFnResult)) {
+        return [validationFnResult];
+      }
+
+      return validationFnResult;
+    } catch (error: any) {
+      if (error?.message === "VALIDATION_TIMEOUT") {
+        return [
+          {
+            isValid: false,
+            invalidMessage:
+              this.timeoutMessage || "Validation took too long. Please try again.",
+            severity: "error",
+          },
+        ];
+      }
+      // Re-throw other errors
+      throw error;
+    } finally {
+      this.abortController = null;
+    }
+  }
+
+  cleanup() {
+    if (this.abortController) {
+      this.abortController.abort();
+      this.abortController = null;
+    }
   }
 }
 
@@ -299,8 +353,16 @@ async function asyncValidate(
   validations: FormItemValidations,
   onValidate: ValidateEventHandler,
   deferredValue: any,
+  timeout: number = 3000,
+  timeoutMessage?: string,
 ) {
-  const validator = new FormItemValidator(validations, onValidate, deferredValue);
+  const validator = new FormItemValidator(
+    validations,
+    onValidate,
+    deferredValue,
+    timeout,
+    timeoutMessage,
+  );
   // console.log("calling async validate with ", deferredValue);
   return await validator.validate();
 }
@@ -312,22 +374,36 @@ export function useValidation(
   dispatch: Dispatch<ContainerAction | FormAction>,
   bindTo: string,
   throttleWaitInMs: number = 0,
+  timeout: number = 3000,
+  timeoutMessage?: string,
 ) {
   const deferredValue = useDeferredValue(value);
 
   const throttledAsyncValidate = useMemo(() => {
     if (throttleWaitInMs !== 0) {
-      return asyncThrottle(asyncValidate, throttleWaitInMs, {
-        trailing: true,
-        leading: true,
-      });
+      return asyncThrottle(
+        (validations: FormItemValidations, onValidate: ValidateEventHandler, value: any) =>
+          asyncValidate(validations, onValidate, value, timeout, timeoutMessage),
+        throttleWaitInMs,
+        {
+          trailing: true,
+          leading: true,
+        },
+      );
     }
-    return asyncValidate;
-  }, [throttleWaitInMs]);
+    return (validations: FormItemValidations, onValidate: ValidateEventHandler, value: any) =>
+      asyncValidate(validations, onValidate, value, timeout, timeoutMessage);
+  }, [throttleWaitInMs, timeout, timeoutMessage]);
 
   useEffect(
     function runAllValidations() {
-      const validator = new FormItemValidator(validations, onValidate, deferredValue);
+      const validator = new FormItemValidator(
+        validations,
+        onValidate,
+        deferredValue,
+        timeout,
+        timeoutMessage,
+      );
       let ignore = false;
       const partialResult = validator.preValidate();
       if (!ignore) {
@@ -344,9 +420,10 @@ export function useValidation(
       }
       return () => {
         ignore = true;
+        validator.cleanup();
       };
     },
-    [bindTo, deferredValue, dispatch, onValidate, throttledAsyncValidate, validations],
+    [bindTo, deferredValue, dispatch, onValidate, throttledAsyncValidate, validations, timeout, timeoutMessage],
   );
 }
 

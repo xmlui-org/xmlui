@@ -1319,6 +1319,158 @@ test.describe("Theme Variables", () => {
 });
 
 // =============================================================================
+// ONVALIDATE TIMEOUT TESTS
+// =============================================================================
+
+test.describe("onValidate Timeout", () => {
+  test("onValidate times out after specified duration and shows error", async ({
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem 
+          testId="field1"
+          label="Email" 
+          bindTo="email"
+          validationMode="onChanged"
+          customValidationsTimeout="1000"
+          onValidate="(value) => { await delay(3000); return true; }"
+        />
+      </Form>
+    `);
+
+    const field1Driver = await createFormItemDriver("field1");
+    const input = await createTextBoxDriver(field1Driver.input);
+    
+    await input.field.fill("test@example.com");
+    
+    // After 1 second, should show timeout error
+    await expect(field1Driver.component).toContainText("Validation took too long", { timeout: 2000 });
+  });
+
+  test("onValidate uses custom timeout message", async ({
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem 
+          testId="field1"
+          label="Email" 
+          bindTo="email"
+          validationMode="onChanged"
+          customValidationsTimeout="1000"
+          customValidationsTimeoutMessage="Email validation is taking too long!"
+          onValidate="(value) => { await delay(3000); return true; }"
+        />
+      </Form>
+    `);
+
+    const field1Driver = await createFormItemDriver("field1");
+    const input = await createTextBoxDriver(field1Driver.input);
+    
+    await input.field.fill("test@example.com");
+    
+    await expect(field1Driver.component).toContainText("Email validation is taking too long!", { timeout: 2000 });
+  });
+
+  test("onValidate cancels previous validation when value changes", async ({
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form>
+        <FormItem 
+          testId="field1"
+          label="Email" 
+          bindTo="email"
+          validationMode="onChanged"
+          customValidationsTimeout="2000"
+          onValidate="(value) => { await delay(1500, () => { testState = value; }); return true; }"
+        />
+      </Form>
+    `);
+
+    const field1Driver = await createFormItemDriver("field1");
+    const input = await createTextBoxDriver(field1Driver.input);
+    
+    // Type first value
+    await input.field.fill("test1");
+    
+    // Quickly change to second value (should cancel first validation)
+    await input.field.fill("test2");
+    
+    // Wait for validation to complete
+    await expect.poll(testStateDriver.testState, { timeout: 3000 }).toEqual("test2");
+  });
+
+  test("onValidate with zero timeout disables timeout mechanism", async ({
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form>
+        <FormItem 
+          testId="field1"
+          label="Email" 
+          bindTo="email"
+          validationMode="onChanged"
+          customValidationsTimeout="0"
+          onValidate="(value) => { await delay(2000, () => { testState = true; }); return true; }"
+        />
+      </Form>
+    `);
+
+    const field1Driver = await createFormItemDriver("field1");
+    const input = await createTextBoxDriver(field1Driver.input);
+    
+    await input.field.fill("test@example.com");
+    
+    // Should NOT timeout, validation should complete normally
+    await expect.poll(testStateDriver.testState, { timeout: 3000 }).toBe(true);
+    
+    // Should not show timeout error
+    await expect(field1Driver.component).not.toContainText("Validation took too long");
+  });
+
+  test("onValidate completes successfully within timeout period", async ({
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem 
+          testId="field1"
+          label="Email" 
+          bindTo="email"
+          validationMode="onChanged"
+          customValidationsTimeout="2000"
+          onValidate="(value) => {
+            await delay(500);
+            return { isValid: false, invalidMessage: 'Custom error', severity: 'error' };
+          }"
+        />
+      </Form>
+    `);
+
+    const field1Driver = await createFormItemDriver("field1");
+    const input = await createTextBoxDriver(field1Driver.input);
+    
+    await input.field.fill("test@example.com");
+    
+    // Should show custom error, not timeout error
+    await expect(field1Driver.component).toContainText("Custom error", { timeout: 1500 });
+    await expect(field1Driver.component).not.toContainText("Validation took too long");
+  });
+});
+
+// =============================================================================
 // OTHER EDGE CASE TESTS
 // =============================================================================
 

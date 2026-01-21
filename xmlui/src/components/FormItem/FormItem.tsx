@@ -78,6 +78,15 @@ export const FormItemMd = createMetadata({
       type: "number",
       defaultValue: defaultProps.customValidationsDebounce,
     },
+    customValidationsTimeout: {
+      description: `This optional number prop sets the maximum time (in milliseconds) to wait for custom validation to complete. If validation exceeds this time, it will be cancelled and treated as a validation failure.`,
+      type: "number",
+      defaultValue: defaultProps.customValidationsTimeout,
+    },
+    customValidationsTimeoutMessage: {
+      description: `This optional string prop customizes the error message shown when validation times out. If not provided, a default timeout message is used.`,
+      type: "string",
+    },
     validationMode: {
       description:
         `This property sets what kind of validation mode or strategy to employ for a particular ` +
@@ -261,7 +270,6 @@ export const formItemComponentRenderer = createComponentRenderer(
     className,
     layoutContext,
     lookupEventHandler,
-    lookupAction,
     registerComponentApi,
   }) => {
     const {
