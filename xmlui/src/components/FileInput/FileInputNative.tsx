@@ -131,6 +131,8 @@ export const FileInput = ({
 
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [displayedFiles, setDisplayedFiles] = useState<File[]>([]);
+  const [parseFields, setParseFields] = useState<string[] | undefined>(undefined);
 
   // Auto-infer file types based on parseAs
   const inferredFileType = parseAs === "csv" ? ".csv" : parseAs === "json" ? ".json" : undefined;
@@ -179,6 +181,9 @@ export const FileInput = ({
         loggerService.log(["[FileInput] No files accepted, returning"]);
         return;
       }
+
+      // Store files for display purposes (file names in TextBox)
+      setDisplayedFiles(acceptedFiles);
 
       // If no parsing is needed, just pass the files through
       if (!parseAs) {
@@ -235,6 +240,8 @@ export const FileInput = ({
                       resolve({ file, data: [], error });
                     } else {
                       loggerService.log(["[FileInput] CSV parse successful, row count:", results.data.length]);
+                      loggerService.log(["[FileInput] CSV meta fields:", results.meta.fields]);
+                      setParseFields(results.meta.fields);
                       resolve({ file, data: results.data, error: undefined });
                     }
                   },
@@ -312,8 +319,9 @@ export const FileInput = ({
 
       loggerService.log(["[FileInput] onDrop completed"]);
 
-      // Stop loading spinner
+      // Stop loading spinner and restore focus
       setIsLoading(false);
+      buttonRef.current?.focus();
     },
     [updateState, onDidChange, parseAs, csvOptions, onParseError, multiple, directory],
   );
@@ -332,6 +340,8 @@ export const FileInput = ({
     open();
   });
 
+  const getFields = useCallback(() => parseFields, [parseFields]);
+
   useEffect(() => {
     registerComponentApi?.({
       focus,
@@ -339,8 +349,9 @@ export const FileInput = ({
       get inProgress() {
         return isLoading;
       },
+      getFields,
     });
-  }, [focus, doOpen, registerComponentApi, isLoading]);
+  }, [focus, doOpen, registerComponentApi, isLoading, getFields]);
 
   // Solution source: https://stackoverflow.com/questions/1084925/input-type-file-show-only-button
   return (
@@ -378,7 +389,7 @@ export const FileInput = ({
           <TextBox
             placeholder={placeholder}
             enabled={enabled}
-            value={_value?.map((v) => v.name).join(", ") || ""}
+            value={displayedFiles?.map((v) => v.name).join(", ") || ""}
             validationStatus={validationStatus}
             readOnly
             tabIndex={-1}
