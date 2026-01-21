@@ -50,6 +50,7 @@ export const ContextMenu = forwardRef(function ContextMenu(
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
   const [enableClicks, setEnableClicks] = useState(true);
+  const [contentReady, setContentReady] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const closeMenu = useCallback(() => {
@@ -63,8 +64,6 @@ export const ContextMenu = forwardRef(function ContextMenu(
   const openAt = useCallback((event: MouseEvent | React.MouseEvent, context?: any) => {
     // Prevent the browser's default context menu
     event.preventDefault();
-    
-    console.log('ContextMenu openAt:', event.clientX, event.clientY);
     
     // Set the position where the menu should appear
     setPosition({
@@ -83,7 +82,6 @@ export const ContextMenu = forwardRef(function ContextMenu(
     
     // Re-enable clicks after mouse button is released
     const enableAfterRelease = () => {
-      console.log('Enabling clicks after mouseup');
       setEnableClicks(true);
     };
     
@@ -91,6 +89,11 @@ export const ContextMenu = forwardRef(function ContextMenu(
     window.addEventListener('mouseup', enableAfterRelease, { once: true });
     window.addEventListener('pointerup', enableAfterRelease, { once: true });
   }, [updateState]);
+
+  const handleContentRef = useCallback((el: HTMLDivElement | null) => {
+    contentRef.current = el;
+    setContentReady(!!el);
+  }, []);
 
   useEffect(() => {
     registerComponentApi?.({
@@ -100,32 +103,37 @@ export const ContextMenu = forwardRef(function ContextMenu(
     });
   }, [registerComponentApi, closeMenu, openAt]);
 
-  // Handle positioning the menu at the clicked coordinates
+  // Adjust menu position to stay within viewport
   useEffect(() => {
-    if (open && position && contentRef.current) {
+    if (open && position && contentReady && contentRef.current) {
       const content = contentRef.current;
       const { innerWidth, innerHeight } = window;
       const rect = content.getBoundingClientRect();
       
-      // Calculate if menu would overflow viewport
       let x = position.x;
       let y = position.y;
+      const margin = 8;
       
-      // Adjust horizontal position if menu would overflow right edge
-      if (x + rect.width > innerWidth) {
-        x = innerWidth - rect.width - 8; // 8px margin
+      // Adjust horizontal position
+      if (x + rect.width > innerWidth - margin) {
+        x = innerWidth - rect.width - margin;
+      }
+      if (x < margin) {
+        x = margin;
       }
       
-      // Adjust vertical position if menu would overflow bottom edge
-      if (y + rect.height > innerHeight) {
-        y = innerHeight - rect.height - 8; // 8px margin
+      // Adjust vertical position
+      if (y + rect.height > innerHeight - margin) {
+        y = innerHeight - rect.height - margin;
+      }
+      if (y < margin) {
+        y = margin;
       }
       
-      // Apply positioning
       content.style.left = `${x}px`;
       content.style.top = `${y}px`;
     }
-  }, [open, position]);
+  }, [open, position, contentReady]);
 
   return (
     <DropdownMenuContext.Provider value={{ closeMenu }}>
@@ -141,7 +149,7 @@ export const ContextMenu = forwardRef(function ContextMenu(
         {/* No trigger element for ContextMenu - it's opened programmatically */}
         <DropdownMenuPrimitive.Portal container={root}>
           <DropdownMenuPrimitive.Content
-            ref={contentRef}
+            ref={handleContentRef}
             align={alignment}
             style={{
               ...style,
