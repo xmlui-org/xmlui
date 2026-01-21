@@ -1,4 +1,5 @@
 @use "../../components-core/theming/themes" as t;
+@use "../Menu/Menu.module.scss" as menu;
 
 // --- This code snippet is required to collect the theme variables used in this module
 $themeVars: ();
@@ -7,6 +8,7 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+// DropdownMenu-specific theme variables (map to shared Menu variables)
 $backgroundColor-DropdownMenu: createThemeVar("backgroundColor-DropdownMenu");
 $borderRadius-DropdownMenu: createThemeVar("borderRadius-DropdownMenu");
 $boxShadow-DropdownMenu: createThemeVar("boxShadow-DropdownMenu");
@@ -14,6 +16,8 @@ $borderColor-DropdownMenu-content: createThemeVar("borderColor-DropdownMenu-cont
 $borderWidth-DropdownMenu-content: createThemeVar("borderWidth-DropdownMenu-content");
 $borderStyle-DropdownMenu-content: createThemeVar("borderStyle-DropdownMenu-content");
 $minWidth-DropdowMenu: createThemeVar("minWidth-DropdownMenu");
+
+// Re-export MenuItem and MenuSeparator theme variables for backward compatibility
 $backgroundColor-MenuItem: createThemeVar("backgroundColor-MenuItem");
 $color-MenuItem: createThemeVar("color-MenuItem");
 $fontFamily-MenuItem: createThemeVar("fontFamily-MenuItem");
@@ -37,91 +41,34 @@ $color-MenuSeparator: createThemeVar("color-MenuSeparator");
 @layer components {
 
   .DropdownMenuContent {
-    max-height: var(--radix-dropdown-menu-content-available-height);
-    overflow: auto;
-
-    &.compact {
-      min-width: auto;
-    } 
-  }
-
-  .DropdownMenuContent,
-  .DropdownMenuSubContent {
+    @include menu.menuContent;
+    // DropdownMenu-specific overrides using component-specific variables
     background-color: $backgroundColor-DropdownMenu;
     border-radius: $borderRadius-DropdownMenu;
     min-width: $minWidth-DropdowMenu;
     box-shadow: $boxShadow-DropdownMenu;
-    animation-duration: 400ms;
-    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: transform, opacity;
+    border: $borderWidth-DropdownMenu-content $borderStyle-DropdownMenu-content
+      $borderColor-DropdownMenu-content;
+  }
+
+  .DropdownMenuSubContent {
+    @include menu.menuContent;
+    // DropdownMenu-specific overrides using component-specific variables
+    background-color: $backgroundColor-DropdownMenu;
+    border-radius: $borderRadius-DropdownMenu;
+    min-width: $minWidth-DropdowMenu;
+    box-shadow: $boxShadow-DropdownMenu;
     border: $borderWidth-DropdownMenu-content $borderStyle-DropdownMenu-content
       $borderColor-DropdownMenu-content;
   }
 
   .DropdownMenuItem,
   .DropdownMenuSubTrigger {
-    background-color: $backgroundColor-MenuItem;
-    color: $color-MenuItem;
-    font-family: $fontFamily-MenuItem;
-    display: flex;
-    border: 0;
-    width: 100%;
-    gap: $gap-MenuItem;
-    font-size: $fontSize-MenuItem;
-    padding: $paddingVertical-MenuItem 0;
-    padding-inline: $paddingHorizontal-MenuItem; //t.$space-3;
-    cursor: pointer;
-    align-items: center;
-    justify-content: space-between;
-    user-select: none;
-    outline: none;
-
-    &:hover,
-    &[data-highlighted] {
-      background-color: $backgroundColor-MenuItem--hover;
-      color: $color-MenuItem--hover;
-    }
-
-    &.active {
-      background-color: $backgroundColor-MenuItem--active;
-      color: $color-MenuItem--active;
-
-      &:hover {
-        background-color: $backgroundColor-MenuItem--active--hover;
-        color: $color-MenuItem--active--hover;
-      }
-    }
-
-    &.disabled {
-      background-color: $backgroundColor-MenuItem;
-      color: $color-MenuItem--disabled;
-      cursor: not-allowed;
-
-      &:hover {
-        background-color: $backgroundColor-MenuItem;
-        color: $color-MenuItem--disabled;
-      }
-    }
-
-    &.compact {
-      padding: 0;
-    }
-
-    .wrapper {
-      flex: 1;
-    }
+    @include menu.menuItem;
   }
 
   .DropdownMenuSeparator {
-    margin-top: $marginTop-MenuSeparator;
-    margin-bottom: $marginBottom-MenuSeparator;
-    width: $width-MenuSeparator;
-    height: $height-MenuSeparator;
-    background-color: $color-MenuSeparator;
-
-    &:first-child, &:last-child{
-      display: none;
-    }
+    @include menu.menuSeparator;
   }
 }
 

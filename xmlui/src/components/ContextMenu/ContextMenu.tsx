@@ -17,7 +17,7 @@ export const ContextMenuMd = createMetadata({
     "when opened programmatically via its `openAt()` API. Unlike `DropdownMenu`, it has no " +
     "trigger button and is typically used with `onContextMenu` events to create right-click " +
     "menus or custom context-aware action menus. The menu automatically positions itself " +
-    "within the viewport and closes when clicking outside or when a menu item is selected.",
+    "within the viewport and closes when clicking outside or when a menu item is selected. ",
   parts: {
     content: {
       description: "The content area of the ContextMenu where menu items are displayed.",
@@ -44,7 +44,7 @@ export const ContextMenuMd = createMetadata({
       signature: "open(): void",
     },
     openAt: {
-      description: 
+      description:
         `This method opens the context menu at the specified event position (e.g., mouse click coordinates). ` +
         `Optionally, you can pass a context object that will be available within the menu as \`$context\`. ` +
         `The method automatically prevents the browser's default context menu from appearing.`,
@@ -76,7 +76,7 @@ export const contextMenuComponentRenderer = createComponentRenderer(
   ({ node, extractValue, renderChild, registerComponentApi, className, state, updateState }) => {
     // Get the context data from state
     const contextData = state.$context;
-    
+
     // Wrap children in a Container with context variables to make $context available
     const nodeWithContextVars = useMemo(
       () =>
@@ -87,7 +87,7 @@ export const contextMenuComponentRenderer = createComponentRenderer(
         }) as ContainerWrapperDef,
       [node.children, contextData],
     );
-    
+
     return (
       <ContextMenu
         registerComponentApi={registerComponentApi}

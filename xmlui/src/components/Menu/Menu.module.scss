@@ -1,0 +1,128 @@
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+// Shared menu content theme variables
+$backgroundColor-Menu: createThemeVar("backgroundColor-Menu");
+$borderRadius-Menu: createThemeVar("borderRadius-Menu");
+$boxShadow-Menu: createThemeVar("boxShadow-Menu");
+$borderColor-Menu-content: createThemeVar("borderColor-Menu-content");
+$borderWidth-Menu-content: createThemeVar("borderWidth-Menu-content");
+$borderStyle-Menu-content: createThemeVar("borderStyle-Menu-content");
+$minWidth-Menu: createThemeVar("minWidth-Menu");
+
+// MenuItem theme variables
+$backgroundColor-MenuItem: createThemeVar("backgroundColor-MenuItem");
+$color-MenuItem: createThemeVar("color-MenuItem");
+$fontFamily-MenuItem: createThemeVar("fontFamily-MenuItem");
+$gap-MenuItem: createThemeVar("gap-MenuItem");
+$fontSize-MenuItem: createThemeVar("fontSize-MenuItem");
+$paddingVertical-MenuItem: createThemeVar("paddingVertical-MenuItem");
+$paddingHorizontal-MenuItem: createThemeVar("paddingHorizontal-MenuItem");
+$backgroundColor-MenuItem--hover: createThemeVar("backgroundColor-MenuItem--hover");
+$backgroundColor-MenuItem--active: createThemeVar("backgroundColor-MenuItem--active");
+$backgroundColor-MenuItem--active--hover: createThemeVar("backgroundColor-MenuItem--active--hover");
+$color-MenuItem--hover: createThemeVar("color-MenuItem--hover");
+$color-MenuItem--active: createThemeVar("color-MenuItem--active");
+$color-MenuItem--active--hover: createThemeVar("color-MenuItem--active--hover");
+$color-MenuItem--disabled: createThemeVar("color-MenuItem--disabled");
+
+// MenuSeparator theme variables
+$marginTop-MenuSeparator: createThemeVar("marginTop-MenuSeparator");
+$marginBottom-MenuSeparator: createThemeVar("marginBottom-MenuSeparator");
+$width-MenuSeparator: createThemeVar("width-MenuSeparator");
+$height-MenuSeparator: createThemeVar("height-MenuSeparator");
+$color-MenuSeparator: createThemeVar("color-MenuSeparator");
+
+// Mixins for shared styles
+@mixin menuContent {
+  background-color: $backgroundColor-Menu;
+  border-radius: $borderRadius-Menu;
+  min-width: $minWidth-Menu;
+  box-shadow: $boxShadow-Menu;
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+  border: $borderWidth-Menu-content $borderStyle-Menu-content $borderColor-Menu-content;
+  max-height: var(--radix-dropdown-menu-content-available-height);
+  overflow: auto;
+
+  &.compact {
+    min-width: auto;
+  }
+}
+
+@mixin menuItem {
+  background-color: $backgroundColor-MenuItem;
+  color: $color-MenuItem;
+  font-family: $fontFamily-MenuItem;
+  display: flex;
+  border: 0;
+  width: 100%;
+  gap: $gap-MenuItem;
+  font-size: $fontSize-MenuItem;
+  padding: $paddingVertical-MenuItem 0;
+  padding-inline: $paddingHorizontal-MenuItem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  outline: none;
+
+  &:hover,
+  &[data-highlighted] {
+    background-color: $backgroundColor-MenuItem--hover;
+    color: $color-MenuItem--hover;
+  }
+
+  &.active {
+    background-color: $backgroundColor-MenuItem--active;
+    color: $color-MenuItem--active;
+
+    &:hover {
+      background-color: $backgroundColor-MenuItem--active--hover;
+      color: $color-MenuItem--active--hover;
+    }
+  }
+
+  &.disabled {
+    background-color: $backgroundColor-MenuItem;
+    color: $color-MenuItem--disabled;
+    cursor: not-allowed;
+
+    &:hover {
+      background-color: $backgroundColor-MenuItem;
+      color: $color-MenuItem--disabled;
+    }
+  }
+
+  &.compact {
+    padding: 0;
+  }
+
+  .wrapper {
+    flex: 1;
+  }
+}
+
+@mixin menuSeparator {
+  margin-top: $marginTop-MenuSeparator;
+  margin-bottom: $marginBottom-MenuSeparator;
+  width: $width-MenuSeparator;
+  height: $height-MenuSeparator;
+  background-color: $color-MenuSeparator;
+
+  &:first-child, &:last-child{
+    display: none;
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}
