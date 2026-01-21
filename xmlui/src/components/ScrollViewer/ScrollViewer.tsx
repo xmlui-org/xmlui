@@ -12,19 +12,28 @@ export const ScrollViewerMd = createMetadata({
   description:
     "`ScrollViewer` is a simple layout container that stretches to fill its parent's viewport " +
     "and provides customizable scrollbar styles for scrollable content. It supports four scrollbar " +
-    "modes: normal (standard browser scrollbars), styled (themed scrollbars always visible), " +
+    "modes: normal (standard browser scrollbars), overlay (themed scrollbars always visible), " +
     "whenMouseOver (scrollbars appear on hover), and whenScrolling (scrollbars appear during scrolling).",
   props: {
     scrollStyle: {
       description:
         "This property determines the scrollbar style and behavior. " +
         "`normal` uses the standard browser scrollbar. " +
-        "`styled` uses themed scrollbars that are always visible and can be customized via theme variables. " +
+        "`overlay` uses themed scrollbars that are always visible and can be customized via theme variables. " +
         "`whenMouseOver` shows overlay scrollbars that appear when the mouse hovers over the scroll area and hide after 200ms when the mouse leaves. " +
         "`whenScrolling` shows overlay scrollbars only during active scrolling and hides them after 400ms of inactivity.",
       valueType: "string",
-      allowedValues: ["normal", "styled", "whenMouseOver", "whenScrolling"],
+      allowedValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
       defaultValue: defaultProps.scrollStyle,
+    },
+    showScrollerFade: {
+      description:
+        "When enabled, displays gradient fade indicators at the top and bottom of the scroll container to visually indicate that more content is available in those directions. " +
+        "The fade indicators automatically appear/disappear based on the current scroll position. " +
+        "Top fade shows when scrolled down from the top, bottom fade shows when not at the bottom. " +
+        "Only works with overlay scrollbar modes (not with `normal` mode).",
+      valueType: "boolean",
+      defaultValue: defaultProps.showScrollerFade,
     },
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -62,6 +71,12 @@ export const ScrollViewerMd = createMetadata({
     [`transition-${SCROLLER}`]: "CSS transition for the scrollbar container (opacity, visibility, position changes)",
     [`transitionTrack-${SCROLLER}`]: "CSS transition for the scrollbar track (opacity, background-color, border-color)",
     [`transitionHandle-${SCROLLER}`]: "CSS transition for the scrollbar handle (opacity, background-color, border-color, size changes)",
+
+    // --- Fade overlays
+    [`height-fade-${SCROLLER}`]: "The height of the fade overlay gradients at the top and bottom of the scroll container",
+    [`backgroundColor-fadeTop-${SCROLLER}`]: "The background gradient for the top fade overlay (typically a gradient from opaque to transparent)",
+    [`backgroundColor-fadeBottom-${SCROLLER}`]: "The background gradient for the bottom fade overlay (typically a gradient from transparent to opaque)",
+    [`transition-fade-${SCROLLER}`]: "CSS transition for the fade overlays (opacity changes)",
   },
   defaultThemeVars: {
     // --- Scrollbar sizing
@@ -99,6 +114,11 @@ export const ScrollViewerMd = createMetadata({
     [`transitionTrack-${SCROLLER}`]: "opacity 0.15s, background-color 0.15s, border-color 0.15s",
     [`transitionHandle-${SCROLLER}`]:
       "opacity 0.15s, background-color 0.15s, border-color 0.15s, height 0.15s, width 0.15s",
+
+    // --- Fade overlays
+    [`height-fade-${SCROLLER}`]: "64px",
+    [`backgroundColor-fade-${SCROLLER}`]: "rgba(255, 255, 255, 0.75)",
+    [`transition-fade-${SCROLLER}`]: "opacity 0.3s ease-in-out",
   },
 });
 
@@ -107,9 +127,14 @@ export const scrollViewerComponentRenderer = createComponentRenderer(
   ScrollViewerMd,
   ({ node, extractValue, renderChild, className }) => {
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle);
+    const showScrollerFade = extractValue.asOptionalBoolean(node.props.showScrollerFade);
 
     return (
-      <ScrollViewer className={className} scrollStyle={scrollStyle as any}>
+      <ScrollViewer 
+        className={className} 
+        scrollStyle={scrollStyle as any}
+        showScrollerFade={showScrollerFade}
+      >
         {renderChild(node.children)}
       </ScrollViewer>
     );

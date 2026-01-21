@@ -49,9 +49,15 @@ This property defines the logo template to display in the navigation panel with 
 
 -  default: **"normal"**
 
-This property determines the scrollbar style. Options: "normal" uses the browser's default scrollbar; "styled" displays a themed scrollbar that is always visible; "whenMouseOver" shows the scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.
+This property determines the scrollbar style. Options: "normal" uses the browser's default scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.
 
-Available values: `normal` **(default)**, `styled`, `whenMouseOver`, `whenScrolling`
+Available values: `normal` **(default)**, `overlay`, `whenMouseOver`, `whenScrolling`
+
+### `showScrollerFade` [#showscrollerfade]
+
+-  default: **true**
+
+When enabled, displays gradient fade indicators at the top and bottom edges of the navigation panel when scrollable content extends beyond the visible area. The fade effect provides a visual cue to users that additional content is available by scrolling. The indicators automatically appear and disappear based on the scroll position. This property only works with "overlay", "whenMouseOver", and "whenScrolling" scroll styles.
 
 ## Events [#events]
 

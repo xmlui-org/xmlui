@@ -199,6 +199,7 @@ export function buildLinkMap(
 export const defaultProps = {
   inDrawer: false,
   scrollStyle: "normal" as ScrollStyle,
+  showScrollerFade: true,
 };
 
 interface INavPanelContext {
@@ -217,6 +218,7 @@ function DrawerNavPanel({
   className,
   style,
   scrollStyle = defaultProps.scrollStyle,
+  showScrollerFade = defaultProps.showScrollerFade,
   ...rest
 }: {
   children: ReactNode;
@@ -224,6 +226,7 @@ function DrawerNavPanel({
   style?: React.CSSProperties;
   logoContent?: ReactNode;
   scrollStyle?: ScrollStyle;
+  showScrollerFade?: boolean;
 }) {
   return (
     <NavPanelContext.Provider value={contextValue}>
@@ -231,7 +234,7 @@ function DrawerNavPanel({
         <div className={classnames(styles.logoWrapper, styles.inDrawer)}>
           {logoContent || <Logo />}
         </div>
-        <Scroller className={styles.wrapperInner} style={style} scrollStyle={scrollStyle}>
+        <Scroller className={styles.wrapperInner} style={style} scrollStyle={scrollStyle} showScrollerFade={showScrollerFade}>
           {children}
         </Scroller>
       </div>
@@ -246,6 +249,7 @@ type Props = {
   logoContent?: ReactNode;
   inDrawer?: boolean;
   renderChild: RenderChildFn;
+  showScrollerFade?: boolean;
   navLinks?: NavHierarchyNode[];
   scrollStyle?: ScrollStyle;
 };
@@ -260,6 +264,7 @@ export const NavPanel = forwardRef(function NavPanel(
     renderChild,
     navLinks,
     scrollStyle = defaultProps.scrollStyle,
+    showScrollerFade = defaultProps.showScrollerFade,
     ...rest
   }: Props,
   forwardedRef: React.ForwardedRef<any>,
@@ -284,7 +289,7 @@ export const NavPanel = forwardRef(function NavPanel(
 
   if (inDrawer) {
     return (
-      <DrawerNavPanel {...rest} style={style} logoContent={safeLogoContent} className={className} scrollStyle={scrollStyle}>
+      <DrawerNavPanel {...rest} style={style} logoContent={safeLogoContent} className={className} scrollStyle={scrollStyle} showScrollerFade={showScrollerFade}>
         {children}
       </DrawerNavPanel>
     );
@@ -304,7 +309,7 @@ export const NavPanel = forwardRef(function NavPanel(
       {showLogo && (
         <div className={classnames(styles.logoWrapper)}>{safeLogoContent || <Logo />}</div>
       )}
-      <Scroller className={styles.wrapperInner} style={style} scrollStyle={scrollStyle}>
+      <Scroller className={styles.wrapperInner} style={style} scrollStyle={scrollStyle} showScrollerFade={showScrollerFade}>
         {children}
       </Scroller>
     </div>

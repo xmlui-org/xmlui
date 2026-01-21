@@ -74,12 +74,21 @@ const stackMd = createMetadata({
     },
     scrollStyle: {
       description: `This property determines the scrollbar style. Options: "normal" uses the browser's default ` +
-        `scrollbar; "styled" displays a themed scrollbar that is always visible; "whenMouseOver" shows the ` +
+        `scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the ` +
         `scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar ` +
         `only while scrolling is active and fades out after 400ms of inactivity.`,
       valueType: "string",
-      availableValues: ["normal", "styled", "whenMouseOver", "whenScrolling"],
+      availableValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
       defaultValue: defaultProps.scrollStyle,
+    },
+    showScrollerFade: {
+      description:
+        "When enabled, displays gradient fade indicators at the top and bottom of the scroll container to visually indicate that more content is available in those directions. " +
+        "The fade indicators automatically appear/disappear based on the current scroll position. " +
+        "Top fade shows when scrolled down from the top, bottom fade shows when not at the bottom. " +
+        "Only works with overlay scrollbar modes (not with 'normal' mode).",
+      valueType: "boolean",
+      defaultValue: defaultProps.showScrollerFade,
     },
   },
   events: {
@@ -180,6 +189,7 @@ type RenderStackPars = {
   horizontalAlignment: string;
   verticalAlignment: string;
   scrollStyle?: string;
+  showScrollerFade?: boolean;
   registerComponentApi?: (api: any) => void;
 };
 
@@ -193,6 +203,7 @@ function renderStack({
   lookupEventHandler,
   renderChild,
   scrollStyle,
+  showScrollerFade,
   registerComponentApi,
 }: RenderStackPars) {
   if (!isComponentDefChildren(node.children)) {
@@ -207,6 +218,7 @@ function renderStack({
       hoverContainer={extractValue(node.props?.hoverContainer)}
       visibleOnHover={extractValue(node.props?.visibleOnHover)}
       scrollStyle={scrollStyle as any}
+      showScrollerFade={showScrollerFade}
       className={className}
       onMount={lookupEventHandler("mounted")}
       registerComponentApi={registerComponentApi}
@@ -227,6 +239,7 @@ export const stackComponentRenderer = createComponentRenderer(
     const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
     const verticalAlignment = extractValue(node.props?.verticalAlignment);
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
+    const showScrollerFade = extractValue.asOptionalBoolean(node.props.showScrollerFade);
     return renderStack({
       node,
       extractValue,
@@ -235,6 +248,7 @@ export const stackComponentRenderer = createComponentRenderer(
       horizontalAlignment,
       verticalAlignment,
       scrollStyle,
+      showScrollerFade,
       lookupEventHandler,
       renderChild,
       registerComponentApi,

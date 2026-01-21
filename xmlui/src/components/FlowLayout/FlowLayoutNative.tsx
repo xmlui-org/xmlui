@@ -175,15 +175,17 @@ type FlowLayoutProps = {
   rowGap: string | number;
   verticalAlignment?: string;
   scrollStyle?: ScrollStyle;
+  showScrollerFade?: boolean;
   children: ReactNode;
   registerComponentApi?: (api: any) => void;
 };
 
-export const defaultProps: Pick<FlowLayoutProps, "columnGap" | "rowGap" | "verticalAlignment" | "scrollStyle"> = {
+export const defaultProps: Pick<FlowLayoutProps, "columnGap" | "rowGap" | "verticalAlignment" | "scrollStyle" | "showScrollerFade"> = {
   columnGap: "$gap-normal",
   rowGap: "$gap-normal",
   verticalAlignment: "start",
   scrollStyle: "normal" as ScrollStyle,
+  showScrollerFade: true,
 };
 
 export const FlowLayout = forwardRef(function FlowLayout(
@@ -194,6 +196,7 @@ export const FlowLayout = forwardRef(function FlowLayout(
     rowGap = 0,
     verticalAlignment = defaultProps.verticalAlignment,
     scrollStyle = defaultProps.scrollStyle,
+    showScrollerFade = defaultProps.showScrollerFade,
     children,
     registerComponentApi,
     ...rest
@@ -262,6 +265,7 @@ export const FlowLayout = forwardRef(function FlowLayout(
         className={className}
         ref={containerRef}
         scrollStyle={scrollStyle}
+        showScrollerFade={showScrollerFade}
         {...rest}
       >
         <div className={styles.outer}>

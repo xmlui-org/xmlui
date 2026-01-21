@@ -28,9 +28,9 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByText("Content")).toBeVisible();
   });
 
-  test("renders with scrollStyle='styled'", async ({ initTestBed, page }) => {
+  test("renders with scrollStyle='overlay'", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <ScrollViewer testId="viewer" scrollStyle="styled">
+      <ScrollViewer testId="viewer" scrollStyle="overlay">
         <Text>Content</Text>
       </ScrollViewer>
     `);
@@ -100,7 +100,7 @@ test.describe("Basic Functionality", () => {
   test("handles scrollable content", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Stack height="200px">
-        <ScrollViewer testId="viewer" scrollStyle="styled">
+        <ScrollViewer testId="viewer" scrollStyle="overlay">
           <Stack>
             <Text>Line 1</Text>
             <Text>Line 2</Text>
@@ -119,6 +119,123 @@ test.describe("Basic Functionality", () => {
 
     await expect(page.getByTestId("viewer")).toBeVisible();
     await expect(page.getByText("Line 1", { exact: true })).toBeVisible();
+  });
+
+  test("showScrollerFade is true by default", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stack height="200px">
+        <ScrollViewer testId="viewer" scrollStyle="overlay">
+          <Stack height="500px">
+            <Text>Tall content</Text>
+          </Stack>
+        </ScrollViewer>
+      </Stack>
+    `);
+
+    // Fade overlays should be visible
+    const fadeOverlays = page.locator("[class*='fadeOverlay']");
+    await expect(fadeOverlays).toHaveCount(2);
+  });
+
+  test("showScrollerFade displays fade indicators", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stack height="200px">
+        <ScrollViewer testId="viewer" scrollStyle="overlay" showScrollerFade="true">
+          <Stack height="500px">
+            <Text>Tall content</Text>
+          </Stack>
+        </ScrollViewer>
+      </Stack>
+    `);
+
+    // Fade overlays should exist (top and bottom)
+    const fadeOverlays = page.locator("[class*='fadeOverlay']");
+    await expect(fadeOverlays).toHaveCount(2);
+  });
+
+  test("bottom fade is visible when not at bottom", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stack height="200px">
+        <ScrollViewer testId="viewer" scrollStyle="overlay" showScrollerFade="true">
+          <Stack height="500px">
+            <Text>Tall content</Text>
+          </Stack>
+        </ScrollViewer>
+      </Stack>
+    `);
+
+    // Wait for initialization
+    await page.waitForTimeout(100);
+
+    // Bottom fade should be visible (has fadeVisible class)
+    const bottomFade = page.locator("[class*='fadeBottom'][class*='fadeVisible']");
+    await expect(bottomFade).toBeVisible();
+  });
+
+  test("top fade appears when scrolled down", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stack height="200px">
+        <ScrollViewer testId="viewer" scrollStyle="overlay" showScrollerFade="true">
+          <Stack height="500px">
+            <Text testId="content">Tall content</Text>
+          </Stack>
+        </ScrollViewer>
+      </Stack>
+    `);
+
+    // Wait for initialization
+    await page.waitForTimeout(100);
+
+    // Scroll down
+    const viewer = page.getByTestId("viewer");
+    await viewer.evaluate((el) => {
+      el.querySelector('[data-overlayscrollbars-viewport]')?.scrollTo(0, 50);
+    });
+
+    // Wait for fade to update
+    await page.waitForTimeout(100);
+
+    // Top fade should now be visible
+    const topFade = page.locator("[class*='fadeTop'][class*='fadeVisible']");
+    await expect(topFade).toBeVisible();
+  });
+
+  test("showScrollerFade works with whenMouseOver scrollStyle", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stack height="200px">
+        <ScrollViewer testId="viewer" scrollStyle="whenMouseOver" showScrollerFade="true">
+          <Stack height="500px">
+            <Text>Tall content</Text>
+          </Stack>
+        </ScrollViewer>
+      </Stack>
+    `);
+
+    // Wait for initialization
+    await page.waitForTimeout(100);
+
+    // Fade overlays should exist
+    const fadeOverlays = page.locator("[class*='fadeOverlay']");
+    await expect(fadeOverlays).toHaveCount(2);
+  });
+
+  test("showScrollerFade works with whenScrolling scrollStyle", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stack height="200px">
+        <ScrollViewer testId="viewer" scrollStyle="whenScrolling" showScrollerFade="true">
+          <Stack height="500px">
+            <Text>Tall content</Text>
+          </Stack>
+        </ScrollViewer>
+      </Stack>
+    `);
+
+    // Wait for initialization
+    await page.waitForTimeout(100);
+
+    // Fade overlays should exist
+    const fadeOverlays = page.locator("[class*='fadeOverlay']");
+    await expect(fadeOverlays).toHaveCount(2);
   });
 });
 
@@ -163,7 +280,7 @@ test.describe("Theme Variables", () => {
   test("applies size-Scroller theme variable", async ({ initTestBed, page }) => {
     await initTestBed(
       `
-      <ScrollViewer testId="viewer" scrollStyle="styled">
+      <ScrollViewer testId="viewer" scrollStyle="overlay">
         <Stack height="500px">
           <Text>Tall content</Text>
         </Stack>
@@ -183,7 +300,7 @@ test.describe("Theme Variables", () => {
   test("applies backgroundColor-handle-Scroller theme variable", async ({ initTestBed, page }) => {
     await initTestBed(
       `
-      <ScrollViewer testId="viewer" scrollStyle="styled">
+      <ScrollViewer testId="viewer" scrollStyle="overlay">
         <Stack height="500px">
           <Text>Tall content</Text>
         </Stack>
@@ -203,7 +320,7 @@ test.describe("Theme Variables", () => {
   test("applies borderRadius-handle-Scroller theme variable", async ({ initTestBed, page }) => {
     await initTestBed(
       `
-      <ScrollViewer testId="viewer" scrollStyle="styled">
+      <ScrollViewer testId="viewer" scrollStyle="overlay">
         <Stack height="500px">
           <Text>Tall content</Text>
         </Stack>
@@ -223,7 +340,7 @@ test.describe("Theme Variables", () => {
   test("applies minSize-handle-Scroller theme variable", async ({ initTestBed, page }) => {
     await initTestBed(
       `
-      <ScrollViewer testId="viewer" scrollStyle="styled">
+      <ScrollViewer testId="viewer" scrollStyle="overlay">
         <Stack height="500px">
           <Text>Tall content</Text>
         </Stack>
@@ -243,7 +360,7 @@ test.describe("Theme Variables", () => {
   test("applies backgroundColor-track-Scroller theme variable", async ({ initTestBed, page }) => {
     await initTestBed(
       `
-      <ScrollViewer testId="viewer" scrollStyle="styled">
+      <ScrollViewer testId="viewer" scrollStyle="overlay">
         <Stack height="500px">
           <Text>Tall content</Text>
         </Stack>
@@ -263,7 +380,7 @@ test.describe("Theme Variables", () => {
   test("applies multiple theme variables together", async ({ initTestBed, page }) => {
     await initTestBed(
       `
-      <ScrollViewer testId="viewer" scrollStyle="styled">
+      <ScrollViewer testId="viewer" scrollStyle="overlay">
         <Stack height="500px">
           <Text>Tall content</Text>
         </Stack>
@@ -334,7 +451,7 @@ test.describe("Other Edge Cases", () => {
   test("works with nested ScrollViewers", async ({ initTestBed, page }) => {
     await initTestBed(`
       <ScrollViewer testId="outer" scrollStyle="normal">
-        <ScrollViewer testId="inner" scrollStyle="styled">
+        <ScrollViewer testId="inner" scrollStyle="overlay">
           <Text>Nested content</Text>
         </ScrollViewer>
       </ScrollViewer>

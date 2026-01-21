@@ -43,6 +43,11 @@ $transition-Scroller: createThemeVar('transition-Scroller');
 $transition-track-Scroller: createThemeVar('transition-track-Scroller');
 $transition-handle-Scroller: createThemeVar('transition-handle-Scroller');
 
+// --- Fade overlay variables
+$height-fade-Scroller: createThemeVar('height-fade-Scroller');
+$backgroundColor-fade-Scroller: createThemeVar('backgroundColor-fade-Scroller');
+$transition-fade-Scroller: createThemeVar('transition-fade-Scroller');
+
 // --- Apply theme variables to the scrollbar
 .wrapper {
   :global(.os-scrollbar) {
@@ -87,6 +92,44 @@ $transition-handle-Scroller: createThemeVar('transition-handle-Scroller');
   :global(.os-scrollbar-handle) {
     transition: #{$transition-handle-Scroller};
   }
+}
+
+// --- Fade container and overlays
+.fadeContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.fadeOverlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: #{$height-fade-Scroller};
+  pointer-events: none;
+  opacity: 0;
+  transition: #{$transition-fade-Scroller};
+  z-index: 10;
+}
+
+.fadeTop {
+  top: 0;
+  background: linear-gradient(to bottom, #{$backgroundColor-fade-Scroller}, transparent);
+}
+
+.fadeBottom {
+  bottom: 0;
+  background: linear-gradient(to top, #{$backgroundColor-fade-Scroller}, transparent);
+}
+
+.fadeVisible {
+  opacity: 1;
+}
+
+.fadeContainer > .wrapper {
+  width: 100%;
+  height: 100%;
 }
 
 // --- Export theme variables for registration

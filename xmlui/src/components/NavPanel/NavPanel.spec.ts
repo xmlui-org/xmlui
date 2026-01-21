@@ -957,3 +957,244 @@ test("border, border-thickness-bottom", async ({ initTestBed, createNavPanelDriv
   await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
   await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
+
+// =============================================================================
+// SCROLLERFADE TESTS
+// =============================================================================
+
+test.describe("showScrollerFade", () => {
+  test("showScrollerFade is true by default", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App layout="vertical">
+        <NavPanel testId="panel" scrollStyle="overlay">
+          <NavLink label="Link 1" to="/1" />
+          <NavLink label="Link 2" to="/2" />
+          <NavLink label="Link 3" to="/3" />
+          <NavLink label="Link 4" to="/4" />
+          <NavLink label="Link 5" to="/5" />
+          <NavLink label="Link 6" to="/6" />
+          <NavLink label="Link 7" to="/7" />
+          <NavLink label="Link 8" to="/8" />
+          <NavLink label="Link 9" to="/9" />
+          <NavLink label="Link 10" to="/10" />
+        </NavPanel>
+        <Pages fallbackPath="/">
+          <Page url="/1"><Text>Page 1</Text></Page>
+          <Page url="/2"><Text>Page 2</Text></Page>
+          <Page url="/3"><Text>Page 3</Text></Page>
+          <Page url="/4"><Text>Page 4</Text></Page>
+          <Page url="/5"><Text>Page 5</Text></Page>
+          <Page url="/6"><Text>Page 6</Text></Page>
+          <Page url="/7"><Text>Page 7</Text></Page>
+          <Page url="/8"><Text>Page 8</Text></Page>
+          <Page url="/9"><Text>Page 9</Text></Page>
+          <Page url="/10"><Text>Page 10</Text></Page>
+        </Pages>
+      </App>
+    `);
+
+    // Fade overlays should be visible
+    const fadeOverlays = page.locator("[class*='fadeOverlay']");
+    await expect(fadeOverlays).toHaveCount(2);
+  });
+
+  test("showScrollerFade displays fade indicators", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App layout="vertical">
+        <NavPanel testId="panel" scrollStyle="overlay" showScrollerFade="true">
+          <NavLink label="Link 1" to="/1" />
+          <NavLink label="Link 2" to="/2" />
+          <NavLink label="Link 3" to="/3" />
+          <NavLink label="Link 4" to="/4" />
+          <NavLink label="Link 5" to="/5" />
+          <NavLink label="Link 6" to="/6" />
+          <NavLink label="Link 7" to="/7" />
+          <NavLink label="Link 8" to="/8" />
+          <NavLink label="Link 9" to="/9" />
+          <NavLink label="Link 10" to="/10" />
+        </NavPanel>
+        <Pages fallbackPath="/">
+          <Page url="/1"><Text>Page 1</Text></Page>
+          <Page url="/2"><Text>Page 2</Text></Page>
+          <Page url="/3"><Text>Page 3</Text></Page>
+          <Page url="/4"><Text>Page 4</Text></Page>
+          <Page url="/5"><Text>Page 5</Text></Page>
+          <Page url="/6"><Text>Page 6</Text></Page>
+          <Page url="/7"><Text>Page 7</Text></Page>
+          <Page url="/8"><Text>Page 8</Text></Page>
+          <Page url="/9"><Text>Page 9</Text></Page>
+          <Page url="/10"><Text>Page 10</Text></Page>
+        </Pages>
+      </App>
+    `);
+
+    // Fade overlays should exist (top and bottom)
+    const fadeOverlays = page.locator("[class*='fadeOverlay']");
+    await expect(fadeOverlays).toHaveCount(2);
+  });
+
+  test("bottom fade is visible when not at bottom", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App layout="vertical">
+        <NavPanel testId="panel" scrollStyle="overlay" showScrollerFade="true">
+          <NavLink label="Link 1" to="/1" />
+          <NavLink label="Link 2" to="/2" />
+          <NavLink label="Link 3" to="/3" />
+          <NavLink label="Link 4" to="/4" />
+          <NavLink label="Link 5" to="/5" />
+          <NavLink label="Link 6" to="/6" />
+          <NavLink label="Link 7" to="/7" />
+          <NavLink label="Link 8" to="/8" />
+          <NavLink label="Link 9" to="/9" />
+          <NavLink label="Link 10" to="/10" />
+        </NavPanel>
+        <Pages fallbackPath="/">
+          <Page url="/1"><Text>Page 1</Text></Page>
+          <Page url="/2"><Text>Page 2</Text></Page>
+          <Page url="/3"><Text>Page 3</Text></Page>
+          <Page url="/4"><Text>Page 4</Text></Page>
+          <Page url="/5"><Text>Page 5</Text></Page>
+          <Page url="/6"><Text>Page 6</Text></Page>
+          <Page url="/7"><Text>Page 7</Text></Page>
+          <Page url="/8"><Text>Page 8</Text></Page>
+          <Page url="/9"><Text>Page 9</Text></Page>
+          <Page url="/10"><Text>Page 10</Text></Page>
+        </Pages>
+      </App>
+    `);
+
+    // Wait for initialization
+    await page.waitForTimeout(100);
+
+    // Fade overlays should exist
+    const fadeOverlays = page.locator("[class*='fadeOverlay']");
+    await expect(fadeOverlays).toHaveCount(2);
+    
+    // Bottom fade overlay should exist
+    const bottomFade = page.locator("[class*='fadeBottom']");
+    await expect(bottomFade).toBeVisible();
+  });
+
+  test("top fade appears when scrolled down", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App layout="vertical">
+        <NavPanel testId="panel" scrollStyle="overlay" showScrollerFade="true">
+          <NavLink label="Link 1" to="/1" />
+          <NavLink label="Link 2" to="/2" />
+          <NavLink label="Link 3" to="/3" />
+          <NavLink label="Link 4" to="/4" />
+          <NavLink label="Link 5" to="/5" />
+          <NavLink label="Link 6" to="/6" />
+          <NavLink label="Link 7" to="/7" />
+          <NavLink label="Link 8" to="/8" />
+          <NavLink label="Link 9" to="/9" />
+          <NavLink label="Link 10" to="/10" />
+        </NavPanel>
+        <Pages fallbackPath="/">
+          <Page url="/1"><Text>Page 1</Text></Page>
+          <Page url="/2"><Text>Page 2</Text></Page>
+          <Page url="/3"><Text>Page 3</Text></Page>
+          <Page url="/4"><Text>Page 4</Text></Page>
+          <Page url="/5"><Text>Page 5</Text></Page>
+          <Page url="/6"><Text>Page 6</Text></Page>
+          <Page url="/7"><Text>Page 7</Text></Page>
+          <Page url="/8"><Text>Page 8</Text></Page>
+          <Page url="/9"><Text>Page 9</Text></Page>
+          <Page url="/10"><Text>Page 10</Text></Page>
+        </Pages>
+      </App>
+    `);
+
+    // Wait for initialization
+    await page.waitForTimeout(100);
+
+    // Scroll down in NavPanel
+    const panel = page.getByTestId("panel");
+    await panel.evaluate((el) => {
+      el.querySelector('[data-overlayscrollbars-viewport]')?.scrollTo(0, 50);
+    });
+
+    // Wait for fade to update
+    await page.waitForTimeout(100);
+
+    // Top fade overlay should exist
+    const topFade = page.locator("[class*='fadeTop']");
+    await expect(topFade).toBeVisible();
+  });
+
+  test("showScrollerFade works with whenMouseOver scrollStyle", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App layout="vertical">
+        <NavPanel testId="panel" scrollStyle="whenMouseOver" showScrollerFade="true">
+          <NavLink label="Link 1" to="/1" />
+          <NavLink label="Link 2" to="/2" />
+          <NavLink label="Link 3" to="/3" />
+          <NavLink label="Link 4" to="/4" />
+          <NavLink label="Link 5" to="/5" />
+          <NavLink label="Link 6" to="/6" />
+          <NavLink label="Link 7" to="/7" />
+          <NavLink label="Link 8" to="/8" />
+          <NavLink label="Link 9" to="/9" />
+          <NavLink label="Link 10" to="/10" />
+        </NavPanel>
+        <Pages fallbackPath="/">
+          <Page url="/1"><Text>Page 1</Text></Page>
+          <Page url="/2"><Text>Page 2</Text></Page>
+          <Page url="/3"><Text>Page 3</Text></Page>
+          <Page url="/4"><Text>Page 4</Text></Page>
+          <Page url="/5"><Text>Page 5</Text></Page>
+          <Page url="/6"><Text>Page 6</Text></Page>
+          <Page url="/7"><Text>Page 7</Text></Page>
+          <Page url="/8"><Text>Page 8</Text></Page>
+          <Page url="/9"><Text>Page 9</Text></Page>
+          <Page url="/10"><Text>Page 10</Text></Page>
+        </Pages>
+      </App>
+    `);
+
+    // Wait for initialization
+    await page.waitForTimeout(100);
+
+    // Fade overlays should exist
+    const fadeOverlays = page.locator("[class*='fadeOverlay']");
+    await expect(fadeOverlays).toHaveCount(2);
+  });
+
+  test("showScrollerFade works with whenScrolling scrollStyle", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App layout="vertical">
+        <NavPanel testId="panel" scrollStyle="whenScrolling" showScrollerFade="true">
+          <NavLink label="Link 1" to="/1" />
+          <NavLink label="Link 2" to="/2" />
+          <NavLink label="Link 3" to="/3" />
+          <NavLink label="Link 4" to="/4" />
+          <NavLink label="Link 5" to="/5" />
+          <NavLink label="Link 6" to="/6" />
+          <NavLink label="Link 7" to="/7" />
+          <NavLink label="Link 8" to="/8" />
+          <NavLink label="Link 9" to="/9" />
+          <NavLink label="Link 10" to="/10" />
+        </NavPanel>
+        <Pages fallbackPath="/">
+          <Page url="/1"><Text>Page 1</Text></Page>
+          <Page url="/2"><Text>Page 2</Text></Page>
+          <Page url="/3"><Text>Page 3</Text></Page>
+          <Page url="/4"><Text>Page 4</Text></Page>
+          <Page url="/5"><Text>Page 5</Text></Page>
+          <Page url="/6"><Text>Page 6</Text></Page>
+          <Page url="/7"><Text>Page 7</Text></Page>
+          <Page url="/8"><Text>Page 8</Text></Page>
+          <Page url="/9"><Text>Page 9</Text></Page>
+          <Page url="/10"><Text>Page 10</Text></Page>
+        </Pages>
+      </App>
+    `);
+
+    // Wait for initialization
+    await page.waitForTimeout(100);
+
+    // Fade overlays should exist
+    const fadeOverlays = page.locator("[class*='fadeOverlay']");
+    await expect(fadeOverlays).toHaveCount(2);
+  });
+});

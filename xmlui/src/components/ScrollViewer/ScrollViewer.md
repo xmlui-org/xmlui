@@ -12,7 +12,7 @@
 
 The `scrollStyle` property controls how scrollbars are displayed:
 - **`normal`**: Uses the browser's native default scrollbar
-- **`styled`**: Displays a themed scrollbar that is always visible and customizable via theme variables
+- **`overlay`**: Displays a themed scrollbar that is always visible and customizable via theme variables
 - **`whenMouseOver`**: Shows the scrollbar only when hovering over the scroll container
 - **`whenScrolling`**: Displays the scrollbar only while scrolling, then fades out after 400ms of inactivity
 
@@ -43,13 +43,13 @@ The `scrollStyle` property controls how scrollbars are displayed:
 </App>
 ```
 
-**Styled Scrollbar (Always Visible, Themed):**
+**Overlay Scrollbar (Always Visible, Themed):**
 
-The styled scrollbar is always visible and uses theme variables for customization.
+The overlay scrollbar is always visible and uses theme variables for customization.
 
-```xmlui-pg copy name="ScrollStyle: Styled" height="400px"
+```xmlui-pg copy name="ScrollStyle: Overlay" height="400px"
 <App scrollWholePage="false">
-  <ScrollViewer scrollStyle="styled" height="300px" backgroundColor="$color-surface-100">
+  <ScrollViewer scrollStyle="overlay" height="300px" backgroundColor="$color-surface-100">
     <Items
       id="myList"
       data="{ Array.from({ length: 100 }).map((_, i) => ('Item #' + i)) }"
