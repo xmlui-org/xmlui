@@ -3,7 +3,7 @@ import styles from "./List.module.scss";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
-import { createMetadata, d, dComponent, dInternal } from "../metadata-helpers";
+import { createMetadata, d, dComponent, dContextMenu, dInternal } from "../metadata-helpers";
 import { scrollAnchoringValues } from "../abstractions";
 import { ListNative, MemoizedSection, defaultProps } from "./ListNative";
 
@@ -110,6 +110,9 @@ export const ListMd = createMetadata({
     },
   },
   childrenAsTemplate: "itemTemplate",
+  events: {
+    contextMenu: dContextMenu(COMP),
+  },
   apis: {
     scrollToTop: {
       description: "This method scrolls the list to the top.",
@@ -174,6 +177,7 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
         scrollAnchor={node.props.scrollAnchor as any}
         pageInfo={extractValue(node.props.pageInfo)}
         idKey={extractValue(node.props.idKey)}
+        onContextMenu={lookupEventHandler("contextMenu")}
         requestFetchPrevPage={lookupEventHandler("requestFetchPrevPage")}
         requestFetchNextPage={lookupEventHandler("requestFetchNextPage")}
         emptyListPlaceholder={renderChild(node.props.emptyListTemplate)}

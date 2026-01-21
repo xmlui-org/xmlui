@@ -412,6 +412,28 @@ test("click event provides correct event data", async ({ initTestBed, createAvat
   await expect(driver.component).toHaveAttribute("alt", `Avatar of ${TEST_NAME}`);
 });
 
+test("contextMenu event fires on right click", async ({ initTestBed, createAvatarDriver }) => {
+  const TEST_NAME = "Context Menu User";
+
+  const { testStateDriver } = await initTestBed(
+    `
+    <Avatar
+      name="${TEST_NAME}"
+      onContextMenu="testState = 'context-menu-fired'"
+    />
+  `,
+    {},
+  );
+
+  const driver = await createAvatarDriver();
+
+  // Right-click the avatar to trigger context menu
+  await driver.component.click({ button: "right" });
+
+  // Verify the contextMenu event was fired
+  await expect.poll(testStateDriver.testState).toEqual("context-menu-fired");
+});
+
 test("non-clickable avatar does not respond to clicks", async ({
   initTestBed,
   createAvatarDriver,

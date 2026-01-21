@@ -177,6 +177,7 @@ type FlowLayoutProps = {
   scrollStyle?: ScrollStyle;
   showScrollerFade?: boolean;
   children: ReactNode;
+  onContextMenu?: any;
   registerComponentApi?: (api: any) => void;
 };
 
@@ -198,6 +199,7 @@ export const FlowLayout = forwardRef(function FlowLayout(
     scrollStyle = defaultProps.scrollStyle,
     showScrollerFade = defaultProps.showScrollerFade,
     children,
+    onContextMenu,
     registerComponentApi,
     ...rest
   }: FlowLayoutProps,
@@ -266,6 +268,7 @@ export const FlowLayout = forwardRef(function FlowLayout(
         ref={containerRef}
         scrollStyle={scrollStyle}
         showScrollerFade={showScrollerFade}
+        onContextMenu={onContextMenu}
         {...rest}
       >
         <div className={styles.outer}>

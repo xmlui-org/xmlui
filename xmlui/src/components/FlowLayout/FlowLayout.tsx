@@ -5,7 +5,7 @@ import { isComponentDefChildren } from "../../components-core/utils/misc";
 import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { FlowItemBreak, FlowItemWrapper, FlowLayout, defaultProps } from "./FlowLayoutNative";
-import { createMetadata } from "../metadata-helpers";
+import { createMetadata, dContextMenu } from "../metadata-helpers";
 import { alignmentOptionValues } from "../abstractions";
 
 const COMP = "FlowLayout";
@@ -62,6 +62,9 @@ export const FlowLayoutMd = createMetadata({
       defaultValue: defaultProps.showScrollerFade,
     },
   },
+  events: {
+    contextMenu: dContextMenu(COMP),
+  },
   apis: {
     scrollToTop: {
       description:
@@ -80,7 +83,7 @@ export const FlowLayoutMd = createMetadata({
 export const flowLayoutComponentRenderer = createComponentRenderer(
   COMP,
   FlowLayoutMd,
-  ({ node, renderChild, className, extractValue, registerComponentApi }) => {
+  ({ node, renderChild, className, extractValue, registerComponentApi, lookupEventHandler }) => {
     if (!isComponentDefChildren(node.children)) {
       throw new NotAComponentDefError();
     }
@@ -105,6 +108,7 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
         verticalAlignment={verticalAlignment}
         scrollStyle={scrollStyle}
         showScrollerFade={showScrollerFade}
+        onContextMenu={lookupEventHandler("contextMenu")}
         registerComponentApi={registerComponentApi}
       >
         {renderChild(node.children, {

@@ -7,7 +7,7 @@ import "./react-table-config.d.ts";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
-import { createMetadata, d, dAutoFocus, dComponent, dInternal } from "../metadata-helpers";
+import { createMetadata, d, dAutoFocus, dComponent, dContextMenu, dInternal } from "../metadata-helpers";
 import type { OurColumnMetadata } from "../Column/TableContext";
 import { TableContext } from "../Column/TableContext";
 import {
@@ -240,6 +240,7 @@ export const TableMd = createMetadata({
     },
   },
   events: {
+    contextMenu: dContextMenu(COMP),
     sortingDidChange: {
       description:
         `This event is fired when the table data sorting has changed. It has two arguments: ` +
@@ -456,6 +457,7 @@ const TableWithColumns = memo(
             iconSortAsc={extractValue.asOptionalString(node.props?.iconSortAsc)}
             iconSortDesc={extractValue.asOptionalString(node.props?.iconSortDesc)}
             iconNoSort={extractValue.asOptionalString(node.props?.iconNoSort)}
+            onContextMenu={lookupEventHandler("contextMenu")}
             sortingDidChange={lookupEventHandler("sortingDidChange")}
             onSelectionDidChange={lookupEventHandler("selectionDidChange")}
             willSort={lookupEventHandler("willSort")}

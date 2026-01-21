@@ -10,7 +10,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { isComponentDefChildren } from "../../components-core/utils/misc";
 import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { createMetadata, dClick, dInternal } from "../metadata-helpers";
+import { createMetadata, dClick, dContextMenu, dInternal } from "../metadata-helpers";
 import { DEFAULT_ORIENTATION, Stack, defaultProps } from "./StackNative";
 import { alignmentOptionValues } from "../abstractions";
 
@@ -93,6 +93,7 @@ const stackMd = createMetadata({
   },
   events: {
     click: dClick(COMP),
+    contextMenu: dContextMenu(COMP),
     mounted: {
       description: "Reserved for future use",
       signature: "mounted(): void",
@@ -220,6 +221,8 @@ function renderStack({
       scrollStyle={scrollStyle as any}
       showScrollerFade={showScrollerFade}
       className={className}
+      onClick={lookupEventHandler("click")}
+      onContextMenu={lookupEventHandler("contextMenu")}
       onMount={lookupEventHandler("mounted")}
       registerComponentApi={registerComponentApi}
     >

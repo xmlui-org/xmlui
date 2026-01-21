@@ -6,6 +6,17 @@ test.describe("Basic Functionality For All Variants", () => {
     await initTestBed(`<Badge testId="badge" />`);
     await expect(page.getByTestId("badge")).toBeVisible();
   });
+
+  test("contextMenu event fires on right click", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(
+      `<Badge testId="badge" value="Test" onContextMenu="testState = 'context-menu-fired'" />`
+    );
+
+    const badge = page.getByTestId("badge");
+    await badge.click({ button: "right" });
+
+    await expect.poll(testStateDriver.testState).toEqual("context-menu-fired");
+  });
 });
 
 // =============================================================================

@@ -28,14 +28,14 @@ type Props = {
   color?: string | BadgeColors;
   style?: CSSProperties;
   className?: string;
-};
+} & Pick<React.HTMLAttributes<HTMLDivElement>, "onContextMenu">;
 
 export const defaultProps: Pick<Props, "variant"> = {
   variant: "badge",
 };
 
 export const Badge = forwardRef(function Badge(
-  { children, color, variant = defaultProps.variant, style, className, ...rest }: Props,
+  { children, color, variant = defaultProps.variant, style, className, onContextMenu, ...rest }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   return (
@@ -49,6 +49,7 @@ export const Badge = forwardRef(function Badge(
         },
         className,
       )}
+      onContextMenu={onContextMenu}
       style={{
         ...(color
           ? typeof color === "string"

@@ -10,14 +10,14 @@ type Props = {
   name?: string;
   style?: CSSProperties;
   className?: string;
-} & Pick<React.HTMLAttributes<HTMLDivElement>, "onClick">;
+} & Pick<React.HTMLAttributes<HTMLDivElement>, "onClick" | "onContextMenu">;
 
 export const defaultProps: Pick<Props, "size"> = {
   size: "sm",
 };
 
 export const Avatar = memo(forwardRef(function Avatar(
-  { size = defaultProps.size, url, name, style, className, onClick, ...rest }: Props,
+  { size = defaultProps.size, url, name, style, className, onClick, onContextMenu, ...rest }: Props,
   ref: Ref<any>,
 ) {
   // Memoize the abbreviated name calculation to avoid recalculation on every render
@@ -72,6 +72,7 @@ export const Avatar = memo(forwardRef(function Avatar(
         className={commonClassNames}
         style={mergedStyle}
         onClick={onClick}
+        onContextMenu={onContextMenu}
         onKeyDown={handleKeyDown}
         tabIndex={onClick ? 0 : undefined}
       />
@@ -84,6 +85,7 @@ export const Avatar = memo(forwardRef(function Avatar(
         className={commonClassNames}
         style={mergedStyle}
         onClick={onClick}
+        onContextMenu={onContextMenu}
         onKeyDown={handleKeyDown}
         role="img"
         aria-label={altTxt}

@@ -216,6 +216,7 @@ type DynamicHeightListProps = {
   orderBy?: OrderBy;
   availableGroups?: string[];
   scrollAnchor?: ScrollAnchoring;
+  onContextMenu?: any;
   requestFetchPrevPage?: () => any;
   requestFetchNextPage?: () => any;
   pageInfo?: PageInfo;
@@ -293,6 +294,7 @@ export const ListNative = forwardRef(function DynamicHeightList2(
     orderBy,
     availableGroups,
     scrollAnchor = defaultProps.scrollAnchor,
+    onContextMenu,
     requestFetchPrevPage = noop,
     requestFetchNextPage = noop,
     pageInfo,
@@ -509,6 +511,7 @@ export const ListNative = forwardRef(function DynamicHeightList2(
           {...rest}
           ref={rootRef}
           style={style}
+          onContextMenu={onContextMenu}
           className={classnames(
             styles.outerListWrapper,
             {

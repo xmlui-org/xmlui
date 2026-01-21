@@ -4,7 +4,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { sizeMd } from "../../components/abstractions";
 import { Avatar, defaultProps } from "./AvatarNative";
-import { createMetadata, dClick } from "../metadata-helpers";
+import { createMetadata, dClick, dContextMenu } from "../metadata-helpers";
 
 const COMP = "Avatar";
 
@@ -40,6 +40,7 @@ export const AvatarMd = createMetadata({
   },
   events: {
     click: dClick(COMP),
+    contextMenu: dContextMenu(COMP),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -63,6 +64,7 @@ export const avatarComponentRenderer = createComponentRenderer(
         url={node.props.url ? extractResourceUrl(node.props.url) : undefined}
         name={extractValue(node.props.name)}
         onClick={lookupEventHandler("click")}
+        onContextMenu={lookupEventHandler("contextMenu")}
       />
     );
   },

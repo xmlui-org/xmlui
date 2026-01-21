@@ -1908,3 +1908,32 @@ test.describe("Cell Vertical Alignment", () => {
     }
   });
 });
+
+// =============================================================================
+// EVENT TESTS
+// =============================================================================
+
+test.describe("Events", () => {
+  test("contextMenu event fires on right click", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App var.message="Not clicked">
+        <Text testId="output" label="{message}" />
+        <Table 
+          data='{${JSON.stringify(sampleData)}}' 
+          testId="table"
+          onContextMenu="() => message = 'Context menu triggered'"
+        >
+          <Column bindTo="name" header="Name"/>
+          <Column bindTo="quantity" header="Quantity"/>
+        </Table>
+      </App>
+    `);
+
+    const table = page.getByTestId("table");
+    const output = page.getByTestId("output");
+
+    await expect(output).toHaveText("Not clicked");
+    await table.click({ button: "right" });
+    await expect(output).toHaveText("Context menu triggered");
+  });
+});
