@@ -1,7 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import {
   createContext,
-  Fragment,
   memo,
   useCallback,
   useContext,
@@ -9,7 +8,6 @@ import {
   useId,
   useMemo,
 } from "react";
-import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 import type { RegisterComponentApiFn, RenderChildFn } from "../../abstractions/RendererDefs";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
@@ -19,6 +17,7 @@ import type {
   FormItemValidations,
   ValidateEventHandler,
   ValidationMode,
+  ValidationSeverity,
 } from "../Form/FormContext";
 import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
 import { TextBox } from "../TextBox/TextBoxNative";
@@ -34,7 +33,6 @@ import {
   fieldInitialized,
   fieldLostFocus,
   fieldRemoved,
-  UNBOUND_FIELD_SUFFIX,
 } from "../Form/formActions";
 import { TextArea } from "../TextArea/TextAreaNative";
 import { useEvent } from "../../components-core/utils/misc";
@@ -44,14 +42,12 @@ import { AutoComplete } from "../AutoComplete/AutoCompleteNative";
 import type { LabelPosition, RequireLabelMode } from "../abstractions";
 import type { FormItemMd } from "./FormItem";
 import { ItemWithLabel } from "./ItemWithLabel";
-import { useValidation, useValidationDisplay } from "./Validations";
+import { resolveFormItemId } from "./FormItemUtils";
 import { Slider } from "../Slider/SliderNative";
 import { ColorPicker } from "../ColorPicker/ColorPickerNative";
-import { HelperText } from "./HelperText";
 import { Items } from "../Items/ItemsNative";
 import { EMPTY_ARRAY } from "../../components-core/constants";
 import { useShallowCompareMemoize } from "../../components-core/utils/hooks";
-import styles from "./FormItem.module.scss";
 
 const DEFAULT_LABEL_POSITIONS: Record<FormControlType | string, LabelPosition> = {
   checkbox: "end",
@@ -80,6 +76,11 @@ type Props = {
   itemIndex?: number;
   gap?: string;
   noSubmit?: boolean;
+  formItemId?: string;
+  validationStatus?: ValidationSeverity;
+  invalidMessages?: string[];
+  validationResult?: ReactNode;
+  validationInProgress?: boolean;
 } & FormItemValidations;
 
 export const defaultProps: Pick<
@@ -172,9 +173,9 @@ export const FormItem = memo(function FormItem({
   labelWidth,
   labelBreak = defaultProps.labelBreak,
   children,
-  onValidate,
-  customValidationsDebounce = defaultProps.customValidationsDebounce,
-  validationMode,
+  onValidate: _onValidate,
+  customValidationsDebounce: _customValidationsDebounce = defaultProps.customValidationsDebounce,
+  validationMode: _validationMode,
   registerComponentApi,
   maxTextLength,
   inputRenderer,
@@ -183,6 +184,11 @@ export const FormItem = memo(function FormItem({
   gap,
   noSubmit = defaultProps.noSubmit,
   requireLabelMode,
+  formItemId: formItemIdFromProps,
+  validationStatus,
+  invalidMessages,
+  validationResult,
+  validationInProgress,
   layoutContext, // Destructured to prevent passing to ItemWithLabel
   ...rest
 }: Props & { layoutContext?: any }) {
@@ -207,20 +213,16 @@ export const FormItem = memo(function FormItem({
   const defaultId = useId();
   const { parentFormItemId } = useContext(FormItemContext);
   const formItemId = useMemo(() => {
-    const safeBindTo = bindTo || `${defaultId}${UNBOUND_FIELD_SUFFIX}`;
-    if (parentFormItemId) {
-      if (itemIndex !== undefined) {
-        let parentFieldReference = `${parentFormItemId}[${itemIndex}]`;
-        if (bindTo !== undefined && bindTo.trim() === "") {
-          return parentFieldReference;
-        } else {
-          return `${parentFieldReference}.${safeBindTo}`;
-        }
-      }
-    } else {
-      return safeBindTo;
+    if (formItemIdFromProps) {
+      return formItemIdFromProps;
     }
-  }, [bindTo, defaultId, itemIndex, parentFormItemId]);
+    return resolveFormItemId({
+      bindTo,
+      defaultId,
+      parentFormItemId,
+      itemIndex,
+    });
+  }, [bindTo, defaultId, formItemIdFromProps, itemIndex, parentFormItemId]);
 
   const labelWidthValue = useFormContextPart((value) => labelWidth || value?.itemLabelWidth);
   const labelBreakValue = useFormContextPart((value) =>
@@ -239,21 +241,9 @@ export const FormItem = memo(function FormItem({
 
   const value = useFormContextPart<any>((value) => getByPath(value?.subject, formItemId));
 
-  const validationResult = useFormContextPart((value) => value?.validationResults[formItemId]);
   const dispatch = useFormContextPart((value) => value?.dispatch);
   const formEnabled = useFormContextPart((value) => value?.enabled);
   const itemRequireLabelMode = useFormContextPart((value) => value?.itemRequireLabelMode);
-  const contextVerboseValidationFeedback = useFormContextPart((value) => value?.verboseValidationFeedback);
-
-  const isForcedVerbose =
-    type === "checkbox" ||
-    type === "switch" ||
-    type === "radioGroup" ||
-    type === "colorpicker" ||
-    type === "slider" ||
-    (type === "datePicker" && (rest as any).inline);
-
-  const verboseValidationFeedback = isForcedVerbose ? true : (contextVerboseValidationFeedback ?? true);
 
   const isEnabled = enabled && formEnabled;
 
@@ -262,8 +252,6 @@ export const FormItem = memo(function FormItem({
     // Pass undefined as value when initialValue is undefined to avoid overwriting existing values
     dispatch(fieldInitialized(formItemId, initialValue, false, noSubmit));
   }, [dispatch, formItemId, initialValue, noSubmit]);
-
-  useValidation(validations, onValidate, value, dispatch, formItemId, customValidationsDebounce);
 
   const onStateChange = useCallback(
     ({ value }: any, options?: any) => {
@@ -280,14 +268,6 @@ export const FormItem = memo(function FormItem({
       dispatch(fieldRemoved(formItemId));
     };
   }, [formItemId, dispatch]);
-
-  const { validationStatus, isHelperTextShown } = useValidationDisplay(
-    formItemId,
-    value,
-    validationResult,
-    validationMode,
-    !!verboseValidationFeedback
-  );
 
   const onFocus = useEvent(() => {
     dispatch(fieldFocused(formItemId));
@@ -311,6 +291,7 @@ export const FormItem = memo(function FormItem({
           onBlur={onBlur}
           enabled={isEnabled}
           validationStatus={validationStatus}
+          invalidMessages={invalidMessages}
         >
           {children}
         </Select>
@@ -328,6 +309,7 @@ export const FormItem = memo(function FormItem({
           onBlur={onBlur}
           enabled={isEnabled}
           validationStatus={validationStatus}
+          invalidMessages={invalidMessages}
         >
           {children}
         </AutoComplete>
@@ -345,6 +327,7 @@ export const FormItem = memo(function FormItem({
           onBlur={onBlur}
           enabled={isEnabled}
           validationStatus={validationStatus}
+          invalidMessages={invalidMessages}
         />
       );
       break;
@@ -380,6 +363,7 @@ export const FormItem = memo(function FormItem({
           enabled={isEnabled}
           integersOnly={type === "integer"}
           validationStatus={validationStatus}
+          invalidMessages={invalidMessages}
           min={validations.minValue}
           max={validations.maxValue}
           maxLength={maxTextLength ?? validations?.maxLength}
@@ -433,6 +417,7 @@ export const FormItem = memo(function FormItem({
           onBlur={onBlur}
           enabled={isEnabled}
           validationStatus={validationStatus}
+          invalidMessages={invalidMessages}
           maxLength={maxTextLength ?? validations?.maxLength}
           gap={gap}
         />
@@ -451,6 +436,7 @@ export const FormItem = memo(function FormItem({
           onBlur={onBlur}
           enabled={isEnabled}
           validationStatus={validationStatus}
+          invalidMessages={invalidMessages}
           maxLength={maxTextLength ?? validations?.maxLength}
         />
       );
@@ -467,6 +453,7 @@ export const FormItem = memo(function FormItem({
           onBlur={onBlur}
           enabled={isEnabled}
           validationStatus={validationStatus}
+          invalidMessages={invalidMessages}
           maxLength={maxTextLength ?? validations?.maxLength}
         />
       );
@@ -528,8 +515,6 @@ export const FormItem = memo(function FormItem({
     }
   }
 
-  const [animateContainerRef] = useAutoAnimate({ duration: 100 });
-
   const isInsideForm = useIsInsideForm();
   if (!isInsideForm) {
     throw new Error("FormItem must be used inside a Form");
@@ -553,37 +538,13 @@ export const FormItem = memo(function FormItem({
         labelBreak={labelBreakValue}
         enabled={isEnabled}
         required={validations.required}
-        validationInProgress={validationResult?.partial}
+        validationInProgress={validationInProgress}
         onFocus={onFocus}
         onBlur={onBlur}
         style={style}
         requireLabelMode={requireLabelMode ?? itemRequireLabelMode}
         className={className}
-        validationResult={
-          (verboseValidationFeedback === false) ? null : (
-          <div ref={animateContainerRef} className={styles.helperTextContainer}>
-            {isHelperTextShown &&
-              validationResult?.validations.map((singleValidation, i) => (
-                <Fragment key={i}>
-                  {singleValidation.isValid && !!singleValidation.validMessage && (
-                    <HelperText
-                      text={singleValidation.validMessage}
-                      status={"valid"}
-                      style={{ opacity: singleValidation.stale ? 0.5 : undefined }}
-                    />
-                  )}
-                  {!singleValidation.isValid && !!singleValidation.invalidMessage && (
-                    <HelperText
-                      text={singleValidation.invalidMessage}
-                      status={singleValidation.severity}
-                      style={{ opacity: singleValidation.stale ? 0.5 : undefined }}
-                    />
-                  )}
-                </Fragment>
-              ))}
-          </div>
-          )
-        }
+        validationResult={validationResult}
       >
         {formControl}
       </ItemWithLabel>

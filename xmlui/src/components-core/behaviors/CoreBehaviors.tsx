@@ -15,11 +15,13 @@ import {
 } from "../../components/Animation/AnimationNative";
 import { ItemWithLabel } from "../../components/FormItem/ItemWithLabel";
 import { FormBindingWrapper } from "../../components/FormItem/FormBindingWrapper";
+import { ValidationWrapper } from "../../components/FormItem/ValidationWrapper";
 import { parseTooltipOptions, Tooltip } from "../../components/Tooltip/TooltipNative";
 import { useStyles } from "../theming/StyleContext";
 import { THEME_VAR_PREFIX } from "../theming/layout-resolver";
 import { parseLayoutProperty, toCssPropertyName } from "../theming/parse-layout-props";
 import { buttonVariantValues, type RequireLabelMode } from "../../components/abstractions";
+import type { FormItemValidations } from "../../components/Form/FormContext";
 import type { Behavior } from "./Behavior";
 import { badgeVariantValues } from "../../components/Badge/BadgeNative";
 import { TableOfContentsContext } from "../TableOfContentsContext";
@@ -322,6 +324,11 @@ const FORM_BINDABLE_COMPONENTS = [
   "ColorPicker",
 ] as const;
 
+const FORM_VALIDATION_COMPONENTS = [
+  ...FORM_BINDABLE_COMPONENTS,
+  "FormItem",
+] as const;
+
 /**
  * Behavior for adding bookmark functionality to any visual component.
  * When a component has a `bookmark` property, this behavior adds bookmark-related
@@ -476,11 +483,130 @@ export const formBindingBehavior: Behavior = {
     return true;
   },
   attach: (context, node, metadata) => {
-    const { extractValue, node: componentNode, lookupEventHandler } = context;
+    const { extractValue, node: componentNode } = context;
 
     const bindTo = extractValue.asOptionalString(componentNode.props?.bindTo);
     const initialValue = extractValue(componentNode.props?.initialValue);
     const noSubmit = extractValue.asOptionalBoolean(componentNode.props?.noSubmit, false);
+
+    // Validation props used for required label display
+    const required = extractValue.asOptionalBoolean(componentNode.props?.required);
+    const requiredInvalidMessage = extractValue.asOptionalString(
+      componentNode.props?.requiredInvalidMessage,
+    );
+    const minLength = extractValue.asOptionalNumber(componentNode.props?.minLength);
+    const maxLength = extractValue.asOptionalNumber(componentNode.props?.maxLength);
+    const lengthInvalidMessage = extractValue.asOptionalString(
+      componentNode.props?.lengthInvalidMessage,
+    );
+    const lengthInvalidSeverity = extractValue.asOptionalString(
+      componentNode.props?.lengthInvalidSeverity,
+    );
+    const minValue = extractValue.asOptionalNumber(componentNode.props?.minValue);
+    const maxValue = extractValue.asOptionalNumber(componentNode.props?.maxValue);
+    const rangeInvalidMessage = extractValue.asOptionalString(
+      componentNode.props?.rangeInvalidMessage,
+    );
+    const rangeInvalidSeverity = extractValue.asOptionalString(
+      componentNode.props?.rangeInvalidSeverity,
+    );
+    const pattern = extractValue.asOptionalString(componentNode.props?.pattern);
+    const patternInvalidMessage = extractValue.asOptionalString(
+      componentNode.props?.patternInvalidMessage,
+    );
+    const patternInvalidSeverity = extractValue.asOptionalString(
+      componentNode.props?.patternInvalidSeverity,
+    );
+    const regex = extractValue.asOptionalString(componentNode.props?.regex);
+    const regexInvalidMessage = extractValue.asOptionalString(
+      componentNode.props?.regexInvalidMessage,
+    );
+    const regexInvalidSeverity = extractValue.asOptionalString(
+      componentNode.props?.regexInvalidSeverity,
+    );
+
+    const requireLabelMode = extractValue.asOptionalString(
+      componentNode.props?.requireLabelMode,
+    ) as RequireLabelMode | undefined;
+
+    // Label props (optional, for standalone use)
+    const label = extractValue.asOptionalString(componentNode.props?.label);
+    const labelPosition = extractValue(componentNode.props?.labelPosition);
+    const labelWidth = extractValue.asOptionalString(componentNode.props?.labelWidth);
+    const labelBreak = extractValue.asOptionalBoolean(componentNode.props?.labelBreak);
+
+    // Other props
+    const enabled = extractValue.asOptionalBoolean(componentNode.props?.enabled, true);
+
+    const validations: FormItemValidations = {
+      required,
+      requiredInvalidMessage,
+      minLength,
+      maxLength,
+      lengthInvalidMessage,
+      lengthInvalidSeverity: lengthInvalidSeverity as any,
+      minValue,
+      maxValue,
+      rangeInvalidMessage,
+      rangeInvalidSeverity: rangeInvalidSeverity as any,
+      pattern,
+      patternInvalidMessage,
+      patternInvalidSeverity: patternInvalidSeverity as any,
+      regex,
+      regexInvalidMessage,
+      regexInvalidSeverity: regexInvalidSeverity as any,
+    };
+
+    return (
+      <FormBindingWrapper
+        key={bindTo}
+        bindTo={bindTo!}
+        initialValue={initialValue}
+        noSubmit={noSubmit}
+        validations={validations}
+        label={label}
+        labelPosition={labelPosition as any}
+        labelWidth={labelWidth}
+        labelBreak={labelBreak}
+        enabled={enabled}
+        requireLabelMode={requireLabelMode}
+      >
+        {node as ReactElement}
+      </FormBindingWrapper>
+    );
+  },
+};
+
+export const validationBehavior: Behavior = {
+  name: "validation",
+  canAttach: (context, node) => {
+    const { extractValue } = context;
+
+    const bindTo = extractValue(node.props?.bindTo, true);
+    const isFormItem = node.type === "FormItem";
+    if (!isFormItem && (bindTo === undefined || bindTo === null)) {
+      return false;
+    }
+
+    if (!FORM_VALIDATION_COMPONENTS.includes(node.type as any)) {
+      return false;
+    }
+
+    return true;
+  },
+  attach: (context, node, metadata) => {
+    const { extractValue, node: componentNode, lookupEventHandler } = context;
+    const renderedNode = node as ReactElement;
+
+    const bindTo = extractValue.asOptionalString(componentNode.props?.bindTo);
+    const itemIndex =
+      (renderedNode.props as any)?.itemIndex ??
+      extractValue.asOptionalNumber(componentNode.props?.itemIndex);
+    const formItemType = extractValue.asOptionalString(componentNode.props?.type);
+    const inline = extractValue.asOptionalBoolean(componentNode.props?.inline);
+    const verboseValidationFeedback = extractValue.asOptionalBoolean(
+      componentNode.props?.verboseValidationFeedback,
+    );
 
     // Validation props
     const required = extractValue.asOptionalBoolean(componentNode.props?.required);
@@ -522,18 +648,6 @@ export const formBindingBehavior: Behavior = {
       0,
     );
     const validationMode = extractValue.asOptionalString(componentNode.props?.validationMode);
-    const requireLabelMode = extractValue.asOptionalString(
-      componentNode.props?.requireLabelMode,
-    ) as RequireLabelMode | undefined;
-
-    // Label props (optional, for standalone use)
-    const label = extractValue.asOptionalString(componentNode.props?.label);
-    const labelPosition = extractValue(componentNode.props?.labelPosition);
-    const labelWidth = extractValue.asOptionalString(componentNode.props?.labelWidth);
-    const labelBreak = extractValue.asOptionalBoolean(componentNode.props?.labelBreak);
-
-    // Other props
-    const enabled = extractValue.asOptionalBoolean(componentNode.props?.enabled, true);
 
     // Event handlers
     let onValidate = lookupEventHandler("validate");
@@ -548,7 +662,7 @@ export const formBindingBehavior: Behavior = {
       }
     }
 
-    const validations = {
+    const validations: FormItemValidations = {
       required,
       requiredInvalidMessage,
       minLength,
@@ -567,25 +681,24 @@ export const formBindingBehavior: Behavior = {
       regexInvalidSeverity: regexInvalidSeverity as any,
     };
 
+    const isFormItem = componentNode.type === "FormItem";
+
     return (
-      <FormBindingWrapper
-        key={bindTo}
-        bindTo={bindTo!}
-        initialValue={initialValue}
-        noSubmit={noSubmit}
+      <ValidationWrapper
+        bindTo={bindTo}
         validations={validations}
         onValidate={onValidate}
         customValidationsDebounce={customValidationsDebounce}
         validationMode={validationMode as any}
-        label={label}
-        labelPosition={labelPosition as any}
-        labelWidth={labelWidth}
-        labelBreak={labelBreak}
-        enabled={enabled}
-        requireLabelMode={requireLabelMode}
+        verboseValidationFeedback={verboseValidationFeedback}
+        itemIndex={itemIndex}
+        formItemType={formItemType}
+        componentType={componentNode.type}
+        inline={inline}
+        isFormItem={isFormItem}
       >
         {node as ReactElement}
-      </FormBindingWrapper>
+      </ValidationWrapper>
     );
   },
 };

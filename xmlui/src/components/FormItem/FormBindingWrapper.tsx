@@ -1,20 +1,14 @@
-import type { CSSProperties, ReactElement } from "react";
+import type { CSSProperties, ReactElement, ReactNode } from "react";
 import {
   cloneElement,
-  Fragment,
   useCallback,
   useEffect,
   useId,
   useMemo,
 } from "react";
-import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
-import type {
-  FormItemValidations,
-  ValidateEventHandler,
-  ValidationMode,
-} from "../Form/FormContext";
+import type { FormItemValidations, ValidationSeverity } from "../Form/FormContext";
 import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
 import { useIsInsideFormItem } from "./FormItemNative";
 import {
@@ -28,10 +22,7 @@ import { getByPath } from "../Form/FormNative";
 import { useEvent } from "../../components-core/utils/misc";
 import type { LabelPosition, RequireLabelMode } from "../abstractions";
 import { ItemWithLabel } from "./ItemWithLabel";
-import { useValidation, useValidationDisplay } from "./Validations";
-import { HelperText } from "./HelperText";
 import { useShallowCompareMemoize } from "../../components-core/utils/hooks";
-import styles from "./FormItem.module.scss";
 
 type FormBindingWrapperProps = {
   children: ReactElement;
@@ -40,9 +31,6 @@ type FormBindingWrapperProps = {
   noSubmit?: boolean;
   validations: FormItemValidations;
   requireLabelMode?: RequireLabelMode;
-  onValidate?: ValidateEventHandler;
-  customValidationsDebounce?: number;
-  validationMode?: ValidationMode;
   // Optional label props
   label?: string;
   labelPosition?: LabelPosition;
@@ -52,7 +40,10 @@ type FormBindingWrapperProps = {
   style?: CSSProperties;
   className?: string;
   registerComponentApi?: RegisterComponentApiFn;
-  verboseValidationFeedback?: boolean;
+  validationStatus?: ValidationSeverity;
+  invalidMessages?: string[];
+  validationResult?: ReactNode;
+  validationInProgress?: boolean;
 };
 
 export function FormBindingWrapper({
@@ -61,9 +52,6 @@ export function FormBindingWrapper({
   initialValue: initialValueFromProps,
   noSubmit = false,
   validations: validationsInput,
-  onValidate,
-  customValidationsDebounce = 0,
-  validationMode,
   label,
   labelPosition,
   labelWidth,
@@ -73,7 +61,10 @@ export function FormBindingWrapper({
   style,
   className,
   registerComponentApi,
-  verboseValidationFeedback: verboseValidationFeedbackFromProps,
+  validationStatus,
+  invalidMessages,
+  validationResult,
+  validationInProgress,
 }: FormBindingWrapperProps) {
   const validations = useShallowCompareMemoize(validationsInput);
   const defaultId = useId();
@@ -102,38 +93,9 @@ export function FormBindingWrapper({
       : initialValueFromSubject;
 
   const value = useFormContextPart<any>((value) => getByPath(value?.subject, formItemId));
-  const validationResult = useFormContextPart((value) => value?.validationResults[formItemId]);
   const dispatch = useFormContextPart((value) => value?.dispatch);
   const formEnabled = useFormContextPart((value) => value?.enabled);
   const formRequireLabelMode = useFormContextPart((value) => value?.itemRequireLabelMode);
-  const contextVerboseValidationFeedback = useFormContextPart((value) => value?.verboseValidationFeedback);
-
-  // Logic to determine if verbose feedback should be forced based on component type
-  const isForcedVerbose = useMemo(() => {
-    const type = (children as any)?.type;
-    const props = (children as any)?.props;
-    const displayName = type?.displayName || type?.name ||
-                        type?.render?.displayName || type?.render?.name || // for forwardRef
-                        type?.type?.displayName || type?.type?.name || // for memo
-                        "";
-
-    // Check for specific component display names
-    // We check for "Toggle" because both Checkbox and Switch use the Toggle component
-    return (
-      displayName.includes("Checkbox") ||
-      displayName.includes("Switch") ||
-      displayName.includes("RadioGroup") ||
-      displayName.includes("ColorPicker") ||
-      displayName.includes("Slider") ||
-      displayName.includes("Toggle") ||
-      (displayName.includes("DatePicker") && props?.inline)
-    );
-  }, [children]);
-
-  const childVerboseValidationFeedback = (children as any)?.props?.verboseValidationFeedback;
-  const verboseValidationFeedback = isForcedVerbose
-    ? true
-    : (verboseValidationFeedbackFromProps ?? childVerboseValidationFeedback ?? contextVerboseValidationFeedback ?? true);
 
   const isEnabled = enabled && formEnabled;
 
@@ -142,9 +104,6 @@ export function FormBindingWrapper({
     if (!isInsideForm) return;
     dispatch(fieldInitialized(formItemId, initialValue, false, noSubmit));
   }, [dispatch, formItemId, initialValue, noSubmit, isInsideForm]);
-
-  // Run validations
-  useValidation(validations, onValidate, value, dispatch, formItemId, customValidationsDebounce);
 
   const childUpdateState = (children as any)?.props?.updateState;
   const childRegisterComponentApi = (children as any)?.props?.registerComponentApi;
@@ -170,24 +129,6 @@ export function FormBindingWrapper({
     };
   }, [formItemId, dispatch, isInsideForm]);
 
-  // Get validation display state
-  const { validationStatus, isHelperTextShown: isHelperTextShownHook } = useValidationDisplay(
-    formItemId,
-    value,
-    validationResult,
-    validationMode ?? "errorLate",
-    verboseValidationFeedback ?? true
-  );
-
-  // We use useFormContextPart to access forceShowValidationResult efficiently.
-  // This avoids re-rendering the component on every form state change which happens
-  // when using useContext(FormContext).
-  const forceShowValidationResult = useFormContextPart(
-    (value) => value?.interactionFlags[formItemId]?.forceShowValidationResult
-  );
-
-  const isHelperTextShown = isHelperTextShownHook || !!forceShowValidationResult;
-
   // Focus/blur handlers for validation modes
   const onFocus = useEvent(() => {
     if (!isInsideForm) return;
@@ -199,18 +140,11 @@ export function FormBindingWrapper({
     dispatch(fieldLostFocus(formItemId));
   });
 
-  const [animateContainerRef] = useAutoAnimate({ duration: 100 });
-
   // If not inside a form, or if already inside a FormItem, just render the children
   // The FormItem will handle the form binding in that case
   if (!isInsideForm || isInsideFormItem) {
     return children;
   }
-
-  // Get all invalid messages from validation results
-  const invalidMessages = validationResult?.validations
-    .filter((v) => !v.isValid && v.invalidMessage)
-    .map((v) => v.invalidMessage) ?? [];
 
   // Clone the input component and inject form-related props
   const enhancedInput = cloneElement(children, {
@@ -224,31 +158,6 @@ export function FormBindingWrapper({
     registerComponentApi: registerComponentApi ?? childRegisterComponentApi,
   });
 
-  // Create validation result display (hidden when verboseValidationFeedback is false (concise mode))
-  const validationResultDisplay = (verboseValidationFeedback === false) ? null : (
-    <div ref={animateContainerRef} className={styles.helperTextContainer}>
-      {isHelperTextShown &&
-        validationResult?.validations.map((singleValidation, i) => (
-          <Fragment key={i}>
-            {singleValidation.isValid && !!singleValidation.validMessage && (
-              <HelperText
-                text={singleValidation.validMessage}
-                status={"valid"}
-                style={{ opacity: singleValidation.stale ? 0.5 : undefined }}
-              />
-            )}
-            {!singleValidation.isValid && !!singleValidation.invalidMessage && (
-              <HelperText
-                text={singleValidation.invalidMessage}
-                status={singleValidation.severity}
-                style={{ opacity: singleValidation.stale ? 0.5 : undefined }}
-              />
-            )}
-          </Fragment>
-        ))}
-    </div>
-  );
-
   return (
     <ItemWithLabel
       labelPosition={labelPositionValue}
@@ -257,12 +166,12 @@ export function FormBindingWrapper({
       labelBreak={labelBreakValue}
       enabled={isEnabled}
       required={validations.required}
-      validationInProgress={validationResult?.partial}
+      validationInProgress={validationInProgress}
       onFocus={onFocus}
       onBlur={onBlur}
       style={style}
       className={className}
-      validationResult={validationResultDisplay}
+      validationResult={validationResult}
       requireLabelMode={requireLabelMode ?? formRequireLabelMode}
     >
       {enhancedInput}
