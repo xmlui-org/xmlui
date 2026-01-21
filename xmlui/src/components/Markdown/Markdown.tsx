@@ -198,8 +198,8 @@ export const MarkdownMd = createMetadata({
     "marginLeft-Image-markdown": "$space-0",
     "marginRight-Image-markdown": "$space-0",
 
-    "marginTop-Text-markdown": "$space-3",
-    "marginBottom-Text-markdown": "$space-3",
+    "marginTop-Text-markdown": "$space-2",
+    "marginBottom-Text-markdown": "$space-2",
     "fontSize-Text-markdown": "$fontSize",
     "fontWeight-Text-markdown": "fontWeight-Text",
 

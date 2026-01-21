@@ -134,6 +134,41 @@ export const Markdown = memo(
       }
     };
 
+    // Prevent xmlui-pg playground elements (samp tags with data-pg-content) from being wrapped in <p> tags
+    const preventPlaygroundParagraphWrap = () => {
+      return function transformer(tree: Node) {
+        visit(tree, "element", (node: any, index: number | undefined, parent: any) => {
+          // We're looking for <p> tags that contain only a <samp> element with data-pg-content
+          if (node.tagName !== "p" || !node.children || !Array.isArray(node.children)) {
+            return;
+          }
+
+          // Filter out whitespace-only text nodes
+          const nonEmptySiblings = node.children.filter((child: any) => {
+            return !(child.type === "text" && /^\s*$/.test(child.value));
+          });
+
+          // Check if this paragraph contains only a samp element with data-pg-content
+          if (
+            nonEmptySiblings.length === 1 &&
+            nonEmptySiblings[0].type === "element" &&
+            nonEmptySiblings[0].tagName === "samp" &&
+            nonEmptySiblings[0].properties?.["data-pg-content"]
+          ) {
+            const sampElement = nonEmptySiblings[0];
+            
+            // Replace the paragraph with the samp element by modifying the parent's children
+            if (parent && parent.children && Array.isArray(parent.children) && typeof index === "number") {
+              parent.children.splice(index, 1, sampElement);
+            }
+            
+            // Return the sampElement to continue visiting from there
+            return index;
+          }
+        });
+      };
+    };
+
     // Determine overflow mode classes based on overflowMode
     const overflowClasses = useMemo(() => {
       const classes: Record<string, boolean> = {};
@@ -205,7 +240,7 @@ export const Markdown = memo(
       >
         <ReactMarkdown
           remarkPlugins={[remarkGfm, markdownCodeBlockParser, markdownImgParser]}
-          rehypePlugins={[rehypeRaw]}
+          rehypePlugins={[rehypeRaw, preventPlaygroundParagraphWrap]}
           components={{
             details({ children, node, ...props }) {
               return (
@@ -299,7 +334,13 @@ export const Markdown = memo(
                 </LinkAwareHeading>
               );
             },
-            p({ id, children }) {
+            p({ id, children, node }) {
+              // Check if this paragraph contains a samp element (xmlui-pg playground)
+              // If so, render the children directly without the paragraph wrapper
+              if ((node as any)?.children?.[0]?.tagName === "samp") {
+                return <>{children}</>;
+              }
+              
               return (
                 <Text variant="paragraph" className={styles.markdown} uid={id} >
                   {children}
