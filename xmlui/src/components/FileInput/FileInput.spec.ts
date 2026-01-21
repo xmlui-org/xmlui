@@ -126,6 +126,32 @@ test("component textbox is readonly for accessibility", async ({
 });
 
 // =============================================================================
+// API TESTS
+// =============================================================================
+
+test.describe("Api", () => {
+  test("bindTo syncs $data and value", async ({ initTestBed, page, createFileInputDriver }) => {
+    await initTestBed(`
+      <Form hideButtonRow="true">
+        <FileInput id="boundFileInput" testId="boundFileInput" bindTo="files" />
+        <Text testId="dataValue">{$data.files.length}</Text>
+        <Text testId="compValue">{boundFileInput.value.length}</Text>
+      </Form>
+    `);
+
+    const driver = await createFileInputDriver("boundFileInput");
+    await driver.getHiddenInput().setInputFiles({
+      name: "test.txt",
+      mimeType: "text/plain",
+      buffer: Buffer.from("hello"),
+    });
+
+    await expect(page.getByTestId("dataValue")).toHaveText("1");
+    await expect(page.getByTestId("compValue")).toHaveText("1");
+  });
+});
+
+// =============================================================================
 // VISUAL STATE TESTS
 // =============================================================================
 

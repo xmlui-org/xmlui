@@ -574,6 +574,24 @@ test("setValue input value", async ({ initTestBed, page }) => {
   await expect(valueDisplay).toHaveText("1");
 });
 
+test("bindTo syncs $data and value", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <Form hideButtonRow="true">
+      <RadioGroup id="boundRadioGroup" bindTo="choice">
+        <Option value="first">First</Option>
+        <Option value="second">Second</Option>
+      </RadioGroup>
+      <Button testId="setBtn" onClick="boundRadioGroup.setValue('second')" />
+      <Text testId="dataValue">{$data.choice}</Text>
+      <Text testId="compValue">{boundRadioGroup.value}</Text>
+    </Form>
+  `);
+
+  await page.getByTestId("setBtn").click();
+  await expect(page.getByTestId("dataValue")).toHaveText("second");
+  await expect(page.getByTestId("compValue")).toHaveText("second");
+});
+
 // =============================================================================
 // BEHAVIORS AND PARTS TESTS
 // =============================================================================

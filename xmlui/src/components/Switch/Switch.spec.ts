@@ -623,6 +623,21 @@ test.describe("Api", () => {
     await expect(page.getByTestId("value")).toHaveText("true");
   });
 
+  test("bindTo syncs $data and value", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form hideButtonRow="true">
+        <Switch id="boundSwitch" bindTo="enabled" />
+        <Button testId="setBtn" onClick="boundSwitch.setValue(true)" />
+        <Text testId="dataValue">{$data.enabled}</Text>
+        <Text testId="compValue">{boundSwitch.value}</Text>
+      </Form>
+    `);
+
+    await page.getByTestId("setBtn").click();
+    await expect(page.getByTestId("dataValue")).toHaveText("true");
+    await expect(page.getByTestId("compValue")).toHaveText("true");
+  });
+
   test("component setValue API updates state", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Fragment>

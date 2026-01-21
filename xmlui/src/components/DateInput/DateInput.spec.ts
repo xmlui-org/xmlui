@@ -1005,6 +1005,21 @@ test.describe("API Methods", () => {
     await expect(driver.yearInput).toHaveValue("2024");
   });
 
+  test("bindTo syncs $data and value", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form hideButtonRow="true">
+        <DateInput id="boundDateInput" bindTo="dateValue" />
+        <Button testId="setBtn" onClick="boundDateInput.setValue('05/25/2024')" />
+        <Text testId="dataValue">{$data.dateValue}</Text>
+        <Text testId="compValue">{boundDateInput.value}</Text>
+      </Form>
+    `);
+
+    await page.getByTestId("setBtn").click();
+    await expect(page.getByTestId("dataValue")).toHaveText("05/25/2024");
+    await expect(page.getByTestId("compValue")).toHaveText("05/25/2024");
+  });
+
   test("value getter returns current date value", async ({
     initTestBed,
     createDateInputDriver,

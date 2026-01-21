@@ -656,6 +656,21 @@ test.describe("Api", () => {
     await expect(page.getByTestId("value")).toContainText("true");
   });
 
+  test("bindTo syncs $data and value", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form hideButtonRow="true">
+        <Checkbox id="boundCheckbox" bindTo="accepted" />
+        <Button testId="setBtn" onClick="boundCheckbox.setValue(true)" />
+        <Text testId="dataValue">{$data.accepted}</Text>
+        <Text testId="compValue">{boundCheckbox.value}</Text>
+      </Form>
+    `);
+
+    await page.getByTestId("setBtn").click();
+    await expect(page.getByTestId("dataValue")).toHaveText("true");
+    await expect(page.getByTestId("compValue")).toHaveText("true");
+  });
+
   test("component setValue API updates state", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Fragment>

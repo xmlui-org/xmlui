@@ -146,16 +146,20 @@ export function FormBindingWrapper({
   // Run validations
   useValidation(validations, onValidate, value, dispatch, formItemId, customValidationsDebounce);
 
+  const childUpdateState = (children as any)?.props?.updateState;
+  const childRegisterComponentApi = (children as any)?.props?.registerComponentApi;
+
   // Handle value changes
   const onStateChange = useCallback(
     ({ value }: any, options?: any) => {
+      childUpdateState?.({ value }, options);
       if (!isInsideForm) return;
       // We already handled the initial value in the useEffect with fieldInitialized
       if (!options?.initial) {
         dispatch(fieldChanged(formItemId, value));
       }
     },
-    [formItemId, dispatch, isInsideForm],
+    [childUpdateState, formItemId, dispatch, isInsideForm],
   );
 
   // Cleanup on unmount
@@ -217,7 +221,7 @@ export function FormBindingWrapper({
     enabled: isEnabled,
     validationStatus,
     invalidMessages,
-    registerComponentApi,
+    registerComponentApi: registerComponentApi ?? childRegisterComponentApi,
   });
 
   // Create validation result display (hidden when verboseValidationFeedback is false (concise mode))

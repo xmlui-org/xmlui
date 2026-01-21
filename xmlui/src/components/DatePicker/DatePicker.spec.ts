@@ -428,6 +428,21 @@ test("component setValue API works", async ({ page, initTestBed }) => {
   await expect(page.getByTestId("datePicker")).toHaveText("06/01/2024");
 });
 
+test("bindTo syncs $data and value", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <Form hideButtonRow="true">
+      <DatePicker id="boundDatePicker" bindTo="dateValue" dateFormat="MM/dd/yyyy" />
+      <Button testId="setBtn" onClick="boundDatePicker.setValue('06/01/2024')" />
+      <Text testId="dataValue">{$data.dateValue}</Text>
+      <Text testId="compValue">{boundDatePicker.value}</Text>
+    </Form>
+  `);
+
+  await page.getByTestId("setBtn").click();
+  await expect(page.getByTestId("dataValue")).toHaveText("06/01/2024");
+  await expect(page.getByTestId("compValue")).toHaveText("06/01/2024");
+});
+
 test("component focus API works", async ({ page, initTestBed }) => {
   await initTestBed(`
     <Fragment>
