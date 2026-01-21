@@ -1383,6 +1383,85 @@ export class DropdownMenuDriver extends ComponentDriver {
   }
 }
 
+// --- ContextMenu
+
+export class ContextMenuDriver extends ComponentDriver {
+  /**
+   * Get all menu items
+   */
+  getMenuItems() {
+    return this.page.getByRole("menuitem");
+  }
+
+  /**
+   * Get a specific menu item by text
+   */
+  getMenuItem(text: string) {
+    return this.page.getByRole("menuitem", { name: text });
+  }
+
+  /**
+   * Click a menu item by text
+   */
+  async clickMenuItem(text: string) {
+    await this.getMenuItem(text).click();
+  }
+
+  /**
+   * Open a submenu by hovering over it
+   */
+  async openSubMenu(submenuText: string) {
+    await this.page.getByText(submenuText).hover();
+  }
+
+  /**
+   * Get menu separators
+   */
+  getMenuSeparators() {
+    return this.page.locator('[class*="DropdownMenuSeparator"]');
+  }
+
+  /**
+   * Get the menu content container
+   */
+  getMenuContent() {
+    return this.page.locator('[class*="ContextMenuContent"]');
+  }
+
+  /**
+   * Check if the menu is open
+   */
+  async isOpen() {
+    try {
+      const content = this.getMenuContent();
+      return await content.isVisible();
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Wait for menu to open
+   */
+  async waitForOpen() {
+    await this.getMenuContent().waitFor({ state: "visible" });
+  }
+
+  /**
+   * Wait for menu to close
+   */
+  async waitForClose() {
+    await this.getMenuContent().waitFor({ state: "hidden" });
+  }
+
+  /**
+   * Close the context menu by clicking outside
+   */
+  async close() {
+    await this.page.keyboard.press("Escape");
+  }
+}
+
 // --- Slider
 
 export class SliderDriver extends ComponentDriver {

@@ -50,6 +50,7 @@ import {
   CodeBlockDriver,
   CheckboxDriver,
   DropdownMenuDriver,
+  ContextMenuDriver,
   ExpandableItemDriver,
   FileInputDriver,
   FileUploadDropZoneDriver,
@@ -566,6 +567,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(DropdownMenuDriver, testIdOrLocator);
     });
   },
+  createContextMenuDriver: async ({ createDriver }, use) => {
+    await use((testIdOrLocator?: string | Locator) => {
+      return createDriver(ContextMenuDriver, testIdOrLocator);
+    });
+  },
   createTimeInputDriver: async ({ createDriver }, use) => {
     await use((testIdOrLocator?: string | Locator) => {
       return createDriver(TimeInputDriver, testIdOrLocator);
@@ -676,6 +682,7 @@ type TestDriverExtenderProps = {
   createLabelDriver: ComponentDriverMethod<LabelDriver>;
   createSpinnerDriver: ComponentDriverMethod<SpinnerDriver>;
   createDropdownMenuDriver: ComponentDriverMethod<DropdownMenuDriver>;
+  createContextMenuDriver: ComponentDriverMethod<ContextMenuDriver>;
   createTimeInputDriver: ComponentDriverMethod<TimeInputDriver>;
   createTimerDriver: ComponentDriverMethod<TimerDriver>;
   createDateInputDriver: ComponentDriverMethod<DateInputDriver>;
