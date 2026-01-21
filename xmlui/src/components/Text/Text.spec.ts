@@ -2142,6 +2142,32 @@ test.describe("Custom Variants", () => {
 });
 
 // =============================================================================
+// EVENT TESTS
+// =============================================================================
+
+test.describe("Events", () => {
+  test("contextMenu event fires on right click", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App var.message="Not clicked">
+        <Text testId="output" value="{message}" />
+        <Text 
+          testId="text"
+          value="Right-click me"
+          onContextMenu="message = 'Context menu triggered'"
+        />
+      </App>
+    `);
+
+    const text = page.getByTestId("text");
+    const output = page.getByTestId("output");
+
+    await expect(output).toHaveText("Not clicked");
+    await text.click({ button: "right" });
+    await expect(output).toHaveText("Context menu triggered");
+  });
+});
+
+// =============================================================================
 // SMOKE TESTS (kept for compatibility)
 // =============================================================================
 

@@ -4,7 +4,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { TableOfContents, defaultProps } from "./TableOfContentsNative";
 import { useIndexerContext } from "../App/IndexerContext";
-import { createMetadata } from "../metadata-helpers";
+import { createMetadata, dContextMenu } from "../metadata-helpers";
 
 const COMP = "TableOfContents";
 const COMP_CHILD = "TableOfContentsItem";
@@ -37,6 +37,9 @@ export const TableOfContentsMd = createMetadata({
       valueType: "boolean",
       defaultValue: false,
     },
+  },
+  events: {
+    contextMenu: dContextMenu(COMP),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -81,13 +84,14 @@ function IndexAwareTableOfContents(props) {
 export const tableOfContentsRenderer = createComponentRenderer(
   COMP,
   TableOfContentsMd,
-  ({ className, node, extractValue }) => {
+  ({ className, node, extractValue, lookupEventHandler }) => {
     return (
       <IndexAwareTableOfContents
         className={className}
         smoothScrolling={extractValue.asOptionalBoolean(node.props?.smoothScrolling)}
         maxHeadingLevel={extractValue.asOptionalNumber(node.props?.maxHeadingLevel)}
         omitH1={extractValue.asOptionalBoolean(node.props?.omitH1)}
+        onContextMenu={lookupEventHandler("contextMenu")}
       />
     );
   },

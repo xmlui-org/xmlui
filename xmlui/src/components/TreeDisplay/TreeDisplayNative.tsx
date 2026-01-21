@@ -16,6 +16,7 @@ type Props = {
   children?: ReactNode;
   content?: string;
   itemHeight?: number;
+  onContextMenu?: any;
 };
 
 export const defaultProps: Pick<Props, "content" | "itemHeight"> = {
@@ -219,7 +220,7 @@ const renderTreeNode = (
 };
 
 export const TreeDisplay = forwardRef(function TreeDisplay(
-  { style, className, children, content = defaultProps.content, itemHeight = defaultProps.itemHeight }: Props,
+  { style, className, children, content = defaultProps.content, itemHeight = defaultProps.itemHeight, onContextMenu }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const contentString = (content || children?.toString() || "").toString();
@@ -227,7 +228,7 @@ export const TreeDisplay = forwardRef(function TreeDisplay(
   const treeNodes = useMemo(() => parseTreeContent(contentString), [contentString]);
 
   return (
-    <div className={classnames(styles.treeDisplay, className)} style={style} ref={forwardedRef}>
+    <div className={classnames(styles.treeDisplay, className)} style={style} ref={forwardedRef} onContextMenu={onContextMenu}>
       <div className={styles.content}>
         {treeNodes.map((node, index) => renderTreeNode(node, index, itemHeight, 0, []))}
       </div>

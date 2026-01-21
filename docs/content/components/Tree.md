@@ -411,6 +411,14 @@ The selected item ID in source data format.
 
 ## Events [#events]
 
+### `contextMenu` [#contextmenu]
+
+This event is triggered when the Tree is right-clicked (context menu).
+
+**Signature**: `contextMenu(event: MouseEvent): void`
+
+- `event`: The mouse event object.
+
 ### `loadChildren` [#loadchildren]
 
 Fired when a tree node needs to load children dynamically. Should return an array of child data.

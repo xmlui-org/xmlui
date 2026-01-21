@@ -128,9 +128,15 @@ You can observe no gap between the items in a single row of the `FlowLayout`, as
 
 -  default: **"normal"**
 
-This property determines the scrollbar style. Options: "normal" uses the browser's default scrollbar; "styled" displays a themed scrollbar that is always visible; "whenMouseOver" shows the scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.
+This property determines the scrollbar style. Options: "normal" uses the browser's default scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.
 
-Available values: `normal` **(default)**, `styled`, `whenMouseOver`, `whenScrolling`
+Available values: `normal` **(default)**, `overlay`, `whenMouseOver`, `whenScrolling`
+
+### `showScrollerFade` [#showscrollerfade]
+
+-  default: **true**
+
+When enabled, displays gradient fade indicators at the top and bottom of the scroll container to visually indicate that more content is available in those directions. The fade indicators automatically appear/disappear based on the current scroll position. Top fade shows when scrolled down from the top, bottom fade shows when not at the bottom. Only works with overlay scrollbar modes (not with 'normal' mode).
 
 ### `verticalAlignment` [#verticalalignment]
 
@@ -142,7 +148,13 @@ Available values: `start` **(default)**, `center`, `end`
 
 ## Events [#events]
 
-This component does not have any events.
+### `contextMenu` [#contextmenu]
+
+This event is triggered when the FlowLayout is right-clicked (context menu).
+
+**Signature**: `contextMenu(event: MouseEvent): void`
+
+- `event`: The mouse event object.
 
 ## Exposed Methods [#exposed-methods]
 

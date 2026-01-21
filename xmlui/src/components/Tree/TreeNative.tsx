@@ -293,6 +293,7 @@ interface TreeComponentProps {
   onNodeExpanded?: (node: FlatTreeNode) => void;
   onNodeCollapsed?: (node: FlatTreeNode) => void;
   loadChildren?: (node: FlatTreeNode) => Promise<any[]>;
+  onContextMenu?: any;
   itemRenderer: (item: any) => ReactNode;
   className?: string;
 }
@@ -328,6 +329,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     onNodeExpanded,
     onNodeCollapsed,
     loadChildren,
+    onContextMenu,
     itemRenderer,
     className,
   } = props;
@@ -1628,6 +1630,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       onFocus={handleTreeFocus}
       onBlur={handleTreeBlur}
       onKeyDown={handleKeyDown}
+      onContextMenu={onContextMenu}
       style={{ height: "100%", overflow: "auto" }}
     >
       <Virtualizer ref={listRef} itemSize={measuredItemSize || itemHeight}>

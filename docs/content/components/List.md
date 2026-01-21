@@ -1453,7 +1453,13 @@ Available values: `top` **(default)**, `bottom`
 
 ## Events [#events]
 
-This component does not have any events.
+### `contextMenu` [#contextmenu]
+
+This event is triggered when the List is right-clicked (context menu).
+
+**Signature**: `contextMenu(event: MouseEvent): void`
+
+- `event`: The mouse event object.
 
 ## Exposed Methods [#exposed-methods]
 

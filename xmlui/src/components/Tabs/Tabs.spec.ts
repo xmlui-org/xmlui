@@ -1439,4 +1439,27 @@ test.describe("onDidChange callback functionality", () => {
     await page.getByRole("tab", { name: "Tab Two" }).click();
     await expect(page.getByText("Changes: 1")).toBeVisible(); // Should still be 1
   });
+
+  test("contextMenu event fires on right click", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App var.message="Not clicked">
+        <Text testId="output" label="{message}" />
+        <Tabs testId="tabs" onContextMenu="message = 'Context menu triggered'">
+          <TabItem label="Tab One">
+            <Text>Content one</Text>
+          </TabItem>
+          <TabItem label="Tab Two">
+            <Text>Content two</Text>
+          </TabItem>
+        </Tabs>
+      </App>
+    `);
+
+    const tabs = page.getByTestId("tabs");
+    const output = page.getByTestId("output");
+
+    await expect(output).toHaveText("Not clicked");
+    await tabs.click({ button: "right" });
+    await expect(output).toHaveText("Context menu triggered");
+  });
 });

@@ -127,7 +127,13 @@ The scrollbar appears only while actively scrolling and fades out after 400ms of
 
 -  default: **"normal"**
 
-This property determines the scrollbar style and behavior. `normal` uses the standard browser scrollbar. `styled` uses themed scrollbars that are always visible and can be customized via theme variables. `whenMouseOver` shows overlay scrollbars that appear when the mouse hovers over the scroll area and hide after 200ms when the mouse leaves. `whenScrolling` shows overlay scrollbars only during active scrolling and hides them after 400ms of inactivity.
+This property determines the scrollbar style and behavior. `normal` uses the standard browser scrollbar. `overlay` uses themed scrollbars that are always visible and can be customized via theme variables. `whenMouseOver` shows overlay scrollbars that appear when the mouse hovers over the scroll area and hide after 200ms when the mouse leaves. `whenScrolling` shows overlay scrollbars only during active scrolling and hides them after 400ms of inactivity.
+
+### `showScrollerFade` [#showscrollerfade]
+
+-  default: **true**
+
+When enabled, displays gradient fade indicators at the top and bottom of the scroll container to visually indicate that more content is available in those directions. The fade indicators automatically appear/disappear based on the current scroll position. Top fade shows when scrolled down from the top, bottom fade shows when not at the bottom. Only works with overlay scrollbar modes (not with `normal` mode).
 
 ## Events [#events]
 
@@ -145,6 +151,7 @@ The `ScrollViewer` component uses shared theme variables with other layout conta
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-fade-Scroller | rgba(255, 255, 255, 0.75) | rgba(255, 255, 255, 0.75) |
 | [backgroundColor](../styles-and-themes/common-units/#color)-handle-Scroller | $color-surface-200 | $color-surface-200 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-handle-Scroller--active | $color-surface-400 | $color-surface-400 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-handle-Scroller--hover | $color-surface-400 | $color-surface-400 |
@@ -159,6 +166,7 @@ The `ScrollViewer` component uses shared theme variables with other layout conta
 | [border](../styles-and-themes/common-units/#border)-track-Scroller--hover | none | none |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-handle-Scroller | 10px | 10px |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-track-Scroller | 2px | 2px |
+| [height](../styles-and-themes/common-units/#size)-fade-Scroller | 64px | 64px |
 | maxSize-handle-Scroller | none | none |
 | minSize-handle-Scroller | 33px | 33px |
 | [offset](../styles-and-themes/common-units/#size)-handleInteractiveArea-Scroller | 4px | 4px |
@@ -168,6 +176,7 @@ The `ScrollViewer` component uses shared theme variables with other layout conta
 | [size](../styles-and-themes/common-units/#size)-perpendicularHandle-Scroller--active | 100% | 100% |
 | [size](../styles-and-themes/common-units/#size)-perpendicularHandle-Scroller--hover | 100% | 100% |
 | [size](../styles-and-themes/common-units/#size)-Scroller | 10px | 10px |
+| [transition](../styles-and-themes/common-units/#transition)-fade-Scroller | opacity 0.3s ease-in-out | opacity 0.3s ease-in-out |
 | [transition](../styles-and-themes/common-units/#transition)-handle-Scroller | *none* | *none* |
 | [transition](../styles-and-themes/common-units/#transition)-Scroller | opacity 0.15s, visibility 0.15s, top 0.15s, right 0.15s, bottom 0.15s, left 0.15s | opacity 0.15s, visibility 0.15s, top 0.15s, right 0.15s, bottom 0.15s, left 0.15s |
 | [transition](../styles-and-themes/common-units/#transition)-track-Scroller | *none* | *none* |
@@ -204,3 +213,7 @@ The `ScrollViewer` component uses shared theme variables with other layout conta
 | **`transition-Scroller`** | CSS transition for the scrollbar container (opacity, visibility, position changes) |
 | **`transitionTrack-Scroller`** | CSS transition for the scrollbar track (opacity, background-color, border-color) |
 | **`transitionHandle-Scroller`** | CSS transition for the scrollbar handle (opacity, background-color, border-color, size changes) |
+| **`height-fade-Scroller`** | The height of the fade overlay gradients at the top and bottom of the scroll container |
+| **`backgroundColor-fadeTop-Scroller`** | The background gradient for the top fade overlay (typically a gradient from opaque to transparent) |
+| **`backgroundColor-fadeBottom-Scroller`** | The background gradient for the bottom fade overlay (typically a gradient from transparent to opaque) |
+| **`transition-fade-Scroller`** | CSS transition for the fade overlays (opacity changes) |

@@ -21,6 +21,7 @@ type Props = {
   smoothScrolling?: boolean;
   maxHeadingLevel?: number;
   omitH1?: boolean;
+  onContextMenu?: any;
 };
 
 export const defaultProps = {
@@ -36,6 +37,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
     maxHeadingLevel = defaultProps.maxHeadingLevel,
     omitH1 = defaultProps.omitH1,
     className,
+    onContextMenu,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -103,6 +105,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
       className={classnames(styles.nav, className)}
       ref={ref}
       style={style}
+      onContextMenu={onContextMenu}
     >
       <div className={styles.indicator} ref={indicatorRef} />
       <ul className={styles.list}>

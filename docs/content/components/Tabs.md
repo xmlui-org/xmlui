@@ -243,6 +243,14 @@ Makes tabs fill the full width of the container, distributing them evenly:
 
 ## Events [#events]
 
+### `contextMenu` [#contextmenu]
+
+This event is triggered when the Tabs is right-clicked (context menu).
+
+**Signature**: `contextMenu(event: MouseEvent): void`
+
+- `event`: The mouse event object.
+
 ### `didChange` [#didchange]
 
 This event is triggered when value of Tabs has changed.

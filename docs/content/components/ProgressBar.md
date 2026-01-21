@@ -46,4 +46,5 @@ This component does not expose any methods.
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-indicator-ProgressBar | 999em | 999em |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-ProgressBar | 999em | 999em |
 | [color](../styles-and-themes/common-units/#color)-indicator-ProgressBar | $color-primary-500 | $color-primary-500 |
+| [color](../styles-and-themes/common-units/#color)-indicator-ProgressBar--complete | *none* | *none* |
 | [thickness](../styles-and-themes/common-units/#size)-ProgressBar | 0.5em | 0.5em |

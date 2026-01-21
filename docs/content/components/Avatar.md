@@ -92,6 +92,14 @@ This event is triggered when the Avatar is clicked.
 </App>
 ```
 
+### `contextMenu` [#contextmenu]
+
+This event is triggered when the Avatar is right-clicked (context menu).
+
+**Signature**: `contextMenu(event: MouseEvent): void`
+
+- `event`: The mouse event object.
+
 ## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
