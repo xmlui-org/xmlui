@@ -354,13 +354,12 @@ This event is triggered when file parsing fails (when using `parseAs`). If not p
 
 ```xmlui-pg copy display name="Example: parseError"
 ---app
-<App var.errorMessage="" var.items="{[]}">
+<App var.items="{[]}">
   <FileInput
     parseAs="csv"
     onDidChange="data => items = data"
-    onParseError="(err, file) => errorMessage = file.name + ': ' + err.message"
+    onParseError="(err, file) => toast.error(file.name + ': ' + err.message)"
   />
-  <Text value="{errorMessage}" color="$color-danger-500" when="{errorMessage}" />
   <List data="{items}" when="{items.length > 0}">
     <Text value="{$item.name}: ${$item.price}" />
   </List>
@@ -371,13 +370,12 @@ Right-click and save: [sample-broken.csv](/resources/files/sample-broken.csv). T
 
 ```xmlui-pg copy display name="Example: JSON parseError"
 ---app
-<App var.errorMessage="" var.data="{[]}">
+<App var.data="{[]}">
   <FileInput
     parseAs="json"
-    onDidChange="data => data = data"
-    onParseError="(err, file) => errorMessage = file.name + ': ' + err.message"
+    onDidChange="rows => data = rows"
+    onParseError="(err, file) => toast.error(file.name + ': ' + err.message)"
   />
-  <Text value="{errorMessage}" color="$color-danger-500" when="{errorMessage}" />
   <List data="{data}" when="{data.length > 0}">
     <Text value="{$item.name}: ${$item.price}" />
   </List>
