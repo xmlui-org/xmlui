@@ -264,7 +264,14 @@ export const SubMenuItem = forwardRef<HTMLDivElement, SubMenuItemProps>(function
   return (
     <DropdownMenuPrimitive.Sub open={open} onOpenChange={setOpen}>
       <DropdownMenuPrimitive.SubTrigger ref={ref} className={styles.DropdownMenuSubTrigger} asChild>
-        {triggerTemplate ? triggerTemplate : <div>{label}</div>}
+        {triggerTemplate ? (
+          triggerTemplate
+        ) : (
+          <div className={styles.subMenuItemTrigger}>
+            <span>{label}</span>
+            <Icon name="chevronright" fallback="chevronright" />
+          </div>
+        )}
       </DropdownMenuPrimitive.SubTrigger>
       <DropdownMenuPrimitive.Portal container={root}>
         <DropdownMenuPrimitive.SubContent

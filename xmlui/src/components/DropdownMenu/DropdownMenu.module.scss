@@ -67,6 +67,14 @@ $color-MenuSeparator: createThemeVar("color-MenuSeparator");
     @include menu.menuItem;
   }
 
+  .subMenuItemTrigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: $gap-MenuItem;
+  }
+
   .DropdownMenuSeparator {
     @include menu.menuSeparator;
   }
