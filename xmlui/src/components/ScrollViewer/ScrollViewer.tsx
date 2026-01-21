@@ -100,7 +100,7 @@ export const ScrollViewerMd = createMetadata({
     [`backgroundColor-handle-${SCROLLER}--active`]: "$color-surface-400",
     [`border-handle-${SCROLLER}`]: "none",
     [`border-handle-${SCROLLER}--hover`]: "none",
-    [`border-handle-${SCROLLER}--active`]: "1px solid red",
+    [`border-handle-${SCROLLER}--active`]: "none",
     [`minSize-handle-${SCROLLER}`]: "33px",
     [`maxSize-handle-${SCROLLER}`]: "none",
     [`size-perpendicularHandle-${SCROLLER}`]: "100%",

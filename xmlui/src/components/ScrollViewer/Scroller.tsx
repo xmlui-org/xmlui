@@ -93,6 +93,45 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
     };
   }, [showScrollerFade, osReady, updateFadeIndicators]);
 
+  // Set up transition detection for all overlay scrollbar modes
+  useEffect(() => {
+    if (normalizedScrollStyle === "normal" || !osReady || !osInstanceRef.current) return;
+
+    const instance = osInstanceRef.current;
+    const { viewport } = instance.elements();
+    
+    if (!viewport) return;
+
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+    // Listen for transitionend events to update scrollbars after transitions complete
+    const handleTransitionEnd = (e: TransitionEvent) => {
+      // Only respond to grid-template-rows and opacity transitions (NavGroup expand/collapse)
+      // Ignore color, background-color transitions to prevent excessive updates
+      if (e.propertyName !== 'grid-template-rows' && e.propertyName !== 'opacity') {
+        return;
+      }
+      
+      // Debounce updates to avoid interfering with scrollbar auto-hide behavior
+      if (debounceTimer) clearTimeout(debounceTimer);
+      
+      debounceTimer = setTimeout(() => {
+        instance.update(true);
+        
+        if (showScrollerFade) {
+          updateFadeIndicators();
+        }
+      }, 50);
+    };
+
+    viewport.addEventListener('transitionend', handleTransitionEnd);
+
+    return () => {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      viewport.removeEventListener('transitionend', handleTransitionEnd);
+    };
+  }, [normalizedScrollStyle, osReady, showScrollerFade, updateFadeIndicators]);
+
   // Normal mode: use standard div with default browser scrollbar
   if (normalizedScrollStyle === "normal") {
     return (
@@ -158,7 +197,7 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
           options={{
             scrollbars: {
               autoHide: "leave",
-              autoHideDelay: 200,
+              autoHideDelay: 400,
             },
           }}
           {...rest}
