@@ -124,5 +124,6 @@ This component does not expose any methods.
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-MenuItem | $fontFamily | $fontFamily |
 | [fontSize](../styles-and-themes/common-units/#size)-MenuItem | $fontSize-sm | $fontSize-sm |
 | [gap](../styles-and-themes/common-units/#size)-MenuItem | $space-2 | $space-2 |
+| [maxWidth](../styles-and-themes/common-units/#size)-MenuItem | 100% | 100% |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-MenuItem | $space-3 | $space-3 |
 | [paddingVertical](../styles-and-themes/common-units/#size)-MenuItem | $space-2 | $space-2 |
