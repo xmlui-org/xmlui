@@ -3,7 +3,7 @@ import styles from "./TreeDisplay.module.scss";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { TreeDisplay, defaultProps } from "./TreeDisplayNative";
-import { createMetadata } from "../metadata-helpers";
+import { createMetadata, dContextMenu } from "../metadata-helpers";
 
 const COMP = "TreeDisplay";
 
@@ -26,6 +26,9 @@ export const TreeDisplayMd = createMetadata({
       defaultValue: defaultProps.itemHeight,
     },
   },
+  events: {
+    contextMenu: dContextMenu(COMP),
+  },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "$backgroundColor-CodeBlock",
@@ -45,12 +48,13 @@ export const TreeDisplayMd = createMetadata({
 export const treeDisplayComponentRenderer = createComponentRenderer(
   COMP,
   TreeDisplayMd,
-  ({ node, extractValue, renderChild, className }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
     return (
       <TreeDisplay
         className={className}
         content={extractValue.asOptionalString(node.props.content)}
         itemHeight={extractValue.asOptionalNumber(node.props.itemHeight)}
+        onContextMenu={lookupEventHandler("contextMenu")}
       >
         {renderChild(node.children)}
       </TreeDisplay>

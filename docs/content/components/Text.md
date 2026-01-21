@@ -519,7 +519,13 @@ The table below indicates which Text `variant` maps to which HtmlTag component.
 
 ## Events [#events]
 
-This component does not have any events.
+### `contextMenu` [#contextmenu]
+
+This event is triggered when the Text is right-clicked (context menu).
+
+**Signature**: `contextMenu(event: MouseEvent): void`
+
+- `event`: The mouse event object.
 
 ## Exposed Methods [#exposed-methods]
 

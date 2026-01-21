@@ -12,6 +12,17 @@ test.describe("Basic Functionality", () => {
     await expect(driver.component).toBeVisible();
   });
 
+  test("contextMenu event fires on right click", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(
+      `<Card testId="card" title="Test" onContextMenu="testState = 'context-menu-fired'" />`
+    );
+
+    const card = page.getByTestId("card");
+    await card.click({ button: "right" });
+
+    await expect.poll(testStateDriver.testState).toEqual("context-menu-fired");
+  });
+
   test("Card renders with title", async ({ initTestBed, createCardDriver }) => {
     await initTestBed(`<Card title="Test Title" />`);
     const title = (await createCardDriver()).component.getByRole("heading");

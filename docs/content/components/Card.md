@@ -162,6 +162,14 @@ This event is triggered when the `Card` is clicked.
 </App>
 ```
 
+### `contextMenu` [#contextmenu]
+
+This event is triggered when the Card is right-clicked (context menu).
+
+**Signature**: `contextMenu(event: MouseEvent): void`
+
+- `event`: The mouse event object.
+
 ## Exposed Methods [#exposed-methods]
 
 ### `scrollToBottom` [#scrolltobottom]

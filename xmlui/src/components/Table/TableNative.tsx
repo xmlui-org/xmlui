@@ -53,6 +53,7 @@ import { type OurColumnMetadata } from "../Column/TableContext";
 import useRowSelection from "./useRowSelection";
 import { PaginationNative, type Position } from "../Pagination/PaginationNative";
 import { Part } from "../Part/Part";
+import { dContextMenu } from "../metadata-helpers";
 
 // =====================================================================================================================
 // Helper types
@@ -120,6 +121,7 @@ type TableProps = {
   iconSortAsc?: string;
   iconSortDesc?: string;
   iconNoSort?: string;
+  onContextMenu?: any;
   sortingDidChange?: AsyncFunction;
   onSelectionDidChange?: AsyncFunction;
   willSort?: AsyncFunction;
@@ -260,6 +262,7 @@ export const Table = forwardRef(
       iconNoSort,
       sortingDidChange,
       willSort,
+      onContextMenu,
       style,
       className,
       noDataRenderer,
@@ -767,6 +770,7 @@ export const Table = forwardRef(
         className={classnames(styles.wrapper, className, { [styles.noScroll]: hasOutsideScroll })}
         tabIndex={-1}
         onKeyDown={onKeyDown}
+        onContextMenu={(e) => {e.preventDefault(); onContextMenu?.(e)}}
         ref={ref}
         style={style}
       >

@@ -13,6 +13,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
   dClick,
+  dContextMenu,
   dGotFocus,
   dLostFocus,
   dOrientation,
@@ -114,6 +115,7 @@ export const ButtonMd = createMetadata({
   },
   events: {
     click: dClick(COMP),
+    contextMenu: dContextMenu(COMP),
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
   },
@@ -206,6 +208,7 @@ export const buttonComponentRenderer = createComponentRenderer(
         contentPosition={extractValue.asOptionalString(node.props.contentPosition)}
         disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
         onClick={lookupEventHandler("click")}
+        onContextMenu={lookupEventHandler("contextMenu")}
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
         className={className}

@@ -24,7 +24,13 @@ This property indicates that smooth scrolling is used while scrolling the select
 
 ## Events [#events]
 
-This component does not have any events.
+### `contextMenu` [#contextmenu]
+
+This event is triggered when the TableOfContents is right-clicked (context menu).
+
+**Signature**: `contextMenu(event: MouseEvent): void`
+
+- `event`: The mouse event object.
 
 ## Exposed Methods [#exposed-methods]
 

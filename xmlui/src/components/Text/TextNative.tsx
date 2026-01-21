@@ -108,6 +108,7 @@ type TextProps = {
   breakMode?: BreakMode;
   style?: CSSProperties;
   className?: string;
+  onContextMenu?: any;
   registerComponentApi?: RegisterComponentApiFn;
   [variantSpecificProps: string]: any;
 };
@@ -132,6 +133,7 @@ export const Text = forwardRef(function Text(
     ellipses = defaultProps.ellipses,
     overflowMode = defaultProps.overflowMode,
     breakMode = defaultProps.breakMode,
+    onContextMenu,
     registerComponentApi,
     ...variantSpecificProps
   }: TextProps,
@@ -314,6 +316,7 @@ export const Text = forwardRef(function Text(
     <Element
       {...restVariantSpecificProps}
       ref={ref as any}
+      onContextMenu={onContextMenu}
       className={classnames(
         syntaxHighlightClasses,
         styles.text,

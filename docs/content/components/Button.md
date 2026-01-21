@@ -254,6 +254,14 @@ This event is triggered when the Button is clicked.
 </App>
 ```
 
+### `contextMenu` [#contextmenu]
+
+This event is triggered when the Button is right-clicked (context menu).
+
+**Signature**: `contextMenu(event: MouseEvent): void`
+
+- `event`: The mouse event object.
+
 ### `gotFocus` [#gotfocus]
 
 This event is triggered when the Button has received the focus.

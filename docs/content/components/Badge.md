@@ -70,7 +70,13 @@ Available values: `badge` **(default)**, `pill`
 
 ## Events [#events]
 
-This component does not have any events.
+### `contextMenu` [#contextmenu]
+
+This event is triggered when the Badge is right-clicked (context menu).
+
+**Signature**: `contextMenu(event: MouseEvent): void`
+
+- `event`: The mouse event object.
 
 ## Exposed Methods [#exposed-methods]
 

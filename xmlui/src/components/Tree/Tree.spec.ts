@@ -3541,3 +3541,37 @@ test.describe("Edge Cases", () => {
   });
 });
 
+// =============================================================================
+// EVENT TESTS
+// =============================================================================
+
+test.describe("Events", () => {
+  test("contextMenu event fires on right click", async ({ initTestBed, page }) => {
+    const data = [
+      { id: 1, name: "Item 1" },
+      { id: 2, name: "Item 2" },
+    ];
+
+    await initTestBed(`
+      <App var.message="Not clicked">
+        <Text testId="output" value="{message}" />
+        <VStack height="200px">
+          <Tree 
+            testId="tree" 
+            data='{${JSON.stringify(data)}}' 
+            dataFormat="flat"
+            onContextMenu="message = 'Context menu triggered'"
+          />
+        </VStack>
+      </App>
+    `);
+
+    const tree = page.getByTestId("tree");
+    const output = page.getByTestId("output");
+
+    await expect(output).toHaveText("Not clicked");
+    await tree.click({ button: "right" });
+    await expect(output).toHaveText("Context menu triggered");
+  });
+});
+

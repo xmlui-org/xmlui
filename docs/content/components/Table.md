@@ -1367,6 +1367,14 @@ An AppState instance to synchronize the table's selection state with. The table 
 
 ## Events [#events]
 
+### `contextMenu` [#contextmenu]
+
+This event is triggered when the Table is right-clicked (context menu).
+
+**Signature**: `contextMenu(event: MouseEvent): void`
+
+- `event`: The mouse event object.
+
 ### `selectionDidChange` [#selectiondidchange]
 
 This event is triggered when the table's current selection (the rows selected) changes. Its parameter is an array of the selected table row items. 

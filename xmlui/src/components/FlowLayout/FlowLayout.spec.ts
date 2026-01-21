@@ -35,6 +35,19 @@ test.describe("Basic functionality", () => {
     expect(rect2.y).toBeLessThan(rect3.y);
   });
 
+  test("contextMenu event fires on right click", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(
+      `<FlowLayout testId="flow" onContextMenu="testState = 'context-menu-fired'">
+        <Text>Item 1</Text>
+      </FlowLayout>`
+    );
+
+    const flow = page.getByTestId("flow");
+    await flow.click({ button: "right" });
+
+    await expect.poll(testStateDriver.testState).toEqual("context-menu-fired");
+  });
+
   test("component renders when widths specified", async ({ page, initTestBed }) => {
     await initTestBed(`
       <FlowLayout>

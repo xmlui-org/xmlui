@@ -18,6 +18,17 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect((await createButtonDriver()).component).toBeAttached();
   });
 
+  test("contextMenu event fires on right click", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(
+      `<Button label="Test" onContextMenu="testState = 'context-menu-fired'" />`
+    );
+
+    const button = page.getByRole("button");
+    await button.click({ button: "right" });
+
+    await expect.poll(testStateDriver.testState).toEqual("context-menu-fired");
+  });
+
   // --- label
 
   test("renders ASCII text in label", async ({ initTestBed, createButtonDriver }) => {

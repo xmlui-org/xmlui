@@ -2,7 +2,7 @@ import styles from "./Card.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { createMetadata, dClick } from "../metadata-helpers";
+import { createMetadata, dClick, dContextMenu } from "../metadata-helpers";
 import { orientationOptionMd, alignmentOptionValues } from "../abstractions";
 import { Card, defaultProps } from "./CardNative";
 
@@ -85,6 +85,7 @@ export const CardMd = createMetadata({
   },
   events: {
     click: dClick(COMP),
+    contextMenu: dContextMenu(COMP),
   },
   apis: {
     scrollToTop: {
@@ -150,6 +151,7 @@ export const cardComponentRenderer = createComponentRenderer(
         horizontalAlignment={extractValue.asOptionalString(node.props.horizontalAlignment)}
         verticalAlignment={extractValue.asOptionalString(node.props.verticalAlignment)}
         onClick={lookupEventHandler("click")}
+        onContextMenu={lookupEventHandler("contextMenu")}
         registerComponentApi={registerComponentApi}
       >
         {renderChild(node.children, {

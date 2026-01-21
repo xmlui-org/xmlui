@@ -40,6 +40,7 @@ type Props = {
   scrollStyle?: ScrollStyle;
   showScrollerFade?: boolean;
   onClick?: any;
+  onContextMenu?: any;
   onMount?: any;
   registerComponentApi?: (api: any) => void;
 };
@@ -61,6 +62,7 @@ export const Stack = forwardRef(function Stack(
     scrollStyle = defaultProps.scrollStyle,
     showScrollerFade = defaultProps.showScrollerFade,
     onClick,
+    onContextMenu,
     onMount,
     className,
     registerComponentApi,
@@ -124,6 +126,7 @@ export const Stack = forwardRef(function Stack(
     <Scroller
       {...rest}
       onClick={onClick}
+      onContextMenu={onContextMenu}
       ref={containerRef}
       style={style}
       scrollStyle={scrollStyle}

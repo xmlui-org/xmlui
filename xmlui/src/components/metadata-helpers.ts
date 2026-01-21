@@ -48,6 +48,16 @@ export function dClick(comp: string): ComponentEventMetadata {
   };
 }
 
+export function dContextMenu(comp: string): ComponentEventMetadata {
+  return {
+    description: `This event is triggered when the ${comp} is right-clicked (context menu).`,
+    signature: "contextMenu(event: MouseEvent): void",
+    parameters: {
+      event: "The mouse event object.",
+    },
+  };
+}
+
 export function dInit(comp: string): ComponentEventMetadata {
   return {
     description: `This event is triggered when the ${comp} is about to be rendered for the first time.`,

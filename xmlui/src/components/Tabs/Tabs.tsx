@@ -5,7 +5,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 
 import { MemoizedItem } from "../container-helpers";
 import { Tabs, defaultProps } from "./TabsNative";
-import { createMetadata, d, dComponent, dDidChange } from "../metadata-helpers";
+import { createMetadata, d, dComponent, dDidChange, dContextMenu } from "../metadata-helpers";
 
 const COMP = "Tabs";
 
@@ -56,6 +56,7 @@ export const TabsMd = createMetadata({
     },
   },
   events: {
+    contextMenu: dContextMenu(COMP),
     didChange: dDidChange(COMP),
   },
   apis: {
@@ -117,6 +118,7 @@ export const tabsComponentRenderer = createComponentRenderer(
         tabAlignment={extractValue(node.props?.tabAlignment)}
         accordionView={extractValue(node.props?.accordionView)}
         onDidChange={lookupEventHandler("didChange")}
+        onContextMenu={lookupEventHandler("contextMenu")}
         registerComponentApi={registerComponentApi}
       >
         {renderChild(node.children)}

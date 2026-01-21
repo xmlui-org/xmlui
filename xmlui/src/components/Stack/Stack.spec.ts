@@ -16,6 +16,19 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByTestId("stack")).toBeEmpty();
   });
 
+  test("contextMenu event fires on right click", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(
+      `<Stack testId="stack" onContextMenu="testState = 'context-menu-fired'">
+        <Text>Item 1</Text>
+      </Stack>`
+    );
+
+    const stack = page.getByTestId("stack");
+    await stack.click({ button: "right" });
+
+    await expect.poll(testStateDriver.testState).toEqual("context-menu-fired");
+  });
+
   test("showScrollerFade is true by default", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Stack testId="stack" height="200px" scrollStyle="overlay">

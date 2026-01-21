@@ -11,6 +11,19 @@ test.describe("Basic Functionality", () => {
     await expect(driver.component).toBeVisible();
   });
 
+  test("contextMenu event fires on right click", async ({ initTestBed, page, createListDriver }) => {
+    const { testStateDriver } = await initTestBed(
+      `<List data="{[{id: 1, name: 'Item 1'}]}" onContextMenu="testState = 'context-menu-fired'">
+        <Text>{$item.name}</Text>
+      </List>`
+    );
+
+    const driver = await createListDriver();
+    await driver.component.click({ button: "right" });
+
+    await expect.poll(testStateDriver.testState).toEqual("context-menu-fired");
+  });
+
   test("renders array of objects correctly", async ({ initTestBed, createListDriver }) => {
     await initTestBed(`
       <List data="{[

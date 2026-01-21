@@ -2,7 +2,7 @@ import type { ComponentDef } from "../..";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
-import { createMetadata } from "../metadata-helpers";
+import { createMetadata, dContextMenu } from "../metadata-helpers";
 import { TreeComponent, defaultProps } from "./TreeNative";
 import styles from "./TreeComponent.module.scss";
 
@@ -128,6 +128,7 @@ export const TreeMd = createMetadata({
     },
   },
   events: {
+    contextMenu: dContextMenu(COMP),
     selectionDidChange: {
       description: `Fired when the tree selection changes.`,
       signature: "selectionDidChange(event: { selectedNode: FlatTreeNode | null, previousNode: FlatTreeNode | null }): void",
@@ -369,6 +370,7 @@ export const treeComponentRenderer = createComponentRenderer(
         onNodeExpanded={lookupEventHandler("nodeDidExpand")}
         onNodeCollapsed={lookupEventHandler("nodeDidCollapse")}
         loadChildren={lookupEventHandler("loadChildren")}
+        onContextMenu={lookupEventHandler("contextMenu")}
         itemRenderer={(flatTreeNode: any) => {
           const itemContext = {
             id: flatTreeNode.id,                     // $item.id - Internal unique identifier

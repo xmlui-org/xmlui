@@ -37,6 +37,7 @@ type Props = {
 } & Pick<
   React.HTMLAttributes<HTMLButtonElement>,
   | "onClick"
+  | "onContextMenu"
   | "onFocus"
   | "onBlur"
   | "onMouseEnter"
@@ -83,6 +84,7 @@ export const Button = React.forwardRef(function Button(
     children,
     formId,
     onClick,
+    onContextMenu,
     onFocus,
     onBlur,
     style,
@@ -146,6 +148,7 @@ export const Button = React.forwardRef(function Button(
       form={formId}
       style={style}
       onClick={onClick}
+      onContextMenu={onContextMenu}
       onFocus={onFocus}
       onBlur={onBlur}
     >

@@ -17,6 +17,7 @@ export function useMouseEventHandlers(lookupEvent: LookupEventHandlerFn, shouldS
   const onMouseLeave = useEventHandler("mouseLeave", lookupEvent, shouldSkip);
   const onMouseEnter = useEventHandler("mouseEnter", lookupEvent, shouldSkip);
   const onDoubleClick = useEventHandler("doubleClick", lookupEvent, shouldSkip);
+  const onContextMenu = useEventHandler("contextMenu", lookupEvent, shouldSkip);
 
   if (shouldSkip) {
     return EMPTY_OBJECT;
@@ -28,6 +29,7 @@ export function useMouseEventHandlers(lookupEvent: LookupEventHandlerFn, shouldS
       onMouseLeave,
       onMouseEnter,
       onDoubleClick,
+      onContextMenu,
     }).filter(([, value]) => value !== undefined)
   );
 
@@ -48,6 +50,9 @@ export function useMouseEventHandlers(lookupEvent: LookupEventHandlerFn, shouldS
         if (onEvent) {
           if (typeof event.stopPropagation === "function") {
             event?.stopPropagation();
+          }
+          if (typeof event.preventDefault === "function") {
+            event?.preventDefault();
           }
           onEvent(event);
         }

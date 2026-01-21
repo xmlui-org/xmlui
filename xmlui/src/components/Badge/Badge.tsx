@@ -9,7 +9,7 @@ import {
   isBadgeColors,
   type BadgeColors,
 } from "./BadgeNative";
-import { createMetadata, dInternal } from "../metadata-helpers";
+import { createMetadata, dContextMenu, dInternal } from "../metadata-helpers";
 import { toCssVar } from "../../parsers/style-parser/StyleParser";
 
 const COMP = "Badge";
@@ -43,7 +43,9 @@ export const BadgeMd = createMetadata({
         `key. If this property is not set, no color mapping is used.`,
     },
   },
-  events: {},
+  events: {
+    contextMenu: dContextMenu(COMP),
+  },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`padding-${COMP}`]: `$space-0_5 $space-2`,
@@ -60,7 +62,7 @@ export const BadgeMd = createMetadata({
 export const badgeComponentRenderer = createComponentRenderer(
   COMP,
   BadgeMd,
-  ({ node, extractValue, renderChild, className }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
     const value = extractValue.asDisplayText(node.props.value);
     const colorMap: Record<string, string | BadgeColors> | undefined = extractValue(
       node.props?.colorMap,
@@ -78,7 +80,12 @@ export const badgeComponentRenderer = createComponentRenderer(
       }
     }
     return (
-      <Badge variant={extractValue(node.props.variant)} color={colorValue} className={className}>
+      <Badge
+        variant={extractValue(node.props.variant)}
+        color={colorValue}
+        className={className}
+        onContextMenu={lookupEventHandler("contextMenu")}
+      >
         {value || (node.children && renderChild(node.children)) || String.fromCharCode(0xa0)}
       </Badge>
     );

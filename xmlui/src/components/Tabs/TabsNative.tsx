@@ -40,6 +40,7 @@ type Props = {
   className?: string;
   distributeEvenly?: boolean;
   onDidChange?: (index: number, id: string, label: string) => void;
+  onContextMenu?: any;
 };
 
 export const defaultProps = {
@@ -64,6 +65,7 @@ export const Tabs = forwardRef(function Tabs(
     className,
     distributeEvenly = defaultProps.distributeEvenly,
     onDidChange = noop,
+    onContextMenu,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -214,6 +216,7 @@ export const Tabs = forwardRef(function Tabs(
         ref={forwardedRef}
         className={classnames(className, styles.tabs)}
         value={`${currentTab}`}
+        onContextMenu={onContextMenu}
         onValueChange={(tab) => {
           const tabItem = tabItems.find((item) => item.innerId === tab);
           const newIndex = tabItems.findIndex((item) => item.innerId === tab);

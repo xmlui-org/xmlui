@@ -24,6 +24,7 @@ type Props = {
   horizontalAlignment?: string;
   verticalAlignment?: string;
   onClick?: any;
+  onContextMenu?: any;
   registerComponentApi?: (api: any) => void;
 };
 
@@ -47,6 +48,7 @@ export const Card = forwardRef(function Card(
     showAvatar = !!avatarUrl || defaultProps.showAvatar,
     avatarSize,
     onClick,
+    onContextMenu,
     registerComponentApi,
     ...rest
   }: Props,
@@ -131,6 +133,7 @@ export const Card = forwardRef(function Card(
       )}
       style={style}
       onClick={onClick}
+      onContextMenu={onContextMenu}
     >
       {[title, subtitle, avatarUrl, showAvatar].some(Boolean) && (
         <div className={styles.avatarWrapper}>

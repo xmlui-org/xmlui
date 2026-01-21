@@ -10,7 +10,7 @@ import {
   type BreakMode,
 } from "../abstractions";
 import { Text, defaultProps } from "./TextNative";
-import { createMetadata, d } from "../metadata-helpers";
+import { createMetadata, d, dContextMenu } from "../metadata-helpers";
 
 const COMP = "Text";
 
@@ -95,6 +95,9 @@ export const TextMd = createMetadata({
         },
       ],
     },
+  },
+  events: {
+    contextMenu: dContextMenu(COMP),
   },
   apis: {
     hasOverflow: {
@@ -202,7 +205,7 @@ export const TextMd = createMetadata({
 export const textComponentRenderer = createComponentRenderer(
   COMP,
   TextMd,
-  ({ node, extractValue, className, renderChild, registerComponentApi }) => {
+  ({ node, extractValue, className, renderChild, registerComponentApi, lookupEventHandler }) => {
     const {
       variant,
       maxLines,
@@ -233,6 +236,7 @@ export const textComponentRenderer = createComponentRenderer(
         overflowMode={extractValue(overflowMode) as OverflowMode | undefined}
         breakMode={extractValue(breakMode) as BreakMode | undefined}
         registerComponentApi={registerComponentApi}
+        onContextMenu={lookupEventHandler("contextMenu")}
         {...variantSpecificProps}
       >
         {extractValue.asDisplayText(value) || renderChild(node.children)}
