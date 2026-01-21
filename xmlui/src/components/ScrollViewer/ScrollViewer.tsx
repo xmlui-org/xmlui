@@ -77,6 +77,10 @@ export const ScrollViewerMd = createMetadata({
     [`backgroundColor-fadeTop-${SCROLLER}`]: "The background gradient for the top fade overlay (typically a gradient from opaque to transparent)",
     [`backgroundColor-fadeBottom-${SCROLLER}`]: "The background gradient for the bottom fade overlay (typically a gradient from transparent to opaque)",
     [`transition-fade-${SCROLLER}`]: "CSS transition for the fade overlays (opacity changes)",
+
+    // --- Auto-hide delays
+    [`autoHideDelay-whenMouseOver-${SCROLLER}`]: "Delay in milliseconds before hiding scrollbar after mouse leaves in whenMouseOver mode",
+    [`autoHideDelay-whenScrolling-${SCROLLER}`]: "Delay in milliseconds before hiding scrollbar after scrolling stops in whenScrolling mode",
   },
   defaultThemeVars: {
     // --- Scrollbar sizing
@@ -100,7 +104,7 @@ export const ScrollViewerMd = createMetadata({
     [`backgroundColor-handle-${SCROLLER}--active`]: "$color-surface-400",
     [`border-handle-${SCROLLER}`]: "none",
     [`border-handle-${SCROLLER}--hover`]: "none",
-    [`border-handle-${SCROLLER}--active`]: "1px solid red",
+    [`border-handle-${SCROLLER}--active`]: "none",
     [`minSize-handle-${SCROLLER}`]: "33px",
     [`maxSize-handle-${SCROLLER}`]: "none",
     [`size-perpendicularHandle-${SCROLLER}`]: "100%",
@@ -119,6 +123,10 @@ export const ScrollViewerMd = createMetadata({
     [`height-fade-${SCROLLER}`]: "64px",
     [`backgroundColor-fade-${SCROLLER}`]: "rgba(255, 255, 255, 0.75)",
     [`transition-fade-${SCROLLER}`]: "opacity 0.3s ease-in-out",
+
+    // --- Auto-hide delays
+    [`autoHideDelay-whenMouseOver-${SCROLLER}`]: "400",
+    [`autoHideDelay-whenScrolling-${SCROLLER}`]: "400",
   },
 });
 

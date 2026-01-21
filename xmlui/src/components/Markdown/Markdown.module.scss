@@ -161,13 +161,13 @@ $fontWeight-Tr-markdown: createThemeVar("fontWeight-Tr-markdown");
 $themeVars: t.composeBorderVars($themeVars, "Tr-markdown");
 
 // --- td
-$backgroundColor-HtmlTd: createThemeVar("backgroundColor-HtmlTd");
-$text-align-HtmlTd: createThemeVar("text-align-HtmlTd");
-$verticalAlignment-HtmlTd: createThemeVar("verticalAlignment-HtmlTd");
-$fontSize-HtmlTd: createThemeVar("fontSize-HtmlTd");
-$fontWeight-HtmlTd: createThemeVar("fontWeight-HtmlTd");
-$themeVars: t.composeBorderVars($themeVars, "HtmlTd");
-$themeVars: t.composePaddingVars($themeVars, "HtmlTd");
+$backgroundColor-Td-markdown: createThemeVar("backgroundColor-Td-markdown");
+$textAlign-Td-markdown: createThemeVar("textAlign-Td-markdown");
+$verticalAlignment-Td-markdown: createThemeVar("verticalAlignment-Td-markdown");
+$fontSize-Td-markdown: createThemeVar("fontSize-Td-markdown");
+$fontWeight-Td-markdown: createThemeVar("fontWeight-Td-markdown");
+$themeVars: t.composeBorderVars($themeVars, "Td-markdown");
+$themeVars: t.composePaddingVars($themeVars, "Td-markdown");
 
 // --- List styling (for both ul and ol)
 $themeVars: t.composeBorderVars($themeVars, "Ol-markdown");
@@ -466,7 +466,7 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
 
       & > :first-child {
         // Center icon with first line of text (baseline alignment)
-        margin-top: 0.1em;
+        margin-top: 0.25em;
       }
     }
 
@@ -612,7 +612,7 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
       color: $textColor-Tr-markdown;
       font-weight: $fontWeight-Tr-markdown;
       font-size: $fontSize-Tr-markdown;
-      @include t.borderVars($themeVars, "HtmlTr");
+      @include t.borderVars($themeVars, "Tr-markdown");
 
       &:nth-child(even) {
         background-color: $backgroundColor-even-Tr-markdown;
@@ -632,13 +632,13 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
 
     // --- td
     .htmlTd {
-      background-color: $backgroundColor-HtmlTd;
-      text-align: $text-align-HtmlTd;
-      vertical-align: $verticalAlignment-HtmlTd;
-      font-size: $fontSize-HtmlTd;
-      font-weight: $fontWeight-HtmlTd;
-      @include t.borderVars($themeVars, "HtmlTd");
-      @include t.paddingVars($themeVars, "HtmlTd");
+      background-color: $backgroundColor-Td-markdown;
+      text-align: $textAlign-Td-markdown;
+      vertical-align: $verticalAlignment-Td-markdown;
+      font-size: $fontSize-Td-markdown;
+      font-weight: $fontWeight-Td-markdown;
+      @include t.borderVars($themeVars, "Td-markdown");
+      @include t.paddingVars($themeVars, "Td-markdown");
       
       // Allow wrapping at word boundaries (spaces) and hyphens, but never break within words
       white-space: normal;

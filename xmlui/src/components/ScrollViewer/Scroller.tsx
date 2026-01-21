@@ -3,6 +3,7 @@ import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 import type { OverlayScrollbars } from "overlayscrollbars";
 import "overlayscrollbars/styles/overlayscrollbars.css";
 import styles from "./ScrollViewer.module.scss";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 
 export type ScrollStyle = "normal" | "overlay" | "whenMouseOver" | "whenScrolling";
 
@@ -43,6 +44,11 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
   const [showBottomFade, setShowBottomFade] = useState(false);
   const osInstanceRef = React.useRef<OverlayScrollbars | null>(null);
   const [osReady, setOsReady] = useState(false);
+  const { getThemeVar } = useTheme();
+
+  // Get auto-hide delay values from theme
+  const autoHideDelayMouseOver = parseInt(getThemeVar("autoHideDelay-whenMouseOver-Scroller") || "200", 10);
+  const autoHideDelayScrolling = parseInt(getThemeVar("autoHideDelay-whenScrolling-Scroller") || "400", 10);
 
   // Normalize scrollStyle to a valid value, defaulting to "normal" for unrecognized values
   const normalizedScrollStyle = (["normal", "overlay", "whenMouseOver", "whenScrolling"].includes(scrollStyle as string)
@@ -92,6 +98,45 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
       resizeObserver.disconnect();
     };
   }, [showScrollerFade, osReady, updateFadeIndicators]);
+
+  // Set up transition detection for all overlay scrollbar modes
+  useEffect(() => {
+    if (normalizedScrollStyle === "normal" || !osReady || !osInstanceRef.current) return;
+
+    const instance = osInstanceRef.current;
+    const { viewport } = instance.elements();
+    
+    if (!viewport) return;
+
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+    // Listen for transitionend events to update scrollbars after transitions complete
+    const handleTransitionEnd = (e: TransitionEvent) => {
+      // Only respond to grid-template-rows and opacity transitions (NavGroup expand/collapse)
+      // Ignore color, background-color transitions to prevent excessive updates
+      if (e.propertyName !== 'grid-template-rows' && e.propertyName !== 'opacity') {
+        return;
+      }
+      
+      // Debounce updates to avoid interfering with scrollbar auto-hide behavior
+      if (debounceTimer) clearTimeout(debounceTimer);
+      
+      debounceTimer = setTimeout(() => {
+        instance.update(true);
+        
+        if (showScrollerFade) {
+          updateFadeIndicators();
+        }
+      }, 50);
+    };
+
+    viewport.addEventListener('transitionend', handleTransitionEnd);
+
+    return () => {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      viewport.removeEventListener('transitionend', handleTransitionEnd);
+    };
+  }, [normalizedScrollStyle, osReady, showScrollerFade, updateFadeIndicators]);
 
   // Normal mode: use standard div with default browser scrollbar
   if (normalizedScrollStyle === "normal") {
@@ -158,7 +203,7 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
           options={{
             scrollbars: {
               autoHide: "leave",
-              autoHideDelay: 200,
+              autoHideDelay: autoHideDelayMouseOver,
             },
           }}
           {...rest}
@@ -198,7 +243,7 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
         options={{
           scrollbars: {
             autoHide: "scroll",
-            autoHideDelay: 400,
+            autoHideDelay: autoHideDelayScrolling,
           },
         }}
         {...rest}
