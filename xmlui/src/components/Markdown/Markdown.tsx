@@ -178,6 +178,9 @@ export const MarkdownMd = createMetadata({
     "fontWeight-Thead-markdown": "$fontWeight-bold",
     "padding-Th-markdown": "$space-2",
     "fontSize-Th-markdown": "$fontSize-sm",
+    "border-Tr-markdown": "1px solid $borderColor",
+    "padding-Td-markdown": "$space-2",
+    "verticalAlignment-Td-markdown": "top",
 
     "marginLeft-Ul-markdown": "$space-8",
     "marginRight-Ul-markdown": "$space-0",
@@ -196,7 +199,7 @@ export const MarkdownMd = createMetadata({
     "marginRight-Image-markdown": "$space-0",
 
     "marginTop-Text-markdown": "$space-3",
-    "marginBottom-Text-markdown": "$space-6",
+    "marginBottom-Text-markdown": "$space-3",
     "fontSize-Text-markdown": "$fontSize",
     "fontWeight-Text-markdown": "fontWeight-Text",
 

@@ -126,11 +126,13 @@ export const XmlUiDocsThemeDefinition: ThemeDefinition = {
     "marginTop-H1-markdown": "$space-2",
     "marginBottom-H1-markdown": "$space-2",
     "fontSize-H2-markdown": "$fontSize-3xl",
-    "marginTop-H2-markdown": "$space-8",
+    "marginTop-H2-markdown": "$space-6",
     "marginBottom-H2-markdown": "$space-1",
     "fontSize-H3-markdown": "$fontSize-xl",
-    "marginTop-H3-markdown": "$space-8",
+    "marginTop-H3-markdown": "$space-6",
     "marginBottom-H3-markdown": "$space-1",
+    "marginTop-H4-markdown": "$space-6",
+    "marginBottom-H4-markdown": "$space-1",
     "fontWeight-PrevNextLink": "500",
     "textColor-PrevNextLink": "$color-surface-900",
     "padding-PrevNextLink": "4px",
@@ -140,7 +142,6 @@ export const XmlUiDocsThemeDefinition: ThemeDefinition = {
     "backgroundColor-CodeBlock": "$color-surface-100",
     "textColor-Link": "$color-surface-600",
     "textColor-Link--hover": "$color-surface-900",
-    "fontSize-Text-code": "13px",
   },
 };
 
