@@ -2,9 +2,8 @@ import styles from "./ContextMenu.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { alignmentOptionMd } from "../abstractions";
-import { createMetadata, d } from "../metadata-helpers";
-import { ContextMenu, defaultContextMenuProps } from "./ContextMenuNative";
+import { createMetadata } from "../metadata-helpers";
+import { ContextMenu } from "./ContextMenuNative";
 import type { ContainerWrapperDef } from "../../components-core/rendering/ContainerWrapper";
 import { useMemo } from "react";
 
@@ -24,13 +23,9 @@ export const ContextMenuMd = createMetadata({
     },
   },
   props: {
-    alignment: {
-      description:
-        "This property allows you to determine the alignment of the context menu panel with " +
-        "the displayed menu items.",
-      valueType: "string",
-      availableValues: alignmentOptionMd,
-      defaultValue: defaultContextMenuProps.alignment,
+    menuWidth: {
+      type: "string",
+      description: "Sets the width of the context menu.",
     },
   },
   events: {},
@@ -38,10 +33,6 @@ export const ContextMenuMd = createMetadata({
     close: {
       description: `This method closes the context menu.`,
       signature: "close(): void",
-    },
-    open: {
-      description: `This method opens the context menu. Note: You should typically use openAt() instead to position the menu at specific coordinates.`,
-      signature: "open(): void",
     },
     openAt: {
       description:
@@ -77,6 +68,9 @@ export const contextMenuComponentRenderer = createComponentRenderer(
     // Get the context data from state
     const contextData = state.$context;
 
+    // Extract menuWidth property
+    const menuWidth = extractValue(node.props.menuWidth);
+
     // Wrap children in a Container with context variables to make $context available
     const nodeWithContextVars = useMemo(
       () =>
@@ -93,7 +87,7 @@ export const contextMenuComponentRenderer = createComponentRenderer(
         registerComponentApi={registerComponentApi}
         updateState={updateState}
         className={className}
-        alignment={extractValue(node.props?.alignment)}
+        menuWidth={menuWidth}
       >
         {renderChild(nodeWithContextVars)}
       </ContextMenu>

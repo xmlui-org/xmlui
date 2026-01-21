@@ -182,6 +182,7 @@ export const MenuItemMd = createMetadata({
     [`paddingVertical-${MICOMP}`]: "$space-2",
     [`paddingHorizontal-${MICOMP}`]: "$space-3",
     [`backgroundColor-${MICOMP}--hover`]: "$backgroundColor-dropdown-item--hover",
+    [`maxWidth-${MICOMP}`]: "100%",
     [`color-${MICOMP}--hover`]: "inherit",
     [`gap-${MICOMP}`]: "$space-2",
     [`color-${MICOMP}--active`]: "$color-primary",
@@ -197,7 +198,7 @@ export const menuItemRenderer = createComponentRenderer(
   ({ node, renderChild, lookupEventHandler, lookupAction, extractValue, className }) => {
     const clickEventHandler = lookupEventHandler("click");
 
-    let clickHandler;
+    let clickHandler: { (): void; (event: any): void; };
     const to = extractValue(node.props.to);
     if (!clickEventHandler && to?.trim()) {
       const navigateAction = lookupAction("navigate", { signError: false });

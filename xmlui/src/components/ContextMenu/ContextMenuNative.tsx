@@ -2,8 +2,6 @@ import {
   type CSSProperties,
   forwardRef,
   type ReactNode,
-  createContext,
-  useContext,
   useCallback,
   useState,
   useEffect,
@@ -16,7 +14,6 @@ import styles from "./ContextMenu.module.scss";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useTheme } from "../../components-core/theming/ThemeContext";
-import type { AlignmentOptions } from "../abstractions";
 import { DropdownMenuContext } from "../DropdownMenu/DropdownMenuNative";
 
 type ContextMenuProps = {
@@ -25,12 +22,8 @@ type ContextMenuProps = {
   updateState?: (state: any) => void;
   style?: CSSProperties;
   className?: string;
-  alignment?: AlignmentOptions;
   compact?: boolean;
-};
-
-export const defaultContextMenuProps: Pick<ContextMenuProps, "alignment"> = {
-  alignment: "start",
+  menuWidth?: string;
 };
 
 export const ContextMenu = forwardRef(function ContextMenu(
@@ -40,18 +33,19 @@ export const ContextMenu = forwardRef(function ContextMenu(
     updateState,
     style,
     className,
-    alignment = defaultContextMenuProps.alignment,
     compact = false,
+    menuWidth,
     ...rest
   }: ContextMenuProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { root } = useTheme();
+  const { root, getThemeVar } = useTheme();
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
   const [enableClicks, setEnableClicks] = useState(true);
   const [contentReady, setContentReady] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
+  const effectiveMenuWidth = menuWidth ?? getThemeVar("minWidth-ContextMenu") ?? "160px";
 
   const closeMenu = useCallback(() => {
     setOpen(false);
@@ -65,7 +59,8 @@ export const ContextMenu = forwardRef(function ContextMenu(
     // Prevent the browser's default context menu
     event.preventDefault();
     
-    // Set the position where the menu should appear
+    // Calculate coordinates - use clientX/clientY which are viewport-relative
+    // These coordinates will be adjusted relative to the portal container below
     setPosition({
       x: event.clientX,
       y: event.clientY,
@@ -97,34 +92,39 @@ export const ContextMenu = forwardRef(function ContextMenu(
 
   useEffect(() => {
     registerComponentApi?.({
-      open: () => setOpen(true),
       close: closeMenu,
       openAt,
     });
   }, [registerComponentApi, closeMenu, openAt]);
 
-  // Adjust menu position to stay within viewport
+  // Adjust menu position to stay within viewport (or portal container)
   useEffect(() => {
     if (open && position && contentReady && contentRef.current) {
       const content = contentRef.current;
-      const { innerWidth, innerHeight } = window;
       const rect = content.getBoundingClientRect();
       
-      let x = position.x;
-      let y = position.y;
+      // Get the portal container's bounds
+      // If root is document.body, use the window; otherwise use the root element's bounds
+      const containerRect = root && root !== document.body 
+        ? root.getBoundingClientRect() 
+        : { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
+      
+      // Calculate position relative to the container
+      let x = position.x - containerRect.left;
+      let y = position.y - containerRect.top;
       const margin = 8;
       
-      // Adjust horizontal position
-      if (x + rect.width > innerWidth - margin) {
-        x = innerWidth - rect.width - margin;
+      // Adjust horizontal position to stay within container
+      if (x + rect.width > containerRect.width - margin) {
+        x = containerRect.width - rect.width - margin;
       }
       if (x < margin) {
         x = margin;
       }
       
-      // Adjust vertical position
-      if (y + rect.height > innerHeight - margin) {
-        y = innerHeight - rect.height - margin;
+      // Adjust vertical position to stay within container
+      if (y + rect.height > containerRect.height - margin) {
+        y = containerRect.height - rect.height - margin;
       }
       if (y < margin) {
         y = margin;
@@ -133,7 +133,7 @@ export const ContextMenu = forwardRef(function ContextMenu(
       content.style.left = `${x}px`;
       content.style.top = `${y}px`;
     }
-  }, [open, position, contentReady]);
+  }, [open, position, contentReady, root]);
 
   return (
     <DropdownMenuContext.Provider value={{ closeMenu }}>
@@ -150,15 +150,28 @@ export const ContextMenu = forwardRef(function ContextMenu(
         <DropdownMenuPrimitive.Portal container={root}>
           <DropdownMenuPrimitive.Content
             ref={handleContentRef}
-            align={alignment}
             style={{
               ...style,
-              position: 'fixed',
+              minWidth: effectiveMenuWidth,
+              // Use absolute positioning when portal container is not document.body
+              // This allows positioning relative to the container
+              position: root && root !== document.body ? 'absolute' : 'fixed',
               // Initial positioning - will be adjusted by useEffect
-              left: position?.x ?? 0,
-              top: position?.y ?? 0,
+              // Calculate container-relative coordinates if using a custom container
+              left: position?.x ? (
+                root && root !== document.body
+                  ? position.x - root.getBoundingClientRect().left
+                  : position.x
+              ) : 0,
+              top: position?.y ? (
+                root && root !== document.body
+                  ? position.y - root.getBoundingClientRect().top
+                  : position.y
+              ) : 0,
               // Disable pointer events until mouse button is released
               pointerEvents: enableClicks ? 'auto' : 'none',
+              // Apply menuWidth if provided
+              ...(menuWidth && { width: menuWidth }),
             }}
             className={classnames(styles.ContextMenuContent, className, {
               [styles.compact]: compact,
