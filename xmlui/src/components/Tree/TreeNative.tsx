@@ -220,6 +220,27 @@ const findAllParentIds = (
 };
 
 /**
+ * Collect descendant node IDs for a given node.
+ * @param treeNode Root node
+ * @param includeSelf Whether to include the root node in the result
+ */
+const collectDescendantIds = (treeNode: TreeNode, includeSelf = false): Set<string> => {
+  const ids = new Set<string>();
+
+  const visit = (node: TreeNode, isRoot: boolean) => {
+    if (!isRoot || includeSelf) {
+      ids.add(String(node.key));
+    }
+    if (node.children) {
+      node.children.forEach((child) => visit(child, false));
+    }
+  };
+
+  visit(treeNode, true);
+  return ids;
+};
+
+/**
  * Expand all parent paths for an array of node IDs to ensure they are visible
  * @param nodeIds Array of node IDs that should be expanded
  * @param treeItemsById Map of all tree nodes by their ID
@@ -703,29 +724,24 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
             (n) => String(n.key) === String(node.key),
           );
 
-          const descendantIdsToClear = new Set<string>();
-          const collectDescendants = (treeNode: TreeNode) => {
-            if (treeNode.children) {
-              treeNode.children.forEach((child) => {
-                descendantIdsToClear.add(String(child.key));
-                collectDescendants(child);
-              });
-            }
-          };
-
-          if (nodeToLoad) {
-            collectDescendants(nodeToLoad);
-          }
+          const descendantIdsToClear = nodeToLoad
+            ? collectDescendantIds(nodeToLoad, false)
+            : new Set<string>();
 
           // Set loading state and clear descendant load states
           setNodeStates((prev) => {
             const newMap = new Map(prev);
             if (descendantIdsToClear.size > 0) {
-              for (const key of Array.from(newMap.keys())) {
-                if (descendantIdsToClear.has(String(key))) {
-                  newMap.delete(key);
-                }
+              const keyLookup = new Map<string, string | number>();
+              for (const key of newMap.keys()) {
+                keyLookup.set(String(key), key);
               }
+              descendantIdsToClear.forEach((id) => {
+                const keyToDelete = keyLookup.get(id);
+                if (keyToDelete !== undefined) {
+                  newMap.delete(keyToDelete);
+                }
+              });
             }
             newMap.set(node.key, "loading");
             return newMap;
@@ -839,16 +855,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         );
 
         if (nodeToCollapse) {
-          const idsToRemove = new Set<string>();
-
-          const collectDescendants = (treeNode: TreeNode) => {
-            idsToRemove.add(String(treeNode.key));
-            if (treeNode.children) {
-              treeNode.children.forEach((child) => collectDescendants(child));
-            }
-          };
-
-          collectDescendants(nodeToCollapse);
+          const idsToRemove = collectDescendantIds(nodeToCollapse, true);
 
           setExpandedIds((prev) => prev.filter((id) => !idsToRemove.has(String(id))));
         } else {
@@ -1156,17 +1163,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           (n) => String(n.key) === String(nodeId),
         );
         if (nodeToCollapse) {
-          const idsToRemove = new Set<string>();
-
-          // Recursively collect all descendant IDs
-          const collectDescendants = (treeNode: TreeNode) => {
-            idsToRemove.add(String(treeNode.key));
-            if (treeNode.children) {
-              treeNode.children.forEach((child) => collectDescendants(child));
-            }
-          };
-
-          collectDescendants(nodeToCollapse);
+          const idsToRemove = collectDescendantIds(nodeToCollapse, true);
 
           // Remove all descendant IDs from expanded list
           setExpandedIds((prev) => prev.filter((id) => !idsToRemove.has(String(id))));
