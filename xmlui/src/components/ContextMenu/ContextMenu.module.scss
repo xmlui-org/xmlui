@@ -1,0 +1,40 @@
+@use "../../components-core/theming/themes" as t;
+@use "../Menu/Menu.module.scss" as menu;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+// ContextMenu-specific theme variables (map to shared Menu variables)
+$backgroundColor-ContextMenu: createThemeVar("backgroundColor-ContextMenu");
+$borderRadius-ContextMenu: createThemeVar("borderRadius-ContextMenu");
+$boxShadow-ContextMenu: createThemeVar("boxShadow-ContextMenu");
+$borderColor-ContextMenu-content: createThemeVar("borderColor-ContextMenu-content");
+$borderWidth-ContextMenu-content: createThemeVar("borderWidth-ContextMenu-content");
+$borderStyle-ContextMenu-content: createThemeVar("borderStyle-ContextMenu-content");
+$minWidth-ContextMenu: createThemeVar("minWidth-ContextMenu");
+
+@layer components {
+
+  .ContextMenuContent {
+    @include menu.menuContent;
+    // ContextMenu-specific overrides using component-specific variables
+    background-color: $backgroundColor-ContextMenu;
+    border-radius: $borderRadius-ContextMenu;
+    min-width: $minWidth-ContextMenu;
+    box-shadow: $boxShadow-ContextMenu;
+    border: $borderWidth-ContextMenu-content $borderStyle-ContextMenu-content
+      $borderColor-ContextMenu-content;
+    // ContextMenu-specific animation duration (faster than DropdownMenu)
+    animation-duration: 200ms;
+    z-index: 9999;
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

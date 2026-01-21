@@ -29,9 +29,9 @@ type DropdownMenuContextType = {
   closeMenu: () => void;
 };
 
-const DropdownMenuContext = createContext<DropdownMenuContextType | null>(null);
+export const DropdownMenuContext = createContext<DropdownMenuContextType | null>(null);
 
-const useDropdownMenuContext = () => {
+export const useDropdownMenuContext = () => {
   const context = useContext(DropdownMenuContext);
   return context;
 };
@@ -264,7 +264,14 @@ export const SubMenuItem = forwardRef<HTMLDivElement, SubMenuItemProps>(function
   return (
     <DropdownMenuPrimitive.Sub open={open} onOpenChange={setOpen}>
       <DropdownMenuPrimitive.SubTrigger ref={ref} className={styles.DropdownMenuSubTrigger} asChild>
-        {triggerTemplate ? triggerTemplate : <div>{label}</div>}
+        {triggerTemplate ? (
+          triggerTemplate
+        ) : (
+          <div className={styles.subMenuItemTrigger}>
+            <span>{label}</span>
+            <Icon name="chevronright" fallback="chevronright" />
+          </div>
+        )}
       </DropdownMenuPrimitive.SubTrigger>
       <DropdownMenuPrimitive.Portal container={root}>
         <DropdownMenuPrimitive.SubContent
