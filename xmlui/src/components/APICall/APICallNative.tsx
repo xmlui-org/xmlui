@@ -64,6 +64,28 @@ function interpolateNotificationMessage(
   return message;
 }
 
+/**
+ * Step 9: Calculate next polling interval based on backoff strategy
+ */
+function calculateNextInterval(
+  baseInterval: number,
+  attempt: number,
+  strategy: string,
+  maxInterval: number
+): number {
+  switch (strategy) {
+    case 'linear':
+      // Add 1 second per attempt
+      return Math.min(baseInterval + (attempt * 1000), maxInterval);
+    case 'exponential':
+      // Double each time: baseInterval * 2^attempt
+      return Math.min(baseInterval * Math.pow(2, attempt), maxInterval);
+    case 'none':
+    default:
+      return baseInterval;
+  }
+}
+
 export function APICallNative({ registerComponentApi, node, uid, updateState, onStatusUpdate, onTimeout }: Props) {
   // Track deferred state using ref to avoid re-renders
   const deferredStateRef = useRef<DeferredState>({
@@ -104,7 +126,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     // Step 4: Cleanup polling on unmount
     return () => {
       if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
+        clearTimeout(pollingIntervalRef.current);
         pollingIntervalRef.current = null;
       }
     };
@@ -170,6 +192,10 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
             const pollingInterval = parseInt(pollingIntervalProp as string) || 2000;
             const maxPollingDuration = parseInt((node.props as any)?.maxPollingDuration as string) || 300000;
             
+            // Step 9: Get backoff configuration
+            const pollingBackoff = (node.props as any)?.pollingBackoff || 'none';
+            const maxPollingInterval = parseInt((node.props as any)?.maxPollingInterval as string) || 30000;
+            
             // Initialize polling state
             const newState = {
               ...deferredStateRef.current,
@@ -218,7 +244,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
                   deferredStateRef.current = timeoutState;
                   
                   if (pollingIntervalRef.current) {
-                    clearInterval(pollingIntervalRef.current);
+                    clearTimeout(pollingIntervalRef.current);
                     pollingIntervalRef.current = null;
                   }
                   
@@ -337,7 +363,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
                 if (updatedState.progress >= 100) {
                   // Stop polling
                   if (pollingIntervalRef.current) {
-                    clearInterval(pollingIntervalRef.current);
+                    clearTimeout(pollingIntervalRef.current);
                     pollingIntervalRef.current = null;
                   }
                   
@@ -370,18 +396,37 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
                       toast.success(interpolated, { id: toastIdRef.current });
                     }
                   }
+                  return; // Don't schedule next poll
                 }
+                
+                // Step 9: Schedule next poll with backoff
+                scheduleNextPoll();
                 
               } catch (statusError) {
                 console.error("Status request failed:", statusError);
+                // Step 9: Schedule retry even on error
+                scheduleNextPoll();
               }
             };
             
-            // Start polling loop
-            pollingIntervalRef.current = setInterval(pollStatus, pollingInterval);
+            // Step 9: Schedule next poll with backoff
+            const scheduleNextPoll = () => {
+              if (!deferredStateRef.current.isPolling) return;
+              
+              const nextInterval = calculateNextInterval(
+                pollingInterval,
+                deferredStateRef.current.attempts,
+                pollingBackoff,
+                maxPollingInterval
+              );
+              
+              pollingIntervalRef.current = setTimeout(pollStatus, nextInterval) as any;
+            };
             
-            // Make first poll immediately
-            pollStatus();
+            // Start polling loop - make first poll immediately, then schedule with backoff
+            pollStatus().then(() => {
+              scheduleNextPoll();
+            });
           } else {
             // Step 3: Single poll mode (no pollingInterval)
             try {
@@ -450,7 +495,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     
     // Step 4: Clear polling interval
     if (pollingIntervalRef.current) {
-      clearInterval(pollingIntervalRef.current);
+      clearTimeout(pollingIntervalRef.current);
       pollingIntervalRef.current = null;
     }
     
@@ -509,7 +554,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     
     // Step 4: Clear polling interval
     if (pollingIntervalRef.current) {
-      clearInterval(pollingIntervalRef.current);
+      clearTimeout(pollingIntervalRef.current);
       pollingIntervalRef.current = null;
     }
     

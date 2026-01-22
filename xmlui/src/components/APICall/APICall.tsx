@@ -154,6 +154,20 @@ export const APICallMd = createMetadata({
       valueType: "number",
       defaultValue: 300000,
     },
+    pollingBackoff: {
+      description:
+        "Strategy for increasing polling interval over time. Options: 'none' (fixed interval), " +
+        "'linear' (adds 1 second per attempt), 'exponential' (doubles each time). Defaults to 'none'.",
+      valueType: "string",
+      availableValues: ["none", "linear", "exponential"],
+      defaultValue: "none",
+    },
+    maxPollingInterval: {
+      description:
+        "Maximum interval between polls when using backoff strategies, in milliseconds. Defaults to 30000ms (30 seconds).",
+      valueType: "number",
+      defaultValue: 30000,
+    },
     completionCondition: {
       description:
         "Expression that returns true when the deferred operation is complete. " +

@@ -2658,3 +2658,72 @@ test.describe("Deferred Mode - Step 8: Timeout", () => {
     await expect.poll(testStateDriver.testState).toEqual('timeout');
   });
 });
+
+// =============================================================================
+// DEFERRED MODE - STEP 9: BACKOFF STRATEGIES
+// =============================================================================
+test.describe("Deferred Mode - Step 9: Retry Logic", () => {
+  test("retries status check on failure", async ({ 
+    initTestBed, 
+    createButtonDriver 
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall 
+          id="api" 
+          url="/api/task" 
+          method="post"
+          deferredMode="true"
+          statusUrl="/api/task/status"
+          pollingInterval="200"
+          pollingBackoff="exponential"
+          maxPollingInterval="1000"
+          completionCondition="$statusData.done === true"
+          onStatusUpdate="statusData => {
+            const updateCount = (testState?.updateCount || 0) + 1;
+            testState = { updateCount: updateCount, done: statusData.done };
+          }"
+        />
+        <Button onClick="api.execute()" testId="exec" />
+      </Fragment>
+    `, {
+      apiInterceptor: {
+        operations: {
+          "start": {
+            url: "/api/task",
+            method: "post",
+            handler: `
+              $state.pollTimestamps = [];
+              return { id: "t1" };
+            `,
+          },
+          "status": {
+            url: "/api/task/status",
+            method: "get",
+            handler: `
+              if (!$state.pollTimestamps) $state.pollTimestamps = [];
+              $state.pollTimestamps.push(Date.now());
+              
+              // Complete after 4 polls
+              if ($state.pollTimestamps.length >= 4) {
+                return { done: true, timestamps: $state.pollTimestamps };
+              }
+              
+              return { done: false };
+            `,
+          },
+        },
+      },
+    });
+    
+    const execButton = await createButtonDriver("exec");
+    await execButton.click();
+    
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    
+    const result = await testStateDriver.testState();
+    // Should have made 4 attempts (polls)
+    expect(result.updateCount).toBeGreaterThanOrEqual(3);
+    expect(result.done).toEqual(true);
+  });
+});

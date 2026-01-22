@@ -1381,7 +1381,7 @@ test.describe("Deferred Mode - Step 4: Polling Loop", () => {
 
 ---
 
-### Step 6: Add Progress Extraction & Context Variables
+### Step 6: Add Progress Extraction & Context Variables ✅
 
 **Goal**: Extract progress and expose context variables.
 
@@ -1508,7 +1508,7 @@ test.describe("Deferred Mode - Step 6: Progress & Context", () => {
 
 ---
 
-### Step 7: Add Notification Updates
+### Step 7: Add Notification Updates ✅
 
 **Goal**: Implement auto-updating toast notifications.
 
@@ -1588,7 +1588,7 @@ test.describe("Deferred Mode - Step 7: Notifications", () => {
 
 ---
 
-### Step 8: Add Timeout Detection
+### Step 8: Add Timeout Detection ✅
 
 **Goal**: Stop polling after `maxPollingDuration`.
 
