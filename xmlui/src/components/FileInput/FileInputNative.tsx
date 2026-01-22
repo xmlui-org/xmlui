@@ -34,11 +34,17 @@ function toDropzoneAccept(acceptsFileType: string | undefined): Accept | undefin
 // ============================================================================
 // React FileInput component implementation
 
-// Parse result type for multiple files
+// Parse result type for individual files
 export type ParseResult = {
   file: File;
   data: any[];
   error?: Error;
+};
+
+// Result type when parseAs is set
+export type ParseAsResult = {
+  files: File[];
+  parsedData: ParseResult[];
 };
 
 type Props = {
@@ -56,7 +62,7 @@ type Props = {
   buttonIconPosition?: IconPosition;
   // Input props
   updateState?: UpdateStateFn;
-  onDidChange?: (newValue: File[] | any[] | ParseResult[]) => void;
+  onDidChange?: (newValue: File[] | ParseAsResult) => void;
   onFocus?: () => void;
   onBlur?: () => void;
   registerComponentApi?: RegisterComponentApiFn;
@@ -218,6 +224,13 @@ export const FileInput = ({
             case "csv": {
               loggerService.log(["[FileInput] Entering CSV parse branch for:", file.name]);
 
+              // Check for empty file before parsing
+              const text = await file.text();
+              if (text.trim() === "") {
+                loggerService.log(["[FileInput] Empty CSV file, returning empty array"]);
+                return { file, data: [], error: undefined };
+              }
+
               const defaultCsvOptions: Papa.ParseConfig = {
                 header: true,
                 skipEmptyLines: true,
@@ -227,7 +240,7 @@ export const FileInput = ({
               loggerService.log(["[FileInput] CSV parse options:", defaultCsvOptions]);
 
               return new Promise<ParseResult>((resolve) => {
-                Papa.parse(file, {
+                Papa.parse(text, {
                   ...defaultCsvOptions,
                   complete: (results: Papa.ParseResult<any>) => {
                     loggerService.log(["[FileInput] Papa.parse complete callback called for:", file.name]);
@@ -271,6 +284,12 @@ export const FileInput = ({
               const text = await file.text();
               loggerService.log(["[FileInput] Read file text, length:", text.length]);
 
+              // Handle empty files gracefully
+              if (text.trim() === "") {
+                loggerService.log(["[FileInput] Empty JSON file, returning empty array"]);
+                return { file, data: [], error: undefined };
+              }
+
               const data = JSON.parse(text);
               const arrayData = Array.isArray(data) ? data : [data];
               loggerService.log(["[FileInput] JSON.parse successful, array length:", arrayData.length]);
@@ -312,22 +331,16 @@ export const FileInput = ({
         });
       }
 
-      // For single files, return just the data array; for multiple files, return ParseResult[]
-      if (multiple || directory) {
-        loggerService.log(["[FileInput] Multiple files mode - returning ParseResult[]"]);
-        loggerService.log(["[FileInput] Calling updateState with results"]);
-        updateState({ value: results });
-        loggerService.log(["[FileInput] Calling onDidChange with results"]);
-        onDidChange(results);
-      } else {
-        const singleResult = results[0];
-        loggerService.log(["[FileInput] Single file mode - returning data array for:", singleResult.file.name]);
-        loggerService.log(["[FileInput] Data array length:", singleResult.data.length]);
-        loggerService.log(["[FileInput] Calling updateState with data"]);
-        updateState({ value: singleResult.data });
-        loggerService.log(["[FileInput] Calling onDidChange with data"]);
-        onDidChange(singleResult.data);
-      }
+      // Return { files, parsedData } when parseAs is set for consistent access to both
+      const parseAsResult: ParseAsResult = {
+        files: acceptedFiles,
+        parsedData: results,
+      };
+      loggerService.log(["[FileInput] Returning ParseAsResult with", results.length, "parsed file(s)"]);
+      loggerService.log(["[FileInput] Calling updateState with parseAsResult"]);
+      updateState({ value: parseAsResult });
+      loggerService.log(["[FileInput] Calling onDidChange with parseAsResult"]);
+      onDidChange(parseAsResult);
 
       loggerService.log(["[FileInput] onDrop completed"]);
 
@@ -335,7 +348,7 @@ export const FileInput = ({
       setIsLoading(false);
       buttonRef.current?.focus();
     },
-    [updateState, onDidChange, parseAs, csvOptions, onParseError, multiple, directory],
+    [updateState, onDidChange, parseAs, csvOptions, onParseError],
   );
 
   const { getRootProps, getInputProps, open } = useDropzone({
