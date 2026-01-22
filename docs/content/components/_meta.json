@@ -74,6 +74,7 @@
   "PasswordInput": "PasswordInput",
   "PieChart": "PieChart",
   "ProgressBar": "ProgressBar",
+  "QRCode": "QRCode",
   "Queue": "Queue",
   "RadioGroup": "RadioGroup",
   "RealTimeAdapter": "RealTimeAdapter",

@@ -403,6 +403,7 @@
                 <NavLink icon="component" label="PasswordInput" to="/components/PasswordInput" />
                 <NavLink icon="component" label="PieChart" to="/components/PieChart" />
                 <NavLink icon="component" label="ProgressBar" to="/components/ProgressBar" />
+                <NavLink icon="component" label="QRCode" to="/components/QRCode" />
                 <NavLink icon="component" label="Queue" to="/components/Queue" />
                 <NavLink icon="component" label="RadioGroup" to="/components/RadioGroup" />
                 <NavLink icon="component" label="RealTimeAdapter" to="/components/RealTimeAdapter" />

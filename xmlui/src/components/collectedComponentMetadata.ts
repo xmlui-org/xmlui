@@ -213,6 +213,8 @@ import { ResponsiveBarMd } from "./ResponsiveBar/ResponsiveBar";
 import { ScrollViewer } from "./ScrollViewer/ScrollViewerNative";
 import { ScrollViewerMd } from "./ScrollViewer/ScrollViewer";
 import { ContextMenuMd } from "./ContextMenu/ContextMenu";
+import QRCode from "react-qr-code";
+import { QRCodeMd } from "./QRCode/QRCode";
 
 export const collectedComponentMetadata = {
   // --- HTML tags
@@ -385,6 +387,7 @@ export const collectedComponentMetadata = {
   Pagination: PaginationMd,
   PositionedContainer: PositionedContainerMd,
   ProgressBar: ProgressBarMd,
+  QRCode: QRCodeMd,
   Queue: QueueMd,
   RadioGroup: RadioGroupMd,
   RealTimeAdapter: RealTimeAdapterMd,

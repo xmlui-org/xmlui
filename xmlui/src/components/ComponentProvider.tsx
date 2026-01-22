@@ -151,6 +151,7 @@ import { autoCompleteComponentRenderer } from "./AutoComplete/AutoComplete";
 import type StandaloneExtensionManager from "../components-core/StandaloneExtensionManager";
 import { backdropComponentRenderer } from "./Backdrop/Backdrop";
 import { scrollViewerComponentRenderer } from "./ScrollViewer/ScrollViewer";
+import { qrCodeComponentRenderer } from "./QRCode/QRCode";
 import type { ThemeDefinition } from "../abstractions/ThemingDefs";
 import type { Extension } from "../abstractions/ExtensionDefs";
 import { brComponentRenderer, BrComponentRenderer } from "./Br/Br";
@@ -571,6 +572,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(vSplitterComponentRenderer);
       this.registerCoreComponent(hSplitterComponentRenderer);
       this.registerCoreComponent(queueComponentRenderer);
+      this.registerCoreComponent(qrCodeComponentRenderer);
       this.registerCoreComponent(positionedContainerComponentRenderer);
       this.registerCoreComponent(changeListenerComponentRenderer);
       this.registerCoreComponent(realTimeAdapterComponentRenderer);
