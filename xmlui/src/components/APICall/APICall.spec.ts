@@ -2939,3 +2939,262 @@ test.describe("Deferred Mode - Step 11: Cancellation", () => {
     await expect.poll(testStateDriver.testState).toEqual('done');
   });
 });
+
+// =============================================================================
+// DEFERRED MODE - STEP 12: INTEGRATION TESTING & POLISH
+// =============================================================================
+test.describe("Deferred Mode - Step 12: Integration & Polish", () => {
+  test("encryption at rest scenario - complete workflow", async ({ 
+    initTestBed, 
+    createButtonDriver,
+    page 
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall 
+          id="enableEncryption"
+          url="/api/encryption/enable"
+          method="post"
+          deferredMode="true"
+          statusUrl="/api/encryption/status/{$result.operationId}"
+          pollingInterval="800"
+          progressExtractor="$statusData.progress"
+          inProgressNotificationMessage="Enabling encryption: {$progress}% complete"
+          completedNotificationMessage="Encryption enabled successfully!"
+          onSuccess="result => testState = { started: true, id: result.operationId }"
+        />
+        <Button onClick="enableEncryption.execute()" testId="enable" label="Enable Encryption" />
+      </Fragment>
+    `, {
+      apiInterceptor: {
+        initialize: "$state.encryptionProgress = 0;",
+        operations: {
+          "enable": {
+            url: "/api/encryption/enable",
+            method: "post",
+            handler: `
+              $state.encryptionProgress = 0;
+              return { operationId: "enc-op-1" };
+            `,
+          },
+          "status": {
+            url: "/api/encryption/status/enc-op-1",
+            method: "get",
+            handler: `
+              $state.encryptionProgress += 50;
+              
+              if ($state.encryptionProgress >= 100) {
+                return { status: "completed", progress: 100 };
+              }
+              
+              return { status: "in-progress", progress: $state.encryptionProgress };
+            `,
+          },
+        },
+      },
+    });
+    
+    const button = await createButtonDriver("enable");
+    await button.click();
+    
+    // Should see initial success
+    await expect.poll(testStateDriver.testState).toHaveProperty('started', true);
+    
+    // Should see progress message
+    await expect(page.getByText(/Enabling encryption.*complete/)).toBeVisible({ timeout: 3000 });
+    
+    // Wait for completion
+    await expect(page.getByText("Encryption enabled successfully!")).toBeVisible({ timeout: 5000 });
+  });
+
+  test("handles multiple concurrent deferred operations", async ({ 
+    initTestBed, 
+    createButtonDriver 
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall 
+          id="task1"
+          url="/api/task1"
+          method="post"
+          deferredMode="true"
+          statusUrl="/api/task1/status"
+          pollingInterval="300"
+          onStatusUpdate="statusData => {
+            if (!testState) testState = { task1Updates: 0, task2Updates: 0 };
+            testState = { ...testState, task1Updates: testState.task1Updates + 1 };
+          }"
+        />
+        <APICall 
+          id="task2"
+          url="/api/task2"
+          method="post"
+          deferredMode="true"
+          statusUrl="/api/task2/status"
+          pollingInterval="300"
+          onStatusUpdate="statusData => {
+            if (!testState) testState = { task1Updates: 0, task2Updates: 0 };
+            testState = { ...testState, task2Updates: testState.task2Updates + 1 };
+          }"
+        />
+        <Button onClick="task1.execute(); task2.execute(); delay(1500); testState = { ...testState, done: true };" testId="exec" />
+      </Fragment>
+    `, {
+      apiInterceptor: {
+        initialize: "$state.task1Polls = 0; $state.task2Polls = 0;",
+        operations: {
+          "start-task1": {
+            url: "/api/task1",
+            method: "post",
+            handler: `return { taskId: "t1" };`,
+          },
+          "start-task2": {
+            url: "/api/task2",
+            method: "post",
+            handler: `return { taskId: "t2" };`,
+          },
+          "status-task1": {
+            url: "/api/task1/status",
+            method: "get",
+            handler: `
+              $state.task1Polls++;
+              if ($state.task1Polls >= 3) {
+                return { status: "completed" };
+              }
+              return { status: "pending" };
+            `,
+          },
+          "status-task2": {
+            url: "/api/task2/status",
+            method: "get",
+            handler: `
+              $state.task2Polls++;
+              if ($state.task2Polls >= 3) {
+                return { status: "completed" };
+              }
+              return { status: "pending" };
+            `,
+          },
+        },
+      },
+    });
+    
+    const execButton = await createButtonDriver("exec");
+    await execButton.click();
+    
+    await expect.poll(testStateDriver.testState).toHaveProperty('done', true);
+    
+    const result = await testStateDriver.testState();
+    // Both tasks should have received updates
+    expect(result.task1Updates).toBeGreaterThan(0);
+    expect(result.task2Updates).toBeGreaterThan(0);
+  });
+
+  test("can resume polling after stopPolling()", async ({ 
+    initTestBed, 
+    createButtonDriver 
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall 
+          id="api" 
+          url="/api/task" 
+          method="post"
+          deferredMode="true"
+          statusUrl="/api/task/status"
+          pollingInterval="400"
+        />
+        <Button onClick="
+          api.execute();
+          delay(300);
+          api.stopPolling();
+          delay(100);
+          let stoppedState = api.isPolling();
+          api.resumePolling();
+          delay(100);
+          let resumedState = api.isPolling();
+          testState = { stopped: !stoppedState, resumed: resumedState };
+        " testId="exec" />
+      </Fragment>
+    `, {
+      apiInterceptor: {
+        operations: {
+          "start": {
+            url: "/api/task",
+            method: "post",
+            handler: `return { taskId: "t1" };`,
+          },
+          "status": {
+            url: "/api/task/status",
+            method: "get",
+            handler: `return { status: "pending" };`,
+          },
+        },
+      },
+    });
+    
+    const execButton = await createButtonDriver("exec");
+    await execButton.click();
+    
+    await expect.poll(testStateDriver.testState).toBeTruthy();
+    const result = await testStateDriver.testState();
+    // Should have stopped polling
+    expect(result.stopped).toEqual(true);
+    // isPolling flag should be set to true after resume
+    expect(result.resumed).toEqual(true);
+  });
+
+  test("cleans up polling when component unmounts (stopPolling stops polls)", async ({ 
+    initTestBed,
+    createButtonDriver
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall 
+          id="api" 
+          url="/api/task" 
+          method="post"
+          deferredMode="true"
+          statusUrl="/api/task/status"
+          pollingInterval="300"
+          onStatusUpdate="statusData => {
+            if (!testState) testState = { pollCount: 0 };
+            testState = { pollCount: testState.pollCount + 1 };
+          }"
+        />
+        <Button onClick="api.execute(); delay(1000); api.stopPolling(); delay(1000); testState = { ...testState, done: true };" testId="exec" />
+      </Fragment>
+    `, {
+      apiInterceptor: {
+        operations: {
+          "start": {
+            url: "/api/task",
+            method: "post",
+            handler: `return { taskId: "t1" };`,
+          },
+          "status": {
+            url: "/api/task/status",
+            method: "get",
+            handler: `return { status: "pending" };`,
+          },
+        },
+      },
+    });
+    
+    const execButton = await createButtonDriver("exec");
+    await execButton.click();
+    
+    // Wait for completion
+    await expect.poll(testStateDriver.testState).toHaveProperty('done', true);
+    
+    const result = await testStateDriver.testState();
+    const pollCountBeforeWait = result.pollCount;
+    
+    // Wait a bit more to ensure no more polling
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    const finalResult = await testStateDriver.testState();
+    // Poll count should not have increased after stopPolling
+    expect(finalResult.pollCount).toEqual(pollCountBeforeWait);
+  });
+});
