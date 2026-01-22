@@ -30,8 +30,12 @@ export const defaultProps = {
   method: "get",
 };
 
+// =============================================================================
+// HELPER FUNCTIONS
+// =============================================================================
+
 /**
- * Step 7: Interpolates notification messages with context variables
+ * Interpolates notification messages with context variables
  * Replaces {$progress}, {$statusData.property}, etc. with actual values
  */
 function interpolateNotificationMessage(
@@ -65,7 +69,7 @@ function interpolateNotificationMessage(
 }
 
 /**
- * Step 9: Calculate next polling interval based on backoff strategy
+ * Calculate next polling interval based on backoff strategy
  */
 function calculateNextInterval(
   baseInterval: number,
@@ -167,13 +171,13 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     attempts: 0,
   });
 
-  // Step 4: Track polling interval for cleanup
+  // Track polling interval for cleanup
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Step 7: Track toast notification ID for updates
+  // Track toast notification ID for updates
   const toastIdRef = useRef<string | null>(null);
   
-  // Step 11: Track last result and execution context for cancel() method
+  // Track last result and execution context for cancel() method
   const lastResultRef = useRef<any>(null);
   const executionContextRef = useRef<ActionExecutionContext | null>(null);
 
@@ -187,7 +191,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
         loaded: false,
         lastResult: undefined,
         lastError: undefined,
-        // Step 6: Expose context variables for deferred mode
+        // Expose context variables for deferred mode
         ...(deferredMode && { 
           $statusData: deferredStateRef.current.statusData,
           $progress: deferredStateRef.current.progress,
@@ -199,7 +203,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
       });
     }
 
-    // Step 4: Cleanup polling on unmount
+    // Cleanup polling on unmount
     return () => {
       if (pollingIntervalRef.current) {
         clearTimeout(pollingIntervalRef.current);
@@ -207,6 +211,10 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
       }
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  
+  // =============================================================================
+  // DEFERRED OPERATIONS HANDLERS
+  // =============================================================================
   
   /**
    * Handles polling timeout - stops polling and fires onTimeout event
@@ -435,6 +443,10 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     });
   });
   
+  // =============================================================================
+  // MAIN API EXECUTION
+  // =============================================================================
+  
   // TODO pause until the apiInterceptorContext is initialized (to make sure the API calls are intercepted)
   const execute = useEvent(
     async (executionContext: ActionExecutionContext, ...eventArgs: any[]) => {
@@ -528,7 +540,10 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     },
   );
 
-  // Deferred state API methods
+  // =============================================================================
+  // DEFERRED STATE API METHODS
+  // =============================================================================
+
   const stopPolling = useEvent(() => {
     const newState = {
       ...deferredStateRef.current,
@@ -588,7 +603,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
   });
 
   const cancel = useEvent(async () => {
-    // Step 11: Server-side cancellation support
+    // Server-side cancellation support
     const cancelUrl = (node.props as any)?.cancelUrl;
     
     // Stop polling first
