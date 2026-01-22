@@ -1839,3 +1839,120 @@ test.describe("Deferred Mode - Step 1: Metadata", () => {
     // Both should initialize without type errors
   });
 });
+
+test.describe("Deferred Mode - Step 2: State Management", () => {
+  test("deferred API methods can be called and return expected values", async ({ 
+    initTestBed, 
+    createButtonDriver 
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall 
+          id="api" 
+          url="/api/test" 
+          method="get"
+          deferredMode="true" 
+        />
+        <Button 
+          onClick="
+            let status = api.getStatus();
+            let polling1 = api.isPolling();
+            api.resumePolling();
+            let polling2 = api.isPolling();
+            api.stopPolling();
+            let polling3 = api.isPolling();
+            testState = { status, polling1, polling2, polling3 };
+          " 
+          testId="test" 
+          label="Test" 
+        />
+      </Fragment>
+    `, {
+      apiInterceptor: basicApiInterceptor,
+    });
+    
+    const button = await createButtonDriver("test");
+    await button.click();
+
+    // Wait for state to be updated
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    
+    const result = await testStateDriver.testState();
+    expect(result.status).toEqual(null); // getStatus() returns null initially
+    expect(result.polling1).toEqual(false); // isPolling() returns false initially
+    expect(result.polling2).toEqual(true); // isPolling() returns true after resumePolling()
+    expect(result.polling3).toEqual(false); // isPolling() returns false after stopPolling()
+  });
+
+  test("deferred state does not interfere with normal APICall operation", async ({ 
+    initTestBed, 
+    createButtonDriver 
+  }) => {
+    const { testStateDriver } = await initTestBed(
+      `
+      <Fragment>
+        <APICall 
+          id="api" 
+          url="/api/test" 
+          method="get" 
+          deferredMode="true"
+          onSuccess="arg => testState = arg.message"
+        />
+        <Button testId="trigger" onClick="api.execute()" label="Execute" />
+      </Fragment>
+    `,
+      {
+        apiInterceptor: basicApiInterceptor,
+      },
+    );
+
+    const button = await createButtonDriver("trigger");
+    await button.click();
+
+    // Wait for completion
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    // Should execute normally even with deferredMode enabled
+    await expect.poll(testStateDriver.testState).toEqual("GET success");
+  });
+
+  test("cancel() method can be called", async ({ 
+    initTestBed, 
+    createButtonDriver 
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall 
+          id="api" 
+          url="/api/test" 
+          method="get"
+          deferredMode="true" 
+        />
+        <Button 
+          onClick="
+            api.resumePolling();
+            let before = api.isPolling();
+            api.cancel();
+            let after = api.isPolling();
+            testState = { before, after };
+          " 
+          testId="test" 
+          label="Test" 
+        />
+      </Fragment>
+    `, {
+      apiInterceptor: basicApiInterceptor,
+    });
+    
+    const button = await createButtonDriver("test");
+    await button.click();
+
+    // Wait for state to be updated
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    
+    const result = await testStateDriver.testState();
+    expect(result.before).toEqual(true); // Should be polling before cancel
+    expect(result.after).toEqual(false); // Should not be polling after cancel
+  });
+});
+

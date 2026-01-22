@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import type { ActionExecutionContext } from "../../abstractions/ActionDefs";
@@ -13,19 +13,38 @@ interface Props {
   updateState?: (state: any) => void;
 }
 
+interface DeferredState {
+  isPolling: boolean;
+  statusData: any;
+  progress: number;
+  attempts: number;
+  startTime?: number;
+}
+
 export const defaultProps = {
   method: "get",
 };
 
 export function APICallNative({ registerComponentApi, node, uid, updateState }: Props) {
+  // Track deferred state using ref to avoid re-renders
+  const deferredStateRef = useRef<DeferredState>({
+    isPolling: false,
+    statusData: null,
+    progress: 0,
+    attempts: 0,
+  });
+
   // Initialize state with default values
   useEffect(() => {
+    const deferredMode = (node.props as any)?.deferredMode === "true" || (node.props as any)?.deferredMode === true;
+    
     if (updateState) {
       updateState({ 
         inProgress: false, 
         loaded: false,
         lastResult: undefined,
-        lastError: undefined
+        lastError: undefined,
+        ...(deferredMode && { deferredState: { ...deferredStateRef.current } })
       });
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -83,12 +102,65 @@ export function APICallNative({ registerComponentApi, node, uid, updateState }: 
     },
   );
 
+  // Deferred state API methods
+  const stopPolling = useEvent(() => {
+    const newState = {
+      ...deferredStateRef.current,
+      isPolling: false,
+    };
+    deferredStateRef.current = newState;
+    
+    if (updateState) {
+      updateState({ deferredState: { ...newState } });
+    }
+    return false;
+  });
+
+  const resumePolling = useEvent(() => {
+    const newState = {
+      ...deferredStateRef.current,
+      isPolling: true,
+    };
+    deferredStateRef.current = newState;
+    
+    if (updateState) {
+      updateState({ deferredState: { ...newState } });
+    }
+    return true;
+  });
+
+  const getStatus = useEvent(() => {
+    return deferredStateRef.current.statusData;
+  });
+
+  const isPolling = useEvent(() => {
+    return deferredStateRef.current.isPolling;
+  });
+
+  const cancel = useEvent(async () => {
+    // Placeholder for Step 11 implementation
+    const newState = {
+      ...deferredStateRef.current,
+      isPolling: false,
+    };
+    deferredStateRef.current = newState;
+    
+    if (updateState) {
+      updateState({ deferredState: { ...newState } });
+    }
+  });
+
   useEffect(() => {
     registerComponentApi({
       execute: execute,
+      stopPolling: stopPolling,
+      resumePolling: resumePolling,
+      getStatus: getStatus,
+      isPolling: isPolling,
+      cancel: cancel,
       _SUPPORT_IMPLICIT_CONTEXT: true,
     });
-  }, [execute, registerComponentApi]);
+  }, [execute, stopPolling, resumePolling, getStatus, isPolling, cancel, registerComponentApi]);
 
   return null;
 }
