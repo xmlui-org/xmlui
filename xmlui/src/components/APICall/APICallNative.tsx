@@ -86,6 +86,78 @@ function calculateNextInterval(
   }
 }
 
+/**
+ * Interpolates URL templates with result context variables
+ * Example: "/api/status/{$result.taskId}" -> "/api/status/task-123"
+ */
+function interpolateUrl(template: string, result: any): string {
+  if (!result || typeof result !== 'object') return template;
+  
+  return template.replace(/\{\$result\.([^}]+)\}/g, (match, key) => {
+    return result[key] ?? match;
+  });
+}
+
+/**
+ * Updates component state with deferred operation context variables
+ */
+function updateDeferredState(
+  deferredState: DeferredState,
+  updateState: ((state: any) => void) | undefined
+): void {
+  if (!updateState) return;
+  
+  const elapsed = Date.now() - (deferredState.startTime || Date.now());
+  
+  updateState({
+    $statusData: deferredState.statusData,
+    $progress: deferredState.progress,
+    $polling: deferredState.isPolling,
+    $attempts: deferredState.attempts,
+    $elapsed: elapsed,
+    deferredState: { ...deferredState }
+  });
+}
+
+/**
+ * Extracts progress value from status data using progressExtractor expression
+ * Returns a number between 0 and 100
+ */
+function extractProgress(
+  statusData: any,
+  progressExtractor: string | undefined,
+  executionContext: ActionExecutionContext,
+  result: any
+): number {
+  if (!progressExtractor || !statusData) return 0;
+  
+  try {
+    const parser = new Parser(progressExtractor);
+    const expr = parser.parseExpr();
+    
+    const contextForProgress = {
+      $statusData: statusData,
+      $result: result,
+    };
+    
+    const extractedValue = evalBinding(expr, {
+      localContext: contextForProgress,
+      appContext: executionContext.appContext,
+      options: {
+        defaultToOptionalMemberAccess: true,
+      },
+    });
+    
+    if (extractedValue !== undefined && extractedValue !== null) {
+      return Math.max(0, Math.min(100, Number(extractedValue)));
+    }
+  } catch (error) {
+    console.error("Error evaluating progressExtractor:", error);
+  }
+  
+  return 0;
+}
+
 export function APICallNative({ registerComponentApi, node, uid, updateState, onStatusUpdate, onTimeout }: Props) {
   // Track deferred state using ref to avoid re-renders
   const deferredStateRef = useRef<DeferredState>({

@@ -93,8 +93,9 @@ Use banner comments to mark sections:
 
 ## Execution Order
 
-1. ⬜ **Fix linting** (3 type casts) - 2 min
-2. ⬜ **Create helper functions** (interpolateUrl, updateDeferredState, extractProgress) - 10 min
+1. ✅ **Fix linting** (3 type casts) - 2 min
+2. ✅ **Create helper functions** (interpolateUrl, updateDeferredState, extractProgress) - 10 min
+3. ⬜ **Extract polling timeout handler** - 5 min
 3. ⬜ **Extract polling timeout handler** - 5 min
 4. ⬜ **Extract polling completion handler** - 5 min
 5. ⬜ **Extract single poll logic** - 8 min
