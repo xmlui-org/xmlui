@@ -442,6 +442,166 @@ export const ComponentName = forwardRef(function ComponentName(
 
 **Key conventions:** Always use `forwardRef`, define TypeScript interfaces, export `defaultProps`, use scoped CSS modules, support standard HTML attributes via `...rest`, handle accessibility (ARIA), and do NOT set `displayName`.
 
+## Component Documentation
+
+XMLUI components use a special documentation format stored in `.md` files within each component's folder. Documentation is **generated** from these files, not manually created.
+
+### Documentation File Structure
+
+Create a `ComponentName.md` file in the component folder (e.g., `src/components/QRCode/QRCode.md`).
+
+**File location:**
+```
+ComponentName/
+├── ComponentName.tsx
+├── ComponentName.md              # Documentation file (when requested)
+├── ComponentNameNative.tsx
+└── ComponentName.module.scss
+```
+
+### Documentation Format
+
+The documentation uses special section markers that the documentation generator processes:
+
+```markdown
+%-DESC-START
+
+**Key features:**
+- **Feature 1**: Description
+- **Feature 2**: Description
+- **Feature 3**: Description
+
+%-DESC-END
+
+%-PROP-START propName
+
+```xmlui-pg copy display name="Example: propName"
+<App>
+  <ComponentName propName="value" />
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START anotherProp
+
+Additional text explaining the property.
+
+```xmlui-pg copy display name="Example: anotherProp variants"
+<App>
+  <ComponentName anotherProp="option1" />
+  <ComponentName anotherProp="option2" />
+</App>
+```
+
+%-PROP-END
+
+%-EVENT-START eventName
+
+```xmlui-pg copy display name="Example: eventName"
+<App>
+  <ComponentName onEventName="toast('Event fired')" />
+</App>
+```
+
+%-EVENT-END
+
+%-USE-CASES-START
+
+## Use Case Title
+
+Description of the use case.
+
+```xmlui-pg copy display name="Example: use case"
+<App>
+  <ComponentName />
+</App>
+```
+
+## Another Use Case
+
+More examples and best practices.
+
+%-USE-CASES-END
+```
+
+### Section Markers
+
+**Required markers:**
+
+- `%-DESC-START` / `%-DESC-END` - Component description with key features (appears at the top)
+- `%-PROP-START propName` / `%-PROP-END` - Examples for specific properties
+  - Must match exact property names from metadata
+  - Can include multiple code examples per property
+  - Add explanatory text between examples
+
+**Optional markers:**
+
+- `%-EVENT-START eventName` / `%-EVENT-END` - Event handler examples
+- `%-USE-CASES-START` / `%-USE-CASES-END` - Advanced examples, use cases, and best practices
+  - Can contain multiple sections with markdown headings
+  - Great for showcasing real-world usage patterns
+
+### Code Example Format
+
+All interactive examples use the `xmlui-pg` code fence with attributes:
+
+```markdown
+```xmlui-pg copy display name="Example: descriptive title"
+<App>
+  <ComponentName prop="value" />
+</App>
+```
+```
+
+**Attributes:**
+- `copy` - Enables copy-to-clipboard button
+- `display` - Shows the example in the playground
+- `name="Example: title"` - Descriptive title for the example
+
+### Documentation Rules
+
+❌ **Don't:**
+- Create documentation files in `docs/content/components/` (auto-generated location)
+- Use regular markdown code fences (use `xmlui-pg` instead)
+- Add examples without section markers
+- Forget to match property/event names exactly
+
+✅ **Do:**
+- Place `.md` file in the component's folder alongside `.tsx` files
+- Use section markers for all content
+- Provide clear, self-contained examples
+- Include key features in the description
+- Show multiple use cases for complex properties
+- Reference theme variables when applicable
+
+### Documentation Generation
+
+Documentation is generated via:
+
+```bash
+npm run generate-docs-with-refresh
+```
+
+This processes all `ComponentName.md` files and generates the final documentation in `docs/content/components/`.
+
+**Generation process:**
+1. Reads component metadata from `ComponentName.tsx`
+2. Merges with examples from `ComponentName.md`
+3. Generates complete documentation with:
+   - Property tables from metadata
+   - Code examples from `.md` file
+   - Theme variable tables
+   - Event documentation
+
+### Examples to Reference
+
+See these components for documentation examples:
+- `Button.md` - Comprehensive property examples
+- `Avatar.md` - Simple, focused examples
+- `Stack.md` - Layout-focused examples
+- `Select.md` - Form component with many options
+
 ## Testing
 
 Follow patterns in [testing-conventions.md](./testing-conventions.md).
