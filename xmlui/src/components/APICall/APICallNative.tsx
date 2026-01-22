@@ -234,6 +234,36 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     }
   });
   
+  /**
+   * Handles polling completion - stops polling and shows completion notification
+   */
+  const handlePollingCompletion = useEvent((updatedState: DeferredState, result: any) => {
+    if (pollingIntervalRef.current) {
+      clearTimeout(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
+    }
+    
+    const completionState = {
+      ...updatedState,
+      isPolling: false,
+    };
+    deferredStateRef.current = completionState;
+    updateDeferredState(completionState, updateState);
+    
+    // Show completion notification
+    const completedMessage = (node.props as any)?.completedNotificationMessage;
+    if (completedMessage && toastIdRef.current) {
+      const interpolated = interpolateNotificationMessage(completedMessage, {
+        progress: completionState.progress,
+        statusData: completionState.statusData,
+        result: result,
+      });
+      if (interpolated) {
+        toast.success(interpolated, { id: toastIdRef.current });
+      }
+    }
+  });
+  
   // TODO pause until the apiInterceptorContext is initialized (to make sure the API calls are intercepted)
   const execute = useEvent(
     async (executionContext: ActionExecutionContext, ...eventArgs: any[]) => {
@@ -438,41 +468,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
                 
                 // Step 7: Check for completion (simple check for now - progress === 100)
                 if (updatedState.progress >= 100) {
-                  // Stop polling
-                  if (pollingIntervalRef.current) {
-                    clearTimeout(pollingIntervalRef.current);
-                    pollingIntervalRef.current = null;
-                  }
-                  
-                  const completionState = {
-                    ...updatedState,
-                    isPolling: false,
-                  };
-                  deferredStateRef.current = completionState;
-                  
-                  if (updateState) {
-                    updateState({ 
-                      $statusData: completionState.statusData,
-                      $progress: completionState.progress,
-                      $polling: completionState.isPolling,
-                      $attempts: completionState.attempts,
-                      $elapsed: Date.now() - (completionState.startTime || Date.now()),
-                      deferredState: { ...completionState }
-                    });
-                  }
-                  
-                  // Show completion notification
-                  const completedMessage = (node.props as any)?.completedNotificationMessage;
-                  if (completedMessage && toastIdRef.current) {
-                    const interpolated = interpolateNotificationMessage(completedMessage, {
-                      progress: completionState.progress,
-                      statusData: completionState.statusData,
-                      result: result,
-                    });
-                    if (interpolated) {
-                      toast.success(interpolated, { id: toastIdRef.current });
-                    }
-                  }
+                  handlePollingCompletion(updatedState, result);
                   return; // Don't schedule next poll
                 }
                 
