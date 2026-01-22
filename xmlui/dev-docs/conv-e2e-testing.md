@@ -532,6 +532,77 @@ Write async operations in sequence - XMLUI executes them sequentially:
     });
   });
 " />
+**Banned Functions:**
+
+XMLUI scripts cannot use certain global functions that manage timers and execution flow. See `bannedFunctions.ts` for the complete list.
+
+Commonly banned functions include:
+- `setTimeout`, `setInterval`, `clearTimeout`, `clearInterval`
+- `setImmediate`, `clearImmediate`
+- `requestAnimationFrame`, `cancelAnimationFrame`
+- `requestIdleCallback`, `cancelIdleCallback`
+- `queueMicrotask`
+- `eval`
+
+```typescript
+// ❌ INCORRECT - setTimeout is banned
+onValidate="async value => {
+  await new Promise(resolve => setTimeout(resolve, 500));
+  return { isValid: true };
+}"
+
+// ✅ CORRECT - Use delay() function instead
+onValidate="value => {
+  await delay(500);
+  return { isValid: true };
+}"
+```
+
+**Async Event Handlers:**
+
+Event handlers like `onValidate` are automatically handled as async by XMLUI. Do NOT use the `async` keyword explicitly:
+
+```typescript
+// ❌ INCORRECT - Don't use async keyword in XMLUI scripts
+onValidate="async value => {
+  await delay(500);
+  return { isValid: true };
+}"
+
+// ✅ CORRECT - XMLUI handles async automatically
+onValidate="value => {
+  await delay(500);
+  return { isValid: true };
+}"
+```
+
+**Using the delay() function:**
+
+For asynchronous delays in XMLUI scripts, use the `delay()` function which is available globally:
+
+```typescript
+// Simple delay
+onValidate="value => {
+  await delay(500);
+  return { isValid: value.length >= 3 };
+}"
+
+// Delay with multiple operations
+onValidate="value => {
+  await delay(1000);
+  if (!testState) testState = { validationCount: 0 };
+  testState.validationCount = testState.validationCount + 1;
+  return { isValid: value && value.includes('test') };
+}"
+```
+
+`delay` can also accept a callback function:
+
+```typescript
+onValidate="value => {
+  await delay(1500, () => { testState = value });
+  return true;
+}"
 ```
 
 ### Non-Visual Components

@@ -118,6 +118,15 @@ export const FormMd = createMetadata({
       type: "boolean",
       defaultValue: defaultProps.enableSubmit,
     },
+    formValidationTimeout: {
+      description:
+        `This property sets the maximum time (in milliseconds) to wait for all async field validations ` +
+        `to complete when submitting the form. If validations do not complete within this timeout, ` +
+        `the form submission is blocked and a validation error is displayed. Individual fields can ` +
+        `also have their own timeout via \`customValidationsTimeout\`.`,
+      type: "number",
+      defaultValue: defaultProps.formValidationTimeout,
+    },
     submitUrl: d(`URL to submit the form data.`),
     submitMethod: {
       description:

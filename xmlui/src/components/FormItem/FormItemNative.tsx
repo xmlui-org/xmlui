@@ -255,8 +255,8 @@ export const FormItem = memo(function FormItem({
   useEffect(() => {
     // Always dispatch fieldInitialized to ensure noSubmit tracking
     // Pass undefined as value when initialValue is undefined to avoid overwriting existing values
-    dispatch(fieldInitialized(formItemId, initialValue, false, noSubmit));
-  }, [dispatch, formItemId, initialValue, noSubmit]);
+    dispatch(fieldInitialized(formItemId, initialValue, false, noSubmit, !!_onValidate));
+  }, [dispatch, formItemId, initialValue, noSubmit, _onValidate]);
 
   const onStateChange = useCallback(
     ({ value }: any, options?: any) => {

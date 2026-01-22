@@ -2057,6 +2057,389 @@ test.describe("Basic Functionality", () => {
       await expect(field1Driver.component).not.toContainText("Field 1: minimum 5 chars");
       await expect(field2Driver.component).toContainText("Field 2: must contain test");
     });
+
+    test.describe("Form-level validation timeout", () => {
+      test("form waits for all async validations to complete before submitting", async ({
+        initTestBed,
+        createFormDriver,
+      }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Form
+            data="{{ field1: 'test1', field2: 'test2' }}"
+            onSubmit="data => testState = { submitted: true, data }">
+            <FormItem 
+              testId="field1"
+              label="Field 1" 
+              bindTo="field1"
+              onValidate="(value) => {
+                await delay(500); return { isValid: true };
+              }"
+            />
+            <FormItem 
+              testId="field2"
+              label="Field 2" 
+              bindTo="field2"
+              onValidate="(value) => {
+                await delay(300); return { isValid: true };
+              }"
+            />
+          </Form>
+        `);
+
+        const formDriver = await createFormDriver();
+
+        // Submit form
+        await formDriver.submitForm();
+
+        // Form should wait for all validations and then submit
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state?.submitted === true;
+        }, { timeout: 3000 }).toBe(true);
+
+        const state = await testStateDriver.testState();
+        expect(state?.data).toEqual({ field1: "test1", field2: "test2" });
+      });
+
+      test("form times out if async validations take too long", async ({
+        initTestBed,
+        createFormDriver,
+        page,
+      }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Form
+            data="{{ field1: 'test1' }}"
+            formValidationTimeout="500"
+            onSubmit="data => testState = { submitted: true }">
+            <FormItem 
+              testId="field1"
+              label="Field 1" 
+              bindTo="field1"
+              onValidate="(value) => {
+                await delay(2000); return { isValid: true };
+              }"
+            />
+          </Form>
+        `);
+
+        const formDriver = await createFormDriver();
+
+        // Submit form
+        await formDriver.submitForm();
+
+        // Should show timeout error message
+        await expect(page.getByText(/Form validation timed out after 500ms/)).toBeVisible({ timeout: 2000 });
+
+        // Form should NOT have submitted
+        const state = await testStateDriver.testState();
+        expect(state?.submitted).not.toBe(true);
+      });
+
+      test("form shows custom timeout error message in validation summary", async ({
+        initTestBed,
+        createFormDriver,
+        page,
+      }) => {
+        await initTestBed(`
+          <Form
+            data="{{ field1: 'test1', field2: 'test2' }}"
+            formValidationTimeout="600">
+            <FormItem 
+              testId="field1"
+              label="Field 1" 
+              bindTo="field1"
+              onValidate="(value) => {
+                await delay(1000); return { isValid: true };
+              }"
+            />
+            <FormItem 
+              testId="field2"
+              label="Field 2" 
+              bindTo="field2"
+              onValidate="(value) => {
+                await delay(800); return { isValid: true };
+              }"
+            />
+          </Form>
+        `);
+
+        const formDriver = await createFormDriver();
+
+        // Submit form
+        await formDriver.submitForm();
+
+        // Should show timeout error with correct timeout value
+        await expect(page.getByText(/Form validation timed out after 600ms/)).toBeVisible({ timeout: 2000 });
+        await expect(page.getByText(/Some fields are still validating/)).toBeVisible();
+      });
+
+      test("form uses default 10s timeout when formValidationTimeout not specified", async ({
+        initTestBed,
+        createFormDriver,
+      }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Form
+            data="{{ field1: 'test1' }}"
+            onSubmit="data => testState = { submitted: true, data }">
+            <FormItem 
+              testId="field1"
+              label="Field 1" 
+              bindTo="field1"
+              onValidate="(value) => {
+                await delay(500); return { isValid: true };
+              }"
+            />
+          </Form>
+        `);
+
+        const formDriver = await createFormDriver();
+
+        // Submit form
+        await formDriver.submitForm();
+
+        // With default 10s timeout, validation should complete successfully
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state?.submitted === true;
+        }, { timeout: 3000 }).toBe(true);
+
+        const state = await testStateDriver.testState();
+        expect(state?.data).toEqual({ field1: "test1" });
+      });
+
+      test("multiple fields with async validations all complete within form timeout", async ({
+        initTestBed,
+        createFormDriver,
+      }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Form
+            data="{{ field1: 'test1', field2: 'test2', field3: 'test3' }}"
+            formValidationTimeout="3000"
+            onSubmit="data => testState = { submitted: true, validationSequence: testState?.validationSequence || [] }">
+            <FormItem 
+              testId="field1"
+              label="Field 1" 
+              bindTo="field1"
+              onValidate="(value) => {
+                await delay(400); 
+                if (!testState) testState = { validationSequence: [] };
+                testState.validationSequence = testState.validationSequence.concat(['field1']);
+                return { isValid: true };
+              }"
+            />
+            <FormItem 
+              testId="field2"
+              label="Field 2" 
+              bindTo="field2"
+              onValidate="(value) => {
+                await delay(600);
+                if (!testState) testState = { validationSequence: [] };
+                testState.validationSequence = testState.validationSequence.concat(['field2']);
+                return { isValid: true };
+              }"
+            />
+            <FormItem 
+              testId="field3"
+              label="Field 3" 
+              bindTo="field3"
+              onValidate="(value) => {
+                await delay(300);
+                if (!testState) testState = { validationSequence: [] };
+                testState.validationSequence = testState.validationSequence.concat(['field3']);
+                return { isValid: true };
+              }"
+            />
+          </Form>
+        `);
+
+        const formDriver = await createFormDriver();
+
+        // Submit form
+        await formDriver.submitForm();
+
+        // All validations should complete within timeout and form should submit
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state?.submitted === true;
+        }, { timeout: 4000 }).toBe(true);
+
+        // All three validations should have run
+        const state = await testStateDriver.testState();
+        expect(state?.validationSequence).toContain("field1");
+        expect(state?.validationSequence).toContain("field2");
+        expect(state?.validationSequence).toContain("field3");
+      });
+
+      test("form timeout blocks submission even when some fields complete successfully", async ({
+        initTestBed,
+        createFormDriver,
+        page,
+      }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Form
+            data="{{ field1: 'test1', field2: 'test2' }}"
+            formValidationTimeout="700"
+            onSubmit="data => testState = { submitted: true }">
+            <FormItem 
+              testId="field1"
+              label="Field 1" 
+              bindTo="field1"
+              onValidate="(value) => {
+                await delay(200);
+                return { isValid: true };
+              }"
+            />
+            <FormItem 
+              testId="field2"
+              label="Field 2" 
+              bindTo="field2"
+              onValidate="(value) => {
+                await delay(1500);
+                return { isValid: true };
+              }"
+            />
+          </Form>
+        `);
+
+        const formDriver = await createFormDriver();
+
+        // Submit form
+        await formDriver.submitForm();
+
+        // Should show timeout error even though field1 completed
+        await expect(page.getByText(/Form validation timed out after 700ms/)).toBeVisible({ timeout: 2000 });
+
+        // Form should NOT have submitted
+        const state = await testStateDriver.testState();
+        expect(state?.submitted).not.toBe(true);
+      });
+
+      test("form timeout works correctly with field-level timeout", async ({
+        initTestBed,
+        createFormDriver,
+        createFormItemDriver,
+        page,
+      }) => {
+        await initTestBed(`
+          <Form
+            data="{{ field1: 'test1', field2: 'test2' }}"
+            formValidationTimeout="2000">
+            <FormItem 
+              testId="field1"
+              label="Field 1" 
+              bindTo="field1"
+              customValidationsTimeout="500"
+              customValidationsTimeoutMessage="Field 1 validation timeout"
+              onValidate="(value) => {
+                await delay(1000); return { isValid: true };
+              }"
+            />
+            <FormItem 
+              testId="field2"
+              label="Field 2" 
+              bindTo="field2"
+              onValidate="(value) => {
+                await delay(300); return { isValid: true };
+              }"
+            />
+          </Form>
+        `);
+
+        const formDriver = await createFormDriver();
+        const field1Driver = await createFormItemDriver("field1");
+
+        // Submit form
+        await formDriver.submitForm();
+
+        // Field 1 should timeout with its custom message
+        await expect(field1Driver.component).toContainText("Field 1 validation timeout", { timeout: 1500 });
+
+        // Form should not show form-level timeout since field timeout is shorter
+        // and blocks the submission
+        await expect(page.getByText(/Form validation timed out/)).not.toBeVisible();
+      });
+
+      test("form proceeds normally when all validations complete before timeout", async ({
+        initTestBed,
+        createFormDriver,
+      }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Form
+            data="{{ field1: 'test1', field2: 'test2' }}"
+            formValidationTimeout="5000"
+            onSubmit="data => testState = { submitted: true, data }">
+            <FormItem 
+              testId="field1"
+              label="Field 1" 
+              bindTo="field1"
+              onValidate="(value) => {
+                await delay(100);
+                return { isValid: value && value.length >= 3, invalidMessage: 'Too short', severity: 'error' };
+              }"
+            />
+            <FormItem 
+              testId="field2"
+              label="Field 2" 
+              bindTo="field2"
+              onValidate="(value) => {
+                await delay(150);
+                return { isValid: value && value.includes('test'), invalidMessage: 'Must include test', severity: 'error' };
+              }"
+            />
+          </Form>
+        `);
+
+        const formDriver = await createFormDriver();
+
+        // Submit form
+        await formDriver.submitForm();
+
+        // Form should submit successfully
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state?.submitted === true;
+        }, { timeout: 2000 }).toBe(true);
+
+        const state = await testStateDriver.testState();
+        expect(state?.data).toEqual({ field1: "test1", field2: "test2" });
+      });
+
+      test("form timeout respects validation failures within timeout period", async ({
+        initTestBed,
+        createFormDriver,
+        createFormItemDriver,
+      }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Form
+            data="{{ field1: 'ab' }}"
+            formValidationTimeout="2000"
+            onSubmit="data => testState = { submitted: true }">
+            <FormItem 
+              testId="field1"
+              label="Field 1" 
+              bindTo="field1"
+              onValidate="(value) => {
+                await delay(300);
+                return { isValid: value && value.length >= 5, invalidMessage: 'Too short - need 5+ chars', severity: 'error' };
+              }"
+            />
+          </Form>
+        `);
+
+        const formDriver = await createFormDriver();
+        const field1Driver = await createFormItemDriver("field1");
+
+        // Submit form
+        await formDriver.submitForm();
+
+        // Should show validation error (not timeout error)
+        await expect(field1Driver.component).toContainText("Too short - need 5+ chars", { timeout: 1500 });
+
+        // Form should NOT have submitted due to validation failure
+        const state = await testStateDriver.testState();
+        expect(state?.submitted).not.toBe(true);
+      });
+    });
   });
 
   // =============================================================================

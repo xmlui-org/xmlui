@@ -91,12 +91,20 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       } else {
         state.noSubmitFields[uid] = false;
       }
+      // Track fields that have async validation handlers
+      if (action.payload.hasOnValidate && !state.fieldsRequiringValidation.includes(uid)) {
+        state.fieldsRequiringValidation.push(uid);
+      }
       break;
     }
     case FormActionKind.FIELD_REMOVED: {
       delete state.validationResults[uid];
       delete state.interactionFlags[uid];
       delete state.noSubmitFields[uid];
+      const reqIndex = state.fieldsRequiringValidation.indexOf(uid);
+      if (reqIndex !== -1) state.fieldsRequiringValidation.splice(reqIndex, 1);
+      const pendIndex = state.validationsPending.indexOf(uid);
+      if (pendIndex !== -1) state.validationsPending.splice(pendIndex, 1);
       break;
     }
     case FormActionKind.FIELD_VALUE_CHANGED: {
@@ -128,8 +136,17 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
           isValid: mergedValidations.find((val) => !val.isValid) === undefined,
           validations: mergedValidations,
         };
+        // Mark validation as pending when partial result is dispatched
+        if (!state.validationsPending.includes(uid)) {
+          state.validationsPending.push(uid);
+        }
       } else {
         state.validationResults[uid] = action.payload.validationResult;
+        // Mark validation as complete when non-partial result is dispatched
+        const pendIndex = state.validationsPending.indexOf(uid);
+        if (pendIndex !== -1) {
+          state.validationsPending.splice(pendIndex, 1);
+        }
       }
       const currentIsInvalidToValid = !prevValid && state.validationResults[uid].isValid;
       if (currentIsInvalidToValid) {
@@ -205,6 +222,8 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       return {
         ...initialState,
         resetVersion: (state.resetVersion ?? 0) + 1,
+        fieldsRequiringValidation: [],
+        validationsPending: [],
       };
     }
     default:
@@ -220,6 +239,8 @@ interface FormState {
   noSubmitFields: Record<string, boolean>; // Track noSubmit flag for each field
   submitInProgress?: boolean;
   resetVersion?: number;
+  fieldsRequiringValidation: string[]; // Fields that have onValidate handlers
+  validationsPending: string[]; // Fields currently running async validations
 }
 
 const initialState: FormState = {
@@ -230,6 +251,8 @@ const initialState: FormState = {
   noSubmitFields: {},
   submitInProgress: false,
   resetVersion: 0,
+  fieldsRequiringValidation: [],
+  validationsPending: [],
 };
 
 type OnSubmit = (
@@ -272,6 +295,7 @@ type Props = {
   verboseValidationFeedback?: boolean;
   validationIconSuccess?: string;
   validationIconError?: string;
+  formValidationTimeout?: number;
 };
 
 export const defaultProps: Pick<
@@ -289,6 +313,7 @@ export const defaultProps: Pick<
   | "itemRequireLabelMode"
   | "validationIconSuccess"
   | "validationIconError"
+  | "formValidationTimeout"
 > = {
   cancelLabel: "Cancel",
   saveLabel: "Save",
@@ -303,6 +328,7 @@ export const defaultProps: Pick<
   itemRequireLabelMode: "markRequired",
   validationIconSuccess: "checkmark",
   validationIconError: "error",
+  formValidationTimeout: 10000, // 10 seconds
 };
 
 // --- Remove the properties from formState.subject where the property name ends with UNBOUND_FIELD_SUFFIX
@@ -351,13 +377,20 @@ const Form = forwardRef(function (
     verboseValidationFeedback,
     validationIconSuccess = defaultProps.validationIconSuccess,
     validationIconError = defaultProps.validationIconError,
+    formValidationTimeout = defaultProps.formValidationTimeout,
     ...rest
   }: Props,
   ref: ForwardedRef<HTMLFormElement>,
 ) {
   const formRef = useRef<HTMLFormElement>(null);
+  const formStateRef = useRef<FormState>(formState);
   const [confirmSubmitModalVisible, setConfirmSubmitModalVisible] = useState(false);
   const requestModalFormClose = useModalFormClose();
+
+  // Keep formStateRef in sync with formState
+  useEffect(() => {
+    formStateRef.current = formState;
+  }, [formState]);
 
   const isEnabled = enabled && !formState.submitInProgress;
   const isDirty = useMemo(() => {
@@ -406,17 +439,83 @@ const Form = forwardRef(function (
     void requestModalFormClose();
   });
 
-  const doValidate = useEvent(() => {
+  /**
+   * Wait for all async validations to complete with a timeout
+   * @param timeout - Maximum time to wait in milliseconds
+   * @returns Promise that resolves when all validations complete or timeout occurs
+   */
+  const waitForAsyncValidations = useEvent(async (timeout: number): Promise<boolean> => {
+    const startTime = Date.now();
+    
+    // Poll for async validations to complete
+    while (true) {
+      const currentState = formStateRef.current;
+      
+      // Check if all fields that need validation have started
+      const allFieldsStarted = currentState.fieldsRequiringValidation.every(
+        fieldId => currentState.validationResults[fieldId] !== undefined
+      );
+      
+      // Check if all validations have completed
+      const allFieldsCompleted = currentState.validationsPending.length === 0;
+      
+      if (allFieldsStarted && allFieldsCompleted) {
+        // All async validations have completed
+        return true;
+      }
+      
+      const elapsed = Date.now() - startTime;
+      if (elapsed >= timeout) {
+        // Timeout occurred
+        return false;
+      }
+      
+      // Wait a bit before checking again (avoid tight loop)
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
+  });
+
+  const doValidate = useEvent(async () => {
     // Trigger validation display on all fields
     dispatch(triedToSubmit());
 
-    // Get validation results grouped by severity
+    // Wait for async validations to complete with timeout
+    const timeoutMs = formValidationTimeout ?? defaultProps.formValidationTimeout!;
+    const validationsCompleted = await waitForAsyncValidations(timeoutMs);
+    
+    if (!validationsCompleted) {
+      // Timeout occurred - add a validation error
+      const timeoutError: SingleValidationResult = {
+        isValid: false,
+        severity: 'error',
+        invalidMessage: `Form validation timed out after ${timeoutMs}ms. Some fields are still validating.`,
+      };
+      
+      // Dispatch the timeout error to generalValidationResults so it appears in ValidationSummary
+      dispatch(
+        backendValidationArrived({
+          generalValidationResults: [timeoutError],
+          fieldValidationResults: {},
+        }),
+      );
+      
+      // Return validation result with timeout error (use ref for current state)
+      return {
+        isValid: false,
+        data: cleanUpSubject(formStateRef.current.subject, formStateRef.current.noSubmitFields),
+        errors: [timeoutError],
+        warnings: [],
+        validationResults: formStateRef.current.validationResults,
+      };
+    }
+
+    // Get validation results grouped by severity (use ref for current state)
     const { error, warning } = groupInvalidValidationResultsBySeverity(
-      Object.values(formState.validationResults),
+      Object.values(formStateRef.current.validationResults),
     );
 
-    // Prepare cleaned data
-    const cleanedData = cleanUpSubject(formState.subject, formState.noSubmitFields);
+    // Prepare cleaned data (use ref for current state)
+    const cleanedData = cleanUpSubject(formStateRef.current.subject, formStateRef.current.noSubmitFields);
 
     // Return validation result
     return {
@@ -424,7 +523,7 @@ const Form = forwardRef(function (
       data: cleanedData,
       errors: error,
       warnings: warning,
-      validationResults: formState.validationResults,
+      validationResults: formStateRef.current.validationResults,
     };
   });
 
@@ -445,7 +544,7 @@ const Form = forwardRef(function (
     setConfirmSubmitModalVisible(false);
 
     // Use the extracted validation logic
-    const validationResult = doValidate();
+    const validationResult = await doValidate();
 
     if (!validationResult.isValid) {
       return;
@@ -752,6 +851,7 @@ export const FormWithContextVar = forwardRef(function (
         verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
         validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
         validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
+        formValidationTimeout={extractValue.asOptionalNumber(node.props.formValidationTimeout)}
         formState={formState}
         dispatch={dispatch}
         id={node.uid}
