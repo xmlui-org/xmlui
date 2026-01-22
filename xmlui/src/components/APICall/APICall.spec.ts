@@ -70,6 +70,22 @@ const confirmationInterceptor: ApiInterceptorDefinition = {
   },
 };
 
+// Step 3: Single poll mock backend
+const singlePollMock: ApiInterceptorDefinition = {
+  operations: {
+    "start": {
+      url: "/api/operation",
+      method: "post",
+      handler: `return { operationId: "op-123" };`,
+    },
+    "status": {
+      url: "/api/operation/status/op-123",
+      method: "get",
+      handler: `return { status: "completed", progress: 100 };`,
+    },
+  },
+};
+
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================
@@ -1953,6 +1969,115 @@ test.describe("Deferred Mode - Step 2: State Management", () => {
     const result = await testStateDriver.testState();
     expect(result.before).toEqual(true); // Should be polling before cancel
     expect(result.after).toEqual(false); // Should not be polling after cancel
+  });
+});
+
+test.describe("Deferred Mode - Step 3: Single Poll", () => {
+  test("makes status request after initial call", async ({ 
+    initTestBed, 
+    createButtonDriver 
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall 
+          id="api" 
+          url="/api/operation" 
+          method="post"
+          deferredMode="true"
+          statusUrl="/api/operation/status/{$result.operationId}"
+        />
+        <Button onClick="api.execute(); delay(100); testState = api.getStatus();" testId="exec" label="Execute" />
+      </Fragment>
+    `, {
+      apiInterceptor: singlePollMock,
+    });
+    
+    const execButton = await createButtonDriver("exec");
+    
+    // Execute operation
+    await execButton.click();
+    
+    // Poll until status is set
+    await expect.poll(testStateDriver.testState).toEqual({ status: "completed", progress: 100 });
+  });
+
+  test("status request interpolates result variables", async ({ 
+    initTestBed, 
+    createButtonDriver 
+  }) => {
+    const customMock: ApiInterceptorDefinition = {
+      operations: {
+        "start": {
+          url: "/api/job",
+          method: "post",
+          handler: `return { jobId: "job-456", type: "export" };`,
+        },
+        "status": {
+          url: "/api/job/job-456/status",
+          method: "get",
+          handler: `return { jobId: "job-456", status: "done" };`,
+        },
+      },
+    };
+
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall 
+          id="api" 
+          url="/api/job" 
+          method="post"
+          deferredMode="true"
+          statusUrl="/api/job/{$result.jobId}/status"
+        />
+        <Button onClick="api.execute(); delay(100); testState = api.getStatus();" testId="exec" label="Execute" />
+      </Fragment>
+    `, {
+      apiInterceptor: customMock,
+    });
+    
+    const execButton = await createButtonDriver("exec");
+    
+    // Execute operation and wait for status
+    await execButton.click();
+    
+    // Poll until we get the status
+    await expect.poll(async () => {
+      const status = await testStateDriver.testState();
+      return status?.jobId;
+    }).toEqual("job-456");
+    
+    const status = await testStateDriver.testState();
+    expect(status.status).toEqual("done");
+  });
+
+  test("does not make status request when statusUrl not provided", async ({ 
+    initTestBed, 
+    createButtonDriver 
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall 
+          id="api" 
+          url="/api/operation" 
+          method="post"
+          deferredMode="true"
+        />
+        <Button onClick="api.execute(); delay(100); testState = api.getStatus();" testId="exec" label="Execute" />
+      </Fragment>
+    `, {
+      apiInterceptor: singlePollMock,
+    });
+    
+    const execButton = await createButtonDriver("exec");
+    
+    // Execute operation
+    await execButton.click();
+    
+    // Wait a bit then check - should stay null
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    const status = await testStateDriver.testState();
+    expect(status).toEqual(null); // No status request made
   });
 });
 

@@ -87,6 +87,52 @@ export function APICallNative({ registerComponentApi, node, uid, updateState }: 
           });
         }
         
+        // Step 3: Single poll for deferred operations
+        const deferredMode = (node.props as any)?.deferredMode === "true" || (node.props as any)?.deferredMode === true;
+        if (deferredMode && (node.props as any)?.statusUrl) {
+          // Extract statusUrl with result context
+          let statusUrl = (node.props as any).statusUrl as string;
+          
+          // Replace {$result.xxx} placeholders with actual values from result
+          if (result && typeof result === 'object') {
+            statusUrl = statusUrl.replace(/\{\$result\.([^}]+)\}/g, (match, key) => {
+              return result[key] ?? match;
+            });
+          }
+          
+          // Make single status request using callApi
+          try {
+            const statusMethod = ((node.props as any)?.statusMethod as string) || "get";
+            const statusData = await callApi(
+              executionContext,
+              {
+                url: statusUrl,
+                method: statusMethod,
+                uid: uid,
+                params: { $result: result },
+              },
+              {
+                resolveBindingExpressions: false,
+              },
+            );
+            
+            // Store status data
+            const newState = {
+              ...deferredStateRef.current,
+              statusData: statusData,
+              attempts: 1,
+              startTime: Date.now(),
+            };
+            deferredStateRef.current = newState;
+            
+            if (updateState) {
+              updateState({ deferredState: { ...newState } });
+            }
+          } catch (statusError) {
+            console.error("Status request failed:", statusError);
+          }
+        }
+        
         return result;
       } catch (error) {
         // Store error and update state on failure

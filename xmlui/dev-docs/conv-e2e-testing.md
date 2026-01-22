@@ -382,6 +382,51 @@ const dateStr = "2025-08-07";
 const pattern = "test";
 ```
 
+**NO async/await keywords:**
+
+XMLUI automatically handles asynchronous operations without explicit `async`/`await` syntax:
+
+```typescript
+// ✅ CORRECT - XMLUI handles async automatically
+<Button onClick="api.execute(); delay(100); testState = api.getStatus();" />
+
+// ❌ INCORRECT - No await keyword
+<Button onClick="await api.execute(); await delay(100); testState = api.getStatus();" />
+```
+
+**Use delay() instead of setTimeout():**
+
+```typescript
+// ✅ CORRECT - Use delay() function
+<Button onClick="api.execute(); delay(100); testState = api.getStatus();" />
+
+// ❌ INCORRECT - setTimeout not available
+<Button onClick="api.execute().then(() => { setTimeout(() => { testState = api.getStatus(); }, 100); })" />
+```
+
+**Sequential async operations:**
+
+Write async operations in sequence - XMLUI executes them sequentially:
+
+```typescript
+// ✅ CORRECT - XMLUI awaits each operation automatically
+<Button onClick="
+  let result = api.execute();
+  delay(100);
+  let status = api.getStatus();
+  testState = { result, status };
+" />
+
+// ❌ INCORRECT - Promise chains not needed
+<Button onClick="
+  api.execute().then(result => {
+    return delay(100).then(() => {
+      testState = { result, status: api.getStatus() };
+    });
+  });
+" />
+```
+
 ### Non-Visual Components
 
 Access APIs through Button click handlers:

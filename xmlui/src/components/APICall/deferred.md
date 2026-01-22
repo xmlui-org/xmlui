@@ -164,6 +164,64 @@ Automatic toast notifications with progress updates:
 
 ## Implementation Strategy
 
+### Testing Best Practice
+
+**⚠️ IMPORTANT: Efficient Test Execution**
+
+When implementing each step:
+1. **After making changes**: Run ONLY the failing/new tests first using `--grep` flag
+   ```bash
+   npx playwright test APICall.spec.ts --grep "Step 3" --reporter=line
+   ```
+2. **Once specific tests pass**: Run the complete test suite to ensure no regressions
+   ```bash
+   npx playwright test APICall.spec.ts --reporter=line
+   ```
+
+This approach saves significant time during iterative development while ensuring overall quality.
+
+### XMLUI Scripting Patterns
+
+**⚠️ IMPORTANT: XMLUI Script Constraints**
+
+XMLUI scripting has different patterns than standard JavaScript:
+
+1. **Async/Await**: XMLUI does NOT support `async`/`await` keywords
+   - XMLUI automatically detects async functions and awaits them
+   - Write async code as if it's synchronous
+   ```xmlui
+   <!-- ✅ CORRECT - XMLUI handles async automatically -->
+   <Button onClick="api.execute(); delay(100); testState = api.getStatus();" />
+   
+   <!-- ❌ INCORRECT - No await keyword -->
+   <Button onClick="await api.execute(); await delay(100); testState = api.getStatus();" />
+   ```
+
+2. **Delays**: Use `delay()` function, NOT `setTimeout()`
+   ```xmlui
+   <!-- ✅ CORRECT -->
+   <Button onClick="delay(100); doSomething();" />
+   
+   <!-- ❌ INCORRECT - setTimeout not available -->
+   <Button onClick="setTimeout(() => { doSomething(); }, 100);" />
+   ```
+
+3. **Sequential Async Operations**: Simply write them in sequence
+   ```xmlui
+   <!-- ✅ CORRECT - XMLUI executes sequentially -->
+   <Button onClick="
+     let result = api.execute();
+     delay(100);
+     let status = api.getStatus();
+     testState = { result, status };
+   " />
+   ```
+
+These patterns apply to:
+- Event handlers (`onClick`, `onSuccess`, etc.)
+- Test state assignments
+- Any XMLUI script context
+
 ### Phase 1: Core Deferred Logic
 
 **Files to modify:**
@@ -1047,7 +1105,7 @@ test.describe("Deferred Mode - Step 2: State", () => {
 
 ---
 
-### Step 3: Implement Single Poll (No Loop)
+### ✅ Step 3: Implement Single Poll (No Loop) (COMPLETE)
 
 **Goal**: Make status request after initial call completes. Single poll only.
 
