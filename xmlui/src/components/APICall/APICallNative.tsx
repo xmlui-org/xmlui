@@ -286,7 +286,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
                   executionContext,
                   {
                     url: interpolatedStatusUrl,
-                    method: statusMethod,
+                    method: statusMethod as "get" | "post" | "put" | "delete" | "patch" | "head" | "options" | "trace" | "connect",
                     uid: uid,
                     params: { $result: result },
                   },
@@ -444,7 +444,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
                 executionContext,
                 {
                   url: interpolatedStatusUrl,
-                  method: statusMethod,
+                  method: statusMethod as "get" | "post" | "put" | "delete" | "patch" | "head" | "options" | "trace" | "connect",
                   uid: uid,
                   params: { $result: result },
                 },
@@ -604,7 +604,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
           executionContextRef.current,
           {
             url: interpolatedCancelUrl,
-            method: cancelMethod,
+            method: cancelMethod as "get" | "post" | "put" | "delete" | "patch" | "head" | "options" | "trace" | "connect",
             body: cancelBody,
             uid: uid,
             params: { $result: lastResult },
