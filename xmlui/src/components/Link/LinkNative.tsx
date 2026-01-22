@@ -6,7 +6,7 @@ import {
   type ReactNode,
   useMemo,
 } from "react";
-import { Link } from "@remix-run/react";
+import { Link } from "react-router-dom";
 import classnames from "classnames";
 
 import styles from "./Link.module.scss";
@@ -75,8 +75,10 @@ export const LinkNative = forwardRef(function LinkNative(
   // - verticalAlignment controls align-items (cross axis)
   const alignmentClasses = useMemo(() => {
     return {
-      horizontal: horizontalAlignment && styles[`justifyItems${capitalizeFirstLetter(horizontalAlignment)}`],
-      vertical: verticalAlignment && styles[`alignItems${capitalizeFirstLetter(verticalAlignment)}`],
+      horizontal:
+        horizontalAlignment && styles[`justifyItems${capitalizeFirstLetter(horizontalAlignment)}`],
+      vertical:
+        verticalAlignment && styles[`alignItems${capitalizeFirstLetter(verticalAlignment)}`],
     };
   }, [horizontalAlignment, verticalAlignment]);
 
@@ -89,11 +91,17 @@ export const LinkNative = forwardRef(function LinkNative(
       style={style}
       target={target}
       onClick={onClick}
-      className={classnames(className, styles.container, {
-        [styles.iconLink]: iconLink,
-        [styles.active]: active,
-        [styles.disabled]: disabled,
-      }, alignmentClasses.horizontal, alignmentClasses.vertical)}
+      className={classnames(
+        className,
+        styles.container,
+        {
+          [styles.iconLink]: iconLink,
+          [styles.active]: active,
+          [styles.disabled]: disabled,
+        },
+        alignmentClasses.horizontal,
+        alignmentClasses.vertical,
+      )}
     >
       {icon && (
         <Part partId={PART_ICON}>

@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { Link } from "@remix-run/react";
+import { Link } from "react-router-dom";
 import scrollIntoView from "scroll-into-view-if-needed";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
@@ -87,14 +87,14 @@ export const TableOfContents = forwardRef(function TableOfContents(
         const itemRect = activeItem.getBoundingClientRect();
         const relativeTop = itemRect.top - navRect.top + tocRef.current.scrollTop;
         const relativeLeft = itemRect.left - navRect.left;
-        
+
         indicatorRef.current.style.top = `${relativeTop}px`;
         indicatorRef.current.style.left = `${relativeLeft}px`;
         indicatorRef.current.style.height = `${itemRect.height}px`;
-        indicatorRef.current.style.display = 'block';
+        indicatorRef.current.style.display = "block";
       }
     } else if (indicatorRef?.current) {
-      indicatorRef.current.style.display = 'none';
+      indicatorRef.current.style.display = "none";
     }
   }, [activeAnchorId, headings]);
 

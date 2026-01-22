@@ -18,7 +18,7 @@ import { getMaxLinesStyle } from "../../components-core/utils/css-utils";
 import { TableOfContentsContext } from "../../components-core/TableOfContentsContext";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import type { HeadingLevel } from "./abstractions";
-import { Link } from "@remix-run/react";
+import { Link } from "react-router-dom";
 import { useAppContext } from "../../components-core/AppContext";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 
@@ -86,8 +86,8 @@ export const Heading = forwardRef(function Heading(
   const scrollIntoView = useCallback((options?: ScrollIntoViewOptions) => {
     if (elementRef.current) {
       elementRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
+        behavior: "smooth",
+        block: "start",
         ...options,
       });
     }
@@ -96,7 +96,9 @@ export const Heading = forwardRef(function Heading(
   const hasOverflow = useCallback(() => {
     if (elementRef.current) {
       const element = elementRef.current;
-      return element.scrollWidth > element.clientWidth || element.scrollHeight > element.clientHeight;
+      return (
+        element.scrollWidth > element.clientWidth || element.scrollHeight > element.clientHeight
+      );
     }
     return false;
   }, []);
@@ -115,13 +117,13 @@ export const Heading = forwardRef(function Heading(
         ?.replace(/[^\w\s-]/g, "")
         ?.replace(/\s+/g, "-")
         ?.toLowerCase();
-      
+
       // Ensure ID starts with a letter or underscore (not a digit)
       // This is required for querySelector to work without escaping
       if (newAnchorId && /^[0-9]/.test(newAnchorId)) {
         newAnchorId = "toc-" + newAnchorId;
       }
-      
+
       setAnchorId(newAnchorId || null);
     }
   }, []);
