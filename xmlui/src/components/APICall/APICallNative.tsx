@@ -5,6 +5,7 @@ import type { ActionExecutionContext } from "../../abstractions/ActionDefs";
 import { useEvent } from "../../components-core/utils/misc";
 import { callApi } from "../../components-core/action/APICall";
 import type { ApiActionComponent } from "../../components/APICall/APICall";
+import { extractParam } from "../../components-core/utils/extractParam";
 
 interface Props {
   registerComponentApi: RegisterComponentApiFn;
@@ -48,7 +49,15 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
         loaded: false,
         lastResult: undefined,
         lastError: undefined,
-        ...(deferredMode && { deferredState: { ...deferredStateRef.current } })
+        // Step 6: Expose context variables for deferred mode
+        ...(deferredMode && { 
+          $statusData: deferredStateRef.current.statusData,
+          $progress: deferredStateRef.current.progress,
+          $polling: deferredStateRef.current.isPolling,
+          $attempts: deferredStateRef.current.attempts,
+          $elapsed: 0,
+          deferredState: { ...deferredStateRef.current }
+        })
       });
     }
 
@@ -130,16 +139,24 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
             };
             deferredStateRef.current = newState;
             
+            // Step 6: Update state with context variables
             if (updateState) {
-              updateState({ deferredState: { ...newState } });
+              updateState({ 
+                $statusData: newState.statusData,
+                $progress: newState.progress,
+                $polling: newState.isPolling,
+                $attempts: newState.attempts,
+                $elapsed: 0,
+                deferredState: { ...newState }
+              });
             }
             
             // Async polling function
             const pollStatus = async () => {
               try {
                 // Check if we've exceeded maxPollingDuration
-                const elapsed = Date.now() - (deferredStateRef.current.startTime || 0);
-                if (elapsed > maxPollingDuration) {
+                const elapsedTime = Date.now() - (deferredStateRef.current.startTime || 0);
+                if (elapsedTime > maxPollingDuration) {
                   // Stop polling due to timeout
                   const timeoutState = {
                     ...deferredStateRef.current,
@@ -152,8 +169,16 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
                     pollingIntervalRef.current = null;
                   }
                   
+                  // Step 6: Update state with context variables on timeout
                   if (updateState) {
-                    updateState({ deferredState: { ...timeoutState } });
+                    updateState({ 
+                      $statusData: timeoutState.statusData,
+                      $progress: timeoutState.progress,
+                      $polling: timeoutState.isPolling,
+                      $attempts: timeoutState.attempts,
+                      $elapsed: elapsedTime,
+                      deferredState: { ...timeoutState }
+                    });
                   }
                   return;
                 }
@@ -172,22 +197,56 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
                   },
                 );
                 
-                // Update attempts and status data
+                // Step 6: Extract progress using progressExtractor expression
+                let progress = 0;
+                const progressExtractor = (node.props as any)?.progressExtractor;
+                if (progressExtractor && statusData) {
+                  try {
+                    // Evaluate progress expression with statusData as context
+                    const contextForProgress = {
+                      $statusData: statusData,
+                      $result: result,
+                    };
+                    const extractedValue = extractParam(
+                      contextForProgress,
+                      progressExtractor,
+                      executionContext.appContext,
+                    );
+                    // Ensure progress is a number between 0 and 100
+                    if (extractedValue !== undefined && extractedValue !== null) {
+                      progress = Math.max(0, Math.min(100, Number(extractedValue)));
+                    }
+                  } catch (error) {
+                    console.error("Error evaluating progressExtractor:", error);
+                  }
+                }
+                
+                // Update attempts, status data, and progress
                 const updatedState = {
                   ...deferredStateRef.current,
                   statusData: statusData,
+                  progress: progress,
                   attempts: deferredStateRef.current.attempts + 1,
                 };
                 deferredStateRef.current = updatedState;
                 
+                // Step 6: Calculate elapsed time and update state with all context variables
+                const elapsedMs = Date.now() - (updatedState.startTime || Date.now());
                 if (updateState) {
-                  updateState({ deferredState: { ...updatedState } });
+                  updateState({ 
+                    $statusData: updatedState.statusData,
+                    $progress: updatedState.progress,
+                    $polling: updatedState.isPolling,
+                    $attempts: updatedState.attempts,
+                    $elapsed: elapsedMs,
+                    deferredState: { ...updatedState }
+                  });
                 }
                 
-                // Step 5: Fire onStatusUpdate event
+                // Step 5: Fire onStatusUpdate event with progress from Step 6
                 if (onStatusUpdate) {
                   try {
-                    await onStatusUpdate(statusData, 0); // TODO: progress in Step 6
+                    await onStatusUpdate(statusData, progress);
                   } catch (eventError) {
                     console.error("onStatusUpdate event handler error:", eventError);
                   }
@@ -225,11 +284,20 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
                 statusData: statusData,
                 attempts: 1,
                 startTime: Date.now(),
+                progress: 0, // Single poll mode doesn't extract progress
               };
               deferredStateRef.current = newState;
               
+              // Step 6: Update state with context variables (single poll mode)
               if (updateState) {
-                updateState({ deferredState: { ...newState } });
+                updateState({ 
+                  $statusData: newState.statusData,
+                  $progress: newState.progress,
+                  $polling: newState.isPolling,
+                  $attempts: newState.attempts,
+                  $elapsed: 0,
+                  deferredState: { ...newState }
+                });
               }
             } catch (statusError) {
               console.error("Status request failed:", statusError);
@@ -266,8 +334,17 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
       pollingIntervalRef.current = null;
     }
     
+    // Step 6: Update state with context variables
+    const elapsed = Date.now() - (newState.startTime || Date.now());
     if (updateState) {
-      updateState({ deferredState: { ...newState } });
+      updateState({ 
+        $statusData: newState.statusData,
+        $progress: newState.progress,
+        $polling: newState.isPolling,
+        $attempts: newState.attempts,
+        $elapsed: elapsed,
+        deferredState: { ...newState }
+      });
     }
     return false;
   });
@@ -279,8 +356,17 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     };
     deferredStateRef.current = newState;
     
+    // Step 6: Update state with context variables
+    const elapsed = Date.now() - (newState.startTime || Date.now());
     if (updateState) {
-      updateState({ deferredState: { ...newState } });
+      updateState({ 
+        $statusData: newState.statusData,
+        $progress: newState.progress,
+        $polling: newState.isPolling,
+        $attempts: newState.attempts,
+        $elapsed: elapsed,
+        deferredState: { ...newState }
+      });
     }
     return true;
   });
@@ -307,8 +393,17 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
       pollingIntervalRef.current = null;
     }
     
+    // Step 6: Update state with context variables
+    const elapsed = Date.now() - (newState.startTime || Date.now());
     if (updateState) {
-      updateState({ deferredState: { ...newState } });
+      updateState({ 
+        $statusData: newState.statusData,
+        $progress: newState.progress,
+        $polling: newState.isPolling,
+        $attempts: newState.attempts,
+        $elapsed: elapsed,
+        deferredState: { ...newState }
+      });
     }
   });
 

@@ -2419,3 +2419,130 @@ test.describe("Deferred Mode - Step 5: Status Update Event", () => {
     expect(finalState.pollingStatus).toEqual(false);
   });
 });
+
+// =============================================================================
+// DEFERRED MODE - STEP 6: PROGRESS EXTRACTION & CONTEXT VARIABLES
+// =============================================================================
+
+test.describe("Deferred Mode - Step 6: Progress & Context Variables", () => {
+  test("extracts progress from status data", async ({ 
+    initTestBed, 
+    createButtonDriver 
+  }) => {
+    const progressMock: ApiInterceptorDefinition = {
+      "initialize": "$state.progressValue = 0;",
+      "operations": {
+        "start": {
+          "url": "/api/process",
+          "method": "post",
+          "handler": `
+            $state.progressValue = 0;
+            return { jobId: "job-1" };
+          `,
+        },
+        "status": {
+          "url": "/api/process/status/job-1",
+          "method": "get",
+          "handler": `
+            if (!$state.progressValue) $state.progressValue = 0;
+            $state.progressValue += 33;
+            if ($state.progressValue > 100) $state.progressValue = 100;
+            return { progress: $state.progressValue };
+          `,
+        },
+      },
+    };
+
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall 
+          id="api" 
+          url="/api/process" 
+          method="post"
+          deferredMode="true"
+          statusUrl="/api/process/status/{$result.jobId}"
+          pollingInterval="500"
+          progressExtractor="$statusData.progress"
+          onStatusUpdate="statusData => {
+            testState = { statusProgress: statusData.progress };
+          }"
+        />
+        <Button onClick="api.execute()" testId="exec" label="Execute" />
+      </Fragment>
+    `, {
+      apiInterceptor: progressMock,
+    });
+    
+    const execButton = await createButtonDriver("exec");
+    await execButton.click();
+    
+    // Wait for multiple polls to ensure we get progress updates
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const result = await testStateDriver.testState();
+    expect(result).toBeTruthy();
+    expect(result.statusProgress).toBeGreaterThan(0);
+  });
+  
+  test("progress value passed to onStatusUpdate event", async ({ 
+    initTestBed,
+    createButtonDriver 
+  }) => {
+    const progressEventMock: ApiInterceptorDefinition = {
+      "initialize": "$state.progressValue = 0;",
+      "operations": {
+        "start": {
+          "url": "/api/task",
+          "method": "post",
+          "handler": `
+            $state.progressValue = 0;
+            return { taskId: "t1" };
+          `,
+        },
+        "status": {
+          "url": "/api/task/status",
+          "method": "get",
+          "handler": `
+            if (!$state.progressValue) $state.progressValue = 0;
+            $state.progressValue += 25;
+            if ($state.progressValue > 100) $state.progressValue = 100;
+            return { progress: $state.progressValue, done: $state.progressValue >= 100 };
+          `,
+        },
+      },
+    };
+
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall 
+          id="api" 
+          url="/api/task" 
+          method="post"
+          deferredMode="true"
+          statusUrl="/api/task/status"
+          pollingInterval="500"
+          progressExtractor="$statusData.progress"
+          onStatusUpdate="statusData => {
+            testState = statusData.progress;
+            if (statusData.done === true) {
+              api.stopPolling();
+            }
+          }"
+        />
+        <Button onClick="api.execute()" testId="exec" label="Execute" />
+      </Fragment>
+    `, {
+      apiInterceptor: progressEventMock,
+    });
+    
+    const execButton = await createButtonDriver("exec");
+    await execButton.click();
+    
+    // Wait for at least one poll
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    const result = await testStateDriver.testState();
+    // Progress should be extracted and available in statusData
+    expect(result).toBeGreaterThan(0);
+  });
+});

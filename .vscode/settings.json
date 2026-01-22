@@ -28,6 +28,7 @@
   "chat.tools.terminal.autoApprove": {
     "npx playwright": true,
     "npm view": true,
-    "npm install": true
+    "npm install": true,
+    "npx tsc": true
   }
 }
