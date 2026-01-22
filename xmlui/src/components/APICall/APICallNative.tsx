@@ -208,6 +208,32 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   
+  /**
+   * Handles polling timeout - stops polling and fires onTimeout event
+   */
+  const handlePollingTimeout = useEvent(async (elapsedTime: number) => {
+    const timeoutState = {
+      ...deferredStateRef.current,
+      isPolling: false,
+    };
+    deferredStateRef.current = timeoutState;
+    
+    if (pollingIntervalRef.current) {
+      clearTimeout(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
+    }
+    
+    updateDeferredState(timeoutState, updateState);
+    
+    if (onTimeout) {
+      try {
+        await onTimeout();
+      } catch (eventError) {
+        console.error("onTimeout event handler error:", eventError);
+      }
+    }
+  });
+  
   // TODO pause until the apiInterceptorContext is initialized (to make sure the API calls are intercepted)
   const execute = useEvent(
     async (executionContext: ActionExecutionContext, ...eventArgs: any[]) => {
@@ -318,38 +344,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
                 // Check if we've exceeded maxPollingDuration
                 const elapsedTime = Date.now() - (deferredStateRef.current.startTime || 0);
                 if (elapsedTime > maxPollingDuration) {
-                  // Stop polling due to timeout
-                  const timeoutState = {
-                    ...deferredStateRef.current,
-                    isPolling: false,
-                  };
-                  deferredStateRef.current = timeoutState;
-                  
-                  if (pollingIntervalRef.current) {
-                    clearTimeout(pollingIntervalRef.current);
-                    pollingIntervalRef.current = null;
-                  }
-                  
-                  // Step 6: Update state with context variables on timeout
-                  if (updateState) {
-                    updateState({ 
-                      $statusData: timeoutState.statusData,
-                      $progress: timeoutState.progress,
-                      $polling: timeoutState.isPolling,
-                      $attempts: timeoutState.attempts,
-                      $elapsed: elapsedTime,
-                      deferredState: { ...timeoutState }
-                    });
-                  }
-                  
-                  // Step 8: Fire onTimeout event
-                  if (onTimeout) {
-                    try {
-                      await onTimeout();
-                    } catch (eventError) {
-                      console.error("onTimeout event handler error:", eventError);
-                    }
-                  }
+                  await handlePollingTimeout(elapsedTime);
                   return;
                 }
                 
