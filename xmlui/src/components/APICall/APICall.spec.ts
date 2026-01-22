@@ -115,6 +115,37 @@ const pollingLoopMock: ApiInterceptorDefinition = {
   },
 };
 
+// Step 5: Status update event mock backend
+const statusUpdateMock: ApiInterceptorDefinition = {
+  initialize: "$state.statusChecks = 0;",
+  operations: {
+    "start": {
+      url: "/api/deploy",
+      method: "post",
+      handler: `
+        $state.statusChecks = 0;
+        return { deploymentId: "deploy-1" };
+      `,
+    },
+    "status": {
+      url: "/api/deploy/status/deploy-1",
+      method: "get",
+      handler: `
+        $state.statusChecks++;
+        
+        // Transition through states
+        if ($state.statusChecks === 1) {
+          return { status: "pending", phase: "Initializing" };
+        } else if ($state.statusChecks === 2) {
+          return { status: "in-progress", phase: "Running" };
+        } else {
+          return { status: "completed", phase: "Succeeded" };
+        }
+      `,
+    },
+  },
+};
+
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================
@@ -2235,5 +2266,156 @@ test.describe("Deferred Mode - Step 4: Polling Loop", () => {
     
     // After maxPollingDuration, should have stopped polling
     await expect.poll(testStateDriver.testState).toEqual(false);
+  });
+});
+// =============================================================================
+// DEFERRED MODE - STEP 5: STATUS UPDATE EVENT
+// =============================================================================
+
+test.describe("Deferred Mode - Step 5: Status Update Event", () => {
+  test("fires onStatusUpdate event on each poll", async ({ 
+    initTestBed, 
+    createButtonDriver 
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall 
+          id="api" 
+          url="/api/deploy" 
+          method="post"
+          deferredMode="true"
+          statusUrl="/api/deploy/status/{$result.deploymentId}"
+          pollingInterval="500"
+          onStatusUpdate="statusData => {
+            const updateCount = (testState?.updateCount || 0) + 1;
+            testState = { lastStatus: statusData.status, updateCount: updateCount };
+            if (statusData.status === 'completed') {
+              api.stopPolling();
+            }
+          }"
+        />
+        <Button onClick="api.execute()" testId="exec" />
+        <Button onClick="testState = { ...(testState || {}), isPolling: api.isPolling() }" testId="check" />
+      </Fragment>
+    `, {
+      apiInterceptor: statusUpdateMock,
+    });
+    
+    const execButton = await createButtonDriver("exec");
+    const checkButton = await createButtonDriver("check");
+    
+    await execButton.click();
+    
+    // Wait for polling to complete
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Check that updates were received
+    await checkButton.click();
+    const result = await testStateDriver.testState();
+    
+    expect(result.lastStatus).toEqual('completed');
+    expect(result.updateCount).toBeGreaterThanOrEqual(3); // At least 3 polls
+    expect(result.isPolling).toEqual(false); // Should have stopped
+  });
+  
+  test("user can stop polling from onStatusUpdate", async ({ 
+    initTestBed, 
+    createButtonDriver 
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall 
+          id="api" 
+          url="/api/deploy" 
+          method="post"
+          deferredMode="true"
+          statusUrl="/api/deploy/status/{$result.deploymentId}"
+          pollingInterval="500"
+          onStatusUpdate="statusData => {
+            testState = statusData;
+            if (statusData.status === 'completed') {
+              api.stopPolling();
+            }
+          }"
+        />
+        <Button onClick="api.execute()" testId="exec" />
+        <Button onClick="testState = { ...(testState || {}), pollingStatus: api.isPolling() }" testId="check" />
+      </Fragment>
+    `, {
+      apiInterceptor: statusUpdateMock,
+    });
+    
+    const execButton = await createButtonDriver("exec");
+    const checkButton = await createButtonDriver("check");
+    
+    await execButton.click();
+    
+    // Wait for polling to complete (3 polls at 500ms = ~1500ms)
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Check status
+    await checkButton.click();
+    const finalState = await testStateDriver.testState();
+    
+    expect(finalState.status).toEqual('completed');
+    expect(finalState.pollingStatus).toEqual(false);
+  });
+
+  test("onStatusUpdate can handle errors", async ({ 
+    initTestBed, 
+    createButtonDriver 
+  }) => {
+    const errorMock: ApiInterceptorDefinition = {
+      operations: {
+        "start": {
+          url: "/api/risky",
+          method: "post",
+          handler: `return { operationId: "risky-1" };`,
+        },
+        "status": {
+          url: "/api/risky/status/risky-1",
+          method: "get",
+          handler: `return { status: "failed", error: "Operation failed" };`,
+        },
+      },
+    };
+
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall 
+          id="api" 
+          url="/api/risky" 
+          method="post"
+          deferredMode="true"
+          statusUrl="/api/risky/status/{$result.operationId}"
+          pollingInterval="500"
+          onStatusUpdate="statusData => {
+            testState = statusData;
+            if (statusData.status === 'failed') {
+              api.stopPolling();
+            }
+          }"
+        />
+        <Button onClick="api.execute()" testId="exec" />
+        <Button onClick="testState = { ...(testState || {}), pollingStatus: api.isPolling() }" testId="check" />
+      </Fragment>
+    `, {
+      apiInterceptor: errorMock,
+    });
+    
+    const execButton = await createButtonDriver("exec");
+    const checkButton = await createButtonDriver("check");
+    
+    await execButton.click();
+    
+    // Wait for first poll
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Check status
+    await checkButton.click();
+    const finalState = await testStateDriver.testState();
+    
+    expect(finalState.status).toEqual('failed');
+    expect(finalState.pollingStatus).toEqual(false);
   });
 });

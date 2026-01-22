@@ -1,16 +1,18 @@
 import { useEffect, useRef } from "react";
 
-import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import type { RegisterComponentApiFn, LookupEventHandlerFn } from "../../abstractions/RendererDefs";
 import type { ActionExecutionContext } from "../../abstractions/ActionDefs";
 import { useEvent } from "../../components-core/utils/misc";
 import { callApi } from "../../components-core/action/APICall";
 import type { ApiActionComponent } from "../../components/APICall/APICall";
+import { APICallMd } from "../../components/APICall/APICall";
 
 interface Props {
   registerComponentApi: RegisterComponentApiFn;
   node: ApiActionComponent;
   uid: symbol;
   updateState?: (state: any) => void;
+  lookupEventHandler: LookupEventHandlerFn<typeof APICallMd>;
 }
 
 interface DeferredState {
@@ -25,7 +27,7 @@ export const defaultProps = {
   method: "get",
 };
 
-export function APICallNative({ registerComponentApi, node, uid, updateState }: Props) {
+export function APICallNative({ registerComponentApi, node, uid, updateState, lookupEventHandler }: Props) {
   // Track deferred state using ref to avoid re-renders
   const deferredStateRef = useRef<DeferredState>({
     isPolling: false,
@@ -183,7 +185,15 @@ export function APICallNative({ registerComponentApi, node, uid, updateState }: 
                   updateState({ deferredState: { ...updatedState } });
                 }
                 
-                // TODO: Step 5 - Check completion conditions here
+                // Step 5: Fire onStatusUpdate event
+                const statusUpdateHandler = lookupEventHandler("statusUpdate");
+                if (statusUpdateHandler) {
+                  try {
+                    await statusUpdateHandler(statusData, 0); // TODO: progress in Step 6
+                  } catch (eventError) {
+                    console.error("onStatusUpdate event handler error:", eventError);
+                  }
+                }
                 
               } catch (statusError) {
                 console.error("Status request failed:", statusError);

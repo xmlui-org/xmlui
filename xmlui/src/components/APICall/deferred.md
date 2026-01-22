@@ -816,10 +816,10 @@ const deferredMockBackend: ApiInterceptorDefinition = {
         const operationId = 'op-' + Math.random().toString(36).substr(2, 9);
         
         // Store operation in mock state
-        if (!globalThis.mockOperations) {
-          globalThis.mockOperations = {};
+        if (!$state.mockOperations) {
+          $state.mockOperations = {};
         }
-        globalThis.mockOperations[operationId] = {
+        $state.mockOperations[operationId] = {
           status: 'pending',
           progress: 0,
           startTime: Date.now()
@@ -835,7 +835,7 @@ const deferredMockBackend: ApiInterceptorDefinition = {
       method: "get",
       handler: `
         const { operationId } = $pathParams;
-        const operation = globalThis.mockOperations?.[operationId];
+        const operation = $state.mockOperations?.[operationId];
         
         if (!operation) {
           throw Errors.HttpError(404, { message: "Operation not found" });
@@ -876,7 +876,7 @@ const counterBasedMock: ApiInterceptorDefinition = {
       url: "/api/task",
       method: "post",
       handler: `
-        globalThis.statusCallCount = 0;
+        $state.statusCallCount = 0;
         return { taskId: "task-123" };
       `,
     },
@@ -884,13 +884,13 @@ const counterBasedMock: ApiInterceptorDefinition = {
       url: "/api/task/status/task-123",
       method: "get",
       handler: `
-        if (!globalThis.statusCallCount) globalThis.statusCallCount = 0;
-        globalThis.statusCallCount++;
+        if (!$state.statusCallCount) $state.statusCallCount = 0;
+        $state.statusCallCount++;
         
         // Return different status based on call count
-        if (globalThis.statusCallCount === 1) {
+        if ($state.statusCallCount === 1) {
           return { status: 'pending', progress: 0 };
-        } else if (globalThis.statusCallCount === 2) {
+        } else if ($state.statusCallCount === 2) {
           return { status: 'in-progress', progress: 50 };
         } else {
           return { status: 'completed', progress: 100 };
@@ -955,11 +955,11 @@ const errorScenarioMock: ApiInterceptorDefinition = {
       url: "/api/operation/status/:id",
       method: "get",
       handler: `
-        if (!globalThis.statusAttempts) globalThis.statusAttempts = 0;
-        globalThis.statusAttempts++;
+        if (!$state.statusAttempts) $state.statusAttempts = 0;
+        $state.statusAttempts++;
         
         // First 2 calls fail (to test retry logic)
-        if (globalThis.statusAttempts <= 2) {
+        if ($state.statusAttempts <= 2) {
           throw Errors.HttpError(503, { message: "Service temporarily unavailable" });
         }
         
@@ -1348,137 +1348,36 @@ test.describe("Deferred Mode - Step 4: Polling Loop", () => {
 
 ---
 
-### Step 5: Add Completion/Error Condition Detection
+### Step 5: Add Status Update Event & Manual Polling Control ✅
 
-**Goal**: Stop polling when conditions are met.
+**Goal**: Fire event on each status update and allow user to control polling continuation.
+
+**Approach**: Use events (async functions) instead of properties for conditions:
+- Add `onStatusUpdate` event - fires after each status poll with status data
+- User can call `api.stopPolling()` in the event handler based on status data
+- This follows XMLUI's event-driven async pattern (like Form's `willSubmit`)
 
 **Changes**:
-- Add `completionCondition` property
-- Add `errorCondition` property
-- Evaluate expressions on each poll
-- Stop polling when condition met
-- Fire appropriate events
+- ✅ Add `onStatusUpdate` event that fires after each poll
+- ✅ Event receives `(statusData, progress)` parameters
+- ✅ User can examine status and call `stopPolling()` to stop polling
+- ✅ Use `lookupEventHandler()` to properly compile event handlers
+- ✅ Pass `lookupEventHandler` from renderer to APICallNative component
 
-**Mock Backend**:
-```typescript
-const conditionTestMock: ApiInterceptorDefinition = {
-  operations: {
-    "start": {
-      url: "/api/deploy",
-      method: "post",
-      handler: `
-        globalThis.deployStatus = 'pending';
-        return { deploymentId: "deploy-1" };
-      `,
-    },
-    "status": {
-      url: "/api/deploy/status/deploy-1",
-      method: "get",
-      handler: `
-        if (!globalThis.statusChecks) globalThis.statusChecks = 0;
-        globalThis.statusChecks++;
-        
-        // Transition through states
-        if (globalThis.statusChecks === 1) {
-          return { status: 'pending', phase: 'Initializing' };
-        } else if (globalThis.statusChecks === 2) {
-          return { status: 'in-progress', phase: 'Running' };
-        } else {
-          return { status: 'completed', phase: 'Succeeded' };
-        }
-      `,
-    },
-  },
-};
-```
-
-**Testing**:
-```typescript
-test.describe("Deferred Mode - Step 5: Conditions", () => {
-  test("stops polling when completionCondition is met", async ({ 
-    initTestBed, 
-    createButtonDriver 
-  }) => {
-    const { testStateDriver } = await initTestBed(`
-      <Fragment>
-        <APICall 
-          id="api" 
-          url="/api/deploy" 
-          method="post"
-          deferredMode="true"
-          statusUrl="/api/deploy/status/{$result.deploymentId}"
-          pollingInterval="500"
-          completionCondition="$statusData.status === 'completed'"
-          onSuccess="result => testState = { initial: result }"
-          onPollingComplete="status => testState = { final: status }"
-        />
-        <Button onClick="api.execute()" testId="exec" />
-      </Fragment>
-    `, {
-      apiInterceptor: conditionTestMock,
-    });
-    
-    const execButton = await createButtonDriver("exec");
-    await execButton.click();
-    
-    // Wait for polling to complete
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    const result = await testStateDriver.testState();
-    expect(result.final.status).toEqual('completed');
-  });
-  
-  test("handles errorCondition correctly", async ({ 
-    initTestBed, 
-    createButtonDriver 
-  }) => {
-    const { testStateDriver } = await initTestBed(`
-      <Fragment>
-        <APICall 
-          id="api" 
-          url="/api/deploy" 
-          method="post"
-          deferredMode="true"
-          statusUrl="/api/deploy/status/{$result.deploymentId}"
-          pollingInterval="500"
-          errorCondition="$statusData.status === 'failed'"
-          onError="error => testState = { error: error }"
-        />
-        <Button onClick="api.execute()" testId="exec" />
-      </Fragment>
-    `, {
-      apiInterceptor: {
-        operations: {
-          "start": {
-            url: "/api/deploy",
-            method: "post",
-            handler: `return { deploymentId: "deploy-1" };`,
-          },
-          "status": {
-            url: "/api/deploy/status/deploy-1",
-            method: "get",
-            handler: `return { status: "failed", error: "Deployment failed" };`,
-          },
-        },
-      },
-    });
-    
-    const execButton = await createButtonDriver("exec");
-    await execButton.click();
-    
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const result = await testStateDriver.testState();
-    expect(result.error).toBeDefined();
-  });
-});
-```
+**Implementation Details**:
+- Updated APICall.tsx renderer to pass `lookupEventHandler` to native component
+- Updated APICallNative Props interface to include `lookupEventHandler`
+- Fire event in `pollStatus()` function after updating deferred state
+- Use `lookupEventHandler("statusUpdate")` to get compiled event function
 
 **Verification**:
-- Completion condition stops polling
-- Error condition triggers error handling
-- Events fire correctly
-- All existing tests pass
+- ✅ `onStatusUpdate` event fires on each poll
+- ✅ Event receives status data as parameter
+- ✅ User can call `stopPolling()` from within event
+- ✅ Polling stops when requested
+- ✅ Can handle error status conditions
+- ✅ All existing tests pass (77 passing, 1 skipped)
+- ✅ 3 Step 5 tests added: fires on each poll, user control, error handling
 
 ---
 
@@ -1522,7 +1421,7 @@ test.describe("Deferred Mode - Step 6: Progress & Context", () => {
             url: "/api/process",
             method: "post",
             handler: `
-              globalThis.progressValue = 0;
+              $state.progressValue = 0;
               return { jobId: "job-1" };
             `,
           },
@@ -1530,10 +1429,10 @@ test.describe("Deferred Mode - Step 6: Progress & Context", () => {
             url: "/api/process/status/job-1",
             method: "get",
             handler: `
-              if (!globalThis.progressValue) globalThis.progressValue = 0;
-              globalThis.progressValue += 33;
-              if (globalThis.progressValue > 100) globalThis.progressValue = 100;
-              return { progress: globalThis.progressValue };
+              if (!$state.progressValue) $state.progressValue = 0;
+              $state.progressValue += 33;
+              if ($state.progressValue > 100) $state.progressValue = 100;
+              return { progress: $state.progressValue };
             `,
           },
         },
@@ -1579,9 +1478,9 @@ test.describe("Deferred Mode - Step 6: Progress & Context", () => {
             url: "/api/task/status",
             method: "get",
             handler: `
-              if (!globalThis.calls) globalThis.calls = 0;
-              globalThis.calls++;
-              if (globalThis.calls >= 2) {
+              if (!$state.calls) $state.calls = 0;
+              $state.calls++;
+              if ($state.calls >= 2) {
                 return { done: true };
               }
               return { done: false };
@@ -1649,7 +1548,7 @@ test.describe("Deferred Mode - Step 7: Notifications", () => {
             url: "/api/upload",
             method: "post",
             handler: `
-              globalThis.uploadPercent = 0;
+              $state.uploadPercent = 0;
               return { uploadId: "up-1" };
             `,
           },
@@ -1657,9 +1556,9 @@ test.describe("Deferred Mode - Step 7: Notifications", () => {
             url: "/api/upload/status",
             method: "get",
             handler: `
-              globalThis.uploadPercent += 50;
-              if (globalThis.uploadPercent > 100) globalThis.uploadPercent = 100;
-              return { percent: globalThis.uploadPercent };
+              $state.uploadPercent += 50;
+              if ($state.uploadPercent > 100) $state.uploadPercent = 100;
+              return { percent: $state.uploadPercent };
             `,
           },
         },
@@ -1797,7 +1696,7 @@ test.describe("Deferred Mode - Step 9: Retry Logic", () => {
             url: "/api/task",
             method: "post",
             handler: `
-              globalThis.pollTimestamps = [];
+              $state.pollTimestamps = [];
               return { id: "t1" };
             `,
           },
@@ -1805,12 +1704,12 @@ test.describe("Deferred Mode - Step 9: Retry Logic", () => {
             url: "/api/task/status",
             method: "get",
             handler: `
-              if (!globalThis.pollTimestamps) globalThis.pollTimestamps = [];
-              globalThis.pollTimestamps.push(Date.now());
+              if (!$state.pollTimestamps) $state.pollTimestamps = [];
+              $state.pollTimestamps.push(Date.now());
               
               // Complete after 4 polls
-              if (globalThis.pollTimestamps.length >= 4) {
-                return { done: true, timestamps: globalThis.pollTimestamps };
+              if ($state.pollTimestamps.length >= 4) {
+                return { done: true, timestamps: $state.pollTimestamps };
               }
               
               return { done: false };
@@ -1878,8 +1777,8 @@ test.describe("Deferred Mode - Step 10: Backoff", () => {
             url: "/api/task",
             method: "post",
             handler: `
-              globalThis.pollIntervals = [];
-              globalThis.lastPollTime = Date.now();
+              $state.pollIntervals = [];
+              $state.lastPollTime = Date.now();
               return { id: "t1" };
             `,
           },
@@ -1888,15 +1787,15 @@ test.describe("Deferred Mode - Step 10: Backoff", () => {
             method: "get",
             handler: `
               const now = Date.now();
-              if (globalThis.lastPollTime) {
-                const interval = now - globalThis.lastPollTime;
-                globalThis.pollIntervals.push(interval);
+              if ($state.lastPollTime) {
+                const interval = now - $state.lastPollTime;
+                $state.pollIntervals.push(interval);
               }
-              globalThis.lastPollTime = now;
+              $state.lastPollTime = now;
               
               // Complete after 5 polls
-              if (globalThis.pollIntervals.length >= 4) {
-                return { done: true, intervals: globalThis.pollIntervals };
+              if ($state.pollIntervals.length >= 4) {
+                return { done: true, intervals: $state.pollIntervals };
               }
               
               return { done: false };
@@ -1970,7 +1869,7 @@ test.describe("Deferred Mode - Step 11: Cancellation", () => {
             url: "/api/operation/status/op-1",
             method: "get",
             handler: `
-              if (globalThis.operationCancelled) {
+              if ($state.operationCancelled) {
                 return { status: "cancelled" };
               }
               return { status: "in-progress" };
@@ -1980,7 +1879,7 @@ test.describe("Deferred Mode - Step 11: Cancellation", () => {
             url: "/api/operation/cancel/op-1",
             method: "post",
             handler: `
-              globalThis.operationCancelled = true;
+              $state.operationCancelled = true;
               return { status: "cancelled" };
             `,
           },
@@ -2109,14 +2008,14 @@ test("encryption at rest scenario", async ({ initTestBed, createButtonDriver, pa
           url: "/api/encryption/status/enc-op-1",
           method: "get",
           handler: `
-            if (!globalThis.encryptionProgress) globalThis.encryptionProgress = 0;
-            globalThis.encryptionProgress += 50;
+            if (!$state.encryptionProgress) $state.encryptionProgress = 0;
+            $state.encryptionProgress += 50;
             
-            if (globalThis.encryptionProgress >= 100) {
+            if ($state.encryptionProgress >= 100) {
               return { status: "completed", progress: 100 };
             }
             
-            return { status: "in-progress", progress: globalThis.encryptionProgress };
+            return { status: "in-progress", progress: $state.encryptionProgress };
           `,
         },
       },

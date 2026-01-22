@@ -334,13 +334,14 @@ export const APICallMd = createMetadata({
 export const apiCallRenderer = createComponentRenderer(
   COMP,
   APICallMd,
-  ({ node, registerComponentApi, uid, updateState }) => {
+  ({ node, registerComponentApi, uid, updateState, lookupEventHandler }) => {
     return (
       <APICallNative 
         registerComponentApi={registerComponentApi} 
         node={node as any} 
         uid={uid}
         updateState={updateState}
+        lookupEventHandler={lookupEventHandler}
       />
     );
   },
