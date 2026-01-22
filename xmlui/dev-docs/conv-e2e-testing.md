@@ -382,6 +382,60 @@ const dateStr = "2025-08-07";
 const pattern = "test";
 ```
 
+### APIInterceptor State Management
+
+**CRITICAL**: In APIInterceptor handlers, use `$state` to maintain state across API calls, NOT `globalThis`:
+
+```typescript
+// ✅ CORRECT - Use $state context variable
+const mockBackend: ApiInterceptorDefinition = {
+  "initialize": "$state.pollCount = 0; $state.items = [];",
+  "operations": {
+    "create": {
+      "url": "/api/items",
+      "method": "post",
+      "handler": "
+        $state.items.push({ id: $state.items.length + 1, name: $body.name });
+        return { id: $state.items.length };
+      "
+    },
+    "list": {
+      "url": "/api/items",
+      "method": "get",
+      "handler": "return { items: $state.items };"
+    },
+    "status": {
+      "url": "/api/status",
+      "method": "get",
+      "handler": "
+        $state.pollCount++;
+        return { pollCount: $state.pollCount };
+      "
+    }
+  }
+};
+
+// ❌ INCORRECT - globalThis is not available
+const mockBackend: ApiInterceptorDefinition = {
+  "operations": {
+    "create": {
+      "handler": "
+        globalThis.items = globalThis.items || [];  // Will not work!
+        globalThis.items.push(...);
+      "
+    }
+  }
+};
+```
+
+**Key Points:**
+- `$state` is a singleton state object accessible across all API operations in a test
+- Use `initialize` property to set initial state values
+- Properties can be read and modified: `$state.count++`, `$state.items.push(item)`
+- State persists across multiple API calls within the same test
+- Each test gets a fresh `$state` instance
+- Available context variables in handlers: `$state`, `$body`, `$params`, `$query`
+
 **NO async/await keywords:**
 
 XMLUI automatically handles asynchronous operations without explicit `async`/`await` syntax:

@@ -34,6 +34,9 @@ export function APICallNative({ registerComponentApi, node, uid, updateState }: 
     attempts: 0,
   });
 
+  // Step 4: Track polling interval for cleanup
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
   // Initialize state with default values
   useEffect(() => {
     const deferredMode = (node.props as any)?.deferredMode === "true" || (node.props as any)?.deferredMode === true;
@@ -47,6 +50,14 @@ export function APICallNative({ registerComponentApi, node, uid, updateState }: 
         ...(deferredMode && { deferredState: { ...deferredStateRef.current } })
       });
     }
+
+    // Step 4: Cleanup polling on unmount
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+      }
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   
   // TODO pause until the apiInterceptorContext is initialized (to make sure the API calls are intercepted)
@@ -87,49 +98,134 @@ export function APICallNative({ registerComponentApi, node, uid, updateState }: 
           });
         }
         
-        // Step 3: Single poll for deferred operations
+        // Step 3-4: Single poll or polling loop for deferred operations
         const deferredMode = (node.props as any)?.deferredMode === "true" || (node.props as any)?.deferredMode === true;
-        if (deferredMode && (node.props as any)?.statusUrl) {
-          // Extract statusUrl with result context
-          let statusUrl = (node.props as any).statusUrl as string;
-          
-          // Replace {$result.xxx} placeholders with actual values from result
+        const statusUrl = (node.props as any)?.statusUrl;
+        const pollingIntervalProp = (node.props as any)?.pollingInterval;
+        
+        if (deferredMode && statusUrl) {
+          // Interpolate statusUrl with result context
+          let interpolatedStatusUrl = statusUrl as string;
           if (result && typeof result === 'object') {
-            statusUrl = statusUrl.replace(/\{\$result\.([^}]+)\}/g, (match, key) => {
+            interpolatedStatusUrl = interpolatedStatusUrl.replace(/\{\$result\.([^}]+)\}/g, (match, key) => {
               return result[key] ?? match;
             });
           }
           
-          // Make single status request using callApi
-          try {
-            const statusMethod = ((node.props as any)?.statusMethod as string) || "get";
-            const statusData = await callApi(
-              executionContext,
-              {
-                url: statusUrl,
-                method: statusMethod,
-                uid: uid,
-                params: { $result: result },
-              },
-              {
-                resolveBindingExpressions: false,
-              },
-            );
+          const statusMethod = ((node.props as any)?.statusMethod as string) || "get";
+          
+          // Step 4: Check if pollingInterval is provided
+          if (pollingIntervalProp) {
+            // Polling loop mode
+            const pollingInterval = parseInt(pollingIntervalProp as string) || 2000;
+            const maxPollingDuration = parseInt((node.props as any)?.maxPollingDuration as string) || 300000;
             
-            // Store status data
+            // Initialize polling state
             const newState = {
               ...deferredStateRef.current,
-              statusData: statusData,
-              attempts: 1,
+              isPolling: true,
               startTime: Date.now(),
+              attempts: 0,
             };
             deferredStateRef.current = newState;
             
             if (updateState) {
               updateState({ deferredState: { ...newState } });
             }
-          } catch (statusError) {
-            console.error("Status request failed:", statusError);
+            
+            // Async polling function
+            const pollStatus = async () => {
+              try {
+                // Check if we've exceeded maxPollingDuration
+                const elapsed = Date.now() - (deferredStateRef.current.startTime || 0);
+                if (elapsed > maxPollingDuration) {
+                  // Stop polling due to timeout
+                  const timeoutState = {
+                    ...deferredStateRef.current,
+                    isPolling: false,
+                  };
+                  deferredStateRef.current = timeoutState;
+                  
+                  if (pollingIntervalRef.current) {
+                    clearInterval(pollingIntervalRef.current);
+                    pollingIntervalRef.current = null;
+                  }
+                  
+                  if (updateState) {
+                    updateState({ deferredState: { ...timeoutState } });
+                  }
+                  return;
+                }
+                
+                // Make status request
+                const statusData = await callApi(
+                  executionContext,
+                  {
+                    url: interpolatedStatusUrl,
+                    method: statusMethod,
+                    uid: uid,
+                    params: { $result: result },
+                  },
+                  {
+                    resolveBindingExpressions: false,
+                  },
+                );
+                
+                // Update attempts and status data
+                const updatedState = {
+                  ...deferredStateRef.current,
+                  statusData: statusData,
+                  attempts: deferredStateRef.current.attempts + 1,
+                };
+                deferredStateRef.current = updatedState;
+                
+                if (updateState) {
+                  updateState({ deferredState: { ...updatedState } });
+                }
+                
+                // TODO: Step 5 - Check completion conditions here
+                
+              } catch (statusError) {
+                console.error("Status request failed:", statusError);
+              }
+            };
+            
+            // Start polling loop
+            pollingIntervalRef.current = setInterval(pollStatus, pollingInterval);
+            
+            // Make first poll immediately
+            pollStatus();
+          } else {
+            // Step 3: Single poll mode (no pollingInterval)
+            try {
+              const statusData = await callApi(
+                executionContext,
+                {
+                  url: interpolatedStatusUrl,
+                  method: statusMethod,
+                  uid: uid,
+                  params: { $result: result },
+                },
+                {
+                  resolveBindingExpressions: false,
+                },
+              );
+              
+              // Store status data
+              const newState = {
+                ...deferredStateRef.current,
+                statusData: statusData,
+                attempts: 1,
+                startTime: Date.now(),
+              };
+              deferredStateRef.current = newState;
+              
+              if (updateState) {
+                updateState({ deferredState: { ...newState } });
+              }
+            } catch (statusError) {
+              console.error("Status request failed:", statusError);
+            }
           }
         }
         
@@ -155,6 +251,12 @@ export function APICallNative({ registerComponentApi, node, uid, updateState }: 
       isPolling: false,
     };
     deferredStateRef.current = newState;
+    
+    // Step 4: Clear polling interval
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
+    }
     
     if (updateState) {
       updateState({ deferredState: { ...newState } });
@@ -190,6 +292,12 @@ export function APICallNative({ registerComponentApi, node, uid, updateState }: 
       isPolling: false,
     };
     deferredStateRef.current = newState;
+    
+    // Step 4: Clear polling interval
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
+    }
     
     if (updateState) {
       updateState({ deferredState: { ...newState } });

@@ -1181,25 +1181,30 @@ test.describe("Deferred Mode - Step 3: Single Poll", () => {
 
 ---
 
-### Step 4: Implement Polling Loop (Basic)
+### Step 4: Implement Polling Loop (Basic) ✅
 
 **Goal**: Add interval-based polling with fixed interval.
 
 **Changes**:
-- Add polling interval management
+- Add `pollingIntervalRef` for interval management
+- Distinguish between single poll (Step 3) and polling loop (Step 4)
+  - If `pollingInterval` prop present: Start interval-based polling
+  - If no `pollingInterval` prop: Do single poll (Step 3 behavior)
 - Loop until `maxPollingDuration` reached
-- Stop on unmount (cleanup)
-- Update `isPolling` state
+- Stop on unmount (cleanup in useEffect)
+- Update `isPolling` state during polling
+- Clear interval in `stopPolling()` and `cancel()`
 
-**Mock Backend**:
+**Mock Backend** (using `$state`):
 ```typescript
 const pollingLoopMock: ApiInterceptorDefinition = {
+  initialize: "$state.pollCount = 0;",
   operations: {
     "start": {
       url: "/api/task",
       method: "post",
       handler: `
-        globalThis.pollCount = 0;
+        $state.pollCount = 0;
         return { taskId: "task-1" };
       `,
     },
@@ -1207,15 +1212,14 @@ const pollingLoopMock: ApiInterceptorDefinition = {
       url: "/api/task/status/task-1",
       method: "get",
       handler: `
-        if (!globalThis.pollCount) globalThis.pollCount = 0;
-        globalThis.pollCount++;
+        $state.pollCount++;
         
         // Complete after 3 polls
-        if (globalThis.pollCount >= 3) {
-          return { status: "completed", pollCount: globalThis.pollCount };
+        if ($state.pollCount >= 3) {
+          return { status: "completed", pollCount: $state.pollCount };
         }
         
-        return { status: "pending", pollCount: globalThis.pollCount };
+        return { status: "pending", pollCount: $state.pollCount };
       `,
     },
   },
@@ -1335,11 +1339,12 @@ test.describe("Deferred Mode - Step 4: Polling Loop", () => {
 ```
 
 **Verification**:
-- Polling loop works correctly
-- `isPolling` state accurate
-- `stopPolling()` works
-- Cleanup on unmount (no memory leaks)
-- All existing tests pass
+- ✅ Polling loop works correctly
+- ✅ `isPolling` state accurate
+- ✅ `stopPolling()` works
+- ✅ Cleanup on unmount (no memory leaks)
+- ✅ All existing tests pass (74 passing, 1 skipped)
+- ✅ 4 Step 4 tests added: multiple polls, isPolling state, stopPolling(), maxPollingDuration timeout
 
 ---
 
@@ -2192,6 +2197,124 @@ test("can resume polling after stopPolling()", async ({
 - Add troubleshooting section
 
 ---
+
+## Testing Best Practices
+
+### Efficient Test Execution Strategy
+
+When tests fail during development, run only the failing tests first using `--grep`, then run the full suite:
+
+```bash
+# Run only failing tests first for fast feedback
+npx playwright test --grep "specific failing test name" --reporter=line
+
+# Once passing, run full suite to ensure no regressions
+npx playwright test src/components/APICall/APICall.spec.ts --reporter=line
+```
+
+This approach:
+- Provides immediate feedback on the specific issue
+- Avoids waiting for unrelated tests to complete
+- Ensures full test coverage before marking work complete
+
+### APIInterceptor State Management with $state
+
+**CRITICAL**: In APIInterceptor handlers, use `$state` to maintain state across API calls, NOT `globalThis`:
+
+```typescript
+// ✅ CORRECT - Use $state context variable
+const mockBackend: ApiInterceptorDefinition = {
+  "initialize": "$state.pollCount = 0; $state.taskId = null;",
+  "operations": {
+    "start": {
+      "url": "/api/task",
+      "method": "post",
+      "handler": `
+        $state.pollCount = 0;
+        $state.taskId = 'task-1';
+        return { taskId: $state.taskId };
+      `
+    },
+    "status": {
+      "url": "/api/task/status/task-1",
+      "method": "get",
+      "handler": `
+        $state.pollCount++;
+        if ($state.pollCount >= 3) {
+          return { status: 'completed', pollCount: $state.pollCount };
+        }
+        return { status: 'pending', pollCount: $state.pollCount };
+      `
+    }
+  }
+};
+
+// ❌ INCORRECT - globalThis is not available in APIInterceptor handlers
+const mockBackend: ApiInterceptorDefinition = {
+  "operations": {
+    "start": {
+      "handler": `
+        globalThis.pollCount = 0;  // Will not work!
+        return { taskId: 'task-1' };
+      `
+    }
+  }
+};
+```
+
+**Key Points:**
+- `$state` is a singleton state object accessible across all API operations
+- Use `initialize` property to set initial state values
+- Properties can be read and modified: `$state.count++`, `$state.items.push(item)`
+- State persists across multiple API calls in the same test
+- Each test gets a fresh `$state` instance
+
+### XMLUI Script Patterns
+
+**No async/await keywords:**
+
+XMLUI automatically handles asynchronous operations without explicit `async`/`await` syntax:
+
+```typescript
+// ✅ CORRECT - XMLUI handles async automatically
+<Button onClick="api.execute(); delay(100); testState = api.getStatus();" />
+
+// ❌ INCORRECT - No await keyword
+<Button onClick="await api.execute(); await delay(100); testState = api.getStatus();" />
+```
+
+**Use delay() instead of setTimeout():**
+
+```typescript
+// ✅ CORRECT - Use delay() function
+<Button onClick="api.execute(); delay(100); testState = api.getStatus();" />
+
+// ❌ INCORRECT - setTimeout not available
+<Button onClick="api.execute().then(() => { setTimeout(() => { testState = api.getStatus(); }, 100); })" />
+```
+
+**Sequential async operations:**
+
+Write async operations in sequence - XMLUI executes them sequentially:
+
+```typescript
+// ✅ CORRECT - XMLUI awaits each operation automatically
+<Button onClick="
+  let result = api.execute();
+  delay(100);
+  let status = api.getStatus();
+  testState = { result, status };
+" />
+
+// ❌ INCORRECT - Promise chains not needed
+<Button onClick="
+  api.execute().then(result => {
+    return delay(100).then(() => {
+      testState = { result, status: api.getStatus() };
+    });
+  });
+" />
+```
 
 ## Testing Commands
 
