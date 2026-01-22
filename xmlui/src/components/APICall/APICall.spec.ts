@@ -2251,10 +2251,11 @@ test.describe("Deferred Mode - Step 4: Polling Loop", () => {
           method="post"
           deferredMode="true"
           statusUrl="/api/task/status/{$result.taskId}"
-          pollingInterval="500"
-          maxPollingDuration="1000"
+          pollingInterval="200"
+          maxPollingDuration="800"
+          onTimeout="testState = { timedOut: true, isPolling: api.isPolling() };"
         />
-        <Button onClick="api.execute(); delay(1500); testState = api.isPolling();" testId="exec" label="Execute" />
+        <Button onClick="api.execute();" testId="exec" label="Execute" />
       </Fragment>
     `, {
       apiInterceptor: pollingLoopMock,
@@ -2264,8 +2265,15 @@ test.describe("Deferred Mode - Step 4: Polling Loop", () => {
     
     await execButton.click();
     
-    // After maxPollingDuration, should have stopped polling
-    await expect.poll(testStateDriver.testState).toEqual(false);
+    // Wait for timeout event to fire (maxPollingDuration + buffer)
+    await expect.poll(async () => {
+      const state = await testStateDriver.testState();
+      return state?.timedOut;
+    }).toEqual(true);
+    
+    // Verify polling has stopped when timeout fired
+    const finalState = await testStateDriver.testState();
+    expect(finalState.isPolling).toEqual(false);
   });
 });
 // =============================================================================
