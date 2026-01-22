@@ -2546,3 +2546,115 @@ test.describe("Deferred Mode - Step 6: Progress & Context Variables", () => {
     expect(result).toBeGreaterThan(0);
   });
 });
+// =============================================================================
+// DEFERRED MODE - STEP 7: NOTIFICATION UPDATES
+// =============================================================================
+test.describe("Deferred Mode - Step 7: Notifications", () => {
+  test("shows progress notification with updates", async ({ 
+    initTestBed,
+    createButtonDriver,
+    page 
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <APICall 
+          id="api" 
+          url="/api/upload" 
+          method="post"
+          deferredMode="true"
+          statusUrl="/api/upload/status"
+          pollingInterval="500"
+          completionCondition="$progress === 100"
+          progressExtractor="$statusData.percent"
+          inProgressNotificationMessage="Uploading: {$progress}% complete"
+          completedNotificationMessage="Upload complete!"
+        />
+        <Button onClick="api.execute()" testId="exec" />
+      </Fragment>
+    `, {
+      apiInterceptor: {
+        operations: {
+          "start": {
+            url: "/api/upload",
+            method: "post",
+            handler: `
+              $state.uploadPercent = 0;
+              return { uploadId: "up-1" };
+            `,
+          },
+          "status": {
+            url: "/api/upload/status",
+            method: "get",
+            handler: `
+              $state.uploadPercent += 50;
+              if ($state.uploadPercent > 100) $state.uploadPercent = 100;
+              return { percent: $state.uploadPercent };
+            `,
+          },
+        },
+      },
+    });
+    
+    const execButton = await createButtonDriver("exec");
+    await execButton.click();
+    
+    // Should see progress notification
+    await expect(page.getByText(/Uploading: \d+% complete/)).toBeVisible();
+    
+    // Wait for completion
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // Should see completion message (use .first() to avoid strict mode violation)
+    await expect(page.getByText("Upload complete!").first()).toBeVisible();
+  });
+});
+
+// =============================================================================
+// DEFERRED MODE - STEP 8: TIMEOUT DETECTION
+// =============================================================================
+test.describe("Deferred Mode - Step 8: Timeout", () => {
+  test("stops polling after maxPollingDuration", async ({ 
+    initTestBed, 
+    createButtonDriver 
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall 
+          id="api" 
+          url="/api/longop" 
+          method="post"
+          deferredMode="true"
+          statusUrl="/api/longop/status"
+          pollingInterval="200"
+          maxPollingDuration="800"
+          completionCondition="$statusData.done === true"
+          onTimeout="() => testState = 'timeout'"
+        />
+        <Button onClick="api.execute()" testId="exec" />
+      </Fragment>
+    `, {
+      apiInterceptor: {
+        operations: {
+          "start": {
+            url: "/api/longop",
+            method: "post",
+            handler: `return { id: "op-1" };`,
+          },
+          "status": {
+            url: "/api/longop/status",
+            method: "get",
+            handler: `return { done: false };`, // Never completes
+          },
+        },
+      },
+    });
+    
+    const execButton = await createButtonDriver("exec");
+    await execButton.click();
+    
+    // Wait for timeout (800ms + buffer)
+    await new Promise(resolve => setTimeout(resolve, 1200));
+    
+    await expect.poll(testStateDriver.testState).toEqual('timeout');
+  });
+});

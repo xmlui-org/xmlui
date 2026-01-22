@@ -7,6 +7,7 @@ import { callApi } from "../../components-core/action/APICall";
 import type { ApiActionComponent } from "../../components/APICall/APICall";
 import { evalBinding } from "../../components-core/script-runner/eval-tree-sync";
 import { Parser } from "../../parsers/scripting/Parser";
+import toast from "react-hot-toast";
 
 interface Props {
   registerComponentApi: RegisterComponentApiFn;
@@ -14,6 +15,7 @@ interface Props {
   uid: symbol;
   updateState?: (state: any) => void;
   onStatusUpdate?: (statusData: any, progress: number) => void | Promise<void>;
+  onTimeout?: () => void | Promise<void>;
 }
 
 interface DeferredState {
@@ -28,7 +30,41 @@ export const defaultProps = {
   method: "get",
 };
 
-export function APICallNative({ registerComponentApi, node, uid, updateState, onStatusUpdate }: Props) {
+/**
+ * Step 7: Interpolates notification messages with context variables
+ * Replaces {$progress}, {$statusData.property}, etc. with actual values
+ */
+function interpolateNotificationMessage(
+  template: string | undefined,
+  context: { progress: number; statusData: any; result?: any }
+): string | undefined {
+  if (!template) return undefined;
+  
+  let message = template;
+  
+  // Replace {$progress}
+  message = message.replace(/\{\$progress\}/g, String(context.progress));
+  
+  // Replace {$statusData.property} patterns
+  if (context.statusData && typeof context.statusData === 'object') {
+    message = message.replace(/\{\$statusData\.([^}]+)\}/g, (match, key) => {
+      const value = context.statusData[key];
+      return value !== undefined ? String(value) : match;
+    });
+  }
+  
+  // Replace {$result.property} patterns
+  if (context.result && typeof context.result === 'object') {
+    message = message.replace(/\{\$result\.([^}]+)\}/g, (match, key) => {
+      const value = context.result[key];
+      return value !== undefined ? String(value) : match;
+    });
+  }
+  
+  return message;
+}
+
+export function APICallNative({ registerComponentApi, node, uid, updateState, onStatusUpdate, onTimeout }: Props) {
   // Track deferred state using ref to avoid re-renders
   const deferredStateRef = useRef<DeferredState>({
     isPolling: false,
@@ -39,6 +75,9 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
 
   // Step 4: Track polling interval for cleanup
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Step 7: Track toast notification ID for updates
+  const toastIdRef = useRef<string | null>(null);
 
   // Initialize state with default values
   useEffect(() => {
@@ -152,6 +191,19 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
               });
             }
             
+            // Step 7: Show initial progress notification
+            const inProgressMessage = (node.props as any)?.inProgressNotificationMessage;
+            if (inProgressMessage) {
+              const interpolated = interpolateNotificationMessage(inProgressMessage, {
+                progress: newState.progress,
+                statusData: newState.statusData,
+                result: result,
+              });
+              if (interpolated) {
+                toastIdRef.current = toast.loading(interpolated);
+              }
+            }
+            
             // Async polling function
             const pollStatus = async () => {
               try {
@@ -180,6 +232,15 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
                       $elapsed: elapsedTime,
                       deferredState: { ...timeoutState }
                     });
+                  }
+                  
+                  // Step 8: Fire onTimeout event
+                  if (onTimeout) {
+                    try {
+                      await onTimeout();
+                    } catch (eventError) {
+                      console.error("onTimeout event handler error:", eventError);
+                    }
                   }
                   return;
                 }
@@ -256,6 +317,58 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
                     await onStatusUpdate(statusData, progress);
                   } catch (eventError) {
                     console.error("onStatusUpdate event handler error:", eventError);
+                  }
+                }
+                
+                // Step 7: Update progress notification
+                const inProgressMessage = (node.props as any)?.inProgressNotificationMessage;
+                if (inProgressMessage && toastIdRef.current) {
+                  const interpolated = interpolateNotificationMessage(inProgressMessage, {
+                    progress: updatedState.progress,
+                    statusData: updatedState.statusData,
+                    result: result,
+                  });
+                  if (interpolated) {
+                    toast.loading(interpolated, { id: toastIdRef.current });
+                  }
+                }
+                
+                // Step 7: Check for completion (simple check for now - progress === 100)
+                if (updatedState.progress >= 100) {
+                  // Stop polling
+                  if (pollingIntervalRef.current) {
+                    clearInterval(pollingIntervalRef.current);
+                    pollingIntervalRef.current = null;
+                  }
+                  
+                  const completionState = {
+                    ...updatedState,
+                    isPolling: false,
+                  };
+                  deferredStateRef.current = completionState;
+                  
+                  if (updateState) {
+                    updateState({ 
+                      $statusData: completionState.statusData,
+                      $progress: completionState.progress,
+                      $polling: completionState.isPolling,
+                      $attempts: completionState.attempts,
+                      $elapsed: Date.now() - (completionState.startTime || Date.now()),
+                      deferredState: { ...completionState }
+                    });
+                  }
+                  
+                  // Show completion notification
+                  const completedMessage = (node.props as any)?.completedNotificationMessage;
+                  if (completedMessage && toastIdRef.current) {
+                    const interpolated = interpolateNotificationMessage(completedMessage, {
+                      progress: completionState.progress,
+                      statusData: completionState.statusData,
+                      result: result,
+                    });
+                    if (interpolated) {
+                      toast.success(interpolated, { id: toastIdRef.current });
+                    }
                   }
                 }
                 

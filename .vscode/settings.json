@@ -29,6 +29,8 @@
     "npx playwright": true,
     "npm view": true,
     "npm install": true,
-    "npx tsc": true
+    "npx tsc": true,
+    "od": true,
+    "mv": true
   }
 }

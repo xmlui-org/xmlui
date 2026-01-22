@@ -172,6 +172,25 @@ export const APICallMd = createMetadata({
         "Can access $statusData context variable. If not specified, no progress tracking.",
       valueType: "string",
     },
+    inProgressNotificationMessage: {
+      description:
+        "Message to show in toast notification during deferred operation polling. " +
+        "Can include {$progress}, {$statusData.property}, and other context variables. " +
+        "Notification will update on each poll with current values.",
+      valueType: "string",
+    },
+    completedNotificationMessage: {
+      description:
+        "Message to show in toast notification when deferred operation completes successfully. " +
+        "Can include {$statusData.property} and other context variables from the final status.",
+      valueType: "string",
+    },
+    errorNotificationMessage: {
+      description:
+        "Message to show in toast notification when deferred operation fails. " +
+        "Can include {$statusData.property} and other context variables from the error status.",
+      valueType: "string",
+    },
     payloadType: dInternal(),
     invalidates: dInternal(),
     updates: dInternal(),
@@ -342,6 +361,7 @@ export const apiCallRenderer = createComponentRenderer(
         uid={uid}
         updateState={updateState}
         onStatusUpdate={lookupEventHandler("statusUpdate")}
+        onTimeout={lookupEventHandler("timeout")}
       />
     );
   },
