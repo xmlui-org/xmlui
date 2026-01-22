@@ -91,10 +91,6 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       } else {
         state.noSubmitFields[uid] = false;
       }
-      // Track fields that have async validation handlers
-      if (action.payload.hasOnValidate && !state.fieldsRequiringValidation.includes(uid)) {
-        state.fieldsRequiringValidation.push(uid);
-      }
       break;
     }
     case FormActionKind.FIELD_REMOVED: {

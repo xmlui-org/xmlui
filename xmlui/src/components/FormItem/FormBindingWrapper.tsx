@@ -102,7 +102,7 @@ export function FormBindingWrapper({
   // Initialize field in Form
   useEffect(() => {
     if (!isInsideForm) return;
-    dispatch(fieldInitialized(formItemId, initialValue, false, noSubmit, false));
+    dispatch(fieldInitialized(formItemId, initialValue, false, noSubmit));
   }, [dispatch, formItemId, initialValue, noSubmit, isInsideForm]);
 
   const childUpdateState = (children as any)?.props?.updateState;

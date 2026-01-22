@@ -33,6 +33,7 @@ import {
   fieldInitialized,
   fieldLostFocus,
   fieldRemoved,
+  fieldValidationRegistered,
 } from "../Form/formActions";
 import { TextArea } from "../TextArea/TextAreaNative";
 import { useEvent } from "../../components-core/utils/misc";
@@ -255,7 +256,11 @@ export const FormItem = memo(function FormItem({
   useEffect(() => {
     // Always dispatch fieldInitialized to ensure noSubmit tracking
     // Pass undefined as value when initialValue is undefined to avoid overwriting existing values
-    dispatch(fieldInitialized(formItemId, initialValue, false, noSubmit, !!_onValidate));
+    dispatch(fieldInitialized(formItemId, initialValue, false, noSubmit));
+    // Register validation handler separately
+    if (_onValidate) {
+      dispatch(fieldValidationRegistered(formItemId, true));
+    }
   }, [dispatch, formItemId, initialValue, noSubmit, _onValidate]);
 
   const onStateChange = useCallback(
