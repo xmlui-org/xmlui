@@ -301,6 +301,140 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     }
   });
   
+  /**
+   * Executes continuous polling with backoff strategy
+   */
+  const executePollingLoop = useEvent((
+    executionContext: ActionExecutionContext,
+    statusUrl: string,
+    statusMethod: string,
+    result: any,
+    pollingInterval: number,
+    maxPollingDuration: number,
+    pollingBackoff: string,
+    maxPollingInterval: number
+  ) => {
+    // Initialize polling state
+    const newState = {
+      ...deferredStateRef.current,
+      isPolling: true,
+      startTime: Date.now(),
+      attempts: 0,
+    };
+    deferredStateRef.current = newState;
+    updateDeferredState(newState, updateState);
+    
+    // Show initial progress notification
+    const inProgressMessage = (node.props as any)?.inProgressNotificationMessage;
+    if (inProgressMessage) {
+      const interpolated = interpolateNotificationMessage(inProgressMessage, {
+        progress: newState.progress,
+        statusData: newState.statusData,
+        result: result,
+      });
+      if (interpolated) {
+        toastIdRef.current = toast.loading(interpolated);
+      }
+    }
+    
+    // Async polling function
+    const pollStatus = async () => {
+      try {
+        // Check timeout
+        const elapsedTime = Date.now() - (deferredStateRef.current.startTime || 0);
+        if (elapsedTime > maxPollingDuration) {
+          await handlePollingTimeout(elapsedTime);
+          return;
+        }
+        
+        // Make status request
+        const statusData = await callApi(
+          executionContext,
+          {
+            url: statusUrl,
+            method: statusMethod as "get" | "post" | "put" | "delete" | "patch" | "head" | "options" | "trace" | "connect",
+            uid: uid,
+            params: { $result: result },
+          },
+          {
+            resolveBindingExpressions: false,
+          },
+        );
+        
+        // Extract progress
+        const progress = extractProgress(
+          statusData,
+          (node.props as any)?.progressExtractor,
+          executionContext,
+          result
+        );
+        
+        // Update state
+        const updatedState = {
+          ...deferredStateRef.current,
+          statusData: statusData,
+          progress: progress,
+          attempts: deferredStateRef.current.attempts + 1,
+        };
+        deferredStateRef.current = updatedState;
+        updateDeferredState(updatedState, updateState);
+        
+        // Fire onStatusUpdate event
+        if (onStatusUpdate) {
+          try {
+            await onStatusUpdate(statusData, progress);
+          } catch (eventError) {
+            console.error("onStatusUpdate event handler error:", eventError);
+          }
+        }
+        
+        // Update progress notification
+        if (inProgressMessage && toastIdRef.current) {
+          const interpolated = interpolateNotificationMessage(inProgressMessage, {
+            progress: updatedState.progress,
+            statusData: updatedState.statusData,
+            result: result,
+          });
+          if (interpolated) {
+            toast.loading(interpolated, { id: toastIdRef.current });
+          }
+        }
+        
+        // Check for completion
+        if (updatedState.progress >= 100) {
+          handlePollingCompletion(updatedState, result);
+          return;
+        }
+        
+        // Schedule next poll
+        scheduleNextPoll();
+        
+      } catch (statusError) {
+        console.error("Status request failed:", statusError);
+        scheduleNextPoll();
+      }
+    };
+    
+    // Schedule next poll with backoff
+    const scheduleNextPoll = () => {
+      if (!deferredStateRef.current.isPolling) return;
+      
+      const nextInterval = calculateNextInterval(
+        pollingInterval,
+        deferredStateRef.current.attempts,
+        pollingBackoff,
+        maxPollingInterval
+      );
+      
+      pollingIntervalRef.current = setTimeout(pollStatus, nextInterval) as any;
+    };
+    
+    // Start polling
+    pollStatus().then(() => {
+      scheduleNextPoll();
+    });
+  });
+  
   // TODO pause until the apiInterceptorContext is initialized (to make sure the API calls are intercepted)
   const execute = useEvent(
     async (executionContext: ActionExecutionContext, ...eventArgs: any[]) => {
@@ -366,177 +500,19 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
             // Polling loop mode
             const pollingInterval = parseInt(pollingIntervalProp as string) || 2000;
             const maxPollingDuration = parseInt((node.props as any)?.maxPollingDuration as string) || 300000;
-            
-            // Step 9: Get backoff configuration
             const pollingBackoff = (node.props as any)?.pollingBackoff || 'none';
             const maxPollingInterval = parseInt((node.props as any)?.maxPollingInterval as string) || 30000;
             
-            // Initialize polling state
-            const newState = {
-              ...deferredStateRef.current,
-              isPolling: true,
-              startTime: Date.now(),
-              attempts: 0,
-            };
-            deferredStateRef.current = newState;
-            
-            // Step 6: Update state with context variables
-            if (updateState) {
-              updateState({ 
-                $statusData: newState.statusData,
-                $progress: newState.progress,
-                $polling: newState.isPolling,
-                $attempts: newState.attempts,
-                $elapsed: 0,
-                deferredState: { ...newState }
-              });
-            }
-            
-            // Step 7: Show initial progress notification
-            const inProgressMessage = (node.props as any)?.inProgressNotificationMessage;
-            if (inProgressMessage) {
-              const interpolated = interpolateNotificationMessage(inProgressMessage, {
-                progress: newState.progress,
-                statusData: newState.statusData,
-                result: result,
-              });
-              if (interpolated) {
-                toastIdRef.current = toast.loading(interpolated);
-              }
-            }
-            
-            // Async polling function
-            const pollStatus = async () => {
-              try {
-                // Check if we've exceeded maxPollingDuration
-                const elapsedTime = Date.now() - (deferredStateRef.current.startTime || 0);
-                if (elapsedTime > maxPollingDuration) {
-                  await handlePollingTimeout(elapsedTime);
-                  return;
-                }
-                
-                // Make status request
-                const statusData = await callApi(
-                  executionContext,
-                  {
-                    url: interpolatedStatusUrl,
-                    method: statusMethod as "get" | "post" | "put" | "delete" | "patch" | "head" | "options" | "trace" | "connect",
-                    uid: uid,
-                    params: { $result: result },
-                  },
-                  {
-                    resolveBindingExpressions: false,
-                  },
-                );
-                
-                // Step 6: Extract progress using progressExtractor expression
-                let progress = 0;
-                const progressExtractor = (node.props as any)?.progressExtractor;
-                if (progressExtractor && statusData) {
-                  try {
-                    // Parse the progress extractor expression
-                    const parser = new Parser(progressExtractor);
-                    const expr = parser.parseExpr();
-                    
-                    // Evaluate the expression with statusData as context
-                    const contextForProgress = {
-                      $statusData: statusData,
-                      $result: result,
-                    };
-                    const extractedValue = evalBinding(expr, {
-                      localContext: contextForProgress,
-                      appContext: executionContext.appContext,
-                      options: {
-                        defaultToOptionalMemberAccess: true,
-                      },
-                    });
-                    // Ensure progress is a number between 0 and 100
-                    if (extractedValue !== undefined && extractedValue !== null) {
-                      progress = Math.max(0, Math.min(100, Number(extractedValue)));
-                    }
-                  } catch (error) {
-                    console.error("Error evaluating progressExtractor:", error);
-                  }
-                }
-                
-                // Update attempts, status data, and progress
-                const updatedState = {
-                  ...deferredStateRef.current,
-                  statusData: statusData,
-                  progress: progress,
-                  attempts: deferredStateRef.current.attempts + 1,
-                };
-                deferredStateRef.current = updatedState;
-                
-                // Step 6: Calculate elapsed time and update state with all context variables
-                const elapsedMs = Date.now() - (updatedState.startTime || Date.now());
-                if (updateState) {
-                  updateState({ 
-                    $statusData: updatedState.statusData,
-                    $progress: updatedState.progress,
-                    $polling: updatedState.isPolling,
-                    $attempts: updatedState.attempts,
-                    $elapsed: elapsedMs,
-                    deferredState: { ...updatedState }
-                  });
-                }
-                
-                // Step 5: Fire onStatusUpdate event with progress from Step 6
-                if (onStatusUpdate) {
-                  try {
-                    await onStatusUpdate(statusData, progress);
-                  } catch (eventError) {
-                    console.error("onStatusUpdate event handler error:", eventError);
-                  }
-                }
-                
-                // Step 7: Update progress notification
-                const inProgressMessage = (node.props as any)?.inProgressNotificationMessage;
-                if (inProgressMessage && toastIdRef.current) {
-                  const interpolated = interpolateNotificationMessage(inProgressMessage, {
-                    progress: updatedState.progress,
-                    statusData: updatedState.statusData,
-                    result: result,
-                  });
-                  if (interpolated) {
-                    toast.loading(interpolated, { id: toastIdRef.current });
-                  }
-                }
-                
-                // Step 7: Check for completion (simple check for now - progress === 100)
-                if (updatedState.progress >= 100) {
-                  handlePollingCompletion(updatedState, result);
-                  return; // Don't schedule next poll
-                }
-                
-                // Step 9: Schedule next poll with backoff
-                scheduleNextPoll();
-                
-              } catch (statusError) {
-                console.error("Status request failed:", statusError);
-                // Step 9: Schedule retry even on error
-                scheduleNextPoll();
-              }
-            };
-            
-            // Step 9: Schedule next poll with backoff
-            const scheduleNextPoll = () => {
-              if (!deferredStateRef.current.isPolling) return;
-              
-              const nextInterval = calculateNextInterval(
-                pollingInterval,
-                deferredStateRef.current.attempts,
-                pollingBackoff,
-                maxPollingInterval
-              );
-              
-              pollingIntervalRef.current = setTimeout(pollStatus, nextInterval) as any;
-            };
-            
-            // Start polling loop - make first poll immediately, then schedule with backoff
-            pollStatus().then(() => {
-              scheduleNextPoll();
-            });
+            executePollingLoop(
+              executionContext,
+              interpolatedStatusUrl,
+              statusMethod,
+              result,
+              pollingInterval,
+              maxPollingDuration,
+              pollingBackoff,
+              maxPollingInterval
+            );
           } else {
             // Step 3: Single poll mode (no pollingInterval)
             await executeSinglePoll(executionContext, interpolatedStatusUrl, statusMethod, result);
