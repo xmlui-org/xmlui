@@ -31,6 +31,9 @@
     "npm install": true,
     "npx tsc": true,
     "od": true,
-    "mv": true
+    "mv": true,
+    "git checkout": true,
+    "git add": true,
+    "git commit": true
   }
 }

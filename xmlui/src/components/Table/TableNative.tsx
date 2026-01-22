@@ -26,6 +26,7 @@ import {
 } from "@tanstack/react-table";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { Virtualizer, type VirtualizerHandle } from "virtua";
 import { orderBy } from "lodash-es";
 import classnames from "classnames";
 
@@ -145,6 +146,7 @@ type TableProps = {
   pageSizeSelectorPosition?: Position;
   pageInfoPosition?: Position;
   checkboxTolerance?: CheckboxTolerance;
+  rowHeight?: number;
 };
 
 function defaultIsRowDisabled(_: any) {
@@ -158,6 +160,10 @@ function defaultIsRowUnselectable(_: any) {
 const SELECT_COLUMN_WIDTH = 42;
 
 const DEFAULT_PAGE_SIZES = [10];
+
+// Feature flag for virtua migration (Phase 2: Prototyping)
+// Toggle this to compare TanStack Virtual vs virtua implementations
+const USE_VIRTUA = false;
 
 /**
  * Maps checkbox tolerance values to pixel values
@@ -284,6 +290,7 @@ export const Table = forwardRef(
       showPageInfo = defaultProps.showPageInfo,
       showPageSizeSelector = defaultProps.showPageSizeSelector,
       checkboxTolerance = defaultProps.checkboxTolerance,
+      rowHeight = defaultProps.rowHeight,
       ...rest
       // cols
     }: TableProps,
@@ -655,6 +662,9 @@ export const Table = forwardRef(
 
     const startMargin = useStartMargin(hasOutsideScroll, wrapperRef, scrollRef);
 
+    // ==================================================================================
+    // TanStack Virtual Implementation (existing)
+    // ==================================================================================
     const rowVirtualizer = useVirtualizer({
       count: rows.length,
       getScrollElement: useCallback(() => {
@@ -677,6 +687,29 @@ export const Table = forwardRef(
           (rowVirtualizer.getVirtualItems()?.[rowVirtualizer.getVirtualItems().length - 1]?.end -
             startMargin || 0)
         : 0;
+
+    // ==================================================================================
+    // Virtua Implementation (experimental - Phase 2)
+    // ==================================================================================
+    const virtualizerRef = useRef<VirtualizerHandle>(null);
+    const firstRowRef = useRef<HTMLTableRowElement>(null);
+    const [measuredRowHeight, setMeasuredRowHeight] = useState<number | undefined>(undefined);
+
+    // Measure first row height (Phase 3.3 pattern from List)
+    useEffect(() => {
+      if (USE_VIRTUA && firstRowRef.current && !measuredRowHeight && rows.length > 0) {
+        requestAnimationFrame(() => {
+          if (firstRowRef.current) {
+            const height = firstRowRef.current.offsetHeight;
+            if (height > 0) {
+              setMeasuredRowHeight(height);
+            }
+          }
+        });
+      }
+    }, [measuredRowHeight, rows.length]);
+
+    const effectiveRowHeight = measuredRowHeight || rowHeight || defaultProps.rowHeight;
 
     const hasData = safeData.length !== 0;
 
@@ -977,7 +1010,7 @@ export const Table = forwardRef(
               ))}
             </thead>
           )}
-          {hasData && (
+          {hasData && !USE_VIRTUA && (
             <tbody className={styles.tableBody}>
               {paddingTop > 0 && (
                 <tr>
@@ -1137,6 +1170,138 @@ export const Table = forwardRef(
               )}
             </tbody>
           )}
+          {hasData && USE_VIRTUA && (
+            <tbody className={styles.tableBody}>
+              <Virtualizer
+                ref={virtualizerRef}
+                itemSize={effectiveRowHeight}
+                startMargin={startMargin}
+              >
+                {rows.map((row, rowIndex) => {
+                  const isFirstRow = rowIndex === 0;
+                  return (
+                    <tr
+                      data-index={rowIndex}
+                      key={`${row.id}-${rowIndex}`}
+                      ref={isFirstRow ? firstRowRef : undefined}
+                      className={classnames(styles.row, {
+                        [styles.selected]: row.getIsSelected(),
+                        [styles.focused]: focusedIndex === rowIndex,
+                        [styles.disabled]: rowDisabledPredicate(row.original),
+                        [styles.noBottomBorder]: noBottomBorder,
+                      })}
+                      onClick={(event) => {
+                        if (!row.getCanSelect()) {
+                          return;
+                        }
+                        if (event?.defaultPrevented) {
+                          return;
+                        }
+                        const target = event.target as HTMLElement;
+                        if (target.tagName.toLowerCase() === "input") {
+                          return;
+                        }
+                        if (target.closest("button")) {
+                          return;
+                        }
+
+                        // Check if click is within checkbox boundary
+                        const currentRow = event.currentTarget as HTMLElement;
+                        const checkbox = currentRow.querySelector(
+                          'input[type="checkbox"]',
+                        ) as HTMLInputElement;
+
+                        if (checkbox) {
+                          const checkboxRect = checkbox.getBoundingClientRect();
+                          const clickX = event.clientX;
+                          const clickY = event.clientY;
+
+                          if (
+                            isWithinCheckboxBoundary(clickX, clickY, checkboxRect, tolerancePixels)
+                          ) {
+                            // Toggle the checkbox when clicking within the boundary
+                            // In single selection mode, allow deselection by checking if already selected
+                            if (!enableMultiRowSelection && row.getIsSelected()) {
+                              checkAllRows(false); // Deselect all (which is just this one row)
+                            } else {
+                              toggleRow(row.original, { metaKey: true });
+                            }
+                            return;
+                          }
+                        }
+                        toggleRow(row.original, event);
+                      }}
+                      onMouseMove={(event) => {
+                        // Change cursor and hover state when within checkbox boundary
+                        const currentRow = event.currentTarget as HTMLElement;
+                        const checkbox = currentRow.querySelector(
+                          'input[type="checkbox"]',
+                        ) as HTMLInputElement;
+
+                        if (checkbox) {
+                          const checkboxRect = checkbox.getBoundingClientRect();
+                          const mouseX = event.clientX;
+                          const mouseY = event.clientY;
+
+                          const shouldShowHover = isWithinCheckboxBoundary(
+                            mouseX,
+                            mouseY,
+                            checkboxRect,
+                            tolerancePixels,
+                          );
+
+                          // Update hover state and cursor based on proximity to checkbox
+                          if (shouldShowHover) {
+                            setHoveredRowId(row.id);
+                            currentRow.style.cursor = "pointer";
+                          } else {
+                            setHoveredRowId(null);
+                            currentRow.style.cursor = "";
+                          }
+                        }
+                      }}
+                      onMouseLeave={(event) => {
+                        // Reset cursor and hover state when leaving the row
+                        const currentRow = event.currentTarget as HTMLElement;
+                        currentRow.style.cursor = "";
+                        setHoveredRowId(null);
+                      }}
+                    >
+                      {row.getVisibleCells().map((cell, i) => {
+                        const cellRenderer = cell.column.columnDef?.meta?.cellRenderer;
+                        const size = cell.column.getSize();
+                        const alignmentClass =
+                          cellVerticalAlign === "top"
+                            ? styles.alignTop
+                            : cellVerticalAlign === "bottom"
+                              ? styles.alignBottom
+                              : styles.alignCenter;
+                        return (
+                          <td
+                            className={classnames(styles.cell, alignmentClass)}
+                            key={`${cell.id}-${i}`}
+                            style={{
+                              width: size,
+                              ...getCommonPinningStyles(cell.column),
+                            }}
+                          >
+                            <div className={styles.cellContent}>
+                              {cellRenderer
+                                ? cellRenderer(cell.row.original, rowIndex, i, cell?.getValue())
+                                : (flexRender(
+                                    cell.column.columnDef.cell,
+                                    cell.getContext(),
+                                  ) as ReactNode)}
+                            </div>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
+              </Virtualizer>
+            </tbody>
+          )}
         </table>
         {loading && !hasData && (
           <div className={styles.loadingWrapper}>
@@ -1227,4 +1392,5 @@ export const defaultProps = {
   pageSizeSelectorPosition: "start" as Position,
   pageInfoPosition: "end" as Position,
   checkboxTolerance: "compact" as CheckboxTolerance,
+  rowHeight: 40, // For virtua virtualization
 };
