@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import { useMemo, useEffect } from "react";
-import { Navigate, Route, Routes, useParams } from "@remix-run/react";
+import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import classnames from "classnames";
 
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
@@ -109,7 +109,7 @@ export function Pages({
             <Route path={extractValue(child.props.url)} key={i} element={renderChild(child)} />
           );
         })}
-        {fallbackPath && <Route path="*" element={<Navigate to={fallbackPath} replace  />} />}
+        {fallbackPath && <Route path="*" element={<Navigate to={fallbackPath} replace />} />}
       </Routes>
       {renderChild(restChildren)}
     </>

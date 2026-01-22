@@ -3,7 +3,7 @@ import { forwardRef, memo, useCallback, useMemo, useReducer, useRef, useState } 
 import produce from "immer";
 import { cloneDeep, isEmpty, isPlainObject, merge, pick } from "lodash-es";
 import memoizeOne from "memoize-one";
-import { useLocation, useParams, useSearchParams } from "@remix-run/react";
+import { useLocation, useParams, useSearchParams } from "react-router-dom";
 
 import type { ParentRenderContext } from "../../abstractions/ComponentDefs";
 import type { ContainerState } from "../../abstractions/ContainerDefs";
@@ -76,10 +76,10 @@ export const StateContainer = memo(
 
     /**
      * STATE COMPOSITION PIPELINE
-     * 
+     *
      * The container state is assembled from multiple sources in a specific order and priority.
      * Understanding this flow is critical for debugging state issues.
-     * 
+     *
      * FLOW DIAGRAM:
      * ┌─────────────────────────────────────────────────────────────┐
      * │ 1. Parent State (scoped by `uses` property)                │
@@ -129,30 +129,30 @@ export const StateContainer = memo(
      * └──────────────────────┬──────────────────────────────────────┘
      *                        ↓
      *                  FINAL COMBINED STATE
-     * 
+     *
      * PRIORITY ORDER (later overrides earlier):
      * 1. Parent State (lowest priority)
      * 2. Component State + APIs
      * 3. Context Variables
      * 4. Local Variables (highest priority - can shadow parent state)
      * 5. Routing Parameters (additive, always available)
-     * 
+     *
      * EXAMPLE - Multi-level composition:
-     * 
+     *
      * Parent Container (parentState):
      * { user: { id: 1, name: "John" }, count: 0 }
-     * 
+     *
      * <Stack uses="['user']" var.count="{10}">
      *   - Parent State (after scoping): { user: { id: 1, name: "John" } }
      *   - Local vars: { count: 10 }
      *   - Result: { user: { id: 1, name: "John" }, count: 10 }
-     *   
+     *
      *   CONTRAST: Without 'uses':
      *   <Stack var.count="{10}">
      *   - Parent State (no scoping): { user: { id: 1, name: "John" }, count: 0 }
      *   - Local vars: { count: 10 }
      *   - Result: { user: { id: 1, name: "John" }, count: 10 } (local vars override)
-     * 
+     *
      * DEBUGGING TIPS:
      * - Enable debug mode on component: <Stack debug>
      * - Check debugView.stateTransitions for state changes
@@ -235,26 +235,26 @@ export const StateContainer = memo(
 
     /**
      * Variable Resolution Strategy
-     * 
+     *
      * XMLUI variables can have dependencies on each other and on context variables.
      * Resolution happens in two passes to handle all dependency orderings correctly:
-     * 
+     *
      * Pass 1 (Pre-resolution):
      * - Resolves variables using current state context
      * - Handles forward references (e.g., function using $props defined later)
      * - Results are temporary and may be incomplete
      * - Uses a temporary memoization cache
-     * 
+     *
      * Pass 2 (Final resolution):
      * - Includes pre-resolved variables in the context
      * - Ensures all dependencies are available
      * - Results are memoized for performance
      * - Uses the persistent memoization cache
-     * 
+     *
      * Example: Given vars { fn: "$props.value", $props: "{x: 1}" }
      * - Pass 1: fn tries to use $props (not yet resolved, gets undefined or default)
      * - Pass 2: fn uses $props (now resolved to {x: 1}, works correctly)
-     * 
+     *
      * Future: Consider topological sort of dependencies to enable single-pass resolution
      */
 
@@ -265,7 +265,7 @@ export const StateContainer = memo(
       localVarsStateContext,
       useRef<MemoedVars>(new Map()), // Temporary cache, discarded after this pass
     );
-    
+
     // Merge pre-resolved variables into context for second pass
     const localVarsStateContextWithPreResolvedLocalVars = useShallowCompareMemoize({
       ...preResolvedLocalVars,
@@ -431,9 +431,7 @@ function useMergedState(localVars: ContainerState, componentState: ContainerStat
       if (ret[key] === undefined) {
         ret[key] = value;
       } else {
-        if (
-          (isPlainObject(ret[key]) && isPlainObject(value))
-        ) {
+        if (isPlainObject(ret[key]) && isPlainObject(value)) {
           ret[key] = merge(cloneDeep(ret[key]), value);
         } else {
           ret[key] = value;

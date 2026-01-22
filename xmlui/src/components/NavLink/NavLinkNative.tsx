@@ -1,7 +1,7 @@
 import type { CSSProperties, MouseEventHandler, ReactNode, Ref } from "react";
 import type React from "react";
 import { forwardRef, useContext, useMemo } from "react";
-import { NavLink as RrdNavLink } from "@remix-run/react";
+import { NavLink as RrdNavLink } from "react-router-dom";
 import type { To } from "react-router-dom";
 import classnames from "classnames";
 
@@ -68,7 +68,7 @@ export const NavLink = forwardRef(function NavLink(
     !!appLayoutContext && getAppLayoutOrientation(appLayoutContext.layout).includes("vertical");
   const navPanelContext = useContext(NavPanelContext);
   const inDrawer = navPanelContext?.inDrawer;
-  
+
   const { level: contextLevel } = useContext(NavGroupContext);
   const effectiveLevel = levelProp ?? contextLevel;
   let safeVertical = vertical;
@@ -101,12 +101,14 @@ export const NavLink = forwardRef(function NavLink(
   });
 
   let innerContent = (
-    <div className={classnames(styles.innerContent, {
-      [styles.iconAlignBaseline]: effectiveIconAlignment === "baseline",
-      [styles.iconAlignStart]: effectiveIconAlignment === "start",
-      [styles.iconAlignCenter]: effectiveIconAlignment === "center",
-      [styles.iconAlignEnd]: effectiveIconAlignment === "end",
-    })}>
+    <div
+      className={classnames(styles.innerContent, {
+        [styles.iconAlignBaseline]: effectiveIconAlignment === "baseline",
+        [styles.iconAlignStart]: effectiveIconAlignment === "start",
+        [styles.iconAlignCenter]: effectiveIconAlignment === "center",
+        [styles.iconAlignEnd]: effectiveIconAlignment === "end",
+      })}
+    >
       {icon}
       {children}
     </div>

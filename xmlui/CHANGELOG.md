@@ -1,5 +1,26 @@
 # xmlui
 
+## 0.11.30
+
+### Patch Changes
+
+- 4e0379f: Add ScrollViewer component
+- 498abc1: Document and improve ContextMenu
+- 62d88a4: - Columns with bindTo are now sortable by default
+
+  - Use canSort="false" to disable sorting on individual columns
+  - Use config.json with { "appGlobals": { "columnCanSortDefault": false } } to revert to the old default
+
+- ded963e: Add QRCode component
+- 4e0379f: Add scrollStyle property to Stack, FlowLayout, and NavPanel
+- 84acbea: Add ContextMenu component
+- 6decfd7: Added completed state theme variable for ProgressBar called "color-indicator-ProgressBar--complete".
+- 0f9326f: Added validation timeout handling for input fields. New properties include customValidationsTimeout and customValidationsTimeoutMessage.
+- 7a4974d: upgrade @remix-run/react to 2.17.4, migrate imports to react-router-dom
+- 2fb95aa: Add contextMenu event to several components
+- 05c9fd7: Add scroll fading effect
+- bc7addd: Review markdown rendering and theming
+
 ## 0.11.29
 
 ### Patch Changes

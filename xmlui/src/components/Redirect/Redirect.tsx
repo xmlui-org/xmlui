@@ -1,5 +1,5 @@
 import type { To } from "react-router-dom";
-import { Navigate } from "@remix-run/react";
+import { Navigate } from "react-router-dom";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { createUrlWithQueryParams } from "../component-utils";
@@ -33,6 +33,11 @@ export const redirectRenderer = createComponentRenderer(
   COMP,
   RedirectMd,
   ({ node, extractValue }) => {
-    return <Navigate to={createUrlWithQueryParams(extractValue(node.props.to)) as To} replace={extractValue.asOptionalBoolean(node.props.replace)} />;
+    return (
+      <Navigate
+        to={createUrlWithQueryParams(extractValue(node.props.to)) as To}
+        replace={extractValue.asOptionalBoolean(node.props.replace)}
+      />
+    );
   },
 );

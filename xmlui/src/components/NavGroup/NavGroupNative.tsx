@@ -33,7 +33,7 @@ import { NavLink } from "../NavLink/NavLinkNative";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { NavPanelContext } from "../NavPanel/NavPanelNative";
 import type { NavGroupMd } from "./NavGroup";
-import { useLocation } from "@remix-run/react";
+import { useLocation } from "react-router-dom";
 import classnames from "classnames";
 import { NavGroupContext } from "./NavGroupContext";
 import { getAppLayoutOrientation } from "../App/AppNative";
@@ -97,7 +97,10 @@ export const NavGroup = forwardRef(function NavGroup(
   ref,
 ) {
   const { getThemeVar } = useTheme();
-  const effectiveExpandIconAlignment = expandIconAlignment || (getThemeVar("expandIconAlignment-NavGroup") as "start" | "end" | undefined) || defaultProps.expandIconAlignment;
+  const effectiveExpandIconAlignment =
+    expandIconAlignment ||
+    (getThemeVar("expandIconAlignment-NavGroup") as "start" | "end" | undefined) ||
+    defaultProps.expandIconAlignment;
   const { level } = useContext(NavGroupContext);
   const appLayoutContext = useAppLayoutContext();
   const navPanelContext = useContext(NavPanelContext);
@@ -232,7 +235,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
   };
 
   return (
-    <div 
+    <div
       className={styles.groupWrapper}
       style={expandIconAlignment === "end" ? { width: "100%" } : undefined}
     >

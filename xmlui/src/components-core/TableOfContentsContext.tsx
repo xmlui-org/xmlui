@@ -8,10 +8,9 @@ import {
   useState,
 } from "react";
 import { useIsomorphicLayoutEffect, useScrollEventHandler, useScrollParent } from "./utils/hooks";
-import { useNavigate } from "@remix-run/react";
+import { useNavigate } from "react-router-dom";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "./constants";
 import { useAppContext } from "./AppContext";
-
 
 // --- Stores the information about a particular heading to be displayed in the TOC.
 type HeadingItem = {
@@ -62,7 +61,7 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
   const [headings, setHeadings] = useState<Record<string, HeadingItem>>(EMPTY_OBJECT);
   const [callbacks, setCallbacks] = useState<Array<ActiveAnchorChangedCallback>>(EMPTY_ARRAY);
   const observer = useRef<IntersectionObserver | null>(null);
-  const {forceRefreshAnchorScroll} = useAppContext();
+  const { forceRefreshAnchorScroll } = useAppContext();
   const thisRef = useRef({
     suspendPositionBasedSetActiveId: false,
   });
@@ -165,11 +164,10 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
     });
   }, [headings]);
 
-
   //the content could take time to load, this way we try to force the scroll to anchor mechanism to kick in
   const hasHeadings = sortedHeadings.length > 0;
-  useIsomorphicLayoutEffect(()=>{
-    if(hasHeadings){
+  useIsomorphicLayoutEffect(() => {
+    if (hasHeadings) {
       forceRefreshAnchorScroll();
     }
   }, [forceRefreshAnchorScroll, hasHeadings]);
@@ -192,7 +190,7 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
       scrollToAnchor,
       subscribeToActiveAnchorChange,
       hasTableOfContents: callbacks.length > 0,
-      activeAnchorId
+      activeAnchorId,
     };
   }, [
     registerHeading,
@@ -223,7 +221,7 @@ export function useTableOfContents() {
           </Page>
         </Pages>
     </App>
-    
+
     `);
   }
 
