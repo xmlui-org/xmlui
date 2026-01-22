@@ -1,5 +1,5 @@
 import type { Dispatch, ReactElement } from "react";
-import { Fragment, cloneElement, useId, useMemo, useContext } from "react";
+import { Fragment, cloneElement, useEffect, useId, useMemo, useContext } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 import type {
@@ -14,6 +14,7 @@ import { HelperText } from "./HelperText";
 import { FormItemContext } from "./FormItemNative";
 import { resolveFormItemId } from "./FormItemUtils";
 import { useShallowCompareMemoize } from "../../components-core/utils/hooks";
+import { fieldValidationRegistered } from "../Form/formActions";
 import styles from "./FormItem.module.scss";
 
 type ValidationWrapperProps = {
@@ -101,9 +102,25 @@ export function ValidationWrapper({
 
   const value = useFormContextPart<any>((value) => getByPath(value?.subject, formItemId));
   const validationResult = useFormContextPart((value) => value?.validationResults[formItemId]);
-  const dispatch =
-    useFormContextPart((value) => value?.dispatch) ||
-    ((() => undefined) as unknown as Dispatch<any>);
+  const dispatchFromContext = useFormContextPart((value) => value?.dispatch);
+  const dispatch = useMemo(
+    () => dispatchFromContext || ((() => undefined) as unknown as Dispatch<any>),
+    [dispatchFromContext]
+  );
+
+  // When ValidationWrapper is used as a standalone behavior (not part of FormItem),
+  // we need to notify the Form about validation handlers for Form-level timeout tracking
+  useEffect(() => {
+    if (!isFormItem && isInsideForm && onValidate) {
+      // Use fieldValidationRegistered to update the validation flag without reinitializing the field
+      // This prevents double initialization when used with FormBindingWrapper
+      dispatch(fieldValidationRegistered(formItemId, true));
+      
+      return () => {
+        dispatch(fieldValidationRegistered(formItemId, false));
+      };
+    }
+  }, [isFormItem, isInsideForm, onValidate, dispatch, formItemId]);
 
   useValidation(
     validations,

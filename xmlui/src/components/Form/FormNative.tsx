@@ -107,6 +107,17 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       if (pendIndex !== -1) state.validationsPending.splice(pendIndex, 1);
       break;
     }
+    case FormActionKind.FIELD_VALIDATION_REGISTERED: {
+      // Update hasOnValidate flag for an existing field without reinitializing
+      const hasOnValidate = action.payload.hasOnValidate;
+      if (hasOnValidate && !state.fieldsRequiringValidation.includes(uid)) {
+        state.fieldsRequiringValidation.push(uid);
+      } else if (!hasOnValidate) {
+        const index = state.fieldsRequiringValidation.indexOf(uid);
+        if (index !== -1) state.fieldsRequiringValidation.splice(index, 1);
+      }
+      break;
+    }
     case FormActionKind.FIELD_VALUE_CHANGED: {
       set(state.subject, uid, action.payload.value);
       state.interactionFlags[uid].isDirty = true;
