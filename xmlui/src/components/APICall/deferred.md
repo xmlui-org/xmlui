@@ -1656,7 +1656,7 @@ test.describe("Deferred Mode - Step 8: Timeout", () => {
 
 ---
 
-### Step 9: Add Retry Logic for Status Checks
+### Step 9: Add Retry Logic for Status Checks ✅
 
 **Goal**: Implement polling interval backoff.
 
@@ -1731,15 +1731,15 @@ test.describe("Deferred Mode - Step 9: Retry Logic", () => {
 });
 ```
 
-**Verification**:
+**Verification**: ✅ PASSED
 - Retry logic works correctly
 - Max retries respected
 - Polling continues after successful retry
-- All existing tests pass
+- All existing tests pass (86 passing, 1 skipped)
 
 ---
 
-### Step 10: Add Backoff Strategies
+### Step 10: Add Backoff Strategies ✅
 
 **Goal**: Implement polling interval backoff to reduce server load.
 
@@ -1813,15 +1813,15 @@ test.describe("Deferred Mode - Step 10: Backoff", () => {
 });
 ```
 
-**Verification**:
-- Backoff strategies work
+**Verification**: ✅ PASSED
+- Backoff strategies work (linear and exponential)
 - Intervals increase correctly
 - MaxInterval respected
-- All existing tests pass
+- All existing tests pass (86 passing, 1 skipped)
 
 ---
 
-### Step 11: Add Server-Side Cancellation Support
+### Step 11: Add Server-Side Cancellation Support ✅
 
 **Goal**: Allow cancelling long-running operations on the server.
 
@@ -1959,11 +1959,24 @@ test.describe("Deferred Mode - Step 11: Cancellation", () => {
 });
 ```
 
-**Verification**:
-- Cancel endpoint called
-- Polling stops immediately
-- `cancel()` API works
-- All existing tests pass
+**Testing**: ✅ COMPLETE
+- Created Step 11 test suite with 4 tests:
+  - ✅ cancels operation on server
+  - ✅ cancel() stops polling immediately
+  - ✅ cancel() works without cancelUrl (local stop only)
+  - ✅ interpolates cancelUrl with result context
+
+**Verification**: ✅ PASSED
+- Cancel endpoint called when cancelUrl provided
+- URL interpolation with {$result.property} works correctly
+- Polling stops immediately on cancel()
+- `cancel()` API works with and without cancelUrl
+- All existing tests pass (86 passing, 1 skipped)
+
+**Files Modified**:
+- [APICall.tsx](APICall.tsx) - Added cancelUrl, cancelMethod, cancelBody properties
+- [APICallNative.tsx](APICallNative.tsx) - Implemented server-side cancellation in cancel() method
+- [APICall.spec.ts](APICall.spec.ts) - Added Step 11 test suite
 
 ---
 

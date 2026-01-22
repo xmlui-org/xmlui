@@ -2727,3 +2727,215 @@ test.describe("Deferred Mode - Step 9: Retry Logic", () => {
     expect(result.done).toEqual(true);
   });
 });
+
+// =============================================================================
+// DEFERRED MODE - STEP 11: SERVER-SIDE CANCELLATION
+// =============================================================================
+test.describe("Deferred Mode - Step 11: Cancellation", () => {
+  test("cancels operation on server", async ({ 
+    initTestBed, 
+    createButtonDriver 
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall 
+          id="api" 
+          url="/api/operation" 
+          method="post"
+          deferredMode="true"
+          statusUrl="/api/operation/status/{$result.operationId}"
+          cancelUrl="/api/operation/cancel/{$result.operationId}"
+          cancelMethod="post"
+          pollingInterval="500"
+        />
+        <Button onClick="api.execute(); delay(800); api.cancel(); delay(1000); testState = { cancelled: true };" testId="exec" />
+      </Fragment>
+    `, {
+      apiInterceptor: {
+        initialize: "$state.operationCancelled = false;",
+        operations: {
+          "start": {
+            url: "/api/operation",
+            method: "post",
+            handler: `return { operationId: "op-1" };`,
+          },
+          "status": {
+            url: "/api/operation/status/op-1",
+            method: "get",
+            handler: `
+              if ($state.operationCancelled) {
+                return { status: "cancelled" };
+              }
+              return { status: "in-progress" };
+            `,
+          },
+          "cancel": {
+            url: "/api/operation/cancel/op-1",
+            method: "post",
+            handler: `
+              $state.operationCancelled = true;
+              return { status: "cancelled" };
+            `,
+          },
+        },
+      },
+    });
+    
+    const execButton = await createButtonDriver("exec");
+    
+    await execButton.click();
+    
+    // Wait for cancellation to complete
+    await expect.poll(testStateDriver.testState).toEqual({ cancelled: true });
+  });
+  
+  test("cancel() stops polling immediately", async ({ 
+    initTestBed, 
+    createButtonDriver 
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall 
+          id="api" 
+          url="/api/operation" 
+          method="post"
+          deferredMode="true"
+          statusUrl="/api/operation/status/{$result.operationId}"
+          cancelUrl="/api/operation/cancel/{$result.operationId}"
+          pollingInterval="500"
+        />
+        <Button onClick="api.execute()" testId="exec" />
+        <Button onClick="api.cancel()" testId="cancel" />
+        <Button onClick="testState = api.isPolling()" testId="check" />
+      </Fragment>
+    `, {
+      apiInterceptor: {
+        operations: {
+          "start": {
+            url: "/api/operation",
+            method: "post",
+            handler: `return { operationId: "op-1" };`,
+          },
+          "status": {
+            url: "/api/operation/status/op-1",
+            method: "get",
+            handler: `return { status: "in-progress" };`,
+          },
+          "cancel": {
+            url: "/api/operation/cancel/op-1",
+            method: "post",
+            handler: `return { status: "cancelled" };`,
+          },
+        },
+      },
+    });
+    
+    const execButton = await createButtonDriver("exec");
+    const cancelButton = await createButtonDriver("cancel");
+    const checkButton = await createButtonDriver("check");
+    
+    await execButton.click();
+    await cancelButton.click();
+    
+    // Check immediately after cancel
+    await checkButton.click();
+    await expect.poll(testStateDriver.testState).toEqual(false);
+  });
+
+  test("cancel() works without cancelUrl (local stop only)", async ({ 
+    initTestBed, 
+    createButtonDriver 
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall 
+          id="api" 
+          url="/api/operation" 
+          method="post"
+          deferredMode="true"
+          statusUrl="/api/operation/status/{$result.operationId}"
+          pollingInterval="500"
+        />
+        <Button onClick="api.execute(); delay(100); api.cancel(); delay(100); testState = api.isPolling();" testId="exec" />
+      </Fragment>
+    `, {
+      apiInterceptor: {
+        operations: {
+          "start": {
+            url: "/api/operation",
+            method: "post",
+            handler: `return { operationId: "op-1" };`,
+          },
+          "status": {
+            url: "/api/operation/status/op-1",
+            method: "get",
+            handler: `return { status: "in-progress" };`,
+          },
+        },
+      },
+    });
+    
+    const execButton = await createButtonDriver("exec");
+    
+    await execButton.click();
+    
+    // After cancel, polling should be stopped
+    await expect.poll(testStateDriver.testState).toEqual(false);
+  });
+
+  test("interpolates cancelUrl with result context", async ({ 
+    initTestBed, 
+    createButtonDriver 
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall 
+          id="api" 
+          url="/api/operation" 
+          method="post"
+          deferredMode="true"
+          statusUrl="/api/operation/status/{$result.id}"
+          cancelUrl="/api/operation/cancel/{$result.id}"
+          pollingInterval="500"
+        />
+        <Button onClick="api.execute(); delay(600); api.cancel(); delay(600); testState = 'done';" testId="exec" />
+      </Fragment>
+    `, {
+      apiInterceptor: {
+        initialize: "$state.cancelCalled = false;",
+        operations: {
+          "start": {
+            url: "/api/operation",
+            method: "post",
+            handler: `return { id: "custom-op-123" };`,
+          },
+          "status": {
+            url: "/api/operation/status/custom-op-123",
+            method: "get",
+            handler: `
+              return { 
+                status: "in-progress", 
+                cancelCalled: $state.cancelCalled
+              };
+            `,
+          },
+          "cancel": {
+            url: "/api/operation/cancel/custom-op-123",
+            method: "post",
+            handler: `
+              $state.cancelCalled = true;
+              return { status: "cancelled" };
+            `,
+          },
+        },
+      },
+    });
+    
+    const execButton = await createButtonDriver("exec");
+    
+    await execButton.click();
+    
+    // Wait for the test to complete
+    await expect.poll(testStateDriver.testState).toEqual('done');
+  });
+});

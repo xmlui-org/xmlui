@@ -100,6 +100,10 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
 
   // Step 7: Track toast notification ID for updates
   const toastIdRef = useRef<string | null>(null);
+  
+  // Step 11: Track last result and execution context for cancel() method
+  const lastResultRef = useRef<any>(null);
+  const executionContextRef = useRef<ActionExecutionContext | null>(null);
 
   // Initialize state with default values
   useEffect(() => {
@@ -137,6 +141,9 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     async (executionContext: ActionExecutionContext, ...eventArgs: any[]) => {
       const options = eventArgs[1];
       
+      // Step 11: Store execution context for cancel() method
+      executionContextRef.current = executionContext;
+      
       // Set inProgress before starting
       if (updateState) {
         updateState({ inProgress: true });
@@ -159,6 +166,9 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
             resolveBindingExpressions: true,
           },
         );
+        
+        // Step 11: Store result in ref for cancel() method
+        lastResultRef.current = result;
         
         // Store result and update state on success
         if (updateState) {
@@ -545,20 +555,22 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
   });
 
   const cancel = useEvent(async () => {
-    // Placeholder for Step 11 implementation
+    // Step 11: Server-side cancellation support
+    const cancelUrl = (node.props as any)?.cancelUrl;
+    
+    // Stop polling first
     const newState = {
       ...deferredStateRef.current,
       isPolling: false,
     };
     deferredStateRef.current = newState;
     
-    // Step 4: Clear polling interval
     if (pollingIntervalRef.current) {
       clearTimeout(pollingIntervalRef.current);
       pollingIntervalRef.current = null;
     }
     
-    // Step 6: Update state with context variables
+    // Update state with context variables
     const elapsed = Date.now() - (newState.startTime || Date.now());
     if (updateState) {
       updateState({ 
@@ -569,6 +581,42 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
         $elapsed: elapsed,
         deferredState: { ...newState }
       });
+    }
+    
+    // If cancelUrl is provided, call the cancel endpoint
+    if (cancelUrl && executionContextRef.current) {
+      try {
+        const lastResult = lastResultRef.current;
+        
+        // Interpolate cancelUrl with result context
+        let interpolatedCancelUrl = cancelUrl as string;
+        if (lastResult && typeof lastResult === 'object') {
+          interpolatedCancelUrl = interpolatedCancelUrl.replace(/\{\$result\.([^}]+)\}/g, (match, key) => {
+            return lastResult[key] ?? match;
+          });
+        }
+        
+        const cancelMethod = ((node.props as any)?.cancelMethod as string) || "post";
+        const cancelBody = (node.props as any)?.cancelBody;
+        
+        // Make cancel request
+        await callApi(
+          executionContextRef.current,
+          {
+            url: interpolatedCancelUrl,
+            method: cancelMethod,
+            body: cancelBody,
+            uid: uid,
+            params: { $result: lastResult },
+          },
+          {
+            resolveBindingExpressions: true,
+          },
+        );
+      } catch (cancelError) {
+        console.error("Cancel request failed:", cancelError);
+        // Don't throw - cancellation failure shouldn't break the UI
+      }
     }
   });
 

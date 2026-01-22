@@ -186,6 +186,25 @@ export const APICallMd = createMetadata({
         "Can access $statusData context variable. If not specified, no progress tracking.",
       valueType: "string",
     },
+    cancelUrl: {
+      description:
+        "URL to call when cancelling the deferred operation. " +
+        "Can use $result context from initial response (e.g., '/api/cancel/{$result.operationId}'). " +
+        "If not provided, cancel() will only stop polling without notifying the server.",
+      valueType: "string",
+    },
+    cancelMethod: {
+      description:
+        "HTTP method for cancel requests. Defaults to 'post'.",
+      valueType: "string",
+      availableValues: httpMethodNames,
+      defaultValue: "post",
+    },
+    cancelBody: {
+      description:
+        "Optional body to send with the cancel request. " +
+        "Can use $result context from initial response.",
+    },
     inProgressNotificationMessage: {
       description:
         "Message to show in toast notification during deferred operation polling. " +
