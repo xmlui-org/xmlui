@@ -107,19 +107,33 @@ This property is an optional string to set a label for the button part.
 
 %-PROP-START parseAs
 
-Automatically parse file contents as CSV or JSON. When set, the `onDidChange` event receives parsed data instead of raw File objects.
+Automatically parse file contents as CSV or JSON. When set, the `onDidChange` event receives an object containing both the raw files and parsed data:
+
+```typescript
+type ParseAsResult = {
+  files: File[];        // Original File objects
+  parsedData: Array<{   // Parse results for each file
+    file: File;         // Reference to the file
+    data: any[];        // Parsed data rows
+    error?: Error;      // Parse error, if any
+  }>;
+};
+```
 
 Available values: `"csv"`, `"json"`, `undefined` **(default)**
 
 When `parseAs` is set, `acceptsFileType` is automatically inferred (`.csv` or `.json`) unless explicitly overridden.
+
+> **Note**: Empty files are handled gracefully, returning an empty `data` array without error.
 
 ```xmlui-pg copy display name="Example: parseAs CSV"
 ---app
 <App var.products="{[]}">
   <FileInput
     parseAs="csv"
-    onDidChange="data => products = data"
+    onDidChange="result => products = result.parsedData[0]?.data || []"
   />
+  <Text>{ products }</Text>
   <List data="{products}" when="{products.length > 0}">
     <Text value="{$item.name}: ${$item.price}" />
   </List>
@@ -133,7 +147,7 @@ Right-click and save: [sample-products.csv](/resources/files/sample-products.csv
 <App var.products="{[]}">
   <FileInput
     parseAs="json"
-    onDidChange="data => products = data"
+    onDidChange="result => products = result.parsedData[0]?.data || []"
   />
   <List data="{products}" when="{products.length > 0}">
     <Text value="{$item.name}: ${$item.price} ({$item.category})" />
@@ -150,7 +164,7 @@ Right-click and save: [sample-products.json](/resources/files/sample-products.js
 <App var.config="{[]}">
   <FileInput
     parseAs="json"
-    onDidChange="data => config = data"
+    onDidChange="result => config = result.parsedData[0]?.data || []"
   />
   <List data="{config}" when="{config.length > 0}">
     <Text value="App: {$item.appName} v{$item.version}" />
@@ -162,23 +176,14 @@ Right-click and save: [sample-config.json](/resources/files/sample-config.json).
 
 **Parsing Multiple Files**
 
-When using `parseAs` with `multiple="true"`, the `onDidChange` event receives an array of parse results. Each result contains the original file, parsed data, and any error that occurred.
-
-**Type signature**:
-```typescript
-type ParseResult = {
-  file: File;      // Original file reference
-  data: any[];     // Parsed data (empty array if error)
-  error?: Error;   // Parse error, if any
-};
-```
+When using `parseAs` with `multiple="true"`, the `parsedData` array contains results for each file.
 
 ```xmlui-pg copy display name="Example: Multiple CSV files"
 <App var.results="{[]}">
   <FileInput
     parseAs="csv"
     multiple="true"
-    onDidChange="data => results = data"
+    onDidChange="result => results = result.parsedData"
   />
   <List data="{results}" when="{results.length > 0}">
     <Text value="{$item.file.name}: {$item.data.length} rows" when="{!$item.error}" />
@@ -193,9 +198,9 @@ type ParseResult = {
     parseAs="csv"
     multiple="true"
     csvOptions="{{ dynamicTyping: true }}"
-    onDidChange="{results => {
-      successCount = results.filter(r => !r.error).length;
-      failCount = results.filter(r => r.error).length;
+    onDidChange="{result => {
+      successCount = result.parsedData.filter(r => !r.error).length;
+      failCount = result.parsedData.filter(r => r.error).length;
     }}"
   />
   <HStack when="{successCount + failCount > 0}">
@@ -226,7 +231,7 @@ Common options:
   <FileInput
     parseAs="csv"
     csvOptions="{{ delimiter: ';' }}"
-    onDidChange="rows => data = rows"
+    onDidChange="result => data = result.parsedData[0]?.data || []"
   />
   <List data="{data}" when="{data.length > 0}">
     <Text value="{$item.name}: ${$item.price} ({$item.category})" />
@@ -242,7 +247,7 @@ Right-click and save: [sample-products-semicolon.csv](/resources/files/sample-pr
   <FileInput
     parseAs="csv"
     csvOptions="{{ dynamicTyping: true }}"
-    onDidChange="data => products = data"
+    onDidChange="result => products = result.parsedData[0]?.data || []"
   />
   <List data="{products}" when="{products.length > 0}">
     <Text value="{$item.name}: ${$item.price} (inStock: {$item.inStock})" />
@@ -261,7 +266,7 @@ Right-click and save: [sample-products-typed.csv](/resources/files/sample-produc
     parseAs="csv"
     acceptsFileType=".tsv"
     csvOptions="{{ delimiter: '\t' }}"
-    onDidChange="data => products = data"
+    onDidChange="result => products = result.parsedData[0]?.data || []"
   />
   <List data="{products}" when="{products.length > 0}">
     <Text value="{$item.name}: ${$item.price} - {$item.category}" />
@@ -278,7 +283,7 @@ Right-click and save: [sample-products-tsv.tsv](/resources/files/sample-products
     id="fileInput"
     parseAs="csv"
     csvOptions="{{ dynamicTyping: true }}"
-    onDidChange="data => inventory = data"
+    onDidChange="result => inventory = result.parsedData[0]?.data || []"
   />
   <HStack>
     <Spinner when="{fileInput.inProgress}" delay="{200}" />
@@ -358,7 +363,7 @@ This event is triggered when file parsing fails (when using `parseAs`). If not p
 <App var.items="{[]}">
   <FileInput
     parseAs="csv"
-    onDidChange="data => items = data"
+    onDidChange="result => items = result.parsedData[0]?.data || []"
     onParseError="(err, file) => toast.error(file.name + ': ' + err.message)"
   />
   <List data="{items}" when="{items.length > 0}">
@@ -374,7 +379,7 @@ Right-click and save: [sample-broken.csv](/resources/files/sample-broken.csv). T
 <App var.data="{[]}">
   <FileInput
     parseAs="json"
-    onDidChange="rows => data = rows"
+    onDidChange="result => data = result.parsedData[0]?.data || []"
     onParseError="(err, file) => toast.error(file.name + ': ' + err.message)"
   />
   <List data="{data}" when="{data.length > 0}">
@@ -436,7 +441,7 @@ Use this property to show loading indicators while files are being parsed. See t
   <FileInput
     id="csvInput"
     parseAs="csv"
-    onDidChange="rows => data = rows"
+    onDidChange="result => data = result.parsedData[0]?.data || []"
   />
   <Text value="Parsing file..." when="{csvInput.inProgress}" />
   <Text value="{data.length} rows loaded" when="{!csvInput.inProgress && data.length > 0}" />
@@ -456,7 +461,7 @@ Right-click and save: [sample-products.csv](/resources/files/sample-products.csv
   <FileInput
     id="csvInput"
     parseAs="csv"
-    onDidChange="data => products = data"
+    onDidChange="result => products = result.parsedData[0]?.data || []"
   />
   <Text value="Columns: {csvInput.getFields()?.join(', ')}" when="{csvInput.getFields()}" />
   <List data="{products}" when="{products.length > 0}">
