@@ -519,7 +519,7 @@ Write async operations in sequence - XMLUI executes them sequentially:
 // ✅ CORRECT - XMLUI awaits each operation automatically
 <Button onClick="
   let result = api.execute();
-  delay(100);
+  await delay(100);
   let status = api.getStatus();
   testState = { result, status };
 " />
@@ -532,6 +532,8 @@ Write async operations in sequence - XMLUI executes them sequentially:
     });
   });
 " />
+```
+
 **Banned Functions:**
 
 XMLUI scripts cannot use certain global functions that manage timers and execution flow. See `bannedFunctions.ts` for the complete list.
