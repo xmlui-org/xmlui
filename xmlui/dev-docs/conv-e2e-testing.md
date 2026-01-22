@@ -321,6 +321,59 @@ npx playwright test ComponentName.spec.ts --grep "test name pattern" --reporter=
 npx playwright test ComponentName.spec.ts --grep "Basic Functionality" --reporter=line
 ```
 
+### Debugging Techniques
+
+#### Console Message Capture
+
+Playwright can capture `console.log` messages from the browser for debugging:
+
+```typescript
+test("debug with console messages", async ({ page, initTestBed }) => {
+  // Capture console messages
+  const consoleMessages: string[] = [];
+  page.on('console', msg => {
+    consoleMessages.push(`[${msg.type()}] ${msg.text()}`);
+  });
+
+  await initTestBed(`<ComponentName testId="test" />`);
+  
+  // Your test code here
+  
+  // Log captured messages for debugging
+  console.log("Captured console messages:", consoleMessages);
+});
+```
+
+**Best Practices:**
+- Use console capture for debugging complex issues during development
+- Remove console capture code before committing tests
+- Console messages include all types: `log`, `error`, `warn`, `debug`, etc.
+- Access message type with `msg.type()` and content with `msg.text()`
+
+#### UI-Based Debugging
+
+For visual verification, display debug values directly in the UI using Text elements:
+
+```typescript
+test("debug with UI elements", async ({ page, initTestBed }) => {
+  const { testStateDriver } = await initTestBed(`
+    <Fragment>
+      <ComponentName id="comp" onStatusUpdate="statusData => testState = statusData" />
+      <Text testId="debug-status">Status: {testState?.status}</Text>
+      <Text testId="debug-progress">Progress: {testState?.progress}</Text>
+    </Fragment>
+  `);
+  
+  // Visually verify values in the UI
+  await expect(page.getByTestId("debug-progress")).toContainText("Progress: 25");
+});
+```
+
+**When to Use Each Approach:**
+- **Console capture**: Best for inspecting values, execution flow, or complex data structures during debugging
+- **UI debugging**: Best for visual verification, when you need to see values persist in the UI, or for E2E scenarios where the user would see the values
+- **testState**: Best for final test assertions - more reliable and doesn't require cleanup
+
 ### Event Handler Naming
 
 **ALWAYS use "on" prefix for event handlers:**
@@ -380,6 +433,105 @@ for (let i = 0; i < items.length; i++) {
 const dateStr = "2025-08-07";
 // Use string patterns instead of regex literals
 const pattern = "test";
+```
+
+### APIInterceptor State Management
+
+**CRITICAL**: In APIInterceptor handlers, use `$state` to maintain state across API calls, NOT `globalThis`:
+
+```typescript
+// ✅ CORRECT - Use $state context variable
+const mockBackend: ApiInterceptorDefinition = {
+  "initialize": "$state.pollCount = 0; $state.items = [];",
+  "operations": {
+    "create": {
+      "url": "/api/items",
+      "method": "post",
+      "handler": "
+        $state.items.push({ id: $state.items.length + 1, name: $body.name });
+        return { id: $state.items.length };
+      "
+    },
+    "list": {
+      "url": "/api/items",
+      "method": "get",
+      "handler": "return { items: $state.items };"
+    },
+    "status": {
+      "url": "/api/status",
+      "method": "get",
+      "handler": "
+        $state.pollCount++;
+        return { pollCount: $state.pollCount };
+      "
+    }
+  }
+};
+
+// ❌ INCORRECT - globalThis is not available
+const mockBackend: ApiInterceptorDefinition = {
+  "operations": {
+    "create": {
+      "handler": "
+        globalThis.items = globalThis.items || [];  // Will not work!
+        globalThis.items.push(...);
+      "
+    }
+  }
+};
+```
+
+**Key Points:**
+- `$state` is a singleton state object accessible across all API operations in a test
+- Use `initialize` property to set initial state values
+- Properties can be read and modified: `$state.count++`, `$state.items.push(item)`
+- State persists across multiple API calls within the same test
+- Each test gets a fresh `$state` instance
+- Available context variables in handlers: `$state`, `$body`, `$params`, `$query`
+
+**NO async/await keywords:**
+
+XMLUI automatically handles asynchronous operations without explicit `async`/`await` syntax:
+
+```typescript
+// ✅ CORRECT - XMLUI handles async automatically
+<Button onClick="api.execute(); delay(100); testState = api.getStatus();" />
+
+// ❌ INCORRECT - No await keyword
+<Button onClick="await api.execute(); await delay(100); testState = api.getStatus();" />
+```
+
+**Use delay() instead of setTimeout():**
+
+```typescript
+// ✅ CORRECT - Use delay() function
+<Button onClick="api.execute(); delay(100); testState = api.getStatus();" />
+
+// ❌ INCORRECT - setTimeout not available
+<Button onClick="api.execute().then(() => { setTimeout(() => { testState = api.getStatus(); }, 100); })" />
+```
+
+**Sequential async operations:**
+
+Write async operations in sequence - XMLUI executes them sequentially:
+
+```typescript
+// ✅ CORRECT - XMLUI awaits each operation automatically
+<Button onClick="
+  let result = api.execute();
+  delay(100);
+  let status = api.getStatus();
+  testState = { result, status };
+" />
+
+// ❌ INCORRECT - Promise chains not needed
+<Button onClick="
+  api.execute().then(result => {
+    return delay(100).then(() => {
+      testState = { result, status: api.getStatus() };
+    });
+  });
+" />
 ```
 
 ### Non-Visual Components
