@@ -120,6 +120,58 @@ export const APICallMd = createMetadata({
         "been completed. When this property is not defined, the completion does not display any message.",
       valueType: "string",
     },
+    deferredMode: {
+      description:
+        "Enable deferred operation mode for long-running operations that return 202 Accepted. " +
+        "When enabled, the component will automatically poll a status endpoint to track operation progress. " +
+        "(Experimental feature)",
+      valueType: "boolean",
+      defaultValue: false,
+    },
+    statusUrl: {
+      description:
+        "The URL to poll for status updates when deferredMode is enabled. " +
+        "Can use $result context from initial response (e.g., '/api/status/{$result.operationId}'). " +
+        "Required when deferredMode is true.",
+      valueType: "string",
+    },
+    statusMethod: {
+      description:
+        "HTTP method for status requests. Defaults to 'get'.",
+      valueType: "string",
+      availableValues: httpMethodNames,
+      defaultValue: "get",
+    },
+    pollingInterval: {
+      description:
+        "Milliseconds between status polls. Defaults to 2000ms.",
+      valueType: "number",
+      defaultValue: 2000,
+    },
+    maxPollingDuration: {
+      description:
+        "Maximum time to poll before timing out, in milliseconds. Defaults to 300000ms (5 minutes).",
+      valueType: "number",
+      defaultValue: 300000,
+    },
+    completionCondition: {
+      description:
+        "Expression that returns true when the deferred operation is complete. " +
+        "Can access $statusData context variable containing the latest status response.",
+      valueType: "string",
+    },
+    errorCondition: {
+      description:
+        "Expression that returns true when the deferred operation has failed. " +
+        "Can access $statusData context variable containing the latest status response.",
+      valueType: "string",
+    },
+    progressExtractor: {
+      description:
+        "Expression to extract progress value (0-100) from the status response. " +
+        "Can access $statusData context variable. If not specified, no progress tracking.",
+      valueType: "string",
+    },
     payloadType: dInternal(),
     invalidates: dInternal(),
     updates: dInternal(),
@@ -149,6 +201,38 @@ export const APICallMd = createMetadata({
         error: "The error object containing details about what went wrong with the API request.",
       },
     },
+    statusUpdate: {
+      description:
+        "Fires on each poll when in deferred mode. Passes the status data and current progress.",
+      signature: "(statusData: any, progress: number) => void",
+      parameters: {
+        statusData: "The latest status response data from polling.",
+        progress: "Current progress value 0-100.",
+      },
+    },
+    pollingStart: {
+      description:
+        "Fires when polling begins in deferred mode.",
+      signature: "(initialResult: any) => void",
+      parameters: {
+        initialResult: "The result from the initial API call that returned 202.",
+      },
+    },
+    pollingComplete: {
+      description:
+        "Fires when polling stops in deferred mode (success, failure, timeout, or manual stop).",
+      signature: "(finalStatus: any, reason: string) => void",
+      parameters: {
+        finalStatus: "The final status data.",
+        reason: "Reason for completion: 'completed', 'failed', 'timeout', or 'manual'.",
+      },
+    },
+    timeout: {
+      description:
+        "Fires if max polling duration is exceeded in deferred mode.",
+      signature: "() => void",
+      parameters: {},
+    },
     progress: dInternal(),
   },
   contextVars: {
@@ -166,6 +250,26 @@ export const APICallMd = createMetadata({
     },
     $error: {
       description: "Error details (available in `errorNotificationMessage`)",
+    },
+    $statusData: {
+      description:
+        "Latest status response data when in deferred mode (available in event handlers and notifications)",
+    },
+    $progress: {
+      description:
+        "Current progress 0-100 when in deferred mode (extracted via progressExtractor expression)",
+    },
+    $polling: {
+      description:
+        "Boolean indicating if polling is currently active in deferred mode",
+    },
+    $attempts: {
+      description:
+        "Number of status polls made in deferred mode",
+    },
+    $elapsed: {
+      description:
+        "Time elapsed since polling started in milliseconds",
     },
   },
   apis: {
@@ -198,6 +302,31 @@ export const APICallMd = createMetadata({
       description:
         "The error from the most recent failed API call execution.",
       signature: "lastError: any",
+    },
+    stopPolling: {
+      description:
+        "Manually stop polling in deferred mode. The operation continues on the server.",
+      signature: "stopPolling(): void",
+    },
+    resumePolling: {
+      description:
+        "Resume polling in deferred mode after it was manually stopped.",
+      signature: "resumePolling(): void",
+    },
+    getStatus: {
+      description:
+        "Get the current status data in deferred mode.",
+      signature: "getStatus(): any",
+    },
+    isPolling: {
+      description:
+        "Check if polling is currently active in deferred mode.",
+      signature: "isPolling(): boolean",
+    },
+    cancel: {
+      description:
+        "Cancel the deferred operation on the server and stop polling. Requires cancelUrl to be configured.",
+      signature: "cancel(): Promise<void>",
     },
   },
 });

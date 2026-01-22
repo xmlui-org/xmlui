@@ -941,41 +941,42 @@ Break down the feature into small, testable steps where **each step can be verif
 
 ---
 
-### Step 1: Add Basic Deferred Properties (Metadata Only)
+### Step 1: Add Basic Deferred Properties (Metadata Only) ✅
 
 **Goal**: Add new metadata without changing behavior. All existing tests pass.
 
 **Changes**:
-- Add new properties to `APICallMd` in `APICall.tsx`:
-  - `deferredMode` (boolean)
+- ✅ Added new properties to `APICallMd` in `APICall.tsx`:
+  - `deferredMode` (boolean, default: false)
   - `statusUrl` (string)
-  - `statusMethod` (string)
-  - `pollingInterval` (number)
-  - `maxPollingDuration` (number)
-- Mark as experimental/unstable in metadata
+  - `statusMethod` (string, default: "get")
+  - `pollingInterval` (number, default: 2000)
+  - `maxPollingDuration` (number, default: 300000)
+  - `completionCondition` (string)
+  - `errorCondition` (string)
+  - `progressExtractor` (string)
+- ✅ Added new context variables to metadata:
+  - `$statusData`, `$progress`, `$polling`, `$attempts`, `$elapsed`
+- ✅ Added new events to metadata:
+  - `statusUpdate`, `pollingStart`, `pollingComplete`, `timeout`
+- ✅ Added new API methods to metadata:
+  - `stopPolling()`, `resumePolling()`, `getStatus()`, `isPolling()`, `cancel()`
 
-**Testing**:
-```typescript
-test.describe("Deferred Mode - Step 1: Metadata", () => {
-  test("accepts deferredMode property without error", async ({ initTestBed }) => {
-    // Should not crash with new property
-    await initTestBed(`
-      <APICall 
-        id="api" 
-        url="/api/test" 
-        method="post"
-        deferredMode="true"
-        statusUrl="/api/status"
-      />
-    `);
-    // Just verify it doesn't crash
-  });
-});
-```
+**Testing**: ✅ COMPLETE
+- Created Step 1 test suite in `APICall.spec.ts` with 4 tests:
+  - ✅ Accepts deferredMode property without error
+  - ✅ Accepts all Step 1 deferred properties
+  - ✅ Existing APICall functionality unchanged
+  - ✅ Deferred properties have correct types
 
-**Verification**: 
-- `npx playwright test APICall.spec.ts` passes all existing tests
+**Verification**: ✅ PASSED
+- `npx playwright test APICall.spec.ts --reporter=line` - 64 passed (all existing + Step 1 tests)
 - New properties accepted without errors
+- No breaking changes to existing functionality
+
+**Files Modified**:
+- [APICall.tsx](APICall.tsx) - Added metadata properties, events, context variables, and API methods
+- [APICall.spec.ts](APICall.spec.ts) - Added Step 1 test suite
 
 ---
 

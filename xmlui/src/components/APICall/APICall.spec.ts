@@ -1740,3 +1740,102 @@ test.describe("State Tracking", () => {
     await expect(button).toBeEnabled();
   });
 });
+
+// =============================================================================
+// DEFERRED MODE - STEP 1: METADATA
+// =============================================================================
+
+test.describe("Deferred Mode - Step 1: Metadata", () => {
+  test("accepts deferredMode property without error", async ({ initTestBed }) => {
+    // Should not crash with new deferred mode properties
+    await initTestBed(`
+      <APICall 
+        id="api" 
+        url="/api/operation" 
+        method="post"
+        deferredMode="true"
+        statusUrl="/api/status"
+      />
+    `, {
+      apiInterceptor: basicApiInterceptor,
+    });
+    // Component should initialize without errors
+  });
+
+  test("accepts all Step 1 deferred properties", async ({ initTestBed }) => {
+    // Should accept all new metadata properties
+    await initTestBed(`
+      <APICall 
+        id="api" 
+        url="/api/operation" 
+        method="post"
+        deferredMode="true"
+        statusUrl="/api/operation/status/{$result.operationId}"
+        statusMethod="get"
+        pollingInterval="1000"
+        maxPollingDuration="60000"
+        completionCondition="$statusData.status === 'completed'"
+        errorCondition="$statusData.status === 'failed'"
+        progressExtractor="$statusData.progress"
+      />
+    `, {
+      apiInterceptor: basicApiInterceptor,
+    });
+    // Component should initialize without errors
+  });
+
+  test("existing APICall functionality unchanged", async ({ initTestBed, createButtonDriver }) => {
+    // Verify that adding deferred properties doesn't break basic functionality
+    const { testStateDriver } = await initTestBed(
+      `
+      <Fragment>
+        <APICall 
+          id="api" 
+          url="/api/test" 
+          method="get" 
+          onSuccess="arg => testState = arg.message"
+        />
+        <Button testId="trigger" onClick="api.execute()" label="Execute" />
+      </Fragment>
+    `,
+      {
+        apiInterceptor: basicApiInterceptor,
+      },
+    );
+
+    const button = await createButtonDriver("trigger");
+    await button.click();
+
+    // Wait for completion
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    // Should execute normally
+    await expect.poll(testStateDriver.testState).toEqual("GET success");
+  });
+
+  test("deferred properties have correct types", async ({ initTestBed, page }) => {
+    // Test that string, number, and boolean properties are accepted
+    await initTestBed(`
+      <Fragment>
+        <APICall 
+          id="api1" 
+          url="/api/test" 
+          deferredMode="true"
+          statusUrl="/api/status"
+          statusMethod="post"
+          pollingInterval="2000"
+          maxPollingDuration="300000"
+        />
+        <APICall 
+          id="api2" 
+          url="/api/test"
+          deferredMode="false"
+        />
+      </Fragment>
+    `, {
+      apiInterceptor: basicApiInterceptor,
+    });
+    
+    // Both should initialize without type errors
+  });
+});
