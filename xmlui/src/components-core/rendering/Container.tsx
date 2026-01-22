@@ -10,7 +10,7 @@ import React, {
   useRef,
   useTransition,
 } from "react";
-import { useLocation, useNavigate } from "@remix-run/react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { cloneDeep, isArray } from "lodash-es";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import memoizeOne from "memoize-one";
@@ -116,7 +116,7 @@ export const Container = memo(
     const fnsRef = useRef<Record<symbol, any>>({});
 
     const stateRef = useRef(componentState);
-    
+
     // Sync ref in layout effect to ensure consistency before browser paint
     // This follows React best practices and avoids render-time ref mutations
     useIsomorphicLayoutEffect(() => {
@@ -273,7 +273,7 @@ export const Container = memo(
               });
               const key = generatedId();
               statementPromises.current.set(key, resolve);
-              
+
               try {
                 // We use this to tell react that this update is not high-priority.
                 //   If we don't put it to a transition, the whole app would be blocked if we run a long,
@@ -300,20 +300,20 @@ export const Container = memo(
                 // Always remove from map, even if an error occurred
                 // This prevents memory leaks in long-running applications with frequent errors
                 statementPromises.current.delete(key);
-                
+
                 // Development-only monitoring for potential memory leaks
-                if (process.env.NODE_ENV === 'development') {
+                if (process.env.NODE_ENV === "development") {
                   const mapSize = statementPromises.current.size;
                   if (mapSize > 100) {
                     console.warn(
                       `[Container] Statement promises map is large (${mapSize} entries). ` +
-                      `Possible memory leak or very complex event handler.`,
-                      { containerUid: componentUid }
+                        `Possible memory leak or very complex event handler.`,
+                      { containerUid: componentUid },
                     );
                   }
                 }
               }
-              
+
               changes = [];
             } else {
               //in this else branch normally we block the main thread (we don't wait for any state promise to be resolved),
@@ -500,7 +500,10 @@ export const Container = memo(
         let safeAction = action;
         if (!action && uid.description && options?.eventName) {
           const handlerFnName = `${uid.description}_on${capitalizeFirstLetter(options?.eventName)}`;
-          if (componentState[handlerFnName] && isArrowExpressionObject(componentState[handlerFnName])) {
+          if (
+            componentState[handlerFnName] &&
+            isArrowExpressionObject(componentState[handlerFnName])
+          ) {
             safeAction = componentState[handlerFnName] as ArrowExpression;
           }
         }
@@ -628,7 +631,7 @@ export const Container = memo(
           return ref && renderedChildren[0] && isValidElement(renderedChildren[0])
             ? React.cloneElement(renderedChildren[0], {
                 ref: composeRefs(ref, (renderedChildren[0] as any).ref),
-                ...mergeProps(renderedChildren[0].props, rest)
+                ...mergeProps(renderedChildren[0].props, rest),
               } as any)
             : renderedChildren[0];
         }
@@ -671,7 +674,7 @@ export const Container = memo(
       parentRenderContext,
       uidInfoRef,
       ref,
-      rest
+      rest,
     );
 
     const renderedLoaders = renderLoaders({

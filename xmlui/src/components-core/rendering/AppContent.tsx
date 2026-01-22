@@ -32,7 +32,7 @@ import { AppContext } from "../AppContext";
 import type { GlobalProps } from "./AppRoot";
 import { queryClient } from "./AppRoot";
 import type { ContainerWrapperDef } from "./ContainerWrapper";
-import { useLocation, useNavigate } from "@remix-run/react";
+import { useLocation, useNavigate } from "react-router-dom";
 import type { TrackContainerHeight } from "./AppWrapper";
 import { ThemeToneKeys } from "../theming/utils";
 import StandaloneComponent from "./StandaloneComponent";
@@ -91,7 +91,7 @@ export function AppContent({
     toggleThemeTone,
   } = useThemes();
 
-  const {root} = useTheme();
+  const { root } = useTheme();
 
   // --- Handle special key combinations to change the theme and tone
   useDocumentKeydown((event: KeyboardEvent) => {
@@ -388,10 +388,7 @@ export function AppContent({
   }, [appState, update]);
 
   // --- Create AppState object with global state management functions
-  const AppState = useMemo(
-    () => createAppState(appStateContextValue),
-    [appStateContextValue]
-  );
+  const AppState = useMemo(() => createAppState(appStateContextValue), [appStateContextValue]);
 
   // --- We assemble the app context object form the collected information
   const appContextValue = useMemo(() => {
