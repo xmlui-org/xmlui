@@ -2168,6 +2168,63 @@ const mockBackend: ApiInterceptorDefinition = {
 - State persists across multiple API calls in the same test
 - Each test gets a fresh `$state` instance
 
+### Event Handler Resolution with lookupEventHandler
+
+**CRITICAL**: When passing event handlers from XMLUI component renderer to native component, resolve the event handler in the renderer first, then pass the resolved function:
+
+```typescript
+// ✅ CORRECT - Resolve event in renderer, pass resolved function to native
+export const apiCallRenderer = createComponentRenderer(
+  COMP,
+  APICallMd,
+  ({ node, registerComponentApi, uid, updateState, lookupEventHandler }) => {
+    return (
+      <APICallNative 
+        registerComponentApi={registerComponentApi} 
+        node={node as any} 
+        uid={uid}
+        updateState={updateState}
+        onStatusUpdate={lookupEventHandler("statusUpdate")}
+      />
+    );
+  },
+);
+
+// Native component receives resolved event handler
+interface Props {
+  onStatusUpdate?: (statusData: any, progress: number) => void | Promise<void>;
+}
+
+// Use it directly
+if (onStatusUpdate) {
+  await onStatusUpdate(statusData, 0);
+}
+
+// ❌ INCORRECT - Passing lookupEventHandler function to native component
+export const apiCallRenderer = createComponentRenderer(
+  COMP,
+  APICallMd,
+  ({ node, registerComponentApi, uid, updateState, lookupEventHandler }) => {
+    return (
+      <APICallNative 
+        lookupEventHandler={lookupEventHandler}  // Wrong!
+      />
+    );
+  },
+);
+
+// Native component should NOT receive lookup function
+interface Props {
+  lookupEventHandler: LookupEventHandlerFn<typeof APICallMd>;  // Wrong!
+}
+```
+
+**Key Points:**
+- Event handlers must be resolved in the **renderer** using `lookupEventHandler(eventName)`
+- Native components receive **resolved event functions**, not the lookup function
+- This keeps the native component clean and testable
+- Native components don't need to import metadata types
+
 ### XMLUI Script Patterns
 
 **No async/await keywords:**

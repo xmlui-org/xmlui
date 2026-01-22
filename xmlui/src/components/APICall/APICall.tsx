@@ -341,7 +341,7 @@ export const apiCallRenderer = createComponentRenderer(
         node={node as any} 
         uid={uid}
         updateState={updateState}
-        lookupEventHandler={lookupEventHandler}
+        onStatusUpdate={lookupEventHandler("statusUpdate")}
       />
     );
   },
