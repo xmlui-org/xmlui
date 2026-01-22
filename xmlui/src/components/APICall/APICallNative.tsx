@@ -440,7 +440,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     async (executionContext: ActionExecutionContext, ...eventArgs: any[]) => {
       const options = eventArgs[1];
       
-      // Step 11: Store execution context for cancel() method
+      // Store execution context for cancel() method
       executionContextRef.current = executionContext;
       
       // Set inProgress before starting
@@ -466,7 +466,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
           },
         );
         
-        // Step 11: Store result in ref for cancel() method
+        // Store result in ref for cancel() method
         lastResultRef.current = result;
         
         // Store result and update state on success
@@ -479,25 +479,19 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
           });
         }
         
-        // Step 3-4: Single poll or polling loop for deferred operations
+        // Handle deferred operations (polling)
         const deferredMode = (node.props as any)?.deferredMode === "true" || (node.props as any)?.deferredMode === true;
         const statusUrl = (node.props as any)?.statusUrl;
         const pollingIntervalProp = (node.props as any)?.pollingInterval;
         
         if (deferredMode && statusUrl) {
           // Interpolate statusUrl with result context
-          let interpolatedStatusUrl = statusUrl as string;
-          if (result && typeof result === 'object') {
-            interpolatedStatusUrl = interpolatedStatusUrl.replace(/\{\$result\.([^}]+)\}/g, (match, key) => {
-              return result[key] ?? match;
-            });
-          }
-          
+          const interpolatedStatusUrl = interpolateUrl(statusUrl as string, result);
           const statusMethod = ((node.props as any)?.statusMethod as string) || "get";
           
-          // Step 4: Check if pollingInterval is provided
+          // Execute either single poll or polling loop based on pollingInterval
           if (pollingIntervalProp) {
-            // Polling loop mode
+            // Continuous polling with backoff
             const pollingInterval = parseInt(pollingIntervalProp as string) || 2000;
             const maxPollingDuration = parseInt((node.props as any)?.maxPollingDuration as string) || 300000;
             const pollingBackoff = (node.props as any)?.pollingBackoff || 'none';
@@ -514,7 +508,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
               maxPollingInterval
             );
           } else {
-            // Step 3: Single poll mode (no pollingInterval)
+            // Single status check (no continuous polling)
             await executeSinglePoll(executionContext, interpolatedStatusUrl, statusMethod, result);
           }
         }
@@ -542,13 +536,13 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     };
     deferredStateRef.current = newState;
     
-    // Step 4: Clear polling interval
+    // Clear polling interval
     if (pollingIntervalRef.current) {
       clearTimeout(pollingIntervalRef.current);
       pollingIntervalRef.current = null;
     }
     
-    // Step 6: Update state with context variables
+    // Update state with context variables
     const elapsed = Date.now() - (newState.startTime || Date.now());
     if (updateState) {
       updateState({ 
@@ -570,7 +564,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     };
     deferredStateRef.current = newState;
     
-    // Step 6: Update state with context variables
+    // Update state with context variables
     const elapsed = Date.now() - (newState.startTime || Date.now());
     if (updateState) {
       updateState({ 
