@@ -205,25 +205,6 @@ export const APICallMd = createMetadata({
         "Optional body to send with the cancel request. " +
         "Can use $result context from initial response.",
     },
-    inProgressNotificationMessage: {
-      description:
-        "Message to show in toast notification during deferred operation polling. " +
-        "Can include {$progress}, {$statusData.property}, and other context variables. " +
-        "Notification will update on each poll with current values.",
-      valueType: "string",
-    },
-    completedNotificationMessage: {
-      description:
-        "Message to show in toast notification when deferred operation completes successfully. " +
-        "Can include {$statusData.property} and other context variables from the final status.",
-      valueType: "string",
-    },
-    errorNotificationMessage: {
-      description:
-        "Message to show in toast notification when deferred operation fails. " +
-        "Can include {$statusData.property} and other context variables from the error status.",
-      valueType: "string",
-    },
     payloadType: dInternal(),
     invalidates: dInternal(),
     updates: dInternal(),

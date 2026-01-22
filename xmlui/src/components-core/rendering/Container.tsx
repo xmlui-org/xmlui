@@ -58,6 +58,7 @@ import { EMPTY_ARRAY } from "../constants";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
 import { mergeProps } from "../utils/mergeProps";
+import { loggerService } from "../../logging/LoggerService";
 
 type Props = {
   node: ContainerWrapperDef;
@@ -176,9 +177,78 @@ export const Container = memo(
             changes.push(changeInfo);
           });
         };
+        const xsVerbose = appContext.appGlobals?.xsVerbose === true;
+        const xsLogBucket = appContext.appGlobals?.xsVerboseLogBucket;
+        const xsLogMax = Number(appContext.appGlobals?.xsVerboseLogMax ?? 200);
+        const xsLog = (...args: any[]) => {
+          if (!xsVerbose) return;
+          const payload = ["[xs]", ...args];
+          loggerService.log(payload);
+          console.log(...payload);
+          if (xsLogBucket && appContext.AppState) {
+            try {
+              const current = appContext.AppState.get(xsLogBucket) || [];
+              const next = Array.isArray(current) ? current.slice() : [];
+              next.push({ ts: Date.now(), args });
+              if (Number.isFinite(xsLogMax) && xsLogMax > 0 && next.length > xsLogMax) {
+                next.splice(0, next.length - xsLogMax);
+              }
+              appContext.AppState.set(xsLogBucket, next);
+            } catch (e) {
+              // Don't let logging failures affect app execution
+              console.warn("[xs] Failed to write to AppState log bucket", e);
+            }
+          }
+        };
+
+        const formatChange = (change: any) => {
+          const prev = change.previousValue;
+          const next = change.newValue;
+          let kind: "add" | "remove" | "update" = "update";
+          if (change.action === "unset") {
+            kind = "remove";
+          } else if (prev === undefined && next !== undefined) {
+            kind = "add";
+          }
+          const stringify = (value: any) => {
+            if (value === undefined) return "undefined";
+            try {
+              return JSON.stringify(value, null, 2);
+            } catch {
+              return String(value);
+            }
+          };
+          const prefixLines = (text: string, prefix: string) => {
+            return text
+              .split("\n")
+              .map((line) => `${prefix}${line}`)
+              .join("\n");
+          };
+          const beforeJson = stringify(prev);
+          const afterJson = stringify(next);
+          const diffPretty =
+            `path: ${change.path}\n` +
+            `${prefixLines(beforeJson, "- ")}\n` +
+            `${prefixLines(afterJson, "+ ")}`;
+          return {
+            path: change.path,
+            type: kind,
+            before: prev,
+            after: next,
+            beforeJson,
+            afterJson,
+            diffText:
+              `path: ${change.path}\n` +
+              `- ${beforeJson}\n` +
+              `+ ${afterJson}`,
+            diffPretty,
+          };
+        };
+
         const evalAppContext = {
           ...appContext,
           getThemeVar,
+          xsLog,
         };
         const evalContext: BindingTreeEvaluationContext = {
           appContext: evalAppContext,
@@ -211,6 +281,13 @@ export const Container = memo(
         };
 
         try {
+          if (xsVerbose) {
+            xsLog("handler:start", {
+              uid: componentUid,
+              eventName: options.eventName,
+              args: eventArgs,
+            });
+          }
           // --- Prepare the event handler to an arrow expression statement
           let statements: Statement[];
           if (typeof source === "string") {
@@ -256,6 +333,26 @@ export const Container = memo(
           let mainThreadBlockingRuns = 0;
           evalContext.onStatementCompleted = async (evalContext) => {
             if (changes.length) {
+              if (xsVerbose) {
+                const filteredChanges = changes.filter(
+                  (change) => typeof change.path === "string" && !change.path.startsWith("__arg@@#__"),
+                );
+                if (filteredChanges.length === 0) {
+                  // Only internal argument wiring happened; skip logging.
+                } else {
+                  xsLog("state:changes", {
+                    uid: componentUid,
+                    eventName: options.eventName,
+                    changes: filteredChanges.map((change) => ({
+                      path: change.path,
+                      action: change.action,
+                      previousValue: change.previousValue,
+                      newValue: change.newValue,
+                    })),
+                    diff: filteredChanges.map(formatChange),
+                  });
+                }
+              }
               mainThreadBlockingRuns = 0;
               changes.forEach((change) => {
                 statePartChanged(
@@ -344,10 +441,25 @@ export const Container = memo(
           }
 
           if (evalContext.mainThread?.blocks?.length) {
-            return evalContext.mainThread.blocks[evalContext.mainThread.blocks.length - 1]
-              .returnValue;
+            const returnValue =
+              evalContext.mainThread.blocks[evalContext.mainThread.blocks.length - 1].returnValue;
+            if (xsVerbose) {
+              xsLog("handler:complete", {
+                uid: componentUid,
+                eventName: options.eventName,
+                returnValue,
+              });
+            }
+            return returnValue;
           }
         } catch (e) {
+          if (xsVerbose) {
+            xsLog("handler:error", {
+              uid: componentUid,
+              eventName: options.eventName,
+              error: e,
+            });
+          }
           //if we pass down an event handler to a component, we should sign the error once, not in every step of the component chain
           //  (we use it in the compoundComponent, resolving it's event handlers)
           if (options?.signError !== false) {

@@ -9,6 +9,22 @@ import { evalBinding } from "../../components-core/script-runner/eval-tree-sync"
 import { Parser } from "../../parsers/scripting/Parser";
 import toast from "react-hot-toast";
 
+// =============================================================================
+// DEBUG LOGGING
+// =============================================================================
+const DEBUG_DEFERRED = true; // Set to false to disable debug logging
+
+function debugLog(category: string, message: string, data?: any) {
+  if (!DEBUG_DEFERRED) return;
+  const timestamp = new Date().toISOString().split('T')[1];
+  const prefix = `[APICall:${category}] ${timestamp}`;
+  if (data !== undefined) {
+    console.log(prefix, message, data);
+  } else {
+    console.log(prefix, message);
+  }
+}
+
 interface Props {
   registerComponentApi: RegisterComponentApiFn;
   node: ApiActionComponent;
@@ -184,6 +200,17 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
   // Initialize state with default values
   useEffect(() => {
     const deferredMode = (node.props as any)?.deferredMode === "true" || (node.props as any)?.deferredMode === true;
+
+    debugLog("INIT", "Component initialized", {
+      deferredMode,
+      url: (node.props as any)?.url,
+      statusUrl: (node.props as any)?.statusUrl,
+      pollingInterval: (node.props as any)?.pollingInterval,
+      pollingBackoff: (node.props as any)?.pollingBackoff,
+      maxPollingDuration: (node.props as any)?.maxPollingDuration,
+      maxPollingInterval: (node.props as any)?.maxPollingInterval,
+      props: node.props,
+    });
     
     if (updateState) {
       updateState({ 
@@ -205,6 +232,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
 
     // Cleanup polling on unmount
     return () => {
+      debugLog("CLEANUP", "Component unmount: clearing polling timer");
       if (pollingIntervalRef.current) {
         clearTimeout(pollingIntervalRef.current);
         pollingIntervalRef.current = null;
@@ -220,6 +248,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
    * Handles polling timeout - stops polling and fires onTimeout event
    */
   const handlePollingTimeout = useEvent(async (elapsedTime: number) => {
+    debugLog("TIMEOUT", "Polling timed out", { elapsedTime });
     const timeoutState = {
       ...deferredStateRef.current,
       isPolling: false,
@@ -235,6 +264,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     
     if (onTimeout) {
       try {
+        debugLog("EVENT", "onTimeout handler invoked");
         await onTimeout();
       } catch (eventError) {
         console.error("onTimeout event handler error:", eventError);
@@ -246,6 +276,11 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
    * Handles polling completion - stops polling and shows completion notification
    */
   const handlePollingCompletion = useEvent((updatedState: DeferredState, result: any) => {
+    debugLog("COMPLETE", "Polling completed", {
+      attempts: updatedState.attempts,
+      progress: updatedState.progress,
+      statusData: updatedState.statusData,
+    });
     if (pollingIntervalRef.current) {
       clearTimeout(pollingIntervalRef.current);
       pollingIntervalRef.current = null;
@@ -267,6 +302,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
         result: result,
       });
       if (interpolated) {
+        debugLog("TOAST", "Completion toast shown", { message: interpolated });
         toast.success(interpolated, { id: toastIdRef.current });
       }
     }
@@ -282,6 +318,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     result: any
   ) => {
     try {
+      debugLog("POLL", "Single poll start", { statusUrl, statusMethod });
       const statusData = await callApi(
         executionContext,
         {
@@ -294,6 +331,8 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
           resolveBindingExpressions: false,
         },
       );
+
+      debugLog("POLL", "Single poll response", { statusData });
       
       const newState = {
         ...deferredStateRef.current,
@@ -305,6 +344,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
       deferredStateRef.current = newState;
       updateDeferredState(newState, updateState);
     } catch (statusError) {
+      debugLog("ERROR", "Single poll failed", { statusError });
       console.error("Status request failed:", statusError);
     }
   });
@@ -322,6 +362,14 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     pollingBackoff: string,
     maxPollingInterval: number
   ) => {
+    debugLog("POLL", "Polling loop start", {
+      statusUrl,
+      statusMethod,
+      pollingInterval,
+      maxPollingDuration,
+      pollingBackoff,
+      maxPollingInterval,
+    });
     // Initialize polling state
     const newState = {
       ...deferredStateRef.current,
@@ -341,6 +389,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
         result: result,
       });
       if (interpolated) {
+        debugLog("TOAST", "In-progress toast shown", { message: interpolated });
         toastIdRef.current = toast.loading(interpolated);
       }
     }
@@ -355,6 +404,11 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
           return;
         }
         
+        debugLog("POLL", "Polling request", {
+          attempt: deferredStateRef.current.attempts + 1,
+          statusUrl,
+          statusMethod,
+        });
         // Make status request
         const statusData = await callApi(
           executionContext,
@@ -368,6 +422,8 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
             resolveBindingExpressions: false,
           },
         );
+
+        debugLog("POLL", "Polling response", { statusData });
         
         // Extract progress
         const progress = extractProgress(
@@ -384,12 +440,18 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
           progress: progress,
           attempts: deferredStateRef.current.attempts + 1,
         };
+        debugLog("STATE", "Polling state updated", {
+          attempts: updatedState.attempts,
+          progress: updatedState.progress,
+          statusData: updatedState.statusData,
+        });
         deferredStateRef.current = updatedState;
         updateDeferredState(updatedState, updateState);
         
         // Fire onStatusUpdate event
         if (onStatusUpdate) {
           try {
+            debugLog("EVENT", "onStatusUpdate handler invoked", { progress });
             await onStatusUpdate(statusData, progress);
           } catch (eventError) {
             console.error("onStatusUpdate event handler error:", eventError);
@@ -404,6 +466,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
             result: result,
           });
           if (interpolated) {
+            debugLog("TOAST", "In-progress toast updated", { message: interpolated });
             toast.loading(interpolated, { id: toastIdRef.current });
           }
         }
@@ -418,6 +481,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
         scheduleNextPoll();
         
       } catch (statusError) {
+        debugLog("ERROR", "Polling request failed", { statusError });
         console.error("Status request failed:", statusError);
         scheduleNextPoll();
       }
@@ -433,6 +497,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
         pollingBackoff,
         maxPollingInterval
       );
+      debugLog("POLL", "Scheduling next poll", { nextInterval });
       
       pollingIntervalRef.current = setTimeout(pollStatus, nextInterval) as any;
     };
@@ -451,6 +516,14 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
   const execute = useEvent(
     async (executionContext: ActionExecutionContext, ...eventArgs: any[]) => {
       const options = eventArgs[1];
+
+      debugLog("EXEC", "APICall execute invoked", {
+        url: (node.props as any)?.url,
+        method: (node.props as any)?.method,
+        deferredMode: (node.props as any)?.deferredMode,
+        statusUrl: (node.props as any)?.statusUrl,
+        pollingInterval: (node.props as any)?.pollingInterval,
+      });
       
       // Store execution context for cancel() method
       executionContextRef.current = executionContext;
@@ -477,6 +550,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
             resolveBindingExpressions: true,
           },
         );
+        debugLog("EXEC", "APICall result", { result });
         
         // Store result in ref for cancel() method
         lastResultRef.current = result;
@@ -500,6 +574,12 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
           // Interpolate statusUrl with result context
           const interpolatedStatusUrl = interpolateUrl(statusUrl as string, result);
           const statusMethod = ((node.props as any)?.statusMethod as string) || "get";
+          debugLog("EXEC", "Deferred mode enabled", {
+            statusUrl,
+            interpolatedStatusUrl,
+            statusMethod,
+            pollingIntervalProp,
+          });
           
           // Execute either single poll or polling loop based on pollingInterval
           if (pollingIntervalProp) {
@@ -521,12 +601,14 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
             );
           } else {
             // Single status check (no continuous polling)
+            debugLog("EXEC", "Deferred mode single poll");
             await executeSinglePoll(executionContext, interpolatedStatusUrl, statusMethod, result);
           }
         }
         
         return result;
       } catch (error) {
+        debugLog("ERROR", "APICall failed", { error });
         // Store error and update state on failure
         if (updateState) {
           updateState({ 
@@ -545,6 +627,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
   // =============================================================================
 
   const stopPolling = useEvent(() => {
+    debugLog("API", "stopPolling called");
     const newState = {
       ...deferredStateRef.current,
       isPolling: false,
@@ -573,6 +656,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
   });
 
   const resumePolling = useEvent(() => {
+    debugLog("API", "resumePolling called");
     const newState = {
       ...deferredStateRef.current,
       isPolling: true,
@@ -595,14 +679,17 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
   });
 
   const getStatus = useEvent(() => {
+    debugLog("API", "getStatus called");
     return deferredStateRef.current.statusData;
   });
 
   const isPolling = useEvent(() => {
+    debugLog("API", "isPolling called");
     return deferredStateRef.current.isPolling;
   });
 
   const cancel = useEvent(async () => {
+    debugLog("API", "cancel called");
     // Server-side cancellation support
     const cancelUrl = (node.props as any)?.cancelUrl;
     
@@ -661,6 +748,10 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
             resolveBindingExpressions: true,
           },
         );
+        debugLog("API", "cancel request sent", {
+          cancelUrl: interpolatedCancelUrl,
+          cancelMethod,
+        });
       } catch (cancelError) {
         console.error("Cancel request failed:", cancelError);
         // Don't throw - cancellation failure shouldn't break the UI
