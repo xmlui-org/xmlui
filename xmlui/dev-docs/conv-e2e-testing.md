@@ -321,6 +321,59 @@ npx playwright test ComponentName.spec.ts --grep "test name pattern" --reporter=
 npx playwright test ComponentName.spec.ts --grep "Basic Functionality" --reporter=line
 ```
 
+### Debugging Techniques
+
+#### Console Message Capture
+
+Playwright can capture `console.log` messages from the browser for debugging:
+
+```typescript
+test("debug with console messages", async ({ page, initTestBed }) => {
+  // Capture console messages
+  const consoleMessages: string[] = [];
+  page.on('console', msg => {
+    consoleMessages.push(`[${msg.type()}] ${msg.text()}`);
+  });
+
+  await initTestBed(`<ComponentName testId="test" />`);
+  
+  // Your test code here
+  
+  // Log captured messages for debugging
+  console.log("Captured console messages:", consoleMessages);
+});
+```
+
+**Best Practices:**
+- Use console capture for debugging complex issues during development
+- Remove console capture code before committing tests
+- Console messages include all types: `log`, `error`, `warn`, `debug`, etc.
+- Access message type with `msg.type()` and content with `msg.text()`
+
+#### UI-Based Debugging
+
+For visual verification, display debug values directly in the UI using Text elements:
+
+```typescript
+test("debug with UI elements", async ({ page, initTestBed }) => {
+  const { testStateDriver } = await initTestBed(`
+    <Fragment>
+      <ComponentName id="comp" onStatusUpdate="statusData => testState = statusData" />
+      <Text testId="debug-status">Status: {testState?.status}</Text>
+      <Text testId="debug-progress">Progress: {testState?.progress}</Text>
+    </Fragment>
+  `);
+  
+  // Visually verify values in the UI
+  await expect(page.getByTestId("debug-progress")).toContainText("Progress: 25");
+});
+```
+
+**When to Use Each Approach:**
+- **Console capture**: Best for inspecting values, execution flow, or complex data structures during debugging
+- **UI debugging**: Best for visual verification, when you need to see values persist in the UI, or for E2E scenarios where the user would see the values
+- **testState**: Best for final test assertions - more reliable and doesn't require cleanup
+
 ### Event Handler Naming
 
 **ALWAYS use "on" prefix for event handlers:**

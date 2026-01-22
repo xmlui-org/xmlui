@@ -5,7 +5,8 @@ import type { ActionExecutionContext } from "../../abstractions/ActionDefs";
 import { useEvent } from "../../components-core/utils/misc";
 import { callApi } from "../../components-core/action/APICall";
 import type { ApiActionComponent } from "../../components/APICall/APICall";
-import { extractParam } from "../../components-core/utils/extractParam";
+import { evalBinding } from "../../components-core/script-runner/eval-tree-sync";
+import { Parser } from "../../parsers/scripting/Parser";
 
 interface Props {
   registerComponentApi: RegisterComponentApiFn;
@@ -202,16 +203,22 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
                 const progressExtractor = (node.props as any)?.progressExtractor;
                 if (progressExtractor && statusData) {
                   try {
-                    // Evaluate progress expression with statusData as context
+                    // Parse the progress extractor expression
+                    const parser = new Parser(progressExtractor);
+                    const expr = parser.parseExpr();
+                    
+                    // Evaluate the expression with statusData as context
                     const contextForProgress = {
                       $statusData: statusData,
                       $result: result,
                     };
-                    const extractedValue = extractParam(
-                      contextForProgress,
-                      progressExtractor,
-                      executionContext.appContext,
-                    );
+                    const extractedValue = evalBinding(expr, {
+                      localContext: contextForProgress,
+                      appContext: executionContext.appContext,
+                      options: {
+                        defaultToOptionalMemberAccess: true,
+                      },
+                    });
                     // Ensure progress is a number between 0 and 100
                     if (extractedValue !== undefined && extractedValue !== null) {
                       progress = Math.max(0, Math.min(100, Number(extractedValue)));
