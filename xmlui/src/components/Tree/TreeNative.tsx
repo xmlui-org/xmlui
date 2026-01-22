@@ -220,6 +220,27 @@ const findAllParentIds = (
 };
 
 /**
+ * Collect descendant node IDs for a given node.
+ * @param treeNode Root node
+ * @param includeSelf Whether to include the root node in the result
+ */
+const collectDescendantIds = (treeNode: TreeNode, includeSelf = false): Set<string> => {
+  const ids = new Set<string>();
+
+  const visit = (node: TreeNode, isRoot: boolean) => {
+    if (!isRoot || includeSelf) {
+      ids.add(String(node.key));
+    }
+    if (node.children) {
+      node.children.forEach((child) => visit(child, false));
+    }
+  };
+
+  visit(treeNode, true);
+  return ids;
+};
+
+/**
  * Expand all parent paths for an array of node IDs to ensure they are visible
  * @param nodeIds Array of node IDs that should be expanded
  * @param treeItemsById Map of all tree nodes by their ID
@@ -536,7 +557,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
   const treeContainerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<VirtualizerHandle>(null);
-  
+
   // State and ref for measuring first item size when fixedItemSize is enabled
   const firstItemRef = useRef<HTMLDivElement>(null);
   const [measuredItemSize, setMeasuredItemSize] = useState<number | undefined>(undefined);
@@ -544,7 +565,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   const flatTreeData = useMemo(() => {
     return toFlatTree(treeData, expandedIds, fieldConfig.dynamicField, nodeStates);
   }, [expandedIds, treeData, fieldConfig.dynamicField, nodeStates]);
-  
+
   // Measure first item size when fixedItemSize is enabled
   useEffect(() => {
     if (fixedItemSize && firstItemRef.current && !measuredItemSize && flatTreeData.length > 0) {
@@ -699,8 +720,32 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         // Check if we need to load children dynamically
         const nodeWithState = node as FlatTreeNodeWithState;
         if (nodeWithState.loadingState === "unloaded" && loadChildren) {
-          // Set loading state
-          setNodeStates((prev) => new Map(prev).set(node.key, "loading"));
+          const nodeToLoad = Object.values(treeItemsById).find(
+            (n) => String(n.key) === String(node.key),
+          );
+
+          const descendantIdsToClear = nodeToLoad
+            ? collectDescendantIds(nodeToLoad, false)
+            : new Set<string>();
+
+          // Set loading state and clear descendant load states
+          setNodeStates((prev) => {
+            const newMap = new Map(prev);
+            if (descendantIdsToClear.size > 0) {
+              const keyLookup = new Map<string, string | number>();
+              for (const key of newMap.keys()) {
+                keyLookup.set(String(key), key);
+              }
+              descendantIdsToClear.forEach((id) => {
+                const keyToDelete = keyLookup.get(id);
+                if (keyToDelete !== undefined) {
+                  newMap.delete(keyToDelete);
+                }
+              });
+            }
+            newMap.set(node.key, "loading");
+            return newMap;
+          });
 
           // Immediately remove existing children so node appears empty while loading
           updateInternalData((prevData) => {
@@ -805,7 +850,17 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         }
       } else {
         // Collapsing the node
-        setExpandedIds((prev) => prev.filter((id) => id !== node.key));
+        const nodeToCollapse = Object.values(treeItemsById).find(
+          (n) => String(n.key) === String(node.key),
+        );
+
+        if (nodeToCollapse) {
+          const idsToRemove = collectDescendantIds(nodeToCollapse, true);
+
+          setExpandedIds((prev) => prev.filter((id) => !idsToRemove.has(String(id))));
+        } else {
+          setExpandedIds((prev) => prev.filter((id) => id !== node.key));
+        }
 
         // Fire nodeDidCollapse event
         if (onNodeCollapsed) {
@@ -813,7 +868,16 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         }
       }
     },
-    [onNodeExpanded, onNodeCollapsed, loadChildren, data, dataFormat, fieldConfig, setNodeStates],
+    [
+      onNodeExpanded,
+      onNodeCollapsed,
+      loadChildren,
+      data,
+      dataFormat,
+      fieldConfig,
+      setNodeStates,
+      treeItemsById,
+    ],
   );
 
   // Simplified keyboard navigation handler
@@ -1099,17 +1163,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           (n) => String(n.key) === String(nodeId),
         );
         if (nodeToCollapse) {
-          const idsToRemove = new Set<string>();
-
-          // Recursively collect all descendant IDs
-          const collectDescendants = (treeNode: TreeNode) => {
-            idsToRemove.add(String(treeNode.key));
-            if (treeNode.children) {
-              treeNode.children.forEach((child) => collectDescendants(child));
-            }
-          };
-
-          collectDescendants(nodeToCollapse);
+          const idsToRemove = collectDescendantIds(nodeToCollapse, true);
 
           // Remove all descendant IDs from expanded list
           setExpandedIds((prev) => prev.filter((id) => !idsToRemove.has(String(id))));
@@ -1619,6 +1673,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     }
   }, []);
 
+
   return (
     <div
       ref={treeContainerRef}
@@ -1637,7 +1692,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         {flatTreeData.map((node, index) => {
           const isFirstItem = index === 0;
           const shouldMeasure = isFirstItem && fixedItemSize;
-          
+
           return shouldMeasure ? (
             <div key={node.key} ref={firstItemRef}>
               <TreeRow index={index} data={itemData} />
