@@ -163,7 +163,7 @@ const DEFAULT_PAGE_SIZES = [10];
 
 // Feature flag for virtua migration (Phase 2: Prototyping)
 // Toggle this to compare TanStack Virtual vs virtua implementations
-const USE_VIRTUA = false;
+const USE_VIRTUA = true;
 
 /**
  * Maps checkbox tolerance values to pixel values
