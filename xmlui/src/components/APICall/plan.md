@@ -97,7 +97,8 @@ Use banner comments to mark sections:
 2. ✅ **Create helper functions** (interpolateUrl, updateDeferredState, extractProgress) - 10 min
 3. ✅ **Extract polling timeout handler** - 5 min
 4. ✅ **Extract polling completion handler** - 5 min
-5. ⬜ **Extract single poll logic** - 8 min
+5. ✅ **Extract single poll logic** - 8 min
+6. ⬜ **Extract polling loop logic** - 10 min
 3. ⬜ **Extract polling timeout handler** - 5 min
 4. ⬜ **Extract polling completion handler** - 5 min
 5. ⬜ **Extract single poll logic** - 8 min

@@ -264,6 +264,43 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     }
   });
   
+  /**
+   * Executes a single status poll (no continuous polling)
+   */
+  const executeSinglePoll = useEvent(async (
+    executionContext: ActionExecutionContext,
+    statusUrl: string,
+    statusMethod: string,
+    result: any
+  ) => {
+    try {
+      const statusData = await callApi(
+        executionContext,
+        {
+          url: statusUrl,
+          method: statusMethod as "get" | "post" | "put" | "delete" | "patch" | "head" | "options" | "trace" | "connect",
+          uid: uid,
+          params: { $result: result },
+        },
+        {
+          resolveBindingExpressions: false,
+        },
+      );
+      
+      const newState = {
+        ...deferredStateRef.current,
+        statusData: statusData,
+        attempts: 1,
+        startTime: Date.now(),
+        progress: 0,
+      };
+      deferredStateRef.current = newState;
+      updateDeferredState(newState, updateState);
+    } catch (statusError) {
+      console.error("Status request failed:", statusError);
+    }
+  });
+  
   // TODO pause until the apiInterceptorContext is initialized (to make sure the API calls are intercepted)
   const execute = useEvent(
     async (executionContext: ActionExecutionContext, ...eventArgs: any[]) => {
@@ -502,44 +539,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
             });
           } else {
             // Step 3: Single poll mode (no pollingInterval)
-            try {
-              const statusData = await callApi(
-                executionContext,
-                {
-                  url: interpolatedStatusUrl,
-                  method: statusMethod as "get" | "post" | "put" | "delete" | "patch" | "head" | "options" | "trace" | "connect",
-                  uid: uid,
-                  params: { $result: result },
-                },
-                {
-                  resolveBindingExpressions: false,
-                },
-              );
-              
-              // Store status data
-              const newState = {
-                ...deferredStateRef.current,
-                statusData: statusData,
-                attempts: 1,
-                startTime: Date.now(),
-                progress: 0, // Single poll mode doesn't extract progress
-              };
-              deferredStateRef.current = newState;
-              
-              // Step 6: Update state with context variables (single poll mode)
-              if (updateState) {
-                updateState({ 
-                  $statusData: newState.statusData,
-                  $progress: newState.progress,
-                  $polling: newState.isPolling,
-                  $attempts: newState.attempts,
-                  $elapsed: 0,
-                  deferredState: { ...newState }
-                });
-              }
-            } catch (statusError) {
-              console.error("Status request failed:", statusError);
-            }
+            await executeSinglePoll(executionContext, interpolatedStatusUrl, statusMethod, result);
           }
         }
         
