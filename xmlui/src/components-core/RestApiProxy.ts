@@ -568,13 +568,13 @@ export default class RestApiProxy {
   };
 
   private generateFullApiUrl(relativePath: string, queryParams: Record<string, any> | undefined) {
-    const { baseUrl: basePath, mergedParams } = normalizeUrlAndParams(
+    const { baseUrl: basePath, mergedParams, fragment } = normalizeUrlAndParams(
       relativePath,
       queryParams,
     );
 
     let queryString = "";
-    if (mergedParams) {
+    if (mergedParams && Object.keys(mergedParams).length > 0) {
       const params = new URLSearchParams();
       Object.entries(mergedParams).forEach(([key, value]) => {
         if (Array.isArray(value)) {
@@ -585,14 +585,20 @@ export default class RestApiProxy {
           params.append(key, value);
         }
       });
-      queryString = `?${params}`;
+      // Only add query string if there are actually params after filtering
+      const paramsString = params.toString();
+      if (paramsString) {
+        queryString = `?${paramsString}`;
+      }
     }
 
+    const fragmentString = fragment || "";
+
     if (basePath.startsWith("http://") || basePath.startsWith("https://")) {
-      return `${basePath}${queryString}`;
+      return `${basePath}${queryString}${fragmentString}`;
     }
     //TODO check if autoEncode is enabled
-    return `${this.config.apiUrl || ""}${basePath}${queryString}`;
+    return `${this.config.apiUrl || ""}${basePath}${queryString}${fragmentString}`;
   }
 
   private raiseError = async (response: Response | AxiosResponse) => {

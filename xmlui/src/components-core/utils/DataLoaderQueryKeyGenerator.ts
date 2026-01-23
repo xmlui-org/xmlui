@@ -19,21 +19,30 @@ type DataLoaderQueryKey = [UrlKeyPart, UrlQueryParamsPart?];
 export function normalizeUrlAndParams(
   url: string,
   queryParams: UrlQueryParamsPart | undefined
-): { baseUrl: string; mergedParams: UrlQueryParamsPart | undefined } {
+): { baseUrl: string; mergedParams: UrlQueryParamsPart | undefined; fragment?: string } {
   if (!url) {
     return { baseUrl: url, mergedParams: queryParams };
   }
 
+  // Extract fragment first (if present)
+  let fragment: string | undefined;
+  let urlWithoutFragment = url;
+  const fragmentIndex = url.indexOf('#');
+  if (fragmentIndex !== -1) {
+    fragment = url.substring(fragmentIndex);
+    urlWithoutFragment = url.substring(0, fragmentIndex);
+  }
+
   // Check if URL contains query parameters
-  const queryIndex = url.indexOf('?');
+  const queryIndex = urlWithoutFragment.indexOf('?');
   if (queryIndex === -1) {
     // No embedded query params, return as-is
-    return { baseUrl: url, mergedParams: queryParams };
+    return { baseUrl: urlWithoutFragment, mergedParams: queryParams, fragment };
   }
 
   // Split URL into base and query string
-  const baseUrl = url.substring(0, queryIndex);
-  const queryString = url.substring(queryIndex + 1);
+  const baseUrl = urlWithoutFragment.substring(0, queryIndex);
+  const queryString = urlWithoutFragment.substring(queryIndex + 1);
 
   // Parse embedded query parameters
   const embeddedParams: Record<string, any> = {};
@@ -51,7 +60,7 @@ export function normalizeUrlAndParams(
     ? { ...embeddedParams, ...queryParams }
     : queryParams;
 
-  return { baseUrl, mergedParams };
+  return { baseUrl, mergedParams, fragment };
 }
 
 export class DataLoaderQueryKeyGenerator {
