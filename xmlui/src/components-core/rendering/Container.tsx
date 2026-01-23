@@ -229,6 +229,7 @@ export const Container = memo(
                       .filter(Boolean)
                       .join("\n\n"))) ||
                 undefined,
+              diffJson: args && args[1] && Array.isArray(args[1].diff) ? args[1].diff : undefined,
             });
           }
           if (xsLogBucket && appContext.AppState) {
