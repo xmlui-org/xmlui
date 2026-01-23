@@ -335,7 +335,7 @@ export const Container = memo(
           if (xsVerbose) {
             xsLog("handler:start", {
               uid: componentUid,
-              eventName: options.eventName,
+              eventName: options?.eventName,
               args: eventArgs,
             });
           }
@@ -497,7 +497,7 @@ export const Container = memo(
             if (xsVerbose) {
               xsLog("handler:complete", {
                 uid: componentUid,
-                eventName: options.eventName,
+                eventName: options?.eventName,
                 returnValue,
               });
             }
@@ -507,7 +507,7 @@ export const Container = memo(
           if (xsVerbose) {
             xsLog("handler:error", {
               uid: componentUid,
-              eventName: options.eventName,
+              eventName: options?.eventName,
               error: e,
             });
           }
