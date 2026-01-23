@@ -24,6 +24,7 @@ import { useIndexerContext } from "../../components/App/IndexerContext";
 import { createMetadata, d } from "../../components/metadata-helpers";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
 import { createContextVariableError } from "../EngineError";
+import { loggerService } from "../../logging/LoggerService";
 
 type LoaderProps = {
   loader: DataLoaderDef;
@@ -53,6 +54,101 @@ function DataLoader({
   structuralSharing = true,
 }: LoaderProps) {
   const appContext = useAppContext();
+  const xsVerbose = appContext.appGlobals?.xsVerbose === true;
+  const xsLogMax = Number(appContext.appGlobals?.xsVerboseLogMax ?? 200);
+  const prevDataRef = useRef<any>(undefined);
+
+  const xsLog = useCallback(
+    (...args: any[]) => {
+      if (!xsVerbose) return;
+      const payload = ["[xs]", ...args];
+      loggerService.log(payload);
+      console.log(...payload);
+      if (typeof window !== "undefined") {
+        const w = window as any;
+        w._xsLogs = Array.isArray(w._xsLogs) ? w._xsLogs : [];
+        const seen = new WeakSet();
+        const safeStringify = (value: any) => {
+          try {
+            return JSON.stringify(
+              value,
+              (_key, val) => {
+                if (typeof val === "function") return "[Function]";
+                if (typeof window !== "undefined") {
+                  if (val === window) return "[Window]";
+                  if (val === document) return "[Document]";
+                }
+                if (val && typeof Node !== "undefined" && val instanceof Node) {
+                  return "[DOM Node]";
+                }
+                if (val && typeof val === "object") {
+                  if (seen.has(val)) return "[Circular]";
+                  seen.add(val);
+                }
+                return val;
+              },
+              2,
+            );
+          } catch {
+            return String(value);
+          }
+        };
+        w._xsLogs.push({
+          ts: Date.now(),
+          text: safeStringify(args),
+          kind: args && args[0] ? args[0] : undefined,
+          eventName: args && args[1] && args[1].eventName ? args[1].eventName : undefined,
+          uid: args && args[1] && args[1].uid ? String(args[1].uid) : undefined,
+          diffPretty:
+            args &&
+            args[1] &&
+            (args[1].diffPretty ||
+              (Array.isArray(args[1].diff) &&
+                args[1].diff
+                  .map((d: any) => d && d.diffPretty)
+                  .filter(Boolean)
+                  .join("\n\n"))) ||
+            undefined,
+          diffJson: args && args[1] && Array.isArray(args[1].diff) ? args[1].diff : undefined,
+        });
+        if (Number.isFinite(xsLogMax) && xsLogMax > 0 && w._xsLogs.length > xsLogMax) {
+          w._xsLogs.splice(0, w._xsLogs.length - xsLogMax);
+        }
+      }
+    },
+    [xsLogMax, xsVerbose],
+  );
+
+  const formatDiff = (path: string, before: any, after: any) => {
+    const stringify = (value: any) => {
+      if (value === undefined) return "undefined";
+      try {
+        return JSON.stringify(value, null, 2);
+      } catch {
+        return String(value);
+      }
+    };
+    const prefixLines = (text: string, prefix: string) => {
+      return text
+        .split("\n")
+        .map((line) => `${prefix}${line}`)
+        .join("\n");
+    };
+    const beforeJson = stringify(before);
+    const afterJson = stringify(after);
+    const diffPretty =
+      `path: ${path}\n` + `${prefixLines(beforeJson, "- ")}\n` + `${prefixLines(afterJson, "+ ")}`;
+    return {
+      path,
+      type: "update",
+      before,
+      after,
+      beforeJson,
+      afterJson,
+      diffText: `path: ${path}\n- ${beforeJson}\n+ ${afterJson}`,
+      diffPretty,
+    };
+  };
   const url = extractParam(state, loader.props.url, appContext);
   const queryParamsInner = useMemo(() => {
     return extractParam(state, loader.props.queryParams, appContext);
@@ -322,6 +418,19 @@ function DataLoader({
       //     console.log("[SQL DataLoader] Data keys:", Object.keys(data));
       //   }
       // }
+
+      if (xsVerbose) {
+        const before = prevDataRef.current;
+        const after = data;
+        const dataSourceId = loader.props.id || loader.uid || loader.props.url || "DataSource";
+        const path = `DataSource:${dataSourceId}`;
+        xsLog("state:changes", {
+          uid: dataSourceId,
+          eventName: `DataSource:${dataSourceId}`,
+          diff: [formatDiff(path, before, after)],
+        });
+        prevDataRef.current = data;
+      }
 
       loaderLoaded(data, pageInfo);
       // console.log("[DataLoader] After loaderLoaded() call");

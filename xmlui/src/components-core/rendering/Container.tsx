@@ -219,6 +219,10 @@ export const Container = memo(
               text: safeStringify(args),
               kind: args && args[0] ? args[0] : undefined,
               eventName: args && args[1] && args[1].eventName ? args[1].eventName : undefined,
+              uid:
+                args && args[1] && args[1].uid
+                  ? String(args[1].uid)
+                  : undefined,
               diffPretty:
                 args &&
                 args[1] &&
