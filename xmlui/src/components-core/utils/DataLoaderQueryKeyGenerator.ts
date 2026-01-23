@@ -40,10 +40,15 @@ export function normalizeUrlAndParams(
   if (queryString) {
     const searchParams = new URLSearchParams(queryString);
     // Use getAll to handle duplicate keys as arrays
+    // Process each unique key only once
+    const processedKeys = new Set<string>();
     searchParams.forEach((_, key) => {
-      const values = searchParams.getAll(key);
-      // Store as array if there are multiple values, otherwise store the single value
-      embeddedParams[key] = values.length > 1 ? values : values[0];
+      if (!processedKeys.has(key)) {
+        processedKeys.add(key);
+        const values = searchParams.getAll(key);
+        // Store as array if there are multiple values, otherwise store the single value
+        embeddedParams[key] = values.length > 1 ? values : values[0];
+      }
     });
   }
 
