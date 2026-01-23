@@ -16,6 +16,7 @@ import { createLoaderRenderer } from "../renderers";
 import RestApiProxy from "../RestApiProxy";
 import { extractParam } from "../utils/extractParam";
 import { DataLoaderQueryKeyGenerator } from "../utils/DataLoaderQueryKeyGenerator";
+import { normalizeUrlAndParams } from "../utils/urlNormalization";
 import { PageableLoader } from "../loader/PageableLoader";
 import { Loader } from "../loader/Loader";
 import { useAppContext } from "../AppContext";
@@ -63,34 +64,7 @@ function DataLoader({
   // This ensures consistent behavior whether params are in URL or queryParams prop
   // Fixes issue #2672: https://github.com/xmlui-org/xmlui/issues/2672
   const { url, queryParams } = useMemo(() => {
-    if (!rawUrl) {
-      return { url: rawUrl, queryParams: rawQueryParams };
-    }
-
-    const queryIndex = rawUrl.indexOf('?');
-    if (queryIndex === -1) {
-      // No embedded query params
-      return { url: rawUrl, queryParams: rawQueryParams };
-    }
-
-    // Extract embedded query params from URL
-    const baseUrl = rawUrl.substring(0, queryIndex);
-    const queryString = rawUrl.substring(queryIndex + 1);
-
-    const embeddedParams: Record<string, any> = {};
-    if (queryString) {
-      const searchParams = new URLSearchParams(queryString);
-      searchParams.forEach((value, key) => {
-        embeddedParams[key] = value;
-      });
-    }
-
-    // Merge embedded params with explicit queryParams
-    // Explicit queryParams take precedence
-    const mergedParams = Object.keys(embeddedParams).length > 0
-      ? { ...embeddedParams, ...rawQueryParams }
-      : rawQueryParams;
-
+    const { baseUrl, mergedParams } = normalizeUrlAndParams(rawUrl, rawQueryParams);
     return { url: baseUrl, queryParams: mergedParams };
   }, [rawUrl, rawQueryParams]);
 

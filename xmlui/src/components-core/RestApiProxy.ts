@@ -14,6 +14,7 @@ import { randomUUID, readCookie } from "./utils/misc";
 import { GenericBackendError } from "./EngineError";
 import { processStatementQueue } from "./script-runner/process-statement-sync";
 import type { IApiInterceptor } from "./interception/abstractions";
+import { normalizeUrlAndParams } from "./utils/urlNormalization";
 
 type OnProgressFn = (progressEvent: { loaded: number; total?: number; progress?: number }) => void;
 
@@ -473,7 +474,12 @@ export default class RestApiProxy {
   }) => {
     const includeClientTxId = method && method !== "get" && !!transactionId;
     const headersWithoutContentType = { ...this.getHeaders(), ["Content-Type"]: undefined };
-    let url = this.generateFullApiUrl(relativePath, queryParams);
+    
+    // Normalize URL and query params to handle embedded query parameters
+    // This ensures consistent API calls whether params are in URL or queryParams prop
+    // Fixes issue #2672: https://github.com/xmlui-org/xmlui/issues/2672
+    const { baseUrl, mergedParams } = normalizeUrlAndParams(relativePath, queryParams);
+    let url = this.generateFullApiUrl(baseUrl, mergedParams);
     const hasBody = body !== undefined;
 
     const aggregatedHeaders = omitBy(
