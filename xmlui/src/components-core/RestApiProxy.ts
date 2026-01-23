@@ -10,6 +10,7 @@ import {
 } from "./script-runner/ScriptingSourceTree";
 
 import { extractParam } from "./utils/extractParam";
+import { normalizeUrlAndParams } from "./utils/DataLoaderQueryKeyGenerator";
 import { randomUUID, readCookie } from "./utils/misc";
 import { GenericBackendError } from "./EngineError";
 import { processStatementQueue } from "./script-runner/process-statement-sync";
@@ -567,10 +568,15 @@ export default class RestApiProxy {
   };
 
   private generateFullApiUrl(relativePath: string, queryParams: Record<string, any> | undefined) {
+    const { baseUrl: basePath, mergedParams } = normalizeUrlAndParams(
+      relativePath,
+      queryParams,
+    );
+
     let queryString = "";
-    if (queryParams) {
+    if (mergedParams) {
       const params = new URLSearchParams();
-      Object.entries(queryParams).forEach(([key, value]) => {
+      Object.entries(mergedParams).forEach(([key, value]) => {
         if (Array.isArray(value)) {
           value.forEach((item) => {
             params.append(key, item);
@@ -581,11 +587,12 @@ export default class RestApiProxy {
       });
       queryString = `?${params}`;
     }
-    if (relativePath.startsWith("http://") || relativePath.startsWith("https://")) {
-      return `${relativePath}${queryString}`;
+
+    if (basePath.startsWith("http://") || basePath.startsWith("https://")) {
+      return `${basePath}${queryString}`;
     }
     //TODO check if autoEncode is enabled
-    return `${this.config.apiUrl || ""}${relativePath}${queryString}`;
+    return `${this.config.apiUrl || ""}${basePath}${queryString}`;
   }
 
   private raiseError = async (response: Response | AxiosResponse) => {

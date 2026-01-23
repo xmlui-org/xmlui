@@ -13,10 +13,10 @@ type DataLoaderQueryKey = [UrlKeyPart, UrlQueryParamsPart?];
  * the base URL and merged query parameters separately.
  * This ensures consistent cache keys regardless of whether query params are
  * provided via the queryParams prop or embedded in the URL string.
- * 
+ *
  * Fixes issue #2672: https://github.com/xmlui-org/xmlui/issues/2672
  */
-function normalizeUrlAndParams(
+export function normalizeUrlAndParams(
   url: string,
   queryParams: UrlQueryParamsPart | undefined
 ): { baseUrl: string; mergedParams: UrlQueryParamsPart | undefined } {
@@ -69,7 +69,7 @@ export class DataLoaderQueryKeyGenerator {
     // Normalize URL and query params to ensure consistent cache keys
     // This fixes issue #2672 where embedded query params in URL create different cache keys
     const { baseUrl, mergedParams } = normalizeUrlAndParams(url, queryParams);
-    
+
     this.url = baseUrl;
     this.queryParams = mergedParams;
     this.key = [baseUrl];
