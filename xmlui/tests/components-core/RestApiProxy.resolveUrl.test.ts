@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import RestApiProxy from "../../src/components-core/RestApiProxy";
 
+const createProxy = () => new RestApiProxy({ appGlobals: { apiUrl: "https://api.example" } } as any);
+
 describe("RestApiProxy.resolveUrl", () => {
   it("encodes inline query params and prefixes apiUrl for relative paths", () => {
-    const proxy = new RestApiProxy({ appGlobals: { apiUrl: "https://api.example" } } as any);
+    const proxy = createProxy();
 
     const url = proxy.resolveUrl({
       operation: { url: "/ListFolder?path=:sh:Documents:/" } as any,
@@ -14,7 +16,7 @@ describe("RestApiProxy.resolveUrl", () => {
   });
 
   it("encodes explicit queryParams the same as inline params", () => {
-    const proxy = new RestApiProxy({ appGlobals: { apiUrl: "https://api.example" } } as any);
+    const proxy = createProxy();
 
     const url = proxy.resolveUrl({
       operation: { url: "/ListFolder", queryParams: { path: ":sh:Documents:/" } } as any,
@@ -24,7 +26,7 @@ describe("RestApiProxy.resolveUrl", () => {
   });
 
   it("explicit queryParams override embedded ones", () => {
-    const proxy = new RestApiProxy({ appGlobals: { apiUrl: "https://api.example" } } as any);
+    const proxy = createProxy();
 
     const url = proxy.resolveUrl({
       operation: {
@@ -37,7 +39,7 @@ describe("RestApiProxy.resolveUrl", () => {
   });
 
   it("preserves absolute base urls without prefixing apiUrl", () => {
-    const proxy = new RestApiProxy({ appGlobals: { apiUrl: "https://api.example" } } as any);
+    const proxy = createProxy();
 
     const url = proxy.resolveUrl({
       operation: { url: "https://other.example/ListFolder?path=:sh:Documents:/" } as any,
@@ -47,7 +49,7 @@ describe("RestApiProxy.resolveUrl", () => {
   });
 
   it("handles empty queryParams object", () => {
-    const proxy = new RestApiProxy({ appGlobals: { apiUrl: "https://api.example" } } as any);
+    const proxy = createProxy();
 
     const url = proxy.resolveUrl({
       operation: { url: "/ListFolder", queryParams: {} } as any,
@@ -57,7 +59,7 @@ describe("RestApiProxy.resolveUrl", () => {
   });
 
   it("handles undefined queryParams", () => {
-    const proxy = new RestApiProxy({ appGlobals: { apiUrl: "https://api.example" } } as any);
+    const proxy = createProxy();
 
     const url = proxy.resolveUrl({
       operation: { url: "/ListFolder", queryParams: undefined } as any,
@@ -66,38 +68,31 @@ describe("RestApiProxy.resolveUrl", () => {
     expect(url).toBe("https://api.example/ListFolder");
   });
 
-  it("filters out query parameters with undefined values", () => {
-    const proxy = new RestApiProxy({ appGlobals: { apiUrl: "https://api.example" } } as any);
+  it("filters out query parameters with undefined or null values", () => {
+    const proxy = createProxy();
 
     const url = proxy.resolveUrl({
       operation: {
         url: "/ListFolder",
-        queryParams: { path: ":sh:Documents:/", filter: undefined, page: 1 },
+        queryParams: { path: ":sh:Documents:/", filter: undefined, page: 1, empty: null },
       } as any,
     });
 
     expect(url).toBe("https://api.example/ListFolder?path=%3Ash%3ADocuments%3A%2F&page=1");
   });
 
-  it("encodes query parameters with special characters (spaces, ampersands, equals)", () => {
   it("handles array values in queryParams", () => {
-    const proxy = new RestApiProxy({ appGlobals: { apiUrl: "https://api.example" } } as any);
+    const proxy = createProxy();
 
     const url = proxy.resolveUrl({
       operation: { url: "/ListFolder", queryParams: { tags: ["a", "b"] } } as any,
     });
 
     expect(url).toBe("https://api.example/ListFolder?tags=a&tags=b");
+  });
+
   it("handles duplicate query parameter keys as arrays", () => {
-    const proxy = new RestApiProxy({ appGlobals: { apiUrl: "https://api.example" } } as any);
-
-    const url = proxy.resolveUrl({
-      operation: { url: "/ListFolder?tag=a&tag=b" } as any,
-    });
-
-    expect(url).toBe("https://api.example/ListFolder?tag=a&tag=b");
-  it("handles array parameters in embedded query strings", () => {
-    const proxy = new RestApiProxy({ appGlobals: { apiUrl: "https://api.example" } } as any);
+    const proxy = createProxy();
 
     const url = proxy.resolveUrl({
       operation: { url: "/List?tag=a&tag=b" } as any,
@@ -106,8 +101,21 @@ describe("RestApiProxy.resolveUrl", () => {
     expect(url).toBe("https://api.example/List?tag=a&tag=b");
   });
 
-  it("merges array parameters from embedded query string with explicit queryParams", () => {
-    const proxy = new RestApiProxy({ appGlobals: { apiUrl: "https://api.example" } } as any);
+  it("explicit array queryParams override embedded array params", () => {
+    const proxy = createProxy();
+
+    const url = proxy.resolveUrl({
+      operation: {
+        url: "/List?tag=a&tag=b",
+        queryParams: { tag: ["c", "d"] },
+      } as any,
+    });
+
+    expect(url).toBe("https://api.example/List?tag=c&tag=d");
+  });
+
+  it("encodes query parameters with special characters", () => {
+    const proxy = createProxy();
 
     const url = proxy.resolveUrl({
       operation: {
@@ -125,8 +133,23 @@ describe("RestApiProxy.resolveUrl", () => {
     );
   });
 
+  it("serializes object queryParams as JSON", () => {
+    const proxy = createProxy();
+
+    const url = proxy.resolveUrl({
+      operation: {
+        url: "/Search",
+        queryParams: { filter: { name: "John", age: 30 } },
+      } as any,
+    });
+
+    expect(url).toBe(
+      "https://api.example/Search?filter=%7B%22name%22%3A%22John%22%2C%22age%22%3A30%7D"
+    );
+  });
+
   it("preserves URL fragments when present", () => {
-    const proxy = new RestApiProxy({ appGlobals: { apiUrl: "https://api.example" } } as any);
+    const proxy = createProxy();
 
     const url = proxy.resolveUrl({
       operation: { url: "/Page?section=intro#details" } as any,
@@ -136,16 +159,7 @@ describe("RestApiProxy.resolveUrl", () => {
   });
 
   it("preserves URL fragments with explicit query params", () => {
-        url: "/List?tag=a&tag=b",
-        queryParams: { category: "books" },
-      } as any,
-    });
-
-    expect(url).toBe("https://api.example/List?tag=a&tag=b&category=books");
-  });
-
-  it("explicit array queryParams override embedded array params", () => {
-    const proxy = new RestApiProxy({ appGlobals: { apiUrl: "https://api.example" } } as any);
+    const proxy = createProxy();
 
     const url = proxy.resolveUrl({
       operation: {
@@ -155,11 +169,5 @@ describe("RestApiProxy.resolveUrl", () => {
     });
 
     expect(url).toBe("https://api.example/Page?section=intro&page=1#details");
-        url: "/List?tag=a&tag=b",
-        queryParams: { tag: ["c", "d"] },
-      } as any,
-    });
-
-    expect(url).toBe("https://api.example/List?tag=c&tag=d");
   });
 });

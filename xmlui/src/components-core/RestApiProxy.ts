@@ -576,13 +576,23 @@ export default class RestApiProxy {
     let queryString = "";
     if (mergedParams && Object.keys(mergedParams).length > 0) {
       const params = new URLSearchParams();
+      const appendParam = (key: string, value: any) => {
+        if (value === undefined || value === null) {
+          return;
+        }
+        if (isPlainObject(value)) {
+          params.append(key, JSON.stringify(value));
+          return;
+        }
+        params.append(key, String(value));
+      };
       Object.entries(mergedParams).forEach(([key, value]) => {
         if (Array.isArray(value)) {
           value.forEach((item) => {
-            params.append(key, item);
+            appendParam(key, item);
           });
-        } else if (value !== undefined) {
-          params.append(key, value);
+        } else {
+          appendParam(key, value);
         }
       });
       // Only add query string if there are actually params after filtering
