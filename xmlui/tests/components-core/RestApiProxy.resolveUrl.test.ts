@@ -54,5 +54,39 @@ describe("RestApiProxy.resolveUrl", () => {
     });
 
     expect(url).toBe("https://api.example/ListFolder?tag=a&tag=b");
+  it("handles array parameters in embedded query strings", () => {
+    const proxy = new RestApiProxy({ appGlobals: { apiUrl: "https://api.example" } } as any);
+
+    const url = proxy.resolveUrl({
+      operation: { url: "/List?tag=a&tag=b" } as any,
+    });
+
+    expect(url).toBe("https://api.example/List?tag=a&tag=b");
+  });
+
+  it("merges array parameters from embedded query string with explicit queryParams", () => {
+    const proxy = new RestApiProxy({ appGlobals: { apiUrl: "https://api.example" } } as any);
+
+    const url = proxy.resolveUrl({
+      operation: {
+        url: "/List?tag=a&tag=b",
+        queryParams: { category: "books" },
+      } as any,
+    });
+
+    expect(url).toBe("https://api.example/List?tag=a&tag=b&category=books");
+  });
+
+  it("explicit array queryParams override embedded array params", () => {
+    const proxy = new RestApiProxy({ appGlobals: { apiUrl: "https://api.example" } } as any);
+
+    const url = proxy.resolveUrl({
+      operation: {
+        url: "/List?tag=a&tag=b",
+        queryParams: { tag: ["c", "d"] },
+      } as any,
+    });
+
+    expect(url).toBe("https://api.example/List?tag=c&tag=d");
   });
 });
