@@ -80,6 +80,33 @@ describe("RestApiProxy.resolveUrl", () => {
   });
 
   it("encodes query parameters with special characters (spaces, ampersands, equals)", () => {
+  it("handles array values in queryParams", () => {
+    const proxy = new RestApiProxy({ appGlobals: { apiUrl: "https://api.example" } } as any);
+
+    const url = proxy.resolveUrl({
+      operation: { url: "/ListFolder", queryParams: { tags: ["a", "b"] } } as any,
+    });
+
+    expect(url).toBe("https://api.example/ListFolder?tags=a&tags=b");
+  it("handles duplicate query parameter keys as arrays", () => {
+    const proxy = new RestApiProxy({ appGlobals: { apiUrl: "https://api.example" } } as any);
+
+    const url = proxy.resolveUrl({
+      operation: { url: "/ListFolder?tag=a&tag=b" } as any,
+    });
+
+    expect(url).toBe("https://api.example/ListFolder?tag=a&tag=b");
+  it("handles array parameters in embedded query strings", () => {
+    const proxy = new RestApiProxy({ appGlobals: { apiUrl: "https://api.example" } } as any);
+
+    const url = proxy.resolveUrl({
+      operation: { url: "/List?tag=a&tag=b" } as any,
+    });
+
+    expect(url).toBe("https://api.example/List?tag=a&tag=b");
+  });
+
+  it("merges array parameters from embedded query string with explicit queryParams", () => {
     const proxy = new RestApiProxy({ appGlobals: { apiUrl: "https://api.example" } } as any);
 
     const url = proxy.resolveUrl({
@@ -109,6 +136,15 @@ describe("RestApiProxy.resolveUrl", () => {
   });
 
   it("preserves URL fragments with explicit query params", () => {
+        url: "/List?tag=a&tag=b",
+        queryParams: { category: "books" },
+      } as any,
+    });
+
+    expect(url).toBe("https://api.example/List?tag=a&tag=b&category=books");
+  });
+
+  it("explicit array queryParams override embedded array params", () => {
     const proxy = new RestApiProxy({ appGlobals: { apiUrl: "https://api.example" } } as any);
 
     const url = proxy.resolveUrl({
@@ -119,5 +155,11 @@ describe("RestApiProxy.resolveUrl", () => {
     });
 
     expect(url).toBe("https://api.example/Page?section=intro&page=1#details");
+        url: "/List?tag=a&tag=b",
+        queryParams: { tag: ["c", "d"] },
+      } as any,
+    });
+
+    expect(url).toBe("https://api.example/List?tag=c&tag=d");
   });
 });
