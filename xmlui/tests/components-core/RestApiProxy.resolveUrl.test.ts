@@ -45,4 +45,14 @@ describe("RestApiProxy.resolveUrl", () => {
 
     expect(url).toBe("https://other.example/ListFolder?path=%3Ash%3ADocuments%3A%2F");
   });
+
+  it("handles duplicate query parameter keys as arrays", () => {
+    const proxy = new RestApiProxy({ appGlobals: { apiUrl: "https://api.example" } } as any);
+
+    const url = proxy.resolveUrl({
+      operation: { url: "/ListFolder?tag=a&tag=b" } as any,
+    });
+
+    expect(url).toBe("https://api.example/ListFolder?tag=a&tag=b");
+  });
 });

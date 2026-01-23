@@ -39,9 +39,11 @@ export function normalizeUrlAndParams(
   const embeddedParams: Record<string, any> = {};
   if (queryString) {
     const searchParams = new URLSearchParams(queryString);
-    searchParams.forEach((value, key) => {
-      // Store the decoded value to match URLSearchParams behavior when building URLs
-      embeddedParams[key] = value;
+    // Use getAll to handle duplicate keys as arrays
+    searchParams.forEach((_, key) => {
+      const values = searchParams.getAll(key);
+      // Store as array if there are multiple values, otherwise store the single value
+      embeddedParams[key] = values.length > 1 ? values : values[0];
     });
   }
 
