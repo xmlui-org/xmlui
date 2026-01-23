@@ -304,6 +304,13 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
     white-space: nowrap;
     text-overflow: ellipsis;
     padding: 0;
+
+    // Reset font-size for select column to prevent checkbox from inheriting header font-size
+    &[data-column-id="select"] {
+      .headerContent {
+        font-size: t.$fontSize-sm;
+      }
+    }
   }
 
   .noRows {

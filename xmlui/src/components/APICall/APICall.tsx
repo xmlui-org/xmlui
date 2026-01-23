@@ -104,22 +104,6 @@ export const APICallMd = createMetadata({
         `confirmation dialog that is displayed before the \`${COMP}\` is executed.`,
       valueType: "string",
     },
-    inProgressNotificationMessage: {
-      description:
-        "This property customizes the message that is displayed in a toast while the API " +
-        "operation is in progress. If not defined, no progress message is displayed.",
-      valueType: "string",
-    },
-    errorNotificationMessage: {
-      description: "",
-      valueType: "string",
-    },
-    completedNotificationMessage: {
-      description:
-        "This property defines the message to display automatically when the operation has " +
-        "been completed. When this property is not defined, the completion does not display any message.",
-      valueType: "string",
-    },
     deferredMode: {
       description:
         "Enable deferred operation mode for long-running operations that return 202 Accepted. " +
