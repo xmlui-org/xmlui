@@ -8,6 +8,52 @@ type UrlQueryParamsPart = Record<string, any>;
 
 type DataLoaderQueryKey = [UrlKeyPart, UrlQueryParamsPart?];
 
+/**
+ * Normalizes a URL by extracting any embedded query parameters and returning
+ * the base URL and merged query parameters separately.
+ * This ensures consistent cache keys regardless of whether query params are
+ * provided via the queryParams prop or embedded in the URL string.
+ * 
+ * Fixes issue #2672: https://github.com/xmlui-org/xmlui/issues/2672
+ */
+function normalizeUrlAndParams(
+  url: string,
+  queryParams: UrlQueryParamsPart | undefined
+): { baseUrl: string; mergedParams: UrlQueryParamsPart | undefined } {
+  if (!url) {
+    return { baseUrl: url, mergedParams: queryParams };
+  }
+
+  // Check if URL contains query parameters
+  const queryIndex = url.indexOf('?');
+  if (queryIndex === -1) {
+    // No embedded query params, return as-is
+    return { baseUrl: url, mergedParams: queryParams };
+  }
+
+  // Split URL into base and query string
+  const baseUrl = url.substring(0, queryIndex);
+  const queryString = url.substring(queryIndex + 1);
+
+  // Parse embedded query parameters
+  const embeddedParams: Record<string, any> = {};
+  if (queryString) {
+    const searchParams = new URLSearchParams(queryString);
+    searchParams.forEach((value, key) => {
+      // Store the decoded value to match URLSearchParams behavior when building URLs
+      embeddedParams[key] = value;
+    });
+  }
+
+  // Merge embedded params with explicit queryParams
+  // Explicit queryParams take precedence over embedded params
+  const mergedParams = Object.keys(embeddedParams).length > 0
+    ? { ...embeddedParams, ...queryParams }
+    : queryParams;
+
+  return { baseUrl, mergedParams };
+}
+
 export class DataLoaderQueryKeyGenerator {
   private readonly url: UrlKeyPart;
   private readonly queryParams?: UrlQueryParamsPart;
@@ -20,11 +66,15 @@ export class DataLoaderQueryKeyGenerator {
     body: any,
     rawBody: any,
   ) {
-    this.url = url;
-    this.queryParams = queryParams;
-    this.key = [url];
-    if (queryParams) {
-      this.key.push(queryParams);
+    // Normalize URL and query params to ensure consistent cache keys
+    // This fixes issue #2672 where embedded query params in URL create different cache keys
+    const { baseUrl, mergedParams } = normalizeUrlAndParams(url, queryParams);
+    
+    this.url = baseUrl;
+    this.queryParams = mergedParams;
+    this.key = [baseUrl];
+    if (mergedParams) {
+      this.key.push(mergedParams);
     }
     if (apiUrl) {
       this.key.push(apiUrl);
