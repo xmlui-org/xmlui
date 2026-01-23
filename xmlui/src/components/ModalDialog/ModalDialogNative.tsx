@@ -21,6 +21,7 @@ import { Icon } from "../Icon/IconNative";
 import { Button } from "../Button/ButtonNative";
 import { ModalVisibilityContext } from "./ModalVisibilityContext";
 import { Part } from "../Part/Part";
+import { m } from "framer-motion";
 
 const PART_TITLE = "title";
 const PART_CONTENT = "content";
@@ -125,6 +126,7 @@ function useModalLocalOpenState(isInitiallyOpen: boolean, onOpen?: OnOpen, onClo
 function useModalOpenState(isInitiallyOpen = true, onOpen?: OnOpen, onClose?: OnClose) {
   const modalStateContext = useContext(ModalStateContext);
   const modalLocalOpenState = useModalLocalOpenState(isInitiallyOpen, onOpen, onClose);
+  console.log("useModalOpenState: modalStateContext =", modalStateContext, modalLocalOpenState);
   return modalStateContext || modalLocalOpenState;
 }
 
