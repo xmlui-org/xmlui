@@ -36,12 +36,20 @@ export function normalizeUrlAndParams(
   const queryString = url.substring(queryIndex + 1);
 
   // Parse embedded query parameters
+  // Fix for duplicate query parameter keys (e.g., "tag=a&tag=b")
+  // Previously, only the last value was kept; now we properly handle arrays
   const embeddedParams: Record<string, any> = {};
   if (queryString) {
     const searchParams = new URLSearchParams(queryString);
-    searchParams.forEach((value, key) => {
-      // Store the decoded value to match URLSearchParams behavior when building URLs
-      embeddedParams[key] = value;
+    // Process each unique key only once to avoid redundant getAll() calls
+    const processedKeys = new Set<string>();
+    searchParams.forEach((_, key) => {
+      if (!processedKeys.has(key)) {
+        processedKeys.add(key);
+        const values = searchParams.getAll(key);
+        // Store as array if there are multiple values, otherwise store the single value
+        embeddedParams[key] = values.length > 1 ? values : values[0];
+      }
     });
   }
 
