@@ -421,3 +421,90 @@ test.describe("Theme Variables", () => {
     await expect(titleHeader).toHaveCSS("font-weight", "700");
   });
 });
+
+// =============================================================================
+// REGRESSION TESTS
+// =============================================================================
+
+test.describe("Regression Tests", () => {
+  // GitHub issue #2673: ModalDialog should unmount children when not visible
+  // to prevent unnecessary network requests and hook execution
+  test("should unmount children when closed via imperative API (#2673)", async ({
+    page,
+    initTestBed,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment var.mountCount="{0}">
+        <Button testId="openButton" onClick="modal.open()">Open Modal</Button>
+        
+        <ModalDialog id="modal">
+          <Text testId="modalContent" onInit="mountCount = mountCount + 1">Modal is open (mount count: {mountCount})</Text>
+        </ModalDialog>
+        
+        <Text testId="outsideMountCount">Mount count: {mountCount}</Text>
+      </Fragment>
+    `);
+
+    // Initial state - modal is closed, mount count should be 0
+    await expect(page.getByTestId("modalContent")).not.toBeVisible();
+    await expect(page.getByTestId("outsideMountCount")).toHaveText("Mount count: 0");
+
+    // Open the modal - this should trigger onInit and increment mount count to 1
+    await page.getByTestId("openButton").click();
+    await expect(page.getByTestId("modalContent")).toBeVisible();
+    await expect(page.getByTestId("modalContent")).toContainText("mount count: 1");
+    await expect(page.getByTestId("outsideMountCount")).toHaveText("Mount count: 1");
+
+    // Close the modal by clicking the X button in the dialog
+    const closeBtn = page.getByRole("dialog").getByRole("button", { name: "Close" });
+    await closeBtn.click();
+    await expect(page.getByTestId("modalContent")).not.toBeVisible();
+    await expect(page.getByTestId("outsideMountCount")).toHaveText("Mount count: 1");
+
+    // Open the modal again - this should increment the count to 2 (remount triggers onInit again)
+    await page.getByTestId("openButton").click();
+    await expect(page.getByTestId("modalContent")).toBeVisible();
+    await expect(page.getByTestId("modalContent")).toContainText("mount count: 2");
+    await expect(page.getByTestId("outsideMountCount")).toHaveText("Mount count: 2");
+  });
+
+  // Test to verify that the declarative 'when' approach also unmounts correctly
+  test("correctly unmounts children when using 'when' prop (#2673 - declarative control)", async ({
+    page,
+    initTestBed,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment var.isOpen="{false}" var.mountCount="{0}">
+        <Button testId="openButton" onClick="isOpen = true">Open Modal</Button>
+        
+        <ModalDialog when="{isOpen}" onClose="isOpen = false">
+          <Text testId="modalContent" onInit="mountCount = mountCount + 1">Modal is open (mount count: {mountCount})</Text>
+        </ModalDialog>
+        
+        <Text testId="outsideMountCount">Mount count: {mountCount}</Text>
+      </Fragment>
+    `);
+
+    // Initial state - modal is closed, mount count should be 0
+    await expect(page.getByTestId("modalContent")).not.toBeVisible();
+    await expect(page.getByTestId("outsideMountCount")).toHaveText("Mount count: 0");
+
+    // Open the modal - this should trigger mount and onInit
+    await page.getByTestId("openButton").click();
+    await expect(page.getByTestId("modalContent")).toBeVisible();
+    await expect(page.getByTestId("modalContent")).toContainText("mount count: 1");
+    await expect(page.getByTestId("outsideMountCount")).toHaveText("Mount count: 1");
+
+    // Close the modal using the X button
+    const closeBtn = page.getByRole("dialog").getByRole("button", { name: "Close" });
+    await closeBtn.click();
+    await expect(page.getByTestId("modalContent")).not.toBeVisible();
+    await expect(page.getByTestId("outsideMountCount")).toHaveText("Mount count: 1");
+
+    // Open the modal again - this should increment to 2 (remount triggers onInit again)
+    await page.getByTestId("openButton").click();
+    await expect(page.getByTestId("modalContent")).toBeVisible();
+    await expect(page.getByTestId("modalContent")).toContainText("mount count: 2");
+    await expect(page.getByTestId("outsideMountCount")).toHaveText("Mount count: 2");
+  });
+});
