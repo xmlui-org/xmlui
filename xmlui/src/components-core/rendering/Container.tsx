@@ -185,6 +185,52 @@ export const Container = memo(
           const payload = ["[xs]", ...args];
           loggerService.log(payload);
           console.log(...payload);
+          if (typeof window !== "undefined") {
+            const w = window as any;
+            w._xsLogs = Array.isArray(w._xsLogs) ? w._xsLogs : [];
+            const seen = new WeakSet();
+            const safeStringify = (value: any) => {
+              try {
+                return JSON.stringify(
+                  value,
+                  (_key, val) => {
+                    if (typeof val === "function") return "[Function]";
+                    if (typeof window !== "undefined") {
+                      if (val === window) return "[Window]";
+                      if (val === document) return "[Document]";
+                    }
+                    if (val && typeof Node !== "undefined" && val instanceof Node) {
+                      return "[DOM Node]";
+                    }
+                    if (val && typeof val === "object") {
+                      if (seen.has(val)) return "[Circular]";
+                      seen.add(val);
+                    }
+                    return val;
+                  },
+                  2,
+                );
+              } catch {
+                return String(value);
+              }
+            };
+            w._xsLogs.push({
+              ts: Date.now(),
+              text: safeStringify(args),
+              kind: args && args[0] ? args[0] : undefined,
+              eventName: args && args[1] && args[1].eventName ? args[1].eventName : undefined,
+              diffPretty:
+                args &&
+                args[1] &&
+                (args[1].diffPretty ||
+                  (Array.isArray(args[1].diff) &&
+                    args[1].diff
+                      .map((d: any) => d && d.diffPretty)
+                      .filter(Boolean)
+                      .join("\n\n"))) ||
+                undefined,
+            });
+          }
           if (xsLogBucket && appContext.AppState) {
             try {
               const current = appContext.AppState.get(xsLogBucket) || [];
