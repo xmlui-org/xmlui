@@ -60,6 +60,29 @@ import { useApiInterceptorContext } from "../interception/useApiInterceptorConte
 import { mergeProps } from "../utils/mergeProps";
 import { loggerService } from "../../logging/LoggerService";
 
+// =============================================================================
+// TRACE ID MANAGEMENT - for correlating handler events
+// =============================================================================
+const traceStack: string[] = [];
+
+function generateTraceId(): string {
+  return `t-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function pushTrace(): string {
+  const id = generateTraceId();
+  traceStack.push(id);
+  return id;
+}
+
+function popTrace(): void {
+  traceStack.pop();
+}
+
+function currentTrace(): string | undefined {
+  return traceStack[traceStack.length - 1];
+}
+
 type Props = {
   node: ContainerWrapperDef;
   resolvedKey?: string;
@@ -216,9 +239,12 @@ export const Container = memo(
             };
             w._xsLogs.push({
               ts: Date.now(),
+              traceId: currentTrace(),
               text: safeStringify(args),
               kind: args && args[0] ? args[0] : undefined,
               eventName: args && args[1] && args[1].eventName ? args[1].eventName : undefined,
+              componentType: args && args[1] && args[1].componentType ? args[1].componentType : undefined,
+              componentLabel: args && args[1] && args[1].componentLabel ? args[1].componentLabel : undefined,
               uid:
                 args && args[1] && args[1].uid
                   ? String(args[1].uid)
@@ -331,11 +357,19 @@ export const Container = memo(
           },
         };
 
+        // Generate trace ID for this handler execution
+        const traceId = xsVerbose ? pushTrace() : undefined;
+
         try {
           if (xsVerbose) {
+            // Extract component context from options if available
+            const componentType = options?.componentType;
+            const componentLabel = options?.componentLabel || options?.componentId;
             xsLog("handler:start", {
               uid: componentUid,
               eventName: options?.eventName,
+              componentType,
+              componentLabel,
               args: eventArgs,
             });
           }
@@ -527,6 +561,11 @@ export const Container = memo(
             });
           }
           throw e;
+        } finally {
+          // Always pop the trace when handler completes (success or error)
+          if (traceId) {
+            popTrace();
+          }
         }
       },
     );

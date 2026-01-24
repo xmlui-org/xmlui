@@ -26,6 +26,15 @@ export type LookupActionOptions = {
 
   // extra context to pass to the action
   context?: any;
+
+  // Component type for inspector logging (e.g., "Button", "MenuItem")
+  componentType?: string;
+
+  // Component label for inspector logging (e.g., "Delete", "Save")
+  componentLabel?: string;
+
+  // Component id for inspector logging
+  componentId?: string;
 };
 
 // This function resolves an action by its name (within the component node that
