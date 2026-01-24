@@ -196,9 +196,19 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   const memoedLookupEventHandler: LookupEventHandlerFn = useCallback(
     (eventName, actionOptions) => {
       const action = safeNode.events?.[eventName] || actionOptions?.defaultHandler;
-      return lookupAction(action, uid, { eventName, ...actionOptions });
+      // Extract component context for inspector logging
+      const componentType = safeNode.type;
+      const componentLabel = safeNode.props?.label || safeNode.props?.text || safeNode.props?.title;
+      const componentId = safeNode.uid;
+      return lookupAction(action, uid, {
+        eventName,
+        componentType,
+        componentLabel,
+        componentId,
+        ...actionOptions
+      });
     },
-    [lookupAction, safeNode.events, uid],
+    [lookupAction, safeNode.events, safeNode.type, safeNode.props?.label, safeNode.props?.text, safeNode.props?.title, safeNode.uid, uid],
   );
 
   // --- Set up the mouse event handlers for the component
@@ -311,6 +321,29 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     return null;
   }
 
+  // --- Create interaction logger for inspector/debugging
+  const xsVerbose = appContext.appGlobals?.xsVerbose === true;
+  const logInteraction = useCallback(
+    (interaction: string, detail?: Record<string, any>) => {
+      if (!xsVerbose) return;
+      if (typeof window !== "undefined") {
+        const w = window as any;
+        w._xsLogs = Array.isArray(w._xsLogs) ? w._xsLogs : [];
+        w._xsLogs.push({
+          ts: Date.now(),
+          traceId: w._xsCurrentTrace,
+          kind: "interaction",
+          componentType: safeNode.type,
+          componentLabel: safeNode.props?.label || safeNode.props?.text || safeNode.props?.title,
+          uid: safeNode.uid,
+          interaction,
+          detail,
+        });
+      }
+    },
+    [xsVerbose, safeNode.type, safeNode.props?.label, safeNode.props?.text, safeNode.props?.title, safeNode.uid]
+  );
+
   // --- Assemble the renderer context we pass down the rendering chain
   const rendererContext: RendererContext<any> = {
     node: safeNode,
@@ -328,6 +361,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     className,
     layoutContext: layoutContextRef?.current,
     uid,
+    logInteraction,
   };
 
   // --- No special behavior, let's render the component according to its definition.

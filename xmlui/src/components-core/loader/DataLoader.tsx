@@ -95,10 +95,13 @@ function DataLoader({
         };
         w._xsLogs.push({
           ts: Date.now(),
+          perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+          traceId: w._xsCurrentTrace, // Pick up trace ID if a handler is currently executing
           text: safeStringify(args),
           kind: args && args[0] ? args[0] : undefined,
           eventName: args && args[1] && args[1].eventName ? args[1].eventName : undefined,
           uid: args && args[1] && args[1].uid ? String(args[1].uid) : undefined,
+          componentType: "DataSource", // Mark as DataSource for inspector display
           diffPretty:
             args &&
             args[1] &&

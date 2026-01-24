@@ -36,6 +36,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import type { TrackContainerHeight } from "./AppWrapper";
 import { ThemeToneKeys } from "../theming/utils";
 import StandaloneComponent from "./StandaloneComponent";
+import { loggerService } from "../../logging/LoggerService";
 
 // --- The properties of the AppContent component
 type AppContentProps = {
@@ -368,17 +369,86 @@ export function AppContent({
   // --- app-wide state using buckets (state sections).
   const [appState, setAppState] = useState<Record<string, Record<string, any>>>(EMPTY_OBJECT);
 
-  const update = useCallback((bucket: string, patch: any) => {
-    setAppState((prev) => {
-      return {
-        ...prev,
-        [bucket]: {
+  const xsVerbose = appGlobals?.xsVerbose === true;
+  const xsLogMax = Number(appGlobals?.xsVerboseLogMax ?? 200);
+
+  const update = useCallback(
+    (bucket: string, patch: any) => {
+      setAppState((prev) => {
+        const before = prev[bucket];
+        const after = {
           ...(prev[bucket] || {}),
           ...patch,
-        },
-      };
-    });
-  }, []);
+        };
+        const next = {
+          ...prev,
+          [bucket]: after,
+        };
+
+        if (xsVerbose && typeof window !== "undefined") {
+          const w = window as any;
+          w._xsLogs = Array.isArray(w._xsLogs) ? w._xsLogs : [];
+          const lastInteraction = w._xsLastInteraction;
+          const traceId =
+            lastInteraction && Date.now() - lastInteraction.ts < 2000
+              ? lastInteraction.id
+              : undefined;
+          const perfTs = typeof performance !== "undefined" ? performance.now() : undefined;
+
+          const stringify = (value: any) => {
+            if (value === undefined) return "undefined";
+            try {
+              return JSON.stringify(value, null, 2);
+            } catch {
+              return String(value);
+            }
+          };
+          const prefixLines = (text: string, prefix: string) =>
+            text
+              .split("\n")
+              .map((line) => `${prefix}${line}`)
+              .join("\n");
+          const beforeJson = stringify(before);
+          const afterJson = stringify(after);
+          const diffPretty =
+            `path: AppState:${bucket}\n` +
+            `${prefixLines(beforeJson, "- ")}\n` +
+            `${prefixLines(afterJson, "+ ")}`;
+          const diff = {
+            path: `AppState:${bucket}`,
+            type: "update",
+            before,
+            after,
+            beforeJson,
+            afterJson,
+            diffText: `path: AppState:${bucket}\n- ${beforeJson}\n+ ${afterJson}`,
+            diffPretty,
+          };
+
+          const payload = ["[xs]", "state:changes", { uid: bucket, eventName: `AppState:${bucket}` }];
+          loggerService.log(payload);
+          console.log(...payload);
+
+          w._xsLogs.push({
+            ts: Date.now(),
+            perfTs,
+            kind: "state:changes",
+            eventName: `AppState:${bucket}`,
+            uid: bucket,
+            traceId,
+            diffPretty,
+            diffJson: [diff],
+          });
+          if (Number.isFinite(xsLogMax) && xsLogMax > 0 && w._xsLogs.length > xsLogMax) {
+            w._xsLogs.splice(0, w._xsLogs.length - xsLogMax);
+          }
+        }
+
+        return next;
+      });
+    },
+    [xsVerbose, xsLogMax],
+  );
 
   const appStateContextValue: IAppStateContext = useMemo(() => {
     return {
@@ -386,6 +456,93 @@ export function AppContent({
       update,
     };
   }, [appState, update]);
+
+  useEffect(() => {
+    if (!xsVerbose || typeof document === "undefined") return;
+
+    const safeStringify = (value: any) => {
+      try {
+        return JSON.stringify(value, null, 2);
+      } catch {
+        return String(value);
+      }
+    };
+
+    const capture = (event: Event) => {
+      const target = event.target as HTMLElement | null;
+      const path = (event as any).composedPath?.() as EventTarget[] | undefined;
+      const elements = (path || []).filter(
+        (item): item is HTMLElement => item instanceof HTMLElement,
+      );
+      const nearest =
+        elements.find(
+          (el) => el.hasAttribute("data-inspectid") || el.hasAttribute("data-testid"),
+        ) || target;
+      const inspectId = nearest?.getAttribute?.("data-inspectid") || undefined;
+      const testId = nearest?.getAttribute?.("data-testid") || undefined;
+      const componentId = testId || inspectId;
+      const textContent = nearest?.textContent?.trim();
+      const text =
+        textContent && textContent.length > 80 ? textContent.slice(0, 77) + "…" : textContent;
+
+      const detail: Record<string, any> = {
+        componentId,
+        inspectId,
+        targetTag: (target && target.tagName) || undefined,
+        text,
+      };
+      if (event instanceof MouseEvent) {
+        detail.button = event.button;
+      }
+      if (event instanceof KeyboardEvent) {
+        detail.key = event.key;
+        detail.code = event.code;
+        detail.ctrlKey = event.ctrlKey;
+        detail.metaKey = event.metaKey;
+        detail.shiftKey = event.shiftKey;
+        detail.altKey = event.altKey;
+      }
+
+      const w = window as any;
+      w._xsLogs = Array.isArray(w._xsLogs) ? w._xsLogs : [];
+      const inspectInfo = inspectId && w._xsInspectMap ? w._xsInspectMap[inspectId] : undefined;
+      const componentType = inspectInfo?.componentType || "DOM";
+      const componentLabel =
+        inspectInfo?.componentLabel ||
+        (inspectInfo?.componentType ? inspectInfo.componentType : undefined) ||
+        componentId ||
+        text ||
+        detail.targetTag ||
+        "Unknown";
+      const interactionId = `i-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+      const perfTs = typeof performance !== "undefined" ? performance.now() : undefined;
+      w._xsLastInteraction = { id: interactionId, ts: Date.now() };
+      w._xsCurrentTraceId = interactionId;
+      w._xsLogs.push({
+        ts: Date.now(),
+        perfTs,
+        kind: "interaction",
+        eventName: event.type,
+        uid: componentId,
+        traceId: interactionId,
+        componentType,
+        componentLabel,
+        interaction: event.type,
+        detail,
+        text: safeStringify(detail),
+      });
+      if (Number.isFinite(xsLogMax) && xsLogMax > 0 && w._xsLogs.length > xsLogMax) {
+        w._xsLogs.splice(0, w._xsLogs.length - xsLogMax);
+      }
+    };
+
+    const types = ["click", "dblclick", "contextmenu", "keydown"];
+    types.forEach((type) => document.addEventListener(type, capture, true));
+
+    return () => {
+      types.forEach((type) => document.removeEventListener(type, capture, true));
+    };
+  }, [xsVerbose, xsLogMax]);
 
   // --- Create AppState object with global state management functions
   const AppState = useMemo(() => createAppState(appStateContextValue), [appStateContextValue]);

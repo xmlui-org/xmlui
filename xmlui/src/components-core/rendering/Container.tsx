@@ -69,18 +69,34 @@ function generateTraceId(): string {
   return `t-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function pushTrace(): string {
-  const id = generateTraceId();
+function pushTrace(preferredId?: string): string {
+  const id = preferredId || generateTraceId();
   traceStack.push(id);
+  // Make current trace globally accessible for async code (DataLoader, etc.)
+  if (typeof window !== "undefined") {
+    (window as any)._xsCurrentTrace = id;
+  }
   return id;
 }
 
 function popTrace(): void {
   traceStack.pop();
+  // Update global trace to new top of stack (or undefined if empty)
+  if (typeof window !== "undefined") {
+    (window as any)._xsCurrentTrace = traceStack[traceStack.length - 1];
+  }
 }
 
 function currentTrace(): string | undefined {
   return traceStack[traceStack.length - 1];
+}
+
+// Export for use by other modules (DataLoader, etc.)
+export function getCurrentTrace(): string | undefined {
+  if (typeof window !== "undefined") {
+    return (window as any)._xsCurrentTrace;
+  }
+  return currentTrace();
 }
 
 type Props = {
@@ -239,6 +255,7 @@ export const Container = memo(
             };
             w._xsLogs.push({
               ts: Date.now(),
+              perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
               traceId: currentTrace(),
               text: safeStringify(args),
               kind: args && args[0] ? args[0] : undefined,
@@ -358,15 +375,24 @@ export const Container = memo(
         };
 
         // Generate trace ID for this handler execution
-        const traceId = xsVerbose ? pushTrace() : undefined;
+        const preferredTraceId =
+          xsVerbose && typeof window !== "undefined"
+            ? (() => {
+                const w = window as any;
+                const last = w._xsLastInteraction;
+                return last && Date.now() - last.ts < 2000 ? last.id : undefined;
+              })()
+            : undefined;
+        const traceId = xsVerbose ? pushTrace(preferredTraceId) : undefined;
+        // Extract component context for logging
+        const uidName = componentUid.description || "";
+        const componentType = options?.componentType;
+        const componentLabel = options?.componentLabel || options?.componentId || uidName;
 
         try {
           if (xsVerbose) {
-            // Extract component context from options if available
-            const componentType = options?.componentType;
-            const componentLabel = options?.componentLabel || options?.componentId;
             xsLog("handler:start", {
-              uid: componentUid,
+              uid: uidName,
               eventName: options?.eventName,
               componentType,
               componentLabel,
@@ -426,8 +452,10 @@ export const Container = memo(
                   // Only internal argument wiring happened; skip logging.
                 } else {
                   xsLog("state:changes", {
-                    uid: componentUid,
+                    uid: uidName,
                     eventName: options.eventName,
+                    componentType,
+                    componentLabel,
                     changes: filteredChanges.map((change) => ({
                       path: change.path,
                       action: change.action,
@@ -530,8 +558,10 @@ export const Container = memo(
               evalContext.mainThread.blocks[evalContext.mainThread.blocks.length - 1].returnValue;
             if (xsVerbose) {
               xsLog("handler:complete", {
-                uid: componentUid,
+                uid: uidName,
                 eventName: options?.eventName,
+                componentType,
+                componentLabel,
                 returnValue,
               });
             }
@@ -540,8 +570,10 @@ export const Container = memo(
         } catch (e) {
           if (xsVerbose) {
             xsLog("handler:error", {
-              uid: componentUid,
+              uid: uidName,
               eventName: options?.eventName,
+              componentType,
+              componentLabel,
               error: e,
             });
           }
