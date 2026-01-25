@@ -82,6 +82,13 @@ export function InspectorProvider({
     });
     (window as any)._xsInspectMap = map;
   }, [inspectable]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (sources) {
+      (window as any)._xsSources = sources;
+    }
+  }, [sources]);
   const contextValue: IInspectorContext = useMemo(() => {
     return {
       sources,
