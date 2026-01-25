@@ -57,6 +57,9 @@ function DataLoader({
   const xsVerbose = appContext.appGlobals?.xsVerbose === true;
   const xsLogMax = Number(appContext.appGlobals?.xsVerboseLogMax ?? 200);
   const prevDataRef = useRef<any>(undefined);
+  const instanceIdRef = useRef<string>(
+    `ds-${Math.random().toString(36).slice(2, 8)}-${Date.now().toString(36)}`
+  );
 
   const xsLog = useCallback(
     (...args: any[]) => {
@@ -97,6 +100,7 @@ function DataLoader({
           ts: Date.now(),
           perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
           traceId: w._xsCurrentTrace, // Pick up trace ID if a handler is currently executing
+          instanceId: instanceIdRef.current,
           text: safeStringify(args),
           kind: args && args[0] ? args[0] : undefined,
           eventName: args && args[1] && args[1].eventName ? args[1].eventName : undefined,
@@ -430,6 +434,7 @@ function DataLoader({
         xsLog("state:changes", {
           uid: dataSourceId,
           eventName: `DataSource:${dataSourceId}`,
+          instanceId: instanceIdRef.current,
           diff: [formatDiff(path, before, after)],
         });
         prevDataRef.current = data;
