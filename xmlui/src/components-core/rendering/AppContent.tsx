@@ -573,7 +573,7 @@ export function AppContent({
       const perfTs = typeof performance !== "undefined" ? performance.now() : undefined;
       const eventTs = typeof event.timeStamp === "number" ? event.timeStamp : undefined;
       w._xsLastInteraction = { id: interactionId, ts: Date.now() };
-      w._xsCurrentTraceId = interactionId;
+      w._xsCurrentTrace = interactionId;
       w._xsLogs.push({
         ts: Date.now(),
         perfTs,

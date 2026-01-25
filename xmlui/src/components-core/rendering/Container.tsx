@@ -379,6 +379,7 @@ export const Container = memo(
           xsVerbose && typeof window !== "undefined"
             ? (() => {
                 const w = window as any;
+                if (w._xsCurrentTrace) return w._xsCurrentTrace;
                 const last = w._xsLastInteraction;
                 return last && Date.now() - last.ts < 2000 ? last.id : undefined;
               })()

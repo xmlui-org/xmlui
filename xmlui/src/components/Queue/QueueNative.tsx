@@ -69,6 +69,7 @@ const queueReducer = produce((state: QueueState, action: QueueAction) => {
           actionItemId,
           status: "pending",
           item,
+          traceId: action.payload.traceId,
         };
       });
       return {
@@ -155,17 +156,25 @@ export function Queue({
 
   let appContext = useAppContext();
 
+  const getTraceIdForQueue = () => {
+    if (typeof window === "undefined") return undefined;
+    const w = window as any;
+    return w._xsCurrentTrace || w._xsLastInteraction?.id;
+  };
+
   // --- This Queue API adds a single item to the queue
   const enqueueItem = useEvent((item: any) => {
     const itemId = generatedId();
-    dispatch(actionQueueInitialized([item], generatedId(), [itemId]));
+    const traceId = getTraceIdForQueue();
+    dispatch(actionQueueInitialized([item], generatedId(), [itemId], traceId));
     return itemId;
   });
 
   // --- This Queue API adds a list of items to the queue
   const enqueueItems = useEvent((items: any[]) => {
     const itemIds = items.map(() => generatedId());
-    dispatch(actionQueueInitialized(items, generatedId(), itemIds));
+    const traceId = getTraceIdForQueue();
+    dispatch(actionQueueInitialized(items, generatedId(), itemIds, traceId));
     return itemIds;
   });
 
@@ -218,6 +227,12 @@ export function Queue({
       }
       runningActionItemRef.current.add(actionItemId);
       const item = queueItem.item;
+      let prevTrace: string | undefined;
+      if (typeof window !== "undefined" && queueItem?.traceId) {
+        const w = window as any;
+        prevTrace = w._xsCurrentTrace;
+        w._xsCurrentTrace = queueItem.traceId;
+      }
       let processItemContext = {};
       try {
         const willProcessResult = await willProcessItem?.({
@@ -262,6 +277,10 @@ export function Queue({
           appContext.signError(error as Error);
         }
       } finally {
+        if (typeof window !== "undefined" && queueItem?.traceId) {
+          const w = window as any;
+          w._xsCurrentTrace = prevTrace;
+        }
         runningActionItemRef.current.delete(actionItemId);
       }
     },
@@ -349,6 +368,7 @@ type QueueItemState = "pending" | "started" | "in-progress" | "completed" | "err
 export type QueueItem = {
   actionItemId: string;
   batchId?: string;
+  traceId?: string;
   status: QueueItemState;
   item: any;
   progress?: any;
@@ -465,4 +485,3 @@ export function QueueWithContextVar({
     />
   );
 }
-
