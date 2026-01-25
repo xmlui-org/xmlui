@@ -89,6 +89,19 @@ export function InspectorProvider({
       (window as any)._xsSources = sources;
     }
   }, [sources]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!projectCompilation) return;
+    const files: string[] = [];
+    if (projectCompilation.entrypoint?.filename) {
+      files.push(projectCompilation.entrypoint.filename);
+    }
+    projectCompilation.components?.forEach((comp) => {
+      if (comp?.filename) files.push(comp.filename);
+    });
+    (window as any)._xsSourceFiles = files;
+  }, [projectCompilation]);
   const contextValue: IInspectorContext = useMemo(() => {
     return {
       sources,
