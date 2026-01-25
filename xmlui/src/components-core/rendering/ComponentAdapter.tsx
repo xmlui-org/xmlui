@@ -102,6 +102,36 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     };
   }, [onUnmount, uid]);
 
+  // --- Register component info to global map for inspector
+  // --- This allows the inspector to resolve testId -> component type/label
+  // --- Use explicit testId/uid if provided, otherwise fall back to component type
+  const testIdForMap = safeNode.testId || safeNode.uid || safeNode.type;
+  const resolvedTestId = useMemo(
+    () => (testIdForMap ? extractParam(state, testIdForMap, appContext, true) : undefined),
+    [state, testIdForMap, appContext],
+  );
+  useEffect(() => {
+    if (!resolvedTestId || typeof window === "undefined") return;
+    const w = window as any;
+    w._xsTestIdMap = w._xsTestIdMap || {};
+    const componentType = safeNode.type;
+    const props = safeNode.props || {};
+    const componentLabel =
+      props.label ?? props.title ?? props.name ?? props.text ?? props.value ?? props.placeholder;
+    w._xsTestIdMap[resolvedTestId] = {
+      componentType,
+      componentLabel,
+      uid: uid.description,
+      testId: resolvedTestId,
+    };
+    return () => {
+      // Cleanup on unmount
+      if (w._xsTestIdMap) {
+        delete w._xsTestIdMap[resolvedTestId];
+      }
+    };
+  }, [resolvedTestId, safeNode.type, safeNode.props, uid]);
+
   // --- Obtain a function to register the component API
   const memoedRegisterComponentApi: RegisterComponentApiFn = useCallback(
     (api) => {
@@ -400,19 +430,16 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     // --- Components may have a `testId` property for E2E testing purposes. Inject the value of `testId`
     // --- into the DOM object of the rendered React component.
     if (
-      // --- The component has its "id" (internally, "uid") or "testId" property defined
-      ((appContext?.decorateComponentsWithTestId &&
-        (safeNode.uid !== undefined || safeNode.testId !== undefined)) ||
-        // --- The component has its "inspectId" property defined
-        inspectId !== undefined) &&
-      // // --- The app context indicates test mode
+      // --- Decorate when decorateComponentsWithTestId is enabled OR inspectId is defined
+      (appContext?.decorateComponentsWithTestId || inspectId !== undefined) &&
       // --- The component is visual
       descriptor?.nonVisual !== true &&
       // --- The component is not opaque
       descriptor?.opaque !== true
     ) {
       // --- Use `ComponentDecorator` to inject the `data-testid` attribute into the component.
-      const testId = safeNode.testId || safeNode.uid;
+      // --- Use explicit testId/uid if provided, otherwise fall back to component type
+      const testId = safeNode.testId || safeNode.uid || safeNode.type;
       const resolvedUid = extractParam(state, testId, appContext, true);
       renderedNode = (
         <ComponentDecorator

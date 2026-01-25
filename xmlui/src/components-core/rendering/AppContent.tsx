@@ -505,12 +505,20 @@ export function AppContent({
       const elements = (path || []).filter(
         (item): item is HTMLElement => item instanceof HTMLElement,
       );
-      const nearest =
-        elements.find(
-          (el) => el.hasAttribute("data-inspectid") || el.hasAttribute("data-testid"),
-        ) || target;
-      const inspectId = nearest?.getAttribute?.("data-inspectid") || undefined;
-      const testId = nearest?.getAttribute?.("data-testid") || undefined;
+
+      // Find element with data-inspectid (prefer) or data-testid
+      const withInspectId = elements.find((el) => el.hasAttribute("data-inspectid"));
+      const withTestId = elements.find((el) => el.hasAttribute("data-testid"));
+      // Also try .closest() as fallback in case composedPath missed something
+      const closestInspect = target?.closest?.("[data-inspectid]") as HTMLElement | null;
+      const closestTestId = target?.closest?.("[data-testid]") as HTMLElement | null;
+
+      const inspectEl = withInspectId || closestInspect;
+      const testIdEl = withTestId || closestTestId;
+      const nearest = inspectEl || testIdEl || target;
+
+      const inspectId = inspectEl?.getAttribute?.("data-inspectid") || undefined;
+      const testId = testIdEl?.getAttribute?.("data-testid") || undefined;
       const componentId = testId || inspectId;
       const textContent = nearest?.textContent?.trim();
       const text =
@@ -536,14 +544,26 @@ export function AppContent({
 
       const w = window as any;
       w._xsLogs = Array.isArray(w._xsLogs) ? w._xsLogs : [];
-      const inspectInfo = inspectId && w._xsInspectMap ? w._xsInspectMap[inspectId] : undefined;
-      const componentType = inspectInfo?.componentType || "DOM";
+
+      // Try to resolve component info from _xsInspectMap (for inspect="true" components)
+      // or _xsTestIdMap (for all components with testId/uid)
+      let componentInfo =
+        (inspectId && w._xsInspectMap ? w._xsInspectMap[inspectId] : undefined) ||
+        (testId && w._xsTestIdMap ? w._xsTestIdMap[testId] : undefined);
+
+      // Build descriptive component info
+      // Priority: componentInfo > testId > element attributes > tag name
+      const componentType = componentInfo?.componentType || undefined;
       const componentLabel =
-        inspectInfo?.componentLabel ||
-        (inspectInfo?.componentType ? inspectInfo.componentType : undefined) ||
+        componentInfo?.componentLabel ||
+        (componentInfo?.componentType ? componentInfo.componentType : undefined) ||
+        testId ||
         componentId ||
-        text ||
-        detail.targetTag ||
+        // For better context, show the element hierarchy if we only have tag names
+        (detail.targetTag && nearest !== target && nearest?.tagName
+          ? `${nearest.tagName.toLowerCase()} > ${detail.targetTag.toLowerCase()}`
+          : undefined) ||
+        detail.targetTag?.toLowerCase() ||
         "Unknown";
       const interactionId = `i-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
       const perfTs = typeof performance !== "undefined" ? performance.now() : undefined;

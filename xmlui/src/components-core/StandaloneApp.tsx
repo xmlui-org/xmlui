@@ -158,8 +158,10 @@ function StandaloneApp({
 
   // --- Components can be decorated with test IDs used in end-to-end tests.
   // --- This flag checks the environment if the app runs in E2E test mode.
+  // --- Also enable when xsVerbose is true (for inspector support).
   const shouldDecorateWithTestId =
     decorateComponentsWithTestId ||
+    appGlobals?.xsVerbose === true ||
     // @ts-ignore
     (typeof window !== "undefined" ? window.XMLUI_MOCK_TEST_ID : false);
 
