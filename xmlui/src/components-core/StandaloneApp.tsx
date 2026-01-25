@@ -394,17 +394,27 @@ function resolveRuntime(runtime: Record<string, any>): {
         codeBehindsByFileName[key] = value.default;
         const componentCompilationForCodeBehind = projectCompilation.components.findLast(
           ({ filename }) => {
-            const idxOfCodeBehindFileExtension = key.lastIndexOf(codeBehindFileExtension);
-            const idxOfComponentFileExtension = filename.lastIndexOf(componentFileExtension);
+            // Compare just the base filenames without extensions
+            // This handles cases where filename is an absolute path and key is a module specifier
+            const getBaseName = (p: string) => {
+              const lastSlash = Math.max(p.lastIndexOf("/"), p.lastIndexOf("\\"));
+              return lastSlash >= 0 ? p.substring(lastSlash + 1) : p;
+            };
+            const filenameBase = getBaseName(filename);
+            const keyBase = getBaseName(key);
+            const idxOfCodeBehindFileExtension = keyBase.lastIndexOf(codeBehindFileExtension);
+            const idxOfComponentFileExtension = filenameBase.lastIndexOf(componentFileExtension);
             const extensionlessFilenamesMatch =
-              filename.substring(0, idxOfComponentFileExtension) ===
-              key.substring(0, idxOfCodeBehindFileExtension);
+              filenameBase.substring(0, idxOfComponentFileExtension) ===
+              keyBase.substring(0, idxOfCodeBehindFileExtension);
 
             return extensionlessFilenamesMatch;
           },
         );
 
-        componentCompilationForCodeBehind.codeBehindSource = value.default.src;
+        if (componentCompilationForCodeBehind) {
+          componentCompilationForCodeBehind.codeBehindSource = value.default.src;
+        }
       } else {
         // --- "default" contains the component definition, the file index,
         // --- and the source code.
@@ -413,7 +423,9 @@ function resolveRuntime(runtime: Record<string, any>): {
 
         const componentCompilation: ComponentCompilation = {
           definition: value.default.component,
-          filename: key,
+          // Use value.default.file (the actual file path) instead of key (module specifier)
+          // to match the debug.source.fileId set on component nodes
+          filename: value.default.file,
           markupSource: value.default.src,
           dependencies: new Set(),
         };
