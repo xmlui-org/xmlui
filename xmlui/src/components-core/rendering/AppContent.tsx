@@ -469,6 +469,37 @@ export function AppContent({
     };
 
     const capture = (event: Event) => {
+      if (typeof document !== "undefined") {
+        const activeEl = document.activeElement as HTMLElement | null;
+        const isInspectorEl = (el: Element | null | undefined) => {
+          if (!el || !(el instanceof HTMLElement)) return false;
+          return (
+            el.closest?.('[data-testid="InspectorDialog"]') ||
+            el.closest?.('[data-testid="InspectorFrame"]') ||
+            el.getAttribute?.("data-testid") === "Inspector" ||
+            el.getAttribute?.("data-testid") === "InspectorDialog" ||
+            el.getAttribute?.("data-testid") === "InspectorFrame" ||
+            (el instanceof HTMLIFrameElement &&
+              el.src &&
+              el.src.includes("/xs-diff.html"))
+          );
+        };
+
+        if (isInspectorEl(activeEl)) {
+          return;
+        }
+
+        const path = (event as any).composedPath?.() as EventTarget[] | undefined;
+        if (path) {
+          for (const p of path) {
+            if (isInspectorEl(p as Element)) {
+              return;
+            }
+          }
+        } else if (isInspectorEl(event.target as Element)) {
+          return;
+        }
+      }
       const target = event.target as HTMLElement | null;
       const path = (event as any).composedPath?.() as EventTarget[] | undefined;
       const elements = (path || []).filter(
@@ -516,11 +547,13 @@ export function AppContent({
         "Unknown";
       const interactionId = `i-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
       const perfTs = typeof performance !== "undefined" ? performance.now() : undefined;
+      const eventTs = typeof event.timeStamp === "number" ? event.timeStamp : undefined;
       w._xsLastInteraction = { id: interactionId, ts: Date.now() };
       w._xsCurrentTraceId = interactionId;
       w._xsLogs.push({
         ts: Date.now(),
         perfTs,
+        eventTs,
         kind: "interaction",
         eventName: event.type,
         uid: componentId,
