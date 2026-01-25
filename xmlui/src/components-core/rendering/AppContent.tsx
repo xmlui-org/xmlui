@@ -398,9 +398,11 @@ export function AppContent({
           const w = window as any;
           w._xsLogs = Array.isArray(w._xsLogs) ? w._xsLogs : [];
           const lastInteraction = w._xsLastInteraction;
+          // Only use startup trace as fallback if startup is not yet complete
+          // After first user interaction, _xsStartupComplete is set to true
           const traceId =
             w._xsCurrentTrace ||
-            w._xsStartupTrace ||
+            (!w._xsStartupComplete ? w._xsStartupTrace : undefined) ||
             (lastInteraction && Date.now() - lastInteraction.ts < 2000 ? lastInteraction.id : undefined);
           const perfTs = typeof performance !== "undefined" ? performance.now() : undefined;
 
@@ -539,7 +541,14 @@ export function AppContent({
       }
       processedEvents.add(event);
 
+      // Skip programmatic/synthetic events - only trace real user interactions
+      // event.isTrusted is true for user-initiated events, false for dispatchEvent()/click()/etc.
+      if (!event.isTrusted) {
+        return;
+      }
+
       const target = event.target as HTMLElement | null;
+
       const composedPath = (event as any).composedPath?.() as EventTarget[] | undefined;
       const elements = (composedPath || []).filter(
         (item): item is HTMLElement => item instanceof HTMLElement,
@@ -615,6 +624,9 @@ export function AppContent({
       }
       if (typeof window !== "undefined") {
         const w = window as any;
+        // First user interaction marks startup as complete
+        // After this, handlers without a user interaction won't use the startup trace
+        w._xsStartupComplete = true;
         if (w._xsCurrentTrace === w._xsStartupTrace) {
           w._xsCurrentTrace = undefined;
         }
