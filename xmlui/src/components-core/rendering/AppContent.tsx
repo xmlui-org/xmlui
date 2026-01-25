@@ -75,6 +75,15 @@ export function AppContent({
   children,
   onInit,
 }: AppContentProps) {
+  if (typeof window !== "undefined") {
+    const w = window as any;
+    if (!w._xsStartupTrace) {
+      w._xsStartupTrace = `startup-${Date.now().toString(36)}`;
+    }
+    if (!w._xsCurrentTrace) {
+      w._xsCurrentTrace = w._xsStartupTrace;
+    }
+  }
   const [loggedInUser, setLoggedInUser] = useState(null);
   const debugView = useDebugView();
   const componentRegistry = useComponentRegistry();
@@ -390,9 +399,9 @@ export function AppContent({
           w._xsLogs = Array.isArray(w._xsLogs) ? w._xsLogs : [];
           const lastInteraction = w._xsLastInteraction;
           const traceId =
-            lastInteraction && Date.now() - lastInteraction.ts < 2000
-              ? lastInteraction.id
-              : undefined;
+            w._xsCurrentTrace ||
+            w._xsStartupTrace ||
+            (lastInteraction && Date.now() - lastInteraction.ts < 2000 ? lastInteraction.id : undefined);
           const perfTs = typeof performance !== "undefined" ? performance.now() : undefined;
 
           const stringify = (value: any) => {
@@ -463,6 +472,16 @@ export function AppContent({
 
   useEffect(() => {
     if (!xsVerbose || typeof document === "undefined") return;
+
+    if (typeof window !== "undefined") {
+      const w = window as any;
+      if (!w._xsStartupTrace) {
+        w._xsStartupTrace = `startup-${Date.now().toString(36)}`;
+      }
+      if (!w._xsCurrentTrace) {
+        w._xsCurrentTrace = w._xsStartupTrace;
+      }
+    }
 
     const safeStringify = (value: any) => {
       try {
@@ -578,6 +597,13 @@ export function AppContent({
       ) {
         componentLabel = textHint;
       }
+      if (typeof window !== "undefined") {
+        const w = window as any;
+        if (w._xsCurrentTrace === w._xsStartupTrace) {
+          w._xsCurrentTrace = undefined;
+        }
+      }
+
       const interactionId = `i-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
       const perfTs = typeof performance !== "undefined" ? performance.now() : undefined;
       const eventTs = typeof event.timeStamp === "number" ? event.timeStamp : undefined;
