@@ -61,6 +61,9 @@ function DataLoader({
     `ds-${Math.random().toString(36).slice(2, 8)}-${Date.now().toString(36)}`
   );
 
+  // Capture trace ID when fetch is triggered, not when it completes
+  const pendingTraceIdRef = useRef<string | undefined>(undefined);
+
   const xsLog = useCallback(
     (...args: any[]) => {
       if (!xsVerbose) return;
@@ -99,7 +102,7 @@ function DataLoader({
         w._xsLogs.push({
           ts: Date.now(),
           perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-          traceId: w._xsCurrentTrace, // Pick up trace ID if a handler is currently executing
+          traceId: pendingTraceIdRef.current || w._xsCurrentTrace, // Use captured trace from fetch trigger, or current trace
           instanceId: instanceIdRef.current,
           dataSourceId: loader?.props?.id,
           dataSourceUrl: loader?.props?.url,
@@ -204,6 +207,13 @@ function DataLoader({
 
   const doLoad = useCallback(
     async (abortSignal?: AbortSignal, pageParams?: any) => {
+      // Capture the current trace ID when fetch is triggered
+      // This way the trace is preserved even if the handler completes before fetch does
+      if (typeof window !== "undefined") {
+        const w = window as any;
+        pendingTraceIdRef.current = w._xsCurrentTrace;
+      }
+
       // For CSV data type, handle directly rather than using RestApiProxy
       if (loader.props.dataType === "csv") {
         try {
@@ -448,6 +458,8 @@ function DataLoader({
           diff: [formatDiff(path, before, after)],
         });
         prevDataRef.current = data;
+        // Clear the pending trace so it's not reused for subsequent automatic refreshes
+        pendingTraceIdRef.current = undefined;
       }
 
       loaderLoaded(data, pageInfo);
