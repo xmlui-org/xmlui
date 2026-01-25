@@ -102,6 +102,7 @@ function DataLoader({
           traceId: w._xsCurrentTrace, // Pick up trace ID if a handler is currently executing
           instanceId: instanceIdRef.current,
           dataSourceId: loader?.props?.id,
+          dataSourceUrl: loader?.props?.url,
           ownerUid: loader?.uid,
           ownerFileId: loader?.debug?.source?.fileId,
           ownerSource: loader?.debug?.source
