@@ -110,17 +110,23 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     () => (testIdForMap ? extractParam(state, testIdForMap, appContext, true) : undefined),
     [state, testIdForMap, appContext],
   );
+  // Resolve label props using extractParam to evaluate expressions
+  const resolvedLabel = useMemo(() => {
+    const props = safeNode.props || {};
+    const rawLabel = props.label ?? props.title ?? props.name ?? props.text ?? props.value ?? props.placeholder;
+    if (rawLabel === undefined) return undefined;
+    // Use extractParam to evaluate expressions like "{mediaSize.largeScreen ? 'Delete' : ''}"
+    return extractParam(state, rawLabel, appContext, true);
+  }, [state, safeNode.props, appContext]);
+
   useEffect(() => {
     if (!resolvedTestId || typeof window === "undefined") return;
     const w = window as any;
     w._xsTestIdMap = w._xsTestIdMap || {};
     const componentType = safeNode.type;
-    const props = safeNode.props || {};
-    const componentLabel =
-      props.label ?? props.title ?? props.name ?? props.text ?? props.value ?? props.placeholder;
     w._xsTestIdMap[resolvedTestId] = {
       componentType,
-      componentLabel,
+      componentLabel: resolvedLabel,
       uid: uid.description,
       testId: resolvedTestId,
     };
@@ -130,7 +136,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
         delete w._xsTestIdMap[resolvedTestId];
       }
     };
-  }, [resolvedTestId, safeNode.type, safeNode.props, uid]);
+  }, [resolvedTestId, safeNode.type, resolvedLabel, uid]);
 
   // --- Obtain a function to register the component API
   const memoedRegisterComponentApi: RegisterComponentApiFn = useCallback(
@@ -227,18 +233,18 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     (eventName, actionOptions) => {
       const action = safeNode.events?.[eventName] || actionOptions?.defaultHandler;
       // Extract component context for inspector logging
+      // Use resolvedLabel which has evaluated expressions
       const componentType = safeNode.type;
-      const componentLabel = safeNode.props?.label || safeNode.props?.text || safeNode.props?.title;
       const componentId = safeNode.uid;
       return lookupAction(action, uid, {
         eventName,
         componentType,
-        componentLabel,
+        componentLabel: resolvedLabel,
         componentId,
         ...actionOptions
       });
     },
-    [lookupAction, safeNode.events, safeNode.type, safeNode.props?.label, safeNode.props?.text, safeNode.props?.title, safeNode.uid, uid],
+    [lookupAction, safeNode.events, safeNode.type, resolvedLabel, safeNode.uid, uid],
   );
 
   // --- Set up the mouse event handlers for the component
@@ -364,14 +370,14 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
           traceId: w._xsCurrentTrace,
           kind: "interaction",
           componentType: safeNode.type,
-          componentLabel: safeNode.props?.label || safeNode.props?.text || safeNode.props?.title,
+          componentLabel: resolvedLabel,
           uid: safeNode.uid,
           interaction,
           detail,
         });
       }
     },
-    [xsVerbose, safeNode.type, safeNode.props?.label, safeNode.props?.text, safeNode.props?.title, safeNode.uid]
+    [xsVerbose, safeNode.type, resolvedLabel, safeNode.uid]
   );
 
   // --- Assemble the renderer context we pass down the rendering chain
