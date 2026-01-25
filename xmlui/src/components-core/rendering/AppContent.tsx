@@ -491,6 +491,10 @@ export function AppContent({
       }
     };
 
+    // Track processed events using WeakSet - same event object = same physical user action
+    const processedEvents = new WeakSet<Event>();
+    let lastEventTraceId = "";
+
     const capture = (event: Event) => {
       if (typeof document !== "undefined") {
         const activeEl = document.activeElement as HTMLElement | null;
@@ -523,9 +527,21 @@ export function AppContent({
           return;
         }
       }
+
+      // Deduplicate using event object identity - same object = same physical event
+      if (processedEvents.has(event)) {
+        // Same event object seen again - just update trace context, don't log
+        const w = window as any;
+        if (lastEventTraceId) {
+          w._xsCurrentTrace = lastEventTraceId;
+        }
+        return;
+      }
+      processedEvents.add(event);
+
       const target = event.target as HTMLElement | null;
-      const path = (event as any).composedPath?.() as EventTarget[] | undefined;
-      const elements = (path || []).filter(
+      const composedPath = (event as any).composedPath?.() as EventTarget[] | undefined;
+      const elements = (composedPath || []).filter(
         (item): item is HTMLElement => item instanceof HTMLElement,
       );
 
@@ -610,13 +626,14 @@ export function AppContent({
         w._xsPendingConfirmTrace = undefined;
       }
       const perfTs = typeof performance !== "undefined" ? performance.now() : undefined;
-      const eventTs = typeof event.timeStamp === "number" ? event.timeStamp : undefined;
+      const logEventTs = typeof event.timeStamp === "number" ? event.timeStamp : undefined;
       w._xsLastInteraction = { id: interactionId, ts: Date.now() };
       w._xsCurrentTrace = interactionId;
+      lastEventTraceId = interactionId;
       w._xsLogs.push({
         ts: Date.now(),
         perfTs,
-        eventTs,
+        eventTs: logEventTs,
         kind: "interaction",
         eventName: event.type,
         uid: componentId,
