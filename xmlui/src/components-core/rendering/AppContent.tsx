@@ -426,22 +426,26 @@ export function AppContent({
           };
 
           const payload = ["[xs]", "state:changes", { uid: bucket, eventName: `AppState:${bucket}` }];
-          loggerService.log(payload);
-          console.log(...payload);
 
-          w._xsLogs.push({
-            ts: Date.now(),
-            perfTs,
-            kind: "state:changes",
-            eventName: `AppState:${bucket}`,
-            uid: bucket,
-            traceId,
-            diffPretty,
-            diffJson: [diff],
-          });
-          if (Number.isFinite(xsLogMax) && xsLogMax > 0 && w._xsLogs.length > xsLogMax) {
-            w._xsLogs.splice(0, w._xsLogs.length - xsLogMax);
-          }
+          // Defer log emission to avoid triggering state updates during render.
+          setTimeout(() => {
+            loggerService.log(payload);
+            console.log(...payload);
+
+            w._xsLogs.push({
+              ts: Date.now(),
+              perfTs,
+              kind: "state:changes",
+              eventName: `AppState:${bucket}`,
+              uid: bucket,
+              traceId,
+              diffPretty,
+              diffJson: [diff],
+            });
+            if (Number.isFinite(xsLogMax) && xsLogMax > 0 && w._xsLogs.length > xsLogMax) {
+              w._xsLogs.splice(0, w._xsLogs.length - xsLogMax);
+            }
+          }, 0);
         }
 
         return next;

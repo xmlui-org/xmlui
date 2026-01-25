@@ -69,6 +69,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   }: Props,
   ref: React.ForwardedRef<any>,
 ) {
+  const { logInteraction: _ignoredLogInteraction, ...restProps } = rest as any;
   // --- Make sure the component definition has `props` and `events` properties
   // --- (even if they are empty)
   const safeNode = useMemo(() => {
@@ -459,7 +460,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
             {
               ...mergeProps(
                 { ...(renderedNode as ReactElement).props, ...mouseEventHandlers },
-                rest,
+                restProps,
               ),
             } as any,
           )}
@@ -528,7 +529,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
             ...renderedNode.props,
             ...(renderedNode.type !== React.Fragment ? mouseEventHandlers : {}),
           },
-          rest,
+          restProps,
         ),
       } as any,
       ...childrenArray,
