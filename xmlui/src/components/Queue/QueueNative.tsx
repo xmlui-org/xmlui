@@ -159,7 +159,7 @@ export function Queue({
   const getTraceIdForQueue = () => {
     if (typeof window === "undefined") return undefined;
     const w = window as any;
-    return w._xsCurrentTrace || w._xsLastInteraction?.id;
+    return w._xsCurrentTrace;
   };
 
   // --- This Queue API adds a single item to the queue

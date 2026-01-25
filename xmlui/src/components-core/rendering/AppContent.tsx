@@ -558,7 +558,9 @@ export function AppContent({
       // Build descriptive component info
       // Priority: componentInfo > testId > element attributes > tag name
       const componentType = componentInfo?.componentType || undefined;
-      const componentLabel =
+      const textHint =
+        detail.text && detail.text.length < 40 ? detail.text : undefined;
+      let componentLabel =
         componentInfo?.componentLabel ||
         (componentInfo?.componentType ? componentInfo.componentType : undefined) ||
         testId ||
@@ -569,6 +571,13 @@ export function AppContent({
           : undefined) ||
         detail.targetTag?.toLowerCase() ||
         "Unknown";
+      if (
+        textHint &&
+        (componentLabel === detail.targetTag?.toLowerCase() ||
+          ["button", "a", "div", "span"].includes(componentLabel))
+      ) {
+        componentLabel = textHint;
+      }
       const interactionId = `i-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
       const perfTs = typeof performance !== "undefined" ? performance.now() : undefined;
       const eventTs = typeof event.timeStamp === "number" ? event.timeStamp : undefined;
