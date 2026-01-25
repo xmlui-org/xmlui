@@ -60,6 +60,10 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
 
   const handleShow = useCallback(
     (title: string | ConfirmParams, message?: string, actionLabel?: string) => {
+      if (typeof window !== "undefined") {
+        const w = window as any;
+        w._xsPendingConfirmTrace = w._xsCurrentTrace || w._xsLastInteraction?.id;
+      }
       if (typeof title === "string") {
         setTitle(title);
         setButtons([

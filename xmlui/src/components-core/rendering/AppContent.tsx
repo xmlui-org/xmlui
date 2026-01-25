@@ -604,7 +604,11 @@ export function AppContent({
         }
       }
 
-      const interactionId = `i-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+      let interactionId = `i-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+      if (w._xsPendingConfirmTrace) {
+        interactionId = w._xsPendingConfirmTrace;
+        w._xsPendingConfirmTrace = undefined;
+      }
       const perfTs = typeof performance !== "undefined" ? performance.now() : undefined;
       const eventTs = typeof event.timeStamp === "number" ? event.timeStamp : undefined;
       w._xsLastInteraction = { id: interactionId, ts: Date.now() };
