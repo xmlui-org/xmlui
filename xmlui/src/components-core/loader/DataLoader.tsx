@@ -101,6 +101,15 @@ function DataLoader({
           perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
           traceId: w._xsCurrentTrace, // Pick up trace ID if a handler is currently executing
           instanceId: instanceIdRef.current,
+          dataSourceId: loader?.props?.id,
+          ownerUid: loader?.uid,
+          ownerFileId: loader?.debug?.source?.fileId,
+          ownerSource: loader?.debug?.source
+            ? {
+                start: loader.debug.source.start,
+                end: loader.debug.source.end,
+              }
+            : undefined,
           text: safeStringify(args),
           kind: args && args[0] ? args[0] : undefined,
           eventName: args && args[1] && args[1].eventName ? args[1].eventName : undefined,
