@@ -29,6 +29,7 @@ import {
   type Literal,
   type MemberAccessExpression,
   type NoArgExpression,
+  type NewExpression,
   type ObjectDestructure,
   type ObjectLiteral,
   type PostfixOpExpression,
@@ -91,6 +92,7 @@ import {
   T_TEMPLATE_LITERAL_EXPRESSION,
   T_DESTRUCTURE,
   T_AWAIT_EXPRESSION,
+  T_NEW_EXPRESSION,
   T_ASYNC_FUNCTION_DECLARATION,
 } from "../../components-core/script-runner/ScriptingSourceTree";
 import type { GenericToken } from "../common/GenericToken";
@@ -2209,6 +2211,101 @@ export class Parser {
    */
   private parseUnaryOrPrefixExpr(): Expression | null {
     const startToken = this._lexer.peek();
+    
+    // Check for new expression
+    if (startToken.type === TokenType.New) {
+      this._lexer.get();
+      
+      // Parse the callee (but not function invocations yet)
+      let callee = this.parsePrimaryExpr();
+      if (!callee) {
+        return null;
+      }
+      
+      // Handle member access on the callee (e.g., new obj.Constructor)
+      let exitLoop = false;
+      do {
+        const currentStart = this._lexer.peek();
+        
+        switch (currentStart.type) {
+          case TokenType.Dot:
+          case TokenType.OptionalChaining: {
+            this._lexer.get();
+            const memberToken = this._lexer.peek();
+            if (memberToken.type !== TokenType.Identifier) {
+              this.reportError("P004");
+              return null;
+            }
+            this._lexer.get();
+            callee = this.createExpressionNode<MemberAccessExpression>(
+              T_MEMBER_ACCESS_EXPRESSION,
+              {
+                obj: callee,
+                member: memberToken.text,
+                opt: currentStart.type === TokenType.OptionalChaining,
+              },
+              startToken,
+              memberToken,
+            );
+            break;
+          }
+          
+          case TokenType.LSquare: {
+            this._lexer.get();
+            const memberExpr = this.parseExpr();
+            if (!memberExpr) {
+              return null;
+            }
+            const endToken = this._lexer.peek();
+            this.expectToken(TokenType.RSquare, "P005");
+            callee = this.createExpressionNode<CalculatedMemberAccessExpression>(
+              T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
+              {
+                obj: callee,
+                member: memberExpr,
+              },
+              startToken,
+              endToken,
+            );
+            break;
+          }
+          
+          default:
+            exitLoop = true;
+            break;
+        }
+      } while (!exitLoop);
+      
+      // Parse arguments if present (they're optional for new operator)
+      let args: Expression[] = [];
+      let endToken = callee.endToken;
+      const nextToken = this._lexer.peek();
+      
+      // Check if there are constructor arguments
+      if (nextToken.type === TokenType.LParent) {
+        this._lexer.get();
+        if (this._lexer.peek().type !== TokenType.RParent) {
+          const expr = this.parseExpr();
+          if (!expr) {
+            this.reportError("W001");
+            return null;
+          }
+          args = expr.type === T_SEQUENCE_EXPRESSION ? expr.exprs : [expr];
+        }
+        endToken = this._lexer.peek();
+        this.expectToken(TokenType.RParent, "W006");
+      }
+      
+      return this.createExpressionNode<NewExpression>(
+        T_NEW_EXPRESSION,
+        {
+          callee,
+          arguments: args,
+        },
+        startToken,
+        endToken,
+      );
+    }
     
     // Check for await expression (contextual keyword)
     if (startToken.type === TokenType.Identifier && startToken.text === "await") {

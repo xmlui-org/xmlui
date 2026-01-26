@@ -22,7 +22,7 @@ const basicApiInterceptor: ApiInterceptorDefinition = {
     "error-test-unknown": {
       url: "/api/error/unknown",
       method: "get",
-      handler: `throw new Error("Unknown error occurred");`,
+      handler: `throw {statusCode: 500, message: $error.message, details: {}};`,
     },
   },
 };

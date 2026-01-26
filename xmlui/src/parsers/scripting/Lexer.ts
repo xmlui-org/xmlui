@@ -1133,6 +1133,7 @@ resolverHash.set("case", TokenType.Case);
 resolverHash.set("default", TokenType.Default);
 resolverHash.set("delete", TokenType.Delete);
 resolverHash.set("function", TokenType.Function);
+resolverHash.set("new", TokenType.New);
 resolverHash.set("as", TokenType.As);
 
 /**

@@ -47,13 +47,15 @@ const basicApiInterceptor: ApiInterceptorDefinition = {
     "error-test-unknown": {
       url: "/api/error/unknown",
       method: "post",
-      handler: `throw new Error("Unknown error occurred");`,
+      handler: `
+      throw {statusCode: 500, message: $error.message, details: {}};
+      `,
     },
     "slow-test": {
       url: "/api/slow",
       method: "get",
       handler: `
-        await new Promise(resolve => setTimeout(resolve, 100));
+        delay(100);
         return { message: "Slow response" };
       `,
     },

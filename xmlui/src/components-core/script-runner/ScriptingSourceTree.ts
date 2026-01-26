@@ -71,6 +71,7 @@ export const {
   T_POSTFIX_OP_EXPRESSION,
   T_REACTIVE_VAR_DECLARATION,
   T_AWAIT_EXPRESSION,
+  T_NEW_EXPRESSION,
   
   // Other node type values
   T_VAR_DECLARATION,
@@ -124,6 +125,7 @@ type PREFIX_OP_EXPRESSION = typeof T_PREFIX_OP_EXPRESSION;
 type POSTFIX_OP_EXPRESSION = typeof T_POSTFIX_OP_EXPRESSION;
 type REACTIVE_VAR_DECLARATION = typeof T_REACTIVE_VAR_DECLARATION;
 type AWAIT_EXPRESSION = typeof T_AWAIT_EXPRESSION;
+type NEW_EXPRESSION = typeof T_NEW_EXPRESSION;
 
 // --- Other node types
 type VAR_DECLARATION = typeof T_VAR_DECLARATION;
@@ -344,6 +346,7 @@ export type Expression =
   | PostfixOpExpression
   | ReactiveVarDeclaration
   | AwaitExpression
+  | NewExpression
   | VarDeclaration
   | Destructure
   | ObjectDestructure
@@ -515,6 +518,12 @@ export interface PostfixOpExpression extends ExpressionBase {
 export interface AwaitExpression extends ExpressionBase {
   type: AWAIT_EXPRESSION;
   expr: Expression;
+}
+
+export interface NewExpression extends ExpressionBase {
+  type: NEW_EXPRESSION;
+  callee: Expression;
+  arguments: Expression[];
 }
 
 /**
