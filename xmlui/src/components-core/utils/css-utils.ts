@@ -1,5 +1,5 @@
-import type {CSSProperties} from "react";
-import { useEffect, useRef} from "react";
+import type { CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 import Color from "color";
 
 import { getVarKey } from "../theming/themeVars";
@@ -84,9 +84,9 @@ export type ColorDef = {
 };
 
 export function getColor(varName: string, format?: "hex" | "rgb" | "hsl") {
-  const varValue = getComputedStyle(document.getElementById("_ui-engine-theme-root")!).getPropertyValue(
-    getVarKey(varName)
-  );
+  const varValue = getComputedStyle(
+    document.getElementById("_ui-engine-theme-root")!,
+  ).getPropertyValue(getVarKey(varName));
   if (format === "hex") {
     return Color(varValue).hex().toString();
   }
@@ -126,7 +126,7 @@ export function getSizeString(size: any): string {
   if (typeof size === "number") {
     return size + "px";
   }
-  
+
   if (typeof size === "string" && /^\d+$/.test(size.trim())) {
     const rowGapValue = parseInt(size, 10);
     if (!isNaN(rowGapValue)) {
@@ -138,43 +138,42 @@ export function getSizeString(size: any): string {
 }
 
 export const useScrollbarWidth = () => {
-  const didCompute = useRef(false);
-  const widthRef = useRef(0);
+  const [scrollbarWidth, setScrollbarWidth] = useState(0);
 
-  useEffect(()=>{
-    function handleResize(){
-      didCompute.current = false;
+  useEffect(() => {
+    const getScrollbarWidth = () => {
+      // Creating invisible container
+      const outer = document.createElement("div");
+      outer.style.visibility = "hidden";
+      outer.style.overflow = "scroll"; // forcing scrollbar to appear
+      document.body.appendChild(outer);
+
+      // Calculating difference between container's full width and the child width
+      const width = outer.offsetWidth - outer.clientWidth;
+
+      // Removing temporary elements from the DOM
+      outer.parentNode.removeChild(outer);
+
+      return width;
+    };
+
+    function handleResize() {
+      let width = getScrollbarWidth();
+      if (window.devicePixelRatio !== Math.round(window.devicePixelRatio)) {
+        //zoomed in a weird ratio, sometimes shows a horizontal scrollbar
+        width = width - 0.5;
+      }
+      setScrollbarWidth(width);
     }
+
+    handleResize();
     window.addEventListener("resize", handleResize);
-    return ()=>{
+    return () => {
       window.removeEventListener("resize", handleResize);
-    }
+    };
   }, []);
 
-  if (didCompute.current) return widthRef.current;
-
-  // Creating invisible container
-  if(typeof document === 'undefined'){
-    return 0;
-  }
-  const outer = document.createElement('div');
-  outer.style.visibility = 'hidden';
-  outer.style.overflow = 'scroll'; // forcing scrollbar to appear
-  document.body.appendChild(outer);
-
-  // Calculating difference between container's full width and the child width
-  const scrollbarWidth = outer.offsetWidth - outer.clientWidth;
-
-  // Removing temporary elements from the DOM
-  outer.parentNode.removeChild(outer);
-
-  didCompute.current = true;
-  widthRef.current = scrollbarWidth;
-  if(window.devicePixelRatio !== Math.round(window.devicePixelRatio)){
-    //zoomed in a weird ratio, sometimes shows a horizontal scrollbar
-    widthRef.current = scrollbarWidth - 0.5;
-  }
-  return widthRef.current;
+  return scrollbarWidth;
 };
 
 export function extractPaddings(extractValue: ValueExtractor, props) {
