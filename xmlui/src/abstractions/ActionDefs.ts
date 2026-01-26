@@ -35,6 +35,12 @@ export type LookupActionOptions = {
 
   // Component id for inspector logging
   componentId?: string;
+
+  // Source file ID for inspector logging (index into _xsSourceFiles)
+  sourceFileId?: string | number;
+
+  // Source character range for inspector logging
+  sourceRange?: { start: number; end: number };
 };
 
 // This function resolves an action by its name (within the component node that

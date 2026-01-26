@@ -281,6 +281,9 @@ export const Container = memo(
                 message: args[1].error.message || String(args[1].error),
                 stack: args[1].error.stack,
               } : undefined,
+              // Source file info for handler errors
+              ownerFileId: args && args[1] ? args[1].ownerFileId : undefined,
+              ownerSource: args && args[1] ? args[1].ownerSource : undefined,
             });
           }
           if (xsLogBucket && appContext.AppState) {
@@ -574,12 +577,26 @@ export const Container = memo(
           }
         } catch (e) {
           if (xsVerbose) {
+            // Look up source info from global storage (handles cached handlers across Container hierarchy)
+            // Use componentId if available, else fall back to componentType+componentLabel
+            const keyPart = options?.componentId || `${componentType || "unknown"}:${componentLabel || ""}`;
+            const sourceKey = `${keyPart};${options?.eventName || "unknown"}`;
+            const storedSourceInfo = typeof window !== "undefined"
+              ? (window as any)._xsHandlerSourceInfo?.[sourceKey]
+              : undefined;
             xsLog("handler:error", {
               uid: uidName,
               eventName: options?.eventName,
               componentType,
               componentLabel,
               error: e,
+              ownerFileId: options?.sourceFileId ?? storedSourceInfo?.fileId ?? (node as any)?.debug?.source?.fileId,
+              ownerSource: options?.sourceRange ?? storedSourceInfo?.range ?? ((node as any)?.debug?.source
+                ? {
+                    start: (node as any).debug.source.start,
+                    end: (node as any).debug.source.end,
+                  }
+                : undefined),
             });
           }
           //if we pass down an event handler to a component, we should sign the error once, not in every step of the component chain
@@ -682,6 +699,19 @@ export const Container = memo(
         if (!fnsRef.current[uid]?.[fnCacheKey]) {
           fnsRef.current[uid] = fnsRef.current[uid] || {};
           fnsRef.current[uid][fnCacheKey] = handler;
+        }
+        // Always update source info for inspector logging (even for cached handlers)
+        // Use global storage since error may be caught in different Container
+        if (typeof window !== "undefined" && options?.sourceFileId !== undefined) {
+          const w = window as any;
+          w._xsHandlerSourceInfo = w._xsHandlerSourceInfo || {};
+          // Use componentId if available, else fall back to componentType+componentLabel
+          const keyPart = options.componentId || `${options.componentType || "unknown"}:${options.componentLabel || ""}`;
+          const sourceKey = `${keyPart};${options?.eventName || "unknown"}`;
+          w._xsHandlerSourceInfo[sourceKey] = {
+            fileId: options.sourceFileId,
+            range: options.sourceRange,
+          };
         }
         return fnsRef.current[uid][fnCacheKey];
       },

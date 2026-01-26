@@ -237,11 +237,15 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       // Use resolvedLabel which has evaluated expressions
       const componentType = safeNode.type;
       const componentId = safeNode.uid;
+      // Extract source file info for inspector error logging
+      const debugSource = (safeNode as any)?.debug?.source;
       return lookupAction(action, uid, {
         eventName,
         componentType,
         componentLabel: resolvedLabel,
         componentId,
+        sourceFileId: debugSource?.fileId,
+        sourceRange: debugSource ? { start: debugSource.start, end: debugSource.end } : undefined,
         ...actionOptions
       });
     },
