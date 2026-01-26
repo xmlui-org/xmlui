@@ -103,7 +103,10 @@ export const labelBehavior: Behavior = {
     // (form-bindable components with bindTo prop will get label from FormBindingWrapper)
     const bindTo = extractValue(node.props?.bindTo, true);
     const hasValueApiPair = !!metadata?.apis?.value && !!metadata?.apis?.setValue;
-    return !(bindTo && hasValueApiPair);
+    if (bindTo && hasValueApiPair || node.type === "FormItem") {
+      return false;
+    }
+    return true;
   },
   attach: (context, node, metadata) => {
     const { extractValue, node: componentNode, className } = context;
@@ -469,7 +472,11 @@ export const formBindingBehavior: Behavior = {
     const bindTo = extractValue(node.props?.bindTo, true);
     // Check if the component exposes value/setValue APIs
     const hasValueApiPair = !!metadata?.apis?.value && !!metadata?.apis?.setValue;
-    return !(!bindTo && !hasValueApiPair);
+    if (!bindTo && !hasValueApiPair || node.type === "FormItem") {
+      return false;
+    }
+    return true;
+
   },
   attach: (context, node, metadata) => {
     const { extractValue, node: componentNode } = context;
@@ -646,6 +653,9 @@ export const validationBehavior: Behavior = {
       componentNode.props?.customValidationsTimeoutMessage,
     );
     const validationMode = extractValue.asOptionalString(componentNode.props?.validationMode);
+    const requireLabelMode = extractValue.asOptionalString(
+      componentNode.props?.requireLabelMode,
+    ) as RequireLabelMode | undefined;
 
     // Event handlers
     let onValidate = lookupEventHandler("validate");
