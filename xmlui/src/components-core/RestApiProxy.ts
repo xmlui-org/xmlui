@@ -568,7 +568,7 @@ export default class RestApiProxy {
   };
 
   private generateFullApiUrl(relativePath: string, queryParams: Record<string, any> | undefined) {
-    const { baseUrl: basePath, mergedParams, fragment } = normalizeUrlAndParams(
+    const { baseUrl: basePath, mergedParams } = normalizeUrlAndParams(
       relativePath,
       queryParams,
     );
@@ -602,13 +602,11 @@ export default class RestApiProxy {
       }
     }
 
-    const fragmentString = fragment || "";
-
     if (basePath.startsWith("http://") || basePath.startsWith("https://")) {
-      return `${basePath}${queryString}${fragmentString}`;
+      return `${basePath}${queryString}`;
     }
     //TODO check if autoEncode is enabled
-    return `${this.config.apiUrl || ""}${basePath}${queryString}${fragmentString}`;
+    return `${this.config.apiUrl || ""}${basePath}${queryString}`;
   }
 
   private raiseError = async (response: Response | AxiosResponse) => {
