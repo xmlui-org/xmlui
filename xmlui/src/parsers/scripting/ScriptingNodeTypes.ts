@@ -42,6 +42,7 @@ export const T_PREFIX_OP_EXPRESSION = 116;
 export const T_POSTFIX_OP_EXPRESSION = 117;
 export const T_REACTIVE_VAR_DECLARATION = 118;
 export const T_AWAIT_EXPRESSION = 119;
+export const T_NEW_EXPRESSION = 120;
 
 // --- Other node type values
 export const T_VAR_DECLARATION = 200;

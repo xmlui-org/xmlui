@@ -17,6 +17,7 @@ import {
   T_IDENTIFIER,
   T_LITERAL,
   T_MEMBER_ACCESS_EXPRESSION,
+  T_NEW_EXPRESSION,
   T_OBJECT_LITERAL,
   T_POSTFIX_OP_EXPRESSION,
   T_PREFIX_OP_EXPRESSION,
@@ -236,6 +237,9 @@ function evalBindingExpressionTree(
 
     case T_AWAIT_EXPRESSION:
       throw new Error("XMLUI does not support the await operator.");
+
+    case T_NEW_EXPRESSION:
+      throw new Error("XMLUI does not support the new operator.");
 
     default:
       throw new Error(`Unknown expression tree node: ${(expr as any).type}`);
