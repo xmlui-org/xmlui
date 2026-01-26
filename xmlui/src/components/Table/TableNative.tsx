@@ -1078,6 +1078,8 @@ export const Table = forwardRef(
                       {row.getVisibleCells().map((cell, i) => {
                         const cellRenderer = cell.column.columnDef?.meta?.cellRenderer;
                         const size = cell.column.getSize();
+                        const columnClassName = cell.column.columnDef?.meta?.className;
+                        const columnStyle = cell.column.columnDef?.meta?.style;
                         const alignmentClass =
                           cellVerticalAlign === "top"
                             ? styles.alignTop
@@ -1086,11 +1088,12 @@ export const Table = forwardRef(
                               : styles.alignCenter;
                         return (
                           <td
-                            className={classnames(styles.cell, alignmentClass)}
+                            className={classnames(styles.cell, alignmentClass, columnClassName)}
                             key={`${cell.id}-${i}`}
                             style={{
                               width: size,
                               ...getCommonPinningStyles(cell.column),
+                              ...columnStyle,
                             }}
                           >
                             <div className={styles.cellContent}>
