@@ -3572,3 +3572,242 @@ test.describe("Events", () => {
   });
 });
 
+// =============================================================================
+// SCROLL STYLING TESTS
+// =============================================================================
+
+test.describe("Scroll Styling", () => {
+  test("renders with scrollStyle='normal'", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack height="200px">
+        <Tree 
+          testId="tree" 
+          dataFormat="flat" 
+          scrollStyle="normal"
+          data='{${JSON.stringify(flatTreeData)}}'>
+          <property name="itemTemplate">
+            <Text value="{$item.name}" />
+          </property>
+        </Tree>
+      </VStack>
+    `);
+
+    const tree = page.getByTestId("tree");
+    await expect(tree).toBeVisible();
+  });
+
+  test("renders with scrollStyle='overlay'", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack height="200px">
+        <Tree 
+          testId="tree" 
+          dataFormat="flat" 
+          scrollStyle="overlay"
+          data='{${JSON.stringify(flatTreeData)}}'>
+          <property name="itemTemplate">
+            <Text value="{$item.name}" />
+          </property>
+        </Tree>
+      </VStack>
+    `);
+
+    const tree = page.getByTestId("tree");
+    await expect(tree).toBeVisible();
+  });
+
+  test("renders with scrollStyle='whenMouseOver'", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack height="200px">
+        <Tree 
+          testId="tree" 
+          dataFormat="flat" 
+          scrollStyle="whenMouseOver"
+          data='{${JSON.stringify(flatTreeData)}}'>
+          <property name="itemTemplate">
+            <Text value="{$item.name}" />
+          </property>
+        </Tree>
+      </VStack>
+    `);
+
+    const tree = page.getByTestId("tree");
+    await expect(tree).toBeVisible();
+  });
+
+  test("renders with scrollStyle='whenScrolling'", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack height="200px">
+        <Tree 
+          testId="tree" 
+          dataFormat="flat" 
+          scrollStyle="whenScrolling"
+          data='{${JSON.stringify(flatTreeData)}}'>
+          <property name="itemTemplate">
+            <Text value="{$item.name}" />
+          </property>
+        </Tree>
+      </VStack>
+    `);
+
+    const tree = page.getByTestId("tree");
+    await expect(tree).toBeVisible();
+  });
+
+  test("showScrollerFade displays fade indicators", async ({ initTestBed, page }) => {
+    // Create tall tree content to ensure scrolling
+    const tallData = Array.from({ length: 50 }, (_, i) => ({
+      id: i + 1,
+      name: `Item ${i + 1}`,
+    }));
+
+    await initTestBed(`
+      <VStack height="200px">
+        <Tree 
+          testId="tree" 
+          dataFormat="flat" 
+          scrollStyle="overlay"
+          showScrollerFade="true"
+          data='{${JSON.stringify(tallData)}}'>
+          <property name="itemTemplate">
+            <Text value="{$item.name}" />
+          </property>
+        </Tree>
+      </VStack>
+    `);
+
+    // Wait for initialization
+    await page.waitForTimeout(100);
+
+    // Fade overlays should exist (top and bottom)
+    const fadeOverlays = page.locator("[class*='fadeOverlay']");
+    await expect(fadeOverlays).toHaveCount(2);
+  });
+
+  test("bottom fade is visible when not at bottom", async ({ initTestBed, page }) => {
+    // Create tall tree content
+    const tallData = Array.from({ length: 50 }, (_, i) => ({
+      id: i + 1,
+      name: `Item ${i + 1}`,
+    }));
+
+    await initTestBed(`
+      <VStack height="200px">
+        <Tree 
+          testId="tree" 
+          dataFormat="flat" 
+          scrollStyle="overlay"
+          showScrollerFade="true"
+          data='{${JSON.stringify(tallData)}}'>
+          <property name="itemTemplate">
+            <Text value="{$item.name}" />
+          </property>
+        </Tree>
+      </VStack>
+    `);
+
+    // Wait for initialization
+    await page.waitForTimeout(100);
+
+    // Bottom fade should be visible (has fadeVisible class)
+    const bottomFade = page.locator("[class*='fadeBottom'][class*='fadeVisible']");
+    await expect(bottomFade).toBeVisible();
+  });
+
+  test("top fade appears when scrolled down", async ({ initTestBed, page }) => {
+    // Create tall tree content
+    const tallData = Array.from({ length: 50 }, (_, i) => ({
+      id: i + 1,
+      name: `Item ${i + 1}`,
+    }));
+
+    await initTestBed(`
+      <VStack height="200px">
+        <Tree 
+          testId="tree" 
+          dataFormat="flat" 
+          scrollStyle="overlay"
+          showScrollerFade="true"
+          data='{${JSON.stringify(tallData)}}'>
+          <property name="itemTemplate">
+            <Text value="{$item.name}" />
+          </property>
+        </Tree>
+      </VStack>
+    `);
+
+    // Wait for initialization
+    await page.waitForTimeout(100);
+
+    // Scroll down
+    const tree = page.getByTestId("tree");
+    await tree.evaluate((el) => {
+      el.querySelector('[data-overlayscrollbars-viewport]')?.scrollTo(0, 50);
+    });
+
+    // Wait for fade to update
+    await page.waitForTimeout(100);
+
+    // Top fade should now be visible
+    const topFade = page.locator("[class*='fadeTop'][class*='fadeVisible']");
+    await expect(topFade).toBeVisible();
+  });
+
+  test("showScrollerFade works with whenMouseOver scrollStyle", async ({ initTestBed, page }) => {
+    const tallData = Array.from({ length: 50 }, (_, i) => ({
+      id: i + 1,
+      name: `Item ${i + 1}`,
+    }));
+
+    await initTestBed(`
+      <VStack height="200px">
+        <Tree 
+          testId="tree" 
+          dataFormat="flat" 
+          scrollStyle="whenMouseOver"
+          showScrollerFade="true"
+          data='{${JSON.stringify(tallData)}}'>
+          <property name="itemTemplate">
+            <Text value="{$item.name}" />
+          </property>
+        </Tree>
+      </VStack>
+    `);
+
+    // Wait for initialization
+    await page.waitForTimeout(100);
+
+    // Fade overlays should exist
+    const fadeOverlays = page.locator("[class*='fadeOverlay']");
+    await expect(fadeOverlays).toHaveCount(2);
+  });
+
+  test("showScrollerFade works with whenScrolling scrollStyle", async ({ initTestBed, page }) => {
+    const tallData = Array.from({ length: 50 }, (_, i) => ({
+      id: i + 1,
+      name: `Item ${i + 1}`,
+    }));
+
+    await initTestBed(`
+      <VStack height="200px">
+        <Tree 
+          testId="tree" 
+          dataFormat="flat" 
+          scrollStyle="whenScrolling"
+          showScrollerFade="true"
+          data='{${JSON.stringify(tallData)}}'>
+          <property name="itemTemplate">
+            <Text value="{$item.name}" />
+          </property>
+        </Tree>
+      </VStack>
+    `);
+
+    // Wait for initialization
+    await page.waitForTimeout(100);
+
+    // Fade overlays should exist
+    const fadeOverlays = page.locator("[class*='fadeOverlay']");
+    await expect(fadeOverlays).toHaveCount(2);
+  });
+});
+

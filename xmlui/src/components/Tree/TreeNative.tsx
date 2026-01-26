@@ -3,6 +3,7 @@ import { Virtualizer, type VirtualizerHandle } from "virtua";
 import classnames from "classnames";
 import Icon from "../Icon/IconNative";
 import { Spinner } from "../Spinner/SpinnerNative";
+import { Scroller } from "../ScrollViewer/Scroller";
 
 import styles from "./TreeComponent.module.scss";
 
@@ -282,6 +283,8 @@ export const defaultProps = {
   itemHeight: 32,
   animateExpand: false,
   expandRotation: 90,
+  scrollStyle: "normal" as const,
+  showScrollerFade: false,
 };
 
 interface TreeComponentProps {
@@ -309,6 +312,8 @@ interface TreeComponentProps {
   fixedItemSize?: boolean;
   animateExpand?: boolean;
   expandRotation?: number;
+  scrollStyle?: "normal" | "overlay" | "whenMouseOver" | "whenScrolling";
+  showScrollerFade?: boolean;
   onItemClick?: (node: FlatTreeNode) => void;
   onSelectionChanged?: (event: TreeSelectionEvent) => void;
   onNodeExpanded?: (node: FlatTreeNode) => void;
@@ -345,6 +350,8 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     fixedItemSize,
     animateExpand = defaultProps.animateExpand,
     expandRotation = defaultProps.expandRotation,
+    scrollStyle = defaultProps.scrollStyle,
+    showScrollerFade = defaultProps.showScrollerFade,
     onItemClick,
     onSelectionChanged,
     onNodeExpanded,
@@ -1675,7 +1682,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
 
   return (
-    <div
+    <Scroller
       ref={treeContainerRef}
       className={classnames(styles.wrapper, className)}
       role="tree"
@@ -1687,6 +1694,8 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       onKeyDown={handleKeyDown}
       onContextMenu={onContextMenu}
       style={{ height: "100%", overflow: "auto" }}
+      scrollStyle={scrollStyle}
+      showScrollerFade={showScrollerFade}
     >
       <Virtualizer ref={listRef} itemSize={measuredItemSize || itemHeight}>
         {flatTreeData.map((node, index) => {
@@ -1702,6 +1711,6 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           );
         })}
       </Virtualizer>
-    </div>
+    </Scroller>
   );
 });

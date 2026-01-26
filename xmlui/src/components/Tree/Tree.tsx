@@ -126,6 +126,26 @@ export const TreeMd = createMetadata({
       description: "The template for each item in the tree.",
       valueType: "ComponentDef",
     },
+    scrollStyle: {
+      description:
+        "This property determines the scrollbar style. Options: \"normal\" uses the browser's default " +
+        "scrollbar; \"overlay\" displays a themed scrollbar that is always visible; \"whenMouseOver\" shows the " +
+        "scrollbar only when hovering over the scroll container; \"whenScrolling\" displays the scrollbar " +
+        "only while scrolling is active and fades out after 400ms of inactivity.",
+      valueType: "string",
+      allowedValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
+      defaultValue: defaultProps.scrollStyle,
+    },
+    showScrollerFade: {
+      description:
+        "When enabled, displays gradient fade indicators at the top and bottom edges of the tree " +
+        "when scrollable content extends beyond the visible area. The fade effect provides a visual cue " +
+        "to users that additional content is available by scrolling. The indicators automatically appear and " +
+        "disappear based on the scroll position. This property only works with \"overlay\", \"whenMouseOver\", and " +
+        "\"whenScrolling\" scroll styles.",
+      valueType: "boolean",
+      defaultValue: defaultProps.showScrollerFade,
+    },
   },
   events: {
     contextMenu: dContextMenu(COMP),
@@ -366,6 +386,8 @@ export const treeComponentRenderer = createComponentRenderer(
         fixedItemSize={extractValue.asOptionalBoolean(node.props.fixedItemSize)}
         animateExpand={extractValue.asOptionalBoolean(node.props.animateExpand, defaultProps.animateExpand)}
         expandRotation={extractValue.asOptionalNumber(node.props.expandRotation, defaultProps.expandRotation)}
+        scrollStyle={extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle)}
+        showScrollerFade={extractValue.asOptionalBoolean(node.props.showScrollerFade, defaultProps.showScrollerFade)}
         onSelectionChanged={lookupEventHandler("selectionDidChange")}
         onNodeExpanded={lookupEventHandler("nodeDidExpand")}
         onNodeCollapsed={lookupEventHandler("nodeDidCollapse")}
