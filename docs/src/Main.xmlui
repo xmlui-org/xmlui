@@ -333,472 +333,127 @@
         <NavGroup label="Reference">
             <NavGroup icon="component" label="Components">
                 <!-- GENERATED CONTENT/Component references links -->
-                <NavLink
-                    icon="component"
-                    label="Components Overview"
-                    to="/components/_overview"
-                />
-                <NavLink
-                    icon="component"
-                    label="APICall"
-                    to="/components/APICall"
-                />
+                <NavLink icon="component" label="Components Overview" to="/components/_overview" />
+                <NavLink icon="component" label="APICall" to="/components/APICall" />
                 <NavLink icon="component" label="App" to="/components/App" />
-                <NavLink
-                    icon="component"
-                    label="AppHeader"
-                    to="/components/AppHeader"
-                />
-                <NavLink
-                    icon="component"
-                    label="AppState"
-                    to="/components/AppState"
-                />
-                <NavLink
-                    icon="component"
-                    label="AutoComplete"
-                    to="/components/AutoComplete"
-                />
-                <NavLink
-                    icon="component"
-                    label="Avatar"
-                    to="/components/Avatar"
-                />
-                <NavLink
-                    icon="component"
-                    label="Backdrop"
-                    to="/components/Backdrop"
-                />
+                <NavLink icon="component" label="AppHeader" to="/components/AppHeader" />
+                <NavLink icon="component" label="AppState" to="/components/AppState" />
+                <NavLink icon="component" label="AutoComplete" to="/components/AutoComplete" />
+                <NavLink icon="component" label="Avatar" to="/components/Avatar" />
+                <NavLink icon="component" label="Backdrop" to="/components/Backdrop" />
                 <NavLink icon="component" label="Badge" to="/components/Badge" />
-                <NavLink
-                    icon="component"
-                    label="BarChart"
-                    to="/components/BarChart"
-                />
-                <NavLink
-                    icon="component"
-                    label="Bookmark"
-                    to="/components/Bookmark"
-                />
-                <NavLink
-                    icon="component"
-                    label="Breakout"
-                    to="/components/Breakout"
-                />
-                <NavLink
-                    icon="component"
-                    label="Button"
-                    to="/components/Button"
-                />
-                <NavLink
-                    icon="component"
-                    label="CHStack"
-                    to="/components/CHStack"
-                />
-                <NavLink
-                    icon="component"
-                    label="CVStack"
-                    to="/components/CVStack"
-                />
+                <NavLink icon="component" label="BarChart" to="/components/BarChart" />
+                <NavLink icon="component" label="Bookmark" to="/components/Bookmark" />
+                <NavLink icon="component" label="Breakout" to="/components/Breakout" />
+                <NavLink icon="component" label="Button" to="/components/Button" />
+                <NavLink icon="component" label="CHStack" to="/components/CHStack" />
+                <NavLink icon="component" label="CVStack" to="/components/CVStack" />
                 <NavLink icon="component" label="Card" to="/components/Card" />
-                <NavLink
-                    icon="component"
-                    label="Carousel"
-                    to="/components/Carousel"
-                />
-                <NavLink
-                    icon="component"
-                    label="ChangeListener"
-                    to="/components/ChangeListener"
-                />
-                <NavLink
-                    icon="component"
-                    label="Checkbox"
-                    to="/components/Checkbox"
-                />
-                <NavLink
-                    icon="component"
-                    label="ColorPicker"
-                    to="/components/ColorPicker"
-                />
-                <NavLink
-                    icon="component"
-                    label="Column"
-                    to="/components/Column"
-                />
-                <NavLink
-                    icon="component"
-                    label="ContentSeparator"
-                    to="/components/ContentSeparator"
-                />
-                <NavLink
-                    icon="component"
-                    label="ContextMenu"
-                    to="/components/ContextMenu"
-                />
-                <NavLink
-                    icon="component"
-                    label="DataSource"
-                    to="/components/DataSource"
-                />
-                <NavLink
-                    icon="component"
-                    label="DateInput"
-                    to="/components/DateInput"
-                />
-                <NavLink
-                    icon="component"
-                    label="DatePicker"
-                    to="/components/DatePicker"
-                />
-                <NavLink
-                    icon="component"
-                    label="DonutChart"
-                    to="/components/DonutChart"
-                />
-                <NavLink
-                    icon="component"
-                    label="DropdownMenu"
-                    to="/components/DropdownMenu"
-                />
-                <NavLink
-                    icon="component"
-                    label="EmojiSelector"
-                    to="/components/EmojiSelector"
-                />
-                <NavLink
-                    icon="component"
-                    label="ExpandableItem"
-                    to="/components/ExpandableItem"
-                />
-                <NavLink
-                    icon="component"
-                    label="FileInput"
-                    to="/components/FileInput"
-                />
-                <NavLink
-                    icon="component"
-                    label="FileUploadDropZone"
-                    to="/components/FileUploadDropZone"
-                />
-                <NavLink
-                    icon="component"
-                    label="FlowLayout"
-                    to="/components/FlowLayout"
-                />
-                <NavLink
-                    icon="component"
-                    label="Footer"
-                    to="/components/Footer"
-                />
+                <NavLink icon="component" label="Carousel" to="/components/Carousel" />
+                <NavLink icon="component" label="ChangeListener" to="/components/ChangeListener" />
+                <NavLink icon="component" label="Checkbox" to="/components/Checkbox" />
+                <NavLink icon="component" label="ColorPicker" to="/components/ColorPicker" />
+                <NavLink icon="component" label="Column" to="/components/Column" />
+                <NavLink icon="component" label="ContentSeparator" to="/components/ContentSeparator" />
+                <NavLink icon="component" label="ContextMenu" to="/components/ContextMenu" />
+                <NavLink icon="component" label="DataSource" to="/components/DataSource" />
+                <NavLink icon="component" label="DateInput" to="/components/DateInput" />
+                <NavLink icon="component" label="DatePicker" to="/components/DatePicker" />
+                <NavLink icon="component" label="DonutChart" to="/components/DonutChart" />
+                <NavLink icon="component" label="DropdownMenu" to="/components/DropdownMenu" />
+                <NavLink icon="component" label="EmojiSelector" to="/components/EmojiSelector" />
+                <NavLink icon="component" label="ExpandableItem" to="/components/ExpandableItem" />
+                <NavLink icon="component" label="FileInput" to="/components/FileInput" />
+                <NavLink icon="component" label="FileUploadDropZone" to="/components/FileUploadDropZone" />
+                <NavLink icon="component" label="FlowLayout" to="/components/FlowLayout" />
+                <NavLink icon="component" label="Footer" to="/components/Footer" />
                 <NavLink icon="component" label="Form" to="/components/Form" />
-                <NavLink
-                    icon="component"
-                    label="FormItem"
-                    to="/components/FormItem"
-                />
-                <NavLink
-                    icon="component"
-                    label="FormSection"
-                    to="/components/FormSection"
-                />
-                <NavLink
-                    icon="component"
-                    label="Fragment"
-                    to="/components/Fragment"
-                />
+                <NavLink icon="component" label="FormItem" to="/components/FormItem" />
+                <NavLink icon="component" label="FormSection" to="/components/FormSection" />
+                <NavLink icon="component" label="Fragment" to="/components/Fragment" />
                 <NavLink icon="component" label="H1" to="/components/H1" />
                 <NavLink icon="component" label="H2" to="/components/H2" />
                 <NavLink icon="component" label="H3" to="/components/H3" />
                 <NavLink icon="component" label="H4" to="/components/H4" />
                 <NavLink icon="component" label="H5" to="/components/H5" />
                 <NavLink icon="component" label="H6" to="/components/H6" />
-                <NavLink
-                    icon="component"
-                    label="HSplitter"
-                    to="/components/HSplitter"
-                />
-                <NavLink
-                    icon="component"
-                    label="HStack"
-                    to="/components/HStack"
-                />
-                <NavLink
-                    icon="component"
-                    label="Heading"
-                    to="/components/Heading"
-                />
-                <NavLink
-                    icon="component"
-                    label="IFrame"
-                    to="/components/IFrame"
-                />
+                <NavLink icon="component" label="HSplitter" to="/components/HSplitter" />
+                <NavLink icon="component" label="HStack" to="/components/HStack" />
+                <NavLink icon="component" label="Heading" to="/components/Heading" />
+                <NavLink icon="component" label="IFrame" to="/components/IFrame" />
                 <NavLink icon="component" label="Icon" to="/components/Icon" />
                 <NavLink icon="component" label="Image" to="/components/Image" />
                 <NavLink icon="component" label="Items" to="/components/Items" />
-                <NavLink
-                    icon="component"
-                    label="LabelList"
-                    to="/components/LabelList"
-                />
-                <NavLink
-                    icon="component"
-                    label="Legend"
-                    to="/components/Legend"
-                />
-                <NavLink
-                    icon="component"
-                    label="LineChart"
-                    to="/components/LineChart"
-                />
+                <NavLink icon="component" label="LabelList" to="/components/LabelList" />
+                <NavLink icon="component" label="Legend" to="/components/Legend" />
+                <NavLink icon="component" label="LineChart" to="/components/LineChart" />
                 <NavLink icon="component" label="Link" to="/components/Link" />
                 <NavLink icon="component" label="List" to="/components/List" />
                 <NavLink icon="component" label="Logo" to="/components/Logo" />
-                <NavLink
-                    icon="component"
-                    label="Markdown"
-                    to="/components/Markdown"
-                />
-                <NavLink
-                    icon="component"
-                    label="MenuItem"
-                    to="/components/MenuItem"
-                />
-                <NavLink
-                    icon="component"
-                    label="MenuSeparator"
-                    to="/components/MenuSeparator"
-                />
-                <NavLink
-                    icon="component"
-                    label="MessageListener"
-                    to="/components/MessageListener"
-                />
-                <NavLink
-                    icon="component"
-                    label="ModalDialog"
-                    to="/components/ModalDialog"
-                />
-                <NavLink
-                    icon="component"
-                    label="NavGroup"
-                    to="/components/NavGroup"
-                />
-                <NavLink
-                    icon="component"
-                    label="NavLink"
-                    to="/components/NavLink"
-                />
-                <NavLink
-                    icon="component"
-                    label="NavPanel"
-                    to="/components/NavPanel"
-                />
-                <NavLink
-                    icon="component"
-                    label="NoResult"
-                    to="/components/NoResult"
-                />
-                <NavLink
-                    icon="component"
-                    label="NumberBox"
-                    to="/components/NumberBox"
-                />
-                <NavLink
-                    icon="component"
-                    label="Option"
-                    to="/components/Option"
-                />
+                <NavLink icon="component" label="Markdown" to="/components/Markdown" />
+                <NavLink icon="component" label="MenuItem" to="/components/MenuItem" />
+                <NavLink icon="component" label="MenuSeparator" to="/components/MenuSeparator" />
+                <NavLink icon="component" label="MessageListener" to="/components/MessageListener" />
+                <NavLink icon="component" label="ModalDialog" to="/components/ModalDialog" />
+                <NavLink icon="component" label="NavGroup" to="/components/NavGroup" />
+                <NavLink icon="component" label="NavLink" to="/components/NavLink" />
+                <NavLink icon="component" label="NavPanel" to="/components/NavPanel" />
+                <NavLink icon="component" label="NoResult" to="/components/NoResult" />
+                <NavLink icon="component" label="NumberBox" to="/components/NumberBox" />
+                <NavLink icon="component" label="Option" to="/components/Option" />
                 <NavLink icon="component" label="Page" to="/components/Page" />
-                <NavLink
-                    icon="component"
-                    label="PageMetaTitle"
-                    to="/components/PageMetaTitle"
-                />
+                <NavLink icon="component" label="PageMetaTitle" to="/components/PageMetaTitle" />
                 <NavLink icon="component" label="Pages" to="/components/Pages" />
-                <NavLink
-                    icon="component"
-                    label="Pagination"
-                    to="/components/Pagination"
-                />
-                <NavLink
-                    icon="component"
-                    label="PasswordInput"
-                    to="/components/PasswordInput"
-                />
-                <NavLink
-                    icon="component"
-                    label="PieChart"
-                    to="/components/PieChart"
-                />
-                <NavLink
-                    icon="component"
-                    label="ProgressBar"
-                    to="/components/ProgressBar"
-                />
-                <NavLink
-                    icon="component"
-                    label="QRCode"
-                    to="/components/QRCode"
-                />
+                <NavLink icon="component" label="Pagination" to="/components/Pagination" />
+                <NavLink icon="component" label="PasswordInput" to="/components/PasswordInput" />
+                <NavLink icon="component" label="PieChart" to="/components/PieChart" />
+                <NavLink icon="component" label="ProgressBar" to="/components/ProgressBar" />
+                <NavLink icon="component" label="QRCode" to="/components/QRCode" />
                 <NavLink icon="component" label="Queue" to="/components/Queue" />
-                <NavLink
-                    icon="component"
-                    label="RadioGroup"
-                    to="/components/RadioGroup"
-                />
-                <NavLink
-                    icon="component"
-                    label="RealTimeAdapter"
-                    to="/components/RealTimeAdapter"
-                />
-                <NavLink
-                    icon="component"
-                    label="Redirect"
-                    to="/components/Redirect"
-                />
-                <NavLink
-                    icon="component"
-                    label="ResponsiveBar"
-                    to="/components/ResponsiveBar"
-                />
-                <NavLink
-                    icon="component"
-                    label="ScrollViewer"
-                    to="/components/ScrollViewer"
-                />
-                <NavLink
-                    icon="component"
-                    label="Select"
-                    to="/components/Select"
-                />
-                <NavLink
-                    icon="component"
-                    label="Slider"
-                    to="/components/Slider"
-                />
+                <NavLink icon="component" label="RadioGroup" to="/components/RadioGroup" />
+                <NavLink icon="component" label="RealTimeAdapter" to="/components/RealTimeAdapter" />
+                <NavLink icon="component" label="Redirect" to="/components/Redirect" />
+                <NavLink icon="component" label="ResponsiveBar" to="/components/ResponsiveBar" />
+                <NavLink icon="component" label="ScrollViewer" to="/components/ScrollViewer" />
+                <NavLink icon="component" label="Select" to="/components/Select" />
+                <NavLink icon="component" label="Slider" to="/components/Slider" />
                 <NavLink icon="component" label="Slot" to="/components/Slot" />
-                <NavLink
-                    icon="component"
-                    label="SpaceFiller"
-                    to="/components/SpaceFiller"
-                />
-                <NavLink
-                    icon="component"
-                    label="Spinner"
-                    to="/components/Spinner"
-                />
-                <NavLink
-                    icon="component"
-                    label="Splitter"
-                    to="/components/Splitter"
-                />
+                <NavLink icon="component" label="SpaceFiller" to="/components/SpaceFiller" />
+                <NavLink icon="component" label="Spinner" to="/components/Spinner" />
+                <NavLink icon="component" label="Splitter" to="/components/Splitter" />
                 <NavLink icon="component" label="Stack" to="/components/Stack" />
-                <NavLink
-                    icon="component"
-                    label="StickyBox"
-                    to="/components/StickyBox"
-                />
-                <NavLink
-                    icon="component"
-                    label="SubMenuItem"
-                    to="/components/SubMenuItem"
-                />
-                <NavLink
-                    icon="component"
-                    label="Switch"
-                    to="/components/Switch"
-                />
-                <NavLink
-                    icon="component"
-                    label="TabItem"
-                    to="/components/TabItem"
-                />
+                <NavLink icon="component" label="StickyBox" to="/components/StickyBox" />
+                <NavLink icon="component" label="SubMenuItem" to="/components/SubMenuItem" />
+                <NavLink icon="component" label="Switch" to="/components/Switch" />
+                <NavLink icon="component" label="TabItem" to="/components/TabItem" />
                 <NavLink icon="component" label="Table" to="/components/Table" />
-                <NavLink
-                    icon="component"
-                    label="TableOfContents"
-                    to="/components/TableOfContents"
-                />
+                <NavLink icon="component" label="TableOfContents" to="/components/TableOfContents" />
                 <NavLink icon="component" label="Tabs" to="/components/Tabs" />
                 <NavLink icon="component" label="Text" to="/components/Text" />
-                <NavLink
-                    icon="component"
-                    label="TextArea"
-                    to="/components/TextArea"
-                />
-                <NavLink
-                    icon="component"
-                    label="TextBox"
-                    to="/components/TextBox"
-                />
+                <NavLink icon="component" label="TextArea" to="/components/TextArea" />
+                <NavLink icon="component" label="TextBox" to="/components/TextBox" />
                 <NavLink icon="component" label="Theme" to="/components/Theme" />
-                <NavLink
-                    icon="component"
-                    label="TimeInput"
-                    to="/components/TimeInput"
-                />
+                <NavLink icon="component" label="TimeInput" to="/components/TimeInput" />
                 <NavLink icon="component" label="Timer" to="/components/Timer" />
-                <NavLink
-                    icon="component"
-                    label="ToneChangerButton"
-                    to="/components/ToneChangerButton"
-                />
-                <NavLink
-                    icon="component"
-                    label="ToneSwitch"
-                    to="/components/ToneSwitch"
-                />
-                <NavLink
-                    icon="component"
-                    label="Tooltip"
-                    to="/components/Tooltip"
-                />
+                <NavLink icon="component" label="ToneChangerButton" to="/components/ToneChangerButton" />
+                <NavLink icon="component" label="ToneSwitch" to="/components/ToneSwitch" />
+                <NavLink icon="component" label="Tooltip" to="/components/Tooltip" />
                 <NavLink icon="component" label="Tree" to="/components/Tree" />
-                <NavLink
-                    icon="component"
-                    label="VSplitter"
-                    to="/components/VSplitter"
-                />
-                <NavLink
-                    icon="component"
-                    label="VStack"
-                    to="/components/VStack"
-                />
+                <NavLink icon="component" label="VSplitter" to="/components/VSplitter" />
+                <NavLink icon="component" label="VStack" to="/components/VStack" />
                 <!-- END GENERATED CONTENT/Component references links -->
             </NavGroup
             >
             <NavGroup icon="puzzle" label="Extensions">
                 <!-- GENERATED CONTENT/Extension references links -->
                 <NavGroup label="Xmlui Animations">
-                    <NavLink
-                        label="Extension Overview"
-                        to="/extensions/xmlui-animations/_overview"
-                    />
-                    <NavLink
-                        label="Animation"
-                        to="/extensions/xmlui-animations/Animation"
-                    />
-                    <NavLink
-                        label="FadeAnimation"
-                        to="/extensions/xmlui-animations/FadeAnimation"
-                    />
-                    <NavLink
-                        label="FadeInAnimation"
-                        to="/extensions/xmlui-animations/FadeInAnimation"
-                    />
-                    <NavLink
-                        label="FadeOutAnimation"
-                        to="/extensions/xmlui-animations/FadeOutAnimation"
-                    />
-                    <NavLink
-                        label="ScaleAnimation"
-                        to="/extensions/xmlui-animations/ScaleAnimation"
-                    />
-                    <NavLink
-                        label="SlideInAnimation"
-                        to="/extensions/xmlui-animations/SlideInAnimation"
-                    />
+                <NavLink label="Extension Overview" to="/extensions/xmlui-animations/_overview" />
+                <NavLink label="Animation" to="/extensions/xmlui-animations/Animation" />
+                <NavLink label="FadeAnimation" to="/extensions/xmlui-animations/FadeAnimation" />
+                <NavLink label="FadeInAnimation" to="/extensions/xmlui-animations/FadeInAnimation" />
+                <NavLink label="FadeOutAnimation" to="/extensions/xmlui-animations/FadeOutAnimation" />
+                <NavLink label="ScaleAnimation" to="/extensions/xmlui-animations/ScaleAnimation" />
+                <NavLink label="SlideInAnimation" to="/extensions/xmlui-animations/SlideInAnimation" />
                 </NavGroup>
                 <!-- END GENERATED CONTENT/Extension references links -->
             </NavGroup
