@@ -1336,7 +1336,7 @@ test.describe("onValidate Timeout", () => {
           bindTo="email"
           validationMode="onChanged"
           customValidationsTimeout="1000"
-          onValidate="(value) => { await delay(3000); return true; }"
+          onValidate="(value) => { delay(3000); return true; }"
         />
       </Form>
     `);
@@ -1364,7 +1364,7 @@ test.describe("onValidate Timeout", () => {
           validationMode="onChanged"
           customValidationsTimeout="1000"
           customValidationsTimeoutMessage="Email validation is taking too long!"
-          onValidate="(value) => { await delay(3000); return true; }"
+          onValidate="(value) => { delay(3000); return true; }"
         />
       </Form>
     `);
@@ -1390,7 +1390,7 @@ test.describe("onValidate Timeout", () => {
           bindTo="email"
           validationMode="onChanged"
           customValidationsTimeout="2000"
-          onValidate="(value) => { await delay(1500, () => { testState = value; }); return true; }"
+          onValidate="(value) => { delay(1500, () => { testState = value; }); return true; }"
         />
       </Form>
     `);
@@ -1421,7 +1421,7 @@ test.describe("onValidate Timeout", () => {
           bindTo="email"
           validationMode="onChanged"
           customValidationsTimeout="0"
-          onValidate="(value) => { await delay(2000, () => { testState = true; }); return true; }"
+          onValidate="(value) => { delay(2000, () => { testState = true; }); return true; }"
         />
       </Form>
     `);
@@ -1452,7 +1452,7 @@ test.describe("onValidate Timeout", () => {
           validationMode="onChanged"
           customValidationsTimeout="2000"
           onValidate="(value) => {
-            await delay(500);
+            delay(500);
             return { isValid: false, invalidMessage: 'Custom error', severity: 'error' };
           }"
         />
