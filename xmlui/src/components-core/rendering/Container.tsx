@@ -414,9 +414,20 @@ export const Container = memo(
           : undefined);
 
         // Extract handler code for logging (works with string, ParsedEventValue, or ArrowExpression)
-        const handlerCode = typeof source === "string"
-          ? source
-          : (source as any)?.source ?? (source as any)?.raw ?? undefined;
+        let handlerCode: string | undefined;
+        if (typeof source === "string") {
+          handlerCode = source;
+        } else if ((source as any)?.source) {
+          // ParsedEventValue has .source
+          handlerCode = (source as any).source;
+        } else if ((source as any)?.name) {
+          // ArrowExpression has .name (function name)
+          handlerCode = `${(source as any).name}()`;
+        }
+        // Debug: log source type if handlerCode is still undefined
+        if (!handlerCode && xsVerbose) {
+          console.log("[xs] handler source type:", typeof source, source?.constructor?.name, Object.keys(source || {}));
+        }
 
         try {
           if (xsVerbose) {
