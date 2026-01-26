@@ -673,11 +673,6 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
       margin-left: $marginLeft-Li-markdown;
       @include t.borderVars($themeVars, "Li-markdown");
       @include t.paddingVars($themeVars, "Li-markdown");
-      
-      // Force alignment at the first baseline
-      &::marker {
-        line-height: 1;
-      }
     }
 
     // --- Video

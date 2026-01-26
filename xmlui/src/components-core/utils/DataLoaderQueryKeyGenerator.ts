@@ -17,7 +17,7 @@ type DataLoaderQueryKey = [UrlKeyPart, UrlQueryParamsPart?];
 export function normalizeUrlAndParams(
   url: string,
   queryParams: UrlQueryParamsPart | undefined
-): { baseUrl: string; mergedParams: UrlQueryParamsPart | undefined } {
+): { baseUrl: string; mergedParams: UrlQueryParamsPart | undefined; fragment?: string } {
   if (!url) {
     return { baseUrl: url, mergedParams: queryParams };
   }
@@ -65,7 +65,7 @@ export function normalizeUrlAndParams(
     ? { ...embeddedParams, ...queryParams }
     : queryParams;
 
-  return { baseUrl, mergedParams };
+  return { baseUrl, mergedParams, fragment };
 }
 
 export class DataLoaderQueryKeyGenerator {

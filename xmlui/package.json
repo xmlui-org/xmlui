@@ -21,6 +21,7 @@
     "generate-all-docs": "npm run build:xmlui-metadata && npm run generate-docs && npm run generate-docs-summaries",
     "export-themes": "npm run build:xmlui-metadata && node scripts/generate-docs/create-theme-files.mjs",
     "generate-docs-with-refresh": "npm run build:xmlui-metadata && npm run generate-docs && npm run generate-docs-summaries",
+    "generate-context-vars-summary": "npm run build:xmlui-metadata && node scripts/generate-docs/generate-context-vars-summary.mjs",
     "gen:langserver-metadata": "node scripts/get-langserver-metadata.js > src/language-server/xmlui-metadata-generated.js"
   },
   "dependencies": {
