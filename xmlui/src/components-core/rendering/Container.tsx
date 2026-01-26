@@ -402,6 +402,17 @@ export const Container = memo(
         // Track handler start time for duration calculation
         const handlerStartPerfTs = typeof performance !== "undefined" ? performance.now() : undefined;
 
+        // Look up source info for handler logging
+        const keyPart = options?.componentId || `${componentType || "unknown"}:${componentLabel || ""}`;
+        const sourceKey = `${keyPart};${options?.eventName || "unknown"}`;
+        const storedSourceInfo = typeof window !== "undefined"
+          ? (window as any)._xsHandlerSourceInfo?.[sourceKey]
+          : undefined;
+        const handlerFileId = options?.sourceFileId ?? storedSourceInfo?.fileId ?? (node as any)?.debug?.source?.fileId;
+        const handlerSourceRange = options?.sourceRange ?? storedSourceInfo?.range ?? ((node as any)?.debug?.source
+          ? { start: (node as any).debug.source.start, end: (node as any).debug.source.end }
+          : undefined);
+
         try {
           if (xsVerbose) {
             xsLog("handler:start", {
@@ -410,6 +421,8 @@ export const Container = memo(
               componentType,
               componentLabel,
               args: eventArgs,
+              ownerFileId: handlerFileId,
+              ownerSource: handlerSourceRange,
             });
           }
           // --- Prepare the event handler to an arrow expression statement
@@ -582,6 +595,8 @@ export const Container = memo(
               componentLabel,
               returnValue,
               duration: handlerDuration,
+              ownerFileId: handlerFileId,
+              ownerSource: handlerSourceRange,
             });
           }
 
