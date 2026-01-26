@@ -249,7 +249,7 @@ async function updateQueriesWithOptimisticValue({
     clientTxId,
     stateContext,
     extractParam(stateContext, optimisticValue, appContext),
-    lookupAction(getOptimisticValue, uid),
+    lookupAction(getOptimisticValue, uid, { eventName: "getOptimisticValue" }),
   );
 
   await doOptimisticUpdate(optimisticValuesByQueryKeys, queryClient);
@@ -332,7 +332,7 @@ export async function callApi(
   const resolvedInvalidates = extractParam(stateContext, invalidates, appContext);
 
   const clientTxId = randomUUID();
-  const beforeRequestFn = lookupAction(onBeforeRequest, uid);
+  const beforeRequestFn = lookupAction(onBeforeRequest, uid, { eventName: "beforeRequest" });
   const beforeRequestResult = await beforeRequestFn?.();
   if (typeof beforeRequestResult === "boolean" && beforeRequestResult === false) {
     return;

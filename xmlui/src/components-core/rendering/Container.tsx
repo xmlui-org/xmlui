@@ -768,7 +768,7 @@ export const Container = memo(
       const api: Record<string, any> = {};
       const self = Symbol("$self");
       Object.entries(node.api).forEach(([key, value]) => {
-        api[key] = lookupAction(value as string, self);
+        api[key] = lookupAction(value as string, self, { eventName: key });
       });
       if (!isImplicit) {
         registerComponentApi(self, api); //we register the api as $self for the compound components,
