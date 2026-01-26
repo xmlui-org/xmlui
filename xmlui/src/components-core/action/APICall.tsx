@@ -3,6 +3,28 @@ import type { QueryClient, QueryKey } from "@tanstack/react-query";
 import { createDraft, finishDraft } from "immer";
 
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
+
+// --- Tracing helper for API calls
+function traceApiCall(
+  kind: "api:start" | "api:complete" | "api:error",
+  url: string,
+  method: string,
+  details?: Record<string, any>,
+) {
+  if (typeof window === "undefined") return;
+  const w = window as any;
+  if (!w._xsLogs) return; // Tracing not enabled
+  w._xsLogs = Array.isArray(w._xsLogs) ? w._xsLogs : [];
+  w._xsLogs.push({
+    ts: Date.now(),
+    perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+    traceId: w._xsCurrentTrace,
+    kind,
+    url,
+    method,
+    ...details,
+  });
+}
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import type { ActionExecutionContext, LookupAsyncFnInner } from "../../abstractions/ActionDefs";
 import { invalidateQueries } from "../utils/actionUtils";
@@ -336,6 +358,11 @@ export async function callApi(
   if (inProgressMessage) {
     loadingToastId = toast.loading(inProgressMessage);
   }
+
+  // Resolve the URL for tracing (handle binding expressions)
+  const resolvedUrl = extractParam(stateContext, url, appContext);
+  const resolvedMethod = method || "GET";
+
   try {
     const operation: ApiOperationDef = {
       headers,
@@ -350,6 +377,12 @@ export async function callApi(
     const _onProgress = lookupAction(onProgress, uid, {
       eventName: "progress",
     });
+
+    // Trace API call start
+    traceApiCall("api:start", resolvedUrl, resolvedMethod, {
+      transactionId: clientTxId,
+    });
+
     const result = await new RestApiProxy(appContext, apiInstance).execute({
       operation,
       params: stateContext,
@@ -358,6 +391,11 @@ export async function callApi(
       onProgress: _onProgress,
     });
     console.log("API call result:", result);
+
+    // Trace API call completion
+    traceApiCall("api:complete", resolvedUrl, resolvedMethod, {
+      transactionId: clientTxId,
+    });
 
     const onSuccessFn = lookupAction(onSuccess, uid, {
       eventName: "success",
@@ -390,6 +428,12 @@ export async function callApi(
     }
     return result;
   } catch (e: any) {
+    // Trace API call error
+    traceApiCall("api:error", resolvedUrl, resolvedMethod, {
+      transactionId: clientTxId,
+      error: e?.message || String(e),
+    });
+
     if (optimisticValuesByQueryKeys.size) {
       await appContext.queryClient!.invalidateQueries();
     }
