@@ -277,6 +277,10 @@ export const Container = memo(
                       .join("\n\n"))) ||
                 undefined,
               diffJson: args && args[1] && Array.isArray(args[1].diff) ? args[1].diff : undefined,
+              error: args && args[1] && args[1].error ? {
+                message: args[1].error.message || String(args[1].error),
+                stack: args[1].error.stack,
+              } : undefined,
             });
           }
           if (xsLogBucket && appContext.AppState) {

@@ -47,12 +47,29 @@ export class ErrorBoundary extends React.Component<Props, State> {
   }
 
   /**
-   * Display any error in the console
+   * Display any error in the console and trace it
    * @param error Error object
    * @param errorInfo Extra information about the error
    */
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("Uncaught error:", error, errorInfo, this.props.location);
+
+    // Trace the error if tracing is enabled
+    if (typeof window !== "undefined") {
+      const w = window as any;
+      if (Array.isArray(w._xsLogs)) {
+        w._xsLogs.push({
+          ts: Date.now(),
+          perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+          traceId: w._xsCurrentTrace,
+          kind: "error:boundary",
+          error: error.message,
+          stack: error.stack,
+          componentStack: errorInfo.componentStack,
+          location: this.props.location,
+        });
+      }
+    }
   }
 
   /**
