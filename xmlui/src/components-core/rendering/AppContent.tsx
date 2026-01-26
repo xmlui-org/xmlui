@@ -378,8 +378,8 @@ export function AppContent({
   // --- app-wide state using buckets (state sections).
   const [appState, setAppState] = useState<Record<string, Record<string, any>>>(EMPTY_OBJECT);
 
-  const xsVerbose = appGlobals?.xsVerbose === true;
-  const xsLogMax = Number(appGlobals?.xsVerboseLogMax ?? 200);
+  const xsVerbose = (appGlobals as any)?.xsVerbose === true;
+  const xsLogMax = Number((appGlobals as any)?.xsVerboseLogMax ?? 200);
 
   const update = useCallback(
     (bucket: string, patch: any) => {

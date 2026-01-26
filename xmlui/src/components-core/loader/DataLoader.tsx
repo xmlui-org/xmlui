@@ -104,7 +104,7 @@ function DataLoader({
           perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
           traceId: pendingTraceIdRef.current || w._xsCurrentTrace, // Use captured trace from fetch trigger, or current trace
           instanceId: instanceIdRef.current,
-          dataSourceId: loader?.props?.id,
+          dataSourceId: (loader?.props as any)?.id,
           dataSourceUrl: loader?.props?.url,
           ownerUid: loader?.uid,
           ownerFileId: loader?.debug?.source?.fileId,
@@ -449,7 +449,7 @@ function DataLoader({
       if (xsVerbose) {
         const before = prevDataRef.current;
         const after = data;
-        const dataSourceId = loader.props.id || loader.uid || loader.props.url || "DataSource";
+        const dataSourceId = (loader.props as any).id || loader.uid || loader.props.url || "DataSource";
         const path = `DataSource:${dataSourceId}`;
         xsLog("state:changes", {
           uid: dataSourceId,

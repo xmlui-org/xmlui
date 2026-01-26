@@ -284,6 +284,8 @@ export const Container = memo(
               // Source file info for handler errors
               ownerFileId: args && args[1] ? args[1].ownerFileId : undefined,
               ownerSource: args && args[1] ? args[1].ownerSource : undefined,
+              // Handler duration (for handler:complete)
+              duration: args && args[1] ? args[1].duration : undefined,
             });
           }
           if (xsLogBucket && appContext.AppState) {
@@ -396,6 +398,9 @@ export const Container = memo(
         const uidName = componentUid.description || "";
         const componentType = options?.componentType;
         const componentLabel = options?.componentLabel || options?.componentId || uidName;
+
+        // Track handler start time for duration calculation
+        const handlerStartPerfTs = typeof performance !== "undefined" ? performance.now() : undefined;
 
         try {
           if (xsVerbose) {
@@ -561,19 +566,27 @@ export const Container = memo(
             });
           }
 
+          // Log handler completion with duration (always, regardless of return value)
+          if (xsVerbose) {
+            const handlerEndPerfTs = typeof performance !== "undefined" ? performance.now() : undefined;
+            const handlerDuration = handlerStartPerfTs !== undefined && handlerEndPerfTs !== undefined
+              ? handlerEndPerfTs - handlerStartPerfTs
+              : undefined;
+            const returnValue = evalContext.mainThread?.blocks?.length
+              ? evalContext.mainThread.blocks[evalContext.mainThread.blocks.length - 1].returnValue
+              : undefined;
+            xsLog("handler:complete", {
+              uid: uidName,
+              eventName: options?.eventName,
+              componentType,
+              componentLabel,
+              returnValue,
+              duration: handlerDuration,
+            });
+          }
+
           if (evalContext.mainThread?.blocks?.length) {
-            const returnValue =
-              evalContext.mainThread.blocks[evalContext.mainThread.blocks.length - 1].returnValue;
-            if (xsVerbose) {
-              xsLog("handler:complete", {
-                uid: uidName,
-                eventName: options?.eventName,
-                componentType,
-                componentLabel,
-                returnValue,
-              });
-            }
-            return returnValue;
+            return evalContext.mainThread.blocks[evalContext.mainThread.blocks.length - 1].returnValue;
           }
         } catch (e) {
           if (xsVerbose) {
