@@ -4,7 +4,6 @@ import { expect, test } from "../../testing/fixtures";
 import {
   apiStyleData,
   apiStyleHierarchy,
-  customDynamicTreeData,
   customFieldsData1,
   customFieldsData2,
   customFieldsHierarchy1,
@@ -14,8 +13,6 @@ import {
   databaseStyleData,
   databaseStyleHierarchy,
   dataWithStateIcons,
-  dynamicFlatData,
-  dynamicTreeData,
   flatDataWithIcons,
   flatTreeData,
   hierarchyDataWithIcons,
@@ -2847,7 +2844,7 @@ test.describe("Events", () => {
                 dataFormat="flat"
                 defaultExpanded="all"
                 data='{${JSON.stringify(flatTreeData)}}'
-                onSelectionDidChange="event => {selectionEvents.push({prev: event.previousNode?.id || null, new: event.newNode?.id || null});}"
+                onSelectionDidChange="event => {selectionEvents.push({prev: event.previousNode?.id || null, next: event.newNode?.id || null});}"
               >
                 <property name="itemTemplate">
                   <HStack testId="{$item.id}">
@@ -2874,7 +2871,7 @@ test.describe("Events", () => {
         const eventsText = page.getByTestId("eventsText");
 
         // Verify we have both selection events with correct previous/new node IDs
-        await expect(eventsText).toHaveText('[{"prev":null,"new":1},{"prev":1,"new":2}]');
+        await expect(eventsText).toHaveText('[{"prev":null,"next":1},{"prev":1,"next":2}]');
       });
 
       test("fires when clearSelection() API method is called", async ({
