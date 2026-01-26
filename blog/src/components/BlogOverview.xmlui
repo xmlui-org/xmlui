@@ -1,8 +1,8 @@
 <Component name="BlogOverview">
   <List
     data="{
-    $props.posts.sort(function(a, b) {
-      return new Date(b.date) - new Date(a.date);
+    $props.posts.toSorted(function(a, b) {
+      return Date.parse(b.date) - Date.parse(a.date);
     })
   }">
     <VStack

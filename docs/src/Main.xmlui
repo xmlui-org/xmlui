@@ -578,15 +578,6 @@
                 content="{appGlobals.content['pages/tutorial-12.md']}"
             />
         </Page>
-        <Page url="/blog">
-            <BlogOverview posts="{posts}" />
-        </Page>
-        <Page url="/blog/{posts[0].slug}">
-            <BlogPage post="{posts[0]}" />
-        </Page>
-        <Page url="/blog/{posts[1].slug}">
-            <BlogPage post="{posts[1]}" />
-        </Page>
         <Page url="/app-structure">
             <DocumentPageNoTOC
                 content="{appGlobals.content['pages/app-structure.md']}"
