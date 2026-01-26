@@ -65,7 +65,7 @@ export function normalizeUrlAndParams(
     ? { ...embeddedParams, ...queryParams }
     : queryParams;
 
-  return { baseUrl, mergedParams, fragment };
+  return { baseUrl, mergedParams };
 }
 
 export class DataLoaderQueryKeyGenerator {
