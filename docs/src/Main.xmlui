@@ -667,6 +667,11 @@
                 content="{appGlobals.content['pages/context-variables.md']}"
             />
         </Page>
+        <Page url="/context-variables2">
+            <DocumentPage
+                content="{appGlobals.content['pages/context-variables2.md']}"
+            />
+        </Page>
         <Page url="/globals">
             <DocumentPage content="{appGlobals.content['pages/globals.md']}" />
         </Page>

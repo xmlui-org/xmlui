@@ -34,6 +34,11 @@
     "mv": true,
     "git checkout": true,
     "git add": true,
-    "git commit": true
+    "git commit": true,
+    "npm run build:xmlui-metadata": true,
+    "/^node scripts/generate-docs/generate-context-vars-summary\\.mjs$/": {
+      "approve": true,
+      "matchCommandLine": true
+    }
   }
 }
