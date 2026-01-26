@@ -285,13 +285,16 @@ export const StateContainer = memo(
 
     // Track declared variable changes for inspector
     const prevVarsRef = useRef<Record<string, any> | null>(null);
+    const initLoggedWithFileRef = useRef<boolean>(false); // Track if we've logged init with file info
+    const pendingInitRef = useRef<Record<string, any> | null>(null); // Store pending init values
     useEffect(() => {
       if (!xsVerbose || typeof window === "undefined") return;
 
       const w = window as any;
       w._xsLogs = Array.isArray(w._xsLogs) ? w._xsLogs : [];
 
-      const sourceInfo = (node as any).debug?.source;
+      // Check both direct debug property and props.debug (the former is set by parser, latter by wrappers)
+      const sourceInfo = (node as any).debug?.source || (node.props as any)?.debug?.source;
 
       // Try to find the source file from debug info or by matching component name
       let resolvedFileId = sourceInfo?.fileId;
@@ -306,12 +309,33 @@ export const StateContainer = memo(
 
       // If no file found yet, try to match based on component uid or containerUid
       if (!resolvedFilePath && w._xsSourceFiles && Array.isArray(w._xsSourceFiles)) {
-        const searchName = node.uid || node.containerUid?.description;
+        const containerUidStr = node.containerUid?.description;
+        const searchName = node.uid || containerUidStr;
+        // Also try the node type if it's not "Container"
+        const typeName = node.type !== "Container" ? node.type : undefined;
+
+        // Build search terms with variations
+        const searchTerms: string[] = [];
         if (searchName) {
-          // Look for a file that contains this component name
-          resolvedFilePath = w._xsSourceFiles.find((f: string) =>
-            f.toLowerCase().includes(searchName.toLowerCase().replace(/\s+/g, ""))
-          );
+          searchTerms.push(searchName);
+          // For containerUid like "fileCatalogContent", also try "fileCatalog" (remove common suffixes)
+          const stripped = searchName.replace(/(Content|Modal|View|Container|Panel)$/i, "");
+          if (stripped !== searchName) searchTerms.push(stripped);
+        }
+        if (typeName) searchTerms.push(typeName);
+
+        for (const term of searchTerms) {
+          if (!term) continue;
+          const termLower = term.toLowerCase();
+          // Look for a file that contains this component name (case-insensitive)
+          resolvedFilePath = w._xsSourceFiles.find((f: string) => {
+            const fLower = f.toLowerCase();
+            // Extract just the filename without path and extension
+            const fileName = fLower.split("/").pop()?.replace(".xmlui", "") || "";
+            // Match if filename contains term, or term contains filename
+            return fileName.includes(termLower) || termLower.includes(fileName);
+          });
+          if (resolvedFilePath) break;
         }
       }
 
@@ -336,6 +360,7 @@ export const StateContainer = memo(
         return;
       }
 
+
       const currentVars: Record<string, any> = {};
       for (const key of declaredVarKeys) {
         currentVars[key] = resolvedLocalVars[key];
@@ -343,11 +368,19 @@ export const StateContainer = memo(
 
       const prevVars = prevVarsRef.current;
       const isInitial = prevVars === null;
+      const hasSourceFiles = w._xsSourceFiles && Array.isArray(w._xsSourceFiles) && w._xsSourceFiles.length > 0;
 
       const changes: Array<{ key: string; before: any; after: any; kind: "init" | "change" }> = [];
 
       if (isInitial) {
-        // Initial mount - capture all declared vars
+        // Initial mount - if source files aren't available yet, defer the init logging
+        if (!hasSourceFiles) {
+          // Store the init values to log later when source files become available
+          pendingInitRef.current = cloneDeep(currentVars);
+          prevVarsRef.current = cloneDeep(currentVars);
+          return; // Don't log yet, wait for source files
+        }
+        // Source files available - capture all declared vars for init
         for (const key of declaredVarKeys) {
           changes.push({
             key,
@@ -357,6 +390,56 @@ export const StateContainer = memo(
           });
         }
       } else {
+        // Check if we have a pending init to log now that source files are available
+        if (pendingInitRef.current && !initLoggedWithFileRef.current && hasSourceFiles) {
+          // Log the deferred init event with file info
+          const initChanges: typeof changes = [];
+          for (const key of declaredVarKeys) {
+            initChanges.push({
+              key,
+              before: undefined,
+              after: pendingInitRef.current[key],
+              kind: "init",
+            });
+          }
+          if (initChanges.length > 0) {
+            // Log the init event (will be handled below after we set up the logging logic)
+            const initVarNames = initChanges.map((c) => c.key).join(", ");
+            const initDisplayId = componentId || initChanges[0]?.key || "component";
+            const stringify = (value: any) => {
+              if (value === undefined) return "undefined";
+              try { return JSON.stringify(value, null, 2); } catch { return String(value); }
+            };
+            const initFormattedChanges = initChanges.map((c) => {
+              return `${c.key}: ${stringify(c.before)} → ${stringify(c.after)}`;
+            });
+            const initLogEntry = {
+              ts: Date.now(),
+              perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+              traceId: getCurrentTrace() || `vars-${initDisplayId}`,
+              kind: "component:vars:init",
+              uid: initDisplayId,
+              eventName: initVarNames,
+              componentType: node.type,
+              componentLabel: componentId || undefined,
+              ownerFileId: resolvedFilePath || sourceInfo?.fileId,
+              ownerSource: sourceInfo ? { start: sourceInfo.start, end: sourceInfo.end } : undefined,
+              file: resolvedFilePath,
+              changes: initChanges.map((c) => ({ key: c.key, before: c.before, after: c.after, changeKind: c.kind })),
+              diff: initChanges.map((c) => ({
+                path: c.key, type: "add", before: c.before, after: c.after,
+                beforeJson: stringify(c.before), afterJson: stringify(c.after),
+                diffPretty: `${c.key}: ${stringify(c.before)} → ${stringify(c.after)}`,
+              })),
+              diffPretty: (resolvedFilePath ? `file: ${resolvedFilePath}\n` : "") + initFormattedChanges.join("\n"),
+            };
+            w._xsLogs.push(initLogEntry);
+            loggerService.log(["[xs]", initLogEntry.kind, initLogEntry]);
+          }
+          initLoggedWithFileRef.current = true;
+          pendingInitRef.current = null;
+        }
+
         // Check for changes
         for (const key of declaredVarKeys) {
           const prev = prevVars[key];
