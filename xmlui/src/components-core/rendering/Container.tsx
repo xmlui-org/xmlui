@@ -423,6 +423,7 @@ export const Container = memo(
               args: eventArgs,
               ownerFileId: handlerFileId,
               ownerSource: handlerSourceRange,
+              handlerCode: typeof source === "string" ? source : undefined,
             });
           }
           // --- Prepare the event handler to an arrow expression statement
@@ -597,6 +598,7 @@ export const Container = memo(
               duration: handlerDuration,
               ownerFileId: handlerFileId,
               ownerSource: handlerSourceRange,
+              handlerCode: typeof source === "string" ? source : undefined,
             });
           }
 
