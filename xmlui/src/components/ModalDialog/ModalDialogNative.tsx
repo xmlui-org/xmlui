@@ -215,7 +215,7 @@ export const ModalDialog = React.forwardRef(
       return null;
     }
 
-    const Content = (
+    const Content = isOpen ? (
       <Part partId={PART_CONTENT}>
         <Dialog.Content
           {...rest}
@@ -267,7 +267,7 @@ export const ModalDialog = React.forwardRef(
           )}
         </Dialog.Content>
       </Part>
-    );
+    ) : null;
 
     return (
       <Dialog.Root open={isOpen} onOpenChange={(open) => (open ? doOpen() : doClose())}>
