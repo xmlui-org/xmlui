@@ -147,27 +147,4 @@ describe("RestApiProxy.resolveUrl", () => {
       "https://api.example/Search?filter=%7B%22name%22%3A%22John%22%2C%22age%22%3A30%7D"
     );
   });
-
-  it("preserves URL fragments when present", () => {
-    const proxy = createProxy();
-
-    const url = proxy.resolveUrl({
-      operation: { url: "/Page?section=intro#details" } as any,
-    });
-
-    expect(url).toBe("https://api.example/Page?section=intro#details");
-  });
-
-  it("preserves URL fragments with explicit query params", () => {
-    const proxy = createProxy();
-
-    const url = proxy.resolveUrl({
-      operation: {
-        url: "/Page#details",
-        queryParams: { section: "intro", page: 1 },
-      } as any,
-    });
-
-    expect(url).toBe("https://api.example/Page?section=intro&page=1#details");
-  });
 });

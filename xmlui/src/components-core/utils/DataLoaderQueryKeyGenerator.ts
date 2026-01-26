@@ -13,8 +13,6 @@ type DataLoaderQueryKey = [UrlKeyPart, UrlQueryParamsPart?];
  * the base URL and merged query parameters separately.
  * This ensures consistent cache keys regardless of whether query params are
  * provided via the queryParams prop or embedded in the URL string.
- *
- * Fixes issue #2672: https://github.com/xmlui-org/xmlui/issues/2672
  */
 export function normalizeUrlAndParams(
   url: string,
@@ -24,12 +22,11 @@ export function normalizeUrlAndParams(
     return { baseUrl: url, mergedParams: queryParams };
   }
 
-  // Extract fragment first (if present)
-  let fragment: string | undefined;
+  // Remove any URL fragment (hash) because fragments are not sent to the backend
+  // and should not affect API request normalization.
   let urlWithoutFragment = url;
   const fragmentIndex = url.indexOf('#');
   if (fragmentIndex !== -1) {
-    fragment = url.substring(fragmentIndex);
     urlWithoutFragment = url.substring(0, fragmentIndex);
   }
 
@@ -37,7 +34,7 @@ export function normalizeUrlAndParams(
   const queryIndex = urlWithoutFragment.indexOf('?');
   if (queryIndex === -1) {
     // No embedded query params, return as-is
-    return { baseUrl: urlWithoutFragment, mergedParams: queryParams, fragment };
+    return { baseUrl: urlWithoutFragment, mergedParams: queryParams };
   }
 
   // Split URL into base and query string
