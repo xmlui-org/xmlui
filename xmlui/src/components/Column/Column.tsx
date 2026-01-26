@@ -1,3 +1,4 @@
+import type React from "react";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { createMetadata } from "../metadata-helpers";
 import { Column, defaultProps } from "./ColumnNative";
@@ -96,9 +97,39 @@ export const columnComponentRenderer = createComponentRenderer(
     const { node, renderChild, extractValue, className, appContext } = rendererContext;
     // Allow config.json to override the default canSort value via appGlobals.columnCanSortDefault
     const canSortDefault = appContext?.appGlobals?.columnCanSortDefault ?? defaultProps.canSort;
+    
+    // Convert horizontalAlignment and verticalAlignment to CSS properties for table cells
+    // since columns are not flex containers
+    const horizontalAlignment = extractValue.asOptionalString(node.props.horizontalAlignment);
+    const verticalAlignment = extractValue.asOptionalString(node.props.verticalAlignment);
+    
+    const style: React.CSSProperties = {};
+    if (horizontalAlignment) {
+      // Use flexbox to align block-level content
+      style.display = 'flex';
+      style.justifyContent = 
+        horizontalAlignment === 'start' ? 'flex-start' :
+        horizontalAlignment === 'center' ? 'center' :
+        horizontalAlignment === 'end' ? 'flex-end' :
+        horizontalAlignment;
+      style.textAlign = horizontalAlignment as any; // Also set textAlign for text content
+    }
+    if (verticalAlignment) {
+      if (!style.display) {
+        style.display = 'flex';
+      }
+      style.alignItems = 
+        verticalAlignment === 'start' ? 'flex-start' :
+        verticalAlignment === 'center' ? 'center' :
+        verticalAlignment === 'end' ? 'flex-end' :
+        verticalAlignment;
+      style.verticalAlign = verticalAlignment as any; // Also set verticalAlign for fallback
+    }
+    
     return (
       <Column
         className={className}
+        style={Object.keys(style).length > 0 ? style : undefined}
         header={extractValue.asDisplayText(node.props.header)}
         accessorKey={extractValue.asOptionalString(node.props.bindTo)}
         canSort={extractValue.asOptionalBoolean(node.props.canSort, canSortDefault)}

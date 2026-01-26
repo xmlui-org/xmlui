@@ -1937,3 +1937,179 @@ test.describe("Events", () => {
     await expect(output).toHaveText("Context menu triggered");
   });
 });
+
+// =============================================================================
+// COLUMN ALIGNMENT TESTS
+// =============================================================================
+
+test.describe("Column Alignment", () => {
+  test.describe("horizontalAlignment property", () => {
+    test("aligns column content to the end", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table">
+          <Column bindTo="name" header="Name"/>
+          <Column bindTo="quantity" header="Quantity" horizontalAlignment="end"/>
+        </Table>
+      `);
+      
+      // Get the second column cells (quantity column)
+      const quantityCells = page.locator("td:nth-child(2)");
+      const firstCell = quantityCells.first();
+      
+      // Verify the cell has flex display and justify-content: flex-end
+      await expect(firstCell).toHaveCSS("display", "flex");
+      await expect(firstCell).toHaveCSS("justify-content", "flex-end");
+      await expect(firstCell).toHaveCSS("text-align", "end");
+    });
+
+    test("aligns column content to the center", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table">
+          <Column bindTo="name" header="Name"/>
+          <Column bindTo="quantity" header="Quantity" horizontalAlignment="center"/>
+        </Table>
+      `);
+      
+      const quantityCells = page.locator("td:nth-child(2)");
+      const firstCell = quantityCells.first();
+      
+      await expect(firstCell).toHaveCSS("display", "flex");
+      await expect(firstCell).toHaveCSS("justify-content", "center");
+      await expect(firstCell).toHaveCSS("text-align", "center");
+    });
+
+    test("aligns column content to the start", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table">
+          <Column bindTo="name" header="Name"/>
+          <Column bindTo="quantity" header="Quantity" horizontalAlignment="start"/>
+        </Table>
+      `);
+      
+      const quantityCells = page.locator("td:nth-child(2)");
+      const firstCell = quantityCells.first();
+      
+      await expect(firstCell).toHaveCSS("display", "flex");
+      await expect(firstCell).toHaveCSS("justify-content", "flex-start");
+      await expect(firstCell).toHaveCSS("text-align", "start");
+    });
+
+    test("works with other layout properties like backgroundColor", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table">
+          <Column bindTo="name" header="Name"/>
+          <Column bindTo="quantity" header="Quantity" horizontalAlignment="end" backgroundColor="lightyellow"/>
+        </Table>
+      `);
+      
+      const quantityCells = page.locator("td:nth-child(2)");
+      const firstCell = quantityCells.first();
+      
+      // Verify alignment
+      await expect(firstCell).toHaveCSS("justify-content", "flex-end");
+      // Verify background color is applied
+      await expect(firstCell).toHaveCSS("background-color", "rgb(255, 255, 224)"); // lightyellow
+    });
+
+    test("applies to all rows in the column", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table">
+          <Column bindTo="name" header="Name"/>
+          <Column bindTo="quantity" header="Quantity" horizontalAlignment="end"/>
+        </Table>
+      `);
+      
+      const quantityCells = page.locator("td:nth-child(2)");
+      const cellCount = await quantityCells.count();
+      
+      // Verify all cells in the column have the alignment
+      for (let i = 0; i < cellCount; i++) {
+        const cell = quantityCells.nth(i);
+        await expect(cell).toHaveCSS("justify-content", "flex-end");
+      }
+    });
+  });
+
+  test.describe("verticalAlignment property", () => {
+    test("aligns column content to the top", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table">
+          <Column bindTo="name" header="Name"/>
+          <Column bindTo="quantity" header="Quantity" verticalAlignment="start"/>
+        </Table>
+      `);
+      
+      const quantityCells = page.locator("td:nth-child(2)");
+      const firstCell = quantityCells.first();
+      
+      await expect(firstCell).toHaveCSS("display", "flex");
+      await expect(firstCell).toHaveCSS("align-items", "flex-start");
+    });
+
+    test("aligns column content to the center", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table">
+          <Column bindTo="name" header="Name"/>
+          <Column bindTo="quantity" header="Quantity" verticalAlignment="center"/>
+        </Table>
+      `);
+      
+      const quantityCells = page.locator("td:nth-child(2)");
+      const firstCell = quantityCells.first();
+      
+      await expect(firstCell).toHaveCSS("display", "flex");
+      await expect(firstCell).toHaveCSS("align-items", "center");
+    });
+
+    test("aligns column content to the bottom", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table">
+          <Column bindTo="name" header="Name"/>
+          <Column bindTo="quantity" header="Quantity" verticalAlignment="end"/>
+        </Table>
+      `);
+      
+      const quantityCells = page.locator("td:nth-child(2)");
+      const firstCell = quantityCells.first();
+      
+      await expect(firstCell).toHaveCSS("display", "flex");
+      await expect(firstCell).toHaveCSS("align-items", "flex-end");
+    });
+  });
+
+  test.describe("combined horizontal and vertical alignment", () => {
+    test("applies both horizontal and vertical alignment", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table">
+          <Column bindTo="name" header="Name"/>
+          <Column bindTo="quantity" header="Quantity" horizontalAlignment="end" verticalAlignment="center"/>
+        </Table>
+      `);
+      
+      const quantityCells = page.locator("td:nth-child(2)");
+      const firstCell = quantityCells.first();
+      
+      await expect(firstCell).toHaveCSS("display", "flex");
+      await expect(firstCell).toHaveCSS("justify-content", "flex-end");
+      await expect(firstCell).toHaveCSS("align-items", "center");
+    });
+
+    test("different columns can have different alignments", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table">
+          <Column bindTo="name" header="Name" horizontalAlignment="start"/>
+          <Column bindTo="quantity" header="Quantity" horizontalAlignment="end"/>
+          <Column bindTo="category" header="Category" horizontalAlignment="center"/>
+        </Table>
+      `);
+      
+      const nameCell = page.locator("td:nth-child(1)").first();
+      const quantityCell = page.locator("td:nth-child(2)").first();
+      const categoryCell = page.locator("td:nth-child(3)").first();
+      
+      await expect(nameCell).toHaveCSS("justify-content", "flex-start");
+      await expect(quantityCell).toHaveCSS("justify-content", "flex-end");
+      await expect(categoryCell).toHaveCSS("justify-content", "center");
+    });
+  });
+});
