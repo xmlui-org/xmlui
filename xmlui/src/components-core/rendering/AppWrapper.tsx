@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
-import React from "react";
-import { BrowserRouter, HashRouter, MemoryRouter, ScrollRestoration } from "react-router-dom";
+import { BrowserRouter, HashRouter, MemoryRouter, useInRouterContext } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 
@@ -175,25 +174,31 @@ export const AppWrapper = ({
   );
 
   // --- Select the router type for the app
-  const Router = previewMode ? MemoryRouter : useHashBasedRouting ? HashRouter : BrowserRouter;
+  let Router = previewMode ? MemoryRouter : useHashBasedRouting ? HashRouter : BrowserRouter;
 
-  const shouldSkipClientRouter = previewMode
-    ? false
-    : typeof window === "undefined" || process.env.VITE_REMIX;
+  const alreadyInRouterContext = useInRouterContext();
+
+  // --- We should create a router if we are explicitly in preview mode (isolated)
+  // --- OR if we are NOT in an existing router context.
+  const shouldCreateRouter = previewMode || !alreadyInRouterContext;
+
+  // --- SSR Fallback: If we need to create a router but are on the server (no window),
+  // --- BrowserRouter/HashRouter will fail. We must fallback to MemoryRouter to prevent crashes.
+  if (shouldCreateRouter && typeof window === "undefined") {
+    Router = MemoryRouter;
+  }
 
   return (
-      <ErrorBoundary node={node} location={"root-outer"}>
-        <QueryClientProvider client={queryClient}>
-          {/* No router in the REMIX environment */}
-          {!!shouldSkipClientRouter && dynamicChildren}
+    <ErrorBoundary node={node} location={"root-outer"}>
+      <QueryClientProvider client={queryClient}>
+        {/* If we have an existing router, render children directly */}
+        {!shouldCreateRouter && dynamicChildren}
 
-          {/* Wrap the app in a router in other cases */}
-          {!shouldSkipClientRouter && (
-            <Router basename={Router === HashRouter ? undefined : baseName}>
-              {dynamicChildren}
-            </Router>
-          )}
-        </QueryClientProvider>
-      </ErrorBoundary>
+        {/* Otherwise create our own router */}
+        {shouldCreateRouter && (
+          <Router basename={Router === HashRouter ? undefined : baseName}>{dynamicChildren}</Router>
+        )}
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
