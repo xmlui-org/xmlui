@@ -7,6 +7,65 @@
 - **Layout control**: Set width using pixels, star sizing (`*`, `2*`), or proportional values
 - **Column pinning**: Pin columns to left or right edges for sticky behavior
 
+You can pass layout properties to a Column:
+
+```xmlui copy {6,7}
+<App>
+  <Table data='{[...]}'>
+    <Column bindTo="name" />
+    <Column
+      bindTo="quantity"
+      horizontalAlignment="right"
+      backgroundColor="lightyellow"
+    />
+    <Column bindTo="unit" />
+  </Table>
+</App>
+```
+
+```xmlui-pg copy name="Example: Layout properties in Column"
+<App>
+  <Table
+    data='{[
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  ]}'
+    rowsSelectable="true"
+    checkboxTolerance="comfortable"
+  >
+    <Column bindTo="name" />
+    <Column
+      bindTo="quantity"
+      horizontalAlignment="right"
+      backgroundColor="lightyellow"
+    />
+    <Column bindTo="unit" />
+  </Table>
+</App>
+```
+
 %-DESC-END
 
 %-PROP-START bindTo
