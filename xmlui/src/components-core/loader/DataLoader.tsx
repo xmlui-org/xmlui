@@ -106,6 +106,7 @@ function DataLoader({
           instanceId: instanceIdRef.current,
           dataSourceId: (loader?.props as any)?.id,
           dataSourceUrl: loader?.props?.url,
+          dataSourceBody: loader?.props?.body,
           ownerUid: loader?.uid,
           ownerFileId: loader?.debug?.source?.fileId,
           ownerSource: loader?.debug?.source
