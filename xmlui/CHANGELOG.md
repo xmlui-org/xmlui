@@ -1,5 +1,18 @@
 # xmlui
 
+## 0.11.31
+
+### Patch Changes
+
+- 796793b: Migrate Table to virtua (from @tanstack/react-virtual)
+- 307611c: Experiment with deferred APICall
+- c05a6dd: Parse async/await in scripts but raise error when executing
+- 00f087d: Allow Column to use layout properties
+- 10c1fa5: Parse new operator but raise error when executing
+- 78716f4: Experimental generation of context variables
+- 33c99cd: Fix <li> issue with Markdown in Firefox
+- e11595e: Fix the inconsistent URL encoding between url and queryParams
+
 ## 0.11.30
 
 ### Patch Changes
