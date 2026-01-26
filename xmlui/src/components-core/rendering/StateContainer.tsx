@@ -380,27 +380,33 @@ export const StateContainer = memo(
           prevVarsRef.current = cloneDeep(currentVars);
           return; // Don't log yet, wait for source files
         }
-        // Source files available - capture all declared vars for init
+        // Source files available - capture all declared vars for init (skip undefined → undefined)
         for (const key of declaredVarKeys) {
-          changes.push({
-            key,
-            before: undefined,
-            after: currentVars[key],
-            kind: "init",
-          });
+          const afterVal = currentVars[key];
+          if (afterVal !== undefined) {
+            changes.push({
+              key,
+              before: undefined,
+              after: afterVal,
+              kind: "init",
+            });
+          }
         }
       } else {
         // Check if we have a pending init to log now that source files are available
         if (pendingInitRef.current && !initLoggedWithFileRef.current && hasSourceFiles) {
-          // Log the deferred init event with file info
+          // Log the deferred init event with file info (skip undefined → undefined)
           const initChanges: typeof changes = [];
           for (const key of declaredVarKeys) {
-            initChanges.push({
-              key,
-              before: undefined,
-              after: pendingInitRef.current[key],
-              kind: "init",
-            });
+            const afterVal = pendingInitRef.current[key];
+            if (afterVal !== undefined) {
+              initChanges.push({
+                key,
+                before: undefined,
+                after: afterVal,
+                kind: "init",
+              });
+            }
           }
           if (initChanges.length > 0) {
             // Log the init event (will be handled below after we set up the logging logic)
