@@ -362,6 +362,13 @@ export async function callApi(
   // Resolve the URL for tracing (handle binding expressions)
   const resolvedUrl = extractParam(stateContext, url, appContext);
   const resolvedMethod = method || "GET";
+  // Resolve body for tracing - try rawBody first, then body
+  let resolvedBody: any = undefined;
+  if (rawBody) {
+    resolvedBody = extractParam(stateContext, rawBody, appContext);
+  } else if (body) {
+    resolvedBody = extractParam(stateContext, body, appContext);
+  }
 
   try {
     const operation: ApiOperationDef = {
@@ -381,6 +388,7 @@ export async function callApi(
     // Trace API call start
     traceApiCall("api:start", resolvedUrl, resolvedMethod, {
       transactionId: clientTxId,
+      body: resolvedBody,
     });
 
     const result = await new RestApiProxy(appContext, apiInstance).execute({
@@ -395,6 +403,7 @@ export async function callApi(
     // Trace API call completion
     traceApiCall("api:complete", resolvedUrl, resolvedMethod, {
       transactionId: clientTxId,
+      body: resolvedBody,
     });
 
     const onSuccessFn = lookupAction(onSuccess, uid, {
@@ -431,6 +440,7 @@ export async function callApi(
     // Trace API call error
     traceApiCall("api:error", resolvedUrl, resolvedMethod, {
       transactionId: clientTxId,
+      body: resolvedBody,
       error: e?.message || String(e),
     });
 
