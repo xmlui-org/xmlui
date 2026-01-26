@@ -487,6 +487,11 @@ export function evalArrow(
   expr: ArrowExpression,
   thread: LogicalThread,
 ): ArrowExpression {
+  // --- Check if this is an async arrow function
+  if (expr.async) {
+    throw new Error("XMLUI does not support async arrow functions.");
+  }
+  
   const lazyArrow = {
     ...expr,
     _ARROW_EXPR_: true,

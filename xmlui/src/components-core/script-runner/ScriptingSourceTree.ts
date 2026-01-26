@@ -48,6 +48,7 @@ export const {
   T_TRY_STATEMENT,
   T_SWITCH_STATEMENT,
   T_FUNCTION_DECLARATION,
+  T_ASYNC_FUNCTION_DECLARATION,
   
   // Expression node type values
   T_UNARY_EXPRESSION,
@@ -69,6 +70,7 @@ export const {
   T_PREFIX_OP_EXPRESSION,
   T_POSTFIX_OP_EXPRESSION,
   T_REACTIVE_VAR_DECLARATION,
+  T_AWAIT_EXPRESSION,
   
   // Other node type values
   T_VAR_DECLARATION,
@@ -99,6 +101,7 @@ type THROW_STATEMENT = typeof T_THROW_STATEMENT;
 type TRY_STATEMENT = typeof T_TRY_STATEMENT;
 type SWITCH_STATEMENT = typeof T_SWITCH_STATEMENT;
 type FUNCTION_DECLARATION = typeof T_FUNCTION_DECLARATION;
+type ASYNC_FUNCTION_DECLARATION = typeof T_ASYNC_FUNCTION_DECLARATION;
 
 // --- Expression node types
 type UNARY_EXPRESSION = typeof T_UNARY_EXPRESSION;
@@ -120,6 +123,7 @@ type ARROW_EXPRESSION = typeof T_ARROW_EXPRESSION;
 type PREFIX_OP_EXPRESSION = typeof T_PREFIX_OP_EXPRESSION;
 type POSTFIX_OP_EXPRESSION = typeof T_POSTFIX_OP_EXPRESSION;
 type REACTIVE_VAR_DECLARATION = typeof T_REACTIVE_VAR_DECLARATION;
+type AWAIT_EXPRESSION = typeof T_AWAIT_EXPRESSION;
 
 // --- Other node types
 type VAR_DECLARATION = typeof T_VAR_DECLARATION;
@@ -308,10 +312,11 @@ export interface SwitchCase extends ExpressionBase {
 }
 
 export interface FunctionDeclaration extends ScripNodeBase {
-  type: FUNCTION_DECLARATION;
+  type: FUNCTION_DECLARATION | ASYNC_FUNCTION_DECLARATION;
   id: Identifier;
   args: Expression[];
   stmt: BlockStatement;
+  async?: boolean;
 }
 
 // =====================================================================================================================
@@ -338,6 +343,7 @@ export type Expression =
   | PrefixOpExpression
   | PostfixOpExpression
   | ReactiveVarDeclaration
+  | AwaitExpression
   | VarDeclaration
   | Destructure
   | ObjectDestructure
@@ -491,6 +497,7 @@ export interface ArrowExpression extends ExpressionBase {
   name?: string;
   args: Expression[];
   statement: Statement;
+  async?: boolean;
 }
 
 export interface PrefixOpExpression extends ExpressionBase {
@@ -502,6 +509,11 @@ export interface PrefixOpExpression extends ExpressionBase {
 export interface PostfixOpExpression extends ExpressionBase {
   type: POSTFIX_OP_EXPRESSION;
   op: PrefixOpSymbol;
+  expr: Expression;
+}
+
+export interface AwaitExpression extends ExpressionBase {
+  type: AWAIT_EXPRESSION;
   expr: Expression;
 }
 
