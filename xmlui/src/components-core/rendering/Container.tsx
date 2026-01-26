@@ -413,6 +413,11 @@ export const Container = memo(
           ? { start: (node as any).debug.source.start, end: (node as any).debug.source.end }
           : undefined);
 
+        // Extract handler code for logging (works with string, ParsedEventValue, or ArrowExpression)
+        const handlerCode = typeof source === "string"
+          ? source
+          : (source as any)?.source ?? (source as any)?.raw ?? undefined;
+
         try {
           if (xsVerbose) {
             xsLog("handler:start", {
@@ -423,7 +428,7 @@ export const Container = memo(
               args: eventArgs,
               ownerFileId: handlerFileId,
               ownerSource: handlerSourceRange,
-              handlerCode: typeof source === "string" ? source : undefined,
+              handlerCode,
             });
           }
           // --- Prepare the event handler to an arrow expression statement
@@ -598,7 +603,7 @@ export const Container = memo(
               duration: handlerDuration,
               ownerFileId: handlerFileId,
               ownerSource: handlerSourceRange,
-              handlerCode: typeof source === "string" ? source : undefined,
+              handlerCode,
             });
           }
 
