@@ -263,6 +263,13 @@ export const TableMd = createMetadata({
         sortDirection: "The intended sort direction: 'asc' for ascending or 'desc' for descending.",
       },
     },
+    rowDoubleClick: {
+      description: `This event is fired when the user double-clicks a table row. The handler receives the clicked row item as its only argument.`,
+      signature: "rowDoubleClick(item: any): void",
+      parameters: {
+        item: "The clicked table row item.",
+      },
+    },
     selectionDidChange: {
       description:
         `This event is triggered when the table's current selection (the rows selected) changes. ` +
@@ -461,6 +468,7 @@ const TableWithColumns = memo(
             sortingDidChange={lookupEventHandler("sortingDidChange")}
             onSelectionDidChange={lookupEventHandler("selectionDidChange")}
             willSort={lookupEventHandler("willSort")}
+            rowDoubleClick={lookupEventHandler("rowDoubleClick")}
             uid={node.uid}
             autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
             hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
