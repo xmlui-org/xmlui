@@ -277,7 +277,6 @@ export const defaultProps = {
   autoExpandToSelection: true,
   itemClickExpands: false,
   loadedField: "loaded",
-  dynamicField: "dynamic",
   iconCollapsed: "chevronright",
   iconExpanded: "chevrondown",
   iconSize: "16",
@@ -306,7 +305,6 @@ interface TreeComponentProps {
   autoExpandToSelection?: boolean;
   itemClickExpands?: boolean;
   loadedField?: string;
-  dynamicField?: string;
   iconCollapsed?: string;
   iconExpanded?: string;
   iconSize?: string;
@@ -345,7 +343,6 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     autoExpandToSelection = defaultProps.autoExpandToSelection,
     itemClickExpands = defaultProps.itemClickExpands,
     loadedField = defaultProps.loadedField,
-    dynamicField = defaultProps.dynamicField,
     iconCollapsed = defaultProps.iconCollapsed,
     iconExpanded = defaultProps.iconExpanded,
     iconSize = defaultProps.iconSize,
@@ -395,7 +392,6 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       childrenField,
       selectableField,
       loadedField,
-      dynamicField,
     }),
     [
       idField,
@@ -407,7 +403,6 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       childrenField,
       selectableField,
       loadedField,
-      dynamicField,
     ],
   );
 
@@ -513,18 +508,18 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
   // Initialize expanded IDs based on defaultExpanded prop
   const [expandedIds, setExpandedIds] = useState<(string | number)[]>(() => {
-    // Helper function to check if a node is dynamic (should not be auto-expanded)
-    const isDynamic = (node: TreeNode): boolean => {
-      return !!(fieldConfig.dynamicField && node[fieldConfig.dynamicField]);
+    // Helper function to check if a node is unloaded (should not be auto-expanded)
+    const isUnloaded = (node: TreeNode): boolean => {
+      return node.loaded === false;
     };
 
     if (defaultExpanded === "first-level") {
-      return treeData.filter((node) => !isDynamic(node)).map((node) => node.key);
+      return treeData.filter((node) => !isUnloaded(node)).map((node) => node.key);
     } else if (defaultExpanded === "all") {
       const allIds: (string | number)[] = [];
       const collectIds = (nodes: TreeNode[]) => {
         nodes.forEach((node) => {
-          if (!isDynamic(node)) {
+          if (!isUnloaded(node)) {
             allIds.push(node.key);
           }
           if (node.children) {
@@ -536,11 +531,11 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       return allIds;
     } else if (Array.isArray(defaultExpanded)) {
       // Expand full paths to specified nodes by including all parent nodes
-      // But exclude dynamic nodes from the expansion
+      // But exclude unloaded nodes from the expansion
       const expandedPaths = expandParentPaths(defaultExpanded, treeItemsById);
       return expandedPaths.filter((nodeId) => {
         const node = treeItemsById[String(nodeId)];
-        return !node || !isDynamic(node);
+        return !node || !isUnloaded(node);
       });
     }
     return [];
@@ -575,8 +570,8 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   const [measuredItemSize, setMeasuredItemSize] = useState<number | undefined>(undefined);
 
   const flatTreeData = useMemo(() => {
-    return toFlatTree(treeData, expandedIds, fieldConfig.dynamicField, nodeStates);
-  }, [expandedIds, treeData, fieldConfig.dynamicField, nodeStates]);
+    return toFlatTree(treeData, expandedIds, nodeStates);
+  }, [expandedIds, treeData, nodeStates]);
 
   // Measure first item size when fixedItemSize is enabled
   useEffect(() => {

@@ -122,11 +122,6 @@ export const TreeMd = createMetadata({
       valueType: "string",
       defaultValue: defaultProps.loadedField,
     },
-    dynamicField: {
-      description: `The property name in source data for dynamic loading state (default: "dynamic").`,
-      valueType: "string",
-      defaultValue: defaultProps.dynamicField,
-    },
     itemTemplate: {
       description: "The template for each item in the tree.",
       valueType: "ComponentDef",
@@ -379,7 +374,6 @@ export const treeComponentRenderer = createComponentRenderer(
         childrenField={extractValue(node.props.childrenField)}
         selectableField={extractValue(node.props.selectableField)}
         loadedField={extractValue(node.props.loadedField)}
-        dynamicField={extractValue(node.props.dynamicField)}
         selectedValue={extractValue(node.props.selectedValue)}
         selectedId={extractValue(node.props.selectedId)}
         defaultExpanded={extractValue(node.props.defaultExpanded)}

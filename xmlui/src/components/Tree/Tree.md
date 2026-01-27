@@ -16,6 +16,7 @@ The "flat" and "hierarchy" data structures both use these fields for a particula
 - `iconExpanded`: An optional icon identifier. This icon is displayed when the field is expanded.
 - `iconCollapsed`: An optional icon identifier. This icon is displayed when the field is collapsed.
 - `selectable`: Indicates if the node can be selected.
+- `loaded`: Indicates if the node's children have been loaded. When set to `false`, the node shows an expand indicator even without children and triggers async loading on expand.
 
 The "flat" structure refers to its direct parent node via the `parentId` property, which contains the ID of the node it is referring to.
 
@@ -73,6 +74,7 @@ When you use data (for example, retrieved from a backend), those structures may 
 - `parentIdField` (default: `parentId`)
 - `childrenField` (default: `children`)
 - `selectableField` (default: `selectable`)
+- `loadedField` (default: `loaded`)
 
 The following example uses the `idField`, `nameField`, and `parentIdField` mapping properties:
 
@@ -223,19 +225,19 @@ This example demonstrates these concepts:
 </App>
 ```
 
-## Dynamic tree nodes
+## Async Loading (Lazy Loading)
 
-When initializing the tree with its `data` property, you can set the `dynamic` property of the node to `true` (you can use a field name alias with the `dynamicField` property). When you extend a dynamic node, the tree fires the `loadChildren` event, and the nodes returned by the event handler will be the actual nodes.
+When initializing the tree with its `data` property, you can set the `loaded` property of a node to `false` (you can use a field name alias with the `loadedField` property). When you expand an unloaded node, the tree fires the `onLoadChildren` event, and the nodes returned by the event handler will be loaded as children.
 
-By default, nodes are not dynamic.
+By default, nodes have `loaded: true`, meaning their children are already available.
 
-While the child nodes are being queried, the tree node displays a spinner to indicate the loading state.
+While the child nodes are being loaded, the tree node displays a spinner to indicate the loading state.
 
-You can use the `markNodeUnloaded` exposed method to reset the state of an already loaded dynamic tree node. The next time the user expands the node, its content will be loaded again.
+You can use the `markNodeUnloaded` exposed method to reset the state of an already loaded tree node. The next time the user expands the node, its content will be loaded again.
 
 The following sample demonstrates this feature. Click the "Child Item 1.2" node to check how it loads its children. Click the Unload button to reload the items when the node is expanded the next time.
 
-```xmlui-pg display copy {16-19} height="340px" /dynamic: true/ /onLoadChildren/ name="Example: dynamic nodes"
+```xmlui-pg display copy {16-19} height="340px" /loaded: false/ /onLoadChildren/ name="Example: async loading"
 <App var.loadCount="{0}">
   <Tree
     testId="tree"
@@ -245,15 +247,15 @@ The following sample demonstrates this feature. Click the "Child Item 1.2" node 
     data='{[
       { id: 1, name: "Root Item 1", parentId: null },
       { id: 2, name: "Child Item 1.1", parentId: 1 },
-      { id: 3, name: "Child Item 1.2", parentId: 1, dynamic: true },
+      { id: 3, name: "Child Item 1.2", parentId: 1, loaded: false },
       { id: 4, name: "Child Item 1.3", parentId: 1 },
     ]}'
     onLoadChildren="(node) => {
       loadCount++;
       delay(1000); 
       return ([
-        { id: 5, name: `Dynamic Item 1.2.1 (${loadCount})` },
-        { id: 6, name: `Dynamic Item 2.2.2 (${loadCount})` },
+        { id: 5, name: `Loaded Item 1.2.1 (${loadCount})`, parentId: 3 },
+        { id: 6, name: `Loaded Item 1.2.2 (${loadCount})`, parentId: 3 },
       ])
     }"
     >
