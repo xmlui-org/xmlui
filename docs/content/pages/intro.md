@@ -51,7 +51,7 @@ How to deploy it as a standalone web application?
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://docs.xmlui.org/resources/files/for-download/xmlui/xmlui-standalone.umd.js"></script>
+  <script src="https://xmlui.org/xmlui.js"></script>
 </head>
 <body>
 </body>
