@@ -7,7 +7,7 @@
         description: "Let's make building user interfaces as easy as it was 30 years ago.",
         author: "Jon Udell",
         date: "2025-07-18",
-        image: "xmlui-demo-gallery.png"
+        image: "xmlui-demo.png"
         },
         {
         title: "Reproducible XMLUI",
@@ -33,6 +33,15 @@
         date: "2025-12-19",
         image: "cli-blog-header.svg"
         },
+        {
+        title: "Supabase + XMLUI",
+        slug: "supabase-and-xmlui",
+        description: "Build an XMLUI interface to a Supabase backend.",
+        author: "Jon Udell",
+        date: "2026-01-27",
+        image: "supabase-and-xmlui.png",
+        draft: true
+        }
         ]}`
 >
     <AppHeader>
@@ -104,6 +113,9 @@
         </Page>
         <Page url="/blog">
             <BlogOverview posts="{posts}" />
+        </Page>
+        <Page url="/blog/supabase-and-xmlui">
+            <BlogPage post="{posts[4]}" />
         </Page>
         <Page url="/blog/introducing-the-xmlui-cli">
             <BlogPage post="{posts[3]}" />
