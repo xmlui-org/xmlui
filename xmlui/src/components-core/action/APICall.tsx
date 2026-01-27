@@ -31,7 +31,7 @@ import { invalidateQueries } from "../utils/actionUtils";
 import { extractParam, shouldKeep } from "../utils/extractParam";
 import { randomUUID } from "../utils/misc";
 import type { ApiActionOptions, ApiOperationDef } from "../RestApiProxy";
-import RestApiProxy from "../RestApiProxy";
+import RestApiProxy, { getLastApiStatus } from "../RestApiProxy";
 import { createAction } from "./actions";
 import { createContextVariableError } from "../EngineError";
 
@@ -405,6 +405,7 @@ export async function callApi(
       transactionId: clientTxId,
       body: resolvedBody,
       result,
+      status: getLastApiStatus(clientTxId),
     });
 
     const onSuccessFn = lookupAction(onSuccess, uid, {

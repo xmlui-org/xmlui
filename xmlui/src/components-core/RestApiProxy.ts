@@ -17,6 +17,23 @@ import type { IApiInterceptor } from "./interception/abstractions";
 
 type OnProgressFn = (progressEvent: { loaded: number; total?: number; progress?: number }) => void;
 
+// Store last API response status for tracing
+function setLastApiStatus(transactionId: string, status: number) {
+  if (typeof window !== "undefined") {
+    const w = window as any;
+    w._xsLastApiStatus = w._xsLastApiStatus || {};
+    w._xsLastApiStatus[transactionId] = status;
+  }
+}
+
+export function getLastApiStatus(transactionId: string): number | undefined {
+  if (typeof window !== "undefined") {
+    const w = window as any;
+    return w._xsLastApiStatus?.[transactionId];
+  }
+  return undefined;
+}
+
 interface FileChunk {
   blob: Blob;
   chunkStart: number;
@@ -533,6 +550,7 @@ export default class RestApiProxy {
           onUploadProgress,
           withCredentials: credentials === "include",
         });
+        setLastApiStatus(transactionId, response.status);
         return await parseResponse(
           response,
           this.appContext?.appGlobals?.logRestApiErrors ?? false,
@@ -554,6 +572,7 @@ export default class RestApiProxy {
       if (!response.clone().ok) {
         throw await this.raiseError(response);
       }
+      setLastApiStatus(transactionId, response.status);
       const parsedResponse = await parseResponse(
         response.clone(),
         this.appContext?.appGlobals?.logRestApiErrors ?? false,
