@@ -75,7 +75,8 @@ export const TreeMd = createMetadata({
       defaultValue: defaultProps.autoExpandToSelection,
     },
     itemClickExpands: {
-      description: "Whether clicking anywhere on a tree item should expand/collapse the node, not just the expand/collapse icon.",
+      description:
+        "Whether clicking anywhere on a tree item should expand/collapse the node, not just the expand/collapse icon.",
       valueType: "boolean",
       defaultValue: defaultProps.itemClickExpands,
     },
@@ -128,9 +129,9 @@ export const TreeMd = createMetadata({
     },
     scrollStyle: {
       description:
-        "This property determines the scrollbar style. Options: \"normal\" uses the browser's default " +
-        "scrollbar; \"overlay\" displays a themed scrollbar that is always visible; \"whenMouseOver\" shows the " +
-        "scrollbar only when hovering over the scroll container; \"whenScrolling\" displays the scrollbar " +
+        'This property determines the scrollbar style. Options: "normal" uses the browser\'s default ' +
+        'scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the ' +
+        'scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar ' +
         "only while scrolling is active and fades out after 400ms of inactivity.",
       valueType: "string",
       allowedValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
@@ -141,8 +142,8 @@ export const TreeMd = createMetadata({
         "When enabled, displays gradient fade indicators at the top and bottom edges of the tree " +
         "when scrollable content extends beyond the visible area. The fade effect provides a visual cue " +
         "to users that additional content is available by scrolling. The indicators automatically appear and " +
-        "disappear based on the scroll position. This property only works with \"overlay\", \"whenMouseOver\", and " +
-        "\"whenScrolling\" scroll styles.",
+        'disappear based on the scroll position. This property only works with "overlay", "whenMouseOver", and ' +
+        '"whenScrolling" scroll styles.',
       valueType: "boolean",
       defaultValue: defaultProps.showScrollerFade,
     },
@@ -151,9 +152,11 @@ export const TreeMd = createMetadata({
     contextMenu: dContextMenu(COMP),
     selectionDidChange: {
       description: `Fired when the tree selection changes.`,
-      signature: "selectionDidChange(event: { selectedNode: FlatTreeNode | null, previousNode: FlatTreeNode | null }): void",
+      signature:
+        "selectionDidChange(event: { selectedNode: FlatTreeNode | null, previousNode: FlatTreeNode | null }): void",
       parameters: {
-        event: "An object containing selectedNode (the newly selected node) and previousNode (the previously selected node).",
+        event:
+          "An object containing selectedNode (the newly selected node) and previousNode (the previously selected node).",
       },
     },
     nodeDidExpand: {
@@ -193,60 +196,71 @@ export const TreeMd = createMetadata({
       parameters: {
         level: "The maximum depth level to expand (0 = root level only)",
       },
-    },
-    expandNode: {
-      description: `Expand a specific node by its source data ID.`,
-      signature: "expandNode(nodeId: string | number): void",
-      parameters: {
-        nodeId: "The ID of the node to expand (source data format)",
+      expandNode: {
+        description: `Expand a specific node by its source data ID.`,
+        signature: "expandNode(nodeId: string | number): void",
+        parameters: {
+          nodeId: "The ID of the node to expand (source data format)",
+        },
       },
-    },
-    collapseNode: {
-      description: `Collapse a specific node by its source data ID.`,
-      signature: "collapseNode(nodeId: string | number): void", 
-      parameters: {
-        nodeId: "The ID of the node to collapse (source data format)",
+      collapseNode: {
+        description: `Collapse a specific node by its source data ID.`,
+        signature: "collapseNode(nodeId: string | number): void",
+        parameters: {
+          nodeId: "The ID of the node to collapse (source data format)",
+        },
       },
-    },
-    selectNode: {
-      description: `Programmatically select a node by its source data ID.`,
-      signature: "selectNode(nodeId: string | number): void",
-      parameters: {
-        nodeId: "The ID of the node to select (source data format)",
+      selectNode: {
+        description: `Programmatically select a node by its source data ID.`,
+        signature: "selectNode(nodeId: string | number): void",
+        parameters: {
+          nodeId: "The ID of the node to select (source data format)",
+        },
       },
-    },
-    clearSelection: {
-      description: `Clear the current selection.`,
-      signature: "clearSelection(): void",
-    },
-    getNodeById: {
-      description: `Get a tree node by its source data ID.`,
-      signature: "getNodeById(nodeId: string | number): TreeNode | null",
-      parameters: {
-        nodeId: "The ID of the node to retrieve (source data format)",
+      clearSelection: {
+        description: `Clear the current selection.`,
+        signature: "clearSelection(): void",
       },
-    },
-    getExpandedNodes: {
-      description: `Get an array of currently expanded node IDs in source data format.`,
-      signature: "getExpandedNodes(): (string | number)[]",
-    },
-    getSelectedNode: {
-      description: `Get the currently selected tree node.`,
-      signature: "getSelectedNode(): TreeNode | null",
-    },
-    scrollIntoView: {
-      description: `Scroll to a specific node and expand parent nodes as needed to make it visible.`,
-      signature: "scrollIntoView(nodeId: string | number, options?: ScrollIntoViewOptions): void",
-      parameters: {
-        nodeId: "The ID of the node to scroll to (source data format)",
-        options: "Optional scroll options",
+      getNodeById: {
+        description: `Get a tree node by its source data ID.`,
+        signature: "getNodeById(nodeId: string | number): TreeNode | null",
+        parameters: {
+          nodeId: "The ID of the node to retrieve (source data format)",
+        },
       },
-    },
-    scrollToItem: {
-      description: `Scroll to a specific node if it's currently visible in the tree.`,
-      signature: "scrollToItem(nodeId: string | number): void",
-      parameters: {
-        nodeId: "The ID of the node to scroll to (source data format)",
+      getExpandedNodes: {
+        description: `Get an array of currently expanded node IDs in source data format.`,
+        signature: "getExpandedNodes(): (string | number)[]",
+      },
+      getSelectedNode: {
+        description: `Get the currently selected tree node.`,
+        signature: "getSelectedNode(): TreeNode | null",
+      },
+      scrollIntoView: {
+        description: `Scroll to a specific node and expand parent nodes as needed to make it visible.`,
+        signature: "scrollIntoView(nodeId: string | number, options?: ScrollIntoViewOptions): void",
+        parameters: {
+          nodeId: "The ID of the node to scroll to (source data format)",
+          options: "Optional scroll options",
+        },
+      },
+      scrollToItem: {
+        description: `Scroll to a specific node if it's currently visible in the tree.`,
+        signature: "scrollToItem(nodeId: string | number): void",
+        parameters: {
+          nodeId: "The ID of the node to scroll to (source data format)",
+        },
+      },
+      getVisibleItems: {
+        description: `Get an array of tree nodes currently visible in the viewport.`,
+        signature: "getVisibleItems(): FlatTreeNode[]",
+      },
+      getExpandedTimestamp: {
+        description: `Get the timestamp when a node was last expanded.`,
+        signature: "getExpandedTimestamp(nodeId: string | number): number | undefined",
+        parameters: {
+          nodeId: "The ID of the node to check (source data format)",
+        },
       },
     },
     appendNode: {
@@ -254,7 +268,8 @@ export const TreeMd = createMetadata({
       signature: "appendNode(parentNodeId: string | number | null, nodeData: any): void",
       parameters: {
         parentNodeId: "The ID of the parent node, or null/undefined to add to root level",
-        nodeData: "The node data object using the format specified in dataFormat and field properties",
+        nodeData:
+          "The node data object using the format specified in dataFormat and field properties",
       },
     },
     removeNode: {
@@ -276,7 +291,8 @@ export const TreeMd = createMetadata({
       signature: "insertNodeBefore(beforeNodeId: string | number, nodeData: any): void",
       parameters: {
         beforeNodeId: "The ID of the existing node before which the new node should be inserted",
-        nodeData: "The node data object using the format specified in dataFormat and field properties",
+        nodeData:
+          "The node data object using the format specified in dataFormat and field properties",
       },
     },
     insertNodeAfter: {
@@ -284,7 +300,8 @@ export const TreeMd = createMetadata({
       signature: "insertNodeAfter(afterNodeId: string | number, nodeData: any): void",
       parameters: {
         afterNodeId: "The ID of the existing node after which the new node should be inserted",
-        nodeData: "The node data object using the format specified in dataFormat and field properties",
+        nodeData:
+          "The node data object using the format specified in dataFormat and field properties",
       },
     },
     getNodeLoadingState: {
@@ -331,7 +348,6 @@ export const treeComponentRenderer = createComponentRenderer(
   COMP,
   TreeMd,
   ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
-
     // Default item template if none is provided:
     //   <HStack verticalAlignment="center">
     //     <Icon when="{$item.icon}" name="{$item.icon}" />
@@ -341,7 +357,7 @@ export const treeComponentRenderer = createComponentRenderer(
       type: "HStack",
       props: {
         verticalAlignment: "center",
-        gap: "$space-4"
+        gap: "$space-4",
       },
       children: [
         {
@@ -378,16 +394,28 @@ export const treeComponentRenderer = createComponentRenderer(
         selectedId={extractValue(node.props.selectedId)}
         defaultExpanded={extractValue(node.props.defaultExpanded)}
         autoExpandToSelection={extractValue(node.props.autoExpandToSelection)}
-        itemClickExpands={extractValue. asOptionalBoolean(node.props.itemClickExpands)}
+        itemClickExpands={extractValue.asOptionalBoolean(node.props.itemClickExpands)}
         iconCollapsed={extractValue(node.props.iconCollapsed)}
         iconExpanded={extractValue(node.props.iconExpanded)}
         iconSize={extractValue(node.props.iconSize)}
         itemHeight={extractValue.asOptionalNumber(node.props.itemHeight, defaultProps.itemHeight)}
         fixedItemSize={extractValue.asOptionalBoolean(node.props.fixedItemSize)}
-        animateExpand={extractValue.asOptionalBoolean(node.props.animateExpand, defaultProps.animateExpand)}
-        expandRotation={extractValue.asOptionalNumber(node.props.expandRotation, defaultProps.expandRotation)}
-        scrollStyle={extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle)}
-        showScrollerFade={extractValue.asOptionalBoolean(node.props.showScrollerFade, defaultProps.showScrollerFade)}
+        animateExpand={extractValue.asOptionalBoolean(
+          node.props.animateExpand,
+          defaultProps.animateExpand,
+        )}
+        expandRotation={extractValue.asOptionalNumber(
+          node.props.expandRotation,
+          defaultProps.expandRotation,
+        )}
+        scrollStyle={extractValue.asOptionalString(
+          node.props.scrollStyle,
+          defaultProps.scrollStyle,
+        )}
+        showScrollerFade={extractValue.asOptionalBoolean(
+          node.props.showScrollerFade,
+          defaultProps.showScrollerFade,
+        )}
         onSelectionChanged={lookupEventHandler("selectionDidChange")}
         onNodeExpanded={lookupEventHandler("nodeDidExpand")}
         onNodeCollapsed={lookupEventHandler("nodeDidCollapse")}
@@ -395,11 +423,11 @@ export const treeComponentRenderer = createComponentRenderer(
         onContextMenu={lookupEventHandler("contextMenu")}
         itemRenderer={(flatTreeNode: any) => {
           const itemContext = {
-            id: flatTreeNode.id,                     // $item.id - Internal unique identifier
-            name: flatTreeNode.displayName,          // $item.name - Primary display text
-            depth: flatTreeNode.depth,               // $item.depth - Nesting level (0-based)
-            isExpanded: flatTreeNode.isExpanded,     // $item.isExpanded - Expansion state
-            hasChildren: flatTreeNode.hasChildren,   // $item.hasChildren - Children indicator
+            id: flatTreeNode.id, // $item.id - Internal unique identifier
+            name: flatTreeNode.displayName, // $item.name - Primary display text
+            depth: flatTreeNode.depth, // $item.depth - Nesting level (0-based)
+            isExpanded: flatTreeNode.isExpanded, // $item.isExpanded - Expansion state
+            hasChildren: flatTreeNode.hasChildren, // $item.hasChildren - Children indicator
             // - icon, iconExpanded, iconCollapsed (from icon fields)
             // - uid, path, parentIds, selectable, children (TreeNode internals)
             // - All original source data properties (custom fields)
@@ -407,9 +435,17 @@ export const treeComponentRenderer = createComponentRenderer(
           };
 
           return node.props.itemTemplate ? (
-            <MemoizedItem node={node.props.itemTemplate} contextVars={{ $item: itemContext }} renderChild={renderChild} />
+            <MemoizedItem
+              node={node.props.itemTemplate}
+              contextVars={{ $item: itemContext }}
+              renderChild={renderChild}
+            />
           ) : (
-            <MemoizedItem node={defaultItemTemplate} contextVars={{ $item: itemContext }} renderChild={renderChild} />
+            <MemoizedItem
+              node={defaultItemTemplate}
+              contextVars={{ $item: itemContext }}
+              renderChild={renderChild}
+            />
           );
         }}
       />

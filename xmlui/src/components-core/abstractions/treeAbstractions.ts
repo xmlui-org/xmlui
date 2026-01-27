@@ -55,6 +55,7 @@ export type NodeLoadingState = 'unloaded' | 'loading' | 'loaded';
 // Extended FlatTreeNode with loading state information
 export interface FlatTreeNodeWithState extends FlatTreeNode {
   loadingState: NodeLoadingState;
+  expandedTimestamp?: number;
 }
 
 export interface TreeNodeInfo {

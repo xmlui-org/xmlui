@@ -544,6 +544,11 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   // Node loading states management for dynamic loading
   const [nodeStates, setNodeStates] = useState<Map<string | number, NodeLoadingState>>(new Map());
 
+  // Expanded timestamps for tracking when nodes were expanded (Step 1: Auto-load feature)
+  const [expandedTimestamps, setExpandedTimestamps] = useState<Map<string | number, number>>(
+    new Map(),
+  );
+
   // Helper functions for managing node loading states
   const getNodeState = useCallback(
     (nodeId: string | number): NodeLoadingState => {
@@ -570,7 +575,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   const [measuredItemSize, setMeasuredItemSize] = useState<number | undefined>(undefined);
 
   const flatTreeData = useMemo(() => {
-    return toFlatTree(treeData, expandedIds, nodeStates);
+    return toFlatTree(treeData, expandedIds, undefined, nodeStates);
   }, [expandedIds, treeData, nodeStates]);
 
   // Measure first item size when fixedItemSize is enabled
@@ -718,6 +723,9 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       if (!node.isExpanded) {
         // Expanding the node
         setExpandedIds((prev) => [...prev, node.key]);
+
+        // Record timestamp when node expands
+        setExpandedTimestamps((prev) => new Map(prev).set(node.key, Date.now()));
 
         // Always fire nodeDidExpand event
         if (onNodeExpanded) {
@@ -1077,6 +1085,9 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         if (!wasExpanded) {
           setExpandedIds((prev) => [...prev, nodeId]);
 
+          // Record timestamp when node expands (Step 1: Auto-load feature)
+          setExpandedTimestamps((prev) => new Map(prev).set(nodeId, Date.now()));
+
           // Always fire nodeDidExpand event
           const node = getNodeById(nodeId);
           if (node && onNodeExpanded) {
@@ -1254,7 +1265,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           const updatedFlatTreeData = toFlatTree(
             treeData,
             newExpandedIds,
-            fieldConfig.dynamicField,
+            undefined,
             nodeStates,
           );
           const nodeIndex = updatedFlatTreeData.findIndex(
@@ -1733,6 +1744,45 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           return currentData;
         });
       },
+
+      getVisibleItems: () => {
+        if (!listRef.current) {
+          return [];
+        }
+
+        const virtualizer = listRef.current;
+        const scrollOffset = virtualizer.scrollOffset;
+        const viewportSize = virtualizer.viewportSize;
+        
+        // Calculate the visible range
+        const startOffset = scrollOffset;
+        const endOffset = scrollOffset + viewportSize;
+        
+        // Find items within the visible range
+        const visibleItems: FlatTreeNode[] = [];
+        
+        for (let i = 0; i < flatTreeData.length; i++) {
+          const itemOffset = virtualizer.getItemOffset(i);
+          const itemSize = virtualizer.getItemSize(i);
+          const itemEnd = itemOffset + itemSize;
+          
+          // Check if item is at least partially visible in the viewport
+          if (itemEnd > startOffset && itemOffset < endOffset) {
+            visibleItems.push(flatTreeData[i]);
+          }
+          
+          // Stop if we've passed the visible range
+          if (itemOffset >= endOffset) {
+            break;
+          }
+        }
+        
+        return visibleItems;
+      },
+
+      getExpandedTimestamp: (nodeId: string | number): number | undefined => {
+        return expandedTimestamps.get(nodeId);
+      },
     };
   }, [
     treeData,
@@ -1748,6 +1798,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     dataFormat,
     data,
     setInternalData,
+    expandedTimestamps,
   ]);
 
   // Register component API methods for external access
