@@ -161,9 +161,21 @@ export function ValidationWrapper({
     validationInProgress: validationResult?.partial ?? false,
   };
 
+  console.log(validationResult?.validations)
+  const validationAttributes = {
+    'data-validation-partial': validationResult?.partial ?? false,
+    'data-validation-status': validationStatus,
+    'data-validation-shown': isHelperTextShown,
+    'data-validation-count': validationResult?.validations?.length ?? 0,
+  };
+
   if (isFormItem) {
     childProps.formItemId = formItemId;
   }
-
-  return cloneElement(children, childProps);
+  
+  return (
+    <div {...validationAttributes}>
+      {cloneElement(children, childProps)}
+    </div>
+  );
 }
