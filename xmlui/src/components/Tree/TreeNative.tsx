@@ -780,13 +780,38 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           onNodeExpanded({ ...node, isExpanded: true });
         }
 
+        // Step 3: Check if this node is dynamic (loads children asynchronously)
+        const isDynamic = (() => {
+          // Check if there's an explicit value set via setDynamic
+          const explicitValue = dynamicStateMap.get(node.key);
+          if (explicitValue !== undefined) {
+            return explicitValue;
+          }
+
+          // Check node data for dynamic field
+          const dynamicFieldName = fieldConfig.dynamicField || "dynamic";
+          if (dynamicFieldName in node) {
+            return Boolean((node as any)[dynamicFieldName]);
+          }
+
+          // If node has loadedField=false, it needs async loading, so treat as dynamic
+          if (loadedField && loadedField in node && !(node as any)[loadedField]) {
+            return true;
+          }
+
+          // Fall back to component-level default
+          return dynamic ?? false;
+        })();
+
         // Check if we need to auto-reload (Step 4: Auto-load feature)
+        // Only apply autoLoadAfter to dynamic nodes
         const currentLoadingState = nodeStates.get(node.key) || "unloaded";
         const collapsedTime = collapsedTimestamps.get(node.key);
         const explicitAutoLoadAfter = autoLoadAfterMap.get(node.key);
         const effectiveAutoLoadAfter = explicitAutoLoadAfter !== undefined ? explicitAutoLoadAfter : autoLoadAfter;
         
         const shouldAutoReload = 
+          isDynamic && // Only auto-reload dynamic nodes
           currentLoadingState === "loaded" && // Node was previously loaded
           loadChildren && // loadChildren handler exists
           collapsedTime !== undefined && // Node was previously collapsed
@@ -795,7 +820,8 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           (Date.now() - collapsedTime) > effectiveAutoLoadAfter; // Threshold exceeded
 
         // Check if we need to load children dynamically
-        if (currentLoadingState === "unloaded" && loadChildren) {
+        // Only load if node is marked as dynamic
+        if (isDynamic && currentLoadingState === "unloaded" && loadChildren) {
           const nodeToLoad = Object.values(treeItemsById).find(
             (n) => String(n.key) === String(node.key),
           );
@@ -1081,6 +1107,8 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       collapsedTimestamps,
       autoLoadAfterMap,
       autoLoadAfter,
+      dynamicStateMap,
+      dynamic,
     ],
   );
 
