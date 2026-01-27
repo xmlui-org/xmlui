@@ -1,7 +1,6 @@
 import {
   cloneElement,
   type ReactElement,
-  type ReactNode,
   useContext,
   useCallback,
   useEffect,
@@ -103,10 +102,10 @@ export const labelBehavior: Behavior = {
     // Don't attach if formBindingBehavior will handle this component
     // (form-bindable components with bindTo prop will get label from FormBindingWrapper)
     const bindTo = extractValue(node.props?.bindTo, true);
-    if (bindTo && FORM_BINDABLE_COMPONENTS.includes(node.type as any)) {
+    const hasValueApiPair = !!metadata?.apis?.value && !!metadata?.apis?.setValue;
+    if (bindTo && hasValueApiPair || node.type === "FormItem") {
       return false;
     }
-
     return true;
   },
   attach: (context, node, metadata) => {
@@ -466,21 +465,18 @@ function BookmarkWrapper({
  */
 export const formBindingBehavior: Behavior = {
   name: "formBinding",
-  canAttach: (context, node) => {
+  canAttach: (context, node, metadata) => {
     const { extractValue } = context;
 
     // Check if the component has a bindTo prop
     const bindTo = extractValue(node.props?.bindTo, true);
-    if (!bindTo) {
+    // Check if the component exposes value/setValue APIs
+    const hasValueApiPair = !!metadata?.apis?.value && !!metadata?.apis?.setValue;
+    if (!bindTo && !hasValueApiPair || node.type === "FormItem") {
       return false;
     }
-
-    // Check if the component type is a form-bindable input
-    if (!FORM_BINDABLE_COMPONENTS.includes(node.type as any)) {
-      return false;
-    }
-
     return true;
+
   },
   attach: (context, node, metadata) => {
     const { extractValue, node: componentNode } = context;
@@ -560,7 +556,7 @@ export const formBindingBehavior: Behavior = {
     return (
       <FormBindingWrapper
         key={bindTo}
-        bindTo={bindTo!}
+        bindTo={bindTo}
         initialValue={initialValue}
         noSubmit={noSubmit}
         validations={validations}
@@ -579,7 +575,7 @@ export const formBindingBehavior: Behavior = {
 
 export const validationBehavior: Behavior = {
   name: "validation",
-  canAttach: (context, node) => {
+  canAttach: (context, node, metadata) => {
     const { extractValue } = context;
 
     const bindTo = extractValue(node.props?.bindTo, true);
@@ -588,8 +584,11 @@ export const validationBehavior: Behavior = {
       return false;
     }
 
-    if (!FORM_VALIDATION_COMPONENTS.includes(node.type as any)) {
-      return false;
+    if (!isFormItem) {
+      const hasValueApiPair = !!metadata?.apis?.value && !!metadata?.apis?.setValue;
+      if (!hasValueApiPair) {
+        return false;
+      }
     }
 
     return true;
@@ -648,6 +647,9 @@ export const validationBehavior: Behavior = {
       0,
     );
     const validationMode = extractValue.asOptionalString(componentNode.props?.validationMode);
+    const requireLabelMode = extractValue.asOptionalString(
+      componentNode.props?.requireLabelMode,
+    ) as RequireLabelMode | undefined;
 
     // Event handlers
     let onValidate = lookupEventHandler("validate");
