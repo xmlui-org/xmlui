@@ -798,53 +798,65 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
             // Load the children data
             const loadedData = await loadChildren({ ...node, isExpanded: true });
 
-            // Update the tree data with loaded children
-            if (loadedData && Array.isArray(loadedData) && loadedData.length > 0) {
-              updateInternalData((prevData) => {
-                const currentData = prevData ?? data;
+            // Update the tree data with loaded children (even if empty)
+            updateInternalData((prevData) => {
+              const currentData = prevData ?? data;
 
-                if (dataFormat === "flat" && Array.isArray(currentData)) {
-                  // Replace existing children with newly loaded data
+              if (dataFormat === "flat" && Array.isArray(currentData)) {
+                // Remove existing children of this node
+                const filteredData = currentData.filter(
+                  (item) =>
+                    String(item[fieldConfig.parentField || "parentId"]) !== String(node.key),
+                );
 
-                  // Remove existing children of this node
-                  const filteredData = currentData.filter(
-                    (item) =>
-                      String(item[fieldConfig.parentField || "parentId"]) !== String(node.key),
-                  );
+                // Add new children if any
+                const newItems =
+                  loadedData && Array.isArray(loadedData)
+                    ? loadedData.map((item) => ({
+                        ...item,
+                        [fieldConfig.parentField || "parentId"]: String(node.key),
+                      }))
+                    : [];
 
-                  // Add new children
-                  const newItems = loadedData.map((item) => ({
-                    ...item,
-                    [fieldConfig.parentField || "parentId"]: String(node.key),
-                  }));
+                // Mark parent node as loaded
+                const updatedData = filteredData.map((item) => {
+                  if (String(item[fieldConfig.idField || "id"]) === String(node.key)) {
+                    return {
+                      ...item,
+                      [fieldConfig.loadedField || "loaded"]: true,
+                    };
+                  }
+                  return item;
+                });
 
-                  return [...filteredData, ...newItems];
-                } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
-                  // For hierarchy format, we need to find the node and add children
-                  const updateHierarchy = (nodes: any[]): any[] => {
-                    return nodes.map((n) => {
-                      if (String(n[fieldConfig.idField || "id"]) === String(node.key)) {
-                        return {
-                          ...n,
-                          [fieldConfig.childrenField || "children"]: loadedData,
-                        };
-                      } else if (n[fieldConfig.childrenField || "children"]) {
-                        return {
-                          ...n,
-                          [fieldConfig.childrenField || "children"]: updateHierarchy(
-                            n[fieldConfig.childrenField || "children"],
-                          ),
-                        };
-                      }
-                      return n;
-                    });
-                  };
-                  return updateHierarchy(currentData);
-                }
+                return [...updatedData, ...newItems];
+              } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+                // For hierarchy format, we need to find the node and add children
+                const updateHierarchy = (nodes: any[]): any[] => {
+                  return nodes.map((n) => {
+                    if (String(n[fieldConfig.idField || "id"]) === String(node.key)) {
+                      return {
+                        ...n,
+                        [fieldConfig.childrenField || "children"]:
+                          loadedData && Array.isArray(loadedData) ? loadedData : [],
+                        [fieldConfig.loadedField || "loaded"]: true,
+                      };
+                    } else if (n[fieldConfig.childrenField || "children"]) {
+                      return {
+                        ...n,
+                        [fieldConfig.childrenField || "children"]: updateHierarchy(
+                          n[fieldConfig.childrenField || "children"],
+                        ),
+                      };
+                    }
+                    return n;
+                  });
+                };
+                return updateHierarchy(currentData);
+              }
 
-                return currentData;
-              });
-            }
+              return currentData;
+            });
 
             // Set loaded state
             setNodeStates((prev) => new Map(prev).set(node.key, "loaded"));
