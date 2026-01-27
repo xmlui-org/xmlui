@@ -1,4 +1,4 @@
-Supabase provides a powerful backend: Postgres database, authentication, real-time subscriptions, storage, and edge functions. But building a frontend typically means setting up a build system, managing dependencies, and writing lots og of boilerplate.
+Supabase provides a powerful backend: Postgres database, authentication, real-time subscriptions, storage, and edge functions. But building a frontend typically means setting up a build system, managing dependencies, and writing lots of boilerplate.
 
 XMLUI offers a streamlined path. It's a declarative markup language that renders directly in the browser. You describe your UI structure, bind it to data sources, and XMLUI handles the rest. No npm, no bundler, no build step. Supabase handles the backend complexity, XMLUI handles the frontend complexity, and you focus on your application logic.
 
@@ -48,17 +48,7 @@ The [Supabase XMLUI quickstart](https://supabase.com/docs/guides/getting-started
 }
 ```
 
-This is the entire frontend!
-
-```bash
-~/xmlui-supabase$ tree
-.
-├── Main.xmlui
-├── config.js
-└── index.html
-```
-
- The `DataSource` component fetches from Supabase's REST API, and the `List` component renders each row. No JavaScript required in your application code.
+This is the entire frontend! The `DataSource` component fetches from Supabase's REST API, and the `List` component renders each row. No JavaScript required in your application code.
 
 ## Adding authentication
 
