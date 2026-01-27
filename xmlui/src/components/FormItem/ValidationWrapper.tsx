@@ -22,8 +22,6 @@ type ValidationWrapperProps = {
   validations: FormItemValidations;
   onValidate?: ValidateEventHandler;
   customValidationsDebounce?: number;
-  customValidationsTimeout?: number;
-  customValidationsTimeoutMessage?: string;
   validationMode?: ValidationMode;
   verboseValidationFeedback?: boolean;
   itemIndex?: number;
@@ -64,8 +62,6 @@ export function ValidationWrapper({
   validations: validationsInput,
   onValidate,
   customValidationsDebounce = 0,
-  customValidationsTimeout,
-  customValidationsTimeoutMessage,
   validationMode,
   verboseValidationFeedback,
   itemIndex,
@@ -112,8 +108,6 @@ export function ValidationWrapper({
     dispatch,
     formItemId,
     customValidationsDebounce,
-    customValidationsTimeout,
-    customValidationsTimeoutMessage,
   );
 
   const { validationStatus, isHelperTextShown } = useValidationDisplay(

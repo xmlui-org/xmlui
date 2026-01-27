@@ -67,30 +67,6 @@ Note how changing the input in the demo below will result in a slight delay of i
 </App>
 ```
 
-### `customValidationsTimeout` [#customvalidationstimeout]
-
--  default: **3000**
-
-This optional number prop sets the maximum time (in milliseconds) to wait for custom validation to complete. If validation exceeds this time, it will be cancelled and treated as a validation failure.
-
-```xmlui-pg copy display name="Example: customValidationsTimeout"
-<App>
-  <Form
-    data="{{ email: '' }}"
-    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
-    <FormItem
-      customValidationsTimeout="2000"
-      customValidationsTimeoutMessage="Email verification is taking too long. Please check your connection."
-      onValidate="(value) => new Promise((resolve) => setTimeout(() => resolve(value.includes('@')), 5000))"
-      bindTo="email" />
-  </Form>
-</App>
-```
-
-### `customValidationsTimeoutMessage` [#customvalidationstimeoutmessage]
-
-This optional string prop customizes the error message shown when validation times out. If not provided, a default timeout message is used.
-
 ### `enabled` [#enabled]
 
 -  default: **true**
