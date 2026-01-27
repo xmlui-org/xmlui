@@ -39,6 +39,7 @@ interface RowContext {
   iconSize: string;
   animateExpand: boolean;
   expandRotation: number;
+  spinnerDelay: number;
 }
 
 interface TreeRowProps {
@@ -62,6 +63,7 @@ const TreeRow = memo(({ index, data }: TreeRowProps) => {
     iconSize,
     animateExpand,
     expandRotation,
+    spinnerDelay,
   } = data;
   const treeItem = nodes[index];
   const isFocused = focusedIndex === index && focusedIndex >= 0;
@@ -150,7 +152,7 @@ const TreeRow = memo(({ index, data }: TreeRowProps) => {
               <>
                 {/* Show loading spinner when node is loading */}
                 {(treeItem as FlatTreeNodeWithState).loadingState === "loading" ? (
-                  <Spinner delay={0} style={{ width: 24, height: 24 }} />
+                  <Spinner delay={spinnerDelay} style={{ width: 24, height: 24 }} />
                 ) : (
                   <Icon
                     name={
@@ -286,6 +288,7 @@ export const defaultProps = {
   scrollStyle: "normal" as const,
   showScrollerFade: false,
   autoLoadAfter: undefined as number | undefined,
+  spinnerDelay: 0,
 };
 
 interface TreeComponentProps {
@@ -316,6 +319,7 @@ interface TreeComponentProps {
   scrollStyle?: "normal" | "overlay" | "whenMouseOver" | "whenScrolling";
   showScrollerFade?: boolean;
   autoLoadAfter?: number;
+  spinnerDelay?: number;
   onItemClick?: (node: FlatTreeNode) => void;
   onSelectionChanged?: (event: TreeSelectionEvent) => void;
   onNodeExpanded?: (node: FlatTreeNode) => void;
@@ -355,6 +359,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     scrollStyle = defaultProps.scrollStyle,
     showScrollerFade = defaultProps.showScrollerFade,
     autoLoadAfter = defaultProps.autoLoadAfter,
+    spinnerDelay = defaultProps.spinnerDelay,
     onItemClick,
     onSelectionChanged,
     onNodeExpanded,
@@ -557,6 +562,11 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     Map<string | number, number | null>
   >(new Map());
 
+  // Collapsed timestamps for tracking when nodes were collapsed (Step 4: Auto-load feature)
+  const [collapsedTimestamps, setCollapsedTimestamps] = useState<Map<string | number, number>>(
+    new Map(),
+  );
+
   // Helper functions for managing node loading states
   const getNodeState = useCallback(
     (nodeId: string | number): NodeLoadingState => {
@@ -591,15 +601,17 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     return flatTreeData.map((node) => {
       const nodeId = node.key;
       const timestamp = expandedTimestamps.get(nodeId);
+      const collapsedTime = collapsedTimestamps.get(nodeId);
       const explicitAutoLoadAfter = autoLoadAfterMap.get(nodeId);
       
       return {
         ...node,
         expandedTimestamp: timestamp,
+        collapsedTimestamp: collapsedTime,
         autoLoadAfter: explicitAutoLoadAfter !== undefined ? explicitAutoLoadAfter : autoLoadAfter,
       };
     });
-  }, [flatTreeData, expandedTimestamps, autoLoadAfterMap, autoLoadAfter]);
+  }, [flatTreeData, expandedTimestamps, collapsedTimestamps, autoLoadAfterMap, autoLoadAfter]);
 
   // Measure first item size when fixedItemSize is enabled
   useEffect(() => {
@@ -755,9 +767,22 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           onNodeExpanded({ ...node, isExpanded: true });
         }
 
+        // Check if we need to auto-reload (Step 4: Auto-load feature)
+        const currentLoadingState = nodeStates.get(node.key) || "unloaded";
+        const collapsedTime = collapsedTimestamps.get(node.key);
+        const explicitAutoLoadAfter = autoLoadAfterMap.get(node.key);
+        const effectiveAutoLoadAfter = explicitAutoLoadAfter !== undefined ? explicitAutoLoadAfter : autoLoadAfter;
+        
+        const shouldAutoReload = 
+          currentLoadingState === "loaded" && // Node was previously loaded
+          loadChildren && // loadChildren handler exists
+          collapsedTime !== undefined && // Node was previously collapsed
+          effectiveAutoLoadAfter !== undefined && // Auto-load is configured
+          effectiveAutoLoadAfter !== null && // Auto-load is not disabled
+          (Date.now() - collapsedTime) > effectiveAutoLoadAfter; // Threshold exceeded
+
         // Check if we need to load children dynamically
-        const nodeWithState = node as FlatTreeNodeWithState;
-        if (nodeWithState.loadingState === "unloaded" && loadChildren) {
+        if (currentLoadingState === "unloaded" && loadChildren) {
           const nodeToLoad = Object.values(treeItemsById).find(
             (n) => String(n.key) === String(node.key),
           );
@@ -897,9 +922,121 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
             // Collapse the node since loading failed
             setExpandedIds((prev) => prev.filter((id) => id !== node.key));
           }
+        } else if (shouldAutoReload) {
+          // Auto-reload: Node was loaded before, threshold exceeded, reload children
+          // Set loading state
+          setNodeStates((prev) => new Map(prev).set(node.key, "loading"));
+
+          // Clear existing children
+          updateInternalData((prevData) => {
+            const currentData = prevData ?? data;
+
+            if (dataFormat === "flat" && Array.isArray(currentData)) {
+              return currentData.filter(
+                (item) => String(item[fieldConfig.parentField || "parentId"]) !== String(node.key),
+              );
+            } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+              const clearChildren = (nodes: any[]): any[] => {
+                return nodes.map((n) => {
+                  if (String(n[fieldConfig.idField || "id"]) === String(node.key)) {
+                    return {
+                      ...n,
+                      [fieldConfig.childrenField || "children"]: [],
+                    };
+                  } else if (n[fieldConfig.childrenField || "children"]) {
+                    return {
+                      ...n,
+                      [fieldConfig.childrenField || "children"]: clearChildren(
+                        n[fieldConfig.childrenField || "children"],
+                      ),
+                    };
+                  }
+                  return n;
+                });
+              };
+              return clearChildren(currentData);
+            }
+
+            return currentData;
+          });
+
+          try {
+            // Reload the children data
+            const loadedData = await loadChildren({ ...node, isExpanded: true });
+
+            // Update the tree data with reloaded children
+            updateInternalData((prevData) => {
+              const currentData = prevData ?? data;
+
+              if (dataFormat === "flat" && Array.isArray(currentData)) {
+                const filteredData = currentData.filter(
+                  (item) =>
+                    String(item[fieldConfig.parentField || "parentId"]) !== String(node.key),
+                );
+
+                const newItems =
+                  loadedData && Array.isArray(loadedData)
+                    ? loadedData.map((item) => ({
+                        ...item,
+                        [fieldConfig.parentField || "parentId"]: String(node.key),
+                      }))
+                    : [];
+
+                const updatedData = filteredData.map((item) => {
+                  if (String(item[fieldConfig.idField || "id"]) === String(node.key)) {
+                    return {
+                      ...item,
+                      [fieldConfig.loadedField || "loaded"]: true,
+                    };
+                  }
+                  return item;
+                });
+
+                return [...updatedData, ...newItems];
+              } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+                const updateHierarchy = (nodes: any[]): any[] => {
+                  return nodes.map((n) => {
+                    if (String(n[fieldConfig.idField || "id"]) === String(node.key)) {
+                      return {
+                        ...n,
+                        [fieldConfig.childrenField || "children"]:
+                          loadedData && Array.isArray(loadedData) ? loadedData : [],
+                        [fieldConfig.loadedField || "loaded"]: true,
+                      };
+                    } else if (n[fieldConfig.childrenField || "children"]) {
+                      return {
+                        ...n,
+                        [fieldConfig.childrenField || "children"]: updateHierarchy(
+                          n[fieldConfig.childrenField || "children"],
+                        ),
+                      };
+                    }
+                    return n;
+                  });
+                };
+                return updateHierarchy(currentData);
+              }
+
+              return currentData;
+            });
+
+            // Set loaded state
+            setNodeStates((prev) => new Map(prev).set(node.key, "loaded"));
+          } catch (error) {
+            console.error("Error auto-reloading tree node data:", error);
+            // Keep loaded state even on reload error
+            setNodeStates((prev) => new Map(prev).set(node.key, "loaded"));
+          }
         }
       } else {
         // Collapsing the node
+        const currentLoadingState = nodeStates.get(node.key) || "unloaded";
+        
+        // Record collapse timestamp for dynamic nodes (Step 4: Auto-load feature)
+        if (currentLoadingState === "loaded" && loadChildren) {
+          setCollapsedTimestamps((prev) => new Map(prev).set(node.key, Date.now()));
+        }
+        
         const nodeToCollapse = Object.values(treeItemsById).find(
           (n) => String(n.key) === String(node.key),
         );
@@ -926,7 +1063,11 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       dataFormat,
       fieldConfig,
       setNodeStates,
+      nodeStates,
       treeItemsById,
+      collapsedTimestamps,
+      autoLoadAfterMap,
+      autoLoadAfter,
     ],
   );
 
@@ -1047,6 +1188,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       iconSize,
       animateExpand,
       expandRotation,
+      spinnerDelay,
     };
   }, [
     flatTreeData,
@@ -1063,6 +1205,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     iconSize,
     animateExpand,
     expandRotation,
+    spinnerDelay,
   ]);
 
   // Shared API implementation to avoid duplication between ref and component APIs

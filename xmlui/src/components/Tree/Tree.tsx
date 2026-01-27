@@ -154,7 +154,15 @@ export const TreeMd = createMetadata({
         "Pass undefined to disable auto-loading by default.",
       valueType: "number",
       defaultValue: defaultProps.autoLoadAfter,
-    },  },
+    },
+    spinnerDelay: {
+      description:
+        "The delay in milliseconds before showing the loading spinner when a node is in loading state. " +
+        "Set to 0 to show immediately, or a higher value to prevent spinner flicker for fast-loading nodes.",
+      valueType: "number",
+      defaultValue: defaultProps.spinnerDelay,
+    },
+  },
   events: {
     contextMenu: dContextMenu(COMP),
     selectionDidChange: {

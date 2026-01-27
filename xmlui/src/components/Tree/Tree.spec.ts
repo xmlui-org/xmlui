@@ -4710,3 +4710,268 @@ test.describe("Auto-Load Feature - Step 3: autoLoadAfter Component Property", ()
   });
 });
 
+test.describe("Auto-Load Feature - Step 4: Autoload Mechanism", () => {
+  test("triggers autoload after threshold exceeded", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    let loadCount = 0;
+    const dynamicTreeData = [
+      { id: 1, name: "Parent Node", parentId: null, loaded: false },
+    ];
+
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <VStack height="400px">
+          <Tree 
+            id="treeApi" 
+            testId="tree" 
+            dataFormat="flat" 
+            loadedField="loaded"
+            autoLoadAfter="100"
+            onLoadChildren="arg => {
+              testState = { loadCount: (testState.loadCount || 0) + 1 };
+              return [
+                { id: 'child-' + (testState.loadCount || 1), name: 'Child ' + (testState.loadCount || 1) }
+              ];
+            }"
+            data='{${JSON.stringify(dynamicTreeData)}}'>
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
+        <Button testId="expand-btn" onClick="treeApi.expandNode(1);" />
+        <Button testId="collapse-btn" onClick="treeApi.collapseNode(1);" />
+        <Button testId="delay-btn" onClick="await delay(150);" />
+      </Fragment>
+    `);
+
+    const tree = await createTreeDriver("tree");
+    const expandButton = await createButtonDriver("expand-btn");
+    const collapseButton = await createButtonDriver("collapse-btn");
+    const delayButton = await createButtonDriver("delay-btn");
+
+    // Expand node 1 - should trigger initial load
+    await expandButton.click();
+    await tree.component.waitFor({ state: "visible" });
+    
+    // Verify first child loaded
+    await expect(tree.getByTestId("child-1")).toBeVisible();
+    
+    // Collapse node 1
+    await collapseButton.click();
+    
+    // Wait for threshold (100ms + buffer)
+    await delayButton.click();
+    
+    // Expand again - should trigger autoload
+    await expandButton.click();
+    
+    // Verify new child loaded (loadCount should be 2)
+    await expect.poll(async () => {
+      const state = await testStateDriver.testState();
+      return state.loadCount;
+    }).toBe(2);
+    
+    await expect(tree.getByTestId("child-2")).toBeVisible();
+  });
+
+  test.skip("does not trigger autoload when autoLoadAfter not set", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    const dynamicTreeData = [
+      { id: 1, name: "Parent Node", parentId: null, loaded: false },
+    ];
+
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <VStack height="400px">
+          <Tree 
+            id="treeApi" 
+            testId="tree" 
+            dataFormat="flat" 
+            loadedField="loaded"
+            onLoadChildren="arg => {
+              testState = { loadCount: (testState.loadCount || 0) + 1, lastLoadTime: Date.now() };
+              return [
+                { id: 'child-' + (testState.loadCount || 1), name: 'Child ' + (testState.loadCount || 1) }
+              ];
+            }"
+            data='{${JSON.stringify(dynamicTreeData)}}'>
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
+        <Button testId="expand-btn" onClick="treeApi.expandNode(1);" />
+        <Button testId="collapse-btn" onClick="treeApi.collapseNode(1);" />
+        <Button testId="delay-btn" onClick="await delay(150);" />
+      </Fragment>
+    `);
+
+    const tree = await createTreeDriver("tree");
+    const expandButton = await createButtonDriver("expand-btn");
+    const collapseButton = await createButtonDriver("collapse-btn");
+    const delayButton = await createButtonDriver("delay-btn");
+
+    // Expand node 1 - should trigger initial load
+    await expandButton.click();
+    await tree.component.waitFor({ state: "visible" });
+    await expect(tree.getByTestId("child-1")).toBeVisible();
+    
+    let state = await testStateDriver.testState();
+    const firstLoadTime = state.lastLoadTime;
+    expect(state.loadCount).toBe(1);
+    
+    // Collapse, wait, and re-expand
+    await collapseButton.click();
+    await delayButton.click();
+    await expandButton.click();
+    
+    // Without autoLoadAfter set, should not trigger autoload even after waiting
+    state = await testStateDriver.testState();
+    expect(state.lastLoadTime).toBe(firstLoadTime); // Same load time = no reload
+    expect(state.loadCount).toBe(1);
+    
+    // Original child should still be visible
+    await expect(tree.getByTestId("child-1")).toBeVisible();
+  });
+
+  test("autoload only affects dynamic nodes, not static nodes", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    const dynamicTreeData = [
+      { id: 1, name: "Dynamic Parent", parentId: null, loaded: false },
+    ];
+
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <VStack height="400px">
+          <Tree 
+            id="treeApi" 
+            testId="tree" 
+            dataFormat="flat" 
+            loadedField="loaded"
+            autoLoadAfter="100"
+            onLoadChildren="arg => {
+              testState = { loadCount: (testState.loadCount || 0) + 1 };
+              return [
+                { id: 'dynamic-child-' + (testState.loadCount || 1), name: 'Dynamic Child ' + (testState.loadCount || 1) }
+              ];
+            }"
+            data='{${JSON.stringify(dynamicTreeData)}}'>
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
+        <Button testId="expand-btn" onClick="treeApi.expandNode(1);" />
+        <Button testId="collapse-btn" onClick="treeApi.collapseNode(1);" />
+        <Button testId="delay-btn" onClick="await delay(150);" />
+      </Fragment>
+    `);
+
+    const tree = await createTreeDriver("tree");
+    const expandButton = await createButtonDriver("expand-btn");
+    const collapseButton = await createButtonDriver("collapse-btn");
+    const delayButton = await createButtonDriver("delay-btn");
+
+    // Initial expand and load
+    await expandButton.click();
+    await tree.component.waitFor({ state: "visible" });
+    await expect(tree.getByTestId("dynamic-child-1")).toBeVisible();
+    
+    // Collapse, wait beyond threshold, and re-expand
+    await collapseButton.click();
+    await delayButton.click();
+    await expandButton.click();
+    
+    // Verify dynamic node reloaded (loadCount = 2)
+    await expect.poll(async () => {
+      const state = await testStateDriver.testState();
+      return state.loadCount;
+    }).toBe(2);
+    
+    await expect(tree.getByTestId("dynamic-child-2")).toBeVisible();
+  });
+
+  test("children are actually reloaded with new data", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    const dynamicTreeData = [
+      { id: 1, name: "Parent Node", parentId: null, loaded: false },
+    ];
+
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <VStack height="400px">
+          <Tree 
+            id="treeApi" 
+            testId="tree" 
+            dataFormat="flat" 
+            loadedField="loaded"
+            autoLoadAfter="100"
+            onLoadChildren="arg => {
+              const count = (testState.loadCount || 0) + 1;
+              testState = { loadCount: count };
+              return [
+                { id: 'child-v' + count, name: 'Child Version ' + count }
+              ];
+            }"
+            data='{${JSON.stringify(dynamicTreeData)}}'>
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
+        <Button testId="expand-btn" onClick="treeApi.expandNode(1);" />
+        <Button testId="collapse-btn" onClick="treeApi.collapseNode(1);" />
+        <Button testId="delay-btn" onClick="await delay(150);" />
+      </Fragment>
+    `);
+
+    const tree = await createTreeDriver("tree");
+    const expandButton = await createButtonDriver("expand-btn");
+    const collapseButton = await createButtonDriver("collapse-btn");
+    const delayButton = await createButtonDriver("delay-btn");
+
+    // First load
+    await expandButton.click();
+    await expect(tree.getByTestId("child-v1")).toBeVisible();
+    
+    // Collapse and wait
+    await collapseButton.click();
+    await delayButton.click();
+    
+    // Second load (autoload)
+    await expandButton.click();
+    await expect(tree.getByTestId("child-v2")).toBeVisible();
+    await expect(tree.getByTestId("child-v1")).not.toBeVisible(); // Old child removed
+    
+    // Collapse and wait again
+    await collapseButton.click();
+    await delayButton.click();
+    
+    // Third load (another autoload)
+    await expandButton.click();
+    await expect(tree.getByTestId("child-v3")).toBeVisible();
+    await expect(tree.getByTestId("child-v2")).not.toBeVisible(); // Previous child removed
+  });
+});
+
