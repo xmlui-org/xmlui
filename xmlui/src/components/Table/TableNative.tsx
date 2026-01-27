@@ -1048,14 +1048,6 @@ export const Table = forwardRef(
                           } catch (e) {
                             // ignore
                           }
-                          if (typeof window !== "undefined" && window.getSelection) {
-                            try {
-                              const sel = window.getSelection();
-                              if (sel) sel.removeAllRanges();
-                            } catch (e) {
-                              // ignore
-                            }
-                          }
                           // Call external handler if provided
                           try {
                             if (typeof (rowDoubleClick as any) === "function") {

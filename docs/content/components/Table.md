@@ -1375,6 +1375,34 @@ This event is triggered when the Table is right-clicked (context menu).
 
 - `event`: The mouse event object.
 
+### `rowDoubleClick` [#rowdoubleclick]
+
+This event is fired when the user double-clicks a table row. The handler receives the clicked row item as its only argument.
+
+**Signature**: `rowDoubleClick(item: any): void`
+
+- `item`: The clicked table row item.
+
+This event is triggered when a table row is double-clicked. The handler receives the row's data item as its only argument.
+
+```xmlui copy {4}
+<App>
+  <Table data='{[...]}' onRowDoubleClick="(item) => console.log(item)">
+    <Column bindTo="name"/>
+
+%-EVENT-START rowDoubleClick
+
+This event is triggered when a table row is double-clicked. The handler receives the row's data item as its only argument.
+
+```xmlui copy {4}
+<App>
+  <Table data='{[...]}' onRowDoubleClick="(item) => console.log(item)">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+  </Table>
+</App>
+```
+
 ### `selectionDidChange` [#selectiondidchange]
 
 This event is triggered when the table's current selection (the rows selected) changes. Its parameter is an array of the selected table row items. 
