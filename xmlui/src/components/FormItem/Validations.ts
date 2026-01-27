@@ -70,14 +70,11 @@ function isRegexValid(value: any = "", regex: string) {
 }
 
 class FormItemValidator {
-  private abortController: AbortController | null = null;
-
   constructor(
     private validations: FormItemValidations,
     private onValidate: ValidateEventHandler,
     private value: any,
-    private timeout: number = 3000,
-    private timeoutMessage?: string,
+    private abortSignal?: AbortSignal,
   ) {}
 
   preValidate = () => {
@@ -232,8 +229,7 @@ class FormItemValidator {
       case "phone":
         return {
           // Phone must contain at least one digit and only allowed characters
-          isValid:
-            /^[a-zA-Z0-9#*)(+.\-_&']+$/.test(this.value) && /[0-9]/.test(this.value),
+          isValid: /^[a-zA-Z0-9#*)(+.\-_&']+$/.test(this.value) && /[0-9]/.test(this.value),
           invalidMessage: patternInvalidMessage || "Not a valid phone number",
           severity: patternInvalidSeverity,
         };
@@ -280,72 +276,49 @@ class FormItemValidator {
     if (!this.onValidate) {
       return undefined;
     }
-
-    // Cancel previous validation if still running
-    if (this.abortController) {
-      this.abortController.abort();
-    }
-
-    this.abortController = new AbortController();
-
-    try {
-      let validationFnResult: any;
-
-      // If timeout is 0 or not set, run without timeout
-      if (!this.timeout || this.timeout === 0) {
-        validationFnResult = await this.onValidate(this.value);
-      } else {
-        // Create timeout promise
-        const timeoutPromise = new Promise<never>((_, reject) =>
-          setTimeout(() => {
-            if (this.abortController) {
-              this.abortController.abort();
-            }
-            reject(new Error("VALIDATION_TIMEOUT"));
-          }, this.timeout),
-        );
-
-        // Race validation against timeout
-        validationFnResult = await Promise.race([this.onValidate(this.value), timeoutPromise]);
-      }
-
-      if (typeof validationFnResult === "boolean") {
-        return [
-          {
-            isValid: validationFnResult,
-            invalidMessage: "Invalid input",
-            severity: "error",
-          },
-        ];
-      }
-      if (!isArray(validationFnResult)) {
-        return [validationFnResult];
-      }
-
-      return validationFnResult;
-    } catch (error: any) {
-      if (error?.message === "VALIDATION_TIMEOUT") {
-        return [
-          {
-            isValid: false,
-            invalidMessage:
-              this.timeoutMessage || "Validation took too long. Please try again.",
-            severity: "error",
-          },
-        ];
+    
+    // --- Wrap the validation call to handle abortion
+    // Why use abort if we have ignore? Because the validation function might be doing
+    // some heavy async work (e.g., network requests) that we want to cancel
+    const validationPromise = this.onValidate(this.value);
+    
+    // Race between the validation promise and an abort promise
+    const validationFnResult = await Promise.race([
+      validationPromise,
+      new Promise<never>((_, reject) => {
+        if (this.abortSignal) {
+          this.abortSignal.addEventListener('abort', () => {
+            reject(new Error('Validation aborted'));
+          });
+        }
+      })
+    ]).catch((error) => {
+      // If aborted or any other error, return undefined (no validation results)
+      if (error.message === 'Validation aborted' || this.abortSignal?.aborted) {
+        return undefined;
       }
       // Re-throw other errors
       throw error;
-    } finally {
-      this.abortController = null;
-    }
-  }
+    });
 
-  cleanup() {
-    if (this.abortController) {
-      this.abortController.abort();
-      this.abortController = null;
+    if (validationFnResult === undefined) {
+      return undefined;
     }
+
+    if (typeof validationFnResult === "boolean") {
+      return [
+        {
+          isValid: validationFnResult,
+          invalidMessage: "Invalid input",
+          severity: "error",
+        },
+      ];
+    }
+    if (!isArray(validationFnResult)) {
+      return [validationFnResult];
+    }
+
+    return validationFnResult;
   }
 }
 
@@ -353,16 +326,9 @@ async function asyncValidate(
   validations: FormItemValidations,
   onValidate: ValidateEventHandler,
   deferredValue: any,
-  timeout: number = 3000,
-  timeoutMessage?: string,
+  abortSignal?: AbortSignal,
 ) {
-  const validator = new FormItemValidator(
-    validations,
-    onValidate,
-    deferredValue,
-    timeout,
-    timeoutMessage,
-  );
+  const validator = new FormItemValidator(validations, onValidate, deferredValue, abortSignal);
   // console.log("calling async validate with ", deferredValue);
   return await validator.validate();
 }
@@ -374,43 +340,30 @@ export function useValidation(
   dispatch: Dispatch<ContainerAction | FormAction>,
   bindTo: string,
   throttleWaitInMs: number = 0,
-  timeout: number = 3000,
-  timeoutMessage?: string,
 ) {
   const deferredValue = useDeferredValue(value);
 
   const throttledAsyncValidate = useMemo(() => {
     if (throttleWaitInMs !== 0) {
-      return asyncThrottle(
-        (validations: FormItemValidations, onValidate: ValidateEventHandler, value: any) =>
-          asyncValidate(validations, onValidate, value, timeout, timeoutMessage),
-        throttleWaitInMs,
-        {
-          trailing: true,
-          leading: true,
-        },
-      );
+      return asyncThrottle(asyncValidate, throttleWaitInMs, {
+        trailing: true,
+        leading: true,
+      });
     }
-    return (validations: FormItemValidations, onValidate: ValidateEventHandler, value: any) =>
-      asyncValidate(validations, onValidate, value, timeout, timeoutMessage);
-  }, [throttleWaitInMs, timeout, timeoutMessage]);
+    return asyncValidate;
+  }, [throttleWaitInMs]);
 
   useEffect(
     function runAllValidations() {
-      const validator = new FormItemValidator(
-        validations,
-        onValidate,
-        deferredValue,
-        timeout,
-        timeoutMessage,
-      );
+      const abortController = new AbortController();
+      const validator = new FormItemValidator(validations, onValidate, deferredValue, abortController.signal);
       let ignore = false;
       const partialResult = validator.preValidate();
       if (!ignore) {
         dispatch(fieldValidated(bindTo, partialResult));
         if (partialResult.partial) {
           void (async () => {
-            const result = await throttledAsyncValidate(validations, onValidate, deferredValue);
+            const result = await throttledAsyncValidate(validations, onValidate, deferredValue, abortController.signal);
             if (!ignore) {
               // console.log(`async validation result for ${bindTo}`, result);
               dispatch(fieldValidated(bindTo, result));
@@ -420,10 +373,10 @@ export function useValidation(
       }
       return () => {
         ignore = true;
-        validator.cleanup();
+        abortController.abort();
       };
     },
-    [bindTo, deferredValue, dispatch, onValidate, throttledAsyncValidate, validations, timeout, timeoutMessage],
+    [bindTo, deferredValue, dispatch, onValidate, throttledAsyncValidate, validations],
   );
 }
 
