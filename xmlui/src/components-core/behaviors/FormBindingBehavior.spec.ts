@@ -314,7 +314,7 @@ test.describe("Behavior Context", () => {
     await expect(page.getByRole("textbox")).toBeVisible();
     await expect(page.getByRole("textbox")).toHaveValue("test");
 
-    await page.getByRole("button", { name: "Save" }).click();
+    await page.getByRole("button", { name: "Save" }).click({delay: 100});
 
     // Empty object since there's no bindTo
     await expect.poll(testStateDriver.testState).toEqual({});

@@ -556,7 +556,7 @@ export const formBindingBehavior: Behavior = {
     return (
       <FormBindingWrapper
         key={bindTo}
-        bindTo={bindTo!}
+        bindTo={bindTo}
         initialValue={initialValue}
         noSubmit={noSubmit}
         validations={validations}

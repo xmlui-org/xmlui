@@ -17,6 +17,7 @@ import {
   fieldInitialized,
   fieldLostFocus,
   fieldRemoved,
+  UNBOUND_FIELD_SUFFIX,
 } from "../Form/formActions";
 import { getByPath } from "../Form/FormNative";
 import { useEvent } from "../../components-core/utils/misc";
@@ -26,7 +27,7 @@ import { useShallowCompareMemoize } from "../../components-core/utils/hooks";
 
 type FormBindingWrapperProps = {
   children: ReactElement;
-  bindTo: string;
+  bindTo?: string;
   initialValue?: any;
   noSubmit?: boolean;
   validations: FormItemValidations;
@@ -69,7 +70,7 @@ export function FormBindingWrapper({
   const validations = useShallowCompareMemoize(validationsInput);
   const defaultId = useId();
   const formItemId = useMemo(() => {
-    return bindTo || defaultId;
+    return bindTo || `${defaultId}${UNBOUND_FIELD_SUFFIX}`;
   }, [bindTo, defaultId]);
 
   // Check if we're inside a form and/or inside a FormItem
@@ -183,7 +184,7 @@ export function FormBindingWrapper({
  * Hook that provides form binding functionality for use in components.
  * This can be used when you need more control over how form binding works.
  */
-export function useFormBinding(bindTo: string, options?: {
+export function useFormBinding(bindTo?: string, options?: {
   initialValue?: any;
   noSubmit?: boolean;
 }) {
@@ -191,7 +192,7 @@ export function useFormBinding(bindTo: string, options?: {
   const isInsideForm = useIsInsideForm();
 
   const formItemId = useMemo(() => {
-    return bindTo || defaultId;
+    return bindTo || `${defaultId}${UNBOUND_FIELD_SUFFIX}`;
   }, [bindTo, defaultId]);
 
   return {
