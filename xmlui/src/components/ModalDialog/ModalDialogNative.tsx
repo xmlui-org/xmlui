@@ -3,7 +3,6 @@ import React, {
   type ReactNode,
   useContext,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -21,6 +20,7 @@ import { Icon } from "../Icon/IconNative";
 import { Button } from "../Button/ButtonNative";
 import { ModalVisibilityContext } from "./ModalVisibilityContext";
 import { Part } from "../Part/Part";
+import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 
 const PART_TITLE = "title";
 const PART_CONTENT = "content";
@@ -162,7 +162,7 @@ export const ModalDialog = React.forwardRef(
     /**
      * https://github.com/radix-ui/primitives/issues/3648
      */
-    useLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
       return () => {
         const root = document.getElementById("root");
         if (root)

@@ -1,16 +1,10 @@
-import React, {
-  type ReactNode,
-  useLayoutEffect,
-  useMemo,
-  useState,
-  useContext,
-  useRef,
-} from "react";
+import React, { type ReactNode, useMemo, useState, useContext, useRef } from "react";
 import { isEqual, noop } from "lodash-es";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
 import { EMPTY_ARRAY } from "../../components-core/constants";
+import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 
 export const defaultProps = {
   idKey: "id",
@@ -79,7 +73,7 @@ export const SelectionStore = ({
     setSelectedRowIds(EMPTY_ARRAY);
   });
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     registerComponentApi({
       clearSelection,
       setSelectedRowIds,

@@ -1,10 +1,11 @@
-import { useCallback, useId, useLayoutEffect, useMemo } from "react";
+import { useCallback, useId, useMemo } from "react";
 
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import { MemoizedItem } from "../../components/container-helpers";
 import { useTableContext } from "./TableContext";
 import type { OurColumnMetadata } from "./TableContext";
+import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 
 type Props = OurColumnMetadata & {
   nodeChildren?: ComponentDef[];
@@ -44,7 +45,7 @@ export function Column({ nodeChildren, renderChild, ...columnMetadata }: Props) 
     return nodeChildren ? cellRenderer : undefined;
   }, [cellRenderer, nodeChildren]);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     registerColumn(
       {
         ...columnMetadata,
@@ -54,7 +55,7 @@ export function Column({ nodeChildren, renderChild, ...columnMetadata }: Props) 
     );
   }, [columnMetadata, id, registerColumn, safeCellRenderer]);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     return () => {
       unRegisterColumn(id);
     };

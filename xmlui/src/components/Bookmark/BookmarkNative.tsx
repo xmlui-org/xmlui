@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
-import { useCallback, useContext, useEffect, useLayoutEffect, useRef } from "react";
+import { useCallback, useContext, useEffect, useRef } from "react";
 import { TableOfContentsContext } from "../../components-core/TableOfContentsContext";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import styles from "./Bookmark.module.scss";
+import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 
 type Props = {
   uid?: string;
@@ -38,17 +39,18 @@ export const Bookmark = ({
       let scrollableParent = elementRef.current.parentElement;
       while (scrollableParent) {
         const style = window.getComputedStyle(scrollableParent);
-        const isScrollable = (style.overflowY === 'scroll' || style.overflowY === 'auto') &&
-                            scrollableParent.scrollHeight > scrollableParent.clientHeight;
-        
+        const isScrollable =
+          (style.overflowY === "scroll" || style.overflowY === "auto") &&
+          scrollableParent.scrollHeight > scrollableParent.clientHeight;
+
         if (isScrollable) {
           // Found a scrollable parent, calculate the position
           const rect = elementRef.current.getBoundingClientRect();
           const parentRect = scrollableParent.getBoundingClientRect();
-          
+
           // Calculate where the element is relative to the parent's viewport
           const relativeTop = rect.top - parentRect.top + scrollableParent.scrollTop;
-          
+
           scrollableParent.scrollTo({
             top: relativeTop,
             behavior: options?.behavior || "smooth",
@@ -57,7 +59,7 @@ export const Bookmark = ({
         }
         scrollableParent = scrollableParent.parentElement;
       }
-      
+
       // Fallback to browser's default scrollIntoView
       elementRef.current.scrollIntoView({
         behavior: options?.behavior || "smooth",
@@ -72,7 +74,7 @@ export const Bookmark = ({
     });
   }, [registerComponentApi, scrollIntoView]);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (observeIntersection && elementRef.current && uid && !omitFromToc) {
       return registerHeading?.({
         id: uid,

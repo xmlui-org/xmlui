@@ -385,10 +385,10 @@ export const useStartMargin = (
   });
 
   // Recalculate on mount and when hasOutsideScroll changes
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const newMargin = calculateStartMargin();
     setStartMargin(newMargin);
-    
+
     // If we got 0 but hasOutsideScroll is true, try again after layout settles
     if (newMargin === 0 && hasOutsideScroll && parentRef.current && scrollRef.current) {
       requestAnimationFrame(() => {
@@ -405,7 +405,7 @@ export const useStartMargin = (
 
 export function useHasExplicitHeight(parentRef: React.MutableRefObject<HTMLDivElement | null>) {
   const [hasHeight, setHasHeight] = useState(false);
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (parentRef.current) {
       const computedStyles = window.getComputedStyle(parentRef.current);
       const hasMaxHeight = computedStyles.maxHeight !== "none";
