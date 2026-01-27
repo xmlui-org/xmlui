@@ -286,6 +286,8 @@ export const Container = memo(
               ownerSource: args && args[1] ? args[1].ownerSource : undefined,
               // Handler duration (for handler:complete)
               duration: args && args[1] ? args[1].duration : undefined,
+              // Handler code for tracing
+              handlerCode: args && args[1] ? args[1].handlerCode : undefined,
             });
           }
           if (xsLogBucket && appContext.AppState) {
