@@ -12,7 +12,6 @@
       <H1>
         {$item.title}
       </H1>
-     <Image src="/blog/images/{$item.image}" />
       <Text variant="em">
         {$item.description}
       </Text>
