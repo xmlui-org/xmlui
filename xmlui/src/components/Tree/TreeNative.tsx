@@ -278,7 +278,9 @@ export const defaultProps = {
   defaultExpanded: "none" as const,
   autoExpandToSelection: true,
   itemClickExpands: false,
+  dynamicField: "dynamic",
   loadedField: "loaded",
+  dynamic: false,
   iconCollapsed: "chevronright",
   iconExpanded: "chevrondown",
   iconSize: "16",
@@ -308,7 +310,9 @@ interface TreeComponentProps {
   defaultExpanded?: DefaultExpansion;
   autoExpandToSelection?: boolean;
   itemClickExpands?: boolean;
+  dynamicField?: string;
   loadedField?: string;
+  dynamic?: boolean;
   iconCollapsed?: string;
   iconExpanded?: string;
   iconSize?: string;
@@ -348,7 +352,9 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     defaultExpanded = defaultProps.defaultExpanded,
     autoExpandToSelection = defaultProps.autoExpandToSelection,
     itemClickExpands = defaultProps.itemClickExpands,
+    dynamicField = defaultProps.dynamicField,
     loadedField = defaultProps.loadedField,
+    dynamic = defaultProps.dynamic,
     iconCollapsed = defaultProps.iconCollapsed,
     iconExpanded = defaultProps.iconExpanded,
     iconSize = defaultProps.iconSize,
@@ -399,6 +405,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       parentField: parentIdField,
       childrenField,
       selectableField,
+      dynamicField,
       loadedField,
     }),
     [
@@ -410,6 +417,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       parentIdField,
       childrenField,
       selectableField,
+      dynamicField,
       loadedField,
     ],
   );
@@ -561,6 +569,11 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   const [autoLoadAfterMap, setAutoLoadAfterMap] = useState<
     Map<string | number, number | null>
   >(new Map());
+
+  // Dynamic state for tracking per-node dynamic values
+  const [dynamicStateMap, setDynamicStateMap] = useState<Map<string | number, boolean>>(
+    new Map(),
+  );
 
   // Collapsed timestamps for tracking when nodes were collapsed (Step 4: Auto-load feature)
   const [collapsedTimestamps, setCollapsedTimestamps] = useState<Map<string | number, number>>(
@@ -1975,6 +1988,43 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         // Fall back to component-level default
         return autoLoadAfter;
       },
+
+      getDynamic: (nodeId: string | number): boolean => {
+        // Check if there's an explicit value set via setDynamic
+        const explicitValue = dynamicStateMap.get(nodeId);
+        if (explicitValue !== undefined) {
+          return explicitValue;
+        }
+
+        // Check node data for dynamic field
+        const node = Object.values(treeItemsById).find(
+          (n) => String(n.key) === String(nodeId),
+        );
+        if (node) {
+          const dynamicFieldName = fieldConfig.dynamicField || "dynamic";
+          // TreeNode has data fields directly copied from source data
+          if (dynamicFieldName in node) {
+            return Boolean((node as any)[dynamicFieldName]);
+          }
+        }
+
+        // Fall back to component-level default
+        return dynamic ?? false;
+      },
+
+      setDynamic: (nodeId: string | number, value: boolean | undefined): void => {
+        if (value === undefined) {
+          // Clear explicit dynamic value for this node
+          setDynamicStateMap((prev) => {
+            const newMap = new Map(prev);
+            newMap.delete(nodeId);
+            return newMap;
+          });
+        } else {
+          // Set explicit dynamic value for this node
+          setDynamicStateMap((prev) => new Map(prev).set(nodeId, value));
+        }
+      },
     };
   }, [
     treeData,
@@ -1993,6 +2043,9 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     expandedTimestamps,
     autoLoadAfterMap,
     autoLoadAfter,
+    dynamicStateMap,
+    dynamic,
+    dynamicField,
   ]);
 
   // Register component API methods for external access

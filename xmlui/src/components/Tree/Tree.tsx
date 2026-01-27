@@ -146,7 +146,25 @@ export const TreeMd = createMetadata({
         '"whenScrolling" scroll styles.',
       valueType: "boolean",
       defaultValue: defaultProps.showScrollerFade,
-    },    autoLoadAfter: {
+    },
+    dynamicField: {
+      description:
+        "The property name in source data for dynamic state (default: 'dynamic'). When true, " +
+        "the node's children should be dynamically loaded via loadChildren event. When false, " +
+        "the node uses static children from data. Ignored if loadChildren handler is not provided.",
+      valueType: "string",
+      defaultValue: defaultProps.dynamicField,
+    },
+    dynamic: {
+      description:
+        "Default value for whether tree nodes should load children dynamically (default: false). " +
+        "If true, nodes will load children via the loadChildren event. If false, nodes use static " +
+        "children from data. Can be overridden per-node in source data using the dynamicField property. " +
+        "Ignored if loadChildren handler is not provided.",
+      valueType: "boolean",
+      defaultValue: defaultProps.dynamic,
+    },
+    autoLoadAfter: {
       description:
         "Default number of milliseconds after which dynamic tree nodes should automatically reload " +
         "their children when collapsed and then re-expanded. Only applies to nodes that were loaded " +
@@ -422,7 +440,9 @@ export const treeComponentRenderer = createComponentRenderer(
         parentIdField={extractValue(node.props.parentIdField)}
         childrenField={extractValue(node.props.childrenField)}
         selectableField={extractValue(node.props.selectableField)}
+        dynamicField={extractValue(node.props.dynamicField)}
         loadedField={extractValue(node.props.loadedField)}
+        dynamic={extractValue.asOptionalBoolean(node.props.dynamic, defaultProps.dynamic)}
         selectedValue={extractValue(node.props.selectedValue)}
         selectedId={extractValue(node.props.selectedId)}
         defaultExpanded={extractValue(node.props.defaultExpanded)}

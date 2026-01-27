@@ -37,6 +37,7 @@ export interface TreeFieldConfig {
   parentField?: string;
   childrenField?: string;
   selectableField?: string;
+  dynamicField?: string;
   loadedField?: string;
 }
 

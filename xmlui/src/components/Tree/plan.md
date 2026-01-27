@@ -1,98 +1,150 @@
-# Tree Auto-Load Feature Implementation Plan
+# Tree Component Async Loading
 
-## Context References
-- E2E Testing Conventions: `/Users/dotneteer/source/xmlui/xmlui/dev-docs/conv-e2e-testing.md`
-- Component Creation Conventions: `/Users/dotneteer/source/xmlui/xmlui/dev-docs/conv-create-components.md`
+The current Tree component's async (lazy) loading mechanism is creepy and needs to be updated.
 
-## Testing Workflow Per Step
-1. **Before implementation**: Run all existing Tree tests to ensure baseline passes
-   ```bash
-   npx playwright test Tree.spec.ts --workers=1 --reporter=line
-   ```
-2. **Implement the step**: Make code changes for the specific step
-3. **Run new tests**: Execute only the new E2E tests for this step
-   ```bash
-   npx playwright test Tree.spec.ts --grep "step name pattern" --workers=1 --reporter=line
-   ```
-4. **Run all Tree tests**: Verify no regressions
-   ```bash
-   npx playwright test Tree.spec.ts --workers=1 --reporter=line
-   ```
-5. **Wait for approval**: Confirm success before proceeding to next step
+## Workflow Rules
 
----
+**Before each step:**
+1. Run all Tree e2e tests to ensure baseline is stable
+2. Implement the feature
+3. Create e2e tests for the new feature
+4. Run the new tests separately first
+5. If new tests pass, run all Tree tests together
+6. If new tests fail, run them separately while stabilizing (do not run all tests)
+7. Only proceed to next step when all tests pass
 
-## Step 1: Add expanded timestamp tracking
-**Implementation:**
-- Add `expandedTimestamp?: number` field to `FlatTreeNodeWithState` interface in `treeAbstractions.ts`
-- Record `Date.now()` in `toggleNode` when expanding nodes (TreeNative.tsx)
-- Add `getExpandedTimestamp(nodeId: string | number): number | undefined` API method
-- Update metadata in Tree.tsx with new API
+**Test command:** `cd /Users/dotneteer/source/xmlui && npx playwright test xmlui/src/components/Tree/`
 
-**E2E Test:**
-- Verify timestamp is recorded when node expands
-- Verify timestamp is retrievable via API
-- Verify timestamp updates on re-expansion
-- Verify undefined returned for never-expanded nodes
+## Step 1: NOT DONE - Baseline Analysis & Plan Refinement
 
----
+**Status:** NOT STARTED
 
-## Step 2: Add autoLoadAfter state field
-**Implementation:**
-- Add `autoLoadAfter?: number | null` field to `FlatTreeNodeWithState` interface
-- Add `setAutoLoadAfter(nodeId: string | number, milliseconds: number | null | undefined): void` API method
-- Update metadata in Tree.tsx with new API
-- Store per-node autoLoadAfter in node state
+**Tasks:**
+- Run all existing Tree e2e tests to establish baseline
+- Analyze Tree component implementation
+- Identify existing vs missing features
+- Document baseline test results
 
-**E2E Test:**
-- Verify setAutoLoadAfter stores value correctly
-- Verify null/undefined clears autoLoadAfter
-- Verify values persist across collapse/expand cycles
-- Verify setting different values for different nodes
+## Idea
 
----
+Let's extend the state of tree nodes with these properties:
 
-## Step 3: Add autoLoadAfter component property
-**Implementation:**
-- Add `autoLoadAfter` property to Tree metadata (default: undefined)
-- Pass through renderer to TreeNative component
-- Apply default to nodes when autoLoadAfter not explicitly set per-node
-- Store default in component props
+- `dynamic`: Boolean property. If true, the node's children should be dynamically loaded. If the data contains children, those should be reloaded the next time the node is expanded. If false, the node is static, use the children in the data provided. If this property is not defined in the data, use the component's value for `dynamic`.
+- `loaded`: Boolean property. Ignored if the node is not dynamic. If true, the node's children are considered loaded. If false, children are loaded the next time the node is expanded.
+- `expanded`: timestamp value (Date().now). Represent the last time the node was expanded. This property it not read from the data.
+- `autoLoadAfter`: numeric property given in milliseconds (negative values are considererd zero). Ignored if the node is not dynamic. The next time the node is expanded, if the time span between the current time and the `expanded` timestamp is greater than `autoLoadAfter`, the node is marked as unloaded and the node's children are loaded again. If this property is not defined in the data, use the component's value for `autoLoadAfter`.
 
-**E2E Test:**
-- Verify default autoLoadAfter is applied to new nodes
-- Verify per-node values override default
-- Verify nodes without explicit value use default
+Let's have these properties to name the data field for a particular property:
+- `dynamicField`: property representing `dynamic`.
+- `loadedField`: property representing `loaded`.
+- `autoLoadAfterField`: representing `autoLoadAfter`.
 
----
+Let's extend the component with these properties:
+- `dynamic`: the default value for the tree nodes' `dynamic` field if the data does not specify them. This property is false, by default.
+- `autoLoadAfter`: the default value for the tree nodes' `autoLoadAfter` field if the data does not specify them. This property is 3000 milliseconds, by default.
 
-## Step 4: Implement autoload mechanism
-**Implementation:**
-- Add `collapsedTimestamp?: number` field to `FlatTreeNodeWithState` interface
-- Record collapse timestamp in `toggleNode` when collapsing dynamic nodes
-- On expand: check if (currentTime - collapsedTimestamp) > autoLoadAfter
-- If condition met: trigger loadChildren event and reload children
-- Only apply to dynamic nodes (nodes with `loadedField` === false initially and then loaded via loadChildren)
+Extend the existing API with these functions:
+- `getDynamic(nodeId: any): boolean`
+- `setDynamic(nodeId: any, value: boolean)`
+- `getLoaded(nodeId: any): boolean`
+- `setLoaded(nodeId: any, value: boolean)`
+- `getAutoLoadAfter(nodeId: any): number`
+- `setAutoLoadAfter(nodeId: any, value: number)`
 
-**E2E Test:**
-- Verify autoload triggers after threshold exceeded
-- Verify autoload doesn't trigger before threshold
-- Verify autoload only affects dynamic nodes, not static nodes
-- Verify children are actually reloaded (new data appears)
-- Use delay() in XMLUI to control timing
+## Resources
 
----
+- xmlui/dev-docs/conv-e2e-testing.md
+- xmlui/dev-docs/conv-create-components.md
+- e2e tests for the APICall components (using mock API interceptor)
+- e2e tests for the Tree component
 
-## Step 5: Edge cases and integration
-**Implementation:**
-- Handle node removal/updates during autoload
-- Ensure autoload state cleared when node manually reloaded via markNodeUnloaded
-- Clear timestamps appropriately on data changes
-- Handle multiple rapid collapse/expand cycles
+## Implementation Plan
 
-**E2E Test:**
-- Complex scenario: multiple nodes with different thresholds
-- Test manual reload clearing autoload state
-- Test rapid collapse/expand doesn't cause issues
-- Test removing nodes with pending autoload
-- Integration test with all features combined
+### Step 1: ✅ DONE - Baseline Analysis
+
+**Status:** COMPLETED
+
+**Baseline Test Results:** 197/202 passing, 5 skipped (58.5s)
+
+**Existing Infrastructure Found:**
+- Props: `loadedField` (default: "loaded"), `autoLoadAfter` (default: undefined)
+- State: `expandedTimestamps`, `collapsedTimestamps`, `autoLoadAfterMap`
+- API Methods: `getExpandedTimestamp`, `setAutoLoadAfter`, `getNodeAutoLoadAfter`, `markNodeLoaded`, `markNodeUnloaded`, `getNodeLoadingState`
+
+**Missing Features (to implement):**
+- `dynamicField` property and `dynamic` component-level default
+- `getDynamic(nodeId)` and `setDynamic(nodeId, value)` API methods
+- `autoLoadAfterField` property for reading per-node autoLoadAfter from data
+- `getLoaded(nodeId)` and `setLoaded(nodeId, value)` API aliases
+
+**Next Step:** Implement `dynamic` field support
+
+### Step 2: ✅ DONE - Add `dynamic` Field Support
+
+**Status:** COMPLETED
+
+**Completed:**
+1. ✅ Baseline check - all Tree tests passing (197/202)
+2. ✅ Added `dynamicField` and `dynamic` properties to Tree component
+3. ✅ Added `dynamicStateMap` state management for per-node overrides
+4. ✅ Implemented `getDynamic(nodeId)` API method
+5. ✅ Implemented `setDynamic(nodeId, value)` API method
+6. ✅ Added `dynamicField` to TreeFieldConfig interface
+7. ✅ Connected properties from Tree.tsx to TreeNative.tsx using extractValue.asOptionalBoolean
+8. ✅ Created 12 e2e tests for dynamic field functionality
+9. ✅ All 12 new tests passing
+10. ✅ All 214 Tree tests passing (209 passed, 5 skipped)
+
+**Implementation Details:**
+- `dynamicField` prop (default: "dynamic") - configurable field name in source data
+- `dynamic` prop (default: false) - component-level default for nodes
+- `getDynamic(nodeId)` - reads from: setDynamic override > data field > component default
+- `setDynamic(nodeId, value)` - sets per-node override (undefined to clear)
+- Value priority: explicit setDynamic > node data field > component-level default
+
+**Next Step:** Step 3 - Integrate `dynamic` with existing async loading logic
+
+### Step 3: NOT DONE - Integrate `dynamic` with Async Loading
+
+**Status:** NOT STARTED
+
+**Tasks:**
+1. Run all Tree e2e tests (baseline check)
+2. Update expansion logic to check `dynamic` field before triggering `loadChildren`
+3. Only apply `autoLoadAfter` threshold to dynamic nodes
+4. Create e2e tests for dynamic/static node behavior
+5. Run new tests separately first
+6. Run all Tree tests together if new tests pass
+
+### Step 4: NOT DONE - Add `autoLoadAfterField`
+
+**Status:** NOT STARTED
+
+**Tasks:**
+1. Run all Tree e2e tests (baseline check)
+2. Add `autoLoadAfterField` property (default: "autoLoadAfter")
+3. Update data parsing to read per-node `autoLoadAfter` values
+4. Create e2e tests for per-node autoLoadAfter configuration
+5. Run new tests separately first
+6. Run all Tree tests together if new tests pass
+
+### Step 5: NOT DONE - API Method Aliases
+
+**Status:** NOT STARTED
+
+**Tasks:**
+1. Run all Tree e2e tests (baseline check)
+2. Add `getLoaded(nodeId)` as alias for `getNodeLoadingState`
+3. Add `setLoaded(nodeId, value)` as wrapper for `markNodeLoaded/Unloaded`
+4. Create e2e tests for new API aliases
+5. Run new tests separately first
+6. Run all Tree tests together if new tests pass
+
+### Step 6: NOT DONE - Documentation
+
+**Status:** NOT STARTED
+
+**Tasks:**
+- Update component documentation with static vs dynamic nodes
+- Document all new API methods
+- Ensure test coverage is comprehensive
