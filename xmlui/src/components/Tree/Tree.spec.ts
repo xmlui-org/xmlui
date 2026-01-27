@@ -4546,3 +4546,167 @@ test.describe("Auto-Load Feature - Step 2: autoLoadAfter State Field", () => {
   });
 });
 
+test.describe("Auto-Load Feature - Step 3: autoLoadAfter Component Property", () => {
+  test("applies default autoLoadAfter to nodes when not set per-node", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <VStack height="400px">
+          <Tree 
+            id="treeApi" 
+            testId="tree" 
+            dataFormat="flat" 
+            defaultExpanded='{[1, 2]}'
+            autoLoadAfter="5000"
+            data='{${JSON.stringify(flatTreeData)}}'>
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
+        <Button testId="get-1-btn" onClick="testState = { value: treeApi.getNodeAutoLoadAfter(1) };" />
+        <Button testId="get-2-btn" onClick="testState = { value: treeApi.getNodeAutoLoadAfter(2) };" />
+      </Fragment>
+    `);
+
+    const get1Button = await createButtonDriver("get-1-btn");
+    const get2Button = await createButtonDriver("get-2-btn");
+    
+    // Check node 1 - should use component default
+    await get1Button.click();
+    let result = await testStateDriver.testState();
+    expect(result.value).toBe(5000);
+    
+    // Check node 2 - should also use component default
+    await get2Button.click();
+    result = await testStateDriver.testState();
+    expect(result.value).toBe(5000);
+  });
+
+  test("per-node setAutoLoadAfter overrides component default", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <VStack height="400px">
+          <Tree 
+            id="treeApi" 
+            testId="tree" 
+            dataFormat="flat" 
+            defaultExpanded='{[1, 2]}'
+            autoLoadAfter="5000"
+            data='{${JSON.stringify(flatTreeData)}}'>
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
+        <Button testId="set-btn" onClick="treeApi.setAutoLoadAfter(1, 3000);" />
+        <Button testId="get-btn" onClick="testState = { value: treeApi.getNodeAutoLoadAfter(1) };" />
+      </Fragment>
+    `);
+
+    const setButton = await createButtonDriver("set-btn");
+    const getButton = await createButtonDriver("get-btn");
+    
+    // Override default with per-node value
+    await setButton.click();
+    
+    // Verify override was successful - should return 3000, not 5000
+    await getButton.click();
+    const result = await testStateDriver.testState();
+    expect(result.value).toBe(3000);
+  });
+
+  test("nodes without explicit value use component default", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <VStack height="400px">
+          <Tree 
+            id="treeApi" 
+            testId="tree" 
+            dataFormat="flat" 
+            defaultExpanded='{[1, 2, 3]}'
+            autoLoadAfter="7000"
+            data='{${JSON.stringify(flatTreeData)}}'>
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
+        <Button testId="set-node-2-btn" onClick="treeApi.setAutoLoadAfter(2, 4000);" />
+        <Button testId="get-1-btn" onClick="testState = { node1: treeApi.getNodeAutoLoadAfter(1) };" />
+        <Button testId="get-2-btn" onClick="testState = { node2: treeApi.getNodeAutoLoadAfter(2) };" />
+        <Button testId="get-3-btn" onClick="testState = { node3: treeApi.getNodeAutoLoadAfter(3) };" />
+      </Fragment>
+    `);
+
+    const setNode2Button = await createButtonDriver("set-node-2-btn");
+    const get1Button = await createButtonDriver("get-1-btn");
+    const get2Button = await createButtonDriver("get-2-btn");
+    const get3Button = await createButtonDriver("get-3-btn");
+    
+    // Set explicit value only for node 2
+    await setNode2Button.click();
+    
+    // Node 1 should use default (7000)
+    await get1Button.click();
+    let result = await testStateDriver.testState();
+    expect(result.node1).toBe(7000);
+    
+    // Node 2 has explicit value (4000)
+    await get2Button.click();
+    result = await testStateDriver.testState();
+    expect(result.node2).toBe(4000);
+    
+    // Node 3 should use default (7000)
+    await get3Button.click();
+    result = await testStateDriver.testState();
+    expect(result.node3).toBe(7000);
+  });
+
+  test("undefined autoLoadAfter disables auto-loading by default", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <VStack height="400px">
+          <Tree 
+            id="treeApi" 
+            testId="tree" 
+            dataFormat="flat" 
+            defaultExpanded='{[1, 2]}'
+            data='{${JSON.stringify(flatTreeData)}}'>
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
+        <Button testId="get-1-btn" onClick="testState = { value: treeApi.getNodeAutoLoadAfter(1) };" />
+      </Fragment>
+    `);
+
+    const get1Button = await createButtonDriver("get-1-btn");
+    
+    // autoLoadAfter not specified, should default to undefined (disabled)
+    await get1Button.click();
+    const result = await testStateDriver.testState();
+    expect(result.value).toBeUndefined();
+  });
+});
+

@@ -146,8 +146,15 @@ export const TreeMd = createMetadata({
         '"whenScrolling" scroll styles.',
       valueType: "boolean",
       defaultValue: defaultProps.showScrollerFade,
-    },
-  },
+    },    autoLoadAfter: {
+      description:
+        "Default number of milliseconds after which dynamic tree nodes should automatically reload " +
+        "their children when collapsed and then re-expanded. Only applies to nodes that were loaded " +
+        "via the loadChildren event. Can be overridden per-node using setAutoLoadAfter API. " +
+        "Pass undefined to disable auto-loading by default.",
+      valueType: "number",
+      defaultValue: defaultProps.autoLoadAfter,
+    },  },
   events: {
     contextMenu: dContextMenu(COMP),
     selectionDidChange: {
@@ -270,6 +277,14 @@ export const TreeMd = createMetadata({
           nodeId: "The ID of the node (source data format)",
           milliseconds:
             "Number of milliseconds after which to auto-reload. Pass null or undefined to disable auto-loading for this node.",
+        },
+      },
+      getNodeAutoLoadAfter: {
+        description: `Get the effective auto-load threshold for a specific node. Returns the node's explicit value if set, otherwise returns the component's default autoLoadAfter value.`,
+        signature:
+          "getNodeAutoLoadAfter(nodeId: string | number): number | null | undefined",
+        parameters: {
+          nodeId: "The ID of the node (source data format)",
         },
       },
     },
@@ -426,6 +441,7 @@ export const treeComponentRenderer = createComponentRenderer(
           node.props.showScrollerFade,
           defaultProps.showScrollerFade,
         )}
+        autoLoadAfter={extractValue.asOptionalNumber(node.props.autoLoadAfter)}
         onSelectionChanged={lookupEventHandler("selectionDidChange")}
         onNodeExpanded={lookupEventHandler("nodeDidExpand")}
         onNodeCollapsed={lookupEventHandler("nodeDidCollapse")}

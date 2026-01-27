@@ -285,6 +285,7 @@ export const defaultProps = {
   expandRotation: 90,
   scrollStyle: "normal" as const,
   showScrollerFade: false,
+  autoLoadAfter: undefined as number | undefined,
 };
 
 interface TreeComponentProps {
@@ -314,6 +315,7 @@ interface TreeComponentProps {
   expandRotation?: number;
   scrollStyle?: "normal" | "overlay" | "whenMouseOver" | "whenScrolling";
   showScrollerFade?: boolean;
+  autoLoadAfter?: number;
   onItemClick?: (node: FlatTreeNode) => void;
   onSelectionChanged?: (event: TreeSelectionEvent) => void;
   onNodeExpanded?: (node: FlatTreeNode) => void;
@@ -352,6 +354,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     expandRotation = defaultProps.expandRotation,
     scrollStyle = defaultProps.scrollStyle,
     showScrollerFade = defaultProps.showScrollerFade,
+    autoLoadAfter = defaultProps.autoLoadAfter,
     onItemClick,
     onSelectionChanged,
     onNodeExpanded,
@@ -582,6 +585,21 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   const flatTreeData = useMemo(() => {
     return toFlatTree(treeData, expandedIds, undefined, nodeStates);
   }, [expandedIds, treeData, nodeStates]);
+
+  // Enhanced flat tree with timestamps and autoLoadAfter values
+  const enhancedFlatTreeData: FlatTreeNodeWithState[] = useMemo(() => {
+    return flatTreeData.map((node) => {
+      const nodeId = node.key;
+      const timestamp = expandedTimestamps.get(nodeId);
+      const explicitAutoLoadAfter = autoLoadAfterMap.get(nodeId);
+      
+      return {
+        ...node,
+        expandedTimestamp: timestamp,
+        autoLoadAfter: explicitAutoLoadAfter !== undefined ? explicitAutoLoadAfter : autoLoadAfter,
+      };
+    });
+  }, [flatTreeData, expandedTimestamps, autoLoadAfterMap, autoLoadAfter]);
 
   // Measure first item size when fixedItemSize is enabled
   useEffect(() => {
@@ -1805,6 +1823,15 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           setAutoLoadAfterMap((prev) => new Map(prev).set(nodeId, milliseconds));
         }
       },
+
+      getNodeAutoLoadAfter: (nodeId: string | number): number | null | undefined => {
+        const explicitValue = autoLoadAfterMap.get(nodeId);
+        if (explicitValue !== undefined) {
+          return explicitValue;
+        }
+        // Fall back to component-level default
+        return autoLoadAfter;
+      },
     };
   }, [
     treeData,
@@ -1822,6 +1849,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     setInternalData,
     expandedTimestamps,
     autoLoadAfterMap,
+    autoLoadAfter,
   ]);
 
   // Register component API methods for external access
