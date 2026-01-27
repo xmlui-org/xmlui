@@ -1,5 +1,5 @@
 import type { CSSProperties, ForwardedRef, ReactElement, ReactNode } from "react";
-import React, { cloneElement, forwardRef, useId, useState, useLayoutEffect, useCallback } from "react";
+import React, { cloneElement, forwardRef, useId, useState, useCallback } from "react";
 import classnames from "classnames";
 import { Slot } from "@radix-ui/react-slot";
 
@@ -11,6 +11,7 @@ import { PART_LABELED_ITEM, PART_LABEL } from "../../components-core/parts";
 import { Part } from "../Part/Part";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
 import { RadioGroup } from "../RadioGroup/RadioGroupNative";
+import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 
 // Component part names
 
@@ -100,7 +101,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     setInputElement(node);
   }, []);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!inputElement) return;
 
     // Measure immediately
@@ -160,14 +161,17 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
             >
               <Part partId={PART_LABEL}>
                 <legend
-                  onClick={onLabelClick || ((e) => {
-                    // For radio groups, focus the first radio option
-                    const fieldset = (e.currentTarget as HTMLElement).closest("fieldset");
-                    if (fieldset) {
-                      const firstRadio = fieldset.querySelector('[role="radio"]') as HTMLElement;
-                      firstRadio?.focus();
-                    }
-                  })}
+                  onClick={
+                    onLabelClick ||
+                    ((e) => {
+                      // For radio groups, focus the first radio option
+                      const fieldset = (e.currentTarget as HTMLElement).closest("fieldset");
+                      if (fieldset) {
+                        const firstRadio = fieldset.querySelector('[role="radio"]') as HTMLElement;
+                        firstRadio?.focus();
+                      }
+                    })
+                  }
                   style={{
                     ...labelStyle,
                     width:
@@ -181,14 +185,18 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
                   })}
                 >
                   {label}
-                  {(requireLabelMode === "markRequired" || requireLabelMode === "markBoth") && required && (
-                    <span className={styles.requiredMark}>*</span>
-                  )}
+                  {(requireLabelMode === "markRequired" || requireLabelMode === "markBoth") &&
+                    required && <span className={styles.requiredMark}>*</span>}
                   {(requireLabelMode === "markOptional" || requireLabelMode === "markBoth") &&
                     !required && <span className={styles.optionalTag}> (Optional)</span>}
                   {validationInProgress && (
                     <Spinner
-                      style={{ height: "1em", width: "1em", marginLeft: "1em", alignSelf: "center" }}
+                      style={{
+                        height: "1em",
+                        width: "1em",
+                        marginLeft: "1em",
+                        alignSelf: "center",
+                      }}
                     />
                   )}
                 </legend>
@@ -248,9 +256,8 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
                 })}
               >
                 {label}
-                {(requireLabelMode === "markRequired" || requireLabelMode === "markBoth") && required && (
-                  <span className={styles.requiredMark}>*</span>
-                )}
+                {(requireLabelMode === "markRequired" || requireLabelMode === "markBoth") &&
+                  required && <span className={styles.requiredMark}>*</span>}
                 {(requireLabelMode === "markOptional" || requireLabelMode === "markBoth") &&
                   !required && <span className={styles.optionalTag}> (Optional)</span>}
                 {validationInProgress && (

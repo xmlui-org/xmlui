@@ -1,14 +1,7 @@
 import type React from "react";
-import {
-  cloneElement,
-  forwardRef,
-  useCallback,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { cloneElement, forwardRef, useCallback, useRef, useState } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
-import { useShallowCompareMemoize } from "./utils/hooks";
+import { useIsomorphicLayoutEffect, useShallowCompareMemoize } from "./utils/hooks";
 
 // --- Describes the properties of the decorator component
 interface DecoratorProps {
@@ -80,7 +73,7 @@ const ComponentDecorator = forwardRef((props: DecoratorProps, forwardedRef) => {
   const shouldRenderHelperSpan = !props.allowOnlyRefdChild && !handlesItemRefs;
 
   // --- When the component mounts, we add the attributes to the component's DOM node
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     let node;
     if (handlesItemRefs) {
       node = itemRef.current;
