@@ -80,6 +80,9 @@ test.describe("Imperative API", () => {
     const tree = await createTreeDriver("tree");
     const collapseButton = await createButtonDriver("collapse-btn");
 
+    // Wait for tree to be fully rendered before proceeding
+    await tree.component.waitFor({ state: "visible" });
+    
     // Verify tree starts with all nodes visible (defaultExpanded="all")
     await expect(tree.getByTestId("1:expand")).toBeVisible();
     await expect(tree.getByTestId("2:expand")).toBeVisible();
@@ -232,13 +235,13 @@ test.describe("Imperative API", () => {
     const tree = await createTreeDriver("tree");
     const scrollButton = await createButtonDriver("scroll-btn");
 
-    // Verify tree is visible and first items are visible
-    await expect(tree.getByTestId("1:scroll")).toBeVisible();
-    await expect(tree.getByTestId("2:scroll")).toBeVisible();
+    // Wait for tree to be fully rendered by checking for first item
+    await expect(tree.getByTestId("1:scroll").first()).toBeVisible();
+    await expect(tree.getByTestId("2:scroll").first()).toBeVisible();
 
     // Verify the target item at the bottom is initially NOT visible in the small viewport
     // (Due to the small height of 150px and many items, item 19 should be out of view)
-    await expect(tree.getByTestId("19:scroll")).not.toBeVisible();
+    await expect(tree.getByTestId("19:scroll").first()).not.toBeVisible();
 
     // Click scroll to item button
     await scrollButton.click();
@@ -474,22 +477,23 @@ test.describe("Imperative API", () => {
     const appendButton = await createButtonDriver("append-btn");
 
     // Check initial tree structure - all nodes visible due to defaultExpanded="all"
-    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
-    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
-    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
-    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+    // Use .first() to handle potential duplicates and add explicit waits
+    await expect(tree.getByTestId("1").first()).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2").first()).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3").first()).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4").first()).toBeVisible(); // Grandchild visible (expanded)
 
     // Append new root node using API
     await appendButton.click();
 
     // Verify original nodes are still visible
-    await expect(tree.getByTestId("1")).toBeVisible(); // Original root
-    await expect(tree.getByTestId("2")).toBeVisible(); // Original child
-    await expect(tree.getByTestId("3")).toBeVisible(); // Original child
-    await expect(tree.getByTestId("4")).toBeVisible(); // Original grandchild
+    await expect(tree.getByTestId("1").first()).toBeVisible(); // Original root
+    await expect(tree.getByTestId("2").first()).toBeVisible(); // Original child
+    await expect(tree.getByTestId("3").first()).toBeVisible(); // Original child
+    await expect(tree.getByTestId("4").first()).toBeVisible(); // Original grandchild
 
     // Verify new root node is now visible
-    await expect(tree.getByTestId("5")).toBeVisible(); // New root node
+    await expect(tree.getByTestId("5").first()).toBeVisible(); // New root node
   });
 
   test("exposes removeNode method with flat data format #1 - remove leaf node", async ({

@@ -276,6 +276,7 @@ export const defaultProps = {
   defaultExpanded: "none" as const,
   autoExpandToSelection: true,
   itemClickExpands: false,
+  loadedField: "loaded",
   dynamicField: "dynamic",
   iconCollapsed: "chevronright",
   iconExpanded: "chevrondown",
@@ -304,6 +305,7 @@ interface TreeComponentProps {
   defaultExpanded?: DefaultExpansion;
   autoExpandToSelection?: boolean;
   itemClickExpands?: boolean;
+  loadedField?: string;
   dynamicField?: string;
   iconCollapsed?: string;
   iconExpanded?: string;
@@ -342,6 +344,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     defaultExpanded = defaultProps.defaultExpanded,
     autoExpandToSelection = defaultProps.autoExpandToSelection,
     itemClickExpands = defaultProps.itemClickExpands,
+    loadedField = defaultProps.loadedField,
     dynamicField = defaultProps.dynamicField,
     iconCollapsed = defaultProps.iconCollapsed,
     iconExpanded = defaultProps.iconExpanded,
@@ -391,6 +394,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       parentField: parentIdField,
       childrenField,
       selectableField,
+      loadedField,
       dynamicField,
     }),
     [
@@ -402,6 +406,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       parentIdField,
       childrenField,
       selectableField,
+      loadedField,
       dynamicField,
     ],
   );

@@ -6,6 +6,7 @@ export interface TreeNode {
   children?: TreeNode[];
   parentIds: (string | number)[];
   selectable: boolean;
+  loaded?: boolean;
   [x: string]: any;
 }
 
@@ -37,6 +38,7 @@ export interface TreeFieldConfig {
   childrenField?: string;
   selectableField?: string;
   dynamicField?: string;
+  loadedField?: string;
 }
 
 export interface TreeSelectionEvent {

@@ -117,6 +117,11 @@ export const TreeMd = createMetadata({
       valueType: "number",
       defaultValue: defaultProps.expandRotation,
     },
+    loadedField: {
+      description: `The property name in source data for loaded state (default: "loaded"). When false, shows expand indicator even without children and triggers async loading.`,
+      valueType: "string",
+      defaultValue: defaultProps.loadedField,
+    },
     dynamicField: {
       description: `The property name in source data for dynamic loading state (default: "dynamic").`,
       valueType: "string",
@@ -373,6 +378,7 @@ export const treeComponentRenderer = createComponentRenderer(
         parentIdField={extractValue(node.props.parentIdField)}
         childrenField={extractValue(node.props.childrenField)}
         selectableField={extractValue(node.props.selectableField)}
+        loadedField={extractValue(node.props.loadedField)}
         dynamicField={extractValue(node.props.dynamicField)}
         selectedValue={extractValue(node.props.selectedValue)}
         selectedId={extractValue(node.props.selectedId)}

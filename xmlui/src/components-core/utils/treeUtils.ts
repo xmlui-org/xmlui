@@ -179,6 +179,7 @@ export function flatToNative(
       displayName,
       parentIds,
       selectable: fieldConfig.selectableField ? (item[fieldConfig.selectableField] ?? true) : true,
+      loaded: fieldConfig.loadedField ? (item[fieldConfig.loadedField] ?? true) : true,
       children,
       // Preserve original item properties
       ...item,
@@ -275,6 +276,7 @@ export function hierarchyToNative(
         displayName,
         parentIds,
         selectable: fieldConfig.selectableField ? (item[fieldConfig.selectableField] ?? true) : true,
+        loaded: fieldConfig.loadedField ? (item[fieldConfig.loadedField] ?? true) : true,
         children: [],
         ...item,
         ...(fieldConfig.iconField && item[fieldConfig.iconField] && {
@@ -308,6 +310,7 @@ export function hierarchyToNative(
       displayName,
       parentIds,
       selectable: fieldConfig.selectableField ? (item[fieldConfig.selectableField] ?? true) : true,
+      loaded: fieldConfig.loadedField ? (item[fieldConfig.loadedField] ?? true) : true,
       // Preserve original item properties (excluding children to avoid overwriting)
       ...item,
       // Add icon properties if configured
