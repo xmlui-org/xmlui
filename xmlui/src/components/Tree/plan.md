@@ -238,6 +238,8 @@ npx playwright test Tree-icons.spec.ts --workers=1 --reporter=line
 - ✅ Defaults to `true` when not specified
 - ✅ No visual/behavioral changes yet
 
+**Status: ✅ COMPLETED**
+
 ---
 
 #### STEP 3: Show Expand Indicator for Unloaded Nodes
@@ -342,6 +344,8 @@ npx playwright test Tree-icons.spec.ts --workers=1 --reporter=line
 - ✅ Unloaded nodes show expand indicator
 - ✅ Loaded nodes without children don't show expand indicator
 - ✅ Nodes with actual children still show expand indicator
+
+**Status: ✅ COMPLETED**
 
 ---
 

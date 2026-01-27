@@ -18,13 +18,14 @@ export function flattenNode(
 ) {
   const { children, key } = node;
   const isExpanded = openedIds.includes(key);
-  // Check if node has actual children OR is a dynamic node that can load children
+  // Check if node has actual children OR is a dynamic node that can load children OR is unloaded
   const hasActualChildren = !!children && children.length > 0;
   const isDynamic = dynamicField && node[dynamicField];
-  const hasChildren = hasActualChildren || isDynamic;
+  const isUnloaded = node.loaded === false;
+  const hasChildren = hasActualChildren || isDynamic || isUnloaded;
   
   // Get loading state for this node
-  const loadingState = nodeStates?.get(key) || (isDynamic ? 'unloaded' : 'loaded');
+  const loadingState = nodeStates?.get(key) || (isDynamic || isUnloaded ? 'unloaded' : 'loaded');
   
   const flatNode: FlatTreeNodeWithState = {
     ...node,
