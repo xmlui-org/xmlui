@@ -280,6 +280,7 @@ export const defaultProps = {
   itemClickExpands: false,
   dynamicField: "dynamic",
   loadedField: "loaded",
+  autoLoadAfterField: "autoLoadAfter",
   dynamic: false,
   iconCollapsed: "chevronright",
   iconExpanded: "chevrondown",
@@ -312,6 +313,7 @@ interface TreeComponentProps {
   itemClickExpands?: boolean;
   dynamicField?: string;
   loadedField?: string;
+  autoLoadAfterField?: string;
   dynamic?: boolean;
   iconCollapsed?: string;
   iconExpanded?: string;
@@ -354,6 +356,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     itemClickExpands = defaultProps.itemClickExpands,
     dynamicField = defaultProps.dynamicField,
     loadedField = defaultProps.loadedField,
+    autoLoadAfterField = defaultProps.autoLoadAfterField,
     dynamic = defaultProps.dynamic,
     iconCollapsed = defaultProps.iconCollapsed,
     iconExpanded = defaultProps.iconExpanded,
@@ -407,6 +410,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       selectableField,
       dynamicField,
       loadedField,
+      autoLoadAfterField,
     }),
     [
       idField,
@@ -419,6 +423,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       selectableField,
       dynamicField,
       loadedField,
+      autoLoadAfterField,
     ],
   );
 
@@ -808,7 +813,17 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         const currentLoadingState = nodeStates.get(node.key) || "unloaded";
         const collapsedTime = collapsedTimestamps.get(node.key);
         const explicitAutoLoadAfter = autoLoadAfterMap.get(node.key);
-        const effectiveAutoLoadAfter = explicitAutoLoadAfter !== undefined ? explicitAutoLoadAfter : autoLoadAfter;
+        
+        // Step 4: Read per-node autoLoadAfter from data field
+        const autoLoadAfterFieldName = fieldConfig.autoLoadAfterField || "autoLoadAfter";
+        const nodeAutoLoadAfter = autoLoadAfterFieldName in node 
+          ? (node as any)[autoLoadAfterFieldName] 
+          : undefined;
+        
+        // Priority: setAutoLoadAfter > node data field > component prop
+        const effectiveAutoLoadAfter = explicitAutoLoadAfter !== undefined 
+          ? explicitAutoLoadAfter 
+          : (nodeAutoLoadAfter !== undefined ? nodeAutoLoadAfter : autoLoadAfter);
         
         const shouldAutoReload = 
           isDynamic && // Only auto-reload dynamic nodes

@@ -173,6 +173,14 @@ export const TreeMd = createMetadata({
       valueType: "number",
       defaultValue: defaultProps.autoLoadAfter,
     },
+    autoLoadAfterField: {
+      description:
+        "The property name in source data for per-node autoLoadAfter values (default: 'autoLoadAfter'). " +
+        "Allows reading node-specific reload thresholds from data. Node-level values take priority over " +
+        "the component-level autoLoadAfter prop.",
+      valueType: "string",
+      defaultValue: defaultProps.autoLoadAfterField,
+    },
     spinnerDelay: {
       description:
         "The delay in milliseconds before showing the loading spinner when a node is in loading state. " +
@@ -442,6 +450,7 @@ export const treeComponentRenderer = createComponentRenderer(
         selectableField={extractValue(node.props.selectableField)}
         dynamicField={extractValue(node.props.dynamicField)}
         loadedField={extractValue(node.props.loadedField)}
+        autoLoadAfterField={extractValue(node.props.autoLoadAfterField)}
         dynamic={extractValue.asOptionalBoolean(node.props.dynamic, defaultProps.dynamic)}
         selectedValue={extractValue(node.props.selectedValue)}
         selectedId={extractValue(node.props.selectedId)}

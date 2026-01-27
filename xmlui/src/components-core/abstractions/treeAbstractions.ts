@@ -39,6 +39,7 @@ export interface TreeFieldConfig {
   selectableField?: string;
   dynamicField?: string;
   loadedField?: string;
+  autoLoadAfterField?: string;
 }
 
 export interface TreeSelectionEvent {
