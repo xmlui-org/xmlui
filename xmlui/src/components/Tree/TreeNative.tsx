@@ -1642,16 +1642,101 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       // Node state management methods
 
       getNodeLoadingState: (nodeId: string | number) => {
-        return getNodeState(nodeId);
+        // First check nodeStates Map (active loading state)
+        const activeState = nodeStates.get(nodeId);
+        if (activeState) {
+          return activeState;
+        }
+        
+        // Fallback to checking loaded field from source data
+        const node = getNodeById(nodeId);
+        if (node && node.loaded === false) {
+          return "unloaded";
+        }
+        
+        // Default to loaded
+        return "loaded";
       },
 
       markNodeLoaded: (nodeId: string | number) => {
         setNodeState(nodeId, "loaded");
+        
+        // Also update the loaded field in source data
+        updateInternalData((prevData) => {
+          const currentData = prevData ?? data;
+          const loadedFieldName = fieldConfig.loadedField || "loaded";
+
+          if (dataFormat === "flat" && Array.isArray(currentData)) {
+            // Update in flat format
+            return currentData.map((item) => {
+              if (String(item[fieldConfig.idField || "id"]) === String(nodeId)) {
+                return { ...item, [loadedFieldName]: true };
+              }
+              return item;
+            });
+          } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+            // Update in hierarchy format
+            const updateHierarchy = (nodes: any[]): any[] => {
+              return nodes.map((node) => {
+                if (String(node[fieldConfig.idField || "id"]) === String(nodeId)) {
+                  return { ...node, [loadedFieldName]: true };
+                } else if (node[fieldConfig.childrenField || "children"]) {
+                  return {
+                    ...node,
+                    [fieldConfig.childrenField || "children"]: updateHierarchy(
+                      node[fieldConfig.childrenField || "children"],
+                    ),
+                  };
+                }
+                return node;
+              });
+            };
+            return updateHierarchy(currentData);
+          }
+
+          return currentData;
+        });
       },
 
       markNodeUnloaded: (nodeId: string | number) => {
         setNodeState(nodeId, "unloaded");
         treeApiMethods.collapseNode(nodeId);
+        
+        // Also update the loaded field in source data
+        updateInternalData((prevData) => {
+          const currentData = prevData ?? data;
+          const loadedFieldName = fieldConfig.loadedField || "loaded";
+
+          if (dataFormat === "flat" && Array.isArray(currentData)) {
+            // Update in flat format
+            return currentData.map((item) => {
+              if (String(item[fieldConfig.idField || "id"]) === String(nodeId)) {
+                return { ...item, [loadedFieldName]: false };
+              }
+              return item;
+            });
+          } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+            // Update in hierarchy format
+            const updateHierarchy = (nodes: any[]): any[] => {
+              return nodes.map((node) => {
+                if (String(node[fieldConfig.idField || "id"]) === String(nodeId)) {
+                  return { ...node, [loadedFieldName]: false };
+                } else if (node[fieldConfig.childrenField || "children"]) {
+                  return {
+                    ...node,
+                    [fieldConfig.childrenField || "children"]: updateHierarchy(
+                      node[fieldConfig.childrenField || "children"],
+                    ),
+                  };
+                }
+                return node;
+              });
+            };
+            return updateHierarchy(currentData);
+          }
+
+          return currentData;
+        });
       },
     };
   }, [

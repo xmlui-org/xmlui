@@ -505,3 +505,197 @@ test.describe("Async Loading with loaded Field", () => {
     await expect(page.getByText("Child 2")).toBeVisible();
   });
 });
+
+// =============================================================================
+// API METHODS WITH LOADED FIELD TESTS
+// =============================================================================
+
+test.describe("API Methods with loaded Field", () => {
+  test("markNodeUnloaded sets loaded to false", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Tree
+          id="tree"
+          dataFormat="flat"
+          data="{[
+            { id: 1, name: 'Parent', loaded: true },
+            { id: 2, name: 'Child', parentId: 1, loaded: true }
+          ]}"
+          loadedField="loaded"
+        >
+          <property name="itemTemplate">
+            <HStack testId="{$item.id}">
+              <Text value="{$item.name}" />
+            </HStack>
+          </property>
+        </Tree>
+        <Button testId="unloadBtn" onClick="tree.markNodeUnloaded(1)" />
+        <Button testId="checkBtn" onClick="testState = tree.getNodeById(1)" />
+      </Fragment>
+    `);
+
+    // Mark node as unloaded
+    await page.getByTestId("unloadBtn").click();
+    await page.waitForTimeout(50);
+
+    // Check that loaded field is false
+    await page.getByTestId("checkBtn").click();
+    const result = await testStateDriver.testState();
+    expect(result.loaded).toBe(false);
+  });
+
+  test("markNodeLoaded sets loaded to true", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Tree
+          id="tree"
+          dataFormat="flat"
+          data="{[
+            { id: 1, name: 'Node', loaded: false }
+          ]}"
+          loadedField="loaded"
+        >
+          <property name="itemTemplate">
+            <HStack testId="{$item.id}">
+              <Text value="{$item.name}" />
+            </HStack>
+          </property>
+        </Tree>
+        <Button testId="loadBtn" onClick="tree.markNodeLoaded(1)" />
+        <Button testId="checkBtn" onClick="testState = tree.getNodeById(1)" />
+      </Fragment>
+    `);
+
+    // Mark node as loaded
+    await page.getByTestId("loadBtn").click();
+    await page.waitForTimeout(50);
+
+    // Check that loaded field is true
+    await page.getByTestId("checkBtn").click();
+    const result = await testStateDriver.testState();
+    expect(result.loaded).toBe(true);
+  });
+
+  test("getNodeLoadingState returns correct state", async ({
+    initTestBed,
+    page,
+    createTreeDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(
+      `
+      <Tree
+        id="tree"
+        dataFormat="flat"
+        testId="tree"
+        itemClickExpands
+        data="{[
+          { id: 1, name: 'Unloaded', loaded: false }
+        ]}"
+        loadedField="loaded"
+        onLoadChildren="arg => Actions.callApi({ url: '/api/tree/children/' + arg.id })"
+      >
+        <property name="itemTemplate">
+          <HStack testId="{$item.id}">
+            <Text value="{$item.name}" />
+          </HStack>
+        </property>
+      </Tree>
+      <Button testId="checkBtn" onClick="testState = tree.getNodeLoadingState(1)" />
+    `,
+      {
+        apiInterceptor: slowLoadMock,
+      },
+    );
+
+    const tree = await createTreeDriver("tree");
+
+    // Initial state should be unloaded
+    await page.getByTestId("checkBtn").click();
+    let result = await testStateDriver.testState();
+    expect(result).toBe("unloaded");
+
+    // Start loading
+    await tree.getByTestId("1").click();
+
+    // Check loading state (might be flaky due to timing)
+    await page.waitForTimeout(50);
+    await page.getByTestId("checkBtn").click();
+    result = await testStateDriver.testState();
+    // Could be "loading" or "loaded" depending on timing
+    expect(["loading", "loaded"]).toContain(result);
+
+    // Wait for completion
+    await expect(page.getByText("Child")).toBeVisible();
+
+    // Final state should be loaded
+    await page.getByTestId("checkBtn").click();
+    result = await testStateDriver.testState();
+    expect(result).toBe("loaded");
+  });
+
+  test("markNodeUnloaded works in hierarchy format", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Tree
+          id="tree"
+          dataFormat="hierarchy"
+          data="{[
+            { id: 1, name: 'Parent', loaded: true, children: [
+              { id: 2, name: 'Child', loaded: true }
+            ]}
+          ]}"
+          loadedField="loaded"
+        >
+          <property name="itemTemplate">
+            <HStack testId="{$item.id}">
+              <Text value="{$item.name}" />
+            </HStack>
+          </property>
+        </Tree>
+        <Button testId="unloadBtn" onClick="tree.markNodeUnloaded(1)" />
+        <Button testId="checkBtn" onClick="testState = tree.getNodeById(1)" />
+      </Fragment>
+    `);
+
+    // Mark node as unloaded
+    await page.getByTestId("unloadBtn").click();
+    await page.waitForTimeout(50);
+
+    // Check that loaded field is false
+    await page.getByTestId("checkBtn").click();
+    const result = await testStateDriver.testState();
+    expect(result.loaded).toBe(false);
+  });
+
+  test("markNodeLoaded works in hierarchy format", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Tree
+          id="tree"
+          dataFormat="hierarchy"
+          data="{[
+            { id: 1, name: 'Node', loaded: false }
+          ]}"
+          loadedField="loaded"
+        >
+          <property name="itemTemplate">
+            <HStack testId="{$item.id}">
+              <Text value="{$item.name}" />
+            </HStack>
+          </property>
+        </Tree>
+        <Button testId="loadBtn" onClick="tree.markNodeLoaded(1)" />
+        <Button testId="checkBtn" onClick="testState = tree.getNodeById(1)" />
+      </Fragment>
+    `);
+
+    // Mark node as loaded
+    await page.getByTestId("loadBtn").click();
+    await page.waitForTimeout(50);
+
+    // Check that loaded field is true
+    await page.getByTestId("checkBtn").click();
+    const result = await testStateDriver.testState();
+    expect(result.loaded).toBe(true);
+  });
+});
