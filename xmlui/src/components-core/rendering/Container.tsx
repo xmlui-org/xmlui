@@ -424,10 +424,6 @@ export const Container = memo(
           // ArrowExpression has .name (function name)
           handlerCode = `${(source as any).name}()`;
         }
-        // Debug: log source type if handlerCode is still undefined
-        if (!handlerCode && xsVerbose) {
-          console.log("[xs] handler source type:", typeof source, source?.constructor?.name, Object.keys(source || {}));
-        }
 
         try {
           if (xsVerbose) {
