@@ -404,6 +404,7 @@ export async function callApi(
     traceApiCall("api:complete", resolvedUrl, resolvedMethod, {
       transactionId: clientTxId,
       body: resolvedBody,
+      result,
     });
 
     const onSuccessFn = lookupAction(onSuccess, uid, {
