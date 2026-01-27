@@ -415,22 +415,6 @@ Note how changing the input in the demo below will result in a slight delay of i
 
 %-PROP-END
 
-%-PROP-START customValidationsTimeout
-
-```xmlui-pg copy display name="Example: customValidationsTimeout"
-<App>
-  <Form
-    data="{{ email: '' }}"
-    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
-    <FormItem
-      customValidationsTimeout="2000"
-      customValidationsTimeoutMessage="Email verification is taking too long. Please check your connection."
-      onValidate="(value) => new Promise((resolve) => setTimeout(() => resolve(value.includes('@')), 5000))"
-      bindTo="email" />
-  </Form>
-</App>
-```
-
 %-PROP-END
 
 %-EVENT-START validate
