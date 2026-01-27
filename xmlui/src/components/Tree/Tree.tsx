@@ -262,6 +262,16 @@ export const TreeMd = createMetadata({
           nodeId: "The ID of the node to check (source data format)",
         },
       },
+      setAutoLoadAfter: {
+        description: `Set the auto-load threshold for a specific node. When the node is collapsed and then re-expanded after this many milliseconds, its children will be automatically reloaded.`,
+        signature:
+          "setAutoLoadAfter(nodeId: string | number, milliseconds: number | null | undefined): void",
+        parameters: {
+          nodeId: "The ID of the node (source data format)",
+          milliseconds:
+            "Number of milliseconds after which to auto-reload. Pass null or undefined to disable auto-loading for this node.",
+        },
+      },
     },
     appendNode: {
       description: `Add a new node to the tree as a child of the specified parent node.`,

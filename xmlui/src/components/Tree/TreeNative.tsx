@@ -549,6 +549,11 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     new Map(),
   );
 
+  // Auto-load after values for tracking per-node autoload thresholds (Step 2: Auto-load feature)
+  const [autoLoadAfterMap, setAutoLoadAfterMap] = useState<
+    Map<string | number, number | null>
+  >(new Map());
+
   // Helper functions for managing node loading states
   const getNodeState = useCallback(
     (nodeId: string | number): NodeLoadingState => {
@@ -1783,6 +1788,23 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       getExpandedTimestamp: (nodeId: string | number): number | undefined => {
         return expandedTimestamps.get(nodeId);
       },
+
+      setAutoLoadAfter: (
+        nodeId: string | number,
+        milliseconds: number | null | undefined,
+      ): void => {
+        if (milliseconds === null || milliseconds === undefined) {
+          // Clear autoLoadAfter for this node
+          setAutoLoadAfterMap((prev) => {
+            const newMap = new Map(prev);
+            newMap.delete(nodeId);
+            return newMap;
+          });
+        } else {
+          // Set autoLoadAfter for this node
+          setAutoLoadAfterMap((prev) => new Map(prev).set(nodeId, milliseconds));
+        }
+      },
     };
   }, [
     treeData,
@@ -1799,6 +1821,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     data,
     setInternalData,
     expandedTimestamps,
+    autoLoadAfterMap,
   ]);
 
   // Register component API methods for external access
