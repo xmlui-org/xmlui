@@ -1602,6 +1602,135 @@ test.describe("Pagination Features", () => {
       await expect(visibleRows).toHaveCount(5);
     });
   });
+
+  test.describe("userSelect properties", () => {
+    test("userSelectCell controls text selection in cells", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' userSelectCell="none" testId="table">
+          <Column bindTo="name" header="Name"/>
+          <Column bindTo="quantity" header="Quantity"/>
+        </Table>
+      `);
+
+      // Get a cell content element
+      const firstCell = page.locator("tbody td").first().locator("div").first();
+      await expect(firstCell).toHaveCSS("user-select", "none");
+    });
+
+    test("userSelectRow controls text selection in rows", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' userSelectRow="text" testId="table">
+          <Column bindTo="name" header="Name"/>
+          <Column bindTo="quantity" header="Quantity"/>
+        </Table>
+      `);
+
+      // Get a table row
+      const firstRow = page.locator("tbody tr").first();
+      await expect(firstRow).toHaveCSS("user-select", "text");
+    });
+
+    test("userSelectHeading controls text selection in headings", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' userSelectHeading="text" testId="table">
+          <Column bindTo="name" header="Name"/>
+          <Column bindTo="quantity" header="Quantity"/>
+        </Table>
+      `);
+
+      // Get a header content element
+      const firstHeader = page.locator("thead th").first().locator("div").first();
+      await expect(firstHeader).toHaveCSS("user-select", "text");
+    });
+
+    test("userSelect properties apply when explicitly set", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}' 
+          userSelectCell="auto"
+          userSelectRow="auto"
+          userSelectHeading="none"
+          testId="table">
+          <Column bindTo="name" header="Name"/>
+          <Column bindTo="quantity" header="Quantity"/>
+        </Table>
+      `);
+
+      // Verify explicitly set values are applied
+      const firstCell = page.locator("tbody td").first().locator("div").first();
+      await expect(firstCell).toHaveCSS("user-select", "auto");
+
+      const firstRow = page.locator("tbody tr").first();
+      await expect(firstRow).toHaveCSS("user-select", "auto");
+
+      const firstHeader = page.locator("thead th").first().locator("div").first();
+      await expect(firstHeader).toHaveCSS("user-select", "none");
+    });
+
+    test("userSelect properties can be set independently", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}' 
+          userSelectCell="text"
+          userSelectRow="none"
+          userSelectHeading="all"
+          testId="table">
+          <Column bindTo="name" header="Name"/>
+        </Table>
+      `);
+
+      const firstCell = page.locator("tbody td").first().locator("div").first();
+      await expect(firstCell).toHaveCSS("user-select", "text");
+
+      const firstRow = page.locator("tbody tr").first();
+      await expect(firstRow).toHaveCSS("user-select", "none");
+
+      const firstHeader = page.locator("thead th").first().locator("div").first();
+      await expect(firstHeader).toHaveCSS("user-select", "all");
+    });
+
+    test("userSelect properties fallback to theme variables", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table">
+          <Column bindTo="name" header="Name"/>
+        </Table>
+      `, {
+        testThemeVars: {
+          "userSelect-cell-Table": "none",
+          "userSelect-row-Table": "text",
+          "userSelect-heading-Table": "all",
+        },
+      });
+
+      const firstCell = page.locator("tbody td").first().locator("div").first();
+      await expect(firstCell).toHaveCSS("user-select", "none");
+
+      const firstRow = page.locator("tbody tr").first();
+      await expect(firstRow).toHaveCSS("user-select", "text");
+
+      const firstHeader = page.locator("thead th").first().locator("div").first();
+      await expect(firstHeader).toHaveCSS("user-select", "all");
+    });
+
+    test("property values override theme variables", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}' 
+          userSelectCell="text"
+          testId="table">
+          <Column bindTo="name" header="Name"/>
+        </Table>
+      `, {
+        testThemeVars: {
+          "userSelect-cell-Table": "none",
+        },
+      });
+
+      // Property value "text" should override theme variable "none"
+      const firstCell = page.locator("tbody td").first().locator("div").first();
+      await expect(firstCell).toHaveCSS("user-select", "text");
+    });
+  });
 });
 
 // =============================================================================

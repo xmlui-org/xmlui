@@ -22,8 +22,17 @@ import {
 } from "./TableNative";
 import type { RendererContext } from "../../abstractions/RendererDefs";
 import { PositionValues } from "../Pagination/PaginationNative";
+import { PropertyValueDescription } from "../../abstractions/ComponentDefs";
 
 const COMP = "Table";
+
+const UserSelectValues: PropertyValueDescription[] = [
+  { value: "auto", description: "Default text selection behavior" },
+  { value: "text", description: "Text can be selected by the user" },
+  { value: "none", description: "Text cannot be selected" },
+  { value: "contain", description: "Selection is contained within this element" },
+  { value: "all", description: "The entire element content is selected as one unit" },
+];
 
 export const TableMd = createMetadata({
   status: "stable",
@@ -238,6 +247,30 @@ export const TableMd = createMetadata({
       availableValues: CheckboxToleranceValues,
       defaultValue: defaultProps.checkboxTolerance,
     },
+    userSelectCell: {
+      description:
+        `This property controls whether users can select text within table cells. ` +
+        `Use \`text\` to allow text selection, \`none\` to prevent selection, or \`auto\` for default behavior.`,
+      valueType: "string",
+      availableValues: UserSelectValues,
+      defaultValue: defaultProps.userSelectCell,
+    },
+    userSelectRow: {
+      description:
+        `This property controls whether users can select text within table rows. ` +
+        `Use \`text\` to allow text selection, \`none\` to prevent selection, or \`auto\` for default behavior.`,
+      valueType: "string",
+      availableValues: UserSelectValues,
+      defaultValue: defaultProps.userSelectRow,
+    },
+    userSelectHeading: {
+      description:
+        `This property controls whether users can select text within table headings. ` +
+        `Use \`text\` to allow text selection, \`none\` to prevent selection, or \`auto\` for default behavior.`,
+      valueType: "string",
+      availableValues: UserSelectValues,
+      defaultValue: defaultProps.userSelectHeading,
+    },
   },
   events: {
     contextMenu: dContextMenu(COMP),
@@ -339,6 +372,9 @@ export const TableMd = createMetadata({
     [`border-${COMP}`]: "0px solid transparent",
     [`borderBottom-last-row-${COMP}`]: `$borderBottom-cell-${COMP}`,
     [`borderRadius-${COMP}`]: "$borderRadius",
+    [`userSelect-heading-${COMP}`]: "text",
+    [`userSelect-cell-${COMP}`]: "none",
+    [`userSelect-row-${COMP}`]: "none",
   },
 });
 
@@ -500,6 +536,9 @@ const TableWithColumns = memo(
             checkboxTolerance={extractValue.asOptionalString(node.props.checkboxTolerance)}
             initiallySelected={extractValue(node.props.initiallySelected)}
             syncWithAppState={extractValue(node.props.syncWithAppState)}
+            userSelectCell={extractValue.asOptionalString(node.props.userSelectCell)}
+            userSelectRow={extractValue.asOptionalString(node.props.userSelectRow)}
+            userSelectHeading={extractValue.asOptionalString(node.props.userSelectHeading)}
           />
         </>
       );

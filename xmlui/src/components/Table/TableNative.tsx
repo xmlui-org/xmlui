@@ -68,6 +68,7 @@ declare module "@tanstack/table-core" {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface ColumnMeta<TData extends RowData, TValue> {
     style?: CSSProperties;
+    className?: string;
     starSizedWidth?: string;
     accessorKey?: string;
     pinTo?: string;
@@ -147,6 +148,9 @@ type TableProps = {
   checkboxTolerance?: CheckboxTolerance;
   rowHeight?: number;
   rowDoubleClick?: (item: any) => void;
+  userSelectCell?: string;
+  userSelectRow?: string;
+  userSelectHeading?: string;
 };
 
 function defaultIsRowDisabled(_: any) {
@@ -288,12 +292,18 @@ export const Table = forwardRef(
       checkboxTolerance = defaultProps.checkboxTolerance,
       rowHeight = defaultProps.rowHeight,
       rowDoubleClick,
+      userSelectCell,
+      userSelectRow,
+      userSelectHeading,
       ...rest
       // cols
     }: TableProps,
     forwardedRef,
   ) => {
     const { getThemeVar } = useTheme();
+    const effectiveUserSelectCell = userSelectCell ?? getThemeVar("userSelect-cell-Table") ?? defaultProps.userSelectCell;
+    const effectiveUserSelectRow = userSelectRow ?? getThemeVar("userSelect-row-Table") ?? defaultProps.userSelectRow;
+    const effectiveUserSelectHeading = userSelectHeading ?? getThemeVar("userSelect-heading-Table") ?? defaultProps.userSelectHeading;
     const safeData = Array.isArray(data) ? data : EMPTY_ARRAY;
     const wrapperRef = useRef<HTMLDivElement>(null);
     const ref = forwardedRef ? composeRefs(wrapperRef, forwardedRef) : wrapperRef;
@@ -917,7 +927,7 @@ export const Table = forwardRef(
                             _updateSorting(header.column.columnDef.meta?.accessorKey)
                           }
                         >
-                          <div className={styles.headerContent} style={style}>
+                          <div className={styles.headerContent} style={{ ...style, userSelect: effectiveUserSelectHeading as React.CSSProperties['userSelect'] }}>
                             {
                               flexRender(
                                 header.column.columnDef.header,
@@ -1000,6 +1010,7 @@ export const Table = forwardRef(
                         [styles.disabled]: rowDisabledPredicate(row.original),
                         [styles.noBottomBorder]: noBottomBorder,
                       })}
+                      style={{ userSelect: effectiveUserSelectRow as React.CSSProperties['userSelect'] }}
                       onClick={(event) => {
                         if (!row.getCanSelect()) {
                           return;
@@ -1111,7 +1122,7 @@ export const Table = forwardRef(
                               ...columnStyle,
                             }}
                           >
-                            <div className={styles.cellContent}>
+                            <div className={styles.cellContent} style={{ userSelect: effectiveUserSelectCell as React.CSSProperties['userSelect'] }}>
                               {cellRenderer
                                 ? cellRenderer(cell.row.original, rowIndex, i, cell?.getValue())
                                 : (flexRender(
@@ -1219,4 +1230,8 @@ export const defaultProps = {
   pageInfoPosition: "end" as Position,
   checkboxTolerance: "compact" as CheckboxTolerance,
   rowHeight: 40, // For virtua virtualization
+  onRowDoubleClick: undefined as unknown as ((item: any) => void) | undefined,
+  userSelectCell: "auto",
+  userSelectRow: "auto",
+  userSelectHeading: "none",
 };
