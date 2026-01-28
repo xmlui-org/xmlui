@@ -1302,4 +1302,21 @@ test.describe("Behaviors and Parts", () => {
     await expect(optionalLabel).toContainText("(Optional)");
     await expect(optionalLabel).not.toContainText("*");
   });
+
+  test("does not duplicate label when inside Form with label prop", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <Checkbox
+          testId="test"
+          label="Show password"
+          labelPosition="end"
+          width="48%"
+        />
+      </Form>
+    `);
+    
+    // Should only have one label with the text "Show password"
+    const labels = page.getByText("Show password");
+    await expect(labels).toHaveCount(1);
+  });
 });

@@ -1308,4 +1308,20 @@ test.describe("Validation Feedback", () => {
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toContainText("This field is required");
   });
+
+  test("does not duplicate label when inside Form with label prop", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <TextBox
+          testId="test"
+          label="Username"
+          labelPosition="top"
+        />
+      </Form>
+    `);
+    
+    // Should only have one label with the text "Username"
+    const labels = page.getByText("Username");
+    await expect(labels).toHaveCount(1);
+  });
 });

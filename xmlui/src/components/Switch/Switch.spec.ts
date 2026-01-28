@@ -1264,4 +1264,20 @@ test.describe("Behaviors and Parts", () => {
     await expect(optionalLabel).toContainText("(Optional)");
     await expect(optionalLabel).not.toContainText("*");
   });
+
+  test("does not duplicate label when inside Form with label prop", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <Switch
+          testId="test"
+          label="Enable notifications"
+          labelPosition="end"
+        />
+      </Form>
+    `);
+    
+    // Should only have one label with the text "Enable notifications"
+    const labels = page.getByText("Enable notifications");
+    await expect(labels).toHaveCount(1);
+  });
 });
