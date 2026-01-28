@@ -23,7 +23,7 @@ describe("Parser - new operator", () => {
 
       expect(expr).not.toBeNull();
       expect(expr!.type).toBe(T_NEW_EXPRESSION);
-      
+
       const newExpr = expr as NewExpression;
       expect(newExpr.callee.type).toBe(T_IDENTIFIER);
       expect((newExpr.callee as Identifier).name).toBe("Date");
@@ -36,7 +36,7 @@ describe("Parser - new operator", () => {
 
       expect(expr).not.toBeNull();
       expect(expr!.type).toBe(T_NEW_EXPRESSION);
-      
+
       const newExpr = expr as NewExpression;
       expect(newExpr.callee.type).toBe(T_IDENTIFIER);
       expect((newExpr.callee as Identifier).name).toBe("Date");
@@ -49,7 +49,7 @@ describe("Parser - new operator", () => {
 
       expect(expr).not.toBeNull();
       expect(expr!.type).toBe(T_NEW_EXPRESSION);
-      
+
       const newExpr = expr as NewExpression;
       expect(newExpr.callee.type).toBe(T_IDENTIFIER);
       expect((newExpr.callee as Identifier).name).toBe("Date");
@@ -64,7 +64,7 @@ describe("Parser - new operator", () => {
 
       expect(expr).not.toBeNull();
       expect(expr!.type).toBe(T_NEW_EXPRESSION);
-      
+
       const newExpr = expr as NewExpression;
       expect(newExpr.arguments).toHaveLength(3);
       expect((newExpr.arguments[0] as Literal).value).toBe(2024);
@@ -78,7 +78,7 @@ describe("Parser - new operator", () => {
 
       expect(expr).not.toBeNull();
       expect(expr!.type).toBe(T_NEW_EXPRESSION);
-      
+
       const newExpr = expr as NewExpression;
       expect(newExpr.callee.type).toBe(T_IDENTIFIER);
       expect((newExpr.callee as Identifier).name).toBe("Error");
@@ -94,10 +94,10 @@ describe("Parser - new operator", () => {
 
       expect(expr).not.toBeNull();
       expect(expr!.type).toBe(T_NEW_EXPRESSION);
-      
+
       const newExpr = expr as NewExpression;
       expect(newExpr.callee.type).toBe(T_MEMBER_ACCESS_EXPRESSION);
-      
+
       const memberAccess = newExpr.callee as MemberAccessExpression;
       expect(memberAccess.obj.type).toBe(T_IDENTIFIER);
       expect((memberAccess.obj as Identifier).name).toBe("obj");
@@ -110,7 +110,7 @@ describe("Parser - new operator", () => {
 
       expect(expr).not.toBeNull();
       expect(expr!.type).toBe(T_NEW_EXPRESSION);
-      
+
       const newExpr = expr as NewExpression;
       expect(newExpr.callee.type).toBe(T_MEMBER_ACCESS_EXPRESSION);
     });
@@ -121,7 +121,7 @@ describe("Parser - new operator", () => {
 
       expect(expr).not.toBeNull();
       expect(expr!.type).toBe(T_NEW_EXPRESSION);
-      
+
       const newExpr = expr as NewExpression;
       expect(newExpr.callee.type).toBe(T_MEMBER_ACCESS_EXPRESSION);
       expect(newExpr.arguments).toHaveLength(3);
@@ -135,7 +135,7 @@ describe("Parser - new operator", () => {
 
       expect(expr).not.toBeNull();
       expect(expr!.type).toBe(T_NEW_EXPRESSION);
-      
+
       const newExpr = expr as NewExpression;
       expect(newExpr.arguments).toHaveLength(2);
       expect(newExpr.arguments[0].type).toBe(T_BINARY_EXPRESSION);
@@ -148,7 +148,7 @@ describe("Parser - new operator", () => {
 
       expect(expr).not.toBeNull();
       expect(expr!.type).toBe(T_NEW_EXPRESSION);
-      
+
       const newExpr = expr as NewExpression;
       expect(newExpr.arguments).toHaveLength(1);
       expect(newExpr.arguments[0].type).toBe(T_ARRAY_LITERAL);
@@ -160,7 +160,7 @@ describe("Parser - new operator", () => {
 
       expect(expr).not.toBeNull();
       expect(expr!.type).toBe(T_NEW_EXPRESSION);
-      
+
       const newExpr = expr as NewExpression;
       expect(newExpr.arguments).toHaveLength(1);
       expect(newExpr.arguments[0].type).toBe(T_OBJECT_LITERAL);
@@ -172,11 +172,11 @@ describe("Parser - new operator", () => {
 
       expect(expr).not.toBeNull();
       expect(expr!.type).toBe(T_NEW_EXPRESSION);
-      
+
       const newExpr = expr as NewExpression;
       expect(newExpr.arguments).toHaveLength(1);
       expect(newExpr.arguments[0].type).toBe(T_NEW_EXPRESSION);
-      
+
       const innerNew = newExpr.arguments[0] as NewExpression;
       expect((innerNew.callee as Identifier).name).toBe("Inner");
     });
@@ -277,7 +277,7 @@ describe("Parser - new operator", () => {
 
       expect(expr).not.toBeNull();
       expect(expr!.type).toBe(T_NEW_EXPRESSION);
-      
+
       const newExpr = expr as NewExpression;
       expect(newExpr.arguments).toHaveLength(10);
     });
@@ -331,9 +331,19 @@ describe("Parser - new operator", () => {
 
     it("should throw error on unclosed parentheses", () => {
       const parser = new Parser("new Date(2024");
-      
+
       // This should throw a parser error about missing ')'
       expect(() => parser.parseExpr()).toThrow();
+    });
+
+    it("Object literal allows new", () => {
+      const parser = new Parser("{new: true}");
+      const expr = parser.parseExpr();
+
+      // While semantically invalid at runtime, this is syntactically valid
+      // JavaScript allows 'new' on any expression
+      expect(expr).not.toBeNull();
+      expect(expr!.type).toBe(T_OBJECT_LITERAL);
     });
   });
 });
