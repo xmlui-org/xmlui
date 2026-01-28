@@ -684,20 +684,30 @@ The `spinnerDelay` property controls how long to wait before showing a loading s
       <Text variant="strong">No delay (instant spinner)</Text>
       <Tree
         testId="tree1"
+        dynamic
+        autoLoadAfter="0"
         itemClickExpands
         spinnerDelay="0"
-        data='{[{ id: 1, name: "Fast Load (200ms)", parentId: null, loaded: false }]}'
-        onLoadChildren="() => { delay(200); return [{ id: 2, name: 'Child', parentId: 1 }]; }">
+        data='{[{ id: 1, name: "Fast Load (200ms)", parentId: null }]}'
+        onLoadChildren="() => { 
+          delay(200); 
+          return [{ id: 2, name: 'Child', parentId: 1, dynamic: false }]; 
+        }">
       </Tree>
     </VStack>
     <VStack gap="$space-1">
       <Text variant="strong">500ms delay (no flicker for fast loads)</Text>
       <Tree
         testId="tree2"
+        dynamic
+        autoLoadAfter="0"
         itemClickExpands
         spinnerDelay="500"
-        data='{[{ id: 3, name: "Fast Load (200ms)", parentId: null, loaded: false }]}'
-        onLoadChildren="() => { delay(200); return [{ id: 4, name: 'Child', parentId: 3 }]; }">
+        data='{[{ id: 3, name: "Fast Load (200ms)", parentId: null }]}'
+        onLoadChildren="() => { 
+          delay(200); 
+          return [{ id: 4, name: 'Child', parentId: 3, dynamic: false }]; 
+        }">
       </Tree>
     </VStack>
   </VStack>

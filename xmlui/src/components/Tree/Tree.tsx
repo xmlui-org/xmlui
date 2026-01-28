@@ -470,6 +470,10 @@ export const treeComponentRenderer = createComponentRenderer(
           node.props.expandRotation,
           defaultProps.expandRotation,
         )}
+        spinnerDelay={extractValue.asOptionalNumber(
+          node.props.spinnerDelay,
+          defaultProps.spinnerDelay,
+        )}
         scrollStyle={extractValue.asOptionalString(
           node.props.scrollStyle,
           defaultProps.scrollStyle,

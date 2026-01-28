@@ -71,17 +71,40 @@ const TreeRow = memo(({ index, data }: TreeRowProps) => {
   // Use string comparison to handle type mismatches between selectedId and treeItem.key
   const isSelected = String(selectedId) === String(treeItem.key);
 
+  // Track whether the spinner delay has expired for this loading node
+  const nodeWithState = treeItem as FlatTreeNodeWithState;
+  const isLoading = nodeWithState.loadingState === "loading";
+  const [showSpinner, setShowSpinner] = useState(false);
+
+  // Manage spinner delay: show expand icon during delay, then show spinner
+  useEffect(() => {
+    if (isLoading) {
+      if (spinnerDelay === 0) {
+        // No delay - show spinner immediately
+        setShowSpinner(true);
+      } else {
+        // Delay showing the spinner
+        const timer = setTimeout(() => {
+          setShowSpinner(true);
+        }, spinnerDelay);
+        return () => clearTimeout(timer);
+      }
+    } else {
+      // Not loading - reset spinner state
+      setShowSpinner(false);
+    }
+  }, [isLoading, spinnerDelay]);
+
   const onToggleNode = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
       // Prevent toggling if node is in loading state
-      const nodeWithState = treeItem as FlatTreeNodeWithState;
-      if (nodeWithState.loadingState === "loading") {
+      if (isLoading) {
         return;
       }
       toggleNode(treeItem);
     },
-    [toggleNode, treeItem],
+    [toggleNode, treeItem, isLoading],
   );
 
   const onItemMouseDownHandler = useCallback(
@@ -109,17 +132,12 @@ const TreeRow = memo(({ index, data }: TreeRowProps) => {
 
       // If itemClickExpands is enabled and item has children, also toggle
       // But prevent toggling if node is in loading state
-      const nodeWithState = treeItem as FlatTreeNodeWithState;
-      if (itemClickExpands && treeItem.hasChildren && nodeWithState.loadingState !== "loading") {
+      if (itemClickExpands && treeItem.hasChildren && !isLoading) {
         toggleNode(treeItem);
       }
     },
-    [onItemClick, itemClickExpands, treeItem, toggleNode],
+    [onItemClick, itemClickExpands, treeItem, toggleNode, isLoading],
   );
-
-  // Get loading state for styling and interaction
-  const nodeWithState = treeItem as FlatTreeNodeWithState;
-  const isLoading = nodeWithState.loadingState === "loading";
 
   return (
     <div style={{ width: "100%", display: "flex" }}>
@@ -150,11 +168,12 @@ const TreeRow = memo(({ index, data }: TreeRowProps) => {
           >
             {treeItem.hasChildren && (
               <>
-                {/* Show loading spinner when node is loading */}
-                {(treeItem as FlatTreeNodeWithState).loadingState === "loading" ? (
-                  <Spinner delay={spinnerDelay} style={{ width: 24, height: 24 }} />
+                {/* Show spinner only after delay expires, otherwise show expand icon */}
+                {isLoading && showSpinner ? (
+                  <Spinner data-tree-node-spinner delay={0} style={{ width: 24, height: 24 }} />
                 ) : (
                   <Icon
+                    data-tree-expand-icon
                     name={
                       animateExpand
                         ? treeItem.iconCollapsed || iconCollapsed
