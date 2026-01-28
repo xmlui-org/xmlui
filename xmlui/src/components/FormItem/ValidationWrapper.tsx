@@ -161,12 +161,12 @@ export function ValidationWrapper({
     validationInProgress: validationResult?.partial ?? false,
   };
 
-  console.log(validationResult?.validations)
   const validationAttributes = {
+    'data-validation-valid': validationResult?.isValid ?? true,
     'data-validation-partial': validationResult?.partial ?? false,
     'data-validation-status': validationStatus,
     'data-validation-shown': isHelperTextShown,
-    'data-validation-count': validationResult?.validations?.length ?? 0,
+    'data-validations-evaluated': validationResult?.validations?.length ?? 0,
   };
 
   if (isFormItem) {

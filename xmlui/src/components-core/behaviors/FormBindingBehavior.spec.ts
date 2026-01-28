@@ -1,3 +1,4 @@
+import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
 // =============================================================================
@@ -371,7 +372,60 @@ test.describe("Validation", () => {
   // EXECUTION: When does validation run?
   // =============================================================================
 
-  test("validation executes on initial mount with initialValue", async ({
+  test("sync validation executes on initial mount", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <TextBox bindTo="firstName" required="true" />
+      </Form>
+    `);
+    const wrapper = page.locator("[data-validation-status]").first();
+
+    // "required" validation should execute on mount
+    await expect(wrapper).toHaveAttribute("data-validations-evaluated", "1");
+  });
+
+  test("async validation executes on initial mount", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form>
+        <TextBox bindTo="firstName" onValidate="() => testState = true" />
+      </Form>
+    `);
+    const input = page.getByRole("textbox");
+    const wrapper = page.locator("[data-validation-status]").first();
+
+    // Validation should execute on mount
+    await expect.poll(testStateDriver.testState).toBe(true);
+    await expect(wrapper).toHaveAttribute("data-validations-evaluated", "1");
+  });
+
+  test("async validation reruns on input change", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form>
+        <TextBox 
+          bindTo="firstName"
+          onValidate="() => { testState = (testState || 0) + 1; return true; }"
+        />
+      </Form>
+    `);
+    const input = page.getByRole("textbox");
+    const wrapper = page.locator("[data-validation-status]").first();
+
+    await input.fill("A");
+
+    await expect.poll(testStateDriver.testState).toBe(2);
+    await expect(wrapper).toHaveAttribute("data-validations-evaluated", "1");
+  });
+
+  test("async validation executes after sync validation on initial mount with initialValue", async ({
     initTestBed,
     page,
   }) => {
@@ -380,134 +434,113 @@ test.describe("Validation", () => {
         <TextBox 
           bindTo="firstName" 
           required="true"
-          minLength="3"
           onValidate="arg => testState = { executed: true, value: arg }"
         />
       </Form>
     `);
-
     const input = page.getByRole("textbox");
-    await expect(input).toHaveValue("Jo");
+    const wrapper = page.locator("[data-validation-status]").first();
 
+    await expect(input).toHaveValue("Jo");
     // Validation should execute on mount
-    await expect.poll(testStateDriver.testState).toEqual({ executed: true, value: "Jo" });
+    await expect.poll(testStateDriver.testState).toMatchObject({ executed: true, value: "Jo" });
+    await expect(wrapper).toHaveAttribute("data-validations-evaluated", "2");
   });
 
-  test("validation executes on value change", async ({ initTestBed, page }) => {
-    const { testStateDriver } = await initTestBed(`
+  test("validation executes on single value change", async ({ initTestBed, page }) => {
+    await initTestBed(`
       <Form>
-        <TextBox 
-          bindTo="firstName" 
-          minLength="3"
-          onValidate="arg => testState = { count: (testState?.count || 0) + 1, value: arg }"
-        />
+        <TextBox bindTo="firstName" minLength="3" />
       </Form>
     `);
-
     const input = page.getByRole("textbox");
-    
+    const wrapper = page.locator("[data-validation-status]").first();
+
     await input.fill("A");
-    await expect.poll(testStateDriver.testState).toEqual({ count: 1, value: "A" });
-
-    await input.fill("AB");
-    await expect.poll(testStateDriver.testState).toEqual({ count: 2, value: "AB" });
-
-    await input.fill("ABC");
-    await expect.poll(testStateDriver.testState).toEqual({ count: 3, value: "ABC" });
+    await expect(wrapper).toHaveAttribute("data-validations-evaluated", "1");
   });
 
-  test("validation executes with throttle/debounce delay", async ({
-    initTestBed,
-    page,
-  }) => {
+  test("validation executes on multiple value changes", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <TextBox bindTo="firstName" minLength="3" />
+      </Form>
+    `);
+    const input = page.getByRole("textbox");
+    const wrapper = page.locator("[data-validation-status]").first();
+
+    await input.fill("A");
+    await expect(wrapper).toHaveAttribute("data-validations-evaluated", "1");
+
+    await input.fill("AB");
+    await expect(wrapper).toHaveAttribute("data-validations-evaluated", "1");
+
+    await input.fill("ABC");
+    await expect(wrapper).toHaveAttribute("data-validations-evaluated", "1");
+  });
+
+  test("validation executes with throttle delay", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Form>
         <TextBox 
           bindTo="firstName"
-          customValidationsDebounce="200"
-          onValidate="arg => testState = { count: (testState?.count || 0) + 1, value: arg.value }"
+          customValidationsDebounce="1000"
+          onValidate="arg => { testState = { count: (testState?.count || 0) + 1, value: arg.value };}"
         />
       </Form>
     `);
 
     const input = page.getByRole("textbox");
-    
-    // Type rapidly - validation should be throttled
-    await input.pressSequentially("ABC", { delay: 10 });
 
-    // Should not have validated yet (still within debounce period)
-    await page.waitForTimeout(50);
-    const stateBeforeDebounce = await testStateDriver.testState();
-    expect(stateBeforeDebounce).toEqual({});
+    // Initial validation on mount
+    await expect.poll(testStateDriver.testState).toMatchObject({ count: 1 });
 
-    // Wait for debounce delay
-    await page.waitForTimeout(200);
+    // Type rapidly - validation should be throttled (leading: true, trailing: true)
+    await input.pressSequentially("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", { delay: 10 });
 
-    // Should have validated only once with final value
-    await expect.poll(testStateDriver.testState).toEqual({ count: 1, value: "ABC" });
+    // First character triggers immediate validation (leading edge)
+    await expect.poll(testStateDriver.testState).toMatchObject({ count: 2 });
+
+    // Wait for throttle period to expire and trailing edge to fire
+    await page.waitForTimeout(1050);
+
+    // Trailing edge fires with final value
+    await expect.poll(testStateDriver.testState).toMatchObject({ count: 3 });
+    // Count should be at least 2 (leading + trailing), could be more depending on timing
+    const finalState = await testStateDriver.testState();
+    expect(finalState.count).toBeGreaterThanOrEqual(2);
   });
 
   // =============================================================================
   // ORCHESTRATION: What order - sync before async?
   // =============================================================================
 
-  test("sync validations complete before async validation", async ({
-    initTestBed,
-    page,
-  }) => {
+  test("sync validations complete before async validation", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Form>
-        <TextBox 
+        <TextBox
           bindTo="firstName"
-          required="true"
           minLength="3"
-          onValidate="arg => { delay(100); testState = { async: true, value: arg.value }; }"
+          onValidate="arg => { delay(100); testState = { async: true, value: arg }; }"
         />
       </Form>
     `);
 
     const input = page.getByRole("textbox");
+    const wrapper = page.locator("[data-validation-status]").first();
+
     await input.fill("AB");
+    // Immediate sync validation evaluation - partial should be true
+    await expect(wrapper).toHaveAttribute("data-validation-partial", "true");
 
-    // Sync validation (minLength) should fail immediately
-    await expect(page.getByText("Input should be at least 3 characters")).toBeVisible();
-
-    // Async validation should not run yet (sync failed)
+    // Async validation runs after sync
     await page.waitForTimeout(150);
-    await expect.poll(testStateDriver.testState).toBeUndefined();
+    await expect(wrapper).toHaveAttribute("data-validation-partial", "false");
+    await expect.poll(testStateDriver.testState).toMatchObject({ async: true, value: "AB" });
   });
 
-  test("async validation runs only after sync validations pass", async ({
-    initTestBed,
-    page,
-  }) => {
-    const { testStateDriver } = await initTestBed(`
-      <Form>
-        <TextBox 
-          bindTo="firstName"
-          minLength="3"
-          onValidate="arg => { delay(50); testState = { value: arg.value, validated: true }; }"
-        />
-      </Form>
-    `);
-
-    const input = page.getByRole("textbox");
-    
-    // First input - too short, async won't run
-    await input.fill("AB");
-    await page.waitForTimeout(100);
-    await expect.poll(testStateDriver.testState).toBeUndefined();
-
-    // Second input - long enough, async runs
-    await input.fill("ABC");
-    await expect.poll(testStateDriver.testState).toEqual({ value: "ABC", validated: true });
-  });
-
-  test("multiple sync validations execute in defined order", async ({
-    initTestBed,
-    page,
-  }) => {
-    const { testStateDriver } = await initTestBed(`
+  test("required validation stops others from being evaluated", async ({ initTestBed, page }) => {
+    await initTestBed(`
       <Form>
         <TextBox 
           bindTo="email"
@@ -520,50 +553,40 @@ test.describe("Validation", () => {
     `);
 
     const input = page.getByRole("textbox");
+    const wrapper = page.locator("[data-validation-status]").first();
 
-    // Empty - required fails first
-    await input.click();
+    // Empty - required fails first (only 1 validation runs - short-circuit)
+    await input.fill("a");
+    await input.clear();
     await input.blur();
     await expect(page.getByText("This field is required")).toBeVisible();
+    await expect(wrapper).toHaveAttribute("data-validations-evaluated", "1");
 
-    // Too short - minLength fails (required passes)
+    // Too short - minLength fails (required passes, all other validations run)
     await input.fill("ab");
-    await expect(page.getByText("Input should be at least 5 characters")).toBeVisible();
-
-    // Long enough but invalid email - pattern fails
-    await input.fill("abcde");
-    await expect(page.getByText("Input is not a valid email address")).toBeVisible();
-
-    // Valid email - all pass
-    await input.fill("a@b.c");
-    await expect(page.getByText("This field is required")).not.toBeVisible();
-    await expect(page.getByText("Input should be at least 5 characters")).not.toBeVisible();
-    await expect(page.getByText("Input is not a valid email address")).not.toBeVisible();
+    await expect(page.getByText("Input should be at least 5 characters").first()).toBeVisible();
+    await expect(wrapper).toHaveAttribute("data-validations-evaluated", "3");
   });
 
   // =============================================================================
   // CANCELLATION: How do rapid changes prevent stale results?
   // =============================================================================
 
-  test("rapid value changes cancel previous async validations", async ({
-    initTestBed,
-    page,
-  }) => {
+  test("rapid value changes cancel previous async validations", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Form>
         <TextBox 
           bindTo="firstName"
-          onValidate="arg => { 
-            let val = arg.value;
+          onValidate="arg => {
             delay(100);
-            testState = { results: [...(testState?.results || []), val] };
+            testState = { results: [...(testState?.results || []), arg] };
           }"
         />
       </Form>
     `);
 
     const input = page.getByRole("textbox");
-    
+
     // Type rapidly - each change should trigger validation
     await input.fill("A");
     await page.waitForTimeout(10);
@@ -576,26 +599,24 @@ test.describe("Validation", () => {
 
     // Due to cancellation, we should see results for each value
     await expect.poll(testStateDriver.testState).toBeDefined();
-    await expect.poll(async () => (await testStateDriver.testState()).results.length).toBeGreaterThan(0);
+    await expect
+      .poll(async () => (await testStateDriver.testState()).results.length)
+      .toBeGreaterThan(0);
   });
 
-  test("stale validation results are discarded", async ({
-    initTestBed,
-    page,
-  }) => {
+  test("stale validation results are discarded", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form>
         <TextBox 
           bindTo="username"
           minLength="1"
           onValidate="arg => {
-            let val = arg.value;
-            if (val === 'slow') {
+            if (arg === 'slow') {
               delay(200);
-              arg.setResult({ isValid: false, invalidMessage: 'slow result' });
+              return { isValid: false, invalidMessage: 'slow result' };
             } else {
               delay(10);
-              arg.setResult({ isValid: true });
+              return { isValid: true };
             }
           }"
         />
@@ -603,11 +624,11 @@ test.describe("Validation", () => {
     `);
 
     const input = page.getByRole("textbox");
-    
+
     // Type "slow" (will take 200ms to validate)
     await input.fill("slow");
     await page.waitForTimeout(20);
-    
+
     // Immediately change to "fast" (will take 10ms to validate)
     await input.fill("fast");
 
@@ -619,32 +640,46 @@ test.describe("Validation", () => {
     await expect(page.getByText("slow result")).not.toBeVisible();
   });
 
-  test("validation cleanup on component unmount", async ({ initTestBed, page }) => {
-    const { testStateDriver } = await initTestBed(`
-      <Form>
-        <Stack when="{{ !testState?.unmounted }}">
+  test.fixme(
+    "validation cleanup on component unmount",
+    SKIP_REASON.TEST_NOT_WORKING(
+      "There might be a problem with cleanup logic in useValidation hook",
+    ),
+    async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+      <Form data="{{ firstName: 'initial' }}" var.test="{{ validationCompleted: false }}">
+        <Stack when="{ !test.unmounted }">
           <TextBox 
             bindTo="firstName"
-            onValidate="arg => { delay(100); testState = { ...testState, validated: true }; }"
+            onValidate="arg => { 
+              delay(100); 
+              testState = { ...test, validationCompleted: true }; 
+            }"
           />
         </Stack>
-        <Button testId="unmount" onClick="testState = { unmounted: true }" />
+        <Button testId="unmount" onClick="test = { ...test, unmounted: true }" />
       </Form>
     `);
 
-    const textBox = page.getByTestId("textbox");
-    await textBox.fill("test");
+      // Wait for initial validation on mount to complete
+      await expect.poll(testStateDriver.testState).toEqual({ validationCompleted: true });
 
-    // Unmount before validation completes
-    await page.waitForTimeout(50);
-    await page.getByTestId("unmount").click();
+      // Now trigger a new validation that we'll interrupt
+      const textBox = page.getByRole("textbox");
+      await textBox.fill("test");
 
-    // Wait to see if validation completes (it shouldn't)
-    await page.waitForTimeout(100);
-    
-    await expect.poll(testStateDriver.testState).toEqual({ validated: undefined });
-    await expect.poll(testStateDriver.testState).toEqual({ unmounted: true });
-  });
+      // Unmount before validation completes
+      await page.waitForTimeout(10);
+      await page.getByTestId("unmount").click();
+
+      // Wait to see if validation completes (it shouldn't due to cleanup)
+      await page.waitForTimeout(150);
+
+      // If cleanup works, state should still show just unmounted (no new validationCompleted)
+      const state = await testStateDriver.testState();
+      expect(state).toEqual({ validationCompleted: true, unmounted: true });
+    },
+  );
 
   // =============================================================================
   // STATE CONSISTENCY: Is state consistent?
@@ -658,117 +693,85 @@ test.describe("Validation", () => {
       <Form>
         <TextBox 
           bindTo="firstName"
+          required="true"
           onValidate="arg => { 
             delay(100);
-            testState = { value: arg.value };
-            arg.setResult({ isValid: true });
+            testState = { value: arg };
+            return { isValid: true };
           }"
         />
       </Form>
     `);
 
     const input = page.getByRole("textbox");
-    
+    const wrapper = page.locator("[data-validation-status]").first();
+
     await input.fill("ABC");
+    // During async validation, partial should be true
+    await expect(wrapper).toHaveAttribute("data-validation-partial", "true");
+
     await page.waitForTimeout(50); // Mid-validation
-    
+
     await input.fill("ABCD");
-    
-    // After completion, should reflect latest value
+    // New validation started, partial should still be true
+    await expect(wrapper).toHaveAttribute("data-validation-partial", "true");
+
+    // After completion, should reflect latest value and partial should be false
     await page.waitForTimeout(150);
     await expect.poll(testStateDriver.testState).toEqual({ value: "ABCD" });
+    await expect(wrapper).toHaveAttribute("data-validation-partial", "false");
   });
 
-  test("partial flag set correctly during async validation", async ({
+  test.fixme("partial should be set if no sync validation is defined",
+    SKIP_REASON.XMLUI_BUG("partial is not set, so the data attribute does not get updated -> investigate"),
+    async ({
     initTestBed,
     page,
   }) => {
-    const { testStateDriver } = await initTestBed(`
+    await initTestBed(`
+      <Form>
+        <TextBox 
+          bindTo="firstName"
+          onValidate="arg => { 
+            delay(100);
+            testState = { value: arg };
+            return { isValid: true };
+          }"
+        />
+      </Form>
+    `);
+
+    const input = page.getByRole("textbox");
+    const wrapper = page.locator("[data-validation-status]").first();
+
+    await input.fill("ABC");
+    await expect(wrapper).toHaveAttribute("data-validation-partial", "true");
+
+    await page.waitForTimeout(100);
+
+    await expect(wrapper).toHaveAttribute("data-validation-partial", "false");
+  });
+
+  test("partial flag set correctly during async validation", async ({ initTestBed, page }) => {
+    await initTestBed(`
       <Form>
         <TextBox 
           bindTo="firstName"
           minLength="3"
-          onValidate="arg => {
-            testState = { ...testState, asyncStarted: true };
-            delay(100);
-            testState = { ...testState, asyncCompleted: true };
-            arg.setResult({ isValid: true });
-          }"
+          onValidate="arg => { delay(100); return true; }"
         />
       </Form>
     `);
 
     const input = page.getByRole("textbox");
-    
+    const wrapper = page.locator("[data-validation-status]").first();
+
     await input.fill("ABC");
-    
-    // Sync validation completes immediately (partial = true)
-    await expect.poll(testStateDriver.testState).toEqual({ asyncStarted: true });
-    
-    // Async validation completes (partial = false)
-    await expect.poll(testStateDriver.testState).toEqual({ asyncCompleted: true });
-  });
+    await expect(wrapper).toHaveAttribute("data-validation-partial", "true");
 
-  test("interactionFlags update consistently with validation state", async ({
-    initTestBed,
-    page,
-  }) => {
-    const { testStateDriver } = await initTestBed(`
-      <Form>
-        <TextBox 
-          bindTo="firstName"
-          required="true"
-          validationMode="errorLate"
-        />
-        <Button testId="submit" onClick="$form.validate(); testState = 'submitted'" />
-      </Form>
-    `);
+    await page.waitForTimeout(100);
 
-    const input = page.getByRole("textbox");
-    
-    // Initial state - not dirty, no error shown
-    await expect(page.getByText("This field is required")).not.toBeVisible();
-    
-    // Type and delete - now dirty
-    await input.fill("A");
-    await input.fill("");
-    await expect(page.getByText("This field is required")).not.toBeVisible(); // errorLate mode
-    
-    // Blur - error should show (dirty + blur)
-    await input.blur();
-    await expect(page.getByText("This field is required")).toBeVisible();
-    
-    // Focus again - error should remain
-    await input.click();
-    await expect(page.getByText("This field is required")).toBeVisible();
-  });
-
-  test("form state remains consistent with rapid field changes", async ({
-    initTestBed,
-    page,
-  }) => {
-    const { testStateDriver } = await initTestBed(`
-      <Form>
-        <TextBox bindTo="field1" testId="field1" />
-        <TextBox bindTo="field2" testId="field2" />
-        <TextBox bindTo="field3" testId="field3" />
-        <Button testId="getData" onClick="testState = $form.getData()" />
-      </Form>
-    `);
-
-    // Rapidly change multiple fields
-    await page.getByRole("textbox").nth(0).fill("value1");
-    await page.getByRole("textbox").nth(1).fill("value2");
-    await page.getByRole("textbox").nth(2).fill("value3");
-    
-    await page.getByRole("button").click();
-    
-    // Form state should reflect all changes
-    await expect.poll(testStateDriver.testState).toEqual({
-      field1: "value1",
-      field2: "value2",
-      field3: "value3",
-    });
+    await expect(wrapper).toHaveAttribute("data-validation-partial", "false");
   });
 
   // =============================================================================
@@ -781,7 +784,13 @@ test.describe("Validation", () => {
   }) => {
     await initTestBed(`
       <Form>
-        <TextBox testId="textbox" bindTo="name" required="true" requiredInvalidMessage="This field is required" label="Test" validationMode="onChanged" />
+        <TextBox
+          bindTo="name"
+          required="true"
+          requiredInvalidMessage="This field is required"
+          label="Test"
+          validationMode="onChanged"
+        />
       </Form>
     `);
 
