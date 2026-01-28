@@ -745,4 +745,23 @@ test.describe("Behaviors and Parts", () => {
     await expect(optionalLabel).toContainText("(Optional)");
     await expect(optionalLabel).not.toContainText("*");
   });
+
+  test("does not duplicate label when inside Form with label prop", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <RadioGroup
+          testId="test"
+          label="Choose option"
+          labelPosition="top"
+        >
+          <Option value="1" label="Option 1" />
+          <Option value="2" label="Option 2" />
+        </RadioGroup>
+      </Form>
+    `);
+    
+    // Should only have one label with the text "Choose option"
+    const labels = page.getByText("Choose option");
+    await expect(labels).toHaveCount(1);
+  });
 });

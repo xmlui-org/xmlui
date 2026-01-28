@@ -1768,4 +1768,20 @@ test.describe("Validation Feedback", () => {
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toContainText("This field is required");
   });
+
+  test("does not duplicate label when inside Form with label prop", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <DateInput
+          testId="test"
+          label="Enter date"
+          labelPosition="top"
+        />
+      </Form>
+    `);
+    
+    // Should only have one label with the text "Enter date"
+    const labels = page.getByText("Enter date");
+    await expect(labels).toHaveCount(1);
+  });
 });
