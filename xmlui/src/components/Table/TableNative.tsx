@@ -1043,11 +1043,8 @@ export const Table = forwardRef(
                       }}
                       onDoubleClick={(event) => {
                           // Prevent browser text selection on double-click
-                          try {
-                            event.preventDefault();
-                          } catch (e) {
-                            // ignore
-                          }
+                          event.preventDefault();
+
                           // Call external handler if provided
                           try {
                             if (typeof (rowDoubleClick as any) === "function") {
@@ -1222,5 +1219,4 @@ export const defaultProps = {
   pageInfoPosition: "end" as Position,
   checkboxTolerance: "compact" as CheckboxTolerance,
   rowHeight: 40, // For virtua virtualization
-  onRowDoubleClick: undefined as unknown as ((item: any) => void) | undefined,
 };
