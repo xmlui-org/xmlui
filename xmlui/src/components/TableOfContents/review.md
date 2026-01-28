@@ -413,6 +413,26 @@ After completing these refactorings:
 
 ## Refactoring Progress
 
+### Step 2: Simplify Render Filter Logic
+**Status:** ✅ Completed  
+**Started:** January 28, 2026  
+**Completed:** January 28, 2026
+
+**Changes Made:**
+- Added `useMemo` import to React imports
+- Created `filteredHeadings` using `useMemo` to filter headings based on `maxHeadingLevel` and `omitH1`
+- Simplified render loop from conditional map with null returns to direct mapping of filtered headings
+- Updated `useIsomorphicLayoutEffect` to use `filteredHeadings` instead of `headings` and `maxHeadingLevel`
+- Removed redundant level checks in the subscription callback (already filtered)
+- Updated `useEffect` dependencies to remove unnecessary `headings` references
+
+**Results:**
+- ✅ No linting issues
+- ✅ All 33 e2e tests passed (1 skipped)
+- Code is now more declarative and performant
+
+---
+
 ### Step 1: CSS Class Simplification
 **Status:** ✅ Completed  
 **Started:** January 28, 2026  

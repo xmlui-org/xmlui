@@ -3,6 +3,7 @@ import {
   type ForwardedRef,
   forwardRef,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -52,16 +53,25 @@ export const TableOfContents = forwardRef(function TableOfContents(
   } = useTableOfContents();
   const [activeAnchorId, setActiveId] = useState(initialActiveAnchorId);
 
+  const ref = forwardedRef ? composeRefs(tocRef, forwardedRef) : tocRef;
+
+  const filteredHeadings = useMemo(
+    () =>
+      headings.filter(
+        (heading) =>
+          heading.level <= maxHeadingLevel && (!omitH1 || heading.level !== 1),
+      ),
+    [headings, maxHeadingLevel, omitH1],
+  );
+
   useIsomorphicLayoutEffect(() => {
     return subscribeToActiveAnchorChange((id) => {
-      const foundHeading = headings.find((heading) => heading.id === id);
-      if (foundHeading?.level <= maxHeadingLevel) {
+      const foundHeading = filteredHeadings.find((heading) => heading.id === id);
+      if (foundHeading) {
         setActiveId(id);
       }
     });
-  }, [headings, maxHeadingLevel, subscribeToActiveAnchorChange]);
-
-  const ref = forwardedRef ? composeRefs(tocRef, forwardedRef) : tocRef;
+  }, [filteredHeadings, subscribeToActiveAnchorChange]);
 
   useEffect(() => {
     if (activeAnchorId && tocRef?.current) {
@@ -76,7 +86,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
         });
       }
     }
-  }, [activeAnchorId, headings]);
+  }, [activeAnchorId]);
 
   // Position indicator over active item
   useEffect(() => {
@@ -96,7 +106,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
     } else if (indicatorRef?.current) {
       indicatorRef.current.style.display = "none";
     }
-  }, [activeAnchorId, headings]);
+  }, [activeAnchorId]);
 
   return (
     <nav
@@ -109,36 +119,31 @@ export const TableOfContents = forwardRef(function TableOfContents(
     >
       <div className={styles.indicator} ref={indicatorRef} />
       <ul className={styles.list}>
-        {headings.map((value) => {
-          if (value.level <= maxHeadingLevel && (!omitH1 || value.level !== 1)) {
-            return (
-              <li
-                key={value.id}
-                className={classnames(styles.listItem, {
-                  [styles.active]: value.id === activeAnchorId,
-                })}
-              >
-                <Link
-                  aria-current={value.id === activeAnchorId ? "page" : "false"}
-                  className={styles.link}
-                  data-level={value.level}
-                  to={`#${value.id}`}
-                  onClick={(event) => {
-                    // cmd/ctrl + click - open in new tab, don't prevent that
-                    if (!event.ctrlKey && !event.metaKey) {
-                      event.preventDefault();
-                    }
-                    scrollToAnchor(value.id, smoothScrolling);
-                  }}
-                  id={value.id}
-                >
-                  {value.text}
-                </Link>
-              </li>
-            );
-          }
-          return null;
-        })}
+        {filteredHeadings.map((value) => (
+          <li
+            key={value.id}
+            className={classnames(styles.listItem, {
+              [styles.active]: value.id === activeAnchorId,
+            })}
+          >
+            <Link
+              aria-current={value.id === activeAnchorId ? "page" : "false"}
+              className={styles.link}
+              data-level={value.level}
+              to={`#${value.id}`}
+              onClick={(event) => {
+                // cmd/ctrl + click - open in new tab, don't prevent that
+                if (!event.ctrlKey && !event.metaKey) {
+                  event.preventDefault();
+                }
+                scrollToAnchor(value.id, smoothScrolling);
+              }}
+              id={value.id}
+            >
+              {value.text}
+            </Link>
+          </li>
+        ))}
       </ul>
     </nav>
   );
