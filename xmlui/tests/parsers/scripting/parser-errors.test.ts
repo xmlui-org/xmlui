@@ -41,10 +41,8 @@ describe("Parser - error cases", () => {
     { src: "func(123,", issue: "W006" },
     { src: "func(123, abs", issue: "W006" },
 
-    { src: "{ true: 123 }", issue: "W007" },
     { src: "{ [a: 123 }", issue: "W005" },
     { src: "{ {a: 12}: 123 }", issue: "W007" },
-    { src: "{ null: 123 }", issue: "W007" },
     { src: "{ a+b: 123 }", issue: "W007" },
 
     { src: "{ abc", issue: "W008" },
