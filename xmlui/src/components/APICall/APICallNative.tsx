@@ -12,7 +12,7 @@ import toast from "react-hot-toast";
 // =============================================================================
 // DEBUG LOGGING
 // =============================================================================
-const DEBUG_DEFERRED = true; // Set to false to disable debug logging
+const DEBUG_DEFERRED = false; // Set to true to enable debug logging
 
 function debugLog(category: string, message: string, data?: any) {
   if (!DEBUG_DEFERRED) return;

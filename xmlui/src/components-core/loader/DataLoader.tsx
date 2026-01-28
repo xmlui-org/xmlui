@@ -24,7 +24,12 @@ import { useIndexerContext } from "../../components/App/IndexerContext";
 import { createMetadata, d } from "../../components/metadata-helpers";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
 import { createContextVariableError } from "../EngineError";
-import { loggerService } from "../../logging/LoggerService";
+import {
+  safeStringify,
+  formatDiff,
+  xsConsoleLog,
+  pushXsLog,
+} from "../inspector/inspectorUtils";
 
 type LoaderProps = {
   loader: DataLoaderDef;
@@ -67,109 +72,36 @@ function DataLoader({
   const xsLog = useCallback(
     (...args: any[]) => {
       if (!xsVerbose) return;
-      const payload = ["[xs]", ...args];
-      loggerService.log(payload);
-      console.log(...payload);
-      if (typeof window !== "undefined") {
-        const w = window as any;
-        w._xsLogs = Array.isArray(w._xsLogs) ? w._xsLogs : [];
-        const seen = new WeakSet();
-        const safeStringify = (value: any) => {
-          try {
-            return JSON.stringify(
-              value,
-              (_key, val) => {
-                if (typeof val === "function") return "[Function]";
-                if (typeof window !== "undefined") {
-                  if (val === window) return "[Window]";
-                  if (val === document) return "[Document]";
-                }
-                if (val && typeof Node !== "undefined" && val instanceof Node) {
-                  return "[DOM Node]";
-                }
-                if (val && typeof val === "object") {
-                  if (seen.has(val)) return "[Circular]";
-                  seen.add(val);
-                }
-                return val;
-              },
-              2,
-            );
-          } catch {
-            return String(value);
-          }
-        };
-        w._xsLogs.push({
-          ts: Date.now(),
-          perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-          traceId: pendingTraceIdRef.current || w._xsCurrentTrace, // Use captured trace from fetch trigger, or current trace
-          instanceId: instanceIdRef.current,
-          dataSourceId: (loader?.props as any)?.id,
-          dataSourceUrl: loader?.props?.url,
-          dataSourceBody: loader?.props?.body,
-          ownerUid: loader?.uid,
-          ownerFileId: loader?.debug?.source?.fileId,
-          ownerSource: loader?.debug?.source
-            ? {
-                start: loader.debug.source.start,
-                end: loader.debug.source.end,
-              }
-            : undefined,
-          text: safeStringify(args),
-          kind: args && args[0] ? args[0] : undefined,
-          eventName: args && args[1] && args[1].eventName ? args[1].eventName : undefined,
-          uid: args && args[1] && args[1].uid ? String(args[1].uid) : undefined,
-          componentType: "DataSource", // Mark as DataSource for inspector display
-          diffPretty:
-            args &&
-            args[1] &&
-            (args[1].diffPretty ||
-              (Array.isArray(args[1].diff) &&
-                args[1].diff
-                  .map((d: any) => d && d.diffPretty)
-                  .filter(Boolean)
-                  .join("\n\n"))) ||
-            undefined,
-          diffJson: args && args[1] && Array.isArray(args[1].diff) ? args[1].diff : undefined,
-        });
-        if (Number.isFinite(xsLogMax) && xsLogMax > 0 && w._xsLogs.length > xsLogMax) {
-          w._xsLogs.splice(0, w._xsLogs.length - xsLogMax);
-        }
-      }
+      xsConsoleLog(...args);
+      const detail = args[1];
+      const w = typeof window !== "undefined" ? (window as any) : {};
+      pushXsLog({
+        ts: Date.now(),
+        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+        traceId: pendingTraceIdRef.current || w._xsCurrentTrace,
+        instanceId: instanceIdRef.current,
+        dataSourceId: (loader?.props as any)?.id,
+        dataSourceUrl: loader?.props?.url,
+        dataSourceBody: loader?.props?.body,
+        ownerUid: loader?.uid,
+        ownerFileId: loader?.debug?.source?.fileId,
+        ownerSource: loader?.debug?.source
+          ? { start: loader.debug.source.start, end: loader.debug.source.end }
+          : undefined,
+        text: safeStringify(args),
+        kind: args[0] ?? undefined,
+        eventName: detail?.eventName,
+        uid: detail?.uid ? String(detail.uid) : undefined,
+        componentType: "DataSource",
+        diffPretty: detail?.diffPretty ||
+          (Array.isArray(detail?.diff) && detail.diff.map((d: any) => d?.diffPretty).filter(Boolean).join("\n\n")) ||
+          undefined,
+        diffJson: Array.isArray(detail?.diff) ? detail.diff : undefined,
+      }, xsLogMax);
     },
-    [xsLogMax, xsVerbose],
+    [xsLogMax, xsVerbose, loader],
   );
 
-  const formatDiff = (path: string, before: any, after: any) => {
-    const stringify = (value: any) => {
-      if (value === undefined) return "undefined";
-      try {
-        return JSON.stringify(value, null, 2);
-      } catch {
-        return String(value);
-      }
-    };
-    const prefixLines = (text: string, prefix: string) => {
-      return text
-        .split("\n")
-        .map((line) => `${prefix}${line}`)
-        .join("\n");
-    };
-    const beforeJson = stringify(before);
-    const afterJson = stringify(after);
-    const diffPretty =
-      `path: ${path}\n` + `${prefixLines(beforeJson, "- ")}\n` + `${prefixLines(afterJson, "+ ")}`;
-    return {
-      path,
-      type: "update",
-      before,
-      after,
-      beforeJson,
-      afterJson,
-      diffText: `path: ${path}\n- ${beforeJson}\n+ ${afterJson}`,
-      diffPretty,
-    };
-  };
   const url = extractParam(state, loader.props.url, appContext);
   const queryParamsInner = useMemo(() => {
     return extractParam(state, loader.props.queryParams, appContext);

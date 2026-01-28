@@ -36,7 +36,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 import type { TrackContainerHeight } from "./AppWrapper";
 import { ThemeToneKeys } from "../theming/utils";
 import StandaloneComponent from "./StandaloneComponent";
-import { loggerService } from "../../logging/LoggerService";
+import {
+  safeStringify,
+  simpleStringify,
+  prefixLines,
+  xsConsoleLog,
+  pushXsLog,
+} from "../inspector/inspectorUtils";
 
 // --- The properties of the AppContent component
 type AppContentProps = {
@@ -396,38 +402,22 @@ export function AppContent({
 
         if (xsVerbose && typeof window !== "undefined") {
           const w = window as any;
-          w._xsLogs = Array.isArray(w._xsLogs) ? w._xsLogs : [];
           const lastInteraction = w._xsLastInteraction;
-          // Only use startup trace as fallback if startup is not yet complete
-          // After first user interaction, _xsStartupComplete is set to true
           const traceId =
             w._xsCurrentTrace ||
             (!w._xsStartupComplete ? w._xsStartupTrace : undefined) ||
             (lastInteraction && Date.now() - lastInteraction.ts < 2000 ? lastInteraction.id : undefined);
           const perfTs = typeof performance !== "undefined" ? performance.now() : undefined;
 
-          const stringify = (value: any) => {
-            if (value === undefined) return "undefined";
-            try {
-              return JSON.stringify(value, null, 2);
-            } catch {
-              return String(value);
-            }
-          };
-          const prefixLines = (text: string, prefix: string) =>
-            text
-              .split("\n")
-              .map((line) => `${prefix}${line}`)
-              .join("\n");
-          const beforeJson = stringify(before);
-          const afterJson = stringify(after);
+          const beforeJson = simpleStringify(before);
+          const afterJson = simpleStringify(after);
           const diffPretty =
             `path: AppState:${bucket}\n` +
             `${prefixLines(beforeJson, "- ")}\n` +
             `${prefixLines(afterJson, "+ ")}`;
           const diff = {
             path: `AppState:${bucket}`,
-            type: "update",
+            type: "update" as const,
             before,
             after,
             beforeJson,
@@ -436,14 +426,10 @@ export function AppContent({
             diffPretty,
           };
 
-          const payload = ["[xs]", "state:changes", { uid: bucket, eventName: `AppState:${bucket}` }];
-
           // Defer log emission to avoid triggering state updates during render.
           setTimeout(() => {
-            loggerService.log(payload);
-            console.log(...payload);
-
-            w._xsLogs.push({
+            xsConsoleLog("state:changes", { uid: bucket, eventName: `AppState:${bucket}` });
+            pushXsLog({
               ts: Date.now(),
               perfTs,
               kind: "state:changes",
@@ -452,10 +438,7 @@ export function AppContent({
               traceId,
               diffPretty,
               diffJson: [diff],
-            });
-            if (Number.isFinite(xsLogMax) && xsLogMax > 0 && w._xsLogs.length > xsLogMax) {
-              w._xsLogs.splice(0, w._xsLogs.length - xsLogMax);
-            }
+            }, xsLogMax);
           }, 0);
         }
 
@@ -484,14 +467,6 @@ export function AppContent({
         w._xsCurrentTrace = w._xsStartupTrace;
       }
     }
-
-    const safeStringify = (value: any) => {
-      try {
-        return JSON.stringify(value, null, 2);
-      } catch {
-        return String(value);
-      }
-    };
 
     // Track processed events using WeakSet - same event object = same physical user action
     const processedEvents = new WeakSet<Event>();

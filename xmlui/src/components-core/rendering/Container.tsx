@@ -58,46 +58,18 @@ import { EMPTY_ARRAY } from "../constants";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
 import { mergeProps } from "../utils/mergeProps";
-import { loggerService } from "../../logging/LoggerService";
+import {
+  pushTrace,
+  popTrace,
+  getCurrentTrace,
+  formatChange,
+  safeStringify,
+  xsConsoleLog,
+  pushXsLog,
+} from "../inspector/inspectorUtils";
 
-// =============================================================================
-// TRACE ID MANAGEMENT - for correlating handler events
-// =============================================================================
-const traceStack: string[] = [];
-
-function generateTraceId(): string {
-  return `t-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
-}
-
-function pushTrace(preferredId?: string): string {
-  const id = preferredId || generateTraceId();
-  traceStack.push(id);
-  // Make current trace globally accessible for async code (DataLoader, etc.)
-  if (typeof window !== "undefined") {
-    (window as any)._xsCurrentTrace = id;
-  }
-  return id;
-}
-
-function popTrace(): void {
-  traceStack.pop();
-  // Update global trace to new top of stack (or undefined if empty)
-  if (typeof window !== "undefined") {
-    (window as any)._xsCurrentTrace = traceStack[traceStack.length - 1];
-  }
-}
-
-function currentTrace(): string | undefined {
-  return traceStack[traceStack.length - 1];
-}
-
-// Export for use by other modules (DataLoader, etc.)
-export function getCurrentTrace(): string | undefined {
-  if (typeof window !== "undefined") {
-    return (window as any)._xsCurrentTrace;
-  }
-  return currentTrace();
-}
+// Re-export for backward compatibility
+export { getCurrentTrace } from "../inspector/inspectorUtils";
 
 type Props = {
   node: ContainerWrapperDef;
@@ -221,75 +193,28 @@ export const Container = memo(
         const xsLogMax = Number(appContext.appGlobals?.xsVerboseLogMax ?? 200);
         const xsLog = (...args: any[]) => {
           if (!xsVerbose) return;
-          const payload = ["[xs]", ...args];
-          loggerService.log(payload);
-          console.log(...payload);
-          if (typeof window !== "undefined") {
-            const w = window as any;
-            w._xsLogs = Array.isArray(w._xsLogs) ? w._xsLogs : [];
-            const seen = new WeakSet();
-            const safeStringify = (value: any) => {
-              try {
-                return JSON.stringify(
-                  value,
-                  (_key, val) => {
-                    if (typeof val === "function") return "[Function]";
-                    if (typeof window !== "undefined") {
-                      if (val === window) return "[Window]";
-                      if (val === document) return "[Document]";
-                    }
-                    if (val && typeof Node !== "undefined" && val instanceof Node) {
-                      return "[DOM Node]";
-                    }
-                    if (val && typeof val === "object") {
-                      if (seen.has(val)) return "[Circular]";
-                      seen.add(val);
-                    }
-                    return val;
-                  },
-                  2,
-                );
-              } catch {
-                return String(value);
-              }
-            };
-            w._xsLogs.push({
-              ts: Date.now(),
-              perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-              traceId: currentTrace(),
-              text: safeStringify(args),
-              kind: args && args[0] ? args[0] : undefined,
-              eventName: args && args[1] && args[1].eventName ? args[1].eventName : undefined,
-              componentType: args && args[1] && args[1].componentType ? args[1].componentType : undefined,
-              componentLabel: args && args[1] && args[1].componentLabel ? args[1].componentLabel : undefined,
-              uid:
-                args && args[1] && args[1].uid
-                  ? String(args[1].uid)
-                  : undefined,
-              diffPretty:
-                args &&
-                args[1] &&
-                (args[1].diffPretty ||
-                  (Array.isArray(args[1].diff) &&
-                    args[1].diff
-                      .map((d: any) => d && d.diffPretty)
-                      .filter(Boolean)
-                      .join("\n\n"))) ||
-                undefined,
-              diffJson: args && args[1] && Array.isArray(args[1].diff) ? args[1].diff : undefined,
-              error: args && args[1] && args[1].error ? {
-                message: args[1].error.message || String(args[1].error),
-                stack: args[1].error.stack,
-              } : undefined,
-              // Source file info for handler errors
-              ownerFileId: args && args[1] ? args[1].ownerFileId : undefined,
-              ownerSource: args && args[1] ? args[1].ownerSource : undefined,
-              // Handler duration (for handler:complete)
-              duration: args && args[1] ? args[1].duration : undefined,
-              // Handler code for tracing
-              handlerCode: args && args[1] ? args[1].handlerCode : undefined,
-            });
-          }
+          xsConsoleLog(...args);
+          const detail = args[1];
+          pushXsLog({
+            ts: Date.now(),
+            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+            traceId: getCurrentTrace(),
+            text: safeStringify(args),
+            kind: args[0] ?? undefined,
+            eventName: detail?.eventName,
+            componentType: detail?.componentType,
+            componentLabel: detail?.componentLabel,
+            uid: detail?.uid ? String(detail.uid) : undefined,
+            diffPretty: detail?.diffPretty ||
+              (Array.isArray(detail?.diff) && detail.diff.map((d: any) => d?.diffPretty).filter(Boolean).join("\n\n")) ||
+              undefined,
+            diffJson: Array.isArray(detail?.diff) ? detail.diff : undefined,
+            error: detail?.error ? { message: detail.error.message || String(detail.error), stack: detail.error.stack } : undefined,
+            ownerFileId: detail?.ownerFileId,
+            ownerSource: detail?.ownerSource,
+            duration: detail?.duration,
+            handlerCode: detail?.handlerCode,
+          }, xsLogMax);
           if (xsLogBucket && appContext.AppState) {
             try {
               const current = appContext.AppState.get(xsLogBucket) || [];
@@ -300,54 +225,9 @@ export const Container = memo(
               }
               appContext.AppState.set(xsLogBucket, next);
             } catch (e) {
-              // Don't let logging failures affect app execution
               console.warn("[xs] Failed to write to AppState log bucket", e);
             }
           }
-        };
-
-        const formatChange = (change: any) => {
-          const prev = change.previousValue;
-          const next = change.newValue;
-          let kind: "add" | "remove" | "update" = "update";
-          if (change.action === "unset") {
-            kind = "remove";
-          } else if (prev === undefined && next !== undefined) {
-            kind = "add";
-          }
-          const stringify = (value: any) => {
-            if (value === undefined) return "undefined";
-            try {
-              return JSON.stringify(value, null, 2);
-            } catch {
-              return String(value);
-            }
-          };
-          const prefixLines = (text: string, prefix: string) => {
-            return text
-              .split("\n")
-              .map((line) => `${prefix}${line}`)
-              .join("\n");
-          };
-          const beforeJson = stringify(prev);
-          const afterJson = stringify(next);
-          const diffPretty =
-            `path: ${change.path}\n` +
-            `${prefixLines(beforeJson, "- ")}\n` +
-            `${prefixLines(afterJson, "+ ")}`;
-          return {
-            path: change.path,
-            type: kind,
-            before: prev,
-            after: next,
-            beforeJson,
-            afterJson,
-            diffText:
-              `path: ${change.path}\n` +
-              `- ${beforeJson}\n` +
-              `+ ${afterJson}`,
-            diffPretty,
-          };
         };
 
         const evalAppContext = {

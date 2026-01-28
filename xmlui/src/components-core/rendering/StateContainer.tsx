@@ -19,8 +19,13 @@ import { useDebugView } from "../DebugViewProvider";
 import { ErrorBoundary } from "../rendering/ErrorBoundary";
 import { collectVariableDependencies } from "../script-runner/visitors";
 import { useReferenceTrackedApi, useShallowCompareMemoize } from "../utils/hooks";
-import { Container, getCurrentTrace } from "./Container";
-import { loggerService } from "../../logging/LoggerService";
+import { Container } from "./Container";
+import {
+  getCurrentTrace,
+  simpleStringify,
+  xsConsoleLog,
+  pushXsLog,
+} from "../inspector/inspectorUtils";
 import { isParsedCodeDeclaration } from "../../abstractions/InternalMarkers";
 import { useAppContext } from "../AppContext";
 import { parseParameterString } from "../script-runner/ParameterParser";
@@ -412,12 +417,8 @@ export const StateContainer = memo(
             // Log the init event (will be handled below after we set up the logging logic)
             const initVarNames = initChanges.map((c) => c.key).join(", ");
             const initDisplayId = componentId || initChanges[0]?.key || "component";
-            const stringify = (value: any) => {
-              if (value === undefined) return "undefined";
-              try { return JSON.stringify(value, null, 2); } catch { return String(value); }
-            };
             const initFormattedChanges = initChanges.map((c) => {
-              return `${c.key}: ${stringify(c.before)} → ${stringify(c.after)}`;
+              return `${c.key}: ${simpleStringify(c.before)} → ${simpleStringify(c.after)}`;
             });
             const initLogEntry = {
               ts: Date.now(),
@@ -434,13 +435,13 @@ export const StateContainer = memo(
               changes: initChanges.map((c) => ({ key: c.key, before: c.before, after: c.after, changeKind: c.kind })),
               diff: initChanges.map((c) => ({
                 path: c.key, type: "add", before: c.before, after: c.after,
-                beforeJson: stringify(c.before), afterJson: stringify(c.after),
-                diffPretty: `${c.key}: ${stringify(c.before)} → ${stringify(c.after)}`,
+                beforeJson: simpleStringify(c.before), afterJson: simpleStringify(c.after),
+                diffPretty: `${c.key}: ${simpleStringify(c.before)} → ${simpleStringify(c.after)}`,
               })),
               diffPretty: (resolvedFilePath ? `file: ${resolvedFilePath}\n` : "") + initFormattedChanges.join("\n"),
             };
-            w._xsLogs.push(initLogEntry);
-            loggerService.log(["[xs]", initLogEntry.kind, initLogEntry]);
+            pushXsLog(initLogEntry);
+            xsConsoleLog(initLogEntry.kind, initLogEntry);
           }
           initLoggedWithFileRef.current = true;
           pendingInitRef.current = null;
@@ -465,25 +466,12 @@ export const StateContainer = memo(
       }
 
       if (changes.length > 0) {
-        const stringify = (value: any) => {
-          if (value === undefined) return "undefined";
-          try {
-            return JSON.stringify(value, null, 2);
-          } catch {
-            return String(value);
-          }
-        };
-
         const varNames = changes.map((c) => c.key).join(", ");
-        // Use componentId if available, otherwise use first var name for identification
         const displayId = componentId || changes[0]?.key || "component";
         const filePath = resolvedFilePath;
 
-        // Format each var change with full context
         const formattedChanges = changes.map((c) => {
-          const beforeStr = stringify(c.before);
-          const afterStr = stringify(c.after);
-          return `${c.key}: ${beforeStr} → ${afterStr}`;
+          return `${c.key}: ${simpleStringify(c.before)} → ${simpleStringify(c.after)}`;
         });
 
         const logEntry = {
@@ -497,7 +485,6 @@ export const StateContainer = memo(
           componentLabel: componentId || undefined,
           ownerFileId: resolvedFilePath || sourceInfo?.fileId,
           ownerSource: sourceInfo ? { start: sourceInfo.start, end: sourceInfo.end } : undefined,
-          // Include file path in a way the viewer can display
           file: filePath,
           changes: changes.map((c) => ({
             key: c.key,
@@ -505,25 +492,20 @@ export const StateContainer = memo(
             after: c.after,
             changeKind: c.kind,
           })),
-          diff: changes.map((c) => {
-            const beforeStr = stringify(c.before);
-            const afterStr = stringify(c.after);
-            return {
-              path: c.key,
-              type: c.kind === "init" ? "add" : "update",
-              before: c.before,
-              after: c.after,
-              beforeJson: beforeStr,
-              afterJson: afterStr,
-              diffPretty: `${c.key}: ${beforeStr} → ${afterStr}`,
-            };
-          }),
-          // Format diffPretty with file info for clear display (omit if unknown)
+          diff: changes.map((c) => ({
+            path: c.key,
+            type: c.kind === "init" ? "add" : "update",
+            before: c.before,
+            after: c.after,
+            beforeJson: simpleStringify(c.before),
+            afterJson: simpleStringify(c.after),
+            diffPretty: `${c.key}: ${simpleStringify(c.before)} → ${simpleStringify(c.after)}`,
+          })),
           diffPretty: (filePath ? `file: ${filePath}\n` : "") + formattedChanges.join("\n"),
         };
 
-        w._xsLogs.push(logEntry);
-        loggerService.log(["[xs]", logEntry.kind, logEntry]);
+        pushXsLog(logEntry);
+        xsConsoleLog(logEntry.kind, logEntry);
       }
 
       prevVarsRef.current = cloneDeep(currentVars);
