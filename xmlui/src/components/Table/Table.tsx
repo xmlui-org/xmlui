@@ -22,7 +22,7 @@ import {
 } from "./TableNative";
 import type { RendererContext } from "../../abstractions/RendererDefs";
 import { PositionValues } from "../Pagination/PaginationNative";
-import { PropertyValueDescription } from "../../abstractions/ComponentDefs";
+import type { PropertyValueDescription } from "../../abstractions/ComponentDefs";
 
 const COMP = "Table";
 
@@ -163,6 +163,12 @@ export const TableMd = createMetadata({
         "Set the header visibility using this property. Set it to \`true\` to hide the header.",
       valueType: "boolean",
       defaultValue: defaultProps.hideHeader,
+    },
+    hideSelectionCheckboxes: {
+      description:
+        "If true, hides selection checkboxes for both rows and header. Selection logic still works via API and keyboard.",
+      valueType: "boolean",
+      defaultValue: false,
     },
     iconNoSort: d(
       `Allows setting an alternate icon displayed in the ${COMP} column header when sorting is ` +
@@ -539,6 +545,7 @@ const TableWithColumns = memo(
             userSelectCell={extractValue.asOptionalString(node.props.userSelectCell)}
             userSelectRow={extractValue.asOptionalString(node.props.userSelectRow)}
             userSelectHeading={extractValue.asOptionalString(node.props.userSelectHeading)}
+            hideSelectionCheckboxes={extractValue.asOptionalBoolean(node.props.hideSelectionCheckboxes)}
           />
         </>
       );
