@@ -1496,7 +1496,37 @@ Click on any of the column headers to trigger a new sorting:
 
 %-EVENT-END
 
+%-EVENT-START rowDoubleClick
+
+This event is triggered when a table row is double-clicked. The handler receives the row's data item as its only argument.
+
+```xmlui copy {4}
+<App>
+  <Table data='{[...]}' onRowDoubleClick="(item) => console.log(item)">
+    <Column bindTo="name"/>
+
+%-EVENT-START rowDoubleClick
+
+This event is triggered when a table row is double-clicked. The handler receives the row's data item as its only argument.
+
+```xmlui copy {4}
+<App>
+  <Table data='{[...]}' onRowDoubleClick="(item) => console.log(item)">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+  </Table>
+</App>
+```
+
+%-EVENT-END
+    <Column bindTo="quantity"/>
+  </Table>
+</App>
+```
+
+%-EVENT-END
 %-API-START clearSelection
+
 
 ```xmlui copy /clearSelection()/ /selectId(1)/ /selectId([2, 4])/ /selectAll()/
 <App>

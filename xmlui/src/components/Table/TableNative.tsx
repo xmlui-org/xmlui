@@ -146,6 +146,7 @@ type TableProps = {
   pageInfoPosition?: Position;
   checkboxTolerance?: CheckboxTolerance;
   rowHeight?: number;
+  rowDoubleClick?: (item: any) => void;
 };
 
 function defaultIsRowDisabled(_: any) {
@@ -286,6 +287,7 @@ export const Table = forwardRef(
       showPageSizeSelector = defaultProps.showPageSizeSelector,
       checkboxTolerance = defaultProps.checkboxTolerance,
       rowHeight = defaultProps.rowHeight,
+      rowDoubleClick,
       ...rest
       // cols
     }: TableProps,
@@ -1039,6 +1041,22 @@ export const Table = forwardRef(
                         }
                         toggleRow(row.original, event);
                       }}
+                      onDoubleClick={(event) => {
+                          // Prevent browser text selection on double-click
+                          try {
+                            event.preventDefault();
+                          } catch (e) {
+                            // ignore
+                          }
+                          // Call external handler if provided
+                          try {
+                            if (typeof (rowDoubleClick as any) === "function") {
+                              (rowDoubleClick as any)(row.original);
+                            }
+                          } catch (e) {
+                            // swallow errors from handler
+                          }
+                        }}
                       onMouseMove={(event) => {
                         // Change cursor and hover state when within checkbox boundary
                         const currentRow = event.currentTarget as HTMLElement;
@@ -1204,4 +1222,5 @@ export const defaultProps = {
   pageInfoPosition: "end" as Position,
   checkboxTolerance: "compact" as CheckboxTolerance,
   rowHeight: 40, // For virtua virtualization
+  onRowDoubleClick: undefined as unknown as ((item: any) => void) | undefined,
 };
