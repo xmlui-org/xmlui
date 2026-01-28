@@ -15,16 +15,21 @@ export function flattenNode(
   openedIds: (string | number)[],
   dynamicField?: string,
   nodeStates?: Map<string | number, NodeLoadingState>,
+  componentDynamic?: boolean,
 ) {
   const { children, key } = node;
   const isExpanded = openedIds.includes(key);
-  // Check if node has actual children OR is a dynamic node that can load children
+  // Check if node has actual children OR is a dynamic node that can load children OR is unloaded
   const hasActualChildren = !!children && children.length > 0;
-  const isDynamic = dynamicField && node[dynamicField];
-  const hasChildren = hasActualChildren || isDynamic;
+  // Check if this specific node is marked as dynamic, or use component-level default
+  const nodeDynamicValue = dynamicField && dynamicField in node ? node[dynamicField] : undefined;
+  const isDynamic = nodeDynamicValue !== undefined ? nodeDynamicValue : (componentDynamic ?? false);
+  // For dynamic nodes, if loaded is not explicitly true, treat as unloaded
+  const isUnloaded = isDynamic ? node.loaded !== true : node.loaded === false;
+  const hasChildren = hasActualChildren || isDynamic || isUnloaded;
   
   // Get loading state for this node
-  const loadingState = nodeStates?.get(key) || (isDynamic ? 'unloaded' : 'loaded');
+  const loadingState = nodeStates?.get(key) || (isDynamic || isUnloaded ? 'unloaded' : 'loaded');
   
   const flatNode: FlatTreeNodeWithState = {
     ...node,
@@ -40,7 +45,7 @@ export function flattenNode(
 
   if (isExpanded && children) {
     for (let child of children) {
-      flattenNode(child, depth + 1, result, openedIds, dynamicField, nodeStates);
+      flattenNode(child, depth + 1, result, openedIds, dynamicField, nodeStates, componentDynamic);
     }
   }
 }
@@ -49,11 +54,12 @@ export function toFlatTree(
   treeData: TreeNode[], 
   openedIds: (string | number)[], 
   dynamicField?: string,
-  nodeStates?: Map<string | number, NodeLoadingState>
+  nodeStates?: Map<string | number, NodeLoadingState>,
+  componentDynamic?: boolean,
 ): FlatTreeNodeWithState[] {
   const ret: FlatTreeNodeWithState[] = [];
   treeData.forEach((node) => {
-    flattenNode(node, 0, ret, openedIds, dynamicField, nodeStates);
+    flattenNode(node, 0, ret, openedIds, dynamicField, nodeStates, componentDynamic);
   });
 
   return ret;
@@ -179,6 +185,7 @@ export function flatToNative(
       displayName,
       parentIds,
       selectable: fieldConfig.selectableField ? (item[fieldConfig.selectableField] ?? true) : true,
+      loaded: fieldConfig.loadedField ? (item[fieldConfig.loadedField] ?? true) : true,
       children,
       // Preserve original item properties
       ...item,
@@ -275,6 +282,7 @@ export function hierarchyToNative(
         displayName,
         parentIds,
         selectable: fieldConfig.selectableField ? (item[fieldConfig.selectableField] ?? true) : true,
+        loaded: fieldConfig.loadedField ? (item[fieldConfig.loadedField] ?? true) : true,
         children: [],
         ...item,
         ...(fieldConfig.iconField && item[fieldConfig.iconField] && {
@@ -308,6 +316,7 @@ export function hierarchyToNative(
       displayName,
       parentIds,
       selectable: fieldConfig.selectableField ? (item[fieldConfig.selectableField] ?? true) : true,
+      loaded: fieldConfig.loadedField ? (item[fieldConfig.loadedField] ?? true) : true,
       // Preserve original item properties (excluding children to avoid overwriting)
       ...item,
       // Add icon properties if configured

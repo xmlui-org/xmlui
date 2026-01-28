@@ -6,6 +6,7 @@ export interface TreeNode {
   children?: TreeNode[];
   parentIds: (string | number)[];
   selectable: boolean;
+  loaded?: boolean;
   [x: string]: any;
 }
 
@@ -37,6 +38,8 @@ export interface TreeFieldConfig {
   childrenField?: string;
   selectableField?: string;
   dynamicField?: string;
+  loadedField?: string;
+  autoLoadAfterField?: string;
 }
 
 export interface TreeSelectionEvent {
@@ -54,6 +57,9 @@ export type NodeLoadingState = 'unloaded' | 'loading' | 'loaded';
 // Extended FlatTreeNode with loading state information
 export interface FlatTreeNodeWithState extends FlatTreeNode {
   loadingState: NodeLoadingState;
+  expandedTimestamp?: number;
+  collapsedTimestamp?: number;
+  autoLoadAfter?: number | null;
 }
 
 export interface TreeNodeInfo {

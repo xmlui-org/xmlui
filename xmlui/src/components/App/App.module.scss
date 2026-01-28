@@ -97,7 +97,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       // Override overflow when scrollWholePage is false
       &:not(.scrollWholePage) {
         overflow: hidden;
-        height: 100vh;
+        height: 100dvh;
         
         &:global(.nested-app) {
           height: 100%;
@@ -111,7 +111,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
     &.desktop {
       width: 100vw;
-      height: 100vh;
+      height: 100dvh;
       margin: 0;
       padding: 0;
       overflow: hidden;
@@ -175,7 +175,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       // Set effective footer height based on whether footer is sticky
       --effective-footer-height: var(--footer-height);
       --content-available-height: calc(
-        var(--containerHeight, 100vh) - var(--header-height) - var(--effective-footer-height)
+        var(--containerHeight, 100dvh) - var(--header-height) - var(--effective-footer-height)
       );
       
       &.noFooter {
@@ -276,7 +276,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
     &:not(.scrollWholePage) {
       overflow: hidden;
-      height: 100vh;
+      height: 100dvh; // Use dynamic viewport height for mobile browser compatibility
       
       // When nested (like in playground), use container dimensions instead of viewport
       &:global(.nested-app) {

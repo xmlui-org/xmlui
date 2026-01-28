@@ -152,7 +152,34 @@ This event is triggered when the RadioGroup has lost the focus.
 
 ## Exposed Methods [#exposed-methods]
 
-This component does not expose any methods.
+### `setValue` [#setvalue]
+
+This API sets the value of the `RadioGroup`. You can use it to programmatically change the value.
+
+**Signature**: `setValue(value: string): void`
+
+- `value`: The new value to set.
+
+You can use this method to set the component's current value programmatically.
+
+```xmlui-pg copy {2, 7-8} display name="Example: value and setValue"
+<App>
+  <RadioGroup id="radio">
+    <Option label="First Item" value="first"/>
+    <Option label="Second Item" value="second"/>
+  </RadioGroup>
+  <HStack>
+    <Button label="Set First" onClick="radio.setValue('first')" />
+    <Button label="Set Second" onClick="radio.setValue('second')" />
+  </HStack>
+</App>
+```
+
+### `value` [#value]
+
+This API retrieves the current value of the `RadioGroup`. You can use it to get the value programmatically.
+
+**Signature**: `get value(): string | undefined`
 
 ## Parts [#parts]
 

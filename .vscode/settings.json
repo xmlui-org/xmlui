@@ -31,6 +31,19 @@
     "npm install": true,
     "npx tsc": true,
     "od": true,
-    "mv": true
+    "mv": true,
+    "git checkout": true,
+    "git add": true,
+    "git commit": true,
+    "npm run build:xmlui-metadata": true,
+    "/^node scripts/generate-docs/generate-context-vars-summary\\.mjs$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "/^cd /Users/dotneteer/source/xmlui/xmlui && node -e \"\nconst \\{ parseExpression, parseStatements \\} = require\\('\\./dist/components-core/script-runner/Parser\\.js'\\);\n\n// Test 1: nested async function\ntry \\{\n  const source1 = 'function outer\\(\\) \\{ async function inner\\(\\) \\{ return 1; \\} \\}';\n  const stmts = parseStatements\\(source1\\);\n  console\\.log\\('Nested async function:'\\);\n  console\\.log\\(JSON\\.stringify\\(stmts, null, 2\\)\\);\n\\} catch \\(e\\) \\{\n  console\\.log\\('Parse error:', e\\.message\\);\n\\}\n\n// Test 2: await expression\ntry \\{\n  const source2 = 'await promise';\n  const expr = parseExpression\\(source2\\);\n  console\\.log\\('\\\\nAwait expression:'\\);\n  console\\.log\\(JSON\\.stringify\\(expr, null, 2\\)\\);\n\\} catch \\(e\\) \\{\n  console\\.log\\('Parse error:', e\\.message\\);\n\\}\n\n// Test 3: property access with async/await\ntry \\{\n  const source3 = 'obj\\.async';\n  const expr = parseExpression\\(source3\\);\n  console\\.log\\('\\\\nProperty access \\(obj\\.async\\):'\\);\n  console\\.log\\(JSON\\.stringify\\(expr, null, 2\\)\\);\n\\} catch \\(e\\) \\{\n  console\\.log\\('Parse error:', e\\.message\\);\n\\}\n\"$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "npm list": true
   }
 }

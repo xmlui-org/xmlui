@@ -10,6 +10,7 @@ import {
 } from "./script-runner/ScriptingSourceTree";
 
 import { extractParam } from "./utils/extractParam";
+import { normalizeUrlAndParams } from "./utils/DataLoaderQueryKeyGenerator";
 import { randomUUID, readCookie } from "./utils/misc";
 import { GenericBackendError } from "./EngineError";
 import { processStatementQueue } from "./script-runner/process-statement-sync";
@@ -586,25 +587,45 @@ export default class RestApiProxy {
   };
 
   private generateFullApiUrl(relativePath: string, queryParams: Record<string, any> | undefined) {
+    const { baseUrl: basePath, mergedParams } = normalizeUrlAndParams(
+      relativePath,
+      queryParams,
+    );
+
     let queryString = "";
-    if (queryParams) {
+    if (mergedParams && Object.keys(mergedParams).length > 0) {
       const params = new URLSearchParams();
-      Object.entries(queryParams).forEach(([key, value]) => {
+      const appendParam = (key: string, value: any) => {
+        if (value === undefined || value === null) {
+          return;
+        }
+        if (isPlainObject(value)) {
+          params.append(key, JSON.stringify(value));
+          return;
+        }
+        params.append(key, String(value));
+      };
+      Object.entries(mergedParams).forEach(([key, value]) => {
         if (Array.isArray(value)) {
           value.forEach((item) => {
-            params.append(key, item);
+            appendParam(key, item);
           });
-        } else if (value !== undefined) {
-          params.append(key, value);
+        } else {
+          appendParam(key, value);
         }
       });
-      queryString = `?${params}`;
+      // Only add query string if there are actually params after filtering
+      const paramsString = params.toString();
+      if (paramsString) {
+        queryString = `?${paramsString}`;
+      }
     }
-    if (relativePath.startsWith("http://") || relativePath.startsWith("https://")) {
-      return `${relativePath}${queryString}`;
+
+    if (basePath.startsWith("http://") || basePath.startsWith("https://")) {
+      return `${basePath}${queryString}`;
     }
     //TODO check if autoEncode is enabled
-    return `${this.config.apiUrl || ""}${relativePath}${queryString}`;
+    return `${this.config.apiUrl || ""}${basePath}${queryString}`;
   }
 
   private raiseError = async (response: Response | AxiosResponse) => {

@@ -15,14 +15,15 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("textbox")).toHaveValue("initial value");
   });
 
-  test("TextBox type='password' binds to Form data", async ({ initTestBed, page }) => {
+  test("TextBox type='password' binds to Form data", async ({ initTestBed, page, createTextBoxDriver }) => {
     const { testStateDriver } = await initTestBed(`
       <Form onSubmit="data => testState = data">
         <PasswordInput testId="password" bindTo="secret" />
       </Form>
     `);
 
-    await page.getByRole("textbox").fill("topsecret");
+    const driver = await createTextBoxDriver("password");
+    await driver.input.fill("topsecret");
     await page.getByRole("button", { name: "Save" }).click();
 
     await expect.poll(testStateDriver.testState).toEqual({
@@ -313,7 +314,7 @@ test.describe("Behavior Context", () => {
     await expect(page.getByRole("textbox")).toBeVisible();
     await expect(page.getByRole("textbox")).toHaveValue("test");
 
-    await page.getByRole("button", { name: "Save" }).click();
+    await page.getByRole("button", { name: "Save" }).click({delay: 100});
 
     // Empty object since there's no bindTo
     await expect.poll(testStateDriver.testState).toEqual({});
@@ -417,11 +418,11 @@ test.describe("Validation", () => {
     // This is a direct copy of FormItem.spec.ts test, just with TextBox+bindTo instead of FormItem
     await initTestBed(`
       <Form>
-        <TextBox 
-          testId="textbox" 
-          bindTo="standaloneField" 
-          label="Required Field" 
-          required="true" 
+        <TextBox
+          testId="textbox"
+          bindTo="standaloneField"
+          label="Required Field"
+          required="true"
           requiredInvalidMessage="This field is required"
         />
       </Form>
@@ -465,12 +466,12 @@ test.describe("Validation", () => {
   }) => {
     await initTestBed(`
       <Form>
-        <TextBox 
-          testId="textbox" 
-          bindTo="field" 
-          minLength="5" 
-          lengthInvalidMessage="Too short" 
-          label="Min Length" 
+        <TextBox
+          testId="textbox"
+          bindTo="field"
+          minLength="5"
+          lengthInvalidMessage="Too short"
+          label="Min Length"
         />
       </Form>
     `);
@@ -522,130 +523,6 @@ test.describe("Validation", () => {
     await formDriver.submitForm();
 
     await expect(page.getByText("FormItem required")).toBeVisible();
-  });
-});
-
-// =============================================================================
-// ONVALIDATE TIMEOUT TESTS
-// =============================================================================
-
-test.describe("onValidate Timeout", () => {
-  test("onValidate times out after specified duration and shows error", async ({
-    initTestBed,
-    page,
-  }) => {
-    await initTestBed(`
-      <Form>
-        <TextBox 
-          testId="field1"
-          label="Email" 
-          bindTo="email"
-          validationMode="onChanged"
-          customValidationsTimeout="1000"
-          onValidate="(value) => { await delay(3000); return true; }"
-        />
-      </Form>
-    `);
-    const input = page.getByRole("textbox");
-    await input.fill("test@example.com");
-    // After 1 second, should show timeout error
-    await expect(page.getByText("Validation took too long")).toBeVisible({ timeout: 2000 });
-  });
-
-  test("onValidate uses custom timeout message", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <Form>
-        <TextBox 
-          testId="field1"
-          label="Email" 
-          bindTo="email"
-          validationMode="onChanged"
-          customValidationsTimeout="1000"
-          customValidationsTimeoutMessage="Email validation is taking too long!"
-          onValidate="(value) => { await delay(3000); return true; }"
-        />
-      </Form>
-    `);
-    const input = page.getByRole("textbox");
-    await input.fill("test@example.com");
-    await expect(page.getByText("Email validation is taking too long!")).toBeVisible({
-      timeout: 2000,
-    });
-  });
-
-  test("onValidate cancels previous validation when value changes", async ({
-    initTestBed,
-    page,
-  }) => {
-    const { testStateDriver } = await initTestBed(`
-      <Form>
-        <TextBox 
-          testId="field1"
-          label="Email" 
-          bindTo="email"
-          validationMode="onChanged"
-          customValidationsTimeout="2000"
-          onValidate="(value) => { await delay(1500, () => { testState = value; }); return true; }"
-        />
-      </Form>
-    `);
-    const input = page.getByRole("textbox");
-
-    // Type first value
-    await input.fill("test1");
-
-    // Quickly change to second value (should cancel first validation)
-    await input.fill("test2");
-
-    // Wait for validation to complete
-    await expect.poll(testStateDriver.testState, { timeout: 3000 }).toEqual("test2");
-  });
-
-  test("onValidate with zero timeout disables timeout mechanism", async ({ initTestBed, page }) => {
-    const { testStateDriver } = await initTestBed(`
-      <Form>
-        <TextBox 
-          testId="field1"
-          label="Email" 
-          bindTo="email"
-          validationMode="onChanged"
-          customValidationsTimeout="0"
-          onValidate="(value) => { await delay(2000, () => { testState = true; }); return true; }"
-        />
-      </Form>
-    `);
-    const input = page.getByRole("textbox");
-    await input.fill("test@example.com");
-
-    // Should NOT timeout, validation should complete normally
-    await expect.poll(testStateDriver.testState, { timeout: 3000 }).toBe(true);
-
-    // Should not show timeout error
-    await expect(page.getByText("Validation took too long")).not.toBeVisible();
-  });
-
-  test("onValidate completes successfully within timeout period", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <Form>
-        <TextBox 
-          testId="field1"
-          label="Email" 
-          bindTo="email"
-          validationMode="onChanged"
-          customValidationsTimeout="2000"
-          onValidate="(value) => {
-            await delay(500);
-            return { isValid: false, invalidMessage: 'Custom error', severity: 'error' };
-          }"
-        />
-      </Form>
-    `);
-    const input = page.getByRole("textbox");
-    await input.fill("test@example.com");
-
-    // Should show custom error, not timeout error
-    await expect(page.getByText("Custom error")).toBeVisible({ timeout: 1500 });
-    await expect(page.getByText("Validation took too long")).not.toBeVisible();
   });
 });
 
@@ -1000,8 +877,8 @@ test.describe("Event Handling", () => {
   test("fires onValidate event", async ({ initTestBed, createTextBoxDriver }) => {
     const { testStateDriver } = await initTestBed(`
       <Form>
-        <TextBox 
-          testId="test" 
+        <TextBox
+          testId="test"
           bindTo="test"
           required="true"
           onValidate="result => testState = result ? 'valid' : 'invalid'"
@@ -1042,11 +919,11 @@ test.describe("Accessibility", () => {
   }) => {
     await initTestBed(`
       <Form>
-        <TextBox 
+        <TextBox
           testId="formItem"
           bindTo="test"
-          label="Test Field" 
-          required="true" 
+          label="Test Field"
+          required="true"
           requiredInvalidMessage="This field is required"
         />
       </Form>
@@ -1084,10 +961,10 @@ test.describe("Accessibility", () => {
   }) => {
     await initTestBed(`
       <Form>
-        <TextBox 
+        <TextBox
           bindTo="test"
-          label="Required Field" 
-          required="true" 
+          label="Required Field"
+          required="true"
         />
       </Form>
     `);
@@ -1181,12 +1058,12 @@ test.describe("Other Edge Cases", () => {
   }) => {
     await initTestBed(`
       <Form>
-        <TextBox 
-          testId="test" 
-          bindTo="test" 
-          minLength="-5" 
-          maxLength="-1" 
-          minValue="-100" 
+        <TextBox
+          testId="test"
+          bindTo="test"
+          minLength="-5"
+          maxLength="-1"
+          minValue="-100"
           maxValue="-10"
         />
       </Form>
@@ -1202,10 +1079,10 @@ test.describe("Other Edge Cases", () => {
   }) => {
     await initTestBed(`
       <Form>
-        <TextBox 
-          testId="test" 
-          bindTo="test" 
-          minValue="999999999" 
+        <TextBox
+          testId="test"
+          bindTo="test"
+          minValue="999999999"
           maxValue="9999999999"
           customValidationsDebounce="999999"
         />
@@ -1251,11 +1128,11 @@ test.describe("Other Edge Cases", () => {
   }) => {
     await initTestBed(`
       <Form>
-        <TextBox 
-          testId="test" 
-          bindTo="test" 
-          type="number" 
-          minValue="100" 
+        <TextBox
+          testId="test"
+          bindTo="test"
+          type="number"
+          minValue="100"
           maxValue="50"
           minLength="10"
           maxLength="5"
@@ -1644,12 +1521,12 @@ test.describe("Other Edge Cases", () => {
     }) => {
       const { testStateDriver } = await initTestBed(`
         <Form onSubmit="data => testState = data">
-          <TextBox 
-            testId="field1" 
-            label="Required No Submit" 
-            bindTo="excluded" 
+          <TextBox
+            testId="field1"
+            label="Required No Submit"
+            bindTo="excluded"
             required="true"
-            noSubmit="true" 
+            noSubmit="true"
           />
         </Form>
       `);
@@ -1812,7 +1689,7 @@ test.describe("Phone Pattern Validation", () => {
     await initTestBed(`
       <Form id="testForm">
         <TextBox
-          testId="phoneField" 
+          testId="phoneField"
           bindTo="mobile"
           pattern="phone"
           patternInvalidSeverity="warning"

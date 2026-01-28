@@ -12,8 +12,3 @@ export function useTheme(): ThemeScope {
 export function useThemes(): AppThemes {
   return useContext(ThemesContext)!;
 }
-
-export function useResourceUrl(resourceString?: string) {
-  const { getResourceUrl } = useTheme();
-  return getResourceUrl(resourceString);
-}

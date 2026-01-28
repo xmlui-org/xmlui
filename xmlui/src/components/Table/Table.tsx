@@ -22,8 +22,17 @@ import {
 } from "./TableNative";
 import type { RendererContext } from "../../abstractions/RendererDefs";
 import { PositionValues } from "../Pagination/PaginationNative";
+import type { PropertyValueDescription } from "../../abstractions/ComponentDefs";
 
 const COMP = "Table";
+
+const UserSelectValues: PropertyValueDescription[] = [
+  { value: "auto", description: "Default text selection behavior" },
+  { value: "text", description: "Text can be selected by the user" },
+  { value: "none", description: "Text cannot be selected" },
+  { value: "contain", description: "Selection is contained within this element" },
+  { value: "all", description: "The entire element content is selected as one unit" },
+];
 
 export const TableMd = createMetadata({
   status: "stable",
@@ -155,6 +164,12 @@ export const TableMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.hideHeader,
     },
+    hideSelectionCheckboxes: {
+      description:
+        "If true, hides selection checkboxes for both rows and header. Selection logic still works via API and keyboard.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
     iconNoSort: d(
       `Allows setting an alternate icon displayed in the ${COMP} column header when sorting is ` +
         `enabled, but the column remains unsorted. You can change the default icon for all ${COMP} ` +
@@ -238,6 +253,30 @@ export const TableMd = createMetadata({
       availableValues: CheckboxToleranceValues,
       defaultValue: defaultProps.checkboxTolerance,
     },
+    userSelectCell: {
+      description:
+        `This property controls whether users can select text within table cells. ` +
+        `Use \`text\` to allow text selection, \`none\` to prevent selection, or \`auto\` for default behavior.`,
+      valueType: "string",
+      availableValues: UserSelectValues,
+      defaultValue: defaultProps.userSelectCell,
+    },
+    userSelectRow: {
+      description:
+        `This property controls whether users can select text within table rows. ` +
+        `Use \`text\` to allow text selection, \`none\` to prevent selection, or \`auto\` for default behavior.`,
+      valueType: "string",
+      availableValues: UserSelectValues,
+      defaultValue: defaultProps.userSelectRow,
+    },
+    userSelectHeading: {
+      description:
+        `This property controls whether users can select text within table headings. ` +
+        `Use \`text\` to allow text selection, \`none\` to prevent selection, or \`auto\` for default behavior.`,
+      valueType: "string",
+      availableValues: UserSelectValues,
+      defaultValue: defaultProps.userSelectHeading,
+    },
   },
   events: {
     contextMenu: dContextMenu(COMP),
@@ -261,6 +300,13 @@ export const TableMd = createMetadata({
       parameters: {
         columnName: "The name of the column about to be sorted.",
         sortDirection: "The intended sort direction: 'asc' for ascending or 'desc' for descending.",
+      },
+    },
+    rowDoubleClick: {
+      description: `This event is fired when the user double-clicks a table row. The handler receives the clicked row item as its only argument.`,
+      signature: "rowDoubleClick(item: any): void",
+      parameters: {
+        item: "The clicked table row item.",
       },
     },
     selectionDidChange: {
@@ -332,6 +378,9 @@ export const TableMd = createMetadata({
     [`border-${COMP}`]: "0px solid transparent",
     [`borderBottom-last-row-${COMP}`]: `$borderBottom-cell-${COMP}`,
     [`borderRadius-${COMP}`]: "$borderRadius",
+    [`userSelect-heading-${COMP}`]: "text",
+    [`userSelect-cell-${COMP}`]: "none",
+    [`userSelect-row-${COMP}`]: "none",
   },
 });
 
@@ -461,6 +510,7 @@ const TableWithColumns = memo(
             sortingDidChange={lookupEventHandler("sortingDidChange")}
             onSelectionDidChange={lookupEventHandler("selectionDidChange")}
             willSort={lookupEventHandler("willSort")}
+            rowDoubleClick={lookupEventHandler("rowDoubleClick")}
             uid={node.uid}
             autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
             hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
@@ -492,6 +542,10 @@ const TableWithColumns = memo(
             checkboxTolerance={extractValue.asOptionalString(node.props.checkboxTolerance)}
             initiallySelected={extractValue(node.props.initiallySelected)}
             syncWithAppState={extractValue(node.props.syncWithAppState)}
+            userSelectCell={extractValue.asOptionalString(node.props.userSelectCell)}
+            userSelectRow={extractValue.asOptionalString(node.props.userSelectRow)}
+            userSelectHeading={extractValue.asOptionalString(node.props.userSelectHeading)}
+            hideSelectionCheckboxes={extractValue.asOptionalBoolean(node.props.hideSelectionCheckboxes)}
           />
         </>
       );

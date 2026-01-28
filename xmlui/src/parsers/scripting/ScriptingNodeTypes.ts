@@ -19,6 +19,7 @@ export const T_THROW_STATEMENT = 17;
 export const T_TRY_STATEMENT = 18;
 export const T_SWITCH_STATEMENT = 19;
 export const T_FUNCTION_DECLARATION = 20;
+export const T_ASYNC_FUNCTION_DECLARATION = 21;
 
 // --- Expression node type values
 export const T_UNARY_EXPRESSION = 100;
@@ -40,6 +41,8 @@ export const T_ARROW_EXPRESSION = 115;
 export const T_PREFIX_OP_EXPRESSION = 116;
 export const T_POSTFIX_OP_EXPRESSION = 117;
 export const T_REACTIVE_VAR_DECLARATION = 118;
+export const T_AWAIT_EXPRESSION = 119;
+export const T_NEW_EXPRESSION = 120;
 
 // --- Other node type values
 export const T_VAR_DECLARATION = 200;

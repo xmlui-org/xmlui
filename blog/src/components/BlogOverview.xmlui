@@ -1,8 +1,8 @@
 <Component name="BlogOverview">
   <List
     data="{
-    $props.posts.sort(function(a, b) {
-      return new Date(b.date) - new Date(a.date);
+    $props.posts.filter(p => !p.draft).toSorted(function(a, b) {
+      return Date.parse(b.date) - Date.parse(a.date);
     })
   }">
     <VStack
@@ -12,7 +12,6 @@
       <H1>
         {$item.title}
       </H1>
-     <Image src="/blog/images/{$item.image}" />
       <Text variant="em">
         {$item.description}
       </Text>

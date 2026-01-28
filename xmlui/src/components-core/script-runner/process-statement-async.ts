@@ -4,6 +4,7 @@ import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
 import {
   T_ARROW_EXPRESSION_STATEMENT,
   T_ASSIGNMENT_EXPRESSION,
+  T_ASYNC_FUNCTION_DECLARATION,
   T_BLOCK_STATEMENT,
   T_BREAK_STATEMENT,
   T_CONST_STATEMENT,
@@ -202,6 +203,9 @@ async function processStatementAsync(
 
   // --- Process the statement according to its type
   switch (statement.type) {
+    case T_ASYNC_FUNCTION_DECLARATION:
+      throw new Error("XMLUI does not support async function declarations.");
+
     case T_FUNCTION_DECLARATION:
       // --- Function declarations are already hoisted, nothing to do
       break;

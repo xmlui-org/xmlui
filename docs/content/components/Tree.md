@@ -4,7 +4,8 @@ The `Tree` component is a virtualized tree component that displays hierarchical 
 
 **Key features:**
 - **Flat and hierarchical data structures**: You can select the most convenient data format to represent the tree. A set of properties enables you to map your data structure to the visual representation of the tree.
-- **Flexible expand/collapse**: You have several properties to represent the expanded and collapsed state of tree nodes. You can also specify several options that determine which tree items are collapsed initially. 
+- **Flexible expand/collapse**: You have several properties to represent the expanded and collapsed state of tree nodes. You can also specify several options that determine which tree items are collapsed initially.
+- **Dynamic (lazy) loading**: Load tree node children asynchronously on demand, with support for auto-reload thresholds and loading state feedback.
 - **Tree API**: Several exposed methods allow you to manage the tree's view state imperatively.
 
 ## Specifying Data [#specifying-data]
@@ -18,6 +19,7 @@ The "flat" and "hierarchy" data structures both use these fields for a particula
 - `iconExpanded`: An optional icon identifier. This icon is displayed when the field is expanded.
 - `iconCollapsed`: An optional icon identifier. This icon is displayed when the field is collapsed.
 - `selectable`: Indicates if the node can be selected.
+- `dynamic`: Indicates if the node's children should be loaded asynchronously. When set to `true`, the node shows an expand indicator and triggers the `onLoadChildren` event when expanded.
 
 The "flat" structure refers to its direct parent node via the `parentId` property, which contains the ID of the node it is referring to.
 
@@ -75,6 +77,7 @@ When you use data (for example, retrieved from a backend), those structures may 
 - `parentIdField` (default: `parentId`)
 - `childrenField` (default: `children`)
 - `selectableField` (default: `selectable`)
+- `loadedField` (default: `loaded`)
 
 The following example uses the `idField`, `nameField`, and `parentIdField` mapping properties:
 
@@ -225,51 +228,145 @@ This example demonstrates these concepts:
 </App>
 ```
 
-## Dynamic tree nodes [#dynamic-tree-nodes]
+## Async Loading (Lazy Loading) [#async-loading-lazy-loading]
 
-When initializing the tree with its `data` property, you can set the `dynamic` property of the node to `true` (you can use a field name alias with the `dynamicField` property). When you extend a dynamic node, the tree fires the `loadChildren` event, and the nodes returned by the event handler will be the actual nodes.
+The Tree component supports asynchronous loading of child nodes, useful for large datasets or data fetched from a server.
 
-By default, nodes are not dynamic.
+### Basic Concept [#basic-concept]
 
-While the child nodes are being queried, the tree node displays a spinner to indicate the loading state.
+When a node has `dynamic: true`, the tree displays an expand icon even if the node has no children yet. When the user expands the node, the `onLoadChildren` event fires, and the returned data becomes the node's children.
 
-You can use the `markNodeUnloaded` exposed method to reset the state of an already loaded dynamic tree node. The next time the user expands the node, its content will be loaded again.
-
-The following sample demonstrates this feature. Click the "Child Item 1.2" node to check how it loads its children. Click the Unload button to reload the items when the node is expanded the next time.
-
-```xmlui-pg display copy {16-19} height="340px" /dynamic: true/ /onLoadChildren/ name="Example: dynamic nodes"
+```xmlui-pg height="180px" name="Example: Basic async loading"
+---app display copy /dynamic: true/ /onLoadChildren/
 <App var.loadCount="{0}">
   <Tree
     testId="tree"
-    defaultExpanded="all"
-    id="tree"
     itemClickExpands
     data='{[
-      { id: 1, name: "Root Item 1", parentId: null },
-      { id: 2, name: "Child Item 1.1", parentId: 1 },
-      { id: 3, name: "Child Item 1.2", parentId: 1, dynamic: true },
-      { id: 4, name: "Child Item 1.3", parentId: 1 },
+      { id: 1, name: "Projects", parentId: null, dynamic: true },
+      { id: 2, name: "Documents", parentId: null },
+    ]}'
+    onLoadChildren="(node) => {
+      // Load only the 'Projects' node
+      if (node.id !== 1) return;
+      loadCount++;
+      delay(500);
+      return [
+        { id: 3, name: `Project A (load #${loadCount})`, parentId: node.id },
+        { id: 4, name: `Project B (load #${loadCount})`, parentId: node.id },
+      ];
+    }">
+  </Tree>
+</App>
+---desc
+When you expand the Projects node for the first time, its children will load (delayed for demonstration). The next time you collapse and then extend this node, no reload happens.
+```
+
+> [!INFO] You can use the component's `dynamic` property to set all nodes to be dynamic by default. However, in this case, even nodes without children will display the expand indicator.
+
+### Loading State Feedback [#loading-state-feedback]
+
+Use the `$item.loadingState` context variable to display loading indicators. The state can be "unloaded", "loading", or "loaded".
+
+```xmlui-pg display copy height="180px" /$item.loadingState/ name="Example: Loading state visual feedback"
+<App var.loadCount="{0}">
+  <Tree
+    testId="tree"
+    itemClickExpands
+    data='{[
+      { id: 1, name: "Root", parentId: null, loaded: false },
     ]}'
     onLoadChildren="(node) => {
       loadCount++;
-      delay(1000); 
-      return ([
-        { id: 5, name: `Dynamic Item 1.2.1 (${loadCount})` },
-        { id: 6, name: `Dynamic Item 2.2.2 (${loadCount})` },
-      ])
-    }"
-    >
+      delay(1000);
+      return [
+        { id: 2, name: `Child 1 (load #${loadCount})`, parentId: node.id },
+        { id: 3, name: `Child 2 (load #${loadCount})`, parentId: node.id },
+      ];
+    }">
     <property name="itemTemplate">
-      <HStack testId="{$item.id}" verticalAlignment="center" gap="$space-1">
-        <Icon name="{$item.hasChildren 
-          ? ($item.loadingState === 'loaded' ? 'folder' : 'folder-outline' ) 
-          : 'code'}" 
+      <HStack testId="{$item.id}" gap="$space-2">
+        <Icon name="{$item.loadingState === 'loaded' 
+          ? 'folder' 
+          : 'folder-outline'}" 
         />
         <Text>{$item.name}</Text>
+        <Badge when="{$item.loadingState === 'loading'}" color="blue">
+          Loading...
+        </Badge>
+        <Badge when="{$item.loadingState === 'loaded'}" color="green">
+          Loaded
+        </Badge>
       </HStack>
     </property>
   </Tree>
-  <Button onClick="tree.markNodeUnloaded(3)">Unload</Button>
+</App>
+```
+
+### Reloading Children [#reloading-children]
+
+Use the `markNodeUnloaded` API method to mark a node as unloaded. The next time the node is expanded, children will be loaded again.
+
+```xmlui-pg display copy height="200px" /markNodeUnloaded/ name="Example: Reload children"
+<App var.loadCount="{0}">
+  <Tree
+    id="tree"
+    testId="tree"
+    itemClickExpands
+    data='{[
+      { id: 1, name: "Data Source", parentId: null, loaded: false },
+    ]}'
+    onLoadChildren="(node) => {
+      loadCount++;
+      delay(500);
+      return [
+        { id: `item-${loadCount}-1`, 
+          name: `Item ${loadCount}.1`, 
+          parentId: node.id
+        },
+        { 
+          id: `item-${loadCount}-2`, 
+          name: `Item ${loadCount}.2`, 
+          parentId: node.id 
+        },
+      ];
+    }">
+  </Tree>
+  <Button onClick="tree.markNodeUnloaded(1)">Reload Data</Button>
+</App>
+```
+
+### Auto-Reload After Time [#auto-reload-after-time]
+
+Set `autoLoadAfter` to automatically reload children after a specified time when a node is collapsed and re-expanded.
+
+```xmlui-pg display copy height="180px" /autoLoadAfter/ name="Example: Auto-reload after time"
+<App var.loadCount="{0}">
+  <VStack gap="$space-2">
+    <Text>
+      Expand the node, collapse it, wait 3 seconds, 
+      and expand again to see auto-reload.
+    </Text>
+    <Tree
+      testId="tree"
+      itemClickExpands
+      autoLoadAfter="3000"
+      data='{[
+        { id: 1, name: "Live Data", parentId: null, dynamic: true },
+      ]}'
+      onLoadChildren="(node) => {
+        loadCount++;
+        delay(500);
+        return [
+          { 
+              id: `ts-${getDate()}`, 
+              name: `Loaded at ${formatDateTime(getDate())} (${loadCount})`, 
+              parentId: node.id 
+          },
+        ];
+      }">
+    </Tree>
+  </VStack>
 </App>
 ```
 
@@ -286,6 +383,74 @@ When true, uses only the collapsed icon and rotates it for expansion instead of 
 -  default: **true**
 
 Automatically expand the path to the selected item.
+
+### `autoLoadAfter` [#autoloadafter]
+
+Default number of milliseconds after which dynamic tree nodes should automatically reload their children when collapsed and then re-expanded. Only applies to nodes that were loaded via the loadChildren event. Can be overridden per-node using setAutoLoadAfter API. Pass undefined to disable auto-loading by default.
+
+The `autoLoadAfter` property sets a time threshold (in milliseconds) for automatically reloading children when a node is collapsed and then re-expanded after the specified time.
+
+```xmlui-pg display copy height="320px" /autoLoadAfter/ name="Example: Auto-reload threshold"
+<App var.reloadCount="{0}">
+  <VStack gap="$space-2">
+    <Text variant="strong">Instructions:</Text>
+    <Text>1. Expand a node to load its children</Text>
+    <Text>2. Collapse the node</Text>
+    <Text>3. Wait 2 seconds, then expand again to see fresh data</Text>
+    <Tree
+      testId="tree"
+      itemClickExpands
+      autoLoadAfter="2000"
+      data='{[
+        { id: 1, name: "Server Data", parentId: null, loaded: false },
+        { id: 2, name: "Database Records", parentId: null, loaded: false },
+      ]}'
+      onLoadChildren="(node) => {
+        reloadCount++;
+        delay(400);
+        const timestamp = Date().toLocaleTimeString();
+        return [
+          { id: `${node.id}-${Date.now()}`, name: `Data loaded at ${timestamp} (#${reloadCount})`, parentId: node.id },
+        ];
+      }">
+    </Tree>
+  </VStack>
+</App>
+```
+
+### `autoLoadAfterField` [#autoloadafterfield]
+
+-  default: **"autoLoadAfter"**
+
+The property name in source data for per-node autoLoadAfter values (default: 'autoLoadAfter'). Allows reading node-specific reload thresholds from data. Node-level values take priority over the component-level autoLoadAfter prop.
+
+The `autoLoadAfterField` property allows setting different auto-reload thresholds for individual nodes via a field in the node data.
+
+```xmlui-pg display copy height="340px" /autoLoadAfterField/ name="Example: Per-node auto-reload"
+<App var.fastReloads="{0}" var.slowReloads="{0}">
+  <VStack gap="$space-2">
+    <Text>Fast node reloads after 1 second, slow node after 5 seconds</Text>
+    <Tree
+      testId="tree"
+      itemClickExpands
+      autoLoadAfterField="reloadDelay"
+      data='{[
+        { id: 1, name: "Fast Updates (1s)", parentId: null, loaded: false, reloadDelay: 1000 },
+        { id: 2, name: "Slow Updates (5s)", parentId: null, loaded: false, reloadDelay: 5000 },
+      ]}'
+      onLoadChildren="(node) => {
+        if (node.id === 1) fastReloads++;
+        if (node.id === 2) slowReloads++;
+        delay(300);
+        const count = node.id === 1 ? fastReloads : slowReloads;
+        return [
+          { id: `${node.id}-${Date.now()}`, name: `Load #${count} at ${Date().toLocaleTimeString()}`, parentId: node.id },
+        ];
+      }">
+    </Tree>
+  </VStack>
+</App>
+```
 
 ### `childrenField` [#childrenfield]
 
@@ -311,11 +476,66 @@ The input data structure format: "flat" (array with parent relationships) or "hi
 
 Initial expansion state: "none", "all", "first-level", or array of specific IDs.
 
+### `dynamic` [#dynamic]
+
+-  default: **false**
+
+Default value for whether tree nodes should load children dynamically (default: false). If true, nodes will load children via the loadChildren event. If false, nodes use static children from data. Can be overridden per-node in source data using the dynamicField property. Ignored if loadChildren handler is not provided.
+
+The `dynamic` property sets the default behavior for all tree nodes. When `true`, all nodes will load their children asynchronously via the `onLoadChildren` event.
+
+```xmlui-pg display copy height="240px" /dynamic="true"/ name="Example: Dynamic tree"
+<App var.count="{0}">
+  <Tree
+    testId="tree"
+    dynamic="true"
+    itemClickExpands
+    data='{[
+      { id: 1, name: "Folder 1", parentId: null },
+      { id: 2, name: "Folder 2", parentId: null },
+    ]}'
+    onLoadChildren="(node) => {
+      count++;
+      delay(300);
+      return [
+        { id: `${node.id}-a`, name: `Item ${node.id}A (${count})`, parentId: node.id },
+        { id: `${node.id}-b`, name: `Item ${node.id}B (${count})`, parentId: node.id },
+      ];
+    }">
+  </Tree>
+</App>
+```
+
 ### `dynamicField` [#dynamicfield]
 
 -  default: **"dynamic"**
 
-The property name in source data for dynamic loading state (default: "dynamic").
+The property name in source data for dynamic state (default: 'dynamic'). When true, the node's children should be dynamically loaded via loadChildren event. When false, the node uses static children from data. Ignored if loadChildren handler is not provided.
+
+The `dynamicField` property allows individual nodes to override the tree's default `dynamic` behavior by setting a field in the node data.
+
+```xmlui-pg display copy height="280px" /dynamicField="loadAsync"/ name="Example: Per-node dynamic control"
+<App var.count="{0}">
+  <Tree
+    testId="tree"
+    dynamic="false"
+    dynamicField="loadAsync"
+    itemClickExpands
+    data='{[
+      { id: 1, name: "Static Folder", parentId: null },
+      { id: 2, name: "Static Item", parentId: 1 },
+      { id: 3, name: "Dynamic Folder", parentId: null, loadAsync: true },
+    ]}'
+    onLoadChildren="(node) => {
+      count++;
+      delay(300);
+      return [
+        { id: `${node.id}-child`, name: `Loaded child (${count})`, parentId: node.id },
+      ];
+    }">
+  </Tree>
+</App>
+```
 
 ### `expandRotation` [#expandrotation]
 
@@ -387,6 +607,34 @@ The height of each tree row in pixels (default: 32).
 
 The template for each item in the tree.
 
+### `loadedField` [#loadedfield]
+
+-  default: **"loaded"**
+
+The property name in source data for loaded state (default: "loaded"). When false, shows expand indicator even without children and triggers async loading.
+
+The `loadedField` property specifies which field in node data indicates whether children have been loaded. This is useful when node data uses a different field name.
+
+```xmlui-pg display copy height="240px" /loadedField="hasLoadedChildren"/ name="Example: Custom loaded field"
+<App>
+  <Tree
+    testId="tree"
+    itemClickExpands
+    loadedField="hasLoadedChildren"
+    data='{[
+      { id: 1, name: "Loaded Node", parentId: null, hasLoadedChildren: true },
+      { id: 2, name: "Unloaded Node", parentId: null, hasLoadedChildren: false },
+    ]}'
+    onLoadChildren="(node) => {
+      delay(300);
+      return [
+        { id: `${node.id}-child`, name: `Child of ${node.id}`, parentId: node.id },
+      ];
+    }">
+  </Tree>
+</App>
+```
+
 ### `nameField` [#namefield]
 
 -  default: **"name"**
@@ -399,6 +647,12 @@ The property name in source data for display text.
 
 The property name in source data for parent relationships (used in flat format).
 
+### `scrollStyle` [#scrollstyle]
+
+-  default: **"normal"**
+
+This property determines the scrollbar style. Options: "normal" uses the browser's default scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.
+
 ### `selectableField` [#selectablefield]
 
 -  default: **"selectable"**
@@ -408,6 +662,57 @@ The property name in source data for selectable state (default: "selectable").
 ### `selectedValue` [#selectedvalue]
 
 The selected item ID in source data format.
+
+### `showScrollerFade` [#showscrollerfade]
+
+-  default: **false**
+
+When enabled, displays gradient fade indicators at the top and bottom edges of the tree when scrollable content extends beyond the visible area. The fade effect provides a visual cue to users that additional content is available by scrolling. The indicators automatically appear and disappear based on the scroll position. This property only works with "overlay", "whenMouseOver", and "whenScrolling" scroll styles.
+
+### `spinnerDelay` [#spinnerdelay]
+
+-  default: **0**
+
+The delay in milliseconds before showing the loading spinner when a node is in loading state. Set to 0 to show immediately, or a higher value to prevent spinner flicker for fast-loading nodes.
+
+The `spinnerDelay` property controls how long to wait before showing a loading spinner, preventing flicker for fast-loading nodes.
+
+```xmlui-pg display copy height="300px" /spinnerDelay/ name="Example: Spinner delay"
+<App>
+  <VStack gap="$space-3">
+    <VStack gap="$space-1">
+      <Text variant="strong">No delay (instant spinner)</Text>
+      <Tree
+        testId="tree1"
+        dynamic
+        autoLoadAfter="0"
+        itemClickExpands
+        spinnerDelay="0"
+        data='{[{ id: 1, name: "Fast Load (200ms)", parentId: null }]}'
+        onLoadChildren="() => { 
+          delay(200); 
+          return [{ id: 2, name: 'Child', parentId: 1, dynamic: false }]; 
+        }">
+      </Tree>
+    </VStack>
+    <VStack gap="$space-1">
+      <Text variant="strong">500ms delay (no flicker for fast loads)</Text>
+      <Tree
+        testId="tree2"
+        dynamic
+        autoLoadAfter="0"
+        itemClickExpands
+        spinnerDelay="500"
+        data='{[{ id: 3, name: "Fast Load (200ms)", parentId: null }]}'
+        onLoadChildren="() => { 
+          delay(200); 
+          return [{ id: 4, name: 'Child', parentId: 3, dynamic: false }]; 
+        }">
+      </Tree>
+    </VStack>
+  </VStack>
+</App>
+```
 
 ## Events [#events]
 
@@ -462,39 +767,17 @@ Add a new node to the tree as a child of the specified parent node.
 - `parentNodeId`: The ID of the parent node, or null/undefined to add to root level
 - `nodeData`: The node data object using the format specified in dataFormat and field properties
 
-### `clearSelection` [#clearselection]
-
-Clear the current selection.
-
-**Signature**: `clearSelection(): void`
-
 ### `collapseAll` [#collapseall]
 
 Collapse all nodes in the tree.
 
 **Signature**: `collapseAll(): void`
 
-### `collapseNode` [#collapsenode]
-
-Collapse a specific node by its source data ID.
-
-**Signature**: `collapseNode(nodeId: string | number): void`
-
-- `nodeId`: The ID of the node to collapse (source data format)
-
 ### `expandAll` [#expandall]
 
 Expand all nodes in the tree.
 
 **Signature**: `expandAll(): void`
-
-### `expandNode` [#expandnode]
-
-Expand a specific node by its source data ID.
-
-**Signature**: `expandNode(nodeId: string | number): void`
-
-- `nodeId`: The ID of the node to expand (source data format)
 
 ### `expandToLevel` [#expandtolevel]
 
@@ -504,20 +787,6 @@ Expand nodes up to the specified depth level (0-based).
 
 - `level`: The maximum depth level to expand (0 = root level only)
 
-### `getExpandedNodes` [#getexpandednodes]
-
-Get an array of currently expanded node IDs in source data format.
-
-**Signature**: `getExpandedNodes(): (string | number)[]`
-
-### `getNodeById` [#getnodebyid]
-
-Get a tree node by its source data ID.
-
-**Signature**: `getNodeById(nodeId: string | number): TreeNode | null`
-
-- `nodeId`: The ID of the node to retrieve (source data format)
-
 ### `getNodeLoadingState` [#getnodeloadingstate]
 
 Get the loading state of a dynamic node.
@@ -525,12 +794,6 @@ Get the loading state of a dynamic node.
 **Signature**: `getNodeLoadingState(nodeId: string | number): NodeLoadingState`
 
 - `nodeId`: The ID of the node to check loading state for
-
-### `getSelectedNode` [#getselectednode]
-
-Get the currently selected tree node.
-
-**Signature**: `getSelectedNode(): TreeNode | null`
 
 ### `insertNodeAfter` [#insertnodeafter]
 
@@ -581,31 +844,6 @@ Remove a node and all its descendants from the tree.
 **Signature**: `removeNode(nodeId: string | number): void`
 
 - `nodeId`: The ID of the node to remove (along with all its descendants)
-
-### `scrollIntoView` [#scrollintoview]
-
-Scroll to a specific node and expand parent nodes as needed to make it visible.
-
-**Signature**: `scrollIntoView(nodeId: string | number, options?: ScrollIntoViewOptions): void`
-
-- `nodeId`: The ID of the node to scroll to (source data format)
-- `options`: Optional scroll options
-
-### `scrollToItem` [#scrolltoitem]
-
-Scroll to a specific node if it's currently visible in the tree.
-
-**Signature**: `scrollToItem(nodeId: string | number): void`
-
-- `nodeId`: The ID of the node to scroll to (source data format)
-
-### `selectNode` [#selectnode]
-
-Programmatically select a node by its source data ID.
-
-**Signature**: `selectNode(nodeId: string | number): void`
-
-- `nodeId`: The ID of the node to select (source data format)
 
 ## Styling [#styling]
 

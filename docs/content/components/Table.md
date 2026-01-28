@@ -1365,6 +1365,54 @@ This property determines the sort order to be `ascending` or `descending`. This 
 
 An AppState instance to synchronize the table's selection state with. The table will read from and write to the 'selectedIds' property of the AppState object. When provided, this takes precedence over the initiallySelected property for initial selection. You can use the AppState's didUpdate event to receive notifications when the selection changes.
 
+### `userSelectCell` [#userselectcell]
+
+-  default: **"auto"**
+
+This property controls whether users can select text within table cells. Use `text` to allow text selection, `none` to prevent selection, or `auto` for default behavior.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `auto` | Default text selection behavior **(default)** |
+| `text` | Text can be selected by the user |
+| `none` | Text cannot be selected |
+| `contain` | Selection is contained within this element |
+| `all` | The entire element content is selected as one unit |
+
+### `userSelectHeading` [#userselectheading]
+
+-  default: **"none"**
+
+This property controls whether users can select text within table headings. Use `text` to allow text selection, `none` to prevent selection, or `auto` for default behavior.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `auto` | Default text selection behavior |
+| `text` | Text can be selected by the user |
+| `none` | Text cannot be selected **(default)** |
+| `contain` | Selection is contained within this element |
+| `all` | The entire element content is selected as one unit |
+
+### `userSelectRow` [#userselectrow]
+
+-  default: **"auto"**
+
+This property controls whether users can select text within table rows. Use `text` to allow text selection, `none` to prevent selection, or `auto` for default behavior.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `auto` | Default text selection behavior **(default)** |
+| `text` | Text can be selected by the user |
+| `none` | Text cannot be selected |
+| `contain` | Selection is contained within this element |
+| `all` | The entire element content is selected as one unit |
+
 ## Events [#events]
 
 ### `contextMenu` [#contextmenu]
@@ -1374,6 +1422,34 @@ This event is triggered when the Table is right-clicked (context menu).
 **Signature**: `contextMenu(event: MouseEvent): void`
 
 - `event`: The mouse event object.
+
+### `rowDoubleClick` [#rowdoubleclick]
+
+This event is fired when the user double-clicks a table row. The handler receives the clicked row item as its only argument.
+
+**Signature**: `rowDoubleClick(item: any): void`
+
+- `item`: The clicked table row item.
+
+This event is triggered when a table row is double-clicked. The handler receives the row's data item as its only argument.
+
+```xmlui copy {4}
+<App>
+  <Table data='{[...]}' onRowDoubleClick="(item) => console.log(item)">
+    <Column bindTo="name"/>
+
+%-EVENT-START rowDoubleClick
+
+This event is triggered when a table row is double-clicked. The handler receives the row's data item as its only argument.
+
+```xmlui copy {4}
+<App>
+  <Table data='{[...]}' onRowDoubleClick="(item) => console.log(item)">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+  </Table>
+</App>
+```
 
 ### `selectionDidChange` [#selectiondidchange]
 
@@ -1883,3 +1959,6 @@ The component has some parts that can be styled through layout properties and th
 | [textColor](../styles-and-themes/common-units/#color)-pagination-Table | $color-secondary | $color-secondary |
 | [textColor](../styles-and-themes/common-units/#color)-Table | *none* | *none* |
 | [textTransform](../styles-and-themes/common-units/#textTransform)-heading-Table | uppercase | uppercase |
+| userSelect-cell-Table | none | none |
+| userSelect-heading-Table | text | text |
+| userSelect-row-Table | none | none |

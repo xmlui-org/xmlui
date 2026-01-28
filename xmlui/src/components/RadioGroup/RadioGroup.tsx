@@ -64,6 +64,19 @@ export const RadioGroupMd = createMetadata({
     lostFocus: dLostFocus(COMP),
     didChange: dDidChange(COMP),
   },
+  apis: {
+    value: {
+      description: `This API retrieves the current value of the \`${COMP}\`. You can use it to get the value programmatically.`,
+      signature: "get value(): string | undefined",
+    },
+    setValue: {
+      description: `This API sets the value of the \`${COMP}\`. You can use it to programmatically change the value.`,
+      signature: "setValue(value: string): void",
+      parameters: {
+        value: "The new value to set.",
+      },
+    },
+  },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`gap-${RGOption}`]: "0.25em",
@@ -81,7 +94,7 @@ export const RadioGroupMd = createMetadata({
     [`backgroundColor-${RGOption}--disabled`]: "$backgroundColor--disabled",
     [`backgroundColor-checked-${RGOption}`]: "$color-primary-500",
     [`backgroundColor-checked-${RGOption}--disabled`]: `$textColor--disabled`,
-    
+
     [`fontSize-${RGOption}`]: "$fontSize-sm",
     [`fontWeight-${RGOption}`]: "$fontWeight-bold",
     [`textColor-${RGOption}--disabled`]: "$textColor--disabled",

@@ -321,6 +321,11 @@
                 label="Set the Width of an Input Field in an HStack"
                 to="/howto/set-width-for-input-fields-in-a-horizontal-layout"
             />
+            <NavLink
+                icon="article"
+                label="Stop DataSource from sending requests in a closed Dialog"
+                to="/howto/stop-datasource-from-sending-requests-in-a-closed-dialog"
+            />
 
             <!-- Add more links as additional files are created -->
         </NavGroup
@@ -573,15 +578,6 @@
                 content="{appGlobals.content['pages/tutorial-12.md']}"
             />
         </Page>
-        <Page url="/blog">
-            <BlogOverview posts="{posts}" />
-        </Page>
-        <Page url="/blog/{posts[0].slug}">
-            <BlogPage post="{posts[0]}" />
-        </Page>
-        <Page url="/blog/{posts[1].slug}">
-            <BlogPage post="{posts[1]}" />
-        </Page>
         <Page url="/app-structure">
             <DocumentPageNoTOC
                 content="{appGlobals.content['pages/app-structure.md']}"
@@ -665,6 +661,11 @@
         <Page url="/context-variables">
             <DocumentPage
                 content="{appGlobals.content['pages/context-variables.md']}"
+            />
+        </Page>
+        <Page url="/context-variables2">
+            <DocumentPage
+                content="{appGlobals.content['pages/context-variables2.md']}"
             />
         </Page>
         <Page url="/globals">
@@ -875,6 +876,11 @@
         <Page url="/howto/set-width-for-input-fields-in-a-horizontal-layout">
             <DocumentPageNoTOC
                 content="{appGlobals.content['pages/howto/set-width-for-input-fields-in-a-horizontal-layout.md']}"
+            />
+        </Page>
+        <Page url="/howto/stop-datasource-from-sending-requests-in-a-closed-dialog">
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/howto/stop-datasource-from-sending-requests-in-a-closed-dialog.md']}"
             />
         </Page>
 

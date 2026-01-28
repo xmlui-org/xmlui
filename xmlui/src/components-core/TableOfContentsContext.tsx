@@ -138,16 +138,21 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
           behavior: smoothScrolling ? "smooth" : "auto",
         });
         notify(id);
-        // Update the URL hash without triggering additional scroll
-        navigate(
-          {
-            hash: `#${value.id}`,
-          },
-          {
-            preventScrollReset: true,
-            replace: true,
-          },
-        );
+        
+        // Only call navigate if the hash is different to avoid scroll reset
+        const currentHash = window.location.hash.slice(1); // Remove the '#'
+        if (currentHash !== value.id) {
+          // Update the URL hash without triggering additional scroll
+          navigate(
+            {
+              hash: `#${value.id}`,
+            },
+            {
+              preventScrollReset: true,
+              replace: true,
+            },
+          );
+        }
       }
     },
     [headings, navigate, notify],

@@ -453,11 +453,17 @@ test("label is rendered if provided", async ({ initTestBed, page }) => {
       <Option value="2">Option 2</Option>
     </RadioGroup>
   `);
-  const labels = page.locator("label");
-  await expect(labels).toHaveCount(3);
-  await expect(labels.nth(0)).toHaveText("Test Label");
-  await expect(labels.nth(1)).toHaveText("Option 1");
-  await expect(labels.nth(2)).toHaveText("Option 2");
+  // RadioGroup uses legend in fieldset, not label
+  const fieldset = page.locator("fieldset");
+  await expect(fieldset).toBeVisible();
+  const legend = fieldset.locator("legend");
+  await expect(legend).toHaveText("Test Label");
+  
+  // Option labels are still regular labels
+  const optionLabels = page.locator("label");
+  await expect(optionLabels).toHaveCount(2);
+  await expect(optionLabels.nth(0)).toHaveText("Option 1");
+  await expect(optionLabels.nth(1)).toHaveText("Option 2");
 });
 
 test("empty string label is not rendered", async ({ initTestBed, page }) => {
@@ -482,12 +488,16 @@ test("labelPosition=start positions label before input with ltr", async ({ initT
     </RadioGroup>
   `);
 
-  const labels = page.locator("label");
-  await expect(labels).toHaveCount(3);
-  const { left: optionLeft } = await getBounds(labels.nth(1));
-  const { right: labelRight } = await getBounds(labels.nth(0));
+  const fieldset = page.locator("fieldset");
+  const legend = fieldset.locator("legend");
+  await expect(legend).toHaveText("test");
+  
+  const optionLabels = page.locator("label");
+  await expect(optionLabels).toHaveCount(2);
+  const { left: optionLeft } = await getBounds(optionLabels.nth(0));
+  const { right: legendRight } = await getBounds(legend);
 
-  expect(labelRight).toBeLessThan(optionLeft);
+  expect(legendRight).toBeLessThan(optionLeft);
 });
 
 test("labelPosition=start positions label after input with rtl", async ({ initTestBed, page }) => {
@@ -498,12 +508,16 @@ test("labelPosition=start positions label after input with rtl", async ({ initTe
     </RadioGroup>
   `);
 
-  const labels = page.locator("label");
-  await expect(labels).toHaveCount(3);
-  const { left: optionLeft } = await getBounds(labels.nth(0));
-  const { right: labelRight } = await getBounds(labels.nth(2));
+  const fieldset = page.locator("fieldset");
+  const legend = fieldset.locator("legend");
+  await expect(legend).toHaveText("test");
+  
+  const optionLabels = page.locator("label");
+  await expect(optionLabels).toHaveCount(2);
+  const { left: legendLeft } = await getBounds(legend);
+  const { right: optionRight } = await getBounds(optionLabels.nth(1));
 
-  expect(labelRight).toBeLessThan(optionLeft);
+  expect(optionRight).toBeLessThan(legendLeft);
 });
 
 test("labelPosition=end positions label after input with ltr", async ({ initTestBed, page }) => {
@@ -514,12 +528,16 @@ test("labelPosition=end positions label after input with ltr", async ({ initTest
     </RadioGroup>
   `);
 
-  const labels = page.locator("label");
-  await expect(labels).toHaveCount(3);
-  const { left: optionLeft } = await getBounds(labels.nth(0));
-  const { right: labelRight } = await getBounds(labels.nth(1));
+  const fieldset = page.locator("fieldset");
+  const legend = fieldset.locator("legend");
+  await expect(legend).toHaveText("test");
+  
+  const optionLabels = page.locator("label");
+  await expect(optionLabels).toHaveCount(2);
+  const { left: legendLeft } = await getBounds(legend);
+  const { right: optionRight } = await getBounds(optionLabels.nth(1));
 
-  expect(labelRight).toBeLessThan(optionLeft);
+  expect(optionRight).toBeLessThan(legendLeft);
 });
 
 test("labelPosition=end positions label after input with rtl", async ({ initTestBed, page }) => {
@@ -530,13 +548,18 @@ test("labelPosition=end positions label after input with rtl", async ({ initTest
     </RadioGroup>
   `);
 
-  const labels = page.locator("label");
-  await expect(labels).toHaveCount(3);
-  await expect(labels.nth(2)).toHaveText("Option 2");
-  const { left: optionLeft } = await getBounds(labels.nth(0));
-  const { right: labelRight } = await getBounds(labels.nth(2));
+  const fieldset = page.locator("fieldset");
+  const legend = fieldset.locator("legend");
+  await expect(legend).toHaveText("test");
+  
+  const optionLabels = page.locator("label");
+  await expect(optionLabels).toHaveCount(2);
+  await expect(optionLabels.nth(1)).toHaveText("Option 2");
+  const { left: optionLeft } = await getBounds(optionLabels.nth(0));
+  const { right: legendRight } = await getBounds(legend);
 
-  expect(optionLeft).toBeLessThan(labelRight);
+  // RTL + end means legend is on the left side (before options)
+  expect(legendRight).toBeLessThan(optionLeft);
 });
 
 test("value returns current input value", async ({ initTestBed, page }) => {

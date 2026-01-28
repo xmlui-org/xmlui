@@ -3,6 +3,7 @@ import {
   type ArrayLiteral,
   type ArrowExpression,
   type AssignmentExpression,
+  type AwaitExpression,
   type ScripNodeBase,
   type BinaryExpression,
   type BlockStatement,
@@ -28,6 +29,7 @@ import {
   type Literal,
   type MemberAccessExpression,
   type NoArgExpression,
+  type NewExpression,
   type ObjectDestructure,
   type ObjectLiteral,
   type PostfixOpExpression,
@@ -89,6 +91,9 @@ import {
   T_LITERAL,
   T_TEMPLATE_LITERAL_EXPRESSION,
   T_DESTRUCTURE,
+  T_AWAIT_EXPRESSION,
+  T_NEW_EXPRESSION,
+  T_ASYNC_FUNCTION_DECLARATION,
 } from "../../components-core/script-runner/ScriptingSourceTree";
 import type { GenericToken } from "../common/GenericToken";
 import { InputStream } from "../common/InputStream";
@@ -268,6 +273,14 @@ export class Parser {
         case TokenType.Function:
           return this.parseFunctionDeclaration();
         default:
+          // Check for async function (contextual keyword)
+          if (startToken.type === TokenType.Identifier && startToken.text === "async") {
+            const nextToken = this._lexer.ahead(1);
+            if (nextToken && nextToken.type === TokenType.Function) {
+              // Don't consume "async" here, let parseFunctionDeclaration handle it
+              return this.parseFunctionDeclaration(false, true);
+            }
+          }
           if (this.isExpressionStart(startToken)) {
             return this.parseExpressionStatement(allowSequence);
           }
@@ -1240,11 +1253,21 @@ export class Parser {
    * Parses a function declaration
    *
    * functionDeclaration
-   *   : "function" identifier "(" [parameterList] ")" blockStatement
+   *   : ["async"] "function" identifier "(" [parameterList] ")" blockStatement
    *   ;
    */
-  private parseFunctionDeclaration(allowNoName = false): FunctionDeclaration | null {
-    const startToken = this._lexer.get();
+  private parseFunctionDeclaration(
+    allowNoName = false,
+    isAsync = false,
+  ): FunctionDeclaration | null {
+    // If async, we need to consume the "async" token first
+    let startToken = this._lexer.peek();
+    if (isAsync) {
+      startToken = this._lexer.get(); // consume "async"
+    }
+
+    // Now consume the "function" keyword
+    this._lexer.get();
 
     // --- Get the function name
     let functionName: string | undefined;
@@ -1375,13 +1398,17 @@ export class Parser {
     if (!stmt) return null;
 
     // --- Done.
+    const nodeData: any = {
+      id: { type: T_IDENTIFIER, name: functionName },
+      args,
+      stmt,
+    };
+    if (isAsync) {
+      nodeData.async = true;
+    }
     return this.createStatementNode<FunctionDeclaration>(
-      T_FUNCTION_DECLARATION,
-      {
-        id: { type: T_IDENTIFIER, name: functionName },
-        args,
-        stmt,
-      },
+      isAsync ? T_ASYNC_FUNCTION_DECLARATION : T_FUNCTION_DECLARATION,
+      nodeData,
       startToken,
       stmt.endToken,
     );
@@ -1490,18 +1517,88 @@ export class Parser {
 
     if (startToken.type === TokenType.Function) {
       const funcDecl = this.parseFunctionDeclaration(true);
-      return funcDecl
-        ? this.createExpressionNode<ArrowExpression>(
-            T_ARROW_EXPRESSION,
-            {
-              name: funcDecl.id.name,
-              args: funcDecl.args,
-              statement: funcDecl.stmt,
-            },
-            startToken,
-            funcDecl.endToken,
-          )
-        : null;
+      if (!funcDecl) return null;
+
+      const nodeData: any = {
+        name: funcDecl.id.name,
+        args: funcDecl.args,
+        statement: funcDecl.stmt,
+      };
+      if (funcDecl.async) {
+        nodeData.async = true;
+      }
+      return this.createExpressionNode<ArrowExpression>(
+        T_ARROW_EXPRESSION,
+        nodeData,
+        startToken,
+        funcDecl.endToken,
+      );
+    }
+
+    // Check for async function expression (contextual keyword)
+    if (startToken.type === TokenType.Identifier && startToken.text === "async") {
+      const nextToken = this._lexer.ahead(1);
+      if (nextToken && nextToken.type === TokenType.Function) {
+        // Don't consume "async" here - parseFunctionDeclaration will handle it
+        const funcDecl = this.parseFunctionDeclaration(true, true);
+        if (!funcDecl) return null;
+
+        const nodeData: any = {
+          name: funcDecl.id.name,
+          args: funcDecl.args,
+          statement: funcDecl.stmt,
+        };
+        if (funcDecl.async) {
+          nodeData.async = true;
+        }
+        return this.createExpressionNode<ArrowExpression>(
+          T_ARROW_EXPRESSION,
+          nodeData,
+          startToken,
+          funcDecl.endToken,
+        );
+      }
+      // Check for async arrow function: async (...) => or async id =>
+      if (
+        nextToken &&
+        (nextToken.type === TokenType.LParent || nextToken.type === TokenType.Identifier)
+      ) {
+        // For async id =>, we need to peek further to confirm it's an arrow function
+        if (nextToken.type === TokenType.Identifier) {
+          const tokenAfterParam = this._lexer.ahead(2);
+          if (!tokenAfterParam || tokenAfterParam.type !== TokenType.Arrow) {
+            // Not an arrow function, treat "async" as a regular identifier
+            // Fall through to parse as normal expression
+          } else {
+            // It's async id => ..., consume and parse
+            this._lexer.get(); // consume "async"
+            const arrowExpr = this.parseNullCoalescingExpr();
+            if (!arrowExpr) {
+              return null;
+            }
+
+            const arrowToken = this._lexer.peek();
+            if (arrowToken.type === TokenType.Arrow) {
+              return this.parseArrowExpression(startToken, arrowExpr, true);
+            }
+          }
+        } else {
+          // It's async (...), consume and parse
+          this._lexer.get(); // consume "async"
+          const arrowExpr = this.parseNullCoalescingExpr();
+          if (!arrowExpr) {
+            return null;
+          }
+
+          const arrowToken = this._lexer.peek();
+          if (arrowToken.type === TokenType.Arrow) {
+            return this.parseArrowExpression(startToken, arrowExpr, true);
+          }
+          // Not an arrow function, this is an error - we consumed "async" but didn't find arrow
+          this.reportError("W002", arrowToken, arrowToken.text);
+          return null;
+        }
+      }
     }
 
     const otherExpr = this.parseNullCoalescingExpr();
@@ -1559,8 +1656,13 @@ export class Parser {
    * Parses an arrow expression
    * @param start Start token
    * @param left Expression to the left from the arrow
+   * @param isAsync Whether this is an async arrow function
    */
-  private parseArrowExpression(start: Token, left: Expression): ArrowExpression | null {
+  private parseArrowExpression(
+    start: Token,
+    left: Expression,
+    isAsync = false,
+  ): ArrowExpression | null {
     // --- Check the left expression
     let isValid: boolean;
     const args: Expression[] = [];
@@ -1651,17 +1753,21 @@ export class Parser {
 
     // --- Get arrow expression statements
     const statement = this.parseStatement(false);
-    return statement
-      ? this.createExpressionNode<ArrowExpression>(
-          T_ARROW_EXPRESSION,
-          {
-            args,
-            statement,
-          },
-          start,
-          statement.endToken,
-        )
-      : null;
+    if (!statement) return null;
+
+    const nodeData: any = {
+      args,
+      statement,
+    };
+    if (isAsync) {
+      nodeData.async = true;
+    }
+    return this.createExpressionNode<ArrowExpression>(
+      T_ARROW_EXPRESSION,
+      nodeData,
+      start,
+      statement.endToken,
+    );
   }
 
   /**
@@ -2109,12 +2215,125 @@ export class Parser {
 
   /**
    * unaryExpr
-   *   : ( "typeof" | "delete" | "+" | "-" | "~" | "!" ) memberOrInvocationExpr
+   *   : ( "typeof" | "delete" | "+" | "-" | "~" | "!" | "await" ) memberOrInvocationExpr
    *   | memberOrInvocationExpr
    *   ;
    */
   private parseUnaryOrPrefixExpr(): Expression | null {
     const startToken = this._lexer.peek();
+
+    // Check for new expression
+    if (startToken.type === TokenType.New) {
+      this._lexer.get();
+
+      // Parse the callee (but not function invocations yet)
+      let callee = this.parsePrimaryExpr();
+      if (!callee) {
+        return null;
+      }
+
+      // Handle member access on the callee (e.g., new obj.Constructor)
+      let exitLoop = false;
+      do {
+        const currentStart = this._lexer.peek();
+
+        switch (currentStart.type) {
+          case TokenType.Dot:
+          case TokenType.OptionalChaining: {
+            this._lexer.get();
+            const memberToken = this._lexer.peek();
+            if (memberToken.type !== TokenType.Identifier) {
+              this.reportError("W003");
+              return null;
+            }
+            this._lexer.get();
+            callee = this.createExpressionNode<MemberAccessExpression>(
+              T_MEMBER_ACCESS_EXPRESSION,
+              {
+                obj: callee,
+                member: memberToken.text,
+                opt: currentStart.type === TokenType.OptionalChaining,
+              },
+              startToken,
+              memberToken,
+            );
+            break;
+          }
+
+          case TokenType.LSquare: {
+            this._lexer.get();
+            const memberExpr = this.parseExpr();
+            if (!memberExpr) {
+              return null;
+            }
+            const endToken = this._lexer.peek();
+            this.expectToken(TokenType.RSquare, "W005");
+            callee = this.createExpressionNode<CalculatedMemberAccessExpression>(
+              T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
+              {
+                obj: callee,
+                member: memberExpr,
+              },
+              startToken,
+              endToken,
+            );
+            break;
+          }
+
+          default:
+            exitLoop = true;
+            break;
+        }
+      } while (!exitLoop);
+
+      // Parse arguments if present (they're optional for new operator)
+      let args: Expression[] = [];
+      let endToken = callee.endToken;
+      const nextToken = this._lexer.peek();
+
+      // Check if there are constructor arguments
+      if (nextToken.type === TokenType.LParent) {
+        this._lexer.get();
+        if (this._lexer.peek().type !== TokenType.RParent) {
+          const expr = this.parseExpr();
+          if (!expr) {
+            this.reportError("W001");
+            return null;
+          }
+          args = expr.type === T_SEQUENCE_EXPRESSION ? expr.exprs : [expr];
+        }
+        endToken = this._lexer.peek();
+        this.expectToken(TokenType.RParent, "W006");
+      }
+
+      return this.createExpressionNode<NewExpression>(
+        T_NEW_EXPRESSION,
+        {
+          callee,
+          arguments: args,
+        },
+        startToken,
+        endToken,
+      );
+    }
+
+    // Check for await expression (contextual keyword)
+    if (startToken.type === TokenType.Identifier && startToken.text === "await") {
+      this._lexer.get();
+      const awaitOperand = this.parseUnaryOrPrefixExpr();
+      if (!awaitOperand) {
+        return null;
+      }
+      return this.createExpressionNode<AwaitExpression>(
+        T_AWAIT_EXPRESSION,
+        {
+          expr: awaitOperand,
+        },
+        startToken,
+        awaitOperand.endToken,
+      );
+    }
+
     if (tokenTraits[startToken.type].canBeUnary) {
       this._lexer.get();
       const unaryOperand = this.parseUnaryOrPrefixExpr();
@@ -2495,7 +2714,16 @@ export class Parser {
         let nameExpr: Expression | null;
 
         // --- Get property name or calculated property name
-        if (traits.expressionStart) {
+        if (traits.keywordLike) {
+          nameExpr = {
+            type: T_IDENTIFIER,
+            nodeId: createXmlUiTreeNodeId(),
+            name: nextToken.text,
+            startToken: nextToken,
+            endToken: nextToken,
+          };
+          this._lexer.get();
+        } else if (traits.expressionStart) {
           if (nextToken.type === TokenType.LSquare) {
             this._lexer.get();
             nameExpr = this.getExpression();
@@ -2527,15 +2755,6 @@ export class Parser {
             this.reportError("W007");
             return null;
           }
-        } else if (traits.keywordLike) {
-          nameExpr = {
-            type: T_IDENTIFIER,
-            nodeId: createXmlUiTreeNodeId(),
-            name: nextToken.text,
-            startToken: nextToken,
-            endToken: nextToken,
-          };
-          this._lexer.get();
         } else {
           this.reportError("W001");
           return null;

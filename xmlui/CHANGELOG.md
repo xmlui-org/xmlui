@@ -1,5 +1,31 @@
 # xmlui
 
+## 0.11.32
+
+### Patch Changes
+
+- cda5e22: fix: window.\_\_PUBLIC_PATH prefix applying twice to icon resources, making them not resolve to anything.
+- e98efdf: Extend Table with userSelect properties
+- 7d66fac: Review the async loading of Tree items
+- 9bea8d0: feat: Open up possibility for custom components to receive input behaviors via an API/context
+- 6ad3926: Add scrollStyle and showScrollerFade to Tree
+- f4842b1: Removed timeout properties from onValidate.
+- 1055794: improve: Provide accessible text label for RadioGroup
+- a8117ba: Allow the "new" keyword in object literals as property name
+
+## 0.11.31
+
+### Patch Changes
+
+- 796793b: Migrate Table to virtua (from @tanstack/react-virtual)
+- 307611c: Experiment with deferred APICall
+- c05a6dd: Parse async/await in scripts but raise error when executing
+- 00f087d: Allow Column to use layout properties
+- 10c1fa5: Parse new operator but raise error when executing
+- 78716f4: Experimental generation of context variables
+- 33c99cd: Fix <li> issue with Markdown in Firefox
+- e11595e: Fix the inconsistent URL encoding between url and queryParams
+
 ## 0.11.30
 
 ### Patch Changes

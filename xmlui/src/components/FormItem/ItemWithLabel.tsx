@@ -1,5 +1,5 @@
 import type { CSSProperties, ForwardedRef, ReactElement, ReactNode } from "react";
-import { cloneElement, forwardRef, useId, useState, useLayoutEffect, useCallback } from "react";
+import React, { cloneElement, forwardRef, useId, useState, useLayoutEffect, useCallback } from "react";
 import classnames from "classnames";
 import { Slot } from "@radix-ui/react-slot";
 
@@ -10,6 +10,7 @@ import { Spinner } from "../Spinner/SpinnerNative";
 import { PART_LABELED_ITEM, PART_LABEL } from "../../components-core/parts";
 import { Part } from "../Part/Part";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
+import { RadioGroup } from "../RadioGroup/RadioGroupNative";
 
 // Component part names
 
@@ -117,6 +118,9 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
   const labelWrapperHeight =
     labelPosition === "start" || labelPosition === "end" ? inputHeight : "auto";
 
+  // Check if the child is a RadioGroup component
+  const isRadioGroup = React.isValidElement(children) && children.type === RadioGroup;
+
   if (label === undefined && !validationResult) {
     return (
       <Part partId={PART_LABELED_ITEM}>
@@ -126,6 +130,89 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
       </Part>
     );
   }
+
+  // For RadioGroup, use fieldset and legend instead of label
+  if (isRadioGroup) {
+    return (
+      <fieldset
+        {...rest}
+        id={inputId}
+        ref={ref as unknown as React.Ref<HTMLFieldSetElement>}
+        style={style}
+        className={classnames(className, styles.itemWithLabel)}
+        disabled={!enabled}
+      >
+        <div
+          className={classnames(styles.container, {
+            [styles.top]: labelPosition === "top",
+            [styles.bottom]: labelPosition === "bottom",
+            [styles.start]: labelPosition === "start",
+            [styles.end]: labelPosition === "end",
+            [styles.shrinkToLabel]: shrinkToLabel,
+          })}
+        >
+          {label && (
+            <div
+              className={styles.labelWrapper}
+              style={{
+                height: labelWrapperHeight,
+              }}
+            >
+              <Part partId={PART_LABEL}>
+                <legend
+                  onClick={onLabelClick || ((e) => {
+                    // For radio groups, focus the first radio option
+                    const fieldset = (e.currentTarget as HTMLElement).closest("fieldset");
+                    if (fieldset) {
+                      const firstRadio = fieldset.querySelector('[role="radio"]') as HTMLElement;
+                      firstRadio?.focus();
+                    }
+                  })}
+                  style={{
+                    ...labelStyle,
+                    width:
+                      labelWidth && numberRegex.test(labelWidth) ? `${labelWidth}px` : labelWidth,
+                    flexShrink: labelWidth !== undefined ? 0 : undefined,
+                  }}
+                  className={classnames(styles.inputLabel, {
+                    [styles.required]: required,
+                    [styles.disabled]: !enabled,
+                    [styles.labelBreak]: labelBreak,
+                  })}
+                >
+                  {label}
+                  {(requireLabelMode === "markRequired" || requireLabelMode === "markBoth") && required && (
+                    <span className={styles.requiredMark}>*</span>
+                  )}
+                  {(requireLabelMode === "markOptional" || requireLabelMode === "markBoth") &&
+                    !required && <span className={styles.optionalTag}> (Optional)</span>}
+                  {validationInProgress && (
+                    <Spinner
+                      style={{ height: "1em", width: "1em", marginLeft: "1em", alignSelf: "center" }}
+                    />
+                  )}
+                </legend>
+              </Part>
+            </div>
+          )}
+          <div className={styles.wrapper}>
+            <Part partId={PART_LABELED_ITEM}>
+              {cloneElement(children as ReactElement, {
+                id: !isInputTemplateUsed ? inputId : undefined,
+                ref: refCallback,
+                ...(cloneStyle ? {} : { style: undefined, className: undefined }),
+              })}
+            </Part>
+            {validationResult && (
+              <div className={styles.validationResultWrapper}>{validationResult}</div>
+            )}
+          </div>
+        </div>
+      </fieldset>
+    );
+  }
+
+  // For other components, use the existing label structure
   return (
     <div {...rest} ref={ref} style={style} className={classnames(className, styles.itemWithLabel)}>
       <div
