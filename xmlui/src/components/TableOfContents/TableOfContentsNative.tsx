@@ -16,6 +16,14 @@ import classnames from "classnames";
 import styles from "./TableOfContents.module.scss";
 import { useTableOfContents } from "../../components-core/TableOfContentsContext";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
+import { useIndicatorPosition } from "./useIndicatorPosition";
+
+// Scroll options for smooth/auto scrolling behavior
+const SCROLL_OPTIONS = {
+  block: "center" as const,
+  inline: "center" as const,
+  scrollMode: "always" as const,
+} as const;
 
 type Props = {
   style?: CSSProperties;
@@ -88,39 +96,21 @@ export const TableOfContents = forwardRef(function TableOfContents(
   );
 
   useEffect(() => {
-    if (activeAnchorId && tocRef?.current) {
-      const activeAnchor = tocRef.current.querySelector(`#${activeAnchorId}`);
-      if (activeAnchor) {
-        scrollIntoView(activeAnchor, {
-          block: "center",
-          inline: "center",
-          behavior: smoothScrolling ? "smooth" : "auto",
-          scrollMode: "always",
-          boundary: tocRef.current,
-        });
-      }
-    }
+    if (!activeAnchorId || !tocRef.current) return;
+
+    const activeAnchor = tocRef.current.querySelector(
+      `[id="${CSS.escape(activeAnchorId)}"]`,
+    );
+    if (!activeAnchor) return;
+
+    scrollIntoView(activeAnchor, {
+      ...SCROLL_OPTIONS,
+      behavior: smoothScrolling ? "smooth" : "auto",
+      boundary: tocRef.current,
+    });
   }, [activeAnchorId, smoothScrolling]);
 
-  // Position indicator over active item
-  useEffect(() => {
-    if (activeAnchorId && tocRef?.current && indicatorRef?.current) {
-      const activeItem = tocRef.current.querySelector(`li.${styles.active}`);
-      if (activeItem) {
-        const navRect = tocRef.current.getBoundingClientRect();
-        const itemRect = activeItem.getBoundingClientRect();
-        const relativeTop = itemRect.top - navRect.top + tocRef.current.scrollTop;
-        const relativeLeft = itemRect.left - navRect.left;
-
-        indicatorRef.current.style.top = `${relativeTop}px`;
-        indicatorRef.current.style.left = `${relativeLeft}px`;
-        indicatorRef.current.style.height = `${itemRect.height}px`;
-        indicatorRef.current.style.display = "block";
-      }
-    } else if (indicatorRef?.current) {
-      indicatorRef.current.style.display = "none";
-    }
-  }, [activeAnchorId]);
+  useIndicatorPosition(activeAnchorId, tocRef, indicatorRef, styles.active);
 
   return (
     <nav
