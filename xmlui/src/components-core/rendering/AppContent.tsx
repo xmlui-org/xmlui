@@ -590,10 +590,17 @@ export function AppContent({
           : undefined) ||
         detail.targetTag?.toLowerCase() ||
         "Unknown";
+      // Prefer textHint when:
+      // 1. componentLabel is a generic HTML tag (button, a, div, span)
+      // 2. componentLabel matches the target tag name
+      // 3. componentLabel is a PascalCase component type (like "NavLink") without componentInfo
+      //    (indicating it's a fallback data-testid, not an explicit user-provided testId)
+      const isPascalCaseComponentType = /^[A-Z][a-zA-Z]*$/.test(componentLabel);
       if (
         textHint &&
         (componentLabel === detail.targetTag?.toLowerCase() ||
-          ["button", "a", "div", "span"].includes(componentLabel))
+          ["button", "a", "div", "span"].includes(componentLabel) ||
+          (isPascalCaseComponentType && !componentInfo))
       ) {
         componentLabel = textHint;
       }

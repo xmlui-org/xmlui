@@ -113,8 +113,9 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
   // --- Register component info to global map for inspector
   // --- This allows the inspector to resolve testId -> component type/label
-  // --- Use explicit testId/uid if provided, otherwise fall back to component type
-  const testIdForMap = safeNode.testId || safeNode.uid || safeNode.type;
+  // --- Only use explicit testId or uid - NOT component type, to avoid collisions
+  // --- when multiple components of the same type exist (e.g., multiple NavLinks)
+  const testIdForMap = safeNode.testId || safeNode.uid;
   const resolvedTestId = useMemo(
     () => (testIdForMap ? extractParam(state, testIdForMap, appContext, true) : undefined),
     [state, testIdForMap, appContext],
