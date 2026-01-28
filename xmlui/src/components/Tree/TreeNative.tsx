@@ -611,8 +611,8 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   const [measuredItemSize, setMeasuredItemSize] = useState<number | undefined>(undefined);
 
   const flatTreeData = useMemo(() => {
-    return toFlatTree(treeData, expandedIds, undefined, nodeStates);
-  }, [expandedIds, treeData, nodeStates]);
+    return toFlatTree(treeData, expandedIds, fieldConfig.dynamicField, nodeStates, dynamic);
+  }, [expandedIds, treeData, nodeStates, fieldConfig.dynamicField, dynamic]);
 
   // Enhanced flat tree with timestamps and autoLoadAfter values
   const enhancedFlatTreeData: FlatTreeNodeWithState[] = useMemo(() => {
@@ -1487,8 +1487,9 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           const updatedFlatTreeData = toFlatTree(
             treeData,
             newExpandedIds,
-            undefined,
+            fieldConfig.dynamicField,
             nodeStates,
+            dynamic,
           );
           const nodeIndex = updatedFlatTreeData.findIndex(
             (item) => String(item.key) === String(nodeId),

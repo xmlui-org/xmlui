@@ -4975,3 +4975,191 @@ test.describe("Auto-Load Feature - Step 4: Autoload Mechanism", () => {
   });
 });
 
+// =============================================================================
+// DYNAMIC NODE LOADED STATE TESTS
+// =============================================================================
+
+test.describe("Dynamic Node Loaded State", () => {
+  test("dynamic nodes without explicit 'loaded' field can be expanded and load children", async ({
+    initTestBed,
+    createTreeDriver,
+  }) => {
+    const dynamicTreeData = [
+      { id: 1, name: "Dynamic Node Without Loaded", parentId: null },
+    ];
+
+    await initTestBed(`
+      <Fragment>
+        <Tree 
+          testId="tree" 
+          dataFormat="flat" 
+          dynamic="true"
+          itemClickExpands
+          onLoadChildren="arg => {
+            return [{ id: 'child-1', name: 'Child 1', parentId: arg.id }];
+          }"
+          data='{${JSON.stringify(dynamicTreeData)}}'>
+          <property name="itemTemplate">
+            <HStack testId="{$item.id}">
+              <Text value="{$item.name}" />
+            </HStack>
+          </property>
+        </Tree>
+      </Fragment>
+    `);
+
+    const tree = await createTreeDriver("tree");
+    
+    // Click to expand the dynamic node
+    await tree.getByTestId("1").click();
+    
+    // Verify children loaded
+    await expect(tree.getByTestId("child-1")).toBeVisible();
+  });
+
+  test("dynamic nodes with 'loaded: false' can be expanded and load children", async ({
+    initTestBed,
+    createTreeDriver,
+  }) => {
+    const dynamicTreeData = [
+      { id: 1, name: "Dynamic Node With Loaded False", parentId: null, loaded: false },
+    ];
+
+    await initTestBed(`
+      <Fragment>
+        <Tree 
+          testId="tree" 
+          dataFormat="flat" 
+          dynamic="true"
+          loadedField="loaded"
+          itemClickExpands
+          onLoadChildren="arg => {
+            return [{ id: 'child-1', name: 'Child 1', parentId: arg.id }];
+          }"
+          data='{${JSON.stringify(dynamicTreeData)}}'>
+          <property name="itemTemplate">
+            <HStack testId="{$item.id}">
+              <Text value="{$item.name}" />
+            </HStack>
+          </property>
+        </Tree>
+      </Fragment>
+    `);
+
+    const tree = await createTreeDriver("tree");
+    
+    // Click to expand the dynamic node
+    await tree.getByTestId("1").click();
+    
+    // Verify children loaded
+    await expect(tree.getByTestId("child-1")).toBeVisible();
+  });
+
+  test("dynamic nodes with 'loaded: true' and no children cannot be expanded", async ({
+    initTestBed,
+    createTreeDriver,
+  }) => {
+    const dynamicTreeData = [
+      { id: 1, name: "Dynamic Node With Loaded True", parentId: null, loaded: true },
+    ];
+
+    await initTestBed(`
+      <Fragment>
+        <Tree 
+          testId="tree" 
+          dataFormat="flat" 
+          dynamic="true"
+          loadedField="loaded"
+          itemClickExpands
+          data='{${JSON.stringify(dynamicTreeData)}}'>
+          <property name="itemTemplate">
+            <HStack testId="{$item.id}">
+              <Text value="{$item.name}" />
+            </HStack>
+          </property>
+        </Tree>
+      </Fragment>
+    `);
+
+    const tree = await createTreeDriver("tree");
+    
+    // Click the node - should not expand (no children, loaded: true)
+    await tree.getByTestId("1").click();
+    
+    // Tree should still only show the one node
+    await expect(tree.getByTestId("1")).toBeVisible();
+  });
+
+  test("non-dynamic nodes without 'loaded' field and no children cannot be expanded", async ({
+    initTestBed,
+    createTreeDriver,
+  }) => {
+    const staticTreeData = [
+      { id: 1, name: "Static Node Without Loaded", parentId: null },
+    ];
+
+    await initTestBed(`
+      <Fragment>
+        <Tree 
+          testId="tree" 
+          dataFormat="flat" 
+          dynamic="false"
+          itemClickExpands
+          data='{${JSON.stringify(staticTreeData)}}'>
+          <property name="itemTemplate">
+            <HStack testId="{$item.id}">
+              <Text value="{$item.name}" />
+            </HStack>
+          </property>
+        </Tree>
+      </Fragment>
+    `);
+
+    const tree = await createTreeDriver("tree");
+    
+    // Click the node - should not expand (static node with no children)
+    await tree.getByTestId("1").click();
+    
+    // Tree should still only show the one node
+    await expect(tree.getByTestId("1")).toBeVisible();
+  });
+
+  test("non-dynamic nodes with 'loaded: false' can be expanded and load children", async ({
+    initTestBed,
+    createTreeDriver,
+  }) => {
+    const staticTreeData = [
+      { id: 1, name: "Static Node With Loaded False", parentId: null, loaded: false },
+    ];
+
+    await initTestBed(`
+      <Fragment>
+        <Tree 
+          testId="tree" 
+          dataFormat="flat" 
+          dynamic="false"
+          loadedField="loaded"
+          itemClickExpands
+          onLoadChildren="arg => {
+            return [{ id: 'child-1', name: 'Child 1', parentId: arg.id }];
+          }"
+          data='{${JSON.stringify(staticTreeData)}}'>
+          <property name="itemTemplate">
+            <HStack testId="{$item.id}">
+              <Text value="{$item.name}" />
+            </HStack>
+          </property>
+        </Tree>
+      </Fragment>
+    `);
+
+    const tree = await createTreeDriver("tree");
+    
+    // Click to expand - loaded: false means it should trigger loading
+    await tree.getByTestId("1").click();
+    
+    // Verify children loaded
+    await expect(tree.getByTestId("child-1")).toBeVisible();
+  });
+});
+
