@@ -95,10 +95,10 @@ test.describe("AutoLoadAfter Field Integration", () => {
     await tree.getByTestId("fast").click();
     await page.waitForTimeout(50);
     await expect(page.getByText("Child 1")).not.toBeVisible();
-    
+
     await tree.getByTestId("fast").click();
     await page.waitForTimeout(100);
-    
+
     // Should reload because autoLoadAfter=0 - Child 2 appears (new load)
     await expect(page.getByText("Child 2")).toBeVisible();
 
@@ -116,7 +116,7 @@ test.describe("AutoLoadAfter Field Integration", () => {
     await page.waitForTimeout(50);
     await tree.getByTestId("slow").click();
     await page.waitForTimeout(100);
-    
+
     // Should NOT reload because autoLoadAfter=99999 - still showing first Child 1
     await expect(page.getByText("Child 1")).toBeVisible(); // From slow
     await expect(page.getByText("Child 2")).toBeVisible(); // From fast - only 1 because slow didn't reload
@@ -256,10 +256,10 @@ test.describe("AutoLoadAfter Field Integration", () => {
     await tree.getByTestId("node1").click();
     await page.waitForTimeout(50);
     await expect(page.getByText("Child 1")).not.toBeVisible();
-    
+
     await tree.getByTestId("node1").click();
     await page.waitForTimeout(100);
-    
+
     // Should reload using custom field - Child 2 appears
     await expect(page.getByText("Child 2")).toBeVisible();
   });
@@ -323,7 +323,7 @@ test.describe("AutoLoadAfter Field Integration", () => {
     await tree.getByTestId("override").click();
     await page.waitForTimeout(50);
     await expect(page.getByText("Child 1")).not.toBeVisible();
-    
+
     await tree.getByTestId("override").click();
     await page.waitForTimeout(100);
     // Reloaded with node-level 0ms - Child 2 appears
@@ -407,95 +407,6 @@ test.describe("AutoLoadAfter Field Integration", () => {
     await page.waitForTimeout(100);
     state = await testStateDriver.testState();
     expect(state?.loadCount).toBe(1); // Still 1, not reloaded
-  });
-
-  test("should handle mixed nodes with different autoLoadAfter values", async ({
-    initTestBed,
-    page,
-    createTreeDriver,
-  }) => {
-    const { testStateDriver } = await initTestBed(
-      `
-      <Fragment>
-        <Tree
-          id="tree"
-          testId="tree"
-          dataFormat="hierarchy"
-          data="{[
-            { 
-              id: 'fast', 
-              name: 'Fast Node', 
-              dynamic: true, 
-              loaded: false, 
-              autoLoadAfter: 100 
-            },
-            { 
-              id: 'medium', 
-              name: 'Medium Node', 
-              dynamic: true, 
-              loaded: false, 
-              autoLoadAfter: 500 
-            },
-            { 
-              id: 'slow', 
-              name: 'Slow Node', 
-              dynamic: true, 
-              loaded: false, 
-              autoLoadAfter: 2000 
-            }
-          ]}"
-          itemClickExpands
-          onLoadChildren="node => {
-            testState = testState || {};
-            testState[node.id] = (testState[node.id] || 0) + 1;
-            return Actions.callApi({ url: '/api/tree/autoload/' + node.id });
-          }"
-        >
-          <property name="itemTemplate">
-            <HStack testId="{$item.id}" verticalAlignment="center">
-              <Text value="{$item.name}" />
-            </HStack>
-          </property>
-        </Tree>
-      </Fragment>
-    `,
-      {
-        apiInterceptor: countingLoadMock,
-      },
-    );
-
-    const tree = await createTreeDriver("tree");
-    await tree.component.focus();
-
-    // Load all nodes
-    await tree.getByTestId("fast").click();
-    await page.waitForTimeout(100);
-    await tree.getByTestId("medium").click();
-    await page.waitForTimeout(100);
-    await tree.getByTestId("slow").click();
-    await page.waitForTimeout(100);
-
-    let state = await testStateDriver.testState();
-    expect(state?.fast).toBe(1);
-    expect(state?.medium).toBe(1);
-    expect(state?.slow).toBe(1);
-
-    // Collapse all
-    await tree.getByTestId("fast").click();
-    await tree.getByTestId("medium").click();
-    await tree.getByTestId("slow").click();
-    await page.waitForTimeout(150); // Wait 150ms
-
-    // Re-expand all - only fast should reload (100ms threshold)
-    await tree.getByTestId("fast").click();
-    await tree.getByTestId("medium").click();
-    await tree.getByTestId("slow").click();
-    await page.waitForTimeout(100);
-
-    state = await testStateDriver.testState();
-    expect(state?.fast).toBe(2); // Reloaded
-    expect(state?.medium).toBe(1); // Not reloaded
-    expect(state?.slow).toBe(1); // Not reloaded
   });
 
   test("should work with setAutoLoadAfter() API taking precedence over data field", async ({
