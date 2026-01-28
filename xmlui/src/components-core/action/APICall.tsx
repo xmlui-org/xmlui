@@ -442,7 +442,7 @@ export async function callApi(
     traceApiCall(appContext, "api:error", resolvedUrl, resolvedMethod, {
       transactionId: clientTxId,
       body: resolvedBody,
-      error: e?.message || String(e),
+      error: { message: e?.message || String(e), stack: e?.stack },
     });
 
     if (optimisticValuesByQueryKeys.size) {

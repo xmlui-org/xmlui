@@ -235,111 +235,139 @@ function DataLoader({
           throw error;
         }
       } else if (loader.props.dataType === "sql") {
+        // Extract SQL query from the body or rawBody
+        let sqlQuery: string = "";
+        let sqlParams: any[] = [];
+
+        // Try to extract SQL query and parameters from body or rawBody
+        if (body && typeof body === "object") {
+          sqlQuery = body.sql || "";
+          sqlParams = body.params || [];
+        } else if (rawBody) {
+          try {
+            const parsedBody = JSON.parse(rawBody);
+            sqlQuery = parsedBody.sql || "";
+            sqlParams = parsedBody.params || [];
+          } catch (e) {
+            // If rawBody is not valid JSON, use it as the SQL query
+            sqlQuery = rawBody;
+          }
+        }
+
+        // If SQL query is empty, throw an error
+        if (!sqlQuery) {
+          throw new Error("SQL query is required for SQL data type");
+        }
+
+        // Prepare request to /query endpoint
+        const queryUrl = url || "/query";
+        const method = extractParam(state, loader.props.method, appContext) || "POST";
+        const headers = extractParam(state, loader.props.headers, appContext) || {
+          "Content-Type": "application/json",
+        };
+
+        const requestBody = JSON.stringify({
+          sql: sqlQuery,
+          params: sqlParams,
+        });
+
+        const fetchOptions: RequestInit = {
+          method,
+          headers,
+          body: requestBody,
+        };
+
+        if (abortSignal) {
+          fetchOptions.signal = abortSignal;
+        }
+
+        // Trace API call start
+        if (xsVerbose) {
+          pushXsLog({
+            ts: Date.now(),
+            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+            traceId: getCurrentTrace(),
+            kind: "api:start",
+            url: queryUrl,
+            method: method,
+            instanceId: instanceIdRef.current,
+            dataSourceId: (loader.props as any).id,
+            dataType: "sql",
+            body: { sql: sqlQuery, params: sqlParams },
+          }, xsLogMax);
+        }
+
         try {
-          //console.log("[SQL DataLoader] Starting SQL data load");
-          // Extract SQL query from the body or rawBody
-          let sqlQuery: string = "";
-          let sqlParams: any[] = [];
-
-          // Try to extract SQL query and parameters from body or rawBody
-          if (body && typeof body === "object") {
-            //console.log("[SQL DataLoader] Using body object:", body);
-            sqlQuery = body.sql || "";
-            sqlParams = body.params || [];
-          } else if (rawBody) {
-            //console.log("[SQL DataLoader] Using rawBody:", rawBody);
-            try {
-              const parsedBody = JSON.parse(rawBody);
-              sqlQuery = parsedBody.sql || "";
-              sqlParams = parsedBody.params || [];
-            } catch (e) {
-              // If rawBody is not valid JSON, use it as the SQL query
-              //console.log("[SQL DataLoader] rawBody is not valid JSON, using as SQL query");
-              sqlQuery = rawBody;
-            }
-          }
-
-          //console.log("[SQL DataLoader] SQL Query:", sqlQuery);
-          //console.log("[SQL DataLoader] SQL Params:", sqlParams);
-
-          // If SQL query is empty, throw an error
-          if (!sqlQuery) {
-            //console.error("[SQL DataLoader] SQL query is empty");
-            throw new Error("SQL query is required for SQL data type");
-          }
-
-          // Prepare request to /query endpoint
-          const queryUrl = url || "/query";
-          const method = extractParam(state, loader.props.method, appContext) || "POST";
-          const headers = extractParam(state, loader.props.headers, appContext) || {
-            "Content-Type": "application/json",
-          };
-
-          //console.log("[SQL DataLoader] Request URL:", queryUrl);
-          //console.log("[SQL DataLoader] Request Method:", method);
-          //console.log("[SQL DataLoader] Request Headers:", headers);
-
-          const requestBody = JSON.stringify({
-            sql: sqlQuery,
-            params: sqlParams,
-          });
-
-          //console.log("[SQL DataLoader] Request Body:", requestBody);
-
-          const fetchOptions: RequestInit = {
-            method,
-            headers,
-            body: requestBody,
-          };
-
-          if (abortSignal) {
-            fetchOptions.signal = abortSignal;
-          }
-
-          //console.log("[SQL DataLoader] Sending fetch request...");
           const response = await fetch(queryUrl, fetchOptions);
-          //console.log("[SQL DataLoader] Response status:", response.status, response.statusText);
 
           if (!response.ok) {
-            console.error(
-              "[SQL DataLoader] Failed response:",
-              response.status,
-              response.statusText,
-            );
-            throw new Error(
-              `Failed to execute SQL query: ${response.status} ${response.statusText}`,
-            );
+            const errorMsg = `Failed to execute SQL query: ${response.status} ${response.statusText}`;
+            // Trace API call error
+            if (xsVerbose) {
+              pushXsLog({
+                ts: Date.now(),
+                perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+                traceId: getCurrentTrace(),
+                kind: "api:error",
+                url: queryUrl,
+                method: method,
+                instanceId: instanceIdRef.current,
+                dataSourceId: (loader.props as any).id,
+                dataType: "sql",
+                error: { message: errorMsg },
+                status: response.status,
+              }, xsLogMax);
+            }
+            throw new Error(errorMsg);
           }
 
           // Parse response as JSON
           const jsonResult = await response.json();
-          //console.log("[SQL DataLoader] Response data:", jsonResult);
 
-          // Check the structure of the response
+          // Determine the final result
+          let finalResult = jsonResult;
           if (jsonResult && typeof jsonResult === "object") {
-            //console.log("[SQL DataLoader] Response keys:", Object.keys(jsonResult));
-
-            // If response has rows property, check if it's in expected format
             if (jsonResult.rows) {
-              //console.log("[SQL DataLoader] Response has 'rows' property:", jsonResult.rows);
-              //console.log("[SQL DataLoader] rows is array:", Array.isArray(jsonResult.rows));
-              // if (Array.isArray(jsonResult.rows) && jsonResult.rows.length > 0) {
-              //   console.log("[SQL DataLoader] First row:", jsonResult.rows[0]);
-              // }
-
-              // Return rows directly for easier table rendering
-              return jsonResult.rows;
-            }
-
-            // Check for other common SQL result formats
-            if (jsonResult.results) {
-              //console.log("[SQL DataLoader] Response has 'results' property");
-              return jsonResult.results;
+              finalResult = jsonResult.rows;
+            } else if (jsonResult.results) {
+              finalResult = jsonResult.results;
             }
           }
 
-          return jsonResult;
-        } catch (error) {
+          // Trace API call completion
+          if (xsVerbose) {
+            pushXsLog({
+              ts: Date.now(),
+              perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+              traceId: getCurrentTrace(),
+              kind: "api:complete",
+              url: queryUrl,
+              method: method,
+              instanceId: instanceIdRef.current,
+              dataSourceId: (loader.props as any).id,
+              dataType: "sql",
+              result: finalResult,
+              status: response.status,
+            }, xsLogMax);
+          }
+
+          return finalResult;
+        } catch (error: any) {
+          // Trace API call error (for network errors, etc.)
+          if (xsVerbose && error?.message && !error.message.startsWith("Failed to execute SQL query:")) {
+            pushXsLog({
+              ts: Date.now(),
+              perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+              traceId: getCurrentTrace(),
+              kind: "api:error",
+              url: queryUrl,
+              method: method,
+              instanceId: instanceIdRef.current,
+              dataSourceId: (loader.props as any).id,
+              dataType: "sql",
+              error: { message: error?.message || String(error), stack: error?.stack },
+            }, xsLogMax);
+          }
           console.error("Error executing SQL query:", error);
           throw error;
         }
@@ -401,7 +429,7 @@ function DataLoader({
               method: method,
               instanceId: instanceIdRef.current,
               dataSourceId: (loader.props as any).id,
-              error: e?.message || String(e),
+              error: { message: e?.message || String(e), stack: e?.stack },
             }, xsLogMax);
           }
           throw e;
