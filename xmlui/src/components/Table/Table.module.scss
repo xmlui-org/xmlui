@@ -127,7 +127,6 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
     font-size: $fontSize-heading-Table;
     color: $textColor-heading-Table;
     font-weight: $fontWeight-heading-Table;
-    user-select: text;
     @include t.paddingVars($themeVars, "heading-#{$component}");
   }
 
@@ -142,7 +141,6 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
     align-items: center;
     white-space: nowrap;
     text-overflow: ellipsis;
-    user-select: text;
     overflow: hidden;
 
     &.alignTop {
@@ -167,7 +165,6 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
       display: flex;
       flex-direction: row;
       border-bottom: $borderBottom-cell-Table;
-      user-select: none;
       //background-color: inherit;
 
       .checkBoxWrapper {
