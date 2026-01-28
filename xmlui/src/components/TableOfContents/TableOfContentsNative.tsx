@@ -2,7 +2,9 @@ import {
   type CSSProperties,
   type ForwardedRef,
   forwardRef,
+  useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -14,6 +16,14 @@ import classnames from "classnames";
 import styles from "./TableOfContents.module.scss";
 import { useTableOfContents } from "../../components-core/TableOfContentsContext";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
+import { useIndicatorPosition } from "./useIndicatorPosition";
+
+// Scroll options for smooth/auto scrolling behavior
+const SCROLL_OPTIONS = {
+  block: "center" as const,
+  inline: "center" as const,
+  scrollMode: "always" as const,
+} as const;
 
 type Props = {
   style?: CSSProperties;
@@ -52,51 +62,55 @@ export const TableOfContents = forwardRef(function TableOfContents(
   } = useTableOfContents();
   const [activeAnchorId, setActiveId] = useState(initialActiveAnchorId);
 
+  const ref = forwardedRef ? composeRefs(tocRef, forwardedRef) : tocRef;
+
+  const filteredHeadings = useMemo(
+    () =>
+      headings.filter(
+        (heading) =>
+          heading.level <= maxHeadingLevel && (!omitH1 || heading.level !== 1),
+      ),
+    [headings, maxHeadingLevel, omitH1],
+  );
+
   useIsomorphicLayoutEffect(() => {
     return subscribeToActiveAnchorChange((id) => {
-      const foundHeading = headings.find((heading) => heading.id === id);
-      if (foundHeading?.level <= maxHeadingLevel) {
+      const foundHeading = filteredHeadings.find((heading) => heading.id === id);
+      if (foundHeading) {
         setActiveId(id);
       }
     });
-  }, [headings, maxHeadingLevel, subscribeToActiveAnchorChange]);
+  }, [filteredHeadings, subscribeToActiveAnchorChange]);
 
-  const ref = forwardedRef ? composeRefs(tocRef, forwardedRef) : tocRef;
+  const handleLinkClick = useCallback(
+    (anchorId: string) => (event: React.MouseEvent<HTMLAnchorElement>) => {
+      // Allow cmd/ctrl+click to open in new tab via browser default behavior
+      const shouldAllowDefault = event.ctrlKey || event.metaKey;
+
+      if (!shouldAllowDefault) {
+        event.preventDefault();
+        scrollToAnchor(anchorId, smoothScrolling);
+      }
+    },
+    [scrollToAnchor, smoothScrolling],
+  );
 
   useEffect(() => {
-    if (activeAnchorId && tocRef?.current) {
-      const activeAnchor = tocRef.current.querySelector(`#${activeAnchorId}`);
-      if (activeAnchor) {
-        scrollIntoView(activeAnchor, {
-          block: "center",
-          inline: "center",
-          behavior: "smooth",
-          scrollMode: "always",
-          boundary: tocRef.current,
-        });
-      }
-    }
-  }, [activeAnchorId, headings]);
+    if (!activeAnchorId || !tocRef.current) return;
 
-  // Position indicator over active item
-  useEffect(() => {
-    if (activeAnchorId && tocRef?.current && indicatorRef?.current) {
-      const activeItem = tocRef.current.querySelector(`li.${styles.active}`);
-      if (activeItem) {
-        const navRect = tocRef.current.getBoundingClientRect();
-        const itemRect = activeItem.getBoundingClientRect();
-        const relativeTop = itemRect.top - navRect.top + tocRef.current.scrollTop;
-        const relativeLeft = itemRect.left - navRect.left;
+    const activeAnchor = tocRef.current.querySelector(
+      `[id="${CSS.escape(activeAnchorId)}"]`,
+    );
+    if (!activeAnchor) return;
 
-        indicatorRef.current.style.top = `${relativeTop}px`;
-        indicatorRef.current.style.left = `${relativeLeft}px`;
-        indicatorRef.current.style.height = `${itemRect.height}px`;
-        indicatorRef.current.style.display = "block";
-      }
-    } else if (indicatorRef?.current) {
-      indicatorRef.current.style.display = "none";
-    }
-  }, [activeAnchorId, headings]);
+    scrollIntoView(activeAnchor, {
+      ...SCROLL_OPTIONS,
+      behavior: smoothScrolling ? "smooth" : "auto",
+      boundary: tocRef.current,
+    });
+  }, [activeAnchorId, smoothScrolling]);
+
+  useIndicatorPosition(activeAnchorId, tocRef, indicatorRef, styles.active);
 
   return (
     <nav
@@ -109,42 +123,25 @@ export const TableOfContents = forwardRef(function TableOfContents(
     >
       <div className={styles.indicator} ref={indicatorRef} />
       <ul className={styles.list}>
-        {headings.map((value) => {
-          if (value.level <= maxHeadingLevel && (!omitH1 || value.level !== 1)) {
-            return (
-              <li
-                key={value.id}
-                className={classnames(styles.listItem, {
-                  [styles.active]: value.id === activeAnchorId,
-                })}
-              >
-                <Link
-                  aria-current={value.id === activeAnchorId ? "page" : "false"}
-                  className={classnames(styles.link, {
-                    [styles.head_1]: value.level === 1,
-                    [styles.head_2]: value.level === 2,
-                    [styles.head_3]: value.level === 3,
-                    [styles.head_4]: value.level === 4,
-                    [styles.head_5]: value.level === 5,
-                    [styles.head_6]: value.level === 6,
-                  })}
-                  to={`#${value.id}`}
-                  onClick={(event) => {
-                    // cmd/ctrl + click - open in new tab, don't prevent that
-                    if (!event.ctrlKey && !event.metaKey) {
-                      event.preventDefault();
-                    }
-                    scrollToAnchor(value.id, smoothScrolling);
-                  }}
-                  id={value.id}
-                >
-                  {value.text}
-                </Link>
-              </li>
-            );
-          }
-          return null;
-        })}
+        {filteredHeadings.map((value) => (
+          <li
+            key={value.id}
+            className={classnames(styles.listItem, {
+              [styles.active]: value.id === activeAnchorId,
+            })}
+          >
+            <Link
+              aria-current={value.id === activeAnchorId ? "page" : "false"}
+              className={styles.link}
+              data-level={value.level}
+              to={`#${value.id}`}
+              onClick={handleLinkClick(value.id)}
+              id={value.id}
+            >
+              {value.text}
+            </Link>
+          </li>
+        ))}
       </ul>
     </nav>
   );
