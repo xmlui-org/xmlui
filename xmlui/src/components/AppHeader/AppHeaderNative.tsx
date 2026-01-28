@@ -5,7 +5,7 @@ import classnames from "classnames";
 import styles from "./AppHeader.module.scss";
 
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
-import { useResourceUrl, useTheme } from "../../components-core/theming/ThemeContext";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import { useAppContext } from "../../components-core/AppContext";
 import { Icon } from "../../components/Icon/IconNative";
@@ -45,11 +45,11 @@ export function useLogoUrl() {
     light: logoLight,
     dark: logoDark,
   };
-  const { activeThemeTone } = useTheme();
+  const { activeThemeTone, getResourceUrl } = useTheme();
 
-  const baseLogoUrl = useResourceUrl("resource:logo") || logo;
+  const baseLogoUrl = getResourceUrl("resource:logo") || logo;
   const toneLogoUrl =
-    useResourceUrl(`resource:logo-${activeThemeTone}`) || logoUrlByTone[activeThemeTone];
+    getResourceUrl(`resource:logo-${activeThemeTone}`) || logoUrlByTone[activeThemeTone];
 
   return toneLogoUrl || baseLogoUrl;
 }

@@ -3,7 +3,7 @@ import type React from "react";
 import styles from "./Icon.module.scss";
 import { useCustomSvgIconRenderer, useIconRegistry } from "../IconRegistryContext";
 import classnames from "classnames";
-import { useResourceUrl, useTheme } from "../../components-core/theming/ThemeContext";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 import { toCssVar } from "../../parsers/style-parser/StyleParser";
 import type { IconRegistryEntry } from "../IconProvider";
 
@@ -66,11 +66,10 @@ export const Icon = forwardRef(function Icon(
     onKeyDown: handleKeyDown,
     tabIndex: onClick ? (tabIndex ?? 0) : tabIndex,
   };
-
   // ---
   const customIconUrl = useCustomIconUrl(name);
   if (customIconUrl) {
-    return <CustomIcon {...computedProps} url={customIconUrl} name={name} ref={ref} />;
+    return <CustomIcon {...computedProps} iconResourceUrl={customIconUrl} name={name} ref={ref} />;
   }
 
   const renderedIcon = iconRenderer?.renderer?.(computedProps, ref);
@@ -86,11 +85,21 @@ export const Icon = forwardRef(function Icon(
 });
 
 const CustomIcon = forwardRef(function CustomIcon(
-  props: IconBaseProps & { size?: string; url: string },
+  props: IconBaseProps & { size?: string; iconResourceUrl: string },
   ref: ForwardedRef<HTMLElement>,
 ) {
-  const { url, width, height, name, style, className, onClick, onKeyDown, tabIndex, ...rest } =
-    props;
+  const {
+    iconResourceUrl,
+    width,
+    height,
+    name,
+    style,
+    className,
+    onClick,
+    onKeyDown,
+    tabIndex,
+    ...rest
+  } = props;
 
   // Handle keyboard events for clickable icons
   const handleKeyDown = (event: React.KeyboardEvent<any>) => {
@@ -101,11 +110,10 @@ const CustomIcon = forwardRef(function CustomIcon(
     onKeyDown?.(event);
   };
 
-  const resourceUrl = useResourceUrl(url);
-  const isSvgIcon = resourceUrl?.toLowerCase()?.endsWith(".svg");
-  const customSvgIconRenderer = useCustomSvgIconRenderer(resourceUrl);
+  const isSvgIcon = iconResourceUrl?.toLowerCase()?.endsWith(".svg");
+  const customSvgIconRenderer = useCustomSvgIconRenderer(iconResourceUrl);
 
-  if (resourceUrl && isSvgIcon) {
+  if (iconResourceUrl && isSvgIcon) {
     const renderedIcon = customSvgIconRenderer?.({
       style,
       className,
@@ -136,7 +144,7 @@ const CustomIcon = forwardRef(function CustomIcon(
   return (
     <img
       ref={ref as ForwardedRef<HTMLImageElement>}
-      src={resourceUrl}
+      src={iconResourceUrl}
       data-icon-name={name}
       style={{ width, height, ...style }}
       alt={name}

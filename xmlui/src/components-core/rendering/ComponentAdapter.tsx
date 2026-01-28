@@ -1,5 +1,13 @@
 import type { MutableRefObject, ReactElement, ReactNode } from "react";
-import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  cloneElement,
+  forwardRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { isEmpty, isPlainObject } from "lodash-es";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
@@ -225,7 +233,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       }
       return getResourceUrl(extractedUrl);
     },
-    [getResourceUrl, valueExtractor, safeNode.type],
+    [getResourceUrl, valueExtractor],
   );
 
   // --- Collect and compile the layout property values
@@ -252,7 +260,14 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     //   ...layoutContextRef?.current,
     //   mediaSize: appContext.mediaSize,
     // });
-  }, [appContext.mediaSize, layoutContextRef, safeNode.props, valueExtractor, themeDisableInlineStyle]);
+  }, [
+    layoutContextRef,
+    appContext.mediaSize,
+    appContext.appGlobals?.disableInlineStyle,
+    themeDisableInlineStyle,
+    safeNode.props,
+    valueExtractor,
+  ]);
 
   // const className = useComponentStyle(cssProps);
 
@@ -275,14 +290,14 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     const prevWhenValue = prevWhenValueRef.current;
 
     // --- Determine if we should call init
-    const shouldCallInit = 
+    const shouldCallInit =
       // Case 1: First render and when is not set (implicitly true) or is true
       (prevWhenValue === undefined && currentWhenValue) ||
       // Case 2: Transition from false to true
       (prevWhenValue === false && currentWhenValue === true);
 
     // --- Determine if we should call cleanup
-    const shouldCallCleanup = 
+    const shouldCallCleanup =
       // Transition from true to false
       prevWhenValue === true && currentWhenValue === false;
 
