@@ -120,14 +120,8 @@ export const TableOfContents = forwardRef(function TableOfContents(
               >
                 <Link
                   aria-current={value.id === activeAnchorId ? "page" : "false"}
-                  className={classnames(styles.link, {
-                    [styles.head_1]: value.level === 1,
-                    [styles.head_2]: value.level === 2,
-                    [styles.head_3]: value.level === 3,
-                    [styles.head_4]: value.level === 4,
-                    [styles.head_5]: value.level === 5,
-                    [styles.head_6]: value.level === 6,
-                  })}
+                  className={styles.link}
+                  data-level={value.level}
                   to={`#${value.id}`}
                   onClick={(event) => {
                     // cmd/ctrl + click - open in new tab, don't prevent that

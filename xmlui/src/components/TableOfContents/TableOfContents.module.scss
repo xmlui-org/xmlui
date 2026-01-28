@@ -97,32 +97,32 @@ $color-indicator-TableOfContents--active: createThemeVar("color-indicator-#{$com
           @include t.paddingVars($themeVars, $componentItem);
           @include t.textVars($themeVars, $componentItem);
 
-          &.head_1 {
+          &[data-level="1"] {
             @include t.paddingVars($themeVars, "#{$componentItem}-level-1");
             @include t.textVars($themeVars, "#{$componentItem}-level-1");
           }
 
-          &.head_2 {
+          &[data-level="2"] {
             @include t.paddingVars($themeVars, "#{$componentItem}-level-2");
             @include t.textVars($themeVars, "#{$componentItem}-level-2");
           }
 
-          &.head_3 {
+          &[data-level="3"] {
             @include t.paddingVars($themeVars, "#{$componentItem}-level-3");
             @include t.textVars($themeVars, "#{$componentItem}-level-3");
           }
 
-          &.head_4 {
+          &[data-level="4"] {
             @include t.paddingVars($themeVars, "#{$componentItem}-level-4");
             @include t.textVars($themeVars, "#{$componentItem}-level-4");
           }
 
-          &.head_5 {
+          &[data-level="5"] {
             @include t.paddingVars($themeVars, "#{$componentItem}-level-5");
             @include t.textVars($themeVars, "#{$componentItem}-level-5");
           }
 
-          &.head_6 {
+          &[data-level="6"] {
             @include t.paddingVars($themeVars, "#{$componentItem}-level-6");
             @include t.textVars($themeVars, "#{$componentItem}-level-6");
           }
@@ -136,22 +136,22 @@ $color-indicator-TableOfContents--active: createThemeVar("color-indicator-#{$com
             font-weight: $fontWeight-TableOfContentsItem--hover;
             color: $textColor-TableOfContentsItem--hover;
 
-            &.head_1 {
+            &[data-level="1"] {
               font-weight: $fontWeight-TableOfContentsItem-level-1--hover;
             }
-            &.head_2 {
+            &[data-level="2"] {
               font-weight: $fontWeight-TableOfContentsItem-level-2--hover;
             }
-            &.head_3 {
+            &[data-level="3"] {
               font-weight: $fontWeight-TableOfContentsItem-level-3--hover;
             }
-            &.head_4 {
+            &[data-level="4"] {
               font-weight: $fontWeight-TableOfContentsItem-level-4--hover;
             }
-            &.head_5 {
+            &[data-level="5"] {
               font-weight: $fontWeight-TableOfContentsItem-level-5--hover;
             }
-            &.head_6 {
+            &[data-level="6"] {
               font-weight: $fontWeight-TableOfContentsItem-level-6--hover;
             }
           }
@@ -164,22 +164,22 @@ $color-indicator-TableOfContents--active: createThemeVar("color-indicator-#{$com
             color: $textColor-TableOfContentsItem--active;
             font-weight: $fontWeight-TableOfContentsItem--active;
 
-            &.head_1 {
+            &[data-level="1"] {
               font-weight: $fontWeight-TableOfContentsItem-level-1--active;
             }
-            &.head_2 {
+            &[data-level="2"] {
               font-weight: $fontWeight-TableOfContentsItem-level-2--active;
             }
-            &.head_3 {
+            &[data-level="3"] {
               font-weight: $fontWeight-TableOfContentsItem-level-3--active;
             }
-            &.head_4 {
+            &[data-level="4"] {
               font-weight: $fontWeight-TableOfContentsItem-level-4--active;
             }
-            &.head_5 {
+            &[data-level="5"] {
               font-weight: $fontWeight-TableOfContentsItem-level-5--active;
             }
-            &.head_6 {
+            &[data-level="6"] {
               font-weight: $fontWeight-TableOfContentsItem-level-6--active;
             }
           }
