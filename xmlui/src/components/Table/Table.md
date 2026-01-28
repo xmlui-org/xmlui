@@ -700,6 +700,42 @@ The default value is `false`.
 
 %-PROP-END
 
+%-PROP-START hideSelectionCheckboxes
+
+Hides the selection checkboxes in both the header and rows while keeping the selection API and keyboard selection behavior intact. Useful when you want selection functionality without visible checkboxes.
+
+The default value is `false`.
+
+```xmlui copy /hideSelectionCheckboxes="true"/
+<App>
+  <Table data='{[...]}' rowsSelectable="true" enableMultiRowSelection="true" hideSelectionCheckboxes="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+```xmlui-pg name="Example: hideSelectionCheckboxes"
+<App>
+  <Table data='{[
+    { id: 0, name: "Apples", quantity: 5, unit: "pieces" },
+    { id: 1, name: "Bananas", quantity: 6, unit: "pieces" },
+    { id: 2, name: "Carrots", quantity: 100, unit: "grams" },
+    { id: 3, name: "Spinach", quantity: 1, unit: "bunch" }
+  ]}'
+    rowsSelectable="true"
+    enableMultiRowSelection="true"
+    hideSelectionCheckboxes="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+%-PROP-END
+
 %-PROP-START checkboxTolerance
 
 The default value is `false`.

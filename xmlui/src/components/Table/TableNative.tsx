@@ -133,6 +133,7 @@ type TableProps = {
   autoFocus?: boolean;
   hideHeader?: boolean;
   hideNoDataView?: boolean;
+  hideSelectionCheckboxes?: boolean;
   alwaysShowSelectionHeader?: boolean;
   alwaysShowSortingIndicator?: boolean;
   alwaysShowPagination?: boolean;
@@ -275,6 +276,7 @@ export const Table = forwardRef(
       autoFocus = defaultProps.autoFocus,
       hideHeader = defaultProps.hideHeader,
       hideNoDataView = defaultProps.hideNoDataView,
+      hideSelectionCheckboxes = defaultProps.hideSelectionCheckboxes,
       alwaysShowPagination,
       alwaysShowSelectionHeader = defaultProps.alwaysShowSelectionHeader,
       alwaysShowSortingIndicator = defaultProps.alwaysShowSortingIndicator,
@@ -497,6 +499,9 @@ export const Table = forwardRef(
 
     // --- Prepare column renderers according to columns defined in the table supporting optional row selection
     const columnsWithSelectColumn: ColumnDef<any>[] = useMemo(() => {
+      if (hideSelectionCheckboxes) {
+        return columnsWithCustomCell;
+      }
       // --- Extend the columns with a selection checkbox (indeterminate)
       const selectColumn = {
         id: "select",
@@ -567,6 +572,7 @@ export const Table = forwardRef(
       rowUnselectablePredicate,
       hoveredRowId,
       headerCheckboxHovered,
+      hideSelectionCheckboxes,
     ]);
 
     // --- Set up page information (using the first page size option)
@@ -1217,6 +1223,7 @@ export const defaultProps = {
   autoFocus: false,
   hideHeader: false,
   hideNoDataView: false,
+  hideSelectionCheckboxes: false,
   alwaysShowSelectionHeader: false,
   alwaysShowSortingIndicator: false,
   noBottomBorder: false,
@@ -1230,7 +1237,6 @@ export const defaultProps = {
   pageInfoPosition: "end" as Position,
   checkboxTolerance: "compact" as CheckboxTolerance,
   rowHeight: 40, // For virtua virtualization
-  onRowDoubleClick: undefined as unknown as ((item: any) => void) | undefined,
   userSelectCell: "auto",
   userSelectRow: "auto",
   userSelectHeading: "none",

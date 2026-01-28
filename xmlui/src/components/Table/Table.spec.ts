@@ -308,6 +308,29 @@ test.describe("Basic Functionality", () => {
     });
   });
 
+  // Tests for hideSelectionCheckboxes prop (separate prop from rowsSelectable)
+  test.describe("hideSelectionCheckboxes property", () => {
+    test("hides checkboxes when true", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="true" hideSelectionCheckboxes="true" testId="table">
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      const checkboxesHidden = page.locator("input[type='checkbox']");
+      await expect(checkboxesHidden).toHaveCount(0);
+    });
+
+    test("shows checkboxes when false", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="true" testId="table">
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      const checkboxesShown = page.locator("input[type='checkbox']");
+      await expect(checkboxesShown).toHaveCount(5);
+    });
+  });
+
   test.describe("autoFocus property", () => {
     test("focuses table when autoFocus is true", async ({ initTestBed, page }) => {
       await initTestBed(`
@@ -1645,8 +1668,8 @@ test.describe("Pagination Features", () => {
 
     test("userSelect properties apply when explicitly set", async ({ initTestBed, page }) => {
       await initTestBed(`
-        <Table 
-          data='{${JSON.stringify(sampleData)}}' 
+        <Table
+          data='{${JSON.stringify(sampleData)}}'
           userSelectCell="auto"
           userSelectRow="auto"
           userSelectHeading="none"
@@ -1669,8 +1692,8 @@ test.describe("Pagination Features", () => {
 
     test("userSelect properties can be set independently", async ({ initTestBed, page }) => {
       await initTestBed(`
-        <Table 
-          data='{${JSON.stringify(sampleData)}}' 
+        <Table
+          data='{${JSON.stringify(sampleData)}}'
           userSelectCell="text"
           userSelectRow="none"
           userSelectHeading="all"
@@ -1714,8 +1737,8 @@ test.describe("Pagination Features", () => {
 
     test("property values override theme variables", async ({ initTestBed, page }) => {
       await initTestBed(`
-        <Table 
-          data='{${JSON.stringify(sampleData)}}' 
+        <Table
+          data='{${JSON.stringify(sampleData)}}'
           userSelectCell="text"
           testId="table">
           <Column bindTo="name" header="Name"/>
@@ -2094,11 +2117,11 @@ test.describe("Column Alignment", () => {
           <Column bindTo="quantity" header="Quantity" horizontalAlignment="end"/>
         </Table>
       `);
-      
+
       // Get the second column cells (quantity column)
       const quantityCells = page.locator("td:nth-child(2)");
       const firstCell = quantityCells.first();
-      
+
       // Verify the cell has flex display and justify-content: flex-end
       await expect(firstCell).toHaveCSS("display", "flex");
       await expect(firstCell).toHaveCSS("justify-content", "flex-end");
@@ -2112,10 +2135,10 @@ test.describe("Column Alignment", () => {
           <Column bindTo="quantity" header="Quantity" horizontalAlignment="center"/>
         </Table>
       `);
-      
+
       const quantityCells = page.locator("td:nth-child(2)");
       const firstCell = quantityCells.first();
-      
+
       await expect(firstCell).toHaveCSS("display", "flex");
       await expect(firstCell).toHaveCSS("justify-content", "center");
       await expect(firstCell).toHaveCSS("text-align", "center");
@@ -2128,10 +2151,10 @@ test.describe("Column Alignment", () => {
           <Column bindTo="quantity" header="Quantity" horizontalAlignment="start"/>
         </Table>
       `);
-      
+
       const quantityCells = page.locator("td:nth-child(2)");
       const firstCell = quantityCells.first();
-      
+
       await expect(firstCell).toHaveCSS("display", "flex");
       await expect(firstCell).toHaveCSS("justify-content", "flex-start");
       await expect(firstCell).toHaveCSS("text-align", "start");
@@ -2144,10 +2167,10 @@ test.describe("Column Alignment", () => {
           <Column bindTo="quantity" header="Quantity" horizontalAlignment="end" backgroundColor="lightyellow"/>
         </Table>
       `);
-      
+
       const quantityCells = page.locator("td:nth-child(2)");
       const firstCell = quantityCells.first();
-      
+
       // Verify alignment
       await expect(firstCell).toHaveCSS("justify-content", "flex-end");
       // Verify background color is applied
@@ -2161,10 +2184,10 @@ test.describe("Column Alignment", () => {
           <Column bindTo="quantity" header="Quantity" horizontalAlignment="end"/>
         </Table>
       `);
-      
+
       const quantityCells = page.locator("td:nth-child(2)");
       const cellCount = await quantityCells.count();
-      
+
       // Verify all cells in the column have the alignment
       for (let i = 0; i < cellCount; i++) {
         const cell = quantityCells.nth(i);
@@ -2181,10 +2204,10 @@ test.describe("Column Alignment", () => {
           <Column bindTo="quantity" header="Quantity" verticalAlignment="start"/>
         </Table>
       `);
-      
+
       const quantityCells = page.locator("td:nth-child(2)");
       const firstCell = quantityCells.first();
-      
+
       await expect(firstCell).toHaveCSS("display", "flex");
       await expect(firstCell).toHaveCSS("align-items", "flex-start");
     });
@@ -2196,10 +2219,10 @@ test.describe("Column Alignment", () => {
           <Column bindTo="quantity" header="Quantity" verticalAlignment="center"/>
         </Table>
       `);
-      
+
       const quantityCells = page.locator("td:nth-child(2)");
       const firstCell = quantityCells.first();
-      
+
       await expect(firstCell).toHaveCSS("display", "flex");
       await expect(firstCell).toHaveCSS("align-items", "center");
     });
@@ -2211,10 +2234,10 @@ test.describe("Column Alignment", () => {
           <Column bindTo="quantity" header="Quantity" verticalAlignment="end"/>
         </Table>
       `);
-      
+
       const quantityCells = page.locator("td:nth-child(2)");
       const firstCell = quantityCells.first();
-      
+
       await expect(firstCell).toHaveCSS("display", "flex");
       await expect(firstCell).toHaveCSS("align-items", "flex-end");
     });
@@ -2228,10 +2251,10 @@ test.describe("Column Alignment", () => {
           <Column bindTo="quantity" header="Quantity" horizontalAlignment="end" verticalAlignment="center"/>
         </Table>
       `);
-      
+
       const quantityCells = page.locator("td:nth-child(2)");
       const firstCell = quantityCells.first();
-      
+
       await expect(firstCell).toHaveCSS("display", "flex");
       await expect(firstCell).toHaveCSS("justify-content", "flex-end");
       await expect(firstCell).toHaveCSS("align-items", "center");
@@ -2245,11 +2268,11 @@ test.describe("Column Alignment", () => {
           <Column bindTo="category" header="Category" horizontalAlignment="center"/>
         </Table>
       `);
-      
+
       const nameCell = page.locator("td:nth-child(1)").first();
       const quantityCell = page.locator("td:nth-child(2)").first();
       const categoryCell = page.locator("td:nth-child(3)").first();
-      
+
       await expect(nameCell).toHaveCSS("justify-content", "flex-start");
       await expect(quantityCell).toHaveCSS("justify-content", "flex-end");
       await expect(categoryCell).toHaveCSS("justify-content", "center");
