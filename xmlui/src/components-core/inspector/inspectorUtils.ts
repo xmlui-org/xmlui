@@ -167,6 +167,7 @@ export function formatChange(change: {
 export interface XsLogEntry {
   ts: number;
   perfTs?: number;
+  startPerfTs?: number;
   traceId?: string;
   kind?: string;
   eventName?: string;

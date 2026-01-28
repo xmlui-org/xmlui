@@ -213,6 +213,7 @@ export const Container = memo(
             ownerFileId: detail?.ownerFileId,
             ownerSource: detail?.ownerSource,
             duration: detail?.duration,
+            startPerfTs: detail?.startPerfTs,
             handlerCode: detail?.handlerCode,
           }, xsLogMax);
           if (xsLogBucket && appContext.AppState) {
@@ -490,6 +491,7 @@ export const Container = memo(
               componentLabel,
               returnValue,
               duration: handlerDuration,
+              startPerfTs: handlerStartPerfTs,
               ownerFileId: handlerFileId,
               ownerSource: handlerSourceRange,
               handlerCode,
@@ -845,13 +847,6 @@ export const Container = memo(
       ],
     );
 
-    // --- Log the component state if you need it for debugging
-    if ((node.props as any)?.debug) {
-      console.log(`Container: ${resolvedKey}`, {
-        componentState,
-        node,
-      });
-    }
 
     // --- Use this object to store information about already rendered UIDs.
     // --- We do not allow any action, loader, or transform to use the same UID; however (as of now) children
