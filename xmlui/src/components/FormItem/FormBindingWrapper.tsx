@@ -141,9 +141,9 @@ export function FormBindingWrapper({
     dispatch(fieldLostFocus(formItemId));
   });
 
-  // If not inside a form, or if already inside a FormItem, just render the children
+  // If already inside a FormItem, just render the children
   // The FormItem will handle the form binding in that case
-  if (!isInsideForm || isInsideFormItem) {
+  if (isInsideFormItem) {
     return children;
   }
 
@@ -159,8 +159,16 @@ export function FormBindingWrapper({
     registerComponentApi: registerComponentApi ?? childRegisterComponentApi,
   });
 
+  // If not inside a form and no label, just return the children
+  if (!isInsideForm && !label) {
+    return children;
+  }
+
+  // Always wrap with ItemWithLabel if label is provided or inside a form
+  // This ensures labels are displayed for components with bindTo prop even outside of Forms
   return (
     <ItemWithLabel
+      id={formItemId}
       labelPosition={labelPositionValue}
       label={label}
       labelWidth={labelWidthValue}
