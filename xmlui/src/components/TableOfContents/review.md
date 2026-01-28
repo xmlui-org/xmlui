@@ -413,6 +413,46 @@ After completing these refactorings:
 
 ## Refactoring Progress
 
+### Step 4: Fix smoothScrolling Consistency
+**Status:** ✅ Completed  
+**Started:** January 28, 2026  
+**Completed:** January 28, 2026
+
+**Changes Made:**
+- Updated the scroll behavior in the automatic scroll effect to respect the `smoothScrolling` prop
+- Changed `behavior: "smooth"` to `behavior: smoothScrolling ? "smooth" : "auto"`
+- Added `smoothScrolling` to the useEffect dependency array
+- Now automatic scrolling respects user preference, consistent with click-based navigation
+
+**Results:**
+- ✅ No linting issues
+- ✅ All 33 e2e tests passed (1 skipped)
+- ✅ Specific smoothScrolling tests passed (2 tests)
+- Behavior is now consistent across all scrolling interactions
+
+---
+
+### Step 3: Improve Event Handler Readability
+**Status:** ✅ Completed  
+**Started:** January 28, 2026  
+**Completed:** January 28, 2026
+
+**Changes Made:**
+- Added `useCallback` import to React imports
+- Extracted inline `onClick` handler into a named `handleLinkClick` function
+- Made the function clearer by:
+  - Using explicit `shouldAllowDefault` variable for intent clarity
+  - Improving comment to explain the actual behavior (allow cmd/ctrl+click for new tab)
+  - Using `useCallback` to prevent recreation on every render
+  - Accepting `anchorId` parameter and returning a click handler function
+
+**Results:**
+- ✅ No linting issues
+- ✅ All 33 e2e tests passed (1 skipped)
+- Code is now more readable and testable
+
+---
+
 ### Step 2: Simplify Render Filter Logic
 **Status:** ✅ Completed  
 **Started:** January 28, 2026  

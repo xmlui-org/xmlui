@@ -2,6 +2,7 @@ import {
   type CSSProperties,
   type ForwardedRef,
   forwardRef,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -73,6 +74,19 @@ export const TableOfContents = forwardRef(function TableOfContents(
     });
   }, [filteredHeadings, subscribeToActiveAnchorChange]);
 
+  const handleLinkClick = useCallback(
+    (anchorId: string) => (event: React.MouseEvent<HTMLAnchorElement>) => {
+      // Allow cmd/ctrl+click to open in new tab via browser default behavior
+      const shouldAllowDefault = event.ctrlKey || event.metaKey;
+
+      if (!shouldAllowDefault) {
+        event.preventDefault();
+        scrollToAnchor(anchorId, smoothScrolling);
+      }
+    },
+    [scrollToAnchor, smoothScrolling],
+  );
+
   useEffect(() => {
     if (activeAnchorId && tocRef?.current) {
       const activeAnchor = tocRef.current.querySelector(`#${activeAnchorId}`);
@@ -80,13 +94,13 @@ export const TableOfContents = forwardRef(function TableOfContents(
         scrollIntoView(activeAnchor, {
           block: "center",
           inline: "center",
-          behavior: "smooth",
+          behavior: smoothScrolling ? "smooth" : "auto",
           scrollMode: "always",
           boundary: tocRef.current,
         });
       }
     }
-  }, [activeAnchorId]);
+  }, [activeAnchorId, smoothScrolling]);
 
   // Position indicator over active item
   useEffect(() => {
@@ -131,13 +145,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
               className={styles.link}
               data-level={value.level}
               to={`#${value.id}`}
-              onClick={(event) => {
-                // cmd/ctrl + click - open in new tab, don't prevent that
-                if (!event.ctrlKey && !event.metaKey) {
-                  event.preventDefault();
-                }
-                scrollToAnchor(value.id, smoothScrolling);
-              }}
+              onClick={handleLinkClick(value.id)}
               id={value.id}
             >
               {value.text}
