@@ -27,6 +27,24 @@ interface DecoratorProps {
 
 const HIDDEN_STYLE: React.CSSProperties = { position: "absolute", width: 0, display: "none" };
 
+function canAcceptRef(element: React.ReactElement) {
+  const type: any = element.type;
+  if (!type) return false;
+  if (typeof type === "string") return true;
+  if (type.prototype && type.prototype.isReactComponent) return true;
+  const forwardRefType = Symbol.for("react.forward_ref");
+  const memoType = Symbol.for("react.memo");
+  if (type.$$typeof === forwardRefType) return true;
+  if (type.$$typeof === memoType) {
+    const inner = type.type;
+    if (typeof inner === "string") return true;
+    if (inner?.prototype?.isReactComponent) return true;
+    if (inner?.$$typeof === forwardRefType) return true;
+  }
+  return false;
+}
+
+
 /**
  * This component decorates the DOM element of a component with a set of
  * attributes. We use this feature to assign helper attributes to the app's
@@ -97,7 +115,9 @@ const ComponentDecorator = forwardRef((props: DecoratorProps, forwardedRef) => {
         <span style={HIDDEN_STYLE} ref={prevSiblingRef} />
       )}
       {cloneElement(props.children, {
-        ref: forwardedRef ? composeRefs(itemRefCallback, forwardedRef) : itemRefCallback,
+        ref: canAcceptRef(props.children)
+          ? (forwardedRef ? composeRefs(itemRefCallback, forwardedRef) : itemRefCallback)
+          : undefined,
       })}
       {!foundNode.current && shouldRenderHelperSpan && (
         <span style={HIDDEN_STYLE} ref={nextSiblingRef} />

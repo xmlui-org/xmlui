@@ -101,7 +101,7 @@ async function uploadFile(
       });
     }
   } catch (e) {
-    const onErrorFn = lookupAction(onError, uid);
+    const onErrorFn = lookupAction(onError, uid, { eventName: "error" });
     const result = await onErrorFn?.(e, stateContext["$param"]);
     if (result !== false) {
       throw e;

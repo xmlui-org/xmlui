@@ -3,13 +3,34 @@ import type { QueryClient, QueryKey } from "@tanstack/react-query";
 import { createDraft, finishDraft } from "immer";
 
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
+import { pushXsLog, getCurrentTrace } from "../inspector/inspectorUtils";
+
+// --- Tracing helper for API calls
+function traceApiCall(
+  appContext: AppContextObject,
+  kind: "api:start" | "api:complete" | "api:error",
+  url: string,
+  method: string,
+  details?: Record<string, any>,
+) {
+  if (appContext.appGlobals?.xsVerbose !== true) return;
+  pushXsLog({
+    ts: Date.now(),
+    perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+    traceId: getCurrentTrace(),
+    kind,
+    url,
+    method,
+    ...details,
+  });
+}
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import type { ActionExecutionContext, LookupAsyncFnInner } from "../../abstractions/ActionDefs";
 import { invalidateQueries } from "../utils/actionUtils";
 import { extractParam, shouldKeep } from "../utils/extractParam";
 import { randomUUID } from "../utils/misc";
 import type { ApiActionOptions, ApiOperationDef } from "../RestApiProxy";
-import RestApiProxy from "../RestApiProxy";
+import RestApiProxy, { getLastApiStatus } from "../RestApiProxy";
 import { createAction } from "./actions";
 import { createContextVariableError } from "../EngineError";
 
@@ -227,7 +248,7 @@ async function updateQueriesWithOptimisticValue({
     clientTxId,
     stateContext,
     extractParam(stateContext, optimisticValue, appContext),
-    lookupAction(getOptimisticValue, uid),
+    lookupAction(getOptimisticValue, uid, { eventName: "getOptimisticValue" }),
   );
 
   await doOptimisticUpdate(optimisticValuesByQueryKeys, queryClient);
@@ -310,7 +331,7 @@ export async function callApi(
   const resolvedInvalidates = extractParam(stateContext, invalidates, appContext);
 
   const clientTxId = randomUUID();
-  const beforeRequestFn = lookupAction(onBeforeRequest, uid);
+  const beforeRequestFn = lookupAction(onBeforeRequest, uid, { eventName: "beforeRequest" });
   const beforeRequestResult = await beforeRequestFn?.();
   if (typeof beforeRequestResult === "boolean" && beforeRequestResult === false) {
     return;
@@ -336,6 +357,18 @@ export async function callApi(
   if (inProgressMessage) {
     loadingToastId = toast.loading(inProgressMessage);
   }
+
+  // Resolve the URL for tracing (handle binding expressions)
+  const resolvedUrl = extractParam(stateContext, url, appContext);
+  const resolvedMethod = method || "GET";
+  // Resolve body for tracing - try rawBody first, then body
+  let resolvedBody: any = undefined;
+  if (rawBody) {
+    resolvedBody = extractParam(stateContext, rawBody, appContext);
+  } else if (body) {
+    resolvedBody = extractParam(stateContext, body, appContext);
+  }
+
   try {
     const operation: ApiOperationDef = {
       headers,
@@ -350,6 +383,13 @@ export async function callApi(
     const _onProgress = lookupAction(onProgress, uid, {
       eventName: "progress",
     });
+
+    // Trace API call start
+    traceApiCall(appContext, "api:start", resolvedUrl, resolvedMethod, {
+      transactionId: clientTxId,
+      body: resolvedBody,
+    });
+
     const result = await new RestApiProxy(appContext, apiInstance).execute({
       operation,
       params: stateContext,
@@ -358,6 +398,14 @@ export async function callApi(
       onProgress: _onProgress,
     });
     console.log("API call result:", result);
+
+    // Trace API call completion
+    traceApiCall(appContext, "api:complete", resolvedUrl, resolvedMethod, {
+      transactionId: clientTxId,
+      body: resolvedBody,
+      result,
+      status: getLastApiStatus(clientTxId),
+    });
 
     const onSuccessFn = lookupAction(onSuccess, uid, {
       eventName: "success",
@@ -390,6 +438,13 @@ export async function callApi(
     }
     return result;
   } catch (e: any) {
+    // Trace API call error
+    traceApiCall(appContext, "api:error", resolvedUrl, resolvedMethod, {
+      transactionId: clientTxId,
+      body: resolvedBody,
+      error: { message: e?.message || String(e), stack: e?.stack },
+    });
+
     if (optimisticValuesByQueryKeys.size) {
       await appContext.queryClient!.invalidateQueries();
     }

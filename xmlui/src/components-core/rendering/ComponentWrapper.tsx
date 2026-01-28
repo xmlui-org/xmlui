@@ -158,6 +158,7 @@ function transformNodeWithChildDatasource(node: ComponentDef) {
         props: child.props,
         events: child.events,
         when: child.when,
+        debug: child.debug,
       });
     } else {
       if (!children) {

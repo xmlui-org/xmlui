@@ -58,6 +58,50 @@ export function InspectorProvider({
     x: 0,
     y: 0,
   });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const map: Record<string, any> = {};
+    Object.values(inspectable).forEach((item: any) => {
+      const node = item?.node;
+      const props = node?.props || {};
+      const label =
+        props.label ??
+        props.title ??
+        props.name ??
+        props.text ??
+        props.value ??
+        props.placeholder ??
+        undefined;
+      map[item.inspectId] = {
+        componentType: node?.type,
+        componentLabel: label,
+        uid: item?.uid?.description,
+        inspectId: item.inspectId,
+      };
+    });
+    (window as any)._xsInspectMap = map;
+  }, [inspectable]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (sources) {
+      (window as any)._xsSources = sources;
+    }
+  }, [sources]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!projectCompilation) return;
+    const files: string[] = [];
+    if (projectCompilation.entrypoint?.filename) {
+      files.push(projectCompilation.entrypoint.filename);
+    }
+    projectCompilation.components?.forEach((comp) => {
+      if (comp?.filename) files.push(comp.filename);
+    });
+    (window as any)._xsSourceFiles = files;
+  }, [projectCompilation]);
   const contextValue: IInspectorContext = useMemo(() => {
     return {
       sources,

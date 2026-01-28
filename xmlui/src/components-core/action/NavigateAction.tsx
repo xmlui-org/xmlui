@@ -18,6 +18,23 @@ function navigate(
         queryParams,
       })
     : pathname;
+
+  // Trace navigation event
+  if (typeof window !== "undefined") {
+    const w = window as any;
+    if (Array.isArray(w._xsLogs)) {
+      w._xsLogs.push({
+        ts: Date.now(),
+        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+        traceId: w._xsCurrentTrace,
+        kind: "navigate",
+        from: location.pathname,
+        to: String(to),
+        queryParams,
+      });
+    }
+  }
+
   navigate(to);
 }
 

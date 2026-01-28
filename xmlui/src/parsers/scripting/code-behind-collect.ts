@@ -70,6 +70,7 @@ export function collectCodeBehindFromSource(
     }
     const arrow: ArrowExpression = {
       type: T_ARROW_EXPRESSION,
+      name: stmt.id.name, // Store function name for tracing
       args: stmt.args.slice(),
       statement: stmt.stmt,
       // closureContext: obtainClosures({
