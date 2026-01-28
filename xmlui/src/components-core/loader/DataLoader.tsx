@@ -29,6 +29,7 @@ import {
   formatDiff,
   xsConsoleLog,
   pushXsLog,
+  getCurrentTrace,
 } from "../inspector/inspectorUtils";
 
 type LoaderProps = {
@@ -343,18 +344,71 @@ function DataLoader({
           throw error;
         }
       } else {
-        return await api.execute({
-          abortSignal,
-          operation: loader.props as any,
-          params: {
-            ...state,
-            $pageParams: pageParams,
-          },
-          resolveBindingExpressions: true,
-        });
+        // Trace API call start
+        if (xsVerbose) {
+          const method = (loader.props as any).method || "GET";
+          pushXsLog({
+            ts: Date.now(),
+            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+            traceId: getCurrentTrace(),
+            kind: "api:start",
+            url: url,
+            method: method,
+            instanceId: instanceIdRef.current,
+            dataSourceId: (loader.props as any).id,
+            body: body || rawBody,
+          }, xsLogMax);
+        }
+
+        try {
+          const result = await api.execute({
+            abortSignal,
+            operation: loader.props as any,
+            params: {
+              ...state,
+              $pageParams: pageParams,
+            },
+            resolveBindingExpressions: true,
+          });
+
+          // Trace API call completion
+          if (xsVerbose) {
+            const method = (loader.props as any).method || "GET";
+            pushXsLog({
+              ts: Date.now(),
+              perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+              traceId: getCurrentTrace(),
+              kind: "api:complete",
+              url: url,
+              method: method,
+              instanceId: instanceIdRef.current,
+              dataSourceId: (loader.props as any).id,
+              result: result,
+            }, xsLogMax);
+          }
+
+          return result;
+        } catch (e: any) {
+          // Trace API call error
+          if (xsVerbose) {
+            const method = (loader.props as any).method || "GET";
+            pushXsLog({
+              ts: Date.now(),
+              perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+              traceId: getCurrentTrace(),
+              kind: "api:error",
+              url: url,
+              method: method,
+              instanceId: instanceIdRef.current,
+              dataSourceId: (loader.props as any).id,
+              error: e?.message || String(e),
+            }, xsLogMax);
+          }
+          throw e;
+        }
       }
     },
-    [api, loader.props, state, url, body, rawBody, appContext],
+    [api, loader.props, state, url, body, rawBody, appContext, xsVerbose, xsLogMax],
   );
 
   const queryId = useMemo(() => {

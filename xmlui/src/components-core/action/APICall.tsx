@@ -3,22 +3,21 @@ import type { QueryClient, QueryKey } from "@tanstack/react-query";
 import { createDraft, finishDraft } from "immer";
 
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
+import { pushXsLog, getCurrentTrace } from "../inspector/inspectorUtils";
 
 // --- Tracing helper for API calls
 function traceApiCall(
+  appContext: AppContextObject,
   kind: "api:start" | "api:complete" | "api:error",
   url: string,
   method: string,
   details?: Record<string, any>,
 ) {
-  if (typeof window === "undefined") return;
-  const w = window as any;
-  if (!w._xsLogs) return; // Tracing not enabled
-  w._xsLogs = Array.isArray(w._xsLogs) ? w._xsLogs : [];
-  w._xsLogs.push({
+  if (appContext.appGlobals?.xsVerbose !== true) return;
+  pushXsLog({
     ts: Date.now(),
     perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-    traceId: w._xsCurrentTrace,
+    traceId: getCurrentTrace(),
     kind,
     url,
     method,
@@ -386,7 +385,7 @@ export async function callApi(
     });
 
     // Trace API call start
-    traceApiCall("api:start", resolvedUrl, resolvedMethod, {
+    traceApiCall(appContext, "api:start", resolvedUrl, resolvedMethod, {
       transactionId: clientTxId,
       body: resolvedBody,
     });
@@ -401,7 +400,7 @@ export async function callApi(
     console.log("API call result:", result);
 
     // Trace API call completion
-    traceApiCall("api:complete", resolvedUrl, resolvedMethod, {
+    traceApiCall(appContext, "api:complete", resolvedUrl, resolvedMethod, {
       transactionId: clientTxId,
       body: resolvedBody,
       result,
@@ -440,7 +439,7 @@ export async function callApi(
     return result;
   } catch (e: any) {
     // Trace API call error
-    traceApiCall("api:error", resolvedUrl, resolvedMethod, {
+    traceApiCall(appContext, "api:error", resolvedUrl, resolvedMethod, {
       transactionId: clientTxId,
       body: resolvedBody,
       error: e?.message || String(e),
