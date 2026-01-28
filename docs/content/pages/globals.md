@@ -153,10 +153,10 @@ This function formats the specified value's date part. When called without a `fo
 **Examples:**
 
 ```ts
-formatDate(new Date())                    // "10/20/2025" (localized)
-formatDate(new Date(), "MMM dd, yyyy")    // "Oct 20, 2025"
-formatDate(new Date(), "yyyy-MM-dd")      // "2025-10-20"
-formatDate(new Date(), "'Today is' EEEE") // "Today is Monday"
+formatDate(getDate())                    // "10/20/2025" (localized)
+formatDate(getDate(), "MMM dd, yyyy")    // "Oct 20, 2025"
+formatDate(getDate(), "yyyy-MM-dd")      // "2025-10-20"
+formatDate(getDate(), "'Today is' EEEE") // "Today is Monday"
 ```
 
 **Common format patterns:**
@@ -192,10 +192,10 @@ This function formats the specified value into a date and time string. When call
 **Examples:**
 
 ```ts
-formatDateTime(new Date())                           // "10/20/2025, 2:30:45 PM" (localized)
-formatDateTime(new Date(), "MMM dd, yyyy HH:mm:ss")  // "Oct 20, 2025 14:30:45"
-formatDateTime(new Date(), "yyyy-MM-dd'T'HH:mm:ss")  // "2025-10-20T14:30:45"
-formatDateTime(new Date(), "EEEE, MMMM d 'at' h:mm a") // "Monday, October 20 at 2:30 PM"
+formatDateTime(getDate())                           // "10/20/2025, 2:30:45 PM" (localized)
+formatDateTime(getDate(), "MMM dd, yyyy HH:mm:ss")  // "Oct 20, 2025 14:30:45"
+formatDateTime(getDate(), "yyyy-MM-dd'T'HH:mm:ss")  // "2025-10-20T14:30:45"
+formatDateTime(getDate(), "EEEE, MMMM d 'at' h:mm a") // "Monday, October 20 at 2:30 PM"
 ```
 
 See [common format patterns](#formatdate) in the `formatDate` documentation.
@@ -227,11 +227,11 @@ This function formats the specified value's time part. When called without a `fo
 **Examples:**
 
 ```ts
-formatTime(new Date())                    // "2:30:45 PM" (localized)
-formatTime(new Date(), "HH:mm:ss")        // "14:30:45"
-formatTime(new Date(), "h:mm a")          // "2:30 PM"
-formatTime(new Date(), "HH:mm")           // "14:30"
-formatTime(new Date(), "hh:mm:ss a")      // "02:30:45 PM"
+formatTime(getDate())                    // "2:30:45 PM" (localized)
+formatTime(getDate(), "HH:mm:ss")        // "14:30:45"
+formatTime(getDate(), "h:mm a")          // "2:30 PM"
+formatTime(getDate(), "HH:mm")           // "14:30"
+formatTime(getDate(), "hh:mm:ss a")      // "02:30:45 PM"
 ```
 
 See [common format patterns](#formatdate) in the `formatDate` documentation.
