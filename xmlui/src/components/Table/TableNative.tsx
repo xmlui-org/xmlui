@@ -188,7 +188,7 @@ type TableProps = {
   iconSortAsc?: string;
   iconSortDesc?: string;
   iconNoSort?: string;
-  onContextMenu?: any;
+  lookupEventHandler?: any;
   sortingDidChange?: AsyncFunction;
   onSelectionDidChange?: AsyncFunction;
   willSort?: AsyncFunction;
@@ -528,7 +528,7 @@ export const Table = forwardRef(
       iconNoSort,
       sortingDidChange,
       willSort,
-      onContextMenu,
+      lookupEventHandler,
       style,
       className,
       noDataRenderer,
@@ -1101,7 +1101,6 @@ export const Table = forwardRef(
           // Focus the wrapper to enable keyboard shortcuts
           wrapperRef.current?.focus();
         }}
-        onContextMenu={(e) => {e.preventDefault(); onContextMenu?.(e)}}
         ref={ref}
         style={style}
       >
@@ -1425,23 +1424,19 @@ export const Table = forwardRef(
                         // Prevent default browser context menu
                         event.preventDefault();
                         
-                        // Call the context menu handler with the row data accessible via event.currentTarget.dataset
-                        // The handler will have access to the row via the cell renderer's context variables
-                        if (onContextMenu) {
-                          // Store row data in a way the event handler can access it
-                          // The XMLUI event handler will receive the event with this data attached
-                          Object.defineProperty(event, '_xmluiRowData', {
-                            value: row.original,
-                            enumerable: false,
-                            configurable: true,
-                          });
-                          Object.defineProperty(event, '_xmluiRowIndex', {
-                            value: rowIndex,
-                            enumerable: false,
-                            configurable: true,
+                        // Use lookupEventHandler with context containing row variables
+                        if (lookupEventHandler) {
+                          const handler = lookupEventHandler("contextMenu", {
+                            context: {
+                              $item: row.original,
+                              $row: row.original,
+                              $rowIndex: rowIndex,
+                              $itemIndex: rowIndex,
+                            },
+                            ephemeral: true, // Don't cache this handler since context changes per row
                           });
                           
-                          onContextMenu(event);
+                          handler?.(event);
                         }
                       }}
                     >

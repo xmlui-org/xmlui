@@ -581,38 +581,7 @@ const TableWithColumns = memo(
             iconSortAsc={extractValue.asOptionalString(node.props?.iconSortAsc)}
             iconSortDesc={extractValue.asOptionalString(node.props?.iconSortDesc)}
             iconNoSort={extractValue.asOptionalString(node.props?.iconNoSort)}
-            onContextMenu={
-              node.events?.contextMenu
-                ? (event: any) => {
-                    // Extract row data attached by the native component
-                    const rowData = (event as any)._xmluiRowData;
-                    const rowIndex = (event as any)._xmluiRowIndex;
-                    
-                    if (rowData !== undefined) {
-                      // Get the action/expression from the event
-                      const action = node.events?.contextMenu;
-                      if (action) {
-                        // Use lookupEventHandler with defaultHandler and context containing row variables
-                        const handler = lookupEventHandler("contextMenu", {
-                          defaultHandler: action,
-                          context: {
-                            $item: rowData,
-                            $row: rowData,
-                            $rowIndex: rowIndex,
-                            $itemIndex: rowIndex,
-                          },
-                          ephemeral: true, // Don't cache this handler since context changes per row
-                        });
-                        
-                        handler?.(event);
-                      }
-                    } else {
-                      // No row context, just call the regular handler
-                      lookupEventHandler("contextMenu")?.(event);
-                    }
-                  }
-                : undefined
-            }
+            lookupEventHandler={node.events?.contextMenu ? lookupEventHandler : undefined}
             sortingDidChange={lookupEventHandler("sortingDidChange")}
             onSelectionDidChange={lookupEventHandler("selectionDidChange")}
             willSort={lookupEventHandler("willSort")}

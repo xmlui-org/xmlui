@@ -189,6 +189,10 @@ test("applies left and right borders with borderHorizontal theme var", async ({
   });
   const component = (await createAccordionDriver()).component;
 
+  // Wait for styles to be applied
+  await expect(component).toBeVisible();
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+
   await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
   await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
   await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
