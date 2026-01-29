@@ -439,7 +439,7 @@ test.describe("Validation", () => {
       </Form>
     `);
     const input = page.getByRole("textbox");
-    const wrapper = page.locator("[data-validation-status]").first();
+    const wrapper = page.locator("[data-validation-status]");
 
     await expect(input).toHaveValue("Jo");
     // Validation should execute on mount
@@ -580,6 +580,7 @@ test.describe("Validation", () => {
           onValidate="arg => {
             delay(100);
             testState = { results: [...(testState?.results || []), arg] };
+            return true;
           }"
         />
       </Form>
@@ -588,11 +589,7 @@ test.describe("Validation", () => {
     const input = page.getByRole("textbox");
 
     // Type rapidly - each change should trigger validation
-    await input.fill("A");
-    await page.waitForTimeout(10);
-    await input.fill("AB");
-    await page.waitForTimeout(10);
-    await input.fill("ABC");
+    await input.pressSequentially("ABC", { delay: 10 });
 
     // Wait for validations to complete
     await page.waitForTimeout(150);
