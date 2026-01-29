@@ -433,6 +433,44 @@ test("alignment='end' works correctly", async ({ initTestBed, page }) => {
   await page.getByTestId("target").click({ button: "right" });
   await expect(page.getByRole("menuitem", { name: "Item 1" })).toBeVisible();
   });
+
+  test("positions correctly when wrapped in Theme with custom theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme backgroundColor-TestComponent="rgb(200, 200, 200)">
+        <Card testId="target" title="Target" onContextMenu="ev => menu.openAt(ev)" width="500px" height="300px">
+          <Text value="Right click me" />
+        </Card>
+        <ContextMenu id="menu">
+          <MenuItem>Item 1</MenuItem>
+          <MenuItem>Item 2</MenuItem>
+        </ContextMenu>
+      </Theme>
+    `);
+
+    // Get the target element bounds
+    const target = page.getByTestId("target");
+    const targetBox = await target.boundingBox();
+
+    // Right-click near the center
+    const clickX = targetBox!.x + targetBox!.width / 2;
+    const clickY = targetBox!.y + targetBox!.height / 2;
+    await page.mouse.click(clickX, clickY, { button: "right" });
+
+    // Menu should be visible
+    const menu = page.locator('[class*="ContextMenuContent"]');
+    await expect(menu).toBeVisible();
+
+    // Menu should be positioned near click coordinates, NOT at top-left corner (0, 0)
+    const menuBox = await menu.boundingBox();
+    
+    // Verify menu is NOT stuck at top-left corner
+    expect(menuBox!.x).toBeGreaterThan(50); // Should be near center, not at 0
+    expect(menuBox!.y).toBeGreaterThan(50); // Should be near center, not at 0
+    
+    // Verify menu is positioned near the click coordinates
+    expect(menuBox!.x).toBeGreaterThanOrEqual(clickX - 20);
+    expect(menuBox!.y).toBeGreaterThanOrEqual(clickY - 20);
+  });
 });
 
 // =============================================================================

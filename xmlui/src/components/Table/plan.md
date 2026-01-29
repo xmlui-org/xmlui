@@ -1,4 +1,4 @@
-# Extending Table with Keyboard Shortcuts and Actions
+# Extending Table with Context menu events
 
 **IMPORTANT**: 
 
