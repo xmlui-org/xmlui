@@ -1,5 +1,6 @@
 import { type CSSProperties, type ForwardedRef, type ReactNode, forwardRef, useRef, useEffect, useMemo } from "react";
 import classnames from "classnames";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 
 import styles from "./Card.module.scss";
 import { capitalizeFirstLetter } from "../../components-core/utils/misc";
@@ -119,7 +120,7 @@ export const Card = forwardRef(function Card(
   return (
     <div
       {...rest}
-      ref={containerRef}
+      ref={composeRefs(containerRef, forwardedRef)}
       className={classnames(
         styles.wrapper,
         {

@@ -311,6 +311,7 @@ const App: StandaloneAppDescription = {
     "icon.article": "/resources/icons/article.svg",
     "icon.star": "/resources/icons/star.svg",
     "icon.definition": "/resources/icons/definition.svg",
+    "icon.behavior": "/resources/icons/behavior.svg",
   },
   appGlobals: {
     useHashBasedRouting: false,

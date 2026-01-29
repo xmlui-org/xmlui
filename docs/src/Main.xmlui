@@ -477,6 +477,11 @@
                 />
             </NavGroup>
             <NavLink
+                icon="behavior"
+                label="Behaviors"
+                to="/behaviors"
+            />
+            <NavLink
                 icon="context"
                 label="Context Variables"
                 to="/context-variables"
@@ -666,6 +671,11 @@
         <Page url="/context-variables2">
             <DocumentPage
                 content="{appGlobals.content['pages/context-variables2.md']}"
+            />
+        </Page>
+        <Page url="/behaviors">
+            <DocumentPage
+                content="{appGlobals.content['pages/behaviors.md']}"
             />
         </Page>
         <Page url="/globals">
