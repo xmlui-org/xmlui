@@ -23,7 +23,7 @@
             {formatDate($item.date, "d MMM yyyy")}
           </Text>
         </HStack>
-        <H2 variant="title">
+        <H2 variant="title" showAnchor="false">
           {$item.title}
         </H2>
         <Text variant="description" maxLines="4" ellipses>
