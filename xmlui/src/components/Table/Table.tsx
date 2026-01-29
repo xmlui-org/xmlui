@@ -330,21 +330,22 @@ export const TableMd = createMetadata({
     selectAll: {
       description:
         `This event is triggered when the user presses the select all keyboard shortcut ` +
-        `(default: Ctrl+A/Cmd+A). The handler receives the complete action context including ` +
-        `selection information, focused row, and cell details. Note: The component does not ` +
-        `automatically select all rows; the handler must implement the selection logic ` +
-        `(e.g., by calling the selectAll() API method).`,
+        `(default: Ctrl+A/Cmd+A) and \`rowsSelectable\` is set to \`true\`. The component ` +
+        `automatically selects all rows before invoking this handler. The handler receives ` +
+        `the complete action context with all items selected, including selection information, ` +
+        `focused row, and cell details.`,
       signature: "selectAll(context: TableActionContext): void | Promise<void>",
       parameters: {
-        context: "The action context containing selection, focused row, and cell information.",
+        context: "The action context containing selection, focused row, and cell information. All rows are selected.",
       },
     },
     cut: {
       description:
         `This event is triggered when the user presses the cut keyboard shortcut ` +
-        `(default: Ctrl+X/Cmd+X). The handler receives the complete action context. ` +
-        `Note: The component does not automatically modify data; the handler must implement ` +
-        `the cut logic (e.g., copying data to clipboard and removing from the data source).`,
+        `(default: Ctrl+X/Cmd+X) and \`rowsSelectable\` is set to \`true\`. The handler receives ` +
+        `the complete action context. Note: The component does not automatically modify data; ` +
+        `the handler must implement the cut logic (e.g., copying data to clipboard and removing ` +
+        `from the data source).`,
       signature: "cut(context: TableActionContext): void | Promise<void>",
       parameters: {
         context: "The action context containing selection, focused row, and cell information.",
@@ -353,9 +354,9 @@ export const TableMd = createMetadata({
     copy: {
       description:
         `This event is triggered when the user presses the copy keyboard shortcut ` +
-        `(default: Ctrl+C/Cmd+C). The handler receives the complete action context. ` +
-        `The handler should implement the copy logic (e.g., using the Clipboard API to copy ` +
-        `selected data).`,
+        `(default: Ctrl+C/Cmd+C) and \`rowsSelectable\` is set to \`true\`. The handler receives ` +
+        `the complete action context. The handler should implement the copy logic (e.g., using ` +
+        `the Clipboard API to copy selected data).`,
       signature: "copy(context: TableActionContext): void | Promise<void>",
       parameters: {
         context: "The action context containing selection, focused row, and cell information.",
@@ -364,9 +365,9 @@ export const TableMd = createMetadata({
     paste: {
       description:
         `This event is triggered when the user presses the paste keyboard shortcut ` +
-        `(default: Ctrl+V/Cmd+V). The handler receives the complete action context. ` +
-        `The handler must implement the paste logic (e.g., reading from clipboard and ` +
-        `inserting data into the table).`,
+        `(default: Ctrl+V/Cmd+V) and \`rowsSelectable\` is set to \`true\`. The handler receives ` +
+        `the complete action context. The handler must implement the paste logic (e.g., reading ` +
+        `from clipboard and inserting data into the table).`,
       signature: "paste(context: TableActionContext): void | Promise<void>",
       parameters: {
         context: "The action context containing selection, focused row, and cell information.",
@@ -375,9 +376,10 @@ export const TableMd = createMetadata({
     delete: {
       description:
         `This event is triggered when the user presses the delete keyboard shortcut ` +
-        `(default: Delete key). The handler receives the complete action context. ` +
-        `Note: The component does not automatically remove data; the handler must implement ` +
-        `the delete logic (e.g., removing selected items from the data source).`,
+        `(default: Delete key) and \`rowsSelectable\` is set to \`true\`. The handler receives ` +
+        `the complete action context. Note: The component does not automatically remove data; ` +
+        `the handler must implement the delete logic (e.g., removing selected items from the ` +
+        `data source).`,
       signature: "delete(context: TableActionContext): void | Promise<void>",
       parameters: {
         context: "The action context containing selection, focused row, and cell information.",
@@ -576,6 +578,11 @@ const TableWithColumns = memo(
             onSelectionDidChange={lookupEventHandler("selectionDidChange")}
             willSort={lookupEventHandler("willSort")}
             rowDoubleClick={lookupEventHandler("rowDoubleClick")}
+            onSelectAll={lookupEventHandler("selectAll")}
+            onCut={lookupEventHandler("cut")}
+            onCopy={lookupEventHandler("copy")}
+            onPaste={lookupEventHandler("paste")}
+            onDelete={lookupEventHandler("delete")}
             uid={node.uid}
             autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
             hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
@@ -611,6 +618,7 @@ const TableWithColumns = memo(
             userSelectRow={extractValue.asOptionalString(node.props.userSelectRow)}
             userSelectHeading={extractValue.asOptionalString(node.props.userSelectHeading)}
             hideSelectionCheckboxes={extractValue.asOptionalBoolean(node.props.hideSelectionCheckboxes)}
+            keyBindings={extractValue(node.props.keyBindings)}
           />
         </>
       );

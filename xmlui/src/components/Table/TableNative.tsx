@@ -369,6 +369,8 @@ function useTableKeyboardActions({
   focusedIndex,
   data,
   idKey,
+  rowsSelectable,
+  selectionApi,
 }: {
   keyBindings: Record<string, string>;
   onSelectAll?: AsyncFunction;
@@ -381,6 +383,8 @@ function useTableKeyboardActions({
   focusedIndex: number | null;
   data: any[];
   idKey: string;
+  rowsSelectable: boolean;
+  selectionApi: any;
 }) {
   // Merge user key bindings with defaults (user bindings take precedence)
   const mergedBindings = useMemo(() => {
@@ -429,47 +433,90 @@ function useTableKeyboardActions({
   // Create composite keyboard handler
   const handleKeyboardActions = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
+      // Only handle keyboard actions if rowsSelectable is true
+      if (!rowsSelectable) {
+        return false;
+      }
+
       // Check each parsed binding
       for (const { binding, action } of Object.values(parsedBindings)) {
         if (matchesKeyEvent(event.nativeEvent, binding)) {
-          // Build action context
-          const context = buildActionContext(
-            selectedItems,
-            selectedRowIdMap,
-            focusedIndex,
-            data,
-            idKey
-          );
-
           // Call the appropriate handler
           let handled = false;
           switch (action) {
             case "selectAll":
+              // First, select all items via the API
+              selectionApi.selectAll();
+              
+              // Build the selectedRowIdMap for all items (since selectAll selects everything)
+              const allSelectedRowIdMap: Record<string, boolean> = {};
+              data.forEach((item: any) => {
+                allSelectedRowIdMap[String(item[idKey])] = true;
+              });
+              
+              // Build context with all items selected
+              const selectAllContext = buildActionContext(
+                data, // All data items are selected
+                allSelectedRowIdMap,
+                focusedIndex,
+                data,
+                idKey
+              );
+              
+              // Finally, invoke the event handler if provided
               if (onSelectAll) {
-                onSelectAll(context);
-                handled = true;
+                onSelectAll(selectAllContext);
               }
+              handled = true;
               break;
             case "cut":
               if (onCut) {
+                const context = buildActionContext(
+                  selectedItems,
+                  selectedRowIdMap,
+                  focusedIndex,
+                  data,
+                  idKey
+                );
                 onCut(context);
                 handled = true;
               }
               break;
             case "copy":
               if (onCopy) {
+                const context = buildActionContext(
+                  selectedItems,
+                  selectedRowIdMap,
+                  focusedIndex,
+                  data,
+                  idKey
+                );
                 onCopy(context);
                 handled = true;
               }
               break;
             case "paste":
               if (onPaste) {
+                const context = buildActionContext(
+                  selectedItems,
+                  selectedRowIdMap,
+                  focusedIndex,
+                  data,
+                  idKey
+                );
                 onPaste(context);
                 handled = true;
               }
               break;
             case "delete":
               if (onDelete) {
+                const context = buildActionContext(
+                  selectedItems,
+                  selectedRowIdMap,
+                  focusedIndex,
+                  data,
+                  idKey
+                );
                 onDelete(context);
                 handled = true;
               }
@@ -485,7 +532,7 @@ function useTableKeyboardActions({
 
       return false; // Event not handled
     },
-    [parsedBindings, onSelectAll, onCut, onCopy, onPaste, onDelete, selectedItems, selectedRowIdMap, focusedIndex, data, idKey]
+    [parsedBindings, onSelectAll, onCut, onCopy, onPaste, onDelete, selectedItems, selectedRowIdMap, focusedIndex, data, idKey, rowsSelectable, selectionApi]
   );
 
   return handleKeyboardActions;
@@ -638,6 +685,8 @@ export const Table = forwardRef(
       focusedIndex,
       data: safeData,
       idKey,
+      rowsSelectable,
+      selectionApi,
     });
 
     // --- Create composite keyboard handler that handles both actions and navigation

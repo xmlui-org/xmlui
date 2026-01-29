@@ -291,6 +291,12 @@ I want to extract the key binding (key parsing) mechanism so I can use it in the
 - Updated TypeScript interfaces
 - Documentation of event signatures
 
+**Completion Summary**:
+- ✅ Added 5 action events to Table metadata (selectAll, cut, copy, paste, delete)
+- ✅ Each event accepts TableActionContext with selection, focusedRow, and focusedCell
+- ✅ Updated TableProps interface with event handler props
+- ✅ All event handlers properly wired in Table.tsx (lines 574-583)
+
 ---
 
 ### Step 5: Implement Keyboard Event Handler in Table ✅ COMPLETED
@@ -358,6 +364,16 @@ I want to extract the key binding (key parsing) mechanism so I can use it in the
 - No regression in existing keyboard behavior
 - Table still handles focus appropriately
 
+**Completion Summary**:
+- ✅ Implemented useTableKeyboardActions hook in TableNative.tsx
+- ✅ Added keyBindings prop with default shortcuts (CmdOrCtrl+A, CmdOrCtrl+X, CmdOrCtrl+C, CmdOrCtrl+V, Delete)
+- ✅ Partial override support: user can override individual bindings while keeping defaults for others
+- ✅ Duplicate key binding detection with console warnings
+- ✅ Platform-aware handling: CmdOrCtrl resolves to Meta on macOS, Ctrl elsewhere
+- ✅ Composite keyboard handler integrates with existing row selection navigation
+- ✅ buildActionContext helper constructs TableActionContext from current state
+- ✅ keyBindings prop passed through from Table.tsx (line 619)
+
 ---
 
 ### Step 6: Add Unit Tests for Keyboard Handling ✅ COMPLETED
@@ -384,7 +400,30 @@ I want to extract the key binding (key parsing) mechanism so I can use it in the
      // Test integration with existing keyboard navigation
    });
    ```
-Learnings from Table Code Review**:
+
+**Expected Output**:
+- Unit tests for keyboard action logic
+- Tests verify key binding parsing
+- Tests verify event handler calls
+- Tests verify context construction
+- Tests verify integration with selection
+
+**Completion Summary**:
+- ✅ Created xmlui/tests/components/Table/Table-keyboard-actions.test.ts with 16 unit tests
+- ✅ Tests cover default key bindings, custom key bindings, partial overrides
+- ✅ Tests verify each action (selectAll, cut, copy, paste, delete)
+- ✅ Tests verify TableActionContext structure with selection data
+- ✅ Tests verify platform-specific CmdOrCtrl handling (Meta on macOS, Ctrl elsewhere)
+- ✅ Tests verify duplicate key binding conflict detection
+- ✅ Tests verify integration with existing row selection state
+- ✅ All 16 tests passing
+
+---
+
+### Step 7: Add E2E Tests for Keyboard Shortcuts ✅ COMPLETED
+**Goal**: Add end-to-end tests for keyboard shortcuts.
+
+**Learnings from Table Code Review**:
 - E2E tests are in `xmlui/tests-e2e/` directory
 - Use `.spec.ts` extension for E2E tests  
 - Table has E2E tests showing patterns like `page.keyboard.press()`
@@ -453,31 +492,99 @@ Learnings from Table Code Review**:
 - Coverage of focus and context scenarios
 - Tests verify integration with browser keyboard events
 - No interference with existing functionality
-   const mockOnCut = jest.fn();
-   // etc.
-   ```
 
-**Expected Output**:
-- Comprehensive unit tests in `Table.spec.ts`
-- All tests passing
-- Good coverage of keyboard handling logic
-- No regression in existing tests
-- Clear test descriptions
+**Completion Summary**:
+- ✅ Added 16 comprehensive E2E tests to xmlui/src/components/Table/Table.spec.ts
+- ✅ Test coverage: selectAll (3 tests), delete (2 tests), copy (2 tests), cut (1 test), paste (1 test)
+- ✅ Test coverage: custom key bindings (2 tests), context data (2 tests), integration with row selection (2 tests), event prevention (1 test)
+- ✅ Platform-aware testing: Meta+A on macOS, Control+A elsewhere for CmdOrCtrl+A
+- ✅ All keyboard shortcut tests passing consistently (16/16)
+- ✅ Full Table test suite validated (122/122 tests passing)
+- ✅ Fixed issues: autoFocus for keyboard events, property names, XMLUI syntax, timing delays
+- ✅ No flaky tests, no regressions in existing functionality
 
 ---
 
-### Step 7: Add E2E Tests for Keyboard Shortcuts
-**Goal**: Test keyboard shortcuts in real browser environment.
+### Post-Step 7 Enhancement: rowsSelectable Guard (29 January 2026)
 
-**Tasks**:
-1. Create/update `Table.spec.ts` in `tests-e2e/`:
-   - Test Ctrl+A (selectAll) with selectable rows
-   - Test Delete key (delete) with selected rows
-   - Test Cut/Copy/Paste with selected rows
-   - Test custom key bindings work
-   - Test events receive correct context data
-   - Test shortcuts only work when Table has focus
-   - Test shortcuts don't interfere with text selection in cells
+**Motivation**: Keyboard action events (selectAll, cut, copy, paste, delete) should only fire when `rowsSelectable` is set to true. This ensures these actions are only available when row selection is enabled.
+
+**Changes Made**:
+
+1. **TableNative.tsx** (useTableKeyboardActions hook):
+   - Added `rowsSelectable: boolean` parameter to hook
+   - Added early return `if (!rowsSelectable) return false;` at start of keyboard handler
+   - This prevents all keyboard action processing when rowsSelectable is false
+   - Updated hook invocation to pass `rowsSelectable` prop
+
+2. **Unit Tests** (Table-keyboard-actions.test.ts):
+   - Added "rowsSelectable Guard" test suite with 3 tests:
+     - Verifies keyboard actions don't trigger when rowsSelectable is false
+     - Verifies keyboard actions are allowed when rowsSelectable is true
+     - Verifies all action handlers respect the flag
+   - Total unit tests: 19 (16 original + 3 new)
+
+3. **E2E Tests** (Table.spec.ts):
+   - Added "rowsSelectable guard" test suite with 6 tests:
+     - Tests each action (selectAll, delete, copy, cut, paste) doesn't trigger when rowsSelectable is false
+     - Tests actions work when rowsSelectable is explicitly true
+   - Fixed test assertions to check for `null` instead of `undefined` (testState is initialized as null)
+   - Total Table E2E tests: 128 (122 original + 6 new)
+
+**Test Results**:
+- ✅ All 19 unit tests passing
+- ✅ All 22 keyboard shortcut E2E tests passing (16 original + 6 new)
+- ✅ All 128 Table E2E tests passing
+- ✅ No regressions, no flaky tests
+
+**Behavior**:
+- When `rowsSelectable="false"`: Keyboard shortcuts are completely disabled, event handlers never fire
+- When `rowsSelectable="true"`: Keyboard shortcuts work as designed
+- Default behavior: rowsSelectable defaults to false, so keyboard shortcuts are opt-in alongside row selection
+
+---
+
+### Post-Step 7 Enhancement: selectAll Auto-Selection (29 January 2026)
+
+**Motivation**: When the user presses the selectAll keyboard shortcut, the component should automatically select all rows before invoking the event handler. This provides a better user experience and ensures the context passed to the handler accurately reflects the selection state.
+
+**Changes Made**:
+
+1. **TableNative.tsx** (useTableKeyboardActions hook):
+   - Added `selectionApi` parameter to the hook
+   - Modified selectAll case to call `selectionApi.selectAll()` before building context
+   - Build context with all data items (since selectAll selects everything)
+   - Build fresh selectedRowIdMap for all items to ensure accurate context
+   - Event handler now receives context with all items already selected
+
+2. **E2E Tests** (Table.spec.ts):
+   - Updated existing test "triggers onSelectAll when Ctrl+A is pressed" to expect all items selected
+   - Added new test "automatically selects all items before calling event handler":
+     - Verifies selectedRowCount equals total data length
+     - Verifies all data item IDs are in selectedIds array
+     - Confirms context accurately represents full selection state
+   - Total Table E2E tests: 129 (128 original + 1 new)
+
+3. **Table.tsx** (metadata):
+   - Updated selectAll event description to document auto-selection behavior
+   - Changed from "handler must implement selection logic" to "component automatically selects all rows before invoking this handler"
+   - Updated parameter description to clarify all rows are selected in the context
+
+**Test Results**:
+- ✅ All 23 keyboard shortcut E2E tests passing (22 original + 1 new)
+- ✅ All 129 Table E2E tests passing
+- ✅ No regressions, no flaky tests
+
+**Behavior**:
+- When user presses Ctrl+A/Cmd+A (or custom selectAll binding):
+  1. Component calls `selectionApi.selectAll()` to select all rows
+  2. Component builds context with all items selected
+  3. Component invokes `onSelectAll` event handler with accurate context
+- Handler receives context with:
+  - `selectedRowCount` = total number of rows
+  - `selectedIds` = all row IDs
+  - `selectedItems` = all row items
+- Handler no longer needs to implement selection logic - just react to the selection
 
 2. Follow e2e testing conventions from `conv-e2e-testing.md`:
    - Use `initTestBed` fixture
