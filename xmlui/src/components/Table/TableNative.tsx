@@ -441,6 +441,9 @@ function useTableKeyboardActions({
       // Check each parsed binding
       for (const { binding, action } of Object.values(parsedBindings)) {
         if (matchesKeyEvent(event.nativeEvent, binding)) {
+          // Prevent default browser behavior immediately when key matches
+          event.preventDefault();
+          
           // Call the appropriate handler
           let handled = false;
           switch (action) {
@@ -524,7 +527,6 @@ function useTableKeyboardActions({
           }
 
           if (handled) {
-            event.preventDefault();
             return true; // Signal that the event was handled
           }
         }
@@ -1349,6 +1351,9 @@ export const Table = forwardRef(
                       })}
                       style={{ userSelect: effectiveUserSelectRow as React.CSSProperties['userSelect'] }}
                       onClick={(event) => {
+                        // Focus the table wrapper to enable keyboard shortcuts
+                        wrapperRef.current?.focus();
+                        
                         if (!row.getCanSelect()) {
                           return;
                         }
