@@ -3567,8 +3567,236 @@ test.describe("Events", () => {
     const output = page.getByTestId("output");
 
     await expect(output).toHaveText("Not clicked");
-    await tree.click({ button: "right" });
+    // Right-click on the first node by finding its text
+    await page.getByText("Item 1").click({ button: "right" });
     await expect(output).toHaveText("Context menu triggered");
+  });
+
+  test("contextMenu event receives node context ($item) on right click label", async ({
+    initTestBed,
+    page,
+  }) => {
+    const data = [
+      { id: 1, name: "Item 1" },
+      { id: 2, name: "Item 2" },
+    ];
+
+    const { testStateDriver } = await initTestBed(`
+      <App>
+        <VStack height="200px">
+          <Tree 
+            testId="tree" 
+            data='{${JSON.stringify(data)}}' 
+            dataFormat="flat"
+            defaultExpanded="all"
+            onContextMenu="testState = $item.id"
+          >
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
+      </App>
+    `);
+
+    const item1 = page.getByTestId("1");
+    
+    // Right-click on the label area of item 1
+    await item1.click({ button: "right" });
+    
+    // Verify $item context was passed correctly
+    await expect.poll(testStateDriver.testState).toEqual(1);
+  });
+
+  test("contextMenu event receives node context ($item) on right click arrow area", async ({
+    initTestBed,
+    page,
+  }) => {
+    const data = [
+      { id: 1, name: "Item 1", parentId: null },
+      { id: 2, name: "Item 2", parentId: 1 },
+      { id: 3, name: "Item 3", parentId: 1 },
+    ];
+
+    const { testStateDriver } = await initTestBed(`
+      <App>
+        <VStack height="200px">
+          <Tree 
+            testId="tree" 
+            data='{${JSON.stringify(data)}}' 
+            dataFormat="flat"
+            defaultExpanded="all"
+            onContextMenu="testState = $item.id"
+          >
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
+      </App>
+    `);
+
+    // Right-click on the arrow/gutter area of item 1
+    const expandIcon = page.locator("[data-tree-expand-icon]").first();
+    await expandIcon.click({ button: "right" });
+    
+    // Verify $item context was passed correctly even when clicking the arrow area
+    await expect.poll(testStateDriver.testState).toEqual(1);
+  });
+
+  test("right-clicking arrow area focuses node without toggling expansion", async ({
+    initTestBed,
+    page,
+    createTreeDriver,
+  }) => {
+    const SELECTED_BG_COLOR = "rgb(255, 100, 100)";
+    const data = [
+      { id: 1, name: "Item 1", parentId: null },
+      { id: 2, name: "Item 2", parentId: 1 },
+      { id: 3, name: "Item 3", parentId: 1 },
+    ];
+
+    await initTestBed(
+      `
+      <VStack height="200px">
+        <Tree 
+          testId="tree" 
+          data='{${JSON.stringify(data)}}' 
+          dataFormat="flat"
+        >
+          <property name="itemTemplate">
+            <HStack testId="{$item.id}">
+              <Text value="{$item.name}" />
+            </HStack>
+          </property>
+        </Tree>
+      </VStack>
+    `,
+      {
+        testThemeVars: {
+          "backgroundColor-Tree-row--selected": SELECTED_BG_COLOR,
+        },
+      },
+    );
+
+    const tree = await createTreeDriver("tree");
+
+    // Verify item 1 is collapsed (children not visible)
+    await expect(tree.getByTestId("2")).not.toBeVisible();
+    await expect(tree.getByTestId("3")).not.toBeVisible();
+
+    // Right-click on the arrow/gutter area of item 1
+    const expandIcon = page.locator("[data-tree-expand-icon]").first();
+    await expandIcon.click({ button: "right" });
+
+    // Verify node is selected/focused
+    const selectedRowWrapper = tree.getNodeWrapperByTestId("1");
+    await expect(selectedRowWrapper).toHaveCSS("background-color", SELECTED_BG_COLOR);
+
+    // Verify expansion state did NOT change (children still not visible)
+    await expect(tree.getByTestId("2")).not.toBeVisible();
+    await expect(tree.getByTestId("3")).not.toBeVisible();
+  });
+
+  test("right-clicking arrow area then left-clicking toggles expansion", async ({
+    initTestBed,
+    page,
+    createTreeDriver,
+  }) => {
+    const data = [
+      { id: 1, name: "Item 1", parentId: null },
+      { id: 2, name: "Item 2", parentId: 1 },
+      { id: 3, name: "Item 3", parentId: 1 },
+    ];
+
+    await initTestBed(`
+      <VStack height="200px">
+        <Tree 
+          testId="tree" 
+          data='{${JSON.stringify(data)}}' 
+          dataFormat="flat"
+        >
+          <property name="itemTemplate">
+            <HStack testId="{$item.id}">
+              <Text value="{$item.name}" />
+            </HStack>
+          </property>
+        </Tree>
+      </VStack>
+    `);
+
+    const tree = await createTreeDriver("tree");
+
+    // Verify item 1 is collapsed (children not visible)
+    await expect(tree.getByTestId("2")).not.toBeVisible();
+    await expect(tree.getByTestId("3")).not.toBeVisible();
+
+    // Right-click on arrow (should select but not toggle)
+    const expandIcon = page.locator("[data-tree-expand-icon]").first();
+    await expandIcon.click({ button: "right" });
+
+    // Verify still collapsed
+    await expect(tree.getByTestId("2")).not.toBeVisible();
+    await expect(tree.getByTestId("3")).not.toBeVisible();
+
+    // Now left-click to expand
+    await expandIcon.click();
+
+    // Verify now expanded (children visible)
+    await expect(tree.getByTestId("2")).toBeVisible();
+    await expect(tree.getByTestId("3")).toBeVisible();
+  });
+
+  test("right-clicking to show context menu focuses the item", async ({
+    initTestBed,
+    page,
+    createTreeDriver,
+  }) => {
+    const SELECTED_BG_COLOR = "rgb(255, 0, 0)";
+    const data = [
+      { id: 1, name: "Item 1" },
+      { id: 2, name: "Item 2" },
+      { id: 3, name: "Item 3" },
+    ];
+
+    await initTestBed(
+      `
+      <App var.contextMenuVisible="false">
+        <VStack height="200px">
+          <Tree 
+            testId="tree" 
+            data='{${JSON.stringify(data)}}' 
+            dataFormat="flat"
+            onContextMenu="contextMenuVisible = true"
+          >
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
+      </App>
+    `,
+      {
+        testThemeVars: {
+          "backgroundColor-Tree-row--selected": SELECTED_BG_COLOR,
+        },
+      },
+    );
+
+    const tree = await createTreeDriver("tree");
+
+    // Right-click on Item 2 to trigger context menu
+    await page.getByText("Item 2").click({ button: "right" });
+
+    // Verify the item is now focused/selected
+    const selectedRowWrapper = tree.getNodeWrapperByTestId("2");
+    await expect(selectedRowWrapper).toHaveCSS("background-color", SELECTED_BG_COLOR);
   });
 });
 
