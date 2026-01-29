@@ -567,8 +567,8 @@ export function AppContent({
         (testId && w._xsTestIdMap ? w._xsTestIdMap[testId] : undefined);
 
       // Build descriptive component info
-      // Priority: componentInfo > testId > element attributes > tag name
-      const componentType = componentInfo?.componentType || undefined;
+      // Priority: componentInfo > data-component-type attribute > testId > element attributes > tag name
+      const componentType = componentInfo?.componentType || nearest?.getAttribute?.("data-component-type") || undefined;
       const textHint =
         detail.text && detail.text.length < 40 ? detail.text : undefined;
       let componentLabel =

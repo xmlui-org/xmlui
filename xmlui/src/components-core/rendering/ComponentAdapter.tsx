@@ -471,7 +471,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       const resolvedUid = extractParam(state, testId, appContext, true);
       renderedNode = (
         <ComponentDecorator
-          attr={{ "data-testid": resolvedUid, "data-inspectId": inspectId }}
+          attr={{ "data-testid": resolvedUid, "data-inspectId": inspectId, "data-component-type": safeNode.type }}
           allowOnlyRefdChild={isCompoundComponent || safeNode.type === "ModalDialog"}
           onTargetMounted={safeNode.type === "ModalDialog" ? refreshInspection : undefined}
           ref={ref}
