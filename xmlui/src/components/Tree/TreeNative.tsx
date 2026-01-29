@@ -107,6 +107,21 @@ const TreeRow = memo(({ index, data }: TreeRowProps) => {
     [toggleNode, treeItem, isLoading],
   );
 
+  const onGutterMouseDownHandler = useCallback(
+    (e: React.MouseEvent) => {
+      // Handle selection on mouse down in gutter area (for right-click context menu)
+      // Only select, don't toggle expansion
+      if (treeItem.selectable) {
+        onSelection(treeItem);
+        // Ensure tree container maintains focus after mouse selection
+        setTimeout(() => {
+          treeContainerRef.current?.focus();
+        }, 0);
+      }
+    },
+    [onSelection, treeItem, treeContainerRef],
+  );
+
   const onItemMouseDownHandler = useCallback(
     (e: React.MouseEvent) => {
       // Handle selection immediately on mouse down for immediate visual feedback
@@ -156,6 +171,7 @@ const TreeRow = memo(({ index, data }: TreeRowProps) => {
       >
         <div
           onClick={onToggleNode}
+          onMouseDown={onGutterMouseDownHandler}
           className={styles.gutter}
           style={{ cursor: isLoading ? "default" : "pointer" }}
         >

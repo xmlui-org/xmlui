@@ -3570,6 +3570,109 @@ test.describe("Events", () => {
     await tree.click({ button: "right" });
     await expect(output).toHaveText("Context menu triggered");
   });
+
+  test("right-clicking arrow area focuses node without toggling expansion", async ({
+    initTestBed,
+    page,
+    createTreeDriver,
+  }) => {
+    const SELECTED_BG_COLOR = "rgb(255, 100, 100)";
+    const data = [
+      { id: 1, name: "Item 1", parentId: null },
+      { id: 2, name: "Item 2", parentId: 1 },
+      { id: 3, name: "Item 3", parentId: 1 },
+    ];
+
+    await initTestBed(
+      `
+      <VStack height="200px">
+        <Tree 
+          testId="tree" 
+          data='{${JSON.stringify(data)}}' 
+          dataFormat="flat"
+        >
+          <property name="itemTemplate">
+            <HStack testId="{$item.id}">
+              <Text value="{$item.name}" />
+            </HStack>
+          </property>
+        </Tree>
+      </VStack>
+    `,
+      {
+        testThemeVars: {
+          "backgroundColor-Tree-row--selected": SELECTED_BG_COLOR,
+        },
+      },
+    );
+
+    const tree = await createTreeDriver("tree");
+
+    // Verify item 1 is collapsed (children not visible)
+    await expect(tree.getByTestId("2")).not.toBeVisible();
+    await expect(tree.getByTestId("3")).not.toBeVisible();
+
+    // Right-click on the arrow/gutter area of item 1
+    const expandIcon = page.locator("[data-tree-expand-icon]").first();
+    await expandIcon.click({ button: "right" });
+
+    // Verify node is selected/focused
+    const selectedRowWrapper = tree.getNodeWrapperByTestId("1");
+    await expect(selectedRowWrapper).toHaveCSS("background-color", SELECTED_BG_COLOR);
+
+    // Verify expansion state did NOT change (children still not visible)
+    await expect(tree.getByTestId("2")).not.toBeVisible();
+    await expect(tree.getByTestId("3")).not.toBeVisible();
+  });
+
+  test("right-clicking arrow area then left-clicking toggles expansion", async ({
+    initTestBed,
+    page,
+    createTreeDriver,
+  }) => {
+    const data = [
+      { id: 1, name: "Item 1", parentId: null },
+      { id: 2, name: "Item 2", parentId: 1 },
+      { id: 3, name: "Item 3", parentId: 1 },
+    ];
+
+    await initTestBed(`
+      <VStack height="200px">
+        <Tree 
+          testId="tree" 
+          data='{${JSON.stringify(data)}}' 
+          dataFormat="flat"
+        >
+          <property name="itemTemplate">
+            <HStack testId="{$item.id}">
+              <Text value="{$item.name}" />
+            </HStack>
+          </property>
+        </Tree>
+      </VStack>
+    `);
+
+    const tree = await createTreeDriver("tree");
+
+    // Verify item 1 is collapsed (children not visible)
+    await expect(tree.getByTestId("2")).not.toBeVisible();
+    await expect(tree.getByTestId("3")).not.toBeVisible();
+
+    // Right-click on arrow (should select but not toggle)
+    const expandIcon = page.locator("[data-tree-expand-icon]").first();
+    await expandIcon.click({ button: "right" });
+
+    // Verify still collapsed
+    await expect(tree.getByTestId("2")).not.toBeVisible();
+    await expect(tree.getByTestId("3")).not.toBeVisible();
+
+    // Now left-click to expand
+    await expandIcon.click();
+
+    // Verify now expanded (children visible)
+    await expect(tree.getByTestId("2")).toBeVisible();
+    await expect(tree.getByTestId("3")).toBeVisible();
+  });
 });
 
 // =============================================================================
