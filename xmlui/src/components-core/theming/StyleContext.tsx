@@ -70,7 +70,7 @@ export function useStyleRegistry(): StyleRegistry {
 
 export function useComponentStyle(styles?: Record<string, CSSProperties[keyof CSSProperties]>) {
   const rootStyle = useMemo(() => {
-    return (!styles || Object.keys(styles).length === 0)
+    return !styles || Object.keys(styles).length === 0
       ? EMPTY_OBJECT
       : {
           "&": styles,
@@ -83,22 +83,30 @@ export function useComponentStyle(styles?: Record<string, CSSProperties[keyof CS
 
 export const StyleInjectionTargetContext = createContext<Document | ShadowRoot | null>(null);
 
-export function useDomRoot(){
+export function useDomRoot() {
   const domRoot = useContext(StyleInjectionTargetContext);
   return domRoot;
 }
 
 type InjectOptions = {
   prepend?: boolean;
-}
-export function useStyles(styles: StyleObjectType, {prepend}: InjectOptions = EMPTY_OBJECT ): string {
+};
+export function useStyles(
+  styles: StyleObjectType,
+  { prepend }: InjectOptions = EMPTY_OBJECT,
+): string {
   // we skip this whole thing if we're indexing
-  const {indexing} = useIndexerContext();
+  const { indexing } = useIndexerContext();
   const domRoot = useDomRoot();
-  const injectionTarget = typeof document === "undefined" ? null : domRoot instanceof ShadowRoot ? domRoot : document.head
+  const injectionTarget =
+    typeof document === "undefined"
+      ? null
+      : domRoot instanceof ShadowRoot
+        ? domRoot
+        : document.head;
   const registry = useStyleRegistry();
   const { className, styleHash } = useMemo(() => {
-    if(indexing || !styles || styles === EMPTY_OBJECT || Object.keys(styles).length === 0) {
+    if (indexing || !styles || styles === EMPTY_OBJECT || Object.keys(styles).length === 0) {
       return { className: undefined, styleHash: undefined };
     }
     return registry.register(styles);
@@ -114,7 +122,7 @@ export function useStyles(styles: StyleObjectType, {prepend}: InjectOptions = EM
       const styleElement = document.createElement("style");
       styleElement.setAttribute("data-style-hash", styleHash);
       styleElement.innerHTML = `@layer dynamic {\n${css}\n}`;
-      if(prepend){
+      if (prepend) {
         injectionTarget.insertBefore(styleElement, injectionTarget.firstChild.nextSibling);
       } else {
         injectionTarget.appendChild(styleElement);
@@ -126,7 +134,7 @@ export function useStyles(styles: StyleObjectType, {prepend}: InjectOptions = EM
 
   // HOOK 2: For lifecycle management (reference counting and CLEANUP).
   useEffect(() => {
-    if(!styleHash){
+    if (!styleHash) {
       return;
     }
     // On MOUNT, tell the registry that this component is using this style.
