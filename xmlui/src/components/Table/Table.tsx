@@ -277,6 +277,15 @@ export const TableMd = createMetadata({
       availableValues: UserSelectValues,
       defaultValue: defaultProps.userSelectHeading,
     },
+    keyBindings: {
+      description:
+        "This property defines keyboard shortcuts for table actions. Provide an object with " +
+        "action names as keys and keyboard shortcut strings as values. The shortcut strings use " +
+        "Electron accelerator syntax (e.g., 'CmdOrCtrl+A', 'Delete'). Available actions: " +
+        "\`selectAll\`, \`cut\`, \`copy\`, \`paste\`, \`delete\`. If not provided, default shortcuts are used.",
+      valueType: "any",
+      defaultValue: "{ selectAll: 'CmdOrCtrl+A', cut: 'CmdOrCtrl+X', copy: 'CmdOrCtrl+C', paste: 'CmdOrCtrl+V', delete: 'Delete' }",
+    },
   },
   events: {
     contextMenu: dContextMenu(COMP),
@@ -316,6 +325,62 @@ export const TableMd = createMetadata({
       signature: "selectionDidChange(selectedItems: any[]): void",
       parameters: {
         selectedItems: "An array of the selected table row items.",
+      },
+    },
+    selectAll: {
+      description:
+        `This event is triggered when the user presses the select all keyboard shortcut ` +
+        `(default: Ctrl+A/Cmd+A). The handler receives the complete action context including ` +
+        `selection information, focused row, and cell details. Note: The component does not ` +
+        `automatically select all rows; the handler must implement the selection logic ` +
+        `(e.g., by calling the selectAll() API method).`,
+      signature: "selectAll(context: TableActionContext): void | Promise<void>",
+      parameters: {
+        context: "The action context containing selection, focused row, and cell information.",
+      },
+    },
+    cut: {
+      description:
+        `This event is triggered when the user presses the cut keyboard shortcut ` +
+        `(default: Ctrl+X/Cmd+X). The handler receives the complete action context. ` +
+        `Note: The component does not automatically modify data; the handler must implement ` +
+        `the cut logic (e.g., copying data to clipboard and removing from the data source).`,
+      signature: "cut(context: TableActionContext): void | Promise<void>",
+      parameters: {
+        context: "The action context containing selection, focused row, and cell information.",
+      },
+    },
+    copy: {
+      description:
+        `This event is triggered when the user presses the copy keyboard shortcut ` +
+        `(default: Ctrl+C/Cmd+C). The handler receives the complete action context. ` +
+        `The handler should implement the copy logic (e.g., using the Clipboard API to copy ` +
+        `selected data).`,
+      signature: "copy(context: TableActionContext): void | Promise<void>",
+      parameters: {
+        context: "The action context containing selection, focused row, and cell information.",
+      },
+    },
+    paste: {
+      description:
+        `This event is triggered when the user presses the paste keyboard shortcut ` +
+        `(default: Ctrl+V/Cmd+V). The handler receives the complete action context. ` +
+        `The handler must implement the paste logic (e.g., reading from clipboard and ` +
+        `inserting data into the table).`,
+      signature: "paste(context: TableActionContext): void | Promise<void>",
+      parameters: {
+        context: "The action context containing selection, focused row, and cell information.",
+      },
+    },
+    delete: {
+      description:
+        `This event is triggered when the user presses the delete keyboard shortcut ` +
+        `(default: Delete key). The handler receives the complete action context. ` +
+        `Note: The component does not automatically remove data; the handler must implement ` +
+        `the delete logic (e.g., removing selected items from the data source).`,
+      signature: "delete(context: TableActionContext): void | Promise<void>",
+      parameters: {
+        context: "The action context containing selection, focused row, and cell information.",
       },
     },
   },

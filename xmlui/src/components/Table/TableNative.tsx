@@ -97,6 +97,108 @@ export const CheckboxToleranceValues = ["none", "compact", "comfortable", "spaci
 export type CheckboxTolerance = (typeof CheckboxToleranceValues)[number];
 
 // =====================================================================================================================
+// Table Action Context Types
+
+/**
+ * Context information about the current selection in the table
+ */
+export type TableSelectionContext = {
+  /** Array of selected row items (full row objects) */
+  selectedItems: any[];
+  /** Array of selected row IDs */
+  selectedIds: string[];
+  /** Total number of rows in the table */
+  totalRowCount: number;
+  /** Number of selected rows */
+  selectedRowCount: number;
+};
+
+/**
+ * Context information about a specific row
+ */
+export type TableRowContext = {
+  /** The row data object */
+  item: any;
+  /** Row index in the visible/filtered data (0-based) */
+  rowIndex: number;
+  /** Row ID (from idKey property) */
+  rowId: string;
+  /** Whether this row is currently selected */
+  isSelected: boolean;
+  /** Whether this row is currently focused */
+  isFocused: boolean;
+};
+
+/**
+ * Context information about a specific cell (for future use)
+ */
+export type TableCellContext = {
+  /** The cell value */
+  value: any;
+  /** Column accessor key */
+  columnKey: string;
+  /** Column index (0-based) */
+  columnIndex: number;
+};
+
+/**
+ * Complete context passed to table action event handlers
+ */
+export type TableActionContext = {
+  /** Selection context */
+  selection: TableSelectionContext;
+  /** Current focused row context (if any) */
+  focusedRow: TableRowContext | null;
+  /** Cell context (null for now, reserved for future cell-level actions) */
+  focusedCell: TableCellContext | null;
+};
+
+/**
+ * Helper function to build TableActionContext from current table state
+ * 
+ * @param selectedItems - Array of selected row items
+ * @param selectedRowIdMap - Map of selected row IDs
+ * @param focusedIndex - Currently focused row index (-1 if none)
+ * @param data - All table data
+ * @param idKey - Property name used for row IDs
+ * @returns Complete action context
+ */
+function buildActionContext(
+  selectedItems: any[],
+  selectedRowIdMap: Record<string, boolean>,
+  focusedIndex: number,
+  data: any[],
+  idKey: string,
+): TableActionContext {
+  const selectedIds = Object.keys(selectedRowIdMap).filter((id) => selectedRowIdMap[id]);
+
+  const selection: TableSelectionContext = {
+    selectedItems,
+    selectedIds,
+    totalRowCount: data.length,
+    selectedRowCount: selectedItems.length,
+  };
+
+  let focusedRow: TableRowContext | null = null;
+  if (focusedIndex >= 0 && focusedIndex < data.length) {
+    const item = data[focusedIndex];
+    focusedRow = {
+      item,
+      rowIndex: focusedIndex,
+      rowId: String(item[idKey]),
+      isSelected: selectedRowIdMap[String(item[idKey])] ?? false,
+      isFocused: true,
+    };
+  }
+
+  return {
+    selection,
+    focusedRow,
+    focusedCell: null, // Reserved for future use
+  };
+}
+
+// =====================================================================================================================
 // React Table component implementation
 
 type CellVerticalAlign = "top" | "center" | "bottom";
@@ -152,6 +254,12 @@ type TableProps = {
   userSelectCell?: string;
   userSelectRow?: string;
   userSelectHeading?: string;
+  keyBindings?: Record<string, string>;
+  onSelectAll?: AsyncFunction;
+  onCut?: AsyncFunction;
+  onCopy?: AsyncFunction;
+  onPaste?: AsyncFunction;
+  onDelete?: AsyncFunction;
 };
 
 function defaultIsRowDisabled(_: any) {
@@ -1240,4 +1348,11 @@ export const defaultProps = {
   userSelectCell: "auto",
   userSelectRow: "auto",
   userSelectHeading: "none",
+  keyBindings: {
+    selectAll: "CmdOrCtrl+A",
+    cut: "CmdOrCtrl+X",
+    copy: "CmdOrCtrl+C",
+    paste: "CmdOrCtrl+V",
+    delete: "Delete",
+  },
 };
