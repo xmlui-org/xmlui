@@ -358,15 +358,22 @@ export async function callApi(
     loadingToastId = toast.loading(inProgressMessage);
   }
 
-  // Resolve the URL for tracing (handle binding expressions)
-  const resolvedUrl = extractParam(stateContext, url, appContext);
+  // Resolve URL/body for tracing (handle binding expressions)
+  // Wrapped in try-catch since tracing should never break the API call
   const resolvedMethod = method || "GET";
-  // Resolve body for tracing - try rawBody first, then body
+  let resolvedUrl: string | undefined;
   let resolvedBody: any = undefined;
-  if (rawBody) {
-    resolvedBody = extractParam(stateContext, rawBody, appContext);
-  } else if (body) {
-    resolvedBody = extractParam(stateContext, body, appContext);
+  try {
+    resolvedUrl = extractParam(stateContext, url, appContext);
+    if (rawBody) {
+      resolvedBody = extractParam(stateContext, rawBody, appContext);
+    } else if (body) {
+      resolvedBody = extractParam(stateContext, body, appContext);
+    }
+  } catch {
+    // Tracing resolution failed - use raw values as fallback
+    resolvedUrl = typeof url === "string" ? url : "[unresolved]";
+    resolvedBody = rawBody || body;
   }
 
   try {
