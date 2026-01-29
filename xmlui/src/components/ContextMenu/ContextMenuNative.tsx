@@ -79,6 +79,8 @@ export const ContextMenu = forwardRef(function ContextMenu(
   const openAt = useCallback((event: MouseEvent | React.MouseEvent, context?: any) => {
     // Prevent the browser's default context menu
     event.preventDefault();
+    // Stop event propagation to prevent any parent handlers from firing
+    event.stopPropagation();
     
     // Calculate coordinates - use clientX/clientY which are viewport-relative
     // These coordinates will be adjusted relative to the portal container below
@@ -96,14 +98,11 @@ export const ContextMenu = forwardRef(function ContextMenu(
     // Open the menu
     setOpen(true);
     
-    // Re-enable clicks after mouse button is released
-    const enableAfterRelease = () => {
+    // Re-enable clicks after a short delay to ensure the current event cycle completes
+    // This prevents the click from the right-click from registering as a menu click
+    setTimeout(() => {
       setEnableClicks(true);
-    };
-    
-    // Listen for mouseup to re-enable clicks
-    window.addEventListener('mouseup', enableAfterRelease, { once: true });
-    window.addEventListener('pointerup', enableAfterRelease, { once: true });
+    }, 100);
   }, [updateState]);
 
   const handleContentRef = useCallback((el: HTMLDivElement | null) => {
