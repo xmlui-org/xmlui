@@ -53,7 +53,6 @@ import { type OurColumnMetadata } from "../Column/TableContext";
 import useRowSelection from "./useRowSelection";
 import { PaginationNative, type Position } from "../Pagination/PaginationNative";
 import { Part } from "../Part/Part";
-import { dContextMenu } from "../metadata-helpers";
 import { parseKeyBinding, matchesKeyEvent, ParsedKeyBinding } from "../../parsers/keybinding-parser/keybinding-parser";
 
 // =====================================================================================================================
