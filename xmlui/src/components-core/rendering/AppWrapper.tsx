@@ -188,6 +188,20 @@ export const AppWrapper = ({
     Router = MemoryRouter;
   }
 
+  // --- Prepare router props
+  const routerProps: any = {};
+
+  if (Router === MemoryRouter && typeof window === "undefined") {
+    // Server-side rendering: try to get the correct location
+
+    const serverLocation = getServerLocation(globalProps);
+    if (serverLocation) {
+      routerProps.initialEntries = [serverLocation];
+    }
+    // If no location found, MemoryRouter will default to "/"
+    // This maintains backward compatibility
+  }
+
   return (
     <ErrorBoundary node={node} location={"root-outer"}>
       <QueryClientProvider client={queryClient}>
@@ -196,9 +210,29 @@ export const AppWrapper = ({
 
         {/* Otherwise create our own router */}
         {shouldCreateRouter && (
-          <Router basename={Router === HashRouter ? undefined : baseName}>{dynamicChildren}</Router>
+          <Router basename={Router === HashRouter ? undefined : baseName} {...routerProps}>
+            {dynamicChildren}
+          </Router>
         )}
       </QueryClientProvider>
     </ErrorBoundary>
   );
 };
+
+/**
+ * Attempts to get the server-side location from various sources during SSR.
+ * Returns null if no location can be determined.
+ */
+function getServerLocation(globalProps?: GlobalProps): string | null {
+  if (typeof window !== "undefined") {
+    // Client-side: this function shouldn't be called, but return null
+    return null;
+  }
+
+  // Check global variable that frameworks can set (e.g., in entry.server.tsx)
+  if (typeof global !== "undefined" && (global as any).__XMLUI_SSR_LOCATION) {
+    return (global as any).__XMLUI_SSR_LOCATION;
+  }
+
+  return null;
+}
