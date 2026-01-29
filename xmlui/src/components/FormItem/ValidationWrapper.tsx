@@ -161,9 +161,21 @@ export function ValidationWrapper({
     validationInProgress: validationResult?.partial ?? false,
   };
 
+  const validationAttributes = {
+    'data-validation-valid': validationResult?.isValid ?? true,
+    'data-validation-partial': validationResult?.partial ?? false,
+    'data-validation-status': validationStatus,
+    'data-validation-shown': isHelperTextShown,
+    'data-validations-evaluated': validationResult?.validations?.length ?? 0,
+  };
+
   if (isFormItem) {
     childProps.formItemId = formItemId;
   }
-
-  return cloneElement(children, childProps);
+  
+  return (
+    <div {...validationAttributes}>
+      {cloneElement(children, childProps)}
+    </div>
+  );
 }

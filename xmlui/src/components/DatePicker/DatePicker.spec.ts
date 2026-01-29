@@ -684,7 +684,7 @@ test.describe("Validation Feedback", () => {
   test("shows valid icon in concise mode when valid", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form verboseValidationFeedback="{false}">
-        <DatePicker testId="input" bindTo="input" required="{true}" />
+        <DatePicker testId="input" bindTo="input" required="{true}" validationMode="onChanged" />
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
@@ -696,9 +696,6 @@ test.describe("Validation Feedback", () => {
     await page.getByTestId("input").click();
     // Select any enabled date (usually first available in current view)
     await page.locator("[role='gridcell']:not([aria-disabled='true'])").first().click();
-    
-    // Blur to ensure validation triggers if needed
-    await page.getByTestId("input").blur();
 
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).toBeVisible();
