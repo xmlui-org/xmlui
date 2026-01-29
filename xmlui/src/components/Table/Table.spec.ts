@@ -1202,6 +1202,135 @@ test.describe("Basic Functionality", () => {
       await expect(quantityHeader.locator("[data-part-id='orderIndicator']")).toHaveCount(1);
     });
   });
+
+  test.describe("onContextMenu event", () => {
+    test("fires onContextMenu event on right-click", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table" onContextMenu="() => testState = 'context-menu-fired'">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `);
+
+      const firstRow = page.locator("tbody tr").first();
+      await expect(firstRow).toBeVisible();
+      await firstRow.click({ button: "right" });
+
+      await expect.poll(testStateDriver.testState).toEqual("context-menu-fired");
+    });
+
+    test("provides $item context variable with row data", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table" onContextMenu="() => testState = $item">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `);
+
+      const firstRow = page.locator("tbody tr").first();
+      await firstRow.click({ button: "right" });
+
+      const result = await testStateDriver.testState();
+      expect(result.id).toEqual(1);
+      expect(result.name).toEqual("Apple");
+      expect(result.quantity).toEqual(5);
+      expect(result.category).toEqual("Fruit");
+    });
+
+    test("provides $row context variable with row data", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table" onContextMenu="() => testState = $row">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `);
+
+      const secondRow = page.locator("tbody tr").nth(1);
+      await secondRow.click({ button: "right" });
+
+      const result = await testStateDriver.testState();
+      expect(result.id).toEqual(2);
+      expect(result.name).toEqual("Banana");
+      expect(result.quantity).toEqual(3);
+      expect(result.category).toEqual("Fruit");
+    });
+
+    test("provides $rowIndex context variable with correct index", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table" onContextMenu="() => testState = $rowIndex">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `);
+
+      const thirdRow = page.locator("tbody tr").nth(2);
+      await thirdRow.click({ button: "right" });
+
+      await expect.poll(testStateDriver.testState).toEqual(2);
+    });
+
+    test("provides $itemIndex context variable with correct index", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table" onContextMenu="() => testState = $itemIndex">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `);
+
+      const fourthRow = page.locator("tbody tr").nth(3);
+      await fourthRow.click({ button: "right" });
+
+      await expect.poll(testStateDriver.testState).toEqual(3);
+    });
+
+    test("provides all context variables together", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table" onContextMenu="() => testState = { item: $item.name, row: $row.name, rowIndex: $rowIndex, itemIndex: $itemIndex }">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `);
+
+      const secondRow = page.locator("tbody tr").nth(1);
+      await secondRow.click({ button: "right" });
+
+      const result = await testStateDriver.testState();
+      expect(result.item).toEqual("Banana");
+      expect(result.row).toEqual("Banana");
+      expect(result.rowIndex).toEqual(1);
+      expect(result.itemIndex).toEqual(1);
+    });
+
+    test("context variables match the correct row when clicking different rows", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table" onContextMenu="() => testState = { name: $item.name, index: $rowIndex }">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `);
+
+      // Click first row
+      const firstRow = page.locator("tbody tr").first();
+      await firstRow.click({ button: "right" });
+      let result = await testStateDriver.testState();
+      expect(result.name).toEqual("Apple");
+      expect(result.index).toEqual(0);
+
+      // Click third row
+      const thirdRow = page.locator("tbody tr").nth(2);
+      await thirdRow.click({ button: "right" });
+      result = await testStateDriver.testState();
+      expect(result.name).toEqual("Carrot");
+      expect(result.index).toEqual(2);
+
+      // Click last row
+      const lastRow = page.locator("tbody tr").nth(3);
+      await lastRow.click({ button: "right" });
+      result = await testStateDriver.testState();
+      expect(result.name).toEqual("Spinach");
+      expect(result.index).toEqual(3);
+    });
+  });
 });
 
 // =============================================================================

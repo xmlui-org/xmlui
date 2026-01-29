@@ -1421,6 +1421,29 @@ export const Table = forwardRef(
                         currentRow.style.cursor = "";
                         setHoveredRowId(null);
                       }}
+                      onContextMenu={(event) => {
+                        // Prevent default browser context menu
+                        event.preventDefault();
+                        
+                        // Call the context menu handler with the row data accessible via event.currentTarget.dataset
+                        // The handler will have access to the row via the cell renderer's context variables
+                        if (onContextMenu) {
+                          // Store row data in a way the event handler can access it
+                          // The XMLUI event handler will receive the event with this data attached
+                          Object.defineProperty(event, '_xmluiRowData', {
+                            value: row.original,
+                            enumerable: false,
+                            configurable: true,
+                          });
+                          Object.defineProperty(event, '_xmluiRowIndex', {
+                            value: rowIndex,
+                            enumerable: false,
+                            configurable: true,
+                          });
+                          
+                          onContextMenu(event);
+                        }
+                      }}
                     >
                       {row.getVisibleCells().map((cell, i) => {
                         const cellRenderer = cell.column.columnDef?.meta?.cellRenderer;
