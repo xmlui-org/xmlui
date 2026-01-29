@@ -163,10 +163,7 @@ export const XmlUiBlogThemeDefinition: ThemeDefinition = {
     "textColor-Text-info": "$color-primary-400",
     "textColor-Text-info--hover": "$color-primary-400",
     "textColor-Text-description": "$color-surface-500",
-    "textColor-Text-description--hover": "$color-surface-500",
-    "fontSize-Text-title": "40px",
-    "textColor-Text-title": "$color-surface-900",
-    "textColor-Text-title--hover": "$color-surface-900",
+    "textColor-Text-description--hover": "$color-surface-500"
   },
 };
 
