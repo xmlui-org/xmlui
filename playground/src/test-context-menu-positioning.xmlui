@@ -1,0 +1,92 @@
+<!-- Test file to verify ContextMenu positioning fix with Theme component -->
+<!-- The current app works with a wired-id user only. It uses a single drive. -->
+<App
+  layout="vertical-full-header"
+  scrollWholePage="false"
+  paddingVertical="0"
+>
+
+  <Pages fallbackPath="/">
+
+    <!-- We have a single main page for browsing files -->
+    <Page url="/" padding="0">
+      <Theme
+        thickness-resizer-Splitter="$space-1"
+        backgroundColor-resizer-Splitter="transparent"
+      >
+       <TestContextMenuTable />
+      </Theme>
+    </Page>
+  </Pages>
+</App>
+
+<!--
+  Test component: table with 30 rows and a context menu with submenu
+  - Self-contained single-file XMLUI component for manual/testing purposes
+  - Uses `triggerTemplate` on `SubMenuItem` to display an icon in the submenu trigger
+-->
+<Component name="TestContextMenuTable">
+  <!-- Local app state for items and selection -->
+  <AppState
+    id="data"
+    initialValue="{{ items: [
+    { id: 'row-1', name: 'Row 1', size: '1 KB', type: 'txt', modified: '2025-01-01', isFolder: false },
+    { id: 'row-2', name: 'Row 2', size: '2 KB', type: 'txt', modified: '2025-01-02', isFolder: false },
+    { id: 'row-3', name: 'Row 3', size: '3 KB', type: 'txt', modified: '2025-01-03', isFolder: false },
+    { id: 'row-4', name: 'Row 4', size: '4 KB', type: 'txt', modified: '2025-01-04', isFolder: false },
+    { id: 'row-5', name: 'Row 5', size: '5 KB', type: 'txt', modified: '2025-01-05', isFolder: false },
+    { id: 'row-6', name: 'Row 6', size: '6 KB', type: 'txt', modified: '2025-01-06', isFolder: false },
+    { id: 'row-7', name: 'Row 7', size: '7 KB', type: 'txt', modified: '2025-01-07', isFolder: false },
+    { id: 'row-8', name: 'Row 8', size: '8 KB', type: 'txt', modified: '2025-01-08', isFolder: false },
+    { id: 'row-9', name: 'Row 9', size: '9 KB', type: 'txt', modified: '2025-01-09', isFolder: false }
+  ] }}"
+  />
+
+  <AppState id="selection" initialValue="{{ selectedIds: [] }}" />
+
+  <!-- Self-contained ContextMenu with a SubMenuItem (submenu) -->
+  <ContextMenu id="contextMenu" menuWidth="220px">
+    <MenuItem onClick="toast.success('Action 1')">
+      Action 1
+    </MenuItem>
+    <MenuSeparator />
+
+    <SubMenuItem label="Share">
+      <MenuItem onClick="toast.success('Share via link')">
+        Share via link
+      </MenuItem>
+      <MenuItem onClick="toast.success('Share with people')">
+        Share with people
+      </MenuItem>
+    </SubMenuItem>
+
+    <MenuSeparator />
+    <MenuItem onClick="toast.success('Properties')">
+      Properties
+    </MenuItem>
+  </ContextMenu>
+
+  <!-- Primary: table -->
+  <Stack height="100%">
+    <Table items="{data.value.items}" rowsSelectable="true" height="400px">
+      <Column header="Name" width="2*">
+        <Link onContextMenu="ev => contextMenu.openAt(ev, selection.value.selectedIds)">
+          <Text value="{$item.name}" maxLines="1" />
+        </Link>
+      </Column>
+
+      <Column header="Size" bindTo="size" width="*">
+        <Text value="{$item.size}" />
+      </Column>
+
+      <Column header="Type" bindTo="type" width="*">
+        <Text value="{$item.type}" />
+      </Column>
+
+      <Column header="Modified" bindTo="modified" width="*">
+        <Text value="{$item.modified}" />
+      </Column>
+    </Table>
+  </Stack>
+
+</Component>
