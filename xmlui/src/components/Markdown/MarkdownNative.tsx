@@ -438,6 +438,28 @@ export const Markdown = memo(
                 target = "_blank";
               }
 
+              // Detect downloadable files by checking for file extensions
+              // Exclude web page extensions that should navigate instead
+              if (href) {
+                // Remove query parameters and hash fragments
+                const pathOnly = href.split('?')[0].split('#')[0];
+                
+                // Match file extension pattern: ends with .{2-5 alphanumeric chars}
+                const fileExtensionMatch = pathOnly.match(/\.([a-zA-Z0-9]{2,5})$/);
+                
+                if (fileExtensionMatch) {
+                  const extension = fileExtensionMatch[1].toLowerCase();
+                  
+                  // Web page extensions that should navigate, not download
+                  const navigableExtensions = ['html', 'htm', 'php', 'asp', 'aspx', 'jsp', 'xhtml'];
+                  
+                  // If it has a file extension and it's not a navigable web page, trigger download
+                  if (!navigableExtensions.includes(extension)) {
+                    props.download = true;
+                  }
+                }
+              }
+
               return (
                 <LinkNative to={href} target={target} {...(props as any)}>
                   {label}
