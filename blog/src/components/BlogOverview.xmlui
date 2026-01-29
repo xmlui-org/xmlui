@@ -17,10 +17,9 @@
       marginBottom="$space-6">
       <VStack gap="$space-2">
         <HStack>
-          <Text variant="author">
+          <Text variant="info">
             {$item.author}
-          </Text>
-          <Text variant="date">
+            •
             {formatDate($item.date, "d MMM yyyy")}
           </Text>
         </HStack>

@@ -1,9 +1,13 @@
 <Component name="BlogPage">
   <VStack gap="$space-2">
-    <Link to="/blog" icon="chevronleft" label="Go to all posts" active />
+    <Link to="/blog"abel="Go to all posts" active>
+      <Text>
+        ← Go to all posts
+      </Text>
+    </Link>
     <Card padding="$space-4" borderRadius="$space-2" backgroundColor="$color-surface-0" boxShadow="$boxShadow-spread">
       <VStack gap="$space-2">
-          <Text variant="author">
+          <Text variant="info">
             {$props.post.author}
             •
             {formatDate($props.post.date, "d MMM yyyy")}
