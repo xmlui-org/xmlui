@@ -1281,6 +1281,30 @@ and sorting is not done according to the column. Use the "-" (dash) value to sig
 
 %-PROP-END
 
+%-PROP-START keyBindings
+
+This property uses the following default key bindings:
+
+```json
+{ 
+  "selectAll": "CmdOrCtrl+A", 
+  "cut": "CmdOrCtrl+X", 
+  "copy": "CmdOrCtrl+C", 
+  "paste": "CmdOrCtrl+V", 
+  "delete": "Delete"
+}
+```
+
+You can use these accelerator key names:
+- `CmdOrCtrl`: Command on macOS, Ctrl on Windows/Linux
+- `Alt`: Alt/Options
+- `Shift`: Shift
+- `Super`: Command on macOS, Windows key on Windows/Linux
+- `Ctrl`: Control key
+- `Cmd`: Command key (macOS only)
+
+%-PROP-END
+
 %-EVENT-START sortingDidChange
 
 Note the [`canSort`](/components/Column#cansort-default-true) properties on the `Column` components which enable custom ordering.

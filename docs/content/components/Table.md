@@ -488,6 +488,44 @@ The default value is `false`.
 </App>
 ```
 
+### `hideSelectionCheckboxes` [#hideselectioncheckboxes]
+
+-  default: **false**
+
+If true, hides selection checkboxes for both rows and header. Selection logic still works via API and keyboard.
+
+Hides the selection checkboxes in both the header and rows while keeping the selection API and keyboard selection behavior intact. Useful when you want selection functionality without visible checkboxes.
+
+The default value is `false`.
+
+```xmlui copy /hideSelectionCheckboxes="true"/
+<App>
+  <Table data='{[...]}' rowsSelectable="true" enableMultiRowSelection="true" hideSelectionCheckboxes="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+```xmlui-pg name="Example: hideSelectionCheckboxes"
+<App>
+  <Table data='{[
+    { id: 0, name: "Apples", quantity: 5, unit: "pieces" },
+    { id: 1, name: "Bananas", quantity: 6, unit: "pieces" },
+    { id: 2, name: "Carrots", quantity: 100, unit: "grams" },
+    { id: 3, name: "Spinach", quantity: 1, unit: "bunch" }
+  ]}'
+    rowsSelectable="true"
+    enableMultiRowSelection="true"
+    hideSelectionCheckboxes="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
 ### `iconNoSort` [#iconnosort]
 
 Allows setting an alternate icon displayed in the Table column header when sorting is enabled, but the column remains unsorted. You can change the default icon for all Table instances with the "icon.nosort:Table" declaration in the app configuration file.
@@ -822,6 +860,30 @@ This property adds pagination controls to the `Table`.
   </Table>
 </App>
 ```
+
+### `keyBindings` [#keybindings]
+
+This property defines keyboard shortcuts for table actions. Provide an object with action names as keys and keyboard shortcut strings as values. The shortcut strings use Electron accelerator syntax (e.g., 'CmdOrCtrl+A', 'Delete'). Available actions: `selectAll`, `cut`, `copy`, `paste`, `delete`. If not provided, default shortcuts are used.
+
+This property uses the following default key bindings:
+
+```json
+{ 
+  "selectAll": "CmdOrCtrl+A", 
+  "cut": "CmdOrCtrl+X", 
+  "copy": "CmdOrCtrl+C", 
+  "paste": "CmdOrCtrl+V", 
+  "delete": "Delete"
+}
+```
+
+You can use these accelerator key names:
+- `CmdOrCtrl`: Command on macOS, Ctrl on Windows/Linux
+- `Alt`: Alt/Options
+- `Shift`: Shift
+- `Super`: Command on macOS, Windows key on Windows/Linux
+- `Ctrl`: Control key
+- `Cmd`: Command key (macOS only)
 
 ### `loading` [#loading]
 
@@ -1423,6 +1485,46 @@ This event is triggered when the Table is right-clicked (context menu).
 
 - `event`: The mouse event object.
 
+### `copyAction` [#copyaction]
+
+This event is triggered when the user presses the copy keyboard shortcut (default: Ctrl+C/Cmd+C) and `rowsSelectable` is set to `true`. The handler receives three parameters: the focused row, selected items, and selected IDs. The handler should implement the copy logic (e.g., using the Clipboard API to copy selected data).
+
+**Signature**: `copy(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>`
+
+- `row`: The currently focused row context, or null if no row is focused.
+- `selectedItems`: Array of selected row items.
+- `selectedIds`: Array of selected row IDs (as strings).
+
+### `cutAction` [#cutaction]
+
+This event is triggered when the user presses the cut keyboard shortcut (default: Ctrl+X/Cmd+X) and `rowsSelectable` is set to `true`. The handler receives three parameters: the focused row, selected items, and selected IDs. Note: The component does not automatically modify data; the handler must implement the cut logic (e.g., copying data to clipboard and removing from the data source).
+
+**Signature**: `cut(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>`
+
+- `row`: The currently focused row context, or null if no row is focused.
+- `selectedItems`: Array of selected row items.
+- `selectedIds`: Array of selected row IDs (as strings).
+
+### `deleteAction` [#deleteaction]
+
+This event is triggered when the user presses the delete keyboard shortcut (default: Delete key) and `rowsSelectable` is set to `true`. The handler receives three parameters: the focused row, selected items, and selected IDs. Note: The component does not automatically remove data; the handler must implement the delete logic (e.g., removing selected items from the data source).
+
+**Signature**: `delete(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>`
+
+- `row`: The currently focused row context, or null if no row is focused.
+- `selectedItems`: Array of selected row items.
+- `selectedIds`: Array of selected row IDs (as strings).
+
+### `pasteAction` [#pasteaction]
+
+This event is triggered when the user presses the paste keyboard shortcut (default: Ctrl+V/Cmd+V) and `rowsSelectable` is set to `true`. The handler receives three parameters: the focused row, selected items, and selected IDs. The handler must implement the paste logic (e.g., reading from clipboard and inserting data into the table).
+
+**Signature**: `paste(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>`
+
+- `row`: The currently focused row context, or null if no row is focused.
+- `selectedItems`: Array of selected row items.
+- `selectedIds`: Array of selected row IDs (as strings).
+
 ### `rowDoubleClick` [#rowdoubleclick]
 
 This event is fired when the user double-clicks a table row. The handler receives the clicked row item as its only argument.
@@ -1450,6 +1552,16 @@ This event is triggered when a table row is double-clicked. The handler receives
   </Table>
 </App>
 ```
+
+### `selectAllAction` [#selectallaction]
+
+This event is triggered when the user presses the select all keyboard shortcut (default: Ctrl+A/Cmd+A) and `rowsSelectable` is set to `true`. The component automatically selects all rows before invoking this handler. The handler receives three parameters: the currently focused row (if any), all selected items, and all selected IDs.
+
+**Signature**: `selectAll(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>`
+
+- `row`: The currently focused row context, or null if no row is focused. Contains item data, row index, row ID, and selection state.
+- `selectedItems`: Array of all selected row items. When selectAll is triggered, this contains all table rows.
+- `selectedIds`: Array of all selected row IDs (as strings). When selectAll is triggered, this contains all row IDs.
 
 ### `selectionDidChange` [#selectiondidchange]
 
