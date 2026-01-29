@@ -1271,4 +1271,23 @@ test.describe("Validation Feedback", () => {
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toContainText("This field is required");
   });
+
+  test("does not duplicate label when inside Form with label prop", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <AutoComplete
+          testId="test"
+          label="Search"
+          labelPosition="top"
+        >
+          <Option value="1" label="Option 1" />
+          <Option value="2" label="Option 2" />
+        </AutoComplete>
+      </Form>
+    `);
+    
+    // Should only have one label with the text "Search"
+    const labels = page.getByText("Search");
+    await expect(labels).toHaveCount(1);
+  });
 });

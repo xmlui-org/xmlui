@@ -47,6 +47,27 @@ export const ContextMenu = forwardRef(function ContextMenu(
   const contentRef = useRef<HTMLDivElement>(null);
   const effectiveMenuWidth = menuWidth ?? getThemeVar("minWidth-ContextMenu") ?? "160px";
 
+  const getContainerInfo = useCallback(() => {
+    if (!root || root === document.body) {
+      return { 
+        rect: { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight },
+        useFixed: true 
+      };
+    }
+    
+    const rect = root.getBoundingClientRect();
+    // Check if the root element has display:contents or has collapsed bounds
+    // In such cases, fall back to viewport coordinates
+    if (rect.width === 0 || rect.height === 0) {
+      return { 
+        rect: { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight },
+        useFixed: true 
+      };
+    }
+    
+    return { rect, useFixed: false };
+  }, [root]);
+
   const closeMenu = useCallback(() => {
     setOpen(false);
     // Clear context data when closing
@@ -58,6 +79,8 @@ export const ContextMenu = forwardRef(function ContextMenu(
   const openAt = useCallback((event: MouseEvent | React.MouseEvent, context?: any) => {
     // Prevent the browser's default context menu
     event.preventDefault();
+    // Stop event propagation to prevent any parent handlers from firing
+    event.stopPropagation();
     
     // Calculate coordinates - use clientX/clientY which are viewport-relative
     // These coordinates will be adjusted relative to the portal container below
@@ -75,14 +98,11 @@ export const ContextMenu = forwardRef(function ContextMenu(
     // Open the menu
     setOpen(true);
     
-    // Re-enable clicks after mouse button is released
-    const enableAfterRelease = () => {
+    // Re-enable clicks after a short delay to ensure the current event cycle completes
+    // This prevents the click from the right-click from registering as a menu click
+    setTimeout(() => {
       setEnableClicks(true);
-    };
-    
-    // Listen for mouseup to re-enable clicks
-    window.addEventListener('mouseup', enableAfterRelease, { once: true });
-    window.addEventListener('pointerup', enableAfterRelease, { once: true });
+    }, 100);
   }, [updateState]);
 
   const handleContentRef = useCallback((el: HTMLDivElement | null) => {
@@ -104,10 +124,7 @@ export const ContextMenu = forwardRef(function ContextMenu(
       const rect = content.getBoundingClientRect();
       
       // Get the portal container's bounds
-      // If root is document.body, use the window; otherwise use the root element's bounds
-      const containerRect = root && root !== document.body 
-        ? root.getBoundingClientRect() 
-        : { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
+      const { rect: containerRect } = getContainerInfo();
       
       // Calculate position relative to the container
       let x = position.x - containerRect.left;
@@ -133,7 +150,7 @@ export const ContextMenu = forwardRef(function ContextMenu(
       content.style.left = `${x}px`;
       content.style.top = `${y}px`;
     }
-  }, [open, position, contentReady, root]);
+  }, [open, position, contentReady, getContainerInfo]);
 
   return (
     <DropdownMenuContext.Provider value={{ closeMenu }}>
@@ -150,29 +167,22 @@ export const ContextMenu = forwardRef(function ContextMenu(
         <DropdownMenuPrimitive.Portal container={root}>
           <DropdownMenuPrimitive.Content
             ref={handleContentRef}
-            style={{
-              ...style,
-              minWidth: effectiveMenuWidth,
-              // Use absolute positioning when portal container is not document.body
-              // This allows positioning relative to the container
-              position: root && root !== document.body ? 'absolute' : 'fixed',
-              // Initial positioning - will be adjusted by useEffect
-              // Calculate container-relative coordinates if using a custom container
-              left: position?.x ? (
-                root && root !== document.body
-                  ? position.x - root.getBoundingClientRect().left
-                  : position.x
-              ) : 0,
-              top: position?.y ? (
-                root && root !== document.body
-                  ? position.y - root.getBoundingClientRect().top
-                  : position.y
-              ) : 0,
-              // Disable pointer events until mouse button is released
-              pointerEvents: enableClicks ? 'auto' : 'none',
-              // Apply menuWidth if provided
-              ...(menuWidth && { width: menuWidth }),
-            }}
+            style={(() => {
+              const { rect: containerRect, useFixed } = getContainerInfo();
+              return {
+                ...style,
+                minWidth: effectiveMenuWidth,
+                // Use fixed positioning when dealing with viewport or collapsed containers
+                position: useFixed ? 'fixed' : 'absolute',
+                // Initial positioning - will be adjusted by useEffect
+                left: position?.x ? position.x - containerRect.left : 0,
+                top: position?.y ? position.y - containerRect.top : 0,
+                // Disable pointer events until mouse button is released
+                pointerEvents: enableClicks ? 'auto' : 'none',
+                // Apply menuWidth if provided
+                ...(menuWidth && { width: menuWidth }),
+              };
+            })()}
             className={classnames(styles.ContextMenuContent, className, {
               [styles.compact]: compact,
             })}

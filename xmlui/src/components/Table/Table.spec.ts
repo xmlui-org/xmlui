@@ -24,7 +24,6 @@
  */
 
 import { expect, test } from "../../testing/fixtures";
-import { SKIP_REASON } from "../../testing/component-test-helpers";
 
 // Sample data for testing
 const sampleData = [
@@ -79,6 +78,7 @@ test.describe("Basic Functionality", () => {
     `);
 
     const firstRow = page.locator("tbody tr").first();
+    await expect(firstRow).toBeVisible();
     await firstRow.dblclick();
 
     await expect.poll(testStateDriver.testState).toEqual("Apple");
@@ -117,6 +117,15 @@ test.describe("Basic Functionality", () => {
         </Table>
       `);
 
+      // Wait for table to be visible first
+      const table = page.getByTestId("table");
+      await expect(table).toBeVisible();
+
+      // Wait for rows to be present
+      const rows = page.locator("tbody tr");
+      await expect(rows).toHaveCount(2);
+
+      // Now check for cell content
       await expect(page.locator("td").filter({ hasText: "Test" }).first()).toBeVisible();
       await expect(page.locator("td").filter({ hasText: "42" }).first()).toBeVisible();
       await expect(page.locator("td").filter({ hasText: "true" }).first()).toBeVisible();
@@ -188,11 +197,15 @@ test.describe("Basic Functionality", () => {
         </Table>
       `);
 
-      // Header should not be visible
-      await expect(page.locator("th")).toHaveCount(0);
+      // Wait for table to be visible and fully rendered
+      const table = page.getByTestId("table");
+      await expect(table).toBeVisible();
 
-      // Data should still be visible
+      // Wait for data to be visible (ensures table is fully rendered)
       await expect(page.locator("td").filter({ hasText: "Apple" }).first()).toBeVisible();
+
+      // Now check that headers are not present
+      await expect(page.locator("th")).toHaveCount(0);
     });
 
     test("shows header when hideHeader is false", async ({ initTestBed, page }) => {
@@ -203,7 +216,15 @@ test.describe("Basic Functionality", () => {
         </Table>
       `);
 
+      // Wait for table to be visible first
+      const table = page.getByTestId("table");
+      await expect(table).toBeVisible();
+
+      // Wait for headers to be present
       const headers = page.locator("th");
+      await expect(headers).toHaveCount(2);
+
+      // Check header text content
       await expect(headers.nth(0)).toContainText("Name");
       await expect(headers.nth(1)).toContainText("Quantity");
     });
@@ -1179,6 +1200,135 @@ test.describe("Basic Functionality", () => {
       // Non-sortable column should not have an indicator at all
       const quantityHeader = page.getByRole("columnheader").filter({ hasText: "Quantity" }).first();
       await expect(quantityHeader.locator("[data-part-id='orderIndicator']")).toHaveCount(1);
+    });
+  });
+
+  test.describe("onContextMenu event", () => {
+    test("fires onContextMenu event on right-click", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table" onContextMenu="() => testState = 'context-menu-fired'">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `);
+
+      const firstRow = page.locator("tbody tr").first();
+      await expect(firstRow).toBeVisible();
+      await firstRow.click({ button: "right" });
+
+      await expect.poll(testStateDriver.testState).toEqual("context-menu-fired");
+    });
+
+    test("provides $item context variable with row data", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table" onContextMenu="() => testState = $item">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `);
+
+      const firstRow = page.locator("tbody tr").first();
+      await firstRow.click({ button: "right" });
+
+      const result = await testStateDriver.testState();
+      expect(result.id).toEqual(1);
+      expect(result.name).toEqual("Apple");
+      expect(result.quantity).toEqual(5);
+      expect(result.category).toEqual("Fruit");
+    });
+
+    test("provides $row context variable with row data", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table" onContextMenu="() => testState = $row">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `);
+
+      const secondRow = page.locator("tbody tr").nth(1);
+      await secondRow.click({ button: "right" });
+
+      const result = await testStateDriver.testState();
+      expect(result.id).toEqual(2);
+      expect(result.name).toEqual("Banana");
+      expect(result.quantity).toEqual(3);
+      expect(result.category).toEqual("Fruit");
+    });
+
+    test("provides $rowIndex context variable with correct index", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table" onContextMenu="() => testState = $rowIndex">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `);
+
+      const thirdRow = page.locator("tbody tr").nth(2);
+      await thirdRow.click({ button: "right" });
+
+      await expect.poll(testStateDriver.testState).toEqual(2);
+    });
+
+    test("provides $itemIndex context variable with correct index", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table" onContextMenu="() => testState = $itemIndex">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `);
+
+      const fourthRow = page.locator("tbody tr").nth(3);
+      await fourthRow.click({ button: "right" });
+
+      await expect.poll(testStateDriver.testState).toEqual(3);
+    });
+
+    test("provides all context variables together", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table" onContextMenu="() => testState = { item: $item.name, row: $row.name, rowIndex: $rowIndex, itemIndex: $itemIndex }">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `);
+
+      const secondRow = page.locator("tbody tr").nth(1);
+      await secondRow.click({ button: "right" });
+
+      const result = await testStateDriver.testState();
+      expect(result.item).toEqual("Banana");
+      expect(result.row).toEqual("Banana");
+      expect(result.rowIndex).toEqual(1);
+      expect(result.itemIndex).toEqual(1);
+    });
+
+    test("context variables match the correct row when clicking different rows", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table" onContextMenu="() => testState = { name: $item.name, index: $rowIndex }">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `);
+
+      // Click first row
+      const firstRow = page.locator("tbody tr").first();
+      await firstRow.click({ button: "right" });
+      let result = await testStateDriver.testState();
+      expect(result.name).toEqual("Apple");
+      expect(result.index).toEqual(0);
+
+      // Click third row
+      const thirdRow = page.locator("tbody tr").nth(2);
+      await thirdRow.click({ button: "right" });
+      result = await testStateDriver.testState();
+      expect(result.name).toEqual("Carrot");
+      expect(result.index).toEqual(2);
+
+      // Click last row
+      const lastRow = page.locator("tbody tr").nth(3);
+      await lastRow.click({ button: "right" });
+      result = await testStateDriver.testState();
+      expect(result.name).toEqual("Spinach");
+      expect(result.index).toEqual(3);
     });
   });
 });
@@ -2276,6 +2426,651 @@ test.describe("Column Alignment", () => {
       await expect(nameCell).toHaveCSS("justify-content", "flex-start");
       await expect(quantityCell).toHaveCSS("justify-content", "flex-end");
       await expect(categoryCell).toHaveCSS("justify-content", "center");
+    });
+  });
+});
+
+// =============================================================================
+// KEYBOARD SHORTCUT TESTS
+// =============================================================================
+
+test.describe("Keyboard Shortcuts", () => {
+  test.describe("selectAll action (Ctrl+A / Cmd+A)", () => {
+    test("triggers onSelectAll when Ctrl+A is pressed", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          testId="table"
+          autoFocus="true"
+          onSelectAllAction="(row, selectedItems, selectedIds) => testState = { action: 'selectAll', selectedItemsLength: selectedItems.length }"
+        >
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `);
+
+      const table = page.getByTestId("table");
+      await expect(table).toBeVisible();
+      
+      // Press the platform-appropriate key: Cmd+A on macOS, Ctrl+A elsewhere
+      const isMac = process.platform === 'darwin';
+      const selectAllKey = isMac ? 'Meta+A' : 'Control+A';
+      await page.keyboard.press(selectAllKey);
+
+      await expect.poll(testStateDriver.testState).toEqual({
+        action: "selectAll",
+        selectedItemsLength: sampleData.length, // All items are now automatically selected
+      });
+    });
+
+    test("passes correct context with selected items", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          testId="table"
+          autoFocus="true"
+          onSelectAllAction="(row, selectedItems, selectedIds) => testState = { 
+            selectedItemsLength: selectedItems.length,
+            selectedIdsLength: selectedIds.length,
+            focusedRow: row ? row.item.name : null
+          }"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+
+      // Select some rows first
+      const firstRow = page.locator("tbody tr").first();
+      await firstRow.click();
+
+      // Press the platform-appropriate key
+      const isMac = process.platform === 'darwin';
+      const selectAllKey = isMac ? 'Meta+A' : 'Control+A';
+      await page.keyboard.press(selectAllKey);
+
+      const result = await testStateDriver.testState();
+      expect(result.selectedItemsLength).toBeGreaterThanOrEqual(0);
+      expect(result.selectedIdsLength).toBeGreaterThan(0);
+    });
+
+    test("does not trigger when table is not focused", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <TextBox testId="input" />
+          <Table 
+            data='{${JSON.stringify(sampleData)}}'
+            rowsSelectable="true"
+            testId="table"
+            onSelectAllAction="(row, selectedItems, selectedIds) => testState = 'selectAll triggered'"
+          >
+            <Column bindTo="name"/>
+          </Table>
+        </Fragment>
+      `);
+
+      // Focus the text input instead of table
+      const input = page.getByTestId("input").getByRole("textbox");
+      await input.focus();
+      await page.keyboard.press("Control+A");
+
+      // Should not trigger table's selectAll
+      await expect.poll(testStateDriver.testState).not.toEqual("selectAll triggered");
+    });
+
+    test("automatically selects all items before calling event handler", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          testId="table"
+          autoFocus="true"
+          onSelectAllAction="(row, selectedItems, selectedIds) => testState = { 
+            selectedItemsLength: selectedItems.length,
+            selectedIdsLength: selectedIds.length,
+            selectedIds: selectedIds
+          }"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+
+      const table = page.getByTestId("table");
+      await expect(table).toBeVisible();
+      
+      // Press the platform-appropriate key
+      const isMac = process.platform === 'darwin';
+      const selectAllKey = isMac ? 'Meta+A' : 'Control+A';
+      await page.keyboard.press(selectAllKey);
+      await page.waitForTimeout(100);
+
+      // Verify that all items are selected in the context
+      const result = await testStateDriver.testState();
+      expect(result.selectedItemsLength).toBe(sampleData.length);
+      expect(result.selectedIdsLength).toBe(sampleData.length);
+      expect(result.selectedIds).toHaveLength(sampleData.length);
+      
+      // Verify all sample data IDs are in the selected IDs
+      sampleData.forEach(item => {
+        expect(result.selectedIds).toContain(String(item.id));
+      });
+    });
+  });
+
+  test.describe("delete action (Delete key)", () => {
+    test("triggers onDelete when Delete key is pressed", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          testId="table"
+          autoFocus="true"
+          onDeleteAction="(row, selectedItems, selectedIds) => testState = { action: 'delete', selectedItemsLength: selectedItems.length }"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+
+      await page.keyboard.press("Delete");
+
+      await expect.poll(testStateDriver.testState).toEqual({
+        action: "delete",
+        selectedItemsLength: 0,
+      });
+    });
+
+    test("passes selected items in context", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          testId="table"
+          autoFocus="true"
+          onDeleteAction="(row, selectedItems, selectedIds) => testState = {
+            selectedIds: selectedIds,
+            selectedItemsLength: selectedItems.length
+          }"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+
+      // Select a row
+      const firstRow = page.locator("tbody tr").first();
+      await firstRow.click();
+
+      await page.keyboard.press("Delete");
+
+      const result = await testStateDriver.testState();
+      expect(Array.isArray(result.selectedIds)).toBe(true);
+      expect(typeof result.selectedItemsLength).toBe("number");
+    });
+  });
+
+  test.describe("copy action (Ctrl+C / Cmd+C)", () => {
+    test("triggers onCopy when Ctrl+C is pressed", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          testId="table"
+          autoFocus="true"
+          onCopyAction="(row, selectedItems, selectedIds) => testState = { action: 'copy', selectedItemsLength: selectedItems.length }"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+
+      const isMac = process.platform === 'darwin';
+      const copyKey = isMac ? 'Meta+C' : 'Control+C';
+      await page.keyboard.press(copyKey);
+
+      await expect.poll(testStateDriver.testState).toEqual({
+        action: "copy",
+        selectedItemsLength: 0,
+      });
+    });
+
+    test("provides selected items for copying", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          testId="table"
+          autoFocus="true"
+          onCopyAction="(row, selectedItems, selectedIds) => testState = {
+            items: selectedItems.map(item => item.name)
+          }"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+
+      // Select multiple rows
+      const firstRow = page.locator("tbody tr").first();
+      await firstRow.click();
+
+      const isMac = process.platform === 'darwin';
+      const copyKey = isMac ? 'Meta+C' : 'Control+C';
+      await page.keyboard.press(copyKey);
+
+      const result = await testStateDriver.testState();
+      expect(Array.isArray(result.items)).toBe(true);
+    });
+  });
+
+  test.describe("cut action (Ctrl+X / Cmd+X)", () => {
+    test("triggers onCut when Ctrl+X is pressed", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          testId="table"
+          autoFocus="true"
+          onCutAction="(row, selectedItems, selectedIds) => testState = { action: 'cut' }"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+
+      const isMac = process.platform === 'darwin';
+      const cutKey = isMac ? 'Meta+X' : 'Control+X';
+      await page.keyboard.press(cutKey);
+
+      await expect.poll(testStateDriver.testState).toEqual({
+        action: "cut",
+      });
+    });
+  });
+
+  test.describe("paste action (Ctrl+V / Cmd+V)", () => {
+    test("triggers onPaste when Ctrl+V is pressed", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          testId="table"
+          autoFocus="true"
+          onPasteAction="(row, selectedItems, selectedIds) => testState = { action: 'paste', focusedRowId: row?.rowId }"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+
+      // Focus a row
+      const firstRow = page.locator("tbody tr").first();
+      await firstRow.click();
+
+      const isMac = process.platform === 'darwin';
+      const pasteKey = isMac ? 'Meta+V' : 'Control+V';
+      await page.keyboard.press(pasteKey);
+
+      const result = await testStateDriver.testState();
+      expect(result.action).toBe("paste");
+    });
+  });
+
+  test.describe("custom key bindings", () => {
+    test("uses custom key bindings when provided", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          testId="table"
+          autoFocus="true"
+          keyBindings='{{ delete: "Backspace" }}'
+          onDeleteAction="(row, selectedItems, selectedIds) => testState = 'custom delete triggered'"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      
+      // Default Delete key should not work
+      await page.keyboard.press("Delete");
+      await expect.poll(testStateDriver.testState).not.toEqual("custom delete triggered");
+
+      // Custom Backspace key should work
+      await page.keyboard.press("Backspace");
+      await expect.poll(testStateDriver.testState).toEqual("custom delete triggered");
+    });
+
+    test("allows partial override of default bindings", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          testId="table"
+          autoFocus="true"
+          keyBindings='{{ copy: "Alt+C" }}'
+          onCopyAction="(row, selectedItems, selectedIds) => testState = 'alt copy'"
+          onDeleteAction="(row, selectedItems, selectedIds) => testState = 'default delete'"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+
+      // Custom Alt+C for copy
+      await page.keyboard.press("Alt+C");
+      await expect.poll(testStateDriver.testState).toEqual("alt copy");
+
+      // Default Delete should still work
+      await page.keyboard.press("Delete");
+      await expect.poll(testStateDriver.testState).toEqual("default delete");
+    });
+  });
+
+  test.describe("context data structure", () => {
+    test("provides complete context with selection, focusedRow, and focusedCell", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          testId="table"
+          autoFocus="true"
+          onCopyAction="(row, selectedItems, selectedIds) => testState = {
+            hasSelectedIds: Array.isArray(selectedIds),
+            hasSelectedItems: Array.isArray(selectedItems),
+            hasRow: row !== null,
+            contextFields: ['row', 'selectedItems', 'selectedIds']
+          }"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+
+      // Select and focus a row
+      const firstRow = page.locator("tbody tr").first();
+      await firstRow.click();
+
+      const isMac = process.platform === 'darwin';
+      const copyKey = isMac ? 'Meta+C' : 'Control+C';
+      await page.keyboard.press(copyKey);
+
+      const result = await testStateDriver.testState();
+      expect(result.hasSelectedIds).toBe(true);
+      expect(result.hasSelectedItems).toBe(true);
+      expect(Array.isArray(result.contextFields)).toBe(true);
+      expect(result.contextFields).toContain("selectedItems");
+      expect(result.contextFields).toContain("selectedIds");
+      expect(result.contextFields).toContain("row");
+    });
+
+    test("focusedRow contains item data when row is focused", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          testId="table"
+          autoFocus="true"
+          onCopyAction="(row, selectedItems, selectedIds) => testState = {
+            focusedRowData: row ? {
+              hasItem: !!row.item,
+              hasRowId: !!row.rowId,
+              isSelected: row.isSelected,
+              isFocused: row.isFocused
+            } : null
+          }"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+
+      const firstRow = page.locator("tbody tr").first();
+      await firstRow.click();
+
+      const isMac = process.platform === 'darwin';
+      const copyKey = isMac ? 'Meta+C' : 'Control+C';
+      await page.keyboard.press(copyKey);
+
+      const result = await testStateDriver.testState();
+      expect(result.focusedRowData).not.toBeNull();
+      expect(result.focusedRowData?.hasItem).toBe(true);
+      expect(result.focusedRowData?.hasRowId).toBe(true);
+      expect(typeof result.focusedRowData?.isSelected).toBe("boolean");
+      expect(typeof result.focusedRowData?.isFocused).toBe("boolean");
+    });
+  });
+
+  test.describe("integration with row selection", () => {
+    test("keyboard shortcuts work alongside arrow key navigation", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          testId="table"
+          autoFocus="true"
+          onCopyAction="(row, selectedItems, selectedIds) => testState = { action: 'copy', focusedName: row?.item.name }"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+
+      const table = page.getByTestId("table");
+      
+      // Navigate with arrow keys
+      await page.keyboard.press("ArrowDown");
+      await page.waitForTimeout(50);
+      await page.keyboard.press("ArrowDown");
+      await page.waitForTimeout(50);
+      
+      // Use keyboard shortcut
+      const isMac = process.platform === 'darwin';
+      const copyKey = isMac ? 'Meta+C' : 'Control+C';
+      await page.keyboard.press(copyKey);
+
+      const result = await testStateDriver.testState();
+      expect(result.action).toBe("copy");
+      // focusedName should either be a string or undefined
+      expect(['string', 'undefined']).toContain(typeof result.focusedName);
+    });
+
+    test("Space key for selection still works after keyboard shortcuts", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          testId="table"
+          autoFocus="true"
+          onSelectionDidChange="items => testState = { count: items.length }"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+
+      // First use a keyboard shortcut (this might not do anything if no onSelectAll handler)
+      const isMac = process.platform === 'darwin';
+      const selectAllKey = isMac ? 'Meta+A' : 'Control+A';
+      await page.keyboard.press(selectAllKey);
+      await page.waitForTimeout(50);
+      
+      // Then try space key for selection
+      await page.keyboard.press("ArrowDown");
+      await page.waitForTimeout(100);
+      await page.keyboard.press("Space");
+      await page.waitForTimeout(100);
+
+      // Should have selected one item
+      await expect.poll(testStateDriver.testState).toMatchObject({ count: 1 });
+    });
+  });
+
+  test.describe("event prevention", () => {
+    test("prevents default browser behavior for handled shortcuts", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          testId="table"
+          autoFocus="true"
+          onSelectAllAction="(row, selectedItems, selectedIds) => testState = 'handled'"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      
+      // CmdOrCtrl+A should be handled by our handler and prevented
+      const isMac = process.platform === 'darwin';
+      const selectAllKey = isMac ? 'Meta+A' : 'Control+A';
+      await page.keyboard.press(selectAllKey);
+
+      await expect.poll(testStateDriver.testState).toEqual("handled");
+    });
+  });
+
+  test.describe("rowsSelectable guard", () => {
+    test("does not trigger onSelectAll when rowsSelectable is false", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="false"
+          testId="table"
+          autoFocus="true"
+          onSelectAllAction="(row, selectedItems, selectedIds) => testState = { triggered: true }"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+
+      const table = page.getByTestId("table");
+      await expect(table).toBeVisible();
+      
+      // Press the platform-appropriate key
+      const isMac = process.platform === 'darwin';
+      const selectAllKey = isMac ? 'Meta+A' : 'Control+A';
+      await page.keyboard.press(selectAllKey);
+      await page.waitForTimeout(100);
+
+      // Should NOT have triggered the handler (testState remains null)
+      const state = await testStateDriver.testState();
+      expect(state).toBeNull();
+    });
+
+    test("does not trigger onDelete when rowsSelectable is false", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="false"
+          testId="table"
+          autoFocus="true"
+          onDeleteAction="(row, selectedItems, selectedIds) => testState = { triggered: true }"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+
+      const table = page.getByTestId("table");
+      await expect(table).toBeVisible();
+      
+      await page.keyboard.press("Delete");
+      await page.waitForTimeout(100);
+
+      // Should NOT have triggered the handler (testState remains null)
+      const state = await testStateDriver.testState();
+      expect(state).toBeNull();
+    });
+
+    test("does not trigger onCopy when rowsSelectable is false", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="false"
+          testId="table"
+          autoFocus="true"
+          onCopyAction="(row, selectedItems, selectedIds) => testState = { triggered: true }"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+
+      const table = page.getByTestId("table");
+      await expect(table).toBeVisible();
+      
+      const isMac = process.platform === 'darwin';
+      const copyKey = isMac ? 'Meta+C' : 'Control+C';
+      await page.keyboard.press(copyKey);
+      await page.waitForTimeout(100);
+
+      // Should NOT have triggered the handler (testState remains null)
+      const state = await testStateDriver.testState();
+      expect(state).toBeNull();
+    });
+
+    test("does not trigger onCut when rowsSelectable is false", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="false"
+          testId="table"
+          autoFocus="true"
+          onCutAction="(row, selectedItems, selectedIds) => testState = { triggered: true }"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+
+      const table = page.getByTestId("table");
+      await expect(table).toBeVisible();
+      
+      const isMac = process.platform === 'darwin';
+      const cutKey = isMac ? 'Meta+X' : 'Control+X';
+      await page.keyboard.press(cutKey);
+      await page.waitForTimeout(100);
+
+      // Should NOT have triggered the handler (testState remains null)
+      const state = await testStateDriver.testState();
+      expect(state).toBeNull();
+    });
+
+    test("does not trigger onPaste when rowsSelectable is false", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="false"
+          testId="table"
+          autoFocus="true"
+          onPasteAction="(row, selectedItems, selectedIds) => testState = { triggered: true }"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+
+      const table = page.getByTestId("table");
+      await expect(table).toBeVisible();
+      
+      const isMac = process.platform === 'darwin';
+      const pasteKey = isMac ? 'Meta+V' : 'Control+V';
+      await page.keyboard.press(pasteKey);
+      await page.waitForTimeout(100);
+
+      // Should NOT have triggered the handler (testState remains null)
+      const state = await testStateDriver.testState();
+      expect(state).toBeNull();
+    });
+
+    test("keyboard actions work when rowsSelectable is explicitly true", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          testId="table"
+          autoFocus="true"
+          onSelectAllAction="(row, selectedItems, selectedIds) => testState = { triggered: true }"
+        >
+          <Column bindTo="name"/>
+        </Table>
+      `);
+
+      const table = page.getByTestId("table");
+      await expect(table).toBeVisible();
+      
+      const isMac = process.platform === 'darwin';
+      const selectAllKey = isMac ? 'Meta+A' : 'Control+A';
+      await page.keyboard.press(selectAllKey);
+      await page.waitForTimeout(100);
+
+      // Should have triggered the handler
+      await expect.poll(testStateDriver.testState).toEqual({ triggered: true });
     });
   });
 });

@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.11.33
+
+### Patch Changes
+
+- 8be5f66: Add selectAll, cut, copy, paste, and delete actions (with keybindings) to Table
+- 7107dd7: fix: labelBehavior - double label issue
+
 ## 0.11.32
 
 ### Patch Changes

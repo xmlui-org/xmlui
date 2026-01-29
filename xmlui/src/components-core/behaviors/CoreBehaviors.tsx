@@ -472,7 +472,7 @@ export const formBindingBehavior: Behavior = {
     const bindTo = extractValue(node.props?.bindTo, true);
     // Check if the component exposes value/setValue APIs
     const hasValueApiPair = !!metadata?.apis?.value && !!metadata?.apis?.setValue;
-    if (!bindTo && !hasValueApiPair || node.type === "FormItem") {
+    if (!bindTo || !hasValueApiPair || node.type === "FormItem") {
       return false;
     }
     return true;

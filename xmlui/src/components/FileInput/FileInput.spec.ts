@@ -842,4 +842,20 @@ test.describe("Behaviors and Parts", () => {
     await expect(optionalLabel).toContainText("(Optional)");
     await expect(optionalLabel).not.toContainText("*");
   });
+
+  test("does not duplicate label when inside Form with label prop", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <FileInput
+          testId="test"
+          label="Upload file"
+          labelPosition="top"
+        />
+      </Form>
+    `);
+    
+    // Should only have one label with the text "Upload file"
+    const labels = page.getByText("Upload file");
+    await expect(labels).toHaveCount(1);
+  });
 });

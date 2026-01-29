@@ -1798,4 +1798,20 @@ test.describe("Behaviors and Parts", () => {
     await expect(ampmInput).toBeVisible();
     await expect(clearButton).toBeVisible();
   });
+
+  test("does not duplicate label when inside Form with label prop", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <TimeInput
+          testId="test"
+          label="Select time"
+          labelPosition="top"
+        />
+      </Form>
+    `);
+    
+    // Should only have one label with the text "Select time"
+    const labels = page.getByText("Select time");
+    await expect(labels).toHaveCount(1);
+  });
 });

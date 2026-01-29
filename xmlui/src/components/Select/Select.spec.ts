@@ -2597,7 +2597,7 @@ test.describe("Validation Feedback", () => {
   test("shows valid icon in concise mode when valid", async ({ initTestBed, page, createSelectDriver }) => {
     await initTestBed(`
       <Form verboseValidationFeedback="{false}">
-        <Select testId="input" bindTo="input" required="{true}">
+        <Select testId="input" bindTo="input" required="{true}" validationMode="onChanged">
           <Option value="1" label="Option 1" />
         </Select>
         <Button testId="submit" type="submit">Submit</Button>
@@ -2610,9 +2610,8 @@ test.describe("Validation Feedback", () => {
     await page.getByTestId("submit").click();
     
     // Now make it valid
-    await driver.toggleOptionsVisibility();
+    await page.getByTestId("input").click();
     await driver.selectLabel("Option 1");
-    await driver.blur();
     
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).toBeVisible();
@@ -2639,5 +2638,24 @@ test.describe("Validation Feedback", () => {
     const tooltip = page.locator("[data-tooltip-container]");
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toContainText("This field is required");
+  });
+
+  test("does not duplicate label when inside Form with label prop", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <Select
+          testId="test"
+          label="Choose option"
+          labelPosition="top"
+        >
+          <Option value="1" label="Option 1" />
+          <Option value="2" label="Option 2" />
+        </Select>
+      </Form>
+    `);
+    
+    // Should only have one label with the text "Choose option"
+    const labels = page.getByText("Choose option");
+    await expect(labels).toHaveCount(1);
   });
 });

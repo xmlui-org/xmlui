@@ -53,7 +53,7 @@ import { type OurColumnMetadata } from "../Column/TableContext";
 import useRowSelection from "./useRowSelection";
 import { PaginationNative, type Position } from "../Pagination/PaginationNative";
 import { Part } from "../Part/Part";
-import { dContextMenu } from "../metadata-helpers";
+import { parseKeyBinding, matchesKeyEvent, ParsedKeyBinding } from "../../parsers/keybinding-parser/keybinding-parser";
 
 // =====================================================================================================================
 // Helper types
@@ -97,6 +97,72 @@ export const CheckboxToleranceValues = ["none", "compact", "comfortable", "spaci
 export type CheckboxTolerance = (typeof CheckboxToleranceValues)[number];
 
 // =====================================================================================================================
+// Table Action Context Types
+
+/**
+ * Context information about a specific row
+ */
+export type TableRowContext = {
+  /** The row data object */
+  item: any;
+  /** Row index in the visible/filtered data (0-based) */
+  rowIndex: number;
+  /** Row ID (from idKey property) */
+  rowId: string;
+  /** Whether this row is currently selected */
+  isSelected: boolean;
+  /** Whether this row is currently focused */
+  isFocused: boolean;
+};
+
+/**
+ * Complete context passed to table action event handlers
+ */
+export type TableActionContext = {
+  /** Array of selected row IDs */
+  selectedIds: string[];
+  /** Array of selected row items (full row objects) */
+  selectedItems: any[];
+  /** Current focused row context (if any) */
+  row: TableRowContext | null;
+};
+
+/**
+ * Helper function to build action context parameters from current table state.
+ * Returns three separate values instead of an object for cleaner event handler APIs.
+ * 
+ * @param selectedItems - Array of selected row items
+ * @param selectedRowIdMap - Map of selected row IDs
+ * @param focusedIndex - Currently focused row index (-1 if none)
+ * @param data - All table data
+ * @param idKey - Property name used for row IDs
+ * @returns Tuple of [row context, selected items, selected IDs]
+ */
+function buildActionContext(
+  selectedItems: any[],
+  selectedRowIdMap: Record<string, boolean>,
+  focusedIndex: number,
+  data: any[],
+  idKey: string,
+): [TableRowContext | null, any[], string[]] {
+  const selectedIds = Object.keys(selectedRowIdMap).filter((id) => selectedRowIdMap[id]);
+
+  let row: TableRowContext | null = null;
+  if (focusedIndex >= 0 && focusedIndex < data.length) {
+    const item = data[focusedIndex];
+    row = {
+      item,
+      rowIndex: focusedIndex,
+      rowId: String(item[idKey]),
+      isSelected: selectedRowIdMap[String(item[idKey])] ?? false,
+      isFocused: true,
+    };
+  }
+
+  return [row, selectedItems, selectedIds];
+}
+
+// =====================================================================================================================
 // React Table component implementation
 
 type CellVerticalAlign = "top" | "center" | "bottom";
@@ -122,7 +188,7 @@ type TableProps = {
   iconSortAsc?: string;
   iconSortDesc?: string;
   iconNoSort?: string;
-  onContextMenu?: any;
+  lookupEventHandler?: any;
   sortingDidChange?: AsyncFunction;
   onSelectionDidChange?: AsyncFunction;
   willSort?: AsyncFunction;
@@ -152,6 +218,12 @@ type TableProps = {
   userSelectCell?: string;
   userSelectRow?: string;
   userSelectHeading?: string;
+  keyBindings?: Record<string, string>;
+  onSelectAllAction?: AsyncFunction;
+  onCutAction?: AsyncFunction;
+  onCopyAction?: AsyncFunction;
+  onPasteAction?: AsyncFunction;
+  onDeleteAction?: AsyncFunction;
 };
 
 function defaultIsRowDisabled(_: any) {
@@ -244,6 +316,193 @@ const getCommonPinningStyles = (column: Column<RowWithOrder>): CSSProperties => 
   };
 };
 
+/**
+ * Custom hook to handle keyboard actions for the Table component
+ * Merges user-provided key bindings with defaults and detects conflicts
+ */
+function useTableKeyboardActions({
+  keyBindings,
+  onSelectAllAction,
+  onCutAction,
+  onCopyAction,
+  onPasteAction,
+  onDeleteAction,
+  selectedItems,
+  selectedRowIdMap,
+  focusedIndex,
+  data,
+  idKey,
+  rowsSelectable,
+  selectionApi,
+}: {
+  keyBindings: Record<string, string>;
+  onSelectAllAction?: AsyncFunction;
+  onCutAction?: AsyncFunction;
+  onCopyAction?: AsyncFunction;
+  onPasteAction?: AsyncFunction;
+  onDeleteAction?: AsyncFunction;
+  selectedItems: any[];
+  selectedRowIdMap: Record<string, boolean>;
+  focusedIndex: number | null;
+  data: any[];
+  idKey: string;
+  rowsSelectable: boolean;
+  selectionApi: any;
+}) {
+  // Merge user key bindings with defaults (user bindings take precedence)
+  const mergedBindings = useMemo(() => {
+    return {
+      ...defaultProps.keyBindings,
+      ...keyBindings,
+    };
+  }, [keyBindings]);
+
+  // Parse key bindings and detect duplicates
+  const parsedBindings = useMemo(() => {
+    const parsed: Record<string, { binding: ParsedKeyBinding; action: string }> = {};
+    const keyToActions: Record<string, string[]> = {};
+
+    // Parse each key binding
+    Object.entries(mergedBindings).forEach(([action, keyString]) => {
+      if (!keyString) return;
+
+      try {
+        const binding = parseKeyBinding(keyString);
+        parsed[action] = { binding, action };
+
+        // Track which actions use the same key for duplicate detection
+        const keySignature = keyString.toLowerCase().trim();
+        if (!keyToActions[keySignature]) {
+          keyToActions[keySignature] = [];
+        }
+        keyToActions[keySignature].push(action);
+      } catch (error) {
+        console.warn(`Failed to parse key binding for action '${action}': ${keyString}`, error);
+      }
+    });
+
+    // Log warnings for duplicate key bindings
+    Object.entries(keyToActions).forEach(([key, actions]) => {
+      if (actions.length > 1) {
+        console.warn(
+          `Key binding conflict: '${key}' is bound to multiple actions: [${actions.join(", ")}]. Using: ${actions[actions.length - 1]}`
+        );
+      }
+    });
+
+    return parsed;
+  }, [mergedBindings]);
+
+  // Create composite keyboard handler
+  const handleKeyboardActions = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      // Check each parsed binding
+      for (const { binding, action } of Object.values(parsedBindings)) {
+        if (matchesKeyEvent(event.nativeEvent, binding)) {
+          // Prevent default browser behavior immediately when key matches
+          event.preventDefault();
+          
+          // If rowsSelectable is false, prevent default but don't execute any actions
+          if (!rowsSelectable) {
+            return true; // Event handled (prevented), but don't execute action
+          }
+          
+          // Call the appropriate handler
+          let handled = false;
+          switch (action) {
+            case "selectAll":
+              // First, select all items via the API
+              selectionApi.selectAll();
+              
+              // Build the selectedRowIdMap for all items (since selectAll selects everything)
+              const allSelectedRowIdMap: Record<string, boolean> = {};
+              data.forEach((item: any) => {
+                allSelectedRowIdMap[String(item[idKey])] = true;
+              });
+              
+              // Build context with all items selected
+              const [row, allItems, allIds] = buildActionContext(
+                data, // All data items are selected
+                allSelectedRowIdMap,
+                focusedIndex,
+                data,
+                idKey
+              );
+              
+              // Finally, invoke the event handler if provided
+              if (onSelectAllAction) {
+                onSelectAllAction(row, allItems, allIds);
+              }
+              handled = true;
+              break;
+            case "cut":
+              if (onCutAction) {
+                const [row, items, ids] = buildActionContext(
+                  selectedItems,
+                  selectedRowIdMap,
+                  focusedIndex,
+                  data,
+                  idKey
+                );
+                onCutAction(row, items, ids);
+                handled = true;
+              }
+              break;
+            case "copy":
+              if (onCopyAction) {
+                const [row, items, ids] = buildActionContext(
+                  selectedItems,
+                  selectedRowIdMap,
+                  focusedIndex,
+                  data,
+                  idKey
+                );
+                onCopyAction(row, items, ids);
+                handled = true;
+              }
+              break;
+            case "paste":
+              if (onPasteAction) {
+                const [row, items, ids] = buildActionContext(
+                  selectedItems,
+                  selectedRowIdMap,
+                  focusedIndex,
+                  data,
+                  idKey
+                );
+                onPasteAction(row, items, ids);
+                handled = true;
+              }
+              break;
+            case "delete":
+              if (onDeleteAction) {
+                const [row, items, ids] = buildActionContext(
+                  selectedItems,
+                  selectedRowIdMap,
+                  focusedIndex,
+                  data,
+                  idKey
+                );
+                onDeleteAction(row, items, ids);
+                handled = true;
+              }
+              break;
+          }
+
+          if (handled) {
+            return true; // Signal that the event was handled
+          }
+        }
+      }
+
+      return false; // Event not handled
+    },
+    [parsedBindings, onSelectAllAction, onCutAction, onCopyAction, onPasteAction, onDeleteAction, selectedItems, selectedRowIdMap, focusedIndex, data, idKey, rowsSelectable, selectionApi]
+  );
+
+  return handleKeyboardActions;
+}
+
 // eslint-disable-next-line react/display-name
 export const Table = forwardRef(
   (
@@ -269,7 +528,7 @@ export const Table = forwardRef(
       iconNoSort,
       sortingDidChange,
       willSort,
-      onContextMenu,
+      lookupEventHandler,
       style,
       className,
       noDataRenderer,
@@ -297,6 +556,12 @@ export const Table = forwardRef(
       userSelectCell,
       userSelectRow,
       userSelectHeading,
+      keyBindings = defaultProps.keyBindings,
+      onSelectAllAction,
+      onCutAction,
+      onCopyAction,
+      onPasteAction,
+      onDeleteAction,
       ...rest
       // cols
     }: TableProps,
@@ -371,6 +636,37 @@ export const Table = forwardRef(
       initiallySelected,
       syncWithAppState,
     });
+
+    // --- Handle keyboard actions (selectAll, cut, copy, paste, delete)
+    const handleKeyboardActions = useTableKeyboardActions({
+      keyBindings,
+      onSelectAllAction,
+      onCutAction,
+      onCopyAction,
+      onPasteAction,
+      onDeleteAction,
+      selectedItems: selectionApi.getSelectedItems(),
+      selectedRowIdMap,
+      focusedIndex,
+      data: safeData,
+      idKey,
+      rowsSelectable,
+      selectionApi,
+    });
+
+    // --- Create composite keyboard handler that handles both actions and navigation
+    const compositeKeyDown = useCallback(
+      (event: React.KeyboardEvent<HTMLDivElement>) => {
+        // First, try to handle keyboard actions (selectAll, cut, copy, paste, delete)
+        const actionHandled = handleKeyboardActions(event);
+
+        // If no action was handled, delegate to existing row selection keyboard navigation
+        if (!actionHandled) {
+          onKeyDown(event);
+        }
+      },
+      [handleKeyboardActions, onKeyDown]
+    );
 
     // --- Create data with order information whenever the items in the table change
     const dataWithOrder = useMemo(() => {
@@ -787,9 +1083,24 @@ export const Table = forwardRef(
       <div
         {...rest}
         className={classnames(styles.wrapper, className, { [styles.noScroll]: hasOutsideScroll })}
-        tabIndex={-1}
-        onKeyDown={onKeyDown}
-        onContextMenu={(e) => {e.preventDefault(); onContextMenu?.(e)}}
+        tabIndex={0}
+        onKeyDown={compositeKeyDown}
+        onClick={(e) => {
+          const target = e.target as HTMLElement;
+          
+          // Skip focusing wrapper if clicking on interactive elements that handle their own focus
+          if (target.closest("button")) {
+            return;
+          }
+          
+          // Skip if target is an element that expects keyboard text input
+          if (isTextInputElement(target)) {
+            return;
+          }
+          
+          // Focus the wrapper to enable keyboard shortcuts
+          wrapperRef.current?.focus();
+        }}
         ref={ref}
         style={style}
       >
@@ -1031,6 +1342,9 @@ export const Table = forwardRef(
                         if (target.closest("button")) {
                           return;
                         }
+                        
+                        // Focus the table wrapper to enable keyboard shortcuts (after checking input/button)
+                        wrapperRef.current?.focus();
 
                         // Check if click is within checkbox boundary
                         const currentRow = event.currentTarget as HTMLElement;
@@ -1105,6 +1419,25 @@ export const Table = forwardRef(
                         const currentRow = event.currentTarget as HTMLElement;
                         currentRow.style.cursor = "";
                         setHoveredRowId(null);
+                      }}
+                      onContextMenu={(event) => {
+                        // Prevent default browser context menu
+                        event.preventDefault();
+                        
+                        // Use lookupEventHandler with context containing row variables
+                        if (lookupEventHandler) {
+                          const handler = lookupEventHandler("contextMenu", {
+                            context: {
+                              $item: row.original,
+                              $row: row.original,
+                              $rowIndex: rowIndex,
+                              $itemIndex: rowIndex,
+                            },
+                            ephemeral: true, // Don't cache this handler since context changes per row
+                          });
+                          
+                          handler?.(event);
+                        }
                       }}
                     >
                       {row.getVisibleCells().map((cell, i) => {
@@ -1209,6 +1542,20 @@ function ColumnOrderingIndicator({
   ); //nosort
 }
 
+/**
+ * Checks if an HTML element expects keyboard text input
+ * @param target - The HTML element to check
+ * @returns true if the element expects text input (textarea, contenteditable, or text-like input)
+ */
+function isTextInputElement(target: HTMLElement): boolean {
+  return (
+    target.tagName.toLowerCase() === "textarea" ||
+    target.contentEditable === "true" ||
+    (target.tagName.toLowerCase() === "input" && 
+     !["checkbox", "radio", "button", "submit", "reset", "file", "image"].includes((target as HTMLInputElement).type))
+  );
+}
+
 export const defaultProps = {
   idKey: "id",
   data: EMPTY_ARRAY,
@@ -1240,4 +1587,11 @@ export const defaultProps = {
   userSelectCell: "auto",
   userSelectRow: "auto",
   userSelectHeading: "none",
+  keyBindings: {
+    selectAll: "CmdOrCtrl+A",
+    cut: "CmdOrCtrl+X",
+    copy: "CmdOrCtrl+C",
+    paste: "CmdOrCtrl+V",
+    delete: "Delete",
+  },
 };
