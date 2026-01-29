@@ -54,6 +54,7 @@ import useRowSelection from "./useRowSelection";
 import { PaginationNative, type Position } from "../Pagination/PaginationNative";
 import { Part } from "../Part/Part";
 import { dContextMenu } from "../metadata-helpers";
+import { parseKeyBinding, matchesKeyEvent, ParsedKeyBinding } from "../../parsers/keybinding-parser/keybinding-parser";
 
 // =====================================================================================================================
 // Helper types
@@ -352,6 +353,144 @@ const getCommonPinningStyles = (column: Column<RowWithOrder>): CSSProperties => 
   };
 };
 
+/**
+ * Custom hook to handle keyboard actions for the Table component
+ * Merges user-provided key bindings with defaults and detects conflicts
+ */
+function useTableKeyboardActions({
+  keyBindings,
+  onSelectAll,
+  onCut,
+  onCopy,
+  onPaste,
+  onDelete,
+  selectedItems,
+  selectedRowIdMap,
+  focusedIndex,
+  data,
+  idKey,
+}: {
+  keyBindings: Record<string, string>;
+  onSelectAll?: AsyncFunction;
+  onCut?: AsyncFunction;
+  onCopy?: AsyncFunction;
+  onPaste?: AsyncFunction;
+  onDelete?: AsyncFunction;
+  selectedItems: any[];
+  selectedRowIdMap: Record<string, boolean>;
+  focusedIndex: number | null;
+  data: any[];
+  idKey: string;
+}) {
+  // Merge user key bindings with defaults (user bindings take precedence)
+  const mergedBindings = useMemo(() => {
+    return {
+      ...defaultProps.keyBindings,
+      ...keyBindings,
+    };
+  }, [keyBindings]);
+
+  // Parse key bindings and detect duplicates
+  const parsedBindings = useMemo(() => {
+    const parsed: Record<string, { binding: ParsedKeyBinding; action: string }> = {};
+    const keyToActions: Record<string, string[]> = {};
+
+    // Parse each key binding
+    Object.entries(mergedBindings).forEach(([action, keyString]) => {
+      if (!keyString) return;
+
+      try {
+        const binding = parseKeyBinding(keyString);
+        parsed[action] = { binding, action };
+
+        // Track which actions use the same key for duplicate detection
+        const keySignature = keyString.toLowerCase().trim();
+        if (!keyToActions[keySignature]) {
+          keyToActions[keySignature] = [];
+        }
+        keyToActions[keySignature].push(action);
+      } catch (error) {
+        console.warn(`Failed to parse key binding for action '${action}': ${keyString}`, error);
+      }
+    });
+
+    // Log warnings for duplicate key bindings
+    Object.entries(keyToActions).forEach(([key, actions]) => {
+      if (actions.length > 1) {
+        console.warn(
+          `Key binding conflict: '${key}' is bound to multiple actions: [${actions.join(", ")}]. Using: ${actions[actions.length - 1]}`
+        );
+      }
+    });
+
+    return parsed;
+  }, [mergedBindings]);
+
+  // Create composite keyboard handler
+  const handleKeyboardActions = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      // Check each parsed binding
+      for (const { binding, action } of Object.values(parsedBindings)) {
+        if (matchesKeyEvent(event.nativeEvent, binding)) {
+          // Build action context
+          const context = buildActionContext(
+            selectedItems,
+            selectedRowIdMap,
+            focusedIndex,
+            data,
+            idKey
+          );
+
+          // Call the appropriate handler
+          let handled = false;
+          switch (action) {
+            case "selectAll":
+              if (onSelectAll) {
+                onSelectAll(context);
+                handled = true;
+              }
+              break;
+            case "cut":
+              if (onCut) {
+                onCut(context);
+                handled = true;
+              }
+              break;
+            case "copy":
+              if (onCopy) {
+                onCopy(context);
+                handled = true;
+              }
+              break;
+            case "paste":
+              if (onPaste) {
+                onPaste(context);
+                handled = true;
+              }
+              break;
+            case "delete":
+              if (onDelete) {
+                onDelete(context);
+                handled = true;
+              }
+              break;
+          }
+
+          if (handled) {
+            event.preventDefault();
+            return true; // Signal that the event was handled
+          }
+        }
+      }
+
+      return false; // Event not handled
+    },
+    [parsedBindings, onSelectAll, onCut, onCopy, onPaste, onDelete, selectedItems, selectedRowIdMap, focusedIndex, data, idKey]
+  );
+
+  return handleKeyboardActions;
+}
+
 // eslint-disable-next-line react/display-name
 export const Table = forwardRef(
   (
@@ -405,6 +544,12 @@ export const Table = forwardRef(
       userSelectCell,
       userSelectRow,
       userSelectHeading,
+      keyBindings = defaultProps.keyBindings,
+      onSelectAll,
+      onCut,
+      onCopy,
+      onPaste,
+      onDelete,
       ...rest
       // cols
     }: TableProps,
@@ -479,6 +624,35 @@ export const Table = forwardRef(
       initiallySelected,
       syncWithAppState,
     });
+
+    // --- Handle keyboard actions (selectAll, cut, copy, paste, delete)
+    const handleKeyboardActions = useTableKeyboardActions({
+      keyBindings,
+      onSelectAll,
+      onCut,
+      onCopy,
+      onPaste,
+      onDelete,
+      selectedItems: selectionApi.getSelectedItems(),
+      selectedRowIdMap,
+      focusedIndex,
+      data: safeData,
+      idKey,
+    });
+
+    // --- Create composite keyboard handler that handles both actions and navigation
+    const compositeKeyDown = useCallback(
+      (event: React.KeyboardEvent<HTMLDivElement>) => {
+        // First, try to handle keyboard actions (selectAll, cut, copy, paste, delete)
+        const actionHandled = handleKeyboardActions(event);
+
+        // If no action was handled, delegate to existing row selection keyboard navigation
+        if (!actionHandled) {
+          onKeyDown(event);
+        }
+      },
+      [handleKeyboardActions, onKeyDown]
+    );
 
     // --- Create data with order information whenever the items in the table change
     const dataWithOrder = useMemo(() => {
@@ -896,7 +1070,7 @@ export const Table = forwardRef(
         {...rest}
         className={classnames(styles.wrapper, className, { [styles.noScroll]: hasOutsideScroll })}
         tabIndex={-1}
-        onKeyDown={onKeyDown}
+        onKeyDown={compositeKeyDown}
         onContextMenu={(e) => {e.preventDefault(); onContextMenu?.(e)}}
         ref={ref}
         style={style}

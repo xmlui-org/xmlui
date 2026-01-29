@@ -203,7 +203,15 @@ test.describe("Basic Functionality", () => {
         </Table>
       `);
 
+      // Wait for table to be visible first
+      const table = page.getByTestId("table");
+      await expect(table).toBeVisible();
+
+      // Wait for headers to be present
       const headers = page.locator("th");
+      await expect(headers).toHaveCount(2);
+
+      // Check header text content
       await expect(headers.nth(0)).toContainText("Name");
       await expect(headers.nth(1)).toContainText("Quantity");
     });
