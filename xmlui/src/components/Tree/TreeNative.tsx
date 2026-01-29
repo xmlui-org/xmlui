@@ -31,6 +31,7 @@ interface RowContext {
   itemClickExpands: boolean;
   onItemClick?: (item: FlatTreeNode) => void;
   onSelection: (node: FlatTreeNode) => void;
+  lookupEventHandler?: any;
   focusedIndex: number;
   onKeyDown: (e: React.KeyboardEvent) => void;
   treeContainerRef: React.RefObject<HTMLDivElement>;
@@ -56,6 +57,7 @@ const TreeRow = memo(({ index, data }: TreeRowProps) => {
     itemClickExpands,
     onItemClick,
     onSelection,
+    lookupEventHandler,
     focusedIndex,
     treeContainerRef,
     iconCollapsed,
@@ -154,6 +156,33 @@ const TreeRow = memo(({ index, data }: TreeRowProps) => {
     [onItemClick, itemClickExpands, treeItem, toggleNode, isLoading],
   );
 
+  const onContextMenuHandler = useCallback(
+    (e: React.MouseEvent) => {
+      // Prevent default browser context menu
+      e.preventDefault();
+      
+      // Use lookupEventHandler with context containing item variables
+      if (lookupEventHandler) {
+        const handler = lookupEventHandler("contextMenu", {
+          context: {
+            $item: {
+              id: treeItem.id,
+              name: treeItem.displayName,
+              depth: treeItem.depth,
+              isExpanded: treeItem.isExpanded,
+              hasChildren: treeItem.hasChildren,
+              ...treeItem,
+            },
+          },
+          ephemeral: true, // Don't cache this handler since context changes per row
+        });
+        
+        handler?.(e);
+      }
+    },
+    [lookupEventHandler, treeItem],
+  );
+
   return (
     <div style={{ width: "100%", display: "flex" }}>
       <div
@@ -168,6 +197,7 @@ const TreeRow = memo(({ index, data }: TreeRowProps) => {
         aria-label={treeItem.displayName}
         aria-busy={isLoading}
         tabIndex={isFocused ? 0 : -1}
+        onContextMenu={onContextMenuHandler}
       >
         <div
           onClick={onToggleNode}
@@ -366,7 +396,7 @@ interface TreeComponentProps {
   onNodeExpanded?: (node: FlatTreeNode) => void;
   onNodeCollapsed?: (node: FlatTreeNode) => void;
   loadChildren?: (node: FlatTreeNode) => Promise<any[]>;
-  onContextMenu?: any;
+  lookupEventHandler?: any;
   itemRenderer: (item: any) => ReactNode;
   className?: string;
 }
@@ -409,7 +439,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     onNodeExpanded,
     onNodeCollapsed,
     loadChildren,
-    onContextMenu,
+    lookupEventHandler,
     itemRenderer,
     className,
   } = props;
@@ -1271,6 +1301,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       itemClickExpands,
       onItemClick,
       onSelection: (node: FlatTreeNode) => setSelectedNodeById(node.key),
+      lookupEventHandler,
       focusedIndex,
       onKeyDown: handleKeyDown,
       treeContainerRef,
@@ -1289,6 +1320,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     itemClickExpands,
     onItemClick,
     setSelectedNodeById,
+    lookupEventHandler,
     focusedIndex,
     handleKeyDown,
     iconCollapsed,
@@ -2166,7 +2198,6 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       onFocus={handleTreeFocus}
       onBlur={handleTreeBlur}
       onKeyDown={handleKeyDown}
-      onContextMenu={onContextMenu}
       style={{ height: "100%", overflow: "auto" }}
       scrollStyle={scrollStyle}
       showScrollerFade={showScrollerFade}

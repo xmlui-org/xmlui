@@ -3567,8 +3567,85 @@ test.describe("Events", () => {
     const output = page.getByTestId("output");
 
     await expect(output).toHaveText("Not clicked");
-    await tree.click({ button: "right" });
+    // Right-click on the first node by finding its text
+    await page.getByText("Item 1").click({ button: "right" });
     await expect(output).toHaveText("Context menu triggered");
+  });
+
+  test("contextMenu event receives node context ($item) on right click label", async ({
+    initTestBed,
+    page,
+  }) => {
+    const data = [
+      { id: 1, name: "Item 1" },
+      { id: 2, name: "Item 2" },
+    ];
+
+    const { testStateDriver } = await initTestBed(`
+      <App>
+        <VStack height="200px">
+          <Tree 
+            testId="tree" 
+            data='{${JSON.stringify(data)}}' 
+            dataFormat="flat"
+            defaultExpanded="all"
+            onContextMenu="testState = $item.id"
+          >
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
+      </App>
+    `);
+
+    const item1 = page.getByTestId("1");
+    
+    // Right-click on the label area of item 1
+    await item1.click({ button: "right" });
+    
+    // Verify $item context was passed correctly
+    await expect.poll(testStateDriver.testState).toEqual(1);
+  });
+
+  test("contextMenu event receives node context ($item) on right click arrow area", async ({
+    initTestBed,
+    page,
+  }) => {
+    const data = [
+      { id: 1, name: "Item 1", parentId: null },
+      { id: 2, name: "Item 2", parentId: 1 },
+      { id: 3, name: "Item 3", parentId: 1 },
+    ];
+
+    const { testStateDriver } = await initTestBed(`
+      <App>
+        <VStack height="200px">
+          <Tree 
+            testId="tree" 
+            data='{${JSON.stringify(data)}}' 
+            dataFormat="flat"
+            defaultExpanded="all"
+            onContextMenu="testState = $item.id"
+          >
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
+      </App>
+    `);
+
+    // Right-click on the arrow/gutter area of item 1
+    const expandIcon = page.locator("[data-tree-expand-icon]").first();
+    await expandIcon.click({ button: "right" });
+    
+    // Verify $item context was passed correctly even when clicking the arrow area
+    await expect.poll(testStateDriver.testState).toEqual(1);
   });
 
   test("right-clicking arrow area focuses node without toggling expansion", async ({
