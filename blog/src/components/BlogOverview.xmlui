@@ -1,34 +1,43 @@
 <Component name="BlogOverview">
+  <H1 textAlign="center" fontSize="42px">
+    Blog
+  </H1>
   <List
     data="{
     $props.posts.filter(p => !p.draft).toSorted(function(a, b) {
       return Date.parse(b.date) - Date.parse(a.date);
     })
   }">
-    <VStack
-       var.blogLink="/blog/{$item.slug}"
-       gap="$space-2"
-       onClick="Actions.navigate(blogLink)">
-      <H1>
-        {$item.title}
-      </H1>
-      <Text variant="em">
-        {$item.description}
-      </Text>
-      <HStack>
-        <Text variant="em" fontSize="$fontSize-xs">
-          {$item.author}
+    <Card
+      var.blogLink="/blog/{$item.slug}"
+      padding="$space-4"
+      borderRadius="$space-2"
+      backgroundColor="$color-surface-0"
+      boxShadow="$boxShadow-spread"
+      marginBottom="$space-6">
+      <VStack gap="$space-2">
+        <HStack>
+          <Text variant="author">
+            {$item.author}
+          </Text>
+          <Text variant="date">
+            {formatDate($item.date, "d MMM yyyy")}
+          </Text>
+        </HStack>
+        <H2 variant="title">
+          {$item.title}
+        </H2>
+        <Text variant="description" maxLines="4" ellipses>
+          {$item.description}
         </Text>
-        <SpaceFiller />
-        <Text variant="em" fontSize="$fontSize-xs">
-          {formatDate($item.date, "MMM dd, yyyy")}
-        </Text>
-      </HStack>
-    </VStack>
-    <ContentSeparator
-      when="{$itemIndex < $props.posts.length - 1}"
-      marginTop="$space-4"
-      marginBottom="$space-8"
-    />
+        <HStack horizontalAlignment="end">
+          <Link to="{blogLink}" active>
+            <Text>
+              Read more →
+            </Text>
+          </Link>
+        </HStack>
+      </VStack>
+    </Card>
   </List>
 </Component>

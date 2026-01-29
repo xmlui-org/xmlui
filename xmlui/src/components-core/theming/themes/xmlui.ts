@@ -159,6 +159,17 @@ export const XmlUiBlogThemeDefinition: ThemeDefinition = {
     "fontWeight-bold": "700",
     "textColor-primary": "$color-surface-800",
     "textColor-NavLink--active": "$color-primary",
+    "textColor-Text-author": "$color-primary-400",
+    "fontSize-Text-author": "$fontSize-xs",
+    "fontSize-Text-date": "$fontSize-xs",
+    "textColor-Text-author--hover": "$color-primary-400",
+    "textColor-Text-date": "$color-primary-400",
+    "textColor-Text-date--hover": "$color-primary-400",
+    "textColor-Text-description": "$color-surface-500",
+    "textColor-Text-description--hover": "$color-surface-500",
+    "fontSize-Text-title": "40px",
+    "textColor-Text-title": "$color-surface-900",
+    "textColor-Text-title--hover": "$color-surface-900",
   },
 };
 

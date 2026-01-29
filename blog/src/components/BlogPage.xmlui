@@ -1,26 +1,19 @@
 <Component name="BlogPage">
-    <VStack>
-      <Link
-        fontSize="$fontSize-xs"
-        textDecorationLine="none"
-        label="← All posts"
-        to="/blog" />
-      <H1>
-        {$props.post.title}
-      </H1>
-      <Text fontSize="$fontSize-lg" color="$color-surface-400">
-        {$props.post.description}
-      </Text>
-      <HStack width="100%" paddingVertical="$space-2">
-        <Text fontWeight="600">
-          {$props.post.author}
-        </Text>
-        <SpaceFiller />
-        <Text color="$color-surface-400">
-          {formatDate($props.post.date, "MMM dd, yyyy")}
-        </Text>
-      </HStack>
-      <Image src="/blog/images/{$props.post.image}" />
-      <Markdown marginTop="$space-4" data="/blog/{$props.post.slug}.md" />
-    </VStack>
+  <VStack gap="$space-2">
+    <Link to="/blog" icon="chevronleft" label="Go to all posts" active />
+    <Card padding="$space-4" borderRadius="$space-2" backgroundColor="$color-surface-0" boxShadow="$boxShadow-spread">
+      <VStack gap="$space-2">
+          <Text variant="author">
+            {$props.post.author}
+            •
+            {formatDate($props.post.date, "d MMM yyyy")}
+          </Text>
+        <H1 showAnchor="false">
+          {$props.post.title}
+        </H1>
+        <!--<Image when="{$props.post.image}" src="/blog/images/{$props.post.image}" />-->
+        <Markdown marginTop="$space-4" data="/blog/{$props.post.slug}.md" />
+      </VStack>
+    </Card>
+  </VStack>
 </Component>
