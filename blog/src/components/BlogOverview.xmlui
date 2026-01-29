@@ -1,5 +1,5 @@
 <Component name="BlogOverview">
-  <H1 textAlign="center" fontSize="42px">
+  <H1 textAlign="center" fontSize="42px" showAnchor="false">
     Blog
   </H1>
   <List
