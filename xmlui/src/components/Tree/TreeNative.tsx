@@ -161,6 +161,15 @@ const TreeRow = memo(({ index, data }: TreeRowProps) => {
       // Prevent default browser context menu
       e.preventDefault();
       
+      // Focus the item when context menu is triggered
+      if (treeItem.selectable) {
+        onSelection(treeItem);
+        // Ensure tree container maintains focus after mouse selection
+        setTimeout(() => {
+          treeContainerRef.current?.focus();
+        }, 0);
+      }
+      
       // Use lookupEventHandler with context containing item variables
       if (lookupEventHandler) {
         const handler = lookupEventHandler("contextMenu", {
@@ -180,7 +189,7 @@ const TreeRow = memo(({ index, data }: TreeRowProps) => {
         handler?.(e);
       }
     },
-    [lookupEventHandler, treeItem],
+    [lookupEventHandler, treeItem, onSelection, treeContainerRef],
   );
 
   return (

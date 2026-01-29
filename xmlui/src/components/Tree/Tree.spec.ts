@@ -3750,6 +3750,54 @@ test.describe("Events", () => {
     await expect(tree.getByTestId("2")).toBeVisible();
     await expect(tree.getByTestId("3")).toBeVisible();
   });
+
+  test("right-clicking to show context menu focuses the item", async ({
+    initTestBed,
+    page,
+    createTreeDriver,
+  }) => {
+    const SELECTED_BG_COLOR = "rgb(255, 0, 0)";
+    const data = [
+      { id: 1, name: "Item 1" },
+      { id: 2, name: "Item 2" },
+      { id: 3, name: "Item 3" },
+    ];
+
+    await initTestBed(
+      `
+      <App var.contextMenuVisible="false">
+        <VStack height="200px">
+          <Tree 
+            testId="tree" 
+            data='{${JSON.stringify(data)}}' 
+            dataFormat="flat"
+            onContextMenu="contextMenuVisible = true"
+          >
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
+      </App>
+    `,
+      {
+        testThemeVars: {
+          "backgroundColor-Tree-row--selected": SELECTED_BG_COLOR,
+        },
+      },
+    );
+
+    const tree = await createTreeDriver("tree");
+
+    // Right-click on Item 2 to trigger context menu
+    await page.getByText("Item 2").click({ button: "right" });
+
+    // Verify the item is now focused/selected
+    const selectedRowWrapper = tree.getNodeWrapperByTestId("2");
+    await expect(selectedRowWrapper).toHaveCSS("background-color", SELECTED_BG_COLOR);
+  });
 });
 
 // =============================================================================
