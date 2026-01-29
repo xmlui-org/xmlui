@@ -81,15 +81,7 @@ export function AppContent({
   children,
   onInit,
 }: AppContentProps) {
-  if (typeof window !== "undefined") {
-    const w = window as any;
-    if (!w._xsStartupTrace) {
-      w._xsStartupTrace = `startup-${Date.now().toString(36)}`;
-    }
-    if (!w._xsCurrentTrace) {
-      w._xsCurrentTrace = w._xsStartupTrace;
-    }
-  }
+  // Note: Startup trace initialization is deferred to the xsVerbose useEffect below
   const [loggedInUser, setLoggedInUser] = useState(null);
   const debugView = useDebugView();
   const componentRegistry = useComponentRegistry();

@@ -54,9 +54,12 @@ export class ErrorBoundary extends React.Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("Uncaught error:", error, errorInfo, this.props.location);
 
-    // Trace the error if tracing is enabled
+    // Trace the error if xsVerbose tracing is enabled
+    // Note: ErrorBoundary is a class component without access to appContext,
+    // so we check _xsLogs existence as a proxy for xsVerbose being enabled
     if (typeof window !== "undefined") {
       const w = window as any;
+      // _xsLogs is only initialized when xsVerbose=true in AppContent
       if (Array.isArray(w._xsLogs)) {
         w._xsLogs.push({
           ts: Date.now(),

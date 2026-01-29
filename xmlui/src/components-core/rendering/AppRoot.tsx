@@ -60,15 +60,7 @@ export function AppRoot({
   extensionManager?: StandaloneExtensionManager;
   isNested?: boolean;
 }) {
-  if (typeof window !== "undefined") {
-    const w = window as any;
-    if (!w._xsStartupTrace) {
-      w._xsStartupTrace = `startup-${Date.now().toString(36)}`;
-    }
-    if (!w._xsCurrentTrace) {
-      w._xsCurrentTrace = w._xsStartupTrace;
-    }
-  }
+  // Note: Startup trace initialization is handled by AppContent's xsVerbose useEffect
   // --- Make sure, the root node is wrapped in a `Theme` component. Also,
   // --- the root node must be wrapped in a `Container` component managing
   // --- the app's top-level state.

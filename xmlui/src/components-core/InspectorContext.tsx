@@ -59,8 +59,12 @@ export function InspectorProvider({
     y: 0,
   });
 
+  // Only populate inspector maps when xsVerbose is enabled (check window._xsLogs existence as proxy)
   useEffect(() => {
     if (typeof window === "undefined") return;
+    const w = window as any;
+    // Only run if xsVerbose tracing is active (indicated by _xsLogs being initialized)
+    if (!Array.isArray(w._xsLogs)) return;
     const map: Record<string, any> = {};
     Object.values(inspectable).forEach((item: any) => {
       const node = item?.node;
@@ -80,18 +84,24 @@ export function InspectorProvider({
         inspectId: item.inspectId,
       };
     });
-    (window as any)._xsInspectMap = map;
+    w._xsInspectMap = map;
   }, [inspectable]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    const w = window as any;
+    // Only run if xsVerbose tracing is active
+    if (!Array.isArray(w._xsLogs)) return;
     if (sources) {
-      (window as any)._xsSources = sources;
+      w._xsSources = sources;
     }
   }, [sources]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    const w = window as any;
+    // Only run if xsVerbose tracing is active
+    if (!Array.isArray(w._xsLogs)) return;
     if (!projectCompilation) return;
     const files: string[] = [];
     if (projectCompilation.entrypoint?.filename) {
@@ -100,7 +110,7 @@ export function InspectorProvider({
     projectCompilation.components?.forEach((comp) => {
       if (comp?.filename) files.push(comp.filename);
     });
-    (window as any)._xsSourceFiles = files;
+    w._xsSourceFiles = files;
   }, [projectCompilation]);
   const contextValue: IInspectorContext = useMemo(() => {
     return {

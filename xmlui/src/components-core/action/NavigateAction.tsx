@@ -3,7 +3,7 @@ import { createUrlWithQueryParams } from "../../components/component-utils";
 import { createAction } from "./actions";
 
 function navigate(
-  { navigate, location }: ActionExecutionContext,
+  { navigate, location, appContext }: ActionExecutionContext,
   pathname: string | number,
   queryParams?: Record<string, any>,
 ) {
@@ -19,8 +19,8 @@ function navigate(
       })
     : pathname;
 
-  // Trace navigation event
-  if (typeof window !== "undefined") {
+  // Trace navigation event (only when xsVerbose is enabled)
+  if (appContext?.appGlobals?.xsVerbose === true && typeof window !== "undefined") {
     const w = window as any;
     if (Array.isArray(w._xsLogs)) {
       w._xsLogs.push({

@@ -12,6 +12,7 @@ import type { ButtonVariant, ButtonThemeColor } from "../abstractions";
 import { Button } from "../Button/ButtonNative";
 import { Stack } from "../Stack/StackNative";
 import { Dialog } from "./Dialog";
+import { useAppContext } from "../../components-core/AppContext";
 
 const ConfirmationModalContext = React.createContext({
   confirm: (title: string, message?: string, actionLabel?: string) => Promise.resolve(false),
@@ -37,6 +38,9 @@ type ConfirmParams = {
 };
 
 export const ConfirmationModalContextProvider = ({ children }: Props) => {
+  const appContext = useAppContext();
+  const xsVerbose = appContext?.appGlobals?.xsVerbose === true;
+
   // State
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [title, setTitle] = useState<string>("Are you sure?");
@@ -60,10 +64,10 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
 
   const handleShow = useCallback(
     (title: string | ConfirmParams, message?: string, actionLabel?: string) => {
-      if (typeof window !== "undefined") {
+      // Trace confirmation modal show (only when xsVerbose is enabled)
+      if (xsVerbose && typeof window !== "undefined") {
         const w = window as any;
         w._xsPendingConfirmTrace = w._xsCurrentTrace || w._xsLastInteraction?.id;
-        // Trace confirmation modal show
         if (Array.isArray(w._xsLogs)) {
           const modalTitle = typeof title === "string" ? title : title.title;
           w._xsLogs.push({
@@ -95,12 +99,12 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
         resolver.current = resolve;
       });
     },
-    [],
+    [xsVerbose],
   );
 
   const handleOk = useCallback((value: any) => {
-    // Trace confirmation
-    if (typeof window !== "undefined") {
+    // Trace confirmation (only when xsVerbose is enabled)
+    if (xsVerbose && typeof window !== "undefined") {
       const w = window as any;
       if (Array.isArray(w._xsLogs)) {
         // Restore trace context from when modal was shown
@@ -121,11 +125,11 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
       resolver.current(value);
     }
     setShowConfirmationModal(false);
-  }, []);
+  }, [xsVerbose]);
 
   const handleCancel = useCallback(() => {
-    // Trace cancellation
-    if (typeof window !== "undefined") {
+    // Trace cancellation (only when xsVerbose is enabled)
+    if (xsVerbose && typeof window !== "undefined") {
       const w = window as any;
       if (Array.isArray(w._xsLogs)) {
         // Restore trace context from when modal was shown
@@ -145,7 +149,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
       resolver.current(false);
     }
     setShowConfirmationModal(false);
-  }, []);
+  }, [xsVerbose]);
 
   const contextValue = useMemo(() => {
     return {

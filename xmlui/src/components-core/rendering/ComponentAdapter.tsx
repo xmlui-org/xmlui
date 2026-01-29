@@ -129,8 +129,9 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     return extractParam(state, rawLabel, appContext, true);
   }, [state, safeNode.props, appContext]);
 
+  const xsVerboseForMap = appContext.appGlobals?.xsVerbose === true;
   useEffect(() => {
-    if (!resolvedTestId || typeof window === "undefined") return;
+    if (!xsVerboseForMap || !resolvedTestId || typeof window === "undefined") return;
     const w = window as any;
     w._xsTestIdMap = w._xsTestIdMap || {};
     const componentType = safeNode.type;
@@ -146,7 +147,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
         delete w._xsTestIdMap[resolvedTestId];
       }
     };
-  }, [resolvedTestId, safeNode.type, resolvedLabel, uid]);
+  }, [xsVerboseForMap, resolvedTestId, safeNode.type, resolvedLabel, uid]);
 
   // --- Obtain a function to register the component API
   const memoedRegisterComponentApi: RegisterComponentApiFn = useCallback(
