@@ -433,16 +433,16 @@ function useTableKeyboardActions({
   // Create composite keyboard handler
   const handleKeyboardActions = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
-      // Only handle keyboard actions if rowsSelectable is true
-      if (!rowsSelectable) {
-        return false;
-      }
-
       // Check each parsed binding
       for (const { binding, action } of Object.values(parsedBindings)) {
         if (matchesKeyEvent(event.nativeEvent, binding)) {
           // Prevent default browser behavior immediately when key matches
           event.preventDefault();
+          
+          // If rowsSelectable is false, prevent default but don't execute any actions
+          if (!rowsSelectable) {
+            return true; // Event handled (prevented), but don't execute action
+          }
           
           // Call the appropriate handler
           let handled = false;
@@ -1120,8 +1120,24 @@ export const Table = forwardRef(
       <div
         {...rest}
         className={classnames(styles.wrapper, className, { [styles.noScroll]: hasOutsideScroll })}
-        tabIndex={-1}
+        tabIndex={0}
         onKeyDown={compositeKeyDown}
+        onClick={(e) => {
+          const target = e.target as HTMLElement;
+          // Skip focusing if we're clicking on/in a button or a text input
+          if (target.closest("button")) {
+            return;
+          }
+          if (target.tagName.toLowerCase() === "input") {
+            const inputType = (target as HTMLInputElement).type;
+            // Skip text inputs but allow checkboxes to focus the wrapper
+            if (inputType !== "checkbox") {
+              return;
+            }
+          }
+          // Focus the wrapper to enable keyboard shortcuts
+          wrapperRef.current?.focus();
+        }}
         onContextMenu={(e) => {e.preventDefault(); onContextMenu?.(e)}}
         ref={ref}
         style={style}
@@ -1351,9 +1367,6 @@ export const Table = forwardRef(
                       })}
                       style={{ userSelect: effectiveUserSelectRow as React.CSSProperties['userSelect'] }}
                       onClick={(event) => {
-                        // Focus the table wrapper to enable keyboard shortcuts
-                        wrapperRef.current?.focus();
-                        
                         if (!row.getCanSelect()) {
                           return;
                         }
@@ -1367,6 +1380,9 @@ export const Table = forwardRef(
                         if (target.closest("button")) {
                           return;
                         }
+                        
+                        // Focus the table wrapper to enable keyboard shortcuts (after checking input/button)
+                        wrapperRef.current?.focus();
 
                         // Check if click is within checkbox boundary
                         const currentRow = event.currentTarget as HTMLElement;
