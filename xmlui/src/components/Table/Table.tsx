@@ -26,7 +26,7 @@ import type { PropertyValueDescription } from "../../abstractions/ComponentDefs"
 
 const COMP = "Table";
 
-const UserSelectValues: PropertyValueDescription[] = [
+const userSelectValues: PropertyValueDescription[] = [
   { value: "auto", description: "Default text selection behavior" },
   { value: "text", description: "Text can be selected by the user" },
   { value: "none", description: "Text cannot be selected" },
@@ -258,7 +258,7 @@ export const TableMd = createMetadata({
         `This property controls whether users can select text within table cells. ` +
         `Use \`text\` to allow text selection, \`none\` to prevent selection, or \`auto\` for default behavior.`,
       valueType: "string",
-      availableValues: UserSelectValues,
+      availableValues: userSelectValues,
       defaultValue: defaultProps.userSelectCell,
     },
     userSelectRow: {
@@ -266,7 +266,7 @@ export const TableMd = createMetadata({
         `This property controls whether users can select text within table rows. ` +
         `Use \`text\` to allow text selection, \`none\` to prevent selection, or \`auto\` for default behavior.`,
       valueType: "string",
-      availableValues: UserSelectValues,
+      availableValues: userSelectValues,
       defaultValue: defaultProps.userSelectRow,
     },
     userSelectHeading: {
@@ -274,7 +274,7 @@ export const TableMd = createMetadata({
         `This property controls whether users can select text within table headings. ` +
         `Use \`text\` to allow text selection, \`none\` to prevent selection, or \`auto\` for default behavior.`,
       valueType: "string",
-      availableValues: UserSelectValues,
+      availableValues: userSelectValues,
       defaultValue: defaultProps.userSelectHeading,
     },
     keyBindings: {
@@ -284,7 +284,6 @@ export const TableMd = createMetadata({
         "Electron accelerator syntax (e.g., 'CmdOrCtrl+A', 'Delete'). Available actions: " +
         "\`selectAll\`, \`cut\`, \`copy\`, \`paste\`, \`delete\`. If not provided, default shortcuts are used.",
       valueType: "any",
-      defaultValue: "{ selectAll: 'CmdOrCtrl+A', cut: 'CmdOrCtrl+X', copy: 'CmdOrCtrl+C', paste: 'CmdOrCtrl+V', delete: 'Delete' }",
     },
   },
   events: {
@@ -327,62 +326,71 @@ export const TableMd = createMetadata({
         selectedItems: "An array of the selected table row items.",
       },
     },
-    selectAll: {
+    selectAllAction: {
       description:
         `This event is triggered when the user presses the select all keyboard shortcut ` +
         `(default: Ctrl+A/Cmd+A) and \`rowsSelectable\` is set to \`true\`. The component ` +
         `automatically selects all rows before invoking this handler. The handler receives ` +
-        `the complete action context with all items selected, including selection information, ` +
-        `focused row, and cell details.`,
-      signature: "selectAll(context: TableActionContext): void | Promise<void>",
+        `three parameters: the currently focused row (if any), all selected items, and all selected IDs.`,
+      signature: "selectAll(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
       parameters: {
-        context: "The action context containing selection, focused row, and cell information. All rows are selected.",
+        row: "The currently focused row context, or null if no row is focused. Contains item data, row index, row ID, and selection state.",
+        selectedItems: "Array of all selected row items. When selectAll is triggered, this contains all table rows.",
+        selectedIds: "Array of all selected row IDs (as strings). When selectAll is triggered, this contains all row IDs.",
       },
     },
-    cut: {
+    cutAction: {
       description:
         `This event is triggered when the user presses the cut keyboard shortcut ` +
         `(default: Ctrl+X/Cmd+X) and \`rowsSelectable\` is set to \`true\`. The handler receives ` +
-        `the complete action context. Note: The component does not automatically modify data; ` +
-        `the handler must implement the cut logic (e.g., copying data to clipboard and removing ` +
-        `from the data source).`,
-      signature: "cut(context: TableActionContext): void | Promise<void>",
+        `three parameters: the focused row, selected items, and selected IDs. Note: The component ` +
+        `does not automatically modify data; the handler must implement the cut logic (e.g., ` +
+        `copying data to clipboard and removing from the data source).`,
+      signature: "cut(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
       parameters: {
-        context: "The action context containing selection, focused row, and cell information.",
+        row: "The currently focused row context, or null if no row is focused.",
+        selectedItems: "Array of selected row items.",
+        selectedIds: "Array of selected row IDs (as strings).",
       },
     },
-    copy: {
+    copyAction: {
       description:
         `This event is triggered when the user presses the copy keyboard shortcut ` +
         `(default: Ctrl+C/Cmd+C) and \`rowsSelectable\` is set to \`true\`. The handler receives ` +
-        `the complete action context. The handler should implement the copy logic (e.g., using ` +
-        `the Clipboard API to copy selected data).`,
-      signature: "copy(context: TableActionContext): void | Promise<void>",
+        `three parameters: the focused row, selected items, and selected IDs. The handler should ` +
+        `implement the copy logic (e.g., using the Clipboard API to copy selected data).`,
+      signature: "copy(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
       parameters: {
-        context: "The action context containing selection, focused row, and cell information.",
+        row: "The currently focused row context, or null if no row is focused.",
+        selectedItems: "Array of selected row items.",
+        selectedIds: "Array of selected row IDs (as strings).",
       },
     },
-    paste: {
+    pasteAction: {
       description:
         `This event is triggered when the user presses the paste keyboard shortcut ` +
         `(default: Ctrl+V/Cmd+V) and \`rowsSelectable\` is set to \`true\`. The handler receives ` +
-        `the complete action context. The handler must implement the paste logic (e.g., reading ` +
-        `from clipboard and inserting data into the table).`,
-      signature: "paste(context: TableActionContext): void | Promise<void>",
+        `three parameters: the focused row, selected items, and selected IDs. The handler must ` +
+        `implement the paste logic (e.g., reading from clipboard and inserting data into the table).`,
+      signature: "paste(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
       parameters: {
-        context: "The action context containing selection, focused row, and cell information.",
+        row: "The currently focused row context, or null if no row is focused.",
+        selectedItems: "Array of selected row items.",
+        selectedIds: "Array of selected row IDs (as strings).",
       },
     },
-    delete: {
+    deleteAction: {
       description:
         `This event is triggered when the user presses the delete keyboard shortcut ` +
         `(default: Delete key) and \`rowsSelectable\` is set to \`true\`. The handler receives ` +
-        `the complete action context. Note: The component does not automatically remove data; ` +
-        `the handler must implement the delete logic (e.g., removing selected items from the ` +
-        `data source).`,
-      signature: "delete(context: TableActionContext): void | Promise<void>",
+        `three parameters: the focused row, selected items, and selected IDs. Note: The component ` +
+        `does not automatically remove data; the handler must implement the delete logic (e.g., ` +
+        `removing selected items from the data source).`,
+      signature: "delete(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
       parameters: {
-        context: "The action context containing selection, focused row, and cell information.",
+        row: "The currently focused row context, or null if no row is focused.",
+        selectedItems: "Array of selected row items.",
+        selectedIds: "Array of selected row IDs (as strings).",
       },
     },
   },
@@ -578,11 +586,11 @@ const TableWithColumns = memo(
             onSelectionDidChange={lookupEventHandler("selectionDidChange")}
             willSort={lookupEventHandler("willSort")}
             rowDoubleClick={lookupEventHandler("rowDoubleClick")}
-            onSelectAll={lookupEventHandler("selectAll")}
-            onCut={lookupEventHandler("cut")}
-            onCopy={lookupEventHandler("copy")}
-            onPaste={lookupEventHandler("paste")}
-            onDelete={lookupEventHandler("delete")}
+            onSelectAllAction={lookupEventHandler("selectAllAction")}
+            onCutAction={lookupEventHandler("cutAction")}
+            onCopyAction={lookupEventHandler("copyAction")}
+            onPasteAction={lookupEventHandler("pasteAction")}
+            onDeleteAction={lookupEventHandler("deleteAction")}
             uid={node.uid}
             autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
             hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}

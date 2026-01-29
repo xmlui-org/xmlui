@@ -101,20 +101,6 @@ export type CheckboxTolerance = (typeof CheckboxToleranceValues)[number];
 // Table Action Context Types
 
 /**
- * Context information about the current selection in the table
- */
-export type TableSelectionContext = {
-  /** Array of selected row items (full row objects) */
-  selectedItems: any[];
-  /** Array of selected row IDs */
-  selectedIds: string[];
-  /** Total number of rows in the table */
-  totalRowCount: number;
-  /** Number of selected rows */
-  selectedRowCount: number;
-};
-
-/**
  * Context information about a specific row
  */
 export type TableRowContext = {
@@ -131,38 +117,27 @@ export type TableRowContext = {
 };
 
 /**
- * Context information about a specific cell (for future use)
- */
-export type TableCellContext = {
-  /** The cell value */
-  value: any;
-  /** Column accessor key */
-  columnKey: string;
-  /** Column index (0-based) */
-  columnIndex: number;
-};
-
-/**
  * Complete context passed to table action event handlers
  */
 export type TableActionContext = {
-  /** Selection context */
-  selection: TableSelectionContext;
+  /** Array of selected row IDs */
+  selectedIds: string[];
+  /** Array of selected row items (full row objects) */
+  selectedItems: any[];
   /** Current focused row context (if any) */
-  focusedRow: TableRowContext | null;
-  /** Cell context (null for now, reserved for future cell-level actions) */
-  focusedCell: TableCellContext | null;
+  row: TableRowContext | null;
 };
 
 /**
- * Helper function to build TableActionContext from current table state
+ * Helper function to build action context parameters from current table state.
+ * Returns three separate values instead of an object for cleaner event handler APIs.
  * 
  * @param selectedItems - Array of selected row items
  * @param selectedRowIdMap - Map of selected row IDs
  * @param focusedIndex - Currently focused row index (-1 if none)
  * @param data - All table data
  * @param idKey - Property name used for row IDs
- * @returns Complete action context
+ * @returns Tuple of [row context, selected items, selected IDs]
  */
 function buildActionContext(
   selectedItems: any[],
@@ -170,20 +145,13 @@ function buildActionContext(
   focusedIndex: number,
   data: any[],
   idKey: string,
-): TableActionContext {
+): [TableRowContext | null, any[], string[]] {
   const selectedIds = Object.keys(selectedRowIdMap).filter((id) => selectedRowIdMap[id]);
 
-  const selection: TableSelectionContext = {
-    selectedItems,
-    selectedIds,
-    totalRowCount: data.length,
-    selectedRowCount: selectedItems.length,
-  };
-
-  let focusedRow: TableRowContext | null = null;
+  let row: TableRowContext | null = null;
   if (focusedIndex >= 0 && focusedIndex < data.length) {
     const item = data[focusedIndex];
-    focusedRow = {
+    row = {
       item,
       rowIndex: focusedIndex,
       rowId: String(item[idKey]),
@@ -192,11 +160,7 @@ function buildActionContext(
     };
   }
 
-  return {
-    selection,
-    focusedRow,
-    focusedCell: null, // Reserved for future use
-  };
+  return [row, selectedItems, selectedIds];
 }
 
 // =====================================================================================================================
@@ -256,11 +220,11 @@ type TableProps = {
   userSelectRow?: string;
   userSelectHeading?: string;
   keyBindings?: Record<string, string>;
-  onSelectAll?: AsyncFunction;
-  onCut?: AsyncFunction;
-  onCopy?: AsyncFunction;
-  onPaste?: AsyncFunction;
-  onDelete?: AsyncFunction;
+  onSelectAllAction?: AsyncFunction;
+  onCutAction?: AsyncFunction;
+  onCopyAction?: AsyncFunction;
+  onPasteAction?: AsyncFunction;
+  onDeleteAction?: AsyncFunction;
 };
 
 function defaultIsRowDisabled(_: any) {
@@ -359,11 +323,11 @@ const getCommonPinningStyles = (column: Column<RowWithOrder>): CSSProperties => 
  */
 function useTableKeyboardActions({
   keyBindings,
-  onSelectAll,
-  onCut,
-  onCopy,
-  onPaste,
-  onDelete,
+  onSelectAllAction,
+  onCutAction,
+  onCopyAction,
+  onPasteAction,
+  onDeleteAction,
   selectedItems,
   selectedRowIdMap,
   focusedIndex,
@@ -373,11 +337,11 @@ function useTableKeyboardActions({
   selectionApi,
 }: {
   keyBindings: Record<string, string>;
-  onSelectAll?: AsyncFunction;
-  onCut?: AsyncFunction;
-  onCopy?: AsyncFunction;
-  onPaste?: AsyncFunction;
-  onDelete?: AsyncFunction;
+  onSelectAllAction?: AsyncFunction;
+  onCutAction?: AsyncFunction;
+  onCopyAction?: AsyncFunction;
+  onPasteAction?: AsyncFunction;
+  onDeleteAction?: AsyncFunction;
   selectedItems: any[];
   selectedRowIdMap: Record<string, boolean>;
   focusedIndex: number | null;
@@ -458,7 +422,7 @@ function useTableKeyboardActions({
               });
               
               // Build context with all items selected
-              const selectAllContext = buildActionContext(
+              const [row, allItems, allIds] = buildActionContext(
                 data, // All data items are selected
                 allSelectedRowIdMap,
                 focusedIndex,
@@ -467,60 +431,60 @@ function useTableKeyboardActions({
               );
               
               // Finally, invoke the event handler if provided
-              if (onSelectAll) {
-                onSelectAll(selectAllContext);
+              if (onSelectAllAction) {
+                onSelectAllAction(row, allItems, allIds);
               }
               handled = true;
               break;
             case "cut":
-              if (onCut) {
-                const context = buildActionContext(
+              if (onCutAction) {
+                const [row, items, ids] = buildActionContext(
                   selectedItems,
                   selectedRowIdMap,
                   focusedIndex,
                   data,
                   idKey
                 );
-                onCut(context);
+                onCutAction(row, items, ids);
                 handled = true;
               }
               break;
             case "copy":
-              if (onCopy) {
-                const context = buildActionContext(
+              if (onCopyAction) {
+                const [row, items, ids] = buildActionContext(
                   selectedItems,
                   selectedRowIdMap,
                   focusedIndex,
                   data,
                   idKey
                 );
-                onCopy(context);
+                onCopyAction(row, items, ids);
                 handled = true;
               }
               break;
             case "paste":
-              if (onPaste) {
-                const context = buildActionContext(
+              if (onPasteAction) {
+                const [row, items, ids] = buildActionContext(
                   selectedItems,
                   selectedRowIdMap,
                   focusedIndex,
                   data,
                   idKey
                 );
-                onPaste(context);
+                onPasteAction(row, items, ids);
                 handled = true;
               }
               break;
             case "delete":
-              if (onDelete) {
-                const context = buildActionContext(
+              if (onDeleteAction) {
+                const [row, items, ids] = buildActionContext(
                   selectedItems,
                   selectedRowIdMap,
                   focusedIndex,
                   data,
                   idKey
                 );
-                onDelete(context);
+                onDeleteAction(row, items, ids);
                 handled = true;
               }
               break;
@@ -534,7 +498,7 @@ function useTableKeyboardActions({
 
       return false; // Event not handled
     },
-    [parsedBindings, onSelectAll, onCut, onCopy, onPaste, onDelete, selectedItems, selectedRowIdMap, focusedIndex, data, idKey, rowsSelectable, selectionApi]
+    [parsedBindings, onSelectAllAction, onCutAction, onCopyAction, onPasteAction, onDeleteAction, selectedItems, selectedRowIdMap, focusedIndex, data, idKey, rowsSelectable, selectionApi]
   );
 
   return handleKeyboardActions;
@@ -594,11 +558,11 @@ export const Table = forwardRef(
       userSelectRow,
       userSelectHeading,
       keyBindings = defaultProps.keyBindings,
-      onSelectAll,
-      onCut,
-      onCopy,
-      onPaste,
-      onDelete,
+      onSelectAllAction,
+      onCutAction,
+      onCopyAction,
+      onPasteAction,
+      onDeleteAction,
       ...rest
       // cols
     }: TableProps,
@@ -677,11 +641,11 @@ export const Table = forwardRef(
     // --- Handle keyboard actions (selectAll, cut, copy, paste, delete)
     const handleKeyboardActions = useTableKeyboardActions({
       keyBindings,
-      onSelectAll,
-      onCut,
-      onCopy,
-      onPaste,
-      onDelete,
+      onSelectAllAction,
+      onCutAction,
+      onCopyAction,
+      onPasteAction,
+      onDeleteAction,
       selectedItems: selectionApi.getSelectedItems(),
       selectedRowIdMap,
       focusedIndex,
@@ -1124,17 +1088,17 @@ export const Table = forwardRef(
         onKeyDown={compositeKeyDown}
         onClick={(e) => {
           const target = e.target as HTMLElement;
-          // Skip focusing if we're clicking on/in a button or a text input
+          
+          // Skip focusing wrapper if clicking on interactive elements that handle their own focus
           if (target.closest("button")) {
             return;
           }
-          if (target.tagName.toLowerCase() === "input") {
-            const inputType = (target as HTMLInputElement).type;
-            // Skip text inputs but allow checkboxes to focus the wrapper
-            if (inputType !== "checkbox") {
-              return;
-            }
+          
+          // Skip if target is an element that expects keyboard text input
+          if (isTextInputElement(target)) {
+            return;
           }
+          
           // Focus the wrapper to enable keyboard shortcuts
           wrapperRef.current?.focus();
         }}
@@ -1559,6 +1523,20 @@ function ColumnOrderingIndicator({
   ) : (
     <Icon name={iconNoSort} size="12" />
   ); //nosort
+}
+
+/**
+ * Checks if an HTML element expects keyboard text input
+ * @param target - The HTML element to check
+ * @returns true if the element expects text input (textarea, contenteditable, or text-like input)
+ */
+function isTextInputElement(target: HTMLElement): boolean {
+  return (
+    target.tagName.toLowerCase() === "textarea" ||
+    target.contentEditable === "true" ||
+    (target.tagName.toLowerCase() === "input" && 
+     !["checkbox", "radio", "button", "submit", "reset", "file", "image"].includes((target as HTMLInputElement).type))
+  );
 }
 
 export const defaultProps = {

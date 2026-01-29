@@ -24,7 +24,6 @@
  */
 
 import { expect, test } from "../../testing/fixtures";
-import { SKIP_REASON } from "../../testing/component-test-helpers";
 
 // Sample data for testing
 const sampleData = [
@@ -79,6 +78,7 @@ test.describe("Basic Functionality", () => {
     `);
 
     const firstRow = page.locator("tbody tr").first();
+    await expect(firstRow).toBeVisible();
     await firstRow.dblclick();
 
     await expect.poll(testStateDriver.testState).toEqual("Apple");
@@ -117,6 +117,15 @@ test.describe("Basic Functionality", () => {
         </Table>
       `);
 
+      // Wait for table to be visible first
+      const table = page.getByTestId("table");
+      await expect(table).toBeVisible();
+
+      // Wait for rows to be present
+      const rows = page.locator("tbody tr");
+      await expect(rows).toHaveCount(2);
+
+      // Now check for cell content
       await expect(page.locator("td").filter({ hasText: "Test" }).first()).toBeVisible();
       await expect(page.locator("td").filter({ hasText: "42" }).first()).toBeVisible();
       await expect(page.locator("td").filter({ hasText: "true" }).first()).toBeVisible();
@@ -188,11 +197,15 @@ test.describe("Basic Functionality", () => {
         </Table>
       `);
 
-      // Header should not be visible
-      await expect(page.locator("th")).toHaveCount(0);
+      // Wait for table to be visible and fully rendered
+      const table = page.getByTestId("table");
+      await expect(table).toBeVisible();
 
-      // Data should still be visible
+      // Wait for data to be visible (ensures table is fully rendered)
       await expect(page.locator("td").filter({ hasText: "Apple" }).first()).toBeVisible();
+
+      // Now check that headers are not present
+      await expect(page.locator("th")).toHaveCount(0);
     });
 
     test("shows header when hideHeader is false", async ({ initTestBed, page }) => {
@@ -2301,7 +2314,7 @@ test.describe("Keyboard Shortcuts", () => {
           rowsSelectable="true"
           testId="table"
           autoFocus="true"
-          onSelectAll="context => testState = { action: 'selectAll', selectedRowCount: context.selection.selectedRowCount }"
+          onSelectAllAction="(row, selectedItems, selectedIds) => testState = { action: 'selectAll', selectedItemsLength: selectedItems.length }"
         >
           <Column bindTo="name"/>
           <Column bindTo="quantity"/>
@@ -2318,7 +2331,7 @@ test.describe("Keyboard Shortcuts", () => {
 
       await expect.poll(testStateDriver.testState).toEqual({
         action: "selectAll",
-        selectedRowCount: sampleData.length, // All items are now automatically selected
+        selectedItemsLength: sampleData.length, // All items are now automatically selected
       });
     });
 
@@ -2329,10 +2342,10 @@ test.describe("Keyboard Shortcuts", () => {
           rowsSelectable="true"
           testId="table"
           autoFocus="true"
-          onSelectAll="context => testState = { 
-            selectedRowCount: context.selection.selectedRowCount,
-            totalRowCount: context.selection.totalRowCount,
-            focusedRow: context.focusedRow ? context.focusedRow.item.name : null
+          onSelectAllAction="(row, selectedItems, selectedIds) => testState = { 
+            selectedItemsLength: selectedItems.length,
+            selectedIdsLength: selectedIds.length,
+            focusedRow: row ? row.item.name : null
           }"
         >
           <Column bindTo="name"/>
@@ -2349,8 +2362,8 @@ test.describe("Keyboard Shortcuts", () => {
       await page.keyboard.press(selectAllKey);
 
       const result = await testStateDriver.testState();
-      expect(result.selectedRowCount).toBeGreaterThanOrEqual(0);
-      expect(result.totalRowCount).toBeGreaterThan(0);
+      expect(result.selectedItemsLength).toBeGreaterThanOrEqual(0);
+      expect(result.selectedIdsLength).toBeGreaterThan(0);
     });
 
     test("does not trigger when table is not focused", async ({ initTestBed, page }) => {
@@ -2361,7 +2374,7 @@ test.describe("Keyboard Shortcuts", () => {
             data='{${JSON.stringify(sampleData)}}'
             rowsSelectable="true"
             testId="table"
-            onSelectAll="context => testState = 'selectAll triggered'"
+            onSelectAllAction="(row, selectedItems, selectedIds) => testState = 'selectAll triggered'"
           >
             <Column bindTo="name"/>
           </Table>
@@ -2384,10 +2397,10 @@ test.describe("Keyboard Shortcuts", () => {
           rowsSelectable="true"
           testId="table"
           autoFocus="true"
-          onSelectAll="context => testState = { 
-            selectedRowCount: context.selection.selectedRowCount,
-            totalRowCount: context.selection.totalRowCount,
-            selectedIds: context.selection.selectedIds
+          onSelectAllAction="(row, selectedItems, selectedIds) => testState = { 
+            selectedItemsLength: selectedItems.length,
+            selectedIdsLength: selectedIds.length,
+            selectedIds: selectedIds
           }"
         >
           <Column bindTo="name"/>
@@ -2405,8 +2418,8 @@ test.describe("Keyboard Shortcuts", () => {
 
       // Verify that all items are selected in the context
       const result = await testStateDriver.testState();
-      expect(result.selectedRowCount).toBe(sampleData.length);
-      expect(result.totalRowCount).toBe(sampleData.length);
+      expect(result.selectedItemsLength).toBe(sampleData.length);
+      expect(result.selectedIdsLength).toBe(sampleData.length);
       expect(result.selectedIds).toHaveLength(sampleData.length);
       
       // Verify all sample data IDs are in the selected IDs
@@ -2424,7 +2437,7 @@ test.describe("Keyboard Shortcuts", () => {
           rowsSelectable="true"
           testId="table"
           autoFocus="true"
-          onDelete="context => testState = { action: 'delete', selectedRowCount: context.selection.selectedRowCount }"
+          onDeleteAction="(row, selectedItems, selectedIds) => testState = { action: 'delete', selectedItemsLength: selectedItems.length }"
         >
           <Column bindTo="name"/>
         </Table>
@@ -2434,7 +2447,7 @@ test.describe("Keyboard Shortcuts", () => {
 
       await expect.poll(testStateDriver.testState).toEqual({
         action: "delete",
-        selectedRowCount: 0,
+        selectedItemsLength: 0,
       });
     });
 
@@ -2445,9 +2458,9 @@ test.describe("Keyboard Shortcuts", () => {
           rowsSelectable="true"
           testId="table"
           autoFocus="true"
-          onDelete="context => testState = {
-            selectedIds: context.selection.selectedIds,
-            selectedRowCount: context.selection.selectedRowCount
+          onDeleteAction="(row, selectedItems, selectedIds) => testState = {
+            selectedIds: selectedIds,
+            selectedItemsLength: selectedItems.length
           }"
         >
           <Column bindTo="name"/>
@@ -2462,7 +2475,7 @@ test.describe("Keyboard Shortcuts", () => {
 
       const result = await testStateDriver.testState();
       expect(Array.isArray(result.selectedIds)).toBe(true);
-      expect(typeof result.selectedRowCount).toBe("number");
+      expect(typeof result.selectedItemsLength).toBe("number");
     });
   });
 
@@ -2474,7 +2487,7 @@ test.describe("Keyboard Shortcuts", () => {
           rowsSelectable="true"
           testId="table"
           autoFocus="true"
-          onCopy="context => testState = { action: 'copy', selectedRowCount: context.selection.selectedRowCount }"
+          onCopyAction="(row, selectedItems, selectedIds) => testState = { action: 'copy', selectedItemsLength: selectedItems.length }"
         >
           <Column bindTo="name"/>
         </Table>
@@ -2486,7 +2499,7 @@ test.describe("Keyboard Shortcuts", () => {
 
       await expect.poll(testStateDriver.testState).toEqual({
         action: "copy",
-        selectedRowCount: 0,
+        selectedItemsLength: 0,
       });
     });
 
@@ -2497,8 +2510,8 @@ test.describe("Keyboard Shortcuts", () => {
           rowsSelectable="true"
           testId="table"
           autoFocus="true"
-          onCopy="context => testState = {
-            items: context.selection.selectedItems.map(item => item.name)
+          onCopyAction="(row, selectedItems, selectedIds) => testState = {
+            items: selectedItems.map(item => item.name)
           }"
         >
           <Column bindTo="name"/>
@@ -2526,7 +2539,7 @@ test.describe("Keyboard Shortcuts", () => {
           rowsSelectable="true"
           testId="table"
           autoFocus="true"
-          onCut="context => testState = { action: 'cut' }"
+          onCutAction="(row, selectedItems, selectedIds) => testState = { action: 'cut' }"
         >
           <Column bindTo="name"/>
         </Table>
@@ -2550,7 +2563,7 @@ test.describe("Keyboard Shortcuts", () => {
           rowsSelectable="true"
           testId="table"
           autoFocus="true"
-          onPaste="context => testState = { action: 'paste', focusedRowId: context.focusedRow?.rowId }"
+          onPasteAction="(row, selectedItems, selectedIds) => testState = { action: 'paste', focusedRowId: row?.rowId }"
         >
           <Column bindTo="name"/>
         </Table>
@@ -2578,7 +2591,7 @@ test.describe("Keyboard Shortcuts", () => {
           testId="table"
           autoFocus="true"
           keyBindings='{{ delete: "Backspace" }}'
-          onDelete="context => testState = 'custom delete triggered'"
+          onDeleteAction="(row, selectedItems, selectedIds) => testState = 'custom delete triggered'"
         >
           <Column bindTo="name"/>
         </Table>
@@ -2601,8 +2614,8 @@ test.describe("Keyboard Shortcuts", () => {
           testId="table"
           autoFocus="true"
           keyBindings='{{ copy: "Alt+C" }}'
-          onCopy="context => testState = 'alt copy'"
-          onDelete="context => testState = 'default delete'"
+          onCopyAction="(row, selectedItems, selectedIds) => testState = 'alt copy'"
+          onDeleteAction="(row, selectedItems, selectedIds) => testState = 'default delete'"
         >
           <Column bindTo="name"/>
         </Table>
@@ -2626,11 +2639,11 @@ test.describe("Keyboard Shortcuts", () => {
           rowsSelectable="true"
           testId="table"
           autoFocus="true"
-          onCopy="context => testState = {
-            hasSelectionContext: !!context.selection,
-            hasFocusedRow: context.focusedRow !== null,
-            hasFocusedCell: context.focusedCell !== null,
-            selectionFields: Object.keys(context.selection || {})
+          onCopyAction="(row, selectedItems, selectedIds) => testState = {
+            hasSelectedIds: Array.isArray(selectedIds),
+            hasSelectedItems: Array.isArray(selectedItems),
+            hasRow: row !== null,
+            contextFields: ['row', 'selectedItems', 'selectedIds']
           }"
         >
           <Column bindTo="name"/>
@@ -2646,12 +2659,12 @@ test.describe("Keyboard Shortcuts", () => {
       await page.keyboard.press(copyKey);
 
       const result = await testStateDriver.testState();
-      expect(result.hasSelectionContext).toBe(true);
-      expect(Array.isArray(result.selectionFields)).toBe(true);
-      expect(result.selectionFields).toContain("selectedItems");
-      expect(result.selectionFields).toContain("selectedIds");
-      expect(result.selectionFields).toContain("totalRowCount");
-      expect(result.selectionFields).toContain("selectedRowCount");
+      expect(result.hasSelectedIds).toBe(true);
+      expect(result.hasSelectedItems).toBe(true);
+      expect(Array.isArray(result.contextFields)).toBe(true);
+      expect(result.contextFields).toContain("selectedItems");
+      expect(result.contextFields).toContain("selectedIds");
+      expect(result.contextFields).toContain("row");
     });
 
     test("focusedRow contains item data when row is focused", async ({ initTestBed, page }) => {
@@ -2661,12 +2674,12 @@ test.describe("Keyboard Shortcuts", () => {
           rowsSelectable="true"
           testId="table"
           autoFocus="true"
-          onCopy="context => testState = {
-            focusedRowData: context.focusedRow ? {
-              hasItem: !!context.focusedRow.item,
-              hasRowId: !!context.focusedRow.rowId,
-              isSelected: context.focusedRow.isSelected,
-              isFocused: context.focusedRow.isFocused
+          onCopyAction="(row, selectedItems, selectedIds) => testState = {
+            focusedRowData: row ? {
+              hasItem: !!row.item,
+              hasRowId: !!row.rowId,
+              isSelected: row.isSelected,
+              isFocused: row.isFocused
             } : null
           }"
         >
@@ -2698,7 +2711,7 @@ test.describe("Keyboard Shortcuts", () => {
           rowsSelectable="true"
           testId="table"
           autoFocus="true"
-          onCopy="context => testState = { action: 'copy', focusedName: context.focusedRow?.item.name }"
+          onCopyAction="(row, selectedItems, selectedIds) => testState = { action: 'copy', focusedName: row?.item.name }"
         >
           <Column bindTo="name"/>
         </Table>
@@ -2761,7 +2774,7 @@ test.describe("Keyboard Shortcuts", () => {
           rowsSelectable="true"
           testId="table"
           autoFocus="true"
-          onSelectAll="context => testState = 'handled'"
+          onSelectAllAction="(row, selectedItems, selectedIds) => testState = 'handled'"
         >
           <Column bindTo="name"/>
         </Table>
@@ -2784,7 +2797,7 @@ test.describe("Keyboard Shortcuts", () => {
           rowsSelectable="false"
           testId="table"
           autoFocus="true"
-          onSelectAll="context => testState = { triggered: true }"
+          onSelectAllAction="(row, selectedItems, selectedIds) => testState = { triggered: true }"
         >
           <Column bindTo="name"/>
         </Table>
@@ -2811,7 +2824,7 @@ test.describe("Keyboard Shortcuts", () => {
           rowsSelectable="false"
           testId="table"
           autoFocus="true"
-          onDelete="context => testState = { triggered: true }"
+          onDeleteAction="(row, selectedItems, selectedIds) => testState = { triggered: true }"
         >
           <Column bindTo="name"/>
         </Table>
@@ -2835,7 +2848,7 @@ test.describe("Keyboard Shortcuts", () => {
           rowsSelectable="false"
           testId="table"
           autoFocus="true"
-          onCopy="context => testState = { triggered: true }"
+          onCopyAction="(row, selectedItems, selectedIds) => testState = { triggered: true }"
         >
           <Column bindTo="name"/>
         </Table>
@@ -2861,7 +2874,7 @@ test.describe("Keyboard Shortcuts", () => {
           rowsSelectable="false"
           testId="table"
           autoFocus="true"
-          onCut="context => testState = { triggered: true }"
+          onCutAction="(row, selectedItems, selectedIds) => testState = { triggered: true }"
         >
           <Column bindTo="name"/>
         </Table>
@@ -2887,7 +2900,7 @@ test.describe("Keyboard Shortcuts", () => {
           rowsSelectable="false"
           testId="table"
           autoFocus="true"
-          onPaste="context => testState = { triggered: true }"
+          onPasteAction="(row, selectedItems, selectedIds) => testState = { triggered: true }"
         >
           <Column bindTo="name"/>
         </Table>
@@ -2913,7 +2926,7 @@ test.describe("Keyboard Shortcuts", () => {
           rowsSelectable="true"
           testId="table"
           autoFocus="true"
-          onSelectAll="context => testState = { triggered: true }"
+          onSelectAllAction="(row, selectedItems, selectedIds) => testState = { triggered: true }"
         >
           <Column bindTo="name"/>
         </Table>

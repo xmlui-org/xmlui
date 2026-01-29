@@ -544,6 +544,161 @@ I want to extract the key binding (key parsing) mechanism so I can use it in the
 
 ---
 
+### Post-Step 7 Enhancement 3: Simplified TableActionContext API (29 January 2026)
+
+**Motivation**: The initial TableActionContext structure was overly nested with unnecessary properties. Simplifying it makes the API more intuitive and reduces boilerplate for developers working with keyboard action events.
+
+**Changes Made**:
+
+1. **TableNative.tsx** (Type Definitions):
+   - Removed `TableSelectionContext` type (previously contained `totalRowCount`, `selectedRowCount`, `selectedIds`, `selectedItems`)
+   - Removed `TableCellContext` type (was reserved for future use but never utilized, always passed as `null`)
+   - Flattened `TableActionContext` structure:
+     - **Old**: `{ selection: { selectedIds, selectedItems, totalRowCount, selectedRowCount }, focusedRow: {...}, focusedCell: null }`
+     - **New**: `{ selectedIds: string[], selectedItems: any[], row: TableRowContext | null }`
+   - Renamed `focusedRow` property to `row` for brevity
+
+2. **TableNative.tsx** (buildActionContext helper):
+   - Simplified logic to return flat structure directly
+   - Removed intermediate selection object construction
+   - Removed `totalRowCount` and `selectedRowCount` calculations (developers can compute these from arrays)
+   - Returns: `{ selectedIds, selectedItems, row }`
+
+3. **Table.tsx** (Event Metadata):
+   - Updated parameter descriptions for all 5 keyboard action events (selectAll, cut, copy, paste, delete)
+   - Changed from "selection, focused row, and cell information" to specific flat structure: "selectedIds (array of selected row IDs), selectedItems (array of selected row items), and row (currently focused row, if any)"
+
+4. **E2E Tests** (Table.spec.ts):
+   - Updated all keyboard shortcut tests (23 tests) to use new flat context structure
+   - Changed from `context.selection.selectedIds` to `context.selectedIds`
+   - Changed from `context.selection.selectedItems` to `context.selectedItems`
+   - Changed from `context.focusedRow` to `context.row`
+   - Removed tests checking for `context.selection` existence (no longer nested)
+   - Updated context structure verification tests to check for top-level properties
+
+**Test Results**:
+- ✅ All 23 keyboard shortcut E2E tests passing
+- ✅ All 129 Table E2E tests passing (excluding 2 pre-existing flaky tests unrelated to refactoring)
+- ✅ No regressions in existing functionality
+
+**API Before/After**:
+
+```typescript
+// OLD STRUCTURE
+interface TableActionContext {
+  selection: {
+    selectedIds: string[];
+    selectedItems: any[];
+    totalRowCount: number;
+    selectedRowCount: number;
+  };
+  focusedRow: TableRowContext | null;
+  focusedCell: null;
+}
+
+// Usage
+onCopy="context => {
+  const ids = context.selection.selectedIds;
+  const count = context.selection.selectedRowCount;
+  const focusedItem = context.focusedRow?.item;
+}"
+
+// NEW STRUCTURE
+interface TableActionContext {
+  selectedIds: string[];
+  selectedItems: any[];
+  row: TableRowContext | null;
+}
+
+// Usage
+onCopy="context => {
+  const ids = context.selectedIds;
+  const count = context.selectedIds.length; // Compute from array
+  const focusedItem = context.row?.item;
+}"
+```
+
+**Benefits**:
+- **Simpler**: Flat structure, no nested objects
+- **More direct**: Access properties immediately without traversing
+- **Cleaner**: Removed unused properties (`focusedCell`, `totalRowCount`, `selectedRowCount`)
+- **Consistent**: Follows common JavaScript patterns for context objects
+
+---
+
+### Post-Step 7 Enhancement 4: Three-Parameter Event Signature (29 January 2026)
+
+**Motivation**: While the flattened TableActionContext was an improvement, passing a single object parameter still requires destructuring or property access in event handlers. Using three separate parameters provides the cleanest, most intuitive API - parameters can be used directly without any object navigation.
+
+**Changes Made**:
+
+1. **TableNative.tsx** (buildActionContext function):
+   - Changed return type from `TableActionContext` object to tuple: `[TableRowContext | null, any[], string[]]`
+   - Function now returns three separate values: `[row, selectedItems, selectedIds]`
+   - Updated JSDoc to reflect tuple return type
+
+2. **TableNative.tsx** (Event Handler Invocations):
+   - Updated all 5 keyboard action handlers (selectAll, cut, copy, paste, delete)
+   - Changed from: `onSelectAll(context)` → `onSelectAll(row, selectedItems, selectedIds)`
+   - Uses destructuring assignment: `const [row, items, ids] = buildActionContext(...)`
+   - All event handlers now receive three direct parameters instead of one context object
+
+3. **Table.tsx** (Event Metadata):
+   - Updated signatures for all 5 keyboard action events
+   - Old: `selectAll(context: TableActionContext): void | Promise<void>`
+   - New: `selectAll(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>`
+   - Updated parameter descriptions for each event to document the three parameters individually
+   - Each parameter now has its own description explaining its purpose and type
+
+4. **E2E Tests** (Table.spec.ts):
+   - Updated all 23 keyboard shortcut tests
+   - Changed event handler signatures from `context =>` to `(row, selectedItems, selectedIds) =>`
+   - Updated property access from `context.selectedIds` to `selectedIds` (direct parameter)
+   - Updated property access from `context.selectedItems` to `selectedItems`
+   - Updated property access from `context.row` to `row`
+   - Simplified context field checking tests (no longer using `Object.keys(context)`)
+
+**Test Results**:
+- ✅ All 23 keyboard shortcut E2E tests passing
+- ✅ All 129 Table E2E tests passing
+- ✅ No regressions in existing functionality
+- ✅ All tests run faster due to simpler handler logic
+
+**API Before/After**:
+
+```typescript
+// OLD: Single object parameter (Enhancement 3)
+onCopy="context => {
+  const ids = context.selectedIds;
+  const items = context.selectedItems;
+  const focusedItem = context.row?.item;
+  // Process copy...
+}"
+
+// NEW: Three separate parameters (Enhancement 4)
+onCopy="(row, selectedItems, selectedIds) => {
+  const ids = selectedIds;
+  const items = selectedItems;
+  const focusedItem = row?.item;
+  // Process copy...
+}"
+
+// Even simpler - no intermediate variables needed
+onCopy="(row, selectedItems, selectedIds) => {
+  clipboard.write(selectedItems.map(item => item.name).join(', '));
+}"
+```
+
+**Benefits**:
+- **Most direct**: Parameters are immediately usable, no property access needed
+- **Familiar**: Matches standard function parameter patterns in JavaScript/TypeScript
+- **Cleaner handlers**: Less boilerplate code in event handlers
+- **Better IDE support**: Each parameter appears separately in autocomplete/intellisense
+- **Easier to ignore unused params**: Can omit trailing params: `(row, selectedItems) => ...`
+- **More functional style**: Encourages direct parameter usage vs object mutation
+
+---
+
 ### Post-Step 7 Enhancement: selectAll Auto-Selection (29 January 2026)
 
 **Motivation**: When the user presses the selectAll keyboard shortcut, the component should automatically select all rows before invoking the event handler. This provides a better user experience and ensures the context passed to the handler accurately reflects the selection state.
