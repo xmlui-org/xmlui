@@ -188,7 +188,7 @@ type TableProps = {
   iconSortAsc?: string;
   iconSortDesc?: string;
   iconNoSort?: string;
-  onContextMenu?: any;
+  lookupEventHandler?: any;
   sortingDidChange?: AsyncFunction;
   onSelectionDidChange?: AsyncFunction;
   willSort?: AsyncFunction;
@@ -528,7 +528,7 @@ export const Table = forwardRef(
       iconNoSort,
       sortingDidChange,
       willSort,
-      onContextMenu,
+      lookupEventHandler,
       style,
       className,
       noDataRenderer,
@@ -1101,7 +1101,6 @@ export const Table = forwardRef(
           // Focus the wrapper to enable keyboard shortcuts
           wrapperRef.current?.focus();
         }}
-        onContextMenu={(e) => {e.preventDefault(); onContextMenu?.(e)}}
         ref={ref}
         style={style}
       >
@@ -1420,6 +1419,25 @@ export const Table = forwardRef(
                         const currentRow = event.currentTarget as HTMLElement;
                         currentRow.style.cursor = "";
                         setHoveredRowId(null);
+                      }}
+                      onContextMenu={(event) => {
+                        // Prevent default browser context menu
+                        event.preventDefault();
+                        
+                        // Use lookupEventHandler with context containing row variables
+                        if (lookupEventHandler) {
+                          const handler = lookupEventHandler("contextMenu", {
+                            context: {
+                              $item: row.original,
+                              $row: row.original,
+                              $rowIndex: rowIndex,
+                              $itemIndex: rowIndex,
+                            },
+                            ephemeral: true, // Don't cache this handler since context changes per row
+                          });
+                          
+                          handler?.(event);
+                        }
                       }}
                     >
                       {row.getVisibleCells().map((cell, i) => {
