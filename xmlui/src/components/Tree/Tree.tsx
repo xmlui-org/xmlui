@@ -487,7 +487,7 @@ export const treeComponentRenderer = createComponentRenderer(
         onNodeExpanded={lookupEventHandler("nodeDidExpand")}
         onNodeCollapsed={lookupEventHandler("nodeDidCollapse")}
         loadChildren={lookupEventHandler("loadChildren")}
-        onContextMenu={lookupEventHandler("contextMenu")}
+        lookupEventHandler={node.events?.contextMenu ? lookupEventHandler : undefined}
         itemRenderer={(flatTreeNode: any) => {
           const itemContext = {
             id: flatTreeNode.id, // $item.id - Internal unique identifier

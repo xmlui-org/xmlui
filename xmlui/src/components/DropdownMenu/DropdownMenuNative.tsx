@@ -250,16 +250,19 @@ export const MenuItem = forwardRef(function MenuItem(
 
 type SubMenuItemProps = {
   label?: string;
+  icon?: ReactNode;
+  iconPosition?: IconPosition;
   children?: ReactNode;
   triggerTemplate?: ReactNode;
 };
 
 export const SubMenuItem = forwardRef<HTMLDivElement, SubMenuItemProps>(function SubMenuItem(
-  { children, label, triggerTemplate },
+  { children, label, icon, iconPosition = defaultMenuItemProps.iconPosition, triggerTemplate },
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
   const { root } = useTheme();
   const [open, setOpen] = useState(false);
+  const iconToStart = iconPosition === "start";
 
   return (
     <DropdownMenuPrimitive.Sub open={open} onOpenChange={setOpen}>
@@ -268,7 +271,9 @@ export const SubMenuItem = forwardRef<HTMLDivElement, SubMenuItemProps>(function
           triggerTemplate
         ) : (
           <div className={styles.subMenuItemTrigger}>
-            <span>{label}</span>
+            {iconToStart && icon}
+            <div className={styles.wrapper}>{label}</div>
+            {!iconToStart && icon}
             <Icon name="chevronright" fallback="chevronright" />
           </div>
         )}

@@ -241,6 +241,155 @@ test("removeIndents=false: 4space/1 tab indent maps to a code block", async ({
 });
 
 // =============================================================================
+// FILE DOWNLOAD ATTRIBUTE TESTS
+// =============================================================================
+
+test.describe("File Download Attribute", () => {
+  test("adds download attribute to links with common file extensions", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = `
+[PDF File](/resources/files/sample.pdf)
+[CSV File](/resources/files/sample-products.csv)
+[ZIP Archive](/downloads/package.zip)
+[JSON Data](/api/data.json)
+[Excel File](/reports/data.xlsx)
+[Text File](/docs/readme.txt)
+    `;
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    const pdfLink = page.getByRole("link", { name: "PDF File" });
+    const csvLink = page.getByRole("link", { name: "CSV File" });
+    const zipLink = page.getByRole("link", { name: "ZIP Archive" });
+    const jsonLink = page.getByRole("link", { name: "JSON Data" });
+    const excelLink = page.getByRole("link", { name: "Excel File" });
+    const txtLink = page.getByRole("link", { name: "Text File" });
+
+    await expect(pdfLink).toHaveAttribute("download");
+    await expect(csvLink).toHaveAttribute("download");
+    await expect(zipLink).toHaveAttribute("download");
+    await expect(jsonLink).toHaveAttribute("download");
+    await expect(excelLink).toHaveAttribute("download");
+    await expect(txtLink).toHaveAttribute("download");
+  });
+
+  test("does not add download attribute to web page links", async ({ initTestBed, page }) => {
+    const SOURCE = `
+[HTML Page](/docs/index.html)
+[HTM Page](/docs/page.htm)
+[PHP Script](/api/endpoint.php)
+[ASP Page](/legacy/page.asp)
+[ASPX Page](/app/default.aspx)
+[JSP Page](/java/app.jsp)
+    `;
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    const htmlLink = page.getByRole("link", { name: "HTML Page" });
+    const htmLink = page.getByRole("link", { name: "HTM Page" });
+    const phpLink = page.getByRole("link", { name: "PHP Script" });
+    const aspLink = page.getByRole("link", { name: "ASP Page" });
+    const aspxLink = page.getByRole("link", { name: "ASPX Page" });
+    const jspLink = page.getByRole("link", { name: "JSP Page" });
+
+    await expect(htmlLink).not.toHaveAttribute("download");
+    await expect(htmLink).not.toHaveAttribute("download");
+    await expect(phpLink).not.toHaveAttribute("download");
+    await expect(aspLink).not.toHaveAttribute("download");
+    await expect(aspxLink).not.toHaveAttribute("download");
+    await expect(jspLink).not.toHaveAttribute("download");
+  });
+
+  test("handles file links with query parameters correctly", async ({ initTestBed, page }) => {
+    const SOURCE = `
+[CSV with Query](/api/export.csv?format=standard&date=2024)
+[PDF with Hash](/docs/report.pdf#page=5)
+[File with Both](/data/file.json?v=1#section)
+    `;
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    const csvLink = page.getByRole("link", { name: "CSV with Query" });
+    const pdfLink = page.getByRole("link", { name: "PDF with Hash" });
+    const jsonLink = page.getByRole("link", { name: "File with Both" });
+
+    await expect(csvLink).toHaveAttribute("download");
+    await expect(pdfLink).toHaveAttribute("download");
+    await expect(jsonLink).toHaveAttribute("download");
+  });
+
+  test("does not add download attribute to links without file extensions", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = `
+[No Extension](/docs/readme)
+[Directory](/resources/)
+[Root](/api)
+    `;
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    const noExtLink = page.getByRole("link", { name: "No Extension" });
+    const dirLink = page.getByRole("link", { name: "Directory" });
+    const rootLink = page.getByRole("link", { name: "Root" });
+
+    await expect(noExtLink).not.toHaveAttribute("download");
+    await expect(dirLink).not.toHaveAttribute("download");
+    await expect(rootLink).not.toHaveAttribute("download");
+  });
+
+  test("handles various document and archive formats", async ({ initTestBed, page }) => {
+    const SOURCE = `
+[Word Doc](/files/document.doc)
+[Word DocX](/files/document.docx)
+[PowerPoint](/slides/presentation.ppt)
+[PowerPoint X](/slides/presentation.pptx)
+[RAR Archive](/downloads/archive.rar)
+[7z Archive](/downloads/data.7z)
+    `;
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    const docLink = page.getByRole("link", { name: "Word Doc", exact: true });
+    const docxLink = page.getByRole("link", { name: "Word DocX" });
+    const pptLink = page.getByRole("link", { name: "PowerPoint", exact: true });
+    const pptxLink = page.getByRole("link", { name: "PowerPoint X" });
+    const rarLink = page.getByRole("link", { name: "RAR Archive" });
+    const sevenZLink = page.getByRole("link", { name: "7z Archive" });
+
+    await expect(docLink).toHaveAttribute("download");
+    await expect(docxLink).toHaveAttribute("download");
+    await expect(pptLink).toHaveAttribute("download");
+    await expect(pptxLink).toHaveAttribute("download");
+    await expect(rarLink).toHaveAttribute("download");
+    await expect(sevenZLink).toHaveAttribute("download");
+  });
+
+  test("file extension detection is case-insensitive", async ({ initTestBed, page }) => {
+    const SOURCE = `
+[Uppercase PDF](/files/DOCUMENT.PDF)
+[Mixed Case CSV](/data/Products.CsV)
+[Lowercase Zip](/archives/data.zip)
+    `;
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    const pdfLink = page.getByRole("link", { name: "Uppercase PDF" });
+    const csvLink = page.getByRole("link", { name: "Mixed Case CSV" });
+    const zipLink = page.getByRole("link", { name: "Lowercase Zip" });
+
+    await expect(pdfLink).toHaveAttribute("download");
+    await expect(csvLink).toHaveAttribute("download");
+    await expect(zipLink).toHaveAttribute("download");
+  });
+
+  test("preserves explicit download attribute from HTML", async ({ initTestBed, page }) => {
+    const SOURCE = `<a href="/resources/files/sample-products.csv" download>Click to Download</a>`;
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    const link = page.getByRole("link", { name: "Click to Download" });
+    await expect(link).toHaveAttribute("download");
+  });
+});
+
+// =============================================================================
 // REGRESSION TESTS
 // =============================================================================
 
