@@ -198,7 +198,7 @@ export const Container = memo(
           pushXsLog({
             ts: Date.now(),
             perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-            traceId: getCurrentTrace(),
+            traceId: detail?.traceId ?? getCurrentTrace(),
             text: safeStringify(args),
             kind: args[0] ?? undefined,
             eventName: detail?.eventName,
@@ -307,6 +307,9 @@ export const Container = memo(
           // ArrowExpression has .name (function name)
           handlerCode = `${(source as any).name}()`;
         }
+
+        // Capture traceId at handler start so handler:complete uses the same trace
+        const handlerTraceId = getCurrentTrace();
 
         try {
           if (xsVerbose) {
@@ -495,6 +498,7 @@ export const Container = memo(
               ownerFileId: handlerFileId,
               ownerSource: handlerSourceRange,
               handlerCode,
+              traceId: handlerTraceId,
             });
           }
 
@@ -523,6 +527,7 @@ export const Container = memo(
                     end: (node as any).debug.source.end,
                   }
                 : undefined),
+              traceId: handlerTraceId,
             });
           }
           //if we pass down an event handler to a component, we should sign the error once, not in every step of the component chain

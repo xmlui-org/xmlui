@@ -81,7 +81,8 @@ export function AppContent({
   children,
   onInit,
 }: AppContentProps) {
-  // Note: Startup trace initialization is deferred to the xsVerbose useEffect below
+  // Note: Startup trace initialization happens during render (near xsVerbose definition)
+  // to ensure it's set before children mount and trigger useQuery fetches
   const [loggedInUser, setLoggedInUser] = useState(null);
   const debugView = useDebugView();
   const componentRegistry = useComponentRegistry();
@@ -378,6 +379,18 @@ export function AppContent({
 
   const xsVerbose = (appGlobals as any)?.xsVerbose === true;
   const xsLogMax = Number((appGlobals as any)?.xsVerboseLogMax ?? 200);
+
+  // Initialize startup trace early during render, BEFORE children mount
+  // This ensures DataLoader can capture the trace when useQuery triggers fetches
+  if (xsVerbose && typeof window !== "undefined") {
+    const w = window as any;
+    if (!w._xsStartupTrace) {
+      w._xsStartupTrace = `startup-${Date.now().toString(36)}`;
+    }
+    if (!w._xsCurrentTrace) {
+      w._xsCurrentTrace = w._xsStartupTrace;
+    }
+  }
 
   const update = useCallback(
     (bucket: string, patch: any) => {

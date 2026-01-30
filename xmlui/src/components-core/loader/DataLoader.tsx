@@ -29,7 +29,6 @@ import {
   formatDiff,
   xsConsoleLog,
   pushXsLog,
-  getCurrentTrace,
 } from "../inspector/inspectorUtils";
 
 type LoaderProps = {
@@ -286,7 +285,7 @@ function DataLoader({
           pushXsLog({
             ts: Date.now(),
             perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-            traceId: getCurrentTrace(),
+            traceId: pendingTraceIdRef.current,
             kind: "api:start",
             url: queryUrl,
             method: method,
@@ -307,7 +306,7 @@ function DataLoader({
               pushXsLog({
                 ts: Date.now(),
                 perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-                traceId: getCurrentTrace(),
+                traceId: pendingTraceIdRef.current,
                 kind: "api:error",
                 url: queryUrl,
                 method: method,
@@ -339,7 +338,7 @@ function DataLoader({
             pushXsLog({
               ts: Date.now(),
               perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-              traceId: getCurrentTrace(),
+              traceId: pendingTraceIdRef.current,
               kind: "api:complete",
               url: queryUrl,
               method: method,
@@ -358,7 +357,7 @@ function DataLoader({
             pushXsLog({
               ts: Date.now(),
               perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-              traceId: getCurrentTrace(),
+              traceId: pendingTraceIdRef.current,
               kind: "api:error",
               url: queryUrl,
               method: method,
@@ -378,7 +377,7 @@ function DataLoader({
           pushXsLog({
             ts: Date.now(),
             perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-            traceId: getCurrentTrace(),
+            traceId: pendingTraceIdRef.current,
             kind: "api:start",
             url: url,
             method: method,
@@ -405,7 +404,7 @@ function DataLoader({
             pushXsLog({
               ts: Date.now(),
               perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-              traceId: getCurrentTrace(),
+              traceId: pendingTraceIdRef.current,
               kind: "api:complete",
               url: url,
               method: method,
@@ -423,7 +422,7 @@ function DataLoader({
             pushXsLog({
               ts: Date.now(),
               perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-              traceId: getCurrentTrace(),
+              traceId: pendingTraceIdRef.current,
               kind: "api:error",
               url: url,
               method: method,
