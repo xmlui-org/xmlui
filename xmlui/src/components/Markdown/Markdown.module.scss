@@ -751,6 +751,30 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
   overflow-wrap: break-word;
 }
 
+// --- XMLUI Inline wrapper
+// Resets typography properties that might bleed from markdown context
+// while preserving layout/positioning to maintain markdown flow integration
+.xmluiInline {
+  // Reset typography
+  font-size: initial;
+  line-height: initial;
+  font-family: initial;
+  font-weight: initial;
+  
+  // Reset text styling
+  text-decoration: none;
+  text-transform: none;
+  letter-spacing: normal;
+  word-spacing: normal;
+  
+  // Preserve layout - inline-block allows proper sizing while maintaining flow
+  display: inline-block;
+  vertical-align: baseline;
+  
+  // Add slight margin for visual separation from surrounding markdown text
+  margin: 0.25em 0;
+}
+
 // --- We export the theme variables to add them to the component renderer
 :export {
   themeVars: t.json-stringify($themeVars);

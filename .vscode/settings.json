@@ -46,6 +46,10 @@
     },
     "npm list": true,
     "npx vitest": true,
-    "npx eslint": true
+    "npx eslint": true,
+    "/^node -e \"const styles = \\{\\}; styles\\.xmluiInline = 'test'; console\\.log\\('✓ xmluiInline class name is valid'\\)\"$/": {
+      "approve": true,
+      "matchCommandLine": true
+    }
   }
 }
