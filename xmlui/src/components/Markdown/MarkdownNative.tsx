@@ -111,6 +111,61 @@ export const Markdown = memo(
     }: MarkdownProps,
     ref,
   ) {
+    // Determine overflow mode classes based on overflowMode
+    const overflowClasses = useMemo(() => {
+      const classes: Record<string, boolean> = {};
+
+      // If overflowMode is not explicitly set, use original behavior
+      if (!overflowMode) {
+        return classes;
+      }
+
+      switch (overflowMode) {
+        case "none":
+          classes[styles.overflowNone] = true;
+          break;
+        case "scroll":
+          classes[styles.overflowScroll] = true;
+          break;
+        case "ellipsis":
+          classes[styles.overflowEllipsis] = true;
+          break;
+        case "flow":
+          classes[styles.overflowFlow] = true;
+          break;
+      }
+
+      return classes;
+    }, [overflowMode]);
+
+    // Determine break mode classes
+    const breakClasses = useMemo(() => {
+      const classes: Record<string, boolean> = {};
+
+      // Only apply break mode classes if explicitly set (preserves theme variable support)
+      if (breakMode) {
+        switch (breakMode) {
+          case "normal":
+            classes[styles.breakNormal] = true;
+            break;
+          case "word":
+            classes[styles.breakWord] = true;
+            break;
+          case "anywhere":
+            classes[styles.breakAnywhere] = true;
+            break;
+          case "keep":
+            classes[styles.breakKeep] = true;
+            break;
+          case "hyphenate":
+            classes[styles.breakHyphenate] = true;
+            break;
+        }
+      }
+
+      return classes;
+    }, [breakMode]);
+
     const imageInfo = useRef(new Map<string, boolean>());
     if (typeof children !== "string") {
       return null;
@@ -168,61 +223,6 @@ export const Markdown = memo(
         });
       };
     };
-
-    // Determine overflow mode classes based on overflowMode
-    const overflowClasses = useMemo(() => {
-      const classes: Record<string, boolean> = {};
-
-      // If overflowMode is not explicitly set, use original behavior
-      if (!overflowMode) {
-        return classes;
-      }
-
-      switch (overflowMode) {
-        case "none":
-          classes[styles.overflowNone] = true;
-          break;
-        case "scroll":
-          classes[styles.overflowScroll] = true;
-          break;
-        case "ellipsis":
-          classes[styles.overflowEllipsis] = true;
-          break;
-        case "flow":
-          classes[styles.overflowFlow] = true;
-          break;
-      }
-
-      return classes;
-    }, [overflowMode]);
-
-    // Determine break mode classes
-    const breakClasses = useMemo(() => {
-      const classes: Record<string, boolean> = {};
-
-      // Only apply break mode classes if explicitly set (preserves theme variable support)
-      if (breakMode) {
-        switch (breakMode) {
-          case "normal":
-            classes[styles.breakNormal] = true;
-            break;
-          case "word":
-            classes[styles.breakWord] = true;
-            break;
-          case "anywhere":
-            classes[styles.breakAnywhere] = true;
-            break;
-          case "keep":
-            classes[styles.breakKeep] = true;
-            break;
-          case "hyphenate":
-            classes[styles.breakHyphenate] = true;
-            break;
-        }
-      }
-
-      return classes;
-    }, [breakMode]);
 
     return (
       <div
@@ -436,6 +436,28 @@ export const Markdown = memo(
               // Use openLinkInNewTab as default if no explicit target is set
               if (!target && openLinkInNewTab) {
                 target = "_blank";
+              }
+
+              // Detect downloadable files by checking for file extensions
+              // Exclude web page extensions that should navigate instead
+              if (href) {
+                // Remove query parameters and hash fragments
+                const pathOnly = href.split('?')[0].split('#')[0];
+                
+                // Match file extension pattern: ends with .{2-5 alphanumeric chars}
+                const fileExtensionMatch = pathOnly.match(/\.([a-zA-Z0-9]{2,5})$/);
+                
+                if (fileExtensionMatch) {
+                  const extension = fileExtensionMatch[1].toLowerCase();
+                  
+                  // Web page extensions that should navigate, not download
+                  const navigableExtensions = ['html', 'htm', 'php', 'asp', 'aspx', 'jsp', 'xhtml'];
+                  
+                  // If it has a file extension and it's not a navigable web page, trigger download
+                  if (!navigableExtensions.includes(extension)) {
+                    props.download = true;
+                  }
+                }
               }
 
               return (

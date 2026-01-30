@@ -87,6 +87,9 @@ export const LinkNative = forwardRef(function LinkNative(
     <Node
       {...anchorProps}
       ref={forwardedRef as any}
+      // This line is needed to make download work with Link
+      // Ref: https://v2.remix.run/docs/components/link#reloaddocument
+      reloadDocument={anchorProps.download !== undefined}
       to={smartTo}
       style={style}
       target={target}

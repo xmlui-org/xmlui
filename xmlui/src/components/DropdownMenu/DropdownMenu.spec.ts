@@ -682,3 +682,294 @@ test.describe("Nested DropdownMenu and Select", () => {
     await expect(page.getByText("Outer Dialog")).not.toBeVisible();
   });
 });
+
+// =============================================================================
+// SUBMENUITEM ICON TESTS
+// =============================================================================
+
+test.describe("SubMenuItem Icon Support", () => {
+  test("renders SubMenuItem with icon", async ({ initTestBed, createDropdownMenuDriver, page }) => {
+    await initTestBed(`
+      <DropdownMenu label="Menu">
+        <SubMenuItem label="Share" icon="home">
+          <MenuItem>Share via link</MenuItem>
+          <MenuItem>Share via email</MenuItem>
+        </SubMenuItem>
+      </DropdownMenu>
+    `);
+    const driver = await createDropdownMenuDriver();
+
+    await driver.open();
+    
+    // Check that the submenu item is visible with its label
+    await expect(page.getByText("Share")).toBeVisible();
+    
+    // Check that an icon is rendered (at least one SVG should exist in the submenu trigger)
+    const submenuTrigger = page.getByText("Share").locator("..");
+    const icons = submenuTrigger.locator("svg");
+    // Should have at least 2 SVGs: the icon and the chevron
+    await expect(icons).toHaveCount(2);
+  });
+
+  test("renders SubMenuItem with icon at start position (default)", async ({
+    initTestBed,
+    createDropdownMenuDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <DropdownMenu label="Menu">
+        <SubMenuItem label="Actions" icon="home" iconPosition="start">
+          <MenuItem>Action 1</MenuItem>
+          <MenuItem>Action 2</MenuItem>
+        </SubMenuItem>
+      </DropdownMenu>
+    `);
+    const driver = await createDropdownMenuDriver();
+
+    await driver.open();
+    
+    await expect(page.getByText("Actions")).toBeVisible();
+    const submenuTrigger = page.getByText("Actions").locator("..");
+    const icons = submenuTrigger.locator("svg");
+    
+    // Should have 2 SVGs: the icon and the chevron
+    await expect(icons).toHaveCount(2);
+    
+    // Verify icon is positioned at the start (first SVG before the label)
+    const firstIcon = icons.first();
+    const iconBox = await firstIcon.boundingBox();
+    const labelBox = await page.getByText("Actions").boundingBox();
+    
+    expect(iconBox.x).toBeLessThan(labelBox.x);
+  });
+
+  test("renders SubMenuItem with icon at end position", async ({
+    initTestBed,
+    createDropdownMenuDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <DropdownMenu label="Menu">
+        <SubMenuItem label="Export" icon="home" iconPosition="end">
+          <MenuItem>Export as PDF</MenuItem>
+          <MenuItem>Export as CSV</MenuItem>
+        </SubMenuItem>
+      </DropdownMenu>
+    `);
+    const driver = await createDropdownMenuDriver();
+
+    await driver.open();
+    
+    await expect(page.getByText("Export")).toBeVisible();
+    const submenuTrigger = page.getByText("Export").locator("..");
+    const icons = submenuTrigger.locator("svg");
+    
+    // Should have 2 SVGs: the icon and the chevron
+    await expect(icons).toHaveCount(2);
+    
+    // Verify icon is positioned at the end (first SVG after the label, before chevron)
+    const firstIcon = icons.first();
+    const iconBox = await firstIcon.boundingBox();
+    const labelBox = await page.getByText("Export").boundingBox();
+    
+    expect(iconBox.x).toBeGreaterThan(labelBox.x + labelBox.width);
+  });
+
+  test("renders SubMenuItem without icon", async ({
+    initTestBed,
+    createDropdownMenuDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <DropdownMenu label="Menu">
+        <SubMenuItem label="No Icon">
+          <MenuItem>Item 1</MenuItem>
+        </SubMenuItem>
+      </DropdownMenu>
+    `);
+    const driver = await createDropdownMenuDriver();
+
+    await driver.open();
+    
+    await expect(page.getByText("No Icon")).toBeVisible();
+    
+    // Check that only the chevron is rendered (only one SVG)
+    const submenuTrigger = page.getByText("No Icon").locator("..");
+    const icons = submenuTrigger.locator("svg");
+    await expect(icons).toHaveCount(1); // Only the chevron
+  });
+
+  test("renders multiple SubMenuItems with different icons", async ({
+    initTestBed,
+    createDropdownMenuDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <DropdownMenu label="Menu">
+        <SubMenuItem label="File" icon="folder">
+          <MenuItem>Open</MenuItem>
+          <MenuItem>Save</MenuItem>
+        </SubMenuItem>
+        <SubMenuItem label="Edit" icon="folder">
+          <MenuItem>Cut</MenuItem>
+          <MenuItem>Copy</MenuItem>
+        </SubMenuItem>
+        <SubMenuItem label="Settings" icon="folder">
+          <MenuItem>Preferences</MenuItem>
+          <MenuItem>Options</MenuItem>
+        </SubMenuItem>
+      </DropdownMenu>
+    `);
+    const driver = await createDropdownMenuDriver();
+
+    await driver.open();
+    
+    // Verify all submenu items are visible
+    await expect(page.getByText("File")).toBeVisible();
+    await expect(page.getByText("Edit")).toBeVisible();
+    await expect(page.getByText("Settings")).toBeVisible();
+    
+    // Each should have 2 SVGs (icon + chevron)
+    const fileTrigger = page.getByText("File").locator("..");
+    await expect(fileTrigger.locator("svg")).toHaveCount(2);
+    
+    const editTrigger = page.getByText("Edit").locator("..");
+    await expect(editTrigger.locator("svg")).toHaveCount(2);
+    
+    const settingsTrigger = page.getByText("Settings").locator("..");
+    await expect(settingsTrigger.locator("svg")).toHaveCount(2);
+  });
+
+  test("SubMenuItem icon works with nested submenus", async ({
+    initTestBed,
+    createDropdownMenuDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <DropdownMenu label="Menu">
+        <SubMenuItem label="Parent" icon="folder">
+          <MenuItem>Item 1</MenuItem>
+          <SubMenuItem label="Nested" icon="folder">
+            <MenuItem>Nested Item 1</MenuItem>
+            <MenuItem>Nested Item 2</MenuItem>
+          </SubMenuItem>
+        </SubMenuItem>
+      </DropdownMenu>
+    `);
+    const driver = await createDropdownMenuDriver();
+
+    await driver.open();
+    
+    // Verify parent submenu has icon
+    await expect(page.getByText("Parent")).toBeVisible();
+    const parentTrigger = page.getByText("Parent").locator("..");
+    await expect(parentTrigger.locator("svg")).toHaveCount(2); // icon + chevron
+    
+    // Open parent submenu
+    await driver.openSubMenu("Parent");
+    await expect(page.getByText("Nested")).toBeVisible();
+    
+    // Verify nested submenu has icon
+    const nestedTrigger = page.getByText("Nested").locator("..");
+    await expect(nestedTrigger.locator("svg")).toHaveCount(2); // icon + chevron
+  });
+
+  test("SubMenuItem with icon remains functional on hover and click", async ({
+    initTestBed,
+    createDropdownMenuDriver,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <DropdownMenu label="Menu">
+        <SubMenuItem label="Actions" icon="home">
+          <MenuItem onClick="testState = 'action1'">Action 1</MenuItem>
+          <MenuItem onClick="testState = 'action2'">Action 2</MenuItem>
+        </SubMenuItem>
+      </DropdownMenu>
+    `);
+    const driver = await createDropdownMenuDriver();
+
+    await driver.open();
+    
+    // Open submenu with icon
+    await driver.openSubMenu("Actions");
+    
+    // Verify submenu items are accessible
+    await expect(page.getByRole("menuitem", { name: "Action 1" })).toBeVisible();
+    await expect(page.getByRole("menuitem", { name: "Action 2" })).toBeVisible();
+    
+    // Click on submenu item and verify functionality
+    await page.getByRole("menuitem", { name: "Action 1" }).click();
+    await expect.poll(testStateDriver.testState).toEqual("action1");
+  });
+
+  test("SubMenuItem icon with custom triggerTemplate overrides default icon", async ({
+    initTestBed,
+    createDropdownMenuDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <DropdownMenu label="Menu">
+        <SubMenuItem label="Custom" icon="home">
+          <property name="triggerTemplate">
+            <Button label="Custom Trigger" icon="star" />
+          </property>
+          <MenuItem>Item 1</MenuItem>
+        </SubMenuItem>
+      </DropdownMenu>
+    `);
+    const driver = await createDropdownMenuDriver();
+
+    await driver.open();
+    
+    // The custom trigger should be visible
+    await expect(page.getByText("Custom Trigger")).toBeVisible();
+    
+    // The custom trigger's icon should be visible (has an SVG)
+    const customTrigger = page.getByText("Custom Trigger").locator("..");
+    await expect(customTrigger.locator("svg").first()).toBeVisible();
+    
+    // The default label should NOT be visible
+    await expect(page.getByText("Custom").and(page.getByText("Custom Trigger").locator("..").locator(".."))).not.toBeVisible();
+  });
+
+  test("SubMenuItem with icon and MenuItem with icon can coexist", async ({
+    initTestBed,
+    createDropdownMenuDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <DropdownMenu label="Menu">
+        <MenuItem icon="home">Home</MenuItem>
+        <SubMenuItem label="Share" icon="home">
+          <MenuItem icon="home">Download</MenuItem>
+          <MenuItem icon="email">Email</MenuItem>
+        </SubMenuItem>
+      </DropdownMenu>
+    `);
+    const driver = await createDropdownMenuDriver();
+
+    await driver.open();
+    
+    // Verify MenuItem icon (has an SVG)
+    const homeItem = page.getByRole("menuitem", { name: "Home" });
+    await expect(homeItem).toBeVisible();
+    await expect(homeItem.locator("svg")).toBeVisible();
+    
+    // Verify SubMenuItem icon (has 2 SVGs: icon + chevron)
+    const shareTrigger = page.getByText("Share").locator("..");
+    await expect(shareTrigger.locator("svg")).toHaveCount(2);
+    
+    // Open submenu
+    await driver.openSubMenu("Share");
+    
+    // Verify nested MenuItem icons (each has an SVG)
+    const downloadItem = page.getByRole("menuitem", { name: "Download" });
+    await expect(downloadItem).toBeVisible();
+    await expect(downloadItem.locator("svg")).toBeVisible();
+    
+    const emailItem = page.getByRole("menuitem", { name: "Email" });
+    await expect(emailItem).toBeVisible();
+    await expect(emailItem.locator("svg")).toBeVisible();
+  });
+});

@@ -7,8 +7,14 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$borderRadius-FileUploadDropZone: createThemeVar("borderRadius-FileUploadDropZone");
+$borderColor-FileUploadDropZone: createThemeVar("borderColor-FileUploadDropZone--default");
+$borderWidth-FileUploadDropZone: createThemeVar("borderWidth-FileUploadDropZone--default");
+$borderStyle-FileUploadDropZone: createThemeVar("borderStyle-FileUploadDropZone--default");
+
 $backgroundColor-FileUploadDropZone: createThemeVar("backgroundColor-FileUploadDropZone");
 $textColor-FileUploadDropZone: createThemeVar("textColor-FileUploadDropZone");
+$textColor-dropping-FileUploadDropZone: createThemeVar("textColor-dropping-FileUploadDropZone");
 $backgroundColor-dropping-FileUploadDropZone: createThemeVar(
   "backgroundColor-dropping-FileUploadDropZone"
 );
@@ -18,7 +24,10 @@ $opacity-dropping-FileUploadDropZone: createThemeVar("opacity-dropping-FileUploa
   .wrapper {
     position: relative;
     background-color: $backgroundColor-FileUploadDropZone;
-    color: $textColor-FileUploadDropZone;
+    border-radius: $borderRadius-FileUploadDropZone;
+    border-color: $borderColor-FileUploadDropZone;
+    border-width: $borderWidth-FileUploadDropZone;
+    border-style: $borderStyle-FileUploadDropZone;
     display: flex;
     flex-direction: column;
   }
@@ -33,13 +42,17 @@ $opacity-dropping-FileUploadDropZone: createThemeVar("opacity-dropping-FileUploa
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    color: $textColor-FileUploadDropZone;
 
-    &:before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background-color: $backgroundColor-dropping-FileUploadDropZone;
-      opacity: $opacity-dropping-FileUploadDropZone; //0.5;
+    &.onDragActive  {
+      color: $textColor-dropping-FileUploadDropZone;
+      &:before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-color: $backgroundColor-dropping-FileUploadDropZone;
+        opacity: $opacity-dropping-FileUploadDropZone;
+      }
     }
   }
 }
