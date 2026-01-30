@@ -149,6 +149,29 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     };
   }, [xsVerboseForMap, resolvedTestId, safeNode.type, resolvedLabel, uid]);
 
+  // --- Ref to store inspector context for event handlers
+  // --- Using a ref allows memoedLookupEventHandler to stay stable while still
+  // --- having access to current values (avoids triggering init/cleanup re-runs)
+  const inspectorContextRef = useRef({
+    componentType: safeNode.type,
+    componentLabel: resolvedLabel,
+    componentId: safeNode.uid,
+    sourceFileId: (safeNode as any)?.debug?.source?.fileId,
+    sourceRange: (safeNode as any)?.debug?.source
+      ? { start: (safeNode as any).debug.source.start, end: (safeNode as any).debug.source.end }
+      : undefined,
+  });
+  // Keep the ref updated with current values
+  inspectorContextRef.current = {
+    componentType: safeNode.type,
+    componentLabel: resolvedLabel,
+    componentId: safeNode.uid,
+    sourceFileId: (safeNode as any)?.debug?.source?.fileId,
+    sourceRange: (safeNode as any)?.debug?.source
+      ? { start: (safeNode as any).debug.source.start, end: (safeNode as any).debug.source.end }
+      : undefined,
+  };
+
   // --- Obtain a function to register the component API
   const memoedRegisterComponentApi: RegisterComponentApiFn = useCallback(
     (api) => {
@@ -243,23 +266,20 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   const memoedLookupEventHandler: LookupEventHandlerFn = useCallback(
     (eventName, actionOptions) => {
       const action = safeNode.events?.[eventName] || actionOptions?.defaultHandler;
-      // Extract component context for inspector logging
-      // Use resolvedLabel which has evaluated expressions
-      const componentType = safeNode.type;
-      const componentId = safeNode.uid;
-      // Extract source file info for inspector error logging
-      const debugSource = (safeNode as any)?.debug?.source;
+      // Read inspector context from ref to avoid changing callback identity
+      // when label/type/etc change (which would trigger init/cleanup re-runs)
+      const ctx = inspectorContextRef.current;
       return lookupAction(action, uid, {
         eventName,
-        componentType,
-        componentLabel: resolvedLabel,
-        componentId,
-        sourceFileId: debugSource?.fileId,
-        sourceRange: debugSource ? { start: debugSource.start, end: debugSource.end } : undefined,
+        componentType: ctx.componentType,
+        componentLabel: ctx.componentLabel,
+        componentId: ctx.componentId,
+        sourceFileId: ctx.sourceFileId,
+        sourceRange: ctx.sourceRange,
         ...actionOptions
       });
     },
-    [lookupAction, safeNode.events, safeNode.type, resolvedLabel, safeNode.uid, uid],
+    [lookupAction, safeNode.events, uid],
   );
 
   // --- Set up the mouse event handlers for the component
@@ -374,12 +394,8 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     prevWhenValueRef.current = currentWhenValue;
   }, [currentWhenValue, memoedLookupEventHandler]);
 
-  // --- If when is false, don't render the component
-  if (!currentWhenValue) {
-    return null;
-  }
-
   // --- Create interaction logger for inspector/debugging
+  // --- IMPORTANT: This must be BEFORE the early return to maintain consistent hook order
   const xsVerbose = appContext.appGlobals?.xsVerbose === true;
   const logInteraction = useCallback(
     (interaction: string, detail?: Record<string, any>) => {
@@ -401,6 +417,11 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     },
     [xsVerbose, safeNode.type, resolvedLabel, safeNode.uid]
   );
+
+  // --- If when is false, don't render the component
+  if (!currentWhenValue) {
+    return null;
+  }
 
   // --- Assemble the renderer context we pass down the rendering chain
   const rendererContext: RendererContext<any> = {
@@ -458,16 +479,18 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     // --- Components may have a `testId` property for E2E testing purposes. Inject the value of `testId`
     // --- into the DOM object of the rendered React component.
     if (
-      // --- Decorate when decorateComponentsWithTestId is enabled OR inspectId is defined
-      (appContext?.decorateComponentsWithTestId || inspectId !== undefined) &&
+      // --- The component has its "id" (internally, "uid") or "testId" property defined
+      ((appContext?.decorateComponentsWithTestId &&
+        (safeNode.uid !== undefined || safeNode.testId !== undefined)) ||
+        // --- The component has its "inspectId" property defined
+        inspectId !== undefined) &&
       // --- The component is visual
       descriptor?.nonVisual !== true &&
       // --- The component is not opaque
       descriptor?.opaque !== true
     ) {
       // --- Use `ComponentDecorator` to inject the `data-testid` attribute into the component.
-      // --- Use explicit testId/uid if provided, otherwise fall back to component type
-      const testId = safeNode.testId || safeNode.uid || safeNode.type;
+      const testId = safeNode.testId || safeNode.uid;
       const resolvedUid = extractParam(state, testId, appContext, true);
       renderedNode = (
         <ComponentDecorator
