@@ -1,4 +1,5 @@
 import { cloneDeep, get as lodashGet, set as lodashSet, isEqual } from "lodash-es";
+import type { MutableRefObject } from "react";
 import type { IAppStateContext } from "../../components/App/AppStateContext";
 
 /**
@@ -42,16 +43,17 @@ function deepFreeze<T>(obj: T): T {
 }
 
 /**
- * Creates an AppState object that provides global state management methods
+ * Creates an AppState object that provides global state management methods.
+ * Uses a ref to always access the latest context without triggering re-creation.
  */
-export function createAppState(appStateContext: IAppStateContext): AppState {
-  // Don't destructure - always access the latest state from context
+export function createAppState(appStateContextRef: MutableRefObject<IAppStateContext>): AppState {
+  // Use ref to always access latest state without recreating AppState object
   /**
    * Helper to get current value from a bucket path
    */
   function getBucketValue(bucket: string): any {
     try {
-      const value = lodashGet(appStateContext.appState, bucket);
+      const value = lodashGet(appStateContextRef.current.appState, bucket);
       // Unwrap values that were wrapped for primitives/arrays
       if (value !== null && typeof value === 'object' && !Array.isArray(value) && '__value__' in value) {
         return value.__value__;
@@ -82,17 +84,17 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
         const isObject = value !== null && typeof value === 'object' && !Array.isArray(value);
         if (isObject) {
           // For plain objects, pass them directly for merging
-          appStateContext.update(topLevelKey, value);
+          appStateContextRef.current.update(topLevelKey, value);
         } else {
           // For primitives and arrays, wrap in a container object
-          appStateContext.update(topLevelKey, { __value__: value });
+          appStateContextRef.current.update(topLevelKey, { __value__: value });
         }
       } else {
         // Nested case: use lodash set on cloned object
-        const currentTopLevel = appStateContext.appState[topLevelKey] || {};
+        const currentTopLevel = appStateContextRef.current.appState[topLevelKey] || {};
         const clonedTopLevel = cloneDeep(currentTopLevel);
         lodashSet(clonedTopLevel, parts.slice(1).join("."), value);
-        appStateContext.update(topLevelKey, clonedTopLevel);
+        appStateContextRef.current.update(topLevelKey, clonedTopLevel);
       }
     } catch (error) {
       console.warn(`[AppState] Error setting bucket '${bucket}':`, error);
