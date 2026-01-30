@@ -15,9 +15,13 @@ export const FileUploadDropZoneMd = createMetadata({
   props: {
     text: {
       description:
-        "With this property, you can change the default text to display when files " +
-        "are dragged over the drop zone.",
+        "With this property, you can change the default text to display in the drop zone.",
       defaultValue: defaultProps.text,
+      type: "string",
+    },
+    icon: {
+      description: `Specifies an icon name. The framework will render an icon if XMLUI recognizes the icon by its name.`,
+      defaultValue: defaultProps.icon,
       type: "string",
     },
     allowPaste: {
@@ -34,7 +38,9 @@ export const FileUploadDropZoneMd = createMetadata({
       "boolean",
       true,
     ),
-    acceptedFileTypes: d(`Accepted file MIME types, separated by commas. For example: 'image/*,application/pdf'.`),
+    acceptedFileTypes: d(
+      `Accepted file MIME types, separated by commas. For example: 'image/*,application/pdf'.`,
+    ),
     maxFiles: d(`The maximum number of files that can be selected.`),
   },
   events: {
@@ -54,13 +60,18 @@ export const FileUploadDropZoneMd = createMetadata({
   defaultThemeVars: {
     "backgroundColor-FileUploadDropZone": "$backgroundColor",
     "backgroundColor-dropping-FileUploadDropZone": "$backgroundColor--selected",
-    "opacity-dropping-FileUploadDropZone": "0.5",
-    "textColor-FileUploadDropZone": "$textColor",
+    "opacity-dropping-FileUploadDropZone": "0.3",
+    "textColor-FileUploadDropZone": "$textColor-secondary",
+    "textColor-dropping-FileUploadDropZone": "$color-primary-700",
+    "borderStyle-FileUploadDropZone": "dashed",
+    "borderColor-FileUploadDropZone": "$color-secondary-200",
+    "borderWidth-FileUploadDropZone": "2px",
+    "borderRadius-FileUploadDropZone": "$borderRadius",
     light: {
       // --- No light-specific theme vars
     },
     dark: {
-      // --- No dark-specific theme vars
+      "backgroundColor-dropping-FileUploadDropZone": "$color-primary-300",
     },
   },
 });
@@ -68,7 +79,15 @@ export const FileUploadDropZoneMd = createMetadata({
 export const fileUploadDropZoneComponentRenderer = createComponentRenderer(
   COMP,
   FileUploadDropZoneMd,
-  ({ node, extractValue, updateState, renderChild, lookupEventHandler, registerComponentApi, className }) => {
+  ({
+    node,
+    extractValue,
+    updateState,
+    renderChild,
+    lookupEventHandler,
+    registerComponentApi,
+    className,
+  }) => {
     return (
       <FileUploadDropZone
         onUpload={lookupEventHandler("upload")!}
@@ -77,6 +96,7 @@ export const fileUploadDropZoneComponentRenderer = createComponentRenderer(
         className={className}
         allowPaste={extractValue(node.props.allowPaste)}
         text={extractValue(node.props.text)}
+        icon={extractValue(node.props.icon)}
         disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
         updateState={updateState}
         acceptedFileTypes={extractValue.asOptionalString(node.props.acceptedFileTypes)}

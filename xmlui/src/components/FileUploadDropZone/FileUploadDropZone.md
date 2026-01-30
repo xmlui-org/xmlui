@@ -7,8 +7,8 @@ The component provides a surface on which you can drag files or paste files from
 ```xmlui-pg copy display name="Example: using FileUploadDropZone" height="200px"
 ---app copy display
 <App>
-  <H3>The cyan area below is a FileUploadDropZone</H3>
-  <FileUploadDropZone backgroundColor="cyan" height="100px"
+  <FileUploadDropZone
+    height="100px"
     onUpload="
       (files) => {
         console.log(files); 
@@ -28,11 +28,12 @@ This property indicates if the drop zone accepts files pasted from the clipboard
 
 The following example sets this property to `false` and, thus, it turns off pasting files:
 
-```xmlui-pg copy display name="Example: allowPaste" height="200px"
+```xmlui-pg copy display name="Example: allowPaste" height="240px" /allowPaste="false"/
 ---app copy display
 <App>
   <H3>You cannot paste files from the clipboard</H3>
-  <FileUploadDropZone backgroundColor="cyan" height="100px"
+  <FileUploadDropZone
+    height="100px"
     allowPaste="false"
     onUpload="(files) => files.map(file => toast('file ' + file.path + ' uploaded'))" />
 </App>

@@ -27,17 +27,22 @@ type Props = {
   className?: string;
   allowPaste?: boolean;
   text?: string;
+  icon?: string;
   disabled?: boolean;
   updateState?: UpdateStateFn;
   acceptedFileTypes?: string;
   maxFiles?: number;
 };
 
-export const defaultProps: Pick<Props, "onUpload" | "uid" | "allowPaste" | "text" | "disabled"> = {
+export const defaultProps: Pick<
+  Props,
+  "onUpload" | "uid" | "allowPaste" | "text" | "icon" | "disabled"
+> = {
   onUpload: asyncNoop,
   uid: "fileUploadDialog",
   allowPaste: true,
   text: "Drop files here",
+  icon: "upload",
   disabled: false,
 };
 
@@ -55,6 +60,7 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
     updateState,
     acceptedFileTypes,
     maxFiles,
+    icon = defaultProps.icon,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -142,9 +148,15 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
     <div {...rootProps} data-drop-enabled={!disabled} ref={rootRef}>
       <input {...getInputProps()} />
       {children}
+      {!children && !isDragActive && (
+        <div className={classnames(styles.dropPlaceholder)}>
+          <Icon name={icon}></Icon>
+          {text}
+        </div>
+      )}
       {isDragActive && isDragAccept && (
-        <div className={styles.dropPlaceholder}>
-          <Icon name={"upload"}></Icon>
+        <div className={classnames(styles.dropPlaceholder, styles.onDragActive)}>
+          <Icon name={icon}></Icon>
           {text}
         </div>
       )}

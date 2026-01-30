@@ -9,8 +9,8 @@ The component provides a surface on which you can drag files or paste files from
 ```xmlui-pg copy display name="Example: using FileUploadDropZone" height="200px"
 ---app copy display
 <App>
-  <H3>The cyan area below is a FileUploadDropZone</H3>
-  <FileUploadDropZone backgroundColor="cyan" height="100px"
+  <FileUploadDropZone
+    height="100px"
     onUpload="
       (files) => {
         console.log(files); 
@@ -38,11 +38,12 @@ This property indicates if the drop zone accepts files pasted from the clipboard
 
 The following example sets this property to `false` and, thus, it turns off pasting files:
 
-```xmlui-pg copy display name="Example: allowPaste" height="200px"
+```xmlui-pg copy display name="Example: allowPaste" height="240px" /allowPaste="false"/
 ---app copy display
 <App>
   <H3>You cannot paste files from the clipboard</H3>
-  <FileUploadDropZone backgroundColor="cyan" height="100px"
+  <FileUploadDropZone
+    height="100px"
     allowPaste="false"
     onUpload="(files) => files.map(file => toast('file ' + file.path + ' uploaded'))" />
 </App>
@@ -64,7 +65,7 @@ The maximum number of files that can be selected.
 
 -  default: **"Drop files here"**
 
-With this property, you can change the default text to display when files are dragged over the drop zone.
+With this property, you can change the default text to display in the drop zone.
 
 ## Events [#events]
 
@@ -88,7 +89,15 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-dropping-FileUploadDropZone | $backgroundColor--selected | $backgroundColor--selected |
+| [backgroundColor](../styles-and-themes/common-units/#color)-dropping-FileUploadDropZone | $backgroundColor--selected | $color-primary-300 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-FileUploadDropZone | $backgroundColor | $backgroundColor |
-| [opacity](../styles-and-themes/common-units/#opacity)-dropping-FileUploadDropZone | 0.5 | 0.5 |
-| [textColor](../styles-and-themes/common-units/#color)-FileUploadDropZone | $textColor | $textColor |
+| [borderColor](../styles-and-themes/common-units/#color)-FileUploadDropZone | $color-secondary-200 | $color-secondary-200 |
+| [borderColor](../styles-and-themes/common-units/#color)-FileUploadDropZone--default | *none* | *none* |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-FileUploadDropZone | $borderRadius | $borderRadius |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-FileUploadDropZone | dashed | dashed |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-FileUploadDropZone--default | *none* | *none* |
+| [borderWidth](../styles-and-themes/common-units/#size)-FileUploadDropZone | 2px | 2px |
+| [borderWidth](../styles-and-themes/common-units/#size)-FileUploadDropZone--default | *none* | *none* |
+| [opacity](../styles-and-themes/common-units/#opacity)-dropping-FileUploadDropZone | 0.3 | 0.3 |
+| [textColor](../styles-and-themes/common-units/#color)-dropping-FileUploadDropZone | $color-primary-700 | $color-primary-700 |
+| [textColor](../styles-and-themes/common-units/#color)-FileUploadDropZone | $textColor-secondary | $textColor-secondary |
