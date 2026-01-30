@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   observeInlinePattern,
   convertInlinePatternToMarkdown,
@@ -6,6 +6,7 @@ import {
   convertPlaygroundPatternToMarkdown,
 } from "../../src/components/Markdown/utils";
 import { decodeFromBase64 } from "../../src/components-core/utils/base64-utils";
+import { xmlUiMarkupToComponent } from "../../src/components-core/xmlui-parser";
 
 describe("observeInlinePattern", () => {
   it("detects basic xmlui-inline pattern", () => {
@@ -341,5 +342,65 @@ Some text
     
     expect(resolvedMd).toBe(convertInlinePatternToMarkdown(markdown));
     expect(resolvedMd).toContain("<span data-inline-content=");
+  });
+});
+
+describe("InlineApp component parsing", () => {
+  it("parses valid XMLUI markup without errors", () => {
+    const markup = "<Text>Hello World</Text>";
+    const { errors, component } = xmlUiMarkupToComponent(markup);
+
+    expect(errors).toHaveLength(0);
+    expect(component).toBeDefined();
+  });
+
+  it("returns errors for invalid XMLUI markup", () => {
+    const markup = "<Text>Unclosed tag";
+    const { errors } = xmlUiMarkupToComponent(markup);
+
+    expect(errors.length).toBeGreaterThan(0);
+  });
+
+  it("handles empty markup", () => {
+    const markup = "";
+    const { errors } = xmlUiMarkupToComponent(markup);
+
+    // Empty markup produces an error
+    expect(errors.length).toBeGreaterThan(0);
+  });
+
+  it("parses complex nested XMLUI markup", () => {
+    const markup = `<VStack>
+      <Text>Title</Text>
+      <Button variant="primary">Click Me</Button>
+    </VStack>`;
+    const { errors, component } = xmlUiMarkupToComponent(markup);
+
+    expect(errors).toHaveLength(0);
+    expect(component).toBeDefined();
+  });
+
+  it("handles XMLUI with binding expressions", () => {
+    const markup = '<Text>{$message}</Text>';
+    const { errors, component } = xmlUiMarkupToComponent(markup);
+
+    expect(errors).toHaveLength(0);
+    expect(component).toBeDefined();
+  });
+
+  it("handles XMLUI with event handlers", () => {
+    const markup = '<Button onClick="toast(\'Clicked\')">Click</Button>';
+    const { errors, component } = xmlUiMarkupToComponent(markup);
+
+    expect(errors).toHaveLength(0);
+    expect(component).toBeDefined();
+  });
+
+  it("parses component with props successfully", () => {
+    const markup = '<Button variant="primary" size="lg">Test</Button>';
+    const { errors, component } = xmlUiMarkupToComponent(markup);
+
+    expect(errors).toHaveLength(0);
+    expect(component).toBeDefined();
   });
 });
