@@ -65,6 +65,59 @@ export function observePlaygroundPattern(content: string): [number, number, stri
   return null; // No valid end pattern found
 }
 
+export function observeInlinePattern(content: string): [number, number, string] | null {
+  const startPattern = "```xmlui-inline";
+  const endPattern = "```";
+
+  const startIndex = content.indexOf(startPattern);
+  if (startIndex === -1) {
+    return null; // No match for the start pattern
+  }
+
+  // Find the end of the start pattern
+  const startContentIndex = content.indexOf("\n", startIndex);
+  if (startContentIndex === -1) {
+    return null; // Malformed pattern, no newline after start
+  }
+
+  // Search for the end pattern after the start content
+  let endIndex = startContentIndex;
+  while (endIndex !== -1) {
+    endIndex = content.indexOf(endPattern, endIndex + 1);
+    if (endIndex !== -1) {
+      // Check if the end pattern is not escaped with backslash
+      const precedingChar = content[endIndex - 1];
+      if (precedingChar !== "\\") {
+        return [
+          startIndex,
+          endIndex + endPattern.length,
+          content.substring(startIndex, endIndex + endPattern.length),
+        ];
+      }
+    }
+  }
+
+  return null; // No valid end pattern found
+}
+
+export function convertInlinePatternToMarkdown(content: string): string {
+  if (!content.startsWith("```xmlui-inline")) {
+    return content; // Not an inline pattern, return unchanged
+  }
+
+  // Extract the XMLUI markup content between the code fence markers
+  const lines = content.split("\n");
+  
+  // Remove the first line (```xmlui-inline) and last line (```)
+  const xmluiContent = lines.slice(1, -1).join("\n");
+
+  // Base64 encode the XMLUI markup for safe transport through markdown parser
+  const base64Content = encodeToBase64(xmluiContent);
+
+  // Return a span element with the encoded content
+  return `<span data-inline-content="${base64Content}"></span>`;
+}
+
 export function parseSegmentProps(input: string): SegmentProps {
   const segment: SegmentProps = {};
 
