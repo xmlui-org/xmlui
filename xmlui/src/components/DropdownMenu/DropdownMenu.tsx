@@ -239,6 +239,16 @@ export const SubMenuItemMd = createMetadata({
     "navigation and action organization.",
   docFolder: DDMCOMP,
   props: {
+    iconPosition: {
+      description: `This property allows you to determine the position of the icon displayed in the submenu item.`,
+      valueType: "string",
+      availableValues: iconPositionMd,
+      defaultValue: defaultMenuItemProps.iconPosition,
+    },
+    icon: {
+      description: `This property names an optional icon to display with the submenu item. You can use component-specific icons in the format "iconName:SubMenuItem".`,
+      valueType: "string",
+    },
     label: dLabel(),
     triggerTemplate: dTriggerTemplate(SMCOMP),
   },
@@ -248,9 +258,16 @@ export const subMenuItemRenderer = createComponentRenderer(
   SMCOMP,
   SubMenuItemMd,
   ({ node, renderChild, extractValue }) => {
+    const iconName = extractValue(node.props?.icon);
     return (
       <SubMenuItem
         label={extractValue(node.props?.label)}
+        iconPosition={extractValue.asOptionalString(node.props.iconPosition)}
+        icon={
+          iconName && (
+            <Icon name={iconName} fallback={iconName} />
+          )
+        }
         triggerTemplate={renderChild(node.props?.triggerTemplate)}
       >
         {renderChild(node.children)}

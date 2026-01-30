@@ -11,6 +11,23 @@
 
 ## Properties [#properties]
 
+### `icon` [#icon]
+
+This property names an optional icon to display with the submenu item. You can use component-specific icons in the format "iconName:SubMenuItem".
+
+### `iconPosition` [#iconposition]
+
+-  default: **"start"**
+
+This property allows you to determine the position of the icon displayed in the submenu item.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `start` | The icon will appear at the start (left side when the left-to-right direction is set) **(default)** |
+| `end` | The icon will appear at the end (right side when the left-to-right direction is set) |
+
 ### `label` [#label]
 
 This property sets the label of the component.  If not set, the component will not display a label.
