@@ -36,6 +36,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 import type { TrackContainerHeight } from "./AppWrapper";
 import { ThemeToneKeys } from "../theming/utils";
 import StandaloneComponent from "./StandaloneComponent";
+import {
+  safeStringify,
+  simpleStringify,
+  prefixLines,
+  xsConsoleLog,
+  pushXsLog,
+} from "../inspector/inspectorUtils";
 
 // --- The properties of the AppContent component
 type AppContentProps = {
@@ -74,6 +81,8 @@ export function AppContent({
   children,
   onInit,
 }: AppContentProps) {
+  // Note: Startup trace initialization happens during render (near xsVerbose definition)
+  // to ensure it's set before children mount and trigger useQuery fetches
   const [loggedInUser, setLoggedInUser] = useState(null);
   const debugView = useDebugView();
   const componentRegistry = useComponentRegistry();
@@ -368,17 +377,81 @@ export function AppContent({
   // --- app-wide state using buckets (state sections).
   const [appState, setAppState] = useState<Record<string, Record<string, any>>>(EMPTY_OBJECT);
 
-  const update = useCallback((bucket: string, patch: any) => {
-    setAppState((prev) => {
-      return {
-        ...prev,
-        [bucket]: {
+  const xsVerbose = (appGlobals as any)?.xsVerbose === true;
+  const xsLogMax = Number((appGlobals as any)?.xsVerboseLogMax ?? 200);
+
+  // Initialize startup trace early during render, BEFORE children mount
+  // This ensures DataLoader can capture the trace when useQuery triggers fetches
+  if (xsVerbose && typeof window !== "undefined") {
+    const w = window as any;
+    if (!w._xsStartupTrace) {
+      w._xsStartupTrace = `startup-${Date.now().toString(36)}`;
+    }
+    if (!w._xsCurrentTrace) {
+      w._xsCurrentTrace = w._xsStartupTrace;
+    }
+  }
+
+  const update = useCallback(
+    (bucket: string, patch: any) => {
+      setAppState((prev) => {
+        const before = prev[bucket];
+        const after = {
           ...(prev[bucket] || {}),
           ...patch,
-        },
-      };
-    });
-  }, []);
+        };
+        const next = {
+          ...prev,
+          [bucket]: after,
+        };
+
+        if (xsVerbose && typeof window !== "undefined") {
+          const w = window as any;
+          const lastInteraction = w._xsLastInteraction;
+          const traceId =
+            w._xsCurrentTrace ||
+            (!w._xsStartupComplete ? w._xsStartupTrace : undefined) ||
+            (lastInteraction && Date.now() - lastInteraction.ts < 2000 ? lastInteraction.id : undefined);
+          const perfTs = typeof performance !== "undefined" ? performance.now() : undefined;
+
+          const beforeJson = simpleStringify(before);
+          const afterJson = simpleStringify(after);
+          const diffPretty =
+            `path: AppState:${bucket}\n` +
+            `${prefixLines(beforeJson, "- ")}\n` +
+            `${prefixLines(afterJson, "+ ")}`;
+          const diff = {
+            path: `AppState:${bucket}`,
+            type: "update" as const,
+            before,
+            after,
+            beforeJson,
+            afterJson,
+            diffText: `path: AppState:${bucket}\n- ${beforeJson}\n+ ${afterJson}`,
+            diffPretty,
+          };
+
+          // Defer log emission to avoid triggering state updates during render.
+          setTimeout(() => {
+            xsConsoleLog("state:changes", { uid: bucket, eventName: `AppState:${bucket}` });
+            pushXsLog({
+              ts: Date.now(),
+              perfTs,
+              kind: "state:changes",
+              eventName: `AppState:${bucket}`,
+              uid: bucket,
+              traceId,
+              diffPretty,
+              diffJson: [diff],
+            }, xsLogMax);
+          }, 0);
+        }
+
+        return next;
+      });
+    },
+    [xsVerbose, xsLogMax],
+  );
 
   const appStateContextValue: IAppStateContext = useMemo(() => {
     return {
@@ -386,6 +459,202 @@ export function AppContent({
       update,
     };
   }, [appState, update]);
+
+  useEffect(() => {
+    if (!xsVerbose || typeof document === "undefined") return;
+
+    if (typeof window !== "undefined") {
+      const w = window as any;
+      if (!w._xsStartupTrace) {
+        w._xsStartupTrace = `startup-${Date.now().toString(36)}`;
+      }
+      if (!w._xsCurrentTrace) {
+        w._xsCurrentTrace = w._xsStartupTrace;
+      }
+    }
+
+    // Track processed events using WeakSet - same event object = same physical user action
+    const processedEvents = new WeakSet<Event>();
+    let lastEventTraceId = "";
+
+    const capture = (event: Event) => {
+      if (typeof document !== "undefined") {
+        const activeEl = document.activeElement as HTMLElement | null;
+        const isInspectorEl = (el: Element | null | undefined) => {
+          if (!el || !(el instanceof HTMLElement)) return false;
+          return (
+            el.closest?.('[data-testid="InspectorDialog"]') ||
+            el.closest?.('[data-testid="InspectorFrame"]') ||
+            el.getAttribute?.("data-testid") === "Inspector" ||
+            el.getAttribute?.("data-testid") === "InspectorDialog" ||
+            el.getAttribute?.("data-testid") === "InspectorFrame" ||
+            (el instanceof HTMLIFrameElement &&
+              el.src &&
+              el.src.includes("/xs-diff.html"))
+          );
+        };
+
+        if (isInspectorEl(activeEl)) {
+          return;
+        }
+
+        const path = (event as any).composedPath?.() as EventTarget[] | undefined;
+        if (path) {
+          for (const p of path) {
+            if (isInspectorEl(p as Element)) {
+              return;
+            }
+          }
+        } else if (isInspectorEl(event.target as Element)) {
+          return;
+        }
+      }
+
+      // Deduplicate using event object identity - same object = same physical event
+      if (processedEvents.has(event)) {
+        // Same event object seen again - just update trace context, don't log
+        const w = window as any;
+        if (lastEventTraceId) {
+          w._xsCurrentTrace = lastEventTraceId;
+        }
+        return;
+      }
+      processedEvents.add(event);
+
+      // Skip programmatic/synthetic events - only trace real user interactions
+      // event.isTrusted is true for user-initiated events, false for dispatchEvent()/click()/etc.
+      if (!event.isTrusted) {
+        return;
+      }
+
+      const target = event.target as HTMLElement | null;
+
+      const composedPath = (event as any).composedPath?.() as EventTarget[] | undefined;
+      const elements = (composedPath || []).filter(
+        (item): item is HTMLElement => item instanceof HTMLElement,
+      );
+
+      // Find element with data-inspectid (prefer) or data-testid
+      const withInspectId = elements.find((el) => el.hasAttribute("data-inspectid"));
+      const withTestId = elements.find((el) => el.hasAttribute("data-testid"));
+      // Also try .closest() as fallback in case composedPath missed something
+      const closestInspect = target?.closest?.("[data-inspectid]") as HTMLElement | null;
+      const closestTestId = target?.closest?.("[data-testid]") as HTMLElement | null;
+
+      const inspectEl = withInspectId || closestInspect;
+      const testIdEl = withTestId || closestTestId;
+      const nearest = inspectEl || testIdEl || target;
+
+      const inspectId = inspectEl?.getAttribute?.("data-inspectid") || undefined;
+      const testId = testIdEl?.getAttribute?.("data-testid") || undefined;
+      const componentId = testId || inspectId;
+      const textContent = nearest?.textContent?.trim();
+      const text =
+        textContent && textContent.length > 80 ? textContent.slice(0, 77) + "…" : textContent;
+
+      const detail: Record<string, any> = {
+        componentId,
+        inspectId,
+        targetTag: (target && target.tagName) || undefined,
+        text,
+      };
+      if (event instanceof MouseEvent) {
+        detail.button = event.button;
+      }
+      if (event instanceof KeyboardEvent) {
+        detail.key = event.key;
+        detail.code = event.code;
+        detail.ctrlKey = event.ctrlKey;
+        detail.metaKey = event.metaKey;
+        detail.shiftKey = event.shiftKey;
+        detail.altKey = event.altKey;
+      }
+
+      const w = window as any;
+      w._xsLogs = Array.isArray(w._xsLogs) ? w._xsLogs : [];
+
+      // Try to resolve component info from _xsInspectMap (for inspect="true" components)
+      // or _xsTestIdMap (for all components with testId/uid)
+      let componentInfo =
+        (inspectId && w._xsInspectMap ? w._xsInspectMap[inspectId] : undefined) ||
+        (testId && w._xsTestIdMap ? w._xsTestIdMap[testId] : undefined);
+
+      // Build descriptive component info
+      // Priority: componentInfo > data-component-type attribute > testId > element attributes > tag name
+      const componentType = componentInfo?.componentType || nearest?.getAttribute?.("data-component-type") || undefined;
+      const textHint =
+        detail.text && detail.text.length < 40 ? detail.text : undefined;
+      let componentLabel =
+        componentInfo?.componentLabel ||
+        (componentInfo?.componentType ? componentInfo.componentType : undefined) ||
+        testId ||
+        componentId ||
+        // For better context, show the element hierarchy if we only have tag names
+        (detail.targetTag && nearest !== target && nearest?.tagName
+          ? `${nearest.tagName.toLowerCase()} > ${detail.targetTag.toLowerCase()}`
+          : undefined) ||
+        detail.targetTag?.toLowerCase() ||
+        "Unknown";
+      // Prefer textHint when:
+      // 1. componentLabel is a generic HTML tag (button, a, div, span)
+      // 2. componentLabel matches the target tag name
+      // 3. componentLabel is a PascalCase component type (like "NavLink") without componentInfo
+      //    (indicating it's a fallback data-testid, not an explicit user-provided testId)
+      const isPascalCaseComponentType = /^[A-Z][a-zA-Z]*$/.test(componentLabel);
+      if (
+        textHint &&
+        (componentLabel === detail.targetTag?.toLowerCase() ||
+          ["button", "a", "div", "span"].includes(componentLabel) ||
+          (isPascalCaseComponentType && !componentInfo))
+      ) {
+        componentLabel = textHint;
+      }
+      if (typeof window !== "undefined") {
+        const w = window as any;
+        // First user interaction marks startup as complete
+        // After this, handlers without a user interaction won't use the startup trace
+        w._xsStartupComplete = true;
+        if (w._xsCurrentTrace === w._xsStartupTrace) {
+          w._xsCurrentTrace = undefined;
+        }
+      }
+
+      let interactionId = `i-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+      if (w._xsPendingConfirmTrace) {
+        interactionId = w._xsPendingConfirmTrace;
+        w._xsPendingConfirmTrace = undefined;
+      }
+      const perfTs = typeof performance !== "undefined" ? performance.now() : undefined;
+      const logEventTs = typeof event.timeStamp === "number" ? event.timeStamp : undefined;
+      w._xsLastInteraction = { id: interactionId, ts: Date.now() };
+      w._xsCurrentTrace = interactionId;
+      lastEventTraceId = interactionId;
+      w._xsLogs.push({
+        ts: Date.now(),
+        perfTs,
+        eventTs: logEventTs,
+        kind: "interaction",
+        eventName: event.type,
+        uid: componentId,
+        traceId: interactionId,
+        componentType,
+        componentLabel,
+        interaction: event.type,
+        detail,
+        text: safeStringify(detail),
+      });
+      if (Number.isFinite(xsLogMax) && xsLogMax > 0 && w._xsLogs.length > xsLogMax) {
+        w._xsLogs.splice(0, w._xsLogs.length - xsLogMax);
+      }
+    };
+
+    const types = ["click", "dblclick", "contextmenu", "keydown"];
+    types.forEach((type) => document.addEventListener(type, capture, true));
+
+    return () => {
+      types.forEach((type) => document.removeEventListener(type, capture, true));
+    };
+  }, [xsVerbose, xsLogMax]);
 
   // --- Create AppState object with global state management functions
   const AppState = useMemo(() => createAppState(appStateContextValue), [appStateContextValue]);

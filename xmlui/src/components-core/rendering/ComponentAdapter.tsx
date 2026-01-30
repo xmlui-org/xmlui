@@ -77,6 +77,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   }: Props,
   ref: React.ForwardedRef<any>,
 ) {
+  const { logInteraction: _ignoredLogInteraction, ...restProps } = rest as any;
   // --- Make sure the component definition has `props` and `events` properties
   // --- (even if they are empty)
   const safeNode = useMemo(() => {
@@ -109,6 +110,67 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       }
     };
   }, [onUnmount, uid]);
+
+  // --- Register component info to global map for inspector
+  // --- This allows the inspector to resolve testId -> component type/label
+  // --- Only use explicit testId or uid - NOT component type, to avoid collisions
+  // --- when multiple components of the same type exist (e.g., multiple NavLinks)
+  const testIdForMap = safeNode.testId || safeNode.uid;
+  const resolvedTestId = useMemo(
+    () => (testIdForMap ? extractParam(state, testIdForMap, appContext, true) : undefined),
+    [state, testIdForMap, appContext],
+  );
+  // Resolve label props using extractParam to evaluate expressions
+  const resolvedLabel = useMemo(() => {
+    const props = safeNode.props || {};
+    const rawLabel = props.label ?? props.title ?? props.name ?? props.text ?? props.value ?? props.placeholder;
+    if (rawLabel === undefined) return undefined;
+    // Use extractParam to evaluate expressions like "{mediaSize.largeScreen ? 'Delete' : ''}"
+    return extractParam(state, rawLabel, appContext, true);
+  }, [state, safeNode.props, appContext]);
+
+  const xsVerboseForMap = appContext.appGlobals?.xsVerbose === true;
+  useEffect(() => {
+    if (!xsVerboseForMap || !resolvedTestId || typeof window === "undefined") return;
+    const w = window as any;
+    w._xsTestIdMap = w._xsTestIdMap || {};
+    const componentType = safeNode.type;
+    w._xsTestIdMap[resolvedTestId] = {
+      componentType,
+      componentLabel: resolvedLabel,
+      uid: uid.description,
+      testId: resolvedTestId,
+    };
+    return () => {
+      // Cleanup on unmount
+      if (w._xsTestIdMap) {
+        delete w._xsTestIdMap[resolvedTestId];
+      }
+    };
+  }, [xsVerboseForMap, resolvedTestId, safeNode.type, resolvedLabel, uid]);
+
+  // --- Ref to store inspector context for event handlers
+  // --- Using a ref allows memoedLookupEventHandler to stay stable while still
+  // --- having access to current values (avoids triggering init/cleanup re-runs)
+  const inspectorContextRef = useRef({
+    componentType: safeNode.type,
+    componentLabel: resolvedLabel,
+    componentId: safeNode.uid,
+    sourceFileId: (safeNode as any)?.debug?.source?.fileId,
+    sourceRange: (safeNode as any)?.debug?.source
+      ? { start: (safeNode as any).debug.source.start, end: (safeNode as any).debug.source.end }
+      : undefined,
+  });
+  // Keep the ref updated with current values
+  inspectorContextRef.current = {
+    componentType: safeNode.type,
+    componentLabel: resolvedLabel,
+    componentId: safeNode.uid,
+    sourceFileId: (safeNode as any)?.debug?.source?.fileId,
+    sourceRange: (safeNode as any)?.debug?.source
+      ? { start: (safeNode as any).debug.source.start, end: (safeNode as any).debug.source.end }
+      : undefined,
+  };
 
   // --- Obtain a function to register the component API
   const memoedRegisterComponentApi: RegisterComponentApiFn = useCallback(
@@ -204,7 +266,18 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   const memoedLookupEventHandler: LookupEventHandlerFn = useCallback(
     (eventName, actionOptions) => {
       const action = safeNode.events?.[eventName] || actionOptions?.defaultHandler;
-      return lookupAction(action, uid, { eventName, ...actionOptions });
+      // Read inspector context from ref to avoid changing callback identity
+      // when label/type/etc change (which would trigger init/cleanup re-runs)
+      const ctx = inspectorContextRef.current;
+      return lookupAction(action, uid, {
+        eventName,
+        componentType: ctx.componentType,
+        componentLabel: ctx.componentLabel,
+        componentId: ctx.componentId,
+        sourceFileId: ctx.sourceFileId,
+        sourceRange: ctx.sourceRange,
+        ...actionOptions
+      });
     },
     [lookupAction, safeNode.events, uid],
   );
@@ -321,6 +394,30 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     prevWhenValueRef.current = currentWhenValue;
   }, [currentWhenValue, memoedLookupEventHandler]);
 
+  // --- Create interaction logger for inspector/debugging
+  // --- IMPORTANT: This must be BEFORE the early return to maintain consistent hook order
+  const xsVerbose = appContext.appGlobals?.xsVerbose === true;
+  const logInteraction = useCallback(
+    (interaction: string, detail?: Record<string, any>) => {
+      if (!xsVerbose) return;
+      if (typeof window !== "undefined") {
+        const w = window as any;
+        w._xsLogs = Array.isArray(w._xsLogs) ? w._xsLogs : [];
+        w._xsLogs.push({
+          ts: Date.now(),
+          traceId: w._xsCurrentTrace,
+          kind: "interaction",
+          componentType: safeNode.type,
+          componentLabel: resolvedLabel,
+          uid: safeNode.uid,
+          interaction,
+          detail,
+        });
+      }
+    },
+    [xsVerbose, safeNode.type, resolvedLabel, safeNode.uid]
+  );
+
   // --- If when is false, don't render the component
   if (!currentWhenValue) {
     return null;
@@ -343,6 +440,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     className,
     layoutContext: layoutContextRef?.current,
     uid,
+    logInteraction,
   };
 
   // --- No special behavior, let's render the component according to its definition.
@@ -386,7 +484,6 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
         (safeNode.uid !== undefined || safeNode.testId !== undefined)) ||
         // --- The component has its "inspectId" property defined
         inspectId !== undefined) &&
-      // // --- The app context indicates test mode
       // --- The component is visual
       descriptor?.nonVisual !== true &&
       // --- The component is not opaque
@@ -397,7 +494,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       const resolvedUid = extractParam(state, testId, appContext, true);
       renderedNode = (
         <ComponentDecorator
-          attr={{ "data-testid": resolvedUid, "data-inspectId": inspectId }}
+          attr={{ "data-testid": resolvedUid, "data-inspectId": inspectId, "data-component-type": safeNode.type }}
           allowOnlyRefdChild={isCompoundComponent || safeNode.type === "ModalDialog"}
           onTargetMounted={safeNode.type === "ModalDialog" ? refreshInspection : undefined}
           ref={ref}
@@ -407,7 +504,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
             {
               ...mergeProps(
                 { ...(renderedNode as ReactElement).props, ...mouseEventHandlers },
-                rest,
+                restProps,
               ),
             } as any,
           )}
@@ -476,7 +573,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
             ...renderedNode.props,
             ...(renderedNode.type !== React.Fragment ? mouseEventHandlers : {}),
           },
-          rest,
+          restProps,
         ),
       } as any,
       ...childrenArray,

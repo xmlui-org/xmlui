@@ -25,7 +25,6 @@ const moduleScriptExtension = new RegExp(`.${moduleFileExtension}$`);
  * Transform XMLUI files to JS objects.
  */
 export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plugin {
-  let itemIndex = 0;
   return {
     name: "vite:transform-xmlui",
 
@@ -35,7 +34,12 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
       };
 
       if (xmluiExtension.test(id)) {
-        const fileId = "" + itemIndex++;
+        // Use the file path relative to project root for cleaner display
+        // Vite's id is an absolute path, so we make it relative to cwd
+        const projectRoot = process.cwd();
+        const fileId = id.startsWith(projectRoot)
+          ? id.substring(projectRoot.length)
+          : id;
         let { component, errors, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
           code,
           fileId,

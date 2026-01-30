@@ -198,7 +198,8 @@ export const menuItemRenderer = createComponentRenderer(
   ({ node, renderChild, lookupEventHandler, lookupAction, extractValue, className }) => {
     const clickEventHandler = lookupEventHandler("click");
 
-    let clickHandler: { (): void; (event: any): void; };
+    // Use the XMLUI click handler if defined, otherwise fall back to navigation
+    let clickHandler = clickEventHandler;
     const to = extractValue(node.props.to);
     if (!clickEventHandler && to?.trim()) {
       const navigateAction = lookupAction("navigate", { signError: false });

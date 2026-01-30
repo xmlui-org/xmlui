@@ -245,7 +245,7 @@ const getWrappedWithContainer = (node: ContainerWrapperDef) => {
     apiBoundContainer: node?.apiBoundContainer,
     contextVars: node.contextVars,
     props: {
-      debug: (node.props as any)?.debug,
+      debug: (node as any).debug || (node.props as any)?.debug,
     },
     children: [wrappedNode],
   } as ContainerWrapperDef;

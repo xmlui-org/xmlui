@@ -24,6 +24,12 @@ import { useIndexerContext } from "../../components/App/IndexerContext";
 import { createMetadata, d } from "../../components/metadata-helpers";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
 import { createContextVariableError } from "../EngineError";
+import {
+  safeStringify,
+  formatDiff,
+  xsConsoleLog,
+  pushXsLog,
+} from "../inspector/inspectorUtils";
 
 type LoaderProps = {
   loader: DataLoaderDef;
@@ -53,6 +59,49 @@ function DataLoader({
   structuralSharing = true,
 }: LoaderProps) {
   const appContext = useAppContext();
+  const xsVerbose = appContext.appGlobals?.xsVerbose === true;
+  const xsLogMax = Number(appContext.appGlobals?.xsVerboseLogMax ?? 200);
+  const prevDataRef = useRef<any>(undefined);
+  const instanceIdRef = useRef<string>(
+    `ds-${Math.random().toString(36).slice(2, 8)}-${Date.now().toString(36)}`
+  );
+
+  // Capture trace ID when fetch is triggered, not when it completes
+  const pendingTraceIdRef = useRef<string | undefined>(undefined);
+
+  const xsLog = useCallback(
+    (...args: any[]) => {
+      if (!xsVerbose) return;
+      xsConsoleLog(...args);
+      const detail = args[1];
+      const w = typeof window !== "undefined" ? (window as any) : {};
+      pushXsLog({
+        ts: Date.now(),
+        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+        traceId: pendingTraceIdRef.current || w._xsCurrentTrace,
+        instanceId: instanceIdRef.current,
+        dataSourceId: (loader?.props as any)?.id,
+        dataSourceUrl: loader?.props?.url,
+        dataSourceBody: loader?.props?.body,
+        ownerUid: loader?.uid,
+        ownerFileId: loader?.debug?.source?.fileId,
+        ownerSource: loader?.debug?.source
+          ? { start: loader.debug.source.start, end: loader.debug.source.end }
+          : undefined,
+        text: safeStringify(args),
+        kind: args[0] ?? undefined,
+        eventName: detail?.eventName,
+        uid: detail?.uid ? String(detail.uid) : undefined,
+        componentType: "DataSource",
+        diffPretty: detail?.diffPretty ||
+          (Array.isArray(detail?.diff) && detail.diff.map((d: any) => d?.diffPretty).filter(Boolean).join("\n\n")) ||
+          undefined,
+        diffJson: Array.isArray(detail?.diff) ? detail.diff : undefined,
+      }, xsLogMax);
+    },
+    [xsLogMax, xsVerbose, loader],
+  );
+
   const rawUrl = extractParam(state, loader.props.url, appContext);
   const rawQueryParamsInner = useMemo(() => {
     return extractParam(state, loader.props.queryParams, appContext);
@@ -126,6 +175,13 @@ function DataLoader({
 
   const doLoad = useCallback(
     async (abortSignal?: AbortSignal, pageParams?: any) => {
+      // Capture the current trace ID when fetch is triggered
+      // This way the trace is preserved even if the handler completes before fetch does
+      if (typeof window !== "undefined") {
+        const w = window as any;
+        pendingTraceIdRef.current = w._xsCurrentTrace;
+      }
+
       // For CSV data type, handle directly rather than using RestApiProxy
       if (loader.props.dataType === "csv") {
         try {
@@ -178,127 +234,208 @@ function DataLoader({
           throw error;
         }
       } else if (loader.props.dataType === "sql") {
+        // Extract SQL query from the body or rawBody
+        let sqlQuery: string = "";
+        let sqlParams: any[] = [];
+
+        // Try to extract SQL query and parameters from body or rawBody
+        if (body && typeof body === "object") {
+          sqlQuery = body.sql || "";
+          sqlParams = body.params || [];
+        } else if (rawBody) {
+          try {
+            const parsedBody = JSON.parse(rawBody);
+            sqlQuery = parsedBody.sql || "";
+            sqlParams = parsedBody.params || [];
+          } catch (e) {
+            // If rawBody is not valid JSON, use it as the SQL query
+            sqlQuery = rawBody;
+          }
+        }
+
+        // If SQL query is empty, throw an error
+        if (!sqlQuery) {
+          throw new Error("SQL query is required for SQL data type");
+        }
+
+        // Prepare request to /query endpoint
+        const queryUrl = url || "/query";
+        const method = extractParam(state, loader.props.method, appContext) || "POST";
+        const headers = extractParam(state, loader.props.headers, appContext) || {
+          "Content-Type": "application/json",
+        };
+
+        const requestBody = JSON.stringify({
+          sql: sqlQuery,
+          params: sqlParams,
+        });
+
+        const fetchOptions: RequestInit = {
+          method,
+          headers,
+          body: requestBody,
+        };
+
+        if (abortSignal) {
+          fetchOptions.signal = abortSignal;
+        }
+
+        // Trace API call start
+        if (xsVerbose) {
+          pushXsLog({
+            ts: Date.now(),
+            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+            traceId: pendingTraceIdRef.current,
+            kind: "api:start",
+            url: queryUrl,
+            method: method,
+            instanceId: instanceIdRef.current,
+            dataSourceId: (loader.props as any).id,
+            dataType: "sql",
+            body: { sql: sqlQuery, params: sqlParams },
+          }, xsLogMax);
+        }
+
         try {
-          //console.log("[SQL DataLoader] Starting SQL data load");
-          // Extract SQL query from the body or rawBody
-          let sqlQuery: string = "";
-          let sqlParams: any[] = [];
-
-          // Try to extract SQL query and parameters from body or rawBody
-          if (body && typeof body === "object") {
-            //console.log("[SQL DataLoader] Using body object:", body);
-            sqlQuery = body.sql || "";
-            sqlParams = body.params || [];
-          } else if (rawBody) {
-            //console.log("[SQL DataLoader] Using rawBody:", rawBody);
-            try {
-              const parsedBody = JSON.parse(rawBody);
-              sqlQuery = parsedBody.sql || "";
-              sqlParams = parsedBody.params || [];
-            } catch (e) {
-              // If rawBody is not valid JSON, use it as the SQL query
-              //console.log("[SQL DataLoader] rawBody is not valid JSON, using as SQL query");
-              sqlQuery = rawBody;
-            }
-          }
-
-          //console.log("[SQL DataLoader] SQL Query:", sqlQuery);
-          //console.log("[SQL DataLoader] SQL Params:", sqlParams);
-
-          // If SQL query is empty, throw an error
-          if (!sqlQuery) {
-            //console.error("[SQL DataLoader] SQL query is empty");
-            throw new Error("SQL query is required for SQL data type");
-          }
-
-          // Prepare request to /query endpoint
-          const queryUrl = url || "/query";
-          const method = extractParam(state, loader.props.method, appContext) || "POST";
-          const headers = extractParam(state, loader.props.headers, appContext) || {
-            "Content-Type": "application/json",
-          };
-
-          //console.log("[SQL DataLoader] Request URL:", queryUrl);
-          //console.log("[SQL DataLoader] Request Method:", method);
-          //console.log("[SQL DataLoader] Request Headers:", headers);
-
-          const requestBody = JSON.stringify({
-            sql: sqlQuery,
-            params: sqlParams,
-          });
-
-          //console.log("[SQL DataLoader] Request Body:", requestBody);
-
-          const fetchOptions: RequestInit = {
-            method,
-            headers,
-            body: requestBody,
-          };
-
-          if (abortSignal) {
-            fetchOptions.signal = abortSignal;
-          }
-
-          //console.log("[SQL DataLoader] Sending fetch request...");
           const response = await fetch(queryUrl, fetchOptions);
-          //console.log("[SQL DataLoader] Response status:", response.status, response.statusText);
 
           if (!response.ok) {
-            console.error(
-              "[SQL DataLoader] Failed response:",
-              response.status,
-              response.statusText,
-            );
-            throw new Error(
-              `Failed to execute SQL query: ${response.status} ${response.statusText}`,
-            );
+            const errorMsg = `Failed to execute SQL query: ${response.status} ${response.statusText}`;
+            // Trace API call error
+            if (xsVerbose) {
+              pushXsLog({
+                ts: Date.now(),
+                perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+                traceId: pendingTraceIdRef.current,
+                kind: "api:error",
+                url: queryUrl,
+                method: method,
+                instanceId: instanceIdRef.current,
+                dataSourceId: (loader.props as any).id,
+                dataType: "sql",
+                error: { message: errorMsg },
+                status: response.status,
+              }, xsLogMax);
+            }
+            throw new Error(errorMsg);
           }
 
           // Parse response as JSON
           const jsonResult = await response.json();
-          //console.log("[SQL DataLoader] Response data:", jsonResult);
 
-          // Check the structure of the response
+          // Determine the final result
+          let finalResult = jsonResult;
           if (jsonResult && typeof jsonResult === "object") {
-            //console.log("[SQL DataLoader] Response keys:", Object.keys(jsonResult));
-
-            // If response has rows property, check if it's in expected format
             if (jsonResult.rows) {
-              //console.log("[SQL DataLoader] Response has 'rows' property:", jsonResult.rows);
-              //console.log("[SQL DataLoader] rows is array:", Array.isArray(jsonResult.rows));
-              // if (Array.isArray(jsonResult.rows) && jsonResult.rows.length > 0) {
-              //   console.log("[SQL DataLoader] First row:", jsonResult.rows[0]);
-              // }
-
-              // Return rows directly for easier table rendering
-              return jsonResult.rows;
-            }
-
-            // Check for other common SQL result formats
-            if (jsonResult.results) {
-              //console.log("[SQL DataLoader] Response has 'results' property");
-              return jsonResult.results;
+              finalResult = jsonResult.rows;
+            } else if (jsonResult.results) {
+              finalResult = jsonResult.results;
             }
           }
 
-          return jsonResult;
-        } catch (error) {
+          // Trace API call completion
+          if (xsVerbose) {
+            pushXsLog({
+              ts: Date.now(),
+              perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+              traceId: pendingTraceIdRef.current,
+              kind: "api:complete",
+              url: queryUrl,
+              method: method,
+              instanceId: instanceIdRef.current,
+              dataSourceId: (loader.props as any).id,
+              dataType: "sql",
+              result: finalResult,
+              status: response.status,
+            }, xsLogMax);
+          }
+
+          return finalResult;
+        } catch (error: any) {
+          // Trace API call error (for network errors, etc.)
+          if (xsVerbose && error?.message && !error.message.startsWith("Failed to execute SQL query:")) {
+            pushXsLog({
+              ts: Date.now(),
+              perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+              traceId: pendingTraceIdRef.current,
+              kind: "api:error",
+              url: queryUrl,
+              method: method,
+              instanceId: instanceIdRef.current,
+              dataSourceId: (loader.props as any).id,
+              dataType: "sql",
+              error: { message: error?.message || String(error), stack: error?.stack },
+            }, xsLogMax);
+          }
           console.error("Error executing SQL query:", error);
           throw error;
         }
       } else {
-        return await api.execute({
-          abortSignal,
-          operation: loader.props as any,
-          params: {
-            ...state,
-            $pageParams: pageParams,
-          },
-          resolveBindingExpressions: true,
-        });
+        // Trace API call start
+        if (xsVerbose) {
+          const method = (loader.props as any).method || "GET";
+          pushXsLog({
+            ts: Date.now(),
+            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+            traceId: pendingTraceIdRef.current,
+            kind: "api:start",
+            url: url,
+            method: method,
+            instanceId: instanceIdRef.current,
+            dataSourceId: (loader.props as any).id,
+            body: body || rawBody,
+          }, xsLogMax);
+        }
+
+        try {
+          const result = await api.execute({
+            abortSignal,
+            operation: loader.props as any,
+            params: {
+              ...state,
+              $pageParams: pageParams,
+            },
+            resolveBindingExpressions: true,
+          });
+
+          // Trace API call completion
+          if (xsVerbose) {
+            const method = (loader.props as any).method || "GET";
+            pushXsLog({
+              ts: Date.now(),
+              perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+              traceId: pendingTraceIdRef.current,
+              kind: "api:complete",
+              url: url,
+              method: method,
+              instanceId: instanceIdRef.current,
+              dataSourceId: (loader.props as any).id,
+              result: result,
+            }, xsLogMax);
+          }
+
+          return result;
+        } catch (e: any) {
+          // Trace API call error
+          if (xsVerbose) {
+            const method = (loader.props as any).method || "GET";
+            pushXsLog({
+              ts: Date.now(),
+              perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+              traceId: pendingTraceIdRef.current,
+              kind: "api:error",
+              url: url,
+              method: method,
+              instanceId: instanceIdRef.current,
+              dataSourceId: (loader.props as any).id,
+              error: { message: e?.message || String(e), stack: e?.stack },
+            }, xsLogMax);
+          }
+          throw e;
+        }
       }
     },
-    [api, loader.props, state, url, body, rawBody, appContext],
+    [api, loader.props, state, url, body, rawBody, appContext, xsVerbose, xsLogMax],
   );
 
   const queryId = useMemo(() => {
@@ -357,6 +494,22 @@ function DataLoader({
       //     console.log("[SQL DataLoader] Data keys:", Object.keys(data));
       //   }
       // }
+
+      if (xsVerbose) {
+        const before = prevDataRef.current;
+        const after = data;
+        const dataSourceId = (loader.props as any).id || loader.uid || loader.props.url || "DataSource";
+        const path = `DataSource:${dataSourceId}`;
+        xsLog("state:changes", {
+          uid: dataSourceId,
+          eventName: `DataSource:${dataSourceId}`,
+          instanceId: instanceIdRef.current,
+          diff: [formatDiff(path, before, after)],
+        });
+        prevDataRef.current = data;
+        // Clear the pending trace so it's not reused for subsequent automatic refreshes
+        pendingTraceIdRef.current = undefined;
+      }
 
       loaderLoaded(data, pageInfo);
       // console.log("[DataLoader] After loaderLoaded() call");
