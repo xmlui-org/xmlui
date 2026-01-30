@@ -13,6 +13,8 @@ import {
   convertTreeDisplayToMarkdown,
   observePlaygroundPattern,
   observeTreeDisplay,
+  observeInlinePattern,
+  convertInlinePatternToMarkdown,
 } from "./utils";
 import { createMetadata, d } from "../metadata-helpers";
 import type { BreakMode, OverflowMode } from "../abstractions";
@@ -322,6 +324,15 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
           resolvedMd.slice(0, nextTreeDisplay[0]) +
           convertTreeDisplayToMarkdown(nextTreeDisplay[2]) +
           resolvedMd.slice(nextTreeDisplay[1]);
+      }
+
+      while (true) {
+        const nextInline = observeInlinePattern(resolvedMd);
+        if (!nextInline) break;
+        resolvedMd =
+          resolvedMd.slice(0, nextInline[0]) +
+          convertInlinePatternToMarkdown(nextInline[2]) +
+          resolvedMd.slice(nextInline[1]);
       }
 
       resolvedMd = parseBindingExpression(resolvedMd, extractValue);

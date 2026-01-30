@@ -45,6 +45,7 @@
       "matchCommandLine": true
     },
     "npm list": true,
-    "npx vitest": true
+    "npx vitest": true,
+    "npx eslint": true
   }
 }

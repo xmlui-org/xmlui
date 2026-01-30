@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   observeInlinePattern,
   convertInlinePatternToMarkdown,
+  observePlaygroundPattern,
+  convertPlaygroundPatternToMarkdown,
 } from "../../src/components/Markdown/utils";
 import { decodeFromBase64 } from "../../src/components-core/utils/base64-utils";
 
@@ -207,5 +209,137 @@ describe("convertInlinePatternToMarkdown", () => {
     const decoded = decodeFromBase64(base64Content);
 
     expect(decoded).toBe(xmluiContent);
+  });
+});
+
+describe("Markdown integration with inline patterns", () => {
+  it("converts single xmlui-inline block to span tag", () => {
+    const markdown = "# Heading\n\n```xmlui-inline\n<Text>Hello</Text>\n```\n\nMore text";
+    
+    let resolvedMd = markdown;
+    const nextInline = observeInlinePattern(resolvedMd);
+    
+    expect(nextInline).not.toBeNull();
+    
+    resolvedMd =
+      resolvedMd.slice(0, nextInline![0]) +
+      convertInlinePatternToMarkdown(nextInline![2]) +
+      resolvedMd.slice(nextInline![1]);
+    
+    expect(resolvedMd).toContain("<span data-inline-content=");
+    expect(resolvedMd).toContain("# Heading");
+    expect(resolvedMd).toContain("More text");
+    expect(resolvedMd).not.toContain("```xmlui-inline");
+  });
+
+  it("converts multiple xmlui-inline blocks", () => {
+    const markdown = `\`\`\`xmlui-inline
+<Text>First</Text>
+\`\`\`
+
+Some text
+
+\`\`\`xmlui-inline
+<Button>Second</Button>
+\`\`\``;
+
+    let resolvedMd = markdown;
+    let count = 0;
+    
+    while (true) {
+      const nextInline = observeInlinePattern(resolvedMd);
+      if (!nextInline) break;
+      
+      resolvedMd =
+        resolvedMd.slice(0, nextInline[0]) +
+        convertInlinePatternToMarkdown(nextInline[2]) +
+        resolvedMd.slice(nextInline[1]);
+      
+      count++;
+    }
+    
+    expect(count).toBe(2);
+    expect(resolvedMd).toContain("Some text");
+    expect(resolvedMd).not.toContain("```xmlui-inline");
+    
+    // Should have two span elements
+    const spans = resolvedMd.match(/<span data-inline-content=/g);
+    expect(spans?.length).toBe(2);
+  });
+
+  it("handles inline blocks with markdown before and after", () => {
+    const markdown = `**Bold text**
+
+\`\`\`xmlui-inline
+<Text>Inline content</Text>
+\`\`\`
+
+*Italic text*`;
+
+    let resolvedMd = markdown;
+    const nextInline = observeInlinePattern(resolvedMd);
+    
+    resolvedMd =
+      resolvedMd.slice(0, nextInline![0]) +
+      convertInlinePatternToMarkdown(nextInline![2]) +
+      resolvedMd.slice(nextInline![1]);
+    
+    expect(resolvedMd).toContain("**Bold text**");
+    expect(resolvedMd).toContain("*Italic text*");
+    expect(resolvedMd).toContain("<span data-inline-content=");
+  });
+
+  it("processes inline blocks alongside playground blocks", () => {
+    const markdown = `\`\`\`xmlui-pg
+<App><Text>Playground</Text></App>
+\`\`\`
+
+\`\`\`xmlui-inline
+<Text>Inline</Text>
+\`\`\``;
+
+    let resolvedMd = markdown;
+    
+    // Process playground first (as in actual implementation)
+    while (true) {
+      const nextPlayground = observePlaygroundPattern(resolvedMd);
+      if (!nextPlayground) break;
+      
+      resolvedMd =
+        resolvedMd.slice(0, nextPlayground[0]) +
+        convertPlaygroundPatternToMarkdown(nextPlayground[2]) +
+        resolvedMd.slice(nextPlayground[1]);
+    }
+    
+    // Then process inline
+    while (true) {
+      const nextInline = observeInlinePattern(resolvedMd);
+      if (!nextInline) break;
+      
+      resolvedMd =
+        resolvedMd.slice(0, nextInline[0]) +
+        convertInlinePatternToMarkdown(nextInline[2]) +
+        resolvedMd.slice(nextInline[1]);
+    }
+    
+    expect(resolvedMd).toContain("<samp data-pg-content="); // From playground
+    expect(resolvedMd).toContain("<span data-inline-content="); // From inline
+    expect(resolvedMd).not.toContain("```xmlui-pg");
+    expect(resolvedMd).not.toContain("```xmlui-inline");
+  });
+
+  it("handles empty markdown with only inline block", () => {
+    const markdown = "```xmlui-inline\n<Text>Only content</Text>\n```";
+    
+    let resolvedMd = markdown;
+    const nextInline = observeInlinePattern(resolvedMd);
+    
+    resolvedMd =
+      resolvedMd.slice(0, nextInline![0]) +
+      convertInlinePatternToMarkdown(nextInline![2]) +
+      resolvedMd.slice(nextInline![1]);
+    
+    expect(resolvedMd).toBe(convertInlinePatternToMarkdown(markdown));
+    expect(resolvedMd).toContain("<span data-inline-content=");
   });
 });
