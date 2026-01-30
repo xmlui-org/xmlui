@@ -1,0 +1,40 @@
+{
+  "trailingSlash": "never",
+  "globalHeaders": {
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"
+  },
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": [
+      "/resources/*",
+      "/assets/*",
+      "/*.{png,csv,jpg,jpeg,gif,svg,webp,ico,json,xml,rss,js,css,woff,woff2,ttf,eot,md,mp4,mp3,zip,html}"
+    ]
+  },
+  "routes": [
+    {
+      "route": "/assets/*",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "route": "/*.{png,csv,jpg,jpeg,gif,svg,webp,ico,json,xml,rss,js,css,woff,woff2,ttf,eot,md,mp4,mp3,zip,html}",
+      "headers": {
+        "Cache-Control": "max-age=30, must-revalidate"
+      }
+    },
+    {
+      "route": "/*",
+      "headers": {
+        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"
+      }
+    }
+  ],
+  "mimeTypes": {
+    ".md": "text/markdown",
+    ".json": "application/json",
+    ".rss": "application/rss+xml"
+  }
+}
