@@ -388,7 +388,10 @@ export function AppContent({
   }, [appState, update]);
 
   // --- Create AppState object with global state management functions
-  const AppState = useMemo(() => createAppState(appStateContextValue), [appStateContextValue]);
+  // Use ref pattern to prevent AppState recreation when context changes
+  const appStateContextRef = useRef<IAppStateContext>(appStateContextValue);
+  appStateContextRef.current = appStateContextValue;
+  const AppState = useMemo(() => createAppState(appStateContextRef), []);
 
   // --- We assemble the app context object form the collected information
   const appContextValue = useMemo(() => {
