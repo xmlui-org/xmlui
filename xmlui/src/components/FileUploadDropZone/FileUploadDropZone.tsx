@@ -14,9 +14,7 @@ export const FileUploadDropZoneMd = createMetadata({
     "files from their local file system onto a designated area within the UI.",
   props: {
     text: {
-      description:
-        "With this property, you can change the default text to display when files " +
-        "are dragged over the drop zone.",
+      description: "With this property, you can change the default text to display in the drop zone.",
       defaultValue: defaultProps.text,
       type: "string",
     },
@@ -54,13 +52,18 @@ export const FileUploadDropZoneMd = createMetadata({
   defaultThemeVars: {
     "backgroundColor-FileUploadDropZone": "$backgroundColor",
     "backgroundColor-dropping-FileUploadDropZone": "$backgroundColor--selected",
-    "opacity-dropping-FileUploadDropZone": "0.5",
-    "textColor-FileUploadDropZone": "$textColor",
+    "opacity-dropping-FileUploadDropZone": "0.3",
+    "textColor-FileUploadDropZone": "$textColor-secondary",
+    "textColor-dropping-FileUploadDropZone": "$color-primary-700",
+    "borderStyle-FileUploadDropZone": "dashed",
+    "borderColor-FileUploadDropZone": "$color-secondary-200",
+    "borderWidth-FileUploadDropZone": "2px",
+    "borderRadius-FileUploadDropZone": "$borderRadius",
     light: {
       // --- No light-specific theme vars
     },
     dark: {
-      // --- No dark-specific theme vars
+      "backgroundColor-dropping-FileUploadDropZone": "$color-primary-300",
     },
   },
 });

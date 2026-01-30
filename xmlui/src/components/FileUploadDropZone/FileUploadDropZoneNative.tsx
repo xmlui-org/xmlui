@@ -142,8 +142,14 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
     <div {...rootProps} data-drop-enabled={!disabled} ref={rootRef}>
       <input {...getInputProps()} />
       {children}
+      {!children && !isDragActive && (
+        <div className={classnames(styles.dropPlaceholder)}>
+          <Icon name={"upload"}></Icon>
+          {text}
+        </div>
+      )}
       {isDragActive && isDragAccept && (
-        <div className={styles.dropPlaceholder}>
+        <div className={classnames(styles.dropPlaceholder, styles.onDragActive)}>
           <Icon name={"upload"}></Icon>
           {text}
         </div>
