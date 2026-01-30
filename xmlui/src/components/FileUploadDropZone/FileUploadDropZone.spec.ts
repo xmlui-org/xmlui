@@ -70,6 +70,22 @@ test("component supports allowPaste property", async ({
   await expect(driver.component).toBeVisible();
 });
 
+test("can render icon", async ({ initTestBed, createFileUploadDropZoneDriver }) => {
+  await initTestBed(`<FileUploadDropZone height="100px" />`);
+  const driver = await createFileUploadDropZoneDriver();
+  await expect(driver.getDropIcon()).toBeVisible();
+});
+
+test("can render custom icon", async ({ initTestBed, createFileUploadDropZoneDriver }) => {
+  await initTestBed(`<FileUploadDropZone height="100px" icon="test" />`, {
+    resources: {
+      "icon.test": "resources/bell.svg",
+    },
+  });
+  const driver = await createFileUploadDropZoneDriver();
+  await expect(driver.getDropIcon()).toBeVisible();
+});
+
 test("component supports acceptedFileTypes property", async ({
   initTestBed,
   createFileUploadDropZoneDriver,
@@ -406,17 +422,6 @@ test("component maintains performance with large child content", async ({
 // =============================================================================
 // DRAG AND DROP BEHAVIOR TESTS
 // =============================================================================
-
-test("component displays icon when dragging files over", async ({
-  initTestBed,
-  createFileUploadDropZoneDriver,
-}) => {
-  await initTestBed(`<FileUploadDropZone text="Drop now!">Upload Area</FileUploadDropZone>`);
-  const driver = await createFileUploadDropZoneDriver();
-
-  await expect(driver.component).toBeVisible();
-  // Icon would appear during actual drag operation
-});
 
 test("component handles drag enter and leave events", async ({
   initTestBed,
