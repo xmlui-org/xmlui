@@ -1,6 +1,6 @@
 import type React from "react";
-import { type CSSProperties, useCallback, useEffect, useId, useRef, useState } from "react";
-import type { DropzoneRootProps } from "react-dropzone";
+import { type CSSProperties, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import type { Accept, DropzoneRootProps } from "react-dropzone";
 import * as dropzone from "react-dropzone";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import classnames from "classnames";
@@ -20,14 +20,31 @@ import { TextBox } from "../TextBox/TextBoxNative";
 // https://github.com/react-dropzone/react-dropzone/issues/1259
 const { useDropzone } = dropzone;
 
+/**
+ * Convert a file type string (e.g., ".csv" or ".txt,.jpg") to react-dropzone's Accept format
+ */
+function toDropzoneAccept(acceptsFileType: string | undefined): Accept | undefined {
+  if (!acceptsFileType) return undefined;
+
+  const extensions = acceptsFileType.split(",").map(ext => ext.trim());
+  // Use a wildcard MIME type to accept any file with the specified extensions
+  return { "application/octet-stream": extensions };
+}
+
 // ============================================================================
 // React FileInput component implementation
 
-// Parse result type for multiple files
+// Parse result type for individual files
 export type ParseResult = {
   file: File;
   data: any[];
   error?: Error;
+};
+
+// Result type when parseAs is set
+export type ParseAsResult = {
+  files: File[];
+  parsedData: ParseResult[];
 };
 
 type Props = {
@@ -45,7 +62,7 @@ type Props = {
   buttonIconPosition?: IconPosition;
   // Input props
   updateState?: UpdateStateFn;
-  onDidChange?: (newValue: File[] | any[] | ParseResult[]) => void;
+  onDidChange?: (newValue: File[] | ParseAsResult) => void;
   onFocus?: () => void;
   onBlur?: () => void;
   registerComponentApi?: RegisterComponentApiFn;
@@ -131,12 +148,15 @@ export const FileInput = ({
 
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [displayedFiles, setDisplayedFiles] = useState<File[]>([]);
+  const [parseFields, setParseFields] = useState<string[] | undefined>(undefined);
 
   // Auto-infer file types based on parseAs
   const inferredFileType = parseAs === "csv" ? ".csv" : parseAs === "json" ? ".json" : undefined;
   const _acceptsFileType = acceptsFileType
     ? (typeof acceptsFileType === "string" ? acceptsFileType : acceptsFileType?.join(","))
     : inferredFileType;
+  const dropzoneAccept = useMemo(() => toDropzoneAccept(_acceptsFileType), [_acceptsFileType]);
 
   useEffect(() => {
     if (autoFocus) {
@@ -180,6 +200,9 @@ export const FileInput = ({
         return;
       }
 
+      // Store files for display purposes (file names in TextBox)
+      setDisplayedFiles(acceptedFiles);
+
       // If no parsing is needed, just pass the files through
       if (!parseAs) {
         loggerService.log(["[FileInput] No parseAs specified, passing files through"]);
@@ -201,6 +224,13 @@ export const FileInput = ({
             case "csv": {
               loggerService.log(["[FileInput] Entering CSV parse branch for:", file.name]);
 
+              // Check for empty file before parsing
+              const text = await file.text();
+              if (text.trim() === "") {
+                loggerService.log(["[FileInput] Empty CSV file, returning empty array"]);
+                return { file, data: [], error: undefined };
+              }
+
               const defaultCsvOptions: Papa.ParseConfig = {
                 header: true,
                 skipEmptyLines: true,
@@ -210,7 +240,7 @@ export const FileInput = ({
               loggerService.log(["[FileInput] CSV parse options:", defaultCsvOptions]);
 
               return new Promise<ParseResult>((resolve) => {
-                Papa.parse(file, {
+                Papa.parse(text, {
                   ...defaultCsvOptions,
                   complete: (results: Papa.ParseResult<any>) => {
                     loggerService.log(["[FileInput] Papa.parse complete callback called for:", file.name]);
@@ -235,6 +265,8 @@ export const FileInput = ({
                       resolve({ file, data: [], error });
                     } else {
                       loggerService.log(["[FileInput] CSV parse successful, row count:", results.data.length]);
+                      loggerService.log(["[FileInput] CSV meta fields:", results.meta.fields]);
+                      setParseFields(results.meta.fields);
                       resolve({ file, data: results.data, error: undefined });
                     }
                   },
@@ -251,6 +283,12 @@ export const FileInput = ({
 
               const text = await file.text();
               loggerService.log(["[FileInput] Read file text, length:", text.length]);
+
+              // Handle empty files gracefully
+              if (text.trim() === "") {
+                loggerService.log(["[FileInput] Empty JSON file, returning empty array"]);
+                return { file, data: [], error: undefined };
+              }
 
               const data = JSON.parse(text);
               const arrayData = Array.isArray(data) ? data : [data];
@@ -293,32 +331,28 @@ export const FileInput = ({
         });
       }
 
-      // For single files, return just the data array; for multiple files, return ParseResult[]
-      if (multiple || directory) {
-        loggerService.log(["[FileInput] Multiple files mode - returning ParseResult[]"]);
-        loggerService.log(["[FileInput] Calling updateState with results"]);
-        updateState({ value: results });
-        loggerService.log(["[FileInput] Calling onDidChange with results"]);
-        onDidChange(results);
-      } else {
-        const singleResult = results[0];
-        loggerService.log(["[FileInput] Single file mode - returning data array for:", singleResult.file.name]);
-        loggerService.log(["[FileInput] Data array length:", singleResult.data.length]);
-        loggerService.log(["[FileInput] Calling updateState with data"]);
-        updateState({ value: singleResult.data });
-        loggerService.log(["[FileInput] Calling onDidChange with data"]);
-        onDidChange(singleResult.data);
-      }
+      // Return { files, parsedData } when parseAs is set for consistent access to both
+      const parseAsResult: ParseAsResult = {
+        files: acceptedFiles,
+        parsedData: results,
+      };
+      loggerService.log(["[FileInput] Returning ParseAsResult with", results.length, "parsed file(s)"]);
+      loggerService.log(["[FileInput] Calling updateState with parseAsResult"]);
+      updateState({ value: parseAsResult });
+      loggerService.log(["[FileInput] Calling onDidChange with parseAsResult"]);
+      onDidChange(parseAsResult);
 
       loggerService.log(["[FileInput] onDrop completed"]);
 
-      // Stop loading spinner
+      // Stop loading spinner and restore focus
       setIsLoading(false);
+      buttonRef.current?.focus();
     },
-    [updateState, onDidChange, parseAs, csvOptions, onParseError, multiple, directory],
+    [updateState, onDidChange, parseAs, csvOptions, onParseError],
   );
 
   const { getRootProps, getInputProps, open } = useDropzone({
+    accept: dropzoneAccept,
     disabled: !enabled,
     multiple: multiple || directory,
     onDrop,
@@ -332,6 +366,8 @@ export const FileInput = ({
     open();
   });
 
+  const getFields = useCallback(() => parseFields, [parseFields]);
+
   useEffect(() => {
     registerComponentApi?.({
       focus,
@@ -339,8 +375,9 @@ export const FileInput = ({
       get inProgress() {
         return isLoading;
       },
+      getFields,
     });
-  }, [focus, doOpen, registerComponentApi, isLoading]);
+  }, [focus, doOpen, registerComponentApi, isLoading, getFields]);
 
   // Solution source: https://stackoverflow.com/questions/1084925/input-type-file-show-only-button
   return (
@@ -378,7 +415,7 @@ export const FileInput = ({
           <TextBox
             placeholder={placeholder}
             enabled={enabled}
-            value={_value?.map((v) => v.name).join(", ") || ""}
+            value={displayedFiles?.map((v) => v.name).join(", ") || ""}
             validationStatus={validationStatus}
             readOnly
             tabIndex={-1}
