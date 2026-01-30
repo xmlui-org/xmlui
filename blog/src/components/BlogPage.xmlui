@@ -1,22 +1,22 @@
 <Component name="BlogPage">
-  <VStack gap="$space-2">
+  <VStack gap="$space-2" marginTop="$space-4">
     <Link to="/blog"abel="Go to all posts" active>
-      <Text>
+      <Button variant="ghost" color="$color-primary-500">
         ← Go to all posts
-      </Text>
+      </Button>
     </Link>
-    <Card padding="$space-4" borderRadius="$space-2" backgroundColor="$color-surface-0" boxShadow="$boxShadow-spread">
+    <Card padding="$space-7" borderRadius="$space-2" backgroundColor="$color-surface-0" boxShadow="$boxShadow-spread">
       <VStack gap="$space-2">
-          <Text variant="info">
-            {$props.post.author}
-            •
-            {formatDate($props.post.date, "d MMM yyyy")}
-          </Text>
-        <H1 showAnchor="false">
+        <H1 showAnchor="false" fontSize="32px">
           {$props.post.title}
         </H1>
-        <!--<Image when="{$props.post.image}" src="/blog/images/{$props.post.image}" />-->
-        <Markdown marginTop="$space-4" data="/blog/{$props.post.slug}.md" />
+          <Text variant="info">
+              {$props.post.author}
+              •
+              {formatDate($props.post.date, "d MMM yyyy")}
+          </Text>
+        <Image when="{$props.post.image}" src="/blog/images/{$props.post.image}" />
+        <Markdown data="/blog/{$props.post.slug}.md" />
       </VStack>
     </Card>
   </VStack>

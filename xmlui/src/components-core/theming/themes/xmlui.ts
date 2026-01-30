@@ -153,17 +153,22 @@ export const XmlUiBlogThemeDefinition: ThemeDefinition = {
     // --- App layout
     "maxWidth-content-App": "800px",
     // --- Fundamental colors & typography
+    "color-surface": "rgb(111, 110, 119)",
     backgroundColor: "$color-surface-0",
     "fontSize": "14px",
     "fontWeight-Text": "400",
     "fontWeight-bold": "700",
     "textColor-primary": "$color-surface-800",
     "textColor-NavLink--active": "$color-primary",
-    "fontSize-Text-info": "$fontSize-xs",
-    "textColor-Text-info": "$color-primary-400",
-    "textColor-Text-info--hover": "$color-primary-400",
+    "fontSize-Text-info": "$fontSize-sm",
+    "textColor-Text-info": "$color-primary-500",
+    "textColor-Text-info--hover": "$color-primary-500",
+    "textColor-Text-infoStrong": "$color-primary-500",
     "textColor-Text-description": "$color-surface-500",
-    "textColor-Text-description--hover": "$color-surface-500"
+    "textColor-Text-description--hover": "$color-surface-500",
+    "textColor-Text": "$color-surface-700",
+    "textColor-H2": "$color-surface-900",
+    "textColor-H1": "$color-surface-900",
   },
 };
 

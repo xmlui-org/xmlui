@@ -1,42 +1,51 @@
 <Component name="BlogOverview">
-  <H1 textAlign="center" fontSize="42px" showAnchor="false">
-    Blog
-  </H1>
-  <List
-    data="{
-    $props.posts.filter(p => !p.draft).toSorted(function(a, b) {
-      return Date.parse(b.date) - Date.parse(a.date);
-    })
-  }">
-    <Card
-      var.blogLink="/blog/{$item.slug}"
-      padding="$space-4"
-      borderRadius="$space-2"
-      backgroundColor="$color-surface-0"
-      boxShadow="$boxShadow-spread"
-      marginBottom="$space-6">
-      <VStack gap="$space-2">
-        <HStack>
-          <Text variant="info">
-            {$item.author}
-            •
-            {formatDate($item.date, "d MMM yyyy")}
-          </Text>
-        </HStack>
-        <H2 variant="title" showAnchor="false">
-          {$item.title}
-        </H2>
-        <Text variant="description" maxLines="4" ellipses>
-          {$item.description}
-        </Text>
-        <HStack horizontalAlignment="end">
-          <Link to="{blogLink}" active>
-            <Text>
-              Read more →
-            </Text>
-          </Link>
-        </HStack>
-      </VStack>
-    </Card>
-  </List>
+    <VStack marginTop="$space-4">
+        <H1 textAlign="center" fontSize="42px" showAnchor="false">
+            Blog
+        </H1>
+        <FlowLayout>
+            <Items data="{
+                $props.posts.filter(p => !p.draft).toSorted(function(a, b) {
+                  return Date.parse(b.date) - Date.parse(a.date);
+                })
+            }">
+                <Link width="100%" active="true" to="/blog/{$item.slug}">
+                    <Card
+                            width="100%"
+                            var.blogLink="/blog/{$item.slug}"
+                            padding="$space-7"
+                            borderRadius="$space-2"
+                            backgroundColor="$color-surface-0"
+                            boxShadow="$boxShadow-spread"
+                            marginBottom="$space-6">
+                        <VStack gap="$space-3">
+                            <HStack>
+                                <Text variant="info">
+                                    {$item.author}
+                                    •
+                                    {formatDate($item.date, "d MMM yyyy")}
+                                </Text>
+                            </HStack>
+                            <Image when="{$item.image}" src="{`/blog/images/${$item.image}`}" />
+
+                            <H2 variant="title" fontSize="24px" showAnchor="false">
+                                {$item.title}
+                            </H2>
+                            <Text variant="description" maxLines="4" ellipses>
+                                {$item.description}
+                            </Text>
+                            <HStack horizontalAlignment="end">
+                                <Link to="{blogLink}" active>
+                                    <Button variant="ghost" color="$color-primary-500">
+                                        Read more →
+                                    </Button>
+                                </Link>
+                            </HStack>
+                        </VStack>
+                    </Card>
+
+                </Link>
+            </Items>
+        </FlowLayout>
+    </VStack>
 </Component>
