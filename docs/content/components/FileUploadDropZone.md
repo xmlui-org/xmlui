@@ -67,12 +67,6 @@ The maximum number of files that can be selected.
 
 With this property, you can change the default text to display in the drop zone.
 
-### `whileDraggingText` [#whiledraggingtext]
-
--  default: **"Drop files here"**
-
-With this property, you can change the default text to display when files are dragged over the drop zone.
-
 ## Events [#events]
 
 ### `upload` [#upload]
@@ -104,6 +98,6 @@ This component does not expose any methods.
 | [borderStyle](../styles-and-themes/common-units/#border-style)-FileUploadDropZone--default | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-FileUploadDropZone | 2px | 2px |
 | [borderWidth](../styles-and-themes/common-units/#size)-FileUploadDropZone--default | *none* | *none* |
-| [opacity](../styles-and-themes/common-units/#opacity)-dropping-FileUploadDropZone | 0.5 | 0.5 |
+| [opacity](../styles-and-themes/common-units/#opacity)-dropping-FileUploadDropZone | 0.3 | 0.3 |
 | [textColor](../styles-and-themes/common-units/#color)-dropping-FileUploadDropZone | $color-primary-700 | $color-primary-700 |
-| [textColor](../styles-and-themes/common-units/#color)-FileUploadDropZone | $textColor | $textColor |
+| [textColor](../styles-and-themes/common-units/#color)-FileUploadDropZone | $textColor-secondary | $textColor-secondary |
