@@ -13,6 +13,46 @@
 
 <body>
   <div id="root"></div>
+  <script>
+    window.getBlurb = function(md, maxLen = 200) {
+      if (!md) return '';
+      const lines = md.split('\n');
+      let blurb = '';
+      for (const line of lines) {
+        const trimmed = line.trim();
+        // Skip empty lines, headers, blockquotes, code blocks, images, admonitions, HTML tags, horizontal rules
+        if (!trimmed ||
+            trimmed.startsWith('#') ||
+            trimmed.startsWith('>') ||
+            trimmed.startsWith('```') ||
+            trimmed.startsWith('![') ||
+            trimmed.startsWith('[!') ||
+            trimmed.startsWith('<') ||
+            trimmed.startsWith('---')) continue;
+        blurb = trimmed;
+        break;
+      }
+      // Strip markdown links: [text](url) -> text
+      blurb = blurb.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+      // Strip inline code backticks
+      blurb = blurb.replace(/`([^`]+)`/g, '$1');
+      // Strip bold/italic markers
+      blurb = blurb.replace(/\*+([^*]+)\*+/g, '$1');
+      // Find sentence boundaries and keep at least 2
+      const sentences = blurb.match(/[^.!?]*[.!?]+/g) || [blurb];
+      if (sentences.length >= 2) {
+        let result = '';
+        for (let i = 0; i < sentences.length; i++) {
+          const next = result + sentences[i];
+          // Keep at least 3 sentences, then stop if over maxLen
+          if (i >= 3 && next.length > maxLen) break;
+          result = next;
+        }
+        blurb = result.trim();
+      }
+      return blurb;
+    };
+  </script>
   <script type="module" src="/index.ts"></script>
 
 </body>
