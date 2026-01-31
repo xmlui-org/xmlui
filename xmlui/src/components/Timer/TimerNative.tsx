@@ -174,7 +174,8 @@ export const Timer = forwardRef(function Timer(
       if (initialDelay > 0 && !hasEverStarted) {
         initialDelayRef.current = setTimeout(() => {
           initialDelayRef.current = null;
-          startTicking();
+          handleTick();    // Fire immediately when initialDelay expires
+          startTicking();  // Then start the interval for subsequent ticks
         }, initialDelay);
       } else {
         startTicking();
