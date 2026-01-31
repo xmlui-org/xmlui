@@ -15,6 +15,9 @@
       <Text variant="em">
         {$item.description}
       </Text>
+      <Text>
+        {window.getBlurb(appGlobals.prefetchedContent['/blog/' + $item.slug + '.md'])}
+      </Text>
       <HStack>
         <Text variant="em" fontSize="$fontSize-xs">
           {$item.author}
