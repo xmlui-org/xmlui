@@ -111,6 +111,61 @@ export const Markdown = memo(
     }: MarkdownProps,
     ref,
   ) {
+    // Determine overflow mode classes based on overflowMode
+    const overflowClasses = useMemo(() => {
+      const classes: Record<string, boolean> = {};
+
+      // If overflowMode is not explicitly set, use original behavior
+      if (!overflowMode) {
+        return classes;
+      }
+
+      switch (overflowMode) {
+        case "none":
+          classes[styles.overflowNone] = true;
+          break;
+        case "scroll":
+          classes[styles.overflowScroll] = true;
+          break;
+        case "ellipsis":
+          classes[styles.overflowEllipsis] = true;
+          break;
+        case "flow":
+          classes[styles.overflowFlow] = true;
+          break;
+      }
+
+      return classes;
+    }, [overflowMode]);
+
+    // Determine break mode classes
+    const breakClasses = useMemo(() => {
+      const classes: Record<string, boolean> = {};
+
+      // Only apply break mode classes if explicitly set (preserves theme variable support)
+      if (breakMode) {
+        switch (breakMode) {
+          case "normal":
+            classes[styles.breakNormal] = true;
+            break;
+          case "word":
+            classes[styles.breakWord] = true;
+            break;
+          case "anywhere":
+            classes[styles.breakAnywhere] = true;
+            break;
+          case "keep":
+            classes[styles.breakKeep] = true;
+            break;
+          case "hyphenate":
+            classes[styles.breakHyphenate] = true;
+            break;
+        }
+      }
+
+      return classes;
+    }, [breakMode]);
+
     const imageInfo = useRef(new Map<string, boolean>());
     if (typeof children !== "string") {
       return null;
@@ -168,61 +223,6 @@ export const Markdown = memo(
         });
       };
     };
-
-    // Determine overflow mode classes based on overflowMode
-    const overflowClasses = useMemo(() => {
-      const classes: Record<string, boolean> = {};
-
-      // If overflowMode is not explicitly set, use original behavior
-      if (!overflowMode) {
-        return classes;
-      }
-
-      switch (overflowMode) {
-        case "none":
-          classes[styles.overflowNone] = true;
-          break;
-        case "scroll":
-          classes[styles.overflowScroll] = true;
-          break;
-        case "ellipsis":
-          classes[styles.overflowEllipsis] = true;
-          break;
-        case "flow":
-          classes[styles.overflowFlow] = true;
-          break;
-      }
-
-      return classes;
-    }, [overflowMode]);
-
-    // Determine break mode classes
-    const breakClasses = useMemo(() => {
-      const classes: Record<string, boolean> = {};
-
-      // Only apply break mode classes if explicitly set (preserves theme variable support)
-      if (breakMode) {
-        switch (breakMode) {
-          case "normal":
-            classes[styles.breakNormal] = true;
-            break;
-          case "word":
-            classes[styles.breakWord] = true;
-            break;
-          case "anywhere":
-            classes[styles.breakAnywhere] = true;
-            break;
-          case "keep":
-            classes[styles.breakKeep] = true;
-            break;
-          case "hyphenate":
-            classes[styles.breakHyphenate] = true;
-            break;
-        }
-      }
-
-      return classes;
-    }, [breakMode]);
 
     return (
       <div
