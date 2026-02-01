@@ -39,9 +39,6 @@
                             {$item.title}
                         </H2>
                         <Text variant="description" maxLines="4" ellipses>
-                            {$item.description}
-                        </Text>
-                        <Text>
                             {window.getBlurb(appGlobals.prefetchedContent['/blog/' + $item.slug + '.md'])}
                         </Text>
                         <HStack horizontalAlignment="start" marginTop="auto">
