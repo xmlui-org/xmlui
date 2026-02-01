@@ -4,7 +4,7 @@
         {
         title: "Introducing XMLUI",
         slug: "introducing-xmlui",
-        description: "This article introduces XMLUI as a way to build modern, reactive, themed web UIs by composing React-based components declaratively in XML, without needing to write React or CSS. It revives the Visual Basic-style “componentware” approach, where solution builders wire together powerful prebuilt components (data sources, tables, forms, themes) and add only small, well-scoped JavaScript snippets when needed. The post also highlights XMLUI’s reactivity model, powerful theming system, easy deployment as static apps, extensibility via wrapped React components, and tight collaboration with LLMs through an MCP server so assistants can understand XMLUI docs, components, and best practices.",
+        description: "Introduces XMLUI as a way to build modern, reactive, themed web UIs by composing React-based components declaratively in XML, without needing to write React or CSS. It revives the Visual Basic-style “componentware” approach, where solution builders wire together powerful prebuilt components (data sources, tables, forms, themes) and add only small, well-scoped JavaScript snippets when needed. The post also highlights XMLUI’s reactivity model, powerful theming system, easy deployment as static apps, extensibility via wrapped React components, and tight collaboration with LLMs through an MCP server so assistants can understand XMLUI docs, components, and best practices.",
         author: "Jon Udell",
         date: "2025-07-18",
         image: "xmlui-demo.png"
@@ -12,7 +12,7 @@
         {
         title: "Reproducible XMLUI",
         slug: "xmlui-playground",
-        description: "The article introduces XMLUI playgrounds, which let you embed live-editable XMLUI code examples directly into documentation, tutorials, and bug reports so behavior can be demonstrated and reproduced in place. A playground bundles the XMLUI app, its data, and UI into a single shareable snippet that can be tweaked in real time, making it easier to explain issues, showcase components, and collaborate around concrete, runnable examples.",
+        description: "Introduces XMLUI playgrounds, which let you embed live-editable XMLUI code examples directly into documentation, tutorials, and bug reports so behavior can be demonstrated and reproduced in place. A playground bundles the XMLUI app, its data, and UI into a single shareable snippet that can be tweaked in real time, making it easier to explain issues, showcase components, and collaborate around concrete, runnable examples.",
         author: "Jon Udell",
         date: "2025-10-27",
         image: "playground.png"
@@ -20,7 +20,7 @@
         {
         title: "An XMLUI-powered blog",
         slug: "xmlui-powered-blog",
-        description: "The article explains how the XMLUI team built a very simple blog engine from a few XMLUI components and post metadata plus Markdown files, then wired in navigation and an RSS feed so the whole blog can be deployed as a tiny standalone XMLUI app.",
+        description: "Explains how the XMLUI team built a very simple blog engine from a few XMLUI components and post metadata plus Markdown files, then wired in navigation and an RSS feed so the whole blog can be deployed as a tiny standalone XMLUI app.",
         author: "Jon Udell",
         date: "2025-10-28",
         image: "blog-scrabble.png"
@@ -114,12 +114,7 @@
         <Page url="/blog">
             <BlogOverview posts="{posts}" />
         </Page>
-        <Page url="/blog-2">
-            <BlogOverview2 posts="{posts}" />
-        </Page>
-        <Page url="/blog-3">
-            <BlogOverview3 posts="{posts}" />
-        </Page>
+
         <Page url="/blog/supabase-and-xmlui">
             <BlogPage post="{posts[4]}" />
         </Page>
