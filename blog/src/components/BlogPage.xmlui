@@ -1,26 +1,21 @@
 <Component name="BlogPage">
-    <VStack>
-      <Link
-        fontSize="$fontSize-xs"
-        textDecorationLine="none"
-        label="← All posts"
-        to="/blog" />
-      <H1>
+  <VStack gap="$space-2" marginTop="$space-4">
+    <Link to="/blog" abel="Go to all posts" active>
+      <Button variant="ghost" color="$color-primary-500">
+        ← Go to all posts
+      </Button>
+    </Link>
+    <VStack gap="$space-2">
+      <H1 showAnchor="false" fontSize="32px">
         {$props.post.title}
       </H1>
-      <Text fontSize="$fontSize-lg" color="$color-surface-400">
-        {$props.post.description}
+      <Text variant="info">
+        {$props.post.author}
+        •
+        {formatDate($props.post.date, "d MMM yyyy")}
       </Text>
-      <HStack width="100%" paddingVertical="$space-2">
-        <Text fontWeight="600">
-          {$props.post.author}
-        </Text>
-        <SpaceFiller />
-        <Text color="$color-surface-400">
-          {formatDate($props.post.date, "MMM dd, yyyy")}
-        </Text>
-      </HStack>
-      <Image src="/blog/images/{$props.post.image}" />
-      <Markdown marginTop="$space-4" data="/blog/{$props.post.slug}.md" />
+      <Image when="{$props.post.image}" src="/blog/images/{$props.post.image}" />
+      <Markdown data="/blog/{$props.post.slug}.md" />
     </VStack>
+  </VStack>
 </Component>
