@@ -72,14 +72,3 @@ jobs:
           app_location: "blog/xmlui-optimized-output"
           skip_app_build: true
           production_branch: "main"
-
-      - name: Create Pull Request for generated releases.json
-        uses: peter-evans/create-pull-request@v7
-        with:
-          add-paths: "docs/public/resources/files/releases.json"
-          commit-message: "chore: update generated releases.json"
-          title: "docs: Update generated releases.json"
-          body: "This PR was automatically opened by the **Deploy docs (optimized)** workflow, which generates the `releases.json` file with data about the latest releases."
-          branch: "automated/update-releases"
-          delete-branch: true # Clean up the temp branch after merge
-          labels: automated
