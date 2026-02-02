@@ -2,6 +2,7 @@ import { dataToEsm } from "@rollup/pluginutils";
 import type { Plugin } from "vite";
 import {
   collectCodeBehindFromSource,
+  collectCodeBehindFromSourceWithImports,
   removeCodeBehindTokensFromTree,
 } from "../src/parsers/scripting/code-behind-collect";
 import {
@@ -10,7 +11,10 @@ import {
   moduleFileExtension,
 } from "../src/parsers/xmlui-parser/fileExtensions";
 import { Parser } from "../src/parsers/scripting/Parser";
+import { ModuleResolver } from "../src/parsers/scripting/ModuleResolver";
+import type { ModuleFetcher } from "../src/parsers/scripting/ModuleResolver";
 import * as path from "path";
+import * as fs from "fs/promises";
 import { errReportComponent, xmlUiMarkupToComponent } from "../src/components-core/xmlui-parser";
 
 export type PluginOptions = {
@@ -66,7 +70,25 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
           ? id.substring(0, id.length - (codeBehindFileExtension.length + 1))
           : id.substring(0, id.length - (moduleFileExtension.length + 1));
 
-        const codeBehind = collectCodeBehindFromSource(moduleNameResolver(moduleName), code);
+        // --- Create a module fetcher for import support
+        const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
+          // --- Resolve the module path relative to the current file
+          const resolvedPath = ModuleResolver.resolvePath(modulePath, id);
+          // --- Convert to filesystem path
+          const fsPath = resolvedPath.startsWith("/") ? resolvedPath : "/" + resolvedPath;
+          try {
+            return await fs.readFile(fsPath, "utf-8");
+          } catch (e) {
+            throw new Error(`Failed to read module: ${fsPath}`);
+          }
+        };
+
+        // --- Collect code-behind with import support
+        const codeBehind = await collectCodeBehindFromSourceWithImports(
+          moduleNameResolver(moduleName),
+          code,
+          moduleFetcher,
+        );
         removeCodeBehindTokensFromTree(codeBehind);
 
         // TODO: Add error handling.
