@@ -1135,6 +1135,8 @@ resolverHash.set("delete", TokenType.Delete);
 resolverHash.set("function", TokenType.Function);
 resolverHash.set("new", TokenType.New);
 resolverHash.set("as", TokenType.As);
+resolverHash.set("import", TokenType.Import);
+resolverHash.set("from", TokenType.From);
 
 /**
  * Tests if a token id EOF

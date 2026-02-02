@@ -44,6 +44,11 @@
       "approve": true,
       "matchCommandLine": true
     },
-    "npm list": true
+    "npm list": true,
+    "/^cd /Users/dotneteer/source/xmlui && npm run --list 2>&1 \\| head -50$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "npx vitest": true
   }
 }
