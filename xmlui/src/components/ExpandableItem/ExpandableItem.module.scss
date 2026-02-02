@@ -10,17 +10,23 @@ $themeVars: ();
 $component: "ExpandableItem";
 $themeVars: t.composeBorderVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, $component);
+$themeVars: t.composePaddingVars($themeVars, "summary-#{$component}");
 $themeVars: t.composePaddingVars($themeVars, "content-#{$component}");
 $backgroundColor-ExpandableItem: createThemeVar("backgroundColor-#{$component}");
+$backgroundColor-ExpandableItem--hover: createThemeVar("backgroundColor-#{$component}--hover");
+$backgroundColor-ExpandableItem--active: createThemeVar("backgroundColor-#{$component}--active");
+$borderRadius-summary-ExpandableItem: createThemeVar("borderRadius-summary-#{$component}");
 $color-ExpandableItem: createThemeVar("color-#{$component}");
 $color-ExpandableItem--disabled: createThemeVar("color-#{$component}--disabled");
 $fontFamily-ExpandableItem: createThemeVar("fontFamily-#{$component}");
 $fontSize-ExpandableItem: createThemeVar("fontSize-#{$component}");
 $fontWeight-ExpandableItem: createThemeVar("fontWeight-#{$component}");
-$paddingVertical-ExpandableItem-summary: createThemeVar("paddingVertical-ExpandableItem-summary");
-$paddingHorizontal-ExpandableItem-summary: createThemeVar("paddingHorizontal-ExpandableItem-summary");
-$gap-ExpandableItem: createThemeVar("gap-ExpandableItem");
-$transition-ExpandableItem: createThemeVar("transition-ExpandableItem");
+$paddingVertical-ExpandableItem-summary: createThemeVar("paddingVertical-#{$component}-summary");
+$paddingHorizontal-ExpandableItem-summary: createThemeVar("paddingHorizontal-#{$component}-summary");
+$gap-ExpandableItem: createThemeVar("gap-#{$component}");
+$transition-summary-ExpandableItem: createThemeVar("transition-summary-#{$component}");
+$animation-content-ExpandableItem: createThemeVar("animation-content-#{$component}");
+$animationDuration-content-ExpandableItem: createThemeVar("animationDuration-content-#{$component}");
 
 @layer components {
   .expandableItem {
@@ -32,8 +38,6 @@ $transition-ExpandableItem: createThemeVar("transition-ExpandableItem");
     font-family: $fontFamily-ExpandableItem;
     font-size: $fontSize-ExpandableItem;
     font-weight: $fontWeight-ExpandableItem;
-    transition: $transition-ExpandableItem;
-    
     &.disabled {
       color: $color-ExpandableItem--disabled;
       cursor: not-allowed;
@@ -44,6 +48,18 @@ $transition-ExpandableItem: createThemeVar("transition-ExpandableItem");
       align-items: center;
       gap: $gap-ExpandableItem;
       cursor: pointer;
+      user-select: none;
+      @include t.paddingVars($themeVars, "summary-#{$component}");
+      border-radius: $borderRadius-summary-ExpandableItem;
+      transition: $transition-summary-ExpandableItem;
+
+      &:hover {
+        background-color: $backgroundColor-ExpandableItem--hover;
+      }
+
+      &:active {
+        background-color: $backgroundColor-ExpandableItem--active;
+      }
       
       &.iconStart {
         flex-direction: row;
@@ -78,7 +94,23 @@ $transition-ExpandableItem: createThemeVar("transition-ExpandableItem");
     
     .content {
       width: 100%;
-    @include t.paddingVars($themeVars, "content-#{$component}");
+      @include t.paddingVars($themeVars, "content-#{$component}");
+      animation: expandableItemSlideIn $animationDuration-content-ExpandableItem $animation-content-ExpandableItem;
+      
+      &.contentHidden {
+        display: none;
+      }
+    }
+
+    @keyframes expandableItemSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     
     &.disabled .summary {

@@ -4,7 +4,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { iconPositionMd } from "../abstractions";
 import { createMetadata, d, dComponent } from "../../components/metadata-helpers";
-import { defaultExpandableItemProps, ExpandableItem } from "./ExpandableItemNative";
+import { defaultExpandableItemProps, ExpandableItem, PART_CONTENT, PART_SUMMARY } from "./ExpandableItemNative";
 
 const COMP = "ExpandableItem";
 
@@ -15,8 +15,11 @@ export const ExpandableItemMd = createMetadata({
     "details disclosure element. When the user clicks on the `summary` the content " +
     "expands or collapses.",
   parts: {
-    summary: {
+    [PART_SUMMARY]: {
       description: "The summary section that is always visible and acts as the trigger.",
+    },
+    [PART_CONTENT]: {
+      description: "The content section that is expanded or collapsed.",
     },
   },
   props: {
@@ -85,7 +88,9 @@ export const ExpandableItemMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
   defaultThemeVars: {
-    [`backgroundColor-${COMP}`]: "$backgroundColor",
+    [`backgroundColor-${COMP}`]: "transparent",
+    [`backgroundColor-${COMP}--hover`]: "$color-secondary-100",
+    [`backgroundColor-${COMP}--active`]: "$color-secondary-100",
     [`color-${COMP}`]: "$textColor-primary",
     [`color-${COMP}--disabled`]: "$textColor--disabled",
     [`fontFamily-${COMP}`]: "$fontFamily",
@@ -98,11 +103,15 @@ export const ExpandableItemMd = createMetadata({
     [`paddingBottom-${COMP}`]: "$space-2",
     [`paddingLeft-${COMP}`]: "$space-0",
     [`paddingRight-${COMP}`]: "$space-0",
+    [`padding-summary-${COMP}`]: "$space-2 $space-4",
+    [`borderRadius-summary-${COMP}`]: "$borderRadius",
+    [`transition-summary-${COMP}`]: "color 0.2s, background 0.2s",
     [`gap-${COMP}`]: "$space-2",
     [`paddingLeft-content-${COMP}`]: "$space-3",
     [`paddingRight-content-${COMP}`]: "$space-3",
     [`paddingVertical-content-${COMP}`]: "$space-2",
-    [`transition-${COMP}`]: "0.2s ease",
+    [`animationDuration-content-${COMP}`]: "0.2s",
+    [`animation-content-${COMP}`]: "ease-out",
   },
 });
 

@@ -319,7 +319,7 @@ export class SplitterDriver extends ComponentDriver {
 
 export class ExpandableItemDriver extends ComponentDriver {
   getSummary() {
-    return this.component.locator('[class*="_summary_"]');
+    return this.component.locator('[data-part-id="summary"]');
   }
 
   getSummaryContent() {
@@ -327,7 +327,7 @@ export class ExpandableItemDriver extends ComponentDriver {
   }
 
   getContent() {
-    return this.component.locator('[class*="_content_"]');
+    return this.component.locator('[data-part-id="content"]');
   }
 
   getIcon() {
