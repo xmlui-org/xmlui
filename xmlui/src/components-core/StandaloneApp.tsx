@@ -435,10 +435,8 @@ function resolveRuntime(runtime: Record<string, any>): {
           entryPointCodeBehind = value.default.codeBehind;
         }
         
-        if (value.default.file) {
-          // TODO: Remove this prop
-          sources[value.default.file] = value.default.src;
-        }
+        // Use key (the actual file path from Vite glob) for consistent source lookups
+        sources[key] = value.default.src;
       }
     }
 
@@ -480,13 +478,12 @@ function resolveRuntime(runtime: Record<string, any>): {
         // --- "default" contains the component definition, the file index,
         // --- and the source code.
         componentsByFileName[key] = value.default.component;
-        sources[value.default.file] = value.default.src;
+        sources[key] = value.default.src;
 
         const componentCompilation: ComponentCompilation = {
           definition: value.default.component,
-          // Use value.default.file (the actual file path) instead of key (module specifier)
-          // to match the debug.source.fileId set on component nodes
-          filename: value.default.file,
+          // Use key (the actual file path from Vite glob) for consistent source lookups
+          filename: key,
           markupSource: value.default.src,
           dependencies: new Set(),
         };
