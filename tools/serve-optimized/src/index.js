@@ -60,8 +60,8 @@ class Server {
     this.staticDir = staticDir;
     this.port = options.port || null;
     this.explicitPort = options.port != null;
-    this.logging = options.logging || false;
     this.server = null;
+    this.hasStarted = false; // Track if startup messages have been shown
 
     this._validateStaticDir();
   }
@@ -78,8 +78,6 @@ class Server {
   }
 
   _log(level, message, extra = {}) {
-    if (!this.logging) return;
-
     const timestamp = new Date().toISOString();
     const logData = {
       timestamp,
@@ -275,26 +273,29 @@ class Server {
     return new Promise((resolve, reject) => {
       this.server = http.createServer(this._createRequestHandler());
 
+      const showStartupMessage = () => {
+        const actualPort = this.server.address().port;
+        const resolvedStaticDir = path.resolve(this.staticDir);
+
+        console.log(`🚀 Static server running at http://localhost:${actualPort}`);
+        console.log(`📁 Serving files from: ${resolvedStaticDir}`);
+
+        if (actualPort === 0) {
+          console.log(`🔢 Port was automatically assigned by the OS`);
+        }
+
+        console.log(`⏹️  Press Ctrl+C to stop the server`);
+        console.log();
+
+        resolve({ port: actualPort, staticDir: resolvedStaticDir });
+      };
+
       const tryStart = (portToTry) => {
-        this.server.listen(portToTry, () => {
-          const actualPort = this.server.address().port;
-          const resolvedStaticDir = path.resolve(this.staticDir);
-
-          console.log(`🚀 Static server running at http://localhost:${actualPort}`);
-          console.log(`📁 Serving files from: ${resolvedStaticDir}`);
-
-          if (this.logging) {
-            console.log(`📝 Request logging enabled`);
+        this.server.on("listening", () => {
+          if (!this.hasStarted) {
+            this.hasStarted = true;
+            showStartupMessage();
           }
-
-          if (actualPort === 0) {
-            console.log(`🔢 Port was automatically assigned by the OS`);
-          }
-
-          console.log(`⏹️  Press Ctrl+C to stop the server`);
-          console.log();
-
-          resolve({ port: actualPort, staticDir: resolvedStaticDir });
         });
 
         this.server.on("error", (err) => {
@@ -314,6 +315,8 @@ class Server {
             reject(err);
           }
         });
+
+        this.server.listen(portToTry);
       };
 
       // If no explicit port specified, try 3000 first, then fallback to 0

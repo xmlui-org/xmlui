@@ -27,7 +27,6 @@ function main() {
 
   const server = new Server(staticDir, {
     port,
-    logging: true,
   });
 
   server.start().catch((err) => {
