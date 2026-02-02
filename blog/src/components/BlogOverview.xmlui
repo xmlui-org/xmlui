@@ -42,12 +42,10 @@
                             {$item.description}
                         </Text>
                         <Text variant="blurb" maxLines="4" ellipses>
-                            {window.getBlurb(appGlobals.prefetchedContent['/blog/' + $item.slug + '.md'])}
+                            {globalThis.getBlurb(appGlobals.prefetchedContent['/blog/' + $item.slug + '.md'])}
                         </Text>
                         <HStack horizontalAlignment="start" marginTop="auto">
-                            <Link to="{blogLink}" active>
-                                Read more →
-                            </Link>
+                            Read more →
                         </HStack>
                     </VStack>
                 </Link>
