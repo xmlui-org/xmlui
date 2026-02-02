@@ -18,10 +18,10 @@ describe("Parser - Multiple Import Specifiers", () => {
     expect(importDecl.type).toBe(T_IMPORT_DECLARATION);
     expect(importDecl.specifiers).toHaveLength(2);
 
-    expect(importDecl.specifiers[0].imported.text).toBe("foo");
+    expect(importDecl.specifiers[0].imported.name).toBe("foo");
     expect(importDecl.specifiers[0].local).toBeUndefined();
 
-    expect(importDecl.specifiers[1].imported.text).toBe("bar");
+    expect(importDecl.specifiers[1].imported.name).toBe("bar");
     expect(importDecl.specifiers[1].local).toBeUndefined();
   });
 
@@ -34,9 +34,9 @@ describe("Parser - Multiple Import Specifiers", () => {
     const importDecl = statements![0] as any;
     expect(importDecl.specifiers).toHaveLength(3);
 
-    expect(importDecl.specifiers[0].imported.text).toBe("alpha");
-    expect(importDecl.specifiers[1].imported.text).toBe("beta");
-    expect(importDecl.specifiers[2].imported.text).toBe("gamma");
+    expect(importDecl.specifiers[0].imported.name).toBe("alpha");
+    expect(importDecl.specifiers[1].imported.name).toBe("beta");
+    expect(importDecl.specifiers[2].imported.name).toBe("gamma");
   });
 
   it("should parse import with five or more identifiers", () => {
@@ -48,7 +48,7 @@ describe("Parser - Multiple Import Specifiers", () => {
     const importDecl = statements![0] as any;
     expect(importDecl.specifiers).toHaveLength(6);
 
-    const names = importDecl.specifiers.map((s: any) => s.imported.text);
+    const names = importDecl.specifiers.map((s: any) => s.imported.name);
     expect(names).toEqual(["a", "b", "c", "d", "e", "f"]);
   });
 
@@ -114,7 +114,7 @@ describe("Parser - Multiple Import Specifiers", () => {
     const statements = parser.parseStatements();
 
     const importDecl = statements![0] as any;
-    const names = importDecl.specifiers.map((s: any) => s.imported.text);
+    const names = importDecl.specifiers.map((s: any) => s.imported.name);
     expect(names).toEqual(["first", "second", "third", "fourth"]);
   });
 
@@ -127,7 +127,7 @@ describe("Parser - Multiple Import Specifiers", () => {
     const importDecl = statements![0] as any;
     expect(importDecl.specifiers).toHaveLength(3);
 
-    const names = importDecl.specifiers.map((s: any) => s.imported.text);
+    const names = importDecl.specifiers.map((s: any) => s.imported.name);
     expect(names).toEqual([
       "calculateTotalPrice",
       "formatCurrencyValue",
@@ -174,7 +174,7 @@ describe("Parser - Multiple Import Specifiers", () => {
     const importDecl = statements![0] as any;
     expect(importDecl.specifiers).toHaveLength(5);
 
-    const names = importDecl.specifiers.map((s: any) => s.imported.text);
+    const names = importDecl.specifiers.map((s: any) => s.imported.name);
     expect(names).toEqual([
       "_private",
       "$dollar",

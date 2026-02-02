@@ -48,4 +48,7 @@ export type ScriptParsingErrorCodes =
   | "W038"
   | "W039"
   | "W041"
-  | "W042";
+  | "W042"
+  | "W043"
+  | "W044"
+  | "W045";

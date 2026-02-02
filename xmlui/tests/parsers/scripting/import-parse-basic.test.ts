@@ -26,7 +26,7 @@ describe("Parser - Basic Import Statement", () => {
     const specifier = importDecl.specifiers[0];
     expect(specifier.type).toBe(T_IMPORT_SPECIFIER);
     expect(specifier.imported.type).toBe(T_IDENTIFIER);
-    expect(specifier.imported.text).toBe("foo");
+    expect(specifier.imported.name).toBe("foo");
     expect(specifier.local).toBeUndefined();
 
     expect(importDecl.source).toBeDefined();
@@ -53,7 +53,7 @@ describe("Parser - Basic Import Statement", () => {
     expect(statements).toHaveLength(1);
     const importDecl = statements![0] as any;
     expect(importDecl.type).toBe(T_IMPORT_DECLARATION);
-    expect(importDecl.specifiers[0].imported.text).toBe("baz");
+    expect(importDecl.specifiers[0].imported.name).toBe("baz");
   });
 
   it("should parse import with whitespace variations", () => {
@@ -63,7 +63,7 @@ describe("Parser - Basic Import Statement", () => {
 
     expect(statements).toHaveLength(1);
     const importDecl = statements![0] as any;
-    expect(importDecl.specifiers[0].imported.text).toBe("foo");
+    expect(importDecl.specifiers[0].imported.name).toBe("foo");
   });
 
   it("should report error for missing opening brace", () => {

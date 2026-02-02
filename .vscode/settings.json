@@ -49,6 +49,7 @@
       "approve": true,
       "matchCommandLine": true
     },
-    "npx vitest": true
+    "npx vitest": true,
+    "timeout": true
   }
 }

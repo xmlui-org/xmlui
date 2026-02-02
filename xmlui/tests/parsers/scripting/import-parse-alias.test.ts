@@ -19,9 +19,9 @@ describe("Parser - Import with Aliases", () => {
     expect(importDecl.specifiers).toHaveLength(1);
 
     const specifier = importDecl.specifiers[0];
-    expect(specifier.imported.text).toBe("foo");
+    expect(specifier.imported.name).toBe("foo");
     expect(specifier.local).toBeDefined();
-    expect(specifier.local.text).toBe("myFoo");
+    expect(specifier.local.name).toBe("myFoo");
   });
 
   it("should parse multiple imports with mixed aliases", () => {
@@ -34,16 +34,16 @@ describe("Parser - Import with Aliases", () => {
     expect(importDecl.specifiers).toHaveLength(3);
 
     // First specifier: aliased
-    expect(importDecl.specifiers[0].imported.text).toBe("foo");
-    expect(importDecl.specifiers[0].local.text).toBe("myFoo");
+    expect(importDecl.specifiers[0].imported.name).toBe("foo");
+    expect(importDecl.specifiers[0].local.name).toBe("myFoo");
 
     // Second specifier: no alias
-    expect(importDecl.specifiers[1].imported.text).toBe("bar");
+    expect(importDecl.specifiers[1].imported.name).toBe("bar");
     expect(importDecl.specifiers[1].local).toBeUndefined();
 
     // Third specifier: aliased
-    expect(importDecl.specifiers[2].imported.text).toBe("baz");
-    expect(importDecl.specifiers[2].local.text).toBe("myBaz");
+    expect(importDecl.specifiers[2].imported.name).toBe("baz");
+    expect(importDecl.specifiers[2].local.name).toBe("myBaz");
   });
 
   it("should parse all imports with aliases", () => {
@@ -69,8 +69,8 @@ describe("Parser - Import with Aliases", () => {
     expect(importDecl.specifiers).toHaveLength(3);
 
     const mappings = importDecl.specifiers.map((s: any) => ({
-      imported: s.imported.text,
-      local: s.local.text,
+      imported: s.imported.name,
+      local: s.local.name,
     }));
 
     expect(mappings[0]).toEqual({ imported: "camelCase", local: "pascalCase" });
@@ -85,8 +85,8 @@ describe("Parser - Import with Aliases", () => {
 
     const importDecl = statements![0] as any;
     expect(importDecl.specifiers).toHaveLength(2);
-    expect(importDecl.specifiers[0].local.text).toBe("myFoo");
-    expect(importDecl.specifiers[1].local.text).toBe("myBar");
+    expect(importDecl.specifiers[0].local.name).toBe("myFoo");
+    expect(importDecl.specifiers[1].local.name).toBe("myBar");
   });
 
   it("should handle minimal spacing with aliases", () => {
@@ -96,8 +96,8 @@ describe("Parser - Import with Aliases", () => {
 
     const importDecl = statements![0] as any;
     expect(importDecl.specifiers).toHaveLength(2);
-    expect(importDecl.specifiers[0].local.text).toBe("x");
-    expect(importDecl.specifiers[1].local.text).toBe("y");
+    expect(importDecl.specifiers[0].local.name).toBe("x");
+    expect(importDecl.specifiers[1].local.name).toBe("y");
   });
 
   it("should report error for missing identifier after as", () => {
@@ -130,8 +130,8 @@ describe("Parser - Import with Aliases", () => {
     const statements = parser.parseStatements();
 
     const importDecl = statements![0] as any;
-    expect(importDecl.specifiers[0].imported.text).toBe("originalFunctionName");
-    expect(importDecl.specifiers[0].local.text).toBe("renamedFunctionNameForSpecificPurpose");
+    expect(importDecl.specifiers[0].imported.name).toBe("originalFunctionName");
+    expect(importDecl.specifiers[0].local.name).toBe("renamedFunctionNameForSpecificPurpose");
   });
 
   it("should handle underscores and dollar signs in aliases", () => {
@@ -142,9 +142,9 @@ describe("Parser - Import with Aliases", () => {
     const importDecl = statements![0] as any;
     expect(importDecl.specifiers).toHaveLength(3);
 
-    expect(importDecl.specifiers[0].local.text).toBe("_foo");
-    expect(importDecl.specifiers[1].local.text).toBe("$bar");
-    expect(importDecl.specifiers[2].local.text).toBe("_$baz");
+    expect(importDecl.specifiers[0].local.name).toBe("_foo");
+    expect(importDecl.specifiers[1].local.name).toBe("$bar");
+    expect(importDecl.specifiers[2].local.name).toBe("_$baz");
   });
 
   it("should preserve alias mapping in order", () => {
@@ -154,8 +154,8 @@ describe("Parser - Import with Aliases", () => {
 
     const importDecl = statements![0] as any;
     const mappings = importDecl.specifiers.map((s: any) => [
-      s.imported.text,
-      s.local.text,
+      s.imported.name,
+      s.local.name,
     ]);
 
     expect(mappings).toEqual([
@@ -195,22 +195,22 @@ describe("Parser - Import with Aliases", () => {
     expect(importDecl.specifiers).toHaveLength(6);
 
     // Verify each specifier
-    expect(importDecl.specifiers[0].imported.text).toBe("a");
+    expect(importDecl.specifiers[0].imported.name).toBe("a");
     expect(importDecl.specifiers[0].local).toBeUndefined();
 
-    expect(importDecl.specifiers[1].imported.text).toBe("b");
-    expect(importDecl.specifiers[1].local.text).toBe("B");
+    expect(importDecl.specifiers[1].imported.name).toBe("b");
+    expect(importDecl.specifiers[1].local.name).toBe("B");
 
-    expect(importDecl.specifiers[2].imported.text).toBe("c");
+    expect(importDecl.specifiers[2].imported.name).toBe("c");
     expect(importDecl.specifiers[2].local).toBeUndefined();
 
-    expect(importDecl.specifiers[3].imported.text).toBe("d");
-    expect(importDecl.specifiers[3].local.text).toBe("D");
+    expect(importDecl.specifiers[3].imported.name).toBe("d");
+    expect(importDecl.specifiers[3].local.name).toBe("D");
 
-    expect(importDecl.specifiers[4].imported.text).toBe("e");
-    expect(importDecl.specifiers[4].local.text).toBe("E");
+    expect(importDecl.specifiers[4].imported.name).toBe("e");
+    expect(importDecl.specifiers[4].local.name).toBe("E");
 
-    expect(importDecl.specifiers[5].imported.text).toBe("f");
+    expect(importDecl.specifiers[5].imported.name).toBe("f");
     expect(importDecl.specifiers[5].local).toBeUndefined();
   });
 
@@ -227,8 +227,8 @@ describe("Parser - Import with Aliases", () => {
 
     const importDecl = statements![0] as any;
     expect(importDecl.specifiers).toHaveLength(2);
-    expect(importDecl.specifiers[0].local.text).toBe("calc");
-    expect(importDecl.specifiers[1].local.text).toBe("format");
+    expect(importDecl.specifiers[0].local.name).toBe("calc");
+    expect(importDecl.specifiers[1].local.name).toBe("format");
   });
 
   it("should handle mixed case sensitivity in aliases", () => {
@@ -239,10 +239,10 @@ describe("Parser - Import with Aliases", () => {
     const importDecl = statements![0] as any;
     expect(importDecl.specifiers).toHaveLength(2);
 
-    expect(importDecl.specifiers[0].imported.text).toBe("FOO");
-    expect(importDecl.specifiers[0].local.text).toBe("foo");
+    expect(importDecl.specifiers[0].imported.name).toBe("FOO");
+    expect(importDecl.specifiers[0].local.name).toBe("foo");
 
-    expect(importDecl.specifiers[1].imported.text).toBe("foo");
-    expect(importDecl.specifiers[1].local.text).toBe("FOO");
+    expect(importDecl.specifiers[1].imported.name).toBe("foo");
+    expect(importDecl.specifiers[1].local.name).toBe("FOO");
   });
 });

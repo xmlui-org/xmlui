@@ -63,6 +63,9 @@ export const ErrorCodes = {
   importedFunctionNotFound: "W039",
   circularImport: "W041",
   circularImportDetailed: "W042",
+  reactiveVarInImportedModule: "W043",
+  constLetInImportedModule: "W044",
+  invalidStatementInImportedModule: "W045",
 } as const;
 
 export type ErrorCodes = (typeof ErrorCodes)[keyof typeof ErrorCodes];
@@ -114,4 +117,7 @@ export const errorMessages: ErrorText = {
   [ErrorCodes.importedFunctionNotFound]: "Module '{0}' does not export '{1}'",
   [ErrorCodes.circularImport]: "Circular import detected: {0}",
   [ErrorCodes.circularImportDetailed]: "Circular import chain: {0}",
+  [ErrorCodes.reactiveVarInImportedModule]: "Reactive variable declarations are not allowed in imported modules. Found: '{0}'",
+  [ErrorCodes.constLetInImportedModule]: "const/let variable declarations are not allowed in imported modules. Found: '{0}'",
+  [ErrorCodes.invalidStatementInImportedModule]: "Only function declarations are allowed in imported modules. Found: {0}",
 };

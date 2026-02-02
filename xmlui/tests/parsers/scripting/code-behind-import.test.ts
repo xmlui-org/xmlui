@@ -74,7 +74,7 @@ function test() { return 2; }`;
   describe("With Imports (Async)", () => {
     it("should collect code-behind with single import", async () => {
       const modules: { [key: string]: string } = {
-        "/helpers.xs": "export function add(a, b) { return a + b; }",
+        "/helpers.xs": "function add(a, b) { return a + b; }",
         "/main.xs": `import { add } from './helpers.xs';
 function calculate() { return add(1, 2); }`,
       };
@@ -93,14 +93,15 @@ function calculate() { return add(1, 2); }`,
       );
 
       expect(result.functions).toHaveProperty("calculate");
-      expect(Object.keys(result.functions).length).toBe(1);
+      expect(result.functions).toHaveProperty("add");
+      expect(Object.keys(result.functions).length).toBe(2);
       expect(result.moduleErrors).toEqual({});
     });
 
     it("should collect code-behind with multiple imports", async () => {
       const modules: { [key: string]: string } = {
-        "/math.xs": "export function add(a, b) { return a + b; } export function multiply(a, b) { return a * b; }",
-        "/string.xs": "export function concat(a, b) { return a + b; }",
+        "/math.xs": "function add(a, b) { return a + b; } function multiply(a, b) { return a * b; }",
+        "/string.xs": "function concat(a, b) { return a + b; }",
         "/app.xs": `import { add, multiply } from './math.xs';
 import { concat } from './string.xs';
 function process() { return 1; }`,
@@ -120,7 +121,10 @@ function process() { return 1; }`,
       );
 
       expect(result.functions).toHaveProperty("process");
-      expect(Object.keys(result.functions).length).toBe(1);
+      expect(result.functions).toHaveProperty("add");
+      expect(result.functions).toHaveProperty("multiply");
+      expect(result.functions).toHaveProperty("concat");
+      expect(Object.keys(result.functions).length).toBe(4);
       expect(result.moduleErrors).toEqual({});
     });
 
@@ -138,8 +142,8 @@ function add(a, b) {
 
     it("should collect vars and functions together", async () => {
       const modules: { [key: string]: string } = {
-        "/config.xs": "export const DEFAULT_TIMEOUT = 1000;",
-        "/app.xs": `import { DEFAULT_TIMEOUT } from './config.xs';
+        "/config.xs": "export function getDefaultTimeout() { return 1000; }",
+        "/app.xs": `import { getDefaultTimeout } from './config.xs';
 var appState = {};
 function initialize() { return appState; }`,
       };
@@ -353,7 +357,7 @@ function destroy() { return 4; }`;
 
     it("should handle module with both vars and functions", async () => {
       const modules: { [key: string]: string } = {
-        "/helpers.xs": "export function format(s) { return s.trim(); }",
+        "/helpers.xs": "function format(s) { return s.trim(); }",
         "/app.xs": `import { format } from './helpers.xs';
 var settings = { debug: true };
 var cache = {};
@@ -378,8 +382,9 @@ function validate(data) { return data != null; }`,
       expect(result.vars).toHaveProperty("cache");
       expect(result.functions).toHaveProperty("process");
       expect(result.functions).toHaveProperty("validate");
+      expect(result.functions).toHaveProperty("format");
       expect(Object.keys(result.vars).length).toBe(2);
-      expect(Object.keys(result.functions).length).toBe(2);
+      expect(Object.keys(result.functions).length).toBe(3);
     });
   });
 

@@ -1316,7 +1316,7 @@ export class Parser {
         imported: {
           type: T_IDENTIFIER,
           nodeId: createXmlUiTreeNodeId(),
-          text: importedName,
+          name: importedName,
           startToken: idToken,
           endToken: idToken,
         },
@@ -1336,7 +1336,7 @@ export class Parser {
         specifier.local = {
           type: T_IDENTIFIER,
           nodeId: createXmlUiTreeNodeId(),
-          text: aliasToken.text,
+          name: aliasToken.text,
           startToken: aliasToken,
           endToken: aliasToken,
         };

@@ -11,9 +11,10 @@ import {
 } from "../../components-core/script-runner/ScriptingSourceTree";
 import type { VisitorState } from "./tree-visitor";
 import { visitNode } from "./tree-visitor";
-import { isModuleErrors, parseScriptModule, parseScriptModuleWithImports } from "./modules";
+import { isModuleErrors, parseScriptModule, parseScriptModuleWithImports, clearParsedModulesCache } from "./modules";
 import { PARSED_MARK_PROP } from "../../abstractions/InternalMarkers";
 import type { ModuleFetcher } from "./ModuleResolver";
+import { ModuleResolver } from "./ModuleResolver";
 
 // Re-export for backward compatibility
 export { PARSED_MARK_PROP } from "../../abstractions/InternalMarkers";
@@ -71,16 +72,41 @@ export async function collectCodeBehindFromSourceWithImports(
     return collectCodeBehindFromSource(moduleName, source);
   }
 
+  // --- Clear caches for a fresh parse
+  clearParsedModulesCache();
+  ModuleResolver.resetImportStack();
+
   // --- Parse the module with import support
   const parsedModule = await parseScriptModuleWithImports(moduleName, source, moduleFetcher);
   if (isModuleErrors(parsedModule)) {
     return { ...result, moduleErrors: parsedModule };
   }
 
-  // --- Collect statements from the module
+  // --- Collect statements from the module (vars and functions defined in this file)
   parsedModule.statements.forEach((stmt) => {
     collectStatementFromModule(stmt, result, collectedFunctions);
   });
+
+  // --- Add imported functions to the result (these come from imports)
+  Object.entries(parsedModule.functions).forEach(([name, func]) => {
+    if (!result.functions[name] && !collectedFunctions[name]) {
+      // Convert FunctionDeclaration to CodeDeclaration format
+      const arrow: ArrowExpression = {
+        type: T_ARROW_EXPRESSION,
+        args: func.args.slice(),
+        statement: func.stmt,
+      } as ArrowExpression;
+
+      const codeDecl = {
+        [PARSED_MARK_PROP]: true,
+        tree: arrow,
+      };
+
+      collectedFunctions[name] = codeDecl;
+      result.functions[name] = codeDecl;
+    }
+  });
+
   return result;
 }
 
