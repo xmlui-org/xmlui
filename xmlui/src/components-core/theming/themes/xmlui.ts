@@ -87,7 +87,7 @@ export const XmlUiDocsThemeDefinition: ThemeDefinition = {
 
     // --- Colors & typography
     "color-surface": "rgb(111, 110, 119)",
-    "backgroundColor": "color-surface-1",
+    "backgroundColor": "$color-surface-0",
     "fontSize": "15px",
     "fontFamily-monospace": "Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace",
     "font-feature-settings": "'cv03', 'ss03'",
