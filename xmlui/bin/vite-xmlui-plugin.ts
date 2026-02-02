@@ -30,6 +30,7 @@ const moduleScriptExtension = new RegExp(`.${moduleFileExtension}$`);
  * Transform XMLUI files to JS objects.
  */
 export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plugin {
+  let itemIndex = 0;
   return {
     name: "vite:transform-xmlui",
 

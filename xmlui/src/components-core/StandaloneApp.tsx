@@ -236,34 +236,40 @@ async function parseComponentMarkupResponse(response: Response): Promise<ParsedR
   const code = await response.text();
   const fileId = response.url;
   
-  // --- Collect code-behind with import support
-  let codeBehind: CollectedDeclarations | undefined;
-  try {
-    const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
-      const resolvedPath = ModuleResolver.resolvePath(modulePath, response.url);
-      const moduleResponse = await fetchWithoutCache(resolvedPath);
-      if (!moduleResponse.ok) {
-        throw new Error(`Failed to fetch module: ${resolvedPath}`);
-      }
-      return await moduleResponse.text();
-    };
+  // --- Extract script content from XMLUI markup (if present)
+  const scriptMatch = code.match(/<script>([\s\S]*?)<\/script>/);
 
-    codeBehind = await collectCodeBehindFromSourceWithImports(response.url, code, moduleFetcher);
-    
-    if (Object.keys(codeBehind.moduleErrors ?? {}).length > 0) {
-      const compName =
-        response.url.substring(
-          response.url.lastIndexOf("/") + 1,
-          response.url.length - ".xmlui".length,
-        );
-      return {
-        component: errReportModuleErrors(codeBehind.moduleErrors, fileId),
-        file: fileId,
-        hasError: true,
+  // --- Collect code-behind with import support (only if there's a script block)
+  let codeBehind: CollectedDeclarations | undefined;
+  if (scriptMatch && scriptMatch[1]) {
+    try {
+      const scriptContent = scriptMatch[1];
+      const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
+        const resolvedPath = ModuleResolver.resolvePath(modulePath, response.url);
+        const moduleResponse = await fetchWithoutCache(resolvedPath);
+        if (!moduleResponse.ok) {
+          throw new Error(`Failed to fetch module: ${resolvedPath}`);
+        }
+        return await moduleResponse.text();
       };
+
+      codeBehind = await collectCodeBehindFromSourceWithImports(response.url, scriptContent, moduleFetcher);
+
+      if (Object.keys(codeBehind.moduleErrors ?? {}).length > 0) {
+        const compName =
+          response.url.substring(
+            response.url.lastIndexOf("/") + 1,
+            response.url.length - ".xmlui".length,
+          );
+        return {
+          component: errReportModuleErrors(codeBehind.moduleErrors, fileId),
+          file: fileId,
+          hasError: true,
+        };
+      }
+    } catch (e) {
+      console.error('[parseComponentMarkupResponse] Error collecting code-behind:', e);
     }
-  } catch (e) {
-    console.error('[parseComponentMarkupResponse] Error collecting code-behind:', e);
   }
   
   let { component, errors, erroneousCompoundComponentName } = xmlUiMarkupToComponent(code, fileId, codeBehind);
