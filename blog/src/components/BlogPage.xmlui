@@ -1,9 +1,7 @@
 <Component name="BlogPage">
   <VStack gap="$space-2" marginTop="$space-4">
     <Link to="/blog" abel="Go to all posts" active>
-      <Button variant="ghost" color="$color-primary-500">
-        ← Go to all posts
-      </Button>
+      ← Go to all posts
     </Link>
     <VStack gap="$space-2">
       <H1 showAnchor="false" fontSize="32px">
