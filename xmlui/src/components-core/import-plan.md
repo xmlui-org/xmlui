@@ -1228,10 +1228,10 @@ npm run test  # Full test suite
 
 Use this checklist to track implementation progress:
 
-- [ ] **Step 1**: Add Import Token to Lexer
-- [ ] **Step 2**: Add Import AST Node Types  
-- [ ] **Step 3**: Parse Simple Import Statement
-- [ ] **Step 4**: Parse Multiple Named Imports
+- [x] **Step 1**: Add Import Token to Lexer
+- [x] **Step 2**: Add Import AST Node Types  
+- [x] **Step 3**: Parse Simple Import Statement
+- [x] **Step 4**: Parse Multiple Named Imports
 - [ ] **Step 5**: Parse Import with Aliases
 - [ ] **Step 6**: Validate Import Statement Position
 - [ ] **Step 7**: Create Module Resolver (Basic)

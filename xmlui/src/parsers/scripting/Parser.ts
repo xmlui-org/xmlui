@@ -25,6 +25,8 @@ import {
   type FunctionInvocationExpression,
   type Identifier,
   type IfStatement,
+  type ImportDeclaration,
+  type ImportSpecifier,
   type LetStatement,
   type Literal,
   type MemberAccessExpression,
@@ -94,6 +96,8 @@ import {
   T_AWAIT_EXPRESSION,
   T_NEW_EXPRESSION,
   T_ASYNC_FUNCTION_DECLARATION,
+  T_IMPORT_DECLARATION,
+  T_IMPORT_SPECIFIER,
 } from "../../components-core/script-runner/ScriptingSourceTree";
 import type { GenericToken } from "../common/GenericToken";
 import { InputStream } from "../common/InputStream";
@@ -228,6 +232,8 @@ export class Parser {
     try {
       const startToken = this._lexer.peek();
       switch (startToken.type) {
+        case TokenType.Import:
+          return this.parseImportStatement();
         case TokenType.Semicolon:
           return this.parseEmptyStatement();
         case TokenType.Let:
@@ -1246,6 +1252,115 @@ export class Parser {
       },
       startToken,
       endToken,
+    );
+  }
+
+  /**
+   * Parses an import statement
+   *
+   * importStatement
+   *   : "import" "{" identifier ("," identifier)* "}" "from" stringLiteral ";"
+   *   ;
+   */
+  private parseImportStatement(): ImportDeclaration | null {
+    const startToken = this._lexer.get(); // consume 'import'
+
+    // Expect opening brace
+    const lbrace = this._lexer.peek();
+    if (lbrace.type !== TokenType.LBrace) {
+      this.reportError("W032", lbrace);
+      return null;
+    }
+    this._lexer.get(); // consume '{'
+
+    // Parse import specifiers
+    const specifiers: ImportSpecifier[] = [];
+    while (true) {
+      const idToken = this._lexer.peek();
+      if (idToken.type !== TokenType.Identifier) {
+        this.reportError("W033", idToken);
+        return null;
+      }
+      const importedName = idToken.text;
+      this._lexer.get(); // consume identifier
+
+      const specifier: ImportSpecifier = {
+        type: T_IMPORT_SPECIFIER,
+        imported: {
+          type: T_IDENTIFIER,
+          nodeId: createXmlUiTreeNodeId(),
+          text: importedName,
+          startToken: idToken,
+          endToken: idToken,
+        },
+        startToken: idToken,
+        endToken: idToken,
+      };
+
+      // Check for 'as' alias
+      const nextToken = this._lexer.peek();
+      if (nextToken.type === TokenType.Identifier && nextToken.text === "as") {
+        this._lexer.get(); // consume 'as'
+        const aliasToken = this._lexer.peek();
+        if (aliasToken.type !== TokenType.Identifier) {
+          this.reportError("W034", aliasToken);
+          return null;
+        }
+        specifier.local = {
+          type: T_IDENTIFIER,
+          nodeId: createXmlUiTreeNodeId(),
+          text: aliasToken.text,
+          startToken: aliasToken,
+          endToken: aliasToken,
+        };
+        specifier.endToken = aliasToken;
+        this._lexer.get(); // consume alias
+      }
+
+      specifiers.push(specifier);
+
+      // Check for comma or closing brace
+      const delimToken = this._lexer.peek();
+      if (delimToken.type === TokenType.RBrace) {
+        this._lexer.get(); // consume '}'
+        break;
+      }
+      if (delimToken.type !== TokenType.Comma) {
+        this.reportError("W035", delimToken);
+        return null;
+      }
+      this._lexer.get(); // consume ','
+    }
+
+    // Expect 'from'
+    const fromToken = this._lexer.peek();
+    if (fromToken.type !== TokenType.From) {
+      this.reportError("W036", fromToken);
+      return null;
+    }
+    this._lexer.get(); // consume 'from'
+
+    // Parse module path
+    const pathToken = this._lexer.peek();
+    if (pathToken.type !== TokenType.StringLiteral) {
+      this.reportError("W037", pathToken);
+      return null;
+    }
+    this._lexer.get(); // consume string literal
+
+    // Parse the string literal to extract the path
+    const source = this.parseStringLiteral(pathToken, true);
+
+    // Consume optional semicolon
+    if (this._lexer.peek().type === TokenType.Semicolon) {
+      this._lexer.get();
+    }
+
+    return this.createStatementNode<ImportDeclaration>(
+      T_IMPORT_DECLARATION,
+      { specifiers, source },
+      startToken,
+      pathToken,
     );
   }
 

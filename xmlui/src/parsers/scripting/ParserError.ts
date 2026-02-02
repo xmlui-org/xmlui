@@ -53,6 +53,12 @@ export const ErrorCodes = {
   moduleOnlyExports: "W029",
   nestedExport: "W030",
   dollarIdentifier: "W031",
+  openBraceImportExpected: "W032",
+  identifierInImportExpected: "W033",
+  identifierAfterAsExpected: "W034",
+  commaOrCloseBraceExpected: "W035",
+  importFromExpected: "W036",
+  importPathExpected: "W037",
 } as const;
 
 export type ErrorCodes = (typeof ErrorCodes)[keyof typeof ErrorCodes];
@@ -93,4 +99,10 @@ export const errorMessages: ErrorText = {
   [ErrorCodes.moduleOnlyExports]: "An imported module can contain only exported functions",
   [ErrorCodes.nestedExport]: "Nested declarations cannot be exported",
   [ErrorCodes.dollarIdentifier]: "An identifier in a declaration cannot start with '$'",
+  [ErrorCodes.openBraceImportExpected]: "'{' expected in import statement",
+  [ErrorCodes.identifierInImportExpected]: "Identifier expected in import specifier",
+  [ErrorCodes.identifierAfterAsExpected]: "Identifier expected after 'as'",
+  [ErrorCodes.commaOrCloseBraceExpected]: "',' or '}' expected in import statement",
+  [ErrorCodes.importFromExpected]: "'from' expected in import statement",
+  [ErrorCodes.importPathExpected]: "String literal expected for import path",
 };
