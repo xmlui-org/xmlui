@@ -4,6 +4,7 @@ import type {
   CompoundComponentDef,
 } from "../../abstractions/ComponentDefs";
 import { collectCodeBehindFromSource } from "../scripting/code-behind-collect";
+import type { CollectedDeclarations } from "../../components-core/script-runner/ScriptingSourceTree";
 import { Node } from "./syntax-node";
 import { SyntaxKind } from "./syntax-kind";
 import { Parser } from "../scripting/Parser";
@@ -55,6 +56,7 @@ export function nodeToComponentDef(
   node: Node,
   originalGetText: GetText,
   fileId: string | number,
+  preResolvedImports?: CollectedDeclarations,
 ): ComponentDef | CompoundComponentDef | null {
   const getText = (node: TransformNode) => {
     return node.text ?? originalGetText(node);
@@ -1077,6 +1079,74 @@ export function nodeToComponentDef(
       }
     }
   }
+
+  /**
+   * Parse the script tag and add it to its containing componenet's definition.
+   * Reports errors encountered during script parsing.
+   * @param comp The component containing the script tag
+   */
+  function processScriptTag(
+    comp: ComponentDef | CompoundComponentDef,
+    scriptTag: Node,
+    getText: GetText,
+  ) {
+    if (getAttributes(scriptTag).length > 0) {
+      reportError(DIAGS_TRANSFORM.scriptNoAttrs);
+    }
+    const scriptText = getText(scriptTag);
+    const scriptContentPos = scriptText.indexOf(">") + 1;
+    const scriptContent = scriptText.slice(scriptContentPos, scriptText.lastIndexOf("</"));
+
+    if (scriptContent.trim().length === 0) {
+      return;
+    }
+
+    comp.script = scriptContent;
+    // --- Run the parse and collect on scripts
+    const parser = new Parser(scriptContent);
+    try {
+      // --- We parse the module file to catch parsing errors
+      parser.parseStatements();
+      comp.scriptCollected = collectCodeBehindFromSource("Main", scriptContent);
+      
+      // --- Merge pre-resolved imports if provided
+      if (preResolvedImports) {
+        comp.scriptCollected.functions = {
+          ...preResolvedImports.functions,
+          ...comp.scriptCollected.functions,
+        };
+        comp.scriptCollected.vars = {
+          ...preResolvedImports.vars,
+          ...comp.scriptCollected.vars,
+        };
+      }
+      
+      if (comp.scriptCollected.hasInvalidStatements) {
+        comp.scriptError = new Error(
+          `Only reactive variable and function definitions are allowed in a code-behind module.`,
+        );
+      }
+    } catch (err) {
+      if (parser.errors && parser.errors.length > 0) {
+        const errMsg = parser.errors[0];
+        const diag: TransformDiagPositionless = {
+          code: errMsg.code,
+          message: errMsg.text,
+        };
+        const errPos = scriptTag.pos + scriptContentPos + errMsg.position;
+        const errEnd = scriptTag.pos + scriptContentPos + errMsg.end;
+        reportError(diag, errPos, errEnd);
+      } else {
+        comp.scriptError = err;
+      }
+    }
+
+    // --- We may have module parsing/execution errors
+    const moduleErrors = comp.scriptCollected?.moduleErrors ?? {};
+    if (Object.keys(moduleErrors).length > 0) {
+      comp.scriptError = moduleErrors;
+    }
+  }
 }
 
 function createTextNodeCDataElement(textValue: string): Node {
@@ -1380,59 +1450,4 @@ export function stripOnPrefix(name: string) {
 
 function splitUsesValue(value: string) {
   return value.split(",").map((v) => v.trim());
-}
-
-/**
- * Parse the script tag and add it to its containing componenet's definition.
- * Reports errors encountered during script parsing.
- * @param comp The component containing the script tag
- */
-function processScriptTag(
-  comp: ComponentDef | CompoundComponentDef,
-  scriptTag: Node,
-  getText: GetText,
-) {
-  if (getAttributes(scriptTag).length > 0) {
-    reportError(DIAGS_TRANSFORM.scriptNoAttrs);
-  }
-  const scriptText = getText(scriptTag);
-  const scriptContentPos = scriptText.indexOf(">") + 1;
-  const scriptContent = scriptText.slice(scriptContentPos, scriptText.lastIndexOf("</"));
-
-  if (scriptContent.trim().length === 0) {
-    return;
-  }
-
-  comp.script = scriptContent;
-  // --- Run the parse and collect on scripts
-  const parser = new Parser(scriptContent);
-  try {
-    // --- We parse the module file to catch parsing errors
-    parser.parseStatements();
-    comp.scriptCollected = collectCodeBehindFromSource("Main", scriptContent);
-    if (comp.scriptCollected.hasInvalidStatements) {
-      comp.scriptError = new Error(
-        `Only reactive variable and function definitions are allowed in a code-behind module.`,
-      );
-    }
-  } catch (err) {
-    if (parser.errors && parser.errors.length > 0) {
-      const errMsg = parser.errors[0];
-      const diag: TransformDiagPositionless = {
-        code: errMsg.code,
-        message: errMsg.text,
-      };
-      const errPos = scriptTag.pos + scriptContentPos + errMsg.position;
-      const errEnd = scriptTag.pos + scriptContentPos + errMsg.end;
-      reportError(diag, errPos, errEnd);
-    } else {
-      comp.scriptError = err;
-    }
-  }
-
-  // --- We may have module parsing/execution errors
-  const moduleErrors = comp.scriptCollected?.moduleErrors ?? {};
-  if (Object.keys(moduleErrors).length > 0) {
-    comp.scriptError = moduleErrors;
-  }
 }

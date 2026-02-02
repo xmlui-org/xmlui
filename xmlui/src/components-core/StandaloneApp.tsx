@@ -31,8 +31,11 @@ import {
 import { Parser } from "../parsers/scripting/Parser";
 import {
   collectCodeBehindFromSource,
+  collectCodeBehindFromSourceWithImports,
   removeCodeBehindTokensFromTree,
 } from "../parsers/scripting/code-behind-collect";
+import { ModuleResolver } from "../parsers/scripting/ModuleResolver";
+import type { ModuleFetcher } from "../parsers/scripting/ModuleResolver";
 import { ComponentRegistry } from "../components/ComponentProvider";
 import { checkXmlUiMarkup, type MetadataHandler, visitComponent } from "./markup-check";
 import StandaloneExtensionManager from "./StandaloneExtensionManager";
@@ -112,6 +115,8 @@ function StandaloneApp({
   // --- Fetch all files constituting the standalone app, including components,
   // --- themes, and other artifacts. Display the app version numbers in the
   // --- console.
+  console.log("Runtime:", runtime);
+
   const { standaloneApp, projectCompilation } = useStandalone(appDef, runtime, extensionManager);
 
   usePrintVersionNumber(standaloneApp);
@@ -228,7 +233,38 @@ async function parseComponentMarkupResponse(response: Response): Promise<ParsedR
   }
   const code = await response.text();
   const fileId = response.url;
-  let { component, errors, erroneousCompoundComponentName } = xmlUiMarkupToComponent(code, fileId);
+  
+  // --- Collect code-behind with import support
+  let codeBehind: CollectedDeclarations | undefined;
+  try {
+    const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
+      const resolvedPath = ModuleResolver.resolvePath(modulePath, response.url);
+      const moduleResponse = await fetchWithoutCache(resolvedPath);
+      if (!moduleResponse.ok) {
+        throw new Error(`Failed to fetch module: ${resolvedPath}`);
+      }
+      return await moduleResponse.text();
+    };
+
+    codeBehind = await collectCodeBehindFromSourceWithImports(response.url, code, moduleFetcher);
+    
+    if (Object.keys(codeBehind.moduleErrors ?? {}).length > 0) {
+      const compName =
+        response.url.substring(
+          response.url.lastIndexOf("/") + 1,
+          response.url.length - ".xmlui".length,
+        );
+      return {
+        component: errReportModuleErrors(codeBehind.moduleErrors, fileId),
+        file: fileId,
+        hasError: true,
+      };
+    }
+  } catch (e) {
+    console.error('[parseComponentMarkupResponse] Error collecting code-behind:', e);
+  }
+  
+  let { component, errors, erroneousCompoundComponentName } = xmlUiMarkupToComponent(code, fileId, codeBehind);
   if (errors.length > 0) {
     const compName =
       erroneousCompoundComponentName ??
@@ -241,6 +277,7 @@ async function parseComponentMarkupResponse(response: Response): Promise<ParsedR
   return {
     component,
     src: code,
+    codeBehind,
     file: fileId,
     hasError: errors.length > 0,
   };
@@ -275,7 +312,19 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
   }
 
   try {
-    const codeBehind = collectCodeBehindFromSource("Main", code);
+    // --- Create a module fetcher for resolving imports
+    const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
+      // --- Resolve the module path relative to the current file
+      const resolvedPath = ModuleResolver.resolvePath(modulePath, response.url);
+      const moduleResponse = await fetchWithoutCache(resolvedPath);
+      if (!moduleResponse.ok) {
+        throw new Error(`Failed to fetch module: ${resolvedPath}`);
+      }
+      return await moduleResponse.text();
+    };
+
+    // --- Collect code-behind with import support
+    const codeBehind = await collectCodeBehindFromSourceWithImports(response.url, code, moduleFetcher);
     if (Object.keys(codeBehind.moduleErrors ?? {}).length > 0) {
       return {
         component: errReportModuleErrors(codeBehind.moduleErrors, response.url),
@@ -372,6 +421,12 @@ function resolveRuntime(runtime: Record<string, any>): {
         entryPoint = value.default.component;
         projectCompilation.entrypoint.definition = entryPoint;
         projectCompilation.entrypoint.markupSource = value.default.src;
+        
+        // --- If the component has codeBehind with imports, use it
+        if (value.default.codeBehind) {
+          entryPointCodeBehind = value.default.codeBehind;
+        }
+        
         if (value.default.file) {
           // TODO: Remove this prop
           sources[value.default.file] = value.default.src;

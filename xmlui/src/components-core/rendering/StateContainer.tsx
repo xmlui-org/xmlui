@@ -206,10 +206,12 @@ export const StateContainer = memo(
     );
     const parsedScriptPart = node.scriptCollected;
     if (parsedScriptPart?.moduleErrors && !isEmpty(parsedScriptPart.moduleErrors)) {
+      console.error("Module errors in StateContainer:", parsedScriptPart.moduleErrors);
       throw new CodeBehindParseError(parsedScriptPart.moduleErrors);
     }
 
     if (node.scriptError && !isEmpty(node.scriptError)) {
+      console.error("Script error in StateContainer:", node.scriptError);
       throw new CodeBehindParseError(node.scriptError);
     }
     const referenceTrackedApi = useReferenceTrackedApi(componentState);

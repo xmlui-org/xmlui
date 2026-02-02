@@ -49,6 +49,7 @@ export const {
   T_SWITCH_STATEMENT,
   T_FUNCTION_DECLARATION,
   T_ASYNC_FUNCTION_DECLARATION,
+  T_IMPORT_DECLARATION,
   
   // Expression node type values
   T_UNARY_EXPRESSION,
@@ -78,7 +79,8 @@ export const {
   T_DESTRUCTURE,
   T_ARRAY_DESTRUCTURE,
   T_OBJECT_DESTRUCTURE,
-  T_SWITCH_CASE
+  T_SWITCH_CASE,
+  T_IMPORT_SPECIFIER
 } = NodeTypes;
 
 // --- Statement node types
@@ -103,6 +105,7 @@ type TRY_STATEMENT = typeof T_TRY_STATEMENT;
 type SWITCH_STATEMENT = typeof T_SWITCH_STATEMENT;
 type FUNCTION_DECLARATION = typeof T_FUNCTION_DECLARATION;
 type ASYNC_FUNCTION_DECLARATION = typeof T_ASYNC_FUNCTION_DECLARATION;
+type IMPORT_DECLARATION = typeof T_IMPORT_DECLARATION;
 
 // --- Expression node types
 type UNARY_EXPRESSION = typeof T_UNARY_EXPRESSION;
@@ -133,6 +136,7 @@ type DESTRUCTURE = typeof T_DESTRUCTURE;
 type ARRAY_DESTRUCTURE = typeof T_ARRAY_DESTRUCTURE;
 type OBJECT_DESTRUCTURE = typeof T_OBJECT_DESTRUCTURE;
 type SWITCH_CASE = typeof T_SWITCH_CASE;
+type IMPORT_SPECIFIER = typeof T_IMPORT_SPECIFIER;
 
 // =====================================================================================================================
 // Statements
@@ -157,7 +161,8 @@ export type Statement =
   | ThrowStatement
   | TryStatement
   | SwitchStatement
-  | FunctionDeclaration;
+  | FunctionDeclaration
+  | ImportDeclaration;
 
 export type LoopStatement = WhileStatement | DoWhileStatement;
 
@@ -319,6 +324,18 @@ export interface FunctionDeclaration extends ScripNodeBase {
   args: Expression[];
   stmt: BlockStatement;
   async?: boolean;
+}
+
+export interface ImportSpecifier extends ExpressionBase {
+  type: IMPORT_SPECIFIER;
+  imported: Identifier;
+  local?: Identifier;
+}
+
+export interface ImportDeclaration extends ScripNodeBase {
+  type: IMPORT_DECLARATION;
+  specifiers: ImportSpecifier[];
+  source: Literal;
 }
 
 // =====================================================================================================================
