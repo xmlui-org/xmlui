@@ -529,9 +529,9 @@ test("component works in nested scenarios", async ({ initTestBed, createExpandab
   const driver = await createExpandableItemDriver();
   
   // Expand parent
-  await driver.getSummary().click();
-  await expect(driver.getContent()).toBeVisible();
+  await driver.getSummary().first().click();
+  await expect(driver.getContent().first()).toBeVisible();
   
   // Should see nested expandable item
-  await expect(driver.getContent()).toContainText("Child");
+  await expect(driver.getSummary().nth(1)).toContainText("Child");
 });

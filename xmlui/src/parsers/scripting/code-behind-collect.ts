@@ -11,8 +11,10 @@ import {
 } from "../../components-core/script-runner/ScriptingSourceTree";
 import type { VisitorState } from "./tree-visitor";
 import { visitNode } from "./tree-visitor";
-import { isModuleErrors, parseScriptModule } from "./modules";
+import { isModuleErrors, parseScriptModule, parseScriptModuleWithImports, clearParsedModulesCache } from "./modules";
 import { PARSED_MARK_PROP } from "../../abstractions/InternalMarkers";
+import type { ModuleFetcher } from "./ModuleResolver";
+import { ModuleResolver } from "./ModuleResolver";
 
 // Re-export for backward compatibility
 export { PARSED_MARK_PROP } from "../../abstractions/InternalMarkers";
@@ -39,57 +41,131 @@ export function collectCodeBehindFromSource(
 
   // --- Collect statements from the module
   parsedModule.statements.forEach((stmt) => {
-    switch (stmt.type) {
-      case T_VAR_STATEMENT:
-        stmt.decls.forEach((decl) => {
-          if (decl.id.name in result.vars) {
-            throw new Error(`Duplicated var declaration: '${decl.id.name}'`);
-          }
-          result.vars[decl.id.name] = {
-            [PARSED_MARK_PROP]: true,
-            tree: decl.expr,
-          };
-        });
-        break;
-      case T_FUNCTION_DECLARATION:
-        addFunctionDeclaration(stmt);
-        break;
-      default:
-        result.hasInvalidStatements = true;
-    }
+    collectStatementFromModule(stmt, result, collectedFunctions);
   });
   return result;
+}
 
-  // --- Collect function declaration data
-  function addFunctionDeclaration(stmt: FunctionDeclaration): void {
-    if (collectedFunctions?.[stmt.id.name] !== undefined) {
-      return;
-    }
-    if (stmt.id.name in result.functions) {
-      throw new Error(`Duplicated function declaration: '${stmt.id.name}'`);
-    }
-    const arrow: ArrowExpression = {
-      type: T_ARROW_EXPRESSION,
-      name: stmt.id.name, // Store function name for tracing
-      args: stmt.args.slice(),
-      statement: stmt.stmt,
-      // closureContext: obtainClosures({
-      //   childThreads: [],
-      //   blocks: [{ vars: {} }],
-      //   loops: [],
-      //   breakLabelValue: -1,
-      // }),
-    } as ArrowExpression;
+/**
+ * Async version that supports module imports
+ * @param moduleName The name/path of the module
+ * @param source The source code to parse
+ * @param moduleFetcher Optional fetcher for resolving imports
+ * @returns The collected code-behind declarations
+ */
+export async function collectCodeBehindFromSourceWithImports(
+  moduleName: string,
+  source: string,
+  moduleFetcher?: ModuleFetcher
+): Promise<CollectedDeclarations> {
+  const result: CollectedDeclarations = {
+    vars: {},
+    moduleErrors: {},
+    functions: {},
+    hasInvalidStatements: false,
+  };
 
-    collectedFunctions[stmt.id.name] = {
-      [PARSED_MARK_PROP]: true,
-      tree: arrow,
-    };
-    result.functions[stmt.id.name] = {
-      [PARSED_MARK_PROP]: true,
-      tree: arrow,
-    };
+  const collectedFunctions: Record<string, CodeDeclaration> = {};
+
+  // --- If no fetcher provided, fall back to sync version
+  if (!moduleFetcher) {
+    return collectCodeBehindFromSource(moduleName, source);
   }
+
+  // --- Clear caches for a fresh parse
+  clearParsedModulesCache();
+  ModuleResolver.resetImportStack();
+
+  // --- Parse the module with import support
+  const parsedModule = await parseScriptModuleWithImports(moduleName, source, moduleFetcher);
+  if (isModuleErrors(parsedModule)) {
+    return { ...result, moduleErrors: parsedModule };
+  }
+
+  // --- Collect statements from the module (vars and functions defined in this file)
+  parsedModule.statements.forEach((stmt) => {
+    collectStatementFromModule(stmt, result, collectedFunctions);
+  });
+
+  // --- Add imported functions to the result (these come from imports)
+  Object.entries(parsedModule.functions).forEach(([name, func]) => {
+    if (!result.functions[name] && !collectedFunctions[name]) {
+      // Convert FunctionDeclaration to CodeDeclaration format
+      const arrow: ArrowExpression = {
+        type: T_ARROW_EXPRESSION,
+        args: func.args.slice(),
+        statement: func.stmt,
+      } as ArrowExpression;
+
+      const codeDecl = {
+        [PARSED_MARK_PROP]: true,
+        tree: arrow,
+      };
+
+      collectedFunctions[name] = codeDecl;
+      result.functions[name] = codeDecl;
+    }
+  });
+
+  return result;
+}
+
+/**
+ * Helper function to collect a statement from a module
+ */
+function collectStatementFromModule(
+  stmt: Statement,
+  result: CollectedDeclarations,
+  collectedFunctions: Record<string, CodeDeclaration>
+): void {
+  switch (stmt.type) {
+    case T_VAR_STATEMENT:
+      stmt.decls.forEach((decl) => {
+        if (decl.id.name in result.vars) {
+          throw new Error(`Duplicated var declaration: '${decl.id.name}'`);
+        }
+        result.vars[decl.id.name] = {
+          [PARSED_MARK_PROP]: true,
+          tree: decl.expr,
+        };
+      });
+      break;
+    case T_FUNCTION_DECLARATION:
+      addFunctionDeclaration(stmt as FunctionDeclaration, result, collectedFunctions);
+      break;
+    default:
+      result.hasInvalidStatements = true;
+  }
+}
+
+/**
+ * Helper function to add a function declaration
+ */
+function addFunctionDeclaration(
+  stmt: FunctionDeclaration,
+  result: CollectedDeclarations,
+  collectedFunctions: Record<string, CodeDeclaration>
+): void {
+  if (collectedFunctions?.[stmt.id.name] !== undefined) {
+    return;
+  }
+  if (stmt.id.name in result.functions) {
+    throw new Error(`Duplicated function declaration: '${stmt.id.name}'`);
+  }
+  const arrow: ArrowExpression = {
+    type: T_ARROW_EXPRESSION,
+    args: stmt.args.slice(),
+    statement: stmt.stmt,
+  } as ArrowExpression;
+
+  collectedFunctions[stmt.id.name] = {
+    [PARSED_MARK_PROP]: true,
+    tree: arrow,
+  };
+  result.functions[stmt.id.name] = {
+    [PARSED_MARK_PROP]: true,
+    tree: arrow,
+  };
 }
 
 // --- Remove all code-behind tokens from the tree

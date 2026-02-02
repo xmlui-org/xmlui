@@ -114,6 +114,7 @@
         <Page url="/blog">
             <BlogOverview posts="{posts}" />
         </Page>
+
         <Page url="/blog/supabase-and-xmlui">
             <BlogPage post="{posts[4]}" />
         </Page>

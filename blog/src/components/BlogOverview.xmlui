@@ -1,37 +1,57 @@
 <Component name="BlogOverview">
-  <List
-    data="{
-    $props.posts.filter(p => !p.draft).toSorted(function(a, b) {
-      return Date.parse(b.date) - Date.parse(a.date);
-    })
-  }">
-    <VStack
-       var.blogLink="/blog/{$item.slug}"
-       gap="$space-2"
-       onClick="Actions.navigate(blogLink)">
-      <H1>
-        {$item.title}
-      </H1>
-      <Text variant="em">
-        {$item.description}
-      </Text>
-      <Text>
-        {window.getBlurb(appGlobals.prefetchedContent['/blog/' + $item.slug + '.md'])}
-      </Text>
-      <HStack>
-        <Text variant="em" fontSize="$fontSize-xs">
-          {$item.author}
-        </Text>
-        <SpaceFiller />
-        <Text variant="em" fontSize="$fontSize-xs">
-          {formatDate($item.date, "MMM dd, yyyy")}
-        </Text>
-      </HStack>
+    <VStack marginTop="$space-4">
+        <H1 textAlign="center" fontSize="42px" showAnchor="false">
+            Blog
+        </H1>
+        <FlowLayout verticalAlignment="stretch" gap="$space-6">
+            <Items
+                data="{
+                $props.posts.filter(p => !p.draft).toSorted(function(a, b) {
+                  return Date.parse(b.date) - Date.parse(a.date);
+                })
+            }"
+            >
+                <Link
+                    width="100%"
+                    height="100%"
+                    active="true"
+                    to="/blog/{$item.slug}"
+                >
+
+                    <VStack
+                        gap="$space-3"
+                        height="*"
+                        minHeight="0"
+                        width="100%"
+                        var.blogLink="/blog/{$item.slug}"
+                        padding="$space-7"
+                        borderRadius="$space-2"
+                    >
+                        <HStack>
+                            <Text variant="info">
+                                {$item.author}
+                                •
+                                {formatDate($item.date, "d MMM yyyy")}
+                            </Text>
+                        </HStack>
+
+                        <H2 variant="title" fontSize="24px" showAnchor="false">
+                            {$item.title}
+                        </H2>
+                        <Text variant="description" maxLines="4" ellipses>
+                            {$item.description}
+                        </Text>
+                        <Text variant="blurb" maxLines="4" ellipses>
+                            {window.getBlurb(appGlobals.prefetchedContent['/blog/' + $item.slug + '.md'])}
+                        </Text>
+                        <HStack horizontalAlignment="start" marginTop="auto">
+                            <Link to="{blogLink}" active>
+                                Read more →
+                            </Link>
+                        </HStack>
+                    </VStack>
+                </Link>
+            </Items>
+        </FlowLayout>
     </VStack>
-    <ContentSeparator
-      when="{$itemIndex < $props.posts.length - 1}"
-      marginTop="$space-4"
-      marginBottom="$space-8"
-    />
-  </List>
 </Component>

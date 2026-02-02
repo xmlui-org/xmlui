@@ -87,7 +87,7 @@ export const XmlUiDocsThemeDefinition: ThemeDefinition = {
 
     // --- Colors & typography
     "color-surface": "rgb(111, 110, 119)",
-    "backgroundColor": "color-surface-1",
+    "backgroundColor": "$color-surface-0",
     "fontSize": "15px",
     "fontFamily-monospace": "Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace",
     "font-feature-settings": "'cv03', 'ss03'",
@@ -153,12 +153,28 @@ export const XmlUiBlogThemeDefinition: ThemeDefinition = {
     // --- App layout
     "maxWidth-content-App": "800px",
     // --- Fundamental colors & typography
-    backgroundColor: "$color-surface-0",
+    "color-surface": "rgb(111, 110, 119)",
+    "backgroundColor": "color-surface-1",
     "fontSize": "14px",
     "fontWeight-Text": "400",
     "fontWeight-bold": "700",
     "textColor-primary": "$color-surface-800",
     "textColor-NavLink--active": "$color-primary",
+    "fontSize-Text-info": "$fontSize-sm",
+    "textColor-Text-info": "$color-primary-500",
+    "textColor-Text-info--hover": "$color-primary-500",
+    "textColor-Text-infoStrong": "$color-primary-500",
+    "textColor-Text-description": "$color-surface-800",
+    "textColor-Text-description--hover": "$color-surface-800",
+    "fontSize-Text-description": "18px",
+    "fontWeight-Text-description": "bold",
+    "textColor-Text-blurb": "$color-surface-800",
+    "textColor-Text-blurb--hover": "$color-surface-800",
+    "textColor-Text": "$color-surface-800",
+    "textColor-H2": "$color-surface-800",
+    "textColor-H1": "$color-surface-800",
+    "fontWeight-Link--active": "normal",
+    "textColor-Link--active": "$color-primary-500",
   },
 };
 

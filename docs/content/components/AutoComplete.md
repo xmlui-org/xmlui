@@ -8,7 +8,7 @@
 - **Custom option creation**: Enable `creatable="true"` to let users add new options
 - **Rich customization**: Use `optionTemplate` to create complex option layouts
 
-## Using AutoComplete [#using-autocomplete]
+## Using AutoComplete
 
 ```xmlui-pg copy display height="200px" name="Example: Using AutoComplete"
 <App>

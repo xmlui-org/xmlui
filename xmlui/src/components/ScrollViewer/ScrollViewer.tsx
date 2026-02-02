@@ -121,7 +121,7 @@ export const ScrollViewerMd = createMetadata({
 
     // --- Fade overlays
     [`height-fade-${SCROLLER}`]: "64px",
-    [`backgroundColor-fade-${SCROLLER}`]: "rgba(255, 255, 255, 0.75)",
+    [`backgroundColor-fade-${SCROLLER}`]: "rgb(from $color-surface-0 r g b / 0.75)",
     [`transition-fade-${SCROLLER}`]: "opacity 0.3s ease-in-out",
 
     // --- Auto-hide delays
