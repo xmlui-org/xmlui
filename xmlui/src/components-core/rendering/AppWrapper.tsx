@@ -193,13 +193,14 @@ export const AppWrapper = ({
 
   if (Router === MemoryRouter && typeof window === "undefined") {
     // Server-side rendering: try to get the correct location
+    // Location will be injected on the server side as well
 
-    const serverLocation = getServerLocation(globalProps);
+    const serverLocation =
+      globalThis?.location?.pathname + globalThis?.location?.search + globalThis?.location?.hash;
     if (serverLocation) {
       routerProps.initialEntries = [serverLocation];
     }
     // If no location found, MemoryRouter will default to "/"
-    // This maintains backward compatibility
   }
 
   return (
