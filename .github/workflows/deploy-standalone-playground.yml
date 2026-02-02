@@ -28,3 +28,4 @@ jobs:
           action: "upload"
           app_location: "playground/dist"
           skip_app_build: true
+          production_branch: "main"
