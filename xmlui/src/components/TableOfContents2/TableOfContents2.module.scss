@@ -1,0 +1,213 @@
+@use "../../components-core/theming/themes" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$component: "TableOfContents2";
+$width-TableOfContents2: createThemeVar("width-#{$component}");
+// Use NavPanel background so ToC matches NavPanel in light and dark mode
+$backgroundColor-NavPanel: createThemeVar("backgroundColor-NavPanel");
+$themeVars: t.composeBorderVars($themeVars, $component);
+$themeVars: t.composePaddingVars($themeVars, $component);
+
+$componentItem: "TableOfContents2Item";
+$themeVars: t.composeTextVars($themeVars, $componentItem);
+$themeVars: t.composeBorderVars($themeVars, $componentItem);
+$themeVars: t.composeBorderVars($themeVars, "#{$componentItem}--hover");
+$themeVars: t.composeBorderVars($themeVars, "#{$componentItem}--active");
+$themeVars: t.composePaddingVars($themeVars, $componentItem);
+$themeVars: t.composePaddingVars($themeVars, "#{$componentItem}-level-1");
+$themeVars: t.composeTextVars($themeVars, "#{$componentItem}-level-1");
+$themeVars: t.composePaddingVars($themeVars, "#{$componentItem}-level-2");
+$themeVars: t.composeTextVars($themeVars, "#{$componentItem}-level-2");
+$themeVars: t.composePaddingVars($themeVars, "#{$componentItem}-level-3");
+$themeVars: t.composeTextVars($themeVars, "#{$componentItem}-level-3");
+$themeVars: t.composePaddingVars($themeVars, "#{$componentItem}-level-4");
+$themeVars: t.composeTextVars($themeVars, "#{$componentItem}-level-4");
+$themeVars: t.composePaddingVars($themeVars, "#{$componentItem}-level-5");
+$themeVars: t.composeTextVars($themeVars, "#{$componentItem}-level-5");
+$themeVars: t.composePaddingVars($themeVars, "#{$componentItem}-level-6");
+$themeVars: t.composeTextVars($themeVars, "#{$componentItem}-level-6");
+
+$marginTop-TableOfContents2: createThemeVar("marginTop-#{$component}");
+$marginBottom-TableOfContents2: createThemeVar("marginBottom-#{$component}");
+// Use NavPanel/NavLink colors for consistency (light and dark mode)
+$textColor-NavLink: createThemeVar("textColor-NavLink");
+$textColor-NavLink--hover: createThemeVar("textColor-NavLink--hover");
+$textColor-NavLink--active: createThemeVar("textColor-NavLink--active");
+$backgroundColor-NavLink--hover: createThemeVar("backgroundColor-NavLink--hover");
+$backgroundColor-NavLink--active: createThemeVar("backgroundColor-NavLink--active");
+$fontWeight-TableOfContents2Item--hover: createThemeVar("fontWeight-#{$componentItem}--hover");
+$fontWeight-TableOfContents2Item-level-1--hover: createThemeVar("fontWeight-#{$componentItem}-level-1--hover");
+$fontWeight-TableOfContents2Item-level-2--hover: createThemeVar("fontWeight-#{$componentItem}-level-2--hover");
+$fontWeight-TableOfContents2Item-level-3--hover: createThemeVar("fontWeight-#{$componentItem}-level-3--hover");
+$fontWeight-TableOfContents2Item-level-4--hover: createThemeVar("fontWeight-#{$componentItem}-level-4--hover");
+$fontWeight-TableOfContents2Item-level-5--hover: createThemeVar("fontWeight-#{$componentItem}-level-5--hover");
+$fontWeight-TableOfContents2Item-level-6--hover: createThemeVar("fontWeight-#{$componentItem}-level-6--hover");
+$fontWeight-TableOfContents2Item--active: createThemeVar("fontWeight-#{$componentItem}--active");
+$fontWeight-TableOfContents2Item-level-1--active: createThemeVar("fontWeight-#{$componentItem}-level-1--active");
+$fontWeight-TableOfContents2Item-level-2--active: createThemeVar("fontWeight-#{$componentItem}-level-2--active");
+$fontWeight-TableOfContents2Item-level-3--active: createThemeVar("fontWeight-#{$componentItem}-level-3--active");
+$fontWeight-TableOfContents2Item-level-4--active: createThemeVar("fontWeight-#{$componentItem}-level-4--active");
+$fontWeight-TableOfContents2Item-level-5--active: createThemeVar("fontWeight-#{$componentItem}-level-5--active");
+$fontWeight-TableOfContents2Item-level-6--active: createThemeVar("fontWeight-#{$componentItem}-level-6--active");
+$color-indicator-TableOfContents2: createThemeVar("color-indicator-#{$component}");
+$width-indicator-TableOfContents2: createThemeVar("width-indicator-#{$component}");
+$color-indicator-TableOfContents2--active: createThemeVar("color-indicator-#{$component}--active");
+
+@layer components {
+  .wrapper {
+    height: calc(
+      100dvh
+      - var(--header-abs-height, 0px)
+      - var(--footer-abs-height, 0px)
+      - var(--page-wrapper-padding-top, 0px)
+      - var(--page-wrapper-padding-bottom, 0px)
+      - 2px
+    );
+    min-height: 0;
+    width: $width-TableOfContents2;
+    min-width: 250px;
+    flex-shrink: 0;
+    position: sticky;
+    top: calc(var(--header-height, 0px) + var(--page-wrapper-padding-top, 0px));
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    scrollbar-width: thin;
+    @include t.borderVars($themeVars, $component);
+    @include t.paddingVars($themeVars, $component);
+    background-color: $backgroundColor-NavPanel;
+    margin-top: $marginTop-TableOfContents2;
+    margin-bottom: $marginBottom-TableOfContents2;
+
+    .wrapperInner {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+
+      .listItem {
+        list-style-type: none;
+        border-left: $width-indicator-TableOfContents2 solid $color-indicator-TableOfContents2 !important;
+
+        .link {
+          display: block;
+          overflow-wrap: break-word;
+          @include t.paddingVars($themeVars, $componentItem);
+          @include t.textVars($themeVars, $componentItem);
+          color: $textColor-NavLink;
+
+          &[data-level="1"] {
+            @include t.paddingVars($themeVars, "#{$componentItem}-level-1");
+            @include t.textVars($themeVars, "#{$componentItem}-level-1");
+          }
+
+          &[data-level="2"] {
+            @include t.paddingVars($themeVars, "#{$componentItem}-level-2");
+            @include t.textVars($themeVars, "#{$componentItem}-level-2");
+          }
+
+          &[data-level="3"] {
+            @include t.paddingVars($themeVars, "#{$componentItem}-level-3");
+            @include t.textVars($themeVars, "#{$componentItem}-level-3");
+          }
+
+          &[data-level="4"] {
+            @include t.paddingVars($themeVars, "#{$componentItem}-level-4");
+            @include t.textVars($themeVars, "#{$componentItem}-level-4");
+          }
+
+          &[data-level="5"] {
+            @include t.paddingVars($themeVars, "#{$componentItem}-level-5");
+            @include t.textVars($themeVars, "#{$componentItem}-level-5");
+          }
+
+          &[data-level="6"] {
+            @include t.paddingVars($themeVars, "#{$componentItem}-level-6");
+            @include t.textVars($themeVars, "#{$componentItem}-level-6");
+          }
+        }
+
+        &:hover {
+          @include t.borderVars($themeVars, "#{$componentItem}--hover");
+          background-color: $backgroundColor-NavLink--hover;
+
+          .link {
+            font-weight: $fontWeight-TableOfContents2Item--hover;
+            color: $textColor-NavLink--hover;
+
+            &[data-level="1"] {
+              font-weight: $fontWeight-TableOfContents2Item-level-1--hover;
+            }
+            &[data-level="2"] {
+              font-weight: $fontWeight-TableOfContents2Item-level-2--hover;
+            }
+            &[data-level="3"] {
+              font-weight: $fontWeight-TableOfContents2Item-level-3--hover;
+            }
+            &[data-level="4"] {
+              font-weight: $fontWeight-TableOfContents2Item-level-4--hover;
+            }
+            &[data-level="5"] {
+              font-weight: $fontWeight-TableOfContents2Item-level-5--hover;
+            }
+            &[data-level="6"] {
+              font-weight: $fontWeight-TableOfContents2Item-level-6--hover;
+            }
+          }
+        }
+
+        &.active {
+          background-color: $backgroundColor-NavLink--active;
+
+          .link {
+            color: $textColor-NavLink--active;
+            font-weight: $fontWeight-TableOfContents2Item--active;
+
+            &[data-level="1"] {
+              font-weight: $fontWeight-TableOfContents2Item-level-1--active;
+            }
+            &[data-level="2"] {
+              font-weight: $fontWeight-TableOfContents2Item-level-2--active;
+            }
+            &[data-level="3"] {
+              font-weight: $fontWeight-TableOfContents2Item-level-3--active;
+            }
+            &[data-level="4"] {
+              font-weight: $fontWeight-TableOfContents2Item-level-4--active;
+            }
+            &[data-level="5"] {
+              font-weight: $fontWeight-TableOfContents2Item-level-5--active;
+            }
+            &[data-level="6"] {
+              font-weight: $fontWeight-TableOfContents2Item-level-6--active;
+            }
+          }
+        }
+      }
+    }
+
+    .indicator {
+      position: absolute;
+      left: 0;
+      width: 2px;
+      background-color: $color-indicator-TableOfContents2--active;
+      transition: top 0.3s ease, height 0.3s ease;
+      pointer-events: none;
+      z-index: 10;
+    }
+  }
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

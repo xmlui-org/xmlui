@@ -61,6 +61,7 @@ import { SwitchMd } from "./Switch/Switch";
 import { TableMd } from "./Table/Table";
 import { ColumnMd } from "./Column/Column";
 import { TableOfContentsMd } from "./TableOfContents/TableOfContents";
+import { TableOfContents2Md } from "./TableOfContents2/TableOfContents2";
 import { TabsMd } from "./Tabs/Tabs";
 import { TextMd } from "./Text/Text";
 import { TextAreaMd } from "./TextArea/TextArea";
@@ -413,6 +414,7 @@ export const collectedComponentMetadata = {
   Switch: SwitchMd,
   Table: TableMd,
   TableOfContents: TableOfContentsMd,
+  TableOfContents2: TableOfContents2Md,
   TabItem: TabItemMd,
   Tabs: TabsMd,
   Text: TextMd,

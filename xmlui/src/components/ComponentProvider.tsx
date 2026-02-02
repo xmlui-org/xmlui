@@ -135,6 +135,7 @@ import { tabsComponentRenderer } from "./Tabs/Tabs";
 import { bookmarkComponentRenderer } from "./Bookmark/Bookmark";
 import { appStateComponentRenderer } from "./AppState/AppState";
 import { tableOfContentsRenderer } from "./TableOfContents/TableOfContents";
+import { tableOfContents2Renderer } from "./TableOfContents2/TableOfContents2";
 import { accordionComponentRenderer } from "./Accordion/Accordion";
 import { tabItemComponentRenderer } from "./Tabs/TabItem";
 import { accordionItemComponentRenderer } from "./Accordion/AccordionItem";
@@ -600,6 +601,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(tabsComponentRenderer);
       this.registerCoreComponent(bookmarkComponentRenderer);
       this.registerCoreComponent(tableOfContentsRenderer);
+      this.registerCoreComponent(tableOfContents2Renderer);
       this.registerCoreComponent(codeBlockComponentRenderer);
       // --- Nested app and related components
       this.registerCoreComponent(nestedAppComponentRenderer);

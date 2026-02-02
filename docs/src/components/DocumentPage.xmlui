@@ -1,7 +1,6 @@
 <Component name="DocumentPage">
     <HStack gap="$space-5">
         <VStack width="*">
-
             <Markdown
                 when="{$props.content || $props.url}"
                 content="{$props.content}"
@@ -9,7 +8,9 @@
             <Slot when="{!$props.content && !$props.url}" />
             <DocumentLinks />
         </VStack>
-        <TableOfContents
+        <TableOfContents2
+            scrollStyle="whenScrolling"
+            showScrollerFade="true"
             width="$space-64"
             omitH1
             when="{mediaSize.sizeIndex > 3 && !$props.hideToc}"
