@@ -70,11 +70,13 @@ $color-indicator-TableOfContents--active: createThemeVar("color-indicator-#{$com
     align-self: flex-start;
     width: $width-TableOfContents;
     height: $height-TableOfContents;
-    max-height: calc(100vh - var(--header-abs-height) - var(--footer-abs-height));
+    max-height: calc(
+      100dvh - var(--header-abs-height, 0px) - var(--footer-abs-height, 0px) - 2px
+    );
     overflow-y: auto;
     overflow-x: hidden;
     z-index: 99;
-    top: var(--header-height);
+    top: var(--header-height, 0px);
     position: sticky;
     scrollbar-width: thin;
     // --- Do not collapse these padding properties; they are intentionally expanded
