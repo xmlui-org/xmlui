@@ -41,9 +41,46 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
 
       if (xmluiExtension.test(id)) {
         const fileId = "" + itemIndex++;
+        
+        // --- Extract script content from XMLUI markup
+        const scriptMatch = code.match(/<script>([\s\S]*?)<\/script>/);
+        let codeBehind;
+        
+        if (scriptMatch && scriptMatch[1]) {
+          const scriptContent = scriptMatch[1];
+          
+          // --- Create a module fetcher for import support
+          const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
+            // The modulePath parameter is the RESOLVED absolute path
+            try {
+              return await fs.readFile(modulePath, "utf-8");
+            } catch (e) {
+              throw new Error(`Failed to read module: ${modulePath}. Error: ${e}`);
+            }
+          };
+
+          // --- Collect code-behind with import support from inline <script> tags
+          try {
+            // Clear caches for fresh parse
+            clearParsedModulesCache();
+            ModuleResolver.clearCache();
+            ModuleResolver.resetImportStack();
+            
+            codeBehind = await collectCodeBehindFromSourceWithImports(
+              moduleNameResolver(id),
+              scriptContent,
+              moduleFetcher,
+            );
+            removeCodeBehindTokensFromTree(codeBehind);
+          } catch (e) {
+            console.error('[vite-xmlui-plugin] Error collecting imports:', e);
+          }
+        }
+        
         let { component, errors, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
           code,
           fileId,
+          codeBehind,
         );
         if (errors.length > 0) {
           component = errReportComponent(errors, id, erroneousCompoundComponentName);
@@ -51,6 +88,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         const file = {
           component,
           src: code,
+          codeBehind,
           file: fileId,
         };
 

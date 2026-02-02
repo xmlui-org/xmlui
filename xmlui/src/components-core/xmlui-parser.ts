@@ -7,7 +7,7 @@ import type { GeneralDiag, ParserDiag } from "../parsers/xmlui-parser/diagnostic
 import { SyntaxKind } from "../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../parsers/xmlui-parser/syntax-node";
 import type { ScriptParserErrorMessage } from "../abstractions/scripting/ScriptParserError";
-import type { ModuleErrors } from "./script-runner/ScriptingSourceTree";
+import type { ModuleErrors, CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 import { DocumentCursor } from "../language-server/base/text-document";
 
 interface ErrorForDisplay extends GeneralDiag {
@@ -28,10 +28,15 @@ const COLOR_PRIMARY = "hsl(204, 30.3%, 13%)";
 const COLOR_PRIMARY_LINE_NUMS = "#555b5e";
 const RADIUS = "0.5rem";
 
-export function xmlUiMarkupToComponent(source: string, fileId: string | number = 0): ParserResult {
+export function xmlUiMarkupToComponent(
+  source: string,
+  fileId: string | number = 0,
+  preResolvedImports?: CollectedDeclarations,
+): ParserResult {
   const { parse, getText } = createXmlUiParser(source);
   const { node, errors } = parse();
   const cursor = new DocumentCursor(source);
+  
   if (errors.length > 0) {
     const errorsToDisplay = errors.map((err) => {
       return errorWithDisplayFields(err, cursor, source);
@@ -45,7 +50,7 @@ export function xmlUiMarkupToComponent(source: string, fileId: string | number =
   }
 
   try {
-    const component = nodeToComponentDef(node, getText, fileId);
+    const component = nodeToComponentDef(node, getText, fileId, preResolvedImports);
     const transformResult = { component, errors: [] };
     return transformResult;
   } catch (e) {
