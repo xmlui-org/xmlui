@@ -1,5 +1,17 @@
 # xmlui
 
+## 0.11.34
+
+### Patch Changes
+
+- f4ff5cd: Fix ContextMenu regressions
+- 6b1df19: Add icon to SubMenuItem
+- be41834: Updated FileUploadDropZone so the default styling is more user friendly.
+- 19eb716: Fix onContextMenu issues with Tree
+- a1baf19: Fixed issue with markdown links to properly download resource files.
+- b9d774f: Experiment with module imports
+- a94ec67: Tweaked ExpandableItem styles so the summary button appears interactable.
+
 ## 0.11.33
 
 ### Patch Changes
