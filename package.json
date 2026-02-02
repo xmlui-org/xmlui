@@ -10,6 +10,7 @@
     "./playground",
     "./tools/create-app",
     "./tools/vscode",
+    "./tools/serve-optimized",
     "./packages/*"
   ],
   "devDependencies": {
