@@ -59,6 +59,7 @@ export const ErrorCodes = {
   commaOrCloseBraceExpected: "W035",
   importFromExpected: "W036",
   importPathExpected: "W037",
+  importNotAtTop: "W040",
 } as const;
 
 export type ErrorCodes = (typeof ErrorCodes)[keyof typeof ErrorCodes];
@@ -105,4 +106,5 @@ export const errorMessages: ErrorText = {
   [ErrorCodes.commaOrCloseBraceExpected]: "',' or '}' expected in import statement",
   [ErrorCodes.importFromExpected]: "'from' expected in import statement",
   [ErrorCodes.importPathExpected]: "String literal expected for import path",
+  [ErrorCodes.importNotAtTop]: "Import statements must appear at the top of the file, before any other statements",
 };

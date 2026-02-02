@@ -149,6 +149,9 @@ export class Parser {
   // --- Indicates the parsing level
   private _statementLevel = 0;
 
+  // --- Track if we've seen any non-import statements (for import position validation)
+  private _hasNonImportStatement = false;
+
   /**
    * Initializes the parser with the specified source code
    * @param source Source code to parse
@@ -163,6 +166,7 @@ export class Parser {
    */
   setSource(source: string): void {
     this._lexer = new Lexer(new InputStream(source));
+    this._hasNonImportStatement = false;
   }
 
   /**
@@ -212,6 +216,7 @@ export class Parser {
    */
   parseStatements(): Statement[] | null {
     this._statementLevel = 0;
+    this._hasNonImportStatement = false;
     const statements: Statement[] = [];
     while (!this.isEof) {
       const statement = this.parseStatement();
@@ -233,26 +238,40 @@ export class Parser {
       const startToken = this._lexer.peek();
       switch (startToken.type) {
         case TokenType.Import:
+          // Check if import is at the top (no non-import statements yet)
+          if (this._hasNonImportStatement) {
+            this.reportError("W040", startToken);
+            return null;
+          }
           return this.parseImportStatement();
         case TokenType.Semicolon:
           return this.parseEmptyStatement();
         case TokenType.Let:
+          this._hasNonImportStatement = true;
           return this.parseLetStatement();
         case TokenType.Const:
+          this._hasNonImportStatement = true;
           return this.parseConstStatement();
         case TokenType.Var:
+          this._hasNonImportStatement = true;
           return this.parseVarStatement();
         case TokenType.LBrace:
+          this._hasNonImportStatement = true;
           return this.parseBlockStatement();
         case TokenType.If:
+          this._hasNonImportStatement = true;
           return this.parseIfStatement();
         case TokenType.Do:
+          this._hasNonImportStatement = true;
           return this.parseDoWhileStatement();
         case TokenType.While:
+          this._hasNonImportStatement = true;
           return this.parseWhileStatement();
         case TokenType.Return:
+          this._hasNonImportStatement = true;
           return this.parseReturnStatement();
         case TokenType.Break:
+          this._hasNonImportStatement = true;
           this._lexer.get();
           return this.createStatementNode<BreakStatement>(
             T_BREAK_STATEMENT,
@@ -261,6 +280,7 @@ export class Parser {
             startToken,
           );
         case TokenType.Continue:
+          this._hasNonImportStatement = true;
           this._lexer.get();
           return this.createStatementNode<ContinueStatement>(
             T_CONTINUE_STATEMENT,
@@ -269,14 +289,19 @@ export class Parser {
             startToken,
           );
         case TokenType.For:
+          this._hasNonImportStatement = true;
           return this.parseForStatement();
         case TokenType.Throw:
+          this._hasNonImportStatement = true;
           return this.parseThrowStatement();
         case TokenType.Try:
+          this._hasNonImportStatement = true;
           return this.parseTryStatement();
         case TokenType.Switch:
+          this._hasNonImportStatement = true;
           return this.parseSwitchStatement();
         case TokenType.Function:
+          this._hasNonImportStatement = true;
           return this.parseFunctionDeclaration();
         default:
           // Check for async function (contextual keyword)
@@ -284,10 +309,12 @@ export class Parser {
             const nextToken = this._lexer.ahead(1);
             if (nextToken && nextToken.type === TokenType.Function) {
               // Don't consume "async" here, let parseFunctionDeclaration handle it
+              this._hasNonImportStatement = true;
               return this.parseFunctionDeclaration(false, true);
             }
           }
           if (this.isExpressionStart(startToken)) {
+            this._hasNonImportStatement = true;
             return this.parseExpressionStatement(allowSequence);
           }
           this.reportError("W002", startToken, startToken.text);
@@ -1299,7 +1326,7 @@ export class Parser {
 
       // Check for 'as' alias
       const nextToken = this._lexer.peek();
-      if (nextToken.type === TokenType.Identifier && nextToken.text === "as") {
+      if (nextToken.type === TokenType.As) {
         this._lexer.get(); // consume 'as'
         const aliasToken = this._lexer.peek();
         if (aliasToken.type !== TokenType.Identifier) {

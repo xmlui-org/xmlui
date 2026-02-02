@@ -1232,8 +1232,8 @@ Use this checklist to track implementation progress:
 - [x] **Step 2**: Add Import AST Node Types  
 - [x] **Step 3**: Parse Simple Import Statement
 - [x] **Step 4**: Parse Multiple Named Imports
-- [ ] **Step 5**: Parse Import with Aliases
-- [ ] **Step 6**: Validate Import Statement Position
+- [x] **Step 5**: Parse Import with Aliases
+- [x] **Step 6**: Validate Import Statement Position
 - [ ] **Step 7**: Create Module Resolver (Basic)
 - [ ] **Step 8**: Add Module Fetching to Resolver
 - [ ] **Step 9**: Update parseScriptModule for Imports
