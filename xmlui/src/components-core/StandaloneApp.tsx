@@ -31,8 +31,11 @@ import {
 import { Parser } from "../parsers/scripting/Parser";
 import {
   collectCodeBehindFromSource,
+  collectCodeBehindFromSourceWithImports,
   removeCodeBehindTokensFromTree,
 } from "../parsers/scripting/code-behind-collect";
+import { ModuleResolver } from "../parsers/scripting/ModuleResolver";
+import type { ModuleFetcher } from "../parsers/scripting/ModuleResolver";
 import { ComponentRegistry } from "../components/ComponentProvider";
 import { checkXmlUiMarkup, type MetadataHandler, visitComponent } from "./markup-check";
 import StandaloneExtensionManager from "./StandaloneExtensionManager";
@@ -275,7 +278,19 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
   }
 
   try {
-    const codeBehind = collectCodeBehindFromSource("Main", code);
+    // --- Create a module fetcher for resolving imports
+    const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
+      // --- Resolve the module path relative to the current file
+      const resolvedPath = ModuleResolver.resolvePath(modulePath, response.url);
+      const moduleResponse = await fetchWithoutCache(resolvedPath);
+      if (!moduleResponse.ok) {
+        throw new Error(`Failed to fetch module: ${resolvedPath}`);
+      }
+      return await moduleResponse.text();
+    };
+
+    // --- Collect code-behind with import support
+    const codeBehind = await collectCodeBehindFromSourceWithImports(response.url, code, moduleFetcher);
     if (Object.keys(codeBehind.moduleErrors ?? {}).length > 0) {
       return {
         component: errReportModuleErrors(codeBehind.moduleErrors, response.url),
