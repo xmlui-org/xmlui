@@ -113,8 +113,16 @@ export function useStyles(
   }, [indexing, registry, styles]);
 
   useInsertionEffect(() => {
-    if (!styleHash || registry.injected.has(styleHash)) {
-      return;
+    if (!styleHash) return;
+
+    if (registry.injected.has(styleHash)) {
+      // Only check DOM if we think it's already injected
+      const existingElement = injectionTarget?.querySelector(
+        `style[data-style-hash="${styleHash}"]`,
+      );
+      if (existingElement) return; // Style exists in DOM, skip injection
+      // Style missing from DOM but marked as injected - continue to re-inject
+      // can happen when there's a whole-page re-render due to hydration error
     }
 
     const { css } = registry.cache.get(styleHash) || {};
