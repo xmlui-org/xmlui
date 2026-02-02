@@ -1234,11 +1234,11 @@ Use this checklist to track implementation progress:
 - [x] **Step 4**: Parse Multiple Named Imports
 - [x] **Step 5**: Parse Import with Aliases
 - [x] **Step 6**: Validate Import Statement Position
-- [ ] **Step 7**: Create Module Resolver (Basic)
-- [ ] **Step 8**: Add Module Fetching to Resolver
-- [ ] **Step 9**: Update parseScriptModule for Imports
-- [ ] **Step 10**: Detect Circular Imports
-- [ ] **Step 11**: Update collectCodeBehindFromSource
+- [x] **Step 7**: Create Module Resolver (Basic)
+- [x] **Step 8**: Add Module Fetching to Resolver
+- [x] **Step 9**: Update parseScriptModule for Imports
+- [x] **Step 10**: Detect Circular Imports
+- [x] **Step 11**: Update collectCodeBehindFromSource
 - [ ] **Step 12**: Integrate with StandaloneApp (Buildless)
 - [ ] **Step 13**: Integrate with Vite Plugin (Built)
 - [ ] **Step 14**: End-to-End Integration Test
