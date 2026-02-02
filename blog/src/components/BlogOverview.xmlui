@@ -39,13 +39,14 @@
                             {$item.title}
                         </H2>
                         <Text variant="description" maxLines="4" ellipses>
+                            {$item.description}
+                        </Text>
+                        <Text variant="blurb" maxLines="4" ellipses>
                             {window.getBlurb(appGlobals.prefetchedContent['/blog/' + $item.slug + '.md'])}
                         </Text>
                         <HStack horizontalAlignment="start" marginTop="auto">
                             <Link to="{blogLink}" active>
-                                <Button variant="ghost" color="$color-primary-500">
-                                    Read more →
-                                </Button>
+                                Read more →
                             </Link>
                         </HStack>
                     </VStack>
