@@ -1,13 +1,17 @@
 import type { ScriptModule } from "../../components-core/script-runner/ScriptingSourceTree";
 import {
   T_FUNCTION_DECLARATION,
+  T_IMPORT_DECLARATION,
   type FunctionDeclaration,
+  type ImportDeclaration,
   type Statement,
 } from "../../components-core/script-runner/ScriptingSourceTree";
 import type { ErrorCodes, ParserErrorMessage } from "./ParserError";
 import { Parser } from "./Parser";
 import { errorMessages } from "./ParserError";
 import { TokenType } from "./TokenType";
+import type { ModuleFetcher } from "./ModuleResolver";
+import { ModuleResolver } from "./ModuleResolver";
 
 /**
  * Represents a module error
@@ -122,5 +126,132 @@ export function parseScriptModule(moduleName: string, source: string): ScriptMod
         column: stmt.startToken?.startColumn ?? 1,
       });
     }
+  }
+}
+
+/**
+ * Parses a script module with import support
+ * @param moduleName Name of the module
+ * @param source Source code to parse
+ * @param moduleFetcher Function to fetch module content (required for import resolution)
+ * @returns The parsed and resolved module
+ */
+export async function parseScriptModuleWithImports(
+  moduleName: string,
+  source: string,
+  moduleFetcher: ModuleFetcher,
+): Promise<ScriptModule | ModuleErrors> {
+  // --- Set up the module fetcher
+  ModuleResolver.setCustomFetcher(moduleFetcher);
+  ModuleResolver.resetImportStack();
+
+  // --- Parse the source code
+  const parser = new Parser(source);
+  let statements: Statement[] = [];
+  const moduleErrors: ModuleErrors = {};
+
+  try {
+    statements = parser.parseStatements()!;
+  } catch (error) {
+    moduleErrors[moduleName] = parser.errors;
+    return moduleErrors;
+  }
+
+  // --- Check for unparsed tail
+  const lastToken = parser.current;
+  if (lastToken.type !== TokenType.Eof) {
+    moduleErrors[moduleName] ??= [];
+    moduleErrors[moduleName].push({
+      code: "W002",
+      text: errorMessages["W002"].replace(/\{(\d+)}/g, () => lastToken.text),
+      position: lastToken.startPosition,
+      end: lastToken.endPosition,
+      line: lastToken.startLine,
+      column: lastToken.startColumn,
+    });
+    return moduleErrors;
+  }
+
+  const errors: ParserErrorMessage[] = [];
+
+  // --- Separate imports from other statements
+  const imports: ImportDeclaration[] = [];
+  const otherStatements: Statement[] = [];
+
+  statements.forEach((stmt) => {
+    if (stmt.type === T_IMPORT_DECLARATION) {
+      imports.push(stmt as ImportDeclaration);
+    } else {
+      otherStatements.push(stmt);
+    }
+  });
+
+  // --- Collect functions from this module
+  const functions: Record<string, FunctionDeclaration> = {};
+  otherStatements
+    .filter((stmt) => stmt.type === T_FUNCTION_DECLARATION)
+    .forEach((stmt) => {
+      const func = stmt as FunctionDeclaration;
+      if (functions[func.id.name]) {
+        addErrorMessage("W020", stmt, func.id.name);
+        return;
+      }
+      functions[func.id.name] = func;
+    });
+
+  // --- Process imports - validate they can be resolved
+  for (const importDecl of imports) {
+    try {
+      // Try to resolve the import path
+      ModuleResolver.resolvePath(importDecl.source.value, moduleName);
+
+      // Try to fetch the module content
+      await ModuleResolver.resolveAndFetchModule(importDecl.source.value, moduleName);
+    } catch (error) {
+      // Handle circular imports and fetch errors
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes("Circular import")) {
+        addErrorMessage("W041", importDecl, errorMessage);
+      } else if (errorMessage.includes("goes above root")) {
+        addErrorMessage("W022", importDecl, importDecl.source.value);
+      } else {
+        addErrorMessage("W022", importDecl, importDecl.source.value);
+      }
+    }
+  }
+
+  // --- Successful module parsing
+  const parsedModule: ScriptModule = {
+    type: "ScriptModule",
+    name: moduleName,
+    functions,
+    statements: otherStatements, // Exclude imports from statements
+    sources: new Map(),
+  };
+
+  // --- Catch errors
+  if (errors.length > 0) {
+    moduleErrors[moduleName] = errors;
+    return moduleErrors;
+  }
+
+  // --- Done.
+  return parsedModule;
+
+  function addErrorMessage(code: ErrorCodes, stmt: Statement, ...args: any[]): void {
+    let errorText = errorMessages[code];
+    if (args) {
+      args.forEach(
+        (o, idx) => (errorText = errorText.replaceAll(`{${idx}}`, args[idx].toString())),
+      );
+    }
+    errors.push({
+      code,
+      text: errorMessages[code].replace(/\{(\d+)}/g, (_, index) => args[index]),
+      position: stmt.startToken?.startPosition ?? 0,
+      end: stmt.startToken?.endPosition ?? 0,
+      line: stmt.startToken?.startLine ?? 1,
+      column: stmt.startToken?.startColumn ?? 1,
+    });
   }
 }

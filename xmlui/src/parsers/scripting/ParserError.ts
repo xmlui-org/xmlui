@@ -60,6 +60,9 @@ export const ErrorCodes = {
   importFromExpected: "W036",
   importPathExpected: "W037",
   importNotAtTop: "W040",
+  importedFunctionNotFound: "W039",
+  circularImport: "W041",
+  circularImportDetailed: "W042",
 } as const;
 
 export type ErrorCodes = (typeof ErrorCodes)[keyof typeof ErrorCodes];
@@ -107,4 +110,8 @@ export const errorMessages: ErrorText = {
   [ErrorCodes.importFromExpected]: "'from' expected in import statement",
   [ErrorCodes.importPathExpected]: "String literal expected for import path",
   [ErrorCodes.importNotAtTop]: "Import statements must appear at the top of the file, before any other statements",
+  [ErrorCodes.moduleNotFound]: "Cannot find module '{0}'",
+  [ErrorCodes.importedFunctionNotFound]: "Module '{0}' does not export '{1}'",
+  [ErrorCodes.circularImport]: "Circular import detected: {0}",
+  [ErrorCodes.circularImportDetailed]: "Circular import chain: {0}",
 };
