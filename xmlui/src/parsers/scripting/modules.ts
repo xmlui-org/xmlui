@@ -28,7 +28,7 @@ import {
   type LetStatement,
   type ConstStatement,
 } from "../../components-core/script-runner/ScriptingSourceTree";
-import type { ErrorCodes, ParserErrorMessage } from "./ParserError";
+import { ErrorCodes, ParserErrorMessage } from "./ParserError";
 import { Parser } from "./Parser";
 import { errorMessages } from "./ParserError";
 import { TokenType } from "./TokenType";
@@ -101,10 +101,10 @@ function validateImportedModuleStatements(
     // Error: Reactive var declarations
     if (stmt.type === T_VAR_STATEMENT) {
       const varStmt = stmt as VarStatement;
-      const varNames = varStmt.decls.map(d => d.id.name).join(", ");
+      const varNames = varStmt.decls.map((d) => d.id.name).join(", ");
       errors.push({
-        code: "W043",
-        text: errorMessages["W043"].replace("{0}", varNames),
+        code: ErrorCodes.reactiveVarInImportedModule,
+        text: errorMessages[ErrorCodes.reactiveVarInImportedModule].replace("{0}", varNames),
         position: stmt.startToken?.startPosition ?? 0,
         end: stmt.endToken?.endPosition ?? stmt.startToken?.endPosition ?? 0,
         line: stmt.startToken?.startLine ?? 1,
@@ -116,10 +116,10 @@ function validateImportedModuleStatements(
     // Error: const/let declarations
     if (stmt.type === T_CONST_STATEMENT || stmt.type === T_LET_STATEMENT) {
       const declStmt = stmt as ConstStatement | LetStatement;
-      const varNames = declStmt.decls.map(d => d.id ?? "?").join(", ");
+      const varNames = declStmt.decls.map((d) => d.id ?? "?").join(", ");
       errors.push({
-        code: "W044",
-        text: errorMessages["W044"].replace("{0}", varNames),
+        code: ErrorCodes.constLetInImportedModule,
+        text: errorMessages[ErrorCodes.constLetInImportedModule].replace("{0}", varNames),
         position: stmt.startToken?.startPosition ?? 0,
         end: stmt.endToken?.endPosition ?? stmt.startToken?.endPosition ?? 0,
         line: stmt.startToken?.startLine ?? 1,
@@ -131,8 +131,8 @@ function validateImportedModuleStatements(
     // Warning: Any other statement type
     const stmtType = statementTypeNames[stmt.type] || `statement type ${stmt.type}`;
     warnings.push({
-      code: "W045",
-      text: errorMessages["W045"].replace("{0}", stmtType),
+      code: ErrorCodes.invalidStatementInImportedModule,
+      text: errorMessages[ErrorCodes.invalidStatementInImportedModule].replace("{0}", stmtType),
       position: stmt.startToken?.startPosition ?? 0,
       end: stmt.endToken?.endPosition ?? stmt.startToken?.endPosition ?? 0,
       line: stmt.startToken?.startLine ?? 1,
@@ -178,8 +178,8 @@ export function parseScriptModule(moduleName: string, source: string): ScriptMod
     if (lastToken.type !== TokenType.Eof) {
       moduleErrors[moduleName] ??= [];
       moduleErrors[moduleName].push({
-        code: "W002",
-        text: errorMessages["W002"].replace(/\{(\d+)}/g, () => lastToken.text),
+        code: ErrorCodes.unexpectedToken,
+        text: errorMessages[ErrorCodes.unexpectedToken].replace(/\{(\d+)}/g, () => lastToken.text),
         position: lastToken.startPosition,
         end: lastToken.endPosition,
         line: lastToken.startLine,
@@ -197,7 +197,7 @@ export function parseScriptModule(moduleName: string, source: string): ScriptMod
       .forEach((stmt) => {
         const func = stmt as FunctionDeclaration;
         if (functions[func.id.name]) {
-          addErrorMessage("W020", stmt, func.id.name);
+          addErrorMessage(ErrorCodes.funcAlreadyDefined, stmt, func.id.name);
           return;
         }
         functions[func.id.name] = func;
@@ -273,10 +273,14 @@ export async function parseScriptModuleWithImports(
   parsedModulesCache.set(moduleName, parsePromise);
 
   const result = await parsePromise;
-  
+
   // Store the final result (not the promise)
-  parsedModulesCache.set(moduleName, result);
-  
+  if (!isModuleErrors(result)) {
+    parsedModulesCache.set(moduleName, result);
+  } else {
+    parsedModulesCache.set(moduleName, result as any);
+  }
+
   return result;
 }
 
@@ -305,8 +309,8 @@ async function doParseModule(
   if (lastToken.type !== TokenType.Eof) {
     moduleErrors[moduleName] ??= [];
     moduleErrors[moduleName].push({
-      code: "W002",
-      text: errorMessages["W002"].replace(/\{(\d+)}/g, () => lastToken.text),
+      code: ErrorCodes.unexpectedToken,
+      text: errorMessages[ErrorCodes.unexpectedToken].replace(/\{(\d+)}/g, () => lastToken.text),
       position: lastToken.startPosition,
       end: lastToken.endPosition,
       line: lastToken.startLine,
@@ -337,7 +341,7 @@ async function doParseModule(
     .forEach((stmt) => {
       const func = stmt as FunctionDeclaration;
       if (functions[func.id.name]) {
-        addErrorMessage("W020", stmt, func.id.name);
+        addErrorMessage(ErrorCodes.funcAlreadyDefined, stmt, func.id.name);
         return;
       }
       functions[func.id.name] = func;
@@ -348,27 +352,19 @@ async function doParseModule(
     try {
       // Check if we would create a circular import before fetching
       const resolvedPath = ModuleResolver.resolvePath(importDecl.source.value, moduleName);
-      
+
       // Check if we're trying to import ourselves or create a circular dependency
       if (resolvedPath === moduleName) {
         // Direct self-import
-        addErrorMessage("W041", importDecl, `Self-import detected: ${resolvedPath}`);
+        addErrorMessage(ErrorCodes.circularImport, importDecl, `Self-import detected: ${resolvedPath}`);
         continue;
       }
-      
+
       // Check if this module is already being parsed (circular)
       const cached = parsedModulesCache.get(resolvedPath);
       if (cached instanceof Promise) {
         // Module is currently being parsed - this is a circular import
-        addErrorMessage("W041", importDecl, `Circular import: ${moduleName} → ${resolvedPath}`);
-        continue;
-      }
-      
-      const circularChain = ModuleResolver.detectCircularImport(resolvedPath);
-      if (circularChain) {
-        // Circular import detected - add error and skip
-        const chainStr = circularChain.join(" → ");
-        addErrorMessage("W041", importDecl, `${chainStr}`);
+        addErrorMessage(ErrorCodes.circularImport, importDecl, `Circular import: ${moduleName} → ${resolvedPath}`);
         continue;
       }
 
@@ -391,7 +387,13 @@ async function doParseModule(
         Object.entries(importedModuleResult).forEach(([path, errs]) => {
           moduleErrors[path] = errs;
           // Check if any of these are validation errors (W043, W044)
-          if (errs.some(e => e.code === "W043" || e.code === "W044")) {
+          if (
+            errs.some(
+              (e) =>
+                e.code === ErrorCodes.reactiveVarInImportedModule ||
+                e.code === ErrorCodes.constLetInImportedModule,
+            )
+          ) {
             hasValidationErrors = true;
           }
         });
@@ -434,7 +436,7 @@ async function doParseModule(
         if (importedModuleResult.functions[importedName]) {
           // Add to available functions with the local name (aliasing support)
           if (functions[localName]) {
-            addErrorMessage("W020", importDecl, localName);
+            addErrorMessage(ErrorCodes.funcAlreadyDefined, importDecl, localName);
           } else {
             functions[localName] = importedModuleResult.functions[importedName];
           }
@@ -444,11 +446,11 @@ async function doParseModule(
       // Handle circular imports and fetch errors
       const errorMessage = error instanceof Error ? error.message : String(error);
       if (errorMessage.includes("Circular import")) {
-        addErrorMessage("W041", importDecl, errorMessage);
+        addErrorMessage(ErrorCodes.circularImport, importDecl, errorMessage);
       } else if (errorMessage.includes("goes above root")) {
-        addErrorMessage("W022", importDecl, importDecl.source.value);
+        addErrorMessage(ErrorCodes.moduleNotFound, importDecl, importDecl.source.value);
       } else {
-        addErrorMessage("W022", importDecl, importDecl.source.value);
+        addErrorMessage(ErrorCodes.moduleNotFound, importDecl, importDecl.source.value);
       }
     }
   }
@@ -467,7 +469,7 @@ async function doParseModule(
     moduleErrors[moduleName] = errors;
     return moduleErrors;
   }
-  
+
   // Also return errors if any imported modules had validation errors
   if (hasValidationErrors) {
     return moduleErrors;
@@ -492,6 +494,17 @@ async function doParseModule(
       column: stmt.startToken?.startColumn ?? 1,
     });
   }
+}
+
+/**
+ * Gets the parsed modules cache
+ * @returns The cache map of parsed modules
+ */
+export function getParsedModulesCache(): Map<
+  string,
+  ScriptModule | Promise<ScriptModule | ModuleErrors>
+> {
+  return parsedModulesCache;
 }
 
 /**
