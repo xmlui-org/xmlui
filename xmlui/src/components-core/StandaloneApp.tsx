@@ -115,8 +115,6 @@ function StandaloneApp({
   // --- Fetch all files constituting the standalone app, including components,
   // --- themes, and other artifacts. Display the app version numbers in the
   // --- console.
-  console.log("Runtime:", runtime);
-
   const { standaloneApp, projectCompilation } = useStandalone(appDef, runtime, extensionManager);
 
   usePrintVersionNumber(standaloneApp);
@@ -236,43 +234,7 @@ async function parseComponentMarkupResponse(response: Response): Promise<ParsedR
   const code = await response.text();
   const fileId = response.url;
   
-  // --- Extract script content from XMLUI markup (if present)
-  const scriptMatch = code.match(/<script>([\s\S]*?)<\/script>/);
-
-  // --- Collect code-behind with import support (only if there's a script block)
-  let codeBehind: CollectedDeclarations | undefined;
-  if (scriptMatch && scriptMatch[1]) {
-    try {
-      const scriptContent = scriptMatch[1];
-      const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
-        const resolvedPath = ModuleResolver.resolvePath(modulePath, response.url);
-        const moduleResponse = await fetchWithoutCache(resolvedPath);
-        if (!moduleResponse.ok) {
-          throw new Error(`Failed to fetch module: ${resolvedPath}`);
-        }
-        return await moduleResponse.text();
-      };
-
-      codeBehind = await collectCodeBehindFromSourceWithImports(response.url, scriptContent, moduleFetcher);
-
-      if (Object.keys(codeBehind.moduleErrors ?? {}).length > 0) {
-        const compName =
-          response.url.substring(
-            response.url.lastIndexOf("/") + 1,
-            response.url.length - ".xmlui".length,
-          );
-        return {
-          component: errReportModuleErrors(codeBehind.moduleErrors, fileId),
-          file: fileId,
-          hasError: true,
-        };
-      }
-    } catch (e) {
-      console.error('[parseComponentMarkupResponse] Error collecting code-behind:', e);
-    }
-  }
-  
-  let { component, errors, erroneousCompoundComponentName } = xmlUiMarkupToComponent(code, fileId, codeBehind);
+  let { component, errors, erroneousCompoundComponentName } = xmlUiMarkupToComponent(code, fileId);
   if (errors.length > 0) {
     const compName =
       erroneousCompoundComponentName ??
@@ -285,7 +247,6 @@ async function parseComponentMarkupResponse(response: Response): Promise<ParsedR
   return {
     component,
     src: code,
-    codeBehind,
     file: fileId,
     hasError: errors.length > 0,
   };
@@ -429,11 +390,6 @@ function resolveRuntime(runtime: Record<string, any>): {
         entryPoint = value.default.component;
         projectCompilation.entrypoint.definition = entryPoint;
         projectCompilation.entrypoint.markupSource = value.default.src;
-        
-        // --- If the component has codeBehind with imports, use it
-        if (value.default.codeBehind) {
-          entryPointCodeBehind = value.default.codeBehind;
-        }
         
         // Use key (the actual file path from Vite glob) for consistent source lookups
         sources[key] = value.default.src;
