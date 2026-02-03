@@ -167,7 +167,7 @@ describe("Attribute value parsing", () => {
 
     it("object value #1", () => {
     // --- Act
-    const source = "{{ from: from, to: to }}";
+    const source = "{{ from: from1, to: to }}";
     const val = parseAttributeValue(source)!;
 
     // --- Assert

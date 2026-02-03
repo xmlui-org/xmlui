@@ -12,6 +12,7 @@ import type { ButtonVariant, ButtonThemeColor } from "../abstractions";
 import { Button } from "../Button/ButtonNative";
 import { Stack } from "../Stack/StackNative";
 import { Dialog } from "./Dialog";
+import { useAppContext } from "../../components-core/AppContext";
 
 const ConfirmationModalContext = React.createContext({
   confirm: (title: string, message?: string, actionLabel?: string) => Promise.resolve(false),
@@ -37,6 +38,9 @@ type ConfirmParams = {
 };
 
 export const ConfirmationModalContextProvider = ({ children }: Props) => {
+  const appContext = useAppContext();
+  const xsVerbose = appContext?.appGlobals?.xsVerbose === true;
+
   // State
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [title, setTitle] = useState<string>("Are you sure?");
@@ -60,6 +64,22 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
 
   const handleShow = useCallback(
     (title: string | ConfirmParams, message?: string, actionLabel?: string) => {
+      // Trace confirmation modal show (only when xsVerbose is enabled)
+      if (xsVerbose && typeof window !== "undefined") {
+        const w = window as any;
+        w._xsPendingConfirmTrace = w._xsCurrentTrace || w._xsLastInteraction?.id;
+        if (Array.isArray(w._xsLogs)) {
+          const modalTitle = typeof title === "string" ? title : title.title;
+          w._xsLogs.push({
+            ts: Date.now(),
+            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+            traceId: w._xsCurrentTrace,
+            kind: "modal:show",
+            modalType: "confirmation",
+            title: modalTitle,
+          });
+        }
+      }
       if (typeof title === "string") {
         setTitle(title);
         setButtons([
@@ -79,22 +99,57 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
         resolver.current = resolve;
       });
     },
-    [],
+    [xsVerbose],
   );
 
   const handleOk = useCallback((value: any) => {
+    // Trace confirmation (only when xsVerbose is enabled)
+    if (xsVerbose && typeof window !== "undefined") {
+      const w = window as any;
+      if (Array.isArray(w._xsLogs)) {
+        // Restore trace context from when modal was shown
+        if (w._xsPendingConfirmTrace) {
+          w._xsCurrentTrace = w._xsPendingConfirmTrace;
+        }
+        w._xsLogs.push({
+          ts: Date.now(),
+          perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+          traceId: w._xsCurrentTrace,
+          kind: "modal:confirm",
+          modalType: "confirmation",
+          value,
+        });
+      }
+    }
     if (resolver.current) {
       resolver.current(value);
     }
     setShowConfirmationModal(false);
-  }, []);
+  }, [xsVerbose]);
 
   const handleCancel = useCallback(() => {
+    // Trace cancellation (only when xsVerbose is enabled)
+    if (xsVerbose && typeof window !== "undefined") {
+      const w = window as any;
+      if (Array.isArray(w._xsLogs)) {
+        // Restore trace context from when modal was shown
+        if (w._xsPendingConfirmTrace) {
+          w._xsCurrentTrace = w._xsPendingConfirmTrace;
+        }
+        w._xsLogs.push({
+          ts: Date.now(),
+          perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+          traceId: w._xsCurrentTrace,
+          kind: "modal:cancel",
+          modalType: "confirmation",
+        });
+      }
+    }
     if (resolver.current) {
       resolver.current(false);
     }
     setShowConfirmationModal(false);
-  }, []);
+  }, [xsVerbose]);
 
   const contextValue = useMemo(() => {
     return {

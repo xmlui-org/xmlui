@@ -1,6 +1,6 @@
 import type * as React from "react";
 import type { CSSProperties, ForwardedRef, ReactNode } from "react";
-import { forwardRef, useCallback, useEffect } from "react";
+import { forwardRef, useCallback, useEffect, useRef } from "react";
 import * as dropzone from "react-dropzone";
 
 import styles from "./FileUploadDropZone.module.scss";
@@ -69,15 +69,40 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
   const accept = acceptedFileTypes
     ? acceptedFileTypes.split(",").reduce((acc, type) => ({ ...acc, [type.trim()]: [] }), {})
     : undefined;
+
+  // Store the trace ID that was active when the file picker was opened
+  // so we can restore it when onDrop fires (which happens asynchronously after the user selects files)
+  const pendingTraceIdRef = useRef<string | undefined>(undefined);
+
   const onDrop = useCallback(
-    (acceptedFiles: File[]) => {
+    async (acceptedFiles: File[]) => {
       if (!acceptedFiles.length) {
         return;
       }
-      updateState?.({
-        value: acceptedFiles,
-      });
-      onUpload?.(acceptedFiles);
+
+      // Restore the trace ID that was active when open() was called
+      let prevTrace: string | undefined;
+      if (typeof window !== "undefined" && pendingTraceIdRef.current) {
+        const w = window as any;
+        prevTrace = w._xsCurrentTrace;
+        w._xsCurrentTrace = pendingTraceIdRef.current;
+      }
+
+      try {
+        updateState?.({
+          value: acceptedFiles,
+        });
+        // Must await onUpload since it's an async handler - otherwise our finally
+        // block runs before the handler code executes
+        await onUpload?.(acceptedFiles);
+      } finally {
+        // Restore the previous trace
+        if (typeof window !== "undefined" && pendingTraceIdRef.current) {
+          const w = window as any;
+          w._xsCurrentTrace = prevTrace;
+          pendingTraceIdRef.current = undefined;
+        }
+      }
     },
     [onUpload, updateState],
   );
@@ -93,6 +118,11 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
   });
 
   const doOpen = useEvent(() => {
+    // Capture the current trace ID before opening the file picker
+    // The file picker is async - onDrop will fire later when the user selects files
+    if (typeof window !== "undefined") {
+      pendingTraceIdRef.current = (window as any)._xsCurrentTrace;
+    }
     open();
   });
 
@@ -120,6 +150,12 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
           //the clipboardData.files doesn't necessarily contains files... so we have to double check it
           event.stopPropagation(); //it's for nested file upload dropzones
           event.preventDefault(); // and this one is for preventing to paste in the file name, if we a have stored file on the clipboard (copied from finder/windows explorer for example)
+
+          // Capture any active trace before dispatching the change event
+          // The change event may be handled asynchronously by react-dropzone
+          if (typeof window !== "undefined") {
+            pendingTraceIdRef.current = (window as any)._xsCurrentTrace;
+          }
 
           //stolen from here: https://github.com/react-dropzone/react-dropzone/issues/1210#issuecomment-1537862105
           (inputRef.current as unknown as HTMLInputElement).files = event.clipboardData.files;

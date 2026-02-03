@@ -20,6 +20,7 @@ export const T_TRY_STATEMENT = 18;
 export const T_SWITCH_STATEMENT = 19;
 export const T_FUNCTION_DECLARATION = 20;
 export const T_ASYNC_FUNCTION_DECLARATION = 21;
+export const T_IMPORT_DECLARATION = 22;
 
 // --- Expression node type values
 export const T_UNARY_EXPRESSION = 100;
@@ -50,3 +51,4 @@ export const T_DESTRUCTURE = 201;
 export const T_ARRAY_DESTRUCTURE = 202;
 export const T_OBJECT_DESTRUCTURE = 203;
 export const T_SWITCH_CASE = 204;
+export const T_IMPORT_SPECIFIER = 205;

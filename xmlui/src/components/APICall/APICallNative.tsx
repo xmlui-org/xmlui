@@ -184,7 +184,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
   // Initialize state with default values
   useEffect(() => {
     const deferredMode = (node.props as any)?.deferredMode === "true" || (node.props as any)?.deferredMode === true;
-    
+
     if (updateState) {
       updateState({ 
         inProgress: false, 
@@ -294,7 +294,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
           resolveBindingExpressions: false,
         },
       );
-      
+
       const newState = {
         ...deferredStateRef.current,
         statusData: statusData,
@@ -368,7 +368,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
             resolveBindingExpressions: false,
           },
         );
-        
+
         // Extract progress
         const progress = extractProgress(
           statusData,
@@ -416,7 +416,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
         
         // Schedule next poll
         scheduleNextPoll();
-        
+
       } catch (statusError) {
         console.error("Status request failed:", statusError);
         scheduleNextPoll();
@@ -433,7 +433,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
         pollingBackoff,
         maxPollingInterval
       );
-      
+
       pollingIntervalRef.current = setTimeout(pollStatus, nextInterval) as any;
     };
     
@@ -451,7 +451,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
   const execute = useEvent(
     async (executionContext: ActionExecutionContext, ...eventArgs: any[]) => {
       const options = eventArgs[1];
-      
+
       // Store execution context for cancel() method
       executionContextRef.current = executionContext;
       
@@ -477,7 +477,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
             resolveBindingExpressions: true,
           },
         );
-        
+
         // Store result in ref for cancel() method
         lastResultRef.current = result;
         
@@ -500,7 +500,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
           // Interpolate statusUrl with result context
           const interpolatedStatusUrl = interpolateUrl(statusUrl as string, result);
           const statusMethod = ((node.props as any)?.statusMethod as string) || "get";
-          
+
           // Execute either single poll or polling loop based on pollingInterval
           if (pollingIntervalProp) {
             // Continuous polling with backoff

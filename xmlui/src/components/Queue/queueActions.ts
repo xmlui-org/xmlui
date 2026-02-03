@@ -84,13 +84,19 @@ export function actionItemError(actionItemId: string, error: any) {
 }
 
 // Signs that a particular component (`uid`) has initialized its execution `queue` with the specified `batchId`.
-export function actionQueueInitialized(queue: Array<any>, batchId: string, actionItemIds: string[]) {
+export function actionQueueInitialized(
+  queue: Array<any>,
+  batchId: string,
+  actionItemIds: string[],
+  traceId?: string,
+) {
   return {
     type: QueueActionKind.ACTION_QUEUE_INITIALIZED,
     payload: {
       queue,
       actionItemIds,
       batchId,
+      traceId,
     },
   };
 }

@@ -60,6 +60,7 @@ export function AppRoot({
   extensionManager?: StandaloneExtensionManager;
   isNested?: boolean;
 }) {
+  // Note: Startup trace initialization is handled by AppContent's xsVerbose useEffect
   // --- Make sure, the root node is wrapped in a `Theme` component. Also,
   // --- the root node must be wrapped in a `Container` component managing
   // --- the app's top-level state.

@@ -1,5 +1,5 @@
 import type { MutableRefObject, ReactNode, RefObject } from "react";
-import { forwardRef, memo, useCallback, useMemo, useReducer, useRef, useState } from "react";
+import { forwardRef, memo, useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import produce from "immer";
 import { cloneDeep, isEmpty, isPlainObject, merge, pick } from "lodash-es";
 import memoizeOne from "memoize-one";
@@ -20,6 +20,12 @@ import { ErrorBoundary } from "../rendering/ErrorBoundary";
 import { collectVariableDependencies } from "../script-runner/visitors";
 import { useReferenceTrackedApi, useShallowCompareMemoize } from "../utils/hooks";
 import { Container } from "./Container";
+import {
+  getCurrentTrace,
+  simpleStringify,
+  xsConsoleLog,
+  pushXsLog,
+} from "../inspector/inspectorUtils";
 import { isParsedCodeDeclaration } from "../../abstractions/InternalMarkers";
 import { useAppContext } from "../AppContext";
 import { parseParameterString } from "../script-runner/ParameterParser";
@@ -73,6 +79,8 @@ export const StateContainer = memo(
     const [version, setVersion] = useState(0);
     const routingParams = useRoutingParams();
     const memoedVars = useRef<MemoedVars>(new Map());
+    const appContext = useAppContext();
+    const xsVerbose = appContext.appGlobals?.xsVerbose === true;
 
     /**
      * STATE COMPOSITION PIPELINE
@@ -206,10 +214,12 @@ export const StateContainer = memo(
     );
     const parsedScriptPart = node.scriptCollected;
     if (parsedScriptPart?.moduleErrors && !isEmpty(parsedScriptPart.moduleErrors)) {
+      console.error("Module errors in StateContainer:", parsedScriptPart.moduleErrors);
       throw new CodeBehindParseError(parsedScriptPart.moduleErrors);
     }
 
     if (node.scriptError && !isEmpty(node.scriptError)) {
+      console.error("Script error in StateContainer:", node.scriptError);
       throw new CodeBehindParseError(node.scriptError);
     }
     const referenceTrackedApi = useReferenceTrackedApi(componentState);
@@ -279,6 +289,229 @@ export const StateContainer = memo(
       localVarsStateContextWithPreResolvedLocalVars,
       memoedVars, // Persistent cache for performance
     );
+
+    // Track declared variable changes for inspector
+    const prevVarsRef = useRef<Record<string, any> | null>(null);
+    const initLoggedWithFileRef = useRef<boolean>(false); // Track if we've logged init with file info
+    const pendingInitRef = useRef<Record<string, any> | null>(null); // Store pending init values
+    useEffect(() => {
+      if (!xsVerbose || typeof window === "undefined") return;
+
+      const w = window as any;
+      w._xsLogs = Array.isArray(w._xsLogs) ? w._xsLogs : [];
+
+      // Check both direct debug property and props.debug (the former is set by parser, latter by wrappers)
+      const sourceInfo = (node as any).debug?.source || (node.props as any)?.debug?.source;
+
+      // Try to find the source file from debug info or by matching component name
+      let resolvedFileId = sourceInfo?.fileId;
+      let resolvedFilePath: string | undefined;
+
+      // If we have a numeric fileId, resolve it from _xsSourceFiles
+      if (typeof resolvedFileId === "number" && w._xsSourceFiles) {
+        resolvedFilePath = w._xsSourceFiles[resolvedFileId];
+      } else if (typeof resolvedFileId === "string") {
+        resolvedFilePath = resolvedFileId;
+      }
+
+      // If no file found yet, try to match based on component uid or containerUid
+      if (!resolvedFilePath && w._xsSourceFiles && Array.isArray(w._xsSourceFiles)) {
+        const containerUidStr = node.containerUid?.description;
+        const searchName = node.uid || containerUidStr;
+        // Also try the node type if it's not "Container"
+        const typeName = node.type !== "Container" ? node.type : undefined;
+
+        // Build search terms with variations
+        const searchTerms: string[] = [];
+        if (searchName) {
+          searchTerms.push(searchName);
+          // For containerUid like "fileCatalogContent", also try "fileCatalog" (remove common suffixes)
+          const stripped = searchName.replace(/(Content|Modal|View|Container|Panel)$/i, "");
+          if (stripped !== searchName) searchTerms.push(stripped);
+        }
+        if (typeName) searchTerms.push(typeName);
+
+        for (const term of searchTerms) {
+          if (!term) continue;
+          const termLower = term.toLowerCase();
+          // Look for a file that contains this component name (case-insensitive)
+          resolvedFilePath = w._xsSourceFiles.find((f: string) => {
+            const fLower = f.toLowerCase();
+            // Extract just the filename without path and extension
+            const fileName = fLower.split("/").pop()?.replace(".xmlui", "") || "";
+            // Match if filename contains term, or term contains filename
+            return fileName.includes(termLower) || termLower.includes(fileName);
+          });
+          if (resolvedFilePath) break;
+        }
+      }
+
+      // Build a meaningful component identifier from available info
+      const fileName = resolvedFilePath ? resolvedFilePath.split("/").pop()?.replace(".xmlui", "") : undefined;
+      // Prefer meaningful identifiers: uid > filename > containerUid, avoid generic "Container"
+      const componentId = node.uid || fileName || node.containerUid?.description ||
+        (node.type !== "Container" ? node.type : undefined) || undefined;
+
+      // Get only user-declared VARS (not functions), filtering out framework-injected ones
+      const frameworkVars = new Set([
+        "$props", "emitEvent", "hasEventHandler", "updateState",
+        "$item", "$itemIndex", "$this", "$parent",
+      ]);
+      // Only track vars, not functions - combine inline vars and script-collected vars
+      const varsOnly = { ...(node.vars || {}), ...(node.scriptCollected?.vars || {}) };
+      const declaredVarKeys = Object.keys(varsOnly).filter(
+        (key) => !frameworkVars.has(key) && !key.startsWith("$")
+      );
+      if (declaredVarKeys.length === 0) {
+        prevVarsRef.current = {};
+        return;
+      }
+
+
+      const currentVars: Record<string, any> = {};
+      for (const key of declaredVarKeys) {
+        currentVars[key] = resolvedLocalVars[key];
+      }
+
+      const prevVars = prevVarsRef.current;
+      const isInitial = prevVars === null;
+      const hasSourceFiles = w._xsSourceFiles && Array.isArray(w._xsSourceFiles) && w._xsSourceFiles.length > 0;
+
+      const changes: Array<{ key: string; before: any; after: any; kind: "init" | "change" }> = [];
+
+      if (isInitial) {
+        // Initial mount - if source files aren't available yet, defer the init logging
+        if (!hasSourceFiles) {
+          // Store the init values to log later when source files become available
+          pendingInitRef.current = cloneDeep(currentVars);
+          prevVarsRef.current = cloneDeep(currentVars);
+          return; // Don't log yet, wait for source files
+        }
+        // Source files available - capture all declared vars for init (skip undefined → undefined)
+        for (const key of declaredVarKeys) {
+          const afterVal = currentVars[key];
+          if (afterVal !== undefined) {
+            changes.push({
+              key,
+              before: undefined,
+              after: afterVal,
+              kind: "init",
+            });
+          }
+        }
+      } else {
+        // Check if we have a pending init to log now that source files are available
+        if (pendingInitRef.current && !initLoggedWithFileRef.current && hasSourceFiles) {
+          // Log the deferred init event with file info (skip undefined → undefined)
+          const initChanges: typeof changes = [];
+          for (const key of declaredVarKeys) {
+            const afterVal = pendingInitRef.current[key];
+            if (afterVal !== undefined) {
+              initChanges.push({
+                key,
+                before: undefined,
+                after: afterVal,
+                kind: "init",
+              });
+            }
+          }
+          if (initChanges.length > 0) {
+            // Log the init event (will be handled below after we set up the logging logic)
+            const initVarNames = initChanges.map((c) => c.key).join(", ");
+            const initDisplayId = componentId || initChanges[0]?.key || "component";
+            const initFormattedChanges = initChanges.map((c) => {
+              return `${c.key}: ${simpleStringify(c.before)} → ${simpleStringify(c.after)}`;
+            });
+            const initLogEntry = {
+              ts: Date.now(),
+              perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+              traceId: getCurrentTrace() || `vars-${initDisplayId}`,
+              kind: "component:vars:init",
+              uid: initDisplayId,
+              eventName: initVarNames,
+              componentType: node.type,
+              componentLabel: componentId || undefined,
+              ownerFileId: resolvedFilePath || sourceInfo?.fileId,
+              ownerSource: sourceInfo ? { start: sourceInfo.start, end: sourceInfo.end } : undefined,
+              file: resolvedFilePath,
+              changes: initChanges.map((c) => ({ key: c.key, before: c.before, after: c.after, changeKind: c.kind })),
+              diff: initChanges.map((c) => ({
+                path: c.key, type: "add", before: c.before, after: c.after,
+                beforeJson: simpleStringify(c.before), afterJson: simpleStringify(c.after),
+                diffPretty: `${c.key}: ${simpleStringify(c.before)} → ${simpleStringify(c.after)}`,
+              })),
+              diffPretty: (resolvedFilePath ? `file: ${resolvedFilePath}\n` : "") + initFormattedChanges.join("\n"),
+            };
+            pushXsLog(initLogEntry);
+            xsConsoleLog(initLogEntry.kind, initLogEntry);
+          }
+          initLoggedWithFileRef.current = true;
+          pendingInitRef.current = null;
+        }
+
+        // Check for changes
+        for (const key of declaredVarKeys) {
+          const prev = prevVars[key];
+          const curr = currentVars[key];
+          // Deep comparison for objects/arrays
+          const prevJson = JSON.stringify(prev);
+          const currJson = JSON.stringify(curr);
+          if (prevJson !== currJson) {
+            changes.push({
+              key,
+              before: prev,
+              after: curr,
+              kind: "change",
+            });
+          }
+        }
+      }
+
+      if (changes.length > 0) {
+        const varNames = changes.map((c) => c.key).join(", ");
+        const displayId = componentId || changes[0]?.key || "component";
+        const filePath = resolvedFilePath;
+
+        const formattedChanges = changes.map((c) => {
+          return `${c.key}: ${simpleStringify(c.before)} → ${simpleStringify(c.after)}`;
+        });
+
+        const logEntry = {
+          ts: Date.now(),
+          perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+          traceId: getCurrentTrace() || `vars-${displayId}`,
+          kind: isInitial ? "component:vars:init" : "component:vars:change",
+          uid: displayId,
+          eventName: varNames,
+          componentType: node.type,
+          componentLabel: componentId || undefined,
+          ownerFileId: resolvedFilePath || sourceInfo?.fileId,
+          ownerSource: sourceInfo ? { start: sourceInfo.start, end: sourceInfo.end } : undefined,
+          file: filePath,
+          changes: changes.map((c) => ({
+            key: c.key,
+            before: c.before,
+            after: c.after,
+            changeKind: c.kind,
+          })),
+          diff: changes.map((c) => ({
+            path: c.key,
+            type: c.kind === "init" ? "add" : "update",
+            before: c.before,
+            after: c.after,
+            beforeJson: simpleStringify(c.before),
+            afterJson: simpleStringify(c.after),
+            diffPretty: `${c.key}: ${simpleStringify(c.before)} → ${simpleStringify(c.after)}`,
+          })),
+          diffPretty: (filePath ? `file: ${filePath}\n` : "") + formattedChanges.join("\n"),
+        };
+
+        pushXsLog(logEntry);
+        xsConsoleLog(logEntry.kind, logEntry);
+      }
+
+      prevVarsRef.current = cloneDeep(currentVars);
+    }, [xsVerbose, varDefinitions, resolvedLocalVars, node]);
 
     const mergedWithVars = useMergedState(resolvedLocalVars, componentStateWithApis);
     const combinedState = useCombinedState(

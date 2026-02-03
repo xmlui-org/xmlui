@@ -3,7 +3,7 @@ import { createUrlWithQueryParams } from "../../components/component-utils";
 import { createAction } from "./actions";
 
 function navigate(
-  { navigate, location }: ActionExecutionContext,
+  { navigate, location, appContext }: ActionExecutionContext,
   pathname: string | number,
   queryParams?: Record<string, any>,
 ) {
@@ -18,6 +18,23 @@ function navigate(
         queryParams,
       })
     : pathname;
+
+  // Trace navigation event (only when xsVerbose is enabled)
+  if (appContext?.appGlobals?.xsVerbose === true && typeof window !== "undefined") {
+    const w = window as any;
+    if (Array.isArray(w._xsLogs)) {
+      w._xsLogs.push({
+        ts: Date.now(),
+        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+        traceId: w._xsCurrentTrace,
+        kind: "navigate",
+        from: location.pathname,
+        to: String(to),
+        queryParams,
+      });
+    }
+  }
+
   navigate(to);
 }
 
