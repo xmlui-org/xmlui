@@ -15,12 +15,12 @@ export const NavPanelCollapseButtonMd = createMetadata({
     icon: {
       description: "Icon name for the button when the panel is expanded (collapse action).",
       valueType: "string",
-      defaultValue: "menu",
+      defaultValue: "sidebar-collapse",
     },
     iconCollapsed: {
       description: "Icon name for the button when the panel is collapsed (expand action).",
       valueType: "string",
-      defaultValue: "menu",
+      defaultValue: "sidebar-collapse",
     },
     "aria-label": {
       description: "Accessible label for the button when expanded.",
@@ -34,8 +34,8 @@ export const NavPanelCollapseButtonMd = createMetadata({
 });
 
 export function NavPanelCollapseButton({
-  icon = "menu",
-  iconCollapsed = "menu",
+  icon = "sidebar-collapse",
+  iconCollapsed = "sidebar-collapse",
   "aria-label": ariaLabel = "Collapse sidebar",
   "aria-labelCollapsed": ariaLabelCollapsed = "Expand sidebar",
 }) {
@@ -63,8 +63,8 @@ export const navPanelCollapseButtonComponentRenderer = createComponentRenderer(
   ({ node, extractValue }) => {
     return (
       <NavPanelCollapseButton
-        icon={extractValue.asOptionalString(node.props.icon, "menu")}
-        iconCollapsed={extractValue.asOptionalString(node.props.iconCollapsed, "menu")}
+        icon={extractValue.asOptionalString(node.props.icon)}
+        iconCollapsed={extractValue.asOptionalString(node.props.iconCollapsed)}
         aria-label={extractValue.asOptionalString(node.props["aria-label"], "Collapse sidebar")}
         aria-labelCollapsed={extractValue.asOptionalString(
           node.props["aria-labelCollapsed"],

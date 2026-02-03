@@ -488,7 +488,9 @@ export function App({
 
   const content = (
     <AppContainer
-      className={classnames(wrapperBaseClasses, ...config.containerClasses)}
+      className={classnames(wrapperBaseClasses, ...config.containerClasses, {
+        [styles.navPanelCollapsed]: navPanelVisible && navPanelCollapsed && config.useVerticalFullHeaderStructure,
+      })}
       style={styleWithHelpers}
       ref={shouldContainerScroll ? pageScrollRef : undefined}
       {...rest}

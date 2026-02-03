@@ -131,6 +131,7 @@ import TableInsertColumnIcon from "./Icon/TableInsertColumnIcon";
 import TableDeleteColumnIcon from "./Icon/TableDeleteColumnIcon";
 import { ChevronsRightIcon } from "./Icon/ChevronsRight";
 import { ChevronsLeftIcon } from "./Icon/ChevronsLeft";
+import { SidebarCollapseIcon } from "./Icon/SidebarCollapseIcon";
 
 type IconRenderer<T extends IconBaseProps> = (
   props: T,
@@ -299,6 +300,7 @@ registerIconRenderer("trending-level", (props: IconBaseProps) => <TrendingLevelI
 registerIconRenderer("sortasc", (props: IconBaseProps) => <SortAscendingIcon {...props} />);
 registerIconRenderer("sortdesc", (props: IconBaseProps) => <SortDescendingIcon {...props} />);
 registerIconRenderer("nosort", (props: IconBaseProps) => <NoSortIcon {...props} />);
+registerIconRenderer("sidebar-collapse", (props: IconBaseProps) => <SidebarCollapseIcon {...props} />);
 
 registerIconRenderer("admonition_info", (props: IconBaseProps) => (
   <AdmonitionInfoIcon {...props} />

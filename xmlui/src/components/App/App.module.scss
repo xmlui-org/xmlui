@@ -408,6 +408,15 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     min-height: 100%;
     display: flex;
     flex-direction: column;
+    transition: max-width 0.2s ease;
+
+    // When nav panel is collapsed, content grows by the freed width
+    .navPanelCollapsed & {
+      max-width: calc(
+        #{$maxWidth-content-App} + (#{$width-navPanel-App} - #{$width-navPanel-collapsed-App})
+      );
+    }
+
     &.withDefaultContentPadding {
       padding-left: t.$space-4;
       padding-right: t.$space-4;
