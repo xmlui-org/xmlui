@@ -16,7 +16,11 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("textbox")).toHaveValue("initial value");
   });
 
-  test("TextBox type='password' binds to Form data", async ({ initTestBed, page, createTextBoxDriver }) => {
+  test("TextBox type='password' binds to Form data", async ({
+    initTestBed,
+    page,
+    createTextBoxDriver,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Form onSubmit="data => testState = data">
         <PasswordInput testId="password" bindTo="secret" />
@@ -275,7 +279,7 @@ test.describe("Basic Functionality", () => {
     createFileInputDriver,
   }) => {
     const { testStateDriver } = await initTestBed(`
-      <Form onSubmit="data => testState = data">
+      <Form onSubmit="data => { testState = data; }">
         <FileInput testId="fileInput" bindTo="files" parseAs="csv" />
       </Form>
     `);
@@ -289,10 +293,32 @@ test.describe("Basic Functionality", () => {
 
     await page.getByRole("button", { name: "Save" }).click();
     await expect.poll(testStateDriver.testState).toEqual({
-      files: [
-        { name: "Widget", price: "10" },
-        { name: "Gadget", price: "20" },
-      ],
+      files: {
+        files: [
+          {
+            path: "./sample.csv",
+            relativePath: "./sample.csv",
+          },
+        ],
+        parsedData: [
+          {
+            file: {
+              path: "./sample.csv",
+              relativePath: "./sample.csv",
+            },
+            data: [
+              {
+                name: "Widget",
+                price: "10",
+              },
+              {
+                name: "Gadget",
+                price: "20",
+              },
+            ],
+          },
+        ],
+      },
     });
   });
 });
@@ -315,7 +341,7 @@ test.describe("Behavior Context", () => {
     await expect(page.getByRole("textbox")).toBeVisible();
     await expect(page.getByRole("textbox")).toHaveValue("test");
 
-    await page.getByRole("button", { name: "Save" }).click({delay: 100});
+    await page.getByRole("button", { name: "Save" }).click({ delay: 100 });
 
     // Empty object since there's no bindTo
     await expect.poll(testStateDriver.testState).toEqual({});
@@ -372,10 +398,7 @@ test.describe("Validation", () => {
   // EXECUTION: When does validation run?
   // =============================================================================
 
-  test("sync validation executes on initial mount", async ({
-    initTestBed,
-    page,
-  }) => {
+  test("sync validation executes on initial mount", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form>
         <TextBox bindTo="firstName" required="true" />
@@ -387,10 +410,7 @@ test.describe("Validation", () => {
     await expect(wrapper).toHaveAttribute("data-validations-evaluated", "1");
   });
 
-  test("async validation executes on initial mount", async ({
-    initTestBed,
-    page,
-  }) => {
+  test("async validation executes on initial mount", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Form>
         <TextBox bindTo="firstName" onValidate="() => testState = true" />
@@ -404,10 +424,7 @@ test.describe("Validation", () => {
     await expect(wrapper).toHaveAttribute("data-validations-evaluated", "1");
   });
 
-  test("async validation reruns on input change", async ({
-    initTestBed,
-    page,
-  }) => {
+  test("async validation reruns on input change", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Form>
         <TextBox 
@@ -496,7 +513,9 @@ test.describe("Validation", () => {
     await expect.poll(testStateDriver.testState).toMatchObject({ count: 1 });
 
     // Type rapidly - validation should be throttled (leading: true, trailing: true)
-    await input.pressSequentially("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", { delay: 10 });
+    await input.pressSequentially("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", {
+      delay: 10,
+    });
 
     // First character triggers immediate validation (leading edge)
     await expect.poll(testStateDriver.testState).toMatchObject({ count: 2 });
@@ -719,13 +738,13 @@ test.describe("Validation", () => {
     await expect(wrapper).toHaveAttribute("data-validation-partial", "false");
   });
 
-  test.fixme("partial should be set if no sync validation is defined",
-    SKIP_REASON.XMLUI_BUG("partial is not set, so the data attribute does not get updated -> investigate"),
-    async ({
-    initTestBed,
-    page,
-  }) => {
-    await initTestBed(`
+  test.fixme(
+    "partial should be set if no sync validation is defined",
+    SKIP_REASON.XMLUI_BUG(
+      "partial is not set, so the data attribute does not get updated -> investigate",
+    ),
+    async ({ initTestBed, page }) => {
+      await initTestBed(`
       <Form>
         <TextBox 
           bindTo="firstName"
@@ -738,16 +757,17 @@ test.describe("Validation", () => {
       </Form>
     `);
 
-    const input = page.getByRole("textbox");
-    const wrapper = page.locator("[data-validation-status]").first();
+      const input = page.getByRole("textbox");
+      const wrapper = page.locator("[data-validation-status]").first();
 
-    await input.fill("ABC");
-    await expect(wrapper).toHaveAttribute("data-validation-partial", "true");
+      await input.fill("ABC");
+      await expect(wrapper).toHaveAttribute("data-validation-partial", "true");
 
-    await page.waitForTimeout(100);
+      await page.waitForTimeout(100);
 
-    await expect(wrapper).toHaveAttribute("data-validation-partial", "false");
-  });
+      await expect(wrapper).toHaveAttribute("data-validation-partial", "false");
+    },
+  );
 
   test("partial flag set correctly during async validation", async ({ initTestBed, page }) => {
     await initTestBed(`
