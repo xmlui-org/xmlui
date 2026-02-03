@@ -29,6 +29,13 @@
         scrollStyle="whenScrolling"
         showScrollerFade="true"
     >
+        <property name="footerTemplate">
+            <HStack verticalAlignment="center" gap="$space-2">
+                <ToneChangerButton />
+                <SpaceFiller />
+                <NavPanelCollapseButton />
+            </HStack>
+        </property>
         <Stack
             paddingHorizontal="$space-4"
             paddingBottom="$space-4"

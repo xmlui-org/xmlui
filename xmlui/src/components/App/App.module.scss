@@ -8,6 +8,7 @@ $themeVars: ();
 }
 
 $width-navPanel-App: createThemeVar("width-navPanel-App");
+$width-navPanel-collapsed-App: createThemeVar("width-navPanel-collapsed-App");
 $backgroundColor-navPanel-App: createThemeVar("backgroundColor-navPanel-App");
 $boxShadow-header-App: createThemeVar("boxShadow-header-App");
 $boxShadow-navPanel-App: createThemeVar("boxShadow-navPanel-App");
@@ -65,6 +66,12 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       .navPanelWrapper {
         width: $width-navPanel-App;
         flex-shrink: 0;
+
+        &.navPanelWrapperCollapsed {
+          width: $width-navPanel-collapsed-App;
+          min-width: $width-navPanel-collapsed-App;
+          overflow: hidden;
+        }
       }
 
       .footerWrapper {
@@ -205,6 +212,13 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
           width: 50vw;
           z-index: -1;
           background-color: $backgroundColor-navPanel-App;
+        }
+
+        // Collapsed state: narrow strip so main content can use the space
+        &.navPanelWrapperCollapsed {
+          width: $width-navPanel-collapsed-App;
+          min-width: $width-navPanel-collapsed-App;
+          overflow: hidden;
         }
 
         // Hide on small screens
@@ -361,9 +375,22 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     display: flex;
     position: sticky;
     top: 0;
+    transition: width 0.2s ease;
 
     &:empty {
       display: none;
+    }
+
+    &.navPanelWrapperCollapsed {
+      width: $width-navPanel-collapsed-App;
+      min-width: $width-navPanel-collapsed-App;
+      overflow: hidden;
+
+      // Keep inner slot (and NavPanel) at expanded width so only the viewport clips; no resize during animation
+      > .navPanelWrapper {
+        width: $width-navPanel-App;
+        min-width: $width-navPanel-App;
+      }
     }
   }
 

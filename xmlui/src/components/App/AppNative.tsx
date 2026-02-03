@@ -294,6 +294,14 @@ export function App({
     safeLayout,
   );
 
+  const [navPanelCollapsed, setNavPanelCollapsedState] = useState(false);
+  const setNavPanelCollapsed = useCallback((collapsed: boolean) => {
+    setNavPanelCollapsedState(collapsed);
+  }, []);
+  const toggleNavPanelCollapsed = useCallback(() => {
+    setNavPanelCollapsedState((prev) => !prev);
+  }, []);
+
   useIsomorphicLayoutEffect(() => {
     if (window.history.scrollRestoration !== "manual") {
       window.history.scrollRestoration = "manual";
@@ -374,6 +382,9 @@ export function App({
     hasRegisteredNavPanel,
     hasRegisteredHeader,
     navPanelVisible,
+    navPanelCollapsed,
+    setNavPanelCollapsed,
+    toggleNavPanelCollapsed,
     drawerVisible,
     showDrawer,
     hideDrawer,
@@ -487,7 +498,11 @@ export function App({
           {renderHeaderSlot()}
           <div className={styles.mainContentRow}>
             {navPanelVisible && (
-              <aside className={styles.navPanelWrapper}>
+              <aside
+                className={classnames(styles.navPanelWrapper, {
+                  [styles.navPanelWrapperCollapsed]: navPanelCollapsed,
+                })}
+              >
                 <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>
               </aside>
             )}
@@ -779,6 +794,9 @@ function useAppLayoutContextValue({
   hasRegisteredNavPanel,
   hasRegisteredHeader,
   navPanelVisible,
+  navPanelCollapsed,
+  setNavPanelCollapsed,
+  toggleNavPanelCollapsed,
   drawerVisible,
   showDrawer,
   hideDrawer,
@@ -798,6 +816,9 @@ function useAppLayoutContextValue({
   hasRegisteredNavPanel: boolean;
   hasRegisteredHeader: boolean;
   navPanelVisible: boolean;
+  navPanelCollapsed: boolean;
+  setNavPanelCollapsed: (collapsed: boolean) => void;
+  toggleNavPanelCollapsed: () => void;
   drawerVisible: boolean;
   showDrawer: () => void;
   hideDrawer: () => void;
@@ -819,6 +840,9 @@ function useAppLayoutContextValue({
       hasRegisteredNavPanel,
       hasRegisteredHeader,
       navPanelVisible,
+      navPanelCollapsed,
+      setNavPanelCollapsed,
+      toggleNavPanelCollapsed,
       drawerVisible,
       layout,
       logo,
@@ -840,6 +864,9 @@ function useAppLayoutContextValue({
       hasRegisteredNavPanel,
       hasRegisteredHeader,
       navPanelVisible,
+      navPanelCollapsed,
+      setNavPanelCollapsed,
+      toggleNavPanelCollapsed,
       drawerVisible,
       layout,
       logo,
