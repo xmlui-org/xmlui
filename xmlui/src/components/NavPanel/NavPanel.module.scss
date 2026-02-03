@@ -35,6 +35,21 @@ $themeVars: t.appendThemeVarWithDefault($themeVars, "borderColor-footer-#{$compo
 $borderColor-footer-NavPanel: createThemeVar("borderColor-footer-#{$component}");
 $themeVars: t.composePaddingVars($themeVars, "footer-#{$component}") !global;
 
+// Összecsukás és footer fade egyszerre: 0–50% kifagy, 50–100% visszajön (csak .collapsed, nincs JS)
+:global {
+  @keyframes navPanelFooterFadeOutThenIn {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+}
+
 @layer components {
   .wrapper {
     --footer-height: 0;     //temp solution, it's because of callbackDrive, settings stickyBox to the bottom (we'll have to introduce a smarter stickyBox)
@@ -128,6 +143,11 @@ $themeVars: t.composePaddingVars($themeVars, "footer-#{$component}") !global;
     @include t.paddingVars($themeVars, "footer-#{$component}");
     border-top: 1px solid $borderColor-footer-NavPanel;
     background-color: $backgroundColor-NavPanel;
+  }
+
+  // Footer: collapse-kor egyszerre fut a sidebar és a fade (0.4s: 0–0.2s kifagy, 0.2–0.4s vissza)
+  .wrapper.collapsed .footer {
+    animation: navPanelFooterFadeOutThenIn 0.4s ease forwards;
   }
 
   .wrapper.collapsed {
