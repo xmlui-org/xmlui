@@ -229,8 +229,10 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
   };
 
   const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+    if (!to) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setExpanded((prev) => !prev);
   };
 
