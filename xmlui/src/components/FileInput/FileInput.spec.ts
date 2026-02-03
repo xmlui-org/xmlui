@@ -420,7 +420,7 @@ test.describe("Parsing", () => {
 
   test("parses csv and emits row data", async ({ initTestBed, createFileInputDriver }) => {
     const { testStateDriver } = await initTestBed(`
-      <FileInput parseAs="csv" onDidChange="data => testState = data.length" />
+      <FileInput parseAs="csv" onDidChange="result => testState = result.parsedData[0].data.length" />
     `);
     const driver = await createFileInputDriver();
     // Upload a CSV file through the hidden input; onDidChange emits parsed rows.
@@ -436,7 +436,7 @@ test.describe("Parsing", () => {
 
   test("parses json object as array", async ({ initTestBed, createFileInputDriver }) => {
     const { testStateDriver } = await initTestBed(`
-      <FileInput parseAs="json" onDidChange="data => testState = data.length" />
+      <FileInput parseAs="json" onDidChange="result => testState = result.parsedData[0].data.length" />
     `);
     const driver = await createFileInputDriver();
     // Single JSON object is normalized into an array.
@@ -455,7 +455,7 @@ test.describe("Parsing", () => {
       <FileInput
         parseAs="csv"
         multiple="true"
-        onDidChange="results => testState = results.length"
+        onDidChange="result => testState = result.parsedData.length"
       />
     `);
     const driver = await createFileInputDriver();
@@ -494,7 +494,7 @@ test.describe("Parsing", () => {
 
   test("parses json array correctly", async ({ initTestBed, createFileInputDriver }) => {
     const { testStateDriver } = await initTestBed(`
-      <FileInput parseAs="json" onDidChange="data => testState = data.length" />
+      <FileInput parseAs="json" onDidChange="result => testState = result.parsedData[0].data.length" />
     `);
     const driver = await createFileInputDriver();
     // JSON array should be passed through as-is.
@@ -512,7 +512,7 @@ test.describe("Parsing", () => {
       <FileInput
         parseAs="csv"
         csvOptions="{{ delimiter: ';' }}"
-        onDidChange="data => testState = data.length"
+        onDidChange="result => testState = result.parsedData[0].data.length"
       />
     `);
     const driver = await createFileInputDriver();
@@ -531,7 +531,7 @@ test.describe("Parsing", () => {
       <FileInput
         parseAs="csv"
         csvOptions="{{ dynamicTyping: true }}"
-        onDidChange="data => testState = typeof data[0].price"
+        onDidChange="result => testState = typeof result.parsedData[0].data[0].price"
       />
     `);
     const driver = await createFileInputDriver();
@@ -550,7 +550,7 @@ test.describe("Parsing", () => {
       <FileInput
         parseAs="csv"
         csvOptions="{{ header: false }}"
-        onDidChange="data => testState = data.length"
+        onDidChange="result => testState = result.parsedData[0].data.length"
       />
     `);
     const driver = await createFileInputDriver();
@@ -568,7 +568,7 @@ test.describe("Parsing", () => {
     const { testStateDriver } = await initTestBed(`
       <FileInput
         parseAs="csv"
-        onDidChange="data => testState = { name: data[0].name, price: data[0].price }"
+        onDidChange="result => testState = { name: result.parsedData[0].data[0].name, price: result.parsedData[0].data[0].price }"
       />
     `);
     const driver = await createFileInputDriver();
@@ -591,7 +591,7 @@ test.describe("Parsing", () => {
     const { testStateDriver } = await initTestBed(`
       <FileInput
         parseAs="json"
-        onDidChange="data => testState = data[0]"
+        onDidChange="result => testState = result.parsedData[0].data[0]"
       />
     `);
     const driver = await createFileInputDriver();
@@ -612,7 +612,7 @@ test.describe("Parsing", () => {
 
   test("handles empty csv file", async ({ initTestBed, createFileInputDriver }) => {
     const { testStateDriver } = await initTestBed(`
-      <FileInput parseAs="csv" onDidChange="data => testState = data.length" />
+      <FileInput parseAs="csv" onDidChange="result => testState = result.parsedData[0].data.length" />
     `);
     const driver = await createFileInputDriver();
     await driver.getHiddenInput().setInputFiles({
@@ -626,17 +626,17 @@ test.describe("Parsing", () => {
 
   test("handles empty json file", async ({ initTestBed, createFileInputDriver }) => {
     const { testStateDriver } = await initTestBed(`
-      <FileInput parseAs="json" onParseError="testState = 'error'" />
+      <FileInput parseAs="json" onDidChange="result => testState = result.parsedData[0].data.length" />
     `);
     const driver = await createFileInputDriver();
-    // Empty JSON should trigger parse error.
+    // Empty JSON is handled gracefully and returns empty array.
     await driver.getHiddenInput().setInputFiles({
       name: "empty.json",
       mimeType: "application/json",
       buffer: Buffer.from(""),
     });
 
-    await expect.poll(testStateDriver.testState).toEqual("error");
+    await expect.poll(testStateDriver.testState).toEqual(0);
   });
 
   test("can override acceptsFileType when parseAs is set", async ({ initTestBed, createFileInputDriver }) => {
@@ -651,10 +651,10 @@ test.describe("Parsing", () => {
       <FileInput
         parseAs="csv"
         multiple="true"
-        onDidChange="results => testState = {
-          hasFile: !!results[0].file,
-          hasData: Array.isArray(results[0].data),
-          fileName: results[0].file.name
+        onDidChange="result => testState = {
+          hasFile: !!result.parsedData[0].file,
+          hasData: Array.isArray(result.parsedData[0].data),
+          fileName: result.parsedData[0].file.name
         }"
       />
     `);
@@ -705,10 +705,10 @@ test.describe("Parsing", () => {
       <FileInput
         parseAs="json"
         multiple="true"
-        onDidChange="results => testState = {
-          total: results.length,
-          errors: results.filter(r => r.error).length,
-          success: results.filter(r => !r.error).length
+        onDidChange="result => testState = {
+          total: result.parsedData.length,
+          errors: result.parsedData.filter(r => r.error).length,
+          success: result.parsedData.filter(r => !r.error).length
         }"
       />
     `);
