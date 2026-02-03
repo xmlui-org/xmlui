@@ -7,8 +7,8 @@ $themeVars: ();
 }
 
 $component: "TableOfContents";
-$backgroundColor-TableOfContents: createThemeVar("backgroundColor-#{$component}");
 $width-TableOfContents: createThemeVar("width-#{$component}");
+$backgroundColor-TableOfContents: createThemeVar("backgroundColor-#{$component}");
 $height-TableOfContents: createThemeVar("height-#{$component}");
 $themeVars: t.composeBorderVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, $component);
@@ -32,7 +32,6 @@ $themeVars: t.composeTextVars($themeVars, "#{$componentItem}-level-5");
 $themeVars: t.composePaddingVars($themeVars, "#{$componentItem}-level-6");
 $themeVars: t.composeTextVars($themeVars, "#{$componentItem}-level-6");
 
-// Variables for @layer section
 $marginTop-TableOfContents: createThemeVar("marginTop-#{$component}");
 $marginBottom-TableOfContents: createThemeVar("marginBottom-#{$component}");
 $textColor-TableOfContentsItem: createThemeVar("textColor-#{$componentItem}");
@@ -59,27 +58,37 @@ $width-indicator-TableOfContents: createThemeVar("width-indicator-#{$component}"
 $color-indicator-TableOfContents--active: createThemeVar("color-indicator-#{$component}--active");
 
 @layer components {
-  .nav {
-    border-width: createThemeVar("borderWidth-#{$component}");
-    border-color: createThemeVar("borderColor-#{$component}");
-    border-style: createThemeVar("borderStyle-#{$component}");
+  .wrapper {
+    height: $height-TableOfContents;
+    max-height: calc(
+      100dvh
+      - var(--header-abs-height, 0px)
+      - var(--footer-abs-height, 0px)
+      - var(--page-wrapper-padding-top, 0px)
+      - var(--page-wrapper-padding-bottom, 0px)
+      - 2px
+    );
+    min-height: 0;
+    width: $width-TableOfContents;
+    min-width: 250px;
+    flex-shrink: 0;
+    position: sticky;
+    top: calc(var(--header-height, 0px) + var(--page-wrapper-padding-top, 0px));
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    scrollbar-width: thin;
     @include t.borderVars($themeVars, $component);
     @include t.paddingVars($themeVars, $component);
     background-color: $backgroundColor-TableOfContents;
-    min-width: 250px;
-    align-self: flex-start;
-    width: $width-TableOfContents;
-    height: $height-TableOfContents;
-    max-height: calc(100vh - var(--header-abs-height) - var(--footer-abs-height));
-    overflow-y: auto;
-    overflow-x: hidden;
-    z-index: 99;
-    top: var(--header-height);
-    position: sticky;
-    scrollbar-width: thin;
-    // --- Do not collapse these padding properties; they are intentionally expanded
     margin-top: $marginTop-TableOfContents;
     margin-bottom: $marginBottom-TableOfContents;
+
+    .wrapperInner {
+      display: flex;
+      flex-direction: column;
+    }
 
     .list {
       margin: 0;
@@ -93,9 +102,9 @@ $color-indicator-TableOfContents--active: createThemeVar("color-indicator-#{$com
         .link {
           display: block;
           overflow-wrap: break-word;
-          color: $textColor-TableOfContentsItem;
           @include t.paddingVars($themeVars, $componentItem);
           @include t.textVars($themeVars, $componentItem);
+          color: $textColor-TableOfContentsItem;
 
           &[data-level="1"] {
             @include t.paddingVars($themeVars, "#{$componentItem}-level-1");
