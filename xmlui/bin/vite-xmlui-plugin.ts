@@ -41,14 +41,14 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
 
       if (xmluiExtension.test(id)) {
         const fileId = "" + itemIndex++;
-        
+
         // --- Extract script content from XMLUI markup
         const scriptMatch = code.match(/<script>([\s\S]*?)<\/script>/);
         let codeBehind;
-        
+
         if (scriptMatch && scriptMatch[1]) {
           const scriptContent = scriptMatch[1];
-          
+
           // --- Create a module fetcher for import support
           const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
             // The modulePath parameter is the RESOLVED absolute path
@@ -65,7 +65,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
             clearParsedModulesCache();
             ModuleResolver.clearCache();
             ModuleResolver.resetImportStack();
-            
+
             codeBehind = await collectCodeBehindFromSourceWithImports(
               moduleNameResolver(id),
               scriptContent,
@@ -76,7 +76,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
             console.error('[vite-xmlui-plugin] Error collecting imports:', e);
           }
         }
-        
+
         let { component, errors, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
           code,
           fileId,

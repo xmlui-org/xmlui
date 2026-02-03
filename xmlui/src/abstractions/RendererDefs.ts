@@ -13,6 +13,17 @@ import type { LookupActionOptions, LookupAsyncFn, LookupSyncFn } from "./ActionD
 import type { AsyncFunction } from "./FunctionDefs";
 import type { ComponentApi } from "./ApiDefs";
 
+// Interaction detail for logging user interactions
+export interface InteractionDetail {
+  [key: string]: any;
+}
+
+// Function signature for logging user interactions (for inspector/debugging)
+export type LogInteractionFn = (
+  interaction: string,
+  detail?: InteractionDetail
+) => void;
+
 // This interface defines the renderer context for the exposed components of the
 // XMLUI framework.
 export interface RendererContext<TMd extends ComponentMetadata = ComponentMetadata>
@@ -42,6 +53,9 @@ export interface RendererContext<TMd extends ComponentMetadata = ComponentMetada
   lookupSyncCallback: LookupSyncFn;
 
   className?: string;
+
+  // Log a user interaction for inspector/debugging (no-op when xsVerbose is false)
+  logInteraction: LogInteractionFn;
 }
 
 export type UpdateStateFn = (componentState: any, options?: any) => void; // This function updates the state of a component.

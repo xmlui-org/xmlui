@@ -163,8 +163,10 @@ function StandaloneApp({
 
   // --- Components can be decorated with test IDs used in end-to-end tests.
   // --- This flag checks the environment if the app runs in E2E test mode.
+  // --- Also enable when xsVerbose is true (for inspector support).
   const shouldDecorateWithTestId =
     decorateComponentsWithTestId ||
+    appGlobals?.xsVerbose === true ||
     // @ts-ignore
     (typeof window !== "undefined" ? window.XMLUI_MOCK_TEST_ID : false);
 
@@ -234,34 +236,40 @@ async function parseComponentMarkupResponse(response: Response): Promise<ParsedR
   const code = await response.text();
   const fileId = response.url;
   
-  // --- Collect code-behind with import support
-  let codeBehind: CollectedDeclarations | undefined;
-  try {
-    const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
-      const resolvedPath = ModuleResolver.resolvePath(modulePath, response.url);
-      const moduleResponse = await fetchWithoutCache(resolvedPath);
-      if (!moduleResponse.ok) {
-        throw new Error(`Failed to fetch module: ${resolvedPath}`);
-      }
-      return await moduleResponse.text();
-    };
+  // --- Extract script content from XMLUI markup (if present)
+  const scriptMatch = code.match(/<script>([\s\S]*?)<\/script>/);
 
-    codeBehind = await collectCodeBehindFromSourceWithImports(response.url, code, moduleFetcher);
-    
-    if (Object.keys(codeBehind.moduleErrors ?? {}).length > 0) {
-      const compName =
-        response.url.substring(
-          response.url.lastIndexOf("/") + 1,
-          response.url.length - ".xmlui".length,
-        );
-      return {
-        component: errReportModuleErrors(codeBehind.moduleErrors, fileId),
-        file: fileId,
-        hasError: true,
+  // --- Collect code-behind with import support (only if there's a script block)
+  let codeBehind: CollectedDeclarations | undefined;
+  if (scriptMatch && scriptMatch[1]) {
+    try {
+      const scriptContent = scriptMatch[1];
+      const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
+        const resolvedPath = ModuleResolver.resolvePath(modulePath, response.url);
+        const moduleResponse = await fetchWithoutCache(resolvedPath);
+        if (!moduleResponse.ok) {
+          throw new Error(`Failed to fetch module: ${resolvedPath}`);
+        }
+        return await moduleResponse.text();
       };
+
+      codeBehind = await collectCodeBehindFromSourceWithImports(response.url, scriptContent, moduleFetcher);
+
+      if (Object.keys(codeBehind.moduleErrors ?? {}).length > 0) {
+        const compName =
+          response.url.substring(
+            response.url.lastIndexOf("/") + 1,
+            response.url.length - ".xmlui".length,
+          );
+        return {
+          component: errReportModuleErrors(codeBehind.moduleErrors, fileId),
+          file: fileId,
+          hasError: true,
+        };
+      }
+    } catch (e) {
+      console.error('[parseComponentMarkupResponse] Error collecting code-behind:', e);
     }
-  } catch (e) {
-    console.error('[parseComponentMarkupResponse] Error collecting code-behind:', e);
   }
   
   let { component, errors, erroneousCompoundComponentName } = xmlUiMarkupToComponent(code, fileId, codeBehind);
@@ -427,10 +435,8 @@ function resolveRuntime(runtime: Record<string, any>): {
           entryPointCodeBehind = value.default.codeBehind;
         }
         
-        if (value.default.file) {
-          // TODO: Remove this prop
-          sources[value.default.file] = value.default.src;
-        }
+        // Use key (the actual file path from Vite glob) for consistent source lookups
+        sources[key] = value.default.src;
       }
     }
 
@@ -447,25 +453,36 @@ function resolveRuntime(runtime: Record<string, any>): {
         codeBehindsByFileName[key] = value.default;
         const componentCompilationForCodeBehind = projectCompilation.components.findLast(
           ({ filename }) => {
-            const idxOfCodeBehindFileExtension = key.lastIndexOf(codeBehindFileExtension);
-            const idxOfComponentFileExtension = filename.lastIndexOf(componentFileExtension);
+            // Compare just the base filenames without extensions
+            // This handles cases where filename is an absolute path and key is a module specifier
+            const getBaseName = (p: string) => {
+              const lastSlash = Math.max(p.lastIndexOf("/"), p.lastIndexOf("\\"));
+              return lastSlash >= 0 ? p.substring(lastSlash + 1) : p;
+            };
+            const filenameBase = getBaseName(filename);
+            const keyBase = getBaseName(key);
+            const idxOfCodeBehindFileExtension = keyBase.lastIndexOf(codeBehindFileExtension);
+            const idxOfComponentFileExtension = filenameBase.lastIndexOf(componentFileExtension);
             const extensionlessFilenamesMatch =
-              filename.substring(0, idxOfComponentFileExtension) ===
-              key.substring(0, idxOfCodeBehindFileExtension);
+              filenameBase.substring(0, idxOfComponentFileExtension) ===
+              keyBase.substring(0, idxOfCodeBehindFileExtension);
 
             return extensionlessFilenamesMatch;
           },
         );
 
-        componentCompilationForCodeBehind.codeBehindSource = value.default.src;
+        if (componentCompilationForCodeBehind) {
+          componentCompilationForCodeBehind.codeBehindSource = value.default.src;
+        }
       } else {
         // --- "default" contains the component definition, the file index,
         // --- and the source code.
         componentsByFileName[key] = value.default.component;
-        sources[value.default.file] = value.default.src;
+        sources[key] = value.default.src;
 
         const componentCompilation: ComponentCompilation = {
           definition: value.default.component,
+          // Use key (the actual file path from Vite glob) for consistent source lookups
           filename: key,
           markupSource: value.default.src,
           dependencies: new Set(),
