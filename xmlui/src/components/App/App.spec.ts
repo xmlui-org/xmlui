@@ -301,6 +301,56 @@ test.describe("Edge Cases", () => {
     await expect(page.getByText("Themed Header")).toBeVisible();
     await expect(page.getByText("Themed Footer")).toBeVisible();
   });
+
+  test("respects Fragment when='false' attribute in App children", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App>
+        <H1 testId="title">Welcome to LW Tutorial</H1>
+        <Fragment when="false">
+          <Text testId="hidden-text">Hello, LW Tutorial!</Text>
+        </Fragment>
+      </App>
+    `);
+
+    // Title should be visible
+    await expect(page.getByTestId("title")).toBeVisible();
+    await expect(page.getByText("Welcome to LW Tutorial")).toBeVisible();
+    
+    // Fragment content should NOT be visible (when="false")
+    await expect(page.getByTestId("hidden-text")).not.toBeVisible();
+    await expect(page.getByText("Hello, LW Tutorial!")).not.toBeVisible();
+  });
+
+  test("respects Fragment when='true' attribute in App children", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App>
+        <H1 testId="title">Welcome</H1>
+        <Fragment when="true">
+          <Text testId="visible-text">This should be visible</Text>
+        </Fragment>
+      </App>
+    `);
+
+    // Both should be visible
+    await expect(page.getByTestId("title")).toBeVisible();
+    await expect(page.getByTestId("visible-text")).toBeVisible();
+  });
+
+  test("respects Fragment when condition inside Theme wrapper", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App layout="desktop">
+        <Theme>
+          <AppHeader testId="header">Header</AppHeader>
+          <Fragment when="false">
+            <Footer testId="hidden-footer">This footer should not appear</Footer>
+          </Fragment>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("header")).toBeVisible();
+    await expect(page.getByTestId("hidden-footer")).not.toBeVisible();
+  });
 });
 
 // =============================================================================
