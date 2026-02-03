@@ -8,7 +8,7 @@
             <Slot when="{!$props.content && !$props.url}" />
             <DocumentLinks />
         </VStack>
-        <TableOfContents2
+        <TableOfContents
             scrollStyle="whenScrolling"
             showScrollerFade="true"
             width="$space-64"

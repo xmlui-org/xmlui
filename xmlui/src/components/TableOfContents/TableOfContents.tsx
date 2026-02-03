@@ -12,8 +12,9 @@ const COMP_CHILD = "TableOfContentsItem";
 export const TableOfContentsMd = createMetadata({
   status: "stable",
   description:
-    "`TableOfContents` component collects [Heading](/components/Heading) and " +
-    "[Bookmark](/components/Bookmark) within the current page and displays them in a navigable tree.",
+    "`TableOfContents` collects [Heading](/components/Heading) and " +
+    "[Bookmark](/components/Bookmark) within the current page and displays them in a navigable tree. " +
+    "Uses the same Scroller behavior as NavPanel (scrollStyle, showScrollerFade).",
   props: {
     smoothScrolling: {
       description:
@@ -37,12 +38,28 @@ export const TableOfContentsMd = createMetadata({
       valueType: "boolean",
       defaultValue: false,
     },
+    scrollStyle: {
+      description: `This property determines the scrollbar style. Options: "normal" uses the browser's default ` +
+        `scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the ` +
+        `scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar ` +
+        `only while scrolling is active and fades out after 400ms of inactivity.`,
+      valueType: "string",
+      availableValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
+      defaultValue: defaultProps.scrollStyle,
+    },
+    showScrollerFade: {
+      description: `When enabled, displays gradient fade indicators at the top and bottom edges when scrollable ` +
+        `content extends beyond the visible area. Only works with "overlay", "whenMouseOver", and "whenScrolling" scroll styles.`,
+      valueType: "boolean",
+      defaultValue: defaultProps.showScrollerFade,
+    },
   },
   events: {
     contextMenu: dContextMenu(COMP),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
+    [`height-${COMP}`]: "auto",
     [`padding-${COMP}`]: "$space-2",
     [`textColor-${COMP_CHILD}`]: "$color-secondary-500",
     [`textColor-${COMP_CHILD}--hover`]: "$textColor-primary",
@@ -73,7 +90,7 @@ export const TableOfContentsMd = createMetadata({
   },
 });
 
-function IndexAwareTableOfContents(props) {
+function IndexAwareTableOfContents(props: React.ComponentProps<typeof TableOfContents>) {
   const { indexing } = useIndexerContext();
   if (indexing) {
     return null;
@@ -91,6 +108,8 @@ export const tableOfContentsRenderer = createComponentRenderer(
         smoothScrolling={extractValue.asOptionalBoolean(node.props?.smoothScrolling)}
         maxHeadingLevel={extractValue.asOptionalNumber(node.props?.maxHeadingLevel)}
         omitH1={extractValue.asOptionalBoolean(node.props?.omitH1)}
+        scrollStyle={extractValue.asOptionalString(node.props?.scrollStyle, defaultProps.scrollStyle)}
+        showScrollerFade={extractValue.asOptionalBoolean(node.props?.showScrollerFade)}
         onContextMenu={lookupEventHandler("contextMenu")}
       />
     );

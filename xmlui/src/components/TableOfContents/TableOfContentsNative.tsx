@@ -14,6 +14,7 @@ import { composeRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 
 import styles from "./TableOfContents.module.scss";
+import { Scroller, type ScrollStyle } from "../ScrollViewer/Scroller";
 import { useTableOfContents } from "../../components-core/TableOfContentsContext";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { useIndicatorPosition } from "./useIndicatorPosition";
@@ -32,12 +33,16 @@ type Props = {
   maxHeadingLevel?: number;
   omitH1?: boolean;
   onContextMenu?: any;
+  scrollStyle?: ScrollStyle;
+  showScrollerFade?: boolean;
 };
 
 export const defaultProps = {
   smoothScrolling: false,
   maxHeadingLevel: 6,
   omitH1: false,
+  scrollStyle: "normal" as ScrollStyle,
+  showScrollerFade: true,
 };
 
 export const TableOfContents = forwardRef(function TableOfContents(
@@ -48,11 +53,13 @@ export const TableOfContents = forwardRef(function TableOfContents(
     omitH1 = defaultProps.omitH1,
     className,
     onContextMenu,
+    scrollStyle = defaultProps.scrollStyle,
+    showScrollerFade = defaultProps.showScrollerFade,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const tocRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const indicatorRef = useRef<HTMLDivElement>(null);
   const {
     headings,
@@ -62,7 +69,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
   } = useTableOfContents();
   const [activeAnchorId, setActiveId] = useState(initialActiveAnchorId);
 
-  const ref = forwardedRef ? composeRefs(tocRef, forwardedRef) : tocRef;
+  const ref = forwardedRef ? composeRefs(wrapperRef, forwardedRef) : wrapperRef;
 
   const filteredHeadings = useMemo(
     () =>
@@ -84,7 +91,6 @@ export const TableOfContents = forwardRef(function TableOfContents(
 
   const handleLinkClick = useCallback(
     (anchorId: string) => (event: React.MouseEvent<HTMLAnchorElement>) => {
-      // Allow cmd/ctrl+click to open in new tab via browser default behavior
       const shouldAllowDefault = event.ctrlKey || event.metaKey;
 
       if (!shouldAllowDefault) {
@@ -96,9 +102,9 @@ export const TableOfContents = forwardRef(function TableOfContents(
   );
 
   useEffect(() => {
-    if (!activeAnchorId || !tocRef.current) return;
+    if (!activeAnchorId || !wrapperRef.current) return;
 
-    const activeAnchor = tocRef.current.querySelector(
+    const activeAnchor = wrapperRef.current.querySelector(
       `[id="${CSS.escape(activeAnchorId)}"]`,
     );
     if (!activeAnchor) return;
@@ -106,43 +112,50 @@ export const TableOfContents = forwardRef(function TableOfContents(
     scrollIntoView(activeAnchor, {
       ...SCROLL_OPTIONS,
       behavior: smoothScrolling ? "smooth" : "auto",
-      boundary: tocRef.current,
+      boundary: wrapperRef.current,
     });
   }, [activeAnchorId, smoothScrolling]);
 
-  useIndicatorPosition(activeAnchorId, tocRef, indicatorRef, styles.active);
+  useIndicatorPosition(activeAnchorId, wrapperRef, indicatorRef, styles.active);
 
   return (
     <nav
       {...rest}
       aria-label="Table of Contents"
-      className={classnames(styles.nav, className)}
+      className={classnames(styles.wrapper, className)}
       ref={ref}
       style={style}
       onContextMenu={onContextMenu}
     >
       <div className={styles.indicator} ref={indicatorRef} />
-      <ul className={styles.list}>
-        {filteredHeadings.map((value) => (
-          <li
-            key={value.id}
-            className={classnames(styles.listItem, {
-              [styles.active]: value.id === activeAnchorId,
-            })}
-          >
-            <Link
-              aria-current={value.id === activeAnchorId ? "page" : "false"}
-              className={styles.link}
-              data-level={value.level}
-              to={`#${value.id}`}
-              onClick={handleLinkClick(value.id)}
-              id={value.id}
+      <Scroller
+        className={styles.wrapperInner}
+        style={style}
+        scrollStyle={scrollStyle}
+        showScrollerFade={showScrollerFade}
+      >
+        <ul className={styles.list}>
+          {filteredHeadings.map((value) => (
+            <li
+              key={value.id}
+              className={classnames(styles.listItem, {
+                [styles.active]: value.id === activeAnchorId,
+              })}
             >
-              {value.text}
-            </Link>
-          </li>
-        ))}
-      </ul>
+              <Link
+                aria-current={value.id === activeAnchorId ? "page" : "false"}
+                className={styles.link}
+                data-level={value.level}
+                to={`#${value.id}`}
+                onClick={handleLinkClick(value.id)}
+                id={value.id}
+              >
+                {value.text}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </Scroller>
     </nav>
   );
 });
