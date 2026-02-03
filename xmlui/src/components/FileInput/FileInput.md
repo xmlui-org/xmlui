@@ -109,18 +109,10 @@ This property is an optional string to set a label for the button part.
 
 Automatically parse file contents as CSV or JSON. When set, the `onDidChange` event receives an object containing both the raw files and parsed data:
 
-```typescript
-type ParseAsResult = {
-  files: File[];        // Original File objects
-  parsedData: Array<{   // Parse results for each file
-    file: File;         // Reference to the file
-    data: any[];        // Parsed data rows
-    error?: Error;      // Parse error, if any
-  }>;
-};
-```
-
-Available values: `"csv"`, `"json"`, `undefined` **(default)**
+| Key | Value |
+|:---|:---|
+| `files` | Array containing the original [File objects](https://developer.mozilla.org/en-US/docs/Web/API/File) |
+| `parsedData` | Array containing: <ul><li>`file`: Reference to the original [File object](https://developer.mozilla.org/en-US/docs/Web/API/File)</li><li>`data`: The parsed data rows</li><li>`error`: Parse error object, if any</li></ul> |
 
 When `parseAs` is set, `acceptsFileType` is automatically inferred (`.csv` or `.json`) unless explicitly overridden.
 
@@ -139,7 +131,7 @@ When `parseAs` is set, `acceptsFileType` is automatically inferred (`.csv` or `.
   </List>
 </App>
 ---desc
-Right-click and save: [sample-products.csv](/resources/files/sample-products.csv). Then drag it onto the input, or click Browse to select it.
+Click to save: [sample-products.csv](/resources/files/sample-products.csv). Then drag it onto the input, or click Browse to select it.
 ```
 
 ```xmlui-pg copy display name="Example: parseAs JSON"
@@ -154,7 +146,7 @@ Right-click and save: [sample-products.csv](/resources/files/sample-products.csv
   </List>
 </App>
 ---desc
-Right-click and save: [sample-products.json](/resources/files/sample-products.json). Then browse to sample-products.json.
+Click to save: [sample-products.json](/resources/files/sample-products.json). Then browse to sample-products.json.
 ```
 
 > **Note**: JSON parsing automatically converts single objects to arrays. If your JSON file contains a single object `{...}`, it will be wrapped as `[{...}]` for consistent handling.
@@ -171,7 +163,7 @@ Right-click and save: [sample-products.json](/resources/files/sample-products.js
   </List>
 </App>
 ---desc
-Right-click and save: [sample-config.json](/resources/files/sample-config.json). Then browse to sample-config.json.
+Click to save: [sample-config.json](/resources/files/sample-config.json). Then browse to sample-config.json.
 ```
 
 **Parsing Multiple Files**
@@ -238,7 +230,7 @@ Common options:
   </List>
 </App>
 ---desc
-Right-click and save: [sample-products-semicolon.csv](/resources/files/sample-products-semicolon.csv). Then browse to sample-products-semicolon.csv.
+Click to save: [sample-products-semicolon.csv](/resources/files/sample-products-semicolon.csv). Then browse to sample-products-semicolon.csv.
 ```
 
 ```xmlui-pg copy display name="Example: CSV with type conversion"
@@ -254,7 +246,7 @@ Right-click and save: [sample-products-semicolon.csv](/resources/files/sample-pr
   </List>
 </App>
 ---desc
-Right-click and save: [sample-products-typed.csv](/resources/files/sample-products-typed.csv). Then browse to sample-products-typed.csv.
+Click to save: [sample-products-typed.csv](/resources/files/sample-products-typed.csv). Then browse to sample-products-typed.csv.
 ```
 
 > **Note**: `dynamicTyping: true` is not a default. It converts string values to numbers and booleans during parsing.
@@ -273,7 +265,7 @@ Right-click and save: [sample-products-typed.csv](/resources/files/sample-produc
   </List>
 </App>
 ---desc
-Right-click and save: [sample-products-tsv.tsv](/resources/files/sample-products-tsv.tsv). Then browse to sample-products-tsv.tsv.
+Click to save: [sample-products-tsv.tsv](/resources/files/sample-products-tsv.tsv). Then browse to sample-products-tsv.tsv.
 ```
 
 ```xmlui-pg copy display name="Example: Large file with loading spinner"
@@ -296,7 +288,7 @@ Right-click and save: [sample-products-tsv.tsv](/resources/files/sample-products
   <Text value="Showing first 10 of {inventory.length} items" when="{inventory.length > 10}" />
 </App>
 ---desc
-Right-click and save: [sample-inventory.csv](/resources/files/sample-inventory.csv) (5000 rows). Then browse to sample-inventory.csv.
+Click to save: [sample-inventory.csv](/resources/files/sample-inventory.csv) (5000 rows). Then browse to sample-inventory.csv.
 ```
 
 %-PROP-END
@@ -371,7 +363,7 @@ This event is triggered when file parsing fails (when using `parseAs`). If not p
   </List>
 </App>
 ---desc
-Right-click and save: [sample-broken.csv](/resources/files/sample-broken.csv). Then browse to sample-broken.csv.
+Click to save: [sample-broken.csv](/resources/files/sample-broken.csv). Then browse to sample-broken.csv.
 ```
 
 ```xmlui-pg copy display name="Example: JSON parseError"
@@ -387,7 +379,7 @@ Right-click and save: [sample-broken.csv](/resources/files/sample-broken.csv). T
   </List>
 </App>
 ---desc
-Right-click and save: [sample-broken.json](/resources/files/sample-broken.json). Then browse to sample-broken.json.
+Click to save: [sample-broken.json](/resources/files/sample-broken.json). Then browse to sample-broken.json.
 ```
 
 %-EVENT-END
@@ -454,7 +446,7 @@ Use this property to show loading indicators while files are being parsed. See t
 
 Returns an array of column header names (available when `parseAs="csv"` and `header: true`, which is the default).
 
-Right-click and save: [sample-products.csv](/resources/files/sample-products.csv). Then browse to sample-products.csv.
+Click to save: [sample-products.csv](/resources/files/sample-products.csv). Then browse to sample-products.csv.
 
 ```xmlui-pg copy display name="Example: getFields"
 <App var.products="{[]}">
