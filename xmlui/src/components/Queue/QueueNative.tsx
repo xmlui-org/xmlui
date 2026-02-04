@@ -1,5 +1,5 @@
 import type React from "react";
-import { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useRef } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import toast from "react-hot-toast";
 import produce from "immer";
 import { isEqual } from "lodash-es";
@@ -12,7 +12,7 @@ import type {
   ValueExtractor,
 } from "../../abstractions/RendererDefs";
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
-import { usePrevious } from "../../components-core/utils/hooks";
+import { useIsomorphicLayoutEffect, usePrevious } from "../../components-core/utils/hooks";
 import { generatedId, useEvent } from "../../components-core/utils/misc";
 import { useAppContext } from "../../components-core/AppContext";
 import { MemoizedItem } from "../container-helpers";
@@ -149,7 +149,7 @@ export function Queue({
 }: Props) {
   const runningActionItemRef = useRef<Set<string>>(new Set());
   const [internalQueueState, internalDispatch] = useReducer(queueReducer, INITIAL_STATE);
-  
+
   // Use external state if provided, otherwise use internal state
   const queueState = externalQueueState ?? internalQueueState;
   const dispatch = externalDispatch ?? internalDispatch;
@@ -322,7 +322,7 @@ export function Queue({
   }, [clearAfterFinish, clearCompleted, getQueuedItems, onComplete, renderResultFeedback]);
 
   //with useEffect, it's showing the previous state for some reason, review!
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!queue.length) {
       return;
     }

@@ -1,6 +1,6 @@
 {
   "name": "xmlui",
-  "version": "0.11.34",
+  "version": "0.11.33",
   "sideEffects": false,
   "type": "module",
   "scripts": {
@@ -202,6 +202,10 @@
     "./parser": {
       "import": "./src/parsers/xmlui-parser/index.ts",
       "require": "./src/parsers/xmlui-parser/index.ts"
+    },
+    "./*.css": {
+      "import": "./dist/lib/*.css",
+      "require": "./dist/lib/*.css"
     },
     "./index.scss": {
       "import": "./src/index.scss",

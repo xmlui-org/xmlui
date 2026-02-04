@@ -38,3 +38,4 @@ jobs:
           action: "upload"
           app_location: "docs/dist"
           skip_app_build: true
+          production_branch: "main"

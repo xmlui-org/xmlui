@@ -111,6 +111,9 @@
         <Page url="/">
             <BlogOverview posts="{posts}" />
         </Page>
+        <Page url="/404">
+            <PageNotFound />
+        </Page>
         <Page url="/blog">
             <BlogOverview posts="{posts}" />
         </Page>

@@ -1,6 +1,7 @@
-import { useLayoutEffect, useRef, useState, type ReactNode, type CSSProperties } from "react";
+import { useRef, useState, type ReactNode, type CSSProperties } from "react";
 
 import styles from "./Breakout.module.scss";
+import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 
 type Props = {
   children?: ReactNode;
@@ -12,7 +13,7 @@ export const Breakout = ({ children, style, ...rest }: Props) => {
   const [breakoutStyle, setBreakoutStyle] = useState<CSSProperties>({});
   const calculatedRef = useRef(false);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const updateBreakoutStyle = () => {
       if (!ref.current) return;
 

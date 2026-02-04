@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
-import React from "react";
-import { BrowserRouter, HashRouter, MemoryRouter, ScrollRestoration } from "react-router-dom";
+import { BrowserRouter, HashRouter, MemoryRouter, useInRouterContext } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 
@@ -175,25 +174,66 @@ export const AppWrapper = ({
   );
 
   // --- Select the router type for the app
-  const Router = previewMode ? MemoryRouter : useHashBasedRouting ? HashRouter : BrowserRouter;
+  let Router = previewMode ? MemoryRouter : useHashBasedRouting ? HashRouter : BrowserRouter;
 
-  const shouldSkipClientRouter = previewMode
-    ? false
-    : typeof window === "undefined" || process.env.VITE_REMIX;
+  const alreadyInRouterContext = useInRouterContext();
+
+  // --- We should create a router if we are explicitly in preview mode (isolated)
+  // --- OR if we are NOT in an existing router context.
+  const shouldCreateRouter = previewMode || !alreadyInRouterContext;
+
+  // --- SSR Fallback: If we need to create a router but are on the server (no window),
+  // --- BrowserRouter/HashRouter will fail. We must fallback to MemoryRouter to prevent crashes.
+  if (shouldCreateRouter && typeof window === "undefined") {
+    Router = MemoryRouter;
+  }
+
+  // --- Prepare router props
+  const routerProps: any = {};
+
+  if (Router === MemoryRouter && typeof window === "undefined") {
+    // Server-side rendering: try to get the correct location
+    // Location will be injected on the server side as well
+
+    const serverLocation =
+      globalThis?.location?.pathname + globalThis?.location?.search + globalThis?.location?.hash;
+    if (serverLocation) {
+      routerProps.initialEntries = [serverLocation];
+    }
+    // If no location found, MemoryRouter will default to "/"
+  }
 
   return (
-      <ErrorBoundary node={node} location={"root-outer"}>
-        <QueryClientProvider client={queryClient}>
-          {/* No router in the REMIX environment */}
-          {!!shouldSkipClientRouter && dynamicChildren}
+    <ErrorBoundary node={node} location={"root-outer"}>
+      <QueryClientProvider client={queryClient}>
+        {/* If we have an existing router, render children directly */}
+        {!shouldCreateRouter && dynamicChildren}
 
-          {/* Wrap the app in a router in other cases */}
-          {!shouldSkipClientRouter && (
-            <Router basename={Router === HashRouter ? undefined : baseName}>
-              {dynamicChildren}
-            </Router>
-          )}
-        </QueryClientProvider>
-      </ErrorBoundary>
+        {/* Otherwise create our own router */}
+        {shouldCreateRouter && (
+          <Router basename={Router === HashRouter ? undefined : baseName} {...routerProps}>
+            {dynamicChildren}
+          </Router>
+        )}
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
+
+/**
+ * Attempts to get the server-side location from various sources during SSR.
+ * Returns null if no location can be determined.
+ */
+function getServerLocation(globalProps?: GlobalProps): string | null {
+  if (typeof window !== "undefined") {
+    // Client-side: this function shouldn't be called, but return null
+    return null;
+  }
+
+  // Check global variable that frameworks can set (e.g., in entry.server.tsx)
+  if (typeof global !== "undefined" && (global as any).__XMLUI_SSR_LOCATION) {
+    return (global as any).__XMLUI_SSR_LOCATION;
+  }
+
+  return null;
+}

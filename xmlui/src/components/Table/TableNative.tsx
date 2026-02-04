@@ -1,13 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import type {
   CellContext,
@@ -682,11 +674,11 @@ export const Table = forwardRef(
     const [_sortBy, _setSortBy] = useState(sortBy);
     const [_sortingDirection, _setSortingDirection] = useState(sortingDirection);
 
-    useLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
       _setSortBy(sortBy);
     }, [sortBy]);
 
-    useLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
       _setSortingDirection(sortingDirection);
     }, [sortingDirection]);
 

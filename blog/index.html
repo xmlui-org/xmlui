@@ -1,60 +1,71 @@
 <!doctype html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/resources/favicon.ico" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="alternate" type="application/rss+xml" title="XMLUI Blog" href="/feed.rss" />
-  <script>window.__PUBLIC_PATH = '/'</script>
-  <base href="/">
-  <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-S7NYYDMNPR"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-S7NYYDMNPR'); </script>	
-</head>
-
-<body>
-  <div id="root"></div>
-  <script>
-    window.getBlurb = function(md, maxLen = 200) {
-      if (!md) return '';
-      const lines = md.split('\n');
-      let blurb = '';
-      for (const line of lines) {
-        const trimmed = line.trim();
-        // Skip empty lines, headers, blockquotes, code blocks, images, admonitions, HTML tags, horizontal rules
-        if (!trimmed ||
-            trimmed.startsWith('#') ||
-            trimmed.startsWith('>') ||
-            trimmed.startsWith('```') ||
-            trimmed.startsWith('![') ||
-            trimmed.startsWith('[!') ||
-            trimmed.startsWith('<') ||
-            trimmed.startsWith('---')) continue;
-        blurb = trimmed;
-        break;
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/resources/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="alternate" type="application/rss+xml" title="XMLUI Blog" href="/feed.rss" />
+    <script>
+      globalThis.__PUBLIC_PATH = "/";
+    </script>
+    <base href="/" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-S7NYYDMNPR"></script>
+    <script>
+      globalThis.dataLayer = globalThis.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
       }
-      // Strip markdown links: [text](url) -> text
-      blurb = blurb.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
-      // Strip inline code backticks
-      blurb = blurb.replace(/`([^`]+)`/g, '$1');
-      // Strip bold/italic markers
-      blurb = blurb.replace(/\*+([^*]+)\*+/g, '$1');
-      // Find sentence boundaries and keep at least 2
-      const sentences = blurb.match(/[^.!?]*[.!?]+/g) || [blurb];
-      if (sentences.length >= 2) {
-        let result = '';
-        for (let i = 0; i < sentences.length; i++) {
-          const next = result + sentences[i];
-          // Keep at least 3 sentences, then stop if over maxLen
-          if (i >= 3 && next.length > maxLen) break;
-          result = next;
+      gtag("js", new Date());
+      gtag("config", "G-S7NYYDMNPR");
+    </script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script>
+      globalThis.getBlurb = function (md, maxLen = 200) {
+        if (!md) return "";
+        const lines = md.split("\n");
+        let blurb = "";
+        for (const line of lines) {
+          const trimmed = line.trim();
+          // Skip empty lines, headers, blockquotes, code blocks, images, admonitions, HTML tags, horizontal rules
+          if (
+            !trimmed ||
+            trimmed.startsWith("#") ||
+            trimmed.startsWith(">") ||
+            trimmed.startsWith("```") ||
+            trimmed.startsWith("![") ||
+            trimmed.startsWith("[!") ||
+            trimmed.startsWith("<") ||
+            trimmed.startsWith("---")
+          )
+            continue;
+          blurb = trimmed;
+          break;
         }
-        blurb = result.trim();
-      }
-      return blurb;
-    };
-  </script>
-  <script type="module" src="/index.ts"></script>
-
-</body>
-
+        // Strip markdown links: [text](url) -> text
+        blurb = blurb.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+        // Strip inline code backticks
+        blurb = blurb.replace(/`([^`]+)`/g, "$1");
+        // Strip bold/italic markers
+        blurb = blurb.replace(/\*+([^*]+)\*+/g, "$1");
+        // Find sentence boundaries and keep at least 2
+        const sentences = blurb.match(/[^.!?]*[.!?]+/g) || [blurb];
+        if (sentences.length >= 2) {
+          let result = "";
+          for (let i = 0; i < sentences.length; i++) {
+            const next = result + sentences[i];
+            // Keep at least 3 sentences, then stop if over maxLen
+            if (i >= 3 && next.length > maxLen) break;
+            result = next;
+          }
+          blurb = result.trim();
+        }
+        return blurb;
+      };
+    </script>
+    <script type="module" src="/index.ts"></script>
+  </body>
 </html>

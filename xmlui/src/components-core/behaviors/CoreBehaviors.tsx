@@ -5,7 +5,6 @@ import {
   useCallback,
   useEffect,
   useRef,
-  useLayoutEffect,
 } from "react";
 import {
   Animation,
@@ -25,6 +24,7 @@ import type { Behavior } from "./Behavior";
 import { badgeVariantValues } from "../../components/Badge/BadgeNative";
 import { TableOfContentsContext } from "../TableOfContentsContext";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import { useIsomorphicLayoutEffect } from "../utils/hooks";
 
 /**
  * Behavior for applying tooltips to components.
@@ -323,10 +323,7 @@ const FORM_BINDABLE_COMPONENTS = [
   "ColorPicker",
 ] as const;
 
-const FORM_VALIDATION_COMPONENTS = [
-  ...FORM_BINDABLE_COMPONENTS,
-  "FormItem",
-] as const;
+const FORM_VALIDATION_COMPONENTS = [...FORM_BINDABLE_COMPONENTS, "FormItem"] as const;
 
 /**
  * Behavior for adding bookmark functionality to any visual component.
@@ -439,7 +436,7 @@ function BookmarkWrapper({
     });
   }, [registerComponentApi, scrollIntoView]);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (observeIntersection && elementRef.current && bookmarkId && !omitFromToc) {
       return registerHeading?.({
         id: bookmarkId,
