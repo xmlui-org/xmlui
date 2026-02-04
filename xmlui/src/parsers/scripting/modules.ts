@@ -35,6 +35,7 @@ import { TokenType } from "./TokenType";
 import type { ModuleFetcher, ModuleErrors } from "./types";
 import { ModuleResolver } from "./ModuleResolver";
 import { ModuleCache } from "./ModuleCache";
+import { ModuleValidator } from "./ModuleValidator";
 
 // Re-export types for backward compatibility
 export type { ModuleErrors, ModuleWarnings } from "./types";
@@ -86,53 +87,8 @@ function validateImportedModuleStatements(
   errors: ParserErrorMessage[],
   warnings: ParserErrorMessage[],
 ): void {
-  for (const stmt of statements) {
-    // Skip imports and function declarations - these are allowed
-    if (stmt.type === T_IMPORT_DECLARATION || stmt.type === T_FUNCTION_DECLARATION) {
-      continue;
-    }
-
-    // Error: Reactive var declarations
-    if (stmt.type === T_VAR_STATEMENT) {
-      const varStmt = stmt as VarStatement;
-      const varNames = varStmt.decls.map((d) => d.id.name).join(", ");
-      errors.push({
-        code: ErrorCodes.reactiveVarInImportedModule,
-        text: errorMessages[ErrorCodes.reactiveVarInImportedModule].replace("{0}", varNames),
-        position: stmt.startToken?.startPosition ?? 0,
-        end: stmt.endToken?.endPosition ?? stmt.startToken?.endPosition ?? 0,
-        line: stmt.startToken?.startLine ?? 1,
-        column: stmt.startToken?.startColumn ?? 1,
-      });
-      continue;
-    }
-
-    // Error: const/let declarations
-    if (stmt.type === T_CONST_STATEMENT || stmt.type === T_LET_STATEMENT) {
-      const declStmt = stmt as ConstStatement | LetStatement;
-      const varNames = declStmt.decls.map((d) => d.id ?? "?").join(", ");
-      errors.push({
-        code: ErrorCodes.constLetInImportedModule,
-        text: errorMessages[ErrorCodes.constLetInImportedModule].replace("{0}", varNames),
-        position: stmt.startToken?.startPosition ?? 0,
-        end: stmt.endToken?.endPosition ?? stmt.startToken?.endPosition ?? 0,
-        line: stmt.startToken?.startLine ?? 1,
-        column: stmt.startToken?.startColumn ?? 1,
-      });
-      continue;
-    }
-
-    // Warning: Any other statement type
-    const stmtType = statementTypeNames[stmt.type] || `statement type ${stmt.type}`;
-    warnings.push({
-      code: ErrorCodes.invalidStatementInImportedModule,
-      text: errorMessages[ErrorCodes.invalidStatementInImportedModule].replace("{0}", stmtType),
-      position: stmt.startToken?.startPosition ?? 0,
-      end: stmt.endToken?.endPosition ?? stmt.startToken?.endPosition ?? 0,
-      line: stmt.startToken?.startLine ?? 1,
-      column: stmt.startToken?.startColumn ?? 1,
-    });
-  }
+  // Delegate to ModuleValidator
+  ModuleValidator.validateImportedModule(modulePath, statements, errors, warnings);
 }
 
 /**
