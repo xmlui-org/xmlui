@@ -39,14 +39,40 @@ export interface ModuleLoadOptions {
 export type ModuleLoadResult = Result<ScriptModule, ModuleErrors>;
 
 /**
- * High-level module loader that orchestrates:
- * 1. Path resolution
- * 2. Module fetching
- * 3. Parsing with validation
- * 4. Caching
- * 5. Import resolution
- * 
- * This is the primary entry point for loading XMLUI script modules.
+ * High-level module loader that orchestrates the complete module loading pipeline:
+ * 1. **Path Resolution** - Converts relative imports to absolute paths/URLs
+ * 2. **Module Fetching** - Retrieves module content from file system or network
+ * 3. **Parsing & Validation** - Parses source code into AST with validation
+ * 4. **Circular Detection** - Detects and prevents circular import chains
+ * 5. **Caching** - Stores both fetched and parsed modules for reuse
+ *
+ * This is the primary entry point for all module loading in XMLUI scripts.
+ * It provides a clean, type-safe API with `Result<T, E>` error handling.
+ *
+ * @example
+ * ```typescript
+ * // Load a module from a file path
+ * const result = await ModuleLoader.loadModule('/src/utils.js', {
+ *   fetcher: async (path) => await fs.readFile(path, 'utf-8'),
+ *   baseUrl: '/src/scripts'
+ * });
+ *
+ * if (result.ok) {
+ *   console.log('Functions:', Object.keys(result.value.functions));
+ * } else {
+ *   console.error('Parse errors:', result.error);
+ * }
+ *
+ * // Load and parse source code directly
+ * const sourceResult = await ModuleLoader.loadFromSource(
+ *   'inline-script',
+ *   `function greet() { return 'hello'; }`,
+ *   { allowImports: false }
+ * );
+ *
+ * // Clear all caches between test runs
+ * ModuleLoader.clearAllCaches();
+ * ```
  */
 export class ModuleLoader {
   /**

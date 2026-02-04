@@ -16,7 +16,6 @@ import { PARSED_MARK_PROP } from "../../abstractions/InternalMarkers";
 import type { ModuleFetcher } from "./types";
 import { clearAllModuleCaches } from "./ModuleCache";
 import { ModuleLoader } from "./ModuleLoader";
-import { isOk } from "./types";
 
 // Re-export for backward compatibility
 export { PARSED_MARK_PROP } from "../../abstractions/InternalMarkers";
@@ -85,8 +84,9 @@ export async function collectCodeBehindFromSourceWithImports(
   });
 
   // --- Handle errors
-  if (!isOk(loadResult)) {
-    return { ...result, moduleErrors: loadResult.error };
+  if (!loadResult.ok) {
+    const errorResult = loadResult as { ok: false; error: any };
+    return { ...result, moduleErrors: errorResult.error };
   }
 
   const parsedModule = loadResult.value;
@@ -100,10 +100,11 @@ export async function collectCodeBehindFromSourceWithImports(
   Object.entries(parsedModule.functions).forEach(([name, func]) => {
     if (!result.functions[name] && !collectedFunctions[name]) {
       // Convert FunctionDeclaration to CodeDeclaration format
+      const funcDecl = func as any;
       const arrow: ArrowExpression = {
         type: T_ARROW_EXPRESSION,
-        args: func.args.slice(),
-        statement: func.stmt,
+        args: funcDecl.args.slice(),
+        statement: funcDecl.stmt,
       } as ArrowExpression;
 
       const codeDecl = {

@@ -100,7 +100,7 @@ export function unwrap<T, E>(result: Result<T, E>): T {
   if (result.ok) {
     return result.value;
   }
-  throw new Error(`Failed to unwrap result: ${JSON.stringify(result.error)}`);
+  throw new Error(`Failed to unwrap result: ${JSON.stringify((result as any).error)}`);
 }
 
 /**
