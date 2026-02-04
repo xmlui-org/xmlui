@@ -119,6 +119,37 @@ function StandaloneApp({
 
   usePrintVersionNumber(standaloneApp);
 
+  // --- Display build errors from the vite-xmlui-plugin if any exist
+  useEffect(() => {
+    const buildErrors: Array<{ importingFile: string; importedModule: string; errors: any[] }> = [];
+    
+    // --- Collect module errors from all runtime items (moduleErrors is a direct property on the module)
+    Object.entries(runtime || {}).forEach(([key, module]: [string, any]) => {
+      if (module?.moduleErrors && Object.keys(module.moduleErrors).length > 0) {
+        Object.entries(module.moduleErrors).forEach(([modulePath, errors]: [string, any]) => {
+          buildErrors.push({
+            importingFile: key,
+            importedModule: modulePath,
+            errors: errors,
+          });
+        });
+      }
+    });
+
+    // --- Display collected errors in console
+    if (buildErrors.length > 0) {
+      console.group("🔴 Build Errors Found");
+      buildErrors.forEach(({ importingFile, importedModule, errors }) => {
+        console.group(`${importingFile} imports ${importedModule}`);
+        errors.forEach((err: any) => {
+          console.error(`  [${err.code}] Line ${err.line}:${err.column} - ${err.text}`);
+        });
+        console.groupEnd();
+      });
+      console.groupEnd();
+    }
+  }, [runtime]);
+
   const {
     apiInterceptor,
     name,

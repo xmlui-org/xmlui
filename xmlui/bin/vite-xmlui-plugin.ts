@@ -72,8 +72,17 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
               moduleFetcher,
             );
             removeCodeBehindTokensFromTree(codeBehind);
+
+            // --- Display any module errors or warnings found
+            if (codeBehind.moduleErrors && Object.keys(codeBehind.moduleErrors).length > 0) {
+              Object.entries(codeBehind.moduleErrors).forEach(([modulePath, errors]) => {
+                errors.forEach((err) => {
+                  this.warn(`[${modulePath}:${err.line}:${err.column}] ${err.code}: ${err.text}`);
+                });
+              });
+            }
           } catch (e) {
-            console.error('[vite-xmlui-plugin] Error collecting imports:', e);
+            this.error(`Error collecting imports: ${e}`);
           }
         }
 
@@ -88,7 +97,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         const file = {
           component,
           src: code,
-          codeBehind,
+          ...(codeBehind || {}),
           file: fileId,
         };
 
@@ -133,15 +142,33 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         );
         removeCodeBehindTokensFromTree(codeBehind);
 
-        // --- Check for module errors and throw if any exist
+        // --- Display any module errors as warnings
         if (codeBehind.moduleErrors && Object.keys(codeBehind.moduleErrors).length > 0) {
-          const errorMessages: string[] = [];
           Object.entries(codeBehind.moduleErrors).forEach(([modulePath, errors]) => {
             errors.forEach((err) => {
-              errorMessages.push(`  ${modulePath}:${err.line}:${err.column} - ${err.code}: ${err.text}`);
+              this.warn(`[${modulePath}:${err.line}:${err.column}] ${err.code}: ${err.text}`);
             });
           });
-          throw new Error(`Module parsing errors:\n${errorMessages.join('\n')}`);
+        }
+
+        // --- Check for critical module errors (not validation warnings) and throw if any exist
+        const hasCriticalErrors = codeBehind.moduleErrors && 
+          Object.entries(codeBehind.moduleErrors).some(([_, errors]) => 
+            errors.some(err => !err.code.startsWith("W04")) // W043, W044, W045 are validation warnings
+          );
+        
+        if (hasCriticalErrors) {
+          const errorMessages: string[] = [];
+          Object.entries(codeBehind.moduleErrors!).forEach(([modulePath, errors]) => {
+            errors.forEach((err) => {
+              if (!err.code.startsWith("W04")) {
+                errorMessages.push(`  ${modulePath}:${err.line}:${err.column} - ${err.code}: ${err.text}`);
+              }
+            });
+          });
+          if (errorMessages.length > 0) {
+            throw new Error(`Module parsing errors:\n${errorMessages.join('\n')}`);
+          }
         }
 
         return {
