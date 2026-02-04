@@ -28,12 +28,17 @@ import {
   type LetStatement,
   type ConstStatement,
 } from "../../components-core/script-runner/ScriptingSourceTree";
-import type { ErrorCodes, ParserErrorMessage } from "./ParserError";
+import { ErrorCodes, ParserErrorMessage } from "./ParserError";
 import { Parser } from "./Parser";
 import { errorMessages } from "./ParserError";
 import { TokenType } from "./TokenType";
-import type { ModuleFetcher } from "./ModuleResolver";
+import type { ModuleFetcher, ModuleErrors } from "./types";
 import { ModuleResolver } from "./ModuleResolver";
+import { ModuleCache } from "./ModuleCache";
+import { ModuleValidator } from "./ModuleValidator";
+
+// Re-export types for backward compatibility
+export type { ModuleErrors, ModuleWarnings } from "./types";
 
 // Mapping of statement types to human-readable names
 const statementTypeNames: Record<number, string> = {
@@ -61,16 +66,6 @@ const statementTypeNames: Record<number, string> = {
 };
 
 /**
- * Represents a module error
- */
-export type ModuleErrors = Record<string, ParserErrorMessage[]>;
-
-/**
- * Represents module warnings (non-fatal issues)
- */
-export type ModuleWarnings = Record<string, ParserErrorMessage[]>;
-
-/**
  * Checks if the result is a module error
  * @param result Result to check
  * @returns True if the result is a module error
@@ -92,53 +87,8 @@ function validateImportedModuleStatements(
   errors: ParserErrorMessage[],
   warnings: ParserErrorMessage[],
 ): void {
-  for (const stmt of statements) {
-    // Skip imports and function declarations - these are allowed
-    if (stmt.type === T_IMPORT_DECLARATION || stmt.type === T_FUNCTION_DECLARATION) {
-      continue;
-    }
-
-    // Error: Reactive var declarations
-    if (stmt.type === T_VAR_STATEMENT) {
-      const varStmt = stmt as VarStatement;
-      const varNames = varStmt.decls.map(d => d.id.name).join(", ");
-      errors.push({
-        code: "W043",
-        text: errorMessages["W043"].replace("{0}", varNames),
-        position: stmt.startToken?.startPosition ?? 0,
-        end: stmt.endToken?.endPosition ?? stmt.startToken?.endPosition ?? 0,
-        line: stmt.startToken?.startLine ?? 1,
-        column: stmt.startToken?.startColumn ?? 1,
-      });
-      continue;
-    }
-
-    // Error: const/let declarations
-    if (stmt.type === T_CONST_STATEMENT || stmt.type === T_LET_STATEMENT) {
-      const declStmt = stmt as ConstStatement | LetStatement;
-      const varNames = declStmt.decls.map(d => d.id ?? "?").join(", ");
-      errors.push({
-        code: "W044",
-        text: errorMessages["W044"].replace("{0}", varNames),
-        position: stmt.startToken?.startPosition ?? 0,
-        end: stmt.endToken?.endPosition ?? stmt.startToken?.endPosition ?? 0,
-        line: stmt.startToken?.startLine ?? 1,
-        column: stmt.startToken?.startColumn ?? 1,
-      });
-      continue;
-    }
-
-    // Warning: Any other statement type
-    const stmtType = statementTypeNames[stmt.type] || `statement type ${stmt.type}`;
-    warnings.push({
-      code: "W045",
-      text: errorMessages["W045"].replace("{0}", stmtType),
-      position: stmt.startToken?.startPosition ?? 0,
-      end: stmt.endToken?.endPosition ?? stmt.startToken?.endPosition ?? 0,
-      line: stmt.startToken?.startLine ?? 1,
-      column: stmt.startToken?.startColumn ?? 1,
-    });
-  }
+  // Delegate to ModuleValidator
+  ModuleValidator.validateImportedModule(modulePath, statements, errors, warnings);
 }
 
 /**
@@ -178,8 +128,8 @@ export function parseScriptModule(moduleName: string, source: string): ScriptMod
     if (lastToken.type !== TokenType.Eof) {
       moduleErrors[moduleName] ??= [];
       moduleErrors[moduleName].push({
-        code: "W002",
-        text: errorMessages["W002"].replace(/\{(\d+)}/g, () => lastToken.text),
+        code: ErrorCodes.unexpectedToken,
+        text: errorMessages[ErrorCodes.unexpectedToken].replace(/\{(\d+)}/g, () => lastToken.text),
         position: lastToken.startPosition,
         end: lastToken.endPosition,
         line: lastToken.startLine,
@@ -197,7 +147,7 @@ export function parseScriptModule(moduleName: string, source: string): ScriptMod
       .forEach((stmt) => {
         const func = stmt as FunctionDeclaration;
         if (functions[func.id.name]) {
-          addErrorMessage("W020", stmt, func.id.name);
+          addErrorMessage(ErrorCodes.funcAlreadyDefined, stmt, func.id.name);
           return;
         }
         functions[func.id.name] = func;
@@ -244,6 +194,7 @@ export function parseScriptModule(moduleName: string, source: string): ScriptMod
 }
 
 // Cache for parsed modules to avoid infinite recursion
+// This is kept for getParsedModulesCache() backward compatibility
 const parsedModulesCache = new Map<string, ScriptModule | Promise<ScriptModule | ModuleErrors>>();
 
 /**
@@ -253,31 +204,82 @@ const parsedModulesCache = new Map<string, ScriptModule | Promise<ScriptModule |
  * @param moduleFetcher Function to fetch module content (required for import resolution)
  * @returns The parsed and resolved module
  */
+/**
+ * Parses a script module with import support (async version - primary API)
+ * @param moduleName Name of the module
+ * @param source Source code to parse
+ * @param moduleFetcher Function to fetch module content (required for import resolution)
+ * @returns The parsed and resolved module
+ */
+export async function parseScriptModuleAsync(
+  moduleName: string,
+  source: string,
+  moduleFetcher: ModuleFetcher,
+): Promise<ScriptModule | ModuleErrors> {
+  // --- Check for circular parsing (module is currently being parsed)
+  if (ModuleCache.isCurrentlyParsing(moduleName)) {
+    // Return a circular dependency error
+    const moduleErrors: ModuleErrors = {
+      [moduleName]: [
+        {
+          code: ErrorCodes.circularImport,
+          text: `Circular import detected: module ${moduleName} imports itself`,
+          position: 0,
+          end: 0,
+          line: 1,
+          column: 1,
+        },
+      ],
+    };
+    return moduleErrors;
+  }
+
+  // --- Check if we've already parsed this module (completed)
+  if (ModuleCache.hasParsed(moduleName)) {
+    const cached = ModuleCache.getParsed(moduleName)!;
+    // Only return if it's not a promise (meaning it's completed)
+    if (!(cached instanceof Promise)) {
+      return cached;
+    }
+  }
+
+  // --- Mark as currently being parsed
+  ModuleCache.markCurrentlyParsing(moduleName);
+
+  // --- Set up the module fetcher
+  ModuleResolver.setCustomFetcher(moduleFetcher);
+
+  try {
+    // --- Parse the module
+    const parsePromise = doParseModule(moduleName, source, moduleFetcher);
+    ModuleCache.setParsed(moduleName, parsePromise);
+
+    const result = await parsePromise;
+
+    // Store the final result (not the promise)
+    if (!isModuleErrors(result)) {
+      ModuleCache.setParsed(moduleName, result);
+    } else {
+      ModuleCache.setParsed(moduleName, result as any);
+    }
+
+    return result;
+  } finally {
+    // --- Remove from currently parsing set
+    ModuleCache.unmarkCurrentlyParsing(moduleName);
+  }
+}
+
+/**
+ * Parses a script module with import support (legacy alias for backward compatibility)
+ * @deprecated Use parseScriptModuleAsync instead
+ */
 export async function parseScriptModuleWithImports(
   moduleName: string,
   source: string,
   moduleFetcher: ModuleFetcher,
 ): Promise<ScriptModule | ModuleErrors> {
-  // --- Check if we're already parsing or have parsed this module
-  if (parsedModulesCache.has(moduleName)) {
-    const cached = parsedModulesCache.get(moduleName)!;
-    // If it's a promise, wait for it; otherwise return the cached result
-    return cached instanceof Promise ? await cached : cached;
-  }
-
-  // --- Set up the module fetcher
-  ModuleResolver.setCustomFetcher(moduleFetcher);
-
-  // --- Create a promise for this module to prevent circular parsing
-  const parsePromise = doParseModule(moduleName, source, moduleFetcher);
-  parsedModulesCache.set(moduleName, parsePromise);
-
-  const result = await parsePromise;
-  
-  // Store the final result (not the promise)
-  parsedModulesCache.set(moduleName, result);
-  
-  return result;
+  return parseScriptModuleAsync(moduleName, source, moduleFetcher);
 }
 
 /**
@@ -305,8 +307,8 @@ async function doParseModule(
   if (lastToken.type !== TokenType.Eof) {
     moduleErrors[moduleName] ??= [];
     moduleErrors[moduleName].push({
-      code: "W002",
-      text: errorMessages["W002"].replace(/\{(\d+)}/g, () => lastToken.text),
+      code: ErrorCodes.unexpectedToken,
+      text: errorMessages[ErrorCodes.unexpectedToken].replace(/\{(\d+)}/g, () => lastToken.text),
       position: lastToken.startPosition,
       end: lastToken.endPosition,
       line: lastToken.startLine,
@@ -337,7 +339,7 @@ async function doParseModule(
     .forEach((stmt) => {
       const func = stmt as FunctionDeclaration;
       if (functions[func.id.name]) {
-        addErrorMessage("W020", stmt, func.id.name);
+        addErrorMessage(ErrorCodes.funcAlreadyDefined, stmt, func.id.name);
         return;
       }
       functions[func.id.name] = func;
@@ -348,27 +350,19 @@ async function doParseModule(
     try {
       // Check if we would create a circular import before fetching
       const resolvedPath = ModuleResolver.resolvePath(importDecl.source.value, moduleName);
-      
+
       // Check if we're trying to import ourselves or create a circular dependency
       if (resolvedPath === moduleName) {
         // Direct self-import
-        addErrorMessage("W041", importDecl, `Self-import detected: ${resolvedPath}`);
+        addErrorMessage(ErrorCodes.circularImport, importDecl, `Self-import detected: ${resolvedPath}`);
         continue;
       }
-      
+
       // Check if this module is already being parsed (circular)
       const cached = parsedModulesCache.get(resolvedPath);
       if (cached instanceof Promise) {
         // Module is currently being parsed - this is a circular import
-        addErrorMessage("W041", importDecl, `Circular import: ${moduleName} → ${resolvedPath}`);
-        continue;
-      }
-      
-      const circularChain = ModuleResolver.detectCircularImport(resolvedPath);
-      if (circularChain) {
-        // Circular import detected - add error and skip
-        const chainStr = circularChain.join(" → ");
-        addErrorMessage("W041", importDecl, `${chainStr}`);
+        addErrorMessage(ErrorCodes.circularImport, importDecl, `Circular import: ${moduleName} → ${resolvedPath}`);
         continue;
       }
 
@@ -379,7 +373,7 @@ async function doParseModule(
       );
 
       // Parse the imported module to extract its functions
-      const importedModuleResult = await parseScriptModuleWithImports(
+      const importedModuleResult = await parseScriptModuleAsync(
         resolvedModule.path,
         resolvedModule.content,
         moduleFetcher,
@@ -391,7 +385,13 @@ async function doParseModule(
         Object.entries(importedModuleResult).forEach(([path, errs]) => {
           moduleErrors[path] = errs;
           // Check if any of these are validation errors (W043, W044)
-          if (errs.some(e => e.code === "W043" || e.code === "W044")) {
+          if (
+            errs.some(
+              (e) =>
+                e.code === ErrorCodes.reactiveVarInImportedModule ||
+                e.code === ErrorCodes.constLetInImportedModule,
+            )
+          ) {
             hasValidationErrors = true;
           }
         });
@@ -434,7 +434,7 @@ async function doParseModule(
         if (importedModuleResult.functions[importedName]) {
           // Add to available functions with the local name (aliasing support)
           if (functions[localName]) {
-            addErrorMessage("W020", importDecl, localName);
+            addErrorMessage(ErrorCodes.funcAlreadyDefined, importDecl, localName);
           } else {
             functions[localName] = importedModuleResult.functions[importedName];
           }
@@ -444,11 +444,11 @@ async function doParseModule(
       // Handle circular imports and fetch errors
       const errorMessage = error instanceof Error ? error.message : String(error);
       if (errorMessage.includes("Circular import")) {
-        addErrorMessage("W041", importDecl, errorMessage);
+        addErrorMessage(ErrorCodes.circularImport, importDecl, errorMessage);
       } else if (errorMessage.includes("goes above root")) {
-        addErrorMessage("W022", importDecl, importDecl.source.value);
+        addErrorMessage(ErrorCodes.moduleNotFound, importDecl, importDecl.source.value);
       } else {
-        addErrorMessage("W022", importDecl, importDecl.source.value);
+        addErrorMessage(ErrorCodes.moduleNotFound, importDecl, importDecl.source.value);
       }
     }
   }
@@ -467,7 +467,7 @@ async function doParseModule(
     moduleErrors[moduleName] = errors;
     return moduleErrors;
   }
-  
+
   // Also return errors if any imported modules had validation errors
   if (hasValidationErrors) {
     return moduleErrors;
@@ -495,9 +495,23 @@ async function doParseModule(
 }
 
 /**
+ * Gets the parsed modules cache
+ * @returns The cache map of parsed modules
+ * @deprecated Use ModuleCache.getParsed() instead
+ */
+export function getParsedModulesCache(): Map<
+  string,
+  ScriptModule | Promise<ScriptModule | ModuleErrors>
+> {
+  // Return a proxy to maintain backward compatibility
+  return parsedModulesCache;
+}
+
+/**
  * Clears the parsed modules cache
  * Should be called between test runs or when starting a new parse session
+ * @deprecated Use ModuleCache.clearParsed() or ModuleCache.clear() instead
  */
 export function clearParsedModulesCache(): void {
-  parsedModulesCache.clear();
+  ModuleCache.clear();
 }

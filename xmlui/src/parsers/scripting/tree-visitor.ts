@@ -658,7 +658,6 @@ export function visitNode<TState = any>(
       return state;
 
     default:
-      unreachable(subject);
       return state;
   }
 }

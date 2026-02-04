@@ -1,46 +1,19 @@
-/**
- * Interface representing a resolved module with content
- */
-export interface ResolvedModule {
-  /**
-   * The absolute path to the module
-   */
-  path: string;
+import type { ResolvedModule, ModuleFetcher } from "./types";
+import { ModuleCache } from "./ModuleCache";
+import { CircularDependencyDetector } from "./CircularDependencyDetector";
+import { PathResolver } from "./PathResolver";
 
-  /**
-   * The content of the module file
-   */
-  content: string;
-
-  /**
-   * The timestamp when the module was last modified (milliseconds)
-   */
-  lastModified: number;
-}
-
-/**
- * Type for custom fetch function (useful for testing)
- */
-export type ModuleFetcher = (path: string) => Promise<string>;
+// Re-export types for backward compatibility
+export type { ResolvedModule, ModuleFetcher } from "./types";
 
 /**
  * Module resolver for handling import paths in XMLUI scripts
  */
 export class ModuleResolver {
   /**
-   * Cache for fetched modules
-   */
-  private static moduleCache: Map<string, ResolvedModule> = new Map();
-
-  /**
    * Custom fetch function (defaults to reading from filesystem)
    */
   private static customFetcher: ModuleFetcher | null = null;
-
-  /**
-   * Stack to track imports currently being resolved (for circular detection)
-   */
-  private static importStack: string[] = [];
 
   /**
    * Sets a custom fetcher function (useful for testing)
@@ -52,30 +25,18 @@ export class ModuleResolver {
 
   /**
    * Clears the module cache
+   * @deprecated Use ModuleCache.clearResolved() or ModuleCache.clear() instead
    */
   static clearCache(): void {
-    this.moduleCache.clear();
+    ModuleCache.clearResolved();
   }
 
   /**
    * Resets the import stack (call this when starting a fresh parse)
+   * @deprecated Use CircularDependencyDetector.reset() instead
    */
   static resetImportStack(): void {
-    this.importStack = [];
-  }
-
-  /**
-   * Detects circular imports by tracking the resolution stack
-   * @param modulePath The module path being resolved
-   * @returns The circular import chain if detected, or null
-   */
-  private static detectCircularImport(modulePath: string): string[] | null {
-    const index = this.importStack.indexOf(modulePath);
-    if (index !== -1) {
-      // Circular import detected - return the chain
-      return [...this.importStack.slice(index), modulePath];
-    }
-    return null;
+    CircularDependencyDetector.reset();
   }
 
   /**
@@ -86,19 +47,19 @@ export class ModuleResolver {
    */
   static async resolveModule(modulePath: string): Promise<ResolvedModule> {
     // Check for circular import
-    const circularChain = this.detectCircularImport(modulePath);
+    const circularChain = CircularDependencyDetector.checkCircular(modulePath);
     if (circularChain) {
       const chainStr = circularChain.join(" → ");
       throw new Error(`Circular import detected: ${chainStr}`);
     }
 
     // Check cache first (don't add to stack if cached)
-    if (this.moduleCache.has(modulePath)) {
-      return this.moduleCache.get(modulePath)!;
+    if (ModuleCache.hasResolved(modulePath)) {
+      return ModuleCache.getResolved(modulePath)!;
     }
 
     // Add to import stack
-    this.importStack.push(modulePath);
+    CircularDependencyDetector.push(modulePath);
 
     let content: string;
 
@@ -115,7 +76,7 @@ export class ModuleResolver {
       }
     } catch (error) {
       // Remove from stack on error
-      this.importStack.pop();
+      CircularDependencyDetector.pop();
 
       throw new Error(
         `Failed to fetch module at ${modulePath}: ${error instanceof Error ? error.message : String(error)}`,
@@ -123,7 +84,7 @@ export class ModuleResolver {
     }
 
     // Remove from stack after successful fetch
-    this.importStack.pop();
+    CircularDependencyDetector.pop();
 
     const resolved: ResolvedModule = {
       path: modulePath,
@@ -132,7 +93,7 @@ export class ModuleResolver {
     };
 
     // Cache the result
-    this.moduleCache.set(modulePath, resolved);
+    ModuleCache.setResolved(modulePath, resolved);
 
     return resolved;
   }
@@ -160,25 +121,8 @@ export class ModuleResolver {
    * @throws Error if the path is invalid
    */
   static resolvePath(importPath: string, fromFile: string): string {
-    // Validate inputs
-    if (!importPath) {
-      throw new Error("Import path cannot be empty");
-    }
-
-    // Only handle relative paths (starting with ./ or ../)
-    if (!importPath.startsWith("./") && !importPath.startsWith("../")) {
-      throw new Error(
-        `Import path must be relative (start with ./ or ../): ${importPath}`,
-      );
-    }
-
-    // Get the directory of the source file
-    const fromDir = this.getDirectory(fromFile);
-
-    // Resolve the path by combining directory with import path
-    return this.normalizePath(
-      this.joinPaths(fromDir, importPath),
-    );
+    // Delegate to PathResolver for clean separation of concerns
+    return PathResolver.resolve(importPath, fromFile);
   }
 
   /**
@@ -187,81 +131,7 @@ export class ModuleResolver {
    * @returns The directory path (without trailing slash)
    */
   private static getDirectory(filePath: string): string {
-    const lastSlashIndex = filePath.lastIndexOf("/");
-    if (lastSlashIndex === -1) {
-      // No directory separator, file is in root
-      return "";
-    }
-    // Return everything up to but not including the last slash
-    // If that's empty (root dir), return "/" to represent root
-    const dir = filePath.substring(0, lastSlashIndex);
-    return dir || "/";
-  }
-
-  /**
-   * Joins two path segments together
-   * @param basePath The base path
-   * @param relativePath The relative path
-   * @returns The joined path
-   */
-  private static joinPaths(basePath: string, relativePath: string): string {
-    // Remove leading ./ from relative path for consistency
-    let cleaned = relativePath;
-    while (cleaned.startsWith("./")) {
-      cleaned = cleaned.substring(2);
-    }
-
-    if (!basePath) {
-      return cleaned;
-    }
-
-    // If basePath is "/", don't add extra slash
-    if (basePath === "/") {
-      return "/" + cleaned;
-    }
-
-    return basePath + "/" + cleaned;
-  }
-
-  /**
-   * Normalizes a path by removing . and .. segments
-   * @param path The path to normalize
-   * @returns The normalized path
-   * @throws Error if path tries to go above root
-   */
-  private static normalizePath(path: string): string {
-    // Remove leading slash for processing
-    const isAbsolute = path.startsWith("/");
-    const workPath = isAbsolute ? path.substring(1) : path;
-
-    // Split into segments
-    const segments = workPath.split("/").filter((seg) => seg !== "");
-
-    const normalized: string[] = [];
-
-    for (const segment of segments) {
-      if (segment === ".") {
-        // Current directory - skip
-        continue;
-      } else if (segment === "..") {
-        // Parent directory
-        if (normalized.length === 0) {
-          throw new Error("Import path goes above root directory");
-        }
-        normalized.pop();
-      } else {
-        // Regular segment
-        normalized.push(segment);
-      }
-    }
-
-    // Reconstruct path
-    let result = normalized.join("/");
-    if (isAbsolute) {
-      result = "/" + result;
-    }
-
-    return result;
+    return PathResolver.getDirectory(filePath);
   }
 
   /**
@@ -271,7 +141,7 @@ export class ModuleResolver {
    * @returns True if paths are equivalent after normalization
    */
   static arePathsEqual(path1: string, path2: string): boolean {
-    return this.normalizePath(path1) === this.normalizePath(path2);
+    return PathResolver.normalizePath(path1) === PathResolver.normalizePath(path2);
   }
 
   /**
@@ -280,10 +150,6 @@ export class ModuleResolver {
    * @returns The file name with extension
    */
   static getFileName(filePath: string): string {
-    const lastSlashIndex = filePath.lastIndexOf("/");
-    if (lastSlashIndex === -1) {
-      return filePath;
-    }
-    return filePath.substring(lastSlashIndex + 1);
+    return PathResolver.getFileName(filePath);
   }
 }

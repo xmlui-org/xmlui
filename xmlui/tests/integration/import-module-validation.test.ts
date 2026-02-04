@@ -1,22 +1,18 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { collectCodeBehindFromSourceWithImports } from "../../src/parsers/scripting/code-behind-collect";
 import { ModuleResolver } from "../../src/parsers/scripting/ModuleResolver";
-import { clearParsedModulesCache } from "../../src/parsers/scripting/modules";
-import type { ModuleFetcher } from "../../src/parsers/scripting/ModuleResolver";
+import { clearAllModuleCaches } from "../../src/parsers/scripting/ModuleCache";
+import type { ModuleFetcher } from "../../src/parsers/scripting/types";
 
 describe("Import Module Validation Tests", () => {
   beforeEach(() => {
-    ModuleResolver.clearCache();
-    ModuleResolver.resetImportStack();
+    clearAllModuleCaches();
     ModuleResolver.setCustomFetcher(null);
-    clearParsedModulesCache();
   });
 
   afterEach(() => {
-    ModuleResolver.clearCache();
-    ModuleResolver.resetImportStack();
+    clearAllModuleCaches();
     ModuleResolver.setCustomFetcher(null);
-    clearParsedModulesCache();
   });
 
   describe("Valid modules with only function declarations", () => {

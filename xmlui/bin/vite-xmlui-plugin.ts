@@ -11,9 +11,9 @@ import {
   moduleFileExtension,
 } from "../src/parsers/xmlui-parser/fileExtensions";
 import { Parser } from "../src/parsers/scripting/Parser";
-import { ModuleResolver } from "../src/parsers/scripting/ModuleResolver";
-import { clearParsedModulesCache } from "../src/parsers/scripting/modules";
-import type { ModuleFetcher } from "../src/parsers/scripting/ModuleResolver";
+import { clearAllModuleCaches } from "../src/parsers/scripting/ModuleCache";
+import type { ModuleFetcher } from "../src/parsers/scripting/types";
+import { ScriptExtractor } from "../src/parsers/scripting/ScriptExtractor";
 import * as path from "path";
 import * as fs from "fs/promises";
 import { errReportComponent, xmlUiMarkupToComponent } from "../src/components-core/xmlui-parser";
@@ -42,12 +42,12 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
       if (xmluiExtension.test(id)) {
         const fileId = "" + itemIndex++;
 
-        // --- Extract script content from XMLUI markup
-        const scriptMatch = code.match(/<script>([\s\S]*?)<\/script>/);
+        // --- Extract script content from XMLUI markup using ScriptExtractor
+        const scriptResult = ScriptExtractor.extractInlineScript(code);
         let codeBehind;
 
-        if (scriptMatch && scriptMatch[1]) {
-          const scriptContent = scriptMatch[1];
+        if (scriptResult) {
+          const scriptContent = scriptResult.script;
 
           // --- Create a module fetcher for import support
           const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
@@ -62,9 +62,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
           // --- Collect code-behind with import support from inline <script> tags
           try {
             // Clear caches for fresh parse
-            clearParsedModulesCache();
-            ModuleResolver.clearCache();
-            ModuleResolver.resetImportStack();
+            clearAllModuleCaches();
 
             codeBehind = await collectCodeBehindFromSourceWithImports(
               moduleNameResolver(id),
@@ -72,8 +70,17 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
               moduleFetcher,
             );
             removeCodeBehindTokensFromTree(codeBehind);
+
+            // --- Display any module errors or warnings found
+            if (codeBehind.moduleErrors && Object.keys(codeBehind.moduleErrors).length > 0) {
+              Object.entries(codeBehind.moduleErrors).forEach(([modulePath, errors]) => {
+                errors.forEach((err) => {
+                  this.warn(`[${modulePath}:${err.line}:${err.column}] ${err.code}: ${err.text}`);
+                });
+              });
+            }
           } catch (e) {
-            console.error('[vite-xmlui-plugin] Error collecting imports:', e);
+            this.error(`Error collecting imports: ${e}`);
           }
         }
 
@@ -88,7 +95,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         const file = {
           component,
           src: code,
-          codeBehind,
+          ...(codeBehind || {}),
           file: fileId,
         };
 
@@ -102,9 +109,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
       const hasModuleScriptExtension = moduleScriptExtension.test(id);
       if (hasXmluiScriptExtension || hasModuleScriptExtension) {
         // --- Clear caches for fresh parse
-        clearParsedModulesCache();
-        ModuleResolver.clearCache();
-        ModuleResolver.resetImportStack();
+        clearAllModuleCaches();
 
         // --- We parse the module file to catch parsing errors
 
@@ -133,15 +138,33 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         );
         removeCodeBehindTokensFromTree(codeBehind);
 
-        // --- Check for module errors and throw if any exist
+        // --- Display any module errors as warnings
         if (codeBehind.moduleErrors && Object.keys(codeBehind.moduleErrors).length > 0) {
-          const errorMessages: string[] = [];
           Object.entries(codeBehind.moduleErrors).forEach(([modulePath, errors]) => {
             errors.forEach((err) => {
-              errorMessages.push(`  ${modulePath}:${err.line}:${err.column} - ${err.code}: ${err.text}`);
+              this.warn(`[${modulePath}:${err.line}:${err.column}] ${err.code}: ${err.text}`);
             });
           });
-          throw new Error(`Module parsing errors:\n${errorMessages.join('\n')}`);
+        }
+
+        // --- Check for critical module errors (not validation warnings) and throw if any exist
+        const hasCriticalErrors = codeBehind.moduleErrors && 
+          Object.entries(codeBehind.moduleErrors).some(([_, errors]) => 
+            errors.some(err => !err.code.startsWith("W04")) // W043, W044, W045 are validation warnings
+          );
+        
+        if (hasCriticalErrors) {
+          const errorMessages: string[] = [];
+          Object.entries(codeBehind.moduleErrors!).forEach(([modulePath, errors]) => {
+            errors.forEach((err) => {
+              if (!err.code.startsWith("W04")) {
+                errorMessages.push(`  ${modulePath}:${err.line}:${err.column} - ${err.code}: ${err.text}`);
+              }
+            });
+          });
+          if (errorMessages.length > 0) {
+            throw new Error(`Module parsing errors:\n${errorMessages.join('\n')}`);
+          }
         }
 
         return {

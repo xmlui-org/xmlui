@@ -11,10 +11,11 @@ import {
 } from "../../components-core/script-runner/ScriptingSourceTree";
 import type { VisitorState } from "./tree-visitor";
 import { visitNode } from "./tree-visitor";
-import { isModuleErrors, parseScriptModule, parseScriptModuleWithImports, clearParsedModulesCache } from "./modules";
+import { isModuleErrors, parseScriptModule, parseScriptModuleAsync, parseScriptModuleWithImports } from "./modules";
 import { PARSED_MARK_PROP } from "../../abstractions/InternalMarkers";
-import type { ModuleFetcher } from "./ModuleResolver";
-import { ModuleResolver } from "./ModuleResolver";
+import type { ModuleFetcher } from "./types";
+import { clearAllModuleCaches } from "./ModuleCache";
+import { ModuleLoader } from "./ModuleLoader";
 
 // Re-export for backward compatibility
 export { PARSED_MARK_PROP } from "../../abstractions/InternalMarkers";
@@ -47,7 +48,7 @@ export function collectCodeBehindFromSource(
 }
 
 /**
- * Async version that supports module imports
+ * Async version that supports module imports (uses ModuleLoader internally)
  * @param moduleName The name/path of the module
  * @param source The source code to parse
  * @param moduleFetcher Optional fetcher for resolving imports
@@ -72,15 +73,23 @@ export async function collectCodeBehindFromSourceWithImports(
     return collectCodeBehindFromSource(moduleName, source);
   }
 
-  // --- Clear caches for a fresh parse
-  clearParsedModulesCache();
-  ModuleResolver.resetImportStack();
+  // --- Clear caches for a fresh parse (maintain original behavior)
+  clearAllModuleCaches();
 
-  // --- Parse the module with import support
-  const parsedModule = await parseScriptModuleWithImports(moduleName, source, moduleFetcher);
-  if (isModuleErrors(parsedModule)) {
-    return { ...result, moduleErrors: parsedModule };
+  // --- Use ModuleLoader for consistent loading
+  const loadResult = await ModuleLoader.loadFromSource(moduleName, source, {
+    fetcher: moduleFetcher,
+    allowImports: true,
+    skipCache: false, // We just cleared, so cache is empty anyway
+  });
+
+  // --- Handle errors
+  if (!loadResult.ok) {
+    const errorResult = loadResult as { ok: false; error: any };
+    return { ...result, moduleErrors: errorResult.error };
   }
+
+  const parsedModule = loadResult.value;
 
   // --- Collect statements from the module (vars and functions defined in this file)
   parsedModule.statements.forEach((stmt) => {
@@ -91,10 +100,11 @@ export async function collectCodeBehindFromSourceWithImports(
   Object.entries(parsedModule.functions).forEach(([name, func]) => {
     if (!result.functions[name] && !collectedFunctions[name]) {
       // Convert FunctionDeclaration to CodeDeclaration format
+      const funcDecl = func as any;
       const arrow: ArrowExpression = {
         type: T_ARROW_EXPRESSION,
-        args: func.args.slice(),
-        statement: func.stmt,
+        args: funcDecl.args.slice(),
+        statement: funcDecl.stmt,
       } as ArrowExpression;
 
       const codeDecl = {
