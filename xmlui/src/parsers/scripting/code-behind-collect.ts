@@ -11,7 +11,7 @@ import {
 } from "../../components-core/script-runner/ScriptingSourceTree";
 import type { VisitorState } from "./tree-visitor";
 import { visitNode } from "./tree-visitor";
-import { isModuleErrors, parseScriptModule, parseScriptModuleWithImports } from "./modules";
+import { isModuleErrors, parseScriptModule, parseScriptModuleAsync, parseScriptModuleWithImports } from "./modules";
 import { PARSED_MARK_PROP } from "../../abstractions/InternalMarkers";
 import type { ModuleFetcher } from "./types";
 import { clearAllModuleCaches } from "./ModuleCache";
@@ -76,7 +76,7 @@ export async function collectCodeBehindFromSourceWithImports(
   clearAllModuleCaches();
 
   // --- Parse the module with import support
-  const parsedModule = await parseScriptModuleWithImports(moduleName, source, moduleFetcher);
+  const parsedModule = await parseScriptModuleAsync(moduleName, source, moduleFetcher);
   if (isModuleErrors(parsedModule)) {
     return { ...result, moduleErrors: parsedModule };
   }

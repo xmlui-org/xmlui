@@ -248,7 +248,14 @@ const parsedModulesCache = new Map<string, ScriptModule | Promise<ScriptModule |
  * @param moduleFetcher Function to fetch module content (required for import resolution)
  * @returns The parsed and resolved module
  */
-export async function parseScriptModuleWithImports(
+/**
+ * Parses a script module with import support (async version - primary API)
+ * @param moduleName Name of the module
+ * @param source Source code to parse
+ * @param moduleFetcher Function to fetch module content (required for import resolution)
+ * @returns The parsed and resolved module
+ */
+export async function parseScriptModuleAsync(
   moduleName: string,
   source: string,
   moduleFetcher: ModuleFetcher,
@@ -305,6 +312,18 @@ export async function parseScriptModuleWithImports(
     // --- Remove from currently parsing set
     ModuleCache.unmarkCurrentlyParsing(moduleName);
   }
+}
+
+/**
+ * Parses a script module with import support (legacy alias for backward compatibility)
+ * @deprecated Use parseScriptModuleAsync instead
+ */
+export async function parseScriptModuleWithImports(
+  moduleName: string,
+  source: string,
+  moduleFetcher: ModuleFetcher,
+): Promise<ScriptModule | ModuleErrors> {
+  return parseScriptModuleAsync(moduleName, source, moduleFetcher);
 }
 
 /**
@@ -398,7 +417,7 @@ async function doParseModule(
       );
 
       // Parse the imported module to extract its functions
-      const importedModuleResult = await parseScriptModuleWithImports(
+      const importedModuleResult = await parseScriptModuleAsync(
         resolvedModule.path,
         resolvedModule.content,
         moduleFetcher,
