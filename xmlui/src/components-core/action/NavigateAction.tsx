@@ -1,6 +1,7 @@
 import type { ActionExecutionContext } from "../../abstractions/ActionDefs";
 import { createUrlWithQueryParams } from "../../components/component-utils";
 import { createAction } from "./actions";
+import { getCurrentTrace } from "../inspector/inspectorUtils";
 
 function navigate(
   { navigate, location, appContext }: ActionExecutionContext,
@@ -26,7 +27,7 @@ function navigate(
       w._xsLogs.push({
         ts: Date.now(),
         perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-        traceId: w._xsCurrentTrace,
+        traceId: getCurrentTrace(),
         kind: "navigate",
         from: location.pathname,
         to: String(to),

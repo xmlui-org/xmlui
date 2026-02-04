@@ -22,6 +22,7 @@ import type {
 import type { LookupAsyncFn, LookupSyncFn } from "../../abstractions/ActionDefs";
 
 import { extractParam, shouldKeep } from "../utils/extractParam";
+import { getCurrentTrace } from "../inspector/inspectorUtils";
 import { useTheme } from "../theming/ThemeContext";
 import { useComponentStyle } from "../theming/StyleContext";
 import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
@@ -405,7 +406,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
         w._xsLogs = Array.isArray(w._xsLogs) ? w._xsLogs : [];
         w._xsLogs.push({
           ts: Date.now(),
-          traceId: w._xsCurrentTrace,
+          traceId: getCurrentTrace(),
           kind: "interaction",
           componentType: safeNode.type,
           componentLabel: resolvedLabel,
