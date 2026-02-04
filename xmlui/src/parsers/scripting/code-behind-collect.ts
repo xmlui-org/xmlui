@@ -15,6 +15,8 @@ import { isModuleErrors, parseScriptModule, parseScriptModuleAsync, parseScriptM
 import { PARSED_MARK_PROP } from "../../abstractions/InternalMarkers";
 import type { ModuleFetcher } from "./types";
 import { clearAllModuleCaches } from "./ModuleCache";
+import { ModuleLoader } from "./ModuleLoader";
+import { isOk } from "./types";
 
 // Re-export for backward compatibility
 export { PARSED_MARK_PROP } from "../../abstractions/InternalMarkers";
@@ -47,7 +49,7 @@ export function collectCodeBehindFromSource(
 }
 
 /**
- * Async version that supports module imports
+ * Async version that supports module imports (uses ModuleLoader internally)
  * @param moduleName The name/path of the module
  * @param source The source code to parse
  * @param moduleFetcher Optional fetcher for resolving imports
@@ -72,14 +74,22 @@ export async function collectCodeBehindFromSourceWithImports(
     return collectCodeBehindFromSource(moduleName, source);
   }
 
-  // --- Clear caches for a fresh parse
+  // --- Clear caches for a fresh parse (maintain original behavior)
   clearAllModuleCaches();
 
-  // --- Parse the module with import support
-  const parsedModule = await parseScriptModuleAsync(moduleName, source, moduleFetcher);
-  if (isModuleErrors(parsedModule)) {
-    return { ...result, moduleErrors: parsedModule };
+  // --- Use ModuleLoader for consistent loading
+  const loadResult = await ModuleLoader.loadFromSource(moduleName, source, {
+    fetcher: moduleFetcher,
+    allowImports: true,
+    skipCache: false, // We just cleared, so cache is empty anyway
+  });
+
+  // --- Handle errors
+  if (!isOk(loadResult)) {
+    return { ...result, moduleErrors: loadResult.error };
   }
+
+  const parsedModule = loadResult.value;
 
   // --- Collect statements from the module (vars and functions defined in this file)
   parsedModule.statements.forEach((stmt) => {
