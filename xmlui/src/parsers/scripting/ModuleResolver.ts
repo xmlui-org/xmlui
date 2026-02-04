@@ -1,46 +1,18 @@
-/**
- * Interface representing a resolved module with content
- */
-export interface ResolvedModule {
-  /**
-   * The absolute path to the module
-   */
-  path: string;
+import type { ResolvedModule, ModuleFetcher } from "./types";
+import { ModuleCache } from "./ModuleCache";
+import { CircularDependencyDetector } from "./CircularDependencyDetector";
 
-  /**
-   * The content of the module file
-   */
-  content: string;
-
-  /**
-   * The timestamp when the module was last modified (milliseconds)
-   */
-  lastModified: number;
-}
-
-/**
- * Type for custom fetch function (useful for testing)
- */
-export type ModuleFetcher = (path: string) => Promise<string>;
+// Re-export types for backward compatibility
+export type { ResolvedModule, ModuleFetcher } from "./types";
 
 /**
  * Module resolver for handling import paths in XMLUI scripts
  */
 export class ModuleResolver {
   /**
-   * Cache for fetched modules
-   */
-  private static moduleCache: Map<string, ResolvedModule> = new Map();
-
-  /**
    * Custom fetch function (defaults to reading from filesystem)
    */
   private static customFetcher: ModuleFetcher | null = null;
-
-  /**
-   * Stack to track imports currently being resolved (for circular detection)
-   */
-  private static importStack: string[] = [];
 
   /**
    * Sets a custom fetcher function (useful for testing)
@@ -52,30 +24,18 @@ export class ModuleResolver {
 
   /**
    * Clears the module cache
+   * @deprecated Use ModuleCache.clearResolved() or ModuleCache.clear() instead
    */
   static clearCache(): void {
-    this.moduleCache.clear();
+    ModuleCache.clearResolved();
   }
 
   /**
    * Resets the import stack (call this when starting a fresh parse)
+   * @deprecated Use CircularDependencyDetector.reset() instead
    */
   static resetImportStack(): void {
-    this.importStack = [];
-  }
-
-  /**
-   * Detects circular imports by tracking the resolution stack
-   * @param modulePath The module path being resolved
-   * @returns The circular import chain if detected, or null
-   */
-  private static detectCircularImport(modulePath: string): string[] | null {
-    const index = this.importStack.indexOf(modulePath);
-    if (index !== -1) {
-      // Circular import detected - return the chain
-      return [...this.importStack.slice(index), modulePath];
-    }
-    return null;
+    CircularDependencyDetector.reset();
   }
 
   /**
@@ -86,19 +46,19 @@ export class ModuleResolver {
    */
   static async resolveModule(modulePath: string): Promise<ResolvedModule> {
     // Check for circular import
-    const circularChain = this.detectCircularImport(modulePath);
+    const circularChain = CircularDependencyDetector.checkCircular(modulePath);
     if (circularChain) {
       const chainStr = circularChain.join(" → ");
       throw new Error(`Circular import detected: ${chainStr}`);
     }
 
     // Check cache first (don't add to stack if cached)
-    if (this.moduleCache.has(modulePath)) {
-      return this.moduleCache.get(modulePath)!;
+    if (ModuleCache.hasResolved(modulePath)) {
+      return ModuleCache.getResolved(modulePath)!;
     }
 
     // Add to import stack
-    this.importStack.push(modulePath);
+    CircularDependencyDetector.push(modulePath);
 
     let content: string;
 
@@ -115,7 +75,7 @@ export class ModuleResolver {
       }
     } catch (error) {
       // Remove from stack on error
-      this.importStack.pop();
+      CircularDependencyDetector.pop();
 
       throw new Error(
         `Failed to fetch module at ${modulePath}: ${error instanceof Error ? error.message : String(error)}`,
@@ -123,7 +83,7 @@ export class ModuleResolver {
     }
 
     // Remove from stack after successful fetch
-    this.importStack.pop();
+    CircularDependencyDetector.pop();
 
     const resolved: ResolvedModule = {
       path: modulePath,
@@ -132,7 +92,7 @@ export class ModuleResolver {
     };
 
     // Cache the result
-    this.moduleCache.set(modulePath, resolved);
+    ModuleCache.setResolved(modulePath, resolved);
 
     return resolved;
   }

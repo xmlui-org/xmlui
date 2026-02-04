@@ -11,10 +11,10 @@ import {
 } from "../../components-core/script-runner/ScriptingSourceTree";
 import type { VisitorState } from "./tree-visitor";
 import { visitNode } from "./tree-visitor";
-import { isModuleErrors, parseScriptModule, parseScriptModuleWithImports, clearParsedModulesCache } from "./modules";
+import { isModuleErrors, parseScriptModule, parseScriptModuleWithImports } from "./modules";
 import { PARSED_MARK_PROP } from "../../abstractions/InternalMarkers";
-import type { ModuleFetcher } from "./ModuleResolver";
-import { ModuleResolver } from "./ModuleResolver";
+import type { ModuleFetcher } from "./types";
+import { clearAllModuleCaches } from "./ModuleCache";
 
 // Re-export for backward compatibility
 export { PARSED_MARK_PROP } from "../../abstractions/InternalMarkers";
@@ -73,8 +73,7 @@ export async function collectCodeBehindFromSourceWithImports(
   }
 
   // --- Clear caches for a fresh parse
-  clearParsedModulesCache();
-  ModuleResolver.resetImportStack();
+  clearAllModuleCaches();
 
   // --- Parse the module with import support
   const parsedModule = await parseScriptModuleWithImports(moduleName, source, moduleFetcher);

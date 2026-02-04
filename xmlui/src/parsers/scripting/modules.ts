@@ -32,8 +32,12 @@ import { ErrorCodes, ParserErrorMessage } from "./ParserError";
 import { Parser } from "./Parser";
 import { errorMessages } from "./ParserError";
 import { TokenType } from "./TokenType";
-import type { ModuleFetcher } from "./ModuleResolver";
+import type { ModuleFetcher, ModuleErrors } from "./types";
 import { ModuleResolver } from "./ModuleResolver";
+import { ModuleCache } from "./ModuleCache";
+
+// Re-export types for backward compatibility
+export type { ModuleErrors, ModuleWarnings } from "./types";
 
 // Mapping of statement types to human-readable names
 const statementTypeNames: Record<number, string> = {
@@ -59,16 +63,6 @@ const statementTypeNames: Record<number, string> = {
   [T_FUNCTION_DECLARATION]: "function declaration",
   [T_IMPORT_DECLARATION]: "import declaration",
 };
-
-/**
- * Represents a module error
- */
-export type ModuleErrors = Record<string, ParserErrorMessage[]>;
-
-/**
- * Represents module warnings (non-fatal issues)
- */
-export type ModuleWarnings = Record<string, ParserErrorMessage[]>;
 
 /**
  * Checks if the result is a module error
@@ -244,6 +238,7 @@ export function parseScriptModule(moduleName: string, source: string): ScriptMod
 }
 
 // Cache for parsed modules to avoid infinite recursion
+// This is kept for getParsedModulesCache() backward compatibility
 const parsedModulesCache = new Map<string, ScriptModule | Promise<ScriptModule | ModuleErrors>>();
 
 /**
@@ -258,30 +253,58 @@ export async function parseScriptModuleWithImports(
   source: string,
   moduleFetcher: ModuleFetcher,
 ): Promise<ScriptModule | ModuleErrors> {
-  // --- Check if we're already parsing or have parsed this module
-  if (parsedModulesCache.has(moduleName)) {
-    const cached = parsedModulesCache.get(moduleName)!;
-    // If it's a promise, wait for it; otherwise return the cached result
-    return cached instanceof Promise ? await cached : cached;
+  // --- Check for circular parsing (module is currently being parsed)
+  if (ModuleCache.isCurrentlyParsing(moduleName)) {
+    // Return a circular dependency error
+    const moduleErrors: ModuleErrors = {
+      [moduleName]: [
+        {
+          code: ErrorCodes.circularImport,
+          text: `Circular import detected: module ${moduleName} imports itself`,
+          position: 0,
+          end: 0,
+          line: 1,
+          column: 1,
+        },
+      ],
+    };
+    return moduleErrors;
   }
+
+  // --- Check if we've already parsed this module (completed)
+  if (ModuleCache.hasParsed(moduleName)) {
+    const cached = ModuleCache.getParsed(moduleName)!;
+    // Only return if it's not a promise (meaning it's completed)
+    if (!(cached instanceof Promise)) {
+      return cached;
+    }
+  }
+
+  // --- Mark as currently being parsed
+  ModuleCache.markCurrentlyParsing(moduleName);
 
   // --- Set up the module fetcher
   ModuleResolver.setCustomFetcher(moduleFetcher);
 
-  // --- Create a promise for this module to prevent circular parsing
-  const parsePromise = doParseModule(moduleName, source, moduleFetcher);
-  parsedModulesCache.set(moduleName, parsePromise);
+  try {
+    // --- Parse the module
+    const parsePromise = doParseModule(moduleName, source, moduleFetcher);
+    ModuleCache.setParsed(moduleName, parsePromise);
 
-  const result = await parsePromise;
+    const result = await parsePromise;
 
-  // Store the final result (not the promise)
-  if (!isModuleErrors(result)) {
-    parsedModulesCache.set(moduleName, result);
-  } else {
-    parsedModulesCache.set(moduleName, result as any);
+    // Store the final result (not the promise)
+    if (!isModuleErrors(result)) {
+      ModuleCache.setParsed(moduleName, result);
+    } else {
+      ModuleCache.setParsed(moduleName, result as any);
+    }
+
+    return result;
+  } finally {
+    // --- Remove from currently parsing set
+    ModuleCache.unmarkCurrentlyParsing(moduleName);
   }
-
-  return result;
 }
 
 /**
@@ -499,18 +522,21 @@ async function doParseModule(
 /**
  * Gets the parsed modules cache
  * @returns The cache map of parsed modules
+ * @deprecated Use ModuleCache.getParsed() instead
  */
 export function getParsedModulesCache(): Map<
   string,
   ScriptModule | Promise<ScriptModule | ModuleErrors>
 > {
+  // Return a proxy to maintain backward compatibility
   return parsedModulesCache;
 }
 
 /**
  * Clears the parsed modules cache
  * Should be called between test runs or when starting a new parse session
+ * @deprecated Use ModuleCache.clearParsed() or ModuleCache.clear() instead
  */
 export function clearParsedModulesCache(): void {
-  parsedModulesCache.clear();
+  ModuleCache.clear();
 }

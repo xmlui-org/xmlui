@@ -11,9 +11,8 @@ import {
   moduleFileExtension,
 } from "../src/parsers/xmlui-parser/fileExtensions";
 import { Parser } from "../src/parsers/scripting/Parser";
-import { ModuleResolver } from "../src/parsers/scripting/ModuleResolver";
-import { clearParsedModulesCache } from "../src/parsers/scripting/modules";
-import type { ModuleFetcher } from "../src/parsers/scripting/ModuleResolver";
+import { clearAllModuleCaches } from "../src/parsers/scripting/ModuleCache";
+import type { ModuleFetcher } from "../src/parsers/scripting/types";
 import * as path from "path";
 import * as fs from "fs/promises";
 import { errReportComponent, xmlUiMarkupToComponent } from "../src/components-core/xmlui-parser";
@@ -62,9 +61,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
           // --- Collect code-behind with import support from inline <script> tags
           try {
             // Clear caches for fresh parse
-            clearParsedModulesCache();
-            ModuleResolver.clearCache();
-            ModuleResolver.resetImportStack();
+            clearAllModuleCaches();
 
             codeBehind = await collectCodeBehindFromSourceWithImports(
               moduleNameResolver(id),
@@ -111,9 +108,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
       const hasModuleScriptExtension = moduleScriptExtension.test(id);
       if (hasXmluiScriptExtension || hasModuleScriptExtension) {
         // --- Clear caches for fresh parse
-        clearParsedModulesCache();
-        ModuleResolver.clearCache();
-        ModuleResolver.resetImportStack();
+        clearAllModuleCaches();
 
         // --- We parse the module file to catch parsing errors
 
