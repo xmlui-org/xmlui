@@ -40,6 +40,23 @@ export default ({ mode = "lib" }) => {
       };
       break;
     }
+    case "inspector-parser": {
+      // Standalone XMLUI parser for browser use (e.g., Inspector viewer)
+      // Minimal bundle with no React/component dependencies
+      distSubDirName = "inspector";
+      lib = {
+        entry: [path.resolve("src", "parsers", "xmlui-parser-standalone", "index.ts")],
+        name: "XmluiParser",
+        formats: ["es", "umd"] as any,
+        fileName: (format: any) => `xmlui-parser.${format}.js`,
+      };
+      define = {
+        "process.env": {
+          NODE_ENV: env.NODE_ENV,
+        },
+      };
+      break;
+    }
     case "metadata": {
       distSubDirName = "metadata";
       lib = {
@@ -71,7 +88,9 @@ export default ({ mode = "lib" }) => {
   let plugins =
     mode === "metadata"
       ? [ViteXmlui({})]
-      : [react(), svgr(), ViteYaml(), ViteXmlui({}), libInjectCss(), dts({ rollupTypes: true })];
+      : mode === "inspector-parser"
+        ? [dts({ rollupTypes: true })]  // Minimal plugins for standalone parser
+        : [react(), svgr(), ViteYaml(), ViteXmlui({}), libInjectCss(), dts({ rollupTypes: true })];
 
   if (mode === "lib") {
     plugins.push(
@@ -127,8 +146,8 @@ export default ({ mode = "lib" }) => {
       rollupOptions: {
         treeshake: mode === "metadata" ? "smallest" : undefined,
         external:
-          mode === "standalone"
-            ? []
+          mode === "standalone" || mode === "inspector-parser"
+            ? []  // Bundle everything for standalone builds
             : [...Object.keys(packageJson.dependencies), "react/jsx-runtime", "@playwright/test"],
         output: {
           globals: {
