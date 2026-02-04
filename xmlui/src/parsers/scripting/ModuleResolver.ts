@@ -172,6 +172,17 @@ export class ModuleResolver {
       );
     }
 
+    // --- Check if fromFile is a URL (for buildless apps)
+    if (fromFile.startsWith('http://') || fromFile.startsWith('https://')) {
+      try {
+        const baseUrl = new URL(fromFile);
+        const resolvedUrl = new URL(importPath, baseUrl);
+        return resolvedUrl.toString();
+      } catch (e) {
+        throw new Error(`Failed to resolve URL: ${importPath} from ${fromFile}`);
+      }
+    }
+
     // Get the directory of the source file
     const fromDir = this.getDirectory(fromFile);
 

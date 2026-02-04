@@ -265,7 +265,33 @@ async function parseComponentMarkupResponse(response: Response): Promise<ParsedR
   const code = await response.text();
   const fileId = response.url;
   
-  let { component, errors, erroneousCompoundComponentName } = xmlUiMarkupToComponent(code, fileId);
+  let codeBehind: CollectedDeclarations | undefined;
+
+  // --- Extract inline script from markup
+  const scriptMatch = code.match(/<script>([\s\S]*?)<\/script>/);
+  if (scriptMatch && scriptMatch[1]) {
+    const scriptContent = scriptMatch[1];
+    
+    try {
+      // --- Create a module fetcher for import support
+      // --- Note: modulePath is already resolved by ModuleResolver.resolvePath()
+      const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
+        const moduleResponse = await fetchWithoutCache(modulePath);
+        if (!moduleResponse.ok) {
+          throw new Error(`Failed to fetch module: ${modulePath}`);
+        }
+        return await moduleResponse.text();
+      };
+
+      // --- Collect code-behind with import support from inline scripts
+      codeBehind = await collectCodeBehindFromSourceWithImports(fileId, scriptContent, moduleFetcher);
+      removeCodeBehindTokensFromTree(codeBehind);
+    } catch (e) {
+      console.error(`Error collecting imports from inline script in ${fileId}:`, e);
+    }
+  }
+  
+  let { component, errors, erroneousCompoundComponentName } = xmlUiMarkupToComponent(code, fileId, codeBehind);
   if (errors.length > 0) {
     const compName =
       erroneousCompoundComponentName ??
@@ -275,10 +301,12 @@ async function parseComponentMarkupResponse(response: Response): Promise<ParsedR
       );
     component = errReportComponent(errors, fileId, compName);
   }
+  
   return {
     component,
     src: code,
     file: fileId,
+    codeBehind: codeBehind,
     hasError: errors.length > 0,
   };
 }
@@ -314,8 +342,24 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
   try {
     // --- Create a module fetcher for resolving imports
     const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
-      // --- Resolve the module path relative to the current file
-      const resolvedPath = ModuleResolver.resolvePath(modulePath, response.url);
+      // --- For URLs (buildless apps), use URL resolution; for file paths, use ModuleResolver
+      let resolvedPath: string;
+      if (response.url.startsWith('http://') || response.url.startsWith('https://')) {
+        // --- URL-based resolution for buildless apps
+        const baseUrl = new URL(response.url);
+        const moduleName = modulePath.startsWith('.') ? modulePath : `./${modulePath}`;
+        try {
+          const resolvedUrl = new URL(moduleName, baseUrl);
+          resolvedPath = resolvedUrl.toString();
+        } catch (e) {
+          console.error(`[moduleFetcher] Failed to resolve URL: ${modulePath} from ${response.url}`, e);
+          throw new Error(`Failed to resolve module URL: ${modulePath}`);
+        }
+      } else {
+        // --- File path resolution for other cases
+        resolvedPath = ModuleResolver.resolvePath(modulePath, response.url);
+      }
+      
       const moduleResponse = await fetchWithoutCache(resolvedPath);
       if (!moduleResponse.ok) {
         throw new Error(`Failed to fetch module: ${resolvedPath}`);
@@ -869,9 +913,10 @@ function useStandalone(
         vars: {
           ...loadedEntryPointCodeBehind?.vars,
           ...loadedEntryPoint.component.vars,
+          ...loadedEntryPoint.codeBehind?.vars,
         },
-        functions: loadedEntryPointCodeBehind?.functions,
-        scriptError: loadedEntryPointCodeBehind?.moduleErrors,
+        functions: loadedEntryPoint.codeBehind?.functions || loadedEntryPointCodeBehind?.functions,
+        scriptError: loadedEntryPoint.codeBehind?.moduleErrors || loadedEntryPointCodeBehind?.moduleErrors,
       };
 
       const defaultTheme = (entryPointWithCodeBehind as ComponentDef).props?.defaultTheme;
@@ -892,18 +937,20 @@ function useStandalone(
         .filter((compWrapper) => !compWrapper?.file?.endsWith(".xmlui.xs"))
         .map((compWrapper) => {
           const componentCodeBehind = codeBehinds[compWrapper.file + ".xs"];
-          return {
+          const result = {
             ...compWrapper.component,
             component: {
               ...(compWrapper.component as any).component,
               vars: {
                 ...(compWrapper.component as any).component.vars,
+                ...compWrapper.codeBehind?.vars,
                 ...componentCodeBehind?.vars,
               },
-              functions: componentCodeBehind?.functions,
-              scriptError: componentCodeBehind?.moduleErrors,
+              functions: compWrapper.codeBehind?.functions || componentCodeBehind?.functions,
+              scriptError: compWrapper.codeBehind?.moduleErrors || componentCodeBehind?.moduleErrors,
             },
           };
+          return result;
         });
 
       // --- We may have components that are not in the configuration file.
