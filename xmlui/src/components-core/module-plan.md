@@ -343,9 +343,9 @@ parsers/scripting/
 
 ---
 
-### Phase 7: Deduplicate Script Extraction
+### Phase 7: Deduplicate Script Extraction ✅ COMPLETED
 
-#### Step 7.1: Create ScriptExtractor Utility
+#### Step 7.1: Create ScriptExtractor Utility ✅
 **Goal:** Single place for script tag extraction  
 **Changes:**
 - Create `xmlui/src/parsers/scripting/ScriptExtractor.ts`
@@ -358,7 +358,7 @@ parsers/scripting/
 
 ---
 
-#### Step 7.2: Use ScriptExtractor
+#### Step 7.2: Use ScriptExtractor ✅
 **Goal:** Remove duplication  
 **Changes:**
 - Update StandaloneApp.tsx to use ScriptExtractor
@@ -371,9 +371,9 @@ parsers/scripting/
 
 ---
 
-### Phase 8: Simplify Module Fetcher
+### Phase 8: Simplify Module Fetcher ✅ COMPLETED
 
-#### Step 8.1: Remove Custom Fetcher Type
+#### Step 8.1: Remove Custom Fetcher Type ✅
 **Goal:** Use standard async functions  
 **Changes:**
 - Change `ModuleFetcher` type to just `(path: string) => Promise<string>`
@@ -386,7 +386,7 @@ parsers/scripting/
 
 ---
 
-#### Step 8.2: Optional Fetcher with Default
+#### Step 8.2: Optional Fetcher with Default ✅
 **Goal:** Simpler API  
 **Changes:**
 - Make fetcher optional in parsing functions

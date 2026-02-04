@@ -13,6 +13,7 @@ import {
 import { Parser } from "../src/parsers/scripting/Parser";
 import { clearAllModuleCaches } from "../src/parsers/scripting/ModuleCache";
 import type { ModuleFetcher } from "../src/parsers/scripting/types";
+import { ScriptExtractor } from "../src/parsers/scripting/ScriptExtractor";
 import * as path from "path";
 import * as fs from "fs/promises";
 import { errReportComponent, xmlUiMarkupToComponent } from "../src/components-core/xmlui-parser";
@@ -41,12 +42,12 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
       if (xmluiExtension.test(id)) {
         const fileId = "" + itemIndex++;
 
-        // --- Extract script content from XMLUI markup
-        const scriptMatch = code.match(/<script>([\s\S]*?)<\/script>/);
+        // --- Extract script content from XMLUI markup using ScriptExtractor
+        const scriptResult = ScriptExtractor.extractInlineScript(code);
         let codeBehind;
 
-        if (scriptMatch && scriptMatch[1]) {
-          const scriptContent = scriptMatch[1];
+        if (scriptResult) {
+          const scriptContent = scriptResult.script;
 
           // --- Create a module fetcher for import support
           const moduleFetcher: ModuleFetcher = async (modulePath: string) => {

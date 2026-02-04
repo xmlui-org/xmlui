@@ -1313,6 +1313,7 @@ export class Parser {
 
       const specifier: ImportSpecifier = {
         type: T_IMPORT_SPECIFIER,
+        nodeId: createXmlUiTreeNodeId(),
         imported: {
           type: T_IDENTIFIER,
           nodeId: createXmlUiTreeNodeId(),

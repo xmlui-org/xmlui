@@ -162,7 +162,8 @@ export type Statement =
   | TryStatement
   | SwitchStatement
   | FunctionDeclaration
-  | ImportDeclaration;
+  | ImportDeclaration
+  | ImportSpecifier;
 
 export type LoopStatement = WhileStatement | DoWhileStatement;
 

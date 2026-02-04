@@ -35,7 +35,8 @@ import {
   removeCodeBehindTokensFromTree,
 } from "../parsers/scripting/code-behind-collect";
 import { ModuleResolver } from "../parsers/scripting/ModuleResolver";
-import type { ModuleFetcher } from "../parsers/scripting/ModuleResolver";
+import type { ModuleFetcher } from "../parsers/scripting/types";
+import { ScriptExtractor } from "../parsers/scripting/ScriptExtractor";
 import { ComponentRegistry } from "../components/ComponentProvider";
 import { checkXmlUiMarkup, type MetadataHandler, visitComponent } from "./markup-check";
 import StandaloneExtensionManager from "./StandaloneExtensionManager";
@@ -267,10 +268,10 @@ async function parseComponentMarkupResponse(response: Response): Promise<ParsedR
   
   let codeBehind: CollectedDeclarations | undefined;
 
-  // --- Extract inline script from markup
-  const scriptMatch = code.match(/<script>([\s\S]*?)<\/script>/);
-  if (scriptMatch && scriptMatch[1]) {
-    const scriptContent = scriptMatch[1];
+  // --- Extract inline script from markup using ScriptExtractor
+  const scriptResult = ScriptExtractor.extractInlineScript(code);
+  if (scriptResult) {
+    const scriptContent = scriptResult.script;
     
     try {
       // --- Create a module fetcher for import support
