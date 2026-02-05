@@ -1,7 +1,7 @@
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
-const url = require("url");
+const { URL } = require("url");
 
 // MIME types mapping
 const mimeTypes = {
@@ -77,22 +77,13 @@ class Server {
     }
   }
 
-  _log(level, message, extra = {}) {
-    const timestamp = new Date().toISOString();
-    const logData = {
-      timestamp,
-      level,
-      message,
-      ...extra,
-    };
-
-    if (level === "error") {
-      console.error(`[${timestamp}] ERROR: ${message}`, extra);
-    } else if (level === "warn") {
-      console.warn(`[${timestamp}] WARN: ${message}`, extra);
-    } else {
-      console.log(`[${timestamp}] ${level.toUpperCase()}: ${message}`, extra);
-    }
+  _getTimestamp() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+    const milliseconds = String(now.getMilliseconds()).padStart(3, "0");
+    return `${hours}:${minutes}:${seconds}.${milliseconds.slice(0, 2)}`;
   }
 
   getMimeType(filePath) {
@@ -132,17 +123,13 @@ class Server {
 
   _createRequestHandler() {
     return (req, res) => {
-      const startTime = Date.now();
-      const parsedUrl = url.parse(req.url);
+      const parsedUrl = new URL(req.url);
       let pathname = parsedUrl.pathname;
 
       // Normalize pathname (remove leading slash, ensure it doesn't start with ..)
       pathname = pathname.replace(/^\/+/, "");
       if (pathname.includes("..")) {
-        this._log("warn", "Invalid path attempt", {
-          pathname,
-          userAgent: req.headers["user-agent"],
-        });
+        console.warn(`\x1b[33mWARN: Invalid path attempt\x1b[0m`);
         res.writeHead(400);
         res.end("Bad Request");
         return;
@@ -165,12 +152,9 @@ class Server {
 
         if (isResource) {
           // Return proper 404 for resource files
-          statusCode = 404;
-          this._log("info", "Resource not found", {
-            pathname,
-            statusCode,
-            userAgent: req.headers["user-agent"],
-          });
+          const timestamp = this._getTimestamp();
+          const msg = `${timestamp} \x1b[36m${req.method}\x1b[0m \x1b[33m${pathname}\x1b[0m -> \x1b[31m404\x1b[0m -`;
+          console.log(msg);
 
           res.writeHead(404, { "Content-Type": "text/plain" });
           res.end("404 Not Found");
@@ -181,18 +165,10 @@ class Server {
         const indexPath = path.join(this.staticDir, "index.html");
         if (fs.existsSync(indexPath)) {
           filePath = indexPath;
-          this._log("info", "SPA fallback to index.html", {
-            pathname,
-            fallbackFile: "index.html",
-            userAgent: req.headers["user-agent"],
-          });
         } else {
-          statusCode = 404;
-          this._log("error", "No index.html for SPA fallback", {
-            pathname,
-            statusCode,
-            userAgent: req.headers["user-agent"],
-          });
+          const timestamp = this._getTimestamp();
+          const msg = `${timestamp} \x1b[36m${req.method}\x1b[0m \x1b[33m${pathname}\x1b[0m -> \x1b[31m404\x1b[0m -`;
+          console.log(msg);
 
           res.writeHead(404, { "Content-Type": "text/plain" });
           res.end("404 Not Found");
@@ -200,30 +176,13 @@ class Server {
         }
       }
 
-      // Serve the file
+      // Serve file
       try {
-        const stat = fs.statSync(filePath);
         const mimeType = this.getMimeType(filePath);
-        const responseTime = Date.now() - startTime;
 
         // Set cache headers based on file type
         let headers = { "Content-Type": mimeType };
-
-        if (
-          mimeType.startsWith("image/") ||
-          pathname.includes(".woff") ||
-          pathname.includes(".ttf")
-        ) {
-          headers["Cache-Control"] = "public, max-age=31536000, immutable";
-        } else if (
-          pathname.includes(".html") ||
-          pathname.includes(".js") ||
-          pathname.includes(".css")
-        ) {
-          headers["Cache-Control"] = "max-age=30, must-revalidate";
-        } else {
-          headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0";
-        }
+        headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0";
 
         res.writeHead(statusCode, headers);
 
@@ -231,12 +190,7 @@ class Server {
         readStream.pipe(res);
 
         readStream.on("error", (err) => {
-          this._log("error", "Error reading file", {
-            filePath,
-            error: err.message,
-            userAgent: req.headers["user-agent"],
-          });
-
+          console.error(`\x1b[31mERROR: Error reading file ${err.message}\x1b[0m`);
           if (!res.headersSent) {
             res.writeHead(500);
             res.end("Internal Server Error");
@@ -244,25 +198,20 @@ class Server {
         });
 
         readStream.on("end", () => {
-          this._log("info", "Request served", {
-            method: req.method,
-            pathname,
-            statusCode,
-            contentType: mimeType,
-            fileSize: stat.size,
-            responseTime: `${responseTime}ms`,
-            userAgent: req.headers["user-agent"],
-          });
+          const timestamp = this._getTimestamp();
+          const returnedFile = filePath.replace(this.staticDir + path.sep, "");
+
+          let logOutput = `${timestamp} \x1b[36m${req.method}\x1b[0m \x1b[33m${pathname}\x1b[0m -> \x1b[32m${statusCode}\x1b[0m`;
+
+          // Only show file path if it's different from requested path and wasn't directly requested HTML
+          if (returnedFile !== pathname) {
+            logOutput += ` \x1b[35m${returnedFile}\x1b[0m`;
+          }
+
+          console.log(logOutput);
         });
       } catch (err) {
-        const responseTime = Date.now() - startTime;
-        this._log("error", "Error serving file", {
-          filePath,
-          error: err.message,
-          responseTime: `${responseTime}ms`,
-          userAgent: req.headers["user-agent"],
-        });
-
+        console.error(`\x1b[31mERROR: Error serving file ${err.message}\x1b[0m`);
         res.writeHead(500);
         res.end("Internal Server Error");
       }
@@ -277,14 +226,17 @@ class Server {
         const actualPort = this.server.address().port;
         const resolvedStaticDir = path.resolve(this.staticDir);
 
-        console.log(`🚀 Static server running at http://localhost:${actualPort}`);
-        console.log(`📁 Serving files from: ${resolvedStaticDir}`);
+        console.log(
+          `\x1b[34m   XMLUI static file server for previewing optimized outputs.\x1b[0m\n`,
+        );
+        console.log(`\x1b[34m📁 This is the Serving files from: ${resolvedStaticDir}\x1b[0m`);
+        console.log(`\x1b[32m🚀 Static server running at http://localhost:${actualPort}\x1b[0m`);
 
         if (actualPort === 0) {
-          console.log(`🔢 Port was automatically assigned by the OS`);
+          console.log(`\x1b[33m🔢 Port was automatically assigned by the OS\x1b[0m`);
         }
 
-        console.log(`⏹️  Press Ctrl+C to stop the server`);
+        console.log(`\x1b[36m⏹️ Press Ctrl+C to stop the server\x1b[0m`);
         console.log();
 
         resolve({ port: actualPort, staticDir: resolvedStaticDir });
@@ -301,17 +253,17 @@ class Server {
         this.server.on("error", (err) => {
           if (err.code === "EADDRINUSE") {
             if (this.explicitPort) {
-              console.error(`❌ Error: Port ${portToTry} is already in use`);
+              console.error(`\x1b[31m❌ Error: Port ${portToTry} is already in use\x1b[0m`);
               reject(err);
             } else if (portToTry === 3000) {
-              console.log(`⚠️  Port 3000 is in use, trying OS-assigned port...`);
+              console.log(`\x1b[33m⚠️  Port 3000 is in use, trying OS-assigned port...\x1b[0m\n`);
               tryStart(0);
             } else {
-              console.error(`❌ Error: Could not find an available port`);
+              console.error(`\x1b[31m❌ Error: Could not find an available port\x1b[0m`);
               reject(err);
             }
           } else {
-            console.error(`❌ Server error: ${err.message}`);
+            console.error(`\x1b[31m❌ Server error: ${err.message}\x1b[0m`);
             reject(err);
           }
         });

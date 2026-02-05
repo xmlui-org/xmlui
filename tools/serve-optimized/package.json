@@ -1,6 +1,7 @@
 {
-  "name": "@xmlui/serve-optimized",
-  "version": "1.0.0",
+  "name": "serve-optimized",
+  "version": "0.0.1",
+  "private": true,
   "description": "Static file server optimized for XMLUI applications with SPA fallback and resource 404 handling",
   "main": "src/index.js",
   "bin": {
@@ -13,11 +14,8 @@
     "static",
     "server",
     "xmlui",
-    "spa",
-    "fallback"
+    "spa"
   ],
-  "author": "XMLUI Team",
-  "license": "MIT",
   "engines": {
     "node": ">=14.0.0"
   },
