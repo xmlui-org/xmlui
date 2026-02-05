@@ -91,6 +91,7 @@ This method toggles the item's expanded state.
 
 The component has some parts that can be styled through layout properties and theme variables separately:
 
+- **`content`**: The content section that is expanded or collapsed.
 - **`summary`**: The summary section that is always visible and acts as the trigger.
 
 ## Styling [#styling]
@@ -99,7 +100,11 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-ExpandableItem | $backgroundColor | $backgroundColor |
+| [animation](../styles-and-themes/layout-props/#animation)-content-ExpandableItem | ease-out | ease-out |
+| [animationDuration](../styles-and-themes/layout-props/#animationDuration)-content-ExpandableItem | 0.2s | 0.2s |
+| [backgroundColor](../styles-and-themes/common-units/#color)-ExpandableItem | transparent | transparent |
+| [backgroundColor](../styles-and-themes/common-units/#color)-ExpandableItem--active | $color-secondary-100 | $color-secondary-100 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-ExpandableItem--hover | $color-secondary-100 | $color-secondary-100 |
 | [border](../styles-and-themes/common-units/#border)-ExpandableItem | *none* | *none* |
 | [borderBottom](../styles-and-themes/common-units/#border)-ExpandableItem | *none* | *none* |
 | [borderBottomColor](../styles-and-themes/common-units/#color)-ExpandableItem | *none* | *none* |
@@ -117,6 +122,7 @@ The component has some parts that can be styled through layout properties and th
 | [borderLeftStyle](../styles-and-themes/common-units/#border-style)-ExpandableItem | *none* | *none* |
 | [borderLeftWidth](../styles-and-themes/common-units/#size)-ExpandableItem | *none* | *none* |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-ExpandableItem | 0 | 0 |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-summary-ExpandableItem | $borderRadius | $borderRadius |
 | [borderRight](../styles-and-themes/common-units/#border)-ExpandableItem | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-ExpandableItem | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-ExpandableItem | *none* | *none* |
@@ -141,18 +147,25 @@ The component has some parts that can be styled through layout properties and th
 | [gap](../styles-and-themes/common-units/#size)-ExpandableItem | $space-2 | $space-2 |
 | [padding](../styles-and-themes/common-units/#size)-content-ExpandableItem | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-ExpandableItem | *none* | *none* |
+| [padding](../styles-and-themes/common-units/#size)-summary-ExpandableItem | $space-2 $space-4 | $space-2 $space-4 |
 | [paddingBottom](../styles-and-themes/common-units/#size)-content-ExpandableItem | *none* | *none* |
 | [paddingBottom](../styles-and-themes/common-units/#size)-ExpandableItem | $space-2 | $space-2 |
+| [paddingBottom](../styles-and-themes/common-units/#size)-summary-ExpandableItem | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-content-ExpandableItem | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-ExpandableItem | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-ExpandableItem-summary | *none* | *none* |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-summary-ExpandableItem | *none* | *none* |
 | [paddingLeft](../styles-and-themes/common-units/#size)-content-ExpandableItem | $space-3 | $space-3 |
 | [paddingLeft](../styles-and-themes/common-units/#size)-ExpandableItem | $space-0 | $space-0 |
+| [paddingLeft](../styles-and-themes/common-units/#size)-summary-ExpandableItem | *none* | *none* |
 | [paddingRight](../styles-and-themes/common-units/#size)-content-ExpandableItem | $space-3 | $space-3 |
 | [paddingRight](../styles-and-themes/common-units/#size)-ExpandableItem | $space-0 | $space-0 |
+| [paddingRight](../styles-and-themes/common-units/#size)-summary-ExpandableItem | *none* | *none* |
 | [paddingTop](../styles-and-themes/common-units/#size)-content-ExpandableItem | *none* | *none* |
 | [paddingTop](../styles-and-themes/common-units/#size)-ExpandableItem | $space-2 | $space-2 |
+| [paddingTop](../styles-and-themes/common-units/#size)-summary-ExpandableItem | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-content-ExpandableItem | $space-2 | $space-2 |
 | [paddingVertical](../styles-and-themes/common-units/#size)-ExpandableItem | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-ExpandableItem-summary | *none* | *none* |
-| [transition](../styles-and-themes/common-units/#transition)-ExpandableItem | 0.2s ease | 0.2s ease |
+| [paddingVertical](../styles-and-themes/common-units/#size)-summary-ExpandableItem | *none* | *none* |
+| [transition](../styles-and-themes/common-units/#transition)-summary-ExpandableItem | color 0.2s, background 0.2s | color 0.2s, background 0.2s |
