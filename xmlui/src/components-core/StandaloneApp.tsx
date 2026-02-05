@@ -226,9 +226,7 @@ function StandaloneApp({
         // @ts-ignore
         routerBaseName={typeof window !== "undefined" ? window.__PUBLIC_PATH || "" : ""}
         globalProps={globalProps}
-        globalVars={(() => {
-          return globalVars;
-        })()}
+        globalVars={globalVars}
         defaultTheme={defaultTheme}
         defaultTone={defaultTone as ThemeTone}
         resources={resources}
@@ -788,11 +786,11 @@ function useStandalone(
     return extractedVars;
   };
 
-  const globalVars = useMemo(() => {
+  const [globalVars, setGlobalVars] = useState<Record<string, any>>(() => {
     // Get the vars in Globals.xs module directly from runtime
     const globalsXs = runtime?.[GLOBALS_BUILT_RESOURCE];
     return extractGlobals({ ...(globalsXs?.vars || {}), ...(globalsXs?.functions || {}) });
-  }, [runtime]);
+  });
 
   useIsomorphicLayoutEffect(() => {
     void (async function () {
@@ -885,8 +883,9 @@ function useStandalone(
           const resp = await fetchWithoutCache(GLOBALS_FILE);
           if (resp.ok) {
             const parsedGlobals = await parseCodeBehindResponse(resp);
-            console.log("Globals.xs:", parsedGlobals)
-            resolve(parsedGlobals);
+            const globalsXs = parsedGlobals?.codeBehind;
+            const extractedGlobals = extractGlobals({ ...(globalsXs?.vars || {}), ...(globalsXs?.functions || {}) });
+            resolve(extractedGlobals);
           } else {
             resolve({
               component: errReportMessage(`Failed to load the globals component (${GLOBALS_FILE})`),
@@ -936,7 +935,8 @@ function useStandalone(
         Promise.all(themePromises || []),
       ]);
 
-      // --- Process globals
+      // --- We will pass these globals
+      setGlobalVars(loadedGlobals);
 
       // --- Collect the elements of the standalone app (and potential errors)
       const errorComponents: ComponentDef[] = [];
@@ -1198,6 +1198,7 @@ function useStandalone(
       setStandaloneApp(newAppDef);
     })();
   }, [runtime, standaloneAppDef]);
+
   return { standaloneApp, projectCompilation, globalVars };
 }
 
