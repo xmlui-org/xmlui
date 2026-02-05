@@ -24,11 +24,8 @@ import {
   type FunctionDeclaration,
   type ImportDeclaration,
   type Statement,
-  type VarStatement,
-  type LetStatement,
-  type ConstStatement,
 } from "../../components-core/script-runner/ScriptingSourceTree";
-import { ErrorCodes, ParserErrorMessage } from "./ParserError";
+import { ErrorCodes, type ParserErrorMessage } from "./ParserError";
 import { Parser } from "./Parser";
 import { errorMessages } from "./ParserError";
 import { TokenType } from "./TokenType";
@@ -274,7 +271,7 @@ export async function parseScriptModuleAsync(
  * Parses a script module with import support (legacy alias for backward compatibility)
  * @deprecated Use parseScriptModuleAsync instead
  */
-export async function parseScriptModuleWithImports(
+export function parseScriptModuleWithImports(
   moduleName: string,
   source: string,
   moduleFetcher: ModuleFetcher,
