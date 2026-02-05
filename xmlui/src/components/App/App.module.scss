@@ -14,6 +14,7 @@ $boxShadow-header-App: createThemeVar("boxShadow-header-App");
 $boxShadow-navPanel-App: createThemeVar("boxShadow-navPanel-App");
 $backgroundColor-content-App: createThemeVar("backgroundColor-content-App");
 $borderLeft-content-App: createThemeVar("borderLeft-content-App");
+$borderRight-navPanelWrapper-App: createThemeVar("borderRight-navPanelWrapper-App");
 $maxWidth-content-App: createThemeVar("maxWidth-content-App");
 $maxWidth-App: createThemeVar("maxWidth-App");
 $backgroundColor-AppHeader: createThemeVar("backgroundColor-AppHeader");
@@ -66,6 +67,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       .navPanelWrapper {
         width: $width-navPanel-App;
         flex-shrink: 0;
+        border-right: $borderRight-navPanelWrapper-App;
 
         &.navPanelWrapperCollapsed {
           width: $width-navPanel-collapsed-App;
@@ -202,6 +204,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
         position: sticky;
         height: var(--content-available-height);
         top: var(--header-height);
+        border-right: $borderRight-navPanelWrapper-App;
 
         &::before {
           content: "";
@@ -373,9 +376,16 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
   .navPanelWrapper {
     display: flex;
+    flex-direction: column;
     position: sticky;
     top: 0;
     transition: width 0.2s ease;
+
+    // First child (sidebar wrapper) takes space, footer stays at bottom
+    > *:first-child {
+      flex: 1;
+      min-height: 0;
+    }
 
     &:empty {
       display: none;

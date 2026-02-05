@@ -143,9 +143,24 @@ $themeVars: t.composePaddingVars($themeVars, "footer-#{$component}") !global;
   }
 
   // Footer: collapse-kor azonnal rejtett (opacity 0), sidebar (0.2s) után fade in – villogás nélkül
-  .wrapper.collapsed .footer {
+  .footer.footerCollapsed {
     opacity: 0;
     animation: navPanelFooterFadeIn 0.2s ease 0.2s forwards;
+    flex-direction: column;
+    justify-content: center;
+    border-top: none;
+    border-left: 1px solid $borderColor-footer-NavPanel;
+    min-width: 0;
+    width: $width-navPanel-collapsed-App;
+    max-width: $width-navPanel-collapsed-App;
+    padding-inline: 0;
+
+    // Stack footer content (e.g. HStack with buttons) vertically so it fits in the narrow strip
+    > * {
+      flex-direction: column;
+      min-width: 0;
+      width: 100%;
+    }
   }
 
   .wrapper.collapsed {
@@ -167,24 +182,6 @@ $themeVars: t.composePaddingVars($themeVars, "footer-#{$component}") !global;
       border: none !important;
       transition: opacity 0.1s ease 0.2s, visibility 0s linear 0.3s,
         flex 0s ease 0.2s, min-height 0s ease 0.2s, max-height 0s ease 0.2s;
-    }
-
-    .footer {
-      flex-direction: column;
-      justify-content: center;
-      border-top: none;
-      border-left: 1px solid $borderColor-footer-NavPanel;
-      min-width: 0;
-      width: $width-navPanel-collapsed-App;
-      max-width: $width-navPanel-collapsed-App;
-      padding-inline: 0;
-
-      // Stack footer content (e.g. HStack with buttons) vertically so it fits in the narrow strip
-      > * {
-        flex-direction: column;
-        min-width: 0;
-        width: 100%;
-      }
     }
   }
 }

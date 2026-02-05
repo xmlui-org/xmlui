@@ -320,7 +320,7 @@ export const NavPanel = forwardRef(function NavPanel(
     );
   }
 
-  return (
+  const wrapperEl = (
     <div
       {...rest}
       ref={forwardedRef}
@@ -344,7 +344,22 @@ export const NavPanel = forwardRef(function NavPanel(
       >
         {children}
       </Scroller>
-      {hasFooter && <div className={styles.footer}>{footerContent}</div>}
     </div>
   );
+
+  if (vertical && hasFooter) {
+    return (
+      <>
+        {wrapperEl}
+        <div
+          className={classnames(styles.footer, {
+            [styles.footerCollapsed]: collapsed,
+          })}
+        >
+          {footerContent}
+        </div>
+      </>
+    );
+  }
+  return wrapperEl;
 });
