@@ -118,9 +118,6 @@ function StandaloneApp({
   // --- Fetch all files constituting the standalone app, including components,
   // --- themes, and other artifacts. Display the app version numbers in the
   // --- console.
-  console.log("Runtime:", runtime);
-
-
   const { standaloneApp, projectCompilation, globalVars } = useStandalone(appDef, runtime, extensionManager);
 
   usePrintVersionNumber(standaloneApp);
@@ -224,7 +221,6 @@ function StandaloneApp({
         routerBaseName={typeof window !== "undefined" ? window.__PUBLIC_PATH || "" : ""}
         globalProps={globalProps}
         globalVars={(() => {
-          console.log("[DEBUG] StandaloneApp render - passing globalVars to AppRoot:", { ...globalVars }, "with keys:", Object.keys(globalVars));
           return globalVars;
         })()}
         defaultTheme={defaultTheme}
@@ -430,7 +426,6 @@ function matchesFolder(path: string, folderName: string) {
 function resolveRuntime(runtime: Record<string, any>): {
   standaloneApp: StandaloneAppDescription;
   projectCompilation?: ProjectCompilation;
-  globalVars?: Record<string, any>;
 } {
   // --- Collect the components and their sources. We pass the sources to the standalone app
   // --- so that it can be used for error display and debugging purposes.
@@ -453,10 +448,6 @@ function resolveRuntime(runtime: Record<string, any>): {
   let entryPoint: ComponentDef | undefined;
   let entryPointCodeBehind: CollectedDeclarations | undefined;
   let apiInterceptor: any;
-  let globalVars: Record<string, any> = {};
-
-  console.log("[DEBUG] resolveRuntime() - Runtime keys:", Object.keys(runtime));
-  console.log("[DEBUG] resolveRuntime() - Checking for 'Globals' file with keys matching:", Object.keys(runtime).filter(k => k.includes("Global")));
 
   // --- Process the runtime files
   for (const [key, value] of Object.entries(runtime)) {
@@ -489,49 +480,6 @@ function resolveRuntime(runtime: Record<string, any>): {
     // --- Use API emulation if available
     if (matchesFileName(key, "api")) {
       apiInterceptor = value.default;
-    }
-
-    // --- Extract global variables from Globals.xs
-    if (matchesFileName(key, "Globals")) {
-      console.log("[DEBUG] Detected Globals.xs module at key:", key);
-      const globalsModule = value;
-      console.log("[DEBUG] Globals module structure (keys):", Object.keys(globalsModule));
-      console.log("[DEBUG] Globals module full object:", globalsModule);
-      console.log("[DEBUG] Globals module.vars:", globalsModule?.vars);
-      console.log("[DEBUG] Globals module.default:", globalsModule?.default);
-      console.log("[DEBUG] Does module have vars?", !!globalsModule?.vars);
-      if (globalsModule?.vars) {
-        console.log("[DEBUG] Variable names in Globals:", Object.keys(globalsModule.vars));
-        // Create a minimal evaluation context for evaluating global variable expressions
-        const evalContext: BindingTreeEvaluationContext = {
-          localContext: {},
-          mainThread: {
-            parent: null,
-            childThreads: [],
-            blocks: [{ vars: {} }],
-            loops: [],
-            breakLabelValue: -1,
-          },
-        };
-        
-        // Evaluate each variable's expression tree
-        for (const [varName, varDecl] of Object.entries(globalsModule.vars)) {
-          try {
-            const tree = (varDecl as any)?.tree;
-            console.log(`[DEBUG] Evaluating '${varName}':`, { tree, varDeclKeys: Object.keys(varDecl as any) });
-            if (tree) {
-              const value = evalBindingExpression(tree, evalContext);
-              console.log(`[DEBUG] ✅ '${varName}' = ${value} (type: ${typeof value})`);
-              globalVars[varName] = value;
-            } else {
-              console.warn(`[DEBUG] ❌ Variable '${varName}' has no tree property, varDecl:`, varDecl);
-            }
-          } catch (error) {
-            console.error(`[DEBUG] ❌ Failed to evaluate global variable '${varName}':`, error);
-          }
-        }
-        console.log("[DEBUG] ✅ Final globalVars after extraction:", { ...globalVars });
-      }
     }
 
     // --- Collect the components and their code behinds
@@ -627,7 +575,6 @@ function resolveRuntime(runtime: Record<string, any>): {
   }
 
   // --- Done.
-  console.log("[DEBUG] resolveRuntime() - Returning globalVars:", { ...globalVars }, "with keys:", Object.keys(globalVars));
   return {
     standaloneApp: {
       ...config,
@@ -638,7 +585,6 @@ function resolveRuntime(runtime: Record<string, any>): {
       sources,
     },
     projectCompilation,
-    globalVars,
   };
 }
 
@@ -776,11 +722,11 @@ function useStandalone(
   });
 
   const [projectCompilation, setProjectCompilation] = useState<ProjectCompilation>(null);
-  const [globalVars, setGlobalVars] = useState<Record<string, any>>(() => {
-    const resolvedRuntime = resolveRuntime(runtime);
-    console.log("[DEBUG] useStandalone() initial state - globalVars:", { ...resolvedRuntime.globalVars }, "with keys:", Object.keys(resolvedRuntime.globalVars || {}));
-    return resolvedRuntime.globalVars || {};
-  });
+  const globalVars = useMemo(() => {
+    return {
+      count: 42,
+    }
+  }, [runtime, standaloneApp]);
 
   useIsomorphicLayoutEffect(() => {
     void (async function () {
@@ -1157,9 +1103,7 @@ function useStandalone(
         extensionManager,
       });
 
-      console.log("[DEBUG] useStandalone() effect - setting globalVars:", { ...resolvedRuntime.globalVars }, "with keys:", Object.keys(resolvedRuntime.globalVars || {}));
       setProjectCompilation(resolvedRuntime.projectCompilation);
-      setGlobalVars(resolvedRuntime.globalVars || {});
       setStandaloneApp(newAppDef);
     })();
   }, [runtime, standaloneAppDef]);

@@ -61,8 +61,6 @@ export function AppRoot({
   extensionManager?: StandaloneExtensionManager;
   isNested?: boolean;
 }) {
-  // Note: Startup trace initialization is handled by AppContent's xsVerbose useEffect
-  console.log("[DEBUG] AppRoot() received globalVars:", { ...globalVars }, "with keys:", Object.keys(globalVars || {}));
   // --- Make sure, the root node is wrapped in a `Theme` component. Also,
   // --- the root node must be wrapped in a `Container` component managing
   // --- the app's top-level state.
@@ -83,8 +81,6 @@ export function AppRoot({
     };
   }, [node, globalVars]);
 
-  console.log("[DEBUG] AppRoot() created root container with globalVars:", { ...globalVars }, "uid: root");
-
   if (projectCompilation) {
     const entryDeps = projectCompilation.entrypoint.dependencies;
 
@@ -97,39 +93,42 @@ export function AppRoot({
   resetErrors();
 
   // --- Add isNested to global props so it can be accessed throughout the app
-  const enhancedGlobalProps = useMemo(() => ({
-    ...globalProps,
-    isNested,
-  }), [globalProps, isNested]);
+  const enhancedGlobalProps = useMemo(
+    () => ({
+      ...globalProps,
+      isNested,
+    }),
+    [globalProps, isNested],
+  );
 
   // --- Render the app providing a component registry (in which the engine finds a
   // --- component definition by its name). Ensure the app has a context for debugging.
   return (
     <ComponentProvider contributes={contributes} extensionManager={extensionManager}>
       <StyleProvider>
-          <DebugViewProvider debugConfig={globalProps?.debug}>
-            <AppWrapper
-              projectCompilation={projectCompilation}
-              resourceMap={resourceMap}
-              apiInterceptor={apiInterceptor}
-              node={rootNode as ComponentLike}
-              contributes={contributes}
-              resources={resources}
-              routerBaseName={routerBaseName}
-              decorateComponentsWithTestId={decorateComponentsWithTestId}
-              debugEnabled={debugEnabled}
-              defaultTheme={defaultTheme}
-              defaultTone={defaultTone}
-              globalProps={enhancedGlobalProps}
-              standalone={standalone}
-              trackContainerHeight={trackContainerHeight}
-              previewMode={previewMode}
-              sources={sources}
-              onInit={onInit}
-            >
-              {children}
-            </AppWrapper>
-          </DebugViewProvider>
+        <DebugViewProvider debugConfig={globalProps?.debug}>
+          <AppWrapper
+            projectCompilation={projectCompilation}
+            resourceMap={resourceMap}
+            apiInterceptor={apiInterceptor}
+            node={rootNode as ComponentLike}
+            contributes={contributes}
+            resources={resources}
+            routerBaseName={routerBaseName}
+            decorateComponentsWithTestId={decorateComponentsWithTestId}
+            debugEnabled={debugEnabled}
+            defaultTheme={defaultTheme}
+            defaultTone={defaultTone}
+            globalProps={enhancedGlobalProps}
+            standalone={standalone}
+            trackContainerHeight={trackContainerHeight}
+            previewMode={previewMode}
+            sources={sources}
+            onInit={onInit}
+          >
+            {children}
+          </AppWrapper>
+        </DebugViewProvider>
       </StyleProvider>
     </ComponentProvider>
   );
