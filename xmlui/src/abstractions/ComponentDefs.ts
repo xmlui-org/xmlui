@@ -31,6 +31,14 @@ export interface ComponentDefCore {
   vars?: Record<string, any>;
 
   /**
+   * Global variables that flow down to all child containers regardless of the `uses`
+   * property. These variables are shared across the entire application and updates
+   * to them propagate back to the root container where they are defined.
+   * Only the root container should define globalVars.
+   */
+  globalVars?: Record<string, any>;
+
+  /**
    * Each component may have child components to constitute a hierarchy of components.
    * This property holds the definition of these nested children.
    */

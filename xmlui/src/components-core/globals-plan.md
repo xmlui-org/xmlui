@@ -106,7 +106,38 @@ return {
 
 **Result:** Global variables now flow down to all containers including compound components via the existing state inheritance mechanism. Local variables declared with `var.count="{0}"` will shadow the global variable in their scope.
 
-**Status:** ✅ Implemented and fixed
+**Status:** ✅ Implemented
+
+**Breaking Changes with Initial Approach:**
+- ✅ Global variables accessible in compound components
+- ⚠️ All parent variables are now accessible (not just globals)
+- ⚠️ Potential for variable name collisions if parent and component use same names
+
+**Revised Implementation - Separate Global Variables Flow:**
+
+To avoid breaking changes, we implemented a separate `globalVars` flow that works alongside `uses`:
+
+**Files Changed:**
+1. `xmlui/src/abstractions/ComponentDefs.ts` - Added `globalVars` property to ComponentDefCore
+2. `xmlui/src/abstractions/RendererDefs.ts` - Added `globalVars` to ComponentRendererContextBase
+3. `xmlui/src/components-core/rendering/AppRoot.tsx` - Use `globalVars` instead of `vars`
+4. `xmlui/src/components-core/rendering/ContainerWrapper.tsx` - Pass `parentGlobalVars` through hierarchy
+5. `xmlui/src/components-core/rendering/StateContainer.tsx` - Merge and flow globalVars
+6. `xmlui/src/components-core/rendering/Container.tsx` - Pass globalVars to children via renderChild
+7. `xmlui/src/components-core/rendering/ComponentWrapper.tsx` - Extract and pass globalVars to ContainerWrapper
+
+**Key Mechanism:**
+GlobalVars are added to `combinedState` but NOT to `componentState` or `resolvedLocalVars`. The existing `statePartChanged` logic (StateContainer.tsx lines 543-568) already handles bubbling:
+- If a variable is in local state → dispatch locally
+- If a variable is NOT in local state → bubble up to parent (via `parentStatePartChanged`)
+
+Since globalVars are not in local state, changes automatically propagate up to the root container!
+
+**Final Result:**
+- ✅ Global variables accessible everywhere including compound components
+- ✅ Updates to globals propagate to root automatically (existing mechanism)
+- ✅ Compound components maintain isolation (`uses: []`) for their local state
+- ✅ No breaking changes
 
 ### Phase 2: Dynamic Global Variables Declaration
 

@@ -19,6 +19,7 @@ export const ComponentWrapper = memo(
       node,
       resolvedKey,
       state,
+      globalVars,
       dispatch,
       appContext,
       lookupAction,
@@ -87,6 +88,7 @@ export const ComponentWrapper = memo(
           resolvedKey={resolvedKey}
           node={nodeWithTransformedDatasourceProp as ContainerWrapperDef}
           parentState={state}
+          parentGlobalVars={globalVars}
           parentDispatch={dispatch}
           layoutContextRef={stableLayoutContext}
           parentRenderContext={parentRenderContext}

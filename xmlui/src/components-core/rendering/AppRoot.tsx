@@ -77,7 +77,7 @@ export function AppRoot({
       uid: "root",
       children: [themedRoot],
       uses: [],
-      vars: {
+      globalVars: {
         count: 42,
       },
     };
