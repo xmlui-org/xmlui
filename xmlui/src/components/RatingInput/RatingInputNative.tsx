@@ -83,6 +83,7 @@ export function RatingInput({
   validationIconError,
   verboseValidationFeedback,
   registerComponentApi,
+  ...rest
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const max = useMemo(() => {
@@ -178,6 +179,7 @@ export function RatingInput({
         onBlur={isInteractive ? onBlur : undefined}
         aria-disabled={!isInteractive}
         tabIndex={-1}
+        {...rest}
       >
         {(localValue === undefined || localValue === null) && placeholder && (
           <span className={styles.placeholder}>{placeholder}</span>
