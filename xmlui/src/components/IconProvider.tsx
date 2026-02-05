@@ -131,6 +131,7 @@ import TableInsertColumnIcon from "./Icon/TableInsertColumnIcon";
 import TableDeleteColumnIcon from "./Icon/TableDeleteColumnIcon";
 import { ChevronsRightIcon } from "./Icon/ChevronsRight";
 import { ChevronsLeftIcon } from "./Icon/ChevronsLeft";
+import { ICON_NAMES } from "./icons-abstractions";
 
 type IconRenderer<T extends IconBaseProps> = (
   props: T,
@@ -164,8 +165,8 @@ function registerIconRenderer(name: string | string[], renderer: IconRenderer<an
   }
 }
 
-registerIconRenderer("assign", (props: IconBaseProps) => <FiUser {...props} />);
-registerIconRenderer("arrowup", (props: IconBaseProps) => <BsArrowUpShort {...props} />);
+registerIconRenderer(ICON_NAMES.ASSIGN, (props: IconBaseProps) => <FiUser {...props} />);
+registerIconRenderer(ICON_NAMES.ARROW_UP, (props: IconBaseProps) => <BsArrowUpShort {...props} />);
 registerIconRenderer("arrowleft", (props: IconBaseProps) => <BsArrowLeftShort {...props} />);
 registerIconRenderer("arrowright", (props: IconBaseProps) => <BsArrowRightShort {...props} />);
 registerIconRenderer("pause", (props: IconBaseProps) => <BsPause {...props} />);
@@ -210,7 +211,7 @@ registerIconRenderer("rename", (props: IconBaseProps) => (
 registerIconRenderer("hyperlink", (props: IconBaseProps) => <HyperLinkIcon {...props} />);
 registerIconRenderer("globe", (props: IconBaseProps) => <GlobeIcon {...props} />);
 registerIconRenderer("link", (props: IconBaseProps) => <LinkIcon {...props} />);
-registerIconRenderer("looseList", (props: IconBaseProps) => <LooseListIcon {...props} />);
+registerIconRenderer("looselist", (props: IconBaseProps) => <LooseListIcon {...props} />);
 registerIconRenderer("options", (props: IconBaseProps) => <MoreOptionsIcon {...props} />);
 registerIconRenderer("search", (props: IconBaseProps) => <SearchIcon {...props} />);
 registerIconRenderer("filter", (props: IconBaseProps) => <FilterIcon {...props} />);

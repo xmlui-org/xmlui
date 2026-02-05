@@ -250,8 +250,6 @@ Automatically parse file contents as CSV or JSON. When set, the `onDidChange` ev
 | `files` | Array containing the original [File objects](https://developer.mozilla.org/en-US/docs/Web/API/File) |
 | `parsedData` | Array containing: <ul><li>`file`: Reference to the original [File object](https://developer.mozilla.org/en-US/docs/Web/API/File)</li><li>`data`: The parsed data rows</li><li>`error`: Parse error object, if any</li></ul> |
 
-Available values: `"csv"`, `"json"`, `undefined` **(default)**
-
 When `parseAs` is set, `acceptsFileType` is automatically inferred (`.csv` or `.json`) unless explicitly overridden.
 
 > **Note**: Empty files are handled gracefully, returning an empty `data` array without error.
