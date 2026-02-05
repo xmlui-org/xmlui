@@ -514,7 +514,13 @@ export function App({
         </>
       ) : config.navPanelPosition === "side" ? (
         <>
-          {navPanelVisible && <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>}
+          {navPanelVisible && (
+            <AppNavPanelSlot
+              className={navPanelCollapsed ? styles.navPanelWrapperCollapsed : undefined}
+            >
+              {navPanel}
+            </AppNavPanelSlot>
+          )}
           <AppContentSlot ref={pageScrollRef}>
             {renderHeaderSlot()}
             {renderPagesSlot()}
