@@ -139,6 +139,7 @@ import { accordionComponentRenderer } from "./Accordion/Accordion";
 import { tabItemComponentRenderer } from "./Tabs/TabItem";
 import { accordionItemComponentRenderer } from "./Accordion/AccordionItem";
 import { sliderComponentRenderer } from "./Slider/Slider";
+import { ratingInputComponentRenderer } from "./RatingInput/RatingInput";
 import { carouselComponentRenderer } from "./Carousel/Carousel";
 import { carouselItemComponentRenderer } from "./Carousel/CarouselItem";
 import { createPropHolderComponent } from "../components-core/renderers";
@@ -608,6 +609,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(carouselComponentRenderer);
       this.registerCoreComponent(accordionComponentRenderer);
       this.registerCoreComponent(sliderComponentRenderer);
+      this.registerCoreComponent(ratingInputComponentRenderer);
       this.registerCoreComponent(backdropComponentRenderer);
       this.registerCoreComponent(toastComponentRenderer);
     }
