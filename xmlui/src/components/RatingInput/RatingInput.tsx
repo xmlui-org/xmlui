@@ -44,6 +44,11 @@ export const RatingInputMd = createMetadata({
     [`opacity-${COMP}--disabled`]: "0.6",
     [`opacity-${COMP}--readOnly`]: "0.8",
   },
+  parts: {
+    input: {
+      description: "The rating input area (star buttons container).",
+    },
+  },
   props: {
     placeholder: dPlaceholder(),
     initialValue: {
@@ -118,6 +123,13 @@ export const ratingInputComponentRenderer = createComponentRenderer(
     registerComponentApi,
   }) => {
     const props = (node.props ?? {}) as Record<string, unknown>;
+    const rawMax = extractValue(props.maxRating);
+    const maxRating =
+      typeof rawMax === "number" && Number.isFinite(rawMax)
+        ? rawMax
+        : typeof rawMax === "string" && !Number.isNaN(parseFloat(rawMax))
+          ? Number(rawMax)
+          : defaultProps.maxRating;
 
     return (
       <RatingInput
@@ -125,7 +137,7 @@ export const ratingInputComponentRenderer = createComponentRenderer(
         value={state?.value}
         updateState={updateState}
         initialValue={extractValue.asOptionalNumber(props.initialValue)}
-        maxRating={extractValue.asOptionalNumber(props.maxRating)}
+        maxRating={maxRating}
         autoFocus={extractValue.asOptionalBoolean(props.autoFocus)}
         readOnly={extractValue.asOptionalBoolean(props.readOnly)}
         required={extractValue.asOptionalBoolean(props.required)}

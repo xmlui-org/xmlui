@@ -2,8 +2,10 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import styles from "./RatingInput.module.scss";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
+import { PART_INPUT } from "../../components-core/parts";
 import type { ValidationStatus } from "../abstractions";
 import { noop } from "../../components-core/constants";
+import { Part } from "../Part/Part";
 
 type Props = {
   validationStatus?: ValidationStatus;
@@ -86,7 +88,8 @@ export function RatingInput({
   const max = useMemo(() => {
     const numericMax = typeof maxRating === "number" ? maxRating : DEFAULT_MAX_RATING;
     const safeMax = Number.isFinite(numericMax) ? numericMax : DEFAULT_MAX_RATING;
-    return Math.max(1, Math.min(Math.round(safeMax), 10));
+    const result = Math.max(1, Math.min(Math.round(safeMax), 10));
+    return Number.isFinite(result) ? result : DEFAULT_MAX_RATING;
   }, [maxRating]);
 
   const currentValue = Number(value ?? 0);
@@ -123,6 +126,7 @@ export function RatingInput({
   }, []);
 
   const setValue = useEvent((newValue: number | string) => {
+    if (!isInteractive) return;
     const numericValue =
       typeof newValue === "number"
         ? newValue
@@ -155,56 +159,59 @@ export function RatingInput({
   const finalValidationIconError = validationIconError ?? DEFAULT_VALIDATION_ICON_ERROR;
 
   return (
-    <div
-      id={id}
-      ref={containerRef}
-      className={[
-        styles.container,
-        className,
-        !enabled ? styles.disabled : "",
-        readOnly ? styles.readOnly : "",
-        validationStatus === "error" ? styles.error : "",
-        validationStatus === "warning" ? styles.warning : "",
-        validationStatus === "valid" ? styles.valid : "",
-      ]
-        .filter(Boolean)
-        .join(" ")}
-      onFocus={onFocus}
-      onBlur={onBlur}
-      aria-disabled={!isInteractive}
-      tabIndex={-1}
-    >
-      {(localValue === undefined || localValue === null) && placeholder && (
-        <span className={styles.placeholder}>{placeholder}</span>
-      )}
-      {Array.from({ length: max }, (_, index) => {
-        const ratingValue = index + 1;
-        const isActive = ratingValue <= currentValue;
-        const label = `Set rating to ${ratingValue}`;
-
-        return (
-          <button
-            key={ratingValue}
-            type="button"
-            className={[
-              styles.star,
-              isActive ? styles.starActive : "",
-              !isInteractive ? styles.disabled : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-            onClick={() => handleSelect(ratingValue)}
-            disabled={!isInteractive}
-            aria-label={label}
-          >
-            {isActive ? "★" : "☆"}
-          </button>
-        );
-      })}
-      {!finalVerboseValidationFeedback &&
-        (finalValidationIconSuccess || finalValidationIconError || invalidMessages?.length) && (
-          <span aria-hidden="true" />
+    <Part partId={PART_INPUT}>
+      <div
+        id={id}
+        ref={containerRef}
+        className={[
+          styles.container,
+          className,
+          !enabled ? styles.disabled : "",
+          readOnly ? styles.readOnly : "",
+          validationStatus === "error" ? styles.error : "",
+          validationStatus === "warning" ? styles.warning : "",
+          validationStatus === "valid" ? styles.valid : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        onFocus={isInteractive ? onFocus : undefined}
+        onBlur={isInteractive ? onBlur : undefined}
+        aria-disabled={!isInteractive}
+        tabIndex={-1}
+      >
+        {(localValue === undefined || localValue === null) && placeholder && (
+          <span className={styles.placeholder}>{placeholder}</span>
         )}
-    </div>
+        {Array.from({ length: max }, (_, index) => {
+          const ratingValue = index + 1;
+          const isActive = ratingValue <= currentValue;
+          const label = `Set rating to ${ratingValue}`;
+
+          return (
+            <button
+              role="button"
+              key={ratingValue}
+              type="button"
+              className={[
+                styles.star,
+                isActive ? styles.starActive : "",
+                !isInteractive ? styles.disabled : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              onClick={() => handleSelect(ratingValue)}
+              disabled={!isInteractive}
+              aria-label={label}
+            >
+              {isActive ? "★" : "☆"}
+            </button>
+          );
+        })}
+        {!finalVerboseValidationFeedback &&
+          (finalValidationIconSuccess || finalValidationIconError || invalidMessages?.length) && (
+            <span aria-hidden="true" />
+          )}
+      </div>
+    </Part>
   );
 }
