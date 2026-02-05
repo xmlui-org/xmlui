@@ -25,7 +25,7 @@
         />
     </AppHeader>
     <NavPanel
-        when="{!window.location.hash.includes('/404') || mediaSize.sizeIndex <= 2}"
+        when="{(!globalThis.location.hash.includes('/404') && !globalThis.location.pathname.includes('/404')) || mediaSize.sizeIndex <= 2}"
         scrollStyle="whenScrolling"
         showScrollerFade="true"
     >

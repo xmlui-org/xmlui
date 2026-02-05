@@ -96,8 +96,10 @@ export const FileInputMd = createMetadata({
     ),
     parseAs: d(
       `Automatically parse file contents as CSV or JSON. When set, the \`onDidChange\` event receives ` +
-        `parsed data instead of raw File objects. When \`parseAs\` is set, \`acceptsFileType\` is automatically ` +
-        `inferred (e.g., ".csv" or ".json") unless explicitly overridden.`,
+        `an object \`{ files: File[], parsedData: ParseResult[] }\` containing both the raw files and parsed data. ` +
+        `Each \`ParseResult\` includes \`file\`, \`data\` (parsed rows), and optional \`error\`. ` +
+        `When \`parseAs\` is set, \`acceptsFileType\` is automatically inferred (e.g., ".csv" or ".json") ` +
+        `unless explicitly overridden. Empty files are handled gracefully, returning an empty data array.`,
       ["csv", "json"],
     ),
     csvOptions: d(
@@ -143,6 +145,10 @@ export const FileInputMd = createMetadata({
     inProgress: {
       description: "This property indicates whether file parsing is currently in progress (when using parseAs).",
       signature: "get inProgress(): boolean",
+    },
+    getFields: {
+      description: "This method returns the column headers from the most recently parsed CSV file.",
+      signature: "getFields(): string[] | undefined",
     },
   },
   themeVars: parseScssVar(styles.themeVars),

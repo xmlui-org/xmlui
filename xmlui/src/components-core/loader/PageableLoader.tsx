@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import type { InfiniteData, QueryFunction } from "@tanstack/react-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import produce, { createDraft, finishDraft } from "immer";
@@ -14,7 +14,7 @@ import type {
 } from "../abstractions/LoaderRenderer";
 import { extractParam } from "../utils/extractParam";
 import { useAppContext } from "../AppContext";
-import { usePrevious } from "../utils/hooks";
+import { useIsomorphicLayoutEffect, usePrevious } from "../utils/hooks";
 
 export type LoaderDirections = "FORWARD" | "BACKWARD" | "BIDIRECTIONAL";
 
@@ -169,11 +169,11 @@ export function PageableLoader({
   const prevData = usePrevious(data);
   const prevError = usePrevious(error);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     loaderInProgressChanged(isFetching); //TODO isFetchingPrevPage / nextPage
   }, [isFetching, loaderInProgressChanged]);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     loaderIsRefetchingChanged(isRefetching); //TODO isFetchingPrevPage / nextPage
   }, [isRefetching, loaderIsRefetchingChanged]);
 
@@ -188,7 +188,7 @@ export function PageableLoader({
 
   const prevPageInfo = usePrevious(pageInfo);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     // console.log("data changed", {
     //   status,
     //   data,

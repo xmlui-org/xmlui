@@ -112,12 +112,15 @@ export const errorMessages: ErrorText = {
   [ErrorCodes.commaOrCloseBraceExpected]: "',' or '}' expected in import statement",
   [ErrorCodes.importFromExpected]: "'from' expected in import statement",
   [ErrorCodes.importPathExpected]: "String literal expected for import path",
-  [ErrorCodes.importNotAtTop]: "Import statements must appear at the top of the file, before any other statements",
-  [ErrorCodes.moduleNotFound]: "Cannot find module '{0}'",
+  [ErrorCodes.importNotAtTop]:
+    "Import statements must appear at the top of the file, before any other statements",
   [ErrorCodes.importedFunctionNotFound]: "Module '{0}' does not export '{1}'",
   [ErrorCodes.circularImport]: "Circular import detected: {0}",
   [ErrorCodes.circularImportDetailed]: "Circular import chain: {0}",
-  [ErrorCodes.reactiveVarInImportedModule]: "Reactive variable declarations are not allowed in imported modules. Found: '{0}'",
-  [ErrorCodes.constLetInImportedModule]: "const/let variable declarations are not allowed in imported modules. Found: '{0}'",
-  [ErrorCodes.invalidStatementInImportedModule]: "Only function declarations are allowed in imported modules. Found: {0}",
+  [ErrorCodes.reactiveVarInImportedModule]:
+    "Reactive variable declarations are not allowed in imported modules. Found: '{0}'",
+  [ErrorCodes.constLetInImportedModule]:
+    "const/let variable declarations are not allowed in imported modules. Found: '{0}'",
+  [ErrorCodes.invalidStatementInImportedModule]:
+    "Only function declarations are allowed in imported modules. Found: {0}",
 };

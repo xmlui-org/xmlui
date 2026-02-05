@@ -1,6 +1,7 @@
 %-DESC-START
 
 **Key features:**
+- **Drag and drop**: Drop files directly onto the input or use the file browser
 - **File type filtering**: Restrict selection to specific file types using `acceptsFileType`
 - **Multiple file selection**: Enable users to select multiple files simultaneously
 - **Directory selection**: Allow folder selection instead of individual files
@@ -106,25 +107,31 @@ This property is an optional string to set a label for the button part.
 
 %-PROP-START parseAs
 
-Automatically parse file contents as CSV or JSON. When set, the `onDidChange` event receives parsed data instead of raw File objects.
+Automatically parse file contents as CSV or JSON. When set, the `onDidChange` event receives an object containing both the raw files and parsed data:
 
-Available values: `"csv"`, `"json"`, `undefined` **(default)**
+| Key | Value |
+|:---|:---|
+| `files` | Array containing the original [File objects](https://developer.mozilla.org/en-US/docs/Web/API/File) |
+| `parsedData` | Array containing: <ul><li>`file`: Reference to the original [File object](https://developer.mozilla.org/en-US/docs/Web/API/File)</li><li>`data`: The parsed data rows</li><li>`error`: Parse error object, if any</li></ul> |
 
 When `parseAs` is set, `acceptsFileType` is automatically inferred (`.csv` or `.json`) unless explicitly overridden.
+
+> **Note**: Empty files are handled gracefully, returning an empty `data` array without error.
 
 ```xmlui-pg copy display name="Example: parseAs CSV"
 ---app
 <App var.products="{[]}">
   <FileInput
     parseAs="csv"
-    onDidChange="data => products = data"
+    onDidChange="result => products = result.parsedData[0]?.data || []"
   />
+  <Text>{ products }</Text>
   <List data="{products}" when="{products.length > 0}">
     <Text value="{$item.name}: ${$item.price}" />
   </List>
 </App>
 ---desc
-Right-click and save: [sample-products.csv](/resources/files/sample-products.csv). Then browse to sample-products.csv.
+Click to save: [sample-products.csv](/resources/files/sample-products.csv). Then drag it onto the input, or click Browse to select it.
 ```
 
 ```xmlui-pg copy display name="Example: parseAs JSON"
@@ -132,14 +139,14 @@ Right-click and save: [sample-products.csv](/resources/files/sample-products.csv
 <App var.products="{[]}">
   <FileInput
     parseAs="json"
-    onDidChange="data => products = data"
+    onDidChange="result => products = result.parsedData[0]?.data || []"
   />
   <List data="{products}" when="{products.length > 0}">
     <Text value="{$item.name}: ${$item.price} ({$item.category})" />
   </List>
 </App>
 ---desc
-Right-click and save: [sample-products.json](/resources/files/sample-products.json). Then browse to sample-products.json.
+Click to save: [sample-products.json](/resources/files/sample-products.json). Then browse to sample-products.json.
 ```
 
 > **Note**: JSON parsing automatically converts single objects to arrays. If your JSON file contains a single object `{...}`, it will be wrapped as `[{...}]` for consistent handling.
@@ -149,35 +156,26 @@ Right-click and save: [sample-products.json](/resources/files/sample-products.js
 <App var.config="{[]}">
   <FileInput
     parseAs="json"
-    onDidChange="data => config = data"
+    onDidChange="result => config = result.parsedData[0]?.data || []"
   />
   <List data="{config}" when="{config.length > 0}">
     <Text value="App: {$item.appName} v{$item.version}" />
   </List>
 </App>
 ---desc
-Right-click and save: [sample-config.json](/resources/files/sample-config.json). Then browse to sample-config.json.
+Click to save: [sample-config.json](/resources/files/sample-config.json). Then browse to sample-config.json.
 ```
 
-## Parsing Multiple Files
+**Parsing Multiple Files**
 
-When using `parseAs` with `multiple="true"`, the `onDidChange` event receives an array of parse results. Each result contains the original file, parsed data, and any error that occurred.
-
-**Type signature**:
-```typescript
-type ParseResult = {
-  file: File;      // Original file reference
-  data: any[];     // Parsed data (empty array if error)
-  error?: Error;   // Parse error, if any
-};
-```
+When using `parseAs` with `multiple="true"`, the `parsedData` array contains results for each file.
 
 ```xmlui-pg copy display name="Example: Multiple CSV files"
 <App var.results="{[]}">
   <FileInput
     parseAs="csv"
     multiple="true"
-    onDidChange="data => results = data"
+    onDidChange="result => results = result.parsedData"
   />
   <List data="{results}" when="{results.length > 0}">
     <Text value="{$item.file.name}: {$item.data.length} rows" when="{!$item.error}" />
@@ -192,9 +190,9 @@ type ParseResult = {
     parseAs="csv"
     multiple="true"
     csvOptions="{{ dynamicTyping: true }}"
-    onDidChange="{results => {
-      successCount = results.filter(r => !r.error).length;
-      failCount = results.filter(r => r.error).length;
+    onDidChange="{result => {
+      successCount = result.parsedData.filter(r => !r.error).length;
+      failCount = result.parsedData.filter(r => r.error).length;
     }}"
   />
   <HStack when="{successCount + failCount > 0}">
@@ -225,14 +223,14 @@ Common options:
   <FileInput
     parseAs="csv"
     csvOptions="{{ delimiter: ';' }}"
-    onDidChange="rows => data = rows"
+    onDidChange="result => data = result.parsedData[0]?.data || []"
   />
   <List data="{data}" when="{data.length > 0}">
     <Text value="{$item.name}: ${$item.price} ({$item.category})" />
   </List>
 </App>
 ---desc
-Right-click and save: [sample-products-semicolon.csv](/resources/files/sample-products-semicolon.csv). Then browse to sample-products-semicolon.csv.
+Click to save: [sample-products-semicolon.csv](/resources/files/sample-products-semicolon.csv). Then browse to sample-products-semicolon.csv.
 ```
 
 ```xmlui-pg copy display name="Example: CSV with type conversion"
@@ -241,14 +239,14 @@ Right-click and save: [sample-products-semicolon.csv](/resources/files/sample-pr
   <FileInput
     parseAs="csv"
     csvOptions="{{ dynamicTyping: true }}"
-    onDidChange="data => products = data"
+    onDidChange="result => products = result.parsedData[0]?.data || []"
   />
   <List data="{products}" when="{products.length > 0}">
     <Text value="{$item.name}: ${$item.price} (inStock: {$item.inStock})" />
   </List>
 </App>
 ---desc
-Right-click and save: [sample-products-typed.csv](/resources/files/sample-products-typed.csv). Then browse to sample-products-typed.csv.
+Click to save: [sample-products-typed.csv](/resources/files/sample-products-typed.csv). Then browse to sample-products-typed.csv.
 ```
 
 > **Note**: `dynamicTyping: true` is not a default. It converts string values to numbers and booleans during parsing.
@@ -260,14 +258,14 @@ Right-click and save: [sample-products-typed.csv](/resources/files/sample-produc
     parseAs="csv"
     acceptsFileType=".tsv"
     csvOptions="{{ delimiter: '\t' }}"
-    onDidChange="data => products = data"
+    onDidChange="result => products = result.parsedData[0]?.data || []"
   />
   <List data="{products}" when="{products.length > 0}">
     <Text value="{$item.name}: ${$item.price} - {$item.category}" />
   </List>
 </App>
 ---desc
-Right-click and save: [sample-products-tsv.tsv](/resources/files/sample-products-tsv.tsv). Then browse to sample-products-tsv.tsv.
+Click to save: [sample-products-tsv.tsv](/resources/files/sample-products-tsv.tsv). Then browse to sample-products-tsv.tsv.
 ```
 
 ```xmlui-pg copy display name="Example: Large file with loading spinner"
@@ -277,7 +275,7 @@ Right-click and save: [sample-products-tsv.tsv](/resources/files/sample-products
     id="fileInput"
     parseAs="csv"
     csvOptions="{{ dynamicTyping: true }}"
-    onDidChange="data => inventory = data"
+    onDidChange="result => inventory = result.parsedData[0]?.data || []"
   />
   <HStack>
     <Spinner when="{fileInput.inProgress}" delay="{200}" />
@@ -290,7 +288,7 @@ Right-click and save: [sample-products-tsv.tsv](/resources/files/sample-products
   <Text value="Showing first 10 of {inventory.length} items" when="{inventory.length > 10}" />
 </App>
 ---desc
-Right-click and save: [sample-inventory.csv](/resources/files/sample-inventory.csv) (5000 rows). Then browse to sample-inventory.csv.
+Click to save: [sample-inventory.csv](/resources/files/sample-inventory.csv) (5000 rows). Then browse to sample-inventory.csv.
 ```
 
 %-PROP-END
@@ -354,36 +352,34 @@ This event is triggered when file parsing fails (when using `parseAs`). If not p
 
 ```xmlui-pg copy display name="Example: parseError"
 ---app
-<App var.errorMessage="" var.items="{[]}">
+<App var.items="{[]}">
   <FileInput
     parseAs="csv"
-    onDidChange="data => items = data"
-    onParseError="(err, file) => errorMessage = file.name + ': ' + err.message"
+    onDidChange="result => items = result.parsedData[0]?.data || []"
+    onParseError="(err, file) => toast.error(file.name + ': ' + err.message)"
   />
-  <Text value="{errorMessage}" color="$color-danger-500" when="{errorMessage}" />
   <List data="{items}" when="{items.length > 0}">
     <Text value="{$item.name}: ${$item.price}" />
   </List>
 </App>
 ---desc
-Right-click and save: [sample-broken.csv](/resources/files/sample-broken.csv). Then browse to sample-broken.csv.
+Click to save: [sample-broken.csv](/resources/files/sample-broken.csv). Then browse to sample-broken.csv.
 ```
 
 ```xmlui-pg copy display name="Example: JSON parseError"
 ---app
-<App var.errorMessage="" var.data="{[]}">
+<App var.data="{[]}">
   <FileInput
     parseAs="json"
-    onDidChange="data => data = data"
-    onParseError="(err, file) => errorMessage = file.name + ': ' + err.message"
+    onDidChange="result => data = result.parsedData[0]?.data || []"
+    onParseError="(err, file) => toast.error(file.name + ': ' + err.message)"
   />
-  <Text value="{errorMessage}" color="$color-danger-500" when="{errorMessage}" />
   <List data="{data}" when="{data.length > 0}">
     <Text value="{$item.name}: ${$item.price}" />
   </List>
 </App>
 ---desc
-Right-click and save: [sample-broken.json](/resources/files/sample-broken.json). Then browse to sample-broken.json.
+Click to save: [sample-broken.json](/resources/files/sample-broken.json). Then browse to sample-broken.json.
 ```
 
 %-EVENT-END
@@ -437,10 +433,32 @@ Use this property to show loading indicators while files are being parsed. See t
   <FileInput
     id="csvInput"
     parseAs="csv"
-    onDidChange="rows => data = rows"
+    onDidChange="result => data = result.parsedData[0]?.data || []"
   />
   <Text value="Parsing file..." when="{csvInput.inProgress}" />
   <Text value="{data.length} rows loaded" when="{!csvInput.inProgress && data.length > 0}" />
+</App>
+```
+
+%-API-END
+
+%-API-START getFields
+
+Returns an array of column header names (available when `parseAs="csv"` and `header: true`, which is the default).
+
+Click to save: [sample-products.csv](/resources/files/sample-products.csv). Then browse to sample-products.csv.
+
+```xmlui-pg copy display name="Example: getFields"
+<App var.products="{[]}">
+  <FileInput
+    id="csvInput"
+    parseAs="csv"
+    onDidChange="result => products = result.parsedData[0]?.data || []"
+  />
+  <Text value="Columns: {csvInput.getFields()?.join(', ')}" when="{csvInput.getFields()}" />
+  <List data="{products}" when="{products.length > 0}">
+    <Text value="{$item.name}: ${$item.price}" />
+  </List>
 </App>
 ```
 

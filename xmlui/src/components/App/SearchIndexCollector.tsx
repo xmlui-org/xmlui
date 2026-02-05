@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import { useAppContext } from "../../components-core/AppContext";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 import type { PageMd } from "../Pages/Pages";
 import { IndexerContext } from "./IndexerContext";
 import { useSearchContextSetIndexing, useSearchContextUpdater } from "./SearchContext";
@@ -26,6 +27,7 @@ interface SearchIndexCollectorProps {
 export function SearchIndexCollector({ Pages, renderChild }: SearchIndexCollectorProps) {
   const appContext = useAppContext();
   const setIndexing = useSearchContextSetIndexing();
+  const { root } = useTheme();
 
   const [indexState, setIndexState] = useState<{ index: number; done: boolean }>({
     index: 0,
@@ -81,18 +83,19 @@ export function SearchIndexCollector({ Pages, renderChild }: SearchIndexCollecto
 
   return (
     <IndexerContext.Provider value={indexerContextValue}>
-      {createPortal(
-        <div style={HIDDEN_STYLE} aria-hidden="true">
-          {/* Render only one PageIndexer at a time */}
-          <PageIndexer
-            Page={currentPageToProcess}
-            renderChild={renderChild}
-            onIndexed={handlePageIndexed}
-            key={currentPageToProcess.props?.url || indexState.index} // Key ensures re-mount
-          />
-        </div>,
-        document.body,
-      )}
+      {root &&
+        createPortal(
+          <div style={HIDDEN_STYLE} aria-hidden="true">
+            {/* Render only one PageIndexer at a time */}
+            <PageIndexer
+              Page={currentPageToProcess}
+              renderChild={renderChild}
+              onIndexed={handlePageIndexed}
+              key={currentPageToProcess.props?.url || indexState.index} // Key ensures re-mount
+            />
+          </div>,
+          root,
+        )}
     </IndexerContext.Provider>
   );
 }

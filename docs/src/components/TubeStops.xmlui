@@ -4,7 +4,7 @@
     id="stops"
     when="{$props.line}"
     url="https://api.tfl.gov.uk/Line/{$props.line}/StopPoints"
-    transformResult="{window.transformStops}"
+    transformResult="{globalThis.transformStops}"
   />
 
   <Text variant="strong">{$props.line}</Text>
