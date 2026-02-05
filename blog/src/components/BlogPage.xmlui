@@ -1,12 +1,17 @@
 <Component name="BlogPage">
   <VStack gap="$space-2" marginTop="$space-4">
-    <Link to="/blog" abel="Go to all posts" active>
+    <Link to="/blog" abel="Go to all posts">
       ← Go to all posts
     </Link>
     <VStack gap="$space-2">
-      <H1 showAnchor="false" fontSize="32px">
-        {$props.post.title}
-      </H1>
+      <VStack gap="$space-0_5">
+        <H1 showAnchor="false" fontSize="32px">
+          {$props.post.title}
+        </H1>
+        <Text variant="description" maxLines="4" ellipses fontSize="24px">
+            {$props.post.description}
+        </Text>
+      </VStack>
       <Text variant="info">
         {$props.post.author}
         •
