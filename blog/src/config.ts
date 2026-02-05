@@ -277,6 +277,58 @@ function buildTreeFromPathsAndMeta(
 }
 
 const groupedNavPanelContent = buildTreeFromPathsAndMeta(navPanelContent, metaJsons);
+
+export const blogPosts = [
+  {
+    title: "Introducing XMLUI",
+    slug: "introducing-xmlui",
+    description:
+      "Let's make building user interfaces as easy as it was 30 years ago.",
+    author: "Jon Udell",
+    date: "2025-07-18",
+    image: "xmlui-demo.png",
+    tags: ["intro", "xmlui"],
+  },
+  {
+    title: "Reproducible XMLUI",
+    slug: "xmlui-playground",
+    description:
+      "Use playgrounds to infuse docs with live examples, iterate on prototypes, and reproduce bugs.",
+    author: "Jon Udell",
+    date: "2025-10-27",
+    image: "playground.png",
+    tags: ["playground", "docs", "demo"],
+  },
+  {
+    title: "An XMLUI-powered blog",
+    slug: "xmlui-powered-blog",
+    description: "How we made this blog with a few dozen lines of XMLUI.",
+    author: "Jon Udell",
+    date: "2025-10-28",
+    image: "blog-scrabble.png",
+    tags: ["blog", "xmlui"],
+  },
+  {
+    title: "Introducing the XMLUI CLI",
+    slug: "introducing-the-xmlui-cli",
+    description: "Your all-in-one tool for working with XMLUI.",
+    author: "Jon Udell",
+    date: "2025-12-19",
+    image: "cli-blog-header.svg",
+    tags: ["cli", "tooling", "demo"],
+  },
+  {
+    title: "Supabase + XMLUI",
+    slug: "supabase-and-xmlui",
+    description: "Build an XMLUI interface to a Supabase backend.",
+    author: "Jon Udell",
+    date: "2026-01-27",
+    image: "supabase-and-xmlui.png",
+    draft: true,
+    tags: ["supabase", "backend", "api"],
+  },
+];
+
 const App: StandaloneAppDescription = {
   name: "XMLUI Blog",
   defaultTheme: "xmlui-blog",
@@ -301,6 +353,8 @@ const App: StandaloneAppDescription = {
     prefetchedContent,
     lintSeverity: "skip", // Turn off xmlui linting
     popOutUrl: "https://playground.xmlui.org/#/playground",
+    blog: { layout: "featuredWithTabs" },
+    posts: blogPosts,
   },
 };
 
