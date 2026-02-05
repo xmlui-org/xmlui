@@ -27,10 +27,10 @@ import { useIsomorphicLayoutEffect } from "./utils/hooks";
 import {
   codeBehindFileExtension,
   componentFileExtension,
+  moduleFileExtension,
 } from "../parsers/xmlui-parser/fileExtensions";
 import { Parser } from "../parsers/scripting/Parser";
 import {
-  collectCodeBehindFromSource,
   collectCodeBehindFromSourceWithImports,
   removeCodeBehindTokensFromTree,
 } from "../parsers/scripting/code-behind-collect";
@@ -55,14 +55,15 @@ import type {
   ComponentCompilation,
   ProjectCompilation,
 } from "../abstractions/scripting/Compilation";
-import { evalBinding, evalBindingExpression } from "./script-runner/eval-tree-sync";
+import { evalBinding } from "./script-runner/eval-tree-sync";
 import type { BindingTreeEvaluationContext } from "./script-runner/BindingTreeEvaluationContext";
 import { MetadataProvider } from "../language-server/services/common/metadata-utils";
 import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
-import { ca } from "date-fns/locale";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
+const GLOBALS_BUILT_RESOURCE ="/src/Globals.xs"
+const GLOBALS_FILE = "Globals." + moduleFileExtension;
 const CONFIG_FILE = "config.json";
 
 const metadataProvider = new MetadataProvider(collectedComponentMetadata);
@@ -746,15 +747,12 @@ function useStandalone(
   });
 
   const [projectCompilation, setProjectCompilation] = useState<ProjectCompilation>(null);
-  const globalVars = useMemo(() => {
-    // Get the vars in Globals.xs module directly from runtime
-    const globalsXs = runtime?.["/src/Globals.xs"];
-    const varsSource = globalsXs?.vars || {};
-    const functionsSource = globalsXs?.functions || {};
-    const combinedSource = { ...varsSource, ...functionsSource };
-    const extractedVars: Record<string, any> = {};
 
-    for (const [key, value] of Object.entries(combinedSource)) {
+  // --- This function extracts the global variables and functions from the combined 
+  // --- pre-built Globals.xs module.
+  const extractGlobals = (prebuiltGlobals: Record<string, any>): Record<string, any> => {
+    const extractedVars: Record<string, any> = {};
+    for (const [key, value] of Object.entries(prebuiltGlobals)) {
       // The value is a variable definition object with __PARSED__ and tree
       if (
         typeof value === "object" &&
@@ -788,10 +786,12 @@ function useStandalone(
       }
     }
     return extractedVars;
+  };
 
-    // return {
-    //   count: 42,
-    // };
+  const globalVars = useMemo(() => {
+    // Get the vars in Globals.xs module directly from runtime
+    const globalsXs = runtime?.[GLOBALS_BUILT_RESOURCE];
+    return extractGlobals({ ...(globalsXs?.vars || {}), ...(globalsXs?.functions || {}) });
   }, [runtime]);
 
   useIsomorphicLayoutEffect(() => {
@@ -879,6 +879,26 @@ function useStandalone(
         }
       }) as any;
 
+      // --- Fetch the optional Globals.xs file containing global variables and functions
+      const globalsPromise = new Promise(async (resolve) => {
+        try {
+          const resp = await fetchWithoutCache(GLOBALS_FILE);
+          if (resp.ok) {
+            const parsedGlobals = await parseCodeBehindResponse(resp);
+            console.log("Globals.xs:", parsedGlobals)
+            resolve(parsedGlobals);
+          } else {
+            resolve({
+              component: errReportMessage(`Failed to load the globals component (${GLOBALS_FILE})`),
+              file: GLOBALS_FILE,
+              hasError: true,
+            });
+          }
+        } catch (e) {
+          resolve(null);
+        }
+      }) as any;
+
       // --- Fetch the configuration file (we do not check whether the content is semantically valid)
       let config: StandaloneJsonConfig = undefined;
       try {
@@ -909,11 +929,14 @@ function useStandalone(
       });
 
       // --- Let the promises resolve
-      const [loadedEntryPoint, loadedComponents, themes] = await Promise.all([
+      const [loadedEntryPoint, loadedGlobals, loadedComponents, themes] = await Promise.all([
         entryPointPromise,
+        globalsPromise,
         Promise.all(componentPromises || []),
         Promise.all(themePromises || []),
       ]);
+
+      // --- Process globals
 
       // --- Collect the elements of the standalone app (and potential errors)
       const errorComponents: ComponentDef[] = [];
