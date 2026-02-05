@@ -7,7 +7,7 @@ import { useAppLayoutContext } from "../App/AppLayoutContext";
 const COMP = "NavPanelCollapseButton";
 
 export const NavPanelCollapseButtonMd = createMetadata({
-  status: "stable",
+  status: "experimental",
   description:
     "`NavPanelCollapseButton` toggles the sidebar (NavPanel) collapse state when used in a vertical app layout. " +
     "Place it in the NavPanel footer (e.g. next to ToneChangerButton) for a Nextra-like sidebar toggle.",
