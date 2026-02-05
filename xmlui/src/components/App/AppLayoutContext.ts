@@ -60,6 +60,9 @@ export type AppLayoutType = (typeof appLayoutNames)[number];
 export interface IAppLayoutContext {
   layout: AppLayoutType;
   navPanelVisible: boolean;
+  navPanelCollapsed: boolean;
+  setNavPanelCollapsed: (collapsed: boolean) => void;
+  toggleNavPanelCollapsed: () => void;
   drawerVisible: boolean;
   showDrawer: () => void;
   hideDrawer: () => void;

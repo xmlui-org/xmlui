@@ -74,6 +74,7 @@ import { FormSectionMd } from "./FormSection/FormSection";
 import { BreakoutMd } from "./Breakout/Breakout";
 import { CarouselMd } from "./Carousel/Carousel";
 import { ToneChangerButtonMd } from "./ToneChangerButton/ToneChangerButton";
+import { NavPanelCollapseButtonMd } from "./NavPanelCollapseButton/NavPanelCollapseButton";
 import { ToneSwitchMd } from "./ToneSwitch/ToneSwitch";
 import { OptionMd } from "./Option/Option";
 import { AutoCompleteMd } from "./AutoComplete/AutoComplete";
@@ -423,6 +424,7 @@ export const collectedComponentMetadata = {
   TimeInput: TimeInputMd,
   Timer: TimerMd,
   ToneChangerButton: ToneChangerButtonMd,
+  NavPanelCollapseButton: NavPanelCollapseButtonMd,
   ToneSwitch: ToneSwitchMd,
   Tree: TreeMd,
   BarChart: BarChartMd,

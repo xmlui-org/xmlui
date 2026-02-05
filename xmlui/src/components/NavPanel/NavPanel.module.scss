@@ -18,6 +18,8 @@ $themeVars: t.composePaddingVars($themeVars, "logo-#{$component}");
 $marginBottom-logo-NavPanel: createThemeVar("marginBottom-logo-#{$component}");
 
 $maxWidth-content-NavPanel: createThemeVar("maxWidth-content-App");
+$width-navPanel-App: createThemeVar("width-navPanel-App");
+$width-navPanel-collapsed-App: createThemeVar("width-navPanel-collapsed-App");
 
 $height-NavPanel: createThemeVar("height-AppHeader");
 $paddingVertical-AppHeader: createThemeVar("paddingVertical-AppHeader");
@@ -28,6 +30,22 @@ $paddingHorizontal-NavPanel: createThemeVar("paddingHorizontal-#{$component}");
 $paddingVertical-logo-NavPanel: createThemeVar("paddingVertical-logo-#{$component}");
 $paddingHorizontal-logo-NavPanel: createThemeVar("paddingHorizontal-logo-#{$component}");
 $horizontalAlignment-logo-NavPanel: createThemeVar("horizontalAlignment-logo-#{$component}");
+
+$themeVars: t.appendThemeVarWithDefault($themeVars, "borderColor-footer-#{$component}", t.getThemeVar($themeVars, "borderColor-#{$component}")) !global;
+$borderColor-footer-NavPanel: createThemeVar("borderColor-footer-#{$component}");
+$themeVars: t.composePaddingVars($themeVars, "footer-#{$component}") !global;
+
+// Collapse-kor footer azonnal rejtett (nincs villogás), majd 0.2s után fade in
+:global {
+  @keyframes navPanelFooterFadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
 
 @layer components {
   .wrapper {
@@ -52,6 +70,17 @@ $horizontalAlignment-logo-NavPanel: createThemeVar("horizontalAlignment-logo-#{$
     &.vertical {
       scrollbar-gutter: stable;
       border-right: $borderRight-NavPanel-vertical;
+      width: $width-navPanel-App;
+      min-width: $width-navPanel-App;
+    }
+
+    &.hasFooter {
+      overflow: hidden;
+
+      .wrapperInner {
+        flex: 1;
+        min-height: 0;
+      }
     }
 
     &.horizontal{
@@ -99,6 +128,60 @@ $horizontalAlignment-logo-NavPanel: createThemeVar("horizontalAlignment-logo-#{$
 
     &.inDrawer {     //to make room for the close button
       min-height: 32px;
+    }
+  }
+
+  .footer {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: t.getThemeVar($themeVars, "paddingHorizontal-footer-#{$component}");
+    @include t.paddingVars($themeVars, "footer-#{$component}");
+    border-top: 1px solid $borderColor-footer-NavPanel;
+    background-color: $backgroundColor-NavPanel;
+  }
+
+  // Footer: collapse-kor azonnal rejtett (opacity 0), sidebar (0.2s) után fade in – villogás nélkül
+  .footer.footerCollapsed {
+    opacity: 0;
+    animation: navPanelFooterFadeIn 0.2s ease 0.2s forwards;
+    flex-direction: column;
+    justify-content: center;
+    border-top: none;
+    border-left: 1px solid $borderColor-footer-NavPanel;
+    min-width: 0;
+    width: $width-navPanel-collapsed-App;
+    max-width: $width-navPanel-collapsed-App;
+    padding-inline: 0;
+
+    // Stack footer content (e.g. HStack with buttons) vertically so it fits in the narrow strip
+    > * {
+      flex-direction: column;
+      min-width: 0;
+      width: 100%;
+    }
+  }
+
+  .wrapper.collapsed {
+    overflow: hidden;
+    justify-content: flex-end;
+    padding-inline: 0;
+
+    // Hide with CSS only after the aside width transition (0.2s) has finished
+    .logoWrapper,
+    .wrapperInner {
+      flex: 0 0 0 !important;
+      min-height: 0 !important;
+      max-height: 0 !important;
+      overflow: hidden !important;
+      opacity: 0;
+      visibility: hidden;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: none !important;
+      transition: opacity 0.1s ease 0.2s, visibility 0s linear 0.3s,
+        flex 0s ease 0.2s, min-height 0s ease 0.2s, max-height 0s ease 0.2s;
     }
   }
 }

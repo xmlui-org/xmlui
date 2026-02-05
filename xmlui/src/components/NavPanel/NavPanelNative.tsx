@@ -9,6 +9,9 @@ import { Logo } from "../Logo/LogoNative";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { getAppLayoutOrientation } from "../App/AppNative";
 import { useLinkInfoContext } from "../App/LinkInfoContext";
+import { Part } from "../Part/Part";
+
+export const PART_NAV_PANEL_FOOTER = "footer";
 
 // Define navigation hierarchy node structure
 export interface NavHierarchyNode {
@@ -214,6 +217,7 @@ const contextValue = {
 
 function DrawerNavPanel({
   logoContent,
+  footerContent,
   children,
   className,
   style,
@@ -225,18 +229,34 @@ function DrawerNavPanel({
   className?: string;
   style?: React.CSSProperties;
   logoContent?: ReactNode;
+  footerContent?: ReactNode;
   scrollStyle?: ScrollStyle;
   showScrollerFade?: boolean;
 }) {
+  const hasFooter = !!footerContent;
   return (
     <NavPanelContext.Provider value={contextValue}>
-      <div {...rest} className={classnames(styles.wrapper, className)} style={style}>
+      <div
+        {...rest}
+        className={classnames(styles.wrapper, className, { [styles.hasFooter]: hasFooter })}
+        style={style}
+      >
         <div className={classnames(styles.logoWrapper, styles.inDrawer)}>
           {logoContent || <Logo />}
         </div>
-        <Scroller className={styles.wrapperInner} style={style} scrollStyle={scrollStyle} showScrollerFade={showScrollerFade}>
+        <Scroller
+          className={styles.wrapperInner}
+          style={style}
+          scrollStyle={scrollStyle}
+          showScrollerFade={showScrollerFade}
+        >
           {children}
         </Scroller>
+        {hasFooter && (
+          <div className={styles.footer} data-part="footer">
+            {footerContent}
+          </div>
+        )}
       </div>
     </NavPanelContext.Provider>
   );
@@ -247,6 +267,7 @@ type Props = {
   className?: string;
   style?: React.CSSProperties;
   logoContent?: ReactNode;
+  footerContent?: ReactNode;
   inDrawer?: boolean;
   renderChild: RenderChildFn;
   showScrollerFade?: boolean;
@@ -259,6 +280,7 @@ export const NavPanel = forwardRef(function NavPanel(
     children,
     style,
     logoContent,
+    footerContent,
     className,
     inDrawer = defaultProps.inDrawer,
     renderChild,
@@ -276,7 +298,10 @@ export const NavPanel = forwardRef(function NavPanel(
     appLayoutContext?.layout === "vertical" || appLayoutContext?.layout === "vertical-sticky";
   const isCondensed = appLayoutContext?.layout?.startsWith("condensed");
   const vertical = appLayoutContext?.layout?.startsWith("vertical");
+  const collapsed = !!appLayoutContext?.navPanelCollapsed && vertical;
   const safeLogoContent = logoContent || renderChild(appLayoutContext?.logoContentDef);
+  // Footer only in vertical layouts: vertical, vertical-sticky, vertical-full-header
+  const hasFooter = !!footerContent && vertical;
 
   // Register the linkMap when navLinks change
   const registerLinkMap = linkInfoContext?.registerLinkMap;
@@ -289,13 +314,21 @@ export const NavPanel = forwardRef(function NavPanel(
 
   if (inDrawer) {
     return (
-      <DrawerNavPanel {...rest} style={style} logoContent={safeLogoContent} className={className} scrollStyle={scrollStyle} showScrollerFade={showScrollerFade}>
+      <DrawerNavPanel
+        {...rest}
+        style={style}
+        logoContent={safeLogoContent}
+        footerContent={hasFooter ? footerContent : undefined}
+        className={className}
+        scrollStyle={scrollStyle}
+        showScrollerFade={showScrollerFade}
+      >
         {children}
       </DrawerNavPanel>
     );
   }
 
-  return (
+  const wrapperEl = (
     <div
       {...rest}
       ref={forwardedRef}
@@ -303,15 +336,36 @@ export const NavPanel = forwardRef(function NavPanel(
         [styles.horizontal]: horizontal,
         [styles.vertical]: vertical,
         [styles.condensed]: isCondensed,
+        [styles.hasFooter]: hasFooter,
+        [styles.collapsed]: collapsed,
       })}
       style={style}
     >
       {showLogo && (
         <div className={classnames(styles.logoWrapper)}>{safeLogoContent || <Logo />}</div>
       )}
-      <Scroller className={styles.wrapperInner} style={style} scrollStyle={scrollStyle} showScrollerFade={showScrollerFade}>
+      <Scroller
+        className={styles.wrapperInner}
+        style={style}
+        scrollStyle={scrollStyle}
+        showScrollerFade={showScrollerFade}
+      >
         {children}
       </Scroller>
+      {hasFooter && (
+        <Part partId={PART_NAV_PANEL_FOOTER}>
+          <div
+            className={classnames(styles.footer, {
+              [styles.footerCollapsed]: collapsed,
+            })}  
+          >
+            {footerContent}
+          </div>
+        </Part>
+
+      )}
     </div>
   );
+
+  return wrapperEl;
 });

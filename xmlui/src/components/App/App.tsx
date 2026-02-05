@@ -118,6 +118,8 @@ export const AppMd = createMetadata({
   defaultThemeVars: {
     "maxWidth-Drawer": "100%",
     [`width-navPanel-${COMP}`]: "$space-64",
+    [`width-navPanel-collapsed-${COMP}`]: "48px",
+    [`borderRight-navPanelWrapper-${COMP}`]: "1px solid $borderColor",
     [`backgroundColor-navPanel-${COMP}`]: "$backgroundColor",
     [`maxWidth-content-${COMP}`]: "$maxWidth-content",
     [`maxWidth-${COMP}`]: "$maxWidth-content",

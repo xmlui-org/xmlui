@@ -294,6 +294,14 @@ export function App({
     safeLayout,
   );
 
+  const [navPanelCollapsed, setNavPanelCollapsedState] = useState(false);
+  const setNavPanelCollapsed = useCallback((collapsed: boolean) => {
+    setNavPanelCollapsedState(collapsed);
+  }, []);
+  const toggleNavPanelCollapsed = useCallback(() => {
+    setNavPanelCollapsedState((prev) => !prev);
+  }, []);
+
   useIsomorphicLayoutEffect(() => {
     if (window.history.scrollRestoration !== "manual") {
       window.history.scrollRestoration = "manual";
@@ -374,6 +382,9 @@ export function App({
     hasRegisteredNavPanel,
     hasRegisteredHeader,
     navPanelVisible,
+    navPanelCollapsed,
+    setNavPanelCollapsed,
+    toggleNavPanelCollapsed,
     drawerVisible,
     showDrawer,
     hideDrawer,
@@ -477,7 +488,9 @@ export function App({
 
   const content = (
     <AppContainer
-      className={classnames(wrapperBaseClasses, ...config.containerClasses)}
+      className={classnames(wrapperBaseClasses, ...config.containerClasses, {
+        [styles.navPanelCollapsed]: navPanelVisible && navPanelCollapsed && config.useVerticalFullHeaderStructure,
+      })}
       style={styleWithHelpers}
       ref={shouldContainerScroll ? pageScrollRef : undefined}
       {...rest}
@@ -487,7 +500,11 @@ export function App({
           {renderHeaderSlot()}
           <div className={styles.mainContentRow}>
             {navPanelVisible && (
-              <aside className={styles.navPanelWrapper}>
+              <aside
+                className={classnames(styles.navPanelWrapper, {
+                  [styles.navPanelWrapperCollapsed]: navPanelCollapsed,
+                })}
+              >
                 <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>
               </aside>
             )}
@@ -497,7 +514,13 @@ export function App({
         </>
       ) : config.navPanelPosition === "side" ? (
         <>
-          {navPanelVisible && <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>}
+          {navPanelVisible && (
+            <AppNavPanelSlot
+              className={navPanelCollapsed ? styles.navPanelWrapperCollapsed : undefined}
+            >
+              {navPanel}
+            </AppNavPanelSlot>
+          )}
           <AppContentSlot ref={pageScrollRef}>
             {renderHeaderSlot()}
             {renderPagesSlot()}
@@ -779,6 +802,9 @@ function useAppLayoutContextValue({
   hasRegisteredNavPanel,
   hasRegisteredHeader,
   navPanelVisible,
+  navPanelCollapsed,
+  setNavPanelCollapsed,
+  toggleNavPanelCollapsed,
   drawerVisible,
   showDrawer,
   hideDrawer,
@@ -798,6 +824,9 @@ function useAppLayoutContextValue({
   hasRegisteredNavPanel: boolean;
   hasRegisteredHeader: boolean;
   navPanelVisible: boolean;
+  navPanelCollapsed: boolean;
+  setNavPanelCollapsed: (collapsed: boolean) => void;
+  toggleNavPanelCollapsed: () => void;
   drawerVisible: boolean;
   showDrawer: () => void;
   hideDrawer: () => void;
@@ -819,6 +848,9 @@ function useAppLayoutContextValue({
       hasRegisteredNavPanel,
       hasRegisteredHeader,
       navPanelVisible,
+      navPanelCollapsed,
+      setNavPanelCollapsed,
+      toggleNavPanelCollapsed,
       drawerVisible,
       layout,
       logo,
@@ -840,6 +872,9 @@ function useAppLayoutContextValue({
       hasRegisteredNavPanel,
       hasRegisteredHeader,
       navPanelVisible,
+      navPanelCollapsed,
+      setNavPanelCollapsed,
+      toggleNavPanelCollapsed,
       drawerVisible,
       layout,
       logo,
