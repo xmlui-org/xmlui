@@ -131,6 +131,8 @@ import TableInsertColumnIcon from "./Icon/TableInsertColumnIcon";
 import TableDeleteColumnIcon from "./Icon/TableDeleteColumnIcon";
 import { ChevronsRightIcon } from "./Icon/ChevronsRight";
 import { ChevronsLeftIcon } from "./Icon/ChevronsLeft";
+import { ICON_NAMES } from "./icons-abstractions";
+import { I } from "../testing/infrastructure/dist/internal/chunks/index._m-k4_XL";
 
 type IconRenderer<T extends IconBaseProps> = (
   props: T,
@@ -164,169 +166,166 @@ function registerIconRenderer(name: string | string[], renderer: IconRenderer<an
   }
 }
 
-registerIconRenderer("assign", (props: IconBaseProps) => <FiUser {...props} />);
-registerIconRenderer("arrowup", (props: IconBaseProps) => <BsArrowUpShort {...props} />);
-registerIconRenderer("arrowleft", (props: IconBaseProps) => <BsArrowLeftShort {...props} />);
-registerIconRenderer("arrowright", (props: IconBaseProps) => <BsArrowRightShort {...props} />);
-registerIconRenderer("pause", (props: IconBaseProps) => <BsPause {...props} />);
-registerIconRenderer("play", (props: IconBaseProps) => <BsPlay {...props} />);
-registerIconRenderer("date", (props: IconBaseProps) => <CiCalendarDate {...props} />);
-registerIconRenderer("hamburger", (props: IconBaseProps) => <AiOutlineMenu {...props} />);
-registerIconRenderer("send", (props: IconBaseProps) => <AiOutlineSend {...props} />);
-registerIconRenderer("users", (props: IconBaseProps) => <FiUsers {...props} />);
-registerIconRenderer("refresh", (props: IconBaseProps) => <FiRefreshCcw {...props} />);
-registerIconRenderer("chevrondown", (props: IconBaseProps) => <FiChevronDown {...props} />);
-registerIconRenderer("chevronup", (props: IconBaseProps) => <FiChevronUp {...props} />);
-registerIconRenderer("chevronright", (props: IconBaseProps) => <ChevronRightIcon {...props} />);
-registerIconRenderer("chevronleft", (props: IconBaseProps) => <ChevronLeftIcon {...props} />);
-registerIconRenderer("chevronsright", (props: IconBaseProps) => <ChevronsRightIcon {...props} />);
-registerIconRenderer("chevronsleft", (props: IconBaseProps) => <ChevronsLeftIcon {...props} />);
-registerIconRenderer("doublechevrondown", (props: IconBaseProps) => <FiChevronsDown {...props} />);
-registerIconRenderer("doublechevronup", (props: IconBaseProps) => <FiChevronsUp {...props} />);
-registerIconRenderer("doublechevronright", (props: IconBaseProps) => (
+registerIconRenderer(ICON_NAMES.ASSIGN, (props: IconBaseProps) => <FiUser {...props} />);
+registerIconRenderer(ICON_NAMES.ARROW_UP, (props: IconBaseProps) => <BsArrowUpShort {...props} />);
+registerIconRenderer(ICON_NAMES.ARROW_LEFT, (props: IconBaseProps) => <BsArrowLeftShort {...props} />);
+registerIconRenderer(ICON_NAMES.ARROW_RIGHT, (props: IconBaseProps) => <BsArrowRightShort {...props} />);
+registerIconRenderer(ICON_NAMES.PAUSE, (props: IconBaseProps) => <BsPause {...props} />);
+registerIconRenderer(ICON_NAMES.PLAY, (props: IconBaseProps) => <BsPlay {...props} />);
+registerIconRenderer(ICON_NAMES.DATE, (props: IconBaseProps) => <CiCalendarDate {...props} />);
+registerIconRenderer(ICON_NAMES.HAMBURGER, (props: IconBaseProps) => <AiOutlineMenu {...props} />);
+registerIconRenderer(ICON_NAMES.SEND, (props: IconBaseProps) => <AiOutlineSend {...props} />);
+registerIconRenderer(ICON_NAMES.USERS, (props: IconBaseProps) => <FiUsers {...props} />);
+registerIconRenderer(ICON_NAMES.REFRESH, (props: IconBaseProps) => <FiRefreshCcw {...props} />);
+registerIconRenderer(ICON_NAMES.CHEVRON_DOWN, (props: IconBaseProps) => <FiChevronDown {...props} />);
+registerIconRenderer(ICON_NAMES.CHEVRON_UP, (props: IconBaseProps) => <FiChevronUp {...props} />);
+registerIconRenderer(ICON_NAMES.CHEVRON_RIGHT, (props: IconBaseProps) => <ChevronRightIcon {...props} />);
+registerIconRenderer(ICON_NAMES.CHEVRON_LEFT, (props: IconBaseProps) => <ChevronLeftIcon {...props} />);
+registerIconRenderer(ICON_NAMES.CHEVRONS_RIGHT, (props: IconBaseProps) => <ChevronsRightIcon {...props} />);
+registerIconRenderer(ICON_NAMES.CHEVRONS_LEFT, (props: IconBaseProps) => <ChevronsLeftIcon {...props} />);
+registerIconRenderer(ICON_NAMES.DOUBLE_CHEVRON_DOWN, (props: IconBaseProps) => <FiChevronsDown {...props} />);
+registerIconRenderer(ICON_NAMES.DOUBLE_CHEVRON_UP, (props: IconBaseProps) => <FiChevronsUp {...props} />);
+registerIconRenderer(ICON_NAMES.DOUBLE_CHEVRON_RIGHT, (props: IconBaseProps) => (
   <FiChevronsRight {...props} />
 ));
-registerIconRenderer("doublechevronleft", (props: IconBaseProps) => <FiChevronsLeft {...props} />);
-registerIconRenderer("dotmenu", (props: IconBaseProps) => <DotMenuIcon {...props} />);
-registerIconRenderer("dotmenuhorizontal", (props: IconBaseProps) => (
+registerIconRenderer(ICON_NAMES.DOUBLE_CHEVRON_LEFT, (props: IconBaseProps) => <FiChevronsLeft {...props} />);
+registerIconRenderer(ICON_NAMES.DOT_MENU, (props: IconBaseProps) => <DotMenuIcon {...props} />);
+registerIconRenderer(ICON_NAMES.DOT_MENU_HORIZONTAL, (props: IconBaseProps) => (
   <DotMenuHorizontalIcon {...props} />
 ));
-registerIconRenderer("noresult", (props: IconBaseProps) => <FiSlash {...props} />);
-registerIconRenderer("crm", (props: IconBaseProps) => <IoChatboxOutline {...props} />);
-registerIconRenderer("chat", (props: IconBaseProps) => <IoChatboxOutline {...props} />);
-registerIconRenderer("pencil", (props: IconBaseProps) => <IoPencil {...props} />);
-registerIconRenderer("cube", (props: IconBaseProps) => <IoCubeOutline {...props} />);
-registerIconRenderer("apps", (props: IconBaseProps) => <FiGrid {...props} />);
-registerIconRenderer("permissions", (props: IconBaseProps) => <FiKey {...props} />);
-registerIconRenderer("close", (props: IconBaseProps) => <FiX {...props} />);
-registerIconRenderer("star", (props: IconBaseProps) => <FiStar {...props} />);
-registerIconRenderer("help", (props: IconBaseProps) => <FiHelpCircle {...props} />);
-registerIconRenderer("compactlist", (props: IconBaseProps) => <CompactListIcon {...props} />);
-registerIconRenderer("copy", (props: IconBaseProps) => <ContentCopyIcon {...props} />);
-registerIconRenderer("move", (props: IconBaseProps) => <FiClipboard {...props} />);
-registerIconRenderer("rename", (props: IconBaseProps) => (
+registerIconRenderer(ICON_NAMES.NO_RESULT, (props: IconBaseProps) => <FiSlash {...props} />);
+registerIconRenderer(ICON_NAMES.CRM, (props: IconBaseProps) => <IoChatboxOutline {...props} />);
+registerIconRenderer(ICON_NAMES.CHAT, (props: IconBaseProps) => <IoChatboxOutline {...props} />);
+registerIconRenderer(ICON_NAMES.PENCIL, (props: IconBaseProps) => <IoPencil {...props} />);
+registerIconRenderer(ICON_NAMES.CUBE, (props: IconBaseProps) => <IoCubeOutline {...props} />);
+registerIconRenderer(ICON_NAMES.APPS, (props: IconBaseProps) => <FiGrid {...props} />);
+registerIconRenderer(ICON_NAMES.PERMISSIONS, (props: IconBaseProps) => <FiKey {...props} />);
+registerIconRenderer(ICON_NAMES.CLOSE, (props: IconBaseProps) => <FiX {...props} />);
+registerIconRenderer(ICON_NAMES.STAR, (props: IconBaseProps) => <FiStar {...props} />);
+registerIconRenderer(ICON_NAMES.HELP, (props: IconBaseProps) => <FiHelpCircle {...props} />);
+registerIconRenderer(ICON_NAMES.COMPACT_LIST, (props: IconBaseProps) => <CompactListIcon {...props} />);
+registerIconRenderer(ICON_NAMES.COPY, (props: IconBaseProps) => <ContentCopyIcon {...props} />);
+registerIconRenderer(ICON_NAMES.MOVE, (props: IconBaseProps) => <FiClipboard {...props} />);
+registerIconRenderer(ICON_NAMES.RENAME, (props: IconBaseProps) => (
   <MdOutlineDriveFileRenameOutline {...props} />
 ));
-registerIconRenderer("hyperlink", (props: IconBaseProps) => <HyperLinkIcon {...props} />);
-registerIconRenderer("globe", (props: IconBaseProps) => <GlobeIcon {...props} />);
-registerIconRenderer("link", (props: IconBaseProps) => <LinkIcon {...props} />);
-registerIconRenderer("looseList", (props: IconBaseProps) => <LooseListIcon {...props} />);
-registerIconRenderer("options", (props: IconBaseProps) => <MoreOptionsIcon {...props} />);
-registerIconRenderer("search", (props: IconBaseProps) => <SearchIcon {...props} />);
-registerIconRenderer("filter", (props: IconBaseProps) => <FilterIcon {...props} />);
-registerIconRenderer("trash", (props: IconBaseProps) => <TrashIcon {...props} />);
-registerIconRenderer("pen", (props: IconBaseProps) => <PenIcon {...props} />);
-registerIconRenderer("email", (props: IconBaseProps) => <EmailIcon {...props} />);
-registerIconRenderer("phone", (props: IconBaseProps) => <PhoneIcon {...props} />);
-registerIconRenderer("home", (props: IconBaseProps) => <HomeIcon {...props} />);
-registerIconRenderer("user", (props: IconBaseProps) => <UserIcon {...props} />);
-registerIconRenderer("exit", (props: IconBaseProps) => <RxExit {...props} />);
-registerIconRenderer("adduser", (props: IconBaseProps) => <FiUserPlus {...props} />);
-registerIconRenderer("userminus", (props: IconBaseProps) => <FiUserMinus {...props} />);
-registerIconRenderer("plus", (props: IconBaseProps) => <PlusIcon {...props} />);
-registerIconRenderer("inspect", (props: IconBaseProps) => <InspectIcon {...props} />);
-registerIconRenderer("plus-circle", (props: IconBaseProps) => <AiOutlinePlusCircle {...props} />);
-registerIconRenderer("filledplus", (props: IconBaseProps) => <FillPlusCircleIcon {...props} />);
-registerIconRenderer("darktolight", (props: IconBaseProps) => <DarkToLightIcon {...props} />);
-registerIconRenderer("lighttodark", (props: IconBaseProps) => <LightToDarkIcon {...props} />);
-registerIconRenderer("checkmark", (props: IconBaseProps) => <CheckIcon {...props} />);
-registerIconRenderer("valid", (props: IconBaseProps) => <FiCheckCircle {...props} />);
-registerIconRenderer("info", (props: IconBaseProps) => <FiAlertOctagon {...props} />);
-registerIconRenderer("error", (props: IconBaseProps) => <ErrorIcon {...props} />);
-registerIconRenderer("warning", (props: IconBaseProps) => <WarningIcon {...props} />);
-registerIconRenderer("board", (props: IconBaseProps) => <BoardIcon {...props} />);
-registerIconRenderer("list", (props: IconBaseProps) => <ListIcon {...props} />);
-registerIconRenderer("folder", (props: IconBaseProps) => <FolderIcon {...props} />);
-registerIconRenderer("folder-outline", (props: IconBaseProps) => <FiFolder {...props} />);
-registerIconRenderer("emptyfolder", (props: IconBaseProps) => <EmptyFolderIcon {...props} />);
-registerIconRenderer("pdf", (props: IconBaseProps) => <PDFIcon {...props} />);
-registerIconRenderer("txt", (props: IconBaseProps) => <TxtIcon {...props} />);
-registerIconRenderer("doc", (props: IconBaseProps) => <DocIcon {...props} />);
-registerIconRenderer("docx", (props: IconBaseProps) => <DocIcon {...props} />);
-registerIconRenderer("doc-outline", (props: IconBaseProps) => <DocFileIcon {...props} />);
-registerIconRenderer("conf", (props: IconBaseProps) => <GrDocumentConfig {...props} />);
-registerIconRenderer("code", (props: IconBaseProps) => <CodeFileIcon {...props} />);
-registerIconRenderer("codesandbox", (props: IconBaseProps) => <CodeSandboxIcon {...props} />);
-registerIconRenderer("box", (props: IconBaseProps) => <BoxIcon {...props} />);
-registerIconRenderer(["xls", "xlsx"], (props: IconBaseProps) => <XlsIcon {...props} />);
-registerIconRenderer(
-  ["jpg", "jpeg", "png", "webp", "svg", "gif", "tif", "ppt", "pptx"],
-  (props: IconBaseProps) => <ImageFileIcon {...props} />,
-);
-registerIconRenderer("unknownfile", (props: IconBaseProps) => <UnknownFileIcon {...props} />);
-registerIconRenderer("photo", (props: IconBaseProps) => <PhotoIcon {...props} />);
-registerIconRenderer("previous", (props: IconBaseProps) => <GrPrevious {...props} />);
-registerIconRenderer("next", (props: IconBaseProps) => <GrNext {...props} />);
-registerIconRenderer("like", (props: IconBaseProps) => <AiOutlineLike {...props} />);
-registerIconRenderer("reply", (props: IconBaseProps) => <BsReply {...props} />);
-registerIconRenderer("attach", (props: IconBaseProps) => <AttachmentIcon {...props} />);
-registerIconRenderer("attach2", (props: IconBaseProps) => <RiAttachment2 {...props} />);
-registerIconRenderer("emoji", (props: IconBaseProps) => <GrEmoji {...props} />);
-registerIconRenderer("message", (props: IconBaseProps) => <RiMessage2Line {...props} />);
-registerIconRenderer("upload", (props: IconBaseProps) => <FiUpload {...props} />);
-registerIconRenderer("split-vertical", (props: IconBaseProps) => <VscSplitVertical {...props} />);
-registerIconRenderer("split-horizontal", (props: IconBaseProps) => (
+registerIconRenderer(ICON_NAMES.HYPERLINK, (props: IconBaseProps) => <HyperLinkIcon {...props} />);
+registerIconRenderer(ICON_NAMES.GLOBE, (props: IconBaseProps) => <GlobeIcon {...props} />);
+registerIconRenderer(ICON_NAMES.LINK, (props: IconBaseProps) => <LinkIcon {...props} />);
+registerIconRenderer(ICON_NAMES.LOOSE_LIST, (props: IconBaseProps) => <LooseListIcon {...props} />);
+registerIconRenderer(ICON_NAMES.OPTIONS, (props: IconBaseProps) => <MoreOptionsIcon {...props} />);
+registerIconRenderer(ICON_NAMES.SEARCH, (props: IconBaseProps) => <SearchIcon {...props} />);
+registerIconRenderer(ICON_NAMES.FILTER, (props: IconBaseProps) => <FilterIcon {...props} />);
+registerIconRenderer(ICON_NAMES.TRASH, (props: IconBaseProps) => <TrashIcon {...props} />);
+registerIconRenderer(ICON_NAMES.PEN, (props: IconBaseProps) => <PenIcon {...props} />);
+registerIconRenderer(ICON_NAMES.EMAIL, (props: IconBaseProps) => <EmailIcon {...props} />);
+registerIconRenderer(ICON_NAMES.PHONE, (props: IconBaseProps) => <PhoneIcon {...props} />);
+registerIconRenderer(ICON_NAMES.HOME, (props: IconBaseProps) => <HomeIcon {...props} />);
+registerIconRenderer(ICON_NAMES.USER, (props: IconBaseProps) => <UserIcon {...props} />);
+registerIconRenderer(ICON_NAMES.EXIT, (props: IconBaseProps) => <RxExit {...props} />);
+registerIconRenderer(ICON_NAMES.ADD_USER, (props: IconBaseProps) => <FiUserPlus {...props} />);
+registerIconRenderer(ICON_NAMES.USER_MINUS, (props: IconBaseProps) => <FiUserMinus {...props} />);
+registerIconRenderer(ICON_NAMES.PLUS, (props: IconBaseProps) => <PlusIcon {...props} />);
+registerIconRenderer(ICON_NAMES.INSPECT, (props: IconBaseProps) => <InspectIcon {...props} />);
+registerIconRenderer(ICON_NAMES.PLUS_CIRCLE, (props: IconBaseProps) => <AiOutlinePlusCircle {...props} />);
+registerIconRenderer(ICON_NAMES.FILLED_PLUS, (props: IconBaseProps) => <FillPlusCircleIcon {...props} />);
+registerIconRenderer(ICON_NAMES.DARK_TO_LIGHT, (props: IconBaseProps) => <DarkToLightIcon {...props} />);
+registerIconRenderer(ICON_NAMES.LIGHT_TO_DARK, (props: IconBaseProps) => <LightToDarkIcon {...props} />);
+registerIconRenderer(ICON_NAMES.CHECKMARK, (props: IconBaseProps) => <CheckIcon {...props} />);
+registerIconRenderer(ICON_NAMES.VALID, (props: IconBaseProps) => <FiCheckCircle {...props} />);
+registerIconRenderer(ICON_NAMES.INFO, (props: IconBaseProps) => <FiAlertOctagon {...props} />);
+registerIconRenderer(ICON_NAMES.ERROR, (props: IconBaseProps) => <ErrorIcon {...props} />);
+registerIconRenderer(ICON_NAMES.WARNING, (props: IconBaseProps) => <WarningIcon {...props} />);
+registerIconRenderer(ICON_NAMES.BOARD, (props: IconBaseProps) => <BoardIcon {...props} />);
+registerIconRenderer(ICON_NAMES.LIST, (props: IconBaseProps) => <ListIcon {...props} />);
+registerIconRenderer(ICON_NAMES.FOLDER, (props: IconBaseProps) => <FolderIcon {...props} />);
+registerIconRenderer(ICON_NAMES.FOLDER_OUTLINE, (props: IconBaseProps) => <FiFolder {...props} />);
+registerIconRenderer(ICON_NAMES.EMPTY_FOLDER, (props: IconBaseProps) => <EmptyFolderIcon {...props} />);
+registerIconRenderer(ICON_NAMES.PDF, (props: IconBaseProps) => <PDFIcon {...props} />);
+registerIconRenderer(ICON_NAMES.TXT, (props: IconBaseProps) => <TxtIcon {...props} />);
+registerIconRenderer(ICON_NAMES.DOC, (props: IconBaseProps) => <DocIcon {...props} />);
+registerIconRenderer(ICON_NAMES.DOCX, (props: IconBaseProps) => <DocIcon {...props} />);
+registerIconRenderer(ICON_NAMES.DOC_OUTLINE, (props: IconBaseProps) => <DocFileIcon {...props} />);
+registerIconRenderer(ICON_NAMES.CONF, (props: IconBaseProps) => <GrDocumentConfig {...props} />);
+registerIconRenderer(ICON_NAMES.CODE, (props: IconBaseProps) => <CodeFileIcon {...props} />);
+registerIconRenderer(ICON_NAMES.CODE_SANDBOX, (props: IconBaseProps) => <CodeSandboxIcon {...props} />);
+registerIconRenderer(ICON_NAMES.BOX, (props: IconBaseProps) => <BoxIcon {...props} />);
+registerIconRenderer(ICON_NAMES.XLS as unknown as string[], (props: IconBaseProps) => <XlsIcon {...props} />);
+registerIconRenderer(ICON_NAMES.IMAGE_FILES as unknown as string[], (props: IconBaseProps) => <ImageFileIcon {...props} />);
+registerIconRenderer(ICON_NAMES.UNKNOWN_FILE, (props: IconBaseProps) => <UnknownFileIcon {...props} />);
+registerIconRenderer(ICON_NAMES.PHOTO, (props: IconBaseProps) => <PhotoIcon {...props} />);
+registerIconRenderer(ICON_NAMES.PREVIOUS, (props: IconBaseProps) => <GrPrevious {...props} />);
+registerIconRenderer(ICON_NAMES.NEXT, (props: IconBaseProps) => <GrNext {...props} />);
+registerIconRenderer(ICON_NAMES.LIKE, (props: IconBaseProps) => <AiOutlineLike {...props} />);
+registerIconRenderer(ICON_NAMES.REPLY, (props: IconBaseProps) => <BsReply {...props} />);
+registerIconRenderer(ICON_NAMES.ATTACH, (props: IconBaseProps) => <AttachmentIcon {...props} />);
+registerIconRenderer(ICON_NAMES.ATTACH2, (props: IconBaseProps) => <RiAttachment2 {...props} />);
+registerIconRenderer(ICON_NAMES.EMOJI, (props: IconBaseProps) => <GrEmoji {...props} />);
+registerIconRenderer(ICON_NAMES.MESSAGE, (props: IconBaseProps) => <RiMessage2Line {...props} />);
+registerIconRenderer(ICON_NAMES.UPLOAD, (props: IconBaseProps) => <FiUpload {...props} />);
+registerIconRenderer(ICON_NAMES.SPLIT_VERTICAL, (props: IconBaseProps) => <VscSplitVertical {...props} />);
+registerIconRenderer(ICON_NAMES.SPLIT_HORIZONTAL, (props: IconBaseProps) => (
   <VscSplitHorizontal {...props} />
 ));
-registerIconRenderer("swap", (props: IconBaseProps) => <IoSwapVertical {...props} />);
-registerIconRenderer("download", (props: IconBaseProps) => <FiDownload {...props} />);
-registerIconRenderer("note", (props: IconBaseProps) => <RiStickyNoteLine {...props} />);
-registerIconRenderer("binding", (props: IconBaseProps) => <BindingIcon {...props} />);
-registerIconRenderer("database", (props: IconBaseProps) => <DatabaseIcon {...props} />);
-registerIconRenderer("unlink", (props: IconBaseProps) => <UnlinkIcon {...props} />);
-registerIconRenderer("api", (props: IconBaseProps) => <ApiIcon {...props} />);
-registerIconRenderer("expression", (props: IconBaseProps) => <ExpressionIcon {...props} />);
-registerIconRenderer("chat", (props: IconBaseProps) => <BsChatDots {...props} />);
-registerIconRenderer("hash", (props: IconBaseProps) => <BsHash {...props} />);
-registerIconRenderer("drive", (props: IconBaseProps) => <FiHardDrive {...props} />);
-registerIconRenderer("lock", (props: IconBaseProps) => <FiLock {...props} />);
-registerIconRenderer("start", (props: IconBaseProps) => <VscDebugStart {...props} />);
-registerIconRenderer("stop", (props: IconBaseProps) => <VscDebugStop {...props} />);
-registerIconRenderer("restart", (props: IconBaseProps) => <TfiReload {...props} />);
-registerIconRenderer("duplicate", (props: IconBaseProps) => <HiOutlineDuplicate {...props} />);
-registerIconRenderer("connect", (props: IconBaseProps) => <RxLightningBolt {...props} />);
-registerIconRenderer("cog", (props: IconBaseProps) => <HiOutlineCog {...props} />);
-registerIconRenderer("sun", (props: IconBaseProps) => <HiSun {...props} />);
-registerIconRenderer("moon", (props: IconBaseProps) => <MoonIcon {...props} />);
-registerIconRenderer("stars", (props: IconBaseProps) => <StarsIcon {...props} />);
-registerIconRenderer("share", (props: IconBaseProps) => <ShareIcon {...props} />);
-registerIconRenderer("new-window", (props: IconBaseProps) => <RxOpenInNewWindow {...props} />);
-registerIconRenderer("paint", (props: IconBaseProps) => <HiOutlinePaintBrush {...props} />);
-registerIconRenderer("palette", (props: IconBaseProps) => <MdOutlinePalette {...props} />);
-registerIconRenderer("trending-up", (props: IconBaseProps) => <TrendingUpIcon {...props} />);
-registerIconRenderer("trending-down", (props: IconBaseProps) => <TrendingDownIcon {...props} />);
-registerIconRenderer("trending-level", (props: IconBaseProps) => <TrendingLevelIcon {...props} />);
-registerIconRenderer("sortasc", (props: IconBaseProps) => <SortAscendingIcon {...props} />);
-registerIconRenderer("sortdesc", (props: IconBaseProps) => <SortDescendingIcon {...props} />);
-registerIconRenderer("nosort", (props: IconBaseProps) => <NoSortIcon {...props} />);
+registerIconRenderer(ICON_NAMES.SWAP, (props: IconBaseProps) => <IoSwapVertical {...props} />);
+registerIconRenderer(ICON_NAMES.DOWNLOAD, (props: IconBaseProps) => <FiDownload {...props} />);
+registerIconRenderer(ICON_NAMES.NOTE, (props: IconBaseProps) => <RiStickyNoteLine {...props} />);
+registerIconRenderer(ICON_NAMES.BINDING, (props: IconBaseProps) => <BindingIcon {...props} />);
+registerIconRenderer(ICON_NAMES.DATABASE, (props: IconBaseProps) => <DatabaseIcon {...props} />);
+registerIconRenderer(ICON_NAMES.UNLINK, (props: IconBaseProps) => <UnlinkIcon {...props} />);
+registerIconRenderer(ICON_NAMES.API, (props: IconBaseProps) => <ApiIcon {...props} />);
+registerIconRenderer(ICON_NAMES.EXPRESSION, (props: IconBaseProps) => <ExpressionIcon {...props} />);
+registerIconRenderer(ICON_NAMES.CHAT, (props: IconBaseProps) => <BsChatDots {...props} />);
+registerIconRenderer(ICON_NAMES.HASH, (props: IconBaseProps) => <BsHash {...props} />);
+registerIconRenderer(ICON_NAMES.DRIVE, (props: IconBaseProps) => <FiHardDrive {...props} />);
+registerIconRenderer(ICON_NAMES.LOCK, (props: IconBaseProps) => <FiLock {...props} />);
+registerIconRenderer(ICON_NAMES.START, (props: IconBaseProps) => <VscDebugStart {...props} />);
+registerIconRenderer(ICON_NAMES.STOP, (props: IconBaseProps) => <VscDebugStop {...props} />);
+registerIconRenderer(ICON_NAMES.RESTART, (props: IconBaseProps) => <TfiReload {...props} />);
+registerIconRenderer(ICON_NAMES.DUPLICATE, (props: IconBaseProps) => <HiOutlineDuplicate {...props} />);
+registerIconRenderer(ICON_NAMES.CONNECT, (props: IconBaseProps) => <RxLightningBolt {...props} />);
+registerIconRenderer(ICON_NAMES.COG, (props: IconBaseProps) => <HiOutlineCog {...props} />);
+registerIconRenderer(ICON_NAMES.SUN, (props: IconBaseProps) => <HiSun {...props} />);
+registerIconRenderer(ICON_NAMES.MOON, (props: IconBaseProps) => <MoonIcon {...props} />);
+registerIconRenderer(ICON_NAMES.STARS, (props: IconBaseProps) => <StarsIcon {...props} />);
+registerIconRenderer(ICON_NAMES.SHARE, (props: IconBaseProps) => <ShareIcon {...props} />);
+registerIconRenderer(ICON_NAMES.NEW_WINDOW, (props: IconBaseProps) => <RxOpenInNewWindow {...props} />);
+registerIconRenderer(ICON_NAMES.PAINT, (props: IconBaseProps) => <HiOutlinePaintBrush {...props} />);
+registerIconRenderer(ICON_NAMES.PALETTE, (props: IconBaseProps) => <MdOutlinePalette {...props} />);
+registerIconRenderer(ICON_NAMES.TRENDING_UP, (props: IconBaseProps) => <TrendingUpIcon {...props} />);
+registerIconRenderer(ICON_NAMES.TRENDING_DOWN, (props: IconBaseProps) => <TrendingDownIcon {...props} />);
+registerIconRenderer(ICON_NAMES.TRENDING_LEVEL, (props: IconBaseProps) => <TrendingLevelIcon {...props} />);
+registerIconRenderer(ICON_NAMES.SORT_ASC, (props: IconBaseProps) => <SortAscendingIcon {...props} />);
+registerIconRenderer(ICON_NAMES.SORT_DESC, (props: IconBaseProps) => <SortDescendingIcon {...props} />);
+registerIconRenderer(ICON_NAMES.NO_SORT, (props: IconBaseProps) => <NoSortIcon {...props} />);
 
-registerIconRenderer("admonition_info", (props: IconBaseProps) => (
+registerIconRenderer(ICON_NAMES.ADMONITION_INFO, (props: IconBaseProps) => (
   <AdmonitionInfoIcon {...props} />
 ));
-registerIconRenderer("admonition_warning", (props: IconBaseProps) => (
+registerIconRenderer(ICON_NAMES.ADMONITION_WARNING, (props: IconBaseProps) => (
   <AdmonitionWarningIcon {...props} />
 ));
-registerIconRenderer("admonition_danger", (props: IconBaseProps) => (
+registerIconRenderer(ICON_NAMES.ADMONITION_DANGER, (props: IconBaseProps) => (
   <AdmonitionDangerIcon {...props} />
 ));
-registerIconRenderer("admonition_note", (props: IconBaseProps) => (
+registerIconRenderer(ICON_NAMES.ADMONITION_NOTE, (props: IconBaseProps) => (
   <AdmonitionNoteIcon {...props} />
 ));
-registerIconRenderer("admonition_tip", (props: IconBaseProps) => <AdmonitionTipIcon {...props} />);
+registerIconRenderer(ICON_NAMES.ADMONITION_TIP, (props: IconBaseProps) => <AdmonitionTipIcon {...props} />);
 
 // --- IDE extras (temporary)
-registerIconRenderer("arrowdown", (props: IconBaseProps) => <BsArrowDownShort {...props} />);
-registerIconRenderer("square", (props: IconBaseProps) => <BsSquare {...props} />);
-registerIconRenderer("squarehalf", (props: IconBaseProps) => <BsSquareHalf {...props} />);
-registerIconRenderer("squarefill", (props: IconBaseProps) => <BsSquareFill {...props} />);
+registerIconRenderer(ICON_NAMES.ARROW_DOWN, (props: IconBaseProps) => <BsArrowDownShort {...props} />);
+registerIconRenderer(ICON_NAMES.SQUARE, (props: IconBaseProps) => <BsSquare {...props} />);
+registerIconRenderer(ICON_NAMES.SQUARE_HALF, (props: IconBaseProps) => <BsSquareHalf {...props} />);
+registerIconRenderer(ICON_NAMES.SQUARE_FILL, (props: IconBaseProps) => <BsSquareFill {...props} />);
 
-registerIconRenderer("table-insert-row", (props) => <TableInsertRowIcon {...props} />);
-registerIconRenderer("table-delete-row", (props) => <TableDeleteRowIcon {...props} />);
-registerIconRenderer("table-insert-column", (props) => <TableInsertColumnIcon {...props} />);
-registerIconRenderer("table-delete-column", (props) => <TableDeleteColumnIcon {...props} />);
+registerIconRenderer(ICON_NAMES.TABLE_INSERT_ROW, (props) => <TableInsertRowIcon {...props} />);
+registerIconRenderer(ICON_NAMES.TABLE_DELETE_ROW, (props) => <TableDeleteRowIcon {...props} />);
+registerIconRenderer(ICON_NAMES.TABLE_INSERT_COLUMN, (props) => <TableInsertColumnIcon {...props} />);
+registerIconRenderer(ICON_NAMES.TABLE_DELETE_COLUMN, (props) => <TableDeleteColumnIcon {...props} />);
 
-registerIconRenderer("eye", (props) => <IoEyeOutline {...props} />);
-registerIconRenderer("eye-off", (props) => <IoEyeOffOutline {...props} />);
+registerIconRenderer(ICON_NAMES.EYE, (props) => <IoEyeOutline {...props} />);
+registerIconRenderer(ICON_NAMES.EYE_OFF, (props) => <IoEyeOffOutline {...props} />);
 
 export function IconProvider({ children }: { children: ReactNode }) {
   const getRegisteredIconNames = useCallback(() => {

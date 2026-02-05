@@ -1,6 +1,6 @@
 # TableOfContents [#tableofcontents]
 
-`TableOfContents` component collects [Heading](/components/Heading) and [Bookmark](/components/Bookmark) within the current page and displays them in a navigable tree.
+`TableOfContents` collects [Heading](/components/Heading) and [Bookmark](/components/Bookmark) within the current page and displays them in a navigable tree. Uses the same Scroller behavior as NavPanel (scrollStyle, showScrollerFade).
 
 ## Properties [#properties]
 
@@ -15,6 +15,20 @@ Defines the maximum heading level (1 to 6) to include in the table of contents. 
 -  default: **false**
 
 If true, the `H1` heading is not included in the table of contents. This is useful when the `H1` is used for the page title and you want to avoid duplication.
+
+### `scrollStyle` [#scrollstyle]
+
+-  default: **"normal"**
+
+This property determines the scrollbar style. Options: "normal" uses the browser's default scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.
+
+Available values: `normal` **(default)**, `overlay`, `whenMouseOver`, `whenScrolling`
+
+### `showScrollerFade` [#showscrollerfade]
+
+-  default: **true**
+
+When enabled, displays gradient fade indicators at the top and bottom edges when scrollable content extends beyond the visible area. Only works with "overlay", "whenMouseOver", and "whenScrolling" scroll styles.
 
 ### `smoothScrolling` [#smoothscrolling]
 
@@ -245,7 +259,7 @@ This component does not expose any methods.
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem-level-6 | $fontWeight-normal | $fontWeight-normal |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem-level-6--active | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem-level-6--hover | *none* | *none* |
-| [height](../styles-and-themes/common-units/#size)-TableOfContents | *none* | *none* |
+| [height](../styles-and-themes/common-units/#size)-TableOfContents | auto | auto |
 | [letterSpacing](../styles-and-themes/common-units/#size)-TableOfContentsItem | *none* | *none* |
 | [letterSpacing](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-1 | *none* | *none* |
 | [letterSpacing](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-2 | *none* | *none* |

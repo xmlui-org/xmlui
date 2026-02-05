@@ -5,6 +5,7 @@ import { ErrorWithSeverity, LOGGER_LEVELS, logger } from "./logger.mjs";
 import { winPathToPosix, deleteFileIfExists, fromKebabtoReadable, createTable } from "./utils.mjs";
 import { DocsGenerator } from "./DocsGenerator.mjs";
 import { collectedComponentMetadata } from "../../dist/metadata/xmlui-metadata.js";
+import { getAllIconNames } from "../../dist/metadata/icons.js";
 import { FOLDERS } from "./folders.mjs";
 import { existsSync } from "fs";
 import { configManager, pathResolver } from "./configuration-management.mjs";
@@ -25,6 +26,7 @@ import {
   ERROR_CONTEXTS,
   COMPONENT_NAV_ERRORS,
   EXTENSIONS_NAVIGATION,
+  ICONS_NAVIGATION,
 } from "./constants.mjs";
 import { handleNonFatalError, withErrorHandling } from "./error-handling.mjs";
 
@@ -35,6 +37,7 @@ const filterByProps = { [METADATA_PROPERTIES.IS_HTML_TAG]: true };
 const [components] = partitionMetadata(collectedComponentMetadata, filterByProps);
 
 await generateComponents(components);
+generateIconNames();
 
 // --- Extensions
 const extensionsConfig = await configManager.loadExtensionsConfig();
@@ -358,6 +361,62 @@ async function generateComponents(metadata) {
   await metadataGenerator.createMetadataJsonForLanding(URL_REFERENCES.DOCS, "components");
 }
 
+async function generateIconNames() {
+  try {
+    // Get all icon names from the built icons.js file
+    const iconNames = getAllIconNames();
+    
+    // Sort the icon names alphabetically
+    const sortedIconNames = iconNames.sort();
+    
+    // Generate the var tag with the array of icon names
+    // Use single quotes for strings inside the array to avoid conflicts with the attribute's double quotes
+    const iconNamesArray = JSON.stringify(sortedIconNames, null, 2)
+      .replace(/"/g, "'") // Replace double quotes with single quotes
+      .replace(/^/gm, '  ') // Indent each line by 2 spaces
+      .trim();
+    
+    const varTag = `<variable name="names" value="{${iconNamesArray}}" />`;
+    
+    // Read the Icons.xmlui file to find indentation
+    const iconsXmluiPath = join(FOLDERS.docsRoot, FILE_PATHS.ICONS_XMLUI);
+    
+    if (!existsSync(iconsXmluiPath)) {
+      logger.warn(`Icons.xmlui file not found at ${iconsXmluiPath}`);
+      return;
+    }
+    
+    const fileContent = await readFile(iconsXmluiPath, TEXT_CONSTANTS.UTF8_ENCODING);
+    
+    // Find the content between delimiters to get indentation
+    const startDelimiterRegex = ICONS_NAVIGATION.DELIMITERS.START_REGEX;
+    const endDelimiterRegex = ICONS_NAVIGATION.DELIMITERS.END_REGEX;
+    
+    const startMatch = fileContent.match(startDelimiterRegex);
+    const endMatch = fileContent.match(endDelimiterRegex);
+    
+    if (!startMatch || !endMatch) {
+      logger.warn('Icon names delimiters not found in Icons.xmlui');
+      return;
+    }
+    
+    const startIndex = startMatch.index;
+    const endIndex = endMatch.index;
+    const generatedContentStart = startIndex + startMatch[0].length;
+    const generatedContent = fileContent.substring(generatedContentStart, endIndex);
+    
+    // Calculate indentation depth
+    const indentationDepth = calculateIndentationDepth(generatedContent);
+    
+    // Replace the generated content
+    await replaceGeneratedContentInIconsXmlui(varTag, indentationDepth);
+    
+    logger.info(`Generated ${sortedIconNames.length} icon names in Icons.xmlui`);
+  } catch (error) {
+    logger.error(`Failed to generate icon names: ${error.message}`);
+  }
+}
+
 // NOTE: Unused - we are not generating Html component docs
 async function generateHtmlTagComponents(metadata) {
   const componentsConfig = await configManager.loadComponentsConfig();
@@ -561,6 +620,59 @@ function calculateIndentationDepth(content) {
 
   // Return 0 if no lines had content or all lines were empty
   return minIndentation === Infinity ? 0 : minIndentation;
+}
+
+/**
+ * Replaces the content between GENERATED CONTENT delimiters in Icons.xmlui with icon names
+ * @param {string} content - The content to insert
+ * @param {number} indentationDepth - Number of spaces to indent each line
+ */
+async function replaceGeneratedContentInIconsXmlui(content, indentationDepth) {
+  try {
+    const iconsXmluiPath = join(FOLDERS.docsRoot, FILE_PATHS.ICONS_XMLUI);
+
+    if (!existsSync(iconsXmluiPath)) {
+      throw new Error(`Icons.xmlui file not found at ${iconsXmluiPath}`);
+    }
+
+    // Read the Icons.xmlui file
+    const fileContent = await readFile(iconsXmluiPath, TEXT_CONSTANTS.UTF8_ENCODING);
+
+    // Define the delimiter patterns using regex
+    const startDelimiterRegex = ICONS_NAVIGATION.DELIMITERS.START_REGEX;
+    const endDelimiterRegex = ICONS_NAVIGATION.DELIMITERS.END_REGEX;
+
+    const startMatch = fileContent.match(startDelimiterRegex);
+    const endMatch = fileContent.match(endDelimiterRegex);
+
+    if (!startMatch || !endMatch) {
+      throw new Error('Icon names delimiters not found in Icons.xmlui');
+    }
+
+    const startIndex = startMatch.index;
+    const endIndex = endMatch.index;
+
+    // Create indented content
+    const indentString = " ".repeat(indentationDepth);
+    const indentedContent = indentString + content;
+
+    // Build the new content with proper formatting
+    const newGeneratedContent =
+      TEXT_CONSTANTS.NEWLINE_SEPARATOR +
+      indentedContent +
+      TEXT_CONSTANTS.NEWLINE_SEPARATOR +
+      indentString;
+
+    // Replace the content between delimiters
+    const beforeDelimiter = fileContent.substring(0, startIndex + startMatch[0].length);
+    const afterDelimiter = fileContent.substring(endIndex);
+    const newFileContent = beforeDelimiter + newGeneratedContent + afterDelimiter;
+
+    // Write the updated content back to the file
+    await writeFile(iconsXmluiPath, newFileContent, TEXT_CONSTANTS.UTF8_ENCODING);
+  } catch (error) {
+    throw new Error(`Failed to replace icon names content: ${error.message}`);
+  }
 }
 
 /**
