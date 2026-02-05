@@ -27,6 +27,7 @@
                         padding="$space-7"
                         borderRadius="$space-2"
                     >
+                    <VStack gap="$space-2">
                         <HStack>
                             <Text variant="info">
                                 {$item.author}
@@ -34,18 +35,22 @@
                                 {formatDate($item.date, "d MMM yyyy")}
                             </Text>
                         </HStack>
-
-                        <H2 variant="title" fontSize="24px" showAnchor="false">
-                            {$item.title}
-                        </H2>
-                        <Text variant="description" maxLines="4" ellipses>
-                            {$item.description}
-                        </Text>
+                        <VStack gap="$space-0_5">
+                            <H2 variant="title" fontSize="24px" showAnchor="false">
+                                {$item.title}
+                            </H2>
+                            <Text variant="description" maxLines="4" ellipses>
+                                {$item.description}
+                            </Text>
+                        </VStack>
+                        </VStack>
                         <Text variant="blurb" maxLines="4" ellipses>
                             {globalThis.getBlurb(appGlobals.prefetchedContent['/blog/' + $item.slug + '.md'])}
                         </Text>
                         <HStack horizontalAlignment="start" marginTop="auto">
+                        <Link to="/blog/{$item.slug}">
                             Read more →
+                            </Link>
                         </HStack>
                     </VStack>
                 </Link>
