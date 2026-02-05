@@ -380,8 +380,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     position: sticky;
     top: 0;
     transition: width 0.2s ease;
-
-    // First child (sidebar wrapper) takes space, footer stays at bottom
     > *:first-child {
       flex: 1;
       min-height: 0;

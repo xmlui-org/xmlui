@@ -9,6 +9,9 @@ import { Logo } from "../Logo/LogoNative";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { getAppLayoutOrientation } from "../App/AppNative";
 import { useLinkInfoContext } from "../App/LinkInfoContext";
+import { Part } from "../Part/Part";
+
+export const PART_NAV_PANEL_FOOTER = "footer";
 
 // Define navigation hierarchy node structure
 export interface NavHierarchyNode {
@@ -249,7 +252,11 @@ function DrawerNavPanel({
         >
           {children}
         </Scroller>
-        {hasFooter && <div className={styles.footer}>{footerContent}</div>}
+        {hasFooter && (
+          <div className={styles.footer} data-part="footer">
+            {footerContent}
+          </div>
+        )}
       </div>
     </NavPanelContext.Provider>
   );
@@ -344,22 +351,20 @@ export const NavPanel = forwardRef(function NavPanel(
       >
         {children}
       </Scroller>
+      {hasFooter && (
+        <Part partId={PART_NAV_PANEL_FOOTER}>
+          <div
+            className={classnames(styles.footer, {
+              [styles.footerCollapsed]: collapsed,
+            })}  
+          >
+            {footerContent}
+          </div>
+        </Part>
+
+      )}
     </div>
   );
 
-  if (vertical && hasFooter) {
-    return (
-      <>
-        {wrapperEl}
-        <div
-          className={classnames(styles.footer, {
-            [styles.footerCollapsed]: collapsed,
-          })}
-        >
-          {footerContent}
-        </div>
-      </>
-    );
-  }
   return wrapperEl;
 });
