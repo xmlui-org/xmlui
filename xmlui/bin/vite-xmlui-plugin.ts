@@ -1,7 +1,6 @@
 import { dataToEsm } from "@rollup/pluginutils";
 import type { Plugin } from "vite";
 import {
-  collectCodeBehindFromSource,
   collectCodeBehindFromSourceWithImports,
   removeCodeBehindTokensFromTree,
 } from "../src/parsers/scripting/code-behind-collect";
@@ -31,12 +30,19 @@ const moduleScriptExtension = new RegExp(`.${moduleFileExtension}$`);
  */
 export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plugin {
   let itemIndex = 0;
+  
+  // Helper to normalize Windows paths to use forward slashes
+  const normalizePath = (p: string) => p.replace(/\\/g, '/');
+  
   return {
     name: "vite:transform-xmlui",
 
     async transform(code: string, id: string, options) {
+      // Normalize path separators for cross-platform consistency
+      const normalizedId = normalizePath(id);
+      
       const moduleNameResolver = (moduleName: string) => {
-        return path.resolve(path.dirname(id), moduleName);
+        return path.resolve(path.dirname(normalizedId), moduleName);
       };
 
       if (xmluiExtension.test(id)) {
@@ -65,7 +71,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
             clearAllModuleCaches();
 
             codeBehind = await collectCodeBehindFromSourceWithImports(
-              moduleNameResolver(id),
+              normalizedId,
               scriptContent,
               moduleFetcher,
             );
@@ -132,7 +138,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
 
         // --- Collect code-behind with import support
         const codeBehind = await collectCodeBehindFromSourceWithImports(
-          moduleNameResolver(moduleName),
+          normalizedId,
           code,
           moduleFetcher,
         );

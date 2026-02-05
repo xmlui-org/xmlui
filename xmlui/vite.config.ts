@@ -43,9 +43,11 @@ export default ({ mode = "lib" }) => {
     case "metadata": {
       distSubDirName = "metadata";
       lib = {
-        entry: [path.resolve("src", "components", "collectedComponentMetadata.ts")],
+        entry: {
+          "xmlui-metadata": path.resolve("src", "components", "collectedComponentMetadata.ts"),
+          "icons": path.resolve("src", "components", "icons-abstractions.ts"),
+        },
         name: "xmlui-metadata",
-        fileName: "xmlui-metadata",
       };
       define = {
         "process.env": {

@@ -153,7 +153,7 @@ The `ScrollViewer` component uses shared theme variables with other layout conta
 | --- | --- | --- |
 | autoHideDelay-whenMouseOver-Scroller | 400 | 400 |
 | autoHideDelay-whenScrolling-Scroller | 400 | 400 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-fade-Scroller | rgba(255, 255, 255, 0.75) | rgba(255, 255, 255, 0.75) |
+| [backgroundColor](../styles-and-themes/common-units/#color)-fade-Scroller | rgb(from $color-surface-0 r g b / 0.75) | rgb(from $color-surface-0 r g b / 0.75) |
 | [backgroundColor](../styles-and-themes/common-units/#color)-handle-Scroller | $color-surface-200 | $color-surface-200 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-handle-Scroller--active | $color-surface-400 | $color-surface-400 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-handle-Scroller--hover | $color-surface-400 | $color-surface-400 |

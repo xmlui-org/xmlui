@@ -105,7 +105,7 @@ export class ModuleResolver {
    * @returns The resolved module with content
    * @throws Error if path or fetch fails
    */
-  static async resolveAndFetchModule(
+  static resolveAndFetchModule(
     importPath: string,
     fromFile: string,
   ): Promise<ResolvedModule> {

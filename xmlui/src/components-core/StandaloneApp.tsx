@@ -277,9 +277,11 @@ async function parseComponentMarkupResponse(response: Response): Promise<ParsedR
       // --- Create a module fetcher for import support
       // --- Note: modulePath is already resolved by ModuleResolver.resolvePath()
       const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
-        const moduleResponse = await fetchWithoutCache(modulePath);
+        // --- Normalize the path for consistency across platforms (especially Windows)
+        const normalizedPath = normalizePath(modulePath);
+        const moduleResponse = await fetchWithoutCache(normalizedPath);
         if (!moduleResponse.ok) {
-          throw new Error(`Failed to fetch module: ${modulePath}`);
+          throw new Error(`Failed to fetch module: ${normalizedPath}`);
         }
         return await moduleResponse.text();
       };
@@ -343,27 +345,13 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
   try {
     // --- Create a module fetcher for resolving imports
     const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
-      // --- For URLs (buildless apps), use URL resolution; for file paths, use ModuleResolver
-      let resolvedPath: string;
-      if (response.url.startsWith('http://') || response.url.startsWith('https://')) {
-        // --- URL-based resolution for buildless apps
-        const baseUrl = new URL(response.url);
-        const moduleName = modulePath.startsWith('.') ? modulePath : `./${modulePath}`;
-        try {
-          const resolvedUrl = new URL(moduleName, baseUrl);
-          resolvedPath = resolvedUrl.toString();
-        } catch (e) {
-          console.error(`[moduleFetcher] Failed to resolve URL: ${modulePath} from ${response.url}`, e);
-          throw new Error(`Failed to resolve module URL: ${modulePath}`);
-        }
-      } else {
-        // --- File path resolution for other cases
-        resolvedPath = ModuleResolver.resolvePath(modulePath, response.url);
-      }
+      // --- ModuleLoader already resolves the path, so we just need to normalize and fetch it
+      // --- Normalize the path for consistency across platforms (especially Windows)
+      const normalizedPath = normalizePath(modulePath);
       
-      const moduleResponse = await fetchWithoutCache(resolvedPath);
+      const moduleResponse = await fetchWithoutCache(normalizedPath);
       if (!moduleResponse.ok) {
-        throw new Error(`Failed to fetch module: ${resolvedPath}`);
+        throw new Error(`Failed to fetch module: ${normalizedPath}`);
       }
       return await moduleResponse.text();
     };
