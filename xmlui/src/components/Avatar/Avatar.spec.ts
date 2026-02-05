@@ -2,14 +2,16 @@ import { getBounds } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 import { sizeValues } from "../abstractions";
 
-test.describe("smoke tests", { tag: "@smoke" }, () => {
+test.describe("smoke tests", () => {
   test("No initials without name", async ({ initTestBed, createAvatarDriver }) => {
     await initTestBed(`<Avatar />`);
     await expect((await createAvatarDriver()).component).toBeEmpty();
   });
 
   test("Can render 2 initials", async ({ initTestBed, createAvatarDriver }) => {
-    await initTestBed(`<Avatar name="Tim Smith"/>`);
+    await initTestBed(`<Avatar name="Tim Smith"/>`, {
+      globalXs: "var count = 6*7;"
+    });
     await expect((await createAvatarDriver()).component).toContainText("TS");
   });
 });

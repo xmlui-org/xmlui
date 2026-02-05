@@ -68,7 +68,7 @@ import { ModalDialogDriver } from "./drivers/ModalDialogDriver";
 import { TextBoxDriver } from "./drivers/TextBoxDriver";
 import { NumberBoxDriver } from "./drivers/NumberBoxDriver";
 import { TreeDriver } from "./drivers/TreeDriver";
-
+import { collectCodeBehindFromSource } from "../parsers/scripting/code-behind-collect";
 export { expect } from "./assertions";
 
 const isCI = process?.env?.CI === "true";
@@ -195,6 +195,7 @@ export type TestBedDescription = Omit<
   testThemeVars?: Record<string, string>;
   components?: string[];
   appGlobals?: Record<string, any>;
+  globalXs?: string;
 };
 
 export const test = baseTest.extend<TestDriverExtenderProps>({
@@ -241,6 +242,19 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
         return component as CompoundComponentDef;
       });
 
+      let runtime: any;
+      if (description?.globalXs) {
+        const parsedCodeBehind = collectCodeBehindFromSource("Globals", description.globalXs);
+        if (parsedCodeBehind.vars || parsedCodeBehind.functions) {
+          runtime = {
+            "/src/Globals.xs": {
+              vars: {},
+              functions: {},
+            }
+          };
+        }
+      }
+
       if (source !== "" && entryPoint.children) {
         const sourceBaseComponent = entryPoint.children[0];
         const isCompoundComponentRoot =
@@ -284,6 +298,7 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       await page.addInitScript((app) => {
         // @ts-ignore
         window.TEST_ENV = app;
+        window.TEST_RUNTIME = runtime;
       }, _appDescription);
       const { width, height } = page.viewportSize();
       await page.goto("/");
