@@ -13,6 +13,24 @@
             {$props.post.description}
           </Text>
         </VStack>
+        <HStack
+          when="{$props.post.tags && $props.post.tags.length > 0}"
+          gap="$space-1_5"
+          flexWrap="wrap"
+        >
+          <Items data="{$props.post.tags}">
+            <Text
+              variant="info"
+              fontSize="13px"
+              paddingVertical="$space-0_5"
+              paddingHorizontal="$space-1_5"
+              borderRadius="$space-1"
+              backgroundColor="$color-surface-100"
+            >
+              {$item}
+            </Text>
+          </Items>
+        </HStack>
         <Text variant="info">
           {$props.post.author}
           •

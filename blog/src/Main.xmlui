@@ -7,7 +7,8 @@
         description: "Let's make building user interfaces as easy as it was 30 years ago.",
         author: "Jon Udell",
         date: "2025-07-18",
-        image: "xmlui-demo.png"
+        image: "xmlui-demo.png",
+        tags: ["intro", "xmlui"]
         },
         {
         title: "Reproducible XMLUI",
@@ -15,7 +16,8 @@
         description: "Use playgrounds to infuse docs with live examples, iterate on prototypes, and reproduce bugs.",
         author: "Jon Udell",
         date: "2025-10-27",
-        image: "playground.png"
+        image: "playground.png",
+        tags: ["playground", "docs", "demo"]
         },
         {
         title: "An XMLUI-powered blog",
@@ -23,7 +25,8 @@
         description: "How we made this blog with a few dozen lines of XMLUI.",
         author: "Jon Udell",
         date: "2025-10-28",
-        image: "blog-scrabble.png"
+        image: "blog-scrabble.png",
+        tags: ["blog", "xmlui"]
         },
         {
         title: "Introducing the XMLUI CLI",
@@ -31,7 +34,8 @@
         description: "Your all-in-one tool for working with XMLUI.",
         author: "Jon Udell",
         date: "2025-12-19",
-        image: "cli-blog-header.svg"
+        image: "cli-blog-header.svg",
+        tags: ["cli", "tooling", "demo"]
         },
         {
         title: "Supabase + XMLUI",
@@ -40,7 +44,8 @@
         author: "Jon Udell",
         date: "2026-01-27",
         image: "supabase-and-xmlui.png",
-        draft: true
+        draft: true,
+        tags: ["supabase", "backend", "api"]
         }
         ]}`
 >

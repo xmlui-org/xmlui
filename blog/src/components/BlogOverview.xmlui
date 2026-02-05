@@ -43,6 +43,24 @@
                                 {$item.description}
                             </Text>
                         </VStack>
+                        <HStack
+                          when="{$item.tags && $item.tags.length > 0}"
+                          gap="$space-1_5"
+                          flexWrap="wrap"
+                        >
+                          <Items data="{$item.tags}">
+                            <Text
+                              variant="info"
+                              fontSize="12px"
+                              paddingVertical="$space-0_5"
+                              paddingHorizontal="$space-1_5"
+                              borderRadius="$space-1"
+                              backgroundColor="$color-surface-100"
+                            >
+                              {$item}
+                            </Text>
+                          </Items>
+                        </HStack>
                         </VStack>
                         <Text variant="blurb" maxLines="4" ellipses>
                             {globalThis.getBlurb(appGlobals.prefetchedContent['/blog/' + $item.slug + '.md'])}
