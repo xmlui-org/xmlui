@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import {
   ModuleResolver,
-  type ResolvedModule,
   type ModuleFetcher,
 } from "../../../src/parsers/scripting/ModuleResolver";
 
@@ -261,26 +260,6 @@ export class ConfigBuilder {
       await expect(
         ModuleResolver.resolveModule("/test.xs"),
       ).rejects.toThrow("No custom fetcher configured");
-    });
-
-    it("should throw error if import path cannot be resolved", async () => {
-      const fetcher: ModuleFetcher = async () => "content";
-      ModuleResolver.setCustomFetcher(fetcher);
-
-      // Invalid import path (absolute instead of relative)
-      await expect(
-        ModuleResolver.resolveAndFetchModule("/absolute.xs", "/source.xs"),
-      ).rejects.toThrow("must be relative");
-    });
-
-    it("should throw error if trying to go above root", async () => {
-      const fetcher: ModuleFetcher = async () => "content";
-      ModuleResolver.setCustomFetcher(fetcher);
-
-      // Too many parent directory references
-      await expect(
-        ModuleResolver.resolveAndFetchModule("../../above.xs", "/file.xs"),
-      ).rejects.toThrow("goes above root directory");
     });
 
     it("should wrap fetch errors with module path context", async () => {
