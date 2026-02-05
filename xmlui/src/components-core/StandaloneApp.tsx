@@ -748,10 +748,13 @@ function useStandalone(
   const [projectCompilation, setProjectCompilation] = useState<ProjectCompilation>(null);
   const globalVars = useMemo(() => {
     // Get the vars in Globals.xs module directly from runtime
-    const varsSource = runtime?.["/src/Globals.xs"]?.vars || {};
+    const globalsXs = runtime?.["/src/Globals.xs"];
+    const varsSource = globalsXs?.vars || {};
+    const functionsSource = globalsXs?.functions || {};
+    const combinedSource = { ...varsSource, ...functionsSource };
     const extractedVars: Record<string, any> = {};
 
-    for (const [key, value] of Object.entries(varsSource)) {
+    for (const [key, value] of Object.entries(combinedSource)) {
       // The value is a variable definition object with __PARSED__ and tree
       if (
         typeof value === "object" &&
