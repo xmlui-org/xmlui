@@ -16,6 +16,7 @@ $backgroundColor-content-App: createThemeVar("backgroundColor-content-App");
 $borderLeft-content-App: createThemeVar("borderLeft-content-App");
 $borderRight-navPanelWrapper-App: createThemeVar("borderRight-navPanelWrapper-App");
 $maxWidth-content-App: createThemeVar("maxWidth-content-App");
+$maxWidth-content-App--withToc: createThemeVar("maxWidth-content-App--withToc");
 $maxWidth-App: createThemeVar("maxWidth-App");
 $backgroundColor-AppHeader: createThemeVar("backgroundColor-AppHeader");
 $borderBottom-NavPanel: createThemeVar("borderBottom-AppHeader");
@@ -418,10 +419,21 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     flex-direction: column;
     transition: max-width 0.2s ease;
 
+    // When TOC is active (e.g. blog post with tableOfContents), use wider content width
+    &.withToc {
+      max-width: $maxWidth-content-App--withToc;
+    }
+
     // When nav panel is collapsed, content grows by the freed width
     .navPanelCollapsed & {
       max-width: calc(
         #{$maxWidth-content-App} + (#{$width-navPanel-App} - #{$width-navPanel-collapsed-App})
+      );
+    }
+
+    .navPanelCollapsed &.withToc {
+      max-width: calc(
+        #{$maxWidth-content-App--withToc} + (#{$width-navPanel-App} - #{$width-navPanel-collapsed-App})
       );
     }
 

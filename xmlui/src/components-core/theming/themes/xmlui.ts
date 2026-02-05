@@ -151,7 +151,8 @@ export const XmlUiBlogThemeDefinition: ThemeDefinition = {
   color: "$color-primary-500",
   themeVars: {
     // --- App layout (match docs content width)
-    "maxWidth-content-App": "1000px",
+    "maxWidth-content-App": "800px",
+    "maxWidth-content-App--withToc": "1000px",
     // --- Fundamental colors & typography
     "color-surface": "rgb(111, 110, 119)",
     "backgroundColor": "color-surface-1",

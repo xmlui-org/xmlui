@@ -355,9 +355,9 @@ const App: StandaloneAppDescription = {
     popOutUrl: "https://playground.xmlui.org/#/playground",
     blog: {
       posts: blogPosts,
-      layout: "featuredWithTabs",
-      //layout: "basic",
-      tableOfContents: true,
+      //layout: "featuredWithTabs",
+      layout: "basic",
+      tableOfContents: false,
     },
   },
 };

@@ -425,8 +425,17 @@ export function App({
     },
   ];
 
+  const blogConfig = appGlobals?.blog as { tableOfContents?: boolean } | undefined;
+  const isBlogPageWithToc =
+    blogConfig &&
+    blogConfig.tableOfContents !== false &&
+    (location.pathname === "/" ||
+      location.pathname === "/blog" ||
+      location.pathname.startsWith("/blog/"));
+
   const pagesWrapperClasses = classnames(styles.pageContentContainer, {
     [styles.withDefaultContentPadding]: applyDefaultContentPadding,
+    [styles.withToc]: isBlogPageWithToc,
   });
 
   const config = layoutConfigs[safeLayout];
