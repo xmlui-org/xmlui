@@ -300,7 +300,8 @@ export const NavPanel = forwardRef(function NavPanel(
   const vertical = appLayoutContext?.layout?.startsWith("vertical");
   const collapsed = !!appLayoutContext?.navPanelCollapsed && vertical;
   const safeLogoContent = logoContent || renderChild(appLayoutContext?.logoContentDef);
-  const hasFooter = !!footerContent && !horizontal;
+  // Footer only in vertical layouts: vertical, vertical-sticky, vertical-full-header
+  const hasFooter = !!footerContent && vertical;
 
   // Register the linkMap when navLinks change
   const registerLinkMap = linkInfoContext?.registerLinkMap;
@@ -317,7 +318,7 @@ export const NavPanel = forwardRef(function NavPanel(
         {...rest}
         style={style}
         logoContent={safeLogoContent}
-        footerContent={footerContent}
+        footerContent={hasFooter ? footerContent : undefined}
         className={className}
         scrollStyle={scrollStyle}
         showScrollerFade={showScrollerFade}
