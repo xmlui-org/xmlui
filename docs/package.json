@@ -12,7 +12,7 @@
     "build-optimized": "npm run gen:releases && npm run gen:download-latest-xmlui-release && npm run gen:rss && npx xmlui-optimizer",
     "release:docs": "xmlui zip-dist --source=dist --target=dist/ui.zip",
     "release-ci-optimized": "npm run build-optimized && mv xmlui-optimized-output/optimized-staticwebapp.config.json xmlui-optimized-output/staticwebapp.config.json",
-    "preview-optimized": "npx serve@latest ./xmlui-optimized-output -c optimized-serve.json"
+    "preview-optimized": "npx serve-optimized ./xmlui-optimized-output"
   },
   "dependencies": {
     "@shikijs/langs": "3.4.2",

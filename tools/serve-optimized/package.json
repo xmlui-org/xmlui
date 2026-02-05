@@ -1,0 +1,27 @@
+{
+  "name": "serve-optimized",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Static file server optimized for XMLUI applications with SPA fallback and resource 404 handling",
+  "main": "src/index.js",
+  "bin": {
+    "serve-optimized": "bin/serve-optimized.js"
+  },
+  "scripts": {
+    "start": "node bin/serve-optimized.js"
+  },
+  "keywords": [
+    "static",
+    "server",
+    "xmlui",
+    "spa"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "README.md"
+  ]
+}
