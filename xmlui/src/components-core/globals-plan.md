@@ -139,11 +139,114 @@ Since globalVars are not in local state, changes automatically propagate up to t
 - ✅ Compound components maintain isolation (`uses: []`) for their local state
 - ✅ No breaking changes
 
-### Phase 2: Dynamic Global Variables Declaration
+### Phase 2: Dynamic Global Variables Declaration ✅
 
 **Goal:** Allow declaring global variables dynamically (non-hardcoded).
 
-**Options:**
+**Status:** ✅ Implemented
+
+**Decision:** Use `Globals.xs` file in the same folder as Main.xmlui for global variable declarations.
+
+**Example - Globals.xs:**
+```javascript
+var count = 6*7;
+```
+
+**Technical Details:**
+
+The vite-xmlui-plugin already processes `.xs` files into syntax trees. The StandaloneApp component receives these in its `runtime` argument.
+
+**Runtime structure for Globals.xs:**
+```javascript
+runtime = {
+  '/src/Globals.xs': Module {
+    vars: {
+      count: {
+        tree: { op: '*', left: {...}, right: {...}, type: 101, nodeId: 8 },
+        __PARSED__: true
+      }
+    },
+    // ... other properties (functions, moduleErrors, hasInvalidStatements, src)
+  },
+  '/src/Main.xmlui': Module { ... },
+  // ... other modules
+}
+```
+
+**Key observations:**
+- Globals.xs is already compiled by vite-xmlui-plugin
+- Variables are stored in `runtime['/src/Globals.xs'].vars`
+- Each variable has a `tree` property containing the expression AST
+- The `__PARSED__: true` flag indicates successful parsing
+- Expression trees need to be evaluated to get initial values
+
+**Implementation needed:**
+1. Detect Globals.xs module in runtime object (StandaloneApp.tsx)
+2. Extract variable declarations from `runtime['/src/Globals.xs'].vars`
+3. Evaluate expression trees to get initial values using `evalBindingExpression()` from eval-tree-sync.ts
+4. Pass evaluated variables as `globalVars` prop to AppRoot
+5. AppRoot merges these into root container instead of hardcoded values
+
+**Expression Evaluation:**
+Use `evalBindingExpression(source, evalContext, thread)` from eval-tree-sync.ts to evaluate variable initialization expressions.
+
+Example:
+```javascript
+// From Globals.xs: var count = 6*7;
+const tree = runtime['/src/Globals.xs'].vars.count.tree;
+const value = evalBindingExpression(tree, evalContext, thread);
+// value === 42
+```
+
+This function:
+- Takes an expression tree (the `tree` property)
+- Evaluates it synchronously using JavaScript semantics
+- Returns the computed value
+
+**Implementation Completed:**
+
+**Files Modified:**
+1. **StandaloneApp.tsx:**
+   - Added imports for `evalBindingExpression` and `BindingTreeEvaluationContext`
+   - Updated `resolveRuntime()` return type to include `globalVars?: Record<string, any>`
+   - Added Globals.xs detection and extraction logic (lines 486-515):
+     - Detects key matching "Globals" filename
+     - Extracts vars object from module
+     - Creates minimal `evalContext` with mainThread structure
+     - Evaluates each variable's expression tree using `evalBindingExpression()`
+     - Builds `globalVars` object with evaluated values
+   - Returns `globalVars` from `resolveRuntime()` (line 621)
+   - Updated `useStandalone()` to track and return `globalVars` state
+   - Extracts `globalVars` from `useStandalone()` result and passes to AppRoot (line 224)
+
+2. **AppWrapper.tsx:**
+   - Added `globalVars?: Record<string, any>` property to `AppWrapperProps` type
+
+3. **AppRoot.tsx:**
+   - Added `globalVars` parameter to component function signature (line 47)
+   - Modified root container creation to use `globalVars: globalVars || {}` (line 87)
+   - Removed hardcoded `{ count: 42 }`
+
+**How it works:**
+1. vite-xmlui-plugin compiles Globals.xs into expression trees in runtime object
+2. StandaloneApp detects Globals.xs module by filename
+3. Extracts and evaluates each variable's expression tree synchronously
+4. Passes evaluated globalVars to AppRoot component
+5. AppRoot creates root container with dynamic globalVars
+6. GlobalVars flow through entire component hierarchy via existing mechanism
+
+**Testing:**
+To test this feature:
+1. Create a `Globals.xs` file in the same folder as Main.xmlui:
+   ```javascript
+   var count = 6*7;
+   ```
+2. Use the test app from Phase 1 (Main.xmlui and IncButton.xmlui)
+3. Run the app - should display 42 (result of 6*7) as initial count value
+4. Clicking buttons should increment the shared global count
+5. 4th button's local `count` variable should operate independently (starting from 0)
+
+**Alternative options (not chosen):**
 
 **Option A: Via AppState.xmlui**
 Add support for declaring global variables in an optional `AppState.xmlui` file at the app root:

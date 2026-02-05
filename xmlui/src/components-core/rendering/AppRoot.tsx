@@ -45,6 +45,7 @@ export function AppRoot({
   defaultTone,
   resources,
   globalProps,
+  globalVars,
   standalone,
   trackContainerHeight,
   routerBaseName,
@@ -61,6 +62,7 @@ export function AppRoot({
   isNested?: boolean;
 }) {
   // Note: Startup trace initialization is handled by AppContent's xsVerbose useEffect
+  console.log("[DEBUG] AppRoot() received globalVars:", { ...globalVars }, "with keys:", Object.keys(globalVars || {}));
   // --- Make sure, the root node is wrapped in a `Theme` component. Also,
   // --- the root node must be wrapped in a `Container` component managing
   // --- the app's top-level state.
@@ -77,11 +79,11 @@ export function AppRoot({
       uid: "root",
       children: [themedRoot],
       uses: [],
-      globalVars: {
-        count: 42,
-      },
+      globalVars: globalVars || {},
     };
-  }, [node]);
+  }, [node, globalVars]);
+
+  console.log("[DEBUG] AppRoot() created root container with globalVars:", { ...globalVars }, "uid: root");
 
   if (projectCompilation) {
     const entryDeps = projectCompilation.entrypoint.dependencies;
