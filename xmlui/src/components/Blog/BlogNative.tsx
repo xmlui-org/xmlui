@@ -56,7 +56,6 @@ function getBlurb(md: string | undefined, maxLen = 200): string {
   return "";
 }
 
-const gap = "1rem";
 const blogBasePath = "/blog";
 
 type Props = {
@@ -155,32 +154,26 @@ function BlogPostView({
   const markdownContent = prefetchedContent[`/blog/${post.slug}.md`];
 
   return (
-    <div className={classnames("xmlui-blog-post", className)} style={{ display: "flex", flexDirection: "column", gap, marginTop: gap, ...style }}>
+    <div className={classnames("xmlui-blog-post", styles.postRoot, className)} style={style}>
       <LinkNative to={blogBasePath}>← Go to all posts</LinkNative>
-      <div style={{ display: "flex", flexDirection: "row", gap: "1.25rem", alignItems: "flex-start" }}>
-        <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+      <div className={styles.postRow}>
+        <div
+          className={classnames(styles.postContent, !showToc && styles.postContentNoToc)}
+        >
+          <div className={styles.postMeta}>
             {post.tags && post.tags.length > 0 && (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.375rem" }}>
+              <div className={styles.postTagsRow}>
                 {post.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    style={{
-                      fontSize: 13,
-                      padding: "2px 6px",
-                      borderRadius: 4,
-                      backgroundColor: "var(--xmlui-color-surface-100, #f0f0f0)",
-                    }}
-                  >
+                  <span key={tag} className={styles.postTag}>
                     {tag}
                   </span>
                 ))}
               </div>
             )}
-            <Heading level="h1" showAnchor={false} style={{ fontSize: 32 }}>
+            <Heading level="h1" showAnchor={false} className={styles.postTitle}>
               {post.title}
             </Heading>
-            <Text variant="description" style={{ fontSize: 24 }} maxLines={4} ellipses>
+            <Text variant="description" className={styles.postDescriptionLarge} maxLines={4} ellipses>
               {post.description}
             </Text>
           </div>
@@ -195,15 +188,7 @@ function BlogPostView({
           )}
         </div>
         {showToc && (
-          <div
-            style={{
-              width: "16rem",
-              flexShrink: 0,
-              position: "sticky",
-              top: "var(--xmlui-height-AppHeader)",
-              alignSelf: "flex-start",
-            }}
-          >
+          <div className={styles.postTocSidebar}>
             <TableOfContents
               scrollStyle="whenScrolling"
               showScrollerFade
@@ -236,40 +221,22 @@ function PostCard({
   return (
     <LinkNative to={`${blogBasePath}/${post.slug}`} active>
       <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: compact ? "0.5rem" : "0.75rem",
-          height: "100%",
-          minHeight: 0,
-          width: "100%",
-          padding: compact ? "1rem" : "1.75rem",
-          borderRadius: 8,
-          boxSizing: "border-box",
-        }}
+        className={classnames(styles.postCard, compact && styles.postCardCompact)}
       >
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+        <div className={styles.postCardInner}>
           <Text variant="info">
             {post.author} • {fmt(post.date, "d MMM yyyy")}
           </Text>
-          <Heading level="h2" showAnchor={false} style={{ fontSize: compact ? 18 : 24 }}>
+          <Heading level="h2" showAnchor={false} className={styles.postCardTitle}>
             {post.title}
           </Heading>
           <Text variant="description" maxLines={4} ellipses>
             {post.description}
           </Text>
           {post.tags && post.tags.length > 0 && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.375rem" }}>
+            <div className={styles.postTagsRow}>
               {post.tags.map((tag) => (
-                <span
-                  key={tag}
-                  style={{
-                    fontSize: 12,
-                    padding: "2px 6px",
-                    borderRadius: 4,
-                    backgroundColor: "var(--xmlui-color-surface-100, #f0f0f0)",
-                  }}
-                >
+                <span key={tag} className={styles.postCardTag}>
                   {tag}
                 </span>
               ))}
@@ -281,7 +248,45 @@ function PostCard({
             {blurb}
           </Text>
         )}
-        <div style={{ marginTop: "auto" }}>
+        <div className={styles.postCardReadMore}>
+          <LinkNative to={`${blogBasePath}/${post.slug}`}>Read more →</LinkNative>
+        </div>
+      </div>
+    </LinkNative>
+  );
+}
+
+function FeaturedStylePostItem({
+  post,
+  blogBasePath,
+  formatDate: fmt,
+  getBlurb: blurbFn,
+  prefetchedContent,
+}: {
+  post: BlogPost;
+  blogBasePath: string;
+  formatDate: (d: string, f?: string) => string;
+  getBlurb: (md: string | undefined, max?: number) => string;
+  prefetchedContent: Record<string, string>;
+}) {
+  const blurb = blurbFn(prefetchedContent[`/blog/${post.slug}.md`]);
+  return (
+    <LinkNative to={`${blogBasePath}/${post.slug}`} active>
+      <div className={styles.featuredStylePost}>
+        <div className={styles.featuredStylePostInner}>
+          <Text variant="info">
+            {post.author} • {fmt(post.date, "d MMM yyyy")}
+          </Text>
+          <Heading level="h2" showAnchor={false} className={styles.featuredStylePostTitle}>
+            {post.title}
+          </Heading>
+        </div>
+        {blurb && (
+          <Text variant="blurb" maxLines={4} ellipses>
+            {blurb}
+          </Text>
+        )}
+        <div className={styles.featuredPostReadMore}>
           <LinkNative to={`${blogBasePath}/${post.slug}`}>Read more →</LinkNative>
         </div>
       </div>
@@ -307,11 +312,11 @@ function BlogListViewBasic({
   style?: CSSProperties;
 }) {
   return (
-    <div className={classnames("xmlui-blog-list-basic", className)} style={{ marginTop: gap, ...style }}>
-      <Heading level="h1" showAnchor={false} style={{ textAlign: "center", fontSize: 42 }}>
+    <div className={classnames("xmlui-blog-list-basic", styles.listBasicRoot, className)} style={style}>
+      <Heading level="h1" showAnchor={false} className={styles.listTitle}>
         Blog
       </Heading>
-      <FlowLayout columnGap={gap} rowGap="1.5rem" style={{ marginTop: gap }}>
+      <FlowLayout columnGap="1rem" rowGap="1.5rem" className={styles.listBasicFlow}>
         {sortedPosts.map((post) => (
           <FlowItemWrapper key={post.slug} width="100%">
             <PostCard
@@ -353,25 +358,18 @@ function BlogListViewFeatured({
     sortedPosts.filter((p) => p.tags && p.tags.includes(tag));
 
   return (
-    <div className={classnames("xmlui-blog-list-featured", className)} style={{ marginTop: gap, display: "flex", flexDirection: "column", gap: "2rem", ...style }}>
-      <Heading level="h1" showAnchor={false} style={{ textAlign: "center", fontSize: 42 }}>
+    <div className={classnames("xmlui-blog-list-featured", styles.listFeaturedRoot, className)} style={style}>
+      <Heading level="h1" showAnchor={false} className={styles.listTitle}>
         Blog
       </Heading>
 
       {latestPost && (
-        <div
-          className={styles.featuredPost}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "1rem",
-          }}
-        >
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+        <div className={styles.featuredPost}>
+          <div className={styles.featuredPostInner}>
             <Text variant="info">
               {latestPost.author} • {formatDate(latestPost.date, "d MMM yyyy")}
             </Text>
-            <Heading level="h2" showAnchor={false} style={{ fontSize: 24 }}>
+            <Heading level="h2" showAnchor={false} className={styles.featuredPostTitle}>
               {latestPost.title}
             </Heading>
             <Text variant="description">
@@ -383,14 +381,14 @@ function BlogListViewFeatured({
               {latestPostBlurb}
             </Text>
           )}
-          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <div className={styles.featuredPostReadMore}>
             <LinkNative to={`${blogBasePath}/${latestPost.slug}`}>Read more →</LinkNative>
           </div>
         </div>
       )}
 
       <div className={styles.sectionAllPosts}>
-        <Heading level="h2" showAnchor={false} className={styles.sectionAllPostsHeading} style={{ fontSize: "1.25rem" }}>
+        <Heading level="h2" showAnchor={false} className={styles.sectionAllPostsHeading}>
           All blog posts
         </Heading>
 
@@ -399,13 +397,12 @@ function BlogListViewFeatured({
             <div className={styles.postsGrid}>
               {sortedPosts.map((post) => (
                 <div key={post.slug} className={styles.postsGridItem}>
-                  <PostCard
+                  <FeaturedStylePostItem
                     post={post}
                     blogBasePath={blogBasePath}
                     formatDate={formatDate}
                     getBlurb={getBlurb}
                     prefetchedContent={prefetchedContent}
-                    compact
                   />
                 </div>
               ))}
@@ -416,13 +413,12 @@ function BlogListViewFeatured({
               <div className={styles.postsGrid}>
                 {postsByTag(tag).map((post) => (
                   <div key={post.slug} className={styles.postsGridItem}>
-                    <PostCard
+                    <FeaturedStylePostItem
                       post={post}
                       blogBasePath={blogBasePath}
                       formatDate={formatDate}
                       getBlurb={getBlurb}
                       prefetchedContent={prefetchedContent}
-                      compact
                     />
                   </div>
                 ))}
