@@ -358,6 +358,7 @@ const App: StandaloneAppDescription = {
       //layout: "featuredWithTabs",
       layout: "basic",
       tableOfContents: false,
+      //showTags: false,
     },
   },
 };

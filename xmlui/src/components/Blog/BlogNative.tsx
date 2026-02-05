@@ -30,6 +30,8 @@ type BlogConfig = {
   posts: BlogPost[];
   layout?: "basic" | "featuredWithTabs";
   tableOfContents?: boolean;
+  /** When false, hides tags in the basic layout. Default true. */
+  showTags?: boolean;
 };
 
 function formatDate(dateStr: string, format?: string): string {
@@ -128,6 +130,7 @@ export function Blog({ className, style }: Props) {
       blogBasePath={blogBasePath}
       formatDate={formatDate}
       getBlurb={getBlurb}
+      showTags={blogConfig.showTags !== false}
       className={className}
       style={style}
     />
@@ -209,6 +212,7 @@ function PostCard({
   getBlurb: blurbFn,
   prefetchedContent,
   compact,
+  showTags = true,
 }: {
   post: BlogPost;
   blogBasePath: string;
@@ -216,6 +220,7 @@ function PostCard({
   getBlurb: (md: string | undefined, max?: number) => string;
   prefetchedContent: Record<string, string>;
   compact?: boolean;
+  showTags?: boolean;
 }) {
   const blurb = blurbFn(prefetchedContent[`/blog/${post.slug}.md`]);
   return (
@@ -233,7 +238,7 @@ function PostCard({
           <Text variant="description" maxLines={4} ellipses>
             {post.description}
           </Text>
-          {post.tags && post.tags.length > 0 && (
+          {showTags && post.tags && post.tags.length > 0 && (
             <div className={styles.postTagsRow}>
               {post.tags.map((tag) => (
                 <span key={tag} className={styles.postCardTag}>
@@ -300,6 +305,7 @@ function BlogListViewBasic({
   blogBasePath,
   formatDate,
   getBlurb,
+  showTags,
   className,
   style,
 }: {
@@ -308,6 +314,7 @@ function BlogListViewBasic({
   blogBasePath: string;
   formatDate: (d: string, f?: string) => string;
   getBlurb: (md: string | undefined, max?: number) => string;
+  showTags: boolean;
   className?: string;
   style?: CSSProperties;
 }) {
@@ -325,6 +332,7 @@ function BlogListViewBasic({
               formatDate={formatDate}
               getBlurb={getBlurb}
               prefetchedContent={prefetchedContent}
+              showTags={showTags}
             />
           </FlowItemWrapper>
         ))}
