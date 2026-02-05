@@ -132,7 +132,7 @@ import TableDeleteColumnIcon from "./Icon/TableDeleteColumnIcon";
 import { ChevronsRightIcon } from "./Icon/ChevronsRight";
 import { ChevronsLeftIcon } from "./Icon/ChevronsLeft";
 import { ICON_NAMES } from "./icons-abstractions";
-import { I } from "../testing/infrastructure/dist/internal/chunks/index._m-k4_XL";
+import {GoSidebarCollapse} from "react-icons/go";
 
 type IconRenderer<T extends IconBaseProps> = (
   props: T,
@@ -188,6 +188,7 @@ registerIconRenderer(ICON_NAMES.DOUBLE_CHEVRON_UP, (props: IconBaseProps) => <Fi
 registerIconRenderer(ICON_NAMES.DOUBLE_CHEVRON_RIGHT, (props: IconBaseProps) => (
   <FiChevronsRight {...props} />
 ));
+registerIconRenderer(ICON_NAMES.SIDEBAR_COLLAPSE, (props: IconBaseProps) => <GoSidebarCollapse {...props} />)
 registerIconRenderer(ICON_NAMES.DOUBLE_CHEVRON_LEFT, (props: IconBaseProps) => <FiChevronsLeft {...props} />);
 registerIconRenderer(ICON_NAMES.DOT_MENU, (props: IconBaseProps) => <DotMenuIcon {...props} />);
 registerIconRenderer(ICON_NAMES.DOT_MENU_HORIZONTAL, (props: IconBaseProps) => (
