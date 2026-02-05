@@ -26,7 +26,11 @@ type BlogPost = {
   draft?: boolean;
 };
 
-type BlogConfig = true | { layout?: "basic" | "featuredWithTabs" };
+type BlogConfig = {
+  posts: BlogPost[];
+  layout?: "basic" | "featuredWithTabs";
+  tableOfContents?: boolean;
+};
 
 function formatDate(dateStr: string, format?: string): string {
   if (typeof globalThis !== "undefined" && typeof (globalThis as any).formatDate === "function") {
@@ -64,16 +68,17 @@ export function Blog({ className, style }: Props) {
   const { slug } = useParams<{ slug?: string }>();
   const { appGlobals, mediaSize } = useAppContext();
 
-  const posts = (appGlobals?.posts as BlogPost[] | undefined) || [];
   const blogConfig = appGlobals?.blog as BlogConfig | undefined;
   const prefetchedContent = (appGlobals?.prefetchedContent as Record<string, string> | undefined) || {};
 
+  const layout = blogConfig?.layout ?? "basic";
+
   const sortedPosts = useMemo(
     () =>
-      posts
+      (Array.isArray(blogConfig?.posts) ? blogConfig.posts : [])
         .filter((p) => !p.draft)
         .sort((a, b) => Date.parse(b.date) - Date.parse(a.date)),
-    [posts],
+    [blogConfig?.posts],
   );
 
   const allTags = useMemo(
@@ -82,13 +87,7 @@ export function Blog({ className, style }: Props) {
     [sortedPosts],
   );
 
-  const layout = useMemo(() => {
-    if (!blogConfig) return null;
-    if (blogConfig === true) return "basic";
-    return blogConfig.layout || "basic";
-  }, [blogConfig]);
-
-  if (!blogConfig || !layout) {
+  if (!blogConfig || !Array.isArray(blogConfig.posts) || blogConfig.posts.length === 0) {
     return null;
   }
 
@@ -103,7 +102,7 @@ export function Blog({ className, style }: Props) {
         formatDate={formatDate}
         className={className}
         style={style}
-        mediaSize={mediaSize}
+        showToc={blogConfig.tableOfContents !== false && mediaSize.sizeIndex > 3}
       />
     );
   }
@@ -143,7 +142,7 @@ function BlogPostView({
   formatDate: fmt,
   className,
   style,
-  mediaSize,
+  showToc,
 }: {
   post: BlogPost;
   prefetchedContent: Record<string, string>;
@@ -151,10 +150,9 @@ function BlogPostView({
   formatDate: (d: string, f?: string) => string;
   className?: string;
   style?: CSSProperties;
-  mediaSize: { sizeIndex: number };
+  showToc: boolean;
 }) {
   const markdownContent = prefetchedContent[`/blog/${post.slug}.md`];
-  const showToc = mediaSize.sizeIndex > 3;
 
   return (
     <div className={classnames("xmlui-blog-post", className)} style={{ display: "flex", flexDirection: "column", gap, marginTop: gap, ...style }}>

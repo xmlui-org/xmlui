@@ -7,10 +7,10 @@ const COMP = "Blog";
 export const BlogMd = createMetadata({
   status: "stable",
   description:
-    "`Blog` renders blog list or a single post based on the current route and " +
-    "appGlobals.blog / appGlobals.posts. When appGlobals.blog is set (e.g. true or { layout: \"basic\" } or { layout: \"featuredWithTabs\" }), " +
-    "it shows the list view; when the route has a slug (e.g. /blog/:slug), it shows the post. " +
-    "Requires appGlobals.posts to be set.",
+    "`Blog` renders blog list or a single post based on the current route and appGlobals.blog. " +
+    "appGlobals.blog must be an object with required `posts` (array of post objects). " +
+    "Optional: `layout` (\"basic\" | \"featuredWithTabs\", default \"basic\"), `tableOfContents` (boolean, toggles TOC on post pages). " +
+    "When the route has a slug (e.g. /blog/:slug), it shows the post; otherwise the list view.",
   props: {},
 });
 
