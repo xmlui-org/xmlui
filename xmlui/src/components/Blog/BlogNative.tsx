@@ -342,6 +342,7 @@ function BlogListViewFeatured({
   style?: CSSProperties;
 }) {
   const latestPost = sortedPosts[0];
+  const latestPostBlurb = latestPost ? getBlurb(prefetchedContent[`/blog/${latestPost.slug}.md`]) : "";
   const postsByTag = (tag: string) =>
     sortedPosts.filter((p) => p.tags && p.tags.includes(tag));
 
@@ -355,18 +356,11 @@ function BlogListViewFeatured({
         <div
           className={styles.featuredPost}
           style={{
-            padding: "1.75rem",
-            borderRadius: 8,
-            backgroundColor: "var(--xmlui-backgroundColor-Card, #fff)",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
             display: "flex",
             flexDirection: "column",
             gap: "1rem",
           }}
         >
-          {latestPost.image && (
-            <Image src={`/blog/images/${latestPost.image}`} alt="" style={{ width: "100%" }} />
-          )}
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
             <Text variant="info">
               {latestPost.author} • {formatDate(latestPost.date, "d MMM yyyy")}
@@ -378,6 +372,11 @@ function BlogListViewFeatured({
               {latestPost.description}
             </Text>
           </div>
+          {latestPostBlurb && (
+            <Text variant="blurb" maxLines={4} ellipses>
+              {latestPostBlurb}
+            </Text>
+          )}
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <LinkNative to={`${blogBasePath}/${latestPost.slug}`}>Read more →</LinkNative>
           </div>
@@ -385,11 +384,11 @@ function BlogListViewFeatured({
       )}
 
       <div className={styles.sectionAllPosts}>
-        <Heading level="h2" showAnchor={false} style={{ fontSize: "1.25rem" }}>
+        <Heading level="h2" showAnchor={false} className={styles.sectionAllPostsHeading} style={{ fontSize: "1.25rem" }}>
           All blog posts
         </Heading>
 
-        <Tabs>
+        <Tabs className={styles.blogTabs}>
           <TabItemComponent label="All posts">
             <div className={styles.postsGrid}>
               {sortedPosts.map((post) => (

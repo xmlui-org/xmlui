@@ -31,3 +31,51 @@
 .sectionAllPosts {
   margin-top: 2.5rem;
 }
+
+.sectionAllPostsHeading {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 1.25rem;
+}
+
+// Segmented tab selector: rounded container, active = white pill, inactive = grey text
+.blogTabs > div:first-child {
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: var(--xmlui-color-surface-100, #f5f5f5);
+  border: 1px solid var(--xmlui-color-border, #e5e5e5);
+  border-radius: 8px;
+  padding: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+
+  // Remove default Tabs filler border (the line under the tab list)
+  & > div:not([role="tab"]) {
+    border: none !important;
+  }
+}
+
+.blogTabs [role="tab"] {
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  border-bottom: none !important;
+  color: var(--xmlui-color-text-secondary, #666);
+  padding: 8px 12px;
+  font-size: inherit;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--xmlui-color-text, #333);
+  }
+}
+
+.blogTabs [role="tab"][data-state="active"] {
+  background: var(--xmlui-backgroundColor-Card, #fff);
+  border: 1px solid var(--xmlui-color-border, #e0e0e0);
+  border-bottom: 1px solid var(--xmlui-color-border, #e0e0e0) !important;
+  color: var(--xmlui-color-primary, #0066cc);
+  font-weight: 500;
+}
