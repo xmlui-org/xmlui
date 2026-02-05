@@ -150,8 +150,8 @@ export const XmlUiBlogThemeDefinition: ThemeDefinition = {
   extends: "xmlui",
   color: "$color-primary-500",
   themeVars: {
-    // --- App layout
-    "maxWidth-content-App": "800px",
+    // --- App layout (match docs content width)
+    "maxWidth-content-App": "1000px",
     // --- Fundamental colors & typography
     "color-surface": "rgb(111, 110, 119)",
     "backgroundColor": "color-surface-1",
