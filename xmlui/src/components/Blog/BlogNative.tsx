@@ -197,7 +197,15 @@ function BlogPostView({
           )}
         </div>
         {showToc && (
-          <div style={{ width: "16rem", flexShrink: 0 }}>
+          <div
+            style={{
+              width: "16rem",
+              flexShrink: 0,
+              position: "sticky",
+              top: "var(--xmlui-height-AppHeader)",
+              alignSelf: "flex-start",
+            }}
+          >
             <TableOfContents
               scrollStyle="whenScrolling"
               showScrollerFade

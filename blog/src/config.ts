@@ -353,7 +353,7 @@ const App: StandaloneAppDescription = {
     prefetchedContent,
     lintSeverity: "skip", // Turn off xmlui linting
     popOutUrl: "https://playground.xmlui.org/#/playground",
-    blog: { layout: "basic" },
+    blog: { layout: "featuredWithTabs" },
     posts: blogPosts,
   },
 };
