@@ -77,6 +77,9 @@ export function AppRoot({
       uid: "root",
       children: [themedRoot],
       uses: [],
+      vars: {
+        count: 42,
+      },
     };
   }, [node]);
 
