@@ -287,7 +287,7 @@ export const blogPosts = [
     author: "Jon Udell",
     date: "2025-07-18",
     image: "xmlui-demo.png",
-    tags: ["intro", "xmlui"],
+    tags: ["xmlui"],
   },
   {
     title: "Reproducible XMLUI",
@@ -297,7 +297,7 @@ export const blogPosts = [
     author: "Jon Udell",
     date: "2025-10-27",
     image: "playground.png",
-    tags: ["playground", "docs", "demo"],
+    tags: ["playground"],
   },
   {
     title: "An XMLUI-powered blog",
@@ -306,7 +306,7 @@ export const blogPosts = [
     author: "Jon Udell",
     date: "2025-10-28",
     image: "blog-scrabble.png",
-    tags: ["blog", "xmlui"],
+    tags: ["blog"],
   },
   {
     title: "Introducing the XMLUI CLI",
@@ -315,7 +315,7 @@ export const blogPosts = [
     author: "Jon Udell",
     date: "2025-12-19",
     image: "cli-blog-header.svg",
-    tags: ["cli", "tooling", "demo"],
+    tags: ["cli"],
   },
   {
     title: "Supabase + XMLUI",
@@ -325,7 +325,7 @@ export const blogPosts = [
     date: "2026-01-27",
     image: "supabase-and-xmlui.png",
     draft: true,
-    tags: ["supabase", "backend", "api"],
+    tags: ["supabase"],
   },
 ];
 
