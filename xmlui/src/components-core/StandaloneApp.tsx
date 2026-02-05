@@ -55,10 +55,11 @@ import type {
   ComponentCompilation,
   ProjectCompilation,
 } from "../abstractions/scripting/Compilation";
-import { evalBindingExpression } from "./script-runner/eval-tree-sync";
+import { evalBinding, evalBindingExpression } from "./script-runner/eval-tree-sync";
 import type { BindingTreeEvaluationContext } from "./script-runner/BindingTreeEvaluationContext";
 import { MetadataProvider } from "../language-server/services/common/metadata-utils";
 import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
+import { ca } from "date-fns/locale";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -118,14 +119,18 @@ function StandaloneApp({
   // --- Fetch all files constituting the standalone app, including components,
   // --- themes, and other artifacts. Display the app version numbers in the
   // --- console.
-  const { standaloneApp, projectCompilation, globalVars } = useStandalone(appDef, runtime, extensionManager);
+  const { standaloneApp, projectCompilation, globalVars } = useStandalone(
+    appDef,
+    runtime,
+    extensionManager,
+  );
 
   usePrintVersionNumber(standaloneApp);
 
   // --- Display build errors from the vite-xmlui-plugin if any exist
   useEffect(() => {
     const buildErrors: Array<{ importingFile: string; importedModule: string; errors: any[] }> = [];
-    
+
     // --- Collect module errors from all runtime items (moduleErrors is a direct property on the module)
     Object.entries(runtime || {}).forEach(([key, module]: [string, any]) => {
       if (module?.moduleErrors && Object.keys(module.moduleErrors).length > 0) {
@@ -270,14 +275,14 @@ async function parseComponentMarkupResponse(response: Response): Promise<ParsedR
   }
   const code = await response.text();
   const fileId = response.url;
-  
+
   let codeBehind: CollectedDeclarations | undefined;
 
   // --- Extract inline script from markup using ScriptExtractor
   const scriptResult = ScriptExtractor.extractInlineScript(code);
   if (scriptResult) {
     const scriptContent = scriptResult.script;
-    
+
     try {
       // --- Create a module fetcher for import support
       // --- Note: modulePath is already resolved by ModuleResolver.resolvePath()
@@ -290,14 +295,22 @@ async function parseComponentMarkupResponse(response: Response): Promise<ParsedR
       };
 
       // --- Collect code-behind with import support from inline scripts
-      codeBehind = await collectCodeBehindFromSourceWithImports(fileId, scriptContent, moduleFetcher);
+      codeBehind = await collectCodeBehindFromSourceWithImports(
+        fileId,
+        scriptContent,
+        moduleFetcher,
+      );
       removeCodeBehindTokensFromTree(codeBehind);
     } catch (e) {
       console.error(`Error collecting imports from inline script in ${fileId}:`, e);
     }
   }
-  
-  let { component, errors, erroneousCompoundComponentName } = xmlUiMarkupToComponent(code, fileId, codeBehind);
+
+  let { component, errors, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
+    code,
+    fileId,
+    codeBehind,
+  );
   if (errors.length > 0) {
     const compName =
       erroneousCompoundComponentName ??
@@ -307,7 +320,7 @@ async function parseComponentMarkupResponse(response: Response): Promise<ParsedR
       );
     component = errReportComponent(errors, fileId, compName);
   }
-  
+
   return {
     component,
     src: code,
@@ -350,22 +363,25 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
     const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
       // --- For URLs (buildless apps), use URL resolution; for file paths, use ModuleResolver
       let resolvedPath: string;
-      if (response.url.startsWith('http://') || response.url.startsWith('https://')) {
+      if (response.url.startsWith("http://") || response.url.startsWith("https://")) {
         // --- URL-based resolution for buildless apps
         const baseUrl = new URL(response.url);
-        const moduleName = modulePath.startsWith('.') ? modulePath : `./${modulePath}`;
+        const moduleName = modulePath.startsWith(".") ? modulePath : `./${modulePath}`;
         try {
           const resolvedUrl = new URL(moduleName, baseUrl);
           resolvedPath = resolvedUrl.toString();
         } catch (e) {
-          console.error(`[moduleFetcher] Failed to resolve URL: ${modulePath} from ${response.url}`, e);
+          console.error(
+            `[moduleFetcher] Failed to resolve URL: ${modulePath} from ${response.url}`,
+            e,
+          );
           throw new Error(`Failed to resolve module URL: ${modulePath}`);
         }
       } else {
         // --- File path resolution for other cases
         resolvedPath = ModuleResolver.resolvePath(modulePath, response.url);
       }
-      
+
       const moduleResponse = await fetchWithoutCache(resolvedPath);
       if (!moduleResponse.ok) {
         throw new Error(`Failed to fetch module: ${resolvedPath}`);
@@ -374,7 +390,11 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
     };
 
     // --- Collect code-behind with import support
-    const codeBehind = await collectCodeBehindFromSourceWithImports(response.url, code, moduleFetcher);
+    const codeBehind = await collectCodeBehindFromSourceWithImports(
+      response.url,
+      code,
+      moduleFetcher,
+    );
     if (Object.keys(codeBehind.moduleErrors ?? {}).length > 0) {
       return {
         component: errReportModuleErrors(codeBehind.moduleErrors, response.url),
@@ -471,7 +491,7 @@ function resolveRuntime(runtime: Record<string, any>): {
         entryPoint = value.default.component;
         projectCompilation.entrypoint.definition = entryPoint;
         projectCompilation.entrypoint.markupSource = value.default.src;
-        
+
         // Use key (the actual file path from Vite glob) for consistent source lookups
         sources[key] = value.default.src;
       }
@@ -699,7 +719,11 @@ function useStandalone(
   standaloneAppDef: StandaloneAppDescription | undefined,
   runtime: Record<string, any> = EMPTY_OBJECT,
   extensionManager?: StandaloneExtensionManager,
-): { standaloneApp: StandaloneAppDescription | null; projectCompilation?: ProjectCompilation; globalVars?: Record<string, any> } {
+): {
+  standaloneApp: StandaloneAppDescription | null;
+  projectCompilation?: ProjectCompilation;
+  globalVars?: Record<string, any>;
+} {
   const [standaloneApp, setStandaloneApp] = useState<StandaloneAppDescription | null>(() => {
     // --- Initialize the standalone app
     const resolvedRuntime = resolveRuntime(runtime);
@@ -723,10 +747,49 @@ function useStandalone(
 
   const [projectCompilation, setProjectCompilation] = useState<ProjectCompilation>(null);
   const globalVars = useMemo(() => {
-    return {
-      count: 42,
+    // Get the vars in Globals.xs module directly from runtime
+    const varsSource = runtime?.["/src/Globals.xs"]?.vars || {};
+    const extractedVars: Record<string, any> = {};
+
+    for (const [key, value] of Object.entries(varsSource)) {
+      // The value is a variable definition object with __PARSED__ and tree
+      if (
+        typeof value === "object" &&
+        value !== null &&
+        (value as any).__PARSED__ &&
+        (value as any).tree
+      ) {
+        const tree = (value as any).tree;
+
+        try {
+          // Create a minimal evaluation context to evaluate the tree expression
+          const evalContext: BindingTreeEvaluationContext = {
+            mainThread: {
+              childThreads: [],
+              blocks: [{ vars: {} }],
+              loops: [],
+              breakLabelValue: -1,
+            },
+            localContext: {},
+          };
+
+          // Evaluate the expression tree (handles literals, binary expressions, etc.)
+          const evaluatedValue = evalBinding(tree, evalContext);
+          extractedVars[key] = evaluatedValue;
+        } catch (error) {
+          // If evaluation fails, try to extract literal value as fallback
+          extractedVars[key] = (tree as any).value ?? 0;
+        }
+      } else {
+        extractedVars[key] = value;
+      }
     }
-  }, [runtime, standaloneApp]);
+    return extractedVars;
+
+    // return {
+    //   count: 42,
+    // };
+  }, [runtime]);
 
   useIsomorphicLayoutEffect(() => {
     void (async function () {
@@ -927,7 +990,8 @@ function useStandalone(
           ...loadedEntryPoint.codeBehind?.vars,
         },
         functions: loadedEntryPoint.codeBehind?.functions || loadedEntryPointCodeBehind?.functions,
-        scriptError: loadedEntryPoint.codeBehind?.moduleErrors || loadedEntryPointCodeBehind?.moduleErrors,
+        scriptError:
+          loadedEntryPoint.codeBehind?.moduleErrors || loadedEntryPointCodeBehind?.moduleErrors,
       };
 
       const defaultTheme = (entryPointWithCodeBehind as ComponentDef).props?.defaultTheme;
@@ -958,7 +1022,8 @@ function useStandalone(
                 ...componentCodeBehind?.vars,
               },
               functions: compWrapper.codeBehind?.functions || componentCodeBehind?.functions,
-              scriptError: compWrapper.codeBehind?.moduleErrors || componentCodeBehind?.moduleErrors,
+              scriptError:
+                compWrapper.codeBehind?.moduleErrors || componentCodeBehind?.moduleErrors,
             },
           };
           return result;
