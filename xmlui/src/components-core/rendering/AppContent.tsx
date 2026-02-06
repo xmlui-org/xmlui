@@ -557,10 +557,35 @@ export function AppContent({
       const text =
         textContent && textContent.length > 80 ? textContent.slice(0, 77) + "…" : textContent;
 
+      // Find all testIds in the path from target to root, for better selector options
+      const testIdsInPath: string[] = [];
+      for (const el of elements) {
+        const tid = el.getAttribute?.("data-testid");
+        if (tid && !testIdsInPath.includes(tid)) {
+          testIdsInPath.push(tid);
+        }
+      }
+
+      // Build a selector path from the testId element to the clicked element
+      // This helps with replay - e.g., "[data-testid='tree'] >> text=foo"
+      let selectorPath: string | undefined;
+      if (testIdEl && target && testIdEl !== target) {
+        const targetText = target.textContent?.trim();
+        if (targetText && targetText.length < 50) {
+          selectorPath = `[data-testid="${testId}"] >> text=${targetText}`;
+        }
+      }
+
+      // Also capture the target element's own testId if it has one (different from ancestor)
+      const targetTestId = target?.getAttribute?.("data-testid") || undefined;
+
       const detail: Record<string, any> = {
         componentId,
         inspectId,
         targetTag: (target && target.tagName) || undefined,
+        targetTestId: targetTestId !== testId ? targetTestId : undefined,
+        testIdsInPath: testIdsInPath.length > 1 ? testIdsInPath : undefined,
+        selectorPath,
         text,
       };
       if (event instanceof MouseEvent) {

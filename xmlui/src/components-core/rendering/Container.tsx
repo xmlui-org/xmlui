@@ -217,6 +217,7 @@ export const Container = memo(
             duration: detail?.duration,
             startPerfTs: detail?.startPerfTs,
             handlerCode: detail?.handlerCode,
+            eventArgs: detail?.args?.length ? detail.args : undefined,
           }, xsLogMax);
           if (xsLogBucket && appContext.AppState) {
             try {
