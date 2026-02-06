@@ -57,7 +57,7 @@ export const SelectOption = forwardRef<React.ElementRef<typeof Item>, Option>(
         ) : (
           <>
             <div className={styles.selectOptionContent} ref={visibleContentRef}>
-              <ItemText>{label}</ItemText>
+              <ItemText>{label || value}</ItemText>
             </div>
             {selectedValue === value && (
               <ItemIndicator className={styles.selectItemIndicator}>
