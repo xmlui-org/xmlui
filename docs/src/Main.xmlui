@@ -398,6 +398,7 @@
                 <NavLink icon="component" label="NavGroup" to="/components/NavGroup" />
                 <NavLink icon="component" label="NavLink" to="/components/NavLink" />
                 <NavLink icon="component" label="NavPanel" to="/components/NavPanel" />
+                <NavLink icon="component" label="NavPanelCollapseButton" to="/components/NavPanelCollapseButton" />
                 <NavLink icon="component" label="NoResult" to="/components/NoResult" />
                 <NavLink icon="component" label="NumberBox" to="/components/NumberBox" />
                 <NavLink icon="component" label="Option" to="/components/Option" />
