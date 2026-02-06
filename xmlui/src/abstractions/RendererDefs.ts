@@ -176,6 +176,9 @@ export interface ComponentRendererContextBase<TMd extends ComponentMetadata = Co
   // The state of the container in which the component is rendered
   state: ContainerState;
 
+  // Global variables that flow down to all containers regardless of `uses`
+  globalVars?: Record<string, any>;
+
   // The application context the component (and its binding expressions) can use
   appContext?: AppContextObject;
 

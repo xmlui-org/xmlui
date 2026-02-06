@@ -69,7 +69,6 @@ export const CompoundComponent = forwardRef(
       const { loaders, vars, functions, scriptError, ...rest } = compound;
       return {
         type: "Container",
-        uses: EMPTY_ARRAY,
         api,
         scriptCollected,
         loaders: loaders,

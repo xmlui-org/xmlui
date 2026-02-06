@@ -75,6 +75,7 @@ type Props = {
   node: ContainerWrapperDef;
   resolvedKey?: string;
   componentState: ContainerState;
+  globalVars?: Record<string, any>;
   dispatch: ContainerDispatcher;
   setVersion: Dispatch<SetStateAction<number>>;
   version: number;
@@ -96,6 +97,7 @@ export const Container = memo(
     {
       node,
       componentState,
+      globalVars,
       dispatch: containerDispatch,
       parentDispatch,
       resolvedKey,
@@ -785,6 +787,7 @@ export const Container = memo(
           const renderedChild = renderChild({
             node: child,
             state: componentState,
+            globalVars,
             dispatch,
             appContext,
             lookupAction,

@@ -45,6 +45,10 @@ export type AppWrapperProps = {
   // --- property. This property contains the values to pass to `appGlobals`.
   globalProps?: GlobalProps;
 
+  // --- Global variables extracted from Globals.xs file and added to the
+  // --- root container state, accessible throughout the entire app.
+  globalVars?: Record<string, any>;
+
   // --- Apps may use external resources (images, text files, icons, etc.).
   // --- This property contains the dictionary of these resources.
   resources?: Record<string, string>;

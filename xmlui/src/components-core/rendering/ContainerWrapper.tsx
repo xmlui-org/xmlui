@@ -147,6 +147,7 @@ type Props = {
   node: ContainerWrapperDef;
   resolvedKey?: string;
   parentState: ContainerState;
+  parentGlobalVars?: Record<string, any>;
   parentStatePartChanged: StatePartChangedFn;
   parentRegisterComponentApi: RegisterComponentApiFnInner;
   parentDispatch: ContainerDispatcher;
@@ -167,6 +168,7 @@ export const ContainerWrapper = memo(
       node,
       resolvedKey,
       parentState,
+      parentGlobalVars,
       parentStatePartChanged,
       parentRegisterComponentApi,
       parentDispatch,
@@ -187,6 +189,7 @@ export const ContainerWrapper = memo(
           node={containerizedNode as any}
           resolvedKey={resolvedKey}
           parentState={parentState}
+          parentGlobalVars={parentGlobalVars}
           parentStatePartChanged={parentStatePartChanged}
           parentRegisterComponentApi={parentRegisterComponentApi}
           parentDispatch={parentDispatch}

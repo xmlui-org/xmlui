@@ -2,7 +2,7 @@ import { getBounds } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 import { sizeValues } from "../abstractions";
 
-test.describe("smoke tests", { tag: "@smoke" }, () => {
+test.describe("smoke tests", () => {
   test("No initials without name", async ({ initTestBed, createAvatarDriver }) => {
     await initTestBed(`<Avatar />`);
     await expect((await createAvatarDriver()).component).toBeEmpty();

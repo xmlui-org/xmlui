@@ -68,7 +68,9 @@ import { ModalDialogDriver } from "./drivers/ModalDialogDriver";
 import { TextBoxDriver } from "./drivers/TextBoxDriver";
 import { NumberBoxDriver } from "./drivers/NumberBoxDriver";
 import { TreeDriver } from "./drivers/TreeDriver";
-
+import { collectCodeBehindFromSource } from "../parsers/scripting/code-behind-collect";
+import { evalBinding } from "../components-core/script-runner/eval-tree-sync";
+import { BindingTreeEvaluationContext } from "../components-core/script-runner/BindingTreeEvaluationContext";
 export { expect } from "./assertions";
 
 const isCI = process?.env?.CI === "true";
@@ -195,6 +197,7 @@ export type TestBedDescription = Omit<
   testThemeVars?: Record<string, string>;
   components?: string[];
   appGlobals?: Record<string, any>;
+  globalXs?: string;
 };
 
 export const test = baseTest.extend<TestDriverExtenderProps>({
@@ -241,6 +244,57 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
         return component as CompoundComponentDef;
       });
 
+      let runtime: any;
+      if (description?.globalXs) {
+        const parsedCodeBehind = collectCodeBehindFromSource("Globals", description.globalXs);
+        if (parsedCodeBehind?.vars || parsedCodeBehind?.functions) {
+          const prebuiltGlobals = {
+            ...(parsedCodeBehind?.vars || {}),
+            ...(parsedCodeBehind?.functions || {}),
+          };
+          const extractedVars: Record<string, any> = {};
+          for (const [key, value] of Object.entries(prebuiltGlobals)) {
+            // The value is a variable definition object with __PARSED__ and tree
+            if (
+              typeof value === "object" &&
+              value !== null &&
+              (value as any).__PARSED__ &&
+              (value as any).tree
+            ) {
+              const tree = (value as any).tree;
+
+              try {
+                // Create a minimal evaluation context to evaluate the tree expression
+                const evalContext: BindingTreeEvaluationContext = {
+                  mainThread: {
+                    childThreads: [],
+                    blocks: [{ vars: {} }],
+                    loops: [],
+                    breakLabelValue: -1,
+                  },
+                  localContext: {},
+                };
+
+                // Evaluate the expression tree (handles literals, binary expressions, etc.)
+                const evaluatedValue = evalBinding(tree, evalContext);
+                extractedVars[key] = evaluatedValue;
+              } catch (error) {
+                // If evaluation fails, try to extract literal value as fallback
+                extractedVars[key] = (tree as any).value ?? 0;
+              }
+            } else {
+              extractedVars[key] = value;
+            }
+          }
+
+          runtime = {
+            "/src/Globals.xs": {
+              vars: extractedVars,
+            },
+          };
+        }
+      }
+
       if (source !== "" && entryPoint.children) {
         const sourceBaseComponent = entryPoint.children[0];
         const isCompoundComponentRoot =
@@ -267,12 +321,13 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
         ...themedDescription.resources,
       };
 
-      const _appDescription: StandaloneAppDescription = {
+      const _appDescription: StandaloneAppDescription & { runtime: any } = {
         name: "test bed app",
         ...themedDescription,
         resources: mergedResources,
         components,
         entryPoint,
+        runtime,
       };
 
       const clipboard = new Clipboard(page);
@@ -284,6 +339,7 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       await page.addInitScript((app) => {
         // @ts-ignore
         window.TEST_ENV = app;
+        window.TEST_RUNTIME = app.runtime;
       }, _appDescription);
       const { width, height } = page.viewportSize();
       await page.goto("/");

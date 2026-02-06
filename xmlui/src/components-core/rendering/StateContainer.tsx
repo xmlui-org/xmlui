@@ -46,6 +46,7 @@ type Props = {
   node: ContainerWrapperDef;
   resolvedKey?: string;
   parentState: ContainerState;
+  parentGlobalVars?: Record<string, any>;
   parentStatePartChanged: StatePartChangedFn;
   parentRegisterComponentApi: RegisterComponentApiFnInner;
   parentDispatch: ContainerDispatcher;
@@ -64,6 +65,7 @@ export const StateContainer = memo(
       node,
       resolvedKey,
       parentState,
+      parentGlobalVars,
       parentStatePartChanged,
       parentRegisterComponentApi,
       parentDispatch,
@@ -514,9 +516,20 @@ export const StateContainer = memo(
     }, [xsVerbose, varDefinitions, resolvedLocalVars, node]);
 
     const mergedWithVars = useMergedState(resolvedLocalVars, componentStateWithApis);
+
+    // Merge parent's globalVars with current node's globalVars
+    // Current node's globalVars take precedence (usually only root defines them)
+    const currentGlobalVars = useMemo(() => {
+      return {
+        ...(parentGlobalVars || {}),
+        ...(node.globalVars || {}),
+      };
+    }, [parentGlobalVars, node.globalVars]);
+
     const combinedState = useCombinedState(
       stateFromOutside,
       node.contextVars,
+      currentGlobalVars,  // Add globalVars to combined state
       mergedWithVars,
       routingParams,
     );
@@ -543,7 +556,27 @@ export const StateContainer = memo(
     const statePartChanged: StatePartChangedFn = useCallback(
       (pathArray, newValue, target, action) => {
         const key = pathArray[0];
-        if (key in componentStateRef.current || key in resolvedLocalVars) {
+        const isGlobalVar = key in currentGlobalVars;
+        const isRoot = node.uid === 'root';
+        
+        if (isGlobalVar) {
+          if (isRoot) {
+            // Root container should handle global var updates itself
+            dispatch({
+              type: ContainerActionKind.STATE_PART_CHANGED,
+              payload: {
+                path: pathArray,
+                value: newValue,
+                target,
+                actionType: action,
+                localVars: resolvedLocalVars,
+              },
+            });
+          } else {
+            // Non-root containers bubble globals to parent
+            parentStatePartChanged(pathArray, newValue, target, action);
+          }
+        } else if (key in componentStateRef.current || key in resolvedLocalVars) {
           // --- Sign that a state field (or a part of it) has changed
           dispatch({
             type: ContainerActionKind.STATE_PART_CHANGED,
@@ -556,12 +589,13 @@ export const StateContainer = memo(
             },
           });
         } else {
+          // Not global, not local - bubble up if allowed by uses
           if (!node.uses || node.uses.includes(key)) {
             parentStatePartChanged(pathArray, newValue, target, action);
           }
         }
       },
-      [resolvedLocalVars, node.uses, parentStatePartChanged],
+      [resolvedLocalVars, currentGlobalVars, node.uses, node.uid, parentStatePartChanged],
     );
 
     return (
@@ -570,6 +604,7 @@ export const StateContainer = memo(
           resolvedKey={resolvedKey}
           node={node}
           componentState={combinedState}
+          globalVars={currentGlobalVars}
           dispatch={dispatch}
           parentDispatch={parentDispatch}
           setVersion={setVersion}
