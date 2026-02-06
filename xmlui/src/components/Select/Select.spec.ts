@@ -1120,6 +1120,69 @@ test.describe("Visual State", () => {
     const { width } = await input.boundingBox();
     expect(width).toBe(200);
   });
+
+  test("dropdown height is consistent across Select variants with same number of options", async ({
+    page,
+    initTestBed,
+  }) => {
+    // Create a test with SimpleSelect (no searchable, no multiSelect)
+    await initTestBed(`
+      <HStack>
+        <Select testId="simpleSelect" width="33%">
+          <Option value="opt1" label="Option 1"/>
+          <Option value="opt2" label="Option 2"/>
+          <Option value="opt3" label="Option 3"/>
+          <Option value="opt4" label="Option 4"/>
+          <Option value="opt5" label="Option 5"/>
+        </Select>
+        <Select testId="searchableSelect" width="33%" searchable="true">
+          <Option value="opt1" label="Option 1"/>
+          <Option value="opt2" label="Option 2"/>
+          <Option value="opt3" label="Option 3"/>
+          <Option value="opt4" label="Option 4"/>
+          <Option value="opt5" label="Option 5"/>
+        </Select>
+        <Select testId="multiSelect" width="33%" multiSelect="true">
+          <Option value="opt1" label="Option 1"/>
+          <Option value="opt2" label="Option 2"/>
+          <Option value="opt3" label="Option 3"/>
+          <Option value="opt4" label="Option 4"/>
+          <Option value="opt5" label="Option 5"/>
+        </Select>
+      </HStack>
+    `);
+
+    const simpleSelect = page.getByTestId("simpleSelect");
+    await simpleSelect.click();
+
+    // Get the dropdown content height for SimpleSelect
+    const simpleDropdown = page.locator("[data-state='open'][role='listbox']").first();
+    const { height: simpleHeight } = await simpleDropdown.boundingBox();
+    // close
+    await page.getByText('Option 1').click();
+
+    const searchableSelect = page.getByTestId("searchableSelect");
+    await searchableSelect.click();
+
+    // Get the dropdown content height for searchable Select
+    const searchableDropdown = page.getByRole('dialog').locator("[role='listbox']");
+    const { height: searchableHeight } = await searchableDropdown.boundingBox();
+    // close
+    await page.getByRole('listbox').getByText('Option 1').click();
+
+    const multiSelect = page.getByTestId("multiSelect");
+    await multiSelect.click();
+
+    // Get the dropdown content height for multiSelect
+    const multiDropdown = page.getByRole('dialog').locator("[role='listbox']");
+    const { height: multiHeight } = await multiDropdown.boundingBox();
+
+    // All dropdowns should have approximately the same height
+    // Allow small variance for padding/borders
+    expect(Math.abs(simpleHeight - searchableHeight)).toBeLessThan(5);
+    expect(Math.abs(searchableHeight - multiHeight)).toBeLessThan(5);
+    expect(Math.abs(simpleHeight - multiHeight)).toBeLessThan(5);
+  });
 });
 
 // =============================================================================

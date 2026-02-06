@@ -326,7 +326,11 @@
                 label="Stop DataSource from sending requests in a closed Dialog"
                 to="/howto/stop-datasource-from-sending-requests-in-a-closed-dialog"
             />
-
+            <NavLink
+                icon="article"
+                label="Add custom icons"
+                to="/howto/add-custom-icons"
+            />
             <!-- Add more links as additional files are created -->
         </NavGroup
         >
@@ -887,6 +891,11 @@
         <Page url="/howto/stop-datasource-from-sending-requests-in-a-closed-dialog">
             <DocumentPageNoTOC
                 content="{appGlobals.content['pages/howto/stop-datasource-from-sending-requests-in-a-closed-dialog.md']}"
+            />
+        </Page>
+        <Page url="/howto/add-custom-icons">
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/howto/add-custom-icons.md']}"
             />
         </Page>
 
