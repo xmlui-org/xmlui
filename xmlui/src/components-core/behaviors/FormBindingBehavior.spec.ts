@@ -834,13 +834,14 @@ test.describe("Validation", () => {
 
     const textbox = page.getByRole("textbox").first();
 
-    // Type and clear to make dirty, then lose focus
+    // Type and clear to make dirty
     await textbox.fill("test");
-    await textbox.fill("");
+    await textbox.clear();
 
-    // Tab to lose focus (blur)
-    await page.getByRole("textbox").last().focus();
+    // Explicitly blur the field to trigger validation
+    await textbox.blur();
 
+    // Wait for validation error message to appear
     await expect(page.getByText("This field is required")).toBeVisible();
   });
 

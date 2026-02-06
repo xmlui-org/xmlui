@@ -41,6 +41,15 @@ $cursor-resizer-vertical-Splitter: createThemeVar("cursor-resizer-vertical-#{$co
     &.horizontal {
       flex-direction: row;
     }
+
+    &.dragging {
+      .primaryPanel,
+      .secondaryPanel,
+      .panel {
+        pointer-events: none;
+        user-select: none;
+      }
+    }
   }
 
   .panel {
