@@ -302,6 +302,32 @@ test.describe("Edge Cases", () => {
     await expect(page.getByText("Themed Footer")).toBeVisible();
   });
 
+  test("handles script at App level with Theme wrapping AppHeader", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App layout="vertical-full-header" scrollWholePage="false" paddingVertical="0">
+        <script>
+        </script>
+        <Theme>
+          <AppHeader testId="app-header" padding="0" height="$space-11">
+            <Text>Header Text</Text>
+          </AppHeader>
+        </Theme>
+        <Pages fallbackPath="/">
+          <Page url="/" padding="0">
+            <Table height="100%" id="filesTable" testId="main-table" />
+          </Page>
+        </Pages>
+      </App>
+    `);
+
+    // Verify AppHeader is visible and not rendered above viewport
+    await expect(page.getByTestId("app-header")).toBeVisible();
+    await expect(page.getByText("Header Text")).toBeVisible();
+    
+    // Verify the table is also rendered correctly
+    await expect(page.getByTestId("main-table")).toBeVisible();
+  });
+
   test("respects Fragment when='false' attribute in App children", async ({ initTestBed, page }) => {
     await initTestBed(`
       <App>

@@ -139,6 +139,10 @@ function extractDirectChild(child: ComponentDef, result: ExtractedComponents): v
   }
 
   switch (child.type) {
+    case "Theme":
+      // Theme can contain special components, extract them
+      extractFromThemeWrapper(child, result);
+      break;
     case "AppHeader":
       result.AppHeader = child;
       break;
