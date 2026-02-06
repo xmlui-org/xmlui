@@ -60,15 +60,18 @@ Only those components trigger their `topicReceived` event, which subscribed to t
 
 **Test:** ✅ Unit tests - 10/10 tests passing (PubSubBehavior.test.ts)
 
-### Step 3: Register PubSub Behavior
-- Update `xmlui/src/components-core/behaviors/CoreBehaviors.tsx`:
-  - Export `pubSubBehavior` (import from PubSubBehavior.tsx)
+### Step 3: Register PubSub Behavior ✅ COMPLETED
+- ✅ Updated `xmlui/src/components-core/behaviors/CoreBehaviors.tsx`:
+  - Exported `pubSubBehavior` (re-export from PubSubBehavior.tsx) - completed in Step 2
 
-- Update `xmlui/src/components/ComponentProvider.tsx`:
-  - Import `pubSubBehavior`
-  - Register: `this.registerBehavior(pubSubBehavior)` after existing behaviors
+- ✅ Updated `xmlui/src/components/ComponentProvider.tsx`:
+  - Imported `pubSubBehavior` from CoreBehaviors
+  - Registered: `this.registerBehavior(pubSubBehavior)` after `bookmarkBehavior` and before `formBindingBehavior`
 
-**Test:** Start dev server, verify no runtime errors
+**Behavior order:** labelBehavior → animationBehavior → tooltipBehavior → variantBehavior → bookmarkBehavior → **pubSubBehavior** → formBindingBehavior → validationBehavior
+
+**Test:** ✅ Build succeeds - `npm run build:xmlui` completed without errors
+**Test:** ✅ All unit tests pass - 22/22 tests passing (PubSubService + PubSubBehavior)
 
 ### Step 4: Create E2E Tests
 - Create `xmlui/tests-e2e/pubsub-behavior.spec.ts`:
