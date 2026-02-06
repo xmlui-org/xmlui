@@ -9,9 +9,7 @@ test.describe("smoke tests", () => {
   });
 
   test("Can render 2 initials", async ({ initTestBed, createAvatarDriver }) => {
-    await initTestBed(`<Avatar name="Tim Smith"/>`, {
-      globalXs: "var count = 6*7;"
-    });
+    await initTestBed(`<Avatar name="Tim Smith"/>`);
     await expect((await createAvatarDriver()).component).toContainText("TS");
   });
 });

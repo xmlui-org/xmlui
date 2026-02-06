@@ -120,7 +120,6 @@ function StandaloneApp({
   // --- Fetch all files constituting the standalone app, including components,
   // --- themes, and other artifacts. Display the app version numbers in the
   // --- console.
-  console.log(runtime);
   const { standaloneApp, projectCompilation, globalVars } = useStandalone(
     appDef,
     runtime,

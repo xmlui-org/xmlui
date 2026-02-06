@@ -2,4 +2,4 @@
 "xmlui": patch
 ---
 
-Add global variables to xmlui (Glabals.xs)
+Add global variables to xmlui (Globals.xs)
