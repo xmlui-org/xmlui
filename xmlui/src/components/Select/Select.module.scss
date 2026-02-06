@@ -308,6 +308,7 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
   .selectContent {
     outline: none;
     overflow: auto;
+    max-height: 280px;
     background-color: $backgroundColor-menu-Select;
     border-radius: $borderRadius-menu-Select;
     box-shadow: $boxShadow-menu-Select;

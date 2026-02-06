@@ -341,6 +341,98 @@ test.describe("Basic Functionality", () => {
     },
   );
 
+  test(
+    "Option label defaults to value in SimpleSelect",
+    { tag: "@smoke" },
+    async ({ initTestBed, page, createSelectDriver }) => {
+      await initTestBed(`
+      <Fragment>
+        <Select id="mySelect">
+          <Option value="opt1"/>
+          <Option value="opt2"/>
+          <Option value="opt3"/>
+        </Select>
+        <Text testId="text">Selected value: {mySelect.value}</Text>
+      </Fragment>
+    `);
+      const driver = await createSelectDriver("mySelect");
+      await driver.toggleOptionsVisibility();
+      
+      // Options should display their values
+      await expect(page.getByRole("option", { name: "opt1" })).toBeVisible();
+      await expect(page.getByRole("option", { name: "opt2" })).toBeVisible();
+      await expect(page.getByRole("option", { name: "opt3" })).toBeVisible();
+      
+      // Select an option and verify
+      await page.getByRole("option", { name: "opt2" }).click();
+      await expect(page.getByTestId("text")).toHaveText("Selected value: opt2");
+      await expect(driver.component).toHaveText("opt2");
+    },
+  );
+
+  test(
+    "Option label defaults to value in searchable Select",
+    { tag: "@smoke" },
+    async ({ initTestBed, page, createSelectDriver }) => {
+      await initTestBed(`
+      <Fragment>
+        <Select id="mySelect" searchable="true">
+          <Option value="opt1"/>
+          <Option value="opt2"/>
+          <Option value="opt3"/>
+        </Select>
+        <Text testId="text">Selected value: {mySelect.value}</Text>
+      </Fragment>
+    `);
+      const driver = await createSelectDriver("mySelect");
+      await driver.toggleOptionsVisibility();
+      
+      // Options should display their values
+      await expect(page.getByRole("option", { name: "opt1" })).toBeVisible();
+      await expect(page.getByRole("option", { name: "opt2" })).toBeVisible();
+      await expect(page.getByRole("option", { name: "opt3" })).toBeVisible();
+      
+      // Select an option and verify
+      await page.getByRole("option", { name: "opt2" }).click();
+      await expect(page.getByTestId("text")).toHaveText("Selected value: opt2");
+      await expect(driver.component).toHaveText("opt2");
+    },
+  );
+
+  test(
+    "Option label defaults to value in multiSelect",
+    { tag: "@smoke" },
+    async ({ initTestBed, page, createSelectDriver }) => {
+      await initTestBed(`
+      <Fragment>
+        <Select id="mySelect" multiSelect="true">
+          <Option value="opt1"/>
+          <Option value="opt2"/>
+          <Option value="opt3"/>
+        </Select>
+        <Text testId="text">Selected values: {mySelect.value}</Text>
+      </Fragment>
+    `);
+      const driver = await createSelectDriver("mySelect");
+      await driver.toggleOptionsVisibility();
+      
+      // Options should display their values
+      await expect(page.getByRole("option", { name: "opt1" })).toBeVisible();
+      await expect(page.getByRole("option", { name: "opt2" })).toBeVisible();
+      await expect(page.getByRole("option", { name: "opt3" })).toBeVisible();
+      
+      // Select multiple options and verify
+      await page.getByRole("option", { name: "opt1" }).click();
+      await page.getByRole("option", { name: "opt3" }).click();
+      await expect(page.getByTestId("text")).toHaveText("Selected values: opt1,opt3");
+      
+      // Selected values should appear as badges with their value text
+      await driver.toggleOptionsVisibility();
+      await expect(page.getByText("opt1").first()).toBeVisible();
+      await expect(page.getByText("opt3").first()).toBeVisible();
+    },
+  );
+
   // --- clearable prop
 
   test("clear button not visible by default (clearable=false)", async ({
