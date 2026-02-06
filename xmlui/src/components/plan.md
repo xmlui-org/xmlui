@@ -73,27 +73,42 @@ Only those components trigger their `topicReceived` event, which subscribed to t
 **Test:** ✅ Build succeeds - `npm run build:xmlui` completed without errors
 **Test:** ✅ All unit tests pass - 22/22 tests passing (PubSubService + PubSubBehavior)
 
-### Step 4: Create E2E Tests
-- Create `xmlui/tests-e2e/pubsub-behavior.spec.ts`:
-  - Test basic pub/sub: component subscribes, button publishes, verify `testState` receives data
-  - Test multiple topics: subscribe to 2 topics, publish to each, verify both received
-  - Test topic filtering: component subscribes to "topic1", publish to "topic2", verify no trigger
-  - Test unsubscribe on unmount: component with subscription, conditionally render, verify cleanup
-  - Test data payload: publish object, array, primitives
-  - Test multiple subscribers: 2 components subscribe to same topic, both receive
+### Step 4: Create E2E Tests ✅ COMPLETED
+- ✅ Created `xmlui/tests-e2e/pubsub-behavior.spec.ts`:
+  - Basic pub/sub: component subscribes, button publishes, verify testState receives data ✅
+  - Multiple topics: subscribe to 2 topics, publish to each, verify both received ✅  
+  - Topic filtering: component subscribes to "topic1", publish to "topic2", verify no trigger ✅
+  - Data payloads: publish object, array, primitives ✅
+  - Multiple subscribers: 2 components subscribe to same topic, both receive ✅
+  - Component without onTopicReceived handler does not error ✅
+  - PubSub with AppState integration ✅
+  - Cascading topic publications ✅
 
-**Run:** `npm run test:e2e -- pubsub-behavior.spec.ts`
+- ⏭️ Skipped tests (edge cases for future work):
+  - Unsubscribe on unmount with conditional rendering
+  - PubSub with form components (complex DOM interaction)
+  - Conditional rendering subscription lifecycle
 
-### Step 5: Documentation
-- Update `xmlui/dev-docs/component-behaviors.md`:
-  - Add "PubSub Behavior" section following existing behavior pattern
-  - Document `subscribeToTopic` prop, `onTopicReceived` event, `publishTopic` global
-  - Include usage example
+**Test Results:** ✅ 17/17 E2E tests passing (all tests fixed with global variables)
+- ✅ All previously skipped tests now working with global variables:
+  - Multiple publish events with delays ✅
+  - Subscription cleanup on unmount ✅
+  - PubSub with form components ✅
+  - PubSub with conditional rendering ✅
+- ✅ All tests migrated from AppState/var to global variables for consistency
 
-- Create component documentation (if needed):
-  - Add entry to docs site explaining pub/sub pattern
+### Step 5: Documentation ✅ COMPLETED
+- ✅ Updated `xmlui/dev-docs/component-behaviors.md`:
+  - Added "PubSub Behavior" section with comprehensive documentation
+  - Documented attachment criteria and wrapping process
+  - Included usage examples for single topic, multiple topics, and global function
+  - Documented topic types, event handler signature, use cases
+  - Explained implementation details and relationship with other behaviors
+  - Listed known limitations
+  - Updated behavior execution order to include pubSubBehavior
+  - Updated intro to mention 8 framework behaviors (was 7)
 
-**Validation:** Read documentation, verify clarity and completeness
+**Validation:** ✅ Documentation complete, follows existing behavior documentation patterns
 
 ---
 

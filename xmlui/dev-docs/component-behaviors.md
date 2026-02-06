@@ -1,6 +1,6 @@
 # Component Behaviors
 
-This document explains XMLUI's component behavior system - a cross-cutting concern mechanism that enables attaching reusable functionality to components declaratively. It covers the behavior architecture, the seven framework behaviors (label, animation, tooltip, variant, bookmark, form binding, and validation), the attachment mechanism, and implementation details for framework developers working on the XMLUI core.
+This document explains XMLUI's component behavior system - a cross-cutting concern mechanism that enables attaching reusable functionality to components declaratively. It covers the behavior architecture, the eight framework behaviors (label, animation, tooltip, variant, bookmark, pubsub, form binding, and validation), the attachment mechanism, and implementation details for framework developers working on the XMLUI core.
 
 ## What Are Component Behaviors?
 
@@ -630,9 +630,134 @@ Both approaches:
 
 The behavior approach is cleaner when you want bookmark functionality on an existing component without an extra wrapper element.
 
+### PubSub Behavior
+
+Enables publisher-subscriber messaging between unrelated components using a topic-based publish/subscribe pattern. Components can subscribe to topics and receive notifications when those topics are published, enabling decoupled communication across the component tree.
+
+**Attachment Criteria:**
+```typescript
+canAttach: (context, node, metadata) => {
+  const subscribeToTopic = extractValue(node.props?.subscribeToTopic, true);
+  return !!subscribeToTopic;
+}
+```
+
+**Usage Example:**
+```xmlui
+<Fragment>
+  <!-- Publisher: triggers topic from button click -->
+  <Button 
+    label="Notify" 
+    onClick="publishTopic('user-action', { action: 'clicked', timestamp: Date.now() })" />
+  
+  <!-- Subscriber: receives topic notifications -->
+  <Text 
+    subscribeToTopic="user-action"
+    onTopicReceived="(topic, data) => AppState.set('lastAction', data.action)"
+  >Subscriber</Text>
+  
+  <!-- Can subscribe to multiple topics -->
+  <Card 
+    subscribeToTopic="{['topic-a', 'topic-b', 'topic-c']}"
+    onTopicReceived="(topic, data) => console.log('Received:', topic, data)"
+  >Multi-topic Subscriber</Card>
+</Fragment>
+```
+
+**Wrapping Process:**
+1. Extracts the `subscribeToTopic` property which can be:
+   - A single string topic: `"my-topic"`
+   - A single numeric topic: `{42}`
+   - An array of topics: `{['topic-a', 'topic-b', 10]}`
+2. Looks up the `onTopicReceived` event handler callback
+3. Wraps the component in `<PubSubWrapper>` which:
+   - Accesses the PubSubService from AppContext
+   - Subscribes to specified topic(s) when the component mounts
+   - Calls the `onTopicReceived` handler when topics are published
+   - Automatically unsubscribes when the component unmounts
+
+**Global Function - publishTopic:**
+
+The `publishTopic(topic, data?)` function is available globally in all XMLUI expressions and event handlers:
+
+```xmlui
+<!-- Publish from onClick handler -->
+<Button onClick="publishTopic('save-requested', { formId: 'user-form' })" />
+
+<!-- Publish from conditional expression -->
+<Text if="valid" onChange="publishTopic('validation-passed')" />
+
+<!-- Publish from action -->
+<Button onClick="myAction('param1'); publishTopic('action-complete')" />
+```
+
+**Topic Types:**
+
+Topics can be strings or numbers:
+- String topics: `"user-logged-in"`, `"data-updated"`, `"modal-closed"`
+- Numeric topics: `{1}`, `{42}`, `{constants.REFRESH_TOPIC}`
+- Mixed in arrays: `{['string-topic', 123, 'another-topic']}`
+
+**Event Handler Signature:**
+
+The `onTopicReceived` event handler receives two parameters:
+
+```typescript
+onTopicReceived: (topic: string | number, data?: any) => void | Promise<void>
+```
+
+- **topic** - The topic identifier that was published
+- **data** - Optional data payload passed to `publishTopic()`
+
+**Use Cases:**
+
+The PubSub behavior enables several common patterns:
+
+1. **Cross-Component Notifications** - Notify unrelated components of state changes without prop drilling
+2. **Event Broadcasting** - Announce global events (user logged in, theme changed, data refreshed)
+3. **Component Coordination** - Coordinate actions between sibling components without parent mediation
+4. **Cascade Updates** - Trigger updates in multiple subscribers from a single publish
+5. **Decoupled Communication** - Allow components to communicate without direct references
+
+**Implementation Details:**
+
+- **Service Layer** - Uses `PubSubService` (created in AppContent) with Map-based topic subscriptions
+- **Context Integration** - Service accessed via `AppContext.pubSubService`, function via `AppContext.publishTopic`
+- **Subscription Lifecycle** - Subscriptions managed via useEffect with cleanup on unmount
+- **Error Handling** - Callback errors are caught and logged to prevent cascade failures
+- **Multiple Subscribers** - Multiple components can subscribe to the same topic; all receive notifications
+- **Topic Filtering** - Each subscriber only receives notifications for its subscribed topics
+
+**Relationship with Other Behaviors:**
+
+The PubSub behavior is independent of other behaviors and can work alongside them:
+
+```xmlui
+<!-- Works with form binding and validation -->
+<TextBox 
+  bindTo="email"
+  label="Email"
+  subscribeToTopic="clear-form"
+  onTopicReceived="() => AppState.set('email', '')" />
+
+<!-- Works with animations and tooltips -->
+<Card
+  animation="fadeIn"
+  tooltip="Updates automatically"
+  subscribeToTopic="data-refresh"
+  onTopicReceived="() => refreshData()" />
+```
+
+**Limitations:**
+
+- Topics are scoped to a single application instance - not persisted or shared across browser tabs
+- Publish is fire-and-forget - no acknowledgment or return values from subscribers
+- Event handlers execute synchronously (async handlers are supported but not awaited)
+- No built-in message history - subscribers only receive publications after subscription
+
 ### Behavior Execution Order
 
-Behaviors are registered in the `ComponentRegistry` during construction. The framework registers its seven core behaviors first, followed by any behaviors contributed by external packages:
+Behaviors are registered in the `ComponentRegistry` during construction. The framework registers its eight core behaviors first, followed by any behaviors contributed by external packages:
 
 ```typescript
 // Framework behaviors registered in ComponentRegistry constructor
@@ -641,6 +766,7 @@ this.registerBehavior(animationBehavior);
 this.registerBehavior(tooltipBehavior);
 this.registerBehavior(variantBehavior);
 this.registerBehavior(bookmarkBehavior);
+this.registerBehavior(pubSubBehavior);
 this.registerBehavior(formBindingBehavior);
 this.registerBehavior(validationBehavior);
 
@@ -652,22 +778,24 @@ contributes.behaviors?.forEach((behavior) => {
 
 **Order Significance:**
 
-The registration order matters because behaviors wrap sequentially. The current order (label, animation, tooltip, variant, bookmark, formBinding, validation) produces this nesting for a component with multiple behaviors:
+The registration order matters because behaviors wrap sequentially. The current order (label, animation, tooltip, variant, bookmark, pubSub, formBinding, validation) produces this nesting for a component with multiple behaviors:
 
 ```
 <ValidationWrapper>      ← Validation behavior (outermost)
   <FormBindingWrapper>   ← Form binding behavior
-    <BookmarkWrapper>    ← Bookmark behavior
-      <VariantWrapper>   ← Variant behavior
-        <Tooltip>        ← Tooltip behavior
-          <Animation>    ← Animation behavior
-            <ItemWithLabel> ← Label behavior
-              <TextBox />   ← Original component
-            </ItemWithLabel>
-          </Animation>
-        </Tooltip>
-      </VariantWrapper>
-    </BookmarkWrapper>
+    <PubSubWrapper>      ← PubSub behavior
+      <BookmarkWrapper>  ← Bookmark behavior
+        <VariantWrapper> ← Variant behavior
+          <Tooltip>      ← Tooltip behavior
+            <Animation>  ← Animation behavior
+              <ItemWithLabel> ← Label behavior
+                <TextBox />   ← Original component
+              </ItemWithLabel>
+            </Animation>
+          </Tooltip>
+        </VariantWrapper>
+      </BookmarkWrapper>
+    </PubSubWrapper>
   </FormBindingWrapper>
 </ValidationWrapper>
 ```
@@ -678,6 +806,7 @@ This order ensures:
 - **Tooltips** appear on the fully animated and labeled component
 - **Variant styling** applies to components with tooltips and animations
 - **Bookmark functionality** works at the component level with all visual enhancements applied
+- **PubSub messaging** enables topic subscriptions for components with all visual behaviors applied
 - **Form binding** manages state and value synchronization for form-bound components
 - **Validation** is the outermost layer, monitoring and validating the entire form-bound component
 
@@ -687,10 +816,11 @@ The behaviors are applied in a specific sequence where each layer builds on the 
 3. Tooltip behavior adds hover information to the animated component
 4. Variant behavior applies custom theme styling
 5. Bookmark behavior adds navigation and TOC integration
-6. Form binding behavior connects the component to form state
-7. Validation behavior adds validation logic and feedback
+6. PubSub behavior adds topic subscription and messaging capabilities
+7. Form binding behavior connects the component to form state
+8. Validation behavior adds validation logic and feedback
 
-Note that not all behaviors will attach to every component - behaviors only attach when their specific conditions are met (e.g., variant behavior only attaches when a component has a non-standard variant prop, form binding only attaches when bindTo is present with value/setValue APIs).
+Note that not all behaviors will attach to every component - behaviors only attach when their specific conditions are met (e.g., variant behavior only attaches when a component has a non-standard variant prop, form binding only attaches when bindTo is present with value/setValue APIs, pubSub only attaches when subscribeToTopic is present).
 
 Changing the order would alter this nesting and could break visual consistency, interaction behavior, or form functionality.
 
