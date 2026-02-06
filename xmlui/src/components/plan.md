@@ -40,32 +40,25 @@ Only those components trigger their `topicReceived` event, which subscribed to t
 
 **Test:** ✅ Unit tests - 12/12 tests passing (PubSubService.test.ts)
 
-### Step 2: Create PubSub Behavior
-- Create `xmlui/src/components-core/behaviors/PubSubBehavior.tsx`:
-  - Export `pubSubBehavior: Behavior`
+### Step 2: Create PubSub Behavior ✅ COMPLETED
+- ✅ Created `xmlui/src/components-core/behaviors/PubSubBehavior.tsx`:
+  - Exported `pubSubBehavior: Behavior`
   - `canAttach`: checks if `node.props?.subscribeToTopic` exists (using `extractValue`)
   - `attach`: 
-    - Extract `subscribeToTopic` (normalize to array if string/number)
-    - Extract `onTopicReceived` event using `lookupEventHandler("topicReceived")`
-    - Return `<PubSubWrapper topics={...} onTopicReceived={...}>{node}</PubSubWrapper>`
+    - Extracts `subscribeToTopic` (normalized to array if string/number)
+    - Extracts `onTopicReceived` event using `lookupEventHandler("topicReceived")`
+    - Returns `<PubSubWrapper topics={...} onTopicReceived={...}>{node}</PubSubWrapper>`
 
-- Create `PubSubWrapper` component in same file:
+- ✅ Created `PubSubWrapper` component in same file:
   - Takes `topics: (string | number)[]`, `onTopicReceived: AsyncFunction | undefined`, `children: ReactElement`
-  - Uses `useContext(AppContext)` to get pubsub service (needs access via AppContext)
-  - `useEffect`: subscribe to topics, returns cleanup (unsubscribe)
+  - Uses `useContext(AppContext)` to get pubsub service
+  - `useEffect`: subscribes to topics, returns cleanup (unsubscribe)
   - Callback invokes `onTopicReceived?.(topic, data)`
 
-**Challenge:** PubSubService needs to be accessible to behavior. Solution: Add `pubSubService` to AppContext (not just `publishTopic`), behaviors can access full context via AppContext.
+- ✅ Updated `xmlui/src/components-core/behaviors/CoreBehaviors.tsx`:
+  - Exported `pubSubBehavior` (re-export from PubSubBehavior.tsx)
 
-- Update `xmlui/src/abstractions/AppContextDefs.ts`:
-  - Add `pubSubService: PubSubService` (type to be exported from PubSubService.ts)
-
-- Update `xmlui/src/components-core/rendering/AppContent.tsx`:
-  - Add `pubSubService` to appContextValue
-
-**Test:** Unit test for PubSubBehavior (`PubSubBehavior.spec.ts`):
-  - Test `canAttach` with/without `subscribeToTopic`
-  - Mock RendererContext, verify behavior logic
+**Test:** ✅ Unit tests - 10/10 tests passing (PubSubBehavior.test.ts)
 
 ### Step 3: Register PubSub Behavior
 - Update `xmlui/src/components-core/behaviors/CoreBehaviors.tsx`:

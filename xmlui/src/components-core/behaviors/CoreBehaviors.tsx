@@ -26,6 +26,9 @@ import { TableOfContentsContext } from "../TableOfContentsContext";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useIsomorphicLayoutEffect } from "../utils/hooks";
 
+// Re-export pubSubBehavior from its own file
+export { pubSubBehavior } from "./PubSubBehavior";
+
 /**
  * Behavior for applying tooltips to components.
  */
