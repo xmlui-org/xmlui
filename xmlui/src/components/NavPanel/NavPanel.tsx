@@ -23,11 +23,19 @@ export const NavPanelMd = createMetadata({
     content: {
       description: "The content area within the NavPanel component.",
     },
+    footer: {
+      description:
+        "Optional footer area at the bottom of the NavPanel (e.g. for theme switcher or layout toggle). Shown only when footerTemplate is set.",
+    },
   },
   props: {
     logoTemplate: dComponent(
       `This property defines the logo template to display in the navigation panel with the ` +
         `\`vertical\` and \`vertical-sticky\` layout.`,
+    ),
+    footerTemplate: dComponent(
+      `Optional template for a footer at the bottom of the NavPanel. When set, the footer is shown ` +
+        `below the scrollable nav content (e.g. for theme switcher or sidebar toggle, similar to Nextra).`,
     ),
     inDrawer: {
       description: `This property determines if the navigation panel is displayed in a drawer.`,
@@ -67,6 +75,9 @@ export const NavPanelMd = createMetadata({
     [`paddingHorizontal-logo-${COMP}`]: "$space-4",
     [`marginBottom-logo-${COMP}`]: "$space-4",
     [`boxShadow-${COMP}-vertical`]: "4px 0 4px 0 rgb(0 0 0 / 10%)",
+    [`padding-footer-${COMP}`]: "$space-2",
+    [`paddingHorizontal-footer-${COMP}`]: "$space-4",
+    [`paddingVertical-footer-${COMP}`]: "$space-2",
   },
 });
 
@@ -83,10 +94,14 @@ function NavPanelWithBuiltNavHierarchy({
 
   const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
   const showScrollerFade = extractValue.asOptionalBoolean(node.props.showScrollerFade);
+  const footerContent = node.props.footerTemplate
+    ? renderChild(node.props.footerTemplate)
+    : undefined;
 
   return (
     <NavPanel
       logoContent={renderChild(node.props.logoTemplate)}
+      footerContent={footerContent}
       className={classnames(layoutContext?.themeClassName, className)}
       inDrawer={layoutContext?.inDrawer}
       renderChild={renderChild}

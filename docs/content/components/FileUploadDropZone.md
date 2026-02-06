@@ -57,6 +57,12 @@ Try it! When you copy a file to a clipboard, you cannot paste it with the keyboa
 
 If set to `false`, the drop zone will be disabled and users will not be able to upload files.
 
+### `icon` [#icon]
+
+-  default: **"upload"**
+
+Specifies an icon name. The framework will render an icon if XMLUI recognizes the icon by its name.
+
 ### `maxFiles` [#maxfiles]
 
 The maximum number of files that can be selected.

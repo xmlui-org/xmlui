@@ -62,7 +62,7 @@ import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree"
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
-const GLOBALS_BUILT_RESOURCE ="/src/Globals.xs"
+const GLOBALS_BUILT_RESOURCE = "/src/Globals.xs";
 const GLOBALS_FILE = "Globals." + moduleFileExtension;
 const CONFIG_FILE = "config.json";
 
@@ -286,9 +286,11 @@ async function parseComponentMarkupResponse(response: Response): Promise<ParsedR
       // --- Create a module fetcher for import support
       // --- Note: modulePath is already resolved by ModuleResolver.resolvePath()
       const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
-        const moduleResponse = await fetchWithoutCache(modulePath);
+        // --- Normalize the path for consistency across platforms (especially Windows)
+        const normalizedPath = normalizePath(modulePath);
+        const moduleResponse = await fetchWithoutCache(normalizedPath);
         if (!moduleResponse.ok) {
-          throw new Error(`Failed to fetch module: ${modulePath}`);
+          throw new Error(`Failed to fetch module: ${normalizedPath}`);
         }
         return await moduleResponse.text();
       };
@@ -381,9 +383,13 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
         resolvedPath = ModuleResolver.resolvePath(modulePath, response.url);
       }
 
-      const moduleResponse = await fetchWithoutCache(resolvedPath);
+      // --- ModuleLoader already resolves the path, so we just need to normalize and fetch it
+      // --- Normalize the path for consistency across platforms (especially Windows)
+      const normalizedPath = normalizePath(modulePath);
+
+      const moduleResponse = await fetchWithoutCache(normalizedPath);
       if (!moduleResponse.ok) {
-        throw new Error(`Failed to fetch module: ${resolvedPath}`);
+        throw new Error(`Failed to fetch module: ${normalizedPath}`);
       }
       return await moduleResponse.text();
     };
@@ -746,7 +752,7 @@ function useStandalone(
 
   const [projectCompilation, setProjectCompilation] = useState<ProjectCompilation>(null);
 
-  // --- This function extracts the global variables and functions from the combined 
+  // --- This function extracts the global variables and functions from the combined
   // --- pre-built Globals.xs module.
   const extractGlobals = (prebuiltGlobals: Record<string, any>): Record<string, any> => {
     const extractedVars: Record<string, any> = {};
@@ -884,7 +890,10 @@ function useStandalone(
           if (resp.ok) {
             const parsedGlobals = await parseCodeBehindResponse(resp);
             const globalsXs = parsedGlobals?.codeBehind;
-            const extractedGlobals = extractGlobals({ ...(globalsXs?.vars || {}), ...(globalsXs?.functions || {}) });
+            const extractedGlobals = extractGlobals({
+              ...(globalsXs?.vars || {}),
+              ...(globalsXs?.functions || {}),
+            });
             resolve(extractedGlobals);
           } else {
             resolve({

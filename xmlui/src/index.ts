@@ -51,6 +51,7 @@ import { VisuallyHidden } from "./components/VisuallyHidden";
 import { LinkNative } from "./components/Link/LinkNative";
 import { Breakout } from "./components/Breakout/BreakoutNative";
 import { ToneChangerButton } from "./components/ToneChangerButton/ToneChangerButton";
+import { NavPanelCollapseButton } from "./components/NavPanelCollapseButton/NavPanelCollapseButton";
 import { Logo } from "./components/Logo/LogoNative";
 import { Theme } from "./components/Theme/ThemeNative";
 import { useSearchContextContent } from "./components/App/SearchContext";
@@ -195,6 +196,7 @@ export {
   VisuallyHidden,
   LinkNative,
   ToneChangerButton,
+  NavPanelCollapseButton,
   Logo,
   Breakout,
   useSearchContextContent,

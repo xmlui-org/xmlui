@@ -259,9 +259,19 @@ export const EXTENSIONS_NAVIGATION = {
   },
 };
 
+export const ICONS_NAVIGATION = {
+  DELIMITERS: {
+    START: "<!-- GENERATED CONTENT/Icon names -->",
+    END: "<!-- END GENERATED CONTENT/Icon names -->",
+    START_REGEX: /<!--\s*GENERATED CONTENT\/Icon names.*?-->/,
+    END_REGEX: /<!--\s*END GENERATED CONTENT\/Icon names.*?-->/,
+  },
+};
+
 // File paths used in the documentation generation
 export const FILE_PATHS = {
   MAIN_XMLUI: "src/Main.xmlui",
+  ICONS_XMLUI: "src/components/Icons.xmlui",
 };
 
 // Path constants for resolving workspace locations

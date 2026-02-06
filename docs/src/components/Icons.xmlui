@@ -1,29 +1,155 @@
-<Component
-    name="Icons"
-    var.names="{[
-        'adduser', 'admonition_danger', 'admonition_info',
-        'admonition_note', 'admonition_tip', 'admonition_warning', 'api', 'apps',
-        'arrowdown', 'arrowleft', 'arrowright', 'arrowup', 'assign', 'attach',
-        'attach2', 'binding', 'board', 'box', 'chat', 'checkmark', 'chevrondown',
-        'chevronleft', 'chevronright', 'chevronsleft', 'chevronsright', 'chevronup',
-        'close', 'cog', 'code', 'codesandbox', 'compactlist', 'conf', 'connect', 'copy',
-        'cube', 'date', 'database', 'darktolight', 'doc', 'doc-outline', 'docx',
-        'dotmenu', 'dotmenuhorizontal', 'download', 'drive', 'duplicate',
-        'emptyfolder', 'emoji', 'error', 'exit', 'expression', 'filledplus',
-        'filter', 'folder', 'folder-outline', 'gif', 'globe', 'hash', 'help',
-        'home', 'hyperlink', 'info', 'inspect', 'jpeg', 'jpg', 'lighttodark', 'like',
-        'link', 'list', 'looselist', 'lock', 'message', 'moon', 'move',
-        'new-window', 'next', 'noresult', 'note', 'nosort', 'options', 'paint',
-        'palette', 'pause', 'pen', 'permissions', 'photo', 'phone', 'play',
-        'plus', 'plus-circle', 'png', 'ppt', 'pptx', 'previous', 'refresh',
-        'rename', 'reply', 'restart', 'search', 'send', 'share', 'sortasc',
-        'sortdesc', 'split-horizontal', 'split-vertical', 'square', 'squarefill',
-        'squarehalf', 'star', 'stars', 'start', 'stop', 'sun', 'swap', 'svg',
-        'tif', 'trash', 'trending-down', 'trending-level', 'trending-up', 'txt',
-        'unlink', 'unknownfile', 'upload', 'user', 'userminus', 'users', 'valid',
-        'warning', 'webp', 'xls', 'xlsx'
-    ].toSorted()}"
->
+<Component name="Icons">
+    <!-- GENERATED CONTENT/Icon names -->
+  <variable name="names" value="{[
+    'adduser',
+    'admonition_danger',
+    'admonition_info',
+    'admonition_note',
+    'admonition_tip',
+    'admonition_warning',
+    'api',
+    'apps',
+    'arrowdown',
+    'arrowleft',
+    'arrowright',
+    'arrowup',
+    'assign',
+    'attach',
+    'attach2',
+    'binding',
+    'board',
+    'box',
+    'chat',
+    'checkmark',
+    'chevrondown',
+    'chevronleft',
+    'chevronright',
+    'chevronsleft',
+    'chevronsright',
+    'chevronup',
+    'close',
+    'code',
+    'codesandbox',
+    'cog',
+    'compactlist',
+    'conf',
+    'connect',
+    'copy',
+    'crm',
+    'cube',
+    'darktolight',
+    'database',
+    'date',
+    'doc',
+    'doc-outline',
+    'docx',
+    'dotmenu',
+    'dotmenuhorizontal',
+    'doublechevrondown',
+    'doublechevronleft',
+    'doublechevronright',
+    'doublechevronup',
+    'download',
+    'drive',
+    'duplicate',
+    'email',
+    'emoji',
+    'emptyfolder',
+    'error',
+    'exit',
+    'expression',
+    'eye',
+    'eye-off',
+    'filledplus',
+    'filter',
+    'folder',
+    'folder-outline',
+    'gif',
+    'globe',
+    'hamburger',
+    'hash',
+    'help',
+    'home',
+    'hyperlink',
+    'info',
+    'inspect',
+    'jpeg',
+    'jpg',
+    'lighttodark',
+    'like',
+    'link',
+    'list',
+    'lock',
+    'looselist',
+    'message',
+    'moon',
+    'move',
+    'new-window',
+    'next',
+    'noresult',
+    'nosort',
+    'note',
+    'options',
+    'paint',
+    'palette',
+    'pause',
+    'pdf',
+    'pen',
+    'pencil',
+    'permissions',
+    'phone',
+    'photo',
+    'play',
+    'plus',
+    'plus-circle',
+    'png',
+    'ppt',
+    'pptx',
+    'previous',
+    'refresh',
+    'rename',
+    'reply',
+    'restart',
+    'search',
+    'send',
+    'share',
+    'sortasc',
+    'sortdesc',
+    'split-horizontal',
+    'split-vertical',
+    'square',
+    'squarefill',
+    'squarehalf',
+    'star',
+    'stars',
+    'start',
+    'stop',
+    'sun',
+    'svg',
+    'swap',
+    'table-delete-column',
+    'table-delete-row',
+    'table-insert-column',
+    'table-insert-row',
+    'tif',
+    'trash',
+    'trending-down',
+    'trending-level',
+    'trending-up',
+    'txt',
+    'unknownfile',
+    'unlink',
+    'upload',
+    'user',
+    'userminus',
+    'users',
+    'valid',
+    'warning',
+    'webp',
+    'xls',
+    'xlsx'
+  ]}" />
+  <!-- END GENERATED CONTENT/Icon names -->
     <DocumentPageNoTOC>
         <H1>
             Icons
@@ -32,20 +158,14 @@
         <FlowLayout gap="$space-2" padding="$space-2">
             <Items data="{names}">
                 <VStack
-                    width="12.5%"
+                    width="20%"
                     verticalAlignment="center"
                     horizontalAlignment="center"
-                    marginBottom="$space-8"
+                    marginBottom="$space-10"
                     gap="$space-2"
                 >
-                    <Icon
-                        padding="$space-2"
-                        name="{$item}"
-                        height="40px"
-                        width="40px"
-                        boxShadow="$boxShadow-spread-2"
-                    />
-                    <Text fontSize="$fontSize-tiny">
+                    <Icon name="{$item}" size="lg" />
+                    <Text fontSize="$fontSize-xs">
                         {$item}
                     </Text>
                 </VStack>

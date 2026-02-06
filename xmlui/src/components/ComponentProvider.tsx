@@ -139,11 +139,13 @@ import { accordionComponentRenderer } from "./Accordion/Accordion";
 import { tabItemComponentRenderer } from "./Tabs/TabItem";
 import { accordionItemComponentRenderer } from "./Accordion/AccordionItem";
 import { sliderComponentRenderer } from "./Slider/Slider";
+import { ratingInputComponentRenderer } from "./RatingInput/RatingInput";
 import { carouselComponentRenderer } from "./Carousel/Carousel";
 import { carouselItemComponentRenderer } from "./Carousel/CarouselItem";
 import { createPropHolderComponent } from "../components-core/renderers";
 import { breakoutComponentRenderer } from "./Breakout/Breakout";
 import { toneChangerButtonComponentRenderer } from "./ToneChangerButton/ToneChangerButton";
+import { navPanelCollapseButtonComponentRenderer } from "./NavPanelCollapseButton/NavPanelCollapseButton";
 import { toneSwitchComponentRenderer } from "./ToneSwitch/ToneSwitch";
 import { apiCallRenderer } from "./APICall/APICall";
 import { optionComponentRenderer } from "./Option/Option";
@@ -588,6 +590,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(autoCompleteComponentRenderer);
       this.registerCoreComponent(dropdownMenuComponentRenderer);
       this.registerCoreComponent(toneChangerButtonComponentRenderer);
+      this.registerCoreComponent(navPanelCollapseButtonComponentRenderer);
       this.registerCoreComponent(toneSwitchComponentRenderer);
       this.registerCoreComponent(inspectButtonComponentRenderer);
       this.registerCoreComponent(formSectionRenderer);
@@ -608,6 +611,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(carouselComponentRenderer);
       this.registerCoreComponent(accordionComponentRenderer);
       this.registerCoreComponent(sliderComponentRenderer);
+      this.registerCoreComponent(ratingInputComponentRenderer);
       this.registerCoreComponent(backdropComponentRenderer);
       this.registerCoreComponent(toastComponentRenderer);
     }
