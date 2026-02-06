@@ -7,6 +7,7 @@ import { version } from "../../../package.json";
 
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
+import { createPubSubService } from "../pubsub/PubSubService";
 import { useConfirm } from "../../components/ModalDialog/ConfirmationModalContextProvider";
 import { useTheme, useThemes } from "../theming/ThemeContext";
 import {
@@ -88,6 +89,10 @@ export function AppContent({
   const componentRegistry = useComponentRegistry();
   const navigate = useNavigate();
   const { confirm } = useConfirm();
+
+  // --- Create PubSubService with stable reference across renders
+  const pubSubServiceRef = useRef(createPubSubService());
+  const pubSubService = pubSubServiceRef.current;
 
   // --- Prepare theme-related variables. We will use them to manage the selected theme
   // --- and also pass them to the app context.
@@ -725,6 +730,10 @@ export function AppContent({
 
       // --- AppState global state management
       AppState,
+
+      // --- PubSub messaging
+      pubSubService,
+      publishTopic: pubSubService.publishTopic,
     };
     return ret;
   }, [
@@ -751,6 +760,7 @@ export function AppContent({
     scrollBookmarkIntoView,
     root,
     AppState,
+    pubSubService,
   ]);
 
   return (

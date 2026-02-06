@@ -1,6 +1,6 @@
 # Component Behaviors
 
-This document explains XMLUI's component behavior system - a cross-cutting concern mechanism that enables attaching reusable functionality to components declaratively. It covers the behavior architecture, the three core behaviors (tooltip, animation, label), the attachment mechanism, and implementation details for framework developers working on the XMLUI core.
+This document explains XMLUI's component behavior system - a cross-cutting concern mechanism that enables attaching reusable functionality to components declaratively. It covers the behavior architecture, the seven framework behaviors (label, animation, tooltip, variant, bookmark, form binding, and validation), the attachment mechanism, and implementation details for framework developers working on the XMLUI core.
 
 ## What Are Component Behaviors?
 
@@ -25,10 +25,7 @@ All behaviors implement a simple contract with three members:
 ```typescript
 export interface Behavior {
   name: string;
-  canAttach: (node: ComponentDef, metadata: ComponentMetadata) => boolean;
-  // The attach method now receives an optional metadata argument so
-  // behaviors can make use of component descriptor information when
-  // transforming the rendered node.
+  canAttach: (context: RendererContext<any>, node: ComponentDef, metadata: ComponentMetadata) => boolean;
   attach: (
     context: RendererContext<any>,
     node: ReactNode,
@@ -38,7 +35,7 @@ export interface Behavior {
 ```
 
 - **name** - Unique identifier for the behavior (e.g., "tooltip", "animation", "label")
-- **canAttach** - Predicate determining if the behavior applies to a specific component instance based on its definition and metadata
+- **canAttach** - Predicate determining if the behavior applies to a specific component instance based on the renderer context, component definition, and metadata
 - **attach** - Transformation function that wraps the rendered React node with enhanced functionality
 
 **Important Note on Transformation Flexibility:**
@@ -59,10 +56,7 @@ const behaviors = componentRegistry.getBehaviors();
 // 3. Apply behaviors sequentially (skip compound components)
 if (!isCompoundComponent) {
     for (const behavior of behaviors) {
-      if (behavior.canAttach(rendererContext.node, descriptor)) {
-        // Pass the component metadata into attach so behaviors that need
-        // descriptor-level information (for example, to avoid wrapping
-        // components marked `opaque` or `nonVisual`) can use it.
+      if (behavior.canAttach(rendererContext, rendererContext.node, descriptor)) {
         renderedNode = behavior.attach(rendererContext, renderedNode, descriptor);
       }
     }
@@ -77,10 +71,10 @@ if (!isCompoundComponent) {
 2. **Behavior Retrieval** - `componentRegistry.getBehaviors()` returns all registered behaviors from the central registry (framework behaviors plus any contributed by external packages)
 3. **Compound Check** - If the component is a compound (XMLUI-defined) component, skip all behaviors to avoid wrapping internal structure
 4. **Sequential Evaluation** - For each behavior in order:
-  - Call `canAttach(node, metadata)` with the component definition and its metadata descriptor
-  - If true, call `attach(context, renderedNode, metadata)` to wrap the node; the metadata is passed so behaviors can consult descriptor-level information during attachment
+  - Call `canAttach(context, node, metadata)` with the renderer context, component definition, and metadata descriptor
+  - If true, call `attach(context, renderedNode, metadata)` to wrap the node
   - The wrapped node becomes the input for the next behavior
-5. **Result** - Multiple behaviors create nested wrappers in application order (tooltip innermost, label outermost)
+5. **Result** - Multiple behaviors create nested wrappers in application order (label innermost, validation outermost)
 
 This placement ensures behaviors wrap the core component but remain inside decorations (test IDs), API bindings, and layout wrappers.
 
@@ -98,9 +92,13 @@ class ComponentRegistry {
     // ... component and action registration ...
 
     // Register framework-implemented behaviors
-    this.registerBehavior(tooltipBehavior);
-    this.registerBehavior(animationBehavior);
     this.registerBehavior(labelBehavior);
+    this.registerBehavior(animationBehavior);
+    this.registerBehavior(tooltipBehavior);
+    this.registerBehavior(variantBehavior);
+    this.registerBehavior(bookmarkBehavior);
+    this.registerBehavior(formBindingBehavior);
+    this.registerBehavior(validationBehavior);
 
     // Register external behaviors from contributes
     contributes.behaviors?.forEach((behavior) => {
@@ -189,34 +187,61 @@ registerBehavior(myBehavior, "after", "tooltip");
 
 ## Framework-Implemented Behaviors
 
-XMLUI currently implements several behaviors that handle common cross-cutting concerns. These serve as examples of the behavior pattern and provide essential functionality across all visual components:
+XMLUI currently implements seven behaviors that handle common cross-cutting concerns. These serve as examples of the behavior pattern and provide essential functionality across all visual components:
 
-### Tooltip Behavior
+1. **Label Behavior** - Wraps form input components with labels and visual indicators
+2. **Animation Behavior** - Applies entry/exit animations using CSS animations or transitions
+3. **Tooltip Behavior** - Displays informational text or markdown on hover
+4. **Variant Behavior** - Applies custom theme variant styling to components
+5. **Bookmark Behavior** - Adds bookmark functionality for scroll-to navigation
+6. **Form Binding Behavior** - Binds input components directly to forms
+7. **Validation Behavior** - Adds validation logic to form-bindable components
 
-Displays informational text or markdown content when hovering over visual components. The tooltip behavior activates when a component has either the `tooltip` or `tooltipMarkdown` property defined.
+### Label Behavior
+
+Wraps form input components with labels, positioning, and visual indicators (required asterisk, validation states). The label behavior activates when a component has the `label` property and does not explicitly handle its own labeling.
 
 **Attachment Criteria:**
 ```typescript
-canAttach: (node) => {
-  const tooltipText = node.props?.tooltip;
-  const tooltipMarkdown = node.props?.tooltipMarkdown;
-  return !!tooltipText || !!tooltipMarkdown;
+canAttach: (context, node, metadata) => {
+  // Don't attach if component declares its own label prop handling
+  if (metadata?.props?.label) {
+    return false;
+  }
+  // Only attach if component has a label prop
+  if (!node.props?.label) {
+    return false;
+  }
+  // Don't attach if formBindingBehavior will handle this component
+  const bindTo = extractValue(node.props?.bindTo, true);
+  const hasValueApiPair = !!metadata?.apis?.value && !!metadata?.apis?.setValue;
+  if (bindTo && hasValueApiPair || node.type === "FormItem") {
+    return false;
+  }
+  return true;
 }
 ```
 
 **Usage Example:**
 ```xmlui
-<Button 
-  label="Click me" 
-  tooltip="This button saves your changes"
-  tooltipOptions="right; delayDuration: 800" />
+<TextBox 
+  label="Email Address" 
+  labelPosition="top"
+  required={true}
+  placeholder="your@email.com" />
 ```
 
 **Wrapping Process:**
-1. Extracts `tooltip`, `tooltipMarkdown`, and `tooltipOptions` properties using the renderer context's value extractor
-2. Parses tooltip options (side, alignment, delay, etc.) via `parseTooltipOptions()`
-3. Wraps the rendered component in a `<Tooltip>` component with extracted configuration
-4. The wrapped component becomes the tooltip trigger; the Tooltip component handles display logic
+1. Extracts label-related properties: `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `style`, `readOnly`, `shrinkToLabel`
+2. Uses the renderer context's `className` to maintain styling consistency
+3. Wraps the component in `<ItemWithLabel>` which handles label rendering, positioning, and required indicators
+4. Special handling for `inputTemplate` - the `isInputTemplateUsed` flag adjusts label layout when custom input templates are present
+
+**Metadata Check Explanation:**
+
+The label behavior checks `metadata?.props?.label` to determine if a component has explicit label property metadata defined. Components like Checkbox or Radio that include label rendering as part of their core functionality define `label` in their metadata. For these components, the label behavior does not attach - they handle their own labels.
+
+Components like TextBox or Select do not define `label` in their metadata because they expect the label behavior to handle labeling. The presence of a `label` prop in the component instance (but absence in metadata) signals that the behavior should attach.
 
 ### Animation Behavior
 
@@ -224,8 +249,9 @@ Applies entry/exit animations to components using CSS animations or transitions.
 
 **Attachment Criteria:**
 ```typescript
-canAttach: (node) => {
-  return !!node.props?.animation;
+canAttach: (context, node) => {
+  const animation = extractValue(node.props?.animation, true);
+  return !!animation;
 }
 ```
 
@@ -258,19 +284,151 @@ return (
 
 ModalDialog components have internal animation support. When wrapped by the animation behavior, the `externalAnimation` prop signals the dialog to defer to external animation control.
 
-### Label Behavior
+### Tooltip Behavior
 
-Wraps form input components with labels, positioning, and visual indicators (required asterisk, validation states). The label behavior activates when a component has the `label` property and does not explicitly handle its own labeling.
+Displays informational text or markdown content when hovering over visual components. The tooltip behavior activates when a component has either the `tooltip` or `tooltipMarkdown` property defined.
 
 **Attachment Criteria:**
 ```typescript
-canAttach: (node, metadata) => {
-  // Don't attach if component declares its own label prop handling
-  if (metadata?.props?.label) {
+canAttach: (context, node) => {
+  const tooltipText = extractValue(node.props?.tooltip, true);
+  const tooltipMarkdown = extractValue(node.props?.tooltipMarkdown, true);
+  return !!tooltipText || !!tooltipMarkdown;
+}
+```
+
+**Usage Example:**
+```xmlui
+<Button 
+  label="Click me" 
+  tooltip="This button saves your changes"
+  tooltipOptions="right; delayDuration: 800" />
+```
+
+**Wrapping Process:**
+1. Extracts `tooltip`, `tooltipMarkdown`, and `tooltipOptions` properties using the renderer context's value extractor
+2. Parses tooltip options (side, alignment, delay, etc.) via `parseTooltipOptions()`
+3. Wraps the rendered component in a `<Tooltip>` component with extracted configuration
+4. The wrapped component becomes the tooltip trigger; the Tooltip component handles display logic
+
+### Animation Behavior
+
+Applies entry/exit animations to components using CSS animations or transitions. The animation behavior activates when a component has the `animation` property defined.
+
+**Attachment Criteria:**
+```typescript
+canAttach: (context, node) => {
+  const animation = extractValue(node.props?.animation, true);
+  return !!animation;
+}
+```
+
+**Usage Example:**
+```xmlui
+<Card 
+  title="Welcome" 
+  animation="fadeIn"
+  animationOptions="duration: 500; delay: 200" />
+```
+
+**Wrapping Process:**
+1. Extracts `animation` and `animationOptions` properties from the component definition
+2. Parses animation configuration via `parseAnimation()` and `parseAnimationOptions()`
+3. Wraps the component in an `<Animation>` component that manages the animation lifecycle
+4. Special handling for ModalDialog components - passes `externalAnimation={true}` to prevent animation conflicts
+
+**ModalDialog Special Case:**
+```typescript
+return (
+  <Animation animation={parseAnimation(animation)} {...parsedOptions}>
+    {context.node.type === "ModalDialog"
+      ? cloneElement(node as ReactElement, {
+          externalAnimation: true,
+        })
+      : node}
+  </Animation>
+);
+```
+
+ModalDialog components have internal animation support. When wrapped by the animation behavior, the `externalAnimation` prop signals the dialog to defer to external animation control.
+
+### Variant Behavior
+
+Applies custom theme variant styling to components with non-predefined variant values. This behavior enables theme-level variants that extend beyond a component's built-in variant options. For Button components, this only applies if the variant is not "solid", "outlined", or "ghost". For Badge components, it skips predefined badge variants. For other components, it applies to any component with a variant prop.
+
+**Attachment Criteria:**
+```typescript
+canAttach: (context, node) => {
+  const variant = extractValue(node.props?.variant, true);
+  
+  // Must have a variant prop
+  if (!variant) {
     return false;
   }
-  // Only attach if component has a label prop
-  if (!node.props?.label) {
+  
+  // Special handling for Button component
+  if (node.type === "Button") {
+    const variantStr = typeof variant === "string" ? variant : String(variant);
+    return (
+      variantStr != undefined &&
+      variantStr !== "" &&
+      !buttonVariantValues.includes(variantStr as any)
+    );
+  }
+  
+  // Special handling for Badge component
+  if (node.type === "Badge") {
+    const variantStr = typeof variant === "string" ? variant : String(variant);
+    return !badgeVariantValues.includes(variantStr as any);
+  }
+  
+  return true;
+}
+```
+
+**Usage Example:**
+```xmlui
+<Button 
+  label="Premium Action" 
+  variant="premium" />
+```
+
+**Wrapping Process:**
+1. Extracts the `variant` property from the component definition
+2. Retrieves theme variables from component metadata (`metadata?.themeVars`)
+3. Generates variant-specific CSS variable references for each theme variable
+4. Uses the `useStyles` hook to create a CSS class with variant-specific styling
+5. Wraps the component in a `VariantWrapper` component that clones the rendered node and adds the variant class
+
+**How Variant Styling Works:**
+
+For a Button with `variant="premium"`, the behavior looks for theme variables like `color-Button`, `backgroundColor-Button`, etc. It then generates CSS that references variant-specific versions:
+
+```css
+.variant-class {
+  color: var(--xmlui-color-Button-premium, var(--xmlui-color-Button));
+  background-color: var(--xmlui-backgroundColor-Button-premium, var(--xmlui-backgroundColor-Button));
+}
+```
+
+This allows themes to define variant-specific values like `--xmlui-backgroundColor-Button-premium: purple` while falling back to the standard `--xmlui-backgroundColor-Button` if the variant isn't defined in the theme.
+
+**Component Type Filtering:**
+
+The behavior only processes theme variables that match the current component type. For example, when rendering an H1 component, it won't apply theme variables from Heading-related variables that might have `component: "Heading"` in their parsed metadata. This prevents cross-contamination of styles between related components.
+
+### Form Binding Behavior
+
+Binds input components directly to a Form without requiring a FormItem wrapper. When a component has a `bindTo` prop, is inside a Form context, and exposes value/setValue APIs, this behavior wraps it with form binding logic (validation, state management, label rendering, etc.).
+
+**Attachment Criteria:**
+```typescript
+canAttach: (context, node, metadata) => {
+  const bindTo = extractValue(node.props?.bindTo, true);
+  const hasValueApiPair = !!metadata?.apis?.value && !!metadata?.apis?.setValue;
+  
+  // Only attach if component has bindTo, has value/setValue APIs, and is not FormItem
+  if (!bindTo || !hasValueApiPair || node.type === "FormItem") {
     return false;
   }
   return true;
@@ -279,80 +437,161 @@ canAttach: (node, metadata) => {
 
 **Usage Example:**
 ```xmlui
-<TextBox 
-  label="Email Address" 
-  labelPosition="top"
-  required={true}
-  placeholder="your@email.com" />
+<Form>
+  <TextBox 
+    bindTo="email"
+    label="Email Address"
+    required={true}
+    minLength={5}
+    pattern="email" />
+</Form>
 ```
 
 **Wrapping Process:**
-1. Extracts label-related properties: `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `style`, `readOnly`, `shrinkToLabel`
-2. Uses the renderer context's `className` to maintain styling consistency
-3. Wraps the component in `<ItemWithLabel>` which handles label rendering, positioning, and required indicators
-4. Special handling for `inputTemplate` - the `isInputTemplateUsed` flag adjusts label layout when custom input templates are present
+1. Extracts binding-related properties: `bindTo`, `initialValue`, `noSubmit`
+2. Extracts all validation properties: `required`, `minLength`, `maxLength`, `minValue`, `maxValue`, `pattern`, `regex`, and their associated invalid messages and severity levels
+3. Extracts label properties if present: `label`, `labelPosition`, `labelWidth`, `labelBreak`
+4. Extracts other properties: `enabled`, `requireLabelMode`
+5. Wraps the component in `<FormBindingWrapper>` which:
+   - Manages the connection between the component and Form context
+   - Provides the value from form state to the component
+   - Updates form state when component value changes
+   - Handles label rendering (if label props are provided)
+   - Passes validation configuration to child components
 
-**Metadata Check Explanation:**
+**Form-Bindable Components:**
 
-The label behavior checks `metadata?.props?.label` to determine if a component has explicit label property metadata defined. Components like Checkbox or Radio that include label rendering as part of their core functionality define `label` in their metadata. For these components, the label behavior does not attach - they handle their own labels.
+The behavior only attaches to components that support form binding. These include:
+- TextBox, PasswordInput, TextArea
+- NumberBox, Slider
+- Toggle, Checkbox, Switch
+- Select, AutoComplete
+- DatePicker, DateInput, TimeInput
+- ColorPicker, FileInput, RadioGroup
 
-Components like TextBox or Select do not define `label` in their metadata because they expect the label behavior to handle labeling. The presence of a `label` prop in the component instance (but absence in metadata) signals that the behavior should attach.
+**Relationship with Label Behavior:**
+
+When formBindingBehavior attaches, it takes over label rendering responsibility from labelBehavior. The labelBehavior's `canAttach` explicitly checks for this and skips attachment when a component has both `bindTo` and value/setValue APIs. This prevents double-wrapping and ensures consistent label rendering within form contexts.
+
+### Validation Behavior
+
+Adds validation logic and feedback to form-bindable components and FormItem components. This behavior validates input values against validation rules (required, min/max length, min/max value, pattern, regex) and displays validation feedback to users.
+
+**Attachment Criteria:**
+```typescript
+canAttach: (context, node, metadata) => {
+  const bindTo = extractValue(node.props?.bindTo, true);
+  const isFormItem = node.type === "FormItem";
+  
+  // Attach if it's a FormItem, or if it has bindTo and value/setValue APIs
+  if (!isFormItem && (bindTo === undefined || bindTo === null)) {
+    return false;
+  }
+  
+  if (!isFormItem) {
+    const hasValueApiPair = !!metadata?.apis?.value && !!metadata?.apis?.setValue;
+    if (!hasValueApiPair) {
+      return false;
+    }
+  }
+  
+  return true;
+}
+```
+
+**Usage Example:**
+```xmlui
+<Form>
+  <TextBox 
+    bindTo="username"
+    label="Username"
+    required={true}
+    minLength={3}
+    maxLength={20}
+    requiredInvalidMessage="Username is required"
+    lengthInvalidMessage="Username must be between 3 and 20 characters"
+    pattern="alphanumeric" />
+</Form>
+```
+
+**Wrapping Process:**
+1. Extracts component-specific properties: `bindTo`, `itemIndex`, `type` (for FormItem), `inline`, `verboseValidationFeedback`
+2. Extracts all validation properties and messages:
+   - `required`, `requiredInvalidMessage`
+   - `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`
+   - `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`
+   - `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`
+   - `regex`, `regexInvalidMessage`, `regexInvalidSeverity`
+3. Extracts validation configuration: `customValidationsDebounce`, `validationMode`, `requireLabelMode`
+4. Looks up the `onValidate` event handler (if provided)
+5. Wraps the component in `<ValidationWrapper>` which:
+   - Monitors the component's value from form context
+   - Executes validation rules whenever the value changes
+   - Displays validation feedback (error/warning messages)
+   - Integrates with Form's validation state
+   - Supports custom validation via `onValidate` callback
+
+**Validation Types:**
+
+The validation behavior supports several built-in validation types:
+- **Required validation** - Ensures field is not empty
+- **Length validation** - Validates string length (min/max)
+- **Range validation** - Validates numeric values (min/max)
+- **Pattern validation** - Validates against predefined patterns (email, phone, alphanumeric, etc.)
+- **Regex validation** - Validates against custom regular expressions
+- **Custom validation** - Executes user-defined validation via `onValidate` callback
+
+**Validation Modes:**
+
+The behavior supports different validation modes that control when validation runs:
+- **onChange** - Validates on every value change
+- **onBlur** - Validates when the field loses focus
+- **onSubmit** - Validates only when the form is submitted
+
+**Severity Levels:**
+
+Validation messages can have different severity levels:
+- **error** - Prevents form submission (default)
+- **warning** - Shows warning but allows form submission
+
+**Relationship with Form Binding Behavior:**
+
+The validationBehavior works in tandem with formBindingBehavior. The binding behavior establishes the connection to form state, while the validation behavior adds validation logic on top. Both behaviors check for the same criteria (bindTo + value/setValue APIs) and wrap the component in their respective wrappers, creating a nested structure:
+
+```jsx
+<ValidationWrapper>
+  <FormBindingWrapper>
+    <TextBox />
+  </FormBindingWrapper>
+</ValidationWrapper>
+```
 
 ### Bookmark Behavior
 
-Adds bookmark functionality to any visual component, enabling scroll-to navigation and table of contecore behaviors first, followed by any behaviors contributed by external packages:
+Adds bookmark functionality to any visual component, enabling scroll-to navigation and table of contents integration. When a component has a `bookmark` property, this behavior adds bookmark-related attributes and functionality.
 
+**Attachment Criteria:**
 ```typescript
-// Framework behaviors registered in ComponentRegistry constructor
-this.registerBehavior(labelBehavior);
-this.registerBehavior(animationBehavior);
-this.registerBehavior(tooltipBehavior);
-this.registerBehavior(variantBehavior);
-this.registerBehavior(bookmarkBehavior);
-this.registerBehavior(formBindingBehavior);
-
-// External behaviors registered after
-contributes.behaviors?.forEach((behavior) => {
-  this.registerBehavior(behavior);
-});
+canAttach: (context, node, metadata) => {
+  // Don't attach to non-visual components
+  if (metadata?.nonVisual) {
+    return false;
+  }
+  
+  const bookmark = extractValue(node.props?.bookmark, true);
+  return !!bookmark;
+}
 ```
 
-**Order Significance:**
-
-The registration order matters because behaviors wrap sequentially. The current order produces this nesting for a component with label, animation, and tooltip
-  <Stack bookmark="section1" height="1200px" 
-    <Tooltip>            ← Tooltip behavior
-      <Button />         ← Original component
-    </Tooltip>
-  </Animation>
-</ItemWithLabel>
+**Usage Example:**
+```xmlui
+<Stack bookmark="section1" bookmarkTitle="Introduction" height="1200px" 
+  backgroundColor="blue">
+  <!-- content -->
+</Stack>
 ```
 
-For a component with bookmark behavior, the bookmark attributes are added directly without wrapping:
-
-```
-<ItemWithLabel>          ← Label behavior (if present)
-  <Animation>            ← Animation behavior (if present)
-    <Tooltip>            ← Tooltip behavior (if present)
-      <BookmarkWrapper>  ← Bookmark behavior wrapper (manages functionality)
-        <Stack           ← Original component with added attributes
-          id="myBookmark"
-          data-anchor={true}
-          ref={elementRef}
-        />
-      </BookmarkWrapper>
-    </Tooltip>
-  </Animation>
-</ItemWithLabel>
-```
-
-This order ensures:
-- Tooltips appear on the actual interactive component
-- Animations affect the component and its tooltip together
-- Labels encompass the entire animated, tooltip-enabled component
-- Bookmark attributes are added to the core component element
-- Variant and form binding behaviors wrap appropriately based on component type
-**Transformation Process:**
+**Wrapping Process:**
 
 Unlike other behaviors that wrap components, the bookmark behavior uses `React.cloneElement()` to add bookmark-related attributes directly to the component without introducing extra DOM wrappers:
 
@@ -393,13 +632,17 @@ The behavior approach is cleaner when you want bookmark functionality on an exis
 
 ### Behavior Execution Order
 
-Behaviors are registered in the `ComponentRegistry` during construction. The framework registers its three core behaviors first, followed by any behaviors contributed by external packages:
+Behaviors are registered in the `ComponentRegistry` during construction. The framework registers its seven core behaviors first, followed by any behaviors contributed by external packages:
 
 ```typescript
 // Framework behaviors registered in ComponentRegistry constructor
-this.registerBehavior(tooltipBehavior);
-this.registerBehavior(animationBehavior);
 this.registerBehavior(labelBehavior);
+this.registerBehavior(animationBehavior);
+this.registerBehavior(tooltipBehavior);
+this.registerBehavior(variantBehavior);
+this.registerBehavior(bookmarkBehavior);
+this.registerBehavior(formBindingBehavior);
+this.registerBehavior(validationBehavior);
 
 // External behaviors registered after
 contributes.behaviors?.forEach((behavior) => {
@@ -409,24 +652,47 @@ contributes.behaviors?.forEach((behavior) => {
 
 **Order Significance:**
 
-The registration order matters because behaviors wrap sequentially. The current order (tooltip, animation, label) produces this nesting:
+The registration order matters because behaviors wrap sequentially. The current order (label, animation, tooltip, variant, bookmark, formBinding, validation) produces this nesting for a component with multiple behaviors:
 
 ```
-<ItemWithLabel>          ← Label behavior (outermost)
-  <Animation>            ← Animation behavior (middle)
-    <Tooltip>            ← Tooltip behavior (innermost)
-      <Button />         ← Original component
-    </Tooltip>
-  </Animation>
-</ItemWithLabel>
+<ValidationWrapper>      ← Validation behavior (outermost)
+  <FormBindingWrapper>   ← Form binding behavior
+    <BookmarkWrapper>    ← Bookmark behavior
+      <VariantWrapper>   ← Variant behavior
+        <Tooltip>        ← Tooltip behavior
+          <Animation>    ← Animation behavior
+            <ItemWithLabel> ← Label behavior
+              <TextBox />   ← Original component
+            </ItemWithLabel>
+          </Animation>
+        </Tooltip>
+      </VariantWrapper>
+    </BookmarkWrapper>
+  </FormBindingWrapper>
+</ValidationWrapper>
 ```
 
 This order ensures:
-- Tooltips appear on the actual interactive component
-- Animations affect the component and its tooltip together
-- Labels encompass the entire animated, tooltip-enabled component
+- **Labels** are closest to the core component, wrapping input elements with their labels
+- **Animations** affect the labeled component and its contents together
+- **Tooltips** appear on the fully animated and labeled component
+- **Variant styling** applies to components with tooltips and animations
+- **Bookmark functionality** works at the component level with all visual enhancements applied
+- **Form binding** manages state and value synchronization for form-bound components
+- **Validation** is the outermost layer, monitoring and validating the entire form-bound component
 
-Changing the order would alter this nesting and could break visual consistency or interaction behavior.
+The behaviors are applied in a specific sequence where each layer builds on the previous:
+1. Label behavior wraps the core component (TextBox) with label UI
+2. Animation behavior adds animation capabilities to the labeled component
+3. Tooltip behavior adds hover information to the animated component
+4. Variant behavior applies custom theme styling
+5. Bookmark behavior adds navigation and TOC integration
+6. Form binding behavior connects the component to form state
+7. Validation behavior adds validation logic and feedback
+
+Note that not all behaviors will attach to every component - behaviors only attach when their specific conditions are met (e.g., variant behavior only attaches when a component has a non-standard variant prop, form binding only attaches when bindTo is present with value/setValue APIs).
+
+Changing the order would alter this nesting and could break visual consistency, interaction behavior, or form functionality.
 
 ## Renderer Context in Behaviors
 
@@ -587,7 +853,7 @@ This position ensures behaviors wrap the core component but remain inside decora
 
 ### Behavior Transformation Examples
 
-The following examples demonstrate how the framework-implemented behaviors transform components. These behaviors all use the wrapping approach, where the rendered component is wrapped in additional React components to provide enhanced functionality.
+The following examples demonstrate how the framework-implemented behaviors transform components.
 
 **Single Behavior (Tooltip):**
 
@@ -599,42 +865,30 @@ Produces:
 ```jsx
 <Tooltip text="Save your changes">
   <button className="xmlui-button">Save</button>
-</Tooltip>Label Behavior Check]
-    C --> D{Metadata has label prop?}
-    D -->|Yes| E[Skip - component handles own label]
-    D -->|No| F{Instance has label prop?}
-    F -->|Yes| G[Wrap in ItemWithLabel component]
-    F -->|No| H[Animation Behavior Check]
-    E --> H
-    G --> H
-    H --> I{Has animation prop?}
-    I -->|Yes| J[Wrap in Animation component]
-    I -->|No| K[Tooltip Behavior Check]
-    J --> K
-    K --> L{Has tooltip or tooltipMarkdown prop?}
-    L -->|Yes| M[Wrap in Tooltip component]
-    L -->|No| N[Variant Behavior Check]
-    M --> N
-    N --> O{Has non-standard variant prop?}
-    O -->|Yes| P[Wrap in VariantWrapper component]
-    O -->|No| Q[Bookmark Behavior Check]
-    P --> Q
-    Q --> R{Has bookmark prop AND not nonVisual?}
-    R -->|Yes| S[Wrap in BookmarkWrapper, add attributes via cloneElement]
-    R -->|No| T[Form Binding Behavior Check]
-    S --> T
-    T --> U{Has bindTo prop AND is form-bindable?}
-    U -->|Yes| V[Wrap in FormBindingWrapper component]
-    U -->|No| W[Return transformed node]
-    V --> W
-    Z --> WassName="xmlui-card">
+</Tooltip>
+```
+
+**Multiple Behaviors with Animation:**
+
+```xmlui
+<Card 
+  title="Welcome"
+  animation="fadeIn"
+  tooltip="This is a welcome card" />
+```
+
+Produces:
+```jsx
+<Animation animation={fadeInAnimation}>
+  <Tooltip text="This is a welcome card">
+    <div className="xmlui-card">
       <div className="card-title">Welcome</div>
     </div>
   </Tooltip>
 </Animation>
 ```
 
-**All Three Behaviors:**
+**Label, Animation, and Tooltip:**
 
 ```xmlui
 <TextBox 
@@ -653,6 +907,72 @@ Produces:
   </Animation>
 </ItemWithLabel>
 ```
+
+**Form Binding with Validation:**
+
+```xmlui
+<Form>
+  <TextBox 
+    bindTo="username"
+    label="Username"
+    required={true}
+    minLength={3}
+    tooltip="Choose a unique username" />
+</Form>
+```
+
+Produces:
+```jsx
+<ValidationWrapper bindTo="username" validations={{required: true, minLength: 3}}>
+  <FormBindingWrapper bindTo="username" label="Username">
+    <Tooltip text="Choose a unique username">
+      <input type="text" className="xmlui-textbox" />
+    </Tooltip>
+  </FormBindingWrapper>
+</ValidationWrapper>
+```
+
+**Variant Behavior:**
+
+```xmlui
+<Button label="Premium Action" variant="premium" />
+```
+
+Produces:
+```jsx
+<VariantWrapper variant="premium" componentType="Button">
+  <button className="xmlui-button premium-variant-class">Premium Action</button>
+</VariantWrapper>
+```
+
+**Bookmark Behavior:**
+
+```xmlui
+<Stack 
+  bookmark="section1"
+  bookmarkTitle="Introduction"
+  height="200px"
+  backgroundColor="blue" />
+```
+
+Produces:
+```jsx
+<BookmarkWrapper 
+  bookmarkId="section1"
+  title="Introduction"
+  level={1}
+  omitFromToc={false}>
+  <div 
+    className="xmlui-stack"
+    id="section1"
+    data-anchor={true}
+    ref={elementRef}
+    style={{ height: "200px", backgroundColor: "blue" }}
+  />
+</BookmarkWrapper>
+```
+
+Note: The BookmarkWrapper uses `React.cloneElement()` to add the `id`, `ref`, and `data-anchor` attributes directly to the Stack component without introducing an extra DOM wrapper between the wrapper and the Stack.
 
 ### Metadata-Driven Attachment
 
@@ -681,14 +1001,22 @@ export type ComponentMetadata<
 **Label Behavior Metadata Check:**
 
 ```typescript
-canAttach: (node, metadata) => {
+canAttach: (context, node, metadata) => {
   // Check if component defines its own label handling
   if (metadata?.props?.label) {
     return false;  // Component handles labels itself
   }
   // Check if instance has label prop
-  if (!node.props?.label) {
+  const { extractValue } = context;
+  const label = extractValue(node.props?.label, true);
+  if (!label) {
     return false;  // No label to attach
+  }
+  // Don't attach if formBindingBehavior will handle this component
+  const bindTo = extractValue(node.props?.bindTo, true);
+  const hasValueApiPair = !!metadata?.apis?.value && !!metadata?.apis?.setValue;
+  if (bindTo && hasValueApiPair || node.type === "FormItem") {
+    return false;
   }
   return true;  // Attach label behavior
 }
@@ -734,23 +1062,48 @@ graph TD
 flowchart TD
     A[Component rendered] --> B{Is compound component?}
     B -->|Yes| Z[Skip all behaviors]
-    B -->|No| C[Tooltip Behavior Check]
-    C --> D{Has tooltip or tooltipMarkdown prop?}
-    D -->|Yes| E[Wrap in Tooltip component]
-    D -->|No| F[Animation Behavior Check]
-    E --> F
-    F --> G{Has animation prop?}
-    G -->|Yes| H[Wrap in Animation component]
-    G -->|No| I[Label Behavior Check]
+    B -->|No| C[Label Behavior Check]
+    C --> D{Metadata has label prop?}
+    D -->|Yes| E[Skip - component handles own label]
+    D -->|No| F{Instance has label prop?}
+    F -->|Yes| G{Has bindTo + value/setValue APIs?}
+    G -->|Yes| E
+    G -->|No| H[Wrap in ItemWithLabel]
+    F -->|No| I[Continue to Animation]
+    E --> I
     H --> I
-    I --> J{Metadata has label prop?}
-    J -->|Yes| K[Skip - component handles own label]
-    J -->|No| L{Instance has label prop?}
-    K --> M[Return transformed node]
-    L -->|Yes| N[Wrap in ItemWithLabel component]
-    L -->|No| M
-    N --> M
-    Z --> M
+    
+    I[Animation Behavior Check] --> J{Has animation prop?}
+    J -->|Yes| K[Wrap in Animation]
+    J -->|No| L[Continue to Tooltip]
+    K --> L
+    
+    L[Tooltip Behavior Check] --> M{Has tooltip or tooltipMarkdown?}
+    M -->|Yes| N[Wrap in Tooltip]
+    M -->|No| O[Continue to Variant]
+    N --> O
+    
+    O[Variant Behavior Check] --> P{Has non-standard variant?}
+    P -->|Yes| Q[Wrap in VariantWrapper]
+    P -->|No| R[Continue to Bookmark]
+    Q --> R
+    
+    R[Bookmark Behavior Check] --> S{Has bookmark AND not nonVisual?}
+    S -->|Yes| T[Wrap in BookmarkWrapper]
+    S -->|No| U[Continue to Form Binding]
+    T --> U
+    
+    U[Form Binding Behavior Check] --> V{Has bindTo AND value/setValue APIs?}
+    V -->|Yes| W[Wrap in FormBindingWrapper]
+    V -->|No| X[Continue to Validation]
+    W --> X
+    
+    X[Validation Behavior Check] --> Y1{Is FormItem OR has bindTo+APIs?}
+    Y1 -->|Yes| Y2[Wrap in ValidationWrapper]
+    Y1 -->|No| Y3[Return transformed node]
+    Y2 --> Y3
+    
+    Z --> Y3
 ```
 
 ## Summary
