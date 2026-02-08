@@ -298,6 +298,129 @@ export function isContainerLike(node: ComponentDef) {
 <Stack direction="horizontal" />
 ```
 
+### Global Variables
+
+XMLUI supports application-wide global variables and functions through the **Globals.xs** file. This feature enables state sharing across all components without prop drilling.
+
+#### File Structure
+
+Place a `Globals.xs` file in your application root (same directory as `Main.xmlui`):
+
+```
+my-app/
+  ├── Main.xmlui
+  ├── Globals.xs          # Application-wide globals
+  ├── components/
+  └── themes/
+```
+
+**Globals.xs syntax:**
+```javascript
+// Variables
+var count = 0;
+var appTitle = "My Application";
+var config = { apiUrl: "/api", timeout: 5000 };
+
+// Functions
+function incrementCount() {
+  count++;
+}
+
+function getCount() {
+  return count;
+}
+
+function resetConfig() {
+  config = { apiUrl: "/api", timeout: 5000 };
+}
+```
+
+#### Loading Mechanisms
+
+**Built Mode (Pre-compiled):**
+- The `vite-xmlui-plugin` compiles `Globals.xs` during build time
+- Globals are stored in `runtime["/src/Globals.xs"]` 
+- Extracted during StandaloneApp initialization via `extractGlobals()` function
+- No runtime fetching required
+
+**Buildless Mode (Runtime):**
+- StandaloneApp fetches `Globals.xs` using `fetchWithoutCache(GLOBALS_FILE)`
+- Parsed via `parseCodeBehindResponse()` 
+- Variables and functions extracted via `extractGlobals()`
+- Loaded alongside Main.xmlui during app bootstrap
+
+**Code extraction (from StandaloneApp.tsx):**
+```typescript
+const extractGlobals = (prebuiltGlobals: Record<string, any>): Record<string, any> => {
+  const extractedVars: Record<string, any> = {};
+  for (const [key, value] of Object.entries(prebuiltGlobals)) {
+    // Evaluate parsed expressions or use literal values
+    if (typeof value === "object" && value !== null && 
+        value.__PARSED__ && value.tree) {
+      const evaluatedValue = evalBinding(value.tree, evalContext);
+      extractedVars[key] = evaluatedValue;
+    } else {
+      extractedVars[key] = value;
+    }
+  }
+  return extractedVars;
+};
+```
+
+#### Usage in Components
+
+Global variables and functions are accessible in any component without imports:
+
+```xml
+<!-- Main.xmlui -->
+<App>
+  <Text>Count: {count}</Text>
+  <Text>Calculated: {getCount() * 2}</Text>
+  <Button label="Increment" onClick="count++" />
+  <Button label="Increment (function)" onClick="incrementCount()" />
+  <MyCounter />
+</App>
+
+<!-- components/MyCounter.xmlui -->
+<Component name="MyCounter">
+  <Stack>
+    <Text>Counter component sees: {count}</Text>
+    <Button label="Add 5" onClick="count += 5" />
+  </Stack>
+</Component>
+```
+
+**Key characteristics:**
+- All components in the application share the same global state
+- Changes to global variables trigger re-renders across all components using them
+- Global functions can access and modify global variables
+- No prop drilling required
+
+#### Variable Shadowing
+
+Local variables can shadow global variables with the same name:
+
+```xml
+<App>
+  <!-- Uses global count -->
+  <Text testId="global">Global: {count}</Text>
+  <Button label="Global: {count}" onClick="count++" />
+  
+  <!-- Local count shadows global -->
+  <Button 
+    var.count="{0}"
+    testId="local"
+    label="Local: {count}" 
+    onClick="count++" />
+</App>
+```
+
+In this example:
+- The first Text and Button access the global `count`
+- The second Button defines `var.count="{0}"`, creating a local variable that shadows the global
+- Clicking the first button updates global count (affects global Text)
+- Clicking the second button updates only its local count (isolated state)
+
 ## Container Architecture
 
 ### Container Hierarchy
@@ -342,9 +465,10 @@ The `StateContainer` assembles the complete state from multiple layers:
 
 1. **State from Parent**: Inherited state from parent containers (with optional scoping via `uses`)
 2. **Component APIs**: Exposed component methods and properties  
-3. **Local Variables**: Variables declared in the current component
-4. **Context Variables**: Variables provided to child components
-5. **Routing Parameters**: URL parameters, query strings, and navigation context
+3. **Global Variables**: Application-wide variables from Globals.xs (lower priority, can be shadowed)
+4. **Local Variables**: Variables declared in the current component (highest priority, can shadow globals)
+5. **Context Variables**: Variables provided to child components
+6. **Routing Parameters**: URL parameters, query strings, and navigation context
 
 ### State Flow Implementation
 
@@ -356,19 +480,32 @@ const localVarsStateContext = useCombinedState(stateFromOutside, componentStateW
 const resolvedLocalVars = useVars(varDefinitions, functionDeps, localVarsStateContext, memoedVars);
 const mergedWithVars = useMergedState(resolvedLocalVars, componentStateWithApis);
 
+// Merge parent's globalVars with current node's globalVars
+// Current node's globalVars take precedence (usually only root defines them)
+const currentGlobalVars = useMemo(() => {
+  return {
+    ...(parentGlobalVars || {}),
+    ...(node.globalVars || {}),
+  };
+}, [parentGlobalVars, node.globalVars]);
+
 // State priority order (later overrides earlier):
 // 1. stateFromOutside (parent state - lowest priority)
 // 2. node.contextVars (context variables like $item)
-// 3. mergedWithVars (local vars + component APIs - highest priority)
+// 3. currentGlobalVars (global variables from Globals.xs)
+// 4. mergedWithVars (local vars + component APIs - highest priority)
 const combinedState = useCombinedState(
-  stateFromOutside,      // Parent state (lowest priority) - allows shadowing
+  stateFromOutside,      // Parent state (lowest priority)
   node.contextVars,      // Context vars
-  mergedWithVars,        // Local vars and component APIs (highest priority) - enables shadowing
+  currentGlobalVars,     // Global variables (can be shadowed by local vars)
+  mergedWithVars,        // Local vars and component APIs (highest priority)
   routingParams          // Routing parameters
 );
 ```
 
-**State Shadowing**: The priority order allows local variables to shadow (override) parent state variables with the same name. This enables child containers to define their own versions of variables without being forced to use the parent's state, supporting better component encapsulation.
+**State Shadowing**: The priority order allows local variables to shadow (override) both parent state variables and global variables with the same name. This enables containers to define their own versions of variables without being forced to use the parent's or global state, supporting better component encapsulation.
+
+**Global Variable Flow**: Global variables are defined once in Globals.xs (stored in the root container's `globalVars` property) and flow down through the container hierarchy via `parentGlobalVars`. Each container merges its parent's global vars with its own (though typically only the root container defines them), making them accessible throughout the entire application.
 
 ### Variable Resolution and Memoization
 
@@ -521,10 +658,49 @@ export function buildProxy(
 When a proxied state change occurs:
 
 1. **Detection**: Proxy intercepts the change and calls the callback
-2. **Path Analysis**: Determines if the change belongs to current container or parent
+2. **Path Analysis**: Determines if the change belongs to current container, global state, or parent
 3. **Dispatch**: Sends `STATE_PART_CHANGED` action to appropriate container
 4. **Reduction**: Immer-based reducer applies the change immutably
 5. **Re-render**: React re-renders affected components
+
+### Global Variable Change Handling
+
+Global variable changes are handled specially in the `statePartChanged` callback:
+
+```typescript
+// From StateContainer.tsx
+const statePartChanged: StatePartChangedFn = useCallback(
+  (pathArray, newValue, target, action) => {
+    const key = pathArray[0];
+    const isGlobalVar = key in currentGlobalVars;
+    const isRoot = node.uid === 'root';
+    
+    if (isGlobalVar) {
+      if (isRoot) {
+        // Root container handles global var updates itself
+        dispatch({
+          type: ContainerActionKind.STATE_PART_CHANGED,
+          payload: { path: pathArray, value: newValue, target, actionType: action, localVars: resolvedLocalVars },
+        });
+      } else {
+        // Non-root containers bubble globals to parent
+        parentStatePartChanged(pathArray, newValue, target, action);
+      }
+    } else if (key in componentStateRef.current || key in resolvedLocalVars) {
+      // Local state change
+      dispatch({ /* ... */ });
+    } else {
+      // Not global, not local - bubble up if allowed by uses
+      if (!node.uses || node.uses.includes(key)) {
+        parentStatePartChanged(pathArray, newValue, target, action);
+      }
+    }
+  },
+  [resolvedLocalVars, currentGlobalVars, node.uses, node.uid, parentStatePartChanged],
+);
+```
+
+**Key insight**: Changes to global variables always bubble up to the root container, ensuring all components observing that global variable receive the update. This maintains consistency across the entire application while preserving the container hierarchy for local state.
 
 ## Component Identification and APIs
 
