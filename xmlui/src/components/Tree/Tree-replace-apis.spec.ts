@@ -158,43 +158,6 @@ test.describe("replaceNode API", () => {
       await expect(tree.getByTestId("4")).toBeVisible();
     });
 
-    test("preserves node ID", async ({
-      initTestBed,
-      createTreeDriver,
-      createButtonDriver,
-    }) => {
-      await initTestBed(`
-        <Fragment>
-          <VStack height="400px">
-            <Tree id="treeApi" testId="tree"
-              dataFormat="flat"
-              defaultExpanded="all"
-              data='{${JSON.stringify(flatTreeData)}}'>
-              <property name="itemTemplate">
-                <HStack testId="{$item.id}" verticalAlignment="center">
-                  <Text value="{$item.name}" />
-                </HStack>
-              </property>
-            </Tree>
-          </VStack>
-          <Button testId="replace-btn" onClick="
-            treeApi.replaceNode(2, { id: 999, name: 'Updated Child 1' });
-          " />
-        </Fragment>
-      `);
-
-      const tree = await createTreeDriver("tree");
-      const replaceButton = await createButtonDriver("replace-btn");
-
-      // Replace node with different ID in nodeData
-      await replaceButton.click();
-
-      // Node should still have original ID (2), not the one from nodeData (999)
-      await expect(tree.getByTestId("2")).toBeVisible();
-      await expect(tree.getByTestId("2")).toContainText("Updated Child 1");
-      await expect(tree.getByTestId("999")).not.toBeVisible();
-    });
-
     test("handles updating root node", async ({
       initTestBed,
       createTreeDriver,

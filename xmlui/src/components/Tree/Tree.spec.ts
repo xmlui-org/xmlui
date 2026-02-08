@@ -4380,6 +4380,329 @@ test.describe("API - getVisibleItems", () => {
 });
 
 // =============================================================================
+// API METHOD TESTS - replaceNode
+// =============================================================================
+
+test.describe("API - replaceNode", () => {
+  test("replaces node properties without changing ID in flat format", async ({
+    initTestBed,
+    createButtonDriver,
+    page,
+  }) => {
+    const testData = [
+      { id: 1, name: "Root", parentId: null },
+      { id: 2, name: "Child 1", parentId: 1 },
+      { id: 3, name: "Child 2", parentId: 1 },
+    ];
+
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <VStack height="400px">
+          <Tree 
+            id="treeApi" 
+            testId="tree" 
+            dataFormat="flat" 
+            defaultExpanded="all"
+            data='{${JSON.stringify(testData)}}'>
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
+        <Button testId="replace-btn" label="Replace" onClick="
+          treeApi.replaceNode(2, { name: 'Modified Child' });
+          testState = 'replaced';
+        " />
+      </Fragment>
+    `);
+
+    const replaceButton = await createButtonDriver("replace-btn");
+    await replaceButton.click();
+
+    await expect.poll(testStateDriver.testState).toBe("replaced");
+    
+    // Verify the node name changed but ID stayed the same
+    const item2 = page.getByTestId("2");
+    await expect(item2).toBeVisible();
+    await expect(item2).toContainText("Modified Child");
+  });
+
+  test("replaces node ID in flat format and updates children parent references", async ({
+    initTestBed,
+    createButtonDriver,
+    page,
+  }) => {
+    const testData = [
+      { id: "folder1", name: "Folder 1", parentId: null },
+      { id: "folder1/file1", name: "File 1", parentId: "folder1" },
+      { id: "folder1/file2", name: "File 2", parentId: "folder1" },
+    ];
+
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <VStack height="400px">
+          <Tree 
+            id="treeApi" 
+            testId="tree" 
+            dataFormat="flat" 
+            defaultExpanded="all"
+            data='{${JSON.stringify(testData)}}'>
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
+        <Button testId="replace-btn" label="Replace" onClick="
+          treeApi.replaceNode('folder1', { id: 'renamedFolder', name: 'Renamed Folder' });
+          testState = 'replaced';
+        " />
+      </Fragment>
+    `);
+
+    const replaceButton = await createButtonDriver("replace-btn");
+    await replaceButton.click();
+
+    await expect.poll(testStateDriver.testState).toBe("replaced");
+    
+    // Verify old ID no longer exists
+    const oldItem = page.getByTestId("folder1");
+    await expect(oldItem).not.toBeVisible();
+    
+    // Verify new ID exists with new name
+    const newItem = page.getByTestId("renamedFolder");
+    await expect(newItem).toBeVisible();
+    await expect(newItem).toContainText("Renamed Folder");
+    
+    // Verify children are still visible (expansion state was preserved)
+    // The children still have their original IDs, only their parentId changed
+    await expect(page.getByTestId("folder1/file1")).toBeVisible();
+    await expect(page.getByTestId("folder1/file2")).toBeVisible();
+  });
+
+  test("replaces node properties without changing ID in hierarchy format", async ({
+    initTestBed,
+    createButtonDriver,
+    page,
+  }) => {
+    const testData = [
+      {
+        id: 1,
+        name: "Root",
+        children: [
+          { id: 2, name: "Child 1" },
+          { id: 3, name: "Child 2" },
+        ],
+      },
+    ];
+
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <VStack height="400px">
+          <Tree 
+            id="treeApi" 
+            testId="tree" 
+            dataFormat="hierarchy" 
+            defaultExpanded="all"
+            data='{${JSON.stringify(testData)}}'>
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
+        <Button testId="replace-btn" label="Replace" onClick="
+          treeApi.replaceNode(2, { name: 'Modified Child' });
+          testState = 'replaced';
+        " />
+      </Fragment>
+    `);
+
+    const replaceButton = await createButtonDriver("replace-btn");
+    await replaceButton.click();
+
+    await expect.poll(testStateDriver.testState).toBe("replaced");
+    
+    // Verify the node name changed but ID stayed the same
+    const item2 = page.getByTestId("2");
+    await expect(item2).toBeVisible();
+    await expect(item2).toContainText("Modified Child");
+  });
+
+  test("replaces node ID in hierarchy format", async ({
+    initTestBed,
+    createButtonDriver,
+    page,
+  }) => {
+    const testData = [
+      {
+        id: "folder1",
+        name: "Folder 1",
+        children: [
+          { id: "folder1/file1", name: "File 1" },
+          { id: "folder1/file2", name: "File 2" },
+        ],
+      },
+    ];
+
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <VStack height="400px">
+          <Tree 
+            id="treeApi" 
+            testId="tree" 
+            dataFormat="hierarchy" 
+            defaultExpanded="all"
+            data='{${JSON.stringify(testData)}}'>
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
+        <Button testId="replace-btn" label="Replace" onClick="
+          treeApi.replaceNode('folder1', { id: 'renamedFolder', name: 'Renamed Folder' });
+          testState = 'replaced';
+        " />
+      </Fragment>
+    `);
+
+    const replaceButton = await createButtonDriver("replace-btn");
+    await replaceButton.click();
+
+    await expect.poll(testStateDriver.testState).toBe("replaced");
+    
+    // Verify old ID no longer exists
+    const oldItem = page.getByTestId("folder1");
+    await expect(oldItem).not.toBeVisible();
+    
+    // Verify new ID exists with new name
+    const newItem = page.getByTestId("renamedFolder");
+    await expect(newItem).toBeVisible();
+    await expect(newItem).toContainText("Renamed Folder");
+    
+    // Verify children are still visible (hierarchy format doesn't use parent references)
+    await expect(page.getByTestId("folder1/file1")).toBeVisible();
+    await expect(page.getByTestId("folder1/file2")).toBeVisible();
+  });
+
+  test("replaceNode preserves children when not specified in nodeData", async ({
+    initTestBed,
+    createButtonDriver,
+    page,
+  }) => {
+    const testData = [
+      {
+        id: 1,
+        name: "Root",
+        children: [
+          { id: 2, name: "Child 1" },
+          { id: 3, name: "Child 2" },
+        ],
+      },
+    ];
+
+    await initTestBed(`
+      <Fragment>
+        <VStack height="400px">
+          <Tree 
+            id="treeApi" 
+            testId="tree" 
+            dataFormat="hierarchy" 
+            defaultExpanded="all"
+            data='{${JSON.stringify(testData)}}'>
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
+        <Button testId="replace-btn" label="Replace" onClick="
+          treeApi.replaceNode(1, { name: 'Modified Root' });
+        " />
+      </Fragment>
+    `);
+
+    const replaceButton = await createButtonDriver("replace-btn");
+    await replaceButton.click();
+
+    // Wait for update
+    await page.waitForTimeout(100);
+    
+    // Verify root name changed
+    const root = page.getByTestId("1");
+    await expect(root).toContainText("Modified Root");
+    
+    // Verify children still exist
+    await expect(page.getByTestId("2")).toBeVisible();
+    await expect(page.getByTestId("3")).toBeVisible();
+  });
+
+  test("replaceNode with complex ID change scenario in flat format", async ({
+    initTestBed,
+    createButtonDriver,
+    page,
+  }) => {
+    const testData = [
+      { id: "/root", name: "Root", parentId: null },
+      { id: "/root/folder1", name: "Folder 1", parentId: "/root" },
+      { id: "/root/folder1/file1", name: "File 1", parentId: "/root/folder1" },
+      { id: "/root/folder2", name: "Folder 2", parentId: "/root" },
+    ];
+
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <VStack height="400px">
+          <Tree 
+            id="treeApi" 
+            testId="tree" 
+            dataFormat="flat" 
+            defaultExpanded="all"
+            data='{${JSON.stringify(testData)}}'>
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
+        <Button testId="replace-btn" label="Replace" onClick="
+          treeApi.replaceNode('/root/folder1', { 
+            id: '/root/renamedFolder', 
+            name: 'Renamed Folder' 
+          });
+          testState = 'replaced';
+        " />
+      </Fragment>
+    `);
+
+    const replaceButton = await createButtonDriver("replace-btn");
+    await replaceButton.click();
+
+    await expect.poll(testStateDriver.testState).toBe("replaced");
+    
+    // Verify the renamed folder exists with correct name
+    await expect(page.getByTestId("/root/renamedFolder")).toBeVisible();
+    await expect(page.getByTestId("/root/renamedFolder")).toContainText("Renamed Folder");
+    
+    // Verify old ID doesn't exist
+    await expect(page.getByTestId("/root/folder1")).not.toBeVisible();
+    
+    // Verify child is still visible (expansion state preserved, parentId updated)
+    await expect(page.getByTestId("/root/folder1/file1")).toBeVisible();
+    
+    // Verify other folder was not affected and is still visible
+    await expect(page.getByTestId("/root/folder2")).toBeVisible();
+  });
+});
+
+// =============================================================================
 // AUTO-LOAD FEATURE TESTS - STEP 1: EXPANDED TIMESTAMP TRACKING
 // =============================================================================
 

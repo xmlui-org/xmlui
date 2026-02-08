@@ -1950,16 +1950,26 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         const fieldChildren = fieldConfig.childrenField || "children";
         const fieldParent = fieldConfig.parentField || "parentId";
 
+        // Check if we're changing the node's ID
+        const newId = nodeData[fieldId];
+        const isIdChanging = newId !== undefined && String(newId) !== nodeIdStr;
+
         // Helper function to replace node properties in flat format
         const replaceNodeInFlat = (data: any[]): any[] => {
           return data.map((item) => {
             if (String(item[fieldId]) === nodeIdStr) {
               // Merge properties: nodeData overrides existing properties
-              // Only replace children if nodeData explicitly specifies them
+              // Allow ID to be updated if provided in nodeData
               return {
                 ...item,
                 ...nodeData,
-                [fieldId]: nodeId, // Preserve the node ID
+              };
+            }
+            // If ID is changing, update children's parent references
+            if (isIdChanging && String(item[fieldParent]) === nodeIdStr) {
+              return {
+                ...item,
+                [fieldParent]: newId,
               };
             }
             return item;
@@ -1971,11 +1981,10 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           return nodes.map((node: any) => {
             if (String(node[fieldId]) === nodeIdStr) {
               // Merge properties: nodeData overrides existing properties
-              // Only replace children if nodeData explicitly specifies them
+              // Allow ID to be updated if provided in nodeData
               const updatedNode = {
                 ...node,
                 ...nodeData,
-                [fieldId]: nodeId, // Preserve the node ID
               };
 
               // If nodeData doesn't specify children, preserve existing children
@@ -2011,6 +2020,19 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
           return currentData;
         });
+
+        // If the ID is changing, also update the expansion state
+        if (isIdChanging) {
+          setExpandedIds((prev) => {
+            // Check if the old ID was expanded
+            const wasExpanded = prev.some((id) => String(id) === nodeIdStr);
+            if (wasExpanded) {
+              // Replace old ID with new ID in the expansion list
+              return prev.map((id) => (String(id) === nodeIdStr ? newId : id));
+            }
+            return prev;
+          });
+        }
       },
 
       replaceChildren: (nodeId: string | number, newChildren: any[]) => {
