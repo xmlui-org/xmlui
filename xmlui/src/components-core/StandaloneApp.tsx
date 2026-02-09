@@ -58,6 +58,7 @@ import type {
 import { evalBinding } from "./script-runner/eval-tree-sync";
 import type { BindingTreeEvaluationContext } from "./script-runner/BindingTreeEvaluationContext";
 import { MetadataProvider } from "../language-server/services/common/metadata-utils";
+import { extractParam } from "./utils/extractParam";
 import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 
 const MAIN_FILE = "Main." + componentFileExtension;
@@ -572,7 +573,7 @@ function resolveRuntime(runtime: Record<string, any>): {
     },
     functions: entryPointCodeBehind?.functions,
     scriptError: entryPointCodeBehind?.moduleErrors,
-  } as ComponentLike;
+  } as ComponentDef;
 
   // --- Collect the component definition we pass to the rendering engine
   let components: Array<CompoundComponentDef> = [];

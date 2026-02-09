@@ -198,6 +198,7 @@ export type TestBedDescription = Omit<
   components?: string[];
   appGlobals?: Record<string, any>;
   globalXs?: string;
+  noFragmentWrapper?: boolean;
 };
 
 export const test = baseTest.extend<TestDriverExtenderProps>({
@@ -218,7 +219,9 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
         "icon.bell": "/resources/bell.svg",
       };
       // --- Initialize XMLUI App
-      const { errors, component } = xmlUiMarkupToComponent(`
+      const markup = description?.noFragmentWrapper
+        ? source
+        : `
           <Fragment var.testState="{null}">
             ${source}
             <Stack width="0" height="0">
@@ -227,7 +230,9 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
                 value="{ typeof testState === 'undefined' ? 'undefined' : JSON.stringify(testState) }"/>
             </Stack>
           </Fragment>
-        `);
+        `;
+      
+      const { errors, component } = xmlUiMarkupToComponent(markup);
 
       if (errors.length > 0) {
         throw { errors };
@@ -295,8 +300,21 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
         }
       }
 
+      // Add entryPoint to runtime so resolveRuntime can find it
+      if (description?.noFragmentWrapper && entryPoint) {
+        runtime = runtime || {};
+        runtime["/src/Main.xmlui"] = {
+          default: {
+            component: entryPoint,
+            src: source,
+          },
+        };
+      }
+
       if (source !== "" && entryPoint.children) {
-        const sourceBaseComponent = entryPoint.children[0];
+        const sourceBaseComponent = description?.noFragmentWrapper
+          ? entryPoint // When no wrapper, entryPoint is the actual source component
+          : entryPoint.children[0]; // With wrapper, it's inside Fragment
         const isCompoundComponentRoot =
           components &&
           components?.length > 0 &&

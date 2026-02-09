@@ -519,12 +519,38 @@ export const StateContainer = memo(
 
     // Merge parent's globalVars with current node's globalVars
     // Current node's globalVars take precedence (usually only root defines them)
+    // Evaluate any string expressions (binding expressions) in globalVars
     const currentGlobalVars = useMemo(() => {
+      // Evaluate parentGlobalVars if they contain string expressions
+      const evaluatedParentGlobals: Record<string, any> = {};
+      if (parentGlobalVars) {
+        for (const [key, value] of Object.entries(parentGlobalVars)) {
+          if (typeof value === "string") {
+            evaluatedParentGlobals[key] = extractParam(EMPTY_OBJECT, value, appContext, false);
+          } else {
+            evaluatedParentGlobals[key] = value;
+          }
+        }
+      }
+      
+      // Evaluate node.globalVars if they contain string expressions
+      const evaluatedNodeGlobals: Record<string, any> = {};
+      if (node.globalVars) {
+        for (const [key, value] of Object.entries(node.globalVars)) {
+          if (typeof value === "string") {
+            evaluatedNodeGlobals[key] = extractParam(EMPTY_OBJECT, value, appContext, false);
+          } else {
+            evaluatedNodeGlobals[key] = value;
+          }
+        }
+      }
+      
+      // Merge with node globals taking precedence
       return {
-        ...(parentGlobalVars || {}),
-        ...(node.globalVars || {}),
+        ...evaluatedParentGlobals,
+        ...evaluatedNodeGlobals,
       };
-    }, [parentGlobalVars, node.globalVars]);
+    }, [parentGlobalVars, node.globalVars, appContext]);
 
     const combinedState = useCombinedState(
       stateFromOutside,
