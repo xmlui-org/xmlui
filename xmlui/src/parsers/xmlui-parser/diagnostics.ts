@@ -208,6 +208,7 @@ export const ErrCodesTransform = {
   nsValueIncorrect: "T028",
   nsSchemeIncorrect: "T029",
   scriptParse: "T030",
+  globalNotAllowedInNested: "T031",
   ...ErrorCodes,
 } as const;
 
@@ -295,6 +296,10 @@ export const DIAGS_TRANSFORM = {
   cannotMixFieldItem: {
     code: ErrCodesTransform.cannotMixFieldItem,
     message: "Cannot mix 'field' and 'item' nodes within an element.",
+  },
+  globalNotAllowedInNested: {
+    code: ErrCodesTransform.globalNotAllowedInNested,
+    message: "Global variables can only be declared in the root element or compound component definitions, not in nested regular components.",
   },
   cantHaveNameAttr: function (nodeName: string) {
     return {

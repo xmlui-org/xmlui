@@ -43,6 +43,7 @@ const HelperNode = {
   template: "template",
   event: "event",
   variable: "variable",
+  global: "global",
   loaders: "loaders",
   uses: "uses",
   method: "method",
@@ -169,11 +170,14 @@ export function nodeToComponentDef(
 
     const nonVarHelperNodes: Node[] = [];
     const nestedVars: Node[] = [];
+    const nestedGlobals: Node[] = [];
     for (let child of children) {
       if (child.kind === SyntaxKind.ElementNode) {
         const childName = getComponentName(child, getText);
         if (childName === HelperNode.variable) {
           nestedVars.push(child);
+        } else if (childName === HelperNode.global) {
+          nestedGlobals.push(child);
         } else if (childName in HelperNode) {
           nonVarHelperNodes.push(child);
         }
@@ -182,8 +186,8 @@ export function nodeToComponentDef(
 
     // --- Should we wrap with a Fragment?
     let element: Node;
-    if (nestedComponents.length > 1 || nestedVars.length > 0) {
-      element = wrapWithFragment([...nestedVars, ...nestedComponents]);
+    if (nestedComponents.length > 1 || nestedVars.length > 0 || nestedGlobals.length > 0) {
+      element = wrapWithFragment([...nestedVars, ...nestedGlobals, ...nestedComponents]);
     } else {
       element = nestedComponents[0];
     }
@@ -350,6 +354,21 @@ export function nodeToComponentDef(
               if (!isComponent(comp)) return;
               comp.vars ??= {};
               comp.vars[name] = value;
+            },
+          );
+          return;
+
+        case HelperNode.global:
+          collectElementHelper(
+            usesStack,
+            comp,
+            child,
+
+            (name) => (isComponent(comp) ? comp.globalVars?.[name] : undefined),
+            (name, value) => {
+              if (!isComponent(comp)) return;
+              comp.globalVars ??= {};
+              comp.globalVars[name] = value;
             },
           );
           return;
