@@ -845,9 +845,10 @@ function useStandalone(
         // --- This ensures test components' globalVars are included
         const parsedGlobals: Record<string, any> = {};
         
-        // Collect from root element
-        if (appDef.entryPoint?.globalVars) {
-          Object.assign(parsedGlobals, appDef.entryPoint.globalVars);
+        // Collect from root element (cast as ComponentDef since entryPoint is always a component definition)
+        const entryPointDef = appDef.entryPoint as ComponentDef;
+        if (entryPointDef?.globalVars) {
+          Object.assign(parsedGlobals, entryPointDef.globalVars);
         }
         
         // Collect from compound components
