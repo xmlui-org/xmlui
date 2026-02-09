@@ -841,11 +841,31 @@ function useStandalone(
         setProjectCompilation(resolvedRuntime.projectCompilation);
         setStandaloneApp(appDef);
         
-        // --- Merge parsed globalVars with Globals.xs globals
+        // --- Collect globalVars from the MERGED app definition (not resolved runtime)
+        // --- This ensures test components' globalVars are included
+        const parsedGlobals: Record<string, any> = {};
+        
+        // Collect from root element
+        if (appDef.entryPoint?.globalVars) {
+          Object.assign(parsedGlobals, appDef.entryPoint.globalVars);
+        }
+        
+        // Collect from compound components
+        appDef.components?.forEach((compound) => {
+          if (compound?.component?.globalVars) {
+            Object.keys(compound.component.globalVars).forEach((key) => {
+              if (!(key in parsedGlobals)) {
+                parsedGlobals[key] = compound.component.globalVars[key];
+              }
+            });
+          }
+        });
+        
+        // --- Merge parsed globalVars with Globals.xs globals (Globals.xs takes precedence)
         const globalsXs = runtime?.[GLOBALS_BUILT_RESOURCE];
         const globalsXsVars = extractGlobals({ ...(globalsXs?.vars || {}), ...(globalsXs?.functions || {}) });
         const mergedGlobalVars = {
-          ...(resolvedRuntime.globalVars || {}),
+          ...parsedGlobals,
           ...globalsXsVars,
         };
         setGlobalVars(mergedGlobalVars);

@@ -15,7 +15,7 @@ test.describe("Global Tag - Basic Functionality", () => {
     await initTestBed(
       `
       <App>
-        <global name="count" value="{42}"/>
+        <global name="count" value="{6*7}"/>
         <Text testId="countText">Count: {count}</Text>
       </App>
     `,
@@ -31,7 +31,7 @@ test.describe("Global Tag - Basic Functionality", () => {
   }) => {
     await initTestBed(
       `
-      <App global.count="{42}">
+      <App global.count="{6*7}">
         <Text testId="countText">Count: {count}</Text>
       </App>
     `,
