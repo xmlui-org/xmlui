@@ -125,7 +125,6 @@ function StandaloneApp({
     runtime,
     extensionManager,
   );
-
   usePrintVersionNumber(standaloneApp);
 
   // --- Display build errors from the vite-xmlui-plugin if any exist
@@ -795,7 +794,8 @@ function useStandalone(
   const [globalVars, setGlobalVars] = useState<Record<string, any>>(() => {
     // Get the vars in Globals.xs module directly from runtime
     const globalsXs = runtime?.[GLOBALS_BUILT_RESOURCE];
-    return extractGlobals({ ...(globalsXs?.vars || {}), ...(globalsXs?.functions || {}) });
+    const extracted = extractGlobals({ ...(globalsXs?.vars || {}), ...(globalsXs?.functions || {}) });
+    return extracted;
   });
 
   useIsomorphicLayoutEffect(() => {
