@@ -48,9 +48,7 @@
                             {globalThis.getBlurb(appGlobals.prefetchedContent['/blog/' + $item.slug + '.md'])}
                         </Text>
                         <HStack horizontalAlignment="start" marginTop="auto">
-                        <Link to="/blog/{$item.slug}">
                             Read more →
-                            </Link>
                         </HStack>
                     </VStack>
                 </Link>
