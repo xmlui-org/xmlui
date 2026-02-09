@@ -579,6 +579,38 @@ export function AppContent({
       // Also capture the target element's own testId if it has one (different from ancestor)
       const targetTestId = target?.getAttribute?.("data-testid") || undefined;
 
+      // Capture ARIA role and accessible name for Playwright selector generation
+      let ariaRole: string | undefined;
+      let ariaName: string | undefined;
+      if (target) {
+        // Explicit role attribute takes precedence
+        ariaRole = target.getAttribute?.("role") || undefined;
+        // Infer implicit ARIA role from HTML tag
+        if (!ariaRole) {
+          const tag = target.tagName?.toLowerCase();
+          if (tag === "button") ariaRole = "button";
+          else if (tag === "a" && target.hasAttribute?.("href")) ariaRole = "link";
+          else if (tag === "input") {
+            const type = (target as HTMLInputElement).type;
+            if (type === "checkbox") ariaRole = "checkbox";
+            else if (type === "radio") ariaRole = "radio";
+            else ariaRole = "textbox";
+          }
+          else if (tag === "select") ariaRole = "combobox";
+          else if (tag === "textarea") ariaRole = "textbox";
+        }
+        // Accessible name: aria-label > aria-labelledby > text content (for buttons/links)
+        ariaName = target.getAttribute?.("aria-label") || undefined;
+        if (!ariaName && target.getAttribute?.("aria-labelledby")) {
+          const labelEl = document.getElementById(target.getAttribute("aria-labelledby")!);
+          ariaName = labelEl?.textContent?.trim() || undefined;
+        }
+        if (!ariaName && (ariaRole === "button" || ariaRole === "link")) {
+          const btnText = target.textContent?.trim();
+          if (btnText && btnText.length < 50) ariaName = btnText;
+        }
+      }
+
       const detail: Record<string, any> = {
         componentId,
         inspectId,
@@ -587,6 +619,8 @@ export function AppContent({
         testIdsInPath: testIdsInPath.length > 1 ? testIdsInPath : undefined,
         selectorPath,
         text,
+        ariaRole,
+        ariaName,
       };
       if (event instanceof MouseEvent) {
         detail.button = event.button;
