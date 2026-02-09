@@ -123,7 +123,7 @@ class Server {
 
   _createRequestHandler() {
     return (req, res) => {
-      const parsedUrl = new URL(req.url);
+      const parsedUrl = new URL(req.url, "http://localhost");
       let pathname = parsedUrl.pathname;
 
       // Normalize pathname (remove leading slash, ensure it doesn't start with ..)
