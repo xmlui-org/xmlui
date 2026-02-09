@@ -29,21 +29,26 @@ const moduleScriptExtension = new RegExp(`.${moduleFileExtension}$`);
  * Transform XMLUI files to JS objects.
  */
 export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plugin {
-  let itemIndex = 0;
-  
+  let projectRoot = '';
+
   // Helper to normalize Windows paths to use forward slashes
   const normalizePath = (p: string) => p.replace(/\\/g, '/');
-  
+
   return {
     name: "vite:transform-xmlui",
+
+    configResolved(config) {
+      projectRoot = normalizePath(config.root);
+    },
 
     async transform(code: string, id: string, options) {
       // Normalize path separators for cross-platform consistency
       const normalizedId = normalizePath(id);
-      
+
       if (xmluiExtension.test(id)) {
-       
-        const fileId = "" + itemIndex++;
+
+        // Use path relative to project root as fileId — matches glob keys used by _xsSourceFiles
+        const fileId = projectRoot ? normalizedId.slice(projectRoot.length) : normalizedId;
 
         // --- Extract script content from XMLUI markup using ScriptExtractor
         const scriptResult = ScriptExtractor.extractInlineScript(code);
