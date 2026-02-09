@@ -303,3 +303,76 @@ describe("Xmlui transform - global.* attribute syntax", () => {
     });
   });
 });
+
+describe("Xmlui transform - <global> diagnostic errors", () => {
+  describe("T031: Global not allowed in nested components", () => {
+    it("throws T031 error when <global> is in nested regular component", () => {
+      try {
+        transformSource(`
+          <Stack>
+            <Button>
+              <global name='invalid' value='{0}'/>
+            </Button>
+          </Stack>
+        `);
+        assert.fail("Exception expected");
+      } catch (err) {
+        expect(err.toString()).includes("T031");
+      }
+    });
+
+    it("throws T031 error when <global> is deeply nested", () => {
+      try {
+        transformSource(`
+          <Stack>
+            <HStack>
+              <VStack>
+                <global name='deepNested' value='{0}'/>
+              </VStack>
+            </HStack>
+          </Stack>
+        `);
+        assert.fail("Exception expected");
+      } catch (err) {
+        expect(err.toString()).includes("T031");
+      }
+    });
+
+    it("throws T031 error for global.* attribute in nested component", () => {
+      try {
+        transformSource(`
+          <Stack>
+            <Button global.invalid='{0}'/>
+          </Stack>
+        `);
+        assert.fail("Exception expected");
+      } catch (err) {
+        expect(err.toString()).includes("T031");
+      }
+    });
+
+    it("allows <global> in root element (no error)", () => {
+      const cd = transformSource("<Stack><global name='valid' value='{0}'/></Stack>") as ComponentDef;
+      expect(cd.globalVars!.valid).equal("{0}");
+    });
+
+    it("allows <global> in compound component definition (no error)", () => {
+      const cd = transformSource(
+        "<Component name='Test'><global name='valid' value='{0}'/><Button/></Component>",
+      ) as CompoundComponentDef;
+      expect(cd.component.globalVars!.valid).equal("{0}");
+    });
+
+    it("allows global.* in root element (no error)", () => {
+      const cd = transformSource("<Stack global.valid='{0}'/>") as ComponentDef;
+      expect(cd.globalVars!.valid).equal("{0}");
+    });
+
+    it("allows global.* in compound component definition (no error)", () => {
+      const cd = transformSource(
+        "<Component name='Test' global.valid='{0}'><Button/></Component>",
+      ) as CompoundComponentDef;
+      expect(cd.component.globalVars!.valid).equal("{0}");
+    });
+  });
+});

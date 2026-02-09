@@ -91,7 +91,7 @@ export function nodeToComponentDef(
     };
 
     // --- Done
-    collectTraits(usesStack, component, node);
+    collectTraits(usesStack, component, node, true);
     hoistScriptCollectedFromFragments(component);
     return component;
   }
@@ -99,6 +99,7 @@ export function nodeToComponentDef(
   function transformInnerElement(
     usesStack: Map<string, string>[],
     node: Node,
+    allowGlobalVars: boolean = false,
   ): ComponentDef | CompoundComponentDef | null {
     const name = getNamespaceResolvedComponentName(node, getText, namespaceStack);
 
@@ -118,7 +119,7 @@ export function nodeToComponentDef(
     };
 
     // --- Done
-    collectTraits(usesStack, component, node);
+    collectTraits(usesStack, component, node, allowGlobalVars);
     hoistScriptCollectedFromFragments(component);
     return component;
   }
@@ -210,7 +211,7 @@ export function nodeToComponentDef(
         addToNamespaces(namespaceStack, element, attr.unsegmentedName, attr.value);
       });
 
-    let nestedComponent: ComponentDef = transformInnerElement(usesStack, element)! as ComponentDef;
+    let nestedComponent: ComponentDef = transformInnerElement(usesStack, element, true)! as ComponentDef;
     namespaceStack.pop();
 
     const component: CompoundComponentDef = {
@@ -247,7 +248,7 @@ export function nodeToComponentDef(
     };
 
     const nodeClone: Node = withNewChildNodes(node, nonVarHelperNodes);
-    collectTraits(usesStack, component, nodeClone);
+    collectTraits(usesStack, component, nodeClone, false);
     return component;
   }
 
@@ -255,11 +256,13 @@ export function nodeToComponentDef(
    * Collects component traits from attributes and child elements
    * @param comp Component definition
    * @param element Component element
+   * @param allowGlobalVars Whether global variables are allowed in this context
    */
   function collectTraits(
     usesStack: Map<string, string>[],
     comp: ComponentDef | CompoundComponentDef,
     element: Node,
+    allowGlobalVars: boolean = false,
   ): void {
     const isCompound = !isComponent(comp);
 
@@ -269,7 +272,7 @@ export function nodeToComponentDef(
     // --- Process attributes
     attributes.forEach((attr: Node) => {
       // --- Process the attribute
-      collectAttribute(comp, attr);
+      collectAttribute(comp, attr, allowGlobalVars);
     });
     const childNodes = getChildNodes(element);
 
@@ -372,6 +375,10 @@ export function nodeToComponentDef(
           return;
 
         case HelperNode.global:
+          if (!allowGlobalVars) {
+            reportError(DIAGS_TRANSFORM.globalNotAllowedInNested);
+            return;
+          }
           collectElementHelper(
             usesStack,
             comp,
@@ -417,7 +424,11 @@ export function nodeToComponentDef(
     namespaceStack.pop();
   }
 
-  function collectAttribute(comp: ComponentDef | CompoundComponentDef, attr: Node) {
+  function collectAttribute(
+    comp: ComponentDef | CompoundComponentDef,
+    attr: Node,
+    allowGlobalVars: boolean = false,
+  ) {
     const { namespace, startSegment, name, value, unsegmentedName: nsKey } = segmentAttr(attr);
 
     const attrValueStringNode = attr.children![2];
@@ -470,6 +481,10 @@ export function nodeToComponentDef(
           comp.vars ??= {};
           comp.vars[name] = value;
         } else if (startSegment === "global") {
+          if (!allowGlobalVars) {
+            reportError(DIAGS_TRANSFORM.globalNotAllowedInNested);
+            return;
+          }
           comp.globalVars ??= {};
           comp.globalVars[name] = value;
         } else if (startSegment === "method") {
