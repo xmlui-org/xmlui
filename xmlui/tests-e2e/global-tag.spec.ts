@@ -530,3 +530,120 @@ test.describe("Global Tag - Complex Scenarios", () => {
     await expect(page.getByTestId("visibleText")).toBeVisible();
   });
 });
+
+test.describe("Global Tag - Variable Dependencies", () => {
+  test("global variable can reference other global variables", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <App global.count="{6*8}" global.dummy="{count*3}">
+        <Text testId="countText">Count: {count}</Text>
+        <Text testId="dummyText">Dummy: {dummy}</Text>
+      </App>
+    `,
+      { noFragmentWrapper: true },
+    );
+
+    await expect(page.getByTestId("countText")).toHaveText("Count: 48");
+    await expect(page.getByTestId("dummyText")).toHaveText("Dummy: 144");
+  });
+
+  test("multiple global variables with chained dependencies", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <App global.a="{2}" global.b="{a*3}" global.c="{b+10}">
+        <Text testId="aText">A: {a}</Text>
+        <Text testId="bText">B: {b}</Text>
+        <Text testId="cText">C: {c}</Text>
+      </App>
+    `,
+      { noFragmentWrapper: true },
+    );
+
+    await expect(page.getByTestId("aText")).toHaveText("A: 2");
+    await expect(page.getByTestId("bText")).toHaveText("B: 6");
+    await expect(page.getByTestId("cText")).toHaveText("C: 16");
+  });
+
+  test("compound component global dependencies work with app globals", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(
+      `
+      <App global.baseValue="{10}">
+        <Text testId="appText">App: {baseValue}</Text>
+        <TestComponent />
+      </App>
+    `,
+      {
+        noFragmentWrapper: true,
+        components: [
+          `
+      <Component name="TestComponent" global.multiplied="{baseValue*2}">
+        <Text testId="compText">Component: {multiplied}</Text>
+      </Component>
+    `,
+        ],
+      },
+    );
+
+    await expect(page.getByTestId("appText")).toHaveText("App: 10");
+    await expect(page.getByTestId("compText")).toHaveText("Component: 20");
+  });
+
+  test("global variables with mixed element and attribute syntax and dependencies", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(
+      `
+      <App global.x="{5}">
+        <global name="y" value="{x*2}"/>
+        <global name="z" value="{y+x}"/>
+        <Text testId="xText">X: {x}</Text>
+        <Text testId="yText">Y: {y}</Text>
+        <Text testId="zText">Z: {z}</Text>
+      </App>
+    `,
+      { noFragmentWrapper: true },
+    );
+
+    await expect(page.getByTestId("xText")).toHaveText("X: 5");
+    await expect(page.getByTestId("yText")).toHaveText("Y: 10");
+    await expect(page.getByTestId("zText")).toHaveText("Z: 15");
+  });
+
+  test("dependent global variables are reevaluated when dependencies change", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(
+      `
+      <App global.count="{6*7}" global.dummy="{count*3}">
+        <Text testId="countText">Count: {count}</Text>
+        <Text testId="dummyText">Dummy: {dummy}</Text>
+        <Button label="Increment" onClick="count++" />
+      </App>
+    `,
+      { noFragmentWrapper: true },
+    );
+
+    // Initial state
+    await expect(page.getByTestId("countText")).toHaveText("Count: 42");
+    await expect(page.getByTestId("dummyText")).toHaveText("Dummy: 126");
+
+    // Click button to increment count
+    await page.getByRole("button", { name: "Increment" }).click();
+
+    // Both count and dummy should be updated
+    await expect(page.getByTestId("countText")).toHaveText("Count: 43");
+    await expect(page.getByTestId("dummyText")).toHaveText("Dummy: 129");
+
+    // Click again
+    await page.getByRole("button", { name: "Increment" }).click();
+
+    // Verify both updated again
+    await expect(page.getByTestId("countText")).toHaveText("Count: 44");
+    await expect(page.getByTestId("dummyText")).toHaveText("Dummy: 132");
+  });
+});

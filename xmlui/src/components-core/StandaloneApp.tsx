@@ -160,8 +160,19 @@ function StandaloneApp({
     }
   }, [runtime]);
 
-  const {
-    apiInterceptor,
+  // Helper to filter out internal metadata (__tree_* keys) from globalVars
+  // Exposes only the actual variable values to the renderer
+  const filterGlobalVars = (vars: Record<string, any>): Record<string, any> => {
+    const filtered: Record<string, any> = {};
+    for (const [key, value] of Object.entries(vars)) {
+      if (!key.startsWith("__")) {
+        filtered[key] = value;
+      }
+    }
+    return filtered;
+  };
+
+  const { apiInterceptor,
     name,
     appGlobals,
     defaultTheme,
@@ -227,7 +238,7 @@ function StandaloneApp({
         // @ts-ignore
         routerBaseName={typeof window !== "undefined" ? window.__PUBLIC_PATH || "" : ""}
         globalProps={globalProps}
-        globalVars={globalVars}
+        globalVars={filterGlobalVars(globalVars)}
         defaultTheme={defaultTheme}
         defaultTone={defaultTone as ThemeTone}
         resources={resources}
@@ -773,40 +784,139 @@ function useStandalone(
   // --- pre-built Globals.xs module.
   const extractGlobals = (prebuiltGlobals: Record<string, any>): Record<string, any> => {
     const extractedVars: Record<string, any> = {};
-    for (const [key, value] of Object.entries(prebuiltGlobals)) {
-      // The value is a variable definition object with __PARSED__ and tree
-      if (
-        typeof value === "object" &&
-        value !== null &&
-        (value as any).__PARSED__ &&
-        (value as any).tree
-      ) {
-        const tree = (value as any).tree;
+    
+    // Process variables in multiple passes to handle dependencies
+    // Keep processing until no new variables are resolved (fixed-point iteration)
+    const unprocessed = new Map(Object.entries(prebuiltGlobals));
+    let progress = true;
+    let maxIterations = 100; // Prevent infinite loops
+    let iterations = 0;
+    
+    while (unprocessed.size > 0 && progress && iterations < maxIterations) {
+      progress = false;
+      iterations++;
+      
+      for (const [key, value] of Array.from(unprocessed.entries())) {
+        // The value is a variable definition object with __PARSED__ and tree
+        if (
+          typeof value === "object" &&
+          value !== null &&
+          (value as any).__PARSED__ &&
+          (value as any).tree
+        ) {
+          const tree = (value as any).tree;
 
+          try {
+            // Create an evaluation context with previously extracted variables available
+            const evalContext: BindingTreeEvaluationContext = {
+              mainThread: {
+                childThreads: [],
+                blocks: [{ vars: { ...extractedVars } }],  // Include previously evaluated globals
+                loops: [],
+                breakLabelValue: -1,
+              },
+              localContext: extractedVars,  // Also include in localContext for variable lookup
+            };
+
+            // Evaluate the expression tree (handles literals, binary expressions, etc.)
+            const evaluatedValue = evalBinding(tree, evalContext);
+            extractedVars[key] = evaluatedValue;
+            
+            // IMPORTANT: Store the original tree to enable re-evaluation on global updates (for reactivity)
+            extractedVars[`__tree_${key}`] = tree;
+            
+            unprocessed.delete(key);
+            progress = true;
+          } catch (error) {
+            // If evaluation fails, skip for now (may be waiting for dependencies)
+            // It will be retried in the next iteration if another variable gets resolved
+          }
+        } else {
+          // Literal value, not an expression
+          extractedVars[key] = value;
+          unprocessed.delete(key);
+          progress = true;
+        }
+      }
+    }
+    
+    // Handle any remaining unprocessed variables (circular dependencies or evaluation errors)
+    for (const [key, value] of unprocessed.entries()) {
+      if (typeof value === "object" && value !== null && (value as any).tree) {
         try {
-          // Create a minimal evaluation context to evaluate the tree expression
-          const evalContext: BindingTreeEvaluationContext = {
-            mainThread: {
-              childThreads: [],
-              blocks: [{ vars: {} }],
-              loops: [],
-              breakLabelValue: -1,
-            },
-            localContext: {},
-          };
-
-          // Evaluate the expression tree (handles literals, binary expressions, etc.)
-          const evaluatedValue = evalBinding(tree, evalContext);
-          extractedVars[key] = evaluatedValue;
-        } catch (error) {
-          // If evaluation fails, try to extract literal value as fallback
-          extractedVars[key] = (tree as any).value ?? 0;
+          extractedVars[key] = (value as any).tree.value ?? 0;
+          // Still store the tree for potential re-evaluation
+          extractedVars[`__tree_${key}`] = (value as any).tree;
+        } catch {
+          extractedVars[key] = 0;
         }
       } else {
         extractedVars[key] = value;
       }
     }
+    
     return extractedVars;
+  };
+
+  // Helper function to re-evaluate globals when dependencies change
+  // This enables reactive updates when a global variable is modified
+  // NOTE: Currently, this function is prepared but not automatically called on global state changes.
+  // Full reactivity for dependent globals would require integration with the state management system
+  // to automatically re-evaluate when a global is modified (e.g., via count++).
+  // For now, dependent globals maintain their initially evaluated values.
+  const reEvaluateGlobals = (globals: Record<string, any>): Record<string, any> => {
+    const result = { ...globals };
+    
+    // Find all keys with stored expression trees
+    const treesMap = new Map<string, any>();
+    for (const [key, value] of Object.entries(globals)) {
+      if (key.startsWith("__tree_")) {
+        const varName = key.substring("__tree_".length);
+        if (varName && !varName.startsWith("__")) {  // Avoid re-evaluating metadata
+          treesMap.set(varName, value);
+        }
+      }
+    }
+    
+    // If there are no trees to re-evaluate, return globals as-is
+    if (treesMap.size === 0) {
+      return result;
+    }
+    
+    // Re-evaluate all variables with trees in dependency order (may need multiple passes)
+    let changed = true;
+    let iterations = 0;
+    const maxIterations = 10;
+    
+    while (changed && iterations < maxIterations) {
+      changed = false;
+      iterations++;
+      
+      for (const [varName, tree] of treesMap.entries()) {
+        try {
+          const evalContext: BindingTreeEvaluationContext = {
+            mainThread: {
+              childThreads: [],
+              blocks: [{ vars: { ...result } }],  // Use current global values
+              loops: [],
+              breakLabelValue: -1,
+            },
+            localContext: result,
+          };
+          
+          const evaluatedValue = evalBinding(tree, evalContext);
+          if (result[varName] !== evaluatedValue) {
+            result[varName] = evaluatedValue;
+            changed = true;  // Something changed, may need another pass for transitive dependencies
+          }
+        } catch (error) {
+          // If re-evaluation fails, keep the current value
+          // This handles cases where dependencies aren't yet available
+        }
+      }
+    }
+    
+    return result;
   };
 
   const [globalVars, setGlobalVars] = useState<Record<string, any>>(() => {
