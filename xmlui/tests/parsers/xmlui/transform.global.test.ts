@@ -227,8 +227,6 @@ describe("Xmlui transform - <global> helper tag", () => {
   });
 });
 
-// NOTE: Tests below are for Step 2 (global.* attribute syntax) - not yet implemented
-/*
 describe("Xmlui transform - global.* attribute syntax", () => {
   describe("Basic global.* attribute parsing", () => {
     it("global.* attribute works in root", () => {
@@ -305,4 +303,3 @@ describe("Xmlui transform - global.* attribute syntax", () => {
     });
   });
 });
-*/

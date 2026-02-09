@@ -157,6 +157,16 @@ export function nodeToComponentDef(
       });
     }
 
+    // --- Get global attributes
+    let globals: Record<string, any> | undefined;
+    const globalsAttrs = attrs.filter((attr) => attr.startSegment === "global");
+    if (globalsAttrs.length > 0) {
+      globals = {};
+      globalsAttrs.forEach((attr) => {
+        globals![attr.name] = attr.value;
+      });
+    }
+
     const children = getChildNodes(node);
 
     // --- Get the single component definition
@@ -220,6 +230,9 @@ export function nodeToComponentDef(
     }
     if (vars) {
       nestedComponent.vars = { ...nestedComponent.vars, ...vars };
+    }
+    if (globals) {
+      nestedComponent.globalVars = { ...nestedComponent.globalVars, ...globals };
     }
     if (codeBehind) {
       component.codeBehind = codeBehind.value;
@@ -416,7 +429,7 @@ export function nodeToComponentDef(
     const isCompound = !isComponent(comp);
     // --- Handle single-word attributes
     if (isCompound) {
-      if (startSegment && startSegment !== "method" && startSegment !== "var") {
+      if (startSegment && startSegment !== "method" && startSegment !== "var" && startSegment !== "global") {
         reportError(DIAGS_TRANSFORM.invalidReusableCompAttr(nsKey));
         return;
       }
@@ -456,6 +469,9 @@ export function nodeToComponentDef(
         if (startSegment === "var") {
           comp.vars ??= {};
           comp.vars[name] = value;
+        } else if (startSegment === "global") {
+          comp.globalVars ??= {};
+          comp.globalVars[name] = value;
         } else if (startSegment === "method") {
           comp.api ??= {};
           comp.api[name] = value;
