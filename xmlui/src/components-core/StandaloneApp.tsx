@@ -451,6 +451,7 @@ function matchesFolder(path: string, folderName: string) {
 function resolveRuntime(runtime: Record<string, any>): {
   standaloneApp: StandaloneAppDescription;
   projectCompilation?: ProjectCompilation;
+  globalVars?: Record<string, any>;
 } {
   // --- Collect the components and their sources. We pass the sources to the standalone app
   // --- so that it can be used for error display and debugging purposes.
@@ -599,6 +600,20 @@ function resolveRuntime(runtime: Record<string, any>): {
     });
   }
 
+  // --- Collect globalVars from compound components and root element
+  const compoundGlobals: Record<string, any> = {};
+  components.forEach((compound) => {
+    if (compound.component?.globalVars) {
+      Object.assign(compoundGlobals, compound.component.globalVars);
+    }
+  });
+
+  // --- Merge with root globals (root takes precedence)
+  const mergedGlobals = {
+    ...compoundGlobals,
+    ...(entryPointWithCodeBehind.globalVars || {}),
+  };
+
   // --- Done.
   return {
     standaloneApp: {
@@ -610,6 +625,7 @@ function resolveRuntime(runtime: Record<string, any>): {
       sources,
     },
     projectCompilation,
+    globalVars: mergedGlobals,
   };
 }
 
@@ -823,6 +839,15 @@ function useStandalone(
         });
         setProjectCompilation(resolvedRuntime.projectCompilation);
         setStandaloneApp(appDef);
+        
+        // --- Merge parsed globalVars with Globals.xs globals
+        const globalsXs = runtime?.[GLOBALS_BUILT_RESOURCE];
+        const globalsXsVars = extractGlobals({ ...(globalsXs?.vars || {}), ...(globalsXs?.functions || {}) });
+        const mergedGlobalVars = {
+          ...(resolvedRuntime.globalVars || {}),
+          ...globalsXsVars,
+        };
+        setGlobalVars(mergedGlobalVars);
         return;
       }
 
@@ -1205,6 +1230,33 @@ function useStandalone(
 
       setProjectCompilation(resolvedRuntime.projectCompilation);
       setStandaloneApp(newAppDef);
+      
+      // --- Collect and merge globalVars from parsed components
+      const parsedGlobals: Record<string, any> = {};
+      
+      // Collect from root element
+      if (entryPointWithCodeBehind.globalVars) {
+        Object.assign(parsedGlobals, entryPointWithCodeBehind.globalVars);
+      }
+      
+      // Collect from compound components (root precedence already handled in component order)
+      componentsWithCodeBehinds.forEach((compound) => {
+        if (compound?.component?.globalVars) {
+          // Only add if not already in parsedGlobals (maintains root precedence)
+          Object.keys(compound.component.globalVars).forEach((key) => {
+            if (!(key in parsedGlobals)) {
+              parsedGlobals[key] = compound.component.globalVars[key];
+            }
+          });
+        }
+      });
+      
+      // Merge with Globals.xs (Globals.xs takes precedence over parsed)
+      const mergedGlobalVars = {
+        ...parsedGlobals,
+        ...loadedGlobals,
+      };
+      setGlobalVars(mergedGlobalVars);
     })();
   }, [runtime, standaloneAppDef]);
 
