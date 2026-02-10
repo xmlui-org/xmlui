@@ -963,20 +963,35 @@ export const Table = forwardRef(
     const startMargin = useStartMargin(hasOutsideScroll, wrapperRef, scrollRef);
 
     const [headerFixed, setHeaderFixed] = useState(false);
+
     useEffect(() => {
       if (!hasOutsideScroll || !tableRef.current) return;
 
-      const handleScroll = () => {
-        const tableRect = tableRef.current?.getBoundingClientRect();
-        if (!tableRect) return;
-        
-        // Fix header when table top goes above viewport
-        setHeaderFixed(tableRect.top < 0 && tableRect.bottom > 0);
-      };
+      const root = scrollRef.current === document.body ? null : scrollRef.current;
 
-      const scrollContainer = scrollRef.current || window;
-      scrollContainer.addEventListener('scroll', handleScroll);
-      return () => scrollContainer.removeEventListener('scroll', handleScroll);
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          // More nuanced: only fix when table top is significantly above viewport
+          // and table bottom is still below viewport (table is actually visible)
+          const rect = entry.boundingClientRect;
+          const rootRect = entry.rootBounds;
+          
+          if (!rootRect) return;
+          
+          const tableIsScrolledPast = rect.top < rootRect.top;
+          const tableIsStillVisible = rect.bottom > rootRect.top;
+          
+          setHeaderFixed(tableIsScrolledPast && tableIsStillVisible);
+        },
+        {
+          root,
+          threshold: Array.from({ length: 101 }, (_, i) => i / 100), // 0, 0.01, 0.02, ..., 1.00
+        }
+      );
+
+      observer.observe(tableRef.current);
+
+      return () => observer.disconnect();
     }, [hasOutsideScroll]);
 
     // ==================================================================================
