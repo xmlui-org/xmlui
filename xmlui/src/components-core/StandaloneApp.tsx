@@ -7,7 +7,6 @@ import yaml from "js-yaml";
 import type { StandaloneAppDescription, StandaloneJsonConfig } from "./abstractions/standalone";
 import type {
   ComponentDef,
-  ComponentLike,
   CompoundComponentDef,
 } from "../abstractions/ComponentDefs";
 
@@ -58,12 +57,12 @@ import type {
 import { evalBinding } from "./script-runner/eval-tree-sync";
 import type { BindingTreeEvaluationContext } from "./script-runner/BindingTreeEvaluationContext";
 import { MetadataProvider } from "../language-server/services/common/metadata-utils";
+import { extractParam } from "./utils/extractParam";
 import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
-const GLOBALS_BUILT_RESOURCE = "/src/Globals.xs";
-const GLOBALS_FILE = "Globals." + moduleFileExtension;
+const MAIN_XS_BUILT_RESOURCE = "/src/Main.xmlui.xs";
 const CONFIG_FILE = "config.json";
 
 const metadataProvider = new MetadataProvider(collectedComponentMetadata);
@@ -158,8 +157,19 @@ function StandaloneApp({
     }
   }, [runtime]);
 
-  const {
-    apiInterceptor,
+  // Helper to filter out internal metadata (__tree_* keys) from globalVars
+  // Exposes only the actual variable values to the renderer
+  const filterGlobalVars = (vars: Record<string, any>): Record<string, any> => {
+    const filtered: Record<string, any> = {};
+    for (const [key, value] of Object.entries(vars)) {
+      if (!key.startsWith("__")) {
+        filtered[key] = value;
+      }
+    }
+    return filtered;
+  };
+
+  const { apiInterceptor,
     name,
     appGlobals,
     defaultTheme,
@@ -225,7 +235,7 @@ function StandaloneApp({
         // @ts-ignore
         routerBaseName={typeof window !== "undefined" ? window.__PUBLIC_PATH || "" : ""}
         globalProps={globalProps}
-        globalVars={globalVars}
+        globalVars={filterGlobalVars(globalVars)}
         defaultTheme={defaultTheme}
         defaultTone={defaultTone as ThemeTone}
         resources={resources}
@@ -343,6 +353,7 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
     throw new Error(`Failed to fetch ${response.url}`);
   }
   const code = await response.text();
+  
   const parser = new Parser(code);
   try {
     parser.parseStatements();
@@ -409,11 +420,12 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
 
     // --- Remove the code-behind tokens from the tree shrinking the tree
     removeCodeBehindTokensFromTree(codeBehind);
-    return {
+    const result = {
       src: code,
       codeBehind: codeBehind,
       file: response.url,
     };
+    return result;
   } catch (e) {
     console.error("Error collecting code behind", e);
   }
@@ -450,6 +462,7 @@ function matchesFolder(path: string, folderName: string) {
 function resolveRuntime(runtime: Record<string, any>): {
   standaloneApp: StandaloneAppDescription;
   projectCompilation?: ProjectCompilation;
+  globalVars?: Record<string, any>;
 } {
   // --- Collect the components and their sources. We pass the sources to the standalone app
   // --- so that it can be used for error display and debugging purposes.
@@ -487,17 +500,22 @@ function resolveRuntime(runtime: Record<string, any>): {
         // --- "default" contains the functions and variables declared in the
         // --- code behind file.
         entryPointCodeBehind = value.default;
-        projectCompilation.entrypoint.codeBehindSource = value.default.src;
+        if (value.default?.src) {
+          projectCompilation.entrypoint.codeBehindSource = value.default.src;
+        }
       } else {
         projectCompilation.entrypoint.filename = key;
         // --- "default" contains the component definition, the file index,
         // --- and the source code.
-        entryPoint = value.default.component;
-        projectCompilation.entrypoint.definition = entryPoint;
-        projectCompilation.entrypoint.markupSource = value.default.src;
-
-        // Use key (the actual file path from Vite glob) for consistent source lookups
-        sources[key] = value.default.src;
+        if (value.default?.component) {
+          entryPoint = value.default.component;
+          projectCompilation.entrypoint.definition = entryPoint;
+        }
+        if (value.default?.src) {
+          projectCompilation.entrypoint.markupSource = value.default.src;
+          // Use key (the actual file path from Vite glob) for consistent source lookups
+          sources[key] = value.default.src;
+        }
       }
     }
 
@@ -532,20 +550,24 @@ function resolveRuntime(runtime: Record<string, any>): {
           },
         );
 
-        if (componentCompilationForCodeBehind) {
+        if (componentCompilationForCodeBehind && value.default?.src) {
           componentCompilationForCodeBehind.codeBehindSource = value.default.src;
         }
       } else {
         // --- "default" contains the component definition, the file index,
         // --- and the source code.
-        componentsByFileName[key] = value.default.component;
-        sources[key] = value.default.src;
+        if (value.default?.component) {
+          componentsByFileName[key] = value.default.component;
+        }
+        if (value.default?.src) {
+          sources[key] = value.default.src;
+        }
 
         const componentCompilation: ComponentCompilation = {
-          definition: value.default.component,
+          definition: value.default?.component,
           // Use key (the actual file path from Vite glob) for consistent source lookups
           filename: key,
-          markupSource: value.default.src,
+          markupSource: value.default?.src,
           dependencies: new Set(),
         };
         projectCompilation.components.push(componentCompilation);
@@ -570,7 +592,7 @@ function resolveRuntime(runtime: Record<string, any>): {
     },
     functions: entryPointCodeBehind?.functions,
     scriptError: entryPointCodeBehind?.moduleErrors,
-  } as ComponentLike;
+  } as ComponentDef;
 
   // --- Collect the component definition we pass to the rendering engine
   let components: Array<CompoundComponentDef> = [];
@@ -598,6 +620,20 @@ function resolveRuntime(runtime: Record<string, any>): {
     });
   }
 
+  // --- Collect globalVars from compound components and root element
+  const compoundGlobals: Record<string, any> = {};
+  components.forEach((compound) => {
+    if (compound.component?.globalVars) {
+      Object.assign(compoundGlobals, compound.component.globalVars);
+    }
+  });
+
+  // --- Merge with root globals (root takes precedence)
+  const mergedGlobals = {
+    ...compoundGlobals,
+    ...(entryPointWithCodeBehind.globalVars || {}),
+  };
+
   // --- Done.
   return {
     standaloneApp: {
@@ -609,6 +645,7 @@ function resolveRuntime(runtime: Record<string, any>): {
       sources,
     },
     projectCompilation,
+    globalVars: mergedGlobals,
   };
 }
 
@@ -755,47 +792,145 @@ function useStandalone(
   // --- pre-built Globals.xs module.
   const extractGlobals = (prebuiltGlobals: Record<string, any>): Record<string, any> => {
     const extractedVars: Record<string, any> = {};
-    for (const [key, value] of Object.entries(prebuiltGlobals)) {
-      // The value is a variable definition object with __PARSED__ and tree
-      if (
-        typeof value === "object" &&
-        value !== null &&
-        (value as any).__PARSED__ &&
-        (value as any).tree
-      ) {
-        const tree = (value as any).tree;
+    
+    // Process variables in multiple passes to handle dependencies
+    // Keep processing until no new variables are resolved (fixed-point iteration)
+    const unprocessed = new Map(Object.entries(prebuiltGlobals));
+    let progress = true;
+    let maxIterations = 100; // Prevent infinite loops
+    let iterations = 0;
+    
+    while (unprocessed.size > 0 && progress && iterations < maxIterations) {
+      progress = false;
+      iterations++;
+      
+      for (const [key, value] of Array.from(unprocessed.entries())) {
+        // The value is a variable definition object with __PARSED__ and tree
+        if (
+          typeof value === "object" &&
+          value !== null &&
+          (value as any).__PARSED__ &&
+          (value as any).tree
+        ) {
+          const tree = (value as any).tree;
 
+          try {
+            // Create an evaluation context with previously extracted variables available
+            const evalContext: BindingTreeEvaluationContext = {
+              mainThread: {
+                childThreads: [],
+                blocks: [{ vars: { ...extractedVars } }],  // Include previously evaluated globals
+                loops: [],
+                breakLabelValue: -1,
+              },
+              localContext: extractedVars,  // Also include in localContext for variable lookup
+            };
+
+            // Evaluate the expression tree (handles literals, binary expressions, etc.)
+            const evaluatedValue = evalBinding(tree, evalContext);
+            extractedVars[key] = evaluatedValue;
+            
+            // IMPORTANT: Store the original tree to enable re-evaluation on global updates (for reactivity)
+            extractedVars[`__tree_${key}`] = tree;
+            
+            unprocessed.delete(key);
+            progress = true;
+          } catch (error) {
+            // If evaluation fails, skip for now (may be waiting for dependencies)
+            // It will be retried in the next iteration if another variable gets resolved
+          }
+        } else {
+          // Literal value, not an expression
+          extractedVars[key] = value;
+          unprocessed.delete(key);
+          progress = true;
+        }
+      }
+    }
+    
+    // Handle any remaining unprocessed variables (circular dependencies or evaluation errors)
+    for (const [key, value] of unprocessed.entries()) {
+      if (typeof value === "object" && value !== null && (value as any).tree) {
         try {
-          // Create a minimal evaluation context to evaluate the tree expression
-          const evalContext: BindingTreeEvaluationContext = {
-            mainThread: {
-              childThreads: [],
-              blocks: [{ vars: {} }],
-              loops: [],
-              breakLabelValue: -1,
-            },
-            localContext: {},
-          };
-
-          // Evaluate the expression tree (handles literals, binary expressions, etc.)
-          const evaluatedValue = evalBinding(tree, evalContext);
-          extractedVars[key] = evaluatedValue;
-        } catch (error) {
-          // If evaluation fails, try to extract literal value as fallback
-          extractedVars[key] = (tree as any).value ?? 0;
+          extractedVars[key] = (value as any).tree.value ?? 0;
+          // Still store the tree for potential re-evaluation
+          extractedVars[`__tree_${key}`] = (value as any).tree;
+        } catch {
+          extractedVars[key] = 0;
         }
       } else {
         extractedVars[key] = value;
       }
     }
+    
     return extractedVars;
   };
 
+  // Helper function to re-evaluate globals when dependencies change
+  // This enables reactive updates when a global variable is modified
+  // NOTE: Currently, this function is prepared but not automatically called on global state changes.
+  // Full reactivity for dependent globals would require integration with the state management system
+  // to automatically re-evaluate when a global is modified (e.g., via count++).
+  // For now, dependent globals maintain their initially evaluated values.
+  const reEvaluateGlobals = (globals: Record<string, any>): Record<string, any> => {
+    const result = { ...globals };
+    
+    // Find all keys with stored expression trees
+    const treesMap = new Map<string, any>();
+    for (const [key, value] of Object.entries(globals)) {
+      if (key.startsWith("__tree_")) {
+        const varName = key.substring("__tree_".length);
+        if (varName && !varName.startsWith("__")) {  // Avoid re-evaluating metadata
+          treesMap.set(varName, value);
+        }
+      }
+    }
+    
+    // If there are no trees to re-evaluate, return globals as-is
+    if (treesMap.size === 0) {
+      return result;
+    }
+    
+    // Re-evaluate all variables with trees in dependency order (may need multiple passes)
+    let changed = true;
+    let iterations = 0;
+    const maxIterations = 10;
+    
+    while (changed && iterations < maxIterations) {
+      changed = false;
+      iterations++;
+      
+      for (const [varName, tree] of treesMap.entries()) {
+        try {
+          const evalContext: BindingTreeEvaluationContext = {
+            mainThread: {
+              childThreads: [],
+              blocks: [{ vars: { ...result } }],  // Use current global values
+              loops: [],
+              breakLabelValue: -1,
+            },
+            localContext: result,
+          };
+          
+          const evaluatedValue = evalBinding(tree, evalContext);
+          if (result[varName] !== evaluatedValue) {
+            result[varName] = evaluatedValue;
+            changed = true;  // Something changed, may need another pass for transitive dependencies
+          }
+        } catch (error) {
+          // If re-evaluation fails, keep the current value
+          // This handles cases where dependencies aren't yet available
+        }
+      }
+    }
+    
+    return result;
+  };
+
   const [globalVars, setGlobalVars] = useState<Record<string, any>>(() => {
-    // Get the vars in Globals.xs module directly from runtime
-    const globalsXs = runtime?.[GLOBALS_BUILT_RESOURCE];
-    const extracted = extractGlobals({ ...(globalsXs?.vars || {}), ...(globalsXs?.functions || {}) });
-    return extracted;
+    // Get the vars in Main.xmlui.xs module directly from runtime
+    const mainXs = runtime?.[MAIN_XS_BUILT_RESOURCE];
+    return extractGlobals({ ...(mainXs?.vars || {}), ...(mainXs?.functions || {}) });
   });
 
   useIsomorphicLayoutEffect(() => {
@@ -812,6 +947,16 @@ function useStandalone(
         if (!appDef) {
           throw new Error("couldn't find the application metadata");
         }
+        
+        // --- Transform Main.xmlui.xs variables into <global> tags for dependency support
+        const mainXs = runtime?.[MAIN_XS_BUILT_RESOURCE];
+        if (mainXs?.vars || mainXs?.functions) {
+          appDef.entryPoint = transformMainXsToGlobalTags(
+            appDef.entryPoint as ComponentDef,
+            mainXs
+          );
+        }
+        
         const lintErrorComponent = processAppLinting(appDef, metadataProvider);
         if (lintErrorComponent) {
           appDef.entryPoint = lintErrorComponent;
@@ -823,6 +968,31 @@ function useStandalone(
         });
         setProjectCompilation(resolvedRuntime.projectCompilation);
         setStandaloneApp(appDef);
+        
+        // --- Collect globalVars from the MERGED app definition (not resolved runtime)
+        // --- This ensures test components' globalVars are included
+        const parsedGlobals: Record<string, any> = {};
+        
+        // Collect from root element (cast as ComponentDef since entryPoint is always a component definition)
+        const entryPointDef = appDef.entryPoint as ComponentDef;
+        if (entryPointDef?.globalVars) {
+          Object.assign(parsedGlobals, entryPointDef.globalVars);
+        }
+        
+        // Collect from compound components
+        appDef.components?.forEach((compound) => {
+          if (compound?.component?.globalVars) {
+            Object.keys(compound.component.globalVars).forEach((key) => {
+              if (!(key in parsedGlobals)) {
+                parsedGlobals[key] = compound.component.globalVars[key];
+              }
+            });
+          }
+        });
+        
+        // --- Since Globals.xs variables are now transformed to <global> tags,
+        // --- we only need to set the parsed globals from component definitions
+        setGlobalVars(parsedGlobals);
         return;
       }
 
@@ -883,22 +1053,25 @@ function useStandalone(
         }
       }) as any;
 
-      // --- Fetch the optional Globals.xs file containing global variables and functions
+      // --- Fetch the optional Main.xmlui.xs file containing global variables and functions
       const globalsPromise = new Promise(async (resolve) => {
         try {
-          const resp = await fetchWithoutCache(GLOBALS_FILE);
+          const resp = await fetchWithoutCache(MAIN_CODE_BEHIND_FILE);
+          
           if (resp.ok) {
             const parsedGlobals = await parseCodeBehindResponse(resp);
-            const globalsXs = parsedGlobals?.codeBehind;
+            
+            const mainXs = parsedGlobals?.codeBehind;
             const extractedGlobals = extractGlobals({
-              ...(globalsXs?.vars || {}),
-              ...(globalsXs?.functions || {}),
+              ...(mainXs?.vars || {}),
+              ...(mainXs?.functions || {}),
             });
-            resolve(extractedGlobals);
+            // Return structure matching vite-xmlui-plugin: codeBehind spread with src and extractedGlobals
+            resolve({ ...parsedGlobals?.codeBehind, src: parsedGlobals?.src, __extractedGlobals: extractedGlobals });
           } else {
             resolve({
-              component: errReportMessage(`Failed to load the globals component (${GLOBALS_FILE})`),
-              file: GLOBALS_FILE,
+              component: errReportMessage(`Failed to load the code-behind (${MAIN_CODE_BEHIND_FILE})`),
+              file: MAIN_CODE_BEHIND_FILE,
               hasError: true,
             });
           }
@@ -944,8 +1117,7 @@ function useStandalone(
         Promise.all(themePromises || []),
       ]);
 
-      // --- We will pass these globals
-      setGlobalVars(loadedGlobals);
+      // Note: setGlobalVars is called later after merging with parsedGlobals from components
 
       // --- Collect the elements of the standalone app (and potential errors)
       const errorComponents: ComponentDef[] = [];
@@ -1017,7 +1189,7 @@ function useStandalone(
       });
 
       // --- Assemble the runtime for the main app file
-      const entryPointWithCodeBehind = {
+      let entryPointWithCodeBehind: ComponentDef = {
         ...loadedEntryPoint.component,
         vars: {
           ...loadedEntryPointCodeBehind?.vars,
@@ -1028,6 +1200,15 @@ function useStandalone(
         scriptError:
           loadedEntryPoint.codeBehind?.moduleErrors || loadedEntryPointCodeBehind?.moduleErrors,
       };
+      
+      // --- Transform Main.xmlui.xs variables into <global> tags for dependency support (same as pre-built path)
+      if (loadedGlobals && typeof loadedGlobals === 'object' && ((loadedGlobals as any).vars || (loadedGlobals as any).functions)) {
+        // Pass loadedGlobals directly - it has the same structure as runtime[MAIN_XS_BUILT_RESOURCE]
+        entryPointWithCodeBehind = transformMainXsToGlobalTags(
+          entryPointWithCodeBehind,
+          loadedGlobals as any
+        );
+      }
 
       const defaultTheme = (entryPointWithCodeBehind as ComponentDef).props?.defaultTheme;
       // --- We test whether the default theme is not from a binding
@@ -1205,6 +1386,30 @@ function useStandalone(
 
       setProjectCompilation(resolvedRuntime.projectCompilation);
       setStandaloneApp(newAppDef);
+      
+      // --- Collect and merge globalVars from parsed components
+      const parsedGlobals: Record<string, any> = {};
+      
+      // Collect from root element
+      if (entryPointWithCodeBehind.globalVars) {
+        Object.assign(parsedGlobals, entryPointWithCodeBehind.globalVars);
+      }
+      
+      // Collect from compound components (root precedence already handled in component order)
+      componentsWithCodeBehinds.forEach((compound) => {
+        if (compound?.component?.globalVars) {
+          // Only add if not already in parsedGlobals (maintains root precedence)
+          Object.keys(compound.component.globalVars).forEach((key) => {
+            if (!(key in parsedGlobals)) {
+              parsedGlobals[key] = compound.component.globalVars[key];
+            }
+          });
+        }
+      });
+      
+      // Set globalVars with expressions from parsedGlobals (same as pre-built path)
+      // DO NOT merge with extractedMainXsGlobals - those are static evaluated values that break reactivity
+      setGlobalVars(parsedGlobals);
     })();
   }, [runtime, standaloneAppDef]);
 
@@ -1326,6 +1531,72 @@ export function startApp(
   contentRoot.render(<StandaloneApp runtime={runtime} extensionManager={extensionManager} />);
   return contentRoot;
 }
+
+/**
+ * Transform Main.xmlui.xs variables into globalVars property to leverage
+ * the existing dependency system that works correctly for globalVars
+ */
+function transformMainXsToGlobalTags(
+  entryPoint: ComponentDef,
+  mainXs: { vars?: Record<string, any>; functions?: Record<string, any>; src?: string }
+): ComponentDef {
+  const globalVars: Record<string, string> = {};
+  
+  // Process vars from Main.xmlui.xs
+  if (mainXs.vars) {
+    Object.entries(mainXs.vars).forEach(([varName, varDef]) => {
+      // Use the source text directly from the parsed expression
+      let valueExpression = "";
+      
+      if (typeof varDef === "object" && varDef?.source) {
+        // Use the source text preserved by the parser
+        valueExpression = varDef.source;
+      } else if (mainXs.src) {
+        // Fallback: extract from source code using regex when we have the full source
+        const srcMatch = mainXs.src.match(new RegExp(`var\\s+${varName}\\s*=\\s*(.+?)(?:;|$)`, 'm'));
+        if (srcMatch) {
+          valueExpression = srcMatch[1].trim();
+        }
+      }
+      
+      if (!valueExpression) {
+        valueExpression = "0"; // Safe fallback
+      }
+      
+      // Wrap in braces if not already wrapped
+      if (!valueExpression.startsWith("{")) {
+        valueExpression = `{${valueExpression}}`;
+      }
+      
+      // Add to globalVars
+      globalVars[varName] = valueExpression;
+    });
+  }
+  
+  // Process functions from Main.xmlui.xs (preserve them as functions, not globalVars)
+  const functions = mainXs.functions || {};
+  
+  // Add the globalVars and functions to the entry point
+  if (Object.keys(globalVars).length > 0 || Object.keys(functions).length > 0) {
+    const transformedEntryPoint: ComponentDef = {
+      ...entryPoint,
+      globalVars: {
+        ...entryPoint.globalVars,
+        ...globalVars
+      },
+      functions: {
+        ...entryPoint.functions,
+        ...functions
+      }
+    };
+    
+    return transformedEntryPoint;
+  }
+  
+  return entryPoint;
+}
+
+// Note: reconstructExpressionFromTree function removed - now using source text directly from parser
 
 export default StandaloneApp;
 

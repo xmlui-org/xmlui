@@ -58,8 +58,6 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
     }
   }
 
-
-  .headerWrapper,
   .tableBody {
     display: inline-block;
     min-width: 100%;
@@ -293,6 +291,8 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
     position: sticky;
     top: 0;
     z-index: 2;
+    display: inline-block;
+    background-color: $backgroundColor-Table;
   }
 
   .columnCell {

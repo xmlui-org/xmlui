@@ -3104,7 +3104,6 @@ export class Parser {
    * @param stump Stump properties
    * @param startToken The token that starts the expression
    * @param endToken The token that ends the expression
-   * @param source Expression source code to store to the node
    */
   private createExpressionNode<T extends Expression>(
     type: Expression["type"],
@@ -3118,11 +3117,23 @@ export class Parser {
     if (!startToken) {
       startToken = endToken;
     }
+    
+    // Extract source text if we have valid token positions
+    let source: string | undefined;
+    if (startToken && endToken && this._lexer.input.source) {
+      const startPos = startToken.startPosition;
+      const endPos = endToken.endPosition;
+      if (startPos <= endPos) {
+        source = this._lexer.input.source.substring(startPos, endPos);
+      }
+    }
+    
     return Object.assign({}, stump, {
       type,
       nodeId: createXmlUiTreeNodeId(),
       startToken,
       endToken,
+      source,
     });
   }
 

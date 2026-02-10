@@ -18,7 +18,7 @@
         {formatDate($props.post.date, "d MMM yyyy")}
       </Text>
       <Image when="{$props.post.image}" src="/blog/images/{$props.post.image}" />
-      <Markdown data="/blog/{$props.post.slug}.md" />
+      <Markdown content="{appGlobals.prefetchedContent[`/blog/${$props.post.slug}.md`]}" />
     </VStack>
   </VStack>
 </Component>

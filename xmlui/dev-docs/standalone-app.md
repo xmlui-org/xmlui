@@ -210,15 +210,17 @@ When using a web server that can serve static files, only these three files are 
 **How Buildless Apps Bootstrap:**
 1. Browser loads `index.html` which includes the XMLUI runtime script
 2. Runtime automatically looks for `Main.xmlui` as the entry point
-3. Framework fetches and parses source files on-demand as components are referenced
-4. Component discovery happens recursively - as markup references components, they're loaded from the `components/` directory
-5. Themes and configuration are loaded from their respective directories/files
+3. Runtime fetches `Globals.xs` (if present) for application-wide global variables and functions
+4. Framework fetches and parses source files on-demand as components are referenced
+5. Component discovery happens recursively - as markup references components, they're loaded from the `components/` directory
+6. Themes and configuration are loaded from their respective directories/files
 
 **Key Characteristics of Buildless Deployment:**
 - **Zero Build Step**: Apps can be deployed directly to any static web server
-- **Runtime Parsing**: Source files are fetched and parsed in the browser
+- **Runtime Parsing**: Source files (including Globals.xs) are fetched and parsed in the browser
 - **Development Speed**: Changes are immediately visible on page refresh
 - **Simple Deployment**: Copy files to a web server and serve `index.html`
+- **Global Variables**: Define app-wide state in `Globals.xs` without build configuration
 
 This buildless approach enables rapid prototyping and simple deployment scenarios where build complexity isn't desired.
 
@@ -229,18 +231,20 @@ Built apps represent XMLUI's production-ready deployment approach where source f
 Built apps use Vite with HMR. The vite-xmlui-plugin compiles `.xmlui` files to component definitions at build time, eliminating runtime parsing overhead for faster startup.
 
 **How Built Apps Bootstrap:**
-1. Vite pre-compiles `.xmlui`/`.xmlui.xs` files via vite-xmlui-plugin during build
-2. Compiled definitions are bundled into ESM modules
+1. Vite pre-compiles `.xmlui`/`.xmlui.xs`/`Globals.xs` files via vite-xmlui-plugin during build
+2. Compiled definitions (including global variables) are bundled into ESM modules
 3. Browser loads bundled JS/CSS
-4. `StandaloneApp` receives pre-compiled `runtime` object
-5. Rendering begins immediately without parsing
+4. `StandaloneApp` receives pre-compiled `runtime` object with `runtime["/src/Globals.xs"]`
+5. Global variables are extracted via `extractGlobals()` function during initialization
+6. Rendering begins immediately without parsing
 
 **Key Characteristics of Built Deployment:**
-- **Optimized Performance**: All source files are pre-parsed and bundled
-- **Dependency Bundling**: All XMLUI components and logic are included in the JavaScript bundle
+- **Optimized Performance**: All source files (including Globals.xs) are pre-parsed and bundled
+- **Dependency Bundling**: All XMLUI components, global variables, and logic are included in the JavaScript bundle
 - **Asset Optimization**: CSS is extracted and optimized, resources are processed
 - **Production Ready**: Minified, tree-shaken, and optimized for fast loading
-- **No Runtime Parsing**: No need to fetch and parse .xmlui files at runtime
+- **No Runtime Parsing**: No need to fetch and parse .xmlui or Globals.xs files at runtime
+- **Global Variables**: Pre-evaluated and built into the runtime bundle
 
 ## The StandaloneApp Component
 
@@ -256,15 +260,61 @@ An XMLUI app is represented as an immutable object in memory composed from the X
 **Key Properties:**
 - `appDef`: Pre-defined app description (used in inline/test modes)
 - `runtime`: Pre-compiled component definitions (for built apps)
+- `globalVars`: Application-wide variables and functions from Globals.xs
 
-**Built Mode:** The `runtime` property contains pre-compiled component definitions created by the vite-xmlui-plugin during build time. The `mergeAppDefWithRuntime()` function combines any provided `appDef` with the pre-compiled runtime to create the final app representation.
+**Built Mode:** The `runtime` property contains pre-compiled component definitions created by the vite-xmlui-plugin during build time. Global variables are extracted from `runtime["/src/Globals.xs"]` during StandaloneApp initialization:
+
+```typescript
+// From StandaloneApp.tsx
+const [globalVars, setGlobalVars] = useState<Record<string, any>>(() => {
+  // Get the vars in Globals.xs module directly from runtime
+  const globalsXs = runtime?.[GLOBALS_BUILT_RESOURCE];
+  return extractGlobals({ ...(globalsXs?.vars || {}), ...(globalsXs?.functions || {}) });
+});
+```
+
+The `mergeAppDefWithRuntime()` function combines any provided `appDef` with the pre-compiled runtime to create the final app representation.
 
 **Buildless Mode:** When no pre-compiled runtime exists, the `useStandalone` hook implements fallback logic:
 1. Fetches `Main.xmlui` as the entry point using `xmlUiMarkupToComponent()`
-2. Loads `config.json` for app configuration and theme settings
-3. Recursively discovers and loads missing components from the `components/` directory using `collectMissingComponents()`
-4. Parses both `.xmlui` markup files and `.xmlui.xs` code-behind files
-5. Assembles everything into a `StandaloneAppDescription` object with entryPoint, components, themes, and configuration
+2. Fetches `Globals.xs` (if present) for application-wide global variables and functions
+3. Loads `config.json` for app configuration and theme settings
+4. Recursively discovers and loads missing components from the `components/` directory using `collectMissingComponents()`
+5. Parses both `.xmlui` markup files and `.xmlui.xs` code-behind files
+6. Extracts global variables via `extractGlobals()` from the parsed Globals.xs
+7. Assembles everything into a `StandaloneAppDescription` object with entryPoint, components, themes, configuration, and globalVars
+
+**Global Variables Loading (Buildless):**
+```typescript
+// From StandaloneApp.tsx - buildless mode
+const globalsPromise = new Promise(async (resolve) => {
+  try {
+    const resp = await fetchWithoutCache(GLOBALS_FILE);  // "Globals.xs"
+    if (resp.ok) {
+      const parsedGlobals = await parseCodeBehindResponse(resp);
+      const globalsXs = parsedGlobals?.codeBehind;
+      const extractedGlobals = extractGlobals({
+        ...(globalsXs?.vars || {}),
+        ...(globalsXs?.functions || {}),
+      });
+      resolve(extractedGlobals);
+    } else {
+      resolve({ /* error component */ });
+    }
+  } catch (e) {
+    resolve(null);
+  }
+}) as any;
+
+const [loadedEntryPoint, loadedGlobals, loadedComponents, themes] = await Promise.all([
+  entryPointPromise,
+  globalsPromise,    // Global variables loaded in parallel
+  Promise.all(componentPromises || []),
+  Promise.all(themePromises || []),
+]);
+
+setGlobalVars(loadedGlobals);  // Store globals for use in app
+```
 
 The resulting internal representation is a complete app definition that the rendering engine can process regardless of whether it was created from pre-compiled sources or parsed at runtime.
 
@@ -274,9 +324,9 @@ Here's a comprehensive table of all objects involved in rendering XMLUI apps:
 
 | **Object** | **Type** | **Role/Contribution to Rendering** |
 |------------|----------|-------------------------------------|
-| **StandaloneApp** | React Component | Root component that prepares app internal representation and initiates rendering via ApiInterceptorProvider → AppRoot |
+| **StandaloneApp** | React Component | Root component that prepares app internal representation (including loading Globals.xs) and initiates rendering via ApiInterceptorProvider → AppRoot |
 | **ApiInterceptorProvider** | React Component | Wraps the app to provide mocked API functionality and routing context; waits for API interceptor initialization if needed |
-| **AppRoot** | React Component | Main rendering orchestrator that wraps app definition in root Container and Theme components; sets up component registry |
+| **AppRoot** | React Component | Main rendering orchestrator that wraps app definition in root Container (with globalVars) and Theme components; sets up component registry |
 | **ComponentProvider** | React Context | Provides component registry that maps component names to their renderer functions; manages core and compound components |
 | **StyleProvider** | React Component | Provides CSS-in-JS styling context and theme-based styling capabilities for components |
 | **DebugViewProvider** | React Context | Provides debug configuration and development tooling context for the application |
@@ -292,13 +342,13 @@ Here's a comprehensive table of all objects involved in rendering XMLUI apps:
 | **AppContent** | React Component | Creates application context with global functions, viewport management, theme info, and app state; provides navigation and utility functions |
 | **AppContext.Provider** | React Context | Provides global app functions (navigate, toast, confirm, etc.) and environment information |
 | **AppStateContext.Provider** | React Context | Manages application state in "buckets" to avoid prop drilling through component hierarchies |
-| **StandaloneComponent** | React Component | Root container renderer that wraps the app definition in a Container component and initiates the renderChild process |
-| **renderChild()** | Function | The "jolly-joker" function that recursively processes component definitions into React elements; handles TextNode, Slot, and component rendering |
-| **ComponentWrapper** | React Component | Prepares components for XMLUI environment; connects with state management; transforms data operations; routes to ContainerWrapper or ComponentAdapter |
-| **ContainerWrapper** | React Component | Manages state containers for components that need state management; wraps components in StateContainer for isolated state |
+| **StandaloneComponent** | React Component | Root container renderer that wraps the app definition in a Container component (with globalVars property) and initiates the renderChild process |
+| **renderChild()** | Function | The "jolly-joker" function that recursively processes component definitions into React elements; passes globalVars through ChildRendererContext |
+| **ComponentWrapper** | React Component | Prepares components for XMLUI environment; passes globalVars to children; transforms data operations; routes to ContainerWrapper or ComponentAdapter |
+| **ContainerWrapper** | React Component | Manages state containers; passes parentGlobalVars to StateContainer for global variable inheritance |
 | **ComponentAdapter** | React Component | Translates XMLUI domain concepts to React concepts; creates RendererContext; handles API-bound components, slots, decorations, and error boundaries |
-| **Container** | React Component | Manages component state and provides context for child components; handles state isolation and cleanup |
-| **StateContainer** | React Component | Provides isolated state management for container components; manages component lifecycle and state updates |
+| **Container** | React Component | Manages component state; passes globalVars through ChildRendererContext to renderChild for propagation to children |
+| **StateContainer** | React Component | Merges parentGlobalVars with node.globalVars; adds currentGlobalVars to combinedState; handles global variable change bubbling to root |
 | **ApiBoundComponent** | React Component | Handles components with API-bound properties and events (DataSource, APICall, FileUpload, etc.) |
 | **ComponentDecorator** | React Component | Decorates components with test IDs, inspection attributes, and other development/tooling features |
 | **SlotItem** | React Component | Manages template transposition for Slot components in reusable component patterns |
