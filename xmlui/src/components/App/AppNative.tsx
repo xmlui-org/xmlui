@@ -30,6 +30,7 @@ import { SearchContextProvider } from "./SearchContext";
 import type { NavHierarchyNode } from "../NavPanel/NavPanelNative";
 import { LinkInfoContext } from "./LinkInfoContext";
 import { EMPTY_OBJECT } from "../../components-core/constants";
+import { Part } from "../Part/Part";
 
 // --- Slot Components ---
 
@@ -436,19 +437,21 @@ export function App({
 
   // Helper functions for rendering slots
   const renderHeaderSlot = () => (
-    <AppHeaderSlot
-      ref={headerSize.refCallback}
-      className={classnames(
-        config.showCondensedHeader && "app-layout-condensed",
-        config.headerClasses,
-      )}
-    >
-      {config.showCondensedHeader && !hasRegisteredHeader && hasRegisteredNavPanel && (
-        <AppContextAwareAppHeader renderChild={renderChild} />
-      )}
-      {header}
-      {config.navPanelInHeader && navPanelVisible && <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>}
-    </AppHeaderSlot>
+    <Part partId="header">
+      <AppHeaderSlot
+        ref={headerSize.refCallback}
+        className={classnames(
+          config.showCondensedHeader && "app-layout-condensed",
+          config.headerClasses,
+        )}
+      >
+        {config.showCondensedHeader && !hasRegisteredHeader && hasRegisteredNavPanel && (
+          <AppContextAwareAppHeader renderChild={renderChild} />
+        )}
+        {header}
+        {config.navPanelInHeader && navPanelVisible && <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>}
+      </AppHeaderSlot>
+    </Part>
   );
 
   const renderFooterSlot = () => {
