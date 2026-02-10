@@ -985,25 +985,6 @@ export const Table = forwardRef(
       let tableOffsetTop = 0;
       let tableHeight = 0;
       let theadHeight = thead.offsetHeight;
-
-      const cacheOffsets = () => {
-        theadHeight = thead.offsetHeight;
-        tableHeight = table.offsetHeight;
-        if (isBody) {
-          tableOffsetTop = table.getBoundingClientRect().top + window.scrollY;
-        } else {
-          tableOffsetTop =
-            table.getBoundingClientRect().top -
-            scrollEl.getBoundingClientRect().top +
-            scrollEl.scrollTop;
-        }
-      };
-      cacheOffsets();
-
-      const ro = new ResizeObserver(cacheOffsets);
-      ro.observe(table);
-      ro.observe(scrollEl === document.documentElement ? document.body : scrollEl);
-
       let lastOffset = -1;
 
       const applyTransform = () => {
@@ -1030,6 +1011,26 @@ export const Table = forwardRef(
           thead.style.position = '';
         }
       };
+
+      const cacheOffsets = () => {
+        theadHeight = thead.offsetHeight;
+        tableHeight = table.offsetHeight;
+        if (isBody) {
+          tableOffsetTop = table.getBoundingClientRect().top + window.scrollY;
+        } else {
+          tableOffsetTop =
+            table.getBoundingClientRect().top -
+            scrollEl.getBoundingClientRect().top +
+            scrollEl.scrollTop;
+        }
+        // Ensure header is correctly positioned after resizing (e.g. orientation change)
+        requestAnimationFrame(applyTransform);
+      };
+      cacheOffsets();
+
+      const ro = new ResizeObserver(cacheOffsets);
+      ro.observe(table);
+      ro.observe(scrollEl === document.documentElement ? document.body : scrollEl);
 
       // --- Momentum-phase polling ---
       // After touchend, mobile browsers momentum-scroll but throttle scroll events.
