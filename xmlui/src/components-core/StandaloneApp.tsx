@@ -125,8 +125,6 @@ function StandaloneApp({
     extensionManager,
   );
 
-  console.log("[StandaloneApp.render] globalVars keys:", Object.keys(globalVars || {}).slice(0, 15));
-  console.log("[StandaloneApp.render] count:", globalVars?.count, ", dummy:", globalVars?.dummy, ", getCount:", typeof globalVars?.getCount);
   console.log("Runtime:", runtime);
   usePrintVersionNumber(standaloneApp);
 
@@ -239,12 +237,7 @@ function StandaloneApp({
         // @ts-ignore
         routerBaseName={typeof window !== "undefined" ? window.__PUBLIC_PATH || "" : ""}
         globalProps={globalProps}
-        globalVars={(() => {
-          const filtered = filterGlobalVars(globalVars);
-          console.log("[StandaloneApp] Passing to AppRoot - filtered globalVars keys:", Object.keys(filtered).slice(0, 15));
-          console.log("[StandaloneApp] Passing to AppRoot - count:", filtered.count, ", dummy:", filtered.dummy, ", getCount:", typeof filtered.getCount);
-          return filtered;
-        })()}
+        globalVars={filterGlobalVars(globalVars)}
         defaultTheme={defaultTheme}
         defaultTone={defaultTone as ThemeTone}
         resources={resources}
@@ -362,8 +355,6 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
     throw new Error(`Failed to fetch ${response.url}`);
   }
   const code = await response.text();
-  console.log(`[parseCodeBehindResponse] Parsing: ${response.url}, code length: ${code.length}`);
-  console.log(`[parseCodeBehindResponse] Code preview: ${code.substring(0, 200)}`);
   
   const parser = new Parser(code);
   try {
@@ -436,12 +427,6 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
       codeBehind: codeBehind,
       file: response.url,
     };
-    console.log(`[parseCodeBehindResponse] Result for ${response.url}:`, JSON.stringify({
-      file: result.file,
-      srcLength: result.src.length,
-      codeBehindVars: Object.keys(result.codeBehind?.vars || {}),
-      codeBehindFunctions: Object.keys(result.codeBehind?.functions || {}),
-    }, null, 2));
     return result;
   } catch (e) {
     console.error("Error collecting code behind", e);
@@ -808,17 +793,6 @@ function useStandalone(
   // --- This function extracts the global variables and functions from the combined
   // --- pre-built Globals.xs module.
   const extractGlobals = (prebuiltGlobals: Record<string, any>): Record<string, any> => {
-    console.log("[extractGlobals] Called with:", JSON.stringify({
-      keys: Object.keys(prebuiltGlobals),
-      keyCount: Object.keys(prebuiltGlobals).length,
-      sampleValues: Object.entries(prebuiltGlobals).slice(0, 3).map(([k, v]) => ({
-        key: k,
-        valueType: typeof v,
-        hasParsed: typeof v === 'object' && v !== null ? '__PARSED__' in v : false,
-        hasTree: typeof v === 'object' && v !== null ? 'tree' in v : false,
-      })),
-    }, null, 2));
-    
     const extractedVars: Record<string, any> = {};
     
     // Process variables in multiple passes to handle dependencies
@@ -890,16 +864,6 @@ function useStandalone(
         extractedVars[key] = value;
       }
     }
-    
-    console.log("[extractGlobals] Final extracted variables:", JSON.stringify({
-      keys: Object.keys(extractedVars).filter(k => !k.startsWith('__tree_')),
-      values: Object.entries(extractedVars)
-        .filter(([k]) => !k.startsWith('__tree_'))
-        .reduce((acc, [k, v]) => {
-          acc[k] = typeof v === 'object' ? '[object]' : v;
-          return acc;
-        }, {} as Record<string, any>),
-    }, null, 2));
     
     return extractedVars;
   };
@@ -989,11 +953,6 @@ function useStandalone(
         // --- Transform Main.xmlui.xs variables into <global> tags for dependency support
         const mainXs = runtime?.[MAIN_XS_BUILT_RESOURCE];
         if (mainXs?.vars || mainXs?.functions) {
-          console.log("[StandaloneApp] Found Main.xmlui.xs content:", {
-            vars: Object.keys(mainXs?.vars || {}),
-            functions: Object.keys(mainXs?.functions || {})
-          });
-          
           appDef.entryPoint = transformMainXsToGlobalTags(
             appDef.entryPoint as ComponentDef,
             mainXs
@@ -1035,7 +994,6 @@ function useStandalone(
         
         // --- Since Globals.xs variables are now transformed to <global> tags,
         // --- we only need to set the parsed globals from component definitions
-        console.log("[StandaloneApp] Setting globalVars from parsed components:", parsedGlobals);
         setGlobalVars(parsedGlobals);
         return;
       }
@@ -1100,35 +1058,19 @@ function useStandalone(
       // --- Fetch the optional Main.xmlui.xs file containing global variables and functions
       const globalsPromise = new Promise(async (resolve) => {
         try {
-          console.log(`[StandaloneApp] Starting to fetch Main.xmlui.xs: "${MAIN_CODE_BEHIND_FILE}"`);
           const resp = await fetchWithoutCache(MAIN_CODE_BEHIND_FILE);
-          console.log(`[StandaloneApp] Fetch response status: ${resp.status}, ok: ${resp.ok}`);
           
           if (resp.ok) {
             const parsedGlobals = await parseCodeBehindResponse(resp);
-            console.log("[StandaloneApp] Parsed globals response:", JSON.stringify({
-              hasCodeBehind: !!parsedGlobals?.codeBehind,
-              codeBehindVars: Object.keys(parsedGlobals?.codeBehind?.vars || {}),
-              codeBehindFunctions: Object.keys(parsedGlobals?.codeBehind?.functions || {}),
-              src: parsedGlobals?.src?.substring(0, 100) || "null",
-            }, null, 2));
             
             const mainXs = parsedGlobals?.codeBehind;
             const extractedGlobals = extractGlobals({
               ...(mainXs?.vars || {}),
               ...(mainXs?.functions || {}),
             });
-            console.log("[StandaloneApp] Extracted globals:", JSON.stringify(
-              Object.keys(extractedGlobals).reduce((acc, key) => {
-                acc[key] = typeof extractedGlobals[key] === 'object' ? "[object]" : extractedGlobals[key];
-                return acc;
-              }, {} as Record<string, any>),
-              null, 2
-            ));
             // Return structure matching vite-xmlui-plugin: codeBehind spread with src and extractedGlobals
             resolve({ ...parsedGlobals?.codeBehind, src: parsedGlobals?.src, __extractedGlobals: extractedGlobals });
           } else {
-            console.log(`[StandaloneApp] Failed to fetch Main.xmlui.xs, status: ${resp.status}`);
             resolve({
               component: errReportMessage(`Failed to load the code-behind (${MAIN_CODE_BEHIND_FILE})`),
               file: MAIN_CODE_BEHIND_FILE,
@@ -1136,7 +1078,6 @@ function useStandalone(
             });
           }
         } catch (e) {
-          console.error("[StandaloneApp] Error fetching/parsing Main.xmlui.xs:", e);
           resolve(null);
         }
       }) as any;
@@ -1177,21 +1118,6 @@ function useStandalone(
         Promise.all(componentPromises || []),
         Promise.all(themePromises || []),
       ]);
-
-      console.log("[StandaloneApp] After promise resolution, loadedGlobals:", JSON.stringify(
-        loadedGlobals && typeof loadedGlobals === 'object' ? {
-          type: "object",
-          hasVars: !!(loadedGlobals as any).vars,
-          hasFunctions: !!(loadedGlobals as any).functions,
-          hasSrc: !!(loadedGlobals as any).src,
-          hasExtractedGlobals: !!(loadedGlobals as any).__extractedGlobals,
-          varsKeys: (loadedGlobals as any).vars ? Object.keys((loadedGlobals as any).vars).slice(0, 10) : [],
-          functionsKeys: (loadedGlobals as any).functions ? Object.keys((loadedGlobals as any).functions).slice(0, 10) : [],
-          hasError: (loadedGlobals as any).hasError,
-          isComponent: !!(loadedGlobals as any).component,
-        } : loadedGlobals,
-        null, 2
-      ));
 
       // Note: setGlobalVars is called later after merging with parsedGlobals from components
 
@@ -1279,11 +1205,6 @@ function useStandalone(
       
       // --- Transform Main.xmlui.xs variables into <global> tags for dependency support (same as pre-built path)
       if (loadedGlobals && typeof loadedGlobals === 'object' && ((loadedGlobals as any).vars || (loadedGlobals as any).functions)) {
-        console.log("[StandaloneApp] Transforming Main.xmlui.xs into global tags:", {
-          vars: Object.keys((loadedGlobals as any).vars || {}),
-          functions: Object.keys((loadedGlobals as any).functions || {})
-        });
-        
         // Pass loadedGlobals directly - it has the same structure as runtime[MAIN_XS_BUILT_RESOURCE]
         entryPointWithCodeBehind = transformMainXsToGlobalTags(
           entryPointWithCodeBehind,
@@ -1474,7 +1395,6 @@ function useStandalone(
       // Collect from root element
       if (entryPointWithCodeBehind.globalVars) {
         Object.assign(parsedGlobals, entryPointWithCodeBehind.globalVars);
-        console.log("[StandaloneApp] parsedGlobals from entryPointWithCodeBehind.globalVars:", parsedGlobals);
       }
       
       // Collect from compound components (root precedence already handled in component order)
@@ -1491,7 +1411,6 @@ function useStandalone(
       
       // Set globalVars with expressions from parsedGlobals (same as pre-built path)
       // DO NOT merge with extractedMainXsGlobals - those are static evaluated values that break reactivity
-      console.log("[StandaloneApp] Setting globalVars from parsedGlobals (expressions):", parsedGlobals);
       setGlobalVars(parsedGlobals);
     })();
   }, [runtime, standaloneAppDef]);
@@ -1628,27 +1547,22 @@ function transformMainXsToGlobalTags(
   // Process vars from Main.xmlui.xs
   if (mainXs.vars) {
     Object.entries(mainXs.vars).forEach(([varName, varDef]) => {
-      console.log(`[transformMainXs] Processing var ${varName}:`, varDef);
-      
       // Use the source text directly from the parsed expression
       let valueExpression = "";
       
       if (typeof varDef === "object" && varDef?.source) {
         // Use the source text preserved by the parser
         valueExpression = varDef.source;
-        console.log(`[transformMainXs] Using parsed source for ${varName}: "${valueExpression}"`);
       } else if (mainXs.src) {
         // Fallback: extract from source code using regex when we have the full source
         const srcMatch = mainXs.src.match(new RegExp(`var\\s+${varName}\\s*=\\s*(.+?)(?:;|$)`, 'm'));
         if (srcMatch) {
           valueExpression = srcMatch[1].trim();
-          console.log(`[transformMainXs] Extracted from mainXs.src for ${varName}: "${valueExpression}"`);
         }
       }
       
       if (!valueExpression) {
         valueExpression = "0"; // Safe fallback
-        console.log(`[transformMainXs] Using fallback value for ${varName}: "${valueExpression}"`);
       }
       
       // Wrap in braces if not already wrapped
@@ -1658,7 +1572,6 @@ function transformMainXsToGlobalTags(
       
       // Add to globalVars
       globalVars[varName] = valueExpression;
-      console.log(`[transformMainXs] Set globalVar ${varName} = "${valueExpression}"`);
     });
   }
   
@@ -1679,8 +1592,6 @@ function transformMainXsToGlobalTags(
       }
     };
     
-    console.log(`[transformMainXs] Transformed entry point with globalVars:`, globalVars);
-    console.log(`[transformMainXs] Transformed entry point with functions:`, Object.keys(functions));
     return transformedEntryPoint;
   }
   
