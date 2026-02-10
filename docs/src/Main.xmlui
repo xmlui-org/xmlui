@@ -835,9 +835,9 @@
                 content="{appGlobals.content['pages/vscode.md']}"
             />
         </Page>
-        <Page url="/components/*">
+        <Page url="/components/:compId">
             <script>
-              var contentKey = "components/" + $routeParams["*"];
+              var contentKey = "components/" + $routeParams.compId;
               var content = appGlobals.content[contentKey];
             </script>
             <DocumentPage when="{content}" content="{content}" />
