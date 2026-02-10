@@ -1118,7 +1118,7 @@ export const Table = forwardRef(
           paginationControls}
 
         <table className={styles.table} ref={tableRef}>
-          {!hideHeader && /* <thead style={{ height: headerHeight }} className={styles.headerWrapper}> */ (
+          {!hideHeader && (
               <thead 
                 style={{ 
                   height: headerHeight,
