@@ -599,11 +599,33 @@ export function AppContent({
           else if (tag === "select") ariaRole = "combobox";
           else if (tag === "textarea") ariaRole = "textbox";
         }
-        // Accessible name: aria-label > aria-labelledby > text content (for buttons/links)
+        // Accessible name: aria-label > aria-labelledby > associated label > text content
         ariaName = target.getAttribute?.("aria-label") || undefined;
         if (!ariaName && target.getAttribute?.("aria-labelledby")) {
           const labelEl = document.getElementById(target.getAttribute("aria-labelledby")!);
           ariaName = labelEl?.textContent?.trim() || undefined;
+        }
+        // For form inputs, resolve from the associated <label> element.
+        // First try the native .labels property, then walk up the DOM to
+        // find a nearby <label> — XMLUI's label htmlFor may reference a
+        // wrapper id rather than the input's React-generated id.
+        if (!ariaName && (ariaRole === "textbox" || ariaRole === "checkbox" ||
+            ariaRole === "radio" || ariaRole === "combobox")) {
+          const labels = (target as HTMLInputElement).labels;
+          if (labels && labels.length > 0) {
+            ariaName = labels[0].textContent?.trim() || undefined;
+          }
+          if (!ariaName) {
+            // Walk up to find the nearest <label> in the component tree
+            let el = target.parentElement;
+            for (let i = 0; i < 5 && el && !ariaName; i++) {
+              const label = el.querySelector("label");
+              if (label) {
+                ariaName = label.textContent?.trim() || undefined;
+              }
+              el = el.parentElement;
+            }
+          }
         }
         if (!ariaName && (ariaRole === "button" || ariaRole === "link")) {
           const btnText = target.textContent?.trim();
