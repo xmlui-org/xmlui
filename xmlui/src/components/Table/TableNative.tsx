@@ -962,36 +962,150 @@ export const Table = forwardRef(
 
     const startMargin = useStartMargin(hasOutsideScroll, wrapperRef, scrollRef);
 
-    const [headerFixed, setHeaderFixed] = useState(false);
+    const theadRef = useRef<HTMLTableSectionElement>(null);
 
+    // Use transform-based approach to keep header visible during outside scroll.
+    // The header stays in document flow (no position:fixed) — we just visually
+    // shift it with translate3d, which avoids all layout-shift/bounce issues.
+    // We run synchronously in the scroll handler and cache layout offsets so we
+    // only use cheap scrollTop reads per frame.
+    // On mobile, scroll events are throttled during momentum scrolling, so we
+    // also listen to touchmove (fires every frame during active touch) and run
+    // a rAF polling loop during the momentum phase (touchend → scrollend/idle).
     useEffect(() => {
-      if (!hasOutsideScroll || !tableRef.current) return;
+      if (!hasOutsideScroll || !tableRef.current || !theadRef.current) return;
 
-      const root = scrollRef.current === document.body ? null : scrollRef.current;
+      const isBody = !scrollRef.current || scrollRef.current === document.body;
+      const scrollEl = isBody ? document.documentElement : scrollRef.current!;
+      const scrollTarget: EventTarget = isBody ? window : scrollRef.current!;
+      const thead = theadRef.current;
+      const table = tableRef.current;
 
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          // More nuanced: only fix when table top is significantly above viewport
-          // and table bottom is still below viewport (table is actually visible)
-          const rect = entry.boundingClientRect;
-          const rootRect = entry.rootBounds;
-          
-          if (!rootRect) return;
-          
-          const tableIsScrolledPast = rect.top < rootRect.top;
-          const tableIsStillVisible = rect.bottom > rootRect.top;
-          
-          setHeaderFixed(tableIsScrolledPast && tableIsStillVisible);
-        },
-        {
-          root,
-          threshold: Array.from({ length: 101 }, (_, i) => i / 100), // 0, 0.01, 0.02, ..., 1.00
+      // Cache layout values — recomputed only on resize, not every scroll
+      let tableOffsetTop = 0;
+      let tableHeight = 0;
+      let theadHeight = thead.offsetHeight;
+
+      const cacheOffsets = () => {
+        theadHeight = thead.offsetHeight;
+        tableHeight = table.offsetHeight;
+        if (isBody) {
+          tableOffsetTop = table.getBoundingClientRect().top + window.scrollY;
+        } else {
+          tableOffsetTop =
+            table.getBoundingClientRect().top -
+            scrollEl.getBoundingClientRect().top +
+            scrollEl.scrollTop;
         }
-      );
+      };
+      cacheOffsets();
 
-      observer.observe(tableRef.current);
+      const ro = new ResizeObserver(cacheOffsets);
+      ro.observe(table);
+      ro.observe(scrollEl === document.documentElement ? document.body : scrollEl);
 
-      return () => observer.disconnect();
+      let lastOffset = -1;
+
+      const applyTransform = () => {
+        const scrollTop = isBody ? window.scrollY : scrollEl.scrollTop;
+        const tableTop = tableOffsetTop - scrollTop;
+
+        const tableScrolledPast = tableTop < 0;
+        const tableStillVisible = tableTop + tableHeight > theadHeight;
+
+        if (tableScrolledPast && tableStillVisible) {
+          const offset = -tableTop;
+          if (offset !== lastOffset) {
+            lastOffset = offset;
+            thead.style.transform = `translate3d(0,${offset}px,0)`;
+            if (!thead.style.zIndex) {
+              thead.style.zIndex = '1000';
+              thead.style.position = 'relative';
+            }
+          }
+        } else if (lastOffset !== -1) {
+          lastOffset = -1;
+          thead.style.transform = '';
+          thead.style.zIndex = '';
+          thead.style.position = '';
+        }
+      };
+
+      // --- Momentum-phase polling ---
+      // After touchend, mobile browsers momentum-scroll but throttle scroll events.
+      // We poll via rAF until scroll position stabilises for ~100ms.
+      let pollRafId: number | null = null;
+      let lastPollScrollTop = -1;
+      let idleFrames = 0;
+      const IDLE_THRESHOLD = 6; // ~100ms at 60fps
+
+      const pollLoop = () => {
+        applyTransform();
+        const currentScroll = isBody ? window.scrollY : scrollEl.scrollTop;
+        if (currentScroll === lastPollScrollTop) {
+          idleFrames++;
+        } else {
+          idleFrames = 0;
+          lastPollScrollTop = currentScroll;
+        }
+        if (idleFrames < IDLE_THRESHOLD) {
+          pollRafId = requestAnimationFrame(pollLoop);
+        } else {
+          pollRafId = null;
+        }
+      };
+
+      const startPolling = () => {
+        if (pollRafId == null) {
+          idleFrames = 0;
+          lastPollScrollTop = -1;
+          pollRafId = requestAnimationFrame(pollLoop);
+        }
+      };
+
+      const stopPolling = () => {
+        if (pollRafId != null) {
+          cancelAnimationFrame(pollRafId);
+          pollRafId = null;
+        }
+      };
+
+      // --- Event handlers ---
+      const onScroll = () => {
+        applyTransform();
+      };
+
+      const onTouchMove = () => {
+        applyTransform();
+      };
+
+      const onTouchEnd = () => {
+        // Finger lifted — momentum scroll may be happening. Start polling.
+        startPolling();
+      };
+
+      const onTouchStart = () => {
+        // Finger back down — stop polling, touchmove will take over.
+        stopPolling();
+      };
+
+      scrollTarget.addEventListener('scroll', onScroll, { passive: true });
+      scrollTarget.addEventListener('touchmove', onTouchMove, { passive: true });
+      scrollTarget.addEventListener('touchend', onTouchEnd, { passive: true });
+      scrollTarget.addEventListener('touchstart', onTouchStart, { passive: true });
+      applyTransform(); // initial check
+
+      return () => {
+        scrollTarget.removeEventListener('scroll', onScroll);
+        scrollTarget.removeEventListener('touchmove', onTouchMove);
+        scrollTarget.removeEventListener('touchend', onTouchEnd);
+        scrollTarget.removeEventListener('touchstart', onTouchStart);
+        stopPolling();
+        ro.disconnect();
+        thead.style.transform = '';
+        thead.style.zIndex = '';
+        thead.style.position = '';
+      };
     }, [hasOutsideScroll]);
 
     // ==================================================================================
@@ -1134,14 +1248,15 @@ export const Table = forwardRef(
 
         <table className={styles.table} ref={tableRef}>
           {!hideHeader && (
+            <>
               <thead 
+                ref={theadRef}
                 style={{ 
                   height: headerHeight,
-                  position: headerFixed ? 'fixed' : 'sticky',
-                  top: headerFixed ? 0 : undefined,
-                  width: headerFixed ? tableRef.current?.offsetWidth : undefined,
-                  zIndex: headerFixed ? 1000 : undefined,
-                  minWidth: headerFixed ? undefined : "100%",
+                  position: 'sticky',
+                  top: 0,
+                  minWidth: "100%",
+                  willChange: hasOutsideScroll ? 'transform' : undefined,
                 }} 
                 className={styles.headerWrapper}
               >
@@ -1340,6 +1455,7 @@ export const Table = forwardRef(
                 </tr>
               ))}
             </thead>
+            </>
           )}
           {hasData && (
             <tbody className={styles.tableBody}>
