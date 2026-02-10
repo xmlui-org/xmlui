@@ -867,8 +867,9 @@ export function AppContent({
 function signError(error: Error | string) {
   const message = typeof error === "string" ? error : error.message || "Something went wrong";
   toast.error(message);
-  // Log to _xsLogs so regression tests can detect runtime errors.
-  // _xsLogs only exists when xsVerbose=true (same guard as ErrorBoundary).
+  // Always log to console so Playwright page.on('console') can capture it
+  console.error("[xmlui]", message);
+  // Also log to _xsLogs when xsVerbose is active (same guard as ErrorBoundary).
   if (typeof window !== "undefined") {
     const w = window as any;
     if (Array.isArray(w._xsLogs)) {

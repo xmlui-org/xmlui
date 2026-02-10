@@ -62,7 +62,7 @@ export function reportEngineError(error: Error | string, errorToThrow?: any): vo
   }
 
   if (helperMessage) {
-    console.log(helperMessage, ...colors);
+    console.error(helperMessage, ...colors);
   }
   appErrors.push({ error, helperMessage, colors });
   throw errorToThrow ?? error;
