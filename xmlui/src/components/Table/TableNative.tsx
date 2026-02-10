@@ -987,7 +987,43 @@ export const Table = forwardRef(
       let tableOffsetTop = 0;
       let tableHeight = 0;
       let theadHeight = thead.offsetHeight;
+      let fixedHeaderOffset = 0;
       let lastOffset = -1;
+
+      const getFixedHeaderOffset = (): number => {
+        // Get the root node for this component (either document or shadow root)
+        const rootNode = thead.getRootNode() as Document | ShadowRoot;
+
+        // Combine selectors into single query for better performance
+        // Note: Avoid [style*="..."] selectors - they only match inline styles, not computed styles
+        const selector = '[data-part-header], [role="banner"], header, .app-header, .header, [data-fixed-header]';
+        
+        let maxBottom = 0;
+        
+        try {
+          const elements = rootNode.querySelectorAll(selector);
+          
+          // Use for...of for better performance than forEach
+          for (const el of elements) {
+            if (el === thead || thead.contains(el)) continue;
+            
+            const style = window.getComputedStyle(el);
+            
+            // Only check position if element is fixed/sticky
+            if (style.position === 'fixed' || style.position === 'sticky') {
+              const rect = el.getBoundingClientRect();
+              // Check if element is at or near the top of the viewport
+              if (rect.top <= 10 && rect.bottom > 0) {
+                maxBottom = Math.max(maxBottom, rect.bottom);
+              }
+            }
+          }
+        } catch (e) {
+          // Invalid selector or other DOM error, return 0
+        }
+        
+        return maxBottom;
+      };
 
       const applyTransform = () => {
         const scrollTop = isBody ? window.scrollY : scrollEl.scrollTop;
@@ -997,7 +1033,7 @@ export const Table = forwardRef(
         const tableStillVisible = tableTop + tableHeight > theadHeight;
 
         if (tableScrolledPast && tableStillVisible) {
-          const offset = -tableTop;
+          const offset = -tableTop + fixedHeaderOffset;
           if (offset !== lastOffset) {
             lastOffset = offset;
             thead.style.transform = `translate3d(0,${offset}px,0)`;
@@ -1017,6 +1053,7 @@ export const Table = forwardRef(
       const cacheOffsets = () => {
         theadHeight = thead.offsetHeight;
         tableHeight = table.offsetHeight;
+        fixedHeaderOffset = getFixedHeaderOffset();
         if (isBody) {
           tableOffsetTop = table.getBoundingClientRect().top + window.scrollY;
         } else {

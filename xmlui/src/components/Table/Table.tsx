@@ -635,6 +635,7 @@ const TableWithColumns = memo(
             userSelectHeading={extractValue.asOptionalString(node.props.userSelectHeading)}
             hideSelectionCheckboxes={extractValue.asOptionalBoolean(node.props.hideSelectionCheckboxes)}
             keyBindings={extractValue(node.props.keyBindings)}
+            alwaysShowHeader={extractValue.asOptionalBoolean(node.props.alwaysShowHeader)}
           />
         </>
       );
