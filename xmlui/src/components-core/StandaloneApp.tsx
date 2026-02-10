@@ -124,8 +124,6 @@ function StandaloneApp({
     runtime,
     extensionManager,
   );
-
-  console.log("Runtime:", runtime);
   usePrintVersionNumber(standaloneApp);
 
   // --- Display build errors from the vite-xmlui-plugin if any exist

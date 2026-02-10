@@ -41,11 +41,8 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
       // Normalize path separators for cross-platform consistency
       const normalizedId = normalizePath(id);
       
-      const moduleNameResolver = (moduleName: string) => {
-        return path.resolve(path.dirname(normalizedId), moduleName);
-      };
-
       if (xmluiExtension.test(id)) {
+       
         const fileId = "" + itemIndex++;
 
         // --- Extract script content from XMLUI markup using ScriptExtractor
@@ -180,8 +177,48 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
       }
       return null;
     },
-    // async generateBundle(opts, bundle, isWrite){
-    //   console.log('generate bundle', opts);
-    // }
+    
+    handleHotUpdate({ file, server }) {
+      // Normalize path for cross-platform consistency
+      const normalizedFile = normalizePath(file);
+      
+      // Check if the changed file is an XMLUI-related file
+      const isXmluiFile = xmluiExtension.test(normalizedFile);
+      const isXsFile = xmluiScriptExtension.test(normalizedFile) || 
+                       moduleScriptExtension.test(normalizedFile);
+      
+      if (isXmluiFile || isXsFile) {
+        // Clear module caches to ensure fresh parsing on next transform
+        clearAllModuleCaches();
+        
+        // For .xs files, we need a full page reload to ensure all imports are re-evaluated
+        // This mimics stopping and restarting the dev server
+        if (isXsFile) {
+          this.warn(`[vite-xmlui-plugin] Processing updated script file: ${file}`);
+
+          // Invalidate ALL modules to force complete re-transformation (mimic dev server restart)
+          const allModules = Array.from(server.moduleGraph.idToModuleMap.values());
+          
+          for (const mod of allModules) {
+            server.moduleGraph.invalidateModule(mod);
+          }
+          
+          // Trigger full page reload
+          server.ws.send({
+            type: 'full-reload',
+            path: '*'
+          });
+          return [];
+        }
+        
+        // For .xmlui files, do a targeted HMR
+        const module = server.moduleGraph.getModuleById(normalizedFile);
+        if (module) {
+          return [module];
+        }
+      }
+      
+      return undefined;
+    },
   };
 }
