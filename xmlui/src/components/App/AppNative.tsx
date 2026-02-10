@@ -442,6 +442,7 @@ export function App({
         config.showCondensedHeader && "app-layout-condensed",
         config.headerClasses,
       )}
+      data-part-header
     >
       {config.showCondensedHeader && !hasRegisteredHeader && hasRegisteredNavPanel && (
         <AppContextAwareAppHeader renderChild={renderChild} />
