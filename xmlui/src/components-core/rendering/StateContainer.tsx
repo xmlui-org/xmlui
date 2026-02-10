@@ -1,7 +1,7 @@
 import type { MutableRefObject, ReactNode, RefObject } from "react";
 import { forwardRef, memo, useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import produce from "immer";
-import { cloneDeep, isEmpty, isPlainObject, merge, pick } from "lodash-es";
+import { cloneDeep, isEmpty, isPlainObject, merge } from "lodash-es";
 import memoizeOne from "memoize-one";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 
@@ -40,25 +40,62 @@ import type {
 import type { ComponentApi } from "../../abstractions/ApiDefs";
 
 import { useLinkInfoContext } from "../../components/App/LinkInfoContext";
+import {
+  extractScopedState,
+  CodeBehindParseError,
+  ParseVarError,
+} from "./ContainerUtils";
 
-// --- Properties of the MemoizedErrorProneContainer component
+// ============================================================================
+// TYPE DEFINITIONS
+// ============================================================================
+
+/**
+ * Props for the StateContainer component.
+ * StateContainer manages the 6-layer state composition pipeline and variable resolution.
+ */
 type Props = {
+  /** Container wrapper definition with component metadata */
   node: ContainerWrapperDef;
+  /** Resolved key for React reconciliation */
   resolvedKey?: string;
+  /** Parent container's state (will be scoped by `uses` property) */
   parentState: ContainerState;
+  /** Global variables from parent container */
   parentGlobalVars?: Record<string, any>;
+  /** Callback when part of parent state changes */
   parentStatePartChanged: StatePartChangedFn;
+  /** Parent's function to register component APIs */
   parentRegisterComponentApi: RegisterComponentApiFnInner;
+  /** Parent container's dispatcher */
   parentDispatch: ContainerDispatcher;
+  /** Parent rendering context */
   parentRenderContext?: ParentRenderContext;
+  /** Reference to layout context */
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
+  /** Reference to UID information */
   uidInfoRef?: RefObject<Record<string, any>>;
+  /** Whether this is an implicit container (follows parent's registration) */
   isImplicit?: boolean;
+  /** Child elements to render */
   children?: ReactNode;
 };
 
-// A React component that wraps a view container into an error boundary
-// (it's a named function inside the memo, this way it will be visible with that name in the react devtools)
+// ============================================================================
+// STATE CONTAINER COMPONENT
+// ============================================================================
+
+/**
+ * StateContainer component that orchestrates the 6-layer state composition pipeline.
+ * Manages:
+ * - Parent state scoping (via `uses` property)
+ * - Component reducer state
+ * - Component APIs
+ * - Context variables
+ * - Local variable resolution (two-pass for forward references)
+ * - Routing parameters
+ * - Inspector logging for debugging
+ */
 export const StateContainer = memo(
   forwardRef(function StateContainer(
     {
@@ -83,6 +120,10 @@ export const StateContainer = memo(
     const memoedVars = useRef<MemoedVars>(new Map());
     const appContext = useAppContext();
     const xsVerbose = appContext.appGlobals?.xsVerbose === true;
+
+    // ========================================================================
+    // STATE COMPOSITION PIPELINE DOCUMENTATION
+    // ========================================================================
 
     /**
      * STATE COMPOSITION PIPELINE
@@ -170,9 +211,17 @@ export const StateContainer = memo(
      * - Variable resolution errors logged to console
      */
 
+    // ========================================================================
+    // LAYER 1: PARENT STATE SCOPING
+    // ========================================================================
+
     const stateFromOutside = useShallowCompareMemoize(
       useMemo(() => extractScopedState(parentState, node.uses), [node.uses, parentState]),
     );
+
+    // ========================================================================
+    // LAYER 2: COMPONENT REDUCER STATE
+    // ========================================================================
 
     // --- All state manipulation happens through the container reducer, which is created here.
     // --- This reducer allow collecting state changes for debugging purposes. The `debugView`
@@ -180,6 +229,10 @@ export const StateContainer = memo(
     const debugView = useDebugView();
     const containerReducer = createContainerReducer(debugView);
     const [componentState, dispatch] = useReducer(containerReducer, EMPTY_OBJECT);
+
+    // ========================================================================
+    // LAYER 3: COMPONENT APIS
+    // ========================================================================
 
     // --- The exposed APIs of components are also the part of the state.
     const [componentApis, setComponentApis] = useState<Record<symbol, ComponentApi>>(EMPTY_OBJECT);
@@ -209,11 +262,20 @@ export const StateContainer = memo(
       }, [componentState, componentApis]),
     );
 
+    // ========================================================================
+    // LAYER 4: CONTEXT VARIABLES
+    // ========================================================================
+
     const localVarsStateContext = useCombinedState(
       stateFromOutside,
       componentStateWithApis,
       node.contextVars,
     );
+
+    // ========================================================================
+    // LAYER 5: LOCAL VARIABLE RESOLUTION (TWO-PASS)
+    // ========================================================================
+
     const parsedScriptPart = node.scriptCollected;
     if (parsedScriptPart?.moduleErrors && !isEmpty(parsedScriptPart.moduleErrors)) {
       console.error("Module errors in StateContainer:", parsedScriptPart.moduleErrors);
@@ -291,6 +353,10 @@ export const StateContainer = memo(
       localVarsStateContextWithPreResolvedLocalVars,
       memoedVars, // Persistent cache for performance
     );
+
+    // ========================================================================
+    // INSPECTOR LOGGING - VARIABLE CHANGES
+    // ========================================================================
 
     // Track declared variable changes for inspector
     const prevVarsRef = useRef<Record<string, any> | null>(null);
@@ -517,6 +583,10 @@ export const StateContainer = memo(
 
     const mergedWithVars = useMergedState(resolvedLocalVars, componentStateWithApis);
 
+    // ========================================================================
+    // GLOBAL VARIABLES HANDLING
+    // ========================================================================
+
     // Collect dependencies of global variables from expression trees
     // This enables re-evaluation when dependencies change (reactivity)
     const globalDependencies = useMemo(() => {
@@ -682,8 +752,12 @@ export const StateContainer = memo(
       return {
         ...evaluatedParentGlobals,
         ...evaluatedNodeGlobals,
-      };
+      };   
     }, [parentGlobalVars, node.globalVars, appContext, globalDepValueMap, globalDependencies, componentStateWithApis]);
+
+    // ========================================================================
+    // LAYER 6: FINAL STATE COMBINATION
+    // ========================================================================
 
     const combinedState = useCombinedState(
       stateFromOutside,
@@ -692,6 +766,10 @@ export const StateContainer = memo(
       mergedWithVars,
       routingParams,
     );
+
+    // ========================================================================
+    // COMPONENT API REGISTRATION
+    // ========================================================================
 
     const registerComponentApi: RegisterComponentApiFnInner = useCallback((uid, api) => {
       setComponentApis(
@@ -711,6 +789,10 @@ export const StateContainer = memo(
     }, []);
 
     const componentStateRef = useRef(componentStateWithApis);
+
+    // ========================================================================
+    // STATE CHANGE CALLBACK
+    // ========================================================================
 
     const statePartChanged: StatePartChangedFn = useCallback(
       (pathArray, newValue, target, action) => {
@@ -757,6 +839,10 @@ export const StateContainer = memo(
       [resolvedLocalVars, currentGlobalVars, node.uses, node.uid, parentStatePartChanged],
     );
 
+    // ========================================================================
+    // RENDERING
+    // ========================================================================
+
     return (
       <ErrorBoundary node={node} location={"container"}>
         <Container
@@ -786,6 +872,14 @@ export const StateContainer = memo(
   }),
 );
 
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+
+/**
+ * Hook to get routing-related parameters from React Router.
+ * Returns pathname, route params, query params, and link info.
+ */
 const useRoutingParams = () => {
   const [queryParams] = useSearchParams();
   const routeParams = useParams();
@@ -812,21 +906,6 @@ const useRoutingParams = () => {
     };
   }, [linkInfo, location.pathname, queryParamsMap, routeParams]);
 };
-
-// Extracts the `state` property values defined in a component definition's `uses` property. It uses the specified
-// `appContext` when resolving the state values.
-function extractScopedState(
-  parentState: ContainerState,
-  uses?: string[],
-): ContainerState | undefined {
-  if (!uses) {
-    return parentState;
-  }
-  if (uses.length === 0) {
-    return EMPTY_OBJECT;
-  }
-  return pick(parentState, uses);
-}
 
 // This hook combines state properties in a list of states so that a particular state property in a higher
 // argument index overrides the same-named state property in a lower argument index.
@@ -1002,34 +1081,6 @@ function useVars(
   }, [appContext, componentState, fnDeps, memoedVars, referenceTrackedApi, vars]);
 
   return useShallowCompareMemoize(resolvedVars);
-}
-
-class CodeBehindParseError extends Error {
-  constructor(errors: ModuleErrors) {
-    const mainErrors = errors["Main"] || [];
-    const messages = mainErrors.map((errorMessage) => {
-      let ret = `${errorMessage.code} : ${errorMessage.text}`;
-      const posInfo = [];
-      if (errorMessage.line !== undefined) {
-        posInfo.push(`line:${errorMessage.line}`);
-      }
-      if (errorMessage.column !== undefined) {
-        posInfo.push(`column:${errorMessage.column}`);
-      }
-      if (posInfo.length) {
-        ret = `${ret} (${posInfo.join(", ")})`;
-      }
-      return ret;
-    });
-    super(messages.join("\n"));
-    Object.setPrototypeOf(this, CodeBehindParseError.prototype);
-  }
-}
-
-class ParseVarError extends Error {
-  constructor(varName: string, originalError: any) {
-    super(`Error on var: ${varName} - ${originalError?.message || "unknown"}`);
-  }
 }
 
 //true if it's coming from a code behind or a script tag
