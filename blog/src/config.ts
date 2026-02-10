@@ -357,8 +357,8 @@ const App: StandaloneAppDescription = {
       posts: blogPosts,
       //layout: "featuredWithTabs",
       layout: "basic",
-      tableOfContents: false,
-      //showTags: false,
+      tableOfContents: true,
+      showTags: true,
     },
   },
 };

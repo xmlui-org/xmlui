@@ -104,6 +104,7 @@ export function Blog({ className, style }: Props) {
         className={className}
         style={style}
         showToc={blogConfig.tableOfContents !== false && mediaSize.sizeIndex > 3}
+        showTags={blogConfig.showTags !== false}
       />
     );
   }
@@ -113,6 +114,7 @@ export function Blog({ className, style }: Props) {
       <BlogListViewFeatured
         sortedPosts={sortedPosts}
         allTags={allTags}
+        showTags={blogConfig.showTags !== false}
         prefetchedContent={prefetchedContent}
         blogBasePath={blogBasePath}
         formatDate={formatDate}
@@ -145,6 +147,7 @@ function BlogPostView({
   className,
   style,
   showToc,
+  showTags = true,
 }: {
   post: BlogPost;
   prefetchedContent: Record<string, string>;
@@ -153,6 +156,7 @@ function BlogPostView({
   className?: string;
   style?: CSSProperties;
   showToc: boolean;
+  showTags?: boolean;
 }) {
   const markdownContent = prefetchedContent[`/blog/${post.slug}.md`];
 
@@ -164,7 +168,7 @@ function BlogPostView({
           className={classnames(styles.postContent, !showToc && styles.postContentNoToc)}
         >
           <div className={styles.postMeta}>
-            {post.tags && post.tags.length > 0 && (
+            {showTags && post.tags && post.tags.length > 0 && (
               <div className={styles.postTagsRow}>
                 {post.tags.map((tag) => (
                   <span key={tag} className={styles.postTag}>
@@ -267,12 +271,14 @@ function FeaturedStylePostItem({
   formatDate: fmt,
   getBlurb: blurbFn,
   prefetchedContent,
+  showTags = true,
 }: {
   post: BlogPost;
   blogBasePath: string;
   formatDate: (d: string, f?: string) => string;
   getBlurb: (md: string | undefined, max?: number) => string;
   prefetchedContent: Record<string, string>;
+  showTags?: boolean;
 }) {
   const blurb = blurbFn(prefetchedContent[`/blog/${post.slug}.md`]);
   return (
@@ -285,6 +291,15 @@ function FeaturedStylePostItem({
           <Heading level="h2" showAnchor={false} className={styles.featuredStylePostTitle}>
             {post.title}
           </Heading>
+          {showTags && post.tags && post.tags.length > 0 && (
+            <div className={styles.postTagsRow}>
+              {post.tags.map((tag) => (
+                <span key={tag} className={styles.postCardTag}>
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
         {blurb && (
           <Text variant="blurb" maxLines={4} ellipses>
@@ -344,6 +359,7 @@ function BlogListViewBasic({
 function BlogListViewFeatured({
   sortedPosts,
   allTags,
+  showTags = true,
   prefetchedContent,
   blogBasePath,
   formatDate,
@@ -353,6 +369,7 @@ function BlogListViewFeatured({
 }: {
   sortedPosts: BlogPost[];
   allTags: string[];
+  showTags?: boolean;
   prefetchedContent: Record<string, string>;
   blogBasePath: string;
   formatDate: (d: string, f?: string) => string;
@@ -360,7 +377,15 @@ function BlogListViewFeatured({
   className?: string;
   style?: CSSProperties;
 }) {
-  const latestPost = sortedPosts[0];
+  const latestPost = useMemo(
+    () =>
+      sortedPosts.length === 0
+        ? undefined
+        : sortedPosts.reduce((latest, p) =>
+            Date.parse(p.date) > Date.parse(latest.date) ? p : latest,
+          ),
+    [sortedPosts],
+  );
   const latestPostBlurb = latestPost ? getBlurb(prefetchedContent[`/blog/${latestPost.slug}.md`]) : "";
   const postsByTag = (tag: string) =>
     sortedPosts.filter((p) => p.tags && p.tags.includes(tag));
@@ -372,27 +397,38 @@ function BlogListViewFeatured({
       </Heading>
 
       {latestPost && (
-        <div className={styles.featuredPost}>
-          <div className={styles.featuredPostInner}>
-            <Text variant="info">
-              {latestPost.author} • {formatDate(latestPost.date, "d MMM yyyy")}
-            </Text>
-            <Heading level="h2" showAnchor={false} className={styles.featuredPostTitle}>
-              {latestPost.title}
-            </Heading>
-            <Text variant="description">
-              {latestPost.description}
-            </Text>
+        <LinkNative to={`${blogBasePath}/${latestPost.slug}`} active>
+          <div className={styles.featuredPost}>
+            <div className={styles.featuredPostInner}>
+              <Text variant="info">
+                {latestPost.author} • {formatDate(latestPost.date, "d MMM yyyy")}
+              </Text>
+              <Heading level="h2" showAnchor={false} className={styles.featuredPostTitle}>
+                {latestPost.title}
+              </Heading>
+              <Text variant="description">
+                {latestPost.description}
+              </Text>
+              {showTags && latestPost.tags && latestPost.tags.length > 0 && (
+                <div className={styles.postTagsRow}>
+                  {latestPost.tags.map((tag) => (
+                    <span key={tag} className={styles.postCardTag}>
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+            {latestPostBlurb && (
+              <Text variant="blurb" maxLines={4} ellipses>
+                {latestPostBlurb}
+              </Text>
+            )}
+            <div className={styles.featuredPostReadMore}>
+              Read more →
+            </div>
           </div>
-          {latestPostBlurb && (
-            <Text variant="blurb" maxLines={4} ellipses>
-              {latestPostBlurb}
-            </Text>
-          )}
-          <div className={styles.featuredPostReadMore}>
-            <LinkNative to={`${blogBasePath}/${latestPost.slug}`}>Read more →</LinkNative>
-          </div>
-        </div>
+        </LinkNative>
       )}
 
       <div className={styles.sectionAllPosts}>
@@ -411,28 +447,31 @@ function BlogListViewFeatured({
                     formatDate={formatDate}
                     getBlurb={getBlurb}
                     prefetchedContent={prefetchedContent}
+                    showTags={showTags}
                   />
                 </div>
               ))}
             </div>
           </TabItemComponent>
-          {allTags.map((tag) => (
-            <TabItemComponent key={tag} label={tag}>
-              <div className={styles.postsGrid}>
-                {postsByTag(tag).map((post) => (
-                  <div key={post.slug} className={styles.postsGridItem}>
-                    <FeaturedStylePostItem
-                      post={post}
-                      blogBasePath={blogBasePath}
-                      formatDate={formatDate}
-                      getBlurb={getBlurb}
-                      prefetchedContent={prefetchedContent}
-                    />
-                  </div>
-                ))}
-              </div>
-            </TabItemComponent>
-          ))}
+          {showTags &&
+            allTags.map((tag) => (
+              <TabItemComponent key={tag} label={tag}>
+                <div className={styles.postsGrid}>
+                  {postsByTag(tag).map((post) => (
+                    <div key={post.slug} className={styles.postsGridItem}>
+                      <FeaturedStylePostItem
+                        post={post}
+                        blogBasePath={blogBasePath}
+                        formatDate={formatDate}
+                        getBlurb={getBlurb}
+                        prefetchedContent={prefetchedContent}
+                        showTags={showTags}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </TabItemComponent>
+            ))}
         </Tabs>
       </div>
     </div>
