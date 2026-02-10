@@ -63,7 +63,7 @@ import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree"
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
-const GLOBALS_BUILT_RESOURCE = "/src/Globals.xs";
+const MAIN_XS_BUILT_RESOURCE = "/src/Main.xmlui.xs";
 const GLOBALS_FILE = "Globals." + moduleFileExtension;
 const CONFIG_FILE = "config.json";
 
@@ -502,17 +502,22 @@ function resolveRuntime(runtime: Record<string, any>): {
         // --- "default" contains the functions and variables declared in the
         // --- code behind file.
         entryPointCodeBehind = value.default;
-        projectCompilation.entrypoint.codeBehindSource = value.default.src;
+        if (value.default?.src) {
+          projectCompilation.entrypoint.codeBehindSource = value.default.src;
+        }
       } else {
         projectCompilation.entrypoint.filename = key;
         // --- "default" contains the component definition, the file index,
         // --- and the source code.
-        entryPoint = value.default.component;
-        projectCompilation.entrypoint.definition = entryPoint;
-        projectCompilation.entrypoint.markupSource = value.default.src;
-
-        // Use key (the actual file path from Vite glob) for consistent source lookups
-        sources[key] = value.default.src;
+        if (value.default?.component) {
+          entryPoint = value.default.component;
+          projectCompilation.entrypoint.definition = entryPoint;
+        }
+        if (value.default?.src) {
+          projectCompilation.entrypoint.markupSource = value.default.src;
+          // Use key (the actual file path from Vite glob) for consistent source lookups
+          sources[key] = value.default.src;
+        }
       }
     }
 
@@ -547,20 +552,24 @@ function resolveRuntime(runtime: Record<string, any>): {
           },
         );
 
-        if (componentCompilationForCodeBehind) {
+        if (componentCompilationForCodeBehind && value.default?.src) {
           componentCompilationForCodeBehind.codeBehindSource = value.default.src;
         }
       } else {
         // --- "default" contains the component definition, the file index,
         // --- and the source code.
-        componentsByFileName[key] = value.default.component;
-        sources[key] = value.default.src;
+        if (value.default?.component) {
+          componentsByFileName[key] = value.default.component;
+        }
+        if (value.default?.src) {
+          sources[key] = value.default.src;
+        }
 
         const componentCompilation: ComponentCompilation = {
-          definition: value.default.component,
+          definition: value.default?.component,
           // Use key (the actual file path from Vite glob) for consistent source lookups
           filename: key,
-          markupSource: value.default.src,
+          markupSource: value.default?.src,
           dependencies: new Set(),
         };
         projectCompilation.components.push(componentCompilation);
@@ -921,9 +930,9 @@ function useStandalone(
   };
 
   const [globalVars, setGlobalVars] = useState<Record<string, any>>(() => {
-    // Get the vars in Globals.xs module directly from runtime
-    const globalsXs = runtime?.[GLOBALS_BUILT_RESOURCE];
-    return extractGlobals({ ...(globalsXs?.vars || {}), ...(globalsXs?.functions || {}) });
+    // Get the vars in Main.xmlui.xs module directly from runtime
+    const mainXs = runtime?.[MAIN_XS_BUILT_RESOURCE];
+    return extractGlobals({ ...(mainXs?.vars || {}), ...(mainXs?.functions || {}) });
   });
 
   useIsomorphicLayoutEffect(() => {
@@ -941,17 +950,17 @@ function useStandalone(
           throw new Error("couldn't find the application metadata");
         }
         
-        // --- Transform Globals.xs variables into <global> tags for dependency support
-        const globalsXs = runtime?.[GLOBALS_BUILT_RESOURCE];
-        if (globalsXs?.vars || globalsXs?.functions) {
-          console.log("[StandaloneApp] Found Globals.xs content:", {
-            vars: Object.keys(globalsXs?.vars || {}),
-            functions: Object.keys(globalsXs?.functions || {})
+        // --- Transform Main.xmlui.xs variables into <global> tags for dependency support
+        const mainXs = runtime?.[MAIN_XS_BUILT_RESOURCE];
+        if (mainXs?.vars || mainXs?.functions) {
+          console.log("[StandaloneApp] Found Main.xmlui.xs content:", {
+            vars: Object.keys(mainXs?.vars || {}),
+            functions: Object.keys(mainXs?.functions || {})
           });
           
-          appDef.entryPoint = transformGlobalsXsToGlobalTags(
+          appDef.entryPoint = transformMainXsToGlobalTags(
             appDef.entryPoint as ComponentDef,
-            globalsXs
+            mainXs
           );
         }
         
@@ -1524,19 +1533,19 @@ export function startApp(
 }
 
 /**
- * Transform Globals.xs variables into globalVars property to leverage
+ * Transform Main.xmlui.xs variables into globalVars property to leverage
  * the existing dependency system that works correctly for globalVars
  */
-function transformGlobalsXsToGlobalTags(
+function transformMainXsToGlobalTags(
   entryPoint: ComponentDef,
-  globalsXs: { vars?: Record<string, any>; functions?: Record<string, any> }
+  mainXs: { vars?: Record<string, any>; functions?: Record<string, any>; src?: string }
 ): ComponentDef {
   const globalVars: Record<string, string> = {};
   
-  // Process vars from Globals.xs
-  if (globalsXs.vars) {
-    Object.entries(globalsXs.vars).forEach(([varName, varDef]) => {
-      console.log(`[transformGlobalsXs] Processing var ${varName}:`, varDef);
+  // Process vars from Main.xmlui.xs
+  if (mainXs.vars) {
+    Object.entries(mainXs.vars).forEach(([varName, varDef]) => {
+      console.log(`[transformMainXs] Processing var ${varName}:`, varDef);
       
       // Use the source text directly from the parsed expression
       let valueExpression = "";
@@ -1544,19 +1553,19 @@ function transformGlobalsXsToGlobalTags(
       if (typeof varDef === "object" && varDef?.source) {
         // Use the source text preserved by the parser
         valueExpression = varDef.source;
-        console.log(`[transformGlobalsXs] Using parsed source for ${varName}: "${valueExpression}"`);
-      } else if (typeof varDef === "object" && varDef?.src) {
-        // Fallback: extract from source code using regex
-        const srcMatch = varDef.src.match(new RegExp(`var\\s+${varName}\\s*=\\s*(.+?)(?:;|$)`, 'm'));
+        console.log(`[transformMainXs] Using parsed source for ${varName}: "${valueExpression}"`);
+      } else if (mainXs.src) {
+        // Fallback: extract from source code using regex when we have the full source
+        const srcMatch = mainXs.src.match(new RegExp(`var\\s+${varName}\\s*=\\s*(.+?)(?:;|$)`, 'm'));
         if (srcMatch) {
           valueExpression = srcMatch[1].trim();
-          console.log(`[transformGlobalsXs] Extracted from src for ${varName}: "${valueExpression}"`);
+          console.log(`[transformMainXs] Extracted from mainXs.src for ${varName}: "${valueExpression}"`);
         }
       }
       
       if (!valueExpression) {
         valueExpression = "0"; // Safe fallback
-        console.log(`[transformGlobalsXs] Using fallback value for ${varName}: "${valueExpression}"`);
+        console.log(`[transformMainXs] Using fallback value for ${varName}: "${valueExpression}"`);
       }
       
       // Wrap in braces if not already wrapped
@@ -1566,12 +1575,12 @@ function transformGlobalsXsToGlobalTags(
       
       // Add to globalVars
       globalVars[varName] = valueExpression;
-      console.log(`[transformGlobalsXs] Set globalVar ${varName} = "${valueExpression}"`);
+      console.log(`[transformMainXs] Set globalVar ${varName} = "${valueExpression}"`);
     });
   }
   
-  // Process functions from Globals.xs (preserve them as functions, not globalVars)
-  const functions = globalsXs.functions || {};
+  // Process functions from Main.xmlui.xs (preserve them as functions, not globalVars)
+  const functions = mainXs.functions || {};
   
   // Add the globalVars and functions to the entry point
   if (Object.keys(globalVars).length > 0 || Object.keys(functions).length > 0) {
@@ -1587,8 +1596,8 @@ function transformGlobalsXsToGlobalTags(
       }
     };
     
-    console.log(`[transformGlobalsXs] Transformed entry point with globalVars:`, globalVars);
-    console.log(`[transformGlobalsXs] Transformed entry point with functions:`, Object.keys(functions));
+    console.log(`[transformMainXs] Transformed entry point with globalVars:`, globalVars);
+    console.log(`[transformMainXs] Transformed entry point with functions:`, Object.keys(functions));
     return transformedEntryPoint;
   }
   

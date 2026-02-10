@@ -195,7 +195,7 @@ export type TestBedDescription = Omit<
   testThemeVars?: Record<string, string>;
   components?: string[];
   appGlobals?: Record<string, any>;
-  globalXs?: string;
+  mainXs?: string;
   noFragmentWrapper?: boolean;
 };
 
@@ -248,16 +248,16 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       });
 
       let runtime: any;
-      if (description?.globalXs) {
-        const parsedCodeBehind = collectCodeBehindFromSource("Globals", description.globalXs);
+      if (description?.mainXs) {
+        const parsedCodeBehind = collectCodeBehindFromSource("Main", description.mainXs);
         if (parsedCodeBehind?.vars || parsedCodeBehind?.functions) {
           // Pass through the variable definitions with their source text intact
-          // for StandaloneApp to process with transformGlobalsXsToGlobalTags
+          // for StandaloneApp to process with transformMainXsToGlobalTags
           runtime = {
-            "/src/Globals.xs": {
+            "/src/Main.xmlui.xs": {
               vars: parsedCodeBehind.vars || {},
               functions: parsedCodeBehind.functions || {},
-              src: description.globalXs, // Include original source for debugging
+              src: description.mainXs, // Include original source for debugging
             },
           };
         }

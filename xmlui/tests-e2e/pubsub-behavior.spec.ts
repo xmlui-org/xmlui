@@ -181,7 +181,7 @@ test.describe("Multiple Topics", () => {
       </Fragment>
     `,
       {
-        globalXs: `
+        mainXs: `
       var sub1Topic = null;
       var sub1Data = null;
       var sub2Topic = null;
@@ -227,7 +227,7 @@ test.describe("Multiple Topics", () => {
       </Fragment>
     `,
       {
-        globalXs: `
+        mainXs: `
       var sub1Topic = null;
       var sub1Data = null;
       var sub2Topic = null;
@@ -296,7 +296,7 @@ test.describe("Multiple Topics", () => {
       </Fragment>
     `,
       {
-        globalXs: `
+        mainXs: `
       var stringSubTopic = null;
       var stringSubData = null;
       var numberSubTopic = null;
@@ -347,7 +347,7 @@ test.describe("Multiple Topics", () => {
       </Fragment>
     `,
       {
-        globalXs: `
+        mainXs: `
       var eventCount = 0;
     `,
       }
@@ -394,7 +394,7 @@ test.describe("Subscription Lifecycle", () => {
       </Fragment>
     `,
       {
-        globalXs: `
+        mainXs: `
       var showSubscriber = true;
       var received = false;
     `,
@@ -459,7 +459,7 @@ test.describe("Integration", () => {
       </Fragment>
     `,
       {
-        globalXs: `
+        mainXs: `
       var count = 0;
     `,
       }
@@ -492,7 +492,7 @@ test.describe("Integration", () => {
       </Fragment>
     `,
       {
-        globalXs: `
+        mainXs: `
       var message = '';
     `,
       }
@@ -549,7 +549,7 @@ test.describe("Integration", () => {
       </Fragment>
     `,
       {
-        globalXs: `
+        mainXs: `
       var mode = 'subscribe';
       var receivedCount = 0;
     `,

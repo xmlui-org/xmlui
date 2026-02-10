@@ -32,7 +32,7 @@ test.describe("Global variables", () => {
       </Component>
     `,
         ],
-        globalXs: `
+        mainXs: `
       var count = 6*7;
 
       function getCount() {
@@ -68,7 +68,7 @@ test.describe("Global variables", () => {
       </Component>
     `,
         ],
-        globalXs: `
+        mainXs: `
       var count = 10;
 
       function getCount() {
@@ -96,7 +96,7 @@ test.describe("Global variables", () => {
       </App>
     `,
       {
-        globalXs: `
+        mainXs: `
       var count = 5;
 
       function getCount() {
@@ -129,7 +129,7 @@ test.describe("Global variables", () => {
       </App>
     `,
       {
-        globalXs: `
+        mainXs: `
       var count = 42;
 
       function getCount() {
@@ -157,7 +157,7 @@ test.describe("Global variables", () => {
       </App>
     `,
       {
-        globalXs: `
+        mainXs: `
       var count = 20;
 
       function getCount() {
@@ -186,7 +186,7 @@ test.describe("Global variables", () => {
       </App>
     `,
       {
-        globalXs: `
+        mainXs: `
       var count = 7;
 
       function getCount() {

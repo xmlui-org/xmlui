@@ -340,7 +340,7 @@ test.describe("Global Tag - Integration with Globals.xs", () => {
     `,
       {
         noFragmentWrapper: true,
-        globalXs: `
+        mainXs: `
       var xsCount = 20;
     `,
       },
@@ -372,7 +372,7 @@ test.describe("Global Tag - Integration with Globals.xs", () => {
     `,
       {
         noFragmentWrapper: true,
-        globalXs: `
+        mainXs: `
       function getDouble() {
         return count * 2;
       }
@@ -404,7 +404,7 @@ test.describe("Global Tag - Integration with Globals.xs", () => {
     `,
       {
         noFragmentWrapper: true,
-        globalXs: `
+        mainXs: `
       var count = 42;
     `,
       },
@@ -453,7 +453,7 @@ test.describe("Global Tag - Complex Scenarios", () => {
       </Component>
     `,
         ],
-        globalXs: `
+        mainXs: `
       var xsCount = 0;
     `,
       },
