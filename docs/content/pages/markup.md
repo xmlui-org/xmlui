@@ -64,7 +64,7 @@ Or a complex JSON object, in which case you'll write an outer set of curly brace
 
 ## Variables
 
-A component may declare a variable that's visible to itself and its children. Variable names start with a letter or an underscore (`_`) and continue with these characters or digits.
+A component may declare a *variable* that's visible to itself and its children. Variable names start with a letter or an underscore (`_`) and continue with these characters or digits.
 
 You can declare a variable using the `var` prefix.
 
@@ -169,3 +169,23 @@ We've seen two ways to declare variables: a `var` declaration in an XML attribut
 >   <Text>Click count = {count}</Text>
 > </Button>
 > ```
+
+## Global Variables
+
+A component may declare a *global variable* that's visible everywhere in the application. Global variable names follow the variable naming shown earlier.
+
+You can declare a variable using the `global` prefix.
+
+```xmlui-pg name="Declaring a global variable with global"
+---app copy display
+<App global.stations="{ [ 'Bakerloo', 'Central', 'Circle'] }">
+  <H2>Station List</H2>
+  <Stations />
+</App>
+---comp display copy
+<Component name="Stations">
+  <Items data="{stations}">
+    <Text> {$item} </Text>
+  </Items>
+</Component>
+```
