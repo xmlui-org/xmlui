@@ -45,7 +45,7 @@ import { type OurColumnMetadata } from "../Column/TableContext";
 import useRowSelection from "./useRowSelection";
 import { PaginationNative, type Position } from "../Pagination/PaginationNative";
 import { Part } from "../Part/Part";
-import { parseKeyBinding, matchesKeyEvent, ParsedKeyBinding } from "../../parsers/keybinding-parser/keybinding-parser";
+import { parseKeyBinding, matchesKeyEvent, type ParsedKeyBinding } from "../../parsers/keybinding-parser/keybinding-parser";
 
 // =====================================================================================================================
 // Helper types
@@ -962,6 +962,23 @@ export const Table = forwardRef(
 
     const startMargin = useStartMargin(hasOutsideScroll, wrapperRef, scrollRef);
 
+    const [headerFixed, setHeaderFixed] = useState(false);
+    useEffect(() => {
+      if (!hasOutsideScroll || !tableRef.current) return;
+
+      const handleScroll = () => {
+        const tableRect = tableRef.current?.getBoundingClientRect();
+        if (!tableRect) return;
+        
+        // Fix header when table top goes above viewport
+        setHeaderFixed(tableRect.top < 0 && tableRect.bottom > 0);
+      };
+
+      const scrollContainer = scrollRef.current || window;
+      scrollContainer.addEventListener('scroll', handleScroll);
+      return () => scrollContainer.removeEventListener('scroll', handleScroll);
+    }, [hasOutsideScroll]);
+
     // ==================================================================================
     // Virtua Virtualization
     // ==================================================================================
@@ -1101,8 +1118,18 @@ export const Table = forwardRef(
           paginationControls}
 
         <table className={styles.table} ref={tableRef}>
-          {!hideHeader && (
-            <thead style={{ height: headerHeight }} className={styles.headerWrapper}>
+          {!hideHeader && /* <thead style={{ height: headerHeight }} className={styles.headerWrapper}> */ (
+              <thead 
+                style={{ 
+                  height: headerHeight,
+                  position: headerFixed ? 'fixed' : 'sticky',
+                  top: headerFixed ? 0 : undefined,
+                  width: headerFixed ? tableRef.current?.offsetWidth : undefined,
+                  zIndex: headerFixed ? 1000 : undefined,
+                  minWidth: headerFixed ? undefined : "100%",
+                }} 
+                className={styles.headerWrapper}
+              >
               {table.getHeaderGroups().map((headerGroup, headerGroupIndex) => (
                 <tr
                   key={`${headerGroup.id}-${headerGroupIndex}`}
@@ -1127,7 +1154,7 @@ export const Table = forwardRef(
                         const clickX = event.clientX;
                         const clickY = event.clientY;
                         const checkbox = headerCell.querySelector(
-                          'input[type=\"checkbox\"]',
+                          'input[type="checkbox"]',
                         ) as HTMLInputElement;
 
                         if (checkbox) {
@@ -1172,7 +1199,7 @@ export const Table = forwardRef(
                           const mouseX = event.clientX;
                           const mouseY = event.clientY;
                           const checkbox = headerCell.querySelector(
-                            'input[type=\"checkbox\"]',
+                            'input[type="checkbox"]',
                           ) as HTMLInputElement;
 
                           if (checkbox) {
