@@ -517,14 +517,173 @@ export const StateContainer = memo(
 
     const mergedWithVars = useMergedState(resolvedLocalVars, componentStateWithApis);
 
+    // Collect dependencies of global variables from expression trees
+    // This enables re-evaluation when dependencies change (reactivity)
+    const globalDependencies = useMemo(() => {
+      const deps: Record<string, string[]> = {};
+      
+      // Collect dependencies from parent global vars
+      if (parentGlobalVars) {
+        for (const [key, value] of Object.entries(parentGlobalVars)) {
+          if (key.startsWith("__")) continue;
+          const treeKey = `__tree_${key}`;
+          const tree = parentGlobalVars[treeKey];
+          
+          if (tree && typeof tree === "object") {
+            // Extract variable dependencies from expression tree
+            deps[key] = collectVariableDependencies(tree);
+          }
+        }
+      }
+      
+      // Collect dependencies from node global vars
+      if (node.globalVars) {
+        for (const [key, value] of Object.entries(node.globalVars)) {
+          if (key.startsWith("__")) continue;
+          const treeKey = `__tree_${key}`;
+          const tree = node.globalVars[treeKey];
+          
+          if (tree && typeof tree === "object") {
+            // Extract variable dependencies from expression tree
+            deps[key] = collectVariableDependencies(tree);
+          }
+        }
+      }
+      
+      return deps;
+    }, [parentGlobalVars, node.globalVars]);
+
+    // Build a dependency map for triggering re-evaluation when global dependencies change
+    // This includes actual runtime values of globals that other globals depend on
+    const globalDepValueMap = useMemo(() => {
+      const depMap: Record<string, any> = {};
+      const allCurrentGlobals = { ...parentGlobalVars, ...node.globalVars };
+      
+      // For each global, collect the actual values of its dependencies
+      for (const [globalKey, depNames] of Object.entries(globalDependencies)) {
+        if (!depNames) continue;
+        
+        // Include values of direct dependencies
+        for (const depName of depNames) {
+          // Check if this is another global (in parentGlobalVars or node.globalVars)
+          if (depName in allCurrentGlobals && !depName.startsWith("__")) {
+            // Use the original string expression as the key, not the value
+            // This way we can track when the definition changes
+            const depGlobalValue = allCurrentGlobals[depName];
+            const depKey = `${globalKey}:${depName}`;
+            depMap[depKey] = depGlobalValue;
+          }
+        }
+      }
+      
+      // Also include current values of componentState globals to detect runtime changes
+      // When a global is updated (e.g., count++), the new value is stored in componentState
+      // We need to detect this change to trigger re-evaluation of dependent globals
+      if (node.globalVars) {
+        for (const globalKey of Object.keys(node.globalVars)) {
+          if (!globalKey.startsWith("__") && globalKey in componentStateWithApis) {
+            // Include the actual runtime value from componentState
+            const componentValue = componentStateWithApis[globalKey];
+            depMap[`runtime:${globalKey}`] = componentValue;
+          }
+        }
+      }
+      
+      return depMap;
+    }, [globalDependencies, parentGlobalVars, node.globalVars, componentStateWithApis]);
+
     // Merge parent's globalVars with current node's globalVars
     // Current node's globalVars take precedence (usually only root defines them)
+    // Evaluate any string expressions (binding expressions) in globalVars
+    // IMPORTANT: This memo includes globalDepValueMap to trigger re-evaluation
+    // when globals that affect others change during component lifetime
     const currentGlobalVars = useMemo(() => {
+      // Evaluate parentGlobalVars if they contain string expressions
+      const evaluatedParentGlobals: Record<string, any> = {};
+      if (parentGlobalVars) {
+        // Process parent globals in order, accumulating evaluated values
+        // Skip __tree_* keys as they're metadata for re-evaluation
+        for (const [key, value] of Object.entries(parentGlobalVars)) {
+          if (key.startsWith("__")) {
+            // Skip internal metadata keys
+            continue;
+          }
+          if (typeof value === "string") {
+            // Create state with previously evaluated parent globals for dependency resolution
+            evaluatedParentGlobals[key] = extractParam(
+              evaluatedParentGlobals,  // Include previously evaluated globals
+              value,
+              appContext,
+              false,
+            );
+          } else {
+            evaluatedParentGlobals[key] = value;
+          }
+        }
+      }
+      
+      // Evaluate node.globalVars if they contain string expressions
+      // Include both parent globals and previously evaluated node globals
+      const evaluatedNodeGlobals: Record<string, any> = {};
+      if (node.globalVars) {
+        // Merge parent globals with node globals for evaluation context
+        // START with componentStateWithApis values for any globals that have been updated at runtime
+        // This is KEY for reactivity: when count++ updates count, subsequent globals can see the new value
+        let globalsForContext = { ...evaluatedParentGlobals, ...evaluatedNodeGlobals };
+        
+        for (const [key, value] of Object.entries(node.globalVars)) {
+          if (key.startsWith("__")) {
+            // Skip internal metadata keys
+            continue;
+          }
+          if (typeof value === "string") {
+            // CRITICAL: For evaluation, use componentStateWithApis values if they exist
+            // This ensures that when a global is updated (e.g., count++), we see the NEW value, not the old one
+            const evalContext: Record<string, any> = {};
+            
+            // First, define all globals that might be dependencies from their current runtime values
+            if (node.globalVars) {
+              for (const [globalKey] of Object.entries(node.globalVars)) {
+                if (!globalKey.startsWith("__")) {
+                  // Prefer componentStateWithApis value (runtime updated) over initially evaluated value
+                  if (globalKey in componentStateWithApis) {
+                    evalContext[globalKey] = componentStateWithApis[globalKey];
+                  } else if (globalKey in globalsForContext) {
+                    evalContext[globalKey] = globalsForContext[globalKey];
+                  }
+                }
+              }
+            }
+            
+            // Also include parent globals
+            for (const [pkey, pval] of Object.entries(evaluatedParentGlobals)) {
+              if (!(pkey in evalContext)) {
+                evalContext[pkey] = pval;
+              }
+            }
+            
+            // Create state with all available globals for dependency resolution
+            evaluatedNodeGlobals[key] = extractParam(
+              evalContext,
+              value,
+              appContext,
+              false,
+            );
+            // Update the context for subsequent variables with the newly evaluated value
+            globalsForContext[key] = evaluatedNodeGlobals[key];
+          } else {
+            evaluatedNodeGlobals[key] = value;
+            globalsForContext[key] = value;
+          }
+        }
+      }
+      
+      // Merge with node globals taking precedence
       return {
-        ...(parentGlobalVars || {}),
-        ...(node.globalVars || {}),
+        ...evaluatedParentGlobals,
+        ...evaluatedNodeGlobals,
       };
-    }, [parentGlobalVars, node.globalVars]);
+    }, [parentGlobalVars, node.globalVars, appContext, globalDepValueMap, globalDependencies, componentStateWithApis]);
 
     const combinedState = useCombinedState(
       stateFromOutside,

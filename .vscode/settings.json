@@ -50,6 +50,11 @@
       "matchCommandLine": true
     },
     "npx vitest": true,
-    "timeout": true
+    "timeout": true,
+    "npm run lint:check": true,
+    "/^npm run \\| grep -E \"lint\\|check\"$/": {
+      "approve": true,
+      "matchCommandLine": true
+    }
   }
 }
