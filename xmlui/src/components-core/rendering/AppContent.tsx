@@ -43,6 +43,7 @@ import {
   prefixLines,
   xsConsoleLog,
   pushXsLog,
+  splicePreservingInteractions,
 } from "../inspector/inspectorUtils";
 
 // --- The properties of the AppContent component
@@ -606,22 +607,31 @@ export function AppContent({
           ariaName = labelEl?.textContent?.trim() || undefined;
         }
         // For form inputs, resolve from the associated <label> element.
-        // First try the native .labels property, then walk up the DOM to
-        // find a nearby <label> — XMLUI's label htmlFor may reference a
-        // wrapper id rather than the input's React-generated id.
+        // HTMLInputElement.labels uses the for/id association, which works
+        // because ItemWithLabel passes the same inputId to both <label htmlFor>
+        // and cloneElement(child, { id: inputId }).
         if (!ariaName && (ariaRole === "textbox" || ariaRole === "checkbox" ||
             ariaRole === "radio" || ariaRole === "combobox")) {
           const labels = (target as HTMLInputElement).labels;
           if (labels && labels.length > 0) {
-            ariaName = labels[0].textContent?.trim() || undefined;
+            // Strip trailing markers like "*" (required) or "(Optional)"
+            let labelText = labels[0].textContent?.trim();
+            if (labelText) {
+              labelText = labelText.replace(/\s*\*$/, "").replace(/\s*\(Optional\)$/, "").trim();
+            }
+            ariaName = labelText || undefined;
           }
           if (!ariaName) {
-            // Walk up to find the nearest <label> in the component tree
+            // Fallback: walk up DOM to find nearest <label> in the component tree
             let el = target.parentElement;
-            for (let i = 0; i < 5 && el && !ariaName; i++) {
+            for (let i = 0; i < 10 && el && !ariaName; i++) {
               const label = el.querySelector("label");
               if (label) {
-                ariaName = label.textContent?.trim() || undefined;
+                let labelText = label.textContent?.trim();
+                if (labelText) {
+                  labelText = labelText.replace(/\s*\*$/, "").replace(/\s*\(Optional\)$/, "").trim();
+                }
+                ariaName = labelText || undefined;
               }
               el = el.parentElement;
             }
@@ -730,7 +740,7 @@ export function AppContent({
         text: safeStringify(detail),
       });
       if (Number.isFinite(xsLogMax) && xsLogMax > 0 && w._xsLogs.length > xsLogMax) {
-        w._xsLogs.splice(0, w._xsLogs.length - xsLogMax);
+        splicePreservingInteractions(w._xsLogs, xsLogMax);
       }
     };
 
@@ -855,7 +865,23 @@ export function AppContent({
 
 // --- We pass this funtion to the global app context
 function signError(error: Error | string) {
-  toast.error(typeof error === "string" ? error : error.message || "Something went wrong");
+  const message = typeof error === "string" ? error : error.message || "Something went wrong";
+  toast.error(message);
+  // Log to _xsLogs so regression tests can detect runtime errors.
+  // _xsLogs only exists when xsVerbose=true (same guard as ErrorBoundary).
+  if (typeof window !== "undefined") {
+    const w = window as any;
+    if (Array.isArray(w._xsLogs)) {
+      w._xsLogs.push({
+        ts: Date.now(),
+        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+        traceId: w._xsCurrentTrace,
+        kind: "error:runtime",
+        error: message,
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+    }
+  }
 }
 
 /**
