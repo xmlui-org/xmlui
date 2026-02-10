@@ -1,4 +1,4 @@
-import {FiSearch} from "react-icons/fi";
-import type {IconBaseProps} from "./IconNative";
+import Icon from "./svg/fi-search.svg?react";
+import type { IconBaseProps } from "./IconNative";
 
-export const SearchIcon = (props: IconBaseProps) => <FiSearch {...props}/>
+export const SearchIcon = (props: IconBaseProps) => <Icon {...props}/>;

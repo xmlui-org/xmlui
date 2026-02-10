@@ -1,4 +1,4 @@
-import {MdOutlineLaunch} from "react-icons/md";
-import type {IconBaseProps} from "./IconNative";
+import Icon from "./svg/md-outline-launch.svg?react";
+import type { IconBaseProps } from "./IconNative";
 
-export const HyperLinkIcon = (props: IconBaseProps) => <MdOutlineLaunch  {...props}/>
+export const HyperLinkIcon = (props: IconBaseProps) => <Icon {...props}/>;

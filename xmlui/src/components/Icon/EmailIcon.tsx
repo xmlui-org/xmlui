@@ -1,4 +1,4 @@
-import type {IconBaseProps} from "./IconNative";
-import {MdOutlineMailOutline} from "react-icons/md";
+import Icon from "./svg/md-outline-mail-outline.svg?react";
+import type { IconBaseProps } from "./IconNative";
 
-export const EmailIcon = (props: IconBaseProps) => <MdOutlineMailOutline {...props}/>
+export const EmailIcon = (props: IconBaseProps) => <Icon {...props}/>;

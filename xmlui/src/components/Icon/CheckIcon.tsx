@@ -1,4 +1,4 @@
-import { FiCheck } from "react-icons/fi";
-import type {IconBaseProps} from "./IconNative";
+import Icon from "./svg/fi-check.svg?react";
+import type { IconBaseProps } from "./IconNative";
 
-export const CheckIcon = (props: IconBaseProps) => <FiCheck {...props}/>
+export const CheckIcon = (props: IconBaseProps) => <Icon {...props}/>

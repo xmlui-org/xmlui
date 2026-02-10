@@ -1,4 +1,4 @@
+import Icon from "./svg/io-ellipsis-horizontal.svg?react";
 import type { IconBaseProps } from "./IconNative";
-import { IoEllipsisHorizontal } from "react-icons/io5";
 
-export const DotMenuHorizontalIcon = (props: IconBaseProps) => <IoEllipsisHorizontal {...props} />;
+export const DotMenuHorizontalIcon = (props: IconBaseProps) => <Icon {...props}/>;

@@ -1,0 +1,4 @@
+import Icon from "./svg/io-chatbox-outline.svg?react";
+import type { IconBaseProps } from "./IconNative";
+
+export const IoChatboxOutlineIcon = (props: IconBaseProps) => <Icon {...props}/>;

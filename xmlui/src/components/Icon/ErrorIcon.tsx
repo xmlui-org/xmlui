@@ -1,4 +1,4 @@
-import {BiErrorCircle} from "react-icons/bi";
-import type {IconBaseProps} from "./IconNative";
+import Icon from "./svg/bi-error-circle.svg?react";
+import type { IconBaseProps } from "./IconNative";
 
-export const ErrorIcon = (props: IconBaseProps) => <BiErrorCircle {...props}/>
+export const ErrorIcon = (props: IconBaseProps) => <Icon {...props}/>;

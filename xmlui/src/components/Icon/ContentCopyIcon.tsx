@@ -1,4 +1,4 @@
-import type {IconBaseProps} from "./IconNative";
-import {MdOutlineContentCopy} from "react-icons/md";
+import Icon from "./svg/md-outline-content-copy.svg?react";
+import type { IconBaseProps } from "./IconNative";
 
-export const ContentCopyIcon = (props: IconBaseProps) => <MdOutlineContentCopy {...props} />
+export const ContentCopyIcon = (props: IconBaseProps) => <Icon {...props}/>

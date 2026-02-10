@@ -1,4 +1,4 @@
-import {MdOutlineDeleteForever} from "react-icons/md";
-import type {IconBaseProps} from "./IconNative";
+import Icon from "./svg/md-outline-delete-forever.svg?react";
+import type { IconBaseProps } from "./IconNative";
 
-export const TrashIcon = (props: IconBaseProps) => <MdOutlineDeleteForever {...props} />
+export const TrashIcon = (props: IconBaseProps) => <Icon {...props}/>;
