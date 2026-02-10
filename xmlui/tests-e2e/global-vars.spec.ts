@@ -208,4 +208,273 @@ test.describe("Global variables", () => {
     await expect(page.getByTestId("countText")).toHaveText("Count: 8");
     await expect(page.getByTestId("doubleText")).toHaveText("Double: 16");
   });
+
+  test("dependent global variable", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <App>
+        <Text testId="countText">Count: {count}</Text>
+        <Text testId="dummyText">Dummy: {dummy}</Text>
+        <Button label="Increment" onClick="count++" />
+      </App>
+    `,
+      {
+        mainXs: `
+      var count = 6*7;
+      var dummy = 3*count;
+    `,
+      },
+    );
+
+    await expect(page.getByTestId("countText")).toHaveText("Count: 42");
+    await expect(page.getByTestId("dummyText")).toHaveText("Dummy: 126");
+    
+    await page.getByRole("button", { name: "Increment" }).click();
+    
+    await expect(page.getByTestId("countText")).toHaveText("Count: 43");
+    // dummy is reactive - it updates when count changes
+    await expect(page.getByTestId("dummyText")).toHaveText("Dummy: 129");
+  });
+
+  test("component-declared global accessible from parent", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <App>
+        <Text testId="incbGlobalText">incbGlobal: {incbGlobal}</Text>
+        <IncButton label="First Button" />
+      </App>
+    `,
+      {
+        components: [
+          `
+      <Component name="IncButton" global.incbGlobal="{73}">
+        <H3 testId="incbInComponent">Hello: {incbGlobal}</H3>
+        <Button
+          label="{($props.label ?? 'Click me') + ': ' + incbGlobal}"
+          onClick="incbGlobal += 2" />
+      </Component>
+    `,
+        ],
+      },
+    );
+
+    await expect(page.getByTestId("incbGlobalText")).toHaveText("incbGlobal: 73");
+    await expect(page.getByTestId("incbInComponent")).toHaveText("Hello: 73");
+    
+    await page.getByRole("button", { name: "First Button: 73" }).click();
+    
+    await expect(page.getByTestId("incbGlobalText")).toHaveText("incbGlobal: 75");
+    await expect(page.getByTestId("incbInComponent")).toHaveText("Hello: 75");
+  });
+
+  test("multiple variables modified in one onClick", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <App>
+        <Text testId="countText">Count: {count}</Text>
+        <Text testId="incbGlobalText">incbGlobal: {incbGlobal}</Text>
+        <IncButton label="Multi-update" />
+      </App>
+    `,
+      {
+        components: [
+          `
+      <Component name="IncButton" global.incbGlobal="{73}">
+        <Button
+          label="{$props.label + ': ' + count + '/' + incbGlobal}"
+          onClick="count++; incbGlobal += 2" />
+      </Component>
+    `,
+        ],
+        mainXs: `
+      var count = 10;
+    `,
+      },
+    );
+
+    await expect(page.getByTestId("countText")).toHaveText("Count: 10");
+    await expect(page.getByTestId("incbGlobalText")).toHaveText("incbGlobal: 73");
+    
+    await page.getByRole("button", { name: "Multi-update: 10/73" }).click();
+    
+    await expect(page.getByTestId("countText")).toHaveText("Count: 11");
+    await expect(page.getByTestId("incbGlobalText")).toHaveText("incbGlobal: 75");
+  });
+
+  test("complete sample from requirements", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <App>
+        <Text testId="countText">Count: {count}</Text>
+        <Text testId="dummyText">Dummy: {dummy}</Text>
+        <Text testId="getCountText">GetCount: {getCount()}</Text>
+        <Text testId="incbGlobalText">incbGlobal: {incbGlobal}</Text>
+        <IncButton label="1st button" />
+        <Button
+          label="3rd button: {count}"
+          onClick="count++" />
+      </App>
+    `,
+      {
+        components: [
+          `
+      <Component name="IncButton" global.incbGlobal="{73}">
+        <H3 testId="helloText">Hello: {incbGlobal}</H3>
+        <Button
+          label="{($props.label ?? 'Click me to increment') + ': ' + count}"
+          onClick="count++; incbGlobal += 2" />
+      </Component>
+    `,
+        ],
+        mainXs: `
+      var count = 6*7;
+      var dummy = 3*count;
+
+      function getCount() {
+        return count;
+      }
+    `,
+      },
+    );
+
+    // Initial values
+    await expect(page.getByTestId("countText")).toHaveText("Count: 42");
+    await expect(page.getByTestId("dummyText")).toHaveText("Dummy: 126");
+    await expect(page.getByTestId("getCountText")).toHaveText("GetCount: 42");
+    await expect(page.getByTestId("incbGlobalText")).toHaveText("incbGlobal: 73");
+    await expect(page.getByTestId("helloText")).toHaveText("Hello: 73");
+    
+    // Click 1st button (IncButton) - increments both count and incbGlobal
+    await page.getByRole("button", { name: "1st button: 42" }).click();
+    await expect(page.getByTestId("countText")).toHaveText("Count: 43");
+    await expect(page.getByTestId("getCountText")).toHaveText("GetCount: 43");
+    await expect(page.getByTestId("incbGlobalText")).toHaveText("incbGlobal: 75");
+    await expect(page.getByTestId("helloText")).toHaveText("Hello: 75");
+    
+    // Click 3rd button - only increments count
+    await page.getByRole("button", { name: "3rd button: 43" }).click();
+    await expect(page.getByTestId("countText")).toHaveText("Count: 44");
+    await expect(page.getByTestId("getCountText")).toHaveText("GetCount: 44");
+    await expect(page.getByTestId("incbGlobalText")).toHaveText("incbGlobal: 75");
+    
+    // Click 1st button again
+    await page.getByRole("button", { name: "1st button: 44" }).click();
+    await expect(page.getByTestId("countText")).toHaveText("Count: 45");
+    await expect(page.getByTestId("getCountText")).toHaveText("GetCount: 45");
+    await expect(page.getByTestId("incbGlobalText")).toHaveText("incbGlobal: 77");
+    await expect(page.getByTestId("helloText")).toHaveText("Hello: 77");
+  });
+
+  test("multiple component instances share component-declared global", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <App>
+        <Text testId="sharedGlobalText">Shared: {sharedGlobal}</Text>
+        <SharedButton label="Button 1" />
+        <SharedButton label="Button 2" />
+        <SharedButton label="Button 3" />
+      </App>
+    `,
+      {
+        components: [
+          `
+      <Component name="SharedButton" global.sharedGlobal="{100}">
+        <Button
+          label="{$props.label + ': ' + sharedGlobal}"
+          onClick="sharedGlobal += 10" />
+      </Component>
+    `,
+        ],
+      },
+    );
+
+    await expect(page.getByTestId("sharedGlobalText")).toHaveText("Shared: 100");
+    
+    await page.getByRole("button", { name: "Button 1: 100" }).click();
+    await expect(page.getByTestId("sharedGlobalText")).toHaveText("Shared: 110");
+    
+    await page.getByRole("button", { name: "Button 2: 110" }).click();
+    await expect(page.getByTestId("sharedGlobalText")).toHaveText("Shared: 120");
+    
+    await page.getByRole("button", { name: "Button 3: 120" }).click();
+    await expect(page.getByTestId("sharedGlobalText")).toHaveText("Shared: 130");
+  });
+
+  test("component globals and Globals.xs variables coexist", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <App>
+        <Text testId="xsCountText">XS Count: {xsCount}</Text>
+        <Text testId="compGlobalText">Comp Global: {compGlobal}</Text>
+        <GlobalComponent />
+        <Button label="Increment XS" onClick="xsCount++" />
+      </App>
+    `,
+      {
+        components: [
+          `
+      <Component name="GlobalComponent" global.compGlobal="{50}">
+        <Button
+          label="Increment Comp: {compGlobal}"
+          onClick="compGlobal += 5" />
+      </Component>
+    `,
+        ],
+        mainXs: `
+      var xsCount = 20;
+    `,
+      },
+    );
+
+    await expect(page.getByTestId("xsCountText")).toHaveText("XS Count: 20");
+    await expect(page.getByTestId("compGlobalText")).toHaveText("Comp Global: 50");
+    
+    await page.getByRole("button", { name: "Increment XS" }).click();
+    await expect(page.getByTestId("xsCountText")).toHaveText("XS Count: 21");
+    await expect(page.getByTestId("compGlobalText")).toHaveText("Comp Global: 50");
+    
+    await page.getByRole("button", { name: "Increment Comp: 50" }).click();
+    await expect(page.getByTestId("xsCountText")).toHaveText("XS Count: 21");
+    await expect(page.getByTestId("compGlobalText")).toHaveText("Comp Global: 55");
+  });
+
+  test("component can access both its own global and parent globals", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <App>
+        <Text testId="countText">Count: {count}</Text>
+        <Text testId="compVarText">Comp Var: {compVar}</Text>
+        <MixedComponent />
+      </App>
+    `,
+      {
+        components: [
+          `
+      <Component name="MixedComponent" global.compVar="{200}">
+        <Text testId="mixedCountText">Inside Count: {count}</Text>
+        <Text testId="mixedCompVarText">Inside Comp Var: {compVar}</Text>
+        <Button
+          label="Update Both"
+          onClick="count += 5; compVar += 10" />
+      </Component>
+    `,
+        ],
+        mainXs: `
+      var count = 100;
+    `,
+      },
+    );
+
+    await expect(page.getByTestId("countText")).toHaveText("Count: 100");
+    await expect(page.getByTestId("compVarText")).toHaveText("Comp Var: 200");
+    await expect(page.getByTestId("mixedCountText")).toHaveText("Inside Count: 100");
+    await expect(page.getByTestId("mixedCompVarText")).toHaveText("Inside Comp Var: 200");
+    
+    await page.getByRole("button", { name: "Update Both" }).click();
+    
+    await expect(page.getByTestId("countText")).toHaveText("Count: 105");
+    await expect(page.getByTestId("compVarText")).toHaveText("Comp Var: 210");
+    await expect(page.getByTestId("mixedCountText")).toHaveText("Inside Count: 105");
+    await expect(page.getByTestId("mixedCompVarText")).toHaveText("Inside Comp Var: 210");
+  });
 });
