@@ -127,6 +127,7 @@ function StandaloneApp({
     extensionManager,
   );
 
+  console.log("Runtime:", runtime);
   usePrintVersionNumber(standaloneApp);
 
   // --- Display build errors from the vite-xmlui-plugin if any exist
@@ -1537,23 +1538,20 @@ function transformGlobalsXsToGlobalTags(
     Object.entries(globalsXs.vars).forEach(([varName, varDef]) => {
       console.log(`[transformGlobalsXs] Processing var ${varName}:`, varDef);
       
-      // Extract the original expression string from the variable definition
+      // Use the source text directly from the parsed expression
       let valueExpression = "";
       
-      if (typeof varDef === "object" && varDef?.src) {
-        // Try to extract from source code
+      if (typeof varDef === "object" && varDef?.source) {
+        // Use the source text preserved by the parser
+        valueExpression = varDef.source;
+        console.log(`[transformGlobalsXs] Using parsed source for ${varName}: "${valueExpression}"`);
+      } else if (typeof varDef === "object" && varDef?.src) {
+        // Fallback: extract from source code using regex
         const srcMatch = varDef.src.match(new RegExp(`var\\s+${varName}\\s*=\\s*(.+?)(?:;|$)`, 'm'));
         if (srcMatch) {
           valueExpression = srcMatch[1].trim();
-          console.log(`[transformGlobalsXs] Extracted expression for ${varName}: "${valueExpression}"`);
+          console.log(`[transformGlobalsXs] Extracted from src for ${varName}: "${valueExpression}"`);
         }
-      }
-      
-      // Fallback: try to reconstruct from tree or use a simple value
-      if (!valueExpression && typeof varDef === "object" && varDef?.tree) {
-        // For simple cases, try to reconstruct
-        valueExpression = reconstructExpressionFromTree(varDef.tree);
-        console.log(`[transformGlobalsXs] Reconstructed expression for ${varName}: "${valueExpression}"`);
       }
       
       if (!valueExpression) {
@@ -1572,86 +1570,32 @@ function transformGlobalsXsToGlobalTags(
     });
   }
   
-  // Process functions from Globals.xs (treat them as variables)
-  if (globalsXs.functions) {
-    Object.entries(globalsXs.functions).forEach(([funcName, funcDef]) => {
-      console.log(`[transformGlobalsXs] Processing function ${funcName}:`, funcDef);
-      
-      // Functions are more complex, for now just create a placeholder
-      globalVars[funcName] = "{function(){}}";
-    });
-  }
+  // Process functions from Globals.xs (preserve them as functions, not globalVars)
+  const functions = globalsXs.functions || {};
   
-  // Add the globalVars to the entry point
-  if (Object.keys(globalVars).length > 0) {
+  // Add the globalVars and functions to the entry point
+  if (Object.keys(globalVars).length > 0 || Object.keys(functions).length > 0) {
     const transformedEntryPoint: ComponentDef = {
       ...entryPoint,
       globalVars: {
         ...entryPoint.globalVars,
         ...globalVars
+      },
+      functions: {
+        ...entryPoint.functions,
+        ...functions
       }
     };
     
     console.log(`[transformGlobalsXs] Transformed entry point with globalVars:`, globalVars);
+    console.log(`[transformGlobalsXs] Transformed entry point with functions:`, Object.keys(functions));
     return transformedEntryPoint;
   }
   
   return entryPoint;
 }
 
-/**
- * Simple expression reconstruction from expression tree
- * This handles basic cases like literals, identifiers, and binary expressions
- */
-function reconstructExpressionFromTree(tree: any): string | null {
-  if (!tree || typeof tree !== "object") {
-    return null;
-  }
-  
-  console.log(`[reconstructExpression] Processing tree:`, tree);
-  
-  // Handle different node types - note that XMLUI uses numeric type codes
-  if (tree.type === 101) { // BinaryExpression 
-    const left = reconstructExpressionFromTree(tree.left);
-    const right = reconstructExpressionFromTree(tree.right);
-    const operator = tree.op || tree.operator; // Handle both 'op' and 'operator' properties
-    if (left && right && operator) {
-      const result = `${left}${operator}${right}`;
-      console.log(`[reconstructExpression] Binary: ${result}`);
-      return result;
-    }
-  } else if (tree.type === 107) { // Identifier
-    const result = tree.name;
-    console.log(`[reconstructExpression] Identifier: ${result}`);
-    return result;
-  } else if (tree.type === 109) { // Literal
-    const result = String(tree.value);
-    console.log(`[reconstructExpression] Literal: ${result}`);
-    return result;
-  } else {
-    // Try legacy string-based types as fallback
-    switch (tree.type) {
-      case "Literal":
-        return String(tree.value);
-        
-      case "Identifier":
-        return tree.name;
-        
-      case "BinaryExpression":
-        const left = reconstructExpressionFromTree(tree.left);
-        const right = reconstructExpressionFromTree(tree.right);
-        if (left && right) {
-          return `${left}${tree.operator}${right}`;
-        }
-        break;
-        
-      default:
-        console.log(`[reconstructExpression] Unhandled tree type: ${tree.type}`);
-    }
-  }
-  
-  return null;
-}
+// Note: reconstructExpressionFromTree function removed - now using source text directly from parser
 
 export default StandaloneApp;
 

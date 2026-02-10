@@ -613,7 +613,7 @@ test.describe("Global Tag - Variable Dependencies", () => {
     await expect(page.getByTestId("zText")).toHaveText("Z: 15");
   });
 
-  test.skip("dependent global variables are reevaluated when dependencies change", async ({
+  test("dependent global variables are reevaluated when dependencies change", async ({
     page,
     initTestBed,
   }) => {

@@ -69,8 +69,6 @@ import { TextBoxDriver } from "./drivers/TextBoxDriver";
 import { NumberBoxDriver } from "./drivers/NumberBoxDriver";
 import { TreeDriver } from "./drivers/TreeDriver";
 import { collectCodeBehindFromSource } from "../parsers/scripting/code-behind-collect";
-import { evalBinding } from "../components-core/script-runner/eval-tree-sync";
-import { BindingTreeEvaluationContext } from "../components-core/script-runner/BindingTreeEvaluationContext";
 export { expect } from "./assertions";
 
 const isCI = process?.env?.CI === "true";
@@ -253,48 +251,13 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       if (description?.globalXs) {
         const parsedCodeBehind = collectCodeBehindFromSource("Globals", description.globalXs);
         if (parsedCodeBehind?.vars || parsedCodeBehind?.functions) {
-          const prebuiltGlobals = {
-            ...(parsedCodeBehind?.vars || {}),
-            ...(parsedCodeBehind?.functions || {}),
-          };
-          const extractedVars: Record<string, any> = {};
-          for (const [key, value] of Object.entries(prebuiltGlobals)) {
-            // The value is a variable definition object with __PARSED__ and tree
-            if (
-              typeof value === "object" &&
-              value !== null &&
-              (value as any).__PARSED__ &&
-              (value as any).tree
-            ) {
-              const tree = (value as any).tree;
-
-              try {
-                // Create a minimal evaluation context to evaluate the tree expression
-                const evalContext: BindingTreeEvaluationContext = {
-                  mainThread: {
-                    childThreads: [],
-                    blocks: [{ vars: {} }],
-                    loops: [],
-                    breakLabelValue: -1,
-                  },
-                  localContext: {},
-                };
-
-                // Evaluate the expression tree (handles literals, binary expressions, etc.)
-                const evaluatedValue = evalBinding(tree, evalContext);
-                extractedVars[key] = evaluatedValue;
-              } catch (error) {
-                // If evaluation fails, try to extract literal value as fallback
-                extractedVars[key] = (tree as any).value ?? 0;
-              }
-            } else {
-              extractedVars[key] = value;
-            }
-          }
-
+          // Pass through the variable definitions with their source text intact
+          // for StandaloneApp to process with transformGlobalsXsToGlobalTags
           runtime = {
             "/src/Globals.xs": {
-              vars: extractedVars,
+              vars: parsedCodeBehind.vars || {},
+              functions: parsedCodeBehind.functions || {},
+              src: description.globalXs, // Include original source for debugging
             },
           };
         }
