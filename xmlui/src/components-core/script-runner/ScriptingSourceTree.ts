@@ -375,6 +375,9 @@ export type Expression =
 export interface ExpressionBase extends ScripNodeBase {
   // Is this expression parenthesized?
   parenthesized?: number;
+  
+  // The original source text of this expression
+  source?: string;
 }
 
 export type UnaryOpSymbols = "+" | "-" | "~" | "!" | "typeof" | "delete";
