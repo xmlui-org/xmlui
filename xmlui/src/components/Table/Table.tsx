@@ -285,6 +285,14 @@ export const TableMd = createMetadata({
         "\`selectAll\`, \`cut\`, \`copy\`, \`paste\`, \`delete\`. If not provided, default shortcuts are used.",
       valueType: "any",
     },
+    alwaysShowHeader: {
+      description:
+        "This property indicates whether the table header is always visible when scrolling and no height is specified. " +
+        "When set to \`true\`, the header is sticky and always visible on page scroll. " +
+        "Otherwise, it scrolls with the content and may not be visible when scrolled down.",
+      valueType: "boolean",
+      defaultValue: defaultProps.alwaysShowHeader,
+    },
   },
   events: {
     contextMenu: dContextMenu(COMP),

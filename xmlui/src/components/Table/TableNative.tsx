@@ -216,6 +216,7 @@ type TableProps = {
   onCopyAction?: AsyncFunction;
   onPasteAction?: AsyncFunction;
   onDeleteAction?: AsyncFunction;
+  alwaysShowHeader?: boolean;
 };
 
 function defaultIsRowDisabled(_: any) {
@@ -554,6 +555,7 @@ export const Table = forwardRef(
       onCopyAction,
       onPasteAction,
       onDeleteAction,
+      alwaysShowHeader = defaultProps.alwaysShowHeader,
       ...rest
       // cols
     }: TableProps,
@@ -973,7 +975,7 @@ export const Table = forwardRef(
     // also listen to touchmove (fires every frame during active touch) and run
     // a rAF polling loop during the momentum phase (touchend → scrollend/idle).
     useEffect(() => {
-      if (!hasOutsideScroll || !tableRef.current || !theadRef.current) return;
+      if (!alwaysShowHeader || !hasOutsideScroll || !tableRef.current || !theadRef.current) return;
 
       const isBody = !scrollRef.current || scrollRef.current === document.body;
       const scrollEl = isBody ? document.documentElement : scrollRef.current!;
@@ -1107,7 +1109,7 @@ export const Table = forwardRef(
         thead.style.zIndex = '';
         thead.style.position = '';
       };
-    }, [hasOutsideScroll]);
+    }, [alwaysShowHeader, hasOutsideScroll]);
 
     // ==================================================================================
     // Virtua Virtualization
@@ -1257,7 +1259,7 @@ export const Table = forwardRef(
                   position: 'sticky',
                   top: 0,
                   minWidth: "100%",
-                  willChange: hasOutsideScroll ? 'transform' : undefined,
+                  willChange: alwaysShowHeader && hasOutsideScroll ? 'transform' : undefined,
                 }} 
                 className={styles.headerWrapper}
               >
@@ -1745,4 +1747,5 @@ export const defaultProps = {
     paste: "CmdOrCtrl+V",
     delete: "Delete",
   },
+  alwaysShowHeader: false,
 };
