@@ -229,7 +229,7 @@ class Server {
         console.log(
           `\x1b[34m   XMLUI static file server for previewing optimized outputs.\x1b[0m\n`,
         );
-        console.log(`\x1b[34m📁 This is the Serving files from: ${resolvedStaticDir}\x1b[0m`);
+        console.log(`\x1b[34m📁 Serving files from: ${resolvedStaticDir}\x1b[0m`);
         console.log(`\x1b[32m🚀 Static server running at http://localhost:${actualPort}\x1b[0m`);
 
         if (actualPort === 0) {
