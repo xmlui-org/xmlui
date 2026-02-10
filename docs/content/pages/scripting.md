@@ -147,6 +147,9 @@ We defined the function in XMLUI's `index.html` like so:
 
 When you define functions in `index.html` you can keep everything in one place for easy reference, and debug your functions in the browser's devtools environment.
 
+
+## Code-Behind files
+
 You can alternatively put functions into XMLUI *code-behind* files. In this case, for the `TubeStops` component which lives in the file `TubeStops.xmlui`, you would create a parallel file called `TubeStops.xmlui.xs`. In that context, arrow functions are required, so the function would look like this.
 
 ```js
@@ -169,6 +172,8 @@ function transformStops(stops) {
   });
 }
 ```
+
+> [!INFO] The code-behind file for the application root, `Main.xmlui.xs`, is special. All variables and functions declared here are [global variables](../markup#global-variables).
 
 ## index.html vs code-behind
 

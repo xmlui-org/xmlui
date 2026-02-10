@@ -8,7 +8,7 @@ import type { ThemeTone } from "../../abstractions/ThemingDefs";
 import { errReportComponent, xmlUiMarkupToComponent } from "../../components-core/xmlui-parser";
 import { ApiInterceptorProvider } from "../../components-core/interception/ApiInterceptorProvider";
 import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
-import type { CompoundComponentDef } from "../../abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { useComponentRegistry } from "../ComponentRegistryContext";
 import { useIndexerContext } from "../App/IndexerContext";
@@ -229,6 +229,20 @@ export function NestedApp({
     if (errors.length > 0) {
       component = errReportComponent(errors, "Main.xmlui", erroneousCompoundComponentName);
     }
+
+    // Extract globalVars from the parsed app component
+    // The app can be either a ComponentDef (with type property) or CompoundComponentDef (with component property)
+    let appGlobalVars: Record<string, any> = {};
+    if (component) {
+      if ('type' in component) {
+        // It's a ComponentDef
+        appGlobalVars = (component as ComponentDef).globalVars || {};
+      } else if ('component' in component) {
+        // It's a CompoundComponentDef, get globalVars from the nested component
+        appGlobalVars = (component as CompoundComponentDef).component?.globalVars || {};
+      }
+    }
+
     const compoundComponents: CompoundComponentDef[] = (components ?? []).map((src) => {
       const isErrorReportComponent = typeof src !== "string";
       if (isErrorReportComponent) {
@@ -240,6 +254,15 @@ export function NestedApp({
       if (errors.length > 0) {
         return errReportComponent(errors, `nested xmlui`, erroneousCompoundComponentName);
       }
+      
+      // Extract globalVars from component definitions too
+      if (component && 'component' in component) {
+        const compGlobalVars = (component as CompoundComponentDef).component?.globalVars;
+        if (compGlobalVars) {
+          appGlobalVars = { ...appGlobalVars, ...compGlobalVars };
+        }
+      }
+      
       return component;
     });
 
@@ -268,6 +291,7 @@ export function NestedApp({
                   trackContainerHeight={height ? "fixed" : "auto"}
                   node={component}
                   globalProps={globalProps}
+                  globalVars={appGlobalVars}
                   defaultTheme={activeTheme || config?.defaultTheme}
                   defaultTone={toneToApply as ThemeTone}
                   contributes={{
