@@ -12,12 +12,10 @@ import { CharacterCodes } from "./CharacterCodes";
 import type { GetText } from "./parser";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
 import {
-  DiagnosticCategory,
   DIAGS_TRANSFORM,
   TransformDiag,
   type TransformDiagPositionless,
 } from "./diagnostics";
-import { VscFileSymlinkDirectory } from "react-icons/vsc";
 
 export const COMPOUND_COMP_ID = "Component";
 export const UCRegex = /^[A-Z]/;

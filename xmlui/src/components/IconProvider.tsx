@@ -143,7 +143,6 @@ import TableDeleteColumnIcon from "./Icon/TableDeleteColumnIcon";
 import { ChevronsRightIcon } from "./Icon/ChevronsRight";
 import { ChevronsLeftIcon } from "./Icon/ChevronsLeft";
 import { ICON_NAMES } from "./icons-abstractions";
-import {GoSidebarCollapse} from "react-icons/go";
 
 type IconRenderer<T extends IconBaseProps> = (
   props: T,
