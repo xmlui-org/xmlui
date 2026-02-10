@@ -5,9 +5,12 @@
     <link rel="icon" type="image/svg+xml" href="/resources/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="alternate" type="application/rss+xml" title="XMLUI Blog" href="/feed.rss" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"
+      rel="stylesheet"
+    />
     <script>
       globalThis.__PUBLIC_PATH = "/";
     </script>
@@ -21,6 +24,57 @@
       }
       gtag("js", new Date());
       gtag("config", "G-S7NYYDMNPR");
+    </script>
+    <script>
+      globalThis.posts = [
+        {
+          title: "Introducing XMLUI",
+          slug: "introducing-xmlui",
+          description: "Let's make building user interfaces as easy as it was 30 years ago.",
+          author: "Jon Udell",
+          date: "2025-07-18",
+          image: "xmlui-demo.png",
+          tags: ["xmlui"],
+        },
+        {
+          title: "Reproducible XMLUI",
+          slug: "xmlui-playground",
+          description:
+            "Use playgrounds to infuse docs with live examples, iterate on prototypes, and reproduce bugs.",
+          author: "Jon Udell",
+          date: "2025-10-27",
+          image: "playground.png",
+          tags: ["playground"],
+        },
+        {
+          title: "An XMLUI-powered blog",
+          slug: "xmlui-powered-blog",
+          description: "How we made this blog with a few dozen lines of XMLUI.",
+          author: "Jon Udell",
+          date: "2025-10-28",
+          image: "blog-scrabble.png",
+          tags: ["blog"],
+        },
+        {
+          title: "Introducing the XMLUI CLI",
+          slug: "introducing-the-xmlui-cli",
+          description: "Your all-in-one tool for working with XMLUI.",
+          author: "Jon Udell",
+          date: "2025-12-19",
+          image: "cli-blog-header.svg",
+          tags: ["cli"],
+        },
+        {
+          title: "Supabase + XMLUI",
+          slug: "supabase-and-xmlui",
+          description: "Build an XMLUI interface to a Supabase backend.",
+          author: "Jon Udell",
+          date: "2026-01-27",
+          image: "supabase-and-xmlui.png",
+          draft: true,
+          tags: ["supabase"],
+        },
+      ];
     </script>
   </head>
 
