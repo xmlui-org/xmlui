@@ -105,6 +105,7 @@ test("component is keyboard accessible", async ({ page, initTestBed }) => {
   const colorInput = page.locator("input[type='color']");
   
   // Focus the input
+  await expect(colorInput).toBeVisible();
   await page.keyboard.press("Tab");
   
   // Verify the input is focused

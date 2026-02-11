@@ -1478,6 +1478,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(listWrapper).toBeVisible();
 
     // Close dropdown before hovering to show tooltip (modal overlay blocks hover)
+    await expect(listWrapper).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(listWrapper).not.toBeVisible();
 
@@ -2051,10 +2052,12 @@ test.describe("Grouping Functionality", () => {
     await driver.toggleOptionsVisibility();
 
     // Navigate with arrow keys
+    await expect(driver.component).toBeVisible();
     await page.keyboard.press("ArrowDown");
     await page.waitForTimeout(100);
     await page.keyboard.press("ArrowDown");
     await page.waitForTimeout(100);
+    await expect(driver.component).toBeVisible();
     await page.keyboard.press("Enter");
     await page.waitForTimeout(100);
     // Should select Banana (third option)

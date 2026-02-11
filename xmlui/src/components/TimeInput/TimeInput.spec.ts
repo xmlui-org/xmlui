@@ -713,7 +713,11 @@ test.describe("Basic Functionality", () => {
       await initTestBed(`<TimeInput testId="timeInput" seconds="true" />`);
       const driver = await createTimeInputDriver("timeInput");
 
+      await expect(driver.hourInput).toBeVisible();
+      await expect(driver.minuteInput).toBeVisible();
+      await expect(driver.secondInput).toBeVisible(); // Wait for all inputs to be rendered
       await driver.hourInput.focus();
+      await expect(driver.hourInput).toBeFocused();
       await page.keyboard.press("Tab");
       await expect(driver.minuteInput).toBeFocused();
       await page.keyboard.press("Tab");
@@ -729,6 +733,9 @@ test.describe("Basic Functionality", () => {
       const driver = await createTimeInputDriver("timeInput");
 
       // Start at hour input
+      await expect(driver.hourInput).toBeVisible();
+      await expect(driver.minuteInput).toBeVisible();
+      await expect(driver.secondInput).toBeVisible(); // Wait for all inputs to be rendered
       await driver.hourInput.focus();
       await expect(driver.hourInput).toBeFocused();
 
@@ -758,6 +765,8 @@ test.describe("Basic Functionality", () => {
       const driver = await createTimeInputDriver("timeInput");
 
       // Start at hour input
+      await expect(driver.hourInput).toBeVisible();
+      await expect(driver.minuteInput).toBeVisible(); // Wait for inputs to be rendered
       await driver.hourInput.focus();
       await expect(driver.hourInput).toBeFocused();
 
@@ -779,6 +788,10 @@ test.describe("Basic Functionality", () => {
       const driver = await createTimeInputDriver("timeInput");
 
       // Start at hour input
+      await expect(driver.hourInput).toBeVisible();
+      await expect(driver.minuteInput).toBeVisible();
+      await expect(driver.secondInput).toBeVisible();
+      await expect(driver.amPmInput).toBeVisible(); // Wait for all inputs to be rendered
       await driver.hourInput.focus();
       await expect(driver.hourInput).toBeFocused();
 
@@ -816,6 +829,9 @@ test.describe("Basic Functionality", () => {
       const driver = await createTimeInputDriver("timeInput");
 
       // Start at hour input
+      await expect(driver.hourInput).toBeVisible();
+      await expect(driver.minuteInput).toBeVisible();
+      await expect(driver.amPmInput).toBeVisible(); // Wait for all inputs to be rendered
       await driver.hourInput.focus();
       await expect(driver.hourInput).toBeFocused();
 
@@ -848,8 +864,10 @@ test.describe("Basic Functionality", () => {
       await initTestBed(`<TimeInput testId="timeInput" hour24="false" initialValue="14:30" />`);
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.amPmInput).toHaveText("PM");
+      await expect(driver.amPmInput).toBeVisible(); // Wait for input to be rendered
       await driver.amPmInput.focus();
-      await page.keyboard.press("a", { delay: 100 });
+      await expect(driver.amPmInput).toBeFocused();
+      await page.keyboard.press("a");
       await expect(driver.amPmInput).toHaveText("AM");
     });
 
@@ -857,8 +875,10 @@ test.describe("Basic Functionality", () => {
       await initTestBed(`<TimeInput testId="timeInput" hour24="false" initialValue="03:30" />`);
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.amPmInput).toHaveText("AM");
+      await expect(driver.amPmInput).toBeVisible(); // Wait for input to be rendered
       await driver.amPmInput.focus();
-      await page.keyboard.press("p", { delay: 100 });
+      await expect(driver.amPmInput).toBeFocused();
+      await page.keyboard.press("p");
       await expect(driver.amPmInput).toHaveText("PM");
     });
 
@@ -1122,6 +1142,9 @@ test.describe("Accessibility", () => {
     const driver = await createTimeInputDriver("timeInput");
 
     // Tab through all inputs
+    await expect(driver.hourInput).toBeVisible();
+    await expect(driver.minuteInput).toBeVisible();
+    await expect(driver.secondInput).toBeVisible(); // Wait for all inputs to be rendered
     await driver.hourInput.focus();
     await expect(driver.hourInput).toBeFocused();
 
