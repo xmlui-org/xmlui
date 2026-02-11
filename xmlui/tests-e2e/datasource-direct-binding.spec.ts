@@ -1,7 +1,12 @@
 import { expect, test } from "../src/testing/fixtures";
 
-test("directly bound datasource doesn't show empty list template during load", async ({ page, initTestBed }) => {
-  await initTestBed(`
+test("directly bound datasource doesn't show empty list template during load", async ({
+  page,
+  initTestBed,
+}) => {
+  const reqPromise = page.waitForRequest("/data1", { timeout: 0 });
+  await initTestBed(
+    `
     <Fragment>
         <DataSource url="/data1" id="data"/>
         <List data="{data}" testId="list">
@@ -10,26 +15,32 @@ test("directly bound datasource doesn't show empty list template during load", a
           </property>
         </List>
     </Fragment>
-    `, {
-    apiInterceptor: {
-      operations: {
-        "load-api-data1": {
-          url: "/data1",
-          method: "get",
-          handler: `() => { return ['data1', 'data2']; }`,
+    `,
+    {
+      apiInterceptor: {
+        operations: {
+          "load-api-data1": {
+            url: "/data1",
+            method: "get",
+            handler: `() => { return ['data1', 'data2']; }`,
+          },
         },
       },
     },
-  });
-  await page.waitForRequest("/data1", {timeout: 0});
+  );
+  await reqPromise;
   //asserts that the emptyListTemplate is not rendered
   expect(await page.getByTestId("emptyLabel").count()).toEqual(0);
   await expect(page.getByTestId("list")).toHaveText("data1data2");
 });
 
-
-test("directly bound datasource through multiple container levels", async ({ page, initTestBed }) => {
-  await initTestBed(`
+test("directly bound datasource through multiple container levels", async ({
+  page,
+  initTestBed,
+}) => {
+  const reqPromise = page.waitForRequest("/data1");
+  await initTestBed(
+    `
     <App>
       <DataSource id="allContacts" url="/data1" />
       <Pages>
@@ -42,19 +53,21 @@ test("directly bound datasource through multiple container levels", async ({ pag
         </Page>
       </Pages>
     </App>
-    `, {
-    apiInterceptor: {
-      operations: {
-        "load-api-data1": {
-          url: "/data1",
-          method: "get",
-          handler: `() => { return ['data1', 'data2']; }`,
+    `,
+    {
+      apiInterceptor: {
+        operations: {
+          "load-api-data1": {
+            url: "/data1",
+            method: "get",
+            handler: `() => { return ['data1', 'data2']; }`,
+          },
         },
       },
     },
-  });
+  );
 
-  await page.waitForRequest("/data1", {timeout: 0});
+  await reqPromise;
   //asserts that the emptyListTemplate is not rendered
   expect(await page.getByTestId("emptyLabel").count()).toEqual(0);
   await expect(page.getByTestId("list")).toHaveText("data1data2");

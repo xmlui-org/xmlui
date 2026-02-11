@@ -27,8 +27,8 @@
     "changeset:publish": "changeset publish",
     "build-xmlui": "turbo run build:xmlui-all",
     "build-vscode-extension": "turbo run xmlui-vscode#build:vsix",
-    "test": "turbo run test:all",
-    "test-smoke": "turbo run test:smoke",
+    "test": "turbo run //#_test:e2e:with-unit-tests",
+    "test-smoke": "turbo run //#_test:e2e:smoke:with-unit-tests",
     "test-e2e-dev": "playwright test",
     "test:e2e": "cross-env PLAYWRIGHT_USE_DEV_SERVER=false playwright test",
     "test:e2e:smoke": "cross-env PLAYWRIGHT_USE_DEV_SERVER=false playwright test --project=*-smoke",
@@ -38,6 +38,8 @@
     "release-docs": "turbo run release:docs",
     "build-blog": "turbo run build:blog",
     "watch-docs-content": "turbo watch generate-docs-summaries",
-    "generate-docs": "turbo run generate-docs"
+    "generate-docs": "turbo run generate-docs",
+    "_test:e2e:with-unit-tests": "cross-env PLAYWRIGHT_USE_DEV_SERVER=false playwright test",
+    "_test:e2e:smoke:with-unit-tests": "cross-env PLAYWRIGHT_USE_DEV_SERVER=false playwright test --project=*-smoke"
   }
 }
