@@ -6,8 +6,96 @@ import { createMetadata, dComponent } from "../metadata-helpers";
 import { NavPanel, defaultProps, buildNavHierarchy } from "./NavPanelNative";
 import { useMemo } from "react";
 import classnames from "classnames";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
 
 const COMP = "NavPanel";
+
+type AppNavItem = {
+  to?: string;
+  label?: string;
+  icon?: string;
+  description?: string;
+  children?: AppNavItem[];
+  target?: string;
+  active?: boolean;
+  noIndicator?: boolean;
+  initiallyExpanded?: boolean;
+  iconAlignment?: string;
+};
+
+type AppNavData = {
+  mobileLinks?: AppNavItem[];
+  items?: AppNavItem[];
+};
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return !!value && typeof value === "object" && !Array.isArray(value);
+}
+
+function toNavComponentDef(item: AppNavItem, uidPrefix: string, idx: number): ComponentDef | undefined {
+  const hasChildren = Array.isArray(item.children);
+  if (hasChildren) {
+    if (!item.label) return undefined;
+    return {
+      type: "NavGroup",
+      uid: `${uidPrefix}-group-${idx}`,
+      props: {
+        label: item.label,
+        to: item.to,
+        icon: item.icon,
+        initiallyExpanded: item.initiallyExpanded,
+        iconAlignment: item.iconAlignment,
+      },
+      children: item.children
+        ?.map((child, childIdx) => toNavComponentDef(child, `${uidPrefix}-group-${idx}`, childIdx))
+        .filter(Boolean) as ComponentDef[],
+    };
+  }
+
+  if (!item.label || !item.to) return undefined;
+  return {
+    type: "NavLink",
+    uid: `${uidPrefix}-link-${idx}`,
+    props: {
+      label: item.label,
+      to: item.to,
+      icon: item.icon,
+      target: item.target,
+      active: item.active,
+      noIndicator: item.noIndicator,
+      iconAlignment: item.iconAlignment,
+    },
+  };
+}
+
+function buildAutoNavChildren(rawNav: unknown): ComponentDef[] {
+  if (!isPlainObject(rawNav)) return [];
+  const nav = rawNav as AppNavData;
+  const children: ComponentDef[] = [];
+
+  const mobileLinks = Array.isArray(nav.mobileLinks) ? nav.mobileLinks : [];
+  const mobileLinkNodes = mobileLinks
+    .map((item, idx) => toNavComponentDef(item, "auto-mobile", idx))
+    .filter(Boolean) as ComponentDef[];
+
+  if (mobileLinkNodes.length > 0) {
+    children.push({
+      type: "Fragment",
+      uid: "auto-mobile-links",
+      when: "{mediaSize.sizeIndex <= 2}",
+      children: mobileLinkNodes,
+    });
+  }
+
+  const items = Array.isArray(nav.items) ? nav.items : [];
+  children.push(
+    ...(items
+      .map((item, idx) => toNavComponentDef(item, "auto-main", idx))
+      .filter(Boolean) as ComponentDef[]),
+  );
+
+  return children;
+}
 
 export const NavPanelMd = createMetadata({
   status: "stable",
@@ -87,10 +175,22 @@ function NavPanelWithBuiltNavHierarchy({
   className,
   layoutContext,
   extractValue,
+  appContext,
 }) {
+  const autoNavChildren = useMemo(() => {
+    return buildAutoNavChildren(appContext?.appGlobals?.nav);
+  }, [appContext?.appGlobals?.nav]);
+
+  const effectiveChildren = useMemo(() => {
+    if (autoNavChildren.length === 0) {
+      return node.children;
+    }
+    return [...(node.children ?? []), ...autoNavChildren];
+  }, [autoNavChildren, node.children]);
+
   const navLinks = useMemo(() => {
-    return buildNavHierarchy(node.children, extractValue, undefined, []);
-  }, [extractValue, node.children]);
+    return buildNavHierarchy(effectiveChildren, extractValue, undefined, []);
+  }, [effectiveChildren, extractValue]);
 
   const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
   const showScrollerFade = extractValue.asOptionalBoolean(node.props.showScrollerFade);
@@ -109,7 +209,7 @@ function NavPanelWithBuiltNavHierarchy({
       scrollStyle={scrollStyle}
       showScrollerFade={showScrollerFade}
     >
-      {renderChild(node.children)}
+      {renderChild(effectiveChildren)}
     </NavPanel>
   );
 }
@@ -117,7 +217,7 @@ function NavPanelWithBuiltNavHierarchy({
 export const navPanelRenderer = createComponentRenderer(
   COMP,
   NavPanelMd,
-  ({ node, renderChild, className, layoutContext, extractValue }) => {
+  ({ node, renderChild, className, layoutContext, extractValue, appContext }) => {
     return (
       <NavPanelWithBuiltNavHierarchy
         node={node}
@@ -125,6 +225,7 @@ export const navPanelRenderer = createComponentRenderer(
         className={className}
         layoutContext={layoutContext}
         extractValue={extractValue}
+        appContext={appContext}
       />
     );
   },

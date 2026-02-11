@@ -1,6 +1,7 @@
 import type { StandaloneAppDescription } from "xmlui";
 import { createHighlighterCoreSync, type DecorationItem } from "shiki";
 import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
+import docsNav from "./nav.json";
 // @ts-ignore
 import js from "@shikijs/langs/javascript";
 // @ts-ignore
@@ -316,6 +317,7 @@ const App: StandaloneAppDescription = {
     useHashBasedRouting: false,
     showHeadingAnchors: true,
     searchIndexEnabled: true,
+    nav: docsNav.nav,
     navPanelContent: groupedNavPanelContent,
     content,
     plainTextContent,
