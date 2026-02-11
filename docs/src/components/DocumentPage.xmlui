@@ -1,6 +1,7 @@
 <Component name="DocumentPage">
     <HStack gap="$space-5">
         <VStack width="*">
+            <Breadcrumb />
             <Markdown
                 when="{$props.content || $props.url}"
                 content="{$props.content}"

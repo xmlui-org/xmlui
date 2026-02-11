@@ -1,4 +1,123 @@
 <Component name="Breadcrumb">
-    <!-- Todo: Add breadcrumb navigation -->
-    <Text />
+    <script>
+      function normalizePath(path) {
+        let safePath = typeof path === "string" && path ? path : "/";
+        if (safePath[0] !== "/") {
+          safePath = "/" + safePath;
+        }
+        while (safePath.indexOf("//") >= 0) {
+          safePath = safePath.split("//").join("/");
+        }
+        if (safePath.length > 1 && safePath[safePath.length - 1] === "/") {
+          safePath = safePath.substring(0, safePath.length - 1);
+        }
+        return safePath;
+      }
+
+      function resolveCurrentPath() {
+        let pathname =
+          globalThis.location && typeof globalThis.location.pathname === "string"
+            ? globalThis.location.pathname
+            : "/";
+        const hash =
+          globalThis.location && typeof globalThis.location.hash === "string"
+            ? globalThis.location.hash
+            : "";
+
+        if ((!pathname || pathname === "/") && hash.indexOf("#/") === 0) {
+          pathname = hash.substring(1);
+        }
+
+        return normalizePath(pathname);
+      }
+
+      function flattenNavLinks(nav) {
+        const links = {};
+
+        function walk(items) {
+          if (!Array.isArray(items)) return;
+          items.forEach((item) => {
+            if (!item || typeof item !== "object") return;
+            const to = typeof item.to === "string" ? item.to : "";
+            const label = typeof item.label === "string" ? item.label : "";
+            if (to && label && to[0] === "/") {
+              links[to] = label;
+            }
+            if (Array.isArray(item.children)) {
+              walk(item.children);
+            }
+          });
+        }
+
+        walk(nav && nav.mobileLinks);
+        walk(nav && nav.items);
+        return links;
+      }
+
+      function existsInNav(path, navMap) {
+        if (!path || !navMap) return false;
+        return !!navMap[path];
+      }
+
+      function prettifySegment(segment) {
+        if (!segment) return "";
+        const decoded = decodeURIComponent(segment);
+        const parts = decoded
+          .split("-")
+          .join(" ")
+          .split("_")
+          .join(" ")
+          .split(" ")
+          .filter((p) => p);
+        return parts.join(" ");
+      }
+
+      function getBreadcrumbItems() {
+        const nav = appGlobals && appGlobals.nav ? appGlobals.nav : {};
+        const navMap = flattenNavLinks(nav);
+        const currentPath = resolveCurrentPath();
+
+        if (currentPath === "/") {
+          return [];
+        }
+
+        const parts = currentPath.split("/").filter((p) => p);
+        const crumbs = [];
+        let acc = "";
+        parts.forEach((part, idx) => {
+          acc += "/" + part;
+          const isLast = idx === parts.length - 1;
+          const label = navMap[acc] || prettifySegment(part);
+          crumbs.push({
+            to: acc,
+            label,
+            isLink: existsInNav(acc, navMap) && !isLast,
+          });
+        });
+
+        return crumbs;
+      }
+    </script>
+
+    <variable name="breadcrumbItems" value="{getBreadcrumbItems()}" />
+
+    <HStack
+        when="{breadcrumbItems.length > 0}"
+        gap="$space-2"
+        verticalAlignment="center"
+        wrap="true"
+        marginBottom="$space-4"
+    >
+        <Items data="{breadcrumbItems}">
+            <Fragment when="{!$isFirst}">
+                <Text variant="description">/</Text>
+            </Fragment>
+            <Link when="{$item.isLink}" to="{$item.to}">
+                {$item.label}
+            </Link>
+            <Text when="{!$item.isLink}" variant="description">
+                {$item.label}
+            </Text>
+        </Items>
+    </HStack>
 </Component>
