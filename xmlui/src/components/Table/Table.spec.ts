@@ -1077,7 +1077,7 @@ test.describe("Basic Functionality", () => {
 
     test("hides no data view when noDataTemplate is null", async ({ initTestBed, page }) => {
       await initTestBed(`
-        <Table data='{[]}' noDataTemplate="{null}" testId="table">
+        <Table data='{[]}' noDataTemplate="" testId="table">
           <Column bindTo="name"/>
         </Table>
       `);
