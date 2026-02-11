@@ -108,16 +108,18 @@
       "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.test.ts"],
       "outputs": ["src/testing/infrastructure/dist/**"]
     },
-    "test:all": {
-      "dependsOn": ["test:unit", "//#test:e2e"],
-      "outputs": ["playwright-report/**"]
-    },
-    "test:smoke": {
-      "dependsOn": ["test:unit", "//#test:e2e:smoke"],
-      "outputs": ["playwright-report/**"]
-    },
-    "test:unit": {
+    "xmlui#test:unit": {
       "outputs": []
+    },
+    "//#_test:e2e:with-unit-tests": {
+      "env": ["PLAYWRIGHT_USE_DEV_SERVER"],
+      "dependsOn": ["xmlui#build:xmlui-test-bed", "xmlui#test:unit"],
+      "outputs": ["playwright-report/**"]
+    },
+    "//#_test:e2e:smoke:with-unit-tests": {
+      "env": ["PLAYWRIGHT_USE_DEV_SERVER"],
+      "dependsOn": ["xmlui#build:xmlui-test-bed", "xmlui#test:unit"],
+      "outputs": ["playwright-report/**"]
     },
     "//#test:e2e": {
       "env": ["PLAYWRIGHT_USE_DEV_SERVER"],
