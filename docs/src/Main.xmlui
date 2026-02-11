@@ -89,8 +89,8 @@
         <NavGroup label="Guides" to="/guides">
             <NavLink icon="hierarchy" label="App Structure" to="/app-structure" />
             <NavLink icon="markup" label="Markup" to="/markup" />
-            <NavLink icon="boundary" label="Scoping" to="/scoping" />
             <NavLink icon="bolt" label="Scripting" to="/scripting" />
+            <NavLink icon="boundary" label="Scoping" to="/scoping" />
             <NavLink
                 icon="playground"
                 label="Codefences and playgrounds"

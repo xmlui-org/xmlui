@@ -979,6 +979,12 @@ function useStandalone(
           Object.assign(parsedGlobals, entryPointDef.globalVars);
         }
         
+        // Collect functions from root element (from Main.xmlui.xs)
+        // Functions need to flow through globalVars to be available in compound components
+        if (entryPointDef?.functions) {
+          Object.assign(parsedGlobals, entryPointDef.functions);
+        }
+        
         // Collect from compound components
         appDef.components?.forEach((compound) => {
           if (compound?.component?.globalVars) {
@@ -1573,8 +1579,40 @@ function transformMainXsToGlobalTags(
     });
   }
   
-  // Process functions from Main.xmlui.xs (preserve them as functions, not globalVars)
-  const functions = mainXs.functions || {};
+  // Process functions from Main.xmlui.xs
+  // Functions are parse trees that need to be evaluated to become callable
+  const functions: Record<string, any> = {};
+  if (mainXs.functions) {
+    Object.entries(mainXs.functions).forEach(([funcName, funcDef]) => {
+      // Functions come as objects with __PARSED__ mark and tree property
+      if (
+        typeof funcDef === "object" &&
+        funcDef !== null &&
+        (funcDef as any).__PARSED__ &&
+        (funcDef as any).tree
+      ) {
+        try {
+          // Evaluate the function tree to get an actual callable function
+          const evalContext: BindingTreeEvaluationContext = {
+            mainThread: {
+              childThreads: [],
+              blocks: [{ vars: {} }],
+              loops: [],
+              breakLabelValue: -1,
+            },
+            localContext: {},
+          };
+          const evaluatedFunc = evalBinding((funcDef as any).tree, evalContext);
+          functions[funcName] = evaluatedFunc;
+        } catch (error) {
+          console.error(`Failed to evaluate function ${funcName}:`, error);
+        }
+      } else {
+        // Already evaluated or literal value
+        functions[funcName] = funcDef;
+      }
+    });
+  }
   
   // Add the globalVars and functions to the entry point
   if (Object.keys(globalVars).length > 0 || Object.keys(functions).length > 0) {
