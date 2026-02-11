@@ -821,17 +821,30 @@ test.describe("Layout Input Validation", () => {
     // App should log a console error when an invalid layout is provided
     const consoleMessages: { type: string; text: string }[] = [];
     
-    page.on('console', msg => {
-      consoleMessages.push({
-        type: msg.type(),
-        text: msg.text()
+    // Set up console listener before initializing the test bed
+    const consolePromise = new Promise<void>((resolve) => {
+      page.on('console', msg => {
+        const message = {
+          type: msg.type(),
+          text: msg.text()
+        };
+        consoleMessages.push(message);
+        
+        // Resolve when we find the expected error message
+        if ((message.type === 'log' || message.type === 'error' || message.type === 'warning') &&
+            (message.text.includes('layout type not supported') || message.text.includes('invalid-layout'))) {
+          resolve();
+        }
       });
     });
 
     await initTestBed(`<App layout="invalid-layout" testId="app">test text</App>`);
     
-    // Wait for console messages
-    await page.waitForTimeout(100);
+    // Wait for the expected console message (with timeout)
+    await Promise.race([
+      consolePromise,
+      page.waitForTimeout(2000) // Fallback timeout
+    ]);
     
     // Should have a console log about unsupported layout
     const hasLayoutError = consoleMessages.some(msg => 

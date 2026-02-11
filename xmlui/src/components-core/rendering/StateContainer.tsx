@@ -757,12 +757,19 @@ export const StateContainer = memo(
         }
       }
       
+      // Add functions from node.functions (these are already evaluated function objects,not strings)
+      if (node.functions) {
+        Object.entries(node.functions).forEach(([funcName, funcValue]) => {
+          evaluatedNodeGlobals[funcName] = funcValue;
+        });
+      }
+      
       // Merge with node globals taking precedence
       return {
         ...evaluatedParentGlobals,
         ...evaluatedNodeGlobals,
       };   
-    }, [parentGlobalVars, node.globalVars, appContext, globalDepValueMap, globalDependencies, componentStateWithApis]);
+    }, [parentGlobalVars, node.globalVars, node.functions, appContext, globalDepValueMap, globalDependencies, componentStateWithApis]);
 
     // Stabilize currentGlobalVars reference to prevent unnecessary re-renders
     // Only create new reference when values actually change (shallow comparison)
