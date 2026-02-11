@@ -5527,6 +5527,148 @@ test.describe("Auto-Load Feature - Step 4: Autoload Mechanism", () => {
 });
 
 // =============================================================================
+// REGRESSION TEST: Issue #2786 - collapseNode() should mark nodes as unloaded
+// =============================================================================
+
+test.describe("Regression: Issue #2786 - collapseNode() with autoLoadAfter=0", () => {
+  test("collapseNode() API marks node as unloaded when autoLoadAfter is 0", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+      const dynamicTreeData = [
+        { id: 1, name: "Parent Node", parentId: null, loaded: false },
+      ];
+
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree 
+              id="treeApi" 
+              testId="tree" 
+              dataFormat="flat" 
+              loadedField="loaded"
+              autoLoadAfter="0"
+              onLoadChildren="arg => {
+                testState = { loadCount: (testState.loadCount || 0) + 1 };
+                return [
+                  { id: 'child-' + (testState.loadCount || 1), name: 'Child ' + (testState.loadCount || 1) }
+                ];
+              }"
+              data='{${JSON.stringify(dynamicTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button testId="expand-btn" onClick="treeApi.expandNode(1);" />
+          <Button testId="collapse-btn" onClick="treeApi.collapseNode(1);" />
+          <Button testId="check-state-btn" onClick="testState = { ...testState, loadingState: treeApi.getNodeLoadingState(1) };" />
+        </Fragment>
+      `);
+
+      const expandButton = await createButtonDriver("expand-btn");
+      const collapseButton = await createButtonDriver("collapse-btn");
+      const checkStateButton = await createButtonDriver("check-state-btn");
+
+      // Expand node 1 - should trigger initial load
+      await expandButton.click();
+      
+      // Verify node is loaded
+      await checkStateButton.click();
+      let state = await testStateDriver.testState();
+      expect(state.loadingState).toBe("loaded");
+      expect(state.loadCount).toBe(1);
+
+      // Collapse node 1 using collapseNode() API
+      // With autoLoadAfter="0", this should mark the node as unloaded
+      await collapseButton.click();
+      
+      // Check loading state after collapse - should be 'unloaded'
+      await checkStateButton.click();
+      state = await testStateDriver.testState();
+      expect(state.loadingState).toBe("unloaded");
+
+      // Re-expand should trigger reload since node was marked unloaded
+      await expandButton.click();
+      
+      // Verify reload happened (loadCount should be 2)
+      await expect.poll(async () => {
+        const state = await testStateDriver.testState();
+        return state.loadCount;
+      }).toBe(2);
+    });
+
+  test("manual collapse (clicking) marks node as unloaded when autoLoadAfter is 0", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+      const dynamicTreeData = [
+        { id: 1, name: "Parent Node", parentId: null, loaded: false },
+      ];
+
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree 
+              id="treeApi" 
+              testId="tree" 
+              dataFormat="flat" 
+              loadedField="loaded"
+              autoLoadAfter="0"
+              itemClickExpands
+              onLoadChildren="arg => {
+                testState = { loadCount: (testState.loadCount || 0) + 1 };
+                return [
+                  { id: 'child-' + (testState.loadCount || 1), name: 'Child ' + (testState.loadCount || 1) }
+                ];
+              }"
+              data='{${JSON.stringify(dynamicTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button testId="check-state-btn" onClick="testState = { ...testState, loadingState: treeApi.getNodeLoadingState(1) };" />
+        </Fragment>
+      `);
+
+      const tree = await createTreeDriver("tree");
+      const checkStateButton = await createButtonDriver("check-state-btn");
+
+      // Expand node 1 by clicking - should trigger initial load
+      await tree.getByTestId("1").click();
+      
+      // Verify node is loaded
+      await checkStateButton.click();
+      let state = await testStateDriver.testState();
+      expect(state.loadingState).toBe("loaded");
+      expect(state.loadCount).toBe(1);
+
+      // Collapse by clicking again
+      await tree.getByTestId("1").click();
+      
+      // Check loading state after manual collapse - should be 'unloaded'
+      await checkStateButton.click();
+      state = await testStateDriver.testState();
+      expect(state.loadingState).toBe("unloaded");
+
+      // Re-expand should trigger reload since node was marked unloaded
+      await tree.getByTestId("1").click();
+      
+      // Verify reload happened (loadCount should be 2)
+      await expect.poll(async () => {
+        const state = await testStateDriver.testState();
+        return state.loadCount;
+      }).toBe(2);
+    });
+});
+
+// =============================================================================
 // DYNAMIC NODE LOADED STATE TESTS
 // =============================================================================
 
