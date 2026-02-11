@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import classnames from "classnames";
 
 import { useAppContext } from "../../components-core/AppContext";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 import { LinkNative } from "../Link/LinkNative";
 import { Text } from "../Text/TextNative";
 import { Heading } from "../Heading/HeadingNative";
@@ -63,14 +64,15 @@ type Props = {
 
 export function Blog({ className, style }: Props) {
   const { slug } = useParams<{ slug?: string }>();
-  const { appGlobals, mediaSize, getLayoutConfig } = useAppContext();
+  const { appGlobals, mediaSize } = useAppContext();
+  const { getThemeVar } = useTheme();
 
   const blogConfig = appGlobals?.blog as BlogConfig | undefined;
   const prefetchedContent = (appGlobals?.prefetchedContent as Record<string, string> | undefined) || {};
 
-  const layout = getLayoutConfig<"basic" | "featuredWithTabs">("layout", "basic") ?? "basic";
-  const tableOfContentsEnabled = getLayoutConfig<boolean>("tableOfContents", true) !== false;
-  const showTagsEnabled = getLayoutConfig<boolean>("tags", true) !== false;
+  const layout = (getThemeVar("layout") as "basic" | "featuredWithTabs" | undefined) ?? "basic";
+  const tableOfContentsEnabled = getThemeVar("tableOfContents") !== "false";
+  const showTagsEnabled = getThemeVar("tags") !== "false";
 
   const sortedPosts = useMemo(
     () =>

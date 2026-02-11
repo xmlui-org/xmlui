@@ -135,9 +135,6 @@ export interface ThemeDefinition extends ThemeDefinitionDetails {
   // This property defines a color that represents the theme.
   color?: string;
 
-  // This property stores layout-affecting global config values for the active theme.
-  // These values can be queried from app context through helper functions.
-  layoutConfig?: Record<string, any>;
 }
 
 export type DefaultThemeVars = Record<string | ThemeTone, string | Record<string, string>>;

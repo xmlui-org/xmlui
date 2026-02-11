@@ -214,9 +214,8 @@ export type AppContextObject = {
   // This function toggles the current theme tone from "light" to "dark" or vice versa.
   toggleThemeTone: () => void;
 
-  // Retrieves a layout config value from the active theme by path.
-  // Returns `fallback` when the path cannot be resolved.
-  getLayoutConfig: <T = unknown>(path: string, fallback?: T) => T | undefined;
+  // This function gets the value of the specified theme variable.
+  getThemeVar: (themeVar: string) => string | undefined;
 
   // ==============================================================================================
   // Users

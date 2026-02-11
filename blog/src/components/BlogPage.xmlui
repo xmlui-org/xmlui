@@ -1,7 +1,7 @@
 <Component name="BlogPage">
     <script>
-        var showToc = getLayoutConfig("tableOfContents", true) !== false && mediaSize.sizeIndex > 3;
-        var showTags = getLayoutConfig("tags", true) !== false;
+        var showToc = getThemeVar("tableOfContents") !== "false" && mediaSize.sizeIndex > 3;
+        var showTags = getThemeVar("tags") !== "false";
         var markdownContent = appGlobals.prefetchedContent[`/blog/${$props.post.slug}.md`];
     </script>
 

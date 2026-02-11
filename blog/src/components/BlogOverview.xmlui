@@ -1,7 +1,7 @@
 <Component name="BlogOverview">
     <script>
-        var layout = getLayoutConfig("layout", "basic");
-        var showTags = getLayoutConfig("tags", true) !== false;
+        var layout = getThemeVar("layout") || "basic";
+        var showTags = getThemeVar("tags") !== "false";
         var sortedPosts = (appGlobals.blog?.posts || [])
             .filter((p) => !p.draft)
             .toSorted((a, b) => Date.parse(b.date) - Date.parse(a.date));
@@ -22,7 +22,7 @@
         </H1>
 
         <BasicLayout
-            when="{layout !== 'featuredWithTabs'}"
+            when="{layout === 'basic'}"
             sortedPosts="{sortedPosts}"
             showTags="{showTags}"
         />

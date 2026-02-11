@@ -191,8 +191,7 @@ export function App({
     ? (normalized as AppLayoutType)
     : "condensed-sticky";
   const appContext = useAppContext();
-  const { setLoggedInUser, mediaSize, forceRefreshAnchorScroll, appGlobals, getLayoutConfig } =
-    appContext;
+  const { setLoggedInUser, mediaSize, forceRefreshAnchorScroll, appGlobals } = appContext;
   const hasRegisteredHeader = header !== undefined;
 
   // Check if NavPanel exists and is actually displayed
@@ -427,7 +426,7 @@ export function App({
     },
   ];
 
-  const tableOfContentsEnabled = getLayoutConfig<boolean>("tableOfContents", true) !== false;
+  const tableOfContentsEnabled = getThemeVar("tableOfContents") !== "false";
   const isBlogPageWithToc =
     tableOfContentsEnabled &&
     (location.pathname === "/" ||
