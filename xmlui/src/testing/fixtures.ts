@@ -325,7 +325,7 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       const { width, height } = page.viewportSize();
 
       await page.goto("/");
-      if (!description.noFragmentWrapper) {
+      if (!description?.noFragmentWrapper) {
         await page.getByTestId(testStateViewTestId).waitFor({ state: "attached" });
       }
 
