@@ -26,7 +26,7 @@ import {
   xsConsoleLog,
   pushXsLog,
 } from "../inspector/inspectorUtils";
-import { isParsedCodeDeclaration } from "../../abstractions/InternalMarkers";
+import { isParsedCodeDeclaration, ARROW_EXPR_MARK } from "../../abstractions/InternalMarkers";
 import { useAppContext } from "../AppContext";
 import { parseParameterString } from "../script-runner/ParameterParser";
 import { evalBinding } from "../script-runner/eval-tree-sync";
@@ -587,6 +587,19 @@ export const StateContainer = memo(
     const mergedWithVarsRaw = useMergedState(resolvedLocalVars, componentStateWithApis);
     const mergedWithVars = useMemo(() => {
       const filtered: ContainerState = {};
+      const excluded: string[] = [];
+      
+      // DEBUG compound component filtering
+      const isCompound = node.uses && Array.isArray(node.uses) && node.uses.length === 0;
+      if (isCompound) {
+        console.log(`[BEFORE FILTER]`, {
+          mergedWithVarsRaw: Object.keys(mergedWithVarsRaw),
+          resolvedLocalVars: Object.keys(resolvedLocalVars),
+          parentGlobalVars: parentGlobalVars ? Object.keys(parentGlobalVars) : [],
+          nodeVars: node.vars ? Object.keys(node.vars) : [],
+        });
+      }
+      
       for (const [key, value] of Object.entries(mergedWithVarsRaw)) {
         // Check if this key is defined locally (can shadow globals)
         const isDefinedLocally = (key in resolvedLocalVars) || (node.vars && key in node.vars);
@@ -600,10 +613,24 @@ export const StateContainer = memo(
         // 2. It's not a global at all
         if (isDefinedLocally || (!isParentGlobal && !isNodeGlobal)) {
           filtered[key] = value;
+        } else {
+          excluded.push(key);
+          if (isCompound) {
+            console.log(`[EXCLUDING '${key}']`, { isDefinedLocally, isParentGlobal, isNodeGlobal });
+          }
         }
       }
+      
+      // DEBUG: Log filtering for compound components
+      if (isCompound && excluded.length > 0) {
+        console.log(`[FILTER MERGED]`, {
+          excluded,
+          kept: Object.keys(filtered),
+        });
+      }
+      
       return filtered;
-    }, [mergedWithVarsRaw, parentGlobalVars, node.globalVars, resolvedLocalVars, node.vars]);
+    }, [mergedWithVarsRaw, parentGlobalVars, node.globalVars, resolvedLocalVars, node.vars, node.uses]);
 
     // ========================================================================
     // GLOBAL VARIABLES HANDLING
@@ -713,6 +740,16 @@ export const StateContainer = memo(
               false,
             );
             console.log(`[StateContainer ${node.type}] Evaluated parent global '${key}':`, evaluatedParentGlobals[key]);
+          } else if (isParsedValue(value)) {
+            // Unwrap parsed values (arrow expressions, etc.)
+            console.log(`[StateContainer ${node.type}] Unwrapping parsed parent global '${key}'`);
+            const unwrapped = value.tree;
+            // Mark arrow expressions with _ARROW_EXPR_ so evaluator recognizes them as callable
+            if (unwrapped.type === T_ARROW_EXPRESSION) {
+              evaluatedParentGlobals[key] = { ...unwrapped, [ARROW_EXPR_MARK]: true };
+            } else {
+              evaluatedParentGlobals[key] = unwrapped;
+            }
           } else {
             console.log(`[StateContainer ${node.type}] Using direct value for parent global '${key}':`, value);
             evaluatedParentGlobals[key] = value;
@@ -782,6 +819,17 @@ export const StateContainer = memo(
             );
             // Update the context for subsequent variables with the newly evaluated value
             globalsForContext[key] = evaluatedNodeGlobals[key];
+          } else if (isParsedValue(value)) {
+            // CRITICAL: Unwrap parsed values (especially arrow expressions/functions from Main.xmlui.xs)
+            // The evaluator expects arrow expressions with _ARROW_EXPR_: true marker
+            const unwrapped = value.tree;
+            if (unwrapped.type === T_ARROW_EXPRESSION) {
+              evaluatedNodeGlobals[key] = { ...unwrapped, [ARROW_EXPR_MARK]: true };
+              globalsForContext[key] = { ...unwrapped, [ARROW_EXPR_MARK]: true };
+            } else {
+              evaluatedNodeGlobals[key] = unwrapped;
+              globalsForContext[key] = unwrapped;
+            }
           } else {
             evaluatedNodeGlobals[key] = value;
             globalsForContext[key] = value;
@@ -793,13 +841,19 @@ export const StateContainer = memo(
       return {
         ...evaluatedParentGlobals,
         ...evaluatedNodeGlobals,
-      };   
+      };
     }, [parentGlobalVars, node.globalVars, appContext, globalDepValueMap, globalDependencies, componentStateWithApis]);
 
-    // ========================================================================
-    // LAYER 6: FINAL STATE COMBINATION
-    // ========================================================================
-
+    // DEBUG: Log globals for containers with uses=[] (compound components)
+    if (node.uses && Array.isArray(node.uses) && node.uses.length === 0) {
+      console.log(`[COMPOUND GLOBALS]`, {
+        parentGlobalVars: parentGlobalVars ? Object.keys(parentGlobalVars) : [],
+        parentGlobalVarsValues: parentGlobalVars,
+        nodeGlobalVars: node.globalVars ? Object.keys(node.globalVars) : [],
+        currentGlobalVars: Object.keys(currentGlobalVars),
+        currentGlobalVarsValues: currentGlobalVars,
+      });
+    }
     // CRITICAL: Merge order determines shadowing behavior
     // Order: stateFromOutside → contextVars → globalVars → localVars → routingParams
     // This allows local vars to shadow globals (local vars come after globals)

@@ -870,6 +870,15 @@ export const Container = memo(
           // --- Invoke the jolly-joker `renderChild` function to render the child. Note that
           // --- in the context, we pass the `stableRenderChild` function, so the child can
           // --- render its children recursively.
+          
+          // DEBUG: Log globalVars when rendering compound components
+          if (child.type === 'IncButton' || (child.type && child.type !== 'Container' && child.type !== 'Button' && child.type !== 'Text' && child.type !== 'TextNode')) {
+            console.log(`[Container rendering ${child.type}]`, {
+              globalVars: globalVars ? Object.keys(globalVars) : [],
+              globalVarsValues: globalVars,
+            });
+          }
+          
           const renderedChild = renderChild({
             node: child,
             state: componentState,

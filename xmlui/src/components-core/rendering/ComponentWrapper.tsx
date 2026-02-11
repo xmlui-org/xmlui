@@ -83,6 +83,16 @@ export const ComponentWrapper = memo(
 
     if (isContainerLike(nodeWithTransformedDatasourceProp)) {
       // --- This component should be rendered as a container
+      
+      // DEBUG: Log what globals are being passed to containers with uses=[]
+      if (nodeWithTransformedDatasourceProp.uses && Array.isArray(nodeWithTransformedDatasourceProp.uses) && nodeWithTransformedDatasourceProp.uses.length === 0) {
+        console.log(`[ComponentWrapper passing to ContainerWrapper]`, {
+          nodeType: nodeWithTransformedDatasourceProp.type,
+          globalVars: globalVars ? Object.keys(globalVars) : [],
+          globalVarsValues: globalVars,
+        });
+      }
+      
       return (
         <ContainerWrapper
           resolvedKey={resolvedKey}

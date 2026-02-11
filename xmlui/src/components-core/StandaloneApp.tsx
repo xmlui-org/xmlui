@@ -863,6 +863,7 @@ function useStandalone(
       }
     }
     
+
     return extractedVars;
   };
 
@@ -1573,8 +1574,17 @@ function transformMainXsToGlobalTags(
     });
   }
   
-  // Process functions from Main.xmlui.xs (preserve them as functions, not globalVars)
+  // Process functions from Main.xmlui.xs
+  // CRITICAL: Functions MUST be in globalVars to propagate to child/compound components
+  // Add them to both globalVars (for propagation) and functions (for local use)
   const functions = mainXs.functions || {};
+  
+  // Add functions to globalVars so they propagate
+  if (functions) {
+    Object.entries(functions).forEach(([funcName, funcDef]) => {
+      globalVars[funcName] = funcDef;
+    });
+  }
   
   // Add the globalVars and functions to the entry point
   if (Object.keys(globalVars).length > 0 || Object.keys(functions).length > 0) {
