@@ -1,11 +1,4 @@
-import {
-  cloneElement,
-  type ReactElement,
-  useContext,
-  useCallback,
-  useEffect,
-  useRef,
-} from "react";
+import { cloneElement, type ReactElement, useContext, useCallback, useEffect, useRef } from "react";
 import {
   Animation,
   parseAnimation,
@@ -34,6 +27,24 @@ export { pubSubBehavior } from "./PubSubBehavior";
  */
 export const tooltipBehavior: Behavior = {
   name: "tooltip",
+  metadata: {
+    name: "tooltip",
+    triggerProps: ["tooltip", "tooltipMarkdown"],
+    otherProps: ["tooltipOptions"],
+    condition: {
+      type: "or",
+      conditions: [
+        {
+          type: "hasProp",
+          propName: "tooltip",
+        },
+        {
+          type: "hasProp",
+          propName: "tooltipMarkdown",
+        },
+      ],
+    },
+  },
   canAttach: (context, node) => {
     const { extractValue } = context;
     const tooltipText = extractValue(node.props?.tooltip, true);
@@ -60,6 +71,15 @@ export const tooltipBehavior: Behavior = {
  */
 export const animationBehavior: Behavior = {
   name: "animation",
+  metadata: {
+    name: "animation",
+    triggerProps: ["animation"],
+    otherProps: ["animationOptions"],
+    condition: {
+      type: "hasProp",
+      propName: "animation",
+    },
+  },
   canAttach: (context, node) => {
     const { extractValue } = context;
     const animation = extractValue(node.props?.animation, true);
@@ -88,6 +108,29 @@ export const animationBehavior: Behavior = {
  */
 export const labelBehavior: Behavior = {
   name: "label",
+  metadata: {
+    name: "label",
+    triggerProps: ["label"],
+    otherProps: [
+      "labelPosition",
+      "labelWidth",
+      "labelBreak",
+      "required",
+      "enabled",
+      "shrinkToLabel",
+      "style",
+      "readOnly",
+    ],
+    condition: {
+      type: "and",
+      conditions: [
+        {
+          type: "hasProp",
+          propName: "label",
+        },
+      ],
+    },
+  },
   canAttach: (context, node, metadata) => {
     /**
      * This behavior can be attached if the component has a 'label' prop
@@ -106,7 +149,7 @@ export const labelBehavior: Behavior = {
     // (form-bindable components with bindTo prop will get label from FormBindingWrapper)
     const bindTo = extractValue(node.props?.bindTo, true);
     const hasValueApiPair = !!metadata?.apis?.value && !!metadata?.apis?.setValue;
-    if (bindTo && hasValueApiPair || node.type === "FormItem") {
+    if ((bindTo && hasValueApiPair) || node.type === "FormItem") {
       return false;
     }
     return true;
@@ -153,6 +196,15 @@ export const labelBehavior: Behavior = {
  */
 export const variantBehavior: Behavior = {
   name: "variant",
+  metadata: {
+    name: "variant",
+    triggerProps: ["variant"],
+    otherProps: [],
+    condition: {
+      type: "hasProp",
+      propName: "variant",
+    },
+  },
   canAttach: (context, node) => {
     const { extractValue } = context;
     const variant = extractValue(node.props?.variant, true);
@@ -335,6 +387,15 @@ const FORM_VALIDATION_COMPONENTS = [...FORM_BINDABLE_COMPONENTS, "FormItem"] as 
  */
 export const bookmarkBehavior: Behavior = {
   name: "bookmark",
+  metadata: {
+    name: "bookmark",
+    triggerProps: ["bookmark"],
+    otherProps: ["bookmarkLevel", "bookmarkTitle", "bookmarkOmitFromToc"],
+    condition: {
+      type: "hasProp",
+      propName: "bookmark",
+    },
+  },
   canAttach: (context, node, metadata) => {
     // Don't attach to non-visual components
     if (metadata?.nonVisual) {
@@ -465,6 +526,44 @@ function BookmarkWrapper({
  */
 export const formBindingBehavior: Behavior = {
   name: "formBinding",
+  metadata: {
+    name: "formBinding",
+    triggerProps: ["bindTo"],
+    otherProps: [
+      "initialValue",
+      "noSubmit",
+      "required",
+      "minLength",
+      "maxLength",
+      "lengthInvalidMessage",
+      "lengthInvalidSeverity",
+      "minValue",
+      "maxValue",
+      "rangeInvalidMessage",
+      "rangeInvalidSeverity",
+      "pattern",
+      "patternInvalidMessage",
+      "patternInvalidSeverity",
+      "regex",
+      "regexInvalidMessage",
+      "regexInvalidSeverity",
+      "label",
+      "labelPosition",
+      "labelWidth",
+      "labelBreak",
+      "enabled",
+      "requireLabelMode",
+    ],
+    condition: {
+      type: "and",
+      conditions: [
+        {
+          type: "hasProp",
+          propName: "bindTo",
+        },
+      ],
+    },
+  },
   canAttach: (context, node, metadata) => {
     const { extractValue } = context;
 
@@ -476,7 +575,6 @@ export const formBindingBehavior: Behavior = {
       return false;
     }
     return true;
-
   },
   attach: (context, node, metadata) => {
     const { extractValue, node: componentNode } = context;
@@ -575,6 +673,31 @@ export const formBindingBehavior: Behavior = {
 
 export const validationBehavior: Behavior = {
   name: "validation",
+  metadata: {
+    name: "validation",
+    triggerProps: [
+      "required",
+      "minLength",
+      "maxLength",
+      "lengthInvalidMessage",
+      "lengthInvalidSeverity",
+      "minValue",
+      "maxValue",
+      "rangeInvalidMessage",
+      "rangeInvalidSeverity",
+      "pattern",
+      "patternInvalidMessage",
+      "patternInvalidSeverity",
+      "regex",
+      "regexInvalidMessage",
+      "regexInvalidSeverity",
+    ],
+    otherProps: [],
+    condition: {
+      type: "or",
+      conditions: [],
+    },
+  },
   canAttach: (context, node, metadata) => {
     const { extractValue } = context;
 
