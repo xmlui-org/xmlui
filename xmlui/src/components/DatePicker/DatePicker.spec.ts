@@ -46,6 +46,7 @@ test("component displays initialValue correctly (range)", async ({ page, initTes
 
 test("component opens calendar when clicked", async ({ page, initTestBed }) => {
   await initTestBed(`<DatePicker testId="datePicker" />`);
+  await expect(page.getByTestId("datePicker")).toBeVisible();
   await page.getByTestId("datePicker").click();
   await expect(page.getByRole("menu")).toBeVisible();
 });
@@ -104,6 +105,7 @@ test("component has correct accessibility attributes", async ({ page, initTestBe
 
 test("component is focusable via label", async ({ page, initTestBed }) => {
   await initTestBed(`<DatePicker testId="datePicker" label="Birth Date" />`);
+  await expect(page.getByText("Birth Date")).toBeVisible();
   await page.getByText("Birth Date").click();
   // --- clicking the label to focus the input opens up the dialog
   await expect(
@@ -316,6 +318,7 @@ test("component displays placeholder text", async ({ page, initTestBed }) => {
 
 test("component shows week numbers when enabled", async ({ page, initTestBed }) => {
   await initTestBed(`<DatePicker testId="datePicker" showWeekNumber="true" />`);
+  await expect(page.getByTestId("datePicker")).toBeVisible();
   await page.getByTestId("datePicker").click();
   await expect(page.locator("[role='rowheader']").first()).toBeVisible();
 });
@@ -415,6 +418,7 @@ test("component handles disabledDates correctly", async ({ page, initTestBed }) 
   const testMonthName = format(today, "LLLL");
 
   await initTestBed(`<DatePicker testId="datePicker" disabledDates="{['${testDayFormatted}']}" />`, {});
+  await expect(page.getByTestId("datePicker")).toBeVisible();
   await page.getByTestId("datePicker").click();
 
   const testDayCell = page.getByRole("grid", { name: testMonthName }).getByLabel(testDay.toString());

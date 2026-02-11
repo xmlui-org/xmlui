@@ -319,7 +319,12 @@ npx playwright test ComponentName.spec.ts --grep "test name pattern" --reporter=
 
 # Run specific test categories during development
 npx playwright test ComponentName.spec.ts --grep "Basic Functionality" --reporter=line
+
+# Verify test stability before completion - ALWAYS run before considering tests done
+npx playwright test ComponentName.spec.ts --workers=10
 ```
+
+**IMPORTANT**: Always run with `--workers=10` as a final verification step. Tests that pass with `--workers=1` may fail with parallel execution due to timing issues.
 
 ### Debugging Techniques
 
@@ -858,6 +863,76 @@ await page.waitForTimeout(100); // Avoid timeouts before keyboard press
 - `.toBeFocused()` - After `.focus()` call or before keyboard action requiring focus
 - Both can be used together for maximum stability in complex scenarios
 
+### Click Interactions After initTestBed
+
+**CRITICAL**: Always wait for elements to be visible before clicking, especially immediately after `initTestBed()`. While Playwright's `.click()` has built-in actionability waiting, explicit visibility checks improve test stability with parallel execution and make test intent clearer.
+
+**Common Patterns:**
+
+```typescript
+// ✅ CORRECT - Click with visibility check
+await initTestBed(`<DatePicker testId="datePicker" />`);
+await expect(page.getByTestId("datePicker")).toBeVisible();
+await page.getByTestId("datePicker").click();
+
+// ✅ CORRECT - Label click with visibility check
+await initTestBed(`<Slider label="Volume Control" />`);
+await expect(page.getByText("Volume Control")).toBeVisible();
+await page.getByText("Volume Control").click();
+
+// ✅ CORRECT - Using component driver (which may include visibility checks)
+await initTestBed(`<Card onClick="testState = true" />`);
+const driver = await createCardDriver();
+await driver.click(); // Driver may handle visibility internally
+
+// ❌ POTENTIALLY PROBLEMATIC - Click immediately after initTestBed
+await initTestBed(`<Component />`);
+await page.getByTestId("component").click(); // May execute before render completes
+```
+
+**Key Rules:**
+1. **Add `.toBeVisible()` checks before clicks** immediately after `initTestBed()`
+2. **Test clarity**: Explicit checks make the test's expectations clear
+3. **Parallel execution**: Prevents race conditions when running with multiple workers
+4. **Component drivers**: May include visibility checks internally, reducing boilerplate
+
+**When Visibility Checks Are Most Important:**
+- Immediately after `initTestBed()` calls
+- Before clicking labels that trigger focus changes
+- Before clicking elements that open dropdowns/modals
+- In tests that consistently fail with parallel workers
+
+### Throttle and Debounce Testing
+
+**CRITICAL**: Avoid exact timing assertions when testing throttled or debounced behavior. Cloud CI environments with 10+ parallel workers experience CPU throttling and resource contention that make precise timing unpredictable.
+
+```typescript
+// ❌ PROBLEMATIC - Exact count expectations break in cloud CI
+await input.pressSequentially("aaaaaa", { delay: 10 });
+await expect.poll(testState).toMatchObject({ count: 2 }); // Expects exactly 2
+
+// ✅ CORRECT - Range-based assertions verify behavior without exact timing
+const initialCount = (await testStateDriver.testState()).count;
+await input.pressSequentially("aaaaaa", { delay: 10 });
+await page.waitForTimeout(1200); // Extra margin for cloud CI
+
+const finalCount = (await testStateDriver.testState()).count;
+expect(finalCount).toBeGreaterThan(initialCount); // Throttle fired
+expect(finalCount).toBeLessThan(10); // But not for every character
+```
+
+**Key Rules:**
+1. **Use range assertions** instead of exact counts: `toBeGreaterThan()` + `toBeLessThan()`
+2. **Add timing margin**: Use longer waits (1200ms vs 1050ms) for cloud CI variability  
+3. **Verify behavior, not timing**: Test that throttling *reduces* calls, not exact count
+4. **Avoid intermediate checks**: Don't assert counts during typing—only check final state
+
+**Why This Matters:**
+- Local tests with `--workers=1` run on dedicated CPU with predictable timing
+- Cloud CI with `--workers=10` shares CPU across parallel tests
+- Resource contention causes variable delays in `pressSequentially`, throttle callbacks
+- What takes 600ms locally might take 2000ms in cloud CI
+
 ## Test Naming
 
 - Avoid "component" - it's redundant
@@ -918,6 +993,54 @@ Avoid duplication with data-driven tests:
   });
 });
 ```
+
+### Parallel Execution Testing
+
+**CRITICAL**: Always verify tests with parallel execution before considering them complete. Tests that pass with `--workers=1` may fail with multiple workers due to timing issues.
+
+**Development Workflow:**
+1. **During development**: Use `--workers=1 --reporter=line` for fast feedback
+2. **Before completion**: Run with `--workers=10` to verify test stability
+3. **Fix any failures**: Add explicit waits (`.toBeFocused()`, `.toBeVisible()`) as needed
+
+```bash
+# Development (fast feedback)
+npx playwright test ComponentName.spec.ts --workers=1 --reporter=line
+
+# Final verification (stability check)
+npx playwright test ComponentName.spec.ts --workers=10
+```
+
+**Common Issues Caught by Parallel Execution:**
+- Missing focus stability checks before keyboard actions
+- Missing visibility checks before click actions
+- Race conditions in component rendering after `initTestBed()`
+- Timing assumptions that work in isolation but fail under load
+- **Exact timing assertions** in throttle/debounce tests (use range assertions instead)
+
+**Best Practice**: If a test consistently passes with `--workers=1` but fails with `--workers=10`, the issue is almost always a missing explicit wait. Add `.toBeFocused()` after `.focus()` or `.toBeVisible()` before `.click()`. For throttle/debounce tests, replace exact count expectations with range assertions.
+
+### Cloud CI vs Local Testing
+
+**CRITICAL**: Tests may pass locally with `--workers=10` but still fail in cloud CI (GitHub Actions, etc.) due to resource constraints.
+
+**Cloud CI Differences:**
+- **CPU throttling**: Shared/virtualized CPUs are slower and less consistent than local machines
+- **Resource contention**: Multiple jobs running on the same host compete for resources
+- **Variable performance**: Same test run might take 500ms one time, 2000ms another
+- **Memory pressure**: Can cause garbage collection pauses and delays
+
+**How to Write Cloud-Resilient Tests:**
+1. **Avoid exact timing assertions**: Use ranges (`toBeGreaterThan` + `toBeLessThan`) not exact values
+2. **Add timing margins**: If you wait 1000ms locally, use 1200-1500ms for cloud CI
+3. **Use Playwright's built-in waits**: `expect.poll()`, `.toBeVisible()` auto-retry and adapt to slow environments
+4. **Don't assume operation speed**: `pressSequentially`, `fill()`, animations may take longer
+
+**When Local Tests Pass But Cloud CI Fails:**
+- Look for exact count/timing assertions (especially with throttle/debounce)
+- Check for fixed `waitForTimeout()` values that might be too short
+- Verify all actions have visibility/focus checks before them
+- Consider if the test assumes fast CPU (local MacBook Pro vs cloud VM)
 
 ## Layout Testing
 

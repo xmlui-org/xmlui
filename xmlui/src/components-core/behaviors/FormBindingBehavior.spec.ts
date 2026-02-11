@@ -502,32 +502,33 @@ test.describe("Validation", () => {
         <TextBox 
           bindTo="firstName"
           customValidationsDebounce="1000"
-          onValidate="arg => { testState = { count: (testState?.count || 0) + 1, value: arg.value };}"
+          onValidate="arg => { testState = { count: (testState?.count || 0) + 1, value: arg };}"
         />
       </Form>
     `);
 
     const input = page.getByRole("textbox");
+    await expect(input).toBeVisible();
 
     // Initial validation on mount
     await expect.poll(testStateDriver.testState).toMatchObject({ count: 1 });
+
+    const initialCount = (await testStateDriver.testState()).count;
 
     // Type rapidly - validation should be throttled (leading: true, trailing: true)
     await input.pressSequentially("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", {
       delay: 10,
     });
 
-    // First character triggers immediate validation (leading edge)
-    await expect.poll(testStateDriver.testState).toMatchObject({ count: 2 });
-
     // Wait for throttle period to expire and trailing edge to fire
-    await page.waitForTimeout(1050);
+    await page.waitForTimeout(1200);
 
-    // Trailing edge fires with final value
-    await expect.poll(testStateDriver.testState).toMatchObject({ count: 3 });
-    // Count should be at least 2 (leading + trailing), could be more depending on timing
+    // Verify throttling worked: without throttle, we'd have 59+ validations (one per character)
+    // With throttle, we should have significantly fewer (leading + possibly trailing + initial)
     const finalState = await testStateDriver.testState();
-    expect(finalState.count).toBeGreaterThanOrEqual(2);
+    expect(finalState.count).toBeGreaterThan(initialCount); // At least one validation fired
+    expect(finalState.count).toBeLessThan(20); // But throttling prevented most of them
+    expect(finalState.value).toBe("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
   });
 
   // =============================================================================

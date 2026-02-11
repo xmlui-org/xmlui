@@ -915,6 +915,7 @@ test.describe("Event Handling", () => {
 
     await expect(driver.dayInput).toBeVisible(); // Wait for input to be rendered
     await driver.dayInput.focus();
+    await expect(driver.dayInput).toBeFocused();
     await page.keyboard.press("Tab");
     await page.keyboard.press("Tab");
     await page.keyboard.press("Tab"); // Move focus away from all inputs

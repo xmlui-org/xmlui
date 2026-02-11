@@ -880,6 +880,7 @@ test.describe("Accessibility", () => {
   test("page size selector is activated when label is clicked", async ({ initTestBed, page }) => {
     await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}"/>`);
     const trigger = page.getByLabel("Items per page");
+    await expect(page.getByText("Items per page")).toBeVisible();
     await page.getByText("Items per page").click();
     // Clicking the label activates the Select and opens the dropdown
     await expect(trigger).toHaveAttribute("aria-expanded", "true");

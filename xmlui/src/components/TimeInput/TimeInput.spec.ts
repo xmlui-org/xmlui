@@ -717,6 +717,7 @@ test.describe("Basic Functionality", () => {
       await expect(driver.minuteInput).toBeVisible();
       await expect(driver.secondInput).toBeVisible(); // Wait for all inputs to be rendered
       await driver.hourInput.focus();
+      await expect(driver.hourInput).toBeFocused();
       await page.keyboard.press("Tab");
       await expect(driver.minuteInput).toBeFocused();
       await page.keyboard.press("Tab");
@@ -865,6 +866,7 @@ test.describe("Basic Functionality", () => {
       await expect(driver.amPmInput).toHaveText("PM");
       await expect(driver.amPmInput).toBeVisible(); // Wait for input to be rendered
       await driver.amPmInput.focus();
+      await expect(driver.amPmInput).toBeFocused();
       await page.keyboard.press("a");
       await expect(driver.amPmInput).toHaveText("AM");
     });
@@ -875,6 +877,7 @@ test.describe("Basic Functionality", () => {
       await expect(driver.amPmInput).toHaveText("AM");
       await expect(driver.amPmInput).toBeVisible(); // Wait for input to be rendered
       await driver.amPmInput.focus();
+      await expect(driver.amPmInput).toBeFocused();
       await page.keyboard.press("p");
       await expect(driver.amPmInput).toHaveText("PM");
     });
