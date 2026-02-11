@@ -1,4 +1,4 @@
-import {AiOutlineWarning} from "react-icons/ai";
-import type {IconBaseProps} from "./IconNative";
+import Icon from "./svg/ai-outline-warning.svg?react";
+import type { IconBaseProps } from "./IconNative";
 
-export const WarningIcon = (props: IconBaseProps) => <AiOutlineWarning {...props}/>
+export const WarningIcon = (props: IconBaseProps) => <Icon fill="currentColor" stroke="currentColor"  {...props}/>;

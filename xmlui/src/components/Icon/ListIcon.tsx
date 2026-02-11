@@ -1,4 +1,4 @@
-import {FiList} from "react-icons/fi";
-import type {IconBaseProps} from "./IconNative";
+import Icon from "./svg/fi-list.svg?react";
+import type { IconBaseProps } from "./IconNative";
 
-export const ListIcon = (props: IconBaseProps) => <FiList {...props}/>
+export const ListIcon = (props: IconBaseProps) => <Icon {...props}/>;

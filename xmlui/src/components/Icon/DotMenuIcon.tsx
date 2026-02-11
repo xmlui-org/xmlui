@@ -1,6 +1,6 @@
-import type {IconBaseProps} from "./IconNative";
-import { IoEllipsisVertical } from "react-icons/io5";
+import Icon from "./svg/io-ellipsis-vertical.svg?react";
+import type { IconBaseProps } from "./IconNative";
 
 export const DotMenuIcon = (props: IconBaseProps) => (
-  <IoEllipsisVertical {...props}/>
+  <Icon fill="currentColor" stroke="currentColor" {...props}/>
 );

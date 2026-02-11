@@ -1,4 +1,4 @@
-import { FiChevronLeft } from "react-icons/fi";
+import Icon from "./svg/fi-chevron-left.svg?react";
 import type { IconBaseProps } from "./IconNative";
 
-export const ChevronLeftIcon = (props: IconBaseProps) => <FiChevronLeft {...props} />;
+export const ChevronLeftIcon = (props: IconBaseProps) => <Icon {...props}/>

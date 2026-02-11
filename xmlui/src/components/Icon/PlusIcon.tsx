@@ -1,4 +1,4 @@
-import {AiOutlinePlus} from "react-icons/ai";
-import type {IconBaseProps} from "./IconNative";
+import Icon from "./svg/ai-outline-plus.svg?react";
+import type { IconBaseProps } from "./IconNative";
 
-export const PlusIcon = (props: IconBaseProps) => <AiOutlinePlus {...props}/>
+export const PlusIcon = (props: IconBaseProps) => <Icon fill="currentColor" stroke="currentColor"  {...props}/>;
