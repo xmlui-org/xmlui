@@ -151,8 +151,8 @@ export const XmlUiBlogThemeDefinition: ThemeDefinition = {
   color: "$color-primary-500",
   layoutConfig: {
     layout: "basic",
-    tableOfContents: true,
-    tags: true,
+    tableOfContents: false,
+    tags: false,
   },
   themeVars: {
     // --- App layout (match docs content width)
@@ -182,6 +182,28 @@ export const XmlUiBlogThemeDefinition: ThemeDefinition = {
     "fontWeight-Link--active": "normal",
     "textDecorationLine-Link": "none",
     "textColor-Link--active": "$color-primary-500",
+
+    // --- Blog component customization tokens
+    "fontSize-blog-overview-title": "42px",
+    "fontSize-blog-overview-post-title": "24px",
+    "fontSize-blog-overview-featured-title": "24px",
+    "fontSize-blog-page-title": "32px",
+    "minHeight-blog-featured-grid-card": "320px",
+    "marginTop-blog-tabs-content": "$space-6",
+    "border-blog-grid-top": "1px solid $color-surface-200",
+    "border-blog-grid-left": "1px solid $color-surface-200",
+    "border-blog-grid-right": "1px solid $color-surface-200",
+    "border-blog-grid-bottom": "1px solid $color-surface-200",
+
+    // --- Blog text variants
+    "fontSize-Text-blogPostDescription": "24px",
+    "textColor-Text-blogPostDescription": "$color-surface-800",
+    "fontWeight-Text-blogPostDescription": "500",
+    "backgroundColor-Text-tagPill": "$color-surface-100",
+    "textColor-Text-tagPill": "$color-surface-500",
+    "borderRadius-Text-tagPill": "$space-8",
+    "paddingHorizontal-Text-tagPill": "$space-3",
+    "paddingVertical-Text-tagPill": "$space-0_5",
   },
 };
 
