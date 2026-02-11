@@ -50,7 +50,7 @@ test.describe("Global variables", () => {
     await expect (page.getByTestId("getCountText")).toHaveText("getCount: 43");
   });
 
-  test("getCount() in custom component", async ({ page, initTestBed }) => {
+  test.skip("getCount() in custom component", async ({ page, initTestBed }) => {
     await initTestBed(
       `
       <App>

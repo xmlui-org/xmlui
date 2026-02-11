@@ -706,6 +706,15 @@ export const StateContainer = memo(
             // Skip internal metadata keys
             continue;
           }
+          
+          // CRITICAL: If this global was updated at runtime, use the runtime value directly
+          // Don't re-evaluate the original expression (which would give the old value)
+          if (key in componentStateWithApis) {
+            evaluatedNodeGlobals[key] = componentStateWithApis[key];
+            globalsForContext[key] = componentStateWithApis[key];
+            continue;
+          }
+          
           if (typeof value === "string") {
             // CRITICAL: For evaluation, use componentStateWithApis values if they exist
             // This ensures that when a global is updated (e.g., count++), we see the NEW value, not the old one
@@ -755,6 +764,17 @@ export const StateContainer = memo(
       };   
     }, [parentGlobalVars, node.globalVars, appContext, globalDepValueMap, globalDependencies, componentStateWithApis]);
 
+    // Stabilize currentGlobalVars reference to prevent unnecessary re-renders
+    // Only create new reference when values actually change (shallow comparison)
+    const stableCurrentGlobalVars = useShallowCompareMemoize(currentGlobalVars);
+    
+    console.log('[StateContainer]', node.type, node.uid, 'parentGlobalVars:', parentGlobalVars ? Object.keys(parentGlobalVars) : undefined);
+    console.log('[StateContainer]', node.type, node.uid, 'node.globalVars:', node.globalVars ? Object.keys(node.globalVars) : undefined);
+    console.log('[StateContainer]', node.type, node.uid, 'computed stableCurrentGlobalVars:', stableCurrentGlobalVars ? Object.keys(stableCurrentGlobalVars) : undefined);
+    if (node.uid === 'root' || stableCurrentGlobalVars) {
+      console.log('[StateContainer]', node.type, node.uid, 'actual values:', stableCurrentGlobalVars);
+    }
+
     // ========================================================================
     // LAYER 6: FINAL STATE COMBINATION
     // ========================================================================
@@ -762,7 +782,7 @@ export const StateContainer = memo(
     const combinedState = useCombinedState(
       stateFromOutside,
       node.contextVars,
-      currentGlobalVars,  // Add globalVars to combined state
+      stableCurrentGlobalVars,  // Use stable reference
       mergedWithVars,
       routingParams,
     );
@@ -789,6 +809,11 @@ export const StateContainer = memo(
     }, []);
 
     const componentStateRef = useRef(componentStateWithApis);
+    
+    // Keep ref updated with latest componentStateWithApis
+    useEffect(() => {
+      componentStateRef.current = componentStateWithApis;
+    }, [componentStateWithApis]);
 
     // ========================================================================
     // STATE CHANGE CALLBACK
@@ -797,10 +822,27 @@ export const StateContainer = memo(
     const statePartChanged: StatePartChangedFn = useCallback(
       (pathArray, newValue, target, action) => {
         const key = pathArray[0];
-        const isGlobalVar = key in currentGlobalVars;
+        const isLocalVar = key in resolvedLocalVars;
+        const isGlobalVar = key in stableCurrentGlobalVars;
         const isRoot = node.uid === 'root';
         
-        if (isGlobalVar) {
+        console.log('[statePartChanged]', node.uid, 'key:', key, 'isLocal:', isLocalVar, 'isGlobal:', isGlobalVar, 'isRoot:', isRoot, 'newValue:', newValue, 'globalKeys:', Object.keys(stableCurrentGlobalVars));
+        
+        // Check local variables FIRST - they shadow globals
+        if (isLocalVar) {
+          // Local variable - handle locally (even if same name as global)
+          dispatch({
+            type: ContainerActionKind.STATE_PART_CHANGED,
+            payload: {
+              path: pathArray,
+              value: newValue,
+              target,
+              actionType: action,
+              localVars: resolvedLocalVars,
+            },
+          });
+        } else if (isGlobalVar) {
+          // Global variable (not shadowed by local)
           if (isRoot) {
             // Root container should handle global var updates itself
             dispatch({
@@ -817,8 +859,8 @@ export const StateContainer = memo(
             // Non-root containers bubble globals to parent
             parentStatePartChanged(pathArray, newValue, target, action);
           }
-        } else if (key in componentStateRef.current || key in resolvedLocalVars) {
-          // --- Sign that a state field (or a part of it) has changed
+        } else if (key in componentStateRef.current) {
+          // Component state - handle locally
           dispatch({
             type: ContainerActionKind.STATE_PART_CHANGED,
             payload: {
@@ -836,7 +878,7 @@ export const StateContainer = memo(
           }
         }
       },
-      [resolvedLocalVars, currentGlobalVars, node.uses, node.uid, parentStatePartChanged],
+      [resolvedLocalVars, stableCurrentGlobalVars, node.uses, node.uid, parentStatePartChanged],
     );
 
     // ========================================================================
@@ -849,7 +891,7 @@ export const StateContainer = memo(
           resolvedKey={resolvedKey}
           node={node}
           componentState={combinedState}
-          globalVars={currentGlobalVars}
+          globalVars={stableCurrentGlobalVars}
           dispatch={dispatch}
           parentDispatch={parentDispatch}
           setVersion={setVersion}

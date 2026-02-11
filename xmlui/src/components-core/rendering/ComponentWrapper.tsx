@@ -37,6 +37,10 @@ export const ComponentWrapper = memo(
     }: ChildRendererContext & { resolvedKey: string, children?: ReactNode },
     ref,
   ) {
+    if (appContext?.appGlobals?.xsVerbose && node.type !== 'TextNode') {
+      console.log('[ComponentWrapper]', node.type, node.uid, 'received globalVars:', globalVars ? Object.keys(globalVars) : undefined);
+    }
+    
     // --- We pass the layout context to the child components, so we need to
     // --- make sure that it is stable
     const componentRegistry = useComponentRegistry();
@@ -83,6 +87,9 @@ export const ComponentWrapper = memo(
 
     if (isContainerLike(nodeWithTransformedDatasourceProp)) {
       // --- This component should be rendered as a container
+      if (appContext?.appGlobals?.xsVerbose) {
+        console.log('[ComponentWrapper → ContainerWrapper]', node.type, 'passing globalVars:', globalVars ? Object.keys(globalVars) : undefined);
+      }
       return (
         <ContainerWrapper
           resolvedKey={resolvedKey}
@@ -100,12 +107,16 @@ export const ComponentWrapper = memo(
       );
     } else {
       // --- This component should be rendered as a regular component
+      if (appContext?.appGlobals?.xsVerbose) {
+        console.log('[ComponentWrapper → ComponentAdapter]', node.type, 'passing globalVars:', globalVars ? Object.keys(globalVars) : undefined);
+      }
       return (
         <ComponentAdapter
           onUnmount={cleanup}
           memoedVarsRef={memoedVarsRef}
           node={nodeWithTransformedDatasourceProp}
           state={state}
+          globalVars={globalVars}
           dispatch={dispatch}
           appContext={appContext}
           lookupAction={lookupAction}

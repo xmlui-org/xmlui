@@ -180,6 +180,8 @@ export const ContainerWrapper = memo(
     }: Props,
     ref,
   ) {
+    console.log('[ContainerWrapper]', node.type, node.uid, 'received parentGlobalVars:', parentGlobalVars ? Object.keys(parentGlobalVars) : undefined);
+    
     // --- Make sure the component node is wrapped with a container
     const containerizedNode = useMemo(() => getWrappedWithContainer(node), [node]);
 

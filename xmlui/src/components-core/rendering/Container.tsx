@@ -161,6 +161,13 @@ export const Container = memo(
       : containerRegisterComponentApi;
 
     const appContext = useAppContext();
+    const xsVerbose = appContext.appGlobals?.xsVerbose === true;
+    
+    console.log('[Container]', node.type, node.uid, 'received globalVars:', globalVars ? Object.keys(globalVars) : undefined);
+    if (node.uid === 'root' || globalVars) {
+      console.log('[Container]', node.type, node.uid, 'globalVars values:', globalVars);
+    }
+    
     const { getThemeVar } = useTheme();
     const navigate = useNavigate();
     const location = useLocation();
