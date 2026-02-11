@@ -1,4 +1,53 @@
-<Component name="Breadcrumb">
-    <!-- Todo: Add breadcrumb navigation -->
-    <Text />
+<Component name="Breadcrumb" var.crumbs="{[]}">
+  <script>
+    function getCrumbs() {
+    let rawPath = "/";
+    if (globalThis && globalThis.location) {
+      let hash = globalThis.location.hash || "";
+      if (hash && hash.charAt(0) === "#") {
+        rawPath = hash.substring(1);
+      } else if (globalThis.location.pathname) {
+        rawPath = globalThis.location.pathname;
+      }
+    }
+
+    rawPath = rawPath.replace(/^\/+|\/+$/g, "");
+
+    let segments = rawPath ? rawPath.split("/") : [];
+
+    let acc = "";
+
+    let crumbs = segments.map(function (segment) {
+      acc += "/" + segment;
+      return {
+        label: decodeURIComponent(segment).replace(/-/g, " "),
+        href: acc,
+      };
+    });
+    return crumbs;
+    }
+  </script>
+
+  <HStack
+    gap="$space-1"
+    marginBottom="$space-2"
+    fontSize="$fontSize-xs"
+    color="$color-muted-foreground"
+  >
+    <Items items="{getCrumbs()}">
+      <HStack>
+        <Fragment when="{!$isFirst}">
+          <Text>/</Text>
+        </Fragment>
+
+        <Link when="{!$isLast}" to="{$item.href}">
+          {$item.label}
+        </Link>
+
+        <Text when="{$isLast}" variant="strong">
+          {$item.label}
+        </Text>
+      </HStack>
+    </Items>
+  </HStack>
 </Component>

@@ -1,20 +1,24 @@
 <Component name="DocumentPage">
-    <HStack gap="$space-5">
-        <VStack width="*">
-            <Markdown
-                when="{$props.content || $props.url}"
-                content="{$props.content}"
-                data="{$props.url}" />
-            <Slot when="{!$props.content && !$props.url}" />
-            <DocumentLinks />
-        </VStack>
-        <TableOfContents
-            scrollStyle="whenScrolling"
-            showScrollerFade="true"
-            width="$space-64"
-            omitH1
-            when="{mediaSize.sizeIndex > 3 && !$props.hideToc}"
-            maxHeadingLevel="{$props.maxHeadingLevel ? $props.maxHeadingLevel : 3}" />
-        <VStack width="$space-64" when="{mediaSize.sizeIndex > 3 && $props.hideToc}" />
-    </HStack>
+    <VStack>
+        <Breadcrumb />
+        <HStack gap="$space-5">
+            <VStack width="*">
+                <Markdown
+                    when="{$props.content || $props.url}"
+                    content="{$props.content}"
+                    data="{$props.url}" />
+                <Slot when="{!$props.content && !$props.url}" />
+                <DocumentLinks />
+            </VStack>
+            <TableOfContents
+                scrollStyle="whenScrolling"
+                showScrollerFade="true"
+                width="$space-64"
+                smoothScrolling="true"
+                omitH1
+                when="{mediaSize.sizeIndex > 3 && !$props.hideToc}"
+                maxHeadingLevel="{$props.maxHeadingLevel ? $props.maxHeadingLevel : 3}" />
+            <VStack width="$space-64" when="{mediaSize.sizeIndex > 3 && $props.hideToc}" />
+        </HStack>
+    </VStack>
 </Component>
