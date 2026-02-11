@@ -149,6 +149,11 @@ export const XmlUiBlogThemeDefinition: ThemeDefinition = {
   id: "xmlui-blog",
   extends: "xmlui",
   color: "$color-primary-500",
+  layoutConfig: {
+    layout: "basic",
+    tableOfContents: true,
+    tags: true,
+  },
   themeVars: {
     // --- App layout (match docs content width)
     "maxWidth-content-App": "800px",

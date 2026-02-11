@@ -99,6 +99,7 @@ export function AppContent({
   const {
     activeThemeId,
     activeThemeTone,
+    activeTheme,
     setActiveThemeId,
     setActiveThemeTone,
     availableThemeIds,
@@ -375,8 +376,22 @@ export function AppContent({
 
   // --- We extract the global properties from the app configuration and pass them to the app context
   const appGlobals = useMemo(() => {
-    return globalProps ? { ...globalProps } : EMPTY_OBJECT;
-  }, [globalProps]);
+    return {
+      ...(activeTheme?.layoutConfig ?? EMPTY_OBJECT),
+      ...(globalProps ?? EMPTY_OBJECT),
+    };
+  }, [activeTheme, globalProps]);
+
+  const getLayoutConfig = useCallback(
+    <T = unknown>(path: string, fallback?: T): T | undefined => {
+      if (!path) {
+        return (activeTheme?.layoutConfig as T | undefined) ?? fallback;
+      }
+      const value = get(activeTheme?.layoutConfig, path);
+      return (value === undefined ? fallback : value) as T | undefined;
+    },
+    [activeTheme],
+  );
 
   // --- We prepare the helper infrastructure for the `AppState` component, which manages
   // --- app-wide state using buckets (state sections).
@@ -737,6 +752,7 @@ export function AppContent({
       setTheme: setActiveThemeId,
       setThemeTone: setActiveThemeTone,
       toggleThemeTone,
+      getLayoutConfig,
 
       // --- User-related
       loggedInUser,
@@ -778,6 +794,7 @@ export function AppContent({
     setActiveThemeId,
     setActiveThemeTone,
     toggleThemeTone,
+    getLayoutConfig,
     loggedInUser,
     embed,
     apiInterceptorContext,

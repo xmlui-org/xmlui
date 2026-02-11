@@ -28,10 +28,6 @@ type BlogPost = {
 
 type BlogConfig = {
   posts: BlogPost[];
-  layout?: "basic" | "featuredWithTabs";
-  tableOfContents?: boolean;
-  /** When false, hides tags in the basic layout. Default true. */
-  showTags?: boolean;
 };
 
 function formatDate(dateStr: string, format?: string): string {
@@ -67,12 +63,14 @@ type Props = {
 
 export function Blog({ className, style }: Props) {
   const { slug } = useParams<{ slug?: string }>();
-  const { appGlobals, mediaSize } = useAppContext();
+  const { appGlobals, mediaSize, getLayoutConfig } = useAppContext();
 
   const blogConfig = appGlobals?.blog as BlogConfig | undefined;
   const prefetchedContent = (appGlobals?.prefetchedContent as Record<string, string> | undefined) || {};
 
-  const layout = blogConfig?.layout ?? "basic";
+  const layout = getLayoutConfig<"basic" | "featuredWithTabs">("layout", "basic") ?? "basic";
+  const tableOfContentsEnabled = getLayoutConfig<boolean>("tableOfContents", true) !== false;
+  const showTagsEnabled = getLayoutConfig<boolean>("tags", true) !== false;
 
   const sortedPosts = useMemo(
     () =>
@@ -103,8 +101,8 @@ export function Blog({ className, style }: Props) {
         formatDate={formatDate}
         className={className}
         style={style}
-        showToc={blogConfig.tableOfContents !== false && mediaSize.sizeIndex > 3}
-        showTags={blogConfig.showTags !== false}
+        showToc={tableOfContentsEnabled && mediaSize.sizeIndex > 3}
+        showTags={showTagsEnabled}
       />
     );
   }
@@ -114,7 +112,7 @@ export function Blog({ className, style }: Props) {
       <BlogListViewFeatured
         sortedPosts={sortedPosts}
         allTags={allTags}
-        showTags={blogConfig.showTags !== false}
+        showTags={showTagsEnabled}
         prefetchedContent={prefetchedContent}
         blogBasePath={blogBasePath}
         formatDate={formatDate}
@@ -132,7 +130,7 @@ export function Blog({ className, style }: Props) {
       blogBasePath={blogBasePath}
       formatDate={formatDate}
       getBlurb={getBlurb}
-      showTags={blogConfig.showTags !== false}
+      showTags={showTagsEnabled}
       className={className}
       style={style}
     />
