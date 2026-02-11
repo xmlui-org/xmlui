@@ -172,6 +172,7 @@ test.describe("Accessibility", () => {
       </Bookmark>
     `);
 
+    await expect(page.getByRole("button", { name: "Focusable Content" })).toBeVisible();
     await page.keyboard.press("Tab");
     const button = page.getByRole("button", { name: "Focusable Content" });
     await expect(button).toBeFocused();

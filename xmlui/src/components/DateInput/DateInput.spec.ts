@@ -824,6 +824,9 @@ test.describe("User Interactions", () => {
     await initTestBed(`<DateInput testId="dateInput" dateFormat="MM/dd/yyyy" />`);
     const driver = await createDateInputDriver("dateInput");
 
+    await expect(driver.monthInput).toBeVisible();
+    await expect(driver.dayInput).toBeVisible();
+    await expect(driver.yearInput).toBeVisible(); // Wait for all inputs to be rendered
     await driver.monthInput.focus();
     await expect(driver.monthInput).toBeFocused();
 
@@ -842,6 +845,9 @@ test.describe("User Interactions", () => {
     await initTestBed(`<DateInput testId="dateInput" dateFormat="MM/dd/yyyy" />`);
     const driver = await createDateInputDriver("dateInput");
 
+    await expect(driver.monthInput).toBeVisible();
+    await expect(driver.dayInput).toBeVisible();
+    await expect(driver.yearInput).toBeVisible(); // Wait for all inputs to be rendered
     await driver.monthInput.focus();
     await expect(driver.monthInput).toBeFocused();
 
@@ -907,6 +913,7 @@ test.describe("Event Handling", () => {
     );
     const driver = await createDateInputDriver("dateInput");
 
+    await expect(driver.dayInput).toBeVisible(); // Wait for input to be rendered
     await driver.dayInput.focus();
     await page.keyboard.press("Tab");
     await page.keyboard.press("Tab");
@@ -960,6 +967,7 @@ test.describe("Event Handling", () => {
     await driver.yearInput.fill("2024");
 
     // Tab to trigger validation
+    await expect(driver.yearInput).toBeFocused(); // Wait for year input focus after filling
     await page.keyboard.press("Tab");
 
     // Month should be normalized (13 % 10 = 3)
@@ -1204,6 +1212,9 @@ test.describe("Accessibility", () => {
     await initTestBed(`<DateInput testId="dateInput" />`);
     const driver = await createDateInputDriver("dateInput");
 
+    await expect(driver.monthInput).toBeVisible();
+    await expect(driver.dayInput).toBeVisible();
+    await expect(driver.yearInput).toBeVisible(); // Wait for all inputs to be rendered
     await driver.monthInput.focus();
     await expect(driver.monthInput).toBeFocused();
 

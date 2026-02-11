@@ -200,6 +200,7 @@ test.describe("Accessibility", () => {
     await input1.focus();
     await expect(input1).toBeFocused();
 
+    await expect(input1).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(input2).toBeFocused();
   });

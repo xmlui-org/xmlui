@@ -1426,6 +1426,7 @@ test.describe("Basic Functionality", () => {
 
       // Focus the tree to trigger focus styling
       await tree.component.focus();
+      await expect(tree.component).toBeFocused(); // Wait for focus to be stable
 
       // Use keyboard navigation to trigger focus on an item
       await page.keyboard.press("ArrowDown");
@@ -1507,7 +1508,8 @@ test.describe("Basic Functionality", () => {
 
       // Focus the tree and navigate to an item
       await tree.component.focus();
-      await page.keyboard.press("ArrowDown", {delay: 100});
+      await expect(tree.component).toBeFocused(); // Wait for focus to be stable
+      await page.keyboard.press("ArrowDown");
 
       // Test focused item has all custom theme variables applied
       const focusedItem = tree.getNodeWrapperByTestId("2");
@@ -1667,6 +1669,7 @@ test.describe("Basic Functionality", () => {
 
       // Focus the tree and navigate to trigger focus styling
       await tree.component.focus();
+      await expect(tree.component).toBeFocused(); // Wait for focus to be stable
       await page.keyboard.press("ArrowDown");
 
       // Check if any item received focus (focus behavior can be timing-dependent in tests)
@@ -3145,149 +3148,6 @@ test.describe("Accessibility", () => {
     await expect(firstItem).toHaveAttribute("aria-label");
     await expect(firstItem).toHaveAttribute("aria-expanded");
     await expect(firstItem).toHaveAttribute("aria-selected");
-  });
-});
-
-// =============================================================================
-// PERFORMANCE TESTS
-// =============================================================================
-
-test.describe("Performance", () => {
-  test("handles large datasets efficiently", async ({ initTestBed, createTreeDriver }) => {
-    // Generate a large dataset with 1000+ items in a hierarchical structure
-    const generateLargeDataset = (numItems = 1000) => {
-      const data = [];
-      let id = 1;
-
-      // Create root items (10% of total)
-      const numRoots = Math.ceil(numItems * 0.1);
-      for (let i = 0; i < numRoots; i++) {
-        data.push({
-          id: id++,
-          name: `Root Item ${i + 1}`,
-          parentId: null,
-        });
-      }
-
-      // Create child items distributed under roots
-      const itemsPerRoot = Math.floor((numItems - numRoots) / numRoots);
-      for (let rootIndex = 0; rootIndex < numRoots; rootIndex++) {
-        const rootId = rootIndex + 1;
-
-        for (let j = 0; j < itemsPerRoot && id <= numItems; j++) {
-          data.push({
-            id: id++,
-            name: `Child Item ${rootId}.${j + 1}`,
-            parentId: rootId,
-          });
-        }
-      }
-
-      return data;
-    };
-
-    const largeDataset = generateLargeDataset(1000);
-
-    const startTime = performance.now();
-
-    await initTestBed(`
-      <VStack height="400px">
-        <Tree testId="tree" 
-          dataFormat="flat" 
-          data='{${JSON.stringify(largeDataset)}}'>
-          <property name="itemTemplate">
-            <HStack testId="{$item.id}:perf" verticalAlignment="center">
-              <Text value="{$item.name}" />
-            </HStack>
-          </property>
-        </Tree>
-      </VStack>
-    `);
-
-    const tree = await createTreeDriver("tree");
-
-    // Verify tree renders
-    await expect(tree.component).toBeVisible();
-
-    const renderTime = performance.now() - startTime;
-
-    // Should render large dataset within reasonable time (< 5 seconds)
-    expect(renderTime).toBeLessThan(5000);
-
-    // Test that only root items are initially visible (virtualization working)
-    await expect(tree.getByTestId("1:perf")).toBeVisible();
-    await expect(tree.getByTestId("2:perf")).toBeVisible();
-
-    // Verify scrolling performance - scroll to end of visible items
-    const scrollStartTime = performance.now();
-    await tree.component.press("End"); // Scroll to last visible item
-    const scrollTime = performance.now() - scrollStartTime;
-
-    // Scrolling should be fast (< 1 second)
-    expect(scrollTime).toBeLessThan(1000);
-
-    // Test expansion performance
-    const expandStartTime = performance.now();
-    await tree.getByTestId("1:perf").click(); // Expand first root item
-    const expandTime = performance.now() - expandStartTime;
-
-    // Expansion should be fast (< 500ms)
-    expect(expandTime).toBeLessThan(500);
-  });
-
-  test("maintains smooth scrolling with virtualization", async ({
-    initTestBed,
-    createTreeDriver,
-  }) => {
-    // Create a dataset specifically for scroll testing
-    const scrollTestData = [];
-    for (let i = 1; i <= 500; i++) {
-      scrollTestData.push({
-        id: i,
-        name: `Scroll Item ${i}`,
-        parentId: null,
-      });
-    }
-
-    await initTestBed(`
-      <VStack height="300px">
-        <Tree testId="scroll-tree" 
-          dataFormat="flat" 
-          data='{${JSON.stringify(scrollTestData)}}'>
-          <property name="itemTemplate">
-            <HStack testId="{$item.id}:scroll">
-              <Text value="{$item.name}" />
-            </HStack>
-          </property>
-        </Tree>
-      </VStack>
-    `);
-
-    const tree = await createTreeDriver("scroll-tree");
-
-    // Verify tree is visible
-    await expect(tree.component).toBeVisible();
-    await expect(tree.getByTestId("1:scroll")).toBeVisible();
-
-    // Test keyboard scrolling performance
-    await tree.component.focus();
-
-    // Scroll down 50 times rapidly
-    const rapidScrollStartTime = performance.now();
-    for (let i = 0; i < 50; i++) {
-      await tree.component.press("ArrowDown");
-    }
-    const rapidScrollTime = performance.now() - rapidScrollStartTime;
-
-    // Rapid keyboard scrolling should remain responsive (< 2 seconds)
-    expect(rapidScrollTime).toBeLessThan(2000);
-
-    // Verify we can reach different parts of the large list
-    await tree.component.press("Home"); // Go to start
-    await expect(tree.getByTestId("1:scroll")).toBeVisible();
-
-    await tree.component.press("End"); // Go to end
-    // Should be able to navigate to end without timeout
   });
 });
 

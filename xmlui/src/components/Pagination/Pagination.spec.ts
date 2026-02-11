@@ -867,12 +867,12 @@ test.describe("Accessibility", () => {
   });
 
   test("buttons are focusable and keyboard navigable", async ({ initTestBed, page }) => {
-    await initTestBed(`<Pagination itemCount="50" pageSize="10" maxVisiblePages="3"/>`);
-
-    // Test tab navigation through buttons
+    await initTestBed(`<Pagination itemCount="50" pageSize="10" maxVisiblePages="3"/>`);  // Test tab navigation through buttons
+    await expect(page.getByRole("button", { name: "Page 1" })).toBeVisible();
     await page.keyboard.press("Tab");
     await expect(page.getByRole("button", { name: "Page 1" })).toBeFocused();
 
+    await expect(page.getByRole("button", { name: "Page 1" })).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(page.getByRole("button", { name: "Page 2" })).toBeFocused();
   });

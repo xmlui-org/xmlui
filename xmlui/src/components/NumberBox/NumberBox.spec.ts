@@ -231,6 +231,7 @@ test.describe("Basic Functionality", () => {
     await initTestBed(`<NumberBox initialValue="5" />`);
     const input = page.getByRole("textbox");
     await input.focus();
+    await expect(input).toBeFocused();
     await page.keyboard.press("ArrowDown");
     await expect(input).toHaveValue("4");
   });
@@ -325,6 +326,7 @@ test.describe("Accessibility", () => {
 
   test("component supports keyboard navigation", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox label="Amount" />`);
+    await expect(page.getByRole("textbox")).toBeVisible();
     await page.keyboard.press("Tab");
     await expect(page.getByRole("textbox")).toBeFocused();
   });

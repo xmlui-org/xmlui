@@ -181,21 +181,25 @@ test("is keyboard accessible", async ({ initTestBed, createDropdownMenuDriver, p
   `);
 
   const btn = page.getByRole("button");
+  await expect(btn).toBeVisible();
   await page.keyboard.press("Tab");
   await expect(btn).toBeFocused();
 
   // Open with Enter
+  await expect(btn).toBeFocused();
   await page.keyboard.press("Enter");
   const menuItem = page.getByRole("menuitem", { name: "Item 1" });
   await expect(menuItem).toBeVisible();
 
   // Navigate and select with keyboard
+  await expect(menuItem).toBeVisible();
   await page.keyboard.press("ArrowDown");
 
   // Verify the menu item is now focused
   await expect(menuItem).toBeFocused();
 
   // Press Enter to select
+  await expect(menuItem).toBeFocused();
   await page.keyboard.press("Enter");
   await expect.poll(testStateDriver.testState).toEqual("keyboard-activated");
 });
@@ -221,30 +225,37 @@ test("navigates between multiple menu items with arrow keys", async ({
   const item3 = page.getByRole("menuitem", { name: "Item 3" });
 
   // Press ArrowDown to focus first item
+  await expect(item1).toBeVisible();
   await page.keyboard.press("ArrowDown");
   await expect(item1).toBeFocused();
 
   // Press ArrowDown to focus second item
+  await expect(item1).toBeFocused();
   await page.keyboard.press("ArrowDown");
   await expect(item2).toBeFocused();
 
   // Press ArrowDown to focus third item
+  await expect(item2).toBeFocused();
   await page.keyboard.press("ArrowDown");
   await expect(item3).toBeFocused();
 
   // Press ArrowDown again - should wrap to first item
+  await expect(item3).toBeFocused();
   await page.keyboard.press("ArrowDown");
   await expect(item1).toBeFocused();
 
   // Press ArrowUp to go back to third item
+  await expect(item1).toBeFocused();
   await page.keyboard.press("ArrowUp");
   await expect(item3).toBeFocused();
 
   // Press ArrowUp to go to second item
+  await expect(item3).toBeFocused();
   await page.keyboard.press("ArrowUp");
   await expect(item2).toBeFocused();
 
   // Press Enter to select second item
+  await expect(item2).toBeFocused();
   await page.keyboard.press("Enter");
   await expect.poll(testStateDriver.testState).toEqual("item2-clicked");
 });

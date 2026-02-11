@@ -2178,6 +2178,7 @@ test.describe("Accessibility", () => {
 
     const submitButton = page.getByRole("button", { name: "Save" });
     await submitButton.focus();
+    await expect(submitButton).toBeFocused();
     await page.keyboard.press("Enter");
 
     await expect.poll(testStateDriver.testState).toEqual("submitted via keyboard");
@@ -2192,6 +2193,7 @@ test.describe("Accessibility", () => {
 
     const cancelButton = page.getByRole("button", { name: "Cancel" });
     await cancelButton.focus();
+    await expect(cancelButton).toBeFocused();
     await page.keyboard.press("Enter");
 
     await expect.poll(testStateDriver.testState).toEqual("cancelled via keyboard");

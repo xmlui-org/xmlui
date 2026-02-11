@@ -17,6 +17,7 @@ test("component renders with basic content", async ({ page, initTestBed }) => {
 
 test("children are focusable", async ({ page, initTestBed }) => {
   await initTestBed(`<Breakout><Button label="focusable button" /></Breakout>`);
+  await expect(page.getByRole("button")).toBeVisible();
   await page.keyboard.press("Tab");
   await expect(page.getByRole("button")).toBeFocused();
 });

@@ -124,10 +124,12 @@ test("component is keyboard navigable: open/close calendar menu", async ({ page,
   await expect(page.getByTestId("datePicker")).toBeFocused();
 
   // Press Enter to open calendar
+  await expect(page.getByTestId("datePicker")).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(page.getByRole("menu")).toBeVisible();
 
   // Press Escape to close
+  await expect(page.getByRole("menu")).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("menu")).not.toBeVisible();
 });
@@ -147,17 +149,25 @@ test("component is keyboard navigable: navigate controls inside calendar menu", 
     page.getByRole("menu").getByRole("button", { name: "Go to the Previous Month" }),
   ).toBeFocused();
   // Tab to the calendar grid
+  await expect(
+    page.getByRole("menu").getByRole("button", { name: "Go to the Previous Month" }),
+  ).toBeFocused();
   await page.keyboard.press("Tab");
   await expect(
     page.getByRole("menu").getByRole("button", { name: "Go to the Next Month" }),
   ).toBeFocused();
 
+  await expect(
+    page.getByRole("menu").getByRole("button", { name: "Go to the Next Month" }),
+  ).toBeFocused();
   await page.keyboard.press("Tab");
   await expect(page.getByRole("menu").getByLabel("Choose the Month")).toBeFocused();
 
+  await expect(page.getByRole("menu").getByLabel("Choose the Month")).toBeFocused();
   await page.keyboard.press("Tab");
   await expect(page.getByRole("menu").getByLabel("Choose the Year")).toBeFocused();
 
+  await expect(page.getByRole("menu").getByLabel("Choose the Year")).toBeFocused();
   await page.keyboard.press("Tab");
   await expect(page.getByRole("grid", { name: "May" }).getByLabel("25")).toBeFocused();
 });
@@ -176,6 +186,7 @@ test("component is keyboard navigable: navigate days inside calendar menu", asyn
   // The back navigation button is focused first
 
   // Tab to next nav button
+  await expect(page.getByRole("menu")).toBeVisible();
   await page.keyboard.press("Tab");
   // Tab to month select
   await page.keyboard.press("Tab");
@@ -184,11 +195,15 @@ test("component is keyboard navigable: navigate days inside calendar menu", asyn
   // Tab to the calendar grid
   await page.keyboard.press("Tab");
 
+  await expect(page.getByRole("grid", { name: "May" }).getByLabel("15")).toBeVisible();
   await page.keyboard.press("ArrowLeft");
+  await expect(page.getByRole("grid", { name: "May" }).getByLabel("May 14th")).toBeFocused();
   await expect(page.getByRole("grid", { name: "May" }).getByLabel("May 14th")).toBeFocused();
   await page.keyboard.press("ArrowUp");
   await expect(page.getByRole("grid", { name: "May" }).getByLabel("May 7th")).toBeFocused();
+  await expect(page.getByRole("grid", { name: "May" }).getByLabel("May 7th")).toBeFocused();
   await page.keyboard.press("ArrowRight");
+  await expect(page.getByRole("grid", { name: "May" }).getByLabel("May 8th")).toBeFocused();
   await expect(page.getByRole("grid", { name: "May" }).getByLabel("May 8th")).toBeFocused();
   await page.keyboard.press("ArrowDown");
   await expect(page.getByRole("grid", { name: "May" }).getByLabel("May 15th")).toBeFocused();
@@ -205,6 +220,7 @@ test("component is keyboard navigable: enter new date", async ({ page, initTestB
   // The back navigation button is focused first
 
   // Tab to next nav button
+  await expect(page.getByRole("menu")).toBeVisible();
   await page.keyboard.press("Tab");
   // Tab to month select
   await page.keyboard.press("Tab");
@@ -213,7 +229,9 @@ test("component is keyboard navigable: enter new date", async ({ page, initTestB
   // Tab to the calendar grid
   await page.keyboard.press("Tab");
 
+  await expect(page.getByRole("grid", { name: "May" }).getByLabel("15")).toBeVisible();
   await page.keyboard.press("ArrowLeft");
+  await expect(page.getByRole("grid", { name: "May" }).getByLabel("May 14th")).toBeFocused();
   await expect(page.getByRole("grid", { name: "May" }).getByLabel("May 14th")).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(page.getByTestId("datePicker")).toHaveText("05/14/2024");

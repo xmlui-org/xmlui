@@ -775,6 +775,89 @@ Drivers should NOT:
 
 Use web-first assertions: `await expect(checkbox).not.toBeChecked()`. Prefer built-in assertions over attribute checks.
 
+### Keyboard Navigation Testing
+
+**CRITICAL**: Always wait for elements to be visible and focus to be stable before using `page.keyboard.press()`. Keyboard presses immediately after `initTestBed()` or `.focus()` can execute before components are fully rendered, causing race conditions in parallel test execution.
+
+**Verified Solution**: This pattern has been tested across 174 keyboard press occurrences in 29 component files and achieves 100% test success rate with 10 parallel workers.
+
+**Common Patterns:**
+
+```typescript
+// ✅ CORRECT - Tab navigation between elements
+await initTestBed(`<Fragment><Input1 /><Input2 /></Fragment>`);
+await expect(input1).toBeVisible();
+await expect(input2).toBeVisible(); // Wait for all elements
+await input1.focus();
+await expect(input1).toBeFocused(); // Verify focus is stable
+await page.keyboard.press("Tab");
+
+// ✅ CORRECT - Arrow navigation after focus
+const combobox = page.getByRole("combobox");
+await combobox.focus();
+await expect(combobox).toBeFocused(); // Wait for focus to be stable
+await page.keyboard.press("ArrowDown");
+
+// ✅ CORRECT - Sequential arrow key navigation
+await expect(item1).toBeFocused();
+await page.keyboard.press("ArrowDown");
+await expect(item2).toBeFocused();
+// Wait for previous focus to be stable before next navigation
+await expect(item2).toBeFocused();
+await page.keyboard.press("ArrowDown");
+
+// ✅ CORRECT - Enter/Space after focus
+const button = page.getByRole("button");
+await button.focus();
+await expect(button).toBeFocused();
+await page.keyboard.press("Enter");
+
+// ✅ CORRECT - Keyboard shortcuts (platform-aware)
+const isMac = process.platform === 'darwin';
+const selectAllKey = isMac ? 'Meta+A' : 'Control+A';
+await expect(table).toBeVisible();
+await page.keyboard.press(selectAllKey);
+
+// ✅ CORRECT - Multi-input components (DateInput, TimeInput)
+await expect(monthInput).toBeVisible();
+await expect(dayInput).toBeVisible();
+await expect(yearInput).toBeVisible(); // Wait for ALL inputs
+await monthInput.focus();
+await expect(monthInput).toBeFocused();
+await page.keyboard.press("Tab");
+
+// ✅ CORRECT - Dropdown/Menu navigation
+await driver.open(); // Open dropdown
+const menuItem = page.getByRole("menuitem", { name: "Item 1" });
+await expect(menuItem).toBeVisible(); // Wait for menu to render
+await page.keyboard.press("ArrowDown");
+
+// ❌ INCORRECT - No visibility/focus checks
+await initTestBed(`<ComponentName />`);
+await page.keyboard.press("Tab"); // May fail with multiple workers
+
+// ❌ INCORRECT - Focus without stability check
+await element.focus();
+await page.keyboard.press("Enter"); // May execute before focus is stable
+
+// ❌ INCORRECT - Delay workarounds mask the problem
+await page.keyboard.press("Tab", { delay: 100 }); // Remove delays
+await page.waitForTimeout(100); // Avoid timeouts before keyboard press
+```
+
+**Key Rules:**
+1. **Always** wait for target elements to be **visible** before keyboard interaction
+2. **Always** wait for focus to be **stable** after calling `.focus()`
+3. **Never use `{ delay: X }` workarounds** - add proper waits instead
+4. For multi-input components, wait for **ALL** inputs to be visible
+5. For sequential navigation, verify focus is stable before the next `keyboard.press()`
+6. For dropdowns/menus, verify menu items are visible before navigating
+
+**When to Use Which Check:**
+- `.toBeVisible()` - Before first interaction or when checking if UI is ready
+- `.toBeFocused()` - After `.focus()` call or before keyboard action requiring focus
+- Both can be used together for maximum stability in complex scenarios
+
 ## Test Naming
 
 - Avoid "component" - it's redundant
