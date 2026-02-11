@@ -68,7 +68,7 @@ A component may declare a *variable* that's visible to itself and its children. 
 
 You can declare a variable using the `var` prefix.
 
-```xmlui-pg copy name="Declaring a variable with var" display
+```xmlui-pg copy name="Declaring a variable with var" display /var/ /stations/
 <App var.stations="{ [ 'Bakerloo', 'Central', 'Circle'] }">
   <Items data="{stations}">
     <Text> {$item} </Text>
@@ -78,7 +78,7 @@ You can declare a variable using the `var` prefix.
 
 Or using the `<variable>` helper tag.
 
-```xmlui-pg copy name="Declaring a variable with <variable>" display
+```xmlui-pg copy name="Declaring a variable with <variable>" display /<variable/ /stations/
 <App>
   <variable
     name="stations"
@@ -177,15 +177,51 @@ A component may declare a *global variable* that's visible everywhere in the app
 You can declare a variable using the `global` prefix.
 
 ```xmlui-pg name="Declaring a global variable with global"
----app copy display
+---app copy display /global/ /stations/
 <App global.stations="{ [ 'Bakerloo', 'Central', 'Circle'] }">
   <H2>Station List</H2>
   <Stations />
 </App>
----comp display copy
+---comp display copy /stations/
 <Component name="Stations">
   <Items data="{stations}">
     <Text> {$item} </Text>
   </Items>
 </Component>
 ```
+
+Alternatively, you can use the `<global>` helper tag.
+
+```xmlui-pg name="Declaring a global variable with <global>"
+---app copy display /<global/ /stations/
+<App>
+  <global name="stations" value="{ [ 'Bakerloo', 'Central', 'Circle'] }" />
+  <H2>Station List</H2>
+  <Stations />
+</App>
+---comp display copy /stations/
+<Component name="Stations">
+  <Items data="{stations}">
+    <Text> {$item} </Text>
+  </Items>
+</Component>
+```
+
+You can declare global variables in a component:
+
+```xmlui-pg name="Declaring a global variable in a component"
+---app copy display /<global/ /stations/
+<App>
+  <H2>Station List ({stations.length})</H2>
+  <Stations />
+</App>
+---comp display copy /stations/
+<Component name="Stations">
+  <global name="stations" value="{ [ 'Bakerloo', 'Central', 'Circle'] }" />
+  <Items data="{stations}">
+    <Text> {$item} </Text>
+  </Items>
+</Component>
+```
+
+> [!INFO] You can declare global variables only in the root element of the `Main.xmlui` file or in the root elements of component files. If you declare them elsewhere, XMLUI displays an error.
