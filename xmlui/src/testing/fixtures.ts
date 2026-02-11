@@ -233,7 +233,12 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       const { errors, component } = xmlUiMarkupToComponent(markup);
 
       if (errors.length > 0) {
-        throw { errors };
+        const errText = errors
+          .map((e) => {
+            return `code: "${e.code}" msg: "${e.message}"`;
+          })
+          .join("\n");
+        throw new Error(`(${errors.length}) Errors while parsing Main.xmlui:\n${errText}`);
       }
       const entryPoint = component as ComponentDef;
 
