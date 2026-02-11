@@ -2,7 +2,7 @@
 
 ## Variables
 
-A variable declared in a Main.xmlui component is visible to built-in child components (e.g. `Text`) at any level.
+A variable declared in the `Main.xmlui` file is visible to built-in child components (e.g. `Text`) at any level.
 
 ```xmlui-pg
 ---app display filename="Main.xmlui" /grandparent/ /parent/ /child/
@@ -142,6 +142,31 @@ A variable declared in a user-defined component can be passed into another user-
 </Component>
 ```
 
+## Global variables
+
+A [global variable](../markup#global-variables) declared in the root element of `Main.xmlui`, a user-defined component's root element, or in the `Main.xmlui.xs` file is visible in all files at any level.
+
+Local variables can shadow global variables:
+
+```xmlui-pg name="Global and local variables"
+---app copy display /<global/ /stations/
+<App global.count="{42}">
+  <Text>Current global count: {count}</Text>
+  <Button onClick="count++">
+    Increment global count (from Main): {count}
+  </Button>
+  <IncButton />
+  <Button var.count="{0}" onClick="count++">
+    Increment local count: {count}
+  </Button>
+</App>
+---comp display copy
+<Component name="IncButton">
+  <Button onClick="count++">
+    Increment global count (from component): {count}
+  </Button>
+</Component>
+```
 
 
 
