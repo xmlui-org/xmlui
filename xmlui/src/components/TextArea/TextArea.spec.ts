@@ -409,6 +409,7 @@ test.describe("Accessibility", () => {
     await firstTextarea.focus();
     await expect(firstTextarea).toBeFocused();
 
+    await expect(firstTextarea).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(secondTextarea).toBeFocused();
   });

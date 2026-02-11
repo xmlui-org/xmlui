@@ -2513,6 +2513,7 @@ test.describe("Keyboard Shortcuts", () => {
       // Focus the text input instead of table
       const input = page.getByTestId("input").getByRole("textbox");
       await input.focus();
+      await expect(input).toBeFocused();
       await page.keyboard.press("Control+A");
 
       // Should not trigger table's selectAll
@@ -2572,6 +2573,7 @@ test.describe("Keyboard Shortcuts", () => {
         </Table>
       `);
 
+      await expect(page.getByTestId("table")).toBeVisible();
       await page.keyboard.press("Delete");
 
       await expect.poll(testStateDriver.testState).toEqual({
@@ -2600,6 +2602,7 @@ test.describe("Keyboard Shortcuts", () => {
       const firstRow = page.locator("tbody tr").first();
       await firstRow.click();
 
+      await expect(firstRow).toBeVisible();
       await page.keyboard.press("Delete");
 
       const result = await testStateDriver.testState();

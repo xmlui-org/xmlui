@@ -455,6 +455,7 @@ test.describe("Accessibility", () => {
 
     const nav = page.getByRole("navigation");
     await nav.focus();
+    await expect(nav).toBeVisible();
 
     // Tab to first link
     await page.keyboard.press("Tab");
@@ -462,12 +463,14 @@ test.describe("Accessibility", () => {
     await expect(firstLink).toBeFocused();
 
     // Tab to second link
+    await expect(firstLink).toBeFocused();
     await page.keyboard.press("Tab");
     const secondLink = page.getByRole("link", { name: "Second Section" });
     await expect(secondLink).toBeFocused();
 
     // Enter should activate the link
     const secondHeading = page.getByRole("heading", { name: "Second Section" });
+    await expect(secondLink).toBeFocused();
     await page.keyboard.press("Enter");
     await expect(secondHeading).toBeInViewport();
   });

@@ -889,16 +889,20 @@ test.describe("accessibility", () => {
 
     // Focus first tab
     await page.getByRole("tab", { name: "Tab 1" }).focus();
+    await expect(page.getByRole("tab", { name: "Tab 1" })).toBeFocused();
 
     // Arrow right to second tab
+    await expect(page.getByRole("tab", { name: "Tab 1" })).toBeFocused();
     await page.keyboard.press("ArrowRight");
     await expect(page.getByRole("tab", { name: "Tab 2" })).toBeFocused();
 
     // Arrow right to third tab
+    await expect(page.getByRole("tab", { name: "Tab 2" })).toBeFocused();
     await page.keyboard.press("ArrowRight");
     await expect(page.getByRole("tab", { name: "Tab 3" })).toBeFocused();
 
     // Arrow left back to second tab
+    await expect(page.getByRole("tab", { name: "Tab 3" })).toBeFocused();
     await page.keyboard.press("ArrowLeft");
     await expect(page.getByRole("tab", { name: "Tab 2" })).toBeFocused();
   });
@@ -1157,6 +1161,7 @@ test.describe("accessibility", () => {
       await expect(page.getByRole("tab", { name: "Account" })).toBeFocused();
 
       // Press ArrowRight - should move to Stream tab
+      await expect(page.getByRole("tab", { name: "Account" })).toBeFocused();
       await page.keyboard.press("ArrowRight");
       await expect(page.getByText("Account Content")).not.toBeVisible();
       await expect(page.getByText("Stream Content")).toBeVisible();
@@ -1165,6 +1170,7 @@ test.describe("accessibility", () => {
       await expect(page.getByRole("tab", { name: "Stream" })).toBeFocused();
 
       // Press ArrowRight again - should move to Support tab
+      await expect(page.getByRole("tab", { name: "Stream" })).toBeFocused();
       await page.keyboard.press("ArrowRight");
       await expect(page.getByText("Account Content")).not.toBeVisible();
       await expect(page.getByText("Stream Content")).not.toBeVisible();
@@ -1173,6 +1179,7 @@ test.describe("accessibility", () => {
       await expect(page.getByRole("tab", { name: "Support" })).toBeFocused();
 
       // Press ArrowRight from last tab - should cycle back to Account tab
+      await expect(page.getByRole("tab", { name: "Support" })).toBeFocused();
       await page.keyboard.press("ArrowRight");
       await expect(page.getByText("Account Content")).toBeVisible();
       await expect(page.getByText("Stream Content")).not.toBeVisible();
@@ -1207,6 +1214,7 @@ test.describe("accessibility", () => {
       await expect(page.getByRole("tab", { name: "Account" })).toBeFocused();
 
       // Press ArrowLeft from first tab - should cycle to Support tab (last tab)
+      await expect(page.getByRole("tab", { name: "Account" })).toBeFocused();
       await page.keyboard.press("ArrowLeft");
       await expect(page.getByText("Account Content")).not.toBeVisible();
       await expect(page.getByText("Stream Content")).not.toBeVisible();
@@ -1215,6 +1223,7 @@ test.describe("accessibility", () => {
       await expect(page.getByRole("tab", { name: "Support" })).toBeFocused();
 
       // Press ArrowLeft again - should move to Stream tab
+      await expect(page.getByRole("tab", { name: "Support" })).toBeFocused();
       await page.keyboard.press("ArrowLeft");
       await expect(page.getByText("Account Content")).not.toBeVisible();
       await expect(page.getByText("Stream Content")).toBeVisible();
@@ -1223,6 +1232,7 @@ test.describe("accessibility", () => {
       await expect(page.getByRole("tab", { name: "Stream" })).toBeFocused();
 
       // Press ArrowLeft again - should move to Account tab
+      await expect(page.getByRole("tab", { name: "Stream" })).toBeFocused();
       await page.keyboard.press("ArrowLeft");
       await expect(page.getByText("Account Content")).toBeVisible();
       await expect(page.getByText("Stream Content")).not.toBeVisible();
@@ -1250,30 +1260,36 @@ test.describe("accessibility", () => {
       await expect(page.getByText("Account Content")).toBeVisible();
       await expect(page.getByRole("tab", { name: "Account" })).toHaveAttribute("aria-selected", "true");
       await page.getByRole("tab", { name: "Account" }).focus();
+      await expect(page.getByRole("tab", { name: "Account" })).toBeFocused();
 
       // Go forward twice: Account -> Stream -> Support
+      await expect(page.getByRole("tab", { name: "Account" })).toBeFocused();
       await page.keyboard.press("ArrowRight");
       await expect(page.getByText("Stream Content")).toBeVisible();
       await expect(page.getByRole("tab", { name: "Stream" })).toHaveAttribute("aria-selected", "true");
       await expect(page.getByRole("tab", { name: "Stream" })).toBeFocused();
 
+      await expect(page.getByRole("tab", { name: "Stream" })).toBeFocused();
       await page.keyboard.press("ArrowRight");
       await expect(page.getByText("Support Content")).toBeVisible();
       await expect(page.getByRole("tab", { name: "Support" })).toHaveAttribute("aria-selected", "true");
       await expect(page.getByRole("tab", { name: "Support" })).toBeFocused();
 
       // Go back once: Support -> Stream
+      await expect(page.getByRole("tab", { name: "Support" })).toBeFocused();
       await page.keyboard.press("ArrowLeft");
       await expect(page.getByText("Stream Content")).toBeVisible();
       await expect(page.getByRole("tab", { name: "Stream" })).toHaveAttribute("aria-selected", "true");
       await expect(page.getByRole("tab", { name: "Stream" })).toBeFocused();
 
       // Go forward to cycle: Stream -> Support -> Account
+      await expect(page.getByRole("tab", { name: "Stream" })).toBeFocused();
       await page.keyboard.press("ArrowRight");
       await expect(page.getByText("Support Content")).toBeVisible();
       await expect(page.getByRole("tab", { name: "Support" })).toHaveAttribute("aria-selected", "true");
       await expect(page.getByRole("tab", { name: "Support" })).toBeFocused();
 
+      await expect(page.getByRole("tab", { name: "Support" })).toBeFocused();
       await page.keyboard.press("ArrowRight");
       await expect(page.getByText("Account Content")).toBeVisible();
       await expect(page.getByRole("tab", { name: "Account" })).toHaveAttribute("aria-selected", "true");

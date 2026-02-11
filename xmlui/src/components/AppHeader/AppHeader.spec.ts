@@ -74,6 +74,7 @@ test.describe("Accessibility", () => {
     await expect(page.getByTestId("headerLink1")).toBeFocused();
 
     // Test tab navigation works between links
+    await expect(page.getByTestId("headerLink1")).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(page.getByTestId("headerLink2")).toBeFocused();
   });

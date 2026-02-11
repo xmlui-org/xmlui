@@ -1,4 +1,4 @@
-import { getBounds, isIndeterminate, SKIP_REASON } from "../../testing/component-test-helpers";
+import { getBounds, isIndeterminate } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
 // =============================================================================
@@ -467,8 +467,10 @@ test.describe("Accessibility", () => {
 
   test("component supports keyboard navigation", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox />`);
-    await page.keyboard.press("Tab", { delay: 100 });
-    await expect(page.getByRole("checkbox")).toBeFocused();
+    const checkbox = page.getByRole("checkbox");
+    await expect(checkbox).toBeVisible(); // Wait for component to be fully rendered
+    await page.keyboard.press("Tab");
+    await expect(checkbox).toBeFocused();
   });
 
   test("aria-checked=false applies correctly", async ({ initTestBed, page }) => {
