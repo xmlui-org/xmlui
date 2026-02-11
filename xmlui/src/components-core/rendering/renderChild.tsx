@@ -34,6 +34,7 @@ export interface ChildRendererContext extends InnerRendererContext {
 export function renderChild({
   node,
   state,
+  globalVars,
   dispatch,
   appContext,
   lookupAction,
@@ -127,6 +128,7 @@ export function renderChild({
       statePartChanged={statePartChanged}
       memoedVarsRef={memoedVarsRef}
       state={state}
+      globalVars={globalVars}
       dispatch={dispatch}
       appContext={appContext}
       lookupAction={lookupAction}

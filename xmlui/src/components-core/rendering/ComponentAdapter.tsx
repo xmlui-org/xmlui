@@ -62,6 +62,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   {
     node,
     state,
+    globalVars,
     appContext,
     dispatch,
     lookupAction,
@@ -428,6 +429,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   const rendererContext: RendererContext<any> = {
     node: safeNode,
     state: state[uid] || EMPTY_OBJECT,
+    globalVars,
     contextVars,
     updateState: memoedUpdateState,
     appContext,

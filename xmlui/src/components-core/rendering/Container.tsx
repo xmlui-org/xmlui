@@ -930,6 +930,7 @@ export const Container = memo(
       },
       [
         componentState,
+        globalVars,
         dispatch,
         appContext,
         lookupAction,

@@ -106,6 +106,7 @@ export const ComponentWrapper = memo(
           memoedVarsRef={memoedVarsRef}
           node={nodeWithTransformedDatasourceProp}
           state={state}
+          globalVars={globalVars}
           dispatch={dispatch}
           appContext={appContext}
           lookupAction={lookupAction}

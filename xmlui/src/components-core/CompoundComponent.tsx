@@ -12,6 +12,7 @@ import { useShallowCompareMemoize } from "./utils/hooks";
 import { isArray, isObject } from "lodash-es";
 import { EMPTY_ARRAY } from "./constants";
 import { mergeProps } from "./utils/mergeProps";
+import { gl } from "date-fns/locale";
 
 type CompoundComponentProps = {
   // Definition of the `component` part of the compound component
@@ -40,6 +41,7 @@ export const CompoundComponent = forwardRef(
       extractResourceUrl,
       appContext,
       state,
+      globalVars,
       lookupAction,
       contextVars, // Extract contextVars to prevent it from being passed to DOM elements
       ...restProps
@@ -68,8 +70,10 @@ export const CompoundComponent = forwardRef(
     // --- Wrap the `component` part with a container that manages the
     const containerNode: ContainerWrapperDef = useMemo(() => {
       const { loaders, vars, functions, scriptError, ...rest } = compound;
+      
       return {
         type: "Container",
+        uses: [],  // Empty array creates a state boundary - blocks parent local vars
         api,
         scriptCollected,
         loaders: loaders,

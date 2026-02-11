@@ -581,7 +581,29 @@ export const StateContainer = memo(
       prevVarsRef.current = cloneDeep(currentVars);
     }, [xsVerbose, varDefinitions, resolvedLocalVars, node]);
 
-    const mergedWithVars = useMergedState(resolvedLocalVars, componentStateWithApis);
+    // CRITICAL: mergedWithVars should NOT include global variables UNLESS they're shadowed by local vars
+    // - Pure globals: flow through currentGlobalVars only
+    // - Shadowed globals: local definition takes precedence, keep in mergedWithVars
+    const mergedWithVarsRaw = useMergedState(resolvedLocalVars, componentStateWithApis);
+    const mergedWithVars = useMemo(() => {
+      const filtered: ContainerState = {};
+      for (const [key, value] of Object.entries(mergedWithVarsRaw)) {
+        // Check if this key is defined locally (can shadow globals)
+        const isDefinedLocally = (key in resolvedLocalVars) || (node.vars && key in node.vars);
+        
+        // Check if key exists in globals
+        const isParentGlobal = parentGlobalVars && key in parentGlobalVars;
+        const isNodeGlobal = node.globalVars && key in node.globalVars;
+        
+        // Keep the variable if:
+        // 1. It's defined locally (shadows any global), OR
+        // 2. It's not a global at all
+        if (isDefinedLocally || (!isParentGlobal && !isNodeGlobal)) {
+          filtered[key] = value;
+        }
+      }
+      return filtered;
+    }, [mergedWithVarsRaw, parentGlobalVars, node.globalVars, resolvedLocalVars, node.vars]);
 
     // ========================================================================
     // GLOBAL VARIABLES HANDLING
@@ -678,7 +700,11 @@ export const StateContainer = memo(
             // Skip internal metadata keys
             continue;
           }
-          if (typeof value === "string") {
+          // CRITICAL: Check if this parent global has been updated in the current container
+          // This allows child components to modify parent globals
+          if (key in componentStateWithApis) {
+            evaluatedParentGlobals[key] = componentStateWithApis[key];
+          } else if (typeof value === "string") {
             // Create state with previously evaluated parent globals for dependency resolution
             evaluatedParentGlobals[key] = extractParam(
               evaluatedParentGlobals,  // Include previously evaluated globals
@@ -686,7 +712,9 @@ export const StateContainer = memo(
               appContext,
               false,
             );
+            console.log(`[StateContainer ${node.type}] Evaluated parent global '${key}':`, evaluatedParentGlobals[key]);
           } else {
+            console.log(`[StateContainer ${node.type}] Using direct value for parent global '${key}':`, value);
             evaluatedParentGlobals[key] = value;
           }
         }
@@ -706,7 +734,20 @@ export const StateContainer = memo(
             // Skip internal metadata keys
             continue;
           }
-          if (typeof value === "string") {
+          
+          console.log(`[StateContainer ${node.type}] Evaluating node global '${key}':`, {
+            originalValue: value,
+            isString: typeof value === 'string',
+            inComponentState: key in componentStateWithApis,
+            componentStateValue: componentStateWithApis[key]
+          });
+          
+          // CRITICAL: Always check if this global has been updated in componentStateWithApis FIRST
+          // This allows state updates (e.g., count++) to override the initial declaration
+          if (key in componentStateWithApis) {
+            evaluatedNodeGlobals[key] = componentStateWithApis[key];
+            globalsForContext[key] = componentStateWithApis[key];
+          } else if (typeof value === "string") {
             // CRITICAL: For evaluation, use componentStateWithApis values if they exist
             // This ensures that when a global is updated (e.g., count++), we see the NEW value, not the old one
             const evalContext: Record<string, any> = {};
@@ -759,13 +800,27 @@ export const StateContainer = memo(
     // LAYER 6: FINAL STATE COMBINATION
     // ========================================================================
 
+    // CRITICAL: Merge order determines shadowing behavior
+    // Order: stateFromOutside → contextVars → globalVars → localVars → routingParams
+    // This allows local vars to shadow globals (local vars come after globals)
     const combinedState = useCombinedState(
       stateFromOutside,
       node.contextVars,
-      currentGlobalVars,  // Add globalVars to combined state
-      mergedWithVars,
+      currentGlobalVars,    // Global vars BEFORE local vars  
+      mergedWithVars,       // Local vars AFTER globals (can shadow them)
       routingParams,
     );
+    
+    // LOG SHADOWING: Check if a local var is shadowing a global
+    if ('count' in currentGlobalVars && 'count' in mergedWithVars) {
+      console.log(`[SHADOWING ${node.type}] Local 'count' shadowing global:`, {
+        global: currentGlobalVars.count,
+        local: mergedWithVars.count,
+        final: combinedState.count,
+        nodeVars: node.vars?.count,
+        resolvedLocalVars: resolvedLocalVars.count,
+      });
+    }
 
     // ========================================================================
     // COMPONENT API REGISTRATION
@@ -797,8 +852,24 @@ export const StateContainer = memo(
     const statePartChanged: StatePartChangedFn = useCallback(
       (pathArray, newValue, target, action) => {
         const key = pathArray[0];
-        const isGlobalVar = key in currentGlobalVars;
+        
+        // CRITICAL: Check for LOCAL variable FIRST before checking global
+        // This allows local vars to shadow globals with the same name
+        const isLocalVar = key in resolvedLocalVars;
+        const isGlobalVar = !isLocalVar && (key in currentGlobalVars);
         const isRoot = node.uid === 'root';
+        
+        // LOG STATE CHANGE: Show which path the update takes
+        if (key === 'count') {
+          console.log(`[STATE CHANGE ${node.type}] ${key}:`, {
+            newValue,
+            isLocalVar,
+            isGlobalVar,
+            inResolvedLocalVars: key in resolvedLocalVars,
+            resolvedLocalVarsValue: resolvedLocalVars[key],
+            nodeVars: node.vars?.[key],
+          });
+        }
         
         if (isGlobalVar) {
           if (isRoot) {
@@ -817,7 +888,7 @@ export const StateContainer = memo(
             // Non-root containers bubble globals to parent
             parentStatePartChanged(pathArray, newValue, target, action);
           }
-        } else if (key in componentStateRef.current || key in resolvedLocalVars) {
+        } else if (key in componentStateRef.current || isLocalVar) {
           // --- Sign that a state field (or a part of it) has changed
           dispatch({
             type: ContainerActionKind.STATE_PART_CHANGED,
