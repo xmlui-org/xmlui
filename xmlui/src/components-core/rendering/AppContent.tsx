@@ -583,6 +583,7 @@ export function AppContent({
       // Capture ARIA role and accessible name for Playwright selector generation
       let ariaRole: string | undefined;
       let ariaName: string | undefined;
+      let ariaTarget = target; // may walk up to nearest ancestor with a role
       if (target) {
         // Explicit role attribute takes precedence
         ariaRole = target.getAttribute?.("role") || undefined;
@@ -600,10 +601,31 @@ export function AppContent({
           else if (tag === "select") ariaRole = "combobox";
           else if (tag === "textarea") ariaRole = "textbox";
         }
+        // If no role found on target (e.g. click landed on svg/use inside a
+        // menuitem, or div inside a table row), walk up to the nearest
+        // ancestor with an explicit or implicit role
+        if (!ariaRole) {
+          let el = target.parentElement;
+          for (let i = 0; i < 10 && el; i++) {
+            // Check explicit role attribute first
+            const parentRole = el.getAttribute?.("role");
+            if (parentRole) {
+              ariaRole = parentRole;
+              ariaTarget = el;
+              break;
+            }
+            // Check implicit role from HTML tag
+            const parentTag = el.tagName?.toLowerCase();
+            if (parentTag === "tr") { ariaRole = "row"; ariaTarget = el; break; }
+            if (parentTag === "button") { ariaRole = "button"; ariaTarget = el; break; }
+            if (parentTag === "a" && el.hasAttribute?.("href")) { ariaRole = "link"; ariaTarget = el; break; }
+            el = el.parentElement;
+          }
+        }
         // Accessible name: aria-label > aria-labelledby > associated label > text content
-        ariaName = target.getAttribute?.("aria-label") || undefined;
-        if (!ariaName && target.getAttribute?.("aria-labelledby")) {
-          const labelEl = document.getElementById(target.getAttribute("aria-labelledby")!);
+        ariaName = ariaTarget.getAttribute?.("aria-label") || undefined;
+        if (!ariaName && ariaTarget.getAttribute?.("aria-labelledby")) {
+          const labelEl = document.getElementById(ariaTarget.getAttribute("aria-labelledby")!);
           ariaName = labelEl?.textContent?.trim() || undefined;
         }
         // For form inputs, resolve from the associated <label> element.
@@ -637,9 +659,14 @@ export function AppContent({
             }
           }
         }
-        if (!ariaName && (ariaRole === "button" || ariaRole === "link")) {
-          const btnText = target.textContent?.trim();
+        if (!ariaName && (ariaRole === "button" || ariaRole === "link" || ariaRole === "menuitem")) {
+          const btnText = ariaTarget.textContent?.trim();
           if (btnText && btnText.length < 50) ariaName = btnText;
+        }
+        // For table rows, use the original click target's text as the
+        // accessible name (the row's full textContent is too long)
+        if (!ariaName && ariaRole === "row" && text) {
+          ariaName = text;
         }
       }
 
