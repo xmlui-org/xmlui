@@ -12,6 +12,10 @@
 
 ## Properties [#properties]
 
+### `footerTemplate` [#footertemplate]
+
+Optional template for a footer at the bottom of the NavPanel. When set, the footer is shown below the scrollable nav content (e.g. for theme switcher or sidebar toggle, similar to Nextra).
+
 ### `inDrawer` [#indrawer]
 
 -  default: **false**
@@ -72,6 +76,7 @@ This component does not expose any methods.
 The component has some parts that can be styled through layout properties and theme variables separately:
 
 - **`content`**: The content area within the NavPanel component.
+- **`footer`**: Optional footer area at the bottom of the NavPanel (e.g. for theme switcher or layout toggle). Shown only when footerTemplate is set.
 - **`logo`**: The logo area within the NavPanel component.
 
 ## Styling [#styling]
@@ -87,6 +92,7 @@ The component has some parts that can be styled through layout properties and th
 | [borderBottomColor](../styles-and-themes/common-units/#color)-NavPanel | *none* | *none* |
 | [borderBottomStyle](../styles-and-themes/common-units/#border-style)-NavPanel | *none* | *none* |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-footer-NavPanel | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-NavPanel | *none* | *none* |
 | [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-NavPanel | *none* | *none* |
 | [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-NavPanel | *none* | *none* |
@@ -119,17 +125,24 @@ The component has some parts that can be styled through layout properties and th
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-NavPanel-vertical | 4px 0 4px 0 rgb(0 0 0 / 10%) | 4px 0 4px 0 rgb(0 0 0 / 10%) |
 | [horizontalAlignment](../styles-and-themes/common-units/#alignment)-logo-NavPanel | center | center |
 | [marginBottom](../styles-and-themes/common-units/#size)-logo-NavPanel | $space-4 | $space-4 |
+| [padding](../styles-and-themes/common-units/#size)-footer-NavPanel | $space-2 | $space-2 |
 | [padding](../styles-and-themes/common-units/#size)-logo-NavPanel | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |
+| [paddingBottom](../styles-and-themes/common-units/#size)-footer-NavPanel | *none* | *none* |
 | [paddingBottom](../styles-and-themes/common-units/#size)-logo-NavPanel | *none* | *none* |
 | [paddingBottom](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-footer-NavPanel | $space-4 | $space-4 |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-logo-NavPanel | $space-4 | $space-4 |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-NavPanel | 0 | 0 |
+| [paddingLeft](../styles-and-themes/common-units/#size)-footer-NavPanel | *none* | *none* |
 | [paddingLeft](../styles-and-themes/common-units/#size)-logo-NavPanel | *none* | *none* |
 | [paddingLeft](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |
+| [paddingRight](../styles-and-themes/common-units/#size)-footer-NavPanel | *none* | *none* |
 | [paddingRight](../styles-and-themes/common-units/#size)-logo-NavPanel | *none* | *none* |
 | [paddingRight](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |
+| [paddingTop](../styles-and-themes/common-units/#size)-footer-NavPanel | *none* | *none* |
 | [paddingTop](../styles-and-themes/common-units/#size)-logo-NavPanel | *none* | *none* |
 | [paddingTop](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-footer-NavPanel | $space-2 | $space-2 |
 | [paddingVertical](../styles-and-themes/common-units/#size)-logo-NavPanel | $space-4 | $space-4 |
 | [paddingVertical](../styles-and-themes/common-units/#size)-NavPanel | $space-5 | $space-5 |

@@ -2,6 +2,7 @@ import React, { forwardRef, isValidElement, useMemo } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
 import type { ComponentDef } from "../abstractions/ComponentDefs";
+import { pushXsLog, getCurrentTrace } from "./inspector/inspectorUtils";
 import type { ContainerWrapperDef } from "./rendering/ContainerWrapper";
 import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 import type { RendererContext } from "../abstractions/RendererDefs";
@@ -69,7 +70,6 @@ export const CompoundComponent = forwardRef(
       const { loaders, vars, functions, scriptError, ...rest } = compound;
       return {
         type: "Container",
-        uses: EMPTY_ARRAY,
         api,
         scriptCollected,
         loaders: loaders,
@@ -86,6 +86,20 @@ export const CompoundComponent = forwardRef(
 
     const emitEvent = useEvent((eventName, ...args) => {
       const handler = lookupEventHandler(eventName);
+
+      // Log emitEvent calls when inspector is enabled
+      if (appContext?.appGlobals?.xsVerbose === true) {
+        pushXsLog({
+          ts: Date.now(),
+          perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+          traceId: getCurrentTrace(),
+          kind: "emitEvent",
+          eventName,
+          componentType: compound?.type,
+          componentLabel: uid?.description,
+          eventArgs: args?.length ? args : undefined,
+        });
+      }
 
       if (handler) {
         return handler(...args);

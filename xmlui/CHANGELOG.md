@@ -1,5 +1,38 @@
 # xmlui
 
+## 0.12.0
+
+### Minor Changes
+
+- 19e04b3: Add inspector logging infrastructure for debugging XMLUI applications
+
+  - New `xsVerbose` app global enables detailed event tracing
+  - Logs handler execution, state changes, API calls, and user interactions
+  - Trace IDs correlate related events across async boundaries
+  - Window properties (`window._xsLogs`, etc.) expose data to external tooling
+  - Shared utilities extracted to `inspectorUtils.ts` for consistent logging
+
+### Patch Changes
+
+- d8d3613: - when using `parseAs`, remember the filename(s) and report them in the input box
+
+  - mechanism to access header: getFields
+  - display parse errors
+  - acceptsFileType should influence the system filepicker
+  - drag/drop example
+
+- a79e4f6: improve TableOfContents component
+- e4dab71: Fix Fragment visibility regression
+- 547e261: Add module import to standalone apps
+- a49f1a9: Fix <script> layout issue in App
+- b9a0e56: Extend Tree API with replaceNode and replaceChildren
+- 3dce31d: Experimenting with publish/subscribe behavior
+- e8d6844: Minor Splitter improvements
+- 74ac666: Add global variables to xmlui (Globals.xs)
+- 79cd8c9: Fix breaking component links (404) in docs
+- 7ea3e83: feat: implement navpanelFooter and NavPanelCollapseButton (experimental)
+- f13b74f: Fix Windows-specific module resolution issues
+
 ## 0.11.34
 
 ### Patch Changes

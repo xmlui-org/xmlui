@@ -363,6 +363,24 @@ export const TreeMd = createMetadata({
           "The node data object using the format specified in dataFormat and field properties",
       },
     },
+    replaceNode: {
+      description: `Replace a node's properties with new data using merge semantics. Properties not specified in nodeData are kept from the original node. Children are only replaced if nodeData specifies them.`,
+      signature: "replaceNode(nodeId: string | number, nodeData: any): void",
+      parameters: {
+        nodeId: "The ID of the node to update",
+        nodeData:
+          "The node data object with properties to merge. Uses the format specified in dataFormat and field properties.",
+      },
+    },
+    replaceChildren: {
+      description: `Replace all children of a node with new child nodes.`,
+      signature: "replaceChildren(nodeId: string | number, newChildren: any[]): void",
+      parameters: {
+        nodeId: "The ID of the parent node",
+        newChildren:
+          "Array of child node data objects using the format specified in dataFormat and field properties",
+      },
+    },
     getNodeLoadingState: {
       description: `Get the loading state of a dynamic node.`,
       signature: "getNodeLoadingState(nodeId: string | number): NodeLoadingState",

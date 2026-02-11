@@ -45,7 +45,7 @@ import { type OurColumnMetadata } from "../Column/TableContext";
 import useRowSelection from "./useRowSelection";
 import { PaginationNative, type Position } from "../Pagination/PaginationNative";
 import { Part } from "../Part/Part";
-import { parseKeyBinding, matchesKeyEvent, ParsedKeyBinding } from "../../parsers/keybinding-parser/keybinding-parser";
+import { parseKeyBinding, matchesKeyEvent, type ParsedKeyBinding } from "../../parsers/keybinding-parser/keybinding-parser";
 
 // =====================================================================================================================
 // Helper types
@@ -216,6 +216,7 @@ type TableProps = {
   onCopyAction?: AsyncFunction;
   onPasteAction?: AsyncFunction;
   onDeleteAction?: AsyncFunction;
+  alwaysShowHeader?: boolean;
 };
 
 function defaultIsRowDisabled(_: any) {
@@ -554,6 +555,7 @@ export const Table = forwardRef(
       onCopyAction,
       onPasteAction,
       onDeleteAction,
+      alwaysShowHeader = defaultProps.alwaysShowHeader,
       ...rest
       // cols
     }: TableProps,
@@ -962,6 +964,190 @@ export const Table = forwardRef(
 
     const startMargin = useStartMargin(hasOutsideScroll, wrapperRef, scrollRef);
 
+    const theadRef = useRef<HTMLTableSectionElement>(null);
+
+    // Use transform-based approach to keep header visible during outside scroll.
+    // The header stays in document flow (no position:fixed) — we just visually
+    // shift it with translate3d, which avoids all layout-shift/bounce issues.
+    // We run synchronously in the scroll handler and cache layout offsets so we
+    // only use cheap scrollTop reads per frame.
+    // On mobile, scroll events are throttled during momentum scrolling, so we
+    // also listen to touchmove (fires every frame during active touch) and run
+    // a rAF polling loop during the momentum phase (touchend → scrollend/idle).
+    useEffect(() => {
+      if (!alwaysShowHeader || !hasOutsideScroll || !tableRef.current || !theadRef.current) return;
+
+      const isBody = !scrollRef.current || scrollRef.current === document.body;
+      const scrollEl = isBody ? document.documentElement : scrollRef.current!;
+      const scrollTarget: EventTarget = isBody ? window : scrollRef.current!;
+      const thead = theadRef.current;
+      const table = tableRef.current;
+
+      // Cache layout values — recomputed only on resize, not every scroll
+      let tableOffsetTop = 0;
+      let tableHeight = 0;
+      let theadHeight = thead.offsetHeight;
+      let fixedHeaderOffset = 0;
+      let lastOffset = -1;
+
+      const getFixedHeaderOffset = (): number => {
+        // Get the root node for this component (either document or shadow root)
+        const rootNode = thead.getRootNode() as Document | ShadowRoot;
+
+        // Combine selectors into single query for better performance
+        // Note: Avoid [style*="..."] selectors - they only match inline styles, not computed styles
+        const selector = '[data-part-header], [role="banner"], header, .app-header, .header, [data-fixed-header]';
+        
+        let maxBottom = 0;
+        
+        try {
+          const elements = rootNode.querySelectorAll(selector);
+          
+          // Use for...of for better performance than forEach
+          for (const el of elements) {
+            if (el === thead || thead.contains(el)) continue;
+            
+            const style = window.getComputedStyle(el);
+            
+            // Only check position if element is fixed/sticky
+            if (style.position === 'fixed' || style.position === 'sticky') {
+              const rect = el.getBoundingClientRect();
+              // Check if element is at or near the top of the viewport
+              if (rect.top <= 10 && rect.bottom > 0) {
+                maxBottom = Math.max(maxBottom, rect.bottom);
+              }
+            }
+          }
+        } catch (e) {
+          // Invalid selector or other DOM error, return 0
+        }
+        
+        return maxBottom;
+      };
+
+      const applyTransform = () => {
+        const scrollTop = isBody ? window.scrollY : scrollEl.scrollTop;
+        const tableTop = tableOffsetTop - scrollTop;
+
+        const tableScrolledPast = tableTop < 0;
+        const tableStillVisible = tableTop + tableHeight > theadHeight;
+
+        if (tableScrolledPast && tableStillVisible) {
+          const offset = -tableTop + fixedHeaderOffset;
+          if (offset !== lastOffset) {
+            lastOffset = offset;
+            thead.style.transform = `translate3d(0,${offset}px,0)`;
+            if (!thead.style.zIndex) {
+              thead.style.zIndex = '1000';
+              thead.style.position = 'relative';
+            }
+          }
+        } else if (lastOffset !== -1) {
+          lastOffset = -1;
+          thead.style.transform = '';
+          thead.style.zIndex = '';
+          thead.style.position = '';
+        }
+      };
+
+      const cacheOffsets = () => {
+        theadHeight = thead.offsetHeight;
+        tableHeight = table.offsetHeight;
+        fixedHeaderOffset = getFixedHeaderOffset();
+        if (isBody) {
+          tableOffsetTop = table.getBoundingClientRect().top + window.scrollY;
+        } else {
+          tableOffsetTop =
+            table.getBoundingClientRect().top -
+            scrollEl.getBoundingClientRect().top +
+            scrollEl.scrollTop;
+        }
+        // Ensure header is correctly positioned after resizing (e.g. orientation change)
+        requestAnimationFrame(applyTransform);
+      };
+      cacheOffsets();
+
+      const ro = new ResizeObserver(cacheOffsets);
+      ro.observe(table);
+      ro.observe(scrollEl === document.documentElement ? document.body : scrollEl);
+
+      // --- Momentum-phase polling ---
+      // After touchend, mobile browsers momentum-scroll but throttle scroll events.
+      // We poll via rAF until scroll position stabilises for ~100ms.
+      let pollRafId: number | null = null;
+      let lastPollScrollTop = -1;
+      let idleFrames = 0;
+      const IDLE_THRESHOLD = 6; // ~100ms at 60fps
+
+      const pollLoop = () => {
+        applyTransform();
+        const currentScroll = isBody ? window.scrollY : scrollEl.scrollTop;
+        if (currentScroll === lastPollScrollTop) {
+          idleFrames++;
+        } else {
+          idleFrames = 0;
+          lastPollScrollTop = currentScroll;
+        }
+        if (idleFrames < IDLE_THRESHOLD) {
+          pollRafId = requestAnimationFrame(pollLoop);
+        } else {
+          pollRafId = null;
+        }
+      };
+
+      const startPolling = () => {
+        if (pollRafId == null) {
+          idleFrames = 0;
+          lastPollScrollTop = -1;
+          pollRafId = requestAnimationFrame(pollLoop);
+        }
+      };
+
+      const stopPolling = () => {
+        if (pollRafId != null) {
+          cancelAnimationFrame(pollRafId);
+          pollRafId = null;
+        }
+      };
+
+      // --- Event handlers ---
+      const onScroll = () => {
+        applyTransform();
+      };
+
+      const onTouchMove = () => {
+        applyTransform();
+      };
+
+      const onTouchEnd = () => {
+        // Finger lifted — momentum scroll may be happening. Start polling.
+        startPolling();
+      };
+
+      const onTouchStart = () => {
+        // Finger back down — stop polling, touchmove will take over.
+        stopPolling();
+      };
+
+      scrollTarget.addEventListener('scroll', onScroll, { passive: true });
+      scrollTarget.addEventListener('touchmove', onTouchMove, { passive: true });
+      scrollTarget.addEventListener('touchend', onTouchEnd, { passive: true });
+      scrollTarget.addEventListener('touchstart', onTouchStart, { passive: true });
+      applyTransform(); // initial check
+
+      return () => {
+        scrollTarget.removeEventListener('scroll', onScroll);
+        scrollTarget.removeEventListener('touchmove', onTouchMove);
+        scrollTarget.removeEventListener('touchend', onTouchEnd);
+        scrollTarget.removeEventListener('touchstart', onTouchStart);
+        stopPolling();
+        ro.disconnect();
+        thead.style.transform = '';
+        thead.style.zIndex = '';
+        thead.style.position = '';
+      };
+    }, [alwaysShowHeader, hasOutsideScroll]);
+
     // ==================================================================================
     // Virtua Virtualization
     // ==================================================================================
@@ -1102,7 +1288,18 @@ export const Table = forwardRef(
 
         <table className={styles.table} ref={tableRef}>
           {!hideHeader && (
-            <thead style={{ height: headerHeight }} className={styles.headerWrapper}>
+            <>
+              <thead 
+                ref={theadRef}
+                style={{ 
+                  height: headerHeight,
+                  position: 'sticky',
+                  top: 0,
+                  minWidth: "100%",
+                  willChange: alwaysShowHeader && hasOutsideScroll ? 'transform' : undefined,
+                }} 
+                className={styles.headerWrapper}
+              >
               {table.getHeaderGroups().map((headerGroup, headerGroupIndex) => (
                 <tr
                   key={`${headerGroup.id}-${headerGroupIndex}`}
@@ -1127,7 +1324,7 @@ export const Table = forwardRef(
                         const clickX = event.clientX;
                         const clickY = event.clientY;
                         const checkbox = headerCell.querySelector(
-                          'input[type=\"checkbox\"]',
+                          'input[type="checkbox"]',
                         ) as HTMLInputElement;
 
                         if (checkbox) {
@@ -1172,7 +1369,7 @@ export const Table = forwardRef(
                           const mouseX = event.clientX;
                           const mouseY = event.clientY;
                           const checkbox = headerCell.querySelector(
-                            'input[type=\"checkbox\"]',
+                            'input[type="checkbox"]',
                           ) as HTMLInputElement;
 
                           if (checkbox) {
@@ -1298,6 +1495,7 @@ export const Table = forwardRef(
                 </tr>
               ))}
             </thead>
+            </>
           )}
           {hasData && (
             <tbody className={styles.tableBody}>
@@ -1586,4 +1784,5 @@ export const defaultProps = {
     paste: "CmdOrCtrl+V",
     delete: "Delete",
   },
+  alwaysShowHeader: false,
 };

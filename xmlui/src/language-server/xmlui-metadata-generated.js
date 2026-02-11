@@ -1965,16 +1965,101 @@ export default {
         "description": "This optional string property enables the customization of the submit button in the confirmation dialog that is displayed before the `APICall` is executed.",
         "valueType": "string"
       },
-      "inProgressNotificationMessage": {
-        "description": "This property customizes the message that is displayed in a toast while the API operation is in progress. If not defined, no progress message is displayed.",
+      "deferredMode": {
+        "description": "Enable deferred operation mode for long-running operations that return 202 Accepted. When enabled, the component will automatically poll a status endpoint to track operation progress. (Experimental feature)",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "statusUrl": {
+        "description": "The URL to poll for status updates when deferredMode is enabled. Can use $result context from initial response (e.g., '/api/status/{$result.operationId}'). Required when deferredMode is true.",
         "valueType": "string"
       },
-      "errorNotificationMessage": {
-        "description": "",
+      "statusMethod": {
+        "description": "HTTP method for status requests. Defaults to 'get'.",
+        "valueType": "string",
+        "availableValues": [
+          "get",
+          "post",
+          "put",
+          "delete",
+          "patch",
+          "head",
+          "options",
+          "trace",
+          "connect"
+        ],
+        "defaultValue": "get"
+      },
+      "pollingInterval": {
+        "description": "Milliseconds between status polls. Defaults to 2000ms.",
+        "valueType": "number",
+        "defaultValue": 2000
+      },
+      "maxPollingDuration": {
+        "description": "Maximum time to poll before timing out, in milliseconds. Defaults to 300000ms (5 minutes).",
+        "valueType": "number",
+        "defaultValue": 300000
+      },
+      "pollingBackoff": {
+        "description": "Strategy for increasing polling interval over time. Options: 'none' (fixed interval), 'linear' (adds 1 second per attempt), 'exponential' (doubles each time). Defaults to 'none'.",
+        "valueType": "string",
+        "availableValues": [
+          "none",
+          "linear",
+          "exponential"
+        ],
+        "defaultValue": "none"
+      },
+      "maxPollingInterval": {
+        "description": "Maximum interval between polls when using backoff strategies, in milliseconds. Defaults to 30000ms (30 seconds).",
+        "valueType": "number",
+        "defaultValue": 30000
+      },
+      "completionCondition": {
+        "description": "Expression that returns true when the deferred operation is complete. Can access $statusData context variable containing the latest status response.",
+        "valueType": "string"
+      },
+      "errorCondition": {
+        "description": "Expression that returns true when the deferred operation has failed. Can access $statusData context variable containing the latest status response.",
+        "valueType": "string"
+      },
+      "progressExtractor": {
+        "description": "Expression to extract progress value (0-100) from the status response. Can access $statusData context variable. If not specified, no progress tracking.",
+        "valueType": "string"
+      },
+      "cancelUrl": {
+        "description": "URL to call when cancelling the deferred operation. Can use $result context from initial response (e.g., '/api/cancel/{$result.operationId}'). If not provided, cancel() will only stop polling without notifying the server.",
+        "valueType": "string"
+      },
+      "cancelMethod": {
+        "description": "HTTP method for cancel requests. Defaults to 'post'.",
+        "valueType": "string",
+        "availableValues": [
+          "get",
+          "post",
+          "put",
+          "delete",
+          "patch",
+          "head",
+          "options",
+          "trace",
+          "connect"
+        ],
+        "defaultValue": "post"
+      },
+      "cancelBody": {
+        "description": "Optional body to send with the cancel request. Can use $result context from initial response."
+      },
+      "inProgressNotificationMessage": {
+        "description": "Message to show in toast notification during deferred operation polling. Can include {$progress}, {$statusData.property}, and other context variables. Notification will update on each poll with current values.",
         "valueType": "string"
       },
       "completedNotificationMessage": {
-        "description": "This property defines the message to display automatically when the operation has been completed. When this property is not defined, the completion does not display any message.",
+        "description": "Message to show in toast notification when deferred operation completes successfully. Can include {$statusData.property} and other context variables from the final status.",
+        "valueType": "string"
+      },
+      "errorNotificationMessage": {
+        "description": "Message to show in toast notification when deferred operation fails. Can include {$statusData.property} and other context variables from the error status.",
         "valueType": "string"
       },
       "payloadType": {
@@ -2018,6 +2103,34 @@ export default {
           "error": "The error object containing details about what went wrong with the API request."
         }
       },
+      "statusUpdate": {
+        "description": "Fires on each poll when in deferred mode. Passes the status data and current progress.",
+        "signature": "(statusData: any, progress: number) => void",
+        "parameters": {
+          "statusData": "The latest status response data from polling.",
+          "progress": "Current progress value 0-100."
+        }
+      },
+      "pollingStart": {
+        "description": "Fires when polling begins in deferred mode.",
+        "signature": "(initialResult: any) => void",
+        "parameters": {
+          "initialResult": "The result from the initial API call that returned 202."
+        }
+      },
+      "pollingComplete": {
+        "description": "Fires when polling stops in deferred mode (success, failure, timeout, or manual stop).",
+        "signature": "(finalStatus: any, reason: string) => void",
+        "parameters": {
+          "finalStatus": "The final status data.",
+          "reason": "Reason for completion: 'completed', 'failed', 'timeout', or 'manual'."
+        }
+      },
+      "timeout": {
+        "description": "Fires if max polling duration is exceeded in deferred mode.",
+        "signature": "() => void",
+        "parameters": {}
+      },
       "progress": {
         "description": "This property is for internal use only.",
         "isInternal": true
@@ -2035,6 +2148,21 @@ export default {
       },
       "$error": {
         "description": "Error details (available in `errorNotificationMessage`)"
+      },
+      "$statusData": {
+        "description": "Latest status response data when in deferred mode (available in event handlers and notifications)"
+      },
+      "$progress": {
+        "description": "Current progress 0-100 when in deferred mode (extracted via progressExtractor expression)"
+      },
+      "$polling": {
+        "description": "Boolean indicating if polling is currently active in deferred mode"
+      },
+      "$attempts": {
+        "description": "Number of status polls made in deferred mode"
+      },
+      "$elapsed": {
+        "description": "Time elapsed since polling started in milliseconds"
       }
     },
     "apis": {
@@ -2060,6 +2188,26 @@ export default {
       "lastError": {
         "description": "The error from the most recent failed API call execution.",
         "signature": "lastError: any"
+      },
+      "stopPolling": {
+        "description": "Manually stop polling in deferred mode. The operation continues on the server.",
+        "signature": "stopPolling(): void"
+      },
+      "resumePolling": {
+        "description": "Resume polling in deferred mode after it was manually stopped.",
+        "signature": "resumePolling(): void"
+      },
+      "getStatus": {
+        "description": "Get the current status data in deferred mode.",
+        "signature": "getStatus(): any"
+      },
+      "isPolling": {
+        "description": "Check if polling is currently active in deferred mode.",
+        "signature": "isPolling(): boolean"
+      },
+      "cancel": {
+        "description": "Cancel the deferred operation on the server and stop polling. Requires cancelUrl to be configured.",
+        "signature": "cancel(): Promise<void>"
       }
     }
   },
@@ -2100,7 +2248,7 @@ export default {
           },
           {
             "value": "desktop",
-            "description": "This layout stretches the app to fill the entire browser viewport with zero padding and margins. The header (if present) docks to the top, the footer (if present) docks to the bottom, and the main content stretches to fill the remaining vertical and horizontal space."
+            "description": "This layout is designed for desktop applications with a fixed viewport structure. The app fills the entire browser viewport (100vw × 100vh) with zero padding and margins. The header remains fixed at the top, the footer remains fixed at the bottom, and the main content dynamically fills all remaining vertical space between them. When the content overflows, only the main content area scrolls while the header and footer remain visible. This creates a classic desktop application layout with persistent header and footer regions."
           }
         ]
       },
@@ -2172,11 +2320,13 @@ export default {
     },
     "themeVars": {
       "width-navPanel-App": "var(--xmlui-width-navPanel-App)",
+      "width-navPanel-collapsed-App": "var(--xmlui-width-navPanel-collapsed-App)",
       "backgroundColor-navPanel-App": "var(--xmlui-backgroundColor-navPanel-App)",
       "boxShadow-header-App": "var(--xmlui-boxShadow-header-App)",
       "boxShadow-navPanel-App": "var(--xmlui-boxShadow-navPanel-App)",
       "backgroundColor-content-App": "var(--xmlui-backgroundColor-content-App)",
       "borderLeft-content-App": "var(--xmlui-borderLeft-content-App)",
+      "borderRight-navPanelWrapper-App": "var(--xmlui-borderRight-navPanelWrapper-App)",
       "maxWidth-content-App": "var(--xmlui-maxWidth-content-App)",
       "maxWidth-App": "var(--xmlui-maxWidth-App)",
       "backgroundColor-AppHeader": "var(--xmlui-backgroundColor-AppHeader)",
@@ -2194,6 +2344,8 @@ export default {
     "defaultThemeVars": {
       "maxWidth-Drawer": "100%",
       "width-navPanel-App": "$space-64",
+      "width-navPanel-collapsed-App": "48px",
+      "borderRight-navPanelWrapper-App": "1px solid $borderColor",
       "backgroundColor-navPanel-App": "$backgroundColor",
       "maxWidth-content-App": "$maxWidth-content",
       "maxWidth-App": "$maxWidth-content",
@@ -2482,6 +2634,18 @@ export default {
         "parameters": {
           "item": "The newly created item value."
         }
+      },
+      "verboseValidationFeedback": {
+        "description": "Enables a concise validation summary (icon) in input components.",
+        "type": "boolean"
+      },
+      "validationIconSuccess": {
+        "description": "Icon to display for valid state when concise validation summary is enabled.",
+        "type": "string"
+      },
+      "validationIconError": {
+        "description": "Icon to display for error state when concise validation summary is enabled.",
+        "type": "string"
       }
     },
     "apis": {
@@ -2639,7 +2803,7 @@ export default {
       "textColor-item-AutoComplete--disabled": "var(--xmlui-textColor-item-AutoComplete--disabled)"
     },
     "defaultThemeVars": {
-      "backgroundColor-AutoComplete": "$backgroundColor",
+      "backgroundColor-AutoComplete": "transparent",
       "backgroundColor-menu-AutoComplete": "$color-surface-raised",
       "boxShadow-menu-AutoComplete": "$boxShadow-md",
       "borderRadius-menu-AutoComplete": "$borderRadius",
@@ -2709,6 +2873,13 @@ export default {
       "click": {
         "description": "This event is triggered when the Avatar is clicked.",
         "signature": "click(event: MouseEvent): void",
+        "parameters": {
+          "event": "The mouse event object."
+        }
+      },
+      "contextMenu": {
+        "description": "This event is triggered when the Avatar is right-clicked (context menu).",
+        "signature": "contextMenu(event: MouseEvent): void",
         "parameters": {
           "event": "The mouse event object."
         }
@@ -2809,7 +2980,15 @@ export default {
         "description": "The `Badge` component supports the mapping of a list of colors using the `value` prop as the key. If this property is not set, no color mapping is used."
       }
     },
-    "events": {},
+    "events": {
+      "contextMenu": {
+        "description": "This event is triggered when the Badge is right-clicked (context menu).",
+        "signature": "contextMenu(event: MouseEvent): void",
+        "parameters": {
+          "event": "The mouse event object."
+        }
+      }
+    },
     "themeVars": {
       "border-Badge": "var(--xmlui-border-Badge)",
       "borderHorizontal-Badge": "var(--xmlui-borderHorizontal-Badge, var(--xmlui-border-Badge))",
@@ -2990,7 +3169,7 @@ export default {
   },
   "Button": {
     "status": "stable",
-    "description": "`Button` is the primary interactive component for triggering actions like form submissions, navigation, opening modals, and API calls. It supports multiple visual styles and sizes to match different UI contexts and importance levels.",
+    "description": "`Button`the primary interactive component for triggering actions like form submissions, navigation, opening modals, and API calls. It supports multiple visual styles and sizes to match different UI contexts and importance levels.",
     "parts": {
       "icon": {
         "description": "The icon displayed within the button, if any."
@@ -3162,6 +3341,13 @@ export default {
       "click": {
         "description": "This event is triggered when the Button is clicked.",
         "signature": "click(event: MouseEvent): void",
+        "parameters": {
+          "event": "The mouse event object."
+        }
+      },
+      "contextMenu": {
+        "description": "This event is triggered when the Button is right-clicked (context menu).",
+        "signature": "contextMenu(event: MouseEvent): void",
         "parameters": {
           "event": "The mouse event object."
         }
@@ -3525,6 +3711,26 @@ export default {
         ],
         "valueType": "string",
         "defaultValue": "vertical"
+      },
+      "horizontalAlignment": {
+        "description": "Manages the horizontal content alignment for each child element in the Card.",
+        "availableValues": [
+          "start",
+          "center",
+          "end"
+        ],
+        "valueType": "string",
+        "defaultValue": "start"
+      },
+      "verticalAlignment": {
+        "description": "Manages the vertical content alignment for each child element in the Card.",
+        "availableValues": [
+          "start",
+          "center",
+          "end"
+        ],
+        "valueType": "string",
+        "defaultValue": "start"
       }
     },
     "events": {
@@ -3534,6 +3740,31 @@ export default {
         "parameters": {
           "event": "The mouse event object."
         }
+      },
+      "contextMenu": {
+        "description": "This event is triggered when the Card is right-clicked (context menu).",
+        "signature": "contextMenu(event: MouseEvent): void",
+        "parameters": {
+          "event": "The mouse event object."
+        }
+      }
+    },
+    "apis": {
+      "scrollToTop": {
+        "description": "Scrolls the Card container to the top. Works when the Card has an explicit height and overflowY is set to 'scroll'.",
+        "signature": "scrollToTop(behavior?: 'auto' | 'instant' | 'smooth'): void"
+      },
+      "scrollToBottom": {
+        "description": "Scrolls the Card container to the bottom. Works when the Card has an explicit height and overflowY is set to 'scroll'.",
+        "signature": "scrollToBottom(behavior?: 'auto' | 'instant' | 'smooth'): void"
+      },
+      "scrollToStart": {
+        "description": "Scrolls the Card container to the start (left in LTR, right in RTL). Works when the Card has an explicit width and overflowX is set to 'scroll'.",
+        "signature": "scrollToStart(behavior?: 'auto' | 'instant' | 'smooth'): void"
+      },
+      "scrollToEnd": {
+        "description": "Scrolls the Card container to the end (right in LTR, left in RTL). Works when the Card has an explicit width and overflowX is set to 'scroll'.",
+        "signature": "scrollToEnd(behavior?: 'auto' | 'instant' | 'smooth'): void"
       }
     },
     "themeVars": {
@@ -3578,6 +3809,7 @@ export default {
       "borderEndEndRadius-Card": "var(--xmlui-borderEndEndRadius-Card, var(--xmlui-borderRadius-Card))",
       "boxShadow-Card": "var(--xmlui-boxShadow-Card)",
       "backgroundColor-Card": "var(--xmlui-backgroundColor-Card)",
+      "backgroundColor-Card--hover": "var(--xmlui-backgroundColor-Card--hover)",
       "borderRadius-Card": "var(--xmlui-borderRadius-Card)",
       "gap-Card": "var(--xmlui-gap-Card)",
       "gap-title-Card": "var(--xmlui-gap-title-Card)",
@@ -3591,12 +3823,14 @@ export default {
       "borderRadius-Card": "$borderRadius",
       "boxShadow-Card": "none",
       "backgroundColor-Card": "$color-surface-raised",
+      "backgroundColor-Card--hover": "$color-surface-raised",
       "gap-Card": "var(--stack-gap-default)",
       "gap-title-Card": "$gap-none",
       "gap-avatar-Card": "$gap-normal",
       "verticalAlignment-title-Card": "center"
     },
     "themeVarDescriptions": {
+      "backgroundColor-Card--hover": "The background color of the Card when hovered.",
       "gap-Card": "The gap between the component's children.",
       "gap-title-Card": "The gap between the title and the subtitle",
       "gap-avatar-Card": "The gap between the avatar and the title panel",
@@ -4163,6 +4397,55 @@ export default {
       }
     }
   },
+  "ContextMenu": {
+    "status": "stable",
+    "description": "`ContextMenu` provides a context-sensitive menu that appears at a specific position when opened programmatically via its `openAt()` API. Unlike `DropdownMenu`, it has no trigger button and is typically used with `onContextMenu` events to create right-click menus or custom context-aware action menus. The menu automatically positions itself within the viewport and closes when clicking outside or when a menu item is selected. ",
+    "parts": {
+      "content": {
+        "description": "The content area of the ContextMenu where menu items are displayed."
+      }
+    },
+    "props": {
+      "menuWidth": {
+        "type": "string",
+        "description": "Sets the width of the context menu."
+      }
+    },
+    "events": {},
+    "apis": {
+      "close": {
+        "description": "This method closes the context menu.",
+        "signature": "close(): void"
+      },
+      "openAt": {
+        "description": "This method opens the context menu at the specified event position (e.g., mouse click coordinates). Optionally, you can pass a context object that will be available within the menu as `$context`. The method automatically prevents the browser's default context menu from appearing.",
+        "signature": "openAt(event: MouseEvent, context?: any): void"
+      }
+    },
+    "contextVars": {
+      "$context": {
+        "description": "Contains the context data passed to the `openAt()` method. This allows menu items to access information about the element or data that triggered the context menu.",
+        "valueType": "any"
+      }
+    },
+    "themeVars": {
+      "backgroundColor-ContextMenu": "var(--xmlui-backgroundColor-ContextMenu)",
+      "borderRadius-ContextMenu": "var(--xmlui-borderRadius-ContextMenu)",
+      "boxShadow-ContextMenu": "var(--xmlui-boxShadow-ContextMenu)",
+      "borderColor-ContextMenu-content": "var(--xmlui-borderColor-ContextMenu-content)",
+      "borderWidth-ContextMenu-content": "var(--xmlui-borderWidth-ContextMenu-content)",
+      "borderStyle-ContextMenu-content": "var(--xmlui-borderStyle-ContextMenu-content)",
+      "minWidth-ContextMenu": "var(--xmlui-minWidth-ContextMenu)"
+    },
+    "limitThemeVarsToComponent": true,
+    "defaultThemeVars": {
+      "backgroundColor-ContextMenu": "$color-surface-raised",
+      "minWidth-ContextMenu": "160px",
+      "boxShadow-ContextMenu": "$boxShadow-xl",
+      "borderStyle-ContextMenu-content": "solid",
+      "borderRadius-ContextMenu": "$borderRadius"
+    }
+  },
   "ContentSeparator": {
     "status": "stable",
     "description": "`ContentSeparator` creates visual dividers between content sections using horizontal or vertical lines. It's essential for improving readability by breaking up dense content, separating list items, or creating clear boundaries between different UI sections.",
@@ -4497,6 +4780,23 @@ export default {
       "endIcon": {
         "description": "This property sets an optional icon to appear on the end (right side when the left-to-right direction is set) of the input.",
         "valueType": "string"
+      },
+      "verboseValidationFeedback": {
+        "description": "Enables a concise validation summary (icon) in input components.",
+        "type": "boolean"
+      },
+      "validationIconSuccess": {
+        "description": "Icon to display for valid state when concise validation summary is enabled.",
+        "type": "string"
+      },
+      "validationIconError": {
+        "description": "Icon to display for error state when concise validation summary is enabled.",
+        "type": "string"
+      },
+      "invalidMessages": {
+        "description": "The invalid messages to display for the input component.",
+        "type": "array",
+        "valueType": "string"
       }
     },
     "events": {
@@ -4694,6 +4994,11 @@ export default {
         ],
         "defaultValue": "none"
       },
+      "invalidMessages": {
+        "description": "The invalid messages to display for the input component.",
+        "type": "array",
+        "valueType": "string"
+      },
       "mode": {
         "description": "The mode of the date input (single or range)",
         "valueType": "string",
@@ -4818,6 +5123,18 @@ export default {
       "endIcon": {
         "description": "This property sets an optional icon to appear on the end (right side when the left-to-right direction is set) of the input.",
         "valueType": "string"
+      },
+      "verboseValidationFeedback": {
+        "description": "Enables a concise validation summary (icon) in input components.",
+        "type": "boolean"
+      },
+      "validationIconSuccess": {
+        "description": "Icon to display for valid state when concise validation summary is enabled.",
+        "type": "string"
+      },
+      "validationIconError": {
+        "description": "Icon to display for error state when concise validation summary is enabled.",
+        "type": "string"
       }
     },
     "events": {
@@ -5182,7 +5499,8 @@ export default {
       "marginBottom-MenuSeparator": "var(--xmlui-marginBottom-MenuSeparator)",
       "width-MenuSeparator": "var(--xmlui-width-MenuSeparator)",
       "height-MenuSeparator": "var(--xmlui-height-MenuSeparator)",
-      "color-MenuSeparator": "var(--xmlui-color-MenuSeparator)"
+      "color-MenuSeparator": "var(--xmlui-color-MenuSeparator)",
+      "maxWidth-MenuItem": "var(--xmlui-maxWidth-MenuItem)"
     },
     "limitThemeVarsToComponent": true,
     "defaultThemeVars": {
@@ -5282,7 +5600,8 @@ export default {
       "marginBottom-MenuSeparator": "var(--xmlui-marginBottom-MenuSeparator)",
       "width-MenuSeparator": "var(--xmlui-width-MenuSeparator)",
       "height-MenuSeparator": "var(--xmlui-height-MenuSeparator)",
-      "color-MenuSeparator": "var(--xmlui-color-MenuSeparator)"
+      "color-MenuSeparator": "var(--xmlui-color-MenuSeparator)",
+      "maxWidth-MenuItem": "var(--xmlui-maxWidth-MenuItem)"
     },
     "limitThemeVarsToComponent": true,
     "defaultThemeVars": {
@@ -5294,6 +5613,7 @@ export default {
       "paddingVertical-MenuItem": "$space-2",
       "paddingHorizontal-MenuItem": "$space-3",
       "backgroundColor-MenuItem--hover": "$backgroundColor-dropdown-item--hover",
+      "maxWidth-MenuItem": "100%",
       "color-MenuItem--hover": "inherit",
       "gap-MenuItem": "$space-2",
       "color-MenuItem--active": "$color-primary",
@@ -5307,6 +5627,25 @@ export default {
     "description": "`SubMenuItem` creates hierarchical menu structures by acting as both a menu item and a container for nested menu items. When clicked or hovered, it reveals a submenu containing additional [MenuItem](/components/MenuItem), [MenuSeparator](/components/MenuSeparator), or other [SubMenuItem](/components/SubMenuItems) components, enabling complex multi-level navigation and action organization.",
     "docFolder": "DropdownMenu",
     "props": {
+      "iconPosition": {
+        "description": "This property allows you to determine the position of the icon displayed in the submenu item.",
+        "valueType": "string",
+        "availableValues": [
+          {
+            "value": "start",
+            "description": "The icon will appear at the start (left side when the left-to-right direction is set)"
+          },
+          {
+            "value": "end",
+            "description": "The icon will appear at the end (right side when the left-to-right direction is set)"
+          }
+        ],
+        "defaultValue": "start"
+      },
+      "icon": {
+        "description": "This property names an optional icon to display with the submenu item. You can use component-specific icons in the format \"iconName:SubMenuItem\".",
+        "valueType": "string"
+      },
       "label": {
         "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
@@ -5343,6 +5682,9 @@ export default {
     "parts": {
       "summary": {
         "description": "The summary section that is always visible and acts as the trigger."
+      },
+      "content": {
+        "description": "The content section that is expanded or collapsed."
       }
     },
     "props": {
@@ -5458,6 +5800,13 @@ export default {
       "paddingRight-ExpandableItem": "var(--xmlui-paddingRight-ExpandableItem, var(--xmlui-paddingHorizontal-ExpandableItem, var(--xmlui-padding-ExpandableItem)))",
       "paddingTop-ExpandableItem": "var(--xmlui-paddingTop-ExpandableItem, var(--xmlui-paddingVertical-ExpandableItem, var(--xmlui-padding-ExpandableItem)))",
       "paddingBottom-ExpandableItem": "var(--xmlui-paddingBottom-ExpandableItem, var(--xmlui-paddingVertical-ExpandableItem, var(--xmlui-padding-ExpandableItem)))",
+      "padding-summary-ExpandableItem": "var(--xmlui-padding-summary-ExpandableItem)",
+      "paddingHorizontal-summary-ExpandableItem": "var(--xmlui-paddingHorizontal-summary-ExpandableItem, var(--xmlui-padding-summary-ExpandableItem))",
+      "paddingVertical-summary-ExpandableItem": "var(--xmlui-paddingVertical-summary-ExpandableItem, var(--xmlui-padding-summary-ExpandableItem))",
+      "paddingLeft-summary-ExpandableItem": "var(--xmlui-paddingLeft-summary-ExpandableItem, var(--xmlui-paddingHorizontal-summary-ExpandableItem, var(--xmlui-padding-summary-ExpandableItem)))",
+      "paddingRight-summary-ExpandableItem": "var(--xmlui-paddingRight-summary-ExpandableItem, var(--xmlui-paddingHorizontal-summary-ExpandableItem, var(--xmlui-padding-summary-ExpandableItem)))",
+      "paddingTop-summary-ExpandableItem": "var(--xmlui-paddingTop-summary-ExpandableItem, var(--xmlui-paddingVertical-summary-ExpandableItem, var(--xmlui-padding-summary-ExpandableItem)))",
+      "paddingBottom-summary-ExpandableItem": "var(--xmlui-paddingBottom-summary-ExpandableItem, var(--xmlui-paddingVertical-summary-ExpandableItem, var(--xmlui-padding-summary-ExpandableItem)))",
       "padding-content-ExpandableItem": "var(--xmlui-padding-content-ExpandableItem)",
       "paddingHorizontal-content-ExpandableItem": "var(--xmlui-paddingHorizontal-content-ExpandableItem, var(--xmlui-padding-content-ExpandableItem))",
       "paddingVertical-content-ExpandableItem": "var(--xmlui-paddingVertical-content-ExpandableItem, var(--xmlui-padding-content-ExpandableItem))",
@@ -5466,6 +5815,9 @@ export default {
       "paddingTop-content-ExpandableItem": "var(--xmlui-paddingTop-content-ExpandableItem, var(--xmlui-paddingVertical-content-ExpandableItem, var(--xmlui-padding-content-ExpandableItem)))",
       "paddingBottom-content-ExpandableItem": "var(--xmlui-paddingBottom-content-ExpandableItem, var(--xmlui-paddingVertical-content-ExpandableItem, var(--xmlui-padding-content-ExpandableItem)))",
       "backgroundColor-ExpandableItem": "var(--xmlui-backgroundColor-ExpandableItem)",
+      "backgroundColor-ExpandableItem--hover": "var(--xmlui-backgroundColor-ExpandableItem--hover)",
+      "backgroundColor-ExpandableItem--active": "var(--xmlui-backgroundColor-ExpandableItem--active)",
+      "borderRadius-summary-ExpandableItem": "var(--xmlui-borderRadius-summary-ExpandableItem)",
       "color-ExpandableItem": "var(--xmlui-color-ExpandableItem)",
       "color-ExpandableItem--disabled": "var(--xmlui-color-ExpandableItem--disabled)",
       "fontFamily-ExpandableItem": "var(--xmlui-fontFamily-ExpandableItem)",
@@ -5474,11 +5826,15 @@ export default {
       "paddingVertical-ExpandableItem-summary": "var(--xmlui-paddingVertical-ExpandableItem-summary)",
       "paddingHorizontal-ExpandableItem-summary": "var(--xmlui-paddingHorizontal-ExpandableItem-summary)",
       "gap-ExpandableItem": "var(--xmlui-gap-ExpandableItem)",
-      "transition-ExpandableItem": "var(--xmlui-transition-ExpandableItem)"
+      "transition-summary-ExpandableItem": "var(--xmlui-transition-summary-ExpandableItem)",
+      "animation-content-ExpandableItem": "var(--xmlui-animation-content-ExpandableItem)",
+      "animationDuration-content-ExpandableItem": "var(--xmlui-animationDuration-content-ExpandableItem)"
     },
     "limitThemeVarsToComponent": true,
     "defaultThemeVars": {
-      "backgroundColor-ExpandableItem": "$backgroundColor",
+      "backgroundColor-ExpandableItem": "transparent",
+      "backgroundColor-ExpandableItem--hover": "$color-secondary-100",
+      "backgroundColor-ExpandableItem--active": "$color-secondary-100",
       "color-ExpandableItem": "$textColor-primary",
       "color-ExpandableItem--disabled": "$textColor--disabled",
       "fontFamily-ExpandableItem": "$fontFamily",
@@ -5491,11 +5847,15 @@ export default {
       "paddingBottom-ExpandableItem": "$space-2",
       "paddingLeft-ExpandableItem": "$space-0",
       "paddingRight-ExpandableItem": "$space-0",
+      "padding-summary-ExpandableItem": "$space-2 $space-4",
+      "borderRadius-summary-ExpandableItem": "$borderRadius",
+      "transition-summary-ExpandableItem": "color 0.2s, background 0.2s",
       "gap-ExpandableItem": "$space-2",
       "paddingLeft-content-ExpandableItem": "$space-3",
       "paddingRight-content-ExpandableItem": "$space-3",
       "paddingVertical-content-ExpandableItem": "$space-2",
-      "transition-ExpandableItem": "0.2s ease"
+      "animationDuration-content-ExpandableItem": "0.2s",
+      "animation-content-ExpandableItem": "ease-out"
     }
   },
   "FileInput": {
@@ -5635,6 +5995,16 @@ export default {
         ],
         "valueType": "string",
         "defaultValue": "primary"
+      },
+      "parseAs": {
+        "description": "Automatically parse file contents as CSV or JSON. When set, the `onDidChange` event receives an object `{ files: File[], parsedData: ParseResult[] }` containing both the raw files and parsed data. Each `ParseResult` includes `file`, `data` (parsed rows), and optional `error`. When `parseAs` is set, `acceptsFileType` is automatically inferred (e.g., \".csv\" or \".json\") unless explicitly overridden. Empty files are handled gracefully, returning an empty data array.",
+        "availableValues": [
+          "csv",
+          "json"
+        ]
+      },
+      "csvOptions": {
+        "description": "Configuration options for CSV parsing (used when `parseAs=\"csv\"`). Supports all Papa Parse configuration options. Default options: `{ header: true, skipEmptyLines: true }`. Common options include `delimiter`, `header`, `dynamicTyping`, `skipEmptyLines`, and `transform`."
       }
     },
     "events": {
@@ -5654,6 +6024,14 @@ export default {
         "description": "This event is triggered when the FileInput has lost the focus.",
         "signature": "lostFocus(): void",
         "parameters": {}
+      },
+      "parseError": {
+        "description": "This event is triggered when file parsing fails. Receives the error and the file that failed to parse.",
+        "signature": "parseError(error: Error, file: File): void",
+        "parameters": {
+          "error": "The parsing error that occurred",
+          "file": "The file that failed to parse"
+        }
       }
     },
     "apis": {
@@ -5675,6 +6053,14 @@ export default {
       "open": {
         "description": "This API command triggers the file browsing dialog to open.",
         "signature": "open(): void"
+      },
+      "inProgress": {
+        "description": "This property indicates whether file parsing is currently in progress (when using parseAs).",
+        "signature": "get inProgress(): boolean"
+      },
+      "getFields": {
+        "description": "This method returns the column headers from the most recently parsed CSV file.",
+        "signature": "getFields(): string[] | undefined"
       }
     },
     "themeVars": {
@@ -5694,8 +6080,13 @@ export default {
     "description": "`FileUploadDropZone` enables users to upload files by dragging and dropping files from their local file system onto a designated area within the UI.",
     "props": {
       "text": {
-        "description": "With this property, you can change the default text to display when files are dragged over the drop zone.",
+        "description": "With this property, you can change the default text to display in the drop zone.",
         "defaultValue": "Drop files here",
+        "type": "string"
+      },
+      "icon": {
+        "description": "Specifies an icon name. The framework will render an icon if XMLUI recognizes the icon by its name.",
+        "defaultValue": "upload",
         "type": "string"
       },
       "allowPaste": {
@@ -5726,18 +6117,30 @@ export default {
       }
     },
     "themeVars": {
+      "borderRadius-FileUploadDropZone": "var(--xmlui-borderRadius-FileUploadDropZone)",
+      "borderColor-FileUploadDropZone--default": "var(--xmlui-borderColor-FileUploadDropZone--default)",
+      "borderWidth-FileUploadDropZone--default": "var(--xmlui-borderWidth-FileUploadDropZone--default)",
+      "borderStyle-FileUploadDropZone--default": "var(--xmlui-borderStyle-FileUploadDropZone--default)",
       "backgroundColor-FileUploadDropZone": "var(--xmlui-backgroundColor-FileUploadDropZone)",
       "textColor-FileUploadDropZone": "var(--xmlui-textColor-FileUploadDropZone)",
+      "textColor-dropping-FileUploadDropZone": "var(--xmlui-textColor-dropping-FileUploadDropZone)",
       "backgroundColor-dropping-FileUploadDropZone": "var(--xmlui-backgroundColor-dropping-FileUploadDropZone)",
       "opacity-dropping-FileUploadDropZone": "var(--xmlui-opacity-dropping-FileUploadDropZone)"
     },
     "defaultThemeVars": {
       "backgroundColor-FileUploadDropZone": "$backgroundColor",
       "backgroundColor-dropping-FileUploadDropZone": "$backgroundColor--selected",
-      "opacity-dropping-FileUploadDropZone": "0.5",
-      "textColor-FileUploadDropZone": "$textColor",
+      "opacity-dropping-FileUploadDropZone": "0.3",
+      "textColor-FileUploadDropZone": "$textColor-secondary",
+      "textColor-dropping-FileUploadDropZone": "$color-primary-700",
+      "borderStyle-FileUploadDropZone": "dashed",
+      "borderColor-FileUploadDropZone": "$color-secondary-200",
+      "borderWidth-FileUploadDropZone": "2px",
+      "borderRadius-FileUploadDropZone": "$borderRadius",
       "light": {},
-      "dark": {}
+      "dark": {
+        "backgroundColor-dropping-FileUploadDropZone": "$color-primary-300"
+      }
     }
   },
   "FlowLayout": {
@@ -5766,6 +6169,41 @@ export default {
         ],
         "valueType": "string",
         "defaultValue": "start"
+      },
+      "scrollStyle": {
+        "description": "This property determines the scrollbar style. Options: \"normal\" uses the browser's default scrollbar; \"overlay\" displays a themed scrollbar that is always visible; \"whenMouseOver\" shows the scrollbar only when hovering over the scroll container; \"whenScrolling\" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.",
+        "valueType": "string",
+        "availableValues": [
+          "normal",
+          "overlay",
+          "whenMouseOver",
+          "whenScrolling"
+        ],
+        "defaultValue": "normal"
+      },
+      "showScrollerFade": {
+        "description": "When enabled, displays gradient fade indicators at the top and bottom of the scroll container to visually indicate that more content is available in those directions. The fade indicators automatically appear/disappear based on the current scroll position. Top fade shows when scrolled down from the top, bottom fade shows when not at the bottom. Only works with overlay scrollbar modes (not with 'normal' mode).",
+        "valueType": "boolean",
+        "defaultValue": true
+      }
+    },
+    "events": {
+      "contextMenu": {
+        "description": "This event is triggered when the FlowLayout is right-clicked (context menu).",
+        "signature": "contextMenu(event: MouseEvent): void",
+        "parameters": {
+          "event": "The mouse event object."
+        }
+      }
+    },
+    "apis": {
+      "scrollToTop": {
+        "description": "Scrolls the FlowLayout container to the top. Works when the FlowLayout has an explicit height and overflowY is set to 'scroll'.",
+        "signature": "scrollToTop(behavior?: 'auto' | 'instant' | 'smooth'): void"
+      },
+      "scrollToBottom": {
+        "description": "Scrolls the FlowLayout container to the bottom. Works when the FlowLayout has an explicit height and overflowY is set to 'scroll'.",
+        "signature": "scrollToBottom(behavior?: 'auto' | 'instant' | 'smooth'): void"
       }
     },
     "themeVars": []
@@ -5893,6 +6331,18 @@ export default {
         "type": "boolean",
         "defaultValue": true
       },
+      "verboseValidationFeedback": {
+        "description": "Enables a concise validation summary (icon) in input components.",
+        "type": "boolean"
+      },
+      "validationIconSuccess": {
+        "description": "Icon to display for valid state when concise validation summary is enabled.",
+        "type": "string"
+      },
+      "validationIconError": {
+        "description": "Icon to display for error state when concise validation summary is enabled.",
+        "type": "string"
+      },
       "keepModalOpenOnSubmit": {
         "description": "This property prevents the modal from closing when the form is submitted.",
         "type": "boolean",
@@ -5955,6 +6405,25 @@ export default {
         "description": "This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).",
         "valueType": "boolean",
         "defaultValue": true
+      },
+      "itemRequireLabelMode": {
+        "description": "This property controls how required indicators are displayed for required form items. Individual `FormItem` instances can override this property.",
+        "availableValues": [
+          {
+            "value": "markRequired",
+            "description": "Show \"*\" for required fields"
+          },
+          {
+            "value": "markOptional",
+            "description": "Show \"(Optional)\" for optional fields"
+          },
+          {
+            "value": "markBoth",
+            "description": "Show \"*\" for required AND \"(Optional)\" for optional fields"
+          }
+        ],
+        "defaultValue": "markRequired",
+        "type": "string"
       },
       "_data_url": {
         "description": "when we have an api bound data prop, we inject the url here",
@@ -6031,7 +6500,7 @@ export default {
     "defaultThemeVars": {
       "gap-Form": "$space-4",
       "gap-buttonRow-Form": "$space-4",
-      "backgroundColor-Form": "$backgroundColor",
+      "backgroundColor-Form": "transparent",
       "backgroundColor-ValidationDisplay-error": "$color-danger-100",
       "backgroundColor-ValidationDisplay-warning": "$color-warn-100",
       "backgroundColor-ValidationDisplay-info": "$color-primary-100",
@@ -6193,6 +6662,25 @@ export default {
         ],
         "defaultValue": "errorLate"
       },
+      "requireLabelMode": {
+        "description": "Controls how required/optional status is visually indicated in the label.",
+        "type": "string",
+        "availableValues": [
+          {
+            "value": "markRequired",
+            "description": "Show \"*\" for required fields"
+          },
+          {
+            "value": "markOptional",
+            "description": "Show \"(Optional)\" for optional fields"
+          },
+          {
+            "value": "markBoth",
+            "description": "Show \"*\" for required AND \"(Optional)\" for optional fields"
+          }
+        ],
+        "isRequired": false
+      },
       "initialValue": {
         "description": "This property sets the component's initial value."
       },
@@ -6352,7 +6840,8 @@ export default {
       "fontWeight-FormItemLabel-required": "var(--xmlui-fontWeight-FormItemLabel-required)",
       "fontStyle-FormItemLabel-required": "var(--xmlui-fontStyle-FormItemLabel-required)",
       "textTransform-FormItemLabel-required": "var(--xmlui-textTransform-FormItemLabel-required)",
-      "textColor-FormItemLabel-requiredMark": "var(--xmlui-textColor-FormItemLabel-requiredMark)"
+      "textColor-FormItemLabel-requiredMark": "var(--xmlui-textColor-FormItemLabel-requiredMark)",
+      "textColor-FormItemLabel-optionalTag": "var(--xmlui-textColor-FormItemLabel-optionalTag)"
     },
     "defaultThemeVars": {
       "textColor-FormItemLabel": "$textColor",
@@ -6360,7 +6849,8 @@ export default {
       "fontWeight-FormItemLabel": "$fontWeight-medium",
       "fontStyle-FormItemLabel": "normal",
       "textTransform-FormItemLabel": "none",
-      "textColor-FormItemLabel-requiredMark": "$color-danger-400"
+      "textColor-FormItemLabel-requiredMark": "$color-danger-400",
+      "textColor-FormItemLabel-optionalTag": "$textColor-secondary"
     }
   },
   "FormSection": {
@@ -7470,6 +7960,7 @@ export default {
     },
     "defaultThemeVars": {
       "fontSize-H1": "$fontSize-2xl",
+      "lineHeight-H1": "$lineHeight-tight",
       "marginTop-H1": "0",
       "marginBottom-H1": "0",
       "fontSize-H1-markdown": "$fontSize-2xl",
@@ -7990,6 +8481,7 @@ export default {
     },
     "defaultThemeVars": {
       "fontSize-H2": "$fontSize-xl",
+      "lineHeight-H2": "$lineHeight-tight",
       "marginTop-H2": "0",
       "marginBottom-H2": "0",
       "fontSize-H2-markdown": "$fontSize-xl",
@@ -8510,6 +9002,7 @@ export default {
     },
     "defaultThemeVars": {
       "fontSize-H3": "$fontSize-lg",
+      "lineHeight-H3": "$lineHeight-tight",
       "marginTop-H3": "0",
       "marginBottom-H3": "0",
       "fontSize-H3-markdown": "$fontSize-lg",
@@ -9030,6 +9523,7 @@ export default {
     },
     "defaultThemeVars": {
       "fontSize-H4": "$fontSize-base",
+      "lineHeight-H4": "$lineHeight-tight",
       "marginTop-H4": "0",
       "marginBottom-H4": "0",
       "fontSize-H4-markdown": "$fontSize-base",
@@ -9550,6 +10044,7 @@ export default {
     },
     "defaultThemeVars": {
       "fontSize-H5": "$fontSize-sm",
+      "lineHeight-H5": "$lineHeight-tight",
       "marginTop-H5": "0",
       "marginBottom-H5": "0",
       "fontSize-H5-markdown": "$fontSize-sm",
@@ -10070,6 +10565,7 @@ export default {
     },
     "defaultThemeVars": {
       "fontSize-H6": "$fontSize-xs",
+      "lineHeight-H6": "$lineHeight-tight",
       "marginTop-H6": "0",
       "marginBottom-H6": "0",
       "fontSize-H6-markdown": "$fontSize-xs",
@@ -10398,6 +10894,26 @@ export default {
       },
       "icon": {
         "description": "This property allows you to add an optional icon (specify the icon's name) to the link."
+      },
+      "horizontalAlignment": {
+        "description": "Manages the horizontal content alignment for child elements in the Link.",
+        "availableValues": [
+          "start",
+          "center",
+          "end"
+        ],
+        "valueType": "string",
+        "defaultValue": "start"
+      },
+      "verticalAlignment": {
+        "description": "Manages the vertical content alignment for child elements in the Link.",
+        "availableValues": [
+          "start",
+          "center",
+          "end"
+        ],
+        "valueType": "string",
+        "defaultValue": "start"
       }
     },
     "events": {
@@ -10550,6 +11066,11 @@ export default {
         "type": "string",
         "defaultValue": "top"
       },
+      "fixedItemSize": {
+        "description": "When set to `true`, the list will measure the height of the first item and use that as a fixed size hint for all items. This improves scroll performance when all items have the same height. If items have varying heights, leave this as `false`.",
+        "type": "boolean",
+        "defaultValue": false
+      },
       "groupBy": {
         "description": "This property sets which data item property is used to group the list items. If not set, no grouping is done."
       },
@@ -10603,6 +11124,15 @@ export default {
       }
     },
     "childrenAsTemplate": "itemTemplate",
+    "events": {
+      "contextMenu": {
+        "description": "This event is triggered when the List is right-clicked (context menu).",
+        "signature": "contextMenu(event: MouseEvent): void",
+        "parameters": {
+          "event": "The mouse event object."
+        }
+      }
+    },
     "apis": {
       "scrollToTop": {
         "description": "This method scrolls the list to the top.",
@@ -10649,7 +11179,7 @@ export default {
       }
     },
     "themeVars": {
-      "backgroundColor-List": "var(--xmlui-backgroundColor-List)"
+      "backgroundColor-List2": "var(--xmlui-backgroundColor-List2)"
     },
     "defaultThemeVars": {
       "backgroundColor-List": "$backgroundColor"
@@ -10805,28 +11335,55 @@ export default {
       "fontSize-H1-markdown": "var(--xmlui-fontSize-H1-markdown)",
       "marginTop-H2-markdown": "var(--xmlui-marginTop-H2-markdown)",
       "marginBottom-H2-markdown": "var(--xmlui-marginBottom-H2-markdown)",
+      "fontSize-H2-markdown": "var(--xmlui-fontSize-H2-markdown)",
       "marginTop-H3-markdown": "var(--xmlui-marginTop-H3-markdown)",
       "marginBottom-H3-markdown": "var(--xmlui-marginBottom-H3-markdown)",
+      "fontSize-H3-markdown": "var(--xmlui-fontSize-H3-markdown)",
       "marginTop-H4-markdown": "var(--xmlui-marginTop-H4-markdown)",
       "marginBottom-H4-markdown": "var(--xmlui-marginBottom-H4-markdown)",
+      "fontSize-H4-markdown": "var(--xmlui-fontSize-H4-markdown)",
       "marginTop-H5-markdown": "var(--xmlui-marginTop-H5-markdown)",
       "marginBottom-H5-markdown": "var(--xmlui-marginBottom-H5-markdown)",
+      "fontSize-H5-markdown": "var(--xmlui-fontSize-H5-markdown)",
       "marginTop-H6-markdown": "var(--xmlui-marginTop-H6-markdown)",
       "marginBottom-H6-markdown": "var(--xmlui-marginBottom-H6-markdown)",
+      "fontSize-H6-markdown": "var(--xmlui-fontSize-H6-markdown)",
       "marginTop-Image-markdown": "var(--xmlui-marginTop-Image-markdown)",
       "marginBottom-Image-markdown": "var(--xmlui-marginBottom-Image-markdown)",
       "marginLeft-Image-markdown": "var(--xmlui-marginLeft-Image-markdown)",
       "marginRight-Image-markdown": "var(--xmlui-marginRight-Image-markdown)",
       "backgroundColor-Admonition-markdown-info": "var(--xmlui-backgroundColor-Admonition-markdown-info)",
       "borderColor-Admonition-markdown-info": "var(--xmlui-borderColor-Admonition-markdown-info)",
+      "borderWidth-Admonition-markdown-info": "var(--xmlui-borderWidth-Admonition-markdown-info)",
+      "borderStyle-Admonition-markdown-info": "var(--xmlui-borderStyle-Admonition-markdown-info)",
       "backgroundColor-Admonition-markdown-warning": "var(--xmlui-backgroundColor-Admonition-markdown-warning)",
       "borderColor-Admonition-markdown-warning": "var(--xmlui-borderColor-Admonition-markdown-warning)",
+      "borderWidth-Admonition-markdown-warning": "var(--xmlui-borderWidth-Admonition-markdown-warning)",
+      "borderStyle-Admonition-markdown-warning": "var(--xmlui-borderStyle-Admonition-markdown-warning)",
       "backgroundColor-Admonition-markdown-danger": "var(--xmlui-backgroundColor-Admonition-markdown-danger)",
       "borderColor-Admonition-markdown-danger": "var(--xmlui-borderColor-Admonition-markdown-danger)",
+      "borderWidth-Admonition-markdown-danger": "var(--xmlui-borderWidth-Admonition-markdown-danger)",
+      "borderStyle-Admonition-markdown-danger": "var(--xmlui-borderStyle-Admonition-markdown-danger)",
       "backgroundColor-Admonition-markdown-note": "var(--xmlui-backgroundColor-Admonition-markdown-note)",
       "borderColor-Admonition-markdown-note": "var(--xmlui-borderColor-Admonition-markdown-note)",
+      "borderWidth-Admonition-markdown-note": "var(--xmlui-borderWidth-Admonition-markdown-note)",
+      "borderStyle-Admonition-markdown-note": "var(--xmlui-borderStyle-Admonition-markdown-note)",
       "backgroundColor-Admonition-markdown-tip": "var(--xmlui-backgroundColor-Admonition-markdown-tip)",
       "borderColor-Admonition-markdown-tip": "var(--xmlui-borderColor-Admonition-markdown-tip)",
+      "borderWidth-Admonition-markdown-tip": "var(--xmlui-borderWidth-Admonition-markdown-tip)",
+      "borderStyle-Admonition-markdown-tip": "var(--xmlui-borderStyle-Admonition-markdown-tip)",
+      "backgroundColor-Admonition-markdown-card": "var(--xmlui-backgroundColor-Admonition-markdown-card)",
+      "borderColor-Admonition-markdown-card": "var(--xmlui-borderColor-Admonition-markdown-card)",
+      "borderWidth-Admonition-markdown-card": "var(--xmlui-borderWidth-Admonition-markdown-card)",
+      "borderStyle-Admonition-markdown-card": "var(--xmlui-borderStyle-Admonition-markdown-card)",
+      "backgroundColor-Admonition-markdown-feat": "var(--xmlui-backgroundColor-Admonition-markdown-feat)",
+      "borderColor-Admonition-markdown-feat": "var(--xmlui-borderColor-Admonition-markdown-feat)",
+      "borderWidth-Admonition-markdown-feat": "var(--xmlui-borderWidth-Admonition-markdown-feat)",
+      "borderStyle-Admonition-markdown-feat": "var(--xmlui-borderStyle-Admonition-markdown-feat)",
+      "backgroundColor-Admonition-markdown-def": "var(--xmlui-backgroundColor-Admonition-markdown-def)",
+      "borderColor-Admonition-markdown-def": "var(--xmlui-borderColor-Admonition-markdown-def)",
+      "borderWidth-Admonition-markdown-def": "var(--xmlui-borderWidth-Admonition-markdown-def)",
+      "borderStyle-Admonition-markdown-def": "var(--xmlui-borderStyle-Admonition-markdown-def)",
       "borderColor-HorizontalRule-markdown": "var(--xmlui-borderColor-HorizontalRule-markdown)",
       "borderStyle-HorizontalRule-markdown": "var(--xmlui-borderStyle-HorizontalRule-markdown)",
       "borderWidth-HorizontalRule-markdown": "var(--xmlui-borderWidth-HorizontalRule-markdown)",
@@ -11012,50 +11569,50 @@ export default {
       "borderStartEndRadius-Tr-markdown": "var(--xmlui-borderStartEndRadius-Tr-markdown, var(--xmlui-borderRadius-Tr-markdown))",
       "borderEndStartRadius-Tr-markdown": "var(--xmlui-borderEndStartRadius-Tr-markdown, var(--xmlui-borderRadius-Tr-markdown))",
       "borderEndEndRadius-Tr-markdown": "var(--xmlui-borderEndEndRadius-Tr-markdown, var(--xmlui-borderRadius-Tr-markdown))",
-      "backgroundColor-HtmlTd": "var(--xmlui-backgroundColor-HtmlTd)",
-      "text-align-HtmlTd": "var(--xmlui-text-align-HtmlTd)",
-      "verticalAlignment-HtmlTd": "var(--xmlui-verticalAlignment-HtmlTd)",
-      "fontSize-HtmlTd": "var(--xmlui-fontSize-HtmlTd)",
-      "fontWeight-HtmlTd": "var(--xmlui-fontWeight-HtmlTd)",
-      "border-HtmlTd": "var(--xmlui-border-HtmlTd)",
-      "borderHorizontal-HtmlTd": "var(--xmlui-borderHorizontal-HtmlTd, var(--xmlui-border-HtmlTd))",
-      "borderVertical-HtmlTd": "var(--xmlui-borderVertical-HtmlTd, var(--xmlui-border-HtmlTd))",
-      "borderLeft-HtmlTd": "var(--xmlui-borderLeft-HtmlTd, var(--xmlui-borderHorizontal-HtmlTd, var(--xmlui-border-HtmlTd)))",
-      "borderRight-HtmlTd": "var(--xmlui-borderRight-HtmlTd, var(--xmlui-borderHorizontal-HtmlTd, var(--xmlui-border-HtmlTd)))",
-      "borderTop-HtmlTd": "var(--xmlui-borderTop-HtmlTd, var(--xmlui-borderVertical-HtmlTd, var(--xmlui-border-HtmlTd)))",
-      "borderBottom-HtmlTd": "var(--xmlui-borderBottom-HtmlTd, var(--xmlui-borderVertical-HtmlTd, var(--xmlui-border-HtmlTd)))",
-      "borderWidth-HtmlTd": "var(--xmlui-borderWidth-HtmlTd)",
-      "borderHorizontalWidth-HtmlTd": "var(--xmlui-borderHorizontalWidth-HtmlTd, var(--xmlui-borderWidth-HtmlTd))",
-      "borderLeftWidth-HtmlTd": "var(--xmlui-borderLeftWidth-HtmlTd, var(--xmlui-borderHorizontalWidth-HtmlTd, var(--xmlui-borderWidth-HtmlTd)))",
-      "borderRightWidth-HtmlTd": "var(--xmlui-borderRightWidth-HtmlTd, var(--xmlui-borderHorizontalWidth-HtmlTd, var(--xmlui-borderWidth-HtmlTd)))",
-      "borderVerticalWidth-HtmlTd": "var(--xmlui-borderVerticalWidth-HtmlTd, var(--xmlui-borderWidth-HtmlTd))",
-      "borderTopWidth-HtmlTd": "var(--xmlui-borderTopWidth-HtmlTd, var(--xmlui-borderVerticalWidth-HtmlTd, var(--xmlui-borderWidth-HtmlTd)))",
-      "borderBottomWidth-HtmlTd": "var(--xmlui-borderBottomWidth-HtmlTd, var(--xmlui-borderVerticalWidth-HtmlTd, var(--xmlui-borderWidth-HtmlTd)))",
-      "borderStyle-HtmlTd": "var(--xmlui-borderStyle-HtmlTd)",
-      "borderHorizontalStyle-HtmlTd": "var(--xmlui-borderHorizontalStyle-HtmlTd, var(--xmlui-borderStyle-HtmlTd))",
-      "borderLeftStyle-HtmlTd": "var(--xmlui-borderLeftStyle-HtmlTd, var(--xmlui-borderHorizontalStyle-HtmlTd, var(--xmlui-borderStyle-HtmlTd)))",
-      "borderRightStyle-HtmlTd": "var(--xmlui-borderRightStyle-HtmlTd, var(--xmlui-borderHorizontalStyle-HtmlTd, var(--xmlui-borderStyle-HtmlTd)))",
-      "borderVerticalStyle-HtmlTd": "var(--xmlui-borderVerticalStyle-HtmlTd, var(--xmlui-borderStyle-HtmlTd))",
-      "borderTopStyle-HtmlTd": "var(--xmlui-borderTopStyle-HtmlTd, var(--xmlui-borderVerticalStyle-HtmlTd, var(--xmlui-borderStyle-HtmlTd)))",
-      "borderBottomStyle-HtmlTd": "var(--xmlui-borderBottomStyle-HtmlTd, var(--xmlui-borderVerticalStyle-HtmlTd, var(--xmlui-borderStyle-HtmlTd)))",
-      "borderColor-HtmlTd": "var(--xmlui-borderColor-HtmlTd)",
-      "borderHorizontalColor-HtmlTd": "var(--xmlui-borderHorizontalColor-HtmlTd, var(--xmlui-borderColor-HtmlTd))",
-      "borderLeftColor-HtmlTd": "var(--xmlui-borderLeftColor-HtmlTd, var(--xmlui-borderHorizontalColor-HtmlTd, var(--xmlui-borderColor-HtmlTd)))",
-      "borderRightColor-HtmlTd": "var(--xmlui-borderRightColor-HtmlTd, var(--xmlui-borderHorizontalColor-HtmlTd, var(--xmlui-borderColor-HtmlTd)))",
-      "borderVerticalColor-HtmlTd": "var(--xmlui-borderVerticalColor-HtmlTd, var(--xmlui-borderColor-HtmlTd))",
-      "borderTopColor-HtmlTd": "var(--xmlui-borderTopColor-HtmlTd, var(--xmlui-borderVerticalColor-HtmlTd, var(--xmlui-borderColor-HtmlTd)))",
-      "borderBottomColor-HtmlTd": "var(--xmlui-borderBottomColor-HtmlTd, var(--xmlui-borderVerticalColor-HtmlTd, var(--xmlui-borderColor-HtmlTd)))",
-      "borderStartStartRadius-HtmlTd": "var(--xmlui-borderStartStartRadius-HtmlTd, var(--xmlui-borderRadius-HtmlTd))",
-      "borderStartEndRadius-HtmlTd": "var(--xmlui-borderStartEndRadius-HtmlTd, var(--xmlui-borderRadius-HtmlTd))",
-      "borderEndStartRadius-HtmlTd": "var(--xmlui-borderEndStartRadius-HtmlTd, var(--xmlui-borderRadius-HtmlTd))",
-      "borderEndEndRadius-HtmlTd": "var(--xmlui-borderEndEndRadius-HtmlTd, var(--xmlui-borderRadius-HtmlTd))",
-      "padding-HtmlTd": "var(--xmlui-padding-HtmlTd)",
-      "paddingHorizontal-HtmlTd": "var(--xmlui-paddingHorizontal-HtmlTd, var(--xmlui-padding-HtmlTd))",
-      "paddingVertical-HtmlTd": "var(--xmlui-paddingVertical-HtmlTd, var(--xmlui-padding-HtmlTd))",
-      "paddingLeft-HtmlTd": "var(--xmlui-paddingLeft-HtmlTd, var(--xmlui-paddingHorizontal-HtmlTd, var(--xmlui-padding-HtmlTd)))",
-      "paddingRight-HtmlTd": "var(--xmlui-paddingRight-HtmlTd, var(--xmlui-paddingHorizontal-HtmlTd, var(--xmlui-padding-HtmlTd)))",
-      "paddingTop-HtmlTd": "var(--xmlui-paddingTop-HtmlTd, var(--xmlui-paddingVertical-HtmlTd, var(--xmlui-padding-HtmlTd)))",
-      "paddingBottom-HtmlTd": "var(--xmlui-paddingBottom-HtmlTd, var(--xmlui-paddingVertical-HtmlTd, var(--xmlui-padding-HtmlTd)))",
+      "backgroundColor-Td-markdown": "var(--xmlui-backgroundColor-Td-markdown)",
+      "textAlign-Td-markdown": "var(--xmlui-textAlign-Td-markdown)",
+      "verticalAlignment-Td-markdown": "var(--xmlui-verticalAlignment-Td-markdown)",
+      "fontSize-Td-markdown": "var(--xmlui-fontSize-Td-markdown)",
+      "fontWeight-Td-markdown": "var(--xmlui-fontWeight-Td-markdown)",
+      "border-Td-markdown": "var(--xmlui-border-Td-markdown)",
+      "borderHorizontal-Td-markdown": "var(--xmlui-borderHorizontal-Td-markdown, var(--xmlui-border-Td-markdown))",
+      "borderVertical-Td-markdown": "var(--xmlui-borderVertical-Td-markdown, var(--xmlui-border-Td-markdown))",
+      "borderLeft-Td-markdown": "var(--xmlui-borderLeft-Td-markdown, var(--xmlui-borderHorizontal-Td-markdown, var(--xmlui-border-Td-markdown)))",
+      "borderRight-Td-markdown": "var(--xmlui-borderRight-Td-markdown, var(--xmlui-borderHorizontal-Td-markdown, var(--xmlui-border-Td-markdown)))",
+      "borderTop-Td-markdown": "var(--xmlui-borderTop-Td-markdown, var(--xmlui-borderVertical-Td-markdown, var(--xmlui-border-Td-markdown)))",
+      "borderBottom-Td-markdown": "var(--xmlui-borderBottom-Td-markdown, var(--xmlui-borderVertical-Td-markdown, var(--xmlui-border-Td-markdown)))",
+      "borderWidth-Td-markdown": "var(--xmlui-borderWidth-Td-markdown)",
+      "borderHorizontalWidth-Td-markdown": "var(--xmlui-borderHorizontalWidth-Td-markdown, var(--xmlui-borderWidth-Td-markdown))",
+      "borderLeftWidth-Td-markdown": "var(--xmlui-borderLeftWidth-Td-markdown, var(--xmlui-borderHorizontalWidth-Td-markdown, var(--xmlui-borderWidth-Td-markdown)))",
+      "borderRightWidth-Td-markdown": "var(--xmlui-borderRightWidth-Td-markdown, var(--xmlui-borderHorizontalWidth-Td-markdown, var(--xmlui-borderWidth-Td-markdown)))",
+      "borderVerticalWidth-Td-markdown": "var(--xmlui-borderVerticalWidth-Td-markdown, var(--xmlui-borderWidth-Td-markdown))",
+      "borderTopWidth-Td-markdown": "var(--xmlui-borderTopWidth-Td-markdown, var(--xmlui-borderVerticalWidth-Td-markdown, var(--xmlui-borderWidth-Td-markdown)))",
+      "borderBottomWidth-Td-markdown": "var(--xmlui-borderBottomWidth-Td-markdown, var(--xmlui-borderVerticalWidth-Td-markdown, var(--xmlui-borderWidth-Td-markdown)))",
+      "borderStyle-Td-markdown": "var(--xmlui-borderStyle-Td-markdown)",
+      "borderHorizontalStyle-Td-markdown": "var(--xmlui-borderHorizontalStyle-Td-markdown, var(--xmlui-borderStyle-Td-markdown))",
+      "borderLeftStyle-Td-markdown": "var(--xmlui-borderLeftStyle-Td-markdown, var(--xmlui-borderHorizontalStyle-Td-markdown, var(--xmlui-borderStyle-Td-markdown)))",
+      "borderRightStyle-Td-markdown": "var(--xmlui-borderRightStyle-Td-markdown, var(--xmlui-borderHorizontalStyle-Td-markdown, var(--xmlui-borderStyle-Td-markdown)))",
+      "borderVerticalStyle-Td-markdown": "var(--xmlui-borderVerticalStyle-Td-markdown, var(--xmlui-borderStyle-Td-markdown))",
+      "borderTopStyle-Td-markdown": "var(--xmlui-borderTopStyle-Td-markdown, var(--xmlui-borderVerticalStyle-Td-markdown, var(--xmlui-borderStyle-Td-markdown)))",
+      "borderBottomStyle-Td-markdown": "var(--xmlui-borderBottomStyle-Td-markdown, var(--xmlui-borderVerticalStyle-Td-markdown, var(--xmlui-borderStyle-Td-markdown)))",
+      "borderColor-Td-markdown": "var(--xmlui-borderColor-Td-markdown)",
+      "borderHorizontalColor-Td-markdown": "var(--xmlui-borderHorizontalColor-Td-markdown, var(--xmlui-borderColor-Td-markdown))",
+      "borderLeftColor-Td-markdown": "var(--xmlui-borderLeftColor-Td-markdown, var(--xmlui-borderHorizontalColor-Td-markdown, var(--xmlui-borderColor-Td-markdown)))",
+      "borderRightColor-Td-markdown": "var(--xmlui-borderRightColor-Td-markdown, var(--xmlui-borderHorizontalColor-Td-markdown, var(--xmlui-borderColor-Td-markdown)))",
+      "borderVerticalColor-Td-markdown": "var(--xmlui-borderVerticalColor-Td-markdown, var(--xmlui-borderColor-Td-markdown))",
+      "borderTopColor-Td-markdown": "var(--xmlui-borderTopColor-Td-markdown, var(--xmlui-borderVerticalColor-Td-markdown, var(--xmlui-borderColor-Td-markdown)))",
+      "borderBottomColor-Td-markdown": "var(--xmlui-borderBottomColor-Td-markdown, var(--xmlui-borderVerticalColor-Td-markdown, var(--xmlui-borderColor-Td-markdown)))",
+      "borderStartStartRadius-Td-markdown": "var(--xmlui-borderStartStartRadius-Td-markdown, var(--xmlui-borderRadius-Td-markdown))",
+      "borderStartEndRadius-Td-markdown": "var(--xmlui-borderStartEndRadius-Td-markdown, var(--xmlui-borderRadius-Td-markdown))",
+      "borderEndStartRadius-Td-markdown": "var(--xmlui-borderEndStartRadius-Td-markdown, var(--xmlui-borderRadius-Td-markdown))",
+      "borderEndEndRadius-Td-markdown": "var(--xmlui-borderEndEndRadius-Td-markdown, var(--xmlui-borderRadius-Td-markdown))",
+      "padding-Td-markdown": "var(--xmlui-padding-Td-markdown)",
+      "paddingHorizontal-Td-markdown": "var(--xmlui-paddingHorizontal-Td-markdown, var(--xmlui-padding-Td-markdown))",
+      "paddingVertical-Td-markdown": "var(--xmlui-paddingVertical-Td-markdown, var(--xmlui-padding-Td-markdown))",
+      "paddingLeft-Td-markdown": "var(--xmlui-paddingLeft-Td-markdown, var(--xmlui-paddingHorizontal-Td-markdown, var(--xmlui-padding-Td-markdown)))",
+      "paddingRight-Td-markdown": "var(--xmlui-paddingRight-Td-markdown, var(--xmlui-paddingHorizontal-Td-markdown, var(--xmlui-padding-Td-markdown)))",
+      "paddingTop-Td-markdown": "var(--xmlui-paddingTop-Td-markdown, var(--xmlui-paddingVertical-Td-markdown, var(--xmlui-padding-Td-markdown)))",
+      "paddingBottom-Td-markdown": "var(--xmlui-paddingBottom-Td-markdown, var(--xmlui-paddingVertical-Td-markdown, var(--xmlui-padding-Td-markdown)))",
       "border-Ol-markdown": "var(--xmlui-border-Ol-markdown)",
       "borderHorizontal-Ol-markdown": "var(--xmlui-borderHorizontal-Ol-markdown, var(--xmlui-border-Ol-markdown))",
       "borderVertical-Ol-markdown": "var(--xmlui-borderVertical-Ol-markdown, var(--xmlui-border-Ol-markdown))",
@@ -11252,6 +11809,64 @@ export default {
       "grayscale": {
         "description": "This boolean property specifies whether images should be displayed in grayscale. If set to `true`, all images within the markdown will be rendered in grayscale.",
         "valueType": "boolean"
+      },
+      "truncateLinks": {
+        "description": "This boolean property specifies whether long links should be truncated with ellipsis. If set to `true`, links will be displayed with a maximum width and overflow will be hidden with text-overflow: ellipsis.",
+        "valueType": "boolean"
+      },
+      "openLinkInNewTab": {
+        "description": "This boolean property specifies whether links should open in a new tab. If set to `true`, all links within the markdown will open in a new tab with `target=\"_blank\"`. Links that explicitly specify their own target using the `| target=...` syntax will override this setting.",
+        "valueType": "boolean"
+      },
+      "breakMode": {
+        "description": "This property controls how text breaks into multiple lines. `normal` uses standard word boundaries, `word` breaks long words to prevent overflow, `anywhere` breaks at any character, `keep` prevents word breaking, and `hyphenate` uses automatic hyphenation. When not specified, uses the default browser behavior or theme variables.",
+        "valueType": "string",
+        "defaultValue": "normal",
+        "availableValues": [
+          {
+            "value": "normal",
+            "description": "Uses standard word boundaries for breaking"
+          },
+          {
+            "value": "word",
+            "description": "Breaks long words when necessary to prevent overflow"
+          },
+          {
+            "value": "anywhere",
+            "description": "Breaks at any character if needed to fit content"
+          },
+          {
+            "value": "keep",
+            "description": "Prevents breaking within words entirely"
+          },
+          {
+            "value": "hyphenate",
+            "description": "Uses automatic hyphenation when breaking words"
+          }
+        ]
+      },
+      "overflowMode": {
+        "description": "This property controls how text overflow is handled. `none` prevents wrapping and shows no overflow indicator, `ellipsis` shows ellipses when text is truncated, `scroll` forces single line with horizontal scrolling, and `flow` allows multi-line wrapping with vertical scrolling when needed. When not specified, uses the default text behavior.",
+        "valueType": "string",
+        "defaultValue": "not specified",
+        "availableValues": [
+          {
+            "value": "none",
+            "description": "No wrapping, text stays on a single line with no overflow indicator"
+          },
+          {
+            "value": "ellipsis",
+            "description": "Truncates with an ellipsis"
+          },
+          {
+            "value": "scroll",
+            "description": "Forces single line with horizontal scrolling when content overflows"
+          },
+          {
+            "value": "flow",
+            "description": "Allows text to wrap into multiple lines with vertical scrolling when container height is constrained"
+          }
+        ]
       }
     },
     "defaultThemeVars": {
@@ -11267,12 +11882,17 @@ export default {
       "marginBottom-H5-markdown": "$space-3",
       "marginTop-H6-markdown": "$space-4",
       "marginBottom-H6-markdown": "$space-2_5",
-      "backgroundColor-Admonition-markdown": "$color-primary-100",
-      "border-Admonition-markdown": "1px solid $color-primary-300",
+      "backgroundColor-Admonition-markdown": "$color-surface-100",
+      "border-Admonition-markdown": "0px solid $color-primary-300",
       "backgroundColor-Admonition-markdown-warning": "$color-warn-100",
       "borderColor-Admonition-markdown-warning": "$color-warn-300",
       "backgroundColor-Admonition-markdown-danger": "$color-danger-100",
       "borderColor-Admonition-markdown-danger": "$color-danger-300",
+      "backgroundColor-Admonition-markdown-card": "$color-surface-50",
+      "border-Admonition-markdown-card": "1px solid $color-surface-200",
+      "backgroundColor-Admonition-markdown-feat": "$color-surface-50",
+      "border-Admonition-markdown-feat": "1px solid $color-surface-200",
+      "backgroundColor-Admonition-markdown-def": "$color-surface-50",
       "borderRadius-Admonition-markdown": "$space-2",
       "size-icon-Admonition-markdown": "$space-5",
       "paddingLeft-Admonition-markdown": "$space-2",
@@ -11297,6 +11917,9 @@ export default {
       "fontWeight-Thead-markdown": "$fontWeight-bold",
       "padding-Th-markdown": "$space-2",
       "fontSize-Th-markdown": "$fontSize-sm",
+      "border-Tr-markdown": "1px solid $borderColor",
+      "padding-Td-markdown": "$space-2",
+      "verticalAlignment-Td-markdown": "top",
       "marginLeft-Ul-markdown": "$space-8",
       "marginRight-Ul-markdown": "$space-0",
       "marginTop-Ul-markdown": "$space-2_5",
@@ -11311,8 +11934,8 @@ export default {
       "marginBottom-Image-markdown": "$space-6",
       "marginLeft-Image-markdown": "$space-0",
       "marginRight-Image-markdown": "$space-0",
-      "marginTop-Text-markdown": "$space-3",
-      "marginBottom-Text-markdown": "$space-6",
+      "marginTop-Text-markdown": "$space-2",
+      "marginBottom-Text-markdown": "$space-2",
       "fontSize-Text-markdown": "$fontSize",
       "fontWeight-Text-markdown": "fontWeight-Text",
       "borderColor-HorizontalRule-markdown": "$borderColor",
@@ -11355,7 +11978,8 @@ export default {
       "marginBottom-MenuSeparator": "var(--xmlui-marginBottom-MenuSeparator)",
       "width-MenuSeparator": "var(--xmlui-width-MenuSeparator)",
       "height-MenuSeparator": "var(--xmlui-height-MenuSeparator)",
-      "color-MenuSeparator": "var(--xmlui-color-MenuSeparator)"
+      "color-MenuSeparator": "var(--xmlui-color-MenuSeparator)",
+      "maxWidth-MenuItem": "var(--xmlui-maxWidth-MenuItem)"
     },
     "limitThemeVarsToComponent": true,
     "defaultThemeVars": {
@@ -11365,6 +11989,21 @@ export default {
       "height-MenuSeparator": "1px",
       "color-MenuSeparator": "$borderColor-dropdown-item",
       "marginHorizontal-MenuSeparator": "12px"
+    }
+  },
+  "MessageListener": {
+    "status": "stable",
+    "nonVisual": true,
+    "description": "The `MessageListener` component listens for messages sent via the window.postMessage API from other windows or iframes. It does not render any UI of its own and passes through its children without adding wrapper elements, making it ideal for adding message listening capabilities without disrupting layout.",
+    "props": {},
+    "events": {
+      "messageReceived": {
+        "description": "This event fires when the `MessageListener` component receives a message from another window or iframe via the window.postMessage API.",
+        "signature": "(data: any) => void",
+        "parameters": {
+          "data": "The data sent from the other window via postMessage."
+        }
+      }
     }
   },
   "ModalDialog": {
@@ -11564,19 +12203,111 @@ export default {
         "description": "This Boolean property controls whether to hide the visual indicator for active and hovered states. When set to `true`, the indicator line will not be displayed on the `NavGroup` toggle button.",
         "valueType": "boolean",
         "defaultValue": false
+      },
+      "iconAlignment": {
+        "description": "This property controls the vertical alignment of the icon when the label text wraps to multiple lines. Set to `baseline` to align with the first line of text, `start` to align to the top, `center` for middle alignment (default), or `end` for bottom alignment.",
+        "valueType": "string",
+        "availableValues": [
+          {
+            "value": "baseline",
+            "description": "Align icon with the first line of text"
+          },
+          {
+            "value": "start",
+            "description": "Align icon to the top"
+          },
+          {
+            "value": "center",
+            "description": "Align icon to the center (default)"
+          },
+          {
+            "value": "end",
+            "description": "Align icon to the bottom"
+          }
+        ],
+        "defaultValue": "center"
+      },
+      "expandIconAlignment": {
+        "description": "This property controls the horizontal alignment of the expand/collapse arrow icon. Set to `start` to display the arrow immediately after the label, or `end` to push it to the right edge of the NavGroup (only applies when the NavGroup has a defined width).",
+        "valueType": "string",
+        "availableValues": [
+          {
+            "value": "start",
+            "description": "Display arrow immediately after the label (default)"
+          },
+          {
+            "value": "end",
+            "description": "Push arrow to the right edge of the NavGroup"
+          }
+        ],
+        "defaultValue": "start"
       }
     },
     "themeVars": {
+      "margin-NavGroup": "var(--xmlui-margin-NavGroup)",
+      "marginHorizontal-NavGroup": "var(--xmlui-marginHorizontal-NavGroup, var(--xmlui-margin-NavGroup))",
+      "marginVertical-NavGroup": "var(--xmlui-marginVertical-NavGroup, var(--xmlui-margin-NavGroup))",
+      "marginLeft-NavGroup": "var(--xmlui-marginLeft-NavGroup, var(--xmlui-marginHorizontal-NavGroup, var(--xmlui-margin-NavGroup)))",
+      "marginRight-NavGroup": "var(--xmlui-marginRight-NavGroup, var(--xmlui-marginHorizontal-NavGroup, var(--xmlui-margin-NavGroup)))",
+      "marginTop-NavGroup": "var(--xmlui-marginTop-NavGroup, var(--xmlui-marginVertical-NavGroup, var(--xmlui-margin-NavGroup)))",
+      "marginBottom-NavGroup": "var(--xmlui-marginBottom-NavGroup, var(--xmlui-marginVertical-NavGroup, var(--xmlui-margin-NavGroup)))",
+      "padding-NavGroup": "var(--xmlui-padding-NavGroup)",
+      "paddingHorizontal-NavGroup": "var(--xmlui-paddingHorizontal-NavGroup, var(--xmlui-padding-NavGroup))",
+      "paddingVertical-NavGroup": "var(--xmlui-paddingVertical-NavGroup, var(--xmlui-padding-NavGroup))",
+      "paddingLeft-NavGroup": "var(--xmlui-paddingLeft-NavGroup, var(--xmlui-paddingHorizontal-NavGroup, var(--xmlui-padding-NavGroup)))",
+      "paddingRight-NavGroup": "var(--xmlui-paddingRight-NavGroup, var(--xmlui-paddingHorizontal-NavGroup, var(--xmlui-padding-NavGroup)))",
+      "paddingTop-NavGroup": "var(--xmlui-paddingTop-NavGroup, var(--xmlui-paddingVertical-NavGroup, var(--xmlui-padding-NavGroup)))",
+      "paddingBottom-NavGroup": "var(--xmlui-paddingBottom-NavGroup, var(--xmlui-paddingVertical-NavGroup, var(--xmlui-padding-NavGroup)))",
       "backgroundColor-dropdown-NavGroup": "var(--xmlui-backgroundColor-dropdown-NavGroup)",
       "boxShadow-dropdown-NavGroup": "var(--xmlui-boxShadow-dropdown-NavGroup)",
       "borderRadius-dropdown-NavGroup": "var(--xmlui-borderRadius-dropdown-NavGroup)",
-      "minWidth-dropdown-NavGroup": "var(--xmlui-minWidth-dropdown-NavGroup)"
+      "minWidth-dropdown-NavGroup": "var(--xmlui-minWidth-dropdown-NavGroup)",
+      "marginTop-items-NavGroup": "var(--xmlui-marginTop-items-NavGroup)",
+      "marginBottom-items-NavGroup": "var(--xmlui-marginBottom-items-NavGroup)",
+      "expandIconAlignment-NavGroup": "var(--xmlui-expandIconAlignment-NavGroup)",
+      "padding-level1-NavGroup": "var(--xmlui-padding-level1-NavGroup, var(--xmlui-padding-NavGroup))",
+      "paddingHorizontal-level1-NavGroup": "var(--xmlui-paddingHorizontal-level1-NavGroup, var(--xmlui-paddingHorizontal-NavGroup, var(--xmlui-padding-NavGroup)))",
+      "paddingVertical-level1-NavGroup": "var(--xmlui-paddingVertical-level1-NavGroup, var(--xmlui-paddingVertical-NavGroup, var(--xmlui-padding-NavGroup)))",
+      "paddingLeft-level1-NavGroup": "var(--xmlui-paddingLeft-level1-NavGroup, var(--xmlui-paddingLeft-NavGroup, var(--xmlui-paddingHorizontal-NavGroup, var(--xmlui-padding-NavGroup))))",
+      "paddingRight-level1-NavGroup": "var(--xmlui-paddingRight-level1-NavGroup, var(--xmlui-paddingRight-NavGroup, var(--xmlui-paddingHorizontal-NavGroup, var(--xmlui-padding-NavGroup))))",
+      "paddingTop-level1-NavGroup": "var(--xmlui-paddingTop-level1-NavGroup, var(--xmlui-paddingTop-NavGroup, var(--xmlui-paddingVertical-NavGroup, var(--xmlui-padding-NavGroup))))",
+      "paddingBottom-level1-NavGroup": "var(--xmlui-paddingBottom-level1-NavGroup, var(--xmlui-paddingBottom-NavGroup, var(--xmlui-paddingVertical-NavGroup, var(--xmlui-padding-NavGroup))))",
+      "padding-level2-NavGroup": "var(--xmlui-padding-level2-NavGroup, var(--xmlui-padding-NavGroup))",
+      "paddingHorizontal-level2-NavGroup": "var(--xmlui-paddingHorizontal-level2-NavGroup, var(--xmlui-paddingHorizontal-NavGroup, var(--xmlui-padding-NavGroup)))",
+      "paddingVertical-level2-NavGroup": "var(--xmlui-paddingVertical-level2-NavGroup, var(--xmlui-paddingVertical-NavGroup, var(--xmlui-padding-NavGroup)))",
+      "paddingLeft-level2-NavGroup": "var(--xmlui-paddingLeft-level2-NavGroup, var(--xmlui-paddingLeft-NavGroup, var(--xmlui-paddingHorizontal-NavGroup, var(--xmlui-padding-NavGroup))))",
+      "paddingRight-level2-NavGroup": "var(--xmlui-paddingRight-level2-NavGroup, var(--xmlui-paddingRight-NavGroup, var(--xmlui-paddingHorizontal-NavGroup, var(--xmlui-padding-NavGroup))))",
+      "paddingTop-level2-NavGroup": "var(--xmlui-paddingTop-level2-NavGroup, var(--xmlui-paddingTop-NavGroup, var(--xmlui-paddingVertical-NavGroup, var(--xmlui-padding-NavGroup))))",
+      "paddingBottom-level2-NavGroup": "var(--xmlui-paddingBottom-level2-NavGroup, var(--xmlui-paddingBottom-NavGroup, var(--xmlui-paddingVertical-NavGroup, var(--xmlui-padding-NavGroup))))",
+      "padding-level3-NavGroup": "var(--xmlui-padding-level3-NavGroup, var(--xmlui-padding-NavGroup))",
+      "paddingHorizontal-level3-NavGroup": "var(--xmlui-paddingHorizontal-level3-NavGroup, var(--xmlui-paddingHorizontal-NavGroup, var(--xmlui-padding-NavGroup)))",
+      "paddingVertical-level3-NavGroup": "var(--xmlui-paddingVertical-level3-NavGroup, var(--xmlui-paddingVertical-NavGroup, var(--xmlui-padding-NavGroup)))",
+      "paddingLeft-level3-NavGroup": "var(--xmlui-paddingLeft-level3-NavGroup, var(--xmlui-paddingLeft-NavGroup, var(--xmlui-paddingHorizontal-NavGroup, var(--xmlui-padding-NavGroup))))",
+      "paddingRight-level3-NavGroup": "var(--xmlui-paddingRight-level3-NavGroup, var(--xmlui-paddingRight-NavGroup, var(--xmlui-paddingHorizontal-NavGroup, var(--xmlui-padding-NavGroup))))",
+      "paddingTop-level3-NavGroup": "var(--xmlui-paddingTop-level3-NavGroup, var(--xmlui-paddingTop-NavGroup, var(--xmlui-paddingVertical-NavGroup, var(--xmlui-padding-NavGroup))))",
+      "paddingBottom-level3-NavGroup": "var(--xmlui-paddingBottom-level3-NavGroup, var(--xmlui-paddingBottom-NavGroup, var(--xmlui-paddingVertical-NavGroup, var(--xmlui-padding-NavGroup))))",
+      "padding-level4-NavGroup": "var(--xmlui-padding-level4-NavGroup, var(--xmlui-padding-NavGroup))",
+      "paddingHorizontal-level4-NavGroup": "var(--xmlui-paddingHorizontal-level4-NavGroup, var(--xmlui-paddingHorizontal-NavGroup, var(--xmlui-padding-NavGroup)))",
+      "paddingVertical-level4-NavGroup": "var(--xmlui-paddingVertical-level4-NavGroup, var(--xmlui-paddingVertical-NavGroup, var(--xmlui-padding-NavGroup)))",
+      "paddingLeft-level4-NavGroup": "var(--xmlui-paddingLeft-level4-NavGroup, var(--xmlui-paddingLeft-NavGroup, var(--xmlui-paddingHorizontal-NavGroup, var(--xmlui-padding-NavGroup))))",
+      "paddingRight-level4-NavGroup": "var(--xmlui-paddingRight-level4-NavGroup, var(--xmlui-paddingRight-NavGroup, var(--xmlui-paddingHorizontal-NavGroup, var(--xmlui-padding-NavGroup))))",
+      "paddingTop-level4-NavGroup": "var(--xmlui-paddingTop-level4-NavGroup, var(--xmlui-paddingTop-NavGroup, var(--xmlui-paddingVertical-NavGroup, var(--xmlui-padding-NavGroup))))",
+      "paddingBottom-level4-NavGroup": "var(--xmlui-paddingBottom-level4-NavGroup, var(--xmlui-paddingBottom-NavGroup, var(--xmlui-paddingVertical-NavGroup, var(--xmlui-padding-NavGroup))))"
+    },
+    "themeVarDescriptions": {
+      "marginTop-items-NavGroup": "Sets the margin between the NavGroup header and the first child item. Does not affect margins between child items.",
+      "marginBottom-items-NavGroup": "Sets the margin after the last child item in the NavGroup."
     },
     "defaultThemeVars": {
       "backgroundColor-dropdown-NavGroup": "$backgroundColor-primary",
       "borderRadius-dropdown-NavGroup": "$borderRadius",
       "boxShadow-dropdown-NavGroup": "$boxShadow-spread",
-      "minWidth-dropdown-NavGroup": "11em"
+      "minWidth-dropdown-NavGroup": "11em",
+      "marginTop-items-NavGroup": "0",
+      "marginBottom-items-NavGroup": "0",
+      "expandIconAlignment-NavGroup": "start",
+      "paddingHorizontal-NavGroup": "$space-4",
+      "paddingVertical-NavGroup": "$space-2"
     }
   },
   "NavLink": {
@@ -11647,6 +12378,39 @@ export default {
       },
       "icon": {
         "description": "This property allows you to add an optional icon (specify the icon's name) to the navigation link."
+      },
+      "iconAlignment": {
+        "description": "This property controls the vertical alignment of the icon when the label text wraps to multiple lines. Set to `baseline` to align with the first line of text, `start` to align to the top, `center` for middle alignment (default), or `end` for bottom alignment.",
+        "valueType": "string",
+        "availableValues": [
+          {
+            "value": "baseline",
+            "description": "Align icon with the first line of text"
+          },
+          {
+            "value": "start",
+            "description": "Align icon to the top"
+          },
+          {
+            "value": "center",
+            "description": "Align icon to the center (default)"
+          },
+          {
+            "value": "end",
+            "description": "Align icon to the bottom"
+          }
+        ],
+        "defaultValue": "center"
+      },
+      "level": {
+        "description": "This property specifies the nesting level (1-4) for the navigation link, which affects its padding. Higher levels typically have more left padding to indicate hierarchy. When used inside a NavGroup, the level is automatically inherited from the group context.",
+        "valueType": "number",
+        "availableValues": [
+          1,
+          2,
+          3,
+          4
+        ]
       }
     },
     "events": {
@@ -11698,6 +12462,34 @@ export default {
       "borderStartEndRadius-NavLink": "var(--xmlui-borderStartEndRadius-NavLink, var(--xmlui-borderRadius-NavLink))",
       "borderEndStartRadius-NavLink": "var(--xmlui-borderEndStartRadius-NavLink, var(--xmlui-borderRadius-NavLink))",
       "borderEndEndRadius-NavLink": "var(--xmlui-borderEndEndRadius-NavLink, var(--xmlui-borderRadius-NavLink))",
+      "padding-level1-NavLink": "var(--xmlui-padding-level1-NavLink, var(--xmlui-padding-NavLink))",
+      "paddingHorizontal-level1-NavLink": "var(--xmlui-paddingHorizontal-level1-NavLink, var(--xmlui-paddingHorizontal-NavLink, var(--xmlui-padding-NavLink)))",
+      "paddingVertical-level1-NavLink": "var(--xmlui-paddingVertical-level1-NavLink, var(--xmlui-paddingVertical-NavLink, var(--xmlui-padding-NavLink)))",
+      "paddingLeft-level1-NavLink": "var(--xmlui-paddingLeft-level1-NavLink, var(--xmlui-paddingLeft-NavLink, var(--xmlui-paddingHorizontal-NavLink, var(--xmlui-padding-NavLink))))",
+      "paddingRight-level1-NavLink": "var(--xmlui-paddingRight-level1-NavLink, var(--xmlui-paddingRight-NavLink, var(--xmlui-paddingHorizontal-NavLink, var(--xmlui-padding-NavLink))))",
+      "paddingTop-level1-NavLink": "var(--xmlui-paddingTop-level1-NavLink, var(--xmlui-paddingTop-NavLink, var(--xmlui-paddingVertical-NavLink, var(--xmlui-padding-NavLink))))",
+      "paddingBottom-level1-NavLink": "var(--xmlui-paddingBottom-level1-NavLink, var(--xmlui-paddingBottom-NavLink, var(--xmlui-paddingVertical-NavLink, var(--xmlui-padding-NavLink))))",
+      "padding-level2-NavLink": "var(--xmlui-padding-level2-NavLink, var(--xmlui-padding-NavLink))",
+      "paddingHorizontal-level2-NavLink": "var(--xmlui-paddingHorizontal-level2-NavLink, var(--xmlui-paddingHorizontal-NavLink, var(--xmlui-padding-NavLink)))",
+      "paddingVertical-level2-NavLink": "var(--xmlui-paddingVertical-level2-NavLink, var(--xmlui-paddingVertical-NavLink, var(--xmlui-padding-NavLink)))",
+      "paddingLeft-level2-NavLink": "var(--xmlui-paddingLeft-level2-NavLink, var(--xmlui-paddingLeft-NavLink, var(--xmlui-paddingHorizontal-NavLink, var(--xmlui-padding-NavLink))))",
+      "paddingRight-level2-NavLink": "var(--xmlui-paddingRight-level2-NavLink, var(--xmlui-paddingRight-NavLink, var(--xmlui-paddingHorizontal-NavLink, var(--xmlui-padding-NavLink))))",
+      "paddingTop-level2-NavLink": "var(--xmlui-paddingTop-level2-NavLink, var(--xmlui-paddingTop-NavLink, var(--xmlui-paddingVertical-NavLink, var(--xmlui-padding-NavLink))))",
+      "paddingBottom-level2-NavLink": "var(--xmlui-paddingBottom-level2-NavLink, var(--xmlui-paddingBottom-NavLink, var(--xmlui-paddingVertical-NavLink, var(--xmlui-padding-NavLink))))",
+      "padding-level3-NavLink": "var(--xmlui-padding-level3-NavLink, var(--xmlui-padding-NavLink))",
+      "paddingHorizontal-level3-NavLink": "var(--xmlui-paddingHorizontal-level3-NavLink, var(--xmlui-paddingHorizontal-NavLink, var(--xmlui-padding-NavLink)))",
+      "paddingVertical-level3-NavLink": "var(--xmlui-paddingVertical-level3-NavLink, var(--xmlui-paddingVertical-NavLink, var(--xmlui-padding-NavLink)))",
+      "paddingLeft-level3-NavLink": "var(--xmlui-paddingLeft-level3-NavLink, var(--xmlui-paddingLeft-NavLink, var(--xmlui-paddingHorizontal-NavLink, var(--xmlui-padding-NavLink))))",
+      "paddingRight-level3-NavLink": "var(--xmlui-paddingRight-level3-NavLink, var(--xmlui-paddingRight-NavLink, var(--xmlui-paddingHorizontal-NavLink, var(--xmlui-padding-NavLink))))",
+      "paddingTop-level3-NavLink": "var(--xmlui-paddingTop-level3-NavLink, var(--xmlui-paddingTop-NavLink, var(--xmlui-paddingVertical-NavLink, var(--xmlui-padding-NavLink))))",
+      "paddingBottom-level3-NavLink": "var(--xmlui-paddingBottom-level3-NavLink, var(--xmlui-paddingBottom-NavLink, var(--xmlui-paddingVertical-NavLink, var(--xmlui-padding-NavLink))))",
+      "padding-level4-NavLink": "var(--xmlui-padding-level4-NavLink, var(--xmlui-padding-NavLink))",
+      "paddingHorizontal-level4-NavLink": "var(--xmlui-paddingHorizontal-level4-NavLink, var(--xmlui-paddingHorizontal-NavLink, var(--xmlui-padding-NavLink)))",
+      "paddingVertical-level4-NavLink": "var(--xmlui-paddingVertical-level4-NavLink, var(--xmlui-paddingVertical-NavLink, var(--xmlui-padding-NavLink)))",
+      "paddingLeft-level4-NavLink": "var(--xmlui-paddingLeft-level4-NavLink, var(--xmlui-paddingLeft-NavLink, var(--xmlui-paddingHorizontal-NavLink, var(--xmlui-padding-NavLink))))",
+      "paddingRight-level4-NavLink": "var(--xmlui-paddingRight-level4-NavLink, var(--xmlui-paddingRight-NavLink, var(--xmlui-paddingHorizontal-NavLink, var(--xmlui-padding-NavLink))))",
+      "paddingTop-level4-NavLink": "var(--xmlui-paddingTop-level4-NavLink, var(--xmlui-paddingTop-NavLink, var(--xmlui-paddingVertical-NavLink, var(--xmlui-padding-NavLink))))",
+      "paddingBottom-level4-NavLink": "var(--xmlui-paddingBottom-level4-NavLink, var(--xmlui-paddingBottom-NavLink, var(--xmlui-paddingVertical-NavLink, var(--xmlui-padding-NavLink))))",
       "backgroundColor-NavLink": "var(--xmlui-backgroundColor-NavLink)",
       "backgroundColor-NavLink--hover": "var(--xmlui-backgroundColor-NavLink--hover)",
       "backgroundColor-NavLink--hover--active": "var(--xmlui-backgroundColor-NavLink--hover--active)",
@@ -11724,13 +12516,17 @@ export default {
       "color-indicator-NavLink--hover": "var(--xmlui-color-indicator-NavLink--hover)",
       "color-indicator-NavLink--active": "var(--xmlui-color-indicator-NavLink--active)",
       "color-indicator-NavLink--pressed": "var(--xmlui-color-indicator-NavLink--pressed)",
+      "iconAlignment-NavLink": "var(--xmlui-iconAlignment-NavLink)",
+      "gap-icon-NavLink": "var(--xmlui-gap-icon-NavLink)",
       "outlineWidth-NavLink--focus": "var(--xmlui-outlineWidth-NavLink--focus)",
       "outlineColor-NavLink--focus": "var(--xmlui-outlineColor-NavLink--focus)",
       "outlineStyle-NavLink--focus": "var(--xmlui-outlineStyle-NavLink--focus)",
       "outlineOffset-NavLink--focus": "var(--xmlui-outlineOffset-NavLink--focus)"
     },
     "themeVarDescriptions": {
-      "color-indicator-NavLink": "Provides the following states: `--hover`, `--active`, `--pressed`"
+      "color-indicator-NavLink": "Provides the following states: `--hover`, `--active`, `--pressed`",
+      "iconAlignment-NavLink": "Sets the default vertical alignment of the icon when the label text wraps to multiple lines. Valid values: `baseline`, `start`, `center`, `end`",
+      "gap-icon-NavLink": "Sets the gap between the icon and the text label. Only applied when an icon is present."
     },
     "defaultThemeVars": {
       "border-NavLink": "0px solid $borderColor",
@@ -11750,6 +12546,7 @@ export default {
       "outlineOffset-NavLink--focus": "-1px",
       "borderRadius-indicator-NavLink": "$borderRadius",
       "color-icon-NavLink": "$color-surface-500",
+      "gap-icon-NavLink": "$space-3",
       "color-indicator-NavLink--active": "$color-primary-500",
       "color-indicator-NavLink--pressed": "$color-primary-500",
       "color-indicator-NavLink--hover": "$color-primary-600"
@@ -11764,6 +12561,9 @@ export default {
       },
       "content": {
         "description": "The content area within the NavPanel component."
+      },
+      "footer": {
+        "description": "Optional footer area at the bottom of the NavPanel (e.g. for theme switcher or layout toggle). Shown only when footerTemplate is set."
       }
     },
     "props": {
@@ -11771,10 +12571,30 @@ export default {
         "description": "This property defines the logo template to display in the navigation panel with the `vertical` and `vertical-sticky` layout.",
         "valueType": "ComponentDef"
       },
+      "footerTemplate": {
+        "description": "Optional template for a footer at the bottom of the NavPanel. When set, the footer is shown below the scrollable nav content (e.g. for theme switcher or sidebar toggle, similar to Nextra).",
+        "valueType": "ComponentDef"
+      },
       "inDrawer": {
         "description": "This property determines if the navigation panel is displayed in a drawer.",
         "valueType": "boolean",
         "defaultValue": false
+      },
+      "scrollStyle": {
+        "description": "This property determines the scrollbar style. Options: \"normal\" uses the browser's default scrollbar; \"overlay\" displays a themed scrollbar that is always visible; \"whenMouseOver\" shows the scrollbar only when hovering over the scroll container; \"whenScrolling\" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.",
+        "valueType": "string",
+        "availableValues": [
+          "normal",
+          "overlay",
+          "whenMouseOver",
+          "whenScrolling"
+        ],
+        "defaultValue": "normal"
+      },
+      "showScrollerFade": {
+        "description": "When enabled, displays gradient fade indicators at the top and bottom edges of the navigation panel when scrollable content extends beyond the visible area. The fade effect provides a visual cue to users that additional content is available by scrolling. The indicators automatically appear and disappear based on the scroll position. This property only works with \"overlay\", \"whenMouseOver\", and \"whenScrolling\" scroll styles.",
+        "valueType": "boolean",
+        "defaultValue": true
       }
     },
     "themeVars": {
@@ -11830,10 +12650,20 @@ export default {
       "paddingBottom-logo-NavPanel": "var(--xmlui-paddingBottom-logo-NavPanel, var(--xmlui-paddingVertical-logo-NavPanel, var(--xmlui-padding-logo-NavPanel)))",
       "marginBottom-logo-NavPanel": "var(--xmlui-marginBottom-logo-NavPanel)",
       "maxWidth-content-App": "var(--xmlui-maxWidth-content-App)",
+      "width-navPanel-App": "var(--xmlui-width-navPanel-App)",
+      "width-navPanel-collapsed-App": "var(--xmlui-width-navPanel-collapsed-App)",
       "height-AppHeader": "var(--xmlui-height-AppHeader)",
       "paddingVertical-AppHeader": "var(--xmlui-paddingVertical-AppHeader)",
       "alignment-content-AppHeader": "var(--xmlui-alignment-content-AppHeader)",
-      "horizontalAlignment-logo-NavPanel": "var(--xmlui-horizontalAlignment-logo-NavPanel)"
+      "horizontalAlignment-logo-NavPanel": "var(--xmlui-horizontalAlignment-logo-NavPanel)",
+      "borderColor-footer-NavPanel": "var(--xmlui-borderColor-footer-NavPanel)",
+      "padding-footer-NavPanel": "var(--xmlui-padding-footer-NavPanel)",
+      "paddingHorizontal-footer-NavPanel": "var(--xmlui-paddingHorizontal-footer-NavPanel, var(--xmlui-padding-footer-NavPanel))",
+      "paddingVertical-footer-NavPanel": "var(--xmlui-paddingVertical-footer-NavPanel, var(--xmlui-padding-footer-NavPanel))",
+      "paddingLeft-footer-NavPanel": "var(--xmlui-paddingLeft-footer-NavPanel, var(--xmlui-paddingHorizontal-footer-NavPanel, var(--xmlui-padding-footer-NavPanel)))",
+      "paddingRight-footer-NavPanel": "var(--xmlui-paddingRight-footer-NavPanel, var(--xmlui-paddingHorizontal-footer-NavPanel, var(--xmlui-padding-footer-NavPanel)))",
+      "paddingTop-footer-NavPanel": "var(--xmlui-paddingTop-footer-NavPanel, var(--xmlui-paddingVertical-footer-NavPanel, var(--xmlui-padding-footer-NavPanel)))",
+      "paddingBottom-footer-NavPanel": "var(--xmlui-paddingBottom-footer-NavPanel, var(--xmlui-paddingVertical-footer-NavPanel, var(--xmlui-padding-footer-NavPanel)))"
     },
     "limitThemeVarsToComponent": true,
     "defaultThemeVars": {
@@ -11847,7 +12677,10 @@ export default {
       "paddingVertical-logo-NavPanel": "$space-4",
       "paddingHorizontal-logo-NavPanel": "$space-4",
       "marginBottom-logo-NavPanel": "$space-4",
-      "boxShadow-NavPanel-vertical": "4px 0 4px 0 rgb(0 0 0 / 10%)"
+      "boxShadow-NavPanel-vertical": "4px 0 4px 0 rgb(0 0 0 / 10%)",
+      "padding-footer-NavPanel": "$space-2",
+      "paddingHorizontal-footer-NavPanel": "$space-4",
+      "paddingVertical-footer-NavPanel": "$space-2"
     }
   },
   "NoResult": {
@@ -11914,7 +12747,7 @@ export default {
       "backgroundColor-NoResult": "var(--xmlui-backgroundColor-NoResult)"
     },
     "defaultThemeVars": {
-      "backgroundColor-NoResult": "$backgroundColor",
+      "backgroundColor-NoResult": "transparent",
       "border-NoResult": "0px solid $borderColor",
       "paddingVertical-NoResult": "$space-2",
       "gap-icon-NoResult": "$space-2",
@@ -12048,6 +12881,18 @@ export default {
       "maxValue": {
         "description": "The maximum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.If not set, no maximum value check is done.",
         "defaultValue": 999999999999999
+      },
+      "verboseValidationFeedback": {
+        "description": "Enables a concise validation summary (icon) in input components.",
+        "type": "boolean"
+      },
+      "validationIconSuccess": {
+        "description": "Icon to display for valid state when concise validation summary is enabled.",
+        "type": "string"
+      },
+      "validationIconError": {
+        "description": "Icon to display for error state when concise validation summary is enabled.",
+        "type": "string"
       }
     },
     "events": {
@@ -12466,6 +13311,7 @@ export default {
     "themeVars": {
       "backgroundColor-ProgressBar": "var(--xmlui-backgroundColor-ProgressBar)",
       "color-indicator-ProgressBar": "var(--xmlui-color-indicator-ProgressBar)",
+      "color-indicator-ProgressBar--complete": "var(--xmlui-color-indicator-ProgressBar--complete)",
       "borderRadius-ProgressBar": "var(--xmlui-borderRadius-ProgressBar)",
       "borderRadius-indicator-ProgressBar": "var(--xmlui-borderRadius-indicator-ProgressBar)",
       "thickness-ProgressBar": "var(--xmlui-thickness-ProgressBar)"
@@ -12476,6 +13322,69 @@ export default {
       "thickness-ProgressBar": "0.5em",
       "backgroundColor-ProgressBar": "$color-surface-200",
       "color-indicator-ProgressBar": "$color-primary-500"
+    }
+  },
+  "QRCode": {
+    "status": "stable",
+    "description": "`QRCode` generates a scannable QR code from text, URLs, or any string value. It supports UTF-8 text including emoji and non-ASCII characters, customizable colors, sizes, and error correction levels. Perfect for sharing links, contact information, or any data that needs to be quickly scanned by mobile devices.",
+    "props": {
+      "value": {
+        "description": "This property specifies the text or data to encode in the QR code. The QR code can store up to 2953 characters according to the official QR specification. Supports UTF-8 text including emoji, Korean, Japanese, and other non-ASCII characters.",
+        "valueType": "string",
+        "required": true
+      },
+      "size": {
+        "description": "This property defines the intrinsic size of the QR code in pixels. The actual display size can be controlled using layout properties (width/height). This value affects the internal resolution and detail level of the generated QR code. If not specified, uses the `size-QRCode` theme variable, or defaults to 256.",
+        "valueType": "number",
+        "defaultValue": 256
+      },
+      "level": {
+        "description": "This property sets the error correction level of the QR code. Higher levels increase reliability but also increase the QR code density. 'L' = Low (7% recovery), 'M' = Medium (15% recovery), 'Q' = Quartile (25% recovery), 'H' = High (30% recovery).",
+        "availableValues": [
+          "L",
+          "M",
+          "Q",
+          "H"
+        ],
+        "valueType": "string",
+        "defaultValue": "L"
+      },
+      "color": {
+        "description": "This property sets the foreground color (the dark squares) of the QR code. Accepts any valid CSS color value (hex, rgb, color name).",
+        "valueType": "string",
+        "defaultValue": "#000000"
+      },
+      "backgroundColor": {
+        "description": "This property sets the background color (the light squares) of the QR code. Accepts any valid CSS color value (hex, rgb, color name). Note: QR codes should maintain good contrast for reliable scanning.",
+        "valueType": "string",
+        "defaultValue": "#FFFFFF"
+      },
+      "title": {
+        "description": "This property sets the accessible title attribute for the QR code SVG element. Improves accessibility by providing a text description for screen readers.",
+        "valueType": "string"
+      }
+    },
+    "events": {
+      "init": {
+        "description": "This event is triggered when the QRCode is about to be rendered for the first time.",
+        "signature": "init(): void",
+        "parameters": {}
+      }
+    },
+    "themeVars": {
+      "backgroundColor-QRCode": "var(--xmlui-backgroundColor-QRCode)",
+      "color-QRCode": "var(--xmlui-color-QRCode)",
+      "padding-QRCode": "var(--xmlui-padding-QRCode)",
+      "size-QRCode": "var(--xmlui-size-QRCode)"
+    },
+    "themeVarDescriptions": {
+      "size-QRCode": "Sets the default intrinsic size of the QR code in pixels. The size prop overrides this theme variable, which falls back to the default of 256. Must be a numeric string (e.g., \"256\", \"512\")."
+    },
+    "defaultThemeVars": {
+      "backgroundColor-QRCode": "#FFFFFF",
+      "color-QRCode": "#000000",
+      "padding-QRCode": "$space-4",
+      "size-QRCode": "256"
     }
   },
   "Queue": {
@@ -12643,6 +13552,19 @@ export default {
         "signature": "didChange(newValue: any): void",
         "parameters": {
           "newValue": "The new value of the component."
+        }
+      }
+    },
+    "apis": {
+      "value": {
+        "description": "This API retrieves the current value of the `RadioGroup`. You can use it to get the value programmatically.",
+        "signature": "get value(): string | undefined"
+      },
+      "setValue": {
+        "description": "This API sets the value of the `RadioGroup`. You can use it to programmatically change the value.",
+        "signature": "setValue(value: string): void",
+        "parameters": {
+          "value": "The new value to set."
         }
       }
     },
@@ -12829,6 +13751,126 @@ export default {
       "margin-ResponsiveBar": "0"
     }
   },
+  "ScrollViewer": {
+    "status": "stable",
+    "description": "`ScrollViewer` is a simple layout container that stretches to fill its parent's viewport and provides customizable scrollbar styles for scrollable content. It supports four scrollbar modes: normal (standard browser scrollbars), overlay (themed scrollbars always visible), whenMouseOver (scrollbars appear on hover), and whenScrolling (scrollbars appear during scrolling).",
+    "props": {
+      "scrollStyle": {
+        "description": "This property determines the scrollbar style and behavior. `normal` uses the standard browser scrollbar. `overlay` uses themed scrollbars that are always visible and can be customized via theme variables. `whenMouseOver` shows overlay scrollbars that appear when the mouse hovers over the scroll area and hide after 200ms when the mouse leaves. `whenScrolling` shows overlay scrollbars only during active scrolling and hides them after 400ms of inactivity.",
+        "valueType": "string",
+        "allowedValues": [
+          "normal",
+          "overlay",
+          "whenMouseOver",
+          "whenScrolling"
+        ],
+        "defaultValue": "normal"
+      },
+      "showScrollerFade": {
+        "description": "When enabled, displays gradient fade indicators at the top and bottom of the scroll container to visually indicate that more content is available in those directions. The fade indicators automatically appear/disappear based on the current scroll position. Top fade shows when scrolled down from the top, bottom fade shows when not at the bottom. Only works with overlay scrollbar modes (not with `normal` mode).",
+        "valueType": "boolean",
+        "defaultValue": true
+      }
+    },
+    "themeVars": {
+      "size-Scroller": "var(--xmlui-size-Scroller)",
+      "padding-perpendicular-Scroller": "var(--xmlui-padding-perpendicular-Scroller)",
+      "padding-axis-Scroller": "var(--xmlui-padding-axis-Scroller)",
+      "borderRadius-track-Scroller": "var(--xmlui-borderRadius-track-Scroller)",
+      "backgroundColor-track-Scroller": "var(--xmlui-backgroundColor-track-Scroller)",
+      "backgroundColor-track-Scroller--hover": "var(--xmlui-backgroundColor-track-Scroller--hover)",
+      "backgroundColor-track-Scroller--active": "var(--xmlui-backgroundColor-track-Scroller--active)",
+      "border-track-Scroller": "var(--xmlui-border-track-Scroller)",
+      "border-track-Scroller--hover": "var(--xmlui-border-track-Scroller--hover)",
+      "border-track-Scroller--active": "var(--xmlui-border-track-Scroller--active)",
+      "borderRadius-handle-Scroller": "var(--xmlui-borderRadius-handle-Scroller)",
+      "backgroundColor-handle-Scroller": "var(--xmlui-backgroundColor-handle-Scroller)",
+      "backgroundColor-handle-Scroller--hover": "var(--xmlui-backgroundColor-handle-Scroller--hover)",
+      "backgroundColor-handle-Scroller--active": "var(--xmlui-backgroundColor-handle-Scroller--active)",
+      "border-handle-Scroller": "var(--xmlui-border-handle-Scroller)",
+      "border-handle-Scroller--hover": "var(--xmlui-border-handle-Scroller--hover)",
+      "border-handle-Scroller--active": "var(--xmlui-border-handle-Scroller--active)",
+      "minSize-handle-Scroller": "var(--xmlui-minSize-handle-Scroller)",
+      "maxSize-handle-Scroller": "var(--xmlui-maxSize-handle-Scroller)",
+      "size-perpendicularHandle-Scroller": "var(--xmlui-size-perpendicularHandle-Scroller)",
+      "size-perpendicularHandle-Scroller--hover": "var(--xmlui-size-perpendicularHandle-Scroller--hover)",
+      "size-perpendicularHandle-Scroller--active": "var(--xmlui-size-perpendicularHandle-Scroller--active)",
+      "offset-handleInteractiveArea-Scroller": "var(--xmlui-offset-handleInteractiveArea-Scroller)",
+      "transition-Scroller": "var(--xmlui-transition-Scroller)",
+      "transition-track-Scroller": "var(--xmlui-transition-track-Scroller)",
+      "transition-handle-Scroller": "var(--xmlui-transition-handle-Scroller)",
+      "height-fade-Scroller": "var(--xmlui-height-fade-Scroller)",
+      "backgroundColor-fade-Scroller": "var(--xmlui-backgroundColor-fade-Scroller)",
+      "transition-fade-Scroller": "var(--xmlui-transition-fade-Scroller)"
+    },
+    "themeVarDescriptions": {
+      "size-Scroller": "The width (for vertical scrollbars) or height (for horizontal scrollbars) of the scrollbar",
+      "padding-perpendicular-Scroller": "The padding perpendicular to the scroll direction (e.g., top/bottom padding for vertical scrollbars)",
+      "padding-axis-Scroller": "The padding along the scroll direction (e.g., left/right padding for vertical scrollbars)",
+      "borderRadius-track-Scroller": "The border radius of the scrollbar track (the background area where the handle moves)",
+      "backgroundColor-track-Scroller": "The background color of the scrollbar track in its default state",
+      "backgroundColor-track-Scroller--hover": "The background color of the scrollbar track when hovered",
+      "backgroundColor-track-Scroller--active": "The background color of the scrollbar track when active/pressed",
+      "border-track-Scroller": "The border of the scrollbar track in its default state",
+      "border-track-Scroller--hover": "The border of the scrollbar track when hovered",
+      "border-track-Scroller--active": "The border of the scrollbar track when active/pressed",
+      "borderRadius-handle-Scroller": "The border radius of the scrollbar handle (the draggable thumb)",
+      "backgroundColor-handle-Scroller": "The background color of the scrollbar handle in its default state",
+      "backgroundColor-handle-Scroller--hover": "The background color of the scrollbar handle when hovered",
+      "backgroundColor-handle-Scroller--active": "The background color of the scrollbar handle when active/being dragged",
+      "border-handle-Scroller": "The border of the scrollbar handle in its default state",
+      "border-handle-Scroller--hover": "The border of the scrollbar handle when hovered",
+      "border-handle-Scroller--active": "The border of the scrollbar handle when active/being dragged",
+      "minSize-handle-Scroller": "The minimum size (width/height) of the scrollbar handle",
+      "maxSize-handle-Scroller": "The maximum size (width/height) of the scrollbar handle, or 'none' for no limit",
+      "size-perpendicularHandle-Scroller": "The size of the handle perpendicular to scroll direction (e.g., width of handle for vertical scrollbar) in default state",
+      "size-perpendicularHandle-Scroller--hover": "The size of the handle perpendicular to scroll direction when hovered",
+      "size-perpendicularHandle-Scroller--active": "The size of the handle perpendicular to scroll direction when active/being dragged",
+      "offset-handleInteractiveArea-Scroller": "Additional offset for the interactive area around the handle to make it easier to grab",
+      "transition-Scroller": "CSS transition for the scrollbar container (opacity, visibility, position changes)",
+      "transitionTrack-Scroller": "CSS transition for the scrollbar track (opacity, background-color, border-color)",
+      "transitionHandle-Scroller": "CSS transition for the scrollbar handle (opacity, background-color, border-color, size changes)",
+      "height-fade-Scroller": "The height of the fade overlay gradients at the top and bottom of the scroll container",
+      "backgroundColor-fadeTop-Scroller": "The background gradient for the top fade overlay (typically a gradient from opaque to transparent)",
+      "backgroundColor-fadeBottom-Scroller": "The background gradient for the bottom fade overlay (typically a gradient from transparent to opaque)",
+      "transition-fade-Scroller": "CSS transition for the fade overlays (opacity changes)",
+      "autoHideDelay-whenMouseOver-Scroller": "Delay in milliseconds before hiding scrollbar after mouse leaves in whenMouseOver mode",
+      "autoHideDelay-whenScrolling-Scroller": "Delay in milliseconds before hiding scrollbar after scrolling stops in whenScrolling mode"
+    },
+    "defaultThemeVars": {
+      "size-Scroller": "10px",
+      "padding-perpendicular-Scroller": "2px",
+      "padding-axis-Scroller": "2px",
+      "borderRadius-track-Scroller": "2px",
+      "backgroundColor-track-Scroller": "transparent",
+      "backgroundColor-track-Scroller--hover": "transparent",
+      "backgroundColor-track-Scroller--active": "transparent",
+      "border-track-Scroller": "none",
+      "border-track-Scroller--hover": "none",
+      "border-track-Scroller--active": "none",
+      "borderRadius-handle-Scroller": "10px",
+      "backgroundColor-handle-Scroller": "$color-surface-200",
+      "backgroundColor-handle-Scroller--hover": "$color-surface-400",
+      "backgroundColor-handle-Scroller--active": "$color-surface-400",
+      "border-handle-Scroller": "none",
+      "border-handle-Scroller--hover": "none",
+      "border-handle-Scroller--active": "none",
+      "minSize-handle-Scroller": "33px",
+      "maxSize-handle-Scroller": "none",
+      "size-perpendicularHandle-Scroller": "100%",
+      "size-perpendicularHandle-Scroller--hover": "100%",
+      "size-perpendicularHandle-Scroller--active": "100%",
+      "offset-handleInteractiveArea-Scroller": "4px",
+      "transition-Scroller": "opacity 0.15s, visibility 0.15s, top 0.15s, right 0.15s, bottom 0.15s, left 0.15s",
+      "transitionTrack-Scroller": "opacity 0.15s, background-color 0.15s, border-color 0.15s",
+      "transitionHandle-Scroller": "opacity 0.15s, background-color 0.15s, border-color 0.15s, height 0.15s, width 0.15s",
+      "height-fade-Scroller": "64px",
+      "backgroundColor-fade-Scroller": "rgb(from $color-surface-0 r g b / 0.75)",
+      "transition-fade-Scroller": "opacity 0.3s ease-in-out",
+      "autoHideDelay-whenMouseOver-Scroller": "400",
+      "autoHideDelay-whenScrolling-Scroller": "400"
+    }
+  },
   "Select": {
     "status": "stable",
     "description": "`Select` provides a dropdown interface for choosing from a list of options, supporting both single and multiple selection modes. It offers extensive customization capabilities including search functionality, custom templates, and comprehensive form integration.",
@@ -12950,6 +13992,18 @@ export default {
       "ungroupedHeaderTemplate": {
         "description": "Enables the customization of how the ungrouped options header is displayed in the dropdown. If not provided, ungrouped options will not have a header.",
         "valueType": "ComponentDef"
+      },
+      "verboseValidationFeedback": {
+        "description": "Enables a concise validation summary (icon) in input components.",
+        "type": "boolean"
+      },
+      "validationIconSuccess": {
+        "description": "Icon to display for valid state when concise validation summary is enabled.",
+        "type": "string"
+      },
+      "validationIconError": {
+        "description": "Icon to display for error state when concise validation summary is enabled.",
+        "type": "string"
       }
     },
     "events": {
@@ -13899,6 +14953,22 @@ export default {
         "description": "Reserved for future use",
         "isInternal": true,
         "defaultValue": false
+      },
+      "scrollStyle": {
+        "description": "This property determines the scrollbar style. Options: \"normal\" uses the browser's default scrollbar; \"overlay\" displays a themed scrollbar that is always visible; \"whenMouseOver\" shows the scrollbar only when hovering over the scroll container; \"whenScrolling\" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.",
+        "valueType": "string",
+        "availableValues": [
+          "normal",
+          "overlay",
+          "whenMouseOver",
+          "whenScrolling"
+        ],
+        "defaultValue": "normal"
+      },
+      "showScrollerFade": {
+        "description": "When enabled, displays gradient fade indicators at the top and bottom of the scroll container to visually indicate that more content is available in those directions. The fade indicators automatically appear/disappear based on the current scroll position. Top fade shows when scrolled down from the top, bottom fade shows when not at the bottom. Only works with overlay scrollbar modes (not with 'normal' mode).",
+        "valueType": "boolean",
+        "defaultValue": true
       }
     },
     "events": {
@@ -13909,11 +14979,36 @@ export default {
           "event": "The mouse event object."
         }
       },
+      "contextMenu": {
+        "description": "This event is triggered when the Stack is right-clicked (context menu).",
+        "signature": "contextMenu(event: MouseEvent): void",
+        "parameters": {
+          "event": "The mouse event object."
+        }
+      },
       "mounted": {
         "description": "Reserved for future use",
         "signature": "mounted(): void",
         "parameters": {},
         "isInternal": true
+      }
+    },
+    "apis": {
+      "scrollToTop": {
+        "description": "Scrolls the Stack container to the top. Works when the Stack has an explicit height and overflowY is set to 'scroll'.",
+        "signature": "scrollToTop(behavior?: 'auto' | 'instant' | 'smooth'): void"
+      },
+      "scrollToBottom": {
+        "description": "Scrolls the Stack container to the bottom. Works when the Stack has an explicit height and overflowY is set to 'scroll'.",
+        "signature": "scrollToBottom(behavior?: 'auto' | 'instant' | 'smooth'): void"
+      },
+      "scrollToStart": {
+        "description": "Scrolls the Stack container to the start (left in LTR, right in RTL). Works when the Stack has an explicit width and overflowX is set to 'scroll'.",
+        "signature": "scrollToStart(behavior?: 'auto' | 'instant' | 'smooth'): void"
+      },
+      "scrollToEnd": {
+        "description": "Scrolls the Stack container to the end (right in LTR, left in RTL). Works when the Stack has an explicit width and overflowX is set to 'scroll'.",
+        "signature": "scrollToEnd(behavior?: 'auto' | 'instant' | 'smooth'): void"
       }
     },
     "themeVars": []
@@ -13975,6 +15070,22 @@ export default {
         "description": "Reserved for future use",
         "isInternal": true,
         "defaultValue": false
+      },
+      "scrollStyle": {
+        "description": "This property determines the scrollbar style. Options: \"normal\" uses the browser's default scrollbar; \"overlay\" displays a themed scrollbar that is always visible; \"whenMouseOver\" shows the scrollbar only when hovering over the scroll container; \"whenScrolling\" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.",
+        "valueType": "string",
+        "availableValues": [
+          "normal",
+          "overlay",
+          "whenMouseOver",
+          "whenScrolling"
+        ],
+        "defaultValue": "normal"
+      },
+      "showScrollerFade": {
+        "description": "When enabled, displays gradient fade indicators at the top and bottom of the scroll container to visually indicate that more content is available in those directions. The fade indicators automatically appear/disappear based on the current scroll position. Top fade shows when scrolled down from the top, bottom fade shows when not at the bottom. Only works with overlay scrollbar modes (not with 'normal' mode).",
+        "valueType": "boolean",
+        "defaultValue": true
       }
     },
     "events": {
@@ -13985,11 +15096,36 @@ export default {
           "event": "The mouse event object."
         }
       },
+      "contextMenu": {
+        "description": "This event is triggered when the Stack is right-clicked (context menu).",
+        "signature": "contextMenu(event: MouseEvent): void",
+        "parameters": {
+          "event": "The mouse event object."
+        }
+      },
       "mounted": {
         "description": "Reserved for future use",
         "signature": "mounted(): void",
         "parameters": {},
         "isInternal": true
+      }
+    },
+    "apis": {
+      "scrollToTop": {
+        "description": "Scrolls the Stack container to the top. Works when the Stack has an explicit height and overflowY is set to 'scroll'.",
+        "signature": "scrollToTop(behavior?: 'auto' | 'instant' | 'smooth'): void"
+      },
+      "scrollToBottom": {
+        "description": "Scrolls the Stack container to the bottom. Works when the Stack has an explicit height and overflowY is set to 'scroll'.",
+        "signature": "scrollToBottom(behavior?: 'auto' | 'instant' | 'smooth'): void"
+      },
+      "scrollToStart": {
+        "description": "Scrolls the Stack container to the start (left in LTR, right in RTL). Works when the Stack has an explicit width and overflowX is set to 'scroll'.",
+        "signature": "scrollToStart(behavior?: 'auto' | 'instant' | 'smooth'): void"
+      },
+      "scrollToEnd": {
+        "description": "Scrolls the Stack container to the end (right in LTR, left in RTL). Works when the Stack has an explicit width and overflowX is set to 'scroll'.",
+        "signature": "scrollToEnd(behavior?: 'auto' | 'instant' | 'smooth'): void"
       }
     },
     "themeVars": [],
@@ -14052,6 +15188,22 @@ export default {
         "description": "Reserved for future use",
         "isInternal": true,
         "defaultValue": false
+      },
+      "scrollStyle": {
+        "description": "This property determines the scrollbar style. Options: \"normal\" uses the browser's default scrollbar; \"overlay\" displays a themed scrollbar that is always visible; \"whenMouseOver\" shows the scrollbar only when hovering over the scroll container; \"whenScrolling\" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.",
+        "valueType": "string",
+        "availableValues": [
+          "normal",
+          "overlay",
+          "whenMouseOver",
+          "whenScrolling"
+        ],
+        "defaultValue": "normal"
+      },
+      "showScrollerFade": {
+        "description": "When enabled, displays gradient fade indicators at the top and bottom of the scroll container to visually indicate that more content is available in those directions. The fade indicators automatically appear/disappear based on the current scroll position. Top fade shows when scrolled down from the top, bottom fade shows when not at the bottom. Only works with overlay scrollbar modes (not with 'normal' mode).",
+        "valueType": "boolean",
+        "defaultValue": true
       }
     },
     "events": {
@@ -14062,11 +15214,36 @@ export default {
           "event": "The mouse event object."
         }
       },
+      "contextMenu": {
+        "description": "This event is triggered when the Stack is right-clicked (context menu).",
+        "signature": "contextMenu(event: MouseEvent): void",
+        "parameters": {
+          "event": "The mouse event object."
+        }
+      },
       "mounted": {
         "description": "Reserved for future use",
         "signature": "mounted(): void",
         "parameters": {},
         "isInternal": true
+      }
+    },
+    "apis": {
+      "scrollToTop": {
+        "description": "Scrolls the Stack container to the top. Works when the Stack has an explicit height and overflowY is set to 'scroll'.",
+        "signature": "scrollToTop(behavior?: 'auto' | 'instant' | 'smooth'): void"
+      },
+      "scrollToBottom": {
+        "description": "Scrolls the Stack container to the bottom. Works when the Stack has an explicit height and overflowY is set to 'scroll'.",
+        "signature": "scrollToBottom(behavior?: 'auto' | 'instant' | 'smooth'): void"
+      },
+      "scrollToStart": {
+        "description": "Scrolls the Stack container to the start (left in LTR, right in RTL). Works when the Stack has an explicit width and overflowX is set to 'scroll'.",
+        "signature": "scrollToStart(behavior?: 'auto' | 'instant' | 'smooth'): void"
+      },
+      "scrollToEnd": {
+        "description": "Scrolls the Stack container to the end (right in LTR, left in RTL). Works when the Stack has an explicit width and overflowX is set to 'scroll'.",
+        "signature": "scrollToEnd(behavior?: 'auto' | 'instant' | 'smooth'): void"
       }
     },
     "themeVars": [],
@@ -14129,6 +15306,22 @@ export default {
         "description": "Reserved for future use",
         "isInternal": true,
         "defaultValue": false
+      },
+      "scrollStyle": {
+        "description": "This property determines the scrollbar style. Options: \"normal\" uses the browser's default scrollbar; \"overlay\" displays a themed scrollbar that is always visible; \"whenMouseOver\" shows the scrollbar only when hovering over the scroll container; \"whenScrolling\" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.",
+        "valueType": "string",
+        "availableValues": [
+          "normal",
+          "overlay",
+          "whenMouseOver",
+          "whenScrolling"
+        ],
+        "defaultValue": "normal"
+      },
+      "showScrollerFade": {
+        "description": "When enabled, displays gradient fade indicators at the top and bottom of the scroll container to visually indicate that more content is available in those directions. The fade indicators automatically appear/disappear based on the current scroll position. Top fade shows when scrolled down from the top, bottom fade shows when not at the bottom. Only works with overlay scrollbar modes (not with 'normal' mode).",
+        "valueType": "boolean",
+        "defaultValue": true
       }
     },
     "events": {
@@ -14139,11 +15332,36 @@ export default {
           "event": "The mouse event object."
         }
       },
+      "contextMenu": {
+        "description": "This event is triggered when the Stack is right-clicked (context menu).",
+        "signature": "contextMenu(event: MouseEvent): void",
+        "parameters": {
+          "event": "The mouse event object."
+        }
+      },
       "mounted": {
         "description": "Reserved for future use",
         "signature": "mounted(): void",
         "parameters": {},
         "isInternal": true
+      }
+    },
+    "apis": {
+      "scrollToTop": {
+        "description": "Scrolls the Stack container to the top. Works when the Stack has an explicit height and overflowY is set to 'scroll'.",
+        "signature": "scrollToTop(behavior?: 'auto' | 'instant' | 'smooth'): void"
+      },
+      "scrollToBottom": {
+        "description": "Scrolls the Stack container to the bottom. Works when the Stack has an explicit height and overflowY is set to 'scroll'.",
+        "signature": "scrollToBottom(behavior?: 'auto' | 'instant' | 'smooth'): void"
+      },
+      "scrollToStart": {
+        "description": "Scrolls the Stack container to the start (left in LTR, right in RTL). Works when the Stack has an explicit width and overflowX is set to 'scroll'.",
+        "signature": "scrollToStart(behavior?: 'auto' | 'instant' | 'smooth'): void"
+      },
+      "scrollToEnd": {
+        "description": "Scrolls the Stack container to the end (right in LTR, left in RTL). Works when the Stack has an explicit width and overflowX is set to 'scroll'.",
+        "signature": "scrollToEnd(behavior?: 'auto' | 'instant' | 'smooth'): void"
       }
     },
     "themeVars": [],
@@ -14206,6 +15424,22 @@ export default {
         "description": "Reserved for future use",
         "isInternal": true,
         "defaultValue": false
+      },
+      "scrollStyle": {
+        "description": "This property determines the scrollbar style. Options: \"normal\" uses the browser's default scrollbar; \"overlay\" displays a themed scrollbar that is always visible; \"whenMouseOver\" shows the scrollbar only when hovering over the scroll container; \"whenScrolling\" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.",
+        "valueType": "string",
+        "availableValues": [
+          "normal",
+          "overlay",
+          "whenMouseOver",
+          "whenScrolling"
+        ],
+        "defaultValue": "normal"
+      },
+      "showScrollerFade": {
+        "description": "When enabled, displays gradient fade indicators at the top and bottom of the scroll container to visually indicate that more content is available in those directions. The fade indicators automatically appear/disappear based on the current scroll position. Top fade shows when scrolled down from the top, bottom fade shows when not at the bottom. Only works with overlay scrollbar modes (not with 'normal' mode).",
+        "valueType": "boolean",
+        "defaultValue": true
       }
     },
     "events": {
@@ -14216,11 +15450,36 @@ export default {
           "event": "The mouse event object."
         }
       },
+      "contextMenu": {
+        "description": "This event is triggered when the Stack is right-clicked (context menu).",
+        "signature": "contextMenu(event: MouseEvent): void",
+        "parameters": {
+          "event": "The mouse event object."
+        }
+      },
       "mounted": {
         "description": "Reserved for future use",
         "signature": "mounted(): void",
         "parameters": {},
         "isInternal": true
+      }
+    },
+    "apis": {
+      "scrollToTop": {
+        "description": "Scrolls the Stack container to the top. Works when the Stack has an explicit height and overflowY is set to 'scroll'.",
+        "signature": "scrollToTop(behavior?: 'auto' | 'instant' | 'smooth'): void"
+      },
+      "scrollToBottom": {
+        "description": "Scrolls the Stack container to the bottom. Works when the Stack has an explicit height and overflowY is set to 'scroll'.",
+        "signature": "scrollToBottom(behavior?: 'auto' | 'instant' | 'smooth'): void"
+      },
+      "scrollToStart": {
+        "description": "Scrolls the Stack container to the start (left in LTR, right in RTL). Works when the Stack has an explicit width and overflowX is set to 'scroll'.",
+        "signature": "scrollToStart(behavior?: 'auto' | 'instant' | 'smooth'): void"
+      },
+      "scrollToEnd": {
+        "description": "Scrolls the Stack container to the end (right in LTR, left in RTL). Works when the Stack has an explicit width and overflowX is set to 'scroll'.",
+        "signature": "scrollToEnd(behavior?: 'auto' | 'instant' | 'smooth'): void"
       }
     },
     "themeVars": [],
@@ -14552,6 +15811,11 @@ export default {
         "valueType": "boolean",
         "defaultValue": false
       },
+      "hideSelectionCheckboxes": {
+        "description": "If true, hides selection checkboxes for both rows and header. Selection logic still works via API and keyboard.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
       "iconNoSort": {
         "description": "Allows setting an alternate icon displayed in the Table column header when sorting is enabled, but the column remains unsorted. You can change the default icon for all Table instances with the \"icon.nosort:Table\" declaration in the app configuration file."
       },
@@ -14615,9 +15879,101 @@ export default {
           "spacious"
         ],
         "defaultValue": "compact"
+      },
+      "userSelectCell": {
+        "description": "This property controls whether users can select text within table cells. Use `text` to allow text selection, `none` to prevent selection, or `auto` for default behavior.",
+        "valueType": "string",
+        "availableValues": [
+          {
+            "value": "auto",
+            "description": "Default text selection behavior"
+          },
+          {
+            "value": "text",
+            "description": "Text can be selected by the user"
+          },
+          {
+            "value": "none",
+            "description": "Text cannot be selected"
+          },
+          {
+            "value": "contain",
+            "description": "Selection is contained within this element"
+          },
+          {
+            "value": "all",
+            "description": "The entire element content is selected as one unit"
+          }
+        ],
+        "defaultValue": "auto"
+      },
+      "userSelectRow": {
+        "description": "This property controls whether users can select text within table rows. Use `text` to allow text selection, `none` to prevent selection, or `auto` for default behavior.",
+        "valueType": "string",
+        "availableValues": [
+          {
+            "value": "auto",
+            "description": "Default text selection behavior"
+          },
+          {
+            "value": "text",
+            "description": "Text can be selected by the user"
+          },
+          {
+            "value": "none",
+            "description": "Text cannot be selected"
+          },
+          {
+            "value": "contain",
+            "description": "Selection is contained within this element"
+          },
+          {
+            "value": "all",
+            "description": "The entire element content is selected as one unit"
+          }
+        ],
+        "defaultValue": "auto"
+      },
+      "userSelectHeading": {
+        "description": "This property controls whether users can select text within table headings. Use `text` to allow text selection, `none` to prevent selection, or `auto` for default behavior.",
+        "valueType": "string",
+        "availableValues": [
+          {
+            "value": "auto",
+            "description": "Default text selection behavior"
+          },
+          {
+            "value": "text",
+            "description": "Text can be selected by the user"
+          },
+          {
+            "value": "none",
+            "description": "Text cannot be selected"
+          },
+          {
+            "value": "contain",
+            "description": "Selection is contained within this element"
+          },
+          {
+            "value": "all",
+            "description": "The entire element content is selected as one unit"
+          }
+        ],
+        "defaultValue": "none"
+      },
+      "keyBindings": {
+        "description": "This property defines keyboard shortcuts for table actions. Provide an object with action names as keys and keyboard shortcut strings as values. The shortcut strings use Electron accelerator syntax (e.g., 'CmdOrCtrl+A', 'Delete'). Available actions: `selectAll`, `cut`, `copy`, `paste`, `delete`. If not provided, default shortcuts are used.",
+        "valueType": "any"
       }
     },
     "events": {
+      "contextMenu": {
+        "description": "This event is triggered when the Table is right-clicked (context menu).",
+        "signature": "contextMenu(event: MouseEvent): void",
+        "parameters": {
+          "event": "The mouse event object."
+        }
+      },
       "sortingDidChange": {
         "description": "This event is fired when the table data sorting has changed. It has two arguments: the column's name and the sort direction. When the column name is empty, the table displays the data list as it received it.",
         "signature": "sortingDidChange(columnName: string, sortDirection: 'asc' | 'desc' | null): void",
@@ -14634,11 +15990,63 @@ export default {
           "sortDirection": "The intended sort direction: 'asc' for ascending or 'desc' for descending."
         }
       },
+      "rowDoubleClick": {
+        "description": "This event is fired when the user double-clicks a table row. The handler receives the clicked row item as its only argument.",
+        "signature": "rowDoubleClick(item: any): void",
+        "parameters": {
+          "item": "The clicked table row item."
+        }
+      },
       "selectionDidChange": {
         "description": "This event is triggered when the table's current selection (the rows selected) changes. Its parameter is an array of the selected table row items. ",
         "signature": "selectionDidChange(selectedItems: any[]): void",
         "parameters": {
           "selectedItems": "An array of the selected table row items."
+        }
+      },
+      "selectAllAction": {
+        "description": "This event is triggered when the user presses the select all keyboard shortcut (default: Ctrl+A/Cmd+A) and `rowsSelectable` is set to `true`. The component automatically selects all rows before invoking this handler. The handler receives three parameters: the currently focused row (if any), all selected items, and all selected IDs.",
+        "signature": "selectAll(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
+        "parameters": {
+          "row": "The currently focused row context, or null if no row is focused. Contains item data, row index, row ID, and selection state.",
+          "selectedItems": "Array of all selected row items. When selectAll is triggered, this contains all table rows.",
+          "selectedIds": "Array of all selected row IDs (as strings). When selectAll is triggered, this contains all row IDs."
+        }
+      },
+      "cutAction": {
+        "description": "This event is triggered when the user presses the cut keyboard shortcut (default: Ctrl+X/Cmd+X) and `rowsSelectable` is set to `true`. The handler receives three parameters: the focused row, selected items, and selected IDs. Note: The component does not automatically modify data; the handler must implement the cut logic (e.g., copying data to clipboard and removing from the data source).",
+        "signature": "cut(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
+        "parameters": {
+          "row": "The currently focused row context, or null if no row is focused.",
+          "selectedItems": "Array of selected row items.",
+          "selectedIds": "Array of selected row IDs (as strings)."
+        }
+      },
+      "copyAction": {
+        "description": "This event is triggered when the user presses the copy keyboard shortcut (default: Ctrl+C/Cmd+C) and `rowsSelectable` is set to `true`. The handler receives three parameters: the focused row, selected items, and selected IDs. The handler should implement the copy logic (e.g., using the Clipboard API to copy selected data).",
+        "signature": "copy(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
+        "parameters": {
+          "row": "The currently focused row context, or null if no row is focused.",
+          "selectedItems": "Array of selected row items.",
+          "selectedIds": "Array of selected row IDs (as strings)."
+        }
+      },
+      "pasteAction": {
+        "description": "This event is triggered when the user presses the paste keyboard shortcut (default: Ctrl+V/Cmd+V) and `rowsSelectable` is set to `true`. The handler receives three parameters: the focused row, selected items, and selected IDs. The handler must implement the paste logic (e.g., reading from clipboard and inserting data into the table).",
+        "signature": "paste(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
+        "parameters": {
+          "row": "The currently focused row context, or null if no row is focused.",
+          "selectedItems": "Array of selected row items.",
+          "selectedIds": "Array of selected row IDs (as strings)."
+        }
+      },
+      "deleteAction": {
+        "description": "This event is triggered when the user presses the delete keyboard shortcut (default: Delete key) and `rowsSelectable` is set to `true`. The handler receives three parameters: the focused row, selected items, and selected IDs. Note: The component does not automatically remove data; the handler must implement the delete logic (e.g., removing selected items from the data source).",
+        "signature": "delete(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
+        "parameters": {
+          "row": "The currently focused row context, or null if no row is focused.",
+          "selectedItems": "Array of selected row items.",
+          "selectedIds": "Array of selected row IDs (as strings)."
         }
       }
     },
@@ -14797,12 +16205,15 @@ export default {
       "textColor-heading-Table": "$color-surface-500",
       "border-Table": "0px solid transparent",
       "borderBottom-last-row-Table": "$borderBottom-cell-Table",
-      "borderRadius-Table": "$borderRadius"
+      "borderRadius-Table": "$borderRadius",
+      "userSelect-heading-Table": "text",
+      "userSelect-cell-Table": "none",
+      "userSelect-row-Table": "none"
     }
   },
   "TableOfContents": {
     "status": "stable",
-    "description": "`TableOfContents` component collects [Heading](/components/Heading) and [Bookmark](/components/Bookmark) within the current page and displays them in a navigable tree.",
+    "description": "`TableOfContents` collects [Heading](/components/Heading) and [Bookmark](/components/Bookmark) within the current page and displays them in a navigable tree. Uses the same Scroller behavior as NavPanel (scrollStyle, showScrollerFade).",
     "props": {
       "smoothScrolling": {
         "description": "This property indicates that smooth scrolling is used while scrolling the selected table of contents items into view.",
@@ -14818,11 +16229,36 @@ export default {
         "description": "If true, the `H1` heading is not included in the table of contents. This is useful when the `H1` is used for the page title and you want to avoid duplication.",
         "valueType": "boolean",
         "defaultValue": false
+      },
+      "scrollStyle": {
+        "description": "This property determines the scrollbar style. Options: \"normal\" uses the browser's default scrollbar; \"overlay\" displays a themed scrollbar that is always visible; \"whenMouseOver\" shows the scrollbar only when hovering over the scroll container; \"whenScrolling\" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.",
+        "valueType": "string",
+        "availableValues": [
+          "normal",
+          "overlay",
+          "whenMouseOver",
+          "whenScrolling"
+        ],
+        "defaultValue": "normal"
+      },
+      "showScrollerFade": {
+        "description": "When enabled, displays gradient fade indicators at the top and bottom edges when scrollable content extends beyond the visible area. Only works with \"overlay\", \"whenMouseOver\", and \"whenScrolling\" scroll styles.",
+        "valueType": "boolean",
+        "defaultValue": true
+      }
+    },
+    "events": {
+      "contextMenu": {
+        "description": "This event is triggered when the TableOfContents is right-clicked (context menu).",
+        "signature": "contextMenu(event: MouseEvent): void",
+        "parameters": {
+          "event": "The mouse event object."
+        }
       }
     },
     "themeVars": {
-      "backgroundColor-TableOfContents": "var(--xmlui-backgroundColor-TableOfContents)",
       "width-TableOfContents": "var(--xmlui-width-TableOfContents)",
+      "backgroundColor-TableOfContents": "var(--xmlui-backgroundColor-TableOfContents)",
       "height-TableOfContents": "var(--xmlui-height-TableOfContents)",
       "border-TableOfContents": "var(--xmlui-border-TableOfContents)",
       "borderHorizontal-TableOfContents": "var(--xmlui-borderHorizontal-TableOfContents, var(--xmlui-border-TableOfContents))",
@@ -15209,9 +16645,13 @@ export default {
       "fontWeight-TableOfContentsItem-level-3--active": "var(--xmlui-fontWeight-TableOfContentsItem-level-3--active)",
       "fontWeight-TableOfContentsItem-level-4--active": "var(--xmlui-fontWeight-TableOfContentsItem-level-4--active)",
       "fontWeight-TableOfContentsItem-level-5--active": "var(--xmlui-fontWeight-TableOfContentsItem-level-5--active)",
-      "fontWeight-TableOfContentsItem-level-6--active": "var(--xmlui-fontWeight-TableOfContentsItem-level-6--active)"
+      "fontWeight-TableOfContentsItem-level-6--active": "var(--xmlui-fontWeight-TableOfContentsItem-level-6--active)",
+      "color-indicator-TableOfContents": "var(--xmlui-color-indicator-TableOfContents)",
+      "width-indicator-TableOfContents": "var(--xmlui-width-indicator-TableOfContents)",
+      "color-indicator-TableOfContents--active": "var(--xmlui-color-indicator-TableOfContents--active)"
     },
     "defaultThemeVars": {
+      "height-TableOfContents": "auto",
       "padding-TableOfContents": "$space-2",
       "textColor-TableOfContentsItem": "$color-secondary-500",
       "textColor-TableOfContentsItem--hover": "$textColor-primary",
@@ -15231,8 +16671,12 @@ export default {
       "fontWeight-TableOfContentsItem-level-5": "$fontWeight-normal",
       "fontWeight-TableOfContentsItem-level-6": "$fontWeight-normal",
       "fontStyle-TableOfContentsItem-level-6": "italic",
+      "borderLeft-TableOfContentsItem": "2px solid $color-surface-100",
       "textColor-TableOfContentsItem--active": "$color-primary-400",
-      "fontWeight-TableOfContentsItem--active": "$fontWeight-bold"
+      "fontWeight-TableOfContentsItem--active": "$fontWeight-bold",
+      "width-indicator-TableOfContents": "2px",
+      "color-indicator-TableOfContents": "$color-surface-100",
+      "color-indicator-TableOfContents--active": "$color-surface-900"
     }
   },
   "TabItem": {
@@ -15300,6 +16744,13 @@ export default {
       }
     },
     "events": {
+      "contextMenu": {
+        "description": "This event is triggered when the Tabs is right-clicked (context menu).",
+        "signature": "contextMenu(event: MouseEvent): void",
+        "parameters": {
+          "event": "The mouse event object."
+        }
+      },
       "didChange": {
         "description": "This event is triggered when value of Tabs has changed.",
         "signature": "didChange(newValue: any): void",
@@ -15416,10 +16867,6 @@ export default {
             "description": "Represents a paragraph"
           },
           {
-            "value": "red",
-            "description": "Text displayed in red color"
-          },
-          {
             "value": "placeholder",
             "description": "Text that is mostly used as the placeholder style in input controls"
           },
@@ -15533,6 +16980,15 @@ export default {
         ]
       }
     },
+    "events": {
+      "contextMenu": {
+        "description": "This event is triggered when the Text is right-clicked (context menu).",
+        "signature": "contextMenu(event: MouseEvent): void",
+        "parameters": {
+          "event": "The mouse event object."
+        }
+      }
+    },
     "apis": {
       "hasOverflow": {
         "description": "Returns true when the displayed text overflows its container boundaries.",
@@ -15643,8 +17099,7 @@ export default {
       "fontWeight-Text-tableheading": "var(--xmlui-fontWeight-Text-tableheading)",
       "fontSize-Text-secondary": "var(--xmlui-fontSize-Text-secondary)",
       "textColor-Text-secondary": "var(--xmlui-textColor-Text-secondary)",
-      "textColor-Text-secondary--hover": "var(--xmlui-textColor-Text-secondary--hover)",
-      "textColor-Text-red": "var(--xmlui-textColor-Text-red)"
+      "textColor-Text-secondary--hover": "var(--xmlui-textColor-Text-secondary--hover)"
     },
     "defaultThemeVars": {
       "borderRadius-Text": "$borderRadius",
@@ -15656,7 +17111,6 @@ export default {
       "fontWeight-Text": "$fontWeight-normal",
       "fontSize-Text-secondary": "$fontSize-sm",
       "textColor-Text-secondary": "$textColor-secondary",
-      "textColor-Text-red": "red",
       "fontWeight-Text-abbr": "$fontWeight-bold",
       "textTransform-Text-abbr": "uppercase",
       "fontStyle-Text-cite": "italic",
@@ -15831,6 +17285,18 @@ export default {
             "description": "Can resize in both dimensions"
           }
         ]
+      },
+      "verboseValidationFeedback": {
+        "description": "Enables a concise validation summary (icon) in input components.",
+        "type": "boolean"
+      },
+      "validationIconSuccess": {
+        "description": "Icon to display for valid state when concise validation summary is enabled.",
+        "type": "string"
+      },
+      "validationIconError": {
+        "description": "Icon to display for error state when concise validation summary is enabled.",
+        "type": "string"
       }
     },
     "events": {
@@ -16039,6 +17505,11 @@ export default {
         ],
         "defaultValue": "none"
       },
+      "invalidMessages": {
+        "description": "The invalid messages to display for the input component.",
+        "type": "array",
+        "valueType": "string"
+      },
       "startText": {
         "description": "This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.",
         "valueType": "string"
@@ -16071,6 +17542,18 @@ export default {
         "description": "The icon to display when the password is hidden (when showPasswordToggle is true).",
         "valueType": "string",
         "defaultValue": "eye-off"
+      },
+      "verboseValidationFeedback": {
+        "description": "Enables a concise validation summary (icon) in input components.",
+        "type": "boolean"
+      },
+      "validationIconSuccess": {
+        "description": "Icon to display for valid state when concise validation summary is enabled.",
+        "type": "string"
+      },
+      "validationIconError": {
+        "description": "Icon to display for error state when concise validation summary is enabled.",
+        "type": "string"
       }
     },
     "events": {
@@ -16220,7 +17703,7 @@ export default {
       "Input:borderColor-TextBox--disabled": "var(--xmlui-borderColor-TextBox--disabled)"
     },
     "defaultThemeVars": {
-      "backgroundColor-Input": "$backgroundColor",
+      "backgroundColor-Input": "transparent",
       "borderRadius-Input": "$borderRadius",
       "textColor-Input": "$textColor-primary",
       "backgroundColor-Input--disabled": "$backgroundColor--disabled",
@@ -16317,6 +17800,11 @@ export default {
         ],
         "defaultValue": "none"
       },
+      "invalidMessages": {
+        "description": "The invalid messages to display for the input component.",
+        "type": "array",
+        "valueType": "string"
+      },
       "startText": {
         "description": "This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.",
         "valueType": "string"
@@ -16349,6 +17837,18 @@ export default {
         "description": "The icon to display when the password is hidden (when showPasswordToggle is true).",
         "valueType": "string",
         "defaultValue": "eye-off"
+      },
+      "verboseValidationFeedback": {
+        "description": "Enables a concise validation summary (icon) in input components.",
+        "type": "boolean"
+      },
+      "validationIconSuccess": {
+        "description": "Icon to display for valid state when concise validation summary is enabled.",
+        "type": "string"
+      },
+      "validationIconError": {
+        "description": "Icon to display for error state when concise validation summary is enabled.",
+        "type": "string"
       }
     },
     "events": {
@@ -16498,7 +17998,7 @@ export default {
       "Input:borderColor-TextBox--disabled": "var(--xmlui-borderColor-TextBox--disabled)"
     },
     "defaultThemeVars": {
-      "backgroundColor-Input": "$backgroundColor",
+      "backgroundColor-Input": "transparent",
       "borderRadius-Input": "$borderRadius",
       "textColor-Input": "$textColor-primary",
       "backgroundColor-Input--disabled": "$backgroundColor--disabled",
@@ -16955,6 +18455,30 @@ export default {
       }
     }
   },
+  "NavPanelCollapseButton": {
+    "status": "experimental",
+    "description": "`NavPanelCollapseButton` toggles the sidebar (NavPanel) collapse state when used in a vertical app layout. Place it in the NavPanel footer (e.g. next to ToneChangerButton) for a Nextra-like sidebar toggle.",
+    "props": {
+      "icon": {
+        "description": "Icon name for the button when the panel is expanded (collapse action).",
+        "valueType": "string",
+        "defaultValue": "sidebar-collapse"
+      },
+      "iconCollapsed": {
+        "description": "Icon name for the button when the panel is collapsed (expand action).",
+        "valueType": "string",
+        "defaultValue": "sidebar-collapse"
+      },
+      "aria-label": {
+        "description": "Accessible label for the button when expanded.",
+        "valueType": "string"
+      },
+      "aria-labelCollapsed": {
+        "description": "Accessible label for the button when collapsed.",
+        "valueType": "string"
+      }
+    }
+  },
   "ToneSwitch": {
     "status": "stable",
     "description": "`ToneSwitch` enables the user to switch between light and dark modes using a switch control.",
@@ -17081,9 +18605,14 @@ export default {
         "defaultValue": "16"
       },
       "itemHeight": {
-        "description": "The height of each tree row in pixels (default: 35).",
+        "description": "The height of each tree row in pixels (default: 32).",
         "valueType": "number",
         "defaultValue": 32
+      },
+      "fixedItemSize": {
+        "description": "When set to `true`, the tree will measure the height of the first item and use that as a fixed size hint for all items. This improves scroll performance when all items have the same height. If items have varying heights, leave this as `false`.",
+        "type": "boolean",
+        "defaultValue": false
       },
       "animateExpand": {
         "description": "When true, uses only the collapsed icon and rotates it for expansion instead of switching icons (default: false).",
@@ -17095,17 +18624,64 @@ export default {
         "valueType": "number",
         "defaultValue": 90
       },
-      "dynamicField": {
-        "description": "The property name in source data for dynamic loading state (default: \"dynamic\").",
+      "loadedField": {
+        "description": "The property name in source data for loaded state (default: \"loaded\"). When false, shows expand indicator even without children and triggers async loading.",
         "valueType": "string",
-        "defaultValue": "dynamic"
+        "defaultValue": "loaded"
       },
       "itemTemplate": {
         "description": "The template for each item in the tree.",
         "valueType": "ComponentDef"
+      },
+      "scrollStyle": {
+        "description": "This property determines the scrollbar style. Options: \"normal\" uses the browser's default scrollbar; \"overlay\" displays a themed scrollbar that is always visible; \"whenMouseOver\" shows the scrollbar only when hovering over the scroll container; \"whenScrolling\" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.",
+        "valueType": "string",
+        "allowedValues": [
+          "normal",
+          "overlay",
+          "whenMouseOver",
+          "whenScrolling"
+        ],
+        "defaultValue": "normal"
+      },
+      "showScrollerFade": {
+        "description": "When enabled, displays gradient fade indicators at the top and bottom edges of the tree when scrollable content extends beyond the visible area. The fade effect provides a visual cue to users that additional content is available by scrolling. The indicators automatically appear and disappear based on the scroll position. This property only works with \"overlay\", \"whenMouseOver\", and \"whenScrolling\" scroll styles.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "dynamicField": {
+        "description": "The property name in source data for dynamic state (default: 'dynamic'). When true, the node's children should be dynamically loaded via loadChildren event. When false, the node uses static children from data. Ignored if loadChildren handler is not provided.",
+        "valueType": "string",
+        "defaultValue": "dynamic"
+      },
+      "dynamic": {
+        "description": "Default value for whether tree nodes should load children dynamically (default: false). If true, nodes will load children via the loadChildren event. If false, nodes use static children from data. Can be overridden per-node in source data using the dynamicField property. Ignored if loadChildren handler is not provided.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "autoLoadAfter": {
+        "description": "Default number of milliseconds after which dynamic tree nodes should automatically reload their children when collapsed and then re-expanded. Only applies to nodes that were loaded via the loadChildren event. Can be overridden per-node using setAutoLoadAfter API. Pass undefined to disable auto-loading by default.",
+        "valueType": "number"
+      },
+      "autoLoadAfterField": {
+        "description": "The property name in source data for per-node autoLoadAfter values (default: 'autoLoadAfter'). Allows reading node-specific reload thresholds from data. Node-level values take priority over the component-level autoLoadAfter prop.",
+        "valueType": "string",
+        "defaultValue": "autoLoadAfter"
+      },
+      "spinnerDelay": {
+        "description": "The delay in milliseconds before showing the loading spinner when a node is in loading state. Set to 0 to show immediately, or a higher value to prevent spinner flicker for fast-loading nodes.",
+        "valueType": "number",
+        "defaultValue": 0
       }
     },
     "events": {
+      "contextMenu": {
+        "description": "This event is triggered when the Tree is right-clicked (context menu).",
+        "signature": "contextMenu(event: MouseEvent): void",
+        "parameters": {
+          "event": "The mouse event object."
+        }
+      },
       "selectionDidChange": {
         "description": "Fired when the tree selection changes.",
         "signature": "selectionDidChange(event: { selectedNode: FlatTreeNode | null, previousNode: FlatTreeNode | null }): void",
@@ -17149,61 +18725,87 @@ export default {
         "signature": "expandToLevel(level: number): void",
         "parameters": {
           "level": "The maximum depth level to expand (0 = root level only)"
-        }
-      },
-      "expandNode": {
-        "description": "Expand a specific node by its source data ID.",
-        "signature": "expandNode(nodeId: string | number): void",
-        "parameters": {
-          "nodeId": "The ID of the node to expand (source data format)"
-        }
-      },
-      "collapseNode": {
-        "description": "Collapse a specific node by its source data ID.",
-        "signature": "collapseNode(nodeId: string | number): void",
-        "parameters": {
-          "nodeId": "The ID of the node to collapse (source data format)"
-        }
-      },
-      "selectNode": {
-        "description": "Programmatically select a node by its source data ID.",
-        "signature": "selectNode(nodeId: string | number): void",
-        "parameters": {
-          "nodeId": "The ID of the node to select (source data format)"
-        }
-      },
-      "clearSelection": {
-        "description": "Clear the current selection.",
-        "signature": "clearSelection(): void"
-      },
-      "getNodeById": {
-        "description": "Get a tree node by its source data ID.",
-        "signature": "getNodeById(nodeId: string | number): TreeNode | null",
-        "parameters": {
-          "nodeId": "The ID of the node to retrieve (source data format)"
-        }
-      },
-      "getExpandedNodes": {
-        "description": "Get an array of currently expanded node IDs in source data format.",
-        "signature": "getExpandedNodes(): (string | number)[]"
-      },
-      "getSelectedNode": {
-        "description": "Get the currently selected tree node.",
-        "signature": "getSelectedNode(): TreeNode | null"
-      },
-      "scrollIntoView": {
-        "description": "Scroll to a specific node and expand parent nodes as needed to make it visible.",
-        "signature": "scrollIntoView(nodeId: string | number, options?: ScrollIntoViewOptions): void",
-        "parameters": {
-          "nodeId": "The ID of the node to scroll to (source data format)",
-          "options": "Optional scroll options"
-        }
-      },
-      "scrollToItem": {
-        "description": "Scroll to a specific node if it's currently visible in the tree.",
-        "signature": "scrollToItem(nodeId: string | number): void",
-        "parameters": {
-          "nodeId": "The ID of the node to scroll to (source data format)"
+        },
+        "expandNode": {
+          "description": "Expand a specific node by its source data ID.",
+          "signature": "expandNode(nodeId: string | number): void",
+          "parameters": {
+            "nodeId": "The ID of the node to expand (source data format)"
+          }
+        },
+        "collapseNode": {
+          "description": "Collapse a specific node by its source data ID.",
+          "signature": "collapseNode(nodeId: string | number): void",
+          "parameters": {
+            "nodeId": "The ID of the node to collapse (source data format)"
+          }
+        },
+        "selectNode": {
+          "description": "Programmatically select a node by its source data ID.",
+          "signature": "selectNode(nodeId: string | number): void",
+          "parameters": {
+            "nodeId": "The ID of the node to select (source data format)"
+          }
+        },
+        "clearSelection": {
+          "description": "Clear the current selection.",
+          "signature": "clearSelection(): void"
+        },
+        "getNodeById": {
+          "description": "Get a tree node by its source data ID.",
+          "signature": "getNodeById(nodeId: string | number): TreeNode | null",
+          "parameters": {
+            "nodeId": "The ID of the node to retrieve (source data format)"
+          }
+        },
+        "getExpandedNodes": {
+          "description": "Get an array of currently expanded node IDs in source data format.",
+          "signature": "getExpandedNodes(): (string | number)[]"
+        },
+        "getSelectedNode": {
+          "description": "Get the currently selected tree node.",
+          "signature": "getSelectedNode(): TreeNode | null"
+        },
+        "scrollIntoView": {
+          "description": "Scroll to a specific node and expand parent nodes as needed to make it visible.",
+          "signature": "scrollIntoView(nodeId: string | number, options?: ScrollIntoViewOptions): void",
+          "parameters": {
+            "nodeId": "The ID of the node to scroll to (source data format)",
+            "options": "Optional scroll options"
+          }
+        },
+        "scrollToItem": {
+          "description": "Scroll to a specific node if it's currently visible in the tree.",
+          "signature": "scrollToItem(nodeId: string | number): void",
+          "parameters": {
+            "nodeId": "The ID of the node to scroll to (source data format)"
+          }
+        },
+        "getVisibleItems": {
+          "description": "Get an array of tree nodes currently visible in the viewport.",
+          "signature": "getVisibleItems(): FlatTreeNode[]"
+        },
+        "getExpandedTimestamp": {
+          "description": "Get the timestamp when a node was last expanded.",
+          "signature": "getExpandedTimestamp(nodeId: string | number): number | undefined",
+          "parameters": {
+            "nodeId": "The ID of the node to check (source data format)"
+          }
+        },
+        "setAutoLoadAfter": {
+          "description": "Set the auto-load threshold for a specific node. When the node is collapsed and then re-expanded after this many milliseconds, its children will be automatically reloaded.",
+          "signature": "setAutoLoadAfter(nodeId: string | number, milliseconds: number | null | undefined): void",
+          "parameters": {
+            "nodeId": "The ID of the node (source data format)",
+            "milliseconds": "Number of milliseconds after which to auto-reload. Pass null or undefined to disable auto-loading for this node."
+          }
+        },
+        "getNodeAutoLoadAfter": {
+          "description": "Get the effective auto-load threshold for a specific node. Returns the node's explicit value if set, otherwise returns the component's default autoLoadAfter value.",
+          "signature": "getNodeAutoLoadAfter(nodeId: string | number): number | null | undefined",
+          "parameters": {
+            "nodeId": "The ID of the node (source data format)"
+          }
         }
       },
       "appendNode": {
@@ -17242,6 +18844,22 @@ export default {
         "parameters": {
           "afterNodeId": "The ID of the existing node after which the new node should be inserted",
           "nodeData": "The node data object using the format specified in dataFormat and field properties"
+        }
+      },
+      "replaceNode": {
+        "description": "Replace a node's properties with new data using merge semantics. Properties not specified in nodeData are kept from the original node. Children are only replaced if nodeData specifies them.",
+        "signature": "replaceNode(nodeId: string | number, nodeData: any): void",
+        "parameters": {
+          "nodeId": "The ID of the node to update",
+          "nodeData": "The node data object with properties to merge. Uses the format specified in dataFormat and field properties."
+        }
+      },
+      "replaceChildren": {
+        "description": "Replace all children of a node with new child nodes.",
+        "signature": "replaceChildren(nodeId: string | number, newChildren: any[]): void",
+        "parameters": {
+          "nodeId": "The ID of the parent node",
+          "newChildren": "Array of child node data objects using the format specified in dataFormat and field properties"
         }
       },
       "getNodeLoadingState": {

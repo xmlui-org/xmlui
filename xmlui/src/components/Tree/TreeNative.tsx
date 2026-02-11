@@ -1944,6 +1944,171 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         });
       },
 
+      replaceNode: (nodeId: string | number, nodeData: any) => {
+        const nodeIdStr = String(nodeId);
+        const fieldId = fieldConfig.idField || "id";
+        const fieldChildren = fieldConfig.childrenField || "children";
+        const fieldParent = fieldConfig.parentField || "parentId";
+
+        // Check if we're changing the node's ID
+        const newId = nodeData[fieldId];
+        const isIdChanging = newId !== undefined && String(newId) !== nodeIdStr;
+
+        // Helper function to replace node properties in flat format
+        const replaceNodeInFlat = (data: any[]): any[] => {
+          return data.map((item) => {
+            if (String(item[fieldId]) === nodeIdStr) {
+              // Merge properties: nodeData overrides existing properties
+              // Allow ID to be updated if provided in nodeData
+              return {
+                ...item,
+                ...nodeData,
+              };
+            }
+            // If ID is changing, update children's parent references
+            if (isIdChanging && String(item[fieldParent]) === nodeIdStr) {
+              return {
+                ...item,
+                [fieldParent]: newId,
+              };
+            }
+            return item;
+          });
+        };
+
+        // Helper function to replace node properties in hierarchy format
+        const replaceNodeInHierarchy = (nodes: any[]): any[] => {
+          return nodes.map((node: any) => {
+            if (String(node[fieldId]) === nodeIdStr) {
+              // Merge properties: nodeData overrides existing properties
+              // Allow ID to be updated if provided in nodeData
+              const updatedNode = {
+                ...node,
+                ...nodeData,
+              };
+
+              // If nodeData doesn't specify children, preserve existing children
+              if (!(fieldChildren in nodeData) && node[fieldChildren]) {
+                updatedNode[fieldChildren] = node[fieldChildren];
+              }
+
+              return updatedNode;
+            }
+
+            // Recursively process children
+            const children = node[fieldChildren];
+            if (children && Array.isArray(children)) {
+              return {
+                ...node,
+                [fieldChildren]: replaceNodeInHierarchy(children),
+              };
+            }
+
+            return node;
+          });
+        };
+
+        // Update the internal data state
+        setInternalData((prevData) => {
+          const currentData = prevData ?? data;
+
+          if (dataFormat === "flat" && Array.isArray(currentData)) {
+            return replaceNodeInFlat(currentData);
+          } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+            return replaceNodeInHierarchy(currentData);
+          }
+
+          return currentData;
+        });
+
+        // If the ID is changing, also update the expansion state
+        if (isIdChanging) {
+          setExpandedIds((prev) => {
+            // Check if the old ID was expanded
+            const wasExpanded = prev.some((id) => String(id) === nodeIdStr);
+            if (wasExpanded) {
+              // Replace old ID with new ID in the expansion list
+              return prev.map((id) => (String(id) === nodeIdStr ? newId : id));
+            }
+            return prev;
+          });
+        }
+      },
+
+      replaceChildren: (nodeId: string | number, newChildren: any[]) => {
+        const nodeIdStr = String(nodeId);
+        const fieldId = fieldConfig.idField || "id";
+        const fieldChildren = fieldConfig.childrenField || "children";
+        const fieldParent = fieldConfig.parentField || "parentId";
+
+        // Helper function to replace children in flat format
+        const replaceChildrenInFlat = (data: any[]): any[] => {
+          // First, collect all descendant IDs recursively
+          const getDescendantIds = (parentId: string): string[] => {
+            const descendants: string[] = [];
+            for (const item of data) {
+              if (String(item[fieldParent]) === parentId) {
+                const itemId = String(item[fieldId]);
+                descendants.push(itemId);
+                descendants.push(...getDescendantIds(itemId));
+              }
+            }
+            return descendants;
+          };
+
+          // Get all descendant IDs to remove
+          const idsToRemove = new Set(getDescendantIds(nodeIdStr));
+
+          // Filter out all descendant nodes
+          const filteredData = data.filter((item) => !idsToRemove.has(String(item[fieldId])));
+
+          // Add new children with proper parent reference
+          const newChildNodes = newChildren.map((childData) => ({
+            ...childData,
+            [fieldParent]: nodeId,
+          }));
+
+          return [...filteredData, ...newChildNodes];
+        };
+
+        // Helper function to replace children in hierarchy format
+        const replaceChildrenInHierarchy = (nodes: any[]): any[] => {
+          return nodes.map((node: any) => {
+            if (String(node[fieldId]) === nodeIdStr) {
+              // Replace children array - preserve nested structure
+              return {
+                ...node,
+                [fieldChildren]: newChildren,
+              };
+            }
+
+            // Recursively process children
+            const children = node[fieldChildren];
+            if (children && Array.isArray(children)) {
+              return {
+                ...node,
+                [fieldChildren]: replaceChildrenInHierarchy(children),
+              };
+            }
+
+            return node;
+          });
+        };
+
+        // Update the internal data state
+        setInternalData((prevData) => {
+          const currentData = prevData ?? data;
+
+          if (dataFormat === "flat" && Array.isArray(currentData)) {
+            return replaceChildrenInFlat(currentData);
+          } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+            return replaceChildrenInHierarchy(currentData);
+          }
+
+          return currentData;
+        });
+      },
+
       // Node state management methods
 
       getNodeLoadingState: (nodeId: string | number) => {

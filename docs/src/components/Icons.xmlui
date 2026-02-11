@@ -118,6 +118,7 @@
     'split-horizontal',
     'split-vertical',
     'square',
+    'square-collapse',
     'squarefill',
     'squarehalf',
     'star',

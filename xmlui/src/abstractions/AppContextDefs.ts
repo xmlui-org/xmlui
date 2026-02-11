@@ -12,6 +12,7 @@ import type { ActionFunction } from "./ActionDefs";
 import type { SetupWorker } from "msw/browser";
 import type { IApiInterceptor } from "../components-core/interception/abstractions";
 import type { AppState } from "../components-core/rendering/appState";
+import type { PubSubService } from "../components-core/pubsub/PubSubService";
 
 // This interface defines the properties and services of an app context that the
 // application components can use when implementing their behavior.
@@ -247,6 +248,17 @@ export type AppContextObject = {
   // This object provides methods for managing global application state with support for
   // nested paths, array operations, and immutable state updates.
   AppState: AppState;
+
+  // ==============================================================================================
+  // PubSub Messaging
+
+  // The PubSub service instance for this app, providing subscribe/unsubscribe functionality.
+  // Used internally by the pubsub behavior.
+  pubSubService: PubSubService;
+
+  // Publishes a topic with optional data to all subscribers.
+  // Components can subscribe to topics using the subscribeToTopic prop and onTopicReceived event.
+  publishTopic: (topic: string | number, data?: any) => void;
 };
 
 export const MediaBreakpointKeys = ["xs", "sm", "md", "lg", "xl", "xxl"] as const;

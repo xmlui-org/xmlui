@@ -500,11 +500,13 @@ This component does not expose any methods.
 | [backgroundColor](../styles-and-themes/common-units/#color)-navPanel-App | $backgroundColor | $backgroundColor |
 | [borderBottom](../styles-and-themes/common-units/#border)-AppHeader | *none* | *none* |
 | [borderLeft](../styles-and-themes/common-units/#border)-content-App | *none* | *none* |
+| [borderRight](../styles-and-themes/common-units/#border)-navPanelWrapper-App | 1px solid $borderColor | 1px solid $borderColor |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-header-App | none | none |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-navPanel-App | none | none |
 | [maxWidth](../styles-and-themes/common-units/#size)-App | $maxWidth-content | $maxWidth-content |
 | [maxWidth-content](../styles-and-themes/common-units/#size)-App | $maxWidth-content | $maxWidth-content |
 | [width](../styles-and-themes/common-units/#size)-navPanel-App | $space-64 | $space-64 |
+| [width](../styles-and-themes/common-units/#size)-navPanel-collapsed-App | 48px | 48px |
 
 ### Variable Explanations [#variable-explanations]
 

@@ -7,6 +7,7 @@ import { version } from "../../../package.json";
 
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
+import { createPubSubService } from "../pubsub/PubSubService";
 import { useConfirm } from "../../components/ModalDialog/ConfirmationModalContextProvider";
 import { useTheme, useThemes } from "../theming/ThemeContext";
 import {
@@ -88,6 +89,10 @@ export function AppContent({
   const componentRegistry = useComponentRegistry();
   const navigate = useNavigate();
   const { confirm } = useConfirm();
+
+  // --- Create PubSubService with stable reference across renders
+  const pubSubServiceRef = useRef(createPubSubService());
+  const pubSubService = pubSubServiceRef.current;
 
   // --- Prepare theme-related variables. We will use them to manage the selected theme
   // --- and also pass them to the app context.
@@ -552,10 +557,35 @@ export function AppContent({
       const text =
         textContent && textContent.length > 80 ? textContent.slice(0, 77) + "…" : textContent;
 
+      // Find all testIds in the path from target to root, for better selector options
+      const testIdsInPath: string[] = [];
+      for (const el of elements) {
+        const tid = el.getAttribute?.("data-testid");
+        if (tid && !testIdsInPath.includes(tid)) {
+          testIdsInPath.push(tid);
+        }
+      }
+
+      // Build a selector path from the testId element to the clicked element
+      // This helps with replay - e.g., "[data-testid='tree'] >> text=foo"
+      let selectorPath: string | undefined;
+      if (testIdEl && target && testIdEl !== target) {
+        const targetText = target.textContent?.trim();
+        if (targetText && targetText.length < 50) {
+          selectorPath = `[data-testid="${testId}"] >> text=${targetText}`;
+        }
+      }
+
+      // Also capture the target element's own testId if it has one (different from ancestor)
+      const targetTestId = target?.getAttribute?.("data-testid") || undefined;
+
       const detail: Record<string, any> = {
         componentId,
         inspectId,
         targetTag: (target && target.tagName) || undefined,
+        targetTestId: targetTestId !== testId ? targetTestId : undefined,
+        testIdsInPath: testIdsInPath.length > 1 ? testIdsInPath : undefined,
+        selectorPath,
         text,
       };
       if (event instanceof MouseEvent) {
@@ -725,6 +755,10 @@ export function AppContent({
 
       // --- AppState global state management
       AppState,
+
+      // --- PubSub messaging
+      pubSubService,
+      publishTopic: pubSubService.publishTopic,
     };
     return ret;
   }, [
@@ -751,6 +785,7 @@ export function AppContent({
     scrollBookmarkIntoView,
     root,
     AppState,
+    pubSubService,
   ]);
 
   return (

@@ -5,34 +5,47 @@
   "envMode": "loose",
   "tasks": {
     "build:for-node": {
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.test.ts"],
       "outputs": ["dist/bin/**", "dist/for-node/**"]
     },
     "build:xmlui": {
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.test.ts"],
       "outputs": ["dist/lib/**"]
     },
     "build:xmlui-standalone": {
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.test.ts"],
       "outputs": ["dist/standalone/**"]
     },
     "build:xmlui-metadata": {
-      "inputs": ["$TURBO_DEFAULT$", "!src/language-server/xmlui-metadata-generated.js"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!src/language-server/xmlui-metadata-generated.js",
+        "!**/*.spec.ts",
+        "!**/*.test.ts"
+      ],
       "outputs": ["dist/metadata/**"]
     },
     "gen:langserver-metadata": {
       "dependsOn": ["build:xmlui-metadata"],
+      "inputs": ["scripts/**"],
       "outputs": ["src/language-server/xmlui-metadata-generated.js"]
     },
     "build:extension": {
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.test.ts"],
       "dependsOn": ["^build:extension"],
       "outputs": ["dist/**"]
     },
     "build:meta": {
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.test.ts"],
       "outputs": ["dist/**"]
     },
     "xmlui-vscode#build:vsix": {
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.test.ts"],
       "dependsOn": ["xmlui-vscode#build"],
       "outputs": ["xmlui-vscode-*.vsix"]
     },
     "xmlui-vscode#build": {
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.test.ts"],
       "dependsOn": ["^gen:langserver-metadata"],
       "outputs": ["dist/**"]
     },
@@ -47,10 +60,14 @@
       "outputs": ["dist/**"]
     },
     "gen:releases": {
-      "env": ["GITHUB_TOKEN", "DOCS_XMLUI_MAX_RELEASES_LENGTH"],
-      "outputs": ["public/resources/files/releases.json"]
+      "cache": false,
+      "description": "fetches the releases from github, thus never should be cached."
     },
     "gen:download-latest-xmlui-release": {
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!public/resources/files/for-download/xmlui/xmlui-standalone.umd.js"
+      ],
       "outputs": ["public/resources/files/for-download/xmlui/xmlui-standalone.umd.js"]
     },
     "generate-docs": {
@@ -62,6 +79,7 @@
       "dependsOn": ["generate-docs"]
     },
     "build:docs": {
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.test.ts"],
       "dependsOn": [
         "^build:extension",
         "^build:xmlui",
@@ -76,16 +94,18 @@
       "outputs": ["dist/ui.zip"]
     },
     "build:blog": {
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.test.ts"],
       "dependsOn": ["^build:extension", "^build:xmlui"],
       "outputs": ["dist/**"]
     },
     "build:playground": {
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.test.ts"],
       "dependsOn": ["^build:extension", "^build:xmlui"],
       "outputs": ["dist/**"]
     },
     "xmlui#build:xmlui-test-bed": {
       "dependsOn": ["build:extension"],
-      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts"],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.test.ts"],
       "outputs": ["src/testing/infrastructure/dist/**"]
     },
     "test:all": {

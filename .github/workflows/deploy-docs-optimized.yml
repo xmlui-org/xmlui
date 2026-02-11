@@ -40,7 +40,7 @@ jobs:
       - run: npm ci --prefer-offline
 
       - name: Build standalone xmlui
-        run: npm run build:xmlui-standalone
+        run: npx turbo run build:xmlui-standalone
         working-directory: ./xmlui
 
       - name: Copy standalone build to docs

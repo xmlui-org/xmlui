@@ -50,6 +50,7 @@ export const Splitter = ({
   const [containerSize, setContainerSize] = useState(100);
   const [splitter, setSplitter] = useState<HTMLDivElement | null>(null);
   const [resizerVisible, setResizerVisible] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [resizer, setResizer] = useState<HTMLDivElement | null>(null);
   const [floatingResizer, setFloatingResizer] = useState<HTMLDivElement | null>(null);
   const resizerElement = useMemo(
@@ -140,11 +141,13 @@ export const Splitter = ({
     };
 
     const handleMouseUp = () => {
+      setIsDragging(false);
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
 
     const handleMouseDown = () => {
+      setIsDragging(true);
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
     };
@@ -217,6 +220,7 @@ export const Splitter = ({
         {
           [styles.horizontal]: orientation === "horizontal",
           [styles.vertical]: orientation === "vertical",
+          [styles.dragging]: isDragging,
         },
         className,
       )}

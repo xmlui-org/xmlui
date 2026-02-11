@@ -561,3 +561,73 @@ The `spinnerDelay` property controls how long to wait before showing a loading s
 ```
 
 %-PROP-END
+
+%-API-START replaceNode
+
+```xmlui-pg display copy height="200px" /replaceNode/ name="Example: Update node properties"
+<App>
+  <VStack gap="$space-2">
+    <Tree
+      id="tree"
+      testId="tree"
+      defaultExpanded="all"
+      data='{[
+        { id: 1, name: "Project Files", parentId: null, icon: "folder" },
+        { id: 2, name: "draft.txt", parentId: 1, icon: "warning", status: "draft" },
+        { id: 3, name: "notes.txt", parentId: 1, icon: "list" },
+      ]}'>
+      <property name="itemTemplate">
+        <HStack testId="{$item.id}" gap="$space-2">
+          <Icon name="{$item.icon}" />
+          <Text>{$item.name}</Text>
+          <Badge when="{$item.status}">{$item.status}</Badge>
+        </HStack>
+      </property>
+    </Tree>
+    <Button onClick="tree.replaceNode(2, { 
+      name: 'final.txt', 
+      icon: 'checkmark', 
+      status: 'published' 
+    })">
+      Publish Draft
+    </Button>
+  </VStack>
+</App>
+```
+
+%-API-END
+
+%-API-START replaceChildren
+
+The `replaceChildren(nodeId, newChildren)` method replaces all children of a node with the specified new children array.
+
+```xmlui-pg display copy height="220px" /replaceChildren/ name="Example: Replace node children"
+<App var.version="{1}">
+  <VStack gap="$space-2">
+    <Tree
+      id="tree"
+      testId="tree"
+      defaultExpanded="all"
+      itemClickExpands
+      data='{[
+        { id: 1, name: "Task List", parentId: null },
+        { id: 2, name: "Task A", parentId: 1 },
+        { id: 3, name: "Task B", parentId: 1 },
+      ]}'>
+    </Tree>
+    <Button onClick="
+      version++;
+      tree.replaceChildren(1, [
+        { id: `task-${version}-1`, name: `New Task ${version}.1`, parentId: 1 },
+        { id: `task-${version}-2`, name: `New Task ${version}.2`, parentId: 1 },
+        { id: `task-${version}-3`, name: `New Task ${version}.3`, parentId: 1 },
+      ]);
+      tree.expandNode(1);
+    ">
+      Refresh Tasks
+    </Button>
+  </VStack>
+</App>
+```
+
+%-API-END

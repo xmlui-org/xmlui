@@ -68,7 +68,7 @@ import { ModalDialogDriver } from "./drivers/ModalDialogDriver";
 import { TextBoxDriver } from "./drivers/TextBoxDriver";
 import { NumberBoxDriver } from "./drivers/NumberBoxDriver";
 import { TreeDriver } from "./drivers/TreeDriver";
-
+import { collectCodeBehindFromSource } from "../parsers/scripting/code-behind-collect";
 export { expect } from "./assertions";
 
 const isCI = process?.env?.CI === "true";
@@ -195,6 +195,8 @@ export type TestBedDescription = Omit<
   testThemeVars?: Record<string, string>;
   components?: string[];
   appGlobals?: Record<string, any>;
+  mainXs?: string;
+  noFragmentWrapper?: boolean;
 };
 
 export const test = baseTest.extend<TestDriverExtenderProps>({
@@ -215,7 +217,9 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
         "icon.bell": "/resources/bell.svg",
       };
       // --- Initialize XMLUI App
-      const { errors, component } = xmlUiMarkupToComponent(`
+      const markup = description?.noFragmentWrapper
+        ? source
+        : `
           <Fragment var.testState="{null}">
             ${source}
             <Stack width="0" height="0">
@@ -224,7 +228,9 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
                 value="{ typeof testState === 'undefined' ? 'undefined' : JSON.stringify(testState) }"/>
             </Stack>
           </Fragment>
-        `);
+        `;
+      
+      const { errors, component } = xmlUiMarkupToComponent(markup);
 
       if (errors.length > 0) {
         throw { errors };
@@ -241,8 +247,37 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
         return component as CompoundComponentDef;
       });
 
+      let runtime: any;
+      if (description?.mainXs) {
+        const parsedCodeBehind = collectCodeBehindFromSource("Main", description.mainXs);
+        if (parsedCodeBehind?.vars || parsedCodeBehind?.functions) {
+          // Pass through the variable definitions with their source text intact
+          // for StandaloneApp to process with transformMainXsToGlobalTags
+          runtime = {
+            "/src/Main.xmlui.xs": {
+              vars: parsedCodeBehind.vars || {},
+              functions: parsedCodeBehind.functions || {},
+              src: description.mainXs, // Include original source for debugging
+            },
+          };
+        }
+      }
+
+      // Add entryPoint to runtime so resolveRuntime can find it
+      if (description?.noFragmentWrapper && entryPoint) {
+        runtime = runtime || {};
+        runtime["/src/Main.xmlui"] = {
+          default: {
+            component: entryPoint,
+            src: source,
+          },
+        };
+      }
+
       if (source !== "" && entryPoint.children) {
-        const sourceBaseComponent = entryPoint.children[0];
+        const sourceBaseComponent = description?.noFragmentWrapper
+          ? entryPoint // When no wrapper, entryPoint is the actual source component
+          : entryPoint.children[0]; // With wrapper, it's inside Fragment
         const isCompoundComponentRoot =
           components &&
           components?.length > 0 &&
@@ -267,12 +302,13 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
         ...themedDescription.resources,
       };
 
-      const _appDescription: StandaloneAppDescription = {
+      const _appDescription: StandaloneAppDescription & { runtime: any } = {
         name: "test bed app",
         ...themedDescription,
         resources: mergedResources,
         components,
         entryPoint,
+        runtime,
       };
 
       const clipboard = new Clipboard(page);
@@ -284,6 +320,7 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       await page.addInitScript((app) => {
         // @ts-ignore
         window.TEST_ENV = app;
+        window.TEST_RUNTIME = app.runtime;
       }, _appDescription);
       const { width, height } = page.viewportSize();
       await page.goto("/");

@@ -64,6 +64,7 @@
   "NavGroup": "NavGroup",
   "NavLink": "NavLink",
   "NavPanel": "NavPanel",
+  "NavPanelCollapseButton": "NavPanelCollapseButton",
   "NoResult": "NoResult",
   "NumberBox": "NumberBox",
   "Option": "Option",

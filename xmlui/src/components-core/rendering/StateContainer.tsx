@@ -1,7 +1,7 @@
 import type { MutableRefObject, ReactNode, RefObject } from "react";
 import { forwardRef, memo, useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import produce from "immer";
-import { cloneDeep, isEmpty, isPlainObject, merge, pick } from "lodash-es";
+import { cloneDeep, isEmpty, isPlainObject, merge } from "lodash-es";
 import memoizeOne from "memoize-one";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 
@@ -40,30 +40,69 @@ import type {
 import type { ComponentApi } from "../../abstractions/ApiDefs";
 
 import { useLinkInfoContext } from "../../components/App/LinkInfoContext";
+import {
+  extractScopedState,
+  CodeBehindParseError,
+  ParseVarError,
+} from "./ContainerUtils";
 
-// --- Properties of the MemoizedErrorProneContainer component
+// ============================================================================
+// TYPE DEFINITIONS
+// ============================================================================
+
+/**
+ * Props for the StateContainer component.
+ * StateContainer manages the 6-layer state composition pipeline and variable resolution.
+ */
 type Props = {
+  /** Container wrapper definition with component metadata */
   node: ContainerWrapperDef;
+  /** Resolved key for React reconciliation */
   resolvedKey?: string;
+  /** Parent container's state (will be scoped by `uses` property) */
   parentState: ContainerState;
+  /** Global variables from parent container */
+  parentGlobalVars?: Record<string, any>;
+  /** Callback when part of parent state changes */
   parentStatePartChanged: StatePartChangedFn;
+  /** Parent's function to register component APIs */
   parentRegisterComponentApi: RegisterComponentApiFnInner;
+  /** Parent container's dispatcher */
   parentDispatch: ContainerDispatcher;
+  /** Parent rendering context */
   parentRenderContext?: ParentRenderContext;
+  /** Reference to layout context */
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
+  /** Reference to UID information */
   uidInfoRef?: RefObject<Record<string, any>>;
+  /** Whether this is an implicit container (follows parent's registration) */
   isImplicit?: boolean;
+  /** Child elements to render */
   children?: ReactNode;
 };
 
-// A React component that wraps a view container into an error boundary
-// (it's a named function inside the memo, this way it will be visible with that name in the react devtools)
+// ============================================================================
+// STATE CONTAINER COMPONENT
+// ============================================================================
+
+/**
+ * StateContainer component that orchestrates the 6-layer state composition pipeline.
+ * Manages:
+ * - Parent state scoping (via `uses` property)
+ * - Component reducer state
+ * - Component APIs
+ * - Context variables
+ * - Local variable resolution (two-pass for forward references)
+ * - Routing parameters
+ * - Inspector logging for debugging
+ */
 export const StateContainer = memo(
   forwardRef(function StateContainer(
     {
       node,
       resolvedKey,
       parentState,
+      parentGlobalVars,
       parentStatePartChanged,
       parentRegisterComponentApi,
       parentDispatch,
@@ -81,6 +120,10 @@ export const StateContainer = memo(
     const memoedVars = useRef<MemoedVars>(new Map());
     const appContext = useAppContext();
     const xsVerbose = appContext.appGlobals?.xsVerbose === true;
+
+    // ========================================================================
+    // STATE COMPOSITION PIPELINE DOCUMENTATION
+    // ========================================================================
 
     /**
      * STATE COMPOSITION PIPELINE
@@ -168,9 +211,17 @@ export const StateContainer = memo(
      * - Variable resolution errors logged to console
      */
 
+    // ========================================================================
+    // LAYER 1: PARENT STATE SCOPING
+    // ========================================================================
+
     const stateFromOutside = useShallowCompareMemoize(
       useMemo(() => extractScopedState(parentState, node.uses), [node.uses, parentState]),
     );
+
+    // ========================================================================
+    // LAYER 2: COMPONENT REDUCER STATE
+    // ========================================================================
 
     // --- All state manipulation happens through the container reducer, which is created here.
     // --- This reducer allow collecting state changes for debugging purposes. The `debugView`
@@ -178,6 +229,10 @@ export const StateContainer = memo(
     const debugView = useDebugView();
     const containerReducer = createContainerReducer(debugView);
     const [componentState, dispatch] = useReducer(containerReducer, EMPTY_OBJECT);
+
+    // ========================================================================
+    // LAYER 3: COMPONENT APIS
+    // ========================================================================
 
     // --- The exposed APIs of components are also the part of the state.
     const [componentApis, setComponentApis] = useState<Record<symbol, ComponentApi>>(EMPTY_OBJECT);
@@ -207,11 +262,20 @@ export const StateContainer = memo(
       }, [componentState, componentApis]),
     );
 
+    // ========================================================================
+    // LAYER 4: CONTEXT VARIABLES
+    // ========================================================================
+
     const localVarsStateContext = useCombinedState(
       stateFromOutside,
       componentStateWithApis,
       node.contextVars,
     );
+
+    // ========================================================================
+    // LAYER 5: LOCAL VARIABLE RESOLUTION (TWO-PASS)
+    // ========================================================================
+
     const parsedScriptPart = node.scriptCollected;
     if (parsedScriptPart?.moduleErrors && !isEmpty(parsedScriptPart.moduleErrors)) {
       console.error("Module errors in StateContainer:", parsedScriptPart.moduleErrors);
@@ -289,6 +353,10 @@ export const StateContainer = memo(
       localVarsStateContextWithPreResolvedLocalVars,
       memoedVars, // Persistent cache for performance
     );
+
+    // ========================================================================
+    // INSPECTOR LOGGING - VARIABLE CHANGES
+    // ========================================================================
 
     // Track declared variable changes for inspector
     const prevVarsRef = useRef<Record<string, any> | null>(null);
@@ -514,12 +582,194 @@ export const StateContainer = memo(
     }, [xsVerbose, varDefinitions, resolvedLocalVars, node]);
 
     const mergedWithVars = useMergedState(resolvedLocalVars, componentStateWithApis);
+
+    // ========================================================================
+    // GLOBAL VARIABLES HANDLING
+    // ========================================================================
+
+    // Collect dependencies of global variables from expression trees
+    // This enables re-evaluation when dependencies change (reactivity)
+    const globalDependencies = useMemo(() => {
+      const deps: Record<string, string[]> = {};
+      
+      // Collect dependencies from parent global vars
+      if (parentGlobalVars) {
+        for (const [key, value] of Object.entries(parentGlobalVars)) {
+          if (key.startsWith("__")) continue;
+          const treeKey = `__tree_${key}`;
+          const tree = parentGlobalVars[treeKey];
+          
+          if (tree && typeof tree === "object") {
+            // Extract variable dependencies from expression tree
+            deps[key] = collectVariableDependencies(tree);
+          }
+        }
+      }
+      
+      // Collect dependencies from node global vars
+      if (node.globalVars) {
+        for (const [key, value] of Object.entries(node.globalVars)) {
+          if (key.startsWith("__")) continue;
+          const treeKey = `__tree_${key}`;
+          const tree = node.globalVars[treeKey];
+          
+          if (tree && typeof tree === "object") {
+            // Extract variable dependencies from expression tree
+            deps[key] = collectVariableDependencies(tree);
+          }
+        }
+      }
+      
+      return deps;
+    }, [parentGlobalVars, node.globalVars]);
+
+    // Build a dependency map for triggering re-evaluation when global dependencies change
+    // This includes actual runtime values of globals that other globals depend on
+    const globalDepValueMap = useMemo(() => {
+      const depMap: Record<string, any> = {};
+      const allCurrentGlobals = { ...parentGlobalVars, ...node.globalVars };
+      
+      // For each global, collect the actual values of its dependencies
+      for (const [globalKey, depNames] of Object.entries(globalDependencies)) {
+        if (!depNames) continue;
+        
+        // Include values of direct dependencies
+        for (const depName of depNames) {
+          // Check if this is another global (in parentGlobalVars or node.globalVars)
+          if (depName in allCurrentGlobals && !depName.startsWith("__")) {
+            // Use the original string expression as the key, not the value
+            // This way we can track when the definition changes
+            const depGlobalValue = allCurrentGlobals[depName];
+            const depKey = `${globalKey}:${depName}`;
+            depMap[depKey] = depGlobalValue;
+          }
+        }
+      }
+      
+      // Also include current values of componentState globals to detect runtime changes
+      // When a global is updated (e.g., count++), the new value is stored in componentState
+      // We need to detect this change to trigger re-evaluation of dependent globals
+      if (node.globalVars) {
+        for (const globalKey of Object.keys(node.globalVars)) {
+          if (!globalKey.startsWith("__") && globalKey in componentStateWithApis) {
+            // Include the actual runtime value from componentState
+            const componentValue = componentStateWithApis[globalKey];
+            depMap[`runtime:${globalKey}`] = componentValue;
+          }
+        }
+      }
+      
+      return depMap;
+    }, [globalDependencies, parentGlobalVars, node.globalVars, componentStateWithApis]);
+
+    // Merge parent's globalVars with current node's globalVars
+    // Current node's globalVars take precedence (usually only root defines them)
+    // Evaluate any string expressions (binding expressions) in globalVars
+    // IMPORTANT: This memo includes globalDepValueMap to trigger re-evaluation
+    // when globals that affect others change during component lifetime
+    const currentGlobalVars = useMemo(() => {
+      // Evaluate parentGlobalVars if they contain string expressions
+      const evaluatedParentGlobals: Record<string, any> = {};
+      if (parentGlobalVars) {
+        // Process parent globals in order, accumulating evaluated values
+        // Skip __tree_* keys as they're metadata for re-evaluation
+        for (const [key, value] of Object.entries(parentGlobalVars)) {
+          if (key.startsWith("__")) {
+            // Skip internal metadata keys
+            continue;
+          }
+          if (typeof value === "string") {
+            // Create state with previously evaluated parent globals for dependency resolution
+            evaluatedParentGlobals[key] = extractParam(
+              evaluatedParentGlobals,  // Include previously evaluated globals
+              value,
+              appContext,
+              false,
+            );
+          } else {
+            evaluatedParentGlobals[key] = value;
+          }
+        }
+      }
+      
+      // Evaluate node.globalVars if they contain string expressions
+      // Include both parent globals and previously evaluated node globals
+      const evaluatedNodeGlobals: Record<string, any> = {};
+      if (node.globalVars) {
+        // Merge parent globals with node globals for evaluation context
+        // START with componentStateWithApis values for any globals that have been updated at runtime
+        // This is KEY for reactivity: when count++ updates count, subsequent globals can see the new value
+        let globalsForContext = { ...evaluatedParentGlobals, ...evaluatedNodeGlobals };
+        
+        for (const [key, value] of Object.entries(node.globalVars)) {
+          if (key.startsWith("__")) {
+            // Skip internal metadata keys
+            continue;
+          }
+          if (typeof value === "string") {
+            // CRITICAL: For evaluation, use componentStateWithApis values if they exist
+            // This ensures that when a global is updated (e.g., count++), we see the NEW value, not the old one
+            const evalContext: Record<string, any> = {};
+            
+            // First, define all globals that might be dependencies from their current runtime values
+            if (node.globalVars) {
+              for (const [globalKey] of Object.entries(node.globalVars)) {
+                if (!globalKey.startsWith("__")) {
+                  // Prefer componentStateWithApis value (runtime updated) over initially evaluated value
+                  if (globalKey in componentStateWithApis) {
+                    evalContext[globalKey] = componentStateWithApis[globalKey];
+                  } else if (globalKey in globalsForContext) {
+                    evalContext[globalKey] = globalsForContext[globalKey];
+                  }
+                }
+              }
+            }
+            
+            // Also include parent globals
+            for (const [pkey, pval] of Object.entries(evaluatedParentGlobals)) {
+              if (!(pkey in evalContext)) {
+                evalContext[pkey] = pval;
+              }
+            }
+            
+            // Create state with all available globals for dependency resolution
+            evaluatedNodeGlobals[key] = extractParam(
+              evalContext,
+              value,
+              appContext,
+              false,
+            );
+            // Update the context for subsequent variables with the newly evaluated value
+            globalsForContext[key] = evaluatedNodeGlobals[key];
+          } else {
+            evaluatedNodeGlobals[key] = value;
+            globalsForContext[key] = value;
+          }
+        }
+      }
+      
+      // Merge with node globals taking precedence
+      return {
+        ...evaluatedParentGlobals,
+        ...evaluatedNodeGlobals,
+      };   
+    }, [parentGlobalVars, node.globalVars, appContext, globalDepValueMap, globalDependencies, componentStateWithApis]);
+
+    // ========================================================================
+    // LAYER 6: FINAL STATE COMBINATION
+    // ========================================================================
+
     const combinedState = useCombinedState(
       stateFromOutside,
       node.contextVars,
+      currentGlobalVars,  // Add globalVars to combined state
       mergedWithVars,
       routingParams,
     );
+
+    // ========================================================================
+    // COMPONENT API REGISTRATION
+    // ========================================================================
 
     const registerComponentApi: RegisterComponentApiFnInner = useCallback((uid, api) => {
       setComponentApis(
@@ -540,10 +790,34 @@ export const StateContainer = memo(
 
     const componentStateRef = useRef(componentStateWithApis);
 
+    // ========================================================================
+    // STATE CHANGE CALLBACK
+    // ========================================================================
+
     const statePartChanged: StatePartChangedFn = useCallback(
       (pathArray, newValue, target, action) => {
         const key = pathArray[0];
-        if (key in componentStateRef.current || key in resolvedLocalVars) {
+        const isGlobalVar = key in currentGlobalVars;
+        const isRoot = node.uid === 'root';
+        
+        if (isGlobalVar) {
+          if (isRoot) {
+            // Root container should handle global var updates itself
+            dispatch({
+              type: ContainerActionKind.STATE_PART_CHANGED,
+              payload: {
+                path: pathArray,
+                value: newValue,
+                target,
+                actionType: action,
+                localVars: resolvedLocalVars,
+              },
+            });
+          } else {
+            // Non-root containers bubble globals to parent
+            parentStatePartChanged(pathArray, newValue, target, action);
+          }
+        } else if (key in componentStateRef.current || key in resolvedLocalVars) {
           // --- Sign that a state field (or a part of it) has changed
           dispatch({
             type: ContainerActionKind.STATE_PART_CHANGED,
@@ -556,13 +830,18 @@ export const StateContainer = memo(
             },
           });
         } else {
+          // Not global, not local - bubble up if allowed by uses
           if (!node.uses || node.uses.includes(key)) {
             parentStatePartChanged(pathArray, newValue, target, action);
           }
         }
       },
-      [resolvedLocalVars, node.uses, parentStatePartChanged],
+      [resolvedLocalVars, currentGlobalVars, node.uses, node.uid, parentStatePartChanged],
     );
+
+    // ========================================================================
+    // RENDERING
+    // ========================================================================
 
     return (
       <ErrorBoundary node={node} location={"container"}>
@@ -570,6 +849,7 @@ export const StateContainer = memo(
           resolvedKey={resolvedKey}
           node={node}
           componentState={combinedState}
+          globalVars={currentGlobalVars}
           dispatch={dispatch}
           parentDispatch={parentDispatch}
           setVersion={setVersion}
@@ -592,6 +872,14 @@ export const StateContainer = memo(
   }),
 );
 
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+
+/**
+ * Hook to get routing-related parameters from React Router.
+ * Returns pathname, route params, query params, and link info.
+ */
 const useRoutingParams = () => {
   const [queryParams] = useSearchParams();
   const routeParams = useParams();
@@ -618,21 +906,6 @@ const useRoutingParams = () => {
     };
   }, [linkInfo, location.pathname, queryParamsMap, routeParams]);
 };
-
-// Extracts the `state` property values defined in a component definition's `uses` property. It uses the specified
-// `appContext` when resolving the state values.
-function extractScopedState(
-  parentState: ContainerState,
-  uses?: string[],
-): ContainerState | undefined {
-  if (!uses) {
-    return parentState;
-  }
-  if (uses.length === 0) {
-    return EMPTY_OBJECT;
-  }
-  return pick(parentState, uses);
-}
 
 // This hook combines state properties in a list of states so that a particular state property in a higher
 // argument index overrides the same-named state property in a lower argument index.
@@ -808,34 +1081,6 @@ function useVars(
   }, [appContext, componentState, fnDeps, memoedVars, referenceTrackedApi, vars]);
 
   return useShallowCompareMemoize(resolvedVars);
-}
-
-class CodeBehindParseError extends Error {
-  constructor(errors: ModuleErrors) {
-    const mainErrors = errors["Main"] || [];
-    const messages = mainErrors.map((errorMessage) => {
-      let ret = `${errorMessage.code} : ${errorMessage.text}`;
-      const posInfo = [];
-      if (errorMessage.line !== undefined) {
-        posInfo.push(`line:${errorMessage.line}`);
-      }
-      if (errorMessage.column !== undefined) {
-        posInfo.push(`column:${errorMessage.column}`);
-      }
-      if (posInfo.length) {
-        ret = `${ret} (${posInfo.join(", ")})`;
-      }
-      return ret;
-    });
-    super(messages.join("\n"));
-    Object.setPrototypeOf(this, CodeBehindParseError.prototype);
-  }
-}
-
-class ParseVarError extends Error {
-  constructor(varName: string, originalError: any) {
-    super(`Error on var: ${varName} - ${originalError?.message || "unknown"}`);
-  }
 }
 
 //true if it's coming from a code behind or a script tag

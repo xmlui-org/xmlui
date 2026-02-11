@@ -53,6 +53,7 @@ import { parseHandlerCode, prepareHandlerStatements } from "../utils/statementUt
 import { renderChild } from "./renderChild";
 import { useTheme } from "../theming/ThemeContext";
 import { LoaderComponent } from "../LoaderComponent";
+import { isParsedEventValue, isArrowExpression } from "./ContainerUtils";
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import { EMPTY_ARRAY } from "../constants";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
@@ -71,31 +72,70 @@ import {
 // Re-export for backward compatibility
 export { getCurrentTrace } from "../inspector/inspectorUtils";
 
+// ============================================================================
+// TYPE DEFINITIONS
+// ============================================================================
+
+/**
+ * Props for the Container component.
+ * Container manages component state, event handlers, and child rendering.
+ */
 type Props = {
+  /** Container wrapper definition with children and loaders */
   node: ContainerWrapperDef;
+  /** Resolved key for React reconciliation */
   resolvedKey?: string;
+  /** Current component state */
   componentState: ContainerState;
+  /** Global variables available to the container */
+  globalVars?: Record<string, any>;
+  /** Dispatcher for container state updates */
   dispatch: ContainerDispatcher;
+  /** Function to set version number for re-rendering */
   setVersion: Dispatch<SetStateAction<number>>;
+  /** Current version number for state updates */
   version: number;
+  /** Callback when part of state changes */
   statePartChanged: StatePartChangedFn;
+  /** Function to register component APIs */
   registerComponentApi: RegisterComponentApiFnInner;
+  /** Parent's function to register component APIs */
   parentRegisterComponentApi: RegisterComponentApiFnInner;
+  /** Reference to layout context */
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
+  /** Reference to memoized variables */
   memoedVarsRef: MutableRefObject<MemoedVars>;
+  /** Whether this is an implicit container */
   isImplicit?: boolean;
+  /** Parent container's dispatcher */
   parentDispatch: ContainerDispatcher;
+  /** Parent rendering context */
   parentRenderContext?: ParentRenderContext;
+  /** Reference to UID information */
   uidInfoRef?: RefObject<Record<string, any>>;
+  /** Child elements to render */
   children?: ReactNode;
 };
 
-// React component to display a view container and implement its behavior
+// ============================================================================
+// CONTAINER COMPONENT
+// ============================================================================
+
+/**
+ * Container component that manages component state, event handlers, and child rendering.
+ * Provides:
+ * - Event handler execution (async and sync)
+ * - Event handler caching and lifecycle tracking
+ * - Child component rendering
+ * - Loader rendering
+ * - API registration for compound components
+ */
 export const Container = memo(
   forwardRef(function Container(
     {
       node,
       componentState,
+      globalVars,
       dispatch: containerDispatch,
       parentDispatch,
       resolvedKey,
@@ -139,6 +179,10 @@ export const Container = memo(
     const [_, startTransition] = useTransition();
     const mountedRef = useRef(true);
 
+    // ========================================================================
+    // LIFECYCLE MANAGEMENT
+    // ========================================================================
+
     // --- This ref holds a map of promises for each statement execution that cause any state change.
     const statementPromises = useRef<Map<string, any>>(new Map());
 
@@ -162,6 +206,12 @@ export const Container = memo(
     }, []);
 
     const { apiInstance } = useApiInterceptorContext();
+
+    // ========================================================================
+    // EVENT HANDLER EXECUTION - ASYNC
+    // ========================================================================
+    // runCodeAsync: Executes event handlers asynchronously with state tracking,
+    // inspector logging, and React transition management.
 
     const runCodeAsync = useEvent(
       async (
@@ -215,6 +265,7 @@ export const Container = memo(
             duration: detail?.duration,
             startPerfTs: detail?.startPerfTs,
             handlerCode: detail?.handlerCode,
+            eventArgs: detail?.args?.length ? detail.args : undefined,
           }, xsLogMax);
           if (xsLogBucket && appContext.AppState) {
             try {
@@ -555,6 +606,11 @@ export const Container = memo(
       },
     );
 
+    // ========================================================================
+    // EVENT HANDLER EXECUTION - SYNC
+    // ========================================================================
+    // runCodeSync: Executes arrow expressions synchronously without state tracking.
+
     const runCodeSync = useCallback(
       (arrowExpression: ArrowExpression, ...eventArgs: any[]) => {
         const evalContext: BindingTreeEvaluationContext = {
@@ -581,6 +637,12 @@ export const Container = memo(
       },
       [appContext],
     );
+
+    // ========================================================================
+    // EVENT HANDLER CACHING
+    // ========================================================================
+    // getOrCreateEventHandlerFn: Creates or retrieves cached event handler functions.
+    // Handles string handlers, ParsedEventValues, and ArrowExpressions.
 
     const getOrCreateEventHandlerFn = useEvent(
       (
@@ -648,6 +710,11 @@ export const Container = memo(
       },
     );
 
+    // ========================================================================
+    // SYNC CALLBACK CACHING
+    // ========================================================================
+    // getOrCreateSyncCallbackFn: Creates or retrieves cached synchronous callback functions.
+
     const getOrCreateSyncCallbackFn = useCallback(
       (arrowExpression: ArrowExpression, uid: symbol) => {
         const fnCacheKey = `sync-callback-${arrowExpression.nodeId}`;
@@ -663,6 +730,11 @@ export const Container = memo(
       },
       [runCodeSync],
     );
+
+    // ========================================================================
+    // ACTION AND CALLBACK LOOKUP
+    // ========================================================================
+    // lookupSyncCallback: Resolves and returns synchronous callback functions.
 
     const lookupSyncCallback: LookupSyncFnInner = useCallback(
       (action, uid) => {
@@ -691,6 +763,8 @@ export const Container = memo(
       [getOrCreateSyncCallbackFn],
     );
 
+    // lookupAction: Resolves and returns asynchronous action functions.
+
     const lookupAction: LookupAsyncFnInner = useCallback(
       (
         action: string | undefined | ArrowExpression,
@@ -717,6 +791,11 @@ export const Container = memo(
       },
       [componentState, getOrCreateEventHandlerFn],
     );
+
+    // ========================================================================
+    // API REGISTRATION
+    // ========================================================================
+    // Registers component APIs for compound components and parent access.
 
     const isApiRegisteredInnerRef = useRef(false);
     useEffect(() => {
@@ -749,9 +828,18 @@ export const Container = memo(
       registerComponentApi,
     ]);
 
+    // ========================================================================
+    // CLEANUP
+    // ========================================================================
+
     const cleanup = useEvent((uid) => {
       delete fnsRef.current[uid];
     });
+
+    // ========================================================================
+    // CHILD RENDERING
+    // ========================================================================
+    // stableRenderChild: Renders child components recursively with proper ref composition.
 
     // --- The container wraps the `renderChild` function to provide that to the child components
     const stableRenderChild: RenderChildFn = useCallback(
@@ -785,6 +873,7 @@ export const Container = memo(
           const renderedChild = renderChild({
             node: child,
             state: componentState,
+            globalVars,
             dispatch,
             appContext,
             lookupAction,
@@ -852,6 +941,9 @@ export const Container = memo(
       ],
     );
 
+    // ========================================================================
+    // COMPONENT RENDERING
+    // ========================================================================
 
     // --- Use this object to store information about already rendered UIDs.
     // --- We do not allow any action, loader, or transform to use the same UID; however (as of now) children
@@ -909,17 +1001,36 @@ export const Container = memo(
   }),
 );
 
+// ============================================================================
+// LOADER RENDERING
+// ============================================================================
+
+/**
+ * Context object passed to renderLoaders and renderLoader functions.
+ * Contains all dependencies needed to render loader components.
+ */
 interface LoaderRenderContext {
+  /** Map tracking UIDs already used in this container */
   uidInfo: Record<string, string>;
+  /** Reference to UID information store */
   uidInfoRef: RefObject<Record<string, any>>;
+  /** Array of loader component definitions to render */
   loaders?: ComponentDef[];
+  /** Current container state */
   componentState: ContainerState;
+  /** Container dispatcher for state updates */
   dispatch: ContainerDispatcher;
+  /** Application context object */
   appContext: AppContextObject;
+  /** Function to register component APIs */
   registerComponentApi: RegisterComponentApiFnInner;
+  /** Function to lookup async action handlers */
   lookupAction: LookupAsyncFnInner;
+  /** Function to lookup sync callback handlers */
   lookupSyncCallback: LookupSyncFnInner;
+  /** Function to cleanup component resources */
   cleanup: ComponentCleanupFn;
+  /** Reference to memoized variables */
   memoedVarsRef: MutableRefObject<MemoedVars>;
 }
 
@@ -1024,14 +1135,8 @@ function renderLoaders({
   }
 }
 
-function isParsedEventValue(
-  value: string | ParsedEventValue | ArrowExpression,
-): value is ParsedEventValue {
-  return (value as ParsedEventValue).__PARSED === true;
-}
-
-function isArrowExpression(
-  value: string | ParsedEventValue | ArrowExpression,
-): value is ArrowExpression {
-  return (value as ArrowExpression).type === T_ARROW_EXPRESSION;
-}
+// ============================================================================
+// TYPE GUARDS
+// ============================================================================
+// Type guards are now imported from ContainerUtils.ts
+// See: isParsedEventValue, isArrowExpression

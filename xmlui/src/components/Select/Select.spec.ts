@@ -341,6 +341,98 @@ test.describe("Basic Functionality", () => {
     },
   );
 
+  test(
+    "Option label defaults to value in SimpleSelect",
+    { tag: "@smoke" },
+    async ({ initTestBed, page, createSelectDriver }) => {
+      await initTestBed(`
+      <Fragment>
+        <Select id="mySelect">
+          <Option value="opt1"/>
+          <Option value="opt2"/>
+          <Option value="opt3"/>
+        </Select>
+        <Text testId="text">Selected value: {mySelect.value}</Text>
+      </Fragment>
+    `);
+      const driver = await createSelectDriver("mySelect");
+      await driver.toggleOptionsVisibility();
+      
+      // Options should display their values
+      await expect(page.getByRole("option", { name: "opt1" })).toBeVisible();
+      await expect(page.getByRole("option", { name: "opt2" })).toBeVisible();
+      await expect(page.getByRole("option", { name: "opt3" })).toBeVisible();
+      
+      // Select an option and verify
+      await page.getByRole("option", { name: "opt2" }).click();
+      await expect(page.getByTestId("text")).toHaveText("Selected value: opt2");
+      await expect(driver.component).toHaveText("opt2");
+    },
+  );
+
+  test(
+    "Option label defaults to value in searchable Select",
+    { tag: "@smoke" },
+    async ({ initTestBed, page, createSelectDriver }) => {
+      await initTestBed(`
+      <Fragment>
+        <Select id="mySelect" searchable="true">
+          <Option value="opt1"/>
+          <Option value="opt2"/>
+          <Option value="opt3"/>
+        </Select>
+        <Text testId="text">Selected value: {mySelect.value}</Text>
+      </Fragment>
+    `);
+      const driver = await createSelectDriver("mySelect");
+      await driver.toggleOptionsVisibility();
+      
+      // Options should display their values
+      await expect(page.getByRole("option", { name: "opt1" })).toBeVisible();
+      await expect(page.getByRole("option", { name: "opt2" })).toBeVisible();
+      await expect(page.getByRole("option", { name: "opt3" })).toBeVisible();
+      
+      // Select an option and verify
+      await page.getByRole("option", { name: "opt2" }).click();
+      await expect(page.getByTestId("text")).toHaveText("Selected value: opt2");
+      await expect(driver.component).toHaveText("opt2");
+    },
+  );
+
+  test(
+    "Option label defaults to value in multiSelect",
+    { tag: "@smoke" },
+    async ({ initTestBed, page, createSelectDriver }) => {
+      await initTestBed(`
+      <Fragment>
+        <Select id="mySelect" multiSelect="true">
+          <Option value="opt1"/>
+          <Option value="opt2"/>
+          <Option value="opt3"/>
+        </Select>
+        <Text testId="text">Selected values: {mySelect.value}</Text>
+      </Fragment>
+    `);
+      const driver = await createSelectDriver("mySelect");
+      await driver.toggleOptionsVisibility();
+      
+      // Options should display their values
+      await expect(page.getByRole("option", { name: "opt1" })).toBeVisible();
+      await expect(page.getByRole("option", { name: "opt2" })).toBeVisible();
+      await expect(page.getByRole("option", { name: "opt3" })).toBeVisible();
+      
+      // Select multiple options and verify
+      await page.getByRole("option", { name: "opt1" }).click();
+      await page.getByRole("option", { name: "opt3" }).click();
+      await expect(page.getByTestId("text")).toHaveText("Selected values: opt1,opt3");
+      
+      // Selected values should appear as badges with their value text
+      await driver.toggleOptionsVisibility();
+      await expect(page.getByText("opt1").first()).toBeVisible();
+      await expect(page.getByText("opt3").first()).toBeVisible();
+    },
+  );
+
   // --- clearable prop
 
   test("clear button not visible by default (clearable=false)", async ({
@@ -1027,6 +1119,69 @@ test.describe("Visual State", () => {
     const input = page.getByTestId("test");
     const { width } = await input.boundingBox();
     expect(width).toBe(200);
+  });
+
+  test("dropdown height is consistent across Select variants with same number of options", async ({
+    page,
+    initTestBed,
+  }) => {
+    // Create a test with SimpleSelect (no searchable, no multiSelect)
+    await initTestBed(`
+      <HStack>
+        <Select testId="simpleSelect" width="33%">
+          <Option value="opt1" label="Option 1"/>
+          <Option value="opt2" label="Option 2"/>
+          <Option value="opt3" label="Option 3"/>
+          <Option value="opt4" label="Option 4"/>
+          <Option value="opt5" label="Option 5"/>
+        </Select>
+        <Select testId="searchableSelect" width="33%" searchable="true">
+          <Option value="opt1" label="Option 1"/>
+          <Option value="opt2" label="Option 2"/>
+          <Option value="opt3" label="Option 3"/>
+          <Option value="opt4" label="Option 4"/>
+          <Option value="opt5" label="Option 5"/>
+        </Select>
+        <Select testId="multiSelect" width="33%" multiSelect="true">
+          <Option value="opt1" label="Option 1"/>
+          <Option value="opt2" label="Option 2"/>
+          <Option value="opt3" label="Option 3"/>
+          <Option value="opt4" label="Option 4"/>
+          <Option value="opt5" label="Option 5"/>
+        </Select>
+      </HStack>
+    `);
+
+    const simpleSelect = page.getByTestId("simpleSelect");
+    await simpleSelect.click();
+
+    // Get the dropdown content height for SimpleSelect
+    const simpleDropdown = page.locator("[data-state='open'][role='listbox']").first();
+    const { height: simpleHeight } = await simpleDropdown.boundingBox();
+    // close
+    await page.getByText('Option 1').click();
+
+    const searchableSelect = page.getByTestId("searchableSelect");
+    await searchableSelect.click();
+
+    // Get the dropdown content height for searchable Select
+    const searchableDropdown = page.getByRole('dialog').locator("[role='listbox']");
+    const { height: searchableHeight } = await searchableDropdown.boundingBox();
+    // close
+    await page.getByRole('listbox').getByText('Option 1').click();
+
+    const multiSelect = page.getByTestId("multiSelect");
+    await multiSelect.click();
+
+    // Get the dropdown content height for multiSelect
+    const multiDropdown = page.getByRole('dialog').locator("[role='listbox']");
+    const { height: multiHeight } = await multiDropdown.boundingBox();
+
+    // All dropdowns should have approximately the same height
+    // Allow small variance for padding/borders
+    expect(Math.abs(simpleHeight - searchableHeight)).toBeLessThan(5);
+    expect(Math.abs(searchableHeight - multiHeight)).toBeLessThan(5);
+    expect(Math.abs(simpleHeight - multiHeight)).toBeLessThan(5);
   });
 });
 

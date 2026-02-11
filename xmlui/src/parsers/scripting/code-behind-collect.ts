@@ -137,6 +137,7 @@ function collectStatementFromModule(
         result.vars[decl.id.name] = {
           [PARSED_MARK_PROP]: true,
           tree: decl.expr,
+          source: decl.expr?.source || null, // Store the source text from the new parser feature
         };
       });
       break;
