@@ -59,6 +59,34 @@
         return !!navMap[path];
       }
 
+      function findNavCrumbsByPath(nav, targetPath) {
+        function walk(items, chain) {
+          if (!Array.isArray(items)) return null;
+          for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            if (!item || typeof item !== "object") continue;
+            const label = typeof item.label === "string" ? item.label : "";
+            const to = typeof item.to === "string" ? item.to : "";
+            const nextChain = label ? chain.concat([{ label, to }]) : chain;
+
+            if (to && to === targetPath) {
+              return nextChain;
+            }
+
+            const children = Array.isArray(item.children) ? item.children : null;
+            if (children) {
+              const childMatch = walk(children, nextChain);
+              if (childMatch) return childMatch;
+            }
+          }
+          return null;
+        }
+
+        const fromItems = walk(nav && nav.items, []);
+        if (fromItems) return fromItems;
+        return walk(nav && nav.mobileLinks, []);
+      }
+
       function prettifySegment(segment) {
         if (!segment) return "";
         const decoded = decodeURIComponent(segment);
@@ -79,6 +107,19 @@
 
         if (currentPath === "/") {
           return [];
+        }
+
+        const navCrumbs = findNavCrumbsByPath(nav, currentPath);
+        if (Array.isArray(navCrumbs) && navCrumbs.length > 0) {
+          return navCrumbs.map((crumb, idx) => {
+            const isLast = idx === navCrumbs.length - 1;
+            const to = crumb && typeof crumb.to === "string" ? crumb.to : "";
+            return {
+              to,
+              label: crumb.label,
+              isLink: !!to && to[0] === "/" && !isLast,
+            };
+          });
         }
 
         const parts = currentPath.split("/").filter((p) => p);

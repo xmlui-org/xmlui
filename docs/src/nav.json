@@ -35,37 +35,37 @@
         "label": "Guides",
         "to": "/guides",
         "children": [
-          { "to": "/app-structure", "label": "App Structure", "icon": "hierarchy" },
-          { "to": "/markup", "label": "Markup", "icon": "markup" },
-          { "to": "/scripting", "label": "Scripting", "icon": "bolt" },
-          { "to": "/scoping", "label": "Scoping", "icon": "boundary" },
+          { "to": "/guides/app-structure", "label": "App Structure", "icon": "hierarchy" },
+          { "to": "/guides/markup", "label": "Markup", "icon": "markup" },
+          { "to": "/guides/scripting", "label": "Scripting", "icon": "bolt" },
+          { "to": "/guides/scoping", "label": "Scoping", "icon": "boundary" },
           {
-            "to": "/playground-and-codefence",
+            "to": "/guides/playground-and-codefence",
             "label": "Codefences and playgrounds",
             "icon": "playground"
           },
-          { "to": "/layout", "label": "Layout", "icon": "layout" },
-          { "to": "/working-with-text", "label": "Working with Text", "icon": "typography" },
+          { "to": "/guides/layout", "label": "Layout", "icon": "layout" },
+          { "to": "/guides/working-with-text", "label": "Working with Text", "icon": "typography" },
           {
-            "to": "/working-with-markdown",
+            "to": "/guides/working-with-markdown",
             "label": "Working with Markdown",
             "icon": "markdown"
           },
-          { "to": "/routing-and-links", "label": "Routing and Links", "icon": "link" },
-          { "to": "/forms", "label": "Forms", "icon": "form" },
-          { "to": "/modal-dialogs", "label": "Modal Dialogs", "icon": "dialog" },
+          { "to": "/guides/routing-and-links", "label": "Routing and Links", "icon": "link" },
+          { "to": "/guides/forms", "label": "Forms", "icon": "form" },
+          { "to": "/guides/modal-dialogs", "label": "Modal Dialogs", "icon": "dialog" },
           {
-            "to": "/user-defined-components",
+            "to": "/guides/user-defined-components",
             "label": "User-defined Components",
             "icon": "component"
           },
-          { "to": "/refactoring", "label": "Refactoring", "icon": "refactor" },
+          { "to": "/guides/refactoring", "label": "Refactoring", "icon": "refactor" },
           {
-            "to": "/build-hello-world-component",
+            "to": "/guides/build-hello-world-component",
             "label": "Build a HelloWorld Component",
             "icon": "build"
           },
-          { "to": "/hosted-deployment", "label": "Hosted Deployment", "icon": "deploy" }
+          { "to": "/guides/hosted-deployment", "label": "Hosted Deployment", "icon": "deploy" }
         ]
       },
       {
