@@ -258,9 +258,11 @@
       },
       {
         "label": "Reference",
+        "to": "/reference",
         "children": [
           {
             "label": "Components",
+            "to": "/reference/components",
             "icon": "component",
             "children": [
               { "to": "/components/_overview", "label": "Components Overview", "icon": "component" },

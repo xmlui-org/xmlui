@@ -120,6 +120,16 @@
                 content="{appGlobals.content['pages/guides.md']}"
             />
         </Page>
+        <Page url="/reference">
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/reference.md']}"
+            />
+        </Page>
+        <Page url="/reference/components">
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/reference-components.md']}"
+            />
+        </Page>
         <Page url="/guides/app-structure">
             <DocumentPageNoTOC
                 content="{appGlobals.content['pages/app-structure.md']}"
