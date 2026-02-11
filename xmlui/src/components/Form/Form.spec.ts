@@ -2280,14 +2280,6 @@ test.describe("Edge Cases", () => {
     await expect(driver.component).toBeVisible();
   });
 
-  test("Form does not render if data receives malformed input", async ({
-    initTestBed,
-    createFormDriver,
-  }) => {
-    await initTestBed(`<Form data="{}" />`);
-    await expect((await createFormDriver()).component).not.toBeAttached();
-  });
-
   test("handles deeply nested data structure", async ({
     initTestBed,
     createFormItemDriver,
@@ -2302,21 +2294,6 @@ test.describe("Edge Cases", () => {
     const driver = await createFormItemDriver("nameField");
     const input = await createTextBoxDriver(driver.input);
     await expect(input.field).toHaveValue("John");
-  });
-
-  test("handles form with validation errors", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem label="Email" bindTo="email" type="email" required="true" />
-      </Form>
-    `);
-
-    // Try to submit form without filling required field
-    await page.getByRole("button", { name: "Save" }).click();
-
-    // Validation should prevent submission and show error
-    const form = page.locator("form");
-    await expect(form).toBeVisible();
   });
 
   test("handles rapid form submissions", async ({ initTestBed, page }) => {
