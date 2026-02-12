@@ -24,6 +24,8 @@ export class GenericBackendError extends EngineError {
   readonly errorCategory = "GenericBackendError";
   details: any;
   statusCode: number | undefined;
+  message: string;
+  response: any;
 
   constructor(public readonly info: any, errorCode: number | undefined) {
     // Extract the main message (various field names across API formats)
@@ -51,8 +53,11 @@ export class GenericBackendError extends EngineError {
 
     super(message);
 
+    // Set message as own property for better accessibility in script contexts
+    this.message = message;
     this.details = details;
     this.statusCode = errorCode;
+    this.response = info;
     // --- Set the prototype explicitly.
     Object.setPrototypeOf(this, GenericBackendError.prototype);
   }
@@ -112,5 +117,6 @@ export function createContextVariableError(err: GenericBackendError) {
     statusCode: err.statusCode || 500,
     message: err.message || "An error occurred",
     details: err.details || { },
+    response: err.info,
   }
 }
