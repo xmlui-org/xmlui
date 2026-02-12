@@ -1421,6 +1421,7 @@ export const Table = forwardRef(
                         style={{
                           position: "relative",
                           width: size,
+                          flexShrink: 0,
                           ...getCommonPinningStyles(header.column),
                         }}
                       >
@@ -1647,6 +1648,7 @@ export const Table = forwardRef(
                             key={`${cell.id}-${i}`}
                             style={{
                               width: size,
+                              flexShrink: 0,
                               ...getCommonPinningStyles(cell.column),
                               ...columnStyle,
                             }}
