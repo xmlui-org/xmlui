@@ -2,6 +2,7 @@
   <Stack
     width="{$props.width ? $props.width : '100%'}"
     maxWidth="$maxWidth-content-NoToc">
+    <Breadcrumbs />
     <Markdown
       when="{$props.content || $props.url}"
       content="{$props.content}"
