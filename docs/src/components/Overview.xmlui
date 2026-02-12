@@ -1,0 +1,91 @@
+<Component name="Overview">
+    <script>
+        function flattenLinks(items) {
+            if (!Array.isArray(items)) return [];
+            return items.flatMap((item) => {
+                const ownLink = item?.to ? [item] : [];
+                const childLinks = flattenLinks(item?.children);
+                return [...ownLink, ...childLinks];
+            });
+        }
+
+        function getNavGroup() {
+            return Object.values(appGlobals.navSections || {})
+                .flatMap((section) => section?.items || [])
+                .find((item) => item?.to === $linkInfo?.to || item?.label === $linkInfo?.label);
+        }
+
+        function getTopLevelChildren() {
+            const navGroup = getNavGroup();
+            return navGroup?.children || $linkInfo?.children || [];
+        }
+
+        function getPageDescription() {
+            const navGroup = getNavGroup();
+            return navGroup?.description || $linkInfo?.description;
+        }
+
+        function getRootLinks() {
+            return getTopLevelChildren().filter((item) => item?.to && !(item?.children?.length > 0));
+        }
+
+        function getSubSections() {
+            return getTopLevelChildren()
+                .filter((item) => Array.isArray(item?.children) && item.children.length > 0)
+                .map((item) => ({
+                    title: item.label,
+                    links: flattenLinks(item.children),
+                }))
+                .filter((section) => section.links.length > 0);
+        }
+    </script>
+
+    <Stack width="100%" maxWidth="$maxWidth-content-NoToc" gap="$space-6">
+        <Breadcrumbs />
+        <VStack gap="$space-2">
+            <H1 showAnchor="{false}">{$linkInfo.label}</H1>
+            <Text when="{getPageDescription()}" variant="subtitle">
+                {getPageDescription()}
+            </Text>
+        </VStack>
+
+        <FlowLayout when="{getRootLinks().length > 0}" gap="$space-4">
+            <Items data="{getRootLinks()}">
+                <Link
+                    active="true"
+                    to="{$item.to}"
+                    width="{mediaSize.sizeIndex > 4 ? '24%' : mediaSize.sizeIndex > 3 ? '32%' : mediaSize.sizeIndex > 2 ? '49%' : '100%'}"
+                >
+                    <Card>
+                        <HStack verticalAlignment="center">
+                            <Icon when="{$item.icon}" name="{$item.icon}" />
+                            <Text variant="strong">{$item.label}</Text>
+                        </HStack>
+                    </Card>
+                </Link>
+            </Items>
+        </FlowLayout>
+
+        <Items data="{getSubSections()}">
+            <VStack gap="$space-4">
+                <H2 showAnchor="{false}">{$item.title}</H2>
+                <FlowLayout gap="$space-4">
+                    <Items data="{$item.links}">
+                        <Link
+                            active="true"
+                            to="{$item.to}"
+                            width="{mediaSize.sizeIndex > 4 ? '24%' : mediaSize.sizeIndex > 3 ? '32%' : mediaSize.sizeIndex > 2 ? '49%' : '100%'}"
+                        >
+                            <Card>
+                                <HStack verticalAlignment="center">
+                                    <Icon when="{$item.icon}" name="{$item.icon}" />
+                                    <Text variant="strong">{$item.label}</Text>
+                                </HStack>
+                            </Card>
+                        </Link>
+                    </Items>
+                </FlowLayout>
+            </VStack>
+        </Items>
+    </Stack>
+</Component>

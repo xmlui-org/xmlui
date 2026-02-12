@@ -2,6 +2,8 @@
   "items": [
     {
       "label": "Reference",
+      "to": "/reference",
+      "description": "Detailed API and component reference documentation.",
       "children": [
         {
           "label": "Components",

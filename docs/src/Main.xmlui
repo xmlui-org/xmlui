@@ -165,15 +165,20 @@
                 content="{appGlobals.content['pages/tutorial-12.md']}"
             />
         </Page>
+        <Page url="/learn">
+            <Overview />
+        </Page>
         <Page url="/guides">
-            <DocumentPageNoTOC
-                content="{appGlobals.content['pages/guides.md']}"
-            />
+            <Overview />
+        </Page>
+        <Page url="/tutorial">
+            <Overview />
+        </Page>
+        <Page url="/howto">
+            <Overview />
         </Page>
         <Page url="/reference">
-            <DocumentPageNoTOC
-                content="{appGlobals.content['pages/reference.md']}"
-            />
+            <Overview />
         </Page>
         <Page url="/reference/components">
             <DocumentPageNoTOC

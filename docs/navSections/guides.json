@@ -3,6 +3,7 @@
     {
       "label": "Guides",
       "to": "/guides",
+      "description": "This section contains practical guides for building XMLUI applications.",
       "children": [
         { "to": "/guides/app-structure", "label": "App Structure", "icon": "hierarchy" },
         { "to": "/guides/markup", "label": "Markup", "icon": "markup" },

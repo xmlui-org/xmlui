@@ -2,6 +2,8 @@
   "items": [
     {
       "label": "Learn XMLUI",
+      "to": "/learn",
+      "description": "Start here to learn XMLUI fundamentals from the ground up.",
       "initiallyExpanded": true,
       "children": [
         { "to": "/", "label": "Introduction", "icon": "school" },
