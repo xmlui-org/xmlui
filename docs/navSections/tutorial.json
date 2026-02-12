@@ -2,6 +2,8 @@
   "items": [
     {
       "label": "Tutorial",
+      "to": "/tutorial",
+      "description": "Build an XMLUI invoice app step by step.",
       "children": [
         { "to": "/tutorial-01", "label": "XMLUI Invoice", "icon": "invoice" },
         { "to": "/tutorial-02", "label": "Main.xmlui", "icon": "file-code" },
