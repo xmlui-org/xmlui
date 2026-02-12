@@ -56,6 +56,7 @@ export type UploadOperationDef = ApiOperationDef & {
   file: File;
   formParams?: Record<string, any>;
   asForm?: boolean;
+  fieldName?: string;
 };
 
 export type DownloadOperationDef = ApiOperationDef & {
@@ -310,7 +311,7 @@ export default class RestApiProxy {
     transactionId?: string;
     resolveBindingExpressions?: boolean;
   }) => {
-    const { file, asForm, formParams } = this.extractParam(
+    const { file, asForm, formParams, fieldName } = this.extractParam(
       resolveBindingExpressions,
       operation,
       params,
@@ -329,7 +330,9 @@ export default class RestApiProxy {
 
     if (asForm) {
       const data = new FormData();
-      data.append(file.name, chunk?.blob || file);
+      // Use fieldName if provided, otherwise default to "file"
+      const formFieldName = fieldName || "file";
+      data.append(formFieldName, chunk?.blob || file);
       if (formParams) {
         Object.entries(this.extractParam(resolveBindingExpressions, formParams, params)).forEach(
           ([key, value]) => {

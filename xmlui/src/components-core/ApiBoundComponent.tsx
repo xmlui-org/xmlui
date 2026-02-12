@@ -64,6 +64,7 @@ export function ApiBoundComponent({
             headers,
             method,
             file,
+            fieldName,
           } = actionComponent.props;
           return `(eventArgs) => {
             return Actions.upload({
@@ -76,6 +77,7 @@ export function ApiBoundComponent({
               headers: ${JSON.stringify(headers)}, 
               method: ${JSON.stringify(method)}, 
               file: ${JSON.stringify(file)}, 
+              fieldName: ${JSON.stringify(fieldName)}, 
               params: { '$param': eventArgs }, 
               onError: ${prepareEvent(error)}, 
               onSuccess: ${prepareEvent(success)}, 
