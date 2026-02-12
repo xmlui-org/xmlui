@@ -52,6 +52,13 @@ Try the app by clicking the button several times. Check how the queue processes 
 - `$completedItems`: A list containing the queue items that have been completed (fully processed).
 - `$queuedItems`: A list containing the items waiting in the queue, icluding the completed items.
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+- **label**: Adds a label to input components with a 'label' prop using the ItemWithLabel component.
+- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
+
 ## Properties [#properties]
 
 ### `clearAfterFinish` [#clearafterfinish]

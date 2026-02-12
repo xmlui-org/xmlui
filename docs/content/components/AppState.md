@@ -103,6 +103,13 @@ If you want to run the sample with explicit state buckets (for example, with the
 <AppState id="state" bucket="settings" />
 ```
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+- **label**: Adds a label to input components with a 'label' prop using the ItemWithLabel component.
+- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
+
 ## Properties [#properties]
 
 ### `bucket` [#bucket]

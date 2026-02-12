@@ -9,6 +9,17 @@ For details on how to work with \`FlowLayout\` (like sizing children), see [this
 The `SpaceFiller` component can be used as a line break.
 See the [reference docs](/components/SpaceFiller) for details.
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+- **animation**: Adds animation functionality to components with an 'animation' prop.
+- **bookmark**: Adds bookmark functionality to any visual component with a 'bookmark' prop by adding bookmark-related attributes and APIs directly to the component.
+- **label**: Adds a label to input components with a 'label' prop using the ItemWithLabel component.
+- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
+- **tooltip**: Adds tooltip functionality to components with a 'tooltip' or 'tooltipMarkdown' prop.
+- **variant**: Applies custom variant styling to components with a 'variant' prop. For Button components, this only applies if the variant is not one of the predefined values ('solid', 'outlined', 'ghost'). For other components, it applies to any component with a 'variant' prop.
+
 ## Properties [#properties]
 
 ### `columnGap` [#columngap]

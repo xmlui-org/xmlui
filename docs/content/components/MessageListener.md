@@ -11,6 +11,13 @@ The `MessageListener` component listens for messages sent via the browser's `win
 - **Flexible placement**: Can be used anywhere in the component tree
 - **Multiple listeners**: Multiple MessageListener instances can coexist and all will receive messages
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+- **label**: Adds a label to input components with a 'label' prop using the ItemWithLabel component.
+- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
+
 ## Properties [#properties]
 
 This component does not have any properties.

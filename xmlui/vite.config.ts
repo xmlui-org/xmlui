@@ -69,6 +69,19 @@ export default ({ mode = "lib" }) => {
             "behaviors",
             "collectedBehaviorMetadata.ts",
           ),
+          "behavior-evaluator": path.resolve(
+            "src",
+            "components-core",
+            "behaviors",
+            "behaviorConditionEvaluator.ts",
+          ),
+          "metadata-utils": path.resolve(
+            "src",
+            "language-server",
+            "services",
+            "common",
+            "metadata-utils.ts",
+          ),
         },
         name: "xmlui-metadata",
       };

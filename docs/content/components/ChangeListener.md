@@ -8,6 +8,13 @@
 - **Previous/new values**: Access both old and new values in the change handler
 - **Reactive patterns**: Coordinates between components or triggers side effects
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+- **label**: Adds a label to input components with a 'label' prop using the ItemWithLabel component.
+- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
+
 ## Properties [#properties]
 
 ### `listenTo` [#listento]
