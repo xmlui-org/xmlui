@@ -10,7 +10,19 @@ import type { AsyncFunction } from "../../abstractions/FunctionDefs";
  * subscribed topic is published.
  */
 export const pubSubBehavior: Behavior = {
-  name: "pubsub",
+  metadata: {
+    name: "pubsub",
+    description:
+      "Subscribes the component to specified topics and triggers an event when a topic is received.",
+    triggerProps: ["subscribeToTopic"],
+    props: {
+      subscribeToTopic: {
+        valueType: "any",
+        description:
+          "The topic or topics to subscribe to. Can be a single topic or an array of topics.",
+      },
+    },
+  },
   canAttach: (context, node) => {
     const { extractValue } = context;
     const subscribeToTopic = extractValue(node.props?.subscribeToTopic, true);
@@ -18,18 +30,16 @@ export const pubSubBehavior: Behavior = {
   },
   attach: (context, node, metadata) => {
     const { extractValue, lookupEventHandler } = context;
-    
+
     // Extract the topic(s) to subscribe to
     const subscribeToTopic = extractValue(context.node.props?.subscribeToTopic, true);
-    
+
     // Normalize to array of topics
-    const topics = Array.isArray(subscribeToTopic) 
-      ? subscribeToTopic 
-      : [subscribeToTopic];
-    
+    const topics = Array.isArray(subscribeToTopic) ? subscribeToTopic : [subscribeToTopic];
+
     // Extract the event handler for when a topic is received
     const onTopicReceived = lookupEventHandler("topicReceived" as any);
-    
+
     return (
       <PubSubWrapper topics={topics} onTopicReceived={onTopicReceived}>
         {node as ReactElement}

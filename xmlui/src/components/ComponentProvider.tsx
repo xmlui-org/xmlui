@@ -1059,7 +1059,7 @@ export class ComponentRegistry {
   ) {
     // If position is specified, insert relative to that behavior
     if (position) {
-      const targetIndex = this.behaviors.findIndex((b) => b.name === position);
+      const targetIndex = this.behaviors.findIndex((b) => b.metadata.name === position);
       if (targetIndex !== -1) {
         const insertIndex = location === "before" ? targetIndex : targetIndex + 1;
         this.behaviors.splice(insertIndex, 0, behavior);

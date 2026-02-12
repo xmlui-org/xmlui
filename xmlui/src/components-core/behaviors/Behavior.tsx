@@ -10,11 +10,6 @@ import { BehaviorMetadata } from "./BehavorMetadata";
  */
 export interface Behavior {
   /**
-   * The name of the behavior (e.g., "tooltip", "animation").
-   */
-  name: string;
-
-  /**
    * The metadata that describes the behavior, including its trigger properties and
    */
   metadata: BehaviorMetadata;

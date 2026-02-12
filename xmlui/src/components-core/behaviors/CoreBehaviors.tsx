@@ -26,26 +26,34 @@ export { pubSubBehavior } from "./PubSubBehavior";
  * Behavior for applying tooltips to components.
  */
 export const tooltipBehavior: Behavior = {
-  name: "tooltip",
   metadata: {
     name: "tooltip",
+    description:
+      "Adds tooltip functionality to components with a 'tooltip' or 'tooltipMarkdown' prop.",
     triggerProps: ["tooltip", "tooltipMarkdown"],
-    otherProps: ["tooltipOptions"],
+    props: {
+      tooltip: {
+        valueType: "string",
+        description: "The text to display in the tooltip. Can be plain text or markdown.",
+      },
+      tooltipMarkdown: {
+        valueType: "string",
+        description:
+          "The markdown text to display in the tooltip. Takes precedence over 'tooltip' if both are provided.",
+      },
+      tooltipOptions: {
+        valueType: "any",
+        description: "Options for configuring the tooltip behavior, such as delay and position.",
+      },
+    },
     condition: {
-      type: "or",
-      conditions: [
-        {
-          type: "hasProp",
-          propName: "tooltip",
-        },
-        {
-          type: "hasProp",
-          propName: "tooltipMarkdown",
-        },
-      ],
+      type: "visual",
     },
   },
-  canAttach: (context, node) => {
+  canAttach: (context, node, metadata) => {
+    if (metadata?.nonVisual) {
+      return false;
+    }
     const { extractValue } = context;
     const tooltipText = extractValue(node.props?.tooltip, true);
     const tooltipMarkdown = extractValue(node.props?.tooltipMarkdown, true);
@@ -70,14 +78,23 @@ export const tooltipBehavior: Behavior = {
  * Behavior for applying animations to components.
  */
 export const animationBehavior: Behavior = {
-  name: "animation",
   metadata: {
     name: "animation",
+    description: "Adds animation functionality to components with an 'animation' prop.",
     triggerProps: ["animation"],
-    otherProps: ["animationOptions"],
+    props: {
+      animation: {
+        valueType: "any",
+        description:
+          "The animation definition, which can be a string reference or an object defining the animation.",
+      },
+      animationOptions: {
+        valueType: "any",
+        description: "Options for configuring the animation behavior, such as duration and easing.",
+      },
+    },
     condition: {
-      type: "hasProp",
-      propName: "animation",
+      type: "visual",
     },
   },
   canAttach: (context, node) => {
@@ -107,26 +124,63 @@ export const animationBehavior: Behavior = {
  * Behavior for applying a label to form components using ItemWithLabel.
  */
 export const labelBehavior: Behavior = {
-  name: "label",
   metadata: {
     name: "label",
+    description:
+      "Adds a label to input components with a 'label' prop using the ItemWithLabel component.",
     triggerProps: ["label"],
-    otherProps: [
-      "labelPosition",
-      "labelWidth",
-      "labelBreak",
-      "required",
-      "enabled",
-      "shrinkToLabel",
-      "style",
-      "readOnly",
-    ],
+    props: {
+      label: {
+        valueType: "string",
+        description: "The text to display as the label for the input component.",
+      },
+      labelPosition: {
+        valueType: "string",
+        description: "The position of the label relative to the input component.",
+      },
+      labelWidth: {
+        valueType: "string",
+        description: "The width of the label.",
+      },
+      labelBreak: {
+        valueType: "boolean",
+        description: "Whether the label should break onto a new line.",
+      },
+      required: {
+        valueType: "boolean",
+        description: "Whether the input component is required.",
+      },
+      enabled: {
+        valueType: "boolean",
+        description: "Whether the input component is enabled.",
+      },
+      shrinkToLabel: {
+        valueType: "boolean",
+        description: "Whether the input component should shrink to fit the label.",
+      },
+      style: {
+        valueType: "any",
+        description: "Custom styles for the label.",
+      },
+      readOnly: {
+        valueType: "boolean",
+        description: "Whether the input component is read-only.",
+      },
+    },
     condition: {
       type: "and",
       conditions: [
         {
-          type: "hasProp",
+          type: "hasNoProp",
           propName: "label",
+        },
+        {
+          type: "hasNoProp",
+          propName: "bindTo",
+        },
+        {
+          type: "isNotType",
+          nodeType: "FormItem",
         },
       ],
     },
@@ -195,14 +249,14 @@ export const labelBehavior: Behavior = {
  * This behavior wraps the rendered node in a VariantWrapper component that applies the variant styling.
  */
 export const variantBehavior: Behavior = {
-  name: "variant",
   metadata: {
     name: "variant",
+    description:
+      "Applies custom variant styling to components with a 'variant' prop. For Button components, this only applies if the variant is not one of the predefined values ('solid', 'outlined', 'ghost'). For other components, it applies to any component with a 'variant' prop.",
     triggerProps: ["variant"],
-    otherProps: [],
+    props: {},
     condition: {
-      type: "hasProp",
-      propName: "variant",
+      type: "visual",
     },
   },
   canAttach: (context, node) => {
@@ -386,14 +440,32 @@ const FORM_VALIDATION_COMPONENTS = [...FORM_BINDABLE_COMPONENTS, "FormItem"] as 
  * attributes and functionality without wrapping the component.
  */
 export const bookmarkBehavior: Behavior = {
-  name: "bookmark",
   metadata: {
     name: "bookmark",
+    description:
+      "Adds bookmark functionality to any visual component with a 'bookmark' prop by adding bookmark-related attributes and APIs directly to the component.",
     triggerProps: ["bookmark"],
-    otherProps: ["bookmarkLevel", "bookmarkTitle", "bookmarkOmitFromToc"],
+    props: {
+      bookmark: {
+        valueType: "string",
+        description: "The ID of the bookmark to create for this component.",
+      },
+      bookmarkLevel: {
+        valueType: "number",
+        description: "The heading level for this bookmark (used in table of contents).",
+      },
+      bookmarkTitle: {
+        valueType: "string",
+        description:
+          "The title to use for this bookmark in the table of contents. Defaults to the component's text content.",
+      },
+      bookmarkOmitFromToc: {
+        valueType: "boolean",
+        description: "Whether to omit this bookmark from the table of contents.",
+      },
+    },
     condition: {
-      type: "hasProp",
-      propName: "bookmark",
+      type: "visual",
     },
   },
   canAttach: (context, node, metadata) => {
@@ -525,41 +597,39 @@ function BookmarkWrapper({
  * this behavior wraps it with form binding logic (validation, state management, etc.)
  */
 export const formBindingBehavior: Behavior = {
-  name: "formBinding",
   metadata: {
     name: "formBinding",
+    description:
+      "Binds input components directly to a Form when they have a 'bindTo' prop, without requiring a FormItem wrapper. This behavior adds form binding logic such as validation and state management to the component.",
     triggerProps: ["bindTo"],
-    otherProps: [
-      "initialValue",
-      "noSubmit",
-      "required",
-      "minLength",
-      "maxLength",
-      "lengthInvalidMessage",
-      "lengthInvalidSeverity",
-      "minValue",
-      "maxValue",
-      "rangeInvalidMessage",
-      "rangeInvalidSeverity",
-      "pattern",
-      "patternInvalidMessage",
-      "patternInvalidSeverity",
-      "regex",
-      "regexInvalidMessage",
-      "regexInvalidSeverity",
-      "label",
-      "labelPosition",
-      "labelWidth",
-      "labelBreak",
-      "enabled",
-      "requireLabelMode",
-    ],
+    props: {
+      bindTo: {
+        valueType: "string",
+        description: "The name of the form field to bind this input component to.",
+      },
+      initialValue: {
+        valueType: "any",
+        description: "The initial value for this form field when the form is first rendered.",
+      },
+      noSubmit: {
+        valueType: "boolean",
+        description: "Whether to exclude this field's value from form submission.",
+      },
+    },
     condition: {
       type: "and",
       conditions: [
         {
-          type: "hasProp",
-          propName: "bindTo",
+          type: "hasApi",
+          apiName: "value",
+        },
+        {
+          type: "hasApi",
+          apiName: "setValue",
+        },
+        {
+          type: "isNotType",
+          nodeType: "FormItem",
         },
       ],
     },
@@ -672,30 +742,107 @@ export const formBindingBehavior: Behavior = {
 };
 
 export const validationBehavior: Behavior = {
-  name: "validation",
   metadata: {
     name: "validation",
-    triggerProps: [
-      "required",
-      "minLength",
-      "maxLength",
-      "lengthInvalidMessage",
-      "lengthInvalidSeverity",
-      "minValue",
-      "maxValue",
-      "rangeInvalidMessage",
-      "rangeInvalidSeverity",
-      "pattern",
-      "patternInvalidMessage",
-      "patternInvalidSeverity",
-      "regex",
-      "regexInvalidMessage",
-      "regexInvalidSeverity",
-    ],
-    otherProps: [],
+    description:
+      "Adds validation functionality to input components with validation-related props (e.g., 'required', 'minLength', 'maxLength', etc.) by wrapping them with a ValidationWrapper component that handles validation logic and error display.",
+    triggerProps: ["bindTo"],
+    props: {
+      required: {
+        valueType: "boolean",
+        description: "Whether this field is required (for validation purposes).",
+      },
+      minLength: {
+        valueType: "number",
+        description: "Minimum length for string inputs (for validation purposes).",
+      },
+      maxLength: {
+        valueType: "number",
+        description: "Maximum length for string inputs (for validation purposes).",
+      },
+      lengthInvalidMessage: {
+        valueType: "string",
+        description:
+          "Custom error message to display when input length is invalid (for validation purposes).",
+      },
+      lengthInvalidSeverity: {
+        valueType: "string",
+        description:
+          "Severity level for length validation errors (e.g., 'error', 'warning', 'info') (for validation purposes).",
+      },
+      minValue: {
+        valueType: "number",
+        description: "Minimum value for number inputs (for validation purposes).",
+      },
+      maxValue: {
+        valueType: "number",
+        description: "Maximum value for number inputs (for validation purposes).",
+      },
+      rangeInvalidMessage: {
+        valueType: "string",
+        description:
+          "Custom error message to display when input value is out of range (for validation purposes).",
+      },
+      rangeInvalidSeverity: {
+        valueType: "string",
+        description:
+          "Severity level for range validation errors (e.g., 'error', 'warning', 'info') (for validation purposes).",
+      },
+      pattern: {
+        valueType: "string",
+        description: "Regex pattern for input validation (for validation purposes).",
+      },
+      patternInvalidMessage: {
+        valueType: "string",
+        description:
+          "Custom error message to display when input does not match the pattern (for validation purposes).",
+      },
+      patternInvalidSeverity: {
+        valueType: "string",
+        description:
+          "Severity level for pattern validation errors (e.g., 'error', 'warning', 'info') (for validation purposes).",
+      },
+      regex: {
+        valueType: "string",
+        description: "Regex pattern for input validation (for validation purposes).",
+      },
+      regexInvalidMessage: {
+        valueType: "string",
+        description:
+          "Custom error message to display when input does not match the regex (for validation purposes).",
+      },
+      regexInvalidSeverity: {
+        valueType: "string",
+        description:
+          "Severity level for regex validation errors (e.g., 'error', 'warning', 'info') (for validation purposes).",
+      },
+      validationMode: {
+        valueType: "string",
+        description:
+          "The mode to use for validating the input (e.g., 'onChange', 'onBlur', 'onSubmit').",
+      },
+      verboseValidationFeedback: {
+        valueType: "boolean",
+        description:
+          "Whether to display verbose validation feedback (e.g., show all validation errors instead of just the first one).",
+      },
+    },
     condition: {
-      type: "or",
-      conditions: [],
+      type: "and",
+      conditions: [
+        {
+          type: "hasApi",
+          apiName: "value",
+        },
+        {
+          type: "hasApi",
+          apiName: "setValue",
+        },
+        {
+          type: "isNotType",
+          nodeType: "FormItem",
+        },
+      ],
     },
   },
   canAttach: (context, node, metadata) => {

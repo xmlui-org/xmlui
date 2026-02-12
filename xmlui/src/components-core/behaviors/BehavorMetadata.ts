@@ -1,9 +1,22 @@
+import { ComponentPropertyMetadata } from "../../abstractions/ComponentDefs";
+
 export type BehaviorMetadata = {
+  // Comon name of the behavior, used for display and debugging purposes
   name: string;
+
+  // Longer description of the behavior, used for display and debugging purposes
+  description: string;
+
+  // List of properties that determine if the behavior can attach to a node.
+  // If any of these properties are present on the node, the behavior will be considered for attachment.
   triggerProps: string[];
-  otherProps: string[];
-  condition: BehaviorCondition;
-}
+
+  // List of properties that the behavior will use if attached to a node.
+  props: Record<string, ComponentPropertyMetadata>;
+
+  // Condition that determines if the behavior can attach to a particular component.
+  condition?: BehaviorCondition;
+};
 
 interface ConditionBase {
   // Node type discriminator
@@ -14,13 +27,21 @@ export type BehaviorCondition =
   | AndCondition
   | OrCondition
   | NotCondition
+  | VisualCondition
+  | NonVisualCondition
   | hasPropCondition
+  | hasNoPropCondition
   | PropEqualsCondition
   | PropContainsCondition
   | PropNotEqualsCondition
   | hasApiCondition
+  | hasNoApiCondition
   | hasContextVarCondition
-  | hasEventCondition;
+  | hasNoContextVarCondition
+  | hasEventCondition
+  | hasNoEventCondition
+  | isTypeCondition
+  | isNotTypeCondition;
 
 export interface AndCondition extends ConditionBase {
   type: "and";
@@ -37,8 +58,21 @@ export interface NotCondition extends ConditionBase {
   condition: BehaviorCondition;
 }
 
+export interface VisualCondition extends ConditionBase {
+  type: "visual";
+}
+
+export interface NonVisualCondition extends ConditionBase {
+  type: "nonVisual";
+}
+
 export interface hasPropCondition extends ConditionBase {
   type: "hasProp";
+  propName: string;
+}
+
+export interface hasNoPropCondition extends ConditionBase {
+  type: "hasNoProp";
   propName: string;
 }
 
@@ -62,8 +96,18 @@ export interface hasEventCondition extends ConditionBase {
   eventName: string;
 }
 
+export interface hasNoEventCondition extends ConditionBase {
+  type: "hasNoEvent";
+  eventName: string;
+}
+
 export interface hasApiCondition extends ConditionBase {
   type: "hasApi";
+  apiName: string;
+}
+
+export interface hasNoApiCondition extends ConditionBase {
+  type: "hasNoApi";
   apiName: string;
 }
 
@@ -72,3 +116,17 @@ export interface hasContextVarCondition extends ConditionBase {
   contextVarName: string;
 }
 
+export interface hasNoContextVarCondition extends ConditionBase {
+  type: "hasNoContextVar";
+  contextVarName: string;
+}
+
+export interface isTypeCondition extends ConditionBase {
+  type: "isType";
+  nodeType: string;
+}
+
+export interface isNotTypeCondition extends ConditionBase {
+  type: "isNotType";
+  nodeType: string;
+}
