@@ -775,13 +775,6 @@ export const StateContainer = memo(
     // Only create new reference when values actually change (shallow comparison)
     const stableCurrentGlobalVars = useShallowCompareMemoize(currentGlobalVars);
     
-    console.log('[StateContainer]', node.type, node.uid, 'parentGlobalVars:', parentGlobalVars ? Object.keys(parentGlobalVars) : undefined);
-    console.log('[StateContainer]', node.type, node.uid, 'node.globalVars:', node.globalVars ? Object.keys(node.globalVars) : undefined);
-    console.log('[StateContainer]', node.type, node.uid, 'computed stableCurrentGlobalVars:', stableCurrentGlobalVars ? Object.keys(stableCurrentGlobalVars) : undefined);
-    if (node.uid === 'root' || stableCurrentGlobalVars) {
-      console.log('[StateContainer]', node.type, node.uid, 'actual values:', stableCurrentGlobalVars);
-    }
-
     // ========================================================================
     // LAYER 6: FINAL STATE COMBINATION
     // ========================================================================
@@ -832,8 +825,6 @@ export const StateContainer = memo(
         const isLocalVar = key in resolvedLocalVars;
         const isGlobalVar = key in stableCurrentGlobalVars;
         const isRoot = node.uid === 'root';
-        
-        console.log('[statePartChanged]', node.uid, 'key:', key, 'isLocal:', isLocalVar, 'isGlobal:', isGlobalVar, 'isRoot:', isRoot, 'newValue:', newValue, 'globalKeys:', Object.keys(stableCurrentGlobalVars));
         
         // Check local variables FIRST - they shadow globals
         if (isLocalVar) {
