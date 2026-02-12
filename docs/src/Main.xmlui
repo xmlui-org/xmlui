@@ -180,6 +180,11 @@
                 content="{appGlobals.content['pages/reference-components.md']}"
             />
         </Page>
+        <Page url="/reference/extensions">
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/reference-extensions.md']}"
+            />
+        </Page>
         <Page url="/guides/app-structure">
             <DocumentPageNoTOC
                 content="{appGlobals.content['pages/app-structure.md']}"

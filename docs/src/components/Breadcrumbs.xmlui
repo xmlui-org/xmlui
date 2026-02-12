@@ -1,0 +1,20 @@
+<Component name="Breadcrumbs">
+  <HStack
+      verticalAlignment="center"
+      gap="$space-1"
+      marginBottom="$space-3">
+      <Link to="/">
+          <Text variant="subtitle2">Documentation</Text>
+      </Link>
+      <Text when="{$linkInfo.label}" variant="subtitle2">/</Text>
+      <Items data="{[...($linkInfo.pathSegments || []), $linkInfo].filter(item => item?.label)}">
+          <HStack verticalAlignment="center" gap="$space-1">
+              <Link when="{$item.to && !$isLast}" to="{$item.to}">
+                  <Text variant="subtitle2">{$item.label}</Text>
+              </Link>
+              <Text when="{!$item.to || $isLast}" variant="subtitle2">{$item.label}</Text>
+              <Text when="{!$isLast}" variant="subtitle2">/</Text>
+          </HStack>
+      </Items>
+  </HStack>
+</Component>

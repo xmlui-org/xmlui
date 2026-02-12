@@ -121,9 +121,11 @@
         {
           "label": "Extensions",
           "icon": "puzzle",
+          "to": "/reference/extensions",
           "children": [
             {
               "label": "Xmlui Animations",
+              "to": "/extensions/xmlui-animations",
               "children": [
                 { "to": "/extensions/xmlui-animations/_overview", "label": "Extension Overview" },
                 { "to": "/extensions/xmlui-animations/Animation", "label": "Animation" },
