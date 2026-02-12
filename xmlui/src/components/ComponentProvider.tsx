@@ -110,15 +110,15 @@ import { uploadAction } from "../components-core/action/FileUploadAction";
 import { navigateAction } from "../components-core/action/NavigateAction";
 import { timedAction } from "../components-core/action/TimedAction";
 import {
-  tooltipBehavior,
-  animationBehavior,
-  labelBehavior,
-  variantBehavior,
   formBindingBehavior,
   validationBehavior,
   bookmarkBehavior,
-  pubSubBehavior,
 } from "../components-core/behaviors/CoreBehaviors";
+import { tooltipBehavior } from "../components-core/behaviors/TooltipBehavior";
+import { animationBehavior } from "../components-core/behaviors/AnimationBehavior";
+import { labelBehavior } from "../components-core/behaviors/LabelBehavior";
+import { variantBehavior } from "../components-core/behaviors/VariantBehavior";
+import { pubSubBehavior } from "../components-core/behaviors/PubSubBehavior";
 import type {
   LoaderRenderer,
   LoaderRendererDef,
