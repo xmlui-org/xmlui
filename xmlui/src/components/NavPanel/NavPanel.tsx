@@ -21,22 +21,36 @@ type AppNavItem = {
   noIndicator?: boolean;
   initiallyExpanded?: boolean;
   iconAlignment?: string;
+  mobileOnly?: boolean;
 };
 
 type AppNavData = {
-  mobileLinks?: AppNavItem[];
   items?: AppNavItem[];
 };
 
+type AppNavSections = Record<string, unknown>;
+const MOBILE_ONLY_WHEN = "{mediaSize.sizeIndex <= 2}";
+
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === "object" && !Array.isArray(value);
+}
+
+function withMobileOnly(node: ComponentDef | undefined, item: AppNavItem, uidPrefix: string, idx: number) {
+  if (!node) return undefined;
+  if (!item.mobileOnly) return node;
+  return {
+    type: "Fragment",
+    uid: `${uidPrefix}-mobile-only-${idx}`,
+    when: MOBILE_ONLY_WHEN,
+    children: [node],
+  } as ComponentDef;
 }
 
 function toNavComponentDef(item: AppNavItem, uidPrefix: string, idx: number): ComponentDef | undefined {
   const hasChildren = Array.isArray(item.children);
   if (hasChildren) {
     if (!item.label) return undefined;
-    return {
+    const groupNode: ComponentDef = {
       type: "NavGroup",
       uid: `${uidPrefix}-group-${idx}`,
       props: {
@@ -50,10 +64,11 @@ function toNavComponentDef(item: AppNavItem, uidPrefix: string, idx: number): Co
         ?.map((child, childIdx) => toNavComponentDef(child, `${uidPrefix}-group-${idx}`, childIdx))
         .filter(Boolean) as ComponentDef[],
     };
+    return withMobileOnly(groupNode, item, uidPrefix, idx);
   }
 
   if (!item.label || !item.to) return undefined;
-  return {
+  const linkNode: ComponentDef = {
     type: "NavLink",
     uid: `${uidPrefix}-link-${idx}`,
     props: {
@@ -66,35 +81,74 @@ function toNavComponentDef(item: AppNavItem, uidPrefix: string, idx: number): Co
       iconAlignment: item.iconAlignment,
     },
   };
+  return withMobileOnly(linkNode, item, uidPrefix, idx);
 }
 
-function buildAutoNavChildren(rawNav: unknown): ComponentDef[] {
-  if (!isPlainObject(rawNav)) return [];
-  const nav = rawNav as AppNavData;
+function normalizeSectionData(rawSection: unknown): AppNavData | undefined {
+  if (Array.isArray(rawSection)) {
+    return { items: rawSection as AppNavItem[] };
+  }
+  if (!isPlainObject(rawSection)) {
+    return undefined;
+  }
+  const section = rawSection as AppNavData;
+  if (!Array.isArray(section.items)) {
+    return undefined;
+  }
+  return section;
+}
+
+function buildSectionNavChildren(rawSection: unknown, uidPrefix: string): ComponentDef[] {
+  const section = normalizeSectionData(rawSection);
+  if (!section) return [];
   const children: ComponentDef[] = [];
 
-  const mobileLinks = Array.isArray(nav.mobileLinks) ? nav.mobileLinks : [];
-  const mobileLinkNodes = mobileLinks
-    .map((item, idx) => toNavComponentDef(item, "auto-mobile", idx))
-    .filter(Boolean) as ComponentDef[];
-
-  if (mobileLinkNodes.length > 0) {
-    children.push({
-      type: "Fragment",
-      uid: "auto-mobile-links",
-      when: "{mediaSize.sizeIndex <= 2}",
-      children: mobileLinkNodes,
-    });
-  }
-
-  const items = Array.isArray(nav.items) ? nav.items : [];
+  const items = Array.isArray(section.items) ? section.items : [];
   children.push(
     ...(items
-      .map((item, idx) => toNavComponentDef(item, "auto-main", idx))
+      .map((item, idx) => toNavComponentDef(item, `${uidPrefix}-main`, idx))
       .filter(Boolean) as ComponentDef[]),
   );
 
   return children;
+}
+
+function resolveNavSectionChildren(
+  children: ComponentDef[] | undefined,
+  appNavSections: AppNavSections | undefined,
+  extractValue: any,
+  uidPrefix = "nav-section",
+): ComponentDef[] | undefined {
+  if (!children) return children;
+  const resolvedChildren: ComponentDef[] = [];
+
+  children.forEach((child, idx) => {
+    if (!child || typeof child !== "object") return;
+
+    if (child.type === "NavSection") {
+      const sectionId =
+        extractValue.asOptionalString?.(child.props?.sectionId) ?? extractValue(child.props?.sectionId);
+      const sectionData = sectionId && appNavSections ? appNavSections[sectionId] : undefined;
+      const expanded = buildSectionNavChildren(sectionData, `${uidPrefix}-${sectionId || idx}`);
+      resolvedChildren.push(...expanded);
+      return;
+    }
+
+    if (child.children && child.children.length > 0) {
+      const nested = resolveNavSectionChildren(
+        child.children as ComponentDef[],
+        appNavSections,
+        extractValue,
+        `${uidPrefix}-${idx}`,
+      );
+      resolvedChildren.push({ ...child, children: nested });
+      return;
+    }
+
+    resolvedChildren.push(child);
+  });
+
+  return resolvedChildren;
 }
 
 export const NavPanelMd = createMetadata({
@@ -177,16 +231,13 @@ function NavPanelWithBuiltNavHierarchy({
   extractValue,
   appContext,
 }) {
-  const autoNavChildren = useMemo(() => {
-    return buildAutoNavChildren(appContext?.appGlobals?.nav);
-  }, [appContext?.appGlobals?.nav]);
-
   const effectiveChildren = useMemo(() => {
-    if (autoNavChildren.length === 0) {
-      return node.children;
-    }
-    return [...(node.children ?? []), ...autoNavChildren];
-  }, [autoNavChildren, node.children]);
+    return resolveNavSectionChildren(
+      node.children as ComponentDef[] | undefined,
+      appContext?.appGlobals?.navSections as AppNavSections | undefined,
+      extractValue,
+    );
+  }, [appContext?.appGlobals?.navSections, extractValue, node.children]);
 
   const navLinks = useMemo(() => {
     return buildNavHierarchy(effectiveChildren, extractValue, undefined, []);

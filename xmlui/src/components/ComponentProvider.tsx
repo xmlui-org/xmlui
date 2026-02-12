@@ -289,6 +289,7 @@ import { toastComponentRenderer } from "./Toast/Toast";
 const dataSourcePropHolder = createPropHolderComponent("DataSource");
 const textNodePropHolder = createPropHolderComponent("TextNode");
 const textNodeCDataPropHolder = createPropHolderComponent("TextNodeCData");
+const navSectionPropHolder = createPropHolderComponent("NavSection");
 
 /**
  * Applications can contribute to the registry with their custom (third-party)
@@ -390,6 +391,7 @@ export class ComponentRegistry {
     this.registerCoreComponent(dataSourcePropHolder);
     this.registerCoreComponent(textNodePropHolder);
     this.registerCoreComponent(textNodeCDataPropHolder);
+    this.registerCoreComponent(navSectionPropHolder);
     if (process.env.VITE_USED_COMPONENTS_SpaceFiller !== "false") {
       this.registerCoreComponent(spaceFillerComponentRenderer);
     }
