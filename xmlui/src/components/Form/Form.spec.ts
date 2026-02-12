@@ -3016,7 +3016,7 @@ test("field-related errors map to correct FormItems", async ({
   const fieldDriver = await createFormItemDriver("testField");
 
   await formDriver.submitForm();
-  await expect(fieldDriver.validationStatusIndicator).toHaveAttribute(
+await expect(fieldDriver.validationStatusIndicator).toHaveAttribute(
     fieldDriver.validationStatusTag,
     "warning",
   );
