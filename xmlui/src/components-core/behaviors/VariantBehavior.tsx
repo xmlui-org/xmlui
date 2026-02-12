@@ -16,6 +16,7 @@ import { Behavior } from "./Behavior";
 export const variantBehavior: Behavior = {
   metadata: {
     name: "variant",
+    friendlyName: "Styling Variant",
     description:
       "Applies custom variant styling to components with a 'variant' prop. For Button components, this only applies if the variant is not one of the predefined values ('solid', 'outlined', 'ghost'). For other components, it applies to any component with a 'variant' prop.",
     triggerProps: ["variant"],

@@ -30,18 +30,20 @@ For the shorthand versions see: [H1](./H1), [H2](./H2), [H3](./H3), [H4](./H4), 
 
 This component supports the following behaviors:
 
-- **animation**: Adds animation functionality to components with an 'animation' prop.
-- **bookmark**: Adds bookmark functionality to any visual component with a 'bookmark' prop by adding bookmark-related attributes and APIs directly to the component.
-- **label**: Adds a label to input components with a 'label' prop using the ItemWithLabel component.
-- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
-- **tooltip**: Adds tooltip functionality to components with a 'tooltip' or 'tooltipMarkdown' prop.
-- **variant**: Applies custom variant styling to components with a 'variant' prop. For Button components, this only applies if the variant is not one of the predefined values ('solid', 'outlined', 'ghost'). For other components, it applies to any component with a 'variant' prop.
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
 
 ## Properties [#properties]
 
 ### `ellipses` [#ellipses]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This property indicates whether ellipses should be displayed (`true`) when the heading text is cropped or not (`false`).
 
@@ -65,7 +67,7 @@ This property indicates whether ellipses should be displayed (`true`) when the h
 
 ### `level` [#level]
 
--  default: **"h1"**
+> [!DEF]  default: **"h1"**
 
 This property sets the visual significance (level) of the heading. Accepts multiple formats: `h1`-`h6`, `H1`-`H6`, or `1`-`6`.Invalid values default to `h1`.
 
@@ -97,13 +99,13 @@ This optional property determines the maximum number of lines the component can 
 
 ### `omitFromToc` [#omitfromtoc]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 If true, this heading will be excluded from the table of contents.
 
 ### `preserveLinebreaks` [#preservelinebreaks]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property indicates whether linebreaks should be preserved when displaying text.
 
@@ -136,7 +138,7 @@ You can observe the effect of using `preserveLinebreaks`:
 
 ### `showAnchor` [#showanchor]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property indicates whether an anchor link should be displayed next to the heading. If set to `true`, an anchor link will be displayed on hover next to the heading.
 

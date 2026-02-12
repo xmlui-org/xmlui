@@ -30,17 +30,19 @@ Try this dropdown menu:
 
 This component supports the following behaviors:
 
-- **animation**: Adds animation functionality to components with an 'animation' prop.
-- **bookmark**: Adds bookmark functionality to any visual component with a 'bookmark' prop by adding bookmark-related attributes and APIs directly to the component.
-- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
-- **tooltip**: Adds tooltip functionality to components with a 'tooltip' or 'tooltipMarkdown' prop.
-- **variant**: Applies custom variant styling to components with a 'variant' prop. For Button components, this only applies if the variant is not one of the predefined values ('solid', 'outlined', 'ghost'). For other components, it applies to any component with a 'variant' prop.
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
 
 ## Properties [#properties]
 
 ### `alignment` [#alignment]
 
--  default: **"start"**
+> [!DEF]  default: **"start"**
 
 This property allows you to determine the alignment of the dropdown panel with the displayed menu items.
 
@@ -75,7 +77,7 @@ Available values are:
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -106,13 +108,13 @@ This property sets the label of the component.  If not set, the component will n
 
 ### `triggerButtonIcon` [#triggerbuttonicon]
 
--  default: **"triggerButton:DropdownMenu"**
+> [!DEF]  default: **"triggerButton:DropdownMenu"**
 
 This property defines the icon to display on the trigger button. You can change the default icon for all DropdownMenu instances with the "icon.triggerButton:DropdownMenu" declaration in the app configuration file.
 
 ### `triggerButtonIconPosition` [#triggerbuttoniconposition]
 
--  default: **"end"**
+> [!DEF]  default: **"end"**
 
 This property defines the position of the icon on the trigger button.
 
@@ -125,7 +127,7 @@ Available values:
 
 ### `triggerButtonThemeColor` [#triggerbuttonthemecolor]
 
--  default: **"primary"**
+> [!DEF]  default: **"primary"**
 
 This property defines the theme color of the `Button` as the dropdown menu's trigger. It has no effect when a custom trigger is defined with `triggerTemplate`.
 
@@ -139,7 +141,7 @@ Available values:
 
 ### `triggerButtonVariant` [#triggerbuttonvariant]
 
--  default: **"ghost"**
+> [!DEF]  default: **"ghost"**
 
 This property defines the theme variant of the `Button` as the dropdown menu's trigger. It has no effect when a custom trigger is defined with `triggerTemplate`.
 

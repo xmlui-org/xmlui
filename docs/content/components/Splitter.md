@@ -10,18 +10,20 @@ See also: [HSplitter](/components/HSplitter), [VSplitter](/components/VSplitter)
 
 This component supports the following behaviors:
 
-- **animation**: Adds animation functionality to components with an 'animation' prop.
-- **bookmark**: Adds bookmark functionality to any visual component with a 'bookmark' prop by adding bookmark-related attributes and APIs directly to the component.
-- **label**: Adds a label to input components with a 'label' prop using the ItemWithLabel component.
-- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
-- **tooltip**: Adds tooltip functionality to components with a 'tooltip' or 'tooltipMarkdown' prop.
-- **variant**: Applies custom variant styling to components with a 'variant' prop. For Button components, this only applies if the variant is not one of the predefined values ('solid', 'outlined', 'ghost'). For other components, it applies to any component with a 'variant' prop.
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
 
 ## Properties [#properties]
 
 ### `floating` [#floating]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Toggles whether the resizer is visible (`false`) or not (`true`) when not hovered or dragged. The default value is `false`, meaning the resizer is visible all the time.
 
@@ -36,7 +38,7 @@ Toggles whether the resizer is visible (`false`) or not (`true`) when not hovere
 
 ### `initialPrimarySize` [#initialprimarysize]
 
--  default: **"50%"**
+> [!DEF]  default: **"50%"**
 
 This optional number property sets the initial size of the primary section. The unit of the size value is in pixels or percentages.
 
@@ -51,7 +53,7 @@ This optional number property sets the initial size of the primary section. The 
 
 ### `maxPrimarySize` [#maxprimarysize]
 
--  default: **"100%"**
+> [!DEF]  default: **"100%"**
 
 This property sets the maximum size the primary section can have. The unit of the size value is in pixels or percentages. Negative values are supported and calculate from the end of the container (e.g., "-20%" means "80% of container", "-100px" means "container size - 100px").
 
@@ -75,7 +77,7 @@ This property sets the maximum size the primary section can have. The unit of th
 
 ### `minPrimarySize` [#minprimarysize]
 
--  default: **"0%"**
+> [!DEF]  default: **"0%"**
 
 This property sets the minimum size the primary section can have. The unit of the size value is in pixels or percentages.
 
@@ -90,7 +92,7 @@ This property sets the minimum size the primary section can have. The unit of th
 
 ### `orientation` [#orientation]
 
--  default: **"vertical"**
+> [!DEF]  default: **"vertical"**
 
 Sets whether the `Splitter` divides the container horizontally and lays out the section on top of each other (`vertical`), or vertically by placing the sections next to each other (`horizontal`).
 
@@ -123,7 +125,7 @@ The divider can be customized using XMLUI components via this property.
 
 ### `swapped` [#swapped]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This optional booelan property indicates whether the `Splitter` sections are layed out as primary and secondary (`false`) or secondary and primary (`true`) from left to right.
 

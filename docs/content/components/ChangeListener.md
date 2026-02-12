@@ -12,8 +12,9 @@
 
 This component supports the following behaviors:
 
-- **label**: Adds a label to input components with a 'label' prop using the ItemWithLabel component.
-- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
+| Behavior | Properties |
+| --- | --- |
+| Publish/Subscribe | `subscribeToTopic` |
 
 ## Properties [#properties]
 
@@ -35,7 +36,7 @@ The following sample demonstrates using this property. Every time the user click
 
 ### `throttleWaitInMs` [#throttlewaitinms]
 
--  default: **0**
+> [!DEF]  default: **0**
 
 This variable sets a throttling time (in milliseconds) to apply when executing the `didChange` event handler. All changes within that throttling time will only fire the `didChange` event once.
 

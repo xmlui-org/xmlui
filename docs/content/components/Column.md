@@ -81,11 +81,13 @@ You can pass layout properties to a Column:
 
 This component supports the following behaviors:
 
-- **animation**: Adds animation functionality to components with an 'animation' prop.
-- **bookmark**: Adds bookmark functionality to any visual component with a 'bookmark' prop by adding bookmark-related attributes and APIs directly to the component.
-- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
-- **tooltip**: Adds tooltip functionality to components with a 'tooltip' or 'tooltipMarkdown' prop.
-- **variant**: Applies custom variant styling to components with a 'variant' prop. For Button components, this only applies if the variant is not one of the predefined values ('solid', 'outlined', 'ghost'). For other components, it applies to any component with a 'variant' prop.
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
 
 ## Properties [#properties]
 
@@ -161,13 +163,13 @@ Indicates the name of the current row item's property, the value of which to lay
 
 ### `canResize` [#canresize]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This property indicates whether the user can resize the column. If set to `true`, the column can be resized by dragging the column border. If set to `false`, the column cannot be resized. Double-clicking the column border resets to the original size.
 
 ### `canSort` [#cansort]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This property sets whether the user can sort by a column by clicking on its header (`true`) or not (`false`). If the `bindTo` property is not defined, the column is not sortable.
 

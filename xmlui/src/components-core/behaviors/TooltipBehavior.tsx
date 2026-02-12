@@ -7,6 +7,7 @@ import { Behavior } from "./Behavior";
 export const tooltipBehavior: Behavior = {
   metadata: {
     name: "tooltip",
+    friendlyName: "Tooltip",
     description:
       "Adds tooltip functionality to components with a 'tooltip' or 'tooltipMarkdown' prop.",
     triggerProps: ["tooltip", "tooltipMarkdown"],

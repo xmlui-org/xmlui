@@ -286,8 +286,8 @@ function addBehaviorsSection(component) {
   for (const [behaviorKey, behaviorMetadata] of Object.entries(collectedBehaviorMetadata)) {
     if (canBehaviorAttachToComponent(behaviorMetadata, componentMetadataProvider, component.displayName)) {
       applicableBehaviors.push({
-        name: behaviorMetadata.name,
-        description: behaviorMetadata.description,
+        name: behaviorMetadata.friendlyName || behaviorMetadata.name,
+        propKeys: Object.keys(behaviorMetadata.props || {}),
       });
     }
   }
@@ -297,9 +297,16 @@ function addBehaviorsSection(component) {
   }
 
   buffer += "This component supports the following behaviors:\n\n";
-  for (const behavior of applicableBehaviors) {
-    buffer += `- **${behavior.name}**: ${behavior.description}\n`;
-  }
+  
+  buffer += createTable({
+    headers: ["Behavior", "Properties"],
+    rows: applicableBehaviors.map((behavior) => [
+      behavior.name,
+      behavior.propKeys.length > 0
+        ? behavior.propKeys.map(prop => `\`${prop}\``).join(", ")
+        : "N/A"
+    ]),
+  });
 
   return buffer;
 }
@@ -320,7 +327,7 @@ function addPropsSection(data, component) {
         ? `default: **${typeof prop.defaultValue === "string" ? `"${prop.defaultValue}"` : prop.defaultValue}**`
         : "";
     const propModifier = isRequired || defaultValue ? ` ${isRequired || defaultValue}` : "";
-    buffer += `### \`${propName}\`\n\n${propModifier ? `- ${propModifier}\n\n` : ""}`;
+    buffer += `### \`${propName}\`\n\n${propModifier ? `> [!DEF] ${propModifier}\n\n` : ""}`;
 
     buffer += combineDescriptionAndDescriptionRef(data, prop, METADATA_SECTIONS.PROPS);
     buffer += "\n\n";
@@ -714,17 +721,6 @@ function addNonVisualDisclaimer(isNonVisual) {
   //   ? ">[!WARNING]\n> This component does not show up on the UI; " +
   //       "it merely helps implement UI logic.\n\n"
   //   : "";
-}
-
-function addDefaultValue(component) {
-  const defaultValue = component.defaultValue;
-  if (defaultValue === undefined) {
-    return "";
-  }
-  if (typeof defaultValue === "string") {
-    return `Default value: \`"${defaultValue}"\`.`;
-  }
-  return `Default value: \`${JSON.stringify(defaultValue, null, 2)}\`.`;
 }
 
 function addAvailableValues(component) {

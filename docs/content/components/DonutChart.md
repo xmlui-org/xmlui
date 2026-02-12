@@ -6,12 +6,14 @@ A derivative of [PieChart](/components/PieChart) with a hollow center. Note that
 
 This component supports the following behaviors:
 
-- **animation**: Adds animation functionality to components with an 'animation' prop.
-- **bookmark**: Adds bookmark functionality to any visual component with a 'bookmark' prop by adding bookmark-related attributes and APIs directly to the component.
-- **label**: Adds a label to input components with a 'label' prop using the ItemWithLabel component.
-- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
-- **tooltip**: Adds tooltip functionality to components with a 'tooltip' or 'tooltipMarkdown' prop.
-- **variant**: Applies custom variant styling to components with a 'variant' prop. For Button components, this only applies if the variant is not one of the predefined values ('solid', 'outlined', 'ghost'). For other components, it applies to any component with a 'variant' prop.
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
 
 ## Properties [#properties]
 
@@ -25,7 +27,7 @@ This property specifies the key in the data objects that will be used to render 
 
 ### `innerRadius` [#innerradius]
 
--  default: **60**
+> [!DEF]  default: **60**
 
 Sets the inner radius of the donut chart.
 
@@ -35,19 +37,19 @@ Specifies the key in the data objects that will be used to label the different d
 
 ### `showLabel` [#showlabel]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 Toggles whether to show labels (`true`) or not (`false`).
 
 ### `showLabelList` [#showlabellist]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Whether to show labels in a list (`true`) or not (`false`).
 
 ### `showLegend` [#showlegend]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Whether to show a legend (`true`) or not (`false`).
 

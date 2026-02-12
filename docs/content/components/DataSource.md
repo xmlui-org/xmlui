@@ -31,12 +31,14 @@ By default, structural sharing is turned on. If you do not need this behavior, s
 
 This component supports the following behaviors:
 
-- **animation**: Adds animation functionality to components with an 'animation' prop.
-- **bookmark**: Adds bookmark functionality to any visual component with a 'bookmark' prop by adding bookmark-related attributes and APIs directly to the component.
-- **label**: Adds a label to input components with a 'label' prop using the ItemWithLabel component.
-- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
-- **tooltip**: Adds tooltip functionality to components with a 'tooltip' or 'tooltipMarkdown' prop.
-- **variant**: Applies custom variant styling to components with a 'variant' prop. For Button components, this only applies if the variant is not one of the predefined values ('solid', 'outlined', 'ghost'). For other components, it applies to any component with a 'variant' prop.
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
 
 ## Properties [#properties]
 
@@ -122,7 +124,7 @@ Set request headers. Pass an object whose keys are header names and values are h
 
 ### `id` [#id]
 
--  This property is required.
+> [!DEF]  This property is required.
 
 Set the ID used by other components to access the retrieved data in the `value`property of a `DataSource`, or status info in the `loaded` and `error` properties.When no `id` is set, the component cannot be used programmatically.
 
@@ -132,7 +134,7 @@ Set the message to display when the data fetch is in progress. If the property v
 
 ### `method` [#method]
 
--  default: **"get"**
+> [!DEF]  default: **"get"**
 
 Set the HTTP method.
 
@@ -261,7 +263,7 @@ This `Table` uses the filtered array.
 
 ### `structuralSharing` [#structuralsharing]
 
--  default: **"true"**
+> [!DEF]  default: **"true"**
 
 This property allows structural sharing. When turned on, `DataSource` will keep the original reference if nothing has changed in the data. If a subset has changed, `DataSource` will keep the unchanged parts and only replace the changed parts. If you do not need this behavior, set this property to `false`.
 
@@ -271,7 +273,7 @@ Set an optional function to perform a final transformation of the response data.
 
 ### `url` [#url]
 
--  This property is required.
+> [!DEF]  This property is required.
 
 Set the URL.
 

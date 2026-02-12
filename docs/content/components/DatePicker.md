@@ -12,26 +12,28 @@
 
 This component supports the following behaviors:
 
-- **animation**: Adds animation functionality to components with an 'animation' prop.
-- **bookmark**: Adds bookmark functionality to any visual component with a 'bookmark' prop by adding bookmark-related attributes and APIs directly to the component.
-- **formBinding**: Binds input components directly to a Form when they have a 'bindTo' prop, without requiring a FormItem wrapper. This behavior adds form binding logic such as validation and state management to the component.
-- **label**: Adds a label to input components with a 'label' prop using the ItemWithLabel component.
-- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
-- **tooltip**: Adds tooltip functionality to components with a 'tooltip' or 'tooltipMarkdown' prop.
-- **validation**: Adds validation functionality to input components with validation-related props (e.g., 'required', 'minLength', 'maxLength', etc.) by wrapping them with a ValidationWrapper component that handles validation logic and error display.
-- **variant**: Applies custom variant styling to components with a 'variant' prop. For Button components, this only applies if the variant is not one of the predefined values ('solid', 'outlined', 'ghost'). For other components, it applies to any component with a 'variant' prop.
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Form Binding | `bindTo`, `initialValue`, `noSubmit` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Validation | `required`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `verboseValidationFeedback` |
+| Styling Variant | N/A |
 
 ## Properties [#properties]
 
 ### `autoFocus` [#autofocus]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
 ### `dateFormat` [#dateformat]
 
--  default: **"MM/dd/yyyy"**
+> [!DEF]  default: **"MM/dd/yyyy"**
 
 The format of the date displayed in the input field
 
@@ -147,7 +149,7 @@ The `disabledDates` prop supports multiple patterns for disabling specific dates
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -181,7 +183,7 @@ This property sets the component's initial value.
 
 ### `inline` [#inline]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 If set to true, the calendar is always visible and its panel is rendered as part of the layout. If false, the calendar is shown in a popup when the input is focused or clicked.
 
@@ -191,7 +193,7 @@ The invalid messages to display for the input component.
 
 ### `mode` [#mode]
 
--  default: **"single"**
+> [!DEF]  default: **"single"**
 
 The mode of the datepicker (single or range)
 
@@ -216,13 +218,13 @@ An optional placeholder text that is visible in the input field when its empty.
 
 ### `readOnly` [#readonly]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Set this property to `true` to disallow changing the component value.
 
 ### `showWeekNumber` [#showweeknumber]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Whether to show the week number in the calendar
 
@@ -254,7 +256,7 @@ Icon to display for valid state when concise validation summary is enabled.
 
 ### `validationStatus` [#validationstatus]
 
--  default: **"none"**
+> [!DEF]  default: **"none"**
 
 This property allows you to set the validation status of the input component.
 
@@ -287,7 +289,7 @@ Enables a concise validation summary (icon) in input components.
 
 ### `weekStartsOn` [#weekstartson]
 
--  default: **0**
+> [!DEF]  default: **0**
 
 The first day of the week. 0 is Sunday, 1 is Monday, etc.
 

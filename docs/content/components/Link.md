@@ -23,17 +23,19 @@ You can use the `label` and `icon` properties of a `Link` to set its text and ic
 
 This component supports the following behaviors:
 
-- **animation**: Adds animation functionality to components with an 'animation' prop.
-- **bookmark**: Adds bookmark functionality to any visual component with a 'bookmark' prop by adding bookmark-related attributes and APIs directly to the component.
-- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
-- **tooltip**: Adds tooltip functionality to components with a 'tooltip' or 'tooltipMarkdown' prop.
-- **variant**: Applies custom variant styling to components with a 'variant' prop. For Button components, this only applies if the variant is not one of the predefined values ('solid', 'outlined', 'ghost'). For other components, it applies to any component with a 'variant' prop.
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
 
 ## Properties [#properties]
 
 ### `active` [#active]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Indicates whether this link is active or not. If so, it will have a distinct visual appearance.
 
@@ -47,7 +49,7 @@ Indicates whether this link is active or not. If so, it will have a distinct vis
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -61,7 +63,7 @@ This boolean property value indicates whether the component responds to user eve
 
 ### `horizontalAlignment` [#horizontalalignment]
 
--  default: **"start"**
+> [!DEF]  default: **"start"**
 
 Manages the horizontal content alignment for child elements in the Link.
 
@@ -115,7 +117,7 @@ This property defines the URL of the link. If the value is not defined, the link
 
 ### `verticalAlignment` [#verticalalignment]
 
--  default: **"start"**
+> [!DEF]  default: **"start"**
 
 Manages the vertical content alignment for child elements in the Link.
 

@@ -18,12 +18,14 @@ See [this guide](/forms) for details.
 
 This component supports the following behaviors:
 
-- **animation**: Adds animation functionality to components with an 'animation' prop.
-- **bookmark**: Adds bookmark functionality to any visual component with a 'bookmark' prop by adding bookmark-related attributes and APIs directly to the component.
-- **label**: Adds a label to input components with a 'label' prop using the ItemWithLabel component.
-- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
-- **tooltip**: Adds tooltip functionality to components with a 'tooltip' or 'tooltipMarkdown' prop.
-- **variant**: Applies custom variant styling to components with a 'variant' prop. For Button components, this only applies if the variant is not one of the predefined values ('solid', 'outlined', 'ghost'). For other components, it applies to any component with a 'variant' prop.
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
 
 ## Properties [#properties]
 
@@ -62,7 +64,7 @@ This example mimics a one-second search and turns off the submit button during t
 
 ### `cancelLabel` [#cancellabel]
 
--  default: **"Cancel"**
+> [!DEF]  default: **"Cancel"**
 
 This property defines the label of the Cancel button.
 
@@ -76,13 +78,13 @@ This property sets the initial value of the form's data structure. The form infr
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
 ### `enableSubmit` [#enablesubmit]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This property controls whether the submit button is enabled. When set to false, the submit button is disabled and the form cannot be submitted.
 
@@ -92,13 +94,13 @@ This property sets the message to display when the form submission fails.
 
 ### `hideButtonRow` [#hidebuttonrow]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property hides the button row entirely when set to true.
 
 ### `hideButtonRowUntilDirty` [#hidebuttonrowuntildirty]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property hides the button row until the form data is modified (dirty).
 
@@ -108,13 +110,13 @@ This property sets the message to display when the form is being submitted.
 
 ### `itemLabelBreak` [#itemlabelbreak]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean value indicates if form item labels can be split into multiple lines if it would overflow the available label width. Individual `FormItem` instances can override this property.
 
 ### `itemLabelPosition` [#itemlabelposition]
 
--  default: **"top"**
+> [!DEF]  default: **"top"**
 
 This property sets the position of the item labels within the form.Individual `FormItem` instances can override this property.
 
@@ -133,7 +135,7 @@ This property sets the width of the item labels within the form. Individual `For
 
 ### `itemRequireLabelMode` [#itemrequirelabelmode]
 
--  default: **"markRequired"**
+> [!DEF]  default: **"markRequired"**
 
 This property controls how required indicators are displayed for required form items. Individual `FormItem` instances can override this property.
 
@@ -185,19 +187,19 @@ Fields can override `itemRequireLabelMode` with `requireLabelMode`:
 
 ### `keepModalOpenOnSubmit` [#keepmodalopenonsubmit]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property prevents the modal from closing when the form is submitted.
 
 ### `saveInProgressLabel` [#saveinprogresslabel]
 
--  default: **"Saving..."**
+> [!DEF]  default: **"Saving..."**
 
 This property defines the label of the Save button to display during the form data submit (save) operation.
 
 ### `saveLabel` [#savelabel]
 
--  default: **"Save"**
+> [!DEF]  default: **"Save"**
 
 This property defines the label of the Save button.
 
@@ -211,7 +213,7 @@ URL to submit the form data.
 
 ### `swapCancelAndSave` [#swapcancelandsave]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 By default, the Cancel button is to the left of the Save button. Set this property to `true` to swap them or `false` to keep their original location.
 

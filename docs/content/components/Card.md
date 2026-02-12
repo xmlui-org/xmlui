@@ -46,12 +46,14 @@ Prestyled elements always appear above other children.
 
 This component supports the following behaviors:
 
-- **animation**: Adds animation functionality to components with an 'animation' prop.
-- **bookmark**: Adds bookmark functionality to any visual component with a 'bookmark' prop by adding bookmark-related attributes and APIs directly to the component.
-- **label**: Adds a label to input components with a 'label' prop using the ItemWithLabel component.
-- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
-- **tooltip**: Adds tooltip functionality to components with a 'tooltip' or 'tooltipMarkdown' prop.
-- **variant**: Applies custom variant styling to components with a 'variant' prop. For Button components, this only applies if the variant is not one of the predefined values ('solid', 'outlined', 'ghost'). For other components, it applies to any component with a 'variant' prop.
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
 
 ## Properties [#properties]
 
@@ -67,7 +69,7 @@ The url for an avarar image. If not specified, but [`showAvatar`](#showAvatar) i
 
 ### `horizontalAlignment` [#horizontalalignment]
 
--  default: **"start"**
+> [!DEF]  default: **"start"**
 
 Manages the horizontal content alignment for each child element in the Card.
 
@@ -79,7 +81,7 @@ This optional property wraps the title in a `Link` component that is clickable t
 
 ### `orientation` [#orientation]
 
--  default: **"vertical"**
+> [!DEF]  default: **"vertical"**
 
 An optional property that governs the Card's orientation (whether the Card lays out its children in a row or a column). If the orientation is set to `horizontal`, the Card will display its children in a row, except for its [`title`](#title) and [`subtitle`](#subtitle).
 
@@ -103,7 +105,7 @@ Available values:
 
 ### `showAvatar` [#showavatar]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Indicates whether the avatar should be displayed
 
@@ -143,7 +145,7 @@ This prop sets the prestyled title.
 
 ### `verticalAlignment` [#verticalalignment]
 
--  default: **"start"**
+> [!DEF]  default: **"start"**
 
 Manages the vertical content alignment for each child element in the Card.
 

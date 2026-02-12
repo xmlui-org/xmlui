@@ -12,6 +12,7 @@ import { Behavior } from "./Behavior";
 export const bookmarkBehavior: Behavior = {
   metadata: {
     name: "bookmark",
+    friendlyName: "Bookmark",
     description:
       "Adds bookmark functionality to any visual component with a 'bookmark' prop by adding bookmark-related attributes and APIs directly to the component.",
     triggerProps: ["bookmark"],

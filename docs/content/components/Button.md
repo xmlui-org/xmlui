@@ -12,23 +12,25 @@
 
 This component supports the following behaviors:
 
-- **animation**: Adds animation functionality to components with an 'animation' prop.
-- **bookmark**: Adds bookmark functionality to any visual component with a 'bookmark' prop by adding bookmark-related attributes and APIs directly to the component.
-- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
-- **tooltip**: Adds tooltip functionality to components with a 'tooltip' or 'tooltipMarkdown' prop.
-- **variant**: Applies custom variant styling to components with a 'variant' prop. For Button components, this only applies if the variant is not one of the predefined values ('solid', 'outlined', 'ghost'). For other components, it applies to any component with a 'variant' prop.
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
 
 ## Properties [#properties]
 
 ### `autoFocus` [#autofocus]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Indicates if the button should receive focus when the page loads.
 
 ### `contentPosition` [#contentposition]
 
--  default: **"center"**
+> [!DEF]  default: **"center"**
 
 This optional value determines how the label and icon (or nested children) should be placedinside the Button component.
 
@@ -57,7 +59,7 @@ This optional value is used to provide an accessible name for the Button in the 
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 The value of this property indicates whether the button accepts actions (`true`) or does not react to them (`false`).
 
@@ -86,7 +88,7 @@ This string value denotes an icon name. The framework will render an icon if XML
 
 ### `iconPosition` [#iconposition]
 
--  default: **"start"**
+> [!DEF]  default: **"start"**
 
 This optional string determines the location of the icon in the Button.
 
@@ -139,7 +141,7 @@ This property is an optional string to set a label for the Button. If no label i
 
 ### `orientation` [#orientation]
 
--  default: **"horizontal"**
+> [!DEF]  default: **"horizontal"**
 
 This property sets the main axis along which the nested components are rendered.
 
@@ -152,7 +154,7 @@ Available values:
 
 ### `size` [#size]
 
--  default: **"sm"**
+> [!DEF]  default: **"sm"**
 
 Sets the size of the button.
 
@@ -187,7 +189,7 @@ Available values:
 
 ### `themeColor` [#themecolor]
 
--  default: **"primary"**
+> [!DEF]  default: **"primary"**
 
 Sets the button color scheme defined in the application theme.
 
@@ -211,7 +213,7 @@ Available values:
 
 ### `type` [#type]
 
--  default: **"button"**
+> [!DEF]  default: **"button"**
 
 This optional string describes how the Button appears in an HTML context. You rarely need to set this property explicitly.
 
@@ -225,7 +227,7 @@ Available values:
 
 ### `variant` [#variant]
 
--  default: **"solid"**
+> [!DEF]  default: **"solid"**
 
 The button variant determines the level of emphasis the button should possess.
 

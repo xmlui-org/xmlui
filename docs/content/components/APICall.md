@@ -24,12 +24,9 @@
 
 This component supports the following behaviors:
 
-- **animation**: Adds animation functionality to components with an 'animation' prop.
-- **bookmark**: Adds bookmark functionality to any visual component with a 'bookmark' prop by adding bookmark-related attributes and APIs directly to the component.
-- **label**: Adds a label to input components with a 'label' prop using the ItemWithLabel component.
-- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
-- **tooltip**: Adds tooltip functionality to components with a 'tooltip' or 'tooltipMarkdown' prop.
-- **variant**: Applies custom variant styling to components with a 'variant' prop. For Button components, this only applies if the variant is not one of the predefined values ('solid', 'outlined', 'ghost'). For other components, it applies to any component with a 'variant' prop.
+| Behavior | Properties |
+| --- | --- |
+| Publish/Subscribe | `subscribeToTopic` |
 
 ## Properties [#properties]
 
@@ -43,7 +40,7 @@ Optional body to send with the cancel request. Can use $result context from init
 
 ### `cancelMethod` [#cancelmethod]
 
--  default: **"post"**
+> [!DEF]  default: **"post"**
 
 HTTP method for cancel requests. Defaults to 'post'.
 
@@ -115,7 +112,7 @@ Available values:
 
 ### `deferredMode` [#deferredmode]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Enable deferred operation mode for long-running operations that return 202 Accepted. When enabled, the component will automatically poll a status endpoint to track operation progress. (Experimental feature)
 
@@ -217,19 +214,19 @@ Message to show in toast notification during deferred operation polling. Can inc
 
 ### `maxPollingDuration` [#maxpollingduration]
 
--  default: **300000**
+> [!DEF]  default: **300000**
 
 Maximum time to poll before timing out, in milliseconds. Defaults to 300000ms (5 minutes).
 
 ### `maxPollingInterval` [#maxpollinginterval]
 
--  default: **30000**
+> [!DEF]  default: **30000**
 
 Maximum interval between polls when using backoff strategies, in milliseconds. Defaults to 30000ms (30 seconds).
 
 ### `method` [#method]
 
--  default: **"get"**
+> [!DEF]  default: **"get"**
 
 The method of data manipulation can be done via setting this property.
 
@@ -237,7 +234,7 @@ Available values: `get` **(default)**, `post`, `put`, `delete`, `patch`, `head`,
 
 ### `pollingBackoff` [#pollingbackoff]
 
--  default: **"none"**
+> [!DEF]  default: **"none"**
 
 Strategy for increasing polling interval over time. Options: 'none' (fixed interval), 'linear' (adds 1 second per attempt), 'exponential' (doubles each time). Defaults to 'none'.
 
@@ -245,7 +242,7 @@ Available values: `none` **(default)**, `linear`, `exponential`
 
 ### `pollingInterval` [#pollinginterval]
 
--  default: **2000**
+> [!DEF]  default: **2000**
 
 Milliseconds between status polls. Defaults to 2000ms.
 
@@ -263,7 +260,7 @@ This optional property sets the request body to the value provided here without 
 
 ### `statusMethod` [#statusmethod]
 
--  default: **"get"**
+> [!DEF]  default: **"get"**
 
 HTTP method for status requests. Defaults to 'get'.
 
@@ -275,7 +272,7 @@ The URL to poll for status updates when deferredMode is enabled. Can use $result
 
 ### `url` [#url]
 
--  This property is required.
+> [!DEF]  This property is required.
 
 Use this property to set the URL to which data will be sent. If not provided, an empty URL is used.
 

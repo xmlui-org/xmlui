@@ -26,12 +26,14 @@ You can also paste files from the clipboard: click the drop zone (cyan area) and
 
 This component supports the following behaviors:
 
-- **animation**: Adds animation functionality to components with an 'animation' prop.
-- **bookmark**: Adds bookmark functionality to any visual component with a 'bookmark' prop by adding bookmark-related attributes and APIs directly to the component.
-- **label**: Adds a label to input components with a 'label' prop using the ItemWithLabel component.
-- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
-- **tooltip**: Adds tooltip functionality to components with a 'tooltip' or 'tooltipMarkdown' prop.
-- **variant**: Applies custom variant styling to components with a 'variant' prop. For Button components, this only applies if the variant is not one of the predefined values ('solid', 'outlined', 'ghost'). For other components, it applies to any component with a 'variant' prop.
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
 
 ## Properties [#properties]
 
@@ -41,7 +43,7 @@ Accepted file MIME types, separated by commas. For example: 'image/*,application
 
 ### `allowPaste` [#allowpaste]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This property indicates if the drop zone accepts files pasted from the clipboard (`true`) or only dragged files (`false`).
 
@@ -64,13 +66,13 @@ Try it! When you copy a file to a clipboard, you cannot paste it with the keyboa
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 If set to `false`, the drop zone will be disabled and users will not be able to upload files.
 
 ### `icon` [#icon]
 
--  default: **"upload"**
+> [!DEF]  default: **"upload"**
 
 Specifies an icon name. The framework will render an icon if XMLUI recognizes the icon by its name.
 
@@ -80,7 +82,7 @@ The maximum number of files that can be selected.
 
 ### `text` [#text]
 
--  default: **"Drop files here"**
+> [!DEF]  default: **"Drop files here"**
 
 With this property, you can change the default text to display in the drop zone.
 

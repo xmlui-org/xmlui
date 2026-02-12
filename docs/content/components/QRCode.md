@@ -13,18 +13,20 @@
 
 This component supports the following behaviors:
 
-- **animation**: Adds animation functionality to components with an 'animation' prop.
-- **bookmark**: Adds bookmark functionality to any visual component with a 'bookmark' prop by adding bookmark-related attributes and APIs directly to the component.
-- **label**: Adds a label to input components with a 'label' prop using the ItemWithLabel component.
-- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
-- **tooltip**: Adds tooltip functionality to components with a 'tooltip' or 'tooltipMarkdown' prop.
-- **variant**: Applies custom variant styling to components with a 'variant' prop. For Button components, this only applies if the variant is not one of the predefined values ('solid', 'outlined', 'ghost'). For other components, it applies to any component with a 'variant' prop.
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
 
 ## Properties [#properties]
 
 ### `backgroundColor` [#backgroundcolor]
 
--  default: **"#FFFFFF"**
+> [!DEF]  default: **"#FFFFFF"**
 
 This property sets the background color (the light squares) of the QR code. Accepts any valid CSS color value (hex, rgb, color name). Note: QR codes should maintain good contrast for reliable scanning.
 
@@ -40,7 +42,7 @@ This property sets the background color (the light squares) of the QR code. Acce
 
 ### `color` [#color]
 
--  default: **"#000000"**
+> [!DEF]  default: **"#000000"**
 
 This property sets the foreground color (the dark squares) of the QR code. Accepts any valid CSS color value (hex, rgb, color name).
 
@@ -56,7 +58,7 @@ This property sets the foreground color (the dark squares) of the QR code. Accep
 
 ### `level` [#level]
 
--  default: **"L"**
+> [!DEF]  default: **"L"**
 
 This property sets the error correction level of the QR code. Higher levels increase reliability but also increase the QR code density. 'L' = Low (7% recovery), 'M' = Medium (15% recovery), 'Q' = Quartile (25% recovery), 'H' = High (30% recovery).
 
@@ -87,7 +89,7 @@ Available values: `L` **(default)**, `M`, `Q`, `H`
 
 ### `size` [#size]
 
--  default: **256**
+> [!DEF]  default: **256**
 
 This property defines the intrinsic size of the QR code in pixels. The actual display size can be controlled using layout properties (width/height). This value affects the internal resolution and detail level of the generated QR code. If not specified, uses the `size-QRCode` theme variable, or defaults to 256.
 

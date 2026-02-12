@@ -15,8 +15,9 @@ The `MessageListener` component listens for messages sent via the browser's `win
 
 This component supports the following behaviors:
 
-- **label**: Adds a label to input components with a 'label' prop using the ItemWithLabel component.
-- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
+| Behavior | Properties |
+| --- | --- |
+| Publish/Subscribe | `subscribeToTopic` |
 
 ## Properties [#properties]
 

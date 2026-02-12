@@ -6,18 +6,20 @@
 
 This component supports the following behaviors:
 
-- **animation**: Adds animation functionality to components with an 'animation' prop.
-- **bookmark**: Adds bookmark functionality to any visual component with a 'bookmark' prop by adding bookmark-related attributes and APIs directly to the component.
-- **label**: Adds a label to input components with a 'label' prop using the ItemWithLabel component.
-- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
-- **tooltip**: Adds tooltip functionality to components with a 'tooltip' or 'tooltipMarkdown' prop.
-- **variant**: Applies custom variant styling to components with a 'variant' prop. For Button components, this only applies if the variant is not one of the predefined values ('solid', 'outlined', 'ghost'). For other components, it applies to any component with a 'variant' prop.
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
 
 ## Properties [#properties]
 
 ### `columnGap` [#columngap]
 
--  default: **"3rem"**
+> [!DEF]  default: **"3rem"**
 
 The gap between columns of items within the section.
 
@@ -44,7 +46,7 @@ The heading text to be displayed at the top of the form section.
 
 ### `headingLevel` [#headinglevel]
 
--  default: **"h3"**
+> [!DEF]  default: **"h3"**
 
 The semantic and visual level of the heading.
 
@@ -60,7 +62,7 @@ Available values: `h1`, `h2`, `h3` **(default)**, `h4`, `h5`, `h6`
 
 ### `headingWeight` [#headingweight]
 
--  default: **"bold"**
+> [!DEF]  default: **"bold"**
 
 The font weight of the heading.
 
@@ -88,7 +90,7 @@ Informational text displayed below the heading.
 
 ### `infoFontSize` [#infofontsize]
 
--  default: **"0.8rem"**
+> [!DEF]  default: **"0.8rem"**
 
 The font size of the informational text.
 
@@ -105,13 +107,13 @@ The font size of the informational text.
 
 ### `paddingTop` [#paddingtop]
 
--  default: **"$space-normal"**
+> [!DEF]  default: **"$space-normal"**
 
 The top padding of the FlowLayout where the section's children are placed.
 
 ### `rowGap` [#rowgap]
 
--  default: **"$space-normal"**
+> [!DEF]  default: **"$space-normal"**
 
 The gap between rows of items within the section.
 

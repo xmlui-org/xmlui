@@ -7,6 +7,7 @@ import { FormItemValidations } from "../../components/Form/FormContext";
 export const validationBehavior: Behavior = {
   metadata: {
     name: "validation",
+    friendlyName: "Validation",
     description:
       "Adds validation functionality to input components with validation-related props (e.g., 'required', 'minLength', 'maxLength', etc.) by wrapping them with a ValidationWrapper component that handles validation logic and error display.",
     triggerProps: ["bindTo"],

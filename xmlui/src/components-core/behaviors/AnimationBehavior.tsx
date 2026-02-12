@@ -12,6 +12,7 @@ import { Behavior } from "./Behavior";
 export const animationBehavior: Behavior = {
   metadata: {
     name: "animation",
+    friendlyName: "Animation",
     description: "Adds animation functionality to components with an 'animation' prop.",
     triggerProps: ["animation"],
     props: {

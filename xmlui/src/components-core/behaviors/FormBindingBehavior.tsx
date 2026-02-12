@@ -12,6 +12,7 @@ import { Behavior } from "./Behavior";
 export const formBindingBehavior: Behavior = {
   metadata: {
     name: "formBinding",
+    friendlyName: "Form Binding",
     description:
       "Binds input components directly to a Form when they have a 'bindTo' prop, without requiring a FormItem wrapper. This behavior adds form binding logic such as validation and state management to the component.",
     triggerProps: ["bindTo"],
@@ -153,4 +154,3 @@ export const formBindingBehavior: Behavior = {
     );
   },
 };
-

@@ -12,6 +12,7 @@ import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 export const pubSubBehavior: Behavior = {
   metadata: {
     name: "pubsub",
+    friendlyName: "Publish/Subscribe",
     description:
       "Subscribes the component to specified topics and triggers an event when a topic is received.",
     triggerProps: ["subscribeToTopic"],

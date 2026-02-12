@@ -374,24 +374,26 @@ Set `autoLoadAfter` to automatically reload children after a specified time when
 
 This component supports the following behaviors:
 
-- **animation**: Adds animation functionality to components with an 'animation' prop.
-- **bookmark**: Adds bookmark functionality to any visual component with a 'bookmark' prop by adding bookmark-related attributes and APIs directly to the component.
-- **label**: Adds a label to input components with a 'label' prop using the ItemWithLabel component.
-- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
-- **tooltip**: Adds tooltip functionality to components with a 'tooltip' or 'tooltipMarkdown' prop.
-- **variant**: Applies custom variant styling to components with a 'variant' prop. For Button components, this only applies if the variant is not one of the predefined values ('solid', 'outlined', 'ghost'). For other components, it applies to any component with a 'variant' prop.
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
 
 ## Properties [#properties]
 
 ### `animateExpand` [#animateexpand]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 When true, uses only the collapsed icon and rotates it for expansion instead of switching icons (default: false).
 
 ### `autoExpandToSelection` [#autoexpandtoselection]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 Automatically expand the path to the selected item.
 
@@ -431,7 +433,7 @@ The `autoLoadAfter` property sets a time threshold (in milliseconds) for automat
 
 ### `autoLoadAfterField` [#autoloadafterfield]
 
--  default: **"autoLoadAfter"**
+> [!DEF]  default: **"autoLoadAfter"**
 
 The property name in source data for per-node autoLoadAfter values (default: 'autoLoadAfter'). Allows reading node-specific reload thresholds from data. Node-level values take priority over the component-level autoLoadAfter prop.
 
@@ -465,31 +467,31 @@ The `autoLoadAfterField` property allows setting different auto-reload threshold
 
 ### `childrenField` [#childrenfield]
 
--  default: **"children"**
+> [!DEF]  default: **"children"**
 
 The property name in source data for child arrays (used in hierarchy format).
 
 ### `data` [#data]
 
--  This property is required.
+> [!DEF]  This property is required.
 
 The data source of the tree. Format depends on the dataFormat property.
 
 ### `dataFormat` [#dataformat]
 
--  default: **"flat"**
+> [!DEF]  default: **"flat"**
 
 The input data structure format: "flat" (array with parent relationships) or "hierarchy" (nested objects).
 
 ### `defaultExpanded` [#defaultexpanded]
 
--  default: **"none"**
+> [!DEF]  default: **"none"**
 
 Initial expansion state: "none", "all", "first-level", or array of specific IDs.
 
 ### `dynamic` [#dynamic]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Default value for whether tree nodes should load children dynamically (default: false). If true, nodes will load children via the loadChildren event. If false, nodes use static children from data. Can be overridden per-node in source data using the dynamicField property. Ignored if loadChildren handler is not provided.
 
@@ -519,7 +521,7 @@ The `dynamic` property sets the default behavior for all tree nodes. When `true`
 
 ### `dynamicField` [#dynamicfield]
 
--  default: **"dynamic"**
+> [!DEF]  default: **"dynamic"**
 
 The property name in source data for dynamic state (default: 'dynamic'). When true, the node's children should be dynamically loaded via loadChildren event. When false, the node uses static children from data. Ignored if loadChildren handler is not provided.
 
@@ -550,67 +552,67 @@ The `dynamicField` property allows individual nodes to override the tree's defau
 
 ### `expandRotation` [#expandrotation]
 
--  default: **90**
+> [!DEF]  default: **90**
 
 The number of degrees to rotate the collapsed icon when expanded in animate mode (default: 90).
 
 ### `fixedItemSize` [#fixeditemsize]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 When set to `true`, the tree will measure the height of the first item and use that as a fixed size hint for all items. This improves scroll performance when all items have the same height. If items have varying heights, leave this as `false`.
 
 ### `iconCollapsed` [#iconcollapsed]
 
--  default: **"chevronright"**
+> [!DEF]  default: **"chevronright"**
 
 The icon name to use for collapsed nodes (default: "chevronright").
 
 ### `iconCollapsedField` [#iconcollapsedfield]
 
--  default: **"iconCollapsed"**
+> [!DEF]  default: **"iconCollapsed"**
 
 The property name in source data for collapsed state icons.
 
 ### `iconExpanded` [#iconexpanded]
 
--  default: **"chevrondown"**
+> [!DEF]  default: **"chevrondown"**
 
 The icon name to use for expanded nodes (default: "chevrondown").
 
 ### `iconExpandedField` [#iconexpandedfield]
 
--  default: **"iconExpanded"**
+> [!DEF]  default: **"iconExpanded"**
 
 The property name in source data for expanded state icons.
 
 ### `iconField` [#iconfield]
 
--  default: **"icon"**
+> [!DEF]  default: **"icon"**
 
 The property name in source data for icon identifiers.
 
 ### `iconSize` [#iconsize]
 
--  default: **"16"**
+> [!DEF]  default: **"16"**
 
 The size of the expand/collapse icons (default: "16").
 
 ### `idField` [#idfield]
 
--  default: **"id"**
+> [!DEF]  default: **"id"**
 
 The property name in source data for unique identifiers.
 
 ### `itemClickExpands` [#itemclickexpands]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Whether clicking anywhere on a tree item should expand/collapse the node, not just the expand/collapse icon.
 
 ### `itemHeight` [#itemheight]
 
--  default: **32**
+> [!DEF]  default: **32**
 
 The height of each tree row in pixels (default: 32).
 
@@ -620,7 +622,7 @@ The template for each item in the tree.
 
 ### `loadedField` [#loadedfield]
 
--  default: **"loaded"**
+> [!DEF]  default: **"loaded"**
 
 The property name in source data for loaded state (default: "loaded"). When false, shows expand indicator even without children and triggers async loading.
 
@@ -648,25 +650,25 @@ The `loadedField` property specifies which field in node data indicates whether 
 
 ### `nameField` [#namefield]
 
--  default: **"name"**
+> [!DEF]  default: **"name"**
 
 The property name in source data for display text.
 
 ### `parentIdField` [#parentidfield]
 
--  default: **"parentId"**
+> [!DEF]  default: **"parentId"**
 
 The property name in source data for parent relationships (used in flat format).
 
 ### `scrollStyle` [#scrollstyle]
 
--  default: **"normal"**
+> [!DEF]  default: **"normal"**
 
 This property determines the scrollbar style. Options: "normal" uses the browser's default scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.
 
 ### `selectableField` [#selectablefield]
 
--  default: **"selectable"**
+> [!DEF]  default: **"selectable"**
 
 The property name in source data for selectable state (default: "selectable").
 
@@ -676,13 +678,13 @@ The selected item ID in source data format.
 
 ### `showScrollerFade` [#showscrollerfade]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 When enabled, displays gradient fade indicators at the top and bottom edges of the tree when scrollable content extends beyond the visible area. The fade effect provides a visual cue to users that additional content is available by scrolling. The indicators automatically appear and disappear based on the scroll position. This property only works with "overlay", "whenMouseOver", and "whenScrolling" scroll styles.
 
 ### `spinnerDelay` [#spinnerdelay]
 
--  default: **0**
+> [!DEF]  default: **0**
 
 The delay in milliseconds before showing the loading spinner when a node is in loading state. Set to 0 to show immediately, or a higher value to prevent spinner flicker for fast-loading nodes.
 

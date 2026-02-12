@@ -35,6 +35,7 @@ export const APICallMd = createMetadata({
     "(/components/DataSource) which fetches data. Unlike DataSource, APICall doesn't " +
     "automatically execute - you must trigger it manually with the `execute()` method, " +
     "typically from form submissions or button clicks. See also [Actions.callAPI](/globals#actionscallapi).",
+  nonVisual: true,
   props: {
     method: {
       description: "The method of data manipulation can be done via setting this property.",
@@ -81,8 +82,14 @@ export const APICallMd = createMetadata({
         `\`Access-Control-Allow-Credentials: true\` header on the server).`,
       availableValues: [
         { value: "omit", description: "Never send credentials" },
-        { value: "same-origin", description: "Send credentials only for same-origin requests (default browser behavior)" },
-        { value: "include", description: "Always send credentials, even for cross-origin requests" },
+        {
+          value: "same-origin",
+          description: "Send credentials only for same-origin requests (default browser behavior)",
+        },
+        {
+          value: "include",
+          description: "Always send credentials, even for cross-origin requests",
+        },
       ],
       valueType: "string",
     },
@@ -120,15 +127,13 @@ export const APICallMd = createMetadata({
       valueType: "string",
     },
     statusMethod: {
-      description:
-        "HTTP method for status requests. Defaults to 'get'.",
+      description: "HTTP method for status requests. Defaults to 'get'.",
       valueType: "string",
       availableValues: httpMethodNames,
       defaultValue: "get",
     },
     pollingInterval: {
-      description:
-        "Milliseconds between status polls. Defaults to 2000ms.",
+      description: "Milliseconds between status polls. Defaults to 2000ms.",
       valueType: "number",
       defaultValue: 2000,
     },
@@ -178,8 +183,7 @@ export const APICallMd = createMetadata({
       valueType: "string",
     },
     cancelMethod: {
-      description:
-        "HTTP method for cancel requests. Defaults to 'post'.",
+      description: "HTTP method for cancel requests. Defaults to 'post'.",
       valueType: "string",
       availableValues: httpMethodNames,
       defaultValue: "post",
@@ -247,8 +251,7 @@ export const APICallMd = createMetadata({
       },
     },
     pollingStart: {
-      description:
-        "Fires when polling begins in deferred mode.",
+      description: "Fires when polling begins in deferred mode.",
       signature: "(initialResult: any) => void",
       parameters: {
         initialResult: "The result from the initial API call that returned 202.",
@@ -264,8 +267,7 @@ export const APICallMd = createMetadata({
       },
     },
     timeout: {
-      description:
-        "Fires if max polling duration is exceeded in deferred mode.",
+      description: "Fires if max polling duration is exceeded in deferred mode.",
       signature: "() => void",
       parameters: {},
     },
@@ -281,8 +283,7 @@ export const APICallMd = createMetadata({
         "`$params[0]`, `$params[1]`, etc.)",
     },
     $result: {
-      description:
-        "Response data (available in `completedNotificationMessage`)",
+      description: "Response data (available in `completedNotificationMessage`)",
     },
     $error: {
       description: "Error details (available in `errorNotificationMessage`)",
@@ -296,16 +297,13 @@ export const APICallMd = createMetadata({
         "Current progress 0-100 when in deferred mode (extracted via progressExtractor expression)",
     },
     $polling: {
-      description:
-        "Boolean indicating if polling is currently active in deferred mode",
+      description: "Boolean indicating if polling is currently active in deferred mode",
     },
     $attempts: {
-      description:
-        "Number of status polls made in deferred mode",
+      description: "Number of status polls made in deferred mode",
     },
     $elapsed: {
-      description:
-        "Time elapsed since polling started in milliseconds",
+      description: "Time elapsed since polling started in milliseconds",
     },
   },
   apis: {
@@ -320,8 +318,7 @@ export const APICallMd = createMetadata({
       },
     },
     inProgress: {
-      description:
-        "Boolean flag indicating whether the API call is currently in progress.",
+      description: "Boolean flag indicating whether the API call is currently in progress.",
       signature: "inProgress: boolean",
     },
     loaded: {
@@ -330,33 +327,27 @@ export const APICallMd = createMetadata({
       signature: "loaded: boolean",
     },
     lastResult: {
-      description:
-        "The result from the most recent successful API call execution.",
+      description: "The result from the most recent successful API call execution.",
       signature: "lastResult: any",
     },
     lastError: {
-      description:
-        "The error from the most recent failed API call execution.",
+      description: "The error from the most recent failed API call execution.",
       signature: "lastError: any",
     },
     stopPolling: {
-      description:
-        "Manually stop polling in deferred mode. The operation continues on the server.",
+      description: "Manually stop polling in deferred mode. The operation continues on the server.",
       signature: "stopPolling(): void",
     },
     resumePolling: {
-      description:
-        "Resume polling in deferred mode after it was manually stopped.",
+      description: "Resume polling in deferred mode after it was manually stopped.",
       signature: "resumePolling(): void",
     },
     getStatus: {
-      description:
-        "Get the current status data in deferred mode.",
+      description: "Get the current status data in deferred mode.",
       signature: "getStatus(): any",
     },
     isPolling: {
-      description:
-        "Check if polling is currently active in deferred mode.",
+      description: "Check if polling is currently active in deferred mode.",
       signature: "isPolling(): boolean",
     },
     cancel: {
@@ -372,9 +363,9 @@ export const apiCallRenderer = createComponentRenderer(
   APICallMd,
   ({ node, registerComponentApi, uid, updateState, lookupEventHandler }) => {
     return (
-      <APICallNative 
-        registerComponentApi={registerComponentApi} 
-        node={node as any} 
+      <APICallNative
+        registerComponentApi={registerComponentApi}
+        node={node as any}
         uid={uid}
         updateState={updateState}
         onStatusUpdate={lookupEventHandler("statusUpdate")}

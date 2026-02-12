@@ -56,14 +56,15 @@ Try the app by clicking the button several times. Check how the queue processes 
 
 This component supports the following behaviors:
 
-- **label**: Adds a label to input components with a 'label' prop using the ItemWithLabel component.
-- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
+| Behavior | Properties |
+| --- | --- |
+| Publish/Subscribe | `subscribeToTopic` |
 
 ## Properties [#properties]
 
 ### `clearAfterFinish` [#clearafterfinish]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property indicates the completed items (successful or error) should be removed from the queue after completion.
 

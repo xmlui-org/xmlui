@@ -13,18 +13,20 @@ See the [reference docs](/components/SpaceFiller) for details.
 
 This component supports the following behaviors:
 
-- **animation**: Adds animation functionality to components with an 'animation' prop.
-- **bookmark**: Adds bookmark functionality to any visual component with a 'bookmark' prop by adding bookmark-related attributes and APIs directly to the component.
-- **label**: Adds a label to input components with a 'label' prop using the ItemWithLabel component.
-- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
-- **tooltip**: Adds tooltip functionality to components with a 'tooltip' or 'tooltipMarkdown' prop.
-- **variant**: Applies custom variant styling to components with a 'variant' prop. For Button components, this only applies if the variant is not one of the predefined values ('solid', 'outlined', 'ghost'). For other components, it applies to any component with a 'variant' prop.
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
 
 ## Properties [#properties]
 
 ### `columnGap` [#columngap]
 
--  default: **"$gap-normal"**
+> [!DEF]  default: **"$gap-normal"**
 
 The `columnGap` property specifies the space between items in a single row; it overrides the `gap` value.
 
@@ -50,7 +52,7 @@ You can observe no gap between the rows of the `FlowLayout`, as `columnGap` keep
 
 ### `gap` [#gap]
 
--  default: **"$gap-normal"**
+> [!DEF]  default: **"$gap-normal"**
 
 This property defines the gap between items in the same row and between rows. The FlowLayout component creates a new row when an item is about to overflow the current row.
 
@@ -111,7 +113,7 @@ All items within a `FlowLayout` instance fit in a single row, so `gap` affects o
 
 ### `rowGap` [#rowgap]
 
--  default: **"$gap-normal"**
+> [!DEF]  default: **"$gap-normal"**
 
 The `rowGap` property specifies the space between the FlowLayout rows; it overrides the `gap` value.
 
@@ -137,7 +139,7 @@ You can observe no gap between the items in a single row of the `FlowLayout`, as
 
 ### `scrollStyle` [#scrollstyle]
 
--  default: **"normal"**
+> [!DEF]  default: **"normal"**
 
 This property determines the scrollbar style. Options: "normal" uses the browser's default scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.
 
@@ -145,13 +147,13 @@ Available values: `normal` **(default)**, `overlay`, `whenMouseOver`, `whenScrol
 
 ### `showScrollerFade` [#showscrollerfade]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 When enabled, displays gradient fade indicators at the top and bottom of the scroll container to visually indicate that more content is available in those directions. The fade indicators automatically appear/disappear based on the current scroll position. Top fade shows when scrolled down from the top, bottom fade shows when not at the bottom. Only works with overlay scrollbar modes (not with 'normal' mode).
 
 ### `verticalAlignment` [#verticalalignment]
 
--  default: **"start"**
+> [!DEF]  default: **"start"**
 
 Manages the vertical content alignment for each child element within the same row. This aligns items along the cross-axis of the flex container.
 

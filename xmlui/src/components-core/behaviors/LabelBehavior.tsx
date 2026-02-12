@@ -7,6 +7,7 @@ import { Behavior } from "./Behavior";
 export const labelBehavior: Behavior = {
   metadata: {
     name: "label",
+    friendlyName: "Component Label",
     description:
       "Adds a label to input components with a 'label' prop using the ItemWithLabel component.",
     triggerProps: ["label"],
@@ -51,6 +52,9 @@ export const labelBehavior: Behavior = {
     condition: {
       type: "and",
       conditions: [
+        {
+          type: "visual"
+        },
         {
           type: "hasNoProp",
           propName: "label",

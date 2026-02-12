@@ -17,18 +17,20 @@ This component displays a slideshow by cycling through elements (images, text, o
 
 This component supports the following behaviors:
 
-- **animation**: Adds animation functionality to components with an 'animation' prop.
-- **bookmark**: Adds bookmark functionality to any visual component with a 'bookmark' prop by adding bookmark-related attributes and APIs directly to the component.
-- **label**: Adds a label to input components with a 'label' prop using the ItemWithLabel component.
-- **pubsub**: Subscribes the component to specified topics and triggers an event when a topic is received.
-- **tooltip**: Adds tooltip functionality to components with a 'tooltip' or 'tooltipMarkdown' prop.
-- **variant**: Applies custom variant styling to components with a 'variant' prop. For Button components, this only applies if the variant is not one of the predefined values ('solid', 'outlined', 'ghost'). For other components, it applies to any component with a 'variant' prop.
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
 
 ## Properties [#properties]
 
 ### `autoplay` [#autoplay]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Start scrolling the carousel automatically (`true`) or not (`false`).
 
@@ -52,7 +54,7 @@ This property indicates whether the carousel automatically scrolls through slide
 
 ### `autoplayInterval` [#autoplayinterval]
 
--  default: **5000**
+> [!DEF]  default: **5000**
 
 Specifies the interval between autoplay transitions.
 
@@ -60,7 +62,7 @@ This property specifies the interval between autoplay transitions in millisecond
 
 ### `controls` [#controls]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 Display the previous/next controls (`true`) or not (`false`).
 
@@ -77,7 +79,7 @@ This property indicates whether the carousel displays navigation controls (previ
 
 ### `indicators` [#indicators]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 Display the individual slides as buttons (`true`) or not (`false`).
 
@@ -95,7 +97,7 @@ This property indicates whether the carousel displays position indicators.
 
 ### `loop` [#loop]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Sets whether the carousel should loop back to the start/end when it reaches the last/first slide.
 
@@ -135,7 +137,7 @@ This property specifies the icon to display for the next control button.
 
 ### `orientation` [#orientation]
 
--  default: **"horizontal"**
+> [!DEF]  default: **"horizontal"**
 
 This property indicates the orientation of the carousel. The `horizontal` value indicates that the carousel moves horizontally, and the `vertical` value indicates that the carousel moves vertically.
 
@@ -172,7 +174,7 @@ This property specifies the icon to display for the previous control button.
 
 ### `startIndex` [#startindex]
 
--  default: **0**
+> [!DEF]  default: **0**
 
 The index of the first slide to display.
 
@@ -191,7 +193,7 @@ This property indicates the index of the first slide to display when the carouse
 
 ### `stopAutoplayOnInteraction` [#stopautoplayoninteraction]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This property indicates whether autoplay stops on user interaction.
 
@@ -199,7 +201,7 @@ This property indicates whether autoplay stops when the user interacts with the 
 
 ### `transitionDuration` [#transitionduration]
 
--  default: **25**
+> [!DEF]  default: **25**
 
 The duration of the transition between slides.
 
