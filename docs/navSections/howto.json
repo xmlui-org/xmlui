@@ -2,6 +2,8 @@
   "items": [
     {
       "label": "How To",
+      "to": "/howto",
+      "description": "Quick recipes for common XMLUI tasks.",
       "children": [
         {
           "to": "/howto/expose-a-method-from-a-component",

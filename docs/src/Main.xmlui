@@ -165,25 +165,32 @@
                 content="{appGlobals.content['pages/tutorial-12.md']}"
             />
         </Page>
+        <Page url="/learn">
+            <Overview />
+        </Page>
         <Page url="/guides">
-            <DocumentPageNoTOC
-                content="{appGlobals.content['pages/guides.md']}"
-            />
+            <Overview />
+        </Page>
+        <Page url="/tutorial">
+            <Overview />
+        </Page>
+        <Page url="/howto">
+            <Overview />
         </Page>
         <Page url="/reference">
-            <DocumentPageNoTOC
-                content="{appGlobals.content['pages/reference.md']}"
-            />
+            <Overview />
         </Page>
         <Page url="/reference/components">
-            <DocumentPageNoTOC
-                content="{appGlobals.content['pages/reference-components.md']}"
-            />
+            <Overview />
         </Page>
         <Page url="/reference/extensions">
-            <DocumentPageNoTOC
-                content="{appGlobals.content['pages/reference-extensions.md']}"
-            />
+            <Overview />
+        </Page>
+        <Page url="/reference/themes">
+            <Overview />
+        </Page>
+        <Page url="/extensions/xmlui-animations">
+            <Overview />
         </Page>
         <Page url="/guides/app-structure">
             <DocumentPageNoTOC

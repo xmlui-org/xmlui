@@ -2,9 +2,13 @@
   "items": [
     {
       "label": "Reference",
+      "to": "/reference",
+      "description": "Detailed reference for XMLUI components, extensions, and core concepts.",
       "children": [
         {
           "label": "Components",
+          "to": "/reference/components",
+          "description": "Browse all built-in XMLUI components.",
           "icon": "component",
           "children": [
             { "to": "/components/_overview", "label": "Components Overview", "icon": "component" },
@@ -122,10 +126,12 @@
           "label": "Extensions",
           "icon": "puzzle",
           "to": "/reference/extensions",
+          "description": "Explore extension packages and their APIs.",
           "children": [
             {
               "label": "Xmlui Animations",
               "to": "/extensions/xmlui-animations",
+              "description": "Animation extension components and usage.",
               "children": [
                 { "to": "/extensions/xmlui-animations/_overview", "label": "Extension Overview" },
                 { "to": "/extensions/xmlui-animations/Animation", "label": "Animation" },
@@ -140,6 +146,8 @@
         },
         {
           "label": "Themes",
+          "to": "/reference/themes",
+          "description": "Theme tokens, variables, and styling options.",
           "icon": "theme",
           "children": [
             { "to": "/styles-and-themes/layout-props", "label": "Layout Properties" },
