@@ -664,8 +664,10 @@ export function AppContent({
           if (btnText && btnText.length < 50) ariaName = btnText;
         }
         // For table rows, use the original click target's text as the
-        // accessible name (the row's full textContent is too long)
-        if (!ariaName && ariaRole === "row" && text) {
+        // accessible name (the row's full textContent is too long).
+        // Only when the text is short enough to be a meaningful identifier
+        // (long text means the click landed on a container, not a specific item)
+        if (!ariaName && ariaRole === "row" && text && text.length < 50) {
           ariaName = text;
         }
       }
