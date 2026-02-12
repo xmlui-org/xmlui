@@ -1163,6 +1163,55 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         // Record collapse timestamp for dynamic nodes (Step 4: Auto-load feature)
         if (currentLoadingState === "loaded" && loadChildren) {
           setCollapsedTimestamps((prev) => new Map(prev).set(node.key, Date.now()));
+          
+          // Check if autoLoadAfter is 0, mark node as unloaded immediately
+          const explicitAutoLoadAfter = autoLoadAfterMap.get(node.key);
+          const autoLoadAfterFieldName = fieldConfig.autoLoadAfterField || "autoLoadAfter";
+          const nodeAutoLoadAfter = autoLoadAfterFieldName in node
+            ? (node as any)[autoLoadAfterFieldName]
+            : undefined;
+          const effectiveAutoLoadAfter = explicitAutoLoadAfter !== undefined
+            ? explicitAutoLoadAfter
+            : (nodeAutoLoadAfter !== undefined ? nodeAutoLoadAfter : autoLoadAfter);
+          
+          // If autoLoadAfter is 0, immediately mark node as unloaded
+          if (effectiveAutoLoadAfter === 0) {
+            setNodeStates((prev) => new Map(prev).set(node.key, "unloaded"));
+            
+            // Update the loaded field in source data
+            updateInternalData((prevData) => {
+              const currentData = prevData ?? data;
+              const loadedFieldName = fieldConfig.loadedField || "loaded";
+
+              if (dataFormat === "flat" && Array.isArray(currentData)) {
+                return currentData.map((item) => {
+                  if (String(item[fieldConfig.idField || "id"]) === String(node.key)) {
+                    return { ...item, [loadedFieldName]: false };
+                  }
+                  return item;
+                });
+              } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+                const updateHierarchy = (nodes: any[]): any[] => {
+                  return nodes.map((n) => {
+                    if (String(n[fieldConfig.idField || "id"]) === String(node.key)) {
+                      return { ...n, [loadedFieldName]: false };
+                    } else if (n[fieldConfig.childrenField || "children"]) {
+                      return {
+                        ...n,
+                        [fieldConfig.childrenField || "children"]: updateHierarchy(
+                          n[fieldConfig.childrenField || "children"],
+                        ),
+                      };
+                    }
+                    return n;
+                  });
+                };
+                return updateHierarchy(currentData);
+              }
+
+              return currentData;
+            });
+          }
         }
         
         const nodeToCollapse = Object.values(treeItemsById).find(
@@ -1495,6 +1544,62 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
           // Remove all descendant IDs from expanded list
           setExpandedIds((prev) => prev.filter((id) => !idsToRemove.has(String(id))));
+
+          // Record collapse timestamp for dynamic nodes (Step 4: Auto-load feature)
+          const currentLoadingState = nodeStates.get(nodeId) || "unloaded";
+          if (currentLoadingState === "loaded" && loadChildren) {
+            setCollapsedTimestamps((prev) => new Map(prev).set(nodeId, Date.now()));
+            
+            // Issue #2786 fix: Check if autoLoadAfter is 0, mark node as unloaded immediately
+            const explicitAutoLoadAfter = autoLoadAfterMap.get(nodeId);
+            const autoLoadAfterFieldName = fieldConfig.autoLoadAfterField || "autoLoadAfter";
+            const nodeData = flatTreeData.find((n) => String(n.key) === String(nodeId));
+            const nodeAutoLoadAfter = nodeData && autoLoadAfterFieldName in nodeData
+              ? (nodeData as any)[autoLoadAfterFieldName]
+              : undefined;
+            const effectiveAutoLoadAfter = explicitAutoLoadAfter !== undefined
+              ? explicitAutoLoadAfter
+              : (nodeAutoLoadAfter !== undefined ? nodeAutoLoadAfter : autoLoadAfter);
+            
+            // If autoLoadAfter is 0, immediately mark node as unloaded
+            if (effectiveAutoLoadAfter === 0) {
+              setNodeStates((prev) => new Map(prev).set(nodeId, "unloaded"));
+              
+              // Update the loaded field in source data
+              setInternalData((prevData) => {
+                const currentData = prevData ?? data;
+                const loadedFieldName = fieldConfig.loadedField || "loaded";
+
+                if (dataFormat === "flat" && Array.isArray(currentData)) {
+                  return currentData.map((item) => {
+                    if (String(item[fieldConfig.idField || "id"]) === String(nodeId)) {
+                      return { ...item, [loadedFieldName]: false };
+                    }
+                    return item;
+                  });
+                } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+                  const updateHierarchy = (nodes: any[]): any[] => {
+                    return nodes.map((node) => {
+                      if (String(node[fieldConfig.idField || "id"]) === String(nodeId)) {
+                        return { ...node, [loadedFieldName]: false };
+                      } else if (node[fieldConfig.childrenField || "children"]) {
+                        return {
+                          ...node,
+                          [fieldConfig.childrenField || "children"]: updateHierarchy(
+                            node[fieldConfig.childrenField || "children"],
+                          ),
+                        };
+                      }
+                      return node;
+                    });
+                  };
+                  return updateHierarchy(currentData);
+                }
+
+                return currentData;
+              });
+            }
+          }
 
           // Fire nodeDidCollapse event
           if (nodeToCollapse && onNodeCollapsed) {
@@ -2331,6 +2436,10 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     dynamicStateMap,
     dynamic,
     dynamicField,
+    nodeStates,
+    setNodeStates,
+    loadChildren,
+    setCollapsedTimestamps,
   ]);
 
   // Register component API methods for external access

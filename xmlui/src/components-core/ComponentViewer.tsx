@@ -4,7 +4,7 @@ import React, { useMemo } from "react";
 import { useDevTools } from "./InspectorContext";
 import { Tooltip } from "../components/NestedApp/Tooltip";
 import styles from "../components/NestedApp/NestedApp.module.scss";
-import { AiOutlineClose } from "react-icons/ai";
+import AiOutlineClose from "../components/Icon/svg/ai-outline-close.svg?react";
 import { useAppContext } from "./AppContext";
 
 export const ComponentViewer = () => {

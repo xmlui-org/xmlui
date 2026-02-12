@@ -1,5 +1,24 @@
 # xmlui
 
+## 0.12.1
+
+### Patch Changes
+
+- ef9bc10: Ensure vite dev server restarts when a module changes
+- 4e33e2b: Fix Tree collapseNode to mark the node unloaded
+- 5978efa: Allow Tree.replaceNode to change the node ID
+- 916d0db: Improve inspector trace logging with additional event data
+
+  - Add emitEvent logging to capture component event emissions with arguments
+  - Include eventArgs in handler:start trace events for better debugging
+  - Use getCurrentTrace() consistently in NavigateAction and ComponentAdapter
+  - Add traceId fallback in DataLoader and standalone parser bundle
+
+- 0050784: Global variable handling redesigned
+- c9c4ee2: Fix return from try..catch
+- 9b6268e: Conservative refactoring of containers and state management
+- e506bd3: Removed react-icons as a dependency.
+
 ## 0.12.0
 
 ### Minor Changes

@@ -438,6 +438,7 @@ test.describe("Accessibility", () => {
     await page.waitForTimeout(200);
 
     // Navigate down to third option step by step with longer waits
+    await expect(driver.component).toBeVisible();
     await page.keyboard.press("ArrowDown");
     await page.waitForTimeout(200);
     await page.keyboard.press("ArrowDown");
@@ -446,6 +447,7 @@ test.describe("Accessibility", () => {
     await page.waitForTimeout(200);
 
     // Select with Enter
+    await expect(driver.component).toBeVisible();
     await page.keyboard.press("Enter");
     await page.waitForTimeout(200);
 
@@ -471,6 +473,7 @@ test.describe("Accessibility", () => {
     await page.waitForTimeout(100);
 
     // Navigate with arrow keys
+    await expect(firstRadio).toBeFocused();
     await page.keyboard.press("ArrowDown");
     await page.waitForTimeout(100);
     await page.keyboard.press("ArrowDown");

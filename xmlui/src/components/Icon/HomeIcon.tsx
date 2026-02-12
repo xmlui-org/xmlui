@@ -1,4 +1,4 @@
-import { FiHome } from 'react-icons/fi';
-import type {IconBaseProps} from "./IconNative";
+import Icon from "./svg/fi-home.svg?react";
+import type { IconBaseProps } from "./IconNative";
 
-export const HomeIcon = (props: IconBaseProps) => <FiHome {...props}/>
+export const HomeIcon = (props: IconBaseProps) => <Icon {...props}/>;

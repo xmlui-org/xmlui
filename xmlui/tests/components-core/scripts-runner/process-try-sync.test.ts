@@ -661,4 +661,111 @@ describe("Process try statements (sync) (exp)", () => {
     }
     assert.fail("Exception expected");
   });
+
+  it("try - catch with nested try-return (issue #2779)", () => {
+    // --- Arrange
+    const source = `
+      try {
+        x = 1;
+        throw { type: 'Error' }
+      } catch (err) {
+        x = 2;
+        try {
+          x = 3;
+          return 123;
+        } catch (retryErr) {
+          x = 4;
+        }
+        x = 5; // This should NOT run if return worked
+      }
+    `;
+    const evalContext = createEvalContext({
+      localContext: {
+        x: 0,
+      },
+    });
+    const statements = parseStatements(source);
+
+    // --- Act
+    processStatementQueue(statements, evalContext);
+
+    // --- Assert
+    expect(evalContext.mainThread!.returnValue).equal(123);
+    expect(evalContext.localContext.x).equal(3);
+    expect(evalContext.mainThread!.blocks!.length).equal(1);
+  });
+
+  it("try - catch with nested try-return and finally (issue #2779)", () => {
+    // --- Arrange
+    const source = `
+      try {
+        x = 1;
+        throw { type: 'Error' }
+      } catch (err) {
+        x = 2;
+        try {
+          x = 3;
+          return 123;
+        } catch (retryErr) {
+          x = 4;
+        } finally {
+          x = 10;
+        }
+        x = 5; // This should NOT run if return worked
+      }
+    `;
+    const evalContext = createEvalContext({
+      localContext: {
+        x: 0,
+      },
+    });
+    const statements = parseStatements(source);
+
+    // --- Act
+    processStatementQueue(statements, evalContext);
+
+    // --- Assert
+    expect(evalContext.mainThread!.returnValue).equal(123);
+    expect(evalContext.localContext.x).equal(10);
+    expect(evalContext.mainThread!.blocks!.length).equal(1);
+  });
+
+  it("try - catch with deeply nested try-return (issue #2779)", () => {
+    // --- Arrange
+    const source = `
+      try {
+        x = 1;
+        throw { type: 'Error' }
+      } catch (err) {
+        x = 2;
+        try {
+          x = 3;
+          try {
+            x = 4;
+            return 456;
+          } finally {
+            x = 5;
+          }
+          x = 6; // Should NOT run
+        } catch (retryErr) {
+          x = 7;
+        }
+        x = 8; // This should NOT run if return worked
+      }
+    `;
+    const evalContext = createEvalContext({
+      localContext: {
+        x: 0,
+      },
+    });
+    const statements = parseStatements(source);
+
+    // --- Act
+    processStatementQueue(statements, evalContext);
+
+    // --- Assert
+    expect(evalContext.mainThread!.returnValue).equal(456);
+    expect(evalContext.localContext.x).equal(5);
+    expect(evalContext.mainThread!.blocks!.length).equal(1);
+  });
 });

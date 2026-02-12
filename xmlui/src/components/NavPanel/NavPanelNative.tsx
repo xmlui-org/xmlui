@@ -21,7 +21,7 @@ export interface NavHierarchyNode {
   /** The display label/text for this navigation item */
   label: string;
 
-  /** The URL/route path for navigation (only present for NavLink types) */
+  /** The URL/route path for navigation (present for NavLink and optional for NavGroup) */
   to?: string;
 
   /** Child navigation nodes nested under this node (only present for NavGroup types) */
@@ -87,12 +87,15 @@ export function buildNavHierarchy(
       } else if (child.type === "NavGroup") {
         const label =
           extractValue.asOptionalString?.(child.props?.label) || extractValue(child.props?.label);
+        const to =
+          extractValue.asOptionalString?.(child.props?.to) || extractValue(child.props?.to);
 
         // NavGroups only need a label, no "to" value required
         if (label) {
           const groupNode: NavHierarchyNode = {
             type: "NavGroup",
             label: label,
+            to: to,
             parent: parent,
             pathSegments: [...pathSegments],
             children: [],
@@ -174,7 +177,7 @@ function setNavigationProperties(hierarchy: NavHierarchyNode[]) {
   setFirstLastProperties(hierarchy);
 }
 
-// Function to build a map of NavLinks by their "to" property
+// Function to build a map of navigation nodes by their "to" property
 export function buildLinkMap(
   navLinks: NavHierarchyNode[] | undefined,
 ): Map<string, NavHierarchyNode> {
@@ -184,7 +187,7 @@ export function buildLinkMap(
 
   function processNodes(nodes: NavHierarchyNode[]) {
     nodes.forEach((node) => {
-      if (node.type === "NavLink" && node.to) {
+      if (node.to) {
         // If multiple items use the same "to" value, the last wins
         linkMap.set(node.to, node);
       }

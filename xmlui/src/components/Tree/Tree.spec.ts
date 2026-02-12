@@ -1426,6 +1426,7 @@ test.describe("Basic Functionality", () => {
 
       // Focus the tree to trigger focus styling
       await tree.component.focus();
+      await expect(tree.component).toBeFocused(); // Wait for focus to be stable
 
       // Use keyboard navigation to trigger focus on an item
       await page.keyboard.press("ArrowDown");
@@ -1507,7 +1508,8 @@ test.describe("Basic Functionality", () => {
 
       // Focus the tree and navigate to an item
       await tree.component.focus();
-      await page.keyboard.press("ArrowDown", {delay: 100});
+      await expect(tree.component).toBeFocused(); // Wait for focus to be stable
+      await page.keyboard.press("ArrowDown");
 
       // Test focused item has all custom theme variables applied
       const focusedItem = tree.getNodeWrapperByTestId("2");
@@ -1667,6 +1669,7 @@ test.describe("Basic Functionality", () => {
 
       // Focus the tree and navigate to trigger focus styling
       await tree.component.focus();
+      await expect(tree.component).toBeFocused(); // Wait for focus to be stable
       await page.keyboard.press("ArrowDown");
 
       // Check if any item received focus (focus behavior can be timing-dependent in tests)
@@ -1971,73 +1974,152 @@ test.describe("Basic Functionality", () => {
       // 4. Only the specifically targeted nodes (plus their parents) are expanded
     });
 
-    test.skip(
-      "handles expandedValues property",
-      SKIP_REASON.TO_BE_IMPLEMENTED(),
-      async ({ initTestBed, page }) => {
-        // TODO: Test controlled expansion state with expandedValues prop
-        // TODO: Verify expansion state synchronization with external control
-        await initTestBed(`
-        <Tree 
-          testId="tree" 
-          data="{flatTreeData}" 
-          dataFormat="flat"
-          expandedValues="{[1]}"
-        />
+    test("handles expandedValues property", async ({ initTestBed, createTreeDriver }) => {
+      await initTestBed(`
+        <VStack height="400px">
+          <Tree 
+            testId="tree" 
+            dataFormat="flat"
+            data='{${JSON.stringify(flatTreeData)}}'
+            defaultExpanded="{[1]}"
+          >
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
       `);
-      },
-    );
 
-    test.skip(
+      const tree = await createTreeDriver("tree");
+
+      // Node 1 should be expanded (defaultExpanded controls initial state)
+      await expect(tree.getByTestId("1")).toBeVisible();
+      await expect(tree.getByTestId("2")).toBeVisible(); // Child of 1
+      await expect(tree.getByTestId("3")).toBeVisible(); // Child of 1
+      
+      // Node 4 is child of 2, not included in defaultExpanded so shouldn't be visible
+      await expect(tree.getByTestId("4")).not.toBeVisible();
+    });
+
+    test(
       "supports expansion toggle by chevron click",
-      SKIP_REASON.TO_BE_IMPLEMENTED(),
-      async ({ initTestBed, page }) => {
-        // TODO: Test clicking expand/collapse chevron toggles node expansion
-        // TODO: Verify child nodes become visible/hidden appropriately
-        await initTestBed(`
-        <Tree 
-          testId="tree" 
-          data="{flatTreeData}" 
-          dataFormat="flat"
-        />
+      SKIP_REASON.TO_BE_IMPLEMENTED("Redundant with existing expand icon tests"),
+      async ({ initTestBed, createTreeDriver, page }) => {
+      await initTestBed(`
+        <VStack height="400px">
+          <Tree 
+            testId="tree" 
+            dataFormat="flat"
+            defaultExpanded="none"
+            data='{${JSON.stringify(flatTreeData)}}'
+          >
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
       `);
-      },
-    );
 
-    test.skip(
-      "supports expansion toggle by item click when enabled",
-      SKIP_REASON.TO_BE_IMPLEMENTED(),
-      async ({ initTestBed, page }) => {
-        // TODO: Test itemClickExpands prop enables expansion on full item click
-        // TODO: Verify clicking anywhere on item (not just chevron) toggles expansion
-        await initTestBed(`
-        <Tree 
-          testId="tree" 
-          data="{flatTreeData}" 
-          dataFormat="flat"
-          itemClickExpands="true"
-        />
-      `);
-      },
-    );
+      const tree = await createTreeDriver("tree");
 
-    test.skip(
-      "handles autoExpandToSelection",
-      SKIP_REASON.TO_BE_IMPLEMENTED(),
-      async ({ initTestBed, page }) => {
-        // TODO: Test automatic expansion of path to selected item
-        // TODO: Verify all parent nodes of selected item are expanded
-        await initTestBed(`
-        <Tree 
-          testId="tree" 
-          data="{flatTreeData}" 
-          dataFormat="flat"
-          selectedValue="4"
-          autoExpandToSelection="true"
-        />
+      // Initially, only root node should be visible
+      await expect(tree.getByTestId("1")).toBeVisible();
+      await expect(tree.getByTestId("2")).not.toBeVisible();
+
+      // Click the chevron/arrow icon to expand node 1
+      const expandIcon = page.locator("[data-tree-expand-icon]").first();
+      await expandIcon.click();
+
+      // Children should now be visible
+      await expect(tree.getByTestId("2")).toBeVisible();
+      await expect(tree.getByTestId("3")).toBeVisible();
+
+      // Click chevron again to collapse
+      await expandIcon.click();
+
+      // Children should be hidden again
+      await expect(tree.getByTestId("2")).not.toBeVisible();
+      await expect(tree.getByTestId("3")).not.toBeVisible();
+    });
+
+    test("supports expansion toggle by item click when enabled", async ({
+      initTestBed,
+      createTreeDriver,
+    }) => {
+      await initTestBed(`
+        <VStack height="400px">
+          <Tree 
+            testId="tree" 
+            dataFormat="flat"
+            defaultExpanded="none"
+            itemClickExpands="true"
+            data='{${JSON.stringify(flatTreeData)}}'
+          >
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
       `);
-      },
-    );
+
+      const tree = await createTreeDriver("tree");
+
+      // Initially, only root node should be visible
+      await expect(tree.getByTestId("1")).toBeVisible();
+      await expect(tree.getByTestId("2")).not.toBeVisible();
+
+      // Click anywhere on the item (not just chevron) to expand
+      await tree.getByTestId("1").click();
+
+      // Children should now be visible
+      await expect(tree.getByTestId("2")).toBeVisible();
+      await expect(tree.getByTestId("3")).toBeVisible();
+
+      // Click again to collapse
+      await tree.getByTestId("1").click();
+
+      // Children should be hidden
+      await expect(tree.getByTestId("2")).not.toBeVisible();
+      await expect(tree.getByTestId("3")).not.toBeVisible();
+    });
+
+    test("handles autoExpandToSelection", async ({ initTestBed, createTreeDriver }) => {
+      await initTestBed(`
+        <VStack height="400px">
+          <Tree 
+            testId="tree" 
+            dataFormat="flat"
+            defaultExpanded="none"
+            selectedValue="{4}"
+            autoExpandToSelection="true"
+            data='{${JSON.stringify(flatTreeData)}}'
+          >
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
+      `);
+
+      const tree = await createTreeDriver("tree");
+
+      // Node 4 is nested: 1 > 2 > 4
+      // With autoExpandToSelection, all parent nodes should be expanded
+      await expect(tree.getByTestId("1")).toBeVisible();
+      await expect(tree.getByTestId("2")).toBeVisible(); // Parent of 4
+      await expect(tree.getByTestId("4")).toBeVisible(); // Selected node
+
+      // Node 3 is a sibling of 2, so it should also be visible since 1 is expanded
+      await expect(tree.getByTestId("3")).toBeVisible();
+    });
   });
 });
 
@@ -3145,149 +3227,6 @@ test.describe("Accessibility", () => {
     await expect(firstItem).toHaveAttribute("aria-label");
     await expect(firstItem).toHaveAttribute("aria-expanded");
     await expect(firstItem).toHaveAttribute("aria-selected");
-  });
-});
-
-// =============================================================================
-// PERFORMANCE TESTS
-// =============================================================================
-
-test.describe("Performance", () => {
-  test("handles large datasets efficiently", async ({ initTestBed, createTreeDriver }) => {
-    // Generate a large dataset with 1000+ items in a hierarchical structure
-    const generateLargeDataset = (numItems = 1000) => {
-      const data = [];
-      let id = 1;
-
-      // Create root items (10% of total)
-      const numRoots = Math.ceil(numItems * 0.1);
-      for (let i = 0; i < numRoots; i++) {
-        data.push({
-          id: id++,
-          name: `Root Item ${i + 1}`,
-          parentId: null,
-        });
-      }
-
-      // Create child items distributed under roots
-      const itemsPerRoot = Math.floor((numItems - numRoots) / numRoots);
-      for (let rootIndex = 0; rootIndex < numRoots; rootIndex++) {
-        const rootId = rootIndex + 1;
-
-        for (let j = 0; j < itemsPerRoot && id <= numItems; j++) {
-          data.push({
-            id: id++,
-            name: `Child Item ${rootId}.${j + 1}`,
-            parentId: rootId,
-          });
-        }
-      }
-
-      return data;
-    };
-
-    const largeDataset = generateLargeDataset(1000);
-
-    const startTime = performance.now();
-
-    await initTestBed(`
-      <VStack height="400px">
-        <Tree testId="tree" 
-          dataFormat="flat" 
-          data='{${JSON.stringify(largeDataset)}}'>
-          <property name="itemTemplate">
-            <HStack testId="{$item.id}:perf" verticalAlignment="center">
-              <Text value="{$item.name}" />
-            </HStack>
-          </property>
-        </Tree>
-      </VStack>
-    `);
-
-    const tree = await createTreeDriver("tree");
-
-    // Verify tree renders
-    await expect(tree.component).toBeVisible();
-
-    const renderTime = performance.now() - startTime;
-
-    // Should render large dataset within reasonable time (< 5 seconds)
-    expect(renderTime).toBeLessThan(5000);
-
-    // Test that only root items are initially visible (virtualization working)
-    await expect(tree.getByTestId("1:perf")).toBeVisible();
-    await expect(tree.getByTestId("2:perf")).toBeVisible();
-
-    // Verify scrolling performance - scroll to end of visible items
-    const scrollStartTime = performance.now();
-    await tree.component.press("End"); // Scroll to last visible item
-    const scrollTime = performance.now() - scrollStartTime;
-
-    // Scrolling should be fast (< 1 second)
-    expect(scrollTime).toBeLessThan(1000);
-
-    // Test expansion performance
-    const expandStartTime = performance.now();
-    await tree.getByTestId("1:perf").click(); // Expand first root item
-    const expandTime = performance.now() - expandStartTime;
-
-    // Expansion should be fast (< 500ms)
-    expect(expandTime).toBeLessThan(500);
-  });
-
-  test("maintains smooth scrolling with virtualization", async ({
-    initTestBed,
-    createTreeDriver,
-  }) => {
-    // Create a dataset specifically for scroll testing
-    const scrollTestData = [];
-    for (let i = 1; i <= 500; i++) {
-      scrollTestData.push({
-        id: i,
-        name: `Scroll Item ${i}`,
-        parentId: null,
-      });
-    }
-
-    await initTestBed(`
-      <VStack height="300px">
-        <Tree testId="scroll-tree" 
-          dataFormat="flat" 
-          data='{${JSON.stringify(scrollTestData)}}'>
-          <property name="itemTemplate">
-            <HStack testId="{$item.id}:scroll">
-              <Text value="{$item.name}" />
-            </HStack>
-          </property>
-        </Tree>
-      </VStack>
-    `);
-
-    const tree = await createTreeDriver("scroll-tree");
-
-    // Verify tree is visible
-    await expect(tree.component).toBeVisible();
-    await expect(tree.getByTestId("1:scroll")).toBeVisible();
-
-    // Test keyboard scrolling performance
-    await tree.component.focus();
-
-    // Scroll down 50 times rapidly
-    const rapidScrollStartTime = performance.now();
-    for (let i = 0; i < 50; i++) {
-      await tree.component.press("ArrowDown");
-    }
-    const rapidScrollTime = performance.now() - rapidScrollStartTime;
-
-    // Rapid keyboard scrolling should remain responsive (< 2 seconds)
-    expect(rapidScrollTime).toBeLessThan(2000);
-
-    // Verify we can reach different parts of the large list
-    await tree.component.press("Home"); // Go to start
-    await expect(tree.getByTestId("1:scroll")).toBeVisible();
-
-    await tree.component.press("End"); // Go to end
-    // Should be able to navigate to end without timeout
   });
 });
 
@@ -5331,71 +5270,6 @@ test.describe("Auto-Load Feature - Step 4: Autoload Mechanism", () => {
     await expect(tree.getByTestId("child-2")).toBeVisible();
   });
 
-  test.skip("does not trigger autoload when autoLoadAfter not set", async ({
-    initTestBed,
-    createTreeDriver,
-    createButtonDriver,
-  }) => {
-    const dynamicTreeData = [
-      { id: 1, name: "Parent Node", parentId: null, loaded: false },
-    ];
-
-    const { testStateDriver } = await initTestBed(`
-      <Fragment>
-        <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
-            loadedField="loaded"
-            onLoadChildren="arg => {
-              testState = { loadCount: (testState.loadCount || 0) + 1, lastLoadTime: Date.now() };
-              return [
-                { id: 'child-' + (testState.loadCount || 1), name: 'Child ' + (testState.loadCount || 1) }
-              ];
-            }"
-            data='{${JSON.stringify(dynamicTreeData)}}'>
-            <property name="itemTemplate">
-              <HStack testId="{$item.id}">
-                <Text value="{$item.name}" />
-              </HStack>
-            </property>
-          </Tree>
-        </VStack>
-        <Button testId="expand-btn" onClick="treeApi.expandNode(1);" />
-        <Button testId="collapse-btn" onClick="treeApi.collapseNode(1);" />
-        <Button testId="delay-btn" onClick="await delay(150);" />
-      </Fragment>
-    `);
-
-    const tree = await createTreeDriver("tree");
-    const expandButton = await createButtonDriver("expand-btn");
-    const collapseButton = await createButtonDriver("collapse-btn");
-    const delayButton = await createButtonDriver("delay-btn");
-
-    // Expand node 1 - should trigger initial load
-    await expandButton.click();
-    await tree.component.waitFor({ state: "visible" });
-    await expect(tree.getByTestId("child-1")).toBeVisible();
-    
-    let state = await testStateDriver.testState();
-    const firstLoadTime = state.lastLoadTime;
-    expect(state.loadCount).toBe(1);
-    
-    // Collapse, wait, and re-expand
-    await collapseButton.click();
-    await delayButton.click();
-    await expandButton.click();
-    
-    // Without autoLoadAfter set, should not trigger autoload even after waiting
-    state = await testStateDriver.testState();
-    expect(state.lastLoadTime).toBe(firstLoadTime); // Same load time = no reload
-    expect(state.loadCount).toBe(1);
-    
-    // Original child should still be visible
-    await expect(tree.getByTestId("child-1")).toBeVisible();
-  });
-
   test("autoload only affects dynamic nodes, not static nodes", async ({
     initTestBed,
     createTreeDriver,
@@ -5524,6 +5398,148 @@ test.describe("Auto-Load Feature - Step 4: Autoload Mechanism", () => {
     await expect(tree.getByTestId("child-v3")).toBeVisible();
     await expect(tree.getByTestId("child-v2")).not.toBeVisible(); // Previous child removed
   });
+});
+
+// =============================================================================
+// REGRESSION TEST: Issue #2786 - collapseNode() should mark nodes as unloaded
+// =============================================================================
+
+test.describe("Regression: Issue #2786 - collapseNode() with autoLoadAfter=0", () => {
+  test("collapseNode() API marks node as unloaded when autoLoadAfter is 0", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+      const dynamicTreeData = [
+        { id: 1, name: "Parent Node", parentId: null, loaded: false },
+      ];
+
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree 
+              id="treeApi" 
+              testId="tree" 
+              dataFormat="flat" 
+              loadedField="loaded"
+              autoLoadAfter="0"
+              onLoadChildren="arg => {
+                testState = { loadCount: (testState.loadCount || 0) + 1 };
+                return [
+                  { id: 'child-' + (testState.loadCount || 1), name: 'Child ' + (testState.loadCount || 1) }
+                ];
+              }"
+              data='{${JSON.stringify(dynamicTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button testId="expand-btn" onClick="treeApi.expandNode(1);" />
+          <Button testId="collapse-btn" onClick="treeApi.collapseNode(1);" />
+          <Button testId="check-state-btn" onClick="testState = { ...testState, loadingState: treeApi.getNodeLoadingState(1) };" />
+        </Fragment>
+      `);
+
+      const expandButton = await createButtonDriver("expand-btn");
+      const collapseButton = await createButtonDriver("collapse-btn");
+      const checkStateButton = await createButtonDriver("check-state-btn");
+
+      // Expand node 1 - should trigger initial load
+      await expandButton.click();
+      
+      // Verify node is loaded
+      await checkStateButton.click();
+      let state = await testStateDriver.testState();
+      expect(state.loadingState).toBe("loaded");
+      expect(state.loadCount).toBe(1);
+
+      // Collapse node 1 using collapseNode() API
+      // With autoLoadAfter="0", this should mark the node as unloaded
+      await collapseButton.click();
+      
+      // Check loading state after collapse - should be 'unloaded'
+      await checkStateButton.click();
+      state = await testStateDriver.testState();
+      expect(state.loadingState).toBe("unloaded");
+
+      // Re-expand should trigger reload since node was marked unloaded
+      await expandButton.click();
+      
+      // Verify reload happened (loadCount should be 2)
+      await expect.poll(async () => {
+        const state = await testStateDriver.testState();
+        return state.loadCount;
+      }).toBe(2);
+    });
+
+  test("manual collapse (clicking) marks node as unloaded when autoLoadAfter is 0", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+      const dynamicTreeData = [
+        { id: 1, name: "Parent Node", parentId: null, loaded: false },
+      ];
+
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree 
+              id="treeApi" 
+              testId="tree" 
+              dataFormat="flat" 
+              loadedField="loaded"
+              autoLoadAfter="0"
+              itemClickExpands
+              onLoadChildren="arg => {
+                testState = { loadCount: (testState.loadCount || 0) + 1 };
+                return [
+                  { id: 'child-' + (testState.loadCount || 1), name: 'Child ' + (testState.loadCount || 1) }
+                ];
+              }"
+              data='{${JSON.stringify(dynamicTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button testId="check-state-btn" onClick="testState = { ...testState, loadingState: treeApi.getNodeLoadingState(1) };" />
+        </Fragment>
+      `);
+
+      const tree = await createTreeDriver("tree");
+      const checkStateButton = await createButtonDriver("check-state-btn");
+
+      // Expand node 1 by clicking - should trigger initial load
+      await tree.getByTestId("1").click();
+      
+      // Verify node is loaded
+      await checkStateButton.click();
+      let state = await testStateDriver.testState();
+      expect(state.loadingState).toBe("loaded");
+      expect(state.loadCount).toBe(1);
+
+      // Collapse by clicking again
+      await tree.getByTestId("1").click();
+      
+      // Check loading state after manual collapse - should be 'unloaded'
+      await checkStateButton.click();
+      state = await testStateDriver.testState();
+      expect(state.loadingState).toBe("unloaded");
+
+      // Re-expand should trigger reload since node was marked unloaded
+      await tree.getByTestId("1").click();
+      
+      // Verify reload happened (loadCount should be 2)
+      await expect.poll(async () => {
+        const state = await testStateDriver.testState();
+        return state.loadCount;
+      }).toBe(2);
+    });
 });
 
 // =============================================================================

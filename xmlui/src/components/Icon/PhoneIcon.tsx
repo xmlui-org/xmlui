@@ -1,4 +1,4 @@
-import { FiPhone } from "react-icons/fi";
-import type {IconBaseProps} from "./IconNative";
+import Icon from "./svg/fi-phone.svg?react";
+import type { IconBaseProps } from "./IconNative";
 
-export const PhoneIcon = (props: IconBaseProps) => <FiPhone {...props}/>
+export const PhoneIcon = (props: IconBaseProps) => <Icon {...props}/>;

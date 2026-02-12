@@ -41,6 +41,7 @@ async function uploadFile(
     body,
     chunkSizeInBytes,
     onProgress,
+    fieldName,
   }: UploadActionParams,
   { resolveBindingExpressions }: ApiActionOptions = {},
 ) {
@@ -57,6 +58,7 @@ async function uploadFile(
     url,
     queryParams,
     headers,
+    fieldName,
   };
 
   let result = null;

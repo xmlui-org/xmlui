@@ -1,0 +1,21 @@
+{
+  "items": [
+    {
+      "label": "Tutorial",
+      "children": [
+        { "to": "/tutorial-01", "label": "XMLUI Invoice", "icon": "invoice" },
+        { "to": "/tutorial-02", "label": "Main.xmlui", "icon": "file-code" },
+        { "to": "/tutorial-03", "label": "Navigation", "icon": "menu" },
+        { "to": "/tutorial-04", "label": "InfoCards", "icon": "cards" },
+        { "to": "/tutorial-05", "label": "Charts", "icon": "charts" },
+        { "to": "/tutorial-06", "label": "Slider", "icon": "slider" },
+        { "to": "/tutorial-07", "label": "Invoices", "icon": "file-invoice" },
+        { "to": "/tutorial-08", "label": "Create Invoice", "icon": "create" },
+        { "to": "/tutorial-09", "label": "Invoice Details", "icon": "details" },
+        { "to": "/tutorial-10", "label": "Search", "icon": "search" },
+        { "to": "/tutorial-11", "label": "Import", "icon": "import" },
+        { "to": "/tutorial-12", "label": "Settings", "icon": "settings" }
+      ]
+    }
+  ]
+}

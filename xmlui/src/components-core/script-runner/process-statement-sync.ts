@@ -306,17 +306,18 @@ function processStatement(
 
       // --- Check for try blocks
       if ((thread.tryBlocks ?? []).length > 0) {
-        // --- Mark the loop's try scope to exit with "return"
-        const returnTryScope = thread.tryBlocks![0];
-        returnTryScope.exitType = "return";
+        // --- Mark ALL try scopes to exit with "return" to properly propagate through nested tries
+        for (let i = 0; i < thread.tryBlocks!.length; i++) {
+          thread.tryBlocks![i].exitType = "return";
+        }
 
-        // --- Remove the try/catch/finally block's scope
-        if (returnTryScope.processingPhase !== "postFinally") {
+        // --- Remove the try/catch/finally block's scope (check innermost, not outermost)
+        const tryScope = innermostTryScope(thread);
+        if (tryScope.processingPhase !== "postFinally") {
           thread.blocks!.pop();
         }
 
         // --- Clear the last part of the try/catch/finally block
-        const tryScope = innermostTryScope(thread);
         clearToLabel = tryScope.tryLabel;
       } else {
         // --- Delete the remaining part of the queue
@@ -712,6 +713,9 @@ function processStatement(
           tryScope.processingPhase = "finally";
           if (statement.finallyB) {
             toUnshift = provideFinallyBody(thread, tryScope);
+          } else {
+            // --- No finally block, but we still need to advance to postFinally to check exitType
+            toUnshift = provideFinallyErrorBody(tryScope);
           }
           break;
         case "catch":
@@ -719,6 +723,9 @@ function processStatement(
           tryScope.processingPhase = "finally";
           if (statement.finallyB) {
             toUnshift = provideFinallyBody(thread, tryScope);
+          } else {
+            // --- No finally block, but we still need to advance to postFinally to check exitType
+            toUnshift = provideFinallyErrorBody(tryScope);
           }
           break;
         case "finally":
@@ -752,7 +759,22 @@ function processStatement(
               break;
             }
             case "return":
-              clearToLabel = -1;
+              // --- When returning, we need to clean up any remaining try/catch blocks
+              // --- and their associated block scopes before exiting
+              if (thread.tryBlocks && thread.tryBlocks.length > 0) {
+                // --- There are outer try blocks, exit through them
+                // --- We need to pop the catch block scope that won't be cleaned up
+                // --- because we're skipping its closing statement
+                if (thread.blocks && thread.blocks.length > 1) {
+                  thread.blocks.pop(); // Pop the catch block
+                }
+                // --- The outer try's guard will handle its own cleanup and check exitType
+                const outerTry = thread.tryBlocks[thread.tryBlocks.length - 1];
+                clearToLabel = outerTry.tryLabel;
+              } else {
+                // --- No more try blocks, exit the function
+                clearToLabel = -1;
+              }
               break;
           }
 

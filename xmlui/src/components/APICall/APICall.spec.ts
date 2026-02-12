@@ -1817,6 +1817,84 @@ test.describe("State Tracking", () => {
     // Should be enabled again
     await expect(button).toBeEnabled();
   });
+
+  test("error object contains statusCode, message, details, and response when caught in try/catch", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    // Regression test for issue #2749:
+    // When Actions.callApi throws an error, the caught error should have
+    // statusCode, message, details, and response as easily accessible properties
+    const errorApiInterceptor: ApiInterceptorDefinition = {
+      operations: {
+        "create-file": {
+          url: "/CreateFile",
+          method: "post",
+          handler: `throw Errors.HttpError(409, { message: "File already exists", details: { fileName: $requestBody.name, conflictReason: "Duplicate entry" }, customField: "customValue" });`,
+        },
+      },
+    };
+
+    const { testStateDriver } = await initTestBed(
+      `
+      <Fragment>
+        <Button 
+          testId="trigger" 
+          onClick="
+            try {
+              Actions.callApi({
+                url: '/CreateFile',
+                method: 'post',
+                body: {
+                  name: 'test.txt'
+                }
+              });
+              testState = { caught: false };
+            } catch (error) {
+              // User should be able to access all error properties easily
+              testState = {
+                caught: true,
+                statusCode: error.statusCode,
+                message: error.message,
+                details: error.details,
+                response: error.response,
+                customField: error.response.customField
+              };
+            }
+          "
+        >
+          Trigger
+        </Button>
+      </Fragment>
+    `,
+      {
+        apiInterceptor: errorApiInterceptor,
+      },
+    );
+
+    const executeButton = await createButtonDriver("trigger");
+    await executeButton.click();
+
+    // Verify all error properties are accessible, including the full response
+    await expect.poll(testStateDriver.testState, { timeout: 2000 }).toMatchObject({
+      caught: true,
+      statusCode: 409,
+      message: "File already exists",
+      details: {
+        fileName: "test.txt",
+        conflictReason: "Duplicate entry",
+      },
+      response: {
+        message: "File already exists",
+        details: {
+          fileName: "test.txt",
+          conflictReason: "Duplicate entry",
+        },
+        customField: "customValue",
+      },
+      customField: "customValue",
+    });
+  });
 });
 
 // =============================================================================

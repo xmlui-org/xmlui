@@ -14,6 +14,7 @@ import type { StatePartChangedFn } from "./ContainerWrapper";
 export interface ChildRendererContext extends InnerRendererContext {
   statePartChanged: StatePartChangedFn;
   cleanup: ComponentCleanupFn;
+  globalVars?: Record<string, any>;
 }
 
 /**
@@ -34,6 +35,7 @@ export interface ChildRendererContext extends InnerRendererContext {
 export function renderChild({
   node,
   state,
+  globalVars,
   dispatch,
   appContext,
   lookupAction,
@@ -47,6 +49,9 @@ export function renderChild({
   cleanup,
   uidInfoRef,
 }: ChildRendererContext): ReactNode {
+  if (appContext?.appGlobals?.xsVerbose && node.type !== 'TextNode' && node.type !== 'TextNodeCData') {
+    console.log('[renderChild]', node.type, node.uid, 'globalVars:', globalVars ? Object.keys(globalVars) : undefined);
+  }
   // --- Special handling for init event: if component has init event and when=false,
   // --- we still need to let it render once to trigger init, which may change the when condition
   const hasInitEvent = node.events?.init;
@@ -127,6 +132,7 @@ export function renderChild({
       statePartChanged={statePartChanged}
       memoedVarsRef={memoedVarsRef}
       state={state}
+      globalVars={globalVars}
       dispatch={dispatch}
       appContext={appContext}
       lookupAction={lookupAction}

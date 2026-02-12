@@ -42,6 +42,7 @@ export const CompoundComponent = forwardRef(
       state,
       lookupAction,
       contextVars, // Extract contextVars to prevent it from being passed to DOM elements
+      globalVars,
       ...restProps
     }: CompoundComponentProps,
     forwardedRef: React.ForwardedRef<any>,
@@ -65,9 +66,22 @@ export const CompoundComponent = forwardRef(
 
     const resolvedProps = useShallowCompareMemoize(resolvedPropsInner);
 
+    if (globalVars && Object.keys(globalVars).length > 0) {
+      console.log('[CompoundComponent]', compound.type, 'received globalVars:', Object.keys(globalVars), globalVars);
+    }
+
     // --- Wrap the `component` part with a container that manages the
     const containerNode: ContainerWrapperDef = useMemo(() => {
       const { loaders, vars, functions, scriptError, ...rest } = compound;
+      
+      // Extract global variable keys from globalVars to set as 'uses'
+      // This ensures the compound component only inherits globals, not parent's local vars
+      const globalKeys = globalVars ? Object.keys(globalVars).filter(k => !k.startsWith('__')) : undefined;
+      
+      if (globalKeys && globalKeys.length > 0) {
+        console.log('[CompoundComponent containerNode]', compound.type, 'setting uses to:', globalKeys);
+      }
+      
       return {
         type: "Container",
         api,
@@ -77,12 +91,13 @@ export const CompoundComponent = forwardRef(
         functions: functions,
         scriptError: scriptError,
         containerUid: uid,
+        uses: globalKeys, // Only inherit global variables, not local parent vars
         props: {
           debug: (compound as any).debug || (compound.props as any)?.debug,
         },
         children: [rest],
       };
-    }, [api, compound, scriptCollected, uid]);
+    }, [api, compound, scriptCollected, uid, globalVars]);
 
     const emitEvent = useEvent((eventName, ...args) => {
       const handler = lookupEventHandler(eventName);

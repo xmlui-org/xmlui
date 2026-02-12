@@ -115,6 +115,7 @@ test("closes when pressing Escape", async ({ initTestBed, page }) => {
   await expect(page.getByRole("menuitem", { name: "Item 1" })).toBeVisible();
 
   // Press Escape
+  await expect(page.getByRole("menuitem", { name: "Item 1" })).toBeVisible();
   await page.keyboard.press("Escape");
 
   // Menu should close
@@ -278,10 +279,12 @@ test.describe("Accessibility", () => {
   await expect(menuItem).toBeVisible();
 
   // Navigate with arrow keys
+  await expect(menuItem).toBeVisible();
   await page.keyboard.press("ArrowDown");
   await expect(menuItem).toBeFocused();
 
   // Press Enter to select
+  await expect(menuItem).toBeFocused();
   await page.keyboard.press("Enter");
   await expect.poll(testStateDriver.testState).toEqual("keyboard-activated");
 });
@@ -306,26 +309,32 @@ test("navigates between multiple menu items with arrow keys", async ({ initTestB
   const item3 = page.getByRole("menuitem", { name: "Item 3" });
 
   // Press ArrowDown to focus first item
+  await expect(item1).toBeVisible();
   await page.keyboard.press("ArrowDown");
   await expect(item1).toBeFocused();
 
   // Press ArrowDown to focus second item
+  await expect(item1).toBeFocused();
   await page.keyboard.press("ArrowDown");
   await expect(item2).toBeFocused();
 
   // Press ArrowDown to focus third item
+  await expect(item2).toBeFocused();
   await page.keyboard.press("ArrowDown");
   await expect(item3).toBeFocused();
 
   // Press ArrowDown again - should wrap to first item
+  await expect(item3).toBeFocused();
   await page.keyboard.press("ArrowDown");
   await expect(item1).toBeFocused();
 
   // Press ArrowUp to go back to third item
+  await expect(item1).toBeFocused();
   await page.keyboard.press("ArrowUp");
   await expect(item3).toBeFocused();
 
   // Press Enter to select third item
+  await expect(item3).toBeFocused();
   await page.keyboard.press("Enter");
   await expect.poll(testStateDriver.testState).toEqual("item3-clicked");
   });

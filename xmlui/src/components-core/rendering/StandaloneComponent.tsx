@@ -42,6 +42,7 @@ function StandaloneComponent({ node, children, functions, vars }: RootComponentP
   const renderedRoot = renderChild({
     node: rootNode,
     state: EMPTY_OBJECT,
+    globalVars: undefined, // Let StateContainer extract and manage globalVars from node definition
     dispatch: noop,
     appContext: undefined,
     lookupAction: noop,
@@ -52,7 +53,7 @@ function StandaloneComponent({ node, children, functions, vars }: RootComponentP
     cleanup: noop,
     memoedVarsRef,
   });
-
+  
   return !!children && isValidElement(renderedRoot)
     ? cloneElement(renderedRoot, null, children)
     : renderedRoot;

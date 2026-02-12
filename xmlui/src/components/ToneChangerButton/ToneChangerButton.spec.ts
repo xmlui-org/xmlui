@@ -338,6 +338,7 @@ test.describe("Accessibility", () => {
     await expect(page.getByTestId("theme-state")).toHaveText("light");
     
     // Press Enter to toggle
+    await expect(button).toBeFocused();
     await page.keyboard.press("Enter");
     await expect(page.getByTestId("theme-state")).toHaveText("dark");
   });
@@ -358,6 +359,7 @@ test.describe("Accessibility", () => {
     await expect(page.getByTestId("theme-state")).toHaveText("light");
     
     // Press Space to toggle
+    await expect(button).toBeFocused();
     await page.keyboard.press("Space");
     await expect(page.getByTestId("theme-state")).toHaveText("dark");
   });
@@ -389,6 +391,7 @@ test.describe("Accessibility", () => {
     
     // Focus the first button
     await page.getByRole("button", { name: "Before" }).focus();
+    await expect(page.getByRole("button", { name: "Before" })).toBeFocused();
     
     // Tab to ToneChangerButton
     await page.keyboard.press("Tab");
@@ -396,6 +399,7 @@ test.describe("Accessibility", () => {
     await expect(toneButton).toBeFocused();
     
     // Tab to the next button
+    await expect(toneButton).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(page.getByRole("button", { name: "After" })).toBeFocused();
   });

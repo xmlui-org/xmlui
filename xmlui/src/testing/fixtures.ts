@@ -229,11 +229,16 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
             </Stack>
           </Fragment>
         `;
-      
+
       const { errors, component } = xmlUiMarkupToComponent(markup);
 
       if (errors.length > 0) {
-        throw { errors };
+        const errText = errors
+          .map((e) => {
+            return `code: "${e.code}" msg: "${e.message}"`;
+          })
+          .join("\n");
+        throw new Error(`(${errors.length}) Errors while parsing Main.xmlui:\n${errText}`);
       }
       const entryPoint = component as ComponentDef;
 
@@ -323,7 +328,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
         window.TEST_RUNTIME = app.runtime;
       }, _appDescription);
       const { width, height } = page.viewportSize();
+
       await page.goto("/");
+      if (!description?.noFragmentWrapper) {
+        await page.getByTestId(testStateViewTestId).waitFor({ state: "attached" });
+      }
 
       // Create test icon locators
       const testIcons = {

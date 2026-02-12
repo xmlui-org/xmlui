@@ -1,4 +1,4 @@
-import {HiOutlineViewList} from "react-icons/hi";
-import type {IconBaseProps} from "./IconNative";
+import Icon from "./svg/hi-outline-view-list.svg?react";
+import type { IconBaseProps } from "./IconNative";
 
-export const LooseListIcon = (props: IconBaseProps) => <HiOutlineViewList {...props} />
+export const LooseListIcon = (props: IconBaseProps) => <Icon {...props}/>;

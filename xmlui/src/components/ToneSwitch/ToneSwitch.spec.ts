@@ -67,6 +67,7 @@ test.describe("Accessibility", () => {
     await toggle.focus();
     await expect(toggle).toBeFocused();
     
+    await expect(toggle).toBeFocused();
     await page.keyboard.press("Space");
     await expect(toggle).toBeChecked();
   });
