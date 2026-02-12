@@ -31,8 +31,55 @@ This property customizes the message displayed in a toast when the API invocatio
   id="api"
   method="post"
   url="/api/shopping-list"
-  errorNotificationMessage="${error.statusCode}, ${error.message} {JSON.stringify($error.details)}" />
+  errorNotificationMessage="
+    ${error.statusCode}, ${error.message} {JSON.stringify($error.details)}
+  " />
 ```
+
+**Error handling in try/catch blocks**: When calling `Actions.callApi()`, you can catch errors and access their properties directly:
+
+```xmlui-pg name="Example: Error handling with Actions.callApi"
+---app copy display 
+<App>
+  <Button onClick="
+    try {
+      Actions.callApi({
+        url: '/api/create-file',
+        method: 'post',
+        body: { name: 'file.txt' }
+      });
+      toast.success('File created');
+    } catch (error) {
+      if (error.statusCode === 409) {
+        toast.error('File already exists');
+      } else if (error.statusCode === 400) {
+        toast.error('Invalid request: ' + error.message);
+      } else {
+        toast.error(error.message);
+      }
+    }
+  ">
+    Create File
+  </Button>
+</App>
+---api display
+{
+  "apiUrl": "/api",
+  "operations": {
+    "create-file": {
+      "url": "/create-file",
+      "method": "post",
+      "handler": "throw Errors.HttpError(409, { message: 'File already exists', details: { fileName: $requestBody.name, conflictReason: 'Duplicate entry' }, customField: 'customValue' });"
+    }
+  }
+}
+```
+
+The error object provides:
+- `error.statusCode` - HTTP status code (e.g., 400, 404, 500)
+- `error.message` - Extracted error message
+- `error.details` - Extracted error details object
+- `error.response` - Full original response body (includes custom fields)
 
 **NOTE:** While we support Microsoft/Google-style and RFC 7807 errors, not all response shapes can be accounted for.
 Because of this, there is an attribute available in the `configuration` file called `errorResponseTransform` under `appGlobals`. This exposes the error response using the `$response` context variable.

@@ -223,6 +223,7 @@ test.describe("Basic Functionality", () => {
     await initTestBed(`<NumberBox initialValue="5" />`);
     const input = page.getByRole("textbox");
     await input.focus();
+    await expect(input).toBeFocused();
     await page.keyboard.press("ArrowUp");
     await expect(input).toHaveValue("6");
   });
@@ -231,6 +232,7 @@ test.describe("Basic Functionality", () => {
     await initTestBed(`<NumberBox initialValue="5" />`);
     const input = page.getByRole("textbox");
     await input.focus();
+    await expect(input).toBeFocused();
     await page.keyboard.press("ArrowDown");
     await expect(input).toHaveValue("4");
   });
@@ -325,6 +327,7 @@ test.describe("Accessibility", () => {
 
   test("component supports keyboard navigation", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox label="Amount" />`);
+    await expect(page.getByRole("textbox")).toBeVisible();
     await page.keyboard.press("Tab");
     await expect(page.getByRole("textbox")).toBeFocused();
   });
@@ -354,6 +357,7 @@ test.describe("Label", () => {
 
   test("clicking on the label focuses input field", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox label="Input Field Label" />`);
+    await expect(page.getByText("Input Field Label")).toBeVisible();
     await page.getByText("Input Field Label").click();
     await expect(page.getByRole("textbox")).toBeFocused();
   });

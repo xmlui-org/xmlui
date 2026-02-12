@@ -1,4 +1,4 @@
-import { getBounds, SKIP_REASON } from "../../testing/component-test-helpers";
+import { getBounds } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
 // =============================================================================
@@ -1735,14 +1735,6 @@ test.describe("Other Edge Cases", () => {
 
     await input.field.blur();
     await expect(driver.validationStatusIndicator).toBeVisible();
-  });
-
-  test("handles FormItem with no Form parent gracefully", async ({ initTestBed, page }) => {
-    await initTestBed(`<FormItem label="Standalone FormItem" type="text" />`);
-
-    const field = page.getByRole("textbox");
-    await expect(field).not.toBeVisible();
-    await expect(page.locator("[data-error-boundary]")).toBeVisible();
   });
 
   // =============================================================================

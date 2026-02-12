@@ -74,7 +74,15 @@ test.describe("Basic Functionality", () => {
         },
         { timeout: 2000 },
       )
-      .toEqual({ statusCode: 400, details: "Invalid data", message: "Bad request" });
+      .toEqual({ 
+        statusCode: 400, 
+        details: "Invalid data", 
+        message: "Bad request",
+        response: {
+          message: "Bad request",
+          details: "Invalid data"
+        }
+      });
   });
 
   test("shows error notification: code 400", async ({ page, initTestBed }) => {

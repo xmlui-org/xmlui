@@ -337,6 +337,7 @@ test("gotFocus and lostFocus events work correctly", async ({
   await expect(page.getByTestId("focusText")).toHaveText("AutoComplete focused");
 
   // Blur the autocomplete
+  await expect(driver.component).toBeVisible(); // Wait for component to be stable
   await page.keyboard.press("Tab");
   await expect(page.getByTestId("focusText")).toHaveText("AutoComplete lost focus");
 });
@@ -363,11 +364,13 @@ test("gotFocus and lostFocus events by clicking on label work correctly", async 
   await expect(page.getByTestId("focusText")).toHaveText("AutoComplete lost focus");
 
   // Focus the autocomplete
-  await page.getByText("Select a hero").click();
+  const label = page.getByText("Select a hero");
+  await label.click();
 
   await expect(page.getByTestId("focusText")).toHaveText("AutoComplete focused");
 
   // Blur the autocomplete
+  await expect(label).toBeVisible(); // Wait for component to be stable
   await page.keyboard.press("Tab");
   await expect(page.getByTestId("focusText")).toHaveText("AutoComplete lost focus");
 });
@@ -476,6 +479,7 @@ test("creates new option when typing non-existing value", async ({
   await driver.click();
 
   // Type a new option
+  await expect(driver.component).toBeVisible(); // Wait for component to be stable
   await page.keyboard.type("Peter Parker");
   await page.keyboard.press("Enter");
 
@@ -507,6 +511,7 @@ test("has appropriate ARIA attributes", async ({ initTestBed, page }) => {
 
   // Open the dropdown
   await combobox.focus();
+  await expect(combobox).toBeFocused(); // Wait for focus to be stable
   await page.keyboard.press("Enter");
 
   // Check expanded state
@@ -523,23 +528,26 @@ test("supports keyboard navigation with arrow keys", async ({ initTestBed, page 
   `);
 
   // Focus the autocomplete
-  await page.getByRole("combobox").focus();
+  const combobox = page.getByRole("combobox");
+  await combobox.focus();
+  await expect(combobox).toBeFocused(); // Wait for focus to be stable
 
   // Open dropdown with arrow down
-  await page.keyboard.press("ArrowDown", { delay: 100 });
-  await expect(page.getByRole("listbox")).toBeVisible();
+  await page.keyboard.press("ArrowDown");
+  const listbox = page.getByRole("listbox");
+  await expect(listbox).toBeVisible();
 
   // Navigate through options
-  await page.keyboard.press("ArrowDown", { delay: 100 }); // First option
-  await page.keyboard.press("ArrowDown", { delay: 100 }); // Second option
-  await page.keyboard.press("ArrowDown", { delay: 100 }); // Third option
-  await page.keyboard.press("ArrowUp", { delay: 100 }); // Back to second option
+  await page.keyboard.press("ArrowDown"); // First option
+  await page.keyboard.press("ArrowDown"); // Second option
+  await page.keyboard.press("ArrowDown"); // Third option
+  await page.keyboard.press("ArrowUp"); // Back to second option
 
   // Select with Enter
-  await page.keyboard.press("Enter", { delay: 100 });
+  await page.keyboard.press("Enter");
 
   // Verify selection
-  await expect(page.getByRole("combobox")).toHaveValue("Clark Kent");
+  await expect(combobox).toHaveValue("Clark Kent");
 });
 
 // =============================================================================

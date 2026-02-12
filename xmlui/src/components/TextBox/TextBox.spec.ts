@@ -174,10 +174,12 @@ test.describe("Accessibility", () => {
     const firstInput = await createTextBoxDriver("first-input");
     const secondInput = await createTextBoxDriver("second-input");
 
+    await expect(firstInput.input).toBeVisible();
+    await expect(secondInput.input).toBeVisible(); // Wait for both inputs to be fully rendered
     await firstInput.input.focus();
     await expect(firstInput.input).toBeFocused();
 
-    await page.keyboard.press("Tab", { delay: 100 });
+    await page.keyboard.press("Tab");
     await expect(secondInput.input).toBeFocused();
   });
 

@@ -433,10 +433,12 @@ test.describe("Accessibility", () => {
     const firstSwitch = page.getByLabel("First switch");
     const secondSwitch = page.getByLabel("Second switch");
 
+    await expect(firstSwitch).toBeVisible();
+    await expect(secondSwitch).toBeVisible(); // Wait for both switches to be fully rendered
     await firstSwitch.focus();
     await expect(firstSwitch).toBeFocused();
 
-    await page.keyboard.press("Tab", { delay: 100 });
+    await page.keyboard.press("Tab");
     await expect(secondSwitch).toBeFocused();
   });
 

@@ -201,6 +201,7 @@ test.describe("Accessibility", () => {
 
     // Focus the carousel container
     await page.getByRole("region").focus();
+    await expect(page.getByRole("region")).toBeFocused();
 
     // Press right arrow key
     await page.keyboard.press("ArrowRight");
@@ -210,6 +211,7 @@ test.describe("Accessibility", () => {
     await expect(secondSlide).toBeInViewport();
 
     // Press left arrow key
+    await expect(secondSlide).toBeVisible();
     await page.keyboard.press("ArrowLeft");
 
     // Verify first slide is visible again

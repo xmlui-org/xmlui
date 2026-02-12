@@ -264,9 +264,11 @@ test.describe("Accessibility", () => {
       </ScrollViewer>
     `);
 
+    await expect(page.getByTestId("btn1")).toBeVisible();
     await page.keyboard.press("Tab");
     await expect(page.getByTestId("btn1")).toBeFocused();
     
+    await expect(page.getByTestId("btn1")).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(page.getByTestId("btn2")).toBeFocused();
   });

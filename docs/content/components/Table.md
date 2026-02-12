@@ -38,6 +38,12 @@ All samples use table columns with the following definition unless noted otherwi
 
 ## Properties [#properties]
 
+### `alwaysShowHeader` [#alwaysshowheader]
+
+-  default: **false**
+
+This property indicates whether the table header is always visible when scrolling and no height is specified. When set to `true`, the header is sticky and always visible on page scroll. Otherwise, it scrolls with the content and may not be visible when scrolled down.
+
 ### `alwaysShowPagination` [#alwaysshowpagination]
 
 This property explicitly toggles pagination controls visibility. If set to `true`, controls are always shown even if there is only one page. If set to `false`, controls are hidden. If omitted, controls are hidden when there is only one page and shown otherwise. This property only has effect when pagination is enabled. It acts as an alias for showPaginationControls.

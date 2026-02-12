@@ -39,8 +39,6 @@ function StandaloneComponent({ node, children, functions, vars }: RootComponentP
     };
   }, [functions, node, vars]);
 
-  console.log('[StandaloneComponent] rootNode.globalVars:', rootNode.globalVars);
-  
   const renderedRoot = renderChild({
     node: rootNode,
     state: EMPTY_OBJECT,
@@ -56,8 +54,6 @@ function StandaloneComponent({ node, children, functions, vars }: RootComponentP
     memoedVarsRef,
   });
   
-  console.log('[StandaloneComponent] renderChild called with globalVars: undefined');
-
   return !!children && isValidElement(renderedRoot)
     ? cloneElement(renderedRoot, null, children)
     : renderedRoot;

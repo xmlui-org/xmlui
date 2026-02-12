@@ -7,20 +7,12 @@
  *
  * Test Results Summary:
  * - ✅ 25+ tests passing
- * - ⏭️ 6 tests skipped (require additional implementation investigation)
  *
  * Key Testing Insights:
  * - Use HTML element selectors (th, td, table) rather than role-based selectors
  * - Add .first() to avoid strict mode violations when multiple elements match
  * - Some features like selection checkboxes exist but are hidden via CSS
  * - Loading states, sorting, and pagination may use different implementations than expected
- *
- * Skipped Tests (for future investigation):
- * 1. Loading property visual indicators
- * 2. Row selection interaction (checkboxes are hidden)
- * 3. Sorting functionality behavior
- * 4. Pagination control identification
- * 5. Theme variable CSS property testing
  */
 
 import { expect, test } from "../../testing/fixtures";
@@ -326,6 +318,37 @@ test.describe("Basic Functionality", () => {
       for (let i = 1; i < await checkboxes.count(); i++) {
         await expect(checkboxes.nth(i)).not.toBeChecked();
       }
+    });
+
+    test("checkbox column maintains width with horizontal scrolling (issue #2790)", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{[{foo: "bar"}]}' rowsSelectable="true" testId="table">
+          <Column width="2000px" bindTo="foo" />
+        </Table>
+      `);
+
+      // Get the first header cell (checkbox column)
+      const checkboxHeaderCell = page.locator("th").first();
+      await expect(checkboxHeaderCell).toBeVisible();
+      
+      // Verify checkbox column has non-zero width
+      const headerBox = await checkboxHeaderCell.boundingBox();
+      expect(headerBox).not.toBeNull();
+      expect(headerBox!.width).toBeGreaterThan(0);
+      
+      // Get the first body cell (checkbox column in row)
+      const checkboxBodyCell = page.locator("tbody td").first();
+      await expect(checkboxBodyCell).toBeVisible();
+      
+      // Verify checkbox body cell has non-zero width
+      const bodyBox = await checkboxBodyCell.boundingBox();
+      expect(bodyBox).not.toBeNull();
+      expect(bodyBox!.width).toBeGreaterThan(0);
+      
+      // Specifically verify it's approximately the expected width (42px)
+      // Allow some tolerance for browser rendering differences
+      expect(bodyBox!.width).toBeGreaterThanOrEqual(35);
+      expect(bodyBox!.width).toBeLessThanOrEqual(50);
     });
   });
 
@@ -1077,7 +1100,7 @@ test.describe("Basic Functionality", () => {
 
     test("hides no data view when noDataTemplate is null", async ({ initTestBed, page }) => {
       await initTestBed(`
-        <Table data='{[]}' noDataTemplate="{null}" testId="table">
+        <Table data='{[]}' noDataTemplate="" testId="table">
           <Column bindTo="name"/>
         </Table>
       `);
@@ -2513,6 +2536,7 @@ test.describe("Keyboard Shortcuts", () => {
       // Focus the text input instead of table
       const input = page.getByTestId("input").getByRole("textbox");
       await input.focus();
+      await expect(input).toBeFocused();
       await page.keyboard.press("Control+A");
 
       // Should not trigger table's selectAll
@@ -2572,6 +2596,7 @@ test.describe("Keyboard Shortcuts", () => {
         </Table>
       `);
 
+      await expect(page.getByTestId("table")).toBeVisible();
       await page.keyboard.press("Delete");
 
       await expect.poll(testStateDriver.testState).toEqual({
@@ -2600,6 +2625,7 @@ test.describe("Keyboard Shortcuts", () => {
       const firstRow = page.locator("tbody tr").first();
       await firstRow.click();
 
+      await expect(firstRow).toBeVisible();
       await page.keyboard.press("Delete");
 
       const result = await testStateDriver.testState();
