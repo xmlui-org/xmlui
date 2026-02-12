@@ -540,6 +540,7 @@
             <PageNotFound />
         </Page>
     </Pages>
+    <ScrollToTop marginBottom="$space-4" />
     <Footer sticky="false">
         <Text fontWeight="400">
             This site is an
