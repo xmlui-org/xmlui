@@ -83,7 +83,7 @@
             paddingTop="{mediaSize.sizeIndex <= 2 ? '$space-4' : '0'}"
             gap="0"
         >
-            <NavGroup initiallyExpanded="{true}" label="Learn XMLUI">
+            <NavGroup initiallyExpanded="{true}" label="Learn XMLUI" to="/learn">
                 <NavLink icon="school" label="Introduction" to="/" />
                 <NavLink
                     icon="arrow-shuffle"
@@ -147,7 +147,7 @@
                 to="/guides/hosted-deployment"
             />
         </NavGroup>
-        <NavGroup label="Tutorial">
+        <NavGroup label="Tutorial" to="/tutorial">
             <NavLink icon="invoice" label="XMLUI Invoice" to="/tutorial-01" />
             <NavLink icon="file-code" label="Main.xmlui" to="/tutorial-02" />
             <NavLink icon="menu" label="Navigation" to="/tutorial-03" />
@@ -161,7 +161,7 @@
             <NavLink icon="import" label="Import" to="/tutorial-11" />
             <NavLink icon="settings" label="Settings" to="/tutorial-12" />
         </NavGroup>
-        <NavGroup label="How To">
+        <NavGroup label="How To" to="/howto">
             <NavLink
                 icon="article"
                 iconAlignment="baseline"
@@ -341,10 +341,10 @@
             <!-- Add more links as additional files are created -->
         </NavGroup
         >
-        <NavGroup label="Reference">
+        <NavGroup label="Reference" to="/reference">
             <NavSection sectionId="components" />
             <NavSection sectionId="extensions" />
-            <NavGroup icon="theme" label="Themes">
+            <NavGroup icon="theme" label="Themes" to="/reference/themes">
                 <NavLink
                     label="Layout Properties"
                     to="/styles-and-themes/layout-props"
@@ -489,6 +489,9 @@
             <Overview />
         </Page>
         <Page url="/reference/extensions">
+            <Overview />
+        </Page>
+        <Page url="/extensions/xmlui-animations/_overview">
             <Overview />
         </Page>
         <Page url="/reference/themes">
