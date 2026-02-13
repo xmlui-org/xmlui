@@ -267,20 +267,52 @@ export function AppContent({
   // --- For nested apps (which use MemoryRouter), listen to browser hash changes directly
   // --- This allows xmlui-pg examples to respond to hash navigation from the parent app
   useEffect(() => {
+    console.log("[AppContent] Nested app hash listener setup:", {
+      isNestedApp,
+      hasWindow: typeof window !== "undefined",
+      currentHash: typeof window !== "undefined" ? window.location.hash : "N/A",
+    });
+
     if (!isNestedApp || typeof window === "undefined") return;
 
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1); // Remove the '#' prefix
+      console.log("[AppContent] Hash change detected:", {
+        hash,
+        lastHash: lastHash.current,
+        willProcess: hash && lastHash.current !== hash,
+      });
+
       if (hash && lastHash.current !== hash) {
         lastHash.current = hash;
         const rootNode = root?.getRootNode();
+        console.log("[AppContent] Processing hash navigation:", {
+          hash,
+          hasRoot: !!root,
+          hasRootNode: !!rootNode,
+          rootNodeType: rootNode?.constructor?.name,
+          isShadowRoot: typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot,
+        });
+
         const scrollBehavior = "smooth";
         requestAnimationFrame(() => {
-          if (!rootNode) return;
+          if (!rootNode) {
+            console.log("[AppContent] No rootNode available");
+            return;
+          }
           if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
+            console.log("[AppContent] Searching in ShadowRoot for:", `#${hash}`);
             const el = (rootNode as any).querySelector(`#${hash}`);
+            console.log("[AppContent] Element found:", {
+              found: !!el,
+              elementType: el?.tagName,
+              elementId: el?.id,
+            });
             if (el) {
+              console.log("[AppContent] Scrolling to element");
               scrollAncestorsToView(el, scrollBehavior);
+            } else {
+              console.log("[AppContent] Element not found in shadow DOM");
             }
           }
         });
@@ -288,11 +320,14 @@ export function AppContent({
     };
 
     // Handle initial hash if present
+    console.log("[AppContent] Checking initial hash");
     handleHashChange();
 
     // Listen for hash changes
+    console.log("[AppContent] Setting up hashchange listener");
     window.addEventListener("hashchange", handleHashChange);
     return () => {
+      console.log("[AppContent] Cleaning up hashchange listener");
       window.removeEventListener("hashchange", handleHashChange);
     };
   }, [isNestedApp, root]);
