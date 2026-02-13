@@ -264,73 +264,27 @@ export function AppContent({
   //   }
   // }, [isWindowFocused]);
 
-  // --- For nested apps (which use MemoryRouter), listen to browser hash changes directly
-  // --- This allows xmlui-pg examples to respond to hash navigation from the parent app
+  // --- For nested apps (which use MemoryRouter), listen to MemoryRouter location changes
+  // --- This allows xmlui-pg examples to respond to hash navigation within the nested app
   useEffect(() => {
-    console.log("[AppContent] Nested app hash listener setup:", {
-      isNestedApp,
-      hasWindow: typeof window !== "undefined",
-      currentHash: typeof window !== "undefined" ? window.location.hash : "N/A",
-    });
+    if (!isNestedApp) return;
 
-    if (!isNestedApp || typeof window === "undefined") return;
-
-    const handleHashChange = () => {
-      const hash = window.location.hash.slice(1); // Remove the '#' prefix
-      console.log("[AppContent] Hash change detected:", {
-        hash,
-        lastHash: lastHash.current,
-        willProcess: hash && lastHash.current !== hash,
+    const hash = location.hash.slice(1); // Remove the '#' prefix
+    if (hash && lastHash.current !== hash) {
+      lastHash.current = hash;
+      const rootNode = root?.getRootNode();
+      const scrollBehavior = "smooth";
+      requestAnimationFrame(() => {
+        if (!rootNode) return;
+        if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
+          const el = (rootNode as any).querySelector(`#${hash}`);
+          if (el) {
+            scrollAncestorsToView(el, scrollBehavior);
+          }
+        }
       });
-
-      if (hash && lastHash.current !== hash) {
-        lastHash.current = hash;
-        const rootNode = root?.getRootNode();
-        console.log("[AppContent] Processing hash navigation:", {
-          hash,
-          hasRoot: !!root,
-          hasRootNode: !!rootNode,
-          rootNodeType: rootNode?.constructor?.name,
-          isShadowRoot: typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot,
-        });
-
-        const scrollBehavior = "smooth";
-        requestAnimationFrame(() => {
-          if (!rootNode) {
-            console.log("[AppContent] No rootNode available");
-            return;
-          }
-          if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
-            console.log("[AppContent] Searching in ShadowRoot for:", `#${hash}`);
-            const el = (rootNode as any).querySelector(`#${hash}`);
-            console.log("[AppContent] Element found:", {
-              found: !!el,
-              elementType: el?.tagName,
-              elementId: el?.id,
-            });
-            if (el) {
-              console.log("[AppContent] Scrolling to element");
-              scrollAncestorsToView(el, scrollBehavior);
-            } else {
-              console.log("[AppContent] Element not found in shadow DOM");
-            }
-          }
-        });
-      }
-    };
-
-    // Handle initial hash if present
-    console.log("[AppContent] Checking initial hash");
-    handleHashChange();
-
-    // Listen for hash changes
-    console.log("[AppContent] Setting up hashchange listener");
-    window.addEventListener("hashchange", handleHashChange);
-    return () => {
-      console.log("[AppContent] Cleaning up hashchange listener");
-      window.removeEventListener("hashchange", handleHashChange);
-    };
-  }, [isNestedApp, root]);
+    }
+  }, [isNestedApp, location, root]);
 
   // --- Listen to location change using useEffect with location as dependency
   // https://jasonwatmore.com/react-router-v6-listen-to-location-route-change-without-history-listen
@@ -906,12 +860,11 @@ function scrollAncestorsToView(target: HTMLElement, scrollBehavior?: ScrollBehav
       let parent = current.parentElement;
       // If no parentElement, might be in shadow DOM
       if (!parent && current.getRootNode) {
-        break;
-        // NOTE: Disregard shadow DOM, because we will scroll everything otherwise
-        /* const root = current.getRootNode();
-        if (root && root instanceof ShadowRoot && root.host) {
-          parent = root.host as (HTMLElement | null);
-        } */
+        const rootNode = current.getRootNode();
+        // Cross shadow boundary to continue searching in host document
+        if (rootNode && rootNode instanceof ShadowRoot && rootNode.host) {
+          parent = rootNode.host as HTMLElement | null;
+        }
       }
       if (!parent) break;
 
