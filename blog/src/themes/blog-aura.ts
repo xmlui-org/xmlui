@@ -13,7 +13,7 @@ export const BlogAuraThemeDefinition: ThemeDefinition = {
 
     // --- App layout
     "maxWidth-content-App": "1286px",
-    "maxWidth-content-App--withToc": "1000px",
+    "maxWidth-content-App--withToc": "1100px",
 
     // --- Fundamental colors & typography
     "color-surface": "rgb(111, 110, 119)",
