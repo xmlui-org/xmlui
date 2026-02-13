@@ -248,6 +248,7 @@ export function AppContent({
   const lastHash = useRef("");
   const [scrollForceRefresh, setScrollForceRefresh] = useState(0);
   const tableOfContentsContext = useContext(TableOfContentsContext);
+  const isNestedApp = globalProps?.isNested;
 
   useEffect(() => {
     onInit?.();
@@ -263,10 +264,46 @@ export function AppContent({
   //   }
   // }, [isWindowFocused]);
 
+  // --- For nested apps (which use MemoryRouter), listen to browser hash changes directly
+  // --- This allows xmlui-pg examples to respond to hash navigation from the parent app
+  useEffect(() => {
+    if (!isNestedApp || typeof window === "undefined") return;
+
+    const handleHashChange = () => {
+      const hash = window.location.hash.slice(1); // Remove the '#' prefix
+      if (hash && lastHash.current !== hash) {
+        lastHash.current = hash;
+        const rootNode = root?.getRootNode();
+        const scrollBehavior = "smooth";
+        requestAnimationFrame(() => {
+          if (!rootNode) return;
+          if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
+            const el = (rootNode as any).querySelector(`#${hash}`);
+            if (el) {
+              scrollAncestorsToView(el, scrollBehavior);
+            }
+          }
+        });
+      }
+    };
+
+    // Handle initial hash if present
+    handleHashChange();
+
+    // Listen for hash changes
+    window.addEventListener("hashchange", handleHashChange);
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+    };
+  }, [isNestedApp, root]);
+
   // --- Listen to location change using useEffect with location as dependency
   // https://jasonwatmore.com/react-router-v6-listen-to-location-route-change-without-history-listen
   // https://dev.to/mindactuate/scroll-to-anchor-element-with-react-router-v6-38op
   useEffect(() => {
+    // Skip router location changes for nested apps - we handle browser hash changes separately
+    if (isNestedApp) return;
+
     let hash = "";
     if (location.hash) {
       hash = location.hash.slice(1); // safe hash for further use after navigation
@@ -282,7 +319,8 @@ export function AppContent({
           // --- Check constructor.name to avoid direct ShadowRoot type dependency
           // --- More precise than duck typing, works reliably across different environments
           if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
-            const el = (rootNode as any).getElementById(lastHash.current);
+            // ShadowRoot doesn't have getElementById, use querySelector instead
+            const el = (rootNode as any).querySelector(`#${lastHash.current}`);
             if (!el) return;
             scrollAncestorsToView(el, scrollBehavior);
           } else {
@@ -294,7 +332,7 @@ export function AppContent({
         });
       }
     }
-  }, [location, scrollForceRefresh, root]);
+  }, [location, scrollForceRefresh, root, isNestedApp]);
 
   const forceRefreshAnchorScroll = useCallback(() => {
     lastHash.current = "";
@@ -309,7 +347,8 @@ export function AppContent({
         // Fallback if TableOfContentsContext is not available
         const rootNode = root?.getRootNode();
         if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
-          const el = (rootNode as any).getElementById(bookmarkId);
+          // ShadowRoot doesn't have getElementById, use querySelector instead
+          const el = (rootNode as any).querySelector(`#${bookmarkId}`);
           if (el) {
             scrollAncestorsToView(el, smoothScrolling ? "smooth" : "auto");
           }
