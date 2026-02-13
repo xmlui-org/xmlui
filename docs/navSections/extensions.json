@@ -1,0 +1,43 @@
+{
+  "items": [
+    {
+      "label": "Extensions",
+      "icon": "puzzle",
+      "children": [
+        {
+          "label": "Xmlui Animations",
+          "children": [
+            {
+              "label": "Extension Overview",
+              "to": "/extensions/xmlui-animations/_overview"
+            },
+            {
+              "label": "Animation",
+              "to": "/extensions/xmlui-animations/Animation"
+            },
+            {
+              "label": "FadeAnimation",
+              "to": "/extensions/xmlui-animations/FadeAnimation"
+            },
+            {
+              "label": "FadeInAnimation",
+              "to": "/extensions/xmlui-animations/FadeInAnimation"
+            },
+            {
+              "label": "FadeOutAnimation",
+              "to": "/extensions/xmlui-animations/FadeOutAnimation"
+            },
+            {
+              "label": "ScaleAnimation",
+              "to": "/extensions/xmlui-animations/ScaleAnimation"
+            },
+            {
+              "label": "SlideInAnimation",
+              "to": "/extensions/xmlui-animations/SlideInAnimation"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

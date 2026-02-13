@@ -10,4 +10,5 @@ export const FOLDERS = {
   docsRoot: join(dirname(fileURLToPath(import.meta.url)), "../../../", "docs"),
   pages: join(dirname(fileURLToPath(import.meta.url)), "../../../", "docs", "pages"),
   docsMeta: join(dirname(fileURLToPath(import.meta.url)), "../../../", "docs", "meta"),
+  navSections: join(dirname(fileURLToPath(import.meta.url)), "../../../", "docs", "navSections"),
 };

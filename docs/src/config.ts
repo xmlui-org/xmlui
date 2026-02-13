@@ -2,6 +2,8 @@ import type { StandaloneAppDescription } from "xmlui";
 import { createHighlighterCoreSync, type DecorationItem } from "shiki";
 import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
 import componentsSection from "../navSections/components.json";
+import extensionsSection from "../navSections/extensions.json";
+
 // @ts-ignore
 import js from "@shikijs/langs/javascript";
 // @ts-ignore
@@ -19,6 +21,7 @@ import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkStringify from "remark-stringify";
 import stripMarkdown from "strip-markdown";
+import extensions from "../extensions";
 
 export function markdownToPlainText(markdown: string): string {
   const processor = unified()
@@ -320,6 +323,7 @@ const App: StandaloneAppDescription = {
     searchIndexEnabled: true,
     navSections: {
       components: componentsSection,
+      extensions: extensionsSection,
     },
     navPanelContent: groupedNavPanelContent,
     content,
