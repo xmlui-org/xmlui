@@ -12,7 +12,7 @@ import {
 import type { VisitorState } from "./tree-visitor";
 import { visitNode } from "./tree-visitor";
 import { isModuleErrors, parseScriptModule, parseScriptModuleAsync, parseScriptModuleWithImports } from "./modules";
-import { PARSED_MARK_PROP } from "../../abstractions/InternalMarkers";
+import { PARSED_MARK_PROP, ARROW_EXPR_MARK } from "../../abstractions/InternalMarkers";
 import type { ModuleFetcher } from "./types";
 import { clearAllModuleCaches } from "./ModuleCache";
 import { ModuleLoader } from "./ModuleLoader";
@@ -101,19 +101,16 @@ export async function collectCodeBehindFromSourceWithImports(
     if (!result.functions[name] && !collectedFunctions[name]) {
       // Convert FunctionDeclaration to CodeDeclaration format
       const funcDecl = func as any;
-      const arrow: ArrowExpression = {
+      const arrow: any = {
         type: T_ARROW_EXPRESSION,
         args: funcDecl.args.slice(),
         statement: funcDecl.stmt,
-      } as ArrowExpression;
-
-      const codeDecl = {
-        [PARSED_MARK_PROP]: true,
-        tree: arrow,
+        [ARROW_EXPR_MARK]: true,
+        closureContext: [],
       };
 
-      collectedFunctions[name] = codeDecl;
-      result.functions[name] = codeDecl;
+      collectedFunctions[name] = arrow;
+      result.functions[name] = arrow;
     }
   });
 
@@ -137,7 +134,6 @@ function collectStatementFromModule(
         result.vars[decl.id.name] = {
           [PARSED_MARK_PROP]: true,
           tree: decl.expr,
-          source: decl.expr?.source || null, // Store the source text from the new parser feature
         };
       });
       break;
@@ -163,20 +159,16 @@ function addFunctionDeclaration(
   if (stmt.id.name in result.functions) {
     throw new Error(`Duplicated function declaration: '${stmt.id.name}'`);
   }
-  const arrow: ArrowExpression = {
+  const arrow: any = {
     type: T_ARROW_EXPRESSION,
     args: stmt.args.slice(),
     statement: stmt.stmt,
-  } as ArrowExpression;
+    [ARROW_EXPR_MARK]: true,
+    closureContext: [],
+  };
 
-  collectedFunctions[stmt.id.name] = {
-    [PARSED_MARK_PROP]: true,
-    tree: arrow,
-  };
-  result.functions[stmt.id.name] = {
-    [PARSED_MARK_PROP]: true,
-    tree: arrow,
-  };
+  collectedFunctions[stmt.id.name] = arrow;
+  result.functions[stmt.id.name] = arrow;
 }
 
 // --- Remove all code-behind tokens from the tree
@@ -196,7 +188,7 @@ export function removeCodeBehindTokensFromTree(declarations: CollectedDeclaratio
     removeTokens(declarations.functions[key]);
   });
 
-  function removeTokens(declaration: CodeDeclaration): void {
+  function removeTokens(declaration: any): void {
     const nodeVisitor = (before: boolean, visited: Expression | Statement, state: VisitorState) => {
       if (before) {
         if (visited) {
@@ -207,6 +199,12 @@ export function removeCodeBehindTokensFromTree(declarations: CollectedDeclaratio
       return state;
     };
 
-    visitNode(declaration.tree, state, nodeVisitor, nodeVisitor);
+    // Handle both formats:
+    // - Vars: {__PARSED__: true, tree: ...}
+    // - Functions: arrow expression with _ARROW_EXPR_: true
+    const tree = declaration.tree || declaration;
+    if (tree) {
+      visitNode(tree, state, nodeVisitor, nodeVisitor);
+    }
   }
 }

@@ -425,11 +425,6 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     return null;
   }
 
-  // --- Assemble the renderer context we pass down the rendering chain
-  if (globalVars && Object.keys(globalVars).length > 0) {
-    console.log('[ComponentAdapter]', safeNode.type, safeNode.uid, 'creating rendererContext with globalVars:', Object.keys(globalVars));
-  }
-  
   const rendererContext: RendererContext<any> = {
     node: safeNode,
     state: state[uid] || EMPTY_OBJECT,

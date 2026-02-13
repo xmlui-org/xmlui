@@ -2,10 +2,12 @@
   "items": [
     {
       "label": "Extensions",
+      "to": "/reference/extensions",
       "icon": "puzzle",
       "children": [
         {
           "label": "Xmlui Animations",
+          "to": "/extensions/xmlui-animations",
           "children": [
             {
               "label": "Extension Overview",
