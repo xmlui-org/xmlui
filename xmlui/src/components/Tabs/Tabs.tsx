@@ -88,7 +88,10 @@ export const TabsMd = createMetadata({
     [`backgroundColor-trigger-${COMP}--hover`]: "$color-surface-100",
     [`padding-trigger-${COMP}`]: "$space-4",
     // [`backgroundColor-list-${COMP}`]: "$color-primary-50",
-    // [`textColor-trigger-${COMP}`]: "$color-primary-100",
+    [`textColor-trigger-${COMP}`]: "$color-primary-100",
+    [`textColor-trigger-${COMP}--active`]: "$color-surface-0",
+    [`textColor-trigger-${COMP}--hover`]: "$color-primary-900",
+    [`gap-list-${COMP}`]: "0px",
   },
 });
 

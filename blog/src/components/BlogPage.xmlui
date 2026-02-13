@@ -1,8 +1,14 @@
 <Component name="BlogPage">
     <script>
-        var showToc = getThemeVar("tableOfContents") !== "false" && mediaSize.sizeIndex > 3;
-        var showTags = getThemeVar("tags") !== "false";
-        var markdownContent = appGlobals.prefetchedContent[`/blog/${$props.post.slug}.md`];
+    function showToc() {
+        return getThemeVar("tableOfContents") !== "false" && mediaSize.sizeIndex > 3;
+    }
+    function showTags() {
+        return getThemeVar("tags") !== "false";
+    }
+    function markdownContent() {
+        return appGlobals.prefetchedContent[`/blog/${$props.post.slug}.md`];
+    }
     </script>
 
     <VStack gap="$space-2" marginTop="$space-4">
@@ -24,13 +30,13 @@
                     •
                     {formatDate($props.post.date, "d MMM yyyy")}
                 </Text>
-                <HStack when="{showTags && $props.post.tags && $props.post.tags.length > 0}" gap="$space-1_5">
+                <HStack when="{showTags() && $props.post.tags && $props.post.tags.length > 0}" gap="$space-1_5">
                     <Items data="{$props.post.tags}">
                         <Tag>{$item}</Tag>
                     </Items>
                 </HStack>
                 <Markdown
-                    content="{markdownContent}"
+                    content="{markdownContent()}"
                     showHeadingAnchors
                 />
             </VStack>
@@ -39,7 +45,7 @@
                 showScrollerFade="true"
                 width="$space-64"
                 omitH1
-                when="{showToc}"
+                when="{showToc()}"
                 maxHeadingLevel="3"
             />
         </HStack>

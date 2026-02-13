@@ -1,71 +1,157 @@
 <Component name="FeaturedWithTabsLayout">
-    <VStack gap="$space-8" width="100%">
-        <VStack when="{$props.latestPost}" gap="$space-3" width="100%">
-            <Text variant="info">
-                {$props.latestPost.author}
-                •
-                {formatDate($props.latestPost.date, "d MMM yyyy")}
-            </Text>
-            <H2 variant="title" fontSize="$fontSize-blog-overview-featured-title" showAnchor="false">
-                {$props.latestPost.title}
-            </H2>
-            <Text variant="description" maxLines="4" ellipses>
-                {$props.latestPost.description}
-            </Text>
-            <HStack
-                when="{$props.showTags && $props.latestPost.tags && $props.latestPost.tags.length > 0}"
-                gap="$space-1_5"
-            >
-                <Items data="{$props.latestPost.tags}">
-                    <Tag>{$item}</Tag>
-                </Items>
-            </HStack>
-            <Text variant="blurb" maxLines="4" ellipses>
-                {globalThis.getBlurb(appGlobals.prefetchedContent['/blog/' + $props.latestPost.slug + '.md'])}
-            </Text>
-            <HStack horizontalAlignment="end" width="100%">
-                <Link to="/blog/{$props.latestPost.slug}">
-                    Read more →
-                </Link>
-            </HStack>
-        </VStack>
+    <VStack gap="$space-8" width="100%" paddingTop="$space-14">
+        <HStack gap="$space-4" width="100%">
+            <Card when="{$props.latestPost}" gap="$space-3" width="50%">
+                <VStack gap="$space-3" width="100%" height="100%">
+                    <Image
+                        src="{`/blog/images/demo/demo1.png`}"
+                        fit="cover"
+                        height="200px"
+                        width="*"
+                    />
+                    <VStack gap="$space-3" width="*" height="*">
+                        <Text variant="info">
+                            {$props.latestPost.author}
+                    •
+                    {formatDate($props.latestPost.date, "d MMM yyyy")}
+                        </Text>
+                        <H2
+                            variant="title"
+                            fontSize="$fontSize-blog-overview-featured-title"
+                            showAnchor="false"
+                        >
+                            {$props.latestPost.title}
+                        </H2>
+                        <Text variant="description" maxLines="4" ellipses>
+                            {$props.latestPost.description}
+                        </Text>
+                        <Text variant="blurb" maxLines="4" ellipses>
+                            {globalThis.getBlurb(appGlobals.prefetchedContent['/blog/' + $props.latestPost.slug + '.md'])}
+                        </Text>
+                        <SpaceFiller />
+                        <HStack horizontalAlignment="end" width="100%">
+                            <Link to="/blog/{$props.latestPost.slug}">
+                                Read more →
+                            </Link>
+                        </HStack>
+                    </VStack>
+                </VStack>
+            </Card>
+            <VStack gap="$space-4" width="50%" height="100%">
+                <Card when="{$props.latestPost}" gap="$space-3" width="*">
+                    <HStack gap="$space-7" width="100%">
+                        <Image
+                            src="{`/blog/images/demo/demo2.png`}"
+                            fit="cover"
+                            width="200px"
+                        />
+                        <VStack gap="$space-3" width="*" height="*">
+                            <Text variant="info">
+                                {$props.latestPost.author}
+                    •
+                    {formatDate($props.sortedPosts[1].date, "d MMM yyyy")}
+                            </Text>
+                            <H2
+                                variant="title"
+                                fontSize="$fontSize-blog-overview-featured-title"
+                                showAnchor="false"
+                            >
+                                {$props.sortedPosts[1].title}
+                            </H2>
+                            <Text variant="description" maxLines="4" ellipses>
+                                {$props.sortedPosts[1].description}
+                            </Text>
+                            <Text variant="blurb" maxLines="4" ellipses>
+                                {item.description}
+                            </Text>
+                            <HStack horizontalAlignment="end" width="100%">
+                                <Link to="/blog/{$props.sortedPosts[1].slug}">
+                                    Read more →
+                                </Link>
+                            </HStack>
+                        </VStack>
+                    </HStack>
+                </Card>
+                <Card when="{$props.latestPost}" gap="$space-3" width="*">
+                    <HStack gap="$space-7" width="100%">
+                        <Image
+                            src="{`/blog/images/demo/demo3.png`}"
+                            fit="cover"
+                            width="200px"
+                        />
+                        <VStack gap="$space-3" width="*">
+                            <Text variant="info">
+                                {$props.sortedPosts[2].author}
+                    •
+                    {formatDate($props.sortedPosts[2].date, "d MMM yyyy")}
+                            </Text>
+                            <H2
+                                variant="title"
+                                fontSize="$fontSize-blog-overview-featured-title"
+                                showAnchor="false"
+                            >
+                                {$props.sortedPosts[2].title}
+                            </H2>
+                            <Text variant="description" maxLines="4" ellipses>
+                                {$props.sortedPosts[2].description}
+                            </Text>
+                            <Text variant="blurb" maxLines="4" ellipses>
+                                {item.description}
+                            </Text>
+                            <HStack horizontalAlignment="end" width="100%">
+                                <Link to="/blog/{$props.sortedPosts[2].slug}">
+                                    Read more →
+                                </Link>
+                            </HStack>
+                        </VStack>
+                    </HStack>
+                </Card>
 
-        <VStack gap="$space-4" width="100%">
-            <H2 showAnchor="false" textAlign="center">All blog posts</H2>
-            <Tabs>
+            </VStack>
+        </HStack>
+        <VStack gap="$space-4" width="100%" padding="$space-14">
+            <H2 showAnchor="false" textAlign="center">
+                All blog posts
+            </H2>
+            <Tabs tabAlignment="center">
                 <TabItem label="All posts">
                     <FlowLayout
-                        gap="$space-0"
+                        marginTop="$space-4"
+                        gap="$space-4"
                         width="100%"
-                        borderLeft="$border-blog-grid-left"
                     >
                         <Items data="{$props.sortedPosts}">
-                            <VStack
+                            <Card
                                 width="{mediaSize.sizeIndex > 3 ? '33.3333%' : mediaSize.sizeIndex > 2 ? '50%' : '100%'}"
-                                minHeight="$minHeight-blog-featured-grid-card"
                                 gap="$space-3"
                                 padding="$space-5"
-                                borderTop="{$itemIndex < $props.gridCols ? $border-blog-grid-top : undefined}"
-                                borderRight="$border-blog-grid-right"
-                                borderBottom="$border-blog-grid-bottom"
+                                minHeight="$minHeight-blog-featured-grid-card"
                             >
                                 <Text variant="info">
                                     {$item.author}
                                     •
                                     {formatDate($item.date, "d MMM yyyy")}
                                 </Text>
-                                <H2 variant="title" fontSize="$fontSize-blog-overview-post-title" showAnchor="false">
+                                <H2
+                                    variant="title"
+                                    fontSize="$fontSize-blog-overview-post-title"
+                                    showAnchor="false"
+                                >
                                     {$item.title}
                                 </H2>
                                 <Text variant="blurb" maxLines="6" ellipses>
-                                    {globalThis.getBlurb(appGlobals.prefetchedContent['/blog/' + $item.slug + '.md'])}
+                                    {$item.description}
                                 </Text>
-                                <HStack horizontalAlignment="end" width="100%" marginTop="auto">
+                                <HStack
+                                    horizontalAlignment="end"
+                                    width="100%"
+                                    marginTop="auto"
+                                >
                                     <Link to="/blog/{$item.slug}">
                                         Read more →
                                     </Link>
                                 </HStack>
-                            </VStack>
+                            </Card>
                         </Items>
                     </FlowLayout>
                 </TabItem>
@@ -73,37 +159,44 @@
                 <Items when="{$props.showTags}" data="{$props.postsByTag}">
                     <TabItem label="{$item.tag}">
                         <FlowLayout
-                            gap="$space-0"
+                            marginTop="$space-4"
+                            gap="$space-4"
                             width="100%"
-                            borderLeft="$border-blog-grid-left"
                         >
                             <Items data="{$item.posts}">
-                                <VStack
+                                <Card
                                     width="{mediaSize.sizeIndex > 3 ? '33.3333%' : mediaSize.sizeIndex > 2 ? '50%' : '100%'}"
-                                    minHeight="$minHeight-blog-featured-grid-card"
                                     gap="$space-3"
                                     padding="$space-5"
-                                    borderTop="{$itemIndex < $props.gridCols ? $border-blog-grid-top : undefined}"
-                                    borderRight="$border-blog-grid-right"
-                                    borderBottom="$border-blog-grid-bottom"
+                                    minHeight="$minHeight-blog-featured-grid-card"
                                 >
                                     <Text variant="info">
                                         {$item.author}
                                         •
                                         {formatDate($item.date, "d MMM yyyy")}
                                     </Text>
-                                    <H2 variant="title" fontSize="$fontSize-blog-overview-post-title" showAnchor="false">
+                                    <H2
+                                        variant="title"
+                                        fontSize="$fontSize-blog-overview-post-title"
+                                        showAnchor="false"
+                                    >
                                         {$item.title}
                                     </H2>
                                     <Text variant="blurb" maxLines="6" ellipses>
-                                        {globalThis.getBlurb(appGlobals.prefetchedContent['/blog/' + $item.slug + '.md'])}
+                                        {$item.description}
                                     </Text>
-                                    <HStack horizontalAlignment="end" width="100%" marginTop="auto">
+                                    <HStack
+                                        horizontalAlignment="end"
+                                        width="100%"
+                                        marginTop="auto"
+                                    >
                                         <Link to="/blog/{$item.slug}">
                                             Read more →
-                                        </Link>
-                                    </HStack>
-                                </VStack>
+                                        </Link
+                                        >
+                                    </HStack
+                                    >
+                                </Card>
                             </Items>
                         </FlowLayout>
                     </TabItem>

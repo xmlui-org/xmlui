@@ -158,8 +158,8 @@ export const XmlUiBlogThemeDefinition: ThemeDefinition = {
     // --- Blog layout config
     //layout: "featuredWithTabs",
     layout: "basic",
-    tableOfContents: "true",
-    tags: "true",
+    tableOfContents: "false",
+    tags: "false",
 
     // --- App layout (match docs content width)
     "maxWidth-content-App": "800px",
