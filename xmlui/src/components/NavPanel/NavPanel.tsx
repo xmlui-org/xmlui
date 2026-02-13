@@ -125,7 +125,7 @@ function resolveNavSectionChildren(
   children.forEach((child, idx) => {
     if (!child || typeof child !== "object") return;
 
-    if (child.type === "NavSection") {
+    if (child.type === "IncludeNavSection") {
       const sectionId =
         extractValue.asOptionalString?.(child.props?.sectionId) ?? extractValue(child.props?.sectionId);
       const sectionData = sectionId && appNavSections ? appNavSections[sectionId] : undefined;

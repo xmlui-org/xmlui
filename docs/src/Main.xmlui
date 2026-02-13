@@ -342,8 +342,8 @@
         </NavGroup
         >
         <NavGroup label="Reference" to="/reference">
-            <NavSection sectionId="components" />
-            <NavSection sectionId="extensions" />
+            <IncludeNavSection sectionId="components" />
+            <IncludeNavSection sectionId="extensions" />
             <NavGroup icon="theme" label="Themes" to="/reference/themes">
                 <NavLink
                     label="Layout Properties"
