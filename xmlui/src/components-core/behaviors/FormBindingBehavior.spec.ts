@@ -834,6 +834,7 @@ test.describe("Validation", () => {
     `);
 
     const textbox = page.getByRole("textbox").first();
+    await expect(textbox).toBeVisible();
 
     // Type and clear to make dirty
     await textbox.fill("test");
