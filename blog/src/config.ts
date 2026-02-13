@@ -14,6 +14,7 @@ import json from "@shikijs/langs/json";
 import html from "@shikijs/langs/html";
 
 import { xmluiGrammar, xmluiThemeLight, xmluiThemeDark } from "xmlui/syntax/textmate";
+import { XmluiBlogAuraThemeDefinition } from "./themes/xmlui-blog-aura";
 
 import { unified } from "unified";
 import remarkParse from "remark-parse";
@@ -331,7 +332,8 @@ export const blogPosts = [
 
 const App: StandaloneAppDescription = {
   name: "XMLUI Blog",
-  defaultTheme: "xmlui-blog",
+  themes: [XmluiBlogAuraThemeDefinition],
+  defaultTheme: "xmlui-blog-aura",
   resources: {
     logo: "/resources/logo.svg",
     "logo-dark": "/resources/logo-dark.svg",
