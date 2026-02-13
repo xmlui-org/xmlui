@@ -43,6 +43,7 @@ import {
   prefixLines,
   xsConsoleLog,
   pushXsLog,
+  splicePreservingInteractions,
 } from "../inspector/inspectorUtils";
 
 // --- The properties of the AppContent component
@@ -607,6 +608,105 @@ export function AppContent({
       // Also capture the target element's own testId if it has one (different from ancestor)
       const targetTestId = target?.getAttribute?.("data-testid") || undefined;
 
+      // Capture ARIA role and accessible name for Playwright selector generation
+      let ariaRole: string | undefined;
+      let ariaName: string | undefined;
+      let ariaTarget = target; // may walk up to nearest ancestor with a role
+      if (target) {
+        // Explicit role attribute takes precedence
+        ariaRole = target.getAttribute?.("role") || undefined;
+        // Infer implicit ARIA role from HTML tag
+        if (!ariaRole) {
+          const tag = target.tagName?.toLowerCase();
+          if (tag === "button") ariaRole = "button";
+          else if (tag === "a" && target.hasAttribute?.("href")) ariaRole = "link";
+          else if (tag === "input") {
+            const type = (target as HTMLInputElement).type;
+            if (type === "checkbox") ariaRole = "checkbox";
+            else if (type === "radio") ariaRole = "radio";
+            else ariaRole = "textbox";
+          }
+          else if (tag === "select") ariaRole = "combobox";
+          else if (tag === "textarea") ariaRole = "textbox";
+        }
+        // If no role found on target (e.g. click landed on svg/use inside a
+        // menuitem, or div inside a table row), walk up to the nearest
+        // ancestor with an explicit or implicit role
+        if (!ariaRole) {
+          let el = target.parentElement;
+          for (let i = 0; i < 10 && el; i++) {
+            // Check explicit role attribute first
+            const parentRole = el.getAttribute?.("role");
+            if (parentRole) {
+              ariaRole = parentRole;
+              ariaTarget = el;
+              break;
+            }
+            // Check implicit role from HTML tag
+            const parentTag = el.tagName?.toLowerCase();
+            if (parentTag === "tr") { ariaRole = "row"; ariaTarget = el; break; }
+            if (parentTag === "button") { ariaRole = "button"; ariaTarget = el; break; }
+            if (parentTag === "a" && el.hasAttribute?.("href")) { ariaRole = "link"; ariaTarget = el; break; }
+            el = el.parentElement;
+          }
+        }
+        // Accessible name: aria-label > aria-labelledby > associated label > text content
+        ariaName = ariaTarget.getAttribute?.("aria-label") || undefined;
+        if (!ariaName && ariaTarget.getAttribute?.("aria-labelledby")) {
+          const labelEl = document.getElementById(ariaTarget.getAttribute("aria-labelledby")!);
+          ariaName = labelEl?.textContent?.trim() || undefined;
+        }
+        // For form inputs, resolve from the associated <label> element.
+        // HTMLInputElement.labels uses the for/id association, which works
+        // because ItemWithLabel passes the same inputId to both <label htmlFor>
+        // and cloneElement(child, { id: inputId }).
+        if (!ariaName && (ariaRole === "textbox" || ariaRole === "checkbox" ||
+            ariaRole === "radio" || ariaRole === "combobox")) {
+          const labels = (target as HTMLInputElement).labels;
+          if (labels && labels.length > 0) {
+            // Strip trailing markers like "*" (required) or "(Optional)"
+            let labelText = labels[0].textContent?.trim();
+            if (labelText) {
+              labelText = labelText.replace(/\s*\*$/, "").replace(/\s*\(Optional\)$/, "").trim();
+            }
+            ariaName = labelText || undefined;
+          }
+          if (!ariaName) {
+            // Fallback: walk up DOM to find nearest <label> in the component tree
+            let el = target.parentElement;
+            for (let i = 0; i < 10 && el && !ariaName; i++) {
+              const label = el.querySelector("label");
+              if (label) {
+                let labelText = label.textContent?.trim();
+                if (labelText) {
+                  labelText = labelText.replace(/\s*\*$/, "").replace(/\s*\(Optional\)$/, "").trim();
+                }
+                ariaName = labelText || undefined;
+              }
+              el = el.parentElement;
+            }
+          }
+        }
+        if (!ariaName && (ariaRole === "button" || ariaRole === "link" || ariaRole === "menuitem")) {
+          const btnText = ariaTarget.textContent?.trim();
+          if (btnText && btnText.length < 50) ariaName = btnText;
+        }
+        // For table rows, derive accessible name from the row content.
+        // Prefer the nearest-component text if short (user clicked a specific cell),
+        // otherwise use the first cell's text (the name column).
+        if (!ariaName && ariaRole === "row") {
+          if (text && text.length < 50) {
+            ariaName = text;
+          } else {
+            const firstCell = ariaTarget.querySelector?.("td");
+            const cellText = firstCell?.textContent?.trim();
+            if (cellText && cellText.length < 50) {
+              ariaName = cellText;
+            }
+          }
+        }
+      }
+
       const detail: Record<string, any> = {
         componentId,
         inspectId,
@@ -615,6 +715,8 @@ export function AppContent({
         testIdsInPath: testIdsInPath.length > 1 ? testIdsInPath : undefined,
         selectorPath,
         text,
+        ariaRole,
+        ariaName,
       };
       if (event instanceof MouseEvent) {
         detail.button = event.button;
@@ -698,11 +800,13 @@ export function AppContent({
         componentType,
         componentLabel,
         interaction: event.type,
+        ariaRole: detail.ariaRole,
+        ariaName: detail.ariaName,
         detail,
         text: safeStringify(detail),
       });
       if (Number.isFinite(xsLogMax) && xsLogMax > 0 && w._xsLogs.length > xsLogMax) {
-        w._xsLogs.splice(0, w._xsLogs.length - xsLogMax);
+        splicePreservingInteractions(w._xsLogs, xsLogMax);
       }
     };
 
@@ -827,7 +931,24 @@ export function AppContent({
 
 // --- We pass this funtion to the global app context
 function signError(error: Error | string) {
-  toast.error(typeof error === "string" ? error : error.message || "Something went wrong");
+  const message = typeof error === "string" ? error : error.message || "Something went wrong";
+  toast.error(message);
+  // Always log to console so Playwright page.on('console') can capture it
+  console.error("[xmlui]", message);
+  // Also log to _xsLogs when xsVerbose is active (same guard as ErrorBoundary).
+  if (typeof window !== "undefined") {
+    const w = window as any;
+    if (Array.isArray(w._xsLogs)) {
+      w._xsLogs.push({
+        ts: Date.now(),
+        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+        traceId: w._xsCurrentTrace,
+        kind: "error:runtime",
+        error: message,
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+    }
+  }
 }
 
 /**
