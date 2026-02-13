@@ -663,12 +663,19 @@ export function AppContent({
           const btnText = ariaTarget.textContent?.trim();
           if (btnText && btnText.length < 50) ariaName = btnText;
         }
-        // For table rows, use the original click target's text as the
-        // accessible name (the row's full textContent is too long).
-        // Only when the text is short enough to be a meaningful identifier
-        // (long text means the click landed on a container, not a specific item)
-        if (!ariaName && ariaRole === "row" && text && text.length < 50) {
-          ariaName = text;
+        // For table rows, derive accessible name from the row content.
+        // Prefer the nearest-component text if short (user clicked a specific cell),
+        // otherwise use the first cell's text (the name column).
+        if (!ariaName && ariaRole === "row") {
+          if (text && text.length < 50) {
+            ariaName = text;
+          } else {
+            const firstCell = ariaTarget.querySelector?.("td");
+            const cellText = firstCell?.textContent?.trim();
+            if (cellText && cellText.length < 50) {
+              ariaName = cellText;
+            }
+          }
         }
       }
 
@@ -765,6 +772,8 @@ export function AppContent({
         componentType,
         componentLabel,
         interaction: event.type,
+        ariaRole: detail.ariaRole,
+        ariaName: detail.ariaName,
         detail,
         text: safeStringify(detail),
       });
