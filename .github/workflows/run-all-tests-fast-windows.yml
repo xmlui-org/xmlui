@@ -1,0 +1,49 @@
+name: All Tests (Fast) - Windows
+
+concurrency: # Concurrency ensures that only a single job or workflow using the same concurrency group will run at a time.
+  group: component-e2e-testing-fast-windows
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    timeout-minutes: 90
+    runs-on: windows-latest
+    env:
+      NODE_OPTIONS: "--max-old-space-size=8192"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+      - name: Install node dependencies
+        run: npm ci --prefer-offline
+      - name: Cache for Turbo
+        uses: rharkor/caching-for-turbo@v2.3.1
+      - name: Store Playwright's Version
+        run: |
+          $PLAYWRIGHT_VERSION = npm ls @playwright/test | Select-String "@playwright" | ForEach-Object { $_ -replace ".*@", "" } | Sort-Object | Select-Object -First 1
+          echo "Playwright's Version: $PLAYWRIGHT_VERSION"
+          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $env:GITHUB_ENV
+        shell: pwsh
+      - name: Cache Playwright Browsers for Playwright's Version
+        id: cache-playwright-browsers
+        uses: actions/cache@v4
+        with:
+          path: ~\AppData\Local\ms-playwright
+          key: playwright-browsers-${{ env.PLAYWRIGHT_VERSION }}
+      - name: Install Playwright Browsers
+        if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
+      - name: ensure we can build xmlui and the extensions
+        run: npm run build-xmlui
+      - name: run all tests
+        run: npm run test
+      - uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-windows
+          path: xmlui/playwright-report/
+          retention-days: 30

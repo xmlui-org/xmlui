@@ -36,11 +36,23 @@
         >
             <Search data="{appGlobals.plainTextContent}" />
         </Stack>
-
         <Fragment when="{mediaSize.sizeIndex <= 2}">
-            <NavLink noIndicator label="Demo" to="https://demo.xmlui.org" />
-            <NavLink noIndicator label="Docs" to="/" active />
-            <NavLink noIndicator label="Blog" to="https://blog.xmlui.org" />
+            <NavLink
+                noIndicator
+                label="Demo"
+                to="https://demo.xmlui.org"
+            />
+            <NavLink
+                noIndicator
+                label="Docs"
+                to="/"
+                active
+            />
+            <NavLink
+                noIndicator
+                label="Blog"
+                to="https://blog.xmlui.org"
+            />
             <NavLink
                 to="https://xmlui.org/news"
                 label="News & Reviews"
@@ -510,6 +522,7 @@
         <NavLink icon="mcp" label="Model Context Protocol" to="/mcp" />
         <NavLink icon="vscode-extension" label="VSCode extension" to="/vscode" />
         <NavLink icon="logs" label="Change Log" to="/change-log" />
+
     </NavPanel>
     <Pages fallbackPath="/404" defaultScrollRestoration="true">
         <Page url="/">
@@ -588,67 +601,89 @@
                 content="{appGlobals.content['pages/tutorial-12.md']}"
             />
         </Page>
-        <Page url="/guides">
-            <DocumentPageNoTOC
-                content="{appGlobals.content['pages/guides.md']}"
-            />
+        <Page url="/learn">
+            <Overview />
         </Page>
-        <Page url="/app-structure">
+        <Page url="/guides">
+            <Overview />
+        </Page>
+        <Page url="/tutorial">
+            <Overview />
+        </Page>
+        <Page url="/howto">
+            <Overview />
+        </Page>
+        <Page url="/reference">
+            <Overview />
+        </Page>
+        <Page url="/reference/components">
+            <Overview />
+        </Page>
+        <Page url="/reference/extensions">
+            <Overview />
+        </Page>
+        <Page url="/reference/themes">
+            <Overview />
+        </Page>
+        <Page url="/extensions/xmlui-animations">
+            <Overview />
+        </Page>
+        <Page url="/guides/app-structure">
             <DocumentPageNoTOC
                 content="{appGlobals.content['pages/app-structure.md']}"
             />
         </Page>
-        <Page url="/markup">
+        <Page url="/guides/markup">
             <DocumentPage content="{appGlobals.content['pages/markup.md']}" />
         </Page>
-        <Page url="/scoping">
+        <Page url="/guides/scoping">
             <DocumentPage content="{appGlobals.content['pages/scoping.md']}" />
         </Page>
-        <Page url="/scripting">
+        <Page url="/guides/scripting">
             <DocumentPage content="{appGlobals.content['pages/scripting.md']}" />
         </Page>
-        <Page url="/layout">
+        <Page url="/guides/layout">
             <DocumentPage content="{appGlobals.content['pages/layout.md']}" />
         </Page>
-        <Page url="/working-with-text">
+        <Page url="/guides/working-with-text">
             <DocumentPage
                 content="{appGlobals.content['pages/working-with-text.md']}"
             />
         </Page>
-        <Page url="/playground-and-codefence">
+        <Page url="/guides/playground-and-codefence">
             <DocumentPage
                 maxHeadingLevel="2"
                 content="{appGlobals.content['pages/playground-and-codefence.md']}"
             />
         </Page>
 
-        <Page url="/working-with-markdown">
+        <Page url="/guides/working-with-markdown">
             <DocumentPage
                 content="{appGlobals.content['pages/working-with-markdown.md']}"
             />
         </Page>
-        <Page url="/routing-and-links">
+        <Page url="/guides/routing-and-links">
             <DocumentPage
                 content="{appGlobals.content['pages/routing-and-links.md']}"
             />
         </Page>
-        <Page url="/forms">
+        <Page url="/guides/forms">
             <DocumentPage content="{appGlobals.content['pages/forms.md']}" />
         </Page>
         <Page url="/resources">
             <DocumentPage content="{appGlobals.content['pages/resources.md']}" />
         </Page>
-        <Page url="/modal-dialogs">
+        <Page url="/guides/modal-dialogs">
             <DocumentPageNoTOC
                 content="{appGlobals.content['pages/modal-dialogs.md']}"
             />
         </Page>
-        <Page url="/user-defined-components">
+        <Page url="/guides/user-defined-components">
             <DocumentPageNoTOC
                 content="{appGlobals.content['pages/user-defined-components.md']}"
             />
         </Page>
-        <Page url="/refactoring">
+        <Page url="/guides/refactoring">
             <DocumentPageNoTOC
                 content="{appGlobals.content['pages/refactoring.md']}"
             />
@@ -717,7 +752,7 @@
                 content="{appGlobals.content['pages/glossary.md']}"
             />
         </Page>
-        <Page url="/build-hello-world-component">
+        <Page url="/guides/build-hello-world-component">
             <DocumentPage
                 content="{appGlobals.content['pages/build-hello-world-component.md']}"
             />
@@ -910,7 +945,7 @@
         </Page>
 
         <!-- Add more pages as additional files are created -->
-        <Page url="/hosted-deployment">
+        <Page url="/guides/hosted-deployment">
             <DocumentPage
                 content="{appGlobals.content['pages/hosted-deployment.md']}"
             />
@@ -946,6 +981,7 @@
             <PageNotFound />
         </Page>
     </Pages>
+    <ScrollToTop marginBottom="$space-4" />
     <Footer sticky="false">
         <Text fontWeight="400">
             This site is an

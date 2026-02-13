@@ -117,21 +117,18 @@ test("custom size with pixels applies correct dimensions", async ({
   page,
 }) => {
   await initTestBed(`<Avatar name="JD" size="60px" testId="custom-avatar"/>`, {});
-  
+
   const { width, height } = await getBounds(page.getByTestId("custom-avatar"));
-  
+
   expect(width).toBeCloseTo(60, 1);
   expect(height).toBeCloseTo(60, 1);
 });
 
-test("custom size with rem applies correct dimensions", async ({
-  initTestBed,
-  page,
-}) => {
+test("custom size with rem applies correct dimensions", async ({ initTestBed, page }) => {
   await initTestBed(`<Avatar name="AB" size="5rem" testId="custom-avatar"/>`, {});
-  
+
   const { width, height } = await getBounds(page.getByTestId("custom-avatar"));
-  
+
   // 5rem = 80px (assuming 16px base font size)
   expect(width).toBeCloseTo(80, 1);
   expect(height).toBeCloseTo(80, 1);
@@ -143,36 +140,28 @@ test("custom size calculates font size at ~33% of width", async ({
 }) => {
   await initTestBed(`<Avatar name="TS" size="60px"/>`, {});
   const driver = await createAvatarDriver();
-  
+
   // 60px * 0.33 = 19.8px
-  const fontSize = await driver.component.evaluate((el) => 
-    window.getComputedStyle(el).fontSize
-  );
+  const fontSize = await driver.component.evaluate((el) => window.getComputedStyle(el).fontSize);
   const fontSizeNum = parseFloat(fontSize);
-  
+
   expect(fontSizeNum).toBeCloseTo(19.8, 1);
 });
 
-test("custom size maintains aspect ratio", async ({
-  initTestBed,
-  page,
-}) => {
+test("custom size maintains aspect ratio", async ({ initTestBed, page }) => {
   await initTestBed(`<Avatar name="JS" size="75px" testId="custom-avatar"/>`, {});
-  
+
   const { width, height } = await getBounds(page.getByTestId("custom-avatar"));
-  
+
   expect(width).toBeCloseTo(height, 1);
 });
 
-test("custom size with url property applies to image", async ({
-  initTestBed,
-  page,
-}) => {
+test("custom size with url property applies to image", async ({ initTestBed, page }) => {
   const TEST_URL = "https://example.com/avatar.jpg";
   await initTestBed(`<Avatar url="${TEST_URL}" size="100px" testId="custom-avatar"/>`, {});
-  
+
   const { width, height } = await getBounds(page.getByTestId("custom-avatar"));
-  
+
   expect(width).toBeCloseTo(100, 1);
   expect(height).toBeCloseTo(100, 1);
 });
@@ -866,7 +855,7 @@ test("avatar handles rapid prop changes efficiently", async ({
   await expect(driver2.component).toBeVisible();
   await expect(driver2.component).toContainText("UO");
   // md size is 4em, actual pixel value depends on context
-  const mdWidth = await driver2.component.evaluate(el => el.getBoundingClientRect().width);
+  const mdWidth = await driver2.component.evaluate((el) => el.getBoundingClientRect().width);
   expect(mdWidth).toBeGreaterThan(50); // Verify it's reasonably sized
 
   // Change name while keeping size
@@ -1054,7 +1043,7 @@ test("avatar handles concurrent prop updates correctly", async ({
   await expect(driver2.component).toBeVisible();
   await expect(driver2.component).toContainText("UU");
   // md size is 4em, actual pixel value depends on context
-  const mdWidth = await driver2.component.evaluate(el => el.getBoundingClientRect().width);
+  const mdWidth = await driver2.component.evaluate((el) => el.getBoundingClientRect().width);
   expect(mdWidth).toBeGreaterThan(50); // Verify it's reasonably sized
 
   // Change to image avatar

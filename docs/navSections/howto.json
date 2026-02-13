@@ -1,0 +1,177 @@
+{
+  "items": [
+    {
+      "label": "How To",
+      "to": "/howto",
+      "description": "Quick recipes for common XMLUI tasks.",
+      "children": [
+        {
+          "to": "/howto/expose-a-method-from-a-component",
+          "label": "Expose a method from a component",
+          "icon": "article",
+          "iconAlignment": "baseline"
+        },
+        {
+          "to": "/howto/delegate-a-method",
+          "label": "Delegate a method",
+          "icon": "article",
+          "iconAlignment": "baseline"
+        },
+        {
+          "to": "/howto/react-to-button-click-not-keystrokes",
+          "label": "React to button click not keystrokes",
+          "icon": "article",
+          "iconAlignment": "baseline"
+        },
+        { "to": "/howto/buffer-a-reactive-edit", "label": "Buffer a reactive edit", "icon": "article" },
+        {
+          "to": "/howto/modify-a-value-reported-in-a-column",
+          "label": "Modify a value reported in a Column",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/filter-and-transform-data-from-an-api",
+          "label": "Filter and transform data from an API",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/group-items-in-list-by-a-property",
+          "label": "Group items in List by a property",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/delay-a-datasource-until-another-datasource-is-ready",
+          "label": "Delay a DataSource until another DataSource is ready",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/hide-an-element-until-its-datasource-is-ready",
+          "label": "Hide an element until its DataSource is ready",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/use-built-in-form-validation",
+          "label": "Use built-in form validation",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/do-custom-form-validation",
+          "label": "Do custom form validation",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/assign-a-complex-json-literal-to-a-component-variable",
+          "label": "Assign a complex JSON literal to a component variable",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/use-accessors-to-simplify-complex-expressions",
+          "label": "Use accessors to simplify complex expressions",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/make-a-set-of-equal-width-cards",
+          "label": "Make a set of equal-width cards",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/set-the-initial-value-of-a-select-from-fetched-data",
+          "label": "Set the initial value of a Select from fetched data",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/pass-data-to-a-modal-dialog",
+          "label": "Pass data to a Modal Dialog",
+          "icon": "article"
+        },
+        { "to": "/howto/debug-a-component", "label": "Debug a component", "icon": "article" },
+        {
+          "to": "/howto/share-a-modaldialog-across-components",
+          "label": "Share a ModalDialog across components",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/use-the-same-modaldialog-to-add-or-edit",
+          "label": "Use the same ModalDialog to add or edit",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/validate-dependent-form-fields",
+          "label": "Validate dependent form fields",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/chain-a-refetch",
+          "label": "Chain a DataSource refetch from an APICall.execute",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/control-cache-invalidation",
+          "label": "Control cache invalidation",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/handle-background-operations",
+          "label": "Handle background operations",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/make-a-table-responsive",
+          "label": "Make a table responsive",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/update-ui-optimistically",
+          "label": "Update UI optimistically",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/sync-selections-between-table-and-list-views",
+          "label": "Sync selections between table and list views",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/make-navpanel-width-responsive",
+          "label": "Make NavPanel width responsive",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/debounce-user-input-for-api-calls",
+          "label": "Debounce user input for API calls",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/debounce-with-changelistener",
+          "label": "Debounce with ChangeListener",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/use-modal-dialog-onclose",
+          "label": "Use ModalDialog's onClose() method",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/copy-billing-to-shipping",
+          "label": "Copy billing data to shipping",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/implement-an-authentication-gate",
+          "label": "Implement an authentication gate",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/set-width-for-input-fields-in-a-horizontal-layout",
+          "label": "Set the Width of an Input Field in an HStack",
+          "icon": "article"
+        },
+        {
+          "to": "/howto/stop-datasource-from-sending-requests-in-a-closed-dialog",
+          "label": "Stop DataSource from sending requests in a closed Dialog",
+          "icon": "article"
+        },
+        { "to": "/howto/add-custom-icons", "label": "Add custom icons", "icon": "article" }
+      ]
+    }
+  ]
+}

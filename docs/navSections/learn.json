@@ -1,0 +1,16 @@
+{
+  "items": [
+    {
+      "label": "Learn XMLUI",
+      "to": "/learn",
+      "description": "Start here to understand XMLUI fundamentals.",
+      "initiallyExpanded": true,
+      "children": [
+        { "to": "/", "label": "Introduction", "icon": "school" },
+        { "to": "/reactive-intro", "label": "Reactive Data", "icon": "arrow-shuffle" },
+        { "to": "/components-intro", "label": "Components", "icon": "component" },
+        { "to": "/themes-intro", "label": "Themes", "icon": "theme" }
+      ]
+    }
+  ]
+}
