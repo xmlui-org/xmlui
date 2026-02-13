@@ -118,20 +118,8 @@
             <BlogOverview posts="{posts}" />
         </Page>
 
-        <Page url="/blog/supabase-and-xmlui">
-            <BlogPage post="{posts[4]}" />
-        </Page>
-        <Page url="/blog/introducing-the-xmlui-cli">
-            <BlogPage post="{posts[3]}" />
-        </Page>
-        <Page url="/blog/xmlui-powered-blog">
-            <BlogPage post="{posts[2]}" />
-        </Page>
-        <Page url="/blog/xmlui-playground">
-            <BlogPage post="{posts[1]}" />
-        </Page>
-        <Page url="/blog/introducing-xmlui">
-            <BlogPage post="{posts[0]}" />
+        <Page url="/blog/:slug">
+            <BlogPage post="{posts.find(p => p.slug === $routeParams.slug)}" />
         </Page>
 
     </Pages>
