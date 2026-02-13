@@ -1,11 +1,7 @@
 import type { StandaloneAppDescription } from "xmlui";
 import { createHighlighterCoreSync, type DecorationItem } from "shiki";
 import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
-import learnSection from "../navSections/learn.json";
-import guidesSection from "../navSections/guides.json";
-import tutorialSection from "../navSections/tutorial.json";
-import howtoSection from "../navSections/howto.json";
-import referenceSection from "../navSections/reference.json";
+import componentsSection from "../navSections/components.json";
 // @ts-ignore
 import js from "@shikijs/langs/javascript";
 // @ts-ignore
@@ -323,11 +319,7 @@ const App: StandaloneAppDescription = {
     showHeadingAnchors: true,
     searchIndexEnabled: true,
     navSections: {
-      learn: learnSection,
-      guides: guidesSection,
-      tutorial: tutorialSection,
-      howto: howtoSection,
-      reference: referenceSection,
+      components: componentsSection,
     },
     navPanelContent: groupedNavPanelContent,
     content,
