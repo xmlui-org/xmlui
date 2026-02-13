@@ -78,6 +78,7 @@ test("pressing enter on header expands content", async ({ initTestBed, page }) =
   const content = page.getByText("Content");
 
   await expect(content).not.toBeVisible();
+  await expect(header).toBeVisible(); 
   await header.focus();
   await expect(header).toBeFocused();
   await page.keyboard.press("Enter");

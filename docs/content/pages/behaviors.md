@@ -107,7 +107,37 @@ The string form of `animationOptions` is composed of names or name and value pai
 
 ## Label
 
-*TBD*
+You can add a label to components using the label property. Though labels are primarily used for input components, with the label property, you can add labels to any visual component.
+
+**Trigger Properties**
+
+| Name | Description |
+|---|---|
+| `label` | The text to display as the label for the component |
+
+**Additional Properties**
+
+| Name | Description |
+|---|---|
+| `enabled` | Whether the component should indicate that it is enabled |
+| `labelBreak` | Whether the label should break onto a new line |
+| `labelPosition` | The position of the label relative to the input component ("top", "start", "end", or "bottom") |
+| `labelWidth` | The width of the label |
+| `required` | Whether the component should indicate that it is required |
+| `shrinkToLabel` | Whether the component should shrink to fit the label |
+| `readonly` | Whether the component should indicate that it is read-only |
+
+```xmlui-pg display copy name="Example: label"
+<App>
+  <Avatar name="My Avatar" label="An avatar" labelPosition="start" />
+  <Badge value="Primary" label="Use this badge:" required />
+  <Icon name="home" 
+    label="Welcome home!" 
+    labelPosition="end"
+    width="fit-content"
+  />
+</App>
+```
 
 ## Tooltip
 
@@ -185,4 +215,38 @@ The string form of `tooltipOptions` is composed of names or name and value pairs
 
 ## Variant
 
-*TBD*
+This behavior applies custom variant styling to components with a `variant` property. The value of this property names a set of theme variables that you can use to override the default theme of the component.
+
+**Trigger Properties**
+
+| Name | Description |
+|---|---|
+| `variant` | The variant value to apply |
+
+You can declare your variant-bound theme variables following this naming convention:
+
+`<propertyName>-<part-or-aspect>-<ComponentId>-<variantName>--<state>`
+
+XMLUI will apply theme variables where the `variantName` section is replaced with the value of the `variant` property assigned to your component. The following example defines a few custom variants for `Card`:
+
+```xmlui-pg display copy {3-6,8-10} name="Example: Card variants"
+<App>
+  <Theme 
+    backgroundColor-Card-fancy="lightyellow"
+    backgroundColor-Card-fancy--hover="orange"
+    border-Card-fancy="4px dotted purple"
+    borderRadius-Card-fancy="20px"
+
+    backgroundColor-Card-rigid="$color-surface-200"
+    border-Card-rigid="2px solid $color-primary"
+    borderRadius-Card-rigid="0"
+  >
+    <Card title="Default Card" />
+    <Card title="Fancy Card #1 (hover me!)" variant="fancy" />
+    <Card title="Fancy Card #2 (hover me!)" variant="fancy" />
+    <Card title="Rigid Card #1" variant="rigid" />
+    <Card title="Card with non-existing variant" variant="non-existing" />
+  </Theme>
+</App>
+```
+
