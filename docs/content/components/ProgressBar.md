@@ -8,11 +8,24 @@
 - **Extensive theming**: Customizable background color, indicator color, thickness, and border radius
 - **Responsive design**: Adapts to container width while maintaining consistent height
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `value` [#value]
 
--  default: **0**
+> [!DEF]  default: **0**
 
 This property defines the progress value with a number between 0 and 1.
 

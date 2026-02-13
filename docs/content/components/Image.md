@@ -2,6 +2,19 @@
 
 `Image` displays pictures from URLs or local sources with built-in responsive sizing, aspect ratio control, and accessibility features. It handles different image formats and provides options for lazy loading and click interactions.
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `alt` [#alt]
@@ -38,7 +51,7 @@ This property contains the binary data that represents the image.
 
 ### `fit` [#fit]
 
--  default: **"contain"**
+> [!DEF]  default: **"contain"**
 
 This property sets how the image content should be resized to fit its container.
 
@@ -64,19 +77,19 @@ This property sets how the image content should be resized to fit its container.
 
 ### `grayscale` [#grayscale]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 When set to true, the image will be displayed in grayscale.
 
 ### `inline` [#inline]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 When set to true, the image will be displayed as an inline element instead of a block element.
 
 ### `lazyLoad` [#lazyload]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Lazy loading instructs the browser to load the image only when it is imminently needed (e.g. user scrolls to it).
 

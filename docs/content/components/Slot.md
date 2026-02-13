@@ -128,6 +128,19 @@ The app passes a `header` property value to the `ActionBar` component. `Actionba
 `Actionbar` transforms the `header` property and stores it internally in the `transformedHeader` variable. It utilizes the value in the default header definition and also passes it back to the actual template definition with the `processedHeader` name. XMLUI creates the `$processedHeader` context variable from this name.
 ```
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `name` [#name]

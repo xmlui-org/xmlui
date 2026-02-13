@@ -62,7 +62,26 @@ export default ({ mode = "lib" }) => {
       lib = {
         entry: {
           "xmlui-metadata": path.resolve("src", "components", "collectedComponentMetadata.ts"),
-          "icons": path.resolve("src", "components", "icons-abstractions.ts"),
+          icons: path.resolve("src", "components", "icons-abstractions.ts"),
+          behaviors: path.resolve(
+            "src",
+            "components-core",
+            "behaviors",
+            "collectedBehaviorMetadata.ts",
+          ),
+          "behavior-evaluator": path.resolve(
+            "src",
+            "components-core",
+            "behaviors",
+            "behaviorConditionEvaluator.ts",
+          ),
+          "metadata-utils": path.resolve(
+            "src",
+            "language-server",
+            "services",
+            "common",
+            "metadata-utils.ts",
+          ),
         },
         name: "xmlui-metadata",
       };
@@ -91,7 +110,7 @@ export default ({ mode = "lib" }) => {
     mode === "metadata"
       ? [ViteXmlui({})]
       : mode === "inspector-parser"
-        ? [dts({ rollupTypes: true })]  // Minimal plugins for standalone parser
+        ? [dts({ rollupTypes: true })] // Minimal plugins for standalone parser
         : [react(), svgr(), ViteYaml(), ViteXmlui({}), libInjectCss(), dts({ rollupTypes: true })];
 
   if (mode === "lib") {
@@ -149,7 +168,7 @@ export default ({ mode = "lib" }) => {
         treeshake: mode === "metadata" ? "smallest" : undefined,
         external:
           mode === "standalone" || mode === "inspector-parser"
-            ? []  // Bundle everything for standalone builds
+            ? [] // Bundle everything for standalone builds
             : [...Object.keys(packageJson.dependencies), "react/jsx-runtime", "@playwright/test"],
         output: {
           globals: {

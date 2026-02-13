@@ -142,6 +142,11 @@ export const XmlUiDocsThemeDefinition: ThemeDefinition = {
     "backgroundColor-CodeBlock": "$color-surface-100",
     "textColor-Link": "$color-surface-600",
     "textColor-Link--hover": "$color-surface-900",
+
+    // --- Scroll to top
+    "backgroundColor-ScrollToTop": "$color-surface-100",
+    "border-ScrollToTop": "1px solid $color-surface-200",
+    "color-ScrollToTop": "$color-surface-900",
   },
 };
 

@@ -27,6 +27,9 @@ export interface NavHierarchyNode {
   /** Child navigation nodes nested under this node (only present for NavGroup types) */
   children?: NavHierarchyNode[];
 
+  /** Optional icon name associated with this navigation item */
+  icon?: string;
+
   /** Reference to the immediate parent node in the hierarchy (undefined for root-level nodes) */
   parent?: NavHierarchyNode;
 
@@ -66,6 +69,8 @@ export function buildNavHierarchy(
           extractValue.asOptionalString?.(child.props?.label) || extractValue(child.props?.label);
         const to =
           extractValue.asOptionalString?.(child.props?.to) || extractValue(child.props?.to);
+        const icon =
+          extractValue.asOptionalString?.(child.props?.icon) || extractValue(child.props?.icon);
 
         // Handle case where label might not be in props but in children as text
         let finalLabel = label;
@@ -79,6 +84,7 @@ export function buildNavHierarchy(
             type: "NavLink",
             label: finalLabel,
             to: to,
+            icon: typeof icon === "string" ? icon : undefined,
             parent: parent,
             pathSegments: [...pathSegments],
           };
@@ -89,6 +95,8 @@ export function buildNavHierarchy(
           extractValue.asOptionalString?.(child.props?.label) || extractValue(child.props?.label);
         const to =
           extractValue.asOptionalString?.(child.props?.to) || extractValue(child.props?.to);
+        const icon =
+          extractValue.asOptionalString?.(child.props?.icon) || extractValue(child.props?.icon);
 
         // NavGroups only need a label, no "to" value required
         if (label) {
@@ -96,6 +104,7 @@ export function buildNavHierarchy(
             type: "NavGroup",
             label: label,
             to: to,
+            icon: typeof icon === "string" ? icon : undefined,
             parent: parent,
             pathSegments: [...pathSegments],
             children: [],

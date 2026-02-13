@@ -39,17 +39,32 @@ In the following example, the two Checkbox are functionally the same:
 </App>
 ```
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Form Binding | `bindTo`, `initialValue`, `noSubmit` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Validation | `required`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `verboseValidationFeedback` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `autoFocus` [#autofocus]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -70,7 +85,7 @@ This boolean property value indicates whether the component responds to user eve
 
 ### `indeterminate` [#indeterminate]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 The `true` value of this property signals that the component is in an _intedeterminate state_.
 
@@ -101,7 +116,7 @@ Try this sample by clicking the bottom group of checkboxes.
 
 ### `initialValue` [#initialvalue]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property sets the component's initial value.
 
@@ -111,7 +126,7 @@ This property is used to define a custom checkbox input template
 
 ### `readOnly` [#readonly]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Set this property to `true` to disallow changing the component value.
 
@@ -124,13 +139,13 @@ Set this property to `true` to disallow changing the component value.
 
 ### `required` [#required]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
 ### `validationStatus` [#validationstatus]
 
--  default: **"none"**
+> [!DEF]  default: **"none"**
 
 This property allows you to set the validation status of the input component.
 

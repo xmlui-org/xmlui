@@ -43,6 +43,19 @@ The BarChart component accommodates the size of its parent unless you set it exp
 - **Stacked vs grouped**: Stack bars on top of each other or place them side by side
 - **Custom formatting**: Use `tickFormatter` to format axis labels and [`LabelList`](/components/LabelList) for data labels
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `data` [#data]
@@ -51,37 +64,37 @@ This property is used to provide the component with data to display.The data nee
 
 ### `hideTickX` [#hidetickx]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Controls the visibility of the X-axis ticks. If set to `true`, tick labels on the X-axis will be hidden.
 
 ### `hideTickY` [#hideticky]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Controls the visibility of the Y-axis ticks. If set to `true`, tick labels on the Y-axis will be hidden.
 
 ### `hideTooltip` [#hidetooltip]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Determines whether the tooltip should be hidden. If set to `true`, tooltips will not appear on hover.
 
 ### `hideX` [#hidex]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Determines whether the X-axis should be hidden. If set to `true`, the axis will not be rendered.
 
 ### `hideY` [#hidey]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Determines whether the Y-axis should be hidden. If set to `true`, the axis will not be rendered.
 
 ### `orientation` [#orientation]
 
--  default: **"vertical"**
+> [!DEF]  default: **"vertical"**
 
 This property determines the orientation of the bar chart. The `vertical` variant specifies the horizontal axis as the primary and lays out the bars from left to right. The `horizontal` variant specifies the vertical axis as the primary and has the bars spread from top to bottom.
 
@@ -89,13 +102,13 @@ Available values: `horizontal`, `vertical` **(default)**
 
 ### `showLegend` [#showlegend]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Determines whether the legend should be displayed.
 
 ### `stacked` [#stacked]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property determines how the bars are laid out.If set to `true`, bars with the same category will be stacked on top of each other rather than placed side by side.
 

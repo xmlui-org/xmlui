@@ -72,6 +72,19 @@ Alternatively, you can nest components into `Bookmark`:
 You can try; this example works like the previous one:
 ```
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `id` [#id]
@@ -80,13 +93,13 @@ The unique identifier of the bookmark. You can use this identifier in links to n
 
 ### `level` [#level]
 
--  default: **1**
+> [!DEF]  default: **1**
 
 The level of the bookmark. The level is used to determine the bookmark's position in the table of contents.
 
 ### `omitFromToc` [#omitfromtoc]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 If true, this bookmark will be excluded from the table of contents.
 

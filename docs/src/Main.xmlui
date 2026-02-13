@@ -78,11 +78,316 @@
                 label="Download"
             />
         </Fragment>
-        <NavSection sectionId="learn" />
-        <NavSection sectionId="guides" />
-        <NavSection sectionId="tutorial" />
-        <NavSection sectionId="howto" />
-        <NavSection sectionId="reference" />
+        <Stack
+            padding="0"
+            paddingTop="{mediaSize.sizeIndex <= 2 ? '$space-4' : '0'}"
+            gap="0"
+        >
+            <NavGroup initiallyExpanded="{true}" label="Learn XMLUI" to="/learn">
+                <NavLink icon="school" label="Introduction" to="/" />
+                <NavLink
+                    icon="arrow-shuffle"
+                    label="Reactive Data"
+                    to="/reactive-intro"
+                />
+                <NavLink
+                    icon="component"
+                    label="Components"
+                    to="/components-intro"
+                />
+                <NavLink icon="theme" label="Themes" to="/themes-intro" />
+            </NavGroup>
+        </Stack>
+        <NavGroup label="Guides" to="/guides">
+            <NavLink icon="hierarchy" label="App Structure" to="/guides/app-structure" />
+            <NavLink icon="markup" label="Markup" to="/guides/markup" />
+            <NavLink icon="bolt" label="Scripting" to="/guides/scripting" />
+            <NavLink icon="boundary" label="Scoping" to="/guides/scoping" />
+            <NavLink
+                icon="playground"
+                label="Codefences and playgrounds"
+                to="/guides/playground-and-codefence"
+            />
+            <NavLink icon="layout" label="Layout" to="/guides/layout" />
+            <NavLink
+                icon="typography"
+                label="Working with Text"
+                to="/guides/working-with-text"
+            />
+            <NavLink
+                icon="markdown"
+                label="Working with Markdown"
+                to="/guides/working-with-markdown"
+            />
+            <NavLink
+                icon="link"
+                label="Routing and Links"
+                to="/guides/routing-and-links"
+            />
+            <NavLink icon="form" label="Forms" to="/guides/forms" />
+            <NavLink icon="dialog" label="Modal Dialogs" to="/guides/modal-dialogs" />
+            <NavLink
+                icon="component"
+                label="User-defined Components"
+                to="/guides/user-defined-components"
+            />
+            <NavLink
+                icon="refactor"
+                label="Refactoring"
+                to="/guides/refactoring"
+            />
+            <NavLink
+                icon="build"
+                label="Build a HelloWorld Component"
+                to="/guides/build-hello-world-component"
+            />
+            <NavLink
+                icon="deploy"
+                label="Hosted Deployment"
+                to="/guides/hosted-deployment"
+            />
+        </NavGroup>
+        <NavGroup label="Tutorial" to="/tutorial">
+            <NavLink icon="invoice" label="XMLUI Invoice" to="/tutorial-01" />
+            <NavLink icon="file-code" label="Main.xmlui" to="/tutorial-02" />
+            <NavLink icon="menu" label="Navigation" to="/tutorial-03" />
+            <NavLink icon="cards" label="InfoCards" to="/tutorial-04" />
+            <NavLink icon="charts" label="Charts" to="/tutorial-05" />
+            <NavLink icon="slider" label="Slider" to="/tutorial-06" />
+            <NavLink icon="file-invoice" label="Invoices" to="/tutorial-07" />
+            <NavLink icon="create" label="Create Invoice" to="/tutorial-08" />
+            <NavLink icon="details" label="Invoice Details" to="/tutorial-09" />
+            <NavLink icon="search" label="Search" to="/tutorial-10" />
+            <NavLink icon="import" label="Import" to="/tutorial-11" />
+            <NavLink icon="settings" label="Settings" to="/tutorial-12" />
+        </NavGroup>
+        <NavGroup label="How To" to="/howto">
+            <NavLink
+                icon="article"
+                iconAlignment="baseline"
+                label="Expose a method from a component"
+                to="/howto/expose-a-method-from-a-component"
+            />
+            <NavLink
+                icon="article"
+                iconAlignment="baseline"
+                label="Delegate a method"
+                to="/howto/delegate-a-method"
+            />
+            <NavLink
+                icon="article"
+                iconAlignment="baseline"
+                label="React to button click not keystrokes"
+                to="/howto/react-to-button-click-not-keystrokes"
+            />
+            <NavLink
+                icon="article"
+                label="Buffer a reactive edit"
+                to="/howto/buffer-a-reactive-edit"
+            />
+            <NavLink
+                icon="article"
+                label="Modify a value reported in a Column"
+                to="/howto/modify-a-value-reported-in-a-column"
+            />
+            <NavLink
+                icon="article"
+                label="Filter and transform data from an API"
+                to="/howto/filter-and-transform-data-from-an-api"
+            />
+            <NavLink
+                icon="article"
+                label="Group items in List by a property"
+                to="/howto/group-items-in-list-by-a-property"
+            />
+            <NavLink
+                icon="article"
+                label="Delay a DataSource until another DataSource is ready"
+                to="/howto/delay-a-datasource-until-another-datasource-is-ready"
+            />
+            <NavLink
+                icon="article"
+                label="Hide an element until its DataSource is ready"
+                to="/howto/hide-an-element-until-its-datasource-is-ready"
+            />
+            <NavLink
+                icon="article"
+                label="Use built-in form validation"
+                to="/howto/use-built-in-form-validation"
+            />
+            <NavLink
+                icon="article"
+                label="Do custom form validation"
+                to="/howto/do-custom-form-validation"
+            />
+            <NavLink
+                icon="article"
+                label="Assign a complex JSON literal to a component variable"
+                to="/howto/assign-a-complex-json-literal-to-a-component-variable"
+            />
+            <NavLink
+                icon="article"
+                label="Use accessors to simplify complex expressions"
+                to="/howto/use-accessors-to-simplify-complex-expressions"
+            />
+            <NavLink
+                icon="article"
+                label="Make a set of equal-width cards"
+                to="/howto/make-a-set-of-equal-width-cards"
+            />
+            <NavLink
+                icon="article"
+                label="Set the initial value of a Select from fetched data"
+                to="/howto/set-the-initial-value-of-a-select-from-fetched-data"
+            />
+            <NavLink
+                icon="article"
+                label="Pass data to a Modal Dialog"
+                to="/howto/pass-data-to-a-modal-dialog"
+            />
+            <NavLink
+                icon="article"
+                label="Debug a component"
+                to="/howto/debug-a-component"
+            />
+            <NavLink
+                icon="article"
+                label="Share a ModalDialog across components"
+                to="/howto/share-a-modaldialog-across-components"
+            />
+            <NavLink
+                icon="article"
+                label="Use the same ModalDialog to add or edit"
+                to="/howto/use-the-same-modaldialog-to-add-or-edit"
+            />
+            <NavLink
+                icon="article"
+                label="Chain a DataSource refetch from an APICall.execute"
+                to="/howto/chain-a-refetch"
+            />
+            <NavLink
+                icon="article"
+                label="Control cache invalidation"
+                to="/howto/control-cache-invalidation"
+            />
+            <NavLink
+                icon="article"
+                label="Handle background operations"
+                to="/howto/handle-background-operations"
+            />
+            <!--
+                <NavLink label="Update UI optimistically" to="/howto/update-ui-optimistically" />
+                -->
+            <NavLink
+                icon="article"
+                label="Make a table responsive"
+                to="/howto/make-a-table-responsive"
+            />
+            <NavLink
+                icon="article"
+                label="Update UI optimistically"
+                to="/howto/update-ui-optimistically"
+            />
+            <NavLink
+                icon="article"
+                label="Sync selections between table and list views"
+                to="/howto/sync-selections-between-table-and-list-views"
+            />
+            <NavLink
+                icon="article"
+                label="Make NavPanel width responsive"
+                to="/howto/make-navpanel-width-responsive"
+            />
+            <NavLink
+                icon="article"
+                label="Debounce user input for API calls"
+                to="/howto/debounce-user-input-for-api-calls"
+            />
+            <NavLink
+                icon="article"
+                label="Debounce with ChangeListener"
+                to="/howto/debounce-with-changelistener"
+            />
+            <NavLink
+                icon="article"
+                label="Use ModalDialog's onClose() method"
+                to="/howto/use-modal-dialog-onclose"
+            />
+            <NavLink
+                icon="article"
+                label="Copy billing data to shipping"
+                to="/howto/copy-billing-to-shipping"
+            />
+            <NavLink
+                icon="article"
+                label="Implement an authentication gate"
+                to="/howto/implement-an-authentication-gate"
+            />
+            <NavLink
+                icon="article"
+                label="Set the Width of an Input Field in an HStack"
+                to="/howto/set-width-for-input-fields-in-a-horizontal-layout"
+            />
+            <NavLink
+                icon="article"
+                label="Stop DataSource from sending requests in a closed Dialog"
+                to="/howto/stop-datasource-from-sending-requests-in-a-closed-dialog"
+            />
+            <NavLink
+                icon="article"
+                label="Add custom icons"
+                to="/howto/add-custom-icons"
+            />
+            <!-- Add more links as additional files are created -->
+        </NavGroup
+        >
+        <NavGroup label="Reference" to="/reference">
+            <IncludeNavSection sectionId="components" />
+            <IncludeNavSection sectionId="extensions" />
+            <NavGroup icon="theme" label="Themes" to="/reference/themes">
+                <NavLink
+                    label="Layout Properties"
+                    to="/styles-and-themes/layout-props"
+                />
+                <NavLink
+                    label="Theme Variables"
+                    to="/styles-and-themes/theme-variables"
+                />
+                <NavLink
+                    label="Theme Variable Defaults"
+                    to="/styles-and-themes/theme-variable-defaults"
+                />
+                <NavLink
+                    label="Common Units"
+                    to="/styles-and-themes/common-units"
+                />
+            </NavGroup>
+            <NavLink
+                icon="behavior"
+                label="Behaviors"
+                to="/behaviors"
+            />
+            <NavLink
+                icon="context"
+                label="Context Variables"
+                to="/context-variables"
+            />
+            <NavLink icon="globals" label="Globals" to="/globals" />
+            <NavLink icon="helper-tags" label="Helper Tags" to="/helper-tags" />
+            <NavLink
+                icon="universal-props"
+                label="Universal Properties"
+                to="/universal-properties"
+            />
+            <NavLink
+                icon="template-props"
+                label="Template Properties"
+                to="/template-properties"
+            />
+            <NavLink icon="palette" label="Palettes" to="/palettes" />
+            <NavLink icon="icons" label="Icons" to="/icons" />
+            <NavLink icon="glossary" label="Glossary" to="/glossary" />
+        </NavGroup>
         <NavLink icon="mcp" label="Model Context Protocol" to="/mcp" />
         <NavLink icon="vscode-extension" label="VSCode extension" to="/vscode" />
         <NavLink icon="logs" label="Change Log" to="/change-log" />
@@ -181,14 +486,19 @@
             <Overview />
         </Page>
         <Page url="/reference/components">
-            <DocumentPageNoTOC
-                content="{appGlobals.content['pages/reference-components.md']}"
-            />
+            <Overview />
         </Page>
         <Page url="/reference/extensions">
-            <DocumentPageNoTOC
-                content="{appGlobals.content['pages/reference-extensions.md']}"
-            />
+            <Overview />
+        </Page>
+        <Page url="/extensions/xmlui-animations/_overview">
+            <Overview />
+        </Page>
+        <Page url="/reference/themes">
+            <Overview />
+        </Page>
+        <Page url="/extensions/xmlui-animations">
+            <Overview />
         </Page>
         <Page url="/guides/app-structure">
             <DocumentPageNoTOC
@@ -278,6 +588,11 @@
         <Page url="/context-variables2">
             <DocumentPage
                 content="{appGlobals.content['pages/context-variables2.md']}"
+            />
+        </Page>
+        <Page url="/behaviors">
+            <DocumentPage
+                content="{appGlobals.content['pages/behaviors.md']}"
             />
         </Page>
         <Page url="/globals">
@@ -490,7 +805,9 @@
                 content="{appGlobals.content['pages/howto/set-width-for-input-fields-in-a-horizontal-layout.md']}"
             />
         </Page>
-        <Page url="/howto/stop-datasource-from-sending-requests-in-a-closed-dialog">
+        <Page
+            url="/howto/stop-datasource-from-sending-requests-in-a-closed-dialog"
+        >
             <DocumentPageNoTOC
                 content="{appGlobals.content['pages/howto/stop-datasource-from-sending-requests-in-a-closed-dialog.md']}"
             />
@@ -538,6 +855,7 @@
             <PageNotFound />
         </Page>
     </Pages>
+    <ScrollToTop marginBottom="$space-4" />
     <Footer sticky="false">
         <Text fontWeight="400">
             This site is an

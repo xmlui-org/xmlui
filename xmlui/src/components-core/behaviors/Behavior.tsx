@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import type { RendererContext } from "../../abstractions/RendererDefs";
 import type { ComponentDef, ComponentMetadata } from "../../abstractions/ComponentDefs";
+import { BehaviorMetadata } from "./BehavorMetadata";
 
 /**
  * Defines the shape of a component behavior that can wrap a component with
@@ -9,9 +10,9 @@ import type { ComponentDef, ComponentMetadata } from "../../abstractions/Compone
  */
 export interface Behavior {
   /**
-   * The name of the behavior (e.g., "tooltip", "animation").
+   * The metadata that describes the behavior, including its trigger properties and
    */
-  name: string;
+  metadata: BehaviorMetadata;
 
   /**
    * A function that determines if the behavior should be applied based on the

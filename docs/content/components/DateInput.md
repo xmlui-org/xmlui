@@ -9,17 +9,32 @@
 - **Range support**: Single date selection (default) or date range selection
 - **Accessibility**: Full keyboard navigation and screen reader support
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Form Binding | `bindTo`, `initialValue`, `noSubmit` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Validation | `required`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `verboseValidationFeedback` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `autoFocus` [#autofocus]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
 ### `clearable` [#clearable]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Whether to show a clear button to reset the input
 
@@ -44,7 +59,7 @@ Icon name for the clear button
 
 ### `clearToInitialValue` [#cleartoinitialvalue]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Whether clearing resets to initial value or null
 
@@ -65,7 +80,7 @@ When `true`, the clear button resets the input to its initial value. When `false
 
 ### `dateFormat` [#dateformat]
 
--  default: **"MM/dd/yyyy"**
+> [!DEF]  default: **"MM/dd/yyyy"**
 
 The format of the date displayed in the input field
 
@@ -101,7 +116,7 @@ An optional array of dates that are disabled (compatibility with DatePicker, not
 
 ### `emptyCharacter` [#emptycharacter]
 
--  default: **"-"**
+> [!DEF]  default: **"-"**
 
 Character used to create placeholder text for empty input fields
 
@@ -117,7 +132,7 @@ Character to use as placeholder for empty date values. If longer than 1 characte
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -151,7 +166,7 @@ This property sets the component's initial value.
 
 ### `inline` [#inline]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 Whether to display the date input inline (compatibility with DatePicker, always true for DateInput)
 
@@ -169,7 +184,7 @@ The optional start date of the selectable date range. If not defined, the range 
 
 ### `mode` [#mode]
 
--  default: **"single"**
+> [!DEF]  default: **"single"**
 
 The mode of the date input (single or range)
 
@@ -184,7 +199,7 @@ Available values:
 
 ### `readOnly` [#readonly]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Set this property to `true` to disallow changing the component value.
 
@@ -198,7 +213,7 @@ Makes the date input read-only. Users can see the value but cannot modify it.
 
 ### `required` [#required]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Whether the input is required
 
@@ -212,7 +227,7 @@ Marks the date input as required for form validation.
 
 ### `showWeekNumber` [#showweeknumber]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Whether to show the week number (compatibility with DatePicker, not used in DateInput)
 
@@ -234,7 +249,7 @@ Icon to display for valid state when concise validation summary is enabled.
 
 ### `validationStatus` [#validationstatus]
 
--  default: **"none"**
+> [!DEF]  default: **"none"**
 
 This property allows you to set the validation status of the input component.
 
@@ -266,7 +281,7 @@ Enables a concise validation summary (icon) in input components.
 
 ### `weekStartsOn` [#weekstartson]
 
--  default: **0**
+> [!DEF]  default: **0**
 
 The first day of the week. 0 is Sunday, 1 is Monday, etc. (compatibility with DatePicker, not used in DateInput)
 

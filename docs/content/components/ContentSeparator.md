@@ -7,6 +7,19 @@
 - **Customizable sizing**: Control thickness with the `thickness` property and length with the `length` property
 - **Theme-driven defaults**: Uses theme variables for default sizing when props are not specified
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `length` [#length]
@@ -15,7 +28,7 @@ This property defines the component's width (if the `orientation` is horizontal)
 
 ### `orientation` [#orientation]
 
--  default: **"horizontal"**
+> [!DEF]  default: **"horizontal"**
 
 Sets the main axis of the component
 

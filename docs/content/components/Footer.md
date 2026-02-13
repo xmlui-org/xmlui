@@ -2,11 +2,24 @@
 
 `Footer` provides a designated area at the bottom of your application for footer content such as branding, copyright notices, or utility controls like theme toggles.
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `sticky` [#sticky]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 When set to true (default), keeps the Footer docked to the bottom of the page in sticky layouts. When set to false, allows the Footer to scroll with the main content for non-desktop layouts. In desktop layout, the Footer remains sticky regardless of this property.
 

@@ -32,17 +32,30 @@ No page is fetched from the server, thus the application operates as a [Single P
 </App>
 ```
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `defaultScrollRestoration` [#defaultscrollrestoration]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 When set to true, the page scroll position is restored when navigating back via browser history.
 
 ### `fallbackPath` [#fallbackpath]
 
--  default: **"/"**
+> [!DEF]  default: **"/"**
 
 The fallback path when the current URL does not match any of the paths of the pages.
 

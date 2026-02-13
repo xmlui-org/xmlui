@@ -12,11 +12,24 @@
 
 For common scenarios, consider the specialized variants: [HStack](/components/HStack) (horizontal), [VStack](/components/VStack) (vertical), [CHStack](/components/CHStack) (centered horizontal), and [CVStack](/components/CVStack) (centered vertical).
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `gap` [#gap]
 
--  default: **"$gap-normal"**
+> [!DEF]  default: **"$gap-normal"**
 
 Optional size value indicating the gap between child elements.
 
@@ -43,7 +56,7 @@ In the following example we use pixels, characters (shorthand `ch`), and the `em
 
 ### `horizontalAlignment` [#horizontalalignment]
 
--  default: **"start"**
+> [!DEF]  default: **"start"**
 
 Manages the horizontal content alignment for each child element in the Stack.
 
@@ -62,7 +75,7 @@ Available values: `start` **(default)**, `center`, `end`
 
 ### `orientation` [#orientation]
 
--  default: **"vertical"**
+> [!DEF]  default: **"vertical"**
 
 An optional property that governs the Stack's orientation (whether the Stack lays out its children in a row or a column).
 
@@ -70,7 +83,7 @@ Available values: `horizontal`, `vertical` **(default)**
 
 ### `reverse` [#reverse]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Optional boolean property to reverse the order of child elements.
 
@@ -95,7 +108,7 @@ Default is **false**, which indicates a left-to-right layout.
 
 ### `scrollStyle` [#scrollstyle]
 
--  default: **"normal"**
+> [!DEF]  default: **"normal"**
 
 This property determines the scrollbar style. Options: "normal" uses the browser's default scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.
 
@@ -103,13 +116,13 @@ Available values: `normal` **(default)**, `overlay`, `whenMouseOver`, `whenScrol
 
 ### `showScrollerFade` [#showscrollerfade]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 When enabled, displays gradient fade indicators at the top and bottom of the scroll container to visually indicate that more content is available in those directions. The fade indicators automatically appear/disappear based on the current scroll position. Top fade shows when scrolled down from the top, bottom fade shows when not at the bottom. Only works with overlay scrollbar modes (not with 'normal' mode).
 
 ### `verticalAlignment` [#verticalalignment]
 
--  default: **"start"**
+> [!DEF]  default: **"start"**
 
 Manages the vertical content alignment for each child element in the Stack.
 
@@ -125,7 +138,7 @@ Available values: `start` **(default)**, `center`, `end`
 
 ### `wrapContent` [#wrapcontent]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Optional boolean which wraps the content if set to true and the available space is not big enough. Works only with horizontal orientations.
 

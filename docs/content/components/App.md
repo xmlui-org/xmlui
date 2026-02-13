@@ -7,11 +7,24 @@ The `App` component is the root container that defines your application's overal
 - **Layout templates**: Choose from 7 predefined layouts (horizontal, vertical, condensed, etc.) with sticky navigation options
 - **Routing**: Built-in page routing via the [Pages](/components/Pages) component
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `autoDetectTone` [#autodetecttone]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This boolean property enables automatic detection of the system theme preference. When set to true and no defaultTone is specified, the app will automatically use "light" or "dark" tone based on the user's system theme setting. The app will also respond to changes in the system theme preference.
 
@@ -372,13 +385,13 @@ Optional application name (visible in the browser tab). When you do not define t
 
 ### `noScrollbarGutters` [#noscrollbargutters]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This boolean property specifies whether the scrollbar gutters should be hidden.
 
 ### `scrollWholePage` [#scrollwholepage]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean property specifies whether the whole page should scroll (`true`) or just the content area (`false`). The default value is `true`.
 

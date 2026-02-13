@@ -54,6 +54,19 @@ In the following example, the two List are functionally the same:
 </App>
 ```
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `availableGroups` [#availablegroups]
@@ -139,7 +152,7 @@ This property is an array of group names that the `List` will display. If not se
 
 ### `borderCollapse` [#bordercollapse]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 Collapse items borders
 
@@ -478,7 +491,7 @@ This property defines the template to display when the list is empty.
 
 ### `fixedItemSize` [#fixeditemsize]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 When set to `true`, the list will measure the height of the first item and use that as a fixed size hint for all items. This improves scroll performance when all items have the same height. If items have varying heights, leave this as `false`.
 
@@ -753,7 +766,7 @@ The structure of `$group` in a `groupHeaderTemplate` is the following:
 
 ### `groupsInitiallyExpanded` [#groupsinitiallyexpanded]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This Boolean property defines whether the list groups are initially expanded.
 
@@ -909,7 +922,7 @@ Note how the groups in the right `List` are expanded by default:
 
 ### `hideEmptyGroups` [#hideemptygroups]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean property indicates if empty groups should be hidden (no header and footer are displayed).
 
@@ -1069,7 +1082,7 @@ Note how the `meats` category is not displayed in the right `List`:
 
 ### `idKey` [#idkey]
 
--  default: **"id"**
+> [!DEF]  default: **"id"**
 
 Denotes which attribute of an item acts as the ID or key of the item
 
@@ -1384,7 +1397,7 @@ It contains the following boolean attributes:
 
 ### `scrollAnchor` [#scrollanchor]
 
--  default: **"top"**
+> [!DEF]  default: **"top"**
 
 This property pins the scroll position to a specified location of the list. Available values are shown below.
 

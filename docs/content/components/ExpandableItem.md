@@ -2,29 +2,42 @@
 
 `ExpandableItem` creates expandable/collapsible section, similar to the HTML details disclosure element. When the user clicks on the `summary` the content expands or collapses.
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 When true, the expandable item can be opened and closed. When false, it cannot be toggled.
 
 ### `iconCollapsed` [#iconcollapsed]
 
--  default: **"chevronright"**
+> [!DEF]  default: **"chevronright"**
 
 The icon to display when the item is collapsed.
 
 ### `iconExpanded` [#iconexpanded]
 
--  default: **"chevrondown"**
+> [!DEF]  default: **"chevrondown"**
 
 The icon to display when the item is expanded.
 
 ### `iconPosition` [#iconposition]
 
--  default: **"end"**
+> [!DEF]  default: **"end"**
 
 Determines the position of the icon (start or end).
 
@@ -37,7 +50,7 @@ Available values:
 
 ### `initiallyExpanded` [#initiallyexpanded]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Determines if the component is initially expanded when rendered.
 
@@ -47,7 +60,7 @@ The summary content that is always visible and acts as the trigger.
 
 ### `withSwitch` [#withswitch]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 When true, a switch is used instead of an icon to toggle the expanded state.
 

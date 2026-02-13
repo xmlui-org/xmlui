@@ -11,6 +11,19 @@
 
 For a variation with a hollow center, see [DonutChart](/components/DonutChart).
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `data` [#data]
@@ -23,7 +36,7 @@ This property specifies the key in the data objects that will be used to render 
 
 ### `labelListPosition` [#labellistposition]
 
--  default: **"inside"**
+> [!DEF]  default: **"inside"**
 
 The position of the label list.
 
@@ -39,19 +52,19 @@ The outer radius of the pie chart, can be a number or a string (e.g., '100%').
 
 ### `showLabel` [#showlabel]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 Toggles whether to show labels (`true`) or not (`false`).
 
 ### `showLabelList` [#showlabellist]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Whether to show labels in a list (`true`) or not (`false`).
 
 ### `showLegend` [#showlegend]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Toggles whether to show legend (`true`) or not (`false`).
 

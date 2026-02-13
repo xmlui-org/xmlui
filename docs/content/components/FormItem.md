@@ -16,11 +16,23 @@ See [this guide](/forms) for details.
 - `$validationResult`: Current validation state and error messages for this field
 - `$value`: Current value of the FormItem, accessible in expressions and code snippets
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `autoFocus` [#autofocus]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
@@ -43,7 +55,7 @@ Try to enter some kind of text in the input field labelled `Lastname` and submit
 
 ### `customValidationsDebounce` [#customvalidationsdebounce]
 
--  default: **0**
+> [!DEF]  default: **0**
 
 This optional number prop determines the time interval between two runs of a custom validation.
 
@@ -69,7 +81,7 @@ Note how changing the input in the demo below will result in a slight delay of i
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -84,7 +96,7 @@ This boolean property value indicates whether the component responds to user eve
 
 ### `gap` [#gap]
 
--  default: **"0"**
+> [!DEF]  default: **"0"**
 
 This property defines the gap between the adornments and the input area.
 
@@ -119,13 +131,13 @@ This property sets the label of the component.  If not set, the component will n
 
 ### `labelBreak` [#labelbreak]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean value indicates if the label can be split into multiple lines if it would overflow the available label width.
 
 ### `labelPosition` [#labelposition]
 
--  default: **"top"**
+> [!DEF]  default: **"top"**
 
 Places the label at the given position of the component.
 
@@ -175,7 +187,7 @@ In the app, type a name longer than four characters in both fields, then leave t
 
 ### `lengthInvalidSeverity` [#lengthinvalidseverity]
 
--  default: **"error"**
+> [!DEF]  default: **"error"**
 
 This property sets the severity level of the length validation.
 
@@ -273,7 +285,7 @@ In the demo below, enter an input smaller than 18 or just submit the form as is.
 
 ### `noSubmit` [#nosubmit]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 When set to `true`, the field will not be included in the form's submitted data. This is useful for fields that should be present in the form but not submitted, similar to hidden fields. If multiple FormItems reference the same `bindTo` value and any of them has `noSubmit` set to `true`, the field will NOT be submitted.
 
@@ -322,7 +334,7 @@ In the demo below, enter anything that does not look like an email and click out
 
 ### `patternInvalidSeverity` [#patterninvalidseverity]
 
--  default: **"error"**
+> [!DEF]  default: **"error"**
 
 This property sets the severity level of the pattern validation.
 
@@ -366,7 +378,7 @@ Just submitting the form as is also produces the same error.
 
 ### `rangeInvalidSeverity` [#rangeinvalidseverity]
 
--  default: **"error"**
+> [!DEF]  default: **"error"**
 
 This property sets the severity level of the value range validation.
 
@@ -427,7 +439,7 @@ In the demo below, enter a password that is not a lowercase string and click out
 
 ### `regexInvalidSeverity` [#regexinvalidseverity]
 
--  default: **"error"**
+> [!DEF]  default: **"error"**
 
 This property sets the severity level of regular expression validation.
 
@@ -449,7 +461,7 @@ Just submitting the form as is also produces the same error.
 
 ### `required` [#required]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
@@ -498,7 +510,7 @@ Available values:
 
 ### `type` [#type]
 
--  default: **"text"**
+> [!DEF]  default: **"text"**
 
 This property is used to determine the specific input control the FormItem will wrap around. Note that the control names start with a lowercase letter and map to input components found in XMLUI.
 
@@ -529,7 +541,7 @@ Available values:
 
 ### `validationMode` [#validationmode]
 
--  default: **"errorLate"**
+> [!DEF]  default: **"errorLate"**
 
 This property sets what kind of validation mode or strategy to employ for a particular input field.
 

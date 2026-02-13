@@ -19,11 +19,23 @@ You can use the `label` and `icon` properties of a `Link` to set its text and ic
 </App>
 ```
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `active` [#active]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Indicates whether this link is active or not. If so, it will have a distinct visual appearance.
 
@@ -37,7 +49,7 @@ Indicates whether this link is active or not. If so, it will have a distinct vis
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -51,7 +63,7 @@ This boolean property value indicates whether the component responds to user eve
 
 ### `horizontalAlignment` [#horizontalalignment]
 
--  default: **"start"**
+> [!DEF]  default: **"start"**
 
 Manages the horizontal content alignment for child elements in the Link.
 
@@ -105,7 +117,7 @@ This property defines the URL of the link. If the value is not defined, the link
 
 ### `verticalAlignment` [#verticalalignment]
 
--  default: **"start"**
+> [!DEF]  default: **"start"**
 
 Manages the vertical content alignment for child elements in the Link.
 

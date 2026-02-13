@@ -272,6 +272,8 @@ export const ICONS_NAVIGATION = {
 export const FILE_PATHS = {
   MAIN_XMLUI: "src/Main.xmlui",
   ICONS_XMLUI: "src/components/Icons.xmlui",
+  COMPONENTS_JSON: "components.json",
+  EXTENSIONS_JSON: "extensions.json",
 };
 
 // Path constants for resolving workspace locations

@@ -5,13 +5,12 @@ import type { ThemeTone } from "../../abstractions/ThemingDefs";
 import { Button } from "../Button/ButtonNative";
 import styles from "./NestedApp.module.scss";
 import { Tooltip } from "./Tooltip";
-import RxOpenInNewWindow from "../Icon/svg/rx-open-in-new-window.svg?react";
-import LiaUndoAltSolid from "../Icon/svg/lia-undo-alt-solid.svg?react";
 import { createQueryString, withoutTrailingSlash } from "./utils";
 import { useAppContext } from "../../components-core/AppContext";
 import classnames from "classnames";
 import Logo from "./logo.svg?react";
 import { useTheme } from "../../components-core/theming/ThemeContext";
+import Icon from "../Icon/IconNative";
 
 type AppWithCodeViewNativeProps = {
   // Markdown content to display in the left column
@@ -145,7 +144,7 @@ export function AppWithCodeViewNative({
                           void openPlayground();
                         }}
                       >
-                        <RxOpenInNewWindow />
+                        <Icon name="hyperlink" size="sm" />
                       </button>
                     }
                     label="View and edit in new full-width window"
@@ -161,7 +160,7 @@ export function AppWithCodeViewNative({
                           setRefreshVersion(refreshVersion + 1);
                         }}
                       >
-                        <LiaUndoAltSolid />
+                        <Icon name="refresh" size="sm" />
                       </button>
                     }
                     label="Reset the app"

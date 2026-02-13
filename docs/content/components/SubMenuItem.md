@@ -9,6 +9,18 @@
 - **Progressive disclosure**: Reveals nested options on hover or click interaction
 - **Unlimited depth**: Supports multiple levels of nesting for complex menu hierarchies
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `icon` [#icon]
@@ -17,7 +29,7 @@ This property names an optional icon to display with the submenu item. You can u
 
 ### `iconPosition` [#iconposition]
 
--  default: **"start"**
+> [!DEF]  default: **"start"**
 
 This property allows you to determine the position of the icon displayed in the submenu item.
 

@@ -8,6 +8,19 @@
 - **Clickable**: Supports click events for profile actions, modals, or navigation
 - **Accessible**: Automatically generates appropriate alt text from the name
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `name` [#name]
@@ -22,7 +35,7 @@ This property sets the name value the Avatar uses to display initials. If neithe
 
 ### `size` [#size]
 
--  default: **"sm"**
+> [!DEF]  default: **"sm"**
 
 This property defines the display size of the Avatar. Predefined sizes (xs, sm, md, lg) scale with the current font size (using em units). Custom CSS values (e.g., '50px', '3rem', '5em') are supported for both width and height, with font-size automatically calculated at approximately 33% of the width for proper initial display.
 

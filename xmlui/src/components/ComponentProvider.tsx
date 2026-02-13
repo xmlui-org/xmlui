@@ -109,16 +109,14 @@ import { downloadAction } from "../components-core/action/FileDownloadAction";
 import { uploadAction } from "../components-core/action/FileUploadAction";
 import { navigateAction } from "../components-core/action/NavigateAction";
 import { timedAction } from "../components-core/action/TimedAction";
-import {
-  tooltipBehavior,
-  animationBehavior,
-  labelBehavior,
-  variantBehavior,
-  formBindingBehavior,
-  validationBehavior,
-  bookmarkBehavior,
-  pubSubBehavior,
-} from "../components-core/behaviors/CoreBehaviors";
+import { tooltipBehavior } from "../components-core/behaviors/TooltipBehavior";
+import { animationBehavior } from "../components-core/behaviors/AnimationBehavior";
+import { labelBehavior } from "../components-core/behaviors/LabelBehavior";
+import { variantBehavior } from "../components-core/behaviors/VariantBehavior";
+import { bookmarkBehavior } from "../components-core/behaviors/BookmarkBehavior";
+import { formBindingBehavior } from "../components-core/behaviors/FormBindingBehavior";
+import { validationBehavior } from "../components-core/behaviors/ValidationBehavior";
+import { pubSubBehavior } from "../components-core/behaviors/PubSubBehavior";
 import type {
   LoaderRenderer,
   LoaderRendererDef,
@@ -290,7 +288,7 @@ import { toastComponentRenderer } from "./Toast/Toast";
 const dataSourcePropHolder = createPropHolderComponent("DataSource");
 const textNodePropHolder = createPropHolderComponent("TextNode");
 const textNodeCDataPropHolder = createPropHolderComponent("TextNodeCData");
-const navSectionPropHolder = createPropHolderComponent("NavSection");
+const includeNavSectionPropHolder = createPropHolderComponent("IncludeNavSection");
 
 /**
  * Applications can contribute to the registry with their custom (third-party)
@@ -392,7 +390,7 @@ export class ComponentRegistry {
     this.registerCoreComponent(dataSourcePropHolder);
     this.registerCoreComponent(textNodePropHolder);
     this.registerCoreComponent(textNodeCDataPropHolder);
-    this.registerCoreComponent(navSectionPropHolder);
+    this.registerCoreComponent(includeNavSectionPropHolder);
     if (process.env.VITE_USED_COMPONENTS_SpaceFiller !== "false") {
       this.registerCoreComponent(spaceFillerComponentRenderer);
     }
@@ -1063,7 +1061,7 @@ export class ComponentRegistry {
   ) {
     // If position is specified, insert relative to that behavior
     if (position) {
-      const targetIndex = this.behaviors.findIndex((b) => b.name === position);
+      const targetIndex = this.behaviors.findIndex((b) => b.metadata.name === position);
       if (targetIndex !== -1) {
         const insertIndex = location === "before" ? targetIndex : targetIndex + 1;
         this.behaviors.splice(insertIndex, 0, behavior);

@@ -36,11 +36,24 @@ All samples use table columns with the following definition unless noted otherwi
 
 > **Note**: See [`Column`](../components/Column) to learn more about table columns.
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `alwaysShowHeader` [#alwaysshowheader]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property indicates whether the table header is always visible when scrolling and no height is specified. When set to `true`, the header is sticky and always visible on page scroll. Otherwise, it scrolls with the content and may not be visible when scrolled down.
 
@@ -50,25 +63,25 @@ This property explicitly toggles pagination controls visibility. If set to `true
 
 ### `alwaysShowSelectionHeader` [#alwaysshowselectionheader]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property indicates when the row selection header is displayed. When the value is `true,` the selection header is always visible. Otherwise, it is displayed only when hovered.
 
 ### `alwaysShowSortingIndicator` [#alwaysshowsortingindicator]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property indicates whether the sorting indicator is always visible in the column headers. When set to `true`, the sorting indicator is always visible. Otherwise, it is visible only when the user hovers over/focuses the column header or the column is sorted.
 
 ### `autoFocus` [#autofocus]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
 ### `buttonRowPosition` [#buttonrowposition]
 
--  default: **"center"**
+> [!DEF]  default: **"center"**
 
 Determines where to place the pagination button row in the layout. It works the same as the [Pagination component property](./Pagination#buttonrowposition).
 
@@ -76,7 +89,7 @@ Available values: `start`, `center` **(default)**, `end`
 
 ### `cellVerticalAlign` [#cellverticalalign]
 
--  default: **"center"**
+> [!DEF]  default: **"center"**
 
 This property controls the vertical alignment of cell content. It can be set to `top`, `center`, or `bottom`.
 
@@ -84,7 +97,7 @@ Available values: `top`, `center` **(default)**, `bottom`
 
 ### `checkboxTolerance` [#checkboxtolerance]
 
--  default: **"compact"**
+> [!DEF]  default: **"compact"**
 
 This property controls the tolerance area around checkboxes for easier interaction. This property only has an effect when the rowsSelectable property is set to `true`. `none` provides no tolerance (0px), `compact` provides minimal tolerance (8px), `comfortable` provides medium tolerance (12px), and `spacious` provides generous tolerance (16px) for improved accessibility.
 
@@ -256,7 +269,7 @@ Here, the component displays rocket information coming from the official SpaceX 
 
 ### `enableMultiRowSelection` [#enablemultirowselection]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean property indicates whether you can select multiple rows in the table. This property only has an effect when the rowsSelectable property is set. Setting it to `false` limits selection to a single row.
 
@@ -417,7 +430,7 @@ It accepts common [size values](/styles-and-themes/common-units#size-values).
 
 ### `hideHeader` [#hideheader]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Set the header visibility using this property. Set it to `true` to hide the header.
 
@@ -496,7 +509,7 @@ The default value is `false`.
 
 ### `hideSelectionCheckboxes` [#hideselectioncheckboxes]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 If true, hides selection checkboxes for both rows and header. Selection logic still works via API and keyboard.
 
@@ -767,7 +780,7 @@ Select a column header and set it to descending ordering.
 
 ### `idKey` [#idkey]
 
--  default: **"id"**
+> [!DEF]  default: **"id"**
 
 This property is used to specify the unique ID property in the data array. If the idKey points to a property that does not exist in the data items, that will result in incorrect behavior when using selectable rows.
 
@@ -793,7 +806,7 @@ An array of IDs that should be initially selected when the table is rendered. Th
 
 ### `isPaginated` [#ispaginated]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property adds pagination controls to the `Table`.
 
@@ -909,7 +922,7 @@ This property is useful when data is loaded conditionally or receiving it takes 
 
 ### `noBottomBorder` [#nobottomborder]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property indicates whether the table should have a bottom border. When set to `true`, the table does not have a bottom border. Otherwise, it has a bottom border.
 
@@ -1097,7 +1110,7 @@ Determines where to place the page size selector in the layout. It works the sam
 
 ### `paginationControlsLocation` [#paginationcontrolslocation]
 
--  default: **"bottom"**
+> [!DEF]  default: **"bottom"**
 
 This property determines the location of the pagination controls. It can be set to `top`, `bottom`, or `both`.
 
@@ -1265,19 +1278,19 @@ This property defines a predicate function with a return value that determines i
 
 ### `showCurrentPage` [#showcurrentpage]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 Whether to show the current page indicator. It works the same as the [Pagination component property](./Pagination#showcurrentpage).
 
 ### `showPageInfo` [#showpageinfo]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 Whether to show page information. It works the same as the [Pagination component property](./Pagination#showpageinfo).
 
 ### `showPageSizeSelector` [#showpagesizeselector]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 Whether to show the page size selector. It works the same as the [Pagination component property](./Pagination#showpagesizeselector).
 
@@ -1435,7 +1448,7 @@ An AppState instance to synchronize the table's selection state with. The table 
 
 ### `userSelectCell` [#userselectcell]
 
--  default: **"auto"**
+> [!DEF]  default: **"auto"**
 
 This property controls whether users can select text within table cells. Use `text` to allow text selection, `none` to prevent selection, or `auto` for default behavior.
 
@@ -1451,7 +1464,7 @@ Available values:
 
 ### `userSelectHeading` [#userselectheading]
 
--  default: **"none"**
+> [!DEF]  default: **"none"**
 
 This property controls whether users can select text within table headings. Use `text` to allow text selection, `none` to prevent selection, or `auto` for default behavior.
 
@@ -1467,7 +1480,7 @@ Available values:
 
 ### `userSelectRow` [#userselectrow]
 
--  default: **"auto"**
+> [!DEF]  default: **"auto"**
 
 This property controls whether users can select text within table rows. Use `text` to allow text selection, `none` to prevent selection, or `auto` for default behavior.
 

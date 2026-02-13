@@ -9,11 +9,24 @@
 - **Binding support**: Accepts dynamic values and expressions for context-aware titles
 - **SEO enhancement**: Improves search engine optimization with descriptive page titles
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `value` [#value]
 
--  default: **"XMLUI Application"**
+> [!DEF]  default: **"XMLUI Application"**
 
 This property sets the page's title to display in the browser tab.
 

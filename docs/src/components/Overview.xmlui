@@ -1,18 +1,22 @@
 <Component name="Overview">
     <script>
-        function flattenLinks(items) {
+        function findNavItem(items, predicate) {
             if (!Array.isArray(items)) return [];
-            return items.flatMap((item) => {
-                const ownLink = item?.to ? [item] : [];
-                const childLinks = flattenLinks(item?.children);
-                return [...ownLink, ...childLinks];
-            });
+            for (const item of items) {
+                if (predicate(item)) return item;
+                const nestedMatch = findNavItem(item?.children || [], predicate);
+                if (nestedMatch) return nestedMatch;
+            }
+            return null;
         }
 
         function getNavGroup() {
-            return Object.values(appGlobals.navSections || {})
-                .flatMap((section) => section?.items || [])
-                .find((item) => item?.to === $linkInfo?.to || item?.label === $linkInfo?.label);
+            const navRoots = Object.values(appGlobals.navSections || {}).flatMap((section) => section?.items || []);
+            if ($linkInfo?.to) {
+                const byTo = findNavItem(navRoots, (item) => item?.to === $linkInfo.to);
+                if (byTo) return byTo;
+            }
+            return findNavItem(navRoots, (item) => item?.label === $linkInfo?.label);
         }
 
         function getTopLevelChildren() {
@@ -26,17 +30,23 @@
         }
 
         function getRootLinks() {
-            return getTopLevelChildren().filter((item) => item?.to && !(item?.children?.length > 0));
+            return getTopLevelChildren().filter((item) => item?.to);
         }
 
-        function getSubSections() {
-            return getTopLevelChildren()
-                .filter((item) => Array.isArray(item?.children) && item.children.length > 0)
-                .map((item) => ({
-                    title: item.label,
-                    links: flattenLinks(item.children),
-                }))
-                .filter((section) => section.links.length > 0);
+        function getCardWidth() {
+            if (mediaSize.sizeIndex > 4) return "33.3%";
+            if (mediaSize.sizeIndex > 2) return "50%";
+            return "100%";
+        }
+
+        function getCardIcon(item) {
+            if (item?.icon) return item.icon;
+            const navRoots = Object.values(appGlobals.navSections || {}).flatMap((section) => section?.items || []);
+            const navItem = findNavItem(navRoots, (candidate) => {
+                if (item?.to && candidate?.to) return candidate.to === item.to;
+                return candidate?.label === item?.label;
+            });
+            return navItem?.icon || "";
         }
     </script>
 
@@ -49,43 +59,30 @@
             </Text>
         </VStack>
 
-        <FlowLayout when="{getRootLinks().length > 0}" gap="$space-4">
+        <FlowLayout
+            when="{getRootLinks().length > 0}"
+            gap="$space-4"
+            columnGap="$space-4"
+            rowGap="$space-4"
+        >
             <Items data="{getRootLinks()}">
                 <Link
                     active="true"
                     to="{$item.to}"
-                    width="{mediaSize.sizeIndex > 4 ? '24%' : mediaSize.sizeIndex > 3 ? '32%' : mediaSize.sizeIndex > 2 ? '49%' : '100%'}"
+                    width="{getCardWidth()}"
+                    height="$space-18"
+                    tooltip="{$item.label}"
                 >
-                    <Card>
-                        <HStack verticalAlignment="center">
-                            <Icon when="{$item.icon}" name="{$item.icon}" />
-                            <Text variant="strong">{$item.label}</Text>
+                    <Card width="100%" height="100%" overflow="hidden">
+                        <HStack width="100%" height="100%" verticalAlignment="center" gap="$space-2" overflow="hidden">
+                            <Icon color="$textColor-secondary" when="{getCardIcon($item)}" name="{getCardIcon($item)}" />
+                            <Text width="*" minWidth="0" variant="strong" maxLines="1" ellipses>
+                                {$item.label}
+                            </Text>
                         </HStack>
                     </Card>
                 </Link>
             </Items>
         </FlowLayout>
-
-        <Items data="{getSubSections()}">
-            <VStack gap="$space-4">
-                <H2 showAnchor="{false}">{$item.title}</H2>
-                <FlowLayout gap="$space-4">
-                    <Items data="{$item.links}">
-                        <Link
-                            active="true"
-                            to="{$item.to}"
-                            width="{mediaSize.sizeIndex > 4 ? '24%' : mediaSize.sizeIndex > 3 ? '32%' : mediaSize.sizeIndex > 2 ? '49%' : '100%'}"
-                        >
-                            <Card>
-                                <HStack verticalAlignment="center">
-                                    <Icon when="{$item.icon}" name="{$item.icon}" />
-                                    <Text variant="strong">{$item.label}</Text>
-                                </HStack>
-                            </Card>
-                        </Link>
-                    </Items>
-                </FlowLayout>
-            </VStack>
-        </Items>
     </Stack>
 </Component>

@@ -24,17 +24,32 @@
 
 - `$item`: This context value represents an item when you define an option item template. Use `$item.value` and `$item.label` to refer to the value and label of the particular option.
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Form Binding | `bindTo`, `initialValue`, `noSubmit` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Validation | `required`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `verboseValidationFeedback` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `autoFocus` [#autofocus]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
 ### `creatable` [#creatable]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property allows the user to create new items that are not present in the list of options.
 
@@ -58,13 +73,13 @@ This property defines the template to display when the list of options is empty.
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
 ### `initiallyOpen` [#initiallyopen]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property determines whether the dropdown list is open when the component is first rendered.
 
@@ -78,7 +93,7 @@ This property sets the maximum length of the input it accepts.
 
 ### `multi` [#multi]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 The `true` value of the property indicates if the user can select multiple items.
 
@@ -117,19 +132,19 @@ An optional placeholder text that is visible in the input field when its empty.
 
 ### `readOnly` [#readonly]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Set this property to `true` to disallow changing the component value.
 
 ### `required` [#required]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
 ### `validationStatus` [#validationstatus]
 
--  default: **"none"**
+> [!DEF]  default: **"none"**
 
 This property allows you to set the validation status of the input component.
 

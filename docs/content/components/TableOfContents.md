@@ -2,23 +2,36 @@
 
 `TableOfContents` collects [Heading](/components/Heading) and [Bookmark](/components/Bookmark) within the current page and displays them in a navigable tree. Uses the same Scroller behavior as NavPanel (scrollStyle, showScrollerFade).
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `maxHeadingLevel` [#maxheadinglevel]
 
--  default: **6**
+> [!DEF]  default: **6**
 
 Defines the maximum heading level (1 to 6) to include in the table of contents. For example, if it is 2, then `H1` and `H2` are displayed, but lower levels (`H3` to `H6`) are not.
 
 ### `omitH1` [#omith1]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 If true, the `H1` heading is not included in the table of contents. This is useful when the `H1` is used for the page title and you want to avoid duplication.
 
 ### `scrollStyle` [#scrollstyle]
 
--  default: **"normal"**
+> [!DEF]  default: **"normal"**
 
 This property determines the scrollbar style. Options: "normal" uses the browser's default scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.
 
@@ -26,13 +39,13 @@ Available values: `normal` **(default)**, `overlay`, `whenMouseOver`, `whenScrol
 
 ### `showScrollerFade` [#showscrollerfade]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 When enabled, displays gradient fade indicators at the top and bottom edges when scrollable content extends beyond the visible area. Only works with "overlay", "whenMouseOver", and "whenScrolling" scroll styles.
 
 ### `smoothScrolling` [#smoothscrolling]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property indicates that smooth scrolling is used while scrolling the selected table of contents items into view.
 

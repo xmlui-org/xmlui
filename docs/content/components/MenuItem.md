@@ -11,11 +11,23 @@
 **Usage pattern:**
 Always used within menu containers like `DropdownMenu`. Use `to` for navigation or `onClick` for custom actions. For complex menu structures, combine with `MenuSeparator` and `SubMenuItem` components.
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `active` [#active]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property indicates if the specified menu item is active.
 
@@ -31,7 +43,7 @@ This property indicates if the specified menu item is active.
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -51,7 +63,7 @@ This property names an optional icon to display with the menu item. You can use 
 
 ### `iconPosition` [#iconposition]
 
--  default: **"start"**
+> [!DEF]  default: **"start"**
 
 This property allows you to determine the position of the icon displayed in the menu item.
 

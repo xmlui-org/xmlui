@@ -2,6 +2,19 @@
 
 No description provided.
 
+## Behaviors
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties
 
 ### `animateWhenInView`
@@ -14,7 +27,7 @@ The animation object to be applied to the component
 
 ### `delay`
 
--  default: **0**
+> [!DEF]  default: **0**
 
 The delay before the animation starts in milliseconds
 
@@ -24,19 +37,19 @@ The duration of the animation in milliseconds
 
 ### `loop`
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Indicates whether the animation should loop
 
 ### `once`
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Indicates whether the animation should only run once
 
 ### `reverse`
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Indicates whether the animation should run in reverse
 

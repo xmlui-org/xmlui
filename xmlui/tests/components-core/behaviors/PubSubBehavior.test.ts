@@ -132,7 +132,7 @@ describe("PubSubBehavior", () => {
 
   describe("metadata", () => {
     it("should have correct name", () => {
-      expect(pubSubBehavior.name).toBe("pubsub");
+      expect(pubSubBehavior.metadata.name).toBe("pubsub");
     });
 
     it("should have canAttach method", () => {

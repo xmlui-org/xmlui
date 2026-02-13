@@ -37,17 +37,30 @@ The following app demonstrates two different patterns for using `Redirect`.
 </App>
 ```
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `replace` [#replace]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This boolean property indicates whether the redirect should replace the current history entry or create a new one.
 
 ### `to` [#to]
 
--  default: **""**
+> [!DEF]  default: **""**
 
 This property defines the URL to which this component is about to redirect requests.
 

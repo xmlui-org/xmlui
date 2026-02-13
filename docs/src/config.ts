@@ -1,11 +1,9 @@
 import type { StandaloneAppDescription } from "xmlui";
 import { createHighlighterCoreSync, type DecorationItem } from "shiki";
 import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
-import learnSection from "../navSections/learn.json";
-import guidesSection from "../navSections/guides.json";
-import tutorialSection from "../navSections/tutorial.json";
-import howtoSection from "../navSections/howto.json";
-import referenceSection from "../navSections/reference.json";
+import componentsSection from "../navSections/components.json";
+import extensionsSection from "../navSections/extensions.json";
+
 // @ts-ignore
 import js from "@shikijs/langs/javascript";
 // @ts-ignore
@@ -23,6 +21,7 @@ import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkStringify from "remark-stringify";
 import stripMarkdown from "strip-markdown";
+import extensions from "../extensions";
 
 export function markdownToPlainText(markdown: string): string {
   const processor = unified()
@@ -316,17 +315,15 @@ const App: StandaloneAppDescription = {
     "icon.article": "/resources/icons/article.svg",
     "icon.star": "/resources/icons/star.svg",
     "icon.definition": "/resources/icons/definition.svg",
+    "icon.behavior": "/resources/icons/behavior.svg",
   },
   appGlobals: { 
     useHashBasedRouting: false,
     showHeadingAnchors: true,
     searchIndexEnabled: true,
     navSections: {
-      learn: learnSection,
-      guides: guidesSection,
-      tutorial: tutorialSection,
-      howto: howtoSection,
-      reference: referenceSection,
+      components: componentsSection,
+      extensions: extensionsSection,
     },
     navPanelContent: groupedNavPanelContent,
     content,

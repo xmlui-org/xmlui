@@ -8,17 +8,32 @@
 - **Date restrictions**: Set minimum/maximum dates and disable specific dates
 - **Localization options**: Configure first day of week and show week numbers
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Form Binding | `bindTo`, `initialValue`, `noSubmit` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Validation | `required`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `verboseValidationFeedback` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `autoFocus` [#autofocus]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
 ### `dateFormat` [#dateformat]
 
--  default: **"MM/dd/yyyy"**
+> [!DEF]  default: **"MM/dd/yyyy"**
 
 The format of the date displayed in the input field
 
@@ -134,7 +149,7 @@ The `disabledDates` prop supports multiple patterns for disabling specific dates
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -168,7 +183,7 @@ This property sets the component's initial value.
 
 ### `inline` [#inline]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 If set to true, the calendar is always visible and its panel is rendered as part of the layout. If false, the calendar is shown in a popup when the input is focused or clicked.
 
@@ -178,7 +193,7 @@ The invalid messages to display for the input component.
 
 ### `mode` [#mode]
 
--  default: **"single"**
+> [!DEF]  default: **"single"**
 
 The mode of the datepicker (single or range)
 
@@ -203,13 +218,13 @@ An optional placeholder text that is visible in the input field when its empty.
 
 ### `readOnly` [#readonly]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Set this property to `true` to disallow changing the component value.
 
 ### `showWeekNumber` [#showweeknumber]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Whether to show the week number in the calendar
 
@@ -241,7 +256,7 @@ Icon to display for valid state when concise validation summary is enabled.
 
 ### `validationStatus` [#validationstatus]
 
--  default: **"none"**
+> [!DEF]  default: **"none"**
 
 This property allows you to set the validation status of the input component.
 
@@ -274,7 +289,7 @@ Enables a concise validation summary (icon) in input components.
 
 ### `weekStartsOn` [#weekstartson]
 
--  default: **0**
+> [!DEF]  default: **0**
 
 The first day of the week. 0 is Sunday, 1 is Monday, etc.
 

@@ -43,17 +43,32 @@ You can use `Select` with dynamic options:
 - `$item`: Represents the current option's data (label and value properties)
 - `$itemContext`: Provides the `removeItem()` method for multi-select scenarios
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Form Binding | `bindTo`, `initialValue`, `noSubmit` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Validation | `required`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `verboseValidationFeedback` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `autoFocus` [#autofocus]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
 ### `clearable` [#clearable]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property enables a clear button that allows the user to clear the selected value(s).
 
@@ -105,7 +120,7 @@ Click on the second field to see the custom empty list indicator.
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -169,19 +184,19 @@ This property sets the component's initial value.
 
 ### `inProgress` [#inprogress]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property indicates whether the component is in progress. It can be used to show a loading message.
 
 ### `inProgressNotificationMessage` [#inprogressnotificationmessage]
 
--  default: **""**
+> [!DEF]  default: **""**
 
 This property indicates the message to display when the component is in progress.
 
 ### `multiSelect` [#multiselect]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 The `true` value of the property indicates if the user can select multiple items.
 
@@ -250,7 +265,7 @@ This property allows replacing the default template to display an option in the 
 
 ### `placeholder` [#placeholder]
 
--  default: **""**
+> [!DEF]  default: **""**
 
 An optional placeholder text that is visible in the input field when its empty.
 
@@ -266,19 +281,19 @@ An optional placeholder text that is visible in the input field when its empty.
 
 ### `readOnly` [#readonly]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Set this property to `true` to disallow changing the component value.
 
 ### `required` [#required]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
 ### `searchable` [#searchable]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property enables the search functionality in the dropdown list.
 
@@ -311,7 +326,7 @@ Icon to display for valid state when concise validation summary is enabled.
 
 ### `validationStatus` [#validationstatus]
 
--  default: **"none"**
+> [!DEF]  default: **"none"**
 
 This property allows you to set the validation status of the input component.
 

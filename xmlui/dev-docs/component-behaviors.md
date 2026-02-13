@@ -24,7 +24,7 @@ All behaviors implement a simple contract with three members:
 
 ```typescript
 export interface Behavior {
-  name: string;
+  metadata: BehaviorMetadata;
   canAttach: (context: RendererContext<any>, node: ComponentDef, metadata: ComponentMetadata) => boolean;
   attach: (
     context: RendererContext<any>,
@@ -34,13 +34,91 @@ export interface Behavior {
 }
 ```
 
-- **name** - Unique identifier for the behavior (e.g., "tooltip", "animation", "label")
+- **metadata** - Structured metadata describing the behavior, including its name, description, trigger properties, used properties, and attachment conditions (used for documentation generation)
 - **canAttach** - Predicate determining if the behavior applies to a specific component instance based on the renderer context, component definition, and metadata
 - **attach** - Transformation function that wraps the rendered React node with enhanced functionality
 
 **Important Note on Transformation Flexibility:**
 
 The `attach` function can transform the rendered component in any valid way - wrapping it in other React components is just one approach. Behaviors can also clone the rendered node using `React.cloneElement()` to add or modify properties (such as CSS classes, event handlers, or attributes), compose multiple transformations, or apply any other valid React node manipulation. The only requirement is that `attach` must return a valid React node.
+
+### Behavior Metadata
+
+Each behavior includes structured metadata that describes its purpose, trigger conditions, and properties. This metadata serves both runtime and documentation purposes:
+
+```typescript
+export type BehaviorMetadata = {
+  name: string;                                              // Common name (e.g., "label", "animation")
+  description: string;                                       // Human-readable description
+  triggerProps: string[];                                    // Properties that trigger consideration
+  props: Record<string, ComponentPropertyMetadata>;          // Properties used by the behavior
+  condition?: BehaviorCondition;                             // Optional attachment condition
+};
+```
+
+**Metadata Properties:**
+
+- **name** - The common name of the behavior, used for display and debugging (e.g., "label", "animation", "tooltip")
+- **description** - A longer description explaining what the behavior does and when it applies
+- **triggerProps** - Array of property names that trigger the behavior's consideration for attachment (e.g., `["label"]` for labelBehavior, `["animation"]` for animationBehavior)
+- **props** - Dictionary of all properties the behavior uses, with each property documented with its type and description
+- **condition** - Optional condition tree that determines eligibility beyond just trigger properties (e.g., visual components only, components without certain metadata, etc.)
+
+**Behavior Conditions:**
+
+The `condition` field supports a rich set of condition types for fine-grained control:
+
+- **Logical operators**: `and`, `or`, `not` - Combine multiple conditions
+- **Component type**: `visual`, `nonVisual`, `isType`, `isNotType` - Filter by component characteristics
+- **Property checks**: `hasProp`, `hasNoProp`, `propEquals`, `propContains`, `propNotEquals` - Inspect component properties
+- **API checks**: `hasApi`, `hasNoApi` - Check for exposed APIs
+- **Context checks**: `hasContextVar`, `hasNoContextVar` - Verify context variable access
+- **Event checks**: `hasEvent`, `hasNoEvent` - Check for event handler presence
+
+**Example - Label Behavior Metadata:**
+
+```typescript
+export const labelBehavior: Behavior = {
+  metadata: {
+    name: "label",
+    description: "Adds a label to input components with a 'label' prop using the ItemWithLabel component.",
+    triggerProps: ["label"],
+    props: {
+      label: {
+        valueType: "string",
+        description: "The text to display as the label for the input component.",
+      },
+      labelPosition: {
+        valueType: "string",
+        description: "The position of the label relative to the input component.",
+      },
+      // ... additional properties
+    },
+    condition: {
+      type: "and",
+      conditions: [
+        { type: "hasNoProp", propName: "label" },      // Don't attach if metadata defines label
+        { type: "hasNoProp", propName: "bindTo" },     // Don't attach if form-bound
+        { type: "isNotType", nodeType: "FormItem" },  // Don't attach to FormItem
+      ],
+    },
+  },
+  canAttach: (context, node, metadata) => { /* ... */ },
+  attach: (context, node, metadata) => { /* ... */ },
+};
+```
+
+**Future Documentation Generation:**
+
+The metadata structure is designed to support automated documentation generation. Future tooling will extract this metadata to generate:
+
+- Comprehensive behavior reference documentation
+- Property tables with types and descriptions
+- Examples of trigger conditions and attachment criteria
+- Cross-references between behaviors and their trigger properties
+- Searchable behavior catalogs
+
+The metadata is collected in `collectedBehaviorMetadata.ts` which exports a dictionary of all behavior metadata for easy access by documentation tools.
 
 ### Application in ComponentAdapter
 
@@ -187,15 +265,31 @@ registerBehavior(myBehavior, "after", "tooltip");
 
 ## Framework-Implemented Behaviors
 
-XMLUI currently implements seven behaviors that handle common cross-cutting concerns. These serve as examples of the behavior pattern and provide essential functionality across all visual components:
+XMLUI currently implements eight behaviors that handle common cross-cutting concerns. These serve as examples of the behavior pattern and provide essential functionality across all visual components:
 
 1. **Label Behavior** - Wraps form input components with labels and visual indicators
 2. **Animation Behavior** - Applies entry/exit animations using CSS animations or transitions
 3. **Tooltip Behavior** - Displays informational text or markdown on hover
 4. **Variant Behavior** - Applies custom theme variant styling to components
 5. **Bookmark Behavior** - Adds bookmark functionality for scroll-to navigation
-6. **Form Binding Behavior** - Binds input components directly to forms
-7. **Validation Behavior** - Adds validation logic to form-bindable components
+6. **PubSub Behavior** - Enables publisher-subscriber messaging between components
+7. **Form Binding Behavior** - Binds input components directly to forms
+8. **Validation Behavior** - Adds validation logic to form-bindable components
+
+**Implementation Location:**
+
+Each behavior is implemented in its own file within the `xmlui/src/components-core/behaviors/` directory:
+
+- `LabelBehavior.tsx` - Label behavior implementation
+- `AnimationBehavior.tsx` - Animation behavior implementation
+- `TooltipBehavior.tsx` - Tooltip behavior implementation
+- `VariantBehavior.tsx` - Variant behavior implementation
+- `BookmarkBehavior.tsx` - Bookmark behavior implementation
+- `PubSubBehavior.tsx` - PubSub behavior implementation
+- `FormBindingBehavior.tsx` - Form binding behavior implementation
+- `ValidationBehavior.tsx` - Validation behavior implementation
+
+The `collectedBehaviorMetadata.ts` file exports all behavior metadata in a single dictionary for easy access by documentation generation tools.
 
 ### Label Behavior
 
