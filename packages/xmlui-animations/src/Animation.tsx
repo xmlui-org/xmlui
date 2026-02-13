@@ -22,7 +22,7 @@ export const AnimationMd = createMetadata({
       defaultValue: defaultProps.once,
     },
     reverse: {
-      description: `Indicates whether the animation should run in reverse`,
+      description: `Indicates whether the animation should run in reverse after the normal animation completes`,
       defaultValue: defaultProps.reverse,
     },
     loop: {

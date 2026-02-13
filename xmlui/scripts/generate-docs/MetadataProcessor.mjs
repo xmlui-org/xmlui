@@ -20,6 +20,9 @@ import {
   COMMON_TABLE_HEADERS,
   FILE_EXTENSIONS,
 } from "./constants.mjs";
+import { collectedBehaviorMetadata } from "../../dist/metadata/behaviors.js";
+import { canBehaviorAttachToComponent } from "../../dist/metadata/behavior-evaluator.js";
+import { ComponentMetadataProvider } from "../../dist/metadata/metadata-utils.js";
 
 // Note: string concatenation is the fastest using `+=` in Node.js
 
@@ -147,6 +150,9 @@ export class MetadataProcessor {
       result += addChildrenTemplateSection(component);
       result += "\n\n";
 
+      result += addBehaviorsSection(component);
+      result += "\n\n";
+
       result += addPropsSection(fileData, component);
       result += "\n\n";
 
@@ -258,6 +264,53 @@ function addImportsSection(data, component, sourceFolder, outFolder, examplesFol
   }
 }
 
+function addBehaviorsSection(component) {
+  logger.info(`Processing ${component.displayName} behaviors`);
+  let buffer = `## Behaviors\n\n`;
+
+  // Create a ComponentMetadataProvider for this component
+  const componentMetadataProvider = new ComponentMetadataProvider({
+    description: component.description || "",
+    shortDescription: component.shortDescription || "",
+    status: component.status || "stable",
+    props: component.props || {},
+    events: component.events || {},
+    apis: component.apis || {},
+    contextVars: component.contextVars || {},
+    allowArbitraryProps: component.allowArbitraryProps || false,
+    nonVisual: component.nonVisual || false,
+  });
+
+  // Check which behaviors can attach to this component
+  const applicableBehaviors = [];
+  for (const [behaviorKey, behaviorMetadata] of Object.entries(collectedBehaviorMetadata)) {
+    if (canBehaviorAttachToComponent(behaviorMetadata, componentMetadataProvider, component.displayName)) {
+      applicableBehaviors.push({
+        name: behaviorMetadata.friendlyName || behaviorMetadata.name,
+        propKeys: Object.keys(behaviorMetadata.props || {}),
+      });
+    }
+  }
+
+  if (applicableBehaviors.length === 0) {
+    return buffer + "No behaviors are applicable to this component.\n";
+  }
+
+  buffer += "This component supports the following behaviors:\n\n";
+  
+  buffer += createTable({
+    headers: ["Behavior", "Properties"],
+    rows: applicableBehaviors.map((behavior) => [
+      behavior.name,
+      behavior.propKeys.length > 0
+        ? behavior.propKeys.map(prop => `\`${prop}\``).join(", ")
+        : "N/A"
+    ]),
+  });
+
+  return buffer;
+}
+
 function addPropsSection(data, component) {
   logger.info(`Processing ${component.displayName} props`);
   let buffer = `## ${SECTION_DISPLAY_NAMES.props}\n\n`;
@@ -274,7 +327,7 @@ function addPropsSection(data, component) {
         ? `default: **${typeof prop.defaultValue === "string" ? `"${prop.defaultValue}"` : prop.defaultValue}**`
         : "";
     const propModifier = isRequired || defaultValue ? ` ${isRequired || defaultValue}` : "";
-    buffer += `### \`${propName}\`\n\n${propModifier ? `- ${propModifier}\n\n` : ""}`;
+    buffer += `### \`${propName}\`\n\n${propModifier ? `> [!DEF] ${propModifier}\n\n` : ""}`;
 
     buffer += combineDescriptionAndDescriptionRef(data, prop, METADATA_SECTIONS.PROPS);
     buffer += "\n\n";
@@ -668,17 +721,6 @@ function addNonVisualDisclaimer(isNonVisual) {
   //   ? ">[!WARNING]\n> This component does not show up on the UI; " +
   //       "it merely helps implement UI logic.\n\n"
   //   : "";
-}
-
-function addDefaultValue(component) {
-  const defaultValue = component.defaultValue;
-  if (defaultValue === undefined) {
-    return "";
-  }
-  if (typeof defaultValue === "string") {
-    return `Default value: \`"${defaultValue}"\`.`;
-  }
-  return `Default value: \`${JSON.stringify(defaultValue, null, 2)}\`.`;
 }
 
 function addAvailableValues(component) {

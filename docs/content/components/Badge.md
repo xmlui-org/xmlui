@@ -7,6 +7,19 @@
 - **Two shape variants**: Choose between `badge` (rounded corners) or `pill` (fully rounded)
 - **Flexible color control**: Set just background color or customize both background and text colors
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `colorMap` [#colormap]
@@ -39,7 +52,7 @@ Provide the component with a list or key-value pairs in two ways:
 
 ### `value` [#value]
 
--  This property is required.
+> [!DEF]  This property is required.
 
 The text that the component displays. If this is not defined, the component renders its children as the content of the badge. If neither text nor any child is defined, the component renders a single frame for the badge with a non-breakable space.
 
@@ -55,7 +68,7 @@ The text that the component displays. If this is not defined, the component rend
 
 ### `variant` [#variant]
 
--  default: **"badge"**
+> [!DEF]  default: **"badge"**
 
 Modifies the shape of the component. Comes in the regular `badge` variant or the `pill` variant with fully rounded corners.
 

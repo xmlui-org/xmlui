@@ -26,11 +26,23 @@ You can nest `MenuItem`, `MenuSeparator`, and `SubMenuItem` components into `Dro
 Try this dropdown menu:
 ```
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `alignment` [#alignment]
 
--  default: **"start"**
+> [!DEF]  default: **"start"**
 
 This property allows you to determine the alignment of the dropdown panel with the displayed menu items.
 
@@ -65,7 +77,7 @@ Available values are:
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -96,13 +108,13 @@ This property sets the label of the component.  If not set, the component will n
 
 ### `triggerButtonIcon` [#triggerbuttonicon]
 
--  default: **"triggerButton:DropdownMenu"**
+> [!DEF]  default: **"triggerButton:DropdownMenu"**
 
 This property defines the icon to display on the trigger button. You can change the default icon for all DropdownMenu instances with the "icon.triggerButton:DropdownMenu" declaration in the app configuration file.
 
 ### `triggerButtonIconPosition` [#triggerbuttoniconposition]
 
--  default: **"end"**
+> [!DEF]  default: **"end"**
 
 This property defines the position of the icon on the trigger button.
 
@@ -115,7 +127,7 @@ Available values:
 
 ### `triggerButtonThemeColor` [#triggerbuttonthemecolor]
 
--  default: **"primary"**
+> [!DEF]  default: **"primary"**
 
 This property defines the theme color of the `Button` as the dropdown menu's trigger. It has no effect when a custom trigger is defined with `triggerTemplate`.
 
@@ -129,7 +141,7 @@ Available values:
 
 ### `triggerButtonVariant` [#triggerbuttonvariant]
 
--  default: **"ghost"**
+> [!DEF]  default: **"ghost"**
 
 This property defines the theme variant of the `Button` as the dropdown menu's trigger. It has no effect when a custom trigger is defined with `triggerTemplate`.
 

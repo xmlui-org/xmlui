@@ -12,11 +12,26 @@
 
 The `NumberBox` is often used in forms. See the [this guide](/forms) for details.
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Form Binding | `bindTo`, `initialValue`, `noSubmit` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Validation | `required`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `verboseValidationFeedback` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `autoFocus` [#autofocus]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
@@ -24,7 +39,7 @@ If this boolean prop is set to true, the `NumberBox` input will be focused when 
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -82,7 +97,7 @@ This property defines the gap between the adornments and the input area.
 
 ### `hasSpinBox` [#hasspinbox]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean prop shows (`true`) or hides (`false`) the spinner buttons for the input field.
 
@@ -107,7 +122,7 @@ The initial value displayed in the input field.
 
 ### `integersOnly` [#integersonly]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This boolean property signs whether the input field accepts integers only (`true`) or not (`false`).
 
@@ -124,7 +139,7 @@ This property sets the maximum length of the input it accepts.
 
 ### `maxValue` [#maxvalue]
 
--  default: **999999999999999**
+> [!DEF]  default: **999999999999999**
 
 The maximum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.If not set, no maximum value check is done.
 
@@ -142,7 +157,7 @@ Try to enter a bigger value into the input field below than the maximum allowed.
 
 ### `minValue` [#minvalue]
 
--  default: **-999999999999999**
+> [!DEF]  default: **-999999999999999**
 
 The minimum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.If not set, no minimum value check is done.
 
@@ -168,7 +183,7 @@ A placeholder text that is visible in the input field when its empty.
 
 ### `readOnly` [#readonly]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Set this property to `true` to disallow changing the component value.
 
@@ -182,7 +197,7 @@ If true, the component's value cannot be modified with user interactions.
 
 ### `required` [#required]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
@@ -236,7 +251,7 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 
 ### `step` [#step]
 
--  default: **1**
+> [!DEF]  default: **1**
 
 This prop governs how big the step when clicking on the spinner of the field.
 
@@ -260,7 +275,7 @@ Icon to display for valid state when concise validation summary is enabled.
 
 ### `validationStatus` [#validationstatus]
 
--  default: **"none"**
+> [!DEF]  default: **"none"**
 
 This property allows you to set the validation status of the input component.
 
@@ -295,7 +310,7 @@ Enables a concise validation summary (icon) in input components.
 
 ### `zeroOrPositive` [#zeroorpositive]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This boolean property determines whether the input value can only be 0 or positive numbers (`true`) or also negative (`false`).
 

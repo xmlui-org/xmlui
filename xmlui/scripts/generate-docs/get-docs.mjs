@@ -48,7 +48,7 @@ await generateExtensionPackages(packagesMetadata, extensionsConfig);
 await generateContextVariablesSummary();
 
 /**
- * Generates NavLink elements for components and replaces the generated content in Main.xmlui
+ * Generates JSON structure for components and writes to components.json
  * @param {Record<string, string>} componentsAndFileNames The components and their filenames
  */
 async function generateComponentRefLinks(
@@ -61,32 +61,70 @@ async function generateComponentRefLinks(
       .filter((name) => name !== SUMMARY_CONFIG.COMPONENTS.fileName)
       .sort();
 
-    // Create NavLink elements for each component
-    const componentNavLinks = componentNames.map((componentName) =>
-      navConfigObj.TEMPLATES.NAVLINK(componentName),
-    );
+    // Create JSON structure for each component
+    const componentNavLinks = componentNames.map((componentName) => ({
+      to: `/components/${componentName}`,
+      label: componentName,
+      icon: "component",
+    }));
 
     // Add the Components Overview link at the top
-    const allNavLinks = [
+    const allChildren = [
       navConfigObj.OVERVIEW_LINK
-        ? navConfigObj.TEMPLATES.OVERVIEW_NAVLINK(
-            navConfigObj.OVERVIEW_LINK.LABEL,
-            navConfigObj.OVERVIEW_LINK.TO,
-          )
-        : [],
+        ? {
+            to: navConfigObj.OVERVIEW_LINK.TO,
+            label: navConfigObj.OVERVIEW_LINK.LABEL,
+            icon: "component",
+          }
+        : null,
       ...componentNavLinks,
-    ];
+    ].filter(Boolean);
 
-    // Join with newlines - store in memory instead of writing to file
-    const navLinksContent = allNavLinks.join(TEXT_CONSTANTS.NEWLINE_SEPARATOR);
+    // Create the full JSON structure
+    const componentsJson = {
+      items: [
+        {
+          label: "Components",
+          to: "/reference/components",
+          description: "Browse all built-in XMLUI components.",
+          icon: "component",
+          children: allChildren,
+        },
+      ],
+    };
 
-    // Find and display content between GENERATED CONTENT delimiters in Main.xmlui
-    const { indentationDepth } = await findAndDisplayGeneratedContent();
-
-    // Replace the generated content with the in-memory NavLinks content
-    await replaceGeneratedContentInMainXmlui(navLinksContent, indentationDepth);
+    // Write to components.json file
+    await writeComponentsJson(componentsJson);
   } catch (error) {
     throw new Error(COMPONENT_NAV_ERRORS.COMPONENT_NAV_FAILED);
+  }
+}
+
+/**
+ * Writes the components JSON structure to components.json file
+ * @param {object} componentsJson - The JSON structure to write
+ */
+async function writeComponentsJson(componentsJson) {
+  try {
+    const componentsJsonPath = join(FOLDERS.navSections, FILE_PATHS.COMPONENTS_JSON);
+    await writeFile(componentsJsonPath, JSON.stringify(componentsJson, null, 2), TEXT_CONSTANTS.UTF8_ENCODING);
+    logger.info(`Successfully updated components.json at ${componentsJsonPath}`);
+  } catch (error) {
+    throw new Error(`Failed to write components.json: ${error.message}`);
+  }
+}
+
+/**
+ * Writes the extensions JSON structure to extensions.json file
+ * @param {object} extensionsJson - The JSON structure to write
+ */
+async function writeExtensionsJson(extensionsJson) {
+  try {
+    const extensionsJsonPath = join(FOLDERS.navSections, FILE_PATHS.EXTENSIONS_JSON);
+    await writeFile(extensionsJsonPath, JSON.stringify(extensionsJson, null, 2), TEXT_CONSTANTS.UTF8_ENCODING);
+    logger.info(`Successfully updated extensions.json at ${extensionsJsonPath}`);
+  } catch (error) {
+    throw new Error(`Failed to write extensions.json: ${error.message}`);
   }
 }
 
@@ -250,39 +288,43 @@ async function generateExtensionPackages(metadata, extensionsConfig) {
     });
   }
 
-  const packageGroupsWithComponentLinks = extensionNamesAndCompNames.map((ext) => {
-    logger.info(`Generating NavLinks for Extension Package: ${ext.packageName}`);
+  // Create JSON structure for extensions
+  const extensionGroups = extensionNamesAndCompNames.map((ext) => {
+    logger.info(`Generating JSON for Extension Package: ${ext.packageName}`);
 
-    const compLinks = ext.fileNames.map((compName) => {
-      return EXTENSIONS_NAVIGATION.TEMPLATES.NAVLINK(ext.packageName, compName);
-    });
+    const compLinks = ext.fileNames.map((compName) => ({
+      label: compName,
+      to: `/extensions/${ext.packageName}/${compName}`,
+    }));
 
     // Add the Extensions Overview link at the top
-    const packageLinks = [
-      EXTENSIONS_NAVIGATION.TEMPLATES.OVERVIEW_NAVLINK(
-        EXTENSIONS_NAVIGATION.OVERVIEW_LINK.LABEL,
-        EXTENSIONS_NAVIGATION.OVERVIEW_LINK.TO(ext.packageName),
-      ),
+    const children = [
+      {
+        label: EXTENSIONS_NAVIGATION.OVERVIEW_LINK.LABEL,
+        to: EXTENSIONS_NAVIGATION.OVERVIEW_LINK.TO(ext.packageName),
+      },
       ...compLinks,
     ];
 
-    return EXTENSIONS_NAVIGATION.TEMPLATES.NAVGROUP(
-      fromKebabtoReadable(ext.packageName),
-      packageLinks.join("\n"),
-    );
+    return {
+      label: fromKebabtoReadable(ext.packageName),
+      children,
+    };
   });
-  // Join with newlines - store in memory instead of writing to file
-  const navLinksContent = packageGroupsWithComponentLinks.join(TEXT_CONSTANTS.NEWLINE_SEPARATOR);
 
-  // Find and display content between GENERATED CONTENT delimiters in Main.xmlui
-  const { indentationDepth } = await findAndDisplayGeneratedContent();
+  // Create the full JSON structure for extensions wrapped in a top-level group
+  const extensionsJson = {
+    items: [
+      {
+        label: "Extensions",
+        icon: "puzzle",
+        children: extensionGroups,
+      },
+    ],
+  };
 
-  // Replace the generated content with the in-memory NavLinks content
-  await replaceGeneratedContentInMainXmlui(
-    navLinksContent,
-    indentationDepth,
-    EXTENSIONS_NAVIGATION,
-  );
+  // Write to extensions.json file
+  await writeExtensionsJson(extensionsJson);
 
   // generate a _meta.json for the folder names
   await withErrorHandling(

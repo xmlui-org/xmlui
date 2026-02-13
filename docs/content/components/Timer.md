@@ -31,29 +31,42 @@ The following sample demonstrates many aspects of the `Timer` component. Use the
 </App>
 ```
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 Whether the timer is enabled and should fire events.
 
 ### `initialDelay` [#initialdelay]
 
--  default: **0**
+> [!DEF]  default: **0**
 
 The delay in milliseconds before the first timer event.
 
 ### `interval` [#interval]
 
--  default: **1000**
+> [!DEF]  default: **1000**
 
 The interval in milliseconds between timer events.
 
 ### `once` [#once]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Whether the timer should stop after firing its first tick event.
 

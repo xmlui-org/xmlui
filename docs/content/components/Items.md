@@ -79,6 +79,19 @@ In the following example, the two Items are functionally the same:
 </App>
 ```
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `data` [#data]
@@ -91,7 +104,7 @@ The component template to display a single item
 
 ### `reverse` [#reverse]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property reverses the order in which data is mapped to template components.
 

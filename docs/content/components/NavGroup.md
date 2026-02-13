@@ -89,17 +89,29 @@ See the following for an example of all variants:
 </App>
 ```
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
 ### `expandIconAlignment` [#expandiconalignment]
 
--  default: **"start"**
+> [!DEF]  default: **"start"**
 
 This property controls the horizontal alignment of the expand/collapse arrow icon. Set to `start` to display the arrow immediately after the label, or `end` to push it to the right edge of the NavGroup (only applies when the NavGroup has a defined width).
 
@@ -134,7 +146,7 @@ Look at this example:
 
 ### `iconAlignment` [#iconalignment]
 
--  default: **"center"**
+> [!DEF]  default: **"center"**
 
 This property controls the vertical alignment of the icon when the label text wraps to multiple lines. Set to `baseline` to align with the first line of text, `start` to align to the top, `center` for middle alignment (default), or `end` for bottom alignment.
 
@@ -149,7 +161,7 @@ Available values:
 
 ### `iconHorizontalCollapsed` [#iconhorizontalcollapsed]
 
--  default: **"chevronright"**
+> [!DEF]  default: **"chevronright"**
 
 Set a custom icon to display when the navigation menu is collapsed, is in a **horizontal** app layout, and is in a navigation submenu.
 
@@ -157,7 +169,7 @@ For an example, see the [Custom Icons section](#custom-icons).
 
 ### `iconHorizontalExpanded` [#iconhorizontalexpanded]
 
--  default: **"chevronright"**
+> [!DEF]  default: **"chevronright"**
 
 Set a custom icon to display when the navigation menu is expanded, is in a **horizontal** app layout, and is in a navigation submenu.
 
@@ -165,7 +177,7 @@ For an example, see the [Custom Icons section](#custom-icons).
 
 ### `iconVerticalCollapsed` [#iconverticalcollapsed]
 
--  default: **"chevronright"**
+> [!DEF]  default: **"chevronright"**
 
 Set a custom icon to display when the navigation menu is collapsed, is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.
 
@@ -173,7 +185,7 @@ For an example, see the [Custom Icons section](#custom-icons).
 
 ### `iconVerticalExpanded` [#iconverticalexpanded]
 
--  default: **"chevrondown"**
+> [!DEF]  default: **"chevrondown"**
 
 Set a custom icon to display when the navigation menu is expanded, is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.
 
@@ -193,7 +205,7 @@ For an example, see the [section on the icon property](#icon).
 
 ### `noIndicator` [#noindicator]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This Boolean property controls whether to hide the visual indicator for active and hovered states. When set to `true`, the indicator line will not be displayed on the `NavGroup` toggle button.
 

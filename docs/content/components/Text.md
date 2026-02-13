@@ -30,11 +30,24 @@ When you use a custom variant name (one not in the predefined list), the compone
 
 In this example, the custom variant `brandTitle` is styled using theme variables. Any CSS text property can be configured, including `textColor`, `fontSize`, `fontWeight`, `fontFamily`, `textDecoration*`, `lineHeight`, `backgroundColor`, `textTransform`, `letterSpacing`, `wordSpacing`, `textShadow`, and more.
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `breakMode` [#breakmode]
 
--  default: **"normal"**
+> [!DEF]  default: **"normal"**
 
 This property controls how text breaks into multiple lines. `normal` uses standard word boundaries, `word` breaks long words to prevent overflow, `anywhere` breaks at any character, `keep` prevents word breaking, and `hyphenate` uses automatic hyphenation. When not specified, uses the default browser behavior or theme variables.
 
@@ -117,7 +130,7 @@ Available values:
 
 ### `ellipses` [#ellipses]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This property indicates whether ellipses should be displayed when the text is cropped (`true`) or not (`false`).
 
@@ -158,7 +171,7 @@ This property determines the maximum number of lines the component can wrap to. 
 
 ### `overflowMode` [#overflowmode]
 
--  default: **"not specified"**
+> [!DEF]  default: **"not specified"**
 
 This property controls how text overflow is handled. `none` prevents wrapping and shows no overflow indicator, `ellipsis` shows ellipses when text is truncated, `scroll` forces single line with horizontal scrolling, and `flow` allows multi-line wrapping with vertical scrolling when needed (ignores maxLines). When not specified, uses the default text behavior.
 
@@ -271,7 +284,7 @@ Here are a few examples.
 
 ### `preserveLinebreaks` [#preservelinebreaks]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property indicates if linebreaks should be preserved when displaying text.
 

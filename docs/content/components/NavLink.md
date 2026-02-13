@@ -56,17 +56,29 @@ However, you can create a link that executes an explicit action responding to th
 </App>
 ```
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `active` [#active]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property indicates if the particular navigation is an active link. An active link has a particular visual appearance, provided its [`displayActive`](#displayactive) property is set to `true`.
 
 ### `displayActive` [#displayactive]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This Boolean property indicates if the active state of a link should have a visual indication. Setting it to `false` removes the visual indication of an active link.
 
@@ -83,7 +95,7 @@ This Boolean property indicates if the active state of a link should have a visu
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -129,7 +141,7 @@ This property allows you to add an optional icon (specify the icon's name) to th
 
 ### `iconAlignment` [#iconalignment]
 
--  default: **"center"**
+> [!DEF]  default: **"center"**
 
 This property controls the vertical alignment of the icon when the label text wraps to multiple lines. Set to `baseline` to align with the first line of text, `start` to align to the top, `center` for middle alignment (default), or `end` for bottom alignment.
 
@@ -165,7 +177,7 @@ Available values: `1`, `2`, `3`, `4`
 
 ### `noIndicator` [#noindicator]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This Boolean property controls whether to hide the visual indicator for active and hovered states. When set to `true`, the indicator line will not be displayed.
 

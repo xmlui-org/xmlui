@@ -52,17 +52,30 @@ It also uses the `Logo` component within the template definition:
 The markup displays the app's logo:
 ```
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `alt` [#alt]
 
--  default: **"Logo"**
+> [!DEF]  default: **"Logo"**
 
 Alternative text for the logo image for accessibility.
 
 ### `inline` [#inline]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 When set to true, the image will be displayed as an inline element instead of a block element.
 

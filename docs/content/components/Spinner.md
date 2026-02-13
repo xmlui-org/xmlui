@@ -15,11 +15,24 @@ While it is visible, the action is yet to be completed; on completion, the UI lo
 >[!INFO]
 > `Spinner` ignores the `width`, `minWidth`, `maxWidth`, `height`, `minHeight`, and `maxHeight` properties. If you want to change its size, use the `size-Spinner` theme variable (see details is the [Styling](#styling) section).
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `delay` [#delay]
 
--  default: **400**
+> [!DEF]  default: **400**
 
 The delay in milliseconds before the spinner is displayed.
 
@@ -40,7 +53,7 @@ Use the buttons to toggle between the two `Spinners`.
 
 ### `fullScreen` [#fullscreen]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 If set to `true`, the component will be rendered in a full screen container.
 

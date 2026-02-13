@@ -32,6 +32,19 @@ Try resizing the container or browser window to see the responsive behavior:
 
 - `$overflow`: Boolean indicating whether the child component is displayed in the overflow dropdown menu (true) or visible in the main bar (false).
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `dropdownAlignment` [#dropdownalignment]
@@ -48,19 +61,19 @@ Available values:
 
 ### `dropdownText` [#dropdowntext]
 
--  default: **"More options"**
+> [!DEF]  default: **"More options"**
 
 Text to display in the dropdown trigger button label when items overflow. This text is used for accessibility and appears alongside the overflow icon.
 
 ### `gap` [#gap]
 
--  default: **0**
+> [!DEF]  default: **0**
 
 Gap between child elements in pixels. Controls the spacing between items in the responsive bar layout.
 
 ### `orientation` [#orientation]
 
--  default: **"horizontal"**
+> [!DEF]  default: **"horizontal"**
 
 Layout direction of the responsive bar. In horizontal mode, items are arranged left-to-right and overflow is based on container width. In vertical mode, items are arranged top-to-bottom and overflow is based on container height.
 
@@ -68,7 +81,7 @@ Available values: `horizontal` **(default)**, `vertical`
 
 ### `overflowIcon` [#overflowicon]
 
--  default: **"ellipsisHorizontal:ResponsiveBar"**
+> [!DEF]  default: **"ellipsisHorizontal:ResponsiveBar"**
 
 Icon to display in the dropdown trigger button when items overflow. You can use component-specific icons in the format "iconName:ResponsiveBar".
 
@@ -91,7 +104,7 @@ You can customize the icon used for the overflow dropdown trigger:
 
 ### `reverse` [#reverse]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Reverses the direction of child elements. In horizontal mode, items are arranged from right to left instead of left to right. In vertical mode, items are arranged from bottom to top instead of top to bottom. The dropdown menu position also adjusts to appear at the start (left/top) instead of the end (right/bottom).
 

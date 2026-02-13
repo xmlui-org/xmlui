@@ -58,11 +58,24 @@ The `List` is a perfect example of a component that does not implement its own p
 
 For a comprehensive example, see [How to paginate a List](../howto/paginate-a-list).
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `buttonRowPosition` [#buttonrowposition]
 
--  default: **"center"**
+> [!DEF]  default: **"center"**
 
 Determines where to place the pagination button row in the layout.
 
@@ -70,7 +83,7 @@ Available values: `start`, `center` **(default)**, `end`
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -88,7 +101,7 @@ Total number of items to paginate. If not provided, the component renders simpli
 
 ### `maxVisiblePages` [#maxvisiblepages]
 
--  default: **1**
+> [!DEF]  default: **1**
 
 Maximum number of page buttons to display. If the value is not among the allowed values, it will fall back to the default.
 
@@ -107,7 +120,7 @@ Available values:
 
 ### `pageIndex` [#pageindex]
 
--  default: **0**
+> [!DEF]  default: **0**
 
 Current page index (0-based)
 
@@ -117,7 +130,7 @@ Determines where to place the page information in the layout.
 
 ### `pageSize` [#pagesize]
 
--  default: **10**
+> [!DEF]  default: **10**
 
 Number of items per page
 
@@ -131,19 +144,19 @@ Determines where to place the page size selector in the layout.
 
 ### `showCurrentPage` [#showcurrentpage]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 Whether to show the current page indicator
 
 ### `showPageInfo` [#showpageinfo]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 Whether to show page information
 
 ### `showPageSizeSelector` [#showpagesizeselector]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 Whether to show the page size selector
 

@@ -7,17 +7,32 @@
 - **Step control**: Precise incremental selection with customizable step values
 - **Value formatting**: Custom display formatting for current values and visual feedback
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Form Binding | `bindTo`, `initialValue`, `noSubmit` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Validation | `required`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `verboseValidationFeedback` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `autoFocus` [#autofocus]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -31,7 +46,7 @@ This property sets the component's initial value.
 
 ### `maxValue` [#maxvalue]
 
--  default: **10**
+> [!DEF]  default: **10**
 
 This property specifies the maximum value of the allowed input range.
 
@@ -41,13 +56,13 @@ This property specifies the maximum value of the allowed input range.
 
 ### `minStepsBetweenThumbs` [#minstepsbetweenthumbs]
 
--  default: **1**
+> [!DEF]  default: **1**
 
 This property sets the minimum number of steps required between multiple thumbs on the slider, ensuring they maintain a specified distance.
 
 ### `minValue` [#minvalue]
 
--  default: **0**
+> [!DEF]  default: **0**
 
 This property specifies the minimum value of the allowed input range.
 
@@ -61,25 +76,25 @@ This optional property allows you to apply custom styles to the range element of
 
 ### `readOnly` [#readonly]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Set this property to `true` to disallow changing the component value.
 
 ### `required` [#required]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
 ### `showValues` [#showvalues]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This property controls whether the slider shows the current values of the thumbs.
 
 ### `step` [#step]
 
--  default: **1**
+> [!DEF]  default: **1**
 
 This property defines the increment value for the slider, determining the allowed intervals between selectable values.
 
@@ -89,7 +104,7 @@ This optional property allows you to apply custom styles to the thumb elements o
 
 ### `validationStatus` [#validationstatus]
 
--  default: **"none"**
+> [!DEF]  default: **"none"**
 
 This property allows you to set the validation status of the input component.
 
@@ -103,7 +118,7 @@ Available values:
 
 ### `valueFormat` [#valueformat]
 
--  default: **"(value) => value.toString()"**
+> [!DEF]  default: **"(value) => value.toString()"**
 
 This property allows you to customize how the values are displayed.
 

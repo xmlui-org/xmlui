@@ -8,6 +8,19 @@
 - **Profile menu**: Add user authentication displays, settings menus, or action buttons via `profileMenuTemplate`
 - **Layout integration**: Automatically positioned and styled based on your App's `layout` property
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `logoTemplate` [#logotemplate]
@@ -65,7 +78,7 @@ It accepts component definitions.
 
 ### `showLogo` [#showlogo]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 Show the logo in the header
 

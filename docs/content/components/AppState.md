@@ -103,11 +103,19 @@ If you want to run the sample with explicit state buckets (for example, with the
 <AppState id="state" bucket="settings" />
 ```
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Publish/Subscribe | `subscribeToTopic` |
+
 ## Properties [#properties]
 
 ### `bucket` [#bucket]
 
--  default: **"default"**
+> [!DEF]  default: **"default"**
 
 This property is the identifier of the bucket to which the `AppState` instance is bound. Multiple `AppState` instances with the same bucket will share the same state object: any of them updating the state will cause the other instances to view the new, updated state.
 

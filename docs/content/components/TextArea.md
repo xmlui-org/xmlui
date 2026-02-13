@@ -4,17 +4,32 @@
 
 It is often used in forms, see [this guide](/forms) for details.
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Form Binding | `bindTo`, `initialValue`, `noSubmit` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Validation | `required`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `verboseValidationFeedback` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `autoFocus` [#autofocus]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
 ### `autoSize` [#autosize]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 If set to `true`, this boolean property enables the `TextArea` to resize automatically based on the number of lines inside it.
 
@@ -30,7 +45,7 @@ Write multiple lines in the `TextArea` in the demo below to see how it resizes a
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -42,7 +57,7 @@ This boolean property value indicates whether the component responds to user eve
 
 ### `enterSubmits` [#entersubmits]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This optional boolean property indicates whether pressing the `Enter` key on the keyboard prompts the parent `Form` component to submit.
 
@@ -62,7 +77,7 @@ See [Using Forms](/forms) for details.
 
 ### `escResets` [#escresets]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This boolean property indicates whether the TextArea contents should be reset when pressing the ESC key.
 
@@ -124,7 +139,7 @@ An optional placeholder text that is visible in the input field when its empty.
 
 ### `readOnly` [#readonly]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Set this property to `true` to disallow changing the component value.
 
@@ -136,7 +151,7 @@ Set this property to `true` to disallow changing the component value.
 
 ### `required` [#required]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
@@ -168,7 +183,7 @@ Drag the small resize indicators at the bottom right on each of the controls in 
 
 ### `rows` [#rows]
 
--  default: **2**
+> [!DEF]  default: **2**
 
 Specifies the number of rows the component initially has.
 
@@ -190,7 +205,7 @@ Icon to display for valid state when concise validation summary is enabled.
 
 ### `validationStatus` [#validationstatus]
 
--  default: **"none"**
+> [!DEF]  default: **"none"**
 
 This property allows you to set the validation status of the input component.
 

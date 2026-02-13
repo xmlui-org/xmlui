@@ -2,11 +2,23 @@
 
 `NoResult` displays a visual indication that a query or search returned nothing.
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `hideIcon` [#hideicon]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This boolean property indicates if the icon should be hidden.
 
@@ -21,7 +33,7 @@ This boolean property indicates if the icon should be hidden.
 
 ### `icon` [#icon]
 
--  default: **"noresult"**
+> [!DEF]  default: **"noresult"**
 
 This property defines the icon to display with the component.
 

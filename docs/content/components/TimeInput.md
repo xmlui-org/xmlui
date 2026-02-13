@@ -9,17 +9,32 @@
 - **Accessibility**: Full keyboard navigation and screen reader support
 - **Localization**: Automatic AM/PM labels based on user locale
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Form Binding | `bindTo`, `initialValue`, `noSubmit` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Validation | `required`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `verboseValidationFeedback` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `autoFocus` [#autofocus]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
 ### `clearable` [#clearable]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Whether to show a clear button that allows clearing the selected time
 
@@ -44,13 +59,13 @@ The icon to display in the clear button.
 
 ### `clearToInitialValue` [#cleartoinitialvalue]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Whether the clear button resets the time input to its initial value
 
 ### `emptyCharacter` [#emptycharacter]
 
--  default: **"-"**
+> [!DEF]  default: **"-"**
 
 Character to use as placeholder for empty time values. If longer than 1 character, uses the first character. Defaults to '-'
 
@@ -66,7 +81,7 @@ Character to use as placeholder for empty time values. If longer than 1 characte
 
 ### `enabled` [#enabled]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -90,7 +105,7 @@ This property defines the gap between the adornments and the input area. If not 
 
 ### `hour24` [#hour24]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 Whether to use 24-hour format (true) or 12-hour format with AM/PM (false)
 
@@ -114,13 +129,13 @@ Minimum time that the user can select
 
 ### `readOnly` [#readonly]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Set this property to `true` to disallow changing the component value.
 
 ### `required` [#required]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Whether the time input should be required
 
@@ -134,7 +149,7 @@ Marks the time input as required for form validation.
 
 ### `seconds` [#seconds]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Whether to show and allow input of seconds
 
@@ -148,7 +163,7 @@ This property sets an optional text to appear at the start (left side when the l
 
 ### `validationStatus` [#validationstatus]
 
--  default: **"none"**
+> [!DEF]  default: **"none"**
 
 This property allows you to set the validation status of the input component.
 

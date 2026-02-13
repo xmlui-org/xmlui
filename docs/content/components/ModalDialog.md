@@ -85,11 +85,24 @@ The `ModalDialog` component is also a container such as the [`Card`](/components
 - `$param`: First parameter passed to the `open()` method
 - `$params`: Array of all parameters passed to `open()` method (access with `$params[0]`, `$params[1]`, etc.)
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `closeButtonVisible` [#closebuttonvisible]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 Shows (`true`) or hides (`false`) the visibility of the close button on the dialog.
 
@@ -105,7 +118,7 @@ Click outside the dialog to close it.
 
 ### `fullScreen` [#fullscreen]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Toggles whether the dialog encompasses the whole UI (`true`) or not and has a minimum width and height (`false`).
 

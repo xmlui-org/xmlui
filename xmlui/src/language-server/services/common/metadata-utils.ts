@@ -16,6 +16,7 @@ type RestrictedComponentMetadata = Pick<
   | "contextVars"
   | "allowArbitraryProps"
   | "shortDescription"
+  | "nonVisual"
 >;
 
 export type ComponentMetadataCollection = Record<string, RestrictedComponentMetadata>;

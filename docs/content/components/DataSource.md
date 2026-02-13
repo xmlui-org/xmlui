@@ -27,6 +27,19 @@ When you initiate the refetching of data (e.g., with the `refetch` method or set
 
 By default, structural sharing is turned on. If you do not need this behavior, set the `structuralSharing` property to `false`.
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `body` [#body]
@@ -111,7 +124,7 @@ Set request headers. Pass an object whose keys are header names and values are h
 
 ### `id` [#id]
 
--  This property is required.
+> [!DEF]  This property is required.
 
 Set the ID used by other components to access the retrieved data in the `value`property of a `DataSource`, or status info in the `loaded` and `error` properties.When no `id` is set, the component cannot be used programmatically.
 
@@ -121,7 +134,7 @@ Set the message to display when the data fetch is in progress. If the property v
 
 ### `method` [#method]
 
--  default: **"get"**
+> [!DEF]  default: **"get"**
 
 Set the HTTP method.
 
@@ -250,7 +263,7 @@ This `Table` uses the filtered array.
 
 ### `structuralSharing` [#structuralsharing]
 
--  default: **"true"**
+> [!DEF]  default: **"true"**
 
 This property allows structural sharing. When turned on, `DataSource` will keep the original reference if nothing has changed in the data. If a subset has changed, `DataSource` will keep the unchanged parts and only replace the changed parts. If you do not need this behavior, set this property to `false`.
 
@@ -260,7 +273,7 @@ Set an optional function to perform a final transformation of the response data.
 
 ### `url` [#url]
 
--  This property is required.
+> [!DEF]  This property is required.
 
 Set the URL.
 

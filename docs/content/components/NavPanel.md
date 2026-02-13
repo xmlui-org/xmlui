@@ -10,6 +10,19 @@
 - **Drawer mode**: Can optionally display navigation in a collapsible drawer interface
 - **Theme integration**: Inherits styling from the app's theme system for consistent appearance
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `footerTemplate` [#footertemplate]
@@ -18,7 +31,7 @@ Optional template for a footer at the bottom of the NavPanel. When set, the foot
 
 ### `inDrawer` [#indrawer]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property determines if the navigation panel is displayed in a drawer.
 
@@ -51,7 +64,7 @@ This property defines the logo template to display in the navigation panel with 
 
 ### `scrollStyle` [#scrollstyle]
 
--  default: **"normal"**
+> [!DEF]  default: **"normal"**
 
 This property determines the scrollbar style. Options: "normal" uses the browser's default scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.
 
@@ -59,7 +72,7 @@ Available values: `normal` **(default)**, `overlay`, `whenMouseOver`, `whenScrol
 
 ### `showScrollerFade` [#showscrollerfade]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 When enabled, displays gradient fade indicators at the top and bottom edges of the navigation panel when scrollable content extends beyond the visible area. The fade effect provides a visual cue to users that additional content is available by scrolling. The indicators automatically appear and disappear based on the scroll position. This property only works with "overlay", "whenMouseOver", and "whenScrolling" scroll styles.
 

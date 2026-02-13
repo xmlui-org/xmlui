@@ -52,11 +52,19 @@ Try the app by clicking the button several times. Check how the queue processes 
 - `$completedItems`: A list containing the queue items that have been completed (fully processed).
 - `$queuedItems`: A list containing the items waiting in the queue, icluding the completed items.
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Publish/Subscribe | `subscribeToTopic` |
+
 ## Properties [#properties]
 
 ### `clearAfterFinish` [#clearafterfinish]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 This property indicates the completed items (successful or error) should be removed from the queue after completion.
 

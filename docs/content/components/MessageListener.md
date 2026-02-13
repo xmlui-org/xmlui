@@ -11,6 +11,14 @@ The `MessageListener` component listens for messages sent via the browser's `win
 - **Flexible placement**: Can be used anywhere in the component tree
 - **Multiple listeners**: Multiple MessageListener instances can coexist and all will receive messages
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Publish/Subscribe | `subscribeToTopic` |
+
 ## Properties [#properties]
 
 This component does not have any properties.

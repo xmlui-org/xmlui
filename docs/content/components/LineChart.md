@@ -41,6 +41,19 @@ The LineChart component accommodates the size of its parent unless you set it ex
 - **Stacked vs grouped**: Stack bars on top of each other or place them side by side
 - **Custom formatting**: Use `tickFormatter` to format axis labels and [`LabelList`](/components/LabelList) for data labels
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `data` [#data]
@@ -49,31 +62,31 @@ The data to be displayed in the line chart.It needs to be an array of objects, w
 
 ### `hideTickX` [#hidetickx]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Determines whether the X-axis ticks should be hidden. If set to (`true`), the ticks will not be displayed.
 
 ### `hideTickY` [#hideticky]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Determines whether the Y-axis ticks should be hidden. If set to (`true`), the ticks will not be displayed.
 
 ### `hideTooltip` [#hidetooltip]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Determines whether the tooltip should be hidden.If set to (`true`), no tooltip will be shown when hovering over data points.
 
 ### `hideX` [#hidex]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Determines whether the X-axis should be hidden. If set to (`true`), the axis will not be displayed.
 
 ### `hideY` [#hidey]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Determines whether the Y-axis should be hidden. If set to (`true`), the axis will not be displayed.
 
@@ -95,7 +108,7 @@ The top margin of the chart
 
 ### `showLegend` [#showlegend]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Determines whether the legend should be displayed.
 

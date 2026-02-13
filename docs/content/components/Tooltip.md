@@ -223,11 +223,24 @@ A `tooltipTemplate` may be able to use the `$tooltip` context variable.
 </App>
 ```
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Styling Variant | N/A |
+
 ## Properties [#properties]
 
 ### `align` [#align]
 
--  default: **"center"**
+> [!DEF]  default: **"center"**
 
 The preferred alignment against the trigger
 
@@ -235,25 +248,25 @@ Available values: `start`, `center` **(default)**, `end`
 
 ### `alignOffset` [#alignoffset]
 
--  default: **0**
+> [!DEF]  default: **0**
 
 An offset in pixels from the 'start' or 'end' alignment options
 
 ### `avoidCollisions` [#avoidcollisions]
 
--  default: **true**
+> [!DEF]  default: **true**
 
 When true, overrides the side and align preferences to prevent collisions with boundary edges
 
 ### `defaultOpen` [#defaultopen]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 The open state of the tooltip when it is initially rendered
 
 ### `delayDuration` [#delayduration]
 
--  default: **700**
+> [!DEF]  default: **700**
 
 The duration from when the mouse enters a tooltip trigger until the tooltip opens (in ms)
 
@@ -263,13 +276,13 @@ The markdown content to display in the tooltip
 
 ### `showArrow` [#showarrow]
 
--  default: **false**
+> [!DEF]  default: **false**
 
 Whether to show the arrow pointing to the trigger element
 
 ### `side` [#side]
 
--  default: **"top"**
+> [!DEF]  default: **"top"**
 
 The preferred side of the trigger to render against when open
 
@@ -277,13 +290,13 @@ Available values: `top` **(default)**, `right`, `bottom`, `left`
 
 ### `sideOffset` [#sideoffset]
 
--  default: **4**
+> [!DEF]  default: **4**
 
 The distance in pixels from the trigger
 
 ### `skipDelayDuration` [#skipdelayduration]
 
--  default: **300**
+> [!DEF]  default: **300**
 
 How much time a user has to enter another trigger without incurring a delay again (in ms)
 

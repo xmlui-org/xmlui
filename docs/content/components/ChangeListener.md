@@ -8,6 +8,14 @@
 - **Previous/new values**: Access both old and new values in the change handler
 - **Reactive patterns**: Coordinates between components or triggers side effects
 
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Publish/Subscribe | `subscribeToTopic` |
+
 ## Properties [#properties]
 
 ### `listenTo` [#listento]
@@ -28,7 +36,7 @@ The following sample demonstrates using this property. Every time the user click
 
 ### `throttleWaitInMs` [#throttlewaitinms]
 
--  default: **0**
+> [!DEF]  default: **0**
 
 This variable sets a throttling time (in milliseconds) to apply when executing the `didChange` event handler. All changes within that throttling time will only fire the `didChange` event once.
 
