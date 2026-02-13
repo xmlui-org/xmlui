@@ -109,7 +109,7 @@
 
             </VStack>
         </HStack>
-        <VStack gap="$space-4" width="100%" padding="$space-14">
+        <VStack gap="$space-4" width="100%" paddingTop="$space-14">
             <H2 showAnchor="false" textAlign="center">
                 All blog posts
             </H2>
