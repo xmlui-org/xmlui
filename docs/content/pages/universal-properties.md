@@ -79,3 +79,71 @@ When the property is a string, the value is interpreted as an URL that returns J
 </List>
 ```
 
+## onInit and onCleanup
+
+The `onInit` event fires when a component is first rendered. The paired `onCleanup` event fires when the component is removed. These events work on any component.
+
+```xmlui
+<App var.loaded="{false}">
+  <Button onInit="loaded = true" label="I'm loaded" />
+  <Text when="{loaded}">Button has initialized</Text>
+</App>
+```
+
+`onInit` and `onCleanup` also respond to `when` transitions. When `when` changes from `false` to `true`, `onInit` fires. When `when` changes from `true` to `false`, `onCleanup` fires.
+
+```xmlui
+<App var.showPanel="{false}">
+  <Button label="Toggle" onClick="showPanel = !showPanel" />
+  <Stack
+    when="{showPanel}"
+    onInit="console.log('Panel appeared')"
+    onCleanup="console.log('Panel hidden')"
+  >
+    <Text>Panel content</Text>
+  </Stack>
+</App>
+```
+
+A component with `onInit` and `when="{false}"` still renders once so the init handler can run. This lets `onInit` change the condition that controls rendering:
+
+```xmlui
+<App var.ready="{false}">
+  <Text when="{ready}" onInit="ready = true">Now visible</Text>
+</App>
+```
+
+## tooltip, tooltipMarkdown, and tooltipOptions
+
+All visual components support tooltip properties. Add `tooltip` for plain text or `tooltipMarkdown` for formatted text.
+
+```xmlui
+<Button label="Save" tooltip="Save your changes" />
+```
+
+```xmlui
+<Icon name="info" tooltipMarkdown="**Important**: Check the [docs](/pages/behaviors) for details" />
+```
+
+Use `tooltipOptions` to control placement and behavior. It accepts an object or a shorthand string.
+
+```xmlui
+<Button
+  label="Hover me"
+  tooltip="Below with arrow"
+  tooltipOptions="{{ side: 'bottom', showArrow: true }}"
+/>
+```
+
+The string form uses semicolons to separate options. Enumeration values (like `side` or `align`) can be set by name. Boolean values use the property name for `true` or prefix with `!` for `false`. Numeric values use a colon separator.
+
+```xmlui
+<Card
+  title="Settings"
+  tooltip="Configuration options"
+  tooltipOptions="left; delayDuration: 800; showArrow"
+/>
+```
+
+For full details on tooltip options, see the [Tooltip](/components/Tooltip) component and the [Behaviors](/pages/behaviors) page.
+
