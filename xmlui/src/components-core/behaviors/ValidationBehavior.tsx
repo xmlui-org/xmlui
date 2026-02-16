@@ -14,71 +14,71 @@ export const validationBehavior: Behavior = {
     props: {
       required: {
         valueType: "boolean",
-        description: "Whether this field is required (for validation purposes).",
+        description: "Whether this field is required.",
       },
       minLength: {
         valueType: "number",
-        description: "Minimum length for string inputs (for validation purposes).",
+        description: "Minimum length for string inputs.",
       },
       maxLength: {
         valueType: "number",
-        description: "Maximum length for string inputs (for validation purposes).",
+        description: "Maximum length for string inputs.",
       },
       lengthInvalidMessage: {
         valueType: "string",
         description:
-          "Custom error message to display when input length is invalid (for validation purposes).",
+          "Custom error message to display when input length is invalid.",
       },
       lengthInvalidSeverity: {
         valueType: "string",
         description:
-          "Severity level for length validation errors (e.g., 'error', 'warning', 'info') (for validation purposes).",
+          "Severity level for length validation errors (e.g., 'error', 'warning', 'info').",
       },
       minValue: {
         valueType: "number",
-        description: "Minimum value for number inputs (for validation purposes).",
+        description: "Minimum value for number inputs.",
       },
       maxValue: {
         valueType: "number",
-        description: "Maximum value for number inputs (for validation purposes).",
+        description: "Maximum value for number inputs.",
       },
       rangeInvalidMessage: {
         valueType: "string",
         description:
-          "Custom error message to display when input value is out of range (for validation purposes).",
+          "Custom error message to display when input value is out of range.",
       },
       rangeInvalidSeverity: {
         valueType: "string",
         description:
-          "Severity level for range validation errors (e.g., 'error', 'warning', 'info') (for validation purposes).",
+          "Severity level for range validation errors (e.g., 'error', 'warning', 'info').",
       },
       pattern: {
         valueType: "string",
-        description: "Regex pattern for input validation (for validation purposes).",
+        description: "Regex pattern for input validation.",
       },
       patternInvalidMessage: {
         valueType: "string",
         description:
-          "Custom error message to display when input does not match the pattern (for validation purposes).",
+          "Custom error message to display when input does not match the pattern.",
       },
       patternInvalidSeverity: {
         valueType: "string",
         description:
-          "Severity level for pattern validation errors (e.g., 'error', 'warning', 'info') (for validation purposes).",
+          "Severity level for pattern validation errors (e.g., 'error', 'warning', 'info').",
       },
       regex: {
         valueType: "string",
-        description: "Regex pattern for input validation (for validation purposes).",
+        description: "Regex pattern for input validation.",
       },
       regexInvalidMessage: {
         valueType: "string",
         description:
-          "Custom error message to display when input does not match the regex (for validation purposes).",
+          "Custom error message to display when input does not match the regex.",
       },
       regexInvalidSeverity: {
         valueType: "string",
         description:
-          "Severity level for regex validation errors (e.g., 'error', 'warning', 'info') (for validation purposes).",
+          "Severity level for regex validation errors (e.g., 'error', 'warning', 'info').",
       },
       validationMode: {
         valueType: "string",
