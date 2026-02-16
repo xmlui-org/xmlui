@@ -1,0 +1,189 @@
+name: All Tests (Parallel)
+
+# NOTE: To change the number of parallel batches, update the 'batch-index' values
+# in the matrix strategy below to match your desired batch count (maximum: 8).
+# Example for 4 batches: Change [0, 1, 2] to [0, 1, 2, 3]
+
+concurrency:
+  group: component-e2e-testing-parallel
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+    inputs:
+      num_batches:
+        description: "Number of parallel batches to run (1-8)"
+        required: false
+        default: "3"
+        type: choice
+        options:
+          - "1"
+          - "2"
+          - "3"
+          - "4"
+          - "5"
+          - "6"
+          - "7"
+          - "8"
+
+env:
+  NUM_BATCHES: ${{ github.event.inputs.num_batches || '3' }}
+
+jobs:
+  # Job 1: Generate test distribution
+  distribute-tests:
+    name: Distribute Tests
+    runs-on: ubuntu-latest
+    outputs:
+      batches-json: ${{ steps.distribute.outputs.batches-json }}
+      batch-indices: ${{ steps.distribute.outputs.batch-indices }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+      - name: Install dependencies
+        run: npm ci --prefer-offline
+      - name: Generate batch distribution
+        id: distribute
+        run: |
+          # Generate distribution
+          BATCHES=$(node xmlui/scripts/distribute-tests.cjs ${{ env.NUM_BATCHES }})
+          
+          # Store as JSON output
+          echo "batches-json=$(echo "$BATCHES" | jq -c .)" >> $GITHUB_OUTPUT
+          
+          # Generate batch indices for matrix strategy (0,1,2,... for N batches)
+          BATCH_COUNT=$(echo "$BATCHES" | jq 'length')
+          INDICES=$(jq -n "[range(0;$BATCH_COUNT)]" | jq -r '@json')
+          echo "batch-indices=$INDICES" >> $GITHUB_OUTPUT
+          
+          # Print summary for visibility
+          echo "### Test Distribution" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Total tests: $(echo "$BATCHES" | jq '[.[].testCount] | add')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "$BATCHES" | jq '.[] | "Batch \(.testCount) tests - \(.files | length) files"' -r >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+  # Job 2: Run tests in parallel
+  test:
+    name: Test Batch ${{ matrix.batch-index }}
+    needs: distribute-tests
+    timeout-minutes: 45
+    runs-on: ubuntu-latest-16-core
+    env:
+      NODE_OPTIONS: "--max-old-space-size=8192"
+    strategy:
+      matrix:
+        batch-index: [0, 1, 2]
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+      - name: Install node dependencies
+        run: npm ci --prefer-offline
+      - name: Cache for Turbo
+        uses: rharkor/caching-for-turbo@v2.3.1
+      - name: Store Playwright's Version
+        run: |
+          PLAYWRIGHT_VERSION=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//' | sort | head -n 1)
+          echo "Playwright's Version: $PLAYWRIGHT_VERSION"
+          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
+      - name: Cache Playwright Browsers for Playwright's Version
+        id: cache-playwright-browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-browsers-${{ env.PLAYWRIGHT_VERSION }}
+      - name: Install Playwright Browsers
+        if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
+      - name: Build XMLUI and extensions
+        run: npm run build-xmlui
+      - name: Prepare test batch
+        id: prepare-batch
+        env:
+          BATCHES_JSON: ${{ needs.distribute-tests.outputs.batches-json }}
+        run: |
+          # Extract files for this batch
+          BATCH_INDEX=${{ matrix.batch-index }}
+          BATCH_FILES=$(echo "$BATCHES_JSON" | jq -r ".[$BATCH_INDEX].files[]")
+          
+          # Count files
+          FILE_COUNT=$(echo "$BATCH_FILES" | wc -l)
+          TEST_COUNT=$(echo "$BATCHES_JSON" | jq ".[$BATCH_INDEX].testCount")
+          
+          echo "Batch info:"
+          echo "  Index: $BATCH_INDEX"
+          echo "  Files: $FILE_COUNT"
+          echo "  Tests: $TEST_COUNT"
+          
+          # Save files to environment for next step
+          echo "BATCH_FILES<<EOF" >> $GITHUB_ENV
+          echo "$BATCH_FILES" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+          echo "file-count=$FILE_COUNT" >> $GITHUB_OUTPUT
+          echo "test-count=$TEST_COUNT" >> $GITHUB_OUTPUT
+      - name: Run tests for batch ${{ matrix.batch-index }}
+        run: |
+          if [ -z "$BATCH_FILES" ]; then
+            echo "No files in batch ${{ matrix.batch-index }}"
+            exit 0
+          fi
+          
+          echo "Running batch ${{ matrix.batch-index }}: ${{ steps.prepare-batch.outputs.test-count }} tests in ${{ steps.prepare-batch.outputs.file-count }} files"
+          
+          # Convert file list to array of arguments for playwright test
+          npx playwright test $BATCH_FILES
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-batch-${{ matrix.batch-index }}
+          path: xmlui/playwright-report/
+          retention-days: 30
+
+  # Job 3: Summary and status check
+  test-summary:
+    name: Summary
+    needs: [distribute-tests, test]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all reports
+        uses: actions/download-artifact@v4
+        with:
+          path: all-reports/
+      - name: Generate summary
+        env:
+          BATCHES_JSON: ${{ needs.distribute-tests.outputs.batches-json }}
+        run: |
+          echo "## Parallel E2E Tests Completed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          TOTAL_TESTS=$(echo "$BATCHES_JSON" | jq '[.[].testCount] | add')
+          NUM_BATCHES=$(echo "$BATCHES_JSON" | jq 'length')
+          
+          echo "**Total Tests Run:** $TOTAL_TESTS" >> $GITHUB_STEP_SUMMARY
+          echo "**Number of Parallel Batches:** $NUM_BATCHES" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Batch Details" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "$BATCHES_JSON" | jq -r '.[] | "- **Batch \(.testCount) tests** (\(.files | length) files)"' >> $GITHUB_STEP_SUMMARY
+          
+          # List available reports
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Reports" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          find all-reports/ -maxdepth 1 -type d -name "playwright-report-batch-*" | sort | while read dir; do
+            batch=$(basename "$dir" | sed 's/playwright-report-batch-//')
+            echo "- [Batch $batch Report]()" >> $GITHUB_STEP_SUMMARY
+          done
+
