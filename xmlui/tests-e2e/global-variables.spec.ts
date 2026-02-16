@@ -299,4 +299,46 @@ test.describe("Global variables", () => {
     // Global count should be unchanged
     await expect(page.getByTestId("countText")).toHaveText("Count: 45");
   });
+
+  test("raises T032 error when component declares global variable", async ({
+    page,
+    initTestBed,
+  }) => {
+    // Attempting to create a component with global variables should fail at parse time
+    let didThrow = false;
+    let errorDetails = "";
+    
+    try {
+      await initTestBed(
+        `
+        <App>
+          <Text>This should not render</Text>
+        </App>
+      `,
+        {
+          components: [
+            `
+        <Component name="BadComponent" global.badGlobal="42">
+          <Text>{badGlobal}</Text>
+        </Component>
+      `,
+          ],
+        },
+      );
+    } catch (error) {
+      didThrow = true;
+      // Capture all error details
+      errorDetails = JSON.stringify(error, null, 2);
+      if (error instanceof Error) {
+        if (error.message) errorDetails += "\nMessage: " + error.message;
+        if (error.stack) errorDetails += "\nStack: " + error.stack;
+      }
+    }
+
+    // Should have thrown an error
+    expect(didThrow).toBe(true);
+    
+    // Error details should contain the T032 error code
+    expect(errorDetails).toContain("T032");
+  });
 });

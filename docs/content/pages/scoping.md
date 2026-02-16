@@ -144,7 +144,7 @@ A variable declared in a user-defined component can be passed into another user-
 
 ## Global variables
 
-A [global variable](../markup#global-variables) declared in the root element of `Main.xmlui`, a user-defined component's root element, or in the `Main.xmlui.xs` file is visible in all files at any level.
+A [global variable](../markup#global-variables) declared in the root element of `Main.xmlui`, or in the `Main.xmlui.xs` file is visible in all files at any level.
 
 Local variables can shadow global variables:
 

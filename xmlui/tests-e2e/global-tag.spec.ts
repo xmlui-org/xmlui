@@ -145,41 +145,6 @@ test.describe("Global Tag - Compound Components", () => {
     await expect(page.getByTestId("countText")).toHaveText("Count: 11");
   });
 
-  test("compound component declares its own global variable", async ({
-    page,
-    initTestBed,
-  }) => {
-    await initTestBed(
-      `
-      <App>
-        <Text testId="clicksText">Total Clicks: {totalClicks}</Text>
-        <CounterButton />
-        <CounterButton />
-      </App>
-    `,
-      {
-        noFragmentWrapper: true,
-        components: [
-          `
-      <Component name="CounterButton" global.totalClicks="{0}">
-        <Button
-          label="Clicks: {totalClicks}"
-          onClick="totalClicks++" />
-      </Component>
-    `,
-        ],
-      },
-    );
-
-    await expect(page.getByTestId("clicksText")).toHaveText("Total Clicks: 0");
-
-    await page.getByRole("button", { name: "Clicks: 0" }).first().click();
-    await expect(page.getByTestId("clicksText")).toHaveText("Total Clicks: 1");
-
-    await page.getByRole("button", { name: "Clicks: 1" }).last().click();
-    await expect(page.getByTestId("clicksText")).toHaveText("Total Clicks: 2");
-  });
-
   test("multiple compound components share global state", async ({ page, initTestBed }) => {
     await initTestBed(
       `
@@ -214,40 +179,6 @@ test.describe("Global Tag - Compound Components", () => {
 
     await page.getByRole("button", { name: "Button 3: 7" }).click();
     await expect(page.getByTestId("countText")).toHaveText("Count: 8");
-  });
-
-  test("compound component with both element and attribute syntax", async ({
-    page,
-    initTestBed,
-  }) => {
-    await initTestBed(
-      `
-      <App>
-        <Text testId="widgetCountText">Widget Count: {widgetCount}</Text>
-        <Text testId="widgetThemeText">Theme: {widgetTheme}</Text>
-        <StatefulWidget />
-      </App>
-    `,
-      {
-        noFragmentWrapper: true,
-        components: [
-          `
-      <Component name="StatefulWidget" global.widgetCount="{0}">
-        <global name="widgetTheme" value="{'light'}"/>
-        <Button
-          label="Increment"
-          onClick="widgetCount++" />
-      </Component>
-    `,
-        ],
-      },
-    );
-
-    await expect(page.getByTestId("widgetCountText")).toHaveText("Widget Count: 0");
-    await expect(page.getByTestId("widgetThemeText")).toHaveText("Theme: light");
-
-    await page.getByRole("button", { name: "Increment" }).click();
-    await expect(page.getByTestId("widgetCountText")).toHaveText("Widget Count: 1");
   });
 });
 
@@ -562,33 +493,6 @@ test.describe("Global Tag - Variable Dependencies", () => {
     await expect(page.getByTestId("aText")).toHaveText("A: 2");
     await expect(page.getByTestId("bText")).toHaveText("B: 6");
     await expect(page.getByTestId("cText")).toHaveText("C: 16");
-  });
-
-  test("compound component global dependencies work with app globals", async ({
-    page,
-    initTestBed,
-  }) => {
-    await initTestBed(
-      `
-      <App global.baseValue="{10}">
-        <Text testId="appText">App: {baseValue}</Text>
-        <TestComponent />
-      </App>
-    `,
-      {
-        noFragmentWrapper: true,
-        components: [
-          `
-      <Component name="TestComponent" global.multiplied="{baseValue*2}">
-        <Text testId="compText">Component: {multiplied}</Text>
-      </Component>
-    `,
-        ],
-      },
-    );
-
-    await expect(page.getByTestId("appText")).toHaveText("App: 10");
-    await expect(page.getByTestId("compText")).toHaveText("Component: 20");
   });
 
   test("global variables with mixed element and attribute syntax and dependencies", async ({

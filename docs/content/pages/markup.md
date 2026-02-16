@@ -173,7 +173,7 @@ We've seen two ways to declare variables: a `var` declaration in an XML attribut
 ## Global Variables
 
 A component may declare a *global variable* that's visible everywhere in the application. Global variable names follow the variable naming shown earlier.
-
+> [!IMPORTANT] Global variables can only be declared in the root element of `Main.xmlui`. They **cannot** be declared in component files.
 You can declare a variable using the `global` prefix.
 
 ```xmlui-pg name="Declaring a global variable with global"
@@ -207,21 +207,4 @@ Alternatively, you can use the `<global>` helper tag.
 </Component>
 ```
 
-You can declare global variables in a component:
-
-```xmlui-pg name="Declaring a global variable in a component"
----app copy display /<global/ /stations/
-<App>
-  <H2>Station List ({stations.length})</H2>
-  <Stations />
-</App>
----comp display copy /stations/
-<Component name="Stations">
-  <global name="stations" value="{ [ 'Bakerloo', 'Central', 'Circle'] }" />
-  <Items data="{stations}">
-    <Text> {$item} </Text>
-  </Items>
-</Component>
-```
-
-> [!INFO] You can declare global variables only in the root element of the `Main.xmlui` file or in the root elements of component files. If you declare them elsewhere, XMLUI displays an error.
+> [!INFO] You can declare global variables only in the root element of the `Main.xmlui` file. If you try to declare them in component files or nested elements, XMLUI will display an error.
