@@ -17,9 +17,8 @@ import memoizeOne from "memoize-one";
 
 import type {
   LookupActionOptions,
-  LookupAsyncFnInner,
-  LookupSyncFnInner,
 } from "../../abstractions/ActionDefs";
+import type { LookupAsyncFnInner, LookupSyncFnInner } from "../container/action-lookup";
 import type { ComponentDef, ParentRenderContext } from "../../abstractions/ComponentDefs";
 import type { ContainerState } from "../../abstractions/ContainerDefs";
 import type { LayoutContext, RenderChildFn } from "../../abstractions/RendererDefs";
@@ -63,6 +62,9 @@ import {
   getCurrentTrace,
 } from "../inspector/inspectorUtils";
 import { createHandlerLogger } from "../inspector/handler-logging";
+import { createEventHandlers } from "../container/event-handlers";
+import { createEventHandlerCache } from "../container/event-handler-cache";
+import { createActionLookup } from "../container/action-lookup";
 
 // Re-export for backward compatibility
 export { getCurrentTrace } from "../inspector/inspectorUtils";
@@ -212,491 +214,54 @@ export const Container = memo(
     });
 
     // ========================================================================
-    // EVENT HANDLER EXECUTION - ASYNC
+    // EVENT HANDLER EXECUTION
     // ========================================================================
-    // runCodeAsync: Executes event handlers asynchronously with state tracking,
-    // inspector logging, and React transition management.
+    // Create event handler executors (async and sync)
 
-    const runCodeAsync = useEvent(
-      async (
-        source: string | ParsedEventValue | ArrowExpression,
-        componentUid: symbol,
-        options: LookupActionOptions | undefined,
-        ...eventArgs: any[]
-      ) => {
-        // --- Check if the event handler can sign its lifecycle state
-        const canSignEventLifecycle = () => {
-          return componentUid.description !== undefined && options?.eventName !== undefined;
-        };
-
-        let changes: Array<any> = [];
-        const getComponentStateClone = () => {
-          changes.length = 0;
-          const poj = cloneDeep({ ...stateRef.current, ...(options?.context || {}) });
-          poj["$this"] = stateRef.current[componentUid];
-          return buildProxy(poj, (changeInfo) => {
-            const idRoot = (changeInfo.pathArray as string[])?.[0];
-            if (idRoot?.startsWith("$")) {
-              throw new Error("Cannot update a read-only variable");
-            }
-            changes.push(changeInfo);
-          });
-        };
-
-        // Create xsLog function for use in evalContext
-        const xsLog = handlerLogger.createXsLog();
-
-        const evalAppContext = {
-          ...appContext,
-          getThemeVar,
-          xsLog,
-        };
-        const evalContext: BindingTreeEvaluationContext = {
-          appContext: evalAppContext,
-          eventArgs,
-          localContext: getComponentStateClone(),
-          implicitContextGetter: () => {
-            return {
-              uid: componentUid,
-              state: stateRef.current,
-              getCurrentState: () => stateRef.current,
-              dispatch,
-              appContext: evalAppContext,
-              apiInstance,
-              navigate,
-              location,
-              lookupAction: (action, uid, actionOptions = {}) => {
-                return lookupAction(action, uid, {
-                  ...actionOptions,
-                  ephemeral: true,
-                });
-              },
-            };
-          },
-          options: {
-            defaultToOptionalMemberAccess:
-              typeof appContext.appGlobals?.defaultToOptionalMemberAccess === "boolean"
-                ? appContext.appGlobals.defaultToOptionalMemberAccess
-                : true,
-          },
-        };
-
-        // Initialize trace and extract metadata for logging
-        const traceId = handlerLogger.initializeTrace();
-        const { uidName, componentType, componentLabel } = handlerLogger.extractComponentMetadata(
-          componentUid,
-          options,
-        );
-        const handlerCode = handlerLogger.extractHandlerCode(source);
-        const { handlerFileId, handlerSourceRange } = handlerLogger.lookupSourceInfo(options);
-
-        // Track handler start time for duration calculation
-        const handlerStartPerfTs =
-          typeof performance !== "undefined" ? performance.now() : undefined;
-
-        // Capture traceId at handler start so handler:complete uses the same trace
-        const handlerTraceId = getCurrentTrace();
-
-        try {
-          // Log handler start
-          handlerLogger.logHandlerStart({
-            uid: uidName,
-            eventName: options?.eventName,
-            componentType,
-            componentLabel,
-            eventArgs,
-            ownerFileId: handlerFileId,
-            ownerSource: handlerSourceRange,
-            handlerCode,
-          });
-
-          // --- Prepare the event handler to an arrow expression statement
-          let statements: Statement[];
-          if (typeof source === "string") {
-            if (!parsedStatementsRef.current[source]) {
-              parsedStatementsRef.current[source] = prepareHandlerStatements(
-                parseHandlerCode(source),
-                evalContext,
-              );
-            }
-            statements = parsedStatementsRef.current[source];
-          } else if (isParsedEventValue(source)) {
-            const parseId = source.parseId.toString();
-            if (!parsedStatementsRef.current[parseId]) {
-              parsedStatementsRef.current[parseId] = prepareHandlerStatements(
-                source.statements,
-                evalContext,
-              );
-            }
-            statements = parsedStatementsRef.current[parseId];
-          } else {
-            statements = [
-              {
-                type: T_ARROW_EXPRESSION_STATEMENT,
-                expr: source, //TODO illesg (talk it through why we need to deep clone, it it's omitted, it gets slower every time we run it)
-              } as ArrowExpressionStatement,
-            ];
-          }
-
-          if (!statements?.length) {
-            return;
-          }
-
-          if (canSignEventLifecycle()) {
-            // --- Sign the event handler has been started
-            dispatch({
-              type: ContainerActionKind.EVENT_HANDLER_STARTED,
-              payload: {
-                uid: componentUid,
-                eventName: options.eventName,
-              },
-            });
-          }
-          let mainThreadBlockingRuns = 0;
-          evalContext.onStatementCompleted = async (evalContext) => {
-            if (changes.length) {
-              // Log state changes
-              handlerLogger.logStateChanges({
-                uid: uidName,
-                eventName: options.eventName,
-                componentType,
-                componentLabel,
-                changes,
-              });
-
-              mainThreadBlockingRuns = 0;
-              changes.forEach((change) => {
-                statePartChanged(
-                  change.pathArray,
-                  cloneDeep(change.newValue),
-                  change.target,
-                  change.action,
-                );
-              });
-              let resolve = null;
-              const stateUpdatedPromise = new Promise((res) => {
-                resolve = () => {
-                  res(null);
-                };
-              });
-              const key = generatedId();
-              statementPromises.current.set(key, resolve);
-
-              try {
-                // We use this to tell react that this update is not high-priority.
-                //   If we don't put it to a transition, the whole app would be blocked if we run a long,
-                //   update intensive queue (e.g. an infinite loop which
-                //   increments a counter, see playground example learning/01_Experiments/01_Event_Framework/app ).
-                //   Before this solution, we used a setTimeout(..., 0); hack, but some browsers (chrome especially)
-                //   do some funky stuff with the background tabs (e.g. all the setTimeouts are
-                //   maximized to run in 1 time / minute, doesn't matter if it's timeout is 0)
-                //   As of 2023. June 20, this solution works with backgrounded tabs, too.
-                startTransition(() => {
-                  setVersion((prev) => prev + 1);
-                });
-
-                //TODO this could be a problem - if this container gets unmounted, we still have to wait for the update,
-                //  but in that case this update probably happened in the parent (e.g. a button's event handler removes the whole container
-                //  where the button lives, but it still has some statements to run).
-                // with this solution the statement execution doesn't stop, and we fallback waiting with a setTimeout(0)
-                if (mountedRef.current) {
-                  await stateUpdatedPromise;
-                } else {
-                  await delay(0);
-                }
-              } finally {
-                // Always remove from map, even if an error occurred
-                // This prevents memory leaks in long-running applications with frequent errors
-                statementPromises.current.delete(key);
-
-                // Development-only monitoring for potential memory leaks
-                if (process.env.NODE_ENV === "development") {
-                  const mapSize = statementPromises.current.size;
-                  if (mapSize > 100) {
-                    console.warn(
-                      `[Container] Statement promises map is large (${mapSize} entries). ` +
-                        `Possible memory leak or very complex event handler.`,
-                      { containerUid: componentUid },
-                    );
-                  }
-                }
-              }
-
-              changes = [];
-            } else {
-              //in this else branch normally we block the main thread (we don't wait for any state promise to be resolved),
-              // so in a long-running (typically infinite loop) situation, where there aren't any changes in the state
-              // we block the main thread indefinitely... this 'mainThreadBlockingRuns' var solution makes sure that
-              // we pause in every 100 runs, and let the main thread breath a bit, so it's not frozen for the whole time
-              // (we clear that counter above, too, where we use a startTransition call to de-prioritize this work)
-              mainThreadBlockingRuns++;
-              if (mainThreadBlockingRuns > 100) {
-                mainThreadBlockingRuns = 0;
-                await delay(0);
-              }
-            }
-            evalContext.localContext = getComponentStateClone();
-          };
-
-          await processStatementQueueAsync(statements, evalContext);
-
-          if (canSignEventLifecycle()) {
-            // --- Sign the event handler has successfully completed
-            dispatch({
-              type: ContainerActionKind.EVENT_HANDLER_COMPLETED,
-              payload: {
-                uid: componentUid,
-                eventName: options.eventName,
-              },
-            });
-          }
-
-          // Log handler completion with duration
-          const handlerEndPerfTs =
-            typeof performance !== "undefined" ? performance.now() : undefined;
-          const handlerDuration =
-            handlerStartPerfTs !== undefined && handlerEndPerfTs !== undefined
-              ? handlerEndPerfTs - handlerStartPerfTs
-              : undefined;
-          const returnValue = evalContext.mainThread?.blocks?.length
-            ? evalContext.mainThread.blocks[evalContext.mainThread.blocks.length - 1].returnValue
-            : undefined;
-
-          handlerLogger.logHandlerComplete({
-            uid: uidName,
-            eventName: options?.eventName,
-            componentType,
-            componentLabel,
-            returnValue,
-            duration: handlerDuration,
-            startPerfTs: handlerStartPerfTs,
-            ownerFileId: handlerFileId,
-            ownerSource: handlerSourceRange,
-            handlerCode,
-            traceId: handlerTraceId,
-          });
-
-          if (evalContext.mainThread?.blocks?.length) {
-            return evalContext.mainThread.blocks[evalContext.mainThread.blocks.length - 1]
-              .returnValue;
-          }
-        } catch (e) {
-          // Log handler error
-          handlerLogger.logHandlerError({
-            uid: uidName,
-            eventName: options?.eventName,
-            componentType,
-            componentLabel,
-            error: e,
-            ownerFileId: options?.sourceFileId ?? handlerFileId,
-            ownerSource: options?.sourceRange ?? handlerSourceRange,
-            traceId: handlerTraceId,
-          });
-          //if we pass down an event handler to a component, we should sign the error once, not in every step of the component chain
-          //  (we use it in the compoundComponent, resolving it's event handlers)
-          if (options?.signError !== false) {
-            appContext.signError(e as Error);
-          }
-          if (canSignEventLifecycle()) {
-            dispatch({
-              type: ContainerActionKind.EVENT_HANDLER_ERROR,
-              payload: {
-                uid: componentUid,
-                eventName: options.eventName,
-                error: e,
-              },
-            });
-          }
-          throw e;
-        } finally {
-          // Clean up trace
-          handlerLogger.cleanupTrace(traceId);
-        }
+    const { runCodeAsync, runCodeSync } = createEventHandlers({
+      appContext,
+      handlerLogger,
+      stateRef,
+      getThemeVar,
+      dispatch,
+      apiInstance,
+      navigate,
+      location,
+      lookupAction: (action, uid, options) => {
+        // This will be resolved after lookupAction is defined below
+        return lookupAction(action, uid, options);
       },
-    );
-
-    // ========================================================================
-    // EVENT HANDLER EXECUTION - SYNC
-    // ========================================================================
-    // runCodeSync: Executes arrow expressions synchronously without state tracking.
-
-    const runCodeSync = useCallback(
-      (arrowExpression: ArrowExpression, ...eventArgs: any[]) => {
-        const evalContext: BindingTreeEvaluationContext = {
-          localContext: cloneDeep(stateRef.current),
-          appContext,
-          eventArgs,
-        };
-        try {
-          const arrowStmt = {
-            type: T_ARROW_EXPRESSION_STATEMENT,
-            expr: arrowExpression,
-          } as ArrowExpressionStatement;
-
-          processStatementQueue([arrowStmt], evalContext);
-
-          if (evalContext.mainThread?.blocks?.length) {
-            return evalContext.mainThread.blocks[evalContext.mainThread.blocks.length - 1]
-              .returnValue;
-          }
-        } catch (e) {
-          console.error(e);
-          throw e;
-        }
-      },
-      [appContext],
-    );
+      statePartChanged,
+      startTransition,
+      setVersion,
+      mountedRef,
+      statementPromises,
+      parsedStatementsRef,
+    });
 
     // ========================================================================
     // EVENT HANDLER CACHING
     // ========================================================================
-    // getOrCreateEventHandlerFn: Creates or retrieves cached event handler functions.
-    // Handles string handlers, ParsedEventValues, and ArrowExpressions.
+    // Create event handler cache functions
 
-    const getOrCreateEventHandlerFn = useEvent(
-      (
-        src: string | ParsedEventValue | ArrowExpression,
-        uid: symbol,
-        options?: LookupActionOptions,
-      ) => {
-        if (Array.isArray(src)) {
-          throw new Error("Multiple event handlers are not supported");
-        }
-
-        let fnCacheKey: string;
-        let handler: (...eventArgs: any[]) => Promise<any>;
-        if (typeof src === "string") {
-          // --- We have a string event handler
-          fnCacheKey = `${options?.eventName};${src}`;
-          handler = (...eventArgs: any[]) => {
-            return runCodeAsync(src, uid, options, ...cloneDeep(eventArgs));
-          };
-        } else if (isParsedEventValue(src)) {
-          // --- We have the syntax tree to execute, no need to cache
-          fnCacheKey = `${options?.eventName};${src.parseId}`;
-          handler = (...eventArgs: any[]) => {
-            return runCodeAsync(src, uid, options, ...cloneDeep(eventArgs));
-          };
-        } else if (isArrowExpression(src)) {
-          // --- We have an arrow expression to execute
-          fnCacheKey = `${options?.eventName};${src.statement.nodeId}`;
-          handler = (...eventArgs: any[]) => {
-            return runCodeAsync(src, uid, options, ...cloneDeep(eventArgs));
-          };
-        } else if ((src as any).type) {
-          // --- We have an arrow expression to execute
-          fnCacheKey = `${options?.eventName};${JSON.stringify(src)}`;
-          handler = (...eventArgs: any[]) => {
-            return runCodeAsync(src, uid, options, ...cloneDeep(eventArgs));
-          };
-        } else {
-          // --- We have an unknown event handler
-          throw new Error("Invalid event handler");
-        }
-
-        //if we have a context or ephemeral event handler, we don't cache it (otherwise we would have stale reference for the context)
-        if (options?.ephemeral || options?.context) {
-          return handler;
-        }
-        if (!fnsRef.current[uid]?.[fnCacheKey]) {
-          fnsRef.current[uid] = fnsRef.current[uid] || {};
-          fnsRef.current[uid][fnCacheKey] = handler;
-        }
-
-        // Store source info for inspector logging (even for cached handlers)
-        if (options?.sourceFileId !== undefined) {
-          const keyPart =
-            options.componentId ||
-            `${options.componentType || "unknown"}:${options.componentLabel || ""}`;
-          const sourceKey = `${keyPart};${options?.eventName || "unknown"}`;
-          handlerLogger.storeSourceInfo(sourceKey, options.sourceFileId, options.sourceRange);
-        }
-
-        return fnsRef.current[uid][fnCacheKey];
-      },
-    );
-
-    // ========================================================================
-    // SYNC CALLBACK CACHING
-    // ========================================================================
-    // getOrCreateSyncCallbackFn: Creates or retrieves cached synchronous callback functions.
-
-    const getOrCreateSyncCallbackFn = useCallback(
-      (arrowExpression: ArrowExpression, uid: symbol) => {
-        const fnCacheKey = `sync-callback-${arrowExpression.nodeId}`;
-        if (!fnsRef.current[uid]?.[fnCacheKey]) {
-          fnsRef.current[uid] = fnsRef.current[uid] || {};
-          fnsRef.current[uid][fnCacheKey] = memoizeOne((arrowExpression) => {
-            return (...eventArgs: any[]) => {
-              return runCodeSync(arrowExpression, ...eventArgs);
-            };
-          });
-        }
-        return fnsRef.current[uid][fnCacheKey](arrowExpression);
-      },
-      [runCodeSync],
-    );
+    const { getOrCreateEventHandlerFn, getOrCreateSyncCallbackFn, cleanup } =
+      createEventHandlerCache({
+        fnsRef,
+        runCodeAsync,
+        runCodeSync,
+        handlerLogger,
+      });
 
     // ========================================================================
     // ACTION AND CALLBACK LOOKUP
     // ========================================================================
-    // lookupSyncCallback: Resolves and returns synchronous callback functions.
+    // Create action lookup functions
 
-    const lookupSyncCallback: LookupSyncFnInner = useCallback(
-      (action, uid) => {
-        if (!action) {
-          return undefined;
-        }
-
-        if (typeof action === "function") {
-          return action;
-        }
-
-        // const resolvedAction = extractParam(componentState, action, appContext, true);
-        if (!action) {
-          return undefined;
-        }
-
-        if (typeof action === "function") {
-          return action;
-        }
-
-        if (!isArrowExpressionObject(action)) {
-          throw new Error("Only arrow expression allowed in sync callback");
-        }
-        return getOrCreateSyncCallbackFn(action, uid);
-      },
-      [getOrCreateSyncCallbackFn],
-    );
-
-    // lookupAction: Resolves and returns asynchronous action functions.
-
-    const lookupAction: LookupAsyncFnInner = useCallback(
-      (
-        action: string | undefined | ArrowExpression,
-        uid: symbol,
-        options?: LookupActionOptions,
-      ) => {
-        let safeAction = action;
-        if (!action && uid.description && options?.eventName) {
-          const handlerFnName = `${uid.description}_on${capitalizeFirstLetter(options?.eventName)}`;
-          if (
-            componentState[handlerFnName] &&
-            isArrowExpressionObject(componentState[handlerFnName])
-          ) {
-            safeAction = componentState[handlerFnName] as ArrowExpression;
-          }
-        }
-        if (!safeAction) {
-          return undefined;
-        }
-        if (typeof safeAction === "function") {
-          return safeAction;
-        }
-        return getOrCreateEventHandlerFn(safeAction, uid, options);
-      },
-      [componentState, getOrCreateEventHandlerFn],
-    );
+    const { lookupAction, lookupSyncCallback } = createActionLookup({
+      componentState,
+      getOrCreateEventHandlerFn,
+      getOrCreateSyncCallbackFn,
+    });
 
     // ========================================================================
     // API REGISTRATION
@@ -733,14 +298,6 @@ export const Container = memo(
       parentRegisterComponentApi,
       registerComponentApi,
     ]);
-
-    // ========================================================================
-    // CLEANUP
-    // ========================================================================
-
-    const cleanup = useEvent((uid) => {
-      delete fnsRef.current[uid];
-    });
 
     // ========================================================================
     // CHILD RENDERING
