@@ -103,6 +103,7 @@ test("applies border to all sides with single theme var", async ({
     },
   });
   const component = (await createAccordionDriver()).component;
+  await expect(component).toBeVisible();
 
   await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
   await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
