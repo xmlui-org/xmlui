@@ -49,7 +49,6 @@ import { extractParam, shouldKeep } from "../utils/extractParam";
 import { useIsomorphicLayoutEffect } from "../utils/hooks";
 import { capitalizeFirstLetter, delay, generatedId, useEvent } from "../utils/misc";
 import { parseHandlerCode, prepareHandlerStatements } from "../utils/statementUtils";
-import { renderChild } from "./renderChild";
 import { useTheme } from "../theming/ThemeContext";
 import { LoaderComponent } from "../LoaderComponent";
 import { isParsedEventValue, isArrowExpression } from "./ContainerUtils";
@@ -65,6 +64,8 @@ import { createHandlerLogger } from "../inspector/handler-logging";
 import { createEventHandlers } from "../container/event-handlers";
 import { createEventHandlerCache } from "../container/event-handler-cache";
 import { createActionLookup } from "../container/action-lookup";
+import { createChildRenderer } from "../container/child-rendering";
+import { renderLoaders } from "../container/loader-rendering";
 
 // Re-export for backward compatibility
 export { getCurrentTrace } from "../inspector/inspectorUtils";
@@ -304,105 +305,18 @@ export const Container = memo(
     // ========================================================================
     // stableRenderChild: Renders child components recursively with proper ref composition.
 
-    // --- The container wraps the `renderChild` function to provide that to the child components
-    const stableRenderChild: RenderChildFn = useCallback(
-      (childNode, lc, pRenderContext, uidInfoRef, ref, rest) => {
-        // TODO: Check if this is a valid use case
-        if (typeof childNode === "string") {
-          throw Error("should be resolved for now");
-        }
-
-        // --- Make children an array if it's not
-        const children = isArray(childNode) ? childNode : [childNode];
-
-        if (!children || !children.length) {
-          // --- No child, nothing to render
-          return null;
-        }
-
-        // --- If there are multiple children, we need to add a `key` to each of them
-        const wrapWithFragment = children.length > 1;
-
-        // --- Render each child
-        const renderedChildren = children.map((child, childIndex) => {
-          if (!child) {
-            // --- No child, nothing to render: Should not happen
-            return undefined;
-          }
-
-          // --- Invoke the jolly-joker `renderChild` function to render the child. Note that
-          // --- in the context, we pass the `stableRenderChild` function, so the child can
-          // --- render its children recursively.
-          const renderedChild = renderChild({
-            node: child,
-            state: componentState,
-            globalVars,
-            dispatch,
-            appContext,
-            lookupAction,
-            lookupSyncCallback,
-            registerComponentApi,
-            renderChild: stableRenderChild,
-            statePartChanged: statePartChanged,
-            layoutContext: lc,
-            parentRenderContext: pRenderContext,
-            memoedVarsRef,
-            cleanup,
-            uidInfoRef,
-          });
-
-          if (renderedChild === undefined) {
-            // --- No displayable child, nothing to render
-            return undefined;
-          }
-
-          // --- Let's process the rendered child
-          let rendered = renderedChild;
-          const key = `${childIndex}_${child.uid}`;
-
-          if (wrapWithFragment) {
-            // --- Add the `key` attribute to the child
-            if (React.isValidElement(renderedChild)) {
-              // --- React can display this element
-              rendered = React.cloneElement(renderedChild, { key });
-            } else {
-              // --- A simple text node (or alike). We need to wrap it in a `Fragment`
-              rendered = <Fragment key={key}>{renderedChild}</Fragment>;
-            }
-          }
-
-          // --- Done.
-          return rendered;
-        });
-
-        // --- At this point we have a React node for each child
-        if (renderedChildren.length === 1) {
-          // --- If we have a single (and valid React element) child, we compose its
-          // --- `ref` with the parent's `ref`. This allows the parent to access the child's
-          // --- DOM node. Otherwise, we use the child as is.
-          return ref && renderedChildren[0] && isValidElement(renderedChildren[0])
-            ? React.cloneElement(renderedChildren[0], {
-                ref: composeRefs(ref, (renderedChildren[0] as any).ref),
-                ...mergeProps(renderedChildren[0].props, rest),
-              } as any)
-            : renderedChildren[0];
-        }
-
-        // --- Done.
-        return renderedChildren;
-      },
-      [
-        componentState,
-        dispatch,
-        appContext,
-        lookupAction,
-        lookupSyncCallback,
-        registerComponentApi,
-        statePartChanged,
-        memoedVarsRef,
-        cleanup,
-      ],
-    );
+    const { stableRenderChild } = createChildRenderer({
+      componentState,
+      globalVars,
+      dispatch,
+      appContext,
+      lookupAction,
+      lookupSyncCallback,
+      registerComponentApi,
+      statePartChanged,
+      memoedVarsRef,
+      cleanup,
+    });
 
     // ========================================================================
     // COMPONENT RENDERING
@@ -463,140 +377,6 @@ export const Container = memo(
     );
   }),
 );
-
-// ============================================================================
-// LOADER RENDERING
-// ============================================================================
-
-/**
- * Context object passed to renderLoaders and renderLoader functions.
- * Contains all dependencies needed to render loader components.
- */
-interface LoaderRenderContext {
-  /** Map tracking UIDs already used in this container */
-  uidInfo: Record<string, string>;
-  /** Reference to UID information store */
-  uidInfoRef: RefObject<Record<string, any>>;
-  /** Array of loader component definitions to render */
-  loaders?: ComponentDef[];
-  /** Current container state */
-  componentState: ContainerState;
-  /** Container dispatcher for state updates */
-  dispatch: ContainerDispatcher;
-  /** Application context object */
-  appContext: AppContextObject;
-  /** Function to register component APIs */
-  registerComponentApi: RegisterComponentApiFnInner;
-  /** Function to lookup async action handlers */
-  lookupAction: LookupAsyncFnInner;
-  /** Function to lookup sync callback handlers */
-  lookupSyncCallback: LookupSyncFnInner;
-  /** Function to cleanup component resources */
-  cleanup: ComponentCleanupFn;
-  /** Reference to memoized variables */
-  memoedVarsRef: MutableRefObject<MemoedVars>;
-}
-
-function renderLoaders({
-  uidInfo,
-  uidInfoRef,
-  loaders = EMPTY_ARRAY,
-  componentState,
-  dispatch,
-  appContext,
-  registerComponentApi,
-  lookupAction,
-  lookupSyncCallback,
-  cleanup,
-  memoedVarsRef,
-}: LoaderRenderContext) {
-  return loaders.map((loader: ComponentDef) => {
-    // --- Check for the uniqueness of UIDs
-    if (loader?.uid) {
-      if (uidInfo[loader.uid]) {
-        // --- We have a duplicated ID (another loader)
-        throw new Error(
-          `Another ${uidInfo[loader.uid]} definition in this container already uses the uid '${loader.uid}'`,
-        );
-      }
-      uidInfo[loader.uid] = "loader";
-      uidInfoRef.current[loader.uid] = {
-        type: "loader",
-        value: "loaderValue",
-        uid: loader.uid,
-      };
-    }
-
-    // --- Render the current loader
-    const renderedLoader = renderLoader({
-      loader,
-      componentState,
-      dispatch,
-      appContext,
-      registerComponentApi,
-      lookupAction,
-      lookupSyncCallback,
-      memoedVarsRef,
-      cleanup,
-    });
-
-    // --- Skip loaders with rendering errors
-    if (renderedLoader === undefined) {
-      return undefined;
-    }
-
-    // --- Take care to use a key property for the loader
-    return <Fragment key={loader.uid}>{renderedLoader}</Fragment>;
-  });
-
-  function renderLoader({
-    loader,
-    componentState,
-    dispatch,
-    appContext,
-    registerComponentApi,
-    lookupAction,
-    lookupSyncCallback,
-    cleanup,
-    memoedVarsRef,
-  }: {
-    loader: ComponentDef;
-    componentState: ContainerState;
-    dispatch: ContainerDispatcher;
-    appContext: AppContextObject;
-    registerComponentApi: RegisterComponentApiFnInner;
-    lookupAction: LookupAsyncFnInner;
-    lookupSyncCallback: LookupSyncFnInner;
-    cleanup: ComponentCleanupFn;
-    memoedVarsRef: MutableRefObject<MemoedVars>;
-  }) {
-    // --- For the sake of avoiding further issues
-    if (!loader) {
-      return null;
-    }
-
-    // --- Evaluate "when" to decide if the loader should be rendered
-    // --- Render only visible components
-    if (!shouldKeep(loader.when, componentState, appContext)) {
-      return null;
-    }
-
-    // --- Use the loader type's renderer function
-    return (
-      <LoaderComponent
-        onUnmount={cleanup}
-        node={loader}
-        state={componentState}
-        dispatch={dispatch}
-        registerComponentApi={registerComponentApi}
-        lookupAction={lookupAction}
-        lookupSyncCallback={lookupSyncCallback}
-        memoedVarsRef={memoedVarsRef}
-        appContext={appContext}
-      />
-    );
-  }
-}
 
 // ============================================================================
 // TYPE GUARDS
