@@ -2,6 +2,130 @@ import { test, expect } from "../../testing/fixtures";
 
 const CODE = `<NavPanel><NavLink to="/">Hello</NavLink></NavPanel>`;
 
+test.describe("discover NavGroups and NavLinks", () => {
+  test("Nested NavGroups and NavLinks show in NavPanel", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `
+        <NavPanel>
+          <NavGroup label="group1" to="/link-1">
+            <NavLink to="/link-2">Hello</NavLink>
+          </NavGroup>
+        </NavPanel>
+      `,
+      {
+        components: [
+          `
+          <Component name="Custom">
+            <Card>
+              <H3>Use these actions</H3>
+              <HStack>
+                <Slot />
+              </HStack>
+            </Card>
+          </Component>
+          `,
+        ],
+      },
+    );
+
+    const navgroup = page.getByRole("link", { name: "group1" });
+    await expect(navgroup).toHaveAttribute("href", /\/link-1/);
+
+    await navgroup.click();
+    await expect(page.getByRole("menuitem", { name: "Hello" })).toHaveAttribute("href", /\/link-2/);
+  });
+
+  test("Nested NavGroups and NavLinks in compound component show in NavPanel", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `<NavPanel>
+          <NavGroup label="group1">
+            <NavLink to="/path1">link1</NavLink>
+            <Links/>
+          </NavGroup>
+        </NavPanel>`,
+      {
+        components: [
+          `<Component name="Links">
+            <NavGroup label="group2">
+              <NavLink to="/path2">link2</NavLink>
+              <NavGroup label="group3">
+                <NavLink to="/path3">link3</NavLink>
+              </NavGroup>
+            </NavGroup>
+          </Component>`,
+        ],
+      },
+    );
+
+    const link1 = page.getByRole("menuitem", { name: "link1" });
+    await expect(link1).not.toBeVisible();
+
+    const navgroup1 = page.getByRole("button", { name: "group1" });
+    await navgroup1.click();
+    await expect(link1).toHaveAttribute("href", /path1/);
+
+    const navgroup2 = page.getByRole("menuitem", { name: "group2" });
+    await navgroup2.click();
+    const link2 = page.getByRole("menuitem", { name: "link2" });
+    await expect(link2).toHaveAttribute("href", /path2/);
+
+    const navgroup3 = page.getByRole("menuitem", { name: "group3" });
+    await navgroup3.click();
+    const link3 = page.getByRole("menuitem", { name: "link3" });
+    await expect(link3).toHaveAttribute("href", /path3/);
+  });
+
+  test("Nested NavGroups and NavLinks in nested compound component show in NavPanel", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `<NavPanel>
+          <NavGroup label="group1">
+            <NavLink to="/path1">link1</NavLink>
+            <Links/>
+          </NavGroup>
+        </NavPanel>`,
+      {
+        components: [
+          `<Component name="Links">
+            <NavGroup label="group2">
+              <NavLink to="/path2">link2</NavLink>
+              <Links2/>
+            </NavGroup>
+          </Component>`,
+
+          `<Component name="Links2">
+            <NavGroup label="group3">
+              <NavLink to="/path3">link3</NavLink>
+            </NavGroup>
+          </Component>`,
+        ],
+      },
+    );
+
+    const link1 = page.getByRole("menuitem", { name: "link1" });
+    await expect(link1).not.toBeVisible();
+
+    const navgroup1 = page.getByRole("button", { name: "group1" });
+    await navgroup1.click();
+    await expect(link1).toHaveAttribute("href", /path1/);
+
+    const navgroup2 = page.getByRole("menuitem", { name: "group2" });
+    await navgroup2.click();
+    const link2 = page.getByRole("menuitem", { name: "link2" });
+    await expect(link2).toHaveAttribute("href", /path2/);
+
+    const navgroup3 = page.getByRole("menuitem", { name: "group3" });
+    await navgroup3.click();
+    const link3 = page.getByRole("menuitem", { name: "link3" });
+    await expect(link3).toHaveAttribute("href", /path3/);
+  });
+});
+
 test("border", async ({ initTestBed, createNavPanelDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
@@ -1069,7 +1193,7 @@ test.describe("showScrollerFade", () => {
     // Fade overlays should exist
     const fadeOverlays = page.locator("[class*='fadeOverlay']");
     await expect(fadeOverlays).toHaveCount(2);
-    
+
     // Bottom fade overlay should exist
     const bottomFade = page.locator("[class*='fadeBottom']");
     await expect(bottomFade).toBeVisible();
@@ -1111,7 +1235,7 @@ test.describe("showScrollerFade", () => {
     // Scroll down in NavPanel
     const panel = page.getByTestId("panel");
     await panel.evaluate((el) => {
-      el.querySelector('[data-overlayscrollbars-viewport]')?.scrollTo(0, 50);
+      el.querySelector("[data-overlayscrollbars-viewport]")?.scrollTo(0, 50);
     });
 
     // Wait for fade to update
