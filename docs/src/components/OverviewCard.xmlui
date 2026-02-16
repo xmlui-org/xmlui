@@ -1,0 +1,18 @@
+<Component name="OverviewCard">
+  <Link
+      active="true"
+      to="{$props.to}"
+      width="{$props.width}"
+      height="$space-18"
+      tooltip="{$props.label}"
+  >
+      <Card width="100%" height="100%">
+          <HStack verticalAlignment="center" gap="$space-2" overflow="hidden">
+              <Icon color="$textColor-secondary" when="{$props.icon}" name="{$props.icon}" />
+              <Text width="*" minWidth="0" variant="strong" maxLines="1" ellipses>
+                  {$props.label}
+              </Text>
+          </HStack>
+      </Card>
+  </Link>
+</Component>

@@ -214,6 +214,9 @@ export type AppContextObject = {
   // This function toggles the current theme tone from "light" to "dark" or vice versa.
   toggleThemeTone: () => void;
 
+  // This function gets the value of the specified theme variable.
+  getThemeVar: (themeVar: string) => string | undefined;
+
   // ==============================================================================================
   // Users
 

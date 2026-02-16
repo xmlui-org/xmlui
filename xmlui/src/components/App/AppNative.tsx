@@ -426,8 +426,16 @@ export function App({
     },
   ];
 
+  const tableOfContentsEnabled = getThemeVar("tableOfContents") !== "false";
+  const isBlogPageWithToc =
+    tableOfContentsEnabled &&
+    (location.pathname === "/" ||
+      location.pathname === "/blog" ||
+      location.pathname.startsWith("/blog/"));
+
   const pagesWrapperClasses = classnames(styles.pageContentContainer, {
     [styles.withDefaultContentPadding]: applyDefaultContentPadding,
+    [styles.withToc]: isBlogPageWithToc,
   });
 
   const config = layoutConfigs[safeLayout];

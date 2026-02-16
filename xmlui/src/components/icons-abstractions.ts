@@ -12,7 +12,7 @@ export const ICON_NAMES = {
   SEND: "send",
   USERS: "users",
   REFRESH: "refresh",
-  SIDEBAR_COLLAPSE: "square-collapse",
+  SIDEBAR_COLLAPSE: "sidebar-collapse",
   CHEVRON_DOWN: "chevrondown",
   CHEVRON_UP: "chevronup",
   CHEVRON_RIGHT: "chevronright",

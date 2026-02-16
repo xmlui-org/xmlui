@@ -1,49 +1,4 @@
-<App
-    layout="vertical-full-header"
-    var.posts=`{[
-        {
-        title: "Introducing XMLUI",
-        slug: "introducing-xmlui",
-        description: "Let's make building user interfaces as easy as it was 30 years ago.",
-        author: "Jon Udell",
-        date: "2025-07-18",
-        image: "xmlui-demo.png"
-        },
-        {
-        title: "Reproducible XMLUI",
-        slug: "xmlui-playground",
-        description: "Use playgrounds to infuse docs with live examples, iterate on prototypes, and reproduce bugs.",
-        author: "Jon Udell",
-        date: "2025-10-27",
-        image: "playground.png"
-        },
-        {
-        title: "An XMLUI-powered blog",
-        slug: "xmlui-powered-blog",
-        description: "How we made this blog with a few dozen lines of XMLUI.",
-        author: "Jon Udell",
-        date: "2025-10-28",
-        image: "blog-scrabble.png"
-        },
-        {
-        title: "Introducing the XMLUI CLI",
-        slug: "introducing-the-xmlui-cli",
-        description: "Your all-in-one tool for working with XMLUI.",
-        author: "Jon Udell",
-        date: "2025-12-19",
-        image: "cli-blog-header.svg"
-        },
-        {
-        title: "Supabase + XMLUI",
-        slug: "supabase-and-xmlui",
-        description: "Build an XMLUI interface to a Supabase backend.",
-        author: "Jon Udell",
-        date: "2026-01-27",
-        image: "supabase-and-xmlui.png",
-        draft: true
-        }
-        ]}`
->
+<App layout="vertical-full-header">
     <AppHeader>
         <property name="logoTemplate">
             <Link to="https://xmlui.org/" height="100%">
@@ -109,19 +64,18 @@
 
     <Pages fallbackPath="/404">
         <Page url="/">
-            <BlogOverview posts="{posts}" />
+            <BlogOverview />
         </Page>
         <Page url="/404">
             <PageNotFound />
         </Page>
         <Page url="/blog">
-            <BlogOverview posts="{posts}" />
+            <BlogOverview />
         </Page>
 
         <Page url="/blog/:slug">
-            <BlogPage post="{posts.find(p => p.slug === $routeParams.slug)}" />
+            <BlogPage post="{appGlobals.blog.posts.find(p => p.slug === $routeParams.slug)}" />
         </Page>
-
     </Pages>
     <Footer sticky="false">
         <Text fontWeight="400">

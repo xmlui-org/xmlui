@@ -1,0 +1,268 @@
+$gap: 1rem;
+
+// --- Blog post (single post view)
+.postRoot {
+  display: flex;
+  flex-direction: column;
+  gap: $gap;
+  margin-top: $gap;
+}
+
+.postRow {
+  display: flex;
+  flex-direction: row;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+
+.postContent {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $gap;
+
+  &.postContentNoToc {
+    max-width: 900px;
+  }
+}
+
+.postMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.postTagsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.postTag {
+  font-size: 13px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background-color: var(--xmlui-color-surface-100, #f0f0f0);
+}
+
+.postTitle {
+  font-size: 32px;
+}
+
+.postDescriptionLarge {
+  font-size: 24px;
+}
+
+.postTocSidebar {
+  width: 16rem;
+  flex-shrink: 0;
+  position: sticky;
+  top: var(--xmlui-height-AppHeader, 3.5rem);
+  align-self: flex-start;
+}
+
+// --- Post card (list item)
+.postCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+  padding: 1.75rem;
+  border-radius: 8px;
+  box-sizing: border-box;
+
+  &.postCardCompact {
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+}
+
+.postCardInner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.postCardTag {
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background-color: var(--xmlui-color-surface-100, #f0f0f0);
+}
+
+.postCardTitle {
+  font-size: 24px;
+
+  .postCardCompact & {
+    font-size: 18px;
+  }
+}
+
+.postCardReadMore {
+  margin-top: auto;
+}
+
+// --- List views
+.listBasicRoot {
+  margin-top: $gap;
+}
+
+.listBasicFlow {
+  margin-top: $gap;
+}
+
+.listFeaturedRoot {
+  margin-top: $gap;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.listTitle {
+  text-align: center;
+  font-size: 42px;
+}
+
+.featuredPost {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: $gap;
+}
+
+.featuredPostInner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.featuredPostTitle {
+  font-size: 24px;
+}
+
+.featuredPostReadMore {
+  display: flex;
+  justify-content: flex-end;
+}
+
+// Tab grid item: same style as highlighted post, no description, no card
+.featuredStylePost {
+  display: flex;
+  flex-direction: column;
+  gap: $gap;
+  height: 100%;
+  min-height: 0;
+
+  .featuredPostReadMore {
+    margin-top: auto;
+  }
+}
+
+.featuredStylePostInner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.featuredStylePostTitle {
+  font-size: 24px;
+}
+
+.postsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+
+@media (max-width: 900px) {
+  .postsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .postsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.postsGridItem {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+
+  // Equal-height cards: stretch link and inner card to fill grid cell
+  & > a {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  & > a > div {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.sectionAllPosts {
+  margin-top: 2.5rem;
+}
+
+.sectionAllPostsHeading {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+// Segmented tab selector: rounded container, active = white pill, inactive = grey text
+.blogTabs > div:first-child {
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: var(--xmlui-color-surface-100, #f5f5f5);
+  border: 1px solid var(--xmlui-color-border, #e5e5e5);
+  border-radius: 8px;
+  padding: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+
+  // Remove default Tabs filler border (the line under the tab list)
+  & > div:not([role="tab"]) {
+    border: none !important;
+  }
+}
+
+.blogTabs [role="tab"] {
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  border-bottom: none !important;
+  color: var(--xmlui-color-text-secondary, #666);
+  padding: 8px 12px;
+  font-size: inherit;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--xmlui-color-text, #333);
+  }
+}
+
+.blogTabs [role="tab"][data-state="active"] {
+  background: var(--xmlui-backgroundColor-Card, #fff);
+  border: 1px solid var(--xmlui-color-border, #e0e0e0);
+  border-bottom: 1px solid var(--xmlui-color-border, #e0e0e0) !important;
+  color: var(--xmlui-color-primary, #0066cc);
+  font-weight: 500;
+}

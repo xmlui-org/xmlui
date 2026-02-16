@@ -100,13 +100,14 @@ export function AppContent({
   const {
     activeThemeId,
     activeThemeTone,
+    activeTheme,
     setActiveThemeId,
     setActiveThemeTone,
     availableThemeIds,
     toggleThemeTone,
   } = useThemes();
 
-  const { root } = useTheme();
+  const { root, getThemeVar: themeGetThemeVar } = useTheme();
 
   // --- Handle special key combinations to change the theme and tone
   useDocumentKeydown((event: KeyboardEvent) => {
@@ -405,7 +406,7 @@ export function AppContent({
 
   // --- We extract the global properties from the app configuration and pass them to the app context
   const appGlobals = useMemo(() => {
-    return globalProps ? { ...globalProps } : EMPTY_OBJECT;
+    return globalProps ?? EMPTY_OBJECT;
   }, [globalProps]);
 
   // --- We prepare the helper infrastructure for the `AppState` component, which manages
@@ -870,6 +871,7 @@ export function AppContent({
       setTheme: setActiveThemeId,
       setThemeTone: setActiveThemeTone,
       toggleThemeTone,
+      getThemeVar: themeGetThemeVar,
 
       // --- User-related
       loggedInUser,
@@ -911,6 +913,7 @@ export function AppContent({
     setActiveThemeId,
     setActiveThemeTone,
     toggleThemeTone,
+    themeGetThemeVar,
     loggedInUser,
     embed,
     apiInterceptorContext,

@@ -134,6 +134,7 @@ export interface ThemeDefinition extends ThemeDefinitionDetails {
 
   // This property defines a color that represents the theme.
   color?: string;
+
 }
 
 export type DefaultThemeVars = Record<string | ThemeTone, string | Record<string, string>>;

@@ -18,11 +18,14 @@ $backgroundColor-trigger-Tabs: createThemeVar("backgroundColor-trigger-Tabs");
 $borderRadius-trigger-Tabs: createThemeVar("borderRadius-trigger-Tabs");
 $border-trigger-Tabs: createThemeVar("border-trigger-Tabs");
 $textColor-trigger-Tabs: createThemeVar("textColor-trigger-Tabs");
+$textColor-trigger-Tabs--active: createThemeVar("textColor-trigger-Tabs--active");
+$textColor-trigger-Tabs--hover: createThemeVar("textColor-trigger-Tabs--hover");
 $backgroundColor-trigger-Tabs--hover: createThemeVar("backgroundColor-trigger-Tabs--hover");
 $backgroundColor-trigger-Tabs--active: createThemeVar("backgroundColor-trigger-Tabs--active");
 $backgroundColor-list-Tabs: createThemeVar("backgroundColor-list-Tabs");
 $borderRadius-list-Tabs: createThemeVar("borderRadius-list-Tabs");
 $border-list-Tabs: createThemeVar("border-list-Tabs");
+$gap-list-Tabs: createThemeVar("gap-list-Tabs");
 
 @layer components {
   .tabs {
@@ -60,8 +63,16 @@ $border-list-Tabs: createThemeVar("border-list-Tabs");
     &.distributeEvenly {
       flex: 1 1 auto;
     }
-
     color: $textColor-trigger-Tabs;
+
+    &[data-state="active"] {
+      color: $textColor-trigger-Tabs--active;
+    }
+
+    &:hover {
+      color: $textColor-trigger-Tabs--hover;
+    }
+
     background-color: $backgroundColor-trigger-Tabs;
     border-radius: $borderRadius-trigger-Tabs;
     display: flex;
@@ -118,6 +129,7 @@ $border-list-Tabs: createThemeVar("border-list-Tabs");
     display: flex;
     flex-shrink: 0;
     scrollbar-width: thin;
+    gap: $gap-list-Tabs;
 
     &[data-orientation="vertical"] {
       flex-direction: column;

@@ -61,6 +61,7 @@ import { SwitchMd } from "./Switch/Switch";
 import { TableMd } from "./Table/Table";
 import { ColumnMd } from "./Column/Column";
 import { TableOfContentsMd } from "./TableOfContents/TableOfContents";
+import { BlogMd } from "./Blog/Blog";
 import { TabsMd } from "./Tabs/Tabs";
 import { TextMd } from "./Text/Text";
 import { TextAreaMd } from "./TextArea/TextArea";
@@ -328,6 +329,7 @@ export const collectedComponentMetadata = {
   Avatar: AvatarMd,
   Backdrop: BackdropMd,
   Badge: BadgeMd,
+  Blog: BlogMd,
   Bookmark: BookmarkMd,
   Breakout: BreakoutMd,
   Button: ButtonMd,

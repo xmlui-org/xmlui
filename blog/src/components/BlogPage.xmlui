@@ -1,24 +1,53 @@
 <Component name="BlogPage">
-  <VStack gap="$space-2" marginTop="$space-4">
-    <Link to="/blog" abel="Go to all posts">
-      ← Go to all posts
-    </Link>
-    <VStack gap="$space-2">
-      <VStack gap="$space-0_5">
-        <H1 showAnchor="false" fontSize="32px">
-          {$props.post.title}
-        </H1>
-        <Text variant="description" maxLines="4" ellipses fontSize="24px">
-            {$props.post.description}
-        </Text>
-      </VStack>
-      <Text variant="info">
-        {$props.post.author}
-        •
-        {formatDate($props.post.date, "d MMM yyyy")}
-      </Text>
-      <Image when="{$props.post.image}" src="/blog/images/{$props.post.image}" />
-      <Markdown content="{appGlobals.prefetchedContent[`/blog/${$props.post.slug}.md`]}" />
+    <script>
+    function showToc() {
+        return getThemeVar("tableOfContents") !== "false" && mediaSize.sizeIndex > 3;
+    }
+    function showTags() {
+        return getThemeVar("tags") !== "false";
+    }
+    function markdownContent() {
+        return appGlobals.prefetchedContent[`/blog/${$props.post.slug}.md`];
+    }
+    </script>
+
+    <VStack gap="$space-2" marginTop="$space-4">
+        <Link to="/blog">
+            ← Go to all posts
+        </Link>
+        <HStack gap="$space-5">
+            <VStack width="*" gap="$space-2">
+                <VStack gap="$space-0_5">
+                    <H1 showAnchor="false" fontSize="$fontSize-blog-page-title">
+                        {$props.post.title}
+                    </H1>
+                    <Text variant="blogPostDescription">
+                        {$props.post.description}
+                    </Text>
+                </VStack>
+                <Text variant="info">
+                    {$props.post.author}
+                    •
+                    {formatDate($props.post.date, "d MMM yyyy")}
+                </Text>
+                <HStack when="{showTags() && $props.post.tags && $props.post.tags.length > 0}" gap="$space-1_5">
+                    <Items data="{$props.post.tags}">
+                        <Tag>{$item}</Tag>
+                    </Items>
+                </HStack>
+                <Markdown
+                    content="{markdownContent()}"
+                    showHeadingAnchors
+                />
+            </VStack>
+            <TableOfContents
+                scrollStyle="whenScrolling"
+                showScrollerFade="true"
+                width="$space-64"
+                omitH1
+                when="{showToc()}"
+                maxHeadingLevel="3"
+            />
+        </HStack>
     </VStack>
-  </VStack>
 </Component>

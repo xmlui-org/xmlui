@@ -1,58 +1,39 @@
 <Component name="BlogOverview">
-    <VStack marginTop="$space-4">
-        <H1 textAlign="center" fontSize="42px" showAnchor="false">
+    <script>
+        var layout = getThemeVar("layout") || "basic";
+        var showTags = getThemeVar("tags") !== "false";
+        var sortedPosts = (appGlobals.blog?.posts || [])
+            .filter((p) => !p.draft)
+            .toSorted((a, b) => Date.parse(b.date) - Date.parse(a.date));
+        var allTags = distinct(sortedPosts.flatMap((p) => p.tags || [])).toSorted();
+        var latestPost = sortedPosts.length
+            ? sortedPosts.reduce((latest, p) => Date.parse(p.date) > Date.parse(latest.date) ? p : latest)
+            : null;
+        var gridCols = mediaSize.sizeIndex > 3 ? 3 : mediaSize.sizeIndex > 2 ? 2 : 1;
+        var postsByTag = allTags.map((tag) => ({
+            tag,
+            posts: sortedPosts.filter((p) => p.tags && p.tags.includes(tag)),
+        }));
+    </script>
+
+    <VStack marginTop="$space-4" gap="$space-4">
+        <H1 textAlign="center" fontSize="$fontSize-blog-overview-title" showAnchor="false">
             Blog
         </H1>
-        <FlowLayout verticalAlignment="stretch" gap="$space-6">
-            <Items
-                data="{
-                $props.posts.filter(p => !p.draft).toSorted(function(a, b) {
-                  return Date.parse(b.date) - Date.parse(a.date);
-                })
-            }"
-            >
-                <Link
-                    width="100%"
-                    height="100%"
-                    active="true"
-                    to="/blog/{$item.slug}"
-                >
 
-                    <VStack
-                        gap="$space-3"
-                        height="*"
-                        minHeight="0"
-                        width="100%"
-                        var.blogLink="/blog/{$item.slug}"
-                        padding="$space-7"
-                        borderRadius="$space-2"
-                    >
-                    <VStack gap="$space-2">
-                        <HStack>
-                            <Text variant="info">
-                                {$item.author}
-                                •
-                                {formatDate($item.date, "d MMM yyyy")}
-                            </Text>
-                        </HStack>
-                        <VStack gap="$space-0_5">
-                            <H2 variant="title" fontSize="24px" showAnchor="false">
-                                {$item.title}
-                            </H2>
-                            <Text variant="description" maxLines="4" ellipses>
-                                {$item.description}
-                            </Text>
-                        </VStack>
-                        </VStack>
-                        <Text variant="blurb" maxLines="4" ellipses>
-                            {globalThis.getBlurb(appGlobals.prefetchedContent['/blog/' + $item.slug + '.md'])}
-                        </Text>
-                        <HStack horizontalAlignment="start" marginTop="auto">
-                            Read more →
-                        </HStack>
-                    </VStack>
-                </Link>
-            </Items>
-        </FlowLayout>
+        <BasicLayout
+            when="{layout === 'basic'}"
+            sortedPosts="{sortedPosts}"
+            showTags="{showTags}"
+        />
+
+        <FeaturedWithTabsLayout
+            when="{layout === 'featuredWithTabs'}"
+            latestPost="{latestPost}"
+            sortedPosts="{sortedPosts}"
+            showTags="{showTags}"
+            postsByTag="{postsByTag}"
+            gridCols="{gridCols}"
+        />
     </VStack>
 </Component>
