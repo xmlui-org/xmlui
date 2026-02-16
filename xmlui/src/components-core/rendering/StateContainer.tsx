@@ -22,6 +22,7 @@ import { useReferenceTrackedApi, useShallowCompareMemoize } from "../utils/hooks
 import { Container } from "./Container";
 import { getCurrentTrace } from "../inspector/inspectorUtils";
 import { createVariableLogger } from "../inspector/variable-logging";
+import { mergeComponentApis, STATE_LAYER_DOCUMENTATION } from "../state/state-layers";
 import { isParsedCodeDeclaration } from "../../abstractions/InternalMarkers";
 import { useAppContext } from "../AppContext";
 import { parseParameterString } from "../script-runner/ParameterParser";
@@ -126,85 +127,19 @@ export const StateContainer = memo(
      *
      * The container state is assembled from multiple sources in a specific order and priority.
      * Understanding this flow is critical for debugging state issues.
-     *
-     * FLOW DIAGRAM:
-     * ┌─────────────────────────────────────────────────────────────┐
-     * │ 1. Parent State (scoped by `uses` property)                │
-     * │    - Inherited from parent container                       │
-     * │    - Filtered by `uses` property if present (creates boundary)
-     * │    - Lines 76-78: extractScopedState() filters parent     │
-     * └──────────────────────┬──────────────────────────────────────┘
-     *                        ↓
-     * ┌─────────────────────────────────────────────────────────────┐
-     * │ 2. Component Reducer State                                  │
-     * │    - Managed by container's reducer                        │
-     * │    - Contains loader states, event lifecycle flags         │
-     * │    - Examples: { dataLoader: { loaded: true, data: [...] },
-     * │               eventInProgress: true }                      │
-     * │    - Lines 83-84: useReducer creates this state           │
-     * └──────────────────────┬──────────────────────────────────────┘
-     *                        ↓
-     * ┌─────────────────────────────────────────────────────────────┐
-     * │ 3. Component APIs (exposed methods)                        │
-     * │    - Methods exposed by child components                   │
-     * │    - Registered via registerComponentApi callback          │
-     * │    - Examples: { getSelectedRows(), fetchData() }         │
-     * │    - Lines 86-87: useState manages component APIs         │
-     * └──────────────────────┬──────────────────────────────────────┘
-     *                        ↓
-     * ┌─────────────────────────────────────────────────────────────┐
-     * │ 4. Context Variables (framework-injected)                 │
-     * │    - Special variables like $item, $itemIndex             │
-     * │    - Provided by parent components (e.g., DataTable row)   │
-     * │    - Lines 108: localVarsStateContext combines these      │
-     * └──────────────────────┬──────────────────────────────────────┘
-     *                        ↓
-     * ┌─────────────────────────────────────────────────────────────┐
-     * │ 5. Local Variables (vars, functions, script)              │
-     * │    - Declared in component definition                     │
-     * │    - Resolved in two passes for forward references        │
-     * │    - Highest priority (can shadow parent state)           │
-     * │    - Two-pass resolution explained below                  │
-     * │    - Lines 123-184: Complex variable resolution           │
-     * └──────────────────────┬──────────────────────────────────────┘
-     *                        ↓
-     * ┌─────────────────────────────────────────────────────────────┐
-     * │ 6. Routing Parameters (app-level context)                 │
-     * │    - Added last, always available                         │
-     * │    - Examples: $pathname, $routeParams, $hash             │
-     * │    - Line 185-189: useCombinedState merges all sources   │
-     * └──────────────────────┬──────────────────────────────────────┘
-     *                        ↓
-     *                  FINAL COMBINED STATE
-     *
-     * PRIORITY ORDER (later overrides earlier):
-     * 1. Parent State (lowest priority)
-     * 2. Component State + APIs
-     * 3. Context Variables
-     * 4. Local Variables (highest priority - can shadow parent state)
-     * 5. Routing Parameters (additive, always available)
-     *
-     * EXAMPLE - Multi-level composition:
-     *
-     * Parent Container (parentState):
-     * { user: { id: 1, name: "John" }, count: 0 }
-     *
-     * <Stack uses="['user']" var.count="{10}">
-     *   - Parent State (after scoping): { user: { id: 1, name: "John" } }
-     *   - Local vars: { count: 10 }
-     *   - Result: { user: { id: 1, name: "John" }, count: 10 }
-     *
-     *   CONTRAST: Without 'uses':
-     *   <Stack var.count="{10}">
-     *   - Parent State (no scoping): { user: { id: 1, name: "John" }, count: 0 }
-     *   - Local vars: { count: 10 }
-     *   - Result: { user: { id: 1, name: "John" }, count: 10 } (local vars override)
-     *
-     * DEBUGGING TIPS:
-     * - Enable debug mode on component: <Stack debug>
-     * - Check debugView.stateTransitions for state changes
-     * - Each level can be inspected in React DevTools
-     * - Variable resolution errors logged to console
+     * 
+     * Full pipeline documentation available in: ../state/state-layers.ts
+     * 
+     * Quick reference - see STATE_LAYER_DOCUMENTATION for details:
+     * 1. Parent State (scoped by `uses`)
+     * 2. Component Reducer State (loaders, events)
+     * 3. Component APIs (exposed methods)
+     * 4. Context Variables ($item, $itemIndex)
+     * 5. Local Variables (vars, functions, script)
+     * 6. Routing Parameters ($pathname, $routeParams)
+     * 
+     * Priority: Parent < Component < Context < Local Vars
+     * Routing parameters are additive.
      */
 
     // ========================================================================
@@ -234,28 +169,7 @@ export const StateContainer = memo(
     const [componentApis, setComponentApis] = useState<Record<symbol, ComponentApi>>(EMPTY_OBJECT);
 
     const componentStateWithApis = useShallowCompareMemoize(
-      useMemo(() => {
-        const ret = { ...componentState };
-        for (const stateKey of Object.getOwnPropertySymbols(componentState)) {
-          const value = componentState[stateKey];
-          if (stateKey.description) {
-            ret[stateKey.description] = value;
-          }
-        }
-        if (Reflect.ownKeys(componentApis).length === 0) {
-          //skip containers with no registered apis
-          return ret;
-        }
-        for (const componentApiKey of Object.getOwnPropertySymbols(componentApis)) {
-          const value = componentApis[componentApiKey];
-          if (componentApiKey.description) {
-            const key = componentApiKey.description;
-            ret[key] = { ...(ret[key] || {}), ...value };
-          }
-          ret[componentApiKey] = { ...ret[componentApiKey], ...value };
-        }
-        return ret;
-      }, [componentState, componentApis]),
+      useMemo(() => mergeComponentApis(componentState, componentApis), [componentState, componentApis]),
     );
 
     // ========================================================================
