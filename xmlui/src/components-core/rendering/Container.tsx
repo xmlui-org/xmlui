@@ -60,14 +60,9 @@ import type { ParsedEventValue } from "../../abstractions/scripting/Compilation"
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
 import { mergeProps } from "../utils/mergeProps";
 import {
-  pushTrace,
-  popTrace,
   getCurrentTrace,
-  formatChange,
-  safeStringify,
-  xsConsoleLog,
-  pushXsLog,
 } from "../inspector/inspectorUtils";
+import { createHandlerLogger } from "../inspector/handler-logging";
 
 // Re-export for backward compatibility
 export { getCurrentTrace } from "../inspector/inspectorUtils";
@@ -208,6 +203,15 @@ export const Container = memo(
     const { apiInstance } = useApiInterceptorContext();
 
     // ========================================================================
+    // INSPECTOR LOGGING SETUP
+    // ========================================================================
+
+    const handlerLogger = createHandlerLogger({
+      appContext,
+      nodeDebugSource: (node as any)?.debug?.source,
+    });
+
+    // ========================================================================
     // EVENT HANDLER EXECUTION - ASYNC
     // ========================================================================
     // runCodeAsync: Executes event handlers asynchronously with state tracking,
@@ -238,49 +242,9 @@ export const Container = memo(
             changes.push(changeInfo);
           });
         };
-        const xsVerbose = appContext.appGlobals?.xsVerbose === true;
-        const xsLogBucket = appContext.appGlobals?.xsVerboseLogBucket;
-        const xsLogMax = Number(appContext.appGlobals?.xsVerboseLogMax ?? 200);
-        const xsLog = (...args: any[]) => {
-          if (!xsVerbose) return;
-          xsConsoleLog(...args);
-          const detail = args[1];
-          pushXsLog({
-            ts: Date.now(),
-            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-            traceId: detail?.traceId ?? getCurrentTrace(),
-            text: safeStringify(args),
-            kind: args[0] ?? undefined,
-            eventName: detail?.eventName,
-            componentType: detail?.componentType,
-            componentLabel: detail?.componentLabel,
-            uid: detail?.uid ? String(detail.uid) : undefined,
-            diffPretty: detail?.diffPretty ||
-              (Array.isArray(detail?.diff) && detail.diff.map((d: any) => d?.diffPretty).filter(Boolean).join("\n\n")) ||
-              undefined,
-            diffJson: Array.isArray(detail?.diff) ? detail.diff : undefined,
-            error: detail?.error ? { message: detail.error.message || String(detail.error), stack: detail.error.stack } : undefined,
-            ownerFileId: detail?.ownerFileId,
-            ownerSource: detail?.ownerSource,
-            duration: detail?.duration,
-            startPerfTs: detail?.startPerfTs,
-            handlerCode: detail?.handlerCode,
-            eventArgs: detail?.args?.length ? detail.args : undefined,
-          }, xsLogMax);
-          if (xsLogBucket && appContext.AppState) {
-            try {
-              const current = appContext.AppState.get(xsLogBucket) || [];
-              const next = Array.isArray(current) ? current.slice() : [];
-              next.push({ ts: Date.now(), args });
-              if (Number.isFinite(xsLogMax) && xsLogMax > 0 && next.length > xsLogMax) {
-                next.splice(0, next.length - xsLogMax);
-              }
-              appContext.AppState.set(xsLogBucket, next);
-            } catch (e) {
-              console.warn("[xs] Failed to write to AppState log bucket", e);
-            }
-          }
-        };
+
+        // Create xsLog function for use in evalContext
+        const xsLog = handlerLogger.createXsLog();
 
         const evalAppContext = {
           ...appContext,
@@ -317,64 +281,35 @@ export const Container = memo(
           },
         };
 
-        // Generate trace ID for this handler execution
-        const preferredTraceId =
-          xsVerbose && typeof window !== "undefined"
-            ? (() => {
-                const w = window as any;
-                if (w._xsCurrentTrace) return w._xsCurrentTrace;
-                const last = w._xsLastInteraction;
-                return last && Date.now() - last.ts < 2000 ? last.id : undefined;
-              })()
-            : undefined;
-        const traceId = xsVerbose ? pushTrace(preferredTraceId) : undefined;
-        // Extract component context for logging
-        const uidName = componentUid.description || "";
-        const componentType = options?.componentType;
-        const componentLabel = options?.componentLabel || options?.componentId || uidName;
+        // Initialize trace and extract metadata for logging
+        const traceId = handlerLogger.initializeTrace();
+        const { uidName, componentType, componentLabel } = handlerLogger.extractComponentMetadata(
+          componentUid,
+          options,
+        );
+        const handlerCode = handlerLogger.extractHandlerCode(source);
+        const { handlerFileId, handlerSourceRange } = handlerLogger.lookupSourceInfo(options);
 
         // Track handler start time for duration calculation
-        const handlerStartPerfTs = typeof performance !== "undefined" ? performance.now() : undefined;
-
-        // Look up source info for handler logging
-        const keyPart = options?.componentId || `${componentType || "unknown"}:${componentLabel || ""}`;
-        const sourceKey = `${keyPart};${options?.eventName || "unknown"}`;
-        const storedSourceInfo = typeof window !== "undefined"
-          ? (window as any)._xsHandlerSourceInfo?.[sourceKey]
-          : undefined;
-        const handlerFileId = options?.sourceFileId ?? storedSourceInfo?.fileId ?? (node as any)?.debug?.source?.fileId;
-        const handlerSourceRange = options?.sourceRange ?? storedSourceInfo?.range ?? ((node as any)?.debug?.source
-          ? { start: (node as any).debug.source.start, end: (node as any).debug.source.end }
-          : undefined);
-
-        // Extract handler code for logging (works with string, ParsedEventValue, or ArrowExpression)
-        let handlerCode: string | undefined;
-        if (typeof source === "string") {
-          handlerCode = source;
-        } else if ((source as any)?.source) {
-          // ParsedEventValue has .source
-          handlerCode = (source as any).source;
-        } else if ((source as any)?.name) {
-          // ArrowExpression has .name (function name)
-          handlerCode = `${(source as any).name}()`;
-        }
+        const handlerStartPerfTs =
+          typeof performance !== "undefined" ? performance.now() : undefined;
 
         // Capture traceId at handler start so handler:complete uses the same trace
         const handlerTraceId = getCurrentTrace();
 
         try {
-          if (xsVerbose) {
-            xsLog("handler:start", {
-              uid: uidName,
-              eventName: options?.eventName,
-              componentType,
-              componentLabel,
-              args: eventArgs,
-              ownerFileId: handlerFileId,
-              ownerSource: handlerSourceRange,
-              handlerCode,
-            });
-          }
+          // Log handler start
+          handlerLogger.logHandlerStart({
+            uid: uidName,
+            eventName: options?.eventName,
+            componentType,
+            componentLabel,
+            eventArgs,
+            ownerFileId: handlerFileId,
+            ownerSource: handlerSourceRange,
+            handlerCode,
+          });
+
           // --- Prepare the event handler to an arrow expression statement
           let statements: Statement[];
           if (typeof source === "string") {
@@ -420,28 +355,15 @@ export const Container = memo(
           let mainThreadBlockingRuns = 0;
           evalContext.onStatementCompleted = async (evalContext) => {
             if (changes.length) {
-              if (xsVerbose) {
-                const filteredChanges = changes.filter(
-                  (change) => typeof change.path === "string" && !change.path.startsWith("__arg@@#__"),
-                );
-                if (filteredChanges.length === 0) {
-                  // Only internal argument wiring happened; skip logging.
-                } else {
-                  xsLog("state:changes", {
-                    uid: uidName,
-                    eventName: options.eventName,
-                    componentType,
-                    componentLabel,
-                    changes: filteredChanges.map((change) => ({
-                      path: change.path,
-                      action: change.action,
-                      previousValue: change.previousValue,
-                      newValue: change.newValue,
-                    })),
-                    diff: filteredChanges.map(formatChange),
-                  });
-                }
-              }
+              // Log state changes
+              handlerLogger.logStateChanges({
+                uid: uidName,
+                eventName: options.eventName,
+                componentType,
+                componentLabel,
+                changes,
+              });
+
               mainThreadBlockingRuns = 0;
               changes.forEach((change) => {
                 statePartChanged(
@@ -529,58 +451,47 @@ export const Container = memo(
             });
           }
 
-          // Log handler completion with duration (always, regardless of return value)
-          if (xsVerbose) {
-            const handlerEndPerfTs = typeof performance !== "undefined" ? performance.now() : undefined;
-            const handlerDuration = handlerStartPerfTs !== undefined && handlerEndPerfTs !== undefined
+          // Log handler completion with duration
+          const handlerEndPerfTs =
+            typeof performance !== "undefined" ? performance.now() : undefined;
+          const handlerDuration =
+            handlerStartPerfTs !== undefined && handlerEndPerfTs !== undefined
               ? handlerEndPerfTs - handlerStartPerfTs
               : undefined;
-            const returnValue = evalContext.mainThread?.blocks?.length
-              ? evalContext.mainThread.blocks[evalContext.mainThread.blocks.length - 1].returnValue
-              : undefined;
-            xsLog("handler:complete", {
-              uid: uidName,
-              eventName: options?.eventName,
-              componentType,
-              componentLabel,
-              returnValue,
-              duration: handlerDuration,
-              startPerfTs: handlerStartPerfTs,
-              ownerFileId: handlerFileId,
-              ownerSource: handlerSourceRange,
-              handlerCode,
-              traceId: handlerTraceId,
-            });
-          }
+          const returnValue = evalContext.mainThread?.blocks?.length
+            ? evalContext.mainThread.blocks[evalContext.mainThread.blocks.length - 1].returnValue
+            : undefined;
+
+          handlerLogger.logHandlerComplete({
+            uid: uidName,
+            eventName: options?.eventName,
+            componentType,
+            componentLabel,
+            returnValue,
+            duration: handlerDuration,
+            startPerfTs: handlerStartPerfTs,
+            ownerFileId: handlerFileId,
+            ownerSource: handlerSourceRange,
+            handlerCode,
+            traceId: handlerTraceId,
+          });
 
           if (evalContext.mainThread?.blocks?.length) {
-            return evalContext.mainThread.blocks[evalContext.mainThread.blocks.length - 1].returnValue;
+            return evalContext.mainThread.blocks[evalContext.mainThread.blocks.length - 1]
+              .returnValue;
           }
         } catch (e) {
-          if (xsVerbose) {
-            // Look up source info from global storage (handles cached handlers across Container hierarchy)
-            // Use componentId if available, else fall back to componentType+componentLabel
-            const keyPart = options?.componentId || `${componentType || "unknown"}:${componentLabel || ""}`;
-            const sourceKey = `${keyPart};${options?.eventName || "unknown"}`;
-            const storedSourceInfo = typeof window !== "undefined"
-              ? (window as any)._xsHandlerSourceInfo?.[sourceKey]
-              : undefined;
-            xsLog("handler:error", {
-              uid: uidName,
-              eventName: options?.eventName,
-              componentType,
-              componentLabel,
-              error: e,
-              ownerFileId: options?.sourceFileId ?? storedSourceInfo?.fileId ?? (node as any)?.debug?.source?.fileId,
-              ownerSource: options?.sourceRange ?? storedSourceInfo?.range ?? ((node as any)?.debug?.source
-                ? {
-                    start: (node as any).debug.source.start,
-                    end: (node as any).debug.source.end,
-                  }
-                : undefined),
-              traceId: handlerTraceId,
-            });
-          }
+          // Log handler error
+          handlerLogger.logHandlerError({
+            uid: uidName,
+            eventName: options?.eventName,
+            componentType,
+            componentLabel,
+            error: e,
+            ownerFileId: options?.sourceFileId ?? handlerFileId,
+            ownerSource: options?.sourceRange ?? handlerSourceRange,
+            traceId: handlerTraceId,
+          });
           //if we pass down an event handler to a component, we should sign the error once, not in every step of the component chain
           //  (we use it in the compoundComponent, resolving it's event handlers)
           if (options?.signError !== false) {
@@ -598,10 +509,8 @@ export const Container = memo(
           }
           throw e;
         } finally {
-          // Always pop the trace when handler completes (success or error)
-          if (traceId) {
-            popTrace();
-          }
+          // Clean up trace
+          handlerLogger.cleanupTrace(traceId);
         }
       },
     );
@@ -693,19 +602,16 @@ export const Container = memo(
           fnsRef.current[uid] = fnsRef.current[uid] || {};
           fnsRef.current[uid][fnCacheKey] = handler;
         }
-        // Always update source info for inspector logging (even for cached handlers)
-        // Use global storage since error may be caught in different Container
-        if (typeof window !== "undefined" && options?.sourceFileId !== undefined) {
-          const w = window as any;
-          w._xsHandlerSourceInfo = w._xsHandlerSourceInfo || {};
-          // Use componentId if available, else fall back to componentType+componentLabel
-          const keyPart = options.componentId || `${options.componentType || "unknown"}:${options.componentLabel || ""}`;
+
+        // Store source info for inspector logging (even for cached handlers)
+        if (options?.sourceFileId !== undefined) {
+          const keyPart =
+            options.componentId ||
+            `${options.componentType || "unknown"}:${options.componentLabel || ""}`;
           const sourceKey = `${keyPart};${options?.eventName || "unknown"}`;
-          w._xsHandlerSourceInfo[sourceKey] = {
-            fileId: options.sourceFileId,
-            range: options.sourceRange,
-          };
+          handlerLogger.storeSourceInfo(sourceKey, options.sourceFileId, options.sourceRange);
         }
+
         return fnsRef.current[uid][fnCacheKey];
       },
     );

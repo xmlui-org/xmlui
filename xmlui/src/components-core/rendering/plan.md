@@ -1,481 +1,799 @@
-# Refactoring Plan: Container State Management
+# Container & State Management Refactoring Plan
 
 ## Current Architecture Analysis
 
-### File Structure
-- **Container.tsx** (1042 lines): Rendering logic, event handlers, loaders, child rendering
-- **StateContainer.tsx** (1039 lines): State composition, variable resolution, reducer management
-- **ContainerWrapper.tsx** (300 lines): Container wrapping logic, implicit vs explicit containers
-- **reducer.ts** (180 lines): Redux-style state reducer
-- **buildProxy.ts** (100 lines): Proxy-based change detection
-- **containers.ts** (38 lines): Action type definitions
+### File Structure & Size
+- **StateContainer.tsx**: 1,130 lines - State composition pipeline (6 layers)
+- **Container.tsx**: 1,143 lines - Event handling, rendering, lifecycle
+- **ContainerWrapper.tsx**: 256 lines - Containerization logic
+- **reducer.ts**: 181 lines - State reducer
+- **ContainerUtils.ts**: 123 lines - Pure utility functions
+- **buildProxy.ts**: 92 lines - Proxy-based change tracking
+- **containers.ts**: 38 lines - Action types
+- **Total**: ~3,000 lines
 
 ### Key Responsibilities
 
 **StateContainer.tsx**:
-- State composition pipeline (6 layers: parent → reducer → APIs → context → local vars → routing)
-- Two-pass variable resolution for forward references
+- 6-layer state composition pipeline:
+  1. Parent state scoping (via `uses`)
+  2. Component reducer state
+  3. Component APIs
+  4. Context variables
+  5. Local variable resolution (two-pass for forward references)
+  6. Routing parameters
 - Global variable evaluation and dependency tracking
-- Reducer initialization and component API management
-- Inspector logging for variable changes
-- Routing parameter integration
+- Inspector logging for variable changes (~200 lines)
+- Variable resolution with memoization
+- Routing integration
 
 **Container.tsx**:
-- Component and child rendering via renderChild
-- Event handler execution (async/sync)
-- Event handler caching and lifecycle tracking
+- Async event handler execution (`runCodeAsync`) - ~400 lines
+- Sync event handler execution (`runCodeSync`) - ~50 lines
+- Event handler caching and lifecycle - ~150 lines
+- Inspector logging for handlers (~300 lines)
+- Child rendering via `renderChild`
 - Loader rendering
-- Statement execution with state change tracking
-- Inspector logging for handler execution
-- State update orchestration via React transitions
-- API registration for compound components
+- Statement execution with state tracking
+- React transition management
+- API registration
 
 **ContainerWrapper.tsx**:
-- Determines implicit vs explicit containers
-- Wraps components that need state management
+- Implicit vs explicit container determination
+- Component wrapping logic
 - Error boundary integration
+- Props forwarding to StateContainer
 
-### Problems
+### Key Issues
 
-1. **Large Files**: Container.tsx and StateContainer.tsx are each ~1000 lines with multiple mixed concerns
-2. **Complex State Flow**: 6-layer state composition with unclear priority order
-3. **Two-Pass Resolution**: Variable resolution requires two passes to handle forward references, adding complexity
-4. **Scattered Logic**: Event handling, rendering, variable resolution, and logging all mixed together
-5. **Hard to Follow**: Code flow requires hopping between Container → StateContainer → reducer → buildProxy
-6. **Inspector Code Inline**: Logging and debugging code intertwined with business logic
-7. **Memoization Complexity**: Multiple memoization layers (memoizeOne, useMemo, custom caching)
-8. **Global Variables**: Complex dependency tracking and re-evaluation logic for globals
-9. **Limited Unit Tests**: No dedicated unit tests for Container/StateContainer logic
+1. **Monolithic Files**: Container.tsx and StateContainer.tsx exceed 1,100 lines each
+2. **Mixed Concerns**: Inspector logging intermingled with business logic
+3. **Complex Control Flow**: Deeply nested callbacks, multiple useEvent/useCallback hooks
+4. **Difficult Navigation**: Reader must hop between many sections
+5. **Hidden Dependencies**: Ref juggling and closure-based state management
+6. **Verbose Logging**: Inspector code adds ~500 lines across both files
+7. **Duplication**: Similar error handling, logging, and caching patterns
+
+### Dependencies & Integration Points
+
+**External Dependencies**:
+- React hooks (useState, useReducer, useMemo, useCallback, useEffect, useRef)
+- React Router (useLocation, useNavigate, useParams, useSearchParams)
+- Immer (produce) for immutable updates
+- Lodash (cloneDeep, merge, isEmpty, etc.)
+- memoize-one for function memoization
+
+**Internal Dependencies**:
+- AppContext (global app utilities)
+- ThemeContext (theming support)
+- DebugViewProvider (debug configuration)
+- ApiInterceptorContext (API interception)
+- Script runner (statement processing, tree evaluation)
+- Inspector utilities (logging, tracing)
+- Proxy builder (change tracking)
+
+**Integration Points**:
+- Component renderers (via RendererContext)
+- LoaderComponent (async data loading)
+- ErrorBoundary (error handling)
+- ComponentWrapper (component routing)
+- renderChild (child rendering)
 
 ## Refactoring Goals
 
-1. **Improve code organization**: Add clear section structure for navigation in large files
-2. **Extract pure utilities**: Isolate testable logic without React dependencies
-3. **Enhance documentation**: Add comprehensive JSDoc and architectural docs
-4. **Increase testability**: Create unit tests for extracted utilities
-5. **Improve type safety**: Add type guards and strengthen TypeScript types
-6. **Maintain stability**: Zero test failures, no breaking changes
-7. **Document architecture**: Clear explanation of state composition and event handling
+1. **Reduce file size** to ~300-500 lines per file
+2. **Improve readability** with linear code flow
+3. **Separate concerns** into focused modules
+4. **Extract inspector logic** into dedicated files
+5. **Simplify state composition** with clearer boundaries
+6. **Add strategic comments** for complex flows
+7. **Maintain backward compatibility** (no breaking changes to component API)
+8. **Enable testing** through better separation
 
-**Strategic Approach**: Conservative internal refactoring rather than aggressive module extraction. This approach acknowledges the tight coupling inherent in React component architecture and prioritizes code quality and maintainability over file size reduction.
+## Proposed Architecture
 
-## Refactoring Approach: Conservative vs. Aggressive
+### New File Structure
 
-### ✅ Conservative Approach (ADOPTED)
-**Philosophy**: Improve code quality through internal organization, documentation, and selective utility extraction.
+```
+rendering/
+├── Container.tsx                    (~300 lines) - Core container orchestration
+├── StateContainer.tsx               (~400 lines) - State composition pipeline
+├── ContainerWrapper.tsx             (~256 lines) - No changes
+├── container/
+│   ├── event-handlers.ts           (~300 lines) - Event execution logic
+│   ├── event-handler-cache.ts      (~150 lines) - Handler caching & lifecycle
+│   ├── action-lookup.ts            (~200 lines) - Action resolution functions
+│   └── child-rendering.ts          (~150 lines) - renderChild & loader logic
+├── state/
+│   ├── state-layers.ts             (~250 lines) - Layer composition functions
+│   ├── variable-resolution.ts      (~200 lines) - Two-pass variable resolution
+│   ├── global-variables.ts         (~150 lines) - Global var evaluation
+│   └── routing-state.ts            (~100 lines) - Routing parameter integration
+├── inspector/
+│   ├── handler-logging.ts          (~200 lines) - Handler execution logging
+│   ├── variable-logging.ts         (~200 lines) - Variable change logging
+│   └── state-logging.ts            (~100 lines) - State change logging
+├── reducer.ts                       (~181 lines) - No changes
+├── ContainerUtils.ts                (~123 lines) - No changes
+├── buildProxy.ts                    (~92 lines) - No changes
+└── containers.ts                    (~38 lines) - No changes
+```
 
-**Characteristics**:
-- Large files remain large but well-organized
-- Section headers and subsections for navigation
-- Extract only pure functions without React dependencies
-- Comprehensive JSDoc documentation
-- Incremental, verifiable changes
-- Zero risk of breaking React lifecycle/hooks
+### Module Responsibilities
 
-**Results from Steps 1-2**:
-- ✅ All 4,561 tests pass
-- ✅ Clear section organization
-- ✅ 5 pure utilities extracted with 28 tests
-- ✅ Comprehensive documentation added
-- ✅ Zero regressions
+**container/event-handlers.ts**:
+- `createEventExecutor(config)` - Returns runCodeAsync and runCodeSync
+- Statement parsing and preparation
+- State change tracking and proxy management
+- React transition coordination
+- Error handling and propagation
 
-### ❌ Aggressive Approach (ATTEMPTED & REVERTED)
-**Philosophy**: Extract major functionality into separate modules to reduce file sizes.
+**container/event-handler-cache.ts**:
+- `createEventHandlerCache()` - Handler caching infrastructure
+- `getOrCreateEventHandlerFn()` - Handler lookup/creation
+- Lifecycle tracking (started, completed, error)
+- Source info storage for inspector
 
-**Characteristics**:
-- Break down large files into many smaller modules
-- Extract hook-based functions to separate files
-- Aim for files <400 lines
-- Extensive module interdependencies
+**container/action-lookup.ts**:
+- `createActionLookup(config)` - Returns lookupAction and lookupSyncCallback
+- Sync callback resolution
+- Async action resolution
+- Ephemeral action handling
 
-**Why It Failed**:
-- React hooks cannot be easily extracted
-- Complex lifecycle and context dependencies
-- Risk of breaking subtle runtime behaviors
-- Increased complexity with limited benefit
-- Required extensive mocking for tests
+**container/child-rendering.ts**:
+- `createChildRenderer(config)` - Returns renderChild function
+- Loader component rendering
+- Layout context management
+- Children rendering logic
 
-**Conclusion**: The conservative approach is the right strategy for React component internals.
+**state/state-layers.ts**:
+- `extractParentState(parentState, uses)` - Layer 1: Parent state scoping
+- `mergeComponentState(reducerState, apis)` - Layer 2+3: Reducer + APIs
+- `addContextVariables(state, contextVars)` - Layer 4: Context vars
+- `addRoutingState(state, routing)` - Layer 6: Routing params
+- `composeFinalState(layers)` - Combines all layers
+
+**state/variable-resolution.ts**:
+- `resolveVariables(definitions, dependencies, context, cache)` - Two-pass resolution
+- `collectFunctionDependencies(definitions)` - Dependency collection
+- `evaluateVariable(definition, context)` - Single variable evaluation
+- Clear documentation of two-pass strategy
+
+**state/global-variables.ts**:
+- `resolveGlobalVariables(config)` - Global variable evaluation
+- `collectGlobalDependencies(globalVars)` - Dependency tracking
+- `evaluateGlobalExpression(expr, context)` - Expression evaluation
+- Runtime change detection
+
+**state/routing-state.ts**:
+- `useRoutingParams()` - Routing parameter hook
+- `extractRoutingState(location, params, search, linkInfo)` - State extraction
+- Route variable mapping ($pathname, $routeParams, etc.)
+
+**inspector/handler-logging.ts**:
+- `createHandlerLogger(config)` - Returns logging functions
+- `logHandlerStart(details)` - Log handler execution start
+- `logHandlerComplete(details)` - Log handler completion
+- `logHandlerError(details)` - Log handler errors
+- `formatHandlerLog(details)` - Format log entries
+
+**inspector/variable-logging.ts**:
+- `createVariableLogger(config)` - Returns logging functions
+- `logVariableInit(vars)` - Log initial variable values
+- `logVariableChange(changes)` - Log variable changes
+- `trackVariableChanges(prev, current)` - Change detection
+- Source file resolution logic
+
+**inspector/state-logging.ts**:
+- `createStateLogger(config)` - Returns logging functions
+- `logStateChange(change)` - Log state changes
+- `formatStateChange(change)` - Format change details
+
+## Refactoring Steps
+
+### Step 1: Extract Inspector Logging ✅ COMPLETED
+**Goal**: Remove ~500 lines of logging code from Container.tsx and StateContainer.tsx
+
+**Files created**:
+- ✅ `inspector/handler-logging.ts` (450 lines)
+- ✅ `inspector/variable-logging.ts` (350 lines)
+- ✅ `inspector/state-logging.ts` (150 lines)
+
+**Changes completed**:
+- ✅ Extracted handler logging functions from Container.tsx
+- ✅ Extracted variable logging from StateContainer.tsx
+- ✅ Replaced inline logging with function calls
+- ✅ Maintained same logging behavior and format
+
+**Results**:
+- ✅ Container.tsx reduced from 1,143 to 1,048 lines (95 lines / 8.3% reduction)
+- ✅ StateContainer.tsx reduced from 1,130 to 918 lines (212 lines / 18.8% reduction)
+- ✅ Total reduction: 307 lines from core files
+- ✅ No linting errors
+
+**Testing status**:
+- ⏳ Needs manual testing in browser with xsVerbose mode
+- ⏳ Needs verification of handler execution logging
+- ⏳ Needs verification of variable change tracking
 
 ---
 
-## Refactoring Steps (Conservative Approach)
+### Step 2: Extract Event Handler Management
+**Goal**: Separate event handling logic from Container.tsx
 
-### Step 1: Internal Code Organization (Conservative Approach) ✅ COMPLETED
-**Status**: All three phases completed successfully. Code is better organized, has improved documentation, and zero tests failed.
-
-**Approach**: Conservative internal refactoring without extracting React-dependent code.
+**Files to create**:
+- `container/event-handlers.ts`
+- `container/event-handler-cache.ts`
 
 **Changes**:
-- ✅ **Phase 1a**: Added 14 major section headers to Container.tsx for clear organization
-- ✅ **Phase 1b**: Extracted 2 pure type guard functions to ContainerUtils.ts with null safety
-- ✅ **Phase 1c**: Added comprehensive JSDoc documentation to internal types
+- Extract `runCodeAsync` (~400 lines) to event-handlers.ts
+- Extract `runCodeSync` (~50 lines) to event-handlers.ts
+- Extract `getOrCreateEventHandlerFn` (~100 lines) to event-handler-cache.ts
+- Extract lifecycle tracking (started/completed/error dispatches)
+- Create factory functions that return configured handlers
+- Maintain closure-based access to refs and state
 
-**Files Created**: 
-- `ContainerUtils.ts` (40 lines) - Pure utility functions
-- `ContainerUtils.test.ts` (100 lines) - 12 test cases
+**Interface**:
+```typescript
+// event-handlers.ts
+export function createEventExecutor(config: EventExecutorConfig) {
+  return {
+    runCodeAsync: (source, uid, options, ...args) => Promise<any>,
+    runCodeSync: (arrowExpr, ...args) => any
+  };
+}
 
-**Files Modified**: 
-- `Container.tsx` - Now 1,137 lines with clear sections (was 1,042 lines)
-
-**Code Quality**: 
-- ✅ All 53 test files pass (4,545 tests)
-- ✅ All linting issues resolved
-- ✅ TypeScript strict mode compliant
-- ✅ Added null safety to type guards (improvement!)
-
-**Key Lessons**:
-- Functions with React hooks and lifecycle dependencies cannot be safely extracted
-- Internal types should remain internal to avoid file-hopping
-- Organizational improvements provide significant value without risk
-
-**Next Step**: Step 2 - Consider state composition improvements
-
-### Step 2: Internal Organization of StateContainer (Conservative Approach) ✅ COMPLETED
-**Status**: All three phases completed successfully. Code is better organized, utilities extracted, and zero tests failed.
-
-**Approach**: Conservative internal refactoring without extracting React-dependent code.
-
-**Changes**:
-- ✅ **Phase 2a**: Added 10 major section headers to StateContainer.tsx for 6-layer state pipeline
-- ✅ **Phase 2b**: Extracted 3 pure utilities (extractScopedState, CodeBehindParseError, ParseVarError) to ContainerUtils.ts
-- ✅ **Phase 2c**: Added comprehensive JSDoc documentation to Props type
-
-**Files Modified**:
-- `StateContainer.tsx` - Now 1,088 lines with clear sections (was 1,116 lines)
-- `ContainerUtils.ts` - Now 119 lines (added 3 utilities, was 40 lines)
-- `ContainerUtils.test.ts` - Now 194 lines with 28 tests (added 16 tests, was 100 lines)
-
-**Code Quality**:
-- ✅ All 53 test files pass (4,561 tests)
-- ✅ All linting issues resolved
-- ✅ TypeScript strict mode compliant
-- ✅ E2E tests verified by user
-
-**Key Lessons**:
-- React hooks and lifecycle dependencies cannot be safely extracted
-- Pure utilities can be extracted to improve code organization
-- Section headers significantly improve navigation in large files
-- Error classes benefit from centralization
-
-**Next Step**: Step 3 - Continue with conservative refactoring approach
-
----
-
-## Lessons Learned from Aggressive Extraction Attempt
-
-### ❌ REVERTED: Aggressive Module Extraction Approach
-An attempt was made to extract event handler management into a separate `EventHandlerManager.ts` module (~730 lines). While the code compiled and all linting passed, **this approach was reverted** due to:
-
-**Why It Failed**:
-- React hooks cannot be easily extracted while maintaining the same behavior
-- Complex interdependencies with lifecycle and context
-- Risk of breaking subtle runtime behaviors
-- Increased complexity with little benefit
-
-**Key Lesson**: The conservative approach (Steps 1-2) is more appropriate for React component internals. Continue with internal organization rather than aggressive extraction.
-
----
-
-### Step 3: Further Internal Organization of Container.tsx
-**Goal**: Improve readability and maintainability using conservative internal refactoring
-
-**Approach**: 
-- Add subsection comments within existing major sections
-- Extract more pure utility functions (similar to Step 1b)
-- Add JSDoc documentation to complex internal logic
-- Consider minor function extraction where it doesn't involve hooks
-
-**Potential Changes**:
-- Add subsection headers in "EVENT HANDLER EXECUTION" section
-- Extract pure helper functions for event handler lookup logic
-- Document the event handler caching strategy with JSDoc
-- Consider extracting pure conditional logic from runCodeAsync/runCodeSync
-
-**Files Modified**: 
-- `Container.tsx` - Add subsections and documentation
-- `ContainerUtils.ts` - Possibly add 1-2 pure helpers
-
-**Testing**: Run existing test suite to ensure zero regressions
-
-**Success Criteria**:
-- ✅ Improved code navigation with subsection comments
-- ✅ Additional pure functions extracted with unit tests
-- ✅ Enhanced JSDoc documentation
-- ✅ All tests pass
-
-### Step 4: Further Internal Organization of StateContainer.tsx
-**Goal**: Improve clarity of the 6-layer state composition pipeline
-
-**Approach**:
-- Add subsection comments within state composition layers
-- Extract pure utility functions for state merging logic
-- Add JSDoc documentation explaining composition order
-- Document variable resolution strategy
-
-**Potential Changes**:
-- Add subsection headers within each of the 6 layers
-- Extract pure functions for state merging/filtering logic
-- Document why two-pass variable resolution is necessary
-- Add comments explaining memoization strategy
-
-**Files Modified**:
-- `StateContainer.tsx` - Add subsections and documentation  
-- `ContainerUtils.ts` - Possibly add state manipulation utilities
-
-**Testing**: Run existing test suite to ensure zero regressions
-
-**Success Criteria**:
-- ✅ Crystal-clear state composition flow
-- ✅ Additional pure functions extracted with unit tests
-- ✅ Enhanced JSDoc documentation
-- ✅ All tests pass
-
-### Step 5: Type Safety and Error Handling Review
-**Goal**: Improve type safety and error handling consistency
-
-**Approach**:
-- Review and strengthen TypeScript types
-- Add null safety checks where needed
-- Improve error messages for debugging
-- Document edge cases
-
-**Potential Changes**:
-- Strengthen types for state composition interfaces
-- Add type guards for runtime safety (similar to Step 1b)
-- Improve error messages in variable resolution
-- Document error handling strategy
-
-**Files Modified**:
-- `Container.tsx` - Type improvements
-- `StateContainer.tsx` - Type improvements
-- `ContainerUtils.ts` - New type guards
-
-**Testing**: Verify strict mode compliance and test error scenarios
-
-**Success Criteria**:
-- ✅ Stronger TypeScript types
-- ✅ Better null safety
-- ✅ Clearer error messages
-- ✅ All tests pass
-
-### Step 6: Performance Documentation and Memoization Review
-**Goal**: Document and optimize memoization strategy
-
-**Approach**:
-- Document why each memoization exists
-- Review memoization dependencies for correctness
-- Add performance comments for complex operations
-- Consider memoization improvements
-
-**Potential Changes**:
-- Add JSDoc explaining each useMemo/useCallback usage
-- Review and document memoization dependencies
-- Add performance-related code comments
-- Consider extracting memoization logic to utilities
-
-**Files Modified**:
-- `Container.tsx` - Memoization documentation
-- `StateContainer.tsx` - Memoization documentation
-
-**Testing**: Profile performance before/after any changes
-
-**Success Criteria**:
-- ✅ Clear documentation of memoization strategy
-- ✅ Verified memoization dependencies
-- ✅ No performance regressions
-- ✅ All tests pass
-
-### Step 7: Add Comprehensive Architecture Documentation
-**Goal**: Document the container architecture comprehensively
-
-**Approach**:
-- Update existing architecture documentation
-- Add inline documentation explaining design decisions
-- Create diagrams showing state flow
-- Document the state composition pipeline clearly
-
-**Potential Changes**:
-- Update `xmlui/dev-docs/containers.md` with improved explanations
-- Add Mermaid diagrams showing state composition layers
-- Document the event handler lifecycle
-- Add examples of common container usage patterns
-
-**Files Modified**: 
-- `xmlui/dev-docs/containers.md`
-- Inline documentation in Container.tsx and StateContainer.tsx
-
-**Success Criteria**:
-- ✅ Clear architectural overview
-- ✅ State composition pipeline documented
-- ✅ Visual diagrams added
-- ✅ Common patterns documented
-
-### Step 8: Code Review and Consolidation
-**Goal**: Review all improvements and ensure consistency
-
-**Approach**:
-- Review all changes made in Steps 1-7
-- Ensure consistent documentation style
-- Verify all extracted utilities are used appropriately
-- Check for any remaining opportunities
-
-**Potential Changes**:
-- Final cleanup of comments
-- Ensure consistent JSDoc format
-- Review and optimize imports
-- Final code formatting pass
-
-**Files Modified**: All previously modified files
-
-**Testing**: Full test suite
-
-**Success Criteria**:
-- ✅ Consistent documentation style
-- ✅ No unused utilities  
-- ✅ Clean code structure
-- ✅ All tests pass
-
-### Step 9: Performance Validation
-**Goal**: Ensure no performance regressions from changes
-
-**Approach**:
-- Profile container initialization
-- Measure state composition overhead
-- Check React re-render patterns
-- Verify bundle size hasn't increased
+// event-handler-cache.ts
+export function createEventHandlerCache(config: CacheConfig) {
+  return {
+    getOrCreateHandlerFn: (source, uid, options) => Function,
+    cleanup: (uid) => void
+  };
+}
+```
 
 **Testing**:
-- Performance benchmarks for container creation
-- Re-render count measurements
-- Bundle size analysis
+- Test async event handlers
+- Test sync callbacks
+- Verify handler caching works
+- Test lifecycle flags (clickInProgress, etc.)
+- Verify error handling and propagation
 
-**Success Criteria**:
-- ✅ No performance regressions
-- ✅ Bundle size stable or reduced
-- ✅ Efficient re-render behavior
+**Success criteria**:
+- Container.tsx reduced by ~550 lines
+- Event handler logic isolated and testable
+- All event-based components work correctly
+- No linting errors
 
-### Step 10: Integration Testing and Sign-off
-**Goal**: Final validation before considering refactoring complete
+---
 
-**Approach**:
-- Run full e2e test suite
-- Manual testing of complex scenarios
-- Test inspector functionality
-- Verify error handling works correctly
+### Step 3: Extract Action Lookup Functions
+**Goal**: Separate action resolution from Container.tsx
 
-**Testing**: 
-- Full e2e test suite
-- Manual testing of docs site and playground
-- Inspector integration verification
-- Error scenario testing
+**Files to create**:
+- `container/action-lookup.ts`
 
-**Success Criteria**:
-- ✅ All e2e tests pass
-- ✅ Manual testing successful
-- ✅ Inspector works correctly
-- ✅ Error handling verified
+**Changes**:
+- Extract `lookupAction` (~100 lines)
+- Extract `lookupSyncCallback` (~60 lines)
+- Extract `getOrCreateSyncCallbackFn` (~50 lines)
+- Create factory function returning lookup functions
 
-## File Structure After Conservative Refactoring
-
-```
-components-core/rendering/
-├── Container.tsx                  (~1,137 lines) - Rendering logic (well-organized)
-├── StateContainer.tsx             (~1,088 lines) - State orchestration (well-organized)
-├── ContainerWrapper.tsx           (~300 lines)   - Container wrapping logic
-├── ContainerUtils.ts              (~119 lines)   - Pure utility functions
-├── reducer.ts                     (~180 lines)   - Redux-style state reducer
-├── buildProxy.ts                  (~100 lines)   - Proxy-based change detection
-├── containers.ts                  (~38 lines)    - Action type definitions
-└── __tests__/
-    └── ContainerUtils.test.ts     (~194 lines)   - 28 test cases
+**Interface**:
+```typescript
+// action-lookup.ts
+export function createActionLookup(config: ActionLookupConfig) {
+  return {
+    lookupAction: (action, uid, options) => Promise<any>,
+    lookupSyncCallback: (callback, uid) => Function
+  };
+}
 ```
 
-**Note**: The conservative approach maintains large Container.tsx and StateContainer.tsx files but significantly improves their internal organization through:
-- Clear section headers for navigation
-- Extracted pure utilities with tests
-- Comprehensive JSDoc documentation
-- Better code structure within files
+**Testing**:
+- Test action lookup from event handlers
+- Test sync callback resolution
+- Verify ephemeral actions work
+- Test context propagation
 
-## Metrics
+**Success criteria**:
+- Container.tsx reduced by ~200 lines
+- Action lookup isolated
+- All action-based features work
+- No linting errors
 
-**Before Refactoring**:
-- Container.tsx: 1,042 lines (disorganized)
-- StateContainer.tsx: 1,039 lines (disorganized)  
-- Utility functions: None
-- Unit test coverage: Minimal
-- Documentation: Limited inline docs
+---
 
-**After Steps 1-2 (Conservative Approach)**:
-- Container.tsx: 1,137 lines (well-organized with sections)
-- StateContainer.tsx: 1,088 lines (well-organized with sections)
-- ContainerUtils.ts: 119 lines (5 pure utilities)
-- ContainerUtils.test.ts: 194 lines (28 test cases)
-- Total: ~2,538 lines (vs 2,081 original)
-- Code quality improvements:
-  - ✅ 14 major section headers in Container.tsx
-  - ✅ 10 major section headers in StateContainer.tsx
-  - ✅ 5 pure utility functions extracted
-  - ✅ 28 new unit tests
-  - ✅ Comprehensive JSDoc documentation
-  - ✅ Zero test failures
+### Step 4: Extract Child Rendering
+**Goal**: Separate rendering logic from Container.tsx
 
-**Projected After Steps 3-10 (Continued Conservative Approach)**:
-- Container.tsx: ~1,200 lines (further subsections + docs)
-- StateContainer.tsx: ~1,150 lines (further subsections + docs)
-- ContainerUtils.ts: ~200 lines (additional utilities)
-- ContainerUtils.test.ts: ~300 lines (additional tests)
-- Documentation: Enhanced architecture docs
-- Total: ~2,850 lines
-- Quality improvements:
-  - ✅ Subsection headers within major sections
-  - ✅ More pure utilities with tests
-  - ✅ Enhanced type safety
-  - ✅ Performance documentation
-  - ✅ Comprehensive architecture docs
+**Files to create**:
+- `container/child-rendering.ts`
 
-**Key Insight**: Line count increases slightly, but code quality, maintainability, testability, and documentation improve dramatically. The conservative approach prioritizes internal organization over aggressive extraction.
+**Changes**:
+- Extract `stableRenderChild` (~150 lines)
+- Extract loader rendering logic
+- Extract layout context management
 
-## Success Criteria (Conservative Approach)
+**Interface**:
+```typescript
+// child-rendering.ts
+export function createChildRenderer(config: ChildRendererConfig) {
+  return {
+    renderChild: (child, layoutContext) => ReactNode,
+    renderLoaders: (loaders) => ReactNode
+  };
+}
+```
 
-1. ✅ Clear section organization in large files
-2. ✅ Pure utility functions extracted and tested
-3. ✅ Code readable with clear navigation structure
-4. ✅ Unit tests for extracted utilities
-5. ✅ Comprehensive JSDoc documentation
-6. ✅ Full test suite passes with zero failures
-7. ✅ No performance regressions
-8. ✅ Architecture documentation updated
-9. ✅ Type safety improvements
-10. ✅ Consistent code style and formatting
+**Testing**:
+- Test child component rendering
+- Test loader states (loading, loaded, error)
+- Verify layout context propagation
+- Test nested children
 
-**Note**: The conservative approach prioritizes code quality, maintainability, and documentation over aggressive file size reduction. Files remain large but are well-organized and easier to navigate.
+**Success criteria**:
+- Container.tsx reduced by ~150 lines
+- Rendering logic isolated
+- All components render correctly
+- No linting errors
+
+---
+
+### Step 5: Simplify Container.tsx
+**Goal**: Container.tsx becomes orchestration hub (~300 lines)
+
+**Changes**:
+- Import and use extracted modules
+- Simplify hook composition
+- Add clear section comments
+- Document the orchestration flow
+
+**Structure**:
+```typescript
+// Container.tsx (~300 lines)
+export const Container = memo(forwardRef(function Container(props, ref) {
+  // ========== SETUP ==========
+  // Context, refs, state
+  
+  // ========== INSPECTOR ==========
+  const handlerLogger = useHandlerLogger(config);
+  const stateLogger = useStateLogger(config);
+  
+  // ========== EVENT HANDLERS ==========
+  const { runCodeAsync, runCodeSync } = useEventExecutor(config);
+  const { getOrCreateHandlerFn, cleanup } = useEventHandlerCache(config);
+  
+  // ========== ACTION LOOKUP ==========
+  const { lookupAction, lookupSyncCallback } = useActionLookup(config);
+  
+  // ========== RENDERING ==========
+  const { renderChild, renderLoaders } = useChildRenderer(config);
+  
+  // ========== LIFECYCLE ==========
+  useEffect(...);
+  
+  // ========== RENDER ==========
+  return <>{renderLoaders()}{renderChild(node.children)}</>;
+}));
+```
+
+**Testing**:
+- Run all existing Container tests
+- Verify full integration works
+- Test complex event scenarios
+- Check performance (should be same or better)
+
+**Success criteria**:
+- Container.tsx is ~300 lines
+- Clear linear flow
+- All tests pass
+- No performance regression
+
+---
+
+### Step 6: Extract State Layer Composition
+**Goal**: Make StateContainer's 6-layer pipeline explicit and clear
+
+**Files to create**:
+- `state/state-layers.ts`
+
+**Changes**:
+- Extract layer composition into separate functions
+- Create clear pipeline with named steps
+- Add diagram comments
+
+**Interface**:
+```typescript
+// state-layers.ts
+export function composeContainerState(config: StateCompositionConfig) {
+  // Layer 1: Parent state scoping
+  const parentScoped = extractParentState(config.parentState, config.uses);
+  
+  // Layer 2: Component reducer state
+  const withReducer = { ...parentScoped, ...config.reducerState };
+  
+  // Layer 3: Component APIs
+  const withApis = mergeComponentApis(withReducer, config.apis);
+  
+  // Layer 4: Context variables
+  const withContext = { ...withApis, ...config.contextVars };
+  
+  // Layer 5: Local variables
+  const withVars = { ...withContext, ...config.localVars };
+  
+  // Layer 6: Routing parameters
+  const final = { ...withVars, ...config.routingState };
+  
+  return final;
+}
+```
+
+**Testing**:
+- Test state scoping with `uses` property
+- Test variable shadowing
+- Verify layer priority (later overrides earlier)
+- Test routing parameter injection
+
+**Success criteria**:
+- State composition is explicit and clear
+- Pipeline is easy to understand
+- All state-based features work
+- No linting errors
+
+---
+
+### Step 7: Extract Variable Resolution
+**Goal**: Clarify two-pass variable resolution logic
+
+**Files to create**:
+- `state/variable-resolution.ts`
+
+**Changes**:
+- Extract `useVars` hook and related logic (~200 lines)
+- Extract dependency collection
+- Document two-pass strategy clearly
+
+**Interface**:
+```typescript
+// variable-resolution.ts
+/**
+ * Resolves variables with two-pass strategy:
+ * 
+ * Pass 1: Pre-resolve variables to handle forward references
+ * Pass 2: Final resolution with complete context
+ * 
+ * Example: { fn: "$props.value", $props: "{x: 1}" }
+ * Pass 1: fn gets undefined (props not yet resolved)
+ * Pass 2: fn gets {x: 1} (props now available)
+ */
+export function useVariableResolution(config: VarResolutionConfig) {
+  // Pass 1: Pre-resolution
+  const preResolved = resolveVariables(config.definitions, config.baseContext);
+  
+  // Pass 2: Final resolution with pre-resolved vars
+  const finalResolved = resolveVariables(
+    config.definitions,
+    { ...config.baseContext, ...preResolved }
+  );
+  
+  return finalResolved;
+}
+```
+
+**Testing**:
+- Test forward references (function using var defined later)
+- Test circular dependencies (should handle gracefully)
+- Test dependency changes triggering re-evaluation
+- Verify memoization works
+
+**Success criteria**:
+- Two-pass strategy is well-documented
+- Variable resolution is testable
+- All variable scenarios work
+- No linting errors
+
+---
+
+### Step 8: Extract Global Variable Logic
+**Goal**: Separate global variable handling from StateContainer.tsx
+
+**Files to create**:
+- `state/global-variables.ts`
+
+**Changes**:
+- Extract global variable evaluation (~150 lines)
+- Extract dependency tracking
+- Extract runtime change detection
+
+**Interface**:
+```typescript
+// global-variables.ts
+export function useGlobalVariables(config: GlobalVarConfig) {
+  const dependencies = collectGlobalDependencies(config.globalVars);
+  const evaluated = evaluateGlobalVariables(
+    config.globalVars,
+    config.context,
+    dependencies
+  );
+  return evaluated;
+}
+```
+
+**Testing**:
+- Test global variable access
+- Test global variable updates
+- Test dependency tracking
+- Verify local vars can shadow globals
+
+**Success criteria**:
+- Global variable logic isolated
+- Dependency tracking clear
+- All global var features work
+- No linting errors
+
+---
+
+### Step 9: Extract Routing State Integration
+**Goal**: Separate routing concerns from StateContainer.tsx
+
+**Files to create**:
+- `state/routing-state.ts`
+
+**Changes**:
+- Extract `useRoutingParams` hook (~50 lines)
+- Extract routing state extraction
+- Consolidate routing variable mapping
+
+**Interface**:
+```typescript
+// routing-state.ts
+export function useRoutingParams() {
+  const location = useLocation();
+  const params = useParams();
+  const [searchParams] = useSearchParams();
+  const linkInfo = useLinkInfoContext();
+  
+  return extractRoutingState(location, params, searchParams, linkInfo);
+}
+```
+
+**Testing**:
+- Test $pathname variable
+- Test $routeParams access
+- Test $queryParams access
+- Test route navigation
+
+**Success criteria**:
+- Routing logic isolated
+- State variables work correctly
+- Navigation features work
+- No linting errors
+
+---
+
+### Step 10: Extract Variable Inspector Logging
+**Goal**: Remove variable logging from StateContainer.tsx
+
+**Files to modify**:
+- `inspector/variable-logging.ts` (already created in Step 1, enhance here)
+
+**Changes**:
+- Move complex variable logging (~200 lines)
+- Consolidate source file resolution
+- Handle deferred init logging
+
+**Testing**:
+- Test variable init logging
+- Test variable change logging
+- Verify source file resolution
+- Check deferred logging works
+
+**Success criteria**:
+- StateContainer.tsx reduced by ~200 lines
+- Variable tracking works identically
+- Source attribution correct
+- No linting errors
+
+---
+
+### Step 11: Simplify StateContainer.tsx
+**Goal**: StateContainer.tsx becomes state composition hub (~400 lines)
+
+**Changes**:
+- Import and use extracted modules
+- Simplify hook composition
+- Add clear section comments for remaining code
+- Document state pipeline with diagrams
+
+**Structure**:
+```typescript
+// StateContainer.tsx (~400 lines)
+export const StateContainer = memo(forwardRef(function StateContainer(props, ref) {
+  // ========== LAYER 1: PARENT STATE ==========
+  const parentScoped = extractParentState(parentState, node.uses);
+  
+  // ========== LAYER 2: REDUCER STATE ==========
+  const [componentState, dispatch] = useReducer(containerReducer, {});
+  
+  // ========== LAYER 3: COMPONENT APIS ==========
+  const [componentApis, setComponentApis] = useState({});
+  const withApis = mergeComponentApis(componentState, componentApis);
+  
+  // ========== LAYER 4: CONTEXT VARS ==========
+  const withContext = { ...withApis, ...node.contextVars };
+  
+  // ========== LAYER 5: LOCAL VARS ==========
+  const localVars = useVariableResolution({ ... });
+  const withVars = { ...withContext, ...localVars };
+  
+  // ========== LAYER 6: ROUTING & GLOBALS ==========
+  const routingState = useRoutingParams();
+  const globalVars = useGlobalVariables({ ... });
+  const finalState = { ...withVars, ...routingState };
+  
+  // ========== INSPECTOR ==========
+  useVariableLogger({ ... });
+  
+  // ========== STATE CHANGE HANDLER ==========
+  const statePartChanged = useCallback(...);
+  
+  // ========== RENDER ==========
+  return (
+    <ErrorBoundary>
+      <Container
+        componentState={finalState}
+        globalVars={globalVars}
+        dispatch={dispatch}
+        statePartChanged={statePartChanged}
+        registerComponentApi={registerComponentApi}
+        {...rest}
+      />
+    </ErrorBoundary>
+  );
+}));
+```
+
+**Testing**:
+- Run all existing StateContainer tests
+- Test complete state composition
+- Verify variable resolution
+- Test state change propagation
+
+**Success criteria**:
+- StateContainer.tsx is ~400 lines
+- State pipeline is explicit and clear
+- All tests pass
+- No performance regression
+
+---
+
+### Step 12: Add Documentation & Comments
+**Goal**: Make code self-documenting and easy to understand
+
+**Changes**:
+- Add JSDoc comments to all extracted functions
+- Add flow diagrams to complex logic
+- Document edge cases and gotchas
+- Add usage examples in comments
+
+**Areas to document**:
+- Two-pass variable resolution strategy
+- Event handler lifecycle
+- State layer composition priority
+- Inspector logging integration
+- Caching strategies
+
+**Testing**:
+- Code review for clarity
+- Verify docs match implementation
+- Check examples are accurate
+
+**Success criteria**:
+- All modules well-documented
+- Complex flows have diagrams
+- Edge cases noted
+- Examples provided
+
+---
+
+### Step 13: Final Integration Testing
+**Goal**: Verify entire refactored system works correctly
+
+**Testing strategy**:
+1. Run all unit tests: `npm run test:unit`
+2. Run E2E tests for container features:
+   - Variable state management
+   - Event handlers
+   - Loaders
+   - State scoping with `uses`
+   - Global variables
+   - Routing integration
+3. Manual testing:
+   - Inspector logging in browser
+   - Complex component scenarios
+   - Performance profiling
+4. Check for regressions:
+   - Compare bundle size
+   - Measure render performance
+   - Verify all existing apps work
+
+**Success criteria**:
+- All tests pass
+- No observable regressions
+- Bundle size same or smaller
+- Performance same or better
+- All features work identically
+
+---
+
+### Step 14: Update Documentation
+**Goal**: Update dev docs to reflect new architecture
+
+**Files to update**:
+- `dev-docs/containers.md` - Update architecture section
+- `dev-docs/standalone-app.md` - Update Container & StateContainer sections
+- `dev-docs/conv-create-components.md` - Update if needed
+
+**Changes**:
+- Document new file structure
+- Update architecture diagrams
+- Add references to new modules
+- Update code examples
+
+**Success criteria**:
+- Documentation accurate
+- Architecture clear
+- Examples updated
+- Cross-references correct
+
+## Testing Strategy
+
+### Unit Tests
+- Test each extracted module independently
+- Focus on pure functions where possible
+- Mock dependencies for integration points
+- Achieve >80% code coverage for new modules
+
+### Integration Tests
+- Test Container + extracted modules together
+- Test StateContainer + extracted modules together
+- Verify state composition pipeline
+- Test event handler execution flows
+
+### E2E Tests
+- Use existing E2E tests as regression suite
+- Add tests for edge cases discovered during refactoring
+- Test inspector logging features
+- Verify component isolation
+
+### Performance Testing
+- Compare before/after render times
+- Check memory usage
+- Verify no new performance bottlenecks
+- Profile event handler execution
+
+## Rollout Plan
+
+1. **Steps 1-4**: Extract inspector and event handling (lowest risk)
+2. **Step 5**: Simplify Container.tsx (verify integration)
+3. **Steps 6-10**: Extract state management (medium risk)
+4. **Step 11**: Simplify StateContainer.tsx (verify integration)
+5. **Steps 12-14**: Documentation and final testing
 
 ## Risk Mitigation
 
-**Conservative Approach Rationale**:
-- **React Hook Constraints**: Cannot easily extract functions that use hooks without changing behavior
-- **Complex Interdependencies**: Container and StateContainer have tight coupling with lifecycle and context
-- **Runtime Behavior**: Subtle behaviors may break when extracting React component internals
-- **Testing Complexity**: Extracted modules would require extensive mocking and integration testing
+- Keep original files for comparison during development
+- Run tests after each step before proceeding
+- Use feature flags if needed for gradual rollout
+- Have rollback plan (revert commits) if issues arise
+- Test with real-world apps (docs site, playground, etc.)
 
-**Mitigation Strategies**:
-- **Internal Organization**: Use section headers and subsections for navigation
-- **Pure Function Extraction**: Only extract truly pure functions without React dependencies
-- **Incremental Changes**: Make small, verifiable changes one at a time
-- **Comprehensive Testing**: Run full test suite after each change
-- **Performance Monitoring**: Profile before/after significant changes
-- **Documentation First**: Document existing behavior before modifying
+## Success Metrics
 
-**What Works** (Proven by Steps 1-2):
-- ✅ Adding section headers and subsections
-- ✅ Extracting pure utility functions
-- ✅ Adding JSDoc documentation
-- ✅ Creating unit tests for utilities
-- ✅ Improving type safety with type guards
-
-**What Doesn't Work** (Learned from reverted attempt):
-- ❌ Extracting hook-based functions to separate modules
-- ❌ Breaking tight React component coupling
-- ❌ Large-scale file splitting of component internals
-- ❌ Aggressive module extraction without clear boundaries
+- Container.tsx: 1,143 → ~300 lines (74% reduction)
+- StateContainer.tsx: 1,130 → ~400 lines (65% reduction)
+- Improved maintainability (subjective, via code review)
+- No performance regression (<5% variance)
+- All tests passing
+- Documentation updated and accurate
