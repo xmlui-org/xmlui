@@ -43,6 +43,7 @@ import {
   prefixLines,
   xsConsoleLog,
   pushXsLog,
+  splicePreservingInteractions,
 } from "../inspector/inspectorUtils";
 
 // --- The properties of the AppContent component
@@ -249,6 +250,7 @@ export function AppContent({
   const lastHash = useRef("");
   const [scrollForceRefresh, setScrollForceRefresh] = useState(0);
   const tableOfContentsContext = useContext(TableOfContentsContext);
+  const isNestedApp = globalProps?.isNested;
 
   useEffect(() => {
     onInit?.();
@@ -264,10 +266,36 @@ export function AppContent({
   //   }
   // }, [isWindowFocused]);
 
+  // --- For nested apps (which use MemoryRouter), listen to MemoryRouter location changes
+  // --- This allows xmlui-pg examples to respond to hash navigation within the nested app
+  useEffect(() => {
+    if (!isNestedApp) return;
+
+    const hash = location.hash.slice(1); // Remove the '#' prefix
+    if (hash && lastHash.current !== hash) {
+      lastHash.current = hash;
+      const rootNode = root?.getRootNode();
+      const scrollBehavior = "smooth";
+      requestAnimationFrame(() => {
+        if (!rootNode) return;
+        if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
+          const el = (rootNode as any).querySelector(`#${hash}`);
+          if (el) {
+            // For nested apps, only scroll within the shadow DOM (don't cross into host document)
+            scrollAncestorsToView(el, scrollBehavior, true);
+          }
+        }
+      });
+    }
+  }, [isNestedApp, location, root]);
+
   // --- Listen to location change using useEffect with location as dependency
   // https://jasonwatmore.com/react-router-v6-listen-to-location-route-change-without-history-listen
   // https://dev.to/mindactuate/scroll-to-anchor-element-with-react-router-v6-38op
   useEffect(() => {
+    // Skip router location changes for nested apps - we handle browser hash changes separately
+    if (isNestedApp) return;
+
     let hash = "";
     if (location.hash) {
       hash = location.hash.slice(1); // safe hash for further use after navigation
@@ -283,7 +311,8 @@ export function AppContent({
           // --- Check constructor.name to avoid direct ShadowRoot type dependency
           // --- More precise than duck typing, works reliably across different environments
           if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
-            const el = (rootNode as any).getElementById(lastHash.current);
+            // ShadowRoot doesn't have getElementById, use querySelector instead
+            const el = (rootNode as any).querySelector(`#${lastHash.current}`);
             if (!el) return;
             scrollAncestorsToView(el, scrollBehavior);
           } else {
@@ -295,7 +324,7 @@ export function AppContent({
         });
       }
     }
-  }, [location, scrollForceRefresh, root]);
+  }, [location, scrollForceRefresh, root, isNestedApp]);
 
   const forceRefreshAnchorScroll = useCallback(() => {
     lastHash.current = "";
@@ -310,7 +339,8 @@ export function AppContent({
         // Fallback if TableOfContentsContext is not available
         const rootNode = root?.getRootNode();
         if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
-          const el = (rootNode as any).getElementById(bookmarkId);
+          // ShadowRoot doesn't have getElementById, use querySelector instead
+          const el = (rootNode as any).querySelector(`#${bookmarkId}`);
           if (el) {
             scrollAncestorsToView(el, smoothScrolling ? "smooth" : "auto");
           }
@@ -580,6 +610,105 @@ export function AppContent({
       // Also capture the target element's own testId if it has one (different from ancestor)
       const targetTestId = target?.getAttribute?.("data-testid") || undefined;
 
+      // Capture ARIA role and accessible name for Playwright selector generation
+      let ariaRole: string | undefined;
+      let ariaName: string | undefined;
+      let ariaTarget = target; // may walk up to nearest ancestor with a role
+      if (target) {
+        // Explicit role attribute takes precedence
+        ariaRole = target.getAttribute?.("role") || undefined;
+        // Infer implicit ARIA role from HTML tag
+        if (!ariaRole) {
+          const tag = target.tagName?.toLowerCase();
+          if (tag === "button") ariaRole = "button";
+          else if (tag === "a" && target.hasAttribute?.("href")) ariaRole = "link";
+          else if (tag === "input") {
+            const type = (target as HTMLInputElement).type;
+            if (type === "checkbox") ariaRole = "checkbox";
+            else if (type === "radio") ariaRole = "radio";
+            else ariaRole = "textbox";
+          }
+          else if (tag === "select") ariaRole = "combobox";
+          else if (tag === "textarea") ariaRole = "textbox";
+        }
+        // If no role found on target (e.g. click landed on svg/use inside a
+        // menuitem, or div inside a table row), walk up to the nearest
+        // ancestor with an explicit or implicit role
+        if (!ariaRole) {
+          let el = target.parentElement;
+          for (let i = 0; i < 10 && el; i++) {
+            // Check explicit role attribute first
+            const parentRole = el.getAttribute?.("role");
+            if (parentRole) {
+              ariaRole = parentRole;
+              ariaTarget = el;
+              break;
+            }
+            // Check implicit role from HTML tag
+            const parentTag = el.tagName?.toLowerCase();
+            if (parentTag === "tr") { ariaRole = "row"; ariaTarget = el; break; }
+            if (parentTag === "button") { ariaRole = "button"; ariaTarget = el; break; }
+            if (parentTag === "a" && el.hasAttribute?.("href")) { ariaRole = "link"; ariaTarget = el; break; }
+            el = el.parentElement;
+          }
+        }
+        // Accessible name: aria-label > aria-labelledby > associated label > text content
+        ariaName = ariaTarget.getAttribute?.("aria-label") || undefined;
+        if (!ariaName && ariaTarget.getAttribute?.("aria-labelledby")) {
+          const labelEl = document.getElementById(ariaTarget.getAttribute("aria-labelledby")!);
+          ariaName = labelEl?.textContent?.trim() || undefined;
+        }
+        // For form inputs, resolve from the associated <label> element.
+        // HTMLInputElement.labels uses the for/id association, which works
+        // because ItemWithLabel passes the same inputId to both <label htmlFor>
+        // and cloneElement(child, { id: inputId }).
+        if (!ariaName && (ariaRole === "textbox" || ariaRole === "checkbox" ||
+            ariaRole === "radio" || ariaRole === "combobox")) {
+          const labels = (target as HTMLInputElement).labels;
+          if (labels && labels.length > 0) {
+            // Strip trailing markers like "*" (required) or "(Optional)"
+            let labelText = labels[0].textContent?.trim();
+            if (labelText) {
+              labelText = labelText.replace(/\s*\*$/, "").replace(/\s*\(Optional\)$/, "").trim();
+            }
+            ariaName = labelText || undefined;
+          }
+          if (!ariaName) {
+            // Fallback: walk up DOM to find nearest <label> in the component tree
+            let el = target.parentElement;
+            for (let i = 0; i < 10 && el && !ariaName; i++) {
+              const label = el.querySelector("label");
+              if (label) {
+                let labelText = label.textContent?.trim();
+                if (labelText) {
+                  labelText = labelText.replace(/\s*\*$/, "").replace(/\s*\(Optional\)$/, "").trim();
+                }
+                ariaName = labelText || undefined;
+              }
+              el = el.parentElement;
+            }
+          }
+        }
+        if (!ariaName && (ariaRole === "button" || ariaRole === "link" || ariaRole === "menuitem")) {
+          const btnText = ariaTarget.textContent?.trim();
+          if (btnText && btnText.length < 50) ariaName = btnText;
+        }
+        // For table rows, derive accessible name from the row content.
+        // Prefer the nearest-component text if short (user clicked a specific cell),
+        // otherwise use the first cell's text (the name column).
+        if (!ariaName && ariaRole === "row") {
+          if (text && text.length < 50) {
+            ariaName = text;
+          } else {
+            const firstCell = ariaTarget.querySelector?.("td");
+            const cellText = firstCell?.textContent?.trim();
+            if (cellText && cellText.length < 50) {
+              ariaName = cellText;
+            }
+          }
+        }
+      }
+
       const detail: Record<string, any> = {
         componentId,
         inspectId,
@@ -588,6 +717,8 @@ export function AppContent({
         testIdsInPath: testIdsInPath.length > 1 ? testIdsInPath : undefined,
         selectorPath,
         text,
+        ariaRole,
+        ariaName,
       };
       if (event instanceof MouseEvent) {
         detail.button = event.button;
@@ -671,11 +802,13 @@ export function AppContent({
         componentType,
         componentLabel,
         interaction: event.type,
+        ariaRole: detail.ariaRole,
+        ariaName: detail.ariaName,
         detail,
         text: safeStringify(detail),
       });
       if (Number.isFinite(xsLogMax) && xsLogMax > 0 && w._xsLogs.length > xsLogMax) {
-        w._xsLogs.splice(0, w._xsLogs.length - xsLogMax);
+        splicePreservingInteractions(w._xsLogs, xsLogMax);
       }
     };
 
@@ -802,15 +935,33 @@ export function AppContent({
 
 // --- We pass this funtion to the global app context
 function signError(error: Error | string) {
-  toast.error(typeof error === "string" ? error : error.message || "Something went wrong");
+  const message = typeof error === "string" ? error : error.message || "Something went wrong";
+  toast.error(message);
+  // Always log to console so Playwright page.on('console') can capture it
+  console.error("[xmlui]", message);
+  // Also log to _xsLogs when xsVerbose is active (same guard as ErrorBoundary).
+  if (typeof window !== "undefined") {
+    const w = window as any;
+    if (Array.isArray(w._xsLogs)) {
+      w._xsLogs.push({
+        ts: Date.now(),
+        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+        traceId: w._xsCurrentTrace,
+        kind: "error:runtime",
+        error: message,
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+    }
+  }
 }
 
 /**
  * Scrolls all ancestors of the specified element into view up to the first shadow root the element is in.
  * @param target The element to scroll to, can be in the light or shadow DOM
  * @param scrollBehavior The scroll behavior
+ * @param stopAtShadowBoundary If true, stops at shadow boundary instead of crossing to host document
  */
-function scrollAncestorsToView(target: HTMLElement, scrollBehavior?: ScrollBehavior) {
+function scrollAncestorsToView(target: HTMLElement, scrollBehavior?: ScrollBehavior, stopAtShadowBoundary?: boolean) {
   const scrollables = getScrollableAncestors(target);
   // It's important to start from the outermost and work inwards.
   scrollables.reverse().forEach((container) => {
@@ -835,12 +986,15 @@ function scrollAncestorsToView(target: HTMLElement, scrollBehavior?: ScrollBehav
       let parent = current.parentElement;
       // If no parentElement, might be in shadow DOM
       if (!parent && current.getRootNode) {
-        break;
-        // NOTE: Disregard shadow DOM, because we will scroll everything otherwise
-        /* const root = current.getRootNode();
-        if (root && root instanceof ShadowRoot && root.host) {
-          parent = root.host as (HTMLElement | null);
-        } */
+        const rootNode = current.getRootNode();
+        // Cross shadow boundary to continue searching in host document (unless stopAtShadowBoundary is true)
+        if (rootNode && rootNode instanceof ShadowRoot && rootNode.host) {
+          if (stopAtShadowBoundary) {
+            // Stop here, don't cross into host document
+            break;
+          }
+          parent = rootNode.host as HTMLElement | null;
+        }
       }
       if (!parent) break;
 

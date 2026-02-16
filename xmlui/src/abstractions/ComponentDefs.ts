@@ -228,6 +228,9 @@ export type ComponentPropertyMetadata = {
   // Indicates that a particular property is required for the component to essentially
   // function.
   isRequired?: boolean;
+
+  // Optional message to display if the property is deprecated
+  deprecationMessage?: string;
 };
 
 // This type defines the metadata of a component event. It is used to describe the
@@ -340,6 +343,12 @@ export type ComponentMetadata<
 
   // The name of the default part. Layout properties will be applied to this part by default.
   defaultPart?: string;
+
+  // List of behaviors to exclude from this component
+  excludeBehaviors?: string[];
+
+  // Optional message to display if the component is deprecated
+  deprecationMessage?: string;
 };
 
 export interface ParentRenderContext {

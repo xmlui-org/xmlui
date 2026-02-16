@@ -1,5 +1,8 @@
 # AppState [#appstate]
 
+>[!WARNING]
+> The AppState component is deprecated. We will remove it in a future release. Please use global variables instead.
+
 `AppState` is an invisible component that provides global state management across your entire application. Unlike component variables that are scoped locally, AppState allows any component to access and update shared state without prop drilling.
 
 **Key advantages over variables:**

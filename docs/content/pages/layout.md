@@ -421,28 +421,6 @@ When you use a `HStack` child with star sizing, the effective width is calculate
 </HStack>
 ```
 
-`HStack` has a `wrapContent` property. If you set it to `true`, the engine starts a new line (or column) when the subsequent child to render would overflow in the current line. Here the fourth child does not fit in the first line entirely, so it overflows:
-
-```xmlui-pg copy display name="Example: HStack with overflow in a single row"
-<HStack>
-  <Stack backgroundColor="red" height="36px" width="25%" />
-  <Stack backgroundColor="green" height="36px" width="40%" />
-  <Stack backgroundColor="blue" height="36px" width="20%" />
-  <Stack backgroundColor="purple" height="36px" width="30%" />
-</HStack>
-```
-
-With `wrapContent` flag, the forth child begins a new line.
-
-```xmlui-pg copy display /wrapContent="true"/ name="Example: HStack with wrapContent"
-<HStack wrapContent="true">
-  <Stack backgroundColor="red" height="36px" width="25%" />
-  <Stack backgroundColor="green" height="36px" width="40%" />
-  <Stack backgroundColor="blue" height="36px" width="20%" />
-  <Stack backgroundColor="purple" height="36px" width="30%" />
-</HStack>
-```
-
 ## CHStack
 
 `CHStack` is a shorthand version of `Stack` with a horizontal orientation and centered contents.

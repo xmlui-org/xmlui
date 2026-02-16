@@ -15,6 +15,8 @@ export const FlowLayoutMd = createMetadata({
   description:
     "`FlowLayout` positions content in rows with automatic wrapping. When items " +
     "exceed the available horizontal space, they automatically wrap to a new line.",
+  deprecationMessage:
+    "We plan to deprecate the FlowLayout component in the near future. Please use HStack with wrapContent set to true; it will overtake the role of FlowLayout.",
   props: {
     gap: {
       description:
@@ -22,6 +24,13 @@ export const FlowLayoutMd = createMetadata({
         `component creates a new row when an item is about to overflow the current row.`,
       type: "string",
       defaultValue: "$gap-normal",
+    },
+    itemWidth: {
+      description:
+        "Specifies the default width for child items when they don't have an explicit width property. " +
+        "Accepts any valid CSS width value (e.g., '100%', '200px', '20rem', '*').",
+      valueType: "string",
+      defaultValue: defaultProps.itemWidth,
     },
     columnGap: {
       description:
@@ -44,7 +53,8 @@ export const FlowLayoutMd = createMetadata({
       defaultValue: "start",
     },
     scrollStyle: {
-      description: `This property determines the scrollbar style. Options: "normal" uses the browser's default ` +
+      description:
+        `This property determines the scrollbar style. Options: "normal" uses the browser's default ` +
         `scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the ` +
         `scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar ` +
         `only while scrolling is active and fades out after 400ms of inactivity.`,
@@ -96,8 +106,12 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
       extractValue.asSize(node.props?.rowGap) ||
       extractValue.asSize(node.props?.gap) ||
       extractValue.asSize("$space-4");
+    const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, defaultProps.itemWidth);
     const verticalAlignment = extractValue.asOptionalString(node.props?.verticalAlignment, "start");
-    const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle) as any;
+    const scrollStyle = extractValue.asOptionalString(
+      node.props.scrollStyle,
+      defaultProps.scrollStyle,
+    ) as any;
     const showScrollerFade = extractValue.asOptionalBoolean(node.props.showScrollerFade);
 
     return (
@@ -105,6 +119,7 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
         className={className}
         columnGap={columnGap}
         rowGap={rowGap}
+        itemWidth={itemWidth}
         verticalAlignment={verticalAlignment}
         scrollStyle={scrollStyle}
         showScrollerFade={showScrollerFade}

@@ -10,7 +10,7 @@ We started with the simplest possible approach: post metadata and data as litera
   <NavPanel>
     <NavGroup label="Blog">
       <NavLink label="Newest post" to="/newest-post" />
-      <NavLink label="Older píost" to="/older-post" />
+      <NavLink label="Older post" to="/older-post" />
     </NavGroup>
   </NavPanel>
     <Pages>
@@ -214,8 +214,8 @@ Although we have a `NavGroup` to list the posts, a blog should really have an ov
       <H1>XMLUI Blog</H1>
       <Text>Latest updates, tutorials, and insights for building with XMLUI</Text>
       <List data="{
-        $props.posts.sort(function(a, b) {
-          return new Date(b.date) - new Date(a.date);
+        $props.posts.toSorted(function(a, b) {
+          return Date.parse(b.date) - Date.parse(a.date);
         })
       }">
         <VStack gap="$space-2">
@@ -255,6 +255,35 @@ We refer to the overview in `Pages` along with the same `Page` used for the intr
 </Page>
 ```
 
+## Scale with dynamic routing
+
+So far our approach has been purely declarative. Each post has its own `NavLink` and `Page`, written out explicitly. That's easy to read and requires no JavaScript knowledge. But every time you add a post you need to update three places: the `posts` array, the `NavPanel`, and the `Pages` section.
+
+XMLUI supports [dynamic route segments](https://docs.xmlui.org/routing-and-links) that let you collapse all the per-post `Page` entries into one, using a URL placeholder and the `$routeParams` context variable.
+
+```xmlui copy
+<Page url="/blog/:slug">
+    <BlogPage post="{posts.find(p => p.slug === $routeParams.slug)}" />
+</Page>
+```
+
+The `:slug` in the URL matches any value, and `$routeParams.slug` captures it. The `find` expression looks up the matching post from the array.
+
+We can do the same for navigation using the [Items](https://docs.xmlui.org/components/Items) component to generate `NavLink` entries from the posts array:
+
+```xmlui copy
+<NavPanel>
+    <NavLink label="All Posts" to="/blog" />
+    <Items data="{posts.filter(p => !p.draft).toSorted(function(a, b) {
+      return Date.parse(b.date) - Date.parse(a.date)
+    })}">
+        <NavLink label="{$item.title}" to="/blog/{$item.slug}" />
+    </Items>
+</NavPanel>
+```
+
+Now when you add a post, you only update the `posts` array. The navigation and routing take care of themselves. The tradeoff is that the expressions use a bit of JavaScript — `find`, `filter`, `toSorted`, and `Date.parse` — so this approach suits people who are comfortable with that. For a blog with a handful of posts, the static approach works just fine.
+
 ## Create an RSS feed
 
 We can't call it a blog unless it provides an RSS feed. For that we've added a simple feed generator that reads the metadata and writes `/feed.rss` which is then served statically by the webserver that hosts the site. So we've added a RSS icon to the template and feed autodiscovery to the site's `index.html`.
@@ -277,12 +306,10 @@ But it can exist standalone, you only need a folder with a handful of files.
 ├── components
 │   ├── BlogOverview.xmlui
 │   ├── BlogPage.xmlui
-├── index.html
-└── xmlui
-    └── 0.10.24.js
+└── index.html
 ```
 
-Here's the `index.html`.
+Here's the `index.html`. It loads XMLUI from the CDN, which always serves the latest version.
 
 ```xmlui copy
 <!DOCTYPE html>
@@ -291,12 +318,14 @@ Here's the `index.html`.
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>XMLUI blog test</title>
-  <script src="xmlui/0.10.24.js"></script>
+  <script src="https://cdn.xmlui.org/xmlui.js"></script>
 </head>
 <body>
 </body>
 </html>
 ```
+
+If you'd prefer to pin a specific version to insulate from automatic updates, you can use a versioned URL like `https://cdn.xmlui.org/0.12.0/xmlui.js`.
 
 I dragged the folder containing the standalone app onto Netlify's drop target. Check it out!
 

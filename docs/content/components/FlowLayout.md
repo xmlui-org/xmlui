@@ -1,5 +1,8 @@
 # FlowLayout [#flowlayout]
 
+>[!WARNING]
+> We plan to deprecate the FlowLayout component in the near future. Please use HStack with wrapContent set to true; it will overtake the role of FlowLayout.
+
 `FlowLayout` positions content in rows with automatic wrapping. When items exceed the available horizontal space, they automatically wrap to a new line.
 
 For details on how to work with \`FlowLayout\` (like sizing children), see [this guide](/layout#flowlayout).
@@ -20,7 +23,7 @@ This component supports the following behaviors:
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
 | Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
-| Styling Variant | N/A |
+| Styling Variant | `variant` |
 
 ## Properties [#properties]
 

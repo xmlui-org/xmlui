@@ -805,6 +805,7 @@ export const Table = forwardRef(
           enableMultiRowSelection ? (
             <Toggle
               {...{
+                "aria-label": "Select all rows",
                 className: classnames(styles.checkBoxWrapper, {
                   [styles.showInHeader]: alwaysShowSelectionHeader,
                   [styles.forceHoverWrapper]: headerCheckboxHovered,
@@ -831,6 +832,7 @@ export const Table = forwardRef(
             {row.getCanSelect() &&
             <Toggle
               {...{
+                "aria-label": `Select ${row.original[idKey]}`,
                 className: classnames(styles.checkBoxWrapper, {
                   [styles.forceHoverWrapper]: hoveredRowId === row.id,
                 }),

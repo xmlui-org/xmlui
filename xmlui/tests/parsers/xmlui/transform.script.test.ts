@@ -203,7 +203,7 @@ var b = 2;
     // --- Assert
     const collected = cd.scriptCollected!;
     expect(Object.keys(collected.functions).length).equal(1);
-    expect((collected.functions.a.tree as Expression).type).equal(T_ARROW_EXPRESSION);
+    expect((collected.functions.a as any).type).equal(T_ARROW_EXPRESSION);
   });
 
   it("Script collect - Single function #2", () => {
@@ -219,7 +219,7 @@ var b = 2;
     // --- Assert
     const collected = cd.scriptCollected!;
     expect(Object.keys(collected.functions).length).equal(1);
-    expect((collected.functions.a.tree as Expression).type).equal(T_ARROW_EXPRESSION);
+    expect((collected.functions.a as any).type).equal(T_ARROW_EXPRESSION);
   });
 
   it("Script collect - Multiple function #1", () => {
@@ -236,8 +236,8 @@ var b = 2;
     // --- Assert
     const collected = cd.scriptCollected!;
     expect(Object.keys(collected.functions).length).equal(2);
-    expect((collected.functions.a.tree as Expression).type).equal(T_ARROW_EXPRESSION);
-    expect((collected.functions.b.tree as Expression).type).equal(T_ARROW_EXPRESSION);
+    expect((collected.functions.a as any).type).equal(T_ARROW_EXPRESSION);
+    expect((collected.functions.b as any).type).equal(T_ARROW_EXPRESSION);
   });
 
   it("Script collect - Duplicated function fails", () => {
@@ -270,7 +270,7 @@ var b = 2;
     // --- Assert
     const collected = cd.scriptCollected!;
     expect(Object.keys(collected.functions).length).equal(1);
-    expect((collected.functions.myButton_onClick.tree as Expression).type).equal(
+    expect((collected.functions.myButton_onClick as any).type).equal(
       T_ARROW_EXPRESSION,
     );
   });

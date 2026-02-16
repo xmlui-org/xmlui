@@ -72,20 +72,9 @@
         <Page url="/blog">
             <BlogOverview />
         </Page>
-        <Page url="/blog/supabase-and-xmlui">
-            <BlogPage when="{appGlobals.blog.posts[4]}" post="{appGlobals.blog.posts[4]}" />
-        </Page>
-        <Page url="/blog/introducing-the-xmlui-cli">
-            <BlogPage when="{appGlobals.blog.posts[3]}" post="{appGlobals.blog.posts[3]}" />
-        </Page>
-        <Page url="/blog/xmlui-powered-blog">
-            <BlogPage when="{appGlobals.blog.posts[2]}" post="{appGlobals.blog.posts[2]}" />
-        </Page>
-        <Page url="/blog/xmlui-playground">
-            <BlogPage when="{appGlobals.blog.posts[1]}" post="{appGlobals.blog.posts[1]}" />
-        </Page>
-        <Page url="/blog/introducing-xmlui">
-            <BlogPage when="{appGlobals.blog.posts[0]}" post="{appGlobals.blog.posts[0]}" />
+
+        <Page url="/blog/:slug">
+            <BlogPage post="{appGlobals.blog.posts.find(p => p.slug === $routeParams.slug)}" />
         </Page>
     </Pages>
     <Footer sticky="false">

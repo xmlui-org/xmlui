@@ -14,7 +14,7 @@ export const bookmarkBehavior: Behavior = {
     name: "bookmark",
     friendlyName: "Bookmark",
     description:
-      "Adds bookmark functionality to any visual component with a 'bookmark' prop by adding bookmark-related attributes and APIs directly to the component.",
+      "This behavior adds bookmark functionality to any visual component. Using the specified identifier, you can scroll the particular component into view.",
     triggerProps: ["bookmark"],
     props: {
       bookmark: {
@@ -49,7 +49,7 @@ export const bookmarkBehavior: Behavior = {
     const bookmark = extractValue(node.props?.bookmark, true);
     return !!bookmark;
   },
-  attach: (context, node, metadata) => {
+  attach: (context, node) => {
     const { extractValue, node: componentNode, registerComponentApi } = context;
     const bookmarkId = extractValue.asOptionalString(componentNode.props?.bookmark);
     const bookmarkLevel = extractValue.asOptionalNumber(componentNode.props?.bookmarkLevel, 1);

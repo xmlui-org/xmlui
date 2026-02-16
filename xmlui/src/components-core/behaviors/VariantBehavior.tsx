@@ -20,7 +20,13 @@ export const variantBehavior: Behavior = {
     description:
       "Applies custom variant styling to components with a 'variant' prop. For Button components, this only applies if the variant is not one of the predefined values ('solid', 'outlined', 'ghost'). For other components, it applies to any component with a 'variant' prop.",
     triggerProps: ["variant"],
-    props: {},
+    props: {
+      variant: {
+        valueType: "string",
+        description:
+          "The variant value to apply. For Button components, this should be a custom variant value that is not 'solid', 'outlined', or 'ghost'. For other components, this can be any string value.",
+      },
+    },
     condition: {
       type: "visual",
     },

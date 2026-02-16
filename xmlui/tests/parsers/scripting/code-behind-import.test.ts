@@ -190,7 +190,7 @@ function total() { return sum(1, 2, 3); }`,
       // Verify the collected function is properly formed
       const totalFunc = result.functions["total"];
       expect(totalFunc).toBeDefined();
-      expect(totalFunc.tree).toBeDefined();
+      expect((totalFunc as any).type).toBe(T_ARROW_EXPRESSION);
     });
   });
 
@@ -310,7 +310,7 @@ function process(items) {
       expect(result.functions).toHaveProperty("process");
       const func = result.functions["process"];
       expect(func).toBeDefined();
-      expect(func.tree).toBeDefined();
+      expect((func as any).type).toBe(T_ARROW_EXPRESSION);
     });
 
     it("should handle nested imports with shared dependencies", async () => {
@@ -399,8 +399,7 @@ function add(a, b) {
 
       const func = result.functions["add"];
       expect(func).toBeDefined();
-      expect(func.tree).toBeDefined();
-      expect(func.tree.type).toBe(T_ARROW_EXPRESSION);
+      expect((func as any).type).toBe(T_ARROW_EXPRESSION);
     });
 
     it("should preserve function arguments", async () => {
@@ -413,7 +412,7 @@ function calculate(x, y, z) {
 
       const func = result.functions["calculate"];
       expect(func).toBeDefined();
-      const arrowExpr = func.tree as ArrowExpression;
+      const arrowExpr = func as any as ArrowExpression;
       expect(arrowExpr.args).toBeDefined();
       expect(arrowExpr.args.length).toBe(3);
     });
@@ -429,7 +428,7 @@ function process() {
 
       const func = result.functions["process"];
       expect(func).toBeDefined();
-      const arrowExpr = func.tree as ArrowExpression;
+      const arrowExpr = func as any as ArrowExpression;
       expect(arrowExpr.statement).toBeDefined();
     });
   });
@@ -453,7 +452,8 @@ function process() {
 
       const func = result.functions["test"];
       expect(func).toBeDefined();
-      expect((func as any)[PARSED_MARK_PROP]).toBe(true);
+      // Functions are now arrow expressions with _ARROW_EXPR_ marker
+      expect((func as any)._ARROW_EXPR_).toBe(true);
     });
   });
 });
