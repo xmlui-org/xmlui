@@ -302,27 +302,29 @@ export function AppContent({
     }
     if (lastHash.current !== hash) {
       lastHash.current = hash;
-      if (!location.state?.preventHashScroll) {
-        const rootNode = root?.getRootNode();
-        const scrollBehavior = "instant";
-        requestAnimationFrame(() => {
-          if (!rootNode) return;
-          // --- If element is in shadow DOM (string-based type checking)
-          // --- Check constructor.name to avoid direct ShadowRoot type dependency
-          // --- More precise than duck typing, works reliably across different environments
-          if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
-            // ShadowRoot doesn't have getElementById, use querySelector instead
-            const el = (rootNode as any).querySelector(`#${lastHash.current}`);
-            if (!el) return;
-            scrollAncestorsToView(el, scrollBehavior);
-          } else {
-            // --- If element is in light DOM
-            document
-              .getElementById(lastHash.current)
-              ?.scrollIntoView({ behavior: scrollBehavior, block: "start" });
-          }
-        });
-      }
+
+      const rootNode = root?.getRootNode();
+      // Default behavior is instant; TableOfContentsContext (and others) can override via location.state
+      const scrollBehavior: ScrollBehavior =
+        (location.state as any)?.hashScrollBehavior === "smooth" ? "smooth" : "instant";
+
+      requestAnimationFrame(() => {
+        if (!rootNode) return;
+        // --- If element is in shadow DOM (string-based type checking)
+        // --- Check constructor.name to avoid direct ShadowRoot type dependency
+        // --- More precise than duck typing, works reliably across different environments
+        if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
+          // ShadowRoot doesn't have getElementById, use querySelector instead
+          const el = (rootNode as any).querySelector(`#${lastHash.current}`);
+          if (!el) return;
+          scrollAncestorsToView(el, scrollBehavior);
+        } else {
+          // --- If element is in light DOM
+          document
+            .getElementById(lastHash.current)
+            ?.scrollIntoView({ behavior: scrollBehavior, block: "start" });
+        }
+      });
     }
   }, [location, scrollForceRefresh, root, isNestedApp]);
 

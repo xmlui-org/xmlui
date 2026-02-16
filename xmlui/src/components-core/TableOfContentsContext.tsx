@@ -132,17 +132,16 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
       const value = headings[id];
       if (value) {
         thisRef.current.suspendPositionBasedSetActiveId = true;
-        value.anchor.scrollIntoView({
-          block: "start",
-          inline: "start",
-          behavior: smoothScrolling ? "smooth" : "auto",
-        });
+        // Let AppContent handle the main scroll (it knows about shadow DOM and scroll containers),
+        // but still keep the TOC's own active state in sync.
         notify(id);
-        
+
         // Only call navigate if the hash is different to avoid scroll reset
         const currentHash = window.location.hash.slice(1); // Remove the '#'
         if (currentHash !== value.id) {
-          // Update the URL hash without triggering additional scroll
+          // Update the URL hash and let AppContent perform the scroll.
+          // - preventScrollReset: avoid router's default scroll handling
+          // - state.hashScrollBehavior: tell AppContent whether to use smooth or instant scroll
           navigate(
             {
               hash: `#${value.id}`,
@@ -150,6 +149,9 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
             {
               preventScrollReset: true,
               replace: true,
+              state: {
+                hashScrollBehavior: smoothScrolling ? "smooth" : "instant",
+              },
             },
           );
         }
