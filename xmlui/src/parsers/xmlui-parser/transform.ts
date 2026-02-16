@@ -156,14 +156,10 @@ export function nodeToComponentDef(
       });
     }
 
-    // --- Get global attributes
-    let globals: Record<string, any> | undefined;
+    // --- Report error for global attributes (not allowed in component definitions)
     const globalsAttrs = attrs.filter((attr) => attr.startSegment === "global");
     if (globalsAttrs.length > 0) {
-      globals = {};
-      globalsAttrs.forEach((attr) => {
-        globals![attr.name] = attr.value;
-      });
+      reportError(DIAGS_TRANSFORM.globalNotAllowedInComponent);
     }
 
     const children = getChildNodes(node);
@@ -179,14 +175,14 @@ export function nodeToComponentDef(
 
     const nonVarHelperNodes: Node[] = [];
     const nestedVars: Node[] = [];
-    const nestedGlobals: Node[] = [];
     for (let child of children) {
       if (child.kind === SyntaxKind.ElementNode) {
         const childName = getComponentName(child, getText);
         if (childName === HelperNode.variable) {
           nestedVars.push(child);
         } else if (childName === HelperNode.global) {
-          nestedGlobals.push(child);
+          // Report error for global elements (not allowed in component definitions)
+          reportError(DIAGS_TRANSFORM.globalNotAllowedInComponent, child.start, child.end);
         } else if (childName in HelperNode) {
           nonVarHelperNodes.push(child);
         }
@@ -195,8 +191,8 @@ export function nodeToComponentDef(
 
     // --- Should we wrap with a Fragment?
     let element: Node;
-    if (nestedComponents.length > 1 || nestedVars.length > 0 || nestedGlobals.length > 0) {
-      element = wrapWithFragment([...nestedVars, ...nestedGlobals, ...nestedComponents]);
+    if (nestedComponents.length > 1 || nestedVars.length > 0) {
+      element = wrapWithFragment([...nestedVars, ...nestedComponents]);
     } else {
       element = nestedComponents[0];
     }
@@ -209,7 +205,7 @@ export function nodeToComponentDef(
         addToNamespaces(namespaceStack, element, attr.unsegmentedName, attr.value);
       });
 
-    let nestedComponent: ComponentDef = transformInnerElement(usesStack, element, true)! as ComponentDef;
+    let nestedComponent: ComponentDef = transformInnerElement(usesStack, element, false)! as ComponentDef;
     namespaceStack.pop();
 
     const component: CompoundComponentDef = {
@@ -229,9 +225,6 @@ export function nodeToComponentDef(
     }
     if (vars) {
       nestedComponent.vars = { ...nestedComponent.vars, ...vars };
-    }
-    if (globals) {
-      nestedComponent.globalVars = { ...nestedComponent.globalVars, ...globals };
     }
     if (codeBehind) {
       component.codeBehind = codeBehind.value;
