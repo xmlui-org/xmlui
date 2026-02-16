@@ -17,6 +17,7 @@ import classnames from "classnames";
 import { Button } from "../components/Button/ButtonNative";
 import styles from "./InspectorButton.module.scss";
 import type { ProjectCompilation } from "../abstractions/scripting/Compilation";
+import { ProjectCompilationContext, useProjectCompilation } from "./ProjectCompilationContext";
 
 // --- The context object that is used to store the inspector information.
 interface IInspectorContext {
@@ -29,7 +30,6 @@ interface IInspectorContext {
   setIsOpen: (isOpen: boolean) => void;
   isOpen: boolean;
   inspectedNode: any;
-  projectCompilation: ProjectCompilation | undefined;
   setInspectMode: (inspectMode: (prev: any) => boolean) => void;
   inspectMode: boolean;
   mockApi: any;
@@ -150,7 +150,6 @@ export function InspectorProvider({
       setIsOpen: setShowCode,
       isOpen: showCode,
       devToolsEnabled: showCode,
-      projectCompilation: projectCompilation,
       setInspectMode,
       inspectMode,
       mockApi,
@@ -162,17 +161,17 @@ export function InspectorProvider({
     showCode,
     clickPosition,
     setShowCode,
-    projectCompilation,
     inspectMode,
     mockApi,
   ]);
 
   return (
-    <InspectorContext.Provider value={contextValue}>
-      {children}
-      {process.env.VITE_USER_COMPONENTS_Inspect !== "false" &&
-        inspectable &&
-        Object.values(inspectable).map((item: any) => {
+    <ProjectCompilationContext.Provider value={{ projectCompilation }}>
+      <InspectorContext.Provider value={contextValue}>
+        {children}
+        {process.env.VITE_USER_COMPONENTS_Inspect !== "false" &&
+          inspectable &&
+          Object.values(inspectable).map((item: any) => {
           return (
             <InspectButton
               inspectedNode={inspectedNode}
@@ -187,6 +186,7 @@ export function InspectorProvider({
           );
         })}
     </InspectorContext.Provider>
+    </ProjectCompilationContext.Provider>
   );
 }
 
@@ -360,13 +360,14 @@ function InspectButton({
 
 export function useDevTools() {
   const context = useContext(InspectorContext);
+  const { projectCompilation } = useProjectCompilation();
 
   if (!context) {
     throw new Error("useDevTools must be used within an InspectorProvider");
   }
 
   return {
-    projectCompilation: context.projectCompilation,
+    projectCompilation,
     inspectedNode: context.inspectedNode,
     sources: context.sources,
     isOpen: context.isOpen,

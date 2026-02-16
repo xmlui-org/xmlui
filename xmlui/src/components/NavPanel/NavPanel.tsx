@@ -35,7 +35,12 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === "object" && !Array.isArray(value);
 }
 
-function withMobileOnly(node: ComponentDef | undefined, item: AppNavItem, uidPrefix: string, idx: number) {
+function withMobileOnly(
+  node: ComponentDef | undefined,
+  item: AppNavItem,
+  uidPrefix: string,
+  idx: number,
+) {
   if (!node) return undefined;
   if (!item.mobileOnly) return node;
   return {
@@ -46,7 +51,11 @@ function withMobileOnly(node: ComponentDef | undefined, item: AppNavItem, uidPre
   } as ComponentDef;
 }
 
-function toNavComponentDef(item: AppNavItem, uidPrefix: string, idx: number): ComponentDef | undefined {
+function toNavComponentDef(
+  item: AppNavItem,
+  uidPrefix: string,
+  idx: number,
+): ComponentDef | undefined {
   const hasChildren = Array.isArray(item.children);
   if (hasChildren) {
     if (!item.label) return undefined;
@@ -127,7 +136,8 @@ function resolveNavSectionChildren(
 
     if (child.type === "IncludeNavSection") {
       const sectionId =
-        extractValue.asOptionalString?.(child.props?.sectionId) ?? extractValue(child.props?.sectionId);
+        extractValue.asOptionalString?.(child.props?.sectionId) ??
+        extractValue(child.props?.sectionId);
       const sectionData = sectionId && appNavSections ? appNavSections[sectionId] : undefined;
       const expanded = buildSectionNavChildren(sectionData, `${uidPrefix}-${sectionId || idx}`);
       resolvedChildren.push(...expanded);
@@ -185,7 +195,8 @@ export const NavPanelMd = createMetadata({
       defaultValue: defaultProps.inDrawer,
     },
     scrollStyle: {
-      description: `This property determines the scrollbar style. Options: "normal" uses the browser's default ` +
+      description:
+        `This property determines the scrollbar style. Options: "normal" uses the browser's default ` +
         `scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the ` +
         `scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar ` +
         `only while scrolling is active and fades out after 400ms of inactivity.`,
@@ -194,7 +205,8 @@ export const NavPanelMd = createMetadata({
       defaultValue: defaultProps.scrollStyle,
     },
     showScrollerFade: {
-      description: `When enabled, displays gradient fade indicators at the top and bottom edges of the navigation ` +
+      description:
+        `When enabled, displays gradient fade indicators at the top and bottom edges of the navigation ` +
         `panel when scrollable content extends beyond the visible area. The fade effect provides a visual cue ` +
         `to users that additional content is available by scrolling. The indicators automatically appear and ` +
         `disappear based on the scroll position. This property only works with "overlay", "whenMouseOver", and ` +
@@ -243,7 +255,10 @@ function NavPanelWithBuiltNavHierarchy({
     return buildNavHierarchy(effectiveChildren, extractValue, undefined, []);
   }, [effectiveChildren, extractValue]);
 
-  const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
+  const scrollStyle = extractValue.asOptionalString(
+    node.props.scrollStyle,
+    defaultProps.scrollStyle,
+  );
   const showScrollerFade = extractValue.asOptionalBoolean(node.props.showScrollerFade);
   const footerContent = node.props.footerTemplate
     ? renderChild(node.props.footerTemplate)

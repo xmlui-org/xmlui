@@ -5,6 +5,7 @@ import styles from "./NavPanel.module.scss";
 import { Scroller, type ScrollStyle } from "../ScrollViewer/Scroller";
 
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import { Logo } from "../Logo/LogoNative";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { getAppLayoutOrientation } from "../App/AppNative";
@@ -55,6 +56,8 @@ export function buildNavHierarchy(
   extractValue: any,
   parent?: NavHierarchyNode,
   pathSegments: NavHierarchyNode[] = [],
+  lookupCompoundComponent?: (name: string) => ComponentDef | undefined,
+  visitedComponents: Set<string> = new Set(),
 ): NavHierarchyNode[] {
   if (!children) return [];
 
@@ -117,18 +120,60 @@ export function buildNavHierarchy(
             extractValue,
             groupNode,
             newPathSegments,
+            lookupCompoundComponent,
+            visitedComponents,
           );
           hierarchy.push(groupNode);
         } else if (child.children && child.children.length > 0) {
           // If no label but has children, process them at the current level with same parent and path
-          hierarchy.push(...buildNavHierarchy(child.children, extractValue, parent, pathSegments));
+          hierarchy.push(
+            ...buildNavHierarchy(
+              child.children,
+              extractValue,
+              parent,
+              pathSegments,
+              lookupCompoundComponent,
+              visitedComponents,
+            ),
+          );
         }
       } else if (child.children && child.children.length > 0) {
         //console.log("CN", child.children);
         // Process any children that might contain NavGroup and NavLink components recursively
-        const nestedNodes = buildNavHierarchy(child.children, extractValue, parent, pathSegments);
+        const nestedNodes = buildNavHierarchy(
+          child.children,
+          extractValue,
+          parent,
+          pathSegments,
+          lookupCompoundComponent,
+          visitedComponents,
+        );
         if (nestedNodes.length > 0) {
           hierarchy.push(...nestedNodes);
+        }
+      } else if (lookupCompoundComponent) {
+        // Check if this is a compound component
+        const compoundComponent = lookupCompoundComponent(child.type);
+        if (compoundComponent?.children) {
+          // Cycle detection: skip if we've already visited this component
+          if (visitedComponents.has(child.type)) {
+            return hierarchy;
+          }
+          // Add current component to visited set for cycle detection
+          visitedComponents.add(child.type);
+
+          // Process the compound component's children
+          const compoundNodes = buildNavHierarchy(
+            compoundComponent.children,
+            extractValue,
+            parent,
+            pathSegments,
+            lookupCompoundComponent,
+            visitedComponents,
+          );
+          if (compoundNodes.length > 0) {
+            hierarchy.push(...compoundNodes);
+          }
         }
       }
     });
@@ -369,12 +414,11 @@ export const NavPanel = forwardRef(function NavPanel(
           <div
             className={classnames(styles.footer, {
               [styles.footerCollapsed]: collapsed,
-            })}  
+            })}
           >
             {footerContent}
           </div>
         </Part>
-
       )}
     </div>
   );
