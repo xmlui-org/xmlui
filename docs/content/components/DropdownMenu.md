@@ -36,7 +36,7 @@ This component supports the following behaviors:
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
 | Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
-| Styling Variant | N/A |
+| Styling Variant | `variant` |
 
 ## Properties [#properties]
 

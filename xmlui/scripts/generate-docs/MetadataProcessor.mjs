@@ -281,13 +281,26 @@ function addBehaviorsSection(component) {
     nonVisual: component.nonVisual || false,
   });
 
+  // Get the list of excluded behaviors for this component
+  const excludedBehaviors = component.excludeBehaviors || [];
+
   // Check which behaviors can attach to this component
   const applicableBehaviors = [];
   for (const [behaviorKey, behaviorMetadata] of Object.entries(collectedBehaviorMetadata)) {
+    // Skip excluded behaviors
+    if (excludedBehaviors.includes(behaviorMetadata.name)) {
+      continue;
+    }
+    
     if (canBehaviorAttachToComponent(behaviorMetadata, componentMetadataProvider, component.displayName)) {
+      // Collect distinct property names from triggerProps and props
+      const triggerProps = behaviorMetadata.triggerProps || [];
+      const additionalProps = Object.keys(behaviorMetadata.props || {});
+      const allProps = [...new Set([...triggerProps, ...additionalProps])];
+      
       applicableBehaviors.push({
         name: behaviorMetadata.friendlyName || behaviorMetadata.name,
-        propKeys: Object.keys(behaviorMetadata.props || {}),
+        propKeys: allProps,
       });
     }
   }

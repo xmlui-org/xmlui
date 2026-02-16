@@ -340,6 +340,9 @@ export type ComponentMetadata<
 
   // The name of the default part. Layout properties will be applied to this part by default.
   defaultPart?: string;
+
+  // List of behaviors to exclude from this component
+  excludeBehaviors?: string[];
 };
 
 export interface ParentRenderContext {

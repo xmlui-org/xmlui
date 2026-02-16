@@ -19,6 +19,7 @@ export const AppMd = createMetadata({
     "The `App` component is the root container that defines your application's overall " +
     "structure and layout. It provides a complete UI framework with built-in navigation, " +
     "header, footer, and content areas that work together seamlessly.",
+  excludeBehaviors: ["tooltip", "animation", "label"],
   props: {
     layout: {
       description:

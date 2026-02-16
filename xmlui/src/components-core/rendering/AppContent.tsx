@@ -280,7 +280,8 @@ export function AppContent({
         if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
           const el = (rootNode as any).querySelector(`#${hash}`);
           if (el) {
-            scrollAncestorsToView(el, scrollBehavior);
+            // For nested apps, only scroll within the shadow DOM (don't cross into host document)
+            scrollAncestorsToView(el, scrollBehavior, true);
           }
         }
       });
@@ -955,8 +956,9 @@ function signError(error: Error | string) {
  * Scrolls all ancestors of the specified element into view up to the first shadow root the element is in.
  * @param target The element to scroll to, can be in the light or shadow DOM
  * @param scrollBehavior The scroll behavior
+ * @param stopAtShadowBoundary If true, stops at shadow boundary instead of crossing to host document
  */
-function scrollAncestorsToView(target: HTMLElement, scrollBehavior?: ScrollBehavior) {
+function scrollAncestorsToView(target: HTMLElement, scrollBehavior?: ScrollBehavior, stopAtShadowBoundary?: boolean) {
   const scrollables = getScrollableAncestors(target);
   // It's important to start from the outermost and work inwards.
   scrollables.reverse().forEach((container) => {
@@ -982,8 +984,12 @@ function scrollAncestorsToView(target: HTMLElement, scrollBehavior?: ScrollBehav
       // If no parentElement, might be in shadow DOM
       if (!parent && current.getRootNode) {
         const rootNode = current.getRootNode();
-        // Cross shadow boundary to continue searching in host document
+        // Cross shadow boundary to continue searching in host document (unless stopAtShadowBoundary is true)
         if (rootNode && rootNode instanceof ShadowRoot && rootNode.host) {
+          if (stopAtShadowBoundary) {
+            // Stop here, don't cross into host document
+            break;
+          }
           parent = rootNode.host as HTMLElement | null;
         }
       }

@@ -13,12 +13,9 @@ This component supports the following behaviors:
 
 | Behavior | Properties |
 | --- | --- |
-| Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
-| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
 | Publish/Subscribe | `subscribeToTopic` |
-| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
-| Styling Variant | N/A |
+| Styling Variant | `variant` |
 
 ## Properties [#properties]
 

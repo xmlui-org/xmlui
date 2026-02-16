@@ -470,8 +470,13 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
      * Apply any behaviors to the component.
      */
     const behaviors = componentRegistry.getBehaviors();
+    const excludedBehaviors = descriptor?.excludeBehaviors || [];
     if (!isCompoundComponent) {
       for (const behavior of behaviors) {
+        // Skip behaviors that are explicitly excluded for this component
+        if (excludedBehaviors.includes(behavior.metadata.name)) {
+          continue;
+        }
         if (behavior.canAttach(rendererContext, rendererContext.node, descriptor)) {
           renderedNode = behavior.attach(rendererContext, renderedNode, descriptor);
         }
