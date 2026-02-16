@@ -13,6 +13,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dClick, dContextMenu, dInternal } from "../metadata-helpers";
 import { DEFAULT_ORIENTATION, Stack, defaultProps } from "./StackNative";
 import { alignmentOptionValues } from "../abstractions";
+import { FlowLayout, FlowItemWrapper, FlowItemBreak } from "../FlowLayout/FlowLayoutNative";
 
 const COMP = "Stack";
 
@@ -191,6 +192,7 @@ type RenderStackPars = {
   verticalAlignment: string;
   scrollStyle?: string;
   showScrollerFade?: boolean;
+  wrapContent?: boolean;
   registerComponentApi?: (api: any) => void;
 };
 
@@ -205,11 +207,65 @@ function renderStack({
   renderChild,
   scrollStyle,
   showScrollerFade,
+  wrapContent,
   registerComponentApi,
 }: RenderStackPars) {
   if (!isComponentDefChildren(node.children)) {
     throw new NotAComponentDefError();
   }
+
+  // Use FlowLayout when orientation is horizontal and wrapContent is true
+  if (orientation === "horizontal" && wrapContent) {
+    const columnGap =
+      extractValue.asSize(node.props?.gap) ||
+      extractValue.asSize("$space-4");
+    const rowGap = columnGap; // Use same gap for rows
+
+    return (
+      <FlowLayout
+        className={className}
+        columnGap={columnGap}
+        rowGap={rowGap}
+        verticalAlignment={verticalAlignment || "start"}
+        scrollStyle={scrollStyle as any}
+        showScrollerFade={showScrollerFade}
+        onContextMenu={lookupEventHandler("contextMenu")}
+        registerComponentApi={registerComponentApi}
+      >
+        {renderChild(node.children, {
+          type: "FlowLayout",
+          ignoreLayoutProps: ["width", "minWidth", "maxWidth"],
+          wrapChild: ({ node, extractValue }, renderedChild, hints) => {
+            if (hints?.opaque) {
+              return renderedChild;
+            }
+            if (hints?.nonVisual) {
+              return renderedChild;
+            }
+            // Handle SpaceFiller as flow item break
+            if (node.type === "SpaceFiller") {
+              return <FlowItemBreak force={true} />;
+            }
+            const width = extractValue((node.props as any)?.width);
+            const minWidth = extractValue((node.props as any)?.minWidth);
+            const maxWidth = extractValue((node.props as any)?.maxWidth);
+            return (
+              <FlowItemWrapper
+                width={width}
+                minWidth={minWidth}
+                maxWidth={maxWidth}
+                forceBreak={node.type === "SpaceFiller"}
+              >
+                {renderedChild}
+              </FlowItemWrapper>
+            );
+          },
+        })}
+      </FlowLayout>
+    );
+  }
+
+  // Default Stack behavior
   return (
     <Stack
       orientation={orientation}
@@ -243,6 +299,7 @@ export const stackComponentRenderer = createComponentRenderer(
     const verticalAlignment = extractValue(node.props?.verticalAlignment);
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
     const showScrollerFade = extractValue.asOptionalBoolean(node.props.showScrollerFade);
+    const wrapContent = extractValue.asOptionalBoolean(node.props.wrapContent, false);
     return renderStack({
       node,
       extractValue,
@@ -252,6 +309,7 @@ export const stackComponentRenderer = createComponentRenderer(
       verticalAlignment,
       scrollStyle,
       showScrollerFade,
+      wrapContent,
       lookupEventHandler,
       renderChild,
       registerComponentApi,
@@ -288,6 +346,7 @@ export const hStackComponentRenderer = createComponentRenderer(
     const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
     const verticalAlignment = extractValue(node.props?.verticalAlignment);
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
+    const wrapContent = extractValue.asOptionalBoolean(node.props.wrapContent, false);
     return renderStack({
       node,
       extractValue,
@@ -298,6 +357,7 @@ export const hStackComponentRenderer = createComponentRenderer(
       horizontalAlignment,
       verticalAlignment,
       scrollStyle,
+      wrapContent,
       registerComponentApi,
     });
   },
@@ -328,6 +388,7 @@ export const chStackComponentRenderer = createComponentRenderer(
   CHStackMd,
   ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
+    const wrapContent = extractValue.asOptionalBoolean(node.props.wrapContent, false);
     return renderStack({
       node,
       extractValue,
@@ -338,6 +399,7 @@ export const chStackComponentRenderer = createComponentRenderer(
       horizontalAlignment: "center",
       verticalAlignment: "center",
       scrollStyle,
+      wrapContent,
       registerComponentApi,
     });
   },
