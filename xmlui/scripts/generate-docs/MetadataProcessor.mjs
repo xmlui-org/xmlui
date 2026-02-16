@@ -86,6 +86,7 @@ export class MetadataProcessor {
       result += appendArticleId(component.displayName);
       result += "\n\n";
 
+      result += addDeprecationMessage(component.deprecationMessage);
       result += addComponentStatusDisclaimer(component.status);
       result += addNonVisualDisclaimer(component.nonVisual);
 
@@ -117,6 +118,7 @@ export class MetadataProcessor {
       result += appendArticleId(component.displayName);
       result += "\n\n";
 
+      result += addDeprecationMessage(component.deprecationMessage);
       result += addComponentStatusDisclaimer(component.status);
       result += addNonVisualDisclaimer(component.nonVisual);
 
@@ -695,6 +697,13 @@ function isDirectory(filePath) {
 }
 
 // --- Section helpers (string manipulation)
+
+function addDeprecationMessage(deprecationMessage) {
+  if (!deprecationMessage || deprecationMessage.trim() === "") {
+    return "";
+  }
+  return `>[!WARNING]\n> ${deprecationMessage}\n\n`;
+}
 
 function addComponentStatusDisclaimer(status) {
   let disclaimer = "";
