@@ -1323,3 +1323,192 @@ test.describe("Api", () => {
     expect(scrollLeft).toBe(0);
   });
 });
+
+// =============================================================================
+// ITEMWIDTH PROPERTY TESTS
+// =============================================================================
+
+test.describe("itemWidth property", () => {
+  test("vertical Stack: itemWidth defaults to 100%", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Stack testId="stack" orientation="vertical" width="400px">
+        <Text testId="item1" backgroundColor="lightblue" height="50px">Item 1</Text>
+        <Text testId="item2" backgroundColor="lightgreen" height="50px">Item 2</Text>
+      </Stack>
+    `);
+
+    const { width: stackWidth } = await getBounds(page.getByTestId("stack"));
+    const { width: item1Width } = await getBounds(page.getByTestId("item1"));
+    const { width: item2Width } = await getBounds(page.getByTestId("item2"));
+
+    // Items should take full width (100%) by default in vertical stacks
+    expect(item1Width).toBeCloseTo(stackWidth, 0);
+    expect(item2Width).toBeCloseTo(stackWidth, 0);
+  });
+
+  test("horizontal Stack: itemWidth defaults to fit-content", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Stack testId="stack" orientation="horizontal" width="400px">
+        <Stack testId="item1" backgroundColor="lightblue" height="50px" padding="10px">Short</Stack>
+        <Stack testId="item2" backgroundColor="lightgreen" height="50px" padding="10px">Much longer text</Stack>
+      </Stack>
+    `);
+
+    const { width: item1Width } = await getBounds(page.getByTestId("item1"));
+    const { width: item2Width } = await getBounds(page.getByTestId("item2"));
+
+    // Items should size to their content (different widths) by default
+    expect(item1Width).toBeGreaterThan(0);
+    expect(item2Width).toBeGreaterThan(item1Width);
+
+    // Items should be on the same row
+    const { top: item1Top } = await getBounds(page.getByTestId("item1"));
+    const { top: item2Top } = await getBounds(page.getByTestId("item2"));
+    expect(item1Top).toBe(item2Top);
+  });
+
+  test("VStack: itemWidth defaults to 100%", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <VStack testId="stack" width="400px">
+        <Text testId="item1" backgroundColor="lightblue" height="50px">Item 1</Text>
+        <Text testId="item2" backgroundColor="lightgreen" height="50px">Item 2</Text>
+      </VStack>
+    `);
+
+    const { width: stackWidth } = await getBounds(page.getByTestId("stack"));
+    const { width: item1Width } = await getBounds(page.getByTestId("item1"));
+    const { width: item2Width } = await getBounds(page.getByTestId("item2"));
+
+    // Items should take full width (100%) by default
+    expect(item1Width).toBeCloseTo(stackWidth, 0);
+    expect(item2Width).toBeCloseTo(stackWidth, 0);
+  });
+
+  test("HStack: itemWidth defaults to fit-content", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <HStack testId="stack" width="400px">
+        <Stack testId="item1" backgroundColor="lightblue" height="50px" padding="10px">Short</Stack>
+        <Stack testId="item2" backgroundColor="lightgreen" height="50px" padding="10px">Much longer text</Stack>
+      </HStack>
+    `);
+
+    const { width: item1Width } = await getBounds(page.getByTestId("item1"));
+    const { width: item2Width } = await getBounds(page.getByTestId("item2"));
+
+    // Items should size to their content (different widths) by default
+    expect(item1Width).toBeGreaterThan(0);
+    expect(item2Width).toBeGreaterThan(item1Width);
+  });
+
+  test("HStack with wrapContent and itemWidth (fixed pixels)", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <HStack testId="stack" width="250px" wrapContent="true" itemWidth="120px" gap="0">
+        <Stack testId="item1" backgroundColor="lightblue" height="50px">Item 1</Stack>
+        <Stack testId="item2" backgroundColor="lightgreen" height="50px">Item 2</Stack>
+        <Stack testId="item3" backgroundColor="lightcoral" height="50px">Item 3</Stack>
+      </HStack>
+    `);
+
+    const { width: item1Width } = await getBounds(page.getByTestId("item1"));
+    const { width: item2Width } = await getBounds(page.getByTestId("item2"));
+    const { width: item3Width } = await getBounds(page.getByTestId("item3"));
+
+    // All items should have the specified width
+    expect(item1Width).toBeCloseTo(120, 0);
+    expect(item2Width).toBeCloseTo(120, 0);
+    expect(item3Width).toBeCloseTo(120, 0);
+
+    // First two items on same row, third wraps
+    const { top: item1Top } = await getBounds(page.getByTestId("item1"));
+    const { top: item2Top } = await getBounds(page.getByTestId("item2"));
+    const { top: item3Top } = await getBounds(page.getByTestId("item3"));
+    
+    expect(item1Top).toBe(item2Top);
+    expect(item3Top).toBeGreaterThan(item2Top);
+  });
+
+  test("HStack with wrapContent and itemWidth (percentage)", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <HStack testId="stack" width="400px" wrapContent="true" itemWidth="30%" gap="0">
+        <Stack testId="item1" backgroundColor="lightblue" height="50px">Item 1</Stack>
+        <Stack testId="item2" backgroundColor="lightgreen" height="50px">Item 2</Stack>
+        <Stack testId="item3" backgroundColor="lightcoral" height="50px">Item 3</Stack>
+      </HStack>
+    `);
+
+    const { width: stackWidth } = await getBounds(page.getByTestId("stack"));
+    const { width: item1Width } = await getBounds(page.getByTestId("item1"));
+    const { width: item2Width } = await getBounds(page.getByTestId("item2"));
+    const { width: item3Width } = await getBounds(page.getByTestId("item3"));
+
+    const expectedWidth = stackWidth * 0.30;
+
+    // All items should have 30% width (allowing for rounding)
+    expect(item1Width).toBeCloseTo(expectedWidth, -1);
+    expect(item2Width).toBeCloseTo(expectedWidth, -1);
+    expect(item3Width).toBeCloseTo(expectedWidth, -1);
+  });
+
+  test("wrapContent with explicit child width overrides itemWidth", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <HStack testId="stack" width="400px" wrapContent="true" itemWidth="100px" gap="0">
+        <Stack testId="item1" backgroundColor="lightblue" height="50px">Default</Stack>
+        <Stack testId="item2" backgroundColor="lightgreen" height="50px" width="150px">Custom</Stack>
+        <Stack testId="item3" backgroundColor="lightcoral" height="50px">Default</Stack>
+      </HStack>
+    `);
+
+    const { width: item1Width } = await getBounds(page.getByTestId("item1"));
+    const { width: item2Width } = await getBounds(page.getByTestId("item2"));
+    const { width: item3Width } = await getBounds(page.getByTestId("item3"));
+
+    // Items without explicit width use itemWidth
+    expect(item1Width).toBeCloseTo(100, 0);
+    expect(item3Width).toBeCloseTo(100, 0);
+
+    // Item with explicit width uses its own width
+    expect(item2Width).toBeCloseTo(150, 0);
+  });
+
+  test("Stack with wrapContent and fit-content itemWidth", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Stack testId="stack" orientation="horizontal" width="400px" wrapContent="true" itemWidth="fit-content" gap="$space-2">
+        <Stack testId="item1" backgroundColor="lightblue" height="50px" padding="10px">Short</Stack>
+        <Stack testId="item2" backgroundColor="lightgreen" height="50px" padding="10px">Longer</Stack>
+        <Stack testId="item3" backgroundColor="lightcoral" height="50px" padding="10px">Mid</Stack>
+      </Stack>
+    `);
+
+    const { width: item1Width } = await getBounds(page.getByTestId("item1"));
+    const { width: item2Width } = await getBounds(page.getByTestId("item2"));
+    const { width: item3Width } = await getBounds(page.getByTestId("item3"));
+
+    // Items should size to their content (different widths)
+    expect(item1Width).toBeGreaterThan(0);
+    expect(item2Width).toBeGreaterThan(item1Width);
+    expect(item3Width).toBeGreaterThan(0);
+
+    // All items should be on the same row (fit horizontally with fit-content)
+    const { top: item1Top } = await getBounds(page.getByTestId("item1"));
+    const { top: item2Top } = await getBounds(page.getByTestId("item2"));
+    const { top: item3Top } = await getBounds(page.getByTestId("item3"));
+    expect(item1Top).toBe(item2Top);
+    expect(item2Top).toBe(item3Top);
+  });
+
+  test("CHStack uses fit-content itemWidth by default (no wrapContent)", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <CHStack testId="stack" width="400px">
+        <Stack testId="item1" backgroundColor="lightblue" height="50px" padding="10px">Short</Stack>
+        <Stack testId="item2" backgroundColor="lightgreen" height="50px" padding="10px">Longer text</Stack>
+      </CHStack>
+    `);
+
+    const { width: item1Width } = await getBounds(page.getByTestId("item1"));
+    const { width: item2Width } = await getBounds(page.getByTestId("item2"));
+
+    // Items should size to their content (different widths)
+    expect(item1Width).toBeGreaterThan(0);
+    expect(item2Width).toBeGreaterThan(item1Width);
+  });
+});

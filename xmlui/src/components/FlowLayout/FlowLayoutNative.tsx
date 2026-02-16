@@ -37,12 +37,14 @@ const resolvedCssVars: Record<string, any> = {};
 interface IFlowLayoutContext {
   rowGap: string | number;
   columnGap: string | number;
+  itemWidth: string;
   setNumberOfChildren: Dispatch<SetStateAction<number>>;
 }
 
 const FlowLayoutContext = createContext<IFlowLayoutContext>({
   rowGap: 0,
   columnGap: 0,
+  itemWidth: "100%",
   setNumberOfChildren: noop,
 });
 
@@ -54,7 +56,7 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper(
   { children, forceBreak, ...restProps }: FlowItemProps,
   ref: any,
 ) {
-  const { rowGap, columnGap, setNumberOfChildren } = useContext(FlowLayoutContext);
+  const { rowGap, columnGap, itemWidth, setNumberOfChildren } = useContext(FlowLayoutContext);
   const { mediaSize, appGlobals } = useAppContext();
   useIsomorphicLayoutEffect(() => {
     setNumberOfChildren((prev) => prev + 1);
@@ -63,9 +65,16 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper(
     };
   }, [setNumberOfChildren]);
   const { root } = useTheme();
-  const _width = restProps.width || "100%";
+  const _width = restProps.width || itemWidth;
   const _minWidth = restProps.minWidth || undefined;
   const _maxWidth = restProps.maxWidth || undefined;
+
+  // Check if width is an intrinsic sizing keyword that shouldn't go through layout resolution
+  const isIntrinsicWidth = typeof _width === "string" && 
+    (_width === "fit-content" || 
+     _width === "min-content" || 
+     _width === "max-content" ||
+     _width === "auto");
 
   const {
     width = _width,
@@ -73,6 +82,15 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper(
     maxWidth,
     flex,
   } = useMemo(() => {
+    // Skip layout resolution for intrinsic sizing keywords
+    if (isIntrinsicWidth) {
+      return {
+        width: _width,
+        minWidth: _minWidth,
+        maxWidth: _maxWidth,
+      };
+    }
+    
     return (
       // --- New layout resolution
       resolveLayoutProps(
@@ -94,7 +112,7 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper(
       //   },
       // ).cssProps || {}
     );
-  }, [_maxWidth, _minWidth, _width, appGlobals]);
+  }, [_maxWidth, _minWidth, _width, appGlobals, isIntrinsicWidth]);
 
   const resolvedWidth = useMemo(() => {
     if (width && typeof width === "string" && width.startsWith("var(")) {
@@ -109,11 +127,21 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper(
   }, [_width, root, width]);
 
   const isWidthPercentage = typeof resolvedWidth === "string" && resolvedWidth.endsWith("%");
+  
+  // Check if width is an intrinsic sizing keyword that can't be used in calc()
+  const isIntrinsicSizing = typeof resolvedWidth === "string" && 
+    (resolvedWidth === "fit-content" || 
+     resolvedWidth === "min-content" || 
+     resolvedWidth === "max-content" ||
+     resolvedWidth === "auto");
 
   const _columnGap = normalizeCssValueForCalc(columnGap);
 
   let responsiveWidth;
-  if (isWidthPercentage) {
+  if (isIntrinsicSizing) {
+    // Intrinsic sizing keywords should be used as-is without calc()
+    responsiveWidth = resolvedWidth;
+  } else if (isWidthPercentage) {
     const percNumber = parseFloat(resolvedWidth);
     if (mediaSize.sizeIndex <= 1) {
       let percentage = percNumber * 4;
@@ -173,6 +201,7 @@ type FlowLayoutProps = {
   className?: string;
   columnGap: string | number;
   rowGap: string | number;
+  itemWidth?: string;
   verticalAlignment?: string;
   scrollStyle?: ScrollStyle;
   showScrollerFade?: boolean;
@@ -181,9 +210,10 @@ type FlowLayoutProps = {
   registerComponentApi?: (api: any) => void;
 };
 
-export const defaultProps: Pick<FlowLayoutProps, "columnGap" | "rowGap" | "verticalAlignment" | "scrollStyle" | "showScrollerFade"> = {
+export const defaultProps: Pick<FlowLayoutProps, "columnGap" | "rowGap" | "itemWidth" | "verticalAlignment" | "scrollStyle" | "showScrollerFade"> = {
   columnGap: "$gap-normal",
   rowGap: "$gap-normal",
+  itemWidth: "100%",
   verticalAlignment: "start",
   scrollStyle: "normal" as ScrollStyle,
   showScrollerFade: true,
@@ -195,6 +225,7 @@ export const FlowLayout = forwardRef(function FlowLayout(
     className,
     columnGap = 0,
     rowGap = 0,
+    itemWidth = defaultProps.itemWidth,
     verticalAlignment = defaultProps.verticalAlignment,
     scrollStyle = defaultProps.scrollStyle,
     showScrollerFade = defaultProps.showScrollerFade,
@@ -257,9 +288,10 @@ export const FlowLayout = forwardRef(function FlowLayout(
     return {
       rowGap: _rowGap,
       columnGap: _columnGap,
+      itemWidth,
       setNumberOfChildren,
     };
-  }, [_columnGap, _rowGap]);
+  }, [_columnGap, _rowGap, itemWidth]);
   return (
     <FlowLayoutContext.Provider value={flowLayoutContextValue}>
       <Scroller

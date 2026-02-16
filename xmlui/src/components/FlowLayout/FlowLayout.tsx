@@ -25,6 +25,13 @@ export const FlowLayoutMd = createMetadata({
       type: "string",
       defaultValue: "$gap-normal",
     },
+    itemWidth: {
+      description:
+        "Specifies the default width for child items when they don't have an explicit width property. " +
+        "Accepts any valid CSS width value (e.g., '100%', '200px', '20rem', '*').",
+      valueType: "string",
+      defaultValue: defaultProps.itemWidth,
+    },
     columnGap: {
       description:
         "The \`columnGap\` property specifies the space between items in a single row; it overrides " +
@@ -99,6 +106,7 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
       extractValue.asSize(node.props?.rowGap) ||
       extractValue.asSize(node.props?.gap) ||
       extractValue.asSize("$space-4");
+    const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, defaultProps.itemWidth);
     const verticalAlignment = extractValue.asOptionalString(node.props?.verticalAlignment, "start");
     const scrollStyle = extractValue.asOptionalString(
       node.props.scrollStyle,
@@ -111,6 +119,7 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
         className={className}
         columnGap={columnGap}
         rowGap={rowGap}
+        itemWidth={itemWidth}
         verticalAlignment={verticalAlignment}
         scrollStyle={scrollStyle}
         showScrollerFade={showScrollerFade}

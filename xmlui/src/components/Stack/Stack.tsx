@@ -91,6 +91,13 @@ const stackMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.showScrollerFade,
     },
+    itemWidth: {
+      description:
+        "The default width applied to child elements in the Stack. " +
+        "For vertical stacks, defaults to '100%' (children take full width). " +
+        "For horizontal stacks, defaults to 'fit-content' (children size to their content).",
+      valueType: "string",
+    },
   },
   events: {
     click: dClick(COMP),
@@ -193,6 +200,7 @@ type RenderStackPars = {
   scrollStyle?: string;
   showScrollerFade?: boolean;
   wrapContent?: boolean;
+  itemWidth?: string;
   registerComponentApi?: (api: any) => void;
 };
 
@@ -208,6 +216,7 @@ function renderStack({
   scrollStyle,
   showScrollerFade,
   wrapContent,
+  itemWidth,
   registerComponentApi,
 }: RenderStackPars) {
   if (!isComponentDefChildren(node.children)) {
@@ -226,6 +235,7 @@ function renderStack({
         className={className}
         columnGap={columnGap}
         rowGap={rowGap}
+        itemWidth={itemWidth}
         verticalAlignment={verticalAlignment || "start"}
         scrollStyle={scrollStyle as any}
         showScrollerFade={showScrollerFade}
@@ -285,6 +295,7 @@ function renderStack({
       {renderChild(node.children, {
         type: "Stack",
         orientation,
+        itemWidth,
       })}
     </Stack>
   );
@@ -300,6 +311,10 @@ export const stackComponentRenderer = createComponentRenderer(
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
     const showScrollerFade = extractValue.asOptionalBoolean(node.props.showScrollerFade);
     const wrapContent = extractValue.asOptionalBoolean(node.props.wrapContent, false);
+    const itemWidth = extractValue.asOptionalString(
+      node.props?.itemWidth,
+      orientation === "vertical" ? "100%" : "fit-content"
+    );
     return renderStack({
       node,
       extractValue,
@@ -310,6 +325,7 @@ export const stackComponentRenderer = createComponentRenderer(
       scrollStyle,
       showScrollerFade,
       wrapContent,
+      itemWidth,
       lookupEventHandler,
       renderChild,
       registerComponentApi,
@@ -324,6 +340,7 @@ export const vStackComponentRenderer = createComponentRenderer(
     const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
     const verticalAlignment = extractValue(node.props?.verticalAlignment);
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
+    const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, "100%");
     return renderStack({
       node,
       extractValue,
@@ -334,6 +351,7 @@ export const vStackComponentRenderer = createComponentRenderer(
       horizontalAlignment,
       verticalAlignment,
       scrollStyle,
+      itemWidth,
       registerComponentApi,
     });
   },
@@ -347,6 +365,7 @@ export const hStackComponentRenderer = createComponentRenderer(
     const verticalAlignment = extractValue(node.props?.verticalAlignment);
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
     const wrapContent = extractValue.asOptionalBoolean(node.props.wrapContent, false);
+    const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, "fit-content");
     return renderStack({
       node,
       extractValue,
@@ -358,6 +377,7 @@ export const hStackComponentRenderer = createComponentRenderer(
       verticalAlignment,
       scrollStyle,
       wrapContent,
+      itemWidth,
       registerComponentApi,
     });
   },
@@ -368,6 +388,7 @@ export const cvStackComponentRenderer = createComponentRenderer(
   CVStackMd,
   ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
+    const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, "100%");
     return renderStack({
       node,
       extractValue,
@@ -378,6 +399,7 @@ export const cvStackComponentRenderer = createComponentRenderer(
       horizontalAlignment: "center",
       verticalAlignment: "center",
       scrollStyle,
+      itemWidth,
       registerComponentApi,
     });
   },
@@ -389,6 +411,7 @@ export const chStackComponentRenderer = createComponentRenderer(
   ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
     const wrapContent = extractValue.asOptionalBoolean(node.props.wrapContent, false);
+    const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, "fit-content");
     return renderStack({
       node,
       extractValue,
@@ -400,6 +423,7 @@ export const chStackComponentRenderer = createComponentRenderer(
       verticalAlignment: "center",
       scrollStyle,
       wrapContent,
+      itemWidth,
       registerComponentApi,
     });
   },
