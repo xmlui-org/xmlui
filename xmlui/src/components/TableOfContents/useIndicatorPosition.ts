@@ -1,4 +1,5 @@
-import { RefObject, useEffect } from "react";
+import type { RefObject } from "react";
+import { useEffect } from "react";
 
 interface IndicatorPosition {
   top: number;
@@ -27,7 +28,13 @@ export function useIndicatorPosition(
     const activeItem = containerRef.current.querySelector(
       `li.${activeClassName}`,
     );
-    if (!activeItem) return;
+    if (!activeItem) {
+      // If there is no active item (for example after navigation to a page
+      // where the previous active heading no longer exists), hide the
+      // indicator so it does not remain stuck at an outdated position.
+      indicatorRef.current.style.display = "none";
+      return;
+    }
 
     const navRect = containerRef.current.getBoundingClientRect();
     const itemRect = activeItem.getBoundingClientRect();
