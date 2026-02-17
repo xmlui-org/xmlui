@@ -9,11 +9,13 @@
     "build:extension": "xmlui build-lib",
     "build-watch": "xmlui build-lib --watch",
     "build:demo": "xmlui build",
-    "build:meta": "xmlui build-lib --mode=metadata"
+    "build:meta": "xmlui build-lib --mode=metadata",
+    "test:e2e": "cd ../.. && playwright test packages/xmlui-pdf/src/Pdf.spec.ts",
+    "test:e2e:dev": "cd ../.. && playwright test packages/xmlui-pdf/src/Pdf.spec.ts --workers=1 --reporter=line"
   },
   "dependencies": {
-    "pdfjs-dist": "5.3.93",
-    "react-pdf": "^10.1.0"
+    "pdfjs-dist": "5.4.296",
+    "react-pdf": "^10.3.0"
   },
   "devDependencies": {
     "xmlui": "*"

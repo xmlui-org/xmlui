@@ -197,6 +197,7 @@ export type TestBedDescription = Omit<
   appGlobals?: Record<string, any>;
   mainXs?: string;
   noFragmentWrapper?: boolean;
+  extensionId?: string;
 };
 
 export const test = baseTest.extend<TestDriverExtenderProps>({
@@ -323,11 +324,12 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
         await page.addInitScript(clipboard.init);
       }
 
-      await page.addInitScript((app) => {
+      await page.addInitScript(({ app, extensionId }) => {
         // @ts-ignore
         window.TEST_ENV = app;
         window.TEST_RUNTIME = app.runtime;
-      }, _appDescription);
+        window.TEST_EXTENSION_ID = extensionId;
+      }, { app: _appDescription, extensionId: description?.extensionId });
       const { width, height } = page.viewportSize();
 
       await page.goto("/");
