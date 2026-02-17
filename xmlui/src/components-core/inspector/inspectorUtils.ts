@@ -243,7 +243,7 @@ export function createLogEntry(
 export function xsConsoleLog(...args: any[]): void {
   const payload = ["[xs]", ...args];
   loggerService.log(payload);
-  console.log(...payload);
+  // console.log(...payload);
 }
 
 // =============================================================================
