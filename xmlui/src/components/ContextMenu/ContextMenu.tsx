@@ -6,8 +6,10 @@ import { createMetadata } from "../metadata-helpers";
 import { ContextMenu } from "./ContextMenuNative";
 import type { ContainerWrapperDef } from "../../components-core/rendering/ContainerWrapper";
 import { useMemo } from "react";
+import { filterAdjacentSeparators } from "../menu-helpers";
 
 const CMCOMP = "ContextMenu";
+
 
 export const ContextMenuMd = createMetadata({
   status: "stable",
@@ -71,15 +73,18 @@ export const contextMenuComponentRenderer = createComponentRenderer(
     // Extract menuWidth property
     const menuWidth = extractValue(node.props.menuWidth);
 
+    // Filter out adjacent separators before rendering
+    const filteredChildren = filterAdjacentSeparators(node.children);
+
     // Wrap children in a Container with context variables to make $context available
     const nodeWithContextVars = useMemo(
       () =>
         ({
           type: "Container",
           contextVars: { $context: contextData },
-          children: node.children,
+          children: filteredChildren,
         }) as ContainerWrapperDef,
-      [node.children, contextData],
+      [filteredChildren, contextData],
     );
 
     return (
