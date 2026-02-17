@@ -91,7 +91,7 @@ export type StatePartChangedFn = (
 
 /**
  * Determines if a container is "implicit" (auto-created) vs "explicit" (user-defined).
- * 
+ *
  * **Implicit Containers:**
  * - Created automatically by framework when a component has state-managing properties
  * - Properties that trigger container creation: `vars`, `loaders`, `functions`, `script`, `uses`
@@ -99,37 +99,37 @@ export type StatePartChangedFn = (
  * - Use parent's dispatch and registerComponentApi (no state boundary)
  * - Transparent to the developer
  * - Example: `<Stack var.count="{0}">` - auto-wrapped for variable state
- * 
+ *
  * **Explicit Containers:**
  * - Created when component type is "Container" or has `uses` property defined
  * - Form a state boundary (isolate state from parent)
  * - Have their own dispatch and registerComponentApi
  * - Developer is explicitly creating the container
  * - Example: `<Container uses="['count']">` or `<Stack type="Container">`
- * 
+ *
  * **Impact on State Flow:**
  * - Implicit containers: State changes bubble to parent container's reducer
  * - Explicit containers: State changes handled by own reducer, creating isolation
- * 
+ *
  * @param node - The original component definition
  * @param containerizedNode - The component after wrapping with container properties
  * @returns `true` if the container was auto-created (implicit), `false` if user-defined (explicit)
- * 
+ *
  * @example
  * ```typescript
  * // Implicit container - auto-wrapped for variable state
  * const node1 = { type: "Stack", vars: { count: 0 } };
  * isImplicitContainer(node1, wrappedNode); // true
- * 
+ *
  * // Explicit container - user-defined with uses boundary
  * const node2 = { type: "Stack", uses: ['count'] };
  * isImplicitContainer(node2, wrappedNode); // false (uses property means explicit)
- * 
+ *
  * // Explicit container - type is Container
  * const node3 = { type: "Container", children: [...] };
  * isImplicitContainer(node3, wrappedNode); // false
  * ```
- * 
+ *
  * @see {@link ContainerWrapper} for the wrapping implementation
  */
 export function isImplicitContainer(

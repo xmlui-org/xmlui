@@ -1,13 +1,5 @@
 import type { MutableRefObject, ReactElement, ReactNode } from "react";
-import React, {
-  cloneElement,
-  forwardRef,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo, useRef } from "react";
 import { isEmpty, isPlainObject } from "lodash-es";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
@@ -125,7 +117,8 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // Resolve label props using extractParam to evaluate expressions
   const resolvedLabel = useMemo(() => {
     const props = safeNode.props || {};
-    const rawLabel = props.label ?? props.title ?? props.name ?? props.text ?? props.value ?? props.placeholder;
+    const rawLabel =
+      props.label ?? props.title ?? props.name ?? props.text ?? props.value ?? props.placeholder;
     if (rawLabel === undefined) return undefined;
     // Use extractParam to evaluate expressions like "{mediaSize.largeScreen ? 'Delete' : ''}"
     return extractParam(state, rawLabel, appContext, true);
@@ -278,7 +271,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
         componentId: ctx.componentId,
         sourceFileId: ctx.sourceFileId,
         sourceRange: ctx.sourceRange,
-        ...actionOptions
+        ...actionOptions,
       });
     },
     [lookupAction, safeNode.events, uid],
@@ -417,7 +410,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
         });
       }
     },
-    [xsVerbose, safeNode.type, resolvedLabel, safeNode.uid]
+    [xsVerbose, safeNode.type, resolvedLabel, safeNode.uid],
   );
 
   // --- If when is false, don't render the component
@@ -501,7 +494,11 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       const resolvedUid = extractParam(state, testId, appContext, true);
       renderedNode = (
         <ComponentDecorator
-          attr={{ "data-testid": resolvedUid, "data-inspectId": inspectId, "data-component-type": safeNode.type }}
+          attr={{
+            "data-testid": resolvedUid,
+            "data-inspectId": inspectId,
+            "data-component-type": safeNode.type,
+          }}
           allowOnlyRefdChild={isCompoundComponent || safeNode.type === "ModalDialog"}
           onTargetMounted={safeNode.type === "ModalDialog" ? refreshInspection : undefined}
           ref={ref}

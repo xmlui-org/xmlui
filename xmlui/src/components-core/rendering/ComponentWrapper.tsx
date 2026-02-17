@@ -1,10 +1,10 @@
-import type { ReactNode, RefObject} from "react";
+import type { ReactNode, RefObject } from "react";
 import { forwardRef, memo, useMemo, useRef } from "react";
 
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import { extractParam } from "../utils/extractParam";
 import type { ChildRendererContext } from "./renderChild";
-import type { ContainerWrapperDef} from "./ContainerWrapper";
+import type { ContainerWrapperDef } from "./ContainerWrapper";
 import { ContainerWrapper, isContainerLike } from "./ContainerWrapper";
 import ComponentAdapter from "./ComponentAdapter";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
@@ -34,13 +34,19 @@ export const ComponentWrapper = memo(
       uidInfoRef,
       children,
       ...rest
-    }: ChildRendererContext & { resolvedKey: string, children?: ReactNode },
+    }: ChildRendererContext & { resolvedKey: string; children?: ReactNode },
     ref,
   ) {
-    if (appContext?.appGlobals?.xsVerbose && node.type !== 'TextNode') {
-      console.log('[ComponentWrapper]', node.type, node.uid, 'received globalVars:', globalVars ? Object.keys(globalVars) : undefined);
+    if (appContext?.appGlobals?.xsVerbose && node.type !== "TextNode") {
+      console.log(
+        "[ComponentWrapper]",
+        node.type,
+        node.uid,
+        "received globalVars:",
+        globalVars ? Object.keys(globalVars) : undefined,
+      );
     }
-    
+
     // --- We pass the layout context to the child components, so we need to
     // --- make sure that it is stable
     const componentRegistry = useComponentRegistry();
@@ -84,11 +90,15 @@ export const ComponentWrapper = memo(
       );
     }, [nodeWithTransformedLoaders, resolvedDataPropIsString, uidInfoRef]);
 
-
     if (isContainerLike(nodeWithTransformedDatasourceProp)) {
       // --- This component should be rendered as a container
       if (appContext?.appGlobals?.xsVerbose) {
-        console.log('[ComponentWrapper → ContainerWrapper]', node.type, 'passing globalVars:', globalVars ? Object.keys(globalVars) : undefined);
+        console.log(
+          "[ComponentWrapper → ContainerWrapper]",
+          node.type,
+          "passing globalVars:",
+          globalVars ? Object.keys(globalVars) : undefined,
+        );
       }
       return (
         <ContainerWrapper
@@ -103,12 +113,20 @@ export const ComponentWrapper = memo(
           parentRegisterComponentApi={registerComponentApi}
           uidInfoRef={uidInfoRef}
           ref={ref}
-          {...rest}>{children}</ContainerWrapper>
+          {...rest}
+        >
+          {children}
+        </ContainerWrapper>
       );
     } else {
       // --- This component should be rendered as a regular component
       if (appContext?.appGlobals?.xsVerbose) {
-        console.log('[ComponentWrapper → ComponentAdapter]', node.type, 'passing globalVars:', globalVars ? Object.keys(globalVars) : undefined);
+        console.log(
+          "[ComponentWrapper → ComponentAdapter]",
+          node.type,
+          "passing globalVars:",
+          globalVars ? Object.keys(globalVars) : undefined,
+        );
       }
       return (
         <ComponentAdapter
@@ -127,7 +145,10 @@ export const ComponentWrapper = memo(
           layoutContextRef={stableLayoutContext}
           ref={ref}
           uidInfoRef={uidInfoRef}
-          {...rest}>{children}</ComponentAdapter>
+          {...rest}
+        >
+          {children}
+        </ComponentAdapter>
       );
     }
   }),
@@ -204,7 +225,7 @@ function transformNodeWithDataSourceRefProp(
   let ret = { ...node };
   let resolved = false;
   Object.entries(node.props).forEach(([key, value]) => {
-    let uidInfoForDatasource: { type: string; uid: any; };
+    let uidInfoForDatasource: { type: string; uid: any };
     try {
       uidInfoForDatasource = extractParam(uidInfoRef.current, value);
     } catch (e) {}

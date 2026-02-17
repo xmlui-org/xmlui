@@ -49,14 +49,25 @@ export function renderChild({
   cleanup,
   uidInfoRef,
 }: ChildRendererContext): ReactNode {
-  if (appContext?.appGlobals?.xsVerbose && node.type !== 'TextNode' && node.type !== 'TextNodeCData') {
-    console.log('[renderChild]', node.type, node.uid, 'globalVars:', globalVars ? Object.keys(globalVars) : undefined);
+  if (
+    appContext?.appGlobals?.xsVerbose &&
+    node.type !== "TextNode" &&
+    node.type !== "TextNodeCData"
+  ) {
+    console.log(
+      "[renderChild]",
+      node.type,
+      node.uid,
+      "globalVars:",
+      globalVars ? Object.keys(globalVars) : undefined,
+    );
   }
   // --- Special handling for init event: if component has init event and when=false,
   // --- we still need to let it render once to trigger init, which may change the when condition
   const hasInitEvent = node.events?.init;
-  const shouldCheckWhen = !hasInitEvent || node.type === "TextNode" || node.type === "TextNodeCData";
-  
+  const shouldCheckWhen =
+    !hasInitEvent || node.type === "TextNode" || node.type === "TextNodeCData";
+
   // --- Render only visible components (skip when check if component has init event)
   if (shouldCheckWhen && !shouldKeep(node.when, state, appContext)) {
     return null;

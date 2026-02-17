@@ -2,6 +2,16 @@
 
 A deep dive into XMLUI's hierarchical container system for managing component state, variables, and reactive data binding.
 
+## Overview
+
+XMLUI's container system uses a modular architecture with specialized modules organized into three categories:
+
+- **Inspector Modules** - Debugging and DevTools integration
+- **Container Modules** - Event handling, caching, and rendering
+- **State Modules** - 6-layer state composition pipeline
+
+Container.tsx and StateContainer.tsx orchestrate these modules to provide declarative state management.
+
 ## Fundamentals of XMLUI Reactivity
 
 XMLUI implements **automatic reactivity** where UI updates happen automatically when data changes, without manual DOM manipulation.
@@ -508,60 +518,63 @@ ContainerWrapper (Determines if container needed, calculates implicit/explicit)
             └── Container (Executes event handlers, renders children)
 ```
 
+### Modular Architecture
+
+**Core Orchestration Files:**
+- **Container.tsx** - Event execution orchestration
+- **StateContainer.tsx** - State composition orchestration
+- **ContainerWrapper.tsx** - Determines containerization needs
+
+**Inspector Modules** (`/components-core/inspector/`):
+- **handler-logging.ts** - Event handler execution logging
+- **variable-logging.ts** - Variable change tracking
+- **inspectorUtils.ts** - Shared inspector utilities
+- **state-logging.ts** - State transition logging
+
+**Container Modules** (`/components-core/container/`):
+- **event-handlers.ts** - Async/sync event handler execution
+- **child-rendering.tsx** - Child component rendering
+- **loader-rendering.tsx** - Loader component rendering
+- **event-handler-cache.ts** - Handler caching and lifecycle
+- **action-lookup.ts** - Action resolution
+
+**State Modules** (`/components-core/state/`):
+- **state-layers.ts** - 6-layer state composition implementation
+- **global-variables.ts** - Global variable evaluation and reactivity
+- **variable-resolution.ts** - Two-pass variable resolution
+- **routing-state.ts** - Routing parameter integration
+
 ### Implicit vs Explicit Containers
 
-XMLUI distinguishes between two types of containers that behave differently in the state hierarchy:
+**Implicit Containers** (Auto-created, Transparent):
+- Created automatically for components with `vars`, `loaders`, `functions`, or `script`
+- No `uses` property (inherit all parent state)
+- Share parent's `dispatch` and `registerComponentApi`
+- Example: `<Stack var.count="{0}">` 
 
-**Implicit Containers (Auto-created, Transparent)**
-- Created automatically when a component has state-managing properties (`vars`, `loaders`, `functions`, `script`)
-- Do NOT have a `uses` property defined (inherit all parent state by default)
-- Share the parent's `dispatch` and `registerComponentApi` (no state boundary)
-- Transparent to the developer - just a wrapper for state management
-- Example: `<Stack var.count="{0}">` - auto-wrapped for variable state
-
-**Explicit Containers (User-defined, State Boundary)**
-- Created when:
-  - Component type is "Container": `<Container>`
-  - Component has `uses` property: `<Stack uses="['count']">`
-- Form a state boundary (isolate state from parent)
-- Have their own `dispatch` and `registerComponentApi`
-- Developer is explicitly creating the container for state isolation
-- Changes to state use their own reducer, not bubbled to parent
-
-**Example:**
-```xml
-<!-- Implicit container - transparent wrapper -->
-<Stack var.count="{0}">
-  <Button onClick="count++" />  <!-- Changes use parent's dispatch -->
-</Stack>
-
-<!-- Explicit container - state boundary -->
-<Stack uses="[]" var.count="{0}">
-  <Button onClick="count++" />  <!-- Changes use own dispatch, isolated -->
-</Stack>
-```
-
-**Implementation:**
-```typescript
-// From Container.tsx
-const dispatch = isImplicit ? parentDispatch : containerDispatch;
-const registerComponentApi = isImplicit ? parentRegisterComponentApi : containerRegisterComponentApi;
-```
+**Explicit Containers** (State Boundary):
+- Created via `<Container>` or `uses` property
+- Form state isolation boundary
+- Own `dispatch` and `registerComponentApi`
+- Example: `<Stack uses="[]">` creates isolated state
 
 ### Core Components
 
-**ContainerWrapper** (`/xmlui/src/components-core/rendering/ContainerWrapper.tsx`)
-- Determines if a component needs containerization
-- Wraps components with container characteristics
+**ContainerWrapper** - Determines containerization needs, calculates implicit/explicit status, wraps components
 
-**StateContainer** (`/xmlui/src/components-core/rendering/StateContainer.tsx`)
-- Manages state storage and composition
-- Assembles state from multiple sources
-- Handles state lifecycle
+**StateContainer** - Orchestrates 6-layer state composition pipeline using:
+- `state-layers.ts` - Composition utilities
+- `variable-resolution.ts` - Two-pass resolution
+- `global-variables.ts` - Global variable handling
+- `routing-state.ts` - Routing integration
+- `variable-logging.ts` - Inspection
 
-**Container** (`/xmlui/src/components-core/rendering/Container.tsx`)
-- Executes event handlers asynchronously
-- Manages state changes while maintaining UI responsiveness
+**Container** - Orchestrates event execution and rendering using:
+- `event-handlers.ts` - Event execution
+- `event-handler-cache.ts` - Handler caching
+- `action-lookup.ts` - Action resolution
+- `child-rendering.tsx`, `loader-rendering.tsx` - Rendering
+- `handler-logging.ts` - Inspection
 
 ## State Composition and Management
 
@@ -574,7 +587,18 @@ export type ContainerState = Record<string | symbol, any>;
 
 ### 6-Layer State Composition Pipeline
 
-The `StateContainer` assembles state through a precise 6-layer pipeline (documented in StateContainer.tsx):
+The `StateContainer` assembles state through a precise 6-layer pipeline. This pipeline is now explicitly implemented and documented across multiple specialized modules:
+
+**Core Implementation**: `/xmlui/src/components-core/state/state-layers.ts`
+
+This module provides:
+- Comprehensive pipeline documentation with ASCII diagrams
+- `STATE_LAYER_DOCUMENTATION` constant for programmatic access
+- `mergeComponentApis()` - Merges component APIs into state (Layer 3)
+- `useCombinedState()` - Combines multiple state objects with shallow merge
+- `useMergedState()` - Deep merges object properties for local vars + component state
+
+**Pipeline Visualization**:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -628,6 +652,28 @@ The `StateContainer` assembles state through a precise 6-layer pipeline (documen
 5. Local Variables (highest priority - can shadow globals and parent state)
 6. Routing Parameters (additive, always available)
 
+### State Module Responsibilities
+
+**state-layers.ts** - Implements the 6-layer composition pipeline with utilities:
+- `STATE_LAYER_DOCUMENTATION` - Pipeline documentation
+- `mergeComponentApis()` - Merges component APIs (Layer 3)
+- `useCombinedState()` - Shallow merge of layers
+- `useMergedState()` - Deep merge for local vars + component state
+
+**variable-resolution.ts** - Two-pass resolution for forward references:
+- Pass 1: Pre-resolve with temporary cache
+- Pass 2: Final resolution with persistent memoization
+- Dependency collection and smart caching
+
+**global-variables.ts** - Global variable management:
+- Dependency tracking between globals
+- Runtime reactivity and re-evaluation
+- Expression tree storage for dynamic updates
+
+**routing-state.ts** - Routing integration:
+- Provides `$pathname`, `$routeParams`, `$queryParams`, `$linkInfo`
+- Automatically available in all containers
+
 **Example - Multi-level Composition:**
 ```xml
 <!-- Parent Container -->
@@ -650,481 +696,108 @@ The `StateContainer` assembles state through a precise 6-layer pipeline (documen
 
 ### State Flow Implementation
 
-```typescript
-// Actual flow from StateContainer.tsx - 6-layer pipeline
+StateContainer orchestrates modules to build the final state:
 
+```typescript
 // LAYER 1: Parent state scoping
-const stateFromOutside = useMemo(
-  () => extractScopedState(parentState, node.uses),
-  [node.uses, parentState]
-);
+const stateFromOutside = extractScopedState(parentState, node.uses);
 
 // LAYER 2: Component reducer state
 const [componentState, dispatch] = useReducer(containerReducer, EMPTY_OBJECT);
 
-// LAYER 3: Component APIs
-const [componentApis, setComponentApis] = useState<Record<symbol, ComponentApi>>(EMPTY_OBJECT);
-const componentStateWithApis = useMemo(() => {
-  const ret = { ...componentState };
-  // Merge APIs into state, accessible by component ID
-  for (const componentApiKey of Object.getOwnPropertySymbols(componentApis)) {
-    const value = componentApis[componentApiKey];
-    if (componentApiKey.description) {
-      ret[componentApiKey.description] = { ...(ret[componentApiKey.description] || {}), ...value };
-    }
-    ret[componentApiKey] = { ...ret[componentApiKey], ...value };
-  }
-  return ret;
-}, [componentState, componentApis]);
+// LAYER 3: Component APIs (state-layers.ts)
+const componentStateWithApis = mergeComponentApis(componentState, componentApis);
 
-// LAYER 4: Context variables combined with layers 1-3
-const localVarsStateContext = useCombinedState(
-  stateFromOutside,
-  componentStateWithApis,
-  node.contextVars
-);
+// LAYER 4: Context variables
+const localVarsStateContext = useCombinedState(stateFromOutside, componentStateWithApis, node.contextVars);
 
-// LAYER 5: Local variables (two-pass resolution for forward references)
-const preResolvedLocalVars = useVars(
-  varDefinitions,
-  functionDeps,
-  localVarsStateContext,
-  useRef<MemoedVars>(new Map()) // Temporary cache
-);
-
-const localVarsStateContextWithPreResolvedLocalVars = {
-  ...preResolvedLocalVars,
-  ...localVarsStateContext,
-};
-
-const resolvedLocalVars = useVars(
-  varDefinitions,
-  functionDeps,
-  localVarsStateContextWithPreResolvedLocalVars,
-  memoedVars // Persistent cache
-);
-
+// LAYER 5: Local variables (variable-resolution.ts) - two-pass resolution
+const preResolvedLocalVars = useVars(varDefinitions, functionDeps, localVarsStateContext, tempCache);
+const resolvedLocalVars = useVars(varDefinitions, functionDeps, {...preResolvedLocalVars, ...localVarsStateContext}, persistentCache);
 const mergedWithVars = useMergedState(resolvedLocalVars, componentStateWithApis);
 
-// Global variables: Merge parent globals with node globals
-// Supports dependency tracking and re-evaluation for reactivity
-const currentGlobalVars = useMemo(() => {
-  const evaluatedParentGlobals: Record<string, any> = {};
-  // Evaluate parent globals with expression support
-  if (parentGlobalVars) {
-    for (const [key, value] of Object.entries(parentGlobalVars)) {
-      if (key.startsWith("__")) continue; // Skip __tree_* metadata
-      if (typeof value === "string") {
-        evaluatedParentGlobals[key] = extractParam(
-          evaluatedParentGlobals,
-          value,
-          appContext,
-          false
-        );
-      } else {
-        evaluatedParentGlobals[key] = value;
-      }
-    }
-  }
-  
-  // Evaluate node globals (usually only root defines these)
-  const evaluatedNodeGlobals: Record<string, any> = {};
-  if (node.globalVars) {
-    for (const [key, value] of Object.entries(node.globalVars)) {
-      if (key.startsWith("__")) continue;
-      if (typeof value === "string") {
-        // Use componentStateWithApis for runtime-updated globals
-        const evalContext = { ...evaluatedParentGlobals, ...evaluatedNodeGlobals };
-        // Prefer runtime values from componentState
-        for (const [gkey] of Object.entries(node.globalVars)) {
-          if (!gkey.startsWith("__") && gkey in componentStateWithApis) {
-            evalContext[gkey] = componentStateWithApis[gkey];
-          }
-        }
-        evaluatedNodeGlobals[key] = extractParam(evalContext, value, appContext, false);
-      } else {
-        evaluatedNodeGlobals[key] = value;
-      }
-    }
-  }
-  
-  return { ...evaluatedParentGlobals, ...evaluatedNodeGlobals };
-}, [parentGlobalVars, node.globalVars, appContext, componentStateWithApis]);
+// Global variables (global-variables.ts)
+const currentGlobalVars = useGlobalVariables(parentGlobalVars, node.globalVars, node.functions, componentStateWithApis);
 
-// LAYER 6: Final combination with routing parameters
-const combinedState = useCombinedState(
-  stateFromOutside,      // Parent state (lowest priority)
-  node.contextVars,      // Context variables
-  currentGlobalVars,     // Global variables
-  mergedWithVars,        // Local vars + APIs (highest priority)
-  routingParams          // Routing parameters ($pathname, $routeParams, etc.)
-);
+// LAYER 6: Routing parameters (routing-state.ts) + final combintaion
+const routingParams = useRoutingParams();
+const finalState = useCombinedState(stateFromOutside, node.contextVars, currentGlobalVars, mergedWithVars, routingParams);
 ```
 
-**State Shadowing**: The priority order allows local variables to shadow (override) both parent state variables and global variables with the same name. This enables containers to define their own versions of variables without being forced to use the parent's or global state, supporting better component encapsulation.
+**State Shadowing**: Local variables (Layer 5) can shadow parent state and global variables.
 
-**Global Variable Flow**: Global variables are defined in the root container's `globalVars` property (from Main.xmlui.xs, `global.*` attributes, or `<global>` tags) and flow down through the container hierarchy via `parentGlobalVars`. Each container merges its parent's global vars with its own (though typically only the root container defines them), making them accessible throughout the entire application.
+**Global Variable Flow**: Defined in root container, flow down via `parentGlobalVars`, managed by `global-variables.ts` with dependency tracking and runtime reactivity.
 
 ### Variable Resolution and Memoization
 
-Variables are resolved through a sophisticated **two-pass memoization system** to handle forward references:
+Variables are resolved through a **two-pass memoization system** in the `variable-resolution.ts` module:
 
-**Two-Pass Resolution Strategy:**
+**Pass 1**: Pre-resolve with temporary cache to handle forward references  
+**Pass 2**: Final resolution with persistent memoization
 
-XMLUI variables can have dependencies on each other and on context variables. Resolution happens in two passes to handle all dependency orderings correctly:
+**Example**: `{ fn: "$props.value", $props: "{x: 1}" }` resolves correctly in Pass 2 after `$props` is available.
 
-**Pass 1 (Pre-resolution):**
-- Resolves variables using current state context
-- Handles forward references (e.g., function using $props defined later)
-- Results are temporary and may be incomplete
-- Uses a temporary memoization cache that's discarded after this pass
-
-**Pass 2 (Final resolution):**
-- Includes pre-resolved variables in the context
-- Ensures all dependencies are available
-- Results are memoized for performance
-- Uses the persistent memoization cache
-
-**Example:** Given `vars { fn: "$props.value", $props: "{x: 1}" }`
-- Pass 1: `fn` tries to use `$props` (not yet resolved, gets undefined or default)
-- Pass 2: `fn` uses `$props` (now resolved to `{x: 1}`, works correctly)
-
+**Implementation**:
 ```typescript
-// From StateContainer.tsx - Two-pass resolution
+// Pass 1: Pre-resolve
+const preResolvedLocalVars = useVars(varDefinitions, functionDeps, localVarsStateContext, tempCache);
 
-// Pass 1: Pre-resolve variables to handle forward references
-const preResolvedLocalVars = useVars(
-  varDefinitions,
-  functionDeps,
-  localVarsStateContext,
-  useRef<MemoedVars>(new Map()), // Temporary cache, discarded after this pass
-);
-
-// Merge pre-resolved variables into context for second pass
-const localVarsStateContextWithPreResolvedLocalVars = {
-  ...preResolvedLocalVars,
-  ...localVarsStateContext,
-};
-
-// Pass 2: Final resolution with complete context
-const resolvedLocalVars = useVars(
-  varDefinitions,
-  functionDeps,
-  localVarsStateContextWithPreResolvedLocalVars,
-  memoedVars, // Persistent cache for performance
-);
+// Pass 2: Final resolution with pre-resolved context
+const resolvedLocalVars = useVars(varDefinitions, functionDeps, {...preResolvedLocalVars, ...localVarsStateContext}, persistentCache);
 ```
 
-**Memoization Implementation:**
-
-```typescript
-// From StateContainer.tsx - Memoization structure
-type MemoedVars = Map<any, {
-  getDependencies: (value: string | CodeDeclaration, referenceTrackedApi: Record<string, ComponentApi>) => Array<string>;
-  obtainValue: (expression: any, state: ContainerState, appContext: AppContextObject | undefined, strict: boolean | undefined, stateDeps: Record<string, any>, appContextDeps: Record<string, any>) => any;
-}>;
-```
-
-#### Variable Dependency Tracking
-
-1. **Function Dependencies**: Arrow expressions and their variable dependencies are collected first via `collectFnVarDeps()`
-2. **Variable Dependencies**: Dependencies between variables are resolved in multiple passes
-3. **Memoization**: Results are memoized based on dependency changes using `memoizeOne` to avoid unnecessary recalculation
-
-```typescript
-// Function dependency collection (from StateContainer.tsx)
-const functionDeps = useMemo(() => {
-  const fnDeps: Record<string, Array<string>> = {};
-  Object.entries(varDefinitions).forEach(([key, value]) => {
-    if (isParsedValue(value) && value.tree.type === T_ARROW_EXPRESSION) {
-      fnDeps[key] = collectVariableDependencies(value.tree, referenceTrackedApi);
-    }
-  });
-  return collectFnVarDeps(fnDeps);
-}, [referenceTrackedApi, varDefinitions]);
-```
+**Features**: Dependency tracking, smart caching with `memoizeOne`, supports parsed expressions and string bindings.
 
 ### Component API Registration
 
-Components expose APIs that other components can invoke. The registration system uses Symbol-based keys with optional string descriptions for user-friendly access.
+Components expose APIs through Symbol-based keys with string descriptions for access.
 
-**Registration Flow:**
-```typescript
-// From StateContainer.tsx
-const registerComponentApi: RegisterComponentApiFnInner = useCallback((uid, api) => {
-  setComponentApis(
-    produce((draft) => {
-      if (!draft[uid]) {
-        draft[uid] = {};
-      }
-      Object.entries(api).forEach(([key, value]) => {
-        if (draft[uid][key] !== value) {
-          draft[uid][key] = value;
-        }
-      });
-    }),
-  );
-}, []);
-```
+**Registration**: Components call `registerComponentApi(uid, api)` to expose methods.
 
-**API State Merging:**
+**Merging**: APIs are merged into component state via `mergeComponentApis()` from `state-layers.ts`.
 
-APIs are merged into the component state to make them accessible via component IDs:
-
-```typescript
-// From StateContainer.tsx - componentStateWithApis
-const componentStateWithApis = useMemo(() => {
-  const ret = { ...componentState };
-  
-  // Copy component state with Symbol keys to string keys (for user-friendly access)
-  for (const stateKey of Object.getOwnPropertySymbols(componentState)) {
-    const value = componentState[stateKey];
-    if (stateKey.description) {
-      ret[stateKey.description] = value;
-    }
-  }
-  
-  // Skip if no registered APIs
-  if (Reflect.ownKeys(componentApis).length === 0) {
-    return ret;
-  }
-  
-  // Merge component APIs
-  for (const componentApiKey of Object.getOwnPropertySymbols(componentApis)) {
-    const value = componentApis[componentApiKey];
-    if (componentApiKey.description) {
-      const key = componentApiKey.description;
-      ret[key] = { ...(ret[key] || {}), ...value };
-    }
-    ret[componentApiKey] = { ...ret[componentApiKey], ...value };
-  }
-  
-  return ret;
-}, [componentState, componentApis]);
-```
-
-**Usage Example:**
+**Usage**:
 ```xml
-<DataTable id="myTable" data="/api/users">
-  <!-- API automatically registered: myTable.getSelectedRows(), myTable.fetchData() -->
-</DataTable>
-
-<Button onClick="myTable.getSelectedRows()" label="Get Selected" />
+<DataTable id="myTable" data="/api/users" />
+<Button onClick="myTable.getSelectedRows()" />
 ```
 
-#### Implicit vs Explicit Container Registration
-
-**Critical distinction**: Implicit containers use the parent's `registerComponentApi`, while explicit containers use their own. This is determined by the `isImplicit` flag:
-
-```typescript
-// From Container.tsx
-const dispatch = isImplicit ? parentDispatch : containerDispatch;
-const registerComponentApi = isImplicit 
-  ? parentRegisterComponentApi 
-  : containerRegisterComponentApi;
-```
-
-**Impact:**
-- **Implicit containers**: Child component APIs are registered in the parent container's state
-- **Explicit containers**: Child component APIs are registered in their own state (isolated)
-
-**Example:**
-```xml
-<!-- Implicit container - APIs registered in parent -->
-<Stack var.data="{[]}">
-  <DataTable id="table1" />  
-  <!-- table1 registered in Stack's parent container -->
-</Stack>
-
-<!-- Explicit container - APIs isolated -->
-<Stack uses="[]" var.data="{[]}">
-  <DataTable id="table2" />  
-  <!-- table2 registered in this Stack's own state (isolated) -->
-</Stack>
-```
+**Implicit vs Explicit**:
+- Implicit containers: APIs registered in parent's state
+- Explicit containers: APIs isolated to own state
 
 ## Reducer-Based State Updates
 
-### Container Actions
+State changes use Redux-style actions via `ContainerActionKind` enum (LOADER_LOADED, LOADER_ERROR, EVENT_HANDLER_STARTED, COMPONENT_STATE_CHANGED, STATE_PART_CHANGED, etc.).
 
-State changes are managed through Redux-style actions via the `ContainerActionKind` enum:
-
-```typescript
-// From /xmlui/src/components-core/rendering/containers.ts
-export const enum ContainerActionKind {
-  LOADER_LOADED = "ContainerActionKind:LOADER_LOADED",
-  LOADER_IN_PROGRESS_CHANGED = "ContainerActionKind:LOADER_IN_PROGRESS_CHANGED", 
-  LOADER_IS_REFETCHING_CHANGED = "ContainerActionKind:LOADER_IS_REFETCHING_CHANGED",
-  LOADER_ERROR = "ContainerActionKind:LOADER_ERROR",
-  EVENT_HANDLER_STARTED = "ContainerActionKind:EVENT_HANDLER_STARTED",
-  EVENT_HANDLER_COMPLETED = "ContainerActionKind:EVENT_HANDLER_COMPLETED",
-  EVENT_HANDLER_ERROR = "ContainerActionKind:EVENT_HANDLER_ERROR", 
-  COMPONENT_STATE_CHANGED = "ContainerActionKind:COMPONENT_STATE_CHANGED",
-  STATE_PART_CHANGED = "ContainerActionKind:STATE_PART_CHANGED",
-}
-```
-
-#### Event Handler State Preservation
-
-The event handler lifecycle actions (`EVENT_HANDLER_STARTED`, `EVENT_HANDLER_COMPLETED`, `EVENT_HANDLER_ERROR`) implement a **critical state preservation pattern**. The reducer uses the spread operator to preserve existing state when setting lifecycle flags:
+**State Preservation Pattern**: All reducer actions use spread operator to preserve existing state:
 
 ```typescript
-// From reducer.ts - state preservation pattern
 case ContainerActionKind.EVENT_HANDLER_STARTED:
-  // Skip if this reducer doesn't own this component's state
-  if (!(uid in state)) break;
-  const { eventName } = action.payload;
-  const inProgressFlagName = `${eventName}InProgress`;
-  // CRITICAL: Preserve existing state properties when setting flags
-  state[uid] = { ...state[uid], [inProgressFlagName]: true };
-  storeNextValue(state[uid]);
+  state[uid] = { ...state[uid], [inProgressFlagName]: true }; // Preserves data, error, etc.
   break;
 ```
 
-**Why This Matters**: 
-- Components with reducer state (like `DataSource` or `APICall`) maintain their `data`, `error`, and other properties throughout the event handler lifecycle
-- Without this preservation pattern, setting the `inProgress` flag would replace the entire state object, losing critical data like loaded results or previous errors
-- This pattern resolved issues where APIs would become non-functional after their first error because the state was being wiped out instead of updated
+**Why Critical**: Prevents data loss when setting flags (e.g., `inProgress`) on components with existing state (loaders, API calls).
 
-**Consistent Pattern Applied to All Actions:**
-
-```typescript
-// All state-modifying actions use the spread pattern
-case ContainerActionKind.LOADER_LOADED:
-  state[uid] = {
-    ...state[uid],  // Preserve existing state properties
-    value: data,
-    byId: Array.isArray(data) ? keyBy(data, item => item.$id) : undefined,
-    inProgress: false,
-    loaded: data !== undefined,
-    pageInfo,
-  };
-  break;
-
-case ContainerActionKind.LOADER_ERROR:
-  state[uid] = {
-    ...state[uid],  // Preserve existing state properties
-    error,
-    inProgress: false,
-    loaded: true
-  };
-  break;
-
-case ContainerActionKind.COMPONENT_STATE_CHANGED:
-  state[uid] = {
-    ...state[uid],  // Preserve existing state
-    ...newState,    // Merge new state
-  };
-  break;
-```
-
-This ensures that no state properties are lost during any state update, providing reliable behavior for complex component hierarchies.
-
-### Partial State Changes
-
-The most sophisticated action is `STATE_PART_CHANGED`, which handles deep object/array mutations:
-
-```typescript
-// Example: Updating nested property some.count++
-{
-  "type": "ContainerActionKind:STATE_PART_CHANGED",
-  "payload": {
-    "actionType": "set",
-    "path": ["some", "count"],
-    "target": { "count": 0 },
-    "value": 1,
-    "localVars": resolvedLocalVars
-  }
-}
-```
-
-The reducer uses Lodash's `setWith` to update nested paths while preserving object vs array types based on target structure.
+**Partial State Changes**: `STATE_PART_CHANGED` handles deep mutations using path-based updates with Lodash's `setWith`.
 
 ## Proxy-Based Change Detection
 
-### BuildProxy Function
+State mutations are detected using JavaScript Proxies from `buildProxy.ts`:
 
-State changes are detected using JavaScript Proxies that intercept get/set operations:
-
-```typescript
-// From /xmlui/src/components-core/rendering/buildProxy.ts
-export function buildProxy(
-  proxyTarget: any,
-  callback: (changeInfo: ProxyCallbackArgs) => void,
-  tree: Array<string | symbol> = [],
-): any {
-  const getPath = (prop: string | symbol) => tree.concat(prop).join(".");
-  const proxiedValues = new WeakMap();
-  
-  return new Proxy(proxyTarget, {
-    get: function (target, prop, receiver) {
-      const value = Reflect.get(target, prop, receiver);
-      
-      // Create proxies only for writable objects and arrays
-      if (value && typeof value === "object" && !Object.isFrozen(value)) {
-        // Skip arrow expression objects (special XMLUI internal objects)
-        if (isArrowExpressionObject(value)) {
-          return value;
-        }
-        
-        // Check if it's a plain object or array
-        const obj = value as any;
-        if (obj.constructor && ["Array", "Object"].includes(obj.constructor.name)) {
-          // Ensure same reference on repeated access
-          if (!proxiedValues.has(value)) {
-            proxiedValues.set(value, buildProxy(value, callback, tree.concat(prop)));
-          }
-          return proxiedValues.get(value);
-        }
-      }
-      
-      // Do not create a proxy for other objects
-      return value;
-    },
-    
-    set: function (target, prop, value, receiver) {
-      // Notify of state changes
-      callback({
-        action: "set", 
-        path: getPath(prop),
-        pathArray: tree.concat(prop),
-        target,
-        newValue: value,
-        previousValue: Reflect.get(target, prop, receiver),
-      });
-      
-      // Execute the change
-      return Reflect.set(target, prop, value, receiver);
-    },
-    
-    deleteProperty: function (target, prop) {
-      // Notify of property deletion
-      callback({
-        action: "unset",
-        path: getPath(prop),
-        pathArray: tree.concat(prop),
-        target
-      });
-      
-      // Execute the deletion
-      return Reflect.deleteProperty(target, prop);
-    }
-  });
-}
-```
-
-**Key features:**
-- **Nested proxies**: Creates proxies for nested objects/arrays automatically
-- **Arrow expression handling**: Skips proxying internal XMLUI arrow expression objects
-- **Stable references**: Uses WeakMap to ensure same proxy reference on repeated access
+**Key Features**:
+- **Nested proxies**: Automatically created for nested objects/arrays
+- **Arrow expression handling**: Skips XMLUI internal objects
+- **Stable references**: WeakMap ensures consistent proxy references
 - **Delete support**: Handles property deletion with "unset" action
 
-### Change Propagation
+**Change Propagation**:
+1. Proxy intercepts change and calls callback
+2. Path analysis determines ownership (current container, global, or parent)
+3. Dispatch appropriate action to reducer
 
-When a proxied state change occurs:
-
-1. **Detection**: Proxy intercepts the change and calls the callback
-2. **Path Analysis**: Determines if the change belongs to current container, global state, or parent
+**Example**: `count++` triggers proxy set handler → dispatcher → reducer → state update → re-render.
 3. **Dispatch**: Sends `STATE_PART_CHANGED` action to appropriate container
 4. **Reduction**: Immer-based reducer applies the change immutably
 5. **Re-render**: React re-renders affected components
@@ -1410,227 +1083,133 @@ const componentStateWithApis = useMemo(() => {
 
 ## Asynchronous Event Handler Execution
 
-### UI Responsiveness Strategy
+The `event-handlers.ts` module maintains UI responsiveness through:
 
-The Container component maintains UI responsiveness during long-running operations through:
-
-1. **Async Instruction Execution**: Each instruction in an event handler runs asynchronously
-2. **State Synchronization Points**: Execution pauses after each instruction for state updates
-3. **Promise-Based Coordination**: Uses promises to coordinate when state changes are committed
+1. **Async Instruction Execution**: Each statement runs asynchronously
+2. **State Synchronization**: Execution pauses after each statement for state updates
+3. **Promise-Based Coordination**: Version counters coordinate state commits
 4. **Transition-Based Updates**: Uses React's `startTransition` for non-urgent updates
 
-### Execution Flow
-
+**Execution Flow**:
 ```typescript
-// Simplified execution pattern from Container.tsx
-const executeHandler = async (statements: Statement[], options: ExecutionOptions) => {
-  for (const statement of statements) {
-    // Execute statement
-    await processStatement(statement, evalContext);
-    
-    // Collect state changes
-    if (changes.length > 0) {
-      // Dispatch state changes
-      changes.forEach(change => {
-        statePartChanged(change.pathArray, change.newValue, change.target, change.action);
-      });
-      
-      // Create promise for this statement
-      const statementPromise = new Promise(resolve => {
-        statementPromiseResolvers.current.set(statementId, resolve);
-      });
-      
-      // Increment version to trigger re-render
-      startTransition(() => {
-        setVersion(prev => prev + 1);
-      });
-      
-      // Wait for state to be committed
-      await statementPromise;
-    }
+// Simplified pattern
+for (const statement of statements) {
+  await processStatement(statement, evalContext);
+  if (changes.length > 0) {
+    dispatchChanges();
+    await waitForStateCommit(); // Version-based sync
   }
-};
+}
 ```
 
-### Version-Based Synchronization
-
-The Container uses a version counter to coordinate state updates:
-
-```typescript
-// When version changes, resolve pending promises
-useEffect(() => {
-  // Resolve all pending statement promises
-  statementPromiseResolvers.current.forEach(resolve => resolve());
-  statementPromiseResolvers.current.clear();
-}, [version]);
-```
+**Key Modules**:
+- `event-handlers.ts` - Async/sync execution engine
+- `event-handler-cache.ts` - Handler memoization
+- `action-lookup.ts` - Action resolution
 
 ## State Scoping and Inheritance
 
-### Parent State Extraction
+**Parent State Scoping**: Child containers use the `uses` property to control inherited state:
+- `uses` undefined: Inherit all parent state
+- `uses={[]}`: Inherit no parent state  
+- `uses={['user', 'count']}`: Inherit only specified keys
 
-Child containers can limit which parent state they receive:
+**Context Variables**: Flow down to children via `node.contextVars` (e.g., `$item`, `$itemIndex`)
 
-```typescript
-// From StateContainer.tsx
-function extractScopedState(parentState: ContainerState, uses?: string[]): ContainerState | undefined {
-  if (!uses) {
-    return parentState; // Inherit all parent state
-  }
-  if (uses.length === 0) {
-    return EMPTY_OBJECT; // Inherit no parent state  
-  }
-  return pick(parentState, uses); // Inherit only specified keys
-}
-```
-
-### Context Variables
-
-Containers can provide context variables to their children:
-
-```typescript
-// contextVars flow down to child containers automatically
-const localVarsStateContext = useCombinedState(
-  stateFromOutside,
-  componentStateWithApis, 
-  node.contextVars // These become available to children
-);
-```
-
-### State Merging Strategies
-
-Different merging strategies are used for different state layers:
-
-1. **Override**: Higher-priority state overrides lower-priority (`useCombinedState`)
-2. **Merge**: Object and array values are deep-merged (`useMergedState`)
-3. **Replace**: Simple values replace entirely
+**Merging Strategies**:
+- **Override**: Higher priority overrides lower (`useCombinedState`)
+- **Merge**: Deep merge for objects/arrays (`useMergedState`)
+- **Replace**: Simple values replace entirely
 
 ## Routing Integration
 
-### Routing Parameters as State
+Routing parameters from React Router are automatically available in all containers:
+- `$pathname` - Current URL pathname
+- `$routeParams` - Dynamic route parameters (e.g., `:id`)
+- `$queryParams` - Query string parameters
+- `$linkInfo` - Navigation context
 
-Routing information is automatically injected into container state:
-
-```typescript
-// From StateContainer.tsx - useRoutingParams
-const routingParams = useMemo(() => {
-  return {
-    $pathname: location.pathname,
-    $routeParams: routeParams,      // URL parameters like :id
-    $queryParams: queryParamsMap,   // Query string parameters
-    $linkInfo: linkInfo,            // Navigation context
-  };
-}, [linkInfo, location.pathname, queryParamsMap, routeParams]);
-```
-
-These are automatically available in all containers as context variables.
+Implemented in `routing-state.ts` module.
 
 ## Error Boundaries and Resilience
 
-### Layered Error Protection
+**Layered Error Protection**:
+1. Container-Level: Protects StateContainer from Container errors
+2. StateContainer-Level: Protects parents from child errors
+3. Component-Level: Individual errors don't crash containers
 
-The container system has multiple error boundaries:
-
-1. **Container-Level**: Protects StateContainer from Container errors
-2. **StateContainer-Level**: Protects parent containers from child container errors  
-3. **Component-Level**: Individual component errors don't crash containers
-
-### State Preservation
-
-If a Container crashes during event handler execution, the StateContainer preserves its state, allowing recovery or graceful degradation.
+**State Preservation**: If Container crashes during event execution, StateContainer preserves state for recovery.
 
 ## Performance Optimizations
 
-### Memoization Strategies
+**Memoization**:
+- Component memoization prevents unnecessary re-renders
+- Variable resolution cached by dependencies
+- Shallow comparison for state change detection
+- Stable references for nested proxy access
 
-1. **Component Memoization**: Container components are memoized to prevent unnecessary re-renders
-2. **Variable Memoization**: Variable resolution results are cached based on dependencies
-3. **Shallow Comparison**: State objects use shallow comparison for change detection
-4. **Reference Tracking**: Proxy objects maintain stable references for nested access
-
-### Change Detection Optimizations
-
-1. **Path-Based Updates**: Only affected parts of state tree are updated
-2. **Dependency Tracking**: Variables are only re-evaluated when their dependencies change
-3. **Batch Updates**: Multiple changes in single instruction are batched together
-4. **Transition Updates**: Non-urgent updates use React transitions for better performance
+**Change Detection**:
+- Path-based updates (only affected state parts)
+- Dependency tracking (re-evaluate only when deps change)
+- Batch updates within instructions
+- React transitions for non-urgent updates
 
 ## Debugging Support
 
-### State Transition Logging
+XMLUI provides debugging through inspector modules in `/components-core/inspector/`:
 
-The container reducer can log state transitions for debugging:
+**handler-logging.ts** - Event handler execution tracing:
+- Logs handler start/completion with timing
+- Tracks async operations and errors
+- Associates handlers with component tree locations
 
-```typescript
-// From reducer.ts
-export function createContainerReducer(debugView: IDebugViewContext) {
-  const allowLogging = debugView.collectStateTransitions;
-  // ... logging implementation
-}
-```
+**variable-logging.ts** - Variable change tracking:
+- Monitors all variable value changes
+- Identifies change source and origin
+- Records dependency chains
 
-### Component Keys and Resolution
+**state-logging.ts** - State transition logging:
+- Logs all reducer actions
+- Records before/after snapshots
+- Tracks action payloads
 
-Components receive resolved keys for debugging and tracking:
+**inspectorUtils.ts** - Shared utilities:
+- Execution trace collection
+- Inspector data formatting
+- Component tree navigation
 
-```typescript
-// From renderChild.tsx  
-const key = extractParam(state, node.uid, appContext, true);
-return (
-  <ComponentWrapper
-    key={key}
-    resolvedKey={key} // For debugging container parent chains
-    // ...
-  />
-);
-```
+**DevTools Integration**: Real-time updates, time travel debugging, component tree visualization, performance metrics, and variable watching.
 
 ## Integration Points
 
-### DataSource Integration
+**DataSource**: Integrates via loader actions (`LOADER_LOADED`, `LOADER_ERROR`, etc.)
 
-DataSource components integrate with the container system through loader actions:
+**Forms**: Manage state through container system with internal state for performance
 
-```typescript
-// Loader state management
-dispatch({
-  type: ContainerActionKind.LOADER_LOADED,
-  payload: {
-    uid: dataSourceUid,
-    data: fetchedData,
-    pageInfo: paginationInfo
-  }
-});
-```
-
-### Form Integration
-
-Form components manage their state through the container system while maintaining their own internal state for performance.
-
-### API Integration
-
-Component APIs are registered with containers and become part of the state, making them accessible to other components via component IDs.
+**Component APIs**: Registered with containers, accessible via component IDs
 
 ## Key Design Principles
 
-1. **Hierarchical Encapsulation with Implicit/Explicit Boundaries**: State is scoped to container boundaries while allowing controlled inheritance. Implicit containers provide transparent state management, while explicit containers (via `uses`) create isolation boundaries.
+1. **Modular Architecture**: Specialized modules organized into inspector/, container/, and state/ directories with single responsibilities. Container.tsx and StateContainer.tsx orchestrate these modules.
 
-2. **6-Layer State Composition**: Precise layering of parent state, reducer state, component APIs, context variables, local variables, and routing parameters with clear priority rules enabling predictable state shadowing.
+2. **Hierarchical Encapsulation**: State scoped to container boundaries. Implicit containers provide transparent state management; explicit containers (via `uses`) create isolation boundaries.
 
-3. **Global Variable Flow**: Application-wide variables flow down from root to all containers regardless of `uses` property, with changes bubbling back to root, ensuring consistency across the entire application.
+3. **6-Layer State Composition**: Parent state, reducer state, component APIs, context variables, local variables, and routing parameters with clear priority rules. Implemented in state-layers.ts.
 
-4. **Reactive Consistency with Dependency Tracking**: All state changes automatically propagate to dependent UI elements. Global variables support dependency tracking with automatic re-evaluation when dependencies change.
+4. **Global Variable Flow**: Application-wide variables flow to all containers regardless of `uses`, with changes bubbling to root. Managed by global-variables.ts with dependency tracking.
 
-5. **Two-Pass Variable Resolution**: Forward references in variable declarations are handled through two-pass resolution, ensuring all dependencies are available regardless of declaration order.
+5. **Two-Pass Variable Resolution**: Handles forward references through two-pass resolution in variable-resolution.ts, ensuring dependencies are available regardless of declaration order.
 
-6. **Async Coordination with Version-Based Synchronization**: Long-running operations don't block the UI thread. Promise-based coordination and version counters ensure state changes are committed before proceeding to next instruction.
+6. **Async Coordination**: Version-based synchronization ensures state commits before next instruction. Promise-based coordination prevents UI blocking. Implemented in event-handlers.ts.
 
-7. **Immutable Updates with State Preservation**: All state changes produce new immutable state objects. Critical state preservation pattern ensures existing properties aren't lost during partial updates (e.g., setting `inProgress` flag preserves existing `data`).
+7. **Immutable Updates**: All state changes produce new immutable objects. State preservation pattern prevents data loss during partial updates.
 
-8. **Proxy-Based Transparent Change Detection**: State mutations are detected transparently without special syntax. Proxies handle nested objects, arrays, and skip internal XMLUI structures (arrow expressions).
+8. **Transparent Change Detection**: Proxy-based mutation detection without special syntax. Handles nested objects/arrays, skips internal structures.
 
-9. **Flexible Component Registration**: Implicit containers share parent's registration (transparent), explicit containers have isolated registration (state boundary). Enables both shared and isolated component API patterns.
+9. **Flexible Component Registration**: Implicit containers share parent registration; explicit containers have isolated registration.
 
-10. **Error Isolation with Multiple Boundaries**: Component errors are contained through layered error boundaries (Container, StateContainer, Component levels) and don't crash parent containers or siblings.
+10. **Error Isolation**: Layered error boundaries (Container, StateContainer, Component levels) prevent cascading failures.
 
-This container-based architecture provides XMLUI with a robust, scalable state management solution that maintains the declarative programming model while handling complex state interactions, forward references, global state, and ensuring optimal performance characteristics.
+11. **Comprehensive Debugging**: Inspector modules (handler-logging.ts, variable-logging.ts, state-logging.ts, inspectorUtils.ts) provide real-time visibility, integrating with XMLUI DevTools.
+
+This modular architecture maintains XMLUI's declarative programming model while providing robust state management, performance optimization, and developer-friendly debugging.
