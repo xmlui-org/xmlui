@@ -12,18 +12,29 @@ $backgroundColor-ScrollToTop: createThemeVar("backgroundColor-#{$component}");
 $borderColor-ScrollToTop: createThemeVar("borderColor-#{$component}");
 $color-ScrollToTop: createThemeVar("color-#{$component}");
 $size-ScrollToTop: createThemeVar("size-#{$component}");
+$size-ScrollToTop-xs: createThemeVar("size-#{$component}-xs");
+$size-ScrollToTop-sm: createThemeVar("size-#{$component}-sm");
+$size-ScrollToTop-md: createThemeVar("size-#{$component}-md");
+$size-ScrollToTop-lg: createThemeVar("size-#{$component}-lg");
+
 $borderRadius-ScrollToTop: createThemeVar("borderRadius-#{$component}");
 $shadow-ScrollToTop: createThemeVar("shadow-#{$component}");
 $bottom-ScrollToTop: createThemeVar("bottom-#{$component}");
+
 $horizontalSpacing-ScrollToTop: createThemeVar("horizontalSpacing-#{$component}");
+$horizontalSpacing-ScrollToTop-xs: createThemeVar("horizontalSpacing-#{$component}-xs");
+$horizontalSpacing-ScrollToTop-sm: createThemeVar("horizontalSpacing-#{$component}-sm");
+$horizontalSpacing-ScrollToTop-md: createThemeVar("horizontalSpacing-#{$component}-md");
+$horizontalSpacing-ScrollToTop-lg: createThemeVar("horizontalSpacing-#{$component}-lg");
 $zIndex-ScrollToTop: createThemeVar("zIndex-#{$component}");
 
 @layer components {
   .scrollToTop {
     position: fixed;
     bottom: $bottom-ScrollToTop;
-    width: $size-ScrollToTop;
-    height: $size-ScrollToTop;
+    // Default: large screens → use lg tokens
+    width: $size-ScrollToTop-lg;
+    height: $size-ScrollToTop-lg;
     background-color: $backgroundColor-ScrollToTop;
     border: 1px solid $borderColor-ScrollToTop;
     border-radius: $borderRadius-ScrollToTop;
@@ -51,7 +62,7 @@ $zIndex-ScrollToTop: createThemeVar("zIndex-#{$component}");
     }
 
     &.positionStart {
-      left: $horizontalSpacing-ScrollToTop;
+      left: $horizontalSpacing-ScrollToTop-lg;
     }
 
     &.positionCenter {
@@ -68,7 +79,49 @@ $zIndex-ScrollToTop: createThemeVar("zIndex-#{$component}");
     }
 
     &.positionEnd {
-      right: $horizontalSpacing-ScrollToTop;
+      right: $horizontalSpacing-ScrollToTop-lg;
+    }
+
+    // md breakpoint and below
+    @include t.withMaxScreenSize(2) {
+      width: $size-ScrollToTop-md;
+      height: $size-ScrollToTop-md;
+
+      &.positionStart {
+        left: $horizontalSpacing-ScrollToTop-md;
+      }
+
+      &.positionEnd {
+        right: $horizontalSpacing-ScrollToTop-md;
+      }
+    }
+
+    // sm breakpoint and below
+    @include t.withMaxScreenSize(1) {
+      width: $size-ScrollToTop-sm;
+      height: $size-ScrollToTop-sm;
+
+      &.positionStart {
+        left: $horizontalSpacing-ScrollToTop-sm;
+      }
+
+      &.positionEnd {
+        right: $horizontalSpacing-ScrollToTop-sm;
+      }
+    }
+
+    // xs breakpoint (phones)
+    @include t.withMaxScreenSize(0) {
+      width: $size-ScrollToTop-xs;
+      height: $size-ScrollToTop-xs;
+
+      &.positionStart {
+        left: $horizontalSpacing-ScrollToTop-xs;
+      }
+
+      &.positionEnd {
+        right: $horizontalSpacing-ScrollToTop-xs;
+      }
     }
   }
 }
