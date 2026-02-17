@@ -20,6 +20,10 @@ $size-ScrollToTop-lg: createThemeVar("size-#{$component}-lg");
 $borderRadius-ScrollToTop: createThemeVar("borderRadius-#{$component}");
 $shadow-ScrollToTop: createThemeVar("shadow-#{$component}");
 $bottom-ScrollToTop: createThemeVar("bottom-#{$component}");
+$bottom-ScrollToTop-xs: createThemeVar("bottom-#{$component}-xs");
+$bottom-ScrollToTop-sm: createThemeVar("bottom-#{$component}-sm");
+$bottom-ScrollToTop-md: createThemeVar("bottom-#{$component}-md");
+$bottom-ScrollToTop-lg: createThemeVar("bottom-#{$component}-lg");
 
 $horizontalSpacing-ScrollToTop: createThemeVar("horizontalSpacing-#{$component}");
 $horizontalSpacing-ScrollToTop-xs: createThemeVar("horizontalSpacing-#{$component}-xs");
@@ -31,7 +35,7 @@ $zIndex-ScrollToTop: createThemeVar("zIndex-#{$component}");
 @layer components {
   .scrollToTop {
     position: fixed;
-    bottom: $bottom-ScrollToTop;
+    bottom: $bottom-ScrollToTop-lg;
     // Default: large screens → use lg tokens
     width: $size-ScrollToTop-lg;
     height: $size-ScrollToTop-lg;
@@ -86,6 +90,7 @@ $zIndex-ScrollToTop: createThemeVar("zIndex-#{$component}");
     @include t.withMaxScreenSize(2) {
       width: $size-ScrollToTop-md;
       height: $size-ScrollToTop-md;
+      bottom: $bottom-ScrollToTop-md;
 
       &.positionStart {
         left: $horizontalSpacing-ScrollToTop-md;
@@ -100,6 +105,7 @@ $zIndex-ScrollToTop: createThemeVar("zIndex-#{$component}");
     @include t.withMaxScreenSize(1) {
       width: $size-ScrollToTop-sm;
       height: $size-ScrollToTop-sm;
+      bottom: $bottom-ScrollToTop-sm;
 
       &.positionStart {
         left: $horizontalSpacing-ScrollToTop-sm;
@@ -114,6 +120,7 @@ $zIndex-ScrollToTop: createThemeVar("zIndex-#{$component}");
     @include t.withMaxScreenSize(0) {
       width: $size-ScrollToTop-xs;
       height: $size-ScrollToTop-xs;
+      bottom: $bottom-ScrollToTop-xs;
 
       &.positionStart {
         left: $horizontalSpacing-ScrollToTop-xs;
