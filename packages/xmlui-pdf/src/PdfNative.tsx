@@ -6,6 +6,7 @@ import "react-pdf/dist/Page/TextLayer.css";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import type { Annotation } from "./types/annotation.types";
 import type { SignatureData } from "./types/signature.types";
+import { AnnotationLayer } from "./components/AnnotationLayer/AnnotationLayer";
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
 
@@ -184,15 +185,44 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
           onLoadSuccess={handleLoadSuccess}
           className={styles.document}
         >
-          {Array.from(new Array(numPages), (_, index) => (
-            <Page
-              key={index + 1}
-              pageNumber={index + 1}
-              loading=""
-              className={styles.page}
-              scale={scale}
-            />
-          ))}
+          {Array.from(new Array(numPages), (_, index) => {
+            const pageNumber = index + 1;
+            // TODO: Get actual page dimensions from PDF
+            // For now, use standard A4 dimensions (595 x 842 points)
+            const pageWidth = 595;
+            const pageHeight = 842;
+            
+            return (
+              <div key={pageNumber} className={styles.pageContainer}>
+                <Page
+                  pageNumber={pageNumber}
+                  loading=""
+                  className={styles.page}
+                  scale={scale}
+                />
+                {mode === "edit" && (
+                  <AnnotationLayer
+                    annotations={annotations}
+                    pageNumber={pageNumber}
+                    pageWidth={pageWidth}
+                    pageHeight={pageHeight}
+                    scale={scale}
+                    selectedAnnotationId={selectedAnnotationId}
+                    onAnnotationSelect={(id) => {
+                      setSelectedAnnotationId(id);
+                      onAnnotationSelect?.(id);
+                    }}
+                    onAnnotationUpdate={(id, updates) => {
+                      onAnnotationUpdate?.({
+                        ...annotations.find(a => a.id === id)!,
+                        ...updates,
+                      });
+                    }}
+                  />
+                )}
+              </div>
+            );
+          })}
         </Document>
       </div>
     );

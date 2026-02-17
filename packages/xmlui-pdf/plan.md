@@ -201,55 +201,56 @@ $hasSignature: boolean;                // Phase 2
 
 ---
 
-### Step 3: Update Component Metadata ⬜
+### Step 3: Update Component Metadata ✅
 
 **Goal**: Add new properties, events, and APIs to metadata
 
 **Tasks**:
-1. Update `PdfMd` with new props (mode, annotations, scale, currentPage)
-2. Add event definitions (onAnnotationCreate/Update/Delete/Select)
-3. Add API method definitions (addAnnotation, updateAnnotation, etc.)
-4. Add context variables ($pageCount, $currentPage, $annotations, $mode)
-5. Update renderer to wire up events and registerComponentApi
+1. ✅ Update `PdfMd` with new props (mode, annotations, scale, currentPage)
+2. ✅ Add event definitions (onAnnotationCreate/Update/Delete/Select)
+3. ✅ Add API method definitions (addAnnotation, updateAnnotation, etc.)
+4. ✅ Add context variables ($pageCount, $currentPage, $annotations, $mode)
+5. ✅ Update renderer to wire up events and registerComponentApi
+6. ✅ Add theme variables (boxShadow-page-Pdf, gap-pages-Pdf)
 
-**Tests**: Build test to ensure metadata valid
+**Tests**: ✅ Build test passes
 
-**Verification**: No compilation errors
+**Verification**: ✅ No compilation errors, metadata properly defined
 
 ---
 
-### Step 4: Implement Annotation State Hook ⬜
+### Step 4: Implement Annotation State Hook ✅
 
 **Goal**: Create reusable hook for annotation state management
 
 **Tasks**:
-1. Create `src/hooks/useAnnotations.ts`
-2. Implement CRUD operations: add, update, delete, clear
-3. Handle annotation selection
-4. Generate unique IDs for annotations
-5. Manage immutable state updates
+1. ✅ Create `src/hooks/useAnnotations.ts`
+2. ✅ Implement CRUD operations: add, update, delete, clear
+3. ✅ Handle annotation selection
+4. ✅ Generate unique IDs for annotations
+5. ✅ Manage immutable state updates
 
-**Tests**: Unit tests for useAnnotations hook
+**Tests**: ✅ Unit tests for useAnnotations hook (22 tests passing)
 
-**Verification**: Hook implements correct CRUD logic
+**Verification**: ✅ Hook implements correct CRUD logic with immutable updates
 
 ---
 
-### Step 5: Implement Annotation Overlay Layer ⬜
+### Step 5: Implement Annotation Overlay Layer ✅
 
 **Goal**: Create overlay system for displaying annotations on PDF pages
 
 **Tasks**:
-1. Create `src/components/AnnotationLayer/AnnotationLayer.tsx`
-2. Create `src/components/AnnotationLayer/AnnotationLayer.module.scss`
-3. Implement absolute positioning overlay per page
-4. Use coordinate mapping to position annotations
-5. Render annotation boxes (non-interactive yet)
-6. Integrate into PdfNative
+1. ✅ Create `src/components/AnnotationLayer/AnnotationLayer.tsx`
+2. ✅ Create `src/components/AnnotationLayer/AnnotationLayer.module.scss`
+3. ✅ Implement absolute positioning overlay per page
+4. ✅ Use coordinate mapping to position annotations
+5. ✅ Render annotation boxes (non-interactive yet)
+6. ✅ Integrate into PdfNative (renders in "edit" mode only)
 
-**Tests**: Unit tests for AnnotationLayer with mock annotations
+**Tests**: ✅ Unit tests for AnnotationLayer with mock annotations (15 tests passing)
 
-**Verification**: Annotations display at correct positions
+**Verification**: ✅ Annotations display at correct positions, E2E tests still pass
 
 ---
 

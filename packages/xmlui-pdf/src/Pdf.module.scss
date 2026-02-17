@@ -17,6 +17,11 @@ $gap-pages-Pdf: createThemeVar("gap-pages-Pdf");
   width: fit-content;
 }
 
+.pageContainer {
+  position: relative;
+  width: fit-content;
+}
+
 .page{
   box-shadow: $boxShadow-page-Pdf;
 }
