@@ -53,6 +53,7 @@ export const Splitter = ({
   const [isDragging, setIsDragging] = useState(false);
   const [resizer, setResizer] = useState<HTMLDivElement | null>(null);
   const [floatingResizer, setFloatingResizer] = useState<HTMLDivElement | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
   const resizerElement = useMemo(
     () => (floating ? floatingResizer : resizer),
     [floating, resizer, floatingResizer],
@@ -103,6 +104,7 @@ export const Splitter = ({
       const initialPercentage = toPercentage(initialParsedSize, newContainerSize);
 
       setSizePercentage(initialPercentage);
+      setIsInitialized(true);
 
       if (resize) {
         const actualPrimarySize = (initialPercentage / 100) * newContainerSize;
@@ -229,7 +231,11 @@ export const Splitter = ({
       {isMultiPanel ? (
         <>
           <div
-            style={!swapped ? { flexBasis: size } : {}}
+            style={
+              !swapped
+                ? { flexBasis: isInitialized ? size : initialPrimarySize }
+                : {}
+            }
             className={classnames({
               [styles.primaryPanel]: !swapped,
               [styles.secondaryPanel]: swapped,
@@ -253,7 +259,11 @@ export const Splitter = ({
               [styles.primaryPanel]: swapped,
               [styles.secondaryPanel]: !swapped,
             })}
-            style={swapped ? { flexBasis: size } : {}}
+            style={
+              swapped
+                ? { flexBasis: isInitialized ? size : initialPrimarySize }
+                : {}
+            }
           >
             {childrenArray[1]}
           </div>
