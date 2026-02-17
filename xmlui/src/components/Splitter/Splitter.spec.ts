@@ -433,6 +433,32 @@ test.describe("Basic Functionality", () => {
       
       expect(Math.abs(primaryBounds.width - expectedWidth)).toBeLessThan(tolerance);
     });
+
+    // Regression test for issue #2820: ensures initialPrimarySize applies correctly
+    // Note: This test verifies the final state. The actual layout shift bug cannot be easily
+    // tested in Playwright because by the time the DOM is queryable, useEffect has already run.
+    // Manual testing required: Open Splitter with initialPrimarySize and watch for visual jump
+    test("applies initialPrimarySize to correct final size", async ({ initTestBed, page }) => {
+      // This test ensures initialPrimarySize results in the correct size
+      // Issue #2820: https://github.com/xmlui-org/xmlui/issues/2820
+      // The fix ensures initialPrimarySize is applied via inline style on first render
+      // (before useEffect) to prevent layout shift
+      
+      await initTestBed(`
+        <Splitter height="200px" width="400px" orientation="horizontal" initialPrimarySize="260px" testId="splitter">
+          <Stack backgroundColor="lightblue" height="100%" testId="primary">Primary</Stack>
+          <Stack backgroundColor="darksalmon" height="100%" testId="secondary">Secondary</Stack>
+        </Splitter>
+      `);
+
+      const primary = page.getByTestId("primary");
+      const primaryBounds = await getBounds(primary);
+      
+      // Verify the primary panel has the correct width
+      // With the fix, this should be 260px from the start (no layout shift)
+      const tolerance = 10;
+      expect(Math.abs(primaryBounds.width - 260)).toBeLessThan(tolerance);
+    });
   });
 
   test.describe("floating property", () => {
