@@ -1,65 +1,30 @@
 import type { Dispatch, MutableRefObject, ReactNode, RefObject, SetStateAction } from "react";
-import React, {
+import {
   cloneElement,
   forwardRef,
   Fragment,
   isValidElement,
   memo,
-  useCallback,
   useEffect,
   useRef,
   useTransition,
 } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { cloneDeep, isArray } from "lodash-es";
-import { composeRefs } from "@radix-ui/react-compose-refs";
-import memoizeOne from "memoize-one";
-
-import type {
-  LookupActionOptions,
-} from "../../abstractions/ActionDefs";
-import type { LookupAsyncFnInner, LookupSyncFnInner } from "../container/action-lookup";
-import type { ComponentDef, ParentRenderContext } from "../../abstractions/ComponentDefs";
+import type { ParentRenderContext } from "../../abstractions/ComponentDefs";
 import type { ContainerState } from "../../abstractions/ContainerDefs";
-import type { LayoutContext, RenderChildFn } from "../../abstractions/RendererDefs";
-import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
-import type {
-  ArrowExpression,
-  ArrowExpressionStatement,
-  Statement,
-} from "../script-runner/ScriptingSourceTree";
-import {
-  T_ARROW_EXPRESSION,
-  T_ARROW_EXPRESSION_STATEMENT,
-} from "../script-runner/ScriptingSourceTree";
+import type { LayoutContext } from "../../abstractions/RendererDefs";
+import type { Statement } from "../script-runner/ScriptingSourceTree";
 import type { ContainerDispatcher, MemoedVars } from "../abstractions/ComponentRenderer";
-import { ContainerActionKind } from "./containers";
 import { useAppContext } from "../AppContext";
-import { buildProxy } from "../rendering/buildProxy";
 import type { StatePartChangedFn } from "./ContainerWrapper";
 import type {
-  ComponentCleanupFn,
   ContainerWrapperDef,
   RegisterComponentApiFnInner,
 } from "../rendering/ContainerWrapper";
-import type { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
-import { processStatementQueueAsync } from "../script-runner/process-statement-async";
-import { processStatementQueue } from "../script-runner/process-statement-sync";
-import { extractParam, shouldKeep } from "../utils/extractParam";
+import { extractParam } from "../utils/extractParam";
 import { useIsomorphicLayoutEffect } from "../utils/hooks";
-import { capitalizeFirstLetter, delay, generatedId, useEvent } from "../utils/misc";
-import { parseHandlerCode, prepareHandlerStatements } from "../utils/statementUtils";
 import { useTheme } from "../theming/ThemeContext";
-import { LoaderComponent } from "../LoaderComponent";
-import { isParsedEventValue, isArrowExpression } from "./ContainerUtils";
-import type { AppContextObject } from "../../abstractions/AppContextDefs";
-import { EMPTY_ARRAY } from "../constants";
-import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
-import { mergeProps } from "../utils/mergeProps";
-import {
-  getCurrentTrace,
-} from "../inspector/inspectorUtils";
 import { createHandlerLogger } from "../inspector/handler-logging";
 import { createEventHandlers } from "../container/event-handlers";
 import { createEventHandlerCache } from "../container/event-handler-cache";

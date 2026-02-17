@@ -14,7 +14,7 @@ import type { ParsedEventValue } from "../../abstractions/scripting/Compilation"
 /**
  * Type guard to check if a value is a ParsedEventValue.
  * ParsedEventValues are pre-parsed event handler statements with metadata.
- * 
+ *
  * @param value - The value to check
  * @returns True if the value is a ParsedEventValue
  */
@@ -27,7 +27,7 @@ export function isParsedEventValue(
 /**
  * Type guard to check if a value is an ArrowExpression.
  * ArrowExpressions represent arrow function syntax in the XMLUI scripting tree.
- * 
+ *
  * @param value - The value to check
  * @returns True if the value is an ArrowExpression
  */
@@ -45,16 +45,16 @@ export function isArrowExpression(
  * Extracts scoped state based on the `uses` property.
  * When a container specifies `uses`, it creates a state boundary and only
  * includes the specified properties from parent state.
- * 
+ *
  * @param parentState - The parent container's state
  * @param uses - Array of property names to include (undefined = all, empty = none)
  * @returns Filtered state object
- * 
+ *
  * @example
  * // Include only 'user' from parent:
  * extractScopedState({ user: {...}, count: 5 }, ['user'])
  * // Returns: { user: {...} }
- * 
+ *
  * // Create empty boundary:
  * extractScopedState(parentState, [])
  * // Returns: {}
@@ -89,7 +89,9 @@ export function extractScopedState<T extends Record<string, any>>(
  * Formats module errors into a readable error message.
  */
 export class CodeBehindParseError extends Error {
-  constructor(errors: Record<string, Array<{ code?: string; text: string; line?: number; column?: number }>>) {
+  constructor(
+    errors: Record<string, Array<{ code?: string; text: string; line?: number; column?: number }>>,
+  ) {
     const mainErrors = errors["Main"] || [];
     const messages = mainErrors.map((errorMessage) => {
       let ret = `${errorMessage.code} : ${errorMessage.text}`;

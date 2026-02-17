@@ -1,15 +1,22 @@
 import type { MutableRefObject, ReactNode, RefObject } from "react";
-import { forwardRef, memo, useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
+import {
+  forwardRef,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import produce from "immer";
-import { cloneDeep, isEmpty, isPlainObject, merge } from "lodash-es";
-import memoizeOne from "memoize-one";
+import { isEmpty } from "lodash-es";
 
 import type { ParentRenderContext } from "../../abstractions/ComponentDefs";
 import type { ContainerState } from "../../abstractions/ContainerDefs";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
 import type { ContainerDispatcher, MemoedVars } from "../abstractions/ComponentRenderer";
 import { ContainerActionKind } from "./containers";
-import type { CodeDeclaration, ModuleErrors } from "../script-runner/ScriptingSourceTree";
 import { T_ARROW_EXPRESSION } from "../script-runner/ScriptingSourceTree";
 import { EMPTY_OBJECT } from "../constants";
 import { collectFnVarDeps } from "../rendering/collectFnVarDeps";
@@ -19,25 +26,19 @@ import { ErrorBoundary } from "../rendering/ErrorBoundary";
 import { collectVariableDependencies } from "../script-runner/visitors";
 import { useReferenceTrackedApi, useShallowCompareMemoize } from "../utils/hooks";
 import { Container } from "./Container";
-import { getCurrentTrace } from "../inspector/inspectorUtils";
 import { createVariableLogger } from "../inspector/variable-logging";
-import { mergeComponentApis, STATE_LAYER_DOCUMENTATION } from "../state/state-layers";
+import { mergeComponentApis, useCombinedState, useMergedState } from "../state/state-layers";
 import { useVars, isParsedValue } from "../state/variable-resolution";
 import { useGlobalVariables } from "../state/global-variables";
 import { useRoutingParams } from "../state/routing-state";
 import { useAppContext } from "../AppContext";
-import { extractParam } from "../utils/extractParam";
 import type {
   ContainerWrapperDef,
   RegisterComponentApiFnInner,
   StatePartChangedFn,
 } from "./ContainerWrapper";
 import type { ComponentApi } from "../../abstractions/ApiDefs";
-import {
-  extractScopedState,
-  CodeBehindParseError,
-  ParseVarError,
-} from "./ContainerUtils";
+import { extractScopedState, CodeBehindParseError } from "./ContainerUtils";
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -123,9 +124,9 @@ export const StateContainer = memo(
      *
      * The container state is assembled from multiple sources in a specific order and priority.
      * Understanding this flow is critical for debugging state issues.
-     * 
+     *
      * Full pipeline documentation available in: ../state/state-layers.ts
-     * 
+     *
      * Quick reference - see STATE_LAYER_DOCUMENTATION for details:
      * 1. Parent State (scoped by `uses`)
      * 2. Component Reducer State (loaders, events)
@@ -133,7 +134,7 @@ export const StateContainer = memo(
      * 4. Context Variables ($item, $itemIndex)
      * 5. Local Variables (vars, functions, script)
      * 6. Routing Parameters ($pathname, $routeParams)
-     * 
+     *
      * Priority: Parent < Component < Context < Local Vars
      * Routing parameters are additive.
      */
@@ -165,7 +166,10 @@ export const StateContainer = memo(
     const [componentApis, setComponentApis] = useState<Record<symbol, ComponentApi>>(EMPTY_OBJECT);
 
     const componentStateWithApis = useShallowCompareMemoize(
-      useMemo(() => mergeComponentApis(componentState, componentApis), [componentState, componentApis]),
+      useMemo(
+        () => mergeComponentApis(componentState, componentApis),
+        [componentState, componentApis],
+      ),
     );
 
     // ========================================================================
@@ -294,7 +298,7 @@ export const StateContainer = memo(
       node.functions,
       componentStateWithApis,
     );
-    
+
     // ========================================================================
     // LAYER 6: FINAL STATE COMBINATION
     // ========================================================================
@@ -302,7 +306,7 @@ export const StateContainer = memo(
     const combinedState = useCombinedState(
       stateFromOutside,
       node.contextVars,
-      stableCurrentGlobalVars,  // Use stable reference
+      stableCurrentGlobalVars, // Use stable reference
       mergedWithVars,
       routingParams,
     );
@@ -329,7 +333,7 @@ export const StateContainer = memo(
     }, []);
 
     const componentStateRef = useRef(componentStateWithApis);
-    
+
     // Keep ref updated with latest componentStateWithApis
     useEffect(() => {
       componentStateRef.current = componentStateWithApis;
@@ -344,8 +348,8 @@ export const StateContainer = memo(
         const key = pathArray[0];
         const isLocalVar = key in resolvedLocalVars;
         const isGlobalVar = key in stableCurrentGlobalVars;
-        const isRoot = node.uid === 'root';
-        
+        const isRoot = node.uid === "root";
+
         // Check local variables FIRST - they shadow globals
         if (isLocalVar) {
           // Local variable - handle locally (even if same name as global)
@@ -431,49 +435,3 @@ export const StateContainer = memo(
     );
   }),
 );
-
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
-
-// This hook combines state properties in a list of states so that a particular state property in a higher
-// argument index overrides the same-named state property in a lower argument index.
-function useCombinedState(...states: (ContainerState | undefined)[]) {
-  const combined: ContainerState = useMemo(() => {
-    let ret: ContainerState = {};
-    states.forEach((state = EMPTY_OBJECT) => {
-      // console.log("st", state);
-      if (state !== EMPTY_OBJECT) {
-        ret = { ...ret, ...state };
-      }
-      // console.log("ret", ret);
-    });
-    return ret;
-  }, [states]);
-  return useShallowCompareMemoize(combined);
-}
-
-// This hook combines state properties in a list of states so that a particular state property in a higher
-// argument index merges into the same-named state property in a lower argument index.
-
-// This hook combines state properties in a list of states so that a particular state property in a higher
-// argument index merges into the same-named state property in a lower argument index.
-function useMergedState(localVars: ContainerState, componentState: ContainerState) {
-  const merged = useMemo(() => {
-    const ret = { ...localVars };
-    Reflect.ownKeys(componentState).forEach((key) => {
-      const value = componentState[key];
-      if (ret[key] === undefined) {
-        ret[key] = value;
-      } else {
-        if (isPlainObject(ret[key]) && isPlainObject(value)) {
-          ret[key] = merge(cloneDeep(ret[key]), value);
-        } else {
-          ret[key] = value;
-        }
-      }
-    });
-    return ret;
-  }, [localVars, componentState]);
-  return useShallowCompareMemoize(merged);
-}

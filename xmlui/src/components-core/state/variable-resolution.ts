@@ -1,35 +1,35 @@
 /**
  * Variable Resolution Module
- * 
+ *
  * Implements the two-pass variable resolution strategy for XMLUI containers.
- * 
+ *
  * PROBLEM:
  * Variables can depend on each other in any order, including forward references.
  * Example: { fn: "$props.value", $props: "{x: 1}" }
- * 
+ *
  * SOLUTION:
  * Two-pass resolution ensures all dependencies are available:
- * 
+ *
  * Pass 1 (Pre-resolution):
  * - Resolves variables using current state context
  * - Handles forward references (function using var defined later)
  * - Results are temporary and may be incomplete
  * - Uses temporary memoization cache
- * 
+ *
  * Pass 2 (Final resolution):
  * - Includes pre-resolved variables in the context
  * - Ensures all dependencies are available
  * - Results are memoized for performance
  * - Uses persistent memoization cache
- * 
+ *
  * EXAMPLE:
  * Given vars { fn: "$props.value", $props: "{x: 1}" }
  * - Pass 1: fn tries to use $props (not yet resolved, may be undefined)
  * - Pass 2: fn uses $props (now resolved to {x: 1}, works correctly)
- * 
+ *
  * FUTURE OPTIMIZATION:
  * Consider topological sort of dependencies to enable single-pass resolution
- * 
+ *
  * Part of StateContainer.tsx refactoring - Step 7
  */
 
@@ -51,19 +51,19 @@ import { EMPTY_OBJECT } from "../constants";
 
 /**
  * Resolves variable definitions into their actual values.
- * 
+ *
  * This hook handles variable resolution with dependency tracking and memoization.
  * Variables can depend on:
  * - Other variables (including forward references)
  * - Component state
  * - App context
- * 
+ *
  * The resolution process:
  * 1. Collects dependencies for each variable
  * 2. Resolves dependencies recursively (function deps → var deps)
  * 3. Evaluates each variable with its dependencies
  * 4. Memoizes results for performance
- * 
+ *
  * @param vars - Variable definitions to resolve (from vars, functions, script)
  * @param fnDeps - Pre-computed function dependencies
  * @param componentState - Current component state context
@@ -205,10 +205,10 @@ export function useVars(
 
 /**
  * Type guard to check if a value is a parsed code declaration.
- * 
+ *
  * Parsed values come from code-behind or script tags and contain
  * a syntax tree that can be evaluated.
- * 
+ *
  * @param value - Value to check
  * @returns True if value is a CodeDeclaration
  */
