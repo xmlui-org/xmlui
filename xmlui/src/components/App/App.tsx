@@ -173,7 +173,9 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
   }
 
   const applyDefaultContentPadding = !Pages;
-  const footerSticky = Footer?.props?.sticky ?? true;
+  const footerSticky = Footer?.props?.sticky !== undefined 
+    ? extractValue.asOptionalBoolean(Footer.props.sticky, true)
+    : true;
   const scrollWholePage = extractValue.asOptionalBoolean(node.props.scrollWholePage, true);
   
   // When scrollWholePage is false, pageContentContainer is a vertical flex container

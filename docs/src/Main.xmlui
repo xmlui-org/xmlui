@@ -856,7 +856,7 @@
         </Page>
     </Pages>
     <ScrollToTop marginBottom="$space-4" />
-    <Footer sticky="false">
+    <Footer>
         <Text fontWeight="400">
             This site is an
             <Text variant="strong">
