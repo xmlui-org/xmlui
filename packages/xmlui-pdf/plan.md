@@ -184,20 +184,20 @@ $hasSignature: boolean;                // Phase 2
 
 ---
 
-### Step 2: Create PdfNative Component ⬜
+### Step 2: Create PdfNative Component ✅
 
 **Goal**: Refactor to separate native component following XMLUI conventions
 
 **Tasks**:
-1. Create `src/PdfNative.tsx` - move Pdf.tsx logic here, add forwardRef
-2. Update `src/LazyPdfNative.tsx` - import from PdfNative
-3. Update `src/Pdf.tsx` - metadata and renderer only
-4. Add props: `mode`, `annotations`, `scale` to PdfNative
-5. Add state: `annotations`, `selectedAnnotationId`, `mode`
+1. ✅ Create `src/PdfNative.tsx` - move Pdf.tsx logic here, add forwardRef
+2. ✅ Update `src/LazyPdfNative.tsx` - import from PdfNative
+3. ✅ Update `src/Pdf.tsx` - metadata and renderer only (defined defaultProps locally to avoid breaking lazy loading)
+4. ✅ Add props: `mode`, `annotations`, `scale` to PdfNative
+5. ✅ Add state: `annotations`, `selectedAnnotationId`, `mode`
 
-**Tests**: Existing E2E tests should pass
+**Tests**: ✅ Existing E2E tests pass with both single and parallel workers
 
-**Verification**: Component renders PDFs as before, compiles without errors
+**Verification**: ✅ Component renders PDFs, compiles without errors, lazy loading working correctly
 
 ---
 
