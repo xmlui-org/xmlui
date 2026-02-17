@@ -63,6 +63,15 @@ function safeGetComputedStyle(root?: HTMLElement) {
   return getComputedStyle(root || document.body);
 }
 
+/** Decode URL-encoded hash (e.g. %20 → space) for getElementById; avoids breaking on malformed % sequences. */
+function safeDecodeHash(hash: string): string {
+  try {
+    return decodeURIComponent(hash);
+  } catch {
+    return hash;
+  }
+}
+
 /**
  *  This component wraps the entire app into a container with these particular
  *  responsibilities:
@@ -279,7 +288,8 @@ export function AppContent({
       requestAnimationFrame(() => {
         if (!rootNode) return;
         if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
-          const el = (rootNode as any).querySelector(`#${hash}`);
+          const id = safeDecodeHash(hash);
+          const el = document.getElementById(id);
           if (el) {
             // For nested apps, only scroll within the shadow DOM (don't cross into host document)
             scrollAncestorsToView(el, scrollBehavior, true);
@@ -310,19 +320,14 @@ export function AppContent({
 
       requestAnimationFrame(() => {
         if (!rootNode) return;
-        // --- If element is in shadow DOM (string-based type checking)
-        // --- Check constructor.name to avoid direct ShadowRoot type dependency
-        // --- More precise than duck typing, works reliably across different environments
+        // --- Hash from URL may be encoded (e.g. %20 for space); decode for getElementById
+        const id = safeDecodeHash(lastHash.current);
+        const el = document.getElementById(id);
+        if (!el) return;
         if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
-          // ShadowRoot doesn't have getElementById, use querySelector instead
-          const el = (rootNode as any).querySelector(`#${lastHash.current}`);
-          if (!el) return;
           scrollAncestorsToView(el, scrollBehavior);
         } else {
-          // --- If element is in light DOM
-          document
-            .getElementById(lastHash.current)
-            ?.scrollIntoView({ behavior: scrollBehavior, block: "start" });
+          el.scrollIntoView({ behavior: scrollBehavior, block: "start" });
         }
       });
     }
@@ -339,17 +344,14 @@ export function AppContent({
         tableOfContentsContext.scrollToAnchor(bookmarkId, smoothScrolling);
       } else {
         // Fallback if TableOfContentsContext is not available
-        const rootNode = root?.getRootNode();
-        if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
-          // ShadowRoot doesn't have getElementById, use querySelector instead
-          const el = (rootNode as any).querySelector(`#${bookmarkId}`);
-          if (el) {
+        const el = document.getElementById(bookmarkId);
+        if (el) {
+          const rootNode = root?.getRootNode();
+          if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
             scrollAncestorsToView(el, smoothScrolling ? "smooth" : "auto");
+          } else {
+            el.scrollIntoView({ behavior: smoothScrolling ? "smooth" : "auto", block: "start" });
           }
-        } else {
-          document
-            .getElementById(bookmarkId)
-            ?.scrollIntoView({ behavior: smoothScrolling ? "smooth" : "auto", block: "start" });
         }
       }
     },
