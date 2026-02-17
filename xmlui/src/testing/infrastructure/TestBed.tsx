@@ -4,13 +4,14 @@ import { useState, useEffect } from "react";
 import StandaloneApp from "../../../src/components-core/StandaloneApp";
 import type { StandaloneAppDescription } from "../../../src/components-core/abstractions/standalone";
 import StandaloneExtensionManager from "../../../src/components-core/StandaloneExtensionManager";
+import { extensionRegistry } from "./extension-registry";
 import "xmlui/index.scss";
 
 declare global {
   interface Window {
     TEST_ENV: any | undefined;
     TEST_RUNTIME: any;
-    TEST_EXTENSION_ID?: string;
+    TEST_EXTENSION_IDS?: string[];
   }
 }
 
@@ -19,37 +20,36 @@ function TestBed() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadExtension = async () => {
+    const loadExtensions = async () => {
       const manager = new StandaloneExtensionManager();
       
-      const extensionId = window.TEST_EXTENSION_ID;
-      if (extensionId) {
+      const extensionIds = window.TEST_EXTENSION_IDS;
+      if (extensionIds && extensionIds.length > 0) {
         try {
-          // Map of known test extensions
-          let extensionModule;
-          switch (extensionId) {
-            case "xmlui-pdf":
-              extensionModule = await import("../../../../packages/xmlui-pdf/src/index");
-              break;
-            default:
-              throw new Error(`Unknown extension ID: ${extensionId}`);
-          }
-          
-          if (extensionModule.default) {
-            manager.registerExtension(extensionModule.default);
-          } else {
-            setError("Extension module has no default export");
+          // Load all requested extensions from registry
+          for (const extensionId of extensionIds) {
+            const importFn = extensionRegistry[extensionId];
+            if (!importFn) {
+              throw new Error(`Unknown extension ID: ${extensionId}. Available: ${Object.keys(extensionRegistry).join(", ")}`);
+            }
+            
+            const extensionModule = await importFn();
+            if (extensionModule.default) {
+              manager.registerExtension(extensionModule.default);
+            } else {
+              throw new Error(`Extension "${extensionId}" has no default export`);
+            }
           }
         } catch (error) {
-          console.error("Failed to load extension:", error);
-          setError(`Failed to load extension: ${error}`);
+          console.error("Failed to load extensions:", error);
+          setError(`Failed to load extensions: ${error}`);
         }
       }
       
       setExtensionManager(manager);
     };
     
-    loadExtension();
+    loadExtensions();
   }, []);
 
   if (!window.TEST_ENV) {
