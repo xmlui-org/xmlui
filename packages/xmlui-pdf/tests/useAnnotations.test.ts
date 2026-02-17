@@ -108,7 +108,7 @@ describe("useAnnotations", () => {
       expect(result.current.annotations[0].value).toBe("Updated");
     });
 
-    it("should update the modified timestamp", () => {
+    it("should update the modified timestamp", async () => {
       const { result } = renderHook(() => useAnnotations());
       const annotationData = createAnnotationData();
       
@@ -120,13 +120,13 @@ describe("useAnnotations", () => {
       const originalModified = result.current.annotations[0].modified.getTime();
       
       // Wait a bit to ensure timestamp changes
-      setTimeout(() => {
-        act(() => {
-          result.current.updateAnnotation(addedId!, { value: "Updated" });
-        });
-        
-        expect(result.current.annotations[0].modified.getTime()).toBeGreaterThan(originalModified);
-      }, 10);
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      
+      act(() => {
+        result.current.updateAnnotation(addedId!, { value: "Updated" });
+      });
+      
+      expect(result.current.annotations[0].modified.getTime()).toBeGreaterThan(originalModified);
     });
 
     it("should not modify other annotations", () => {

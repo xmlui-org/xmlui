@@ -35,6 +35,7 @@ export function TextAnnotation({
 
   return (
     <div
+      data-testid="text-annotation"
       className={`${styles.textAnnotation} ${isSelected ? styles.selected : ""}`}
       onClick={handleClick}
     >

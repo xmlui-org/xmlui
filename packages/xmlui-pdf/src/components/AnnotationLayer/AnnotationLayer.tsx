@@ -1,6 +1,8 @@
 import type { Annotation } from "../../types/annotation.types";
 import { pdfToScreenCoordinates, pdfToScreenSize } from "../../utils/coordinateMapping";
 import { TextAnnotation } from "../AnnotationTools/TextAnnotation";
+import { CheckboxAnnotation } from "../AnnotationTools/CheckboxAnnotation";
+import { SignatureAnnotation } from "../AnnotationTools/SignatureAnnotation";
 import styles from "./AnnotationLayer.module.scss";
 
 export interface AnnotationLayerProps {
@@ -75,8 +77,26 @@ export function AnnotationLayer({
               />
             )}
             
-            {/* Placeholder for non-text types or when no update handler */}
-            {(annotation.type !== "text" || !onAnnotationUpdate) && (
+            {annotation.type === "checkbox" && onAnnotationUpdate && (
+              <CheckboxAnnotation
+                annotation={annotation}
+                isSelected={isSelected}
+                onUpdate={onAnnotationUpdate}
+                onSelect={(id) => onAnnotationSelect?.(id)}
+              />
+            )}
+            
+            {annotation.type === "signature" && onAnnotationUpdate && (
+              <SignatureAnnotation
+                annotation={annotation}
+                isSelected={isSelected}
+                onUpdate={onAnnotationUpdate}
+                onSelect={(id) => onAnnotationSelect?.(id)}
+              />
+            )}
+            
+            {/* Placeholder for non-implemented types or when no update handler */}
+            {((annotation.type !== "text" && annotation.type !== "checkbox" && annotation.type !== "signature") || !onAnnotationUpdate) && (
               <div className={styles.annotationContent}>
                 {annotation.properties.label && (
                   <span className={styles.label}>{annotation.properties.label}</span>

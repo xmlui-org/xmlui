@@ -97,24 +97,24 @@ describe("TextAnnotation", () => {
 
   describe("selection", () => {
     it("should apply selected class when selected", () => {
-      const { container } = render(<TextAnnotation {...defaultProps} isSelected={true} />);
+      render(<TextAnnotation {...defaultProps} isSelected={true} />);
       
-      const textAnnotation = container.querySelector(".textAnnotation");
-      expect(textAnnotation?.className).toContain("selected");
+      const textAnnotation = screen.getByTestId("text-annotation");
+      expect(textAnnotation.className).toContain("selected");
     });
 
     it("should not apply selected class when not selected", () => {
-      const { container } = render(<TextAnnotation {...defaultProps} isSelected={false} />);
+      render(<TextAnnotation {...defaultProps} isSelected={false} />);
       
-      const textAnnotation = container.querySelector(".textAnnotation");
-      expect(textAnnotation?.className).not.toContain("selected");
+      const textAnnotation = screen.getByTestId("text-annotation");
+      expect(textAnnotation.className).not.toContain("selected");
     });
 
     it("should call onSelect when container is clicked", () => {
       const onSelect = vi.fn();
-      const { container } = render(<TextAnnotation {...defaultProps} onSelect={onSelect} />);
+      render(<TextAnnotation {...defaultProps} onSelect={onSelect} />);
       
-      const textAnnotation = container.querySelector(".textAnnotation") as HTMLElement;
+      const textAnnotation = screen.getByTestId("text-annotation");
       fireEvent.click(textAnnotation);
       
       expect(onSelect).toHaveBeenCalledWith("text-1");
@@ -164,9 +164,9 @@ describe("TextAnnotation", () => {
   describe("event propagation", () => {
     it("should stop propagation when container is clicked", () => {
       const onSelect = vi.fn();
-      const { container } = render(<TextAnnotation {...defaultProps} onSelect={onSelect} />);
+      render(<TextAnnotation {...defaultProps} onSelect={onSelect} />);
       
-      const textAnnotation = container.querySelector(".textAnnotation") as HTMLElement;
+      const textAnnotation = screen.getByTestId("text-annotation");
       const event = new MouseEvent("click", { bubbles: true });
       const stopPropagationSpy = vi.spyOn(event, "stopPropagation");
       

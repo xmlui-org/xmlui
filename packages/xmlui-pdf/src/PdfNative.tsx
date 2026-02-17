@@ -4,9 +4,10 @@ import { Document, Page, pdfjs } from "react-pdf";
 import workerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import "react-pdf/dist/Page/TextLayer.css";
 import "react-pdf/dist/Page/AnnotationLayer.css";
-import type { Annotation } from "./types/annotation.types";
+import type { Annotation, AnnotationType } from "./types/annotation.types";
 import type { SignatureData } from "./types/signature.types";
 import { AnnotationLayer } from "./components/AnnotationLayer/AnnotationLayer";
+import { FieldToolbar } from "./components/FieldToolbar/FieldToolbar";
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
 
@@ -111,6 +112,51 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
       updateState?.({ currentPage: page });
     }
 
+    // Helper to create annotation at default position
+    function createDefaultAnnotation(type: AnnotationType, page: number): Partial<Annotation> {
+      // Default positions for centering annotations
+      const defaultSizes = {
+        text: { width: 200, height: 50 },
+        checkbox: { width: 150, height: 30 },
+        signature: { width: 250, height: 100 },
+      };
+      
+      // Center horizontally, place near top
+      const pageWidth = 595; // A4 width in points
+      const size = defaultSizes[type];
+      const x = (pageWidth - size.width) / 2;
+      const y = 100; // Near top
+      
+      return {
+        type,
+        page,
+        position: { x, y },
+        size,
+        value: type === "checkbox" ? false : "",
+        properties: {
+          label: type === "text" ? "Text Field" : type === "checkbox" ? "Checkbox" : "Signature",
+          required: false,
+        },
+      };
+    }
+
+    // Handle adding annotation from toolbar
+    function handleAddAnnotation(type: AnnotationType, page: number) {
+      const annotationData = createDefaultAnnotation(type, page);
+      const newAnnotation: Annotation = {
+        ...annotationData as Annotation,
+        id: `annotation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        created: new Date(),
+        modified: new Date(),
+      };
+      onAnnotationCreate?.(newAnnotation);
+      updateState?.({ 
+        annotations: [...annotations, newAnnotation] 
+      });
+      setSelectedAnnotationId(newAnnotation.id);
+      return newAnnotation.id;
+    }
+
     // Register component API methods
     if (registerComponentApi) {
       registerComponentApi({
@@ -178,8 +224,15 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
         ref={ref} 
         id={id} 
         className={className}
-        style={style}
+        style={{ ...style, display: "flex", gap: "16px" }}
       >
+        {mode === "edit" && (
+          <FieldToolbar
+            onAddAnnotation={handleAddAnnotation}
+            currentPage={effectivePage}
+            isEditMode={mode === "edit"}
+          />
+        )}
         <Document
           file={fileSource}
           onLoadSuccess={handleLoadSuccess}
