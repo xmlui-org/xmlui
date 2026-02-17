@@ -144,7 +144,7 @@ export const XmlUiDocsThemeDefinition: ThemeDefinition = {
     "textColor-Link--hover": "$color-surface-900",
 
     // --- Scroll to top
-    "backgroundColor-ScrollToTop": "$color-surface-100",
+    "backgroundColor-ScrollToTop": "rgb(from $color-surface-100 r g b / 0.9)",
     "border-ScrollToTop": "1px solid $color-surface-200",
     "color-ScrollToTop": "$color-surface-900",
   },
