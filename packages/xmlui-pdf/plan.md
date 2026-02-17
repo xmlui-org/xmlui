@@ -169,18 +169,18 @@ $hasSignature: boolean;                // Phase 2
 
 ## Implementation Steps
 
-### Step 1: Set Up Type Definitions and Utilities ⬜
+### Step 1: Set Up Type Definitions and Utilities ✓
 
 **Goal**: Create TypeScript types and coordinate mapping utility
 
 **Tasks**:
 1. Create `src/types/annotation.types.ts` - Annotation types
 2. Create `src/types/signature.types.ts` - Signature types (Phase 2 prep)
-3. Create `src/utils/coordinateMapping.ts` - PDF/screen coordinate conversion
+3. Create `src/utils/coordinateMapping.ts` - PDF/screen coordinate mapping utility
 
-**Tests**: Unit tests for coordinate mapping utility
+**Tests**: Unit tests created in `tests/coordinateMapping.test.ts`
 
-**Verification**: Code compiles, types export correctly
+**Verification**: ✓ Build succeeds, no linting errors, types export correctly
 
 ---
 

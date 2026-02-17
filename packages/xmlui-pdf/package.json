@@ -10,6 +10,8 @@
     "build-watch": "xmlui build-lib --watch",
     "build:demo": "xmlui build",
     "build:meta": "xmlui build-lib --mode=metadata",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
     "test:e2e": "cd ../.. && playwright test packages/xmlui-pdf/src/Pdf.spec.ts",
     "test:e2e:dev": "cd ../.. && playwright test packages/xmlui-pdf/src/Pdf.spec.ts --workers=1 --reporter=line"
   },
@@ -18,6 +20,8 @@
     "react-pdf": "^10.3.0"
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.0",
+    "vitest": "^4.0.16",
     "xmlui": "*"
   },
   "main": "./dist/xmlui-pdf.js",

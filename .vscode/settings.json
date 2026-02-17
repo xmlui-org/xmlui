@@ -2,6 +2,8 @@
   "editor.tabSize": 2,
   //"prettier.configPath": ".prettierrc.js",
   "files.eol": "\n",
+  "vitest.enable": true,
+  "vitest.workspaceConfig": "./vitest.workspace.ts",
   "[html]": {
     "editor.defaultFormatter": "vscode.html-language-features"
   },
