@@ -80,6 +80,17 @@ export const TableOfContents = forwardRef(function TableOfContents(
     [headings, maxHeadingLevel, omitH1],
   );
 
+  // If we navigate to a page where the previous active heading no longer
+  // exists, reset the active state so the indicator and aria attributes
+  // don't refer to a non-existent item.
+  useEffect(() => {
+    if (!activeAnchorId) return;
+    const stillExists = filteredHeadings.some((h) => h.id === activeAnchorId);
+    if (!stillExists) {
+      setActiveId(null);
+    }
+  }, [activeAnchorId, filteredHeadings]);
+
   useIsomorphicLayoutEffect(() => {
     return subscribeToActiveAnchorChange((id) => {
       const foundHeading = filteredHeadings.find((heading) => heading.id === id);
