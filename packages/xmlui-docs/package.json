@@ -1,0 +1,37 @@
+{
+  "name": "xmlui-docs",
+  "version": "0.0.1",
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "start": "xmlui start",
+    "preview": "xmlui preview",
+    "build:extension": "xmlui build-lib",
+    "build-watch": "xmlui build-lib --watch",
+    "build:demo": "xmlui build",
+    "build:meta": "xmlui build-lib --mode=metadata"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "xmlui": "*"
+  },
+  "main": "./dist/xmlui-docs.js",
+  "module": "./dist/xmlui-docs.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/xmlui-docs.mjs",
+      "require": "./dist/xmlui-docs.js"
+    },
+    "./*.css": {
+      "import": "./dist/*.css",
+      "require": "./dist/*.css"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
