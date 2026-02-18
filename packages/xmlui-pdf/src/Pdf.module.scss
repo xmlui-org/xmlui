@@ -10,6 +10,19 @@ $themeVars: ();
 $boxShadow-page-Pdf: createThemeVar("boxShadow-page-Pdf");
 $gap-pages-Pdf: createThemeVar("gap-pages-Pdf");
 
+// Annotation theme variables
+$borderColor-field-Pdf: createThemeVar("borderColor-field-Pdf");
+$backgroundColor-field-Pdf: createThemeVar("backgroundColor-field-Pdf");
+$color-selected-Pdf: createThemeVar("color-selected-Pdf");
+$boxShadow-selected-Pdf: createThemeVar("boxShadow-selected-Pdf");
+$color-delete-Pdf: createThemeVar("color-delete-Pdf");
+$color-resizeHandle-Pdf: createThemeVar("color-resizeHandle-Pdf");
+$backgroundColor-toolbar-Pdf: createThemeVar("backgroundColor-toolbar-Pdf");
+$borderColor-toolbar-Pdf: createThemeVar("borderColor-toolbar-Pdf");
+$backgroundColor-text-Pdf: createThemeVar("backgroundColor-text-Pdf");
+$backgroundColor-checkbox-Pdf: createThemeVar("backgroundColor-checkbox-Pdf");
+$backgroundColor-signature-Pdf: createThemeVar("backgroundColor-signature-Pdf");
+
 .document{
   display: flex;
   flex-direction: column;

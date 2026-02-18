@@ -105,8 +105,52 @@ export const PdfMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
+    // Page styling
     "boxShadow-page-Pdf": "$boxShadow-md",
     "gap-pages-Pdf": "$space-4",
+    
+    // Annotation box styling
+    "borderColor-annotationBox-Pdf": "transparent",
+    "backgroundColor-annotationBox-Pdf": "rgba(255, 255, 255, 0.8)",
+    "borderColor-selected-Pdf": "#007bff",
+    "boxShadow-selected-Pdf": "0 0 0 2px rgba(0, 123, 255, 0.25)",
+    
+    // Type-specific background colors
+    "backgroundColor-text-Pdf": "rgba(255, 255, 220, 0.8)",
+    "backgroundColor-checkbox-Pdf": "rgba(220, 255, 220, 0.8)",
+    "backgroundColor-signature-Pdf": "rgba(220, 220, 255, 0.8)",
+    
+    // Text styling
+    "color-label-Pdf": "#333",
+    "color-value-Pdf": "#666",
+    
+    // Delete button styling
+    "backgroundColor-deleteButton-Pdf": "#dc3545",
+    "backgroundColor-deleteButton-hover-Pdf": "#c82333",
+    "color-deleteButton-Pdf": "white",
+    
+    // Resize handle styling
+    "backgroundColor-resizeHandle-Pdf": "#007bff",
+    "backgroundColor-resizeHandle-hover-Pdf": "#0056b3",
+    
+    // Toolbar styling
+    "backgroundColor-toolbar-Pdf": "#f8f9fa",
+    "borderColor-toolbar-Pdf": "#dee2e6",
+    "color-toolbarTitle-Pdf": "#333",
+    "backgroundColor-toolbarButton-Pdf": "#fff",
+    "backgroundColor-toolbarButton-hover-Pdf": "#e9ecef",
+    "borderColor-toolbarButton-Pdf": "#ced4da",
+    "color-toolbarButton-Pdf": "#495057",
+    "color-toolbarIcon-Pdf": "#007bff",
+    
+    // Properties panel styling
+    "backgroundColor-propertiesPanel-Pdf": "#f8f9fa",
+    "borderColor-propertiesPanel-Pdf": "#dee2e6",
+    "color-propertiesTitle-Pdf": "#212529",
+    "color-propertiesLabel-Pdf": "#495057",
+    "backgroundColor-propertyInput-Pdf": "white",
+    "borderColor-propertyInput-Pdf": "#ced4da",
+    "borderColor-propertyInput-focus-Pdf": "#007bff",
   },
 });
 

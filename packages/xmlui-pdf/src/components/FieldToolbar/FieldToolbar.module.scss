@@ -1,10 +1,27 @@
+@use "xmlui/themes.scss" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$backgroundColor-toolbar-Pdf: createThemeVar("backgroundColor-toolbar-Pdf");
+$borderColor-toolbar-Pdf: createThemeVar("borderColor-toolbar-Pdf");
+$color-toolbarTitle-Pdf: createThemeVar("color-toolbarTitle-Pdf");
+$backgroundColor-toolbarButton-Pdf: createThemeVar("backgroundColor-toolbarButton-Pdf");
+$backgroundColor-toolbarButton-hover-Pdf: createThemeVar("backgroundColor-toolbarButton-hover-Pdf");
+$borderColor-toolbarButton-Pdf: createThemeVar("borderColor-toolbarButton-Pdf");
+$color-toolbarButton-Pdf: createThemeVar("color-toolbarButton-Pdf");
+$color-toolbarIcon-Pdf: createThemeVar("color-toolbarIcon-Pdf");
+
 .toolbar {
   display: flex;
   flex-direction: column;
   gap: 12px;
   padding: 16px;
-  background-color: #f8f9fa;
-  border: 1px solid #dee2e6;
+  background-color: $backgroundColor-toolbar-Pdf;
+  border: 1px solid $borderColor-toolbar-Pdf;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   min-width: 180px;
@@ -13,10 +30,10 @@
 .toolbarTitle {
   font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: $color-toolbarTitle-Pdf;
   margin: 0;
   padding-bottom: 8px;
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid $borderColor-toolbar-Pdf;
 }
 
 .buttonGroup {
@@ -30,17 +47,17 @@
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
-  background-color: #fff;
-  border: 1px solid #ced4da;
+  background-color: $backgroundColor-toolbarButton-Pdf;
+  border: 1px solid $borderColor-toolbarButton-Pdf;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 14px;
-  color: #495057;
+  color: $color-toolbarButton-Pdf;
 
   &:hover {
-    background-color: #e9ecef;
-    border-color: #adb5bd;
+    background-color: $backgroundColor-toolbarButton-hover-Pdf;
+    border-color: $borderColor-toolbarButton-Pdf;
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
@@ -51,7 +68,7 @@
   }
 
   &:focus {
-    outline: 2px solid #007bff;
+    outline: 2px solid $color-toolbarIcon-Pdf;
     outline-offset: 2px;
   }
 }
@@ -64,7 +81,7 @@
   height: 24px;
   font-size: 18px;
   font-weight: 600;
-  color: #007bff;
+  color: $color-toolbarIcon-Pdf;
   flex-shrink: 0;
 }
 
@@ -72,4 +89,8 @@
   flex: 1;
   text-align: left;
   font-weight: 500;
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

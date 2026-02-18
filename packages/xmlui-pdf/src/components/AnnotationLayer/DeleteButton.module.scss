@@ -1,11 +1,23 @@
+@use "xmlui/themes.scss" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$backgroundColor-deleteButton-Pdf: createThemeVar("backgroundColor-deleteButton-Pdf");
+$backgroundColor-deleteButton-hover-Pdf: createThemeVar("backgroundColor-deleteButton-hover-Pdf");
+$color-deleteButton-Pdf: createThemeVar("color-deleteButton-Pdf");
+
 .deleteButton {
   position: absolute;
   top: -12px;
   right: -12px;
   width: 24px;
   height: 24px;
-  background-color: #dc3545;
-  color: white;
+  background-color: $backgroundColor-deleteButton-Pdf;
+  color: $color-deleteButton-Pdf;
   border: 2px solid white;
   border-radius: 50%;
   cursor: pointer;
@@ -21,7 +33,7 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 
   &:hover {
-    background-color: #c82333;
+    background-color: $backgroundColor-deleteButton-hover-Pdf;
     transform: scale(1.15);
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
   }
@@ -31,7 +43,11 @@
   }
 
   &:focus {
-    outline: 2px solid #dc3545;
+    outline: 2px solid $backgroundColor-deleteButton-Pdf;
     outline-offset: 2px;
   }
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

@@ -1,5 +1,22 @@
 @use "xmlui/themes.scss" as t;
 
+// Theme variables for annotations
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$borderColor-annotationBox-Pdf: createThemeVar("borderColor-annotationBox-Pdf");
+$backgroundColor-annotationBox-Pdf: createThemeVar("backgroundColor-annotationBox-Pdf");
+$borderColor-selected-Pdf: createThemeVar("borderColor-selected-Pdf");
+$boxShadow-selected-Pdf: createThemeVar("boxShadow-selected-Pdf");
+$backgroundColor-text-Pdf: createThemeVar("backgroundColor-text-Pdf");
+$backgroundColor-checkbox-Pdf: createThemeVar("backgroundColor-checkbox-Pdf");
+$backgroundColor-signature-Pdf: createThemeVar("backgroundColor-signature-Pdf");
+$color-label-Pdf: createThemeVar("color-label-Pdf");
+$color-value-Pdf: createThemeVar("color-value-Pdf");
+
 // Annotation layer - absolute positioning overlay
 .annotationLayer {
   position: absolute;
@@ -15,33 +32,33 @@
 .annotationBox {
   position: absolute;
   pointer-events: all; // Enable clicking on annotations
-  border: 2px solid transparent;
+  border: 2px solid $borderColor-annotationBox-Pdf;
   border-radius: 4px;
   box-sizing: border-box;
   cursor: pointer;
   transition: border-color 0.2s, box-shadow 0.2s;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: $backgroundColor-annotationBox-Pdf;
 
   &:hover {
     border-color: rgba(0, 123, 255, 0.5);
   }
 
   &.selected {
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    border-color: $borderColor-selected-Pdf;
+    box-shadow: $boxShadow-selected-Pdf;
   }
 
   // Type-specific styling
   &.text {
-    background-color: rgba(255, 255, 220, 0.8);
+    background-color: $backgroundColor-text-Pdf;
   }
 
   &.checkbox {
-    background-color: rgba(220, 255, 220, 0.8);
+    background-color: $backgroundColor-checkbox-Pdf;
   }
 
   &.signature {
-    background-color: rgba(220, 220, 255, 0.8);
+    background-color: $backgroundColor-signature-Pdf;
     border-style: dashed;
   }
 }
@@ -60,7 +77,7 @@
 .label {
   font-size: 12px;
   font-weight: 600;
-  color: #333;
+  color: $color-label-Pdf;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -69,8 +86,11 @@
 // Annotation value
 .value {
   font-size: 14px;
-  color: #666;
+  color: $color-value-Pdf;
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+:export {
+  themeVars: t.json-stringify($themeVars);}

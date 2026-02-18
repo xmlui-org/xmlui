@@ -1,10 +1,26 @@
+@use "xmlui/themes.scss" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$backgroundColor-propertiesPanel-Pdf: createThemeVar("backgroundColor-propertiesPanel-Pdf");
+$borderColor-propertiesPanel-Pdf: createThemeVar("borderColor-propertiesPanel-Pdf");
+$color-propertiesTitle-Pdf: createThemeVar("color-propertiesTitle-Pdf");
+$color-propertiesLabel-Pdf: createThemeVar("color-propertiesLabel-Pdf");
+$backgroundColor-propertyInput-Pdf: createThemeVar("backgroundColor-propertyInput-Pdf");
+$borderColor-propertyInput-Pdf: createThemeVar("borderColor-propertyInput-Pdf");
+$borderColor-propertyInput-focus-Pdf: createThemeVar("borderColor-propertyInput-focus-Pdf");
+
 .propertiesPanel {
   display: flex;
   flex-direction: column;
   gap: 16px;
   padding: 20px;
-  background-color: #f8f9fa;
-  border: 1px solid #dee2e6;
+  background-color: $backgroundColor-propertiesPanel-Pdf;
+  border: 1px solid $borderColor-propertiesPanel-Pdf;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   min-width: 260px;
@@ -17,14 +33,14 @@
   flex-direction: column;
   gap: 8px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid $borderColor-propertiesPanel-Pdf;
 }
 
 .title {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: #212529;
+  color: $color-propertiesTitle-Pdf;
 }
 
 .annotationType {
@@ -56,7 +72,7 @@
 .propertyLabel {
   font-size: 13px;
   font-weight: 600;
-  color: #495057;
+  color: $color-propertiesLabel-Pdf;
   margin: 0;
 }
 
@@ -65,14 +81,14 @@
   width: 100%;
   padding: 8px 12px;
   font-size: 14px;
-  border: 1px solid #ced4da;
+  border: 1px solid $borderColor-propertyInput-Pdf;
   border-radius: 4px;
-  background-color: white;
+  background-color: $backgroundColor-propertyInput-Pdf;
   transition: border-color 0.2s ease;
 
   &:focus {
     outline: none;
-    border-color: #007bff;
+    border-color: $borderColor-propertyInput-focus-Pdf;
     box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
   }
 
@@ -82,6 +98,7 @@
 }
 
 .input[type="number"] {
+  appearance: textfield;
   -moz-appearance: textfield;
 
   &::-webkit-outer-spin-button,
@@ -97,11 +114,11 @@
   gap: 8px;
   cursor: pointer;
   font-size: 14px;
-  color: #495057;
+  color: $color-propertiesLabel-Pdf;
   user-select: none;
 
   &:hover {
-    color: #212529;
+    color: $color-propertiesTitle-Pdf;
   }
 }
 
@@ -110,4 +127,8 @@
   height: 18px;
   cursor: pointer;
   flex-shrink: 0;
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
 }
