@@ -3,6 +3,7 @@ import type { Annotation } from "../../types/annotation.types";
 import { useDrag } from "../../hooks/useDrag";
 import { screenToPdfCoordinates } from "../../utils/coordinateMapping";
 import { ResizableAnnotation } from "./ResizableAnnotation";
+import { DeleteButton } from "./DeleteButton";
 import styles from "./DraggableAnnotation.module.scss";
 
 export interface DraggableAnnotationProps {
@@ -15,6 +16,7 @@ export interface DraggableAnnotationProps {
   scale: number;
   onAnnotationSelect?: (id: string) => void;
   onAnnotationUpdate?: (id: string, updates: Partial<Annotation>) => void;
+  onAnnotationDelete?: (id: string) => void;
   children: React.ReactNode;
   className?: string;
 }
@@ -32,6 +34,7 @@ export function DraggableAnnotation({
   scale,
   onAnnotationSelect,
   onAnnotationUpdate,
+  onAnnotationDelete,
   children,
   className,
 }: DraggableAnnotationProps) {
@@ -101,6 +104,10 @@ export function DraggableAnnotation({
       >
         {children}
       </ResizableAnnotation>
+      
+      {isSelected && onAnnotationDelete && (
+        <DeleteButton onDelete={() => onAnnotationDelete(annotation.id)} />
+      )}
     </div>
   );
 }

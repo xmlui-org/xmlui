@@ -360,7 +360,7 @@ $hasSignature: boolean;                // Phase 2
 
 ---
 
-### Step 12: Implement Delete Functionality ⬜
+### Step 12: Implement Delete Functionality ✅
 
 **Goal**: Enable deleting annotations
 
@@ -377,7 +377,7 @@ $hasSignature: boolean;                // Phase 2
 
 ---
 
-### Step 13: Implement Field Properties Panel ⬜
+### Step 13: Implement Field Properties Panel ✅
 
 **Goal**: Allow editing annotation properties
 

@@ -15,6 +15,7 @@ export interface AnnotationLayerProps {
   selectedAnnotationId?: string;
   onAnnotationSelect?: (id: string) => void;
   onAnnotationUpdate?: (id: string, updates: Partial<Annotation>) => void;
+  onAnnotationDelete?: (id: string) => void;
 }
 
 /**
@@ -30,6 +31,7 @@ export function AnnotationLayer({
   selectedAnnotationId,
   onAnnotationSelect,
   onAnnotationUpdate,
+  onAnnotationDelete,
 }: AnnotationLayerProps) {
   // Filter annotations for current page
   const pageAnnotations = annotations.filter(ann => ann.page === pageNumber);
@@ -66,6 +68,7 @@ export function AnnotationLayer({
             scale={scale}
             onAnnotationSelect={onAnnotationSelect}
             onAnnotationUpdate={onAnnotationUpdate}
+            onAnnotationDelete={onAnnotationDelete}
             className={`${styles.annotationBox} ${isSelected ? styles.selected : ""} ${styles[annotation.type]}`}
           >
             {/* Render interactive annotation components based on type */}

@@ -1,4 +1,4 @@
-import { forwardRef, useState, CSSProperties } from "react";
+import { forwardRef, useState, CSSProperties, useEffect } from "react";
 import styles from "./Pdf.module.scss";
 import { Document, Page, pdfjs } from "react-pdf";
 import workerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
@@ -8,6 +8,8 @@ import type { Annotation, AnnotationType } from "./types/annotation.types";
 import type { SignatureData } from "./types/signature.types";
 import { AnnotationLayer } from "./components/AnnotationLayer/AnnotationLayer";
 import { FieldToolbar } from "./components/FieldToolbar/FieldToolbar";
+import { FieldProperties } from "./components/FieldToolbar/FieldProperties";
+import { FieldProperties } from "./components/FieldToolbar/FieldProperties";
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
 
@@ -90,6 +92,28 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
     
     // Use controlled page if provided, otherwise internal state
     const effectivePage = currentPage ?? internalPage;
+
+    // Keyboard event handler for delete
+    useEffect(() => {
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (!selectedAnnotationId || mode !== "edit") return;
+        
+        if (event.key === "Delete" || event.key === "Backspace") {
+          // Prevent default backspace navigation
+          event.preventDefault();
+          
+          // Delete selected annotation
+          onAnnotationDelete?.(selectedAnnotationId);
+          updateState?.({
+            annotations: annotations.filter(a => a.id !== selectedAnnotationId)
+          });
+          setSelectedAnnotationId(undefined);
+        }
+      };
+
+      document.addEventListener("keydown", handleKeyDown);
+      return () => document.removeEventListener("keydown", handleKeyDown);
+    }, [selectedAnnotationId, mode, annotations, onAnnotationDelete, updateState]);
 
     function handleLoadSuccess({ numPages }: { numPages: number }) {
       setNumPages(numPages);
@@ -218,6 +242,11 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
 
     // Use data if provided, otherwise use src
     const fileSource = data || src;
+    
+    // Get selected annotation for properties panel
+    const selectedAnnotation = selectedAnnotationId 
+      ? annotations.find(a => a.id === selectedAnnotationId) || null
+      : null;
 
     return (
       <div 
@@ -233,7 +262,8 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
             isEditMode={mode === "edit"}
           />
         )}
-        <Document
+        <div style={{ flex: 1 }}>
+          <Document
           file={fileSource}
           onLoadSuccess={handleLoadSuccess}
           className={styles.document}
@@ -271,12 +301,31 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
                         ...updates,
                       });
                     }}
+                    onAnnotationDelete={(id) => {
+                      onAnnotationDelete?.(id);
+                      updateState?.({
+                        annotations: annotations.filter(a => a.id !== id)
+                      });
+                      setSelectedAnnotationId(undefined);
+                    }}
                   />
                 )}
               </div>
             );
           })}
         </Document>
+        </div>
+        {mode === "edit" && (
+          <FieldProperties
+            annotation={selectedAnnotation}
+            onUpdate={(id, updates) => {
+              onAnnotationUpdate?.({
+                ...annotations.find(a => a.id === id)!,
+                ...updates,
+              });
+            }}
+          />
+        )}
       </div>
     );
   }
