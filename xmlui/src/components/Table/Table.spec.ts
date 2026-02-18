@@ -76,6 +76,41 @@ test.describe("Basic Functionality", () => {
     await expect.poll(testStateDriver.testState).toEqual("Apple");
   });
 
+  test("double-click fires handler without interfering with row selection", async ({ initTestBed, page }) => {
+    // Regression test: Verify that double-click doesn't trigger onClick twice
+    // The fix checks event.detail >= 2 to skip onClick on the second click
+    const { testStateDriver } = await initTestBed(`
+      <Table 
+        data='{${JSON.stringify(sampleData)}}' 
+        testId="table" 
+        rowsSelectable="true"
+        onRowDoubleClick="(item) => testState = { ...(testState || {}), action: 'doubleClick', item: item.name }"
+        onSelectionDidChange="(selectedIds) => testState = { ...(testState || {}), selectionCount: selectedIds.length }"
+      >
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+      </Table>
+    `);
+
+    const firstRow = page.locator("tbody tr").first();
+    await expect(firstRow).toBeVisible();
+
+    // Verify double-click fires the handler
+    await firstRow.dblclick();
+    
+    // Double-click handler should fire
+    const state = await testStateDriver.testState();
+    expect(state).toMatchObject({ 
+      action: "doubleClick", 
+      item: "Apple" 
+    });
+
+    // After double-click, the row should be selected (from the first click)
+    // but not toggle-deselected (because event.detail >= 2 prevents second click)
+    await expect(firstRow).toHaveClass(/selected/);
+    expect(state.selectionCount).toBe(1);
+  });
+
   test("renders with empty data array", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Table data='{[]}' testId="table">
