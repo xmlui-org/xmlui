@@ -21,7 +21,9 @@ export const PdfMd = createMetadata({
       valueType: "string",
     },
     data: d(
-      `This property contains the binary data that represents the PDF document.`,
+      `This property contains the binary data that represents the PDF document for in-memory display. ` +
+      `Supports: ArrayBuffer, Uint8Array, Blob, File, or data URL string. ` +
+      `Example: \`data={arrayBuffer}\` or \`data={blob}\` or \`data="data:application/pdf;base64,..."\`.`,
     ),
     mode: {
       description: `Display mode: "view" for read-only or "edit" for annotation editing. Default: "${defaultProps.mode}".`,
@@ -162,7 +164,7 @@ export const pdfComponentRenderer = createComponentRenderer(
     
     return (
       <LazyPdf
-        id={uid}
+        id={String(uid)}
         src={extractValue(props?.src)}
         data={extractValue(props?.data)}
         mode={extractValue.asOptionalString(props?.mode, defaultProps.mode) as "view" | "edit"}
