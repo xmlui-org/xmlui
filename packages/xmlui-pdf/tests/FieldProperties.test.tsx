@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom/vitest";
 import { FieldProperties } from "../src/components/FieldToolbar/FieldProperties";
 import type { Annotation } from "../src/types/annotation.types";
 

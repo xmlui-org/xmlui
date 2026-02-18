@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import "@testing-library/jest-dom/vitest";
 import { AnnotationLayer } from "../src/components/AnnotationLayer/AnnotationLayer";
 import type { Annotation } from "../src/types/annotation.types";
 
