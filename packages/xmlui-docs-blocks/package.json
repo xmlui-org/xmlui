@@ -1,5 +1,5 @@
 {
-  "name": "xmlui-docs",
+  "name": "xmlui-docs-blocks",
   "version": "0.0.1",
   "sideEffects": false,
   "type": "module",
@@ -16,12 +16,12 @@
   "devDependencies": {
     "xmlui": "*"
   },
-  "main": "./dist/xmlui-docs.js",
-  "module": "./dist/xmlui-docs.mjs",
+  "main": "./dist/xmlui-docs-blocks.js",
+  "module": "./dist/xmlui-docs-blocks.mjs",
   "exports": {
     ".": {
-      "import": "./dist/xmlui-docs.mjs",
-      "require": "./dist/xmlui-docs.js"
+      "import": "./dist/xmlui-docs-blocks.mjs",
+      "require": "./dist/xmlui-docs-blocks.js"
     },
     "./*.css": {
       "import": "./dist/*.css",
