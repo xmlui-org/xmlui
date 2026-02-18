@@ -3,6 +3,7 @@ import { pdfToScreenCoordinates, pdfToScreenSize } from "../../utils/coordinateM
 import { TextAnnotation } from "../AnnotationTools/TextAnnotation";
 import { CheckboxAnnotation } from "../AnnotationTools/CheckboxAnnotation";
 import { SignatureAnnotation } from "../AnnotationTools/SignatureAnnotation";
+import { DraggableAnnotation } from "./DraggableAnnotation";
 import styles from "./AnnotationLayer.module.scss";
 
 export interface AnnotationLayerProps {
@@ -54,18 +55,18 @@ export function AnnotationLayer({
         const isSelected = annotation.id === selectedAnnotationId;
 
         return (
-          <div
+          <DraggableAnnotation
             key={annotation.id}
+            annotation={annotation}
+            isSelected={isSelected}
+            screenPosition={screenPosition}
+            screenSize={screenSize}
+            pageWidth={pageWidth}
+            pageHeight={pageHeight}
+            scale={scale}
+            onAnnotationSelect={onAnnotationSelect}
+            onAnnotationUpdate={onAnnotationUpdate}
             className={`${styles.annotationBox} ${isSelected ? styles.selected : ""} ${styles[annotation.type]}`}
-            style={{
-              left: `${screenPosition.x}px`,
-              top: `${screenPosition.y}px`,
-              width: `${screenSize.width}px`,
-              height: `${screenSize.height}px`,
-            }}
-            onClick={() => onAnnotationSelect?.(annotation.id)}
-            data-annotation-id={annotation.id}
-            data-annotation-type={annotation.type}
           >
             {/* Render interactive annotation components based on type */}
             {annotation.type === "text" && onAnnotationUpdate && (
@@ -106,7 +107,7 @@ export function AnnotationLayer({
                 )}
               </div>
             )}
-          </div>
+          </DraggableAnnotation>
         );
       })}
     </div>
