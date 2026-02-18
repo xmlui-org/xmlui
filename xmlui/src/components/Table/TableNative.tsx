@@ -1504,6 +1504,7 @@ export const Table = forwardRef(
             <tbody className={styles.tableBody}>
               <Virtualizer
                 ref={virtualizerRef}
+                scrollRef={wrapperRef}
                 itemSize={effectiveRowHeight}
                 startMargin={startMargin}
               >

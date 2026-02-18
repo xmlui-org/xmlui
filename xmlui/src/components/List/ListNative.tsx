@@ -543,6 +543,7 @@ export const ListNative = forwardRef(function DynamicHeightList2(
             >
               <Virtualizer
                 ref={virtualizerRef}
+                scrollRef={scrollElementRef}
                 shift={shift}
                 onScroll={onScroll}
                 startMargin={startMargin}
