@@ -1187,21 +1187,6 @@ export const Table = forwardRef(
     // ==================================================================================
     const virtualizerRef = useRef<VirtualizerHandle>(null);
     const firstRowRef = useRef<HTMLTableRowElement>(null);
-    const [measuredRowHeight, setMeasuredRowHeight] = useState<number | undefined>(undefined);
-
-    const effectiveRowHeight = measuredRowHeight || rowHeight || defaultProps.rowHeight;
-
-    // Calculate actual item size including borders
-    const effectiveItemSize = useMemo(() => {
-      // If we have measured height, use it
-      if (measuredRowHeight) {
-        return measuredRowHeight;
-      }
-      // Otherwise, add 1px for border to the provided/default height
-      // This accounts for the border-bottom on each row
-      const baseHeight = rowHeight || defaultProps.rowHeight;
-      return baseHeight + 1; // +1 for border-bottom
-    }, [measuredRowHeight, rowHeight]);
 
     const hasData = safeData.length !== 0;
 
@@ -1352,8 +1337,6 @@ export const Table = forwardRef(
       rowDisabledPredicate,
       noBottomBorder,
       effectiveUserSelectRow,
-      effectiveRowHeight,
-      effectiveItemSize,
       firstRowRef,
       toggleRow,
       checkAllRows,
@@ -1448,22 +1431,6 @@ export const Table = forwardRef(
       }
       return table.getPageCount() > 1;
     }, [effectiveIsPaginated, hasData, rows.length, pagination, alwaysShowPagination, table]);
-
-    // Diagnostic: Log Virtualizer configuration when it changes
-    useEffect(() => {
-      const tbody = tableRef.current?.querySelector("tbody");
-
-      // Check tbody's children structure
-      const tbodyChildren = tbody ? Array.from(tbody.children) : [];
-      const childrenInfo = tbodyChildren.map((child, idx) => ({
-        index: idx,
-        tagName: child.tagName,
-        height: (child as HTMLElement).offsetHeight,
-        scrollHeight: (child as HTMLElement).scrollHeight,
-        style: window.getComputedStyle(child as HTMLElement).height,
-        className: (child as HTMLElement).className,
-      }));
-    }, [effectiveItemSize, startMargin, rows.length]);
 
     return (
       <div

@@ -3100,3 +3100,292 @@ test.describe("Keyboard Shortcuts", () => {
     });
   });
 });
+
+// =============================================================================
+// VIRTUALIZATION TESTS
+// =============================================================================
+
+test.describe("Virtualization", () => {
+  test("only renders visible rows when height is constrained with large dataset", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App scrollWholePage="false">
+        <Table
+          height="400px"
+          items="{Array.from({length: 600}, (_, i) => ({id: i + 1}))}"
+          testId="table"
+        >
+          <Column header="Name" width="2*" bindTo="id">
+            <Text value="File #{$item.id}" />
+          </Column>
+          <Column header="Size" width="*">
+            <Text value="Size #{$item.id}" />
+          </Column>
+        </Table>
+      </App>
+    `);
+
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+
+    // Count actual DOM rows in tbody
+    const rows = page.locator("tbody tr");
+    const rowCount = await rows.count();
+
+    // With 400px height and ~41px per row, should render ~10-15 rows (visible + buffer)
+    // Definitely not all 600 rows
+    expect(rowCount).toBeLessThan(30);
+    expect(rowCount).toBeGreaterThan(5);
+
+    // Verify first visible row exists
+    await expect(page.locator("td").filter({ hasText: "File #1" }).first()).toBeVisible();
+
+    // Verify that rows far down the list are NOT in the DOM initially
+    await expect(page.locator("td").filter({ hasText: "File #600" })).toHaveCount(0);
+    await expect(page.locator("td").filter({ hasText: "File #500" })).toHaveCount(0);
+  });
+
+  test("renders new rows when scrolling through large dataset", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App scrollWholePage="false">
+        <Table
+          height="400px"
+          items="{Array.from({length: 600}, (_, i) => ({id: i + 1}))}"
+          testId="table"
+        >
+          <Column header="Name" bindTo="id">
+            <Text value="File #{$item.id}" />
+          </Column>
+        </Table>
+      </App>
+    `);
+
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+
+    // Initially, row 600 should not be in the DOM
+    await expect(page.locator("td").filter({ hasText: "File #600" })).toHaveCount(0);
+
+    // Scroll to bottom
+    await table.evaluate((el) => {
+      el.scrollTop = el.scrollHeight;
+    });
+
+    // Wait a moment for virtualization to update
+    await page.waitForTimeout(100);
+
+    // Now row 600 should be visible
+    await expect(page.locator("td").filter({ hasText: "File #600" }).first()).toBeVisible();
+
+    // And early rows should no longer be in the DOM
+    await expect(page.locator("td").filter({ hasText: "File #1" })).toHaveCount(0);
+  });
+
+  test("scrollbar thumb tracks correctly with large dataset", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App scrollWholePage="false">
+        <Table
+          height="400px"
+          items="{Array.from({length: 600}, (_, i) => ({id: i + 1}))}"
+          testId="table"
+        >
+          <Column header="Name" bindTo="id">
+            <Text value="Item #{$item.id}" />
+          </Column>
+        </Table>
+      </App>
+    `);
+
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+
+    // Get scroll properties
+    const initialScrollTop = await table.evaluate((el) => el.scrollTop);
+    const scrollHeight = await table.evaluate((el) => el.scrollHeight);
+    const clientHeight = await table.evaluate((el) => el.clientHeight);
+
+    // Verify table is scrollable (scrollHeight > clientHeight)
+    expect(scrollHeight).toBeGreaterThan(clientHeight);
+    expect(initialScrollTop).toBe(0);
+
+    // Scroll to middle
+    await table.evaluate((el) => {
+      el.scrollTop = (el.scrollHeight - el.clientHeight) / 2;
+    });
+
+    const middleScrollTop = await table.evaluate((el) => el.scrollTop);
+    expect(middleScrollTop).toBeGreaterThan(0);
+    expect(middleScrollTop).toBeLessThan(scrollHeight - clientHeight);
+
+    // Scroll to bottom
+    await table.evaluate((el) => {
+      el.scrollTop = el.scrollHeight - el.clientHeight;
+    });
+
+    const bottomScrollTop = await table.evaluate((el) => el.scrollTop);
+    expect(bottomScrollTop).toBeGreaterThan(middleScrollTop);
+
+    // Verify we can see the last item when scrolled to bottom
+    await page.waitForTimeout(100);
+    await expect(page.locator("td").filter({ hasText: "Item #600" }).first()).toBeVisible();
+  });
+
+  test("maintains consistent total scroll height with virtualization", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App scrollWholePage="false">
+        <Table
+          height="400px"
+          items="{Array.from({length: 600}, (_, i) => ({id: i + 1}))}"
+          testId="table"
+          rowHeight="40"
+        >
+          <Column header="Name" bindTo="id">
+            <Text value="Item #{$item.id}" />
+          </Column>
+        </Table>
+      </App>
+    `);
+
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+
+    // Get scroll height
+    const scrollHeight = await table.evaluate((el) => el.scrollHeight);
+    const clientHeight = await table.evaluate((el) => el.clientHeight);
+
+    // With 600 rows at ~41px each (40px + 1px border), total height should be ~24,600px
+    // ScrollHeight = clientHeight + total content height, but the wrapper shows the scrollable area
+    // The scrollHeight should accommodate all 600 items
+    expect(scrollHeight).toBeGreaterThan(20000); // At least 20,000px for 600 items
+    expect(scrollHeight).toBeLessThan(30000); // But not unreasonably large
+
+    // Verify we have a reasonable viewport
+    expect(clientHeight).toBeLessThanOrEqual(450); // 400px height + some margin
+  });
+
+  test("virtualization works correctly with sorting", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App scrollWholePage="false">
+        <Table
+          height="400px"
+          items="{Array.from({length: 600}, (_, i) => ({id: i + 1, name: 'Item ' + (i + 1)}))}"
+          sortBy="id"
+          sortDirection="descending"
+          testId="table"
+        >
+          <Column header="ID" bindTo="id" canSort="true">
+            <Text value="{$item.id}" />
+          </Column>
+          <Column header="Name" bindTo="name">
+            <Text value="{$item.name}" />
+          </Column>
+        </Table>
+      </App>
+    `);
+
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+
+    // Count rows - only visible rows should be rendered
+    const rowCount = await page.locator("tbody tr").count();
+    expect(rowCount).toBeLessThan(30); // Only visible rows rendered
+
+    // First visible item should be 600 (sorted descending)
+    await expect(page.locator("td").filter({ hasText: "600" }).first()).toBeVisible();
+
+    // Item #1 should not be visible (it's at the bottom of sorted list)
+    await expect(page.locator("td").filter({ hasText: /^1$/ })).toHaveCount(0);
+
+    // Verify we can scroll to see item #1 at the bottom
+    await table.evaluate((el) => {
+      el.scrollTop = el.scrollHeight;
+    });
+
+    await page.waitForTimeout(100);
+
+    // Now item #1 should be visible at bottom
+    await expect(page.locator("td").filter({ hasText: /^1$/ }).first()).toBeVisible();
+  });
+
+  test("virtualization works correctly with pagination", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App scrollWholePage="false">
+        <Table
+          height="400px"
+          items="{Array.from({length: 100}, (_, i) => ({id: i + 1}))}"
+          isPaginated="true"
+          pageSize="50"
+          testId="table"
+        >
+          <Column header="ID" bindTo="id">
+            <Text value="{$item.id}" />
+          </Column>
+        </Table>
+      </App>
+    `);
+
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+
+    // Even with pagination showing 50 items, virtualization should still limit DOM rows
+    const rowCount = await page.locator("tbody tr").count();
+    expect(rowCount).toBeLessThan(30); // Still virtualizing within the page
+    expect(rowCount).toBeGreaterThan(5); // But has some visible rows
+
+    // First page shows items 1-50
+    await expect(page.locator("td").filter({ hasText: /^1$/ }).first()).toBeVisible();
+
+    // Item #50 should exist in the data but may not be in viewport initially
+    // Scroll to see if item around index 50 can be reached
+    await table.evaluate((el) => {
+      el.scrollTop = el.scrollHeight;
+    });
+
+    await page.waitForTimeout(100);
+
+    // Should be able to see items near the end of page 1 (around item 50)
+    const visibleCells = await page.locator("td").allTextContents();
+    const hasItemsNear50 = visibleCells.some(text => {
+      const num = parseInt(text);
+      return num >= 45 && num <= 50;
+    });
+    expect(hasItemsNear50).toBe(true);
+
+    // Still only rendering visible rows even after scrolling
+    const scrolledRowCount = await page.locator("tbody tr").count();
+    expect(scrolledRowCount).toBeLessThan(30);
+  });
+
+  test("no virtualization occurs when all items fit in viewport", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App scrollWholePage="false">
+        <Table
+          height="400px"
+          items="{Array.from({length: 5}, (_, i) => ({id: i + 1}))}"
+          testId="table"
+        >
+          <Column header="ID" bindTo="id">
+            <Text value="Item #{$item.id}" />
+          </Column>
+        </Table>
+      </App>
+    `);
+
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+
+    // With only 5 items, all should be rendered
+    const rows = page.locator("tbody tr");
+    await expect(rows).toHaveCount(5);
+
+    // All items should be visible
+    await expect(page.locator("td").filter({ hasText: "Item #1" }).first()).toBeVisible();
+    await expect(page.locator("td").filter({ hasText: "Item #5" }).first()).toBeVisible();
+
+    // Table should not be scrollable
+    const scrollHeight = await table.evaluate((el) => el.scrollHeight);
+    const clientHeight = await table.evaluate((el) => el.clientHeight);
+    
+    // ScrollHeight should be close to clientHeight (no scrolling needed)
+    expect(scrollHeight - clientHeight).toBeLessThan(10);
+  });
+});

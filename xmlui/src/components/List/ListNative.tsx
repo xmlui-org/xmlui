@@ -317,7 +317,6 @@ export const ListNative = forwardRef(function DynamicHeightList2(
   
   // State and ref for measuring first item size when fixedItemSize is enabled
   const firstItemRef = useRef<HTMLDivElement>(null);
-  const [measuredItemSize, setMeasuredItemSize] = useState<number | undefined>(undefined);
 
   const scrollParent = useScrollParent(parentRef.current?.parentElement);
   const scrollRef = useRef(scrollParent);
@@ -356,21 +355,6 @@ export const ListNative = forwardRef(function DynamicHeightList2(
   });
 
   const shift = useShift(rows, idKey);
-
-  // Measure first item size when fixedItemSize is enabled
-  useEffect(() => {
-    if (fixedItemSize && firstItemRef.current && !measuredItemSize && rows.length > 0) {
-      // Add a small delay to ensure the item is rendered
-      requestAnimationFrame(() => {
-        if (firstItemRef.current) {
-          const height = firstItemRef.current.offsetHeight;
-          if (height > 0) {
-            setMeasuredItemSize(height);
-          }
-        }
-      });
-    }
-  }, [fixedItemSize, measuredItemSize, rows.length]);
 
   const initiallyScrolledToBottom = useRef(false);
   useEffect(() => {
@@ -548,7 +532,6 @@ export const ListNative = forwardRef(function DynamicHeightList2(
                 onScroll={onScroll}
                 startMargin={startMargin}
                 item={Item as CustomItemComponent}
-                itemSize={measuredItemSize || 67}
               >
                 {rows.map((row, rowIndex) => {
                   const key = row?.[idKey] ?? rowIndex;
