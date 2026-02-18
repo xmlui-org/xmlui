@@ -1,4 +1,4 @@
-import { forwardRef, useState, CSSProperties, useEffect } from "react";
+import { forwardRef, useState, CSSProperties, useEffect, useRef } from "react";
 import styles from "./Pdf.module.scss";
 import { Document, Page, pdfjs } from "react-pdf";
 import workerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
@@ -86,46 +86,127 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
     },
     ref
   ) {
+    // DIAGNOSTIC: Prevent infinite render loop from freezing browser
+    const renderCount = useRef(0);
+    const renderTimestamp = useRef(Date.now());
+    const renderStack = useRef<string[]>([]);
+    
+    renderCount.current++;
+    const now = Date.now();
+    const timeSinceLastRender = now - renderTimestamp.current;
+    renderTimestamp.current = now;
+    
+    // Detect rapid re-renders (likely infinite loop)
+    if (renderCount.current > 50) {
+      console.error("🚨 INFINITE RENDER LOOP DETECTED! Stopping at render #" + renderCount.current);
+      console.error("Render history:", renderStack.current);
+      throw new Error(`PdfNative: Infinite render loop detected. Component rendered ${renderCount.current} times. Check console for details.`);
+    }
+    
+    // Log render info
+    const renderInfo = `Render #${renderCount.current} (+${timeSinceLastRender}ms) | annotations.length=${annotations.length}`;
+    renderStack.current.push(renderInfo);
+    if (renderStack.current.length > 20) renderStack.current.shift();
+    
+    console.log(`[PdfNative] ${renderInfo}`, {
+      mode,
+      scale,
+      currentPage,
+      annotationsAreNew: !useRef(annotations).current || useRef(annotations).current !== annotations,
+      stack: new Error().stack?.split('\n')[2]
+    });
+    
     const [numPages, setNumPages] = useState<number | null>(null);
     const [internalPage, setInternalPage] = useState<number>(1);
     const [selectedAnnotationId, setSelectedAnnotationId] = useState<string | undefined>();
     
     // Use controlled page if provided, otherwise internal state
     const effectivePage = currentPage ?? internalPage;
+    
+    // DIAGNOSTIC: Track all effects
+    const effectRunCount = useRef(0);
+    
+    // Store latest values in refs for API methods (avoid re-registering API on every prop change)
+    const latestValues = useRef({
+      annotations,
+      numPages,
+      selectedAnnotationId,
+      onAnnotationCreate,
+      onAnnotationUpdate,
+      onAnnotationDelete,
+      onSignatureApply,
+      updateState,
+      signatureData,
+    });
+    
+    // Update refs on every render
+    useEffect(() => {
+      latestValues.current = {
+        annotations,
+        numPages,
+        selectedAnnotationId,
+        onAnnotationCreate,
+        onAnnotationUpdate,
+        onAnnotationDelete,
+        onSignatureApply,
+        updateState,
+        signatureData,
+      };
+    });
+    
+    // Track prop changes
+    const prevProps = useRef({ annotations, mode, scale, currentPage });
+    useEffect(() => {
+      effectRunCount.current++;
+      console.log(`[PdfNative] Effect run #${effectRunCount.current} - Props changed:`, {
+        annotationsChanged: prevProps.current.annotations !== annotations,
+        modeChanged: prevProps.current.mode !== mode,
+        scaleChanged: prevProps.current.scale !== scale,
+        pageChanged: prevProps.current.currentPage !== currentPage,
+      });
+      prevProps.current = { annotations, mode, scale, currentPage };
+    }, [annotations, mode, scale, currentPage]);
 
     // Keyboard event handler for delete
     useEffect(() => {
+      console.log('[PdfNative] Keyboard effect mounted/updated', { selectedAnnotationId, mode });
+      
       const handleKeyDown = (event: KeyboardEvent) => {
         if (!selectedAnnotationId || mode !== "edit") return;
         
         if (event.key === "Delete" || event.key === "Backspace") {
+          console.log('[PdfNative] DELETE key pressed', { selectedAnnotationId });
           // Prevent default backspace navigation
           event.preventDefault();
           
-          // Delete selected annotation
+          // Delete selected annotation - let parent component handle state updates
           onAnnotationDelete?.(selectedAnnotationId);
-          updateState?.({
-            annotations: annotations.filter(a => a.id !== selectedAnnotationId)
-          });
           setSelectedAnnotationId(undefined);
         }
       };
 
       document.addEventListener("keydown", handleKeyDown);
-      return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [selectedAnnotationId, mode, annotations, onAnnotationDelete, updateState]);
+      return () => {
+        console.log('[PdfNative] Keyboard effect cleanup');
+        document.removeEventListener("keydown", handleKeyDown);
+      };
+    }, [selectedAnnotationId, mode, onAnnotationDelete]);
 
     function handleLoadSuccess({ numPages }: { numPages: number }) {
+      console.log('[PdfNative] handleLoadSuccess called', { numPages });
       setNumPages(numPages);
       onDocumentLoad?.(numPages);
       
       // Update XMLUI state if connected
-      updateState?.({
-        pageCount: numPages,
-        currentPage: effectivePage,
-        annotations,
-        mode,
-      });
+      if (updateState) {
+        console.log('[PdfNative] Calling updateState from handleLoadSuccess');
+        updateState?.({
+          pageCount: numPages,
+          currentPage: effectivePage,
+          annotations,
+          mode,
+        });
+      }
     }
 
     function handlePageChange(page: number) {
@@ -181,18 +262,22 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
       return newAnnotation.id;
     }
 
-    // Register component API methods
-    if (registerComponentApi) {
+    // Register component API methods (only once on mount to avoid infinite loops)
+    useEffect(() => {
+      if (!registerComponentApi) return;
+      
       registerComponentApi({
         goToPage: (page: number) => {
+          const { numPages } = latestValues.current;
           if (page >= 1 && page <= (numPages ?? 1)) {
             handlePageChange(page);
           }
         },
         setScale: (newScale: number) => {
-          updateState?.({ scale: newScale });
+          latestValues.current.updateState?.({ scale: newScale });
         },
         addAnnotation: (annotationData: any) => {
+          const { annotations, onAnnotationCreate, updateState } = latestValues.current;
           const newAnnotation: Annotation = {
             ...annotationData,
             id: `annotation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -206,6 +291,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
           return newAnnotation.id;
         },
         updateAnnotation: (id: string, updates: any) => {
+          const { annotations, onAnnotationUpdate, updateState } = latestValues.current;
           const annotation = annotations.find(a => a.id === id);
           if (annotation) {
             const updated = {
@@ -220,6 +306,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
           }
         },
         deleteAnnotation: (id: string) => {
+          const { annotations, selectedAnnotationId, onAnnotationDelete, updateState } = latestValues.current;
           onAnnotationDelete?.(id);
           updateState?.({
             annotations: annotations.filter(a => a.id !== id)
@@ -228,17 +315,17 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
             setSelectedAnnotationId(undefined);
           }
         },
-        getAnnotations: () => annotations,
+        getAnnotations: () => latestValues.current.annotations,
         openSignatureModal: (fieldId: string) => {
           // Will be implemented in Phase 2
           console.log("openSignatureModal not yet implemented", fieldId);
         },
         applySignature: (fieldId: string, signature: SignatureData) => {
-          onSignatureApply?.(fieldId, signature);
+          latestValues.current.onSignatureApply?.(fieldId, signature);
         },
-        getSignature: () => signatureData,
+        getSignature: () => latestValues.current.signatureData,
       });
-    }
+    }, [registerComponentApi]); // Only re-run if registerComponentApi function itself changes
 
     // Use data if provided, otherwise use src
     const fileSource = data || src;
@@ -292,20 +379,20 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
                     scale={scale}
                     selectedAnnotationId={selectedAnnotationId}
                     onAnnotationSelect={(id) => {
+                      console.log('[PdfNative] onAnnotationSelect called', { id });
                       setSelectedAnnotationId(id);
                       onAnnotationSelect?.(id);
                     }}
                     onAnnotationUpdate={(id, updates) => {
+                      console.log('[PdfNative] AnnotationLayer.onAnnotationUpdate called', { id, updates });
                       onAnnotationUpdate?.({
                         ...annotations.find(a => a.id === id)!,
                         ...updates,
                       });
                     }}
                     onAnnotationDelete={(id) => {
+                      console.log('[PdfNative] AnnotationLayer.onAnnotationDelete called', { id });
                       onAnnotationDelete?.(id);
-                      updateState?.({
-                        annotations: annotations.filter(a => a.id !== id)
-                      });
                       setSelectedAnnotationId(undefined);
                     }}
                   />
@@ -319,6 +406,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
           <FieldProperties
             annotation={selectedAnnotation}
             onUpdate={(id, updates) => {
+              console.log('[PdfNative] FieldProperties.onUpdate called', { id, updates });
               onAnnotationUpdate?.({
                 ...annotations.find(a => a.id === id)!,
                 ...updates,
