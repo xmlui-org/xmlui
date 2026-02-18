@@ -1,4 +1,5 @@
 import styles from "./DropdownMenu.module.scss";
+import type { ReactNode } from "react";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
@@ -113,7 +114,7 @@ export const dropdownMenuComponentRenderer = createComponentRenderer(
   DDMCOMP,
   DropdownMenuMd,
   ({ node, extractValue, renderChild, registerComponentApi, className, lookupEventHandler }) => {
-    // Filter out adjacent separators before rendering
+    // Filter adjacent separators before rendering to prevent flash
     const filteredChildren = filterAdjacentSeparators(node.children);
     
     return (
@@ -211,6 +212,7 @@ export const menuItemRenderer = createComponentRenderer(
         navigateAction?.({ pathname: to });
       };
     }
+    
     return (
       <MenuItem
         onClick={clickHandler}
@@ -264,7 +266,7 @@ export const subMenuItemRenderer = createComponentRenderer(
   SubMenuItemMd,
   ({ node, renderChild, extractValue }) => {
     const iconName = extractValue(node.props?.icon);
-    // Filter out adjacent separators before rendering
+    // Filter adjacent separators before rendering to prevent flash
     const filteredChildren = filterAdjacentSeparators(node.children);
     
     return (
