@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import type {
   CellContext,
@@ -17,7 +17,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { composeRefs } from "@radix-ui/react-compose-refs";
-import { Virtualizer, type VirtualizerHandle } from "virtua";
+import { Virtualizer, type VirtualizerHandle, type CustomItemComponentProps, type CustomItemComponent } from "virtua";
 import { orderBy } from "lodash-es";
 import classnames from "classnames";
 
@@ -1175,6 +1175,167 @@ export const Table = forwardRef(
 
     const hasData = safeData.length !== 0;
 
+    // Use a ref to avoid recreating VirtualTableRow when rows change
+    const rowsRef = useRef(rows);
+    rowsRef.current = rows;
+
+    // Custom row component for Virtualizer - memoized to avoid recreation on every render
+    const VirtualTableRow = useMemo(() => {
+      const RowComponent = forwardRef<HTMLTableRowElement, CustomItemComponentProps>(
+        ({ style, children, index: rowIndex }, ref) => {
+          const row = rowsRef.current[rowIndex];
+          if (!row) return null;
+          const isFirstRow = rowIndex === 0;
+          
+          return (
+            <tr
+              data-index={rowIndex}
+              ref={composeRefs(ref, isFirstRow ? firstRowRef : undefined)}
+              style={{
+                ...style,
+                userSelect: effectiveUserSelectRow as React.CSSProperties['userSelect'],
+              }}
+              className={classnames(styles.row, {
+                [styles.selected]: row.getIsSelected(),
+                [styles.focused]: focusedIndex === rowIndex,
+                [styles.disabled]: rowDisabledPredicate(row.original),
+                [styles.noBottomBorder]: noBottomBorder,
+              })}
+              onClick={(event) => {
+                if (!row.getCanSelect()) {
+                  return;
+                }
+                if (event?.defaultPrevented) {
+                  return;
+                }
+                const target = event.target as HTMLElement;
+                if (target.tagName.toLowerCase() === "input") {
+                  return;
+                }
+                if (target.closest("button")) {
+                  return;
+                }
+                
+                // Focus the table wrapper to enable keyboard shortcuts (after checking input/button)
+                wrapperRef.current?.focus();
+
+                // Check if click is within checkbox boundary
+                const currentRow = event.currentTarget as HTMLElement;
+                const checkbox = currentRow.querySelector(
+                  'input[type="checkbox"]',
+                ) as HTMLInputElement;
+
+                if (checkbox) {
+                  const checkboxRect = checkbox.getBoundingClientRect();
+                  const clickX = event.clientX;
+                  const clickY = event.clientY;
+
+                  if (
+                    isWithinCheckboxBoundary(clickX, clickY, checkboxRect, tolerancePixels)
+                  ) {
+                    // Toggle the checkbox when clicking within the boundary
+                    // In single selection mode, allow deselection by checking if already selected
+                    if (!enableMultiRowSelection && row.getIsSelected()) {
+                      checkAllRows(false); // Deselect all (which is just this one row)
+                    } else {
+                      toggleRow(row.original, { metaKey: true });
+                    }
+                    return;
+                  }
+                }
+                toggleRow(row.original, event);
+              }}
+              onDoubleClick={(event) => {
+                  // Prevent browser text selection on double-click
+                  event.preventDefault();
+
+                  // Call external handler if provided
+                  try {
+                    if (typeof (rowDoubleClick as any) === "function") {
+                      (rowDoubleClick as any)(row.original);
+                    }
+                  } catch (e) {
+                    // swallow errors from handler
+                  }
+                }}
+              onMouseMove={(event) => {
+                // Change cursor and hover state when within checkbox boundary
+                const currentRow = event.currentTarget as HTMLElement;
+                const checkbox = currentRow.querySelector(
+                  'input[type="checkbox"]',
+                ) as HTMLInputElement;
+
+                if (checkbox) {
+                  const checkboxRect = checkbox.getBoundingClientRect();
+                  const mouseX = event.clientX;
+                  const mouseY = event.clientY;
+
+                  const shouldShowHover = isWithinCheckboxBoundary(
+                    mouseX,
+                    mouseY,
+                    checkboxRect,
+                    tolerancePixels,
+                  );
+
+                  // Update hover state and cursor based on proximity to checkbox
+                  if (shouldShowHover) {
+                    setHoveredRowId(row.id);
+                    currentRow.style.cursor = "pointer";
+                  } else {
+                    setHoveredRowId(null);
+                    currentRow.style.cursor = "";
+                  }
+                }
+              }}
+              onMouseLeave={(event) => {
+                // Reset cursor and hover state when leaving the row
+                const currentRow = event.currentTarget as HTMLElement;
+                currentRow.style.cursor = "";
+                setHoveredRowId(null);
+              }}
+              onContextMenu={(event) => {
+                // Prevent default browser context menu
+                event.preventDefault();
+                
+                // Use lookupEventHandler with context containing row variables
+                if (lookupEventHandler) {
+                  const handler = lookupEventHandler("contextMenu", {
+                    context: {
+                      $item: row.original,
+                      $row: row.original,
+                      $rowIndex: rowIndex,
+                      $itemIndex: rowIndex,
+                    },
+                    ephemeral: true, // Don't cache this handler since context changes per row
+                  });
+                  
+                  handler?.(event);
+                }
+              }}
+            >
+              {children}
+            </tr>
+          );
+        }
+      );
+      RowComponent.displayName = 'VirtualTableRow';
+      return RowComponent;
+    }, [
+      focusedIndex,
+      rowDisabledPredicate,
+      noBottomBorder,
+      effectiveUserSelectRow,
+      firstRowRef,
+      toggleRow,
+      checkAllRows,
+      enableMultiRowSelection,
+      tolerancePixels,
+      wrapperRef,
+      setHoveredRowId,
+      lookupEventHandler,
+      rowDoubleClick,
+    ]);
+
     const touchedSizesRef = useRef<Record<string, boolean>>({});
     const columnSizeTouched = useCallback((id: string) => {
       touchedSizesRef.current[id] = true;
@@ -1501,177 +1662,52 @@ export const Table = forwardRef(
             </>
           )}
           {hasData && (
-            <tbody className={styles.tableBody}>
-              <Virtualizer
-                ref={virtualizerRef}
-                scrollRef={wrapperRef}
-                itemSize={effectiveRowHeight}
-                startMargin={startMargin}
-              >
-                {rows.map((row, rowIndex) => {
-                  const isFirstRow = rowIndex === 0;
-                  return (
-                    <tr
-                      data-index={rowIndex}
-                      key={`${row.id}-${rowIndex}`}
-                      ref={isFirstRow ? firstRowRef : undefined}
-                      className={classnames(styles.row, {
-                        [styles.selected]: row.getIsSelected(),
-                        [styles.focused]: focusedIndex === rowIndex,
-                        [styles.disabled]: rowDisabledPredicate(row.original),
-                        [styles.noBottomBorder]: noBottomBorder,
-                      })}
-                      style={{ userSelect: effectiveUserSelectRow as React.CSSProperties['userSelect'] }}
-                      onClick={(event) => {
-                        if (!row.getCanSelect()) {
-                          return;
-                        }
-                        if (event?.defaultPrevented) {
-                          return;
-                        }
-                        const target = event.target as HTMLElement;
-                        if (target.tagName.toLowerCase() === "input") {
-                          return;
-                        }
-                        if (target.closest("button")) {
-                          return;
-                        }
-                        
-                        // Focus the table wrapper to enable keyboard shortcuts (after checking input/button)
-                        wrapperRef.current?.focus();
-
-                        // Check if click is within checkbox boundary
-                        const currentRow = event.currentTarget as HTMLElement;
-                        const checkbox = currentRow.querySelector(
-                          'input[type="checkbox"]',
-                        ) as HTMLInputElement;
-
-                        if (checkbox) {
-                          const checkboxRect = checkbox.getBoundingClientRect();
-                          const clickX = event.clientX;
-                          const clickY = event.clientY;
-
-                          if (
-                            isWithinCheckboxBoundary(clickX, clickY, checkboxRect, tolerancePixels)
-                          ) {
-                            // Toggle the checkbox when clicking within the boundary
-                            // In single selection mode, allow deselection by checking if already selected
-                            if (!enableMultiRowSelection && row.getIsSelected()) {
-                              checkAllRows(false); // Deselect all (which is just this one row)
-                            } else {
-                              toggleRow(row.original, { metaKey: true });
-                            }
-                            return;
-                          }
-                        }
-                        toggleRow(row.original, event);
-                      }}
-                      onDoubleClick={(event) => {
-                          // Prevent browser text selection on double-click
-                          event.preventDefault();
-
-                          // Call external handler if provided
-                          try {
-                            if (typeof (rowDoubleClick as any) === "function") {
-                              (rowDoubleClick as any)(row.original);
-                            }
-                          } catch (e) {
-                            // swallow errors from handler
-                          }
+            <Virtualizer
+              as="tbody"
+              item={VirtualTableRow as CustomItemComponent}
+              ref={virtualizerRef}
+              scrollRef={wrapperRef}
+              itemSize={effectiveRowHeight}
+              startMargin={startMargin}
+            >
+              {rows.map((row, rowIndex) => (
+                <Fragment key={`${row.id}-${rowIndex}`}>
+                  {row.getVisibleCells().map((cell, i) => {
+                    const cellRenderer = cell.column.columnDef?.meta?.cellRenderer;
+                    const size = cell.column.getSize();
+                    const columnClassName = cell.column.columnDef?.meta?.className;
+                    const columnStyle = cell.column.columnDef?.meta?.style;
+                    const alignmentClass =
+                      cellVerticalAlign === "top"
+                        ? styles.alignTop
+                        : cellVerticalAlign === "bottom"
+                          ? styles.alignBottom
+                          : styles.alignCenter;
+                    return (
+                      <td
+                        className={classnames(styles.cell, alignmentClass, columnClassName)}
+                        key={`${cell.id}-${i}`}
+                        style={{
+                          width: size,
+                          flexShrink: 0,
+                          ...getCommonPinningStyles(cell.column),
+                          ...columnStyle,
                         }}
-                      onMouseMove={(event) => {
-                        // Change cursor and hover state when within checkbox boundary
-                        const currentRow = event.currentTarget as HTMLElement;
-                        const checkbox = currentRow.querySelector(
-                          'input[type="checkbox"]',
-                        ) as HTMLInputElement;
-
-                        if (checkbox) {
-                          const checkboxRect = checkbox.getBoundingClientRect();
-                          const mouseX = event.clientX;
-                          const mouseY = event.clientY;
-
-                          const shouldShowHover = isWithinCheckboxBoundary(
-                            mouseX,
-                            mouseY,
-                            checkboxRect,
-                            tolerancePixels,
-                          );
-
-                          // Update hover state and cursor based on proximity to checkbox
-                          if (shouldShowHover) {
-                            setHoveredRowId(row.id);
-                            currentRow.style.cursor = "pointer";
-                          } else {
-                            setHoveredRowId(null);
-                            currentRow.style.cursor = "";
-                          }
-                        }
-                      }}
-                      onMouseLeave={(event) => {
-                        // Reset cursor and hover state when leaving the row
-                        const currentRow = event.currentTarget as HTMLElement;
-                        currentRow.style.cursor = "";
-                        setHoveredRowId(null);
-                      }}
-                      onContextMenu={(event) => {
-                        // Prevent default browser context menu
-                        event.preventDefault();
-                        
-                        // Use lookupEventHandler with context containing row variables
-                        if (lookupEventHandler) {
-                          const handler = lookupEventHandler("contextMenu", {
-                            context: {
-                              $item: row.original,
-                              $row: row.original,
-                              $rowIndex: rowIndex,
-                              $itemIndex: rowIndex,
-                            },
-                            ephemeral: true, // Don't cache this handler since context changes per row
-                          });
-                          
-                          handler?.(event);
-                        }
-                      }}
-                    >
-                      {row.getVisibleCells().map((cell, i) => {
-                        const cellRenderer = cell.column.columnDef?.meta?.cellRenderer;
-                        const size = cell.column.getSize();
-                        const columnClassName = cell.column.columnDef?.meta?.className;
-                        const columnStyle = cell.column.columnDef?.meta?.style;
-                        const alignmentClass =
-                          cellVerticalAlign === "top"
-                            ? styles.alignTop
-                            : cellVerticalAlign === "bottom"
-                              ? styles.alignBottom
-                              : styles.alignCenter;
-                        return (
-                          <td
-                            className={classnames(styles.cell, alignmentClass, columnClassName)}
-                            key={`${cell.id}-${i}`}
-                            style={{
-                              width: size,
-                              flexShrink: 0,
-                              ...getCommonPinningStyles(cell.column),
-                              ...columnStyle,
-                            }}
-                          >
-                            <div className={styles.cellContent} style={{ userSelect: effectiveUserSelectCell as React.CSSProperties['userSelect'] }}>
-                              {cellRenderer
-                                ? cellRenderer(cell.row.original, rowIndex, i, cell?.getValue())
-                                : (flexRender(
-                                    cell.column.columnDef.cell,
-                                    cell.getContext(),
-                                  ) as ReactNode)}
-                            </div>
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  );
-                })}
-              </Virtualizer>
-            </tbody>
+                      >
+                        <div className={styles.cellContent} style={{ userSelect: effectiveUserSelectCell as React.CSSProperties['userSelect'] }}>
+                          {cellRenderer
+                            ? cellRenderer(cell.row.original, rowIndex, i, cell?.getValue())
+                            : (flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext(),
+                              ) as ReactNode)}
+                        </div>
+                      </td>
+                    );
+                  })}
+                </Fragment>
+              ))}
+            </Virtualizer>
           )}
         </table>
         {loading && !hasData && (
