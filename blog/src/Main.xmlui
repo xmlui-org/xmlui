@@ -72,9 +72,17 @@
         <Page url="/blog">
             <BlogOverview />
         </Page>
-
-        <Page url="/blog/:slug">
-            <BlogPage post="{appGlobals.blog.posts.find(p => p.slug === $routeParams.slug)}" />
+        <Page
+            url="/blog/:slug"
+            staticPaths="{
+            posts.map((p) => {
+              return { params: { slug: p.slug } };
+            })}">
+            <script>
+                var post = posts.find(p => p.slug === $routeParams.slug)
+            </script>
+            <BlogPage when="{post}" post="{post}" />
+            <Redirect when="{!post}" to="/404" />
         </Page>
     </Pages>
     <Footer sticky="false">

@@ -2,7 +2,7 @@
     <script>
         var layout = getThemeVar("layout") || "basic";
         var showTags = getThemeVar("tags") !== "false";
-        var sortedPosts = (appGlobals.blog?.posts || [])
+        var sortedPosts = (posts || [])
             .filter((p) => !p.draft)
             .toSorted((a, b) => Date.parse(b.date) - Date.parse(a.date));
         var allTags = distinct(sortedPosts.flatMap((p) => p.tags || [])).toSorted();
