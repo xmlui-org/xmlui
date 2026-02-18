@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Annotation } from "../../types/annotation.types";
 import { useDrag } from "../../hooks/useDrag";
 import { screenToPdfCoordinates } from "../../utils/coordinateMapping";
+import { ResizableAnnotation } from "./ResizableAnnotation";
 import styles from "./DraggableAnnotation.module.scss";
 
 export interface DraggableAnnotationProps {
@@ -89,7 +90,17 @@ export function DraggableAnnotation({
       data-annotation-id={annotation.id}
       data-annotation-type={annotation.type}
     >
-      {children}
+      <ResizableAnnotation
+        annotation={annotation}
+        isSelected={isSelected}
+        screenSize={screenSize}
+        pageWidth={pageWidth}
+        pageHeight={pageHeight}
+        scale={scale}
+        onAnnotationUpdate={onAnnotationUpdate}
+      >
+        {children}
+      </ResizableAnnotation>
     </div>
   );
 }

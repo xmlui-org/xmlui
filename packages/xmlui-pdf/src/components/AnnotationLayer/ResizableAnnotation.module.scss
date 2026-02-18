@@ -1,0 +1,66 @@
+.resizableWrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.resizing {
+  opacity: 0.8;
+  user-select: none;
+  pointer-events: none;
+}
+
+.resizeHandles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.resizeHandle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: #007bff;
+  border: 2px solid white;
+  border-radius: 50%;
+  pointer-events: all;
+  z-index: 10;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+
+  &:hover {
+    transform: scale(1.3);
+    background-color: #0056b3;
+  }
+
+  &:active {
+    transform: scale(1.5);
+  }
+}
+
+// Position handles at corners
+.nw {
+  top: -5px;
+  left: -5px;
+  cursor: nw-resize;
+}
+
+.ne {
+  top: -5px;
+  right: -5px;
+  cursor: ne-resize;
+}
+
+.sw {
+  bottom: -5px;
+  left: -5px;
+  cursor: sw-resize;
+}
+
+.se {
+  bottom: -5px;
+  right: -5px;
+  cursor: se-resize;
+}
