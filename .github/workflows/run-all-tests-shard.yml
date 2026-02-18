@@ -76,10 +76,10 @@ jobs:
           pattern: blob-report-*
           merge-multiple: true
       - name: Merge into HTML Report
-        run: npx playwright merge-reports --reporter html ./all-blob-reports
-      - name: Upload HTML report
+        run: npx playwright merge-reports --reporter github ./all-blob-reports
+      - name: Upload Github report
         uses: actions/upload-artifact@v4
         with:
-          name: html-report--attempt-${{ github.run_attempt }}
+          name: report-attempt-${{ github.run_attempt }}
           path: playwright-report
           retention-days: 14
