@@ -58,7 +58,7 @@ const App: StandaloneAppDescription = {
     "icon.context": "/resources/icons/context.svg",
     "icon.globals": "/resources/icons/globals.svg",
     "icon.helper-tags": "/resources/icons/helper-tags.svg",
-    "icon.universal-props": "/resources/icons/universal-props.svg",
+    "icon.core-props": "/resources/icons/core-props.svg",
     "icon.template-props": "/resources/icons/template-props.svg",
     "icon.icons": "/resources/icons/icons.svg",
     "icon.glossary": "/resources/icons/glossary.svg",
