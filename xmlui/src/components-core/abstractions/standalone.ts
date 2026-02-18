@@ -33,7 +33,10 @@ export type StandaloneAppDescription = {
   appGlobals?: Record<string, any>;
   apiInterceptor?: ApiInterceptorDefinition;
   sources?: Record<string, string>;
+
+  icons?: Record<string, string>;
 };
+
 
 export type StandaloneJsonConfig = {
   name?: string;

@@ -144,6 +144,250 @@ import { ChevronsRightIcon } from "./Icon/ChevronsRight";
 import { ChevronsLeftIcon } from "./Icon/ChevronsLeft";
 import { ICON_NAMES } from "./icons-abstractions";
 
+const svgAttributeMap: Record<string, string> = {
+  // SVG attributes
+  accentheight: "accentHeight",
+  accumulate: "accumulate",
+  additive: "additive",
+  alignmentbaseline: "alignmentBaseline",
+  allowreorder: "allowReorder",
+  alphabetic: "alphabetic",
+  amplitude: "amplitude",
+  arabicform: "arabicForm",
+  ascent: "ascent",
+  attributename: "attributeName",
+  attributetype: "attributeType",
+  autoreverse: "autoReverse",
+  azimuth: "azimuth",
+  basefrequency: "baseFrequency",
+  baseprofile: "baseProfile",
+  baselineshift: "baselineShift",
+  bbox: "bbox",
+  begin: "begin",
+  bias: "bias",
+  by: "by",
+  calcmode: "calcMode",
+  capheight: "capHeight",
+  clip: "clip",
+  clippath: "clipPath",
+  clippathunits: "clipPathUnits",
+  cliprule: "clipRule",
+  colorinterpolation: "colorInterpolation",
+  colorinterpolationfilters: "colorInterpolationFilters",
+  colorprofile: "colorProfile",
+  colorrendering: "colorRendering",
+  contentscripttype: "contentScriptType",
+  contentstyletype: "contentStyleType",
+  cursor: "cursor",
+  cx: "cx",
+  cy: "cy",
+  d: "d",
+  decelerate: "decelerate",
+  descent: "descent",
+  diffuseconstant: "diffuseConstant",
+  direction: "direction",
+  display: "display",
+  divisor: "divisor",
+  dominantbaseline: "dominantBaseline",
+  dur: "dur",
+  dx: "dx",
+  dy: "dy",
+  edgemode: "edgeMode",
+  elevation: "elevation",
+  enablebackground: "enableBackground",
+  end: "end",
+  exponent: "exponent",
+  externalresourcesrequired: "externalResourcesRequired",
+  fill: "fill",
+  fillopacity: "fillOpacity",
+  fillrule: "fillRule",
+  filter: "filter",
+  filterres: "filterRes",
+  filterunits: "filterUnits",
+  floodcolor: "floodColor",
+  floodopacity: "floodOpacity",
+  focusable: "focusable",
+  fontfamily: "fontFamily",
+  fontsize: "fontSize",
+  fontsizeadjust: "fontSizeAdjust",
+  fontstretch: "fontStretch",
+  fontstyle: "fontStyle",
+  fontvariant: "fontVariant",
+  fontweight: "fontWeight",
+  format: "format",
+  from: "from",
+  fx: "fx",
+  fy: "fy",
+  g1: "g1",
+  g2: "g2",
+  glyphname: "glyphName",
+  glyphorientationhorizontal: "glyphOrientationHorizontal",
+  glyphorientationvertical: "glyphOrientationVertical",
+  glyphref: "glyphRef",
+  gradienttransform: "gradientTransform",
+  gradientunits: "gradientUnits",
+  hanging: "hanging",
+  horizadvx: "horizAdvX",
+  horizoriginx: "horizOriginX",
+  ideographic: "ideographic",
+  imagerendering: "imageRendering",
+  in: "in",
+  in2: "in2",
+  intercept: "intercept",
+  k: "k",
+  k1: "k1",
+  k2: "k2",
+  k3: "k3",
+  k4: "k4",
+  kernelmatrix: "kernelMatrix",
+  kernelunitlength: "kernelUnitLength",
+  kerning: "kerning",
+  keypoints: "keyPoints",
+  keysplines: "keySplines",
+  keytimes: "keyTimes",
+  lengthadjust: "lengthAdjust",
+  letterspacing: "letterSpacing",
+  lightingcolor: "lightingColor",
+  limitingconeangle: "limitingConeAngle",
+  local: "local",
+  markerend: "markerEnd",
+  markerheight: "markerHeight",
+  markermid: "markerMid",
+  markerstart: "markerStart",
+  markerunits: "markerUnits",
+  markerwidth: "markerWidth",
+  mask: "mask",
+  maskcontentunits: "maskContentUnits",
+  maskunits: "maskUnits",
+  mathematical: "mathematical",
+  mode: "mode",
+  numoctaves: "numOctaves",
+  offset: "offset",
+  opacity: "opacity",
+  operator: "operator",
+  order: "order",
+  orient: "orient",
+  orientation: "orientation",
+  origin: "origin",
+  overflow: "overflow",
+  overlineposition: "overlinePosition",
+  overlinethickness: "overlineThickness",
+  paintorder: "paintOrder",
+  panose1: "panose1",
+  pathlength: "pathLength",
+  patterncontentunits: "patternContentUnits",
+  patterntransform: "patternTransform",
+  patternunits: "patternUnits",
+  pointerevents: "pointerEvents",
+  points: "points",
+  pointsatx: "pointsAtX",
+  pointsaty: "pointsAtY",
+  pointsatz: "pointsAtZ",
+  preservealpha: "preserveAlpha",
+  preserveaspectratio: "preserveAspectRatio",
+  primitiveunits: "primitiveUnits",
+  r: "r",
+  radius: "radius",
+  refx: "refX",
+  refy: "refY",
+  renderingintent: "renderingIntent",
+  repeatcount: "repeatCount",
+  repeatdur: "repeatDur",
+  requiredextensions: "requiredExtensions",
+  requiredfeatures: "requiredFeatures",
+  restart: "restart",
+  result: "result",
+  rotate: "rotate",
+  rx: "rx",
+  ry: "ry",
+  scale: "scale",
+  seed: "seed",
+  shaperendering: "shapeRendering",
+  slope: "slope",
+  spacing: "spacing",
+  specularconstant: "specularConstant",
+  specularexponent: "specularExponent",
+  speed: "speed",
+  spreadmethod: "spreadMethod",
+  startoffset: "startOffset",
+  stddeviation: "stdDeviation",
+  stemh: "stemh",
+  stemv: "stemv",
+  stitchtiles: "stitchTiles",
+  stopcolor: "stopColor",
+  stopopacity: "stopOpacity",
+  strikethroughposition: "strikethroughPosition",
+  strikethroughthickness: "strikethroughThickness",
+  string: "string",
+  stroke: "stroke",
+  strokedasharray: "strokeDasharray",
+  strokedashoffset: "strokeDashoffset",
+  strokelinecap: "strokeLinecap",
+  strokelinejoin: "strokeLinejoin",
+  strokemiterlimit: "strokeMiterlimit",
+  strokeopacity: "strokeOpacity",
+  strokewidth: "strokeWidth",
+  surfacescale: "surfaceScale",
+  systemlanguage: "systemLanguage",
+  tablevalues: "tableValues",
+  targetx: "targetX",
+  targety: "targetY",
+  textanchor: "textAnchor",
+  textdecoration: "textDecoration",
+  textlength: "textLength",
+  textrendering: "textRendering",
+  to: "to",
+  transform: "transform",
+  u1: "u1",
+  u2: "u2",
+  underlineposition: "underlinePosition",
+  underlinethickness: "underlineThickness",
+  unicode: "unicode",
+  unicodebidi: "unicodeBidi",
+  unicoderange: "unicodeRange",
+  unitsperem: "unitsPerEm",
+  valphabetic: "vAlphabetic",
+  vhanging: "vHanging",
+  videographic: "vIdeographic",
+  vmathematical: "vMathematical",
+  values: "values",
+  vectoreffect: "vectorEffect",
+  version: "version",
+  vertadvy: "vertAdvY",
+  vertoriginx: "vertOriginX",
+  vertoriginy: "vertOriginY",
+  viewbox: "viewBox",
+  viewtarget: "viewTarget",
+  visibility: "visibility",
+  widths: "widths",
+  wordspacing: "wordSpacing",
+  writingmode: "writingMode",
+  x: "x",
+  x1: "x1",
+  x2: "x2",
+  xchannelselector: "xChannelSelector",
+  xheight: "xHeight",
+  xlinkactuate: "xlinkActuate",
+  xlinkarcrole: "xlinkArcrole",
+  xlinkhref: "xlinkHref",
+  xlinkrole: "xlinkRole",
+  xlinkshow: "xlinkShow",
+  xlinktitle: "xlinkTitle",
+  xlinktype: "xlinkType",
+  xmlns: "xmlns",
+  xmlnsxlink: "xmlnsXlink",
+  xmlbase: "xmlBase",
+  xmllang: "xmlLang",
+  xmlspace: "xmlSpace",
+  y: "y",
+  y1: "y1",
+  y2: "y2",
+  ychannelselector: "yChannelSelector",
+  z: "z",
+  zoomandpan: "zoomAndPan",
+};
+const extraCharRegex = /[-:]/g;
+
 type IconRenderer<T extends IconBaseProps> = (
   props: T,
   ref: ForwardedRef<HTMLElement>,
@@ -338,7 +582,7 @@ registerIconRenderer(ICON_NAMES.TABLE_DELETE_COLUMN, (props) => <TableDeleteColu
 registerIconRenderer(ICON_NAMES.EYE, (props) => <IoEyeOutlineIcon {...props} />);
 registerIconRenderer(ICON_NAMES.EYE_OFF, (props) => <IoEyeOffOutlineIcon {...props} />);
 
-export function IconProvider({ children }: { children: ReactNode }) {
+export function IconProvider({ children, icons }: { children: ReactNode, icons: Record<string, string> }) {
   const getRegisteredIconNames = useCallback(() => {
     return Array.from(pool.keys());
   }, []);
@@ -353,11 +597,190 @@ export function IconProvider({ children }: { children: ReactNode }) {
   const attachedResources = useRef<Record<string, boolean>>({});
   const spriteRootRef = useRef<SVGSVGElement>(null);
 
-  const ensureCustomSvgIcon = useCallback(async (resourceUrl: string) => {
+  useMemo(() => {
+    console.log(icons)
+    if (!icons) return;
+
+    Object.entries(icons).forEach(([iconName, svgData]) => {
+      const iconKey = iconName.toLowerCase();
+      
+      // Skip if already registered
+      if (pool.has(iconKey)) {
+        return;
+      }
+
+      // Decode data URI if needed
+      let decodedSvgData = svgData;
+      if (svgData.startsWith('data:image/svg+xml,')) {
+        decodedSvgData = decodeURIComponent(svgData.replace('data:image/svg+xml,', ''));
+      } else if (svgData.startsWith('data:image/svg+xml;base64,')) {
+        decodedSvgData = atob(svgData.replace('data:image/svg+xml;base64,', ''));
+      }
+
+      // Extract attributes from SVG data using regex (SSR-safe)
+      // Only extract from the opening <svg> tag, not from inner content
+      const svgTagMatch = decodedSvgData.match(/<svg([^>]*)>/);
+      const svgTag = svgTagMatch?.[1] || '';
+      
+      // Pattern matches: attribute-name="value" or attribute-name='value'
+      // Handles hyphens, colons, dots in attribute names (for data-, aria-, xlink:, etc.)
+      const attributePattern = /([\w:.-]+)\s*=\s*["']([^"']*)["']/g;
+      const extractedAttrs: Record<string, string> = {};
+      let match: RegExpExecArray | null;
+      
+      while ((match = attributePattern.exec(svgTag)) !== null) {
+        const [, attrName, attrValue] = match;
+        extractedAttrs[attrName] = attrValue;
+      }
+
+      // Map extracted attributes to React-safe names
+      const safeAttributes: Record<string, any> = {};
+      Object.entries(extractedAttrs).forEach(([key, value]) => {
+        let safeKey = key;
+        
+        // Keep data- and aria- attributes as-is
+        if (/^(data-|aria-)/.test(key)) {
+          safeKey = key;
+        } else {
+          // Convert to lowercase and remove special chars, then map to React prop name
+          const normalizedKey = key.replace(extraCharRegex, "").toLowerCase();
+          safeKey = svgAttributeMap[normalizedKey] || key;
+        }
+        
+        // Skip class attribute (will use className from props)
+        if (safeKey !== 'class' && safeKey !== 'className') {
+          safeAttributes[safeKey] = value;
+        }
+      });
+
+      // Extract inner content (everything between <svg> tags)
+      // Remove comments from the SVG content
+      const innerContent = decodedSvgData
+        .replace(/<svg[^>]*>|<\/svg>/g, '')
+        .replace(/<!--[\s\S]*?-->/g, '');
+      
+      const viewBox = safeAttributes.viewBox || '0 0 24 24';
+      const defaultFill = safeAttributes.fill;
+      const defaultStroke = safeAttributes.stroke;
+      const defaultStrokeWidth = safeAttributes.strokeWidth;
+
+      console.log(safeAttributes)
+
+      // Register icon renderer immediately (works on server and client)
+      registerIconRenderer(iconKey, (props: IconBaseProps) => {
+        const size = props.size || safeAttributes.width || safeAttributes.height || 24;
+        
+        // Merge safe attributes with props (props take precedence)
+        const mergedAttributes = {
+          ...safeAttributes,
+          width: size,
+          height: size,
+          viewBox,
+          fill: props.color || defaultFill || 'currentColor',
+          stroke: defaultStroke,
+          strokeWidth: defaultStrokeWidth,
+          xmlns: "http://www.w3.org/2000/svg",
+          style: props.style,
+          className: props.className,
+
+        };
+
+        // Remove undefined values
+        Object.keys(mergedAttributes).forEach(key => {
+          if (mergedAttributes[key] === undefined) {
+            delete mergedAttributes[key];
+          }
+        });
+
+        return (
+          <svg
+            {...mergedAttributes}
+            dangerouslySetInnerHTML={{ __html: innerContent }}
+          />
+        );
+      });
+    });
+  }, [icons]);
+
+  /* useEffect(() => {
+    if (icons && spriteRootRef.current) {
+      Object.entries(icons).forEach(([iconName, svgData]) => {
+        const iconKey = iconName.toLowerCase();
+        
+        // Skip if already registered
+        if (attachedResources.current[iconKey]) {
+          return;
+        }
+
+        // Parse SVG data
+        const div = document.createElement("div");
+        div.style.display = "none";
+        div.innerHTML = svgData;
+
+        const svgElement = div.children[0];
+        if (!svgElement || svgElement.tagName.toLowerCase() !== "svg") {
+          console.warn(`Invalid SVG data for icon: ${iconName}`);
+          return;
+        }
+
+        // Extract attributes
+        const attrs: Record<string, any> = {};
+        for (let i = 0; i < svgElement.attributes.length; i++) {
+          const attr = svgElement.attributes[i];
+          if (attr.nodeName !== "class") {
+            attrs[attr.nodeName] = attr.nodeValue;
+          }
+        }
+
+        // Create symbol element for sprite sheet
+        const symbol = document.createElementNS("http://www.w3.org/2000/svg", "symbol");
+        symbol.innerHTML = svgElement.innerHTML;
+        symbol.id = iconKey;
+        if (attrs["viewBox"]) {
+          symbol.setAttributeNS(null, "viewBox", attrs["viewBox"]);
+        }
+
+        // Add to sprite sheet
+        spriteRootRef.current!.appendChild(symbol);
+        attachedResources.current[iconKey] = true;
+
+        // Store custom icon metadata
+        const customIcon = {
+          name: iconKey,
+          attributes: attrs,
+        };
+        setCustomSvgs((prev) => ({
+          ...prev,
+          [iconKey]: customIcon,
+        }));
+
+        // Register icon renderer
+       const safeAttributes: any = {};
+        Object.entries(attrs).forEach(([key, value]) => {
+          let safeKey = key;
+          if (/^(data-|aria-)/.test(key)) {
+            safeKey = key;
+          } else {
+            safeKey = key.replace(extraCharRegex, "").toLowerCase();
+          }
+
+          safeAttributes[svgAttributeMap[safeKey] || key] = value;
+        });
+        registerIconRenderer(iconKey, (props: IconBaseProps) => (
+          <svg {...props} {...safeAttributes} style={props.style} className={props.className}>
+            <use href={`#${iconKey}`} />
+          </svg>
+        ));
+      });
+    }
+  }, [icons]); */
+
+  const ensureCustomResourceSvgIcon = useCallback(async (resourceUrl: string) => {
     if (attachedResources.current[resourceUrl]) {
       return;
     }
     const icon = await (await fetch(resourceUrl)).text();
+
     const div = document.createElement("div");
     div.style.display = "none";
     div.innerHTML = icon;
@@ -399,10 +822,10 @@ export function IconProvider({ children }: { children: ReactNode }) {
     return {
       getRegisteredIconNames,
       lookupIconRenderer,
-      ensureCustomSvgIcon,
+      ensureCustomSvgIcon: ensureCustomResourceSvgIcon,
       customSvgs,
     };
-  }, [customSvgs, ensureCustomSvgIcon, getRegisteredIconNames, lookupIconRenderer]);
+  }, [customSvgs, ensureCustomResourceSvgIcon, getRegisteredIconNames, lookupIconRenderer]);
 
   return (
     <IconRegistryContext.Provider value={contextValue}>
