@@ -11,6 +11,7 @@ import { tbdRenderer } from "./docs/TBD";
 import { sectionHeaderRenderer } from "./docs/SectionHeader";
 import { overviewRenderer } from "./docs/Overview";
 import { twoColumnCodeRenderer } from "./docs/TwoColumnCode";
+import { pageNotFoundRenderer } from "./docs/PageNotFound";
 
 export default {
   namespace: "XMLUIExtensions",
@@ -28,5 +29,6 @@ export default {
     sectionHeaderRenderer,
     overviewRenderer,
     twoColumnCodeRenderer,
+    pageNotFoundRenderer,
   ],
 };
