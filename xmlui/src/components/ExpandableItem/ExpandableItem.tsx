@@ -56,6 +56,16 @@ export const ExpandableItemMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultExpandableItemProps.withSwitch,
     },
+    contentWidth: {
+      description: "Sets the width of the expanded content area. Defaults to 100% to fill the parent container.",
+      valueType: "string",
+      defaultValue: defaultExpandableItemProps.contentWidth,
+    },
+    fullWidthSummary: {
+      description: "When true, the summary section takes the full width of the parent container. When combined with iconPosition='end', the icon is aligned to the far edge.",
+      valueType: "boolean",
+      defaultValue: defaultExpandableItemProps.fullWidthSummary,
+    },
   },
   events: {
     expandedChange: {
@@ -89,8 +99,8 @@ export const ExpandableItemMd = createMetadata({
   limitThemeVarsToComponent: true,
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "transparent",
-    [`backgroundColor-${COMP}--hover`]: "$color-secondary-100",
-    [`backgroundColor-${COMP}--active`]: "$color-secondary-100",
+    [`backgroundColor-summary-${COMP}--hover`]: "$color-secondary-100",
+    [`backgroundColor-summary-${COMP}--active`]: "$color-secondary-100",
     [`color-${COMP}`]: "$textColor-primary",
     [`color-${COMP}--disabled`]: "$textColor--disabled",
     [`fontFamily-${COMP}`]: "$fontFamily",
@@ -151,6 +161,14 @@ export const expandableItemComponentRenderer = createComponentRenderer(
         withSwitch={extractValue.asOptionalBoolean(
           node.props.withSwitch,
           defaultExpandableItemProps.withSwitch,
+        )}
+        contentWidth={
+          extractValue.asOptionalString(node.props.contentWidth) ??
+          defaultExpandableItemProps.contentWidth
+        }
+        fullWidthSummary={extractValue.asOptionalBoolean(
+          node.props.fullWidthSummary,
+          defaultExpandableItemProps.fullWidthSummary,
         )}
         onExpandedChange={lookupEventHandler("expandedChange")}
         className={className}
