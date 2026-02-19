@@ -20,6 +20,15 @@ import { sectionHeaderRenderer } from "./docs/SectionHeader";
 import { overviewRenderer } from "./docs/Overview";
 import { twoColumnCodeRenderer } from "./docs/TwoColumnCode";
 import { pageNotFoundRenderer } from "./docs/PageNotFound";
+import {
+  findNavItem,
+  getNavGroup,
+  getTopLevelChildren,
+  getPageDescription,
+  getRootLinks,
+  getCardWidth,
+  getCardIcon,
+} from "./docs/overviewHelpers";
 
 export default {
   namespace: "XMLUIExtensions",
@@ -39,4 +48,13 @@ export default {
     twoColumnCodeRenderer,
     pageNotFoundRenderer,
   ],
+  functions: {
+    findNavItem,
+    getNavGroup,
+    getTopLevelChildren,
+    getPageDescription,
+    getRootLinks,
+    getCardWidth,
+    getCardIcon,
+  },
 };

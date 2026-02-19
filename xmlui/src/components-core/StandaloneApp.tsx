@@ -985,6 +985,17 @@ function useStandalone(
           }
         });
         
+        // Merge extension-provided global functions (app/component globals take precedence)
+        extensionManager?.registeredExtensions?.forEach((ext) => {
+          if (ext.functions) {
+            Object.keys(ext.functions).forEach((key) => {
+              if (!(key in parsedGlobals)) {
+                parsedGlobals[key] = ext.functions![key];
+              }
+            });
+          }
+        });
+        
         // --- Since Globals.xs variables are now transformed to <global> tags,
         // --- we only need to set the parsed globals from component definitions
         setGlobalVars(parsedGlobals);
@@ -1397,6 +1408,17 @@ function useStandalone(
           Object.keys(compound.component.globalVars).forEach((key) => {
             if (!(key in parsedGlobals)) {
               parsedGlobals[key] = compound.component.globalVars[key];
+            }
+          });
+        }
+      });
+      
+      // Merge extension-provided global functions (app/component globals take precedence)
+      extensionManager?.registeredExtensions?.forEach((ext) => {
+        if (ext.functions) {
+          Object.keys(ext.functions).forEach((key) => {
+            if (!(key in parsedGlobals)) {
+              parsedGlobals[key] = ext.functions![key];
             }
           });
         }
