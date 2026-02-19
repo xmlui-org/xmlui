@@ -10,6 +10,7 @@ import { documentPageNoTOCRenderer } from "./docs/DocumentPageNoTOC";
 import { tbdRenderer } from "./docs/TBD";
 import { sectionHeaderRenderer } from "./docs/SectionHeader";
 import { overviewRenderer } from "./docs/Overview";
+import { twoColumnCodeRenderer } from "./docs/TwoColumnCode";
 
 export default {
   namespace: "XMLUIExtensions",
@@ -26,5 +27,6 @@ export default {
     tbdRenderer,
     sectionHeaderRenderer,
     overviewRenderer,
+    twoColumnCodeRenderer,
   ],
 };
