@@ -1479,3 +1479,149 @@ test.describe("onDidChange callback functionality", () => {
     await expect(output).toHaveText("Context menu triggered");
   });
 });
+
+// =============================================================================
+// REGRESSION TESTS
+// =============================================================================
+
+test.describe("regression tests", () => {
+  test("tab labels have sufficient contrast and distinct colors (issue #2840, #2839)", async ({ initTestBed, page }) => {
+    // This test verifies that tab labels have visible, distinct colors with proper contrast.
+    // Issue #2839/#2840: After commit 03ab737b, tab text colors became nearly invisible
+    // because new theme variables (textColor-trigger-Tabs--active, textColor-trigger-Tabs--hover)
+    // defaulted to "none", causing color: initial instead of inheriting parent color.
+    // 
+    // The bug manifested as:
+    // - Inactive tabs: very light color (rgb(224, 231, 255) in light mode, rgb(31, 41, 55) in dark)
+    // - Active tabs: white text on white background, essentially invisible
+    //
+    // Expected behavior:
+    // - Inactive tabs should have medium-dark text (e.g., rgb(79, 70, 229) ~ primary-100)
+    // - Active tabs should have very dark or white text depending on theme (e.g., rgb(255, 255, 255) on dark bg)
+    
+    await initTestBed(`
+      <Tabs testId="tabs" tabAlignment="center">
+        <TabItem label="First">
+          <Text>First tab content</Text>
+        </TabItem>
+        <TabItem label="Second">
+          <Text>Second tab content</Text>
+        </TabItem>
+        <TabItem label="Third">
+          <Text>Third tab content</Text>
+        </TabItem>
+      </Tabs>
+    `);
+
+    const firstTab = page.getByRole("tab", { name: "First" });
+    const secondTab = page.getByRole("tab", { name: "Second" });
+    const thirdTab = page.getByRole("tab", { name: "Third" });
+
+    await expect(firstTab).toBeVisible();
+    await expect(secondTab).toBeVisible();
+    await expect(thirdTab).toBeVisible();
+
+    // Helper to parse RGB values from color string
+    const parseRgb = (colorStr: string): { r: number; g: number; b: number } => {
+      const match = colorStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+      if (!match) throw new Error(`Invalid color format: ${colorStr}`);
+      return { r: parseInt(match[1]), g: parseInt(match[2]), b: parseInt(match[3]) };
+    };
+
+     // Get colors for active and inactive tabs
+    const activeTabColor = await firstTab.evaluate((el) => window.getComputedStyle(el).color);
+    const inactiveTabColor = await secondTab.evaluate((el) => window.getComputedStyle(el).color);
+
+    const activeRgb = parseRgb(activeTabColor);
+    const inactiveRgb = parseRgb(inactiveTabColor);
+
+    // 1. Verify inactive tabs are not washed out
+    // Bug: rgb(207, 225, 247) averages to 226.33 - too light!
+    // Fix: should be darker (< 200)
+    const inactiveBrightness = (inactiveRgb.r + inactiveRgb.g + inactiveRgb.b) / 3;
+    expect(inactiveBrightness).toBeLessThan(200); // Catches washed-out inactive tabs
+
+    // 2. Verify active tabs are not white (invisible on light background)
+    // Bug: rgb(255, 255, 255) - completely white!
+    // Fix: should be a visible color
+    const isWhite = activeRgb.r === 255 && activeRgb.g === 255 && activeRgb.b === 255;
+    expect(isWhite).toBe(false); // Active tabs must not be white
+
+    // 3. Verify active and inactive tabs have different colors
+    const colorDifference = Math.abs(activeRgb.r - inactiveRgb.r) + 
+                           Math.abs(activeRgb.g - inactiveRgb.g) + 
+                           Math.abs(activeRgb.b - inactiveRgb.b);
+    expect(colorDifference).toBeGreaterThan(30); // Should be visually distinct
+
+    // 4. Click second tab and verify it's also not white when active
+    await secondTab.click();
+    await expect(secondTab).toHaveAttribute("aria-selected", "true");
+    
+    const newActiveColor = await secondTab.evaluate((el) => window.getComputedStyle(el).color);
+    const newActiveRgb = parseRgb(newActiveColor);
+    
+    const isWhite2 = newActiveRgb.r === 255 && newActiveRgb.g === 255 && newActiveRgb.b === 255;
+    expect(isWhite2).toBe(false); // Clicked tabs must not be white either
+  });
+
+  test("tab labels with headerTemplate have proper contrast (issue #2840, #2839)", async ({ initTestBed, page }) => {
+    // Verify that headerTemplate content also has visible colors with good contrast.
+    // The bug affected both label attrare not washed out (issue #2840, #2839)", async ({ initTestBed, page }) => {
+    // Verify that headerTemplate content also doesn't have washed-out colors
+    await initTestBed(`
+      <Tabs testId="tabs" tabAlignment="center">
+        <TabItem>
+          <property name="headerTemplate">
+            <Text>XML</Text>
+          </property>
+          <Text>XML content</Text>
+        </TabItem>
+        <TabItem>
+          <property name="headerTemplate">
+            <Text>UI</Text>
+          </property>
+          <Text>UI content</Text>
+        </TabItem>
+        <TabItem>
+          <property name="headerTemplate">
+            <Icon name="info" size="16px" />
+          </property>
+          <Text>Info content</Text>
+        </TabItem>
+      </Tabs>
+    `);
+
+    const xmlTab = page.getByRole("tab", { name: "XML" });
+    const uiTab = page.getByRole("tab", { name: "UI" });
+
+    await expect(xmlTab).toBeVisible();
+    await expect(uiTab).toBeVisible();
+
+    // Parse RGB helper
+    const parseRgb = (colorStr: string): { r: number; g: number; b: number } => {
+      const match = colorStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+      if (!match) throw new Error(`Invalid color format: ${colorStr}`);
+      return { r: parseInt(match[1]), g: parseInt(match[2]), b: parseInt(match[3]) };
+    };
+
+    const activeTabColor = await xmlTab.evaluate((el) => window.getComputedStyle(el).color);
+    const inactiveTabColor = await uiTab.evaluate((el) => window.getComputedStyle(el).color);
+
+    const activeRgb = parseRgb(activeTabColor);
+    const inactiveRgb = parseRgb(inactiveTabColor);
+
+    // Verify inactive tabs are not washed out  
+    const inactiveBrightness = (inactiveRgb.r + inactiveRgb.g + inactiveRgb.b) / 3;
+    expect(inactiveBrightness).toBeLessThan(200); // Same threshold as first test
+
+    // Verify active tabs are not white
+    const isWhite = activeRgb.r === 255 && activeRgb.g === 255 && activeRgb.b === 255;
+    expect(isWhite).toBe(false);
+
+    // Verify active and inactive are visually different
+    const colorDifference = Math.abs(activeRgb.r - inactiveRgb.r) + 
+                           Math.abs(activeRgb.g - inactiveRgb.g) + 
+                           Math.abs(activeRgb.b - inactiveRgb.b);
+    expect(colorDifference).toBeGreaterThan(30);
+  });
+});
