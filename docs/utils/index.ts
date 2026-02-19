@@ -153,7 +153,10 @@ function omitIndexFromPath(path: string) {
   return path.endsWith("index") ? path.substring(0, path.length - "index".length) : path;
 }
 
-function buildTreeFromPathsAndMeta(paths: string[], metaByFolder: Record<string, MetaJson>): TreeNode[] {
+function buildTreeFromPathsAndMeta(
+  paths: string[],
+  metaByFolder: Record<string, MetaJson>,
+): TreeNode[] {
   const root: TreeNode[] = [];
 
   paths.forEach((path) => {
@@ -234,3 +237,21 @@ function buildTreeFromPathsAndMeta(paths: string[], metaByFolder: Record<string,
 }
 
 export const groupedNavPanelContent = buildTreeFromPathsAndMeta(navPanelContent, metaJsons);
+
+export function getLocalIcons() {
+  const icons: Record<string, string> = import.meta.glob(`/icons/**/*.svg`, {
+    import: "default",
+    eager: true,
+    query: "?raw",
+  });
+  const processedIcons: Record<string, string> = {};
+  Object.entries(icons).forEach(([key, value]) => {
+    const iconName =
+      key
+        .split("/")
+        .pop()
+        ?.replace(/\.svg$/, "") || "";
+    processedIcons[iconName] = value;
+  });
+  return processedIcons;
+}

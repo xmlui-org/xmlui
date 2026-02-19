@@ -57,6 +57,7 @@ export function AppRoot({
   projectCompilation,
   isNested = false,
   onInit,
+  icons
 }: AppWrapperProps & {
   extensionManager?: StandaloneExtensionManager;
   isNested?: boolean;
@@ -125,6 +126,7 @@ export function AppRoot({
             previewMode={previewMode}
             sources={sources}
             onInit={onInit}
+            icons={icons}
           >
             {children}
           </AppWrapper>
