@@ -396,6 +396,7 @@ This method sets the active tab by index (0-based).
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-trigger-Tabs | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Tabs | solid | solid |
 | [borderWidth](../styles-and-themes/common-units/#size)-Tabs | 2px | 2px |
+| [gap](../styles-and-themes/common-units/#size)-list-Tabs | 0px | 0px |
 | [padding](../styles-and-themes/common-units/#size)-trigger-Tabs | $space-4 | $space-4 |
 | [paddingBottom](../styles-and-themes/common-units/#size)-trigger-Tabs | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-trigger-Tabs | *none* | *none* |
@@ -403,4 +404,6 @@ This method sets the active tab by index (0-based).
 | [paddingRight](../styles-and-themes/common-units/#size)-trigger-Tabs | *none* | *none* |
 | [paddingTop](../styles-and-themes/common-units/#size)-trigger-Tabs | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-trigger-Tabs | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-trigger-Tabs | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-trigger-Tabs | $color-primary-600 | $color-primary-600 |
+| [textColor](../styles-and-themes/common-units/#color)-trigger-Tabs--active | $color-primary-900 | $color-primary-900 |
+| [textColor](../styles-and-themes/common-units/#color)-trigger-Tabs--hover | $color-primary-900 | $color-primary-900 |

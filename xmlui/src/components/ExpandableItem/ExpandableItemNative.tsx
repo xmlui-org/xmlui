@@ -30,13 +30,15 @@ type ExpandableItemProps = {
   iconCollapsed?: string;
   iconPosition?: "start" | "end";
   withSwitch?: boolean;
+  contentWidth?: string;
+  fullWidthSummary?: boolean;
   onExpandedChange?: (isExpanded: boolean) => void;
   registerComponentApi?: RegisterComponentApiFn;
 };
 
 export const defaultExpandableItemProps: Pick<
   ExpandableItemProps,
-  "initiallyExpanded" | "enabled" | "iconExpanded" | "iconCollapsed" | "iconPosition" | "withSwitch"
+  "initiallyExpanded" | "enabled" | "iconExpanded" | "iconCollapsed" | "iconPosition" | "withSwitch" | "contentWidth" | "fullWidthSummary"
 > = {
   initiallyExpanded: false,
   enabled: true,
@@ -44,6 +46,8 @@ export const defaultExpandableItemProps: Pick<
   iconCollapsed: "chevronright",
   iconPosition: "end",
   withSwitch: false,
+  contentWidth: "100%",
+  fullWidthSummary: false,
 };
 
 export const ExpandableItem = forwardRef(function ExpandableItem(
@@ -58,6 +62,8 @@ export const ExpandableItem = forwardRef(function ExpandableItem(
     iconCollapsed = defaultExpandableItemProps.iconCollapsed,
     iconPosition = defaultExpandableItemProps.iconPosition,
     withSwitch = defaultExpandableItemProps.withSwitch,
+    contentWidth = defaultExpandableItemProps.contentWidth,
+    fullWidthSummary = defaultExpandableItemProps.fullWidthSummary,
     onExpandedChange,
     registerComponentApi,
     ...rest
@@ -160,6 +166,7 @@ export const ExpandableItem = forwardRef(function ExpandableItem(
           className={classNames(styles.summary, {
             [styles.iconStart]: iconPosition === "start",
             [styles.iconEnd]: iconPosition === "end",
+            [styles.fullWidth]: fullWidthSummary,
           })}
           onClick={enabled ? (withSwitch ? handleSummaryClick : toggleOpen) : undefined}
           onKeyDown={handleKeyDown}
@@ -193,6 +200,7 @@ export const ExpandableItem = forwardRef(function ExpandableItem(
           className={classNames(styles.content, {
             [styles.contentHidden]: !isOpen,
           })}
+          style={{ width: contentWidth }}
           role="region"
           aria-labelledby={summaryId}
           aria-hidden={!isOpen}
