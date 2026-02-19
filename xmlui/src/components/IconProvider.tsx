@@ -598,7 +598,6 @@ export function IconProvider({ children, icons }: { children: ReactNode, icons: 
   const spriteRootRef = useRef<SVGSVGElement>(null);
 
   useMemo(() => {
-    console.log(icons)
     if (!icons) return;
 
     Object.entries(icons).forEach(([iconName, svgData]) => {
@@ -663,8 +662,6 @@ export function IconProvider({ children, icons }: { children: ReactNode, icons: 
       const defaultFill = safeAttributes.fill;
       const defaultStroke = safeAttributes.stroke;
       const defaultStrokeWidth = safeAttributes.strokeWidth;
-
-      console.log(safeAttributes)
 
       // Register icon renderer immediately (works on server and client)
       registerIconRenderer(iconKey, (props: IconBaseProps) => {
