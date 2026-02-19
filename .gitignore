@@ -17,7 +17,7 @@ xmlui-optimized-output
 xmlui-temp-build
 
 # Claude Code local config
-.claude/
+.claude
 .mcp.json
 
 docs/scripts/component-metadata.json
