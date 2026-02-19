@@ -6,6 +6,8 @@ export interface SignatureAnnotationProps {
   isSelected: boolean;
   onUpdate: (id: string, updates: Partial<Annotation>) => void;
   onSelect: (id: string) => void;
+  /** Called when user clicks the sign button/placeholder to open the signature modal */
+  onRequestSign?: (id: string) => void;
 }
 
 /**
@@ -18,6 +20,7 @@ export function SignatureAnnotation({
   isSelected,
   onUpdate,
   onSelect,
+  onRequestSign,
 }: SignatureAnnotationProps) {
   const { id, value, properties } = annotation;
   const { label, required } = properties;
@@ -54,17 +57,34 @@ export function SignatureAnnotation({
       )}
       
       {hasSignature ? (
-        // Phase 2: Display signature image
-        <img
-          src={value as string}
-          alt="Signature"
-          className={styles.signatureImage}
-        />
-      ) : (
-        // Phase 1: Display placeholder
-        <div className={styles.signaturePlaceholder}>
-          Click to sign
+        // Signed: show captured signature image with option to re-sign
+        <div className={styles.signedContent}>
+          <img
+            src={value as string}
+            alt="Signature"
+            className={styles.signatureImage}
+          />
+          {isSelected && onRequestSign && (
+            <button
+              type="button"
+              className={styles.resignButton}
+              onClick={(e) => { e.stopPropagation(); onRequestSign(id); }}
+              data-testid="resign-button"
+            >
+              Change
+            </button>
+          )}
         </div>
+      ) : (
+        // Unsigned: placeholder / sign button
+        <button
+          type="button"
+          className={styles.signaturePlaceholder}
+          onClick={(e) => { e.stopPropagation(); onSelect(id); onRequestSign?.(id); }}
+          data-testid="sign-here-button"
+        >
+          ✍ Click to sign
+        </button>
       )}
     </div>
   );

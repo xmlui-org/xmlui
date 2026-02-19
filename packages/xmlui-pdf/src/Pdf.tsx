@@ -10,8 +10,8 @@ const defaultProps = {
   mode: "view" as "view" | "edit",
   scale: 1.0,
   annotations: [] as Annotation[],
-  showToolbar: false,
-  showProperties: false,
+  horizontalAlignment: "start" as "start" | "center" | "end",
+  verticalAlignment: "start" as "start" | "center" | "end",
 };
 
 export const PdfMd = createMetadata({
@@ -45,111 +45,197 @@ export const PdfMd = createMetadata({
     signatureData: d(
       `Pre-loaded signature data to apply to signature fields.`,
     ),
-    showToolbar: {
-      description: `When true, shows the annotation toolbar for adding new annotation fields. Default: ${defaultProps.showToolbar}.`,
-      valueType: "boolean",
+    horizontalAlignment: {
+      description: `Horizontal alignment of PDF pages within the viewer. Options: "start" (default), "center", "end".`,
+      valueType: "string",
     },
-    showProperties: {
-      description: `When true, shows the properties panel for editing the selected annotation. Default: ${defaultProps.showProperties}.`,
-      valueType: "boolean",
+    verticalAlignment: {
+      description: `Vertical alignment of PDF pages within the viewer. Options: "start" (default), "center", "end".`,
+      valueType: "string",
     },
   },
   events: {
-    onDocumentLoad: d(`Fired when the PDF document is loaded successfully.`),
-    onPageChange: d(`Fired when the current page changes.`),
-    onAnnotationCreate: d(`Fired when a new annotation is created.`),
-    onAnnotationUpdate: d(`Fired when an annotation is modified.`),
-    onAnnotationDelete: d(`Fired when an annotation is about to be deleted. Return false from the handler to cancel the deletion.`),
-    onAnnotationSelect: d(`Fired when an annotation is selected.`),
-    onSignatureCapture: d(`Fired when a signature is captured (Phase 2).`),
-    onSignatureApply: d(`Fired when a signature is applied to a field (Phase 2).`),
+    documentLoad: {
+      description: `Fired when the PDF document is loaded successfully.`,
+      signature: "documentLoad(pageCount: number): void",
+      parameters: {
+        pageCount: "The total number of pages in the loaded document.",
+      },
+    },
+    pageChange: {
+      description: `Fired when the current page changes.`,
+      signature: "pageChange(page: number): void",
+      parameters: {
+        page: "The new current page number (1-indexed).",
+      },
+    },
+    annotationCreate: {
+      description: `Fired when a new annotation is created.`,
+      signature: "annotationCreate(annotation: Annotation): void",
+      parameters: {
+        annotation: "The newly created annotation object.",
+      },
+    },
+    annotationUpdate: {
+      description: `Fired when an annotation is modified.`,
+      signature: "annotationUpdate(annotation: Annotation): void",
+      parameters: {
+        annotation: "The updated annotation object.",
+      },
+    },
+    annotationDelete: {
+      description:
+        `Fired when an annotation is about to be deleted. ` +
+        `Return \`false\` from the handler to cancel the deletion.`,
+      signature: "annotationDelete(id: string): false | void | Promise<false | void>",
+      parameters: {
+        id: "The ID of the annotation that is about to be deleted.",
+      },
+    },
+    annotationSelect: {
+      description: `Fired when an annotation is selected or deselected.`,
+      signature: "annotationSelect(id: string | null): void",
+      parameters: {
+        id: "The ID of the selected annotation, or null when the selection is cleared.",
+      },
+    },
+    signatureCapture: {
+      description: `Fired when a signature is captured via the signature modal.`,
+      signature: "signatureCapture(signature: object): void",
+      parameters: {
+        signature: "The captured signature data.",
+      },
+    },
+    signatureApply: {
+      description: `Fired when a captured signature is applied to a signature field.`,
+      signature: "signatureApply(fieldId: string, signature: object): void",
+      parameters: {
+        fieldId: "The ID of the signature field the signature was applied to.",
+        signature: "The signature data that was applied.",
+      },
+    },
   },
   apis: {
     goToPage: {
       description: `Navigate to a specific page.`,
-      args: [{ name: "page", valueType: "number" }],
+      signature: "goToPage(page: number): void",
+      parameters: {
+        page: "The 1-indexed page number to navigate to.",
+      },
     },
     setScale: {
       description: `Set the zoom level to an exact value (clamped between 0.1 and 5).`,
-      args: [{ name: "scale", valueType: "number" }],
+      signature: "setScale(scale: number): void",
+      parameters: {
+        scale: "The scale factor to apply (e.g. 1.0 for 100%, 1.5 for 150%).",
+      },
     },
     zoomTo: {
       description: `Zoom to an exact scale value (clamped between 0.1 and 5). Alias for setScale.`,
-      args: [{ name: "scale", valueType: "number" }],
+      signature: "zoomTo(scale: number): void",
+      parameters: {
+        scale: "The scale factor to apply (e.g. 1.0 for 100%, 1.5 for 150%).",
+      },
     },
     zoomIn: {
       description: `Zoom in by a multiplicative factor (default 1.25).`,
-      args: [{ name: "factor", valueType: "number" }],
+      signature: "zoomIn(factor?: number): void",
+      parameters: {
+        factor: "Multiplicative factor to zoom in by. Defaults to 1.25.",
+      },
     },
     zoomOut: {
       description: `Zoom out by a multiplicative factor (default 1.25).`,
-      args: [{ name: "factor", valueType: "number" }],
+      signature: "zoomOut(factor?: number): void",
+      parameters: {
+        factor: "Multiplicative factor to zoom out by. Defaults to 1.25.",
+      },
     },
     actualSize: {
       description: `Reset zoom to 100% (scale = 1.0).`,
-      args: [],
+      signature: "actualSize(): void",
     },
     fitWidth: {
       description: `Scale the PDF so the page width fills the available viewport width.`,
-      args: [],
+      signature: "fitWidth(): void",
     },
     fitPage: {
       description: `Scale the PDF so the full page fits within the visible viewport (both width and height).`,
-      args: [],
+      signature: "fitPage(): void",
     },
     getScale: {
       description: `Return the current scale value.`,
-      args: [],
+      signature: "getScale(): number",
+      returns: "The current scale factor (e.g. 1.0 for 100%).",
     },
     addAnnotation: {
-      description: `Add a new annotation. Returns the annotation ID.`,
-      args: [{ name: "annotationData", valueType: "object" }],
+      description: `Add a new annotation. Returns the newly assigned annotation ID.`,
+      signature: "addAnnotation(annotationData: object): string",
+      parameters: {
+        annotationData: "An object describing the annotation to add (type, page, position, size, properties).",
+      },
+      returns: "The unique ID assigned to the new annotation.",
     },
     updateAnnotation: {
-      description: `Update an existing annotation.`,
-      args: [
-        { name: "id", valueType: "string" },
-        { name: "updates", valueType: "object" },
-      ],
+      description: `Update an existing annotation by ID.`,
+      signature: "updateAnnotation(id: string, updates: object): void",
+      parameters: {
+        id: "The ID of the annotation to update.",
+        updates: "An object containing the fields to update on the annotation.",
+      },
     },
     deleteAnnotation: {
       description: `Delete an annotation by ID.`,
-      args: [{ name: "id", valueType: "string" }],
+      signature: "deleteAnnotation(id: string): void",
+      parameters: {
+        id: "The ID of the annotation to delete.",
+      },
     },
     getAnnotations: {
       description: `Get all current annotations.`,
-      args: [],
+      signature: "getAnnotations(): Annotation[]",
+      returns: "Array of all current annotations.",
     },
     selectAnnotation: {
       description: `Select an annotation by ID, highlighting it in the PDF.`,
-      args: [{ name: "id", valueType: "string" }],
+      signature: "selectAnnotation(id: string): void",
+      parameters: {
+        id: "The ID of the annotation to select.",
+      },
     },
     deselectAnnotation: {
       description: `Deselect the currently selected annotation.`,
-      args: [],
+      signature: "deselectAnnotation(): void",
     },
     getSelectedAnnotationId: {
       description: `Return the ID of the currently selected annotation, or null if none.`,
-      args: [],
+      signature: "getSelectedAnnotationId(): string | null",
+      returns: "The ID of the currently selected annotation, or null if none is selected.",
     },
     getSelectedAnnotation: {
       description: `Return the full annotation object that is currently selected, or null if none.`,
-      args: [],
+      signature: "getSelectedAnnotation(): Annotation | null",
+      returns: "The currently selected annotation object, or null if none is selected.",
     },
     openSignatureModal: {
-      description: `Open signature capture modal for a field (Phase 2).`,
-      args: [{ name: "fieldId", valueType: "string" }],
+      description: `Open the signature capture modal for a signature field. The user can type their name and choose a font style, then apply the signature to the field.`,
+      signature: "openSignatureModal(fieldId: string): void",
+      parameters: {
+        fieldId: "The ID of the signature field to open the capture modal for.",
+      },
     },
     applySignature: {
-      description: `Apply signature to a field (Phase 2).`,
-      args: [
-        { name: "fieldId", valueType: "string" },
-        { name: "signature", valueType: "object" },
-      ],
+      description: `Apply a captured signature to a signature field.`,
+      signature: "applySignature(fieldId: string, signature: object): void",
+      parameters: {
+        fieldId: "The ID of the signature field to apply the signature to.",
+        signature: "The signature data object to apply.",
+      },
     },
     getSignature: {
-      description: `Get the current signature data (Phase 2).`,
-      args: [],
+      description: `Get the current signature data.`,
+      signature: "getSignature(): object | null",
+      returns: "The current signature data, or null if no signature has been captured.",
     },
   },
   contextVars: {
@@ -180,8 +266,6 @@ export const PdfMd = createMetadata({
     // Text styling
     "color-label-Pdf": "#333",
     "color-value-Pdf": "#666",
-    
-    // Delete button styling
     "backgroundColor-deleteButton-Pdf": "#dc3545",
     "backgroundColor-deleteButton-hover-Pdf": "#c82333",
     "color-deleteButton-Pdf": "white",
@@ -189,25 +273,6 @@ export const PdfMd = createMetadata({
     // Resize handle styling
     "backgroundColor-resizeHandle-Pdf": "#007bff",
     "backgroundColor-resizeHandle-hover-Pdf": "#0056b3",
-    
-    // Toolbar styling
-    "backgroundColor-toolbar-Pdf": "#f8f9fa",
-    "borderColor-toolbar-Pdf": "#dee2e6",
-    "color-toolbarTitle-Pdf": "#333",
-    "backgroundColor-toolbarButton-Pdf": "#fff",
-    "backgroundColor-toolbarButton-hover-Pdf": "#e9ecef",
-    "borderColor-toolbarButton-Pdf": "#ced4da",
-    "color-toolbarButton-Pdf": "#495057",
-    "color-toolbarIcon-Pdf": "#007bff",
-    
-    // Properties panel styling
-    "backgroundColor-propertiesPanel-Pdf": "#f8f9fa",
-    "borderColor-propertiesPanel-Pdf": "#dee2e6",
-    "color-propertiesTitle-Pdf": "#212529",
-    "color-propertiesLabel-Pdf": "#495057",
-    "backgroundColor-propertyInput-Pdf": "white",
-    "borderColor-propertyInput-Pdf": "#ced4da",
-    "borderColor-propertyInput-focus-Pdf": "#007bff",
   },
 });
 
@@ -228,8 +293,8 @@ export const pdfComponentRenderer = createComponentRenderer(
         currentPage={extractValue.asOptionalNumber(props?.currentPage)}
         annotations={extractValue(props?.annotations) || defaultProps.annotations}
         signatureData={extractValue(props?.signatureData)}
-        showToolbar={extractValue.asOptionalBoolean(props?.showToolbar, defaultProps.showToolbar)}
-        showProperties={extractValue.asOptionalBoolean(props?.showProperties, defaultProps.showProperties)}
+        horizontalAlignment={extractValue.asOptionalString(props?.horizontalAlignment, defaultProps.horizontalAlignment) as "start" | "center" | "end"}
+        verticalAlignment={extractValue.asOptionalString(props?.verticalAlignment, defaultProps.verticalAlignment) as "start" | "center" | "end"}
         onDocumentLoad={lookupEventHandler("documentLoad")}
         onPageChange={lookupEventHandler("pageChange")}
         onAnnotationCreate={lookupEventHandler("annotationCreate")}

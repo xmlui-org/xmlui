@@ -4,12 +4,11 @@ import { Document, Page, pdfjs } from "react-pdf";
 import workerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import "react-pdf/dist/Page/TextLayer.css";
 import "react-pdf/dist/Page/AnnotationLayer.css";
-import type { Annotation, AnnotationType } from "./types/annotation.types";
+import type { Annotation } from "./types/annotation.types";
 import type { SignatureData } from "./types/signature.types";
 import type { PdfSource } from "./types/source.types";
 import { AnnotationLayer } from "./components/AnnotationLayer/AnnotationLayer";
-import { FieldToolbar } from "./components/FieldToolbar/FieldToolbar";
-import { FieldProperties } from "./components/FieldToolbar/FieldProperties";
+import { SignatureCapture } from "./components/SignatureCapture/SignatureCapture";
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
 
@@ -85,10 +84,10 @@ export interface PdfNativeProps {
   
   // Signature (Phase 2)
   signatureData?: SignatureData;
-  
+
   // UI visibility
-  showToolbar?: boolean;
-  showProperties?: boolean;
+  horizontalAlignment?: "start" | "center" | "end";
+  verticalAlignment?: "start" | "center" | "end";
   
   // Events
   onDocumentLoad?: (numPages: number) => void;
@@ -114,8 +113,8 @@ export const defaultProps = {
   mode: "view" as PdfMode,
   scale: 1.0,
   annotations: [] as Annotation[],
-  showToolbar: false,
-  showProperties: false,
+  horizontalAlignment: "start" as "start" | "center" | "end",
+  verticalAlignment: "start" as "start" | "center" | "end",
 };
 
 export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
@@ -128,8 +127,8 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
       currentPage,
       annotations = defaultProps.annotations,
       signatureData,
-      showToolbar = defaultProps.showToolbar,
-      showProperties = defaultProps.showProperties,
+      horizontalAlignment = defaultProps.horizontalAlignment,
+      verticalAlignment = defaultProps.verticalAlignment,
       onDocumentLoad,
       onPageChange,
       onAnnotationCreate,
@@ -168,6 +167,10 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
     // methods which close over a stale value (they're registered once on mount).
     const internalAnnotationsRef = useRef<Annotation[]>(annotations);
     internalAnnotationsRef.current = internalAnnotations;
+    // Signature modal state — null means closed, string means open for fieldId
+    const [signatureModalFieldId, setSignatureModalFieldId] = useState<string | null>(null);
+    // Separate ref to hold signer metadata — survives annotation prop re-syncs
+    const signatureMetaRef = useRef<Map<string, { signerName: string; signerFontIndex: number }>>(new Map());
 
     // Sync internalScale when the scale prop changes externally
     const prevScaleProp = useRef(scale);
@@ -278,34 +281,6 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
       updateState?.({ currentPage: page });
     }
 
-    // Helper to create annotation at default position
-    function createDefaultAnnotation(type: AnnotationType, page: number): Partial<Annotation> {
-      // Default positions for centering annotations
-      const defaultSizes = {
-        text: { width: 200, height: 50 },
-        checkbox: { width: 150, height: 30 },
-        signature: { width: 250, height: 100 },
-      };
-      
-      // Center horizontally, place near top
-      const pageWidth = 595; // A4 width in points
-      const size = defaultSizes[type];
-      const x = (pageWidth - size.width) / 2;
-      const y = 100; // Near top
-      
-      return {
-        type,
-        page,
-        position: { x, y },
-        size,
-        value: type === "checkbox" ? false : "",
-        properties: {
-          label: type === "text" ? "Text Field" : type === "checkbox" ? "Checkbox" : "Signature",
-          required: false,
-        },
-      };
-    }
-
     // ---- annotation mutation helpers (keep internal state + notify parent) ----
     function handleAnnotationUpdate(id: string, updates: Partial<Annotation>) {
       const annotation = internalAnnotations.find(a => a.id === id);
@@ -328,23 +303,6 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
       setInternalAnnotations(next);
       updateState?.({ annotations: next });
       if (selectedAnnotationId === id) setSelectedAnnotationId(undefined);
-    }
-
-    // Handle adding annotation from toolbar
-    function handleAddAnnotation(type: AnnotationType, page: number) {
-      const annotationData = createDefaultAnnotation(type, page);
-      const newAnnotation: Annotation = {
-        ...annotationData as Annotation,
-        id: `annotation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        created: new Date(),
-        modified: new Date(),
-      };
-      const next = [...internalAnnotations, newAnnotation];
-      setInternalAnnotations(next);
-      onAnnotationCreate?.(newAnnotation);
-      updateState?.({ annotations: next });
-      setSelectedAnnotationId(newAnnotation.id);
-      return newAnnotation.id;
     }
 
     // Register component API methods (only once on mount to avoid infinite loops)
@@ -469,7 +427,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
           return annotations.find(a => a.id === selectedAnnotationId) || null;
         },
         openSignatureModal: (fieldId: string) => {
-          // Will be implemented in Phase 2
+          setSignatureModalFieldId(fieldId);
         },
         applySignature: (fieldId: string, signature: SignatureData) => {
           latestValues.current.onSignatureApply?.(fieldId, signature);
@@ -480,11 +438,25 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
 
     // Use data if provided, otherwise use src
     const fileSource = data || src;
-    
-    // Get selected annotation for properties panel
-    const selectedAnnotation = selectedAnnotationId 
-      ? internalAnnotations.find(a => a.id === selectedAnnotationId) || null
-      : null;
+
+    // Handle signature capture from modal
+    function handleSignatureCapture(fieldId: string, signature: SignatureData) {
+      // Fire events
+      onSignatureCapture?.(signature);
+      onSignatureApply?.(fieldId, signature);
+      // Store signer metadata in a separate ref so it survives annotation prop re-syncs
+      signatureMetaRef.current.set(fieldId, {
+        signerName: signature.signerName ?? "",
+        signerFontIndex: signature.signerFontIndex ?? 0,
+      });
+      // Apply signature image to the annotation value
+      const next = internalAnnotations.map(a =>
+        a.id === fieldId ? { ...a, value: signature.data, modified: new Date() } : a
+      );
+      setInternalAnnotations(next);
+      updateState?.({ annotations: next });
+      setSignatureModalFieldId(null);
+    }
 
     // Note: id prop is used internally by XMLUI, not applied to DOM
     return (
@@ -496,14 +468,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
         {/* Measurement sentinel: absolutely covers the outer container so it always
             reports the true available layout space, unaffected by PDF content size. */}
         <div ref={measureRef} style={{ position: "absolute", inset: 0, pointerEvents: "none", visibility: "hidden" }} />
-        {mode === "edit" && showToolbar && (
-          <FieldToolbar
-            onAddAnnotation={handleAddAnnotation}
-            currentPage={effectivePage}
-            isEditMode={mode === "edit"}
-          />
-        )}
-        <div ref={viewportRef} style={{ flex: 1, minHeight: 0, overflow: "auto" }}>
+        <div ref={viewportRef} style={{ flex: 1, minHeight: 0, overflow: "auto", display: "flex", flexDirection: "column", alignItems: horizontalAlignment, justifyContent: verticalAlignment }}>
           <Document
           file={fileSource as any}
           onLoadSuccess={handleLoadSuccess}
@@ -546,20 +511,27 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
                       onAnnotationSelect?.(id);
                     }}
                     onAnnotationUpdate={handleAnnotationUpdate}
-                    onAnnotationDelete={handleAnnotationDelete}
-                  />
+                    onAnnotationDelete={handleAnnotationDelete}                    onAnnotationRequestSign={(id) => setSignatureModalFieldId(id)}                  />
                 )}
               </div>
             );
           })}
         </Document>
         </div>
-        {mode === "edit" && showProperties && (
-          <FieldProperties
-            annotation={selectedAnnotation}
-            onUpdate={handleAnnotationUpdate}
-          />
-        )}
+        {/* Signature capture modal — rendered outside the scroll container so it
+            overlays the entire PDF component */}
+        {signatureModalFieldId !== null && (() => {
+          const meta = signatureMetaRef.current.get(signatureModalFieldId);
+          return (
+            <SignatureCapture
+              fieldId={signatureModalFieldId}
+              initialName={meta?.signerName ?? ""}
+              initialFontIndex={meta?.signerFontIndex ?? 0}
+              onCapture={handleSignatureCapture}
+              onClose={() => setSignatureModalFieldId(null)}
+            />
+          );
+        })()}
       </div>
     );
   }

@@ -802,7 +802,7 @@ loadingTask.onPassword = (callback, reason) => {
 4. **Page labels** (`getPageLabels`) - Custom page numbering
 5. **Thumbnails** - Quick navigation
 6. **Form field detection** (`getFieldObjects`) - Identify fillable fields
-7. **Annotation reading** (`getAnnotations`) - Display existing annotations
+7. **Annotation reading** (`getAnnotations`) - Display existing annotations ✅ **IMPLEMENTED** (Phase 1)
 8. **Permissions** (`getPermissions`) - Restrict features based on PDF permissions
 
 ### Medium Priority
@@ -822,6 +822,38 @@ loadingTask.onPassword = (callback, reason) => {
 18. **Text streaming** - Large documents
 19. **Custom text rendering** - Highlighting, redaction
 20. **Annotation filtering** - Selectively display annotations
+
+---
+
+## Implemented XMLUI PDF Component APIs (Phase 1)
+
+### Navigation & View Control
+- ✅ `goToPage(page: number)` - Navigate to a specific page
+- ✅ `setScale(scale: number)` - Set zoom level (0.1-5 range)
+- ✅ `zoomTo(scale: number)` - Zoom to exact scale (alias for setScale)
+- ✅ `zoomIn(factor?: number)` - Zoom in by multiplicative factor (default 1.25)
+- ✅ `zoomOut(factor?: number)` - Zoom out by multiplicative factor (default 1.25)
+- ✅ `actualSize()` - Reset zoom to 100% (scale = 1.0)
+- ✅ `fitWidth()` - Scale so page width fills viewport
+- ✅ `fitPage()` - Scale so full page fits in viewport
+
+### Scale Queries
+- ✅ `getScale()` - Return current scale value
+
+### Annotation Management
+- ✅ `addAnnotation(annotationData: object)` - Add new annotation (returns ID)
+- ✅ `updateAnnotation(id: string, updates: object)` - Update annotation
+- ✅ `deleteAnnotation(id: string)` - Delete annotation by ID
+- ✅ `getAnnotations()` - Get all annotations
+- ✅ `selectAnnotation(id: string)` - Select and highlight annotation
+- ✅ `deselectAnnotation()` - Clear annotation selection
+- ✅ `getSelectedAnnotationId()` - Return selected annotation ID (or null)
+- ✅ `getSelectedAnnotation()` - Return selected annotation object (or null)
+
+### Phase 2 (Not Yet Implemented)
+- ⏳ `openSignatureModal(fieldId: string)` - Open signature capture modal
+- ⏳ `applySignature(fieldId: string, signature: object)` - Apply signature to field
+- ⏳ `getSignature()` - Get current signature data
 
 ---
 

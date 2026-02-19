@@ -21,6 +21,8 @@ export interface SignatureData {
   timestamp: Date;
   /** Name of the signer */
   signerName?: string;
+  /** Index of the font used (for typed signatures) */
+  signerFontIndex?: number;
 }
 
 /**

@@ -432,24 +432,24 @@ $hasSignature: boolean;                // Phase 2
 
 ---
 
-### Step 16: Implement Typed Signature Modal ⬜
+### Step 16: Implement Typed Signature Modal ✅
 
 **Goal**: Allow users to type name for signature
 
 **Tasks**:
-1. Create `src/components/SignatureCapture/SignatureCapture.tsx`
-2. Create `src/components/SignatureCapture/SignatureCapture.module.scss`
-3. Create `src/components/SignatureCapture/SignatureTypeInput.tsx`
-4. Build modal dialog for signature capture
-5. Add text input for name
-6. Font selector (cursive/script fonts)
-7. Preview rendered signature
-8. "Apply" button triggers onSignatureCapture event
-9. Wire openSignatureModal API to show modal
+1. ✅ Create `src/components/SignatureCapture/SignatureCapture.tsx`
+2. ✅ Create `src/components/SignatureCapture/SignatureCapture.module.scss`
+3. ✅ Create `src/components/SignatureCapture/SignatureTypeInput.tsx`
+4. ✅ Build modal dialog for signature capture
+5. ✅ Add text input for name
+6. ✅ Font selector (4 cursive/script system font stacks)
+7. ✅ Live preview rendered signature in selected font
+8. ✅ "Apply" button triggers onSignatureCapture + onSignatureApply events and renders canvas → PNG
+9. ✅ Wire openSignatureModal API to show modal; SignatureAnnotation "Click to sign" button triggers it
 
 **Tests**: Unit tests for SignatureTypeInput
 
-**Verification**: Modal opens, signature typed and styled
+**Verification**: ✅ Modal opens, signature typed, font selected, applied; build succeeds (66 modules)
 
 ---
 
