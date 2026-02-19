@@ -13,6 +13,25 @@ import { FieldProperties } from "./components/FieldToolbar/FieldProperties";
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
 
+/**
+ * Walk up the DOM from `start` to find the nearest ancestor that acts as a
+ * scroll/size container (overflow auto/scroll) or the document root.
+ * Used to find the true available viewport size when Pdf is nested inside
+ * a ScrollViewer — otherwise fitPage/fitWidth produce a smaller result every
+ * call because the inner container grows with the PDF content.
+ */
+function getNearestScrollAncestor(start: HTMLElement | null): HTMLElement {
+  let el = start;
+  while (el && el !== document.documentElement) {
+    const { overflow, overflowY } = getComputedStyle(el);
+    if (/auto|scroll/.test(overflow) || /auto|scroll/.test(overflowY)) {
+      return el;
+    }
+    el = el.parentElement;
+  }
+  return document.documentElement;
+}
+
 // =====================================================================================================================
 // PdfNative component - React implementation
 
@@ -137,6 +156,11 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
     const pageDimensionsRef = useRef<{ width: number; height: number }>({ width: 595, height: 842 });
     // Ref to the scrollable viewport div — used for fit-width / fit-page calculations
     const viewportRef = useRef<HTMLDivElement>(null);
+    // Measurement sentinel: an absolutely-positioned div that always reflects the true
+    // available layout space, independent of PDF content size. Using viewportRef itself
+    // fails inside ScrollViewer because that container grows with content — causing a
+    // feedback loop where fitPage() makes the PDF smaller on every call.
+    const measureRef = useRef<HTMLDivElement>(null);
     // Internal annotation state — initialized from the prop, but owned here so controlled
     // inputs don't snap back to old values when the parent doesn't round-trip updates.
     const [internalAnnotations, setInternalAnnotations] = useState<Annotation[]>(annotations);
@@ -359,19 +383,23 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
           latestValues.current.updateState?.({ scale: 1 });
         },
         fitWidth: () => {
-          const viewport = viewportRef.current;
-          if (!viewport) return;
-          const availableWidth = viewport.clientWidth - 16; // subtract padding
+          const outer = measureRef.current;
+          if (!outer) return;
+          // Use the nearest external scroll ancestor to avoid feedback loop when
+          // Pdf is inside a ScrollViewer (the outer div grows with content).
+          const ancestor = getNearestScrollAncestor(outer.parentElement);
+          const availableWidth = Math.min(outer.clientWidth, ancestor.clientWidth) - 16;
           const newScale = availableWidth / pageDimensionsRef.current.width;
           const clamped = Math.max(0.1, Math.min(5, newScale));
           setInternalScale(clamped);
           latestValues.current.updateState?.({ scale: clamped });
         },
         fitPage: () => {
-          const viewport = viewportRef.current;
-          if (!viewport) return;
-          const availableWidth = viewport.clientWidth - 16;
-          const availableHeight = viewport.clientHeight - 16;
+          const outer = measureRef.current;
+          if (!outer) return;
+          const ancestor = getNearestScrollAncestor(outer.parentElement);
+          const availableWidth = Math.min(outer.clientWidth, ancestor.clientWidth) - 16;
+          const availableHeight = Math.min(outer.clientHeight, ancestor.clientHeight) - 16;
           const scaleW = availableWidth / pageDimensionsRef.current.width;
           const scaleH = availableHeight / pageDimensionsRef.current.height;
           const clamped = Math.max(0.1, Math.min(5, Math.min(scaleW, scaleH)));
@@ -463,8 +491,11 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
       <div 
         ref={ref} 
         className={className}
-        style={{ ...style, display: "flex", gap: "16px" }}
+        style={{ ...style, position: "relative", display: "flex", gap: "16px", minHeight: 0, overflow: "hidden" }}
       >
+        {/* Measurement sentinel: absolutely covers the outer container so it always
+            reports the true available layout space, unaffected by PDF content size. */}
+        <div ref={measureRef} style={{ position: "absolute", inset: 0, pointerEvents: "none", visibility: "hidden" }} />
         {mode === "edit" && showToolbar && (
           <FieldToolbar
             onAddAnnotation={handleAddAnnotation}
