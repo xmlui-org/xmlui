@@ -8,6 +8,8 @@ export interface SignatureAnnotationProps {
   onSelect: (id: string) => void;
   /** Called when user clicks the sign button/placeholder to open the signature modal */
   onRequestSign?: (id: string) => void;
+  /** Called when user clicks clear to remove signature */
+  onClearSign?: (id: string) => void;
 }
 
 /**
@@ -21,9 +23,10 @@ export function SignatureAnnotation({
   onUpdate,
   onSelect,
   onRequestSign,
+  onClearSign,
 }: SignatureAnnotationProps) {
   const { id, value, properties } = annotation;
-  const { label, required } = properties;
+  const { label, required, signerDate } = properties;
   const hasSignature = !!value;
 
   const handleClick = (event: React.MouseEvent) => {
@@ -57,22 +60,41 @@ export function SignatureAnnotation({
       )}
       
       {hasSignature ? (
-        // Signed: show captured signature image with option to re-sign
+        // Signed: show captured signature image with option to re-sign or clear
         <div className={styles.signedContent}>
           <img
             src={value as string}
             alt="Signature"
             className={styles.signatureImage}
           />
-          {isSelected && onRequestSign && (
-            <button
-              type="button"
-              className={styles.resignButton}
-              onClick={(e) => { e.stopPropagation(); onRequestSign(id); }}
-              data-testid="resign-button"
-            >
-              Change
-            </button>
+          {signerDate && (
+            <div className={styles.signatureDate}>
+              Signed: {signerDate}
+            </div>
+          )}
+          {isSelected && (
+            <div className={styles.signatureActions}>
+              {onRequestSign && (
+                <button
+                  type="button"
+                  className={styles.changeButton}
+                  onClick={(e) => { e.stopPropagation(); onRequestSign(id); }}
+                  data-testid="change-signature-button"
+                >
+                  Change
+                </button>
+              )}
+              {onClearSign && (
+                <button
+                  type="button"
+                  className={styles.clearButton}
+                  onClick={(e) => { e.stopPropagation(); onClearSign(id); }}
+                  data-testid="clear-signature-button"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
           )}
         </div>
       ) : (

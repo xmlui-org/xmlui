@@ -58,22 +58,20 @@ $backgroundColor-resizeHandle-hover-Pdf: createThemeVar("backgroundColor-resizeH
   cursor: nw-resize;
 }
 
-.ne {
-  top: -5px;
-  right: -5px;
-  cursor: ne-resize;
-}
-
-.sw {
-  bottom: -5px;
-  left: -5px;
-  cursor: sw-resize;
-}
-
 .se {
   bottom: -5px;
   right: -5px;
   cursor: se-resize;
+}
+
+// Move handle — visually distinct (green tint) and uses a move cursor
+.moveHandle {
+  background-color: #28a745;
+  cursor: move;
+
+  &:hover {
+    background-color: #1e7e34;
+  }
 }
 
 :export {

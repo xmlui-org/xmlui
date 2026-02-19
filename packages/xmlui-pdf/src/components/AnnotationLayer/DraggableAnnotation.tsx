@@ -72,7 +72,7 @@ export function DraggableAnnotation({
 
       setDragOffset({ x: 0, y: 0 });
     },
-    disabled: !isSelected,
+    disabled: !isSelected || annotation.properties.movable === false,
   });
 
   const currentLeft = screenPosition.x + dragOffset.x;
@@ -86,7 +86,7 @@ export function DraggableAnnotation({
         top: `${currentTop}px`,
         width: `${screenSize.width}px`,
         height: `${screenSize.height}px`,
-        cursor: isSelected ? "move" : "pointer",
+        cursor: isSelected && annotation.properties.movable !== false ? "move" : "pointer",
       }}
       onMouseDown={onMouseDown}
       onClick={() => onAnnotationSelect?.(annotation.id)}
@@ -101,6 +101,7 @@ export function DraggableAnnotation({
         pageHeight={pageHeight}
         scale={scale}
         onAnnotationUpdate={onAnnotationUpdate}
+        onMoveHandleMouseDown={onMouseDown}
       >
         {children}
       </ResizableAnnotation>

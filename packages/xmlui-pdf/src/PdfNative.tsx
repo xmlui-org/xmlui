@@ -6,9 +6,12 @@ import "react-pdf/dist/Page/TextLayer.css";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import type { Annotation } from "./types/annotation.types";
 import type { SignatureData } from "./types/signature.types";
+import type { PdfExportData } from "./types/export.types";
 import type { PdfSource } from "./types/source.types";
 import { AnnotationLayer } from "./components/AnnotationLayer/AnnotationLayer";
 import { SignatureCapture } from "./components/SignatureCapture/SignatureCapture";
+import { useSignature } from "./hooks/useSignature";
+import { createSignatureTimestamp } from "./utils/signatureUtils";
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
 
@@ -98,6 +101,7 @@ export interface PdfNativeProps {
   onAnnotationSelect?: (id: string) => void;
   onSignatureCapture?: (signature: SignatureData) => void;
   onSignatureApply?: (fieldId: string, signature: SignatureData) => void;
+  onExportRequest?: (data: PdfExportData) => void;
   
   // API registration
   registerComponentApi?: (api: any) => void;
@@ -137,6 +141,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
       onAnnotationSelect,
       onSignatureCapture,
       onSignatureApply,
+      onExportRequest,
       registerComponentApi,
       updateState,
       id,
@@ -171,6 +176,16 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
     const [signatureModalFieldId, setSignatureModalFieldId] = useState<string | null>(null);
     // Separate ref to hold signer metadata — survives annotation prop re-syncs
     const signatureMetaRef = useRef<Map<string, { signerName: string; signerFontIndex: number }>>(new Map());
+    // Signature storage via custom hook
+    const signatures = useSignature({
+      initialSignatures: signatureData ? { [`sig-${Date.now()}`]: signatureData } : {},
+    });
+    // Ref to keep latest signatures for API access
+    const signaturesRef = useRef(signatures.signatures);
+    signaturesRef.current = signatures.signatures;
+    // Stable ref for signature methods — keeps registerComponentApi effect dependency-free
+    const signatureMethodsRef = useRef(signatures);
+    signatureMethodsRef.current = signatures;
 
     // Sync internalScale when the scale prop changes externally
     const prevScaleProp = useRef(scale);
@@ -209,6 +224,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
       onAnnotationDelete,
       onAnnotationSelect,
       onSignatureApply,
+      onExportRequest,
       updateState,
       signatureData,
     });
@@ -224,6 +240,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
         onAnnotationDelete,
         onAnnotationSelect,
         onSignatureApply,
+        onExportRequest,
         updateState,
         signatureData,
       };
@@ -283,25 +300,26 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
 
     // ---- annotation mutation helpers (keep internal state + notify parent) ----
     function handleAnnotationUpdate(id: string, updates: Partial<Annotation>) {
-      const annotation = internalAnnotations.find(a => a.id === id);
+      const annotation = internalAnnotationsRef.current.find(a => a.id === id);
       if (!annotation) return;
       const updated: Annotation = { ...annotation, ...updates, modified: new Date() };
-      const next = internalAnnotations.map(a => a.id === id ? updated : a);
+      const next = internalAnnotationsRef.current.map(a => a.id === id ? updated : a);
       setInternalAnnotations(next);
-      onAnnotationUpdate?.(updated);
-      updateState?.({ annotations: next });
+      latestValues.current.onAnnotationUpdate?.(updated);
+      latestValues.current.updateState?.({ annotations: next });
     }
 
     async function handleAnnotationDelete(id: string) {
-      const annotation = internalAnnotations.find(a => a.id === id);
+      // Use the always-current ref for the initial locked check
+      const annotation = internalAnnotationsRef.current.find(a => a.id === id);
       // Respect the locked flag
       if (annotation?.properties.locked) return;
       // Allow the event handler to cancel deletion by returning false (mirrors onWillSubmit pattern)
-      const result = await onAnnotationDelete?.(id);
+      const result = await latestValues.current.onAnnotationDelete?.(id);
       if (result === false) return;
-      const next = internalAnnotations.filter(a => a.id !== id);
+      const next = internalAnnotationsRef.current.filter(a => a.id !== id);
       setInternalAnnotations(next);
-      updateState?.({ annotations: next });
+      latestValues.current.updateState?.({ annotations: next });
       if (selectedAnnotationId === id) setSelectedAnnotationId(undefined);
     }
 
@@ -379,25 +397,21 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
             created: new Date(),
             modified: new Date(),
           };
-          setInternalAnnotations(prev => {
-            const next = [...prev, newAnnotation];
-            latestValues.current.updateState?.({ annotations: next });
-            return next;
-          });
+          const next = [...internalAnnotationsRef.current, newAnnotation];
+          setInternalAnnotations(next);
+          latestValues.current.updateState?.({ annotations: next });
           onAnnotationCreate?.(newAnnotation);
           return newAnnotation.id;
         },
         updateAnnotation: (id: string, updates: any) => {
           const { onAnnotationUpdate } = latestValues.current;
-          setInternalAnnotations(prev => {
-            const annotation = prev.find(a => a.id === id);
-            if (!annotation) return prev;
-            const updated = { ...annotation, ...updates, modified: new Date() };
-            const next = prev.map(a => a.id === id ? updated : a);
-            latestValues.current.updateState?.({ annotations: next });
-            onAnnotationUpdate?.(updated);
-            return next;
-          });
+          const annotation = internalAnnotationsRef.current.find(a => a.id === id);
+          if (!annotation) return;
+          const updated = { ...annotation, ...updates, modified: new Date() };
+          const next = internalAnnotationsRef.current.map(a => a.id === id ? updated : a);
+          setInternalAnnotations(next);
+          latestValues.current.updateState?.({ annotations: next });
+          onAnnotationUpdate?.(updated);
         },
         deleteAnnotation: async (id: string) => {
           const { onAnnotationDelete } = latestValues.current;
@@ -405,11 +419,9 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
           if (annotation?.properties.locked) return;
           const result = await onAnnotationDelete?.(id);
           if (result === false) return;
-          setInternalAnnotations(prev => {
-            const next = prev.filter(a => a.id !== id);
-            latestValues.current.updateState?.({ annotations: next });
-            return next;
-          });
+          const next = internalAnnotationsRef.current.filter(a => a.id !== id);
+          setInternalAnnotations(next);
+          latestValues.current.updateState?.({ annotations: next });
           setSelectedAnnotationId(prev => prev === id ? undefined : prev);
         },
         getAnnotations: () => internalAnnotations,
@@ -432,7 +444,33 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
         applySignature: (fieldId: string, signature: SignatureData) => {
           latestValues.current.onSignatureApply?.(fieldId, signature);
         },
-        getSignature: () => latestValues.current.signatureData,
+        getSignature: (fieldId?: string) => {
+          if (fieldId) {
+            return signaturesRef.current[fieldId] ?? null;
+          }
+          // Return all signatures
+          return signaturesRef.current;
+        },
+        saveSignature: (fieldId: string, signature: SignatureData) => {
+          signatureMethodsRef.current.saveSignature(fieldId, signature);
+        },
+        clearSignature: (fieldId: string) => {
+          signatureMethodsRef.current.clearSignature(fieldId);
+        },
+        isSigned: (fieldId: string) => {
+          return signatureMethodsRef.current.isSigned(fieldId);
+        },
+        exportToBackend: () => {
+          const exportData: PdfExportData = {
+            annotations: internalAnnotationsRef.current,
+            signatures: signaturesRef.current,
+            metadata: {
+              exportedAt: new Date(),
+              pageCount: latestValues.current.numPages ?? undefined,
+            },
+          };
+          latestValues.current.onExportRequest?.(exportData);
+        },
       });
     }, [registerComponentApi]); // Only re-run if registerComponentApi function itself changes
 
@@ -444,18 +482,57 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
       // Fire events
       onSignatureCapture?.(signature);
       onSignatureApply?.(fieldId, signature);
+      // Store signature in signatures hook storage
+      signatureMethodsRef.current.saveSignature(fieldId, signature);
       // Store signer metadata in a separate ref so it survives annotation prop re-syncs
+      const now = createSignatureTimestamp();
       signatureMetaRef.current.set(fieldId, {
         signerName: signature.signerName ?? "",
         signerFontIndex: signature.signerFontIndex ?? 0,
       });
-      // Apply signature image to the annotation value
-      const next = internalAnnotations.map(a =>
-        a.id === fieldId ? { ...a, value: signature.data, modified: new Date() } : a
+      // Apply signature image to the annotation value with metadata
+      const next = internalAnnotationsRef.current.map(a =>
+        a.id === fieldId
+          ? {
+              ...a,
+              value: signature.data,
+              properties: {
+                ...(a.properties || {}),
+                signerDate: now,
+              },
+              modified: new Date(),
+            }
+          : a
       );
       setInternalAnnotations(next);
       updateState?.({ annotations: next });
       setSignatureModalFieldId(null);
+    }
+
+      // Handle signature clear from annotation
+    function handleSignatureClear(fieldId: string) {
+      // Fire clear event (null signature indicates clearing)
+      onSignatureApply?.(fieldId, null as any);
+      
+      signatureMethodsRef.current.clearSignature(fieldId);
+      signatureMetaRef.current.delete(fieldId);
+      const next = internalAnnotationsRef.current.map(a =>
+        a.id === fieldId
+          ? {
+              ...a,
+              value: undefined,
+              properties: {
+                ...(a.properties || {}),
+                signerName: undefined,
+                signerFontIndex: undefined,
+                signerDate: undefined,
+              },
+              modified: new Date(),
+            }
+          : a
+      );
+      setInternalAnnotations(next);
+      updateState?.({ annotations: next });
     }
 
     // Note: id prop is used internally by XMLUI, not applied to DOM
@@ -511,7 +588,10 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
                       onAnnotationSelect?.(id);
                     }}
                     onAnnotationUpdate={handleAnnotationUpdate}
-                    onAnnotationDelete={handleAnnotationDelete}                    onAnnotationRequestSign={(id) => setSignatureModalFieldId(id)}                  />
+                    onAnnotationDelete={handleAnnotationDelete}
+                    onAnnotationRequestSign={(id) => setSignatureModalFieldId(id)}
+                    onAnnotationClearSign={handleSignatureClear}
+                  />
                 )}
               </div>
             );

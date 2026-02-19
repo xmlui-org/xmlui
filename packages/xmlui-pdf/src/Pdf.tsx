@@ -114,6 +114,13 @@ export const PdfMd = createMetadata({
         signature: "The signature data that was applied.",
       },
     },
+    exportRequest: {
+      description: `Fired when the user requests to export the PDF with annotations and signatures to the backend.`,
+      signature: "exportRequest(data: PdfExportData): void",
+      parameters: {
+        data: "An object containing annotations, signatures, and metadata ready for backend export.",
+      },
+    },
   },
   apis: {
     goToPage: {
@@ -233,9 +240,40 @@ export const PdfMd = createMetadata({
       },
     },
     getSignature: {
-      description: `Get the current signature data.`,
-      signature: "getSignature(): object | null",
-      returns: "The current signature data, or null if no signature has been captured.",
+      description: `Retrieve stored signature data. Supports retrieving a specific signature by fieldId or all stored signatures.`,
+      signature: "getSignature(fieldId?: string): object | object[] | null",
+      parameters: {
+        fieldId: "Optional. The ID of a specific signature field. If omitted, returns all stored signatures.",
+      },
+      returns: "The requested signature data, an object containing all signatures if no fieldId provided, or null if no signature exists.",
+    },
+    saveSignature: {
+      description: `Save a signature to storage for later retrieval and reuse across fields.`,
+      signature: "saveSignature(fieldId: string, signature: object): void",
+      parameters: {
+        fieldId: "The ID of the field to associate with this signature.",
+        signature: "The signature data object to save.",
+      },
+    },
+    clearSignature: {
+      description: `Clear/remove a signature from storage.`,
+      signature: "clearSignature(fieldId: string): void",
+      parameters: {
+        fieldId: "The ID of the field whose signature should be cleared.",
+      },
+    },
+    isSigned: {
+      description: `Check if a signature field has been signed.`,
+      signature: "isSigned(fieldId: string): boolean",
+      parameters: {
+        fieldId: "The ID of the field to check.",
+      },
+      returns: "True if the field has a valid signature, false otherwise.",
+    },
+    exportToBackend: {
+      description: `Collect all annotations and signatures and trigger the onExportRequest event. Use this to prepare data for backend processing to flatten annotations and save the PDF.`,
+      signature: "exportToBackend(): void",
+      returns: "Fires onExportRequest event with PdfExportData containing annotations, signatures, and metadata.",
     },
   },
   contextVars: {
@@ -303,6 +341,7 @@ export const pdfComponentRenderer = createComponentRenderer(
         onAnnotationSelect={lookupEventHandler("annotationSelect")}
         onSignatureCapture={lookupEventHandler("signatureCapture")}
         onSignatureApply={lookupEventHandler("signatureApply")}
+        onExportRequest={lookupEventHandler("exportRequest")}
         registerComponentApi={registerComponentApi}
         updateState={updateState}
       />

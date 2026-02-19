@@ -1,40 +1,8 @@
 import { useState, useCallback, useEffect } from "react";
 import type { SignatureData } from "../../types/signature.types";
 import { SignatureTypeInput, SIGNATURE_FONTS } from "./SignatureTypeInput";
+import { typedSignatureToDataUrl } from "../../utils/signatureUtils";
 import styles from "./SignatureCapture.module.scss";
-
-// ---------------------------------------------------------------------------
-// Utility — render typed signature to a data URL using an off-screen canvas
-// ---------------------------------------------------------------------------
-
-/**
- * Renders `text` in `fontFamily` on an off-screen canvas and returns
- * a PNG data URL (base64-encoded).
- */
-function typedSignatureToDataUrl(text: string, fontFamily: string): string {
-  const canvas = document.createElement("canvas");
-  const fontSize = 48;
-  const padding = 12;
-
-  // Measure first with a rough canvas to determine width
-  const ctx = canvas.getContext("2d")!;
-  ctx.font = `${fontSize}px ${fontFamily}`;
-  const measured = ctx.measureText(text);
-  const width = Math.ceil(measured.width) + padding * 2;
-  const height = fontSize + padding * 2;
-
-  canvas.width = width;
-  canvas.height = height;
-
-  // Transparent background (already default)
-  // Re-apply font after resize (resizing resets state)
-  ctx.font = `${fontSize}px ${fontFamily}`;
-  ctx.fillStyle = "#11182f";
-  ctx.textBaseline = "middle";
-  ctx.fillText(text, padding, height / 2);
-
-  return canvas.toDataURL("image/png");
-}
 
 // ---------------------------------------------------------------------------
 // Component

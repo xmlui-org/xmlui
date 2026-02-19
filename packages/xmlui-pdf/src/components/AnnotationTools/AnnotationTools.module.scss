@@ -135,22 +135,36 @@
 .signedContent {
   position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
   height: 100%;
+  gap: 2px;
+  padding: 4px;
 }
 
 .signatureImage {
   max-width: 100%;
-  max-height: 100%;
+  max-height: 60%;
   object-fit: contain;
 }
 
-.resignButton {
-  position: absolute;
-  top: 2px;
-  right: 2px;
+.signatureDate {
+  font-size: 10px;
+  color: #666;
+  margin-top: 2px;
+  margin-bottom: 4px;
+}
+
+.signatureActions {
+  display: flex;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.changeButton,
+.clearButton {
   font-size: 11px;
   padding: 2px 6px;
   background: rgba(255, 255, 255, 0.85);
@@ -159,9 +173,28 @@
   cursor: pointer;
   color: #555;
   transition: background 0.15s;
+  white-space: nowrap;
 
   &:hover {
     background: #fff;
     color: #333;
+  }
+}
+
+.changeButton {
+  border-color: #0056b3;
+  color: #0056b3;
+
+  &:hover {
+    background: #f0f7ff;
+  }
+}
+
+.clearButton {
+  border-color: #dc3545;
+  color: #dc3545;
+
+  &:hover {
+    background: #fff5f5;
   }
 }

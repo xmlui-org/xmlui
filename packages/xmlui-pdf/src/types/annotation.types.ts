@@ -39,10 +39,16 @@ export interface AnnotationProperties {
   fontFamily?: string;
   /** When true, the annotation cannot be deleted by the user */
   locked?: boolean;
+  /** When false, the annotation cannot be resized by the user (default: true) */
+  resizable?: boolean;
+  /** When false, the annotation cannot be moved by the user (default: true) */
+  movable?: boolean;
   /** Name of the signer (for signature fields) */
   signerName?: string;
   /** Font index used for typed signature (for signature fields) */
   signerFontIndex?: number;
+  /** Date when signature was applied (for signature fields) */
+  signerDate?: string;
 }
 
 /**

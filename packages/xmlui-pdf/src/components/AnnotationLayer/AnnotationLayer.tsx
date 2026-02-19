@@ -18,6 +18,8 @@ export interface AnnotationLayerProps {
   onAnnotationDelete?: (id: string) => void;
   /** Called when user requests to open the signature modal for a field */
   onAnnotationRequestSign?: (id: string) => void;
+  /** Called when user requests to clear a signature from a field */
+  onAnnotationClearSign?: (id: string) => void;
 }
 
 /**
@@ -35,6 +37,7 @@ export function AnnotationLayer({
   onAnnotationUpdate,
   onAnnotationDelete,
   onAnnotationRequestSign,
+  onAnnotationClearSign,
 }: AnnotationLayerProps) {
   // Filter annotations for current page
   const pageAnnotations = annotations.filter(ann => ann.page === pageNumber);
@@ -100,6 +103,7 @@ export function AnnotationLayer({
                 onUpdate={onAnnotationUpdate}
                 onSelect={(id) => onAnnotationSelect?.(id)}
                 onRequestSign={onAnnotationRequestSign}
+                onClearSign={onAnnotationClearSign}
               />
             )}
             

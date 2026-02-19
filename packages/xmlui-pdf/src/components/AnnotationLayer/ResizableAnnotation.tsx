@@ -12,6 +12,8 @@ export interface ResizableAnnotationProps {
   pageHeight: number;
   scale: number;
   onAnnotationUpdate?: (id: string, updates: Partial<Annotation>) => void;
+  /** MouseDown handler that triggers drag/move — supplied by DraggableAnnotation */
+  onMoveHandleMouseDown?: (e: React.MouseEvent) => void;
   children: React.ReactNode;
 }
 
@@ -32,41 +34,24 @@ export function ResizableAnnotation({
   pageHeight,
   scale,
   onAnnotationUpdate,
+  onMoveHandleMouseDown,
   children,
 }: ResizableAnnotationProps) {
   const [resizeDelta, setResizeDelta] = useState({ width: 0, height: 0 });
   const viewport = { width: pageWidth, height: pageHeight, scale };
   const maintainAspectRatio = annotation.type === "signature";
 
+  // Respect annotation-level flags (default: both enabled)
+  const canResize = annotation.properties.resizable !== false;
+  const canMove = annotation.properties.movable !== false;
+
   const { isResizing, resizeHandlers } = useResize({
     onResizeStart: () => {
       // Visual feedback handled by isResizing state
     },
     onResize: (handle, deltaX, deltaY) => {
-      let widthDelta = 0;
-      let heightDelta = 0;
-
-      // Calculate size changes based on which handle is being dragged
-      switch (handle) {
-        case "nw":
-          widthDelta = -deltaX;
-          heightDelta = -deltaY;
-          break;
-        case "ne":
-          widthDelta = deltaX;
-          heightDelta = -deltaY;
-          break;
-        case "sw":
-          widthDelta = -deltaX;
-          heightDelta = deltaY;
-          break;
-        case "se":
-          widthDelta = deltaX;
-          heightDelta = deltaY;
-          break;
-      }
-
-      setResizeDelta({ width: widthDelta, height: heightDelta });
+      // Only SE handle now, so deltaX/deltaY map directly to width/height
+      setResizeDelta({ width: deltaX, height: deltaY });
     },
     onResizeEnd: (handle, deltaX, deltaY) => {
       if (deltaX === 0 && deltaY === 0) {
@@ -74,32 +59,9 @@ export function ResizableAnnotation({
         return;
       }
 
-      let widthDelta = 0;
-      let heightDelta = 0;
-
-      // Calculate size changes based on which handle was dragged
-      switch (handle) {
-        case "nw":
-          widthDelta = -deltaX;
-          heightDelta = -deltaY;
-          break;
-        case "ne":
-          widthDelta = deltaX;
-          heightDelta = -deltaY;
-          break;
-        case "sw":
-          widthDelta = -deltaX;
-          heightDelta = deltaY;
-          break;
-        case "se":
-          widthDelta = deltaX;
-          heightDelta = deltaY;
-          break;
-      }
-
       // Calculate new screen size
-      const newScreenWidth = screenSize.width + widthDelta;
-      const newScreenHeight = screenSize.height + heightDelta;
+      const newScreenWidth = screenSize.width + deltaX;
+      const newScreenHeight = screenSize.height + deltaY;
 
       // Convert to PDF size
       const newPdfSize = screenToPdfSize(newScreenWidth, newScreenHeight, viewport);
@@ -116,7 +78,7 @@ export function ResizableAnnotation({
 
       setResizeDelta({ width: 0, height: 0 });
     },
-    disabled: !isSelected,
+    disabled: !isSelected || !canResize,
     maintainAspectRatio,
   });
 
@@ -137,26 +99,22 @@ export function ResizableAnnotation({
       
       {isSelected && (
         <div className={styles.resizeHandles}>
-          <div
-            className={`${styles.resizeHandle} ${styles.nw}`}
-            onMouseDown={resizeHandlers.nw}
-            data-testid="resize-handle-nw"
-          />
-          <div
-            className={`${styles.resizeHandle} ${styles.ne}`}
-            onMouseDown={resizeHandlers.ne}
-            data-testid="resize-handle-ne"
-          />
-          <div
-            className={`${styles.resizeHandle} ${styles.sw}`}
-            onMouseDown={resizeHandlers.sw}
-            data-testid="resize-handle-sw"
-          />
-          <div
-            className={`${styles.resizeHandle} ${styles.se}`}
-            onMouseDown={resizeHandlers.se}
-            data-testid="resize-handle-se"
-          />
+          {canMove && onMoveHandleMouseDown && (
+            <div
+              className={`${styles.resizeHandle} ${styles.moveHandle} ${styles.nw}`}
+              onMouseDown={(e) => { e.stopPropagation(); onMoveHandleMouseDown(e); }}
+              data-testid="move-handle-nw"
+              title="Move"
+            />
+          )}
+          {canResize && (
+            <div
+              className={`${styles.resizeHandle} ${styles.se}`}
+              onMouseDown={resizeHandlers.se}
+              data-testid="resize-handle-se"
+              title="Resize"
+            />
+          )}
         </div>
       )}
     </div>
