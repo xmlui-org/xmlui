@@ -1,3 +1,5 @@
+export { shikiHighlighter, highlight } from "./highlighter";
+
 import { basicLayoutRenderer } from "./layouts/BasicLayout";
 import { featuredWithTabsLayoutRenderer } from "./layouts/FeaturedWithTabsLayout";
 import { overviewCardRenderer } from "./docs/OverviewCard";

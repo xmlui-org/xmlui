@@ -4,9 +4,8 @@ import {
   groupedNavPanelContent,
   content,
   plainTextContent,
-  shikiHighlighter,
-  highlight,
 } from "../utils";
+import { shikiHighlighter, highlight } from "xmlui-docs-blocks";
 import type { StandaloneAppDescription } from "xmlui";
 
 

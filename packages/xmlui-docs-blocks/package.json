@@ -12,6 +12,8 @@
     "build:meta": "xmlui build-lib --mode=metadata"
   },
   "dependencies": {
+    "@shikijs/langs": "3.4.2",
+    "shiki": "^3.3.0"
   },
   "devDependencies": {
     "xmlui": "*"

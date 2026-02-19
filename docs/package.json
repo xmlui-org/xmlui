@@ -15,8 +15,6 @@
     "preview-optimized": "npx serve-optimized ./xmlui-optimized-output"
   },
   "dependencies": {
-    "@shikijs/langs": "3.4.2",
-    "shiki": "^3.3.0",
     "xmlui": "*",
     "xmlui-playground": "*",
     "xmlui-search": "*",
