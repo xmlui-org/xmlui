@@ -375,9 +375,9 @@
             <NavLink icon="globals" label="Globals" to="/globals" />
             <NavLink icon="helper-tags" label="Helper Tags" to="/helper-tags" />
             <NavLink
-                icon="universal-props"
-                label="Universal Properties"
-                to="/universal-properties"
+                icon="core-props"
+                label="Core Properties"
+                to="/core-properties"
             />
             <NavLink
                 icon="template-props"
@@ -603,10 +603,13 @@
                 content="{appGlobals.content['pages/helper-tags.md']}"
             />
         </Page>
-        <Page url="/universal-properties">
+        <Page url="/core-properties">
             <DocumentPage
-                content="{appGlobals.content['pages/universal-properties.md']}"
+                content="{appGlobals.content['pages/core-properties.md']}"
             />
+        </Page>
+        <Page url="/universal-properties">
+            <Redirect to="/core-properties" />
         </Page>
         <Page url="/template-properties">
             <DocumentPage
