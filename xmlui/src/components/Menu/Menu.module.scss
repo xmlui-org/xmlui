@@ -120,6 +120,11 @@ $color-MenuSeparator: createThemeVar("color-MenuSeparator");
   &:first-child, &:last-child{
     display: none;
   }
+  
+  // Hide adjacent separators (when MenuSeparator immediately follows another MenuSeparator)
+  & + & {
+    display: none;
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer

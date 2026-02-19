@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import type {
   CellContext,
@@ -17,7 +17,12 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { composeRefs } from "@radix-ui/react-compose-refs";
-import { Virtualizer, type VirtualizerHandle } from "virtua";
+import {
+  Virtualizer,
+  type VirtualizerHandle,
+  type CustomItemComponentProps,
+  type CustomItemComponent,
+} from "virtua";
 import { orderBy } from "lodash-es";
 import classnames from "classnames";
 
@@ -45,7 +50,11 @@ import { type OurColumnMetadata } from "../Column/TableContext";
 import useRowSelection from "./useRowSelection";
 import { PaginationNative, type Position } from "../Pagination/PaginationNative";
 import { Part } from "../Part/Part";
-import { parseKeyBinding, matchesKeyEvent, type ParsedKeyBinding } from "../../parsers/keybinding-parser/keybinding-parser";
+import {
+  parseKeyBinding,
+  matchesKeyEvent,
+  type ParsedKeyBinding,
+} from "../../parsers/keybinding-parser/keybinding-parser";
 
 // =====================================================================================================================
 // Helper types
@@ -122,7 +131,7 @@ export type TableActionContext = {
 /**
  * Helper function to build action context parameters from current table state.
  * Returns three separate values instead of an object for cleaner event handler APIs.
- * 
+ *
  * @param selectedItems - Array of selected row items
  * @param selectedRowIdMap - Map of selected row IDs
  * @param focusedIndex - Currently focused row index (-1 if none)
@@ -378,7 +387,7 @@ function useTableKeyboardActions({
     Object.entries(keyToActions).forEach(([key, actions]) => {
       if (actions.length > 1) {
         console.warn(
-          `Key binding conflict: '${key}' is bound to multiple actions: [${actions.join(", ")}]. Using: ${actions[actions.length - 1]}`
+          `Key binding conflict: '${key}' is bound to multiple actions: [${actions.join(", ")}]. Using: ${actions[actions.length - 1]}`,
         );
       }
     });
@@ -394,34 +403,34 @@ function useTableKeyboardActions({
         if (matchesKeyEvent(event.nativeEvent, binding)) {
           // Prevent default browser behavior immediately when key matches
           event.preventDefault();
-          
+
           // If rowsSelectable is false, prevent default but don't execute any actions
           if (!rowsSelectable) {
             return true; // Event handled (prevented), but don't execute action
           }
-          
+
           // Call the appropriate handler
           let handled = false;
           switch (action) {
             case "selectAll":
               // First, select all items via the API
               selectionApi.selectAll();
-              
+
               // Build the selectedRowIdMap for all items (since selectAll selects everything)
               const allSelectedRowIdMap: Record<string, boolean> = {};
               data.forEach((item: any) => {
                 allSelectedRowIdMap[String(item[idKey])] = true;
               });
-              
+
               // Build context with all items selected
               const [row, allItems, allIds] = buildActionContext(
                 data, // All data items are selected
                 allSelectedRowIdMap,
                 focusedIndex,
                 data,
-                idKey
+                idKey,
               );
-              
+
               // Finally, invoke the event handler if provided
               if (onSelectAllAction) {
                 onSelectAllAction(row, allItems, allIds);
@@ -435,7 +444,7 @@ function useTableKeyboardActions({
                   selectedRowIdMap,
                   focusedIndex,
                   data,
-                  idKey
+                  idKey,
                 );
                 onCutAction(row, items, ids);
                 handled = true;
@@ -448,7 +457,7 @@ function useTableKeyboardActions({
                   selectedRowIdMap,
                   focusedIndex,
                   data,
-                  idKey
+                  idKey,
                 );
                 onCopyAction(row, items, ids);
                 handled = true;
@@ -461,7 +470,7 @@ function useTableKeyboardActions({
                   selectedRowIdMap,
                   focusedIndex,
                   data,
-                  idKey
+                  idKey,
                 );
                 onPasteAction(row, items, ids);
                 handled = true;
@@ -474,7 +483,7 @@ function useTableKeyboardActions({
                   selectedRowIdMap,
                   focusedIndex,
                   data,
-                  idKey
+                  idKey,
                 );
                 onDeleteAction(row, items, ids);
                 handled = true;
@@ -490,7 +499,21 @@ function useTableKeyboardActions({
 
       return false; // Event not handled
     },
-    [parsedBindings, onSelectAllAction, onCutAction, onCopyAction, onPasteAction, onDeleteAction, selectedItems, selectedRowIdMap, focusedIndex, data, idKey, rowsSelectable, selectionApi]
+    [
+      parsedBindings,
+      onSelectAllAction,
+      onCutAction,
+      onCopyAction,
+      onPasteAction,
+      onDeleteAction,
+      selectedItems,
+      selectedRowIdMap,
+      focusedIndex,
+      data,
+      idKey,
+      rowsSelectable,
+      selectionApi,
+    ],
   );
 
   return handleKeyboardActions;
@@ -562,9 +585,14 @@ export const Table = forwardRef(
     forwardedRef,
   ) => {
     const { getThemeVar } = useTheme();
-    const effectiveUserSelectCell = userSelectCell ?? getThemeVar("userSelect-cell-Table") ?? defaultProps.userSelectCell;
-    const effectiveUserSelectRow = userSelectRow ?? getThemeVar("userSelect-row-Table") ?? defaultProps.userSelectRow;
-    const effectiveUserSelectHeading = userSelectHeading ?? getThemeVar("userSelect-heading-Table") ?? defaultProps.userSelectHeading;
+    const effectiveUserSelectCell =
+      userSelectCell ?? getThemeVar("userSelect-cell-Table") ?? defaultProps.userSelectCell;
+    const effectiveUserSelectRow =
+      userSelectRow ?? getThemeVar("userSelect-row-Table") ?? defaultProps.userSelectRow;
+    const effectiveUserSelectHeading =
+      userSelectHeading ??
+      getThemeVar("userSelect-heading-Table") ??
+      defaultProps.userSelectHeading;
     const safeData = Array.isArray(data) ? data : EMPTY_ARRAY;
     const wrapperRef = useRef<HTMLDivElement>(null);
     const ref = forwardedRef ? composeRefs(wrapperRef, forwardedRef) : wrapperRef;
@@ -659,7 +687,7 @@ export const Table = forwardRef(
           onKeyDown(event);
         }
       },
-      [handleKeyboardActions, onKeyDown]
+      [handleKeyboardActions, onKeyDown],
     );
 
     // --- Create data with order information whenever the items in the table change
@@ -828,28 +856,31 @@ export const Table = forwardRef(
             />
           ) : null,
         cell: ({ row }: CellContext<any, unknown>) => {
-          return <>
-            {row.getCanSelect() &&
-            <Toggle
-              {...{
-                "aria-label": `Select ${row.original[idKey]}`,
-                className: classnames(styles.checkBoxWrapper, {
-                  [styles.forceHoverWrapper]: hoveredRowId === row.id,
-                }),
-                value: row.getIsSelected(),
-                indeterminate: row.getIsSomeSelected(),
-                forceHover: hoveredRowId === row.id,
-                onDidChange: () => {
-                  // In single selection mode, allow deselection by checking if already selected
-                  if (!enableMultiRowSelection && row.getIsSelected()) {
-                    checkAllRows(false); // Deselect all (which is just this one row)
-                  } else {
-                    toggleRow(row.original, { metaKey: true });
-                  }
-                },
-              }}
-            />}
-          </>;
+          return (
+            <>
+              {row.getCanSelect() && (
+                <Toggle
+                  {...{
+                    "aria-label": `Select ${row.original[idKey]}`,
+                    className: classnames(styles.checkBoxWrapper, {
+                      [styles.forceHoverWrapper]: hoveredRowId === row.id,
+                    }),
+                    value: row.getIsSelected(),
+                    indeterminate: row.getIsSomeSelected(),
+                    forceHover: hoveredRowId === row.id,
+                    onDidChange: () => {
+                      // In single selection mode, allow deselection by checking if already selected
+                      if (!enableMultiRowSelection && row.getIsSelected()) {
+                        checkAllRows(false); // Deselect all (which is just this one row)
+                      } else {
+                        toggleRow(row.original, { metaKey: true });
+                      }
+                    },
+                  }}
+                />
+              )}
+            </>
+          );
         },
       };
       return rowsSelectable ? [selectColumn, ...columnsWithCustomCell] : columnsWithCustomCell;
@@ -998,21 +1029,22 @@ export const Table = forwardRef(
 
         // Combine selectors into single query for better performance
         // Note: Avoid [style*="..."] selectors - they only match inline styles, not computed styles
-        const selector = '[data-part-header], [role="banner"], header, .app-header, .header, [data-fixed-header]';
-        
+        const selector =
+          '[data-part-header], [role="banner"], header, .app-header, .header, [data-fixed-header]';
+
         let maxBottom = 0;
-        
+
         try {
           const elements = rootNode.querySelectorAll(selector);
-          
+
           // Use for...of for better performance than forEach
           for (const el of elements) {
             if (el === thead || thead.contains(el)) continue;
-            
+
             const style = window.getComputedStyle(el);
-            
+
             // Only check position if element is fixed/sticky
-            if (style.position === 'fixed' || style.position === 'sticky') {
+            if (style.position === "fixed" || style.position === "sticky") {
               const rect = el.getBoundingClientRect();
               // Check if element is at or near the top of the viewport
               if (rect.top <= 10 && rect.bottom > 0) {
@@ -1023,7 +1055,7 @@ export const Table = forwardRef(
         } catch (e) {
           // Invalid selector or other DOM error, return 0
         }
-        
+
         return maxBottom;
       };
 
@@ -1040,15 +1072,15 @@ export const Table = forwardRef(
             lastOffset = offset;
             thead.style.transform = `translate3d(0,${offset}px,0)`;
             if (!thead.style.zIndex) {
-              thead.style.zIndex = '1000';
-              thead.style.position = 'relative';
+              thead.style.zIndex = "1000";
+              thead.style.position = "relative";
             }
           }
         } else if (lastOffset !== -1) {
           lastOffset = -1;
-          thead.style.transform = '';
-          thead.style.zIndex = '';
-          thead.style.position = '';
+          thead.style.transform = "";
+          thead.style.zIndex = "";
+          thead.style.position = "";
         }
       };
 
@@ -1131,22 +1163,22 @@ export const Table = forwardRef(
         stopPolling();
       };
 
-      scrollTarget.addEventListener('scroll', onScroll, { passive: true });
-      scrollTarget.addEventListener('touchmove', onTouchMove, { passive: true });
-      scrollTarget.addEventListener('touchend', onTouchEnd, { passive: true });
-      scrollTarget.addEventListener('touchstart', onTouchStart, { passive: true });
+      scrollTarget.addEventListener("scroll", onScroll, { passive: true });
+      scrollTarget.addEventListener("touchmove", onTouchMove, { passive: true });
+      scrollTarget.addEventListener("touchend", onTouchEnd, { passive: true });
+      scrollTarget.addEventListener("touchstart", onTouchStart, { passive: true });
       applyTransform(); // initial check
 
       return () => {
-        scrollTarget.removeEventListener('scroll', onScroll);
-        scrollTarget.removeEventListener('touchmove', onTouchMove);
-        scrollTarget.removeEventListener('touchend', onTouchEnd);
-        scrollTarget.removeEventListener('touchstart', onTouchStart);
+        scrollTarget.removeEventListener("scroll", onScroll);
+        scrollTarget.removeEventListener("touchmove", onTouchMove);
+        scrollTarget.removeEventListener("touchend", onTouchEnd);
+        scrollTarget.removeEventListener("touchstart", onTouchStart);
         stopPolling();
         ro.disconnect();
-        thead.style.transform = '';
-        thead.style.zIndex = '';
-        thead.style.position = '';
+        thead.style.transform = "";
+        thead.style.zIndex = "";
+        thead.style.position = "";
       };
     }, [alwaysShowHeader, hasOutsideScroll]);
 
@@ -1155,25 +1187,180 @@ export const Table = forwardRef(
     // ==================================================================================
     const virtualizerRef = useRef<VirtualizerHandle>(null);
     const firstRowRef = useRef<HTMLTableRowElement>(null);
-    const [measuredRowHeight, setMeasuredRowHeight] = useState<number | undefined>(undefined);
-
-    // Measure first row height (follows List component pattern)
-    useEffect(() => {
-      if (firstRowRef.current && !measuredRowHeight && rows.length > 0) {
-        requestAnimationFrame(() => {
-          if (firstRowRef.current) {
-            const height = firstRowRef.current.offsetHeight;
-            if (height > 0) {
-              setMeasuredRowHeight(height);
-            }
-          }
-        });
-      }
-    }, [measuredRowHeight, rows.length]);
-
-    const effectiveRowHeight = measuredRowHeight || rowHeight || defaultProps.rowHeight;
 
     const hasData = safeData.length !== 0;
+
+    // Use a ref to avoid recreating VirtualTableRow when rows change
+    const rowsRef = useRef(rows);
+    rowsRef.current = rows;
+
+    // Custom row component for Virtualizer - memoized to avoid recreation on every render
+    const VirtualTableRow = useMemo(() => {
+      const RowComponent = forwardRef<HTMLTableRowElement, CustomItemComponentProps>(
+        ({ style, children, index: rowIndex }, ref) => {
+          const row = rowsRef.current[rowIndex];
+          if (!row) {
+            console.warn(`Table: No row data found at index ${rowIndex}`);
+            return null;
+          }
+          const isFirstRow = rowIndex === 0;
+          return (
+            <tr
+              data-index={rowIndex}
+              ref={composeRefs(ref, isFirstRow ? firstRowRef : undefined)}
+              style={{
+                ...style,
+                userSelect: effectiveUserSelectRow as React.CSSProperties["userSelect"],
+              }}
+              className={classnames(styles.row, {
+                [styles.selected]: row.getIsSelected(),
+                [styles.focused]: focusedIndex === rowIndex,
+                [styles.disabled]: rowDisabledPredicate(row.original),
+                [styles.noBottomBorder]: noBottomBorder,
+              })}
+              onClick={(event) => {
+                // On Windows, the second click of a double-click fires onClick before onDoubleClick.
+                // If we allow state mutations (toggleRow, focus) during that second click, the
+                // resulting re-render can destroy the dblclick event on <tr> elements.
+                // Returning early for detail >= 2 prevents that and lets onDoubleClick fire cleanly.
+                if (event.detail >= 2) {
+                  return;
+                }
+                if (!row.getCanSelect()) {
+                  return;
+                }
+                if (event?.defaultPrevented) {
+                  return;
+                }
+                // Ignore the second click of a double-click to allow onDoubleClick to fire
+                if (event.detail >= 2) {
+                  return;
+                }
+                const target = event.target as HTMLElement;
+                if (target.tagName.toLowerCase() === "input") {
+                  return;
+                }
+                if (target.closest("button")) {
+                  return;
+                }
+
+                // Focus the table wrapper to enable keyboard shortcuts (after checking input/button)
+                wrapperRef.current?.focus();
+
+                // Check if click is within checkbox boundary
+                const currentRow = event.currentTarget as HTMLElement;
+                const checkbox = currentRow.querySelector(
+                  'input[type="checkbox"]',
+                ) as HTMLInputElement;
+
+                if (checkbox) {
+                  const checkboxRect = checkbox.getBoundingClientRect();
+                  const clickX = event.clientX;
+                  const clickY = event.clientY;
+
+                  if (isWithinCheckboxBoundary(clickX, clickY, checkboxRect, tolerancePixels)) {
+                    // Toggle the checkbox when clicking within the boundary
+                    // In single selection mode, allow deselection by checking if already selected
+                    if (!enableMultiRowSelection && row.getIsSelected()) {
+                      checkAllRows(false); // Deselect all (which is just this one row)
+                    } else {
+                      toggleRow(row.original, { metaKey: true });
+                    }
+                    return;
+                  }
+                }
+                toggleRow(row.original, event);
+              }}
+              onDoubleClick={(event) => {
+                // Prevent browser text selection on double-click
+                event.preventDefault();
+
+                // Call external handler if provided
+                if (rowDoubleClick && typeof rowDoubleClick === "function") {
+                  try {
+                    rowDoubleClick(row.original);
+                  } catch (e) {
+                    console.error("Error in rowDoubleClick handler:", e);
+                  }
+                }
+              }}
+              onMouseMove={(event) => {
+                // Change cursor and hover state when within checkbox boundary
+                const currentRow = event.currentTarget as HTMLElement;
+                const checkbox = currentRow.querySelector(
+                  'input[type="checkbox"]',
+                ) as HTMLInputElement;
+
+                if (checkbox) {
+                  const checkboxRect = checkbox.getBoundingClientRect();
+                  const mouseX = event.clientX;
+                  const mouseY = event.clientY;
+
+                  const shouldShowHover = isWithinCheckboxBoundary(
+                    mouseX,
+                    mouseY,
+                    checkboxRect,
+                    tolerancePixels,
+                  );
+
+                  // Update hover state and cursor based on proximity to checkbox
+                  if (shouldShowHover) {
+                    setHoveredRowId(row.id);
+                    currentRow.style.cursor = "pointer";
+                  } else {
+                    setHoveredRowId(null);
+                    currentRow.style.cursor = "";
+                  }
+                }
+              }}
+              onMouseLeave={(event) => {
+                // Reset cursor and hover state when leaving the row
+                const currentRow = event.currentTarget as HTMLElement;
+                currentRow.style.cursor = "";
+                setHoveredRowId(null);
+              }}
+              onContextMenu={(event) => {
+                // Prevent default browser context menu
+                event.preventDefault();
+
+                // Use lookupEventHandler with context containing row variables
+                if (lookupEventHandler) {
+                  const handler = lookupEventHandler("contextMenu", {
+                    context: {
+                      $item: row.original,
+                      $row: row.original,
+                      $rowIndex: rowIndex,
+                      $itemIndex: rowIndex,
+                    },
+                    ephemeral: true, // Don't cache this handler since context changes per row
+                  });
+
+                  handler?.(event);
+                }
+              }}
+            >
+              {children}
+            </tr>
+          );
+        },
+      );
+      RowComponent.displayName = "VirtualTableRow";
+      return RowComponent;
+    }, [
+      focusedIndex,
+      rowDisabledPredicate,
+      noBottomBorder,
+      effectiveUserSelectRow,
+      firstRowRef,
+      toggleRow,
+      checkAllRows,
+      enableMultiRowSelection,
+      tolerancePixels,
+      wrapperRef,
+      setHoveredRowId,
+      lookupEventHandler,
+      rowDoubleClick,
+    ]);
 
     const touchedSizesRef = useRef<Record<string, boolean>>({});
     const columnSizeTouched = useCallback((id: string) => {
@@ -1267,17 +1454,17 @@ export const Table = forwardRef(
         onKeyDown={compositeKeyDown}
         onClick={(e) => {
           const target = e.target as HTMLElement;
-          
+
           // Skip focusing wrapper if clicking on interactive elements that handle their own focus
           if (target.closest("button")) {
             return;
           }
-          
+
           // Skip if target is an element that expects keyboard text input
           if (isTextInputElement(target)) {
             return;
           }
-          
+
           // Focus the wrapper to enable keyboard shortcuts
           wrapperRef.current?.focus();
         }}
@@ -1291,74 +1478,29 @@ export const Table = forwardRef(
         <table className={styles.table} ref={tableRef}>
           {!hideHeader && (
             <>
-              <thead 
+              <thead
                 ref={theadRef}
-                style={{ 
+                style={{
                   height: headerHeight,
-                  position: 'sticky',
+                  position: "sticky",
                   top: 0,
                   minWidth: "100%",
-                  willChange: alwaysShowHeader && hasOutsideScroll ? 'transform' : undefined,
-                }} 
+                  willChange: alwaysShowHeader && hasOutsideScroll ? "transform" : undefined,
+                }}
                 className={styles.headerWrapper}
               >
-              {table.getHeaderGroups().map((headerGroup, headerGroupIndex) => (
-                <tr
-                  key={`${headerGroup.id}-${headerGroupIndex}`}
-                  className={classnames(styles.headerRow, {
-                    [styles.allSelected]: table.getIsAllRowsSelected(),
-                  })}
-                  onClick={(event) => {
-                    const target = event.target as HTMLElement;
-                    const headerCell = target.closest("th");
-
-                    // Only handle clicks for the select column header
-                    if (headerCell && rowsSelectable && enableMultiRowSelection) {
-                      const header = headerGroup.headers.find((h) => {
-                        const headerElement = headerCell;
-                        return (
-                          headerElement?.getAttribute("data-column-id") === h.id ||
-                          h.id === "select"
-                        );
-                      });
-
-                      if (header && header.id === "select") {
-                        const clickX = event.clientX;
-                        const clickY = event.clientY;
-                        const checkbox = headerCell.querySelector(
-                          'input[type="checkbox"]',
-                        ) as HTMLInputElement;
-
-                        if (checkbox) {
-                          const checkboxRect = checkbox.getBoundingClientRect();
-
-                          if (
-                            isWithinCheckboxBoundary(clickX, clickY, checkboxRect, tolerancePixels)
-                          ) {
-                            // Prevent the default click and manually trigger the checkbox
-                            event.preventDefault();
-                            event.stopPropagation();
-
-                            const allSelected = table
-                              .getRowModel()
-                              .rows.every(
-                                (row) =>
-                                  rowDisabledPredicate(row.original) ||
-                                  rowUnselectablePredicate(row.original) ||
-                                  row.getIsSelected(),
-                              );
-                            checkAllRows(!allSelected);
-                          }
-                        }
-                      }
-                    }
-                  }}
-                  onMouseMove={(event) => {
-                    if (rowsSelectable && enableMultiRowSelection) {
+                {table.getHeaderGroups().map((headerGroup, headerGroupIndex) => (
+                  <tr
+                    key={`${headerGroup.id}-${headerGroupIndex}`}
+                    className={classnames(styles.headerRow, {
+                      [styles.allSelected]: table.getIsAllRowsSelected(),
+                    })}
+                    onClick={(event) => {
                       const target = event.target as HTMLElement;
                       const headerCell = target.closest("th");
 
-                      if (headerCell) {
+                      // Only handle clicks for the select column header
+                      if (headerCell && rowsSelectable && enableMultiRowSelection) {
                         const header = headerGroup.headers.find((h) => {
                           const headerElement = headerCell;
                           return (
@@ -1368,46 +1510,210 @@ export const Table = forwardRef(
                         });
 
                         if (header && header.id === "select") {
-                          const mouseX = event.clientX;
-                          const mouseY = event.clientY;
+                          const clickX = event.clientX;
+                          const clickY = event.clientY;
                           const checkbox = headerCell.querySelector(
                             'input[type="checkbox"]',
                           ) as HTMLInputElement;
 
                           if (checkbox) {
                             const checkboxRect = checkbox.getBoundingClientRect();
-                            const shouldShowHover = isWithinCheckboxBoundary(
-                              mouseX,
-                              mouseY,
-                              checkboxRect,
-                              tolerancePixels,
-                            );
 
-                            if (shouldShowHover && !headerCheckboxHovered) {
-                              setHeaderCheckboxHovered(true);
-                              event.currentTarget.style.cursor = "pointer";
-                            } else if (!shouldShowHover && headerCheckboxHovered) {
-                              setHeaderCheckboxHovered(false);
-                              event.currentTarget.style.cursor = "";
+                            if (
+                              isWithinCheckboxBoundary(
+                                clickX,
+                                clickY,
+                                checkboxRect,
+                                tolerancePixels,
+                              )
+                            ) {
+                              // Prevent the default click and manually trigger the checkbox
+                              event.preventDefault();
+                              event.stopPropagation();
+
+                              const allSelected = table
+                                .getRowModel()
+                                .rows.every(
+                                  (row) =>
+                                    rowDisabledPredicate(row.original) ||
+                                    rowUnselectablePredicate(row.original) ||
+                                    row.getIsSelected(),
+                                );
+                              checkAllRows(!allSelected);
                             }
                           }
-                        } else if (headerCheckboxHovered) {
-                          setHeaderCheckboxHovered(false);
-                          event.currentTarget.style.cursor = "";
                         }
                       }
-                    }
-                  }}
-                  onMouseLeave={(event) => {
-                    if (headerCheckboxHovered) {
-                      setHeaderCheckboxHovered(false);
-                      event.currentTarget.style.cursor = "";
-                    }
-                  }}
-                >
-                  {headerGroup.headers.map((header, headerIndex) => {
-                    const { width, ...style } = header.column.columnDef.meta?.style || {};
-                    const size = header.getSize();
+                    }}
+                    onMouseMove={(event) => {
+                      if (rowsSelectable && enableMultiRowSelection) {
+                        const target = event.target as HTMLElement;
+                        const headerCell = target.closest("th");
+
+                        if (headerCell) {
+                          const header = headerGroup.headers.find((h) => {
+                            const headerElement = headerCell;
+                            return (
+                              headerElement?.getAttribute("data-column-id") === h.id ||
+                              h.id === "select"
+                            );
+                          });
+
+                          if (header && header.id === "select") {
+                            const mouseX = event.clientX;
+                            const mouseY = event.clientY;
+                            const checkbox = headerCell.querySelector(
+                              'input[type="checkbox"]',
+                            ) as HTMLInputElement;
+
+                            if (checkbox) {
+                              const checkboxRect = checkbox.getBoundingClientRect();
+                              const shouldShowHover = isWithinCheckboxBoundary(
+                                mouseX,
+                                mouseY,
+                                checkboxRect,
+                                tolerancePixels,
+                              );
+
+                              if (shouldShowHover && !headerCheckboxHovered) {
+                                setHeaderCheckboxHovered(true);
+                                event.currentTarget.style.cursor = "pointer";
+                              } else if (!shouldShowHover && headerCheckboxHovered) {
+                                setHeaderCheckboxHovered(false);
+                                event.currentTarget.style.cursor = "";
+                              }
+                            }
+                          } else if (headerCheckboxHovered) {
+                            setHeaderCheckboxHovered(false);
+                            event.currentTarget.style.cursor = "";
+                          }
+                        }
+                      }
+                    }}
+                    onMouseLeave={(event) => {
+                      if (headerCheckboxHovered) {
+                        setHeaderCheckboxHovered(false);
+                        event.currentTarget.style.cursor = "";
+                      }
+                    }}
+                  >
+                    {headerGroup.headers.map((header, headerIndex) => {
+                      const { width, ...style } = header.column.columnDef.meta?.style || {};
+                      const size = header.getSize();
+                      const alignmentClass =
+                        cellVerticalAlign === "top"
+                          ? styles.alignTop
+                          : cellVerticalAlign === "bottom"
+                            ? styles.alignBottom
+                            : styles.alignCenter;
+                      return (
+                        <th
+                          key={`${header.id}-${headerIndex}`}
+                          data-column-id={header.id}
+                          className={classnames(styles.columnCell, alignmentClass)}
+                          colSpan={header.colSpan}
+                          style={{
+                            position: "relative",
+                            width: size,
+                            flexShrink: 0,
+                            ...getCommonPinningStyles(header.column),
+                          }}
+                        >
+                          <ClickableHeader
+                            hasSorting={
+                              header.column.columnDef.enableSorting &&
+                              !!header.column.columnDef.meta?.accessorKey
+                            }
+                            updateSorting={() =>
+                              _updateSorting(header.column.columnDef.meta?.accessorKey)
+                            }
+                          >
+                            <div
+                              className={styles.headerContent}
+                              style={{
+                                ...style,
+                                userSelect:
+                                  effectiveUserSelectHeading as React.CSSProperties["userSelect"],
+                              }}
+                            >
+                              {
+                                flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext(),
+                                ) as ReactNode
+                              }
+                              {header.column.columnDef.enableSorting && (
+                                <Part partId="orderIndicator">
+                                  <span
+                                    className={classnames(styles.orderingIndicator, {
+                                      [styles.activeOrdering]:
+                                        header.column.columnDef.meta?.accessorKey === _sortBy,
+                                      [styles.alwaysShow]: alwaysShowSortingIndicator,
+                                    })}
+                                  >
+                                    <ColumnOrderingIndicator
+                                      iconSortAsc={iconSortAsc}
+                                      iconSortDesc={iconSortDesc}
+                                      iconNoSort={iconNoSort}
+                                      direction={
+                                        header.column.columnDef.meta?.accessorKey === _sortBy
+                                          ? _sortingDirection
+                                          : undefined
+                                      }
+                                    />
+                                  </span>
+                                </Part>
+                              )}
+                            </div>
+                          </ClickableHeader>
+                          {header.column.getCanResize() && (
+                            <div
+                              {...{
+                                onDoubleClick: () => {
+                                  touchedSizesRef.current[header.column.id] = false;
+                                  if (header.column.columnDef.size !== undefined) {
+                                    header.column.resetSize();
+                                  } else {
+                                    recalculateStarSizes();
+                                  }
+                                },
+                                onMouseDown: (event) => {
+                                  columnSizeTouched(header.column.id);
+                                  header.getResizeHandler()(event);
+                                },
+                                onTouchStart: (event) => {
+                                  columnSizeTouched(header.column.id);
+                                  header.getResizeHandler()(event);
+                                },
+                                className: classnames(styles.resizer, {
+                                  [styles.isResizing]: header.column.getIsResizing(),
+                                }),
+                              }}
+                            />
+                          )}
+                        </th>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </thead>
+            </>
+          )}
+          {hasData && (
+            <Virtualizer
+              as="tbody"
+              item={VirtualTableRow as CustomItemComponent}
+              ref={virtualizerRef}
+              scrollRef={wrapperRef}
+              startMargin={startMargin}
+            >
+              {rows.map((row, rowIndex) => (
+                <Fragment key={`${row.id}-${rowIndex}`}>
+                  {row.getVisibleCells().map((cell, i) => {
+                    const cellRenderer = cell.column.columnDef?.meta?.cellRenderer;
+                    const size = cell.column.getSize();
+                    const columnClassName = cell.column.columnDef?.meta?.className;
+                    const columnStyle = cell.column.columnDef?.meta?.style;
                     const alignmentClass =
                       cellVerticalAlign === "top"
                         ? styles.alignTop
@@ -1415,262 +1721,36 @@ export const Table = forwardRef(
                           ? styles.alignBottom
                           : styles.alignCenter;
                     return (
-                      <th
-                        key={`${header.id}-${headerIndex}`}
-                        data-column-id={header.id}
-                        className={classnames(styles.columnCell, alignmentClass)}
-                        colSpan={header.colSpan}
+                      <td
+                        className={classnames(styles.cell, alignmentClass, columnClassName)}
+                        key={`${cell.id}-${i}`}
                         style={{
-                          position: "relative",
                           width: size,
                           flexShrink: 0,
-                          ...getCommonPinningStyles(header.column),
+                          ...getCommonPinningStyles(cell.column),
+                          ...columnStyle,
                         }}
                       >
-                        <ClickableHeader
-                          hasSorting={
-                            header.column.columnDef.enableSorting &&
-                            !!header.column.columnDef.meta?.accessorKey
-                          }
-                          updateSorting={() =>
-                            _updateSorting(header.column.columnDef.meta?.accessorKey)
-                          }
+                        <div
+                          className={styles.cellContent}
+                          style={{
+                            userSelect:
+                              effectiveUserSelectCell as React.CSSProperties["userSelect"],
+                          }}
                         >
-                          <div className={styles.headerContent} style={{ ...style, userSelect: effectiveUserSelectHeading as React.CSSProperties['userSelect'] }}>
-                            {
-                              flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              ) as ReactNode
-                            }
-                            {header.column.columnDef.enableSorting && (
-                              <Part partId="orderIndicator">
-                                <span
-                                  className={classnames(styles.orderingIndicator, {
-                                    [styles.activeOrdering]:
-                                      header.column.columnDef.meta?.accessorKey === _sortBy,
-                                    [styles.alwaysShow]: alwaysShowSortingIndicator,
-                                  })}
-                                >
-                                  <ColumnOrderingIndicator
-                                    iconSortAsc={iconSortAsc}
-                                    iconSortDesc={iconSortDesc}
-                                    iconNoSort={iconNoSort}
-                                    direction={
-                                      header.column.columnDef.meta?.accessorKey === _sortBy
-                                        ? _sortingDirection
-                                        : undefined
-                                    }
-                                  />
-                                </span>
-                              </Part>
-                            )}
-                          </div>
-                        </ClickableHeader>
-                        {header.column.getCanResize() && (
-                          <div
-                            {...{
-                              onDoubleClick: () => {
-                                touchedSizesRef.current[header.column.id] = false;
-                                if (header.column.columnDef.size !== undefined) {
-                                  header.column.resetSize();
-                                } else {
-                                  recalculateStarSizes();
-                                }
-                              },
-                              onMouseDown: (event) => {
-                                columnSizeTouched(header.column.id);
-                                header.getResizeHandler()(event);
-                              },
-                              onTouchStart: (event) => {
-                                columnSizeTouched(header.column.id);
-                                header.getResizeHandler()(event);
-                              },
-                              className: classnames(styles.resizer, {
-                                [styles.isResizing]: header.column.getIsResizing(),
-                              }),
-                            }}
-                          />
-                        )}
-                      </th>
+                          {cellRenderer
+                            ? cellRenderer(cell.row.original, rowIndex, i, cell?.getValue())
+                            : (flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext(),
+                              ) as ReactNode)}
+                        </div>
+                      </td>
                     );
                   })}
-                </tr>
+                </Fragment>
               ))}
-            </thead>
-            </>
-          )}
-          {hasData && (
-            <tbody className={styles.tableBody}>
-              <Virtualizer
-                ref={virtualizerRef}
-                itemSize={effectiveRowHeight}
-                startMargin={startMargin}
-              >
-                {rows.map((row, rowIndex) => {
-                  const isFirstRow = rowIndex === 0;
-                  return (
-                    <tr
-                      data-index={rowIndex}
-                      key={`${row.id}-${rowIndex}`}
-                      ref={isFirstRow ? firstRowRef : undefined}
-                      className={classnames(styles.row, {
-                        [styles.selected]: row.getIsSelected(),
-                        [styles.focused]: focusedIndex === rowIndex,
-                        [styles.disabled]: rowDisabledPredicate(row.original),
-                        [styles.noBottomBorder]: noBottomBorder,
-                      })}
-                      style={{ userSelect: effectiveUserSelectRow as React.CSSProperties['userSelect'] }}
-                      onClick={(event) => {
-                        if (!row.getCanSelect()) {
-                          return;
-                        }
-                        if (event?.defaultPrevented) {
-                          return;
-                        }
-                        const target = event.target as HTMLElement;
-                        if (target.tagName.toLowerCase() === "input") {
-                          return;
-                        }
-                        if (target.closest("button")) {
-                          return;
-                        }
-                        
-                        // Focus the table wrapper to enable keyboard shortcuts (after checking input/button)
-                        wrapperRef.current?.focus();
-
-                        // Check if click is within checkbox boundary
-                        const currentRow = event.currentTarget as HTMLElement;
-                        const checkbox = currentRow.querySelector(
-                          'input[type="checkbox"]',
-                        ) as HTMLInputElement;
-
-                        if (checkbox) {
-                          const checkboxRect = checkbox.getBoundingClientRect();
-                          const clickX = event.clientX;
-                          const clickY = event.clientY;
-
-                          if (
-                            isWithinCheckboxBoundary(clickX, clickY, checkboxRect, tolerancePixels)
-                          ) {
-                            // Toggle the checkbox when clicking within the boundary
-                            // In single selection mode, allow deselection by checking if already selected
-                            if (!enableMultiRowSelection && row.getIsSelected()) {
-                              checkAllRows(false); // Deselect all (which is just this one row)
-                            } else {
-                              toggleRow(row.original, { metaKey: true });
-                            }
-                            return;
-                          }
-                        }
-                        toggleRow(row.original, event);
-                      }}
-                      onDoubleClick={(event) => {
-                          // Prevent browser text selection on double-click
-                          event.preventDefault();
-
-                          // Call external handler if provided
-                          try {
-                            if (typeof (rowDoubleClick as any) === "function") {
-                              (rowDoubleClick as any)(row.original);
-                            }
-                          } catch (e) {
-                            // swallow errors from handler
-                          }
-                        }}
-                      onMouseMove={(event) => {
-                        // Change cursor and hover state when within checkbox boundary
-                        const currentRow = event.currentTarget as HTMLElement;
-                        const checkbox = currentRow.querySelector(
-                          'input[type="checkbox"]',
-                        ) as HTMLInputElement;
-
-                        if (checkbox) {
-                          const checkboxRect = checkbox.getBoundingClientRect();
-                          const mouseX = event.clientX;
-                          const mouseY = event.clientY;
-
-                          const shouldShowHover = isWithinCheckboxBoundary(
-                            mouseX,
-                            mouseY,
-                            checkboxRect,
-                            tolerancePixels,
-                          );
-
-                          // Update hover state and cursor based on proximity to checkbox
-                          if (shouldShowHover) {
-                            setHoveredRowId(row.id);
-                            currentRow.style.cursor = "pointer";
-                          } else {
-                            setHoveredRowId(null);
-                            currentRow.style.cursor = "";
-                          }
-                        }
-                      }}
-                      onMouseLeave={(event) => {
-                        // Reset cursor and hover state when leaving the row
-                        const currentRow = event.currentTarget as HTMLElement;
-                        currentRow.style.cursor = "";
-                        setHoveredRowId(null);
-                      }}
-                      onContextMenu={(event) => {
-                        // Prevent default browser context menu
-                        event.preventDefault();
-                        
-                        // Use lookupEventHandler with context containing row variables
-                        if (lookupEventHandler) {
-                          const handler = lookupEventHandler("contextMenu", {
-                            context: {
-                              $item: row.original,
-                              $row: row.original,
-                              $rowIndex: rowIndex,
-                              $itemIndex: rowIndex,
-                            },
-                            ephemeral: true, // Don't cache this handler since context changes per row
-                          });
-                          
-                          handler?.(event);
-                        }
-                      }}
-                    >
-                      {row.getVisibleCells().map((cell, i) => {
-                        const cellRenderer = cell.column.columnDef?.meta?.cellRenderer;
-                        const size = cell.column.getSize();
-                        const columnClassName = cell.column.columnDef?.meta?.className;
-                        const columnStyle = cell.column.columnDef?.meta?.style;
-                        const alignmentClass =
-                          cellVerticalAlign === "top"
-                            ? styles.alignTop
-                            : cellVerticalAlign === "bottom"
-                              ? styles.alignBottom
-                              : styles.alignCenter;
-                        return (
-                          <td
-                            className={classnames(styles.cell, alignmentClass, columnClassName)}
-                            key={`${cell.id}-${i}`}
-                            style={{
-                              width: size,
-                              flexShrink: 0,
-                              ...getCommonPinningStyles(cell.column),
-                              ...columnStyle,
-                            }}
-                          >
-                            <div className={styles.cellContent} style={{ userSelect: effectiveUserSelectCell as React.CSSProperties['userSelect'] }}>
-                              {cellRenderer
-                                ? cellRenderer(cell.row.original, rowIndex, i, cell?.getValue())
-                                : (flexRender(
-                                    cell.column.columnDef.cell,
-                                    cell.getContext(),
-                                  ) as ReactNode)}
-                            </div>
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  );
-                })}
-              </Virtualizer>
-            </tbody>
+            </Virtualizer>
           )}
         </table>
         {loading && !hasData && (
@@ -1745,8 +1825,10 @@ function isTextInputElement(target: HTMLElement): boolean {
   return (
     target.tagName.toLowerCase() === "textarea" ||
     target.contentEditable === "true" ||
-    (target.tagName.toLowerCase() === "input" && 
-     !["checkbox", "radio", "button", "submit", "reset", "file", "image"].includes((target as HTMLInputElement).type))
+    (target.tagName.toLowerCase() === "input" &&
+      !["checkbox", "radio", "button", "submit", "reset", "file", "image"].includes(
+        (target as HTMLInputElement).type,
+      ))
   );
 }
 

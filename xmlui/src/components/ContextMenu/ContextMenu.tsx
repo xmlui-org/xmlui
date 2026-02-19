@@ -5,7 +5,6 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata } from "../metadata-helpers";
 import { ContextMenu } from "./ContextMenuNative";
 import type { ContainerWrapperDef } from "../../components-core/rendering/ContainerWrapper";
-import { useMemo } from "react";
 import { filterAdjacentSeparators } from "../menu-helpers";
 
 const CMCOMP = "ContextMenu";
@@ -67,32 +66,22 @@ export const contextMenuComponentRenderer = createComponentRenderer(
   CMCOMP,
   ContextMenuMd,
   ({ node, extractValue, renderChild, registerComponentApi, className, state, updateState }) => {
-    // Get the context data from state
-    const contextData = state.$context;
-
-    // Extract menuWidth property
-    const menuWidth = extractValue(node.props.menuWidth);
-
-    // Filter out adjacent separators before rendering
+    // Filter adjacent separators before rendering to prevent flash
     const filteredChildren = filterAdjacentSeparators(node.children);
-
-    // Wrap children in a Container with context variables to make $context available
-    const nodeWithContextVars = useMemo(
-      () =>
-        ({
-          type: "Container",
-          contextVars: { $context: contextData },
-          children: filteredChildren,
-        }) as ContainerWrapperDef,
-      [filteredChildren, contextData],
-    );
-
+    
+    // Wrap filtered children with $context variable
+    const nodeWithContextVars: ContainerWrapperDef = {
+      type: "Container",
+      contextVars: { $context: state.$context },
+      children: filteredChildren,
+    };
+    
     return (
       <ContextMenu
         registerComponentApi={registerComponentApi}
         updateState={updateState}
         className={className}
-        menuWidth={menuWidth}
+        menuWidth={extractValue(node.props.menuWidth)}
       >
         {renderChild(nodeWithContextVars)}
       </ContextMenu>

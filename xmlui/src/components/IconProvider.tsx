@@ -2,7 +2,7 @@ import type { ForwardedRef, ReactNode } from "react";
 import type React from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
 
-import { IconRegistryContext } from "./IconRegistryContext";
+import { extraCharRegex, IconRegistryContext, svgAttributeMap } from "./IconRegistryContext";
 import type { IconBaseProps } from "./Icon/IconNative";
 import { FiAlertOctagonIcon } from "./Icon/FiAlertOctagonIcon";
 import { FiCheckCircleIcon } from "./Icon/FiCheckCircleIcon";
@@ -338,7 +338,7 @@ registerIconRenderer(ICON_NAMES.TABLE_DELETE_COLUMN, (props) => <TableDeleteColu
 registerIconRenderer(ICON_NAMES.EYE, (props) => <IoEyeOutlineIcon {...props} />);
 registerIconRenderer(ICON_NAMES.EYE_OFF, (props) => <IoEyeOffOutlineIcon {...props} />);
 
-export function IconProvider({ children }: { children: ReactNode }) {
+export function IconProvider({ children, icons }: { children: ReactNode, icons: Record<string, string> }) {
   const getRegisteredIconNames = useCallback(() => {
     return Array.from(pool.keys());
   }, []);
@@ -353,11 +353,114 @@ export function IconProvider({ children }: { children: ReactNode }) {
   const attachedResources = useRef<Record<string, boolean>>({});
   const spriteRootRef = useRef<SVGSVGElement>(null);
 
-  const ensureCustomSvgIcon = useCallback(async (resourceUrl: string) => {
+  useMemo(() => {
+    if (!icons) return;
+
+    Object.entries(icons).forEach(([iconName, svgData]) => {
+      const iconKey = iconName.toLowerCase();
+      
+      // Skip if already registered
+      if (pool.has(iconKey)) {
+        return;
+      }
+
+      // Decode data URI if needed
+      let decodedSvgData = svgData;
+      if (svgData.startsWith('data:image/svg+xml,')) {
+        decodedSvgData = decodeURIComponent(svgData.replace('data:image/svg+xml,', ''));
+      } else if (svgData.startsWith('data:image/svg+xml;base64,')) {
+        decodedSvgData = atob(svgData.replace('data:image/svg+xml;base64,', ''));
+      }
+
+      // Extract attributes from SVG data using regex (SSR-safe)
+      // Only extract from the opening <svg> tag, not from inner content
+      const svgTagMatch = decodedSvgData.match(/<svg([^>]*)>/);
+      const svgTag = svgTagMatch?.[1] || '';
+      
+      // Pattern matches: attribute-name="value" or attribute-name='value'
+      // Handles hyphens, colons, dots in attribute names (for data-, aria-, xlink:, etc.)
+      const attributePattern = /([\w:.-]+)\s*=\s*["']([^"']*)["']/g;
+      const extractedAttrs: Record<string, string> = {};
+      let match: RegExpExecArray | null;
+      
+      while ((match = attributePattern.exec(svgTag)) !== null) {
+        const [, attrName, attrValue] = match;
+        extractedAttrs[attrName] = attrValue;
+      }
+
+      // Map extracted attributes to React-safe names
+      const safeAttributes: Record<string, any> = {};
+      Object.entries(extractedAttrs).forEach(([key, value]) => {
+        let safeKey = key;
+        
+        // Keep data- and aria- attributes as-is
+        if (/^(data-|aria-)/.test(key)) {
+          safeKey = key;
+        } else {
+          // Convert to lowercase and remove special chars, then map to React prop name
+          const normalizedKey = key.replace(extraCharRegex, "").toLowerCase();
+          safeKey = svgAttributeMap[normalizedKey] || key;
+        }
+        
+        // Skip class attribute (will use className from props)
+        if (safeKey !== 'class' && safeKey !== 'className') {
+          safeAttributes[safeKey] = value;
+        }
+      });
+
+      // Extract inner content (everything between <svg> tags)
+      // Remove comments from the SVG content
+      const innerContent = decodedSvgData
+        .replace(/<svg[^>]*>|<\/svg>/g, '')
+        .replace(/<!--[\s\S]*?-->/g, '');
+      
+      const viewBox = safeAttributes.viewBox || '0 0 24 24';
+      const defaultFill = safeAttributes.fill;
+      const defaultStroke = safeAttributes.stroke;
+      const defaultStrokeWidth = safeAttributes.strokeWidth;
+
+      // Register icon renderer immediately (works on server and client)
+      registerIconRenderer(iconKey, (props: IconBaseProps) => {
+        const size = props.size || safeAttributes.width || safeAttributes.height || 24;
+        
+        // Merge safe attributes with props (props take precedence)
+        const mergedAttributes = {
+          ...safeAttributes,
+          width: size,
+          height: size,
+          viewBox,
+          fill: props.color || defaultFill || 'currentColor',
+          stroke: defaultStroke,
+          strokeWidth: defaultStrokeWidth,
+          xmlns: "http://www.w3.org/2000/svg",
+          style: props.style,
+          className: props.className,
+
+        };
+
+        // Remove undefined values
+        Object.keys(mergedAttributes).forEach(key => {
+          if (mergedAttributes[key] === undefined) {
+            delete mergedAttributes[key];
+          }
+        });
+
+        return (
+          <svg
+            {...mergedAttributes}
+            dangerouslySetInnerHTML={{ __html: innerContent }}
+          />
+        );
+      });
+    });
+  }, [icons]);
+
+  const ensureCustomResourceSvgIcon = useCallback(async (resourceUrl: string) => {
     if (attachedResources.current[resourceUrl]) {
       return;
     }
     const icon = await (await fetch(resourceUrl)).text();
+
     const div = document.createElement("div");
     div.style.display = "none";
     div.innerHTML = icon;
@@ -399,10 +502,10 @@ export function IconProvider({ children }: { children: ReactNode }) {
     return {
       getRegisteredIconNames,
       lookupIconRenderer,
-      ensureCustomSvgIcon,
+      ensureCustomSvgIcon: ensureCustomResourceSvgIcon,
       customSvgs,
     };
-  }, [customSvgs, ensureCustomSvgIcon, getRegisteredIconNames, lookupIconRenderer]);
+  }, [customSvgs, ensureCustomResourceSvgIcon, getRegisteredIconNames, lookupIconRenderer]);
 
   return (
     <IconRegistryContext.Provider value={contextValue}>

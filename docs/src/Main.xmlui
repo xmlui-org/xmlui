@@ -838,17 +838,17 @@
                 content="{appGlobals.content['pages/vscode.md']}"
             />
         </Page>
-        <Page url="/components/*">
+        <Page url="/components/:compId">
             <script>
-              var contentKey = "components/" + $routeParams["*"];
+              var contentKey = "components/" + $routeParams.compId;
               var content = appGlobals.content[contentKey];
             </script>
             <DocumentPage when="{content}" content="{content}" />
             <Redirect when="{!content}" to="/404" />
         </Page>
-        <Page url="/extensions/*">
+        <Page url="/extensions/:extensionId">
             <script>
-              var contentKey = "extensions/" + $routeParams["*"];
+              var contentKey = "extensions/" + $routeParams.extensionId;
               var content = appGlobals.content[contentKey];
             </script>
             <DocumentPage when="{content}" content="{content}" />

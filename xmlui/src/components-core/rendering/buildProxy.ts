@@ -66,6 +66,33 @@ export function buildProxy(
     },
 
     set: function (target, prop, value, receiver) {
+      const previousValue = Reflect.get(target, prop, receiver);
+      
+      // --- Skip no-op changes to prevent unnecessary re-renders and inspector noise
+      if (previousValue === value) {
+        return true; // No change needed
+      }
+      
+      // --- For objects and arrays, perform deep comparison using JSON.stringify
+      // --- (consistent with variable-logging.ts)
+      if (
+        previousValue !== null &&
+        previousValue !== undefined &&
+        value !== null &&
+        value !== undefined &&
+        typeof previousValue === "object" &&
+        typeof value === "object"
+      ) {
+        try {
+          if (JSON.stringify(previousValue) === JSON.stringify(value)) {
+            return true; // No actual change in content
+          }
+        } catch (e) {
+          // --- JSON.stringify can fail for circular references or other issues
+          // --- In such cases, proceed with the update
+        }
+      }
+      
       // --- Invoke the callback function to sign any change in the proxied object
       callback({
         action: "set",
@@ -73,7 +100,7 @@ export function buildProxy(
         pathArray: tree.concat(prop),
         target,
         newValue: value,
-        previousValue: Reflect.get(target, prop, receiver),
+        previousValue,
       });
 
       // --- Execute the change.
