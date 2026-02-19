@@ -1,35 +1,35 @@
 <Component name="BlogOverview">
-  <List
+
+ <H1 variant="hero-title" textAlign="center">XMLUI Blog</H1> 
+ <H3 textAlign="center">Tutorials, tips, best practices</H3> 
+  
+  <VStack
+  gap="$space-8"> 
+  <Items
     data="{
     $props.posts.sort(function(a, b) {
       return new Date(b.date) - new Date(a.date);
     })
   }">
-    <VStack
+    <Card
        var.blogLink="/blog/{$item.slug}"
-       gap="$space-2"
+       gap="$space-3"
        onClick="Actions.navigate(blogLink)">
-      <H1>
-        {$item.title}
-      </H1>
      <Image src="/blog/images/{$item.image}" />
-      <Text variant="em">
+     <SpaceFiller />
+     <VStack
+     gap="$space-1">
+     <Text variant="blog-attribution">
+        {formatDate($item.date, "MMM dd, yyyy")} • {$item.author}
+      </Text>
+     <H2>
+        {$item.title}
+      </H2>
+      <Text>
         {$item.description}
       </Text>
-      <HStack>
-        <Text variant="em" fontSize="$fontSize-xs">
-          {$item.author}
-        </Text>
-        <SpaceFiller />
-        <Text variant="em" fontSize="$fontSize-xs">
-          {formatDate($item.date, "MMM dd, yyyy")}
-        </Text>
-      </HStack>
-    </VStack>
-    <ContentSeparator
-      when="{$itemIndex < $props.posts.length - 1}"
-      marginTop="$space-4"
-      marginBottom="$space-8"
-    />
-  </List>
+      </VStack>
+    </Card>
+  </Items>
+  </VStack>
 </Component>

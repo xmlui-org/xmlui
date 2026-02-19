@@ -1,10 +1,10 @@
 <Component name="BlogPage">
-    <VStack>
-      <Link
-        fontSize="$fontSize-xs"
+    <Link
+        fontSize="$fontSize-base"
         textDecorationLine="none"
         label="← All posts"
         to="/blog" />
+    <Card>
       <H1>
         {$props.post.title}
       </H1>
@@ -13,5 +13,5 @@
       </Text>
       <Image src="/blog/images/{$props.post.image}" />
       <Markdown marginTop="$space-4" data="/blog/{$props.post.slug}.md" />
-    </VStack>
+    </Card>
 </Component>
