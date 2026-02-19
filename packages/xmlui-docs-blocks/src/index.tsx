@@ -1,7 +1,30 @@
 import { basicLayoutRenderer } from "./layouts/BasicLayout";
 import { featuredWithTabsLayoutRenderer } from "./layouts/FeaturedWithTabsLayout";
+import { overviewCardRenderer } from "./docs/OverviewCard";
+import { breadcrumbsRenderer } from "./docs/Breadcrumbs";
+import { separatorRenderer } from "./docs/Separator";
+import { linkButtonRenderer } from "./docs/LinkButton";
+import { documentLinksRenderer } from "./docs/DocumentLinks";
+import { documentPageRenderer } from "./docs/DocumentPage";
+import { documentPageNoTOCRenderer } from "./docs/DocumentPageNoTOC";
+import { tbdRenderer } from "./docs/TBD";
+import { sectionHeaderRenderer } from "./docs/SectionHeader";
+import { overviewRenderer } from "./docs/Overview";
 
 export default {
   namespace: "XMLUIExtensions",
-  components: [basicLayoutRenderer, featuredWithTabsLayoutRenderer],
+  components: [
+    basicLayoutRenderer,
+    featuredWithTabsLayoutRenderer,
+    overviewCardRenderer,
+    breadcrumbsRenderer,
+    separatorRenderer,
+    linkButtonRenderer,
+    documentLinksRenderer,
+    documentPageRenderer,
+    documentPageNoTOCRenderer,
+    tbdRenderer,
+    sectionHeaderRenderer,
+    overviewRenderer,
+  ],
 };
