@@ -1216,6 +1216,13 @@ export const Table = forwardRef(
                 [styles.noBottomBorder]: noBottomBorder,
               })}
               onClick={(event) => {
+                // On Windows, the second click of a double-click fires onClick before onDoubleClick.
+                // If we allow state mutations (toggleRow, focus) during that second click, the
+                // resulting re-render can destroy the dblclick event on <tr> elements.
+                // Returning early for detail >= 2 prevents that and lets onDoubleClick fire cleanly.
+                if (event.detail >= 2) {
+                  return;
+                }
                 if (!row.getCanSelect()) {
                   return;
                 }
