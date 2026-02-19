@@ -1535,29 +1535,33 @@ test.describe("regression tests", () => {
     const activeRgb = parseRgb(activeTabColor);
     const inactiveRgb = parseRgb(inactiveTabColor);
 
-    // 1. Verify inactive tabs are not washed out (brightness < 235)
-    // With the bug: rgb(224, 231, 255) averages to ~237 - SHOULD FAIL
-    // With the fix: should be noticeably darker - SHOULD PASS
+    // 1. Verify inactive tabs are not washed out
+    // Bug: rgb(207, 225, 247) averages to 226.33 - too light!
+    // Fix: should be darker (< 200)
     const inactiveBrightness = (inactiveRgb.r + inactiveRgb.g + inactiveRgb.b) / 3;
-    expect(inactiveBrightness).toBeLessThan(235); // Catches the washed-out bug
+    expect(inactiveBrightness).toBeLessThan(200); // Catches washed-out inactive tabs
 
-    // 2. Verify active and inactive tabs have different colors
+    // 2. Verify active tabs are not white (invisible on light background)
+    // Bug: rgb(255, 255, 255) - completely white!
+    // Fix: should be a visible color
+    const isWhite = activeRgb.r === 255 && activeRgb.g === 255 && activeRgb.b === 255;
+    expect(isWhite).toBe(false); // Active tabs must not be white
+
+    // 3. Verify active and inactive tabs have different colors
     const colorDifference = Math.abs(activeRgb.r - inactiveRgb.r) + 
                            Math.abs(activeRgb.g - inactiveRgb.g) + 
                            Math.abs(activeRgb.b - inactiveRgb.b);
     expect(colorDifference).toBeGreaterThan(30); // Should be visually distinct
 
-    // 3. Click second tab and verify colors are still not washed out
+    // 4. Click second tab and verify it's also not white when active
     await secondTab.click();
     await expect(secondTab).toHaveAttribute("aria-selected", "true");
     
     const newActiveColor = await secondTab.evaluate((el) => window.getComputedStyle(el).color);
     const newActiveRgb = parseRgb(newActiveColor);
     
-    // Verify the clicked tab also has proper color (not all white)
-    expect(newActiveRgb.r).not.toBe(255);
-    expect(newActiveRgb.g).not.toBe(255);
-    expect(newActiveRgb.b).not.toBe(255);
+    const isWhite2 = newActiveRgb.r === 255 && newActiveRgb.g === 255 && newActiveRgb.b === 255;
+    expect(isWhite2).toBe(false); // Clicked tabs must not be white either
   });
 
   test("tab labels with headerTemplate have proper contrast (issue #2840, #2839)", async ({ initTestBed, page }) => {
@@ -1606,9 +1610,13 @@ test.describe("regression tests", () => {
     const activeRgb = parseRgb(activeTabColor);
     const inactiveRgb = parseRgb(inactiveTabColor);
 
-    // Verify inactive tabs are not washed out
+    // Verify inactive tabs are not washed out  
     const inactiveBrightness = (inactiveRgb.r + inactiveRgb.g + inactiveRgb.b) / 3;
-    expect(inactiveBrightness).toBeLessThan(235);
+    expect(inactiveBrightness).toBeLessThan(200); // Same threshold as first test
+
+    // Verify active tabs are not white
+    const isWhite = activeRgb.r === 255 && activeRgb.g === 255 && activeRgb.b === 255;
+    expect(isWhite).toBe(false);
 
     // Verify active and inactive are visually different
     const colorDifference = Math.abs(activeRgb.r - inactiveRgb.r) + 
