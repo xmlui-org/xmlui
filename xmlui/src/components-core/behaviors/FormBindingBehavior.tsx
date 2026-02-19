@@ -146,7 +146,6 @@ export const formBindingBehavior: Behavior = {
         labelPosition={labelPosition as any}
         labelWidth={labelWidth}
         labelBreak={labelBreak}
-        className={className}
         enabled={enabled}
         requireLabelMode={requireLabelMode}
       >
