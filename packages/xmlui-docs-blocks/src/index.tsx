@@ -28,7 +28,7 @@ import {
   getRootLinks,
   getCardWidth,
   getCardIcon,
-} from "./docs/overviewHelpers";
+} from "./utils/overviewHelpers";
 
 export default {
   namespace: "XMLUIExtensions",

@@ -1,7 +1,7 @@
 /**
- * Pure helper functions for Overview-style navigation and layout.
- * All context (linkInfo, navSections, mediaSize) is passed as arguments so these
- * can be used as app-context globals from any component.
+ * Utility functions for the Overview component.
+ * Pure helpers (context passed as arguments) so they can be registered as app-context
+ * globals and used from any component, including custom Overview implementations.
  */
 
 export type LinkInfo = { to?: string; label?: string; description?: string; children?: LinkInfo[]; icon?: string };
