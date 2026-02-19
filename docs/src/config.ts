@@ -1,10 +1,10 @@
 import {
-  componentsSection,
-  extensionsSection,
   groupedNavPanelContent,
   content,
   plainTextContent,
 } from "../utils";
+import componentsSection from "../navSections/components.json";
+import extensionsSection from "../navSections/extensions.json";
 import { shikiHighlighter, highlight } from "xmlui-docs-blocks";
 import type { StandaloneAppDescription } from "xmlui";
 

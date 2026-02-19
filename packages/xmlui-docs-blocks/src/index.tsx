@@ -1,4 +1,10 @@
 export { shikiHighlighter, highlight } from "./highlighter";
+export {
+  markdownToPlainText,
+  buildContentFromRuntime,
+  buildTreeFromPathsAndMeta,
+} from "./contentUtils";
+export type { TreeNode, MetaJson } from "./contentUtils";
 
 import { basicLayoutRenderer } from "./layouts/BasicLayout";
 import { featuredWithTabsLayoutRenderer } from "./layouts/FeaturedWithTabsLayout";
