@@ -1,8 +1,8 @@
-import { ReactElement } from "react";
-import { RequireLabelMode } from "../../components/abstractions";
-import { FormItemValidations } from "../../components/Form/FormContext";
+import type { ReactElement } from "react";
+import type { RequireLabelMode } from "../../components/abstractions";
+import type { FormItemValidations } from "../../components/Form/FormContext";
 import { FormBindingWrapper } from "../../components/FormItem/FormBindingWrapper";
-import { Behavior } from "./Behavior";
+import type { Behavior } from "./Behavior";
 
 /**
  * Behavior for binding input components directly to a Form without requiring
@@ -61,7 +61,7 @@ export const formBindingBehavior: Behavior = {
     return true;
   },
   attach: (context, node, metadata) => {
-    const { extractValue, node: componentNode } = context;
+    const { extractValue, node: componentNode, className } = context;
 
     const bindTo = extractValue.asOptionalString(componentNode.props?.bindTo);
     const initialValue = extractValue(componentNode.props?.initialValue);
@@ -146,6 +146,7 @@ export const formBindingBehavior: Behavior = {
         labelPosition={labelPosition as any}
         labelWidth={labelWidth}
         labelBreak={labelBreak}
+        className={className}
         enabled={enabled}
         requireLabelMode={requireLabelMode}
       >
