@@ -244,6 +244,124 @@ test("component keyboard interaction works with switch variant", async ({ initTe
   await expect(driver.getContent()).not.toBeVisible();
 });
 
+test("component renders with component definition summary", async ({ initTestBed, createExpandableItemDriver, page }) => {
+  await initTestBed(`
+    <ExpandableItem>
+      <property name="summary">
+        <Text>Component Summary</Text>
+      </property>
+      Content here
+    </ExpandableItem>
+  `, {});
+  const driver = await createExpandableItemDriver();
+  
+  await expect(driver.component).toBeVisible();
+  await expect(driver.getSummaryContent()).toContainText("Component Summary");
+  await expect(driver.getContent()).not.toBeVisible(); // Initially collapsed
+});
+
+test("component definition summary displays correctly with multiple elements", async ({ initTestBed, createExpandableItemDriver, page }) => {
+  await initTestBed(`
+    <ExpandableItem>
+      <property name="summary">
+        <HStack gap="$space-2">
+          <Icon name="info" />
+          <Text>Custom Summary</Text>
+        </HStack>
+      </property>
+      Content
+    </ExpandableItem>
+  `, {});
+  const driver = await createExpandableItemDriver();
+  
+  await expect(driver.getSummaryContent()).toContainText("Custom Summary");
+  await expect(driver.getSummary()).toBeVisible();
+  await expect(page.getByRole("img")).toBeVisible(); // Icon should be visible
+});
+
+test("component definition summary can be toggled", async ({ initTestBed, createExpandableItemDriver, page }) => {
+  await initTestBed(`
+    <ExpandableItem>
+      <property name="summary">
+        <HStack>
+          <Text>Click to expand</Text>
+        </HStack>
+      </property>
+      Hidden content
+    </ExpandableItem>
+  `, {});
+  const driver = await createExpandableItemDriver();
+  
+  // Initially collapsed
+  await expect(driver.getContent()).not.toBeVisible();
+  
+  // Click to expand
+  await driver.getSummary().click();
+  await expect(driver.getContent()).toBeVisible();
+  await expect(driver.getContent()).toContainText("Hidden content");
+  
+  // Click to collapse
+  await driver.getSummary().click();
+  await expect(driver.getContent()).not.toBeVisible();
+});
+
+test("component definition summary works with events", async ({ initTestBed, createExpandableItemDriver, page }) => {
+  const { testStateDriver } = await initTestBed(`
+    <ExpandableItem onExpandedChange="arg => testState = arg">
+      <property name="summary">
+        <Text>Event Test Summary</Text>
+      </property>
+      Content
+    </ExpandableItem>
+  `, {});
+  const driver = await createExpandableItemDriver();
+  
+  // Click to expand
+  await driver.getSummary().click();
+  await expect.poll(testStateDriver.testState).toEqual(true);
+  await expect(driver.getContent()).toBeVisible();
+  
+  // Click to collapse
+  await driver.getSummary().click();
+  await expect.poll(testStateDriver.testState).toEqual(false);
+  await expect(driver.getContent()).not.toBeVisible();
+});
+
+test("component definition summary works with custom icons", async ({ initTestBed, createExpandableItemDriver, page }) => {
+  await initTestBed(`
+    <ExpandableItem iconCollapsed="plus" iconExpanded="minus">
+      <property name="summary">
+        <HStack gap="$space-2">
+          <Icon name="star" />
+          <Text>Starred Item</Text>
+        </HStack>
+      </property>
+      Content
+    </ExpandableItem>
+  `, {});
+  const driver = await createExpandableItemDriver();
+  
+  await expect(driver.getIcon()).toBeVisible();
+  await expect(page.getByRole("img").first()).toBeVisible(); // Custom icon in summary
+  await expect(driver.getSummaryContent()).toContainText("Starred Item");
+});
+
+test("component definition summary works with initiallyExpanded", async ({ initTestBed, createExpandableItemDriver, page }) => {
+  await initTestBed(`
+    <ExpandableItem initiallyExpanded="true">
+      <property name="summary">
+        <Text>Initially Expanded</Text>
+      </property>
+      Visible content
+    </ExpandableItem>
+  `, {});
+  const driver = await createExpandableItemDriver();
+  
+  await expect(driver.getContent()).toBeVisible();
+  await expect(driver.getContent()).toContainText("Visible content");
+  await expect(driver.getSummaryContent()).toContainText("Initially Expanded");
+});
+
 test("component icon/switch container is hidden from screen readers", async ({ initTestBed, createExpandableItemDriver, page }) => {
   await initTestBed(`<ExpandableItem summary="Test">Content</ExpandableItem>`, {});
   const driver = await createExpandableItemDriver();

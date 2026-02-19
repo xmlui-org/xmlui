@@ -119,9 +119,17 @@ export const expandableItemComponentRenderer = createComponentRenderer(
   COMP,
   ExpandableItemMd,
   ({ node, renderChild, lookupEventHandler, registerComponentApi, extractValue, className }) => {
+    // Handle summary as either a string or a component definition
+    const summaryProp = node.props?.summary;
+    const summaryContent = summaryProp
+      ? typeof summaryProp === 'object' && summaryProp.type
+        ? renderChild(summaryProp)
+        : extractValue(summaryProp)
+      : undefined;
+    
     return (
       <ExpandableItem
-        summary={extractValue(node.props?.summary)}
+        summary={summaryContent}
         initiallyExpanded={extractValue.asOptionalBoolean(
           node.props.initiallyExpanded,
           defaultExpandableItemProps.initiallyExpanded,
