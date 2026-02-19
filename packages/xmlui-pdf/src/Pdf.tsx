@@ -10,6 +10,8 @@ const defaultProps = {
   mode: "view" as "view" | "edit",
   scale: 1.0,
   annotations: [] as Annotation[],
+  showToolbar: false,
+  showProperties: false,
 };
 
 export const PdfMd = createMetadata({
@@ -43,13 +45,21 @@ export const PdfMd = createMetadata({
     signatureData: d(
       `Pre-loaded signature data to apply to signature fields.`,
     ),
+    showToolbar: {
+      description: `When true, shows the annotation toolbar for adding new annotation fields. Default: ${defaultProps.showToolbar}.`,
+      valueType: "boolean",
+    },
+    showProperties: {
+      description: `When true, shows the properties panel for editing the selected annotation. Default: ${defaultProps.showProperties}.`,
+      valueType: "boolean",
+    },
   },
   events: {
     onDocumentLoad: d(`Fired when the PDF document is loaded successfully.`),
     onPageChange: d(`Fired when the current page changes.`),
     onAnnotationCreate: d(`Fired when a new annotation is created.`),
     onAnnotationUpdate: d(`Fired when an annotation is modified.`),
-    onAnnotationDelete: d(`Fired when an annotation is deleted.`),
+    onAnnotationDelete: d(`Fired when an annotation is about to be deleted. Return false from the handler to cancel the deletion.`),
     onAnnotationSelect: d(`Fired when an annotation is selected.`),
     onSignatureCapture: d(`Fired when a signature is captured (Phase 2).`),
     onSignatureApply: d(`Fired when a signature is applied to a field (Phase 2).`),
@@ -60,8 +70,36 @@ export const PdfMd = createMetadata({
       args: [{ name: "page", valueType: "number" }],
     },
     setScale: {
-      description: `Set the zoom level.`,
+      description: `Set the zoom level to an exact value (clamped between 0.1 and 5).`,
       args: [{ name: "scale", valueType: "number" }],
+    },
+    zoomTo: {
+      description: `Zoom to an exact scale value (clamped between 0.1 and 5). Alias for setScale.`,
+      args: [{ name: "scale", valueType: "number" }],
+    },
+    zoomIn: {
+      description: `Zoom in by a multiplicative factor (default 1.25).`,
+      args: [{ name: "factor", valueType: "number" }],
+    },
+    zoomOut: {
+      description: `Zoom out by a multiplicative factor (default 1.25).`,
+      args: [{ name: "factor", valueType: "number" }],
+    },
+    actualSize: {
+      description: `Reset zoom to 100% (scale = 1.0).`,
+      args: [],
+    },
+    fitWidth: {
+      description: `Scale the PDF so the page width fills the available viewport width.`,
+      args: [],
+    },
+    fitPage: {
+      description: `Scale the PDF so the full page fits within the visible viewport (both width and height).`,
+      args: [],
+    },
+    getScale: {
+      description: `Return the current scale value.`,
+      args: [],
     },
     addAnnotation: {
       description: `Add a new annotation. Returns the annotation ID.`,
@@ -80,6 +118,22 @@ export const PdfMd = createMetadata({
     },
     getAnnotations: {
       description: `Get all current annotations.`,
+      args: [],
+    },
+    selectAnnotation: {
+      description: `Select an annotation by ID, highlighting it in the PDF.`,
+      args: [{ name: "id", valueType: "string" }],
+    },
+    deselectAnnotation: {
+      description: `Deselect the currently selected annotation.`,
+      args: [],
+    },
+    getSelectedAnnotationId: {
+      description: `Return the ID of the currently selected annotation, or null if none.`,
+      args: [],
+    },
+    getSelectedAnnotation: {
+      description: `Return the full annotation object that is currently selected, or null if none.`,
       args: [],
     },
     openSignatureModal: {
@@ -103,6 +157,7 @@ export const PdfMd = createMetadata({
     $currentPage: d(`Current page number (1-indexed).`),
     $annotations: d(`Array of all annotations.`),
     $mode: d(`Current display mode ("view" or "edit").`),
+    $scale: d(`Current zoom scale (e.g. 1.0 = 100%).`),
     $hasSignature: d(`Whether a signature has been captured (Phase 2).`),
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -159,12 +214,13 @@ export const PdfMd = createMetadata({
 export const pdfComponentRenderer = createComponentRenderer(
   COMP,
   PdfMd,
-  ({ node, extractValue, lookupEventHandler, registerComponentApi, updateState, state, uid }) => {
+  ({ node, extractValue, lookupEventHandler, registerComponentApi, updateState, state, uid, className }) => {
     const props = node.props as typeof PdfMd.props;
     
     return (
       <LazyPdf
         id={String(uid)}
+        className={className}
         src={extractValue(props?.src)}
         data={extractValue(props?.data)}
         mode={extractValue.asOptionalString(props?.mode, defaultProps.mode) as "view" | "edit"}
@@ -172,6 +228,8 @@ export const pdfComponentRenderer = createComponentRenderer(
         currentPage={extractValue.asOptionalNumber(props?.currentPage)}
         annotations={extractValue(props?.annotations) || defaultProps.annotations}
         signatureData={extractValue(props?.signatureData)}
+        showToolbar={extractValue.asOptionalBoolean(props?.showToolbar, defaultProps.showToolbar)}
+        showProperties={extractValue.asOptionalBoolean(props?.showProperties, defaultProps.showProperties)}
         onDocumentLoad={lookupEventHandler("documentLoad")}
         onPageChange={lookupEventHandler("pageChange")}
         onAnnotationCreate={lookupEventHandler("annotationCreate")}

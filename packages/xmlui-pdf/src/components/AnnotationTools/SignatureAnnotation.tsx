@@ -28,6 +28,11 @@ export function SignatureAnnotation({
     onSelect(id);
   };
 
+  const handleMouseDown = (event: React.MouseEvent) => {
+    // Prevent parent drag handler from intercepting click on signature
+    event.stopPropagation();
+  };
+
   const handleFocus = () => {
     onSelect(id);
   };
@@ -37,6 +42,7 @@ export function SignatureAnnotation({
       data-testid="signature-annotation"
       className={`${styles.signatureAnnotation} ${isSelected ? styles.selected : ""} ${!hasSignature ? styles.empty : ""}`}
       onClick={handleClick}
+      onMouseDown={handleMouseDown}
       tabIndex={0}
       onFocus={handleFocus}
     >

@@ -13,10 +13,17 @@ export function DeleteButton({ onDelete }: DeleteButtonProps) {
     onDelete();
   };
 
+  const handleMouseDown = (event: React.MouseEvent) => {
+    // Prevent parent drag handler from calling preventDefault, which would
+    // suppress this button's click event.
+    event.stopPropagation();
+  };
+
   return (
     <button
       className={styles.deleteButton}
       onClick={handleClick}
+      onMouseDown={handleMouseDown}
       title="Delete annotation (Delete/Backspace)"
       data-testid="delete-button"
       aria-label="Delete annotation"

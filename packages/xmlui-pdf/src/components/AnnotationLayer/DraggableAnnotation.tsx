@@ -105,7 +105,7 @@ export function DraggableAnnotation({
         {children}
       </ResizableAnnotation>
       
-      {isSelected && onAnnotationDelete && (
+      {isSelected && onAnnotationDelete && !annotation.properties.locked && (
         <DeleteButton onDelete={() => onAnnotationDelete(annotation.id)} />
       )}
     </div>

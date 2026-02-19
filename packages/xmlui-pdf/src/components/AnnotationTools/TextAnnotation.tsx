@@ -29,6 +29,11 @@ export function TextAnnotation({
     onSelect(id);
   };
 
+  const handleMouseDown = (event: React.MouseEvent) => {
+    // Prevent parent drag handler from intercepting click on input
+    event.stopPropagation();
+  };
+
   const handleFocus = () => {
     onSelect(id);
   };
@@ -50,6 +55,7 @@ export function TextAnnotation({
         value={value || ""}
         placeholder={placeholder}
         onChange={handleChange}
+        onMouseDown={handleMouseDown}
         onFocus={handleFocus}
         className={styles.input}
         style={{

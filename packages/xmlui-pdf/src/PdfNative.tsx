@@ -76,7 +76,7 @@ export interface PdfNativeProps {
   onPageChange?: (page: number) => void;
   onAnnotationCreate?: (annotation: Annotation) => void;
   onAnnotationUpdate?: (annotation: Annotation) => void;
-  onAnnotationDelete?: (id: string) => void;
+  onAnnotationDelete?: (id: string) => Promise<boolean | void>;
   onAnnotationSelect?: (id: string) => void;
   onSignatureCapture?: (signature: SignatureData) => void;
   onSignatureApply?: (fieldId: string, signature: SignatureData) => void;
@@ -95,8 +95,8 @@ export const defaultProps = {
   mode: "view" as PdfMode,
   scale: 1.0,
   annotations: [] as Annotation[],
-  showToolbar: true,
-  showProperties: true,
+  showToolbar: false,
+  showProperties: false,
 };
 
 export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
@@ -130,7 +130,45 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
     const [numPages, setNumPages] = useState<number | null>(null);
     const [internalPage, setInternalPage] = useState<number>(1);
     const [selectedAnnotationId, setSelectedAnnotationId] = useState<string | undefined>();
-    
+    // Internal scale — owned here so API methods like zoomIn/fitWidth work independently
+    // of whether the parent binds the scale prop.
+    const [internalScale, setInternalScale] = useState<number>(scale);
+    // Track natural page dimensions (PDF points) captured from the first page render
+    const pageDimensionsRef = useRef<{ width: number; height: number }>({ width: 595, height: 842 });
+    // Ref to the scrollable viewport div — used for fit-width / fit-page calculations
+    const viewportRef = useRef<HTMLDivElement>(null);
+    // Internal annotation state — initialized from the prop, but owned here so controlled
+    // inputs don't snap back to old values when the parent doesn't round-trip updates.
+    const [internalAnnotations, setInternalAnnotations] = useState<Annotation[]>(annotations);
+    // Ref that always holds the current annotations — used by the registered API
+    // methods which close over a stale value (they're registered once on mount).
+    const internalAnnotationsRef = useRef<Annotation[]>(annotations);
+    internalAnnotationsRef.current = internalAnnotations;
+
+    // Sync internalScale when the scale prop changes externally
+    const prevScaleProp = useRef(scale);
+    useEffect(() => {
+      if (scale !== prevScaleProp.current) {
+        prevScaleProp.current = scale;
+        setInternalScale(scale);
+      }
+    }, [scale]);
+
+    // Push scale changes to $scale context var
+    useEffect(() => {
+      updateState?.({ scale: internalScale });
+    }, [internalScale]);
+
+    // Keep internal annotations in sync when the prop changes from outside
+    // (e.g. initial load or parent-driven reset), but don't override in-flight edits.
+    const prevAnnotationsProp = useRef(annotations);
+    useEffect(() => {
+      if (annotations !== prevAnnotationsProp.current) {
+        prevAnnotationsProp.current = annotations;
+        setInternalAnnotations(annotations);
+      }
+    }, [annotations]);
+
     // Use controlled page if provided, otherwise internal state
     const effectivePage = currentPage ?? internalPage;
     
@@ -168,14 +206,21 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
     useEffect(() => {
       const handleKeyDown = (event: KeyboardEvent) => {
         if (!selectedAnnotationId || mode !== "edit") return;
+
+        // Don't intercept keys when the user is typing inside an input or textarea
+        const target = event.target as HTMLElement;
+        if (
+          target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable
+        ) {
+          return;
+        }
         
         if (event.key === "Delete" || event.key === "Backspace") {
-          // Prevent default backspace navigation
+          // Prevent default backspace navigation only outside inputs
           event.preventDefault();
-          
-          // Delete selected annotation - let parent component handle state updates
-          onAnnotationDelete?.(selectedAnnotationId);
-          setSelectedAnnotationId(undefined);
+          void handleAnnotationDelete(selectedAnnotationId);
         }
       };
 
@@ -183,7 +228,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
       return () => {
         document.removeEventListener("keydown", handleKeyDown);
       };
-    }, [selectedAnnotationId, mode, onAnnotationDelete]);
+    }, [selectedAnnotationId, mode]);
 
     function handleLoadSuccess({ numPages }: { numPages: number }) {
       setNumPages(numPages);
@@ -196,6 +241,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
           currentPage: effectivePage,
           annotations,
           mode,
+          scale: internalScale,
         });
       }
     }
@@ -236,6 +282,30 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
       };
     }
 
+    // ---- annotation mutation helpers (keep internal state + notify parent) ----
+    function handleAnnotationUpdate(id: string, updates: Partial<Annotation>) {
+      const annotation = internalAnnotations.find(a => a.id === id);
+      if (!annotation) return;
+      const updated: Annotation = { ...annotation, ...updates, modified: new Date() };
+      const next = internalAnnotations.map(a => a.id === id ? updated : a);
+      setInternalAnnotations(next);
+      onAnnotationUpdate?.(updated);
+      updateState?.({ annotations: next });
+    }
+
+    async function handleAnnotationDelete(id: string) {
+      const annotation = internalAnnotations.find(a => a.id === id);
+      // Respect the locked flag
+      if (annotation?.properties.locked) return;
+      // Allow the event handler to cancel deletion by returning false (mirrors onWillSubmit pattern)
+      const result = await onAnnotationDelete?.(id);
+      if (result === false) return;
+      const next = internalAnnotations.filter(a => a.id !== id);
+      setInternalAnnotations(next);
+      updateState?.({ annotations: next });
+      if (selectedAnnotationId === id) setSelectedAnnotationId(undefined);
+    }
+
     // Handle adding annotation from toolbar
     function handleAddAnnotation(type: AnnotationType, page: number) {
       const annotationData = createDefaultAnnotation(type, page);
@@ -245,10 +315,10 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
         created: new Date(),
         modified: new Date(),
       };
+      const next = [...internalAnnotations, newAnnotation];
+      setInternalAnnotations(next);
       onAnnotationCreate?.(newAnnotation);
-      updateState?.({ 
-        annotations: [...annotations, newAnnotation] 
-      });
+      updateState?.({ annotations: next });
       setSelectedAnnotationId(newAnnotation.id);
       return newAnnotation.id;
     }
@@ -264,49 +334,99 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
             handlePageChange(page);
           }
         },
+        // --- Zoom / scale API ---
+        zoomTo: (newScale: number) => {
+          const clamped = Math.max(0.1, Math.min(5, newScale));
+          setInternalScale(clamped);
+          latestValues.current.updateState?.({ scale: clamped });
+        },
+        zoomIn: (factor: number = 1.25) => {
+          setInternalScale(prev => {
+            const next = Math.min(5, prev * factor);
+            latestValues.current.updateState?.({ scale: next });
+            return next;
+          });
+        },
+        zoomOut: (factor: number = 1.25) => {
+          setInternalScale(prev => {
+            const next = Math.max(0.1, prev / factor);
+            latestValues.current.updateState?.({ scale: next });
+            return next;
+          });
+        },
+        actualSize: () => {
+          setInternalScale(1);
+          latestValues.current.updateState?.({ scale: 1 });
+        },
+        fitWidth: () => {
+          const viewport = viewportRef.current;
+          if (!viewport) return;
+          const availableWidth = viewport.clientWidth - 16; // subtract padding
+          const newScale = availableWidth / pageDimensionsRef.current.width;
+          const clamped = Math.max(0.1, Math.min(5, newScale));
+          setInternalScale(clamped);
+          latestValues.current.updateState?.({ scale: clamped });
+        },
+        fitPage: () => {
+          const viewport = viewportRef.current;
+          if (!viewport) return;
+          const availableWidth = viewport.clientWidth - 16;
+          const availableHeight = viewport.clientHeight - 16;
+          const scaleW = availableWidth / pageDimensionsRef.current.width;
+          const scaleH = availableHeight / pageDimensionsRef.current.height;
+          const clamped = Math.max(0.1, Math.min(5, Math.min(scaleW, scaleH)));
+          setInternalScale(clamped);
+          latestValues.current.updateState?.({ scale: clamped });
+        },
+        getScale: () => internalScale,
+        // Legacy — kept for back-compat
         setScale: (newScale: number) => {
-          latestValues.current.updateState?.({ scale: newScale });
+          const clamped = Math.max(0.1, Math.min(5, newScale));
+          setInternalScale(clamped);
+          latestValues.current.updateState?.({ scale: clamped });
         },
         addAnnotation: (annotationData: any) => {
-          const { annotations, onAnnotationCreate, updateState } = latestValues.current;
+          const { onAnnotationCreate } = latestValues.current;
           const newAnnotation: Annotation = {
             ...annotationData,
-            id: `annotation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            id: annotationData.id || `annotation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             created: new Date(),
             modified: new Date(),
           };
-          onAnnotationCreate?.(newAnnotation);
-          updateState?.({ 
-            annotations: [...annotations, newAnnotation] 
+          setInternalAnnotations(prev => {
+            const next = [...prev, newAnnotation];
+            latestValues.current.updateState?.({ annotations: next });
+            return next;
           });
+          onAnnotationCreate?.(newAnnotation);
           return newAnnotation.id;
         },
         updateAnnotation: (id: string, updates: any) => {
-          const { annotations, onAnnotationUpdate, updateState } = latestValues.current;
-          const annotation = annotations.find(a => a.id === id);
-          if (annotation) {
-            const updated = {
-              ...annotation,
-              ...updates,
-              modified: new Date(),
-            };
+          const { onAnnotationUpdate } = latestValues.current;
+          setInternalAnnotations(prev => {
+            const annotation = prev.find(a => a.id === id);
+            if (!annotation) return prev;
+            const updated = { ...annotation, ...updates, modified: new Date() };
+            const next = prev.map(a => a.id === id ? updated : a);
+            latestValues.current.updateState?.({ annotations: next });
             onAnnotationUpdate?.(updated);
-            updateState?.({
-              annotations: annotations.map(a => a.id === id ? updated : a)
-            });
-          }
-        },
-        deleteAnnotation: (id: string) => {
-          const { annotations, selectedAnnotationId, onAnnotationDelete, updateState } = latestValues.current;
-          onAnnotationDelete?.(id);
-          updateState?.({
-            annotations: annotations.filter(a => a.id !== id)
+            return next;
           });
-          if (selectedAnnotationId === id) {
-            setSelectedAnnotationId(undefined);
-          }
         },
-        getAnnotations: () => latestValues.current.annotations,
+        deleteAnnotation: async (id: string) => {
+          const { onAnnotationDelete } = latestValues.current;
+          const annotation = internalAnnotationsRef.current.find(a => a.id === id);
+          if (annotation?.properties.locked) return;
+          const result = await onAnnotationDelete?.(id);
+          if (result === false) return;
+          setInternalAnnotations(prev => {
+            const next = prev.filter(a => a.id !== id);
+            latestValues.current.updateState?.({ annotations: next });
+            return next;
+          });
+          setSelectedAnnotationId(prev => prev === id ? undefined : prev);
+        },
+        getAnnotations: () => internalAnnotations,
         selectAnnotation: (id: string) => {
           setSelectedAnnotationId(id);
           latestValues.current.onAnnotationSelect?.(id);
@@ -335,7 +455,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
     
     // Get selected annotation for properties panel
     const selectedAnnotation = selectedAnnotationId 
-      ? annotations.find(a => a.id === selectedAnnotationId) || null
+      ? internalAnnotations.find(a => a.id === selectedAnnotationId) || null
       : null;
 
     // Note: id prop is used internally by XMLUI, not applied to DOM
@@ -352,7 +472,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
             isEditMode={mode === "edit"}
           />
         )}
-        <div style={{ flex: 1 }}>
+        <div ref={viewportRef} style={{ flex: 1, minHeight: 0, overflow: "auto" }}>
           <Document
           file={fileSource as any}
           onLoadSuccess={handleLoadSuccess}
@@ -371,33 +491,31 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
                   pageNumber={pageNumber}
                   loading=""
                   className={styles.page}
-                  scale={scale}
+                  scale={internalScale}
+                  onRenderSuccess={(page) => {
+                    // Capture natural page dimensions at scale=1 from the first page
+                    if (pageNumber === 1) {
+                      pageDimensionsRef.current = {
+                        width: page.width / internalScale,
+                        height: page.height / internalScale,
+                      };
+                    }
+                  }}
                 />
                 {mode === "edit" && (
                   <AnnotationLayer
-                    annotations={annotations}
+                    annotations={internalAnnotations}
                     pageNumber={pageNumber}
                     pageWidth={pageWidth}
                     pageHeight={pageHeight}
-                    scale={scale}
+                    scale={internalScale}
                     selectedAnnotationId={selectedAnnotationId}
                     onAnnotationSelect={(id) => {
                       setSelectedAnnotationId(id);
                       onAnnotationSelect?.(id);
                     }}
-                    onAnnotationUpdate={(id, updates) => {
-                      const annotation = annotations.find(a => a.id === id);
-                      if (annotation) {
-                        onAnnotationUpdate?.({
-                          ...annotation,
-                          ...updates,
-                        });
-                      }
-                    }}
-                    onAnnotationDelete={(id) => {
-                      onAnnotationDelete?.(id);
-                      setSelectedAnnotationId(undefined);
-                    }}
+                    onAnnotationUpdate={handleAnnotationUpdate}
+                    onAnnotationDelete={handleAnnotationDelete}
                   />
                 )}
               </div>
@@ -408,12 +526,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
         {mode === "edit" && showProperties && (
           <FieldProperties
             annotation={selectedAnnotation}
-            onUpdate={(id, updates) => {
-              onAnnotationUpdate?.({
-                ...annotations.find(a => a.id === id)!,
-                ...updates,
-              });
-            }}
+            onUpdate={handleAnnotationUpdate}
           />
         )}
       </div>

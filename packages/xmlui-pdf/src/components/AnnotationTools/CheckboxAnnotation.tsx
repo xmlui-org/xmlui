@@ -30,6 +30,11 @@ export function CheckboxAnnotation({
     onSelect(id);
   };
 
+  const handleMouseDown = (event: React.MouseEvent) => {
+    // Prevent parent drag handler from intercepting click on checkbox
+    event.stopPropagation();
+  };
+
   const handleFocus = () => {
     onSelect(id);
   };
@@ -45,6 +50,7 @@ export function CheckboxAnnotation({
           type="checkbox"
           checked={isChecked}
           onChange={handleChange}
+          onMouseDown={handleMouseDown}
           onFocus={handleFocus}
           className={styles.checkbox}
         />

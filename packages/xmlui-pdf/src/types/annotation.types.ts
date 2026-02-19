@@ -37,6 +37,8 @@ export interface AnnotationProperties {
   fontSize?: number;
   /** Font family name */
   fontFamily?: string;
+  /** When true, the annotation cannot be deleted by the user */
+  locked?: boolean;
 }
 
 /**

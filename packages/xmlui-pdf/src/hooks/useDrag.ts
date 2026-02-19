@@ -37,7 +37,7 @@ export function useDrag({
   const handleMouseDown = useCallback(
     (event: React.MouseEvent) => {
       if (disabled) return;
-      
+
       event.stopPropagation();
       event.preventDefault();
 
