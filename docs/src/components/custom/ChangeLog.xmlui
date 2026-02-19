@@ -1,58 +1,11 @@
 <Component name="ChangeLog">
-    <DataSource id="downloads" url="/resources/files/releases.json" method="GET" />
+    <DataSource id="releases" url="/resources/files/releases.json" method="GET" />
     <DocumentPageNoTOC>
-        <HStack>
-            <VStack
-                    width="*"
-                    padding="$space-4"
-            >
-                <H1>Change Log</H1>
-                <VStack gap="$space-2" marginBottom="$space-4">
-                    <Items items="{downloads.value}">
-                        <Card>
-                            <HStack>
-                                <HStack verticalAlignment="baseline">
-                                    <H2>{$item.tag_name}</H2>
-                                    <Text value="{formatHumanElapsedTime($item.published_at, true)}"/>
-                                </HStack>
-                                <Fragment when="{$isFirst}">
-                                    <SpaceFiller />
-                                    <Badge variant="pill">Latest</Badge>
-                                </Fragment>
-                            </HStack>
-                            <VStack paddingLeft="$padding-normal">
-                                <Items items="{$item.changes}">
-                                    <HStack>
-                                        <Link
-                                            to="https://github.com/xmlui-org/xmlui/commit/{$item.commit_sha}"
-                                            target="_blank">
-                                            <Icon name="new-window" size="1rem" />
-                                        </Link>
-                                        {$item.description}
-                                    </HStack>
-                                </Items>
-                            </VStack>
-                            <Card backgroundColor="$color-surface-50"
-                                padding="$space-2" marginTop="$space-2">
-                                <HStack verticalAlignment="center" padding="0">
-                                    <Icon name="cube" />
-                                    <Link active="true" to="{$item.assets[0].browser_download_url}">
-                                        {$item.assets[0].name}
-                                    </Link>
-                                    <SpaceFiller />
-
-                                    <Button variant="ghost" themeColor="primary" icon="download" padding="$space-2"
-                                            >
-                                    <Link active="true" to="{$item.assets[0].browser_download_url}">
-                                        Download
-                                    </Link>
-                                    </Button>
-                                </HStack>
-                            </Card>
-                        </Card>
-                    </Items>
-                </VStack>
-            </VStack>
-        </HStack>
+        <ReleaseList
+            items="{releases.value}"
+            title="Change Log"
+            commitBaseUrl="https://github.com/xmlui-org/xmlui/commit"
+            downloadLabel="Download"
+        />
     </DocumentPageNoTOC>
 </Component>

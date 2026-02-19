@@ -20,6 +20,7 @@ import { sectionHeaderRenderer } from "./docs/SectionHeader";
 import { overviewRenderer } from "./docs/Overview";
 import { twoColumnCodeRenderer } from "./docs/TwoColumnCode";
 import { pageNotFoundRenderer } from "./docs/PageNotFound";
+import { releaseListRenderer } from "./docs/ReleaseList";
 import {
   findNavItem,
   getNavGroup,
@@ -47,6 +48,7 @@ export default {
     overviewRenderer,
     twoColumnCodeRenderer,
     pageNotFoundRenderer,
+    releaseListRenderer,
   ],
   functions: {
     findNavItem,
