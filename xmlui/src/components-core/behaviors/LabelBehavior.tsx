@@ -1,5 +1,5 @@
 import { ItemWithLabel } from "../../components/FormItem/ItemWithLabel";
-import { Behavior } from "./Behavior";
+import type { Behavior } from "./Behavior";
 
 /**
  * Behavior for applying a label to form components using ItemWithLabel.
@@ -116,6 +116,7 @@ export const labelBehavior: Behavior = {
         enabled={enabled}
         style={style}
         className={className}
+        cloneStyle={true}
         shrinkToLabel={shrinkToLabel}
         labelStyle={{ pointerEvents: readOnly ? "none" : undefined }}
         isInputTemplateUsed={!!componentNode.props?.inputTemplate}

@@ -180,6 +180,7 @@ export function FormBindingWrapper({
       onBlur={onBlur}
       style={style}
       className={className}
+      cloneStyle={true}
       validationResult={validationResult}
       requireLabelMode={requireLabelMode ?? formRequireLabelMode}
     >
