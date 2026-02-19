@@ -608,9 +608,6 @@
                 content="{appGlobals.content['pages/core-properties.md']}"
             />
         </Page>
-        <Page url="/universal-properties">
-            <Redirect to="/core-properties" />
-        </Page>
         <Page url="/template-properties">
             <DocumentPage
                 content="{appGlobals.content['pages/template-properties.md']}"
