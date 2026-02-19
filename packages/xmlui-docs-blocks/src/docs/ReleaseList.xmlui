@@ -24,7 +24,7 @@
                             >
                                 <Icon name="new-window" size="1rem" />
                             </Link>
-                            <Text>{$item.description}</Text>
+                            <Text width="*" minWidth="0">{$item.description}</Text>
                         </HStack>
                     </Items>
                 </VStack>
