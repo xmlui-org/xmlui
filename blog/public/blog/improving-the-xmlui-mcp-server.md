@@ -39,10 +39,10 @@ Codex does the same thing more concisely.
 
 Outcomes weren't always this good. We improved them recently by pointing our agents at logs the MCP server has collected over the past few months as it helped me work on a dozen different XMLUI apps. Here is part of [Claude's](https://github.com/xmlui-org/xmlui-mcp/issues/5) analysis.
 
-![](/resources/claude-analysis-1.png)
+<img src="/resources/claude-analysis-1.png" style="width:60%;" />
 
 Claude Code proceeded to implement the suggestions which, along with topic indexes, tweaked the scoring system to penalize deprecated components. To test the new build we started another instance of Claude Code and assigned it a task that required it to ask questions the MCP server should help it answer. Claude 1 — the author of the new features — tailed the logs and watched Claude 2 try to use them. I asked Claude 2 for feedback to relay to Claude 1, and it obliged.
 
-![](/resources/claude-analysis-2.png)
+<img src="/resources/claude-analysis-2.png" style="width:60%;" />
 
 As a result we've dropped the intriguing idea of *pattern* search for now. Maybe we'll find a reason to bring it back. Or maybe you will! If you suspect the MCP server could be doing a better job with the questions your agents are asking it, try turning an agent loose on the MCP logs. If the analysis seems sound and the recommendations promising, [raise an issue](https://github.com/xmlui-org/xmlui-mcp/issues/new) and share that info, we'll take a look.
