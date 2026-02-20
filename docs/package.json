@@ -8,7 +8,7 @@
     "gen:releases": "node scripts/get-releases.js --output 'public/resources/files/releases.json'",
     "gen:download-latest-xmlui-release": "node scripts/download-latest-xmlui.js",
     "gen:rss": "node scripts/generate-rss.js",
-    "gen:sitemap": "node scripts/generate-sitemap.js",
+    "gen:sitemap": "tsx scripts/generate-sitemap.mjs",
     "build:docs": "npm run gen:releases && npm run gen:download-latest-xmlui-release && npm run gen:rss && npm run gen:sitemap && xmlui build --buildMode=INLINE_ALL --withMock ",
     "build-optimized": "npm run gen:releases && npm run gen:download-latest-xmlui-release && npm run gen:rss && npm run gen:sitemap && npx xmlui-optimizer",
     "release:docs": "xmlui zip-dist --source=dist --target=dist/ui.zip",
