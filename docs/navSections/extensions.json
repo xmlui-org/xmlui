@@ -36,6 +36,19 @@
               "to": "/extensions/xmlui-animations/SlideInAnimation"
             }
           ]
+        },
+        {
+          "label": "Xmlui Pdf",
+          "children": [
+            {
+              "label": "Extension Overview",
+              "to": "/extensions/xmlui-pdf/_overview"
+            },
+            {
+              "label": "Pdf",
+              "to": "/extensions/xmlui-pdf/Pdf"
+            }
+          ]
         }
       ]
     }

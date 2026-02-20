@@ -1,16 +1,12 @@
 import { Suspense, lazy, forwardRef } from "react";
+import type { PdfNativeProps } from "./PdfNative";
 
-const Pdf = lazy(() => import("./Pdf"));
+const PdfNative = lazy(() => import("./PdfNative").then(m => ({ default: m.PdfNative })));
 
-interface Props {
-  src?: string;
-  data?: any; // Binary data for PDF content
-}
-
-export const LazyPdf = forwardRef((props: Props, ref) => {
+export const LazyPdf = forwardRef<HTMLDivElement, PdfNativeProps>((props, ref) => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <Pdf {...props} ref={ref} />
+      <PdfNative {...props} ref={ref} />
     </Suspense>
   );
 });

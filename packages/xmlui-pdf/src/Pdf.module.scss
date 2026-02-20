@@ -10,6 +10,25 @@ $themeVars: ();
 $boxShadow-page-Pdf: createThemeVar("boxShadow-page-Pdf");
 $gap-pages-Pdf: createThemeVar("gap-pages-Pdf");
 
+// Scrollbar theme variables — shared with the Scroller/ScrollViewer component
+$backgroundColor-handle-Scroller: createThemeVar("backgroundColor-handle-Scroller");
+$backgroundColor-handle-Scroller--hover: createThemeVar("backgroundColor-handle-Scroller--hover");
+$backgroundColor-track-Scroller: createThemeVar("backgroundColor-track-Scroller");
+$size-Scroller: createThemeVar("size-Scroller");
+
+// Annotation theme variables
+$borderColor-field-Pdf: createThemeVar("borderColor-field-Pdf");
+$backgroundColor-field-Pdf: createThemeVar("backgroundColor-field-Pdf");
+$color-selected-Pdf: createThemeVar("color-selected-Pdf");
+$boxShadow-selected-Pdf: createThemeVar("boxShadow-selected-Pdf");
+$color-delete-Pdf: createThemeVar("color-delete-Pdf");
+$color-resizeHandle-Pdf: createThemeVar("color-resizeHandle-Pdf");
+$backgroundColor-toolbar-Pdf: createThemeVar("backgroundColor-toolbar-Pdf");
+$borderColor-toolbar-Pdf: createThemeVar("borderColor-toolbar-Pdf");
+$backgroundColor-text-Pdf: createThemeVar("backgroundColor-text-Pdf");
+$backgroundColor-checkbox-Pdf: createThemeVar("backgroundColor-checkbox-Pdf");
+$backgroundColor-signature-Pdf: createThemeVar("backgroundColor-signature-Pdf");
+
 .document{
   display: flex;
   flex-direction: column;
@@ -17,8 +36,55 @@ $gap-pages-Pdf: createThemeVar("gap-pages-Pdf");
   width: fit-content;
 }
 
+// Viewport scroll-style variants
+// Uses the modern scrollbar-color / scrollbar-width API (Chrome 121+, Firefox 64+, Safari 16.4+).
+// NOTE: ::-webkit-scrollbar and scrollbar-color are MUTUALLY EXCLUSIVE in Chrome —
+// defining any ::-webkit-scrollbar rule on an element causes Chrome to ignore scrollbar-color
+// on that element entirely, so we must use only one API.
+// scrollbar-gutter: stable both-edges reserves equal gutter space on both sides so
+// center-aligned content never shifts when the scrollbar appears/disappears.
+.viewport {
+  // whenMouseOver: transparent by default, show themed colors on :hover
+  &[data-scroll-style="whenMouseOver"] {
+    scrollbar-gutter: stable both-edges;
+    scrollbar-width: #{$size-Scroller};
+    scrollbar-color: transparent transparent;
+    &:hover {
+      scrollbar-color: #{$backgroundColor-handle-Scroller} #{$backgroundColor-track-Scroller};
+    }
+  }
+
+  // whenScrolling: transparent by default, show themed colors while data-scrolling="true" (set by JS)
+  &[data-scroll-style="whenScrolling"] {
+    scrollbar-gutter: stable both-edges;
+    scrollbar-width: #{$size-Scroller};
+    scrollbar-color: transparent transparent;
+    &[data-scrolling="true"] {
+      scrollbar-color: #{$backgroundColor-handle-Scroller} #{$backgroundColor-track-Scroller};
+    }
+  }
+
+  // overlay: always show themed scrollbar
+  &[data-scroll-style="overlay"] {
+    scrollbar-width: #{$size-Scroller};
+    scrollbar-color: #{$backgroundColor-handle-Scroller} #{$backgroundColor-track-Scroller};
+  }
+}
+
+.pageContainer {
+  position: relative;
+  width: fit-content;
+}
+
 .page{
   box-shadow: $boxShadow-page-Pdf;
+  
+  // Ensure canvas and images are visible
+  canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer

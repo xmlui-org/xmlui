@@ -1,6 +1,6 @@
 {
   "excludeComponentStatuses": ["deprecated", "internal"],
   "cleanFolder": true,
-  "includeByName": ["xmlui-animations", "xmlui-website-blocks"],
+  "includeByName": ["xmlui-animations", "xmlui-website-blocks", "xmlui-pdf"],
   "excludeByName": []
 }
