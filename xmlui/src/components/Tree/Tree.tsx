@@ -221,6 +221,50 @@ export const TreeMd = createMetadata({
         node: "The tree node that needs to load its children.",
       },
     },
+    cutAction: {
+      description:
+        `This event is triggered when the user presses the cut keyboard shortcut ` +
+        `(default: Ctrl+X/Cmd+X) while the tree has focus and a node is selected. The handler receives ` +
+        `the focused node. Note: The component does not automatically modify data; the handler must ` +
+        `implement the cut logic (e.g., copying node data to clipboard and removing from the tree).`,
+      signature: "cut(node: FlatTreeNode): void | Promise<void>",
+      parameters: {
+        node: "The currently focused tree node.",
+      },
+    },
+    copyAction: {
+      description:
+        `This event is triggered when the user presses the copy keyboard shortcut ` +
+        `(default: Ctrl+C/Cmd+C) while the tree has focus and a node is selected. The handler receives ` +
+        `the focused node. The handler should implement the copy logic (e.g., using the Clipboard API ` +
+        `to copy the node data).`,
+      signature: "copy(node: FlatTreeNode): void | Promise<void>",
+      parameters: {
+        node: "The currently focused tree node.",
+      },
+    },
+    pasteAction: {
+      description:
+        `This event is triggered when the user presses the paste keyboard shortcut ` +
+        `(default: Ctrl+V/Cmd+V) while the tree has focus and a node is selected. The handler receives ` +
+        `the focused node. The handler must implement the paste logic (e.g., reading from clipboard ` +
+        `and inserting data into the tree).`,
+      signature: "paste(node: FlatTreeNode): void | Promise<void>",
+      parameters: {
+        node: "The currently focused tree node.",
+      },
+    },
+    deleteAction: {
+      description:
+        `This event is triggered when the user presses the delete keyboard shortcut ` +
+        `(default: Delete key) while the tree has focus and a node is selected. The handler receives ` +
+        `the focused node. Note: The component does not automatically remove data; the handler must ` +
+        `implement the delete logic (e.g., removing the node from the data source).`,
+      signature: "delete(node: FlatTreeNode): void | Promise<void>",
+      parameters: {
+        node: "The currently focused tree node.",
+      },
+    },
   },
   apis: {
     expandAll: {
@@ -505,6 +549,10 @@ export const treeComponentRenderer = createComponentRenderer(
         onNodeExpanded={lookupEventHandler("nodeDidExpand")}
         onNodeCollapsed={lookupEventHandler("nodeDidCollapse")}
         loadChildren={lookupEventHandler("loadChildren")}
+        onCutAction={lookupEventHandler("cutAction")}
+        onCopyAction={lookupEventHandler("copyAction")}
+        onPasteAction={lookupEventHandler("pasteAction")}
+        onDeleteAction={lookupEventHandler("deleteAction")}
         lookupEventHandler={node.events?.contextMenu ? lookupEventHandler : undefined}
         itemRenderer={(flatTreeNode: any) => {
           const itemContext = {

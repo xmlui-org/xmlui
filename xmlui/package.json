@@ -130,6 +130,10 @@
   },
   "optionalDependencies": {
     "@esbuild/linux-x64": "0.25.2",
+    "@rolldown/binding-darwin-arm64": "1.0.0-beta.45",
+    "@rolldown/binding-darwin-x64": "1.0.0-beta.45",
+    "@rolldown/binding-linux-x64-gnu": "1.0.0-beta.45",
+    "@rolldown/binding-win32-x64-msvc": "1.0.0-beta.45",
     "@rollup/rollup-linux-x64-gnu": "4.20.0",
     "@rollup/rollup-win32-x64-msvc": "4.20.0"
   },
