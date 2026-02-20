@@ -1,7 +1,8 @@
 <Component name="PdfAsForm">
+  <DataSource id="labels" url="/f1040-fields.json" />
   <HStack height="100%">
     <VStack width="60%">
-      <Pdf id="myPdf" src="/OoPdfFormExample.pdf" mode="edit" />
+      <Pdf id="myPdf" src="/f1040.pdf" mode="edit" fieldLabels="{labels.value}" />
     </VStack>
     <VStack width="40%" padding="$space-2" gap="$space-1">
       <Table
@@ -18,24 +19,17 @@
 ## XMLUI Source
 
 ```xml
-<Component name="PdfAsForm">
-  <HStack height="100%">
-    <VStack width="60%">
-      <Pdf id="myPdf" src="/OoPdfFormExample.pdf" mode="edit" />
-    </VStack>
-    <VStack width="40%">
-      <Table data="{myPdf.formFields}" size="sm">
-        <Column header="Field" bindTo="field" />
-        <Column header="Value" bindTo="value" />
-      </Table>
-    </VStack>
-  </HStack>
-</Component>
+<DataSource id="labels" url="/f1040-fields.json" />
+<Pdf id="myPdf" src="/f1040.pdf" mode="edit" fieldLabels="{labels.value}" />
+<Table data="{myPdf.formFields}" size="sm">
+  <Column header="Field" bindTo="field" />
+  <Column header="Value" bindTo="value" />
+</Table>
 ```
 
 ### How it works
 
-This PDF was created with OpenOffice but uses **AcroForm** fields — the standard PDF spec format for interactive form widgets. Most tools that create fillable PDFs (Acrobat, LibreOffice, PDF libraries) produce AcroForm fields. The `Pdf` component uses pdf.js to render them as native HTML inputs. As you type or select values, the component auto-captures field data and exposes it reactively as `formFields` (an array of `{ field, value, type }`) and `formValues` (a keyed object). The table updates live with no scripting required.
+The IRS Form 1040 uses **AcroForm** fields with XFA-style naming (e.g. `topmostSubform[0].Page1[0].f1_14[0]`). The `Pdf` component auto-detects these fields and renders them as interactive HTML inputs. The optional `fieldLabels` prop maps raw field IDs to human-readable names — loaded here from a JSON file via `DataSource`. As you fill in fields, the table updates reactively with no scripting required.
 
 ### What's next
 

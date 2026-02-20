@@ -53,6 +53,10 @@ export const PdfMd = createMetadata({
       description: `Vertical alignment of PDF pages within the viewer. Options: "start" (default), "center", "end".`,
       valueType: "string",
     },
+    fieldLabels: d(
+      `Optional object mapping raw AcroForm field names (short form, e.g. "f1_01") to human-readable labels. ` +
+      `When provided, the formFields array uses these labels instead of raw field IDs.`,
+    ),
   },
   events: {
     documentLoad: {
@@ -335,6 +339,7 @@ export const pdfComponentRenderer = createComponentRenderer(
         signatureData={extractValue(props?.signatureData)}
         horizontalAlignment={extractValue.asOptionalString(props?.horizontalAlignment, defaultProps.horizontalAlignment) as "start" | "center" | "end"}
         verticalAlignment={extractValue.asOptionalString(props?.verticalAlignment, defaultProps.verticalAlignment) as "start" | "center" | "end"}
+        fieldLabels={extractValue(props?.fieldLabels)}
         onDocumentLoad={lookupEventHandler("documentLoad")}
         onPageChange={lookupEventHandler("pageChange")}
         onAnnotationCreate={lookupEventHandler("annotationCreate")}

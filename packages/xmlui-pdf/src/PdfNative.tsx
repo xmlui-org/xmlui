@@ -88,6 +88,9 @@ export interface PdfNativeProps {
   // Signature (Phase 2)
   signatureData?: SignatureData;
 
+  // Form field labels
+  fieldLabels?: Record<string, string>;
+
   // UI visibility
   horizontalAlignment?: "start" | "center" | "end";
   verticalAlignment?: "start" | "center" | "end";
@@ -131,6 +134,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
       currentPage,
       annotations = defaultProps.annotations,
       signatureData,
+      fieldLabels,
       horizontalAlignment = defaultProps.horizontalAlignment,
       verticalAlignment = defaultProps.verticalAlignment,
       onDocumentLoad,
@@ -278,6 +282,14 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
       };
     }, [selectedAnnotationId, mode]);
 
+    // Extract a short label from possibly-verbose XFA field paths
+    // e.g. "topmostSubform[0].Page1[0].f1_1[0]" → "f1_1"
+    function shortFieldName(name: string): string {
+      const parts = name.split(".");
+      const last = parts[parts.length - 1];
+      return last.replace(/\[\d+\]$/g, "");
+    }
+
     // Read all AcroForm field values from the DOM
     function readFormValues(): { values: Record<string, any>; fields: Array<{ field: string; value: string; type: string }> } | null {
       const fieldDefs = fieldDefsRef.current;
@@ -305,7 +317,9 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
           type = "select";
         }
         values[fieldName] = val;
-        fields.push({ field: fieldName, value: String(val ?? ""), type });
+        const short = shortFieldName(fieldName);
+        const label = fieldLabels?.[short] || fieldLabels?.[fieldName] || short;
+        fields.push({ field: label, value: String(val ?? ""), type });
       }
       return { values, fields };
     }
@@ -340,6 +354,16 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
         observer.disconnect();
       };
     }, [numPages]); // re-attach after pages render
+
+    // Re-capture with updated labels when fieldLabels prop changes
+    useEffect(() => {
+      if (fieldLabels && fieldDefsRef.current) {
+        const result = readFormValues();
+        if (result && result.fields.length > 0) {
+          updateState?.({ formValues: result.values, formFields: result.fields });
+        }
+      }
+    }, [fieldLabels]);
 
     function handleLoadSuccess(pdf: any) {
       const { numPages } = pdf;
