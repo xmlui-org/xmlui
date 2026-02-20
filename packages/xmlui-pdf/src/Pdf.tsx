@@ -296,9 +296,9 @@ export const PdfMd = createMetadata({
       },
       returns: "True if the field has a valid signature, false otherwise.",
     },
-    exportToBackend: {
+    exportAnnotations: {
       description: `Collect all annotations and signatures and trigger the onExportRequest event. Use this to prepare data for backend processing to flatten annotations and save the PDF.`,
-      signature: "exportToBackend(): void",
+      signature: "exportAnnotations(): void",
       returns: "Fires onExportRequest event with PdfExportData containing annotations, signatures, and metadata.",
     },
     getMetadata: {
@@ -415,6 +415,14 @@ export const PdfMd = createMetadata({
       description: `Retrieve download progress information for the PDF. Provides granular tracking of how much of the PDF file has been downloaded, useful for large remote PDFs.`,
       signature: "getDownloadInfo(): Promise<{ length: number } | null>",
       returns: "Promise resolving to an object with a 'length' property indicating the total file size in bytes, or null if no document is loaded.",
+    },
+    exportToPdf: {
+      description:
+        `Export the PDF with all XMLUI annotations (signatures, text fields, checkboxes) embedded as real ` +
+        `PDF content using pdf-lib. The returned \`Uint8Array\` can be downloaded or sent to a backend. ` +
+        `Unlike \`saveDocument()\`, this output is fully readable in Acrobat Reader and any standard PDF viewer.`,
+      signature: "exportToPdf(): Promise<Uint8Array | null>",
+      returns: "Promise resolving to a Uint8Array of the flattened PDF bytes with all annotations embedded, or null if no document is loaded.",
     },
   },
   contextVars: {

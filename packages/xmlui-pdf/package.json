@@ -18,6 +18,7 @@
     "test:e2e:dev": "cd ../.. && playwright test packages/xmlui-pdf/src/Pdf.spec.ts --workers=1 --reporter=line"
   },
   "dependencies": {
+    "pdf-lib": "1.17.1",
     "pdfjs-dist": "5.4.296",
     "react-pdf": "^10.3.0"
   },

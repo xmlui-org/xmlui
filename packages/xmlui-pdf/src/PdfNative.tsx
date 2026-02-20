@@ -4,6 +4,7 @@ import { Document, Page, pdfjs } from "react-pdf";
 import workerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import "react-pdf/dist/Page/TextLayer.css";
 import "react-pdf/dist/Page/AnnotationLayer.css";
+import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import type { Annotation } from "./types/annotation.types";
 import type { SignatureData } from "./types/signature.types";
 import type { PdfExportData } from "./types/export.types";
@@ -504,7 +505,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
         isSigned: (fieldId: string) => {
           return signatureMethodsRef.current.isSigned(fieldId);
         },
-        exportToBackend: () => {
+        exportAnnotations: () => {
           const exportData: PdfExportData = {
             annotations: internalAnnotationsRef.current,
             signatures: signaturesRef.current,
@@ -641,6 +642,81 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
           const proxy = docProxyRef.current;
           if (!proxy) return null;
           return proxy.getDownloadInfo();
+        },
+        exportToPdf: async (): Promise<Uint8Array | null> => {
+          const proxy = docProxyRef.current;
+          if (!proxy) return null;
+
+          // Get the original PDF bytes from PDF.js
+          const originalBytes: Uint8Array = await proxy.getData();
+
+          // Load into pdf-lib for editing
+          const pdfDoc = await PDFDocument.load(originalBytes, { ignoreEncryption: true });
+          const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
+          const pages = pdfDoc.getPages();
+
+          for (const annotation of internalAnnotationsRef.current) {
+            const pageIndex = (annotation.page ?? 1) - 1;
+            if (pageIndex < 0 || pageIndex >= pages.length) continue;
+
+            const page = pages[pageIndex];
+
+            // annotation.position.y represents the TOP edge in the stored Y-up coordinate system
+            // (as evidenced by pdfToScreenCoordinates formula: screenY = (pageHeight - pdfY) * scale).
+            // pdf-lib's drawImage/drawRectangle use bottom-left Y, so we must subtract height
+            // to position the annotation correctly in the PDF.
+            const x = annotation.position.x;
+            const w = annotation.size.width;
+            const h = annotation.size.height;
+            const y = annotation.position.y - h;
+
+            if (annotation.type === "signature" && annotation.value) {
+              try {
+                // annotation.value is a data URL: "data:image/png;base64,..."
+                const base64 = annotation.value.split(",")[1];
+                const pngBytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+                const pngImage = await pdfDoc.embedPng(pngBytes);
+                page.drawImage(pngImage, { x, y, width: w, height: h });
+              } catch (e) {
+                console.warn("[Pdf] exportToPdf: failed to embed signature", e);
+              }
+            } else if (annotation.type === "text" && annotation.value) {
+              const fontSize = Math.min(h * 0.6, 12);
+              // Light background
+              page.drawRectangle({
+                x, y, width: w, height: h,
+                color: rgb(1, 1, 0.88),
+                opacity: 0.6,
+              });
+              page.drawText(String(annotation.value), {
+                x: x + 3,
+                y: y + (h - fontSize) / 2,
+                size: fontSize,
+                font: helvetica,
+                color: rgb(0, 0, 0),
+                maxWidth: w - 6,
+              });
+            } else if (annotation.type === "checkbox") {
+              page.drawRectangle({
+                x, y, width: w, height: h,
+                color: rgb(1, 1, 1),
+                borderColor: rgb(0.3, 0.3, 0.3),
+                borderWidth: 1,
+              });
+              if (annotation.value === true || annotation.value === "true") {
+                const checkSize = Math.min(w, h) * 0.7;
+                page.drawText("✓", {
+                  x: x + (w - checkSize) / 2,
+                  y: y + (h - checkSize) / 2,
+                  size: checkSize,
+                  font: helvetica,
+                  color: rgb(0, 0.5, 0),
+                });
+              }
+            }
+          }
+
+          return pdfDoc.save();
         },
       });
     }, [registerComponentApi]); // Only re-run if registerComponentApi function itself changes
