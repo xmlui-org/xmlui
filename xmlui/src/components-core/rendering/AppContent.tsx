@@ -726,6 +726,10 @@ export function AppContent({
       };
       if (event instanceof MouseEvent) {
         detail.button = event.button;
+        if (event.ctrlKey) detail.ctrlKey = true;
+        if (event.metaKey) detail.metaKey = true;
+        if (event.shiftKey) detail.shiftKey = true;
+        if (event.altKey) detail.altKey = true;
       }
       if (event instanceof KeyboardEvent) {
         detail.key = event.key;
