@@ -28,7 +28,9 @@ export const FileUploadDropZoneMd = createMetadata({
       description:
         "This property indicates if the drop zone accepts files pasted from the " +
         "clipboard (\`true\`) or " +
-        "only dragged files (\`false\`).",
+        "only dragged files (\`false\`). By default, paste-triggered uploads are disabled " +
+        "to prevent unexpected upload dialogs when users paste text into inputs within the drop zone. " +
+        "When enabled, paste events originating from text inputs and editable elements are still ignored.",
       type: "boolean",
       defaultValue: defaultProps.allowPaste,
     },

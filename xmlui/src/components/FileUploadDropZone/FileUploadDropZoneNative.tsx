@@ -40,7 +40,7 @@ export const defaultProps: Pick<
 > = {
   onUpload: asyncNoop,
   uid: "fileUploadDialog",
-  allowPaste: true,
+  allowPaste: false,
   text: "Drop files here",
   icon: "upload",
   disabled: false,
@@ -129,6 +129,16 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
   const handleOnPaste = useCallback(
     (event: React.ClipboardEvent) => {
       if (!allowPaste) {
+        return;
+      }
+      // Ignore paste events originating from text inputs to avoid interfering
+      // with normal text paste operations (e.g., search boxes, text fields)
+      const target = event.target as HTMLElement;
+      if (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target.isContentEditable
+      ) {
         return;
       }
       if (!inputRef.current) {

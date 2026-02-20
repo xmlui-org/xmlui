@@ -43,9 +43,9 @@ Accepted file MIME types, separated by commas. For example: 'image/*,application
 
 ### `allowPaste` [#allowpaste]
 
-> [!DEF]  default: **true**
+> [!DEF]  default: **false**
 
-This property indicates if the drop zone accepts files pasted from the clipboard (`true`) or only dragged files (`false`).
+This property indicates if the drop zone accepts files pasted from the clipboard (`true`) or only dragged files (`false`). By default, paste-triggered uploads are disabled to prevent unexpected upload dialogs when users paste text into inputs within the drop zone. When enabled, paste events originating from text inputs and editable elements are still ignored.
 
 This property indicates if the drop zone accepts files pasted from the clipboard (`true`) or only dragged files (`false`).
 
