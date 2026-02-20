@@ -78,6 +78,13 @@ $backgroundColor-signature-Pdf: createThemeVar("backgroundColor-signature-Pdf");
 
 .page{
   box-shadow: $boxShadow-page-Pdf;
+  
+  // Ensure canvas and images are visible
+  canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer

@@ -1,4 +1,4 @@
-import { forwardRef, useState, CSSProperties, useEffect, useRef } from "react";
+import { forwardRef, useState, CSSProperties, useEffect, useRef, useMemo } from "react";
 import styles from "./Pdf.module.scss";
 import { Document, Page, pdfjs } from "react-pdf";
 import workerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
@@ -648,6 +648,12 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
     // Use data if provided, otherwise use src
     const fileSource = data || src;
 
+    // Memoize options to prevent unnecessary reloads  
+    const documentOptions = useMemo(() => ({
+      verbosity: 1, // Enable warnings and errors
+      wasmUrl: "/wasm/", // Location of WASM decoders for image processing
+    }), []);
+
     // Handle signature capture from modal
     function handleSignatureCapture(fieldId: string, signature: SignatureData) {
       // Fire events
@@ -736,6 +742,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
           file={fileSource as any}
           onLoadSuccess={handleLoadSuccess}
           className={styles.document}
+          options={documentOptions}
         >
           {Array.from(new Array(numPages), (_, index) => {
             const pageNumber = index + 1;
@@ -751,6 +758,10 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
                   loading=""
                   className={styles.page}
                   scale={internalScale}
+                  renderMode="canvas"
+                  renderTextLayer={true}
+                  renderAnnotationLayer={true}
+                  canvasBackground="white"
                   onRenderSuccess={(page) => {
                     // Capture natural page dimensions at scale=1 from the first page
                     if (pageNumber === 1) {

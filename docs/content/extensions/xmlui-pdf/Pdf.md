@@ -50,6 +50,12 @@ Display mode: "view" for read-only or "edit" for annotation editing. Default: "v
 
 Zoom level for the PDF pages. Default: 1.
 
+### `scrollStyle`
+
+> [!DEF]  default: **"normal"**
+
+This property controls the scrollbar display style of the PDF viewport. `normal` (default) shows scrollbars whenever content overflows. `overlay` always shows both scrollbars. `whenMouseOver` hides scrollbars until the pointer enters the viewer. `whenScrolling` hides scrollbars and reveals them briefly while the user is actively scrolling.
+
 ### `signatureData`
 
 Pre-loaded signature data to apply to signature fields.
@@ -147,11 +153,13 @@ Reset zoom to 100% (scale = 1.0).
 
 ### `addAnnotation`
 
-Add a new annotation. Returns the newly assigned annotation ID.
+Add a new annotation to a specific page. The `page` field in `annotationData` (1-based) determines which page the annotation appears on. When `scrollIntoView` is `true` the viewer automatically scrolls that page into view. Returns the newly assigned annotation ID.
 
-**Signature**: `addAnnotation(annotationData: object): string`
+**Signature**: `addAnnotation(annotationData: object, scrollIntoView?: boolean, scrollBehavior?: string): string`
 
-- `annotationData`: An object describing the annotation to add (type, page, position, size, properties).
+- `annotationData`: An object describing the annotation to add. Include `page` (1-based) to place it on a specific page.
+- `scrollIntoView`: When true, scrolls the annotation's page into view after adding. Defaults to false.
+- `scrollBehavior`: Controls the scroll animation: `"smooth"` (default) animates the scroll, `"instant"` jumps immediately.
 
 ### `applySignature`
 
@@ -208,6 +216,113 @@ Get all current annotations.
 
 **Signature**: `getAnnotations(): Annotation[]`
 
+### `getAnnotationsByType`
+
+Retrieve annotations filtered by type from across the entire document. More efficient than getAnnotations() when you only need specific annotation types.
+
+**Signature**: `getAnnotationsByType(types: Set<number>, pageIndexesToSkip?: Set<number>): Promise<object[] | null>`
+
+- `types`: A Set of PDF annotation type IDs to retrieve (e.g., annotation type constants from PDF.js)
+- `pageIndexesToSkip`: Optional Set of 0-indexed page numbers to exclude from the search. Omit to search all pages.
+
+### `getAttachments`
+
+Retrieve embedded files (attachments) from the PDF. Returns a mapping of attachment names to attachment objects containing file data.
+
+**Signature**: `getAttachments(): Promise<Record<string, object> | null>`
+
+### `getData`
+
+Retrieve the raw PDF file bytes. Useful for downloading the PDF file, exporting to a backend, or further processing.
+
+**Signature**: `getData(): Promise<Uint8Array | null>`
+
+### `getDestination`
+
+Retrieve a specific named destination by ID. Useful for internal navigation within the PDF.
+
+**Signature**: `getDestination(id: string): Promise<any[] | null>`
+
+- `id`: The destination name/ID to retrieve.
+
+### `getDestinations`
+
+Retrieve all named destinations in the PDF. Destinations are used for internal links and bookmarks. Returns a mapping from destination name to destination data.
+
+**Signature**: `getDestinations(): Promise<Record<string, any[]> | null>`
+
+### `getDownloadInfo`
+
+Retrieve download progress information for the PDF. Provides granular tracking of how much of the PDF file has been downloaded, useful for large remote PDFs.
+
+**Signature**: `getDownloadInfo(): Promise<{ length: number } | null>`
+
+### `getFieldObjects`
+
+Retrieve AcroForm field objects from the PDF. Returns a map from field name to an array of field descriptors containing name, type, value, and position information.
+
+**Signature**: `getFieldObjects(): Promise<Record<string, object[]> | null>`
+
+### `getJSActions`
+
+Retrieve JavaScript actions from the PDF. Includes document-level and field-level scripts used in forms.
+
+**Signature**: `getJSActions(): Promise<object | null>`
+
+### `getMarkInfo`
+
+Retrieve accessibility mark info from the PDF. Indicates whether the PDF has been properly tagged for accessibility and contains structural information for screen readers.
+
+**Signature**: `getMarkInfo(): Promise<object | null>`
+
+### `getMetadata`
+
+Retrieve document metadata from the PDF. Returns an object with an info dictionary (Title, Author, Subject, Keywords, Creator, Producer, CreationDate, ModDate) and an optional xmp key-value map from XMP metadata.
+
+**Signature**: `getMetadata(): Promise<{ info: object, xmp: object | null } | null>`
+
+### `getOpenAction`
+
+Retrieve the PDF's open action destination. This is the page/location the PDF author intended to be displayed when the document is opened.
+
+**Signature**: `getOpenAction(): Promise<any[] | null>`
+
+### `getOptionalContentConfig`
+
+Retrieve optional content (layers) configuration from the PDF. Useful for CAD drawings, technical documents, and PDFs with multiple content layers that can be toggled.
+
+**Signature**: `getOptionalContentConfig(): Promise<object | null>`
+
+### `getOutline`
+
+Retrieve the document outline (table of contents / bookmarks). Each node has title, bold, italic, color, dest, url, and items (children).
+
+**Signature**: `getOutline(): Promise<object[] | null>`
+
+### `getPageLabels`
+
+Retrieve custom page labels defined in the PDF (e.g. "i", "ii", "1", "A-1"). Returns one label per page in document order.
+
+**Signature**: `getPageLabels(): Promise<string[] | null>`
+
+### `getPageLayout`
+
+Retrieve the page layout preference from the PDF. The layout indicates how pages should be displayed (single page, two-page spread, etc.).
+
+**Signature**: `getPageLayout(): Promise<string | null>`
+
+### `getPageMode`
+
+Retrieve the page mode preference from the PDF. The mode indicates what to display when the PDF is opened (outlines, thumbnails, etc.).
+
+**Signature**: `getPageMode(): Promise<string | null>`
+
+### `getPermissions`
+
+Retrieve the document permission flags. Permissions control whether the user may print, copy, modify, add/modify annotations, etc.
+
+**Signature**: `getPermissions(): Promise<number[] | null>`
+
 ### `getScale`
 
 Return the current scale value.
@@ -234,6 +349,20 @@ Retrieve stored signature data. Supports retrieving a specific signature by fiel
 
 - `fieldId`: Optional. The ID of a specific signature field. If omitted, returns all stored signatures.
 
+### `getTextContent`
+
+Extract plain text from the PDF. When a page number is supplied, returns the text for that page only. When called without arguments, returns concatenated text for all pages separated by newlines.
+
+**Signature**: `getTextContent(pageNumber?: number): Promise<string | null>`
+
+- `pageNumber`: Optional 1-indexed page number. Omit to extract text from all pages.
+
+### `getViewerPreferences`
+
+Retrieve viewer preferences from the PDF. Preferences control how the PDF should be displayed (e.g., layout mode, fullscreen behavior, zoom settings).
+
+**Signature**: `getViewerPreferences(): Promise<object | null>`
+
 ### `goToPage`
 
 Navigate to a specific page.
@@ -241,6 +370,12 @@ Navigate to a specific page.
 **Signature**: `goToPage(page: number): void`
 
 - `page`: The 1-indexed page number to navigate to.
+
+### `hasJSActions`
+
+Check whether the PDF contains JavaScript actions. Useful for detecting forms or documents with interactive behaviors.
+
+**Signature**: `hasJSActions(): Promise<boolean>`
 
 ### `isSigned`
 
@@ -250,6 +385,12 @@ Check if a signature field has been signed.
 
 - `fieldId`: The ID of the field to check.
 
+### `nextPage`
+
+Navigate to the next page. Does nothing if already on the last page.
+
+**Signature**: `nextPage(): void`
+
 ### `openSignatureModal`
 
 Open the signature capture modal for a signature field. The user can type their name and choose a font style, then apply the signature to the field.
@@ -257,6 +398,18 @@ Open the signature capture modal for a signature field. The user can type their 
 **Signature**: `openSignatureModal(fieldId: string): void`
 
 - `fieldId`: The ID of the signature field to open the capture modal for.
+
+### `previousPage`
+
+Navigate to the previous page. Does nothing if already on page 1.
+
+**Signature**: `previousPage(): void`
+
+### `saveDocument`
+
+Save the PDF document with any modifications (filled form fields, annotations, etc.). Returns the modified PDF as raw bytes that can be downloaded or sent to a backend.
+
+**Signature**: `saveDocument(): Promise<Uint8Array | null>`
 
 ### `saveSignature`
 
@@ -327,11 +480,14 @@ Zoom to an exact scale value (clamped between 0.1 and 5). Alias for setScale.
 | [backgroundColor](../styles-and-themes/common-units/#color)-deleteButton-hover-Pdf | #c82333 | #c82333 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-deleteButton-Pdf | #dc3545 | #dc3545 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-field-Pdf | *none* | *none* |
+| [backgroundColor](../styles-and-themes/common-units/#color)-handle-Scroller | $color-surface-200 | $color-surface-200 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-handle-Scroller--hover | $color-surface-400 | $color-surface-400 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-resizeHandle-hover-Pdf | #0056b3 | #0056b3 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-resizeHandle-Pdf | #007bff | #007bff |
 | [backgroundColor](../styles-and-themes/common-units/#color)-signature-Pdf | rgba(220, 220, 255, 0.8) | rgba(220, 220, 255, 0.8) |
 | [backgroundColor](../styles-and-themes/common-units/#color)-text-Pdf | rgba(255, 255, 220, 0.8) | rgba(255, 255, 220, 0.8) |
 | [backgroundColor](../styles-and-themes/common-units/#color)-toolbar-Pdf | *none* | *none* |
+| [backgroundColor](../styles-and-themes/common-units/#color)-track-Scroller | transparent | transparent |
 | [borderColor](../styles-and-themes/common-units/#color)-annotationBox-Pdf | transparent | transparent |
 | [borderColor](../styles-and-themes/common-units/#color)-field-Pdf | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-selected-Pdf | #007bff | #007bff |
@@ -345,3 +501,4 @@ Zoom to an exact scale value (clamped between 0.1 and 5). Alias for setScale.
 | [color](../styles-and-themes/common-units/#color)-selected-Pdf | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-value-Pdf | #666 | #666 |
 | [gap](../styles-and-themes/common-units/#size)-pages-Pdf | $space-4 | $space-4 |
+| [size](../styles-and-themes/common-units/#size)-Scroller | 10px | 10px |

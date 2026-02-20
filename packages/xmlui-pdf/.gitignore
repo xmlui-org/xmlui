@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Auto-generated PDF.js WASM files
+public/wasm
+
 storybook-static
 
 # Editor directories and files

@@ -1,6 +1,71 @@
-<App xmlns:Extensions="component-ns:XMLUIExtensions" xmlns:My="app-ns">
-  helloka
-  <Pdf/>
-  <My:Pdf/>
-  <Extensions:Pdf src="https://api.printnode.com/static/test/pdf/multipage.pdf"/>
+<App
+  scrollWholePage="false"
+  var.nameTypedIn="<none>"
+>
+  <HStack>
+    <Button
+      onClick="myPdf.addAnnotation({
+      id: 'signature-field',
+      type: 'signature',
+      page: 1,
+      position: { x: 50, y: 700 },
+      size: { width: 300, height: 150 },
+      value: '',
+      properties: {
+        label: 'Signature',
+        locked: true,
+        required: true
+      }
+    }, true, 'instant')"
+    >
+      Add signature
+    </Button>
+
+    <Button
+      label="Export"
+      onClick="
+        const bytes = myPdf.saveDocument();
+        const blob = Blob([bytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'document-modified.pdf';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      "
+    />
+
+    <Button onClick="myPdf.zoomIn()">
+      +
+    </Button>
+    <Button onClick="myPdf.zoomOut()">
+      -
+    </Button>
+    <Button onClick="myPdf.actualSize()">
+      100%
+    </Button>
+    <Button onClick="myPdf.fitWidth()">
+      Fit Width
+    </Button>
+    <Button onClick="myPdf.fitPage()">
+      Fit Page
+    </Button>
+  </HStack>
+  <HStack>
+  </HStack>
+
+  <Pdf
+    id="myPdf"
+    height="*"
+    src="/resources/The-Spectrum-User-Manual-v1.0.1.pdf"
+    horizontalAlignment="center"
+    scrollStyle="overlay"
+    mode="edit"
+    onAnnotationUpdate="(anno) => { 
+        if (anno.id === 'name-field') nameTypedIn = anno.value; 
+      }"
+    onExportRequest="data => console.log(data)"
+  />
 </App>
