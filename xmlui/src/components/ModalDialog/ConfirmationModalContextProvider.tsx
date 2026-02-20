@@ -70,6 +70,9 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
         w._xsPendingConfirmTrace = w._xsCurrentTrace || w._xsLastInteraction?.id;
         if (Array.isArray(w._xsLogs)) {
           const modalTitle = typeof title === "string" ? title : title.title;
+          const modalButtons = typeof title === "string"
+            ? [{ label: actionLabel || "Ok", value: true }]
+            : title.buttons.map(b => ({ label: b.label, value: b.value }));
           w._xsLogs.push({
             ts: Date.now(),
             perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
@@ -77,6 +80,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
             kind: "modal:show",
             modalType: "confirmation",
             title: modalTitle,
+            buttons: modalButtons,
           });
         }
       }
@@ -102,7 +106,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
     [xsVerbose],
   );
 
-  const handleOk = useCallback((value: any) => {
+  const handleOk = useCallback((value: any, buttonLabel?: string) => {
     // Trace confirmation (only when xsVerbose is enabled)
     if (xsVerbose && typeof window !== "undefined") {
       const w = window as any;
@@ -118,6 +122,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
           kind: "modal:confirm",
           modalType: "confirmation",
           value,
+          buttonLabel,
         });
       }
     }
@@ -188,7 +193,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
                       size="sm"
                       type="submit"
                       onClick={() => {
-                        handleOk(value);
+                        handleOk(value, label);
                       }}
                     >
                       {label}
