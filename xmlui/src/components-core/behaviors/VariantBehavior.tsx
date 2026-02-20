@@ -1,10 +1,11 @@
-import { ReactElement, cloneElement } from "react";
+import { type ReactElement, cloneElement } from "react";
 import { buttonVariantValues } from "../../components/abstractions";
 import { badgeVariantValues } from "../../components/Badge/BadgeNative";
+import { ItemWithLabel } from "../../components/FormItem/ItemWithLabel";
 import { THEME_VAR_PREFIX } from "../theming/layout-resolver";
 import { parseLayoutProperty, toCssPropertyName } from "../theming/parse-layout-props";
 import { useStyles } from "../theming/StyleContext";
-import { Behavior } from "./Behavior";
+import type { Behavior } from "./Behavior";
 
 /**
  * Behavior for applying custom variant styling to components with non-predefined variant values.
@@ -172,7 +173,26 @@ function VariantWrapper({
   // Generate the CSS class using useStyles hook
   const customVariantClassName = useStyles(variantSpec);
 
-  // Clone the node and add the custom variant className
+  // Check if the child is ItemWithLabel (a wrapper component from labelBehavior)
+  // If so, apply the className to the actual component inside ItemWithLabel instead
+  const isItemWithLabel = children.type === ItemWithLabel;
+  
+  if (isItemWithLabel && children.props?.children) {
+    // Apply className to the actual component inside ItemWithLabel
+    const innerChild = children.props.children as ReactElement;
+    const innerClassName = innerChild.props?.className || "";
+    const newInnerClassName = `${innerClassName} ${customVariantClassName || ""}`.trim();
+    
+    const wrappedChildren = cloneElement(innerChild, {
+      className: newInnerClassName,
+    });
+    
+    return cloneElement(children, {
+      children: wrappedChildren,
+    });
+  }
+
+  // For non-wrapper components, apply className directly
   const existingClassName = children.props.className || "";
   const newClassName = `${existingClassName} ${customVariantClassName || ""}`.trim();
 

@@ -1,8 +1,8 @@
-import { ReactElement } from "react";
+import type { ReactElement } from "react";
 import { ValidationWrapper } from "../../components/FormItem/ValidationWrapper";
-import { Behavior } from "./Behavior";
-import { RequireLabelMode } from "../../components/abstractions";
-import { FormItemValidations } from "../../components/Form/FormContext";
+import type { Behavior } from "./Behavior";
+import type { RequireLabelMode } from "../../components/abstractions";
+import type { FormItemValidations } from "../../components/Form/FormContext";
 
 export const validationBehavior: Behavior = {
   metadata: {

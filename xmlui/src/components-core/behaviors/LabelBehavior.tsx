@@ -94,7 +94,7 @@ export const labelBehavior: Behavior = {
     return true;
   },
   attach: (context, node, metadata) => {
-    const { extractValue, node: componentNode, className } = context;
+    const { extractValue, node: componentNode } = context;
 
     const label = extractValue.asOptionalString(componentNode.props.label);
     const labelPosition = extractValue(componentNode.props.labelPosition);
@@ -115,7 +115,6 @@ export const labelBehavior: Behavior = {
         required={required}
         enabled={enabled}
         style={style}
-        className={className}
         cloneStyle={true}
         shrinkToLabel={shrinkToLabel}
         labelStyle={{ pointerEvents: readOnly ? "none" : undefined }}

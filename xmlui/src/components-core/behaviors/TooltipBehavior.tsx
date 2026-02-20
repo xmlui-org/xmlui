@@ -1,5 +1,5 @@
 import { parseTooltipOptions, Tooltip } from "../../components/Tooltip/TooltipNative";
-import { Behavior } from "./Behavior";
+import type { Behavior } from "./Behavior";
 
 /**
  * Behavior for applying tooltips to components.
