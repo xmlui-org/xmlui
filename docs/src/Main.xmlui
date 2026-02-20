@@ -843,9 +843,9 @@
             <DocumentPage when="{content}" content="{content}" />
             <Redirect when="{!content}" to="/404" />
         </Page>
-        <Page url="/extensions/:extensionId">
+        <Page url="/extensions/*">
             <script>
-              var contentKey = "extensions/" + $routeParams.extensionId;
+              var contentKey = "extensions/" + $routeParams['*'];
               var content = appGlobals.content[contentKey];
             </script>
             <DocumentPage when="{content}" content="{content}" />
