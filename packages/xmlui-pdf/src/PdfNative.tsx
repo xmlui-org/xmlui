@@ -158,6 +158,10 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
     const [internalScale, setInternalScale] = useState<number>(scale);
     // Track natural page dimensions (PDF points) captured from the first page render
     const pageDimensionsRef = useRef<{ width: number; height: number }>({ width: 595, height: 842 });
+    // PDF document proxy — used for getFieldObjects() to harvest form values
+    const pdfDocRef = useRef<any>(null);
+    // Cached AcroForm field definitions — populated on document load
+    const fieldDefsRef = useRef<Record<string, any[]> | null>(null);
     // Ref to the scrollable viewport div — used for fit-width / fit-page calculations
     const viewportRef = useRef<HTMLDivElement>(null);
     // Measurement sentinel: an absolutely-positioned div that always reflects the true
@@ -274,10 +278,89 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
       };
     }, [selectedAnnotationId, mode]);
 
-    function handleLoadSuccess({ numPages }: { numPages: number }) {
+    // Read all AcroForm field values from the DOM
+    function readFormValues(): { values: Record<string, any>; fields: Array<{ field: string; value: string; type: string }> } | null {
+      const fieldDefs = fieldDefsRef.current;
+      if (!fieldDefs) return null;
+      const container = viewportRef.current;
+      if (!container) return null;
+      const values: Record<string, any> = {};
+      const fields: Array<{ field: string; value: string; type: string }> = [];
+      for (const [fieldName, fieldArr] of Object.entries(fieldDefs) as [string, any[]][]) {
+        const field = fieldArr[0];
+        if (!field) continue;
+        const el = container.querySelector(`[data-element-id="${field.id}"]`)
+          || container.querySelector(`[name="${fieldName}"]`) as HTMLElement;
+        if (!el) continue;
+        const tag = (el as HTMLElement).tagName;
+        let val: any;
+        let type = field.type || "text";
+        if (tag === "INPUT" && (el as HTMLInputElement).type === "checkbox") {
+          val = (el as HTMLInputElement).checked;
+          type = "checkbox";
+        } else if (tag === "INPUT" || tag === "TEXTAREA") {
+          val = (el as HTMLInputElement).value;
+        } else if (tag === "SELECT") {
+          val = (el as HTMLSelectElement).value;
+          type = "select";
+        }
+        values[fieldName] = val;
+        fields.push({ field: fieldName, value: String(val ?? ""), type });
+      }
+      return { values, fields };
+    }
+
+    // Auto-capture form values on input/change events, and detect initial form field creation
+    useEffect(() => {
+      const container = viewportRef.current;
+      if (!container) return;
+      const captureValues = () => {
+        const result = readFormValues();
+        if (result && result.fields.length > 0) {
+          updateState?.({ formValues: result.values, formFields: result.fields });
+        }
+      };
+      container.addEventListener("input", captureValues);
+      container.addEventListener("change", captureValues);
+      // Watch for form inputs being added to the DOM (pdf.js creates them asynchronously)
+      const observer = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+          for (const node of m.addedNodes) {
+            if (node instanceof HTMLElement && (node.tagName === "INPUT" || node.tagName === "SELECT" || node.querySelector?.("input, select"))) {
+              captureValues();
+              return;
+            }
+          }
+        }
+      });
+      observer.observe(container, { childList: true, subtree: true });
+      return () => {
+        container.removeEventListener("input", captureValues);
+        container.removeEventListener("change", captureValues);
+        observer.disconnect();
+      };
+    }, [numPages]); // re-attach after pages render
+
+    function handleLoadSuccess(pdf: any) {
+      const { numPages } = pdf;
       setNumPages(numPages);
       onDocumentLoad?.(numPages);
-      
+
+      // Store the PDF document proxy for field access
+      pdfDocRef.current = pdf;
+
+      // Cache AcroForm field definitions for synchronous access
+      // Then try to capture initial values (annotation layer may already be rendered)
+      if (pdf.getFieldObjects) {
+        pdf.getFieldObjects().then((fields: any) => {
+          fieldDefsRef.current = fields;
+          const result = readFormValues();
+          if (result) {
+            updateState?.({ formValues: result.values, formFields: result.fields });
+          }
+        });
+      }
+
       // Update XMLUI state if connected
       if (updateState) {
         updateState?.({
@@ -471,6 +554,13 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
           };
           latestValues.current.onExportRequest?.(exportData);
         },
+        getFormValues: () => {
+          const result = readFormValues();
+          if (result) {
+            latestValues.current.updateState?.({ formValues: result.values, formFields: result.fields });
+          }
+          return result?.values ?? null;
+        },
       });
     }, [registerComponentApi]); // Only re-run if registerComponentApi function itself changes
 
@@ -565,6 +655,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
                   loading=""
                   className={styles.page}
                   scale={internalScale}
+                  renderForms={true}
                   onRenderSuccess={(page) => {
                     // Capture natural page dimensions at scale=1 from the first page
                     if (pageNumber === 1) {
@@ -572,6 +663,12 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
                         width: page.width / internalScale,
                         height: page.height / internalScale,
                       };
+                    }
+                  }}
+                  onRenderAnnotationLayerSuccess={() => {
+                    const result = readFormValues();
+                    if (result) {
+                      updateState?.({ formValues: result.values, formFields: result.fields });
                     }
                   }}
                 />

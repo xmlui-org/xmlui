@@ -1,3 +1,46 @@
-<Component name="Pdf">
-  <Stack>hello it's my pdf</Stack>
+<Component name="PdfAsForm">
+  <HStack height="100%">
+    <VStack width="60%">
+      <Pdf id="myPdf" src="/OoPdfFormExample.pdf" mode="edit" />
+    </VStack>
+    <VStack width="40%" padding="$space-2" gap="$space-1">
+      <Table
+        when="{myPdf.formFields}"
+        data="{myPdf.formFields}"
+        size="sm"
+      >
+        <Column header="Field" bindTo="field" />
+        <Column header="Value" bindTo="value" />
+      </Table>
+    </VStack>
+  </HStack>
+  <Markdown><![CDATA[
+## XMLUI Source
+
+```xml
+<Component name="PdfAsForm">
+  <HStack height="100%">
+    <VStack width="60%">
+      <Pdf id="myPdf" src="/OoPdfFormExample.pdf" mode="edit" />
+    </VStack>
+    <VStack width="40%">
+      <Table data="{myPdf.formFields}" size="sm">
+        <Column header="Field" bindTo="field" />
+        <Column header="Value" bindTo="value" />
+      </Table>
+    </VStack>
+  </HStack>
+</Component>
+```
+
+### How it works
+
+This PDF was created with OpenOffice but uses **AcroForm** fields — the standard PDF spec format for interactive form widgets. Most tools that create fillable PDFs (Acrobat, LibreOffice, PDF libraries) produce AcroForm fields. The `Pdf` component uses pdf.js to render them as native HTML inputs. As you type or select values, the component auto-captures field data and exposes it reactively as `formFields` (an array of `{ field, value, type }`) and `formValues` (a keyed object). The table updates live with no scripting required.
+
+### What's next
+
+- **Non-AcroForm PDFs**: When a PDF has no embedded form fields, the component's existing annotation/overlay system can be used to manually place input regions by page and coordinates.
+- **Richer XMLUI controls**: The field metadata includes type info (text, checkbox, select) and constraints (char limits, dropdown options). A future version could map these to native XMLUI form components for two-way binding.
+- **Backend integration**: The captured `formValues` object is ready to send to a backend service for PDF flattening (stamping the data back into the document to produce a filled PDF) and/or cryptographic signing.
+  ]]></Markdown>
 </Component>

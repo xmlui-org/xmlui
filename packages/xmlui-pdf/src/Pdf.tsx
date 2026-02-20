@@ -283,6 +283,8 @@ export const PdfMd = createMetadata({
     $mode: d(`Current display mode ("view" or "edit").`),
     $scale: d(`Current zoom scale (e.g. 1.0 = 100%).`),
     $hasSignature: d(`Whether a signature has been captured (Phase 2).`),
+    $formValues: d(`Object containing the current values of all AcroForm fields, keyed by field name.`),
+    $formFields: d(`Array of { field, value, type } objects for all AcroForm fields, ready for use as Table data.`),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

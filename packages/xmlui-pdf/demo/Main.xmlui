@@ -1,6 +1,3 @@
-<App xmlns:Extensions="component-ns:XMLUIExtensions" xmlns:My="app-ns">
-  helloka
-  <Pdf/>
-  <My:Pdf/>
-  <Extensions:Pdf src="https://api.printnode.com/static/test/pdf/multipage.pdf"/>
+<App>
+  <PdfAsForm />
 </App>
