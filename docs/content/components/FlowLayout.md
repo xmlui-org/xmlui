@@ -114,6 +114,12 @@ This markup demonstrates different `gap` values:
 All items within a `FlowLayout` instance fit in a single row, so `gap` affects only the space between items. The space between rows comes from the outermost `Stack`.
 ```
 
+### `itemWidth` [#itemwidth]
+
+> [!DEF]  default: **"100%"**
+
+Specifies the default width for child items when they don't have an explicit width property. Accepts any valid CSS width value (e.g., '100%', '200px', '20rem', '*').
+
 ### `rowGap` [#rowgap]
 
 > [!DEF]  default: **"$gap-normal"**

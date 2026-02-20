@@ -57,6 +57,11 @@
           "icon": "component"
         },
         {
+          "to": "/components/Blog",
+          "label": "Blog",
+          "icon": "component"
+        },
+        {
           "to": "/components/Bookmark",
           "label": "Bookmark",
           "icon": "component"

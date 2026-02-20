@@ -796,39 +796,45 @@ loadingTask.onPassword = (callback, reason) => {
 
 ### High Priority (Commonly Needed)
 
-1. **Text extraction** (`getTextContent`) - Search, copy, accessibility
-2. **Metadata** (`getMetadata`) - Display doc info, title, author
-3. **Outline/Bookmarks** (`getOutline`) - Navigation sidebar
-4. **Page labels** (`getPageLabels`) - Custom page numbering
-5. **Thumbnails** - Quick navigation
-6. **Form field detection** (`getFieldObjects`) - Identify fillable fields
+1. **Text extraction** (`getTextContent`) - Search, copy, accessibility ✅ **IMPLEMENTED**
+2. **Metadata** (`getMetadata`) - Display doc info, title, author ✅ **IMPLEMENTED**
+3. **Outline/Bookmarks** (`getOutline`) - Navigation sidebar ✅ **IMPLEMENTED**
+4. **Page labels** (`getPageLabels`) - Custom page numbering ✅ **IMPLEMENTED**
+5. **Thumbnails** - Quick navigation ⏭️ **Deferred** (requires UI component, not just API)
+6. **Form field detection** (`getFieldObjects`) - Identify fillable fields ✅ **IMPLEMENTED**
 7. **Annotation reading** (`getAnnotations`) - Display existing annotations ✅ **IMPLEMENTED** (Phase 1)
-8. **Permissions** (`getPermissions`) - Restrict features based on PDF permissions
+8. **Permissions** (`getPermissions`) - Restrict features based on PDF permissions ✅ **IMPLEMENTED**
 
 ### Medium Priority
 
-9. **Attachments** - Extract embedded files
-10. **Optional content/layers** - CAD/technical drawings
-11. **Destinations** - Named navigation points
-12. **Viewer preferences** - Honor PDF preferences
-13. **XFA forms** - Enterprise forms
-14. **Structure tree** - Accessibility
-15. **Save/export** (`saveDocument`) - Save filled forms
+9. **Attachments** (`getAttachments`) - Extract embedded files ✅ **IMPLEMENTED**
+10. **Optional content/layers** (`getOptionalContentConfig`) - CAD/technical drawings ✅ **IMPLEMENTED**
+11. **Destinations** (`getDestinations`, `getDestination`) - Named navigation points ✅ **IMPLEMENTED**
+12. **Viewer preferences** (`getViewerPreferences`) - Honor PDF preferences ✅ **IMPLEMENTED**
+13. **Form JavaScript** (`hasJSActions`, `getJSActions`) - Enterprise forms ✅ **IMPLEMENTED**
+14. **Page layout/mode** (`getPageLayout`, `getPageMode`) - Respect PDF settings ✅ **IMPLEMENTED**
+15. **Open action** (`getOpenAction`) - Auto-navigate to starting location ✅ **IMPLEMENTED**
+16. **Raw PDF data** (`getData`) - Export/download PDFs ✅ **IMPLEMENTED**
+17. **Annotation filtering** (`getAnnotationsByType`) - Efficient filtering ✅ **IMPLEMENTED**
+18. **Save document** (`saveDocument`) - Persist form changes ✅ **IMPLEMENTED**
+19. **Accessibility mark info** (`getMarkInfo`) - Tagged content support ✅ **IMPLEMENTED**
 
 ### Low Priority / Advanced
 
-16. **Operator list** - Custom rendering
-17. **JavaScript actions** - Form calculations
-18. **Text streaming** - Large documents
-19. **Custom text rendering** - Highlighting, redaction
-20. **Annotation filtering** - Selectively display annotations
+20. **Download progress** (`getDownloadInfo`) - Granular progress tracking ✅ **IMPLEMENTED**
+21. **Resource cleanup** (`cleanup`, `destroy`) - Memory management ⏳ **Not yet implemented**
+22. **Text streaming** (`streamTextContent`) - Handle huge pages ⏳ **Not yet implemented**
+23. **Structure tree** (`getStructTree`) - Accessibility parsing ⏳ **Not yet implemented**
+24. **XFA forms** - XFA-specific APIs ⏳ **Not yet implemented** (deprecated in PDF 2.0)
 
 ---
 
-## Implemented XMLUI PDF Component APIs (Phase 1)
+## Implemented XMLUI PDF Component APIs (Phase 1 & Phase 2)
 
 ### Navigation & View Control
 - ✅ `goToPage(page: number)` - Navigate to a specific page
+- ✅ `previousPage()` - Navigate to previous page
+- ✅ `nextPage()` - Navigate to next page
 - ✅ `setScale(scale: number)` - Set zoom level (0.1-5 range)
 - ✅ `zoomTo(scale: number)` - Zoom to exact scale (alias for setScale)
 - ✅ `zoomIn(factor?: number)` - Zoom in by multiplicative factor (default 1.25)
@@ -850,10 +856,106 @@ loadingTask.onPassword = (callback, reason) => {
 - ✅ `getSelectedAnnotationId()` - Return selected annotation ID (or null)
 - ✅ `getSelectedAnnotation()` - Return selected annotation object (or null)
 
-### Phase 2 (Not Yet Implemented)
-- ⏳ `openSignatureModal(fieldId: string)` - Open signature capture modal
-- ⏳ `applySignature(fieldId: string, signature: object)` - Apply signature to field
-- ⏳ `getSignature()` - Get current signature data
+### Signatures (Phase 2)
+- ✅ `openSignatureModal(fieldId: string)` - Open signature capture modal
+- ✅ `applySignature(fieldId: string, signature: object)` - Apply signature to field
+- ✅ `getSignature(fieldId?: string)` - Get current signature data
+- ✅ `saveSignature(fieldId: string, signature: object)` - Save signature to storage
+- ✅ `clearSignature(fieldId: string)` - Clear signature from field
+- ✅ `isSigned(fieldId: string)` - Check if field has signature
+- ✅ `exportToBackend()` - Export all annotations and signatures
+
+### Document-Level APIs (PDF Metadata & Structure)
+- ✅ `getMetadata()` - Retrieve document metadata (title, author, subject, keywords, etc.)
+- ✅ `getOutline()` - Retrieve document outline/table of contents (bookmarks)
+- ✅ `getPageLabels()` - Retrieve custom page numbering labels
+- ✅ `getPermissions()` - Retrieve document permission flags
+- ✅ `getFieldObjects()` - Retrieve form field objects (AcroForm fields)
+- ✅ `getTextContent(pageNumber?: number)` - Extract plain text from PDF (single page or all pages)
+- ✅ `getAttachments()` - Retrieve embedded files from PDF
+- ✅ `getViewerPreferences()` - Retrieve PDF viewer preferences
+- ✅ `getDestinations()` - Retrieve all named destinations
+- ✅ `getDestination(id: string)` - Retrieve specific named destination
+- ✅ `hasJSActions()` - Check if document has JavaScript actions
+- ✅ `getJSActions()` - Retrieve JavaScript actions from document
+- ✅ `getOptionalContentConfig()` - Retrieve optional content/layers configuration
+- ✅ `getPageLayout()` - Retrieve page layout preference (SinglePage, TwoPageLeft, etc.)
+- ✅ `getPageMode()` - Retrieve page mode (UseNone, UseOutlines, UseThumbs, etc.)
+- ✅ `getOpenAction()` - Retrieve the PDF's open action destination for auto-navigation
+- ✅ `getData()` - Retrieve raw PDF file bytes for download/export
+- ✅ `getAnnotationsByType()` - Retrieve annotations filtered by type across all pages
+- ✅ `saveDocument()` - Save PDF with modifications (filled forms, annotations)
+- ✅ `getMarkInfo()` - Retrieve accessibility mark info for tagged content support
+- ✅ `getDownloadInfo()` - Retrieve download progress information
+
+---
+
+## Additional Relevant APIs from react-pdf/pdfjs-dist (Not Yet Implemented)
+
+### Recently Implemented (High Priority)
+
+These high-priority APIs were just completed:
+
+1. **Page Layout & Mode** - Respect PDF viewer settings:
+   - `getPageLayout()` - Retrieve page layout preference (SinglePage, TwoPageLeft, TwoPageRight, etc.) ✅ **IMPLEMENTED**
+   - `getPageMode()` - Retrieve page mode (UseNone, UseOutlines, UseThumbs, etc.) ✅ **IMPLEMENTED**
+   - **Benefit:** Honors PDF author's intended display mode; useful for auto-switching to two-page view for books
+
+2. **Open Action Destination** - Navigate to PDF's intended starting location:
+   - `getOpenAction()` - Retrieve the PDF's open action (navigation destination) ✅ **IMPLEMENTED**
+   - **Benefit:** Auto-navigate to the page/location the PDF author intended when document loads
+
+3. **Raw PDF Data** - Export and manipulate PDFs:
+   - `getData()` - Retrieve the raw PDF file bytes ✅ **IMPLEMENTED**
+   - **Benefit:** Enable PDF download, further processing, sending to backend, or storage
+
+4. **Annotation Filtering** - Access annotations more efficiently:
+   - `getAnnotationsByType(types: Set<number>, pageIndexesToSkip?: Set<number>)` - Retrieve annotations filtered by type across all pages ✅ **IMPLEMENTED**
+   - **Benefit:** Faster than getAnnotations() + filtering in JavaScript for large PDFs with many annotations
+
+### Medium Priority (Recently Implemented)
+
+These APIs for specific workflows and enhancements were just completed:
+
+5. **Save Modified Document** - Persist form changes:
+   - `saveDocument()` - Save the PDF with any modifications (filled forms, annotations) ✅ **IMPLEMENTED**
+   - **Benefit:** Essential for form-filling workflows; allows saving user entries to PDF
+
+6. **Accessibility Support** - Improve accessibility features:
+   - `getMarkInfo()` - Retrieve accessibility mark info, tagged content indicators ✅ **IMPLEMENTED**
+   - **Benefit:** Support accessible PDF detection; flag high-quality accessible documents
+
+7. **Download Progress** - Track file download during load:
+   - `getDownloadInfo()` - Retrieve download progress { length: number } ✅ **IMPLEMENTED**
+   - **Benefit:** More granular progress tracking than onLoadProgress; useful for large remote PDFs
+
+### Low Priority (Niche Use Cases)
+
+These APIs are useful in specific scenarios but not needed for most document viewers:
+
+8. **Resource Cleanup** - Explicit resource management:
+   - `cleanup(keepLoadedFonts?: boolean)` - Clean up document resources
+   - `destroy()` - Terminate PDF worker and free memory
+   - **Status:** ⏳ Not implemented
+   - **Benefit:** Fine-grained control for memory-constrained environments; auto-cleanup usually sufficient
+
+9. **Text Streaming** - Handle extremely large pages:
+   - `page.streamTextContent()` - Stream text content as ReadableStream instead of waiting for full content
+   - **Status:** ⏳ Not implemented
+   - **Benefit:** Extract text from huge pages without memory overhead
+
+10. **Accessibility Structure** - Parse document structure:
+    - `page.getStructTree()` - Retrieve accessibility structure tree
+    - **Status:** ⏳ Not implemented
+    - **Benefit:** Support screen readers and accessibility features in detail
+
+11. **XFA Forms** - Handle enterprise forms:
+    - `isPureXfa` - Property indicating XFA-only document
+    - `allXfaHtml` - Property with XFA HTML tree
+    - `page.getXfa()` - Get page-level XFA data
+    - `getCalculationOrderIds()` - Get field calculation order
+    - **Status:** ⏳ Not implemented
+    - **Benefit:** XFA is deprecated in PDF 2.0; use AcroForm-based forms instead (see getFieldObjects)
 
 ---
 

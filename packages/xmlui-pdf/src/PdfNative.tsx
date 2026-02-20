@@ -91,6 +91,7 @@ export interface PdfNativeProps {
   // UI visibility
   horizontalAlignment?: "start" | "center" | "end";
   verticalAlignment?: "start" | "center" | "end";
+  scrollStyle?: "normal" | "overlay" | "whenMouseOver" | "whenScrolling";
   
   // Events
   onDocumentLoad?: (numPages: number) => void;
@@ -119,6 +120,7 @@ export const defaultProps = {
   annotations: [] as Annotation[],
   horizontalAlignment: "start" as "start" | "center" | "end",
   verticalAlignment: "start" as "start" | "center" | "end",
+  scrollStyle: "normal" as "normal" | "overlay" | "whenMouseOver" | "whenScrolling",
 };
 
 export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
@@ -133,6 +135,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
       signatureData,
       horizontalAlignment = defaultProps.horizontalAlignment,
       verticalAlignment = defaultProps.verticalAlignment,
+      scrollStyle = defaultProps.scrollStyle,
       onDocumentLoad,
       onPageChange,
       onAnnotationCreate,
@@ -160,6 +163,20 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
     const pageDimensionsRef = useRef<{ width: number; height: number }>({ width: 595, height: 842 });
     // Ref to the scrollable viewport div — used for fit-width / fit-page calculations
     const viewportRef = useRef<HTMLDivElement>(null);
+    // For whenScrolling mode: update data-scrolling directly on the DOM element
+    // (bypasses React render cycle so the scrollbar appears on the very first scroll event)
+    const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    function handleViewportScroll() {
+      if (scrollStyle !== "whenScrolling") return;
+      const el = viewportRef.current;
+      if (!el) return;
+      el.setAttribute("data-scrolling", "true");
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+      scrollTimerRef.current = setTimeout(() => {
+        el.setAttribute("data-scrolling", "false");
+      }, 600);
+    }
     // Measurement sentinel: an absolutely-positioned div that always reflects the true
     // available layout space, independent of PDF content size. Using viewportRef itself
     // fails inside ScrollViewer because that container grows with content — causing a
@@ -186,6 +203,8 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
     // Stable ref for signature methods — keeps registerComponentApi effect dependency-free
     const signatureMethodsRef = useRef(signatures);
     signatureMethodsRef.current = signatures;
+    // Ref to the loaded PDFDocumentProxy — used by document-level API methods
+    const docProxyRef = useRef<any>(null);
 
     // Sync internalScale when the scale prop changes externally
     const prevScaleProp = useRef(scale);
@@ -219,6 +238,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
       annotations,
       numPages,
       selectedAnnotationId,
+      internalPage: 1,
       onAnnotationCreate,
       onAnnotationUpdate,
       onAnnotationDelete,
@@ -235,6 +255,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
         annotations,
         numPages,
         selectedAnnotationId,
+        internalPage,
         onAnnotationCreate,
         onAnnotationUpdate,
         onAnnotationDelete,
@@ -274,7 +295,9 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
       };
     }, [selectedAnnotationId, mode]);
 
-    function handleLoadSuccess({ numPages }: { numPages: number }) {
+    function handleLoadSuccess(pdf: any) {
+      const { numPages } = pdf;
+      docProxyRef.current = pdf;
       setNumPages(numPages);
       onDocumentLoad?.(numPages);
       
@@ -332,6 +355,18 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
           const { numPages } = latestValues.current;
           if (page >= 1 && page <= (numPages ?? 1)) {
             handlePageChange(page);
+          }
+        },
+        previousPage: () => {
+          const currentPage = latestValues.current.internalPage;
+          if (currentPage > 1) {
+            handlePageChange(currentPage - 1);
+          }
+        },
+        nextPage: () => {
+          const { internalPage, numPages } = latestValues.current;
+          if (internalPage < (numPages ?? 1)) {
+            handlePageChange(internalPage + 1);
           }
         },
         // --- Zoom / scale API ---
@@ -471,6 +506,133 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
           };
           latestValues.current.onExportRequest?.(exportData);
         },
+        // --- Document-level PDF.js APIs ---
+        getMetadata: async () => {
+          const proxy = docProxyRef.current;
+          if (!proxy) return null;
+          const { info, metadata } = await proxy.getMetadata();
+          return {
+            info,
+            // Convert XMP metadata object to a plain key-value map when available
+            xmp: metadata ? Object.fromEntries(
+              (metadata as any)._metadataMap ?? []
+            ) : null,
+          };
+        },
+        getOutline: async () => {
+          const proxy = docProxyRef.current;
+          if (!proxy) return null;
+          return proxy.getOutline();
+        },
+        getPageLabels: async () => {
+          const proxy = docProxyRef.current;
+          if (!proxy) return null;
+          return proxy.getPageLabels();
+        },
+        getPermissions: async () => {
+          const proxy = docProxyRef.current;
+          if (!proxy) return null;
+          return proxy.getPermissions();
+        },
+        getFieldObjects: async () => {
+          const proxy = docProxyRef.current;
+          if (!proxy) return null;
+          return proxy.getFieldObjects();
+        },
+        getTextContent: async (pageNumber?: number) => {
+          const proxy = docProxyRef.current;
+          if (!proxy) return null;
+          if (pageNumber != null) {
+            // Single page
+            const page = await proxy.getPage(pageNumber);
+            const tc = await page.getTextContent();
+            return tc.items.map((i: any) => i.str).join(" ");
+          }
+          // All pages — concatenate page-by-page
+          const total = proxy.numPages as number;
+          const parts: string[] = [];
+          for (let p = 1; p <= total; p++) {
+            const page = await proxy.getPage(p);
+            const tc = await page.getTextContent();
+            parts.push(tc.items.map((i: any) => i.str).join(" "));
+          }
+          return parts.join("\n");
+        },
+        getAttachments: async () => {
+          const proxy = docProxyRef.current;
+          if (!proxy) return null;
+          return proxy.getAttachments();
+        },
+        getViewerPreferences: async () => {
+          const proxy = docProxyRef.current;
+          if (!proxy) return null;
+          return proxy.getViewerPreferences();
+        },
+        getDestinations: async () => {
+          const proxy = docProxyRef.current;
+          if (!proxy) return null;
+          return proxy.getDestinations();
+        },
+        getDestination: async (id: string) => {
+          const proxy = docProxyRef.current;
+          if (!proxy) return null;
+          return proxy.getDestination(id);
+        },
+        hasJSActions: async () => {
+          const proxy = docProxyRef.current;
+          if (!proxy) return false;
+          return proxy.hasJSActions();
+        },
+        getJSActions: async () => {
+          const proxy = docProxyRef.current;
+          if (!proxy) return null;
+          return proxy.getJSActions();
+        },
+        getOptionalContentConfig: async () => {
+          const proxy = docProxyRef.current;
+          if (!proxy) return null;
+          return proxy.getOptionalContentConfig();
+        },
+        getPageLayout: async () => {
+          const proxy = docProxyRef.current;
+          if (!proxy) return null;
+          return proxy.getPageLayout();
+        },
+        getPageMode: async () => {
+          const proxy = docProxyRef.current;
+          if (!proxy) return null;
+          return proxy.getPageMode();
+        },
+        getOpenAction: async () => {
+          const proxy = docProxyRef.current;
+          if (!proxy) return null;
+          return proxy.getOpenAction();
+        },
+        getData: async () => {
+          const proxy = docProxyRef.current;
+          if (!proxy) return null;
+          return proxy.getData();
+        },
+        getAnnotationsByType: async (types: Set<number>, pageIndexesToSkip?: Set<number>) => {
+          const proxy = docProxyRef.current;
+          if (!proxy) return null;
+          return proxy.getAnnotationsByType(types, pageIndexesToSkip || new Set());
+        },
+        saveDocument: async () => {
+          const proxy = docProxyRef.current;
+          if (!proxy) return null;
+          return proxy.saveDocument();
+        },
+        getMarkInfo: async () => {
+          const proxy = docProxyRef.current;
+          if (!proxy) return null;
+          return proxy.getMarkInfo();
+        },
+        getDownloadInfo: async () => {
+          const proxy = docProxyRef.current;
+          if (!proxy) return null;
+          return proxy.getDownloadInfo();
+        },
       });
     }, [registerComponentApi]); // Only re-run if registerComponentApi function itself changes
 
@@ -545,7 +707,22 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
         {/* Measurement sentinel: absolutely covers the outer container so it always
             reports the true available layout space, unaffected by PDF content size. */}
         <div ref={measureRef} style={{ position: "absolute", inset: 0, pointerEvents: "none", visibility: "hidden" }} />
-        <div ref={viewportRef} style={{ flex: 1, minHeight: 0, overflow: "auto", display: "flex", flexDirection: "column", alignItems: horizontalAlignment, justifyContent: verticalAlignment }}>
+        <div
+          ref={viewportRef}
+          className={styles.viewport}
+          data-scroll-style={scrollStyle}
+          data-scrolling={scrollStyle === "whenScrolling" ? "false" : undefined}
+          onScroll={handleViewportScroll}
+          style={{
+            flex: 1,
+            minHeight: 0,
+            overflow: scrollStyle === "overlay" ? "scroll" : "auto",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: horizontalAlignment,
+            justifyContent: verticalAlignment,
+          }}
+        >
           <Document
           file={fileSource as any}
           onLoadSuccess={handleLoadSuccess}

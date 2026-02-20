@@ -28,6 +28,7 @@ export const buildLib = async ({
   }
 
   const config: UserConfig = {
+    customLogger: overrides.customLogger,
     resolve: {
       extensions: [".js", ".ts", ".jsx", ".tsx", ".json", ".xmlui", ".xmlui.xs", ".xs"],
     },

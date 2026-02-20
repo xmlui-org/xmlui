@@ -515,6 +515,7 @@ This component does not expose any methods.
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-navPanel-App | none | none |
 | [maxWidth](../styles-and-themes/common-units/#size)-App | $maxWidth-content | $maxWidth-content |
 | [maxWidth-content](../styles-and-themes/common-units/#size)-App | $maxWidth-content | $maxWidth-content |
+| [maxWidth-content](../styles-and-themes/common-units/#size)-App--withToc | *none* | *none* |
 | [width](../styles-and-themes/common-units/#size)-navPanel-App | $space-64 | $space-64 |
 | [width](../styles-and-themes/common-units/#size)-navPanel-collapsed-App | 48px | 48px |
 
