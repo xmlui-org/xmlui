@@ -10,3 +10,4 @@ export * from "./transform";
 export * from "./utils";
 export * from "./xmlui-serializer";
 export * from "./xmlui-tree";
+export { extractParam } from "../../components-core/utils/extractParam";

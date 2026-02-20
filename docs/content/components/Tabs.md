@@ -404,6 +404,6 @@ This method sets the active tab by index (0-based).
 | [paddingRight](../styles-and-themes/common-units/#size)-trigger-Tabs | *none* | *none* |
 | [paddingTop](../styles-and-themes/common-units/#size)-trigger-Tabs | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-trigger-Tabs | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-trigger-Tabs | $color-primary-100 | $color-primary-100 |
-| [textColor](../styles-and-themes/common-units/#color)-trigger-Tabs--active | $color-surface-0 | $color-surface-0 |
+| [textColor](../styles-and-themes/common-units/#color)-trigger-Tabs | $color-primary-600 | $color-primary-600 |
+| [textColor](../styles-and-themes/common-units/#color)-trigger-Tabs--active | $color-primary-900 | $color-primary-900 |
 | [textColor](../styles-and-themes/common-units/#color)-trigger-Tabs--hover | $color-primary-900 | $color-primary-900 |

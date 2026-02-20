@@ -148,6 +148,61 @@ test("supports menu separators", async ({ initTestBed, createDropdownMenuDriver,
   await expect(separators).toHaveCount(1);
 });
 
+test("removes multiple adjacent separators", async ({ initTestBed, createDropdownMenuDriver, page }) => {
+  await initTestBed(`
+    <DropdownMenu label="DropdownMenu">
+      <MenuItem>Item 1</MenuItem>
+      <MenuItem>Item 2</MenuItem>
+      <MenuSeparator />
+      <MenuSeparator />
+      <SubMenuItem label="Submenu">
+        <MenuItem>Submenu Item 1</MenuItem>
+        <MenuItem>Submenu Item 2</MenuItem>
+      </SubMenuItem>
+      <MenuSeparator />
+      <MenuSeparator />
+    </DropdownMenu>
+  `);
+  const driver = await createDropdownMenuDriver();
+
+  await driver.open();
+  await expect(page.getByRole("menuitem", { name: "Item 1" })).toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Item 2" })).toBeVisible();
+  await expect(page.getByText("Submenu")).toBeVisible();
+
+  // Check that only 2 separators are rendered (not 4), since adjacent ones should be removed
+  const separators = driver.getMenuSeparators();
+  await expect(separators).toHaveCount(2);
+});
+
+test("removes adjacent separators in SubMenuItem", async ({ initTestBed, createDropdownMenuDriver, page }) => {
+  await initTestBed(`
+    <DropdownMenu label="DropdownMenu">
+      <MenuItem>Item 1</MenuItem>
+      <SubMenuItem label="Submenu">
+        <MenuItem>Submenu Item 1</MenuItem>
+        <MenuSeparator />
+        <MenuSeparator />
+        <MenuSeparator />
+        <MenuItem>Submenu Item 2</MenuItem>
+      </SubMenuItem>
+    </DropdownMenu>
+  `);
+  const driver = await createDropdownMenuDriver();
+
+  await driver.open();
+  await expect(page.getByText("Submenu")).toBeVisible();
+  
+  // Open the submenu
+  await driver.openSubMenu("Submenu");
+  await expect(page.getByRole("menuitem", { name: "Submenu Item 1" })).toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Submenu Item 2" })).toBeVisible();
+
+  // Check that only 1 separator is rendered (not 3), since adjacent ones should be removed
+  const separators = driver.getMenuSeparators();
+  await expect(separators).toHaveCount(1);
+});
+
 // =============================================================================
 // ACCESSIBILITY TESTS
 // =============================================================================

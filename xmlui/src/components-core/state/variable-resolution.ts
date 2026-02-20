@@ -97,7 +97,6 @@ export function useVars(
                 if (isParsedValue(value)) {
                   return collectVariableDependencies(value.tree, referenceTrackedApi);
                 }
-                // console.log(`GETTING DEPENDENCY FOR ${value} with:`, referenceTrackedApi);
                 const params = parseParameterString(value);
                 let ret = new Set<string>();
                 params.forEach((param) => {
@@ -112,15 +111,6 @@ export function useVars(
               }),
               obtainValue: memoizeOne(
                 (value, state, appContext, strict, deps, appContextDeps) => {
-                  // console.log(
-                  //   "VARS, BUST, obtain value called with",
-                  //   value,
-                  //   { state, appContext },
-                  //   {
-                  //     deps,
-                  //     appContextDeps,
-                  //   }
-                  // );
                   try {
                     return isParsedValue(value)
                       ? evalBinding(value.tree, {
@@ -182,7 +172,6 @@ export function useVars(
           }
           const stateDepValues = pickFromObject(stateContext, dependencies);
           const appContextDepValues = pickFromObject(appContext, dependencies);
-          // console.log("VARS, obtain value called with", stateDepValues, appContextDepValues);
 
           ret[key] = memoedVars.current
             .get(value)!

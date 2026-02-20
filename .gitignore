@@ -1,6 +1,7 @@
 node_modules
 test-results
 playwright-report
+blob-report
 .vs
 .idea
 .windsurf
@@ -14,5 +15,9 @@ coverage
 .next
 xmlui-optimized-output
 xmlui-temp-build
+
+# Claude Code local config
+.claude
+.mcp.json
 
 docs/scripts/component-metadata.json

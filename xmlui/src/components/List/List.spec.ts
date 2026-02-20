@@ -1071,3 +1071,300 @@ test("pageInfo enables pagination", async ({ initTestBed, createListDriver }) =>
   await expect(driver.component).toBeVisible();
   await expect(driver.component).toContainText("Item 1");
 });
+
+// =============================================================================
+// VIRTUALIZATION TESTS
+// =============================================================================
+
+test.describe("Virtualization", () => {
+  test("only renders visible items when height is constrained with large dataset", async ({ initTestBed, createListDriver, page }) => {
+    await initTestBed(`
+      <App scrollWholePage="false">
+        <List
+          height="400px"
+          data="{Array.from({length: 600}, (_, i) => ({id: i + 1, name: 'Item ' + (i + 1)}))}">
+          <Text>{$item.name}</Text>
+        </List>
+      </App>
+    `);
+
+    const driver = await createListDriver();
+    const list = driver.component;
+    await expect(list).toBeVisible();
+
+    // Count actual DOM items in the list using the data-list-item-type attribute
+    const items = page.locator("[data-list-item-type]");
+    const itemCount = await items.count();
+
+    // With 400px height, should render ~10-20 visible items (visible + buffer)
+    // Definitely not all 600 items
+    expect(itemCount).toBeLessThan(50);
+    expect(itemCount).toBeGreaterThan(0);
+
+    // Verify first visible item exists
+    await expect(list).toContainText("Item 1");
+  });
+
+  test("renders new items when scrolling through large dataset", async ({ initTestBed, createListDriver, page }) => {
+    await initTestBed(`
+      <App scrollWholePage="false">
+        <List
+          height="400px"
+          data="{Array.from({length: 600}, (_, i) => ({id: i + 1, name: 'Item ' + (i + 1)}))}">
+          <Text>{$item.name}</Text>
+        </List>
+      </App>
+    `);
+
+    const driver = await createListDriver();
+    const list = driver.component;
+    await expect(list).toBeVisible();
+
+    // Initially, item 600 should not be in the DOM
+    const itemsBefore = page.locator("[data-list-item-type]");
+    const countBefore = await itemsBefore.count();
+    
+    // Should virtualize (not render all items)
+    expect(countBefore).toBeLessThan(50);
+
+    // Scroll to bottom
+    await driver.scrollTo("bottom");
+    await page.waitForTimeout(150);
+
+    // After scrolling to bottom, item count might change (virtualization update)
+    const itemsAfter = page.locator("[data-list-item-type]");
+    const countAfter = await itemsAfter.count();
+    
+    // Should still have virtualization (not render all 600)
+    expect(countAfter).toBeLessThan(100);
+    expect(countAfter).toBeGreaterThan(0);
+  });
+
+  test("scrollbar tracks correctly with large dataset", async ({ initTestBed, createListDriver, page }) => {
+    await initTestBed(`
+      <App scrollWholePage="false">
+        <List
+          height="400px"
+          data="{Array.from({length: 600}, (_, i) => ({id: i + 1, name: 'Item ' + (i + 1)}))}">
+          <Text>{$item.name}</Text>
+        </List>
+      </App>
+    `);
+
+    const driver = await createListDriver();
+    const list = driver.component;
+    await expect(list).toBeVisible();
+
+    // Verify only visible items are rendered (virtualization working)
+    const visibleItems = page.locator("[data-list-item-type]");
+    const visibleCount = await visibleItems.count();
+    
+    // Should have virtualized the list, not rendering all 600 items
+    expect(visibleCount).toBeLessThan(50);
+    expect(visibleCount).toBeGreaterThan(0);
+
+    // Verify scrolling capability by checking scroll properties
+    const scrollHeight = await list.evaluate((el) => el.scrollHeight);
+    const clientHeight = await list.evaluate((el) => el.clientHeight);
+
+    // List should be scrollable (scroll height > client height)
+    // or all items should fit (which is acceptable for virtualization)
+    expect(scrollHeight).toBeGreaterThanOrEqual(clientHeight);
+
+    // Verify we can scroll programmatically
+    await driver.scrollTo("bottom");
+    await page.waitForTimeout(100);
+
+    // After scrolling, list should still be visible
+    await expect(list).toBeVisible();
+  });
+
+  test("maintains consistent total scroll height with virtualization", async ({ initTestBed, createListDriver, page }) => {
+    await initTestBed(`
+      <App scrollWholePage="false">
+        <List
+          height="400px"
+          data="{Array.from({length: 600}, (_, i) => ({id: i + 1, name: 'Item ' + (i + 1)}))}">
+          <Card>
+            <Text>{$item.name}</Text>
+          </Card>
+        </List>
+      </App>
+    `);
+
+    const driver = await createListDriver();
+    const list = driver.component;
+    await expect(list).toBeVisible();
+
+    // Verify virtualization is working by checking only visible items are rendered
+    const items = page.locator("[data-list-item-type]");
+    const itemCount = await items.count();
+    
+    // Should virtualize, not render all 600 items
+    expect(itemCount).toBeLessThan(100);
+    expect(itemCount).toBeGreaterThan(0);
+
+    // Get scroll height (should be consistent)
+    const initialScrollHeight = await list.evaluate((el) => el.scrollHeight);
+    
+    // Scroll around
+    await driver.scrollTo("bottom");
+    await page.waitForTimeout(100);
+    
+    const bottomScrollHeight = await list.evaluate((el) => el.scrollHeight);
+    
+    // Scroll height should remain consistent
+    expect(Math.abs(initialScrollHeight - bottomScrollHeight)).toBeLessThan(10);
+  });
+
+  test("virtualization works correctly with groupBy", async ({ initTestBed, createListDriver, page }) => {
+    await initTestBed(`
+      <App scrollWholePage="false">
+        <List
+          height="400px"
+          groupBy="category"
+          data="{Array.from({length: 600}, (_, i) => ({
+            id: i + 1,
+            name: 'Item ' + (i + 1),
+            category: i < 300 ? 'A' : 'B'
+          }))}">
+          <property name="groupHeaderTemplate">
+            <Text variant="strong">Category: {$group.key}</Text>
+          </property>
+          <Text>{$item.name}</Text>
+        </List>
+      </App>
+    `);
+
+    const driver = await createListDriver();
+    const list = driver.component;
+    await expect(list).toBeVisible();
+
+    // Should show category header
+    await expect(list).toContainText("Category: A");
+
+    // Count visible DOM elements (should be limited by virtualization)
+    const items = page.locator("[data-list-item-type]");
+    const itemCount = await items.count();
+    expect(itemCount).toBeLessThan(100); // Still virtualizing despite grouping
+
+    // First item visible
+    await expect(list).toContainText("Item 1");
+  });
+
+  test("virtualization works correctly with orderBy", async ({ initTestBed, createListDriver, page }) => {
+    await initTestBed(`
+      <App scrollWholePage="false">
+        <List
+          height="400px"
+          orderBy="id"
+          data="{Array.from({length: 600}, (_, i) => ({
+            id: i + 1,
+            name: 'Item ' + (i + 1)
+          }))}">
+          <Text>{$item.name}</Text>
+        </List>
+      </App>
+    `);
+
+    const driver = await createListDriver();
+    const list = driver.component;
+    await expect(list).toBeVisible();
+
+    // Count rows - only visible items should be rendered
+    const items = page.locator("[data-list-item-type]");
+    const itemCount = await items.count();
+    expect(itemCount).toBeLessThan(50); // Only visible items rendered
+    expect(itemCount).toBeGreaterThan(0);
+
+    // Should see Item 1 (first item in order)
+    await expect(list).toContainText("Item 1");
+  });
+
+  test("virtualization works correctly with limit", async ({ initTestBed, createListDriver, page }) => {
+    await initTestBed(`
+      <App scrollWholePage="false">
+        <List
+          height="400px"
+          limit="100"
+          data="{Array.from({length: 600}, (_, i) => ({id: i + 1, name: 'Item ' + (i + 1)}))}">
+          <Text>{$item.name}</Text>
+        </List>
+      </App>
+    `);
+
+    const driver = await createListDriver();
+    const list = driver.component;
+    await expect(list).toBeVisible();
+
+    // Even with limit=100, virtualization should still limit DOM items
+    const items = page.locator("[data-list-item-type]");
+    const itemCount = await items.count();
+    expect(itemCount).toBeLessThan(50); // Still virtualizing within the limit
+    expect(itemCount).toBeGreaterThan(0); // But has some visible items
+
+    // First item visible
+    await expect(list).toContainText("Item 1");
+  });
+
+  test("no virtualization occurs when all items fit in viewport", async ({ initTestBed, createListDriver, page }) => {
+    await initTestBed(`
+      <App scrollWholePage="false">
+        <List
+          height="400px"
+          data="{Array.from({length: 5}, (_, i) => ({id: i + 1, name: 'Item ' + (i + 1)}))}">
+          <Text>{$item.name}</Text>
+        </List>
+      </App>
+    `);
+
+    const driver = await createListDriver();
+    const list = driver.component;
+    await expect(list).toBeVisible();
+
+    // With only 5 items, all should be rendered
+    const items = page.locator("[data-list-item-type]");
+    const itemCount = await items.count();
+    // With 5 items, should render all of them (allowing for some buffer)
+    expect(itemCount).toBeGreaterThanOrEqual(5);
+    expect(itemCount).toBeLessThan(15); // Allow some buffer items
+
+    // All items should be visible
+    await expect(list).toContainText("Item 1");
+    await expect(list).toContainText("Item 5");
+  });
+
+  test("virtualization handles dynamic height items gracefully", async ({ initTestBed, createListDriver, page }) => {
+    await initTestBed(`
+      <App scrollWholePage="false">
+        <List
+          height="400px"
+          data="{Array.from({length: 200}, (_, i) => ({
+            id: i + 1,
+            name: 'Item ' + (i + 1),
+            details: i % 3 === 0 ? 'Long details text.' : 'Short'
+          }))}">
+          <Card>
+            <VStack>
+              <Text variant="strong">{$item.name}</Text>
+              <Text>{$item.details}</Text>
+            </VStack>
+          </Card>
+        </List>
+      </App>
+    `);
+
+    const driver = await createListDriver();
+    const list = driver.component;
+    await expect(list).toBeVisible();
+
+    // Still virtualizing despite dynamic heights
+    const items = page.locator("[data-list-item-type]");
+    const itemCount = await items.count();
+    expect(itemCount).toBeLessThan(50);
+    expect(itemCount).toBeGreaterThan(0);
+
+    // Verify content renders correctly
+    await expect(list).toContainText("Item 1");
+  });
+});

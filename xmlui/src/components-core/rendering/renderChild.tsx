@@ -49,19 +49,6 @@ export function renderChild({
   cleanup,
   uidInfoRef,
 }: ChildRendererContext): ReactNode {
-  if (
-    appContext?.appGlobals?.xsVerbose &&
-    node.type !== "TextNode" &&
-    node.type !== "TextNodeCData"
-  ) {
-    console.log(
-      "[renderChild]",
-      node.type,
-      node.uid,
-      "globalVars:",
-      globalVars ? Object.keys(globalVars) : undefined,
-    );
-  }
   // --- Special handling for init event: if component has init event and when=false,
   // --- we still need to let it render once to trigger init, which may change the when condition
   const hasInitEvent = node.events?.init;
@@ -93,7 +80,6 @@ export function renderChild({
     // --- Check for special Slot cases
     let slotChildren: ComponentDef | ComponentDef[];
     const templateName = node.props?.name;
-    // console.log("templateName", templateName);
     if (templateName) {
       // --- Let's check the validity of the slot name
       if (!templateName.endsWith("Template")) {

@@ -173,6 +173,34 @@ test("supports multiple context menus", async ({ initTestBed, page }) => {
   await expect(separators).toHaveCount(1);
 });
 
+test("removes multiple adjacent separators", async ({ initTestBed, page, createContextMenuDriver }) => {
+  await initTestBed(`
+    <Card testId="target" title="Target" onContextMenu="ev => menu.openAt(ev)">
+      <Text value="Right click me" />
+    </Card>
+    <ContextMenu id="menu">
+      <MenuItem>Item 1</MenuItem>
+      <MenuItem>Item 2</MenuItem>
+      <MenuSeparator />
+      <MenuSeparator />
+      <MenuItem>Item 3</MenuItem>
+      <MenuSeparator />
+      <MenuSeparator />
+    </ContextMenu>
+  `);
+  const driver = await createContextMenuDriver("menu");
+
+  // Open context menu
+  await page.getByTestId("target").click({ button: "right" });
+  await expect(page.getByRole("menuitem", { name: "Item 1" })).toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Item 2" })).toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Item 3" })).toBeVisible();
+
+  // Check that only 2 separators are rendered (not 4), since adjacent ones should be removed
+  const separators = driver.getMenuSeparators();
+  await expect(separators).toHaveCount(2);
+});
+
 test("supports submenus", async ({ initTestBed, page, createContextMenuDriver }) => {
   await initTestBed(`
     <Card testId="target" title="Target" onContextMenu="ev => menu.openAt(ev)">

@@ -1,4 +1,5 @@
 import styles from "./DropdownMenu.module.scss";
+import type { ReactNode } from "react";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
@@ -13,6 +14,7 @@ import {
   MenuSeparator,
   SubMenuItem,
 } from "./DropdownMenuNative";
+import { filterAdjacentSeparators } from "../menu-helpers";
 
 const DDMCOMP = "DropdownMenu";
 
@@ -112,6 +114,9 @@ export const dropdownMenuComponentRenderer = createComponentRenderer(
   DDMCOMP,
   DropdownMenuMd,
   ({ node, extractValue, renderChild, registerComponentApi, className, lookupEventHandler }) => {
+    // Filter adjacent separators before rendering to prevent flash
+    const filteredChildren = filterAdjacentSeparators(node.children);
+    
     return (
       <DropdownMenu
         triggerTemplate={renderChild(node.props?.triggerTemplate)}
@@ -127,7 +132,7 @@ export const dropdownMenuComponentRenderer = createComponentRenderer(
         triggerButtonIconPosition={extractValue(node.props.triggerButtonIconPosition)}
         modal={extractValue.asOptionalBoolean(node.props.modal)}
       >
-        {renderChild(node.children)}
+        {renderChild(filteredChildren)}
       </DropdownMenu>
     );
   },
@@ -207,6 +212,7 @@ export const menuItemRenderer = createComponentRenderer(
         navigateAction?.({ pathname: to });
       };
     }
+    
     return (
       <MenuItem
         onClick={clickHandler}
@@ -260,6 +266,9 @@ export const subMenuItemRenderer = createComponentRenderer(
   SubMenuItemMd,
   ({ node, renderChild, extractValue }) => {
     const iconName = extractValue(node.props?.icon);
+    // Filter adjacent separators before rendering to prevent flash
+    const filteredChildren = filterAdjacentSeparators(node.children);
+    
     return (
       <SubMenuItem
         label={extractValue(node.props?.label)}
@@ -271,7 +280,7 @@ export const subMenuItemRenderer = createComponentRenderer(
         }
         triggerTemplate={renderChild(node.props?.triggerTemplate)}
       >
-        {renderChild(node.children)}
+        {renderChild(filteredChildren)}
       </SubMenuItem>
     );
   },

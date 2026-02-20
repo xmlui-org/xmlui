@@ -1,0 +1,85 @@
+name: All Tests (Sharded)
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest-16-core
+    strategy:
+      fail-fast: false
+      matrix:
+        shardIndex: [1, 2, 3, 4]
+        shardTotal: [4]
+    env:
+      PLAYWRIGHT_USE_DEV_SERVER: "false"
+      NODE_OPTIONS: "--max-old-space-size=8192"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+      - name: Install node dependencies
+        run: npm ci --prefer-offline
+      - name: Cache for Turbo
+        uses: rharkor/caching-for-turbo@v2.3.1
+      - name: Store Playwright's Version
+        run: |
+          PLAYWRIGHT_VERSION=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//' | sort | head -n 1)
+          echo "Playwright's Version: $PLAYWRIGHT_VERSION"
+          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
+      - name: Cache Playwright Browsers for Playwright's Version
+        id: cache-playwright-browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-browsers-${{ env.PLAYWRIGHT_VERSION }}
+      - name: Install Playwright Browsers
+        if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
+      - name: Build Test Bed
+        run: npx turbo run build:xmlui-test-bed --filter=xmlui
+      - name: Run Playwright tests
+        run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} --reporter=blob
+        env:
+          PLAYWRIGHT_USE_DEV_SERVER: "false"
+      - name: Upload blob report to GitHub Actions Artifacts
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: blob-report-${{ matrix.shardIndex }}
+          path: blob-report
+          retention-days: 1
+
+  merge-reports:
+    if: ${{ !cancelled() }}
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+      - name: Install node dependencies
+        run: npm ci --prefer-offline
+      - name: Download blob reports from GitHub Actions Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-blob-reports
+          pattern: blob-report-*
+          merge-multiple: true
+      - name: Merge into HTML Report
+        run: npx playwright merge-reports --reporter github ./all-blob-reports
+      - name: Upload Github report
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-attempt-${{ github.run_attempt }}
+          path: playwright-report
+          retention-days: 14

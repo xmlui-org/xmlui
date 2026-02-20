@@ -97,6 +97,8 @@ export type AppWrapperProps = {
   children?: ReactNode;
 
   onInit?: () => void;
+
+  icons?: Record<string, string>;
 };
 
 /**
@@ -122,6 +124,7 @@ export const AppWrapper = ({
   children,
   projectCompilation,
   onInit,
+  icons
 }: AppWrapperProps) => {
   if (previewMode) {
     // --- Prevent leaking the meta items to the parent document,
@@ -142,7 +145,7 @@ export const AppWrapper = ({
       <Helmet defaultTitle={siteName} titleTemplate={`%s | ${siteName}`} />
       <LoggerProvider>
         <LoggerInitializer />
-        <IconProvider>
+        <IconProvider icons={icons}>
           <ThemeProvider
             resourceMap={resourceMap}
             themes={contributes.themes}

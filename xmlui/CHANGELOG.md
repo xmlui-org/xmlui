@@ -1,5 +1,28 @@
 # xmlui
 
+## 0.12.2
+
+### Patch Changes
+
+- 1ffaf6d: Fix bookmark navigation in nested apps (xmlui-pg playground examples)
+- 51a7021: Add itemWidth property to Stack and FlowLayout
+- c00f264: Change component document generation to the new link format
+- 354669a: Remove global variables from compnent files
+- 23db092: Fix virtualization issues with List and Table
+- 63ef618: Fix shrinking Table selection checkbox
+- 3cf2443: feat: improve NavPanel by using NavSection placeholder components for dynamic nav element generation
+- 3c9936d: Fix initialPrimarySize issue with Splitter
+- 71a1220: fix: handle active heading state in TableOfContents and update indicator visibility
+- 8c51a09: Fix <script> + code-behind function declaration regression
+- a1d6fde: fix: enhance footer behavior in App component
+- a00651d: fix: toc - smoothScrolling
+- 47d70ec: APICall allows access to error response details
+- c9bea96: Actions.upload now allows field name
+- 1ffaf6d: Fix Bookmark scrolling issue with xmlui-pg
+- c853a36: Additional component metadata: "excludeBehaviors", "deprecationMessage"
+- 01e2f2a: Remove multiple adjacent separators from DropdownMenu and ContextMenu
+- a00651d: fix: scroll behavior handling in TableOfContents and AppContent components
+
 ## 0.12.1
 
 ### Patch Changes
