@@ -196,10 +196,16 @@ export const PdfMd = createMetadata({
       returns: "The current scale factor (e.g. 1.0 for 100%).",
     },
     addAnnotation: {
-      description: `Add a new annotation. Returns the newly assigned annotation ID.`,
-      signature: "addAnnotation(annotationData: object): string",
+      description:
+        `Add a new annotation to a specific page. The \`page\` field in \`annotationData\` ` +
+        `(1-based) determines which page the annotation appears on. ` +
+        `When \`scrollIntoView\` is \`true\` the viewer automatically scrolls that page into view. ` +
+        `Returns the newly assigned annotation ID.`,
+      signature: "addAnnotation(annotationData: object, scrollIntoView?: boolean, scrollBehavior?: string): string",
       parameters: {
-        annotationData: "An object describing the annotation to add (type, page, position, size, properties).",
+        annotationData: "An object describing the annotation to add. Include `page` (1-based) to place it on a specific page.",
+        scrollIntoView: "When true, scrolls the annotation's page into view after adding. Defaults to false.",
+        scrollBehavior: "Controls the scroll animation: `\"smooth\"` (default) animates the scroll, `\"instant\"` jumps immediately.",
       },
       returns: "The unique ID assigned to the new annotation.",
     },
@@ -453,7 +459,6 @@ export const PdfMd = createMetadata({
     "backgroundColor-handle-Scroller": "$color-surface-200",
     "backgroundColor-handle-Scroller--hover": "$color-surface-400",
     "backgroundColor-track-Scroller": "transparent",
-    "borderRadius-handle-Scroller": "10px",
   },
 });
 

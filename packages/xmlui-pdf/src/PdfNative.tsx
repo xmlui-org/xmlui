@@ -424,7 +424,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
           setInternalScale(clamped);
           latestValues.current.updateState?.({ scale: clamped });
         },
-        addAnnotation: (annotationData: any) => {
+        addAnnotation: (annotationData: any, scrollIntoView: boolean = false, scrollBehavior: "smooth" | "instant" = "smooth") => {
           const { onAnnotationCreate } = latestValues.current;
           const newAnnotation: Annotation = {
             ...annotationData,
@@ -436,6 +436,15 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
           setInternalAnnotations(next);
           latestValues.current.updateState?.({ annotations: next });
           onAnnotationCreate?.(newAnnotation);
+          if (scrollIntoView && newAnnotation.page != null) {
+            const viewport = viewportRef.current;
+            if (viewport) {
+              const pageEl = viewport.querySelector(
+                `[data-page="${newAnnotation.page}"]`
+              ) as HTMLElement | null;
+              pageEl?.scrollIntoView({ behavior: scrollBehavior, block: "nearest" });
+            }
+          }
           return newAnnotation.id;
         },
         updateAnnotation: (id: string, updates: any) => {
@@ -736,7 +745,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
             const pageHeight = 842;
             
             return (
-              <div key={pageNumber} className={styles.pageContainer}>
+              <div key={pageNumber} data-page={pageNumber} className={styles.pageContainer}>
                 <Page
                   pageNumber={pageNumber}
                   loading=""

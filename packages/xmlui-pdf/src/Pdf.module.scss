@@ -14,7 +14,6 @@ $gap-pages-Pdf: createThemeVar("gap-pages-Pdf");
 $backgroundColor-handle-Scroller: createThemeVar("backgroundColor-handle-Scroller");
 $backgroundColor-handle-Scroller--hover: createThemeVar("backgroundColor-handle-Scroller--hover");
 $backgroundColor-track-Scroller: createThemeVar("backgroundColor-track-Scroller");
-$borderRadius-handle-Scroller: createThemeVar("borderRadius-handle-Scroller");
 $size-Scroller: createThemeVar("size-Scroller");
 
 // Annotation theme variables
@@ -38,86 +37,37 @@ $backgroundColor-signature-Pdf: createThemeVar("backgroundColor-signature-Pdf");
 }
 
 // Viewport scroll-style variants
-// Strategy: use ::-webkit-scrollbar pseudo-elements for Chrome/Safari/Edge (full size +
-// color control), and scrollbar-width/scrollbar-color for Firefox (size approximate).
-// scrollbar-gutter: stable both-edges keeps equal space on both sides of centered content.
+// Uses the modern scrollbar-color / scrollbar-width API (Chrome 121+, Firefox 64+, Safari 16.4+).
+// NOTE: ::-webkit-scrollbar and scrollbar-color are MUTUALLY EXCLUSIVE in Chrome —
+// defining any ::-webkit-scrollbar rule on an element causes Chrome to ignore scrollbar-color
+// on that element entirely, so we must use only one API.
+// scrollbar-gutter: stable both-edges reserves equal gutter space on both sides so
+// center-aligned content never shifts when the scrollbar appears/disappears.
 .viewport {
-  // --- Shared webkit scrollbar size for all non-normal modes
-  &[data-scroll-style="whenMouseOver"],
-  &[data-scroll-style="whenScrolling"],
-  &[data-scroll-style="overlay"] {
-    &::-webkit-scrollbar {
-      width: #{$size-Scroller};
-      height: #{$size-Scroller};
-    }
-  }
-
-  // --- whenMouseOver ---
+  // whenMouseOver: transparent by default, show themed colors on :hover
   &[data-scroll-style="whenMouseOver"] {
     scrollbar-gutter: stable both-edges;
-    scrollbar-width: #{$size-Scroller};        // Firefox 128+ / Chrome 121+
+    scrollbar-width: #{$size-Scroller};
     scrollbar-color: transparent transparent;
-
-    &::-webkit-scrollbar-thumb {
-      background-color: transparent;
-      border-radius: #{$borderRadius-handle-Scroller};
-    }
-    &::-webkit-scrollbar-track {
-      background-color: transparent;
-    }
-
-    // Chrome/Safari: reveal on hover
-    &:hover::-webkit-scrollbar-thumb {
-      background-color: #{$backgroundColor-handle-Scroller};
-    }
-    &:hover::-webkit-scrollbar-track {
-      background-color: #{$backgroundColor-track-Scroller};
-    }
-    // Firefox: reveal on hover
     &:hover {
       scrollbar-color: #{$backgroundColor-handle-Scroller} #{$backgroundColor-track-Scroller};
     }
   }
 
-  // --- whenScrolling ---
+  // whenScrolling: transparent by default, show themed colors while data-scrolling="true" (set by JS)
   &[data-scroll-style="whenScrolling"] {
     scrollbar-gutter: stable both-edges;
     scrollbar-width: #{$size-Scroller};
     scrollbar-color: transparent transparent;
-
-    &::-webkit-scrollbar-thumb {
-      background-color: transparent;
-      border-radius: #{$borderRadius-handle-Scroller};
-    }
-    &::-webkit-scrollbar-track {
-      background-color: transparent;
-    }
-
-    // Chrome/Safari: reveal while JS sets data-scrolling="true"
-    &[data-scrolling="true"]::-webkit-scrollbar-thumb {
-      background-color: #{$backgroundColor-handle-Scroller};
-    }
-    &[data-scrolling="true"]::-webkit-scrollbar-track {
-      background-color: #{$backgroundColor-track-Scroller};
-    }
-    // Firefox: reveal while scrolling
     &[data-scrolling="true"] {
       scrollbar-color: #{$backgroundColor-handle-Scroller} #{$backgroundColor-track-Scroller};
     }
   }
 
-  // --- overlay: always visible ---
+  // overlay: always show themed scrollbar
   &[data-scroll-style="overlay"] {
     scrollbar-width: #{$size-Scroller};
     scrollbar-color: #{$backgroundColor-handle-Scroller} #{$backgroundColor-track-Scroller};
-
-    &::-webkit-scrollbar-thumb {
-      background-color: #{$backgroundColor-handle-Scroller};
-      border-radius: #{$borderRadius-handle-Scroller};
-    }
-    &::-webkit-scrollbar-track {
-      background-color: #{$backgroundColor-track-Scroller};
-    }
   }
 }
 
