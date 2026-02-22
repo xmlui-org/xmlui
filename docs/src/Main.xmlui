@@ -290,6 +290,11 @@
             />
             <NavLink
                 icon="article"
+                label="Toggle multiple items with shared state"
+                to="/howto/toggle-multiple-items-with-shared-state"
+            />
+            <NavLink
+                icon="article"
                 label="Sync selections between table and list views"
                 to="/howto/sync-selections-between-table-and-list-views"
             />
@@ -758,6 +763,11 @@
         <Page url="/howto/update-ui-optimistically">
             <DocumentPageNoTOC
                 content="{appGlobals.content['pages/howto/update-ui-optimistically.md']}"
+            />
+        </Page>
+        <Page url="/howto/toggle-multiple-items-with-shared-state">
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/howto/toggle-multiple-items-with-shared-state.md']}"
             />
         </Page>
         <Page url="/howto/make-a-table-responsive">
