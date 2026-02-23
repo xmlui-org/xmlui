@@ -752,12 +752,12 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
               properties: {
                 ...(a.properties || {}),
                 signerDate: now,
-              } as Annotation["properties"],
+              },
               modified: new Date(),
             }
           : a
       );
-      setInternalAnnotations(next as Annotation[]);
+      setInternalAnnotations(next);
       updateState?.({ annotations: next });
       setSignatureModalFieldId(null);
     }
@@ -779,12 +779,12 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
                 signerName: undefined,
                 signerFontIndex: undefined,
                 signerDate: undefined,
-              } as Annotation["properties"],
+              },
               modified: new Date(),
             }
           : a
       );
-      setInternalAnnotations(next as Annotation[]);
+      setInternalAnnotations(next);
       updateState?.({ annotations: next });
     }
 
