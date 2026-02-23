@@ -143,7 +143,7 @@
     "src/syntax"
   ],
   "bin": {
-    "xmlui": "./bin/bootstrap.js"
+    "xmlui": "dist/bin/index.js"
   },
   "clean-package": {
     "replace": {
@@ -197,46 +197,47 @@
       }
     }
   },
-  "main": "./src/index.ts",
+  "main": "./dist/standalone/xmlui-standalone.umd.js",
   "exports": {
     ".": {
-      "import": "./src/index.ts",
-      "require": "./src/index.ts"
+      "import": "./dist/lib/xmlui.js",
+      "require": "./dist/standalone/xmlui-standalone.umd.js"
+    },
+    "./language-server": {
+      "import": "./dist/for-node/server.js",
+      "require": "./dist/for-node/server.js"
     },
     "./parser": {
-      "import": "./src/parsers/xmlui-parser/index.ts",
-      "require": "./src/parsers/xmlui-parser/index.ts"
+      "import": "./dist/lib/xmlui-parser.js",
+      "require": "./dist/lib/xmlui-parser.js"
     },
     "./*.css": {
       "import": "./dist/lib/*.css",
       "require": "./dist/lib/*.css"
     },
     "./index.scss": {
-      "import": "./src/index.scss",
-      "require": "./src/index.scss"
+      "import": "./dist/lib/scss/index.scss",
+      "require": "./dist/lib/scss/index.scss"
     },
     "./themes.scss": {
-      "import": "./src/components-core/theming/_themes.scss"
+      "import": "./dist/lib/scss/components-core/theming/_themes.scss",
+      "require": "./dist/lib/scss/components-core/theming/_themes.scss"
     },
     "./vite-xmlui-plugin": {
-      "import": "./bin/vite-xmlui-plugin.ts",
-      "require": "./bin/vite-xmlui-plugin.ts"
-    },
-    "./language-server": {
-      "import": "./src/language-server/server.ts",
-      "require": "./src/language-server/server.ts"
+      "import": "./dist/for-node/vite-xmlui-plugin.js",
+      "require": "./dist/for-node/vite-xmlui-plugin.js"
     },
     "./syntax/monaco": {
-      "import": "./src/syntax/monaco/index.ts",
-      "require": "./src/syntax/monaco/index.ts"
+      "import": "./dist/lib/syntax-monaco.js",
+      "require": "./dist/lib/syntax-monaco.js"
     },
     "./syntax/textmate": {
-      "import": "./src/syntax/textMate/index.ts",
-      "require": "./src/syntax/textMate/index.ts"
+      "import": "./dist/lib/syntax-textmate.js",
+      "require": "./dist/lib/syntax-textmate.js"
     },
     "./testing": {
-      "import": "./src/testing/index.ts",
-      "require": "./src/testing/index.ts"
+      "import": "./dist/lib/testing.js",
+      "require": "./dist/lib/testing.js"
     }
   },
   "browserslist": {
@@ -256,5 +257,7 @@
   },
   "msw": {
     "workerDirectory": "src/testing/infrastructure/public"
-  }
+  },
+  "module": "./dist/lib/xmlui.js",
+  "types": "./dist/lib/xmlui.d.ts"
 }

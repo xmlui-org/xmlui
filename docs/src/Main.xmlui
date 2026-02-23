@@ -437,7 +437,7 @@
     </NavPanel>
     <Pages fallbackPath="/404" defaultScrollRestoration="true">
         <Page url="/">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/intro.md']}" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/intro.md']}" useDefault="{true}" />
         </Page>
         <Page url="/reactive-intro">
             <DocumentPageNoTOC

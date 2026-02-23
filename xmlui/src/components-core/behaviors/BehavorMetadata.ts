@@ -6,7 +6,7 @@ export type BehaviorMetadata = {
 
   // Optional friendly name of the behavior, used for display purposes. 
   // If not provided, the 'name' field will be used.
-  friendlyName: string;
+  friendlyName?: string;
 
   // Longer description of the behavior, used for display and debugging purposes
   description: string;
