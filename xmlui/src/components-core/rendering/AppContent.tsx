@@ -827,6 +827,49 @@ export function AppContent({
   // --- Create AppState object with global state management functions
   const AppState = useMemo(() => createAppState(appStateContextValue), [appStateContextValue]);
 
+  // --- Wrap toast to log calls to _xsLogs for test trace capture
+  const tracedToast = useMemo(() => {
+    function logToast(type: string, message: unknown) {
+      if (typeof window !== "undefined") {
+        const w = window as any;
+        if (Array.isArray(w._xsLogs)) {
+          w._xsLogs.push({
+            ts: Date.now(),
+            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+            traceId: w._xsCurrentTrace,
+            kind: "toast",
+            toastType: type,
+            message: typeof message === "string" ? message : String(message),
+          });
+        }
+      }
+    }
+    const wrapper: any = (message: unknown, opts?: any) => {
+      logToast("default", message);
+      return toast(message as any, opts);
+    };
+    wrapper.success = (message: unknown, opts?: any) => {
+      logToast("success", message);
+      return toast.success(message as any, opts);
+    };
+    wrapper.error = (message: unknown, opts?: any) => {
+      logToast("error", message);
+      return toast.error(message as any, opts);
+    };
+    wrapper.loading = (message: unknown, opts?: any) => {
+      logToast("loading", message);
+      return toast.loading(message as any, opts);
+    };
+    wrapper.custom = (message: unknown, opts?: any) => {
+      logToast("custom", message);
+      return toast.custom(message as any, opts);
+    };
+    wrapper.dismiss = toast.dismiss.bind(toast);
+    wrapper.remove = toast.remove.bind(toast);
+    wrapper.promise = toast.promise.bind(toast);
+    return wrapper;
+  }, []);
+
   // --- We assemble the app context object form the collected information
   const appContextValue = useMemo(() => {
     const ret: AppContextObject = {
@@ -866,7 +909,7 @@ export function AppContent({
       // --- Notifications and dialogs
       confirm,
       signError,
-      toast,
+      toast: tracedToast,
 
       // --- Theme-related
       activeThemeId,
