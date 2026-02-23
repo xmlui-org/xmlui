@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Color from "color";
 
 import { getVarKey } from "../theming/themeVars";
@@ -138,27 +138,11 @@ export function getSizeString(size: any): string {
 }
 
 export const useScrollbarWidth = () => {
-  const [scrollbarWidth, setScrollbarWidth] = useState(0);
+  const [scrollbarWidth, setScrollbarWidth] = useState(obtainScrollbarWidth());
 
   useEffect(() => {
-    const getScrollbarWidth = () => {
-      // Creating invisible container
-      const outer = document.createElement("div");
-      outer.style.visibility = "hidden";
-      outer.style.overflow = "scroll"; // forcing scrollbar to appear
-      document.body.appendChild(outer);
-
-      // Calculating difference between container's full width and the child width
-      const width = outer.offsetWidth - outer.clientWidth;
-
-      // Removing temporary elements from the DOM
-      outer.parentNode.removeChild(outer);
-
-      return width;
-    };
-
     function handleResize() {
-      let width = getScrollbarWidth();
+      let width = obtainScrollbarWidth();
       if (window.devicePixelRatio !== Math.round(window.devicePixelRatio)) {
         //zoomed in a weird ratio, sometimes shows a horizontal scrollbar
         width = width - 0.5;
@@ -191,4 +175,29 @@ export function extractPaddings(extractValue: ValueExtractor, props) {
     paddingTop: paddingTop || paddingVertical || padding,
     paddingBottom: paddingBottom || paddingVertical || padding,
   };
+}
+
+// HACK: Cache the scrollbar width to avoid unnecessary calculations on every call
+// This is especially beneficial if the scrollbar width is needed frequently, as it 
+// prevents the need to create and manipulate DOM elements multiple times.
+let cachedScrollbarWidth: number | null = null;
+
+function obtainScrollbarWidth() {
+  if (cachedScrollbarWidth !== null) {
+    return cachedScrollbarWidth;
+  }
+  // Creating invisible container
+  const outer = document.createElement("div");
+  outer.style.visibility = "hidden";
+  outer.style.overflow = "scroll"; // forcing scrollbar to appear
+  document.body.appendChild(outer);
+
+  // Calculating difference between container's full width and the child width
+  const width = outer.offsetWidth - outer.clientWidth;
+
+  // Removing temporary elements from the DOM
+  outer.parentNode.removeChild(outer);
+
+  cachedScrollbarWidth = width;
+  return width;
 }
