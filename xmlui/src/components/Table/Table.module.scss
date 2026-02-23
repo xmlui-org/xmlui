@@ -153,9 +153,10 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
     color: $textColor-Table;
 
     tbody {
-      display: inline-block;
+      display: block;
       min-width: 100%;
       background-color: $backgroundColor-Table;
+      margin-bottom: 1px;
     }
 
     .row,
