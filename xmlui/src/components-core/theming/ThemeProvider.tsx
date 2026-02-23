@@ -19,7 +19,6 @@ import { useComponentRegistry } from "../../components/ComponentRegistryContext"
 import {
   XmlUiBlogThemeDefinition,
   XmlUiCyanThemeDefinition,
-  XmlUiDocsThemeDefinition,
   XmlUiGrayThemeDefinition,
   XmlUiGreenThemeDefinition,
   XmlUiOrangeThemeDefinition,
@@ -241,7 +240,6 @@ export const builtInThemes: Array<ThemeDefinition> = [
   XmlUiPurpleThemeDefinition,
   XmlUiCyanThemeDefinition,
   XmlUiRedThemeDefinition,
-  XmlUiDocsThemeDefinition,
   XmlUiBlogThemeDefinition,
   XmlUiWebThemeDefinition,
   /*SolidThemeDefinition,*/

@@ -190,12 +190,20 @@ function StandaloneApp({
     };
   }, [appGlobals, globals, name]);
 
+  const themesWithExtensions = useMemo(
+    () => [
+      ...(themes || []),
+      ...(extensionManager?.registeredExtensions?.flatMap((ext) => ext.themes ?? []) ?? []),
+    ],
+    [themes, extensionManager],
+  );
+
   let contributes = useMemo(() => {
     return {
       compoundComponents: components,
-      themes,
+      themes: themesWithExtensions,
     };
-  }, [components, themes]);
+  }, [components, themesWithExtensions]);
 
   if (!standaloneApp) {
     // --- Problems found, the standalone app cannot run

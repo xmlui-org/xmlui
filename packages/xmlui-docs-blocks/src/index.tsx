@@ -30,9 +30,11 @@ import {
   getCardWidth,
   getCardIcon,
 } from "./utils/overviewHelpers";
+import { XmlUiDocsThemeDefinition } from "./themes/xmlui-docs";
 
 export default {
   namespace: "XMLUIExtensions",
+  themes: [XmlUiDocsThemeDefinition],
   components: [
     basicLayoutRenderer,
     featuredWithTabsLayoutRenderer,
