@@ -19,7 +19,12 @@ import styles from "./App.module.scss";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { RenderChildFn, RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useAppContext } from "../../components-core/AppContext";
-import { useIsomorphicLayoutEffect, useResizeObserver, useDocumentKeydown, useDocumentKeyup } from "../../components-core/utils/hooks";
+import {
+  useIsomorphicLayoutEffect,
+  useResizeObserver,
+  useDocumentKeydown,
+  useDocumentKeyup,
+} from "../../components-core/utils/hooks";
 import { useTheme, useThemes } from "../../components-core/theming/ThemeContext";
 import { useScrollbarWidth } from "../../components-core/utils/css-utils";
 import { Sheet, SheetContent } from "./Sheet";
@@ -289,8 +294,6 @@ export function App({
     style,
   ]);
 
-  console.log("styleWithHelpers", styleWithHelpers);
-
   // Track whether onReady has been called to ensure it only fires once
   const onReadyCalledRef = useRef(false);
 
@@ -475,7 +478,9 @@ export function App({
           <AppContextAwareAppHeader renderChild={renderChild} />
         )}
         {header}
-        {config.navPanelInHeader && navPanelVisible && <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>}
+        {config.navPanelInHeader && navPanelVisible && (
+          <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>
+        )}
       </AppHeaderSlot>
     </Part>
   );
@@ -518,7 +523,8 @@ export function App({
   const content = (
     <AppContainer
       className={classnames(wrapperBaseClasses, ...config.containerClasses, {
-        [styles.navPanelCollapsed]: navPanelVisible && navPanelCollapsed && config.useVerticalFullHeaderStructure,
+        [styles.navPanelCollapsed]:
+          navPanelVisible && navPanelCollapsed && config.useVerticalFullHeaderStructure,
       })}
       style={styleWithHelpers}
       ref={shouldContainerScroll ? pageScrollRef : undefined}

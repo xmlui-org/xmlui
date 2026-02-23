@@ -138,7 +138,7 @@ export function getSizeString(size: any): string {
 }
 
 export const useScrollbarWidth = () => {
-  const [scrollbarWidth, setScrollbarWidth] = useState(obtainScrollbarWidth());
+  const [scrollbarWidth, setScrollbarWidth] = useState(15);
 
   useEffect(() => {
     function handleResize() {
@@ -178,7 +178,7 @@ export function extractPaddings(extractValue: ValueExtractor, props) {
 }
 
 // HACK: Cache the scrollbar width to avoid unnecessary calculations on every call
-// This is especially beneficial if the scrollbar width is needed frequently, as it 
+// This is especially beneficial if the scrollbar width is needed frequently, as it
 // prevents the need to create and manipulate DOM elements multiple times.
 let cachedScrollbarWidth: number | null = null;
 
