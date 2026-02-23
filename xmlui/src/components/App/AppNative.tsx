@@ -289,6 +289,8 @@ export function App({
     style,
   ]);
 
+  console.log("styleWithHelpers", styleWithHelpers);
+
   // Track whether onReady has been called to ensure it only fires once
   const onReadyCalledRef = useRef(false);
 
