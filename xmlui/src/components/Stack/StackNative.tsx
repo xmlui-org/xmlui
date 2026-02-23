@@ -81,13 +81,9 @@ export const Stack = forwardRef(function Stack(
     horizontalAlignment,
     verticalAlignment,
   );
- 
+
   // Expose ref to parent
   useImperativeHandle(ref, () => containerRef.current as HTMLDivElement);
-
-  useEffect(() => {
-    console.log("Kacsa - desktopOnly", desktopOnly);
-  }, [desktopOnly]);
 
   // Register API methods
   useEffect(() => {
