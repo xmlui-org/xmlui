@@ -110,8 +110,8 @@ export default ({ mode = "lib" }) => {
     mode === "metadata"
       ? [ViteXmlui({})]
       : mode === "inspector-parser"
-        ? [dts({ rollupTypes: true })] // Minimal plugins for standalone parser
-        : [react(), svgr(), ViteYaml(), ViteXmlui({}), libInjectCss(), dts({ rollupTypes: true })];
+        ? [dts({ rollupTypes: true, exclude: ["src/testing/infrastructure/dist/**"] })] // Minimal plugins for standalone parser
+        : [react(), svgr(), ViteYaml(), ViteXmlui({}), libInjectCss(), dts({ rollupTypes: true, exclude: ["src/testing/infrastructure/dist/**"] })];
 
   if (mode === "lib") {
     plugins.push(
