@@ -120,42 +120,60 @@
             <Redirect when="{!post}" to="/404" />
         </Page>
     </Pages>
-    <Footer sticky="false">
-        <Text fontWeight="400">
-            This site is an
-            <Text variant="strong">
-                XMLUI™
+    <Theme
+        padding-Footer="$space-2 $space-4"
+        borderTop-Footer="1px solid $borderColor"
+        backgroundColor-Footer="$backgroundColor-AppHeader"
+        textColor-Footer="$textColor-secondary"
+        fontSize-Footer="15px"
+        verticalAlignment-Footer="center"
+        maxWidth-content-Footer="$maxWidth-content"
+        gap-Footer="$space-normal"
+        margin-Footer="0 auto"
+        color-surface="rgb(111, 110, 119)"
+        backgroundColor="$color-surface-0"
+        fontSize="15px"
+        textColor-Text="$color-surface-600"
+        textColor-Link="$color-surface-600"
+        textColor-Link--hover="$color-surface-900"
+    >
+        <Footer>
+            <Text fontWeight="400">
+                This site is an
+                <Text variant="strong">
+                    XMLUI™
+                </Text>
+                app.
             </Text>
-            app.
-        </Text>
-        <SpaceFiller />
-        <HStack verticalAlignment="center">
-            <Fragment when="{mediaSize.sizeIndex > 2}">
-                <LinkButton
-                    to="https://demo.xmlui.org"
-                    label="Gallery"
-                    blank="{true}"
-                />
-                <LinkButton
-                    to="https://xmlui.org/news"
-                    label="News & Reviews"
-                    blank="{true}"
-                />
-                <LinkButton
-                    to="https://docs.xmlui.org/change-log"
-                    label="Changelog"
-                    blank="{true}"
-                />
-                <Separator />
-                <LinkButton
-                    to="https://github.com/xmlui-org/xmlui"
-                    icon="github"
-                    label="GitHub"
-                    blank="{true}"
-                />
-                <Separator />
-            </Fragment>
-            <ToneSwitch />
-        </HStack>
-    </Footer>
+            <SpaceFiller />
+            <HStack verticalAlignment="center">
+                <Fragment when="{mediaSize.sizeIndex > 2}">
+                    <LinkButton
+                        to="https://demo.xmlui.org"
+                        label="Gallery"
+                        blank="{true}"
+                    />
+                    <LinkButton
+                        to="https://xmlui.org/news"
+                        label="News & Reviews"
+                        blank="{true}"
+                    />
+                    <LinkButton
+                        to="https://docs.xmlui.org/change-log"
+                        label="Changelog"
+                        blank="{true}"
+                    />
+                    <Separator />
+                    <LinkButton
+                        to="https://github.com/xmlui-org/xmlui"
+                        icon="github"
+                        label="GitHub"
+                        blank="{true}"
+                    />
+                    <Separator />
+                </Fragment>
+                <ToneSwitch />
+            </HStack>
+        </Footer>
+    </Theme>
 </App>
