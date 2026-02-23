@@ -101,6 +101,24 @@ export const AppMd = createMetadata({
         data: "The data sent from the other window via postMessage.",
       },
     },
+    keyDown: {
+      description:
+        `This event fires when a key is pressed while the \`${COMP}\` has focus or when the ` +
+        `event reaches the app level without being consumed by a child component.`,
+      signature: "(event: KeyboardEvent) => void",
+      parameters: {
+        event: "The keyboard event object.",
+      },
+    },
+    keyUp: {
+      description:
+        `This event fires when a key is released while the \`${COMP}\` has focus or when the ` +
+        `event reaches the app level without being consumed by a child component.`,
+      signature: "(event: KeyboardEvent) => void",
+      parameters: {
+        event: "The keyboard event object.",
+      },
+    },
   },
   themeVars: { ...parseScssVar(styles.themeVars), ...parseScssVar(drawerStyles.themeVars) },
   limitThemeVarsToComponent: true,
@@ -191,6 +209,8 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
       loggedInUser={extractValue(node.props.loggedInUser)}
       onReady={lookupEventHandler("ready")}
       onMessageReceived={lookupEventHandler("messageReceived")}
+      onKeyDown={lookupEventHandler("keyDown")}
+      onKeyUp={lookupEventHandler("keyUp")}
       name={extractValue(node.props.name)}
       logo={extractValue(node.props.logo)}
       logoDark={extractValue(node.props["logo-dark"])}
