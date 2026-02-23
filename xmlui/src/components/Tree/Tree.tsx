@@ -134,7 +134,7 @@ export const TreeMd = createMetadata({
         'scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar ' +
         "only while scrolling is active and fades out after 400ms of inactivity.",
       valueType: "string",
-      allowedValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
+      availableValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
       defaultValue: defaultProps.scrollStyle,
     },
     showScrollerFade: {

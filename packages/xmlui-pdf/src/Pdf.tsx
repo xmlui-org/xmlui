@@ -1,4 +1,4 @@
-import { createComponentRenderer, createMetadata, d, parseScssVar } from "xmlui";
+import { createComponentRenderer, createMetadata, d, parseScssVar, type ComponentMetadata } from "xmlui";
 import { LazyPdf } from "./LazyPdfNative";
 import styles from "./Pdf.module.scss";
 import type { Annotation } from "./types/annotation.types";
@@ -15,7 +15,7 @@ const defaultProps = {
   scrollStyle: "normal" as "normal" | "overlay" | "whenMouseOver" | "whenScrolling",
 };
 
-export const PdfMd = createMetadata({
+export const PdfMd: ComponentMetadata = createMetadata({
   description: `The \`${COMP}\` component provides a PDF viewer with annotation and signing capabilities.`,
   status: "experimental",
   props: {
@@ -62,7 +62,7 @@ export const PdfMd = createMetadata({
         `\`whenMouseOver\` hides scrollbars until the pointer enters the viewer. ` +
         `\`whenScrolling\` hides scrollbars and reveals them briefly while the user is actively scrolling.`,
       valueType: "string",
-      allowedValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
+      availableValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
       defaultValue: "normal",
     },
   },

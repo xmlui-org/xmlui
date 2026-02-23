@@ -757,7 +757,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
             }
           : a
       );
-      setInternalAnnotations(next);
+      setInternalAnnotations(next as any);
       updateState?.({ annotations: next });
       setSignatureModalFieldId(null);
     }
@@ -784,7 +784,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
             }
           : a
       );
-      setInternalAnnotations(next);
+      setInternalAnnotations(next as any);
       updateState?.({ annotations: next });
     }
 
