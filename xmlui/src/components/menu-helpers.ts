@@ -2,6 +2,34 @@ import type { ReactElement, ReactNode } from "react";
 import type { ComponentDef } from "../abstractions/ComponentDefs";
 
 /**
+ * Checks if a React element is a MenuSeparator.
+ * Since children are wrapped in ComponentWrapper, we need to check the node.type prop.
+ */
+function isSeparatorElement(child: ReactNode): boolean {
+  if (!child || typeof child !== "object" || !("props" in child)) {
+    return false;
+  }
+
+  const element = child as ReactElement;
+  
+  // Check if this is a ComponentWrapper with node.type === "MenuSeparator"
+  if (element.props && typeof element.props === "object" && "node" in element.props) {
+    const node = (element.props as any).node as ComponentDef | undefined;
+    if (node?.type === "MenuSeparator") {
+      return true;
+    }
+  }
+
+  // Fallback: check if element has role="separator" in its props
+  // This catches cases where the separator is already rendered as a DOM element
+  if (element.props?.role === "separator") {
+    return true;
+  }
+
+  return false;
+}
+
+/**
  * Helper function to filter out multiple adjacent MenuSeparator elements.
  * Keeps only one separator when multiple are adjacent.
  */
@@ -55,12 +83,7 @@ export function filterAdjacentSeparatorsFromChildren(children: ReactNode): React
   let previousWasSeparator = false;
 
   for (const child of validChildren) {
-    // Check if this child is a separator by looking for role="separator"
-    const isSeparator =
-      child &&
-      typeof child === "object" &&
-      "props" in child &&
-      (child as ReactElement).props?.role === "separator";
+    const isSeparator = isSeparatorElement(child);
 
     if (isSeparator) {
       // Only add the separator if:
@@ -77,13 +100,7 @@ export function filterAdjacentSeparatorsFromChildren(children: ReactNode): React
   }
 
   // Remove trailing separator if present
-  if (
-    filtered.length > 0 &&
-    filtered[filtered.length - 1] &&
-    typeof filtered[filtered.length - 1] === "object" &&
-    "props" in (filtered[filtered.length - 1] as ReactElement) &&
-    (filtered[filtered.length - 1] as ReactElement).props?.role === "separator"
-  ) {
+  if (filtered.length > 0 && isSeparatorElement(filtered[filtered.length - 1])) {
     filtered.pop();
   }
 
