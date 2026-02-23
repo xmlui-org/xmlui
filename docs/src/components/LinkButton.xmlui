@@ -5,7 +5,6 @@
     textColor-Link--hover="$textColor-Text"
     textColor-Link--active="$textColor-Text">
     <Link
-      when="{mediaSize.sizeIndex > 2}"
       to="{$props.to}"
       target="{$props.blank ? '_blank' : '_self'}"
       active="true">
