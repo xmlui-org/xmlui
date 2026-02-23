@@ -26,7 +26,6 @@ import {
   useDocumentKeyup,
 } from "../../components-core/utils/hooks";
 import { useTheme, useThemes } from "../../components-core/theming/ThemeContext";
-import { useScrollbarWidth } from "../../components-core/utils/css-utils";
 import { Sheet, SheetContent } from "./Sheet";
 import { AppContextAwareAppHeader } from "../AppHeader/AppHeaderNative";
 import type { AppLayoutType, IAppLayoutContext } from "../App/AppLayoutContext";
@@ -263,7 +262,6 @@ export function App({
   const contentScrollRef = useRef(null);
 
   const scrollContainerRef = scrollWholePage ? pageScrollRef : contentScrollRef;
-  const scrollbarWidth = useScrollbarWidth();
 
   const footerSize = useElementSizeObserver();
   const headerSize = useElementSizeObserver();
@@ -282,17 +280,8 @@ export function App({
       "--footer-height": needsHeightCompensation ? `${footerSize.height}px` : "0px",
       "--header-abs-height": headerSize.height + "px",
       "--footer-abs-height": footerSize.height + "px",
-      "--scrollbar-width": noScrollbarGutters ? "0px" : scrollbarWidth + "px",
     } as CSSProperties;
-  }, [
-    footerSize.height,
-    headerSize.height,
-    noScrollbarGutters,
-    safeLayout,
-    scrollWholePage,
-    scrollbarWidth,
-    style,
-  ]);
+  }, [footerSize.height, headerSize.height, safeLayout, scrollWholePage, style]);
 
   // Track whether onReady has been called to ensure it only fires once
   const onReadyCalledRef = useRef(false);
