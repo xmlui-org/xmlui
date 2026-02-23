@@ -619,7 +619,7 @@ function evalNewExpression(
   thread: LogicalThread,
 ): any {
   // --- Allowed constructors
-  const allowedConstructors = new Map([
+  const allowedConstructors = new Map<string, Function>([
     ["String", String],
     ["Date", Date],
     ["Blob", Blob],

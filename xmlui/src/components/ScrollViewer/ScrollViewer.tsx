@@ -23,7 +23,7 @@ export const ScrollViewerMd = createMetadata({
         "`whenMouseOver` shows overlay scrollbars that appear when the mouse hovers over the scroll area and hide after 200ms when the mouse leaves. " +
         "`whenScrolling` shows overlay scrollbars only during active scrolling and hides them after 400ms of inactivity.",
       valueType: "string",
-      allowedValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
+      availableValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
       defaultValue: defaultProps.scrollStyle,
     },
     showScrollerFade: {
