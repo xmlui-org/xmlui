@@ -130,7 +130,6 @@
         fontSize-Footer="15px"
         verticalAlignment-Footer="center"
         maxWidth-content-Footer="$maxWidth-content"
-        gap-Footer="$space-normal"
         margin-Footer="0 auto"
         color-surface="rgb(111, 110, 119)"
         backgroundColor="$color-surface-0"
@@ -138,6 +137,9 @@
         textColor-Text="$color-surface-600"
         textColor-Link="$color-surface-600"
         textColor-Link--hover="$color-surface-900"
+        lineHeight="1.7"
+        gap-Footer="8px"
+        fontWeight-Text-strong="600"
     >
         <Footer>
             <Text fontWeight="400">
