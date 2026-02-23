@@ -2,28 +2,65 @@
     layout="vertical-full-header"
     noScrollbarGutters="false"
 >
-    <AppHeader>
-        <property name="logoTemplate">
-            <Link to="https://xmlui.org/">
-                <Logo height="$space-8" />
-            </Link>
-        </property>
-        <HStack when="{mediaSize.sizeIndex > 2}" gap="0">
-            <NavLink noIndicator label="Docs" to="/" active />
-            <NavLink noIndicator label="Blog" to="https://blog.xmlui.org" />
-            <NavLink
-                to="https://www.xmlui.org/get-started"
-                noIndicator
-                label="Get started"
+    <Theme
+        backgroundColor-AppHeader="$color-surface-raised"
+        borderBottom-AppHeader="1px solid $borderColor"
+        paddingHorizontal-AppHeader="$space-4"
+        paddingLeft-AppHeader="$paddingHorizontal-AppHeader"
+        paddingRight-AppHeader="$paddingHorizontal-AppHeader"
+        paddingTop-AppHeader="$paddingVertical-AppHeader"
+        paddingBottom-AppHeader="$paddingVertical-AppHeader"
+        padding-AppHeader="$paddingTop-AppHeader $paddingRight-AppHeader $paddingBottom-AppHeader $paddingLeft-AppHeader"
+        paddingHorizontal-logo-AppHeader="$space-0"
+        paddingVertical-logo-AppHeader="$space-4"
+        paddingLeft-logo-AppHeader="$paddingHorizontal-logo-AppHeader"
+        paddingRight-logo-AppHeader="$paddingHorizontal-logo-AppHeader"
+        paddingTop-logo-AppHeader="$paddingVertical-logo-AppHeader"
+        paddingBottom-logo-AppHeader="$paddingVertical-logo-AppHeader"
+        padding-logo-AppHeader="$paddingTop-logo-AppHeader $paddingRight-logo-AppHeader $paddingBottom-logo-AppHeader $paddingLeft-logo-AppHeader"
+        maxWidth-content-AppHeader="$maxWidth-content-App"
+        maxWidth-AppHeader="$maxWidth-App"
+        padding-drawerToggle-AppHeader="$space-0_5"
+        borderRadius-AppHeader="0px"
+        color-surface="rgb(111, 110, 119)"
+        backgroundColor="$color-surface-0"
+        fontSize="15px"
+        textColor-Text="$color-surface-600"
+        iconAlignment-NavLink="baseline"
+        fontSize-NavLink="14px"
+        fontWeight-NavLink="500"
+        textColor-NavLink="$color-surface-500"
+        textColor-NavLink--active="$color-surface-900"
+        textColor-NavLink--hover="$color-surface-700"
+        textColor-NavLink--hover--active="$color-surface-900"
+        textColor-NavLink--pressed="$color-surface-900"
+        thickness-indicator-NavLink="0"
+        paddingVertical-NavLink="$space-1_5"
+        paddingLeft-level1-NavLink="$space-0"
+    >
+        <AppHeader>
+            <property name="logoTemplate">
+                <Link to="https://xmlui.org/">
+                    <Logo height="$space-8" />
+                </Link>
+            </property>
+            <HStack when="{mediaSize.sizeIndex > 2}" gap="0">
+                <NavLink noIndicator label="Docs" to="/" active />
+                <NavLink noIndicator label="Blog" to="https://blog.xmlui.org" />
+                <NavLink
+                    to="https://www.xmlui.org/get-started"
+                    noIndicator
+                    label="Get started"
+                />
+            </HStack>
+            <SpaceFiller />
+            <Search
+                collapsible="true"
+                when="{mediaSize.sizeIndex > 1}"
+                data="{appGlobals.plainTextContent}"
             />
-        </HStack>
-        <SpaceFiller />
-        <Search
-            collapsible="true"
-            when="{mediaSize.sizeIndex > 1}"
-            data="{appGlobals.plainTextContent}"
-        />
-    </AppHeader>
+        </AppHeader>
+    </Theme>
     <NavPanel
         when="{(!globalThis.location.hash.includes('/404') && !globalThis.location.pathname.includes('/404')) || mediaSize.sizeIndex <= 2}"
         scrollStyle="whenScrolling"
