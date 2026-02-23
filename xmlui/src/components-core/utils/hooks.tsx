@@ -135,6 +135,20 @@ export function useDocumentKeydown(onDocumentKeydown: (event: KeyboardEvent) => 
 }
 
 /**
+ * This hook runs a callback function when a key is released in the document window.
+ * @param onDocumentKeyup Callback function to run
+ */
+export function useDocumentKeyup(onDocumentKeyup: (event: KeyboardEvent) => void) {
+  const onKeyUp = useEvent(onDocumentKeyup);
+  useEffect(() => {
+    document.addEventListener("keyup", onKeyUp);
+    return () => {
+      document.removeEventListener("keyup", onKeyUp);
+    };
+  }, [onKeyUp]);
+}
+
+/**
  * This hook runs a function when the corresponding component has been mounted.
  * @param onMount
  */

@@ -19,7 +19,7 @@ import styles from "./App.module.scss";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { RenderChildFn, RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useAppContext } from "../../components-core/AppContext";
-import { useIsomorphicLayoutEffect, useResizeObserver } from "../../components-core/utils/hooks";
+import { useIsomorphicLayoutEffect, useResizeObserver, useDocumentKeydown, useDocumentKeyup } from "../../components-core/utils/hooks";
 import { useTheme, useThemes } from "../../components-core/theming/ThemeContext";
 import { useScrollbarWidth } from "../../components-core/utils/css-utils";
 import { Sheet, SheetContent } from "./Sheet";
@@ -79,6 +79,8 @@ type Props = {
   noScrollbarGutters?: boolean;
   onReady?: () => void;
   onMessageReceived?: (data: any, event: MessageEvent) => void;
+  onKeyDown?: (event: KeyboardEvent) => void;
+  onKeyUp?: (event: KeyboardEvent) => void;
   navPanelDef?: ComponentDef;
   logoContentDef?: ComponentDef;
   renderChild?: RenderChildFn;
@@ -103,6 +105,8 @@ export const defaultProps: Pick<
   | "autoDetectTone"
   | "onReady"
   | "onMessageReceived"
+  | "onKeyDown"
+  | "onKeyUp"
 > = {
   scrollWholePage: true,
   noScrollbarGutters: false,
@@ -111,6 +115,8 @@ export const defaultProps: Pick<
   autoDetectTone: false,
   onReady: noop,
   onMessageReceived: noop,
+  onKeyDown: noop,
+  onKeyUp: noop,
 };
 
 /**
@@ -153,6 +159,8 @@ export function App({
   noScrollbarGutters = defaultProps.noScrollbarGutters,
   onReady = defaultProps.onReady,
   onMessageReceived = defaultProps.onMessageReceived,
+  onKeyDown = defaultProps.onKeyDown,
+  onKeyUp = defaultProps.onKeyUp,
   header,
   navPanel,
   footer,
@@ -225,6 +233,14 @@ export function App({
       window.removeEventListener("message", handleMessage);
     };
   }, [onMessageReceived]);
+
+  useDocumentKeydown((event: KeyboardEvent) => {
+    onKeyDown?.(event);
+  });
+
+  useDocumentKeyup((event: KeyboardEvent) => {
+    onKeyUp?.(event);
+  });
 
   // Determine if NavPanel should be visible inline (not in drawer)
   // On large screens: always show inline

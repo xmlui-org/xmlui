@@ -456,6 +456,22 @@ Here is a more complex example built on star-sizing:
 
 ## Events [#events]
 
+### `keyDown` [#keydown]
+
+This event fires when a key is pressed while the `App` has focus or when the event reaches the app level without being consumed by a child component.
+
+**Signature**: `(event: KeyboardEvent) => void`
+
+- `event`: The keyboard event object.
+
+### `keyUp` [#keyup]
+
+This event fires when a key is released while the `App` has focus or when the event reaches the app level without being consumed by a child component.
+
+**Signature**: `(event: KeyboardEvent) => void`
+
+- `event`: The keyboard event object.
+
 ### `messageReceived` [#messagereceived]
 
 This event fires when the `App` component receives a message from another window or iframe via the window.postMessage API.
