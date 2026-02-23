@@ -41,20 +41,22 @@
                     <Logo height="$space-8" />
                 </Link>
             </property>
-            <HStack when="{mediaSize.sizeIndex > 2}" gap="0">
-                <NavLink
-                    noIndicator
-                    label="Docs"
-                    to="https://docs.xmlui.org"
-                />
-                <NavLink
-                    noIndicator
-                    label="Blog"
-                    to="https://blog.xmlui.org"
-                    active
-                />
-                <NavLink to="https://xmlui.org/get-started" noIndicator label="Get started"/>
-            </HStack>
+            <Stack desktopOnly>
+                <HStack gap="0">
+                    <NavLink
+                        noIndicator
+                        label="Docs"
+                        to="https://docs.xmlui.org"
+                    />
+                    <NavLink
+                        noIndicator
+                        label="Blog"
+                        to="https://blog.xmlui.org"
+                        active
+                    />
+                    <NavLink to="https://xmlui.org/get-started" noIndicator label="Get started"/>
+                </HStack>
+            </Stack>
             <property name="profileMenuTemplate">
                 <Search
                     collapsible="true"
@@ -143,35 +145,37 @@
                 <Text variant="strong">
                     XMLUI™
                 </Text>
-                app.
+                app. 
             </Text>
             <SpaceFiller />
             <HStack verticalAlignment="center">
-                <Fragment when="{mediaSize.sizeIndex > 2}">
-                    <LinkButton
-                        to="https://demo.xmlui.org"
-                        label="Gallery"
-                        blank="{true}"
-                    />
-                    <LinkButton
-                        to="https://xmlui.org/news"
-                        label="News & Reviews"
-                        blank="{true}"
-                    />
-                    <LinkButton
-                        to="https://docs.xmlui.org/change-log"
-                        label="Changelog"
-                        blank="{true}"
-                    />
-                    <Separator />
-                    <LinkButton
-                        to="https://github.com/xmlui-org/xmlui"
-                        icon="github"
-                        label="GitHub"
-                        blank="{true}"
-                    />
-                    <Separator />
-                </Fragment>
+               <Stack desktopOnly>
+                    <CHStack>
+                        <LinkButton
+                            to="https://demo.xmlui.org"
+                            label="Gallery"
+                            blank="{true}"
+                        />
+                        <LinkButton
+                            to="https://xmlui.org/news"
+                            label="News & Reviews"
+                            blank="{true}"
+                        />
+                        <LinkButton
+                            to="https://docs.xmlui.org/change-log"
+                            label="Changelog"
+                            blank="{true}"
+                        />
+                        <Separator />
+                        <LinkButton
+                            to="https://github.com/xmlui-org/xmlui"
+                            icon="github"
+                            label="GitHub"
+                            blank="{true}"
+                        />
+                        <Separator />
+                    </CHStack>
+                </Stack>
                 <ToneSwitch />
             </HStack>
         </Footer>

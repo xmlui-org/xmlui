@@ -44,15 +44,21 @@
                     <Logo height="$space-8" />
                 </Link>
             </property>
-            <HStack when="{mediaSize.sizeIndex > 2}" gap="0">
-                <NavLink noIndicator label="Docs" to="/" active />
-                <NavLink noIndicator label="Blog" to="https://blog.xmlui.org" />
-                <NavLink
-                    to="https://www.xmlui.org/get-started"
-                    noIndicator
-                    label="Get started"
-                />
-            </HStack>
+            <Stack desktopOnly>
+                <HStack gap="0">
+                    <NavLink noIndicator label="Docs" to="/" active />
+                    <NavLink
+                        noIndicator
+                        label="Blog"
+                        to="https://blog.xmlui.org"
+                    />
+                    <NavLink
+                        to="https://www.xmlui.org/get-started"
+                        noIndicator
+                        label="Get started"
+                    />
+                </HStack>
+            </Stack>
             <SpaceFiller />
             <Search
                 collapsible="true"
@@ -136,7 +142,11 @@
             </NavGroup>
         </Stack>
         <NavGroup label="Guides" to="/guides">
-            <NavLink icon="hierarchy" label="App Structure" to="/guides/app-structure" />
+            <NavLink
+                icon="hierarchy"
+                label="App Structure"
+                to="/guides/app-structure"
+            />
             <NavLink icon="markup" label="Markup" to="/guides/markup" />
             <NavLink icon="bolt" label="Scripting" to="/guides/scripting" />
             <NavLink icon="boundary" label="Scoping" to="/guides/scoping" />
@@ -162,7 +172,11 @@
                 to="/guides/routing-and-links"
             />
             <NavLink icon="form" label="Forms" to="/guides/forms" />
-            <NavLink icon="dialog" label="Modal Dialogs" to="/guides/modal-dialogs" />
+            <NavLink
+                icon="dialog"
+                label="Modal Dialogs"
+                to="/guides/modal-dialogs"
+            />
             <NavLink
                 icon="component"
                 label="User-defined Components"
@@ -930,31 +944,33 @@
             </Text>
             <SpaceFiller />
             <HStack verticalAlignment="center">
-                <Fragment when="{mediaSize.sizeIndex > 2}">
-                    <LinkButton
-                        to="https://demo.xmlui.org"
-                        label="Gallery"
-                        blank="{true}"
-                    />
-                    <LinkButton
-                        to="https://xmlui.org/news"
-                        label="News & Reviews"
-                        blank="{true}"
-                    />
-                    <LinkButton
-                        to="https://docs.xmlui.org/change-log"
-                        label="Changelog"
-                        blank="{true}"
-                    />
-                    <Separator />
-                    <LinkButton
-                        to="https://github.com/xmlui-org/xmlui"
-                        icon="github"
-                        label="GitHub"
-                        blank="{true}"
-                    />
-                    <Separator />
-                </Fragment>
+                <Stack desktopOnly>
+                    <CHStack>
+                        <LinkButton
+                            to="https://demo.xmlui.org"
+                            label="Gallery"
+                            blank="{true}"
+                        />
+                        <LinkButton
+                            to="https://xmlui.org/news"
+                            label="News & Reviews"
+                            blank="{true}"
+                        />
+                        <LinkButton
+                            to="https://docs.xmlui.org/change-log"
+                            label="Changelog"
+                            blank="{true}"
+                        />
+                        <Separator />
+                        <LinkButton
+                            to="https://github.com/xmlui-org/xmlui"
+                            icon="github"
+                            label="GitHub"
+                            blank="{true}"
+                        />
+                        <Separator />
+                    </CHStack>
+                </Stack>
                 <ToneSwitch />
             </HStack>
         </Footer>
