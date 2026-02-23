@@ -609,7 +609,7 @@ async function evalNewExpressionAsync(
   thread: LogicalThread,
 ): Promise<any> {
   // --- Allowed constructors
-  const allowedConstructors = new Map([
+  const allowedConstructors = new Map<string, new (...args: any[]) => any>([
     ["String", String],
     ["Date", Date],
     ["Blob", Blob],
