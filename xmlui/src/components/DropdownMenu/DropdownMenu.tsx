@@ -14,7 +14,6 @@ import {
   MenuSeparator,
   SubMenuItem,
 } from "./DropdownMenuNative";
-import { filterAdjacentSeparators } from "../menu-helpers";
 
 const DDMCOMP = "DropdownMenu";
 
@@ -114,8 +113,8 @@ export const dropdownMenuComponentRenderer = createComponentRenderer(
   DDMCOMP,
   DropdownMenuMd,
   ({ node, extractValue, renderChild, registerComponentApi, className, lookupEventHandler }) => {
-    // Filter adjacent separators before rendering to prevent flash
-    const filteredChildren = filterAdjacentSeparators(node.children);
+    // Note: Adjacent separator filtering happens at runtime in DropdownMenuNative
+    // to properly handle 'when' conditions on menu items
     
     return (
       <DropdownMenu
@@ -132,7 +131,7 @@ export const dropdownMenuComponentRenderer = createComponentRenderer(
         triggerButtonIconPosition={extractValue(node.props.triggerButtonIconPosition)}
         modal={extractValue.asOptionalBoolean(node.props.modal)}
       >
-        {renderChild(filteredChildren)}
+        {renderChild(node.children)}
       </DropdownMenu>
     );
   },
@@ -266,8 +265,8 @@ export const subMenuItemRenderer = createComponentRenderer(
   SubMenuItemMd,
   ({ node, renderChild, extractValue }) => {
     const iconName = extractValue(node.props?.icon);
-    // Filter adjacent separators before rendering to prevent flash
-    const filteredChildren = filterAdjacentSeparators(node.children);
+    // Note: Adjacent separator filtering happens at runtime in SubMenuItem
+    // to properly handle 'when' conditions on menu items
     
     return (
       <SubMenuItem
@@ -280,7 +279,7 @@ export const subMenuItemRenderer = createComponentRenderer(
         }
         triggerTemplate={renderChild(node.props?.triggerTemplate)}
       >
-        {renderChild(filteredChildren)}
+        {renderChild(node.children)}
       </SubMenuItem>
     );
   },

@@ -5,6 +5,7 @@ import {
   createContext,
   useContext,
   useCallback,
+  useMemo,
 } from "react";
 import { useEffect, useState, useRef } from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
@@ -23,6 +24,7 @@ import type {
 } from "../abstractions";
 import { Button } from "../Button/ButtonNative";
 import { Icon } from "../Icon/IconNative";
+import { filterAdjacentSeparatorsFromChildren } from "../menu-helpers";
 
 // Context to manage dropdown menu state
 type DropdownMenuContextType = {
@@ -116,6 +118,12 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
 
   const contentRef = useRef<HTMLDivElement>(null);
 
+  // Filter adjacent separators from rendered children (after 'when' conditions are evaluated)
+  const filteredChildren = useMemo(
+    () => filterAdjacentSeparatorsFromChildren(children),
+    [children]
+  );
+
   return (
     <DropdownMenuContext.Provider value={{ closeMenu }}>
       <DropdownMenuPrimitive.Root
@@ -173,7 +181,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
             tabIndex={-1}
             loop={true}
           >
-            {children}
+            {filteredChildren}
           </DropdownMenuPrimitive.Content>
         </DropdownMenuPrimitive.Portal>
       </DropdownMenuPrimitive.Root>
@@ -264,6 +272,12 @@ export const SubMenuItem = forwardRef<HTMLDivElement, SubMenuItemProps>(function
   const [open, setOpen] = useState(false);
   const iconToStart = iconPosition === "start";
 
+  // Filter adjacent separators from rendered children (after 'when' conditions are evaluated)
+  const filteredChildren = useMemo(
+    () => filterAdjacentSeparatorsFromChildren(children),
+    [children]
+  );
+
   return (
     <DropdownMenuPrimitive.Sub open={open} onOpenChange={setOpen}>
       <DropdownMenuPrimitive.SubTrigger ref={ref} className={styles.DropdownMenuSubTrigger} asChild>
@@ -284,7 +298,7 @@ export const SubMenuItem = forwardRef<HTMLDivElement, SubMenuItemProps>(function
           sideOffset={2}
           loop={true}
         >
-          {children}
+          {filteredChildren}
         </DropdownMenuPrimitive.SubContent>
       </DropdownMenuPrimitive.Portal>
     </DropdownMenuPrimitive.Sub>

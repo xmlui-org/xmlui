@@ -4,8 +4,6 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata } from "../metadata-helpers";
 import { ContextMenu } from "./ContextMenuNative";
-import type { ContainerWrapperDef } from "../../components-core/rendering/ContainerWrapper";
-import { filterAdjacentSeparators } from "../menu-helpers";
 
 const CMCOMP = "ContextMenu";
 
@@ -65,17 +63,12 @@ export const ContextMenuMd = createMetadata({
 export const contextMenuComponentRenderer = createComponentRenderer(
   CMCOMP,
   ContextMenuMd,
-  ({ node, extractValue, renderChild, registerComponentApi, className, state, updateState }) => {
-    // Filter adjacent separators before rendering to prevent flash
-    const filteredChildren = filterAdjacentSeparators(node.children);
-    
-    // Wrap filtered children with $context variable
-    const nodeWithContextVars: ContainerWrapperDef = {
-      type: "Container",
-      contextVars: { $context: state.$context },
-      children: filteredChildren,
-    };
-    
+  ({ node, extractValue, renderChild, registerComponentApi, className, updateState }) => {
+    // Note: Adjacent separator filtering happens at runtime in ContextMenuNative
+    // to properly handle 'when' conditions on menu items
+    //
+    // Note: $context is injected into the ContextMenu's state via updateState()
+    // and is accessible to children through normal parent state inheritance
     return (
       <ContextMenu
         registerComponentApi={registerComponentApi}
@@ -83,7 +76,7 @@ export const contextMenuComponentRenderer = createComponentRenderer(
         className={className}
         menuWidth={extractValue(node.props.menuWidth)}
       >
-        {renderChild(nodeWithContextVars)}
+        {renderChild(node.children)}
       </ContextMenu>
     );
   },

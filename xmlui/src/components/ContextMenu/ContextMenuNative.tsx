@@ -6,6 +6,7 @@ import {
   useState,
   useEffect,
   useRef,
+  useMemo,
 } from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import classnames from "classnames";
@@ -15,6 +16,7 @@ import styles from "./ContextMenu.module.scss";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { DropdownMenuContext } from "../DropdownMenu/DropdownMenuNative";
+import { filterAdjacentSeparatorsFromChildren } from "../menu-helpers";
 
 type ContextMenuProps = {
   children?: ReactNode;
@@ -46,6 +48,12 @@ export const ContextMenu = forwardRef(function ContextMenu(
   const [contentReady, setContentReady] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const effectiveMenuWidth = menuWidth ?? getThemeVar("minWidth-ContextMenu") ?? "160px";
+
+  // Filter adjacent separators from rendered children (after 'when' conditions are evaluated)
+  const filteredChildren = useMemo(
+    () => filterAdjacentSeparatorsFromChildren(children),
+    [children]
+  );
 
   const getContainerInfo = useCallback(() => {
     if (!root || root === document.body) {
@@ -191,7 +199,7 @@ export const ContextMenu = forwardRef(function ContextMenu(
             onEscapeKeyDown={closeMenu}
             onInteractOutside={closeMenu}
           >
-            {children}
+            {filteredChildren}
           </DropdownMenuPrimitive.Content>
         </DropdownMenuPrimitive.Portal>
       </DropdownMenuPrimitive.Root>
