@@ -517,7 +517,9 @@
 
     <!-- Blog routes -->
     <Page url="/blog">
-      <BlogOverview />
+      <Theme themeId="xmlui-blog">
+        <BlogOverview />
+      </Theme>
     </Page>
     <Page
       url="/blog/:slug"
@@ -526,11 +528,13 @@
               return { params: { slug: p.slug } };
             })}"
     >
-      <script>
-        var post = posts.find(p => p.slug === $routeParams.slug)
-      </script>
-      <BlogPage when="{post}" post="{post}" />
-      <Redirect when="{!post}" to="/404" />
+      <Theme themeId="xmlui-blog">
+        <script>
+          var post = posts.find(p => p.slug === $routeParams.slug)
+        </script>
+        <BlogPage when="{post}" post="{post}" />
+        <Redirect when="{!post}" to="/404" />
+      </Theme>
     </Page>
 
     <!-- Docs routes with /docs prefix -->
