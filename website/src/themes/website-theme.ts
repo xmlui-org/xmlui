@@ -11,6 +11,11 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "maxWidth-content-App": "1000px",
     "maxWidth-content-NoToc": "700px",
 
+    layout: "basic",
+    tableOfContents: "false",
+    tags: "false",
+
+
     // --- Colors & typography
     "color-surface": "rgb(111, 110, 119)",
     "backgroundColor": "$color-surface-0",

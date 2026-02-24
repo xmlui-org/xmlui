@@ -461,7 +461,7 @@
 
   <Pages fallbackPath="/404" defaultScrollRestoration="true">
     <Page url="/">
-      <Theme themeId="xmlui-website-theme">
+      <Theme themeId="xmlui-web">
         <Headlines />
         <HeroApp />
         <Benefits />
