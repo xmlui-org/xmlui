@@ -1,7 +1,24 @@
 <App
   layout="vertical-full-header"
   noScrollbarGutters="false"
-  global.currentSegment="home"
+  global.currentSegment="{(() => {
+    const path = globalThis?.location?.pathname || '/';
+    if (!path || path === '/') {
+      return 'home';
+    } else if (path.startsWith('/docs')) {
+      return 'docs';
+    } else if (path.startsWith('/blog')) {
+      return 'blog';
+    } else if (path.startsWith('/get-started')) {
+      return 'get-started';
+    } else if (path.startsWith('/news')) {
+      return 'news';
+    } else if (path.includes('/404')) {
+      return '404';
+    } else {
+      return path;
+    }
+  })()}"
   onDidNavigate="(ev) => {
     if (!ev || ev === '/' || ev === '') {
       currentSegment = 'home';
