@@ -394,6 +394,11 @@
                 label="Add custom icons"
                 to="/howto/add-custom-icons"
             />
+            <NavLink
+                icon="article"
+                label="Use a local XMLUI framework with the dev server"
+                to="/howto/use-a-local-xmlui-framework-with-the-dev-server"
+            />
             <!-- Add more links as additional files are created -->
         </NavGroup
         >
@@ -876,6 +881,12 @@
         <Page url="/howto/add-custom-icons">
             <DocumentPageNoTOC
                 content="{appGlobals.content['pages/howto/add-custom-icons.md']}"
+            />
+        </Page>
+
+        <Page url="/howto/use-a-local-xmlui-framework-with-the-dev-server">
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/howto/use-a-local-xmlui-framework-with-the-dev-server.md']}"
             />
         </Page>
 
