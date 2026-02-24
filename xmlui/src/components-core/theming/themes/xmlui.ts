@@ -81,8 +81,8 @@ export const XmlUiBlogThemeDefinition: ThemeDefinition = {
   color: "$color-primary-500",
   themeVars: {
     // --- Blog layout config
-    layout: "featuredWithTabs",
-    //layout: "basic",
+    //layout: "featuredWithTabs",
+    layout: "basic",
     tableOfContents: "false",
     tags: "false",
 
