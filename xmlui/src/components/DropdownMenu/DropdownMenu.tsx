@@ -14,7 +14,7 @@ import {
   MenuSeparator,
   SubMenuItem,
 } from "./DropdownMenuNative";
-import { filterAdjacentSeparators } from "../menu-helpers";
+import { filterSeparators } from "../menu-helpers";
 
 const DDMCOMP = "DropdownMenu";
 
@@ -114,8 +114,9 @@ export const dropdownMenuComponentRenderer = createComponentRenderer(
   DDMCOMP,
   DropdownMenuMd,
   ({ node, extractValue, renderChild, registerComponentApi, className, lookupEventHandler }) => {
-    // Filter adjacent separators before rendering to prevent flash
-    const filteredChildren = filterAdjacentSeparators(node.children);
+    // Filter separators dynamically: accounts for adjacent/leading/trailing separators
+    // and `when` conditions on menu items so hidden items don't leave orphaned separators.
+    const filteredChildren = filterSeparators(node.children, extractValue);
     
     return (
       <DropdownMenu
@@ -266,8 +267,9 @@ export const subMenuItemRenderer = createComponentRenderer(
   SubMenuItemMd,
   ({ node, renderChild, extractValue }) => {
     const iconName = extractValue(node.props?.icon);
-    // Filter adjacent separators before rendering to prevent flash
-    const filteredChildren = filterAdjacentSeparators(node.children);
+    // Filter separators dynamically: accounts for adjacent/leading/trailing separators
+    // and `when` conditions on submenu items so hidden items don't leave orphaned separators.
+    const filteredChildren = filterSeparators(node.children, extractValue);
     
     return (
       <SubMenuItem

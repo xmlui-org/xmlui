@@ -196,9 +196,9 @@ test("removes multiple adjacent separators", async ({ initTestBed, page, createC
   await expect(page.getByRole("menuitem", { name: "Item 2" })).toBeVisible();
   await expect(page.getByRole("menuitem", { name: "Item 3" })).toBeVisible();
 
-  // Check that only 2 separators are rendered (not 4), since adjacent ones should be removed
+  // Check that only 1 separator is rendered: adjacent duplicates collapse and the trailing separator is removed
   const separators = driver.getMenuSeparators();
-  await expect(separators).toHaveCount(2);
+  await expect(separators).toHaveCount(1);
 });
 
 test("supports submenus", async ({ initTestBed, page, createContextMenuDriver }) => {
@@ -252,6 +252,143 @@ test("handles disabled menu items", async ({ initTestBed, page, createContextMen
   // Disabled item should not respond
   await page.getByText("Disabled Item").click();
   await expect.poll(testStateDriver.testState).not.toEqual("disabled-clicked");
+  });
+
+  test("shows separators correctly when conditional items are visible (even count)", async ({
+  initTestBed,
+  page,
+  createContextMenuDriver,
+}) => {
+  await initTestBed(`
+    <App var.count="{0}">
+      <Button testId="counter" onClick="count++">Count: {count}</Button>
+      <Card testId="target" title="Target" onContextMenu="ev => menu.openAt(ev)">
+        <Text value="Right click me" />
+      </Card>
+      <ContextMenu id="menu">
+        <MenuItem>Item 1</MenuItem>
+        <MenuItem>Item 2</MenuItem>
+        <MenuSeparator />
+        <MenuSeparator />
+        <SubMenuItem label="Submenu">
+          <MenuItem>Submenu Item 1</MenuItem>
+          <MenuItem>Submenu Item 2</MenuItem>
+        </SubMenuItem>
+        <MenuSeparator />
+        <MenuItem when="{count % 2 === 0}">Other Item 1</MenuItem>
+        <MenuSeparator />
+        <MenuItem when="{count % 2 === 0}">Other Item 2</MenuItem>
+        <MenuSeparator />
+      </ContextMenu>
+    </App>
+  `);
+  const driver = await createContextMenuDriver("menu");
+
+  // count = 0 (even): conditional items are visible
+  await page.getByTestId("target").click({ button: "right" });
+  await expect(page.getByRole("menuitem", { name: "Item 1", exact: true })).toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Item 2", exact: true })).toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Other Item 1", exact: true })).toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Other Item 2", exact: true })).toBeVisible();
+
+  // 3 separators: between Item2/Submenu, Submenu/OtherItem1, OtherItem1/OtherItem2
+  // Adjacent duplicate at top collapses to 1; trailing separator is removed
+  const separators = driver.getMenuSeparators();
+  await expect(separators).toHaveCount(3);
+  });
+
+  test("hides orphaned separators when conditional items are hidden (odd count)", async ({
+  initTestBed,
+  page,
+  createContextMenuDriver,
+}) => {
+  await initTestBed(`
+    <App var.count="{0}">
+      <Button testId="counter" onClick="count++">Count: {count}</Button>
+      <Card testId="target" title="Target" onContextMenu="ev => menu.openAt(ev)">
+        <Text value="Right click me" />
+      </Card>
+      <ContextMenu id="menu">
+        <MenuItem>Item 1</MenuItem>
+        <MenuItem>Item 2</MenuItem>
+        <MenuSeparator />
+        <MenuSeparator />
+        <SubMenuItem label="Submenu">
+          <MenuItem>Submenu Item 1</MenuItem>
+          <MenuItem>Submenu Item 2</MenuItem>
+        </SubMenuItem>
+        <MenuSeparator />
+        <MenuItem when="{count % 2 === 0}">Other Item 1</MenuItem>
+        <MenuSeparator />
+        <MenuItem when="{count % 2 === 0}">Other Item 2</MenuItem>
+        <MenuSeparator />
+      </ContextMenu>
+    </App>
+  `);
+  const driver = await createContextMenuDriver("menu");
+
+  // Increment to count = 1 (odd): conditional items are hidden
+  await page.getByTestId("counter").click();
+
+  await page.getByTestId("target").click({ button: "right" });
+  await expect(page.getByRole("menuitem", { name: "Item 1", exact: true })).toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Item 2", exact: true })).toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Other Item 1", exact: true })).not.toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Other Item 2", exact: true })).not.toBeVisible();
+
+  // Only 1 separator remains: between Item 2 and Submenu
+  // Separators adjacent to hidden items and trailing separator are removed
+  const separators = driver.getMenuSeparators();
+  await expect(separators).toHaveCount(1);
+  });
+
+  test("restores separators when conditional items become visible again", async ({
+  initTestBed,
+  page,
+  createContextMenuDriver,
+}) => {
+  await initTestBed(`
+    <App var.count="{0}">
+      <Button testId="counter" onClick="count++">Count: {count}</Button>
+      <Card testId="target" title="Target" onContextMenu="ev => menu.openAt(ev)">
+        <Text value="Right click me" />
+      </Card>
+      <ContextMenu id="menu">
+        <MenuItem>Item 1</MenuItem>
+        <MenuItem>Item 2</MenuItem>
+        <MenuSeparator />
+        <MenuSeparator />
+        <SubMenuItem label="Submenu">
+          <MenuItem>Submenu Item 1</MenuItem>
+          <MenuItem>Submenu Item 2</MenuItem>
+        </SubMenuItem>
+        <MenuSeparator />
+        <MenuItem when="{count % 2 === 0}">Other Item 1</MenuItem>
+        <MenuSeparator />
+        <MenuItem when="{count % 2 === 0}">Other Item 2</MenuItem>
+        <MenuSeparator />
+      </ContextMenu>
+    </App>
+  `);
+  const driver = await createContextMenuDriver("menu");
+
+  // count = 0 (even): verify 3 separators
+  await page.getByTestId("target").click({ button: "right" });
+  await expect(driver.getMenuSeparators()).toHaveCount(3);
+  await driver.close();
+
+  // count = 1 (odd): verify 1 separator
+  await page.getByTestId("counter").click();
+  await page.getByTestId("target").click({ button: "right" });
+  await expect(driver.getMenuSeparators()).toHaveCount(1);
+  await driver.close();
+
+  // count = 2 (even): separators should be restored to 3
+  await page.getByTestId("counter").click();
+  await page.getByTestId("target").click({ button: "right" });
+  await expect(page.getByRole("menuitem", { name: "Other Item 1", exact: true })).toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Other Item 2", exact: true })).toBeVisible();
+  await expect(driver.getMenuSeparators()).toHaveCount(3);
   });
 });
 
