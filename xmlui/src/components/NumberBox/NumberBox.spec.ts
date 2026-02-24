@@ -1431,7 +1431,7 @@ test("input has correct width in px", async ({ page, initTestBed }) => {
 test("input with label has correct width in px", async ({ page, initTestBed }) => {
   await initTestBed(`<NumberBox width="200px" label="test" testId="test"/>`, {});
 
-  const input = page.getByTestId("test");
+  const input = page.getByTestId("test").locator('[data-part-id="labeledItem"]');
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
@@ -1449,7 +1449,7 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
   await page.setViewportSize({ width: 400, height: 300 });
   await initTestBed(`<NumberBox width="50%" label="test" testId="test"/>`, {});
 
-  const input = page.getByTestId("test");
+  const input = page.getByTestId("test").locator('[data-part-id="labeledItem"]');
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });

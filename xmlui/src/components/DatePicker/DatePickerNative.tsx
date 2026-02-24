@@ -507,6 +507,7 @@ export const DatePicker = forwardRef(function DatePicker(
         autoFocus={autoFocus}
         onFocus={onFocus}
         onBlur={onBlur}
+        {...rest}
       >
         <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
         <div className={styles.datePickerValue}>
