@@ -586,22 +586,22 @@
     <Page url="/docs/howto">
       <Overview />
     </Page>
-    <Page url="/docs/reference">
+    <Page url="/docs/reference/components">
       <Overview />
     </Page>
-    <Page url="/docs/reference/components">
+    <Page url="/docs/reference">
       <Overview />
     </Page>
     <Page url="/docs/reference/extensions">
       <Overview />
     </Page>
-    <Page url="/docs/extensions/xmlui-animations/_overview">
+    <Page url="/docs/reference/extensions/xmlui-animations/_overview">
       <Overview />
     </Page>
     <Page url="/docs/reference/themes">
       <Overview />
     </Page>
-    <Page url="/docs/extensions/xmlui-animations">
+    <Page url="/docs/reference/extensions/xmlui-animations">
       <Overview />
     </Page>
     <Page url="/docs/guides/app-structure">
@@ -942,7 +942,7 @@
         content="{appGlobals.content['pages/vscode.md']}"
       />
     </Page>
-    <Page url="/docs/components/:compId">
+    <Page url="/docs/reference/components/:compId">
       <script>
         var contentKey = "components/" + $routeParams.compId;
         var content = appGlobals.content[contentKey];
@@ -950,7 +950,7 @@
       <DocumentPage when="{content}" content="{content}" />
       <Redirect when="{!content}" to="/404" />
     </Page>
-    <Page url="/docs/extensions/*">
+    <Page url="/docs/reference/extensions/*">
       <script>
         var contentKey = "extensions/" + $routeParams['*'];
         var content = appGlobals.content[contentKey];
@@ -958,7 +958,6 @@
       <DocumentPage when="{content}" content="{content}" />
       <Redirect when="{!content}" to="/404" />
     </Page>
-
     <Page url="/404">
       <PageNotFound />
     </Page>

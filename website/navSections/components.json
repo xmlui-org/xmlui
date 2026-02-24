@@ -2,557 +2,557 @@
   "items": [
     {
       "label": "Components",
-      "to": "/reference/components",
+      "to": "/docs/reference/components",
       "description": "Browse all built-in XMLUI components.",
       "icon": "component",
       "children": [
         {
-          "to": "/components/_overview",
+          "to": "/docs/reference/components/_overview",
           "label": "Components Overview",
           "icon": "component"
         },
         {
-          "to": "/components/APICall",
+          "to": "/docs/reference/components/APICall",
           "label": "APICall",
           "icon": "component"
         },
         {
-          "to": "/components/App",
+          "to": "/docs/reference/components/App",
           "label": "App",
           "icon": "component"
         },
         {
-          "to": "/components/AppHeader",
+          "to": "/docs/reference/components/AppHeader",
           "label": "AppHeader",
           "icon": "component"
         },
         {
-          "to": "/components/AppState",
+          "to": "/docs/reference/components/AppState",
           "label": "AppState",
           "icon": "component"
         },
         {
-          "to": "/components/AutoComplete",
+          "to": "/docs/reference/components/AutoComplete",
           "label": "AutoComplete",
           "icon": "component"
         },
         {
-          "to": "/components/Avatar",
+          "to": "/docs/reference/components/Avatar",
           "label": "Avatar",
           "icon": "component"
         },
         {
-          "to": "/components/Backdrop",
+          "to": "/docs/reference/components/Backdrop",
           "label": "Backdrop",
           "icon": "component"
         },
         {
-          "to": "/components/Badge",
+          "to": "/docs/reference/components/Badge",
           "label": "Badge",
           "icon": "component"
         },
         {
-          "to": "/components/BarChart",
+          "to": "/docs/reference/components/BarChart",
           "label": "BarChart",
           "icon": "component"
         },
         {
-          "to": "/components/Blog",
+          "to": "/docs/reference/components/Blog",
           "label": "Blog",
           "icon": "component"
         },
         {
-          "to": "/components/Bookmark",
+          "to": "/docs/reference/components/Bookmark",
           "label": "Bookmark",
           "icon": "component"
         },
         {
-          "to": "/components/Breakout",
+          "to": "/docs/reference/components/Breakout",
           "label": "Breakout",
           "icon": "component"
         },
         {
-          "to": "/components/Button",
+          "to": "/docs/reference/components/Button",
           "label": "Button",
           "icon": "component"
         },
         {
-          "to": "/components/CHStack",
+          "to": "/docs/reference/components/CHStack",
           "label": "CHStack",
           "icon": "component"
         },
         {
-          "to": "/components/CVStack",
+          "to": "/docs/reference/components/CVStack",
           "label": "CVStack",
           "icon": "component"
         },
         {
-          "to": "/components/Card",
+          "to": "/docs/reference/components/Card",
           "label": "Card",
           "icon": "component"
         },
         {
-          "to": "/components/Carousel",
+          "to": "/docs/reference/components/Carousel",
           "label": "Carousel",
           "icon": "component"
         },
         {
-          "to": "/components/ChangeListener",
+          "to": "/docs/reference/components/ChangeListener",
           "label": "ChangeListener",
           "icon": "component"
         },
         {
-          "to": "/components/Checkbox",
+          "to": "/docs/reference/components/Checkbox",
           "label": "Checkbox",
           "icon": "component"
         },
         {
-          "to": "/components/ColorPicker",
+          "to": "/docs/reference/components/ColorPicker",
           "label": "ColorPicker",
           "icon": "component"
         },
         {
-          "to": "/components/Column",
+          "to": "/docs/reference/components/Column",
           "label": "Column",
           "icon": "component"
         },
         {
-          "to": "/components/ContentSeparator",
+          "to": "/docs/reference/components/ContentSeparator",
           "label": "ContentSeparator",
           "icon": "component"
         },
         {
-          "to": "/components/ContextMenu",
+          "to": "/docs/reference/components/ContextMenu",
           "label": "ContextMenu",
           "icon": "component"
         },
         {
-          "to": "/components/DataSource",
+          "to": "/docs/reference/components/DataSource",
           "label": "DataSource",
           "icon": "component"
         },
         {
-          "to": "/components/DateInput",
+          "to": "/docs/reference/components/DateInput",
           "label": "DateInput",
           "icon": "component"
         },
         {
-          "to": "/components/DatePicker",
+          "to": "/docs/reference/components/DatePicker",
           "label": "DatePicker",
           "icon": "component"
         },
         {
-          "to": "/components/DonutChart",
+          "to": "/docs/reference/components/DonutChart",
           "label": "DonutChart",
           "icon": "component"
         },
         {
-          "to": "/components/DropdownMenu",
+          "to": "/docs/reference/components/DropdownMenu",
           "label": "DropdownMenu",
           "icon": "component"
         },
         {
-          "to": "/components/EmojiSelector",
+          "to": "/docs/reference/components/EmojiSelector",
           "label": "EmojiSelector",
           "icon": "component"
         },
         {
-          "to": "/components/ExpandableItem",
+          "to": "/docs/reference/components/ExpandableItem",
           "label": "ExpandableItem",
           "icon": "component"
         },
         {
-          "to": "/components/FileInput",
+          "to": "/docs/reference/components/FileInput",
           "label": "FileInput",
           "icon": "component"
         },
         {
-          "to": "/components/FileUploadDropZone",
+          "to": "/docs/reference/components/FileUploadDropZone",
           "label": "FileUploadDropZone",
           "icon": "component"
         },
         {
-          "to": "/components/FlowLayout",
+          "to": "/docs/reference/components/FlowLayout",
           "label": "FlowLayout",
           "icon": "component"
         },
         {
-          "to": "/components/Footer",
+          "to": "/docs/reference/components/Footer",
           "label": "Footer",
           "icon": "component"
         },
         {
-          "to": "/components/Form",
+          "to": "/docs/reference/components/Form",
           "label": "Form",
           "icon": "component"
         },
         {
-          "to": "/components/FormItem",
+          "to": "/docs/reference/components/FormItem",
           "label": "FormItem",
           "icon": "component"
         },
         {
-          "to": "/components/FormSection",
+          "to": "/docs/reference/components/FormSection",
           "label": "FormSection",
           "icon": "component"
         },
         {
-          "to": "/components/Fragment",
+          "to": "/docs/reference/components/Fragment",
           "label": "Fragment",
           "icon": "component"
         },
         {
-          "to": "/components/H1",
+          "to": "/docs/reference/components/H1",
           "label": "H1",
           "icon": "component"
         },
         {
-          "to": "/components/H2",
+          "to": "/docs/reference/components/H2",
           "label": "H2",
           "icon": "component"
         },
         {
-          "to": "/components/H3",
+          "to": "/docs/reference/components/H3",
           "label": "H3",
           "icon": "component"
         },
         {
-          "to": "/components/H4",
+          "to": "/docs/reference/components/H4",
           "label": "H4",
           "icon": "component"
         },
         {
-          "to": "/components/H5",
+          "to": "/docs/reference/components/H5",
           "label": "H5",
           "icon": "component"
         },
         {
-          "to": "/components/H6",
+          "to": "/docs/reference/components/H6",
           "label": "H6",
           "icon": "component"
         },
         {
-          "to": "/components/HSplitter",
+          "to": "/docs/reference/components/HSplitter",
           "label": "HSplitter",
           "icon": "component"
         },
         {
-          "to": "/components/HStack",
+          "to": "/docs/reference/components/HStack",
           "label": "HStack",
           "icon": "component"
         },
         {
-          "to": "/components/Heading",
+          "to": "/docs/reference/components/Heading",
           "label": "Heading",
           "icon": "component"
         },
         {
-          "to": "/components/IFrame",
+          "to": "/docs/reference/components/IFrame",
           "label": "IFrame",
           "icon": "component"
         },
         {
-          "to": "/components/Icon",
+          "to": "/docs/reference/components/Icon",
           "label": "Icon",
           "icon": "component"
         },
         {
-          "to": "/components/Image",
+          "to": "/docs/reference/components/Image",
           "label": "Image",
           "icon": "component"
         },
         {
-          "to": "/components/Items",
+          "to": "/docs/reference/components/Items",
           "label": "Items",
           "icon": "component"
         },
         {
-          "to": "/components/LabelList",
+          "to": "/docs/reference/components/LabelList",
           "label": "LabelList",
           "icon": "component"
         },
         {
-          "to": "/components/Legend",
+          "to": "/docs/reference/components/Legend",
           "label": "Legend",
           "icon": "component"
         },
         {
-          "to": "/components/LineChart",
+          "to": "/docs/reference/components/LineChart",
           "label": "LineChart",
           "icon": "component"
         },
         {
-          "to": "/components/Link",
+          "to": "/docs/reference/components/Link",
           "label": "Link",
           "icon": "component"
         },
         {
-          "to": "/components/List",
+          "to": "/docs/reference/components/List",
           "label": "List",
           "icon": "component"
         },
         {
-          "to": "/components/Logo",
+          "to": "/docs/reference/components/Logo",
           "label": "Logo",
           "icon": "component"
         },
         {
-          "to": "/components/Markdown",
+          "to": "/docs/reference/components/Markdown",
           "label": "Markdown",
           "icon": "component"
         },
         {
-          "to": "/components/MenuItem",
+          "to": "/docs/reference/components/MenuItem",
           "label": "MenuItem",
           "icon": "component"
         },
         {
-          "to": "/components/MenuSeparator",
+          "to": "/docs/reference/components/MenuSeparator",
           "label": "MenuSeparator",
           "icon": "component"
         },
         {
-          "to": "/components/MessageListener",
+          "to": "/docs/reference/components/MessageListener",
           "label": "MessageListener",
           "icon": "component"
         },
         {
-          "to": "/components/ModalDialog",
+          "to": "/docs/reference/components/ModalDialog",
           "label": "ModalDialog",
           "icon": "component"
         },
         {
-          "to": "/components/NavGroup",
+          "to": "/docs/reference/components/NavGroup",
           "label": "NavGroup",
           "icon": "component"
         },
         {
-          "to": "/components/NavLink",
+          "to": "/docs/reference/components/NavLink",
           "label": "NavLink",
           "icon": "component"
         },
         {
-          "to": "/components/NavPanel",
+          "to": "/docs/reference/components/NavPanel",
           "label": "NavPanel",
           "icon": "component"
         },
         {
-          "to": "/components/NavPanelCollapseButton",
+          "to": "/docs/reference/components/NavPanelCollapseButton",
           "label": "NavPanelCollapseButton",
           "icon": "component"
         },
         {
-          "to": "/components/NoResult",
+          "to": "/docs/reference/components/NoResult",
           "label": "NoResult",
           "icon": "component"
         },
         {
-          "to": "/components/NumberBox",
+          "to": "/docs/reference/components/NumberBox",
           "label": "NumberBox",
           "icon": "component"
         },
         {
-          "to": "/components/Option",
+          "to": "/docs/reference/components/Option",
           "label": "Option",
           "icon": "component"
         },
         {
-          "to": "/components/Page",
+          "to": "/docs/reference/components/Page",
           "label": "Page",
           "icon": "component"
         },
         {
-          "to": "/components/PageMetaTitle",
+          "to": "/docs/reference/components/PageMetaTitle",
           "label": "PageMetaTitle",
           "icon": "component"
         },
         {
-          "to": "/components/Pages",
+          "to": "/docs/reference/components/Pages",
           "label": "Pages",
           "icon": "component"
         },
         {
-          "to": "/components/Pagination",
+          "to": "/docs/reference/components/Pagination",
           "label": "Pagination",
           "icon": "component"
         },
         {
-          "to": "/components/PasswordInput",
+          "to": "/docs/reference/components/PasswordInput",
           "label": "PasswordInput",
           "icon": "component"
         },
         {
-          "to": "/components/PieChart",
+          "to": "/docs/reference/components/PieChart",
           "label": "PieChart",
           "icon": "component"
         },
         {
-          "to": "/components/ProgressBar",
+          "to": "/docs/reference/components/ProgressBar",
           "label": "ProgressBar",
           "icon": "component"
         },
         {
-          "to": "/components/QRCode",
+          "to": "/docs/reference/components/QRCode",
           "label": "QRCode",
           "icon": "component"
         },
         {
-          "to": "/components/Queue",
+          "to": "/docs/reference/components/Queue",
           "label": "Queue",
           "icon": "component"
         },
         {
-          "to": "/components/RadioGroup",
+          "to": "/docs/reference/components/RadioGroup",
           "label": "RadioGroup",
           "icon": "component"
         },
         {
-          "to": "/components/RealTimeAdapter",
+          "to": "/docs/reference/components/RealTimeAdapter",
           "label": "RealTimeAdapter",
           "icon": "component"
         },
         {
-          "to": "/components/Redirect",
+          "to": "/docs/reference/components/Redirect",
           "label": "Redirect",
           "icon": "component"
         },
         {
-          "to": "/components/ResponsiveBar",
+          "to": "/docs/reference/components/ResponsiveBar",
           "label": "ResponsiveBar",
           "icon": "component"
         },
         {
-          "to": "/components/ScrollViewer",
+          "to": "/docs/reference/components/ScrollViewer",
           "label": "ScrollViewer",
           "icon": "component"
         },
         {
-          "to": "/components/Select",
+          "to": "/docs/reference/components/Select",
           "label": "Select",
           "icon": "component"
         },
         {
-          "to": "/components/Slider",
+          "to": "/docs/reference/components/Slider",
           "label": "Slider",
           "icon": "component"
         },
         {
-          "to": "/components/Slot",
+          "to": "/docs/reference/components/Slot",
           "label": "Slot",
           "icon": "component"
         },
         {
-          "to": "/components/SpaceFiller",
+          "to": "/docs/reference/components/SpaceFiller",
           "label": "SpaceFiller",
           "icon": "component"
         },
         {
-          "to": "/components/Spinner",
+          "to": "/docs/reference/components/Spinner",
           "label": "Spinner",
           "icon": "component"
         },
         {
-          "to": "/components/Splitter",
+          "to": "/docs/reference/components/Splitter",
           "label": "Splitter",
           "icon": "component"
         },
         {
-          "to": "/components/Stack",
+          "to": "/docs/reference/components/Stack",
           "label": "Stack",
           "icon": "component"
         },
         {
-          "to": "/components/StickyBox",
+          "to": "/docs/reference/components/StickyBox",
           "label": "StickyBox",
           "icon": "component"
         },
         {
-          "to": "/components/SubMenuItem",
+          "to": "/docs/reference/components/SubMenuItem",
           "label": "SubMenuItem",
           "icon": "component"
         },
         {
-          "to": "/components/Switch",
+          "to": "/docs/reference/components/Switch",
           "label": "Switch",
           "icon": "component"
         },
         {
-          "to": "/components/TabItem",
+          "to": "/docs/reference/components/TabItem",
           "label": "TabItem",
           "icon": "component"
         },
         {
-          "to": "/components/Table",
+          "to": "/docs/reference/components/Table",
           "label": "Table",
           "icon": "component"
         },
         {
-          "to": "/components/TableOfContents",
+          "to": "/docs/reference/components/TableOfContents",
           "label": "TableOfContents",
           "icon": "component"
         },
         {
-          "to": "/components/Tabs",
+          "to": "/docs/reference/components/Tabs",
           "label": "Tabs",
           "icon": "component"
         },
         {
-          "to": "/components/Text",
+          "to": "/docs/reference/components/Text",
           "label": "Text",
           "icon": "component"
         },
         {
-          "to": "/components/TextArea",
+          "to": "/docs/reference/components/TextArea",
           "label": "TextArea",
           "icon": "component"
         },
         {
-          "to": "/components/TextBox",
+          "to": "/docs/reference/components/TextBox",
           "label": "TextBox",
           "icon": "component"
         },
         {
-          "to": "/components/Theme",
+          "to": "/docs/reference/components/Theme",
           "label": "Theme",
           "icon": "component"
         },
         {
-          "to": "/components/TimeInput",
+          "to": "/docs/reference/components/TimeInput",
           "label": "TimeInput",
           "icon": "component"
         },
         {
-          "to": "/components/Timer",
+          "to": "/docs/reference/components/Timer",
           "label": "Timer",
           "icon": "component"
         },
         {
-          "to": "/components/ToneChangerButton",
+          "to": "/docs/reference/components/ToneChangerButton",
           "label": "ToneChangerButton",
           "icon": "component"
         },
         {
-          "to": "/components/ToneSwitch",
+          "to": "/docs/reference/components/ToneSwitch",
           "label": "ToneSwitch",
           "icon": "component"
         },
         {
-          "to": "/components/Tooltip",
+          "to": "/docs/reference/components/Tooltip",
           "label": "Tooltip",
           "icon": "component"
         },
         {
-          "to": "/components/Tree",
+          "to": "/docs/reference/components/Tree",
           "label": "Tree",
           "icon": "component"
         },
         {
-          "to": "/components/VSplitter",
+          "to": "/docs/reference/components/VSplitter",
           "label": "VSplitter",
           "icon": "component"
         },
         {
-          "to": "/components/VStack",
+          "to": "/docs/reference/components/VStack",
           "label": "VStack",
           "icon": "component"
         }
