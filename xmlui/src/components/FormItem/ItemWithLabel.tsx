@@ -38,6 +38,7 @@ type ItemWithLabelProps = {
   testId?: string;
   cloneStyle?: boolean;
   requireLabelMode?: RequireLabelMode;
+  direction?: "rtl" | "ltr";
 };
 export const defaultProps: Pick<
   ItemWithLabelProps,
@@ -50,6 +51,7 @@ export const defaultProps: Pick<
   | "cloneStyle"
   | "requireLabelMode"
   | "isInputTemplateUsed"
+  | "direction"
 > = {
   labelBreak: true,
   enabled: true,
@@ -60,6 +62,7 @@ export const defaultProps: Pick<
   cloneStyle: false,
   requireLabelMode: "markRequired",
   isInputTemplateUsed: false,
+  direction: "ltr",
 };
 
 const numberRegex = /^[0-9]+$/;
@@ -151,6 +154,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
             [styles.end]: labelPosition === "end",
             [styles.shrinkToLabel]: shrinkToLabel,
           })}
+          dir={rest?.direction}
         >
           {label && (
             <div
