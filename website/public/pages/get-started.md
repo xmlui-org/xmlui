@@ -1,0 +1,119 @@
+# Get Started
+
+The XMLUI engine is a single JS file. Here is the minimal XMLUI setup.
+
+```xmlui-tree
+<your app folder>
+  index.html
+  Main.xmlui
+```
+
+```html
+<!-- index.html -->
+<script src="https://cdn.xmlui.org/xmlui.js"></script>
+```
+
+```xmlui
+<!-- Main.xmlui -->
+<App name="XMLUI Hello World">Hello World</App>
+```
+
+If you want to start from scratch, grab the [latest release](https://github.com/xmlui-org/xmlui/releases) of the engine, create the structure shown above, and run a local webserver (e.g. `python -m http.server`, `npx http-server`).
+
+## Demo Apps
+
+We provide these demo apps:
+
+[xmlui-hello-world](https://github.com/xmlui-org/xmlui-hello-world/releases): A minimal XMLUI app. Run it in an [online playground](https://playground.xmlui.org/#/playground/#H4sIAAAAAAAAE2VTzU7cMBB%2BFXeExCVLFqm9RNmtKK2gB1SpIHqoOZh4SKx1ZizHyQZWeffKScgWuHnG359n5AM0QZFWlgkhO4ByDjLIL5zbSpKUX98GVey2koTI77AP2yuPGAR26J%2BZME%2FH5nh9jdaySLeS8nShLRKiQx9MoeyFNSXVSGEjoUAK6CV80G%2B4xnfy8fSNe2H0RoJD3zBJEHujQ7WRcL72WEsQhkwwyt4r2%2BJGwg%2FbmUZC%2Bn%2FCibuRcJhOZ10EDxPqbfR0mgMkUHDtmJBCA9lfyC9fS0Gqjkaj9PiQfI48mR3EifPsmrPZyyKVoRJf37ZFJk7%2FsLf6VAyfou%2BskaeLUYzxEHPQkynjpkKFNcY0BzAaMuhr2xpIwGPDrS%2Fi1WFIJti98rGEJ6awaswLQgbnX1wPCTxyf1spzfvVT3JtgAxOjq2mhijBNKqBNWUVFu9X0UdV7ErPLelLtuxXN6yV%2FW6U5RIy2FcmYPR5hyoqLHaoV7%2BVNnzluXW%2FXDBMMUAxIpw3tfLPq8%2FrNQxDAlr53QfzCYresz8ytaIS%2FUwchofI5lF9moLpUd9FFcielG0wgWavnEO91M5jZ3B%2Fw%2FqIYW%2BQgppDVuzNC1NQFhJQRTAdzpLLJubu%2BLPm2Y0LDEhxzvGrDcM%2FWRGtOYEDAAA%3D), or use the [XMLUI CLI](https://github.com/xmlui-org/xmlui-cli/releases) to download and run locally.
+
+[xmlui-weather](https://github.com/xmlui-org/xmlui-weather/releases): A simple weather dashboard. Run it in an [online playground](https://playground.xmlui.org/#/playground/#H4sIAAAAAAAAE61Y227bOBD9lSmRjVvUl6RogYVrpUidpl2g2S3qbvNQBwUjTixuJFIgKTupoX%2FqN%2FTLFqRulOLE8WLzFJFnbmeGnKHXRBsqGI2lQDJeE5qmZEwmx2k6FwBLqoYhN7fBnMyoMBQ%2BS037MD2ek2pbI1VhNH0YhEpJdYZa0wUGc9JsGEzSvwU3wZycNqtcn3DlFK6vaKwxb7ZCKRg3XAq7CSukJkJ1Qg0dLmmc4TDMlEJhvte4bwcX4MkLpAq1%2BU4V0ntU%2BJCONNVGSSGT23tEy5VvBxcNtFRxNBdWy8SiZzJTIdpPAM6COfE0FcYAMhUHcxIZk%2BrxaLQyRg25GK0buvM3V1Il1AT%2FHFYyjuY%2FpeFXPKQ2%2BC7lAFK8s6BgTp469DMIjmANfoIggN5UZjEDIQ1cccGqSIFRQ%2BFKKujBc2hcgefQG8KnGKlGCCMMr8FECLZyQNAEh73XUOYUAnApfW05gVHFyvTrzNDwuvwEmHw4PCr%2BAzgvjZ9QHV1KqlgJGTlMhXfysERleEjj45gvRILCFlaIwqByGSgUTr7gjXkrb6rvMgnW3T9EmpmKK%2FuXxjTESMYMLWfvrCYvruHQx3LBDafxV1sKtkAsLvcBK85MFMzJ4SuFib8hxQln04gKl6unSxqXeXGmAljS2GfQqMwjsAzqbWaMFI3OmF6iLaH3aCoKfZMo6GWMrPJzaBRPnj4bxigWJoIjOMjbDk5jHl5b50rPvOwHzs3Xd4rooayXTn%2BmjMv3Smbp%2FTRWd0T%2BKMYqdMVa7iW%2BrhNvBWDyV2rPSk3Yr5%2BncwLL0vxpy%2BHN%2BKmHn3bwk1HH5GTUBH1Ul3Kn%2FG2FwipCd835vObOlOLUlTZDbVQWGr5EL8yOQGnCqmwMFOetkqgs%2BTcaF5%2BUXCjU2iM%2Bkor%2FkMJsO2GzlAuByk%2B1C6lxXaO9oqm6beXno6SMi0XrwrGnrOaujKL46F4a0%2B1RxZIyZLC%2Ff%2Ff2totPWjVsF8oK9ji4pOH1QslMsKmM3VW6F9p%2FBs3GoB1d7X7h3xYWYUHTYE4OOoX7olWEfiNoFZsPexznAGu%2F5Q0VLmx57%2B%2FDhmXbze7dKXl88%2FD2c%2Bj1oQdj6PXytuVQZsKo2xraiszL%2FIbc79gCdoZXZF5JYWb8hz3pL90l7lbOkS8iK3kpY9aRA1g3d1Jge2sP3kA9n7gR6PsUxt2l0%2FzXz5b9NgMbXXpRuLQ9455T%2Ba5G9qr%2FBzdxN36NCd%2FMQRNddfBQh5syvcGJO3fog6W92dd40fHpFDHWEPNr3JIgB%2FzIr7GdpHrZJmoTm3dK9sM9JeuHVXbqmaHGd7bqNdNYZgymctlu5lC3H4%2Fn0GJDC81%2F6zalLWY%2BZAln3NxutRGVwJ0tnNuxcpYisq02VlwwbZFnPEadQ5JGOxr7ZLtYpnCrqbQE5pBctgeV%2FyN5s0woru%2Fzon4wDHWBy3eMcpYJjeYx2jWaXZWfSfk455MS%2BF8MPMb9pMDlD6dnMrrzorCHsTsZPNk8GjzZOgdtvHh2HJKKxwRtnhNgJGhEKN%2Bw9RBU16feMMu1I52MjlM7VZI%2BCWWSSoHCaDL%2BRibT6tOZsifQy0fhVDU%2FlQPInk5piIPDOYGEi%2FPy7fK7azFHHqm73MLayq73UiVTPXSpz9szXd1sNrWUSrBoGZ6gT8JkVIdqibiwTIgrvrC%2FbpgIE7R8rAlnZExukjjjpE8Uavck12S8zvsF7CtV9pNYZwaa%2F0AyJoev0hvSJ5fyZhZRJlcD914kY7LXLOmEWBVSOG0ktmHUtiulnRlycCYZjU84jeWCjMkq4gatnQ7KPa2RDZoHRPEUsQ4UI2iqeELV7eDlwQHJ8z5hVF3fMV5A3aTbSDL7lFKlYJ5fWGnptBcs8BtkX6wWMnZPuT7RK5qmyOrvVOGS4%2BpMsgYjFUdhaOlkczBIn1D3bClV1pkoV92vUSV3LoEGheXZ%2FjyV5%2F8CoVd8TbUSAAA%3D), or use the [XMLUI CLI](https://github.com/xmlui-org/xmlui-cli/releases) to download and run locally.
+
+[xmlui-invoice](https://github.com/xmlui-org/xmlui-invoice/releases): A complete database-backed app. Use the [XMLUI CLI](https://github.com/xmlui-org/xmlui-cli/releases) to download and run locally.
+
+## The XMLUI CLI
+
+The [XMLUI CLI](https://github.com/xmlui-org/xmlui-cli/releases) is your all-in-one tool for working with XMLUI. To install it, visit the [release page](https://github.com/xmlui-org/xmlui-cli/releases), download the zip file for your platform, extract the `xmlui` binary it contains, and place it on your system path.
+
+Once installed you can acquire and run all three apps locally.
+
+`xmlui run https://github.com/xmlui-org/xmlui-hello-world/releases/latest/download/xmlui-hello-world.zip`
+
+`xmlui run https://github.com/xmlui-org/xmlui-weather/releases/latest/download/xmlui-weather.zip`
+
+`xmlui run https://github.com/xmlui-org/xmlui-invoice/releases/latest/download/xmlui-invoice.zip`
+
+**XMLUI Invoice** is a complete app that showcases XMLUI components and patterns. The CLI bundles the XMLUI MCP server so you can work with agents to understand and modify the app.
+
+![xmlui-invoice in action](resources/get-started/new-invoice.png)
+
+See [this blog post](https://blog.xmlui.org/blog/introducing-the-xmlui-cli) for details.
+
+## Working With AIs
+
+Once the XMLUI CLI is installed, you can configure AI coding assistants to use its bundled MCP server. Here's a sample `claude_desktop_config.json` that works with Claude Desktop or (using `claude mcp add-from-claude-desktop`) Claude Code.
+
+```
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/YOURNAME/xmlui-invoice",
+        "/Users/YOURNAME/xmlui-weather"
+      ]
+    },
+    "xmlui": {
+      "command": "/usr/local/bin/xmlui",
+      "args": [
+        "mcp",
+        "-e",
+        "/Users/YOURNAME/xmlui-invoice",
+        "-e",
+        "/Users/YOURNAME/xmlui-weather"
+      ]
+    }
+  }
+}
+```
+
+### Other AIs
+
+Cursor and Kiro: same as above.
+
+<details>
+  <summary>Copilot</summary>
+<pre>
+{
+  "servers": {
+    "xmlui": {
+      "type": "stdio",
+      "command": "/usr/local/bin/xmlui",
+      "args": [
+        "mcp",
+        "-e",
+        "/Users/YOURNAME/xmlui-invoice",
+        "-e",
+        "/Users/YOURNAME/xmlui-weather"
+      ]
+    }
+  }
+}
+</pre>
+</details>
+
+<details>
+  <summary>Codex</summary>
+<pre>
+[mcp_servers.xmlui]
+command = "/usr/local/bin/xmlui"
+args = [
+  "mcp",
+  "-e",
+  "/Users/YOURNAME/xmlui-invoice",
+  "-e",
+  "/Users/YOURNAME/xmlui-weather"
+]
+</pre>
+</details>

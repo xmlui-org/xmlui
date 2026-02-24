@@ -22,5 +22,5 @@
       "utils": ["./utils/index.ts"]
     }
   },
-  "include": ["src", "build", "index.ts", "utils/index.ts"]
+  "include": ["src", "build", "index.ts"]
 }

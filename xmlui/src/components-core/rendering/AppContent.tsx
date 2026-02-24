@@ -95,10 +95,83 @@ export function AppContent({
   // Note: Startup trace initialization happens during render (near xsVerbose definition)
   // to ensure it's set before children mount and trigger useQuery fetches
   const [loggedInUser, setLoggedInUser] = useState(null);
+  
+  // --- Navigation event handlers state
+  const [navigationHandlers, setNavigationHandlersState] = useState<{
+    onWillNavigate?: (to: string | number, queryParams?: Record<string, any>) => false | void | null | undefined;
+    onDidNavigate?: (to: string | number, queryParams?: Record<string, any>) => void;
+  }>({});
+  
+  const setNavigationHandlers = useCallback(
+    (
+      onWillNavigate?: (to: string | number, queryParams?: Record<string, any>) => false | void | null | undefined,
+      onDidNavigate?: (to: string | number, queryParams?: Record<string, any>) => void,
+    ) => {
+      setNavigationHandlersState({ onWillNavigate, onDidNavigate });
+    },
+    [],
+  );
+  
   const debugView = useDebugView();
   const componentRegistry = useComponentRegistry();
-  const navigate = useNavigate();
+  const navigateRouter = useNavigate();
   const { confirm } = useConfirm();
+  
+  const location = useLocation();
+  const previousLocationRef = useRef(location.pathname + location.search + location.hash);
+  const isInitialRenderRef = useRef(true);
+
+  // --- Wrapped navigate function that respects willNavigate/didNavigate events
+  // Note: willNavigate only works for programmatic navigation (navigate(), Actions.navigate())
+  // because we can await the async handler. Cannot work with Link clicks due to React Router limitations.
+  // didNavigate fires for all navigation types (see useEffect below)
+  const navigate = useCallback(
+    async (to: any, options?: any) => {
+      const { onWillNavigate } = navigationHandlers;
+      
+      // Extract queryParams if exists in options (for NavigateAction compatibility)
+      const queryParams = options?.queryParams;
+      
+      // Remove queryParams from options before passing to navigateRouter
+      const { queryParams: _, ...navigateOptions } = options || {};
+      
+      // Call willNavigate handler if defined (only for programmatic navigation)
+      if (onWillNavigate) {
+        const result = await onWillNavigate(to, queryParams);
+        // Cancel navigation if willNavigate returns false
+        if (result === false) {
+          return;
+        }
+      }
+      
+      // Perform the actual navigation
+      navigateRouter(to, navigateOptions);
+      
+      // didNavigate will be fired by the useEffect that watches location changes
+    },
+    [navigateRouter, navigationHandlers],
+  );
+  
+  // Fire didNavigate after any location change (works for all navigation types)
+  useEffect(() => {
+    // Skip firing didNavigate on initial render
+    if (isInitialRenderRef.current) {
+      isInitialRenderRef.current = false;
+      return;
+    }
+    
+    const currentPath = location.pathname + location.search + location.hash;
+    const previousPath = previousLocationRef.current;
+    
+    if (currentPath !== previousPath) {
+      previousLocationRef.current = currentPath;
+      
+      const { onDidNavigate } = navigationHandlers;
+      if (onDidNavigate) {
+        void onDidNavigate(currentPath, undefined);
+      }
+    }
+  }, [location, navigationHandlers]);
 
   // --- Create PubSubService with stable reference across renders
   const pubSubServiceRef = useRef(createPubSubService());
@@ -255,7 +328,6 @@ export function AppContent({
   const isWindowFocused = useIsWindowFocused();
   const apiInterceptorContext = useApiInterceptorContext();
 
-  const location = useLocation();
   const lastHash = useRef("");
   const [scrollForceRefresh, setScrollForceRefresh] = useState(0);
   const tableOfContentsContext = useContext(TableOfContentsContext);
@@ -827,6 +899,49 @@ export function AppContent({
   // --- Create AppState object with global state management functions
   const AppState = useMemo(() => createAppState(appStateContextValue), [appStateContextValue]);
 
+  // --- Wrap toast to log calls to _xsLogs for test trace capture
+  const tracedToast = useMemo(() => {
+    function logToast(type: string, message: unknown) {
+      if (typeof window !== "undefined") {
+        const w = window as any;
+        if (Array.isArray(w._xsLogs)) {
+          w._xsLogs.push({
+            ts: Date.now(),
+            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+            traceId: w._xsCurrentTrace,
+            kind: "toast",
+            toastType: type,
+            message: typeof message === "string" ? message : String(message),
+          });
+        }
+      }
+    }
+    const wrapper: any = (message: unknown, opts?: any) => {
+      logToast("default", message);
+      return toast(message as any, opts);
+    };
+    wrapper.success = (message: unknown, opts?: any) => {
+      logToast("success", message);
+      return toast.success(message as any, opts);
+    };
+    wrapper.error = (message: unknown, opts?: any) => {
+      logToast("error", message);
+      return toast.error(message as any, opts);
+    };
+    wrapper.loading = (message: unknown, opts?: any) => {
+      logToast("loading", message);
+      return toast.loading(message as any, opts);
+    };
+    wrapper.custom = (message: unknown, opts?: any) => {
+      logToast("custom", message);
+      return toast.custom(message as any, opts);
+    };
+    wrapper.dismiss = toast.dismiss.bind(toast);
+    wrapper.remove = toast.remove.bind(toast);
+    wrapper.promise = toast.promise.bind(toast);
+    return wrapper;
+  }, []);
+
   // --- We assemble the app context object form the collected information
   const appContextValue = useMemo(() => {
     const ret: AppContextObject = {
@@ -862,11 +977,12 @@ export function AppContent({
       // --- Navigation-related
       navigate,
       routerBaseName,
+      setNavigationHandlers,
 
       // --- Notifications and dialogs
       confirm,
       signError,
-      toast,
+      toast: tracedToast,
 
       // --- Theme-related
       activeThemeId,
@@ -910,6 +1026,7 @@ export function AppContent({
     standalone,
     navigate,
     routerBaseName,
+    setNavigationHandlers,
     confirm,
     activeThemeId,
     activeThemeTone,

@@ -1,9 +1,9 @@
-import { PdfMd } from "../src";
+import { PdfMd } from "../src/Pdf";
 
 export const componentMetadata = {
   name: "PDF",
-  state: "in progress",
-  description: "This package provides components for working with pdf files.",
+  state: "experimental",
+  description: "This package provides components for working with PDF files.",
   metadata: {
     Pdf: PdfMd,
   },

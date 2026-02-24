@@ -7,18 +7,23 @@ import {
   shikiHighlighter,
   highlight,
 } from "../utils";
+import GhIcon from "../icons/github.svg";
+import RssIcon from "../icons/rss.svg";
+
 import { BlogAuraThemeDefinition } from "./themes/blog-aura";
 
 const App: StandaloneAppDescription = {
   name: "XMLUI Blog",
   themes: [BlogAuraThemeDefinition],
   defaultTheme: "xmlui-blog",
+  icons: {
+    github: GhIcon,
+    rss: RssIcon,
+  },
   resources: {
     logo: "/resources/logo.svg",
     "logo-dark": "/resources/logo-dark.svg",
     favicon: "/resources/favicon.ico",
-    "icon.github": "/resources/icons/github.svg",
-    "icon.rss": "/resources/icons/rss.svg",
   },
   appGlobals: {
     useHashBasedRouting: false,

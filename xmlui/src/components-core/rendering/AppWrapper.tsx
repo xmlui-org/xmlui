@@ -97,6 +97,8 @@ export type AppWrapperProps = {
   children?: ReactNode;
 
   onInit?: () => void;
+
+  icons?: Record<string, string>;
 };
 
 /**
@@ -122,6 +124,7 @@ export const AppWrapper = ({
   children,
   projectCompilation,
   onInit,
+  icons
 }: AppWrapperProps) => {
   if (previewMode) {
     // --- Prevent leaking the meta items to the parent document,
@@ -142,7 +145,7 @@ export const AppWrapper = ({
       <Helmet defaultTitle={siteName} titleTemplate={`%s | ${siteName}`} />
       <LoggerProvider>
         <LoggerInitializer />
-        <IconProvider>
+        <IconProvider icons={icons}>
           <ThemeProvider
             resourceMap={resourceMap}
             themes={contributes.themes}
@@ -177,14 +180,14 @@ export const AppWrapper = ({
     </HelmetProvider>
   );
 
-  // --- Select the router type for the app
-  let Router = previewMode ? MemoryRouter : useHashBasedRouting ? HashRouter : BrowserRouter;
-
   const alreadyInRouterContext = useInRouterContext();
 
   // --- We should create a router if we are explicitly in preview mode (isolated)
   // --- OR if we are NOT in an existing router context.
   const shouldCreateRouter = previewMode || !alreadyInRouterContext;
+
+  // --- Select the router type for the app
+  let Router = previewMode ? MemoryRouter : useHashBasedRouting ? HashRouter : BrowserRouter;
 
   // --- SSR Fallback: If we need to create a router but are on the server (no window),
   // --- BrowserRouter/HashRouter will fail. We must fallback to MemoryRouter to prevent crashes.

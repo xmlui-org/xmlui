@@ -1,6 +1,71 @@
-<App xmlns:Extensions="component-ns:XMLUIExtensions" xmlns:My="app-ns">
-  helloka
-  <Pdf/>
-  <My:Pdf/>
-  <Extensions:Pdf src="https://api.printnode.com/static/test/pdf/multipage.pdf"/>
+<App
+  scrollWholePage="false"
+  var.nameTypedIn="<none>"
+>
+  <HStack>
+    <Button
+      onClick="myPdf.addAnnotation({
+      id: 'signature-field',
+      type: 'signature',
+      page: 1,
+      position: { x: 50, y: 700 },
+      size: { width: 300, height: 150 },
+      value: '',
+      properties: {
+        label: 'Signature',
+        locked: true,
+        required: true
+      }
+    }, true, 'instant')"
+    >
+      Add signature
+    </Button>
+
+    <Button
+      label="Save PDF"
+      onClick="
+        const bytes = myPdf.exportToPdf();
+        const blob = new Blob([bytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'document-modified.pdf';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      "
+    />
+
+    <Button
+      label="Export Overlay"
+      onClick="myPdf.exportAnnotations()"
+    />
+
+    <Button variant="outlined" onClick="myPdf.zoomIn()">
+      +
+    </Button>
+    <Button variant="outlined" onClick="myPdf.zoomOut()">
+      -
+    </Button>
+    <Button variant="outlined" onClick="myPdf.actualSize()">
+      100%
+    </Button>
+    <Button variant="outlined" onClick="myPdf.fitWidth()">
+      Fit Width
+    </Button>
+    <Button variant="outlined" onClick="myPdf.fitPage()">
+      Fit Page
+    </Button>
+  </HStack>
+
+  <Pdf
+    id="myPdf"
+    height="*"
+    src="/resources/fw8ben.pdf"
+    horizontalAlignment="center"
+    scrollStyle="overlay"
+    mode="edit"
+    onExportRequest="data => console.log(JSON.stringify(data, null, 2))"
+  />
 </App>

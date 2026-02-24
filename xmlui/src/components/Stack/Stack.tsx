@@ -38,6 +38,12 @@ const stackMd = createMetadata({
     "block in XMLUI's layout system, it provides comprehensive alignment, spacing, " +
     "and flow control options that serve as the foundation for all specialized stack variants.",
   props: {
+    desktopOnly: {
+      description: "Optional boolean property to hide the Stack on desktop devices.",
+      valueType: "boolean",
+      isInternal: true,
+      defaultValue: false,
+    },
     gap: {
       description: "Optional size value indicating the gap between child elements.",
       valueType: "string",
@@ -291,6 +297,7 @@ function renderStack({
       onContextMenu={lookupEventHandler("contextMenu")}
       onMount={lookupEventHandler("mounted")}
       registerComponentApi={registerComponentApi}
+      desktopOnly={extractValue.asOptionalBoolean(node.props?.desktopOnly)}
     >
       {renderChild(node.children, {
         type: "Stack",

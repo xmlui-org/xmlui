@@ -1,5 +1,405 @@
 [
   {
+    "tag_name": "xmlui@0.12.2",
+    "published_at": "2026-02-18T11:52:16Z",
+    "changes": [
+      {
+        "description": "Fix bookmark navigation in nested apps (xmlui-pg playground examples)",
+        "commit_sha": "1ffaf6d"
+      },
+      {
+        "description": "Add itemWidth property to Stack and FlowLayout",
+        "commit_sha": "51a7021"
+      },
+      {
+        "description": "Change component document generation to the new link format",
+        "commit_sha": "c00f264"
+      },
+      {
+        "description": "Remove global variables from compnent files",
+        "commit_sha": "354669a"
+      },
+      {
+        "description": "Fix virtualization issues with List and Table",
+        "commit_sha": "23db092"
+      },
+      {
+        "description": "Fix shrinking Table selection checkbox",
+        "commit_sha": "63ef618"
+      },
+      {
+        "description": "feat: improve NavPanel by using NavSection placeholder components for dynamic nav element generation",
+        "commit_sha": "3cf2443"
+      },
+      {
+        "description": "Fix initialPrimarySize issue with Splitter",
+        "commit_sha": "3c9936d"
+      },
+      {
+        "description": "fix: handle active heading state in TableOfContents and update indicator visibility",
+        "commit_sha": "71a1220"
+      },
+      {
+        "description": "Fix <script> + code-behind function declaration regression",
+        "commit_sha": "8c51a09"
+      },
+      {
+        "description": "fix: enhance footer behavior in App component",
+        "commit_sha": "a1d6fde"
+      },
+      {
+        "description": "fix: toc - smoothScrolling",
+        "commit_sha": "a00651d"
+      },
+      {
+        "description": "APICall allows access to error response details",
+        "commit_sha": "47d70ec"
+      },
+      {
+        "description": "Actions.upload now allows field name",
+        "commit_sha": "c9bea96"
+      },
+      {
+        "description": "Fix Bookmark scrolling issue with xmlui-pg",
+        "commit_sha": "1ffaf6d"
+      },
+      {
+        "description": "Additional component metadata: \"excludeBehaviors\", \"deprecationMessage\"",
+        "commit_sha": "c853a36"
+      },
+      {
+        "description": "Remove multiple adjacent separators from DropdownMenu and ContextMenu",
+        "commit_sha": "01e2f2a"
+      },
+      {
+        "description": "fix: scroll behavior handling in TableOfContents and AppContent components",
+        "commit_sha": "a00651d"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.2.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.2/xmlui-0.12.2.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.12.1",
+    "published_at": "2026-02-11T18:05:22Z",
+    "changes": [
+      {
+        "description": "Ensure vite dev server restarts when a module changes",
+        "commit_sha": "ef9bc10"
+      },
+      {
+        "description": "Fix Tree collapseNode to mark the node unloaded",
+        "commit_sha": "4e33e2b"
+      },
+      {
+        "description": "Allow Tree.replaceNode to change the node ID",
+        "commit_sha": "5978efa"
+      },
+      {
+        "description": "Improve inspector trace logging with additional event data",
+        "commit_sha": "916d0db"
+      },
+      {
+        "description": "Global variable handling redesigned",
+        "commit_sha": "0050784"
+      },
+      {
+        "description": "Fix return from try..catch",
+        "commit_sha": "c9c4ee2"
+      },
+      {
+        "description": "Conservative refactoring of containers and state management",
+        "commit_sha": "9b6268e"
+      },
+      {
+        "description": "Removed react-icons as a dependency.",
+        "commit_sha": "e506bd3"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.1.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.1/xmlui-0.12.1.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.12.0",
+    "published_at": "2026-02-06T13:46:20Z",
+    "changes": [
+      {
+        "description": "Add inspector logging infrastructure for debugging XMLUI applications",
+        "commit_sha": "19e04b3"
+      },
+      {
+        "description": "- when using `parseAs`, remember the filename(s) and report them in the input box",
+        "commit_sha": "d8d3613"
+      },
+      {
+        "description": "improve TableOfContents component",
+        "commit_sha": "a79e4f6"
+      },
+      {
+        "description": "Fix Fragment visibility regression",
+        "commit_sha": "e4dab71"
+      },
+      {
+        "description": "Add module import to standalone apps",
+        "commit_sha": "547e261"
+      },
+      {
+        "description": "Fix <script> layout issue in App",
+        "commit_sha": "a49f1a9"
+      },
+      {
+        "description": "Extend Tree API with replaceNode and replaceChildren",
+        "commit_sha": "b9a0e56"
+      },
+      {
+        "description": "Experimenting with publish/subscribe behavior",
+        "commit_sha": "3dce31d"
+      },
+      {
+        "description": "Minor Splitter improvements",
+        "commit_sha": "e8d6844"
+      },
+      {
+        "description": "Add global variables to xmlui (Globals.xs)",
+        "commit_sha": "74ac666"
+      },
+      {
+        "description": "Fix breaking component links (404) in docs",
+        "commit_sha": "79cd8c9"
+      },
+      {
+        "description": "feat: implement navpanelFooter and NavPanelCollapseButton (experimental)",
+        "commit_sha": "7ea3e83"
+      },
+      {
+        "description": "Fix Windows-specific module resolution issues",
+        "commit_sha": "f13b74f"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.0.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.0/xmlui-0.12.0.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.11.34",
+    "published_at": "2026-02-02T15:18:46Z",
+    "changes": [
+      {
+        "description": "Fix ContextMenu regressions",
+        "commit_sha": "f4ff5cd"
+      },
+      {
+        "description": "Add icon to SubMenuItem",
+        "commit_sha": "6b1df19"
+      },
+      {
+        "description": "Updated FileUploadDropZone so the default styling is more user friendly.",
+        "commit_sha": "be41834"
+      },
+      {
+        "description": "Fix onContextMenu issues with Tree",
+        "commit_sha": "19eb716"
+      },
+      {
+        "description": "Fixed issue with markdown links to properly download resource files.",
+        "commit_sha": "a1baf19"
+      },
+      {
+        "description": "Experiment with module imports",
+        "commit_sha": "b9d774f"
+      },
+      {
+        "description": "Tweaked ExpandableItem styles so the summary button appears interactable.",
+        "commit_sha": "a94ec67"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.11.34.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.34/xmlui-0.11.34.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.11.33",
+    "published_at": "2026-01-29T11:00:52Z",
+    "changes": [
+      {
+        "description": "Add selectAll, cut, copy, paste, and delete actions (with keybindings) to Table",
+        "commit_sha": "8be5f66"
+      },
+      {
+        "description": "fix: labelBehavior - double label issue",
+        "commit_sha": "7107dd7"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.11.33.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.33/xmlui-0.11.33.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.11.32",
+    "published_at": "2026-01-28T12:54:00Z",
+    "changes": [
+      {
+        "description": "fix: window.\\_\\_PUBLIC_PATH prefix applying twice to icon resources, making them not resolve to anything.",
+        "commit_sha": "cda5e22"
+      },
+      {
+        "description": "Extend Table with userSelect properties",
+        "commit_sha": "e98efdf"
+      },
+      {
+        "description": "Review the async loading of Tree items",
+        "commit_sha": "7d66fac"
+      },
+      {
+        "description": "feat: Open up possibility for custom components to receive input behaviors via an API/context",
+        "commit_sha": "9bea8d0"
+      },
+      {
+        "description": "Add scrollStyle and showScrollerFade to Tree",
+        "commit_sha": "6ad3926"
+      },
+      {
+        "description": "Removed timeout properties from onValidate.",
+        "commit_sha": "f4842b1"
+      },
+      {
+        "description": "improve: Provide accessible text label for RadioGroup",
+        "commit_sha": "1055794"
+      },
+      {
+        "description": "Allow the \"new\" keyword in object literals as property name",
+        "commit_sha": "a8117ba"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.11.32.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.32/xmlui-0.11.32.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.11.31",
+    "published_at": "2026-01-26T15:36:46Z",
+    "changes": [
+      {
+        "description": "Migrate Table to virtua (from @tanstack/react-virtual)",
+        "commit_sha": "796793b"
+      },
+      {
+        "description": "Experiment with deferred APICall",
+        "commit_sha": "307611c"
+      },
+      {
+        "description": "Parse async/await in scripts but raise error when executing",
+        "commit_sha": "c05a6dd"
+      },
+      {
+        "description": "Allow Column to use layout properties",
+        "commit_sha": "00f087d"
+      },
+      {
+        "description": "Parse new operator but raise error when executing",
+        "commit_sha": "10c1fa5"
+      },
+      {
+        "description": "Experimental generation of context variables",
+        "commit_sha": "78716f4"
+      },
+      {
+        "description": "Fix <li> issue with Markdown in Firefox",
+        "commit_sha": "33c99cd"
+      },
+      {
+        "description": "Fix the inconsistent URL encoding between url and queryParams",
+        "commit_sha": "e11595e"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.11.31.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.31/xmlui-0.11.31.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.11.30",
+    "published_at": "2026-01-22T12:45:26Z",
+    "changes": [
+      {
+        "description": "Add ScrollViewer component",
+        "commit_sha": "4e0379f"
+      },
+      {
+        "description": "Document and improve ContextMenu",
+        "commit_sha": "498abc1"
+      },
+      {
+        "description": "- Columns with bindTo are now sortable by default",
+        "commit_sha": "62d88a4"
+      },
+      {
+        "description": "Add QRCode component",
+        "commit_sha": "ded963e"
+      },
+      {
+        "description": "Add scrollStyle property to Stack, FlowLayout, and NavPanel",
+        "commit_sha": "4e0379f"
+      },
+      {
+        "description": "Add ContextMenu component",
+        "commit_sha": "84acbea"
+      },
+      {
+        "description": "Added completed state theme variable for ProgressBar called \"color-indicator-ProgressBar--complete\".",
+        "commit_sha": "6decfd7"
+      },
+      {
+        "description": "Added validation timeout handling for input fields. New properties include customValidationsTimeout and customValidationsTimeoutMessage.",
+        "commit_sha": "0f9326f"
+      },
+      {
+        "description": "upgrade @remix-run/react to 2.17.4, migrate imports to react-router-dom",
+        "commit_sha": "7a4974d"
+      },
+      {
+        "description": "Add contextMenu event to several components",
+        "commit_sha": "2fb95aa"
+      },
+      {
+        "description": "Add scroll fading effect",
+        "commit_sha": "05c9fd7"
+      },
+      {
+        "description": "Review markdown rendering and theming",
+        "commit_sha": "bc7addd"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.11.30.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.30/xmlui-0.11.30.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.11.29",
     "published_at": "2026-01-19T15:48:52Z",
     "changes": [
@@ -120,354 +520,6 @@
       {
         "name": "xmlui-0.11.28.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.28/xmlui-0.11.28.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.27",
-    "published_at": "2026-01-12T15:35:21Z",
-    "changes": [
-      {
-        "description": "Add experimental bookmark behavior",
-        "commit_sha": "bc1090d"
-      },
-      {
-        "description": "feat: add context, line-col numbers to script parse errors",
-        "commit_sha": "fd9a901"
-      },
-      {
-        "description": "Add \"stretch\" property to Stack",
-        "commit_sha": "79701ad"
-      },
-      {
-        "description": "Add scroll APIs to Stack, Card, and FlowLayout",
-        "commit_sha": "bc67363"
-      },
-      {
-        "description": "Variables defined in <script> override variables in component attributes",
-        "commit_sha": "ff49047"
-      },
-      {
-        "description": "Add stretch property to Stack, Splitter, and FlowLayout",
-        "commit_sha": "79701ad"
-      },
-      {
-        "description": "Fix vertically-aligned Text with overflowType=\"ellipsis\"",
-        "commit_sha": "357946d"
-      },
-      {
-        "description": "Fix FlowLayout issue with nested Text using ellipsis",
-        "commit_sha": "0d04660"
-      },
-      {
-        "description": "Fix the issues with the List scroll API",
-        "commit_sha": "539b718"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.27.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.27/xmlui-0.11.27.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.26",
-    "published_at": "2026-01-08T14:08:48Z",
-    "changes": [
-      {
-        "description": "Add verticalAlignment support to FlowLayout",
-        "commit_sha": "b736b85"
-      },
-      {
-        "description": "feat: implement formBindingBehavior",
-        "commit_sha": "9ebc8e5"
-      },
-      {
-        "description": "Clip pixel artifacts experienced with Text overflowMode",
-        "commit_sha": "01ef62b"
-      },
-      {
-        "description": "Fix issues with empty script tag rendering",
-        "commit_sha": "5d715a3"
-      },
-      {
-        "description": "Fix state variables",
-        "commit_sha": "bd035dd"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.26.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.26/xmlui-0.11.26.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.25",
-    "published_at": "2026-01-06T18:17:33Z",
-    "changes": [
-      {
-        "description": "Add Add status/progress to APICall",
-        "commit_sha": "0abc5a0"
-      },
-      {
-        "description": "Make valueTemplate of Select available in single-select mode",
-        "commit_sha": "42c9bf8"
-      },
-      {
-        "description": "fix: building in CONFIG_ONLY mode handles windows paths",
-        "commit_sha": "bc0f328"
-      },
-      {
-        "description": "Fix standalone app component discovery in templates",
-        "commit_sha": "c4ac21c"
-      },
-      {
-        "description": "Add credentials option to DataSource/APICall",
-        "commit_sha": "8b5c6e8"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.25.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.25/xmlui-0.11.25.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.24",
-    "published_at": "2026-01-05T13:00:14Z",
-    "changes": [
-      {
-        "description": "Fix the rendering issues with an attributeless Theme component",
-        "commit_sha": "ada1e74"
-      },
-      {
-        "description": "Add \"Br\" component as an alias to \"br\"",
-        "commit_sha": "1c230fb"
-      },
-      {
-        "description": "Fix the TableOfContents navigation issue",
-        "commit_sha": "82fcb62"
-      },
-      {
-        "description": "Fix the wrong Select height with searchable=\"true\"",
-        "commit_sha": "6313178"
-      },
-      {
-        "description": "feat: Pages - remember scroll-state of page",
-        "commit_sha": "6303921"
-      },
-      {
-        "description": "Fixed regular Select (non-searchable/multiSelect) not having a wide enough dropdown list if input is sized using percentages.",
-        "commit_sha": "c55b2c6"
-      },
-      {
-        "description": "fix: building a projcet in configOnly mode no longer throws the error 'glob.glob is not a function'",
-        "commit_sha": "2a5e9f9"
-      },
-      {
-        "description": "Experiment with \"init\" and \"cleanup\" component events",
-        "commit_sha": "ff03158"
-      },
-      {
-        "description": "The <script> tag will hoist declarations and ignores non-declaration statements",
-        "commit_sha": "17bc1e4"
-      },
-      {
-        "description": "Add experimental \"init\" event to components",
-        "commit_sha": "f1e1fd9"
-      },
-      {
-        "description": "fix: variant styling issue",
-        "commit_sha": "fdca99c"
-      },
-      {
-        "description": "Add signature and parameter descriptions to component event metadata",
-        "commit_sha": "38dd6f0"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.24.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.24/xmlui-0.11.24.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.23",
-    "published_at": "2025-12-16T13:38:50Z",
-    "changes": [
-      {
-        "description": "Introduce theme-context-relative fontSize theme variables",
-        "commit_sha": "7dfb281"
-      },
-      {
-        "description": "Fix Form submit with nested Forms (ModalDialog)",
-        "commit_sha": "7780fc4"
-      },
-      {
-        "description": "fix: patternInvalidSeverity - phone pattern",
-        "commit_sha": "7160bc8"
-      },
-      {
-        "description": "fix: DatePicker to adjust its font size and spacing to the current font size",
-        "commit_sha": "b3b10a2"
-      },
-      {
-        "description": "fix: NumberBox startText and endText uses different color than TextBox",
-        "commit_sha": "965e23e"
-      },
-      {
-        "description": "Implement the ideal text (attributes) typography flow",
-        "commit_sha": "184b7f8"
-      },
-      {
-        "description": "Form's $data is now available in buttonRowTemplate",
-        "commit_sha": "9936586"
-      },
-      {
-        "description": "Fixed FormItem not passing the ungroupedHeaderTemplate and groupHeaderTemplate properties to underlying Select.",
-        "commit_sha": "e7914aa"
-      },
-      {
-        "description": "Experimental <template> helper tag added",
-        "commit_sha": "1f436da"
-      },
-      {
-        "description": "fix: update disabled text color",
-        "commit_sha": "36b1352"
-      },
-      {
-        "description": "improve: use the Select component in the Table as the page size selector",
-        "commit_sha": "74a81b4"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.23.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.23/xmlui-0.11.23.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.22",
-    "published_at": "2025-12-09T14:18:28Z",
-    "changes": [
-      {
-        "description": "feat: pagination controls should only appear in a Table as necessary, alwaysShowPagination - explicitly toggles pagination controls visibility",
-        "commit_sha": "154ae26"
-      },
-      {
-        "description": "Extend ModalDialog with titleTemplate and title-related theme variables",
-        "commit_sha": "865710f"
-      },
-      {
-        "description": "Add grayscale prop to Image and Markdown components. Images can now be displayed in grayscale by setting `grayscale=\"true\"` on either the Image component or the Markdown component (which applies to all images within the markdown content).",
-        "commit_sha": "b4c1da8"
-      },
-      {
-        "description": "fix: table pagination design on mobile",
-        "commit_sha": "f127399"
-      },
-      {
-        "description": "App component refactored",
-        "commit_sha": "cebc0d3"
-      },
-      {
-        "description": "Add app state management with global functions",
-        "commit_sha": "8ad6968"
-      },
-      {
-        "description": "Add a removeBr property to Markdown",
-        "commit_sha": "fa04809"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.22.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.22/xmlui-0.11.22.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.21",
-    "published_at": "2025-12-04T12:24:28Z",
-    "changes": [
-      {
-        "description": "Reworked and standardized disabled input control visuals.",
-        "commit_sha": "62f10d6"
-      },
-      {
-        "description": "fix: validationResult's position",
-        "commit_sha": "10b5305"
-      },
-      {
-        "description": "Matched the structure of the $error context value and the returned object in onError. Updated APICall and Datasource docs to detail changes.",
-        "commit_sha": "3a5c730"
-      },
-      {
-        "description": "feat: Select - handle option groups in the dropdown list",
-        "commit_sha": "304c247"
-      },
-      {
-        "description": "Added property rowUnselectablePredicate to Table to manage per row selection.",
-        "commit_sha": "160726e"
-      },
-      {
-        "description": "feat: Select - handle ungrouped options, ungroupedHeaderTemplate",
-        "commit_sha": "7ca51e1"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.21.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.21/xmlui-0.11.21.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.20",
-    "published_at": "2025-12-01T13:41:09Z",
-    "changes": [
-      {
-        "description": "Only show sorting indicators in the Table when the user hovers/focuses or orders by a column.",
-        "commit_sha": "aaaeb59"
-      },
-      {
-        "description": "Add isDirty() API to Form",
-        "commit_sha": "d5d08fd"
-      },
-      {
-        "description": "fix formItem initialValue with async loaded null field value",
-        "commit_sha": "28317be"
-      },
-      {
-        "description": "Add getData() API to Form",
-        "commit_sha": "2097a64"
-      },
-      {
-        "description": "Add disableInlineStyle property to Theme",
-        "commit_sha": "4828156"
-      },
-      {
-        "description": "refactor: improve Breakout component to handle different layouts",
-        "commit_sha": "0481073"
-      },
-      {
-        "description": "refactor: use radix for dropdown menu implementation",
-        "commit_sha": "4686bfd"
-      },
-      {
-        "description": "Inline styles can be disabled witht \"appGlobals.disableInlineStyle: true\" setting",
-        "commit_sha": "710e72b"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.20.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.20/xmlui-0.11.20.js"
       }
     ]
   }

@@ -36,6 +36,7 @@ import {
   type Expression,
   type FunctionInvocationExpression,
   type MemberAccessExpression,
+  type NewExpression,
   type ObjectLiteral,
   type PostfixOpExpression,
   type PrefixOpExpression,
@@ -239,7 +240,7 @@ function evalBindingExpressionTree(
       throw new Error("XMLUI does not support the await operator.");
 
     case T_NEW_EXPRESSION:
-      throw new Error("XMLUI does not support the new operator.");
+      return evalNewExpression(evaluator, thisStack, expr, evalContext, thread);
 
     default:
       throw new Error(`Unknown expression tree node: ${(expr as any).type}`);
@@ -605,6 +606,66 @@ function evalFunctionInvocation(
     void evalContext.onDidUpdate(rootScope, rootScope.name, "function-call");
   }
 
+  setExprValue(expr, { value }, thread);
+  thisStack.push(value);
+  return value;
+}
+
+function evalNewExpression(
+  evaluator: EvaluatorFunction,
+  thisStack: any[],
+  expr: NewExpression,
+  evalContext: BindingTreeEvaluationContext,
+  thread: LogicalThread,
+): any {
+  // --- Allowed constructors
+  const allowedConstructors = new Map<string, Function>([
+    ["String", String],
+    ["Date", Date],
+    ["Blob", Blob],
+  ]);
+
+  // --- Evaluate the callee to get the constructor
+  const constructorObj = evaluator(thisStack, expr.callee, evalContext, thread);
+  thisStack.pop();
+
+  // --- Check if the constructor is allowed
+  let allowedConstructor: any = null;
+  for (const [name, ctor] of allowedConstructors) {
+    if (constructorObj === ctor) {
+      allowedConstructor = ctor;
+      break;
+    }
+  }
+
+  if (!allowedConstructor) {
+    const constructorName = constructorObj?.name || "unknown";
+    throw new Error(
+      `XMLUI does not support the new operator with constructor '${constructorName}'. ` +
+      `Only String, Date, and Blob are allowed.`
+    );
+  }
+
+  // --- Evaluate arguments
+  const constructorArgs: any[] = [];
+  for (let i = 0; i < expr.arguments.length; i++) {
+    const arg = expr.arguments[i];
+    if (arg.type === T_SPREAD_EXPRESSION) {
+      const funcArg = evaluator([], arg.expr, evalContext, thread);
+      if (!Array.isArray(funcArg)) {
+        throw new Error("Spread operator within a new expression expects an array operand.");
+      }
+      constructorArgs.push(...funcArg);
+    } else {
+      const funcArg = evaluator([], arg, evalContext, thread);
+      constructorArgs.push(funcArg);
+    }
+  }
+
+  // --- Create the new instance
+  const value = new allowedConstructor(...constructorArgs);
+
+  // --- Done.
   setExprValue(expr, { value }, thread);
   thisStack.push(value);
   return value;

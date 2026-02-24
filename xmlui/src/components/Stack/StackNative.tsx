@@ -20,6 +20,7 @@ export const DEFAULT_ORIENTATION = "vertical";
 export const defaultProps = {
   orientation: DEFAULT_ORIENTATION,
   reverse: false,
+  desktopOnly: false,
   hoverContainer: false,
   visibleOnHover: false,
   scrollStyle: "normal" as ScrollStyle,
@@ -42,6 +43,7 @@ type Props = {
   onClick?: any;
   onContextMenu?: any;
   onMount?: any;
+  desktopOnly?: boolean;
   registerComponentApi?: (api: any) => void;
 };
 
@@ -64,6 +66,7 @@ export const Stack = forwardRef(function Stack(
     onClick,
     onContextMenu,
     onMount,
+    desktopOnly = defaultProps.desktopOnly,
     className,
     registerComponentApi,
     ...rest
@@ -135,6 +138,7 @@ export const Stack = forwardRef(function Stack(
         className,
         styles.base,
         {
+          [styles.desktopOnly]: desktopOnly,
           [styles.vertical]: orientation === "vertical",
           [styles.horizontal]: orientation === "horizontal",
           [styles.reverse]: reverse,

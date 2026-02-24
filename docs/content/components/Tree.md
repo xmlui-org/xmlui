@@ -737,6 +737,30 @@ This event is triggered when the Tree is right-clicked (context menu).
 
 - `event`: The mouse event object.
 
+### `copyAction` [#copyaction]
+
+This event is triggered when the user presses the copy keyboard shortcut (default: Ctrl+C/Cmd+C) while the tree has focus and a node is selected. The handler receives the focused node. The handler should implement the copy logic (e.g., using the Clipboard API to copy the node data).
+
+**Signature**: `copy(node: FlatTreeNode): void | Promise<void>`
+
+- `node`: The currently focused tree node.
+
+### `cutAction` [#cutaction]
+
+This event is triggered when the user presses the cut keyboard shortcut (default: Ctrl+X/Cmd+X) while the tree has focus and a node is selected. The handler receives the focused node. Note: The component does not automatically modify data; the handler must implement the cut logic (e.g., copying node data to clipboard and removing from the tree).
+
+**Signature**: `cut(node: FlatTreeNode): void | Promise<void>`
+
+- `node`: The currently focused tree node.
+
+### `deleteAction` [#deleteaction]
+
+This event is triggered when the user presses the delete keyboard shortcut (default: Delete key) while the tree has focus and a node is selected. The handler receives the focused node. Note: The component does not automatically remove data; the handler must implement the delete logic (e.g., removing the node from the data source).
+
+**Signature**: `delete(node: FlatTreeNode): void | Promise<void>`
+
+- `node`: The currently focused tree node.
+
 ### `loadChildren` [#loadchildren]
 
 Fired when a tree node needs to load children dynamically. Should return an array of child data.
@@ -760,6 +784,14 @@ Fired when a tree node is expanded.
 **Signature**: `nodeDidExpand(node: FlatTreeNode): void`
 
 - `node`: The tree node that was expanded.
+
+### `pasteAction` [#pasteaction]
+
+This event is triggered when the user presses the paste keyboard shortcut (default: Ctrl+V/Cmd+V) while the tree has focus and a node is selected. The handler receives the focused node. The handler must implement the paste logic (e.g., reading from clipboard and inserting data into the tree).
+
+**Signature**: `paste(node: FlatTreeNode): void | Promise<void>`
+
+- `node`: The currently focused tree node.
 
 ### `selectionDidChange` [#selectiondidchange]
 

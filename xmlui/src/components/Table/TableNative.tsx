@@ -1199,7 +1199,10 @@ export const Table = forwardRef(
       const RowComponent = forwardRef<HTMLTableRowElement, CustomItemComponentProps>(
         ({ style, children, index: rowIndex }, ref) => {
           const row = rowsRef.current[rowIndex];
-          if (!row) return null;
+          if (!row) {
+            console.warn(`Table: No row data found at index ${rowIndex}`);
+            return null;
+          }
           const isFirstRow = rowIndex === 0;
           return (
             <tr
@@ -1216,10 +1219,21 @@ export const Table = forwardRef(
                 [styles.noBottomBorder]: noBottomBorder,
               })}
               onClick={(event) => {
+                // On Windows, the second click of a double-click fires onClick before onDoubleClick.
+                // If we allow state mutations (toggleRow, focus) during that second click, the
+                // resulting re-render can destroy the dblclick event on <tr> elements.
+                // Returning early for detail >= 2 prevents that and lets onDoubleClick fire cleanly.
+                if (event.detail >= 2) {
+                  return;
+                }
                 if (!row.getCanSelect()) {
                   return;
                 }
                 if (event?.defaultPrevented) {
+                  return;
+                }
+                // Ignore the second click of a double-click to allow onDoubleClick to fire
+                if (event.detail >= 2) {
                   return;
                 }
                 const target = event.target as HTMLElement;
@@ -1262,12 +1276,12 @@ export const Table = forwardRef(
                 event.preventDefault();
 
                 // Call external handler if provided
-                try {
-                  if (typeof (rowDoubleClick as any) === "function") {
-                    (rowDoubleClick as any)(row.original);
+                if (rowDoubleClick && typeof rowDoubleClick === "function") {
+                  try {
+                    rowDoubleClick(row.original);
+                  } catch (e) {
+                    console.error("Error in rowDoubleClick handler:", e);
                   }
-                } catch (e) {
-                  // swallow errors from handler
                 }
               }}
               onMouseMove={(event) => {

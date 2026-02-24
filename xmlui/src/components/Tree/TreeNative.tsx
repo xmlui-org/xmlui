@@ -405,6 +405,10 @@ interface TreeComponentProps {
   onNodeExpanded?: (node: FlatTreeNode) => void;
   onNodeCollapsed?: (node: FlatTreeNode) => void;
   loadChildren?: (node: FlatTreeNode) => Promise<any[]>;
+  onCutAction?: (node: FlatTreeNode) => void | Promise<void>;
+  onCopyAction?: (node: FlatTreeNode) => void | Promise<void>;
+  onPasteAction?: (node: FlatTreeNode) => void | Promise<void>;
+  onDeleteAction?: (node: FlatTreeNode) => void | Promise<void>;
   lookupEventHandler?: any;
   itemRenderer: (item: any) => ReactNode;
   className?: string;
@@ -448,6 +452,10 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     onNodeExpanded,
     onNodeCollapsed,
     loadChildren,
+    onCutAction,
+    onCopyAction,
+    onPasteAction,
+    onDeleteAction,
     lookupEventHandler,
     itemRenderer,
     className,
@@ -1256,9 +1264,46 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       if (flatTreeData.length === 0) return;
 
       const currentIndex = focusedIndex >= 0 ? focusedIndex : 0;
+      const currentNode = currentIndex >= 0 ? flatTreeData[currentIndex] : null;
       let newIndex = currentIndex;
       let handled = false;
 
+      // Check for keyboard actions (cut, copy, paste, delete)
+      const isCtrlOrCmd = e.ctrlKey || e.metaKey;
+      
+      if (currentNode && isCtrlOrCmd && e.key === "x" && onCutAction) {
+        // Cut action (Ctrl/Cmd+X)
+        e.preventDefault();
+        e.stopPropagation();
+        onCutAction(currentNode);
+        return;
+      }
+      
+      if (currentNode && isCtrlOrCmd && e.key === "c" && onCopyAction) {
+        // Copy action (Ctrl/Cmd+C)
+        e.preventDefault();
+        e.stopPropagation();
+        onCopyAction(currentNode);
+        return;
+      }
+      
+      if (currentNode && isCtrlOrCmd && e.key === "v" && onPasteAction) {
+        // Paste action (Ctrl/Cmd+V)
+        e.preventDefault();
+        e.stopPropagation();
+        onPasteAction(currentNode);
+        return;
+      }
+      
+      if (currentNode && e.key === "Delete" && onDeleteAction) {
+        // Delete action
+        e.preventDefault();
+        e.stopPropagation();
+        onDeleteAction(currentNode);
+        return;
+      }
+
+      // Navigation keys
       switch (e.key) {
         case "ArrowDown":
           e.preventDefault();
@@ -1275,13 +1320,12 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         case "ArrowRight":
           e.preventDefault();
           if (currentIndex >= 0) {
-            const currentNode = flatTreeData[currentIndex];
-            if (currentNode.hasChildren && !currentNode.isExpanded) {
+            if (currentNode!.hasChildren && !currentNode!.isExpanded) {
               // Expand node
-              void toggleNode(currentNode);
+              void toggleNode(currentNode!);
             } else if (
-              currentNode.hasChildren &&
-              currentNode.isExpanded &&
+              currentNode!.hasChildren &&
+              currentNode!.isExpanded &&
               currentIndex + 1 < flatTreeData.length
             ) {
               // Move to first child
@@ -1294,14 +1338,13 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         case "ArrowLeft":
           e.preventDefault();
           if (currentIndex >= 0) {
-            const currentNode = flatTreeData[currentIndex];
-            if (currentNode.hasChildren && currentNode.isExpanded) {
+            if (currentNode!.hasChildren && currentNode!.isExpanded) {
               // Collapse node
-              void toggleNode(currentNode);
-            } else if (currentNode.depth > 0) {
+              void toggleNode(currentNode!);
+            } else if (currentNode!.depth > 0) {
               // Move to parent - find previous node with smaller depth
               for (let i = currentIndex - 1; i >= 0; i--) {
-                if (flatTreeData[i].depth < currentNode.depth) {
+                if (flatTreeData[i].depth < currentNode!.depth) {
                   newIndex = i;
                   break;
                 }
@@ -1327,16 +1370,15 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         case " ":
           e.preventDefault();
           if (currentIndex >= 0) {
-            const currentNode = flatTreeData[currentIndex];
             // Handle selection
-            if (currentNode.selectable) {
-              setSelectedNodeById(currentNode.key);
+            if (currentNode!.selectable) {
+              setSelectedNodeById(currentNode!.key);
               // Ensure focus stays on the current item after selection
               newIndex = currentIndex;
             }
             // Handle expansion for Enter key
-            if (e.key === "Enter" && currentNode.hasChildren) {
-              void toggleNode(currentNode);
+            if (e.key === "Enter" && currentNode!.hasChildren) {
+              void toggleNode(currentNode!);
             }
           }
           handled = true;
@@ -1347,7 +1389,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         setFocusedIndex(newIndex);
       }
     },
-    [focusedIndex, flatTreeData, toggleNode, setSelectedNodeById],
+    [focusedIndex, flatTreeData, toggleNode, setSelectedNodeById, onCutAction, onCopyAction, onPasteAction, onDeleteAction],
   );
 
   const itemData = useMemo(() => {

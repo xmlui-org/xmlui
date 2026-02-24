@@ -1,39 +1,72 @@
 <Component name="Breadcrumbs">
-  <Theme
-      color-Link="$textColor-secondary"
-      color-Link--hover="$textColor-primary"
-      color-Link--active="$textColor-primary"
-      textDecorationLine-Link="none">
-      <HStack
-        wrapContent="true"
-        verticalAlignment="center"
-        gap="$space-2">
-          <Link to="/">
-              Documentation
-          </Link>
-          <Icon
-              when="{$linkInfo.label}"
-              name="chevronright"
-              color="$textColor-secondary"
-               />
-          <Items data="{[...($linkInfo.pathSegments || []), $linkInfo].filter(item => item?.label)}">
-              <HStack verticalAlignment="center" gap="$space-2">
-                  <Link when="{$item.to && !$isLast}" to="{$item.to}">
-                      {$item.label}
-                  </Link>
-                  <Text
-                      when="{!$item.to || $isLast}"
-                      fontWeight="{ $isLast ? '$fontWeight-bold' : 'normal' }"
-                      color="{ $isLast ? '$textColor-primary' : '$textColor-secondary' }">
-                      {$item.label}
-                  </Text>
-                  <Icon
-                      when="{!$isLast}"
-                      name="chevronright"
-                      color="$textColor-secondary"
-                  />
-              </HStack>
-          </Items>
-      </HStack>
-  </Theme>
+    <Theme
+        color-Link="$textColor-secondary"
+        color-Link--hover="$textColor-primary"
+        color-Link--active="$textColor-primary"
+        textDecorationLine-Link="none"
+    >
+        <HStack
+            when="{$props.useDefault}"
+            wrapContent="true"
+            verticalAlignment="center"
+            gap="$space-2"
+        >
+            <Link to="/">
+                Documentation
+            </Link>
+            <Icon
+                name="chevronright"
+                color="$textColor-secondary"
+            />
+            <Link to="/">
+                Learn XMLUI
+            </Link>
+            <Icon
+                name="chevronright"
+                color="$textColor-secondary"
+            />
+            <Text
+                fontWeight="$fontWeight-bold"
+                color="$textColor-primary"
+            >
+                Introduction
+            </Text>
+        </HStack>
+        <HStack
+            when="{!$props.useDefault}"
+            wrapContent="true"
+            verticalAlignment="center"
+            gap="$space-2"
+        >
+            <Link to="/">
+                Documentation
+            </Link>
+            <Icon
+                when="{$linkInfo.label}"
+                name="chevronright"
+                color="$textColor-secondary"
+            />
+            <Items
+                data="{[...($linkInfo.pathSegments || []), $linkInfo].filter(item => item?.label)}"
+            >
+                <HStack verticalAlignment="center" gap="$space-2">
+                    <Link when="{$item.to && !$isLast}" to="{$item.to}">
+                        {$item.label}
+                    </Link>
+                    <Text
+                        when="{!$item.to || $isLast}"
+                        fontWeight="{ $isLast ? '$fontWeight-bold' : 'normal' }"
+                        color="{ $isLast ? '$textColor-primary' : '$textColor-secondary' }"
+                    >
+                        {$item.label}
+                    </Text>
+                    <Icon
+                        when="{!$isLast}"
+                        name="chevronright"
+                        color="$textColor-secondary"
+                    />
+                </HStack>
+            </Items>
+        </HStack>
+    </Theme>
 </Component>

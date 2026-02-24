@@ -13,6 +13,23 @@
 // We index all theme variables with this prefix to make a distinction from variables defined in other custom themes.
 $THEME-VAR-PREFIX: xmlui;
 
+// Global variables for theme composition functions
+$tmp: null;
+$tmpAll: null;
+$tmpHorizontal: null;
+$tmpVertical: null;
+$tmpThickness: null;
+$tmpThicknessHorizontal: null;
+$tmpThicknessVertical: null;
+$tmpStyle: null;
+$tmpStyleHorizontal: null;
+$tmpStyleVertical: null;
+$tmpColor: null;
+$tmpColorHorizontal: null;
+$tmpColorVertical: null;
+$tmpRadius: null;
+$tmpRadiusAll: null;
+
 /*
  * This function creates a CSS variable name by combining the prefix and the argument variable name
  */
@@ -53,7 +70,7 @@ $THEME-VAR-PREFIX: xmlui;
   @if $fallbackValue {
     $num: countSubstring($componentVariable, "var(");
     @if ($num <= 1) {
-      @return var(#{str-slice($componentVariable, 5, -2)}, #{$fallbackValue});
+      @return var(#{string.slice($componentVariable, 5, -2)}, #{$fallbackValue});
     }
     //we offset with the number of 'vars' in the $componentVariable, because we have to offset backwards for the closing parenthesis
     // typically when in a useVar we have a hVar as the first argument
@@ -63,11 +80,11 @@ $THEME-VAR-PREFIX: xmlui;
     }
     //@if(string.index(#{$fallbackValue}, 'fontSize-sm')) {
     //  @debug 'original: ' + #{$componentVariable} + ", varcount: " + $num;
-    //  @debug 'concatet:' + var(#{str-slice($componentVariable, 5, -2)}, #{$fallbackValue});
-    //  @debug 'concat 2:' + var(#{str-slice($componentVariable, 5, $offset)}, #{$fallbackValue});
+    //  @debug 'concatet:' + var(#{string.slice($componentVariable, 5, -2)}, #{$fallbackValue});
+    //  @debug 'concat 2:' + var(#{string.slice($componentVariable, 5, $offset)}, #{$fallbackValue});
     //}
     @return string.unquote(
-      "var(#{str-slice($componentVariable, 5, $offset)}, #{$fallbackValue}#{str-slice($componentVariable, $offset + 1)}"
+      "var(#{string.slice($componentVariable, 5, $offset)}, #{$fallbackValue}#{string.slice($componentVariable, $offset + 1)})"
     );
   } @else {
     @return $componentVariable;
@@ -77,11 +94,11 @@ $THEME-VAR-PREFIX: xmlui;
 @function reverse($list, $recursive: false) {
   $result: ();
 
-  @for $i from length($list) * -1 through -1 {
-    @if type-of(nth($list, abs($i))) == list and $recursive {
-      $result: append($result, reverse(nth($list, abs($i)), $recursive));
+  @for $i from list.length($list) * -1 through -1 {
+    @if meta.type-of(list.nth($list, abs($i))) == list and $recursive {
+      $result: list.append($result, reverse(list.nth($list, abs($i)), $recursive));
     } @else {
-      $result: append($result, nth($list, abs($i)));
+      $result: list.append($result, list.nth($list, abs($i)));
     }
   }
 
@@ -99,19 +116,19 @@ $THEME-VAR-PREFIX: xmlui;
 @function remove-nth($list, $index) {
   $result: null;
 
-  @if type-of($index) != number {
-    @warn "$index: #{quote($index)} is not a number for `remove-nth`.";
+  @if meta.type-of($index) != number {
+    @warn "$index: #{string.quote($index)} is not a number for `remove-nth`.";
   } @else if $index == 0 {
     @warn "List index 0 must be a non-zero integer for `remove-nth`.";
-  } @else if abs($index) > length($list) {
-    @warn "List index is #{$index} but list is only #{length($list)} item long for `remove-nth`.";
+  } @else if abs($index) > list.length($list) {
+    @warn "List index is #{$index} but list is only #{list.length($list)} item long for `remove-nth`.";
   } @else {
     $result: ();
-    $index: if($index < 0, length($list) + $index + 1, $index);
+    $index: if($index < 0, list.length($list) + $index + 1, $index);
 
-    @for $i from 1 through length($list) {
+    @for $i from 1 through list.length($list) {
       @if $i != $index {
-        $result: append($result, nth($list, $i));
+        $result: list.append($result, list.nth($list, $i));
       }
     }
   }
@@ -123,16 +140,16 @@ $THEME-VAR-PREFIX: xmlui;
   $result: ();
 
   @each $item in $list {
-    @if not index($used, $item) {
-      $result: append($result, $item, comma);
-      $used: append($used, $item, comma);
+    @if not list.index($used, $item) {
+      $result: list.append($result, $item, comma);
+      $used: list.append($used, $item, comma);
 
-      @if length($list) > 1 {
-        $rest: remove-nth($list, index($list, $item));
+      @if list.length($list) > 1 {
+        $rest: remove-nth($list, list.index($list, $item));
         $combinations: generate-combinations($rest, $used);
 
         @each $combination in $combinations {
-          $result: append($result, join($item, $combination), comma);
+          $result: list.append($result, list.join($item, $combination), comma);
         }
       }
     }
@@ -142,7 +159,7 @@ $THEME-VAR-PREFIX: xmlui;
 }
 
 @function compare($string-a, $string-b) {
-  @return str-length($string-a) > str-length($string-b);
+  @return string.length($string-a) > string.length($string-b);
 }
 
 @function quick-sort($list) {
@@ -170,7 +187,7 @@ $THEME-VAR-PREFIX: xmlui;
 }
 
 @function capitalize($string) {
-  @return to-upper-case(str-slice($string, 1, 1)) + str-slice($string, 2);
+  @return string.to-upper-case(string.slice($string, 1, 1)) + string.slice($string, 2);
 }
 
 @function createHVar($attribute, $component, $traits: (), $states: (), $fallback: false) {
@@ -220,20 +237,20 @@ $THEME-VAR-PREFIX: xmlui;
   // empty array/list
   $split-arr: ();
   // first index of separator in string
-  $index: str-index($string, $separator);
+  $index: string.index($string, $separator);
   // loop through string
   @while $index != null {
     // get the substring from the first character to the separator
-    $item: str-slice($string, 1, $index - 1);
+    $item: string.slice($string, 1, $index - 1);
     // push item to array
-    $split-arr: append($split-arr, $item);
+    $split-arr: list.append($split-arr, $item);
     // remove item and separator from string
-    $string: str-slice($string, $index + 1);
+    $string: string.slice($string, $index + 1);
     // find new index of separator
-    $index: str-index($string, $separator);
+    $index: string.index($string, $separator);
   }
   // add the remaining string to list (the last item)
-  $split-arr: append($split-arr, $string);
+  $split-arr: list.append($split-arr, $string);
 
   @return $split-arr;
 }
@@ -270,13 +287,13 @@ $THEME-VAR-PREFIX: xmlui;
 }
 
 @function json-stringify($var) {
-  $var-type: type-of($var);
+  $var-type: meta.type-of($var);
   $encode-func-name: "_encode-#{$var-type}";
 
-  @if (function-exists($encode-func-name)) {
-    $encode-func: get-function($encode-func-name);
+  @if (meta.function-exists($encode-func-name)) {
+    $encode-func: meta.get-function($encode-func-name);
 
-    @return call($encode-func, $var);
+    @return meta.call($encode-func, $var);
   }
 
   @return $var; // strings and booleans don't need to be modified
@@ -315,8 +332,8 @@ $THEME-VAR-PREFIX: xmlui;
 }
 
 @function _encode-iterable($iterable) {
-  $is-list: type-of($iterable) == "list";
-  $is-map: type-of($iterable) == "map";
+  $is-list: meta.type-of($iterable) == "list";
+  $is-map: meta.type-of($iterable) == "map";
 
   $str: "";
   $opening-bracket: if($is-list, "[", "{");
@@ -334,7 +351,7 @@ $THEME-VAR-PREFIX: xmlui;
     $str: $str + ", " + $entry-string;
   }
 
-  $str: str-slice($str, 3); // remove leading ', ' from ', entry1, entry2'
+  $str: string.slice($str, 3); // remove leading ', ' from ', entry1, entry2'
 
   @return $opening-bracket + $str + $closing-bracket;
 }

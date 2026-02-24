@@ -2,28 +2,71 @@
     layout="vertical-full-header"
     noScrollbarGutters="false"
 >
-    <AppHeader>
-        <property name="logoTemplate">
-            <Link to="https://xmlui.org/">
-                <Logo height="$space-8" />
-            </Link>
-        </property>
-        <HStack when="{mediaSize.sizeIndex > 2}" gap="0">
-            <NavLink noIndicator label="Docs" to="/" active />
-            <NavLink noIndicator label="Blog" to="https://blog.xmlui.org" />
-            <NavLink
-                to="https://www.xmlui.org/get-started"
-                noIndicator
-                label="Get started"
+    <Theme
+        backgroundColor-AppHeader="$color-surface-raised"
+        borderBottom-AppHeader="1px solid $borderColor"
+        paddingHorizontal-AppHeader="$space-4"
+        paddingLeft-AppHeader="$paddingHorizontal-AppHeader"
+        paddingRight-AppHeader="$paddingHorizontal-AppHeader"
+        paddingTop-AppHeader="$paddingVertical-AppHeader"
+        paddingBottom-AppHeader="$paddingVertical-AppHeader"
+        padding-AppHeader="$paddingTop-AppHeader $paddingRight-AppHeader $paddingBottom-AppHeader $paddingLeft-AppHeader"
+        paddingHorizontal-logo-AppHeader="$space-0"
+        paddingVertical-logo-AppHeader="$space-4"
+        paddingLeft-logo-AppHeader="$paddingHorizontal-logo-AppHeader"
+        paddingRight-logo-AppHeader="$paddingHorizontal-logo-AppHeader"
+        paddingTop-logo-AppHeader="$paddingVertical-logo-AppHeader"
+        paddingBottom-logo-AppHeader="$paddingVertical-logo-AppHeader"
+        padding-logo-AppHeader="$paddingTop-logo-AppHeader $paddingRight-logo-AppHeader $paddingBottom-logo-AppHeader $paddingLeft-logo-AppHeader"
+        maxWidth-content-AppHeader="$maxWidth-content-App"
+        maxWidth-AppHeader="$maxWidth-App"
+        padding-drawerToggle-AppHeader="$space-0_5"
+        borderRadius-AppHeader="0px"
+        color-surface="rgb(111, 110, 119)"
+        backgroundColor="$color-surface-0"
+        fontSize="15px"
+        textColor-Text="$color-surface-600"
+        iconAlignment-NavLink="baseline"
+        fontSize-NavLink="14px"
+        fontWeight-NavLink="500"
+        textColor-NavLink="$color-surface-500"
+        textColor-NavLink--active="$color-surface-900"
+        textColor-NavLink--hover="$color-surface-700"
+        textColor-NavLink--hover--active="$color-surface-900"
+        textColor-NavLink--pressed="$color-surface-900"
+        thickness-indicator-NavLink="0"
+        paddingVertical-NavLink="$space-1_5"
+        paddingLeft-level1-NavLink="$space-0"
+    >
+        <AppHeader>
+            <property name="logoTemplate">
+                <Link to="https://xmlui.org/">
+                    <Logo height="$space-8" />
+                </Link>
+            </property>
+            <Stack desktopOnly>
+                <HStack gap="0">
+                    <NavLink noIndicator label="Docs" to="/" active />
+                    <NavLink
+                        noIndicator
+                        label="Blog"
+                        to="https://blog.xmlui.org"
+                    />
+                    <NavLink
+                        to="https://www.xmlui.org/get-started"
+                        noIndicator
+                        label="Get started"
+                    />
+                </HStack>
+            </Stack>
+            <SpaceFiller />
+            <Search
+                collapsible="true"
+                when="{mediaSize.sizeIndex > 1}"
+                data="{appGlobals.plainTextContent}"
             />
-        </HStack>
-        <SpaceFiller />
-        <Search
-            collapsible="true"
-            when="{mediaSize.sizeIndex > 1}"
-            data="{appGlobals.plainTextContent}"
-        />
-    </AppHeader>
+        </AppHeader>
+    </Theme>
     <NavPanel
         when="{(!globalThis.location.hash.includes('/404') && !globalThis.location.pathname.includes('/404')) || mediaSize.sizeIndex <= 2}"
         scrollStyle="whenScrolling"
@@ -99,7 +142,11 @@
             </NavGroup>
         </Stack>
         <NavGroup label="Guides" to="/guides">
-            <NavLink icon="hierarchy" label="App Structure" to="/guides/app-structure" />
+            <NavLink
+                icon="hierarchy"
+                label="App Structure"
+                to="/guides/app-structure"
+            />
             <NavLink icon="markup" label="Markup" to="/guides/markup" />
             <NavLink icon="bolt" label="Scripting" to="/guides/scripting" />
             <NavLink icon="boundary" label="Scoping" to="/guides/scoping" />
@@ -125,7 +172,11 @@
                 to="/guides/routing-and-links"
             />
             <NavLink icon="form" label="Forms" to="/guides/forms" />
-            <NavLink icon="dialog" label="Modal Dialogs" to="/guides/modal-dialogs" />
+            <NavLink
+                icon="dialog"
+                label="Modal Dialogs"
+                to="/guides/modal-dialogs"
+            />
             <NavLink
                 icon="component"
                 label="User-defined Components"
@@ -290,6 +341,11 @@
             />
             <NavLink
                 icon="article"
+                label="Toggle multiple items with shared state"
+                to="/howto/toggle-multiple-items-with-shared-state"
+            />
+            <NavLink
+                icon="article"
                 label="Sync selections between table and list views"
                 to="/howto/sync-selections-between-table-and-list-views"
             />
@@ -375,9 +431,9 @@
             <NavLink icon="globals" label="Globals" to="/globals" />
             <NavLink icon="helper-tags" label="Helper Tags" to="/helper-tags" />
             <NavLink
-                icon="universal-props"
-                label="Universal Properties"
-                to="/universal-properties"
+                icon="core-props"
+                label="Core Properties"
+                to="/core-properties"
             />
             <NavLink
                 icon="template-props"
@@ -395,7 +451,7 @@
     </NavPanel>
     <Pages fallbackPath="/404" defaultScrollRestoration="true">
         <Page url="/">
-            <DocumentPageNoTOC content="{appGlobals.content['pages/intro.md']}" />
+            <DocumentPageNoTOC content="{appGlobals.content['pages/intro.md']}" useDefault="{true}" />
         </Page>
         <Page url="/reactive-intro">
             <DocumentPageNoTOC
@@ -603,9 +659,9 @@
                 content="{appGlobals.content['pages/helper-tags.md']}"
             />
         </Page>
-        <Page url="/universal-properties">
+        <Page url="/core-properties">
             <DocumentPage
-                content="{appGlobals.content['pages/universal-properties.md']}"
+                content="{appGlobals.content['pages/core-properties.md']}"
             />
         </Page>
         <Page url="/template-properties">
@@ -760,6 +816,11 @@
                 content="{appGlobals.content['pages/howto/update-ui-optimistically.md']}"
             />
         </Page>
+        <Page url="/howto/toggle-multiple-items-with-shared-state">
+            <DocumentPageNoTOC
+                content="{appGlobals.content['pages/howto/toggle-multiple-items-with-shared-state.md']}"
+            />
+        </Page>
         <Page url="/howto/make-a-table-responsive">
             <DocumentPageNoTOC
                 content="{appGlobals.content['pages/howto/make-a-table-responsive.md']}"
@@ -843,9 +904,9 @@
             <DocumentPage when="{content}" content="{content}" />
             <Redirect when="{!content}" to="/404" />
         </Page>
-        <Page url="/extensions/:extensionId">
+        <Page url="/extensions/*">
             <script>
-              var contentKey = "extensions/" + $routeParams.extensionId;
+              var contentKey = "extensions/" + $routeParams['*'];
               var content = appGlobals.content[contentKey];
             </script>
             <DocumentPage when="{content}" content="{content}" />
@@ -856,42 +917,62 @@
         </Page>
     </Pages>
     <ScrollToTop marginBottom="$space-4" />
-    <Footer>
-        <Text fontWeight="400">
-            This site is an
-            <Text variant="strong">
-                XMLUI™
+    <Theme
+        padding-Footer="$space-2 $space-4"
+        borderTop-Footer="1px solid $borderColor"
+        backgroundColor-Footer="$backgroundColor-AppHeader"
+        textColor-Footer="$textColor-secondary"
+        fontSize-Footer="15px"
+        verticalAlignment-Footer="center"
+        maxWidth-content-Footer="$maxWidth-content"
+        gap-Footer="$space-normal"
+        margin-Footer="0 auto"
+        color-surface="rgb(111, 110, 119)"
+        backgroundColor="$color-surface-0"
+        fontSize="15px"
+        textColor-Text="$color-surface-600"
+        textColor-Link="$color-surface-600"
+        textColor-Link--hover="$color-surface-900"
+    >
+        <Footer>
+            <Text fontWeight="400">
+                This site is an
+                <Text variant="strong">
+                    XMLUI™
+                </Text>
+                app.
             </Text>
-            app.
-        </Text>
-        <SpaceFiller />
-        <HStack verticalAlignment="center">
-            <Fragment when="{mediaSize.sizeIndex > 2}">
-                <LinkButton
-                    to="https://demo.xmlui.org"
-                    label="Gallery"
-                    blank="{true}"
-                />
-                <LinkButton
-                    to="https://xmlui.org/news"
-                    label="News & Reviews"
-                    blank="{true}"
-                />
-                <LinkButton
-                    to="https://docs.xmlui.org/change-log"
-                    label="Changelog"
-                    blank="{true}"
-                />
-                <Separator />
-                <LinkButton
-                    to="https://github.com/xmlui-org/xmlui"
-                    icon="github"
-                    label="GitHub"
-                    blank="{true}"
-                />
-                <Separator />
-            </Fragment>
-            <ToneSwitch />
-        </HStack>
-    </Footer>
+            <SpaceFiller />
+            <HStack verticalAlignment="center">
+                <Stack desktopOnly>
+                    <CHStack>
+                        <LinkButton
+                            to="https://demo.xmlui.org"
+                            label="Gallery"
+                            blank="{true}"
+                        />
+                        <LinkButton
+                            to="https://xmlui.org/news"
+                            label="News & Reviews"
+                            blank="{true}"
+                        />
+                        <LinkButton
+                            to="https://docs.xmlui.org/change-log"
+                            label="Changelog"
+                            blank="{true}"
+                        />
+                        <Separator />
+                        <LinkButton
+                            to="https://github.com/xmlui-org/xmlui"
+                            icon="github"
+                            label="GitHub"
+                            blank="{true}"
+                        />
+                        <Separator />
+                    </CHStack>
+                </Stack>
+                <ToneSwitch />
+            </HStack>
+        </Footer>
+    </Theme>
 </App>

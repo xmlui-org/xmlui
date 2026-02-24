@@ -73,6 +73,10 @@ Available values: `start` **(default)**, `center`, `end`
 </App>
 ```
 
+### `itemWidth` [#itemwidth]
+
+The default width applied to child elements in the Stack. For vertical stacks, defaults to '100%' (children take full width). For horizontal stacks, defaults to 'fit-content' (children size to their content).
+
 ### `orientation` [#orientation]
 
 > [!DEF]  default: **"vertical"**

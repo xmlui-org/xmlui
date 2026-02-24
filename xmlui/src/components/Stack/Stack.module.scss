@@ -40,6 +40,12 @@ $themeVars: ();
     &.handlesClick{
       cursor: pointer;
     }
+
+    &.desktopOnly{
+      @include t.withMaxScreenSize(2) {
+        display: none;
+      }
+    }
   }
 
   .vertical {

@@ -511,6 +511,88 @@ test.describe("Event Handling", () => {
     // Verify the complex data is received correctly
     await expect.poll(testStateDriver.testState).toEqual(testData);
   });
+
+  test("keyDown event fires when a key is pressed", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App
+        onKeyDown="event => testState = event.key"
+        testId="app"
+      >
+        <Text testId="content">Press a key</Text>
+      </App>
+    `);
+
+    const content = page.getByTestId("content");
+    await expect(content).toBeVisible();
+    await page.keyboard.press("a");
+
+    await expect.poll(testStateDriver.testState).toEqual("a");
+  });
+
+  test("keyDown event receives keyboard event object with key and modifier info", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App
+        onKeyDown="event => testState = { key: event.key, ctrlKey: event.ctrlKey, shiftKey: event.shiftKey, altKey: event.altKey }"
+        testId="app"
+      >
+        <Text testId="content">Press a key</Text>
+      </App>
+    `);
+
+    const content = page.getByTestId("content");
+    await expect(content).toBeVisible();
+    await page.keyboard.press("Shift+x");
+
+    await expect.poll(testStateDriver.testState).toMatchObject({
+      key: "x",
+      ctrlKey: false,
+      shiftKey: true,
+      altKey: false,
+    });
+  });
+
+  test("keyUp event fires when a key is released", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App
+        onKeyUp="event => testState = event.key"
+        testId="app"
+      >
+        <Text testId="content">Press a key</Text>
+      </App>
+    `);
+
+    const content = page.getByTestId("content");
+    await expect(content).toBeVisible();
+    await page.keyboard.press("b");
+
+    await expect.poll(testStateDriver.testState).toEqual("b");
+  });
+
+  test("both keyDown and keyUp events fire for a single key press", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App
+        var.events="{[]}"
+        onKeyDown="event => { events = [...events, 'down:' + event.key]; testState = events; }"
+        onKeyUp="event => { events = [...events, 'up:' + event.key]; testState = events; }"
+        testId="app"
+      >
+        <Text testId="content">Press a key</Text>
+      </App>
+    `);
+
+    const content = page.getByTestId("content");
+    await expect(content).toBeVisible();
+    await page.keyboard.press("x");
+
+    await expect.poll(testStateDriver.testState).toContain("down:x");
+    await expect.poll(testStateDriver.testState).toContain("up:x");
+  });
 });
 
 // =============================================================================

@@ -180,6 +180,7 @@ function StandaloneApp({
     components,
     themes,
     sources,
+    icons,
   } = standaloneApp || {};
 
   const globalProps = useMemo(() => {
@@ -251,6 +252,7 @@ function StandaloneApp({
         sources={sources}
         extensionManager={extensionManager}
         contributes={contributes}
+        icons={icons}
       >
         {children}
       </AppRoot>
@@ -944,7 +946,7 @@ function useStandalone(
         if (!appDef) {
           throw new Error("couldn't find the application metadata");
         }
-        
+
         // --- Transform Main.xmlui.xs variables into <global> tags for dependency support
         const mainXs = runtime?.[MAIN_XS_BUILT_RESOURCE];
         if (mainXs?.vars || mainXs?.functions) {

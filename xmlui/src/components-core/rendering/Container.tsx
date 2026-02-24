@@ -9,7 +9,7 @@ import {
   useRef,
   useTransition,
 } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import type { ParentRenderContext } from "../../abstractions/ComponentDefs";
 import type { ContainerState } from "../../abstractions/ContainerDefs";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
@@ -125,8 +125,9 @@ export const Container = memo(
 
     const appContext = useAppContext();
     const { getThemeVar } = useTheme();
-    const navigate = useNavigate();
     const location = useLocation();
+    // Use navigate from appContext to respect willNavigate/didNavigate events
+    const navigate = appContext.navigate;
 
     const fnsRef = useRef<Record<symbol, any>>({});
 

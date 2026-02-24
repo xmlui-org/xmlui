@@ -19,7 +19,12 @@ import styles from "./App.module.scss";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { RenderChildFn, RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useAppContext } from "../../components-core/AppContext";
-import { useIsomorphicLayoutEffect, useResizeObserver } from "../../components-core/utils/hooks";
+import {
+  useIsomorphicLayoutEffect,
+  useResizeObserver,
+  useDocumentKeydown,
+  useDocumentKeyup,
+} from "../../components-core/utils/hooks";
 import { useTheme, useThemes } from "../../components-core/theming/ThemeContext";
 import { useScrollbarWidth } from "../../components-core/utils/css-utils";
 import { Sheet, SheetContent } from "./Sheet";
@@ -79,6 +84,10 @@ type Props = {
   noScrollbarGutters?: boolean;
   onReady?: () => void;
   onMessageReceived?: (data: any, event: MessageEvent) => void;
+  onKeyDown?: (event: KeyboardEvent) => void;
+  onKeyUp?: (event: KeyboardEvent) => void;
+  onWillNavigate?: (to: string | number, queryParams?: Record<string, any>) => false | void | null | undefined;
+  onDidNavigate?: (to: string | number, queryParams?: Record<string, any>) => void;
   navPanelDef?: ComponentDef;
   logoContentDef?: ComponentDef;
   renderChild?: RenderChildFn;
@@ -103,6 +112,10 @@ export const defaultProps: Pick<
   | "autoDetectTone"
   | "onReady"
   | "onMessageReceived"
+  | "onKeyDown"
+  | "onKeyUp"
+  | "onWillNavigate"
+  | "onDidNavigate"
 > = {
   scrollWholePage: true,
   noScrollbarGutters: false,
@@ -111,6 +124,10 @@ export const defaultProps: Pick<
   autoDetectTone: false,
   onReady: noop,
   onMessageReceived: noop,
+  onKeyDown: noop,
+  onKeyUp: noop,
+  onWillNavigate: undefined,
+  onDidNavigate: undefined,
 };
 
 /**
@@ -153,6 +170,10 @@ export function App({
   noScrollbarGutters = defaultProps.noScrollbarGutters,
   onReady = defaultProps.onReady,
   onMessageReceived = defaultProps.onMessageReceived,
+  onKeyDown = defaultProps.onKeyDown,
+  onKeyUp = defaultProps.onKeyUp,
+  onWillNavigate = defaultProps.onWillNavigate,
+  onDidNavigate = defaultProps.onDidNavigate,
   header,
   navPanel,
   footer,
@@ -191,7 +212,7 @@ export function App({
     ? (normalized as AppLayoutType)
     : "condensed-sticky";
   const appContext = useAppContext();
-  const { setLoggedInUser, mediaSize, forceRefreshAnchorScroll, appGlobals } = appContext;
+  const { setLoggedInUser, setNavigationHandlers, mediaSize, forceRefreshAnchorScroll, appGlobals } = appContext;
   const hasRegisteredHeader = header !== undefined;
 
   // Check if NavPanel exists and is actually displayed
@@ -204,6 +225,13 @@ export function App({
   useEffect(() => {
     setLoggedInUser(loggedInUser);
   }, [loggedInUser, setLoggedInUser]);
+
+  // Set navigation event handlers
+  useEffect(() => {
+    if (setNavigationHandlers) {
+      setNavigationHandlers(onWillNavigate, onDidNavigate);
+    }
+  }, [onWillNavigate, onDidNavigate, setNavigationHandlers]);
 
   // Initialize theme and tone settings
   useThemeInitialization({
@@ -225,6 +253,14 @@ export function App({
       window.removeEventListener("message", handleMessage);
     };
   }, [onMessageReceived]);
+
+  useDocumentKeydown((event: KeyboardEvent) => {
+    onKeyDown?.(event);
+  });
+
+  useDocumentKeyup((event: KeyboardEvent) => {
+    onKeyUp?.(event);
+  });
 
   // Determine if NavPanel should be visible inline (not in drawer)
   // On large screens: always show inline
@@ -457,7 +493,9 @@ export function App({
           <AppContextAwareAppHeader renderChild={renderChild} />
         )}
         {header}
-        {config.navPanelInHeader && navPanelVisible && <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>}
+        {config.navPanelInHeader && navPanelVisible && (
+          <AppNavPanelSlot>{navPanel}</AppNavPanelSlot>
+        )}
       </AppHeaderSlot>
     </Part>
   );
@@ -500,7 +538,8 @@ export function App({
   const content = (
     <AppContainer
       className={classnames(wrapperBaseClasses, ...config.containerClasses, {
-        [styles.navPanelCollapsed]: navPanelVisible && navPanelCollapsed && config.useVerticalFullHeaderStructure,
+        [styles.navPanelCollapsed]:
+          navPanelVisible && navPanelCollapsed && config.useVerticalFullHeaderStructure,
       })}
       style={styleWithHelpers}
       ref={shouldContainerScroll ? pageScrollRef : undefined}

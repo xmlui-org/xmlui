@@ -1,6 +1,5 @@
 import React, { forwardRef, type ReactNode, type CSSProperties } from "react";
 import { Scroller, type ScrollStyle } from "./Scroller";
-import styles from "./ScrollViewer.module.scss";
 
 export const defaultProps = {
   scrollStyle: "normal" as ScrollStyle,

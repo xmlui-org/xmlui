@@ -38,6 +38,7 @@ import {
   type FunctionInvocationExpression,
   type Identifier,
   type MemberAccessExpression,
+  type NewExpression,
   type ObjectLiteral,
   type PostfixOpExpression,
   type PrefixOpExpression,
@@ -224,7 +225,7 @@ async function evalBindingExpressionTreeAsync(
         throw new Error("XMLUI does not support the await operator.");
 
       case T_NEW_EXPRESSION:
-        throw new Error("XMLUI does not support the new operator.");
+        return await evalNewExpressionAsync(evaluator, thisStack, expr, evalContext, thread);
 
       default:
         throw new Error(`Unknown expression tree node: ${(expr as any).type}`);
@@ -593,6 +594,70 @@ async function evalFunctionInvocationAsync(
   if (updatesState && evalContext.onDidUpdate) {
     void evalContext.onDidUpdate(rootScope, rootScope.name, "function-call");
   }
+
+  // --- Done.
+  setExprValue(expr, { value: returnValue }, thread);
+  thisStack.push(returnValue);
+  return returnValue;
+}
+
+async function evalNewExpressionAsync(
+  evaluator: EvaluatorAsyncFunction,
+  thisStack: any[],
+  expr: NewExpression,
+  evalContext: BindingTreeEvaluationContext,
+  thread: LogicalThread,
+): Promise<any> {
+  // --- Allowed constructors
+  const allowedConstructors = new Map<string, Function>([
+    ["String", String],
+    ["Date", Date],
+    ["Blob", Blob],
+  ]);
+
+  // --- Evaluate the callee to get the constructor
+  await evaluator(thisStack, expr.callee, evalContext, thread);
+  const constructorObj = await completeExprValue(expr.callee, thread);
+  thisStack.pop();
+
+  // --- Check if the constructor is allowed
+  let allowedConstructor: any = null;
+  for (const [name, ctor] of allowedConstructors) {
+    if (constructorObj === ctor) {
+      allowedConstructor = ctor;
+      break;
+    }
+  }
+
+  if (!allowedConstructor) {
+    const constructorName = constructorObj?.name || "unknown";
+    throw new Error(
+      `XMLUI does not support the new operator with constructor '${constructorName}'. ` +
+      `Only String, Date, and Blob are allowed.`
+    );
+  }
+
+  // --- Evaluate arguments
+  const constructorArgs: any[] = [];
+  for (let i = 0; i < expr.arguments.length; i++) {
+    const arg = expr.arguments[i];
+    if (arg.type === T_SPREAD_EXPRESSION) {
+      await evaluator([], arg.expr, evalContext, thread);
+      const funcArg = await completeExprValue(arg.expr, thread);
+      if (!Array.isArray(funcArg)) {
+        throw new Error("Spread operator within a new expression expects an array operand.");
+      }
+      constructorArgs.push(...funcArg);
+    } else {
+      await evaluator([], arg, evalContext, thread);
+      const funcArg = await completeExprValue(arg, thread);
+      constructorArgs.push(funcArg);
+    }
+  }
+
+  // --- Create the new instance
+  const value = new allowedConstructor(...constructorArgs);
+  const returnValue = await completePromise(value);
 
   // --- Done.
   setExprValue(expr, { value: returnValue }, thread);

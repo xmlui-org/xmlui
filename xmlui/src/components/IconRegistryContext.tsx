@@ -10,7 +10,7 @@ export function useIconRegistry() {
 }
 
 //https://github.com/hatashiro/react-attr-converter/tree/master
-const svgAttributeMap: Record<string, string> = {
+export const svgAttributeMap: Record<string, string> = {
   // SVG attributes
   accentheight: "accentHeight",
   accumulate: "accumulate",
@@ -253,7 +253,7 @@ const svgAttributeMap: Record<string, string> = {
   zoomandpan: "zoomAndPan",
 };
 
-const extraCharRegex = /[-:]/g;
+export const extraCharRegex = /[-:]/g;
 
 export function useCustomSvgIconRenderer(resourceUrl?: string) {
   const { ensureCustomSvgIcon, customSvgs } = useIconRegistry();

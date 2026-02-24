@@ -456,6 +456,22 @@ Here is a more complex example built on star-sizing:
 
 ## Events [#events]
 
+### `keyDown` [#keydown]
+
+This event fires when a key is pressed while the `App` has focus or when the event reaches the app level without being consumed by a child component.
+
+**Signature**: `(event: KeyboardEvent) => void`
+
+- `event`: The keyboard event object.
+
+### `keyUp` [#keyup]
+
+This event fires when a key is released while the `App` has focus or when the event reaches the app level without being consumed by a child component.
+
+**Signature**: `(event: KeyboardEvent) => void`
+
+- `event`: The keyboard event object.
+
 ### `messageReceived` [#messagereceived]
 
 This event fires when the `App` component receives a message from another window or iframe via the window.postMessage API.
@@ -515,6 +531,7 @@ This component does not expose any methods.
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-navPanel-App | none | none |
 | [maxWidth](../styles-and-themes/common-units/#size)-App | $maxWidth-content | $maxWidth-content |
 | [maxWidth-content](../styles-and-themes/common-units/#size)-App | $maxWidth-content | $maxWidth-content |
+| [maxWidth-content](../styles-and-themes/common-units/#size)-App--withToc | *none* | *none* |
 | [width](../styles-and-themes/common-units/#size)-navPanel-App | $space-64 | $space-64 |
 | [width](../styles-and-themes/common-units/#size)-navPanel-collapsed-App | 48px | 48px |
 

@@ -11,18 +11,26 @@ $component: "ExpandableItem";
 $themeVars: t.composeBorderVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, "summary-#{$component}");
+$themeVars: t.composeTextVars($themeVars, "summary-#{$component}");
+$themeVars: t.composeBorderVars($themeVars, "content-#{$component}");
 $themeVars: t.composePaddingVars($themeVars, "content-#{$component}");
+$themeVars: t.composeTextVars($themeVars, "content-#{$component}");
 $backgroundColor-ExpandableItem: createThemeVar("backgroundColor-#{$component}");
 $backgroundColor-ExpandableItem--hover: createThemeVar("backgroundColor-#{$component}--hover");
 $backgroundColor-ExpandableItem--active: createThemeVar("backgroundColor-#{$component}--active");
+$backgroundColor-summary-ExpandableItem: createThemeVar("backgroundColor-summary-#{$component}");
+$backgroundColor-summary-ExpandableItem--hover: createThemeVar("backgroundColor-summary-#{$component}--hover");
+$backgroundColor-summary-ExpandableItem--active: createThemeVar("backgroundColor-summary-#{$component}--active");
 $borderRadius-summary-ExpandableItem: createThemeVar("borderRadius-summary-#{$component}");
 $color-ExpandableItem: createThemeVar("color-#{$component}");
 $color-ExpandableItem--disabled: createThemeVar("color-#{$component}--disabled");
 $fontFamily-ExpandableItem: createThemeVar("fontFamily-#{$component}");
 $fontSize-ExpandableItem: createThemeVar("fontSize-#{$component}");
 $fontWeight-ExpandableItem: createThemeVar("fontWeight-#{$component}");
-$paddingVertical-ExpandableItem-summary: createThemeVar("paddingVertical-#{$component}-summary");
-$paddingHorizontal-ExpandableItem-summary: createThemeVar("paddingHorizontal-#{$component}-summary");
+$paddingVertical-summary-ExpandableItem: createThemeVar("paddingVertical-summary-#{$component}");
+$paddingHorizontal-summary-ExpandableItem: createThemeVar("paddingHorizontal-summary-#{$component}");
+$paddingVertical-content-ExpandableItem: createThemeVar("paddingVertical-content-#{$component}");
+$paddingHorizontal-content-ExpandableItem: createThemeVar("paddingHorizontal-content-#{$component}");
 $gap-ExpandableItem: createThemeVar("gap-#{$component}");
 $transition-summary-ExpandableItem: createThemeVar("transition-summary-#{$component}");
 $animation-content-ExpandableItem: createThemeVar("animation-content-#{$component}");
@@ -30,7 +38,6 @@ $animationDuration-content-ExpandableItem: createThemeVar("animationDuration-con
 
 @layer components {
   .expandableItem {
-    width: fit-content;
     @include t.borderVars($themeVars, $component);
     @include t.paddingVars($themeVars, $component);
     background-color: $backgroundColor-ExpandableItem;
@@ -49,16 +56,18 @@ $animationDuration-content-ExpandableItem: createThemeVar("animationDuration-con
       gap: $gap-ExpandableItem;
       cursor: pointer;
       user-select: none;
+      background-color: $backgroundColor-summary-ExpandableItem;
       @include t.paddingVars($themeVars, "summary-#{$component}");
+      @include t.textVars($themeVars, "summary-#{$component}");
       border-radius: $borderRadius-summary-ExpandableItem;
       transition: $transition-summary-ExpandableItem;
 
       &:hover {
-        background-color: $backgroundColor-ExpandableItem--hover;
+        background-color: $backgroundColor-summary-ExpandableItem--hover;
       }
 
       &:active {
-        background-color: $backgroundColor-ExpandableItem--active;
+        background-color: $backgroundColor-summary-ExpandableItem--active;
       }
       
       &.iconStart {
@@ -68,6 +77,15 @@ $animationDuration-content-ExpandableItem: createThemeVar("animationDuration-con
       &.iconEnd {
         flex-direction: row-reverse;
         justify-content: space-between;
+      }
+      
+      &.fullWidth {
+        display: flex;
+        width: 100%;
+        
+        &.iconEnd {
+          justify-content: space-between;
+        }
       }
       
       .icon {
@@ -95,6 +113,8 @@ $animationDuration-content-ExpandableItem: createThemeVar("animationDuration-con
     .content {
       width: 100%;
       @include t.paddingVars($themeVars, "content-#{$component}");
+      @include t.borderVars($themeVars, "content-#{$component}");
+      @include t.textVars($themeVars, "content-#{$component}");
       animation: expandableItemSlideIn $animationDuration-content-ExpandableItem $animation-content-ExpandableItem;
       
       &.contentHidden {
