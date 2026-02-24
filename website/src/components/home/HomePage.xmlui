@@ -1,0 +1,9 @@
+<Component name="HomePage">
+  <Theme themeId="xmlui-web">
+    <Headlines />
+    <HeroApp />
+    <Benefits />
+    <WhyXMLUI />
+  </Theme>
+</Component>
+

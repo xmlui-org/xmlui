@@ -1,7 +1,7 @@
 <App
   layout="vertical-full-header"
   noScrollbarGutters="false"
-  global.currentSegment=""
+  global.currentSegment="home"
   onDidNavigate="(ev) => {
     if (!ev || ev === '/' || ev === '') {
       currentSegment = 'home';
@@ -477,15 +477,10 @@
 
   <Pages fallbackPath="/404" defaultScrollRestoration="true">
     <Page url="/">
-      <Theme themeId="xmlui-web">
-        <Headlines />
-        <HeroApp />
-        <Benefits />
-        <WhyXMLUI />
-      </Theme>
+      <HomePage />
     </Page>
     <Page url="/get-started">
-      <GetStarted />
+      <GetStartedPage />
     </Page>
     <Page url="/news">
       <NewsAndReviews />
