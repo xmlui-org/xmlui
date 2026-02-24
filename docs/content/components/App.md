@@ -456,6 +456,15 @@ Here is a more complex example built on star-sizing:
 
 ## Events [#events]
 
+### `didNavigate` [#didnavigate]
+
+This event fires after the app has completed any navigation (including Link clicks, browser back/forward, and programmatic navigation).
+
+**Signature**: `(to: string | number, queryParams?: Record<string, any>) => Promise<void>`
+
+- `to`: The path that was navigated to.
+- `queryParams`: Query parameters (only available for programmatic navigation).
+
 ### `keyDown` [#keydown]
 
 This event fires when a key is pressed while the `App` has focus or when the event reaches the app level without being consumed by a child component.
@@ -510,6 +519,15 @@ Use it as `onReady` when inlining it on the component.
   <Text value="{isAppReady ? 'App is ready' : 'Sadly, App is not ready'}" />
 </App>
 ```
+
+### `willNavigate` [#willnavigate]
+
+This event fires before the app is about to navigate programmatically via `navigate()` or `Actions.navigate()`. The event handler receives the target path and optional query parameters. Returning `false` cancels the navigation; returning `null`, `undefined`, or any other value proceeds with normal navigation. Note: This event does NOT fire for Link clicks or browser back/forward navigation due to React Router limitations (event handlers are async, but router blocking is synchronous).
+
+**Signature**: `(to: string | number, queryParams?: Record<string, any>) => Promise<false | void | null | undefined>`
+
+- `to`: The target path or history delta (e.g., -1 for back) to navigate to.
+- `queryParams`: Optional query parameters to include in the navigation.
 
 ## Exposed Methods [#exposed-methods]
 

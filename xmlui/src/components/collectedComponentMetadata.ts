@@ -216,6 +216,7 @@ import { ScrollViewerMd } from "./ScrollViewer/ScrollViewer";
 import { ContextMenuMd } from "./ContextMenu/ContextMenu";
 import QRCode from "react-qr-code";
 import { QRCodeMd } from "./QRCode/QRCode";
+import { IncludeMarkupMd } from "./IncludeMarkup/IncludeMarkup";
 
 export const collectedComponentMetadata = {
   // --- HTML tags
@@ -369,6 +370,7 @@ export const collectedComponentMetadata = {
   Icon: IconMd,
   IFrame: IFrameMd,
   Image: ImageMd,
+  IncludeMarkup: IncludeMarkupMd,
   Items: ItemsMd,
   Link: LinkMd,
   List: ListMd,

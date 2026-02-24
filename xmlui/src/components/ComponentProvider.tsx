@@ -154,6 +154,7 @@ import type StandaloneExtensionManager from "../components-core/StandaloneExtens
 import { backdropComponentRenderer } from "./Backdrop/Backdrop";
 import { scrollViewerComponentRenderer } from "./ScrollViewer/ScrollViewer";
 import { qrCodeComponentRenderer } from "./QRCode/QRCode";
+import { includeMarkupComponentRenderer } from "./IncludeMarkup/IncludeMarkup";
 import type { ThemeDefinition } from "../abstractions/ThemingDefs";
 import type { Extension } from "../abstractions/ExtensionDefs";
 import { brComponentRenderer, BrComponentRenderer } from "./Br/Br";
@@ -577,6 +578,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(hSplitterComponentRenderer);
       this.registerCoreComponent(queueComponentRenderer);
       this.registerCoreComponent(qrCodeComponentRenderer);
+      this.registerCoreComponent(includeMarkupComponentRenderer);
       this.registerCoreComponent(positionedContainerComponentRenderer);
       this.registerCoreComponent(changeListenerComponentRenderer);
       this.registerCoreComponent(realTimeAdapterComponentRenderer);

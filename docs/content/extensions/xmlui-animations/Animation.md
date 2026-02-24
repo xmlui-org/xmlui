@@ -1,6 +1,6 @@
 # Animation [#animation]
 
-No description provided.
+The `Animation` component represents a generic animation wrapper that can apply various animations to its children.
 
 ## Behaviors
 
@@ -51,7 +51,7 @@ Indicates whether the animation should only run once
 
 > [!DEF]  default: **false**
 
-Indicates whether the animation should run in reverse
+Indicates whether the animation should run in reverse after the normal animation completes
 
 ## Events
 

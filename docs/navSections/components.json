@@ -262,6 +262,11 @@
           "icon": "component"
         },
         {
+          "to": "/components/IncludeMarkup",
+          "label": "IncludeMarkup",
+          "icon": "component"
+        },
+        {
           "to": "/components/Items",
           "label": "Items",
           "icon": "component"
