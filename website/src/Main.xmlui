@@ -2,7 +2,23 @@
   layout="vertical-full-header"
   noScrollbarGutters="false"
   global.currentSegment=""
-  onDidNavigate="(ev) => { currentSegment = ev; console.log('Navigated to segment:', ev) }"
+  onDidNavigate="(ev) => {
+    if (!ev || ev === '/' || ev === '') {
+      currentSegment = 'home';
+    } else if (ev.startsWith('/docs')) {
+      currentSegment = 'docs';
+    } else if (ev.startsWith('/blog')) {
+      currentSegment = 'blog';
+    } else if (ev.startsWith('/get-started')) {
+      currentSegment = 'get-started';
+    } else if (ev.startsWith('/news')) {
+      currentSegment = 'news';
+    } else if (ev.includes('/404')) {
+      currentSegment = '404';
+    } else {
+      currentSegment = ev;
+    }
+  }"
 >
   <AppHeader>
     <property name="logoTemplate">
@@ -16,19 +32,19 @@
           noIndicator
           label="Home"
           to="/"
-          active="{currentSegment === '/'}"
+          active="{currentSegment === 'home'}"
         />
         <NavLink
           noIndicator
           label="Docs"
           to="/docs"
-          active="{currentSegment.startsWith('/docs')}"
+          active="{currentSegment === 'docs'}"
         />
         <NavLink
           noIndicator
           label="Blog"
           to="/blog"
-          active="{currentSegment.startsWith('/blog')}"
+          active="{currentSegment === 'blog'}"
         />
         <NavLink
           to="/get-started"
@@ -40,19 +56,19 @@
     <SpaceFiller />
     <Search
       collapsible="true"
-      when="{mediaSize.sizeIndex > 1}"
+      when="{mediaSize.sizeIndex > 1 && currentSegment && (currentSegment === 'docs' || currentSegment === 'blog')}"
       data="{appGlobals.plainTextContent}"
     />
   </AppHeader>
   <NavPanel
-    when="{currentSegment !== '/' && globalThis.location.pathname !== '/' && !currentSegment.startsWith('/blog') && currentSegment !== '/get-started' && !globalThis.location.pathname.startsWith('/blog') && globalThis.location.pathname !== '/get-started' && ((!globalThis.location.hash.includes('/404') && !globalThis.location.pathname.includes('/404')) || mediaSize.sizeIndex <= 2)}"
+    when="{currentSegment !== 'home' && currentSegment !== 'blog' && currentSegment !== 'get-started' && (currentSegment !== '404' || mediaSize.sizeIndex <= 2)}"
     scrollStyle="whenScrolling"
     showScrollerFade="true"
   >
     <Stack
       paddingHorizontal="$space-4"
       paddingBottom="$space-4"
-      when="{mediaSize.sizeIndex <= 2}"
+      when="{mediaSize.sizeIndex <= 2 && currentSegment && (currentSegment === 'docs' || currentSegment === 'blog')}"
     >
       <Search data="{appGlobals.plainTextContent}" />
     </Stack>
@@ -61,19 +77,19 @@
         noIndicator
         label="Home"
         to="/"
-        active="{currentSegment === '/'}"
+        active="{currentSegment === 'home'}"
       />
       <NavLink
         noIndicator
         label="Docs"
         to="/docs"
-        active="{currentSegment.startsWith('/docs')}"
+        active="{currentSegment === 'docs'}"
       />
       <NavLink
         noIndicator
         label="Blog"
         to="/blog"
-        active="{currentSegment.startsWith('/blog')}"
+        active="{currentSegment === 'blog'}"
       />
       <NavLink
         to="/news"
@@ -99,7 +115,7 @@
       padding="0"
       paddingTop="{mediaSize.sizeIndex <= 2 ? '$space-4' : '0'}"
       gap="0"
-      when="{currentSegment.startsWith('/docs') || globalThis.location.pathname.startsWith('/docs')}"
+      when="{currentSegment === 'docs'}"
     >
       <NavGroup initiallyExpanded="{true}" label="Learn XMLUI" to="/docs/learn">
         <NavLink icon="school" label="Introduction" to="/docs" />
@@ -114,7 +130,7 @@
     <NavGroup
       label="Guides"
       to="/docs/guides"
-      when="{currentSegment.startsWith('/docs') || globalThis.location.pathname.startsWith('/docs')}"
+      when="{currentSegment === 'docs'}"
     >
       <NavLink
         icon="hierarchy"
@@ -179,7 +195,7 @@
     <NavGroup
       label="Tutorial"
       to="/docs/tutorial"
-      when="{currentSegment.startsWith('/docs') || globalThis.location.pathname.startsWith('/docs')}"
+      when="{currentSegment === 'docs'}"
     >
       <NavLink icon="invoice" label="XMLUI Invoice" to="/docs/tutorial-01" />
       <NavLink icon="file-code" label="Main.xmlui" to="/docs/tutorial-02" />
@@ -197,7 +213,7 @@
     <NavGroup
       label="How To"
       to="/docs/howto"
-      when="{currentSegment.startsWith('/docs') || globalThis.location.pathname.startsWith('/docs')}"
+      when="{currentSegment === 'docs'}"
     >
       <NavLink
         icon="article"
@@ -386,7 +402,7 @@
     <NavGroup
       label="Reference"
       to="/docs/reference"
-      when="{currentSegment.startsWith('/docs') || globalThis.location.pathname.startsWith('/docs')}"
+      when="{currentSegment === 'docs'}"
     >
       <IncludeNavSection sectionId="components" />
       <IncludeNavSection sectionId="extensions" />
@@ -443,19 +459,19 @@
       icon="mcp"
       label="Model Context Protocol"
       to="/docs/mcp"
-      when="{currentSegment.startsWith('/docs') || globalThis.location.pathname.startsWith('/docs')}"
+      when="{currentSegment === 'docs'}"
     />
     <NavLink
       icon="vscode-extension"
       label="VSCode extension"
       to="/docs/vscode"
-      when="{currentSegment.startsWith('/docs') || globalThis.location.pathname.startsWith('/docs')}"
+      when="{currentSegment === 'docs'}"
     />
     <NavLink
       icon="logs"
       label="Change Log"
       to="/docs/change-log"
-      when="{currentSegment.startsWith('/docs') || globalThis.location.pathname.startsWith('/docs')}"
+      when="{currentSegment === 'docs'}"
     />
   </NavPanel>
 
