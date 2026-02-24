@@ -78,7 +78,7 @@
     />
   </AppHeader>
   <NavPanel
-    when="{currentSegment !== 'home' && currentSegment !== 'blog' && currentSegment !== 'get-started' && (currentSegment !== '404' || mediaSize.sizeIndex <= 2)}"
+    when="{currentSegment !== 'home' && currentSegment !== 'blog' && currentSegment !== 'get-started' && currentSegment !== 'news' && (currentSegment !== '404' || mediaSize.sizeIndex <= 2)}"
     scrollStyle="whenScrolling"
     showScrollerFade="true"
   >
