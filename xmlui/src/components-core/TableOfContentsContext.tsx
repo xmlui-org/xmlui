@@ -8,7 +8,6 @@ import {
   useState,
 } from "react";
 import { useIsomorphicLayoutEffect, useScrollEventHandler, useScrollParent } from "./utils/hooks";
-import { useNavigate } from "react-router-dom";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "./constants";
 import { useAppContext } from "./AppContext";
 
@@ -125,7 +124,9 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
     };
   }, []);
 
-  const navigate = useNavigate();
+  const appContext = useAppContext();
+  // Use navigate from appContext to respect willNavigate/didNavigate events
+  const navigate = appContext.navigate;
 
   const scrollToAnchor = useCallback(
     (id: string, smoothScrolling: boolean) => {

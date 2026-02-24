@@ -119,6 +119,28 @@ export const AppMd = createMetadata({
         event: "The keyboard event object.",
       },
     },
+    willNavigate: {
+      description:
+        `This event fires before the app is about to navigate programmatically via \`navigate()\` or \`Actions.navigate()\`. ` +
+        `The event handler receives the target path and optional query parameters. Returning \`false\` cancels the navigation; ` +
+        `returning \`null\`, \`undefined\`, or any other value proceeds with normal navigation. ` +
+        `Note: This event does NOT fire for Link clicks or browser back/forward navigation.`,
+      signature: "(to: string | number, queryParams?: Record<string, any>) => false | void | null | undefined",
+      parameters: {
+        to: "The target path or history delta (e.g., -1 for back) to navigate to.",
+        queryParams: "Optional query parameters to include in the navigation.",
+      },
+    },
+    didNavigate: {
+      description: 
+        `This event fires after the app has completed any navigation (including Link clicks, browser back/forward, ` +
+        `and programmatic navigation).`,
+      signature: "(to: string | number, queryParams?: Record<string, any>) => void",
+      parameters: {
+        to: "The path that was navigated to.",
+        queryParams: "Query parameters (only available for programmatic navigation).",
+      },
+    },
   },
   themeVars: { ...parseScssVar(styles.themeVars), ...parseScssVar(drawerStyles.themeVars) },
   limitThemeVarsToComponent: true,
@@ -211,6 +233,8 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
       onMessageReceived={lookupEventHandler("messageReceived")}
       onKeyDown={lookupEventHandler("keyDown")}
       onKeyUp={lookupEventHandler("keyUp")}
+      onWillNavigate={lookupEventHandler("willNavigate")}
+      onDidNavigate={lookupEventHandler("didNavigate")}
       name={extractValue(node.props.name)}
       logo={extractValue(node.props.logo)}
       logoDark={extractValue(node.props["logo-dark"])}

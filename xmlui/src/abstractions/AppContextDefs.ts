@@ -161,6 +161,13 @@ export type AppContextObject = {
   // This property determines the base name used for the router.
   routerBaseName: string;
 
+  // This function sets navigation event handlers (willNavigate and didNavigate).
+  // Used by the App component to register navigation events.
+  setNavigationHandlers?: (
+    onWillNavigate?: (to: string | number, queryParams?: Record<string, any>) => false | void | null | undefined,
+    onDidNavigate?: (to: string | number, queryParams?: Record<string, any>) => void,
+  ) => void;
+
   // ==============================================================================================
   // Notifications and Dialogs
 

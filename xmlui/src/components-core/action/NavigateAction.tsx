@@ -36,7 +36,14 @@ function navigate(
     }
   }
 
-  navigate(to);
+  // Use appContext.navigate if available (which includes willNavigate/didNavigate handlers)
+  // Otherwise fall back to the direct navigate function
+  if (appContext?.navigate) {
+    // Pass queryParams in options for the wrapped navigate to access
+    appContext.navigate(to, { queryParams });
+  } else {
+    navigate(to);
+  }
 }
 
 export const navigateAction = createAction("navigate", navigate);

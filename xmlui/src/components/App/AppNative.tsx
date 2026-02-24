@@ -86,6 +86,8 @@ type Props = {
   onMessageReceived?: (data: any, event: MessageEvent) => void;
   onKeyDown?: (event: KeyboardEvent) => void;
   onKeyUp?: (event: KeyboardEvent) => void;
+  onWillNavigate?: (to: string | number, queryParams?: Record<string, any>) => false | void | null | undefined;
+  onDidNavigate?: (to: string | number, queryParams?: Record<string, any>) => void;
   navPanelDef?: ComponentDef;
   logoContentDef?: ComponentDef;
   renderChild?: RenderChildFn;
@@ -112,6 +114,8 @@ export const defaultProps: Pick<
   | "onMessageReceived"
   | "onKeyDown"
   | "onKeyUp"
+  | "onWillNavigate"
+  | "onDidNavigate"
 > = {
   scrollWholePage: true,
   noScrollbarGutters: false,
@@ -122,6 +126,8 @@ export const defaultProps: Pick<
   onMessageReceived: noop,
   onKeyDown: noop,
   onKeyUp: noop,
+  onWillNavigate: undefined,
+  onDidNavigate: undefined,
 };
 
 /**
@@ -166,6 +172,8 @@ export function App({
   onMessageReceived = defaultProps.onMessageReceived,
   onKeyDown = defaultProps.onKeyDown,
   onKeyUp = defaultProps.onKeyUp,
+  onWillNavigate = defaultProps.onWillNavigate,
+  onDidNavigate = defaultProps.onDidNavigate,
   header,
   navPanel,
   footer,
@@ -204,7 +212,7 @@ export function App({
     ? (normalized as AppLayoutType)
     : "condensed-sticky";
   const appContext = useAppContext();
-  const { setLoggedInUser, mediaSize, forceRefreshAnchorScroll, appGlobals } = appContext;
+  const { setLoggedInUser, setNavigationHandlers, mediaSize, forceRefreshAnchorScroll, appGlobals } = appContext;
   const hasRegisteredHeader = header !== undefined;
 
   // Check if NavPanel exists and is actually displayed
@@ -217,6 +225,13 @@ export function App({
   useEffect(() => {
     setLoggedInUser(loggedInUser);
   }, [loggedInUser, setLoggedInUser]);
+
+  // Set navigation event handlers
+  useEffect(() => {
+    if (setNavigationHandlers) {
+      setNavigationHandlers(onWillNavigate, onDidNavigate);
+    }
+  }, [onWillNavigate, onDidNavigate, setNavigationHandlers]);
 
   // Initialize theme and tone settings
   useThemeInitialization({
