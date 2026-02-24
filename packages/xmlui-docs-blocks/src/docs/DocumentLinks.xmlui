@@ -18,7 +18,7 @@
             paddingHorizontal="$space-4"
             paddingVertical="$space-2"
           >
-            <VStack gap="0">
+            <VStack gap="0" width="100%">
               <HStack verticalAlignment="center" gap="0">
                 <Icon name="chevronleft" />
                 <Text
@@ -31,6 +31,7 @@
               <Text
                 color="$textColor-PrevNextLink"
                 paddingLeft="$padding-PrevNextLink"
+                overflowMode="ellipsis"
               >
                 {$linkInfo.prevLink.label}
               </Text>
@@ -45,7 +46,7 @@
             paddingHorizontal="$space-4"
             paddingVertical="$space-2"
           >
-            <VStack gap="0" horizontalAlignment="end">
+            <VStack gap="0" horizontalAlignment="end" width="100%">
               <HStack verticalAlignment="center" gap="0">
                 <Text
                   fontSize="$fontSize-PrevNextText"
@@ -58,6 +59,7 @@
               <Text
                 color="$textColor-PrevNextLink"
                 paddingRight="$padding-PrevNextLink"
+                overflowMode="ellipsis"
               >
                 {$linkInfo.nextLink.label}
               </Text>
