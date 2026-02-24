@@ -586,7 +586,7 @@ function resolveRuntime(runtime: Record<string, any>): {
   const safeEntryPoint = config?.entryPoint || entryPoint;
 
   // --- We may have a code-behind file. If so, we merge the variables and functions
-  const entryPointWithCodeBehind = {
+  let entryPointWithCodeBehind = {
     ...safeEntryPoint,
     vars: {
       ...entryPointCodeBehind?.vars,
@@ -595,6 +595,24 @@ function resolveRuntime(runtime: Record<string, any>): {
     functions: entryPointCodeBehind?.functions,
     scriptError: entryPointCodeBehind?.moduleErrors,
   } as ComponentDef;
+
+  // --- Treat Main.xmlui.xs variables as globals (same as global.* prefix) so they are
+  // --- accessible to child (compound) components, not just main's local scope.
+  if (entryPointCodeBehind?.vars || entryPointCodeBehind?.functions) {
+    entryPointWithCodeBehind = transformMainXsToGlobalTags(
+      entryPointWithCodeBehind,
+      entryPointCodeBehind as any,
+    );
+    // --- Remove code-behind vars from `vars` so they only exist in `globalVars`.
+    // --- If kept in both, the expression string in globalVars always re-evaluates to
+    // --- the initial value, breaking reactivity after mutations like codeBehindCount++.
+    if (entryPointCodeBehind?.vars && entryPointWithCodeBehind.vars) {
+      const promotedKeys = Object.keys(entryPointCodeBehind.vars);
+      const remainingVars = { ...entryPointWithCodeBehind.vars };
+      promotedKeys.forEach((k) => delete remainingVars[k]);
+      entryPointWithCodeBehind = { ...entryPointWithCodeBehind, vars: remainingVars };
+    }
+  }
 
   // --- Collect the component definition we pass to the rendering engine
   let components: Array<CompoundComponentDef> = [];
@@ -919,9 +937,11 @@ function useStandalone(
   };
 
   const [globalVars, setGlobalVars] = useState<Record<string, any>>(() => {
-    // Get the vars in Main.xmlui.xs module directly from runtime
+    // Get the vars in Main.xmlui.xs module directly from runtime.
+    // Normalize: Vite builds export the module under `.default`; test fixtures expose vars at top level.
     const mainXs = runtime?.[MAIN_XS_BUILT_RESOURCE];
-    return extractGlobals({ ...(mainXs?.vars || {}), ...(mainXs?.functions || {}) });
+    const mainXsData = (mainXs as any)?.default ?? mainXs;
+    return extractGlobals({ ...(mainXsData?.vars || {}), ...(mainXsData?.functions || {}) });
   });
 
   useIsomorphicLayoutEffect(() => {
@@ -939,13 +959,25 @@ function useStandalone(
           throw new Error("couldn't find the application metadata");
         }
 
-        // --- Transform Main.xmlui.xs variables into <global> tags for dependency support
+        // --- Transform Main.xmlui.xs variables into <global> tags for dependency support.
+        // Normalize: Vite builds export the module under `.default`; test fixtures expose vars at top level.
         const mainXs = runtime?.[MAIN_XS_BUILT_RESOURCE];
-        if (mainXs?.vars || mainXs?.functions) {
+        const mainXsData = (mainXs as any)?.default ?? mainXs;
+        if (mainXsData?.vars || mainXsData?.functions) {
           appDef.entryPoint = transformMainXsToGlobalTags(
             appDef.entryPoint as ComponentDef,
-            mainXs
+            mainXsData
           );
+          // --- Remove code-behind vars from `vars` — same reason as in resolveRuntime.
+          if (mainXsData?.vars && appDef.entryPoint) {
+            const promotedKeys = Object.keys(mainXsData.vars);
+            const ep = appDef.entryPoint as ComponentDef;
+            if (ep.vars) {
+              const remainingVars = { ...ep.vars };
+              promotedKeys.forEach((k) => delete remainingVars[k]);
+              appDef.entryPoint = { ...ep, vars: remainingVars };
+            }
+          }
         }
         
         const lintErrorComponent = processAppLinting(appDef, metadataProvider);

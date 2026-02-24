@@ -157,6 +157,7 @@ export function createChildRenderer(config: ChildRendererConfig) {
     },
     [
       componentState,
+      globalVars,
       dispatch,
       appContext,
       lookupAction,
