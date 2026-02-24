@@ -9,30 +9,47 @@ import extensionsSection from "../navSections/extensions.json";
 import extensions from "../extensions";
 export { componentsSection, extensionsSection, extensions, shikiHighlighter, highlight };
 
+// Load only docs content from /content/docs and normalize keys to start at "pages/..."
 // @ts-ignore
-const contentRuntime: Record<string, { default: string }> = import.meta.glob(`/content/**/*.{md,mdx}`, {
-  eager: true,
-  query: "?raw",
-});
+const contentRuntime: Record<string, { default: string }> = import.meta.glob(
+  `/content/docs/**/*.{md,mdx}`,
+  {
+    eager: true,
+    query: "?raw",
+  },
+);
 
 // @ts-ignore
-const metaJsons: Record<string, MetaJson> = import.meta.glob(`/content/**/_meta.json`, {
-  eager: true,
-});
+const metaJsons: Record<string, MetaJson> = import.meta.glob(
+  `/content/docs/**/_meta.json`,
+  {
+    eager: true,
+  },
+);
 
-const { content, plainTextContent, navPanelContent } =
-  buildContentFromRuntime(contentRuntime);
+const { content, plainTextContent, navPanelContent } = buildContentFromRuntime(
+  contentRuntime,
+  {
+    // Strip "/content/docs/" so keys are "pages/intro.md", "components/App", etc.
+    contentPrefix: "/content/docs/",
+  },
+);
 
-// Prefetched blog markdown content, keyed by `/blog/<slug>.md`
+// Prefetched blog markdown content, now loaded from /content/blog,
+// but still keyed by `/blog/<slug>.md` to match BlogPage expectations.
 // @ts-ignore
-const blogPagesRuntime: Record<string, any> = import.meta.glob(`/public/blog/*.md`, {
-  eager: true,
-  query: "?raw",
-});
+const blogPagesRuntime: Record<string, any> = import.meta.glob(
+  `/content/blog/*.md`,
+  {
+    eager: true,
+    query: "?raw",
+  },
+);
 
 export const prefetchedContent: Record<string, any> = {};
 Object.keys(blogPagesRuntime).map((filePath) => {
-  const urlFragment = filePath.substring("/public".length);
+  const fileName = filePath.split("/").pop() || "";
+  const urlFragment = `/blog/${fileName}`;
   prefetchedContent[urlFragment] = blogPagesRuntime[filePath].default;
 });
 
@@ -41,6 +58,10 @@ export { content, plainTextContent };
 export const groupedNavPanelContent = buildTreeFromPathsAndMeta(
   navPanelContent,
   metaJsons,
+  {
+    // Root of the docs content tree
+    contentRoot: "/content/docs",
+  },
 );
 
 export function getLocalIcons() {
