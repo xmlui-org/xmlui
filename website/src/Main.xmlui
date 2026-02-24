@@ -1010,14 +1010,12 @@
               blank="{true}"
             />
             <LinkButton
-              to="https://xmlui.org/news"
+              to="/news"
               label="News & Reviews"
-              blank="{true}"
             />
             <LinkButton
-              to="https://docs.xmlui.org/change-log"
+              to="/docs/change-log"
               label="Changelog"
-              blank="{true}"
             />
             <Separator />
             <LinkButton
