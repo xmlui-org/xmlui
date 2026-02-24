@@ -83,7 +83,7 @@
   </Theme>
 
   <NavPanel
-    when="{!currentSegment.startsWith('/blog') && currentSegment !== '/get-started' && ((!globalThis.location.hash.includes('/404') && !globalThis.location.pathname.includes('/404')) || mediaSize.sizeIndex <= 2)}"
+    when="{!currentSegment.startsWith('/blog') && currentSegment !== '/get-started' && !globalThis.location.pathname.startsWith('/blog') && globalThis.location.pathname !== '/get-started' && ((!globalThis.location.hash.includes('/404') && !globalThis.location.pathname.includes('/404')) || mediaSize.sizeIndex <= 2)}"
     scrollStyle="whenScrolling"
     showScrollerFade="true"
   >
@@ -137,7 +137,7 @@
       padding="0"
       paddingTop="{mediaSize.sizeIndex <= 2 ? '$space-4' : '0'}"
       gap="0"
-      when="{currentSegment.startsWith('/docs')}"
+      when="{currentSegment.startsWith('/docs') || globalThis.location.pathname.startsWith('/docs')}"
     >
       <NavGroup initiallyExpanded="{true}" label="Learn XMLUI" to="/docs/learn">
         <NavLink icon="school" label="Introduction" to="/docs" />
@@ -157,7 +157,7 @@
     <NavGroup
       label="Guides"
       to="/docs/guides"
-      when="{currentSegment.startsWith('/docs')}"
+      when="{currentSegment.startsWith('/docs') || globalThis.location.pathname.startsWith('/docs')}"
     >
       <NavLink
         icon="hierarchy"
@@ -222,7 +222,7 @@
     <NavGroup
       label="Tutorial"
       to="/docs/tutorial"
-      when="{currentSegment.startsWith('/docs')}"
+      when="{currentSegment.startsWith('/docs') || globalThis.location.pathname.startsWith('/docs')}"
     >
       <NavLink icon="invoice" label="XMLUI Invoice" to="/docs/tutorial-01" />
       <NavLink icon="file-code" label="Main.xmlui" to="/docs/tutorial-02" />
@@ -240,7 +240,7 @@
     <NavGroup
       label="How To"
       to="/docs/howto"
-      when="{currentSegment.startsWith('/docs')}"
+      when="{currentSegment.startsWith('/docs') || globalThis.location.pathname.startsWith('/docs')}"
     >
       <NavLink
         icon="article"
@@ -429,7 +429,7 @@
     <NavGroup
       label="Reference"
       to="/docs/reference"
-      when="{currentSegment.startsWith('/docs')}"
+      when="{currentSegment.startsWith('/docs') || globalThis.location.pathname.startsWith('/docs')}"
     >
       <IncludeNavSection sectionId="components" />
       <IncludeNavSection sectionId="extensions" />
@@ -481,19 +481,19 @@
       icon="mcp"
       label="Model Context Protocol"
       to="/docs/mcp"
-      when="{currentSegment.startsWith('/docs')}"
+      when="{currentSegment.startsWith('/docs') || globalThis.location.pathname.startsWith('/docs')}"
     />
     <NavLink
       icon="vscode-extension"
       label="VSCode extension"
       to="/docs/vscode"
-      when="{currentSegment.startsWith('/docs')}"
+      when="{currentSegment.startsWith('/docs') || globalThis.location.pathname.startsWith('/docs')}"
     />
     <NavLink
       icon="logs"
       label="Change Log"
       to="/docs/change-log"
-      when="{currentSegment.startsWith('/docs')}"
+      when="{currentSegment.startsWith('/docs') || globalThis.location.pathname.startsWith('/docs')}"
     />
   </NavPanel>
 
