@@ -885,6 +885,7 @@ export const Table = forwardRef(
       };
       return rowsSelectable ? [selectColumn, ...columnsWithCustomCell] : columnsWithCustomCell;
     }, [
+      idKey,
       rowsSelectable,
       columnsWithCustomCell,
       enableMultiRowSelection,
@@ -1714,6 +1715,7 @@ export const Table = forwardRef(
                     const size = cell.column.getSize();
                     const columnClassName = cell.column.columnDef?.meta?.className;
                     const columnStyle = cell.column.columnDef?.meta?.style;
+
                     const alignmentClass =
                       cellVerticalAlign === "top"
                         ? styles.alignTop
@@ -1725,11 +1727,11 @@ export const Table = forwardRef(
                         className={classnames(styles.cell, alignmentClass, columnClassName)}
                         key={`${cell.id}-${i}`}
                         style={{
-                          width: size,
+                          "--column-width": `${size}px`,
                           flexShrink: 0,
                           ...getCommonPinningStyles(cell.column),
                           ...columnStyle,
-                        }}
+                        } as CSSProperties}
                       >
                         <div
                           className={styles.cellContent}

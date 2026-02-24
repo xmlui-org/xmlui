@@ -130,6 +130,7 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
   .columnCell,
   .cell {
     display: flex;
+    width: var(--column-width, 0);
     align-items: center;
     white-space: nowrap;
     text-overflow: ellipsis;
