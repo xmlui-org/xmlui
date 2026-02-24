@@ -1,5 +1,26 @@
 # xmlui-blog
 
+## 0.0.10
+
+### Patch Changes
+
+- 5039aef: improve: introducing xmlui-docs-blocks extension
+- Updated dependencies [ee1124f]
+- Updated dependencies [d1ca953]
+- Updated dependencies [138cd95]
+- Updated dependencies [73fa50b]
+- Updated dependencies [138cd95]
+- Updated dependencies [fe94dbf]
+- Updated dependencies [c286f9c]
+- Updated dependencies [5039aef]
+- Updated dependencies [c438472]
+- Updated dependencies [b4ed223]
+- Updated dependencies [fc50529]
+- Updated dependencies [75e0ef8]
+- Updated dependencies [c0141e6]
+  - xmlui@0.12.3
+  - xmlui-docs-blocks@0.0.2
+
 ## 0.0.9
 
 ### Patch Changes

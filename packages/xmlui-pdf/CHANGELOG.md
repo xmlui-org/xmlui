@@ -1,5 +1,11 @@
 # xmlui-pdf
 
+## 0.1.12
+
+### Patch Changes
+
+- fe94dbf: Experimenting with pdfjs API (overlays)
+
 ## 0.1.11
 
 ### Patch Changes

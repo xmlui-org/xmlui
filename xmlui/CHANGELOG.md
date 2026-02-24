@@ -1,5 +1,26 @@
 # xmlui
 
+## 0.12.3
+
+### Patch Changes
+
+- ee1124f: Add keyDown and keyUp events to App
+- d1ca953: Prevent FileUploadDropZone from reacting to Ctrl+V (disable paste-on-clipboard)
+- 138cd95: Fix variables declared in `Main.xmlui.xs` not propagating to child components and not updating after mutation.
+
+  Variables in `Main.xmlui.xs` are now treated as globals (equivalent to `global.*` attributes on `<App>`), making them visible to user-defined child components. Mutations such as `codeBehindCount++` now correctly propagate to all child components.
+
+- 73fa50b: Review the ExpandableItem component
+- 138cd95: Fix global variables issue in Main.xmlui.xs
+- fe94dbf: Experimenting with pdfjs API (overlays)
+- c286f9c: Fix the slight scrollbar issue with Table
+- 5039aef: improve: introducing xmlui-docs-blocks extension
+- c438472: Fix Tabs color regression (#2840)
+- b4ed223: Add proxy change optimization (#2844)
+- fc50529: Fix regression with MenuSeparator duplication
+- 75e0ef8: Add keyboard actions to Tree (copy/cut/paste/delete) #2853
+- c0141e6: Fix Table rowDoubleClick regression
+
 ## 0.12.2
 
 ### Patch Changes
