@@ -1237,6 +1237,16 @@ function useStandalone(
           entryPointWithCodeBehind,
           loadedGlobals as any
         );
+        // --- Remove code-behind vars from `vars` so they only exist in `globalVars`.
+        // --- If kept in both, the local var shadows the global, so statePartChanged
+        // --- dispatches locally and the root's global state never updates — child
+        // --- components never see the mutation.
+        if ((loadedGlobals as any)?.vars && entryPointWithCodeBehind.vars) {
+          const promotedKeys = Object.keys((loadedGlobals as any).vars);
+          const remainingVars = { ...entryPointWithCodeBehind.vars };
+          promotedKeys.forEach((k) => delete remainingVars[k]);
+          entryPointWithCodeBehind = { ...entryPointWithCodeBehind, vars: remainingVars };
+        }
       }
 
       const defaultTheme = (entryPointWithCodeBehind as ComponentDef).props?.defaultTheme;
