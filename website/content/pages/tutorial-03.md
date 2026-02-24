@@ -1,0 +1,85 @@
+# Navigation
+
+Let's explore a subset of the app's navigation. The `App`'s `layout` property can be `vertical`.
+
+```xmlui-pg name="vertical layout"
+---app display {3}
+<App
+  name="XMLUI Invoice"
+  layout="vertical"
+>
+  <AppHeader>
+    <H1>XMLUI Invoice</H1>
+  </AppHeader>
+  <NavPanel>
+    <NavLink label="Dashboard" to="/" />
+    <NavLink label="Invoices" to="/invoices" />
+  </NavPanel>
+
+  <Pages>
+    <Page url="/">
+      <Dashboard />
+    </Page>
+    <Page url="/invoices">
+      <Invoices />
+    </Page>
+
+  </Pages>
+
+<Footer>Built with XMLUI <ToneSwitch /> </Footer>
+
+</App>
+---comp display
+<Component name="Dashboard">
+  This is Dashboard.
+</Component>
+---comp display
+<Component name="Invoices">
+  This is Invoices.
+</Component>
+```
+
+## Horizontal
+
+Or it can be `horizontal`.
+
+```xmlui-pg name="horizontal layout"
+---app display {3}
+<App
+  name="XMLUI Invoice"
+  layout="horizontal"
+>
+  <AppHeader>
+    <H1>XMLUI Invoice</H1>
+  </AppHeader>
+  <NavPanel>
+    <NavLink label="Dashboard" to="/" />
+    <NavLink label="Invoices" to="/invoices" />
+  </NavPanel>
+
+  <Pages>
+    <Page url="/">
+      <Dashboard />
+    </Page>
+    <Page url="/invoices">
+      <Invoices />
+    </Page>
+
+  </Pages>
+
+<Footer>Built with XMLUI <ToneSwitch /> </Footer>
+
+</App>
+---comp
+<Component name="Dashboard">
+  This is Dashboard.
+</Component>
+---comp
+<Component name="Invoices">
+  This is Invoices.
+</Component>
+```
+
+## Other layouts
+
+There are a number of other layouts, see [App](/components/App#layout) for details.

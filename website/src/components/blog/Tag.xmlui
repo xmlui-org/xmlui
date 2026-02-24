@@ -1,0 +1,11 @@
+<Component name="Tag">
+    <Text
+        backgroundColor="$color-surface-100"
+        color="$color-surface-500"
+        borderRadius="$space-8"
+        paddingHorizontal="$space-3"
+        paddingVertical="$space-0_5"
+    >
+        <Slot />
+    </Text>
+</Component>

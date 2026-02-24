@@ -4,26 +4,500 @@
   global.currentSegment=""
   onDidNavigate="(ev) => { currentSegment = ev; console.log('Navigated to segment:', ev) }"
 >
-  <AppHeader>
-    <property name="logoTemplate">
-      <Link to="/" height="100%">
-        <Logo height="$space-8" />
-      </Link>
-    </property>
-    <HStack desktopOnly gap="0">
-      <NavLink noIndicator label="Docs" to="/docs" />
-      <NavLink noIndicator label="Blog" to="/blog" />
-      <NavLink noIndicator label="Get Started" to="/get-started" />
-    </HStack>
-    <SpaceFiller />
-    <Search
-      collapsible="true"
-      when="{mediaSize.sizeIndex > 1}"
-      data="{appGlobals.plainTextContent}"
-    />
-  </AppHeader>
+  <Theme
+    backgroundColor-AppHeader="$color-surface-raised"
+    borderBottom-AppHeader="1px solid $borderColor"
+    paddingHorizontal-AppHeader="$space-4"
+    paddingLeft-AppHeader="$paddingHorizontal-AppHeader"
+    paddingRight-AppHeader="$paddingHorizontal-AppHeader"
+    paddingTop-AppHeader="$paddingVertical-AppHeader"
+    paddingBottom-AppHeader="$paddingVertical-AppHeader"
+    padding-AppHeader="$paddingTop-AppHeader $paddingRight-AppHeader $paddingBottom-AppHeader $paddingLeft-AppHeader"
+    paddingHorizontal-logo-AppHeader="$space-0"
+    paddingVertical-logo-AppHeader="$space-4"
+    paddingLeft-logo-AppHeader="$paddingHorizontal-logo-AppHeader"
+    paddingRight-logo-AppHeader="$paddingHorizontal-logo-AppHeader"
+    paddingTop-logo-AppHeader="$paddingVertical-logo-AppHeader"
+    paddingBottom-logo-AppHeader="$paddingVertical-logo-AppHeader"
+    padding-logo-AppHeader="$paddingTop-logo-AppHeader $paddingRight-logo-AppHeader $paddingBottom-logo-AppHeader $paddingLeft-logo-AppHeader"
+    maxWidth-content-AppHeader="$maxWidth-content-App"
+    maxWidth-AppHeader="$maxWidth-App"
+    padding-drawerToggle-AppHeader="$space-0_5"
+    borderRadius-AppHeader="0px"
+    color-surface="rgb(111, 110, 119)"
+    backgroundColor="$color-surface-0"
+    fontSize="15px"
+    textColor-Text="$color-surface-600"
+    iconAlignment-NavLink="baseline"
+    fontSize-NavLink="14px"
+    fontWeight-NavLink="500"
+    textColor-NavLink="$color-surface-500"
+    textColor-NavLink--active="$color-surface-900"
+    textColor-NavLink--hover="$color-surface-700"
+    textColor-NavLink--hover--active="$color-surface-900"
+    textColor-NavLink--pressed="$color-surface-900"
+    thickness-indicator-NavLink="0"
+    paddingVertical-NavLink="$space-1_5"
+    paddingLeft-level1-NavLink="$space-0"
+  >
+    <AppHeader>
+      <property name="logoTemplate">
+        <Link to="/" height="100%">
+          <Logo height="$space-8" />
+        </Link>
+      </property>
+      <Stack desktopOnly>
+        <HStack gap="0">
+          <NavLink
+            noIndicator
+            label="Home"
+            to="/"
+            active="{currentSegment === '/'}"
+          />
+          <NavLink
+            noIndicator
+            label="Docs"
+            to="/docs"
+            active="{currentSegment.startsWith('/docs')}"
+          />
+          <NavLink
+            noIndicator
+            label="Blog"
+            to="/blog"
+            active="{currentSegment.startsWith('/blog')}"
+          />
+          <NavLink
+            to="/get-started"
+            noIndicator
+            label="Get started"
+          />
+        </HStack>
+      </Stack>
+      <SpaceFiller />
+      <Search
+        collapsible="true"
+        when="{mediaSize.sizeIndex > 1}"
+        data="{appGlobals.plainTextContent}"
+      />
+    </AppHeader>
+  </Theme>
 
-  <Pages>
+  <NavPanel
+    when="{(!globalThis.location.hash.includes('/404') && !globalThis.location.pathname.includes('/404')) || mediaSize.sizeIndex <= 2}"
+    scrollStyle="whenScrolling"
+    showScrollerFade="true"
+  >
+    <Stack
+      paddingHorizontal="$space-4"
+      paddingBottom="$space-4"
+      when="{mediaSize.sizeIndex <= 2}"
+    >
+      <Search data="{appGlobals.plainTextContent}" />
+    </Stack>
+    <Fragment when="{mediaSize.sizeIndex <= 2}">
+      <NavLink
+        noIndicator
+        label="Home"
+        to="/"
+        active="{currentSegment === '/'}"
+      />
+      <NavLink
+        noIndicator
+        label="Docs"
+        to="/docs"
+        active="{currentSegment.startsWith('/docs')}"
+      />
+      <NavLink
+        noIndicator
+        label="Blog"
+        to="/blog"
+        active="{currentSegment.startsWith('/blog')}"
+      />
+      <NavLink
+        to="/news"
+        label="News & Reviews"
+        target="_self"
+        noIndicator
+      />
+      <NavLink
+        to="/docs/change-log"
+        label="Changelog"
+        noIndicator
+        target="_self"
+      />
+      <NavLink
+        to="https://github.com/xmlui-org/xmlui"
+        icon="github"
+        label="GitHub"
+        noIndicator
+        target="_blank"
+      />
+    </Fragment>
+    <Stack
+      padding="0"
+      paddingTop="{mediaSize.sizeIndex <= 2 ? '$space-4' : '0'}"
+      gap="0"
+      when="{currentSegment.startsWith('/docs')}"
+    >
+      <NavGroup initiallyExpanded="{true}" label="Learn XMLUI" to="/docs/learn">
+        <NavLink icon="school" label="Introduction" to="/docs" />
+        <NavLink
+          icon="arrow-shuffle"
+          label="Reactive Data"
+          to="/docs/reactive-intro"
+        />
+        <NavLink
+          icon="component"
+          label="Components"
+          to="/docs/components-intro"
+        />
+        <NavLink icon="theme" label="Themes" to="/docs/themes-intro" />
+      </NavGroup>
+    </Stack>
+    <NavGroup
+      label="Guides"
+      to="/docs/guides"
+      when="{currentSegment.startsWith('/docs')}"
+    >
+      <NavLink
+        icon="hierarchy"
+        label="App Structure"
+        to="/docs/guides/app-structure"
+      />
+      <NavLink icon="markup" label="Markup" to="/docs/guides/markup" />
+      <NavLink icon="bolt" label="Scripting" to="/docs/guides/scripting" />
+      <NavLink icon="boundary" label="Scoping" to="/docs/guides/scoping" />
+      <NavLink
+        icon="playground"
+        label="Codefences and playgrounds"
+        to="/docs/guides/playground-and-codefence"
+      />
+      <NavLink
+        icon="layout"
+        label="Layout"
+        to="/docs/guides/layout"
+      />
+      <NavLink
+        icon="typography"
+        label="Working with Text"
+        to="/docs/guides/working-with-text"
+      />
+      <NavLink
+        icon="markdown"
+        label="Working with Markdown"
+        to="/docs/guides/working-with-markdown"
+      />
+      <NavLink
+        icon="link"
+        label="Routing and Links"
+        to="/docs/guides/routing-and-links"
+      />
+      <NavLink icon="form" label="Forms" to="/docs/guides/forms" />
+      <NavLink
+        icon="dialog"
+        label="Modal Dialogs"
+        to="/docs/guides/modal-dialogs"
+      />
+      <NavLink
+        icon="component"
+        label="User-defined Components"
+        to="/docs/guides/user-defined-components"
+      />
+      <NavLink
+        icon="refactor"
+        label="Refactoring"
+        to="/docs/guides/refactoring"
+      />
+      <NavLink
+        icon="build"
+        label="Build a HelloWorld Component"
+        to="/docs/guides/build-hello-world-component"
+      />
+      <NavLink
+        icon="deploy"
+        label="Hosted Deployment"
+        to="/docs/guides/hosted-deployment"
+      />
+    </NavGroup>
+    <NavGroup
+      label="Tutorial"
+      to="/docs/tutorial"
+      when="{currentSegment.startsWith('/docs')}"
+    >
+      <NavLink icon="invoice" label="XMLUI Invoice" to="/docs/tutorial-01" />
+      <NavLink icon="file-code" label="Main.xmlui" to="/docs/tutorial-02" />
+      <NavLink icon="menu" label="Navigation" to="/docs/tutorial-03" />
+      <NavLink icon="cards" label="InfoCards" to="/docs/tutorial-04" />
+      <NavLink icon="charts" label="Charts" to="/docs/tutorial-05" />
+      <NavLink icon="slider" label="Slider" to="/docs/tutorial-06" />
+      <NavLink icon="file-invoice" label="Invoices" to="/docs/tutorial-07" />
+      <NavLink icon="create" label="Create Invoice" to="/docs/tutorial-08" />
+      <NavLink icon="details" label="Invoice Details" to="/docs/tutorial-09" />
+      <NavLink icon="search" label="Search" to="/docs/tutorial-10" />
+      <NavLink icon="import" label="Import" to="/docs/tutorial-11" />
+      <NavLink icon="settings" label="Settings" to="/docs/tutorial-12" />
+    </NavGroup>
+    <NavGroup
+      label="How To"
+      to="/docs/howto"
+      when="{currentSegment.startsWith('/docs')}"
+    >
+      <NavLink
+        icon="article"
+        iconAlignment="baseline"
+        label="Expose a method from a component"
+        to="/docs/howto/expose-a-method-from-a-component"
+      />
+      <NavLink
+        icon="article"
+        iconAlignment="baseline"
+        label="Delegate a method"
+        to="/docs/howto/delegate-a-method"
+      />
+      <NavLink
+        icon="article"
+        iconAlignment="baseline"
+        label="React to button click not keystrokes"
+        to="/docs/howto/react-to-button-click-not-keystrokes"
+      />
+      <NavLink
+        icon="article"
+        label="Buffer a reactive edit"
+        to="/docs/howto/buffer-a-reactive-edit"
+      />
+      <NavLink
+        icon="article"
+        label="Modify a value reported in a Column"
+        to="/docs/howto/modify-a-value-reported-in-a-column"
+      />
+      <NavLink
+        icon="article"
+        label="Filter and transform data from an API"
+        to="/docs/howto/filter-and-transform-data-from-an-api"
+      />
+      <NavLink
+        icon="article"
+        label="Group items in List by a property"
+        to="/docs/howto/group-items-in-list-by-a-property"
+      />
+      <NavLink
+        icon="article"
+        label="Delay a DataSource until another DataSource is ready"
+        to="/docs/howto/delay-a-datasource-until-another-datasource-is-ready"
+      />
+      <NavLink
+        icon="article"
+        label="Hide an element until its DataSource is ready"
+        to="/docs/howto/hide-an-element-until-its-datasource-is-ready"
+      />
+      <NavLink
+        icon="article"
+        label="Use built-in form validation"
+        to="/docs/howto/use-built-in-form-validation"
+      />
+      <NavLink
+        icon="article"
+        label="Do custom form validation"
+        to="/docs/howto/do-custom-form-validation"
+      />
+      <NavLink
+        icon="article"
+        label="Assign a complex JSON literal to a component variable"
+        to="/docs/howto/assign-a-complex-json-literal-to-a-component-variable"
+      />
+      <NavLink
+        icon="article"
+        label="Use accessors to simplify complex expressions"
+        to="/docs/howto/use-accessors-to-simplify-complex-expressions"
+      />
+      <NavLink
+        icon="article"
+        label="Make a set of equal-width cards"
+        to="/docs/howto/make-a-set-of-equal-width-cards"
+      />
+      <NavLink
+        icon="article"
+        label="Set the initial value of a Select from fetched data"
+        to="/docs/howto/set-the-initial-value-of-a-select-from-fetched-data"
+      />
+      <NavLink
+        icon="article"
+        label="Pass data to a Modal Dialog"
+        to="/docs/howto/pass-data-to-a-modal-dialog"
+      />
+      <NavLink
+        icon="article"
+        label="Debug a component"
+        to="/docs/howto/debug-a-component"
+      />
+      <NavLink
+        icon="article"
+        label="Share a ModalDialog across components"
+        to="/docs/howto/share-a-modaldialog-across-components"
+      />
+      <NavLink
+        icon="article"
+        label="Use the same ModalDialog to add or edit"
+        to="/docs/howto/use-the-same-modaldialog-to-add-or-edit"
+      />
+      <NavLink
+        icon="article"
+        label="Paginate a list"
+        to="/docs/howto/paginate-a-list"
+      />
+      <NavLink
+        icon="article"
+        label="Chain a DataSource refetch"
+        to="/docs/howto/chain-a-refetch"
+      />
+      <NavLink
+        icon="article"
+        label="Control cache invalidation"
+        to="/docs/howto/control-cache-invalidation"
+      />
+      <NavLink
+        icon="article"
+        label="Handle background operations"
+        to="/docs/howto/handle-background-operations"
+      />
+      <NavLink
+        icon="article"
+        label="Make a table responsive"
+        to="/docs/howto/make-a-table-responsive"
+      />
+      <NavLink
+        icon="article"
+        label="Update UI optimistically"
+        to="/docs/howto/update-ui-optimistically"
+      />
+      <NavLink
+        icon="article"
+        label="Toggle multiple items with shared state"
+        to="/docs/howto/toggle-multiple-items-with-shared-state"
+      />
+      <NavLink
+        icon="article"
+        label="Sync selections between table and list views"
+        to="/docs/howto/sync-selections-between-table-and-list-views"
+      />
+      <NavLink
+        icon="article"
+        label="Make NavPanel width responsive"
+        to="/docs/howto/make-navpanel-width-responsive"
+      />
+      <NavLink
+        icon="article"
+        label="Debounce user input for API calls"
+        to="/docs/howto/debounce-user-input-for-api-calls"
+      />
+      <NavLink
+        icon="article"
+        label="Debounce with ChangeListener"
+        to="/docs/howto/debounce-with-changelistener"
+      />
+      <NavLink
+        icon="article"
+        label="Use ModalDialog's onClose() method"
+        to="/docs/howto/use-modal-dialog-onclose"
+      />
+      <NavLink
+        icon="article"
+        label="Copy billing data to shipping"
+        to="/docs/howto/copy-billing-to-shipping"
+      />
+      <NavLink
+        icon="article"
+        label="Implement an authentication gate"
+        to="/docs/howto/implement-an-authentication-gate"
+      />
+      <NavLink
+        icon="article"
+        label="Set the Width of an Input Field in an HStack"
+        to="/docs/howto/set-width-for-input-fields-in-a-horizontal-layout"
+      />
+      <NavLink
+        icon="article"
+        label="Stop DataSource from sending requests in a closed Dialog"
+        to="/docs/howto/stop-datasource-from-sending-requests-in-a-closed-dialog"
+      />
+      <NavLink
+        icon="article"
+        label="Add custom icons"
+        to="/docs/howto/add-custom-icons"
+      />
+    </NavGroup>
+    <NavGroup
+      label="Reference"
+      to="/docs/reference"
+      when="{currentSegment.startsWith('/docs')}"
+    >
+      <IncludeNavSection sectionId="components" />
+      <IncludeNavSection sectionId="extensions" />
+      <NavGroup icon="theme" label="Themes" to="/docs/reference/themes">
+        <NavLink
+          label="Layout Properties"
+          to="/docs/styles-and-themes/layout-props"
+        />
+        <NavLink
+          label="Theme Variables"
+          to="/docs/styles-and-themes/theme-variables"
+        />
+        <NavLink
+          label="Theme Variable Defaults"
+          to="/docs/styles-and-themes/theme-variable-defaults"
+        />
+        <NavLink
+          label="Common Units"
+          to="/docs/styles-and-themes/common-units"
+        />
+      </NavGroup>
+      <NavLink
+        icon="behavior"
+        label="Behaviors"
+        to="/docs/behaviors"
+      />
+      <NavLink
+        icon="context"
+        label="Context Variables"
+        to="/docs/context-variables"
+      />
+      <NavLink icon="globals" label="Globals" to="/docs/globals" />
+      <NavLink icon="helper-tags" label="Helper Tags" to="/docs/helper-tags" />
+      <NavLink
+        icon="core-props"
+        label="Core Properties"
+        to="/docs/core-properties"
+      />
+      <NavLink
+        icon="template-props"
+        label="Template Properties"
+        to="/docs/template-properties"
+      />
+      <NavLink icon="palette" label="Palettes" to="/docs/palettes" />
+      <NavLink icon="icons" label="Icons" to="/docs/icons" />
+      <NavLink icon="glossary" label="Glossary" to="/docs/glossary" />
+    </NavGroup>
+    <NavLink
+      icon="mcp"
+      label="Model Context Protocol"
+      to="/docs/mcp"
+      when="{currentSegment.startsWith('/docs')}"
+    />
+    <NavLink
+      icon="vscode-extension"
+      label="VSCode extension"
+      to="/docs/vscode"
+      when="{currentSegment.startsWith('/docs')}"
+    />
+    <NavLink
+      icon="logs"
+      label="Change Log"
+      to="/docs/change-log"
+      when="{currentSegment.startsWith('/docs')}"
+    />
+  </NavPanel>
+
+  <Pages fallbackPath="/404" defaultScrollRestoration="true">
     <Page url="/">
       <H1>
         Website homepage
@@ -32,63 +506,557 @@
     </Page>
     <Page url="/get-started">
       <VStack marginHorizontal="$space-8">
-      <H2>Current segment: {currentSegment}</H2>
+        <H2>Current segment: {currentSegment}</H2>
         <Markdown data="/pages/get-started.md" />
       </VStack>
-    </Page>
-    <Page url="/blog">
-      <H1>
-        Blog
-      </H1>
-      <H2>Current segment: {currentSegment}</H2>
-    </Page>
-    <Page url="/docs">
-      <H1>
-        Docs
-      </H1>
-      <H2>Current segment: {currentSegment}</H2>
     </Page>
     <Page url="/news">
       <H2>Current segment: {currentSegment}</H2>
       <NewsAndReviews />
     </Page>
+
+    <!-- Blog routes -->
+    <Page url="/blog">
+      <BlogOverview />
+    </Page>
+    <Page
+      url="/blog/:slug"
+      staticPaths="{
+            posts.map((p) => {
+              return { params: { slug: p.slug } };
+            })}"
+    >
+      <script>
+        var post = posts.find(p => p.slug === $routeParams.slug)
+      </script>
+      <BlogPage when="{post}" post="{post}" />
+      <Redirect when="{!post}" to="/404" />
+    </Page>
+
+    <!-- Docs routes with /docs prefix -->
+    <Page url="/docs">
+      <DocumentPageNoTOC content="{appGlobals.content['pages/intro.md']}" useDefault="{true}" />
+    </Page>
+    <Page url="/docs/reactive-intro">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/reactive-intro.md']}"
+      />
+    </Page>
+    <Page url="/docs/components-intro">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/components-intro.md']}"
+      />
+    </Page>
+    <Page url="/docs/themes-intro">
+      <ThemesIntro />
+    </Page>
+    <Page url="/docs/tutorial-01">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/tutorial-01.md']}"
+      />
+    </Page>
+    <Page url="/docs/tutorial-02">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/tutorial-02.md']}"
+      />
+    </Page>
+    <Page url="/docs/tutorial-03">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/tutorial-03.md']}"
+      />
+    </Page>
+    <Page url="/docs/tutorial-04">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/tutorial-04.md']}"
+      />
+    </Page>
+    <Page url="/docs/tutorial-05">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/tutorial-05.md']}"
+      />
+    </Page>
+    <Page url="/docs/tutorial-06">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/tutorial-06.md']}"
+      />
+    </Page>
+    <Page url="/docs/tutorial-07">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/tutorial-07.md']}"
+      />
+    </Page>
+    <Page url="/docs/tutorial-08">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/tutorial-08.md']}"
+      />
+    </Page>
+    <Page url="/docs/tutorial-09">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/tutorial-09.md']}"
+      />
+    </Page>
+    <Page url="/docs/tutorial-10">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/tutorial-10.md']}"
+      />
+    </Page>
+    <Page url="/docs/tutorial-11">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/tutorial-11.md']}"
+      />
+    </Page>
+    <Page url="/docs/tutorial-12">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/tutorial-12.md']}"
+      />
+    </Page>
+    <Page url="/docs/learn">
+      <Overview />
+    </Page>
+    <Page url="/docs/guides">
+      <Overview />
+    </Page>
+    <Page url="/docs/tutorial">
+      <Overview />
+    </Page>
+    <Page url="/docs/howto">
+      <Overview />
+    </Page>
+    <Page url="/docs/reference">
+      <Overview />
+    </Page>
+    <Page url="/docs/reference/components">
+      <Overview />
+    </Page>
+    <Page url="/docs/reference/extensions">
+      <Overview />
+    </Page>
+    <Page url="/docs/extensions/xmlui-animations/_overview">
+      <Overview />
+    </Page>
+    <Page url="/docs/reference/themes">
+      <Overview />
+    </Page>
+    <Page url="/docs/extensions/xmlui-animations">
+      <Overview />
+    </Page>
+    <Page url="/docs/guides/app-structure">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/app-structure.md']}"
+      />
+    </Page>
+    <Page url="/docs/guides/markup">
+      <DocumentPage content="{appGlobals.content['pages/markup.md']}" />
+    </Page>
+    <Page url="/docs/guides/scoping">
+      <DocumentPage content="{appGlobals.content['pages/scoping.md']}" />
+    </Page>
+    <Page url="/docs/guides/scripting">
+      <DocumentPage content="{appGlobals.content['pages/scripting.md']}" />
+    </Page>
+    <Page url="/docs/guides/layout">
+      <DocumentPage content="{appGlobals.content['pages/layout.md']}" />
+    </Page>
+    <Page url="/docs/guides/working-with-text">
+      <DocumentPage
+        content="{appGlobals.content['pages/working-with-text.md']}"
+      />
+    </Page>
+    <Page url="/docs/guides/playground-and-codefence">
+      <DocumentPage
+        maxHeadingLevel="2"
+        content="{appGlobals.content['pages/playground-and-codefence.md']}"
+      />
+    </Page>
+    <Page url="/docs/guides/working-with-markdown">
+      <DocumentPage
+        content="{appGlobals.content['pages/working-with-markdown.md']}"
+      />
+    </Page>
+    <Page url="/docs/guides/routing-and-links">
+      <DocumentPage
+        content="{appGlobals.content['pages/routing-and-links.md']}"
+      />
+    </Page>
+    <Page url="/docs/guides/forms">
+      <DocumentPage content="{appGlobals.content['pages/forms.md']}" />
+    </Page>
+    <Page url="/docs/resources">
+      <DocumentPage content="{appGlobals.content['pages/resources.md']}" />
+    </Page>
+    <Page url="/docs/guides/modal-dialogs">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/modal-dialogs.md']}"
+      />
+    </Page>
+    <Page url="/docs/guides/user-defined-components">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/user-defined-components.md']}"
+      />
+    </Page>
+    <Page url="/docs/guides/refactoring">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/refactoring.md']}"
+      />
+    </Page>
+    <Page url="/docs/styles-and-themes/layout-props">
+      <DocumentPage
+        content="{appGlobals.content['pages/styles-and-themes/layout-props.md']}"
+      />
+    </Page>
+    <Page url="/docs/styles-and-themes/theme-variables">
+      <DocumentPage
+        content="{appGlobals.content['pages/styles-and-themes/theme-variables.md']}"
+      />
+    </Page>
+    <Page url="/docs/styles-and-themes/theme-variable-defaults">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/styles-and-themes/theme-variable-defaults.md']}"
+      />
+    </Page>
+    <Page url="/docs/styles-and-themes/common-units">
+      <DocumentPage
+        content="{appGlobals.content['pages/styles-and-themes/common-units.md']}"
+      />
+    </Page>
+    <Page url="/docs/context-variables">
+      <DocumentPage
+        content="{appGlobals.content['pages/context-variables.md']}"
+      />
+    </Page>
+    <Page url="/docs/context-variables2">
+      <DocumentPage
+        content="{appGlobals.content['pages/context-variables2.md']}"
+      />
+    </Page>
+    <Page url="/docs/behaviors">
+      <DocumentPage
+        content="{appGlobals.content['pages/behaviors.md']}"
+      />
+    </Page>
+    <Page url="/docs/globals">
+      <DocumentPage content="{appGlobals.content['pages/globals.md']}" />
+    </Page>
+    <Page url="/docs/helper-tags">
+      <DocumentPage
+        content="{appGlobals.content['pages/helper-tags.md']}"
+      />
+    </Page>
+    <Page url="/docs/core-properties">
+      <DocumentPage
+        content="{appGlobals.content['pages/core-properties.md']}"
+      />
+    </Page>
+    <Page url="/docs/template-properties">
+      <DocumentPage
+        content="{appGlobals.content['pages/template-properties.md']}"
+      />
+    </Page>
+    <Page url="/docs/icons">
+      <Icons />
+    </Page>
+    <Page url="/docs/palettes">
+      <Palettes />
+    </Page>
+    <Page url="/docs/glossary">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/glossary.md']}"
+      />
+    </Page>
+    <Page url="/docs/guides/build-hello-world-component">
+      <DocumentPage
+        content="{appGlobals.content['pages/build-hello-world-component.md']}"
+      />
+    </Page>
+    <Page url="/docs/build-editor-component">
+      <DocumentPage
+        content="{appGlobals.content['pages/build-editor-component.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/expose-a-method-from-a-component">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/expose-a-method-from-a-component.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/delegate-a-method">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/delegate-a-method.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/react-to-button-click-not-keystrokes">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/react-to-button-click-not-keystrokes.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/buffer-a-reactive-edit">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/buffer-a-reactive-edit.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/modify-a-value-reported-in-a-column">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/modify-a-value-reported-in-a-column.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/filter-and-transform-data-from-an-api">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/filter-and-transform-data-from-an-api.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/group-items-in-list-by-a-property">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/group-items-in-list-by-a-property.md']}"
+      />
+    </Page>
+    <Page
+      url="/docs/howto/delay-a-datasource-until-another-datasource-is-ready"
+    >
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/delay-a-datasource-until-another-datasource-is-ready.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/hide-an-element-until-its-datasource-is-ready">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/hide-an-element-until-its-datasource-is-ready.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/use-built-in-form-validation">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/use-built-in-form-validation.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/do-custom-form-validation">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/do-custom-form-validation.md']}"
+      />
+    </Page>
+    <Page
+      url="/docs/howto/assign-a-complex-json-literal-to-a-component-variable"
+    >
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/assign-a-complex-json-literal-to-a-component-variable.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/use-accessors-to-simplify-complex-expressions">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/use-accessors-to-simplify-complex-expressions.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/make-a-set-of-equal-width-cards">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/make-a-set-of-equal-width-cards.md']}"
+      />
+    </Page>
+    <Page
+      url="/docs/howto/set-the-initial-value-of-a-select-from-fetched-data"
+    >
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/set-the-initial-value-of-a-select-from-fetched-data.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/pass-data-to-a-modal-dialog">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/pass-data-to-a-modal-dialog.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/debug-a-component">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/debug-a-component.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/share-a-modaldialog-across-components">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/share-a-modaldialog-across-components.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/use-the-same-modaldialog-to-add-or-edit">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/use-the-same-modaldialog-to-add-or-edit.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/paginate-a-list">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/paginate-a-list.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/chain-a-refetch">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/chain-a-refetch.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/control-cache-invalidation">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/control-cache-invalidation.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/handle-background-operations">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/handle-background-operations.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/update-ui-optimistically">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/update-ui-optimistically.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/toggle-multiple-items-with-shared-state">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/toggle-multiple-items-with-shared-state.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/make-a-table-responsive">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/make-a-table-responsive.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/sync-selections-between-table-and-list-views">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/sync-selections-between-table-and-list-views.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/make-navpanel-width-responsive">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/make-navpanel-width-responsive.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/debounce-user-input-for-api-calls">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/debounce-user-input-for-api-calls.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/debounce-with-changelistener">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/debounce-with-changelistener.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/use-modal-dialog-onclose">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/use-modal-dialog-onclose.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/copy-billing-to-shipping">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/copy-billing-to-shipping.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/implement-an-authentication-gate">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/implement-an-authentication-gate.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/set-width-for-input-fields-in-a-horizontal-layout">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/set-width-for-input-fields-in-a-horizontal-layout.md']}"
+      />
+    </Page>
+    <Page
+      url="/docs/howto/stop-datasource-from-sending-requests-in-a-closed-dialog"
+    >
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/stop-datasource-from-sending-requests-in-a-closed-dialog.md']}"
+      />
+    </Page>
+    <Page url="/docs/howto/add-custom-icons">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/howto/add-custom-icons.md']}"
+      />
+    </Page>
+
+    <Page url="/docs/guides/hosted-deployment">
+      <DocumentPage
+        content="{appGlobals.content['pages/hosted-deployment.md']}"
+      />
+    </Page>
+    <Page url="/docs/change-log">
+      <ChangeLog />
+    </Page>
+    <Page url="/docs/mcp">
+      <DocumentPageNoTOC content="{appGlobals.content['pages/mcp.md']}" />
+    </Page>
+    <Page url="/docs/vscode">
+      <DocumentPageNoTOC
+        content="{appGlobals.content['pages/vscode.md']}"
+      />
+    </Page>
+    <Page url="/docs/components/:compId">
+      <script>
+        var contentKey = "components/" + $routeParams.compId;
+        var content = appGlobals.content[contentKey];
+      </script>
+      <DocumentPage when="{content}" content="{content}" />
+      <Redirect when="{!content}" to="/404" />
+    </Page>
+    <Page url="/docs/extensions/*">
+      <script>
+        var contentKey = "extensions/" + $routeParams['*'];
+        var content = appGlobals.content[contentKey];
+      </script>
+      <DocumentPage when="{content}" content="{content}" />
+      <Redirect when="{!content}" to="/404" />
+    </Page>
+
+    <Page url="/404">
+      <PageNotFound />
+    </Page>
   </Pages>
 
-  <Footer sticky="false">
-    <Text fontWeight="400">
-      This site is an
-      <Text variant="strong">
-        XMLUI™
+  <ScrollToTop marginBottom="$space-4" />
+  <Theme
+    padding-Footer="$space-2 $space-4"
+    borderTop-Footer="1px solid $borderColor"
+    backgroundColor-Footer="$backgroundColor-AppHeader"
+    textColor-Footer="$textColor-secondary"
+    fontSize-Footer="15px"
+    verticalAlignment-Footer="center"
+    maxWidth-content-Footer="$maxWidth-content"
+    gap-Footer="$space-normal"
+    margin-Footer="0 auto"
+    color-surface="rgb(111, 110, 119)"
+    backgroundColor="$color-surface-0"
+    fontSize="15px"
+    textColor-Text="$color-surface-600"
+    textColor-Link="$color-surface-600"
+    textColor-Link--hover="$color-surface-900"
+  >
+    <Footer>
+      <Text fontWeight="400">
+        This site is an
+        <Text variant="strong">
+          XMLUI™
+        </Text>
+        app.
       </Text>
-      app.
-    </Text>
-    <SpaceFiller />
-    <HStack verticalAlignment="center">
-      <Stack desktopOnly>
-        <CHStack>
-          <LinkButton
-            to="https://demo.xmlui.org"
-            label="Gallery"
-            blank="{true}"
-          />
-          <LinkButton to="/news" label="News & Reviews" />
-          <LinkButton
-            to="https://docs.xmlui.org/change-log"
-            label="Changelog"
-            blank="{true}"
-          />
-          <Separator />
-          <LinkButton
-            to="https://github.com/xmlui-org/xmlui"
-            icon="github"
-            label="GitHub"
-            blank="{true}"
-          />
-          <Separator />
-        </CHStack>
-      </Stack>
-      <ToneSwitch />
-    </HStack>
-  </Footer>
-
-</App>
+      <SpaceFiller />
+      <HStack verticalAlignment="center">
+        <Stack desktopOnly>
+          <CHStack>
+            <LinkButton
+              to="https://demo.xmlui.org"
+              label="Gallery"
+              blank="{true}"
+            />
+            <LinkButton
+              to="https://xmlui.org/news"
+              label="News & Reviews"
+              blank="{true}"
+            />
+            <LinkButton
+              to="https://docs.xmlui.org/change-log"
+              label="Changelog"
+              blank="{true}"
+            />
+            <Separator />
+            <LinkButton
+              to="https://github.com/xmlui-org/xmlui"
+              icon="github"
+              label="GitHub"
+              blank="{true}"
+            />
+            <Separator />
+          </CHStack>
+        </Stack>
+        <ToneSwitch />
+      </HStack>
+    </Footer>
+  </Theme>
+  </App>
