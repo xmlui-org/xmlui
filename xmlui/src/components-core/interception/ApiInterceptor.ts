@@ -202,7 +202,14 @@ export class ApiInterceptor implements IApiInterceptor<RequestInit> {
           status: successStatusCode,
         });
       }
-      // console.log(operationId, ret)
+      // Return strings as text/plain so that consumers calling response.text()
+      // receive the raw value instead of a JSON-encoded quoted string.
+      if (typeof ret === "string") {
+        return HttpResponse.text(ret, {
+          headers: headers,
+          status: successStatusCode,
+        });
+      }
       return HttpResponse.json(ret, {
         headers: headers,
         status: successStatusCode,

@@ -680,7 +680,7 @@ When using custom variants, you can style them using theme variables with the na
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-code | $space-0_5 | $space-0_5 |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-codefence | $space-4 | $space-4 |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-keyboard | $space-1 | $space-1 |
-| [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-marked | $space-1 | $space-1 |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-marked | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-tableheading | $space-1 | $space-1 |
 | [paddingVertical](../styles-and-themes/common-units/#size)-Text-codefence | $space-3 | $space-3 |
 | [paddingVertical](../styles-and-themes/common-units/#size)-Text-paragraph | $space-1 | $space-1 |

@@ -666,6 +666,8 @@ The property name in source data for parent relationships (used in flat format).
 
 This property determines the scrollbar style. Options: "normal" uses the browser's default scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.
 
+Available values: `normal` **(default)**, `overlay`, `whenMouseOver`, `whenScrolling`
+
 ### `selectableField` [#selectablefield]
 
 > [!DEF]  default: **"selectable"**

@@ -38,6 +38,31 @@
           ]
         },
         {
+          "label": "Xmlui Website Blocks",
+          "children": [
+            {
+              "label": "Extension Overview",
+              "to": "/extensions/xmlui-website-blocks/_overview"
+            },
+            {
+              "label": "Carousel",
+              "to": "/extensions/xmlui-website-blocks/Carousel"
+            },
+            {
+              "label": "FancyButton",
+              "to": "/extensions/xmlui-website-blocks/FancyButton"
+            },
+            {
+              "label": "HeroSection",
+              "to": "/extensions/xmlui-website-blocks/HeroSection"
+            },
+            {
+              "label": "ScrollToTop",
+              "to": "/extensions/xmlui-website-blocks/ScrollToTop"
+            }
+          ]
+        },
+        {
           "label": "Xmlui Pdf",
           "children": [
             {
