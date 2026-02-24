@@ -246,9 +246,8 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       const components = description?.components?.map((c) => {
         const { component, errors, erroneousCompoundComponentName } = parseComponentIfNecessary(c);
         if (erroneousCompoundComponentName) {
-          const errorMessages = errors.map(e => `[${e.code}] ${e.message}`).join("\n");
           throw new Error(
-            `Error parsing component "${erroneousCompoundComponentName}":\n${errorMessages}`,
+            `Error parsing component "${erroneousCompoundComponentName}": ${errors.join("\n")}`,
           );
         }
         return component as CompoundComponentDef;

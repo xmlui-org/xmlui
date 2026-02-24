@@ -209,7 +209,6 @@ export const ErrCodesTransform = {
   nsSchemeIncorrect: "T029",
   scriptParse: "T030",
   globalNotAllowedInNested: "T031",
-  globalNotAllowedInComponent: "T032",
   ...ErrorCodes,
 } as const;
 
@@ -300,11 +299,7 @@ export const DIAGS_TRANSFORM = {
   },
   globalNotAllowedInNested: {
     code: ErrCodesTransform.globalNotAllowedInNested,
-    message: "Global variables can only be declared in the root element of Main.xmlui, not in nested components.",
-  },
-  globalNotAllowedInComponent: {
-    code: ErrCodesTransform.globalNotAllowedInComponent,
-    message: "Global variables cannot be declared in component definitions. Use Globals.xs or declare them in Main.xmlui instead.",
+    message: "Global variables can only be declared in the root element or compound component definitions, not in nested regular components.",
   },
   cantHaveNameAttr: function (nodeName: string) {
     return {

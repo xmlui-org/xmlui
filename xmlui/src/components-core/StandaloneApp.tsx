@@ -622,8 +622,19 @@ function resolveRuntime(runtime: Record<string, any>): {
     });
   }
 
-  // --- Collect globalVars from root element only (components can no longer define globals)
-  const mergedGlobals = entryPointWithCodeBehind.globalVars || {};
+  // --- Collect globalVars from compound components and root element
+  const compoundGlobals: Record<string, any> = {};
+  components.forEach((compound) => {
+    if (compound.component?.globalVars) {
+      Object.assign(compoundGlobals, compound.component.globalVars);
+    }
+  });
+
+  // --- Merge with root globals (root takes precedence)
+  const mergedGlobals = {
+    ...compoundGlobals,
+    ...(entryPointWithCodeBehind.globalVars || {}),
+  };
 
   // --- Done.
   return {
