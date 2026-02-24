@@ -203,10 +203,6 @@ $borderColor-NumberBox--disabled: createThemeVar("Input:borderColor-NumberBox--d
       border-color: $borderColor-NumberBox--disabled;
     }
 
-    &.rtl {
-      flex-direction: row-reverse;
-    }
-
     .input {
       font-size: inherit;
       color: inherit;

@@ -235,6 +235,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
           [styles.end]: labelPosition === "end",
           [styles.shrinkToLabel]: shrinkToLabel,
         })}
+        dir={rest?.direction}
       >
         {label && (
           <div

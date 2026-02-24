@@ -610,7 +610,6 @@ export const NumberBox = forwardRef(function NumberBox(
         [styles.error]: validationStatus === "error",
         [styles.warning]: validationStatus === "warning",
         [styles.valid]: validationStatus === "valid",
-        [styles.rtl]: direction === "rtl",
       })}
       id={id}
       ref={forwardedRef}
