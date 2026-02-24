@@ -4,6 +4,7 @@ import {
   groupedNavPanelContent,
   content,
   plainTextContent,
+  prefetchedContent,
   shikiHighlighter,
   highlight,
   getLocalIcons,
@@ -30,6 +31,7 @@ const App: StandaloneAppDescription = {
     navPanelContent: groupedNavPanelContent,
     content,
     plainTextContent,
+    prefetchedContent,
     codeHighlighter: {
       availableLangs: shikiHighlighter.getLoadedLanguages(),
       highlight,
