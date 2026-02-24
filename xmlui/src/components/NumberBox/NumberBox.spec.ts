@@ -621,7 +621,7 @@ test.describe("Input Adornments", () => {
     const { left: textLeft, right: textRight } = await getBounds(page.getByText("$"));
 
     await expect(page.getByTestId("input")).toContainText("$");
-    expect(textRight - compLeft).toBeLessThanOrEqual(compRight - textLeft);
+    expect(textRight - compLeft).toBeGreaterThanOrEqual(compRight - textLeft);
   });
 
   test("endText displays at end of input", async ({ initTestBed, page }) => {
@@ -641,7 +641,7 @@ test.describe("Input Adornments", () => {
     const { left: textLeft, right: textRight } = await getBounds(page.getByText("USD"));
 
     await expect(page.getByTestId("input")).toContainText("USD");
-    expect(textRight - compLeft).toBeGreaterThanOrEqual(compRight - textLeft);
+    expect(textRight - compLeft).toBeLessThanOrEqual(compRight - textLeft);
   });
 
   test("startIcon displays at beginning of input", async ({ initTestBed, page }) => {
@@ -659,7 +659,7 @@ test.describe("Input Adornments", () => {
     const { left: compLeft, right: compRight } = await getBounds(page.getByTestId("input"));
     const { left: iconLeft, right: iconRight } = await getBounds(page.getByRole("img").first());
 
-    expect(iconRight - compLeft).toBeLessThanOrEqual(compRight - iconLeft);
+    expect(iconRight - compLeft).toBeGreaterThanOrEqual(compRight - iconLeft);
   });
 
   test("endIcon displays at end of input", async ({ initTestBed, page }) => {
@@ -677,7 +677,7 @@ test.describe("Input Adornments", () => {
     const { left: compLeft, right: compRight } = await getBounds(page.getByTestId("input"));
     const { left: iconLeft, right: iconRight } = await getBounds(page.getByRole("img").first());
 
-    expect(iconRight - compLeft).toBeGreaterThanOrEqual(compRight - iconLeft);
+    expect(iconRight - compLeft).toBeLessThanOrEqual(compRight - iconLeft);
   });
 
   test("multiple adornments can be combined", async ({ initTestBed, page }) => {

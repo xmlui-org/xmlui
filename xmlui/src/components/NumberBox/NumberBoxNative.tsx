@@ -610,6 +610,7 @@ export const NumberBox = forwardRef(function NumberBox(
         [styles.error]: validationStatus === "error",
         [styles.warning]: validationStatus === "warning",
         [styles.valid]: validationStatus === "valid",
+        [styles.rtl]: direction === "rtl",
       })}
       id={id}
       ref={forwardedRef}
@@ -618,6 +619,7 @@ export const NumberBox = forwardRef(function NumberBox(
         inputRef.current?.focus();
       }}
       style={{ ...style, gap }}
+      dir={direction}
     >
       <Part partId={PART_START_ADORNMENT}>
         <Adornment text={startText} iconName={startIcon} className={classnames(styles.adornment)} />
