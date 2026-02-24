@@ -4,84 +4,46 @@
   global.currentSegment=""
   onDidNavigate="(ev) => { currentSegment = ev; console.log('Navigated to segment:', ev) }"
 >
-  <Theme
-    backgroundColor-AppHeader="$color-surface-raised"
-    borderBottom-AppHeader="1px solid $borderColor"
-    paddingHorizontal-AppHeader="$space-4"
-    paddingLeft-AppHeader="$paddingHorizontal-AppHeader"
-    paddingRight-AppHeader="$paddingHorizontal-AppHeader"
-    paddingTop-AppHeader="$paddingVertical-AppHeader"
-    paddingBottom-AppHeader="$paddingVertical-AppHeader"
-    padding-AppHeader="$paddingTop-AppHeader $paddingRight-AppHeader $paddingBottom-AppHeader $paddingLeft-AppHeader"
-    paddingHorizontal-logo-AppHeader="$space-0"
-    paddingVertical-logo-AppHeader="$space-4"
-    paddingLeft-logo-AppHeader="$paddingHorizontal-logo-AppHeader"
-    paddingRight-logo-AppHeader="$paddingHorizontal-logo-AppHeader"
-    paddingTop-logo-AppHeader="$paddingVertical-logo-AppHeader"
-    paddingBottom-logo-AppHeader="$paddingVertical-logo-AppHeader"
-    padding-logo-AppHeader="$paddingTop-logo-AppHeader $paddingRight-logo-AppHeader $paddingBottom-logo-AppHeader $paddingLeft-logo-AppHeader"
-    maxWidth-content-AppHeader="$maxWidth-content-App"
-    maxWidth-AppHeader="$maxWidth-App"
-    padding-drawerToggle-AppHeader="$space-0_5"
-    borderRadius-AppHeader="0px"
-    color-surface="rgb(111, 110, 119)"
-    backgroundColor="$color-surface-0"
-    fontSize="15px"
-    textColor-Text="$color-surface-600"
-    iconAlignment-NavLink="baseline"
-    fontSize-NavLink="14px"
-    fontWeight-NavLink="500"
-    textColor-NavLink="$color-surface-500"
-    textColor-NavLink--active="$color-surface-900"
-    textColor-NavLink--hover="$color-surface-700"
-    textColor-NavLink--hover--active="$color-surface-900"
-    textColor-NavLink--pressed="$color-surface-900"
-    thickness-indicator-NavLink="0"
-    paddingVertical-NavLink="$space-1_5"
-    paddingLeft-level1-NavLink="$space-0"
-  >
-    <AppHeader>
-      <property name="logoTemplate">
-        <Link to="/" height="100%">
-          <Logo height="$space-8" />
-        </Link>
-      </property>
-      <Stack desktopOnly>
-        <HStack gap="0">
-          <NavLink
-            noIndicator
-            label="Home"
-            to="/"
-            active="{currentSegment === '/'}"
-          />
-          <NavLink
-            noIndicator
-            label="Docs"
-            to="/docs"
-            active="{currentSegment.startsWith('/docs')}"
-          />
-          <NavLink
-            noIndicator
-            label="Blog"
-            to="/blog"
-            active="{currentSegment.startsWith('/blog')}"
-          />
-          <NavLink
-            to="/get-started"
-            noIndicator
-            label="Get started"
-          />
-        </HStack>
-      </Stack>
-      <SpaceFiller />
-      <Search
-        collapsible="true"
-        when="{mediaSize.sizeIndex > 1}"
-        data="{appGlobals.plainTextContent}"
-      />
-    </AppHeader>
-  </Theme>
-
+  <AppHeader>
+    <property name="logoTemplate">
+      <Link to="/" height="100%">
+        <Logo height="$space-8" />
+      </Link>
+    </property>
+    <Stack desktopOnly>
+      <HStack gap="0">
+        <NavLink
+          noIndicator
+          label="Home"
+          to="/"
+          active="{currentSegment === '/'}"
+        />
+        <NavLink
+          noIndicator
+          label="Docs"
+          to="/docs"
+          active="{currentSegment.startsWith('/docs')}"
+        />
+        <NavLink
+          noIndicator
+          label="Blog"
+          to="/blog"
+          active="{currentSegment.startsWith('/blog')}"
+        />
+        <NavLink
+          to="/get-started"
+          noIndicator
+          label="Get started"
+        />
+      </HStack>
+    </Stack>
+    <SpaceFiller />
+    <Search
+      collapsible="true"
+      when="{mediaSize.sizeIndex > 1}"
+      data="{appGlobals.plainTextContent}"
+    />
+  </AppHeader>
   <NavPanel
     when="{!currentSegment.startsWith('/blog') && currentSegment !== '/get-started' && !globalThis.location.pathname.startsWith('/blog') && globalThis.location.pathname !== '/get-started' && ((!globalThis.location.hash.includes('/404') && !globalThis.location.pathname.includes('/404')) || mediaSize.sizeIndex <= 2)}"
     scrollStyle="whenScrolling"
