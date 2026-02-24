@@ -1,6 +1,8 @@
 <App
   layout="vertical-full-header"
   noScrollbarGutters="false"
+  global.currentSegment=""
+  onDidNavigate="(ev) => { currentSegment = ev; console.log('Navigated to segment:', ev) }"
 >
   <AppHeader>
     <property name="logoTemplate">
@@ -26,9 +28,11 @@
       <H1>
         Website homepage
       </H1>
+      <H2>Current segment: {currentSegment}</H2>
     </Page>
     <Page url="/get-started">
       <VStack marginHorizontal="$space-8">
+      <H2>Current segment: {currentSegment}</H2>
         <Markdown data="/pages/get-started.md" />
       </VStack>
     </Page>
@@ -36,13 +40,16 @@
       <H1>
         Blog
       </H1>
+      <H2>Current segment: {currentSegment}</H2>
     </Page>
     <Page url="/docs">
       <H1>
         Docs
       </H1>
+      <H2>Current segment: {currentSegment}</H2>
     </Page>
     <Page url="/news">
+      <H2>Current segment: {currentSegment}</H2>
       <NewsAndReviews />
     </Page>
   </Pages>
