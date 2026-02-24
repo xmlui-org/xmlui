@@ -5,7 +5,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata } from "../metadata-helpers";
 import { ContextMenu } from "./ContextMenuNative";
 import type { ContainerWrapperDef } from "../../components-core/rendering/ContainerWrapper";
-import { filterAdjacentSeparators } from "../menu-helpers";
+import { filterSeparators } from "../menu-helpers";
 
 const CMCOMP = "ContextMenu";
 
@@ -66,8 +66,9 @@ export const contextMenuComponentRenderer = createComponentRenderer(
   CMCOMP,
   ContextMenuMd,
   ({ node, extractValue, renderChild, registerComponentApi, className, state, updateState }) => {
-    // Filter adjacent separators before rendering to prevent flash
-    const filteredChildren = filterAdjacentSeparators(node.children);
+    // Filter separators dynamically: accounts for adjacent/leading/trailing separators
+    // and `when` conditions on menu items so hidden items don't leave orphaned separators.
+    const filteredChildren = filterSeparators(node.children, extractValue);
     
     // Wrap filtered children with $context variable
     const nodeWithContextVars: ContainerWrapperDef = {

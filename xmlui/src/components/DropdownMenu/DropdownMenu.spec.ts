@@ -170,9 +170,9 @@ test("removes multiple adjacent separators", async ({ initTestBed, createDropdow
   await expect(page.getByRole("menuitem", { name: "Item 2" })).toBeVisible();
   await expect(page.getByText("Submenu")).toBeVisible();
 
-  // Check that only 2 separators are rendered (not 4), since adjacent ones should be removed
+  // Check that only 1 separator is rendered: adjacent duplicates collapse and the trailing separator is removed
   const separators = driver.getMenuSeparators();
-  await expect(separators).toHaveCount(2);
+  await expect(separators).toHaveCount(1);
 });
 
 test("removes adjacent separators in SubMenuItem", async ({ initTestBed, createDropdownMenuDriver, page }) => {
