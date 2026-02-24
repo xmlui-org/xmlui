@@ -195,13 +195,13 @@ export function pushXsLog(entry: XsLogEntry, xsLogMax: number = 200): void {
 }
 
 /**
- * Trim _xsLogs to the max size while preserving interaction, navigate, and API
- * events. These are rare but critical for Playwright test generation and
+ * Trim _xsLogs to the max size while preserving interaction, navigate, API, and
+ * modal events. These are rare but critical for Playwright test generation and
  * semantic trace comparison, and must not be evicted by high-frequency
  * events (state:changes, handler:start/complete, component:vars:*).
  */
 export function splicePreservingInteractions(logs: any[], maxSize: number): void {
-  const preserved = new Set(["interaction", "navigate", "api:start", "api:complete", "api:error"]);
+  const preserved = new Set(["interaction", "navigate", "api:start", "api:complete", "api:error", "modal:show", "modal:confirm", "modal:cancel"]);
   const keep: any[] = [];
   const evictable: any[] = [];
   for (const entry of logs) {
