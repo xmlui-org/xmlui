@@ -2148,3 +2148,23 @@ test.describe("Phone Pattern Validation", () => {
     await expect(phoneField).toContainText("Not a valid phone number");
   });
 });
+
+// =============================================================================
+// STYLING TESTS
+// =============================================================================
+
+test.describe("Styling Tests", () => {
+  test("theme variables are correctly applied", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <TextBox bindTo="test" testId="field1" width="$testWidth" />
+      </Form>
+    `, {
+      testThemeVars: {
+        "testWidth": "300px",
+      }
+    });
+    const field1 = page.locator("[data-part-id='labeledItem']");
+    await expect(field1).toHaveCSS("width", "300px");
+  });
+});

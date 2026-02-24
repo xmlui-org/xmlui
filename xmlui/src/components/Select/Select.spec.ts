@@ -1098,7 +1098,7 @@ test.describe("Visual State", () => {
   test("input with label has correct width in px", async ({ page, initTestBed }) => {
     await initTestBed(`<Select width="200px" label="test" testId="test"/>`, {});
 
-    const input = page.getByTestId("test");
+    const input = page.getByTestId("test").locator('[data-part-id="labeledItem"]');
     const { width } = await input.boundingBox();
     expect(width).toBe(200);
   });
@@ -1116,7 +1116,7 @@ test.describe("Visual State", () => {
     await page.setViewportSize({ width: 400, height: 300 });
     await initTestBed(`<Select width="50%" label="test" testId="test"/>`, {});
 
-    const input = page.getByTestId("test");
+    const input = page.getByTestId("test").locator('[data-part-id="labeledItem"]');
     const { width } = await input.boundingBox();
     expect(width).toBe(200);
   });

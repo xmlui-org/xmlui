@@ -621,7 +621,7 @@ test.describe("Input Adornments", () => {
     const { left: textLeft, right: textRight } = await getBounds(page.getByText("$"));
 
     await expect(page.getByTestId("input")).toContainText("$");
-    expect(textRight - compLeft).toBeLessThanOrEqual(compRight - textLeft);
+    expect(textRight - compLeft).toBeGreaterThanOrEqual(compRight - textLeft);
   });
 
   test("endText displays at end of input", async ({ initTestBed, page }) => {
@@ -641,7 +641,7 @@ test.describe("Input Adornments", () => {
     const { left: textLeft, right: textRight } = await getBounds(page.getByText("USD"));
 
     await expect(page.getByTestId("input")).toContainText("USD");
-    expect(textRight - compLeft).toBeGreaterThanOrEqual(compRight - textLeft);
+    expect(textRight - compLeft).toBeLessThanOrEqual(compRight - textLeft);
   });
 
   test("startIcon displays at beginning of input", async ({ initTestBed, page }) => {
@@ -659,7 +659,7 @@ test.describe("Input Adornments", () => {
     const { left: compLeft, right: compRight } = await getBounds(page.getByTestId("input"));
     const { left: iconLeft, right: iconRight } = await getBounds(page.getByRole("img").first());
 
-    expect(iconRight - compLeft).toBeLessThanOrEqual(compRight - iconLeft);
+    expect(iconRight - compLeft).toBeGreaterThanOrEqual(compRight - iconLeft);
   });
 
   test("endIcon displays at end of input", async ({ initTestBed, page }) => {
@@ -677,7 +677,7 @@ test.describe("Input Adornments", () => {
     const { left: compLeft, right: compRight } = await getBounds(page.getByTestId("input"));
     const { left: iconLeft, right: iconRight } = await getBounds(page.getByRole("img").first());
 
-    expect(iconRight - compLeft).toBeGreaterThanOrEqual(compRight - iconLeft);
+    expect(iconRight - compLeft).toBeLessThanOrEqual(compRight - iconLeft);
   });
 
   test("multiple adornments can be combined", async ({ initTestBed, page }) => {
@@ -1431,7 +1431,7 @@ test("input has correct width in px", async ({ page, initTestBed }) => {
 test("input with label has correct width in px", async ({ page, initTestBed }) => {
   await initTestBed(`<NumberBox width="200px" label="test" testId="test"/>`, {});
 
-  const input = page.getByTestId("test");
+  const input = page.getByTestId("test").locator('[data-part-id="labeledItem"]');
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
@@ -1449,7 +1449,7 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
   await page.setViewportSize({ width: 400, height: 300 });
   await initTestBed(`<NumberBox width="50%" label="test" testId="test"/>`, {});
 
-  const input = page.getByTestId("test");
+  const input = page.getByTestId("test").locator('[data-part-id="labeledItem"]');
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });

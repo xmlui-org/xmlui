@@ -8,6 +8,8 @@ import { useEvent } from "../../components-core/utils/misc";
 import styles from "./ColorPicker.module.scss";
 import classnames from "classnames";
 import { composeRefs } from "@radix-ui/react-compose-refs";
+import { Part } from "../Part/Part";
+import { PART_INPUT } from "../../components-core/parts";
 
 type Props = {
   id?: string;
@@ -123,28 +125,30 @@ export const ColorPicker = forwardRef(
       /* Produces a 7 character RGB color output in hex as a string type */
     }
     return (
-      <input
-        {...rest}
-        id={id}
-        className={classnames(className, styles.colorInput, {
-          [styles.error]: validationStatus === "error",
-          [styles.warning]: validationStatus === "warning",
-          [styles.valid]: validationStatus === "valid",
-        })}
-        style={style}
-        disabled={!enabled}
-        onFocus={handleOnFocus}
-        onChange={onInputChange}
-        readOnly={readOnly}
-        autoFocus={autoFocus}
-        tabIndex={tabIndex}
-        onBlur={handleOnBlur}
-        required={required}
-        type="color"
-        inputMode="text"
-        ref={composedRef}
-        value={value}
-      />
+      <Part partId={PART_INPUT}>
+        <input
+          {...rest}
+          id={id}
+          className={classnames(className, styles.colorInput, {
+            [styles.error]: validationStatus === "error",
+            [styles.warning]: validationStatus === "warning",
+            [styles.valid]: validationStatus === "valid",
+          })}
+          style={style}
+          disabled={!enabled}
+          onFocus={handleOnFocus}
+          onChange={onInputChange}
+          readOnly={readOnly}
+          autoFocus={autoFocus}
+          tabIndex={tabIndex}
+          onBlur={handleOnBlur}
+          required={required}
+          type="color"
+          inputMode="text"
+          ref={composedRef}
+          value={value}
+        />
+      </Part>
     );
   },
 );

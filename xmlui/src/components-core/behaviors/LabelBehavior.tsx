@@ -1,5 +1,5 @@
 import { ItemWithLabel } from "../../components/FormItem/ItemWithLabel";
-import { Behavior } from "./Behavior";
+import type { Behavior } from "./Behavior";
 
 /**
  * Behavior for applying a label to form components using ItemWithLabel.
@@ -94,7 +94,7 @@ export const labelBehavior: Behavior = {
     return true;
   },
   attach: (context, node, metadata) => {
-    const { extractValue, node: componentNode, className } = context;
+    const { extractValue, node: componentNode } = context;
 
     const label = extractValue.asOptionalString(componentNode.props.label);
     const labelPosition = extractValue(componentNode.props.labelPosition);
@@ -105,6 +105,7 @@ export const labelBehavior: Behavior = {
     const shrinkToLabel = extractValue.asOptionalBoolean(componentNode.props.shrinkToLabel);
     const style = extractValue(componentNode.props.style);
     const readOnly = extractValue.asOptionalBoolean(componentNode.props.readOnly);
+    const direction = extractValue.asOptionalString(componentNode.props.direction) as "rtl" | "ltr" | undefined;
 
     return (
       <ItemWithLabel
@@ -115,10 +116,11 @@ export const labelBehavior: Behavior = {
         required={required}
         enabled={enabled}
         style={style}
-        className={className}
+        cloneStyle={true}
         shrinkToLabel={shrinkToLabel}
         labelStyle={{ pointerEvents: readOnly ? "none" : undefined }}
         isInputTemplateUsed={!!componentNode.props?.inputTemplate}
+        direction={direction}
       >
         {node}
       </ItemWithLabel>
