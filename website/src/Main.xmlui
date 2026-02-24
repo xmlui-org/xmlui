@@ -1,0 +1,87 @@
+<App
+  layout="vertical-full-header"
+  noScrollbarGutters="false"
+>
+  <AppHeader>
+    <property name="logoTemplate">
+      <Link to="/" height="100%">
+        <Logo height="$space-8" />
+      </Link>
+    </property>
+    <HStack desktopOnly gap="0">
+      <NavLink noIndicator label="Docs" to="/docs" />
+      <NavLink noIndicator label="Blog" to="/blog" />
+      <NavLink noIndicator label="Get Started" to="/get-started" />
+    </HStack>
+    <SpaceFiller />
+    <Search
+      collapsible="true"
+      when="{mediaSize.sizeIndex > 1}"
+      data="{appGlobals.plainTextContent}"
+    />
+  </AppHeader>
+
+  <Pages>
+    <Page url="/">
+      <H1>
+        Website homepage
+      </H1>
+    </Page>
+    <Page url="/get-started">
+      <VStack marginHorizontal="$space-8">
+        <Markdown data="/pages/get-started.md" />
+      </VStack>
+    </Page>
+    <Page url="/blog">
+      <H1>
+        Blog
+      </H1>
+    </Page>
+    <Page url="/docs">
+      <H1>
+        Docs
+      </H1>
+    </Page>
+    <Page url="/news">
+      <NewsAndReviews />
+    </Page>
+  </Pages>
+
+  <Footer sticky="false">
+    <Text fontWeight="400">
+      This site is an
+      <Text variant="strong">
+        XMLUI™
+      </Text>
+      app.
+    </Text>
+    <SpaceFiller />
+    <HStack verticalAlignment="center">
+      <Stack desktopOnly>
+        <CHStack>
+          <LinkButton
+            to="https://demo.xmlui.org"
+            label="Gallery"
+            blank="{true}"
+          />
+          <LinkButton to="/news" label="News & Reviews" />
+          <LinkButton
+            to="https://docs.xmlui.org/change-log"
+            label="Changelog"
+            blank="{true}"
+          />
+          <Separator />
+          <LinkButton
+            to="https://github.com/xmlui-org/xmlui"
+            icon="github"
+            label="GitHub"
+            blank="{true}"
+          />
+          <Separator />
+        </CHStack>
+      </Stack>
+      <ToneSwitch />
+    </HStack>
+  </Footer>
+
+</App>

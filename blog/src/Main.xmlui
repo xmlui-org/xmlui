@@ -54,7 +54,11 @@
                         to="https://blog.xmlui.org"
                         active
                     />
-                    <NavLink to="https://xmlui.org/get-started" noIndicator label="Get started"/>
+                    <NavLink
+                        to="https://xmlui.org/get-started"
+                        noIndicator
+                        label="Get started"
+                    />
                 </HStack>
             </Stack>
             <property name="profileMenuTemplate">
@@ -114,7 +118,8 @@
             staticPaths="{
             posts.map((p) => {
               return { params: { slug: p.slug } };
-            })}">
+            })}"
+        >
             <script>
                 var post = posts.find(p => p.slug === $routeParams.slug)
             </script>
@@ -147,11 +152,11 @@
                 <Text variant="strong">
                     XMLUI™
                 </Text>
-                app. 
+                app.
             </Text>
             <SpaceFiller />
             <HStack verticalAlignment="center">
-               <Stack desktopOnly>
+                <Stack desktopOnly>
                     <CHStack>
                         <LinkButton
                             to="https://demo.xmlui.org"
