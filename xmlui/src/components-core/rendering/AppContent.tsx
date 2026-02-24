@@ -95,10 +95,83 @@ export function AppContent({
   // Note: Startup trace initialization happens during render (near xsVerbose definition)
   // to ensure it's set before children mount and trigger useQuery fetches
   const [loggedInUser, setLoggedInUser] = useState(null);
+  
+  // --- Navigation event handlers state
+  const [navigationHandlers, setNavigationHandlersState] = useState<{
+    onWillNavigate?: (to: string | number, queryParams?: Record<string, any>) => false | void | null | undefined;
+    onDidNavigate?: (to: string | number, queryParams?: Record<string, any>) => void;
+  }>({});
+  
+  const setNavigationHandlers = useCallback(
+    (
+      onWillNavigate?: (to: string | number, queryParams?: Record<string, any>) => false | void | null | undefined,
+      onDidNavigate?: (to: string | number, queryParams?: Record<string, any>) => void,
+    ) => {
+      setNavigationHandlersState({ onWillNavigate, onDidNavigate });
+    },
+    [],
+  );
+  
   const debugView = useDebugView();
   const componentRegistry = useComponentRegistry();
-  const navigate = useNavigate();
+  const navigateRouter = useNavigate();
   const { confirm } = useConfirm();
+  
+  const location = useLocation();
+  const previousLocationRef = useRef(location.pathname + location.search + location.hash);
+  const isInitialRenderRef = useRef(true);
+
+  // --- Wrapped navigate function that respects willNavigate/didNavigate events
+  // Note: willNavigate only works for programmatic navigation (navigate(), Actions.navigate())
+  // because we can await the async handler. Cannot work with Link clicks due to React Router limitations.
+  // didNavigate fires for all navigation types (see useEffect below)
+  const navigate = useCallback(
+    async (to: any, options?: any) => {
+      const { onWillNavigate } = navigationHandlers;
+      
+      // Extract queryParams if exists in options (for NavigateAction compatibility)
+      const queryParams = options?.queryParams;
+      
+      // Remove queryParams from options before passing to navigateRouter
+      const { queryParams: _, ...navigateOptions } = options || {};
+      
+      // Call willNavigate handler if defined (only for programmatic navigation)
+      if (onWillNavigate) {
+        const result = await onWillNavigate(to, queryParams);
+        // Cancel navigation if willNavigate returns false
+        if (result === false) {
+          return;
+        }
+      }
+      
+      // Perform the actual navigation
+      navigateRouter(to, navigateOptions);
+      
+      // didNavigate will be fired by the useEffect that watches location changes
+    },
+    [navigateRouter, navigationHandlers],
+  );
+  
+  // Fire didNavigate after any location change (works for all navigation types)
+  useEffect(() => {
+    // Skip firing didNavigate on initial render
+    if (isInitialRenderRef.current) {
+      isInitialRenderRef.current = false;
+      return;
+    }
+    
+    const currentPath = location.pathname + location.search + location.hash;
+    const previousPath = previousLocationRef.current;
+    
+    if (currentPath !== previousPath) {
+      previousLocationRef.current = currentPath;
+      
+      const { onDidNavigate } = navigationHandlers;
+      if (onDidNavigate) {
+        void onDidNavigate(currentPath, undefined);
+      }
+    }
+  }, [location, navigationHandlers]);
 
   // --- Create PubSubService with stable reference across renders
   const pubSubServiceRef = useRef(createPubSubService());
@@ -255,7 +328,6 @@ export function AppContent({
   const isWindowFocused = useIsWindowFocused();
   const apiInterceptorContext = useApiInterceptorContext();
 
-  const location = useLocation();
   const lastHash = useRef("");
   const [scrollForceRefresh, setScrollForceRefresh] = useState(0);
   const tableOfContentsContext = useContext(TableOfContentsContext);
@@ -862,6 +934,7 @@ export function AppContent({
       // --- Navigation-related
       navigate,
       routerBaseName,
+      setNavigationHandlers,
 
       // --- Notifications and dialogs
       confirm,
@@ -910,6 +983,7 @@ export function AppContent({
     standalone,
     navigate,
     routerBaseName,
+    setNavigationHandlers,
     confirm,
     activeThemeId,
     activeThemeTone,

@@ -1,0 +1,42 @@
+{
+  "name": "xmlui-website",
+  "private": true,
+  "version": "0.0.13",
+  "scripts": {
+    "start": "echo '====================================================================\nExecuting \"npm run watch-docs-content\" in the project root,\nyou get automatic content generation based on xmlui metadata!\n====================================================================\n' && xmlui start",
+    "preview": "xmlui preview",
+    "gen:releases": "node scripts/get-releases.js --output 'public/resources/files/releases.json'",
+    "gen:download-latest-xmlui-release": "node scripts/download-latest-xmlui.js",
+    "gen:rss": "node scripts/generate-rss.js",
+    "gen:sitemap": "tsx scripts/generate-sitemap.mjs",
+    "build:docs": "npm run gen:releases && npm run gen:download-latest-xmlui-release && npm run gen:rss && npm run gen:sitemap && xmlui build --buildMode=INLINE_ALL --withMock ",
+    "build-optimized": "npm run gen:releases && npm run gen:download-latest-xmlui-release && npm run gen:rss && npm run gen:sitemap && npx xmlui-optimizer",
+    "release:docs": "xmlui zip-dist --source=dist --target=dist/ui.zip",
+    "release-ci-optimized": "npm run build-optimized && mv xmlui-optimized-output/optimized-staticwebapp.config.json xmlui-optimized-output/staticwebapp.config.json",
+    "preview-optimized": "npx serve-optimized ./xmlui-optimized-output"
+  },
+  "dependencies": {
+    "@shikijs/langs": "3.4.2",
+    "shiki": "^3.3.0",
+    "xmlui": "*",
+    "xmlui-playground": "*",
+    "xmlui-search": "*",
+    "xmlui-hello-world": "*",
+    "xmlui-website-blocks": "*"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  },
+  "devDependencies": {
+    "xmlui-website-blocks": "*",
+    "xmlui-animations": "*",
+    "@emotion/is-prop-valid": "^1.3.1",
+    "@octokit/rest": "^22.0.0",
+    "remark-parse": "11.0.0",
+    "remark-stringify": "11.0.0",
+    "strip-markdown": "6.0.0",
+    "unified": "11.0.5"
+  }
+}
