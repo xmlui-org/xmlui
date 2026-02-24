@@ -45,7 +45,7 @@
     />
   </AppHeader>
   <NavPanel
-    when="{!currentSegment.startsWith('/blog') && currentSegment !== '/get-started' && !globalThis.location.pathname.startsWith('/blog') && globalThis.location.pathname !== '/get-started' && ((!globalThis.location.hash.includes('/404') && !globalThis.location.pathname.includes('/404')) || mediaSize.sizeIndex <= 2)}"
+    when="{currentSegment !== '/' && globalThis.location.pathname !== '/' && !currentSegment.startsWith('/blog') && currentSegment !== '/get-started' && !globalThis.location.pathname.startsWith('/blog') && globalThis.location.pathname !== '/get-started' && ((!globalThis.location.hash.includes('/404') && !globalThis.location.pathname.includes('/404')) || mediaSize.sizeIndex <= 2)}"
     scrollStyle="whenScrolling"
     showScrollerFade="true"
   >
@@ -107,11 +107,6 @@
           icon="arrow-shuffle"
           label="Reactive Data"
           to="/docs/reactive-intro"
-        />
-        <NavLink
-          icon="component"
-          label="Components"
-          to="/docs/components-intro"
         />
         <NavLink icon="theme" label="Themes" to="/docs/themes-intro" />
       </NavGroup>
@@ -397,6 +392,11 @@
       <IncludeNavSection sectionId="extensions" />
       <NavGroup icon="theme" label="Themes" to="/docs/reference/themes">
         <NavLink
+          icon="component"
+          label="Components"
+          to="/docs/components-intro"
+        />
+        <NavLink
           label="Layout Properties"
           to="/docs/styles-and-themes/layout-props"
         />
@@ -461,19 +461,17 @@
 
   <Pages fallbackPath="/404" defaultScrollRestoration="true">
     <Page url="/">
-      <H1>
-        Website homepage
-      </H1>
-      <H2>Current segment: {currentSegment}</H2>
+      <Theme themeId="xmlui-website-theme">
+        <Headlines />
+        <HeroApp />
+        <Benefits />
+        <WhyXMLUI />
+      </Theme>
     </Page>
     <Page url="/get-started">
-      <VStack marginHorizontal="$space-8">
-        <H2>Current segment: {currentSegment}</H2>
-        <Markdown data="/pages/get-started.md" />
-      </VStack>
+      <GetStarted />
     </Page>
     <Page url="/news">
-      <H2>Current segment: {currentSegment}</H2>
       <NewsAndReviews />
     </Page>
 
@@ -967,23 +965,6 @@
   </Pages>
 
   <ScrollToTop marginBottom="$space-4" />
-  <Theme
-    padding-Footer="$space-2 $space-4"
-    borderTop-Footer="1px solid $borderColor"
-    backgroundColor-Footer="$backgroundColor-AppHeader"
-    textColor-Footer="$textColor-secondary"
-    fontSize-Footer="15px"
-    verticalAlignment-Footer="center"
-    maxWidth-content-Footer="$maxWidth-content"
-    gap-Footer="$space-normal"
-    margin-Footer="0 auto"
-    color-surface="rgb(111, 110, 119)"
-    backgroundColor="$color-surface-0"
-    fontSize="15px"
-    textColor-Text="$color-surface-600"
-    textColor-Link="$color-surface-600"
-    textColor-Link--hover="$color-surface-900"
-  >
     <Footer>
       <Text fontWeight="400">
         This site is an
@@ -1024,5 +1005,4 @@
         <ToneSwitch />
       </HStack>
     </Footer>
-  </Theme>
   </App>
