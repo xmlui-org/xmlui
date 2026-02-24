@@ -12,6 +12,7 @@
     "./tools/create-app",
     "./tools/vscode",
     "./tools/serve-optimized",
+    "./tools/ssg",
     "./packages/*"
   ],
   "devDependencies": {

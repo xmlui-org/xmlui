@@ -10,7 +10,7 @@
     "gen:rss": "node scripts/generate-rss.js",
     "gen:sitemap": "tsx scripts/generate-sitemap.mjs",
     "build:docs": "npm run gen:releases && npm run gen:download-latest-xmlui-release && npm run gen:rss && npm run gen:sitemap && xmlui build --buildMode=INLINE_ALL --withMock ",
-    "build-optimized": "npm run gen:releases && npm run gen:download-latest-xmlui-release && npm run gen:rss && npm run gen:sitemap && npx xmlui-optimizer",
+    "build-optimized": "npm run gen:releases && npm run gen:download-latest-xmlui-release && npm run gen:rss && npm run gen:sitemap && npx xmlui-ssg",
     "release:docs": "xmlui zip-dist --source=dist --target=dist/ui.zip",
     "release-ci-optimized": "npm run build-optimized && mv xmlui-optimized-output/optimized-staticwebapp.config.json xmlui-optimized-output/staticwebapp.config.json",
     "preview-optimized": "npx serve-optimized ./xmlui-optimized-output"
