@@ -235,11 +235,11 @@ export class PathResolver {
   getOutputPaths() {
     return {
       themes: this.resolvePath("dist/themes", "project"),
-      components: this.resolvePath("docs/content/components", "workspace"),
-      extensions: this.resolvePath("docs/content/extensions", "workspace"),
-      pages: this.resolvePath("docs/pages", "workspace"),
+      components: this.resolvePath("website/content/docs/components", "workspace"),
+      extensions: this.resolvePath("website/content/docs/extensions", "workspace"),
+      pages: this.resolvePath("website/content/docs/pages", "workspace"),
       metadata: this.resolvePath("dist/metadata", "project"),
-      downloads: this.resolvePath("docs/public/downloads", "workspace")
+      downloads: this.resolvePath("website/public/downloads", "workspace")
     };
   }
 }

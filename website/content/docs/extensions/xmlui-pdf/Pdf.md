@@ -56,6 +56,8 @@ Zoom level for the PDF pages. Default: 1.
 
 This property controls the scrollbar display style of the PDF viewport. `normal` (default) shows scrollbars whenever content overflows. `overlay` always shows both scrollbars. `whenMouseOver` hides scrollbars until the pointer enters the viewer. `whenScrolling` hides scrollbars and reveals them briefly while the user is actively scrolling.
 
+Available values: `normal` **(default)**, `overlay`, `whenMouseOver`, `whenScrolling`
+
 ### `signatureData`
 
 Pre-loaded signature data to apply to signature fields.
@@ -192,11 +194,17 @@ Deselect the currently selected annotation.
 
 **Signature**: `deselectAnnotation(): void`
 
-### `exportToBackend`
+### `exportAnnotations`
 
 Collect all annotations and signatures and trigger the onExportRequest event. Use this to prepare data for backend processing to flatten annotations and save the PDF.
 
-**Signature**: `exportToBackend(): void`
+**Signature**: `exportAnnotations(): void`
+
+### `exportToPdf`
+
+Export the PDF with all XMLUI annotations (signatures, text fields, checkboxes) embedded as real PDF content using pdf-lib. The returned `Uint8Array` can be downloaded or sent to a backend. Unlike `saveDocument()`, this output is fully readable in Acrobat Reader and any standard PDF viewer.
+
+**Signature**: `exportToPdf(): Promise<Uint8Array | null>`
 
 ### `fitPage`
 

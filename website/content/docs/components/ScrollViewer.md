@@ -142,6 +142,8 @@ This component supports the following behaviors:
 
 This property determines the scrollbar style and behavior. `normal` uses the standard browser scrollbar. `overlay` uses themed scrollbars that are always visible and can be customized via theme variables. `whenMouseOver` shows overlay scrollbars that appear when the mouse hovers over the scroll area and hide after 200ms when the mouse leaves. `whenScrolling` shows overlay scrollbars only during active scrolling and hides them after 400ms of inactivity.
 
+Available values: `normal` **(default)**, `overlay`, `whenMouseOver`, `whenScrolling`
+
 ### `showScrollerFade` [#showscrollerfade]
 
 > [!DEF]  default: **true**
