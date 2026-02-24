@@ -1,0 +1,43 @@
+{
+  "name": "xmlui-docs-blocks",
+  "version": "0.0.1",
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "start": "xmlui start",
+    "preview": "xmlui preview",
+    "build:extension": "xmlui build-lib",
+    "build-watch": "xmlui build-lib --watch",
+    "build:demo": "xmlui build",
+    "build:meta": "xmlui build-lib --mode=metadata"
+  },
+  "dependencies": {
+    "@shikijs/langs": "3.4.2",
+    "shiki": "^3.3.0",
+    "unified": "11.0.5",
+    "remark-parse": "11.0.0",
+    "remark-stringify": "11.0.0",
+    "strip-markdown": "6.0.0"
+  },
+  "devDependencies": {
+    "xmlui": "*"
+  },
+  "main": "./dist/xmlui-docs-blocks.js",
+  "module": "./dist/xmlui-docs-blocks.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/xmlui-docs-blocks.mjs",
+      "require": "./dist/xmlui-docs-blocks.js"
+    },
+    "./*.css": {
+      "import": "./dist/*.css",
+      "require": "./dist/*.css"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

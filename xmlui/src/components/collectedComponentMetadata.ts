@@ -189,7 +189,6 @@ import { RootThemeDefinition } from "../components-core/theming/themes/root";
 import {
   XmlUiBlogThemeDefinition,
   XmlUiCyanThemeDefinition,
-  XmlUiDocsThemeDefinition,
   XmlUiGrayThemeDefinition,
   XmlUiGreenThemeDefinition,
   XmlUiOrangeThemeDefinition,
@@ -446,7 +445,6 @@ export const collectedThemes: Record<string, ThemeDefinition> = {
   xmluiPurple: XmlUiPurpleThemeDefinition,
   xmluiCyan: XmlUiCyanThemeDefinition,
   xmluiRed: XmlUiRedThemeDefinition,
-  xmluiDocs: XmlUiDocsThemeDefinition,
   xmluiBlog: XmlUiBlogThemeDefinition,
   xmluiWeb: XmlUiWebThemeDefinition,
 };

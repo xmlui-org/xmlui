@@ -1,0 +1,27 @@
+<Component name="Overview">
+    <Stack width="100%" maxWidth="$maxWidth-content-NoToc" gap="$space-6">
+        <Breadcrumbs />
+        <VStack gap="$space-2">
+            <H1 showAnchor="{false}">{$linkInfo.label}</H1>
+            <Text when="{getPageDescription($linkInfo, appGlobals.navSections)}" variant="subtitle">
+                {getPageDescription($linkInfo, appGlobals.navSections)}
+            </Text>
+        </VStack>
+
+        <FlowLayout
+            when="{getRootLinks($linkInfo, appGlobals.navSections).length > 0}"
+            gap="$space-4"
+            columnGap="$space-4"
+            rowGap="$space-4"
+        >
+            <Items data="{getRootLinks($linkInfo, appGlobals.navSections)}">
+                <OverviewCard
+                    to="{$item.to}"
+                    label="{$item.label}"
+                    icon="{getCardIcon($item, appGlobals.navSections)}"
+                    width="{getCardWidth(mediaSize)}"
+                />
+            </Items>
+        </FlowLayout>
+    </Stack>
+</Component>
