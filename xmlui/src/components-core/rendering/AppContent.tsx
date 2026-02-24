@@ -123,17 +123,21 @@ export function AppContent({
 
   // --- Wrapped navigate function that respects willNavigate/didNavigate events
   // Note: willNavigate only works for programmatic navigation (navigate(), Actions.navigate())
+  // because we can await the async handler. Cannot work with Link clicks due to React Router limitations.
   // didNavigate fires for all navigation types (see useEffect below)
   const navigate = useCallback(
-    (to: any, options?: any) => {
+    async (to: any, options?: any) => {
       const { onWillNavigate } = navigationHandlers;
       
       // Extract queryParams if exists in options (for NavigateAction compatibility)
       const queryParams = options?.queryParams;
       
+      // Remove queryParams from options before passing to navigateRouter
+      const { queryParams: _, ...navigateOptions } = options || {};
+      
       // Call willNavigate handler if defined (only for programmatic navigation)
       if (onWillNavigate) {
-        const result = onWillNavigate(to, queryParams);
+        const result = await onWillNavigate(to, queryParams);
         // Cancel navigation if willNavigate returns false
         if (result === false) {
           return;
@@ -141,7 +145,7 @@ export function AppContent({
       }
       
       // Perform the actual navigation
-      navigateRouter(to, options);
+      navigateRouter(to, navigateOptions);
       
       // didNavigate will be fired by the useEffect that watches location changes
     },
@@ -164,7 +168,7 @@ export function AppContent({
       
       const { onDidNavigate } = navigationHandlers;
       if (onDidNavigate) {
-        onDidNavigate(currentPath, undefined);
+        void onDidNavigate(currentPath, undefined);
       }
     }
   }, [location, navigationHandlers]);
