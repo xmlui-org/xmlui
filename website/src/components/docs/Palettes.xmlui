@@ -1,0 +1,63 @@
+<Component name="Palettes">
+  <DocumentPage>
+    <H1>
+      Color Palettes
+    </H1>
+    Select a theme from the dropdown to see the colors associated with that theme. Use the tone changer button to the right of the dropdown to switch between light and dark tones.
+    <HStack verticalAlignment="center">
+      <Select
+        id="pickTheme"
+        width="30%"
+        initialValue="xmlui"
+        onDidChange="(newTheme) => setTheme(newTheme)">
+        <Option value="xmlui" label="xmlui"/>
+        <Option value="earthtone" label="earthtone"/>
+        <Option value="xmlui-green-on-default" label="xmlui-green"/>
+        <Option value="xmlui-orange-on-default" label="xmlui-orange"/>
+        <Option value="xmlui-gray-on-default" label="xmlui-gray"/>
+      </Select>
+      <ToneSwitch/>
+    </HStack>
+    <ColorPalette title="Surface" palette="surface"/>
+    <ColorPalette title="Primary" palette="primary"/>
+    <ColorPalette title="Secondary" palette="secondary"/>
+    <ColorPalette title="Warning" palette="warn"/>
+    <ColorPalette title="Danger" palette="danger"/>
+    <ColorPalette title="Success" palette="success"/>
+    <ColorPalette title="Info" palette="info"/>
+    <H2>
+      Attention
+    </H2>
+    <FlowLayout>
+      <PaletteItem width="25%" color="color-attention"/>
+    </FlowLayout>
+    <H2>
+      Utility
+    </H2>
+    <FlowLayout>
+      <PaletteItem width="25%" color="color-valid"/>
+      <PaletteItem width="25%" color="color-warning"/>
+      <PaletteItem width="25%" color="color-error"/>
+    </FlowLayout>
+    <H2>
+      Text
+    </H2>
+    <FlowLayout>
+      <PaletteItem width="25%" color="textColor-primary"/>
+      <PaletteItem width="25%" color="textColor-secondary"/>
+      <PaletteItem width="25%" color="textColor-attention"/>
+      <PaletteItem width="25%" color="textColor-subtitle"/>
+      <PaletteItem width="25%" color="textColor--disabled"/>
+    </FlowLayout>
+    <H2>
+      Background
+    </H2>
+    <FlowLayout>
+      <PaletteItem width="33.3%" color="backgroundColor-primary"/>
+      <PaletteItem width="33.3%" color="backgroundColor-secondary"/>
+      <PaletteItem width="33.3%" color="backgroundColor-attention"/>
+      <PaletteItem width="33.3%" color="backgroundColor--disabled"/>
+      <PaletteItem width="33.3%" color="backgroundColor--selected"/>
+    </FlowLayout>
+  </DocumentPage>
+</Component>

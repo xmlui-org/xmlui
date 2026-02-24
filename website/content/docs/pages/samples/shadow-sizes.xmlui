@@ -1,0 +1,28 @@
+<App>
+  <HStack padding="1.5rem" gap="1.5rem">
+      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" boxShadow="$boxShadow" >
+        boxShadow
+      </Stack>
+
+      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" boxShadow="$boxShadow-md">
+        boxShadow-md
+      </Stack>
+
+      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" boxShadow="$boxShadow-xxl">
+        boxShadow-xxl
+      </Stack>
+  </HStack>
+  <HStack padding="1.5rem" gap="1.5rem">
+      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" boxShadow="$boxShadow-spread">
+        boxShadow-spread
+      </Stack>
+
+      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" boxShadow="$boxShadow-spread-2">
+        boxShadow-spread-2
+      </Stack>
+
+      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" boxShadow="$boxShadow-spread-2-xl">
+        boxShadow-spread-2-xl
+      </Stack>
+  </HStack>
+</App>

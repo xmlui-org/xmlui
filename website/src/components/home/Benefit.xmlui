@@ -1,0 +1,13 @@
+<Component name="Benefit">
+  <HStack gap="$space-1">
+    <Icon name="check-circle" height="42px" width="42px" marginTop="-3.5px"/>
+    <VStack width="*">
+      <Text fontSize="$fontSize-lg">
+        {$props.children}
+        <Text variant="strong" fontSize="$fontSize-lg">{$props.title}</Text>
+        <Slot>{$props.benefit}</Slot>
+        </Text>
+    </VStack>
+  </HStack>
+</Component>
+

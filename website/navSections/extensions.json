@@ -3,50 +3,53 @@
     {
       "label": "Extensions",
       "icon": "puzzle",
+      "to": "/docs/reference/extensions",
       "children": [
         {
           "label": "Xmlui Animations",
+          "to": "/docs/reference/extensions/xmlui-animations/_overview",
           "children": [
             {
               "label": "Extension Overview",
-              "to": "/extensions/xmlui-animations/_overview"
+              "to": "/docs/reference/extensions/xmlui-animations/_overview"
             },
             {
               "label": "Animation",
-              "to": "/extensions/xmlui-animations/Animation"
+              "to": "/docs/reference/extensions/xmlui-animations/Animation"
             },
             {
               "label": "FadeAnimation",
-              "to": "/extensions/xmlui-animations/FadeAnimation"
+              "to": "/docs/reference/extensions/xmlui-animations/FadeAnimation"
             },
             {
               "label": "FadeInAnimation",
-              "to": "/extensions/xmlui-animations/FadeInAnimation"
+              "to": "/docs/reference/extensions/xmlui-animations/FadeInAnimation"
             },
             {
               "label": "FadeOutAnimation",
-              "to": "/extensions/xmlui-animations/FadeOutAnimation"
+              "to": "/docs/reference/extensions/xmlui-animations/FadeOutAnimation"
             },
             {
               "label": "ScaleAnimation",
-              "to": "/extensions/xmlui-animations/ScaleAnimation"
+              "to": "/docs/reference/extensions/xmlui-animations/ScaleAnimation"
             },
             {
               "label": "SlideInAnimation",
-              "to": "/extensions/xmlui-animations/SlideInAnimation"
+              "to": "/docs/reference/extensions/xmlui-animations/SlideInAnimation"
             }
           ]
         },
         {
           "label": "Xmlui Pdf",
+          "to": "/docs/reference/extensions/xmlui-pdf/_overview",
           "children": [
             {
               "label": "Extension Overview",
-              "to": "/extensions/xmlui-pdf/_overview"
-            },
+              "to": "/docs/reference/extensions/xmlui-pdf/_overview"
+            },  
             {
               "label": "Pdf",
-              "to": "/extensions/xmlui-pdf/Pdf"
+              "to": "/docs/reference/extensions/xmlui-pdf/Pdf"
             }
           ]
         }

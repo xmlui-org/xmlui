@@ -1,0 +1,8 @@
+<Component name="IncButton2">
+  <variable name="count" value="{0}" />
+  <Button
+    label="Click to increment: {count}"
+    method.setValue="console.log('setValue')"
+    onClick="count++;"
+  />
+</Component>

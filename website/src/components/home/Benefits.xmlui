@@ -1,0 +1,32 @@
+<Component name="Benefits">
+    <FlowLayout
+        gap="$gap-loose"
+        paddingHorizontal="$space-8"
+        paddingTop="$space-12"
+        paddingBottom="$space-4">
+        <Benefit
+            width="50%"
+            title="Easy to create. "
+            benefit="No CSS or React expertise required."
+        />
+        <Benefit
+            width="50%"
+            title="Connected. "
+            benefit="Read and write APIs with little or no scripting."
+        />
+        <Benefit
+            width="50%" title="Modular.">
+            Tap into a deep catalog of
+            <Link
+                to="https://docs.xmlui.org/components/_overview"
+                target="_blank" label="components" />
+            and easily make your own.
+        </Benefit>
+        <Benefit
+            width="50%"
+            title="Easy to deploy. "
+            benefit="Just drop a handful of files onto a static webserver."
+        />
+    </FlowLayout>
+</Component>
+

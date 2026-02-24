@@ -1,0 +1,970 @@
+# Build a Hello World component
+
+In this tutorial we'll build a HelloWorld component that demonstrates the core patterns for XMLUI component development.
+
+The XMLUI framework supports two types of components:
+
+**Core components** are built into the main XMLUI library and available by default. Components like Button, Text, Card, and Stack are always available in any XMLUI app.
+
+**Extension packages** are standalone components that can be optionally included. They are built, distributed, and imported separately, making them perfect for custom components that aren't needed by every XMLUI application.
+
+We'll build an extension package so the HelloWorld component can:
+
+- Live separately from the core XMLUI library
+- Be optionally included in standalone apps
+- Be distributed and reused across different projects
+
+Extensions are the recommended approach for custom components. By the end of this guide, you'll have created a HelloWorld component that:
+
+- Displays a customizable greeting message
+- Features an interactive click counter
+- Uses XMLUI's standard theming system
+- Defines event handlers
+- Provides callable methods
+
+## XMLUI component architecture
+
+XMLUI components are made of three main parts:
+
+1. Native React component (`HelloWorldNative.tsx`) - The actual React implementation
+2. Component metadata (`HelloWorld.tsx`) - Describes props and integrates with XMLUI
+3. For visual components, a .scss file (`HelloWorld.module.scss`)
+
+This separation allows XMLUI to understand your component's interface while maintaining clean React code.
+
+## Prerequisites
+
+- Familiarity with React and TypeScript
+- Basic understanding of XMLUI markup
+- Node.js 18.0.0 or higher
+- npm (comes with Node.js)
+
+## Step 1: Create your project directory
+
+Let's start by creating a new directory for your HelloWorld component project.
+
+**Windows**
+
+```xmlui copy
+mkdir xmlui-hello-world
+cd xmlui-hello-world
+```
+
+**Mac / WSL / Linux**
+
+```xmlui copy
+mkdir xmlui-hello-world
+cd xmlui-hello-world
+```
+
+This creates a fresh project directory where you'll build your component from scratch.
+
+> [!INFO]
+> This page includes playground examples that use the HelloWorld component. They are available here because this site loads the final extension package that you will build. That means the live playground examples here reflect the final state, not the interim states described as we go along. But in the standalone app that you'll create you will see the progression exactly as described here.
+
+## Step 2: Create the package configuration
+
+First, let's initialize a new npm project and install the xmlui package:
+
+```xmlui copy
+npm init -y
+npm install --save-dev xmlui
+```
+
+This creates a basic `package.json` and installs the xmlui package as a development dependency.
+
+Now let's update the `package.json` with the proper configuration for our extension:
+
+```xmlui copy
+{
+  "name": "xmlui-hello-world",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build:extension": "xmlui build-lib"
+  },
+  "devDependencies": {
+    "xmlui": "*"
+  },
+  "main": "./dist/xmlui-hello-world.js",
+  "module": "./dist/xmlui-hello-world.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/xmlui-hello-world.mjs",
+      "require": "./dist/xmlui-hello-world.js"
+    }
+  },
+  "files": [
+    "dist"
+  ]
+}
+```
+
+The build system will generate both:
+
+- xmlui-hello-world.js (CommonJS/UMD for browser script tags)
+- xmlui-hello-world.mjs (ES modules for import statements)
+
+`xmlui-hello-world.js` is the file you'll pull into a standalone XMLUI app using a `<script>` tag.
+
+## Step 3: Create the React component
+
+First, let's create the `src` directory for our component files:
+
+```xmlui copy
+mkdir src
+```
+
+Create `src/HelloWorldNative.tsx` with the core React implementation.
+
+```xmlui copy
+import React, { useState } from "react";
+import styles from "./HelloWorld.module.scss";
+
+type Props = {
+  id?: string;
+  message?: string;
+};
+
+export const defaultProps = {
+  message: "Hello, World!",
+};
+
+export function HelloWorld({
+  id,
+  message = defaultProps.message,
+}: Props) {
+  const [clickCount, setClickCount] = useState(0);
+
+  const handleClick = () => {
+    setClickCount(clickCount + 1);
+  };
+
+  return (
+    <div className={styles.container} id={id}>
+      <h2 className={styles.message}>{message}</h2>
+      <button className={styles.button} onClick={handleClick}>
+        Click me!
+      </button>
+      <div className={styles.counter}>Clicks: {clickCount}</div>
+    </div>
+  );
+}
+```
+
+This creates the core React component with:
+
+- Essential props (id, message)
+- Internal click counter
+
+## Step 4: Create basic styles
+
+Create `src/HelloWorld.module.scss` with the basic styles.
+
+```xmlui copy
+.container {
+  background-color: #f5f5f5;
+  color: #333;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  display: inline-block;
+  min-width: 200px;
+}
+
+.message {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+}
+
+.button {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.counter {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+```
+
+This SCSS module defines the basic visual styling for our HelloWorld component:
+
+- `.container` - Main wrapper with background, padding, and layout
+- `.message` - Styling for the greeting text
+- `.button` - Interactive button with hover effects
+- `.counter` - Display for the click count
+
+At this stage, we use hardcoded colors. In Step 9, we'll replace these theme variables.
+
+## Step 5: Create component metadata and renderer
+
+Create `HelloWorld.tsx`.
+
+```xmlui copy
+import styles from "./HelloWorld.module.scss";
+import { createComponentRenderer, createMetadata } from "xmlui";
+import { HelloWorld, defaultProps } from "./HelloWorldNative";
+
+const HelloWorldMd = createMetadata({
+  description: "`HelloWorld` is a demonstration component.",
+  status: "experimental",
+  props: {
+    message: {
+      description: "The message to display.",
+      isRequired: false,
+      type: "string",
+      defaultValue: defaultProps.message,
+    },
+  },
+});
+
+export const helloWorldComponentRenderer = createComponentRenderer(
+  "HelloWorld",
+  HelloWorldMd,
+  ({ node, extractValue }) => {
+    return (
+      <HelloWorld
+        id={extractValue.asOptionalString(node.props?.id)}
+        message={extractValue.asOptionalString(node.props?.message)}
+      />
+    );
+  }
+);
+```
+
+**What we're creating**
+
+This file bridges the gap between XMLUI markup and React components.
+
+- Metadata (`HelloWorldMd`) - Documents the component's props, behavior, and usage
+- Renderer (`helloWorldComponentRenderer`) - Converts XMLUI markup to React component calls
+
+**The renderer pattern**
+
+The renderer function receives XMLUI context (node, extractValue, etc.) and returns a React component.
+
+It:
+
+- Extracts prop values from XMLUI markup using `extractValue.asOptionalString()`
+- Passes them to the native React component
+- Handles optional props gracefully (undefined becomes default values)
+
+This pattern enables XMLUI to:
+
+- Validate markup against metadata
+- Provide IntelliSense and documentation
+- Handle prop type conversion automatically
+- Support XMLUI-specific features like theming (step 9) and event handling (Step 10)
+
+## Step 6: Create the extension index
+
+Create `src/index.tsx` which exports your component as an extension.
+
+```xmlui copy
+import { helloWorldComponentRenderer } from "./HelloWorld";
+
+export default {
+  namespace: "XMLUIExtensions",
+  components: [helloWorldComponentRenderer],
+};
+```
+
+This creates the main entry point that exports your HelloWorld component under the XMLUIExtensions namespace.
+
+## Step 7: Build the extension
+
+```xmlui copy
+npm run build:extension
+```
+
+This creates `xmlui-hello-world.js` in the `dist` folder.
+
+```xmlui-pg noHeader
+---app
+<TreeDisplay content="
+packages/xmlui-hello-world
+ package.json
+ src
+  index.tsx
+  HelloWorld.tsx
+  HelloWorldNative.tsx
+  HelloWorld.module.scss
+ dist
+  xmlui-hello-world.js
+  xmlui-hello-world.mjs
+ " />
+```
+
+## Step 8: Test the extension
+
+Since we've integrated it into the docs site, you can see it live right here.
+
+```xmlui-pg
+---app display
+<App>
+  <VStack gap="2rem" padding="2rem">
+    <H1>HelloWorld Component Live Demo</H1>
+
+    <Card>
+      <HelloWorld message="Hello from the docs site!" />
+    </Card>
+
+  </VStack>
+</App>
+```
+
+But you will want to see it in a standalone app. Let's create a simple test app to verify our component works.
+
+First, create a test directory and an `xmlui` subdirectory within it:
+
+```xmlui copy
+mkdir test-app
+cd test-app
+mkdir xmlui
+```
+
+Now, copy your built component into the `xmlui` subdirectory:
+
+```xmlui copy
+cp ../dist/xmlui-hello-world.js xmlui/xmlui-hello-world.js
+```
+
+Create the `test-app/Main.xmlui` file with your component's markup:
+
+```xmlui copy
+<App>
+  <VStack gap="2rem" padding="2rem">
+    <Heading>HelloWorld Component Test</Heading>
+    <HelloWorld message="Hello from standalone app!" />
+  </VStack>
+</App>
+```
+
+Finally, create a simple `test-app/index.html` file to load the XMLUI engine from CDN and your component:
+
+```xmlui copy
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HelloWorld Extension Test</title>
+  <script src="https://unpkg.com/xmlui@latest/dist/standalone/xmlui-standalone.umd.js"></script>
+  <script src="xmlui/xmlui-hello-world.js"></script>
+</head>
+<body>
+</body>
+</html>
+```
+
+This creates a simple test app that loads your component.
+
+To run the app with Python:
+
+```xmlui copy
+python -m http.server # visit 8000
+```
+
+With Node.js:
+
+```xmlui copy
+npx -y http-server -p 3000 -c-1 -o
+```
+
+## Step 9: Add theming support
+
+So far, our HelloWorld component uses hardcoded colors. Let's integrate it with XMLUI's theming system to make it more flexible and consistent with the rest of the UI.
+
+**Understanding XMLUI's theme system**
+
+XMLUI provides a sophisticated theming system that:
+
+- Uses semantic design tokens (like `$color-surface-50`, `$color-content-primary`)
+- Automatically supports light and dark modes
+- Maintains consistency across all components
+- Allows runtime customization via the `<Theme>` component
+
+**Adding theme variables**
+
+Let's update our SCSS (`src/HelloWorld.module.scss`) to use XMLUI's theme system:
+
+```xmlui copy
+@use "xmlui/themes.scss" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$component: "HelloWorld";
+
+// Define theme variables for our component
+$backgroundColor: createThemeVar("backgroundColor-#{$component}");
+$textColor: createThemeVar("textColor-#{$component}");
+
+.container {
+  background-color: $backgroundColor;
+  color: $textColor;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  display: inline-block;
+  min-width: 200px;
+}
+
+.message {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+}
+
+.button {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.counter {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
+}
+```
+
+**What changed**
+
+Instead of hardcoded colors like `#f5f5f5` and `#333`, we now use:
+
+- `$backgroundColor` - Uses XMLUI's surface color tokens
+- `$textColor` - Uses XMLUI's content color tokens
+
+The `createThemeVar()` function registers these variables with XMLUI, making them available for customization via the `<Theme>` component and automatic light/dark mode adaptation.
+
+The `:export { themeVars: t.json-stringify($themeVars); }` exports the theme variables so XMLUI can read them.
+
+**Update component metadata**
+
+We also need to tell XMLUI about our theme variables. Update the metadata in `HelloWorld.tsx`:
+
+```xmlui copy
+import styles from "./HelloWorld.module.scss";
+import { createComponentRenderer, parseScssVar, createMetadata } from "xmlui";
+import { HelloWorld, defaultProps } from "./HelloWorldNative";
+
+const HelloWorldMd = createMetadata({
+  description: "`HelloWorld` is a demonstration component.",
+  status: "experimental",
+  props: {
+    message: {
+      description: "The message to display.",
+      isRequired: false,
+      type: "string",
+      defaultValue: defaultProps.message,
+    },
+  },
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`backgroundColor-HelloWorld`]: "$color-surface-50",
+    [`textColor-HelloWorld`]: "$color-content-primary",
+    dark: {
+      [`backgroundColor-HelloWorld`]: "$color-surface-800",
+      // No textColor override needed - $color-content-primary should auto-adapt
+    },
+  },
+});
+
+export const helloWorldComponentRenderer = createComponentRenderer(
+  "HelloWorld",
+  HelloWorldMd,
+  ({ node, extractValue }) => {
+    return (
+      <HelloWorld
+        id={extractValue.asOptionalString(node.props?.id)}
+        message={extractValue.asOptionalString(node.props?.message)}
+      />
+    );
+  }
+);
+```
+
+**Rebuild and test**
+
+```xmlui copy
+npm run build:extension
+```
+
+Now your component uses XMLUI's theme system! It will automatically adapt to light/dark modes and can be customized using the `<Theme>` component.
+
+**Test the themed component**
+
+Copy the new `xmlui-hello-world.js` into your standalone app's `xmlui` folder, and update its `Main.xmlui`.
+
+```xmlui-pg
+---app display copy
+<App>
+  <VStack gap="2rem" padding="2rem">
+    <H1>HelloWorld with Theme Variables</H1>
+
+    <HelloWorld message="Default styling" />
+
+    <Card>
+      <H2>Custom Colors</H2>
+      <Theme
+        backgroundColor-HelloWorld="$color-warn-300"
+        textColor-HelloWorld="$textColor-primary"
+      >
+        <HelloWorld message="Custom colors!" />
+      </Theme>
+    </Card>
+
+    <ToneSwitch />
+  </VStack>
+</App>
+```
+
+Notice how the component now uses theme variables instead of hardcoded colors. The `<Theme>` component allows you to override any theme variable at runtime, making your components incredibly flexible for different contexts and user preferences.
+
+## Step 10: Add event handling
+
+The HelloWorld component has a click handler that increments a counter, and a reset that sets the count to zero. Let's add event definitions to signal parent components when these events happen.
+
+**Add event definitions**
+
+Update the component metadata in `src/HelloWorld.tsx`:
+
+```xmlui copy
+import styles from "./HelloWorld.module.scss";
+import { createComponentRenderer, parseScssVar, createMetadata } from "xmlui";
+import { HelloWorld, defaultProps } from "./HelloWorldNative";
+
+const HelloWorldMd = createMetadata({
+  description:  "`HelloWorld` is a demonstration component.",
+  status: "experimental",
+  props: {
+    message: {
+      description: "The message to display.",
+      isRequired: false,
+      type: "string",
+      defaultValue: defaultProps.message,
+    },
+  },
+  events: {
+    click: {
+      description:
+        "Triggered when the click button is pressed. " + 
+        "Receives the current click count.",
+      type: "function",
+    },
+    reset: {
+      description:
+        "Triggered when the reset button is pressed. " + 
+        "Called when count is reset to 0.",
+      type: "function",
+    },
+  },
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`backgroundColor-HelloWorld`]: "$color-surface-50",
+    [`textColor-HelloWorld`]: "$color-content-primary",
+    dark: {
+      [`backgroundColor-HelloWorld`]: "$color-surface-800",
+      // No textColor override needed - $color-content-primary should auto-adapt
+    },
+  },
+});
+
+export const helloWorldComponentRenderer = createComponentRenderer(
+  "HelloWorld",
+  HelloWorldMd,
+
+  ({ node, extractValue, lookupEventHandler, className }) => {
+    return (
+      <HelloWorld
+        id={extractValue.asOptionalString(node.props?.id)}
+        message={extractValue.asOptionalString(node.props?.message)}
+        onClick={lookupEventHandler("click")}
+        onReset={lookupEventHandler("reset")}
+        className={className}
+      />
+    );
+  },
+);
+```
+
+**Metadata changes:**
+
+- Added `events` section defining `click` and `reset` events
+- Each event includes description and type information for documentation
+
+**Renderer changes:**
+
+- Added `lookupEventHandler` to the renderer context
+- `lookupEventHandler("click")` and `lookupEventHandler("reset")` convert XMLUI event bindings to function references
+- These function references are passed to the native React component
+
+**Update the native component**
+
+Update `src/HelloWorldNative.tsx` to accept and call the event handler.
+
+```xmlui copy
+import React, { useState } from "react";
+import styles from "./HelloWorld.module.scss";
+
+type Props = {
+  id?: string;
+  message?: string;
+  className?: string;
+  onClick?: (event: React.MouseEvent) => void;
+  onReset?: (event: React.MouseEvent) => void;
+};
+
+export const defaultProps = {
+  message: "Hello, World!",
+};
+
+export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
+  function HelloWorld(
+    {
+      id,
+      message = defaultProps.message,
+      className,
+      onClick,
+      onReset
+    },
+    ref
+  ) {
+    const [clickCount, setClickCount] = useState(0);
+
+    const handleClick = (event: React.MouseEvent) => {
+      const newCount = clickCount + 1;
+      setClickCount(newCount);
+      onClick?.(event);
+    };
+
+    const handleReset = (event: React.MouseEvent) => {
+      setClickCount(0);
+      onReset?.(event);
+    };
+
+    return (
+      <div className={`${styles.container} ${className || ''}`} id={id}>
+        <h2 className={styles.message}>{message}</h2>
+        <button
+           className={styles.button}
+              onClick={handleClick}
+            >
+              Click me!
+            </button>
+            <div className={styles.counter}>
+              Clicks: <span className={styles.count}>{clickCount}</span>
+            </div>
+
+            {clickCount > 0 && (
+              <button
+                className={styles.button}
+                onClick={handleReset}
+              >
+                Reset
+              </button>
+            )}
+          </div>
+    );
+  }
+);
+```
+
+**New props**
+
+- `onClick?: (event: React.MouseEvent) => void` - Called when the click button is pressed
+- `onReset?: (event: React.MouseEvent) => void` - Called when the reset button is pressed
+
+**Event handler changes:**
+
+- `handleClick` now calls `onClick?.(event)` after updating internal state
+- `handleReset` now calls `onReset?.(event)` after resetting the counter
+- Both pass the DOM event object (not custom data) to match XMLUI's event system
+
+
+**The event flow:**
+
+1. XMLUI markup: `<HelloWorld onClick="handleHelloClick" />`
+2. Renderer: `lookupEventHandler("click")` finds the `handleHelloClick` function
+3. Native component: Receives the function as `onClick` prop
+4. User interaction: Triggers the function with the DOM event
+
+**Rebuild the extension**
+
+```xmlui copy
+npm run build:extension
+```
+
+**Define the handlers**
+
+This site's `index.html` defines these handler functions. For your standalone app you'll need to add them into its `index.html`.
+
+```xmlui copy
+<script>
+window.handleHelloClick = function(event) {
+  console.log('Hello World clicked!', event);
+  alert('Button clicked!');
+};
+
+window.handleHelloReset = function(event) {
+  console.log('Hello World reset!', event);
+  alert('Counter was reset!');
+};
+</script>
+```
+
+**Test event handling**
+
+Copy the new `xmlui-hello-world.js` into your standalone app's `xmlui` folder, and update its `Main.xmlui`.
+
+Now you can use the component with event handling.
+
+```xmlui-pg
+---app display copy
+<App>
+  <HelloWorld
+    onClick="handleHelloClick"
+    onReset="handleHelloReset"
+  />
+</App>
+```
+
+## Step 11: Add component APIs (external methods)
+
+Update `src/HelloWorldNative.tsx`.
+
+```xmlui copy
+import React, { useState, useEffect } from "react";
+import styles from "./HelloWorld.module.scss";
+import type { RegisterComponentApiFn } from "xmlui";
+
+type Props = {
+  id?: string;
+  message?: string;
+  className?: string;
+  onClick?: (event: React.MouseEvent) => void;
+  onReset?: (event: React.MouseEvent) => void;
+  registerComponentApi?: RegisterComponentApiFn;
+};
+
+export const defaultProps = {
+  message: "Hello, World!",
+};
+
+export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
+  function HelloWorld(
+    {
+      id,
+      message = defaultProps.message,
+      className,
+      onClick,
+      onReset,
+      registerComponentApi
+    },
+    ref
+  ) {
+    const [clickCount, setClickCount] = useState(0);
+
+    // Create setValue method for external API access
+    const setValue = (newCount: number) => {
+      setClickCount(newCount);
+    };
+
+    // Register component API
+    useEffect(() => {
+      registerComponentApi?.({
+        setValue,
+        value: clickCount,
+      });
+    }, [registerComponentApi, setValue, clickCount]);
+
+    const handleClick = (event: React.MouseEvent) => {
+      const newCount = clickCount + 1;
+      setClickCount(newCount);
+      onClick?.(event);
+    };
+
+    const handleReset = (event: React.MouseEvent) => {
+      setClickCount(0);
+      onReset?.(event);
+    };
+
+    return (
+      <div className={`${styles.container} ${className || ''}`} id={id} ref={ref}>
+        <h2 className={styles.message}>{message}</h2>
+        <button
+           className={styles.button}
+              onClick={handleClick}
+            >
+              Click me!
+            </button>
+            <div className={styles.counter}>
+              Clicks: <span className={styles.count}>{clickCount}</span>
+            </div>
+
+            {clickCount > 0 && (
+              <button
+                className={styles.button}
+                onClick={handleReset}
+              >
+                Reset
+              </button>
+            )}
+          </div>
+    );
+  }
+);
+```
+
+**New props**
+
+- `registerComponentApi?: RegisterComponentApiFn` - Function to register component APIs with XMLUI
+
+**New imports:**
+
+- `useEffect` from React - For API registration and state synchronization
+- `RegisterComponentApiFn` type from "xmlui" - Type for the API registration function
+
+**API registration:**
+
+- `setValue` method - Allows external code to set the click count
+- `useEffect` hook registers the API with XMLUI, exposing both `setValue` and `value`
+- API updates whenever `clickCount` changes, ensuring `value` is always current
+
+This enables XMLUI markup to directly call `demo.setValue(5)` and read `demo.value`.
+
+Update `src/HelloWorld.tsx`.
+
+```xmlui copy
+import styles from "./HelloWorld.module.scss";
+import { createComponentRenderer, parseScssVar, createMetadata } from "xmlui";
+import { HelloWorld, defaultProps } from "./HelloWorldNative";
+
+const HelloWorldMd = createMetadata({
+  description:
+    "`HelloWorld` is a demonstration component that shows basic XMLUI patterns.",
+  status: "experimental",
+  props: {
+    message: {
+      description: "The greeting message to display.",
+      isRequired: false,
+      type: "string",
+      defaultValue: defaultProps.message,
+    },
+  },
+  events: {
+    click: {
+      description:
+        "Triggered when the click button is pressed. " + 
+        "Receives the current click count.",
+      type: "function",
+    },
+    reset: {
+      description:
+        "Triggered when the reset button is pressed. " + 
+        "Called when count is reset to 0.",
+      type: "function",
+    },
+  },
+  apis: {
+    value: {
+      description: "The current click count value.",
+      type: "number",
+    },
+    setValue: {
+      description: "Set the click count to a specific value.",
+      type: "function",
+    },
+  },
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`backgroundColor-HelloWorld`]: "$color-surface-50",
+    [`textColor-HelloWorld`]: "$color-content-primary",
+    dark: {
+      [`backgroundColor-HelloWorld`]: "$color-surface-800",
+      // No textColor override needed - $color-content-primary should auto-adapt
+    },
+  },
+});
+
+export const helloWorldComponentRenderer = createComponentRenderer(
+  "HelloWorld",
+  HelloWorldMd,
+
+  ({ node, extractValue, lookupEventHandler, className, registerComponentApi }) => {
+    return (
+      <HelloWorld
+        id={extractValue.asOptionalString(node.props?.id)}
+        message={extractValue.asOptionalString(node.props?.message)}
+        onClick={lookupEventHandler("click")}
+        onReset={lookupEventHandler("reset")}
+        className={className}
+        registerComponentApi={registerComponentApi}
+      />
+    );
+  },
+);
+```
+
+**Metadata**
+
+- Added `apis` section defining `value` (number) and `setValue` (function) APIs
+
+**Renderer Changes**
+
+- Added `registerComponentApi` to the renderer context
+- Passes `registerComponentApi` to the native component for API registration
+
+**The API flow:**
+
+1. XMLUI markup: `<HelloWorld id="demo" />` creates component with ID
+2. Renderer: Registers component APIs via `registerComponentApi`
+3. External access: `demo.setValue(5)` calls the component's setValue method
+4. State reading: `demo.value` returns the current click count
+
+```xmlui copy
+npm run build:extension
+```
+
+Copy the new `xmlui-hello-world.js` into your standalone app's `xmlui` folder, and update its `Main.xmlui` to see this final version.
+
+```xmlui-pg
+---app display copy
+<App xmlns:Extensions="component-ns:XMLUIExtensions">
+
+    <Extensions:HelloWorld id="demo" message="API Demo" />
+
+    <CHStack>
+      <Button onClick="{ console.log('demo.value', demo.value) }">Get Count</Button>
+      <Button onClick="{ demo.setValue(5) }">Set to 5</Button>
+      <Button onClick="{ demo.setValue(0) }">Reset</Button>
+    </CHStack>
+
+</App>
+```

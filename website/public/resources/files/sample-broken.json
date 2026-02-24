@@ -1,0 +1,11 @@
+{
+  "name": "Widget",
+  "price": 9.99,
+  "category": "Tools",
+  "inStock": true
+},
+{
+  "name": "Gadget"
+  "price": 19.99,
+  "category": "Electronics"
+}

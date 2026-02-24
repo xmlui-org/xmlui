@@ -1,0 +1,25 @@
+{
+  "templates": [
+    {
+      "uid": "xmlui-hello-world",
+      "displayName": "XMLUI Hello World",
+      "author": "xmlui.org",
+      "description": "The simplest XMLUI app to get you started.",
+      "zipArchive": "https://github.com/xmlui-org/xmlui-hello-world/releases/latest/download/xmlui-hello-world.zip"
+    },
+    {
+      "uid": "xmlui-weather",
+      "displayName": "XMLUI Weather Dashboard",
+      "author": "xmlui.org",
+      "description": "A simple weather dashboard that displays current weather conditions for any city.",
+      "zipArchive": "https://github.com/xmlui-org/xmlui-weather/releases/latest/download/xmlui-weather.zip"
+    },
+    {
+      "uid": "xmlui-invoice",
+      "displayName": "XMLUI Invoice",
+      "author": "xmlui.org",
+      "description": "A complete business application for invoice management with a local server and database.",
+      "zipArchive": "https://github.com/xmlui-org/xmlui-invoice/releases/latest/download/xmlui-invoice.zip"
+    }
+  ]
+}

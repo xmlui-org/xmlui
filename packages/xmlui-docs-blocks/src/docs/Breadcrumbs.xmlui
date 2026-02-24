@@ -11,14 +11,14 @@
             verticalAlignment="center"
             gap="$space-2"
         >
-            <Link to="/">
+            <Link to="/docs">
                 Documentation
             </Link>
             <Icon
                 name="chevronright"
                 color="$textColor-secondary"
             />
-            <Link to="/">
+            <Link to="/docs/learn">
                 Learn XMLUI
             </Link>
             <Icon
@@ -38,7 +38,7 @@
             verticalAlignment="center"
             gap="$space-2"
         >
-            <Link to="/">
+            <Link to="/docs">
                 Documentation
             </Link>
             <Icon

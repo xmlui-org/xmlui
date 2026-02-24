@@ -16,13 +16,12 @@
     "preview-optimized": "npx serve-optimized ./xmlui-optimized-output"
   },
   "dependencies": {
-    "@shikijs/langs": "3.4.2",
-    "shiki": "^3.3.0",
     "xmlui": "*",
     "xmlui-playground": "*",
     "xmlui-search": "*",
     "xmlui-hello-world": "*",
-    "xmlui-website-blocks": "*"
+    "xmlui-website-blocks": "*",
+    "xmlui-docs-blocks": "*"
   },
   "msw": {
     "workerDirectory": [
@@ -33,10 +32,6 @@
     "xmlui-website-blocks": "*",
     "xmlui-animations": "*",
     "@emotion/is-prop-valid": "^1.3.1",
-    "@octokit/rest": "^22.0.0",
-    "remark-parse": "11.0.0",
-    "remark-stringify": "11.0.0",
-    "strip-markdown": "6.0.0",
-    "unified": "11.0.5"
+    "@octokit/rest": "^22.0.0"
   }
 }

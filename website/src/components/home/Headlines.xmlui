@@ -1,0 +1,32 @@
+<Component name="Headlines">
+    <script>
+        var paddingTop = mediaSize.phone || mediaSize.landscapePhone ? "$space-14" : "$space-20"; 
+        var fontSize = mediaSize.phone || mediaSize.landscapePhone ? "36px" : "42px";
+        var textSize = "24px";
+        var headingLineHeight = "1.2";
+        var textLineHeight = "1.3";
+    </script>
+    <VStack 
+        horizontalAlignment="center" 
+        gap="$gap-tight" 
+        paddingTop="{paddingTop}" 
+        paddingBottom="$space-12">
+        <CVStack gap="0" marginBottom="$space-4" >
+            <H1 fontSize="{fontSize}" textAlign="center" lineHeight="{headingLineHeight}"> 
+                Practical User Interfaces
+            </H1>
+            <H1 marginTop="0" fontSize="{fontSize}" textAlign="center" lineHeight="{headingLineHeight}">
+                Built Simply
+            </H1>
+        </CVStack>
+        <VStack gap="$space-1" horizontalAlignment="center">
+            <Text fontSize="{textSize}" lineHeight="{textLineHeight}" color="$color-secondary-0">
+                Define your UI in any text editor.
+            </Text>
+            <Text fontSize="{textSize}" lineHeight="{textLineHeight}" color="$color-secondary-0">
+                Create clean modern apps.
+            </Text>
+        </VStack>
+    </VStack>
+</Component>
+
