@@ -18,8 +18,8 @@
             width="50%" title="Modular.">
             Tap into a deep catalog of
             <Link
-                to="https://docs.xmlui.org/components/_overview"
-                target="_blank" label="components" />
+                to="/docs/reference/components/_overview"
+                label="components" />
             and easily make your own.
         </Benefit>
         <Benefit
