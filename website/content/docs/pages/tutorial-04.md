@@ -26,7 +26,7 @@ The `Dashboard` page opens with a set of infocards. Here is a simplified version
 > The definition of `var.dashboardStats` uses two sets of curly braces. The outer braces enclose the JavaScript expression to be evaluated. The inner braces enclose a literal object that emulates data returned from an API.
 
 
-In the real app, `dashboardStats` is a [DataSource](/components/DataSource).
+In the real app, `dashboardStats` is a [DataSource](/docs/reference/components/DataSource).
 
 ```xmlui
 <DataSource id="dashboardStats" url="/api/dashboard/stats" method="GET" />
@@ -99,7 +99,7 @@ There are five infocards on the XMLUI Invoice dashboard. To style them all in a 
 </Component>
 ```
 
-A [user-defined component](/components-intro) like `Dashboard` can define any set of names and values. `InfoCard` receives them in its `$props` [context variable](/context-variables). `InfoCard` is opinionated about `borderRadius` and `boxShadow`. It could also receive these in `$props` but chooses not to. And while it is strongly opinionated about the `borderRadius`, which it hardcodes, it is willing to use the theme variable `$boxShadow-spread` so that setting can be theme-governed.
+A [user-defined component](/docs/reference/components-intro) like `Dashboard` can define any set of names and values. `InfoCard` receives them in its `$props` [context variable](/docs/context-variables). `InfoCard` is opinionated about `borderRadius` and `boxShadow`. It could also receive these in `$props` but chooses not to. And while it is strongly opinionated about the `borderRadius`, which it hardcodes, it is willing to use the theme variable `$boxShadow-spread` so that setting can be theme-governed.
 
 Here's a more complete version of the row of `InfoCard`s used in the Invoices app.
 

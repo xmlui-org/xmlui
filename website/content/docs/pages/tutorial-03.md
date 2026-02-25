@@ -82,4 +82,4 @@ Or it can be `horizontal`.
 
 ## Other layouts
 
-There are a number of other layouts, see [App](/components/App#layout) for details.
+There are a number of other layouts, see [App](/docs/reference/components/App#layout) for details.

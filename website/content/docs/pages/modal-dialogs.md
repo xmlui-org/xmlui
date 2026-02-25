@@ -103,7 +103,7 @@ When embedding a form in a dialog, the form's cancel and successful submit actio
 </App>
 ```
 
-See the [ModalDialog](/components/ModalDialog) reference for all properties and events.
+See the [ModalDialog](/docs/reference/components/ModalDialog) reference for all properties and events.
 
 ## When to use declarative vs. imperative modals
 

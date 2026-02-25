@@ -1,6 +1,6 @@
 # Working with Text
 
-Text elements appear in UI components such as menu items, titles, headings, labels, and descriptions. There is also a [Markdown](/components/Markdown) component for complete text documents (like this page). We'll cover `Text` here and `Markdown` in the [next chapter](/working-with-markdown).
+Text elements appear in UI components such as menu items, titles, headings, labels, and descriptions. There is also a [Markdown](/docs/reference/components/Markdown) component for complete text documents (like this page). We'll cover `Text` here and `Markdown` in the [next chapter](/docs/guides/working-with-markdown).
 
 You can nest text in any component that renders its children.
 
@@ -23,7 +23,7 @@ To gain more control we can use the  `Text` component.
 </App>
 ```
 
-Components that render text support theme variables. You can use them, for example, to control the styling of the heading family of components ([Heading](/components/Heading), [H1](/components/H1), [H2](/components/H2), etc).
+Components that render text support theme variables. You can use them, for example, to control the styling of the heading family of components ([Heading](/docs/reference/components/Heading), [H1](/docs/reference/components/H1), [H2](/docs/reference/components/H2), etc).
 
 ```xmlui-pg display name="Example: Text can be styled"
 <App>
@@ -172,7 +172,7 @@ Sometimes you want to preserve line breaks, as when inspecting a JSON object.
 
 ## Variants of the Text component
 
-In addition to the theme variables that govern the `Text` component, you can use the [`variant`](/components/Text#variant) property to control styles directly.
+In addition to the theme variables that govern the `Text` component, you can use the [`variant`](/docs/reference/components/Text#variant) property to control styles directly.
 
 ```xmlui-pg
 <App>

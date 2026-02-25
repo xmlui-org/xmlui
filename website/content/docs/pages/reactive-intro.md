@@ -1,6 +1,6 @@
 # Reactive data binding
 
-Let's load that same London tube data into a [Select](/components/Select) component.
+Let's load that same London tube data into a [Select](/docs/reference/components/Select) component.
 
 ```xmlui-pg height="280px" name="pick a station"
 ---app display
@@ -13,9 +13,9 @@ Let's load that same London tube data into a [Select](/components/Select) compon
 </App>
 ```
 
-The `Select` uses the same API as the `List`. It contains an <a href="/components/Items">Items</a> component which is another way to loop through a sequence and embed a component that receives each item. In this case what's embedded is a selectable <a href="/components/Option">Option</a> which again receives the `$item` variable.
+The `Select` uses the same API as the `List`. It contains an <a href="/docs/reference/components/Items">Items</a> component which is another way to loop through a sequence and embed a component that receives each item. In this case what's embedded is a selectable <a href="/docs/reference/components/Option">Option</a> which again receives the `$item` variable.
 
-Nothing happens yet when you select a tube line. Let's wire up the selection to display details for the selected line in a <a href="/components/Table">Table</a>.
+Nothing happens yet when you select a tube line. Let's wire up the selection to display details for the selected line in a <a href="/docs/reference/components/Table">Table</a>.
 
 ```xmlui-pg name="pick a station"
 ---app display /lines/ /tubeStations/
@@ -39,7 +39,7 @@ Nothing happens yet when you select a tube line. Let's wire up the selection to 
 </App>
 ```
 
-The <a href="/components/DataSource">DataSource</a> component works like the `data` attribute we used with `List` and `Items`: it fetches from a REST endpoint. Unlike `List`,`Select`, and `Table`, `DataSource` isn't a visible component. It works behind the scenes to capture data for use by visible components.
+The <a href="/docs/reference/components/DataSource">DataSource</a> component works like the `data` attribute we used with `List` and `Items`: it fetches from a REST endpoint. Unlike `List`,`Select`, and `Table`, `DataSource` isn't a visible component. It works behind the scenes to capture data for use by visible components.
 
 In this case the returned data object is big and complex, and we only want to display data from the `stations` object nested within it.
 The `resultSelector` property on the `DataSource` targets the nested `stations` object so we can feed just that data into the table.

@@ -1,6 +1,6 @@
 # Main.xmlui
 
-At the root of every XMLUI app is `Main.xmlui` which declares the [App](/components/App) that defines layout and navigation.
+At the root of every XMLUI app is `Main.xmlui` which declares the [App](/docs/reference/components/App) that defines layout and navigation.
 
 ## App
 
@@ -13,7 +13,7 @@ At the root of every XMLUI app is `Main.xmlui` which declares the [App](/compone
 >
 ```
 
-`vertical-full-header` means the header and the navigation bar dock to the top of the app's window, while the footer sticks to the bottom. There are a half-dozen other flavors, see the [App](/components/App) page for the full story.
+`vertical-full-header` means the header and the navigation bar dock to the top of the app's window, while the footer sticks to the bottom. There are a half-dozen other flavors, see the [App](/docs/reference/components/App) page for the full story.
 
 ### Optional default theme
 
@@ -35,7 +35,7 @@ The `defaultTheme` points to a file called `invoice.json`.
 }
 ```
 
-It's concise but very powerful. The choices for `color-primary`, `color-secondary`,  and `color-surface` define a set of coordinated [palettes](/palettes) that form the core of a [Theme](/themes-intro).
+It's concise but very powerful. The choices for `color-primary`, `color-secondary`,  and `color-surface` define a set of coordinated [palettes](/docs/palettes) that form the core of a [Theme](/docs/themes-intro).
 
 Then there's a small handful of theme variables. `gap-adornment-Input` adjusts the space between a dollar sign and its value. `borderRadius-Avatar` does what it says on the tin.
 
@@ -50,7 +50,7 @@ These things are optional. XMLUI's mission is to ensure what you build looks goo
   />
 ```
 
-[AppState](/components/AppState) is a blackboard where components can post and read data. In our demo it defines a data structure for the app settings.
+[AppState](/docs/reference/components/AppState) is a blackboard where components can post and read data. In our demo it defines a data structure for the app settings.
 
 ## AppHeader
 
@@ -69,7 +69,7 @@ These things are optional. XMLUI's mission is to ensure what you build looks goo
 </AppHeader>
 ```
 
-Our demo uses `profileMenuTemplate`, one of the templates [AppHeader](/components/AppHeader) provides so you can compose what goes into common header slots. In XMLUI a `property` is a reusable chunk of UI structure that renders in a particular context.
+Our demo uses `profileMenuTemplate`, one of the templates [AppHeader](/docs/reference/components/AppHeader) provides so you can compose what goes into common header slots. In XMLUI a `property` is a reusable chunk of UI structure that renders in a particular context.
 
 ## NavPanel
 
@@ -86,7 +86,7 @@ Our demo uses `profileMenuTemplate`, one of the templates [AppHeader](/component
   </NavPanel>
 ```
 
-The [NavPanel](/components/NavPanel) defines [NavLink](/components/NavLink)s which are routes, or local URLs, navigable within and from outside the app.
+The [NavPanel](/docs/reference/components/NavPanel) defines [NavLink](/docs/reference/components/NavLink)s which are routes, or local URLs, navigable within and from outside the app.
 
 ## Pages
 
@@ -142,7 +142,7 @@ The [NavPanel](/components/NavPanel) defines [NavLink](/components/NavLink)s whi
   </Pages>
 ```
 
-Each [Page](/components/Page) is a container that binds to a route and holds XMLUI markup. Although you can put anything in there, our demo shows what we think is a best practice: use [Components](/components-intro) to encapsulate UI constructs.
+Each [Page](/docs/reference/components/Page) is a container that binds to a route and holds XMLUI markup. Although you can put anything in there, our demo shows what we think is a best practice: use [Components](/docs/reference/components-intro) to encapsulate UI constructs.
 
 ## Footer
 
@@ -156,6 +156,6 @@ Each [Page](/components/Page) is a container that binds to a route and holds XML
 </App>
 ```
 
-Our `Main.xmlui` concludes with a [Footer](/components/Footer) that embeds a [ToneSwitch](/components/ToneSwitch).
+Our `Main.xmlui` concludes with a [Footer](/docs/reference/components/Footer) that embeds a [ToneSwitch](/docs/reference/components/ToneSwitch).
 
 

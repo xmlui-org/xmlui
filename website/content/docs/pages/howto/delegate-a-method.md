@@ -42,4 +42,4 @@ Use `method.` attributes to directly delegate to internal component methods:
 
 **Cons**: No custom logic, just passes through calls
 
-**See also**: [Expose a method from a component](/howto/expose-a-method-from-a-component) for adding custom logic to methods.
+**See also**: [Expose a method from a component](/docs/howto/expose-a-method-from-a-component) for adding custom logic to methods.

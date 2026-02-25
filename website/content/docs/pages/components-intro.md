@@ -1,39 +1,39 @@
 # Components
 
-We've already seen a number of XMLUI components in action: [DataSource](/components/DataSource), [Items](/components/Items), [List](/components/List), [Markdown](/components/Markdown), [Select](/components/Select), [Option](/components/Option), and [Table](/components/Table).
+We've already seen a number of XMLUI components in action: [DataSource](/docs/reference/components/DataSource), [Items](/docs/reference/components/Items), [List](/docs/reference/components/List), [Markdown](/docs/reference/components/Markdown), [Select](/docs/reference/components/Select), [Option](/docs/reference/components/Option), and [Table](/docs/reference/components/Table).
 
 ## Built-in components
 
-As an XMLUI developer you'll create user interfaces by combining these with others in the [core library](/components/_overview), drawing from these categories:
+As an XMLUI developer you'll create user interfaces by combining these with others in the [core library](/docs/reference/components/_overview), drawing from these categories:
 
-**Data**: [AppState](/components/AppState),
-[DataSource](/components/DataSource),
-[APICall](/components/APICall) ...
+**Data**: [AppState](/docs/reference/components/AppState),
+[DataSource](/docs/reference/components/DataSource),
+[APICall](/docs/reference/components/APICall) ...
 
-**Display**: [Avatar](/components/Avatar),
-[Card](/components/Card), [Heading](/components/Heading), [Image](/components/Image),
-[Icon](/components/Icon),
-[Markdown](/components/Markdown),
-[Text](/components/Text),
-[Table](/components/Table) ...
+**Display**: [Avatar](/docs/reference/docs/reference/components/Avatar),
+[Card](/docs/reference/docs/reference/components/Card), [Heading](/docs/reference/docs/reference/components/Heading), [Image](/docs/reference/docs/reference/components/Image),
+[Icon](/docs/reference/components/Icon),
+[Markdown](/docs/reference/components/Markdown),
+[Text](/docs/reference/components/Text),
+[Table](/docs/reference/components/Table) ...
 
-**Input**: [Checkbox](/components/Checkbox),
-[DatePicker](/components/DatePicker), [Form](/components/Form),
-[FormItem](/components/FormItem),
-[FileInput](/components/FileInput),
-[NumberBox](/components/NumberBox),
-[Select](/components/Select),
-[TextArea](/components/TextArea),
-[TextBox](/components/TextBox) ...
+**Input**: [Checkbox](/docs/reference/components/Checkbox),
+[DatePicker](/docs/reference/components/DatePicker), [Form](/docs/reference/components/Form),
+[FormItem](/docs/reference/components/FormItem),
+[FileInput](/docs/reference/components/FileInput),
+[NumberBox](/docs/reference/components/NumberBox),
+[Select](/docs/reference/components/Select),
+[TextArea](/docs/reference/components/TextArea),
+[TextBox](/docs/reference/components/TextBox) ...
 
-**Layout**: [FlowLayout](/components/FlowLayout), [HStack](/components/HStack), [VStack](/components/VStack) ...
+**Layout**: [FlowLayout](/docs/reference/components/FlowLayout), [HStack](/docs/reference/components/HStack), [VStack](/docs/reference/components/VStack) ...
 
-**Navigation**: [DropdownMenu](/components/DropdownMenu),
-[MenuItem](/components/MenuItem),
-[NavLink](/components/NavLink),
-[NavPanel](/components/NavPanel),
-[Tabs](/components/Tabs),
-[TabItem](/components/TabItem) ...
+**Navigation**: [DropdownMenu](/docs/reference/components/DropdownMenu),
+[MenuItem](/docs/reference/components/MenuItem),
+[NavLink](/docs/reference/components/NavLink),
+[NavPanel](/docs/reference/components/NavPanel),
+[Tabs](/docs/reference/components/Tabs),
+[TabItem](/docs/reference/components/TabItem) ...
 
 ## User-defined components
 
@@ -154,9 +154,9 @@ window.transformStops = function(stops) {
 </details>
 
 
-**Enriches data**. The transformed data has `yes`/`no` values for `wifi` and `toilets`. `TubeStops` uses [Fragment](/components/Fragment) to display an [Icon](/components/Icon) only for `yes` values.
+**Enriches data**. The transformed data has `yes`/`no` values for `wifi` and `toilets`. `TubeStops` uses [Fragment](/docs/reference/components/Fragment) to display an [Icon](/docs/reference/components/Icon) only for `yes` values.
 
 
 When you use custom components to access, transform, and present data, your XMLUI markup stays clean, readable, and easy to read and maintain.
 
-Another way to keep your markup clean: rely on XMLUI's layout and style engine to make your app look good and behave gracefully by default. You can adjust the (many!) settings that define an XMLUI [Theme](/components/Theme), but you'll rarely need to. The next chapter explains why.
+Another way to keep your markup clean: rely on XMLUI's layout and style engine to make your app look good and behave gracefully by default. You can adjust the (many!) settings that define an XMLUI [Theme](/docs/reference/components/Theme), but you'll rarely need to. The next chapter explains why.
