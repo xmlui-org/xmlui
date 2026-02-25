@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.14",
   "scripts": {
-    "start": "echo '====================================================================\nExecuting \"npm run watch-docs-content\" in the project root,\nyou get automatic content generation based on xmlui metadata!\n====================================================================\n' && xmlui start",
+    "start": "echo xmlui start",
     "preview": "xmlui preview",
     "gen:releases": "node scripts/get-releases.js --output 'public/resources/files/releases.json'",
     "gen:download-latest-xmlui-release": "node scripts/download-latest-xmlui.js",
