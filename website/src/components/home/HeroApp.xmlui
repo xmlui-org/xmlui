@@ -6,23 +6,26 @@
         <![CDATA[
 ```xmlui-pg splitView height="430px" immediate withSplashScreen
 ---app display
-<App>
+<App layout="condensed-sticky">
+  <AppHeader>
+    <Text variant="strong">Our Team</Text>
+    <SpaceFiller />
+    <ToneSwitch />
+  </AppHeader>
   <List data="/api/users">
-<Card title="{$item.username}" subtitle="{$item.email}"
-  orientation="horizontal" avatarUrl="{$item.avatar_url}"
->
-  <SpaceFiller />
-  <Badge variant="pill" when="{!mediaSize.phone}">
-    {$item.status}
-  </Badge>
-  <Button variant="ghost" icon="close" tooltip="Delete {$item.username}">
-    <event name="click">
-      <APICall url="/api/users/{$item.id}" method="delete"
-        confirmTitle="Delete {$item.username}?"
-        completedNotificationMessage="{$item.username} deleted" />
-    </event>
-  </Button>
-</Card>
+    <Card title="{$item.username}" subtitle="{$item.email}"
+      orientation="horizontal" avatarUrl="{$item.avatar_url}">
+      <SpaceFiller />
+      <Badge variant="pill" when="{!mediaSize.phone}" value="{$item.status}"
+        colorMap="{{ active: 'green', pending: 'orange' }}" />
+      <Button variant="ghost" icon="close" tooltip="Delete {$item.username}">
+        <event name="click">
+          <APICall url="/api/users/{$item.id}" method="delete"
+            confirmTitle="Delete {$item.username}?"
+            completedNotificationMessage="{$item.username} deleted" />
+        </event>
+      </Button>
+    </Card>
   </List>
 </App>
 ---api
@@ -59,6 +62,13 @@
           avatar_url: 'https://i.pravatar.cc/150?u=noah.jones@example.com',
           status: 'pending'
         },
+        {
+          id: 5,
+          username: 'Pixel Pioneer',
+          email: 'emma.brown@example.com',
+          avatar_url: 'https://i.pravatar.cc/150?u=emma.brown@example.com',
+          status: 'active'
+        },
       ]",
   "operations": {
     "get-users": {
@@ -69,7 +79,7 @@
     "delete-user": {
       "url": "/users/:id",
       "method": "delete",
-      "handler": "if ($state.users.length < 4) {
+      "handler": "if ($state.users.length < 5) {
         throw Errors.HttpError(500, 'This sample does not allow you to delete more users');
       }
       $state.users = $state.users.filter(u => u.id.toString() !== $pathParams.id);"
