@@ -15,25 +15,35 @@
             posts: sortedPosts.filter((p) => p.tags && p.tags.includes(tag)),
         }));
     </script>
+    <CHStack width="100%" gap="0" padding="0">
+        <VStack
+            width="100%"
+            marginTop="$space-4"
+            gap="$space-4"
+            maxWidth="$maxWidth-content-BlogOverview"
+        >
+            <H1
+                textAlign="center"
+                fontSize="$fontSize-blog-overview-title"
+                showAnchor="false"
+            >
+                Blog
+            </H1>
 
-    <VStack marginTop="$space-4" gap="$space-4">
-        <H1 textAlign="center" fontSize="$fontSize-blog-overview-title" showAnchor="false">
-            Blog
-        </H1>
+            <BasicLayout
+                when="{layout === 'basic'}"
+                sortedPosts="{sortedPosts}"
+                showTags="{showTags}"
+            />
 
-        <BasicLayout
-            when="{layout === 'basic'}"
-            sortedPosts="{sortedPosts}"
-            showTags="{showTags}"
-        />
-
-        <FeaturedWithTabsLayout
-            when="{layout === 'featuredWithTabs'}"
-            latestPost="{latestPost}"
-            sortedPosts="{sortedPosts}"
-            showTags="{showTags}"
-            postsByTag="{postsByTag}"
-            gridCols="{gridCols}"
-        />
-    </VStack>
+            <FeaturedWithTabsLayout
+                when="{layout === 'featuredWithTabs'}"
+                latestPost="{latestPost}"
+                sortedPosts="{sortedPosts}"
+                showTags="{showTags}"
+                postsByTag="{postsByTag}"
+                gridCols="{gridCols}"
+            />
+        </VStack>
+    </CHStack>
 </Component>
