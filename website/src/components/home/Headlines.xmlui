@@ -12,10 +12,10 @@
         paddingTop="{paddingTop}" 
         paddingBottom="$space-12">
         <CVStack gap="0" marginBottom="$space-4" >
-            <H1 fontSize="{fontSize}" textAlign="center" lineHeight="{headingLineHeight}"> 
+            <H1 fontSize="{fontSize}" textAlign="center" lineHeight="{headingLineHeight}" showAnchor="false"> 
                 Practical User Interfaces
             </H1>
-            <H1 marginTop="0" fontSize="{fontSize}" textAlign="center" lineHeight="{headingLineHeight}">
+            <H1 marginTop="0" fontSize="{fontSize}" textAlign="center" lineHeight="{headingLineHeight}" showAnchor="false">
                 Built Simply
             </H1>
         </CVStack>
