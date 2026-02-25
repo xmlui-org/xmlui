@@ -207,7 +207,7 @@ async function verifyAppContainerNotScrollable(page: Page) {
   });
 
   expect(info.found).toBe(true);
-  expect(["hidden", "visible", ""]).toContain(info.overflow);
+  expect(["hidden", "visible", "", "clip"]).toContain(info.overflow);
 }
 
 async function scrollAppContainerTo(page: Page, position: "top" | "mid" | "bottom") {
