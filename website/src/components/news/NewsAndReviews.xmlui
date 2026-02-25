@@ -1,5 +1,5 @@
 <Component name="NewsAndReviews">
-  <H1 textAlign="center" fontSize="42px">
+  <H1 textAlign="center" fontSize="42px" showAnchor="false">
     News &amp; reviews
   </H1>
   <FlowLayout gap="$space-6">
@@ -16,7 +16,7 @@
           <Text fontSize="12px" color="$color-surface-300">
             { formatDate($item.date, "MMM do, yyyy") }
           </Text>
-          <H5 maxLines="2">
+          <H5 maxLines="2" showAnchor="false">
             { $item.title }
           </H5>
           <Text color="$color-primary-400" fontFamily="$fontFamily-monospace">
@@ -35,7 +35,8 @@
                 fontSize="14px"
                 color="$color-primary-400"
                 iconPosition="right"
-                icon="arrow-right"
+                icon="arrowright"
+                
               >
                 Go to article
               </Button>
