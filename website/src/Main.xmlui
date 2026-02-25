@@ -603,7 +603,7 @@
     <Page url="/docs/reference/extensions">
       <Overview />
     </Page>
-    <Page url="/docs/reference/extensions/xmlui-animations/_overview">
+    <Page url="/docs/reference/extensions/xmlui-animations/overview">
       <Overview />
     </Page>
     <Page url="/docs/reference/themes">

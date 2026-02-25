@@ -1,6 +1,6 @@
 # Invoice Details
 
-We've seen that the `Invoices` [Table](/components/Table) includes a `Details` [Column](/components/Column) with an icon. Clicking the icon opens a [ModalDialog](/components/ModalDialog) and sends it the current row of the table as `$item`.
+We've seen that the `Invoices` [Table](/docs/reference/components/Table) includes a `Details` [Column](/docs/reference/components/Column) with an icon. Clicking the icon opens a [ModalDialog](/docs/reference/components/ModalDialog) and sends it the current row of the table as `$item`.
 
 ```xmlui /detailsDialog/
 <Table data="{invoices}">
@@ -188,6 +188,6 @@ The second `Table` reports one row per lineitem. The Invoices app chooses not to
 
 The `status` field uses `FormItem type="select"`. It's disabled for statuses other than `paid`, so the operator can mark a `sent` invoice as `paid` but not vice versa.
 
-The [APICall](/component/APICall) is triggered by the submit event. Its `onSuccess` handler uses [Actions.navigate](/globals#navigate) to return to the `Invoices` page.
+The [APICall](/docs/reference/components/APICall) is triggered by the submit event. Its `onSuccess` handler uses [Actions.navigate](/docs/globals#navigate) to return to the `Invoices` page.
 
 In other contexts you use `ModalDialog`'s `close()` method, but when a `Form` is wrapped in a `ModalDialog`, the form's submit and cancel buttons both close the dialog.

@@ -135,5 +135,5 @@ Serving HTTP on :: port 8080 (http://[::]:8080/) ...
 
 In either case, visit http://localhost:8080 to view the app.
 
-See also [Hosted deployment](/hosted-deployment).
+See also [Hosted deployment](/docs/guides/hosted-deployment).
 

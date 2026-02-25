@@ -1,6 +1,6 @@
 # Hosted deployment
 
-You can copy the structure shown in [App Structure](/app-structure) to any webserver configured to serve `index.html` and its subfolders.
+You can copy the structure shown in [App Structure](/docs/guides/app-structure) to any webserver configured to serve `index.html` and its subfolders.
 
 Here are some common alternatives.
 

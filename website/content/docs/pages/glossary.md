@@ -6,7 +6,7 @@ A user-defined component, e.g. `Dashboard.xmlui`, may define scripting logic in 
 
 ## Component
 
-The XMLUI engine provides a suite of [built-in components](/components/_overview). You will typically augment these with [user-defined components](/components-intro). Both are represented in markup using XML tags for component names and attributes for properties.
+The XMLUI engine provides a suite of [built-in components](/docs/reference/components/_overview). You will typically augment these with [user-defined components](/docs/reference/components-intro). Both are represented in markup using XML tags for component names and attributes for properties.
 
 ## Component ID
 
@@ -14,7 +14,7 @@ A component may optionally define an `id` attribute used by other components to 
 
 ## Context variables
 
-Special variables automatically provided by XMLUI within specific scopes, prefixed with `$`. Key examples include `$item` (current item in iterations), `$data` (a form's data object), `$props` (properties passed to user-defined components), and `$value` (current field value in a [FormItem](/components/FormItem)).
+Special variables automatically provided by XMLUI within specific scopes, prefixed with `$`. Key examples include `$item` (current item in iterations), `$data` (a form's data object), `$props` (properties passed to user-defined components), and `$value` (current field value in a [FormItem](/docs/reference/components/FormItem)).
 
 ## Data Binding
 
@@ -54,7 +54,7 @@ A component property, declared with the `<property>` helper tag, whose value is 
 
 ## Reactive data binding
 
-XMLUI enables automatic, reactive connections between data sources and UI components. A [DataSource](/components/DataSource) component, you can fetch data from REST endpoints and make it available to other components. When components reference each other through variables, changing data flows through the system just as spreadsheet cells update when their dependencies change.
+XMLUI enables automatic, reactive connections between data sources and UI components. A [DataSource](/docs/reference/components/DataSource) component, you can fetch data from REST endpoints and make it available to other components. When components reference each other through variables, changing data flows through the system just as spreadsheet cells update when their dependencies change.
 
 ## Resources
 
@@ -62,7 +62,7 @@ External assets, such as an icon, image, or fonts, typically referenced via an U
 
 ## Star sizing
 
-A flexible width allocation system used in components like [Table](/components/Table). Values like `*`, `2*`, and `3*` define proportional column widths. For example, a column with `width="3*"` will take three times as much space as a column with `width="*"`, while fixed-width columns (like `100px`) take their exact specified space first.
+A flexible width allocation system used in components like [Table](/docs/reference/components/Table). Values like `*`, `2*`, and `3*` define proportional column widths. For example, a column with `width="3*"` will take three times as much space as a column with `width="*"`, while fixed-width columns (like `100px`) take their exact specified space first.
 
 ## Theme
 
