@@ -37,6 +37,7 @@ import { useLocation } from "react-router-dom";
 import classnames from "classnames";
 import { NavGroupContext } from "./NavGroupContext";
 import { getAppLayoutOrientation } from "../App/AppNative";
+import { useAppContext } from "../../components-core/AppContext";
 
 type NavGroupComponentDef = ComponentDef<typeof NavGroupMd>;
 
@@ -210,6 +211,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
 ) {
   const { level, iconVerticalCollapsed, iconVerticalExpanded, layoutIsVertical } =
     useContext(NavGroupContext);
+  const { mediaSize } = useAppContext();
   const [expanded, setExpanded] = useState(initiallyExpanded);
   const groupContentInnerRef = useRef<HTMLDivElement>(null);
   const { pathname } = useLocation();
@@ -229,7 +231,12 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
   };
 
   const handleClick = (e: React.MouseEvent) => {
-    if (!to) {
+    const isMobile = mediaSize.sizeIndex <= 2;
+
+    // On mobile, NavGroup headers should not act as navigation links at all,
+    // only toggle expand/collapse. On larger screens, we only prevent navigation
+    // when there is no `to` target.
+    if (isMobile || !to) {
       e.preventDefault();
       e.stopPropagation();
     }

@@ -2,858 +2,1366 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://docs.xmlui.org</loc>
-    <lastmod>2026-02-23</lastmod>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/behaviors</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/blog</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/build-editor-component</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/blog/improving-the-xmlui-mcp-server</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/change-log</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/blog/introducing-the-xmlui-cli</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components-intro</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/blog/introducing-xmlui</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/APICall</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/blog/lorem-ipsum</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/App</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/blog/newest-post</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/AppHeader</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/blog/older-post</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/AppState</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/blog/supabase-and-xmlui</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/AutoComplete</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/blog/xmlui-playground</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Avatar</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/blog/xmlui-powered-blog</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Backdrop</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Badge</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/behaviors</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/BarChart</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/build-editor-component</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Blog</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/change-log</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Bookmark</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components-intro</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Breakout</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/APICall</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Button</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/App</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/CHStack</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/AppHeader</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/CVStack</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/AppState</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Card</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/AutoComplete</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Carousel</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Avatar</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/ChangeListener</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Backdrop</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Checkbox</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Badge</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/ColorPicker</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/BarChart</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Column</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Blog</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/ContentSeparator</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Bookmark</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/ContextMenu</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Breakout</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/DataSource</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Button</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/DateInput</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/CHStack</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/DatePicker</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/CVStack</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/DonutChart</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Card</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/DropdownMenu</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Carousel</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/EmojiSelector</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/ChangeListener</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/ExpandableItem</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Checkbox</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/FileInput</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/ColorPicker</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/FileUploadDropZone</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Column</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/FlowLayout</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/ContentSeparator</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Footer</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/ContextMenu</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Form</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/DataSource</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/FormItem</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/DateInput</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/FormSection</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/DatePicker</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Fragment</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/DonutChart</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/H1</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/DropdownMenu</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/H2</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/EmojiSelector</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/H3</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/ExpandableItem</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/H4</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/FileInput</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/H5</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/FileUploadDropZone</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/H6</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/FlowLayout</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/HSplitter</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Footer</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/HStack</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Form</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Heading</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/FormItem</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/IFrame</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/FormSection</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Icon</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Fragment</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Image</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/H1</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Items</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/H2</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/LabelList</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/H3</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Legend</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/H4</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/LineChart</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/H5</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Link</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/H6</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/List</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/HSplitter</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Logo</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/HStack</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Markdown</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Heading</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/MenuItem</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/IFrame</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/MenuSeparator</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Icon</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/MessageListener</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Image</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/ModalDialog</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/IncludeMarkup</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/NavGroup</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Items</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/NavLink</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/LabelList</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/NavPanel</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Legend</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/NavPanelCollapseButton</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/LineChart</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/NoResult</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Link</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/NumberBox</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/List</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Option</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Logo</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Page</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Markdown</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/PageMetaTitle</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/MenuItem</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Pages</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/MenuSeparator</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Pagination</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/MessageListener</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/PasswordInput</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/ModalDialog</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/PieChart</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/NavGroup</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/ProgressBar</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/NavLink</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/QRCode</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/NavPanel</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Queue</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/NavPanelCollapseButton</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/RadioGroup</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/NoResult</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/RealTimeAdapter</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/NumberBox</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Redirect</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Option</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/ResponsiveBar</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Page</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/ScrollViewer</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/PageMetaTitle</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Select</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Pages</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Slider</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Pagination</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Slot</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/PasswordInput</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/SpaceFiller</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/PieChart</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Spinner</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/ProgressBar</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Splitter</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/QRCode</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Stack</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Queue</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/StickyBox</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/RadioGroup</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/SubMenuItem</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/RealTimeAdapter</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Switch</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Redirect</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/TabItem</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/ResponsiveBar</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Table</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/ScrollViewer</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/TableOfContents</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Select</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Tabs</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Slider</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Text</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Slot</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/TextArea</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/SpaceFiller</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/TextBox</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Spinner</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Theme</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Splitter</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/TimeInput</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Stack</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Timer</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/StickyBox</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/ToneChangerButton</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/SubMenuItem</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/ToneSwitch</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Switch</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Tooltip</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/TabItem</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/Tree</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Table</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/VSplitter</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/TableOfContents</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/VStack</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Tabs</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/components/_overview</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Text</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/context-variables</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/TextArea</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/context-variables2</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/TextBox</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/core-properties</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Theme</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/extensions/xmlui-animations</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/TimeInput</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/extensions/xmlui-animations/Animation</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Timer</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/extensions/xmlui-animations/FadeAnimation</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/ToneChangerButton</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/extensions/xmlui-animations/FadeInAnimation</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/ToneSwitch</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/extensions/xmlui-animations/FadeOutAnimation</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Tooltip</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/extensions/xmlui-animations/ScaleAnimation</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/Tree</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/extensions/xmlui-animations/SlideInAnimation</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/VSplitter</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/extensions/xmlui-animations/_overview</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/VStack</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/extensions/xmlui-pdf/Pdf</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/components/_overview</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/extensions/xmlui-pdf/_overview</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/context-variables</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/globals</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/context-variables2</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/glossary</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/core-properties</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/guides</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/extensions/xmlui-animations</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/guides/app-structure</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/extensions/xmlui-animations/Animation</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/guides/build-hello-world-component</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/extensions/xmlui-animations/FadeAnimation</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/guides/forms</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/extensions/xmlui-animations/FadeInAnimation</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/guides/hosted-deployment</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/extensions/xmlui-animations/FadeOutAnimation</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/guides/layout</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/extensions/xmlui-animations/ScaleAnimation</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/guides/markup</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/extensions/xmlui-animations/SlideInAnimation</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/guides/modal-dialogs</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/extensions/xmlui-animations/_overview</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/guides/playground-and-codefence</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/extensions/xmlui-pdf/Pdf</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/guides/refactoring</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/extensions/xmlui-pdf/_overview</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/guides/routing-and-links</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/extensions/xmlui-website-blocks/Carousel</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/guides/scoping</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/extensions/xmlui-website-blocks/FancyButton</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/guides/scripting</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/extensions/xmlui-website-blocks/HeroSection</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/guides/user-defined-components</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/extensions/xmlui-website-blocks/ScrollToTop</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/guides/working-with-markdown</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/extensions/xmlui-website-blocks/_overview</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/guides/working-with-text</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/globals</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/helper-tags</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/glossary</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/guides</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/add-custom-icons</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/guides/app-structure</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/assign-a-complex-json-literal-to-a-component-variable</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/guides/build-hello-world-component</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/buffer-a-reactive-edit</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/guides/forms</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/chain-a-refetch</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/guides/hosted-deployment</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/control-cache-invalidation</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/guides/layout</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/copy-billing-to-shipping</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/guides/markup</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/debounce-user-input-for-api-calls</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/guides/modal-dialogs</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/debounce-with-changelistener</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/guides/playground-and-codefence</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/debug-a-component</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/guides/refactoring</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/delay-a-datasource-until-another-datasource-is-ready</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/guides/routing-and-links</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/delegate-a-method</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/guides/scoping</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/do-custom-form-validation</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/guides/scripting</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/expose-a-method-from-a-component</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/guides/user-defined-components</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/filter-and-transform-data-from-an-api</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/guides/working-with-markdown</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/group-items-in-list-by-a-property</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/guides/working-with-text</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/handle-background-operations</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/helper-tags</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/hide-an-element-until-its-datasource-is-ready</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/implement-an-authentication-gate</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/add-custom-icons</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/make-a-set-of-equal-width-cards</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/assign-a-complex-json-literal-to-a-component-variable</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/make-a-table-responsive</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/buffer-a-reactive-edit</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/make-navpanel-width-responsive</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/chain-a-refetch</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/modify-a-value-reported-in-a-column</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/control-cache-invalidation</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/paginate-a-list</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/copy-billing-to-shipping</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/pass-data-to-a-modal-dialog</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/debounce-user-input-for-api-calls</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/react-to-button-click-not-keystrokes</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/debounce-with-changelistener</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/set-the-initial-value-of-a-select-from-fetched-data</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/debug-a-component</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/set-width-for-input-fields-in-a-horizontal-layout</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/delay-a-datasource-until-another-datasource-is-ready</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/share-a-modaldialog-across-components</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/delegate-a-method</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/stop-datasource-from-sending-requests-in-a-closed-dialog</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/do-custom-form-validation</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/sync-selections-between-table-and-list-views</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/expose-a-method-from-a-component</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/toggle-multiple-items-with-shared-state</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/filter-and-transform-data-from-an-api</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/update-ui-optimistically</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/group-items-in-list-by-a-property</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/use-accessors-to-simplify-complex-expressions</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/handle-background-operations</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/use-built-in-form-validation</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/hide-an-element-until-its-datasource-is-ready</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/use-modal-dialog-onclose</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/implement-an-authentication-gate</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/howto/use-the-same-modaldialog-to-add-or-edit</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/make-a-set-of-equal-width-cards</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/icons</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/make-a-table-responsive</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/learn</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/make-navpanel-width-responsive</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/mcp</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/modify-a-value-reported-in-a-column</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/palettes</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/paginate-a-list</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/reactive-intro</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/pass-data-to-a-modal-dialog</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/reference</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/react-to-button-click-not-keystrokes</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/reference/components</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/set-the-initial-value-of-a-select-from-fetched-data</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/reference/extensions</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/set-width-for-input-fields-in-a-horizontal-layout</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/reference/themes</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/share-a-modaldialog-across-components</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/resources</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/stop-datasource-from-sending-requests-in-a-closed-dialog</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/styles-and-themes/common-units</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/sync-selections-between-table-and-list-views</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/styles-and-themes/layout-props</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/toggle-multiple-items-with-shared-state</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/styles-and-themes/theme-variable-defaults</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/update-ui-optimistically</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/styles-and-themes/theme-variables</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/use-accessors-to-simplify-complex-expressions</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/template-properties</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/use-built-in-form-validation</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/themes-intro</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/use-modal-dialog-onclose</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/tutorial</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/howto/use-the-same-modaldialog-to-add-or-edit</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/tutorial-01</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/icons</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/tutorial-02</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/learn</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/tutorial-03</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/mcp</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/tutorial-04</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/pages/app-structure</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/tutorial-05</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/pages/behaviors</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/tutorial-06</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/pages/build-editor-component</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/tutorial-07</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/pages/build-hello-world-component</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/tutorial-08</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/pages/components-intro</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/tutorial-09</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/pages/context-variables</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/tutorial-10</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/pages/context-variables2</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/tutorial-11</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/pages/core-properties</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/tutorial-12</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/pages/forms</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/vscode</loc>
-    <lastmod>2026-02-23</lastmod>
+    <loc>https://docs.xmlui.org/docs/pages/globals</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/glossary</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/guides</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/helper-tags</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/hosted-deployment</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/add-custom-icons</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/assign-a-complex-json-literal-to-a-component-variable</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/buffer-a-reactive-edit</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/chain-a-refetch</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/control-cache-invalidation</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/copy-billing-to-shipping</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/debounce-user-input-for-api-calls</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/debounce-with-changelistener</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/debug-a-component</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/delay-a-datasource-until-another-datasource-is-ready</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/delegate-a-method</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/do-custom-form-validation</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/expose-a-method-from-a-component</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/filter-and-transform-data-from-an-api</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/group-items-in-list-by-a-property</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/handle-background-operations</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/hide-an-element-until-its-datasource-is-ready</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/implement-an-authentication-gate</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/make-a-set-of-equal-width-cards</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/make-a-table-responsive</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/make-navpanel-width-responsive</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/modify-a-value-reported-in-a-column</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/paginate-a-list</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/pass-data-to-a-modal-dialog</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/react-to-button-click-not-keystrokes</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/set-the-initial-value-of-a-select-from-fetched-data</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/set-width-for-input-fields-in-a-horizontal-layout</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/share-a-modaldialog-across-components</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/stop-datasource-from-sending-requests-in-a-closed-dialog</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/sync-selections-between-table-and-list-views</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/toggle-multiple-items-with-shared-state</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/update-ui-optimistically</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/use-accessors-to-simplify-complex-expressions</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/use-built-in-form-validation</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/use-modal-dialog-onclose</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/howto/use-the-same-modaldialog-to-add-or-edit</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/intro</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/layout</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/markup</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/mcp</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/modal-dialogs</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/news-and-reviews</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/playground-and-codefence</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/reactive-intro</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/refactoring</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/reference-extensions</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/routing-and-links</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/scoping</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/scripting</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/styles-and-themes/common-units</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/styles-and-themes/layout-props</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/styles-and-themes/theme-variable-defaults</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/styles-and-themes/theme-variables</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/styles-and-themes/themes</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/template-properties</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/test</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/tutorial-01</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/tutorial-02</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/tutorial-03</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/tutorial-04</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/tutorial-05</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/tutorial-06</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/tutorial-07</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/tutorial-08</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/tutorial-09</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/tutorial-10</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/tutorial-11</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/tutorial-12</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/user-defined-components</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/vscode</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/working-with-markdown</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/working-with-text</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/xmlui-animations/Animation</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/xmlui-animations/FadeAnimation</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/xmlui-animations/FadeInAnimation</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/xmlui-animations/FadeOutAnimation</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/xmlui-animations/ScaleAnimation</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/xmlui-animations/SlideInAnimation</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/xmlui-animations/_overview</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/xmlui-charts/BarChart</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/xmlui-charts/DonutChart</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/xmlui-charts/LabelList</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/xmlui-charts/Legend</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/xmlui-charts/LineChart</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/xmlui-charts/PieChart</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/xmlui-charts/_overview</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/xmlui-pdf/Pdf</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/xmlui-pdf/_overview</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/xmlui-spreadsheet/Spreadsheet</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/pages/xmlui-spreadsheet/_overview</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/palettes</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/reactive-intro</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/reference</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/reference/components</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/reference/extensions</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/reference/extensions/xmlui-animations</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/reference/extensions/xmlui-animations/overview</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/reference/themes</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/resources</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/styles-and-themes/common-units</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/styles-and-themes/layout-props</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/styles-and-themes/theme-variable-defaults</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/styles-and-themes/theme-variables</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/template-properties</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/themes-intro</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/tutorial</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/tutorial-01</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/tutorial-02</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/tutorial-03</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/tutorial-04</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/tutorial-05</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/tutorial-06</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/tutorial-07</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/tutorial-08</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/tutorial-09</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/tutorial-10</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/tutorial-11</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/tutorial-12</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/docs/vscode</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/get-started</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/get-started/get-started</loc>
+    <lastmod>2026-02-25</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.xmlui.org/news</loc>
+    <lastmod>2026-02-25</lastmod>
   </url>
 </urlset>
