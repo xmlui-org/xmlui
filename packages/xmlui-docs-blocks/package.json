@@ -1,6 +1,6 @@
 {
   "name": "xmlui-docs-blocks",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "sideEffects": false,
   "type": "module",
   "scripts": {

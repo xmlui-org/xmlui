@@ -1,5 +1,13 @@
 # xmlui
 
+## 0.12.4
+
+### Patch Changes
+
+- 0aaa878: Add experimental IncludeMarkup component
+- 7cf02a7: Inline styles on components with the bindTo property applied will not style the label. Also fixed NumberBox adornment location when writing mode is right-to-left.
+- 48b7e46: Use the new website project as the target of component document generation
+
 ## 0.12.3
 
 ### Patch Changes
